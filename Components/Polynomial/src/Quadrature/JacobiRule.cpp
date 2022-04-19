@@ -129,7 +129,7 @@ namespace Quadrature {
          auto epsilon = std::numeric_limits<MHDFloat>::epsilon();
          static constexpr std::uint32_t ulp = 4;
          static constexpr std::uint32_t maxIter = 20;
-         for(std::uint32_t k = 0; k < size; ++k)
+         for(int k = 0; k < size; ++k)
          {
             // Asymptotic formula (WKB) - works only for positive x.
             internal::MHDFloat r = MHD_MP(0.0);

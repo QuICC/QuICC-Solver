@@ -3,14 +3,21 @@
 #
 cmake_minimum_required(VERSION 3.16.3)
 
+
+# Add release with assert
+include(cmake.d/AddRelWithAssert.cmake)
 # Set default build type
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build,
 options are: Debug Release RelWithDebInfo MinSizeRel.")
 # Toggle-able build type
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug;Release;RelWithDebInfo;MinSizeRel")
+set_property(CACHE CMAKE_BUILD_TYPE
+  PROPERTY STRINGS "Debug;Release;RelWithDebInfo;RelWithAssert;MinSizeRel")
 
 project(QuICC CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Set CMake module path
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake.d")
 
 include(CheckLanguage)
 check_language(CUDA)
@@ -20,8 +27,6 @@ else()
   message(STATUS "No CUDA support detected")
 endif()
 
-# Set CMake module path
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake.d")
 
 include(MacroOutOfSourceBuild)
 MACRO_ENSURE_OUT_OF_SOURCE_BUILD(

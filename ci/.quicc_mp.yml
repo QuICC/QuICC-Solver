@@ -20,11 +20,11 @@ test-quicc_mp-lib:
   script:
     # the tests are not installed, so we need to run them from the build directory
     - cd /QuICC.src/build
-    - ctest --output-on-failure -R PolynomialQuadratureTests_
-    - ctest --output-on-failure -R PolynomialWorlandTests_
-    - ctest --output-on-failure -R PolynomialALegendreTests_
-    - ctest --output-on-failure -R "TransformWorlandTests_Poly_D1_.*projector"
-    - ctest --output-on-failure -R "TransformWorlandTests_.*_integrator"
-    - ctest --output-on-failure -R "TransformWorlandTests_.*_reductor"
-    - ctest --output-on-failure -R "TransformWorlandTests_.*_bfloop"
-    - ctest --output-on-failure -R FrameworkLoadSplitterTests_
+    - ctest --no-tests=error --output-on-failure -R PolynomialQuadratureTests_
+    - ctest --no-tests=error --output-on-failure -R PolynomialWorlandTests_
+    - ctest --no-tests=error --output-on-failure -R PolynomialALegendreTests_
+    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_Poly_D1_.*projector"
+    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_.*_integrator"
+    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_.*_reductor"
+    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_.*_bfloop"
+    - ctest --no-tests=error --output-on-failure -R FrameworkLoadSplitterTests_

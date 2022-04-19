@@ -5,8 +5,8 @@
     - cd /QuICC.src/build
     - cmake .. -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
     - time make
-    - ctest --output-on-failure -R RunBenchmarkBoussinesqSphereRTC
-    - ctest --output-on-failure -R ValidateBenchmarkBoussinesqSphereRTC
+    - ctest --no-tests=error --output-on-failure -R RunBenchmarkBoussinesqSphereRTC
+    - ctest --no-tests=error --output-on-failure -R ValidateBenchmarkBoussinesqSphereRTC
 
 .BoussinesqShellRTC:
   stage: model-build-and-test
@@ -15,8 +15,8 @@
     - cd /QuICC.src/build
     - cmake .. -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
     - time make
-    - ctest --output-on-failure -R RunBenchmarkBoussinesqShellRTC
-    - ctest --output-on-failure -R ValidateBenchmarkBoussinesqShellRTC
+    - ctest --no-tests=error --output-on-failure -R RunBenchmarkBoussinesqShellRTC
+    - ctest --no-tests=error --output-on-failure -R ValidateBenchmarkBoussinesqShellRTC
 
 .BoussinesqSphereTC:
   stage: model-build-and-test
@@ -43,8 +43,8 @@
     - cd /QuICC.src/build
     - cmake .. -DQUICC_MODEL=BoussinesqSphereDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
     - time make
-    - ctest --output-on-failure -R RunBenchmarkBoussinesqSphereDynamo
-    - ctest --output-on-failure -R ValidateBenchmarkBoussinesqSphereDynamo
+    - ctest --no-tests=error --output-on-failure -R RunBenchmarkBoussinesqSphereDynamo
+    - ctest --no-tests=error --output-on-failure -R ValidateBenchmarkBoussinesqSphereDynamo
 
 .BoussinesqShellDynamo:
   stage: model-build-and-test
@@ -53,6 +53,6 @@
     - cd /QuICC.src/build
     - cmake .. -DQUICC_MODEL=BoussinesqShellDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
     - time make
-    - ctest --output-on-failure -R RunBenchmarkBoussinesqShellDynamo
-    - ctest --output-on-failure -R ValidateBenchmarkBoussinesqShellDynamo
+    - ctest --no-tests=error --output-on-failure -R RunBenchmarkBoussinesqShellDynamo
+    - ctest --no-tests=error --output-on-failure -R ValidateBenchmarkBoussinesqShellDynamo
 
