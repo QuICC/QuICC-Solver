@@ -1,0 +1,32 @@
+/** 
+ * @file WorlandRule.hpp
+ * @brief Typedef to the default Worland quadrature rule
+ */
+
+#ifndef QUICC_POLYNOMIAL_QUADRATURE_WORLANDRULE_HPP
+#define QUICC_POLYNOMIAL_QUADRATURE_WORLANDRULE_HPP
+
+// System includes
+//
+
+// External includes
+//
+
+// Project includes
+//
+#include "QuICC/Polynomial/Quadrature/Worland@QUICC_WORLAND_TYPE@Rule.hpp"
+
+namespace QuICC {
+
+namespace Polynomial {
+
+namespace Quadrature {
+
+   /// Default Worland quadrature rule
+   typedef Worland@QUICC_WORLAND_TYPE@Rule WorlandRule;
+
+}
+}
+}
+
+#endif // QUICC_POLYNOMIAL_QUADRATURE_WORLANDRULE_HPP

@@ -1,0 +1,76 @@
+/** \page mhdPDevTSSolveComp Performance comparison for sparse solvers
+ *
+ * Fortytwo
+ * ======
+ *
+ * v1.0.0
+ * ------
+ *
+ * ![1D laplacian and bilaplacian](ts_laplacian1D_fortytwo.jpg)
+ *
+ * ![2D laplacian and bilaplacian](ts_laplacian2D_fortytwo.jpg)
+ *
+ * ![3D laplacian and bilaplacian](ts_laplacian3D_fortytwo.jpg)
+ *
+ * ![Rayleigh-Benard in a 1D box](ts_rb1dboxvc_fortytwo.jpg)
+ *
+ * ![Rayleigh-Benard in a 2D box](ts_rb2dboxvc_fortytwo.jpg)
+ *
+ * ![Rayleigh-Benard in a 3D box](ts_rb3dboxvc_fortytwo.jpg)
+ *
+ * ![Rayleigh-Benard in an annulus](ts_rbannulusvc_fortytwo.jpg)
+ *
+ * ![Rayleigh-Benard in an cylinder](ts_rbcylindervc_fortytwo.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in a 1D box](ts_rrb1dboxvc_fortytwo.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in a 2D box](ts_rrb2dboxvc_fortytwo.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in a 3D box](ts_rrb3dboxvc_fortytwo.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in an annulus](ts_rrbannulusvc_fortytwo.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in an cylinder](ts_rrbcylindervc_fortytwo.jpg)
+ *
+ * ![F-plane 3DQG](ts_fplane3DQG_fortytwo.jpg)
+ *
+ * ![Beta 3DQG](ts_beta3DQG_fortytwo.jpg)
+ *
+ *
+ * Hooloovoo
+ * ======
+ *
+ * v1.0.0
+ * ------
+ *
+ * ![1D laplacian and bilaplacian](ts_laplacian1D_hooloovoo.jpg)
+ *
+ * ![2D laplacian and bilaplacian](ts_laplacian2D_hooloovoo.jpg)
+ *
+ * ![3D laplacian and bilaplacian](ts_laplacian3D_hooloovoo.jpg)
+ *
+ * ![Rayleigh-Benard in a 1D box](ts_rb1dboxvc_hooloovoo.jpg)
+ *
+ * ![Rayleigh-Benard in a 2D box](ts_rb2dboxvc_hooloovoo.jpg)
+ *
+ * ![Rayleigh-Benard in a 3D box](ts_rb3dboxvc_hooloovoo.jpg)
+ *
+ * ![Rayleigh-Benard in an annulus](ts_rbannulusvc_hooloovoo.jpg)
+ *
+ * ![Rayleigh-Benard in an cylinder](ts_rbcylindervc_hooloovoo.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in a 1D box](ts_rrb1dboxvc_hooloovoo.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in a 2D box](ts_rrb2dboxvc_hooloovoo.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in a 3D box](ts_rrb3dboxvc_hooloovoo.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in an annulus](ts_rrbannulusvc_hooloovoo.jpg)
+ *
+ * ![Rotating Rayleigh-Benard in an cylinder](ts_rrbcylindervc_hooloovoo.jpg)
+ *
+ * ![F-plane 3DQG](ts_fplane3DQG_hooloovoo.jpg)
+ *
+ * ![Beta 3DQG](ts_beta3DQG_hooloovoo.jpg)
+ *
+ */

@@ -1,0 +1,34 @@
+/**
+ * @file registerAll.hpp
+ * @brief Register all known @idID@
+ */
+
+#ifndef QUICC_@IDNS@_REGISTERALL_HPP
+#define QUICC_@IDNS@_REGISTERALL_HPP
+
+// System includes
+//
+
+// External includes
+//
+
+// Project includes
+//
+@idHeader@
+
+namespace QuICC {
+
+namespace @idNS@ {
+
+   void registerAll();
+
+   inline void registerAll()
+   {
+      @idList@
+
+   }
+
+}
+}
+
+#endif // QUICC_@IDNS@_REGISTERALL_HPP

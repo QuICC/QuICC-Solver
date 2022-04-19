@@ -1,0 +1,21 @@
+import quicc.recurrence.sphere_jacobi as j
+
+layout = j.w_layout_cpp
+#j.chooseParameters(j.w_alpha_legendre, j.w_beta_any, layout)
+#j.chooseParameters(j.w_alpha_legendre, j.w_beta_minhalf, layout)
+j.chooseParameters(j.w_alpha_legendre, j.w_beta_zero, layout)
+#j.chooseParameters(j.w_alpha_legendre, j.w_beta_plushalf, layout)
+j.r2()
+j.i1()
+j.i1qm()
+j.i1qp()
+j.i2()
+j.i2lapl()
+j.i2qm()
+j.i2qp()
+j.i4()
+j.i4lapl()
+j.i4lapl2()
+j.i4qm()
+j.i4qp()
+j.i6()

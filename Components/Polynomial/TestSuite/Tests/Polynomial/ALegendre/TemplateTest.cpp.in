@@ -1,0 +1,52 @@
+/**
+ * @file @Operator@Test.cpp
+ * @brief Tests for the ALegendre @Operator@ operator
+ */
+
+
+// Configuration includes
+//
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <string>
+
+// Project includes
+//
+#include "QuICC/TestSuite/Polynomial/ALegendre/TestArgs.hpp"
+#include "QuICC/TestSuite/Polynomial/ALegendre/Tester.hpp"
+#include "QuICC/Polynomial/ALegendre/@Operator@.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Polynomial::ALegendre;
+
+TEST_CASE( "Error for @Operator@ operator", "[@Operator@]" ){
+   // Set default arguments if required
+   if(currentts::args().useDefault)
+   {
+      currentts::args().specN = 128;
+      currentts::args().physN = 256;
+      currentts::args().params = {0,1,2,5,20,128};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   REQUIRE( currentts::args().specN > 0 );
+   REQUIRE( currentts::args().physN > 0 );
+   REQUIRE( currentts::args().params.size() > 0 );
+
+   // Typedef for used operator
+   typedef ::QuICC::Polynomial::ALegendre::@Operator@ Operator;
+   typedef typename currentts::Tester<Operator> Tester;
+
+   Tester tester("@Operator@.dat", currentts::args().dumpData);
+   tester.setUlp(currentts::args().ulp);
+
+   Tester::ParameterType params = {-1};
+
+   for(int m: currentts::args().params)
+   {
+      params.at(0) = m;
+      tester.validate(currentts::args().specN, currentts::args().physN, params, currentts::args().type);
+   }
+}

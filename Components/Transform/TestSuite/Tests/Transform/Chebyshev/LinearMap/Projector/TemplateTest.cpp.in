@@ -1,0 +1,59 @@
+/**
+ * @file @Operator@Test.cpp
+ * @brief Tests for the linear map Chebyshev based @Operator@ projector
+ */
+
+
+// Configuration includes
+//
+
+// System includes
+//
+#include <catch2/catch.hpp>
+
+// Project includes
+//
+#include "QuICC/TestSuite/Transform/Chebyshev/LinearMap/TestArgs.hpp"
+#include "QuICC/TestSuite/Transform/Chebyshev/LinearMap/Tester.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/@Operator@.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Transform::Chebyshev::LinearMap;
+
+TEST_CASE( "Error for @Operator@ projector", "[@Operator@:@type@]" )
+{
+   // Set default arguments if required
+   if(currentts::args().useDefault)
+   {
+      currentts::args().params = {0,1,2};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   // Set type
+   currentts::args().setType("@type@");
+
+   REQUIRE( (currentts::args().type == ::QuICC::TestSuite::Transform::TestType::PROJECTOR && "Test type is projector") );
+   REQUIRE( currentts::args().params.size() > 0 );
+
+   // Typedef for used operator
+   typedef ::QuICC::Transform::Fft::Chebyshev::LinearMap::Projector::@Operator@ Projector;
+   typedef typename currentts::Tester<Projector> Tester;
+
+   Tester tester("@Operator@.dat", currentts::args().dumpData);
+   tester.setUlp(currentts::args().ulp);
+
+   Tester::ParameterType params = {-1};
+
+   if(currentts::args().np > 0)
+   {
+      params.push_back(currentts::args().np);
+      params.push_back(currentts::args().rank);
+   }
+
+   for(auto id: currentts::args().params)
+   {
+      params.at(0) = id;
+      tester.validate(params, currentts::args().type);
+   }
+
+}

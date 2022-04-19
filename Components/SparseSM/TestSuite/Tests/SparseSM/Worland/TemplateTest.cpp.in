@@ -1,0 +1,51 @@
+/**
+ * @file @Operator@Test.cpp
+ * @brief Tests for the Worland @Operator@ SparseSM operator
+ */
+
+
+// Configuration includes
+//
+
+// System includes
+//
+#include <catch2/catch.hpp>
+
+// Project includes
+//
+#include "QuICC/TestSuite/SparseSM/Worland/TestArgs.hpp"
+#include "QuICC/TestSuite/SparseSM/Worland/Tester.hpp"
+#include "QuICC/SparseSM/Worland/@Operator@.hpp"
+
+namespace currentts = ::QuICC::TestSuite::SparseSM::Worland;
+
+TEST_CASE( "Error for @Operator@ operator", "[@Operator@:@type@]" )
+{
+
+   // Set default arguments if required
+   if(currentts::args().useDefault)
+   {
+      currentts::args().params = {0,1,2,3,4,10,11,12,13,14};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   // Set type
+   currentts::args().setType("@type@");
+
+   REQUIRE( currentts::args().params.size() > 0 );
+
+   typedef ::QuICC::SparseSM::Worland::@Operator@ Operator;
+   typedef typename currentts::Tester<Operator> Tester;
+
+   Tester tester("@Operator@.dat", currentts::args().dumpData);
+   tester.setUlp(currentts::args().ulp);
+
+   Tester::ParameterType params = {-1};
+
+   for(auto id: currentts::args().params)
+   {
+      params.at(0) = id;
+      tester.validate(params, currentts::args().type);
+   }
+}

@@ -1,0 +1,103 @@
+/**
+ * @file I@idID@.hpp
+ * @brief Interface for a general @idID@
+ */
+
+#ifndef QUICC_@IDNS@_I@IDID@_HPP
+#define QUICC_@IDNS@_I@IDID@_HPP
+
+// System includes
+//
+#include <string>
+#include <memory>
+
+// External includes
+//
+
+// Project includes
+//
+#include "QuICC/BasicTypes.hpp"
+
+namespace QuICC {
+
+namespace @idNS@ {
+
+   /**
+    * @brief Interface for a general @idID@
+    */
+   class I@idID@
+   {
+      public:
+         /**
+          * @brief Constructor
+          *
+          * @param value Value of the @idID@
+          */
+         I@idID@(const MHDFloat value, const std::string tag, const std::string formatted);
+
+         /**
+          * @brief Destructor
+          */
+         virtual ~I@idID@() = default;
+
+         /**
+          * @brief Value of @idID@
+          */
+         MHDFloat value() const;
+
+         /**
+          * @brief Tag of the @idID@
+          */
+         std::string tag() const;
+
+         /**
+          * @brief Formatted name of the @idID@
+          */
+         std::string formatted() const;
+         
+      protected:
+
+      private:
+         /**
+          * @brief Value of @idID@
+          */
+         const MHDFloat mValue;
+
+         /**
+          * @brief Tag of @idID@
+          */
+         const std::string mTag;
+
+         /**
+          * @brief Formatted name of @idID@
+          */
+         const std::string mFormatted;
+   };
+
+   /// Typedef for shared_pointer @idID@
+   typedef std::shared_ptr<I@idID@> SharedI@idID@;
+
+   inline I@idID@::I@idID@(const MHDFloat value, const std::string tag, const std::string formatted)
+      : mValue(value), mTag(tag), mFormatted(formatted)
+   {
+   }
+
+   inline MHDFloat I@idID@::value() const
+   {
+      return this->mValue;
+   }
+
+   inline std::string I@idID@::tag() const
+   {
+      return this->mTag;
+   }
+
+   inline std::string I@idID@::formatted() const
+   {
+      return this->mFormatted;
+   }
+
+}
+}
+
+#endif // QUICC_@IDNS@_I@IDID@_HPP

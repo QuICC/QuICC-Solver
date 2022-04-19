@@ -1,0 +1,45 @@
+# Data directories
+file(MAKE_DIRECTORY
+    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python/data/geometry/spherical/sphere_worland_chebyshev")
+file(MAKE_DIRECTORY
+    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python/data/geometry/spherical/sphere_worland_legendre")
+file(MAKE_DIRECTORY
+    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python/data/geometry/spherical/sphere_worland_cylenergy")
+file(MAKE_DIRECTORY
+    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python/data/geometry/spherical/sphere_worland_sphenergy")
+
+  # Reference directories
+file(MAKE_DIRECTORY
+    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python/ref/geometry/spherical/sphere_worland_chebyshev")
+file(MAKE_DIRECTORY
+    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python/ref/geometry/spherical/sphere_worland_legendre")
+file(MAKE_DIRECTORY
+    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python/ref/geometry/spherical/sphere_worland_cylenergy")
+file(MAKE_DIRECTORY
+    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python/ref/geometry/spherical/sphere_worland_sphenergy")
+
+# Set component test library name
+set(QUICC_CURRENT_COMPONENT_TEST_LIB ${QUICC_CURRENT_COMPONENT_LIB}_ts)
+
+# Create component Testsuite library
+add_library(${QUICC_CURRENT_COMPONENT_TEST_LIB} "")
+set_target_properties(${QUICC_CURRENT_COMPONENT_TEST_LIB} PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(${QUICC_CURRENT_COMPONENT_TEST_LIB} PUBLIC "include" "Tests")
+target_link_libraries(${QUICC_CURRENT_COMPONENT_TEST_LIB}
+  ${QUICC_CURRENT_COMPONENT_LIB}
+)
+
+# Copy component TestSuite Python files
+add_custom_target(${QUICC_CURRENT_COMPONENT_TEST_LIB}_updatepy)
+add_custom_command(TARGET ${QUICC_CURRENT_COMPONENT_TEST_LIB}_updatepy POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+   "${CMAKE_CURRENT_SOURCE_DIR}/Python"
+   "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python"
+   COMMENT "Copying Python files for PyQuICC TestSuite"
+  VERBATIM
+)
+add_dependencies(${QUICC_CURRENT_COMPONENT_TEST_LIB} ${QUICC_CURRENT_COMPONENT_TEST_LIB}_updatepy)
+
+# Add source and tests directories
+add_subdirectory(src)
+add_subdirectory(Tests)

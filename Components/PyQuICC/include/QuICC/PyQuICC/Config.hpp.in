@@ -1,0 +1,20 @@
+/**
+ * @file Config.hpp
+ * @brief Small configuration for to handle Python interpreter settings
+ */
+
+#ifndef QUICC_PYQUICC_CONFIG_HPP
+#define QUICC_PYQUICC_CONFIG_HPP
+
+// System includes
+//
+
+// External includes
+//
+
+// Project includes
+//
+
+#define QUICC_PYTHON_DIR "@QUICC_PYTHON_DIR@"
+
+#endif // QUICC_PYQUICC_CONFIG_HPP

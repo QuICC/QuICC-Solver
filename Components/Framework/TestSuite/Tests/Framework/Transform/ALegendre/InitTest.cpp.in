@@ -1,0 +1,52 @@
+/**
+ * @file InitTest.cpp
+ * @brief Tests for the ALegendre transform initialization
+ */
+
+
+// Configuration includes
+//
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <string>
+
+// Project includes
+//
+#include "QuICC/TestSuite/Framework/Transform/ALegendre/TestArgs.hpp"
+#include "QuICC/Transform/ALegendreTransform.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Framework::Transform::ALegendre;
+typedef currentts::TestArgs Args;
+
+TEST_CASE( "Initialization", "[Init]" ){
+   // Set default arguments if required
+   if(Args::useDefault)
+   {
+      Args::specN = @specN@;
+      Args::physN = @physN@;
+      Args::harmonicM = {@m@};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   REQUIRE( Args::specN > 0 );
+   REQUIRE( Args::physN > 0 );
+   REQUIRE( Args::harmonicM.size() > 0 );
+
+   // Typedef for used transform
+   typedef ::QuICC::Transform::ALegendreTransform TransformType;
+   TransformType t;
+
+   // Create transform setup object
+   auto spSetup = std::make_shared<TransformType::SetupType>(Args::physN, Args::specN, ::QuICC::GridPurpose::SIMULATION);
+   for(int m: Args::harmonicM)
+   {
+      spSetup->addIndex(m, 1);
+   }
+   spSetup->lock();
+
+   // initialize transform
+   t.init(spSetup);
+}

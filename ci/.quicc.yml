@@ -1,0 +1,64 @@
+build-quicc:
+  tags:
+    - docker_jfrog # this is a gitlab-runner which runs a `docker build` step
+  stage: build
+  script:
+    # we are using a Dockerfile that contains the real build instructions, this script will be ignored by the docker_jfrog runner if DOCKERFILE is set
+    - "true"
+  variables:
+    DOCKERFILE: docker/Dockerfile
+    PERSIST_IMAGE_NAME: quicc:latest # only lowercase letters are allowed!
+
+include:
+  - /ci/.daint_runner.yml
+  - /ci/.quicc_tests.yml
+  - /ci/.quicc_models.yml
+
+test-quicc-lib:
+  extends:
+    - .test-lib
+    - .cpu
+  # TODO: hide the implementation detail for the full URL of the image
+  image: art.cscs.ch/contbuild/testing/anfink/quicc:latest
+
+BoussinesqSphereRTC:
+  extends:
+    - .BoussinesqSphereRTC
+    - .cpu
+  # TODO: hide the implementation detail for the full URL of the image
+  image: art.cscs.ch/contbuild/testing/anfink/quicc:latest
+
+BoussinesqSphereTC:
+  extends:
+    - .BoussinesqSphereTC
+    - .cpu
+  # TODO: hide the implementation detail for the full URL of the image
+  image: art.cscs.ch/contbuild/testing/anfink/quicc:latest
+
+BoussinesqSphereDynamo:
+  extends:
+    - .BoussinesqSphereDynamo
+    - .cpu
+  # TODO: hide the implementation detail for the full URL of the image
+  image: art.cscs.ch/contbuild/testing/anfink/quicc:latest
+
+BoussinesqShellRTC:
+  extends:
+    - .BoussinesqShellRTC
+    - .cpu
+  # TODO: hide the implementation detail for the full URL of the image
+  image: art.cscs.ch/contbuild/testing/anfink/quicc:latest
+
+BoussinesqShellTC:
+  extends:
+    - .BoussinesqShellTC
+    - .cpu
+  # TODO: hide the implementation detail for the full URL of the image
+  image: art.cscs.ch/contbuild/testing/anfink/quicc:latest
+
+BoussinesqShellDynamo:
+  extends:
+    - .BoussinesqShellDynamo
+    - .cpu
+  # TODO: hide the implementation detail for the full URL of the image
+  image: art.cscs.ch/contbuild/testing/anfink/quicc:latest

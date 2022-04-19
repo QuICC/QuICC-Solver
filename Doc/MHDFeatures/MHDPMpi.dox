@@ -1,0 +1,12 @@
+/** \page mhdPMpi MPI
+ *
+ * \section mhdSMpiStd MPI standard
+ *    
+ *    Homepage: <a href="http://www.mpi-forum.org/docs/mpi22-report/mpi22-report.htm">MPI-2</a>, <a href="http://www.mpi-forum.org/docs/mpi-2.2/mpi22-report.pdf">(PDF)</a>
+ *
+ *    Homepage: MPI-3, <a href="http://www.mpi-forum.org/docs/mpi-3.0/mpi30-report.pdf">(PDF)</a>
+ *
+ * \section mhdSMpiOpenMpi Open MPI
+ *    
+ *    Homepage: <a href="http://www.open-mpi.org/">Open MPI</a>
+ */

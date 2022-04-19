@@ -1,0 +1,58 @@
+/**
+ * @file InitTest.cpp
+ * @brief Tests for the SphereWorland transform initialization
+ */
+
+
+// Configuration includes
+//
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <string>
+
+// Project includes
+//
+#include "QuICC/TestSuite/Framework/Transform/SphereWorland/TestArgs.hpp"
+#include "QuICC/Transform/SphereWorlandTransform.hpp"
+
+TEST_CASE( "Initialization", "[Init]" ){
+
+   // TestSuite namespace
+   namespace ns_ts = ::QuICC::TestSuite::Framework;
+   // Test namespace
+   namespace ns_test = ns_ts::Transform::SphereWorland;
+   // Typedef for Test arguments
+   typedef ns_test::TestArgs Args;
+   // Typedef for used transform
+   typedef ::QuICC::Transform::SphereWorlandTransform Transform;
+
+   // Set default arguments if required
+   if(Args::useDefault)
+   {
+      Args::specN = @specN@;
+      Args::physN = @physN@;
+      Args::harmonicL = {@l@};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   REQUIRE( Args::specN > 0 );
+   REQUIRE( Args::physN > 0 );
+   REQUIRE( Args::harmonicL.size() > 0 );
+
+   // Typedef for used transform
+   Transform t;
+
+   // Create transform setup object
+   auto spSetup = std::make_shared<Transform::SetupType>(Args::physN, Args::specN, ::QuICC::GridPurpose::SIMULATION);
+   for(int l: Args::harmonicL)
+   {
+      spSetup->addIndex(l, 1);
+   }
+   spSetup->lock();
+
+   // initialize transform
+   t.init(spSetup);
+}

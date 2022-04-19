@@ -1,0 +1,25 @@
+/**
+ * @file @NonDimensional@Test.cpp
+ * @brief Tests for the @NonDimensional@ nondimensional number
+ */
+
+
+// Configuration includes
+//
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <string>
+
+// Project includes
+//
+#include "QuICC/NonDimensional/@NonDimensional@.hpp"
+
+TEST_CASE( "Check hash for @NonDimensional@ nondimensional number", "[@NonDimensional@]" ){
+
+   namespace ns_nd = ::QuICC::NonDimensional;
+
+   REQUIRE( ns_nd::@NonDimensional@::id() > 0 );
+
+}

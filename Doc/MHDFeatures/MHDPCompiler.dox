@@ -1,0 +1,14 @@
+/** \page mhdPCompiler Compiler
+ *
+ * \section mhdSCompilerGCC GCC compiler
+ *
+ *    Homepage: <a href="http://gcc.gnu.org/">GCC</a> 
+ *
+ * \section mhdSCompilerIntel  Intel compiler
+ *
+ *    Homepage: <a href="http://software.intel.com/sites/products/documentation/doclib/stdxe/2013/composerxe/compiler/cpp-lin/index.htm">Intel C++</a>
+ *
+ * \section mhdSCompilerClang  Clang compiler
+ *
+ *    Homepage: <a href="http://clang.llvm.org/">Clang</a>
+ */

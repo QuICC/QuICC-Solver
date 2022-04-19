@@ -1,0 +1,223 @@
+###################################################
+#--------------------- COMPILER ------------------#
+###################################################
+
+#
+# MPI
+#
+find_package(MPI)
+
+
+#
+# BLAS
+#
+
+# look for BLAS, MKL specifically for the 32 bit version
+set(BLA_VENDOR "Intel10_64lp")
+find_package(BLAS)
+if(BLAS_FOUND)
+  message(VERBOSE "MKL BLAS")
+  set(_BLAS_MKL "True")
+else()
+  message(VERBOSE "Generic BLAS")
+  unset(BLA_VENDOR)
+  find_package(BLAS REQUIRED)
+endif()
+
+# patch for pre 3.18 cmake
+set(_BLAS_TARGET "BLAS::BLAS")
+if(NOT TARGET ${_BLAS_TARGET})
+  add_library(${_BLAS_TARGET} INTERFACE IMPORTED)
+  set_property(TARGET ${_BLAS_TARGET} PROPERTY INTERFACE_LINK_LIBRARIES ${BLAS_LIBRARIES})
+  set_property(TARGET ${_BLAS_TARGET} PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${BLAS_INCLUDE_DIRS})
+  if(_BLAS_MKL)
+    target_compile_definitions(${_BLAS_TARGET} INTERFACE "QUICC_USING_MKL_BLAS")
+  endif()
+endif()
+
+###################################################
+#------------ THREADS PARALLELISATION ------------#
+###################################################
+
+quicc_create_option(NAME QUICC_THREADS
+                    OPTS none pthread openmp
+                    LABEL "Threads paralellization")
+quicc_add_definition(QUICC_THREADS)
+
+
+###################################################
+#------------- FFT PLAN COMPUTATION --------------#
+###################################################
+
+find_package(FFTW)
+quicc_create_option(NAME QUICC_FFTPLAN
+                    OPTS Fast Medium Slow
+                    LABEL "FFT plan")
+quicc_add_definition(QUICC_FFTPLAN)
+
+
+###################################################
+#--------- LINEAR ALGEBRA IMPLEMENTATION ---------#
+###################################################
+
+quicc_create_option(NAME QUICC_LINALG
+                    OPTS Eigen
+                    LABEL "Linear algebra")
+quicc_add_definition(QUICC_LINALG)
+
+###################################################
+#----- SPARSE LINEAR ALGEBRA IMPLEMENTATION ------#
+###################################################
+
+quicc_create_option(NAME QUICC_SPLINALG
+                    OPTS SparseLU MUMPS UmfPack
+                    LABEL "Sparse linear algebra")
+quicc_add_definition(QUICC_SPLINALG)
+
+if(QUICC_SPLINALG STREQUAL "MUMPS")
+  option(QUICC_MPISPSOLVE "Use MPI sparse solver?" OFF)
+  if(QUICC_MPISPSOLVE)
+    add_definitions("-DQUICC_MPISPSOLVE")
+  endif(QUICC_MPISPSOLVE)
+endif(QUICC_SPLINALG STREQUAL "MUMPS")
+
+
+###################################################
+#---- SPARSE SPD LINEAR ALGEBRA IMPLEMENTATION ---#
+###################################################
+
+quicc_create_option(NAME QUICC_SPSPDLINALGS
+                    OPTS SimplicialLDLT SimplicialLLT SparseLU UmfPack MUMPS
+                    LABEL "Sparse SPD linear algebra"
+                    ADVANCED)
+quicc_add_definition(QUICC_SPSPDLINALGS)
+
+###################################################
+#---- SPARSE TRI LINEAR ALGEBRA IMPLEMENTATION ---#
+###################################################
+
+quicc_create_option(NAME QUICC_SPTRILINALG
+                    OPTS SparseLU UmfPack MUMPS
+                    LABEL "Sparse triangular linear algebra"
+                    ADVANCED)
+quicc_add_definition(QUICC_SPTRILINALG)
+
+
+# Look for linear algebra libraries that are in use
+include(MatchAny)
+match_any(NAME "QUICC_" STRING "Eigen")
+if(Eigen_IS_USED)
+  include(BundleEigen)
+endif()
+
+match_any(NAME "QUICC_" STRING "UmfPack")
+if(UmfPack_IS_USED)
+  find_package(UMFPACK REQUIRED)
+endif()
+
+match_any(NAME "QUICC_" STRING "MUMPS")
+if(MUMPS_IS_USED)
+  message(SEND_ERROR "MUMPS not supported yet.")
+endif()
+
+###################################################
+#------------------ LARGE IO FORMAT --------------#
+###################################################
+
+if(MPI_FOUND)
+  set(HDF5_PREFER_PARALLEL "True")
+endif()
+
+find_package(HDF5)
+include(MarkAsAdvancedAll)
+mark_as_advanced_all(HDF5)
+
+if(HDF5_FOUND)
+  #TODO, check parallel vs serial in accordance to MPIALGO
+  set(QUICC_LARGEIO "HDF5")
+  quicc_add_definition(QUICC_LARGEIO)
+  # add modern target if it does not exist (pre CMake 3.19)
+  if(NOT TARGET hdf5::hdf5)
+    add_library(hdf5::hdf5 INTERFACE IMPORTED)
+    set_property(TARGET hdf5::hdf5 PROPERTY INTERFACE_LINK_LIBRARIES ${HDF5_LIBRARIES})
+    set_property(TARGET hdf5::hdf5 PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${HDF5_INCLUDE_DIRS})
+  endif()
+endif()
+
+
+###################################################
+#-------------- HDF5 COMPLEX FORMAT --------------#
+###################################################
+
+quicc_create_option(NAME QUICC_HDF5_CMPLX
+                    OPTS "Array" "Struct"
+                    LABEL "HDF5 complex format"
+                    ADVANCED)
+quicc_add_definition(QUICC_HDF5_CMPLX)
+
+
+###################################################
+#----------------- SH NORMALIZATION --------------#
+###################################################
+
+quicc_create_option(NAME QUICC_SH_NORM
+                    OPTS "Unity" "Schmidt"
+                    LABEL "Spherical harmonics normalization"
+                    ADVANCED)
+quicc_add_definition(QUICC_SH_NORM)
+
+
+###################################################
+#-------------- MULTIPLE PRECISION ---------------#
+###################################################
+
+#
+# Use multiple precision computation for inititialisation?.
+#
+option(QUICC_MULTPRECISION "Enable multiple precision computations?" OFF)
+if(QUICC_MULTPRECISION)
+  find_package(Boost REQUIRED)
+
+  quicc_create_option(NAME QUICC_MPBACKEND
+                    OPTS "boost" "gmp" "mpfr" "quad"
+                    LABEL "Multiple precision backend")
+  quicc_add_definition(QUICC_MPBACKEND)
+
+  if(NOT QUICC_LINALG STREQUAL "Eigen")
+    message(SEND_ERROR "------->>> Can't use multiple precision computations with selected implementation <<<-------")
+  else(NOT QUICC_LINALG STREQUAL "Eigen")
+    add_definitions("-DQUICC_MULTPRECISION")
+    quicc_add_definition(QUICC_MPBACKEND)
+    if(NOT QUICC_MPBACKEND STREQUAL "boost")
+      message(FATAL_ERROR "find gmp/mpfr/quad library needs to be implemented")
+    endif()
+    if(NOT QUICC_MPBACKEND STREQUAL "quad")
+      if(NOT DEFINED QUICC_MULTPRECISION_DIGITS)
+        set(QUICC_MULTPRECISION_DIGITS 50)
+      endif(NOT DEFINED QUICC_MULTPRECISION_DIGITS)
+      set(QUICC_MULTPRECISION_DIGITS ${QUICC_MULTPRECISION_DIGITS} CACHE STRING "Multiple precision digits" FORCE)
+      add_definitions("-DQUICC_MULTPRECISION_DIGITS=${QUICC_MULTPRECISION_DIGITS}")
+    endif(NOT QUICC_MPBACKEND STREQUAL "quad")
+    message(STATUS "Multiple precision computations are enabled")
+  endif(NOT QUICC_LINALG STREQUAL "Eigen")
+
+endif(QUICC_MULTPRECISION)
+
+
+###################################################
+#---------- TRANSFORM TREE OPTIMIZATION ----------#
+###################################################
+
+# Disable by default as it doesn't work for all cases
+option(QUICC_OPTIMIZE_TREE "Optimize transform tree?" ON)
+mark_as_advanced(FORCE QUICC_OPTIMIZE_TREE)
+if(QUICC_OPTIMIZE_TREE)
+  add_definitions("-DQUICC_OPTIMIZE_TREE")
+endif(QUICC_OPTIMIZE_TREE)
+
+
+###################################################
+#------------------ EMBEDDED PYTHON --------------#
+###################################################
+
+find_package(Python REQUIRED COMPONENTS Interpreter Development NumPy)

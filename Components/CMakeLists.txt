@@ -1,0 +1,25 @@
+function(quicc_add_component component)
+
+  string(TOLOWER "quicc_${component}" lib)
+  string(TOUPPER "${component}" COMP)
+  set(QUICC_${COMP}_COMPONENT_LIB "${lib}")
+  set(QUICC_${COMP}_COMPONENT_LIB "${lib}" PARENT_SCOPE)
+
+  message(VERBOSE "${component} component")
+  list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+  add_subdirectory(${component} ${component})
+  list(POP_BACK CMAKE_MESSAGE_INDENT)
+endfunction()
+
+quicc_add_component(Profiling)
+quicc_add_component(Common)
+quicc_add_component(Io)
+quicc_add_component(Polynomial)
+quicc_add_component(PyQuICC)
+quicc_add_component(SparseSM)
+quicc_add_component(Transform)
+quicc_add_component(Framework)
+
+if(QUICC_NEEDS_CUDA)
+  set(QUICC_NEEDS_CUDA ON PARENT_SCOPE)
+endif()

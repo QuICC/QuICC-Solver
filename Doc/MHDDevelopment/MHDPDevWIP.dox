@@ -1,0 +1,10 @@
+/** \page mhdPDevWIP Work in Progress
+ *
+ * ASCII outputs:
+ *    - Energy spectrum for scalar fields
+ *    - Kinetic energy (needs correct StreamVerticalWrapper)
+ *
+ * StreamVerticalWrapper:
+ *    - Gradient ordering for streamfunction is different for F-Plane and Betar-plane. Add options or hard code???
+ *
+ */

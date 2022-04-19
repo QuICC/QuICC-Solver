@@ -1,0 +1,53 @@
+/**
+ * @file ICreator.hpp
+ * @brief @idID@ creator interface
+ */
+
+#ifndef QUICC_@IDNS@_ICREATOR_HPP
+#define QUICC_@IDNS@_ICREATOR_HPP
+
+// System includes
+//
+#include <memory>
+
+// External includes
+//
+
+// Project includes
+//
+#include "QuICC/BasicTypes.hpp"
+#include "QuICC/@idNS@/I@idID@.hpp"
+
+namespace QuICC {
+
+namespace @idNS@ {
+
+   /**
+    * @brief @idID@ creator interface
+    */
+   class ICreator
+   {
+      public:
+         /**
+          * @brief Constructor
+          */
+         ICreator() = default;
+
+         /**
+          * @brief Destructor
+          */
+         virtual ~ICreator() = default;
+
+         /**
+          * @brief Create @idID@ shared pointer
+          */
+         virtual SharedI@idID@ create(@idSIG@) const = 0;
+   };
+
+   /// Typedef for a shared pointer ICreator
+   typedef std::shared_ptr<ICreator> SharedICreator;
+
+}
+}
+
+#endif // QUICC_@IDNS@_ICREATOR_HPP

@@ -1,0 +1,124 @@
+/**
+ * @file ISparseSMOperator.cpp
+ * @brief Source of the implementation of generic interface to the sparse operator
+ */
+
+// System includes
+//
+#include <cassert>
+#include <stdexcept>
+
+// External includes
+//
+
+// Class include
+//
+#include "QuICC/SparseSM/ISparseSMOperator.hpp"
+
+// Project includes
+//
+
+namespace QuICC {
+
+namespace SparseSM {
+
+   ISparseSMOperator::ISparseSMOperator(const int rows, const int cols)
+      : mRows(rows), mCols(cols)
+   {
+   }
+
+   ISparseSMOperator::~ISparseSMOperator()
+   {
+   }
+
+   int ISparseSMOperator::rows() const
+   {
+      return this->mRows;
+   }
+
+   int ISparseSMOperator::cols() const
+   {
+      return this->mCols;
+   }
+
+   SparseMatrix ISparseSMOperator::mat() const
+   {
+      internal::SparseMatrix mat;
+      this->buildOp(mat);
+
+      return mat.cast<MHDFloat>();
+   }
+
+   Matrix ISparseSMOperator::banded(unsigned int& kL, unsigned int &kU) const
+   {
+      internal::Matrix bd;
+      this->buildBanded(bd, kL, kU);
+
+      return bd.cast<MHDFloat>();
+   }
+
+   void ISparseSMOperator::buildOp(internal::SparseMatrix& mat) const
+   {
+      // Build triplets
+      TripletList_t list;
+      this->buildTriplets(list);
+
+      // Build sparse matrix
+      mat.resize(this->rows(), this->cols());
+      mat.setFromTriplets(list.begin(), list.end());
+      mat.makeCompressed();
+   }
+
+   void ISparseSMOperator::buildOp(internal::Matrix& bd) const
+   {
+      unsigned int kL, kU;
+      this->buildBanded(bd, kL, kU);
+      if(kU > 0)
+      {
+         bd.topLeftCorner(1,1)(0,0) = kU;
+      }
+      if(kL > 0)
+      {
+         bd.bottomRightCorner(1,1)(0,0) = kL;
+      }
+   }
+
+   void ISparseSMOperator::buildBanded(internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
+   {
+      throw std::logic_error("Banded operator not yet implemented!");
+   }
+
+   void ISparseSMOperator::convertToTriplets(TripletList_t& list, const int d, const ACoeffI& rowIdx, const ACoeff_t& diag) const
+   {
+      for(int i = 0; i < diag.size(); ++i)
+      {
+         int row = rowIdx(i);
+         int col = rowIdx(i) + d;
+         if(col < 0)
+         {
+            this->leftOutOfMatrix(list, row, col, diag(i));
+         } else if(col >= this->cols())
+         {
+            this->rightOutOfMatrix(list, row, col, diag(i));
+         } else
+         {
+            if(diag(i) != MHD_MP(0.0))
+            {
+               list.push_back(Triplet_t(row, col, diag(i)));
+            }
+         }
+      }
+   }
+
+   void ISparseSMOperator::leftOutOfMatrix(TripletList_t& , const int , const int , const Scalar_t ) const
+   {
+      // Ignore entry
+   }
+
+   void ISparseSMOperator::rightOutOfMatrix(TripletList_t& , const int , const int , const Scalar_t ) const
+   {
+      // Ignore entry
+   }
+
+}
+}

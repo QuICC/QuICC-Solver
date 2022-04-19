@@ -1,0 +1,80 @@
+/** \page mhdPDevTodoList Global ToDo list
+ *
+ * \mhdTodo Need additional "Tranposition layer" to remove dealiasing modes from solver, also required for geometric coupling. Should have a (nearly) NOOP implementation for poylnomial transforms.
+ *
+ * \mhdTodo Test stride FFT for chebyshev complex -> complex (should avoir copy of data and temporary storage)
+ *
+ * \mhdTodo Implement a coupled storage data type (i.e. the storage required for the complex solves to avoid copies/temporary storage)
+ *
+ * \mhdTodo TypeSelectors/VariableSelector depends very loosly on model/scheme???
+ *
+ * \mhdTodo Restructure IoHdf5
+ *
+ * \mhdTodo Restructure LoadSplitters
+ *
+ * \mhdTodo Restructure SpatialSchemes
+ *
+ * \mhdTodo Restructure Resolution
+ *
+ * \mhdTodo Restructure StorageProfiler
+ *
+ * \mhdTodo Restructure TransformCoordinators
+ *
+ * \mhdTodo Restructure Communicators
+ *
+ * \mhdTodo Restructure StorageProviders
+ *
+ * \mhdTodo Implement reduced Boussinesq f-plane model
+ *
+ * \mhdTodo Implement reduced anelastic beta model
+ *
+ * \mhdTodo Implement reduced anelastic f-plane model
+ *
+ * \mhdTodo Implement reduced Boussinesq equatorial model
+ *
+ * \mhdTodo Implement Boussinesq cylindrical solver 
+ *
+ * \mhdTodo Implement Boussinesq spherical solver 
+ *
+ * \mhdTodo Implement anelastic cylindrical solver 
+ *
+ * \mhdTodo Implement anelastic spherical solver 
+ *
+ * \mhdTodo Implement spherical harmonic expansion
+ *
+ * \mhdTodo Implement cylindrical spectral operators
+ *
+ * \mhdTodo Implement spherical spectral operators
+ *
+ * \mhdTodo Implement generalized eigensolver
+ *
+ * \mhdTodo To timing experiments to locate real bottlenecks
+ *
+ * \mhdTodo Improve adaptive timestep factorization update
+ *
+ * \mhdTodo Implement nonlinear terms in flux form
+ *
+ * \mhdTodo Implement experimental full sphere Worland quasi-inverse
+ *
+ * \mhdTodo Implement "double covering" full sphere Chebyshev radial expansion
+ *
+ * \mhdTodo Implement parallel sparse solver to use Tubular parallelisation framework
+ *
+ * \mhdTodo Implement experimental GPU solver
+ *
+ * \mhdTodo Test HDF5 parallel IO: collective vs independent 
+ *
+ * \mhdTodo Implement visualization files for cylindrical volumes
+ *
+ * \mhdTodo Implement visualization files for spherical volumes
+ *
+ * \mhdTodo Implement energy output files
+ *
+ * \mhdTodo Implement statistics computation routines and files
+ *
+ * \mhdTodo Implement reduced Rayleigh-Benard model
+ *
+ * \mhdTodo Implement reduced rotating Rayleigh-Benard model
+ *
+ * \mhdTodo Implement reduced large beta model
+ */

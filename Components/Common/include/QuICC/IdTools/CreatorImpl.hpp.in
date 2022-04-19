@@ -1,0 +1,66 @@
+/**
+ * @file CreatorImpl.hpp
+ * @brief @idID@ creator implementation
+ */
+
+#ifndef QUICC_@IDNS@_CREATORIMPL_HPP
+#define QUICC_@IDNS@_CREATORIMPL_HPP
+
+// System includes
+//
+#include <string>
+#include <memory>
+
+// External includes
+//
+
+// Project includes
+//
+#include "QuICC/@idNS@/ICreator.hpp"
+#include "QuICC/@idNS@/I@idID@.hpp"
+
+namespace QuICC {
+
+namespace @idNS@ {
+
+   /**
+    * @brief @idID@ creator implementation
+    */
+   template <typename TName> class CreatorImpl: public ICreator
+   {
+      public:
+         /**
+          * @brief Constructor
+          */
+         CreatorImpl();
+
+         /**
+          * @brief Destructor
+          */
+         virtual ~CreatorImpl();
+
+         /**
+          * @brief Create @idID@ shared pointer
+          */
+         virtual SharedI@idID@ create(@idSIG@) const;
+   };
+
+   template <typename TName> CreatorImpl<TName>::CreatorImpl()
+   {
+   }
+
+   template <typename TName> CreatorImpl<TName>::~CreatorImpl()
+   {
+   }
+
+   template <typename TName> SharedI@idID@ CreatorImpl<TName>::create(@idSIG@) const
+   {
+      std::shared_ptr<TName> spName = std::make_shared<TName>(@idARG@);
+
+      return spName;
+   }
+
+}
+}
+
+#endif // QUICC_@IDNS@_CREATORIMPL_HPP

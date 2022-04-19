@@ -1,0 +1,2 @@
+Configuration of build {#pManBuildConfig}
+======================

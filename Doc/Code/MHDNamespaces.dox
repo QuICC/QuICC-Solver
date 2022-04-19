@@ -1,0 +1,69 @@
+/** 
+ * @namespace QuICC
+ * @brief This is the main namespace for the whole code.
+ *
+ * Everything should be at least in this namespace
+ *
+ * @namespace QuICC::internal
+ * @brief This namespace provides all the multiple precision computations related code.
+ *
+ * @namespace QuICC::Debug
+ * @brief This namespace provides all the debugging related code.
+ *
+ * @namespace QuICC::Diagnostics
+ * @brief This namespace provides the diagnostics related code.
+ *
+ * @namespace QuICC::Dimensions
+ * @brief This namespace provides all the dimensionality related code.
+ *
+ * @namespace QuICC::Equations
+ * @brief This namespace provides all the equation related code.
+ *
+ * @namespace QuICC::IoAscii
+ * @brief This namespace provides all the ASCII IO related code.
+ *
+ * @namespace QuICC::IoBinary
+ * @brief This namespace provides all the binary ASCII IO related code.
+ *
+ * @namespace QuICC::IoConfig
+ * @brief This namespace provides all the configuration file IO related code.
+ *
+ * @namespace QuICC::IoControl
+ * @brief This namespace provides all the IO control related code.
+ *
+ * @namespace QuICC::IoHdf5
+ * @brief This namespace provides all the HDF5 IO related code.
+ *
+ * @namespace QuICC::IoTools
+ * @brief This namespace provides all the IO tools related code.
+ *
+ * @namespace QuICC::IoVariable
+ * @brief This namespace provides all the high level variable IO related code.
+ *
+ * @namespace QuICC::IoXml
+ * @brief This namespace provides all the XML IO related code.
+ *
+ * @namespace QuICC::Parallel
+ * @brief This namespace provides all the parallelisation related code.
+ *
+ * @namespace QuICC::Physical
+ * @brief This namespace provides all the physical space computation related code.
+ *
+ * @namespace QuICC::Schemes
+ * @brief This namespace provides all the spatial schemes related code.
+ *
+ * @namespace QuICC::Solver
+ * @brief This namespace provides all the linear solver related code.
+ *
+ * @namespace QuICC::Spectral
+ * @brief This namespace provides all the spectral space related code.
+ *
+ * @namespace QuICC::Timestep
+ * @brief This namespace provides all the timestep related code.
+ *
+ * @namespace QuICC::Transform
+ * @brief This namespace provides all the transform related code
+ *
+ * @namespace QuICC::TestSuite
+ * @brief This namespace provides all the TestSuite related code
+ */

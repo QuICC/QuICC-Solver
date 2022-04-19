@@ -1,0 +1,131 @@
+/** \page mhdPPython Python
+ *
+ *    \mhdTable{
+ *       <tr>\mhdStatTest<td>Component implementation is done and tested</td></tr>
+ *       <tr>\mhdStatDone<td>Compoment implementation is mostly done but is not yet fully tested</td></tr>
+ *       <tr>\mhdStatWip<td>Component implementation is underway</td></tr>
+ *       <tr>\mhdStatTodo<td>Component is required but implementation was not yet started</td></tr>
+ *       <tr>\mhdStatNK<td>Not known if component can or will be implemented</td></tr>
+ *       <tr>\mhdStatIdea<td>Only an idea. Component implementation was not yet started and may never start</td></tr>
+ *    }   
+ *
+ *    \section mhdSPyCar Cartesian boxes
+ *
+ *    - \subpage mhdPPyCartesian1D <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatWip}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatWip}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPPyCartesian2D <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatWip}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatWip}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPPyCartesian3D <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatWip}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatWip}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ *
+ *    \section mhdSPyAnn Cylindrical annulus
+ *
+ *    - \subpage mhdPPyAnnRadius <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatTodo}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatTodo}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPPyAnnulus <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatTodo}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatTodo}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ *
+ *    \section mhdSPyCyl Cylinder 
+ *
+ *    - \subpage mhdPPyCylRadius <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatTodo}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatTodo}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPPyCylinder <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatTodo}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatTodo}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ *
+ *    \section mhdSPySph Sphere
+ *
+ *    - \subpage mhdPPySphRadius <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatTodo}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatTodo}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPPySphere <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatTodo}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatTodo}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ *
+ *    \section mhdSPyShe Spherical shell
+ *
+ *    - \subpage mhdPPySheRadius <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatTodo}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatTodo}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPPyShell <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdSimpleHeader
+ *          \mhdSimpleStatus{Quasi-inverse operators, \mhdStatTodo}
+ *          \mhdSimpleStatus{Derivative operators, \mhdStatNK}
+ *          \mhdSimpleStatus{Boundary conditions, \mhdStatTodo}
+ *          \mhdSimpleStatus{Accuracy tests, \mhdStatTodo}
+ *       }
+ */

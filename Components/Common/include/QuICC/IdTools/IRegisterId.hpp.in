@@ -1,0 +1,82 @@
+/**
+ * @file IRegisterId.hpp
+ * @brief Register @idID@
+ */
+
+#ifndef QUICC_@IDNS@_IREGISTERID_HPP
+#define QUICC_@IDNS@_IREGISTERID_HPP
+
+// System includes
+//
+
+// External includes
+//
+
+// Project includes
+//
+#include "QuICC/Hasher.hpp"
+#include "QuICC/@idNS@/I@idID@.hpp"
+#include "QuICC/@idNS@/Coordinator.hpp"
+#include "QuICC/@idNS@/CreatorImpl.hpp"
+
+namespace QuICC {
+
+namespace @idNS@ {
+
+   /**
+    * @brief Register @idID@
+    */
+   template <typename T> class IRegisterId: public I@idID@
+   {
+      public:
+         /**
+          * @brief Constructor
+          */
+         IRegisterId(@idSIG@@idCOMMA@const std::string tag, const std::string formatted);
+
+         /**
+          * @brief Destructor
+          */
+         virtual ~IRegisterId() = default;
+
+         /**
+          * @brief Unique id
+          */
+         static const std::size_t& id();
+      
+      protected:
+
+      private:
+   };
+
+   /**
+    * @brief Register new @idID@
+    */
+   template <typename T> static std::size_t registerId(const std::string tag);
+
+   template <typename T> std::size_t registerId(const std::string s)
+   {
+      std::size_t id = Hasher::makeId(s);
+      std::shared_ptr<CreatorImpl<T> >  spFactory = std::make_shared<CreatorImpl<T> >();
+
+      Coordinator::map().insert(std::make_pair(id,spFactory));
+
+      return id;
+   }
+
+   template <typename T> IRegisterId<T>::IRegisterId(@idSIG@@idCOMMA@const std::string tag, const std::string formatted)
+      : I@idID@(@idARG@@idCOMMA@tag, formatted)
+   {
+   }
+
+   template <typename T> const std::size_t& IRegisterId<T>::id()
+   {
+      static std::size_t *i = new std::size_t();
+      *i = registerId<T>(T::sTag());
+      return *i;
+   }
+
+}
+}
+
+#endif // QUICC_@IDNS@_IREGISTERID_HPP

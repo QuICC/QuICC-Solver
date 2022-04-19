@@ -1,0 +1,64 @@
+/** \page mhdPDevTestSuite Test suite
+ *
+ *    \mhdTable{
+ *       <tr>\mhdStatNA<td>Not applicable</td></tr>
+ *       <tr>\mhdStatNI<td>Component tests are not implemented yet</td></tr>
+ *       <tr>\mhdStatPart<td>Component tests are partially implemented yet</td></tr>
+ *       <tr>\mhdStatFail<td>Component tests are implemented but fail</td></tr>
+ *       <tr>\mhdStatPass<td>Component tests are implemented and pass</td></tr>
+ *    }   
+ *
+ * \section mhdSTSTimers Timers (Needs to be merged from old version)
+ *
+ *    \mhdTable{
+ *       \mhdTableHeader
+ *       \mhdStatus{\ref TimerTest.cpp "Timer",\mhdStatPass,\mhdStatPass}
+ *       \mhdStatus{\ref SerialTimerTest.cpp "Serial timer",\mhdStatPass}
+ *       \mhdStatus{\ref MpiTimerTest.cpp "MPI timer",\mhdStatNA,\mhdStatPass}
+ *       }
+ *
+ * \section mhdSTSTransform Transformss (Needs to be merged from old version)
+ *
+ *    \mhdTable{
+ *       \mhdTableHeader
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "Spatial scheme (generic)",\mhdStatPart,\mhdStatPart}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "TTT Spatial scheme",\mhdStatPart,\mhdStatFail}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "TFT spatial scheme",\mhdStatPass,\mhdStatFail}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "TFF spatial scheme",\mhdStatPart,\mhdStatFail}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "FFF spatial scheme",\mhdStatPart,\mhdStatFail}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "SLF spatial scheme",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "WFT spatial scheme",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref SpatialSchemeTest.cpp "WLF spatial scheme",\mhdStatNI,\mhdStatNI}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (generic)",\mhdStatPass}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (generic)",\mhdStatPass}
+ *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (generic)",\mhdStatPart}
+ *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (generic)",\mhdStatPart}
+ *       \mhdStatus{\ref FftTransformTest.cpp "FFT (FFTW)",\mhdStatPass}
+ *       \mhdStatus{\ref ChebyshevTransformTest.cpp "Cartesian Chebyshev (FFTW)",\mhdStatPass}
+ *       \mhdStatus{\ref CylindricalChebyshevTransformTest.cpp "Cylindrical Chebyshev (FFTW)",\mhdStatPart}
+ *       \mhdStatus{\ref SphericalChebyshevTransformTest.cpp "Spherical Chebyshev (FFTW)",\mhdStatPart}
+ *       \mhdStatus{\ref AssociatedLegendreTransformTest.cpp "Associated Legendre (precompute)",\mhdStatNI}
+ *       \mhdStatus{\ref AssociatedLegendreOnlineTransformTest.cpp "Associated Legendre (online)",\mhdStatNI}
+ *       \mhdStatus{\ref WorlandTransformTest.cpp "Worland transform (precompute)",\mhdStatNI}
+ *       \mhdStatus{\ref WorlandOnlineTransformTest.cpp "Worland transform (online)",\mhdStatNI}
+ *    }
+ *
+ * \section mhdSTSSparseSolver Sparse linear solvers
+ *    
+ *    \mhdTable{
+ *       \mhdTableHeader
+ *       \mhdStatus{\subpage mhdPDevTSUmfPack,\mhdStatPass, \mhdStatNA}
+ *       \mhdStatus{\subpage mhdPDevTSSuperLU,\mhdStatPass, \mhdStatNA}
+ *       \mhdStatus{\subpage mhdPDevTSSparseLU,\mhdStatPass, \mhdStatNA}
+ *       \mhdStatus{\subpage mhdPDevTSMumps,\mhdStatPass, \mhdStatNA}
+ *       \mhdStatus{MKL Pardiso (sparse LU),\mhdStatNI, \mhdStatNA}
+ *       \mhdStatus{Pardiso (sparse LU),\mhdStatPart, \mhdStatNA}
+ *       \mhdStatus{PaStiX (sparse LU),\mhdStatNI, \mhdStatNA}
+ *       \mhdStatus{eigen/SparseQR (sparse QR),\mhdStatPart, \mhdStatNA}
+ *       \mhdStatus{SPQR (sparse QR),\mhdStatFail, \mhdStatNA}
+ *       \mhdStatus{eigen/BiCGSTAB (sparse iterative),\mhdStatFail, \mhdStatNA}
+ *    }
+ *
+ *    \subpage mhdPDevTSSolveComp
+ *
+ */

@@ -1,0 +1,14 @@
+/** \page mhdPTutorial Tutorial
+ *
+ * <center>
+ * | \subpage mhdPTutGet |
+ *   \subpage mhdPTutConfig |
+ *   \subpage mhdPTutCompile |
+ *   \subpage mhdPTutIO |
+ *   \subpage mhdPTutParam |
+ *   \subpage mhdPTutPlatform |
+ *   \subpage mhdPTutLinStab |
+ *   \subpage mhdPTutNewModel |
+ *   \subpage mhdPTutGeometry |
+ * </center>
+ */

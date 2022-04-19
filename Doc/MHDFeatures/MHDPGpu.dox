@@ -1,0 +1,12 @@
+/** \page mhdPGpu GPGPU
+ *
+ * <b>This is highly experimental and does not work in production setting yet.</b>
+ *
+ * \section mhdSGpuVienna ViennaCL
+ *
+ *    Homepage: <a href="http://viennacl.sourceforge.net/">ViennaCL</a>
+ *
+ * \section mhdSGpuPlasma PLASMA
+ *
+ *    Homepage: <a href="http://icl.cs.utk.edu/plasma/index.html">PLASMA</a>
+ */

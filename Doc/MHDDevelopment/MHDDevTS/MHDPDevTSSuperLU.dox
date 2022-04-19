@@ -1,0 +1,20 @@
+/** \page mhdPDevTSSuperLU SuperLU (sparse LU)
+ *
+ * Results on FortyTwo:
+ *    - Intel i7-3930K @ 3.2GHz
+ *    - 16GB of RAM
+ *    - SuperLU v4.3.0
+ *    - GCC v4.7.3: -march=native -O2
+ *    - Eigen v3.2.2
+ *
+ *    \subpage mhdPDevTSSolveComp
+ *
+ * Results on Hooloovoo:
+ *    - AMD Opteron 6212 @ 2.6GHz
+ *    - 128GB of RAM
+ *    - SuperLU v4.3.0
+ *    - GCC v4.7.3: -march=native -O2
+ *    - Eigen v3.2.2
+ *
+ *    \subpage mhdPDevTSSolveComp
+ */

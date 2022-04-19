@@ -1,0 +1,110 @@
+/** \page mhdPEigen Eigen problems
+ *
+ *    - <em>Reduced Boussinesq Rayleigh-Bénard</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - <em>Reduced Boussinesq rotating Rayleigh-Bénard</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - \subpage mhdPEigReducedBoussinesqBPlane <em>(Work in progress)</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - <em>Reduced Boussinesq f-plane</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - <em>Reduced Boussinesq equatorial region</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - <em>Reduced anelastic Rayleigh-Bénard</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - <em>Reduced anelastic rotating Rayleigh-Bénard</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - <em>Reduced anelastic \f$\beta\f$-plane</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - <em>Reduced anelastic f-plane</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - <em>Reduced anelastic equatorial region</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - <em>Boussinesq full cylinder</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - <em>Boussinesq cylindrical annulus</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - <em>Boussinesq full sphere</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - <em>Boussinesq spherical shell</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - <em>Anelastic full cylinder</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - <em>Anelastic cylindrical annulus</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *
+ *    - <em>Anelastic full sphere</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ *          
+ *    - <em>Anelastic spherical shell</em>
+ *
+ *       \mhdTable{
+ *          \mhdStatus{Simulation base, \mhdStatTodo}
+ *       }
+ */

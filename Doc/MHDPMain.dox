@@ -1,0 +1,13 @@
+/** \mainpage Quasi-Inverse Convection Code
+ *
+ * <center>
+ * | \subpage mhdPNonlinear |
+ *   \subpage mhdPPython |
+ *   \subpage mhdPEigen |
+ *   \subpage mhdPFeatures |
+ *   \subpage mhdPDevelopment |
+ *   \subpage mhdPTutorial |
+ *   \subpage mhdPStructure |
+ *   \subpage pManToc |
+ * </center>
+ */

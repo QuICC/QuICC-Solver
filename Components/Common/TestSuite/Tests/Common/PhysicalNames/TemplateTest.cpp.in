@@ -1,0 +1,25 @@
+/**
+ * @file @PhysicalNames@Test.cpp
+ * @brief Tests for the @PhysicalNames@ name
+ */
+
+
+// Configuration includes
+//
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <string>
+
+// Project includes
+//
+#include "QuICC/PhysicalNames/@PhysicalNames@.hpp"
+
+TEST_CASE( "Check hash for @PhysicalNames@ name", "[@PhysicalNames@]" ){
+
+   namespace ns_pn = ::QuICC::PhysicalNames;
+
+   REQUIRE( ns_pn::@PhysicalNames@::id() > 0 );
+
+}

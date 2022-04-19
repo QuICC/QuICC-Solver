@@ -1,0 +1,80 @@
+/**
+ * @file Coordinator.hpp
+ * @brief @idID@ coordinator
+ */
+
+#ifndef QUICC_@IDNS@_COORDINATOR_HPP
+#define QUICC_@IDNS@_COORDINATOR_HPP
+
+// System includes
+//
+#include <string>
+#include <memory>
+#include <map>
+
+// External includes
+//
+
+// Project includes
+//
+#include "QuICC/@idNS@/ICreator.hpp"
+
+namespace QuICC {
+
+namespace @idNS@ {
+
+   /**
+    * @brief @idID@ coordinator
+    */
+   class Coordinator
+   {
+      public:
+         /**
+          * @brief Map indexes to creators
+          */
+         static std::map<std::size_t, SharedICreator>&  map();
+
+         /**
+          * @brief Get tag
+          */
+         static std::string  tag(const std::size_t id);
+
+         /**
+          * @brief Get formatted string
+          */
+         static std::string  formatted(const std::size_t id);
+
+      protected:
+
+      private:
+         /**
+          * @brief Constructor
+          */
+         Coordinator() = default;
+
+         /**
+          * @brief Destructor
+          */
+         virtual ~Coordinator() = default;
+   };
+
+   inline std::map<std::size_t,SharedICreator>& Coordinator::map()
+   {
+      static std::map<std::size_t, SharedICreator> creatorMap;
+      return creatorMap;
+   }
+
+   inline std::string Coordinator::tag(const std::size_t id)
+   {
+      return Coordinator::map().find(id)->second->create(@idNAN@)->tag();
+   }
+
+   inline std::string Coordinator::formatted(const std::size_t id)
+   {
+      return Coordinator::map().find(id)->second->create(@idNAN@)->formatted();
+   }
+
+}
+}
+
+#endif // QUICC_@IDNS@_COORDINATOR_HPP

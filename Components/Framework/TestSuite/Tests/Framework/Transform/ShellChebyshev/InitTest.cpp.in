@@ -1,0 +1,65 @@
+/**
+ * @file InitTest.cpp
+ * @brief Tests for the Shell Chebyshev transform initialization
+ */
+
+
+// Configuration includes
+//
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <string>
+
+// Project includes
+//
+#include "QuICC/TestSuite/Framework/Transform/ShellChebyshev/TestArgs.hpp"
+#include "QuICC/Transform/ShellChebyshevTransform.hpp"
+
+TEST_CASE( "Initialization", "[Init]" ){
+
+   // TestSuite namespace
+   namespace ns_ts = ::QuICC::TestSuite::Framework;
+   // Test namespace
+   namespace ns_test = ns_ts::Transform::ShellChebyshev;
+   // Typedef for Test arguments
+   typedef ns_test::TestArgs Args;
+   // Typedef for used transform
+   typedef ::QuICC::Transform::ShellChebyshevTransform Transform;
+
+   // Set default arguments if required
+   if(Args::useDefault)
+   {
+      Args::specN = @specN@;
+      Args::physN = @physN@;
+      Args::blockSize = {@blockSize@};
+      Args::idPairs = {@idPairs@};
+      Args::lower = {@lower@};
+      Args::upper = {@upper@};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   REQUIRE( Args::specN > 0 );
+   REQUIRE( Args::physN > 0 );
+   REQUIRE( Args::blockSize > 0 );
+   REQUIRE( Args::idPairs.size() > 0 );
+   REQUIRE( Args::lower < Args::upper );
+
+   ::QuICC::MatrixI idBlocks(Args::idPairs.size(),2);
+   for(int i = 0; i<idBlocks.rows(); ++i)
+   {
+      idBlocks(i,0) = Args::idPairs.at(i).first;
+      idBlocks(i,1) = Args::idPairs.at(i).second;
+   }
+
+   Transform t;
+
+   // Create transform setup object
+   auto spSetup = std::make_shared<Transform::SetupType>(Args::physN, Args::blockSize, Args::specN, ::QuICC::GridPurpose::SIMULATION);
+   spSetup->setBounds(Args::lower, Args::upper);
+
+   // initialize transform
+   t.init(spSetup);
+}

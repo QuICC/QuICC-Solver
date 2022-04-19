@@ -1,0 +1,9 @@
+/** \page mhdPDevBoundary Boundary conditions
+ *
+ * The implementation of boundary conditions within the quasi-inverse framework requires care. 
+ *
+ *    - The quasi-inverse factor should be included in the boundary conditions where possible
+ *    - The ordering is important in cases where some fields don't have boundary conditions but still need to free boundary rows in coupled systems.
+ *      The quasi-inverse should be applied to the dimension that has boundary conditions and leave the identity to the "unconstrained dimension.
+ *    - The condition number of the matrix might depend strongly on the way the corners are distributed among the boundary conditions.
+ */

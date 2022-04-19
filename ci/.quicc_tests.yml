@@ -1,0 +1,27 @@
+.test-lib:
+  script:
+    # the tests are not installed, so we need to run them from the build directory
+    - cd /QuICC.src/build
+    - ctest --output-on-failure -R PolynomialQuadratureTests_
+    - ctest --output-on-failure -R JacobiBaseTest
+    - ctest --output-on-failure -R JacobiAsymptoticTest
+    - ctest --output-on-failure -R SparseSMWorlandTests_
+    - ctest --output-on-failure -R "TransformFourierTests_Complex_.*_integrator"
+    - ctest --output-on-failure -R "TransformFourierTests_Complex_.*_projector"
+    - ctest --output-on-failure -R "TransformFourierTests_Mixed_.*_integrator"
+    - ctest --output-on-failure -R "TransformFourierTests_Mixed_.*_projector"
+    - ctest --output-on-failure -R "TransformFourierTests_Mixed_.*_bfloop"
+    - ctest --output-on-failure -R "TransformChebyshevTests_.*_integrator"
+    - ctest --output-on-failure -R "TransformChebyshevTests_.*_projector"
+    - ctest --output-on-failure -R "TransformChebyshevTests_.*_bfloop"
+    - ctest --output-on-failure -R "TransformChebyshevTests_.*_reductor"
+    - ctest --output-on-failure -R "TransformWorlandTests_Fft.*_integrator"
+    - ctest --output-on-failure -R "TransformWorlandTests_Poly_EnergySLAPLR2_reductor"
+    - ctest --output-on-failure -R "TransformWorlandTests_Fft_.*_bfloop"
+    - ctest --output-on-failure -R TrackerTest ProfilerTest
+    - ctest --output-on-failure -R TrackerTest TrackerTest
+    - ctest --output-on-failure -R "TransformALegendreTests_Poly_.*_integrator_ulp"
+    - ctest --output-on-failure -R "TransformALegendreTests_Poly_.*_integrator_id"
+    - ctest --output-on-failure -R "TransformALegendreTests_Poly_.*_projector_ulp"
+    - ctest --output-on-failure -R "TransformALegendreTests_Poly_.*_projector_id"
+    - ctest --output-on-failure -R FrameworkLoadSplitterTests_

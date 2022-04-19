@@ -1,0 +1,85 @@
+/**
+ * @file BenchmarkTempC1.hpp
+ * @brief Temperature benchmark state C1 generator kernel
+ */
+
+#ifndef QUICC_PHYSICAL_KERNEL_SHELL_BENCHMARKTEMPC1_HPP
+#define QUICC_PHYSICAL_KERNEL_SHELL_BENCHMARKTEMPC1_HPP
+
+// First include
+//
+
+// Configuration includes
+//
+#include <memory>
+
+// System includes
+//
+
+// External includes
+//
+
+// Project includes
+//
+#include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
+
+namespace QuICC {
+
+namespace Physical {
+
+namespace Kernel {
+
+namespace Shell {
+
+   /**
+    * @brief Temperature benchmark state C1 generator kernel
+    */
+   class BenchmarkTempC1: public IPhysicalKernel
+   {
+      public:
+         /**
+          * @brief Simple constructor
+          */
+         explicit BenchmarkTempC1();
+
+         /**
+          * @brief Simple empty destructor
+          */
+         virtual ~BenchmarkTempC1();
+
+         /**
+          * @brief Initialize kernel
+          *
+          * @param ri Inner radius
+          * @param ro Outer radius
+          */
+         void init(const MHDFloat ri, const MHDFloat ro);
+
+         /**
+          * @brief Compute the physical kernel
+          *
+          * @param rNLComp Nonlinear term component
+          * @param id      ID of the component (allows for a more general implementation)
+          */
+         virtual void compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const;
+
+      protected:
+
+      private:
+         /**
+          * @brief Inner radius of spherical shell
+          */
+         MHDFloat mRi;
+
+         /**
+          * @brief Outer radius of spherical shell
+          */
+         MHDFloat mRo;
+   };
+
+}
+}
+}
+}
+
+#endif // QUICC_PHYSICAL_KERNEL_SHELL_BENCHMARKTEMPC1_HPP

@@ -1,0 +1,54 @@
+/** \page mhdPStrSimulation Simulation
+ *
+ * RunSimulation:
+ *    - Create simulation through factory: \ref mhdPStrSimModelFactory
+ *    - \ref mhdPStrSimRun
+ *    - finalize()
+ */
+
+/** \page mhdPStrSimRun run()
+ *
+ * run():
+ *    - \ref mhdPStrSimInitSolvers
+ *    - \ref mhdPStrSimPreRun 
+ *    - \ref mhdPStrSimMainRun
+ *    - \ref mhdPStrSimPostRun
+ */
+
+/**\page mhdPStrSimInitSolvers initSolvers()
+ * initSolvers():
+ *    - Initialize trivial solver coordinators
+ *    - Initialize linear solver coordinators
+ */
+
+/**\page mhdPStrSimPreRun preRun()
+ * preRun():
+ *    - Initial IO
+ *    - Initial transform to physical space
+ *    - Diagnostics
+ *    - Initialize timestep coordinators
+ */
+
+/**\page mhdPStrSimMainRun mainRun()
+ * mainRun():
+ *    - Main loop of simulation:
+ *       - Nonlinear computations
+ *       - Solve linear systems
+ *       - IO
+ */
+
+/**\page mhdPStrSimPostRun postRun()
+ * postRun():
+ *    - IO
+ */
+
+
+/** \page mhdPStrSimModelFactory ModelFactory::createSimulation()
+ * createSimulation():
+ *    - Create Simulation
+ *    - Extract field names and nondimensional parameters from Python script
+ *    - Initialize simulation
+ *    - Add equations
+ *    - Add IO files
+ *    - Set initial state
+ */

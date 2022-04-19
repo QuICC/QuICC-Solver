@@ -1,0 +1,9 @@
+# Ignore everything
+/*
+
+# Except this file
+!wip
+!.gitignore
+!CMakeLists.txt
+!cmake.d
+!TestSuite

@@ -1,0 +1,35 @@
+# Vim swap files #
+##################
+*.swp
+
+# YCM
+######
+.cache
+compile_commands.json
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Snapshots #
+#############
+*.png
+
+# Wiki pages #
+##############
+QuICC.wiki/
+
+# CLion debug folder #
+######################
+cmake-build-debug/
+.idea/
+
+# Python bytecode #
+###################
+*.pyc

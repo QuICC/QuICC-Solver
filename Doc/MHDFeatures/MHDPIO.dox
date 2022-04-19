@@ -1,0 +1,26 @@
+/** \page mhdPIo Input/Output
+ *
+ * \section mhdSIoIn Input
+ *
+ * \subsection mhdSIoInState  State file
+ *
+ *    Homepage: <a href="http://www.hdfgroup.org/HDF5/">HDF5</a> 
+ *
+ * \subsection mhdSIoInXml  XML configuration file
+ *
+ *    Homepage: <a href="http://rapidxml.sourceforge.net/">Rapid Xml</a> 
+ *
+ * \section mhdPIoOut Output
+ *
+ * \subsection mhdSIoOutAscii  Ascii data file
+ *
+ * \subsection mhdSIoOutState  State file
+ *
+ *    Homepage: <a href="http://www.hdfgroup.org/HDF5/">HDF5</a> 
+ *
+ * \subsection mhdSIoInVis  Visualization file
+ *
+ *    Homepage: <a href="http://www.hdfgroup.org/HDF5/">HDF5</a> 
+ *    Homepage: <a href="http://www.xdmf.org/">XDMF</a>
+ *    Homepage: <a href="http://www.paraview.org/">ParaView</a>
+ */

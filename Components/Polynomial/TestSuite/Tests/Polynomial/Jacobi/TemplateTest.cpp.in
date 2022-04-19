@@ -1,0 +1,53 @@
+/**
+ * @file @Operator@Test.cpp
+ * @brief Tests for the Jacobi @Operator@ operator
+ */
+
+
+// Configuration includes
+//
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <string>
+
+// Project includes
+//
+#include "QuICC/TestSuite/Polynomial/Jacobi/TestArgs.hpp"
+#include "QuICC/TestSuite/Polynomial/Jacobi/Tester.hpp"
+#include "QuICC/Polynomial/Jacobi/@Operator@.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Polynomial::Jacobi;
+
+TEST_CASE( "Error for @Operator@ operator", "[@Operator@]" ){
+   // Set default arguments if required
+   if(currentts::args().useDefault)
+   {
+      currentts::args().specN = 128;
+      currentts::args().physN = 256;
+      currentts::args().params = {-0.5,-0.5, -0.5,0.5, -0.5,31.5};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   REQUIRE( currentts::args().specN > 0 );
+   REQUIRE( currentts::args().physN > 0 );
+   REQUIRE( (currentts::args().params.size() > 0 && currentts::args().params.size() % 2 == 0) );
+
+   typedef ::QuICC::Polynomial::Jacobi::@Operator@<QuICC::Polynomial::Quadrature::natural_t> Operator;
+   typedef typename currentts::Tester<Operator> Tester;
+
+   Tester tester("@Operator@.dat", currentts::args().dumpData);
+   tester.setUlp(currentts::args().ulp);
+
+   Tester::ParameterType params = {-1, -1};
+
+   // Matrix operator
+   for(std::size_t i = 0; i < currentts::args().params.size(); i += 2)
+   {
+      params.at(0) = currentts::args().params.at(i);
+      params.at(1) = currentts::args().params.at(i+1);
+      tester.validate(currentts::args().specN, currentts::args().physN, params, currentts::args().type);
+   }
+}

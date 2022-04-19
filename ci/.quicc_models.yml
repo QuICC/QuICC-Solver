@@ -1,0 +1,58 @@
+.BoussinesqSphereRTC:
+  stage: model-build-and-test
+  script:
+    # the models are not built in the docker image
+    - cd /QuICC.src/build
+    - cmake .. -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
+    - time make
+    - ctest --output-on-failure -R RunBenchmarkBoussinesqSphereRTC
+    - ctest --output-on-failure -R ValidateBenchmarkBoussinesqSphereRTC
+
+.BoussinesqShellRTC:
+  stage: model-build-and-test
+  script:
+    # the models are not built in the docker image
+    - cd /QuICC.src/build
+    - cmake .. -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
+    - time make
+    - ctest --output-on-failure -R RunBenchmarkBoussinesqShellRTC
+    - ctest --output-on-failure -R ValidateBenchmarkBoussinesqShellRTC
+
+.BoussinesqSphereTC:
+  stage: model-build-and-test
+  script:
+    # the models are not built in the docker image
+    - cd /QuICC.src/build
+    - cmake .. -DQUICC_MODEL=BoussinesqSphereTC -DQUICC_GITHUB_PROTOCOL=https
+    - time make
+    # test...
+
+.BoussinesqShellTC:
+  stage: model-build-and-test
+  script:
+    # the models are not built in the docker image
+    - cd /QuICC.src/build
+    - cmake .. -DQUICC_MODEL=BoussinesqShellTC -DQUICC_GITHUB_PROTOCOL=https
+    - time make
+    # test...
+
+.BoussinesqSphereDynamo:
+  stage: model-build-and-test
+  script:
+    # the models are not built in the docker image
+    - cd /QuICC.src/build
+    - cmake .. -DQUICC_MODEL=BoussinesqSphereDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
+    - time make
+    - ctest --output-on-failure -R RunBenchmarkBoussinesqSphereDynamo
+    - ctest --output-on-failure -R ValidateBenchmarkBoussinesqSphereDynamo
+
+.BoussinesqShellDynamo:
+  stage: model-build-and-test
+  script:
+    # the models are not built in the docker image
+    - cd /QuICC.src/build
+    - cmake .. -DQUICC_MODEL=BoussinesqShellDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
+    - time make
+    - ctest --output-on-failure -R RunBenchmarkBoussinesqShellDynamo
+    - ctest --output-on-failure -R ValidateBenchmarkBoussinesqShellDynamo
+
