@@ -46,7 +46,7 @@ namespace Sphere {
          /**
           * @brief Simple empty destructor
           */
-         virtual ~ScalarHarmonic();
+         ~ScalarHarmonic();
 
          /**
           * @brief Initialize kernel
@@ -61,7 +61,7 @@ namespace Sphere {
           * @param rNLComp Nonlinear term component
           * @param id      ID of the component (allows for a more general implementation)
           */
-         virtual void compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const;
+         void compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const final;
 
       protected:
 

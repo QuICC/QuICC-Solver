@@ -51,7 +51,7 @@ namespace Kernel {
           * \param name Name of the field
           * \param spField Shared pointer to the scalar field
           */
-         virtual void setField(std::size_t name, Framework::Selector::VariantSharedScalarVariable spField);
+         virtual void setField(std::size_t name, Framework::Selector::VariantSharedScalarVariable spField) override;
 
          /**
           * @brief Set the smart pointer to the vector field
@@ -59,7 +59,7 @@ namespace Kernel {
           * \param name Name of the field
           * \param spField Shared pointer to the vector field
           */
-         virtual void setField(std::size_t name, Framework::Selector::VariantSharedVectorVariable spField);
+         virtual void setField(std::size_t name, Framework::Selector::VariantSharedVectorVariable spField) override;
 
          /**
           * @brief Compute the physical kernel
@@ -67,7 +67,7 @@ namespace Kernel {
           * @param rNLComp Nonlinear term component
           * @param id      ID of the component (allows for a more general implementation)
           */
-         virtual void compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const;
+         virtual void compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const override;
          
       protected:
          /**

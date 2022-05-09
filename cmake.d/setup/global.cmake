@@ -53,8 +53,6 @@ find_package(FFTW)
 quicc_create_option(NAME QUICC_FFTPLAN
                     OPTS Fast Medium Slow
                     LABEL "FFT plan")
-quicc_add_definition(QUICC_FFTPLAN)
-
 
 ###################################################
 #--------- LINEAR ALGEBRA IMPLEMENTATION ---------#

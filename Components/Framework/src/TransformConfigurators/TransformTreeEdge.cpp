@@ -20,6 +20,7 @@
 //
 #include "QuICC/Arithmetics/None.hpp"
 #include "QuICC/Arithmetics/Set.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -61,6 +62,7 @@ namespace Transform {
 
    TransformTreeEdge::EdgeType_crange TransformTreeEdge::edgeRange() const
    {
+      Profiler::RegionFixture<4> fix("edgeRange");
       return std::make_pair(this->mEdges.begin(), this->mEdges.end());
    }
 

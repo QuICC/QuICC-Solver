@@ -27,6 +27,7 @@
 #include "QuICC/Simulation/Simulation.hpp"
 #include "QuICC/Model/ModelFactory.hpp"
 #include MODELHEADER
+#include "Profiler/Interface.hpp"
 
 // Check Model and Framework compatiblity
 #include "QuICC/Version/ModelChecker.h"
@@ -36,6 +37,8 @@
  */
 int run()
 {
+   QuICC::Profiler::RegionFixture runFix("run");
+
    int status = 0;
 
    // Create simulation
@@ -76,9 +79,10 @@ int run()
  */
 int main(int argc, char* argv[])
 {
-   // Initilise everything that can't be done inside a class
+   // Initialise everything that can't be done inside a class
    QuICC::QuICCEnv().init();
    QuICC::StageTimer::allowIo(QuICC::QuICCEnv().allowsIO());
+   QuICC::Profiler::Initialize();
 
    // Storage for the return code of run
    int code;
@@ -87,6 +91,7 @@ int main(int argc, char* argv[])
    code = run();
 
    // Finalise everything that can't be done inside a class
+   QuICC::Profiler::Finalize();
    QuICC::QuICCEnv().finalize();
 
    return code;

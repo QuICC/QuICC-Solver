@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <iostream>
 #include <map>
-#ifdef QUICC_USE_MPI
+#ifdef QUICC_MPI
 #include <mpi.h>
 #endif
 #include <tuple>
@@ -28,7 +28,7 @@ public:
     using tracking_t = std::tuple<double, double, double, std::uint32_t, SteadyTimer, MemoryTracker>;
     enum tracking {time, memory, memoryDelta, count, timTracker, memTracker};
 
-#ifdef QUICC_USE_MPI
+#ifdef QUICC_MPI
     static void init(MPI_Comm comm = MPI_COMM_WORLD);
 #else
     static void init();
@@ -44,7 +44,7 @@ private:
     // region name -> tracking tuple
     static std::map<std::string, tracking_t> mRegions;
 
-#ifdef QUICC_USE_MPI
+#ifdef QUICC_MPI
     // MPI communicator
     static MPI_Comm mComm;
 #endif

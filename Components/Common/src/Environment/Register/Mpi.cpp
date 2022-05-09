@@ -38,7 +38,7 @@ namespace Register {
    {
       DebuggerMacro_msg("Running registered MPI library initializer", 1);
 
-      MPI_Init(0, 0);
+      MPI_Init(nullptr, nullptr);
    }
 
    void Mpi::finalizer()

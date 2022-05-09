@@ -2,6 +2,8 @@
  * @file Interface.hpp
  * @brief Source of the implementation of Profiler wrappers
  */
+#ifndef QUICC_PROFILER_INTERFACE_HPP
+#define QUICC_PROFILER_INTERFACE_HPP
 
 #include <string>
 #if defined QUICC_MPI
@@ -9,10 +11,14 @@
 #include <mpi.h>
 #endif
 
-#if defined QUICC_PROFILER_BACKEND_NATIVE
+#if defined QUICC_PROFILE_BACKEND_NATIVE
 #include "Tracker/Tracker.hpp"
-#elif defined QUICC_PROFILER_BACKEND_LIKWID
+#elif defined QUICC_PROFILE_BACKEND_LIKWID
 #include <likwid.h>
+#endif
+
+#if ! defined QUICC_PROFILE_LEVEL
+#define QUICC_PROFILE_LEVEL -1
 #endif
 
 namespace QuICC {
@@ -23,7 +29,20 @@ namespace details {
     inline static void Initialize();
     inline static void Finalize();
     inline static void RegionStart(const std::string& name);
-    inline static void RegionEnd(const std::string& name);
+    inline static void RegionStop(const std::string& name);
+
+    inline static void CheckMpiInit()
+    {
+        #ifdef QUICC_MPI
+        // Check that mpi is initialized
+        int isMpiInit;
+        MPI_Initialized(&isMpiInit);
+        if(!isMpiInit)
+        {
+            throw std::logic_error("Mpi is not initialized");
+        }
+        #endif
+    }
 
     class Barrier {
     public:
@@ -31,7 +50,7 @@ namespace details {
         {
             #ifdef QUICC_MPI
             // Get enviroment variable to add mpi barriers
-            const char* env = std::getenv("QUICC_PROFILER_MPI_BARRIER");
+            const char* env = std::getenv("QUICC_PROFILE_MPI_BARRIER");
             if (env) {
                 auto const regex_a = std::regex("after", std::regex::icase);
                 barrier_after = std::regex_search(env, regex_a);
@@ -57,19 +76,15 @@ namespace details {
             #endif
         }
     private:
-        static bool barrier_before;
-        static bool barrier_after;
+        inline static bool barrier_before = false;
+        inline static bool barrier_after = false;
     };
-
-    // static members init
-    bool Barrier::barrier_before = false;
-    bool Barrier::barrier_after = false;
-
 }
 
 
 inline static void Initialize()
 {
+    details::CheckMpiInit();
     details::Barrier::Initialize();
     details::Initialize();
 }
@@ -90,11 +105,11 @@ inline static void RegionStart(const std::string& name)
 }
 
 template <int L = 0>
-inline static void RegionEnd(const std::string& name)
+inline static void RegionStop(const std::string& name)
 {
     if constexpr (L <= QUICC_PROFILE_LEVEL)
     {
-        details::RegionEnd(name);
+        details::RegionStop(name);
         details::Barrier::After();
     }
 }
@@ -109,10 +124,10 @@ public:
         RegionStart<L>(name);
     }
     ~RegionFixture() {
-        RegionEnd<L>(name);
+        RegionStop<L>(name);
     }
 private:
-    const std::string& name;
+    const std::string name;
 };
 
 //
@@ -121,7 +136,7 @@ private:
 //
 //
 
-#if defined QUICC_PROFILER_BACKEND_TESTER
+#if defined QUICC_PROFILE_BACKEND_TESTER
 
 namespace details {
     inline static void Initialize()
@@ -138,13 +153,13 @@ namespace details {
     {
         std::cout << "start: "+name << std::endl;
     }
-    inline static void RegionEnd(const std::string& name)
+    inline static void RegionStop(const std::string& name)
     {
-        std::cout << "end: "+name << std::endl;
+        std::cout << "stop: "+name << std::endl;
     }
 }
 
-#elif defined QUICC_PROFILER_BACKEND_NATIVE
+#elif defined QUICC_PROFILE_BACKEND_NATIVE
 
 namespace details {
     inline static void Initialize()
@@ -161,13 +176,13 @@ namespace details {
     {
         Tracker::start(name);
     }
-    inline static void RegionEnd(const std::string& name)
+    inline static void RegionStop(const std::string& name)
     {
         Tracker::stop(name);
     }
 }
 
-#elif defined QUICC_PROFILER_BACKEND_LIKWID
+#elif defined QUICC_PROFILE_BACKEND_LIKWID
 
 namespace details {
     inline static void Initialize()
@@ -184,10 +199,19 @@ namespace details {
     {
         likwid_markerStartRegion(name.c_str());
     }
-    inline static void RegionEnd(const std::string& name)
+    inline static void RegionStop(const std::string& name)
     {
         likwid_markerStopRegion(name.c_str());
     }
+}
+
+#else // do nothing
+
+namespace details {
+    inline static void Initialize(){}
+    inline static void Finalize(){}
+    inline static void RegionStart(const std::string& name){}
+    inline static void RegionStop(const std::string& name){}
 }
 
 #endif
@@ -195,3 +219,5 @@ namespace details {
 
 } // namespace Profiler
 } // namespace QuICC
+
+#endif // QUICC_PROFILER_INTERFACE_HPP

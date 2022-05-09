@@ -16,6 +16,7 @@
 // Project includes
 //
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -62,6 +63,8 @@ namespace Integrator {
 
    void IALegendreIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<3> fix("IALegendreIntegrator::applyOperators");
+
       // assert right sizes for input matrix
       assert(in.rows() == this->mspSetup->fwdSize());
       assert(in.cols() == this->mspSetup->blockSize());

@@ -33,6 +33,8 @@ namespace QuICC {
 
    SimulationIoControl::~SimulationIoControl()
    {
+      // Finalize ASCII and HDF5 writers
+      this->finalizeWriters();
    }
 
    void SimulationIoControl::setConfigurationFile(Io::Config::SharedConfigurationReader spCfgFile)
@@ -135,17 +137,6 @@ namespace QuICC {
          this->prepareStats(time,timestep);
          this->mActiveStatsWrite = true;
       }
-   }
-
-   void SimulationIoControl::finalize()
-   {
-      if(this->mspStdOut)
-      {
-         this->mspStdOut->finalize();
-      }
-
-      // Finalize ASCII and HDF5 writers
-      this->finalizeWriters();
    }
 
    void SimulationIoControl::addAsciiOutputFile(Io::Variable::SharedIVariableAsciiWriter spOutFile)
@@ -329,9 +320,6 @@ namespace QuICC {
 
       // Store the shared pointer
       this->mspStdOut = spStd;
-
-      // Initialise the StdOutPipe output
-      this->mspStdOut->init();
    }
 
    const SimulationConfig& SimulationIoControl::config() const

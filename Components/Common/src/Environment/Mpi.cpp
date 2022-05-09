@@ -11,6 +11,11 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <regex>
+extern "C"
+{
+   #include <unistd.h>
+}
 
 // External includes
 //
@@ -43,6 +48,9 @@ namespace Environment {
 
       // Set IO rank
       Mpi::mIoRank = 0;
+
+      // Set gdb hook
+      gdbHook();
    }
 
    void Mpi::setup(const int size)
@@ -105,7 +113,7 @@ namespace Environment {
       // everyone makes it here
       if(Mpi::mId == Mpi::mIoRank)
       {
-         std::cerr << msg << std::endl;
+         std::cerr << "Aborted: " + msg << std::endl;
       }
       // after all this effort let's make sure to print!
       MPI_Barrier(MPI_COMM_WORLD);
@@ -120,5 +128,24 @@ namespace Environment {
 
       IEnvironment::finalize();
    }
-}
-}
+
+   void Mpi::gdbHook()
+   {
+      const char* env = std::getenv("QUICC_GDB_HOOK");
+      if (env) {
+         if(Mpi::mId == Mpi::mIoRank)
+         {
+            using namespace std::chrono_literals;
+            volatile int i = 0;
+            char hostname[HOST_NAME_MAX];
+            gethostname(hostname, HOST_NAME_MAX);
+            std::cerr << "PID " << getpid() << " on " << hostname
+               << " ready to attach" << std::endl;
+            while (0 == i)
+            std::this_thread::sleep_for(1s);
+         }
+      }
+   }
+
+} // namespace Enviroment
+} // namespace QuICC

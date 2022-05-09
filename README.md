@@ -145,7 +145,7 @@ cmake </path/to/QuICC> -DBOOST_ROOT=</path/to/boost>
 
 ### Python
 ```bash
-cmake /path/to/QuICC -DPython_ROOT_DIR=/path/to/python
+cmake </path/to/QuICC> -DPython_ROOT_DIR=</path/to/python>
 ```
 
 ## Known issues
@@ -156,3 +156,20 @@ One could still use MKL for the BLAS back-end and ensure that the FFTW shared ob
 ```bash
 LD_PRELOAD=</path/to/FFTW>/libfftw3.so <executable>
 ```
+
+
+## Debugging
+
+### gdb hook
+By setting the enviroment variable `QUICC_GDB_HOOK` to any value a single process will print its PID and wait
+```bash
+QUICC_GDB_HOOK=y mpirun -n 4 <executable>
+```
+## Profiling
+
+Enabled by selecting the desired back-end and granularity level, for instance
+```bash
+cmake </path/to/QuICC> -DQUICC_PROFILE_BACKEND=native -DQUICC_PROFILE_LEVEL=0
+```
+### barrier
+By setting the enviroment variable `QUICC_PROFILE_MPI_BARRIER` to either `after` and/or `before` a mpi barrier will be set before and/or after each region

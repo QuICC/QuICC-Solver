@@ -19,6 +19,7 @@
 // Project includes
 //
 #include "QuICC/Generator/States/Kernels/Tools/SphericalHarmonic.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -45,6 +46,7 @@ namespace Sphere {
 
    void ScalarHarmonic::compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const
    {
+      Profiler::RegionFixture<2> fix("ScalarHarmonicCompute");
       // Initialize to zero
       rNLComp.rData().setZero();
 

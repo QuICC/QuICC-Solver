@@ -17,7 +17,7 @@ namespace QuICC {
 namespace Profiler {
 
 
-#ifdef QUICC_USE_MPI
+#ifdef QUICC_MPI
 void Tracker::init(MPI_Comm comm)
 {
     mComm = comm;
@@ -75,7 +75,7 @@ Tracker::tracking_t Tracker::get(const std::string& regionName)
     return reg->second;
 }
 
-#ifdef QUICC_USE_MPI
+#ifdef QUICC_MPI
 void Tracker::print(std::ostream& os)
 {
 
@@ -149,7 +149,7 @@ void Tracker::print(std::ostream& os)
 std::map<std::string, Tracker::tracking_t>
     Tracker::mRegions{};
 
-#ifdef QUICC_USE_MPI
+#ifdef QUICC_MPI
 MPI_Comm Tracker::mComm = MPI_COMM_NULL;
 #endif
 

@@ -20,6 +20,7 @@
 //
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
 #include "QuICC/TransformGroupers/IForwardGrouper.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -95,6 +96,8 @@ namespace Transform {
 
    template <typename TConfigurator> inline void ForwardSingle2DGrouper<TConfigurator>::transform(std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalars, std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectors, std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel>& kernels, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<1> fix("transformFwdS2D");
+
       // Setup the first exchange communication step for scalar fields
       this->setupGrouped2DCommunication(coord);
 

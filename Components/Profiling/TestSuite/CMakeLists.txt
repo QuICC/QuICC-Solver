@@ -17,8 +17,8 @@ target_link_libraries(TrackerTest ${QUICC_CURRENT_COMPONENT_LIB}::Interface Catc
 # Tracker library. In order to always test it, we need to add it manually when missing
 if(NOT TARGET ${QUICC_CURRENT_COMPONENT_LIB}::Tracker)
     add_subdirectory(../Tracker ${CMAKE_CURRENT_BINARY_DIR}/Tracker EXCLUDE_FROM_ALL)
-    target_link_libraries(TrackerTest ${QUICC_CURRENT_COMPONENT_LIB}::Tracker)
 endif()
+target_link_libraries(TrackerTest ${QUICC_CURRENT_COMPONENT_LIB}::Tracker)
 
 add_test(
     NAME TrackerTest
@@ -38,5 +38,17 @@ if(TARGET LIKWID::LIKWID)
     WORKING_DIRECTORY
     "${QUICC_WORK_DIR}"
   )
+endif()
 
+# mpi
+if(QUICC_MPI)
+    add_executable(ProfilerTestMpi ProfilerTestsMpi.cpp)
+    target_link_libraries(ProfilerTestMpi ${QUICC_CURRENT_COMPONENT_LIB}::Profiling MPI::MPI_CXX)
+
+    add_test(
+    NAME ProfilerTestMpi
+    COMMAND mpirun -n 4 ProfilerTestMpi
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+  )
 endif()

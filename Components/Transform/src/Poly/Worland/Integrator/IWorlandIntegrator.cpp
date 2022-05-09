@@ -17,6 +17,7 @@
 //
 #include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -62,6 +63,8 @@ namespace Integrator {
 
    void IWorlandIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<3> fix("IWorlandIntegrator::applyOperators");
+
       ProfilerMacro_start(Debug::Profiler::WORLANDINTG);
       ProfilerMacro_start(this->mProfileId);
 

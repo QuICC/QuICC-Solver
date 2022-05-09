@@ -76,6 +76,10 @@ namespace Environment {
       protected:
 
       private:
+         /**
+          * @brief setup gdb hook
+          */
+         void gdbHook();
    };
 
 }

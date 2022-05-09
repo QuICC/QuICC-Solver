@@ -20,6 +20,7 @@
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
 #include "QuICC/Framework/Selector/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/BackwardConfigurator.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -105,6 +106,7 @@ namespace Transform {
 
    template <typename TVariable> void BackwardTubularConfigurator::firstStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<1> fix("BwdFirstStep");
       ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Iterators for the three transforms
@@ -132,6 +134,7 @@ namespace Transform {
 
    template <typename TVariable> void BackwardTubularConfigurator::secondStep(const TransformTree& tree, TVariable&, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<1> fix("BwdSecondStep");
       ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Iterators for the three transforms
@@ -158,6 +161,7 @@ namespace Transform {
 
    template <typename TVariable> void BackwardTubularConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<1> fix("BwdLastStep");
       ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Iterators for the three transforms

@@ -22,6 +22,7 @@
 #include "QuICC/Arithmetics/SetNeg.hpp"
 #include "QuICC/Arithmetics/None.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -101,6 +102,8 @@ namespace Transform {
 
    void BackwardConfigurator::project1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("BwdProject1D");
+
       // Debugger message
       DebuggerMacro_msg("Project 1D", 4);
 
@@ -216,6 +219,8 @@ namespace Transform {
 
    void BackwardConfigurator::project2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("BwdProject2D");
+
       // Debugger message
       DebuggerMacro_msg("Project 2D", 4);
 
@@ -340,6 +345,8 @@ namespace Transform {
 
    void BackwardConfigurator::projectND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("BwdProjectND");
+
       // Debugger message
       DebuggerMacro_msg("Project ND", 4);
 
@@ -433,6 +440,8 @@ namespace Transform {
 
    void BackwardConfigurator::project1ND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("BwdProject1ND");
+
       // Debugger message
       DebuggerMacro_msg("Project 1D", 4);
 

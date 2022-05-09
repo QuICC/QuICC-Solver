@@ -39,6 +39,8 @@
 #include "QuICC/Transform/Backward/D2.hpp"
 #include "QuICC/Transform/Backward/D3.hpp"
 
+#include "Profiler/Interface.hpp"
+
 namespace QuICC {
 
 namespace Transform {
@@ -95,6 +97,7 @@ namespace Transform {
 
    void MixedFourierTransform::backward(Matrix& rOut, const MatrixZ& in, const std::size_t id)
    {
+      Profiler::RegionFixture<3> fix("MixedFourierTransform::backward");
       this->mImpl.transform(rOut, in, id);
    }
 

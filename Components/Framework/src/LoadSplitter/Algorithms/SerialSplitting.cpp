@@ -36,7 +36,7 @@ namespace Parallel {
       bool status = true;
 
       // As long as there is a single CPU it should be applicable
-      status = (status && (this->nCpu() == 1));
+      status = this->nCpu() == 1;
 
       // Check for scheme specific conditions
       status = (status && this->mspScheme->applicable());

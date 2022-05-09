@@ -41,6 +41,7 @@
 #include "QuICC/PseudospectralTag/Diagnostic.hpp"
 #include "QuICC/PseudospectralTag/Prognostic.hpp"
 #include "QuICC/PseudospectralTag/Wrapper.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -183,6 +184,8 @@ namespace Pseudospectral {
 
    void Coordinator::evolve()
    {
+      Profiler::RegionFixture fix("evolve");
+
       bool isIntegrating = true;
       while(isIntegrating)
       {
@@ -230,12 +233,16 @@ namespace Pseudospectral {
 
    void Coordinator::updatePhysical()
    {
+      Profiler::RegionFixture fix("updatePhysical");
+
       // Compute physical values
       this->mspBwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mTransformCoordinator);
    }
 
    void Coordinator::updateSpectral()
    {
+      Profiler::RegionFixture fix("updateSpectral");
+
       this->mspFwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mPhysicalKernels, this->mTransformCoordinator);
    }
 
@@ -466,11 +473,13 @@ namespace Pseudospectral {
 
    void Coordinator::computeNonlinear()
    {
+      Profiler::RegionFixture fix("computeNonlinear");
+
       // Compute backward transform
       this->updatePhysical();
 
       // compute nonlinear interaction and forward transform
-      this->mspFwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mPhysicalKernels, this->mTransformCoordinator);
+      this->updateSpectral();
    }
 
    void Coordinator::explicitTrivialEquations(const std::size_t opId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
@@ -570,6 +579,8 @@ namespace Pseudospectral {
 
    void Coordinator::explicitEquations()
    {
+      Profiler::RegionFixture fix("explicitEquations");
+
       // Explicit trivial equations
       this->explicitTrivialEquations(ModelOperator::ExplicitLinear::id());
 
@@ -625,6 +636,8 @@ namespace Pseudospectral {
 
    void Coordinator::solveEquations()
    {
+      Profiler::RegionFixture fix("solveEquations");
+
       // Solve trivial equations
       this->explicitTrivialEquations(ModelOperator::ExplicitNonlinear::id());
       this->solveTrivialEquations(SolveTiming::Before::id());

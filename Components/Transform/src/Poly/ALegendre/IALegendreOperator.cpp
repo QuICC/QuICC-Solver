@@ -17,6 +17,7 @@
 // Project includes
 //
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -49,15 +50,15 @@ namespace ALegendre {
 
    void IALegendreOperator::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<3> fix("IALegendreOperator::transformZ");
       assert(this->isInitialized());
-
       this->applyOperators(rOut, in);
    }
 
    void IALegendreOperator::transform(Matrix& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<3> fix("IALegendreOperator::transform");
       assert(this->isInitialized());
-
       this->applyOperators(rOut, in);
    }
 

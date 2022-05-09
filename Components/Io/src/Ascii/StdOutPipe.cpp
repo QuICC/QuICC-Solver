@@ -36,22 +36,29 @@ namespace Ascii {
    StdOutPipe::StdOutPipe(std::string name)
       : IAsciiWriter(name + StdOutPipe::BASENAME, StdOutPipe::EXTENSION, StdOutPipe::HEADER, StdOutPipe::TYPE, StdOutPipe::VERSION, IAsciiWriter::EXTEND)
    {
-   }
-
-   StdOutPipe::~StdOutPipe()
-   {
-   }
-
-   void StdOutPipe::init()
-   {
       // Initialise parent
       IAsciiWriter::init();
 
       // Backup std::cout buffer
       this->mpCoutBuffer = std::cout.rdbuf();
 
+      // Save stream settings
+      mCoutState.copyfmt(std::cout);
+
       // Redirect std::cout to this file
       std::cout.rdbuf(this->mFile.rdbuf());
+   }
+
+   StdOutPipe::~StdOutPipe()
+   {
+      // Put std::cout buffer back in place
+      std::cout.rdbuf(this->mpCoutBuffer);
+
+      // Restore settings
+      std::cout.copyfmt(mCoutState);
+
+      // Finalise the parent
+      IAsciiWriter::finalize();
    }
 
    void StdOutPipe::writeContent()
@@ -60,14 +67,6 @@ namespace Ascii {
       // Once this file is initialise any std::cout will be written to this file
    }
 
-   void StdOutPipe::finalize()
-   {
-      // Put std::cout buffer back in place
-      std::cout.rdbuf(this->mpCoutBuffer);
-
-      // Finalise the parent
-      IAsciiWriter::finalize();
-   }
 }
 }
 }

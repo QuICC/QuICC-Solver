@@ -10,9 +10,9 @@
     #undef QUICC_PROFILE_LEVEL
 #endif
 #define QUICC_PROFILE_LEVEL 1
-#if ! defined QUICC_PROFILER_BACKEND_NATIVE
-    #define QUICC_PROFILER_BACKEND_NATIVE
-    #define QUICC_PROFILER_BACKEND_NATIVE_CLEANDEF
+#if ! defined QUICC_PROFILE_BACKEND_NATIVE
+    #define QUICC_PROFILE_BACKEND_NATIVE
+    #define QUICC_PROFILE_BACKEND_NATIVE_CLEANDEF
 #endif
 
 #include "Profiler/Interface.hpp"
@@ -36,7 +36,7 @@ TEST_CASE("Start Stop region with String", "[StartStopString]")
     {
         RegionStart(region);
             std::this_thread::sleep_for(100ms);
-        RegionEnd(region);
+        RegionStop(region);
     }
 
     REQUIRE(std::get<Tracker::tracking::count>(Tracker::get(region)) == count);
@@ -87,7 +87,7 @@ TEST_CASE("Nested Levels: on, on, off", "[Levels]")
     #define QUICC_PROFILE_LEVEL GLOBAL_QUICC_PROFILE_LEVEL
     #undef GLOBAL_QUICC_PROFILE_LEVEL
 #endif
-#if defined QUICC_PROFILER_BACKEND_NATIVE_CLEANDEF
-    #undef QUICC_PROFILER_BACKEND_NATIVE_CLEANDEF
-    #undef QUICC_PROFILER_BACKEND_NATIVE
+#if defined QUICC_PROFILE_BACKEND_NATIVE_CLEANDEF
+    #undef QUICC_PROFILE_BACKEND_NATIVE_CLEANDEF
+    #undef QUICC_PROFILE_BACKEND_NATIVE
 #endif

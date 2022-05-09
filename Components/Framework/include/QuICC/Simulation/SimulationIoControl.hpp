@@ -64,11 +64,6 @@ namespace QuICC {
          void cleanup();
 
          /**
-          * @brief Finalise the IO system
-          */
-         void finalize();
-
-         /**
           * @brief Initialise the writer files
           */
          void initWriters();

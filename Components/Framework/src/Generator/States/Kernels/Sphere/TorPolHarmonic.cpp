@@ -21,6 +21,7 @@
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/SpectralKernels/Typedefs.hpp"
 #include "QuICC/Generator/States/Kernels/Tools/SphericalHarmonic.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -53,6 +54,8 @@ namespace Sphere {
 
    void TorPolHarmonic::compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const
    {
+      Profiler::RegionFixture<2> fix("TorPolHarmonicCompute");
+
       // Initialize to zero
       rNLComp.rData().setZero();
 

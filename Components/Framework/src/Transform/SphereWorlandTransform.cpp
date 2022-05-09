@@ -68,6 +68,8 @@
 #include "QuICC/Transform/Reductor/PowerD1R1.hpp"
 #include "QuICC/Transform/Reductor/PowerSLAPLR2.hpp"
 
+#include "Profiler/Interface.hpp"
+
 namespace QuICC {
 
 namespace Transform {
@@ -136,6 +138,7 @@ namespace Transform {
 
    void SphereWorlandTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
    {
+      Profiler::RegionFixture<3> fix("SphereWorlandTransform::forward");
       this->mImpl.transform(rOut, in, id);
    }
 

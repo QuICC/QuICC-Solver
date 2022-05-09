@@ -21,6 +21,7 @@
 #include "QuICC/Framework/Selector/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 #include "QuICC/TransformConfigurators/ForwardConfigurator.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -138,6 +139,7 @@ namespace Transform {
 
    template <typename TVariable> void ForwardTubularConfigurator::firstStep(const TransformTree& tree, TVariable&, Physical::Kernel::SharedIPhysicalKernel spKernel, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<1> fix("FwdFirstStep");
       ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
 
       // Iterators for the three transforms
@@ -165,6 +167,7 @@ namespace Transform {
 
    template <typename TVariable> void ForwardTubularConfigurator::secondStep(const TransformTree& tree, TVariable&, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<1> fix("FwdSecondStep");
       ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
 
       // Iterators for the three transforms
@@ -191,6 +194,7 @@ namespace Transform {
 
    template <typename TVariable> void ForwardTubularConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<1> fix("FwdLastStep");
       ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
 
       // Iterators for the three transforms

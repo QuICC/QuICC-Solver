@@ -34,6 +34,7 @@
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/RuntimeStatus/GoOn.hpp"
 #include "QuICC/Simulation/SimulationIoTools.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -60,6 +61,8 @@ namespace QuICC {
 
    void Simulation::mainRun()
    {
+      QuICC::Profiler::RegionFixture<1> simFix("Simulation::mainRun");
+
       // Reset the profiler if needed
       ProfilerMacro_printInfo();
       ProfilerMacro_reset();

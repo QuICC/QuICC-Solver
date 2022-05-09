@@ -44,16 +44,6 @@ namespace Ascii {
          */
          virtual ~StdOutPipe();
 
-         /**
-          * @brief Init the file
-          */
-         void init();
-
-         /**
-          * @brief Finalise
-          */
-         void finalize();
-
       protected:
          /**
           * @brief
@@ -90,6 +80,11 @@ namespace Ascii {
           * Backup std::cout buffer
           */
          std::streambuf   *mpCoutBuffer;
+
+         /**
+          * Backup std::cout settings
+          */
+          std::ofstream mCoutState;
    };
 
    /// Typedef for a smart shared pointer of a StdOutPipe

@@ -18,6 +18,7 @@
 // Project includes
 //
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -46,6 +47,8 @@ namespace Integrator {
 
    void IMixedIntegrator::transform(MatrixZ& rOut, const Matrix& in) const
    {
+      Profiler::RegionFixture<2> fix("IMixedIntegrator::transform");
+
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == in.rows());
       assert(rOut.cols() == this->outCols());

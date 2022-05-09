@@ -19,6 +19,7 @@
 //
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
 #include "QuICC/TransformGroupers/IForwardGrouper.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -88,6 +89,7 @@ namespace Transform {
 
    template <typename TConfigurator> inline void ForwardEquationGrouper<TConfigurator>::transform(std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalars, std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectors, std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel>& kernels, TransformCoordinatorType& coord)
    {
+
       //
       // Compute nonlinear interaction
       // ... and forward transform
@@ -102,6 +104,8 @@ namespace Transform {
             // Transform scalar equation variable
             if(it->comp<FieldComponents::Physical::Id>() == FieldComponents::Physical::SCALAR)
             {
+               Profiler::RegionFixture<1> fix("transformFwdScalar");
+
                auto scalIt = scalars.find(it->name());
 
                // Setup the first exchange communication step for scalar fields
@@ -125,6 +129,8 @@ namespace Transform {
                // Transform vector equation
             } else
             {
+               Profiler::RegionFixture<1> fix("transformFwdVector");
+
                auto vectIt = vectors.find(it->name());
 
                // Setup the first exchange communication step for vector fields

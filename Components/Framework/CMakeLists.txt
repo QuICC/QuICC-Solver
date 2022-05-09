@@ -21,6 +21,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   ${QUICC_IO_COMPONENT_LIB}_hdf5
   ${QUICC_IO_COMPONENT_LIB}_xml
   ${QUICC_COMMON_COMPONENT_LIB}
+  Profiling::Profiling
   )
 
 # Add source directory

@@ -1,17 +1,24 @@
 # Create component library
 add_library(${QUICC_CURRENT_COMPONENT_LIB}_Interface INTERFACE)
-target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_Interface INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_Interface
+  INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 # Add MPI dependency
 if(QUICC_MPI)
-  target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}_Interface" INTERFACE MPI::MPI_CXX)
+  target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}_Interface"
+    INTERFACE MPI::MPI_CXX)
 endif(QUICC_MPI)
 
-# Backends
-if(QUICC_PROFILER_BACKEND STREQUAL "native")
-  target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}_Interface" INTERFACE ${QUICC_CURRENT_COMPONENT_LIB}::Tracker)
-elseif(QUICC_PROFILER_BACKEND STREQUAL "likwid")
-  target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}_Interface" INTERFACE LIKWID::LIKWID)
-endif()
+# Granularity level
+target_compile_definitions(${QUICC_CURRENT_COMPONENT_LIB}_Interface
+  INTERFACE QUICC_PROFILE_LEVEL=${QUICC_PROFILE_LEVEL}
+  )
 
-add_library(${QUICC_CURRENT_COMPONENT_LIB}::Interface ALIAS ${QUICC_CURRENT_COMPONENT_LIB}_Interface)
+# Backend
+quicc_target_add_definition(${QUICC_CURRENT_COMPONENT_LIB}_Interface INTERFACE
+  OPTION QUICC_PROFILE_BACKEND)
+
+# Alias
+add_library(${QUICC_CURRENT_COMPONENT_LIB}::Interface
+  ALIAS ${QUICC_CURRENT_COMPONENT_LIB}_Interface)
+

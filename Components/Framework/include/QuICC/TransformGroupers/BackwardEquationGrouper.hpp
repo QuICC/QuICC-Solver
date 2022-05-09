@@ -19,6 +19,7 @@
 // Project includes
 //
 #include "QuICC/TransformGroupers/IBackwardGrouper.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -98,6 +99,8 @@ namespace Transform {
             // Transform scalar variable
             if(it->comp<FieldComponents::Spectral::Id>() == FieldComponents::Spectral::SCALAR)
             {
+               Profiler::RegionFixture<1> fix("transformBwdScalar");
+
                auto scalIt = scalars.find(it->name());
 
                // Setup the first exchange communication step for scalar fields
@@ -121,6 +124,8 @@ namespace Transform {
                // Transform vector variable
             } else
             {
+               Profiler::RegionFixture<1> fix("transformBwdVector");
+
                auto vectIt = vectors.find(it->name());
 
                // Setup the first exchange communication step for vector fields

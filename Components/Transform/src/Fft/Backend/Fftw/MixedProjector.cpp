@@ -18,6 +18,7 @@
 // Project includes
 //
 #include "QuICC/Math/Constants.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -111,6 +112,7 @@ namespace Fftw {
 
    void MixedProjector::applyFft() const
    {
+      Profiler::RegionFixture<4> fix("MixedProjector::applyFft");
       fftw_execute_dft_c2r(this->mPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex *>(this->mpIn)), this->mpOut);
    }
 

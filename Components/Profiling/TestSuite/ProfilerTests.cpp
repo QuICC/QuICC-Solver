@@ -11,7 +11,7 @@
 #endif
 #define QUICC_PROFILE_LEVEL 1
 
-#define QUICC_PROFILER_BACKEND_TESTER
+#define QUICC_PROFILE_BACKEND_TESTER
 #include "Profiler/Interface.hpp"
 
 
@@ -64,14 +64,14 @@ TEST_CASE("Start Stop region with String", "[StartStopString]")
     using namespace QuICC::Profiler;
     std::string region = "Important";
     captureAndCheck(std::bind(RegionStart, region), "start: "+region+'\n');
-    captureAndCheck(std::bind(RegionEnd, region), "end: "+region+'\n');
+    captureAndCheck(std::bind(RegionStop, region), "stop: "+region+'\n');
 }
 
 TEST_CASE("Start Stop region with Literal", "[StartStopLiteral]")
 {
     using namespace QuICC::Profiler;
     captureAndCheck(std::bind(RegionStart, "Important"), std::string("start: ")+"Important"+'\n');
-    captureAndCheck(std::bind(RegionEnd, "Important"), std::string("end: ")+"Important"+'\n');
+    captureAndCheck(std::bind(RegionStop, "Important"), std::string("stop: ")+"Important"+'\n');
 }
 
 TEST_CASE("RAII", "[RAII]")
@@ -79,7 +79,7 @@ TEST_CASE("RAII", "[RAII]")
     std::string name = "RAII";
     captureAndCheck([name](){QuICC::Profiler::RegionFixture aFix(name);},
         "start: "+name+'\n'+
-        "end: "+name+'\n');
+        "stop: "+name+'\n');
 }
 
 TEST_CASE("Nested Levels: on, on, off", "[Levels]")
@@ -95,7 +95,7 @@ TEST_CASE("Nested Levels: on, on, off", "[Levels]")
             }
         }
     },
-    "start: Main\nstart: Nested\nend: Nested\nend: Main\n");
+    "start: Main\nstart: Nested\nstop: Nested\nstop: Main\n");
 }
 
 // cleanup & restore

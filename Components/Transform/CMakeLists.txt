@@ -26,6 +26,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   ${QUICC_COMMON_COMPONENT_LIB}
   ${QUICC_SPARSESM_COMPONENT_LIB}
   ${QUICC_POLYNOMIAL_COMPONENT_LIB}
+  Profiling::Profiling
   BLAS::BLAS # banded/tridiag solve/mul TODO: remove dep
   )
 
@@ -45,7 +46,8 @@ if(FFTW_IS_USED)
   if(NOT FFTW_FOUND)
     message(SEND_ERROR "${QUICC_CURRENT_COMPONENT_LIB} requires FFTW, but it was not found.")
   endif()
-  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC FFTW::FFTW)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE FFTW::FFTW)
+  quicc_target_add_definition(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE OPTION QUICC_FFTPLAN)
 endif()
 # match_any cuFFT
 

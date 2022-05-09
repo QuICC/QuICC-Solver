@@ -22,6 +22,7 @@
 #include "QuICC/Arithmetics/SetNeg.hpp"
 #include "QuICC/Arithmetics/None.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -29,6 +30,7 @@ namespace Transform {
 
    void ForwardConfigurator::nonlinearTerm(const TransformTree& tree, Physical::Kernel::SharedIPhysicalKernel spKernel, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("FwdnonlinearTerm");
       ProfilerMacro_start(Debug::Profiler::NONLINEAR);
 
       // Get physical storage
@@ -46,6 +48,7 @@ namespace Transform {
 
    void ForwardConfigurator::integrateND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("FwdintegrateND");
       // Debugger message
       DebuggerMacro_msg("Integrate ND", 4);
 
@@ -163,6 +166,7 @@ namespace Transform {
 
    void ForwardConfigurator::integrate2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("Fwdintegrate2D");
       // Debugger message
       DebuggerMacro_msg("Integrate 2D", 4);
 
@@ -285,6 +289,7 @@ namespace Transform {
 
    void ForwardConfigurator::integrate1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("Fwdintegrate1D");
       // Debugger message
       DebuggerMacro_msg("Integrate 1D", 4);
 
