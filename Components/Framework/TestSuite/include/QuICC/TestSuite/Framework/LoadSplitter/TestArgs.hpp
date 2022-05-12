@@ -51,6 +51,9 @@ namespace LoadSplitter {
       /// Dimension 1D
       unsigned int dim3D;
 
+      /// MPI stage to look at
+      unsigned int stage;
+
       /// MPI ranks for which to compute splitting
       std::vector<double> params;
 

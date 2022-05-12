@@ -67,6 +67,9 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
       throw std::logic_error("Dimensions are not set properly");
    }
 
+   // Get splitting stage
+   QuICC::Dimensions::Transform::Id stageId = static_cast<QuICC::Dimensions::Transform::Id>(currentts::args().stage);
+
    Catch::StringMaker<double>::precision = 15;
 
    QuICC::QuICCEnv().init();
@@ -80,7 +83,7 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
    dim(2) = currentts::args().dim3D;
 
    // Count all modes
-   std::vector<int> tot(currentts::args().dim2D+1, 0);
+   std::vector<int> tot;
 
    int refMult = -1;
    for(int id: currentts::args().params)
@@ -93,12 +96,31 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
       auto best = splitter.bestSplitting(false);
       auto spRes = best.first;
 
-      if(id == 0)
+      if(tot.size() == 0)
       {
-         refMult = spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA1D)->dim<QuICC::Dimensions::Data::DATF1D>(); 
+         int totModes = -1;
+         switch(stageId)
+         {
+            case QuICC::Dimensions::Transform::TRA1D:
+               refMult = currentts::args().dim3D+1;
+               totModes = currentts::args().dim2D+1;
+               break;
+            case QuICC::Dimensions::Transform::TRA2D:
+               refMult = spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA1D)->dim<QuICC::Dimensions::Data::DATF1D>();
+               totModes = currentts::args().dim3D+1;
+               break;
+            case QuICC::Dimensions::Transform::TRA3D:
+               refMult = spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA2D)->dim<QuICC::Dimensions::Data::DATF1D>();
+               totModes = spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA1D)->dim<QuICC::Dimensions::Data::DATF1D>();
+               break;
+            default:
+               throw std::logic_error("Unkown splitting stage");
+               break;
+         }
+         tot = std::vector<int>(totModes, 0);
       }
 
-      int nModes = spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA2D)->dim<QuICC::Dimensions::Data::DAT3D>();
+      int nModes = spRes->cpu()->dim(stageId)->dim<QuICC::Dimensions::Data::DAT3D>();
 
       std::ofstream metaFile;
       if(currentts::args().dumpData)
@@ -115,14 +137,14 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
          }
 
          metaFile << 2+2*nModes << std::endl;
-         metaFile << spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA2D)->dim<QuICC::Dimensions::Data::DATB1D>() << std::endl;
-         metaFile << spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA2D)->dim<QuICC::Dimensions::Data::DATF1D>() << std::endl;
+         metaFile << spRes->cpu()->dim(stageId)->dim<QuICC::Dimensions::Data::DATB1D>() << std::endl;
+         metaFile << spRes->cpu()->dim(stageId)->dim<QuICC::Dimensions::Data::DATF1D>() << std::endl;
       }
 
       for(int i = 0; i < nModes; i++)
       {
-         int m = spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA2D)->idx<QuICC::Dimensions::Data::DAT3D>(i);
-         int mult = spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA2D)->dim<QuICC::Dimensions::Data::DAT2D>(i);
+         int m = spRes->cpu()->dim(stageId)->idx<QuICC::Dimensions::Data::DAT3D>(i);
+         int mult = spRes->cpu()->dim(stageId)->dim<QuICC::Dimensions::Data::DAT2D>(i);
          // Accumulate modes
          tot.at(m) += mult;
 
@@ -148,7 +170,14 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
       for(auto m = 0; m < tot.size(); m++)
       {
          INFO( "m: " << m );
-         CHECK(tot.at(m) == refMult);
+         // Triangular truncation for l,m pairs
+         if(stageId == QuICC::Dimensions::Transform::TRA1D)
+         {
+            CHECK(tot.at(m) == m+1);
+         } else
+         {
+            CHECK(tot.at(m) == refMult);
+         }
       }
    }
    else

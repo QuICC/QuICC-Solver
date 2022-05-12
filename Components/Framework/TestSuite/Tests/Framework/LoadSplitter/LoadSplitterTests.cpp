@@ -34,6 +34,9 @@ int main( int argc, char* argv[] )
       | Opt( test::args().db, "db" )      // Add test db option
          ["--db"]
          ("ID of database file")
+      | Opt( test::args().stage, "stage" )      // Add test stage option
+         ["--stage"]
+         ("ID of MPI stage")
       | Opt( test::args().dim1D, "dim1D" )      // Add test dim1D option
          ["--dim1d"]
          ("Test dim1D")

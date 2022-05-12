@@ -22,7 +22,7 @@ namespace Framework {
 namespace LoadSplitter {
 
    TestArgs::TestArgs()
-      : useDefault(true), dumpData(false), op("P"), db(0), np(0), dim1D(0), dim2D(0), dim3D(0)
+      : useDefault(true), dumpData(false), op("P"), db(0), np(0), dim1D(0), dim2D(0), dim3D(0), stage(1)
    {
    }
 
