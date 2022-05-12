@@ -16,6 +16,12 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+if(QUICC_MULTPRECISION)
+  set(_ulp 110)
+else()
+  set(_ulp 60)
+endif()
+
 set(_tests
   D1:projector
   )
@@ -23,7 +29,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    ULP 60
+    ULP ${_ulp}
   )
 endforeach()
 
@@ -38,6 +44,12 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+if(QUICC_MULTPRECISION)
+  set(_ulp 900)
+else()
+  set(_ulp 250)
+endif()
+
 set(_tests
   D1Y1:projector
   DivY1D1Y1:projector
@@ -46,9 +58,15 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    ULP 250
+    ULP ${_ulp}
   )
 endforeach()
+
+if(QUICC_MULTPRECISION)
+  set(_ulp 600)
+else()
+  set(_ulp 400)
+endif()
 
 set(_tests
   D3:projector
@@ -59,6 +77,6 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    ULP 400
+    ULP ${_ulp}
   )
 endforeach()

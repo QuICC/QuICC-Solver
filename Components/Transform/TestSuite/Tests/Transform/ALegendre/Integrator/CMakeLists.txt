@@ -53,10 +53,17 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    IDS 104 105 106 107 108
-    ULP 100
+    IDS  204 205 206 207  208
+    ULPS 30  120 370 1300 7200
   )
 endforeach()
+
+# The following datasets need to be generated
+# if(QUICC_MULTPRECISION)
+  set(_disabled True)
+# else()
+#   set(_disabled False)
+# endif()
 
 # Special integrator tests
 set(_tests
@@ -66,20 +73,8 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    IDS 109
-    ULP 15000
-  )
-endforeach()
-
-# Special integrator tests
-set(_tests
-  Poly::P:integrator
-  )
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
-    IDS 110
-    ULP 80000
+    IDS  209    210
+    ULPS 15000  80000
+    DISABLED ${_disabled}
   )
 endforeach()

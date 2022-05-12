@@ -1,0 +1,79 @@
+# This file is generated, do not modify!
+build-quicc_serial:
+  tags:
+  - docker_jfrog
+  stage: build
+  script:
+  - 'true'
+  variables:
+    DOCKERFILE: docker/Dockerfile_serial
+    PERSIST_IMAGE_NAME: quicc_serial:latest
+include:
+- /ci/.daint_runner.yml
+- /ci/.quicc_tests.yml
+- /ci/.quicc_models.yml
+test-quicc-lib_serial:
+  extends:
+  - .test-lib
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_serial:latest
+BoussinesqSphereDynamo_serial:
+  extends:
+  - .BoussinesqSphereDynamo
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_serial:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    QUICC_VERSION_TAG: serial
+BoussinesqShellDynamo_serial:
+  extends:
+  - .BoussinesqShellDynamo
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_serial:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    QUICC_VERSION_TAG: serial
+BoussinesqSphereRTC_serial:
+  extends:
+  - .BoussinesqSphereRTC
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_serial:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    QUICC_VERSION_TAG: serial
+BoussinesqShellRTC_serial:
+  extends:
+  - .BoussinesqShellRTC
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_serial:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    QUICC_VERSION_TAG: serial
+BoussinesqSphereTC_serial:
+  extends:
+  - .BoussinesqSphereTC
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_serial:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    QUICC_VERSION_TAG: serial
+BoussinesqShellTC_serial:
+  extends:
+  - .BoussinesqShellTC
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_serial:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    QUICC_VERSION_TAG: serial

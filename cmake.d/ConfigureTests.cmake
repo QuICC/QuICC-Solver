@@ -9,11 +9,19 @@
 #     variable for file configuration
 # TYPES
 #     list of optional types for test executables (see COMMAND)
+# IDS
+#     list of id option
+# ULP
+#     set single ulp option
+# ULPS
+#     list of ulps, should match IDS size
+# DISABLED
+#     if set to true, set test as disabled
 #
 function(quicc_add_test target)
   # parse inputs
-  set(oneValueArgs COMMAND KEYWORD ULP)
-  set(multiValueArgs TYPES IDS)
+  set(oneValueArgs COMMAND KEYWORD ULP DISABLED)
+  set(multiValueArgs TYPES IDS ULPS)
   cmake_parse_arguments(QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_test")
@@ -24,6 +32,8 @@ function(quicc_add_test target)
   string(REGEX REPLACE "Test" "" ${QAT_KEYWORD} ${target})
   message(DEBUG "QAT_KEYWORD: ${QAT_KEYWORD} : ${${QAT_KEYWORD}}")
   message(DEBUG "QAT_ULP: ${QAT_ULP}")
+  message(DEBUG "QAT_ULPS: ${QAT_ULPS}")
+  message(DEBUG "QAT_DISABLED: ${QAT_DISABLED}")
 
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${target}.cpp")
     message(VERBOSE "Adding ${target}")
@@ -91,6 +101,9 @@ function(quicc_add_test target)
       WORKING_DIRECTORY
       "${QUICC_WORK_DIR}"
     )
+    if(QAT_DISABLED)
+      set_tests_properties(${_testname} PROPERTIES DISABLED ${QAT_DISABLED})
+    endif()
   elseif(${_ids_len} LESS 1)
     foreach(_type ${QAT_TYPES})
       set(_testname "${QAT_COMMAND}_${_keyword}_type${_type}${_ulp_name}" )
@@ -101,9 +114,24 @@ function(quicc_add_test target)
       WORKING_DIRECTORY
       "${QUICC_WORK_DIR}"
       )
+      if(QAT_DISABLED)
+        set_tests_properties(${_testname} PROPERTIES DISABLED ${QAT_DISABLED})
+      endif()
     endforeach()
   elseif(${_types_len} LESS 1)
+    list(LENGTH QAT_ULPS _ulps_len)
     foreach(_id ${QAT_IDS})
+      # check for custom ulp
+      if(_ulps_len GREATER 1)
+        if(NOT _ulps_len EQUAL _ids_len)
+          message(SEND_ERROR "ULPS and IDS must have the same")
+        endif()
+        # get current index
+        list(FIND QAT_IDS ${_id} _index)
+        list(GET QAT_ULPS ${_index} _ulp)
+        set(_ulp_cmd "--ulp ${_ulp}")
+        set(_ulp_name "_ulp${_ulp}")
+      endif()
       set(_testname "${QAT_COMMAND}_${_keyword}_id${_id}${_ulp_name}" )
       message(DEBUG "_testname: ${_testname}")
       add_test(
@@ -112,6 +140,9 @@ function(quicc_add_test target)
       WORKING_DIRECTORY
       "${QUICC_WORK_DIR}"
       )
+      if(QAT_DISABLED)
+        set_tests_properties(${_testname} PROPERTIES DISABLED ${QAT_DISABLED})
+      endif()
     endforeach()
   endif()
 

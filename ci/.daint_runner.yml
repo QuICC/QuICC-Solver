@@ -7,6 +7,7 @@
     SLURM_CONSTRAINT: 'mc'
     SLURM_NNODES: 1
     SLURM_NTASKS_PER_NODE: 1
+    SLURM_TIMELIMIT: '20:00'
 
 .gpu:
   extends: .daint
@@ -17,3 +18,4 @@
     SLURM_CONSTRAINT: 'gpu'
     SLURM_NNODES: 1
     SLURM_NTASKS_PER_NODE: 1
+    SLURM_TIMELIMIT: '20:00'

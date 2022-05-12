@@ -2,6 +2,9 @@
 #--------------------- COMPILER ------------------#
 ###################################################
 
+message(STATUS "Global setup")
+list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+
 #
 # MPI
 #
@@ -219,3 +222,5 @@ endif(QUICC_OPTIMIZE_TREE)
 ###################################################
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development NumPy)
+
+list(POP_BACK CMAKE_MESSAGE_INDENT)

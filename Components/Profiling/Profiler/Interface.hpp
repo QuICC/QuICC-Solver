@@ -31,18 +31,34 @@ namespace details {
     inline static void RegionStart(const std::string& name);
     inline static void RegionStop(const std::string& name);
 
-    inline static void CheckMpiInit()
-    {
-        #ifdef QUICC_MPI
-        // Check that mpi is initialized
-        int isMpiInit;
-        MPI_Initialized(&isMpiInit);
-        if(!isMpiInit)
+    class CheckMpi {
+    public:
+        static void Init()
         {
-            throw std::logic_error("Mpi is not initialized");
+            #ifdef QUICC_MPI
+            // Check that mpi is initialized
+            int isMpiInit;
+            MPI_Initialized(&isMpiInit);
+            if(!isMpiInit)
+            {
+                MPI_Init(nullptr, nullptr);
+                amItheOwner = true;
+            }
+            #endif
         }
-        #endif
-    }
+
+        static void Finalize()
+        {
+            #ifdef QUICC_MPI
+            if(amItheOwner)
+            {
+                MPI_Finalize();
+            }
+            #endif
+        }
+    private:
+        inline static bool amItheOwner = false;
+    };
 
     class Barrier {
     public:
@@ -84,7 +100,7 @@ namespace details {
 
 inline static void Initialize()
 {
-    details::CheckMpiInit();
+    details::CheckMpi::Init();
     details::Barrier::Initialize();
     details::Initialize();
 }
@@ -92,6 +108,7 @@ inline static void Initialize()
 inline static void Finalize()
 {
     details::Finalize();
+    details::CheckMpi::Finalize();
 }
 
 template <int L = 0>

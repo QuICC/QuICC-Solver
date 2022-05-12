@@ -1,0 +1,79 @@
+# This file is generated, do not modify!
+build-quicc_mpi:
+  tags:
+  - docker_jfrog
+  stage: build
+  script:
+  - 'true'
+  variables:
+    DOCKERFILE: docker/Dockerfile_mpi
+    PERSIST_IMAGE_NAME: quicc_mpi:latest
+include:
+- /ci/.daint_runner.yml
+- /ci/.quicc_tests.yml
+- /ci/.quicc_models.yml
+test-quicc-lib_mpi:
+  extends:
+  - .test-lib
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+BoussinesqSphereDynamo_mpi:
+  extends:
+  - .BoussinesqSphereDynamo
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellDynamo_mpi:
+  extends:
+  - .BoussinesqShellDynamo
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTC_mpi:
+  extends:
+  - .BoussinesqSphereRTC
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellRTC_mpi:
+  extends:
+  - .BoussinesqShellRTC
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereTC_mpi:
+  extends:
+  - .BoussinesqSphereTC
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellTC_mpi:
+  extends:
+  - .BoussinesqShellTC
+  - .cpu
+  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    QUICC_VERSION_TAG: mpi

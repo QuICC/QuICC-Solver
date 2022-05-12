@@ -1,58 +1,81 @@
-.BoussinesqSphereRTC:
-  stage: model-build-and-test
-  script:
-    # the models are not built in the docker image
-    - cd /QuICC.src/build
-    - cmake .. -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
-    - time make
-    - ctest --no-tests=error --output-on-failure -R RunBenchmarkBoussinesqSphereRTC
-    - ctest --no-tests=error --output-on-failure -R ValidateBenchmarkBoussinesqSphereRTC
-
-.BoussinesqShellRTC:
-  stage: model-build-and-test
-  script:
-    # the models are not built in the docker image
-    - cd /QuICC.src/build
-    - cmake .. -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
-    - time make
-    - ctest --no-tests=error --output-on-failure -R RunBenchmarkBoussinesqShellRTC
-    - ctest --no-tests=error --output-on-failure -R ValidateBenchmarkBoussinesqShellRTC
-
-.BoussinesqSphereTC:
-  stage: model-build-and-test
-  script:
-    # the models are not built in the docker image
-    - cd /QuICC.src/build
-    - cmake .. -DQUICC_MODEL=BoussinesqSphereTC -DQUICC_GITHUB_PROTOCOL=https
-    - time make
-    # test...
-
-.BoussinesqShellTC:
-  stage: model-build-and-test
-  script:
-    # the models are not built in the docker image
-    - cd /QuICC.src/build
-    - cmake .. -DQUICC_MODEL=BoussinesqShellTC -DQUICC_GITHUB_PROTOCOL=https
-    - time make
-    # test...
-
+# This file is generated, do not modify!
 .BoussinesqSphereDynamo:
   stage: model-build-and-test
   script:
-    # the models are not built in the docker image
-    - cd /QuICC.src/build
-    - cmake .. -DQUICC_MODEL=BoussinesqSphereDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
-    - time make
-    - ctest --no-tests=error --output-on-failure -R RunBenchmarkBoussinesqSphereDynamo
-    - ctest --no-tests=error --output-on-failure -R ValidateBenchmarkBoussinesqSphereDynamo
-
+  - hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} && make install"
+  - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamo/build
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamo/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+    && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereDynamo'"
+  - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamo/build/lib/python
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamo/build/Models/BoussinesqSphereDynamo/TestSuite/Benchmarks/_data/Explicit
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamo/build/Models/BoussinesqSphereDynamo/Executables/BoussinesqSphereDynamoExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamo/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereDynamoExplicit && echo ${QUICC_VERSION_TAG}"
 .BoussinesqShellDynamo:
   stage: model-build-and-test
   script:
-    # the models are not built in the docker image
-    - cd /QuICC.src/build
-    - cmake .. -DQUICC_MODEL=BoussinesqShellDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https
-    - time make
-    - ctest --no-tests=error --output-on-failure -R RunBenchmarkBoussinesqShellDynamo
-    - ctest --no-tests=error --output-on-failure -R ValidateBenchmarkBoussinesqShellDynamo
-
+  - hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} && make install"
+  - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamo/build
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamo/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+    && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellDynamo'"
+  - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamo/build/lib/python
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamo/build/Models/BoussinesqShellDynamo/TestSuite/Benchmarks/_data/Explicit
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamo/build/Models/BoussinesqShellDynamo/Executables/BoussinesqShellDynamoExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamo/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellDynamoExplicit && echo ${QUICC_VERSION_TAG}"
+.BoussinesqSphereRTC:
+  stage: model-build-and-test
+  script:
+  - hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} && make install"
+  - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTC/build
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTC/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+    && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTC'"
+  - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTC/build/lib/python
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTC/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Explicit
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTC/build/Models/BoussinesqSphereRTC/Executables/BoussinesqSphereRTCExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTC/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereRTCExplicit && echo ${QUICC_VERSION_TAG}"
+.BoussinesqShellRTC:
+  stage: model-build-and-test
+  script:
+  - hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} && make install"
+  - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTC/build
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTC/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+    && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTC'"
+  - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTC/build/lib/python
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTC/build/Models/BoussinesqShellRTC/TestSuite/Benchmarks/_data/Explicit
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTC/build/Models/BoussinesqShellRTC/Executables/BoussinesqShellRTCExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTC/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellRTCExplicit && echo ${QUICC_VERSION_TAG}"
+.BoussinesqShellTC:
+  stage: model-build-and-test
+  script:
+  - hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} && make install"
+  - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTC/build
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTC/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+    && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellTC'"
+.BoussinesqSphereTC:
+  stage: model-build-and-test
+  script:
+  - hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} && make install"
+  - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTC/build
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTC/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+    && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereTC'"

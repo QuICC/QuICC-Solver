@@ -107,3 +107,52 @@ function (quicc_target_add_definition TGT KIND)
   endif()
   list(POP_BACK CMAKE_MESSAGE_INDENT)
 endfunction (quicc_target_add_definition)
+
+
+#
+# Export target
+#
+function (quicc_export_target TGT)
+  # parse inputs
+  set(oneValueArgs COMPONENT FILES_MATCHING_PATTERN)
+  set(multiValueArgs DIRECTORIES)
+  cmake_parse_arguments(QET "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  message(DEBUG "quicc_target_add_definition")
+  list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+  message(DEBUG "TGT: ${TGT}")
+  message(DEBUG "QET_COMPONENT: ${QET_COMPONENT}")
+  message(DEBUG "QET_DIRECTORIES: ${QET_DIRECTORIES}")
+  message(DEBUG "QET_FILES_MATCHING_PATTERN: ${QET_FILES_MATCHING_PATTERN}")
+
+  # Export info
+  install(TARGETS ${TGT}
+    EXPORT ${TGT}Targets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  )
+
+  # Set filter to default if not set
+  if(NOT QET_FILES_MATCHING_PATTERN)
+    set(QET_FILES_MATCHING_PATTERN "*.h*")
+    message(DEBUG "QET_FILES_MATCHING_PATTERN: ${QET_FILES_MATCHING_PATTERN}")
+  endif()
+  # Install header files
+  foreach( _dir ${QET_DIRECTORIES})
+    install(DIRECTORY ${_dir}
+      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+      COMPONENT ${QET_COMPONENT}
+      FILES_MATCHING PATTERN ${QET_FILES_MATCHING_PATTERN}
+      )
+  endforeach()
+
+  # Export targets
+  install(EXPORT ${TGT}Targets
+    FILE ${TGT}Targets.cmake
+    NAMESPACE ${QUICC_NAMESPACE}
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quicc
+  )
+
+  list(POP_BACK CMAKE_MESSAGE_INDENT)
+endfunction (quicc_export_target)

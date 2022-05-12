@@ -21,6 +21,12 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+if(QUICC_MULTPRECISION)
+  set(_ulp 60)
+else()
+  set(_ulp 25)
+endif()
+
 set(_tests
   I2Y2_Zero:integrator
   I4:integrator
@@ -29,7 +35,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    ULP 25
+    ULP ${_ulp}
   )
 endforeach()
 

@@ -41,7 +41,11 @@ function(quicc_add_benchmark target)
 
   set(_refdir "${QAB_WORKDIR}/_refdata/${target}")
   set(_rundir "${QAB_WORKDIR}/_data/${target}")
+  message(VERBOSE "_rundir: ${_rundir}")
+  set(_binsdir "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_MODEL_DIR}/Executables")
+  message(VERBOSE "_binsdir: ${_binsdir}")
   set(_toolsdir "${PROJECT_SOURCE_DIR}/${QUICC_MODEL_PATH}/TestSuite")
+
   set(_args )
   foreach(_file IN LISTS QAB_STARTFILES)
     list(APPEND _args "COMMAND" ${CMAKE_COMMAND} -E create_symlink
@@ -49,6 +53,7 @@ function(quicc_add_benchmark target)
       "${_rundir}/${_file}"
       )
   endforeach()
+
   foreach(_file IN LISTS QAB_TOOLS)
     list(APPEND _args "COMMAND" ${CMAKE_COMMAND} -E create_symlink
       "${_toolsdir}/${_file}"
@@ -65,6 +70,14 @@ function(quicc_add_benchmark target)
     )
   add_dependencies(${_bench} ${_exe})
 
+  if(QUICC_MPI)
+    set(_mpi_ranks 4)
+    add_custom_command(TARGET ${_bench} POST_BUILD
+      COMMAND sed -i "'s/<cpus>1<\\/cpus>/<cpus>${_mpi_ranks}<\\/cpus>/g'" parameters.cfg
+      WORKING_DIRECTORY ${_rundir}
+      )
+  endif()
+
   # Fetch reference data
   include(FetchBenchmarkReference)
   quicc_fetch_benchmark_reference(
@@ -76,15 +89,37 @@ function(quicc_add_benchmark target)
   )
 
   set(_run "RunBenchmark${_exe}")
+  if(QUICC_MPI AND NOT QUICC_MPI_CI)
+    # check which command is available
+    foreach(_mpiexe IN ITEMS srun mpirun)
+      message(VERBOSE "_mpiexe: ${_mpiexe}")
+      find_program(mpiexe ${_mpiexe})
+      if(mpiexe STREQUAL "mpiexe-NOTFOUND")
+        message(VERBOSE "not found")
+      else()
+        message(VERBOSE "found")
+        break()
+      endif()
+    endforeach()
+    # check that we actually found something
+    if(mpiexe STREQUAL "mpiexe-NOTFOUND")
+      message(SEND_ERROR "could not find mpi executable.")
+    endif()
+    set(_test_param -n ${_mpi_ranks} "${_binsdir}/${_exe}")
+    set(_command ${mpiexe} ${_test_param})
+  else()
+    set(_command ${_exe})
+  endif()
+
   add_test(
     NAME ${_run}
-    COMMAND "${_exe}"
-    WORKING_DIRECTORY
-    "${_rundir}"
+    COMMAND ${_command}
+    WORKING_DIRECTORY "${_rundir}"
     )
   set_tests_properties(${_run} PROPERTIES
     TIMEOUT 300
     )
+
 
   set(_validate "ValidateBenchmark${_exe}")
   add_test(
@@ -92,8 +127,7 @@ function(quicc_add_benchmark target)
     COMMAND "${Python_EXECUTABLE}" validate_benchmark.py
       -d "${_rundir}"
       -r "${_refdir}"
-    WORKING_DIRECTORY
-    "${_rundir}"
+    WORKING_DIRECTORY "${_rundir}"
     )
   set_tests_properties(${_validate} PROPERTIES
     PASS_REGULAR_EXPRESSION "All benchmark validation tests passed!"

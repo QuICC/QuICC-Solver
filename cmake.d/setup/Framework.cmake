@@ -41,6 +41,8 @@ if(NOT QUICC_MPIALGO STREQUAL "Serial")
    endif(NOT MPI_FOUND)
    set(QUICC_MPI ON)
    add_definitions("-DQUICC_MPI")
+   option(QUICC_MPI_CI "Running benchmark on the CI?" OFF)
+   mark_as_advanced(QUICC_MPI_CI)
 else()
    set(QUICC_MPI OFF)
 endif(NOT QUICC_MPIALGO STREQUAL "Serial")
@@ -104,4 +106,25 @@ quicc_create_option(NAME QUICC_TIMESTEPPER
                     LABEL "Time integrator")
 quicc_add_definition(QUICC_TIMESTEPPER)
 
+
+
+
+###################################################
+#------------------- PROFILING -------------------#
+###################################################
+quicc_create_option(NAME QUICC_PROFILE_BACKEND
+                OPTS none native likwid
+                LABEL "Profiler backend."
+                ADVANCED)
+
+if(QUICC_PROFILE_BACKEND STREQUAL "likwid")
+  find_package(LIKWID REQUIRED)
+endif()
+
+quicc_create_option(NAME QUICC_PROFILE_LEVEL
+                OPTS 0 1 2 3 4
+                LABEL "Profiler granularity."
+                ADVANCED)
+
 list(POP_BACK CMAKE_MESSAGE_INDENT)
+

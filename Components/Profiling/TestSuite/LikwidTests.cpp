@@ -1,4 +1,4 @@
-#define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_RUNNER
 #include <catch2/catch.hpp>
 
 #include <chrono>
@@ -17,6 +17,20 @@
 
 #include "Profiler/Interface.hpp"
 
+
+int main( int argc, char* argv[] ) {
+    #ifdef QUICC_MPI
+        MPI_Init(nullptr, nullptr);
+    #endif
+
+    int result = Catch::Session().run( argc, argv );
+
+    #ifdef QUICC_MPI
+        MPI_Finalize();
+    #endif
+
+    return result;
+}
 
 // This is only an integration test
 TEST_CASE("Nested Levels: on, on, off", "[Levels]")

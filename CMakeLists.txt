@@ -71,23 +71,22 @@ include(ConfigureFunctions)
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
 
+option(QUICC_USE_SYSTEM_QUICC "Use system installed QuICC" OFF)
 
-message(STATUS "Global setup")
-list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
-
-# Global code structure
+# Setup paths
+include(structure/external)
 include(structure/global)
 
-# Create global configurator
-include(setup/global)
+# Import framework
+if(QUICC_USE_SYSTEM_QUICC)
+  find_package(quicc REQUIRED)
+else()
+  # Create global configurator
+  include(setup/global)
 
-list(POP_BACK CMAKE_MESSAGE_INDENT)
-
-# External libraries structure
-include(structure/external)
-
-# Framework setup
-include(setup/Framework)
+  # Framework setup
+  include(setup/Framework)
+endif()
 
 # Scripts setup
 include(setup/Scripts)

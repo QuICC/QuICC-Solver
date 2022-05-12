@@ -8,9 +8,10 @@ set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
 # Create component library
 add_library(${QUICC_CURRENT_COMPONENT_LIB} "")
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB} PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  include/
-  )
+target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"  )
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   ${QUICC_COMMON_COMPONENT_LIB}
   )
@@ -20,3 +21,10 @@ add_subdirectory(src)
 
 # Teststuite
 include(cmake.d/setup/TestSuite.cmake)
+
+# Export info
+quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
+  COMPONENT SparseSM
+  DIRECTORIES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/QuICC
+    )

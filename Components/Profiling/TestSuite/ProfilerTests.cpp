@@ -10,6 +10,10 @@
     #undef QUICC_PROFILE_LEVEL
 #endif
 #define QUICC_PROFILE_LEVEL 1
+#ifdef QUICC_MPI
+    #define GLOBAL_QUICC_MPI
+    #undef QUICC_MPI
+#endif
 
 #define QUICC_PROFILE_BACKEND_TESTER
 #include "Profiler/Interface.hpp"
@@ -104,4 +108,8 @@ TEST_CASE("Nested Levels: on, on, off", "[Levels]")
 #if defined GLOBAL_QUICC_PROFILE_LEVEL
     #define QUICC_PROFILE_LEVEL GLOBAL_QUICC_PROFILE_LEVEL
     #undef GLOBAL_QUICC_PROFILE_LEVEL
+#endif
+#ifdef GLOBAL_QUICC_MPI
+    #define QUICC_MPI
+    #undef GLOBAL_QUICC_MPI
 #endif

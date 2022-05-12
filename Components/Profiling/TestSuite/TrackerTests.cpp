@@ -1,4 +1,4 @@
-#define CATCH_CONFIG_MAIN
+#define CATCH_CONFIG_RUNNER
 #include <catch2/catch.hpp>
 
 #include <chrono>
@@ -17,6 +17,19 @@
 
 #include "Profiler/Interface.hpp"
 
+int main( int argc, char* argv[] ) {
+    #ifdef QUICC_MPI
+        MPI_Init(nullptr, nullptr);
+    #endif
+
+    int result = Catch::Session().run( argc, argv );
+
+    #ifdef QUICC_MPI
+        MPI_Finalize();
+    #endif
+
+    return result;
+}
 
 TEST_CASE("Open Close", "[OpenClose]")
 {
@@ -77,9 +90,9 @@ TEST_CASE("Nested Levels: on, on, off", "[Levels]")
     REQUIRE(std::abs(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Nested")) - 0.0) < 0.01);
 
     // high watermark is hard to estimate a priori
-
     Finalize();
 }
+
 
 // restore
 #undef QUICC_PROFILE_LEVEL

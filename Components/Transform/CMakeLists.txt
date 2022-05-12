@@ -19,14 +19,16 @@ include(setup/CUDA)
 # Create component library
 add_library(${QUICC_CURRENT_COMPONENT_LIB} "")
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB} PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  include/
-  )
+target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"  )
+
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   ${QUICC_COMMON_COMPONENT_LIB}
   ${QUICC_SPARSESM_COMPONENT_LIB}
   ${QUICC_POLYNOMIAL_COMPONENT_LIB}
-  Profiling::Profiling
+  QuICC::Profiling
   BLAS::BLAS # banded/tridiag solve/mul TODO: remove dep
   )
 
@@ -57,3 +59,10 @@ add_subdirectory(src)
 
 # Teststuite
 include(setup/TestSuite)
+
+# Export info
+quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
+  COMPONENT Transform
+  DIRECTORIES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/QuICC
+    )

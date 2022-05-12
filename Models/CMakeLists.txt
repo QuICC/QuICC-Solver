@@ -32,12 +32,12 @@
 #
 
 # Default branch for known models
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.0.1" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.0.1" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.0.1" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.0.1" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.0.1" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.0.1" CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.0.2" CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.0.2" CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.0.2" CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.0.2" CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.0.2" CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.0.2" CACHE STRING "Model repository branch.")
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.d")
@@ -120,9 +120,14 @@ foreach(_model ${QUICC_MODEL})
         message(DEBUG "_repo_branch: ${_repo_branch}")
         message(DEBUG "_repo: ${_repo}")
 
+        if(NOT CMAKE_MESSAGE_LOG_LEVEL STREQUAL "VERBOSE" AND
+           NOT CMAKE_MESSAGE_LOG_LEVEL STREQUAL "DEBUG")
+            set(_quiet QUIET)
+        endif()
+
         FetchContent_Declare(
             ${_model}
-            QUIET
+            ${_quiet}
             GIT_REPOSITORY ${_repo}
             GIT_TAG ${_repo_branch}
             GIT_PROGRESS TRUE

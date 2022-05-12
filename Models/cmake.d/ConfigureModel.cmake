@@ -42,7 +42,7 @@ function(quicc_add_model target)
     include/
     )
   target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
-    quicc_framework
+    QuICC::quicc_framework
     )
 
   # Create model implementations libraries
@@ -64,7 +64,7 @@ function(quicc_add_model target)
   add_custom_command(TARGET ${QUICC_CURRENT_MODEL_LIB}_updatepy POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_CURRENT_SOURCE_DIR}/Python"
-    "${CMAKE_BINARY_DIR}/Python"
+    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/python"
     COMMENT "Copying Python files for ${modName}"
     VERBATIM
     )

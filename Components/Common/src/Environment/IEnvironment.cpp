@@ -72,7 +72,8 @@ namespace Environment {
       // Check compatibility between requested cores and setup cores
       if(size != this->size())
       {
-         this->abort("Environment parameters and setup have conflicting sizes");
+         this->abort("Environment parameters and setup have conflicting sizes: "
+            +std::to_string(size)+" vs "+std::to_string(this->size()));
       }
 
       // Check profiler registration

@@ -52,7 +52,7 @@ namespace PyQuICC {
 
       // Get string object for module name
       PyObject* pName;
-      pName = PyUnicode_FromString(("quicc.model."+module).c_str());
+      pName = PyUnicode_FromString(("quicc_solver.model."+module).c_str());
 
       // Import module
       this->mpModule = PyImport_Import(pName);

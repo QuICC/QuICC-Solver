@@ -5,11 +5,12 @@ configure_file(
   )
 
 # Update python files for PyQuICC
+# akin to install, but run everytime a py file is changed
 add_custom_target(${QUICC_CURRENT_COMPONENT_LIB}_updatepy)
 add_custom_command(TARGET ${QUICC_CURRENT_COMPONENT_LIB}_updatepy POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
   "${CMAKE_CURRENT_SOURCE_DIR}/Python"
-  "${CMAKE_BINARY_DIR}/Python"
+  "${QUICC_PYTHON_DIR}"
   COMMENT "Copying Python files for PyQuICC"
   VERBATIM
   )

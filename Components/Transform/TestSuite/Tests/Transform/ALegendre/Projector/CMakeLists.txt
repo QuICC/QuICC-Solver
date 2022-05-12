@@ -38,10 +38,17 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    IDS 104 105 106 107 108
-    ULP 100
+    IDS  204 205  206   207
+    ULPS 400 4500 19000 180000
   )
 endforeach()
+
+# The following tests require ulps O(10^15) ...
+# if(QUICC_MULTPRECISION)
+  set(_disabled True)
+# else()
+  # set(_disabled False)
+# endif()
 
 # Special projector tests
 set(_tests
@@ -51,20 +58,8 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    IDS 109
-    ULP 150
-  )
-endforeach()
-
-# Special projector tests
-set(_tests
-  Poly::P:projector
-  )
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
-    IDS 110
-    ULP 500
+    IDS  208 209 210
+    ULPS 150 150 500
+    DISABLED ${_disabled}
   )
 endforeach()
