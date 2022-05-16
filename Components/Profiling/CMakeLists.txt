@@ -19,7 +19,7 @@ target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
 if(QUICC_PROFILE_BACKEND STREQUAL "native")
   message(VERBOSE "profiler using native backend")
   target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
-    INTERFACE ${QUICC_CURRENT_COMPONENT_LIB}::Tracker)
+    INTERFACE ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}Tracker)
 elseif(QUICC_PROFILE_BACKEND STREQUAL "likwid")
   message(VERBOSE "profiler using likwid backend")
   target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
