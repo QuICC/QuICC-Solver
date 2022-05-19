@@ -67,7 +67,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const;
+         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
 
          /**
           * @brief Compute transform
@@ -75,7 +75,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const Matrix& in) const;
+         virtual void transform(Matrix& rOut, const Matrix& in) const override;
 
          /**
           * @brief Compute transform
@@ -83,7 +83,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const MatrixZ& in) const;
+         virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
 
       protected:
          /**

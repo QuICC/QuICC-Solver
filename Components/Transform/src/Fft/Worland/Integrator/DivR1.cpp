@@ -38,7 +38,9 @@ namespace Integrator {
 
    void DivR1::initBackend() const
    {
-      this->mBackend.init(*this->mspSetup, 1);
+      int lshift = 1; // operator shifts l by one
+      int extraN = 0; // no extra modes are required
+      this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 
    void DivR1::computeWorlandExpansion(const bool isEven) const

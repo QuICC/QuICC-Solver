@@ -39,9 +39,13 @@ namespace Integrator {
 
    void I2_Zero::initBackend() const
    {
+      // l = 0 mode is set to sero
       std::set<int> filter = {0};
       this->mBackend.setZFilter(filter);
-      P::initBackend();
+
+      int lshift = 0; // operator doesn't shift l
+      int extraN = 3; // 3 extra modes are required due to I2 multiplication
+      this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 
    void I2_Zero::applyPostOperator(Matrix& rOut, const bool isEven) const

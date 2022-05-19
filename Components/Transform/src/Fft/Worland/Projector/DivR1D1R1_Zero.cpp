@@ -40,9 +40,12 @@ namespace Projector {
 
    void DivR1D1R1_Zero::initBackend() const
    {
-      this->mBackend.init(*this->mspSetup, -1, true, true);
+      int lshift = -1; // operator shifts l by -1
+      int extraN = 1; // 1 extra mode is required
+      bool onlyShiftParity = true;
+      bool zeroNegativeL = true;
+      this->mBackend.init(*this->mspSetup, lshift, extraN, onlyShiftParity, zeroNegativeL);
       this->mBackend.addStorage(1, 0);
-      this->mBackend.setWSize(1);
    }
 
    void DivR1D1R1_Zero::computeWorlandExpansion(const bool isEven) const

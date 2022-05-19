@@ -47,19 +47,14 @@ namespace Backend {
    {
    }
 
-   void WorlandIntegrator::init(const SetupType& setup, const int lshift, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
+   void WorlandIntegrator::init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
    {
-      this->mpImpl->init(setup, lshift, lshiftOnlyParity, alwaysZeroNegative);
+      this->mpImpl->init(setup, lshift, extraN, lshiftOnlyParity, alwaysZeroNegative);
    }
 
    void WorlandIntegrator::setZFilter(const std::set<int>& filter) const
    {
       this->mpImpl->setZFilter(filter);
-   }
-
-   void WorlandIntegrator::setWSize(const unsigned int shiftMaxL) const
-   {
-      this->mpImpl->setWSize(shiftMaxL);
    }
 
    void WorlandIntegrator::addStorage(const int inExtras, const int outExtras) const

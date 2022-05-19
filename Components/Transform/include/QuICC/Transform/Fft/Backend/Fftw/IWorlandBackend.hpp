@@ -78,12 +78,7 @@ namespace Fftw {
          /**
           * @brief Initialise the FFTW transforms
           */
-         virtual void init(const SetupType& setup, const int lshift, const bool lshiftOnlyParity = false, const bool alwaysZeroNegative = false) const;
-
-         /**
-          * @brief Change internal spectral resolution
-          */
-         virtual void setWSize(const unsigned int shiftMaxL) const;
+         virtual void init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity = false, const bool alwaysZeroNegative = false) const;
 
          /**
           * @brief Initialise the FFTW transforms
@@ -141,6 +136,11 @@ namespace Fftw {
          void add(const int to, const int from, const int nshift, const bool isEven) const;
 
       protected:
+         /**
+          * @brief Change internal spectral resolution
+          */
+         virtual void setWSize() const;
+
          /**
           * @brief Is physical representation even?
           */
@@ -369,6 +369,14 @@ namespace Fftw {
           * @brief Spec size
           */
          mutable int mSpecSize;
+
+         /**
+          * @brief For some operators, the truncation needs to be extended by a few extra modes i
+          *        in order to produce mSpecSize accurate modes at the end. For example, the use
+          *        of the second order quas-inverse I2 requires 3 additional modes due to the 3
+          *        super diagonals.
+          */
+         mutable int mWExtra;
 
          /**
           * @brief Biggest Worland expansion size (ie. l = 0)

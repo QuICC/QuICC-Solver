@@ -17,7 +17,7 @@ add_custom_command(TARGET ${QUICC_CURRENT_COMPONENT_TEST_LIB}_updatepy POST_BUIL
   COMMAND ${CMAKE_COMMAND} -E copy_directory
    "${CMAKE_CURRENT_SOURCE_DIR}/Python"
    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python"
-  COMMENT "Copying Python files for transform TestSuite"
+  COMMENT "Copying Python files for Transform TestSuite"
   VERBATIM
 )
 add_dependencies(${QUICC_CURRENT_COMPONENT_TEST_LIB} ${QUICC_CURRENT_COMPONENT_TEST_LIB}_updatepy)

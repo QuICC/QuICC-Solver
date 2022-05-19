@@ -127,7 +127,7 @@ namespace CuFft {
       }
    }
 
-   void IWorlandBackend::init(const SetupType& setup, const int lshift, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
+   void IWorlandBackend::init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
    {
       this->mFlipped = (std::abs(lshift)%2 == 1);
       int lshift_parity = lshift;
@@ -199,6 +199,8 @@ namespace CuFft {
 
       // Create CUSPARSE context
       CheckCuda(cusparseCreate(&this->mHSparse), __LINE__);
+
+      this->mWExtra = extraN;
    }
 
    void IWorlandBackend::setZFilter(const std::set<int>& filter) const
@@ -216,10 +218,10 @@ namespace CuFft {
       return (this->mZFilter.count(l) == 1);
    }
 
-   void IWorlandBackend::setWSize(const unsigned int shiftMaxL) const
+   void IWorlandBackend::setWSize() const
    {
       // Triangular truncation requirements: WSize = n_lmax_modes + lmax/2
-      this->mWSize = this->mSpecSize + (std::max(std::get<0>(*this->pLoc(true)->rbegin()),std::get<0>(*this->pLoc(false)->rbegin())) + shiftMaxL)/2;
+      this->mWSize = this->mSpecSize + this->mWExtra + (std::max(std::get<0>(*this->pLoc(true)->rbegin()),std::get<0>(*this->pLoc(false)->rbegin())) + shiftMaxL)/2;
    }
 
    IWorlandBackend::LocationVector* IWorlandBackend::pLoc(const bool isEven, const unsigned int id) const

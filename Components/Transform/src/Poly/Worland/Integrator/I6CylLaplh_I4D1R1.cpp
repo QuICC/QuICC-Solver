@@ -49,20 +49,28 @@ namespace Integrator {
       op.resize(igrid.size(), nPoly);
       namespace ev = Polynomial::Worland::Evaluator;
       Polynomial::Worland::Wnl wnl;
-      wnl.compute<MHDFloat>(op, nPoly, l, igrid, iweights, ev::Set());
+
+      // Internal computation uses dealiased modes
+      int nN = nPoly + 0;
+      this->checkGridSize(nN, l, igrid.size());
+
+      internal::Matrix tOp(igrid.size(), nN);
+
+      wnl.compute<internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
       if(l == 0)
       {
-         MHDFloat a = static_cast<MHDFloat>(wnl.alpha(l));
-         MHDFloat b = static_cast<MHDFloat>(wnl.dBeta());
-         ::QuICC::SparseSM::Worland::I4D1R1 spasm(nPoly, nPoly, a, b, 1);
-         op = (spasm.mat()*op.transpose()).transpose();
+         auto a = wnl.alpha(l);
+         auto b = wnl.dBeta();
+         ::QuICC::SparseSM::Worland::I4D1R1 spasm(nN, nN, a, b, 1);
+         tOp = (spasm.mat()*tOp.transpose()).transpose();
       } else
       {
-         MHDFloat a = static_cast<MHDFloat>(wnl.alpha(l));
-         MHDFloat b = static_cast<MHDFloat>(wnl.dBeta());
-         ::QuICC::SparseSM::Worland::I6CylLaplh spasm(nPoly, nPoly, a, b, l);
-         op = (spasm.mat()*op.transpose()).transpose();
+         auto a = wnl.alpha(l);
+         auto b = wnl.dBeta();
+         ::QuICC::SparseSM::Worland::I6CylLaplh spasm(nN, nN, a, b, l);
+         tOp = (spasm.mat()*tOp.transpose()).transpose();
       }
+      op = tOp.cast<MHDFloat>().leftCols(nPoly);
    }
 
    void I6CylLaplh_I4D1R1::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const

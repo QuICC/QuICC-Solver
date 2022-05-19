@@ -57,17 +57,12 @@ namespace Backend {
          /**
           * @brief Initialise the FFT transforms
           */
-         void init(const SetupType& setup, const int lshift, const bool lshiftOnlyParity = false, const bool alwaysZeroNegative = false) const;
+         void init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity = false, const bool alwaysZeroNegative = false) const;
 
          /**
           * @brief Set zero filter
           */
          void setZFilter(const std::set<int>& filter) const;
-
-         /**
-          * @brief Change internal spectral resolution
-          */
-         void setWSize(const unsigned int shiftMaxL) const;
 
          /**
           * @brief Initialise additional temporary storage

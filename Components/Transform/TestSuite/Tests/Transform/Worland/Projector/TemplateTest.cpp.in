@@ -44,7 +44,13 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ projector", "[@Algorithm@::@Operat
 
    Tester::ParameterType params = {-1};
 
-   for(int id: currentts::args().params)
+   if(currentts::args().np > 0)
+   {
+      params.push_back(currentts::args().np);
+      params.push_back(currentts::args().rank);
+   }
+
+   for(auto id: currentts::args().params)
    {
       params.at(0) = id;
       tester.validate(params, currentts::args().type);

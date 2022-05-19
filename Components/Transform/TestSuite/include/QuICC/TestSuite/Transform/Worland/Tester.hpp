@@ -15,6 +15,7 @@
 #include <catch2/catch.hpp>
 #include <string>
 #include <set>
+#include <sstream>
 
 // Project includes
 //
@@ -25,6 +26,20 @@
 #include "QuICC/Transform/Fft/Worland/Setup.hpp"
 #include "QuICC/Transform/Fft/Worland/Tools.hpp"
 #include "QuICC/Transform/Poly/Setup.hpp"
+
+template<class>
+struct sfinae_true : std::true_type{};
+
+namespace internal{
+     template<typename C, typename... Args>
+          static auto test_transform(int)
+                -> sfinae_true<decltype(std::declval<C>().transform(std::declval<Args>()...))>;
+       template<typename, typename... Args>
+            static auto test_transform(long) -> std::false_type;
+}
+
+template <typename T, typename... Args>
+class has_transform: public decltype(internal::test_transform<T, Args...>(0)){};
 
 namespace transf = ::QuICC::Transform;
 
@@ -60,6 +75,21 @@ namespace Worland {
           * @brief Build filename extension with resolution information
           */
          virtual std::string resname(const ParameterType& param) const override;
+
+         /**
+          * @brief Read real data from file
+          */
+         virtual void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+
+         /**
+          * @brief Read complex data from file
+          */
+         virtual void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+
+         /**
+          * @brief Read data from database file
+          */
+         template <typename TData> void dbReadFile(TData& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
 
          /**
           * @brief Test operator
@@ -128,6 +158,56 @@ namespace Worland {
    template <typename TOp, typename TOp2> void Tester<TOp,TOp2>::appendPath()
    {
       this->mPath += "Worland/";
+   }
+
+   template <typename TOp, typename TOp2> void Tester<TOp,TOp2>::readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const
+   {
+      if(param.size() == 1)
+      {
+         TesterBase<TOp>::basicReadFile(data, param, type, ctype);
+      }
+      else
+      {
+         this->dbReadFile(data, param, type, ctype);
+      }
+   }
+
+   template <typename TOp, typename TOp2> void Tester<TOp,TOp2>::readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const
+   {
+      if(param.size() == 1)
+      {
+         TesterBase<TOp>::basicReadFile(data, param, type, ctype);
+      }
+      else
+      {
+         this->dbReadFile(data, param, type, ctype);
+      }
+   }
+
+   template <typename TOp, typename TOp2> template <typename TData> void Tester<TOp,TOp2>::dbReadFile(TData& data, const ParameterType& param, const TestType type, const ContentType ctype) const
+   {
+      // Read database file
+      ParameterType dbParam = {param.at(0)};
+      auto spDbSetup = this->buildSetup(dbParam, type);
+      TData dbData = TData::Zero(data.rows(), spDbSetup->slowSize());
+      std::string fullname = this->makeFilename(dbParam, this->refRoot(), type, ctype);
+      readData(dbData, fullname);
+
+      // Create setup
+      auto spSetup = this->buildSetup(param, type);
+
+      // Loop over indexes
+      int col = 0;
+      for(int j = 0; j < spSetup->slowSize(); j++)
+      {
+         int j_ = spSetup->slow(j);
+         // Loop over multiplier
+         for(int i = 0; i < spSetup->mult(j); i++)
+         {
+            data.col(col) = dbData.col(j_);
+            col++;
+         }
+      }
    }
 
    template <typename TOp, typename TOp2> Matrix Tester<TOp,TOp2>::applyOperator(const ParameterType& param, const TestType type) const
@@ -220,31 +300,41 @@ namespace Worland {
 
    template <typename TOp, typename TOp2> Matrix Tester<TOp,TOp2>::applyReductor(const ParameterType& param) const
    {
-      const TestType type = TestType::REDUCTOR;
+      if constexpr(has_transform<TOp, Matrix&, const MatrixZ&>::value)
+      {
+         const TestType type = TestType::REDUCTOR;
 
-      // Create setup
-      auto spSetup = this->buildSetup(param, type);
+         // Create setup
+         auto spSetup = this->buildSetup(param, type);
 
-      // Input data
-      Matrix inData(spSetup->specSize(), spSetup->blockSize());
-      this->readFile(inData, param, type, ContentType::INPUT);
+         // Input data
+         MatrixZ inData(spSetup->specSize(), spSetup->blockSize());
+         this->readFile(inData, param, type, ContentType::INPUT);
 
-      TOp op;
-      internal::Array igrid;
-      this->initOperator(op, igrid, spSetup);
+         TOp op;
+         internal::Array igrid;
+         this->initOperator(op, igrid, spSetup);
 
-      Matrix outData(op.outRows(), op.outCols());
+         Matrix outData(op.outRows(), op.outCols());
 
-      op.transform(outData, inData);
+         op.transform(outData, inData);
 
-      return outData;
+         return outData;
+      }
+      else
+      {
+         throw std::logic_error("This operator is not a reductor");
+
+         Matrix out;
+         return out;
+      }
    }
 
    template <typename TOp, typename TOp2> Matrix Tester<TOp,TOp2>::applyBFLoop(const ParameterType& param) const
    {
       if constexpr(std::is_same_v<TOp2,void>)
       {
-         throw std::logic_error("Bacward-forward loop can only be computed if second operator type is given");
+         throw std::logic_error("Backward-forward loop can only be computed if second operator type is given");
       }
       else
       {
@@ -282,18 +372,37 @@ namespace Worland {
 
    template <typename TOp, typename TOp2> std::string Tester<TOp,TOp2>::resname(const ParameterType& param) const
    {
-      int id = static_cast<int>(param.at(0));
+      auto id = param.at(0);
 
-      std::string s = "_id" + std::to_string(id);
-      return s;
+      std::stringstream ss;
+      ss.precision(10);
+      ss << "_id" << id;
+
+      if(param.size() == 3)
+      {
+         int np = param.at(1);
+         ss << "_np" << np;
+         int r = param.at(2);
+         ss << "_r" << r;
+      }
+
+      return ss.str();
    }
 
    template <typename TOp, typename TOp2> std::string Tester<TOp,TOp2>::formatParameter(const ParameterType& param) const
    {
-      int id = static_cast<int>(param.at(0));
+      auto id = param.at(0);
 
       std::stringstream ss;
       ss << "id: " << id;
+
+      if(param.size() == 3)
+      {
+         int np = param.at(1);
+         ss << ", np: " << np;
+         int r = param.at(2);
+         ss << ", r: " << r;
+      }
 
       return ss.str();
    }
@@ -330,16 +439,29 @@ namespace Worland {
 
       // Gather indices
       std::map<int,int> indices;
-      for(int i = nMeta; i < meta.size(); i++)
+      if(param.size() == 1)
       {
-         int l = static_cast<int>(meta(i));
-         indices[l]++;
+         for(int i = nMeta; i < meta.size(); i++)
+         {
+            int k_ = static_cast<int>(meta(i));
+            indices[k_]++;
+         }
+      }
+      else
+      {
+         assert((meta.size() - nMeta) % 2 == 0);
+         for(int i = nMeta; i < meta.size(); i += 2)
+         {
+            int k_ = static_cast<int>(meta(i));
+            int mult = static_cast<int>(meta(i+1));
+            indices.insert(std::pair(k_,mult));
+         }
       }
 
       // Add indices with multiplier
-      for(const auto& [l, mult]: indices)
+      for(const auto& [k_, mult]: indices)
       {
-         spSetup->addIndex(l, mult);
+         spSetup->addIndex(k_, mult);
       }
       spSetup->lock();
 

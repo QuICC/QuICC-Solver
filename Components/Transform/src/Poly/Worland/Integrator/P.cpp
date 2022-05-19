@@ -48,7 +48,16 @@ namespace Integrator {
       int nPoly = this->mspSetup->fastSize(i);
       namespace ev = Polynomial::Worland::Evaluator;
       Polynomial::Worland::Wnl wnl;
-      wnl.compute<MHDFloat>(op, nPoly, l, igrid, iweights, ev::Set());
+
+      // Internal computation uses dealiased modes
+      int nN = nPoly;
+      this->checkGridSize(nN, l, igrid.size());
+
+      internal::Matrix tOp(igrid.size(), nN);
+
+      wnl.compute<internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
+
+      op = tOp.cast<MHDFloat>().leftCols(nPoly);
    }
 
    void P::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const

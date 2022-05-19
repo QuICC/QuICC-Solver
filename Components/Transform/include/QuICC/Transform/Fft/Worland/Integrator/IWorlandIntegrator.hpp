@@ -142,6 +142,14 @@ namespace Integrator {
           * @param rOut Output values
           */
          virtual void applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const = 0;
+
+         /**
+          * @brief Compute transform
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          */
+         virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
    };
 
 }

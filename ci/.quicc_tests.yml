@@ -13,9 +13,13 @@
     - ctest --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_projector"
     - ctest --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_bfloop"
     - ctest --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_reductor"
-    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_Fft.*_integrator"
-    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_Poly_EnergySLAPLR2_reductor"
+    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_Fft_.*_integrator"
+    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_Fft_.*_projector"
     - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_Fft_.*_bfloop"
+    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_Poly_.*_integrator"
+    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_Poly_.*_projector"
+    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_Poly_.*_reductor"
+    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_Poly_.*_bfloop"
     - ctest --no-tests=error --output-on-failure -R ProfilerTest
     - ctest --no-tests=error --output-on-failure -R TrackerTest
     - ctest --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_integrator_ulp"

@@ -91,6 +91,16 @@ namespace Worland {
       throw std::logic_error("Data is not compatible with Worland operator");
    }
 
+   void IWorlandOperator::checkGridSize(const int n, const int l, const int gN) const
+   {
+      int allowedN = (2*gN/3 - (l+1)/2 + 2);
+      bool notValid = (n > allowedN);
+      if(notValid)
+      {
+         throw std::logic_error("Worland grid is too small! (" + std::to_string(n) + " > " + std::to_string(allowedN) + ")");
+      }
+   }
+
    MHDFloat IWorlandOperator::requiredStorage() const
    {
       MHDFloat mem = 0.0;

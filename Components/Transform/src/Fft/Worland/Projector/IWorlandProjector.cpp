@@ -44,7 +44,9 @@ namespace Projector {
 
    void IWorlandProjector::initBackend() const
    {
-      this->mBackend.init(*this->mspSetup, 0);
+      int lshift = 0; // operator doesn't shift l
+      int extraN = 0; // no extra modes are required
+      this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 
    void IWorlandProjector::transformBlock(MatrixZ& rOut, const MatrixZ& in, const bool isEven, const bool useReal) const
@@ -134,6 +136,11 @@ namespace Projector {
 #endif // QUICC_STORAGEPROFILE
 
       return mem;
+   }
+
+   void IWorlandProjector::transform(Matrix& rOut, const MatrixZ& in) const
+   {
+      IWorlandOperator::transform(rOut, in);
    }
 
 }

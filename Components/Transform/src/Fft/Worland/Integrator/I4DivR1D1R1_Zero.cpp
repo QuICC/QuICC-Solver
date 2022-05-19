@@ -39,9 +39,14 @@ namespace Integrator {
 
    void I4DivR1D1R1_Zero::initBackend() const
    {
+      // l = 0 mode is set to sero
       std::set<int> filter = {0};
       this->mBackend.setZFilter(filter);
-      DivR1D1R1::initBackend();
+
+      int lshift = 1; // operator shifts l by one
+      int extraN = 6; // 6 extra modes are required due to I4 multiplication
+      this->mBackend.init(*this->mspSetup, lshift, extraN);
+      this->mBackend.addStorage(0, 1);
    }
 
    void I4DivR1D1R1_Zero::applyPostOperator(Matrix& rOut, const bool isEven) const

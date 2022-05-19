@@ -51,7 +51,7 @@ namespace CuFft {
       this->mPadSize = setup.padSize();
 
       // Set internal spectral resolution
-      this->setWSize(0);
+      this->setWSize();
 
       // Initialize temporary storage
       int blockSize = std::max(this->mEBlockSize,this->mOBlockSize);

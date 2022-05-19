@@ -22,6 +22,9 @@
 #include "QuICC/Polynomial/Worland/Evaluator/InnerProduct.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
 
+// It is not clear yet which implementation is more accurate
+#undef QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
+
 namespace QuICC {
 
 namespace Transform {
@@ -55,36 +58,44 @@ namespace Integrator {
       {
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::Wnl wnl;
-#if 0
+
+         // Internal computation uses dealiased modes
+         int nN = nPoly + 0;
+         this->checkGridSize(nPoly, l, igrid.size());
+
+         internal::Matrix tOp(igrid.size(), nN);
+#if defined QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
          // **************************************************
          // Formulation without explicit grid:
          // Operates on polynomials with l = l-1
          int l_in = std::abs(l-1);
-         int n_in = nPoly + 1;
+         int n_in = nN + 1;
+         this->checkGridSize(n_in, l_in, igrid.size());
 
-         Matrix opA(igrid.size(), n_in);
-         wnl.compute<MHDFloat>(opA, n_in, l_in, igrid, iweights, ev::Set());
+         internal::Matrix opA(igrid.size(), n_in);
+         wnl.compute<internal::MHDFloat>(opA, n_in, l_in, igrid, iweights, ev::Set());
 
-         Matrix opB(igrid.size(), n_in);
+         internal::Matrix opB(igrid.size(), n_in);
          Polynomial::Worland::r_1Wnl r_1Wnl;
-         r_1Wnl.compute<MHDFloat>(opB, n_in, l_in, igrid, internal::Array(), ev::Set());
+         r_1Wnl.compute<internal::MHDFloat>(opB, n_in, l_in, igrid, internal::Array(), ev::Set());
 
-         Matrix opC(igrid.size(), nPoly);
+         internal::Matrix opC(igrid.size(), nN);
          Polynomial::Worland::Wnl wnlB;
-         wnlB.compute<MHDFloat>(opC, nPoly, l, igrid, iweights, ev::Set());
+         wnlB.compute<internal::MHDFloat>(opC, nN, l, igrid, iweights, ev::Set());
 
-         op = (opC.transpose()*opB*opA.transpose()).transpose();
+         tOp = (opC.transpose()*opB*opA.transpose()).transpose();
 #else
 
          // **************************************************
          // Alternative formulation of operators:
          // This version uses explicit radial factors to work on l polynomials
 
-         Matrix opA(igrid.size(), nPoly);
-         wnl.compute<MHDFloat>(opA, nPoly, l, igrid, iweights, ev::Set());
+         internal::Matrix opA(igrid.size(), nN);
+         wnl.compute<internal::MHDFloat>(opA, nN, l, igrid, iweights, ev::Set());
 
-         op = (opA.transpose()*igrid.cast<MHDFloat>().array().pow(-1).matrix().asDiagonal()).transpose();
+         tOp = (opA.transpose()*igrid.array().pow(-1).matrix().asDiagonal()).transpose();
 #endif
+         op = tOp.cast<MHDFloat>().leftCols(nPoly);
 
          assert(op.rows() == igrid.size());
          assert(op.cols() == nPoly);
@@ -124,3 +135,5 @@ namespace Integrator {
 }
 }
 }
+
+#undef QUICC_AVOID_EXPLICIT_RADIAL_FACTOR

@@ -39,9 +39,11 @@ namespace Projector {
 
    void D1::initBackend() const
    {
-      this->mBackend.init(*this->mspSetup, -1, true);
+      int lshift = -1; // operator shifts l by -1
+      int extraN = 1; // 1 extra mode is required
+      bool onlyShiftParity = true;
+      this->mBackend.init(*this->mspSetup, lshift, extraN, onlyShiftParity);
       this->mBackend.addStorage(1, 0);
-      this->mBackend.setWSize(1);
    }
 
    void D1::computeWorlandExpansion(const bool isEven) const

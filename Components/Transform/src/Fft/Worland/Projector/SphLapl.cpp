@@ -40,7 +40,9 @@ namespace Projector {
 
    void SphLapl::initBackend() const
    {
-      this->mBackend.init(*this->mspSetup, 0);
+      int lshift = 0; // operator doesn't shift l
+      int extraN = 0; // no extra modes are required
+      this->mBackend.init(*this->mspSetup, lshift, extraN);
       this->mBackend.addStorage(1, 0);
    }
 

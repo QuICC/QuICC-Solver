@@ -38,7 +38,9 @@ namespace Integrator {
 
    void R1::initBackend() const
    {
-      this->mBackend.init(*this->mspSetup, -1);
+      int lshift = -1; // operator shifts l by -1
+      int extraN = 1; // 1 extra modes is required
+      this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 
    void R1::computeWorlandExpansion(const bool isEven) const

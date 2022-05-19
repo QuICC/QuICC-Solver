@@ -43,7 +43,9 @@ namespace Integrator {
 
    void IWorlandIntegrator::initBackend() const
    {
-      this->mBackend.init(*this->mspSetup, 0);
+      int lshift = 0; // operator doesn't shift l
+      int extraN = 0; // no extra modes are required
+      this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 
    void IWorlandIntegrator::transformBlock(MatrixZ& rOut, const MatrixZ& in, const bool isEven, const bool useReal) const
@@ -121,6 +123,11 @@ namespace Integrator {
 #endif // QUICC_STORAGEPROFILE
 
       return mem;
+   }
+
+   void IWorlandIntegrator::transform(Matrix& rOut, const MatrixZ& in) const
+   {
+      IWorlandOperator::transform(rOut, in);
    }
 
 }

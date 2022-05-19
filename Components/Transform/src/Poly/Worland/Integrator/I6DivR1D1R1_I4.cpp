@@ -48,19 +48,25 @@ namespace Integrator {
 
       // Build operator
       int nPoly = this->mspSetup->fastSize(i);
-      op.resize(igrid.size(), nPoly);
       namespace ev = Polynomial::Worland::Evaluator;
       if(l == 0)
       {
          l = 1;
          Polynomial::Worland::Wnl wnl;
 
-         wnl.compute<MHDFloat>(op, nPoly, l, igrid, iweights, ev::Set());
+         // Internal computation uses dealiased modes
+         int nN = nPoly + 0;
+         this->checkGridSize(nN, l, igrid.size());
+
+         Matrix tOp(igrid.size(), nN);
+
+         wnl.compute<MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
          MHDFloat a = static_cast<MHDFloat>(wnl.alpha(l));
          MHDFloat b = static_cast<MHDFloat>(wnl.dBeta());
-         ::QuICC::SparseSM::Worland::I4 spasm(nPoly, nPoly, a, b, l);
-         op = (spasm.mat()*op.transpose()).transpose();
+         ::QuICC::SparseSM::Worland::I4 spasm(nN, nN, a, b, l);
+         tOp = (spasm.mat()*tOp.transpose()).transpose();
+         op = tOp.leftCols(nPoly);
       } else
       {
          // **************************************************
@@ -70,20 +76,27 @@ namespace Integrator {
 
          Polynomial::Worland::Wnl wnl;
 
-         wnl.compute<MHDFloat>(op, nPoly, l_in, igrid, iweights, ev::Set());
+         // Internal computation uses dealiased modes
+         int nN = nPoly + 0;
+         this->checkGridSize(nN, l, igrid.size());
 
-         Matrix opA(igrid.size(), nPoly);
+         internal::Matrix tOp(igrid.size(), nN);
+
+         wnl.compute<internal::MHDFloat>(tOp, nN, l_in, igrid, iweights, ev::Set());
+
+         internal::Matrix opA(igrid.size(), nN);
          Polynomial::Worland::r_1drWnl r_1drWnl;
-         r_1drWnl.compute<MHDFloat>(opA, nPoly, l_in, igrid, internal::Array(), ev::Set());
+         r_1drWnl.compute<internal::MHDFloat>(opA, nN, l_in, igrid, internal::Array(), ev::Set());
 
-         Matrix opB(igrid.size(), nPoly);
+         internal::Matrix opB(igrid.size(), nN);
          Polynomial::Worland::Wnl wnlB;
-         wnlB.compute<MHDFloat>(opB, nPoly, l, igrid, iweights, ev::Set());
+         wnlB.compute<internal::MHDFloat>(opB, nN, l, igrid, iweights, ev::Set());
 
-         MHDFloat a = static_cast<MHDFloat>(wnl.alpha(l));
-         MHDFloat b = static_cast<MHDFloat>(wnl.dBeta());
-         ::QuICC::SparseSM::Worland::I6 spasm(nPoly, nPoly, a, b, l);
-         op = (spasm.mat()*opB.transpose()*opA*op.transpose()).transpose();
+         auto a = wnl.alpha(l);
+         auto b = wnl.dBeta();
+         ::QuICC::SparseSM::Worland::I6 spasm(nN, nN, a, b, l);
+         tOp = (spasm.mat()*opB.transpose()*opA*tOp.transpose()).transpose();
+         op = tOp.cast<MHDFloat>().leftCols(nPoly);
       }
    }
 

@@ -95,6 +95,11 @@ namespace Worland {
 
       protected:
          /**
+          * @brief Check grid size can accommodate exact computation
+          */
+         void checkGridSize(const int n, const int l, const int nG) const;
+
+         /**
           * @brief Polynomial setup object providing the sizes
           */
          mutable SharedSetup    mspSetup;

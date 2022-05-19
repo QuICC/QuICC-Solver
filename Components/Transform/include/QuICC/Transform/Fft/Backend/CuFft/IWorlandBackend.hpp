@@ -102,12 +102,7 @@ namespace CuFft {
          /**
           * @brief Initialise the FFT transforms
           */
-         virtual void init(const SetupType& setup, const int lshift, const bool lshiftOnlyParity = false, const bool alwaysZeroNegative = false) const;
-
-         /**
-          * @brief Change internal spectral resolution
-          */
-         virtual void setWSize(const unsigned int shiftMaxL) const;
+         virtual void init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity = false, const bool alwaysZeroNegative = false) const;
 
          /**
           * @brief Add temporary storage
@@ -165,6 +160,11 @@ namespace CuFft {
          void add(const int to, const int from, const int nshift, const bool isEven) const;
 
       protected:
+         /**
+          * @brief Change internal spectral resolution
+          */
+         virtual void setWSize() const;
+
          /**
           * @brief Is physical representation even?
           */
@@ -378,6 +378,11 @@ namespace CuFft {
           * @brief Backward FFT size
           */
          mutable int mBwdSize;
+
+         /**
+          * @brief Extra modes for internal Worland expansion size
+          */
+         mutable int mWExtra;
 
          /**
           * @brief Biggest Worland expansion size (ie. l = 0)

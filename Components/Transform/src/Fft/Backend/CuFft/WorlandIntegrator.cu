@@ -51,7 +51,7 @@ namespace CuFft {
       this->mpcuWorkTmp = &this->mcuOutTmp;
 
       // Set internal spectral resolution
-      this->setWSize(0);
+      this->setWSize();
       assert(this->mWSize <= this->mBwdSize);
 
       // Set transform scaling

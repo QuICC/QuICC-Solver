@@ -52,7 +52,7 @@ namespace Fftw {
          /**
           * @brief Initialise the FFTW transforms
           */
-         virtual void init(const SetupType& setup, const int lshift, const bool lshiftOnlyParity = false, const bool alwaysZeroNegative = false) const override;
+         virtual void init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity = false, const bool alwaysZeroNegative = false) const override;
 
          /**
           * @brief Set input and output

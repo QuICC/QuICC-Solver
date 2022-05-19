@@ -55,7 +55,15 @@ namespace Integrator {
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::Wnl wnl;
 
-         wnl.compute<MHDFloat>(op, nPoly, l, igrid, (iweights.array()*igrid.array()).matrix(), ev::Set());
+         // Internal computation uses dealiased modes
+         int nN = nPoly;
+         this->checkGridSize(nN, l, igrid.size());
+
+         internal::Matrix tOp(igrid.size(), nN);
+
+         wnl.compute<internal::MHDFloat>(tOp, nN, l, igrid, (iweights.array()*igrid.array()).matrix(), ev::Set());
+
+         op = tOp.cast<MHDFloat>().leftCols(nPoly);
       }
    }
 

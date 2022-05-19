@@ -52,14 +52,21 @@ namespace Integrator {
          op.setZero();
       } else
       {
+         // Internal computation uses dealiased modes
+         int nN = nPoly + 0;
+         this->checkGridSize(nN, l, igrid.size());
+
+         internal::Matrix tOp(igrid.size(), nN);
+
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::Wnl wnl;
-         wnl.compute<MHDFloat>(op, nPoly, l, igrid, iweights, ev::Set());
+         wnl.compute<internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
-         MHDFloat a = static_cast<MHDFloat>(wnl.alpha(l));
-         MHDFloat b = static_cast<MHDFloat>(wnl.dBeta());
-         ::QuICC::SparseSM::Worland::I2 spasm(nPoly, nPoly, a, b, l);
-         op = (spasm.mat()*op.transpose()).transpose();
+         auto a = wnl.alpha(l);
+         auto b = wnl.dBeta();
+         ::QuICC::SparseSM::Worland::I2 spasm(nN, nN, a, b, l);
+         tOp = (spasm.mat()*tOp.transpose()).transpose();
+         op = tOp.cast<MHDFloat>().leftCols(nPoly);
       }
    }
 

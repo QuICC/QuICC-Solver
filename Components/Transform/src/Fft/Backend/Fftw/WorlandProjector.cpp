@@ -38,17 +38,17 @@ namespace Fftw {
    {
    }
 
-   void WorlandProjector::init(const SetupType& setup, const int lshift, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
+   void WorlandProjector::init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
    {
       //Initialize parent
-      IWorlandBackend::init(setup, lshift, lshiftOnlyParity, alwaysZeroNegative);
+      IWorlandBackend::init(setup, lshift, extraN, lshiftOnlyParity, alwaysZeroNegative);
       this->mpWorkTmp = &this->mInTmp;
 
       int fwdSize = setup.fwdSize();
       int bwdSize = setup.bwdSize();
 
       // Set internal spectral resolution
-      this->setWSize(0);
+      this->setWSize();
 
       // Create the plan
       const int  *fftSize = &fwdSize;

@@ -107,7 +107,7 @@ namespace Fftw {
 
    }
 
-   void IWorlandBackend::init(const SetupType& setup, const int lshift, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
+   void IWorlandBackend::init(const SetupType& setup, const int lshift, const int extraN, const bool lshiftOnlyParity, const bool alwaysZeroNegative) const
    {
       this->mFlipped = (std::abs(lshift)%2 == 1);
       int lshift_parity = lshift;
@@ -149,6 +149,8 @@ namespace Fftw {
          }
          col += std::get<2>(loc);
       }
+
+      this->mWExtra = extraN;
    }
 
    void IWorlandBackend::setZFilter(const std::set<int>& filter) const
@@ -166,7 +168,7 @@ namespace Fftw {
       return (this->mZFilter.count(l) == 1);
    }
 
-   void IWorlandBackend::setWSize(const unsigned int shiftMaxL) const
+   void IWorlandBackend::setWSize() const
    {
       int lt = 0;
       int lf = 0;
@@ -179,7 +181,7 @@ namespace Fftw {
          lf = std::get<0>(*this->pLoc(false)->rbegin());
       }
       // Triangular truncation requirements: WSize = n_lmax_modes + lmax/2
-      this->mWSize = this->mSpecSize + (std::max(lt,lf) + shiftMaxL)/2;
+      this->mWSize = this->mSpecSize + this->mWExtra + (std::max(lt,lf))/2;
    }
 
    IWorlandBackend::LocationVector* IWorlandBackend::pLoc(const bool isEven, const unsigned int id) const
