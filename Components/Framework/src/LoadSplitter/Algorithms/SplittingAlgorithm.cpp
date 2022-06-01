@@ -14,6 +14,10 @@
 #include <tuple>
 #include <stdexcept>
 
+#ifdef QUICC_MPI
+#include <mpi.h>
+#endif
+
 // External includes
 //
 
@@ -113,8 +117,8 @@ namespace Parallel {
          {
             SharedTransformResolution  spTRes = this->splitDimension(static_cast<Dimensions::Transform::Id>(j), id, status);
 
+            QuICCEnv().synchronize();
             #ifdef QUICC_MPI
-               QuICCEnv().synchronize();
                MPI_Allreduce(MPI_IN_PLACE, &status, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
             #endif //QUICC_MPI
 

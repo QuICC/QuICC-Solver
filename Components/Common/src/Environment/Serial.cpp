@@ -27,21 +27,15 @@ namespace Environment {
 
    Serial::Serial()
    {
-   }
-
-   Serial::~Serial()
-   {
-   }
-
-   void Serial::init()
-   {
-      IEnvironment::init();
-
       // Set ID
       Serial::mId = 0;
 
       // Set IO rank
       Serial::mIoRank = Serial::mId;
+   }
+
+   Serial::~Serial()
+   {
    }
 
    void Serial::setup(const int size)
@@ -74,12 +68,6 @@ namespace Environment {
    void Serial::abort(const std::string msg)
    {
       throw std::logic_error("Aborted: " + msg);
-   }
-
-   void Serial::finalize()
-   {
-      IEnvironment::finalize();
-
    }
 
 }

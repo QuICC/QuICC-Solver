@@ -24,6 +24,8 @@
 namespace currentts = ::QuICC::TestSuite::Framework::LoadSplitter;
 
 TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
+   // Init Environment
+   QuICC::QuICCEnv();
 
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -40,7 +42,7 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
       currentts::args().dim1D = 0;
 
       currentts::args().params.clear();
-      for(int i = 0; i < currentts::args().np; i++)
+      for(unsigned int i = 0; i < currentts::args().np; i++)
       {
          currentts::args().params.push_back(i);
       }
@@ -71,8 +73,6 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
    QuICC::Dimensions::Transform::Id stageId = static_cast<QuICC::Dimensions::Transform::Id>(currentts::args().stage);
 
    Catch::StringMaker<double>::precision = 15;
-
-   QuICC::QuICCEnv().init();
 
    auto op = currentts::args().op;
    auto db = currentts::args().db;
@@ -167,13 +167,13 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
       CHECK( refMult > 0 );
 
       INFO( "ref:  " << refMult );
-      for(auto m = 0; m < tot.size(); m++)
+      for(std::size_t m = 0; m < tot.size(); m++)
       {
          INFO( "m: " << m );
          // Triangular truncation for l,m pairs
          if(stageId == QuICC::Dimensions::Transform::TRA1D)
          {
-            CHECK(tot.at(m) == m+1);
+            CHECK(tot.at(m) == static_cast<int>(m+1));
          } else
          {
             CHECK(tot.at(m) == refMult);

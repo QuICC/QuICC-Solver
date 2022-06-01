@@ -39,11 +39,6 @@ namespace Environment {
          ~Mpi();
 
          /**
-          * @brief Initialise the environment
-          */
-         virtual void init() override;
-
-         /**
           * @brief Setup the environment
           */
          virtual void setup(const int size) override;
@@ -68,11 +63,6 @@ namespace Environment {
           */
          virtual void abort(const std::string msg) override;
 
-         /**
-          * @brief Finalise environment
-          */
-         virtual void finalize() override;
-
       protected:
 
       private:
@@ -80,6 +70,11 @@ namespace Environment {
           * @brief setup gdb hook
           */
          void gdbHook();
+
+         /**
+          * @brief size of the communicator
+          */
+         static int mCommSize;
    };
 
 }

@@ -32,11 +32,11 @@ class Colorcodes(object):
             self.orange = subprocess.check_output("tput setaf 3".split())
             self.red = subprocess.check_output("tput setaf 1".split())
         except subprocess.CalledProcessError as e:
-            self.bold = ""
-            self.reset = ""
+            self.bold = b""
+            self.reset = b""
 
-            self.blue = ""
-            self.green = ""
-            self.orange = ""
-            self.red = ""
+            self.blue = b""
+            self.green = b""
+            self.orange = b""
+            self.red = b""
 

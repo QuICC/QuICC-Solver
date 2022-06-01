@@ -45,8 +45,6 @@ if(TARGET UMFPACK::UMFPACK)
   target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" UMFPACK::UMFPACK)
 endif()
 
-target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" hdf5::hdf5)
-
 # Add source directory
 add_subdirectory(src)
 

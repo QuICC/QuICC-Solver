@@ -11,17 +11,12 @@
 #include <cassert>
 #include <string>
 #include <map>
-#include <functional>
 
 // External includes
 //
 
 // Project includes
 //
-#include "QuICC/Environment/Register/Profiler.hpp"
-#include "QuICC/Environment/Register/Precision.hpp"
-#include "QuICC/Environment/Register/Hdf5.hpp"
-#include "QuICC/Environment/Register/Mpi.hpp"
 
 namespace QuICC {
 
@@ -64,11 +59,6 @@ namespace Environment {
          virtual bool allowsIO() const;
 
          /**
-          * @brief Initialise the environment
-          */
-         virtual void init();
-
-         /**
           * @brief Setup the environment
           */
          virtual void setup(const int size) = 0;
@@ -93,31 +83,6 @@ namespace Environment {
           */
          virtual void abort(const std::string msg) = 0;
 
-         /**
-          * @brief Finalise environment
-          */
-         virtual void finalize();
-
-         /**
-          * @brief Register an initializer
-          */
-         static int registerInitializer(const int id, std::function<void()> fct);
-
-         /**
-          * @brief Register an initializer
-          */
-         static int registerFinalizer(const int id, std::function<void()> fct);
-
-         /**
-          * @brief Map of initializers (library, components, etc)
-          */
-         static std::map<int,std::function<void()> >& initializers();
-
-         /**
-          * @brief Map of finalizers (library, components, etc)
-          */
-         static std::map<int,std::function<void()> >& finalizers();
-
       protected:
 
          /**
@@ -141,12 +106,6 @@ namespace Environment {
           * @param size Configured size
           */
          virtual void checkEnvironment(const int size);
-
-      private:
-         /**
-          * @brief Check registered initializer/finalizer
-          */
-         template <typename T> void checkRegister(const std::string name);
    };
 
    inline int IEnvironment::size() const
@@ -163,19 +122,6 @@ namespace Environment {
       assert(IEnvironment::mId >= 0);
 
       return IEnvironment::mId;
-   }
-
-   template <typename T> void IEnvironment::checkRegister(const std::string name)
-   {
-      if(T::isActive && IEnvironment::initializers().count(T::initId) != 1)
-      {
-         this->abort(name + " initializer was not registerd");
-      }
-
-      if(T::isActive && IEnvironment::finalizers().count(T::finalId) != 1)
-      {
-         this->abort(name + " finalizer was not registerd");
-      }
    }
 
 }

@@ -11,5 +11,3 @@ else()
     Serial.cpp
     )
 endif(QUICC_MPI)
-
-add_subdirectory(Register)

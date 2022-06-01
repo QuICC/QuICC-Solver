@@ -32,6 +32,8 @@ namespace Hdf5 {
 
    Hdf5File::~Hdf5File()
    {
+      // Cleanup released resources
+      H5garbage_collect();
    }
 
    hid_t Hdf5File::filePList()

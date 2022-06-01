@@ -161,9 +161,9 @@ LD_PRELOAD=</path/to/FFTW>/libfftw3.so <executable>
 ## Debugging
 
 ### gdb hook
-By setting the enviroment variable `QUICC_GDB_HOOK` to any value a single process will print its PID and wait
+By setting the enviroment variable `QUICC_GDB_HOOK` to a non-negative integer value, that process will print its PID and wait
 ```bash
-QUICC_GDB_HOOK=y mpirun -n 4 <executable>
+QUICC_GDB_HOOK=0 mpirun -n 4 <executable>
 ```
 ## Profiling
 

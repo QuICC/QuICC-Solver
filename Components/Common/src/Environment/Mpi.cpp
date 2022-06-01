@@ -10,6 +10,7 @@
 //
 #include <iostream>
 #include <chrono>
+#include <climits>
 #include <thread>
 #include <regex>
 extern "C"
@@ -33,18 +34,13 @@ namespace Environment {
 
    Mpi::Mpi()
    {
-   }
-
-   Mpi::~Mpi()
-   {
-   }
-
-   void Mpi::init()
-   {
-      IEnvironment::init();
+      MPI_Init(nullptr, nullptr);
 
       // Set MPI rank of local CPU
       MPI_Comm_rank(MPI_COMM_WORLD, &Mpi::mId);
+
+      // Get communnicator size
+      MPI_Comm_size(MPI_COMM_WORLD, &Mpi::mCommSize);
 
       // Set IO rank
       Mpi::mIoRank = 0;
@@ -53,17 +49,18 @@ namespace Environment {
       gdbHook();
    }
 
+   Mpi::~Mpi()
+   {
+      MPI_Finalize();
+   }
+
    void Mpi::setup(const int size)
    {
       // Set the number of ranks
       Mpi::mSize = size;
 
-      // Get MPI size
-      int nRank;
-      MPI_Comm_size(MPI_COMM_WORLD, &nRank);
-
       // Check that the environment was setup correctly
-      this->checkEnvironment(nRank);
+      this->checkEnvironment(mCommSize);
    }
 
    void Mpi::synchronize()
@@ -92,7 +89,7 @@ namespace Environment {
       // let's wait a bit for everyone to join
       int request_complete;
       MPI_Status status;
-      for(int i = 0; i < 10; ++i)
+      for(int i = 0; i < 100; ++i)
       {
          MPI_Test(&request, &request_complete, &status);
          if(request_complete)
@@ -121,31 +118,47 @@ namespace Environment {
       exit(1);
    }
 
-   void Mpi::finalize()
-   {
-      // Make sure all finished and are synchronised
-      MPI_Barrier(MPI_COMM_WORLD);
-
-      IEnvironment::finalize();
-   }
-
    void Mpi::gdbHook()
    {
       const char* env = std::getenv("QUICC_GDB_HOOK");
-      if (env) {
-         if(Mpi::mId == Mpi::mIoRank)
+      if (env)
+      {
+         // Try to get rank from env
+         int gdbRank;
+         try
+         {
+            gdbRank = std::stoi(env) % mCommSize;
+         }
+         catch (...)
+         {
+            this->abort("gdb rank needs to be a non-negative integer");
+         }
+
+         if(gdbRank < 0)
+         {
+            this->abort("gdb rank needs to be non-negative");
+         }
+
+         // gdb rank wait for gdb connection
+         if(Mpi::mId == gdbRank)
          {
             using namespace std::chrono_literals;
             volatile int i = 0;
             char hostname[HOST_NAME_MAX];
             gethostname(hostname, HOST_NAME_MAX);
             std::cerr << "PID " << getpid() << " on " << hostname
+               << " with rank " << gdbRank
                << " ready to attach" << std::endl;
             while (0 == i)
             std::this_thread::sleep_for(1s);
          }
       }
+      // Wait for everyone
+      this->synchronize();
    }
+
+   // Static init
+   int Mpi::mCommSize = -99;
 
 } // namespace Enviroment
 } // namespace QuICC

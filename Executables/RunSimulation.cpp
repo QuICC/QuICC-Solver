@@ -79,20 +79,18 @@ int run()
  */
 int main(int argc, char* argv[])
 {
+   // Environment fixture
+   QuICC::QuICCEnv();
+
    // Initialise everything that can't be done inside a class
-   QuICC::QuICCEnv().init();
    QuICC::StageTimer::allowIo(QuICC::QuICCEnv().allowsIO());
    QuICC::Profiler::Initialize();
 
-   // Storage for the return code of run
-   int code;
-
    // Compute simulation
-   code = run();
+   auto code = run();
 
    // Finalise everything that can't be done inside a class
    QuICC::Profiler::Finalize();
-   QuICC::QuICCEnv().finalize();
 
    return code;
 }
