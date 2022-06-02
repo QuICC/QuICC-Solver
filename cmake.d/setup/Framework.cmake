@@ -31,9 +31,15 @@ quicc_add_definition(QUICC_MEMORYUSAGE)
 # Possible options are: Serial, Single1D, Single2D, Tubular
 #
 quicc_create_option(NAME QUICC_MPIALGO
-                    OPTS "Serial" "Tubular" "Single1D" "Single2D" "Coupled2D"
+                    OPTS "Serial" "Tubular" "Single1D" "Single2D" "Coupled2D" "SerialMpi"
                     LABEL "MPI algorithm")
-quicc_add_definition(QUICC_MPIALGO)
+
+if(QUICC_MPIALGO STREQUAL "SerialMpi")
+   # Overwrite def
+   quicc_add_definition(QUICC_MPIALGO FORCE "Serial")
+else()
+   quicc_add_definition(QUICC_MPIALGO)
+endif()
 
 if(NOT QUICC_MPIALGO STREQUAL "Serial")
    if(NOT MPI_FOUND)

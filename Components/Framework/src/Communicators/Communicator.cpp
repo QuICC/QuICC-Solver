@@ -61,8 +61,15 @@ namespace Parallel {
       //
 
       //
-      // MPI code needs to come first
-      // Separating out MPI and serial code makes sure Serial version can be compiled without MPI installed
+      // Serial implementation
+      //
+      if(split == QuICC::Splitting::Locations::NONE)
+      {
+         this->createSerialConverter<Dimensions::Transform::TRA2D>(spRes);
+      }
+
+      //
+      // MPI implementation
       //
       #ifdef QUICC_MPI
          // Load splitting has been done on first dimension
@@ -80,11 +87,6 @@ namespace Parallel {
          // {
          //    Initialisation of this part is done at a higher level to optimise storage/buffer use
          // }
-      //
-      // Serial implementation
-      //
-      #else
-         this->createSerialConverter<Dimensions::Transform::TRA2D>(spRes);
       #endif // QUICC_MPI
 
       // If only one dimension is split. Else the setup will be done at a later stage to optimise memory/buffer usage.
@@ -99,8 +101,16 @@ namespace Parallel {
       //
 
       //
-      // MPI code needs to come first
-      // Separating out MPI and serial code makes sure Serial version can be compiled without MPI installed
+      // Serial implementation
+      //
+      if(split == QuICC::Splitting::Locations::NONE)
+      {
+         // Initialise serial 3D converter
+         this->createSerialConverter<Dimensions::Transform::TRA3D>(spRes);
+      }
+
+      //
+      // MPI implementation
       //
 #ifdef QUICC_MPI
       // Load splitting has been done on first dimension
@@ -120,12 +130,6 @@ namespace Parallel {
          this->createMpiConverter<Dimensions::Transform::TRA3D>(spRes, packs.at(2), packs.at(3));
          // A better implementation using only 3 buffers is possible but requires some cross transform synchronization
       }
-      //
-      // Serial implementation
-      //
-#else
-      // Initialise serial 3D converter
-      this->createSerialConverter<Dimensions::Transform::TRA3D>(spRes);
 #endif // QUICC_MPI
 
       // Setup converter
