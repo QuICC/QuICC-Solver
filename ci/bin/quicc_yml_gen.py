@@ -12,7 +12,7 @@ class config(NamedTuple):
     model: bool
 
 def populateYaml(cnf):
-    imageLocation = 'art.cscs.ch/contbuild/testing/anfink'
+    imageLocation = '$CSCS_REGISTRY_PATH'
     image = 'quicc_'+cnf.tag+':latest'
     configIn = {
         'build-quicc_'+cnf.tag:
@@ -29,7 +29,7 @@ def populateYaml(cnf):
                 'variables':
                     {
                         'DOCKERFILE': 'docker/Dockerfile_'+cnf.tag,
-                        'PERSIST_IMAGE_NAME': image
+                        'PERSIST_IMAGE_NAME': imageLocation+'/'+image
                     },
             },
         'include':

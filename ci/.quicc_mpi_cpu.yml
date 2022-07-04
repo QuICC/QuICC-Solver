@@ -7,7 +7,7 @@ build-quicc_mpi:
   - 'true'
   variables:
     DOCKERFILE: docker/Dockerfile_mpi
-    PERSIST_IMAGE_NAME: quicc_mpi:latest
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi:latest
 include:
 - /ci/.daint_runner.yml
 - /ci/.quicc_tests.yml
@@ -16,12 +16,12 @@ test-quicc-lib_mpi:
   extends:
   - .test-lib
   - .cpu
-  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
 BoussinesqSphereDynamo_mpi:
   extends:
   - .BoussinesqSphereDynamo
   - .cpu
-  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '4'
@@ -31,7 +31,7 @@ BoussinesqShellDynamo_mpi:
   extends:
   - .BoussinesqShellDynamo
   - .cpu
-  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '4'
@@ -41,7 +41,7 @@ BoussinesqSphereRTC_mpi:
   extends:
   - .BoussinesqSphereRTC
   - .cpu
-  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '4'
@@ -51,7 +51,7 @@ BoussinesqShellRTC_mpi:
   extends:
   - .BoussinesqShellRTC
   - .cpu
-  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '4'
@@ -61,7 +61,7 @@ BoussinesqSphereTC_mpi:
   extends:
   - .BoussinesqSphereTC
   - .cpu
-  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '4'
@@ -71,7 +71,7 @@ BoussinesqShellTC_mpi:
   extends:
   - .BoussinesqShellTC
   - .cpu
-  image: art.cscs.ch/contbuild/testing/anfink/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '4'

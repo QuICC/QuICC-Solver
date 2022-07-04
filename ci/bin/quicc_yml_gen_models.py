@@ -21,8 +21,16 @@ def populateYaml(cnf):
             [
                 'hostname',
                 # first install the library to the shared folder
+                # note, only one model per pipeline does this step
                 'cd /QuICC.src/build',
-                '/QuICC.src/ci/bin/mpi_lock.sh \"cmake .. -DCMAKE_INSTALL_PREFIX='+libPath+' && make install\"',
+                '/QuICC.src/ci/bin/mpi_lock.sh \"cmake ..' \
+                    ' -DCMAKE_INSTALL_PREFIX='+libPath+ \
+                    ' -DQUICC_TESTSUITE_POLYNOMIAL=OFF' \
+                    ' -DQUICC_TESTSUITE_FRAMEWORK=OFF' \
+                    ' -DQUICC_TESTSUITE_TRANSFORM=OFF' \
+                    ' -DQUICC_TESTSUITE_PROFILING=OFF' \
+                    ' -DQUICC_TESTSUITE_SPARSESM=OFF' \
+                    ' && make install\"',
                 # then move to the shared location to build the model
                 'mkdir -p '+modelPath+'/build',
                 'cd '+modelPath+'/build',

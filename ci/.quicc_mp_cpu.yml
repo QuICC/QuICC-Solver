@@ -7,7 +7,7 @@ build-quicc_mp:
   - 'true'
   variables:
     DOCKERFILE: docker/Dockerfile_mp
-    PERSIST_IMAGE_NAME: quicc_mp:latest
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mp:latest
 include:
 - /ci/.daint_runner.yml
 - /ci/.quicc_tests.yml
@@ -16,4 +16,4 @@ test-quicc-lib_mp:
   extends:
   - .test-lib
   - .cpu
-  image: art.cscs.ch/contbuild/testing/anfink/quicc_mp:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mp:latest
