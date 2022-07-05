@@ -1,21 +1,20 @@
-.cpu:
+.daint_runner:
   extends: .daint
   variables:
     PULL_IMAGE: 'YES'
+    PULL_ON_HOST_MACHINE: 'NO'
     CSCS_REGISTRY_LOGIN: 'YES'
     USE_MPI: 'YES'
-    SLURM_CONSTRAINT: 'mc'
     SLURM_NNODES: 1
     SLURM_NTASKS_PER_NODE: 1
     SLURM_TIMELIMIT: '20:00'
 
-.gpu:
-  extends: .daint
+.cpu:
+  extends: .daint_runner
   variables:
-    PULL_IMAGE: 'YES'
-    CSCS_REGISTRY_LOGIN: 'YES'
-    USE_MPI: 'YES'
+    SLURM_CONSTRAINT: 'mc'
+
+.gpu:
+  extends: .daint_runner
+  variables:
     SLURM_CONSTRAINT: 'gpu'
-    SLURM_NNODES: 1
-    SLURM_NTASKS_PER_NODE: 1
-    SLURM_TIMELIMIT: '20:00'
