@@ -1,9 +1,9 @@
-message(VERBOSE "Enabling Worland tests:")
+message(VERBOSE "Enabling Chebyshev LinearMap tests:")
 
-set(TestExe SparseSMWorlandTests)
+set(TestExe SparseSMChebyshevLinearMapTests)
 
 # Add target for all tests
-add_executable(${TestExe} WorlandTests.cpp)
+add_executable(${TestExe} ChebyshevLinearMapTests.cpp)
 
 target_link_libraries(${TestExe}
   ${QUICC_CURRENT_COMPONENT_TEST_LIB}
@@ -26,67 +26,60 @@ include(FetchTestReference)
 quicc_fetch_test_reference(
   ${TestExe}
   COMPONENT SparseSM
-  FILENAME "Worland.tar.gz"
+  FILENAME "ChebyshevLinearMap.tar.gz"
   ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
   DATADIR ${QUICC_WORK_DIR}
 )
 
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
-# Create Chebyshev basis tests targets
+# Create basis tests targets
 include(ConfigureTests)
 set(_tests
-  R2:sparse
+  Y1:sparse
+  Y2:sparse
+  I1:sparse
   I2:sparse
+  I2Y1:sparse
+  I2Y2:sparse
+  I2D1:sparse
+  I2Y1D1Y1:sparse
+  I3:sparse
   I4:sparse
-  I6:sparse
+  I4D1:sparse
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 0 1 2 3 4
-    ULP 70
+    IDS 0 1 10 11
+    ULP 11
   )
 endforeach()
 
-# Create Chebyshev basis tests targets
+# Create basis tests targets
 set(_tests
-  R2:sparse
+  I4Y3:sparse
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 10 11 12 13 14
-    ULP 70
+    IDS 0 1 10 11
+    ULPS 25 25 11 11
   )
 endforeach()
 
-# Create Chebyshev basis tests targets
+# Create basis tests targets
 set(_tests
-  I2:sparse
+  I4Y3D1Y1:sparse
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 10 11 12 13 14
-    ULP 70
-  )
-endforeach()
-
-# Create Chebyshev basis tests targets
-set(_tests
-  I4:sparse
-  I6:sparse
-  )
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Operator:type
-    IDS 10 11 12 13 14
-    ULP 95
+    IDS 0 1 10 11
+    ULPS 18 58 11 11
   )
 endforeach()
 

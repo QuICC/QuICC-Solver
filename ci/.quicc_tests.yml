@@ -21,4 +21,5 @@
     - ctest --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_projector_ulp"
     - ctest --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_projector_id"
     - ctest --no-tests=error --output-on-failure -R SparseSMWorlandTests_
+    - ctest --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapTests_
     - ctest --no-tests=error --output-on-failure -R FrameworkLoadSplitterTests_
