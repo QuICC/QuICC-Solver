@@ -72,7 +72,7 @@ if __name__ == '__main__':
             config('BoussinesqSphereRTC', 'Explicit', True),
             config('BoussinesqShellRTC', 'Explicit', True),
             config('BoussinesqShellTC', 'Explicit', False),
-            config('BoussinesqSphereTC', 'Explicit', False),
+            config('BoussinesqSphereTC', 'Explicit', True),
             ]
     else:
         confs = config(sys.argv[1], sys.argv[2], sys.argv[3])
