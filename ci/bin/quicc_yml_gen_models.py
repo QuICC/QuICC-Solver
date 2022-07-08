@@ -71,7 +71,7 @@ if __name__ == '__main__':
             config('BoussinesqShellDynamo', 'Explicit', True),
             config('BoussinesqSphereRTC', 'Explicit', True),
             config('BoussinesqShellRTC', 'Explicit', True),
-            config('BoussinesqShellTC', 'Explicit', False),
+            config('BoussinesqShellTC', 'Explicit', True),
             config('BoussinesqSphereTC', 'Explicit', True),
             ]
     else:

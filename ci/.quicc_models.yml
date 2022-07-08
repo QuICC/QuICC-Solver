@@ -74,6 +74,11 @@
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTC/build
   - /QuICC.src/ci/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellTC'"
+  - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTC/build/lib/python
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTC/build/Models/BoussinesqShellTC/TestSuite/Benchmarks/_data/Explicit
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTC/build/Models/BoussinesqShellTC/Executables/BoussinesqShellTCExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTC/build
+  - /QuICC.src/ci/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellTCExplicit && echo ${QUICC_VERSION_TAG}"
 .BoussinesqSphereTC:
   stage: model-build-and-test
   script:
