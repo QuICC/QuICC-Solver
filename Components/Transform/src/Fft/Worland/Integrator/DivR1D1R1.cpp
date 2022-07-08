@@ -39,8 +39,8 @@ namespace Integrator {
 
    void DivR1D1R1::initBackend() const
    {
-      int lshift = 1; // operator shifts l by one
-      int extraN = 0; // no extra modes are required
+      int lshift = -1; // operator shifts l by one
+      int extraN = 1; // 1 extra modes is required for l - 1 shift
       this->mBackend.init(*this->mspSetup, lshift, extraN);
       this->mBackend.addStorage(0, 1);
    }
@@ -58,13 +58,14 @@ namespace Integrator {
       this->mBackend.lshift(extra, 1, isEven);
       this->mBackend.lowerAlpha(0.5, isEven, extra, 1.0);
       this->mBackend.lowerR2Beta(-0.5, isEven, extra, 1.0);
+      this->mBackend.raiseR2Beta(-0.5, isEven, extra, 1.0/std::sqrt(2.0), true);
 
       // Scaling original expansion
       this->mBackend.scaleALPY(1.0, 1.0, isEven);
+      this->mBackend.raiseR2Beta(-0.5, isEven, main);
 
       // Add second term
       this->mBackend.add(main, extra, 0, isEven);
-      this->mBackend.lowerBeta(-0.5, isEven);
    }
 
    void DivR1D1R1::applyPreOperator(const Matrix& in, const bool isEven) const

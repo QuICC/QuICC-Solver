@@ -28,7 +28,7 @@ namespace Kernel {
 namespace Sphere {
 
    ValidationTorPol::ValidationTorPol()
-      : IPhysicalKernel()
+      : IPhysicalKernel(), mC(1.0)
    {
    }
 
@@ -36,8 +36,9 @@ namespace Sphere {
    {
    }
 
-   void ValidationTorPol::init()
+   void ValidationTorPol::init(const MHDFloat c)
    {
+      this->mC = c;
    }
 
    Array ValidationTorPol::x(const int iR, const int iTh) const
@@ -74,17 +75,17 @@ namespace Sphere {
 
    Array ValidationTorPol::vx(const int iR, const int iTh) const
    {
-      return 1e9*this->x(iR, iTh).array().pow(2)*this->y(iR, iTh).array().pow(2)*this->z(iR, iTh).array().pow(2);
+      return this->mC*this->x(iR, iTh).array().pow(2)*this->y(iR, iTh).array().pow(2)*this->z(iR, iTh).array().pow(2);
    }
 
    Array ValidationTorPol::vy(const int iR, const int iTh) const
    {
-      return -1e9*this->x(iR, iTh).array()*this->y(iR, iTh).array().pow(3)*this->z(iR, iTh).array().pow(2);
+      return -this->mC*this->x(iR, iTh).array()*this->y(iR, iTh).array().pow(3)*this->z(iR, iTh).array().pow(2);
    }
 
    Array ValidationTorPol::vz(const int iR, const int iTh) const
    {
-      return 1e9*(1./3.)*this->x(iR, iTh).array()*this->y(iR, iTh).array().pow(2)*this->z(iR, iTh).array().pow(3);
+      return this->mC*(1./3.)*this->x(iR, iTh).array()*this->y(iR, iTh).array().pow(2)*this->z(iR, iTh).array().pow(3);
    }
 
    void ValidationTorPol::compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const

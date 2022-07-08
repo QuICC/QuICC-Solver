@@ -21,7 +21,8 @@
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Worland/Reductor/IWorlandEnergy.hpp"
+#include "QuICC/Transform/Fft/Worland/Reductor/IEnergyWrapper.hpp"
+#include "QuICC/Transform/Poly/Worland/Reductor/Energy.hpp"
 
 namespace QuICC {
 
@@ -36,31 +37,22 @@ namespace Reductor {
    /**
     * @brief Implementation of the Worland based R^2 energy operator
     */ 
-   class Energy: public IWorlandEnergy
+   class Energy: public IEnergyWrapper<Poly::Worland::Reductor::Energy>
    {
       public:
          /**
           * @brief Constructor
           */
-         Energy();
+         Energy() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~Energy();
+         virtual ~Energy() = default;
          
       protected:
 
       private:
-         /**
-          * @brief Make operator
-          */
-         virtual void makeOperator(Matrix& op, Matrix& eop, const internal::Array& igrid, const internal::Array& iweights, const Array& eweights, const int i) const;
-
-         /**
-          * @brief Apply ith operator
-          */
-         virtual void applyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
    };
 
 }

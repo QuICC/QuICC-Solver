@@ -48,20 +48,6 @@ namespace Integrator {
       this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 
-   void I2_Zero::applyPostOperator(Matrix& rOut, const bool isEven) const
-   {
-      P::computeWorlandExpansion(isEven);
-      this->mBackend.applyI2(isEven);
-      this->mBackend.output(rOut, isEven);
-   }
-
-   void I2_Zero::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
-   {
-      P::computeWorlandExpansion(isEven);
-      this->mBackend.applyI2(isEven);
-      this->mBackend.output(rOut, isEven, useReal);
-   }
-
 }
 }
 }

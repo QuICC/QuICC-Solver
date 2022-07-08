@@ -33,6 +33,12 @@ int main( int argc, char* argv[] )
       | Opt( test::args().params, "id" )      // Add test id option
          ["--id"]
          ("Test id")
+      | Opt( test::args().np, "np" )      // Add test np option
+         ["--np"]
+         ("# MPI ranks")
+      | Opt( test::args().rank, "rank" )      // Add test rank option
+         ["--rank"]
+         ("MPI rank")
       | Opt( testType, "test type" )                          // Add test type
          ["--type"]
          ("Test type: projector, integrator, reductor, bfloop")

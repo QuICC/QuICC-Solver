@@ -22,16 +22,30 @@
 #include "QuICC/Arithmetics/Add.hpp"
 #include "QuICC/Arithmetics/Sub.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
+#include "QuICC/Transform/Path/Scalar.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
+#include "QuICC/Transform/Path/ScalarNL.hpp"
+#include "QuICC/Transform/Path/CurlNL.hpp"
+#include "QuICC/Transform/Path/CurlCurlNL.hpp"
+#include "QuICC/Transform/Path/I2ScalarNL.hpp"
+#include "QuICC/Transform/Path/I2CurlNL.hpp"
+#include "QuICC/Transform/Path/I2CurlCurlNL.hpp"
+#include "QuICC/Transform/Path/I4CurlCurlNL.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
-#include "QuICC/Transform/Forward/T.hpp"
+#include "QuICC/Transform/Forward/I2P.hpp"
 #include "QuICC/Transform/Forward/Laplh_1.hpp"
 #include "QuICC/Transform/Forward/R1.hpp"
 #include "QuICC/Transform/Forward/Laplh_1D1.hpp"
 #include "QuICC/Transform/Forward/Laplh_1Sin_1Dphi.hpp"
-#include "QuICC/Transform/Forward/Q4.hpp"
-#include "QuICC/Transform/Forward/S4.hpp"
-#include "QuICC/Transform/Forward/Q2.hpp"
-#include "QuICC/Transform/Forward/S2.hpp"
+#include "QuICC/Transform/Forward/Pol.hpp"
+#include "QuICC/Transform/Forward/Q.hpp"
+#include "QuICC/Transform/Forward/S.hpp"
+#include "QuICC/Transform/Forward/T.hpp"
+#include "QuICC/Transform/Forward/I4Q.hpp"
+#include "QuICC/Transform/Forward/I4S.hpp"
+#include "QuICC/Transform/Forward/I2Q.hpp"
+#include "QuICC/Transform/Forward/I2S.hpp"
+#include "QuICC/Transform/Forward/I2T.hpp"
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/R_1.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
@@ -59,37 +73,62 @@ namespace Transform {
       return spScheme->has(SpatialScheme::Feature::SphereGeometry);
    }
 
-   std::vector<TransformPath>  SphereTransformSteps::forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const
+   std::vector<TransformPath>  SphereTransformSteps::forwardScalar(const std::vector<PathId >& components) const
    {
       assert(components.size() == 1);
       std::vector<TransformPath> transform;
 
       FieldComponents::Spectral::Id scalId = components.at(0).first;
+      auto flag = components.at(0).second;
 
-      transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
-      transform.back().addEdge(Forward::P::id());
-      transform.back().addEdge(Forward::P::id());
-      transform.back().addEdge(Forward::P::id(), scalId, Arithmetics::Add::id());
+      if(flag == Path::Scalar::id())
+      {
+         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+         transform.back().addEdge(Forward::P::id());
+         transform.back().addEdge(Forward::P::id());
+         transform.back().addEdge(Forward::P::id(), scalId, Arithmetics::Add::id());
+      }
+      else
+      {
+         throw std::logic_error("Requested an unknown scalar forward transform");
+      }
 
       return transform;
    }
 
-   std::vector<TransformPath>  SphereTransformSteps::forwardNLScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const
+   std::vector<TransformPath>  SphereTransformSteps::forwardNLScalar(const std::vector<PathId >& components) const
    {
       assert(components.size() == 1);
       std::vector<TransformPath> transform;
 
       FieldComponents::Spectral::Id scalId = components.at(0).first;
+      auto flag = components.at(0).second;
 
-      transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
-      transform.back().addEdge(Forward::P::id());
-      transform.back().addEdge(Forward::P::id());
-      transform.back().addEdge(Forward::P::id(), scalId, Arithmetics::Add::id());
+      // Without quasi-inverse
+      if(flag == Path::ScalarNL::id())
+      {
+         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+         transform.back().addEdge(Forward::P::id());
+         transform.back().addEdge(Forward::P::id());
+         transform.back().addEdge(Forward::P::id(), scalId, Arithmetics::Add::id());
+      }
+      // Apply second order quasi-inverse
+      else if(flag == Path::I2ScalarNL::id())
+      {
+         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+         transform.back().addEdge(Forward::P::id());
+         transform.back().addEdge(Forward::P::id());
+         transform.back().addEdge(Forward::I2P::id(), scalId, Arithmetics::Add::id());
+      }
+      else
+      {
+         throw std::logic_error("Requested an unknown nonlinear scalar forward transform");
+      }
 
       return transform;
    }
 
-   std::vector<TransformPath>  SphereTransformSteps::forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const
+   std::vector<TransformPath>  SphereTransformSteps::forwardVector(const std::vector<PathId >& components) const
    {
       std::vector<TransformPath> transform;
 
@@ -97,11 +136,11 @@ namespace Transform {
       {
          assert(components.size() == 2);
          FieldComponents::Spectral::Id curlId = components.at(0).first;
-         int curlFlag = components.at(0).second;
+         auto curlFlag = components.at(0).second;
          FieldComponents::Spectral::Id curlcurlId = components.at(1).first;
-         int curlcurlFlag = components.at(1).second;
+         auto curlcurlFlag = components.at(1).second;
 
-         if(curlFlag == 0 && curlcurlFlag == 0)
+         if(curlFlag == Path::TorPol::id() && curlcurlFlag == Path::TorPol::id())
          {
             // Compute Toroidal component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
@@ -118,8 +157,9 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::Laplh_1::id());
-            transform.back().addEdge(Forward::R1::id(), curlcurlId, Arithmetics::Add::id());
-         } else
+            transform.back().addEdge(Forward::Pol::id(), curlcurlId, Arithmetics::Add::id());
+         }
+         else
          {
             throw std::logic_error("Requested an unknown vector forward transform");
          }
@@ -146,7 +186,7 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  SphereTransformSteps::forwardNLVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const
+   std::vector<TransformPath>  SphereTransformSteps::forwardNLVector(const std::vector<PathId >& components) const
    {
       std::vector<TransformPath> transform;
 
@@ -154,12 +194,26 @@ namespace Transform {
       {
          assert(components.size() == 2);
          FieldComponents::Spectral::Id curlId = components.at(0).first;
-         int curlFlag = components.at(0).second;
+         auto curlFlag = components.at(0).second;
          FieldComponents::Spectral::Id curlcurlId = components.at(1).first;
-         int curlcurlFlag = components.at(1).second;
+         auto curlcurlFlag = components.at(1).second;
 
-         // Integrate for standard second order equation
-         if(curlFlag == 0)
+         // Integrate standard second order equation
+         if(curlFlag == Path::I2CurlNL::id())
+         {
+            // Compute curl component
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::Laplh_1Sin_1Dphi::id());
+            transform.back().addEdge(Forward::I2T::id(), curlId, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::Laplh_1D1::id());
+            transform.back().addEdge(Forward::I2T::id(), curlId, Arithmetics::Sub::id());
+         }
+         // Standard second order equation without quasi-inverse
+         else if(curlFlag == Path::CurlNL::id())
          {
             // Compute curl component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
@@ -171,57 +225,82 @@ namespace Transform {
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::Laplh_1D1::id());
             transform.back().addEdge(Forward::T::id(), curlId, Arithmetics::Sub::id());
-         } else
+         }
+         else
          {
-            throw std::logic_error("Requested an unknown vector forward transform");
+            throw std::logic_error("Requested an unknown curl nonlinear vector forward transform");
          }
 
-         // Integrate for standard fourth order spherical equation
-         if(curlcurlFlag == 0)
+         // Integrate fourth order spherical equation
+         if(curlcurlFlag == Path::I4CurlCurlNL::id())
          {
             // Compute curlcurl Q component
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::Q4::id(), curlcurlId, Arithmetics::Sub::id());
+            transform.back().addEdge(Forward::I4Q::id(), curlcurlId, Arithmetics::Sub::id());
 
             // Compute curlcurl S component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::Laplh_1D1::id());
-            transform.back().addEdge(Forward::S4::id(), curlcurlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::I4S::id(), curlcurlId, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::Laplh_1Sin_1Dphi::id());
-            transform.back().addEdge(Forward::S4::id(), curlcurlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::I4S::id(), curlcurlId, Arithmetics::Add::id());
 
-         // Integrate for second order spherical equation
-         } else if(curlcurlFlag == 1)
+         }
+         // Integrate second order spherical equation
+         else if(curlcurlFlag == Path::I2CurlCurlNL::id())
          {
             // Compute curlcurl Q component
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::Q2::id(), curlcurlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::I2Q::id(), curlcurlId, Arithmetics::Add::id());
 
             // Compute curlcurl S component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::Laplh_1D1::id());
-            transform.back().addEdge(Forward::S2::id(), curlcurlId, Arithmetics::Sub::id());
+            transform.back().addEdge(Forward::I2S::id(), curlcurlId, Arithmetics::Sub::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::Laplh_1Sin_1Dphi::id());
-            transform.back().addEdge(Forward::S2::id(), curlcurlId, Arithmetics::Sub::id());
-         } else
+            transform.back().addEdge(Forward::I2S::id(), curlcurlId, Arithmetics::Sub::id());
+
+         }
+         // transform without quasi-inverse
+         else if(curlcurlFlag == Path::CurlCurlNL::id())
          {
-            throw std::logic_error("Requested an unknown vector forward transform");
+            // Compute curlcurl Q component
+            transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::Q::id(), curlcurlId, Arithmetics::Add::id());
+
+            // Compute curlcurl S component
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::Laplh_1D1::id());
+            transform.back().addEdge(Forward::S::id(), curlcurlId, Arithmetics::Sub::id());
+
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::Laplh_1Sin_1Dphi::id());
+            transform.back().addEdge(Forward::S::id(), curlcurlId, Arithmetics::Sub::id());
+         }
+         else
+         {
+            throw std::logic_error("Requested an unknown curlcurl vector forward transform");
          }
 
+      }
       // The following assumes the physical values are obtained from a primitive formulation
-      } else
+      else
       {
          assert(components.size() == 3);
 

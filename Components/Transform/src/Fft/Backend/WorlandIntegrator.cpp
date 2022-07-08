@@ -107,9 +107,9 @@ namespace Backend {
       this->mpImpl->lowerR2Beta(alpha, isEven, id, norm);
    }
 
-   void WorlandIntegrator::raiseR2Beta(const MHDFloat alpha, const bool isEven, const int id, const MHDFloat norm) const
+   void WorlandIntegrator::raiseR2Beta(const MHDFloat alpha, const bool isEven, const int id, const MHDFloat norm, const bool scaleL0) const
    {
-      this->mpImpl->raiseR2Beta(alpha, isEven, id, norm);
+      this->mpImpl->raiseR2Beta(alpha, isEven, id, norm, scaleL0);
    }
 
    void WorlandIntegrator::lowerAlpha(const MHDFloat alpha, const bool isEven, const int id, const MHDFloat norm) const

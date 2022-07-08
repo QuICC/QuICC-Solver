@@ -38,7 +38,7 @@ namespace Integrator {
 
    void DivR1::initBackend() const
    {
-      int lshift = 1; // operator shifts l by one
+      int lshift = -1; // operator shifts l by one
       int extraN = 0; // no extra modes are required
       this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
@@ -46,7 +46,7 @@ namespace Integrator {
    void DivR1::computeWorlandExpansion(const bool isEven) const
    {
       this->mBackend.forwardWorland(isEven);
-      this->mBackend.lowerBeta(-0.5, isEven);
+      this->mBackend.raiseR2Beta(-0.5, isEven);
    }
 
    void DivR1::applyPreOperator(const Matrix& in, const bool isEven) const

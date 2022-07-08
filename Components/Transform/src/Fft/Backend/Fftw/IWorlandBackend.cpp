@@ -314,6 +314,11 @@ namespace Fftw {
       }
       rJ.col(2) = (2.0*(n.array() + 1.0)*(n.array() + a1)).sqrt();
       rJ.col(3) = ((2.0*n.array() + ab1)*(2.0*n.array() + ab2)).sqrt();
+      if(ab1 == 0.0)
+      {
+         rJ.col(0)(1) = 1.0;
+         rJ.col(3)(0) = 1.0;
+      }
    }
 
    void IWorlandBackend::buildShiftU(Matrix& U, const int size, const MHDFloat alpha, const MHDFloat beta, const MHDFloat norm) const

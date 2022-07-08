@@ -119,7 +119,7 @@ namespace CuFft {
          /**
           * @brief Raise beta by 1 and multiply by r^2
           */
-         void raiseR2Beta(const double alpha, const bool isEven, const int id = 0, const double norm = 1.0/std::sqrt(2.0)) const;
+         void raiseR2Beta(const double alpha, const bool isEven, const int id = 0, const double norm = 1.0/std::sqrt(2.0), const bool scaleL0 = false) const;
 
          /**
           * @brief Apply sparse integration operator I2

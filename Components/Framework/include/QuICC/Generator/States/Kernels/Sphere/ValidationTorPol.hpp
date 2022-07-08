@@ -50,9 +50,9 @@ namespace Sphere {
          /**
           * @brief Initialize kernel
           *
-          * @param value Value to set the field to
+          * @param c Constant scaling factor
           */
-         void init();
+         void init(const MHDFloat c = 1.0);
 
          /**
           * @brief Compute the physical kernel
@@ -94,6 +94,11 @@ namespace Sphere {
           * @brief Z component of cartesian vector v
           */
          Array vz(const int iR, const int iTh) const;
+
+         /**
+          * @brief Scaling factor
+          */
+         MHDFloat mC;
    };
 
 }

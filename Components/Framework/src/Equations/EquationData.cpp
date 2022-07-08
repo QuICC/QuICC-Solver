@@ -378,12 +378,12 @@ namespace Equations {
       return id;
    }
 
-   const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& EquationData::nlComponents() const
+   const std::vector<std::pair<FieldComponents::Spectral::Id,std::size_t> >& EquationData::nlComponents() const
    {
       return this->mNLComponents;
    }
 
-   void EquationData::addNLComponent(const FieldComponents::Spectral::Id compId, const int flag)
+   void EquationData::addNLComponent(const FieldComponents::Spectral::Id compId, const std::size_t flag)
    {
       this->mNLComponents.push_back(std::make_pair(compId,flag));
    }

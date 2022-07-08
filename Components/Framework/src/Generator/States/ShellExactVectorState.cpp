@@ -26,6 +26,7 @@
 #include "QuICC/PhysicalKernels/MakeConstant.hpp"
 #include "QuICC/PhysicalKernels/MakeRandom.hpp"
 #include "QuICC/SpectralKernels/Set3DModes.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
 
 namespace QuICC {
 
@@ -154,19 +155,29 @@ namespace Equations {
 
    void ShellExactVectorState::setNLComponents()
    {
+      std::size_t pathId;
+      if(this->ss().formulation() == VectorFormulation::TORPOL)
+      {
+         pathId = Transform::Path::TorPol::id();
+      }
+      else
+      {
+         pathId = 0;
+      }
+
       if(this->ss().spectral().ONE() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().ONE(), 0);
+         this->addNLComponent(this->ss().spectral().ONE(), pathId);
       }
 
       if(this->ss().spectral().TWO() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().TWO(), 0);
+         this->addNLComponent(this->ss().spectral().TWO(), pathId);
       }
 
       if(this->ss().spectral().THREE() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().THREE(), 0);
+         this->addNLComponent(this->ss().spectral().THREE(), pathId);
       }
    }
 

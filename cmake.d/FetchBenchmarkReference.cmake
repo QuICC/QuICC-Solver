@@ -32,7 +32,7 @@ function(quicc_fetch_benchmark_reference target)
     FILENAME "${QAT_FILENAME}"
     ARCHIVEDIR "${QAT_ARCHIVEDIR}"
     DATADIR "${QAT_DATADIR}"
-    GITTAG "v0.0.11"
+    GITTAG "v0.0.17"
     GITURL "https://gitlab.ethz.ch/quicc/test-benchmarks"
     )
 

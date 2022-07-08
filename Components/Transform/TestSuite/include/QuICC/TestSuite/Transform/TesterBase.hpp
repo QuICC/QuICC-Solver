@@ -15,6 +15,7 @@
 #include <catch2/catch.hpp>
 #include <iostream>
 #include <iomanip>
+#include <limits>
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -39,12 +40,13 @@ namespace Transform {
          typedef std::vector<MHDFloat> ParameterType;
 
          /// Typedef for the Error type
-         typedef std::pair<bool,MHDFloat> ErrorType;
+         //typedef std::pair<bool,MHDFloat> ErrorType;
+         typedef std::tuple<bool,MHDFloat,MHDFloat> ErrorType;
 
          /**
           * @brief Constructor
           */
-         TesterBase(const std::string& fname, const bool keepData);
+         TesterBase(const std::string& fname, const bool keepData, const bool usePointScale = true);
 
          /**
           * @brief Destructor
@@ -112,11 +114,6 @@ namespace Transform {
          virtual bool isZero(const MHDFloat ref) const;
 
          /**
-          * @brief Check exact zero values
-          */
-         virtual ErrorType checkZero(const MHDFloat data, const MHDFloat ref) const;
-
-         /**
           * @brief Check normalized values
           */
          virtual ErrorType checkNormal(const MHDFloat data, const MHDFloat ref) const;
@@ -162,9 +159,19 @@ namespace Transform {
          MHDFloat tolerance() const;
 
          /**
+          * @brief Choose between local and global scale reference
+          */
+         MHDFloat getScale(const MHDFloat locScale, const MHDFloat globalScale) const;
+
+         /**
           * @brief Save data to file
           */
          bool mKeepData;
+
+         /**
+          * @brief Use scale from point value (not from full vector)
+          */
+         bool mUsePointScale;
 
          /**
           * @brief Datatype epsilon
@@ -187,8 +194,8 @@ namespace Transform {
          std::string mPath;
    };
 
-   template <typename TOp> TesterBase<TOp>::TesterBase(const std::string& fname, const bool keepData)
-      : mKeepData(keepData), mMaxUlp(11), mEpsilon(std::numeric_limits<MHDFloat>::epsilon()), mBasename(fname), mPath("Transform/")
+   template <typename TOp> TesterBase<TOp>::TesterBase(const std::string& fname, const bool keepData, const bool usePointScale)
+      : mKeepData(keepData), mUsePointScale(usePointScale), mMaxUlp(11), mEpsilon(std::numeric_limits<MHDFloat>::epsilon()), mBasename(fname), mPath("Transform/")
    {
    }
 
@@ -313,11 +320,19 @@ namespace Transform {
    template <typename TOp> void TesterBase<TOp>::computeError(const Matrix& outData, const Matrix& refData) const
    {
       Array globalUlp  = Array::Zero(refData.cols());
+      Array globalL2  = Array::Zero(refData.cols());
 
       // Compute error
       //
       for(int j = 0; j < refData.cols(); j++)
       {
+         auto vecScale = refData.col(j).array().abs().maxCoeff();
+         auto refL2 = refData.col(j).norm();
+         if(this->isZero(refL2))
+         {
+            refL2 = 1.0;
+         }
+
          INFO( "n: " << j );
          for(int i = 0; i < refData.rows(); i++)
          {
@@ -328,7 +343,12 @@ namespace Transform {
             INFO( "refData: " << std::scientific << std::setprecision(16) << refData(i,j) );
 
             // check special values
-            if(this->isSpecial(i, j, outData(i,j), ref))
+            if(std::isnan(outData(i,j)))
+            {
+               err = std::make_tuple(false, std::numeric_limits<MHDFloat>::max(), std::numeric_limits<MHDFloat>::max());
+            }
+            // check special values
+            else if(this->isSpecial(i, j, outData(i,j), ref))
             {
                err = this->checkSpecial(i, j, outData(i,j), refData);
 
@@ -337,36 +357,43 @@ namespace Transform {
                   INFO( "checked special value" );
                   INFO( "outData: " << std::scientific << std::setprecision(16) << outData(i,j) );
                   INFO( "max ulp: " << this->mMaxUlp);
-                  INFO( "measured ulp: " << err.second);
-                  CHECK(err.first);
+                  INFO( "measured ulp: " << std::get<1>(err));
+                  CHECK(std::get<0>(err));
                }
             }
             // check exact zero
             else if(this->isZero(ref))
             {
-               err = this->checkZero(outData(i,j), refData(i,j));
+               auto vScale = vecScale;
+               if(this->isZero(vecScale))
+               {
+                  vScale = 1.0;
+               }
+               auto refScale = this->getScale(1.0, vScale);
+               err = this->checkNormal(outData(i,j), refData(i,j), refScale);
 
                // check error
                {
                   INFO( "checked exact zero" );
                   INFO( "outData: " << std::scientific << std::setprecision(16) << outData(i,j) );
                   INFO( "max ulp: " << this->mMaxUlp);
-                  INFO( "measured ulp: " << err.second);
-                  CHECK(err.first);
+                  INFO( "measured ulp: " << std::get<1>(err));
+                  CHECK(std::get<0>(err));
                }
             }
             // check normalized values
             else if(ref >= std::numeric_limits<MHDFloat>::min())
             {
-               err = this->checkNormal(outData(i,j), refData(i,j));
+               auto refScale = this->getScale(refData(i,j), vecScale);
+               err = this->checkNormal(outData(i,j), refData(i,j), refScale);
 
                // check error
                {
                   INFO( "checked normal value" );
                   INFO( "outData: " << std::scientific << std::setprecision(16) << outData(i,j) );
                   INFO( "max ulp: " << this->mMaxUlp);
-                  INFO( "measured ulp: " << err.second);
-                  CHECK(err.first);
+                  INFO( "measured ulp: " << std::get<1>(err));
+                  CHECK(std::get<0>(err));
                }
             }
             // Check subnormal values
@@ -379,19 +406,24 @@ namespace Transform {
                   INFO( "checked subnormal value" );
                   INFO( "outData: " << std::scientific << std::setprecision(16) << outData(i,j) );
                   INFO( "max ulp: " << this->mMaxUlp);
-                  INFO( "measured ulp: " << err.second);
-                  CHECK(err.first);
+                  INFO( "measured ulp: " << std::get<1>(err));
+                  CHECK(std::get<0>(err));
                }
             }
-            globalUlp(j) = std::max(globalUlp(j), err.second);
+            globalUlp(j) = std::max(globalUlp(j), std::get<1>(err));
+            globalL2(j) += std::pow(std::get<2>(err),2);
          }
+
+         // ||d - ref||/\epsilon||ref||  (L2 norm in ULP)
+         globalL2(j) = std::sqrt(globalL2(j))/(this->mEpsilon*refL2);
       }
 
       std::stringstream ss;
       INFO( "Global max ulp: " << globalUlp.maxCoeff() );
+      INFO( "Global max L2 norm: " << globalL2.maxCoeff() );
       for(auto j = 0; j < globalUlp.size(); j++)
       {
-         ss << "   n = " << j << " : " << globalUlp(j) << std::endl;
+         ss << "   n = " << j << " : " << globalUlp(j) << ",  L2 norm: " << globalL2(j) << std::endl;
       }
       INFO( "Max ulp per col:" );
       INFO( ss.str() );
@@ -402,6 +434,18 @@ namespace Transform {
    template <typename TOp> MHDFloat TesterBase<TOp>::tolerance() const
    {
       return this->mMaxUlp*this->mEpsilon;
+   }
+
+   template <typename TOp> MHDFloat TesterBase<TOp>::getScale(const MHDFloat locRef, const MHDFloat globalRef) const
+   {
+      if(this->mUsePointScale)
+      {
+         return std::abs(locRef);
+      }
+      else
+      {
+         return globalRef;
+      }
    }
 
    template <typename TOp> bool TesterBase<TOp>::isSpecial(const int i, const int j, const MHDFloat data, const MHDFloat ref) const
@@ -415,17 +459,12 @@ namespace Transform {
 
       auto ulp = 0;
 
-      return std::make_pair(isEqual, ulp);
+      return std::make_tuple(isEqual, ulp, 0);
    }
 
    template <typename TOp> bool TesterBase<TOp>::isZero(const MHDFloat ref) const
    {
       return (ref == 0);
-   }
-
-   template <typename TOp> typename TesterBase<TOp>::ErrorType TesterBase<TOp>::checkZero(const MHDFloat data, const MHDFloat ref) const
-   {
-      return this->checkNormal(data, ref, 1.0);
    }
 
    template <typename TOp> typename TesterBase<TOp>::ErrorType TesterBase<TOp>::checkNormal(const MHDFloat data, const MHDFloat ref, const MHDFloat refMod) const
@@ -446,7 +485,7 @@ namespace Transform {
 
       auto ulp = diff / (refMod * this->mEpsilon);
 
-      return std::make_pair(isEqual, ulp);
+      return std::make_tuple(isEqual, ulp, diff);
    }
 
    template <typename TOp> typename TesterBase<TOp>::ErrorType TesterBase<TOp>::checkNormal(const MHDFloat data, const MHDFloat ref) const
@@ -485,7 +524,7 @@ namespace Transform {
          ulp = 1;
       }
 #endif
-      return std::make_pair(isEqual, ulp);
+      return std::make_tuple(isEqual, ulp, 0);
    }
 
    template <typename TOp> std::string TesterBase<TOp>::dataRoot() const

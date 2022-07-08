@@ -57,6 +57,11 @@ namespace Equations {
          void setIdentity(const std::size_t name);
 
          /**
+          * @brief Use nonlinear transform path
+          */
+         void useNonlinearPath(const std::size_t tag);
+
+         /**
           * @brief Set the physical space kernel
           */
          void setPhysicalKernel(const Physical::Kernel::SharedIPhysicalKernel spKernel);
@@ -93,6 +98,11 @@ namespace Equations {
           * @brief Set the nonliner integration components
           */
          virtual void setNLComponents();
+
+         /**
+          * @brief Transform path tag
+          */
+         std::size_t mPathTag;
 
       private:
          /**

@@ -71,7 +71,7 @@ def printResult(condition, msg, ntabs = 1):
 
     return res
 
-def printSummary(results, rows):
+def printSummary(results, rows, reftol = None):
     """Pretty print validation test summary"""
     fail = 0
     tot = 0
@@ -82,9 +82,39 @@ def printSummary(results, rows):
         i = rows.index(r[3][0])
         minTol[i] = max(minTol[i], r[3][1])
 
+    if reftol is None:
+        reftol = [0]*len(minTol)
     print("")
-    print("Minimal passing tolerances:")
-    print([f'{v:.0f}' for v in minTol])
+    print("Passing tolerances (+10%):")
+    e = b"["
+    epc = b"["
+    newtol = []
+    for v,r in zip(minTol,reftol):
+        rr = r
+        if r == 0:
+            cs = b""
+            ce = b""
+            rr = v
+            newtol.append(int(round(v*1.1 + 0.5)))
+        elif v > r:
+            cs = _c.red
+            ce = _c.reset
+            newtol.append(int(round(v*1.1 + 0.5)))
+        else:
+            cs = _c.green
+            ce = _c.reset
+            newtol.append(r)
+        e += cs + (f'{v*1.1 + 0.5:.0f}').encode() + ce + b", "
+        epc += cs + (f'{100*(v-r)/rr:.0f}%').encode() + ce + b", "
+    e = e[:-2] + b"]"
+    epc = epc[:-2] + b"]"
+    print(e.decode())
+    print("")
+    print("Tolerance changes:")
+    print(epc.decode())
+    print("")
+    print("New tolerances:")
+    print(newtol)
 
     print("")
     if(fail == 0):
@@ -101,7 +131,7 @@ def printSummary(results, rows):
             if r[1] > 0:
                 print("\t" + r[2])
 
-def tableTest(fname, ref_dir, data_dir, tid, tol = 11, usecols = None, max_rows = None, threshold = -1, percol = False):
+def tableTest(fname, ref_dir, data_dir, tid, tol = 11, usecols = None, max_rows = None, threshold = -1, percol = False, perrow = False, max_firstcol = 0):
 
     # Validate nusselt number
     extra = ''
@@ -126,32 +156,53 @@ def tableTest(fname, ref_dir, data_dir, tid, tol = 11, usecols = None, max_rows 
 
     if cond:
         ref = np.genfromtxt(ref_dir + fname, usecols=usecols, max_rows = max_rows)
+        ref = np.atleast_2d(ref)
         data = np.genfromtxt(data_dir + fname, usecols=usecols, max_rows = max_rows)
+        data = np.atleast_2d(data)
         cond = (ref.shape == data.shape)
         checks += printResult(cond, f'Checking file size match (shape: {ref.shape})')
-    
+
     if cond:
         max_ulp = 0
-        if percol:
+        # compute reference ulp
+        if percol and perrow:
+            ref_max = np.max(np.abs(ref[:,max_firstcol:]))
+            def get_ulp(r, idx):
+                if idx[1] >= max_firstcol:
+                    ulp = compute_ulp(ref_max)
+                else:
+                    ulp = compute_ulp(r)
+                return ulp
+        elif percol:
             col_max = np.max(np.abs(ref), axis = 0)
-            for idx, r in np.ndenumerate(ref):
-                if r > threshold:
-                    d = data[idx]
-                    diff = np.abs(r-d)
-                    ulp = diff/(compute_ulp(col_max[idx[1]]))
-                    if ulp > max_ulp:
-                        max_ulp = ulp
-                    if ulp > tol:
-                        print((r.item(), d.item(), diff, ulp))
+            def get_ulp(r, idx):
+                if idx[1] >= max_firstcol:
+                    ulp = compute_ulp(col_max[idx[1]])
+                else:
+                    ulp = compute_ulp(r)
+                return ulp
+        elif perrow:
+            row_max = np.max(np.abs(ref[:,max_firstcol:]), axis = 1)
+            def get_ulp(r, idx):
+                if idx[1] >= max_firstcol:
+                    ulp = compute_ulp(row_max[idx[0]])
+                else:
+                    ulp = compute_ulp(r)
+                return ulp
         else:
-            for r, d in np.nditer([ref, data]):
-                if r > threshold:
-                    diff = np.abs(r-d)
-                    ulp = diff/(compute_ulp(r))
-                    if ulp > max_ulp:
-                        max_ulp = ulp
-                    if ulp > tol:
-                        print((r.item(), d.item(), diff, ulp))
+            def get_ulp(r, idx):
+                return compute_ulp(r)
+
+        # Compute error on data
+        for idx, r in np.ndenumerate(ref):
+            if r > threshold:
+                d = data[idx]
+                diff = np.abs(r-d)
+                ulp = diff/get_ulp(r,idx)
+                if ulp > max_ulp:
+                    max_ulp = ulp
+                if ulp > tol:
+                    print((r.item(), d.item(), diff, ulp))
 
         cond = (max_ulp < tol)
         if tol > 1e3:
@@ -168,3 +219,33 @@ def tableTest(fname, ref_dir, data_dir, tid, tol = 11, usecols = None, max_rows 
         print(f'\t{details}')
 
     return (1, int(not cond), f'{fname}{extra}', (tid, max_ulp))
+
+def check_setup(fname, ref_dir, data_dir, trigger, lines_to_check):
+    checked = lines_to_check
+    dlines = []
+    with open(data_dir + fname) as f:
+        for line in f:
+            if line.find(trigger) != -1:
+                checked = 0
+            if checked < lines_to_check:
+                checked += 1
+                dlines.append(line)
+    rlines = []
+    with open(ref_dir + fname) as f:
+        for line in f:
+            if line.find(trigger) != -1:
+                checked = 0
+            if checked < lines_to_check:
+                checked += 1
+                rlines.append(line)
+
+    print(f'Validating setup from {fname}')
+    # Check lines were found
+    cond = (len(dlines) == lines_to_check and len(rlines) == lines_to_check)
+    printResult(cond, 'Checking setup is present')
+
+    # Check lines match
+    cond = True
+    for d,r in zip(dlines,rlines):
+        cond = cond and (d == r)
+    printResult(cond, 'Checking setup match: ')

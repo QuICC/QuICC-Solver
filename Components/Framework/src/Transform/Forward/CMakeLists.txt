@@ -3,10 +3,10 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   D1ZP0.cpp
   D2.cpp
   DfLaplh_1.cpp
-  I2.cpp
+  I2P.cpp
   I2D1.cpp
   I2ZI2D1.cpp
-  I4.cpp
+  I4P.cpp
   I4D1.cpp
   I4D1ZI2.cpp
   I4R_1D1R1.cpp
@@ -33,10 +33,14 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   P0.cpp
   P.cpp
   Pm.cpp
-  Q2.cpp
-  Q4.cpp
   R1.cpp
-  S2.cpp
-  S4.cpp
+  Pol.cpp
+  Q.cpp
+  S.cpp
   T.cpp
+  I2Q.cpp
+  I2S.cpp
+  I2T.cpp
+  I4Q.cpp
+  I4S.cpp
 )

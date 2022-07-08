@@ -200,7 +200,7 @@ namespace Equations {
          /**
           * @brief Get the nonlinear integration components order
           */
-         const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& nlComponents() const;
+         const std::vector<std::pair<FieldComponents::Spectral::Id,std::size_t> >& nlComponents() const;
 
          /**
           * @brief Get equation type
@@ -248,7 +248,7 @@ namespace Equations {
          /**
           * @brief Add a nonlinear integration component
           */
-         void addNLComponent(const FieldComponents::Spectral::Id compId, const int flag);
+         void addNLComponent(const FieldComponents::Spectral::Id compId, const std::size_t flag);
 
          /**
           * @brief Update field requirements information
@@ -331,7 +331,7 @@ namespace Equations {
          /**
           * @brief Nonlinear integration component order
           */
-         std::vector<std::pair<FieldComponents::Spectral::Id,int> >   mNLComponents;
+         std::vector<std::pair<FieldComponents::Spectral::Id,std::size_t> >   mNLComponents;
 
       private:
          /**

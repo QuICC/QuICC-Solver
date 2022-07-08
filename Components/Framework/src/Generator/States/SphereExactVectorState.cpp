@@ -26,13 +26,14 @@
 #include "QuICC/PhysicalKernels/MakeConstant.hpp"
 #include "QuICC/PhysicalKernels/MakeRandom.hpp"
 #include "QuICC/SpectralKernels/Set3DModes.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
 
 namespace QuICC {
 
 namespace Equations {
 
    SphereExactVectorState::SphereExactVectorState(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend)
-      : IVectorEquation(spEqParams,spScheme,spBackend)
+      : IVectorEquation(spEqParams,spScheme,spBackend), mPathTag(0)
    {
    }
 
@@ -47,6 +48,13 @@ namespace Equations {
 
       // Set the variable requirements
       this->setRequirements();
+   }
+
+   void SphereExactVectorState::useNonlinearPath(const std::size_t tag)
+   {
+      // Use transform path for nonlinear computations
+      this->setForwardPathsType(FWD_IS_NONLINEAR);
+      this->mPathTag = tag;
    }
 
    void SphereExactVectorState::setPhysicalKernel(Physical::Kernel::SharedIPhysicalKernel spKernel)
@@ -141,6 +149,14 @@ namespace Equations {
 
       // Forward transform generates field values
       this->setForwardPathsType(FWD_IS_FIELD);
+      if(this->ss().formulation() == VectorFormulation::TORPOL)
+      {
+         this->mPathTag = Transform::Path::TorPol::id();
+      }
+      else
+      {
+         this->mPathTag = 0;
+      }
 
       // Get reference to spatial scheme
       const auto& ss = this->ss();
@@ -155,17 +171,17 @@ namespace Equations {
    {
       if(this->ss().spectral().ONE() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().ONE(), 0);
+         this->addNLComponent(this->ss().spectral().ONE(), this->mPathTag);
       }
 
       if(this->ss().spectral().TWO() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().TWO(), 0);
+         this->addNLComponent(this->ss().spectral().TWO(), this->mPathTag);
       }
 
       if(this->ss().spectral().THREE() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().THREE(), 0);
+         this->addNLComponent(this->ss().spectral().THREE(), this->mPathTag);
       }
    }
 

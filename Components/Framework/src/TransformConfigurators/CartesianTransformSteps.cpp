@@ -30,10 +30,10 @@
 #include "QuICC/Transform/Forward/DfLaplh_1.hpp"
 #include "QuICC/Transform/Forward/Laplh.hpp"
 #include "QuICC/Transform/Forward/Laplh_1.hpp"
-#include "QuICC/Transform/Forward/I2.hpp"
+#include "QuICC/Transform/Forward/I2P.hpp"
 #include "QuICC/Transform/Forward/I2D1.hpp"
 #include "QuICC/Transform/Forward/I2ZI2D1.hpp"
-#include "QuICC/Transform/Forward/I4.hpp"
+#include "QuICC/Transform/Forward/I4P.hpp"
 #include "QuICC/Transform/Forward/I4D1.hpp"
 #include "QuICC/Transform/Forward/I4D1ZI2.hpp"
 #include "QuICC/Transform/Backward/P.hpp"
@@ -62,7 +62,7 @@ namespace Transform {
       return spScheme->has(SpatialScheme::Feature::CartesianGeometry);
    }
 
-   std::vector<TransformPath>  CartesianTransformSteps::forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const
+   std::vector<TransformPath>  CartesianTransformSteps::forwardScalar(const std::vector<PathId >& components) const
    {
       assert(components.size() == 1);
       std::vector<TransformPath> transform;
@@ -77,7 +77,7 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  CartesianTransformSteps::forwardNLScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const
+   std::vector<TransformPath>  CartesianTransformSteps::forwardNLScalar(const std::vector<PathId >& components) const
    {
       assert(components.size() == 1);
       std::vector<TransformPath> transform;
@@ -92,7 +92,7 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  CartesianTransformSteps::forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const
+   std::vector<TransformPath>  CartesianTransformSteps::forwardVector(const std::vector<PathId >& components) const
    {
       std::vector<TransformPath> transform;
 
@@ -100,9 +100,9 @@ namespace Transform {
       {
          assert(components.size() == 2);
          FieldComponents::Spectral::Id curlId = components.at(0).first;
-         int curlFlag = components.at(0).second;
+         auto curlFlag = components.at(0).second;
          FieldComponents::Spectral::Id curlcurlId = components.at(1).first;
-         int curlcurlFlag = components.at(1).second;
+         auto curlcurlFlag = components.at(1).second;
 
          if(curlFlag == 0 && curlcurlFlag == 0)
          {
@@ -166,7 +166,7 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  CartesianTransformSteps::forwardNLVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const
+   std::vector<TransformPath>  CartesianTransformSteps::forwardNLVector(const std::vector<PathId >& components) const
    {
       std::vector<TransformPath> transform;
 
@@ -174,9 +174,9 @@ namespace Transform {
       {
          assert(components.size() == 2);
          FieldComponents::Spectral::Id curlId = components.at(0).first;
-         int curlFlag = components.at(0).second;
+         auto curlFlag = components.at(0).second;
          FieldComponents::Spectral::Id curlcurlId = components.at(1).first;
-         int curlcurlFlag = components.at(1).second;
+         auto curlcurlFlag = components.at(1).second;
 
          // Integrate for standard second order equation
          if(curlFlag == 0)
@@ -185,12 +185,12 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
             transform.back().addEdge(Forward::D1ZP0::id());
             transform.back().addEdge(Forward::Pm::id());
-            transform.back().addEdge(Forward::I2::id(), curlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::I2P::id(), curlId, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::D1::id());
-            transform.back().addEdge(Forward::I2::id(), curlId, Arithmetics::Sub::id());
+            transform.back().addEdge(Forward::I2P::id(), curlId, Arithmetics::Sub::id());
 
             // Integrate for curl of nonlinear and mean Y (induction)
          } else if(curlFlag == 1)
@@ -203,7 +203,7 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::D1::id());
-            transform.back().addEdge(Forward::I2::id(), curlId, Arithmetics::Sub::id());
+            transform.back().addEdge(Forward::I2P::id(), curlId, Arithmetics::Sub::id());
 
          } else
          {
@@ -228,7 +228,7 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::Laplh::id());
-            transform.back().addEdge(Forward::I4::id(), curlcurlId, Arithmetics::Sub::id());
+            transform.back().addEdge(Forward::I4P::id(), curlcurlId, Arithmetics::Sub::id());
 
             // Integrate for double curl of nonlinear term and mean X (induction)
          } else if(curlcurlFlag == 1)
@@ -248,7 +248,7 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::Laplh::id());
-            transform.back().addEdge(Forward::I2::id(), curlcurlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::I2P::id(), curlcurlId, Arithmetics::Add::id());
 
          } else
          {

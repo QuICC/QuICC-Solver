@@ -1,6 +1,6 @@
 /** 
  * @file EnergyD1R1.hpp
- * @brief Implementation of the Worland based D R energy operator
+ * @brief Implementation of the Worland based energy operator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_WORLAND_REDUCTOR_ENERGYD1R1_HPP
@@ -21,7 +21,8 @@
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Worland/Reductor/IWorlandEnergy.hpp"
+#include "QuICC/Transform/Fft/Worland/Reductor/IEnergyWrapper.hpp"
+#include "QuICC/Transform/Poly/Worland/Reductor/EnergyD1R1.hpp"
 
 namespace QuICC {
 
@@ -34,33 +35,24 @@ namespace Worland {
 namespace Reductor {
 
    /**
-    * @brief Implementation of the Worland based D R energy operator
+    * @brief Implementation of the Worland based R^2 energy operator
     */ 
-   class EnergyD1R1: public IWorlandEnergy
+   class EnergyD1R1: public IEnergyWrapper<Poly::Worland::Reductor::EnergyD1R1>
    {
       public:
          /**
           * @brief Constructor
           */
-         EnergyD1R1();
+         EnergyD1R1() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~EnergyD1R1();
+         virtual ~EnergyD1R1() = default;
          
       protected:
 
       private:
-         /**
-          * @brief Make operator
-          */
-         virtual void makeOperator(Matrix& op, Matrix& eop, const internal::Array& igrid, const internal::Array& iweights, const Array& eweights, const int i) const;
-
-         /**
-          * @brief Apply ith operator
-          */
-         virtual void applyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
    };
 
 }

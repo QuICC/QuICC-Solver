@@ -23,6 +23,7 @@
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/SolveTiming/After.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
 
 namespace QuICC {
 
@@ -103,19 +104,29 @@ namespace Equations {
 
    void RandomVectorState::setNLComponents()
    {
+      std::size_t pathId;
+      if(this->ss().formulation() == VectorFormulation::TORPOL)
+      {
+         pathId = Transform::Path::TorPol::id();
+      }
+      else
+      {
+         pathId = 0;
+      }
+
       if(this->ss().spectral().ONE() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().ONE(), 0);
+         this->addNLComponent(this->ss().spectral().ONE(), pathId);
       }
 
       if(this->ss().spectral().TWO() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().TWO(), 0);
+         this->addNLComponent(this->ss().spectral().TWO(), pathId);
       }
 
       if(this->ss().spectral().THREE() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().THREE(), 0);
+         this->addNLComponent(this->ss().spectral().THREE(), pathId);
       }
    }
 

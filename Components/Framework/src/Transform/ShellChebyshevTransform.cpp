@@ -41,11 +41,12 @@
 
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/R1.hpp"
-#include "QuICC/Transform/Forward/Q4.hpp"
-#include "QuICC/Transform/Forward/S4.hpp"
-#include "QuICC/Transform/Forward/T.hpp"
-#include "QuICC/Transform/Forward/Q2.hpp"
-#include "QuICC/Transform/Forward/S2.hpp"
+#include "QuICC/Transform/Forward/Pol.hpp"
+#include "QuICC/Transform/Forward/I4Q.hpp"
+#include "QuICC/Transform/Forward/I4S.hpp"
+#include "QuICC/Transform/Forward/I2Q.hpp"
+#include "QuICC/Transform/Forward/I2S.hpp"
+#include "QuICC/Transform/Forward/I2T.hpp"
 
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/R_1.hpp"
@@ -110,12 +111,12 @@ namespace Transform {
 
       // Create integrators
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::P>(Forward::P::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::Y1>(Forward::R1::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I4Y3_Zero>(Forward::Q4::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I4Y3D1Y1_Zero>(Forward::S4::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y2_Zero>(Forward::T::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y1_Zero>(Forward::Q2::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y1D1Y1_Zero>(Forward::S2::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::Y1>(Forward::Pol::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I4Y3_Zero>(Forward::I4Q::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I4Y3D1Y1_Zero>(Forward::I4S::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y2_Zero>(Forward::I2T::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y1_Zero>(Forward::I2Q::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y1D1Y1_Zero>(Forward::I2S::id());
 
       // Create reductors
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Reductor::Energy>(Reductor::Energy::id());

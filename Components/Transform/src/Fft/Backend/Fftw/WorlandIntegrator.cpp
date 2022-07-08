@@ -272,10 +272,8 @@ namespace Fftw {
       }
    }
 
-   void WorlandIntegrator::raiseR2Beta(const MHDFloat alpha, const bool isEven, const int id, const MHDFloat norm) const
+   void WorlandIntegrator::raiseR2Beta(const MHDFloat alpha, const bool isEven, const int id, const MHDFloat norm, const bool scaleL0) const
    {
-      throw std::logic_error("Raise r^2 beta operator has not been tested!");
-
       Matrix& outTmp = this->mOutTmp.at(id);
       int start = 0;
       for(auto& loc: *this->pLoc(isEven,id))
@@ -285,9 +283,9 @@ namespace Fftw {
          Matrix M;
          this->buildShiftM(M, this->lSize(l), alpha, l+0.5, norm);
          this->applyTriSolve(outTmp, start, cols, M);
-         if(l == 1)
+         if(scaleL0 && l == 0)
          {
-            outTmp.block(0, start, 1, std::get<2>(loc)).array() *= 1.0/std::sqrt(2.0);
+            outTmp.block(0, start, 1, std::get<2>(loc)).array() *= std::sqrt(2.0);
          }
          std::get<4>(loc)++;
          start += cols;
@@ -346,7 +344,9 @@ namespace Fftw {
          int l = std::get<4>(loc);
          int cols = std::get<2>(loc);
          int r = this->lSize(l);
-         ::QuICC::SparseSM::Worland::I2 spasm(r, r, -0.5, -0.5, l);
+         internal::MHDFloat a = -MHD_MP(0.5);
+         internal::MHDFloat b = -MHD_MP(0.5);
+         ::QuICC::SparseSM::Worland::I2 spasm(r, r, a, b, l);
 
          Matrix bd;
          spasm.buildOp(bd);
@@ -365,7 +365,9 @@ namespace Fftw {
          int l = std::get<4>(loc);
          int cols = std::get<2>(loc);
          int r = this->lSize(l);
-         ::QuICC::SparseSM::Worland::I4 spasm(r, r, -0.5, -0.5, l);
+         internal::MHDFloat a = -MHD_MP(0.5);
+         internal::MHDFloat b = -MHD_MP(0.5);
+         ::QuICC::SparseSM::Worland::I4 spasm(r, r, a, b, l);
 
          Matrix bd;
          spasm.buildOp(bd);

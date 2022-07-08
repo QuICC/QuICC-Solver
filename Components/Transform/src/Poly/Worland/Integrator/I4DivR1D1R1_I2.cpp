@@ -26,7 +26,7 @@
 #include "QuICC/SparseSM/Worland/I4.hpp"
 
 // It is not clear yet which implementation is more accurate
-#undef QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
+#define QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
 
 namespace QuICC {
 

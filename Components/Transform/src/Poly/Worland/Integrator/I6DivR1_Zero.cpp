@@ -57,27 +57,40 @@ namespace Integrator {
          Polynomial::Worland::Wnl wnl;
 
          // Internal computation uses dealiased modes
-         int nN = nPoly + 0;
+         const int extraN = 9; // I6 has 9 superdiagonals
+         int nN = nPoly + extraN;
          this->checkGridSize(nN, l, igrid.size());
 
          internal::Matrix tOp(igrid.size(), nN);
+         // **************************************************
+         // Formulation without explicit grid:
+         // Operates on polynomials with l = l-1
+         int l_in = std::abs(l-1);
+         int n_in = nN + 1;
+         this->checkGridSize(n_in, l_in, igrid.size());
 
-         wnl.compute<internal::MHDFloat>(tOp, nN, std::abs(l-1), igrid, iweights, ev::Set());
+         internal::Matrix opA(igrid.size(), n_in);
+         wnl.compute<internal::MHDFloat>(opA, n_in, l_in, igrid, iweights, ev::Set());
 
-         internal::Matrix opA(igrid.size(), nN);
+         internal::Matrix opB(igrid.size(), n_in);
          Polynomial::Worland::r_1Wnl r_1Wnl;
-         r_1Wnl.compute<internal::MHDFloat>(opA, nN, std::abs(l-1), igrid, internal::Array(), ev::Set());
+         r_1Wnl.compute<internal::MHDFloat>(opB, n_in, l_in, igrid, internal::Array(), ev::Set());
 
-         internal::Matrix opB(igrid.size(), nN);
+         internal::Matrix opC(igrid.size(), nN);
          Polynomial::Worland::Wnl wnlB;
-         wnlB.compute<internal::MHDFloat>(opB, nN, l, igrid, iweights, ev::Set());
+         wnlB.compute<internal::MHDFloat>(opC, nN, l, igrid, iweights, ev::Set());
 
+         tOp = (opC.transpose()*opB*opA.transpose()).transpose();
+
+         // Multiply by Quasi-inverse
          auto a = wnl.alpha(l);
          auto b = wnl.dBeta();
          ::QuICC::SparseSM::Worland::I6 spasm(nN, nN, a, b, l);
-         tOp = (spasm.mat()*opB.transpose()*opA*tOp.transpose()).transpose();
-
+         tOp = (spasm.mat()*tOp.transpose()).transpose();
          op = tOp.cast<MHDFloat>().leftCols(nPoly);
+
+         assert(op.rows() == igrid.size());
+         assert(op.cols() == nPoly);
       }
    }
 

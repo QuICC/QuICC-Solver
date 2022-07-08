@@ -26,10 +26,10 @@
 #include "QuICC/Transform/Forward/R1.hpp"
 #include "QuICC/Transform/Forward/Laplh_1D1.hpp"
 #include "QuICC/Transform/Forward/Laplh_1Sin_1Dphi.hpp"
-#include "QuICC/Transform/Forward/Q4.hpp"
-#include "QuICC/Transform/Forward/S4.hpp"
-#include "QuICC/Transform/Forward/Q2.hpp"
-#include "QuICC/Transform/Forward/S2.hpp"
+#include "QuICC/Transform/Forward/I4Q.hpp"
+#include "QuICC/Transform/Forward/I4S.hpp"
+#include "QuICC/Transform/Forward/I2Q.hpp"
+#include "QuICC/Transform/Forward/I2S.hpp"
 
 void createTorPolTree(std::vector<::QuICC::Transform::TransformPath>& t);
 void createTorPolNLTree(std::vector<::QuICC::Transform::TransformPath>& t);
@@ -119,15 +119,15 @@ void createTorPolNLTree(std::vector<::QuICC::Transform::TransformPath>& t)
    t.push_back(TP(::QuICC::FieldComponents::Physical::R, ::QuICC::FieldType::VECTOR));
    t.back().addEdge(ns_QT::Forward::P::id());
    t.back().addEdge(ns_QT::Forward::P::id());
-   t.back().addEdge(ns_QT::Forward::Q4::id(), ::QuICC::FieldComponents::Spectral::POL, ::QuICC::Arithmetics::Sub::id());
+   t.back().addEdge(ns_QT::Forward::I4Q::id(), ::QuICC::FieldComponents::Spectral::POL, ::QuICC::Arithmetics::Sub::id());
 
    t.push_back(TP(::QuICC::FieldComponents::Physical::THETA, ::QuICC::FieldType::VECTOR));
    t.back().addEdge(ns_QT::Forward::P::id());
    t.back().addEdge(ns_QT::Forward::Laplh_1D1::id());
-   t.back().addEdge(ns_QT::Forward::S4::id(), ::QuICC::FieldComponents::Spectral::POL, ::QuICC::Arithmetics::Add::id());
+   t.back().addEdge(ns_QT::Forward::I4S::id(), ::QuICC::FieldComponents::Spectral::POL, ::QuICC::Arithmetics::Add::id());
 
    t.push_back(TP(::QuICC::FieldComponents::Physical::PHI, ::QuICC::FieldType::VECTOR));
    t.back().addEdge(ns_QT::Forward::P::id());
    t.back().addEdge(ns_QT::Forward::Laplh_1Sin_1Dphi::id());
-   t.back().addEdge(ns_QT::Forward::S4::id(), ::QuICC::FieldComponents::Spectral::POL, ::QuICC::Arithmetics::Add::id());
+   t.back().addEdge(ns_QT::Forward::I4S::id(), ::QuICC::FieldComponents::Spectral::POL, ::QuICC::Arithmetics::Add::id());
 }

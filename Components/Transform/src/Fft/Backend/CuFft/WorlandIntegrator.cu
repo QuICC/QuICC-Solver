@@ -460,7 +460,7 @@ namespace CuFft {
       }
    }
 
-   void WorlandIntegrator::raiseR2Beta(const double alpha, const bool isEven, const int id, const double norm) const
+   void WorlandIntegrator::raiseR2Beta(const double alpha, const bool isEven, const int id, const double norm, const scaleL0) const
    {
       throw std::logic_error("Raise r^2 beta operator has not been tested!");
 
@@ -474,7 +474,7 @@ namespace CuFft {
          this->mcuM.reshape(GpuMatrix::KEEP_SIZE, this->lSize(l));
          this->buildShiftM(this->mcuM, alpha, l+0.5, norm);
          this->applyTriSolve(cuOut.data(), cuOut.rows(), start, cols, this->mcuM);
-         if(l == 1)
+         if(scaleL0 && l == 1)
          {
             scale = 1.0/std::sqrt(2.0);
             cublasDscal(this->mHBlas, std::get<2>(loc), &scale, cuOut.data()+start*cuOut.rows(), cuOut.rows());

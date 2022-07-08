@@ -22,6 +22,8 @@
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
+#include "QuICC/Transform/Path/Scalar.hpp"
+#include "QuICC/Transform/Path/I2ScalarNL.hpp"
 
 namespace QuICC {
 
@@ -106,7 +108,14 @@ namespace Equations {
 
    void IScalarEquation::setNLComponents()
    {
-      this->addNLComponent(FieldComponents::Spectral::SCALAR, 0);
+      if(this->mForwardPathsType == FWD_IS_NONLINEAR)
+      {
+         this->addNLComponent(FieldComponents::Spectral::SCALAR, Transform::Path::I2ScalarNL::id());
+      }
+      else if(this->mForwardPathsType == FWD_IS_FIELD)
+      {
+         this->addNLComponent(FieldComponents::Spectral::SCALAR, Transform::Path::Scalar::id());
+      }
    }
 
    std::vector<Transform::TransformPath> IScalarEquation::backwardPaths()

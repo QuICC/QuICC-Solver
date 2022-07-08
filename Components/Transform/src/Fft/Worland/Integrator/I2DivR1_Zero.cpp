@@ -43,8 +43,8 @@ namespace Integrator {
       std::set<int> filter = {0};
       this->mBackend.setZFilter(filter);
 
-      int lshift = 1; // operator shifts l by one
-      int extraN = 3; // 3 extra modes are required due to I2 multiplication
+      int lshift = -1; // operator shifts l by -1
+      int extraN = 4; // 3 extra modes are required due to I2 multiplication, 1 for l - 1 shift
       this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 

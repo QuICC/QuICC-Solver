@@ -52,26 +52,26 @@ namespace QuICC {
              * @brief Generate the list of branches in scalar integration transform
              *
              */
-            virtual std::vector<TransformPath>  forwardScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const;
+            virtual std::vector<TransformPath>  forwardScalar(const std::vector<PathId>& components) const;
 
             /**
              * @brief Generate the list of branches in scalar integration transform
              */
-            virtual std::vector<TransformPath>  forwardNLScalar(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const;
+            virtual std::vector<TransformPath>  forwardNLScalar(const std::vector<PathId>& components) const;
 
             /**
              * @brief Generate the list of branches in vector integration transform
              *
              * @param components Spectral components where to store results: 0: \f$\vec r \nabla\wedge N\f$ 1: \f$\vec r \nabla\wedge\nabla\wedge N\f$
              */
-            virtual std::vector<TransformPath>  forwardVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const;
+            virtual std::vector<TransformPath>  forwardVector(const std::vector<PathId>& components) const;
 
             /**
              * @brief Generate the list of branches in vector integration transform
              *
              * @param components Spectral components where to store results: 0: \f$\vec r \nabla\wedge N\f$ 1: \f$\vec r \nabla\wedge\nabla\wedge N\f$
              */
-            virtual std::vector<TransformPath>  forwardNLVector(const std::vector<std::pair<FieldComponents::Spectral::Id,int> >& components) const;
+            virtual std::vector<TransformPath>  forwardNLVector(const std::vector<PathId>& components) const;
 
             /**
              * @brief Generate the list of branches in scalar projection transform

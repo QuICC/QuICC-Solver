@@ -24,7 +24,7 @@
 #include "QuICC/SparseSM/Worland/I4.hpp"
 
 // It is not clear yet which implementation is more accurate
-#undef QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
+#define QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
 
 namespace QuICC {
 
@@ -61,7 +61,8 @@ namespace Integrator {
          Polynomial::Worland::Wnl wnl;
 
          // Internal computation uses dealiased modes
-         int nN = nPoly + 0;
+         const int extraN = 6; // I4 has 6 superdiagonals
+         int nN = nPoly + extraN;
          this->checkGridSize(nN, l, igrid.size());
 
          internal::Matrix tOp(igrid.size(), nN);

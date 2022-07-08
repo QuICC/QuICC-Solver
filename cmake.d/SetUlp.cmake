@@ -1,7 +1,7 @@
 function(quicc_set_ulp var)
   # parse inputs
-  set(oneValueArgs ULP MPULP)
-  set(multiValueArgs )
+  set(oneValueArgs )
+  set(multiValueArgs ULP MPULP)
   cmake_parse_arguments(QSU "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_set_ulp")

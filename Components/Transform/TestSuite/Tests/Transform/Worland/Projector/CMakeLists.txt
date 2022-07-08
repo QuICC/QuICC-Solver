@@ -1,57 +1,161 @@
 message(VERBOSE "Projectors:")
 
-# Create projector tests targets
+# Set different ULP for normal and MP implementation
+include(SetUlp)
+
+# Create  tests targets
 include(ConfigureTests)
+
 set(_tests
-  Poly::PTest:projector
-  Poly::CylLaplhTest:projector
-  Poly::CylLaplh_DivR1D1R1Test:projector
-  Poly::DivR1CylLaplh_ZeroTest:projector
+  Poly::P:projector
+  )
+quicc_set_ulp(_ulp
+  ULP 8 77 49 53
+  MPULP 1 1 2 1
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULP 5001
+    ULPS ${_ulp}
+    IDS 0 1 2 3
   )
 endforeach()
 
-# Create projector tests targets
-include(ConfigureTests)
 set(_tests
-  Poly::DivR1Test:projector
-  Poly::DivR1_ZeroTest:projector
+  Poly::DivR1_Zero:projector
+  )
+quicc_set_ulp(_ulp
+  ULP 8 34 49 51
+  MPULP 1 1 2 1
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULP 3001
+    ULPS ${_ulp}
+    IDS 0 1 2 3
   )
 endforeach()
 
-# Create projector tests targets
-include(ConfigureTests)
 set(_tests
-  Poly::D1Test:projector
-  Poly::DivR1D1R1Test:projector
-  Poly::SphLaplTest:projector
-  Poly::D1R1Test:projector
-  Poly::D1CylLaplhTest:projector
-  Poly::D1_PTest:projector
-  Poly::DivR1D1R1_ZeroTest:projector
-  Poly::D1CylLaplh_D1DivR1D1R1Test:projector
+  Poly::D1:projector
+  )
+quicc_set_ulp(_ulp
+  ULP 8 51 40 39
+  MPULP 1 1 2 1
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULP 1000
+    ULPS ${_ulp}
+    IDS 0 1 2 3
   )
 endforeach()
 
-# Create projector tests targets
-include(ConfigureTests)
+set(_tests
+  Poly::DivR1D1R1_Zero:projector
+  )
+quicc_set_ulp(_ulp
+  ULP 9 51 40 42
+  MPULP 1 1 1 1
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:type
+    ULPS ${_ulp}
+    IDS 0 1 2 3
+  )
+endforeach()
+
+set(_tests
+  Poly::SphLapl:projector
+  )
+quicc_set_ulp(_ulp
+  ULP 1 35 32 31
+  MPULP 1 1 1 1
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:type
+    ULPS ${_ulp}
+    IDS 0 1 2 3
+  )
+endforeach()
+
+set(_tests
+  Poly::DivR1D1R1:projector
+  )
+quicc_set_ulp(_ulp
+  ULP 9 51 40 39
+  MPULP 1 1 1 1
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:type
+    ULPS ${_ulp}
+    IDS 0 1 2 3
+  )
+endforeach()
+
+set(_tests
+  Poly::D1R1:projector
+  )
+quicc_set_ulp(_ulp
+  ULP 9 54 42 41
+  MPULP 1 1 1 1
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:type
+    ULPS ${_ulp}
+    IDS 0 1 2 3
+  )
+endforeach()
+
+set(_tests
+  Poly::CylLaplh:projector
+  Poly::CylLaplh_DivR1D1R1:projector
+  Poly::D1CylLaplh:projector
+  Poly::D1_P:projector
+  Poly::D1CylLaplh_D1DivR1D1R1:projector
+  Poly::DivR1CylLaplh_Zero:projector
+  )
+quicc_set_ulp(_ulp
+  ULP 1 1 1 1
+  MPULP 1 1 1 1
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:type
+    ULPS ${_ulp}
+    IDS 0 1 2 3
+    DISABLED ON
+  )
+endforeach()
+
+######################
+# FFT based algorithm
+######################
+
+set(_tests
+  Fft::P:projector
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:type
+    ULPS 4 12 3 3
+    IDS  0 1 2 3
+  )
+endforeach()
+
 set(_tests
   Fft::DivR1_Zero:projector
   )
@@ -59,12 +163,11 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULP 750
+    ULPS 5 6 5 4
+    IDS  0 1 2 3
   )
 endforeach()
 
-# Create projector tests targets
-include(ConfigureTests)
 set(_tests
   Fft::D1:projector
   )
@@ -72,12 +175,23 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULP 1800
+    ULPS 5 4 4 4
+    IDS  0 1 2 3
   )
 endforeach()
 
-# Create projector tests targets
-include(ConfigureTests)
+set(_tests
+  Fft::DivR1D1R1_Zero:projector
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:type
+    ULPS 5 4 3 3
+    IDS  0 1 2 3
+  )
+endforeach()
+
 set(_tests
   Fft::SphLapl:projector
   )
@@ -85,20 +199,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULP 16000
-  )
-endforeach()
-
-# Create projector tests targets
-include(ConfigureTests)
-set(_tests
-  Fft::P:projector
-  Fft::DivR1D1R1_Zero:projector
-  )
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
-    ULP 3500
+    ULPS 1 2 5 3
+    IDS  0 1 2 3
   )
 endforeach()

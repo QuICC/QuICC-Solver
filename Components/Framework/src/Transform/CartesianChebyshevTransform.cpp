@@ -40,10 +40,10 @@
 #include "QuICC/Transform/Backward/D2.hpp"
 
 #include "QuICC/Transform/Forward/P.hpp"
-#include "QuICC/Transform/Forward/I2.hpp"
+#include "QuICC/Transform/Forward/I2P.hpp"
 #include "QuICC/Transform/Forward/I2D1.hpp"
 #include "QuICC/Transform/Forward/I2ZI2D1.hpp"
-#include "QuICC/Transform/Forward/I4.hpp"
+#include "QuICC/Transform/Forward/I4P.hpp"
 #include "QuICC/Transform/Forward/I4D1.hpp"
 #include "QuICC/Transform/Forward/I4D1ZI2.hpp"
 
@@ -95,8 +95,8 @@ namespace Transform {
 
       // Create integrators
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::P>(Forward::P::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2>(Forward::I2::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I4>(Forward::I4::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2>(Forward::I2P::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I4>(Forward::I4P::id());
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2D1>(Forward::I2D1::id());
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I4D1>(Forward::I4D1::id());
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2_I2D1>(Forward::I2ZI2D1::id());

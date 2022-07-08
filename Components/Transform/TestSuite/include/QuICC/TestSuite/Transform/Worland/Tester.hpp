@@ -150,7 +150,7 @@ namespace Worland {
    };
 
    template <typename TOp, typename TOp2> Tester<TOp,TOp2>::Tester(const std::string& fname, const bool keepData)
-      : Transform::TesterBase<TOp>(fname, keepData)
+      : Transform::TesterBase<TOp>(fname, keepData, false)
    {
       this->appendPath();
    }

@@ -3,50 +3,26 @@ message(VERBOSE "BFLoop:")
 # Set different ULP for normal and MP implementation
 include(SetUlp)
 
-# Create BFLoop tests targets
+# Create tests targets
 include(ConfigureTests)
 
 set(_tests
   Poly::P:bfloop
   )
-quicc_set_ulp(_ulp ULP 160 MPULP 11)
+quicc_set_ulp(_ulp
+  ULP 16 13 63 39 130 478 1963 3870 7625
+  MPULP 3 1 2 2 2 2 3 5 12
+  )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    IDS 0
-    ULP ${_ulp}
-  )
-endforeach()
-
-set(_tests
-  Poly::P:bfloop
-  )
-quicc_set_ulp(_ulp ULP 220 MPULP 11)
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
-    IDS 1
-    ULP ${_ulp}
-  )
-endforeach()
-
-set(_tests
-  Poly::P:bfloop
-  )
-quicc_set_ulp(_ulp ULP 16000 MPULP 11)
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
-    IDS 2
-    ULP ${_ulp}
+    IDS 0 1 2 3 204 205 206 207 208
+    ULPS ${_ulp}
   )
 endforeach()
 
 # Create BFLoop tests targets
-include(ConfigureTests)
 set(_tests
   Fft::P:bfloop
   )
@@ -54,6 +30,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULP 11
+    IDS 0 1 2 3 204 205 206 207 208 209 210
+    ULPS 2 3 5 3 4 6 8 16 21 28 41
   )
 endforeach()
