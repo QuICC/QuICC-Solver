@@ -29,42 +29,27 @@ namespace Backend {
 
 namespace Fftw {
 
+
    /**
     * @brief Static interface to the global features of the FFTW library 
     */ 
    class Library
    {
       public:
+         Library(Library const&) = delete;
+         void operator=(Library const&) = delete;
+
+         /**
+          * @brief Return singleton
+          */
+         static Library& getInstance();
+
          /**
           * @brief Get the plan flag
           */
          static unsigned int planFlag();
 
-         /**
-          * @brief Initialize the library
-          */
-         static void init();
-
-         /**
-          * @brief Register object using the library
-          */
-         static void registerUser();
-
-         /**
-          * @brief Unregister object using the library
-          */
-         static void unregisterUser();
-
-         /**
-          * @brief Cleanup the library
-          */
-         static void cleanup();
-
       private:
-         /**
-          * @brief Counter for the number of active objects
-          */
-         static int sCounter; 
 
          /**
           * @brief FFTW3 flags for the plan setup

@@ -38,32 +38,13 @@ namespace Fftw {
      unsigned int Library::sPlanFlag = FFTW_PATIENT;
   #endif // QUICC_FFTW_ESTIMATE
 
-   int Library::sCounter = 0;
+   Library& Library::getInstance()
+   {
+      static Library instance;
+      return instance;
+   }
 
    Library::Library()
-   {
-   }
-
-   Library::~Library()
-   {
-   }
-
-   unsigned int Library::planFlag()
-   {
-      return Library::sPlanFlag;
-   }
-
-   void Library::registerUser()
-   {
-      ++Library::sCounter;
-   }
-
-   void Library::unregisterUser()
-   {
-      --Library::sCounter;
-   }
-
-   void Library::init()
    {
       #if defined QUICC_THREADS_PTHREADS || defined QUICC_THREADS_OPENMP
       if(Library::sCounter == 0)
@@ -82,18 +63,20 @@ namespace Fftw {
       #endif //defined QUICC_THREADS_PTHREADS || defined QUICC_THREADS_OPENMP
    }
 
-   void Library::cleanup()
+   Library::~Library()
    {
-      // Check if all objects have been destroyed
-      if(Library::sCounter == 0)
-      {
-         #if defined QUICC_THREADS_PTHREADS || defined QUICC_THREADS_OPENMP
-            fftw_cleanup_threads();
-         #else
-            fftw_cleanup();
-         #endif //defined QUICC_THREADS_PTHREADS || defined QUICC_THREADS_OPENMP
-      }
+      #if defined QUICC_THREADS_PTHREADS || defined QUICC_THREADS_OPENMP
+         fftw_cleanup_threads();
+      #else
+         fftw_cleanup();
+      #endif //defined QUICC_THREADS_PTHREADS || defined
    }
+
+   unsigned int Library::planFlag()
+   {
+      return Library::sPlanFlag;
+   }
+
 
 }
 }

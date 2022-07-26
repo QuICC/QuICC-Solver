@@ -14,7 +14,10 @@ quicc_target_add_definition(${QUICC_CURRENT_COMPONENT_LIB}_Bessel INTERFACE
   OPTION QUICC_BESSEL_IMPL)
 
 if(QUICC_BESSEL_IMPL STREQUAL "Boost")
-  find_package(Boost REQUIRED)
+  find_package(Boost)
+  if(NOT Boost_FOUND)
+    message(FATAL_ERROR "Could not find Boost, try to specify path: -DBOOST_ROOT=</path/to/boost>")
+  endif()
   target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_Bessel INTERFACE Boost::headers)
 endif()
 

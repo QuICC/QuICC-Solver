@@ -75,11 +75,6 @@ namespace Fftw {
           * @brief Cleanup the FFT
           */
          void cleanupFft();
-
-         /**
-          * @brief Cleanup the FFTW library on destruction
-          */
-         void cleanupLibrary();
    };
 
 }

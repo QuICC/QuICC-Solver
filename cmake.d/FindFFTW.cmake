@@ -44,10 +44,25 @@
 # ::
 #
 #   FFTW::FFTW
-
+#
+# The following import targets are created (if requested as COMPONENTS)
+#
+# ::
+#
+#   FFTW::omp
+#   FFTW::pthread
+#   FFTW::mpi
+#
 
 message(VERBOSE "Looking for FTTW")
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+
+# We haven't found FFTW yet. Clear its state in case it is set in the parent
+# scope somewhere else. We can't rely on it because different components may
+# have been requested for this call.
+set(FFTW_FOUND OFF)
+set(FFTW_LIBRARIES)
+
 
 # set paths to look for library
 set(_FFTW_PATHS ${FFTW_ROOT} $ENV{FFTW_ROOT})
@@ -65,7 +80,7 @@ else()
     set(_FFTW_INCLUDE_PATHS ${PKG_FFTW_INCLUDE_DIRS})
 endif()
 
-
+# serial library
 find_library(
     FFTW_LIBRARIES
     NAMES "fftw3"
@@ -79,25 +94,57 @@ find_path(FFTW_INCLUDE_DIRS
     PATH_SUFFIXES "include" "include/fftw"
     ${_FFTW_DEFAULT_PATH_SWITCH}
 )
+set(FFTW_REQUIRED_VARS FFTW_LIBRARIES FFTW_INCLUDE_DIRS)
 
-# check if found
+# Components
+message(DEBUG "FFTW_FIND_COMPONENTS: ${FFTW_FIND_COMPONENTS}")
+foreach(_comp IN LISTS FFTW_FIND_COMPONENTS)
+    set(FFTW_${_comp}_LIBRARY)
+    find_library(
+        FFTW_${_comp}_LIBRARY
+        NAMES "fftw3_${_comp}"
+        HINTS ${_FFTW_PATHS} ENV LIBRARY_PATH
+        PATH_SUFFIXES "lib" "lib64"
+        ${_FFTW_DEFAULT_PATH_SWITCH}
+    )
+    list(APPEND FFTW_REQUIRED_VARS FFTW_${_comp}_LIBRARY)
+
+    if (FFTW_${_comp}_LIBRARY)
+        set(FFTW_${_comp}_FOUND YES)
+    endif()
+endforeach()
+
+# Check if found
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(FFTW REQUIRED_VARS FFTW_INCLUDE_DIRS FFTW_LIBRARIES )
+find_package_handle_standard_args(FFTW
+    REQUIRED_VARS ${FFTW_REQUIRED_VARS}
+    HANDLE_COMPONENTS)
 
-# add target to link against
+
+# Add target to link against
 if(FFTW_FOUND)
-  message(VERBOSE "FFTW FOUND")
   message(VERBOSE "FFTW INCLUDE: ${FFTW_INCLUDE_DIRS}")
   message(VERBOSE "FFTW LIBS: ${FFTW_LIBRARIES}")
-  set(_FFTW_TARGET "FFTW::FFTW")
-  if(NOT TARGET ${_FFTW_TARGET})
-      add_library(${_FFTW_TARGET} INTERFACE IMPORTED)
+  set(_main_tgt "FFTW::FFTW")
+  if(NOT TARGET ${_main_tgt})
+      add_library(${_main_tgt} INTERFACE IMPORTED)
   endif()
-  set_property(TARGET ${_FFTW_TARGET} PROPERTY INTERFACE_LINK_LIBRARIES ${FFTW_LIBRARIES})
-  set_property(TARGET ${_FFTW_TARGET} PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${FFTW_INCLUDE_DIRS})
-else()
-  message(VERBOSE "FFTW NOT FOUND")
+  set_property(TARGET ${_main_tgt} PROPERTY INTERFACE_LINK_LIBRARIES ${FFTW_LIBRARIES})
+  set_property(TARGET ${_main_tgt} PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${FFTW_INCLUDE_DIRS})
 endif()
+
+# Add components
+foreach(_comp IN LISTS FFTW_FIND_COMPONENTS)
+    if(FFTW_${_comp}_FOUND)
+        set(_tgt "FFTW::${_comp}")
+        if(NOT TARGET ${_tgt})
+            add_library(${_tgt} INTERFACE IMPORTED)
+        endif()
+        set_property(TARGET ${_tgt} PROPERTY INTERFACE_LINK_LIBRARIES ${FFTW_${_comp}_LIBRARY})
+        set_property(TARGET ${_tgt} PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${FFTW_INCLUDE_DIRS})
+    endif()
+    target_link_libraries(${_main_tgt} INTERFACE ${_tgt})
+endforeach()
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)
 

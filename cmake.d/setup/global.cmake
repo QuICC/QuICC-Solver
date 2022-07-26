@@ -52,7 +52,16 @@ quicc_add_definition(QUICC_THREADS)
 #------------- FFT PLAN COMPUTATION --------------#
 ###################################################
 
-find_package(FFTW)
+quicc_create_option(
+  NAME QUICC_FFTW_THREADS
+  OPTS none pthread omp
+  LABEL "FFTW threading")
+
+if(QUICC_FFTW_THREADS STREQUAL "none")
+  find_package(FFTW)
+else()
+  find_package(FFTW COMPONENTS ${QUICC_FFTW_THREADS} REQUIRED)
+endif()
 quicc_create_option(NAME QUICC_FFTPLAN
                     OPTS Fast Medium Slow
                     LABEL "FFT plan")

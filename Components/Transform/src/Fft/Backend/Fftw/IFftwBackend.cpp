@@ -37,14 +37,12 @@ namespace Fftw {
    IFftwBackend::~IFftwBackend()
    {
       this->cleanupFft();
-      this->cleanupLibrary();
    }
 
    void IFftwBackend::initLibrary() const
    {
-      // Init and register user with library
-      Library::init();
-      Library::registerUser();
+      // FFTW Fixture
+      Library::getInstance();
    }
 
    void IFftwBackend::cleanupFft()
@@ -55,15 +53,6 @@ namespace Fftw {
          fftw_destroy_plan(this->mPlan);
       }
 
-   }
-
-   void IFftwBackend::cleanupLibrary()
-   {
-      // Unregister user with library
-      Library::unregisterUser();
-
-      // cleanup library
-      Library::cleanup();
    }
 
    MHDFloat IFftwBackend::requiredStorage() const
