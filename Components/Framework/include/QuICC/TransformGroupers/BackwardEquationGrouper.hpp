@@ -89,6 +89,7 @@ namespace Transform {
 
    template <typename TConfigurator> inline void BackwardEquationGrouper<TConfigurator>::transform(std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalars, std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectors, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<1> fix("transformBwd");
       //
       // Compute backward transform
       //
@@ -99,8 +100,6 @@ namespace Transform {
             // Transform scalar variable
             if(it->comp<FieldComponents::Spectral::Id>() == FieldComponents::Spectral::SCALAR)
             {
-               Profiler::RegionFixture<1> fix("transformBwdScalar");
-
                auto scalIt = scalars.find(it->name());
 
                // Setup the first exchange communication step for scalar fields
@@ -124,8 +123,6 @@ namespace Transform {
                // Transform vector variable
             } else
             {
-               Profiler::RegionFixture<1> fix("transformBwdVector");
-
                auto vectIt = vectors.find(it->name());
 
                // Setup the first exchange communication step for vector fields

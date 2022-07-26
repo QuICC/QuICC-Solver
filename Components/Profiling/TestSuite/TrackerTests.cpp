@@ -44,8 +44,8 @@ TEST_CASE("Start Stop region with String", "[StartStopString]")
     using namespace std::chrono_literals;
     Initialize();
     std::string region = "Five hundred millisec";
-    unsigned int count = 5;
-    for (unsigned int i = 0; i < count; ++i)
+    std::size_t count = 5;
+    for (std::size_t i = 0; i < count; ++i)
     {
         RegionStart(region);
             std::this_thread::sleep_for(100ms);
@@ -54,7 +54,13 @@ TEST_CASE("Start Stop region with String", "[StartStopString]")
 
     REQUIRE(std::get<Tracker::tracking::count>(Tracker::get(region)) == count);
     // This check cannot be very precise...
-    REQUIRE(std::abs(std::get<Tracker::tracking::time>(Tracker::get(region)) - 0.5) < 0.01);
+    // Sum up time
+    double timeTot{};
+    for (std::size_t i = 0; i < count; ++i)
+    {
+        timeTot += std::get<Tracker::tracking::time>(Tracker::get(region))[i];
+    }
+    REQUIRE(std::abs(timeTot - 0.5) < 0.01);
 
     Finalize();
 }
@@ -83,8 +89,8 @@ TEST_CASE("Nested Levels: on, on, off", "[Levels]")
     REQUIRE(std::get<Tracker::tracking::count>(Tracker::get("Innermost")) == 0);
 
     // The following checks cannot be very precise...
-    REQUIRE(std::abs(std::get<Tracker::tracking::time>(Tracker::get("Main")) - 0.3) < 0.1);
-    REQUIRE(std::abs(std::get<Tracker::tracking::time>(Tracker::get("Nested")) - 0.2) < 0.1);
+    REQUIRE(std::abs(std::get<Tracker::tracking::time>(Tracker::get("Main"))[0] - 0.3) < 0.1);
+    REQUIRE(std::abs(std::get<Tracker::tracking::time>(Tracker::get("Nested"))[0] - 0.2) < 0.1);
     //
     REQUIRE(std::abs(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Main")) - 80) < 1);
     REQUIRE(std::abs(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Nested")) - 0.0) < 0.01);

@@ -16,10 +16,13 @@
 #include "QuICC/TestSuite/Transform/ALegendre/TestArgs.hpp"
 #include "QuICC/TestSuite/Transform/ALegendre/Tester.hpp"
 #include "QuICC/Transform/@Algorithm@/ALegendre/Projector/@Operator@.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Transform::ALegendre;
 
 TEST_CASE( "@Algorithm@::Error for @Operator@ projector", "[@Algorithm@::@Operator@:@type@]" ){
+
+   QuICC::Profiler::Initialize();
 
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -55,5 +58,7 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ projector", "[@Algorithm@::@Operat
       params.at(0) = id;
       tester.validate(params, currentts::args().type);
    }
+
+   QuICC::Profiler::Finalize();
 
 }

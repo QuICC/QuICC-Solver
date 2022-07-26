@@ -17,6 +17,7 @@
 // Project includes
 //
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -66,6 +67,8 @@ namespace Projector {
 
    void IALegendreProjector::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<3> fix("IALegendreProjector::applyOperators");
+
       // assert right sizes for input  matrix
       assert(in.cols() == this->mspSetup->blockSize());
       // assert right sizes for output matrix

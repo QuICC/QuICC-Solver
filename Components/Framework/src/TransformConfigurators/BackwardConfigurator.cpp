@@ -220,6 +220,7 @@ namespace Transform {
    void BackwardConfigurator::project2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<2> fix("BwdProject2D");
+      Profiler::RegionStart<3> ("BwdProject2D-pre");
 
       // Debugger message
       DebuggerMacro_msg("Project 2D", 4);
@@ -252,6 +253,8 @@ namespace Transform {
          coord.communicator().storage(Dimensions::Transform::TRA2D).provideFwd(pOutVar);
       }
 
+      Profiler::RegionStop<3> ("BwdProject2D-pre");
+
       ProfilerMacro_stop(Debug::Profiler::BWD2DIN);
       ProfilerMacro_start(Debug::Profiler::BWD2DTRA);
 
@@ -261,6 +264,8 @@ namespace Transform {
       ProfilerMacro_stop(Debug::Profiler::BWD2DTRA);
       ProfilerMacro_start(Debug::Profiler::BWD2DOUT);
       ProfilerMacro_start(Debug::Profiler::BWD2DOUTCOMM);
+
+      Profiler::RegionStart<3> ("BwdProject2D-post");
 
       // Hold temporary storage
       if(edge.holdInput())
@@ -338,6 +343,8 @@ namespace Transform {
 
          ProfilerMacro_stop(Debug::Profiler::BWD2DOUTCOMM);
       }
+
+      Profiler::RegionStop<3> ("BwdProject2D-post");
 
       ProfilerMacro_stop(Debug::Profiler::BWD2DOUT);
       ProfilerMacro_stop(Debug::Profiler::BWD2D);

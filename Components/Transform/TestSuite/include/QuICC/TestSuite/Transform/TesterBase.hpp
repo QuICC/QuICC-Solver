@@ -223,21 +223,26 @@ namespace Transform {
       }
       outData = this->testOperator(param, type);
 
-      // Read reference data
-      Matrix refData(outData.rows(), outData.cols());
-      this->readFile(refData, param, type, ContentType::REFERENCE);
+      auto timeOnly = true;
 
-      // Fail if reference not found
-      if(refData.size() == 0)
+      if(not timeOnly)
       {
-         INFO( "reference data was not found" );
-         CHECK( false );
-      }
+         // Read reference data
+         Matrix refData(outData.rows(), outData.cols());
+         this->readFile(refData, param, type, ContentType::REFERENCE);
 
-      // Compare data to reference
-      INFO( "type: " + infoType );
-      INFO( this->formatParameter(param));
-      this->computeError(outData, refData);
+         // Fail if reference not found
+         if(refData.size() == 0)
+         {
+            INFO( "reference data was not found" );
+            CHECK( false );
+         }
+
+         // Compare data to reference
+         INFO( "type: " + infoType );
+         INFO( this->formatParameter(param));
+         this->computeError(outData, refData);
+      }
    }
 
    template <typename TOp> void TesterBase<TOp>::readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const

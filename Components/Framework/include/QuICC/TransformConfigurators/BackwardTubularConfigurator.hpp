@@ -219,6 +219,7 @@ namespace Transform {
 
    inline void BackwardTubularConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("BackwardTubularConfigurator::initiate1DCommunication");
       ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateForwardSend();
@@ -228,6 +229,7 @@ namespace Transform {
 
    inline void BackwardTubularConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("BackwardTubularConfigurator::initiate2DCommunication");
       ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateForwardSend();

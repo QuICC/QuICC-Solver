@@ -11,7 +11,14 @@
 #include <iomanip>
 #include <utility>
 
+#ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5DataSpace.hpp>
+#include <highfive/H5File.hpp>
+#endif
+
 #include "PeakRss.hpp"
+#include "gitHash.hpp"
 
 namespace QuICC {
 namespace Profiler {
@@ -28,7 +35,8 @@ void Tracker::init(){}
 
 void Tracker::initRegion(const std::string& regionName)
 {
-    mRegions.insert({regionName, Tracker::tracking_t{ 0, 0, 0, 0, SteadyTimer(), MemoryTracker()}});
+    mRegions.insert({regionName, Tracker::tracking_t{
+        std::array<double, collectSize>(), 0, 0, 0, SteadyTimer(), MemoryTracker()}});
 }
 
 void Tracker::start(const std::string& regionName)
@@ -55,11 +63,14 @@ void Tracker::stop(const std::string& regionName)
     std::get<tracking::timTracker>(reg->second).stop();
     std::get<tracking::memTracker>(reg->second).stop();
 
-    // update count
-    std::get<tracking::count>(reg->second) += 1;
+    auto count = std::get<tracking::count>(reg->second);
     // time
-    std::get<tracking::time>(reg->second) +=
+    auto id = count % collectSize;
+    std::get<tracking::time>(reg->second)[id] =
         std::get<tracking::timTracker>(reg->second).time();
+    // update count
+    count += 1;
+    std::get<tracking::count>(reg->second) = count;
     // high watermark memory (MB)
     std::get<tracking::memory>(reg->second) =
         std::max(std::get<tracking::memory>(reg->second), PeakRss() * 1.0e-6);
@@ -75,13 +86,75 @@ Tracker::tracking_t Tracker::get(const std::string& regionName)
     return reg->second;
 }
 
+void Tracker::print_hdf5()
+{
+#ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE
+
+    std::string outFile = "profile.hdf5";
+
+    int rank{};
+    int nRanks{1};
+
+    #if QUICC_MPI
+    MPI_Comm_rank(mComm, &rank);
+    MPI_Comm_size(mComm, &nRanks);
+    #endif
+
+    // Write in a format compatible to conduit
+    using namespace HighFive;
+
+    File file(outFile, File::ReadWrite | File::Create | File::Truncate
+    #if QUICC_MPI
+    , MPIOFileDriver(mComm, MPI_INFO_NULL)
+    #endif
+    );
+
+    // Write metadata
+    auto gi = file.createGroup("info");
+    std::vector<size_t> dimScalar(1);
+    dimScalar[0] = std::size_t(1);
+    DataSet dataRanks = gi.createDataSet<int>("ranks", DataSpace(dimScalar));
+    dataRanks.write(nRanks);
+    DataSet dataCommit = gi.createDataSet<char[10]>("git-commit", DataSpace(dimScalar));
+    dataCommit.write(Framework::gitHash);
+
+    // Write timings
+    auto gT = file.createGroup("timings");
+    for (auto reg = mRegions.begin(); reg != mRegions.end(); ++reg)
+    {
+        // compute actual sample size
+        auto count = std::get<tracking::count>(reg->second);
+        auto sampleSize = (count > collectSize) ? collectSize : count;
+
+        // scalars
+        auto gR = gT.createGroup(reg->first);
+        gR.createDataSet<std::uint32_t>("count", DataSpace::From(count)).write(count);
+        gR.createDataSet<std::uint32_t>("sampleSize", DataSpace::From(sampleSize))
+            .write(sampleSize);
+        gR.createDataSet<double>("memory", DataSpace::From(dimScalar))
+            .write(&std::get<tracking::memory>(reg->second));
+        gR.createDataSet<double>("memoryDelta", DataSpace::From(dimScalar))
+            .write(&std::get<tracking::memoryDelta>(reg->second));
+
+        // timings
+        std::vector<size_t> dimSample = {nRanks*sampleSize};
+        gR.createDataSet<double>("time", DataSpace(dimSample))
+            .select({std::size_t(rank)*sampleSize}, {sampleSize})
+            .write(std::get<tracking::time>(reg->second).data());
+
+        // wait for everyone to be done
+        MPI_Barrier(mComm);
+    }
+#endif
+}
+
 #ifdef QUICC_MPI
 void Tracker::print(std::ostream& os)
 {
 
-    int rank, n_ranks;
+    int rank, nRanks;
     MPI_Comm_rank(mComm, &rank);
-    MPI_Comm_size(mComm, &n_ranks);
+    MPI_Comm_size(mComm, &nRanks);
 
     for (auto reg = mRegions.begin(); reg != mRegions.end(); ++reg)
     {
@@ -89,17 +162,33 @@ void Tracker::print(std::ostream& os)
         constexpr std::size_t stat_size = 3;
         std::array<double, stat_size> data{}, data_min{}, data_max{}, data_avg{};
 
+        // avg/min/max time
+        auto count = std::get<tracking::count>(reg->second);
+        auto sampleSize = (count > collectSize) ? collectSize : count;
+        double timeAvg{};
+        double timeMin{1e+300};
+        double timeMax{-1e+300};
+        for (std::size_t i = 0; i < sampleSize; ++i)
+        {
+            auto t = std::get<tracking::time>(reg->second)[i];
+            timeMin = std::min(t, timeMin);
+            timeMax = std::max(t, timeMax);
+            timeAvg += t;
+        }
+        timeAvg /= sampleSize;
+
         // abusing the fact that data types are mapped to the lower part of the enum
-        data[tracking::time] = std::get<tracking::time>(reg->second);
         data[tracking::memory] = std::get<tracking::memory>(reg->second);
         data[tracking::memoryDelta] = std::get<tracking::memoryDelta>(reg->second);
-
+        data[tracking::time] = timeMin;
         MPI_Reduce(data.data(), data_min.data(), stat_size, MPI_DOUBLE, MPI_MIN, 0, mComm);
+        data[tracking::time] = timeMax;
         MPI_Reduce(data.data(), data_max.data(), stat_size, MPI_DOUBLE, MPI_MAX, 0, mComm);
+        data[tracking::time] = timeAvg;
         MPI_Reduce(data.data(), data_avg.data(), stat_size, MPI_DOUBLE, MPI_SUM, 0, mComm);
         for (auto& d : data_avg)
         {
-            d /= n_ranks;
+            d /= nRanks;
         }
 
         if (rank == 0)
@@ -130,6 +219,16 @@ void Tracker::print(std::ostream& os)
 {
     for (auto reg = mRegions.begin(); reg != mRegions.end(); ++reg)
     {
+        // average time
+        auto count = std::get<tracking::count>(reg->second);
+        auto sampleSize = (count > collectSize) ? collectSize : count;
+        double timeAvg{};
+        for (std::size_t i = 0; i < sampleSize; ++i)
+        {
+            timeAvg += std::get<tracking::time>(reg->second)[i];
+        }
+        timeAvg /= sampleSize;
+
         os << reg->first
             << '\t' << std::get<tracking::count>(reg->second) << " times\n"
             << "\t high watermark memory (MB):"
@@ -139,7 +238,7 @@ void Tracker::print(std::ostream& os)
             << '\t' << std::setw(10) << std::get<tracking::memoryDelta>(reg->second)
             << '\n'
             << "\t time (s)                  :"
-            << '\t' << std::setw(10) << std::get<tracking::time>(reg->second)
+            << '\t' << std::setw(10) << timeAvg
             << '\n';
     }
 }

@@ -17,6 +17,10 @@
 #endif
 #include <tuple>
 
+#ifndef QUICC_PROFILE_NATIVE_SAMPLE
+#define QUICC_PROFILE_NATIVE_SAMPLE 100
+#endif
+
 namespace QuICC {
 namespace Profiler {
 
@@ -24,8 +28,10 @@ namespace Profiler {
 class Tracker
 {
 public:
+    static constexpr std::uint32_t collectSize = QUICC_PROFILE_NATIVE_SAMPLE;
 
-    using tracking_t = std::tuple<double, double, double, std::uint32_t, SteadyTimer, MemoryTracker>;
+    using tracking_t = std::tuple<
+        std::array<double, collectSize>, double, double, std::uint32_t, SteadyTimer, MemoryTracker>;
     enum tracking {time, memory, memoryDelta, count, timTracker, memTracker};
 
 #ifdef QUICC_MPI
@@ -38,6 +44,7 @@ public:
     static void stop(const std::string& name);
     static tracking_t get(const std::string& name);
     static void print(std::ostream& os = std::cout);
+    static void print_hdf5();
 
 private:
 

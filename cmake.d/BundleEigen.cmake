@@ -15,7 +15,6 @@ if(QUICC_USE_SYSTEM_EIGEN)
     endif()
 else()
     if(NOT TARGET Eigen3::Eigen)
-        include(MessageQuICC)
         set(QUICC_MESSAGE_QUIET ON)
 
         include(FetchContent)

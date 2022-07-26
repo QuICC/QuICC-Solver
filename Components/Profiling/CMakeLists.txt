@@ -15,6 +15,7 @@ target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
   INTERFACE
     ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}Interface
     ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}Timers)
+
 # Backends
 if(QUICC_PROFILE_BACKEND STREQUAL "native")
   message(VERBOSE "profiler using native backend")
@@ -25,6 +26,7 @@ elseif(QUICC_PROFILE_BACKEND STREQUAL "likwid")
   target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
     INTERFACE LIKWID::LIKWID)
 endif()
+
 # Alias
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS "${QUICC_CURRENT_COMPONENT_LIB}")
 
@@ -33,7 +35,6 @@ option(QUICC_TESTSUITE_PROFILING "Enable Profiling component testsuite?" OFF)
 if(QUICC_TESTSUITE_PROFILING)
   add_subdirectory(TestSuite)
 endif(QUICC_TESTSUITE_PROFILING)
-
 
 # Export info
 quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}

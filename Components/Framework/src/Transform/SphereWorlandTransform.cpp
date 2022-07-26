@@ -162,6 +162,7 @@ namespace Transform {
 
    void SphereWorlandTransform::backward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
    {
+      Profiler::RegionFixture<3> fix("SphereWorlandTransform::backward");
       this->mImpl.transform(rOut, in, id);
    }
 

@@ -187,6 +187,7 @@ namespace details {
     inline static void Finalize()
     {
         Tracker::print();
+        Tracker::print_hdf5();
     }
 
     inline static void RegionStart(const std::string& name)

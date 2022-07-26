@@ -26,6 +26,7 @@
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Arithmetics/Add.hpp"
 #include "QuICC/Arithmetics/Sub.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -109,6 +110,7 @@ namespace Datatypes {
 
    template <typename T1, typename T2, template <typename> class TField> void FieldTools::combine(TField<T1>& rRhs, const TField<T2>& lhs, const std::size_t arithId)
    {
+      Profiler::RegionFixture<3> fix("FieldTools::combine");
       assert(arithId == Arithmetics::Add::id() || arithId == Arithmetics::Sub::id());
 
       if constexpr(std::is_same<T1,T2>::value)
@@ -131,6 +133,7 @@ namespace Datatypes {
 
    template <typename T, template <typename> class TField> void FieldTools::negative(TField<T>& rRhs)
    {
+      Profiler::RegionFixture<3> fix("FieldTools::negative");
       rRhs.rData() = -rRhs.data();
    }
 
