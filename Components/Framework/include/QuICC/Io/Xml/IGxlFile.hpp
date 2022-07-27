@@ -90,7 +90,7 @@ namespace Xml {
    template <typename TBase> const std::string IGxlFile<TBase>::GXLTAG = "gxl";
 
    template <typename TBase> IGxlFile<TBase>::IGxlFile(const std::string& name)
-      : TBase(name, IGxlFile<TBase>::EXTENSION, IGxlFile<TBase>::HEADER, IGxlFile<TBase>::TYPE, IGxlFile<TBase>::VERSION)
+      : TBase(name, IGxlFile<TBase>::EXTENSION, IGxlFile<TBase>::HEADER, IGxlFile<TBase>::TYPE, IGxlFile<TBase>::VERSION, IGxlFile<TBase>::GXLTAG)
    {
    }
 
@@ -115,9 +115,9 @@ namespace Xml {
       this->mXML.append_node(node);
 
       // gxl node
-      node = this->mXML.allocate_node(rapidxml::node_element, this->GXLTAG.c_str());
-      node->append_attribute(this->mXML.allocate_attribute("xmlns:xlink", "http://www.w3.org/1999/xlink"));
-      this->mXML.append_node(node);
+      this->mpRoot = this->mXML.allocate_node(rapidxml::node_element, this->GXLTAG.c_str());
+      this->mpRoot->append_attribute(this->mXML.allocate_attribute("xmlns:xlink", "http://www.w3.org/1999/xlink"));
+      this->mXML.append_node(this->mpRoot);
    }
 
 }

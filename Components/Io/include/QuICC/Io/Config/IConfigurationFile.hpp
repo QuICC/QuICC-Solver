@@ -131,6 +131,11 @@ namespace Config {
           * @brief VERSION of the configuration file
           */
          static const std::string VERSION;
+
+         /**
+          * @brief XML ROOT of the configuration file
+          */
+         static const std::string ROOT;
    };
 
    template <typename TBase> inline std::shared_ptr<const Framework::Block> IConfigurationFile<TBase>::spFramework() const
@@ -169,8 +174,10 @@ namespace Config {
 
    template <typename TBase> const std::string IConfigurationFile<TBase>::VERSION = "1.0";
 
+   template <typename TBase> const std::string IConfigurationFile<TBase>::ROOT = "quicc";
+
    template <typename TBase> IConfigurationFile<TBase>::IConfigurationFile(const int dim, const std::vector<bool>& isPeriodicBox, const std::string& name, const std::string& type)
-      : TBase(name, IConfigurationFile<TBase>::EXTENSION, IConfigurationFile<TBase>::HEADER, type, IConfigurationFile<TBase>::VERSION)
+      : TBase(name, IConfigurationFile<TBase>::EXTENSION, IConfigurationFile<TBase>::HEADER, type, IConfigurationFile<TBase>::VERSION, IConfigurationFile<TBase>::ROOT)
    {
       // Initialize framework
       this->mspFramework = std::make_shared<Framework::Block>();

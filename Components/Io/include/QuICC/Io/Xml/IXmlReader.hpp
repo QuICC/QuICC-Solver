@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IXmlReader.hpp
  * @brief Interface to an XML reader
  */
@@ -34,15 +34,16 @@ namespace Xml {
    {
       public:
          /**
-         * @brief Constructor 
+         * @brief Constructor
          *
          * @param name     Filename
          * @param ext      File extension
          * @param header   Header string of file
          * @param type     Type string of the file
          * @param version  Version string of the file
+         * @param root     XML root string of the file
          */
-         IXmlReader(std::string name, std::string ext, std::string header, std::string type, std::string version);
+         IXmlReader(std::string name, std::string ext, std::string header, std::string type, std::string version, std::string root);
 
          /**
          * @brief Destructor
@@ -63,7 +64,7 @@ namespace Xml {
           * @brief Finalise the file
           */
          virtual void finalize();
-         
+
       protected:
          /**
           * @brief Handle to the file

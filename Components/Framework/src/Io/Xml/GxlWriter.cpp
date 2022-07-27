@@ -64,13 +64,10 @@ namespace Xml {
       color.push_back("blue");
       color.push_back("green");
 
-      // Get master GXL tag
-      rapidxml::xml_node<> *pGxl = this->mXML.first_node(this->GXLTAG.c_str());
-
       // Create master graph
       rapidxml::xml_node<> *pGraph = this->mXML.allocate_node(rapidxml::node_element, "graph");
       pGraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string("master",0)));
-      pGxl->append_node(pGraph);
+      this->mpRoot->append_node(pGraph);
 
       // Loop over the two transposes
       for(size_t i = 0; i < structure.size(); i++)
@@ -141,13 +138,10 @@ namespace Xml {
       color.push_back("green");
       color.push_back("red");
 
-      // Get master GXL tag
-      rapidxml::xml_node<> *pGxl = this->mXML.first_node(this->GXLTAG.c_str());
-
       // Create master graph
       rapidxml::xml_node<> *pGraph = this->mXML.allocate_node(rapidxml::node_element, "graph");
       pGraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string("master",0)));
-      pGxl->append_node(pGraph);
+      this->mpRoot->append_node(pGraph);
 
       // Loop over the paths
       int unid = 0;
@@ -265,13 +259,10 @@ namespace Xml {
       color.push_back("red");
       std::vector<std::string>::const_iterator colorIt = color.begin();
 
-      // Get master GXL tag
-      rapidxml::xml_node<> *pGxl = this->mXML.first_node(this->GXLTAG.c_str());
-
       // Create master graph
       rapidxml::xml_node<> *pGraph = this->mXML.allocate_node(rapidxml::node_element, "graph");
       pGraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string("master",0)));
-      pGxl->append_node(pGraph);
+      this->mpRoot->append_node(pGraph);
 
       // Loop over the trees
       for(auto treeIt = trees.cbegin(); treeIt != trees.cend(); ++treeIt)

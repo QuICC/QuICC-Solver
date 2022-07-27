@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IXmlWriter.hpp
  * @brief Implementation of an XML writer
  */
@@ -36,15 +36,16 @@ namespace Xml {
    {
       public:
          /**
-         * @brief Constructor 
+         * @brief Constructor
          *
          * @param name File name
          * @param ext Extension of the file
          * @param header Header of the file
          * @param type Type of the file
          * @param version Version string of the file
+         * @param root XML Root of the file
          */
-         IXmlWriter(std::string name, std::string ext, std::string header, std::string type, std::string version);
+         IXmlWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, std::string root);
 
          /**
          * @brief Destructor
@@ -66,7 +67,7 @@ namespace Xml {
           * @brief Finalise the file
           */
          virtual void finalize();
-         
+
       protected:
          /**
           * @brief Handle to the file

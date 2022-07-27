@@ -1,5 +1,5 @@
-/** 
- * @file ConfigurationWriter.hpp 
+/**
+ * @file ConfigurationWriter.hpp
  * @brief Implementation of the XML configuration file writer
  */
 
@@ -53,12 +53,17 @@ namespace Config {
           * @brief Read content of configuration file
           */
          virtual void write();
-         
+
       protected:
          /**
           * @brief Write configuration block
           */
          void writeBlock(SharedIConfigurationBlock spBlock);
+
+         /**
+          * @brief Write XML root
+          */
+         void writeRoot();
 
       private:
          /**

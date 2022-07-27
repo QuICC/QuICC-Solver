@@ -22,8 +22,8 @@ namespace Io {
 
 namespace Xml {
 
-   XmlFile::XmlFile(std::string name, std::string ext, std::string header, std::string type, std::string version)
-      : mXML(), mName(name), mExt(ext), mHeader(header), mType(type), mVersion(version)
+   XmlFile::XmlFile(std::string name, std::string ext, std::string header, std::string type, std::string version, std::string root)
+      : mXML(), mName(name), mExt(ext), mHeader(header), mType(type), mVersion(version), mRoot(root)
    {
    }
 
@@ -84,6 +84,11 @@ namespace Xml {
    const std::string& XmlFile::version() const
    {
       return this->mVersion;
+   }
+
+   const std::string& XmlFile::root() const
+   {
+      return this->mRoot;
    }
 
    const std::string XmlFile::FILE_TAG = "file";

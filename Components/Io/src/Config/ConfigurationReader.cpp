@@ -65,7 +65,7 @@ namespace Config {
       if(spBlock->size() > 0)
       {
          // Get master pointer to framework XML code
-         rapidxml::xml_node<> *pMaster = this->mXML.first_node(spBlock->tag().c_str());
+         rapidxml::xml_node<> *pMaster = this->mpRoot->first_node(spBlock->tag().c_str());
 
          // Check if master node exists
          if(pMaster)

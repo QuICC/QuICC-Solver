@@ -1,4 +1,4 @@
-/** 
+/**
  * @file XmlFile.hpp
  * @brief Implementation of a general XML file
  */
@@ -36,9 +36,10 @@ namespace Xml {
          * @param ext      File extension
          * @param header   Header string of file
          * @param type     Type string of file
-         * @param version  Version string of file 
+         * @param version  Version string of file
+         * @param root     XML root
          */
-         XmlFile(std::string name, std::string ext, std::string header, std::string type, std::string version);
+         XmlFile(std::string name, std::string ext, std::string header, std::string type, std::string version, std::string root);
 
          /**
          * @brief Destructor
@@ -49,12 +50,17 @@ namespace Xml {
           * @brief Get filename
           */
          std::string  filename() const;
-         
+
       protected:
          /**
           * @brief XML interface
           */
          rapidxml::xml_document<>   mXML;
+
+         /**
+          * @brief XML interface
+          */
+         rapidxml::xml_node<>*   mpRoot;
 
          /**
           * @brief Get the name
@@ -100,6 +106,11 @@ namespace Xml {
           * @brief Get the version content
           */
          const std::string&  version() const;
+
+         /**
+          * @brief Get the root content
+          */
+         const std::string&  root() const;
 
          /**
           * @brief Reset name
@@ -153,6 +164,11 @@ namespace Xml {
           * @brief Version of the file to check compatibility
           */
          std::string mVersion;
+
+         /**
+          * @brief Version of the file to check compatibility
+          */
+         std::string mRoot;
    };
 
 }

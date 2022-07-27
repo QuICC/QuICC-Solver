@@ -72,6 +72,11 @@ namespace Xml {
           */
          static const std::string VERSION;
 
+         /**
+          * @brief ROOT of the VTK XML file
+          */
+         static const std::string ROOT;
+
       private:
    };
 
@@ -83,8 +88,10 @@ namespace Xml {
 
    template <typename TBase> const std::string IVtpFile<TBase>::VERSION = "1.0";
 
+   template <typename TBase> const std::string IVtpFile<TBase>::ROOT = "undefined";
+
    template <typename TBase> IVtpFile<TBase>::IVtpFile(const std::string& name)
-      : TBase(name, IVtpFile<TBase>::EXTENSION, IVtpFile<TBase>::HEADER, IVtpFile<TBase>::TYPE, IVtpFile<TBase>::VERSION)
+      : TBase(name, IVtpFile<TBase>::EXTENSION, IVtpFile<TBase>::HEADER, IVtpFile<TBase>::TYPE, IVtpFile<TBase>::VERSION, IVtpFile<TBase>::ROOT)
    {
    }
 

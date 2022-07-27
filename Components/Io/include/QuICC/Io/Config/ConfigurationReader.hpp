@@ -1,5 +1,5 @@
-/** 
- * @file ConfigurationReader.hpp 
+/**
+ * @file ConfigurationReader.hpp
  * @brief Implementation of the XML configuration file reader
  */
 
@@ -53,7 +53,7 @@ namespace Config {
           * @brief Read content of configuration file
           */
          virtual void read();
-         
+
       protected:
          /**
           * @brief Read configuration block

@@ -28,8 +28,8 @@ namespace Io {
 
 namespace Xml {
 
-   IXmlWriter::IXmlWriter(std::string name, std::string ext, std::string header, std::string type, std::string version)
-      : XmlFile(name, ext, header, type, version)
+   IXmlWriter::IXmlWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, std::string root)
+      : XmlFile(name, ext, header, type, version, root)
    {
    }
 
@@ -52,10 +52,14 @@ namespace Xml {
       std::string senct = "utf-8";
       node->append_attribute(this->mXML.allocate_attribute(this->mXML.allocate_string(senc.c_str()), this->mXML.allocate_string(senct.c_str())));
       this->mXML.append_node(node);
+
+      // ROOT node
+      this->mpRoot = this->mXML.allocate_node(rapidxml::node_element, this->root().c_str());
+      this->mXML.append_node(this->mpRoot);
       
       // FILEMETA node
       node = this->mXML.allocate_node(rapidxml::node_element, this->fileTag().c_str());
-      this->mXML.append_node(node);
+      this->mpRoot->append_node(node);
       
       // HEADER node
       child = this->mXML.allocate_node(rapidxml::node_element, this->headerTag().c_str());

@@ -79,7 +79,7 @@ namespace Config {
       {
          // Create framework XML node
          rapidxml::xml_node<> *pMaster = this->mXML.allocate_node(rapidxml::node_element, spBlock->tag().c_str());
-         this->mXML.append_node(pMaster);
+         this->mpRoot->append_node(pMaster);
 
          // Check if master node exists
          if(pMaster)

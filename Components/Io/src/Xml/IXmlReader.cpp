@@ -27,8 +27,8 @@ namespace Io {
 
 namespace Xml {
 
-   IXmlReader::IXmlReader(std::string name, std::string ext, std::string header, std::string type, std::string version)
-      : XmlFile(name, ext, header, type, version), mContent()
+   IXmlReader::IXmlReader(std::string name, std::string ext, std::string header, std::string type, std::string version, std::string root)
+      : XmlFile(name, ext, header, type, version, root), mContent()
    {
    }
 
@@ -89,6 +89,24 @@ namespace Xml {
 
          // Create XML tree through parser out of char content
          this->mXML.parse<0>(&this->mContent[0]);
+
+         // Set root
+         this->mpRoot = this->mXML.first_node(this->root().c_str());
+
+         // Backward compatibility with non-conform XML file
+         if(this->mpRoot == nullptr)
+         {
+            // Check it can find the file tag
+            if(this->mXML.first_node(this->fileTag().c_str()))
+            {
+               this->mpRoot = &this->mXML;
+            }
+            else
+            {
+               throw std::logic_error("Incompatible XML format");
+            }
+
+         }
       }
    }
 
@@ -98,7 +116,7 @@ namespace Xml {
       if(QuICCEnv().allowsIO())
       {
          // Get pointer to FILEMETA node
-         rapidxml::xml_node<> *node = this->mXML.first_node(this->fileTag().c_str());
+         rapidxml::xml_node<> *node = this->mpRoot->first_node(this->fileTag().c_str());
 
          // Get pointer to HEADER subnode
          rapidxml::xml_node<> *vnode = node->first_node(this->headerTag().c_str());
