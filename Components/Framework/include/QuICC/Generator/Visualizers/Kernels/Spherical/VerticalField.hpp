@@ -55,10 +55,18 @@ namespace Spherical {
          /**
           * @brief Set the smart pointer to the vector field
           *
-          * \param name Name of the field
+          * \param nameId Name of the field
           * \param spField Shared pointer to the vector field
           */
-         void setVector(std::size_t name, Framework::Selector::VariantSharedVectorVariable spField);
+         void setVector(std::size_t nameId, Framework::Selector::VariantSharedVectorVariable spField);
+
+         /**
+          * @brief Set the smart pointer to the scalar field
+          *
+          * \param nameId Name of the field
+          * \param spField Shared pointer to the scalar field
+          */
+         void setScalar(std::size_t nameId, Framework::Selector::VariantSharedScalarVariable spField);
 
          /**
           * @brief Initialize kernel
@@ -77,13 +85,28 @@ namespace Spherical {
          /**
           * @brief Get name ID of the unknown
           */
-         std::size_t name() const;
+         std::size_t nameId() const;
+
+         /**
+          * @brief Get name ID of the vertical component
+          */
+         std::size_t compNameId() const;
+
+         /**
+          * @brief Use provided component in nonlinear computation
+          */
+         bool hasScalar() const;
 
       private:
          /**
           * @brief Name ID
           */
-         std::size_t mName;
+         std::size_t mNameId;
+
+         /**
+          * @brief Vertical component ID
+          */
+         std::size_t mCompNameId;
 
          /**
           * @brief Storage for output field flag

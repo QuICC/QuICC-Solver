@@ -75,20 +75,19 @@ namespace Equations {
          // Initialize the physical kernel
          auto spNLKernel = std::make_shared<Physical::Kernel::Spherical::CylindricalRadialField>();
          spNLKernel->setVector(this->mFieldName, this->spVector(this->mFieldName));
+         spNLKernel->setScalar(this->name(), this->spScalar(this->name()));
          spNLKernel->init(this->mFieldType, 1.0);
          this->mspNLKernel = spNLKernel;
       }
-   }
-
-   void SphericalRadialCylindricalFieldVisualizer::useNonlinear(const Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id)
-   {
-      std::visit([&](auto&& p){p->rDom(0).rPhys().rData() = rNLComp.data();}, this->spUnknown());
    }
 
    void SphericalRadialCylindricalFieldVisualizer::setRequirements()
    {
       // Set solver timing
       this->setSolveTiming(SolveTiming::After::id());
+
+      // Forward transform generates field values
+      this->setForwardPathsType(FWD_IS_FIELD);
 
       // Get reference to spatial scheme
       const auto& ss = this->ss();

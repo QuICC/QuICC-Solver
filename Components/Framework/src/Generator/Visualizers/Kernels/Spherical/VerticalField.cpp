@@ -19,6 +19,7 @@
 // Project includes
 //
 #include "QuICC/Math/Constants.hpp"
+#include "QuICC/PhysicalNames/Undefined.hpp"
 #include "QuICC/PhysicalOperators/SphericalZComponent.hpp"
 
 namespace QuICC {
@@ -30,7 +31,7 @@ namespace Kernel {
 namespace Spherical {
 
    VerticalField::VerticalField()
-      : IPhysicalKernel()
+      : IPhysicalKernel(), mNameId(PhysicalNames::Undefined::id()), mCompNameId(PhysicalNames::Undefined::id())
    {
    }
 
@@ -38,19 +39,39 @@ namespace Spherical {
    {
    }
 
-   std::size_t VerticalField::name() const
+   std::size_t VerticalField::nameId() const
    {
-      return this->mName;
+      return this->mNameId;
    }
 
-   void VerticalField::setVector(std::size_t name, Framework::Selector::VariantSharedVectorVariable spField)
+   std::size_t VerticalField::compNameId() const
+   {
+      return this->mCompNameId;
+   }
+
+   bool VerticalField::hasScalar() const
+   {
+      return (this->mScalars.count(this->mCompNameId) == 1);
+   }
+
+   void VerticalField::setVector(std::size_t nameId, Framework::Selector::VariantSharedVectorVariable spField)
    {
       // Safety assertion
-      assert(this->mScalars.count(name) + this->mVectors.count(name) == 0);
+      assert(this->mVectors.count(nameId) == 0);
 
-      this->mName = name;
+      this->mNameId = nameId;
 
-      this->setField(name, spField);
+      this->setField(nameId, spField);
+   }
+
+   void VerticalField::setScalar(std::size_t nameId, Framework::Selector::VariantSharedScalarVariable spField)
+   {
+      // Safety assertion
+      assert(this->mScalars.count(nameId) == 0);
+
+      this->mCompNameId = nameId;
+
+      this->setField(nameId, spField);
    }
 
    void VerticalField::init(FieldType::Id type, const MHDFloat scale)
@@ -72,15 +93,30 @@ namespace Spherical {
    {
       if(this->mFieldType == FieldType::VECTOR)
       {
-         std::visit([&](auto&& p){Physical::SphericalZComponent::set(rNLComp, p->dom(0).res(), this->mCosTheta, this->mSinTheta, p->dom(0).phys(), this->mScale);}, this->vector(this->name()));
-      } else if(this->mFieldType == FieldType::GRADIENT)
+         if(this->hasScalar())
+         {
+            std::visit([&](auto&& p, auto&& q){Physical::SphericalZComponent::set(q->rDom(0).rPhys(), p->dom(0).res(), this->mCosTheta, this->mSinTheta, p->dom(0).phys(), this->mScale);}, this->vector(this->nameId()), this->scalar(this->compNameId()));
+         }
+         else
+         {
+            std::visit([&](auto&& p){Physical::SphericalZComponent::set(rNLComp, p->dom(0).res(), this->mCosTheta, this->mSinTheta, p->dom(0).phys(), this->mScale);}, this->vector(this->nameId()));
+         }
+      }
+      else if(this->mFieldType == FieldType::GRADIENT)
       {
          throw std::logic_error("Z Component of gradient not implemented yet!");
 
-         //Physical::SphericalZComponent::add(rNLComp, this->res(), this->mCosTheta, this->mSinTheta, this->vector(mFieldName).dom(0).grad());
-      } else if(this->mFieldType == FieldType::CURL)
+      }
+      else if(this->mFieldType == FieldType::CURL)
       {
-         std::visit([&](auto&& p){Physical::SphericalZComponent::set(rNLComp, p->dom(0).res(), this->mCosTheta, this->mSinTheta, p->dom(0).curl(), this->mScale);}, this->vector(this->name()));
+         if(this->hasScalar())
+         {
+            std::visit([&](auto&& p, auto&& q){Physical::SphericalZComponent::set(q->rDom(0).rPhys(), p->dom(0).res(), this->mCosTheta, this->mSinTheta, p->dom(0).curl(), this->mScale);}, this->vector(this->nameId()), this->scalar(this->compNameId()));
+         }
+         else
+         {
+            std::visit([&](auto&& p){Physical::SphericalZComponent::set(rNLComp, p->dom(0).res(), this->mCosTheta, this->mSinTheta, p->dom(0).curl(), this->mScale);}, this->vector(this->nameId()));
+         }
       }
    }
 

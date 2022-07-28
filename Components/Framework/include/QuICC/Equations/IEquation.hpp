@@ -101,14 +101,6 @@ namespace Equations {
          Physical::Kernel::SharedIPhysicalKernel spNLKernel() const;
 
          /**
-          * @brief Use the nonlinear computation as physical field values
-          *
-          * @param rNLComp Nonlinear term component
-          * @param id      ID of the component (allows for a more general implementation)
-          */
-         virtual void useNonlinear(const Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id);
-
-         /**
           * @brief Initialise the spectral equation matrices
           */
          virtual void initSpectralMatrices() = 0;

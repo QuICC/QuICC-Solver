@@ -415,11 +415,6 @@ namespace Equations {
       }
    }
 
-   void IEquation::useNonlinear(const Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id)
-   {
-      // DO NOTHING IN GENERAL!
-   }
-
    void  IEquation::buildModelMatrix(DecoupledZSparse& rModelMatrix, const std::size_t opId, FieldComponents::Spectral::Id compId, const int matIdx, const std::size_t bcType) const
    {
       // This implementation should never get called!
