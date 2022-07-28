@@ -87,7 +87,7 @@ namespace Variable {
 
       if(this->mOrigin.size() > 0)
       {
-         this->mNusselt = this->mTb/(this->mTb + std::visit([&](auto&& p){return ((this->mOrigin.transpose()*p->dom(0).total().profile(0,0)).array().abs())(0,0);}, sRange.first->second));
+         this->mNusselt = std::visit([&](auto&& p){return (this->mTb/(this->mTb + (this->mOrigin.transpose()*p->dom(0).total().profile(0,0)).array())).abs()(0,0);}, sRange.first->second);
       } else
       {
          this->mNusselt = 0.0;

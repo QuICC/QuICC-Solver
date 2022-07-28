@@ -1,25 +1,27 @@
 .test-lib:
+  variables:
+    TEST_NCPU: 'grep processor /proc/cpuinfo | wc -l'
   script:
     # the tests are not installed, so we need to run them from the build directory
     - cd /QuICC.src/build
-    - ctest --no-tests=error --output-on-failure -R PolynomialQuadratureTests_
-    - ctest --no-tests=error --output-on-failure -R ^Jacobi
-    - ctest --no-tests=error --output-on-failure -R "TransformFourierTests_Complex_.*_integrator"
-    - ctest --no-tests=error --output-on-failure -R "TransformFourierTests_Complex_.*_projector"
-    - ctest --no-tests=error --output-on-failure -R "TransformFourierTests_Mixed_.*_integrator"
-    - ctest --no-tests=error --output-on-failure -R "TransformFourierTests_Mixed_.*_projector"
-    - ctest --no-tests=error --output-on-failure -R "TransformFourierTests_Mixed_.*_bfloop"
-    - ctest --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_integrator"
-    - ctest --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_projector"
-    - ctest --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_bfloop"
-    - ctest --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_reductor"
-    - ctest --no-tests=error --output-on-failure -R "TransformWorlandTests_.*"
-    - ctest --no-tests=error --output-on-failure -R ProfilerTest
-    - ctest --no-tests=error --output-on-failure -R TrackerTest
-    - ctest --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_integrator_ulp"
-    - ctest --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_integrator_id"
-    - ctest --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_projector_ulp"
-    - ctest --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_projector_id"
-    - ctest --no-tests=error --output-on-failure -R SparseSMWorlandTests_
-    - ctest --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapTests_
-    - ctest --no-tests=error --output-on-failure -R FrameworkLoadSplitterTests_
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R PolynomialQuadratureTests_
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Jacobi
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformFourierTests_Complex_.*_integrator"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformFourierTests_Complex_.*_projector"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformFourierTests_Mixed_.*_integrator"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformFourierTests_Mixed_.*_projector"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformFourierTests_Mixed_.*_bfloop"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_integrator"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_projector"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_bfloop"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_reductor"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformWorlandTests_.*"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ProfilerTest
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R TrackerTest
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_integrator_ulp"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_integrator_id"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_projector_ulp"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_projector_id"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandTests_
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapTests_
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkLoadSplitterTests_

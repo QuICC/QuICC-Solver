@@ -32,11 +32,11 @@
 #
 
 # Default branch for known models
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.0.3" CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "fix/nusselt" CACHE STRING "Model repository branch.")
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.0.3" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.0.3" CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "fix/nusselt" CACHE STRING "Model repository branch.")
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.0.3" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.0.3" CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "fix/nusselt" CACHE STRING "Model repository branch.")
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.0.3" CACHE STRING "Model repository branch.")
 
 
