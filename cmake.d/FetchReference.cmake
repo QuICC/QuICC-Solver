@@ -48,26 +48,28 @@ function(quicc_fetch_reference target)
   set(RefTarget "${QAT_NAME}_ReferenceData_${_name}")
   message(DEBUG "${QAT_NAME}_ReferenceData_${_name}: ${RefTarget}")
 
-  ExternalData_Expand_Arguments(${RefTarget}
-    TarPath
-    DATA{${QAT_FILENAME}}
-    )
-  message(DEBUG "TarPath: ${TarPath}")
+  if(NOT TARGET ${RefTarget})
+    ExternalData_Expand_Arguments(${RefTarget}
+      TarPath
+      DATA{${QAT_FILENAME}}
+      )
+    message(DEBUG "TarPath: ${TarPath}")
 
-  if(CMAKE_MESSAGE_LOG_LEVEL STREQUAL "VERBOSE" OR
-    CMAKE_MESSAGE_LOG_LEVEL STREQUAL "DEBUG")
-    set(_prog ON)
-  else()
-    set(_prog OFF)
+    if(CMAKE_MESSAGE_LOG_LEVEL STREQUAL "VERBOSE" OR
+      CMAKE_MESSAGE_LOG_LEVEL STREQUAL "DEBUG")
+      set(_prog ON)
+    else()
+      set(_prog OFF)
+    endif()
+    ExternalData_Add_Target(${RefTarget} SHOW_PROGRESS ${_prog})
+
+    set(_refdata "${QAT_DATADIR}/_refdata")
+    add_custom_command(TARGET ${RefTarget} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E make_directory "${_refdata}"
+      COMMAND tar -xf "${TarPath}" -C "${_refdata}"
+      COMMAND find "${_refdata}" -type d | xargs -I{} realpath --relative-to "${_refdata}" {} | xargs -I{} mkdir -p "${QAT_DATADIR}/_data/{}"
+      )
   endif()
-  ExternalData_Add_Target(${RefTarget} SHOW_PROGRESS ${_prog})
-
-  set(_refdata "${QAT_DATADIR}/_refdata")
-  add_custom_command(TARGET ${RefTarget} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${_refdata}"
-    COMMAND tar -xf "${TarPath}" -C "${_refdata}"
-    COMMAND find "${_refdata}" -type d | xargs -I{} realpath --relative-to "${_refdata}" {} | xargs -I{} mkdir -p "${QAT_DATADIR}/_data/{}"
-    )
 
   # target depends on tar as well
   add_dependencies(${target} ${RefTarget})
