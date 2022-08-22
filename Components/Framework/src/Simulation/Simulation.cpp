@@ -70,6 +70,10 @@ namespace QuICC {
 
       StageTimer::stage("Starting simulation");
 
+
+      // Reset timers after first step to ignore initialization
+      bool resetFirstStep = true;
+
       // Start main loop of simulation
       while(this->mSimRunCtrl.status() == RuntimeStatus::GoOn::id())
       {
@@ -90,6 +94,21 @@ namespace QuICC {
 
          // Update simulation run control
          this->mSimRunCtrl.updateCluster(this->mExecutionTimer.queryTime(ExecutionTimer::TOTAL));
+
+         // Reset profiler
+         if(resetFirstStep)
+         {
+            // Separate timing for first iteration
+            this->mExecutionTimer.stop();
+            this->mExecutionTimer.update(ExecutionTimer::FIRSTSTEP);
+            this->mExecutionTimer.start();
+
+            // Reset profiler
+            ProfilerMacro_printInfo();
+            ProfilerMacro_reset();
+            ProfilerMacro_init();
+            resetFirstStep = false;
+         }
       }
 
       // Profile storage

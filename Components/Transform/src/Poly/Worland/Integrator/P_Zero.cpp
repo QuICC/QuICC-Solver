@@ -33,7 +33,7 @@ namespace Integrator {
    P_Zero::P_Zero()
       : IWorlandIntegrator()
    {
-      this->mProfileId = Debug::Profiler::WORLANDINTG_P;
+      this->mProfileId = Debug::Profiler::WORLANDINTG_P_ZERO;
    }
 
    P_Zero::~P_Zero()

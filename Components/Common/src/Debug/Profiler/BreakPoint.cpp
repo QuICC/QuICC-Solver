@@ -246,16 +246,26 @@ namespace Profiler {
             return "DivR1";
          case WORLANDINTG_DIVR1D1R1:
             return "DivR1D1R1";
-         case WORLANDINTG_I2_ZERO:
-            return "I2_zero";
-         case WORLANDINTG_I2DIVR1_ZERO:
-            return "I2DivR1_Zero";
+         case WORLANDINTG_I2:
+            return "I2";
          case WORLANDINTG_I2DIVR1D1R1_ZERO:
             return "I2DivR1D1R1_Zero";
-         case WORLANDINTG_I4DIVR1_ZERO:
-            return "I4DivR1_Zero";
+         case WORLANDINTG_I2DIVR1_ZERO:
+            return "I2DivR1_Zero";
          case WORLANDINTG_I4DIVR1D1R1_ZERO:
             return "I4DivR1D1R1_Zero";
+         case WORLANDINTG_I4DIVR1_ZERO:
+            return "I4DivR1_Zero";
+         case WORLANDINTG_P_ZERO:
+            return "P_Zero";
+         case WORLANDINTG_I2_ZERO:
+            return "I2_Zero";
+         case WORLANDINTG_DIVR1_ZERO:
+            return "DivR1_Zero";
+         case WORLANDINTG_DIVR1D1R1_ZERO:
+            return "DivR1D1R1_Zero";
+         case WORLANDINTG_R1_ZERO:
+            return "R1_Zero";
 
          case WORLANDREDU:
             return "Reductor";

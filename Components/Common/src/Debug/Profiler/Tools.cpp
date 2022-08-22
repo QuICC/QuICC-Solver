@@ -105,7 +105,7 @@ namespace Profiler {
 
          // Output the timinigs
          std::stringstream oss;
-         int base = 33 + static_cast<int>(min.size() > 0)*10;
+         int base = 35 + static_cast<int>(min.size() > 0)*10;
          auto namedBreak = ProfilerMacro::namePoints();
          int i = 0;
          for(auto it = namedBreak.begin(); it != namedBreak.end(); ++it)
