@@ -48,7 +48,7 @@ function(quicc_add_benchmark target)
 
   set(_args )
   foreach(_file IN LISTS QAB_STARTFILES)
-    list(APPEND _args "COMMAND" ${CMAKE_COMMAND} -E create_symlink
+    list(APPEND _args "COMMAND" ${CMAKE_COMMAND} -E copy
       "${_refdir}/${_file}"
       "${_rundir}/${_file}"
       )

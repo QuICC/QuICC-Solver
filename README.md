@@ -144,6 +144,19 @@ cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
 make <GreatSimulation><Implementation>
 ```
 
+### Euler
+
+```bash
+env2lmod
+module load cmake/3.20.3 gcc/8.2.0 openmpi openblas fftw hdf5 boost python
+
+cmake </path/to/QuICC> -DQUICC_MPIALGO=Tubular \
+-DQUICC_MULTPRECISION=ON \
+-DQUICC_MODEL=<GreatSimulation>
+
+make <GreatSimulation>
+```
+
 ### General optimization
 It is always better to compile for the target architecture (this is not necessary on Piz-Daint as CC will do it for you)
 ```bash
