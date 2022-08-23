@@ -15,24 +15,29 @@ include(FetchReference)
 #     location where data is extracted to ${DATADIR}/_refdata
 function(quicc_fetch_benchmark_reference target)
   # parse inputs
-  set(oneValueArgs MODEL FILENAME ARCHIVEDIR DATADIR)
+  set(oneValueArgs MODEL FILENAME ARCHIVEDIR DATADIR GITTAG)
   set(multiValueArgs )
-  cmake_parse_arguments(QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  cmake_parse_arguments(QFB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_fetch_benchmark_reference")
   list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
   message(DEBUG "target: ${target}")
-  message(DEBUG "QAT_MODEL: ${QAT_MODEL}")
-  message(DEBUG "QAT_FILENAME: ${QAT_FILENAME}")
-  message(DEBUG "QAT_ARCHIVEDIR: ${QAT_ARCHIVEDIR}")
-  message(DEBUG "QAT_DATADIR: ${QAT_DATADIR}")
+  message(DEBUG "QFB_MODEL: ${QFB_MODEL}")
+  message(DEBUG "QFB_FILENAME: ${QFB_FILENAME}")
+  message(DEBUG "QFB_ARCHIVEDIR: ${QFB_ARCHIVEDIR}")
+  message(DEBUG "QFB_DATADIR: ${QFB_DATADIR}")
+
+  if(NOT QFB_GITTAG)
+    set(QFB_GITTAG "main")
+  endif()
+  message(DEBUG "QFB_GITTAG: ${QFB_GITTAG}")
 
   quicc_fetch_reference("${target}"
-    NAME "${QAT_MODEL}"
-    FILENAME "${QAT_FILENAME}"
-    ARCHIVEDIR "${QAT_ARCHIVEDIR}"
-    DATADIR "${QAT_DATADIR}"
-    GITTAG "fix/sphere_nusselt"
+    NAME "${QFB_MODEL}"
+    FILENAME "${QFB_FILENAME}"
+    ARCHIVEDIR "${QFB_ARCHIVEDIR}"
+    DATADIR "${QFB_DATADIR}"
+    GITTAG "${QFB_GITTAG}"
     GITURL "https://gitlab.ethz.ch/quicc/test-benchmarks"
     )
 

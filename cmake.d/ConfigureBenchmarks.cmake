@@ -21,7 +21,7 @@
 #
 function(quicc_add_benchmark target)
   # parse inputs
-  set(oneValueArgs MODEL ARCHIVEDIR WORKDIR RUNID TIMEOUT)
+  set(oneValueArgs MODEL ARCHIVEDIR WORKDIR RUNID TIMEOUT GITTAG)
   set(multiValueArgs STARTFILES TOOLS VARIANTS)
   cmake_parse_arguments(QAB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -109,6 +109,7 @@ function(quicc_add_benchmark target)
     FILENAME "${target}.tar.gz"
     ARCHIVEDIR ${QAB_ARCHIVEDIR}
     DATADIR ${QAB_WORKDIR}
+    GITTAG ${QAB_GITTAG}
   )
 
   set(_run "Run${_bench}")
