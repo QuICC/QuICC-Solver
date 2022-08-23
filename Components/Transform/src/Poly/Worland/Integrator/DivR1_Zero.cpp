@@ -37,7 +37,7 @@ namespace Integrator {
 
    DivR1_Zero::DivR1_Zero()
    {
-      this->mProfileId = Debug::Profiler::WORLANDINTG_DIVR1;
+      this->mProfileId = Debug::Profiler::WORLANDINTG_DIVR1_ZERO;
    }
 
    DivR1_Zero::~DivR1_Zero()

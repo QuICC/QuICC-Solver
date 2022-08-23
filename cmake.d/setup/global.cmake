@@ -27,15 +27,25 @@ else()
   find_package(BLAS REQUIRED)
 endif()
 
-# patch for pre 3.18 cmake
+# add target if needed
 set(_BLAS_TARGET "BLAS::BLAS")
 if(NOT TARGET ${_BLAS_TARGET})
+  message(VERBOSE "BLAS target is missing")
   add_library(${_BLAS_TARGET} INTERFACE IMPORTED)
+else()
+  message(VERBOSE "BLAS target exists")
+  # check tgt properties
+  get_target_property(BLAS_INTERFACE_LINK_LIBS ${_BLAS_TARGET} INTERFACE_LINK_LIBRARIES)
+  message(DEBUG "BLAS_INTERFACE_LINK_LIBS: ${BLAS_INTERFACE_LINK_LIBS}")
+  get_target_property(BLAS_INTERFACE_INCLUDE_DIRECTORIES ${_BLAS_TARGET} INTERFACE_INCLUDE_DIRECTORIES)
+  message(DEBUG "BLAS_INTERFACE_INCLUDE_DIRECTORIES: ${BLAS_INTERFACE_INCLUDE_DIRECTORIES}")
+  # set tgt properties
   set_property(TARGET ${_BLAS_TARGET} PROPERTY INTERFACE_LINK_LIBRARIES ${BLAS_LIBRARIES})
   set_property(TARGET ${_BLAS_TARGET} PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${BLAS_INCLUDE_DIRS})
-  if(_BLAS_MKL)
+endif()
+
+if(_BLAS_MKL)
     target_compile_definitions(${_BLAS_TARGET} INTERFACE "QUICC_USING_MKL_BLAS")
-  endif()
 endif()
 
 ###################################################

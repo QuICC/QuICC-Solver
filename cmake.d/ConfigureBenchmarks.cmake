@@ -9,15 +9,20 @@
 #     directory for storing the archive
 # WORKDIR
 #     working directory
+# RUNID
+#     additional ID for run
 # STARTFILES
 #     list of files required to start
 # TOOLS
 #     list of tools
+# VARIANTS
+#     list of paths to edit in parameters.cfg
+#     format: xmlpath:value
 #
 function(quicc_add_benchmark target)
   # parse inputs
-  set(oneValueArgs MODEL ARCHIVEDIR WORKDIR)
-  set(multiValueArgs STARTFILES TOOLS)
+  set(oneValueArgs MODEL ARCHIVEDIR WORKDIR RUNID TIMEOUT)
+  set(multiValueArgs STARTFILES TOOLS VARIANTS)
   cmake_parse_arguments(QAB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_benchmark")
@@ -25,6 +30,12 @@ function(quicc_add_benchmark target)
   message(DEBUG "QAB_MODEL: ${QAB_MODEL}")
   message(DEBUG "QAB_WORKDIR: ${QAB_WORKDIR}")
   message(DEBUG "QAB_ARCHIVEDIR: ${QAB_ARCHIVEDIR}")
+  message(DEBUG "QAB_RUNID: ${QAB_RUNID}")
+
+  if(NOT QAB_TIMEOUT)
+    set(QAB_TIMEOUT 300)
+  endif()
+  message(DEBUG "QAB_TIMEOUT: ${QAB_TIMEOUT}")
 
   if(NOT QAB_STARTFILES)
     set(QAB_STARTFILES "parameters.cfg" "state_initial.hdf5")
@@ -36,11 +47,19 @@ function(quicc_add_benchmark target)
   endif()
   message(DEBUG "QAB_TOOLS: ${QAB_TOOLS}")
 
+  if(QUICC_MPI)
+    set(_mpi_ranks 4)
+  else()
+    set(_mpi_ranks 1)
+  endif()
+  list(APPEND QAB_VARIANTS "framework/parallel/cpus:${_mpi_ranks}")
+  message(DEBUG "QAB_VARIANTS: ${QAB_VARIANTS}")
+
   set(_exe "${QAB_MODEL}${target}Model")
-  set(_bench "Benchmark${_exe}")
+  set(_bench "Benchmark${_exe}${QAB_RUNID}")
 
   set(_refdir "${QAB_WORKDIR}/_refdata/${target}")
-  set(_rundir "${QAB_WORKDIR}/_data/${target}")
+  set(_rundir "${QAB_WORKDIR}/_data/${target}${QAB_RUNID}")
   message(VERBOSE "_rundir: ${_rundir}")
   set(_binsdir "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_MODEL_DIR}/Executables")
   message(VERBOSE "_binsdir: ${_binsdir}")
@@ -48,7 +67,7 @@ function(quicc_add_benchmark target)
 
   set(_args )
   foreach(_file IN LISTS QAB_STARTFILES)
-    list(APPEND _args "COMMAND" ${CMAKE_COMMAND} -E create_symlink
+    list(APPEND _args "COMMAND" ${CMAKE_COMMAND} -E copy
       "${_refdir}/${_file}"
       "${_rundir}/${_file}"
       )
@@ -64,19 +83,23 @@ function(quicc_add_benchmark target)
 
   add_custom_target(${_bench} ALL
     COMMAND ${CMAKE_COMMAND} -E copy
-      "${CMAKE_CURRENT_SOURCE_DIR}/validate_benchmark_${target}.py"
+      "${CMAKE_CURRENT_SOURCE_DIR}/validate_benchmark_${target}${QAB_RUNID}.py"
       "${_rundir}/validate_benchmark.py"
     ${_args}
     )
   add_dependencies(${_bench} ${_exe})
 
-  if(QUICC_MPI)
-    set(_mpi_ranks 4)
+  # Modify parameters.cfg for variants
+  foreach(_variant IN ITEMS ${QAB_VARIANTS})
+    string(REGEX REPLACE ":" ";" _vlist "${_variant}")
+    list(GET _vlist 0 _path)
+    list(GET _vlist 1 _value)
     add_custom_command(TARGET ${_bench} POST_BUILD
-      COMMAND sed -i "'s/<cpus>1<\\/cpus>/<cpus>${_mpi_ranks}<\\/cpus>/g'" parameters.cfg
+      COMMAND ${CMAKE_COMMAND} -E rename parameters.cfg parameters_orig.cfg
+      COMMAND ${Python_EXECUTABLE} ${_toolsdir}/modify_xml.py -i parameters_orig.cfg -p ${_path} -v ${_value} -o parameters.cfg
       WORKING_DIRECTORY ${_rundir}
       )
-  endif()
+  endforeach()
 
   # Fetch reference data
   include(FetchBenchmarkReference)
@@ -88,7 +111,7 @@ function(quicc_add_benchmark target)
     DATADIR ${QAB_WORKDIR}
   )
 
-  set(_run "RunBenchmark${_exe}")
+  set(_run "Run${_bench}")
   if(QUICC_MPI AND NOT QUICC_MPI_CI)
     # check which command is available
     foreach(_mpiexe IN ITEMS srun mpirun)
@@ -117,11 +140,11 @@ function(quicc_add_benchmark target)
     WORKING_DIRECTORY "${_rundir}"
     )
   set_tests_properties(${_run} PROPERTIES
-    TIMEOUT 300
+    TIMEOUT ${QAB_TIMEOUT}
     )
 
 
-  set(_validate "ValidateBenchmark${_exe}")
+  set(_validate "Validate${_bench}")
   add_test(
     NAME ${_validate}
     COMMAND "${Python_EXECUTABLE}" validate_benchmark.py

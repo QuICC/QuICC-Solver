@@ -115,6 +115,15 @@ namespace QuICC {
       oss.str("");
 
       // Output computation time
+      oss << "First step [s]: " << std::fixed << std::setprecision(digits) << this->mTimes(FIRSTSTEP);
+      if(max.size() != 0)
+      {
+         oss << " / " << max(FIRSTSTEP) << " / " << min(FIRSTSTEP);
+      }
+      Tools::Formatter::printCentered(stream, oss.str(), ' ', base);
+      oss.str("");
+
+      // Output computation time
       oss << "Computation [s]: " << std::fixed << std::setprecision(digits) << this->mTimes(RUN);
       if(max.size() != 0)
       {

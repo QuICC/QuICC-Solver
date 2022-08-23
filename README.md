@@ -17,7 +17,7 @@
 0. Upload your SSH key to your github profile
 1. Clone repository
    ```bash
-   git clone git@github.com:QuICC/QuICC.git
+   git clone -b main git@github.com:QuICC/QuICC.git
    ```
 
 2. Create build directory
@@ -29,7 +29,7 @@
    ```bash
    cmake </path/to/QuICC> -DQUICC_MODEL=<GreatSimulation1>\;<GreatSimulation2>
    ```
-   The physical model descriptions are stored in separate git repositories. A list of existing models is obtained [here](https://github.com/QuICC?q=Model-+in%3Aname&type=&language=). All official model repositories start with "Model-".
+   The physical model descriptions are stored in separate git repositories. A list of existing models is obtained [here](https://github.com/QuICC?q=Model-+in%3Aname&type=&language=). All official model repositories follow the naming "Model-<GreatSimulation>".
 
    The registered models are cloned into Models/.
 
@@ -107,7 +107,8 @@ To check the options selected, use the verbose mode:
 ```bash
 cmake </path/to/QuICC> --log-level=VERBOSE
 ```
-### Piz-Daint 
+
+### Piz-Daint on GPU nodes
 
 ```bash
 module load daint-gpu
@@ -118,7 +119,39 @@ module load CMake/3.21.2
 
 cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
 -DQUICC_MPIALGO=Tubular \
+-DQUICC_MULTPRECISION=ON \
 -DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
+-DQUICC_MODEL=<GreatSimulation>
+
+make <GreatSimulation><Implementation>
+```
+
+### Piz-Daint on MC nodes
+
+```bash
+module load daint-mc
+module switch PrgEnv-cray PrgEnv-gnu
+module load cray-fftw cray-hdf5-parallel cray-python cray-tpsl Boost
+module use /apps/daint/UES/eurohack/modules/all
+module load CMake/3.21.2
+
+cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
+-DQUICC_MPIALGO=Tubular \
+-DQUICC_MULTPRECISION=ON \
+-DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
+-DQUICC_MODEL=<GreatSimulation>
+
+make <GreatSimulation><Implementation>
+```
+
+### Euler
+
+```bash
+env2lmod
+module load cmake/3.20.3 gcc/8.2.0 openmpi openblas fftw hdf5 boost python
+
+cmake </path/to/QuICC> -DQUICC_MPIALGO=Tubular \
+-DQUICC_MULTPRECISION=ON \
 -DQUICC_MODEL=<GreatSimulation>
 
 make <GreatSimulation>
@@ -133,8 +166,6 @@ and to enable vectorized code generation in the `Eigen` library
 ```bash
 cmake </path/to/QuICC> -DQUICC_EIGEN_ENABLE_VECTORIZATION=ON
 ```
-
-
 
 ## Forcing specific libraries
 

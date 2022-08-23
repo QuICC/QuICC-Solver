@@ -31,7 +31,7 @@ namespace QuICC {
          /**
           * @brief Create list of possible timing intervals
           */
-         enum BreakPoint {INIT, PRERUN, RUN, POSTRUN, TOTAL};
+         enum BreakPoint {INIT, PRERUN, FIRSTSTEP, RUN, POSTRUN, TOTAL};
 
          /**
           * @brief Constructor
