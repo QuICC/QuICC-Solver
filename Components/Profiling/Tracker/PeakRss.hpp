@@ -3,7 +3,8 @@
  * @brief Minimal utility to get process memory usage.
  */
 
-#pragma once
+#ifndef QUICC_PROFILER_TRACKER_PEAKRSS_HPP
+#define QUICC_PROFILER_TRACKER_PEAKRSS_HPP
 
 #include <cstddef>
 
@@ -25,13 +26,12 @@
 namespace QuICC {
 namespace Profiler {
 
-/*
- * Extract the peak working set size (rss=resident set size).
- * ref. https://en.wikichip.org/wiki/resident_set_size
+/**
+ * @brief Extract the peak working set size (rss=resident set size)
+ * @return peak working set size in bytes
  *
- * return value is in bytes
+ * ref. https://en.wikichip.org/wiki/resident_set_size
  */
-
 inline std::size_t PeakRss()
 {
 
@@ -56,3 +56,6 @@ inline std::size_t PeakRss()
 
 } // namespace Profiler
 } // namespace QuICC
+
+
+#endif // QUICC_PROFILER_TRACKER_PEAKRSS_HPP

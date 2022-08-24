@@ -1,6 +1,14 @@
 /**
  * @file Interface.hpp
- * @brief Source of the implementation of Profiler wrappers
+ * @brief Implementation of profiler wrappers
+ *
+ * Implementation of profiler wrappers. A backend is selected by a macro
+ * QUICC_PROFILE_BACKEND_<name>.
+ * A new backend needs to implement 4 methods (Initialize, Finalize, RegionStart, RegionStop)
+ * in the namespace QuICC::Profiler::details.
+ * A region is profiler only if the macro QUICC_PROFILE_LEVEL is equal
+ * or higher than the template parameter L that is used for the region.
+ *
  */
 #ifndef QUICC_PROFILER_INTERFACE_HPP
 #define QUICC_PROFILER_INTERFACE_HPP
@@ -26,11 +34,40 @@ namespace QuICC {
 namespace Profiler {
 
 namespace details {
+    /**
+     * @brief Internal interface for backend initialization
+     *
+     * Every backend needs to implement this method.
+     */
     inline static void Initialize();
+    /**
+     * @brief Internal interface for backend finalization
+     *
+     * Every backend needs to implement this method.
+     */
     inline static void Finalize();
+    /**
+     * @brief Internal interface to start the profiler for a region
+     * @param name name of the region to profile
+     *
+     * Every backend needs to implement this method.
+     */
     inline static void RegionStart(const std::string& name);
+    /**
+     * @brief Internal interface to stop the profiler for a region
+     * @param name name of the region to profile
+     *
+     * Every backend needs to implement this method.
+     */
     inline static void RegionStop(const std::string& name);
 
+
+    /**
+     * @brief Class to check wether mpi is already initialized
+     *
+     * This is needed internally to make sure mpi is initialized.
+     * If not it is initialized and finalized internally.
+     */
     class CheckMpi {
     public:
         static void Init()
@@ -60,6 +97,13 @@ namespace details {
         inline static bool amItheOwner = false;
     };
 
+    /**
+     * @brief Class to add barriers to profiled regions
+     *
+     * This is needed internally to add a barrier before, after (or both) a region.
+     * The barrier is activated if an enviroment variable (QUICC_PROFILE_MPI_BARRIER) contains
+     * the string <after> and/or <before.
+     */
     class Barrier {
     public:
         static void Initialize()
@@ -97,7 +141,9 @@ namespace details {
     };
 }
 
-
+/**
+ * @brief Public interface to initialize the profiler
+ */
 inline static void Initialize()
 {
     details::CheckMpi::Init();
@@ -105,12 +151,20 @@ inline static void Initialize()
     details::Initialize();
 }
 
+/**
+ * @brief Public interface to finalize the profiler
+ */
 inline static void Finalize()
 {
     details::Finalize();
     details::CheckMpi::Finalize();
 }
 
+/**
+ * @brief Public interface to start the profiler for a region
+ * @param name name of the region to profile
+ * @tparam L profiling level
+ */
 template <int L = 0>
 inline static void RegionStart(const std::string& name)
 {
@@ -121,6 +175,11 @@ inline static void RegionStart(const std::string& name)
     }
 }
 
+/**
+ * @brief Public interface to stop the profiler for a region
+ * @param name name of the region to profile
+ * @tparam L profiling level
+ */
 template <int L = 0>
 inline static void RegionStop(const std::string& name)
 {
@@ -131,11 +190,18 @@ inline static void RegionStop(const std::string& name)
     }
 }
 
-// Provide RAII for Region
+/**
+ * @brief Provide RAII functionality for a region to be profiled
+ * @tparam L profiling level
+ */
 template <int L = 0>
 class RegionFixture{
 public:
     RegionFixture() = delete;
+    /**
+     * @brief fixture ctor
+     * @param InitName name of the region to profile
+     */
     RegionFixture(const std::string& InitName)
         : name(InitName) {
         RegionStart<L>(name);
@@ -144,6 +210,9 @@ public:
         RegionStop<L>(name);
     }
 private:
+    /**
+     *@brief storage for the name of the region to profile
+     */
     const std::string name;
 };
 
