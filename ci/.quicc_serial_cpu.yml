@@ -1,4 +1,13 @@
 # This file is generated, do not modify!
+include:
+- remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.cscs.yml
+- /ci/.daint_runner.yml
+- /ci/.quicc_tests.yml
+- /ci/.quicc_models.yml
+stages:
+- build
+- test
+- model-build-and-test
 build-quicc_serial:
   tags:
   - docker_jfrog
@@ -8,10 +17,6 @@ build-quicc_serial:
   variables:
     DOCKERFILE: docker/Dockerfile_serial
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_serial:latest
-include:
-- /ci/.daint_runner.yml
-- /ci/.quicc_tests.yml
-- /ci/.quicc_models.yml
 test-quicc-lib_serial:
   extends:
   - .test-lib

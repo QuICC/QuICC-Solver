@@ -14,7 +14,21 @@ class config(NamedTuple):
 def populateYaml(cnf):
     imageLocation = '$CSCS_REGISTRY_PATH'
     image = 'quicc_'+cnf.tag+':latest'
+    csBaseYml = 'https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.cscs.yml'
     configIn = {
+        'include':
+            [
+                {'remote': csBaseYml},
+                '/ci/.daint_runner.yml',
+                '/ci/.quicc_tests.yml',
+                '/ci/.quicc_models.yml',
+            ],
+        'stages':
+            [
+                'build', # build stage is running on the Kubernetes cluster
+                'test', # test stage is running on PizDaint (on 1 node)
+                'model-build-and-test',
+            ],
         'build-quicc_'+cnf.tag:
             {
                 'tags':
@@ -32,12 +46,6 @@ def populateYaml(cnf):
                         'PERSIST_IMAGE_NAME': imageLocation+'/'+image
                     },
             },
-        'include':
-            [
-                '/ci/.daint_runner.yml',
-                '/ci/.quicc_tests.yml',
-                '/ci/.quicc_models.yml'
-            ],
         'test-quicc-lib_'+cnf.tag:
             {
                 'extends':
@@ -96,7 +104,8 @@ if __name__ == '__main__':
         confs = config(sys.argv[1], sys.argv[2], sys.argv[3])
 
     for c in confs:
-        yml = validateYaml(populateYaml(c))
+        # yml = validateYaml(populateYaml(c))
+        yml = populateYaml(c)
         gitlab_yml = open('.quicc_'+c.tag+'_'+c.backend+'.yml','w')
         gitlab_yml.write('# This file is generated, do not modify!\n')
         gitlab_yml.write(yml)
