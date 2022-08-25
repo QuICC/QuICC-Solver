@@ -83,7 +83,7 @@ namespace Parallel {
       this->mspScheme = spBuilder;
    }
 
-   std::pair<int, std::pair<SharedResolution, SplittingDescription> > SplittingAlgorithm::scoreSplitting()
+   std::pair<int, std::pair<SharedResolution, SplittingDescription> > SplittingAlgorithm::scoreSplitting(const Splitting::Groupers::Id grp)
    {
       StageTimer stage;
       std::stringstream ss;
@@ -171,7 +171,7 @@ namespace Parallel {
          this->mspScheme->addTransformSetups(spRes);
 
          // Compute the score of the obtained resolution
-         score = this->computeScore(spRes);
+         score = this->computeScore(spRes, grp);
       } else
       {
          // Set large negative score (splitting is unusable)

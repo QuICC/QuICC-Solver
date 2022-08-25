@@ -16,6 +16,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/SplittingTools.hpp"
 
 namespace QuICC {
 
@@ -124,6 +125,28 @@ namespace QuICC {
       assert(this->mspCfgFile);
 
       return this->mspCfgFile->spFramework()->spNode(Io::Config::Framework::PARALLEL)->iTags().value("cpus");
+   }
+
+   Splitting::Algorithms::Id SimulationConfig::algorithm() const
+   {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
+      auto tag = this->mspCfgFile->spFramework()->spNode(Io::Config::Framework::PARALLEL)->sTags().value("algorithm");
+      auto id = Splitting::getAlgorithmId(tag);
+
+      return id;
+   }
+
+   Splitting::Groupers::Id SimulationConfig::grouper() const
+   {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
+      auto tag = this->mspCfgFile->spFramework()->spNode(Io::Config::Framework::PARALLEL)->sTags().value("grouper");
+      auto id = Splitting::getGrouperId(tag);
+
+      return id;
    }
 
    const std::map<std::string, MHDFloat>& SimulationConfig::physical() const

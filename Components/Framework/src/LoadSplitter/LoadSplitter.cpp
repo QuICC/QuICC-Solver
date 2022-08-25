@@ -54,10 +54,7 @@ namespace Parallel {
       // Check for serial version of code request
       if(this->mNCpu == 1)
       {
-         if(enabled.count(Splitting::Algorithms::SERIAL) == 1)
-         {
-            this->mAlgorithms.push_back(std::make_shared<SerialSplitting>(this->mId, this->mNCpu, dim));
-         }
+         this->mAlgorithms.push_back(std::make_shared<SerialSplitting>(this->mId, this->mNCpu, dim));
 
       // Setup the parallel version (initialise all algorithms and then choose the best one)
       } else
@@ -108,29 +105,7 @@ namespace Parallel {
       }
    }
 
-   void LoadSplitter::init(SpatialScheme::SharedIBuilder spBuilder)
-   {
-      std::set<Splitting::Algorithms::Id> enabled;
-      #ifdef QUICC_MPIALGO_SERIAL
-         enabled.insert(Splitting::Algorithms::SERIAL);
-      #endif //QUICC_MPIALGO_SERIAL
-      #ifdef QUICC_MPIALGO_SINGLE1D
-         enabled.insert(Splitting::Algorithms::SINGLE1D);
-      #endif //QUICC_MPIALGO_SINGLE1D
-      #ifdef QUICC_MPIALGO_SINGLE2D
-         enabled.insert(Splitting::Algorithms::SINGLE2D);
-      #endif //QUICC_MPIALGO_SINGLE2D
-      #ifdef QUICC_MPIALGO_COUPLED2D
-         enabled.insert(Splitting::Algorithms::COUPLED2D);
-      #endif //QUICC_MPIALGO_COUPLED2D
-      #ifdef QUICC_MPIALGO_TUBULAR
-         enabled.insert(Splitting::Algorithms::TUBULAR);
-      #endif //QUICC_MPIALGO_TUBULAR
-
-      this->init(spBuilder, enabled);
-   }
-
-   void LoadSplitter::init(SpatialScheme::SharedIBuilder spBuilder, const std::set<Splitting::Algorithms::Id>& enabled)
+   void LoadSplitter::init(SpatialScheme::SharedIBuilder spBuilder, const std::set<Splitting::Algorithms::Id>& enabled, const Splitting::Groupers::Id grp)
    {
       // Initialise the splitting algorithms
       this->initAlgorithms(spBuilder->resolution(), enabled);
@@ -142,10 +117,10 @@ namespace Parallel {
       }
 
       // Compute the core resolutions and corresponding scores
-      this->initScores();
+      this->initScores(grp);
    }
 
-   void LoadSplitter::initScores()
+   void LoadSplitter::initScores(const Splitting::Groupers::Id grp)
    {
       // Loop over all initialised algorithms
       for(auto it = this->mAlgorithms.begin(); it != this->mAlgorithms.end(); it++)
@@ -157,7 +132,7 @@ namespace Parallel {
             if((*it)->applicable())
             {
                // Get scored resolution object
-               std::pair<int, std::pair<SharedResolution, SplittingDescription> > scored = (*it)->scoreSplitting();
+               std::pair<int, std::pair<SharedResolution, SplittingDescription> > scored = (*it)->scoreSplitting(grp);
 
                // Only scores bigger than 0 are considered
                if(scored.first > 0)

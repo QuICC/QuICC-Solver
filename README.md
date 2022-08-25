@@ -118,7 +118,7 @@ module use /apps/daint/UES/eurohack/modules/all
 module load CMake/3.21.2
 
 cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
--DQUICC_MPIALGO=Tubular \
+-DQUICC_USE_MPI=ON \
 -DQUICC_MULTPRECISION=ON \
 -DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
 -DQUICC_MODEL=<GreatSimulation>
@@ -136,7 +136,7 @@ module use /apps/daint/UES/eurohack/modules/all
 module load CMake/3.21.2
 
 cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
--DQUICC_MPIALGO=Tubular \
+-DQUICC_USE_MPI=ON \
 -DQUICC_MULTPRECISION=ON \
 -DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
 -DQUICC_MODEL=<GreatSimulation>
@@ -150,7 +150,7 @@ make <GreatSimulation><Implementation>
 env2lmod
 module load cmake/3.20.3 gcc/8.2.0 openmpi openblas fftw hdf5 boost python
 
-cmake </path/to/QuICC> -DQUICC_MPIALGO=Tubular \
+cmake </path/to/QuICC> -DQUICC_USE_MPI=ON \
 -DQUICC_MULTPRECISION=ON \
 -DQUICC_MODEL=<GreatSimulation>
 

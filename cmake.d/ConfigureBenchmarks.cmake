@@ -53,6 +53,8 @@ function(quicc_add_benchmark target)
     set(_mpi_ranks 1)
   endif()
   list(APPEND QAB_VARIANTS "framework/parallel/cpus:${_mpi_ranks}")
+  list(APPEND QAB_VARIANTS "framework/parallel/algorithm:tubular")
+  list(APPEND QAB_VARIANTS "framework/parallel/grouper:transform")
   message(DEBUG "QAB_VARIANTS: ${QAB_VARIANTS}")
 
   set(_exe "${QAB_MODEL}${target}Model")

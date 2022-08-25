@@ -91,12 +91,12 @@ namespace Config {
          /**
           * @brief Gather parameters into arrays
           */
-         void gatherParameters(std::vector<int>& iData, std::vector<MHDFloat>& fData);
+         void gatherParameters(std::vector<int>& iData, std::vector<MHDFloat>& fData, std::vector<std::string>& sData);
 
          /**
           * @brief Scatter parameters
           */
-         void scatterParameters(int& iIdx, int& fIdx, const std::vector<int>& iData, const std::vector<MHDFloat>& fData);
+         void scatterParameters(int& iIdx, int& fIdx, int& sIdx, const std::vector<int>& iData, const std::vector<MHDFloat>& fData, const std::vector<std::string>& sData);
 
       protected:
          /**

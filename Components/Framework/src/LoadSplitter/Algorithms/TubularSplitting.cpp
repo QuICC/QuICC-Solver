@@ -203,27 +203,12 @@ namespace Parallel {
       return spTraRes;
    }
 
-   void TubularSplitting::selectGrouper()
+   void TubularSplitting::selectGrouper(const Splitting::Groupers::Id selected)
    {
-      // TRANSFORM grouper setup
-      #if defined QUICC_TRANSGROUPER_TRANSFORM
-         this->mGrouper = Splitting::Groupers::TRANSFORM;
-
-      // SINGLE1D grouper setup
-      #elif defined QUICC_TRANSGROUPER_SINGLE1D
-         this->mGrouper = Splitting::Groupers::SINGLE1D;
-
-      // SINGLE2D grouper setup
-      #elif defined QUICC_TRANSGROUPER_SINGLE2D
-         this->mGrouper = Splitting::Groupers::SINGLE2D;
-
-      // EQUATION grouper setup
-      #else
-         this->mGrouper = Splitting::Groupers::EQUATION;
-      #endif //defined QUICC_TRANSGROUPER_TRANSFORM
+      this->mGrouper = selected;
    }
 
-   Array TubularSplitting::computeScore(SharedResolution spResolution)
+   Array TubularSplitting::computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp)
    {
       // Initialise the score
       Array details(4);
@@ -241,7 +226,7 @@ namespace Parallel {
       details(3) = this->mspScheme->memoryScore(spResolution);
 
       // Select best transform grouper algorithm
-      this->selectGrouper();
+      this->selectGrouper(grp);
 
       return details;
    }

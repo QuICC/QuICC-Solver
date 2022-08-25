@@ -78,17 +78,19 @@ namespace Parallel {
       return spTraRes;
    }
 
-   void Coupled2DSplitting::selectGrouper()
+   void Coupled2DSplitting::selectGrouper(const Splitting::Groupers::Id selected)
    {
-      // SINGLE1D or TRANSFORM grouper setup
-      #if defined QUICC_TRANSGROUPER_SINGLE1D
-         this->mGrouper = Splitting::Groupers::SINGLE1D;
-      #else
+      if(selected != Splitting::Groupers::SINGLE1D)
+      {
          this->mGrouper = Splitting::Groupers::EQUATION;
-      #endif //defined QUICC_TRANSGROUPER_SINGLE1D
+      }
+      else
+      {
+         this->mGrouper = selected;
+      }
    }
 
-   Array Coupled2DSplitting::computeScore(SharedResolution spResolution)
+   Array Coupled2DSplitting::computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp)
    {
       // Initialise the score
       Array details(4);
@@ -106,7 +108,7 @@ namespace Parallel {
       details(3) = this->mspScheme->memoryScore(spResolution);
 
       // Select best transform grouper algorithm
-      this->selectGrouper();
+      this->selectGrouper(grp);
 
       return details;
    }

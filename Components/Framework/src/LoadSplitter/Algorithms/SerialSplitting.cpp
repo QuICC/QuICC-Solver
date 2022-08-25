@@ -63,7 +63,7 @@ namespace Parallel {
       return spTraRes;
    }
 
-   Array SerialSplitting::computeScore(SharedResolution spResolution)
+   Array SerialSplitting::computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp)
    {
       return Array::Constant(4,1.0);
    }

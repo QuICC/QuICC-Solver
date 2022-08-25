@@ -63,17 +63,15 @@ namespace Parallel {
 
          /**
           * @brief Select the transform grouper
-          *
-          * \mhdTodo Grouper selection is not correctly implemented
           */
-         void selectGrouper();
+         void selectGrouper(const Splitting::Groupers::Id selected);
 
          /**
           * @brief Compute the score of the Resolution
           *
           * @param spResolution Shared resolution object
           */
-         virtual Array computeScore(SharedResolution spResolution);
+         virtual Array computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp);
 
       private:
          /**

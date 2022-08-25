@@ -118,6 +118,15 @@ namespace Config {
                         this->writeValue(itIF->second, pComponent, itIF->first);
                      }
 
+                     // Create float component iterator
+                     auto sRange = itM->second->sTags().crange();
+                     // Iterate over all component entries
+                     for(auto itIS = sRange.first; itIS != sRange.second; itIS++)
+                     {
+                        // Create entry value
+                        this->writeValue(itIS->second, pComponent, itIS->first);
+                     }
+
                      // Check if component data is correct
                      itM->second->checkData();
                   } else

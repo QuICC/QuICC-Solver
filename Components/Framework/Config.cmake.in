@@ -6,13 +6,13 @@ if("@QUICC_BESSEL_IMPL@" STREQUAL "Boost")
 endif()
 
 # Force some project variables to match framework
-set(QUICC_MPIALGO "@QUICC_MPIALGO@"
-  CACHE STRING "This is set by the framework" FORCE)
+set(QUICC_USE_MPI @QUICC_USE_MPI@
+  CACHE BOOL "This is set by the framework" FORCE)
 set(QUICC_MULTPRECISION @QUICC_MULTPRECISION@
   CACHE BOOL "This is set by the framework" FORCE)
 
 # Hide them since they should not be changed
-mark_as_advanced(FORCE QUICC_MPIALGO QUICC_MULTPRECISION)
+mark_as_advanced(FORCE QUICC_USE_MPI QUICC_MULTPRECISION)
 
 # Setup
 include(setup/global)

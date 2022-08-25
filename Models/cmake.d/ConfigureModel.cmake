@@ -5,19 +5,16 @@
 #     name/path of the model
 # TYPES
 #     list of model types
-# BROKENMPI
-#     list of broken MPIALGO for implicit solver
 #
 function(quicc_add_model target)
   # parse inputs
-  set(multiValueArgs TYPES BROKENMPI)
+  set(multiValueArgs TYPES)
   cmake_parse_arguments(QAM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_model")
   list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
   message(DEBUG "target: ${target}")
   message(DEBUG "QAM_TYPES: ${QAM_TYPES}")
-  message(DEBUG "QAM_BROKENMPI: ${QAM_BROKENMPI}")
 
   # Set Model name and library name
   get_filename_component(modName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -25,12 +22,6 @@ function(quicc_add_model target)
   string(TOLOWER "quicc_${modName}" QUICC_CURRENT_MODEL_LIB)
 
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.d")
-
-  # Disable broken mpi backend
-  list(FIND QAM_BROKENMPI ${QUICC_MPIALGO} _pos)
-  if(NOT _pos EQUAL -1)
-    list(REMOVE_ITEM QAM_TYPES "Implicit")
-  endif()
 
   # Set library visibility
   set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)

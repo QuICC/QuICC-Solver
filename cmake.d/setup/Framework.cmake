@@ -27,23 +27,13 @@ quicc_add_definition(QUICC_MEMORYUSAGE)
 ###################################################
 
 #
-# Choose the type of MPI parallelisation or serial setup.
-# Possible options are: Serial, Single1D, Single2D, Tubular
+# Enable MPI parallelisation
 #
-quicc_create_option(NAME QUICC_MPIALGO
-                    OPTS "Serial" "Tubular" "Single1D" "Single2D" "Coupled2D" "SerialMpi"
-                    LABEL "MPI algorithm")
+option(QUICC_USE_MPI "Use MPI algorithm" OFF)
 
-if(QUICC_MPIALGO STREQUAL "SerialMpi")
-   # Overwrite def
-   quicc_add_definition(QUICC_MPIALGO FORCE "Serial")
-else()
-   quicc_add_definition(QUICC_MPIALGO)
-endif()
-
-if(NOT QUICC_MPIALGO STREQUAL "Serial")
+if(QUICC_USE_MPI)
    if(NOT MPI_FOUND)
-      message(SEND_ERROR "QUICC_MPIALGO ${QUICC_MPIALGO} requires MPI.")
+      message(SEND_ERROR "QUICC_USE_MPI requires MPI.")
    endif(NOT MPI_FOUND)
    set(QUICC_MPI ON)
    add_definitions("-DQUICC_MPI")
@@ -51,27 +41,8 @@ if(NOT QUICC_MPIALGO STREQUAL "Serial")
    mark_as_advanced(QUICC_MPI_CI)
 else()
    set(QUICC_MPI OFF)
-endif(NOT QUICC_MPIALGO STREQUAL "Serial")
+endif()
 
-###################################################
-#---------- MPI COMMUNICATION GROUPING -----------#
-###################################################
-
-#
-# Choose the type of Serial/MPI parallelisation grouping setup.
-# Possible options are: Serial, Single1D, Single2D, Tubular
-#
-set(QUICC_GROUPERS_SERIAL "Equation")
-set(QUICC_GROUPERS_SINGLE1D "Single1D" "Equation")
-set(QUICC_GROUPERS_SINGLE2D "Single2D" "Equation")
-set(QUICC_GROUPERS_TUBULAR "Transform" "Equation" "Single1D" "Single2D")
-set(QUICC_GROUPERS_COUPLED2D "Equation" "Single1D")
-string(TOUPPER "QUICC_GROUPERS_${QUICC_MPIALGO}" upGrouper)
-
-quicc_create_option(NAME QUICC_TRANSGROUPER
-                    OPTS ${${upGrouper}}
-                    LABEL "MPI algorithm")
-quicc_add_definition(QUICC_TRANSGROUPER)
 
 ###################################################
 #--------------- MPI DATA PACKING ----------------#

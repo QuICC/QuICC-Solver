@@ -100,29 +100,34 @@ namespace Parallel {
       return spTraRes;
    }
 
-   void SingleSplitting::selectGrouper()
+   void SingleSplitting::selectGrouper(const Splitting::Groupers::Id selected)
    {
       // Different splitting directions require a different treatment
       if(this->mSplit == Splitting::Locations::FIRST)
       {
-         // SINGLE1D grouper setup
-         #if defined QUICC_TRANSGROUPER_SINGLE1D
-            this->mGrouper = Splitting::Groupers::SINGLE1D;
-         #else
+         if(selected != Splitting::Groupers::SINGLE1D)
+         {
             this->mGrouper = Splitting::Groupers::EQUATION;
-         #endif //defined QUICC_TRANSGROUPER_SINGLE1D
-      } else
+         }
+         else
+         {
+            this->mGrouper = selected;
+         }
+      }
+      else
       {
-         // SINGLE2D grouper setup
-         #if defined QUICC_TRANSGROUPER_SINGLE2D
-            this->mGrouper = Splitting::Groupers::SINGLE2D;
-         #else
+         if(selected != Splitting::Groupers::SINGLE2D)
+         {
             this->mGrouper = Splitting::Groupers::EQUATION;
-         #endif //defined QUICC_TRANSGROUPER_SINGLE2D
+         }
+         else
+         {
+            this->mGrouper = selected;
+         }
       }
    }
 
-   Array SingleSplitting::computeScore(SharedResolution spResolution)
+   Array SingleSplitting::computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp)
    {
       // Initialise the score
       Array details(4);
@@ -140,7 +145,7 @@ namespace Parallel {
       details(3) = this->mspScheme->memoryScore(spResolution);
 
       // Select best transform grouper algorithm
-      this->selectGrouper();
+      this->selectGrouper(grp);
 
       return details;
    }
