@@ -5,6 +5,7 @@ import os
 import sys
 import yaml
 from typing import NamedTuple
+from quicc_defaults import defaultModels
 
 class config(NamedTuple):
     tag: str
@@ -62,9 +63,7 @@ def populateYaml(cnf):
             tasks = '4'
         else:
             tasks = '1'
-        for model in ['BoussinesqSphereDynamo', 'BoussinesqShellDynamo',
-            'BoussinesqSphereRTC', 'BoussinesqShellRTC',
-            'BoussinesqSphereTC', 'BoussinesqShellTC']:
+        for model in defaultModels():
             configIn[model+'_'+cnf.tag] = {
                     'extends':
                         [

@@ -22,9 +22,9 @@ test-quicc-lib_serial:
   - .test-lib
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
-BoussinesqSphereDynamo_serial:
+BoussinesqSphereDynamoExplicit_serial:
   extends:
-  - .BoussinesqSphereDynamo
+  - .BoussinesqSphereDynamoExplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:
@@ -32,9 +32,9 @@ BoussinesqSphereDynamo_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqShellDynamo_serial:
+BoussinesqShellDynamoExplicit_serial:
   extends:
-  - .BoussinesqShellDynamo
+  - .BoussinesqShellDynamoExplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:
@@ -42,9 +42,9 @@ BoussinesqShellDynamo_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqSphereRTC_serial:
+BoussinesqSphereRTCExplicit_serial:
   extends:
-  - .BoussinesqSphereRTC
+  - .BoussinesqSphereRTCExplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:
@@ -52,9 +52,9 @@ BoussinesqSphereRTC_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqShellRTC_serial:
+BoussinesqSphereRTCImplicit_serial:
   extends:
-  - .BoussinesqShellRTC
+  - .BoussinesqSphereRTCImplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:
@@ -62,9 +62,9 @@ BoussinesqShellRTC_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqSphereTC_serial:
+BoussinesqShellRTCExplicit_serial:
   extends:
-  - .BoussinesqSphereTC
+  - .BoussinesqShellRTCExplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:
@@ -72,9 +72,19 @@ BoussinesqSphereTC_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqShellTC_serial:
+BoussinesqShellTCExplicit_serial:
   extends:
-  - .BoussinesqShellTC
+  - .BoussinesqShellTCExplicit
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_serial:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    QUICC_VERSION_TAG: serial
+BoussinesqSphereTCExplicit_serial:
+  extends:
+  - .BoussinesqSphereTCExplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:

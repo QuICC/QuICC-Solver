@@ -22,9 +22,9 @@ test-quicc-lib_mpi:
   - .test-lib
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
-BoussinesqSphereDynamo_mpi:
+BoussinesqSphereDynamoExplicit_mpi:
   extends:
-  - .BoussinesqSphereDynamo
+  - .BoussinesqSphereDynamoExplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
@@ -32,9 +32,9 @@ BoussinesqSphereDynamo_mpi:
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     QUICC_VERSION_TAG: mpi
-BoussinesqShellDynamo_mpi:
+BoussinesqShellDynamoExplicit_mpi:
   extends:
-  - .BoussinesqShellDynamo
+  - .BoussinesqShellDynamoExplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
@@ -42,9 +42,9 @@ BoussinesqShellDynamo_mpi:
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTC_mpi:
+BoussinesqSphereRTCExplicit_mpi:
   extends:
-  - .BoussinesqSphereRTC
+  - .BoussinesqSphereRTCExplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
@@ -52,9 +52,9 @@ BoussinesqSphereRTC_mpi:
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     QUICC_VERSION_TAG: mpi
-BoussinesqShellRTC_mpi:
+BoussinesqSphereRTCImplicit_mpi:
   extends:
-  - .BoussinesqShellRTC
+  - .BoussinesqSphereRTCImplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
@@ -62,9 +62,9 @@ BoussinesqShellRTC_mpi:
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     QUICC_VERSION_TAG: mpi
-BoussinesqSphereTC_mpi:
+BoussinesqShellRTCExplicit_mpi:
   extends:
-  - .BoussinesqSphereTC
+  - .BoussinesqShellRTCExplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
@@ -72,9 +72,19 @@ BoussinesqSphereTC_mpi:
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     QUICC_VERSION_TAG: mpi
-BoussinesqShellTC_mpi:
+BoussinesqShellTCExplicit_mpi:
   extends:
-  - .BoussinesqShellTC
+  - .BoussinesqShellTCExplicit
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereTCExplicit_mpi:
+  extends:
+  - .BoussinesqSphereTCExplicit
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
