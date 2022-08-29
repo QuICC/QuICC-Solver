@@ -233,9 +233,5 @@ namespace SpatialScheme {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-   bool FFFBuilder::applicable() const
-   {
-      return true;
-   }
 }
 }

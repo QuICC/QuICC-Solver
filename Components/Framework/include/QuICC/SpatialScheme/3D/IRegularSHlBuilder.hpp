@@ -53,11 +53,11 @@ namespace SpatialScheme {
           * @brief Create indexes for a possibly restricted set
           *
           * @param transId Transform ID
-          * @param fwd1D   Storage for forward indexes of first dimension
+          * @param fwd1D   Storage for forward indexes of first dimension (the one acted on by the transform)
           * @param bwd1D   Storage for backward indexes of first dimension
           * @param idx2D   Storage for the indexes of second dimension
           * @param idx3D   Storage for forward indexes of third dimension
-          * @param id      ID of the bin
+          * @param id      ID of the bin (process)
           * @param bins    Total number of bins (useful to build efficient pairs)
           * @param n0      Starting index of restricted set
           * @param nN      Length of restricted set

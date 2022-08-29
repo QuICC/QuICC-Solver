@@ -105,9 +105,5 @@ namespace SpatialScheme {
       this->setMemory(1.0, Dimensions::Transform::TRA1D);
    }
 
-   bool TBuilder::applicable() const
-   {
-      return true;
-   }
 }
 }

@@ -46,11 +46,6 @@ namespace SpatialScheme {
          virtual ~TBuilder();
 
          /**
-          * @brief Scheme specific splitting restrictions
-          */
-         virtual bool applicable() const;
-
-         /**
           * @brief Add the transform setups to resolution
           */
          virtual void addTransformSetups(SharedResolution spRes) const;

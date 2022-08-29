@@ -409,9 +409,5 @@ namespace SpatialScheme {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-   bool WLFmBuilder::applicable() const
-   {
-      return true;
-   }
 }
 }

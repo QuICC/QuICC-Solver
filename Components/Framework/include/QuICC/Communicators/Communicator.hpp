@@ -201,6 +201,7 @@ namespace Parallel {
       this->storage(Dimensions::Transform::TRA1D).provideBwd(pOutData);
 
       // Dealias the data
+      // (copy will be removed)
       pOutData->rData().topRows(rInData.data().rows()) = rInData.data();
 
       // Hold the input data

@@ -178,10 +178,5 @@ namespace SpatialScheme {
       this->setMemory(1.0, Dimensions::Transform::TRA2D);
    }
 
-   bool TTBuilder::applicable() const
-   {
-      return true;
-   }
-
 }
 }

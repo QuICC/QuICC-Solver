@@ -65,9 +65,6 @@ namespace Parallel {
          status = false;
       }
 
-      // Check for scheme specific conditions
-      status = (status && this->mspScheme->applicable());
-
       return status;
    }
 

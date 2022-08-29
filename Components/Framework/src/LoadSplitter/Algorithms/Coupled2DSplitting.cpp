@@ -43,9 +43,6 @@ namespace Parallel {
       // Only works with at least 2 dimensions
       status = (status && (this->dims() > 1));
 
-      // Check for scheme specific conditions
-      status = (status && this->mspScheme->applicable());
-
       return status;
    }
 

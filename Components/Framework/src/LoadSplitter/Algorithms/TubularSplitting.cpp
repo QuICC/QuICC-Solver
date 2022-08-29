@@ -44,12 +44,6 @@ namespace Parallel {
       status = (status && (this->mspScheme->splittableTotal(Dimensions::Transform::TRA3D, Splitting::Locations::FIRST) >= this->factor(0)));
       status = (status && (this->mspScheme->splittableTotal(Dimensions::Transform::TRA3D, Splitting::Locations::BOTH) >= this->factor(1)));
 
-      // Check for scheme specific conditions
-      if(status)
-      {
-         status = (status && this->mspScheme->applicable());
-      }
-
       return status;
    }
 

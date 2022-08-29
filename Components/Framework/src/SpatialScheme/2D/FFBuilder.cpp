@@ -163,10 +163,6 @@ namespace SpatialScheme {
       this->setMemory(1.0, Dimensions::Transform::TRA2D);
    }
 
-   bool FFBuilder::applicable() const
-   {
-      return true;
-   }
 
 }
 }
