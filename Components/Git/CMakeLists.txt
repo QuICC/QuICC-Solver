@@ -2,7 +2,7 @@ set(QUICC_CURRENT_COMPONENT_LIB gitHash)
 
 set(HASH_FILE "gitHash.hpp")
 
-include(SetGitHash)
+include(gitUtils/SetGitHash)
 SetGitHash(${HASH_FILE} COMPONENT Framework)
 
 add_library(${QUICC_CURRENT_COMPONENT_LIB} INTERFACE)
