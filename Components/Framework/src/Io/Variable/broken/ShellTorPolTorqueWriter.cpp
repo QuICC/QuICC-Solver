@@ -277,9 +277,7 @@ namespace Variable {
 	   // Abort if kinetic energy is NaN
 	   if(std::isnan(this->mTorque))
 	   {
-		   QuICCEnv().abort(99);
-
-		   throw std::logic_error("Toroidal torque is NaN!");
+		   QuICCEnv().abort("Toroidal torque is NaN!");
 	   }
    }
 

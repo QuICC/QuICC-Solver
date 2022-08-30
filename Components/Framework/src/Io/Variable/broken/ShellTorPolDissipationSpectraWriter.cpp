@@ -550,10 +550,9 @@ namespace QuICC {
          this->postWrite();
          /*
          // Abort if kinetic Diss is NaN
-         if (isnan(this->mTorDiss.norm()) || isnan(this->mPolDiss.norm())) {
-            QuICCEnv().abort(99);
-
-            throw std::logic_error("Toroidal/Poloidal Diss is NaN!");
+         if (isnan(this->mTorDiss.norm()) || isnan(this->mPolDiss.norm()))
+         {
+            QuICCEnv().abort("Toroidal/Poloidal Diss is NaN!");
          }
           */
       }

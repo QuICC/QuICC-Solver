@@ -189,9 +189,7 @@ namespace Variable {
       // Abort if kinetic power is NaN
       if(std::isnan(this->mTorPower.sum()) || std::isnan(this->mPolPower.sum()))
       {
-         QuICCEnv().abort(99);
-
-         throw std::logic_error("Toroidal/Poloidal N power spectrum is NaN!");
+         QuICCEnv().abort("Toroidal/Poloidal N power spectrum is NaN!");
       }
    }
 

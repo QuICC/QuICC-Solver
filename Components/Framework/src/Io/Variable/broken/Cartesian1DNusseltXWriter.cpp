@@ -147,9 +147,7 @@ namespace Variable {
       // Abort if Nusselt number is NaN
       if(std::isnan(nusselt(0)) || std::isnan(nusselt(1)))
       {
-         QuICCEnv().abort(99);
-
-         throw std::logic_error("Nusselt number is NaN!");
+         QuICCEnv().abort("Nusselt number is NaN!");
       }
    }
 

@@ -95,9 +95,7 @@ namespace Variable {
       // Abort if kinetic energy is NaN
       if(std::isnan(this->mEnergy.sum()))
       {
-         QuICCEnv().abort(99);
-
-         throw std::logic_error("Scalar energy is NaN!");
+         QuICCEnv().abort("Scalar energy is NaN!");
       }
    }
 

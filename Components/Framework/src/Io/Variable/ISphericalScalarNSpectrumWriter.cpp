@@ -127,9 +127,7 @@ namespace Variable {
       // Abort if kinetic power is NaN
       if(std::isnan(this->mPower.sum()))
       {
-         QuICCEnv().abort(99);
-
-         throw std::logic_error("Scalar power is NaN!");
+         QuICCEnv().abort("Scalar power is NaN!");
       }
    }
 

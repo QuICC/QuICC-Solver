@@ -124,9 +124,7 @@ namespace QuICC {
          // Abort if kinetic energy is NaN
          if(std::isnan(this->mAvg.sum()))
          {
-            QuICCEnv().abort(99);
-
-            throw std::logic_error("Horizontal Avg is NaN!");
+            QuICCEnv().abort("Horizontal Avg is NaN!");
          }
       }
 

@@ -112,9 +112,7 @@ namespace QuICC {
          // Abort if kinetic energy is NaN
          if(std::isnan(this->mKurt.sum()) && this->mRMS->RMS().sum() != 0)
          {
-            QuICCEnv().abort(99);
-
-            throw std::logic_error("Kurtosis is NaN!");
+            QuICCEnv().abort("Kurtosis is NaN!");
          }
       }
 
