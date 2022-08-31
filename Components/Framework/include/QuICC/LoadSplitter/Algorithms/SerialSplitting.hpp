@@ -64,7 +64,7 @@ namespace Parallel {
           *
           * @param spResolution Shared resolution object
           */
-         virtual Array computeScore(SharedResolution spResolution);
+         virtual Array computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp);
 
       private:
    };

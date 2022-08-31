@@ -14,6 +14,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Io/Config/ConfigurationReader.hpp"
 
 namespace QuICC {
@@ -58,6 +59,16 @@ namespace QuICC {
           * @brief Get the number of CPUs read from the configuration file
           */
          int nCpu() const;
+
+         /**
+          * @brief Get the parallel splitting algorithm read from the configuration file
+          */
+         Splitting::Algorithms::Id algorithm() const;
+
+         /**
+          * @brief Get the parallel communication grouping algorithm read from the configuration file
+          */
+         Splitting::Groupers::Id grouper() const;
 
          /**
           * @brief Get the map of physical values read from the configuration file

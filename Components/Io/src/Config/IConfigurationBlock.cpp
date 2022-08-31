@@ -108,7 +108,7 @@ namespace Config {
       }
    }
 
-   void IConfigurationBlock::gatherParameters(std::vector<int>& iData, std::vector<MHDFloat>& fData)
+   void IConfigurationBlock::gatherParameters(std::vector<int>& iData, std::vector<MHDFloat>& fData, std::vector<std::string>& sData)
    {
       // Iterate over all master components
       for(auto citB = this->mBlock.cbegin(); citB != this->mBlock.cend(); citB++)
@@ -126,10 +126,17 @@ namespace Config {
          {
             fData.push_back(citIF->second);
          }
+
+         // Iterate over all component entries
+         auto sRange = citB->second->sTags().crange();
+         for(auto citIS = sRange.first; citIS != sRange.second; citIS++)
+         {
+            sData.push_back(citIS->second);
+         }
       }
    }
 
-   void IConfigurationBlock::scatterParameters(int& iIdx, int& fIdx, const std::vector<int>& iData, const std::vector<MHDFloat>& fData)
+   void IConfigurationBlock::scatterParameters(int& iIdx, int& fIdx, int& sIdx, const std::vector<int>& iData, const std::vector<MHDFloat>& fData, const std::vector<std::string>& sData)
    {
       // Iterate over all master components
       for(auto itB = this->mBlock.begin(); itB != this->mBlock.end(); itB++)
@@ -153,9 +160,18 @@ namespace Config {
             // Increment float index
             fIdx++;
          }
+
+         // Create string component iterator
+         auto sRange = itB->second->sTags().crange();
+         // Iterate over all component entries
+         for(auto itIS = sRange.first; itIS != sRange.second; itIS++)
+         {
+            itB->second->sTags().setValue(itIS->first, sData.at(sIdx));
+            // Increment float index
+            sIdx++;
+         }
       }
    }
-
 
 }
 }

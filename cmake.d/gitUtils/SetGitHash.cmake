@@ -76,7 +76,7 @@ function(SetGitHash HASH_FILE)
         -DRUN_CHECK_GIT_HASH=1
         -DGIT_HASH_CACHE=${GIT_HASH_CACHE}
         -DHASH_FILE=${HASH_FILE}
-        -P ${CMAKE_SOURCE_DIR}/cmake.d/SetGitHash.cmake
+        -P ${CMAKE_SOURCE_DIR}/cmake.d/gitUtils/SetGitHash.cmake
         )
     CheckGitHash()
 endfunction()

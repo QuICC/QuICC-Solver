@@ -103,6 +103,9 @@ namespace Environment {
       // we tried...
       if(!request_complete)
       {
+         std::cerr << "Aborted: " + msg << std::endl;
+         using namespace std::chrono_literals;
+         std::this_thread::sleep_for(1ms);
          MPI_Abort(MPI_COMM_WORLD, 666);
       }
       MPI_Wait(&request, MPI_STATUS_IGNORE);

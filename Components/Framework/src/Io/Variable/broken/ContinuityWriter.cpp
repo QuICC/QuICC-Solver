@@ -82,9 +82,7 @@ namespace Variable {
       // Abort if continuity is NaN
       if(std::isnan(continuity))
       {
-         QuICCEnv().abort(99);
-
-         throw std::logic_error("Continuity is NaN!");
+         QuICCEnv().abort("Continuity is NaN!");
       }
    }
 

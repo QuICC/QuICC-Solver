@@ -33,13 +33,8 @@ namespace Parallel {
 
    bool SerialSplitting::applicable() const
    {
-      bool status = true;
-
       // As long as there is a single CPU it should be applicable
-      status = this->nCpu() == 1;
-
-      // Check for scheme specific conditions
-      status = (status && this->mspScheme->applicable());
+      bool status = this->nCpu() == 1;
 
       return status;
    }
@@ -63,7 +58,7 @@ namespace Parallel {
       return spTraRes;
    }
 
-   Array SerialSplitting::computeScore(SharedResolution spResolution)
+   Array SerialSplitting::computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp)
    {
       return Array::Constant(4,1.0);
    }

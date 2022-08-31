@@ -111,9 +111,7 @@ namespace QuICC {
          // Abort if kinetic energy is NaN
          if(std::isnan(this->mSkew.sum()) && this->mRMS->RMS().sum() != 0)
          {
-            QuICCEnv().abort(99);
-
-            throw std::logic_error("Skew is NaN!");
+            QuICCEnv().abort("Skew is NaN!");
          }
       }
 

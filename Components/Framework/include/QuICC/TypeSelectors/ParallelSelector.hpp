@@ -173,26 +173,18 @@ namespace QuICC {
             setGrouper<TGroup,Splitting::Algorithms::SERIAL>(spFwdGrouper, spBwdGrouper);
 
       #ifdef QUICC_MPI
-         #ifdef QUICC_MPIALGO_SINGLE1D
          } else if(algo == Splitting::Algorithms::SINGLE1D)
          {
             setGrouper<TGroup,Splitting::Algorithms::SINGLE1D>(spFwdGrouper, spBwdGrouper);
-         #endif //QUICC_MPIALGO_SINGLE1D
-         #if defined QUICC_MPIALGO_SINGLE2D
          } else if(dims == 3 && algo == Splitting::Algorithms::SINGLE2D)
          {
             setGrouper<TGroup,Splitting::Algorithms::SINGLE2D>(spFwdGrouper, spBwdGrouper);
-         #endif //defined QUICC_MPIALGO_SINGLE2D
-         #if defined QUICC_MPIALGO_TUBULAR
          } else if(dims == 3 && algo == Splitting::Algorithms::TUBULAR)
          {
             setGrouper<TGroup,Splitting::Algorithms::TUBULAR>(spFwdGrouper, spBwdGrouper);
-         #endif //defined QUICC_MPIALGO_TUBULAR
-         #if defined QUICC_MPIALGO_COUPLED2D
          } else if(dims == 3 && algo == Splitting::Algorithms::COUPLED2D)
          {
             setGrouper<TGroup,Splitting::Algorithms::COUPLED2D>(spFwdGrouper, spBwdGrouper);
-         #endif //defined QUICC_MPIALGO_COUPLED2D
       #endif //QUICC_MPI
          } else
          {

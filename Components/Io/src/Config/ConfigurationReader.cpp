@@ -111,6 +111,19 @@ namespace Config {
                         itM->second->fTags().setValue(itIF->first, val);
                      }
 
+                     // Create float component iterator
+                     auto sRange = itM->second->sTags().crange();
+                     // Iterate over all component entries
+                     for(auto itIS = sRange.first; itIS != sRange.second; itIS++)
+                     {
+                        // Read entry value from file
+                        std::string val;
+                        this->readValue(val, pComponent, itIS->first);
+
+                        // Store value
+                        itM->second->sTags().setValue(itIS->first, val);
+                     }
+
                      // Check if component data is correct
                      itM->second->checkData();
                   } else

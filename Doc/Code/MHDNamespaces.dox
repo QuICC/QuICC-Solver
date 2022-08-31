@@ -49,6 +49,9 @@
  * @namespace QuICC::Physical
  * @brief This namespace provides all the physical space computation related code.
  *
+ * @namespace QuICC::Profiler
+ * @brief This namespace provides all the profilers related code.
+ *
  * @namespace QuICC::Schemes
  * @brief This namespace provides all the spatial schemes related code.
  *

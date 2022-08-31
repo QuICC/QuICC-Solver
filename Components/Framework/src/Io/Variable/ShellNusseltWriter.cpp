@@ -138,9 +138,7 @@ namespace Variable {
       // Abort if kinetic energy is NaN
       if(std::isnan(this->mNusselt.sum()))
       {
-         QuICCEnv().abort(99);
-
-         throw std::logic_error("Spherical shell Nusselt is NaN!");
+         QuICCEnv().abort("Spherical shell Nusselt is NaN!");
       }
    }
 

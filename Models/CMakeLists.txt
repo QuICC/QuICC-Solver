@@ -32,12 +32,26 @@
 #
 
 # Default branch for known models
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.0.4" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.0.3" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.0.4" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.0.3" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.0.4" CACHE STRING "Model repository branch.")
-set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.0.3" CACHE STRING "Model repository branch.")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.0.5")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.0.5")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.0.6")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.0.5")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.0.5")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.0.5")
+
+# Cache value, may be overwritten manually
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo
+    ${_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo} CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo
+    ${_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo} CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC
+    ${_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC} CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC
+    ${_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC} CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC
+    ${_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC} CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC
+    ${_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC} CACHE STRING "Model repository branch.")
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.d")
@@ -45,7 +59,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.d")
 # Teststuite
 include(setup/ModelTestSuite)
 
-include(GitHubProtocol)
+include(gitUtils/GitHubProtocol)
 set(_default_model_git_repo_base "${QUICC_GITHUB_PREFIX}QuICC/Model-")
 message(VERBOSE "Default model repository: ${_default_model_git_repo_base}")
 set(QUICC_MODEL_GIT_BRANCH "main" CACHE STRING "Model repository branch.")
@@ -93,8 +107,20 @@ foreach(_model ${QUICC_MODEL})
         if(NOT EXISTS ${_model_path}/CMakeLists.txt)
             message(FATAL_ERROR "${_model_path} exists, but does not contain a valid model.")
         endif()
-        message(VERBOSE "${_model} exists, adding it..")
+        message(VERBOSE "${_model} exists")
+        if(QUICC_MODEL_GIT_BRANCH_${_model})
+            # check if the branch/tag is the same as default
+            include(gitUtils/GetGitBranchTag)
+            quicc_get_branch(_model_branch PATH ${_model_path})
+            set(_repo_branch ${_QUICC_MODEL_GIT_BRANCH_${_model}})
+            list(FIND _model_branch ${_repo_branch} _pos)
+            if(${_pos} LESS 0)
+                message(WARNING "${_model} default (${_repo_branch}) and existing model branch (${_model_branch}) do not match")
+            endif()
+        endif()
+        message(VERBOSE "adding model..")
         add_subdirectory(${_model_path})
+
     else()
         # otherwise try to fetch it from model repo
         message(VERBOSE "${_model} does not exist, trying to fetch it..")

@@ -49,7 +49,7 @@ namespace QuICC {
       // Make sure all communicators are real
       if(MpiFramework::mTransformComms.back() == MPI_COMM_NULL)
       {
-         QuICCEnv().abort(914);
+         QuICCEnv().abort("MPI sub-communicators were not setup properly");
       }
 
       // Get rank in sub group

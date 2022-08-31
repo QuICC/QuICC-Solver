@@ -233,25 +233,41 @@ namespace Config {
       std::vector<int> iData;
       // Create MPI compatible storage for the float values
       std::vector<MHDFloat> fData;
+      // Create MPI compatible storage for the string values
+      std::vector<std::string> sData;
 
       //
       // Gather data
       //
 
       // Gather data from framework
-      this->mspFramework->gatherParameters(iData, fData);
+      this->mspFramework->gatherParameters(iData, fData, sData);
 
       // Gather data from simulation
-      this->mspSimulation->gatherParameters(iData, fData);
+      this->mspSimulation->gatherParameters(iData, fData, sData);
 
       // Gather data from setup
-      this->mspSetup->gatherParameters(iData, fData);
+      this->mspSetup->gatherParameters(iData, fData, sData);
 
       // Gather data from model
-      this->mspModel->gatherParameters(iData, fData);
+      this->mspModel->gatherParameters(iData, fData, sData);
+
+      // Pad the strings
+      const unsigned int maxSize = 20;
+      for(auto it = sData.begin(); it != sData.end(); it++)
+      {
+         if(it->size() > maxSize)
+         {
+            throw std::logic_error("parameter " + *it + " is longer the maximum string size " + std::to_string(maxSize));
+         }
+         else
+         {
+            *it = *it + std::string(maxSize - it->size(), ' ');
+         }
+      }
 
       // Various MPI broadcast data
-      int nBlocks = 2;
+      int nBlocks = 2 + sData.size();
       MPI_Aint    displ[nBlocks];
       int         blocks[nBlocks];
       MPI_Datatype   types[nBlocks];
@@ -268,6 +284,15 @@ namespace Config {
       displ[1] = element;
       blocks[1] = fData.size();
       types[1] = Parallel::MpiTypes::type<MHDFloat>();
+
+      // Create string data part
+      for(auto i = 0; i < sData.size();i++)
+      {
+         MPI_Get_address(sData.at(i).c_str(), &element);
+         displ[2+i] = element;
+         blocks[2+i] = sData.at(i).size();
+         types[2+i] = MPI_CHAR;
+      }
 
       // MPI data type for the combined integer and float data
       MPI_Datatype   cfgType;
@@ -288,22 +313,30 @@ namespace Config {
       // Distribute data
       //
 
+      // Remove padding from strings
+      for(auto it = sData.begin(); it != sData.end(); it++)
+      {
+         it->erase(std::remove_if(it->begin(), it->end(), [](unsigned char x){return std::isspace(x);}), it->end());
+      }
+
       // Global integer index
       int iIdx = 0;
       // Global float index
       int fIdx = 0;
+      // Global string index
+      int sIdx = 0;
 
       // Scatter data to framework
-      this->mspFramework->scatterParameters(iIdx, fIdx, iData, fData);
+      this->mspFramework->scatterParameters(iIdx, fIdx, sIdx, iData, fData, sData);
 
       // Scatter data to simulation
-      this->mspSimulation->scatterParameters(iIdx, fIdx, iData, fData);
+      this->mspSimulation->scatterParameters(iIdx, fIdx, sIdx, iData, fData, sData);
 
       // Scatter data to setup
-      this->mspSetup->scatterParameters(iIdx, fIdx, iData, fData);
+      this->mspSetup->scatterParameters(iIdx, fIdx, sIdx, iData, fData, sData);
 
       // Scatter data to model
-      this->mspModel->scatterParameters(iIdx, fIdx, iData, fData);
+      this->mspModel->scatterParameters(iIdx, fIdx, sIdx, iData, fData, sData);
 
       //
       // End of MPI block

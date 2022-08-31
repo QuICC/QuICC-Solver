@@ -52,7 +52,7 @@ namespace Parallel {
          /**
           * @brief Compute splitting and the corresponding score
           */
-         std::pair<int, std::pair<SharedResolution, SplittingDescription> > scoreSplitting();
+         std::pair<int, std::pair<SharedResolution, SplittingDescription> > scoreSplitting(const Splitting::Groupers::Id grp);
 
          /**
           * @brief Set the spatial scheme builder
@@ -115,7 +115,7 @@ namespace Parallel {
           *
           * @param spResolution Shared resolution object
           */
-         virtual Array computeScore(SharedResolution spResolution) = 0;
+         virtual Array computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp) = 0;
 
          /**
           * @brief Compute score related to communication structure

@@ -92,7 +92,8 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
       auto spScheme = std::make_shared<QuICC::SpatialScheme::@Scheme@>(QuICC::VectorFormulation::TORPOL, QuICC::GridPurpose::SIMULATION);
       auto spBuilder = spScheme->createBuilder(dim, false);
       std::set<QuICC::Splitting::Algorithms::Id> algos = {QuICC::Splitting::Algorithms::TUBULAR};
-      splitter.init(spBuilder, algos);
+      auto grp = QuICC::Splitting::Groupers::TRANSFORM;
+      splitter.init(spBuilder, algos, grp);
       auto best = splitter.bestSplitting(false);
       auto spRes = best.first;
 

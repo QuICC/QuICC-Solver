@@ -42,6 +42,8 @@ namespace Framework {
    void Parallel::init()
    {
       this->iTags().addTag("cpus", -1);
+      this->sTags().addTag("algorithm", "serial");
+      this->sTags().addTag("grouper", "transform");
    }
 
    void Parallel::checkData()

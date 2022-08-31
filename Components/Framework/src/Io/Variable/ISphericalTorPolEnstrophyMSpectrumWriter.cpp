@@ -130,9 +130,7 @@ namespace Variable {
       // Abort if kinetic enstrophy is NaN
       if(std::isnan(this->mTorEnstrophy.sum()) || std::isnan(this->mPolEnstrophy.sum()))
       {
-         QuICCEnv().abort(99);
-
-         throw std::logic_error("Toroidal/Poloidal enstrophy M spectrum is NaN!");
+         QuICCEnv().abort("Toroidal/Poloidal enstrophy M spectrum is NaN!");
       }
    }
 

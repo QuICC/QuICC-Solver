@@ -51,16 +51,9 @@ namespace Parallel {
           * @brief Initialise the algorithms
           *
           * @param spBuilder  Spatial scheme builder
-          */
-         void init(SpatialScheme::SharedIBuilder spBuilder);
-
-         /**
-          * @brief Initialise the algorithms
-          *
-          * @param spBuilder  Spatial scheme builder
           * @param enabled  List of enabled algorithms
           */
-         void init(SpatialScheme::SharedIBuilder spBuilder, const std::set<Splitting::Algorithms::Id>& enabled);
+         void init(SpatialScheme::SharedIBuilder spBuilder, const std::set<Splitting::Algorithms::Id>& enabled, const Splitting::Groupers::Id grp);
 
          /**
           * @brief Get splitting information of the best splitting
@@ -112,7 +105,7 @@ namespace Parallel {
          /**
           * @brief Initialise the scores and corresponding splitting
           */
-         void initScores();
+         void initScores(const Splitting::Groupers::Id grp);
 
          /**
           * @brief Describe the obtained splitting

@@ -264,9 +264,7 @@ namespace Variable {
       // Abort if kinetic energy is NaN
       if(std::isnan(this->mXEnergy) || std::isnan(this->mYEnergy) || std::isnan(this->mTorEnergy) || std::isnan(this->mPolEnergy))
       {
-         QuICCEnv().abort(99);
-
-         throw std::logic_error("Kinetic energy is NaN!");
+         QuICCEnv().abort("Kinetic energy is NaN!");
       }
    }
 

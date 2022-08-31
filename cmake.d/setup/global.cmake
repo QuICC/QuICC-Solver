@@ -153,7 +153,7 @@ include(MarkAsAdvancedAll)
 mark_as_advanced_all(HDF5)
 
 if(HDF5_FOUND)
-  #TODO, check parallel vs serial in accordance to MPIALGO
+  #TODO, check parallel vs serial in accordance to QUICC_USE_MPI
   set(QUICC_LARGEIO "HDF5")
   quicc_add_definition(QUICC_LARGEIO)
   # add modern target if it does not exist (pre CMake 3.19)

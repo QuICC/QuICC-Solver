@@ -227,9 +227,5 @@ namespace SpatialScheme {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-   bool TFTBuilder::applicable() const
-   {
-      return true;
-   }
 }
 }

@@ -4,17 +4,12 @@
 import os
 import sys
 import yaml
-from typing import NamedTuple
-
-class config(NamedTuple):
-    name: str
-    tag: str
-    test: bool
+from quicc_defaults import config, defaultConfigs
 
 def populateYaml(cnf):
     libPath = '${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}'
-    modelPath = libPath+'-'+cnf.name
-    configIn = { '.'+cnf.name:
+    modelPath = libPath+'-'+cnf.name+cnf.tag
+    configIn = { '.'+cnf.name+cnf.tag:
         {
             'stage': 'model-build-and-test',
             'script':
@@ -35,13 +30,13 @@ def populateYaml(cnf):
                 'mkdir -p '+modelPath+'/build',
                 'cd '+modelPath+'/build',
                 # echo command is added to make lock unique per each pipeline
-                '/QuICC.src/ci/bin/mpi_lock.sh \"cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL='+cnf.name+' -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR='+libPath+'/lib/cmake/quicc && bash -c \'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_'+cnf.name+'\'\"',
+                '/QuICC.src/ci/bin/mpi_lock.sh \"cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL='+cnf.name+' -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR='+libPath+'/lib/cmake/quicc && bash -c \'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_'+cnf.name+cnf.tag+'\'\"',
 
             ],
         }
     }
     if cnf.test:
-        configIn['.'+cnf.name]['script'].extend(
+        configIn['.'+cnf.name+cnf.tag]['script'].extend(
             [
                 # export manually non-default path
                 'export PYTHONPATH='+modelPath+'/build/lib/python',
@@ -66,14 +61,7 @@ def validateYaml(yml):
 
 if __name__ == '__main__':
     if(len(sys.argv) < 2):
-        confs = [
-            config('BoussinesqSphereDynamo', 'Explicit', True),
-            config('BoussinesqShellDynamo', 'Explicit', True),
-            config('BoussinesqSphereRTC', 'Explicit', True),
-            config('BoussinesqShellRTC', 'Explicit', True),
-            config('BoussinesqShellTC', 'Explicit', True),
-            config('BoussinesqSphereTC', 'Explicit', True),
-            ]
+        confs = defaultConfigs()
     else:
         confs = config(sys.argv[1], sys.argv[2], sys.argv[3])
 

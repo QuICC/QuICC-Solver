@@ -63,14 +63,14 @@ namespace SpatialScheme {
          void init();
 
          /**
-          * @brief Create indexes for a possibly restricted set (to simplify implementation is is defined for 3D cases)
+          * @brief Create indexes for a possibly restricted set (to simplify implementation it is defined for 3D cases)
           *
           * @param transId Transform ID
-          * @param fwd1D   Storage for forward indexes of first dimension
-          * @param bwd1D   Storage for backward indexes of first dimension
+          * @param fwd1D   Storage for forward indexes of first dimension (the one acted on by the transform and contigous in memory)
+          * @param bwd1D   Storage for backward indexes of first dimension (the one acted on by the transform and contigous in memory)
           * @param idx2D   Storage for the indexes of second dimension
           * @param idx3D   Storage for forward indexes of third dimension
-          * @param id      ID of the bin
+          * @param id      ID of the bin (process/rank)
           * @param bins    Total number of bins (useful to build efficient pairs)
           * @param n0      Starting index of restricted set
           * @param nN      Length of restricted set
@@ -85,11 +85,6 @@ namespace SpatialScheme {
           * @param flag    Flag to specify location of splitting
           */
          virtual int splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag) = 0;
-
-         /**
-          * @brief Scheme specific splitting restrictions
-          */
-         virtual bool applicable() const = 0;
 
          /**
           * @brief Add scheme specific transform setups to resolution

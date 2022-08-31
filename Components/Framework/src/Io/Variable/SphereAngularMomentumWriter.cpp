@@ -169,9 +169,7 @@ namespace Variable {
       // Abort if is NaN
       if(std::isnan(this->mMomentum.sum()))
       {
-         QuICCEnv().abort(99);
-
-         throw std::logic_error("Sphere angular momentum is NaN!");
+         QuICCEnv().abort("Sphere angular momentum is NaN!");
       }
    }
 
