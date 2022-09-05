@@ -20,9 +20,9 @@ def populateYaml(cnf):
         'include':
             [
                 {'remote': csBaseYml},
-                '/ci/.daint_runner.yml',
-                '/ci/.quicc_tests.yml',
-                '/ci/.quicc_models.yml',
+                '/ci/gitlab/.daint_runner.yml',
+                '/ci/gitlab/.quicc_tests.yml',
+                '/ci/gitlab/.quicc_models.yml',
             ],
         'stages':
             [
@@ -43,7 +43,7 @@ def populateYaml(cnf):
                     ],
                 'variables':
                     {
-                        'DOCKERFILE': 'docker/Dockerfile_'+cnf.tag,
+                        'DOCKERFILE': 'ci/docker/Dockerfile_'+cnf.tag,
                         'PERSIST_IMAGE_NAME': imageLocation+'/'+image
                     },
             },

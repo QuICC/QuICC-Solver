@@ -18,7 +18,7 @@ def populateYaml(cnf):
                 # first install the library to the shared folder
                 # note, only one model per pipeline does this step
                 'cd /QuICC.src/build',
-                '/QuICC.src/ci/bin/mpi_lock.sh \"cmake ..' \
+                '/QuICC.src/ci/gitlab/bin/mpi_lock.sh \"cmake ..' \
                     ' -DCMAKE_INSTALL_PREFIX='+libPath+ \
                     ' -DQUICC_TESTSUITE_POLYNOMIAL=OFF' \
                     ' -DQUICC_TESTSUITE_FRAMEWORK=OFF' \
@@ -30,7 +30,7 @@ def populateYaml(cnf):
                 'mkdir -p '+modelPath+'/build',
                 'cd '+modelPath+'/build',
                 # echo command is added to make lock unique per each pipeline
-                '/QuICC.src/ci/bin/mpi_lock.sh \"cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL='+cnf.name+' -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR='+libPath+'/lib/cmake/quicc && bash -c \'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_'+cnf.name+cnf.tag+'\'\"',
+                '/QuICC.src/ci/gitlab/bin/mpi_lock.sh \"cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL='+cnf.name+' -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR='+libPath+'/lib/cmake/quicc && bash -c \'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_'+cnf.name+cnf.tag+'\'\"',
 
             ],
         }
@@ -44,7 +44,7 @@ def populateYaml(cnf):
                 'cd '+modelPath+'/build/Models/'+cnf.name+'/TestSuite/Benchmarks/_data/'+cnf.tag,
                 modelPath+'/build/Models/'+cnf.name+'/Executables/'+cnf.name+cnf.tag+'Model',
                 'cd '+modelPath+'/build',
-                '/QuICC.src/ci/bin/mpi_lock.sh \"ctest --no-tests=error --verbose -R ValidateBenchmark'+cnf.name+cnf.tag+' && echo ${QUICC_VERSION_TAG}\"'
+                '/QuICC.src/ci/gitlab/bin/mpi_lock.sh \"ctest --no-tests=error --verbose -R ValidateBenchmark'+cnf.name+cnf.tag+' && echo ${QUICC_VERSION_TAG}\"'
             ]
         )
 

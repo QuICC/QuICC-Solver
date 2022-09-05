@@ -1,9 +1,9 @@
 # This file is generated, do not modify!
 include:
 - remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.cscs.yml
-- /ci/.daint_runner.yml
-- /ci/.quicc_tests.yml
-- /ci/.quicc_models.yml
+- /ci/gitlab/.daint_runner.yml
+- /ci/gitlab/.quicc_tests.yml
+- /ci/gitlab/.quicc_models.yml
 stages:
 - build
 - test
@@ -15,7 +15,7 @@ build-quicc_serial:
   script:
   - 'true'
   variables:
-    DOCKERFILE: docker/Dockerfile_serial
+    DOCKERFILE: ci/docker/Dockerfile_serial
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_serial:latest
 test-quicc-lib_serial:
   extends:
