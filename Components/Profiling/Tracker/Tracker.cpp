@@ -142,8 +142,10 @@ void Tracker::print_hdf5()
             .select({std::size_t(rank)*sampleSize}, {sampleSize})
             .write(std::get<tracking::time>(reg->second).data());
 
+        #if QUICC_MPI
         // wait for everyone to be done
         MPI_Barrier(mComm);
+        #endif
     }
 #endif
 }
