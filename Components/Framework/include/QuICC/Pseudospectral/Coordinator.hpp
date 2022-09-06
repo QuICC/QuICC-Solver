@@ -29,7 +29,7 @@
 #include "QuICC/SparseSolvers/SparseTrivialCoordinator.hpp"
 #include "QuICC/SparseSolvers/SparseLinearCoordinator.hpp"
 #include "QuICC/Io/Config/ConfigurationReader.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
 #include "QuICC/TypeSelectors/ParallelSelector.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"

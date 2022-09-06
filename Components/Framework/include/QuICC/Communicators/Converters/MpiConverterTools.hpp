@@ -32,7 +32,7 @@
 #include "QuICC/Enums/DimensionTools.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Communicators/Converters/IIndexConv.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
 namespace QuICC {

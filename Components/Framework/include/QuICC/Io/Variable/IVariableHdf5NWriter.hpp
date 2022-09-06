@@ -21,7 +21,7 @@
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Hdf5/IHdf5NWriter.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 
 namespace QuICC {
 

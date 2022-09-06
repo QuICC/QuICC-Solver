@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 

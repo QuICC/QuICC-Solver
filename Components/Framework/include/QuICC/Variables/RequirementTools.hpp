@@ -21,7 +21,7 @@
 #include "QuICC/Variables/VariableRequirement.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
 #include "QuICC/TransformConfigurators/TransformTreeTools.hpp"

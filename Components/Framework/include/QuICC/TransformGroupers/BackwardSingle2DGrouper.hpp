@@ -9,7 +9,7 @@
 // Configuration includes
 //
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 
 // System includes
 //

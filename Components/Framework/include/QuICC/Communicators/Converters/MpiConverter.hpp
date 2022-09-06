@@ -22,7 +22,7 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
-#include "QuICC/Framework/Selector/MpiConverterImpl.hpp"
+#include "QuICC/Communicators/Converters/MpiConverterImpl.hpp"
 #include "QuICC/Communicators/Converters/MpiConverterTools.hpp"
 #include "QuICC/StorageProviders/DynamicPairProvider.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"

@@ -25,7 +25,7 @@
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/EquationParameters.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/Variables/VariableRequirement.hpp"
 #include "QuICC/Simulation/SimulationBoundary.hpp"
 #include "QuICC/Model/IModelBackend.hpp"

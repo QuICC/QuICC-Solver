@@ -20,8 +20,8 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/TypeSelectors/TimeSchemeSelector.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
-#include "QuICC/Framework/Selector/SparseSolver.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
+#include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolver.hpp"

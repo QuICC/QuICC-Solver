@@ -25,8 +25,8 @@
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/DecoupledComplexInternal.hpp"
-#include "QuICC/Framework/Selector/SparseSolver.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/Solver/SparseSolver.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace QuICC {

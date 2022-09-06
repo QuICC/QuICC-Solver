@@ -35,7 +35,7 @@
 #include "QuICC/Simulation/SimulationBoundary.hpp"
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
 #include "QuICC/SpectralKernels/ISpectralKernel.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformPath.hpp"
 
 namespace QuICC {

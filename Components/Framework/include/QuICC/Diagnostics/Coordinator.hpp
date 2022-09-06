@@ -22,7 +22,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Diagnostics/ICflWrapper.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 
 namespace QuICC {
 

@@ -23,7 +23,7 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Tools/ComponentAlias.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
 #include "QuICC/Equations/CouplingIndexType.hpp"
 

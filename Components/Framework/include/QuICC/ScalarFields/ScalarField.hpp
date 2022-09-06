@@ -1,5 +1,5 @@
 /** 
- * @file Datatypes.hpp
+ * @file ScalarFields.hpp
  * @brief Selector for implementation of generic scalar field
  */
 
@@ -26,7 +26,6 @@ namespace Selector {
    /// Template typedef for shared scalar field implementation
    template <typename TData>
       using SharedScalarField = std::shared_ptr<ScalarField<TData> >;
-
    /// Typedef for complex valued scalar field type
    typedef ScalarField<MHDComplex> ComplexScalarField;
 
