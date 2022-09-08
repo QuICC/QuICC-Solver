@@ -79,6 +79,22 @@
   - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/Executables/BoussinesqShellRTCExplicitModel
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellRTCExplicit && echo ${QUICC_VERSION_TAG}"
+.BoussinesqShellRTCImplicit:
+  stage: model-build-and-test
+  script:
+  - hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
+    -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+    && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTCImplicit'"
+  - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build/lib/python
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build/Models/BoussinesqShellRTC/TestSuite/Benchmarks/_data/Implicit
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build/Models/BoussinesqShellRTC/Executables/BoussinesqShellRTCImplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellRTCImplicit && echo ${QUICC_VERSION_TAG}"
 .BoussinesqShellTCExplicit:
   stage: model-build-and-test
   script:

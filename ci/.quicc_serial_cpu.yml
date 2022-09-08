@@ -72,6 +72,16 @@ BoussinesqShellRTCExplicit_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
+BoussinesqShellRTCImplicit_serial:
+  extends:
+  - .BoussinesqShellRTCImplicit
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_serial:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    QUICC_VERSION_TAG: serial
 BoussinesqShellTCExplicit_serial:
   extends:
   - .BoussinesqShellTCExplicit

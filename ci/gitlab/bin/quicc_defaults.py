@@ -15,6 +15,7 @@ def defaultConfigs():
         config('BoussinesqSphereRTC', 'Explicit', True),
         config('BoussinesqSphereRTC', 'Implicit', True),
         config('BoussinesqShellRTC', 'Explicit', True),
+        config('BoussinesqShellRTC', 'Implicit', True),
         config('BoussinesqShellTC', 'Explicit', True),
         config('BoussinesqSphereTC', 'Explicit', True),
         ]
