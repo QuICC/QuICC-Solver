@@ -1,5 +1,11 @@
-quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
-  BinaryFile.cpp
-  IBinaryWriter.cpp
-  DirectBinaryWriter.cpp
-  )
+include(ConfigureLibrary)
+quicc_add_library(binary
+  PARENT ${QUICC_CURRENT_COMPONENT_LIB}
+  LINK PUBLIC QuICC::Common
+  INCLUDE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../include
+  SRC
+    BinaryFile.cpp
+    IBinaryWriter.cpp
+    DirectBinaryWriter.cpp
+  CLASSICHEADER
+)

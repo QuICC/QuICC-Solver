@@ -139,7 +139,7 @@ function (quicc_export_target TGT)
 
   # Export info
   install(TARGETS ${TGT}
-    EXPORT ${TGT}Targets
+    EXPORT QuICCExpTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -153,19 +153,14 @@ function (quicc_export_target TGT)
   endif()
   # Install header files
   foreach( _dir ${QET_DIRECTORIES})
+    message(DEBUG "install directory: ${_dir}")
+    message(DEBUG "destination directory: ${CMAKE_INSTALL_INCLUDEDIR}")
     install(DIRECTORY ${_dir}
       DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
       COMPONENT ${QET_COMPONENT}
       FILES_MATCHING PATTERN ${QET_FILES_MATCHING_PATTERN}
       )
   endforeach()
-
-  # Export targets
-  install(EXPORT ${TGT}Targets
-    FILE ${TGT}Targets.cmake
-    NAMESPACE ${QUICC_NAMESPACE}
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quicc
-  )
 
   list(POP_BACK CMAKE_MESSAGE_INDENT)
 endfunction (quicc_export_target)

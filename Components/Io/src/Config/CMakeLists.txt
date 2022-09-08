@@ -1,8 +1,14 @@
-quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
-  ConfigurationReader.cpp
-  ConfigurationWriter.cpp
-  IConfigurationBlock.cpp
-  IConfigurationNode.cpp
+include(ConfigureLibrary)
+quicc_add_library(config
+  PARENT ${QUICC_CURRENT_COMPONENT_LIB}
+  LINK PUBLIC QuICC::Common
+  INCLUDE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../include
+  SRC
+    ConfigurationReader.cpp
+    ConfigurationWriter.cpp
+    IConfigurationBlock.cpp
+    IConfigurationNode.cpp
+  CLASSICHEADER
   )
 
 add_subdirectory(Framework)

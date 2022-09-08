@@ -18,8 +18,8 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   ${QUICC_TRANSFORM_COMPONENT_LIB}
   ${QUICC_POLYNOMIAL_COMPONENT_LIB}
   ${QUICC_PYQUICC_COMPONENT_LIB}
-  ${QUICC_IO_COMPONENT_LIB}
-  ${QUICC_COMMON_COMPONENT_LIB}
+  QuICC::Io
+  QuICC::Common
   QuICC::Profiling
   )
 
@@ -35,7 +35,14 @@ quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
   DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/QuICC
     ${PROJECT_BINARY_DIR}/include/QuICC
-    )
+)
+
+# Export targets
+install(EXPORT QuICCExpTargets
+  FILE QuICCExpTargets.cmake
+  NAMESPACE ${QUICC_NAMESPACE}
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/quicc
+)
 
 # Create config file
 include(CMakePackageConfigHelpers)

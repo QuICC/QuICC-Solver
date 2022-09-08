@@ -48,6 +48,9 @@ endif()
 # Add source directory
 add_subdirectory(src)
 
+# Alias
+add_library(QuICC::Common ALIAS ${QUICC_CURRENT_COMPONENT_LIB})
+
 # Teststuite
 include(cmake.d/setup/TestSuite.cmake)
 
