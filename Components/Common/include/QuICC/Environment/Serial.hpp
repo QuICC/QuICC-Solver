@@ -64,6 +64,11 @@ namespace Environment {
       protected:
 
       private:
+
+         /**
+          * @brief Check for known mpi launchers
+          */
+         void checkMpiLauncher();
    };
 
 }
