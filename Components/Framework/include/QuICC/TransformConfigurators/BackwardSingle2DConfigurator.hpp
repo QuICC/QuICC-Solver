@@ -20,6 +20,7 @@
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/BackwardConfigurator.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -105,7 +106,7 @@ namespace Transform {
 
    template <typename TVariable> void BackwardSingle2DConfigurator::firstStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("BwdFirstStep");
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -115,12 +116,8 @@ namespace Transform {
       TransformTreeEdge::EdgeType_crange range1D = tree.root().edgeRange();
       TransformTreeEdge::EdgeType_crange range2D;
 
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
-
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
-
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Loop over first transform
       for(it1D = range1D.first; it1D != range1D.second; ++it1D)
@@ -135,8 +132,6 @@ namespace Transform {
             BackwardConfigurator::project2D(*it2D, coord);
          }
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    template <typename TVariable> void BackwardSingle2DConfigurator::secondStep(const TransformTree&, TVariable&, TransformCoordinatorType&)
@@ -145,7 +140,7 @@ namespace Transform {
 
    template <typename TVariable> void BackwardSingle2DConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("BwdLastStep");
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -174,8 +169,6 @@ namespace Transform {
             }
          }
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    inline void BackwardSingle2DConfigurator::setup1DCommunication(const int, TransformCoordinatorType&)
@@ -184,13 +177,11 @@ namespace Transform {
 
    inline void BackwardSingle2DConfigurator::setup2DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Bwd-setup2DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs, TransformDirection::BACKWARD);
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().prepareBackwardReceive();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    inline void BackwardSingle2DConfigurator::initiate1DCommunication(TransformCoordinatorType&)
@@ -199,11 +190,9 @@ namespace Transform {
 
    inline void BackwardSingle2DConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Bwd-initiate2DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateForwardSend();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
 }

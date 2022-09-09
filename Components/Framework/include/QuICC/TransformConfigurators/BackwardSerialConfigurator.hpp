@@ -21,6 +21,7 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 #include "QuICC/TransformConfigurators/BackwardConfigurator.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -122,7 +123,7 @@ namespace Transform {
 
    template <typename TVariable> void BackwardSerialConfigurator::firstStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("BwdFirstStep");
 
       // Iterators for the transforms
       TransformTreeEdge::EdgeType_citerator itSpec;
@@ -132,12 +133,8 @@ namespace Transform {
       TransformTreeEdge::EdgeType_crange rangeSpec = tree.root().edgeRange();
       TransformTreeEdge::EdgeType_crange rangePhys;
 
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
-
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
-
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       if(coord.ss().dimension() == 3)
       {
@@ -203,8 +200,6 @@ namespace Transform {
       {
          throw std::logic_error("Transform with more than 3 dimensions are not implemented");
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    template <typename TVariable> void BackwardSerialConfigurator::secondStep(const TransformTree&, TVariable&, TransformCoordinatorType&)

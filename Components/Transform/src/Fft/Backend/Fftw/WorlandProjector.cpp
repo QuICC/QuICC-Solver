@@ -17,7 +17,6 @@
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Math/Constants.hpp"
 
 namespace QuICC {

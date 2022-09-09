@@ -8,7 +8,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 // System includes
 //
@@ -99,48 +98,39 @@ namespace Transform {
 
    inline void ForwardTubularConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Fwd-setup1DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs, TransformDirection::FORWARD);
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().prepareForwardReceive();
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    inline void ForwardTubularConfigurator::setup2DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Fwd-setup2DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs, TransformDirection::FORWARD);
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().prepareForwardReceive();
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    inline void ForwardTubularConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Fwd-initiate1DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateBackwardSend();
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    inline void ForwardTubularConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Fwd-initiate2DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateBackwardSend();
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    template <typename TVariable> void ForwardTubularConfigurator::firstStep(const TransformTree& tree, TVariable&, Physical::Kernel::SharedIPhysicalKernel spKernel, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<1> fix("FwdFirstStep");
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it3D;
@@ -148,12 +138,8 @@ namespace Transform {
       // Ranges for the vector of edges for the three transforms
       TransformTreeEdge::EdgeType_crange range3D = tree.root().edgeRange();
 
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
-
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(tree, spKernel, coord);
-
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
 
       // Loop over first transform
       for(it3D = range3D.first; it3D != range3D.second; ++it3D)
@@ -161,14 +147,11 @@ namespace Transform {
          // Compute third transform
          ForwardConfigurator::integrateND(*it3D, coord);
       }
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    template <typename TVariable> void ForwardTubularConfigurator::secondStep(const TransformTree& tree, TVariable&, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<1> fix("FwdSecondStep");
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it2D;
@@ -188,14 +171,11 @@ namespace Transform {
             ForwardConfigurator::integrate2D(*it2D, coord);
          }
       }
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    template <typename TVariable> void ForwardTubularConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<1> fix("FwdLastStep");
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -224,8 +204,6 @@ namespace Transform {
             }
          }
       }
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
 }

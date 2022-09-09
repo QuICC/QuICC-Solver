@@ -25,27 +25,6 @@ else(QUICC_DEBUG)
    add_definitions("-DQUICC_NO_DEBUG")
 endif(QUICC_DEBUG)
 
-###################################################
-#------------------- PROFILING -------------------#
-###################################################
-
-#
-# Use internal profiler and type of profiler
-#
-option(QUICC_PROFILE "Activate internal profiler?" OFF)
-
-
-if(QUICC_PROFILE)
-   add_compile_definitions("QUICC_PROFILE")
-
-   if(QUICC_MPI)
-      option(QUICC_PROFILE_PERCORE "Write per core profiling data?" OFF)
-      if(QUICC_PROFILE_PERCORE)
-         add_compile_definitions("QUICC_PROFILE_PERCORE")
-      endif(QUICC_PROFILE_PERCORE)
-   endif(QUICC_MPI)
-
-endif(QUICC_PROFILE)
 
 ###################################################
 #--------------- STORAGE PROFILING ---------------#

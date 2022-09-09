@@ -13,7 +13,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 
 // System includes
@@ -63,13 +62,7 @@ namespace QuICC {
    {
       QuICC::Profiler::RegionFixture<1> simFix("Simulation::mainRun");
 
-      // Reset the profiler if needed
-      ProfilerMacro_printInfo();
-      ProfilerMacro_reset();
-      ProfilerMacro_init();
-
       StageTimer::stage("Starting simulation");
-
 
       // Reset timers after first step to ignore initialization
       bool resetFirstStep = true;
@@ -103,10 +96,6 @@ namespace QuICC {
             this->mExecutionTimer.update(ExecutionTimer::FIRSTSTEP);
             this->mExecutionTimer.start();
 
-            // Reset profiler
-            ProfilerMacro_printInfo();
-            ProfilerMacro_reset();
-            ProfilerMacro_init();
             resetFirstStep = false;
          }
       }
@@ -157,7 +146,8 @@ namespace QuICC {
 
    void Simulation::writeOutput()
    {
-      ProfilerMacro_start(Debug::Profiler::IO);
+      Profiler::RegionFixture fix("IO");
+
       this->mSimIoCtrl.writeStats();
 
       if(this->mSimIoCtrl.isAsciiTime())
@@ -168,8 +158,6 @@ namespace QuICC {
 
       // Write initial ASCII and HDF5 output files if applicable
       this->mSimIoCtrl.writeFiles(this->mPseudospectral.time(), this->mPseudospectral.timestep());
-
-      ProfilerMacro_stop(Debug::Profiler::IO);
    }
 
    void Simulation::postRun()

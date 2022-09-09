@@ -35,7 +35,7 @@ namespace Reductor {
    PowerD1R1::PowerD1R1()
       : IWorlandPower(0)
    {
-      this->mProfileId = Debug::Profiler::WORLANDREDU_POWERD1R1;
+      this->setProfileTag();
    }
 
    PowerD1R1::~PowerD1R1()

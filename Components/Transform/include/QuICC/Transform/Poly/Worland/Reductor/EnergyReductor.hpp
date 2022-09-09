@@ -21,8 +21,8 @@
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Transform/Poly/Worland/Reductor/IWorlandReductor.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -78,8 +78,7 @@ namespace Reductor {
 
    template <typename T> void EnergyReductor<T>::applyOperators(Matrix& rOut, const MatrixZ& in) const
    {
-      ProfilerMacro_start(Debug::Profiler::WORLANDREDU);
-      ProfilerMacro_start(this->mProfileId);
+      Profiler::RegionFixture<3> fix(this->mProfileTag);
 
       // assert right sizes for input  matrix
       assert(in.cols() == this->mspSetup->blockSize());
@@ -97,9 +96,6 @@ namespace Reductor {
 
          start += cols;
       }
-
-      ProfilerMacro_stop(this->mProfileId);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDREDU);
    }
 
    template <typename T> void EnergyReductor<T>::defaultApplyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const

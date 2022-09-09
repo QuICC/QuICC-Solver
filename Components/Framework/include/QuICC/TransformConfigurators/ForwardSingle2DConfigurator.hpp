@@ -8,7 +8,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 // System includes
 //
@@ -21,6 +20,7 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 #include "QuICC/TransformConfigurators/ForwardConfigurator.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -102,13 +102,11 @@ namespace Transform {
 
    inline void ForwardSingle2DConfigurator::setup2DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Fwd-setup2DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs, TransformDirection::FORWARD);
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().prepareForwardReceive();
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    inline void ForwardSingle2DConfigurator::initiate1DCommunication(TransformCoordinatorType&)
@@ -117,16 +115,14 @@ namespace Transform {
 
    inline void ForwardSingle2DConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Fwd-initiate2DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateBackwardSend();
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    template <typename TVariable> void ForwardSingle2DConfigurator::firstStep(const TransformTree& tree, TVariable&, Physical::Kernel::SharedIPhysicalKernel spKernel, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("FwdFirstStep");
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it3D;
@@ -134,12 +130,8 @@ namespace Transform {
       // Ranges for the vector of edges for the three transforms
       TransformTreeEdge::EdgeType_crange range3D = tree.root().edgeRange();
 
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
-
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(tree, spKernel, coord);
-
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
 
       // Loop over first transform
       for(it3D = range3D.first; it3D != range3D.second; ++it3D)
@@ -147,8 +139,6 @@ namespace Transform {
          // Compute third transform
          ForwardConfigurator::integrateND(*it3D, coord);
       }
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    template <typename TVariable> void ForwardSingle2DConfigurator::secondStep(const TransformTree&, TVariable&, TransformCoordinatorType&)
@@ -158,7 +148,7 @@ namespace Transform {
 
    template <typename TVariable> void ForwardSingle2DConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("FwdLastStep");
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -190,8 +180,6 @@ namespace Transform {
             }
          }
       }
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
 }

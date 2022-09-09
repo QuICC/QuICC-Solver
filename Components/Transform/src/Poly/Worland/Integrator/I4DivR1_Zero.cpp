@@ -38,7 +38,7 @@ namespace Integrator {
 
    I4DivR1_Zero::I4DivR1_Zero()
    {
-      this->mProfileId = Debug::Profiler::WORLANDINTG_I4DIVR1_ZERO;
+      this->setProfileTag();
    }
 
    I4DivR1_Zero::~I4DivR1_Zero()

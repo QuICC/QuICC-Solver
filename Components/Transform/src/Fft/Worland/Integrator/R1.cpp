@@ -29,7 +29,7 @@ namespace Integrator {
 
    R1::R1()
    {
-      this->mProfileId = Debug::Profiler::WORLANDINTG_R1;
+      this->setProfileTag();
    }
 
    R1::~R1()

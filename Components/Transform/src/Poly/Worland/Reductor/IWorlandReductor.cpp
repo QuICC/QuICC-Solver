@@ -30,6 +30,7 @@ namespace Reductor {
    IWorlandReductor::IWorlandReductor()
       : IWorlandOperator()
    {
+      this->mProfileTag += "-Reductor";
    }
 
    IWorlandReductor::~IWorlandReductor()

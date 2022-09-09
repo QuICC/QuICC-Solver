@@ -15,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -32,6 +31,7 @@ namespace Integrator {
    IWorlandIntegrator::IWorlandIntegrator()
       : IWorlandOperator()
    {
+      this->mProfileTag += "-Integrator";
    }
 
    IWorlandIntegrator::~IWorlandIntegrator()
@@ -63,10 +63,7 @@ namespace Integrator {
 
    void IWorlandIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
-      Profiler::RegionFixture<3> fix("IWorlandIntegrator::applyOperators");
-
-      ProfilerMacro_start(Debug::Profiler::WORLANDINTG);
-      ProfilerMacro_start(this->mProfileId);
+      Profiler::RegionFixture<3> fix(this->mProfileTag);
 
       // assert right sizes for input matrix
       assert(in.rows() == this->mspSetup->fwdSize());
@@ -85,9 +82,6 @@ namespace Integrator {
 
          start += cols;
       }
-
-      ProfilerMacro_stop(this->mProfileId);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDINTG);
    }
 
    MHDFloat IWorlandIntegrator::requiredStorage() const

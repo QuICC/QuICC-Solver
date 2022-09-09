@@ -5,7 +5,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 // System includes
 //

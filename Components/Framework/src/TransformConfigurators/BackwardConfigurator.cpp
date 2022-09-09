@@ -30,430 +30,124 @@ namespace Transform {
 
    void BackwardConfigurator::prepareSpectral(const TransformTree& tree, Framework::Selector::VariantSharedScalarVariable& rScalar, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("Bwd-prepareSpectral");
+
+      // Debugger message
+      DebuggerMacro_msg("prepareSpectral (scalar)", 4);
+
       // Safety assert
       assert(tree.comp<FieldComponents::Spectral::Id>() == FieldComponents::Spectral::SCALAR);
 
-      ProfilerMacro_start(Debug::Profiler::BWDIN);
-
       // Put scalar into temporary hold storage
       std::visit([&](auto&& p){coord.communicator().dealiasSpectral(p->rDom(0).rTotal());}, rScalar);
-
-      ProfilerMacro_stop(Debug::Profiler::BWDIN);
    }
 
    void BackwardConfigurator::prepareSpectral(const TransformTree& tree, Framework::Selector::VariantSharedVectorVariable& rVector, TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<2> fix("Bwd-prepareSpectral");
+
+      // Debugger message
+      DebuggerMacro_msg("prepareSpectral (vector)", 4);
+
       // Safety assert
       assert(tree.comp<FieldComponents::Spectral::Id>() != FieldComponents::Spectral::SCALAR);
 
-      ProfilerMacro_start(Debug::Profiler::BWDIN);
-
       // Put scalar into temporary hold storage
       std::visit([&](auto&& p){coord.communicator().dealiasSpectral(p->rDom(0).rTotal().rComp(tree.comp<FieldComponents::Spectral::Id>()));}, rVector);
-
-      ProfilerMacro_stop(Debug::Profiler::BWDIN);
    }
 
    void BackwardConfigurator::preparePhysical(const TransformTree&, const TransformTreeEdge& edge, Framework::Selector::VariantSharedScalarVariable& rScalar, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDOUT);
+      Profiler::RegionFixture<2> fix("Bwd-preparePhysical");
+
+      // Debugger message
+      DebuggerMacro_msg("preparePhysical (scalar)", 4);
 
       // Put scalar into temporary hold storage
       if(edge.fieldId() == FieldType::SCALAR)
       {
          std::visit([&](auto&& p){coord.communicator().holdPhysical(p->rDom(0).rPhys());}, rScalar);
-
+      }
       // Put gradient component into temporary hold storage
-      } else if(edge.fieldId() == FieldType::GRADIENT)
+      else if(edge.fieldId() == FieldType::GRADIENT)
       {
          std::visit([&](auto&& p){coord.communicator().holdPhysical(p->rDom(0).rGrad().rComp(edge.outId<FieldComponents::Physical::Id>()));}, rScalar);
-
+      }
       // Put 2nd order gradient component into temporary hold storage
-      } else if(edge.fieldId() == FieldType::GRADIENT2)
+      else if(edge.fieldId() == FieldType::GRADIENT2)
       {
          std::visit([&](auto&& p){coord.communicator().holdPhysical(p->rDom(0).rGrad2().rComp(edge.outId<FieldComponents::Physical::Id>(0),edge.outId<FieldComponents::Physical::Id>(1)));}, rScalar);
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDOUT);
    }
 
    void BackwardConfigurator::preparePhysical(const TransformTree& tree, const TransformTreeEdge& edge, Framework::Selector::VariantSharedVectorVariable& rVector, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDOUT);
+      Profiler::RegionFixture<2> fix("Bwd-preparePhysical");
+
+      // Debugger message
+      DebuggerMacro_msg("preparePhysical (vector)", 4);
 
       // Put vector component into temporary hold storage
       if(edge.fieldId() == FieldType::VECTOR)
       {
          std::visit([&](auto&& p){coord.communicator().holdPhysical(p->rDom(0).rPhys().rComp(edge.outId<FieldComponents::Physical::Id>()));}, rVector);
-
+      }
       // Put vector gradient component into temporary hold storage
-      } else if(edge.fieldId() == FieldType::GRADIENT)
+      else if(edge.fieldId() == FieldType::GRADIENT)
       {
          std::visit([&](auto&& p){coord.communicator().holdPhysical(p->rDom(0).rGrad(tree.comp<FieldComponents::Spectral::Id>()).rComp(edge.outId<FieldComponents::Physical::Id>()));}, rVector);
-
+      }
       // Put curl component into temporary hold storage
-      } else if(edge.fieldId() == FieldType::CURL)
+      else if(edge.fieldId() == FieldType::CURL)
       {
          std::visit([&](auto&& p){coord.communicator().holdPhysical(p->rDom(0).rCurl().rComp(edge.outId<FieldComponents::Physical::Id>()));}, rVector);
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDOUT);
    }
 
    void BackwardConfigurator::project1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("BwdProject1D");
-
       // Debugger message
       DebuggerMacro_msg("Project 1D", 4);
 
-      ProfilerMacro_start(Debug::Profiler::BWD1D);
-      ProfilerMacro_start(Debug::Profiler::BWD1DIN);
-
-      // Get the input data from hold
-      auto pInVar = coord.ss().bwdPtr(Dimensions::Transform::TRA1D);
-      coord.communicator().storage(Dimensions::Transform::TRA1D).recoverBwd(pInVar);
-
-      // Get output storage
-      auto pOutVar = coord.ss().fwdPtr(Dimensions::Transform::TRA1D);
-      auto pRecOutVar = coord.ss().fwdPtr(Dimensions::Transform::TRA1D);
-      if(edge.recoverOutId() >= 0)
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).provideFwd(pOutVar);
-         coord.communicator().storage(Dimensions::Transform::TRA1D).recoverFwd(pRecOutVar, edge.recoverOutId());
-      } else
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).provideFwd(pOutVar);
-      }
-
-      ProfilerMacro_stop(Debug::Profiler::BWD1DIN);
-      ProfilerMacro_start(Debug::Profiler::BWD1DTRA);
-
-      // Compute projection transform for first dimension
-      std::visit([&](auto&& pOut, auto&& pIn){coord.transform1D().backward(pOut->rData(), pIn->data(), edge.opId());}, pOutVar, pInVar);
-
-      ProfilerMacro_stop(Debug::Profiler::BWD1DTRA);
-      ProfilerMacro_start(Debug::Profiler::BWD1DOUT);
-      ProfilerMacro_start(Debug::Profiler::BWD1DOUTCOMM);
-
-      // Hold spectral input
-      if(edge.holdInput())
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).holdBwd(pInVar);
-
-      // Free spectral input
-      } else
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).freeBwd(pInVar);
-      }
-
-      ProfilerMacro_stop(Debug::Profiler::BWD1DOUTCOMM);
-
-      // Combine recovered output with new calculation
-      if(std::visit([](auto&& pRecOut){return (pRecOut != 0);}, pRecOutVar))
-      {
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTWORK);
-
-         std::visit([&](auto&& pRecOut, auto&& pOut){Datatypes::FieldTools::combine(*pRecOut, *pOut, edge.combinedArithId());}, pRecOutVar, pOutVar);
-
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTWORK);
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTCOMM);
-
-         if(edge.combinedOutId() >= 0)
-         {
-            coord.communicator().storage(Dimensions::Transform::TRA1D).holdFwd(pRecOutVar, edge.combinedOutId());
-         } else
-         {
-            coord.communicator().transferForward(Dimensions::Transform::TRA1D, pRecOutVar);
-         }
-
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTCOMM);
-
-      // Hold data for combination
-      } else if(edge.combinedOutId() >= 0)
-      {
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTWORK);
-
-         if(edge.combinedArithId() == Arithmetics::SetNeg::id())
-         {
-            std::visit([](auto&& pOut){Datatypes::FieldTools::negative(*pOut);}, pOutVar);
-         }
-
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTWORK);
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTCOMM);
-
-         coord.communicator().storage(Dimensions::Transform::TRA1D).holdFwd(pOutVar, edge.combinedOutId());
-
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTCOMM);
-      }
-
-      // Transfer calculation
-      if(edge.arithId() != Arithmetics::None::id())
-      {
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTWORK);
-
-         if(edge.arithId() == Arithmetics::SetNeg::id())
-         {
-            std::visit([](auto&& pOut){Datatypes::FieldTools::negative(*pOut);}, pOutVar);
-         }
-
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTWORK);
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTCOMM);
-
-         coord.communicator().transferForward(Dimensions::Transform::TRA1D, pOutVar);
-
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTCOMM);
-
-      } else if(edge.combinedOutId() < 0 || std::visit([](auto&& pRecOut){return (pRecOut != 0);}, pRecOutVar))
-      {
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTCOMM);
-
-         coord.communicator().storage(Dimensions::Transform::TRA1D).freeFwd(pOutVar);
-
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTCOMM);
-      }
-
-      ProfilerMacro_stop(Debug::Profiler::BWD1DOUT);
-      ProfilerMacro_stop(Debug::Profiler::BWD1D);
+      const std::string profRegion = "Bwd-project1D";
+      const auto traId = Dimensions::Transform::TRA1D;
+      const bool processOutput = true;
+      BackwardConfigurator::genericProjection(edge, coord, traId, processOutput, profRegion);
    }
 
    void BackwardConfigurator::project2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("BwdProject2D");
-      Profiler::RegionStart<3> ("BwdProject2D-pre");
-
       // Debugger message
       DebuggerMacro_msg("Project 2D", 4);
 
-      ProfilerMacro_start(Debug::Profiler::BWD2D);
-      ProfilerMacro_start(Debug::Profiler::BWD2DIN);
-
-      auto pInVar = coord.ss().bwdPtr(Dimensions::Transform::TRA2D);
-
-      // Get the input data from hold
-      if(edge.recoverInput())
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA2D).recoverBwd(pInVar);
-
-      // Get the transfered input data
-      } else
-      {
-         coord.communicator().receiveBackward(Dimensions::Transform::TRA2D, pInVar);
-      }
-
-      // Get output storage
-      auto pOutVar = coord.ss().fwdPtr(Dimensions::Transform::TRA2D);
-      auto pRecOutVar = coord.ss().fwdPtr(Dimensions::Transform::TRA2D);
-      if(edge.recoverOutId() >= 0)
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA2D).provideFwd(pOutVar);
-         coord.communicator().storage(Dimensions::Transform::TRA2D).recoverFwd(pRecOutVar, edge.recoverOutId());
-      } else
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA2D).provideFwd(pOutVar);
-      }
-
-      Profiler::RegionStop<3> ("BwdProject2D-pre");
-
-      ProfilerMacro_stop(Debug::Profiler::BWD2DIN);
-      ProfilerMacro_start(Debug::Profiler::BWD2DTRA);
-
-      // Compute projection transform for second dimension
-      std::visit([&](auto&& pOut, auto&& pIn){coord.transform2D().backward(pOut->rData(), pIn->data(), edge.opId());}, pOutVar, pInVar);
-
-      ProfilerMacro_stop(Debug::Profiler::BWD2DTRA);
-      ProfilerMacro_start(Debug::Profiler::BWD2DOUT);
-      ProfilerMacro_start(Debug::Profiler::BWD2DOUTCOMM);
-
-      Profiler::RegionStart<3> ("BwdProject2D-post");
-
-      // Hold temporary storage
-      if(edge.holdInput())
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA2D).holdBwd(pInVar);
-
-      // Free temporary input storage
-      } else
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA2D).freeBwd(pInVar);
-      }
-
-      ProfilerMacro_stop(Debug::Profiler::BWD2DOUTCOMM);
-
-      // Combine recovered output with new calculation
-      if(std::visit([](auto&& pRecOut){return (pRecOut != 0);}, pRecOutVar))
-      {
-         ProfilerMacro_start(Debug::Profiler::BWD2DOUTWORK);
-
-         std::visit([&](auto&& pRecOut, auto&& pOut){Datatypes::FieldTools::combine(*pRecOut, *pOut, edge.combinedArithId());}, pRecOutVar, pOutVar);
-
-         ProfilerMacro_stop(Debug::Profiler::BWD2DOUTWORK);
-         ProfilerMacro_start(Debug::Profiler::BWD2DOUTCOMM);
-
-         if(edge.combinedOutId() >= 0)
-         {
-            coord.communicator().storage(Dimensions::Transform::TRA2D).holdFwd(pRecOutVar, edge.combinedOutId());
-         } else
-         {
-            coord.communicator().transferForward(Dimensions::Transform::TRA2D, pRecOutVar);
-         }
-
-         ProfilerMacro_stop(Debug::Profiler::BWD2DOUTCOMM);
-
-      // Hold data for combination
-      } else if(edge.combinedOutId() >= 0)
-      {
-         ProfilerMacro_start(Debug::Profiler::BWD2DOUTWORK);
-
-         if(edge.combinedArithId() == Arithmetics::SetNeg::id())
-         {
-            std::visit([](auto&& pOut){Datatypes::FieldTools::negative(*pOut);}, pOutVar);
-         }
-
-         ProfilerMacro_stop(Debug::Profiler::BWD2DOUTWORK);
-         ProfilerMacro_start(Debug::Profiler::BWD2DOUTCOMM);
-
-         coord.communicator().storage(Dimensions::Transform::TRA2D).holdFwd(pOutVar, edge.combinedOutId());
-
-         ProfilerMacro_stop(Debug::Profiler::BWD2DOUTCOMM);
-      }
-
-      // Transfer calculation
-      if(edge.arithId() != Arithmetics::None::id())
-      {
-         ProfilerMacro_start(Debug::Profiler::BWD2DOUTWORK);
-
-         if(edge.arithId() == Arithmetics::SetNeg::id())
-         {
-            std::visit([](auto&& pOut){Datatypes::FieldTools::negative(*pOut);}, pOutVar);
-         }
-
-         ProfilerMacro_stop(Debug::Profiler::BWD2DOUTWORK);
-         ProfilerMacro_start(Debug::Profiler::BWD2DOUTCOMM);
-
-         coord.communicator().transferForward(Dimensions::Transform::TRA2D, pOutVar);
-
-         ProfilerMacro_stop(Debug::Profiler::BWD2DOUTCOMM);
-
-      } else if(edge.combinedOutId() < 0 || std::visit([](auto&& pRecOut){return (pRecOut != 0);}, pRecOutVar))
-      {
-         ProfilerMacro_start(Debug::Profiler::BWD2DOUTCOMM);
-
-         coord.communicator().storage(Dimensions::Transform::TRA2D).freeFwd(pOutVar);
-
-         ProfilerMacro_stop(Debug::Profiler::BWD2DOUTCOMM);
-      }
-
-      Profiler::RegionStop<3> ("BwdProject2D-post");
-
-      ProfilerMacro_stop(Debug::Profiler::BWD2DOUT);
-      ProfilerMacro_stop(Debug::Profiler::BWD2D);
+      const std::string profRegion = "Bwd-project2D";
+      const auto traId = Dimensions::Transform::TRA2D;
+      const bool processOutput = true;
+      BackwardConfigurator::genericProjection(edge, coord, traId, processOutput, profRegion);
    }
 
    void BackwardConfigurator::projectND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("BwdProjectND");
 
       // Debugger message
       DebuggerMacro_msg("Project ND", 4);
 
-      ProfilerMacro_start(Debug::Profiler::BWDND);
-      ProfilerMacro_start(Debug::Profiler::BWDNDIN);
-
-      Dimensions::Transform::Id traND = static_cast<Dimensions::Transform::Id>(coord.ss().dimension()-1);
-
-      auto pInVar = coord.ss().bwdPtr(traND);
-
-      // Get the input data from hold
-      if(edge.recoverInput())
-      {
-         coord.communicator().storage(traND).recoverBwd(pInVar);
-
-      // Get the transfered input data
-      } else
-      {
-         coord.communicator().receiveBackward(traND, pInVar);
-      }
-
-      // Get output storage
-      auto pOutVar = coord.ss().fwdPtr(traND);
-      auto pRecOutVar = coord.ss().fwdPtr(traND);
-      if(edge.arithId() == Arithmetics::Set::id() || edge.arithId() == Arithmetics::SetNeg::id())
-      {
-         coord.communicator().storage(traND).recoverFwd(pOutVar);
-      } else
-      {
-         coord.communicator().storage(traND).provideFwd(pOutVar);
-         coord.communicator().storage(traND).recoverFwd(pRecOutVar);
-      }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDNDIN);
-      ProfilerMacro_start(Debug::Profiler::BWDNDTRA);
-
-      // Compute projection transform for third dimension
-      std::visit([&](auto&& pOut, auto&& pIn){coord.transformND().backward(pOut->rData(), pIn->data(), edge.opId());}, pOutVar, pInVar);
-
-      ProfilerMacro_stop(Debug::Profiler::BWDNDTRA);
-      ProfilerMacro_start(Debug::Profiler::BWDNDOUT);
-      ProfilerMacro_start(Debug::Profiler::BWDNDOUTCOMM);
-
-      // Hold temporary storage
-      if(edge.holdInput())
-      {
-         coord.communicator().storage(traND).holdBwd(pInVar);
-
-      // Free temporary input storage
-      } else
-      {
-         coord.communicator().storage(traND).freeBwd(pInVar);
-      }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDNDOUTCOMM);
-
-      // Combine recovered output with new calculation
-      if(std::visit([](auto&& pRecOut){return (pRecOut != 0);}, pRecOutVar))
-      {
-         ProfilerMacro_start(Debug::Profiler::BWDNDOUTWORK);
-
-         std::visit([&](auto&& pRecOut, auto&& pOut){Datatypes::FieldTools::combine(*pRecOut, *pOut, edge.arithId());}, pRecOutVar, pOutVar);
-
-         ProfilerMacro_stop(Debug::Profiler::BWDNDOUTWORK);
-         ProfilerMacro_start(Debug::Profiler::BWDNDOUTCOMM);
-
-         coord.communicator().transferForward(traND, pRecOutVar);
-         coord.communicator().storage(traND).freeFwd(pOutVar);
-
-         ProfilerMacro_stop(Debug::Profiler::BWDNDOUTCOMM);
-      } else
-      {
-         ProfilerMacro_start(Debug::Profiler::BWDNDOUTWORK);
-
-         if(edge.arithId() == Arithmetics::SetNeg::id())
-         {
-            std::visit([](auto&& pOut){Datatypes::FieldTools::negative(*pOut);}, pOutVar);
-         }
-
-         ProfilerMacro_stop(Debug::Profiler::BWDNDOUTWORK);
-         ProfilerMacro_start(Debug::Profiler::BWDNDOUTCOMM);
-
-         coord.communicator().transferForward(traND, pOutVar);
-
-         ProfilerMacro_stop(Debug::Profiler::BWDNDOUTCOMM);
-      }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDNDOUT);
-      ProfilerMacro_stop(Debug::Profiler::BWDND);
+      const std::string profRegion = "Bwd-projectND";
+      const auto traId = static_cast<Dimensions::Transform::Id>(coord.ss().dimension()-1);
+      const bool processOutput = false;
+      BackwardConfigurator::genericProjection(edge, coord, traId, processOutput, profRegion);
    }
 
    void BackwardConfigurator::project1ND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("BwdProject1ND");
-
       // Debugger message
       DebuggerMacro_msg("Project 1D", 4);
 
-      ProfilerMacro_start(Debug::Profiler::BWD1D);
-      ProfilerMacro_start(Debug::Profiler::BWD1DIN);
+      const std::string profRegion = "Bwd-project1ND";
+      throw std::logic_error("Backward 1ND setup is not ported");
+#if 0
+      Profiler::RegionFixture<2> fix(profRegion);
+      Profiler::RegionStart<3> (profRegion + "-pre");
 
       // Get the input data from hold
       auto pInVar = coord.ss().bwdPtr(Dimensions::Transform::TRA1D);
@@ -466,67 +160,243 @@ namespace Transform {
       {
          coord.communicator().storage(Dimensions::Transform::TRA1D).provideFwd(pOutVar);
          coord.communicator().storage(Dimensions::Transform::TRA1D).recoverFwd(pRecOutVar, edge.recoverOutId());
-      } else
+      }
+      else
       {
          coord.communicator().storage(Dimensions::Transform::TRA1D).provideFwd(pOutVar);
       }
 
-      ProfilerMacro_stop(Debug::Profiler::BWD1DIN);
-      ProfilerMacro_start(Debug::Profiler::BWD1DTRA);
+      Profiler::RegionStop<3> (profRegion + "-pre");
+      Profiler::RegionStart<3> (profRegion + "-transform");
 
       // Compute projection transform for first dimension
       std::visit([&](auto&& pOut, auto&& pIn){coord.transform1D().backward(pOut->rData(), pIn->data(), edge.opId());}, pOutVar, pInVar);
 
-      ProfilerMacro_stop(Debug::Profiler::BWD1DTRA);
-      ProfilerMacro_start(Debug::Profiler::BWD1DOUT);
-      ProfilerMacro_start(Debug::Profiler::BWD1DOUTCOMM);
+      Profiler::RegionStop<3> (profRegion + "-transform");
+      Profiler::RegionStart<3> (profRegion + "-post");
+      Profiler::RegionStart<4> (profRegion + "-post" + "-comm_a");
 
       // Hold spectral input
       if(edge.holdInput())
       {
          coord.communicator().storage(Dimensions::Transform::TRA1D).holdBwd(pInVar);
-
+      }
       // Free spectral input
-      } else
+      else
       {
          coord.communicator().storage(Dimensions::Transform::TRA1D).freeBwd(pInVar);
       }
 
-      ProfilerMacro_stop(Debug::Profiler::BWD1DOUTCOMM);
+      Profiler::RegionStop<4> (profRegion + "-post" + "-comm_a");
 
       // Combine recovered output with new calculation
       if(std::visit([](auto&& pRecOut){return (pRecOut != 0);}, pRecOutVar))
       {
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTWORK);
+         Profiler::RegionStart<4> (profRegion + "-post" + "-work_b");
 
          std::visit([&](auto&& pRecOut, auto&& pOut){Datatypes::FieldTools::combine(*pRecOut, *pOut, edge.arithId());}, pRecOutVar, pOutVar);
 
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTWORK);
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTCOMM);
+         Profiler::RegionStop<4> (profRegion + "-post" + "-work_b");
+         Profiler::RegionStart<4> (profRegion + "-post" + "-comm_b");
 
          coord.communicator().transferForward(Dimensions::Transform::TRA1D, pRecOutVar);
          coord.communicator().storage(Dimensions::Transform::TRA1D).freeFwd(pOutVar);
 
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTCOMM);
-      } else
+         Profiler::RegionStop<4> (profRegion + "-post" + "-comm_b");
+      }
+      else
       {
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTWORK);
+         Profiler::RegionStart<4> (profRegion + "-post" + "-work_c");
 
          if(edge.arithId() == Arithmetics::SetNeg::id())
          {
             std::visit([](auto&& pOut){Datatypes::FieldTools::negative(*pOut);}, pOutVar);
          }
 
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTWORK);
-         ProfilerMacro_start(Debug::Profiler::BWD1DOUTCOMM);
+         Profiler::RegionStop<4> (profRegion + "-post" + "-work_c");
+         Profiler::RegionStart<4> (profRegion + "-post" + "-comm_c");
 
          coord.communicator().transferForward(Dimensions::Transform::TRA1D, pOutVar);
 
-         ProfilerMacro_stop(Debug::Profiler::BWD1DOUTCOMM);
+         Profiler::RegionStop<4> (profRegion + "-post" + "-comm_c");
       }
 
-      ProfilerMacro_stop(Debug::Profiler::BWD1DOUT);
-      ProfilerMacro_stop(Debug::Profiler::BWD1D);
+      Profiler::RegionStop<3> (profRegion + "-post");
+#endif
+   }
+
+   void BackwardConfigurator::genericProjection(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const Dimensions::Transform::Id traId, const bool processOutput, const std::string profRegion)
+   {
+      Profiler::RegionFixture<2> fix(profRegion);
+      Profiler::RegionStart<3> (profRegion + "-pre");
+
+      auto pInVar = coord.ss().bwdPtr(traId);
+
+      // Get the input data from hold
+      if(edge.recoverInput())
+      {
+         coord.communicator().storage(traId).recoverBwd(pInVar);
+      }
+      // Get the transfered input data
+      else
+      {
+         coord.communicator().receiveBackward(traId, pInVar);
+      }
+
+      // Get output storage
+      auto pOutVar = coord.ss().fwdPtr(traId);
+      auto pRecOutVar = coord.ss().fwdPtr(traId);
+      if(processOutput)
+      {
+         if(edge.recoverOutId() >= 0)
+         {
+            coord.communicator().storage(traId).provideFwd(pOutVar);
+            coord.communicator().storage(traId).recoverFwd(pRecOutVar, edge.recoverOutId());
+         }
+         else
+         {
+            coord.communicator().storage(traId).provideFwd(pOutVar);
+         }
+      }
+      else
+      {
+         if(edge.arithId() == Arithmetics::Set::id() || edge.arithId() == Arithmetics::SetNeg::id())
+         {
+            coord.communicator().storage(traId).recoverFwd(pOutVar);
+         }
+         else
+         {
+            coord.communicator().storage(traId).provideFwd(pOutVar);
+            coord.communicator().storage(traId).recoverFwd(pRecOutVar);
+         }
+      }
+
+      Profiler::RegionStop<3> (profRegion + "-pre");
+      Profiler::RegionStart<3> (profRegion + "-transform");
+
+      // Compute projection transform
+      std::visit([&](auto&& pOut, auto&& pIn){coord.transform(traId).backward(pOut->rData(), pIn->data(), edge.opId());}, pOutVar, pInVar);
+
+      Profiler::RegionStop<3> (profRegion + "-transform");
+      Profiler::RegionStart<3> (profRegion + "-post");
+      Profiler::RegionStart<4> (profRegion + "-post" + "-comm_a");
+
+      // Hold temporary storage
+      if(edge.holdInput())
+      {
+         coord.communicator().storage(traId).holdBwd(pInVar);
+      }
+      // Free temporary storage
+      else
+      {
+         coord.communicator().storage(traId).freeBwd(pInVar);
+      }
+
+      Profiler::RegionStop<4> (profRegion + "-post" + "-comm_a");
+
+      if(processOutput)
+      {
+         // Combine recovered output with new calculation
+         if(std::visit([](auto&& pRecOut){return (pRecOut != 0);}, pRecOutVar))
+         {
+            Profiler::RegionStart<4> (profRegion + "-post" + "-work_b");
+
+            std::visit([&](auto&& pRecOut, auto&& pOut){Datatypes::FieldTools::combine(*pRecOut, *pOut, edge.combinedArithId());}, pRecOutVar, pOutVar);
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-work_b");
+            Profiler::RegionStart<4> (profRegion + "-post" + "-comm_b");
+
+            if(edge.combinedOutId() >= 0)
+            {
+               coord.communicator().storage(traId).holdFwd(pRecOutVar, edge.combinedOutId());
+            }
+            else
+            {
+               coord.communicator().transferForward(traId, pRecOutVar);
+            }
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-comm_b");
+         }
+         // Hold data for combination
+         else if(edge.combinedOutId() >= 0)
+         {
+            Profiler::RegionStart<4> (profRegion + "-post" + "-work_c");
+
+            if(edge.combinedArithId() == Arithmetics::SetNeg::id())
+            {
+               std::visit([](auto&& pOut){Datatypes::FieldTools::negative(*pOut);}, pOutVar);
+            }
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-work_c");
+            Profiler::RegionStart<4> (profRegion + "-post" + "-comm_c");
+
+            coord.communicator().storage(traId).holdFwd(pOutVar, edge.combinedOutId());
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-comm_c");
+         }
+
+         // Transfer calculation
+         if(edge.arithId() != Arithmetics::None::id())
+         {
+            Profiler::RegionStart<4> (profRegion + "-post" + "-work_d");
+
+            if(edge.arithId() == Arithmetics::SetNeg::id())
+            {
+               std::visit([](auto&& pOut){Datatypes::FieldTools::negative(*pOut);}, pOutVar);
+            }
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-work_d");
+            Profiler::RegionStart<4> (profRegion + "-post" + "-comm_d");
+
+            coord.communicator().transferForward(traId, pOutVar);
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-comm_d");
+         }
+         else if(edge.combinedOutId() < 0 || std::visit([](auto&& pRecOut){return (pRecOut != 0);}, pRecOutVar))
+         {
+            Profiler::RegionStart<4> (profRegion + "-post" + "-comm_e");
+
+            coord.communicator().storage(traId).freeFwd(pOutVar);
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-comm_e");
+         }
+      }
+      else
+      {
+         // Combine recovered output with new calculation
+         if(std::visit([](auto&& pRecOut){return (pRecOut != 0);}, pRecOutVar))
+         {
+            Profiler::RegionStart<4> (profRegion + "-post" + "-work_f");
+
+            std::visit([&](auto&& pRecOut, auto&& pOut){Datatypes::FieldTools::combine(*pRecOut, *pOut, edge.arithId());}, pRecOutVar, pOutVar);
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-work_f");
+            Profiler::RegionStart<4> (profRegion + "-post" + "-comm_f");
+
+            coord.communicator().transferForward(traId, pRecOutVar);
+            coord.communicator().storage(traId).freeFwd(pOutVar);
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-comm_f");
+         }
+         else
+         {
+            Profiler::RegionStart<4> (profRegion + "-post" + "-work_g");
+
+            if(edge.arithId() == Arithmetics::SetNeg::id())
+            {
+               std::visit([](auto&& pOut){Datatypes::FieldTools::negative(*pOut);}, pOutVar);
+            }
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-work_g");
+            Profiler::RegionStart<4> (profRegion + "-post" + "-comm_g");
+
+            coord.communicator().transferForward(traId, pOutVar);
+
+            Profiler::RegionStop<4> (profRegion + "-post" + "-comm_g");
+         }
+      }
+
+      Profiler::RegionStop<3> (profRegion + "-post");
    }
 
 }

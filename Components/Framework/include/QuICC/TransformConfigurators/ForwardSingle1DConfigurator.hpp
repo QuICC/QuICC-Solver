@@ -8,7 +8,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 // System includes
 //
@@ -21,6 +20,7 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 #include "QuICC/TransformConfigurators/ForwardConfigurator.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -98,13 +98,11 @@ namespace Transform {
 
    inline void ForwardSingle1DConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Fwd-setup1DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs, TransformDirection::FORWARD);
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().prepareForwardReceive();
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    inline void ForwardSingle1DConfigurator::setup2DCommunication(const int, TransformCoordinatorType&)
@@ -113,11 +111,9 @@ namespace Transform {
 
    inline void ForwardSingle1DConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Fwd-initiate1DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateBackwardSend();
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    inline void ForwardSingle1DConfigurator::initiate2DCommunication(TransformCoordinatorType&)
@@ -126,7 +122,7 @@ namespace Transform {
 
    template <typename TVariable> void ForwardSingle1DConfigurator::firstStep(const TransformTree& tree, TVariable&, Physical::Kernel::SharedIPhysicalKernel spKernel, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("FwdFirstStep");
 
       // Iterators for the transforms
       TransformTreeEdge::EdgeType_citerator it3D;
@@ -134,12 +130,8 @@ namespace Transform {
       // Ranges for the vector of edges for the transforms
       TransformTreeEdge::EdgeType_crange range3D = tree.root().edgeRange();
 
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
-
       // Compute the nonlinear interaction
       ForwardConfigurator::nonlinearTerm(tree, spKernel, coord);
-
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
 
       if(coord.ss().dimension() == 3)
       {
@@ -174,8 +166,6 @@ namespace Transform {
       {
          throw std::logic_error("Configurator cannot be used with less than 2 dimensions");
       }
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    template <typename TVariable> void ForwardSingle1DConfigurator::secondStep(const TransformTree&, TVariable&, TransformCoordinatorType&)
@@ -185,7 +175,7 @@ namespace Transform {
 
    template <typename TVariable> void ForwardSingle1DConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("FwdLastStep");
 
       // Iterators for the transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -239,8 +229,6 @@ namespace Transform {
       {
          throw std::logic_error("Configurator cannot be used with less than 2 dimensions");
       }
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
 }

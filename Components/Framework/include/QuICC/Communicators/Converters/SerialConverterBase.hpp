@@ -8,7 +8,6 @@
 
 // Debug includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 // Configuration includes
 //

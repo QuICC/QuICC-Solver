@@ -8,7 +8,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 // System includes
 //
@@ -98,6 +97,12 @@ namespace Transform {
          virtual ~ForwardConfigurator() {};
 
       private:
+         /**
+          * @brief Generic implementation of a integration (forward transform)
+          *
+          * @param coord   Transform coordinator
+          */
+         static void genericIntegrate(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const Dimensions::Transform::Id, const bool processOuput, const std::string profRegion);
    };
 
 }

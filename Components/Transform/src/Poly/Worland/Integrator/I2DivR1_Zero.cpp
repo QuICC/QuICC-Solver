@@ -12,7 +12,6 @@
 
 // Class include
 //
-#include "QuICC/Debug/Profiler/BreakPoint.hpp"
 #include "QuICC/Transform/Poly/Worland/Integrator/I2DivR1_Zero.hpp"
 
 // Project includes
@@ -39,7 +38,7 @@ namespace Integrator {
 
    I2DivR1_Zero::I2DivR1_Zero()
    {
-      this->mProfileId = Debug::Profiler::WORLANDINTG_I2DIVR1_ZERO;
+      this->setProfileTag();
    }
 
    I2DivR1_Zero::~I2DivR1_Zero()

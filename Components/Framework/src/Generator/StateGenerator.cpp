@@ -9,7 +9,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 
 // System includes

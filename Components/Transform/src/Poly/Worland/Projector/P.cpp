@@ -16,7 +16,6 @@
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
@@ -33,7 +32,7 @@ namespace Projector {
 
    P::P()
    {
-      this->mProfileId = Debug::Profiler::WORLANDPROJ_P;
+      this->setProfileTag();
    }
 
    P::~P()

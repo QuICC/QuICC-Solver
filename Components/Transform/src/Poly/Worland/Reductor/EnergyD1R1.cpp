@@ -30,7 +30,7 @@ namespace Reductor {
    EnergyD1R1::EnergyD1R1()
       : EnergyReductor<PowerD1R1>()
    {
-      this->mProfileId = Debug::Profiler::WORLANDREDU_ENERGYD1R1;
+      this->setProfileTag();
    }
 
    EnergyD1R1::~EnergyD1R1()

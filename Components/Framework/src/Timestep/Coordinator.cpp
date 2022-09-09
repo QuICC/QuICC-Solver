@@ -16,6 +16,7 @@
 // Project includes
 //
 #include "QuICC/Tools/Formatter.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -213,20 +214,20 @@ namespace Timestep {
 
    void Coordinator::stepForward(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
-      ProfilerMacro_start(Debug::Profiler::TSTEPIN);
+      Profiler::RegionStart<2> ("Timestep-input");
       // Update the equation input to the timestepper
       this->getInput(scalEq, vectEq, scalVar, vectVar);
-      ProfilerMacro_stop(Debug::Profiler::TSTEPIN);
+      Profiler::RegionStop<2> ("Timestep-input");
 
-      ProfilerMacro_start(Debug::Profiler::TSTEPSOLVE);
+      Profiler::RegionStart<2> ("Timestep-solve");
       // Solve all the linear systems
       this->solveSystems();
-      ProfilerMacro_stop(Debug::Profiler::TSTEPSOLVE);
+      Profiler::RegionStop<2> ("Timestep-solve");
 
-      ProfilerMacro_start(Debug::Profiler::TSTEPOUT);
+      Profiler::RegionStart<2> ("Timestep-output");
       // Transfer timestep output back to equations
       this->transferOutput(scalEq, vectEq);
-      ProfilerMacro_stop(Debug::Profiler::TSTEPOUT);
+      Profiler::RegionStop<2> ("Timestep-output");
 
       // Clear the solver RHS
       this->clearSolvers();

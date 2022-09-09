@@ -33,7 +33,7 @@ namespace Integrator {
 
    I2_Zero::I2_Zero()
    {
-      this->mProfileId = Debug::Profiler::WORLANDINTG_I2_ZERO;
+      this->setProfileTag();
    }
 
    I2_Zero::~I2_Zero()

@@ -12,7 +12,6 @@
 
 // Class include
 //
-#include "QuICC/Debug/Profiler/BreakPoint.hpp"
 #include "QuICC/Transform/Fft/Worland/Integrator/DivR1D1R1.hpp"
 
 // Project includes
@@ -30,7 +29,7 @@ namespace Integrator {
 
    DivR1D1R1::DivR1D1R1()
    {
-      this->mProfileId = Debug::Profiler::WORLANDINTG_DIVR1D1R1;
+      this->setProfileTag();
    }
 
    DivR1D1R1::~DivR1D1R1()

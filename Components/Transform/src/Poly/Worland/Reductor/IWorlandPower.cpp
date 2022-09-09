@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
+#include "Profiler/Interface.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandSphEnergyRule.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
@@ -78,8 +78,7 @@ namespace Reductor {
 
    void IWorlandPower::applyOperators(Matrix& rOut, const MatrixZ& in) const
    {
-      ProfilerMacro_start(Debug::Profiler::WORLANDREDU);
-      ProfilerMacro_start(this->mProfileId);
+      Profiler::RegionFixture<3> fix(this->mProfileTag);
 
       // assert right sizes for input  matrix
       assert(in.cols() == this->mspSetup->blockSize());
@@ -97,9 +96,6 @@ namespace Reductor {
 
          start += cols;
       }
-
-      ProfilerMacro_stop(this->mProfileId);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDREDU);
    }
 
    void IWorlandPower::defaultApplyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const

@@ -32,7 +32,7 @@ namespace Projector {
 
    SphLapl::SphLapl()
    {
-      this->mProfileId = Debug::Profiler::WORLANDPROJ_SPHLAPL;
+      this->setProfileTag();
    }
 
    SphLapl::~SphLapl()

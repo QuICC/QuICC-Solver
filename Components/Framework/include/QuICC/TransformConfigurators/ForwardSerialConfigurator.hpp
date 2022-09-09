@@ -20,6 +20,7 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 #include "QuICC/TransformConfigurators/ForwardConfigurator.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -114,7 +115,7 @@ namespace Transform {
 
    template <typename TVariable> void ForwardSerialConfigurator::firstStep(const TransformTree& tree, TVariable& rVariable, Physical::Kernel::SharedIPhysicalKernel spKernel, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("FwdFirstStep");
 
       // Iterators for the transforms
       TransformTreeEdge::EdgeType_citerator itSpec;
@@ -124,12 +125,8 @@ namespace Transform {
       TransformTreeEdge::EdgeType_crange rangeSpec;
       TransformTreeEdge::EdgeType_crange rangePhys = tree.root().edgeRange();
 
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
-
       // Compute the physical space kernel
       ForwardConfigurator::nonlinearTerm(tree, spKernel, coord);
-
-      ProfilerMacro_start(Debug::Profiler::FWDTRANSFORM);
 
       if(coord.ss().dimension() == 3)
       {
@@ -195,8 +192,6 @@ namespace Transform {
       {
          throw std::logic_error("Transform with more than 3 dimensions are not implemented");
       }
-
-      ProfilerMacro_stop(Debug::Profiler::FWDTRANSFORM);
    }
 
    template <typename TVariable> void ForwardSerialConfigurator::secondStep(const TransformTree&, TVariable&, TransformCoordinatorType&)

@@ -32,7 +32,7 @@ namespace Projector {
 
    D1R1::D1R1()
    {
-      this->mProfileId = Debug::Profiler::WORLANDPROJ_D1R1;
+      this->setProfileTag();
    }
 
    D1R1::~D1R1()

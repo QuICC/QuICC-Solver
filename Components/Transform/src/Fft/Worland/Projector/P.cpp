@@ -19,7 +19,6 @@
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Math/Constants.hpp"
 
 namespace QuICC {
@@ -34,7 +33,7 @@ namespace Projector {
 
    P::P()
    {
-      this->mProfileId = Debug::Profiler::WORLANDPROJ_P;
+      this->setProfileTag();
    }
 
    P::~P()

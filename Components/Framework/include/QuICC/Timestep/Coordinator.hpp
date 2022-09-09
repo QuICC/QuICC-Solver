@@ -12,7 +12,6 @@
 // Debug includes
 //
 #include "QuICC/Debug/DebuggerMacro.h"
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 // System includes
 //

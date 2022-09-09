@@ -28,6 +28,7 @@ namespace Worland {
 
    IWorlandOperator::IWorlandOperator()
    {
+      this->mProfileTag += "Worland::Fft";
    }
 
    IWorlandOperator::~IWorlandOperator()

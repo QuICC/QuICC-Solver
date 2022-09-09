@@ -20,8 +20,8 @@
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -35,6 +35,7 @@ namespace Integrator {
 
    IWorlandIntegrator::IWorlandIntegrator()
    {
+      this->mProfileTag += "-Integrator";
    }
 
    IWorlandIntegrator::~IWorlandIntegrator()
@@ -50,27 +51,37 @@ namespace Integrator {
 
    void IWorlandIntegrator::transformBlock(MatrixZ& rOut, const MatrixZ& in, const bool isEven, const bool useReal) const
    {
+      Profiler::RegionStart<3> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven, useReal);
+      Profiler::RegionStop<3> (this->mProfileTag + "-pre");
 
+      Profiler::RegionStart<3> (this->mProfileTag + "-fft");
       this->mBackend.applyFft();
+      Profiler::RegionStop<3> (this->mProfileTag + "-fft");
 
+      Profiler::RegionStart<3> (this->mProfileTag + "-post");
       this->applyPostOperator(rOut, isEven, useReal);
+      Profiler::RegionStop<3> (this->mProfileTag + "-post");
    }
 
    void IWorlandIntegrator::transformBlock(Matrix& rOut, const Matrix& in, const bool isEven) const
    {
+      Profiler::RegionStart<3> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven);
+      Profiler::RegionStop<3> (this->mProfileTag + "-pre");
 
+      Profiler::RegionStart<3> (this->mProfileTag + "-fft");
       this->mBackend.applyFft();
+      Profiler::RegionStop<3> (this->mProfileTag + "-fft");
 
+      Profiler::RegionStart<3> (this->mProfileTag + "-post");
       this->applyPostOperator(rOut, isEven);
+      Profiler::RegionStop<3> (this->mProfileTag + "-post");
    }
 
    void IWorlandIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
-      ProfilerMacro_start(Debug::Profiler::WORLANDTRA);
-      ProfilerMacro_start(Debug::Profiler::WORLANDINTG);
-      ProfilerMacro_start(this->mProfileId);
+      Profiler::RegionFixture<2> fix(this->mProfileTag);
 
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == in.rows());
@@ -80,17 +91,11 @@ namespace Integrator {
       this->transformBlock(rOut, in, true, false);
       this->transformBlock(rOut, in, false, true);
       this->transformBlock(rOut, in, false, false);
-
-      ProfilerMacro_stop(this->mProfileId);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDINTG);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDTRA);
    }
 
    void IWorlandIntegrator::transform(Matrix& rOut, const Matrix& in) const
    {
-      ProfilerMacro_start(Debug::Profiler::WORLANDTRA);
-      ProfilerMacro_start(Debug::Profiler::WORLANDINTG);
-      ProfilerMacro_start(this->mProfileId);
+      Profiler::RegionFixture<2> fix(this->mProfileTag);
 
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == in.rows());
@@ -98,10 +103,6 @@ namespace Integrator {
 
       this->transformBlock(rOut, in, true);
       this->transformBlock(rOut, in, false);
-
-      ProfilerMacro_stop(this->mProfileId);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDINTG);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDTRA);
    }
 
    int IWorlandIntegrator::outRows() const

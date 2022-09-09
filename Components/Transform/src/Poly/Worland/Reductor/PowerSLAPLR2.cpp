@@ -35,6 +35,7 @@ namespace Reductor {
    PowerSLAPLR2::PowerSLAPLR2()
       : IWorlandPower(1)
    {
+      this->setProfileTag();
    }
 
    PowerSLAPLR2::~PowerSLAPLR2()

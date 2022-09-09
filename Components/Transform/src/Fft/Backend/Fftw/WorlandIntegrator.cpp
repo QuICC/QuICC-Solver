@@ -20,7 +20,6 @@
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/SparseSM/Worland/I2.hpp"
 #include "QuICC/SparseSM/Worland/I4.hpp"
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 namespace QuICC {
 

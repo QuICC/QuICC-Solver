@@ -4,5 +4,4 @@ if(QUICC_DEBUG)
     )
 endif(QUICC_DEBUG)
 
-add_subdirectory(Profiler)
 add_subdirectory(StorageProfiler)

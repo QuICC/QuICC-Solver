@@ -12,7 +12,6 @@
 
 // Class include
 //
-#include "QuICC/Debug/Profiler/BreakPoint.hpp"
 #include "QuICC/Transform/Fft/Worland/Projector/SphLapl.hpp"
 
 // Project includes
@@ -31,7 +30,7 @@ namespace Projector {
 
    SphLapl::SphLapl()
    {
-      this->mProfileId = Debug::Profiler::WORLANDPROJ_SPHLAPL;
+      this->setProfileTag();
    }
 
    SphLapl::~SphLapl()

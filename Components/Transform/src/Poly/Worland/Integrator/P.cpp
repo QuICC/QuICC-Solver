@@ -33,7 +33,7 @@ namespace Integrator {
    P::P()
       : IWorlandIntegrator()
    {
-      this->mProfileId = Debug::Profiler::WORLANDINTG_P;
+      this->setProfileTag();
    }
 
    P::~P()

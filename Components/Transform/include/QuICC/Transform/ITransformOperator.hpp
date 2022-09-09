@@ -22,7 +22,6 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Precision.hpp"
-#include "QuICC/Debug/Profiler/BreakPoint.hpp"
 
 namespace QuICC {
 
@@ -56,9 +55,19 @@ namespace Transform {
 
       protected:
          /**
+          * @brief Get operator name from typeid
+          */
+         std::string opName() const;
+
+         /**
+          * @brief Set profiling tag based on operator name
+          */
+         void setProfileTag();
+
+         /**
           * @brief Profiling ID
           */
-         Debug::Profiler::BreakPoint mProfileId;
+         std::string mProfileTag;
 
          /**
           * @brief Need initialization?

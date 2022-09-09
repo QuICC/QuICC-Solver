@@ -16,12 +16,10 @@
 
 // Class include
 //
-#include "QuICC/Debug/Profiler/BreakPoint.hpp"
 #include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
 namespace QuICC {
@@ -35,6 +33,7 @@ namespace Worland {
    IWorlandOperator::IWorlandOperator()
       : ITransformOperator()
    {
+      this->mProfileTag = "Worland::Poly";
    }
 
    IWorlandOperator::~IWorlandOperator()
@@ -61,24 +60,16 @@ namespace Worland {
 
    void IWorlandOperator::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
-      ProfilerMacro_start(Debug::Profiler::WORLANDTRA);
-
       assert(this->isInitialized());
 
       this->applyOperators(rOut, in);
-
-      ProfilerMacro_stop(Debug::Profiler::WORLANDTRA);
    }
 
    void IWorlandOperator::transform(Matrix& rOut, const MatrixZ& in) const
    {
-      ProfilerMacro_start(Debug::Profiler::WORLANDTRA);
-
       assert(this->isInitialized());
 
       this->applyOperators(rOut, in);
-
-      ProfilerMacro_stop(Debug::Profiler::WORLANDTRA);
    }
 
    void IWorlandOperator::applyOperators(MatrixZ&, const MatrixZ&) const

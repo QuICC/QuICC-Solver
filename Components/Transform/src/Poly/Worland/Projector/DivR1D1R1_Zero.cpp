@@ -12,7 +12,6 @@
 
 // Class include
 //
-#include "QuICC/Debug/Profiler/BreakPoint.hpp"
 #include "QuICC/Transform/Poly/Worland/Projector/DivR1D1R1_Zero.hpp"
 
 // Project includes
@@ -33,7 +32,7 @@ namespace Projector {
 
    DivR1D1R1_Zero::DivR1D1R1_Zero()
    {
-      this->mProfileId = Debug::Profiler::WORLANDPROJ_DIVR1D1R1_ZERO;
+      this->setProfileTag();
    }
 
    DivR1D1R1_Zero::~DivR1D1R1_Zero()

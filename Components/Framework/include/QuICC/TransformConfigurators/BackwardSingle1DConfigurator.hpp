@@ -20,6 +20,7 @@
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/BackwardConfigurator.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -105,7 +106,7 @@ namespace Transform {
 
    template <typename TVariable> void BackwardSingle1DConfigurator::firstStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("BwdFirstStep");
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator itSpec;
@@ -113,12 +114,8 @@ namespace Transform {
       // Ranges for the vector of edges for the three transforms
       TransformTreeEdge::EdgeType_crange rangeSpec = tree.root().edgeRange();
 
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
-
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
-
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Loop over first transform
       for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec)
@@ -126,8 +123,6 @@ namespace Transform {
          // Compute first transform
          BackwardConfigurator::project1D(*itSpec, coord);
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    template <typename TVariable> void BackwardSingle1DConfigurator::secondStep(const TransformTree&, TVariable&, TransformCoordinatorType&)
@@ -136,7 +131,7 @@ namespace Transform {
 
    template <typename TVariable> void BackwardSingle1DConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("BwdLastStep");
 
       // Iterators for the transforms
       TransformTreeEdge::EdgeType_citerator itSpec;
@@ -193,19 +188,15 @@ namespace Transform {
       {
          throw std::logic_error("Configurator cannot be used with less than 2 dimensions");
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    inline void BackwardSingle1DConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Bwd-setup1DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs, TransformDirection::BACKWARD);
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().prepareBackwardReceive();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    inline void BackwardSingle1DConfigurator::setup2DCommunication(const int, TransformCoordinatorType&)
@@ -214,11 +205,9 @@ namespace Transform {
 
    inline void BackwardSingle1DConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Bwd-initiate1DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateForwardSend();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    inline void BackwardSingle1DConfigurator::initiate2DCommunication(TransformCoordinatorType&)

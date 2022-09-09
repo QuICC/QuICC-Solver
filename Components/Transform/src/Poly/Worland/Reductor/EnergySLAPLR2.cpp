@@ -30,6 +30,7 @@ namespace Reductor {
    EnergySLAPLR2::EnergySLAPLR2()
       : EnergyReductor<PowerSLAPLR2>()
    {
+      this->setProfileTag();
    }
 
    EnergySLAPLR2::~EnergySLAPLR2()

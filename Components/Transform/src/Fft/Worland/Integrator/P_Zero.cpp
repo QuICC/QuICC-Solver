@@ -19,7 +19,6 @@
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 namespace QuICC {
 
@@ -33,7 +32,7 @@ namespace Integrator {
 
    P_Zero::P_Zero()
    {
-      this->mProfileId = Debug::Profiler::WORLANDINTG_P_ZERO;
+      this->setProfileTag();
    }
 
    P_Zero::~P_Zero()

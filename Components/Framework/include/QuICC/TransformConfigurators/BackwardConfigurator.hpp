@@ -8,7 +8,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 // System includes
 //
@@ -110,6 +109,12 @@ namespace Transform {
          virtual ~BackwardConfigurator() {};
 
       private:
+         /**
+          * @brief Generic implementation of projection (backward transform)
+          *
+          * @param coord   Transform coordinator
+          */
+         static void genericProjection(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const Dimensions::Transform::Id, const bool processOutput, const std::string profRegion);
    };
 
 }

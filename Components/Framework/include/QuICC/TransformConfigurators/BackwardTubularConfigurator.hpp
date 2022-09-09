@@ -107,7 +107,6 @@ namespace Transform {
    template <typename TVariable> void BackwardTubularConfigurator::firstStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<1> fix("BwdFirstStep");
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -115,12 +114,8 @@ namespace Transform {
       // Ranges for the vector of edges for the three transforms
       TransformTreeEdge::EdgeType_crange range1D = tree.root().edgeRange();
 
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
-
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
-
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Loop over first transform
       for(it1D = range1D.first; it1D != range1D.second; ++it1D)
@@ -128,14 +123,11 @@ namespace Transform {
          // Compute first transform
          BackwardConfigurator::project1D(*it1D, coord);
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    template <typename TVariable> void BackwardTubularConfigurator::secondStep(const TransformTree& tree, TVariable&, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<1> fix("BwdSecondStep");
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -155,14 +147,11 @@ namespace Transform {
             BackwardConfigurator::project2D(*it2D, coord);
          }
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    template <typename TVariable> void BackwardTubularConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<1> fix("BwdLastStep");
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -191,50 +180,38 @@ namespace Transform {
             }
          }
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    inline void BackwardTubularConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Bwd-setup1DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs, TransformDirection::BACKWARD);
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().prepareBackwardReceive();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    inline void BackwardTubularConfigurator::setup2DCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Bwd-setup2DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs, TransformDirection::BACKWARD);
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().prepareBackwardReceive();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    inline void BackwardTubularConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("BackwardTubularConfigurator::initiate1DCommunication");
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Bwd-initiate1DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateForwardSend();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    inline void BackwardTubularConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("BackwardTubularConfigurator::initiate2DCommunication");
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Bwd-initiate2DCommunication");
 
       coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateForwardSend();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
 }

@@ -9,7 +9,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 
 // System includes
@@ -192,9 +191,6 @@ namespace QuICC {
 
       // Print execution timer infos
       this->mExecutionTimer.printInfo(std::cout);
-
-      // Print profiling infos (if required)
-      ProfilerMacro_printInfo();
 
       // Print storage profiling infos (if required)
       StorageProfilerMacro_printInfo();
