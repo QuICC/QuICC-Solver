@@ -12,6 +12,7 @@ def defaultConfigs():
     confs = [
         config('BoussinesqSphereDynamo', 'Explicit', True),
         config('BoussinesqShellDynamo', 'Explicit', True),
+        config('BoussinesqShellDynamo', 'Implicit', True),
         config('BoussinesqSphereRTC', 'Explicit', True),
         config('BoussinesqSphereRTC', 'Implicit', True),
         config('BoussinesqShellRTC', 'Explicit', True),
