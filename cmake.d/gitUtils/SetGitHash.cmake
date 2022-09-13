@@ -7,7 +7,8 @@ list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 function(GitWriteHash git_hash)
     set(_file "${CMAKE_CURRENT_BINARY_DIR}/${HASH_FILE}")
     string(TOUPPER "${HASH_FILE}" HFUP)
-    string(REPLACE "\." "_" HFUP ${HFUP})
+    string(REPLACE "." "_" HFUP ${HFUP})
+    message(DEBUG "HFUP: ${HFUP}")
     message(DEBUG "write _file: ${_file} with ${git_hash}")
     set(_header_file
     "#ifndef ${HFUP}\n\
@@ -17,8 +18,8 @@ namespace QuICC\n\
 namespace ${SGH_COMPONENT}\n\
 {\n\
     const char gitHash[10] = \"${git_hash}\"\;\n\
-}\n\n\ // namespace ${SGH_COMPONENT}
-}\n\n\ // namespace QuICC
+} // namespace ${SGH_COMPONENT} \n\
+} // namespace QuICC \n\
 #endif // ${HFUP}\n\
 ")
     message(DEBUG ${_header_file})

@@ -20,8 +20,9 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"  )
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC 
-  ${QUICC_COMMON_COMPONENT_LIB}
-  Python::Python Python::NumPy
+  QuICC::Common
+  Python::Python
+  Python::NumPy
   )
 
 # Install python files

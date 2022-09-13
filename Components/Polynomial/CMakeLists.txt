@@ -25,7 +25,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 
 add_subdirectory(Bessel)
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  ${QUICC_COMMON_COMPONENT_LIB}
+  QuICC::Common
   Polynomial::Bessel
   )
 

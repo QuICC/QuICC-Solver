@@ -20,9 +20,9 @@ if(QUICC_DEBUG)
 endif(QUICC_DEBUG)
 
 if(QUICC_DEBUG)
-   add_definitions("-DQUICC_DEBUG")
+   add_compile_definitions("QUICC_DEBUG")
 else(QUICC_DEBUG)
-   add_definitions("-DQUICC_NO_DEBUG")
+   add_compile_definitions("QUICC_NO_DEBUG")
 endif(QUICC_DEBUG)
 
 
