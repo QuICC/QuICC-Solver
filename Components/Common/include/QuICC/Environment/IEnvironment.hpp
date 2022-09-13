@@ -74,6 +74,11 @@ namespace Environment {
          virtual void check(const int ierr, const int code) = 0;
 
          /**
+          * @brief Check error code for success
+          */
+         virtual void check(const int ierr, const std::string msg) = 0;
+
+         /**
           * @brief Abort with error code
           */
          virtual void abort(const int code) = 0;

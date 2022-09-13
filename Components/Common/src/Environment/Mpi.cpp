@@ -70,10 +70,22 @@ namespace Environment {
 
    void Mpi::check(const int ierr, const int code)
    {
-      if(ierr != MPI_SUCCESS)
-      {
-         this->abort(code);
-      }
+      #ifndef NDEBUG
+         if(ierr != MPI_SUCCESS)
+         {
+            this->abort(code);
+         }
+      #endif
+   }
+
+   void Mpi::check(const int ierr, const std::string msg)
+   {
+      #ifndef NDEBUG
+         if(ierr != MPI_SUCCESS)
+         {
+            this->abort(msg);
+         }
+      #endif
    }
 
    void Mpi::abort(const int code)

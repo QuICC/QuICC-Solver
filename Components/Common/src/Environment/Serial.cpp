@@ -61,10 +61,22 @@ namespace Environment {
 
    void Serial::check(const int ierr, const int code)
    {
-      if(ierr != 0)
-      {
-         this->abort(code);
-      }
+      #ifndef NDEBUG
+         if(ierr != 0)
+         {
+            this->abort(code);
+         }
+      #endif
+   }
+
+   void Serial::check(const int ierr, const std::string msg)
+   {
+      #ifndef NDEBUG
+         if(ierr != 0)
+         {
+            this->abort(msg);
+         }
+      #endif
    }
 
    void Serial::abort(const int code)

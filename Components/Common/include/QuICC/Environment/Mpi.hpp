@@ -54,6 +54,11 @@ namespace Environment {
          virtual void check(const int ierr, const int code) override;
 
          /**
+          * @brief Check error code for success
+          */
+         virtual void check(const int ierr, const std::string code) override;
+
+         /**
           * @brief Abort with error code
           */
          virtual void abort(const int code) override;
