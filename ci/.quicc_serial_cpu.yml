@@ -32,6 +32,16 @@ BoussinesqSphereDynamoExplicit_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
+BoussinesqSphereDynamoImplicit_serial:
+  extends:
+  - .BoussinesqSphereDynamoImplicit
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_serial:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    QUICC_VERSION_TAG: serial
 BoussinesqShellDynamoExplicit_serial:
   extends:
   - .BoussinesqShellDynamoExplicit

@@ -11,6 +11,7 @@ class config(NamedTuple):
 def defaultConfigs():
     confs = [
         config('BoussinesqSphereDynamo', 'Explicit', True),
+        config('BoussinesqSphereDynamo', 'Implicit', True),
         config('BoussinesqShellDynamo', 'Explicit', True),
         config('BoussinesqShellDynamo', 'Implicit', True),
         config('BoussinesqSphereRTC', 'Explicit', True),

@@ -32,6 +32,16 @@ BoussinesqSphereDynamoExplicit_mpi:
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     QUICC_VERSION_TAG: mpi
+BoussinesqSphereDynamoImplicit_mpi:
+  extends:
+  - .BoussinesqSphereDynamoImplicit
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    QUICC_VERSION_TAG: mpi
 BoussinesqShellDynamoExplicit_mpi:
   extends:
   - .BoussinesqShellDynamoExplicit

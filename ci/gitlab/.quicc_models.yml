@@ -15,6 +15,22 @@
   - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build/Models/BoussinesqSphereDynamo/Executables/BoussinesqSphereDynamoExplicitModel
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereDynamoExplicit && echo ${QUICC_VERSION_TAG}"
+.BoussinesqSphereDynamoImplicit:
+  stage: model-build-and-test
+  script:
+  - hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
+    -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoImplicit/build
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoImplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+    && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereDynamoImplicit'"
+  - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoImplicit/build/lib/python
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoImplicit/build/Models/BoussinesqSphereDynamo/TestSuite/Benchmarks/_data/Implicit
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoImplicit/build/Models/BoussinesqSphereDynamo/Executables/BoussinesqSphereDynamoImplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoImplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereDynamoImplicit && echo ${QUICC_VERSION_TAG}"
 .BoussinesqShellDynamoExplicit:
   stage: model-build-and-test
   script:
