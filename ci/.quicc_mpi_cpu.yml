@@ -8,6 +8,7 @@ stages:
 - build
 - test
 - model-build-and-test
+- cleanup
 build-quicc_mpi:
   tags:
   - docker_jfrog
@@ -22,6 +23,12 @@ test-quicc-lib_mpi:
   - .test-lib
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+ci-cache-cleanup:
+  extends: .daint
+  stage: cleanup
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  script:
+  - rm -Rf $CI_CACHE_FOLDER/*
 BoussinesqSphereDynamoExplicit_mpi:
   extends:
   - .BoussinesqSphereDynamoExplicit

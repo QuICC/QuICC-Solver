@@ -8,6 +8,7 @@ stages:
 - build
 - test
 - model-build-and-test
+- cleanup
 build-quicc_mp:
   tags:
   - docker_jfrog
@@ -22,3 +23,9 @@ test-quicc-lib_mp:
   - .test-lib
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mp:latest
+ci-cache-cleanup:
+  extends: .daint
+  stage: cleanup
+  image: $CSCS_REGISTRY_PATH/quicc_mp:latest
+  script:
+  - rm -Rf $CI_CACHE_FOLDER/*

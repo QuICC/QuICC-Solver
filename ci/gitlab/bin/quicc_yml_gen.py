@@ -29,6 +29,7 @@ def populateYaml(cnf):
                 'build', # build stage is running on the Kubernetes cluster
                 'test', # test stage is running on PizDaint (on 1 node)
                 'model-build-and-test',
+                'cleanup',
             ],
         'build-quicc_'+cnf.tag:
             {
@@ -56,7 +57,16 @@ def populateYaml(cnf):
                     ],
                 'image': imageLocation+'/'+image
             },
-
+        'ci-cache-cleanup':
+            {
+                'extends': '.daint',
+                'stage': 'cleanup',
+                'image': imageLocation+'/'+image,
+                'script':
+                    [
+                        'rm -Rf $CI_CACHE_FOLDER/*'
+                    ],
+            },
         }
     if(cnf.model):
         if cnf.tag == 'mpi':
