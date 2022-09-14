@@ -70,9 +70,9 @@ namespace Variable {
          Array mPolEnstrophy;
 
          /**
-          * @brief Initialize enstrophy storage
+          * @brief Reset enstrophy storage
           */
-         virtual void initializeEnstrophy();
+         virtual void resetEnstrophy();
 
          /**
           * @brief Store enstrophy from Q component

@@ -83,7 +83,7 @@ namespace Variable {
       Matrix spectrum(size.first, size.second);
       std::visit([&](auto&& p){coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::PowerR2::id());}, pInVar);
 
-      this->initializePower();
+      this->resetPower();
 
       MHDFloat factor = 1.0;
       int idx = 0;

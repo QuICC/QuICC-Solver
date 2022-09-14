@@ -71,9 +71,9 @@ namespace Variable {
          Matrix mPolPower;
 
          /**
-          * @brief Initialize power storage
+          * @brief Reset power storage
           */
-         virtual void initializePower() override;
+         virtual void resetPower() override;
 
          /**
           * @brief Store power from Q component

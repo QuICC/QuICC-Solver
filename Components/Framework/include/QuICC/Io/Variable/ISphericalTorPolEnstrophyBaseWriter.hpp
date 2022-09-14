@@ -85,9 +85,9 @@ namespace Variable {
 
       private:
          /**
-          * @brief Initialize enstrophy storage
+          * @brief Reset enstrophy storage
           */
-         virtual void initializeEnstrophy() = 0;
+         virtual void resetEnstrophy() = 0;
 
          /**
           * @brief Store enstrophy from Q component

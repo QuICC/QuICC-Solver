@@ -65,9 +65,9 @@ namespace Variable {
          Matrix mPower;
 
          /**
-          * @brief Initialize power storage
+          * @brief Reset power storage
           */
-         virtual void initializePower() override;
+         virtual void resetPower() override;
 
          /**
           * @brief Store power

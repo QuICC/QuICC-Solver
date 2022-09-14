@@ -58,7 +58,8 @@ namespace Reductor {
       if(l == 0)
       {
          eop.setZero();
-      } else
+      }
+      else
       {
          fwnl.compute<MHDFloat>(eop, nPoly, l-1, igrid, iweights, ev::Set());
       }

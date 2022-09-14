@@ -49,7 +49,7 @@ namespace Variable {
       ISphericalScalarEnergyBaseWriter::init();
    }
 
-   void ISphericalScalarLSpectrumWriter::initializeEnergy()
+   void ISphericalScalarLSpectrumWriter::resetEnergy()
    {
       this->mEnergy.setZero();
    }

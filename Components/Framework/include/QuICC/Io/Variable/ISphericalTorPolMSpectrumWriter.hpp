@@ -70,9 +70,9 @@ namespace Variable {
          Array mPolEnergy;
 
          /**
-          * @brief Initialize energy storage
+          * @brief Reset energy storage
           */
-         virtual void initializeEnergy();
+         virtual void resetEnergy();
 
          /**
           * @brief Store energy from Q component

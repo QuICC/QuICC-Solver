@@ -1,10 +1,10 @@
 /** 
- * @file ISphericalTorPolPowerBaseWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics power spectrum calculation for a Toroidal/Poloidal field in a spherical geometry
+ * @file ISphericalTorPolRSpectrumWriter.hpp
+ * @brief Implementation of the ASCII spherical harmonics radial power spectrum calculation for a Toroidal/Poloidal field in a spherical geometry
  */
 
-#ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLPOWERBASEWRITER_HPP
-#define QUICC_IO_VARIABLE_ISPHERICALTORPOLPOWERBASEWRITER_HPP
+#ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLRSPECTRUMWRITER_HPP
+#define QUICC_IO_VARIABLE_ISPHERICALTORPOLRSPECTRUMWRITER_HPP
 
 // Configuration includes
 //
@@ -29,28 +29,26 @@ namespace Io {
 namespace Variable {
 
    /**
-    * @brief Implementation of the ASCII spherical harmonics power spectrum calculation for a Toroidal/Poloidal field in a spherical geometry
+    * @brief Implementation of the ASCII spherical harmonics radial power spectrum calculation for a Toroidal/Poloidal field in a spherical geometry
     */
-   class ISphericalTorPolPowerBaseWriter: public IVariableAsciiWriter
+   class ISphericalTorPolRSpectrumWriter: public IVariableAsciiWriter
    {
       public:
          /**
           * @brief Constructor
           *
-          * @param name       Filename
-          * @param ext        File extension
-          * @param header     Header string of file
-          * @param type       Type string of file
-          * @param version    Version string of file
-          * @param id         ID of the dimension space
-          * @param mode       Write mode of file
           */
-         ISphericalTorPolPowerBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND);
+         ISphericalTorPolRSpectrumWriter(const std::string& prefix, const std::string& type);
 
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalTorPolPowerBaseWriter();
+         virtual ~ISphericalTorPolRSpectrumWriter();
+
+         /**
+          * @brief Initialise the operator, transform and file
+          */
+         virtual void init() override;
 
          /**
           * @brief Activate output of parity splitting in power output
@@ -69,6 +67,11 @@ namespace Variable {
          
       protected:
          /**
+          * @brief Write content
+          */
+         virtual void writeContent() override;
+
+         /**
           * @brief Data ordering is m slowest
           */
          bool mHasMOrdering;
@@ -85,27 +88,42 @@ namespace Variable {
 
       private:
          /**
+          * @brief Radial grid
+          */
+         Array mGrid;
+
+         /**
+          * @brief Storage for the Toroidal power
+          */
+         Matrix mTorPower;
+
+         /**
+          * @brief Storage for the Poloidal power
+          */
+         Matrix mPolPower;
+
+         /**
           * @brief Reset power storage
           */
-         virtual void resetPower() = 0;
+         virtual void resetPower();
 
          /**
           * @brief Store power from Q component
           */
-         virtual void storeQPower(const int n, const int l, const int m, const MHDFloat power) = 0;
+         virtual void storeQPower(const int n, const int l, const int m, const MHDFloat power);
 
          /**
           * @brief Store power from S component
           */
-         virtual void storeSPower(const int n, const int l, const int m, const MHDFloat power) = 0;
+         virtual void storeSPower(const int n, const int l, const int m, const MHDFloat power);
 
          /**
           * @brief Store power from T component
           */
-         virtual void storeTPower(const int n, const int l, const int m, const MHDFloat power) = 0;
+         virtual void storeTPower(const int n, const int l, const int m, const MHDFloat power);
    };
 
-   inline bool ISphericalTorPolPowerBaseWriter::isHeavy() const
+   inline bool ISphericalTorPolRSpectrumWriter::isHeavy() const
    {
       return true;
    }

@@ -65,9 +65,9 @@ namespace Variable {
          Array mEnergy;
 
          /**
-          * @brief Initialize energy storage
+          * @brief Reset energy storage
           */
-         virtual void initializeEnergy();
+         virtual void resetEnergy();
 
          /**
           * @brief Store energy

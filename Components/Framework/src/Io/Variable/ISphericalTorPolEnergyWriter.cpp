@@ -43,7 +43,7 @@ namespace Variable {
    {
    }
 
-   void ISphericalTorPolEnergyWriter::initializeEnergy()
+   void ISphericalTorPolEnergyWriter::resetEnergy()
    {
       this->mTorEnergy.setZero();
       this->mPolEnergy.setZero();

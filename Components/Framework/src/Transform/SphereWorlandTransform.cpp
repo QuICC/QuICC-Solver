@@ -46,6 +46,9 @@
 #include "QuICC/Transform/Poly/Worland/Reductor/PowerD1R1.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/Power.hpp"
+#include "QuICC/Transform/Poly/Worland/Reductor/RadialPower.hpp"
+#include "QuICC/Transform/Poly/Worland/Reductor/RadialPowerDivR1.hpp"
+#include "QuICC/Transform/Poly/Worland/Reductor/RadialPowerDivR1D1R1.hpp"
 
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/R_1.hpp"
@@ -76,6 +79,10 @@
 #include "QuICC/Transform/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Reductor/PowerD1R1.hpp"
 #include "QuICC/Transform/Reductor/PowerSLAPLR2.hpp"
+
+#include "QuICC/Transform/Reductor/RadialPower.hpp"
+#include "QuICC/Transform/Reductor/RadialPowerDivR1.hpp"
+#include "QuICC/Transform/Reductor/RadialPowerDivR1D1R1.hpp"
 
 #include "Profiler/Interface.hpp"
 
@@ -147,6 +154,9 @@ namespace Transform {
       this->mImpl.addOperator<Poly::Worland::Reductor::PowerD1R1>(Reductor::PowerD1R1::id());
       this->mImpl.addOperator<Poly::Worland::Reductor::PowerR2>(Reductor::PowerR2::id());
       this->mImpl.addOperator<Poly::Worland::Reductor::Power>(Reductor::Power::id());
+      this->mImpl.addOperator<Poly::Worland::Reductor::RadialPower>(Reductor::RadialPower::id());
+      this->mImpl.addOperator<Poly::Worland::Reductor::RadialPowerDivR1>(Reductor::RadialPowerDivR1::id());
+      this->mImpl.addOperator<Poly::Worland::Reductor::RadialPowerDivR1D1R1>(Reductor::RadialPowerDivR1D1R1::id());
    }
 
    void SphereWorlandTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)

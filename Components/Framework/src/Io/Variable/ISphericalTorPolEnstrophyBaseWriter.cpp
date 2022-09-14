@@ -68,7 +68,7 @@ namespace Variable {
       spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarTor), 1);
       std::visit([&](auto&& p){coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Energy::id());}, pInVarTor);
 
-      this->initializeEnstrophy();
+      this->resetEnstrophy();
 
       // Compute Q component of enstrophy of QST decomposition
       MHDFloat lfactor = 0.0;

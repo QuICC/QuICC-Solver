@@ -68,7 +68,7 @@ namespace Variable {
       spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarTor), 1);
       std::visit([&](auto&& p){coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyR2::id());}, pInVarTor);
 
-      this->initializeEnergy();
+      this->resetEnergy();
 
       MHDFloat lfactor = 0.0;
       MHDFloat factor = 1.0;

@@ -1,6 +1,6 @@
 /**
- * @file DivR1_Zero.cpp
- * @brief Source of the implementation of the Worland 1/R projector but 0 mode is zeroed
+ * @file RadialPowerDivR1.cpp
+ * @brief Source of the implementation of the Worland 1/R radial power spectrum operator
  */
 
 // System includes
@@ -12,12 +12,13 @@
 
 // Class include
 //
-#include "QuICC/Transform/Poly/Worland/Projector/DivR1_Zero.hpp"
+#include "QuICC/Transform/Poly/Worland/Reductor/RadialPowerDivR1.hpp"
 
 // Project includes
 //
 #include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
+#include "QuICC/Polynomial/Worland/Evaluator/InnerProduct.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
 
 namespace QuICC {
@@ -28,18 +29,19 @@ namespace Poly {
 
 namespace Worland {
 
-namespace Projector {
+namespace Reductor {
 
-   DivR1_Zero::DivR1_Zero()
+   RadialPowerDivR1::RadialPowerDivR1()
+      : IWorlandRadialPower()
    {
       this->setProfileTag();
    }
 
-   DivR1_Zero::~DivR1_Zero()
+   RadialPowerDivR1::~RadialPowerDivR1()
    {
    }
 
-   void DivR1_Zero::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void RadialPowerDivR1::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
 
@@ -58,12 +60,13 @@ namespace Projector {
       }
    }
 
-   void DivR1_Zero::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
+   void RadialPowerDivR1::applyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {
-      #if defined QUICC_WORLAND_PROJIMPL_MATRIX
+      #if defined QUICC_WORLAND_REDUIMPL_MATRIX
          this->defaultApplyOperator(rOut, i, in);
-      #elif defined QUICC_WORLAND_PROJIMPL_OTF
+      #elif defined QUICC_WORLAND_REDUIMPL_OTF
          int l = this->mspSetup->slow(i);
+         int nPoly = this->mspSetup->fastSize(i);
          if(l == 0)
          {
             rOut.setZero();
@@ -72,9 +75,11 @@ namespace Projector {
          {
             namespace ev = Polynomial::Worland::Evaluator;
             Polynomial::Worland::r_1Wnl wnl;
-            wnl.compute<MHDComplex>(rOut, this->mspSetup->fastSize(i), l, this->mGrid, internal::Array(), ev::OuterProduct(in));
+            MatrixZ tmp(this->mGrid.size(), in.cols());
+            wnl.compute<MHDComplex>(tmp, nPoly, l, this->mGrid, internal::Array(), ev::OuterProduct(in));
+            rOut = tmp.array().abs2();
          }
-      #endif //defined QUICC_WORLAND_PROJIMPL_MATRIX
+      #endif //defined QUICC_WORLAND_REDUIMPL_MATRIX
    }
 
 }

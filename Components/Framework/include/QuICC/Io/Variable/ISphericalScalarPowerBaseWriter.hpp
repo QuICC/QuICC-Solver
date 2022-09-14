@@ -85,9 +85,9 @@ namespace Variable {
 
       private:
          /**
-          * @brief Initialize power storage
+          * @brief Reset power storage
           */
-         virtual void initializePower() = 0;
+         virtual void resetPower() = 0;
 
          /**
           * @brief Store power

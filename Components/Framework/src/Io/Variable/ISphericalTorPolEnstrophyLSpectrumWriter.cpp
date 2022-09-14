@@ -50,7 +50,7 @@ namespace Variable {
       ISphericalTorPolEnstrophyBaseWriter::init();
    }
 
-   void ISphericalTorPolEnstrophyLSpectrumWriter::initializeEnstrophy()
+   void ISphericalTorPolEnstrophyLSpectrumWriter::resetEnstrophy()
    {
       this->mTorEnstrophy.setZero();
       this->mPolEnstrophy.setZero();

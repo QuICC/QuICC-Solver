@@ -85,9 +85,9 @@ namespace Variable {
 
       private:
          /**
-          * @brief Initialize energy storage
+          * @brief Reset energy storage
           */
-         virtual void initializeEnergy() = 0;
+         virtual void resetEnergy() = 0;
 
          /**
           * @brief Store energy from Q component
