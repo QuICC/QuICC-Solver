@@ -32,6 +32,9 @@ namespace Transform {
       /// Write output data to file
       bool dumpData;
 
+      /// Only time execution, don't check data
+      bool timeOnly;
+
       /// Test type
       TestType type;
 

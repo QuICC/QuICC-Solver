@@ -53,7 +53,7 @@ TEST_CASE( "@Space@::Error for @Operator@ projector", "[@Space@::@Operator@:@typ
    for(auto id: currentts::args().params)
    {
       params.at(0) = id;
-      tester.validate(params, currentts::args().type);
+      tester.validate(params, currentts::args().type, currentts::args().timeOnly);
    }
 
 }

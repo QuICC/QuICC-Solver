@@ -56,7 +56,7 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ projector", "[@Algorithm@::@Operat
    for(auto id: currentts::args().params)
    {
       params.at(0) = id;
-      tester.validate(params, currentts::args().type);
+      tester.validate(params, currentts::args().type, currentts::args().timeOnly);
    }
 
    QuICC::Profiler::Finalize();

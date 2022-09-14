@@ -56,7 +56,7 @@ namespace Transform {
          /**
           * @brief Validate implementation against reference
           */
-         void validate(const ParameterType& param, const TestType type) const;
+         void validate(const ParameterType& param, const TestType type, const bool timeOnly) const;
 
          /**
           * @brief Set max acceptable ulp
@@ -199,7 +199,7 @@ namespace Transform {
    {
    }
 
-   template <typename TOp> void TesterBase<TOp>::validate(const ParameterType& param, const TestType type) const
+   template <typename TOp> void TesterBase<TOp>::validate(const ParameterType& param, const TestType type, const bool timeOnly) const
    {
       Matrix outData;
       std::string filename = this->mBasename;
@@ -222,8 +222,6 @@ namespace Transform {
             break;
       }
       outData = this->testOperator(param, type);
-
-      auto timeOnly = true;
 
       if(not timeOnly)
       {

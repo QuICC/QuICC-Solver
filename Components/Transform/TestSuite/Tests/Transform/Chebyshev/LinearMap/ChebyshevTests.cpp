@@ -14,11 +14,18 @@
 
 // Project includes
 //
+#include "QuICC/QuICCEnv.hpp"
 #include "QuICC/TestSuite/Transform/Chebyshev/LinearMap/TestArgs.hpp"
+#include "Profiler/Interface.hpp"
+
 namespace test = QuICC::TestSuite::Transform::Chebyshev::LinearMap;
 
 int main( int argc, char* argv[] )
 {
+   QuICC::QuICCEnv();
+
+   QuICC::Profiler::Initialize();
+
    Catch::Session session; // There must be exactly one instance
 
    std::string testType = "";
@@ -65,5 +72,9 @@ int main( int argc, char* argv[] )
       test::args().useDefault = false;
    }
 
-   return session.run();
+   auto ret = session.run();
+
+   QuICC::Profiler::Finalize();
+
+   return ret;
 }

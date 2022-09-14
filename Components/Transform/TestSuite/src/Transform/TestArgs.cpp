@@ -21,7 +21,7 @@ namespace TestSuite {
 namespace Transform {
 
    TestArgs::TestArgs()
-      : useDefault(true), dumpData(false), type(TestType::PROJECTOR), ulp(11), np(0), rank(0)
+      : useDefault(true), dumpData(false), timeOnly(false), type(TestType::PROJECTOR), ulp(11), np(0), rank(0)
    {
    }
 

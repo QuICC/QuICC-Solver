@@ -14,11 +14,18 @@
 
 // Project includes
 //
+#include "QuICC/QuICCEnv.hpp"
 #include "QuICC/TestSuite/Transform/ALegendre/TestArgs.hpp"
+#include "Profiler/Interface.hpp"
+
 namespace test = QuICC::TestSuite::Transform::ALegendre;
 
 int main( int argc, char* argv[] )
 {
+   QuICC::QuICCEnv();
+
+   QuICC::Profiler::Initialize();
+
    Catch::Session session; // There must be exactly one instance
 
    std::string testType = "";
@@ -27,22 +34,25 @@ int main( int argc, char* argv[] )
    using namespace Catch::clara;
    auto cli
       = session.cli()
-      | Opt( test::args().ulp, "ulp" )        // Add max ulp option
+      | Opt( test::args().ulp, "ulp" )       // Add max ulp option
          ["--ulp"]
          ("Maximum acceptable ulp")
-      | Opt( test::args().params, "id" )      // Add test id option
+      | Opt( test::args().params, "id" )     // Add test id option
          ["--id"]
          ("Test id")
-      | Opt( test::args().np, "np" )      // Add test np option
+      | Opt( test::args().np, "np" )         // Add test np option
          ["--np"]
          ("# MPI ranks")
-      | Opt( test::args().rank, "rank" )      // Add test rank option
+      | Opt( test::args().rank, "rank" )     // Add test rank option
          ["--rank"]
          ("MPI rank")
-      | Opt( testType, "test type" )                          // Add test type
+      | Opt( testType, "test type" )         // Add test type
          ["--type"]
          ("Test type: projector, integrator, reductor, bfloop")
-      | Opt( test::args().dumpData )          // Add keep output data option
+      | Opt( test::args().timeOnly )         // Add timing only
+         ["--timeOnly"] 
+         ("Only time execution, don't check results")
+      | Opt( test::args().dumpData )         // Add keep output data option
          ["--dumpData"]
          ("Write output data to file?");
 
@@ -65,5 +75,9 @@ int main( int argc, char* argv[] )
       test::args().useDefault = false;
    }
 
-   return session.run();
+   auto ret = session.run();
+
+   QuICC::Profiler::Finalize();
+
+   return ret;
 }

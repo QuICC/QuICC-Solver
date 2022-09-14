@@ -49,7 +49,7 @@ TEST_CASE( "@Space@::Error for @Operator@ backward-forward loop", "[@Space@::@Op
    for(int id: currentts::args().params)
    {
       params.at(0) = id;
-      tester.validate(params, currentts::args().type);
+      tester.validate(params, currentts::args().type, currentts::args().timeOnly);
    }
 
 }

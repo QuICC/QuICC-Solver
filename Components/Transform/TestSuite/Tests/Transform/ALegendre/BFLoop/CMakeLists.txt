@@ -9,5 +9,6 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
+    ULP 20
   )
 endforeach()
