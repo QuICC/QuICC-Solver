@@ -38,11 +38,22 @@ make <GreatSimulation><Implementation>
 
 ```bash
 env2lmod
-module load cmake/3.20.3 gcc/8.2.0 openmpi openblas fftw hdf5/1.10.1 boost python
+module load cmake/3.20.3 gcc/8.2.0 openmpi openblas fftw hdf5 boost python
 
 cmake </path/to/QuICC> -DQUICC_USE_MPI=ON \
 -DQUICC_MULTPRECISION=ON \
 -DQUICC_MODEL=<GreatSimulation>
 
 make <GreatSimulation>
+```
+the default `h5py` is built with the incorrect hdf5 library, we need to install it ourselves
+
+```bash
+python -m venv quicc_env
+. quicc_env/bin/activate
+python -m pip install h5py
+```
+afterwards you'll only need to activate the python env
+```bash
+. quicc_env/bin/activate
 ```
