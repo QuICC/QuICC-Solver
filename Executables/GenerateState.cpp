@@ -28,9 +28,6 @@
 #include "QuICC/Model/StateGeneratorFactory.hpp"
 #include MODELHEADER
 
-// Check Model and Framework compatiblity
-#include "QuICC/Version/ModelChecker.h"
-
 /**
  * @brief Setup and run the simulation
  */

@@ -286,7 +286,7 @@ namespace Config {
       types[1] = Parallel::MpiTypes::type<MHDFloat>();
 
       // Create string data part
-      for(auto i = 0; i < sData.size();i++)
+      for(std::size_t i = 0; i < sData.size();i++)
       {
          MPI_Get_address(sData.at(i).c_str(), &element);
          displ[2+i] = element;

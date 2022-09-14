@@ -6,7 +6,6 @@
 #ifdef QUICC_MPI
 #ifndef QUICC_MPIFRAMEWORK_HPP
 #define QUICC_MPIFRAMEWORK_HPP
-#pragma message("MpiFramework needs to be restructured and moved to sensible place")
 
 // System includes
 //

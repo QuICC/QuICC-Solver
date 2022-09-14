@@ -29,9 +29,6 @@
 #include MODELHEADER
 #include "Profiler/Interface.hpp"
 
-// Check Model and Framework compatiblity
-#include "QuICC/Version/ModelChecker.h"
-
 /**
  * @brief Setup and run the simulation
  */

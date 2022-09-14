@@ -29,9 +29,6 @@
 #include "QuICC/Io/Config/Simulation/Boundary.hpp"
 #include MODELHEADER
 
-// Check Model and Framework compatiblity
-#include "QuICC/Version/ModelChecker.h"
-
 typedef QuICC::Model::QUICC_RUNSIM_CPPMODEL::PhysicalModel PModel;
 
 /**
