@@ -1,3 +1,4 @@
+add_subdirectory(Communicators)
 add_subdirectory(LoadSplitter)
 add_subdirectory(Transform)
 add_subdirectory(TransformConfigurators)

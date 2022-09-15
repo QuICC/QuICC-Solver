@@ -60,6 +60,20 @@ namespace Transform {
          virtual ArrayI packs2D(const std::vector<TransformTree>& integratorTree) = 0;
 
          /**
+          * @brief Get the packet sizes for given tree for the first exchange
+          *
+          * @param tree Transform tree
+          */
+         int packs1D(const TransformTree& tree);
+
+         /**
+          * @brief Get the packet sizes of tree for the second exchange
+          *
+          * @param tree Transform tree
+          */
+         int packs2D(const TransformTree& tree);
+
+         /**
           * @brief Location of the split in the configurator
           */
          Splitting::Locations::Id split;
