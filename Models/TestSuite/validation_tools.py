@@ -89,23 +89,24 @@ def printSummary(results, rows, reftol = None):
     e = b"["
     epc = b"["
     newtol = []
-    for v,r in zip(minTol,reftol):
+    for v, r in zip(minTol,reftol):
+        vScaled = int(round(v*1.1 + 0.5))
         rr = r
         if r == 0:
             cs = b""
             ce = b""
-            rr = v
-            newtol.append(int(round(v*1.1 + 0.5)))
-        elif v > r:
+            rr = vScaled
+            newtol.append(vScaled)
+        elif vScaled > r:
             cs = _c.red
             ce = _c.reset
-            newtol.append(int(round(v*1.1 + 0.5)))
+            newtol.append(vScaled)
         else:
             cs = _c.green
             ce = _c.reset
             newtol.append(r)
-        e += cs + (f'{v*1.1 + 0.5:.0f}').encode() + ce + b", "
-        epc += cs + (f'{100*(v-r)/rr:.0f}%').encode() + ce + b", "
+        e += cs + (f'{vScaled:.0f}').encode() + ce + b", "
+        epc += cs + (f'{100*(vScaled-r)/rr:.0f}%').encode() + ce + b", "
     e = e[:-2] + b"]"
     epc = epc[:-2] + b"]"
     print(e.decode())
