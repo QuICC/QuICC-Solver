@@ -49,7 +49,7 @@ namespace Integrator {
          /**
           * @brief Destructor
           */
-         virtual ~D1_Neg();
+         ~D1_Neg();
          
       protected:
 
@@ -57,22 +57,14 @@ namespace Integrator {
          /**
           * @brief Initialize operator with mean blocks
           */
-         virtual void initOperator() const;
-
-         /**
-          * @brief Apply pre FFT operator
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         virtual void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const;
+         void initOperator() const final;
 
          /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(MatrixZ& rOut) const;
+         void applyPostOperator(MatrixZ& rOut) const final;
 
          /**
           * @brief Storage for the mean block sizes

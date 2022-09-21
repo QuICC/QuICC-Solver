@@ -38,11 +38,6 @@ namespace Integrator {
    {
    }
 
-   void Df1InvLapl2D::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      this->mBackend.io(rOut, in);
-   }
-
    void Df1InvLapl2D::applyPostOperator(MatrixZ& rOut) const
    {
       std::vector<std::pair<int,int> > orders = { {2,0}, {0,2} };
@@ -57,9 +52,9 @@ namespace Integrator {
       this->mBackend.destroyDiff2D(opId);
    }
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace Complex
+} // namespace Fourier
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

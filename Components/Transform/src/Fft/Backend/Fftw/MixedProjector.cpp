@@ -67,38 +67,27 @@ namespace Fftw {
       }
    }
 
-   void MixedProjector::input(const MatrixZ& in) const
+   void MixedProjector::input(MatrixZ& out, const MatrixZ& in) const
    {
-      this->mTmp.topRows(this->mSpecSize) = in.topRows(this->mSpecSize);
+      out.topRows(this->mSpecSize) = in.topRows(this->mSpecSize);
 
-      this->applyPadding(this->mTmp);
+      this->applyPadding(out);
    }
 
-   void MixedProjector::inputDiff(const MatrixZ& in, const int order, const MHDFloat scale) const
+   void MixedProjector::inputDiff(MatrixZ& out, const MatrixZ& in, const int order, const MHDFloat scale) const
    {
       // Odd order is complex
       if(order%2 == 1)
       {
          MHDComplex sgn = std::pow(-1.0,((order-1)/2)%2)*Math::cI;
-         this->mTmp.topRows(this->mSpecSize) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*in.topRows(this->mSpecSize);
+         out.topRows(this->mSpecSize) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*in.topRows(this->mSpecSize);
       } else
       {
          MHDFloat sgn = std::pow(-1.0,(order/2)%2);
-         this->mTmp.topRows(this->mSpecSize) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*in.topRows(this->mSpecSize);
+         out.topRows(this->mSpecSize) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*in.topRows(this->mSpecSize);
       }
 
-      this->applyPadding(this->mTmp);
-   }
-
-   void MixedProjector::output(MHDFloat* out) const
-   {
-      this->io(out, this->mTmp.data());
-   }
-
-   void MixedProjector::io(MHDFloat* out, const MHDComplex* in) const
-   {
-      this->mpOut = out;
-      this->mpIn = in;
+      this->applyPadding(out);
    }
 
    void MixedProjector::applyPadding(MatrixZ& rData) const
@@ -110,10 +99,10 @@ namespace Fftw {
       rData.bottomRows(this->mPadSize).setZero();
    }
 
-   void MixedProjector::applyFft() const
+   void MixedProjector::applyFft(Matrix& phys, const MatrixZ& mods) const
    {
       Profiler::RegionFixture<4> fix("MixedProjector::applyFft");
-      fftw_execute_dft_c2r(this->mPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex *>(this->mpIn)), this->mpOut);
+      fftw_execute_dft_c2r(this->mPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex *>(mods.data())), phys.data());
    }
 
 }

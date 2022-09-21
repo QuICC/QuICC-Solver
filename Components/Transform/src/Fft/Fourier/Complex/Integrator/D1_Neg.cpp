@@ -43,23 +43,18 @@ namespace Integrator {
       this->mBackend.initMeanBlocks(this->mspSetup->idBlocks());
    }
 
-   void D1_Neg::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      this->mBackend.io(rOut, in);
-   }
-
    void D1_Neg::applyPostOperator(MatrixZ& rOut) const
    {
-      this->mBackend.extractMean();
+      this->mBackend.extractMean(rOut);
 
       this->mBackend.outputDiff(rOut, 1, this->mspSetup->boxScale());
 
       this->mBackend.setMean(rOut, -1.0);
    }
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace Complex
+} // namespace Fourier
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

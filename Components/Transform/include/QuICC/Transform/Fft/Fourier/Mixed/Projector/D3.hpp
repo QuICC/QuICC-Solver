@@ -49,25 +49,18 @@ namespace Projector {
          /**
           * @brief Destructor
           */
-         virtual ~D3();
-         
+         ~D3();
+
       protected:
 
       private:
          /**
           * @brief Apply pre FFT operator
           *
-          * @param rOut Output values
           * @param in   Input values
+          * @param out  Scaled input
           */
-         virtual void applyPreOperator(Matrix& rOut, const MatrixZ& in) const;
-
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         virtual void applyPostOperator(Matrix& rOut) const;
+         void applyPreOperator(MatrixZ& out, const MatrixZ& in) const final;
    };
 
 }

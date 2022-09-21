@@ -47,37 +47,28 @@ namespace Fftw {
          /**
           * @brief Destructor
           */
-         virtual ~MixedProjector();
+         ~MixedProjector();
          
          /**
           * @brief Initialise the FFTW transforms
           */
-         virtual void init(const SetupType& setup) const override;
+         void init(const SetupType& setup) const override;
 
          /**
-          * @brief Set input pointers for FFT
+          * @brief Copy and pad FFT temporary input
           */
-         void input(const MatrixZ& in) const;
+         void input(MatrixZ& out, const MatrixZ& in) const;
 
          /**
           * @brief Apply spectral derivative of given order
+          * and and pad FFT temporary input
           */
-         void inputDiff(const MatrixZ& rData, const int order, const MHDFloat scale) const;
-
-         /**
-          * @brief Set output data pointers for FFT
-          */
-         void output(MHDFloat* out) const;
-
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         void io(MHDFloat* out, const MHDComplex* in) const;
+         void inputDiff(MatrixZ& out, const MatrixZ& rData, const int order, const MHDFloat scale) const;
 
          /**
           * @brief Apply FFT
           */
-         virtual void applyFft() const override;
+         void applyFft(Matrix& phys, const MatrixZ& mods) const override;
          
       protected:
 
@@ -92,15 +83,6 @@ namespace Fftw {
           */
          mutable int mPadSize;
 
-         /**
-          * @brief Input data pointer
-          */
-         mutable const MHDComplex* mpIn;
-
-         /**
-          * @brief Out data pointer
-          */
-         mutable MHDFloat* mpOut;
    };
 
 }

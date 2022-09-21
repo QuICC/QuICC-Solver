@@ -66,6 +66,11 @@ namespace Fftw {
           */
          virtual MHDFloat requiredStorage() const;
 
+         /**
+          * @brief Get the temporary storage
+          */
+         MatrixZ& getStorage() const;
+
       protected:
          /**
           * @brief Get array of positive k

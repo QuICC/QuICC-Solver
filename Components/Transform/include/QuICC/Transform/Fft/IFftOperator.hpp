@@ -96,6 +96,14 @@ namespace Fft {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const;
+
+         /**
+          * @brief dealias modes
+          *
+          * @param truncated  values
+          * @param extended   values
+          */
+         virtual void dealias(MatrixZ& deAliased, const MatrixZ& aliased) const;
          
       protected:
          /**

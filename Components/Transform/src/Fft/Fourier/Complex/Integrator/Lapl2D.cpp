@@ -37,11 +37,6 @@ namespace Integrator {
    {
    }
 
-   void Lapl2D::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      this->mBackend.io(rOut, in);
-   }
-
    void Lapl2D::applyPostOperator(MatrixZ& rOut) const
    {
       std::vector<std::pair<int,int> > orders = { {2,0}, {0,2} };
@@ -50,9 +45,9 @@ namespace Integrator {
       this->mBackend.destroyDiff2D(id);
    }
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace Complex
+} // namespace Fourier
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

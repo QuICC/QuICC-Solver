@@ -49,7 +49,7 @@ namespace Projector {
          /**
           * @brief Destructor
           */
-         virtual ~Df1Lapl2D();
+         ~Df1Lapl2D();
          
       protected:
 
@@ -60,15 +60,8 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const;
-
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         virtual void applyPostOperator(MatrixZ& rOut) const;
-   };
+         void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const final;
+      };
 
 }
 }

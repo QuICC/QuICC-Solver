@@ -66,6 +66,12 @@ namespace Fftw {
       return mem;
    }
 
+   // to be removed
+   void IFftwBackend::applyFft() const {std::logic_error("Backend not implemented.");};
+   void IFftwBackend::applyFft(Matrix&, const MatrixZ&) const {std::logic_error("Backend not implemented.");};
+   void IFftwBackend::applyFft(MatrixZ&, const Matrix&) const {std::logic_error("Backend not implemented.");};
+   void IFftwBackend::applyFft(MatrixZ&, const MatrixZ&) const {std::logic_error("Backend not implemented.");};
+
 }
 }
 }

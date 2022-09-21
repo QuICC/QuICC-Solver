@@ -37,15 +37,9 @@ namespace Projector {
    {
    }
 
-   void P::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
+   void P::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
    {
-      this->mBackend.input(in);
-
-      this->mBackend.output(rOut.data());
-   }
-
-   void P::applyPostOperator(MatrixZ&) const
-   {
+      this->mBackend.input(tmp, in);
    }
 
 }

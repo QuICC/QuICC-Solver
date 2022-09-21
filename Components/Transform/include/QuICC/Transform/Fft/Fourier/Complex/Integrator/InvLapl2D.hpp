@@ -49,32 +49,24 @@ namespace Integrator {
          /**
           * @brief Destructor
           */
-         virtual ~InvLapl2D();
+         ~InvLapl2D();
          
       protected:
 
       private:
          /**
-          * @brief Apply pre FFT operator
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         virtual void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const;
-
-         /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(MatrixZ& rOut) const;
+         void applyPostOperator(MatrixZ& rOut) const final;
    };
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace Complex
+} // namespace Fourier
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_INTEGRATOR_INVLAPL2D_HPP

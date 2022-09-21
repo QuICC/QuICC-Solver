@@ -51,7 +51,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         virtual ~ComplexProjector();
+         ~ComplexProjector();
          
          /**
           * @brief Initialise the FFT transforms
@@ -64,49 +64,39 @@ namespace Backend {
          void initMeanBlocks(const MatrixI& idBlocks) const;
 
          /**
-          * @brief Copy field into backend
+          * @brief Copy and pad FFT temporary input
           */
-         void input(const MatrixZ& in) const;
-
-         /**
-          * @brief Set input data pointers for FFT (uses internal pointer for output)
-          */
-         void input(const MHDComplex* in) const;
+         void input(MatrixZ& tmp, const MatrixZ& in) const;
 
          /**
           * @brief Copy mean of field into backend
           */
-         void inputMean(const MatrixZ& in) const;
-
-         /**
-          * @brief Set output data pointers for FFT (uses internal pointer for input)
-          */
-         void output(MHDComplex* out) const;
-
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         void io(MHDComplex* out, const MHDComplex* in) const;
+         void inputMean(MatrixZ& tmp, const MatrixZ& in) const;
 
          /**
           * @brief Scale with fast index dependent function
           */
-         void inputDiff(const MatrixZ& rData, const int order, const MHDFloat scale) const;
+         void inputDiff(MatrixZ& tmp, const MatrixZ& in, const int order, const MHDFloat scale) const;
 
          /**
           * @brief Scale with fast and slow index dependent functin
           */
-         void inputDiff2D(const MatrixZ& rData, const std::vector<std::pair<int,int> >& orders, const MHDFloat scale, const MatrixI& idBlocks) const;
+         void inputDiff2D(MatrixZ& tmp, const MatrixZ& rData, const std::vector<std::pair<int,int> >& orders, const MHDFloat scale, const MatrixI& idBlocks) const;
 
          /**
           * @brief Apply FFT
           */
-         void applyFft() const;
+         void applyFft(MatrixZ& phys, const MatrixZ& mods) const;
 
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
+
+         /**
+          * @brief Get the temporary storage
+          */
+         MatrixZ& getStorage() const;
 
       protected:
 

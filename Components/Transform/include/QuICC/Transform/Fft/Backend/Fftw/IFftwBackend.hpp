@@ -52,7 +52,10 @@ namespace Fftw {
          /**
           * @brief Apply FFT
           */
-         virtual void applyFft() const = 0;
+         virtual void applyFft() const;
+         virtual void applyFft(Matrix&, const MatrixZ&) const; // =0?
+         virtual void applyFft(MatrixZ&, const Matrix&) const; // =0?
+         virtual void applyFft(MatrixZ&, const MatrixZ&) const; // =0?
 
          /**
           * @brief Get the memory requirements

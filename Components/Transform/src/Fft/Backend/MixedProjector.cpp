@@ -53,29 +53,19 @@ namespace Backend {
       this->mpImpl->init(setup);
    }
 
-   void MixedProjector::input(const MatrixZ& in) const
+   void MixedProjector::input(MatrixZ& out, const MatrixZ& in) const
    {
-      this->mpImpl->input(in);
+      this->mpImpl->input(out, in);
    }
 
-   void MixedProjector::inputDiff(const MatrixZ& in, const int order, const MHDFloat scale) const
+   void MixedProjector::inputDiff(MatrixZ& out, const MatrixZ& in, const int order, const MHDFloat scale) const
    {
-      this->mpImpl->inputDiff(in, order, scale);
+      this->mpImpl->inputDiff(out, in, order, scale);
    }
 
-   void MixedProjector::output(MHDFloat* out) const
+   void MixedProjector::applyFft(Matrix& phys, const MatrixZ& mods) const
    {
-      this->mpImpl->output(out);
-   }
-
-   void MixedProjector::io(MHDFloat* out, const MHDComplex* in) const
-   {
-      this->mpImpl->io(out, in);
-   }
-
-   void MixedProjector::applyFft() const
-   {
-      this->mpImpl->applyFft();
+      this->mpImpl->applyFft(phys, mods);
    }
 
    MHDFloat MixedProjector::requiredStorage() const
@@ -88,6 +78,11 @@ namespace Backend {
 #endif // QUICC_STORAGEPROFILE
 
       return mem;
+   }
+
+   MatrixZ& MixedProjector::getStorage() const
+   {
+      return this->mpImpl->getStorage();
    }
 
 }

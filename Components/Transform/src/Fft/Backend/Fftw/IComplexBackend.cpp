@@ -60,22 +60,6 @@ namespace Fftw {
       }
    }
 
-   void IComplexBackend::input(const MHDComplex* in) const
-   {
-      this->io(this->mTmp.data(), in);
-   }
-
-   void IComplexBackend::output(MHDComplex* out) const
-   {
-      this->io(out, this->mTmp.data());
-   }
-
-   void IComplexBackend::io(MHDComplex* out, const MHDComplex* in) const
-   {
-      this->mpOut = out;
-      this->mpIn = in;
-   }
-
    Array IComplexBackend::positiveK() const
    {
       return Array::LinSpaced(this->mPosN, 0, this->mPosN-1);
@@ -84,6 +68,11 @@ namespace Fftw {
    Array IComplexBackend::negativeK() const
    {
       return Array::LinSpaced(this->mNegN, 0, this->mNegN-1).array() - static_cast<MHDFloat>(this->mNegN);
+   }
+
+   MatrixZ& IComplexBackend::getStorage() const
+   {
+      return this->mTmp;
    }
 
 }

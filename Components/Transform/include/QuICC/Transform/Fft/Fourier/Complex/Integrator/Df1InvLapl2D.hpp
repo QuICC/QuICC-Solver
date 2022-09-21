@@ -49,25 +49,17 @@ namespace Integrator {
          /**
           * @brief Destructor
           */
-         virtual ~Df1InvLapl2D();
+         ~Df1InvLapl2D();
          
       protected:
 
       private:
          /**
-          * @brief Apply pre FFT operator
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         virtual void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const;
-
-         /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(MatrixZ& rOut) const;
+         void applyPostOperator(MatrixZ& rOut) const final;
    };
 
 }

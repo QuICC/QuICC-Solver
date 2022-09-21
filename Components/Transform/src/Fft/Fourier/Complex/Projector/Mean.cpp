@@ -37,15 +37,9 @@ namespace Projector {
    {
    }
 
-   void Mean::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
+   void Mean::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
    {
-      this->mBackend.inputMean(in);
-
-      this->mBackend.output(rOut.data());
-   }
-
-   void Mean::applyPostOperator(MatrixZ&) const
-   {
+      this->mBackend.inputMean(tmp, in);
    }
 
 }

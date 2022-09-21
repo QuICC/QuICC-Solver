@@ -67,19 +67,9 @@ namespace Fftw {
          void initMeanBlocks(const MatrixI& idBlocks) const;
 
          /**
-          * @brief Set input data pointers for FFT (uses internal pointer for output)
+          * @brief Get the temporary storage
           */
-         virtual void input(const MHDComplex* in) const;
-
-         /**
-          * @brief Set output data pointers for FFT (uses internal pointer for input)
-          */
-         virtual void output(MHDComplex* out) const;
-
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         virtual void io(MHDComplex* out, const MHDComplex* in) const;
+         MatrixZ& getStorage() const;
 
       protected:
          /**

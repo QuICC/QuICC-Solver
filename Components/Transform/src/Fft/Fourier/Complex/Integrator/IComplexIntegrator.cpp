@@ -52,8 +52,7 @@ namespace Integrator {
       assert(rOut.rows() >= this->outRows());
       assert(in.cols() <= rOut.cols());
 
-      this->applyPreOperator(rOut, in);
-      this->mBackend.applyFft();
+      this->mBackend.applyFft(rOut, in);
       this->applyPostOperator(rOut);
    }
 
@@ -91,6 +90,18 @@ namespace Integrator {
 #endif // QUICC_STORAGEPROFILE
 
       return mem;
+   }
+
+   void IComplexIntegrator::dealias(MatrixZ& deAliased, const MatrixZ& aliased)const
+   {
+      int specSize = this->mspSetup->specSize();
+      assert(deAliased.rows() == specSize);
+
+      int negN = specSize/2;
+      int posN = negN + (specSize%2);
+
+      deAliased.topRows(posN) = aliased.topRows(posN);
+      deAliased.bottomRows(negN) = aliased.bottomRows(negN);
    }
 
 }

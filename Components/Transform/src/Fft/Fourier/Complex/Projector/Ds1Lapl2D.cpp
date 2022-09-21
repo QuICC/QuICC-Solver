@@ -38,16 +38,11 @@ namespace Projector {
    {
    }
 
-   void Ds1Lapl2D::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
+   void Ds1Lapl2D::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
    {
       std::vector<std::pair<int,int> > orders = { {2,1}, {0,3} };
-      this->mBackend.inputDiff2D(in, orders, this->mspSetup->boxScale(), this->mspSetup->idBlocks());
+      this->mBackend.inputDiff2D(tmp, in, orders, this->mspSetup->boxScale(), this->mspSetup->idBlocks());
 
-      this->mBackend.output(rOut.data());
-   }
-
-   void Ds1Lapl2D::applyPostOperator(MatrixZ&) const
-   {
    }
 
 }

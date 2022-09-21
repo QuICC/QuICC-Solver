@@ -22,7 +22,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:type
-    ULP 60
+    ULP 65
   )
 endforeach()
 

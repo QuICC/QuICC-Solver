@@ -51,7 +51,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         virtual ~MixedProjector();
+         ~MixedProjector();
 
          /**
           * @brief Initialise the FFT transforms
@@ -59,34 +59,29 @@ namespace Backend {
          void init(const SetupType& setup) const;
 
          /**
-          * @brief Set input pointers for FFT
+          * @brief Copy and pad FFT input
           */
-         void input(const MatrixZ& in) const;
+         void input(MatrixZ& out, const MatrixZ& in) const;
 
          /**
-          * @brief Apply spectral derivative of given order
+          * @brief Apply spectral derivative of given order and pad
           */
-         void inputDiff(const MatrixZ& rData, const int order, const MHDFloat scale) const;
-
-         /**
-          * @brief Set output data pointers for FFT
-          */
-         void output(MHDFloat* out) const;
-
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         void io(MHDFloat* out, const MHDComplex* in) const;
+         void inputDiff(MatrixZ& out, const MatrixZ& rData, const int order, const MHDFloat scale) const;
 
          /**
           * @brief Apply FFT
           */
-         void applyFft() const;
+         void applyFft(Matrix& phys, const MatrixZ& mods) const;
 
          /**
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
+
+         /**
+          * @brief Get the temporary storage
+          */
+         MatrixZ& getStorage() const;
 
       protected:
 

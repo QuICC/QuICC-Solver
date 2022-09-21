@@ -38,15 +38,9 @@ namespace Projector {
    {
    }
 
-   void D4::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
+   void D4::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
    {
-      this->mBackend.inputDiff(in, 4, this->mspSetup->boxScale());
-
-      this->mBackend.output(rOut.data());
-   }
-
-   void D4::applyPostOperator(MatrixZ&) const
-   {
+      this->mBackend.inputDiff(tmp, in, 4, this->mspSetup->boxScale());
    }
 
 }

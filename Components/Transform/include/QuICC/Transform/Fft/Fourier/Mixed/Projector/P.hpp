@@ -1,6 +1,6 @@
 /** 
  * @file P.hpp
- * @brief Implementation of the Fourier based P projector
+ * @brief Implementation of the Fourier based mixed P projector (i.e. from phyiscal to modal space)
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_P_HPP
@@ -36,7 +36,8 @@ namespace Mixed {
 namespace Projector {
 
    /**
-    * @brief Implementation of the Fourier based P projector
+    * @brief Implementation of the Fourier based mixed P projector
+    * (i.e. from phyiscal to modal space)
     */ 
    class P: public IMixedProjector
    {
@@ -49,25 +50,18 @@ namespace Projector {
          /**
           * @brief Destructor
           */
-         virtual ~P();
-         
+         ~P();
+
       protected:
 
       private:
          /**
           * @brief Apply pre FFT operator
           *
-          * @param rOut Output values
-          * @param in   Input values
+          * @param in   Input mods values
+          * @param out  Copied and padded input
           */
-         virtual void applyPreOperator(Matrix& rOut, const MatrixZ& in) const;
-
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         virtual void applyPostOperator(Matrix& rOut) const;
+         void applyPreOperator(MatrixZ& out, const MatrixZ& in) const final;
    };
 
 }

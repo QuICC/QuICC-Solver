@@ -51,7 +51,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         virtual ~ComplexIntegrator();
+         ~ComplexIntegrator();
          
          /**
           * @brief Initialise the FFT transforms
@@ -64,29 +64,9 @@ namespace Backend {
          void initMeanBlocks(const MatrixI& idBlocks) const;
 
          /**
-          * @brief Set input data pointers for FFT (uses internal pointer for output)
-          */
-         void input(const MHDComplex* in) const;
-
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         void io(MHDComplex* out, const MHDComplex* in) const;
-
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         void io(MatrixZ& rOut, const MatrixZ& in) const;
-
-         /**
-          * @brief Copy field out of backend
+          * @brief Scale field
           */
          void output(MatrixZ& rOut) const;
-
-         /**
-          * @brief Set output data pointers for FFT (uses internal pointer for input)
-          */
-         void output(MHDComplex* out) const;
 
          /**
           * @brief Copy mean of field out of backend
@@ -94,9 +74,9 @@ namespace Backend {
          void outputMean(MatrixZ& rOut) const;
 
          /**
-          * @brief Copy field out of backend zeroing the mean
+          * @brief Zero the mean
           */
-         void outputZeroMean(MatrixZ& rOut) const;
+         void zeroMean(MatrixZ& rOut) const;
 
          /**
           * @brief Scale with fast index dependent function
@@ -106,7 +86,7 @@ namespace Backend {
          /**
           * @brief Extract the mean
           */
-         void extractMean() const;
+         void extractMean(const MatrixZ& rOut) const;
 
          /**
           * @brief Set the mean
@@ -116,7 +96,7 @@ namespace Backend {
          /**
           * @brief Apply FFT
           */
-         void applyFft() const;
+         void applyFft(MatrixZ& mods, const MatrixZ& phys) const;
 
          /**
           * @brief Compute 2D derivative operator

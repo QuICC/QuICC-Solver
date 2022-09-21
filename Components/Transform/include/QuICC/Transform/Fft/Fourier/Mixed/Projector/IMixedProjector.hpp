@@ -90,17 +90,10 @@ namespace Projector {
          /**
           * @brief Apply pre FFT operator
           *
-          * @param rOut Output values
+          * @param out  Copied or scaled input
           * @param in   Input values
           */
-         virtual void applyPreOperator(Matrix& rOut, const MatrixZ& in) const = 0;
-
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         virtual void applyPostOperator(Matrix& rOut) const = 0;
+         virtual void applyPreOperator(MatrixZ& out, const MatrixZ& in) const = 0;
 
          /**
           * @brief Compute transform C2C or R2R componentwise (disabled)

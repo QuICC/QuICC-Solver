@@ -37,11 +37,6 @@ namespace Integrator {
    {
    }
 
-   void D2::applyPreOperator(MatrixZ& rOut, const Matrix& in) const
-   {
-      this->mBackend.io(rOut, in);
-   }
-
    void D2::applyPostOperator(MatrixZ& rOut) const
    {
       this->mBackend.outputDiff(rOut, 2, this->mspSetup->boxScale());

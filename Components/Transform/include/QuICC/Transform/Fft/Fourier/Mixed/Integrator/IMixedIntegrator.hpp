@@ -74,6 +74,14 @@ namespace Integrator {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
+
+         /**
+          * @brief dealias modes
+          *
+          * @param truncated  values
+          * @param extended   values
+          */
+         virtual void dealias(MatrixZ& deAliased, const MatrixZ& aliased) const override;
          
       protected:
          /**
@@ -86,14 +94,6 @@ namespace Integrator {
           * @brief Initialise FFT backend
           */
          virtual void initBackend() const override;
-
-         /**
-          * @brief Apply pre FFT operator
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         virtual void applyPreOperator(MatrixZ& rOut, const Matrix& in) const = 0;
 
          /**
           * @brief Apply post FFT operator

@@ -37,11 +37,6 @@ namespace Integrator {
    {
    }
 
-   void D1_Neg::applyPreOperator(MatrixZ& rOut, const Matrix& in) const
-   {
-      this->mBackend.io(rOut, in);
-   }
-
    void D1_Neg::applyPostOperator(MatrixZ& rOut) const
    {
       std::map<int,MHDComplex> mod = { {0, -1.0} };

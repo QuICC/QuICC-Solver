@@ -37,19 +37,14 @@ namespace Integrator {
    {
    }
 
-   void P::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      this->mBackend.io(rOut, in);
-   }
-
    void P::applyPostOperator(MatrixZ& rOut) const
    {
       this->mBackend.output(rOut);
    }
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace Complex
+} // namespace Fourier
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

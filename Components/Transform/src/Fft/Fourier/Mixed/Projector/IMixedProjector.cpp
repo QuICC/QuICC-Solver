@@ -51,9 +51,9 @@ namespace Projector {
       assert(rOut.cols() == this->outCols());
       assert(rOut.rows() == this->outRows());
 
-      this->applyPreOperator(rOut, in);
-      this->mBackend.applyFft();
-      this->applyPostOperator(rOut);
+      auto& tmp = this->mBackend.getStorage();
+      this->applyPreOperator(tmp, in);
+      this->mBackend.applyFft(rOut, tmp);
    }
 
    void IMixedProjector::transform(Matrix&, const Matrix&) const

@@ -30,7 +30,6 @@ namespace Backend {
 namespace Fftw {
 
    ComplexIntegrator::ComplexIntegrator()
-      : mNextDiff2DId(0), mOutMap(NULL,0,0)
    {
    }
 
@@ -69,29 +68,9 @@ namespace Fftw {
       }
    }
 
-   void ComplexIntegrator::io(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      if(rOut.rows() == this->mBwdSize)
-      {
-         this->io(rOut.data(), in.data());
-      } else
-      {
-         this->mTmp.resize(this->mBwdSize, this->mBlockSize);
-         this->io(this->mTmp.data(), in.data());
-      }
-   }
-
-   void ComplexIntegrator::io(MHDComplex* out, const MHDComplex* in) const
-   {
-      IComplexBackend::io(out, in);
-
-      new (&this->mOutMap) Eigen::Map<MatrixZ>(this->mpOut, this->mBwdSize, this->mBlockSize);
-   }
-
    void ComplexIntegrator::output(MatrixZ& rOut) const
    {
-      rOut.topRows(this->mPosN) = this->mFftScaling*this->mOutMap.topRows(this->mPosN);
-      rOut.bottomRows(this->mNegN) = this->mFftScaling*this->mOutMap.bottomRows(this->mNegN);
+      rOut *= this->mFftScaling;
    }
 
    void ComplexIntegrator::outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale) const
@@ -100,13 +79,13 @@ namespace Fftw {
       if(order%2 == 1)
       {
          MHDComplex sgn = std::pow(-1.0,((order-1)/2)%2)*this->mFftScaling*Math::cI;
-         rOut.topRows(this->mPosN) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*this->mOutMap.topRows(this->mPosN);
-         rOut.bottomRows(this->mNegN) = (sgn*(scale*this->negativeK()).array().pow(order).matrix()).asDiagonal()*this->mOutMap.bottomRows(this->mNegN);
+         rOut.topRows(this->mPosN) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*rOut.topRows(this->mPosN);
+         rOut.bottomRows(this->mNegN) = (sgn*(scale*this->negativeK()).array().pow(order).matrix()).asDiagonal()*rOut.bottomRows(this->mNegN);
       } else
       {
          MHDFloat sgn = std::pow(-1.0,(order/2)%2)*this->mFftScaling;
-         rOut.topRows(this->mPosN) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*this->mOutMap.topRows(this->mPosN);
-         rOut.bottomRows(this->mNegN) = (sgn*(scale*this->negativeK()).array().pow(order).matrix()).asDiagonal()*this->mOutMap.bottomRows(this->mNegN);
+         rOut.topRows(this->mPosN) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*rOut.topRows(this->mPosN);
+         rOut.bottomRows(this->mNegN) = (sgn*(scale*this->negativeK()).array().pow(order).matrix()).asDiagonal()*rOut.bottomRows(this->mNegN);
       }
    }
 
@@ -224,7 +203,7 @@ namespace Fftw {
 
    void ComplexIntegrator::applyDiff2D(MatrixZ& rOut, const int id) const
    {
-      int negRow = this->mTmp.rows() - this->mNegN;
+      int negRow = rOut.rows() - this->mNegN;
       MatrixZ& opP = std::get<0>(this->mDiff2DOp.at(id));
       MatrixZ& opN = std::get<1>(this->mDiff2DOp.at(id));
       MatrixI& idBlocks = std::get<2>(this->mDiff2DOp.at(id));
@@ -233,8 +212,8 @@ namespace Fftw {
       for(int i = 0; i < idBlocks.rows(); ++i)
       {
          // Split positive and negative frequencies
-         this->mOutMap.block(0, start, this->mPosN, idBlocks(i,1)) = opP.col(i).asDiagonal()*this->mOutMap.block(0, start, this->mPosN, idBlocks(i,1));
-         this->mOutMap.block(negRow, start, this->mNegN, idBlocks(i,1)) = opN.col(i).asDiagonal()*this->mOutMap.block(negRow, start, this->mNegN, idBlocks(i,1));
+         rOut.block(0, start, this->mPosN, idBlocks(i,1)) = opP.col(i).asDiagonal()*rOut.block(0, start, this->mPosN, idBlocks(i,1));
+         rOut.block(negRow, start, this->mNegN, idBlocks(i,1)) = opN.col(i).asDiagonal()*rOut.block(negRow, start, this->mNegN, idBlocks(i,1));
 
          // Increment block counter
          start += idBlocks(i,1);
@@ -243,38 +222,38 @@ namespace Fftw {
       this->output(rOut);
    }
 
-   void ComplexIntegrator::outputZeroMean(MatrixZ& rOut) const
+   void ComplexIntegrator::zeroMean(MatrixZ& rOut) const
    {
       // Zero the mean
       for(auto it = this->mMeanBlocks.cbegin(); it != this->mMeanBlocks.cend(); ++it)
       {
-         this->mOutMap.block(1, it->first, this->mOutMap.rows()-1, it->second).setZero();
+         rOut.block(1, it->first, rOut.rows()-1, it->second).setZero();
       }
-
-      this->output(rOut);
    }
 
    void ComplexIntegrator::outputMean(MatrixZ& rOut) const
    {
+      // This op could be done in place
+      MatrixZ tmp = rOut;
       rOut.setZero();
 
       // Set the mean
       for(auto it = this->mMeanBlocks.cbegin(); it != this->mMeanBlocks.cend(); ++it)
       {
-         rOut.block(0, it->first, 1, it->second) = this->mFftScaling*this->mOutMap.block(0, it->first, 1, it->second);
+         rOut.block(0, it->first, 1, it->second) = this->mFftScaling*tmp.block(0, it->first, 1, it->second);
       }
    }
 
-   void ComplexIntegrator::applyFft() const
+   void ComplexIntegrator::applyFft(MatrixZ& mods, const MatrixZ& phys) const
    {
-      fftw_execute_dft(this->mPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex*>(this->mpIn)), reinterpret_cast<fftw_complex* >(this->mpOut));
+      fftw_execute_dft(this->mPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex*>(phys.data())), reinterpret_cast<fftw_complex* >(mods.data()));
    }
 
-   void ComplexIntegrator::extractMean() const
+   void ComplexIntegrator::extractMean(const MatrixZ& rOut) const
    {
       for(auto it = this->mMeanBlocks.cbegin(); it != this->mMeanBlocks.cend(); ++it)
       {
-         this->mTmpMean.push_back(this->mOutMap.block(0, it->first, 1, it->second).transpose());
+         this->mTmpMean.push_back(rOut.block(0, it->first, 1, it->second).transpose());
       }
    }
 

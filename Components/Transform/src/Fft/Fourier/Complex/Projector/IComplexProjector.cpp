@@ -51,9 +51,9 @@ namespace Projector {
       assert(rOut.rows() == this->outRows());
       assert(in.cols() <= rOut.cols());
 
-      this->applyPreOperator(rOut, in);
-      this->mBackend.applyFft();
-      this->applyPostOperator(rOut);
+      auto& tmp = this->mBackend.getStorage();
+      this->applyPreOperator(tmp, in);
+      this->mBackend.applyFft(rOut, tmp);
    }
 
    void IComplexProjector::transform(Matrix&, const Matrix&) const
