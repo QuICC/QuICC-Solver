@@ -67,17 +67,12 @@ namespace Projector {
       this->mBackend.addSolver(2);
    }
 
-   void SphRadLapl::applyPreOperator(Matrix& rOut, const Matrix& in) const
+   void SphRadLapl::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
       this->mBackend.solver().input(in, 1);
-
-      this->mBackend.getSolution(3, -1, true);
-
+      this->mBackend.getSolution(tmp, 3, -1, true);
       this->mBackend.solver().inputSpectral(1);
-
-      this->mBackend.getSolution(1, 2);
-
-      this->mBackend.output(rOut);
+      this->mBackend.getSolution(tmp, 1, 2);
    }
 
    void SphRadLapl::applyPostOperator(Matrix& rOut) const
@@ -85,22 +80,17 @@ namespace Projector {
       this->mBackend.outputScale(rOut);
    }
 
-   void SphRadLapl::applyPreOperator(const MatrixZ& in, const bool useReal) const
+   void SphRadLapl::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
       this->mBackend.solver().input(in, 1, useReal);
-
-      this->mBackend.getSolution(3, -1, true);
-
+      this->mBackend.getSolution(tmp, 3, -1, true);
       this->mBackend.solver().inputSpectral(1);
-
-      this->mBackend.getSolution(1, 2);
-
-      this->mBackend.io();
+      this->mBackend.getSolution(tmp, 1, 2);
    }
 
-   void SphRadLapl::applyPostOperator(MatrixZ& rOut, const bool useReal) const
+   void SphRadLapl::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      this->mBackend.outputScale(rOut, useReal);
+      this->mBackend.outputScale(rOut, tmp, useReal);
    }
 
 }

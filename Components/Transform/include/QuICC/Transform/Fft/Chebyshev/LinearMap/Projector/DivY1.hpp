@@ -49,7 +49,7 @@ namespace Projector {
          /**
           * @brief Destructor
           */
-         virtual ~DivY1();
+         ~DivY1();
          
       protected:
 
@@ -57,30 +57,31 @@ namespace Projector {
          /**
           * @brief Initialize solver operators
           */
-         virtual void initOperator() const override;
+         void initOperator() const final;
 
          /**
           * @brief Apply pre FFT operator
           *
-          * @param rOut Output values
+          * @param tmp Temporary padded modal values
           * @param in   Input values
           */
-         virtual void applyPreOperator(Matrix& rOut, const Matrix& in) const override;
+         void applyPreOperator(Matrix& tmp, const Matrix& in) const final;
 
          /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(Matrix& rOut) const override;
+         void applyPostOperator(Matrix& rOut) const final;
 
          /**
           * @brief Apply pre FFT operator for component wise openerations
           *
-          * @param in   Input values
+          * @param tmp Temporary padded modal values, either real or im part only
+          * @param in Input values
           * @param useReal Real vs Imag flag
           */
-         virtual void applyPreOperator(const MatrixZ& in, const bool useReal) const override;
+         void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const final;
 
          /**
           * @brief Apply post FFT operator for component wise operations
@@ -88,7 +89,7 @@ namespace Projector {
           * @param rOut Output values
           * @param useReal Real vs Imag flag
           */
-         virtual void applyPostOperator(MatrixZ& rOut, const bool useReal) const override;
+         void applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const final;
    };
 
 }

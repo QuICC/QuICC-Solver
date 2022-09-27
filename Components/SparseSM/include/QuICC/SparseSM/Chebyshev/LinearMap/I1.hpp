@@ -32,7 +32,11 @@ namespace Chebyshev {
 namespace LinearMap {
 
    /**
-    * @brief Implementation of the I sparse integration operator
+    * @brief Implementation of the I sparse integration operator, with mapping y = ax + b
+    *
+    * Setup the relation between the spectral coefficients of a function and the spectral
+    * coefficients of its first order derivative in a form suitable to initialize a sparse
+    * matrix
     */ 
    class I1: public ILinearMapOperator
    {
@@ -64,6 +68,8 @@ namespace LinearMap {
 
          /**
           * @brief Build triplet representation of matrix
+          *
+          * @param[out] list containing triplets
           */
          virtual void buildTriplets(TripletList_t& list) const;
    };

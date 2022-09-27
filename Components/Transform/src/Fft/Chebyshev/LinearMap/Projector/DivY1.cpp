@@ -50,11 +50,9 @@ namespace Projector {
       this->mBackend.setScaler(igrid.array().pow(-1).cast<MHDFloat>().matrix());
    }
 
-   void DivY1::applyPreOperator(Matrix& rOut, const Matrix& in) const
+   void DivY1::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
-      this->mBackend.input(in, true);
-
-      this->mBackend.output(rOut);
+      this->mBackend.input(tmp, in);
    }
 
    void DivY1::applyPostOperator(Matrix& rOut) const
@@ -62,16 +60,14 @@ namespace Projector {
       this->mBackend.outputScale(rOut);
    }
 
-   void DivY1::applyPreOperator(const MatrixZ& in, const bool useReal) const
+   void DivY1::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
-      this->mBackend.input(in, useReal, true);
-
-      this->mBackend.io();
+      this->mBackend.input(tmp, in, useReal);
    }
 
-   void DivY1::applyPostOperator(MatrixZ& rOut, const bool useReal) const
+   void DivY1::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      this->mBackend.outputScale(rOut, useReal);
+      this->mBackend.outputScale(rOut, tmp, useReal);
    }
 
 }

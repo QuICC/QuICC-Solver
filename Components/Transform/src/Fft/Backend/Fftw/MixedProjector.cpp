@@ -67,11 +67,11 @@ namespace Fftw {
       }
    }
 
-   void MixedProjector::input(MatrixZ& out, const MatrixZ& in) const
+   void MixedProjector::input(MatrixZ& tmp, const MatrixZ& in) const
    {
-      out.topRows(this->mSpecSize) = in.topRows(this->mSpecSize);
+      tmp.topRows(this->mSpecSize) = in.topRows(this->mSpecSize);
 
-      this->applyPadding(out);
+      this->applyPadding(tmp);
    }
 
    void MixedProjector::inputDiff(MatrixZ& out, const MatrixZ& in, const int order, const MHDFloat scale) const

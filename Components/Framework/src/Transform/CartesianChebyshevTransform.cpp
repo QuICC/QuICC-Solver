@@ -18,10 +18,7 @@
 // Project includes
 //
 
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D4.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D3.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D2.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
 
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"

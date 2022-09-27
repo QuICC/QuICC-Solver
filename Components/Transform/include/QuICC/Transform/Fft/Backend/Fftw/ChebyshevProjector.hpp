@@ -36,6 +36,7 @@ namespace Fftw {
 
    /**
     * @brief Interface for a generic Chebyshev FFTW based projector
+    * Backward transform, spectral to physical space
     */ 
    class ChebyshevProjector: public IChebyshevBackend
    {
@@ -48,12 +49,12 @@ namespace Fftw {
          /**
           * @brief Destructor
           */
-         virtual ~ChebyshevProjector();
+         ~ChebyshevProjector();
          
          /**
           * @brief Initialise the FFTW transforms
           */
-         virtual void init(const SetupType& setup) const override;
+         void init(const SetupType& setup) const final;
 
          /**
           * @brief Set Scaler array
@@ -61,20 +62,31 @@ namespace Fftw {
          void setScaler(const Array& scaler) const;
 
          /**
-          * @brief Set input
+          * @brief Copy input and pad
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
           */
-         void input(const Matrix& in, const bool needPadding = false) const;
+         void input(Matrix& tmp, const Matrix& in) const;
 
          /**
-          * @brief Set input
+          * @brief Copy input real or imaginary part and pad
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param useReal flag to extract real or im part
           */
-         void input(const MatrixZ& in, const bool useReal, const bool needPadding = false) const;
+         void input(Matrix& tmp, const MatrixZ& in, const bool useReal) const;
 
          /**
-          * @brief Set input and output to internal temporary storage
+          * @brief Copy input real or imaginary part and shift
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param shift
+          * @param useReal flag to extract real or im part
           */
-         void io() const;
-         using IChebyshevBackend::io;
+         void input(Matrix& tmp, const MatrixZ& in, const int shift, const bool useReal) const;
 
          /**
           * @brief Set output
@@ -84,7 +96,7 @@ namespace Fftw {
          /**
           * @brief Set output
           */
-         void output(MatrixZ& rOut, const bool useReal) const;
+         void output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
           * @brief Set output scaled by array
@@ -94,12 +106,12 @@ namespace Fftw {
          /**
           * @brief Set output scaled by array
           */
-         void outputScale(MatrixZ& rOut, const bool useReal) const;
+         void outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
-          * @brief Apply FFT
+          * @brief Apply FFT spectral to physical space
           */
-         virtual void applyFft() const override;
+         void applyFft(Matrix& phys, const Matrix& mods) const override;
 
          /**
           * @brief Add new linear solver
@@ -117,7 +129,9 @@ namespace Fftw {
           * @brief Get solution from solver
           *
           */
-         void getSolution(const int zeroRows = 0, const int extraRows = 0, const bool updateSolver = false) const;
+         void getSolution(Matrix& tmp, const int zeroRows = 0,
+            const int extraRows = 0,
+            const bool updateSolver = false) const;
          
       protected:
 

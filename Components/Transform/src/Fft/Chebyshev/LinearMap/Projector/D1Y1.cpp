@@ -59,31 +59,25 @@ namespace Projector {
       this->mBackend.addSolver(1);
    }
 
-   void D1Y1::applyPreOperator(Matrix& rOut, const Matrix& in) const
+   void D1Y1::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
       this->mBackend.solver().inputSpectral(in);
-
-      this->mBackend.getSolution(1, 1);
-
-      this->mBackend.output(rOut);
+      this->mBackend.getSolution(tmp, 1, 1);
    }
 
    void D1Y1::applyPostOperator(Matrix&) const
    {
    }
 
-   void D1Y1::applyPreOperator(const MatrixZ& in, const bool useReal) const
+   void D1Y1::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
       this->mBackend.solver().inputSpectral(in, useReal);
-
-      this->mBackend.getSolution(1, 1);
-
-      this->mBackend.io();
+      this->mBackend.getSolution(tmp, 1, 1);
    }
 
-   void D1Y1::applyPostOperator(MatrixZ& rOut, const bool useReal) const
+   void D1Y1::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      this->mBackend.output(rOut, useReal);
+      this->mBackend.output(rOut, tmp, useReal);
    }
 
 }

@@ -93,16 +93,6 @@ namespace Fftw {
          mutable int mNegN;
 
          /**
-          * @brief Input data pointer
-          */
-         mutable const MHDComplex* mpIn;
-
-         /**
-          * @brief Out data pointer
-          */
-         mutable MHDComplex* mpOut;
-
-         /**
           * @brief Temporary data
           */
          mutable MatrixZ  mTmp;

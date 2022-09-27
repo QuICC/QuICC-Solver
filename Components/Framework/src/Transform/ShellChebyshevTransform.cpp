@@ -20,8 +20,7 @@
 
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY2.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D2.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1Y1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY1D1Y1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/SphRadLapl.hpp"

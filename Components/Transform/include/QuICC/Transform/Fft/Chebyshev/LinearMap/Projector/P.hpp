@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_PROJECTOR_P_HPP
 #define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_PROJECTOR_P_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -57,33 +48,35 @@ namespace Projector {
          /**
           * @brief Apply pre FFT operator
           *
-          * @param rOut Output values
+          * @param tmp Temporary padded modal values
           * @param in   Input values
           */
-         virtual void applyPreOperator(Matrix& rOut, const Matrix& in) const;
+         void applyPreOperator(Matrix& tmp, const Matrix& in) const final;
 
          /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(Matrix& rOut) const;
+         void applyPostOperator(Matrix& rOut) const final;
 
          /**
           * @brief Apply pre FFT operator for component wise openerations
           *
-          * @param in   Input values
+          * @param tmp Temporary padded modal values, either real or im part only
+          * @param in Input values
           * @param useReal Real vs Imag flag
           */
-         virtual void applyPreOperator(const MatrixZ& in, const bool useReal) const;
+         void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const final;
 
          /**
           * @brief Apply post FFT operator for component wise operations
           *
-          * @param rOut Output values
+          * @param rOut Scaled values
+          * @param tmp Real or imag coefficients
           * @param useReal Real vs Imag flag
           */
-         virtual void applyPostOperator(MatrixZ& rOut, const bool useReal) const;
+         void applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const final;
    };
 
 }

@@ -65,8 +65,20 @@
  * @brief This namespace provides all the timestep related code.
  *
  * @namespace QuICC::Transform
- * @brief This namespace provides all the transform related code
+ * @brief This namespace provides all the transform related code.
+ *
+ * @namespace QuICC::Transform::Fft
+ * @brief This namespace provides all the FFT related code.
+ *
+ * @namespace QuICC::Transform::Fft::Chebyshev
+ * @brief This Namespace provides all the Chebyshev FFT related code.
+ *
+ * @namespace QuICC::Transform::Fft::Chebyshev::LinearMap
+ * @brief This Namespace provides all the Chebyshev FFT with linear mapping related code.
+ *
+ * @namespace QuICC::Transform::Fft::Chebyshev::LinearMap::Projector
+ * @brief This Namespace provides all the projectors related code.
  *
  * @namespace QuICC::TestSuite
- * @brief This namespace provides all the TestSuite related code
+ * @brief This namespace provides all the TestSuite related code.
  */

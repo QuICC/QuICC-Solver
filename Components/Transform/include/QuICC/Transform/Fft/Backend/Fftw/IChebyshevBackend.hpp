@@ -65,6 +65,13 @@ namespace Fftw {
           * @brief Set input and output data pointers for FFT (R2R)
           */
          virtual void io(MHDFloat* out, const MHDFloat* in) const;
+
+         /**
+          * @brief Get the temporary storage
+          *
+          * @param getOut return input or ouput storage
+          */
+         Matrix& getStorage(const bool getOut = false) const;
          
       protected:
          /**

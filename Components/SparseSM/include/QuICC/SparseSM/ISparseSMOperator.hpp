@@ -39,7 +39,12 @@ namespace SparseSM {
          /// Typedef for coefficient array
          typedef internal::ACoeff ACoeff_t;
 
-         /// Typedef for a triplets
+         /**
+          * @brief Typedef for a triplets
+          *
+          * (i,j,value) triplet needed to build a sparse matrix
+          *
+          */
          typedef Eigen::Triplet<Scalar_t>  Triplet_t;
 
          /// Typedef for a list of triplets

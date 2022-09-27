@@ -19,7 +19,7 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::Chebyshev::LinearMap;
 
-TEST_CASE( "Error for @Operator@ projector", "[@Operator@:@type@]" )
+TEST_CASE( "Error for @Operator@@Template@ projector", "[@CatchTestName@]" )
 {
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -30,16 +30,16 @@ TEST_CASE( "Error for @Operator@ projector", "[@Operator@:@type@]" )
    Catch::StringMaker<double>::precision = 15;
 
    // Set type
-   currentts::args().setType("@type@");
+   currentts::args().setType("@Type@");
 
    REQUIRE( (currentts::args().type == ::QuICC::TestSuite::Transform::TestType::PROJECTOR && "Test type is projector") );
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::Fft::Chebyshev::LinearMap::Projector::@Operator@ Projector;
+   typedef ::QuICC::Transform::Fft::Chebyshev::LinearMap::Projector::@Operator@@Template@ Projector;
    typedef typename currentts::Tester<Projector> Tester;
 
-   Tester tester("@Operator@.dat", currentts::args().dumpData);
+   Tester tester("@Operator@@Template@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
 
    Tester::ParameterType params = {-1};

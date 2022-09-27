@@ -48,6 +48,18 @@ namespace Fftw {
       this->mpIn = in;
    }
 
+   Matrix& IChebyshevBackend::getStorage(const bool getOut) const
+   {
+      if (getOut)
+      {
+         return this->mTmp;
+      }
+      else
+      {
+         return this->mTmpComp;
+      }
+   }
+
 }
 }
 }

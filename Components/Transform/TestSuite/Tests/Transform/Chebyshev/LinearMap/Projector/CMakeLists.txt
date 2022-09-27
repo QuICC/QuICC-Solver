@@ -2,81 +2,45 @@ message(VERBOSE "Projectors:")
 
 # Create projector tests targets
 include(ConfigureTests)
+include(SetUlp)
+
+quicc_set_ulp(_ulps
+  ULP 40 40 40 250 250 400
+  MPULP 40 40 40 900 900 600
+  )
 
 set(_tests
   P:projector
   DivY1:projector
   DivY2:projector
-  )
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Operator:type
-    ULP 40
-  )
-endforeach()
-
-if(QUICC_MULTPRECISION)
-  set(_ulp 110)
-else()
-  set(_ulp 60)
-endif()
-
-set(_tests
-  D1:projector
-  )
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Operator:type
-    ULP ${_ulp}
-  )
-endforeach()
-
-set(_tests
-  D4:projector
-  )
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Operator:type
-    ULP 150
-  )
-endforeach()
-
-if(QUICC_MULTPRECISION)
-  set(_ulp 900)
-else()
-  set(_ulp 250)
-endif()
-
-set(_tests
   D1Y1:projector
   DivY1D1Y1:projector
+  SphRadLapl:projector
   )
-foreach(_test ${_tests})
+
+foreach(_test _ulp IN ZIP_LISTS _tests _ulps)
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Operator:type
+    KEYWORD Operator:Type
     ULP ${_ulp}
   )
 endforeach()
 
-if(QUICC_MULTPRECISION)
-  set(_ulp 600)
-else()
-  set(_ulp 400)
-endif()
+quicc_set_ulp(_ulps
+  ULP 60 375 425 116
+  MPULP 150 165 525 150
+  )
 
 set(_tests
-  D3:projector
-  D2:projector
-  SphRadLapl:projector
+  D:1:projector
+  D:2:projector
+  D:3:projector
+  D:4:projector
   )
-foreach(_test ${_tests})
+foreach(_test _ulp IN ZIP_LISTS _tests _ulps)
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Operator:type
+    KEYWORD Operator:Template:Type
     ULP ${_ulp}
   )
 endforeach()

@@ -57,24 +57,21 @@ namespace Backend {
       this->mpImpl->setScaler(scaler);
    }
 
-   void ChebyshevProjector::input(const Matrix& in, const bool needPadding) const
+   void ChebyshevProjector::input(Matrix& tmp, const Matrix& in) const
    {
-      this->mpImpl->input(in, needPadding);
+      this->mpImpl->input(tmp, in);
    }
 
-   void ChebyshevProjector::input(const MatrixZ& in, const bool useReal, const bool needPadding) const
+   void ChebyshevProjector::input(Matrix& tmp, const MatrixZ& in,
+      const bool useReal) const
    {
-      this->mpImpl->input(in, useReal, needPadding);
+      this->mpImpl->input(tmp, in, useReal);
    }
 
-   void ChebyshevProjector::io() const
+   void ChebyshevProjector::input(Matrix& tmp, const MatrixZ& in,
+      const int shift, const bool useReal) const
    {
-      this->mpImpl->io();
-   }
-
-   void ChebyshevProjector::io(MHDFloat* out, const MHDFloat* in) const
-   {
-      this->mpImpl->io(out, in);
+      this->mpImpl->input(tmp, in, shift, useReal);
    }
 
    void ChebyshevProjector::output(Matrix& rOut) const
@@ -82,9 +79,9 @@ namespace Backend {
       this->mpImpl->output(rOut);
    }
 
-   void ChebyshevProjector::output(MatrixZ& rOut, const bool useReal) const
+   void ChebyshevProjector::output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      this->mpImpl->output(rOut, useReal);
+      this->mpImpl->output(rOut, tmp, useReal);
    }
 
    void ChebyshevProjector::outputScale(Matrix& rOut) const
@@ -92,14 +89,14 @@ namespace Backend {
       this->mpImpl->outputScale(rOut);
    }
 
-   void ChebyshevProjector::outputScale(MatrixZ& rOut, const bool useReal) const
+   void ChebyshevProjector::outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      this->mpImpl->outputScale(rOut, useReal);
+      this->mpImpl->outputScale(rOut, tmp, useReal);
    }
 
-   void ChebyshevProjector::applyFft() const
+   void ChebyshevProjector::applyFft(Matrix& phys, const Matrix& mods) const
    {
-      this->mpImpl->applyFft();
+      this->mpImpl->applyFft(phys, mods);
    }
 
    void ChebyshevProjector::addSolver(const int extraRows) const
@@ -107,14 +104,19 @@ namespace Backend {
       this->mpImpl->addSolver(extraRows);
    }
 
-   void ChebyshevProjector::getSolution(const int zeroRows, const int extraRows, const bool updateSolver) const
+   void ChebyshevProjector::getSolution(Matrix& tmp, const int zeroRows, const int extraRows, const bool updateSolver) const
    {
-      this->mpImpl->getSolution(zeroRows, extraRows, updateSolver);
+      this->mpImpl->getSolution(tmp, zeroRows, extraRows, updateSolver);
    }
 
    Fftw::DifferentialSolver& ChebyshevProjector::solver() const
    {
       return this->mpImpl->solver();
+   }
+
+   Matrix& ChebyshevProjector::getStorage(const bool getOut) const
+   {
+      return this->mpImpl->getStorage(getOut);
    }
 
 }

@@ -68,15 +68,11 @@ namespace Fftw {
       }
    }
 
-   void ChebyshevProjector::input(const Matrix& in, const bool needPadding) const
+   void ChebyshevProjector::input(Matrix& tmp, const Matrix& in) const
    {
-      this->mTmp.topRows(this->mSpecSize) = in.topRows(this->mSpecSize);
+      tmp.topRows(this->mSpecSize) = in.topRows(this->mSpecSize);
 
-      // Apply padding if required
-      if(needPadding)
-      {
-         this->applyPadding(this->mTmp);
-      }
+      this->applyPadding(tmp);
    }
 
    void ChebyshevProjector::setScaler(const Array& scaler) const
@@ -84,26 +80,30 @@ namespace Fftw {
       this->mScaler = scaler;
    }
 
-   void ChebyshevProjector::input(const MatrixZ& in, const bool useReal, const bool needPadding) const
+   void ChebyshevProjector::input(Matrix& tmp, const MatrixZ& in,
+      const bool useReal) const
    {
       if(useReal)
       {
-         this->mTmp.topRows(this->mSpecSize) = in.real().topRows(this->mSpecSize);
+         tmp.topRows(this->mSpecSize) = in.real().topRows(this->mSpecSize);
       } else
       {
-         this->mTmp.topRows(this->mSpecSize) = in.imag().topRows(this->mSpecSize);
+         tmp.topRows(this->mSpecSize) = in.imag().topRows(this->mSpecSize);
       }
 
-      // Apply padding if required
-      if(needPadding)
-      {
-         this->applyPadding(this->mTmp);
-      }
+      this->applyPadding(tmp);
    }
 
-   void ChebyshevProjector::io() const
+   void ChebyshevProjector::input(Matrix& tmp, const MatrixZ& in,
+      const int shift, const bool useReal) const
    {
-      this->io(this->mTmpComp.data(), this->mTmp.data());
+      if(useReal)
+      {
+         tmp.topRows(this->mSpecSize - shift) = in.real().block(shift, 0, this->mSpecSize - shift, in.cols());
+      } else
+      {
+         tmp.topRows(this->mSpecSize - shift) = in.imag().block(shift, 0, this->mSpecSize - shift, in.cols());
+      }
    }
 
    void ChebyshevProjector::output(Matrix& rOut) const
@@ -111,14 +111,14 @@ namespace Fftw {
       this->io(rOut.data(), this->mTmp.data());
    }
 
-   void ChebyshevProjector::output(MatrixZ& rOut, const bool useReal) const
+   void ChebyshevProjector::output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
       if(useReal)
       {
-         rOut.real() = this->mTmpComp;
+         rOut.real() = tmp;
       } else
       {
-         rOut.imag() = this->mTmpComp;
+         rOut.imag() = tmp;
       }
    }
 
@@ -127,14 +127,14 @@ namespace Fftw {
       rOut = this->mScaler.asDiagonal()*rOut;
    }
 
-   void ChebyshevProjector::outputScale(MatrixZ& rOut, const bool useReal) const
+   void ChebyshevProjector::outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
       if(useReal)
       {
-         rOut.real() = this->mScaler.asDiagonal()*this->mTmpComp;
+         rOut.real() = this->mScaler.asDiagonal()*tmp;
       } else
       {
-         rOut.imag() = this->mScaler.asDiagonal()*this->mTmpComp;
+         rOut.imag() = this->mScaler.asDiagonal()*tmp;
       }
    }
 
@@ -150,9 +150,9 @@ namespace Fftw {
       }
    }
 
-   void ChebyshevProjector::applyFft() const
+   void ChebyshevProjector::applyFft(Matrix& phys, const Matrix& mods) const
    {
-      fftw_execute_r2r(this->mPlan, const_cast<MHDFloat *>(this->mpIn), this->mpOut);
+      fftw_execute_r2r(this->mPlan, const_cast<MHDFloat *>(mods.data()), phys.data());
    }
 
    void ChebyshevProjector::addSolver(const int extraRows) const
@@ -160,13 +160,13 @@ namespace Fftw {
       this->mspSolver = std::make_shared<DifferentialSolver>(this->mSpecSize, this->mBlockSize, extraRows);
    }
 
-   void ChebyshevProjector::getSolution(const int zeroRows, const int extraRows, const bool updateSolver) const
+   void ChebyshevProjector::getSolution(Matrix& tmp, const int zeroRows, const int extraRows, const bool updateSolver) const
    {
-      this->solver().solve(zeroRows, this->mTmp);
-      this->applyPadding(this->mTmp, extraRows);
+      this->solver().solve(zeroRows, tmp);
+      this->applyPadding(tmp, extraRows);
       if(updateSolver)
       {
-         this->solver().input(this->mTmp, 0);
+         this->solver().input(tmp, 0);
       }
    }
 

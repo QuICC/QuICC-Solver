@@ -64,11 +64,15 @@ function(quicc_add_test target)
         message(DEBUG "_var_1: ${_var_1}: ${${_var_1}}")
       endforeach()
     endif()
-    string(REGEX REPLACE "::" "/" _cppname ${${QAT_KEYWORD}})
+
+    set(CatchTestName ${${QAT_KEYWORD}})
+    message(DEBUG "CatchTestName: ${CatchTestName}")
+    string(REGEX REPLACE "::" "/" _cppname ${CatchTestName})
     string(REGEX REPLACE ":" "_" _cppname ${_cppname})
     message(DEBUG "_cppname: ${_cppname}")
 
-    string(REGEX REPLACE ":+" "_" _keyword ${${QAT_KEYWORD}})
+    string(REGEX REPLACE ":+" "_" _keyword ${CatchTestName})
+    message(DEBUG "_keyword: ${_keyword}")
     set(testfile
       "${CMAKE_CURRENT_BINARY_DIR}/${_cppname}Test.cpp")
     message(DEBUG "testfile: ${testfile}")
@@ -78,7 +82,7 @@ function(quicc_add_test target)
     )
   endif()
 
-  quicc_target_sources(${QAT_COMMAND} PRIVATE
+  target_sources(${QAT_COMMAND} PRIVATE
     ${testfile}
   )
 
