@@ -46,15 +46,20 @@ namespace Variable {
    {
       this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123);
 
-      int m0, l0;
-      if(this->mHasMOrdering)
+      int m0 = -1;
+      int l0 = -1;
+
+      if(this->res().cpu()->dim(Dimensions::Transform::SPECTRAL)->dim<Dimensions::Data::DAT3D>() > 0)
       {
-         m0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         l0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0);
-      } else
-      {
-         l0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         m0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0);
+         if(this->mHasMOrdering)
+         {
+            m0 = this->res().cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT3D>(0);
+            l0 = this->res().cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT2D>(0,0);
+         } else
+         {
+            l0 = this->res().cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT3D>(0);
+            m0 = this->res().cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT2D>(0,0);
+         }
       }
 
       // Background state

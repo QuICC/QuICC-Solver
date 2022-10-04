@@ -49,6 +49,7 @@ namespace SpatialScheme {
       this->enable(Feature::RegularSpectrum);
       this->enable(Feature::SpectralMatrix3D);
       this->enable(Feature::SpectralOrdering123);
+      this->enable(Feature::TransformSpectralOrdering123);
       this->enable(Feature::RealSpectrum);
    }
 

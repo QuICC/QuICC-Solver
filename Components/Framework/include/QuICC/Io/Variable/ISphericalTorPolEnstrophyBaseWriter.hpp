@@ -69,6 +69,11 @@ namespace Variable {
          
       protected:
          /**
+          * @brief Prepare spectral field data for computation
+          */
+         void prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord);
+
+         /**
           * @brief Data ordering is m slowest
           */
          bool mHasMOrdering;

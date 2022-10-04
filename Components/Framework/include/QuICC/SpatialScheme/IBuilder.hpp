@@ -105,6 +105,11 @@ namespace SpatialScheme {
           * @brief Add index counter to shared resolution
           */
          virtual void addIndexCounter(SharedResolution spRes);
+
+         /**
+          * @brief Spectral space and transform have different ordering?
+          */
+         virtual bool sameSpectralOrdering() const;
          
       protected:
          /**

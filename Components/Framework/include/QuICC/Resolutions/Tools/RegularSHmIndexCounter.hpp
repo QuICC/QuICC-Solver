@@ -1,6 +1,6 @@
 /** 
  * @file RegularSHmIndexCounter.hpp
- * @brief Implementation of spherical harmonic index counter with m spectral ordering with regular radial truncation
+ * @brief Implementation of spherical harmonic index counter with m spectral and transform ordering with regular radial truncation
  */
 
 #ifndef QUICC_REGULARSHMINDEXCOUNTER_HPP

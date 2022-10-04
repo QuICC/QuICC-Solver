@@ -57,11 +57,15 @@ namespace QuICC {
       {
          // Dealias variable data
          scalar_iterator_range sRange = this->scalarRange();
-      assert(std::distance(sRange.first, sRange.second) == 1);
+         assert(std::distance(sRange.first, sRange.second) == 1);
 
          if(this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0 && this->mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0) == 0)
          {
-            std::visit([&](auto&& p){coord.communicator().dealiasSpectral(p->rDom(0).rTotal());}, sRange.first->second);
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     coord.communicator().transferForward(Dimensions::Transform::SPECTRAL, p->rDom(0).rTotal(), false);
+                  }, sRange.first->second);
 
             // Recover dealiased BWD data
             auto pInVar = coord.ss().bwdPtr(Dimensions::Transform::TRA1D);

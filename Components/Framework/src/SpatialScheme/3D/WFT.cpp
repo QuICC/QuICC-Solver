@@ -60,6 +60,7 @@ namespace SpatialScheme {
       this->enable(Feature::RegularSpectrum);
       this->enable(Feature::SpectralMatrix2D);
       this->enable(Feature::SpectralOrdering132);
+      this->enable(Feature::TransformSpectralOrdering132);
       this->enable(Feature::ComplexSpectrum);
    }
 

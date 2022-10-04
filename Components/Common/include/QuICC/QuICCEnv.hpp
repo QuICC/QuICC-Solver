@@ -22,4 +22,4 @@ namespace QuICC {
 
 }
 
-#endif // QUICC_IENVIRONMENT_HPP
+#endif // QUICC_QUICCENV_HPP

@@ -66,12 +66,26 @@ namespace Transform {
 
       protected:
          /**
-          * @brief Setup grouped first exchange communication
+          * @brief Setup grouped spectral exchange communication between first transform and spectra
+          *
+          * @param tree Transform tree describing what fields and what operators to apply
+          * @param cood Transform coordinator holding communicators and transforms
+          */
+         void setupGroupedSpectralCommunication(const TransformTree& tree, TransformCoordinatorType& coord);
+
+         /**
+          * @brief Setup grouped first exchange communication between second and first transform
+          *
+          * @param tree Transform tree describing what fields and what operators to apply
+          * @param cood Transform coordinator holding communicators and transforms
           */
          void setupGrouped1DCommunication(TransformCoordinatorType& coord);
 
          /**
-          * @brief Setup grouped second exchange communication
+          * @brief Setup grouped second exchange communication between third and second transform
+          *
+          * @param tree Transform tree describing what fields and what operators to apply
+          * @param cood Transform coordinator holding communicators and transforms
           */
          void setupGrouped2DCommunication(TransformCoordinatorType& coord);
 
@@ -119,13 +133,29 @@ namespace Transform {
             {
                auto scalIt = scalars.find(it->name());
 
+               // Setup the first exchange communication step for scalar fields
+               this->setupGroupedSpectralCommunication(*it, coord);
+
+               // Compute spectral step of transform for scalar fields
+               TConfigurator::spectralStep(*it, scalIt->second, coord);
+               // Initiate the first exchange communication step for scalar fields
+               TConfigurator::template initiateCommunication<Dimensions::Transform::TRA1D>(coord);
+
                // Compute first step of transform for scalar fields
                TConfigurator::firstStep(*it, scalIt->second, coord);
-
+            }
             // Transform vector variable
-            } else
+            else
             {
                auto vectIt = vectors.find(it->name());
+
+               // Setup the first exchange communication step for scalar fields
+               this->setupGroupedSpectralCommunication(*it, coord);
+
+               // Compute spectral step of transform for vector fields
+               TConfigurator::spectralStep(*it, vectIt->second, coord);
+               // Initiate the spectral exchange communication step for vector fields
+               TConfigurator::template initiateCommunication<Dimensions::Transform::TRA1D>(coord);
 
                // Compute first step of transform for vector fields
                TConfigurator::firstStep(*it, vectIt->second, coord);
@@ -134,7 +164,7 @@ namespace Transform {
       }
 
       // Initiate the grouped first exchange communication
-      TConfigurator::initiate1DCommunication(coord);
+      TConfigurator::template initiateCommunication<Dimensions::Transform::TRA2D>(coord);
 
       // Setup the grouped second exchange communication
       this->setupGrouped2DCommunication(coord);
@@ -153,9 +183,9 @@ namespace Transform {
 
                // Compute second step of transform for scalar fields
                TConfigurator::secondStep(*it, scalIt->second, coord);
-
-               // Transform vector variable
-            } else
+            }
+            // Transform vector variable
+            else
             {
                auto vectIt = vectors.find(it->name());
 
@@ -166,7 +196,7 @@ namespace Transform {
       }
 
       // Initiate the grouped second exchange communication
-      TConfigurator::initiate2DCommunication(coord);
+      TConfigurator::template initiateCommunication<Dimensions::Transform::TRA3D>(coord);
 
       //
       // Compute last step
@@ -182,9 +212,9 @@ namespace Transform {
 
                // Compute last step of transform for scalar fields
                TConfigurator::lastStep(*it, scalIt->second, coord);
-
-               // Transform vector variable
-            } else
+            }
+            // Transform vector variable
+            else
             {
                auto vectIt = vectors.find(it->name());
 
@@ -195,11 +225,18 @@ namespace Transform {
       }
    }
 
+   template <typename TConfigurator> void BackwardTransformGrouper<TConfigurator>::setupGroupedSpectralCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
+   {
+      const int packs = 1;
+
+      TConfigurator::template setupCommunication<Dimensions::Transform::TRA1D>(packs, coord);
+   }
+
    template <typename TConfigurator> void BackwardTransformGrouper<TConfigurator>::setupGrouped1DCommunication(TransformCoordinatorType& coord)
    {
       if(this->mGroupedPacks1D > 0)
       {
-         TConfigurator::setup1DCommunication(this->mGroupedPacks1D, coord);
+         TConfigurator::template setupCommunication<Dimensions::Transform::TRA2D>(this->mGroupedPacks1D, coord);
       }
    }
 
@@ -207,7 +244,7 @@ namespace Transform {
    {
       if(this->mGroupedPacks2D > 0)
       {
-         TConfigurator::setup2DCommunication(this->mGroupedPacks2D, coord);
+         TConfigurator::template setupCommunication<Dimensions::Transform::TRA3D>(this->mGroupedPacks2D, coord);
       }
    }
 

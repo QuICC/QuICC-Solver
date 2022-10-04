@@ -87,7 +87,7 @@ namespace Parallel {
                // Add the tubular splitting algorithm
                if(enabled.count(Splitting::Algorithms::TUBULAR) == 1)
                {
-                  this->mAlgorithms.push_back(std::make_shared<TubularSplitting>(this->mId, this->mNCpu, dim));
+                  this->mAlgorithms.push_back(std::make_shared<TubularSplitting>(this->mId, this->mNCpu, dim, Splitting::Locations::BOTH));
                }
             }
 
@@ -167,25 +167,26 @@ namespace Parallel {
       // Make sure there is at least one successful splitting (score > 0)
       if(this->mScores.size() > 0)
       {
+         // Get best
+         auto&& bestPair = this->mScores.rbegin()->second;
+
          if(needCommStructure)
          {
+            auto&& bestRes = bestPair.first;
+            auto&& bestDescr = bestPair.second;
+
             // Build communication structure
-            SplittingAlgorithm::buildCommunicationStructure(this->mId, this->mScores.rbegin()->second.first, this->mScores.rbegin()->second.second.structure);
+            SplittingAlgorithm::buildCommunicationStructure(this->mId, bestRes, bestDescr.structure);
 
             // Describe the splitting with the highest score
-            this->describeSplitting(this->mScores.rbegin()->second.second);
+            this->describeSplitting(bestDescr);
 
-            #ifdef QUICC_DEBUG
-            for(auto it = this->mScores.rbegin()->second.second.vtpFiles.cbegin(); it != this->mScores.rbegin()->second.second.vtpFiles.cend(); ++it)
-            {
-               (*it)->write();
-               (*it)->finalize();
-            }
-            #endif //QUICC_DEBUG
+            // Save stage description
+            bestDescr.save();
          }
 
          // Return the splitting with the highest score
-         return this->mScores.rbegin()->second;
+         return bestPair;
       } else
       {
          throw std::logic_error("No usable splitting has been found!");

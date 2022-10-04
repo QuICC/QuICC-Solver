@@ -39,9 +39,9 @@ BoussinesqSphereDynamoExplicit_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqSphereDynamoImplicit_serial:
+BoussinesqSphereDynamoImplicit_single2d_serial:
   extends:
-  - .BoussinesqSphereDynamoImplicit
+  - .BoussinesqSphereDynamoImplicit_single2d
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:
@@ -59,9 +59,9 @@ BoussinesqShellDynamoExplicit_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqShellDynamoImplicit_serial:
+BoussinesqShellDynamoImplicit_single2d_serial:
   extends:
-  - .BoussinesqShellDynamoImplicit
+  - .BoussinesqShellDynamoImplicit_single2d
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:
@@ -69,9 +69,9 @@ BoussinesqShellDynamoImplicit_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqSphereRTCExplicit_serial:
+BoussinesqSphereRTCExplicit_serial_serial:
   extends:
-  - .BoussinesqSphereRTCExplicit
+  - .BoussinesqSphereRTCExplicit_serial
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:
@@ -79,9 +79,9 @@ BoussinesqSphereRTCExplicit_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqSphereRTCImplicit_serial:
+BoussinesqSphereRTCImplicit_serial_serial:
   extends:
-  - .BoussinesqSphereRTCImplicit
+  - .BoussinesqSphereRTCImplicit_serial
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:
@@ -89,9 +89,9 @@ BoussinesqSphereRTCImplicit_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqShellRTCExplicit_serial:
+BoussinesqShellRTCExplicit_serial_serial:
   extends:
-  - .BoussinesqShellRTCExplicit
+  - .BoussinesqShellRTCExplicit_serial
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:
@@ -99,9 +99,9 @@ BoussinesqShellRTCExplicit_serial:
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     QUICC_VERSION_TAG: serial
-BoussinesqShellRTCImplicit_serial:
+BoussinesqShellRTCImplicit_serial_serial:
   extends:
-  - .BoussinesqShellRTCImplicit
+  - .BoussinesqShellRTCImplicit_serial
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
   variables:

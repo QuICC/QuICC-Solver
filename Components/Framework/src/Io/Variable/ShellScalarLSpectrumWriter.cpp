@@ -49,7 +49,7 @@ namespace Variable {
       MHDFloat ro = this->mPhysical.find(NonDimensional::Upper1D::id())->second->value();
       this->mVolume = (4.0/3.0)*Math::PI*(std::pow(ro,3) - std::pow(ri,3));
 
-      this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123);
+      this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::TransformSpectralOrdering123);
 
       ISphericalScalarLSpectrumWriter::init();
    }

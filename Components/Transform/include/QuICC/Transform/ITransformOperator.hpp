@@ -65,7 +65,7 @@ namespace Transform {
          void setProfileTag();
 
          /**
-          * @brief Profiling ID
+          * @brief Profiling tag
           */
          std::string mProfileTag;
 

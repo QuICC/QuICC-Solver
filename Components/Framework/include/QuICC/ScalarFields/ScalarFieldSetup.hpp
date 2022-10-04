@@ -95,6 +95,16 @@ namespace Datatypes {
           * @brief Array of dimensions for the first data dimension
           */
          int mDim3D;
+
+         /**
+          * @brief Number of rows of 2D storage
+          */
+         int mDataRows;
+
+         /**
+          * @brief Number of columns of 2D storage
+          */
+         int mDataCols;
    };
 
 }

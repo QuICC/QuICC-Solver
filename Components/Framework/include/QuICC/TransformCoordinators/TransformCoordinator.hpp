@@ -272,6 +272,7 @@ namespace QuICC {
       {
          this->mCommunicator.init(it->first, spRes->spFwdSetup(it->first), spRes->spBwdSetup(it->first));
       }
+      this->mCommunicator.init(Dimensions::Transform::SPECTRAL, spRes->spSpectralSetup(), spRes->spSpectralSetup());
    }
 
    template <typename TComm>

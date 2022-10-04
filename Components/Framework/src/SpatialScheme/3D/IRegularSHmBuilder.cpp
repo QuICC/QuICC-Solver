@@ -71,19 +71,19 @@ namespace SpatialScheme {
       if(flag == Splitting::Locations::NONE)
       {
          this->splitSerial(modes, transId);
-
+      }
       // Splitting is on first transform
-      }else if(flag == Splitting::Locations::FIRST)
+      else if(flag == Splitting::Locations::FIRST)
       {
          this->splitSingle1D(modes, n0, nN, transId);
-
+      }
       // Splitting is on second transform
-      } else if(flag == Splitting::Locations::SECOND)
+      else if(flag == Splitting::Locations::SECOND)
       {
          this->splitSingle2D(modes, id, bins, n0, nN, transId);
-
+      }
       // Splitting is on both transforms
-      } else if(flag == Splitting::Locations::BOTH)
+      else if(flag == Splitting::Locations::BOTH)
       {
          this->splitTubular(modes, id, bins, n0, nN, transId);
       }
@@ -92,11 +92,11 @@ namespace SpatialScheme {
       Tools::Regular::fillIndexes2D3D(idx2D, idx3D, modes);
 
       // Fill indexes for 1D
-      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::TRA3D)
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::TRA3D || transId == Dimensions::Transform::SPECTRAL)
       {
          Tools::Regular::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
-
-      } else if(transId == Dimensions::Transform::TRA2D)
+      }
+      else if(transId == Dimensions::Transform::TRA2D)
       {
          Tools::SH::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
       }
@@ -117,58 +117,58 @@ namespace SpatialScheme {
       if(flag == Splitting::Locations::FIRST)
       {
          // Get total size for first transform
-         if(transId == Dimensions::Transform::TRA1D)
+         if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
          {
-            int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
-            int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+            int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+            int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
             return Tools::SH::nHarmonics(nL, nM);
-
+         }
          // Get total size for second transform
-         } else if(transId == Dimensions::Transform::TRA2D)
+         else if(transId == Dimensions::Transform::TRA2D)
          {
             return this->dim(transId, Dimensions::Data::DAT2D);
-
+         }
          // Get total size for third transform
-         } else if(transId == Dimensions::Transform::TRA3D)
+         else if(transId == Dimensions::Transform::TRA3D)
          {
             return this->dim(transId, Dimensions::Data::DAT3D);
          }
-
+      }
       // Splittable size for second transform splitting
-      } else if(flag == Splitting::Locations::SECOND)
+      else if(flag == Splitting::Locations::SECOND)
       {
          // Get total size for first transform
-         if(transId == Dimensions::Transform::TRA1D)
+         if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
          {
             return this->dim(transId, Dimensions::Data::DAT3D);
-
+         }
          // Get total size for second transform
-         } else if(transId == Dimensions::Transform::TRA2D)
+         else if(transId == Dimensions::Transform::TRA2D)
          {
             return this->dim(transId, Dimensions::Data::DAT3D);
-
+         }
          // Get total size for third transform
-         } else if(transId == Dimensions::Transform::TRA3D)
+         else if(transId == Dimensions::Transform::TRA3D)
          {
             return this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
          }
-
+      }
       // Splittable size for both transforms splitting
-      } else if(flag == Splitting::Locations::BOTH)
+      else if(flag == Splitting::Locations::BOTH)
       {
          // Get total size for first transform
-         if(transId == Dimensions::Transform::TRA1D)
+         if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
          {
             return this->dim(transId, Dimensions::Data::DAT2D);
-
+         }
          // Get total size for second transform
-         } else if(transId == Dimensions::Transform::TRA2D)
+         else if(transId == Dimensions::Transform::TRA2D)
          {
             return this->dim(transId, Dimensions::Data::DAT3D);
-
+         }
          // Get total size for third transform
-         } else if(transId == Dimensions::Transform::TRA3D)
+         else if(transId == Dimensions::Transform::TRA3D)
          {
             return this->dim(transId, Dimensions::Data::DAT2D);
          }
@@ -182,19 +182,22 @@ namespace SpatialScheme {
 
    void IRegularSHmBuilder::splitSerial(std::multimap<int,int>& modes, const Dimensions::Transform::Id transId)
    {
-      if(transId == Dimensions::Transform::TRA1D)
+      // Create index list for first transform
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
       {
          int nL = this->dim(transId, Dimensions::Data::DAT2D);
          int nM = this->dim(transId, Dimensions::Data::DAT3D);
 
          // Get full list of harmonics mapped by harmonic order m
          Tools::SH::buildMMap(modes, nL, nM);
-      } else
+      }
+      // Create index list for second and third transform
+      else
       {
          int k0 = 0;
          int kN = this->dim(transId, Dimensions::Data::DAT3D);
          ArrayI j0 = ArrayI::Zero(kN);
-         ArrayI jN = ArrayI::Constant(kN,this->dim(transId, Dimensions::Data::DAT2D));
+         ArrayI jN = ArrayI::Constant(kN, this->dim(transId, Dimensions::Data::DAT2D));
          int c0 = 0;
          int cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
 
@@ -205,16 +208,16 @@ namespace SpatialScheme {
    void IRegularSHmBuilder::splitSingle1D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
    {
       // Create index list for first transform
-      if(transId == Dimensions::Transform::TRA1D)
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
       {
-         int nL = this->dim(transId, Dimensions::Data::DAT3D);
-         int nM = this->dim(transId, Dimensions::Data::DAT2D);
+         int nL = this->dim(transId, Dimensions::Data::DAT2D);
+         int nM = this->dim(transId, Dimensions::Data::DAT3D);
 
          // Get restricted sorted list of harmonics
          Tools::SH::buildMHSortedMap(modes, nL, nM, n0(0), nN(0));
-
+      }
       // Create index list for second transform
-      } else if(transId == Dimensions::Transform::TRA2D)
+      else if(transId == Dimensions::Transform::TRA2D)
       {
          int k0 = 0;
          int kN = this->dim(transId, Dimensions::Data::DAT3D);
@@ -224,9 +227,9 @@ namespace SpatialScheme {
          int cN = this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
 
          Tools::Regular::buildMap(modes, k0, kN, j0, jN, c0, cN);
-
+      }
       // Create index list for third transform
-      } else if(transId == Dimensions::Transform::TRA3D)
+      else if(transId == Dimensions::Transform::TRA3D)
       {
          int k0 = n0(0);
          int kN = nN(0);
@@ -242,10 +245,10 @@ namespace SpatialScheme {
    void IRegularSHmBuilder::splitSingle2D(std::multimap<int,int>& modes, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
    {
       // Create index list for first transform
-      if(transId == Dimensions::Transform::TRA1D)
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
       {
-         int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
-         int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
+         int nL = this->dim(transId, Dimensions::Data::DAT2D);
+         int nM = this->dim(transId, Dimensions::Data::DAT3D);
 
          // Get restricted list of harmonics
          std::vector<int> binOrders;
@@ -259,9 +262,9 @@ namespace SpatialScheme {
                modes.insert(std::make_pair(*vIt, l));
             }
          }
-
+      }
       // Create index list for second transform
-      } else if(transId == Dimensions::Transform::TRA2D)
+      else if(transId == Dimensions::Transform::TRA2D)
       {
          int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
          int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
@@ -278,9 +281,9 @@ namespace SpatialScheme {
                modes.insert(std::make_pair(*vIt, r));
             }
          }
-
+      }
       // Create index list for third transform
-      } else if(transId == Dimensions::Transform::TRA3D)
+      else if(transId == Dimensions::Transform::TRA3D)
       {
          int k0 = 0;
          int kN = this->dim(transId, Dimensions::Data::DAT3D);
@@ -296,10 +299,10 @@ namespace SpatialScheme {
    void IRegularSHmBuilder::splitTubular(std::multimap<int,int>& modes, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
    {
       // Create index list for first transform
-      if(transId == Dimensions::Transform::TRA1D)
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
       {
-         int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
-         int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
+         int nL = this->dim(transId, Dimensions::Data::DAT2D);
+         int nM = this->dim(transId, Dimensions::Data::DAT3D);
 
          // Get restricted list of harmonic orders
          std::vector<int> binOrders;
@@ -327,8 +330,9 @@ namespace SpatialScheme {
             ++i;
          }
 
+      }
       // Create index list for second transform
-      } else if(transId == Dimensions::Transform::TRA2D)
+      else if(transId == Dimensions::Transform::TRA2D)
       {
          int nL = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
          int nM = this->dim(Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
@@ -345,9 +349,9 @@ namespace SpatialScheme {
                modes.insert(std::make_pair(*vIt, n0(1) + r));
             }
          }
-
+      }
       // Create index list for third transform
-      } else if(transId == Dimensions::Transform::TRA3D)
+      else if(transId == Dimensions::Transform::TRA3D)
       {
          int k0 = n0(0);
          int kN = nN(0);

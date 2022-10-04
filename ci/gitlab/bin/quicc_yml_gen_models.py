@@ -9,7 +9,7 @@ from quicc_defaults import config, defaultConfigs
 def populateYaml(cnf):
     libPath = '${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}'
     modelPath = libPath+'-'+cnf.name+cnf.tag
-    configIn = { '.'+cnf.name+cnf.tag:
+    configIn = { '.'+cnf.fullname():
         {
             'stage': 'model-build-and-test',
             'script':
@@ -36,15 +36,15 @@ def populateYaml(cnf):
         }
     }
     if cnf.test:
-        configIn['.'+cnf.name+cnf.tag]['script'].extend(
+        configIn['.'+cnf.fullname()]['script'].extend(
             [
                 # export manually non-default path
                 'export PYTHONPATH='+modelPath+'/build/lib/python',
                 # cannot run the mpi model through ctest within a srun command
-                'cd '+modelPath+'/build/Models/'+cnf.name+'/TestSuite/Benchmarks/_data/'+cnf.tag,
+                'cd '+modelPath+'/build/Models/'+cnf.name+'/TestSuite/Benchmarks/_data/'+cnf.tag+cnf.variant,
                 modelPath+'/build/Models/'+cnf.name+'/Executables/'+cnf.name+cnf.tag+'Model',
                 'cd '+modelPath+'/build',
-                '/QuICC.src/ci/gitlab/bin/mpi_lock.sh \"ctest --no-tests=error --verbose -R ValidateBenchmark'+cnf.name+cnf.tag+' && echo ${QUICC_VERSION_TAG}\"'
+                '/QuICC.src/ci/gitlab/bin/mpi_lock.sh \"ctest --no-tests=error --verbose -R ValidateBenchmark'+cnf.name+cnf.tag+'Model'+cnf.variant+'$ && echo ${QUICC_VERSION_TAG}\"'
             ]
         )
 

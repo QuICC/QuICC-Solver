@@ -164,11 +164,6 @@ namespace QuICC {
 
       protected:
          /**
-          * @brief Execution timer
-          */
-         ExecutionTimer mExecutionTimer;
-
-         /**
           * @brief Shared resolution
           */
          SharedResolution mspRes;

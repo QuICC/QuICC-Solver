@@ -22,6 +22,7 @@
 #include "QuICC/Transform/MixedFourierTransform.hpp"
 #include "QuICC/Communicators/Converters/SHlIndexConv.hpp"
 #include "QuICC/Communicators/Converters/NoIndexConv.hpp"
+#include "QuICC/Communicators/Converters/PassthroughIndexConv.hpp"
 #include "QuICC/Equations/Tools/SHl.hpp"
 #include "QuICC/Equations/Tools/SHlm.hpp"
 
@@ -61,6 +62,7 @@ namespace SpatialScheme {
       this->enable(Feature::FourierIndex2);
       this->enable(Feature::SpectralMatrix1D);
       this->enable(Feature::SpectralOrdering132);
+      this->enable(Feature::TransformSpectralOrdering132);
       this->enable(Feature::ComplexSpectrum);
    }
 
@@ -130,6 +132,9 @@ namespace SpatialScheme {
 
       switch(id)
       {
+         case Dimensions::Transform::TRA1D:
+            spConv = std::make_shared<Parallel::PassthroughIndexConv>();
+            break;
          case Dimensions::Transform::TRA2D:
             spConv = std::make_shared<Parallel::SHlIndexConv>();
             break;
@@ -172,6 +177,9 @@ namespace SpatialScheme {
          case Dimensions::Transform::TRA3D:
             v = std::forward<SLFl::RealTransformDataType *>(0);
             break;
+         case Dimensions::Transform::SPECTRAL:
+            v = std::forward<SLFl::ComplexTransformDataType *>(0);
+            break;
          default:
             throw std::logic_error("Requested forward pointer for unknown dimension");
       }
@@ -190,6 +198,9 @@ namespace SpatialScheme {
             v = std::forward<SLFl::ComplexTransformDataType *>(0);
             break;
          case Dimensions::Transform::TRA3D:
+            v = std::forward<SLFl::ComplexTransformDataType *>(0);
+            break;
+         case Dimensions::Transform::SPECTRAL:
             v = std::forward<SLFl::ComplexTransformDataType *>(0);
             break;
          default:

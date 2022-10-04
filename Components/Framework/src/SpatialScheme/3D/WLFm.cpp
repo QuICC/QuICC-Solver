@@ -20,7 +20,8 @@
 #include "QuICC/Transform/SphereWorlandTransform.hpp"
 #include "QuICC/Transform/ALegendreTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
-#include "QuICC/Communicators/Converters/SHmIndexConv.hpp"
+#include "QuICC/Communicators/Converters/SHm2lIndexConv.hpp"
+#include "QuICC/Communicators/Converters/SHlIndexConv.hpp"
 #include "QuICC/Communicators/Converters/NoIndexConv.hpp"
 #include "QuICC/Equations/Tools/SHm.hpp"
 
@@ -60,6 +61,7 @@ namespace SpatialScheme {
       this->enable(Feature::FourierIndex3);
       this->enable(Feature::SpectralMatrix2D);
       this->enable(Feature::SpectralOrdering123);
+      this->enable(Feature::TransformSpectralOrdering132);
       this->enable(Feature::ComplexSpectrum);
    }
 
@@ -129,8 +131,11 @@ namespace SpatialScheme {
 
       switch(id)
       {
+         case Dimensions::Transform::TRA1D:
+            spConv = std::make_shared<Parallel::SHm2lIndexConv>();
+            break;
          case Dimensions::Transform::TRA2D:
-            spConv = std::make_shared<Parallel::SHmIndexConv>();
+            spConv = std::make_shared<Parallel::SHlIndexConv>();
             break;
          case Dimensions::Transform::TRA3D:
             spConv = std::make_shared<Parallel::NoIndexConv>();
@@ -166,6 +171,9 @@ namespace SpatialScheme {
          case Dimensions::Transform::TRA3D:
             v = std::forward<WLFm::RealTransformDataType *>(0);
             break;
+         case Dimensions::Transform::SPECTRAL:
+            v = std::forward<WLFm::ComplexTransformDataType *>(0);
+            break;
          default:
             throw std::logic_error("Requested forward pointer for unknown dimension");
       }
@@ -184,6 +192,9 @@ namespace SpatialScheme {
             v = std::forward<WLFm::ComplexTransformDataType *>(0);
             break;
          case Dimensions::Transform::TRA3D:
+            v = std::forward<WLFm::ComplexTransformDataType *>(0);
+            break;
+         case Dimensions::Transform::SPECTRAL:
             v = std::forward<WLFm::ComplexTransformDataType *>(0);
             break;
          default:

@@ -32,12 +32,12 @@ namespace Parallel {
          /**
           * @brief Constructor
           */
-         IIndexConv();
+         IIndexConv() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IIndexConv();
+         virtual ~IIndexConv() = default;
 
          /**
           * @brief Initialize index conversions
@@ -65,15 +65,6 @@ namespace Parallel {
          virtual int i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK) const = 0;
 
          /**
-          * @brief Convert first index (3D) (specialised serial version)
-          *
-          * @param i    Array index off first dimension
-          * @param j    Array index of second dimension
-          * @param k    Array index of third dimension
-          */
-         virtual int iS(const int i, const int j, const int k) const = 0;
-
-         /**
           * @brief Convert first index (2D)
           *
           * @param i    Array index off first dimension
@@ -82,14 +73,6 @@ namespace Parallel {
           * @param idxJ Physical index of second dimension
           */
          virtual int i(const int i, const int j, const int idxI, const int idxJ) const = 0;
-
-         /**
-          * @brief Convert first index (2D) (specialised serial version)
-          *
-          * @param i    Array index off first dimension
-          * @param j    Array index of second dimension
-          */
-         virtual int iS(const int i, const int j) const = 0;
 
          /**
           * @brief Convert first index (1D)
@@ -111,15 +94,6 @@ namespace Parallel {
          virtual int j(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK) const = 0;
 
          /**
-          * @brief Convert second index (3D) (specialised serial version)
-          *
-          * @param i    Array index off first dimension
-          * @param j    Array index of second dimension
-          * @param k    Array index of third dimension
-          */
-         virtual int jS(const int i, const int j, const int k) const = 0;
-
-         /**
           * @brief Convert second index (2D)
           *
           * @param i    Array index off first dimension
@@ -129,13 +103,6 @@ namespace Parallel {
           */
          virtual int j(const int i, const int j, const int idxI, const int idxJ) const = 0;
 
-         /**
-          * @brief Convert second index (2D) (specialised serial version)
-          *
-          * @param i    Array index off first dimension
-          * @param j    Array index of second dimension
-          */
-         virtual int jS(const int i, const int j) const = 0;
 
          /**
           * @brief Convert second index (3D)
@@ -148,15 +115,6 @@ namespace Parallel {
           * @param idxK Physical index of third dimension
           */
          virtual int k(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK) const = 0;
-
-         /**
-          * @brief Convert third index (3D) (specialised serial version)
-          *
-          * @param i    Array index off first dimension
-          * @param j    Array index of second dimension
-          * @param k    Array index of third dimension
-          */
-         virtual int kS(const int i, const int j, const int k) const = 0;
    };
 
 }

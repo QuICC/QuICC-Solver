@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 #include "QuICC/TransformConfigurators/ForwardConfigurator.hpp"
@@ -63,24 +64,39 @@ namespace Transform {
          template <typename TVariable> static void lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
-          * @brief First exchange communication setup
+          * @brief Spectral step in transform
+          *
+          * @param rVariable Variable corresponding to the name
+          * @param coord     Transform coordinator
           */
-         static void setup1DCommunication(const int packs, TransformCoordinatorType& coord);
+         template <typename TVariable> static void spectralStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
-          * @brief Second Exchange communication setup
+          * @brief Exchange communication setup
+          *
+          * TId = TRA1D: Communication between first and Spectral transform
+          * TId = TRA2D: Communication between second and first transform
+          * TId = TRA3D: Communication between third and second transform
+          *
+          * @param packs Number of components to pack in single communication
+          * @param coord Transform coordinator holding communicators and transforms
+          *
+          * @tparam TId Communication/transpose stage ID
           */
-         static void setup2DCommunication(const int packs, TransformCoordinatorType& coord);
+         template <Dimensions::Transform::Id TId> static void setupCommunication(const int packs, TransformCoordinatorType& coord);
 
          /**
-          * @brief Initiate first exchange communication
+          * @brief Initiate exchange communication
+          *
+          * TId = TRA1D: Communication between first and Spectral transform
+          * TId = TRA2D: Communication between second and first transform
+          * TId = TRA3D: Communication between third and second transform
+          *
+          * @param coord Transform coordinator holding communicators and transforms
+          *
+          * @tparam TId Communication/transpose stage ID
           */
-         static void initiate1DCommunication(TransformCoordinatorType& coord);
-
-         /**
-          * @brief Initiate second exchange communication
-          */
-         static void initiate2DCommunication(TransformCoordinatorType& coord);
+         template <Dimensions::Transform::Id TId> static void initiateCommunication(TransformCoordinatorType& coord);
 
       protected:
          /**
@@ -96,28 +112,26 @@ namespace Transform {
       private:
    };
 
-   inline void ForwardSingle1DConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
+   template <Dimensions::Transform::Id TId> inline void ForwardSingle1DConfigurator::setupCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Fwd-setup1DCommunication");
+      Profiler::RegionFixture<2> fix("Fwd-setupCommunication");
 
-      coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs, TransformDirection::FORWARD);
+      if constexpr(TId == Dimensions::Transform::TRA1D || TId == Dimensions::Transform::TRA2D)
+      {
+         coord.communicator().converter<TId>().setupCommunication(packs, TransformDirection::FORWARD);
 
-      coord.communicator().converter<Dimensions::Transform::TRA2D>().prepareForwardReceive();
+         coord.communicator().converter<TId>().prepareForwardReceive();
+      }
    }
 
-   inline void ForwardSingle1DConfigurator::setup2DCommunication(const int, TransformCoordinatorType&)
+   template <Dimensions::Transform::Id TId> inline void ForwardSingle1DConfigurator::initiateCommunication(TransformCoordinatorType& coord)
    {
-   }
+      Profiler::RegionFixture<2> fix("Fwd-initiateCommunication");
 
-   inline void ForwardSingle1DConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
-   {
-      Profiler::RegionFixture<2> fix("Fwd-initiate1DCommunication");
-
-      coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateBackwardSend();
-   }
-
-   inline void ForwardSingle1DConfigurator::initiate2DCommunication(TransformCoordinatorType&)
-   {
+      if constexpr(TId == Dimensions::Transform::TRA1D || TId == Dimensions::Transform::TRA2D)
+      {
+         coord.communicator().converter<TId>().initiateBackwardSend();
+      }
    }
 
    template <typename TVariable> void ForwardSingle1DConfigurator::firstStep(const TransformTree& tree, TVariable&, Physical::Kernel::SharedIPhysicalKernel spKernel, TransformCoordinatorType& coord)
@@ -204,9 +218,6 @@ namespace Transform {
                {
                   // Compute third transform
                   ForwardConfigurator::integrate1D(*it1D, coord);
-
-                  // Update equation
-                  ForwardConfigurator::updateEquation(*it1D, rVariable, coord);
                }
             }
          }
@@ -220,14 +231,41 @@ namespace Transform {
             {
                // Compute third transform
                ForwardConfigurator::integrate1D(*it1D, coord);
-
-               // Update equation
-               ForwardConfigurator::updateEquation(*it1D, rVariable, coord);
             }
          }
       } else
       {
          throw std::logic_error("Configurator cannot be used with less than 2 dimensions");
+      }
+   }
+
+   template <typename TVariable> void ForwardSingle1DConfigurator::spectralStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
+   {
+      Profiler::RegionFixture<1> fix("FwdSpectralStep");
+
+      // Iterators for the three transforms
+      TransformTreeEdge::EdgeType_citerator it1D;
+      TransformTreeEdge::EdgeType_citerator it2D;
+      TransformTreeEdge::EdgeType_citerator it3D;
+
+      // Ranges for the vector of edges for the three transforms
+      TransformTreeEdge::EdgeType_crange range1D;
+      TransformTreeEdge::EdgeType_crange range2D;
+      TransformTreeEdge::EdgeType_crange range3D = tree.root().edgeRange();
+
+      // Loop over first transform
+      for(it3D = range3D.first; it3D != range3D.second; ++it3D)
+      {
+         range2D = it3D->edgeRange();
+         for(it2D = range2D.first; it2D != range2D.second; ++it2D)
+         {
+            range1D = it2D->edgeRange();
+            for(it1D = range1D.first; it1D != range1D.second; ++it1D)
+            {
+               // Update equation
+               ForwardConfigurator::updateEquation(*it1D, rVariable, coord);
+            }
+         }
       }
    }
 

@@ -18,6 +18,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
 namespace QuICC {
@@ -30,13 +31,14 @@ namespace Tools {
    {
       std::vector<MHDFloat> eigs;
 
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
       MHDFloat k;
       if(res.sim().ss().dimension() == 3)
       {
-         k = static_cast<MHDFloat>(res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx));
+         k = static_cast<MHDFloat>(tRes.idx<Dimensions::Data::DAT3D>(matIdx));
       } else if(res.sim().ss().dimension() == 2)
       {
-         k = static_cast<MHDFloat>(res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(matIdx));
+         k = static_cast<MHDFloat>(tRes.idx<Dimensions::Data::DAT2D>(matIdx));
       } else
       {
          throw std::logic_error("This eigen direction is not possible for 1D case");
@@ -50,13 +52,14 @@ namespace Tools {
 
    int Regular1D::computeNMat(const Resolution& res) const
    {
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
       int nMat;
       if(res.sim().ss().dimension() == 3)
       {
-         nMat = res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
+         nMat = tRes.dim<Dimensions::Data::DAT3D>();
       } else if(res.sim().ss().dimension() == 2)
       {
-         nMat = res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>();
+         nMat = tRes.dim<Dimensions::Data::DAT2D>();
       } else
       {
          throw std::logic_error("This eigen direction is not possible for 1D case");

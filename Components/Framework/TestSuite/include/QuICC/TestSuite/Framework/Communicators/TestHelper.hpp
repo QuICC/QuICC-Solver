@@ -1,10 +1,10 @@
 /**
- * @file CommunicatorStages.hpp
- * @brief Different stages for Communicator test
+ * @file TestHelper.hpp
+ * @brief Different helper functions for Communicator test
  */
 
-#ifndef QUICC_TESTSUITE_FRAMEWORK_COMMUNICATORS_COMMUNICATORSTAGES_HPP
-#define QUICC_TESTSUITE_FRAMEWORK_COMMUNICATORS_COMMUNICATORSTAGES_HPP
+#ifndef QUICC_TESTSUITE_FRAMEWORK_COMMUNICATORS_TESTHELPER_HPP
+#define QUICC_TESTSUITE_FRAMEWORK_COMMUNICATORS_TESTHELPER_HPP
 
 // Project includes
 //
@@ -28,8 +28,13 @@ namespace Communicators {
    /**
     * @brief Small struct to collect the different objects needed to perform all transpose stages
     */
-   struct CommCoordinator
+   struct Test
    {
+      /**
+       * @brief Shared resolution
+       */
+      SharedResolution spRes;
+
       /**
        * @brief Communicator
        */
@@ -72,24 +77,39 @@ namespace Communicators {
    template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper);
 
    /**
+    * @brief Process command line options
+    */
+   ArrayI processCmdLine();
+
+   /**
     * @brief Initialize the communicator
     */
-   void initCommunicator(CommCoordinator& coord, SharedResolution spRes, const Parallel::SplittingDescription& descr);
+   void initCommunicator(Test& test, const Parallel::SplittingDescription& descr);
+
+   /**
+    * @brief Setup commmunication
+    */
+   void setupSpectralCommunication(Test& test);
 
    /**
     * @brief Perform transform of data between 1D and 2D transform
     */
-   void transposeSpectral_1D(const QuICC::Resolution& res, QuICC::Parallel::Communicator& comm);
+   void transposeSpectral_1D(Test& test);
+
+   /**
+    * @brief Setup commmunication
+    */
+   void setup1D2D3DCommunication(Test& test);
 
    /**
     * @brief Perform transform of data between 1D and 2D transform
     */
-   void transpose1D_2D(const QuICC::Resolution& res, QuICC::Parallel::Communicator& comm);
+   void transpose1D_2D(Test& test);
 
    /**
     * @brief Perform transform of data between 2D and 3D transform
     */
-   void transpose2D_3D(const QuICC::Resolution& res, QuICC::Parallel::Communicator& comm);
+   void transpose2D_3D(Test& test);
 
    template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper)
    {
@@ -120,4 +140,4 @@ namespace Communicators {
 }
 }
 
-#endif //QUICC_TESTSUITE_FRAMEWORK_COMMUNICATORS_COMMUNICATORSTAGES_HPP
+#endif //QUICC_TESTSUITE_FRAMEWORK_COMMUNICATORS_TESTHELPER_HPP

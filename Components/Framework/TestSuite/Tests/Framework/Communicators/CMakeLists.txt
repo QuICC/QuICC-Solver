@@ -17,7 +17,9 @@ set_target_properties(
     RUNTIME_OUTPUT_DIRECTORY
     "${QUICC_WORK_DIR}"
 )
-list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+
+# Base dir for reference data archive
+set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
 
 include(ConfigureTests)
 set(_tests
@@ -33,4 +35,13 @@ foreach(_test ${_tests})
   )
 endforeach()
 
-list(POP_BACK CMAKE_MESSAGE_INDENT)
+# Fetch reference data
+include(FetchTestReference)
+quicc_fetch_test_reference(
+  ${TestExe}
+  COMPONENT Framework
+  FILENAME "Communicators.tar.gz"
+  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+  DATADIR ${QUICC_WORK_DIR}
+)
+

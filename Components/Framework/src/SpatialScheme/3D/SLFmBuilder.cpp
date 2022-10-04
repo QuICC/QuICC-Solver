@@ -298,6 +298,22 @@ namespace SpatialScheme {
       }
 
       //
+      // Initialise spectral transform
+      //
+
+      // Initialise forward dimension of first transform
+      this->setDimension(traSize(0), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of first transform
+      this->setDimension(traSize(0), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATB1D);
+
+      // Initialise second dimension of first transform
+      this->setDimension(traSize(1), Dimensions::Transform::SPECTRAL, Dimensions::Data::DAT2D);
+
+      // Initialise third dimension of first transform
+      this->setDimension(traSize(2), Dimensions::Transform::SPECTRAL, Dimensions::Data::DAT3D);
+
+      //
       // Initialise first transform
       //
 

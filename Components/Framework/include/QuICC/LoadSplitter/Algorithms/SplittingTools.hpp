@@ -51,13 +51,14 @@ namespace Parallel {
          /**
           * @brief Compute a simple balanced split of the elements with regard to the given number of parts
           *
-          * @param n0      Output start index
-          * @param nN      Output number of indexes
-          * @param tot     Total number of indexes
-          * @param parts   Number of parts to split total into
-          * @param id      ID of the CPU
+          * @param n0         Output start index
+          * @param nN         Output number of indexes
+          * @param tot        Total number of indexes
+          * @param parts      Number of parts to split total into
+          * @param id         ID of the CPU
+          * @param allowEmpty Allow some parts to be empty
           */
-         static void balancedSplit(int &n0, int &nN, const int tot, const int parts, const int id);
+         static void balancedSplit(int &n0, int &nN, const int tot, const int parts, const int id, const bool allowEmpty = false);
 
          /**
           * @brief Extract splitting from mapped indexes

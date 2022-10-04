@@ -7,6 +7,7 @@
 
 // Configuration includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 
@@ -66,12 +67,26 @@ namespace Transform {
 
       protected:
          /**
-          * @brief Setup grouped first exchange communication
+          * @brief Setup grouped spectral exchange communication between first transform and spectra
+          *
+          * @param tree Transform tree describing what fields and what operators to apply
+          * @param cood Transform coordinator holding communicators and transforms
+          */
+         void setupGroupedSpectralCommunication(const TransformTree& tree, TransformCoordinatorType& coord);
+
+         /**
+          * @brief Setup grouped first exchange communication between second and first transform
+          *
+          * @param tree Transform tree describing what fields and what operators to apply
+          * @param cood Transform coordinator holding communicators and transforms
           */
          void setupGrouped1DCommunication(const TransformTree& tree, TransformCoordinatorType& coord);
 
          /**
-          * @brief Setup grouped second exchange communication
+          * @brief Setup grouped second exchange communication between third and second transform
+          *
+          * @param tree Transform tree describing what fields and what operators to apply
+          * @param cood Transform coordinator holding communicators and transforms
           */
          void setupGrouped2DCommunication(const TransformTree& tree, TransformCoordinatorType& coord);
 
@@ -103,42 +118,56 @@ namespace Transform {
                auto scalIt = scalars.find(it->name());
 
                // Setup the first exchange communication step for scalar fields
+               this->setupGroupedSpectralCommunication(*it, coord);
+               // Setup the first exchange communication step for scalar fields
                this->setupGrouped1DCommunication(*it, coord);
                // Setup the second exchange communication step for scalar fields
                this->setupGrouped2DCommunication(*it, coord);
 
+               // Compute spectral step of transform for scalar fields
+               TConfigurator::spectralStep(*it, scalIt->second, coord);
+               // Initiate the first exchange communication step for scalar fields
+               TConfigurator::template initiateCommunication<Dimensions::Transform::TRA1D>(coord);
+
                // Compute first step of transform for scalar fields
                TConfigurator::firstStep(*it, scalIt->second, coord);
                // Initiate the first exchange communication step for scalar fields
-               TConfigurator::initiate1DCommunication(coord);
+               TConfigurator::template initiateCommunication<Dimensions::Transform::TRA2D>(coord);
 
                // Compute second step of transform for scalar fields
                TConfigurator::secondStep(*it, scalIt->second, coord);
                // Initiate the second exchange communication step for scalar fields
-               TConfigurator::initiate2DCommunication(coord);
+               TConfigurator::template initiateCommunication<Dimensions::Transform::TRA3D>(coord);
 
                // Compute last step of transform for scalar fields
                TConfigurator::lastStep(*it, scalIt->second, coord);
-
-               // Transform vector variable
-            } else
+            }
+            // Transform vector variable
+            else
             {
                auto vectIt = vectors.find(it->name());
 
+               // Setup the first exchange communication step for scalar fields
+               this->setupGroupedSpectralCommunication(*it, coord);
                // Setup the first exchange communication step for vector fields
                this->setupGrouped1DCommunication(*it, coord);
                // Setup the second exchange communication step for vector fields
                this->setupGrouped2DCommunication(*it, coord);
 
+               // Compute spectral step of transform for vector fields
+               TConfigurator::spectralStep(*it, vectIt->second, coord);
+               // Initiate the spectral exchange communication step for vector fields
+               TConfigurator::template initiateCommunication<Dimensions::Transform::TRA1D>(coord);
+
                // Compute first step of transform for vector fields
                TConfigurator::firstStep(*it, vectIt->second, coord);
                // Initiate the first exchange communication step for vector fields
-               TConfigurator::initiate1DCommunication(coord);
+               TConfigurator::template initiateCommunication<Dimensions::Transform::TRA2D>(coord);
 
                // Compute second step of transform for vector fields
                TConfigurator::secondStep(*it, vectIt->second, coord);
                // Initiate the second exchange communication step for vector fields
-               TConfigurator::initiate2DCommunication(coord);
+               TConfigurator::template initiateCommunication<Dimensions::Transform::TRA3D>(coord);
 
                // Compute last step of transform for vector fields
                TConfigurator::lastStep(*it, vectIt->second, coord);
@@ -147,14 +176,25 @@ namespace Transform {
       }
    }
 
+   template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGroupedSpectralCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
+   {
+      const int packs = 1;
+
+      TConfigurator::template setupCommunication<Dimensions::Transform::TRA1D>(packs, coord);
+   }
+
    template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped1DCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
    {
-      TConfigurator::setup1DCommunication(this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Spectral::Id>())), coord);
+      const int packs = this->mNamedPacks1D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Spectral::Id>()));
+
+      TConfigurator::template setupCommunication<Dimensions::Transform::TRA2D>(packs, coord);
    }
 
    template <typename TConfigurator> void BackwardEquationGrouper<TConfigurator>::setupGrouped2DCommunication(const TransformTree& tree, TransformCoordinatorType& coord)
    {
-      TConfigurator::setup2DCommunication(this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Spectral::Id>())), coord);
+      const int packs = this->mNamedPacks2D.at(std::make_pair(tree.name(), tree.comp<FieldComponents::Spectral::Id>()));
+
+      TConfigurator::template setupCommunication<Dimensions::Transform::TRA3D>(packs, coord);
    }
 
    template <typename TConfigurator> ArrayI BackwardEquationGrouper<TConfigurator>::packs1D(const std::vector<TransformTree>& projectorTree)

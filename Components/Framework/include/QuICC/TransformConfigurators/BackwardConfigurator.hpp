@@ -91,14 +91,6 @@ namespace Transform {
          static void projectND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute the projection transform for 1D case
-          *
-          * @param edge    Transform tree edge
-          * @param coord   Transform coordinator
-          */
-         static void project1ND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
-
-         /**
           * @brief Empty constructor
           */
          BackwardConfigurator() {};

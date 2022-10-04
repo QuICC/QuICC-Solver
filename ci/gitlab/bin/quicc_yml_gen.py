@@ -5,7 +5,7 @@ import os
 import sys
 import yaml
 from typing import NamedTuple
-from quicc_defaults import defaultModels
+from quicc_defaults import defaultConfigs
 
 class config(NamedTuple):
     tag: str
@@ -69,11 +69,14 @@ def populateYaml(cnf):
             },
         }
     if(cnf.model):
-        if cnf.tag == 'mpi':
-            tasks = '4'
-        else:
-            tasks = '1'
-        for model in defaultModels():
+        for modCnf in defaultConfigs():
+            if cnf.tag in modCnf.ignore:
+                continue
+            model = modCnf.fullname()
+            if cnf.tag == 'mpi':
+                tasks = str(modCnf.tasks)
+            else:
+                tasks = '1'
             configIn[model+'_'+cnf.tag] = {
                     'extends':
                         [

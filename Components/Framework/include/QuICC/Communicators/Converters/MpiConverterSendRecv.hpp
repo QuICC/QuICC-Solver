@@ -21,7 +21,6 @@
 //
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/Framework/MpiFramework.hpp"
 #include "QuICC/Communicators/Converters/MpiConverterBase.hpp"
 #include "QuICC/Communicators/Converters/MpiConverterTools.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
@@ -292,7 +291,7 @@ namespace Parallel {
          #if defined QUICC_MPIPACK_MANUAL
             MpiConverterTools::pack(this->mspFBuffers->at(id), this->mspFBuffers->pos(id), data, this->mFTypes.at(id));
          #else
-            int ierr = MPI_Pack(const_cast<typename TFwd::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mspFBuffers->pos(id)), MpiFramework::transformComm(this->mTraId));
+            int ierr = MPI_Pack(const_cast<typename TFwd::PointType *>(data.data().data()), 1, this->mFTypes.at(id), this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mspFBuffers->pos(id)), QuICCEnv().comm(this->mTraId));
             QuICCEnv().check(ierr, 761);
          #endif //defined QUICC_MPIPACK_MANUAL
       }
@@ -312,7 +311,7 @@ namespace Parallel {
          #if defined QUICC_MPIPACK_MANUAL
             MpiConverterTools::pack(this->mspBBuffers->at(id), this->mspBBuffers->pos(id), data, this->mBTypes.at(id));
          #else
-            int ierr = MPI_Pack(const_cast<typename TBwd::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mspBBuffers->pos(id)), MpiFramework::transformComm(this->mTraId));
+            int ierr = MPI_Pack(const_cast<typename TBwd::PointType *>(data.data().data()), 1, this->mBTypes.at(id), this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mspBBuffers->pos(id)), QuICCEnv().comm(this->mTraId));
             QuICCEnv().check(ierr, 762);
          #endif //defined QUICC_MPIPACK_MANUAL
       }
@@ -355,7 +354,7 @@ namespace Parallel {
                #if defined QUICC_MPIPACK_MANUAL
                   MpiConverterTools::unpack(rData, this->mFTypes.at(pos), this->mspFBuffers->at(pos), this->mspFBuffers->pos(pos));
                #else
-                  int ierr = MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mspFBuffers->pos(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), MpiFramework::transformComm(this->mTraId));
+                  int ierr = MPI_Unpack(this->mspFBuffers->at(pos), this->sizeFPacket(pos), &(this->mspFBuffers->pos(pos)), rData.rData().data(), 1, this->mFTypes.at(pos), QuICCEnv().comm(this->mTraId));
                   QuICCEnv().check(ierr, 763);
                #endif //defined QUICC_MPIPACK_MANUAL
             }
@@ -378,7 +377,7 @@ namespace Parallel {
             #if defined QUICC_MPIPACK_MANUAL
                MpiConverterTools::unpack(rData, this->mFTypes.at(id), this->mspFBuffers->at(id), this->mspFBuffers->pos(id));
             #else
-               int ierr = MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mspFBuffers->pos(id)), rData.rData().data(), 1, this->mFTypes.at(id), MpiFramework::transformComm(this->mTraId));
+               int ierr = MPI_Unpack(this->mspFBuffers->at(id), this->sizeFPacket(id), &(this->mspFBuffers->pos(id)), rData.rData().data(), 1, this->mFTypes.at(id), QuICCEnv().comm(this->mTraId));
                QuICCEnv().check(ierr, 764);
             #endif //defined QUICC_MPIPACK_MANUAL
 
@@ -423,7 +422,7 @@ namespace Parallel {
                #if defined QUICC_MPIPACK_MANUAL
                   MpiConverterTools::unpack(rData, this->mBTypes.at(pos), this->mspBBuffers->at(pos), this->mspBBuffers->pos(pos));
                #else
-                  int ierr = MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mspBBuffers->pos(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), MpiFramework::transformComm(this->mTraId));
+                  int ierr = MPI_Unpack(this->mspBBuffers->at(pos), this->sizeBPacket(pos), &(this->mspBBuffers->pos(pos)), rData.rData().data(), 1, this->mBTypes.at(pos), QuICCEnv().comm(this->mTraId));
                   QuICCEnv().check(ierr, 765);
                #endif //defined QUICC_MPIPACK_MANUAL
             }
@@ -446,7 +445,7 @@ namespace Parallel {
             #if defined QUICC_MPIPACK_MANUAL
                MpiConverterTools::unpack(rData, this->mBTypes.at(id), this->mspBBuffers->at(id), this->mspBBuffers->pos(id));
             #else
-               int ierr = MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mspBBuffers->pos(id)), rData.rData().data(), 1, this->mBTypes.at(id), MpiFramework::transformComm(this->mTraId));
+               int ierr = MPI_Unpack(this->mspBBuffers->at(id), this->sizeBPacket(id), &(this->mspBBuffers->pos(id)), rData.rData().data(), 1, this->mBTypes.at(id), QuICCEnv().comm(this->mTraId));
                QuICCEnv().check(ierr, 766);
             #endif //defined QUICC_MPIPACK_MANUAL
          }

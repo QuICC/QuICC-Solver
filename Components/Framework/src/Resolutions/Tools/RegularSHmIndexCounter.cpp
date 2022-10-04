@@ -12,6 +12,7 @@
 // Class include
 //
 #include "QuICC/Resolutions/Tools/RegularSHmIndexCounter.hpp"
+#include "QuICC/Enums/Dimensions.hpp"
 
 // Project includes
 //
@@ -31,21 +32,27 @@ namespace QuICC {
    {
       std::vector<int> key;
 
-      if(id == Dimensions::Transform::TRA1D)
+      if(id == Dimensions::Transform::TRA1D || id == Dimensions::Transform::SPECTRAL)
       {
          key.push_back(i);
          key.push_back(j);
          key.push_back(k);
-      } else if(id == Dimensions::Transform::TRA2D)
+      }
+      else if(id == Dimensions::Transform::TRA2D)
       {
          key.push_back(j);
          key.push_back(i);
          key.push_back(k);
-      } else if(id == Dimensions::Transform::TRA3D)
+      }
+      else if(id == Dimensions::Transform::TRA3D)
       {
          key.push_back(k);
          key.push_back(j);
          key.push_back(i);
+      }
+      else
+      {
+         throw std::logic_error("Unknown ID used to generate VKey");
       }
 
       return key;
@@ -55,15 +62,21 @@ namespace QuICC {
    {
       std::tuple<int,int,int> key;
 
-      if(id == Dimensions::Transform::TRA1D)
+      if(id == Dimensions::Transform::TRA1D || id == Dimensions::Transform::SPECTRAL)
       {
          key = std::make_tuple(i, j, k);
-      } else if(id == Dimensions::Transform::TRA2D)
+      }
+      else if(id == Dimensions::Transform::TRA2D)
       {
          key = std::make_tuple(j, i, k);
-      } else if(id == Dimensions::Transform::TRA3D)
+      }
+      else if(id == Dimensions::Transform::TRA3D)
       {
          key = std::make_tuple(k, j, i);
+      }
+      else
+      {
+         throw std::logic_error("Unknown ID used to generate Key");
       }
 
       return key;
@@ -127,15 +140,15 @@ namespace QuICC {
       // In spectral space offset computation, spherical harmonic triangular truncation make it complicated
       if(spaceId == Dimensions::Space::SPECTRAL)
       {
-         transId = Dimensions::Transform::TRA1D;
+         const auto& tRes = *this->mspCpu->dim(Dimensions::Transform::SPECTRAL);
          simId = Dimensions::Simulation::SIM3D;
 
          // Loop over all local harmonic order m 
          OffsetType offset = 0;
          int m0 = 0;
-         for(int iM = 0; iM < this->mspCpu->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++iM)
+         for(int iM = 0; iM < tRes.dim<Dimensions::Data::DAT3D>(); ++iM)
          {
-            int m_ = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT3D>(iM);
+            int m_ = tRes.idx<Dimensions::Data::DAT3D>(iM);
             if(m_ < spRef->dim(simId,spaceId))
             {
                // Compute the offset to the local harmonic degree m - 1
@@ -149,9 +162,9 @@ namespace QuICC {
 
                // Compute offset for the local l
                offV.clear();
-               for(int iL = 0; iL < this->mspCpu->dim(transId)->dim<Dimensions::Data::DAT2D>(iM); ++iL)
+               for(int iL = 0; iL < tRes.dim<Dimensions::Data::DAT2D>(iM); ++iL)
                {
-                  int l_ = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(iL, iM);
+                  int l_ = tRes.idx<Dimensions::Data::DAT2D>(iL, iM);
                   if(l_ < spRef->dim(Dimensions::Simulation::SIM2D,spaceId))
                   {
                      offV.push_back(offset + l_ - m_);
@@ -160,24 +173,26 @@ namespace QuICC {
 
                offsets.push_back(offV);
 
-               m0 = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT3D>(iM);
+               m0 = tRes.idx<Dimensions::Data::DAT3D>(iM);
 
                // 1D blocks
                blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, m_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
             }
          }
 
+      }
       //  Physical space offset computation (regular)
-      } else //if(spaceId == Dimensions::Space::PHYSICAL)
+      else //if(spaceId == Dimensions::Space::PHYSICAL)
       {
          transId = Dimensions::Transform::TRA3D;
          simId = Dimensions::Simulation::SIM1D;
+         const auto& tRes = *this->mspCpu->dim(transId);
 
          offV.push_back(0);
          offV.push_back(0);
-         for(int i=0; i < this->mspCpu->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
+         for(int i=0; i < tRes.dim<Dimensions::Data::DAT3D>(); ++i)
          {
-            int i_ = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
+            int i_ = tRes.idx<Dimensions::Data::DAT3D>(i);
             // Check if value is available in file
             if(i_ < spRef->dim(simId,spaceId))
             {
@@ -185,7 +200,7 @@ namespace QuICC {
                offV.at(0) = i_;
 
                // Compute offset for second dimension
-               offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
+               offV.at(1) = tRes.idx<Dimensions::Data::DAT2D>(0,i);
 
                offsets.push_back(offV);
 

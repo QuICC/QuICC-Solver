@@ -2,6 +2,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   IRegular3DBuilder.cpp
   IRegularSHlBuilder.cpp
   IRegularSHmBuilder.cpp
+  IRegularSHmlBuilder.cpp
   ITriangularSHlBuilder.cpp
   TTT.cpp
   TTTBuilder.cpp

@@ -15,6 +15,7 @@
 
 // Class include
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Equations/IEquation.hpp"
 
 // Project includes
@@ -278,7 +279,8 @@ namespace Equations {
       int cpuIZero = iZero;
       if(iZero == 1)
       {
-         if(res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0 && res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0) == 0)
+         const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+         if(tRes.idx<Dimensions::Data::DAT3D>(0) == 0 && tRes.idx<Dimensions::Data::DAT2D>(0,0) == 0)
          {
             cpuIZero = 1;
          } else

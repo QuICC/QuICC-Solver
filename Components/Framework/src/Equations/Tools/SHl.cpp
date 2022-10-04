@@ -15,6 +15,7 @@
 // Class include
 //
 #include "QuICC/Equations/Tools/SHl.hpp"
+#include "QuICC/Enums/Dimensions.hpp"
 
 // Project includes
 //
@@ -29,7 +30,7 @@ namespace Tools {
    {
       std::vector<MHDFloat> eigs;
 
-      eigs.push_back(static_cast<MHDFloat>(res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx)));
+      eigs.push_back(static_cast<MHDFloat>(res.cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT3D>(matIdx)));
 
       return eigs;
    }
@@ -37,7 +38,7 @@ namespace Tools {
 
    int SHl::computeNMat(const Resolution& res) const
    {
-      return res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
+      return res.cpu()->dim(Dimensions::Transform::SPECTRAL)->dim<Dimensions::Data::DAT3D>();
    }
 
    void SHl::interpretTauN(ArrayI&, const Resolution&) const
@@ -52,9 +53,10 @@ namespace Tools {
 
    void SHl::interpretRhsN(ArrayI& rRhsCols, const Resolution& res) const
    {
-      for(int l = 0; l < res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); l++)
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      for(int l = 0; l < tRes.dim<Dimensions::Data::DAT3D>(); l++)
       {
-         rRhsCols(l) = res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(l);
+         rRhsCols(l) = tRes.dim<Dimensions::Data::DAT2D>(l);
       }
    }
 

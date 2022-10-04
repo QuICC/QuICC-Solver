@@ -15,6 +15,8 @@
 // Class include
 //
 #include "QuICC/Equations/Tools/SHm.hpp"
+#include "QuICC/Enums/DimensionTools.hpp"
+#include "QuICC/Enums/Dimensions.hpp"
 
 // Project includes
 //
@@ -29,25 +31,26 @@ namespace Tools {
    {
       std::vector<MHDFloat> eigs;
 
-      eigs.push_back(static_cast<MHDFloat>(res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx)));
+      eigs.push_back(static_cast<MHDFloat>(res.cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT3D>(matIdx)));
 
       return eigs;
    }
 
    int SHm::computeNMat(const Resolution& res) const
    {
-      return res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
+      return res.cpu()->dim(Dimensions::Transform::SPECTRAL)->dim<Dimensions::Data::DAT3D>();
    }
 
    void SHm::interpretTauN(ArrayI& rTauNs, const Resolution& res) const
    {
-      for(int m = 0; m < res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      for(int m = 0; m < tRes.dim<Dimensions::Data::DAT3D>(); m++)
       {
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-            int m_ = res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
+            int m_ = tRes.idx<Dimensions::Data::DAT3D>(m);
             rTauNs(m) = rTauNs(m)*(res.sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
-            rTauNs(m) = rTauNs(m)*res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
+            rTauNs(m) = rTauNs(m)*tRes.dim<Dimensions::Data::DAT2D>(m);
          #endif //QUICC_MPISPSOLVE
 
       }
@@ -55,13 +58,14 @@ namespace Tools {
 
    void SHm::interpretGalerkinN(ArrayI& rGalerkinNs, const Resolution& res) const
    {
-      for(int m = 0; m < res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      for(int m = 0; m < tRes.dim<Dimensions::Data::DAT3D>(); m++)
       {
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-            int m_ = res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
+            int m_ = tRes.idx<Dimensions::Data::DAT3D>(m);
             rGalerkinNs(m) = rGalerkinNs(m)*(res.sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
-            rGalerkinNs(m) = rGalerkinNs(m)*res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
+            rGalerkinNs(m) = rGalerkinNs(m)*tRes.dim<Dimensions::Data::DAT2D>(m);
          #endif //QUICC_MPISPSOLVE
       }
    }
@@ -73,13 +77,14 @@ namespace Tools {
 
    void SHm::interpretSystemN(ArrayI& rSystemNs, const Resolution& res) const
    {
-      for(int m = 0; m < res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); m++)
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      for(int m = 0; m < tRes.dim<Dimensions::Data::DAT3D>(); m++)
       {
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-            int m_ = res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(m);
+            int m_ = tRes.idx<Dimensions::Data::DAT3D>(m);
             rSystemNs(m) = rSystemNs(m)*(res.sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
          #else
-            rSystemNs(m) = rSystemNs(m)*res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(m);
+            rSystemNs(m) = rSystemNs(m)*tRes.dim<Dimensions::Data::DAT2D>(m);
          #endif //QUICC_MPISPSOLVE
       }
    }

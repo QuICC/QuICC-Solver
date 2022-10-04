@@ -69,6 +69,11 @@ namespace Variable {
          
       protected:
          /**
+          * @brief Prepare spectral field data for computation
+          */
+         void prepareInput(Transform::TransformCoordinatorType& coord);
+
+         /**
           * @brief Write content
           */
          virtual void writeContent() override;

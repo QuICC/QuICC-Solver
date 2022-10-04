@@ -47,7 +47,7 @@ namespace Parallel {
          /**
           * @brief Destructor
           */
-         virtual ~SplittingAlgorithm();
+         virtual ~SplittingAlgorithm() = default;
 
          /**
           * @brief Compute splitting and the corresponding score
@@ -76,7 +76,7 @@ namespace Parallel {
           *
           * @param spRes   Shared resolution object
           */
-         static void buildCommunicationStructure(const int localId, SharedResolution spRes, std::vector<std::multimap<int,int> >& commStructure);
+         static void buildCommunicationStructure(const int localId, SharedResolution spRes, std::map<Dimensions::Transform::Id,std::multimap<int,int> >& commStructure);
          
       protected:
          /**

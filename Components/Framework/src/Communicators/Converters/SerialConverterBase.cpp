@@ -18,6 +18,7 @@
 
 // Project includes
 //
+#include "QuICC/Communicators/Converters/PassthroughIndexConv.hpp"
 
 namespace QuICC {
 
@@ -34,22 +35,26 @@ namespace Parallel {
 
    void SerialConverterBase::convertFwd(const RealFwdData& in, DynamicPairProvider& storage)
    {
-      this->convertFwdImpl(in, storage);
+      Parallel::PassthroughIndexConv inConv;
+      this->processBwdImpl<RealFwdData,Dimensions::Data::DATF1D>(in, storage, this->idxConv(), inConv);
    }
 
    void SerialConverterBase::convertFwd(const ComplexFwdData& in, DynamicPairProvider& storage)
    {
-      this->convertFwdImpl(in, storage);
+      Parallel::PassthroughIndexConv inConv;
+      this->processBwdImpl<ComplexFwdData,Dimensions::Data::DATF1D>(in, storage, this->idxConv(), inConv);
    }
 
    void SerialConverterBase::convertBwd(const RealBwdData& in, DynamicPairProvider& storage)
    {
-      this->convertBwdImpl(in, storage);
+      Parallel::PassthroughIndexConv outConv;
+      this->processFwdImpl<RealBwdData,Dimensions::Data::DATF1D>(in, storage, outConv, this->idxConv());
    }
 
    void SerialConverterBase::convertBwd(const ComplexBwdData& in, DynamicPairProvider& storage)
    {
-      this->convertBwdImpl(in, storage);
+      Parallel::PassthroughIndexConv outConv;
+      this->processFwdImpl<ComplexBwdData,Dimensions::Data::DATF1D>(in, storage, outConv, this->idxConv());
    }
 
 }

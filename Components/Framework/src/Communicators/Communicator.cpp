@@ -57,6 +57,24 @@ namespace Parallel {
    void Communicator::initConverter(SharedResolution spRes, const std::vector<ArrayI>& packs, Splitting::Locations::Id split)
    {
       /////////////////////////////////////////////////////////////////////////////////
+      // Initialise spectral/1D converter
+      //
+      #ifdef QUICC_MPI
+         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::BOTH)
+         {
+            this->createMpiConverter<Dimensions::Transform::TRA1D>(spRes, packs.at(0), packs.at(1));
+         }
+         else
+         {
+            this->createSerialConverter<Dimensions::Transform::TRA1D>(spRes);
+         }
+      #else
+         this->createSerialConverter<Dimensions::Transform::TRA1D>(spRes);
+      #endif
+      this->converter(Dimensions::Transform::TRA1D).setup();
+
+
+      /////////////////////////////////////////////////////////////////////////////////
       // Initialise 1D/2D converter
       //
 

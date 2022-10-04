@@ -70,15 +70,6 @@ namespace Parallel {
 
    SharedTransformResolution  SingleSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status)
    {
-      // Get size of the splittable dimension(s)
-      int tot = this->mspScheme->splittableTotal(transId, this->mSplit);
-
-      // Build a simple balanced split
-      ArrayI ids(1);
-      ArrayI n0(1);
-      ArrayI nN(1);
-      SplittingTools::balancedSplit(n0(0), nN(0), tot, this->factor(0), cpuId);
-
       // Storage for the forward 1D indexes
       std::vector<ArrayI>  fwd1D;
       // Storage for the backward 1D indexes
@@ -88,9 +79,57 @@ namespace Parallel {
       // Storage for the 3D indexes
       ArrayI  idx3D;
 
-      // Compute the indexes
+      // Create arrays for the IDs
+      ArrayI ids(1);
       ids(0) = cpuId;
-      status = this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, this->mSplit);
+
+      // Get size of the splittable dimension(s)
+      int tot = this->mspScheme->splittableTotal(transId, this->mSplit);
+
+      // Build a simple balanced split
+      ArrayI n0;
+      ArrayI nN;
+      ArrayI bins = this->factors();
+
+      auto loc = this->mSplit;
+
+      if(!this->mspScheme->sameSpectralOrdering() && transId == Dimensions::Transform::SPECTRAL)
+      {
+         loc = Splitting::Locations::SECOND;
+         tot = this->mspScheme->splittableTotal(transId, this->mSplit);
+      }
+
+      if(transId == Dimensions::Transform::TRA1D)
+      {
+         n0.resize(1);
+         nN.resize(1);
+
+         SplittingTools::balancedSplit(n0(0), nN(0), tot, this->factor(0), cpuId);
+      }
+      else if(transId == Dimensions::Transform::TRA2D)
+      {
+         n0.resize(1);
+         nN.resize(1);
+
+         SplittingTools::balancedSplit(n0(0), nN(0), tot, this->factor(0), cpuId);
+      }
+      else if(transId == Dimensions::Transform::TRA3D)
+      {
+         n0.resize(1);
+         nN.resize(1);
+
+         SplittingTools::balancedSplit(n0(0), nN(0), tot, this->factor(0), cpuId);
+      }
+      else if(transId == Dimensions::Transform::SPECTRAL)
+      {
+         n0.resize(1);
+         nN.resize(1);
+
+         SplittingTools::balancedSplit(n0(0), nN(0), tot, this->factor(0), cpuId);
+      }
+
+      // Compute the indexes
+      status = this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, bins, n0, nN, loc);
 
       // Create TransformResolution object
       auto spTraRes = std::make_shared<TransformResolution>(fwd1D, bwd1D, idx2D, idx3D);

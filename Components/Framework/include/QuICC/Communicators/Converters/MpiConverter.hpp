@@ -21,7 +21,6 @@
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/Framework/MpiFramework.hpp"
 #include "QuICC/Communicators/Converters/MpiConverterImpl.hpp"
 #include "QuICC/Communicators/Converters/MpiConverterTools.hpp"
 #include "QuICC/StorageProviders/DynamicPairProvider.hpp"
@@ -117,7 +116,7 @@ namespace Parallel {
          /**
          * @brief Do storage profiling
          */
-         virtual void profileStorage() const;
+         virtual void profileStorage() const override;
 
       protected:
 
@@ -171,8 +170,11 @@ namespace Parallel {
 
    template <typename T> void MpiConverter::getFwdImpl(T *& pData, DynamicPairProvider &storage)
    {
-      // Get storage for output value
-      storage.provideFwd(pData);
+      if(pData == nullptr)
+      {
+         // Get storage for output value
+         storage.provideFwd(pData);
+      }
 
       // Receive converted data
       this->receiveFwd(*pData);
@@ -180,8 +182,11 @@ namespace Parallel {
 
    template <typename T> void MpiConverter::getBwdImpl(T *& pData, DynamicPairProvider &storage)
    {
-      // Get storage for output value
-      storage.provideBwd(pData);
+      if(pData == nullptr)
+      {
+         // Get storage for output value
+         storage.provideBwd(pData);
+      }
 
       // Receive converted data
       this->receiveBwd(*pData);
@@ -190,7 +195,7 @@ namespace Parallel {
    template <typename TFwd,typename TBwd> void MpiConverter::init(SharedResolution spRes, const Dimensions::Transform::Id fwdDim, TFwd &fwdTmp, TBwd &bwdTmp, const ArrayI& fwdPacks, const ArrayI& bwdPacks, std::shared_ptr<IIndexConv> spIdxConv)
    {
       StageTimer stage;
-      stage.start("creating MPI packing datatypes",1);
+      stage.start("Creating MPI packing datatypes",1);
 
       // Set dimensions
       this->mDimensions = spRes->sim().ss().dimension();
@@ -225,31 +230,31 @@ namespace Parallel {
       MpiConverterTools::buildLocalBwdMap(localBwdMap, spRes, this->mTraId, this->idxConv());
 
       // Loop over group cpus
-      this->mBTypes.reserve(MpiFramework::transformCpus(this->mTraId).size());
-      this->mFTypes.reserve(MpiFramework::transformCpus(this->mTraId).size());
-      for(int id = 0; id < MpiFramework::transformCpus(this->mTraId).size(); id++)
+      this->mBTypes.reserve(QuICCEnv().size(this->mTraId));
+      this->mFTypes.reserve(QuICCEnv().size(this->mTraId));
+      for(int id = 0; id < QuICCEnv().size(this->mTraId); id++)
       {
       	 // Synchronize
-     	   MpiFramework::syncTransform(this->mTraId);
+         QuICCEnv().synchronize(this->mTraId);
 
          // Create TBwd datatypes
          #if defined QUICC_MPIPACK_MANUAL
             this->mBTypes.push_back(MpiConverterTools::CoordinateVector());
-            MpiConverterTools<::buildBwdDatatype(this->mBTypes.back(), localBwdMap, spRes, this->mTraId, bTmp, id);
+            MpiConverterTools::buildDatatype<TBwd,Dimensions::Data::DATF1D>(this->mBTypes.back(), localBwdMap, spRes, this->mTraId, this->mTraId, bTmp, id);
          #else
-            MPI_Datatype type = MpiConverterTools::buildBwdDatatype(localBwdMap, spRes, this->mTraId, bTmp, id);
+            MPI_Datatype type = MpiConverterTools::buildDatatype<TBwd,Dimensions::Data::DATF1D>(localBwdMap, spRes, this->mTraId, this->mTraId, bTmp, id);
             this->mBTypes.push_back(type);
          #endif //defined QUICC_MPIPACK_MANUAL
 
       	 // Synchronize
-     	   MpiFramework::syncTransform(this->mTraId);
+         QuICCEnv().synchronize(this->mTraId);
 
          // Create TFwd datatypes
          #if defined QUICC_MPIPACK_MANUAL
             this->mFTypes.push_back(MpiConverterTools::CoordinateVector());
-            MpiConverterTools::buildFwdDatatype(this->mFTypes.back(), localFwdMap, spRes, this->mTraId, fTmp, id);
+            MpiConverterTools::buildDatatype<TFwd,Dimensions::Data::DATB1D>(this->mFTypes.back(), localFwdMap, spRes, this->mTraId, Dimensions::jump(this->mTraId,1), fTmp, id);
          #else
-            type = MpiConverterTools::buildFwdDatatype(localFwdMap, spRes, this->mTraId, fTmp, id);
+            type = MpiConverterTools::buildDatatype<TFwd,Dimensions::Data::DATB1D>(localFwdMap, spRes, this->mTraId, Dimensions::jump(this->mTraId,1), fTmp, id);
             this->mFTypes.push_back(type);
          #endif //defined QUICC_MPIPACK_MANUAL
       }

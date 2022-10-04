@@ -33,6 +33,7 @@ namespace SpatialScheme {
    {
       // Create single rank communicator
       #ifdef QUICC_MPI
+         #pragma message("TTTBuilder seems to be broken in MPI mode!")
          std::vector<int>  ranks;
 
          // Make single core communicator unless MPI sparse solver is used
@@ -41,7 +42,6 @@ namespace SpatialScheme {
          #endif //QUICC_MPISPSOLVE
 
          //MpiFramework::setSpectralComm(ranks);
-#pragma message("TTTBuilder seems to be broken in MPI mode!")
       #endif //QUICC_MPI
    }
 

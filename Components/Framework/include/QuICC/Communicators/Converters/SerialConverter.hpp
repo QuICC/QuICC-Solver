@@ -144,15 +144,42 @@ namespace Parallel {
    template <typename T>
       void SerialConverter::getFwdImpl(T *& pData, DynamicPairProvider  &storage)
    {
-      // Recover storage from provider
-      storage.recoverFwd(pData);
+      if(pData != nullptr)
+      {
+         T *pTmp;
+         // Recover storage from provider
+         storage.recoverFwd(pTmp);
+
+         pData->rData() = pTmp->data();
+
+         storage.freeFwd(*pTmp);
+      }
+      else
+      {
+         // Recover storage from provider
+         storage.recoverFwd(pData);
+      }
    }
 
    template <typename T>
       void SerialConverter::getBwdImpl(T *& pData, DynamicPairProvider  &storage)
    {
-      // Recover storage from provider
-      storage.recoverBwd(pData);
+      if(pData != nullptr)
+      {
+         T *pTmp;
+
+         // Recover storage from provider
+         storage.recoverBwd(pTmp);
+
+         pData->rData() = pTmp->data();
+
+         storage.freeBwd(*pTmp);
+
+      } else
+      {
+         // Recover storage from provider
+         storage.recoverBwd(pData);
+      }
    }
 
 }

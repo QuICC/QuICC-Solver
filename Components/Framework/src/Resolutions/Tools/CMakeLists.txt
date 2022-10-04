@@ -5,6 +5,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   DoublePeriodicIndexCounter.cpp
   RegularSHlIndexCounter.cpp
   RegularSHmIndexCounter.cpp
+  RegularSHmlIndexCounter.cpp
   TriangularSHlIndexCounter.cpp
   TriangularSHmIndexCounter.cpp
   )

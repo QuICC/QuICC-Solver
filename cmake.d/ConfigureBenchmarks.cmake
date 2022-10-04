@@ -21,7 +21,7 @@
 #
 function(quicc_add_benchmark target)
   # parse inputs
-  set(oneValueArgs MODEL ARCHIVEDIR WORKDIR RUNID TIMEOUT GITTAG)
+  set(oneValueArgs MODEL ARCHIVEDIR WORKDIR RUNID TIMEOUT GITTAG MPIRANKS)
   set(multiValueArgs STARTFILES TOOLS VARIANTS)
   cmake_parse_arguments(QAB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -30,7 +30,10 @@ function(quicc_add_benchmark target)
   message(DEBUG "QAB_MODEL: ${QAB_MODEL}")
   message(DEBUG "QAB_WORKDIR: ${QAB_WORKDIR}")
   message(DEBUG "QAB_ARCHIVEDIR: ${QAB_ARCHIVEDIR}")
-  message(DEBUG "QAB_RUNID: ${QAB_RUNID}")
+  if(NOT QAB_MPIRANKS)
+    set(QAB_MPIRANKS 4)
+  endif()
+  message(DEBUG "QAB_MPIRANKS: ${QAB_MPIRANKS}")
 
   if(NOT QAB_TIMEOUT)
     set(QAB_TIMEOUT 300)
@@ -47,8 +50,17 @@ function(quicc_add_benchmark target)
   endif()
   message(DEBUG "QAB_TOOLS: ${QAB_TOOLS}")
 
+  if(NOT QAB_RUNID)
+    foreach(_variant IN ITEMS ${QAB_VARIANTS})
+      string(REGEX REPLACE ":" ";" _vlist "${_variant}")
+      list(GET _vlist 1 _value)
+      string(APPEND QAB_RUNID "_${_value}")
+    endforeach()
+  endif()
+  message(DEBUG "QAB_RUNID: ${QAB_RUNID}")
+
   if(QUICC_MPI)
-    set(_mpi_ranks 4)
+    set(_mpi_ranks ${QAB_MPIRANKS})
   else()
     set(_mpi_ranks 1)
   endif()
@@ -86,7 +98,7 @@ function(quicc_add_benchmark target)
 
     add_custom_target(${_bench} ALL
       COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_CURRENT_SOURCE_DIR}/validate_benchmark_${target}${QAB_RUNID}.py"
+        "${CMAKE_CURRENT_SOURCE_DIR}/validate_benchmark_${target}.py"
         "${_rundir}/validate_benchmark.py"
       ${_args}
       )
@@ -98,6 +110,7 @@ function(quicc_add_benchmark target)
       list(GET _vlist 0 _path)
       list(GET _vlist 1 _value)
       add_custom_command(TARGET ${_bench} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E remove *.dat state0*.hdf5 *.gxl *.vtp
         COMMAND ${CMAKE_COMMAND} -E rename parameters.cfg parameters_orig.cfg
         COMMAND ${Python_EXECUTABLE} ${_toolsdir}/modify_xml.py -i parameters_orig.cfg -p ${_path} -v ${_value} -o parameters.cfg
         WORKING_DIRECTORY ${_rundir}

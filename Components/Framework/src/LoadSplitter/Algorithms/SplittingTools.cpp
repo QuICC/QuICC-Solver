@@ -123,10 +123,10 @@ namespace Parallel {
       return true;
    }
 
-   void SplittingTools::balancedSplit(int &n0, int &nN, const int tot, const int parts, const int id)
+   void SplittingTools::balancedSplit(int &n0, int &nN, const int tot, const int parts, const int id, const bool allowEmpty)
    {
       // Avoid splitting with zero elements
-      if(tot < parts)
+      if(tot < parts && !allowEmpty)
       {
          throw std::logic_error("Number of parts is bigger than total!");
       }

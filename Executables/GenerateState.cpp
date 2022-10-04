@@ -48,7 +48,14 @@ int run()
    // If exception is thrown, finalise (close files) and return
    catch(std::logic_error& e)
    {
-      std::cerr << e.what() << std::endl;
+      try
+      {
+         QuICC::QuICCEnv().abort(e.what());
+      }
+      catch(std::logic_error& ee)
+      {
+         std::cerr << ee.what() << std::endl;
+      }
 
       status = -1;
    }

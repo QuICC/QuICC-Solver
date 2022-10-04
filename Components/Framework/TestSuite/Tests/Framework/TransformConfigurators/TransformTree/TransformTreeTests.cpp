@@ -23,8 +23,6 @@ int main( int argc, char* argv[] )
 
    Catch::Session session; // There must be exactly one instance
 
-   int harmonicL = -1;
-
    // Build a new parser on top of Catch's
    using namespace Catch::clara;
    auto cli

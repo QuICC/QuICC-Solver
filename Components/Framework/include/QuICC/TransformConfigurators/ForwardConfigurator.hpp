@@ -64,13 +64,6 @@ namespace Transform {
          static void integrateND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute the integration transform for the single dimension case
-          *
-          * @param coord   Transform coordinator
-          */
-         static void integrate1ND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
-
-         /**
           * @brief Update scalar variable from dealiased data
           *
           * @param rScalar Scalar variable

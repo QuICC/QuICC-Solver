@@ -22,20 +22,16 @@
 #include "QuICC/PhysicalNames/registerAll.hpp"
 #include "QuICC/Arithmetics/registerAll.hpp"
 #include "QuICC/TestSuite/Framework/Communicators/TestArgs.hpp"
-#include "QuICC/TestSuite/Framework/Communicators/CommunicatorStages.hpp"
+#include "QuICC/TestSuite/Framework/Communicators/TestHelper.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Framework::Communicators;
 
-static const auto badValueOut = std::numeric_limits<QuICC::MHDFloat>::max();
-
 TEST_CASE( "Communicator initialization for @Scheme@", "[@Scheme@]" ){
-
-   namespace ns_QT = ::QuICC::Transform;
 
    // Init Environment
    QuICC::QuICCEnv();
    #ifdef QUICC_MPI
-      {  
+      {
          int size;
          MPI_Comm_size(MPI_COMM_WORLD, &size);
          QuICC::QuICCEnv().setup(size);
@@ -48,76 +44,32 @@ TEST_CASE( "Communicator initialization for @Scheme@", "[@Scheme@]" ){
    QuICC::PhysicalNames::registerAll();
    QuICC::Arithmetics::registerAll();
 
-   // Set default arguments if required
-   if(currentts::args().useDefault)
-   {
-      currentts::args().dim1D = 15;
-      currentts::args().dim2D = 31;
-      currentts::args().dim3D = 31;
-
-      if(currentts::args().algorithm == "")
-      {
-         currentts::args().algorithm = "tubular";
-      }
-
-      if(currentts::args().grouper == "")
-      {
-         currentts::args().grouper = "transform";
-      }
-
-      currentts::args().params.clear();
-   }
-   else
-   {
-      if(currentts::args().algorithm == "")
-      {
-         currentts::args().algorithm = "serial";
-      }
-
-      if(currentts::args().grouper == "")
-      {
-         currentts::args().grouper = "equation";
-      }
-   }
-
-   if(currentts::args().dim1D == 0 || currentts::args().dim2D == 0 || currentts::args().dim3D == 0)
-   {
-      throw std::logic_error("Dimensions are not set properly");
-   }
-
    Catch::StringMaker<double>::precision = 15;
 
-   // Set simulation truncation
-   QuICC::ArrayI dim(3);
-   dim << currentts::args().dim1D, currentts::args().dim2D, currentts::args().dim3D;
+   QuICC::ArrayI dim = currentts::processCmdLine();
 
-   INFO( "Input parameters" );
-   INFO( "dim1D: " << dim(0) );
-   INFO( "dim2D: " << dim(1) );
-   INFO( "dim3D: " << dim(2) );
+   currentts::Test test;
+   QuICC::Parallel::SplittingDescription::store = true;
 
    // Create LoadSplitter, SpatialScheme and generate resolution
    auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper);
-   QuICC::SharedResolution spRes = best.first;
+   test.spRes = best.first;
    auto&& descr = best.second;
 
    // Create communicator
-   currentts::CommCoordinator coord;
-   initCommunicator(coord, spRes, descr);
+   currentts::initCommunicator(test, descr);
+
+   currentts::setupSpectralCommunication(test);
 
    // Spectral/1D space transpose
-   currentts::transposeSpectral_1D(*spRes, coord.comm);
+   currentts::transposeSpectral_1D(test);
 
    // Initialize MPI communication for 1D/2D and 2D/3D transpose
-   CHECK( coord.bwdTree.size() == 1 );
-   coord.comm.template converter<QuICC::Dimensions::Transform::TRA2D>().setupCommunication(coord.spBwdGrouper->packs1D(coord.bwdTree.at(0)), QuICC::TransformDirection::BACKWARD);
-   coord.comm.template converter<QuICC::Dimensions::Transform::TRA2D>().prepareBackwardReceive();
-   coord.comm.template converter<QuICC::Dimensions::Transform::TRA3D>().setupCommunication(coord.spBwdGrouper->packs2D(coord.bwdTree.at(0)), QuICC::TransformDirection::BACKWARD);
-   coord.comm.template converter<QuICC::Dimensions::Transform::TRA3D>().prepareBackwardReceive();
+   currentts::setup1D2D3DCommunication(test);
 
    // 1D/2D transpose
-   currentts::transpose1D_2D(*spRes, coord.comm);
+   currentts::transpose1D_2D(test);
 
    // 2D/3D transpose
-   currentts::transpose2D_3D(*spRes, coord.comm);
+   currentts::transpose2D_3D(test);
 }

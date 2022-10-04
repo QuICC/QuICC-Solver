@@ -26,6 +26,7 @@
 // Project includes
 //
 #include "QuICC/QuICCEnv.hpp"
+#include "QuICC/QuICCTimer.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
@@ -194,11 +195,25 @@ namespace Pseudospectral {
          // Compute explicit linear terms
          this->explicitEquations();
 
+         QuICCTimer().stop();
+         QuICCTimer().update(ExecutionTimer::RUN);
+         QuICCTimer().start();
+
          // Compute the nonlinear terms
          this->computeNonlinear();
 
+         QuICCTimer().stop();
+         QuICCTimer().update(ExecutionTimer::NONLINEAR);
+         QuICCTimer().update(ExecutionTimer::RUN);
+         QuICCTimer().start();
+
          // Timestep the equations
          this->solveEquations();
+
+         QuICCTimer().stop();
+         QuICCTimer().update(ExecutionTimer::TIMESTEP);
+         QuICCTimer().update(ExecutionTimer::RUN);
+         QuICCTimer().start();
 
          isIntegrating = !this->mTimestepCoordinator.finishedStep();
       }

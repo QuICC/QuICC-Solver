@@ -21,6 +21,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
@@ -187,6 +188,7 @@ namespace Equations {
          // Create pointer to sparse operator
          const TOperator * op = &eq.template explicitOperator<TOperator>(opId, compId, fieldId, matIdx);
 
+         const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL);
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
             typename Eigen::Matrix<T,Eigen::Dynamic,1>  tmp(op->cols());
@@ -201,11 +203,11 @@ namespace Equations {
                      eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123) &&
                      eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
                {
-                  corrDim = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
+                  corrDim = tRes.template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
                }
                for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                   if(corrDim > 0)
                   {
                      j_ -= corrDim;
@@ -245,7 +247,7 @@ namespace Equations {
          } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
          {
             // Get mode indexes
-            ArrayI mode = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+            ArrayI mode = tRes.mode(matIdx);
 
             // Assert correct sizes
             assert(op->cols() == explicitField.slice(mode(0)).rows());
@@ -281,12 +283,12 @@ namespace Equations {
                   throw  std::logic_error("Spatial scheme has unknown dimension!");
             }
 
-            for(int k = 0; k < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT3D>(); k++)
+            for(int k = 0; k < tRes.template dim<Dimensions::Data::DAT3D>(); k++)
             {
-               k_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(k)*dimK;
+               k_ = tRes.template idx<Dimensions::Data::DAT3D>(k)*dimK;
                for(int j = 0; j < explicitField.slice(k).cols(); j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
                   for(int i = 0; i < explicitField.slice(k).rows(); i++)
                   {
                      // Compute correct position
@@ -320,6 +322,7 @@ namespace Equations {
          }
       }
 
+      const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       // matIdx is the index of the slowest varying direction with a single RHS
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
@@ -339,7 +342,7 @@ namespace Equations {
                   eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123) &&
                   eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
             {
-               corrDim = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
+               corrDim = tRes.template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
             }
             if(isSet)
             {
@@ -349,7 +352,7 @@ namespace Equations {
 
                for(int j = zeroCol; j < cols; j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                   if(corrDim > 0)
                   {
                      j_ -= corrDim;
@@ -367,7 +370,7 @@ namespace Equations {
             {
                for(int j = zeroCol; j < cols; j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                   if(corrDim > 0)
                   {
                      j_ -= corrDim;
@@ -453,7 +456,7 @@ namespace Equations {
          assert(start >= 0);
 
          // Get mode indexes
-         ArrayI mode = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         ArrayI mode = tRes.mode(matIdx);
          int rows = field.comp(compId).slice(mode(0)).rows();
 
          bool isUsed;
@@ -530,12 +533,12 @@ namespace Equations {
 
          if(isSet)
          {
-            for(int k = 0; k < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT3D>(); k++)
+            for(int k = 0; k < tRes.template dim<Dimensions::Data::DAT3D>(); k++)
             {
-               k_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(k)*dimK;
-               for(int j = 0; j < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT2D>(k); j++)
+               k_ = tRes.template idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < tRes.template dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
                   for(int i = 0; i < eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                   {
                      // Compute correct position
@@ -548,12 +551,12 @@ namespace Equations {
             }
          } else
          {
-            for(int k = 0; k < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT3D>(); k++)
+            for(int k = 0; k < tRes.template dim<Dimensions::Data::DAT3D>(); k++)
             {
-               k_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(k)*dimK;
-               for(int j = 0; j < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT2D>(k); j++)
+               k_ = tRes.template idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < tRes.template dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
                   for(int i = 0; i < eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                   {
                      // Compute correct position
@@ -573,6 +576,7 @@ namespace Equations {
       // Add source term if required
       if(eq.couplingInfo(compId).hasSource())
       {
+         const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL); 
          // matIdx is the index of the slowest varying direction with a single RHS
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
@@ -601,11 +605,11 @@ namespace Equations {
                      eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123) &&
                      eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
                {
-                  corrDim = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
+                  corrDim = tRes.template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
                }
                for(int j = zeroCol; j < cols; j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                   if(corrDim > 0)
                   {
                      j_ -= corrDim;
@@ -670,7 +674,7 @@ namespace Equations {
             assert(start >= 0);
 
             // Get mode indexes
-            ArrayI mode = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+            ArrayI mode = tRes.mode(matIdx);
             int rows = field.comp(compId).slice(mode(0)).rows();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
 
@@ -720,12 +724,12 @@ namespace Equations {
                   throw  std::logic_error("Spatial scheme has unknown dimension!");
             }
 
-            for(int k = 0; k < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT3D>(); k++)
+            for(int k = 0; k < tRes.template dim<Dimensions::Data::DAT3D>(); k++)
             {
-               k_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(k)*dimK;
-               for(int j = 0; j < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT2D>(k); j++)
+               k_ = tRes.template idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < tRes.template dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
                   for(int i = 0; i < eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                   {
                      // Compute correct position
@@ -750,6 +754,7 @@ namespace Equations {
             throw std::logic_error("Galerkin expansion cannot have a nonzero boundary value!");
          }
 
+         const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL);
          // matIdx is the index of the slowest varying direction with a single RHS
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
@@ -778,11 +783,11 @@ namespace Equations {
                      eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123) &&
                      eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
                {
-                  corrDim = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
+                  corrDim = tRes.template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
                }
                for(int j = zeroCol; j < cols; j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                   if(corrDim > 0)
                   {
                      j_ -= corrDim;
@@ -847,7 +852,7 @@ namespace Equations {
             assert(start >= 0);
 
             // Get mode indexes
-            ArrayI mode = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+            ArrayI mode = tRes.mode(matIdx);
             int rows = field.comp(compId).slice(mode(0)).rows();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
 
@@ -897,12 +902,12 @@ namespace Equations {
                   throw  std::logic_error("Spatial scheme has unknown dimension!");
             }
 
-            for(int k = 0; k < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT3D>(); k++)
+            for(int k = 0; k < tRes.template dim<Dimensions::Data::DAT3D>(); k++)
             {
-               k_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(k)*dimK;
-               for(int j = 0; j < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT2D>(k); j++)
+               k_ = tRes.template idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < tRes.template dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
                   for(int i = 0; i < eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                   {
                      // Compute correct position
@@ -919,6 +924,7 @@ namespace Equations {
 
    template <typename TData, typename TField> void setZeroNonlinear(const IFieldEquation& eq, const TField& field, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
    {
+      const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       // matIdx is the index of the slowest varying direction with a single RHS
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
@@ -994,7 +1000,7 @@ namespace Equations {
          assert(start >= 0);
 
          // Get mode indexes
-         ArrayI mode = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         ArrayI mode = tRes.mode(matIdx);
          int rows = field.comp(compId).slice(mode(0)).rows();
          int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
 
@@ -1045,12 +1051,12 @@ namespace Equations {
                   throw  std::logic_error("Spatial scheme has unknown dimension!");
             }
 
-            for(int k = 0; k < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT3D>(); k++)
+            for(int k = 0; k < tRes.template dim<Dimensions::Data::DAT3D>(); k++)
             {
-               k_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(k)*dimK;
-               for(int j = 0; j < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT2D>(k); j++)
+               k_ = tRes.template idx<Dimensions::Data::DAT3D>(k)*dimK;
+               for(int j = 0; j < tRes.template dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+                  j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
                   for(int i = 0; i < eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                   {
                      // Compute correct position
@@ -1093,6 +1099,7 @@ namespace Equations {
          solution = &storage;
       }
 
+      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       if(this->couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
          int rows = field.comp(compId).slice(matIdx).rows();
@@ -1108,11 +1115,11 @@ namespace Equations {
                   eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123) &&
                   eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
             {
-               corrDim = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
+               corrDim = tRes.template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
             }
             for(int j = 0; j < cols; j++)
             {
-               j_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+               j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                if(corrDim > 0)
                {
                   j_ -= corrDim;
@@ -1166,7 +1173,7 @@ namespace Equations {
       } else if(this->couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
          // Get mode indexes
-         ArrayI mode = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         ArrayI mode = tRes.mode(matIdx);
          int rows = field.comp(compId).slice(mode(0)).rows();
 
          // Copy data
@@ -1209,12 +1216,12 @@ namespace Equations {
                throw  std::logic_error("Spatial scheme has unknown dimension!");
          }
 
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT3D>(); k++)
+         for(int k = 0; k < tRes.template dim<Dimensions::Data::DAT3D>(); k++)
          {
-            k_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT3D>(k)*dimK;
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->template dim<Dimensions::Data::DAT2D>(k); j++)
+            k_ = tRes.template idx<Dimensions::Data::DAT3D>(k)*dimK;
+            for(int j = 0; j < tRes.template dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               j_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+               j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
                for(int i = 0; i < this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                {
                   // Compute correct position

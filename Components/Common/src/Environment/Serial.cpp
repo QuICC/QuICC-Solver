@@ -38,6 +38,16 @@ namespace Environment {
    {
    }
 
+   int Serial::id(const std::size_t id) const
+   {
+      return 0;
+   }
+
+   int Serial::size(const std::size_t id) const
+   {
+      return 1;
+   }
+
    void Serial::setup(const int size)
    {
       // Preconditions
@@ -55,6 +65,11 @@ namespace Environment {
    }
 
    void Serial::synchronize()
+   {
+      // Nothing to be done in serial environment
+   }
+
+   void Serial::synchronize(const std::size_t id) const
    {
       // Nothing to be done in serial environment
    }
@@ -79,14 +94,30 @@ namespace Environment {
       #endif
    }
 
-   void Serial::abort(const int code)
+   void Serial::abort(const int code) const
    {
       throw std::logic_error("Aborted with error code: " + std::to_string(code));
    }
 
-   void Serial::abort(const std::string msg)
+   void Serial::abort(const std::string msg) const
    {
       throw std::logic_error("Aborted: " + msg);
+   }
+
+   void Serial::addCommunicator(const std::size_t, const std::vector<int>&)
+   {
+      // Nothing to be done in serial environment
+   }
+
+   const std::vector<int>& Serial::groupIds(const std::size_t) const
+   {
+      static std::vector<int> empty;
+      return empty;
+   }
+
+   int Serial::comm(const std::size_t id) const
+   {
+      return -1;
    }
 
    void Serial::checkMpiLauncher()

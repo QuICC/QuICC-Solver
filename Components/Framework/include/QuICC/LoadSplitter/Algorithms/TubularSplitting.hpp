@@ -37,8 +37,9 @@ namespace Parallel {
           * @param id ID of the CPU/Core
           * @param nCpu Number of cores used
           * @param dim  Dimensions
+          * @param split   Dimension to split
           */
-         TubularSplitting(const int id, const int nCpu, const ArrayI& dim);
+         TubularSplitting(const int id, const int nCpu, const ArrayI& dim, Splitting::Locations::Id split);
 
          /**
           * @brief Destructor
@@ -73,6 +74,15 @@ namespace Parallel {
          virtual Array computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp);
 
       private:
+         /**
+          * @brief Compute a balanced split for 2D data distribution
+          */
+         void balanced2DSplit(ArrayI& n0, ArrayI& nN, const Dimensions::Transform::Id transId, const ArrayI& bins, const ArrayI& ids, const std::vector<Splitting::Locations::Id>& locs, const bool combine, const bool allowEmpty = false);
+
+         /**
+          * @brief Dimension to split
+          */
+         Splitting::Locations::Id mSplit;
    };
 
 }

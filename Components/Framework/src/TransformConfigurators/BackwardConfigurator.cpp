@@ -15,6 +15,7 @@
 
 // Class include
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/TransformConfigurators/BackwardConfigurator.hpp"
 
 // Project includes
@@ -39,7 +40,12 @@ namespace Transform {
       assert(tree.comp<FieldComponents::Spectral::Id>() == FieldComponents::Spectral::SCALAR);
 
       // Put scalar into temporary hold storage
-      std::visit([&](auto&& p){coord.communicator().dealiasSpectral(p->rDom(0).rTotal());}, rScalar);
+      const auto traId = Dimensions::Transform::SPECTRAL;
+      std::visit(
+            [&](auto&& p)
+            {
+               coord.communicator().transferForward(traId, p->rDom(0).rTotal(), false);
+            }, rScalar);
    }
 
    void BackwardConfigurator::prepareSpectral(const TransformTree& tree, Framework::Selector::VariantSharedVectorVariable& rVector, TransformCoordinatorType& coord)
@@ -52,8 +58,13 @@ namespace Transform {
       // Safety assert
       assert(tree.comp<FieldComponents::Spectral::Id>() != FieldComponents::Spectral::SCALAR);
 
-      // Put scalar into temporary hold storage
-      std::visit([&](auto&& p){coord.communicator().dealiasSpectral(p->rDom(0).rTotal().rComp(tree.comp<FieldComponents::Spectral::Id>()));}, rVector);
+      // Transfer scalar
+      const auto traId = Dimensions::Transform::SPECTRAL;
+      std::visit(
+            [&](auto&& p)
+            {
+               coord.communicator().transferForward(traId, p->rDom(0).rTotal().rComp(tree.comp<FieldComponents::Spectral::Id>()), false);
+            }, rVector);
    }
 
    void BackwardConfigurator::preparePhysical(const TransformTree&, const TransformTreeEdge& edge, Framework::Selector::VariantSharedScalarVariable& rScalar, TransformCoordinatorType& coord)
@@ -136,93 +147,6 @@ namespace Transform {
       const auto traId = static_cast<Dimensions::Transform::Id>(coord.ss().dimension()-1);
       const bool processOutput = false;
       BackwardConfigurator::genericProjection(edge, coord, traId, processOutput, profRegion);
-   }
-
-   void BackwardConfigurator::project1ND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
-   {
-      // Debugger message
-      DebuggerMacro_msg("Project 1D", 4);
-
-      const std::string profRegion = "Bwd-project1ND";
-      throw std::logic_error("Backward 1ND setup is not ported");
-#if 0
-      Profiler::RegionFixture<2> fix(profRegion);
-      Profiler::RegionStart<3> (profRegion + "-pre");
-
-      // Get the input data from hold
-      auto pInVar = coord.ss().bwdPtr(Dimensions::Transform::TRA1D);
-      coord.communicator().storage(Dimensions::Transform::TRA1D).recoverBwd(pInVar);
-
-      // Get output storage
-      auto pOutVar = coord.ss().fwdPtr(Dimensions::Transform::TRA1D);
-      auto pRecOutVar = coord.ss().fwdPtr(Dimensions::Transform::TRA1D);
-      if(edge.recoverOutId() >= 0)
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).provideFwd(pOutVar);
-         coord.communicator().storage(Dimensions::Transform::TRA1D).recoverFwd(pRecOutVar, edge.recoverOutId());
-      }
-      else
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).provideFwd(pOutVar);
-      }
-
-      Profiler::RegionStop<3> (profRegion + "-pre");
-      Profiler::RegionStart<3> (profRegion + "-transform");
-
-      // Compute projection transform for first dimension
-      std::visit([&](auto&& pOut, auto&& pIn){coord.transform1D().backward(pOut->rData(), pIn->data(), edge.opId());}, pOutVar, pInVar);
-
-      Profiler::RegionStop<3> (profRegion + "-transform");
-      Profiler::RegionStart<3> (profRegion + "-post");
-      Profiler::RegionStart<4> (profRegion + "-post" + "-comm_a");
-
-      // Hold spectral input
-      if(edge.holdInput())
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).holdBwd(pInVar);
-      }
-      // Free spectral input
-      else
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).freeBwd(pInVar);
-      }
-
-      Profiler::RegionStop<4> (profRegion + "-post" + "-comm_a");
-
-      // Combine recovered output with new calculation
-      if(std::visit([](auto&& pRecOut){return (pRecOut != 0);}, pRecOutVar))
-      {
-         Profiler::RegionStart<4> (profRegion + "-post" + "-work_b");
-
-         std::visit([&](auto&& pRecOut, auto&& pOut){Datatypes::FieldTools::combine(*pRecOut, *pOut, edge.arithId());}, pRecOutVar, pOutVar);
-
-         Profiler::RegionStop<4> (profRegion + "-post" + "-work_b");
-         Profiler::RegionStart<4> (profRegion + "-post" + "-comm_b");
-
-         coord.communicator().transferForward(Dimensions::Transform::TRA1D, pRecOutVar);
-         coord.communicator().storage(Dimensions::Transform::TRA1D).freeFwd(pOutVar);
-
-         Profiler::RegionStop<4> (profRegion + "-post" + "-comm_b");
-      }
-      else
-      {
-         Profiler::RegionStart<4> (profRegion + "-post" + "-work_c");
-
-         if(edge.arithId() == Arithmetics::SetNeg::id())
-         {
-            std::visit([](auto&& pOut){Datatypes::FieldTools::negative(*pOut);}, pOutVar);
-         }
-
-         Profiler::RegionStop<4> (profRegion + "-post" + "-work_c");
-         Profiler::RegionStart<4> (profRegion + "-post" + "-comm_c");
-
-         coord.communicator().transferForward(Dimensions::Transform::TRA1D, pOutVar);
-
-         Profiler::RegionStop<4> (profRegion + "-post" + "-comm_c");
-      }
-
-      Profiler::RegionStop<3> (profRegion + "-post");
-#endif
    }
 
    void BackwardConfigurator::genericProjection(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const Dimensions::Transform::Id traId, const bool processOutput, const std::string profRegion)

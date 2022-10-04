@@ -35,7 +35,7 @@ namespace QuICC {
           *
           * @param transformRes Resolution object for the transforms
           */
-         explicit CoreResolution(const std::vector<SharedTransformResolution>& transformRes);
+         explicit CoreResolution(const std::vector<SharedTransformResolution>& transformRes, SharedTransformResolution spSpectralRes);
 
          /**
           * @brief Empty Destructor
@@ -66,6 +66,11 @@ namespace QuICC {
           * @brief Resolution information for all transforms
           */
          std::vector<SharedTransformResolution>   mTransforms;
+
+         /**
+          * @brief Resolution information for spectral space
+          */
+         SharedTransformResolution   mspSpectral;
    };
 
    /// Typedef for a shared pointer to a CoreResolution object

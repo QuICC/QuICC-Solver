@@ -26,14 +26,16 @@
 // Project includes
 //
 #include "QuICC/QuICCEnv.hpp"
+#include "QuICC/QuICCTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Simulation/SimulationIoTools.hpp"
 
 namespace QuICC {
 
    SimulationBase::SimulationBase()
-      : mExecutionTimer(true), mSimRunCtrl()
+      : mSimRunCtrl()
    {
+      QuICCTimer().start();
    }
 
    SimulationBase::~SimulationBase()
@@ -140,11 +142,11 @@ namespace QuICC {
       this->mPseudospectral.initSolvers();
 
       // Stop timer and update initialisation time
-      this->mExecutionTimer.stop();
-      this->mExecutionTimer.update(ExecutionTimer::INIT);
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::INIT);
 
       // Start timer
-      this->mExecutionTimer.start();
+      QuICCTimer().start();
 
       // Execute pre-run steps
       this->preRun();
@@ -153,32 +155,32 @@ namespace QuICC {
       this->mPseudospectral.cleanupForRun();
 
       // Stop pre-run timing
-      this->mExecutionTimer.stop();
-      this->mExecutionTimer.update(ExecutionTimer::PRERUN);
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::PRERUN);
 
       // Synchronize computation nodes
       QuICCEnv().synchronize();
       StageTimer::completed("Simulation initialisation successfull");
 
       // Start timer
-      this->mExecutionTimer.start();
+      QuICCTimer().start();
 
       // Do main loop
       this->mainRun();
 
       // Stop main loop timing
-      this->mExecutionTimer.stop();
-      this->mExecutionTimer.update(ExecutionTimer::RUN);
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::RUN);
 
       // Start timer
-      this->mExecutionTimer.start();
+      QuICCTimer().start();
 
       // Execute post-run operations
       this->postRun();
 
       // Stop post-run timing
-      this->mExecutionTimer.stop();
-      this->mExecutionTimer.update(ExecutionTimer::POSTRUN);
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::POSTRUN);
 
       // Synchronise computation nodes
       QuICCEnv().synchronize();
@@ -190,7 +192,7 @@ namespace QuICC {
       this->mSimRunCtrl.printInfo(std::cout);
 
       // Print execution timer infos
-      this->mExecutionTimer.printInfo(std::cout);
+      QuICCTimer().printInfo(std::cout);
 
       // Print storage profiling infos (if required)
       StorageProfilerMacro_printInfo();

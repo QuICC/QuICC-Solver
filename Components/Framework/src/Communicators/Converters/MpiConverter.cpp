@@ -78,13 +78,13 @@ namespace Parallel {
       std::vector<int> unusedB;
 
       // Loop over all CPUs
-      for(int i = 0; i < MpiFramework::transformCpus(this->mTraId).size(); i++)
+      for(int i = 0; i < QuICCEnv().size(this->mTraId); i++)
       {
          // Compute buffer sizes for F group
          #if defined QUICC_MPIPACK_MANUAL
             sze = this->mFTypes.at(i).size();
          #else
-            MPI_Pack_size(1, this->mFTypes.at(i), MpiFramework::transformComm(this->mTraId), &sze);
+            MPI_Pack_size(1, this->mFTypes.at(i), QuICCEnv().comm(this->mTraId), &sze);
          #endif //defined QUICC_MPIPACK_MANUAL
          if(sze != 0 || this->mNeedEmptyComm)
          {
@@ -101,7 +101,7 @@ namespace Parallel {
          #if defined QUICC_MPIPACK_MANUAL
             sze = this->mBTypes.at(i).size();
          #else
-            MPI_Pack_size(1, this->mBTypes.at(i), MpiFramework::transformComm(this->mTraId), &sze);
+            MPI_Pack_size(1, this->mBTypes.at(i), QuICCEnv().comm(this->mTraId), &sze);
          #endif //defined QUICC_MPIPACK_MANUAL
          if(sze != 0 || this->mNeedEmptyComm)
          {

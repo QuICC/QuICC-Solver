@@ -220,62 +220,6 @@ namespace Transform {
       Profiler::RegionStop<3> (profRegion + "-post");
    }
 
-   void ForwardConfigurator::integrate1ND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
-   {
-      // Debugger message
-      DebuggerMacro_msg("Integrate 1D", 4);
-
-      const std::string profRegion = "Fwd-integrate1ND";
-      throw std::logic_error("Foward 1ND setup is not ported");
-#if 0
-      Profiler::RegionFixture<2> fix(profRegion);
-      Profiler::RegionStart<3> (profRegion + "-pre");
-
-      // Get recover input data from hold
-      auto pInVar = coord.ss().fwdPtr(Dimensions::Transform::TRA1D);
-      coord.communicator().receiveForward(Dimensions::Transform::TRA1D, pInVar);
-
-      // Get output storage
-      auto pOutVar = coord.ss().bwdPtr(Dimensions::Transform::TRA1D);
-      auto pRecOutVar = coord.ss().bwdPtr(Dimensions::Transform::TRA1D);
-      if(edge.recoverOutId() >= 0)
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).provideBwd(pOutVar);
-         coord.communicator().storage(Dimensions::Transform::TRA1D).recoverBwd(pRecOutVar, edge.recoverOutId());
-      } else
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).provideBwd(pOutVar);
-      }
-
-      Profiler::RegionStop<3> (profRegion + "-pre");
-      Profiler::RegionStart<3> (profRegion + "-transform");
-
-      // Compute integration transform of third dimension
-      std::visit([&](auto&& pOut, auto&& pIn){coord.transform1D().forward(pOut->rData(), pIn->data(), edge.opId());}, pOutVar, pInVar);
-
-      Profiler::RegionStop<3> (profRegion + "-transform");
-      Profiler::RegionStart<3> (profRegion + "-post");
-      Profiler::RegionStart<4> (profRegion + "-post" + "-comm_a");
-
-      // Hold temporary storage
-      if(edge.holdInput())
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).holdFwd(pInVar);
-
-      // Free temporary storage
-      } else
-      {
-         coord.communicator().storage(Dimensions::Transform::TRA1D).freeFwd(pInVar);
-      }
-
-      // Hold temporary storage
-      coord.communicator().storage(Dimensions::Transform::TRA1D).holdBwd(pOutVar);
-
-      Profiler::RegionStop<4> (profRegion + "-post" + "-comm_a");
-      Profiler::RegionStop<3> (profRegion + "-post");
-#endif
-   }
-
    void ForwardConfigurator::updateEquation(const TransformTreeEdge& edge, Framework::Selector::VariantSharedScalarVariable& rScalar, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<2> fix("Fwd-updateEquation");
@@ -283,27 +227,53 @@ namespace Transform {
       // Debugger message
       DebuggerMacro_msg("updateEquation (scalar)", 4);
 
-      const auto transId = Dimensions::Transform::TRA1D;
+      const auto transId = Dimensions::Transform::SPECTRAL;
 
       // Recover temporary storage
-      auto pInVar = coord.ss().bwdPtr(transId);
-      coord.communicator().receiveBackward(transId, pInVar);
+      auto pInVar = coord.ss().fwdPtr(transId);
+      bool freeIn = true;
+      if(edge.arithId() == Arithmetics::Set::id() || edge.arithId() == Arithmetics::SetNeg::id())
+      {
+         std::visit([
+               &](auto&& p)
+               {
+                  pInVar = &p->rDom(0).rPerturbation();
+               }, rScalar);
+         freeIn = false;
+      }
+      coord.communicator().receiveForward(transId, pInVar);
 
-      // Push variable into data pool queue
-      std::visit([&](auto&& p){coord.communicator().storage(transId).holdBwd(p->rDom(0).rPerturbation());}, rScalar);
-
-      // Compute linear term component
-      coord.communicator().updateSpectral(pInVar, edge.arithId());
+      // Combine if needed
+      if(edge.arithId() == Arithmetics::SetNeg::id())
+      {
+         std::visit(
+               [&](auto&& pIn)
+               {
+                  Datatypes::FieldTools::negative(*pIn);
+               }, pInVar);
+      }
+      else if(edge.arithId() == Arithmetics::Add::id() || edge.arithId() == Arithmetics::Sub::id())
+      {
+         std::visit(
+               [&](auto&& pOut, auto&& pIn)
+               {
+                  Datatypes::FieldTools::combine(pOut->rDom(0).rPerturbation(), *pIn, edge.arithId());
+               }, rScalar, pInVar);
+      }
 
       // Hold temporary storage
       if(edge.combinedOutId() >= 0)
       {
-         coord.communicator().storage(transId).holdBwd(pInVar, edge.combinedOutId());
+         throw std::logic_error("NoT SUPPORTED");
+         coord.communicator().storage(transId).holdFwd(pInVar, edge.combinedOutId());
 
       // Free the temporary storage
       } else
       {
-         coord.communicator().storage(transId).freeBwd(pInVar);
+         if(freeIn)
+         {
+            coord.communicator().storage(transId).freeFwd(pInVar);
+         }
       }
    }
 
@@ -314,27 +284,53 @@ namespace Transform {
       // Debugger message
       DebuggerMacro_msg("updateEquation (vector)", 4);
 
-      const auto transId = Dimensions::Transform::TRA1D;
+      const auto transId = Dimensions::Transform::SPECTRAL;
 
       // Recover temporary storage
-      auto pInVar = coord.ss().bwdPtr(transId);
-      coord.communicator().receiveBackward(transId, pInVar);
+      auto pInVar = coord.ss().fwdPtr(transId);
+      bool freeIn = true;
+      if(edge.arithId() == Arithmetics::Set::id() || edge.arithId() == Arithmetics::SetNeg::id())
+      {
+         std::visit([
+               &](auto&& p)
+               {
+                  pInVar = &p->rDom(0).rPerturbation().rComp(edge.outId<FieldComponents::Spectral::Id>());
+               }, rVector);
+         freeIn = false;
+      }
+      coord.communicator().receiveForward(transId, pInVar);
 
-      // Push variable into data pool queue
-      std::visit([&](auto&& p){coord.communicator().storage(transId).holdBwd(p->rDom(0).rPerturbation().rComp(edge.outId<FieldComponents::Spectral::Id>()));}, rVector);
-
-      // Compute linear term component
-      coord.communicator().updateSpectral(pInVar, edge.arithId());
+      // Combine if needed
+      if(edge.arithId() == Arithmetics::SetNeg::id())
+      {
+         std::visit(
+               [&](auto&& pIn)
+               {
+                  Datatypes::FieldTools::negative(*pIn);
+               }, pInVar);
+      }
+      else if(edge.arithId() == Arithmetics::Add::id() || edge.arithId() == Arithmetics::Sub::id())
+      {
+         std::visit(
+               [&](auto&& pOut, auto&& pIn)
+               {
+                  Datatypes::FieldTools::combine(pOut->rDom(0).rPerturbation().rComp(edge.outId<FieldComponents::Spectral::Id>()), *pIn, edge.arithId());
+               }, rVector, pInVar);
+      }
 
       // Hold temporary storage
       if(edge.combinedOutId() >= 0)
       {
-         coord.communicator().storage(transId).holdBwd(pInVar, edge.combinedOutId());
+         throw std::logic_error("NOT YET SUPPORTED");
+         coord.communicator().storage(transId).holdFwd(pInVar, edge.combinedOutId());
 
       // Free the temporary storage
       } else
       {
-         coord.communicator().storage(transId).freeBwd(pInVar);
+         if(freeIn)
+         {
+            coord.communicator().storage(transId).freeFwd(pInVar);
+         }
       }
    }
 

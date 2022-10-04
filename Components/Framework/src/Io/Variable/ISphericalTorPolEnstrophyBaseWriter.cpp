@@ -46,29 +46,57 @@ namespace Variable {
       this->mShowParity = true;
    }
 
-   void ISphericalTorPolEnstrophyBaseWriter::compute(Transform::TransformCoordinatorType& coord)
+   void ISphericalTorPolEnstrophyBaseWriter::prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord)
    {
       // get iterator to field
       vector_iterator vIt;
       vector_iterator_range vRange = this->vectorRange();
       assert(std::distance(vRange.first, vRange.second) == 1);
-      assert(std::visit([&](auto&& p)->bool{return (p->dom(0).res().sim().ss().spectral().ONE() == FieldComponents::Spectral::TOR);}, vRange.first->second));
-      assert(std::visit([&](auto&& p)->bool{return (p->dom(0).res().sim().ss().spectral().TWO() == FieldComponents::Spectral::POL);}, vRange.first->second));
+      auto&& field = vRange.first->second;
+      assert(std::visit([&](auto&& p)->bool{return (p->dom(0).res().sim().ss().spectral().ONE() == FieldComponents::Spectral::TOR);}, field));
+      assert(std::visit([&](auto&& p)->bool{return (p->dom(0).res().sim().ss().spectral().TWO() == FieldComponents::Spectral::POL);}, field));
 
+      constexpr auto TId = Dimensions::Transform::TRA1D;
+      const int packs = 1;
+      coord.communicator().converter<TId>().setupCommunication(packs, TransformDirection::BACKWARD);
+
+      coord.communicator().converter<TId>().prepareBackwardReceive();
+
+      // Dealias variable data
+      std::visit(
+            [&](auto&& p)
+            {
+               coord.communicator().transferForward(Dimensions::Transform::SPECTRAL, p->rDom(0).rTotal().rComp(sId), false);
+            },
+            field);
+
+      coord.communicator().converter<TId>().initiateForwardSend();
+   }
+
+   void ISphericalTorPolEnstrophyBaseWriter::compute(Transform::TransformCoordinatorType& coord)
+   {
+      constexpr auto TId = Dimensions::Transform::TRA1D;
       Matrix spectrum;
 
-      // Dealias toroidal variable data
-      std::visit([&](auto&& p){coord.communicator().dealiasSpectral(p->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));}, vRange.first->second);
+      // Prepare spectral data for transform
+      this->prepareInput(FieldComponents::Spectral::TOR, coord);
 
       // Recover dealiased BWD data
-      auto pInVarTor = coord.ss().bwdPtr(Dimensions::Transform::TRA1D);
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd(pInVarTor);
+      auto pInVarTor = coord.ss().bwdPtr(TId);
+      coord.communicator().receiveBackward(TId, pInVarTor);
 
       // Compute enstrophy reduction
       spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarTor), 1);
-      std::visit([&](auto&& p){coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Energy::id());}, pInVarTor);
+      std::visit(
+            [&](auto&& p)
+            {
+               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Energy::id());
+            },
+            pInVarTor);
 
       this->resetEnstrophy();
+
+      const auto& tRes = *this->res().cpu()->dim(TId);
 
       // Compute Q component of enstrophy of QST decomposition
       MHDFloat lfactor = 0.0;
@@ -77,10 +105,10 @@ namespace Variable {
       if(this->mHasMOrdering)
       {
          // Loop over harmonic order m
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // m = 0, no factor of two
-            int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int m_ = tRes.idx<Dimensions::Data::DAT3D>(k);
             if(m_ == 0)
             {
                factor = 1.0;
@@ -89,9 +117,9 @@ namespace Variable {
                factor = 2.0;
             }
 
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = std::pow(l_*(l_+1.0),2);
 
                this->storeQEnstrophy(l_, m_, factor*lfactor*spectrum(idx, 0));
@@ -101,14 +129,14 @@ namespace Variable {
       } else
       {
          // Loop over harmonic degree l
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int l_ = tRes.idx<Dimensions::Data::DAT3D>(k);
             lfactor = std::pow(l_*(l_+1.0),2);
             // m = 0, no factor of two
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+               int m_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
                // m = 0, no factor of two
                if(m_ == 0)
                {
@@ -125,28 +153,33 @@ namespace Variable {
       }
 
       // Free BWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(pInVarTor);
+      coord.communicator().storage<TId>().freeBwd(pInVarTor);
 
-      // Dealias poloidal variable data for Q component
-      std::visit([&](auto&& p){coord.communicator().dealiasSpectral(p->rDom(0).rTotal().rComp(FieldComponents::Spectral::TOR));}, vRange.first->second);
+      // Prepare spectral data for transform
+      this->prepareInput(FieldComponents::Spectral::TOR, coord);
 
       // Recover dealiased BWD data
-      auto pInVarPolQ = coord.ss().bwdPtr(Dimensions::Transform::TRA1D);
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd(pInVarPolQ);
+      auto pInVarPolQ = coord.ss().bwdPtr(TId);
+      coord.communicator().receiveBackward(TId, pInVarPolQ);
 
       // Compute enstrophy reduction
       spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolQ), 1);
-      std::visit([&](auto&& p){coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyD1R1::id());}, pInVarPolQ);
+      std::visit(
+            [&](auto&& p)
+            {
+               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyD1R1::id());
+            },
+            pInVarPolQ);
 
       // Compute  S component of enstrophy of QST decomposition
       idx = 0;
       if(this->mHasMOrdering)
       {
          // Loop over harmonic order m
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // m = 0, no factor of two
-            int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int m_ = tRes.idx<Dimensions::Data::DAT3D>(k);
             if(m_ == 0)
             {
                factor = 1.0;
@@ -155,9 +188,9 @@ namespace Variable {
                factor = 2.0;
             }
 
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = l_*(l_+1.0);
 
                this->storeSEnstrophy(l_, m_, factor*lfactor*spectrum(idx,0));
@@ -167,13 +200,13 @@ namespace Variable {
       } else
       {
          // Loop over harmonic degree l
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int l_ = tRes.idx<Dimensions::Data::DAT3D>(k);
             lfactor = l_*(l_+1.0);
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+               int m_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
                // m = 0, no factor of two
                if(m_ == 0)
                {
@@ -190,28 +223,33 @@ namespace Variable {
       }
 
       // Free BWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(pInVarPolQ);
+      coord.communicator().storage<TId>().freeBwd(pInVarPolQ);
 
-      // Dealias poloidal variable data for S component
-      std::visit([&](auto&& p){coord.communicator().dealiasSpectral(p->rDom(0).rTotal().rComp(FieldComponents::Spectral::POL));}, vRange.first->second);
+      // Prepare spectral data for transform
+      this->prepareInput(FieldComponents::Spectral::POL, coord);
 
       // Recover dealiased BWD data
-      auto pInVarPolS = coord.ss().bwdPtr(Dimensions::Transform::TRA1D);
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd(pInVarPolS);
+      auto pInVarPolS = coord.ss().bwdPtr(TId);
+      coord.communicator().receiveBackward(TId, pInVarPolS);
 
       // Compute enstrophy reduction
       spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolS), 1);
-      std::visit([&](auto&& p){coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergySLAPLR2::id());}, pInVarPolS);
+      std::visit(
+            [&](auto&& p)
+            {
+               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergySLAPLR2::id());
+            },
+            pInVarPolS);
 
       // Compute T component of enstrophy of QST decomposition
       idx = 0;
       if(this->mHasMOrdering)
       {
          // Loop over harmonic order m
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
             // m = 0, no factor of two
-            int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int m_ = tRes.idx<Dimensions::Data::DAT3D>(k);
             if(m_ == 0)
             {
                factor = 1.0;
@@ -220,9 +258,9 @@ namespace Variable {
                factor = 2.0;
             }
 
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = l_*(l_+1.0);
 
                this->storeTEnstrophy(l_, m_, factor*lfactor*spectrum(idx,0));
@@ -232,13 +270,13 @@ namespace Variable {
       } else
       {
          // Loop over harmonic degree l
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int l_ = tRes.idx<Dimensions::Data::DAT3D>(k);
             lfactor = l_*(l_+1.0);
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+               int m_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
                // m = 0, no factor of two
                if(m_ == 0)
                {
@@ -255,7 +293,7 @@ namespace Variable {
       }
 
       // Free BWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(pInVarPolS);
+      coord.communicator().storage<TId>().freeBwd(pInVarPolS);
    }
 
 }

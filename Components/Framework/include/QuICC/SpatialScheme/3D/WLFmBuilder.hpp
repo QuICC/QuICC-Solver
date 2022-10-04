@@ -20,7 +20,7 @@
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
-#include "QuICC/SpatialScheme/3D/IRegularSHmBuilder.hpp"
+#include "QuICC/SpatialScheme/3D/IRegularSHmlBuilder.hpp"
 #include "QuICC/Transform/Poly/Setup.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Setup.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/Setup.hpp"
@@ -32,13 +32,13 @@ namespace SpatialScheme {
    /**
     * @brief Implementation of the sphere Worland(poly) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme with spectral m ordering
     */
-   class WLFmBuilder: public IRegularSHmBuilder
+   class WLFmBuilder: public IRegularSHmlBuilder
    {
       public:
          /**
           * @brief Tune the shared resolution used by simulation
           */
-         void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr);
+         void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr) override;
 
          /**
           * @brief Constructor
@@ -56,28 +56,33 @@ namespace SpatialScheme {
          /**
           * @brief Add the transform setups to resolution
           */
-         virtual void addTransformSetups(SharedResolution spRes) const;
+         virtual void addTransformSetups(SharedResolution spRes) const override;
+
+         /**
+          * @brief Spectral ordering is different from transform
+          */
+         bool sameSpectralOrdering() const override;
 
       protected:
          /**
           * @brief Initialise the domain dimensions
           */
-         virtual void setDimensions();
+         virtual void setDimensions() override;
 
          /**
           * @brief Set transform costs
           */
-         virtual void setCosts();
+         virtual void setCosts() override;
 
          /**
           * @brief Set transform scalings
           */
-         virtual void setScalings();
+         virtual void setScalings() override;
 
          /**
           * @brief Set transform memory footprint
           */
-         virtual void setMemoryScore();
+         virtual void setMemoryScore() override;
 
       private:
          /**

@@ -156,7 +156,15 @@ namespace Variable {
    void IVariableHdf5NWriter::setDatasetSize()
    {
       // Get dimensions ordered by index access speed (fast -> slow)
-      ArrayI oDims = this->res().counter().orderedDimensions(this->mSpaceId);
+      ArrayI oDims;
+      if(this->mSpaceId == Dimensions::Space::SPECTRAL)
+      {
+         oDims = this->res().counter().orderedDimensions(this->mSpaceId);
+      }
+      else
+      {
+         oDims = this->res().counter().orderedDimensions(this->mSpaceId);
+      }
 
       int nDims = oDims.size();
       for(int i = 0; i < nDims; ++i)
@@ -169,7 +177,14 @@ namespace Variable {
    void IVariableHdf5NWriter::setDatasetOffsets()
    {
       // Compute the offsets
-      this->res().counter().computeOffsets(this->mBlock, this->mFileOffsets, this->mSpaceId);
+      if(this->mSpaceId == Dimensions::Space::SPECTRAL)
+      {
+         this->res().counter().computeOffsets(this->mBlock, this->mFileOffsets, this->mSpaceId);
+      }
+      else
+      {
+         this->res().counter().computeOffsets(this->mBlock, this->mFileOffsets, this->mSpaceId);
+      }
    }
 
    void IVariableHdf5NWriter::setCollIo()

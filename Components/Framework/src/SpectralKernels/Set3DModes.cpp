@@ -18,6 +18,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
 namespace QuICC {
@@ -61,12 +62,13 @@ namespace Kernel {
    {
       // Create key
       std::pair<int,int>   key;
+      const auto& tRes = *this->spRes()->cpu()->dim(Dimensions::Transform::SPECTRAL);
       if(this->spRes()->sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
       {
-         key = std::make_pair(this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k),this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k));
+         key = std::make_pair(tRes.idx<Dimensions::Data::DAT3D>(k),tRes.idx<Dimensions::Data::DAT2D>(j,k));
       } else
       {
-         key = std::make_pair(this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k),this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k));
+         key = std::make_pair(tRes.idx<Dimensions::Data::DAT2D>(j,k),tRes.idx<Dimensions::Data::DAT3D>(k));
       }
 
       // Get value for key

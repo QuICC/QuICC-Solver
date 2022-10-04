@@ -24,14 +24,6 @@ namespace QuICC {
 
 namespace Parallel {
 
-   PMIndexConv::PMIndexConv()
-   {
-   }
-
-   PMIndexConv::~PMIndexConv()
-   {
-   }
-
    void PMIndexConv::init(const Resolution& res, const Dimensions::Transform::Id id)
    {
       /// \mhdBug Calculation of mSimN with double static_cast is not ideal

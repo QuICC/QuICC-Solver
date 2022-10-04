@@ -20,6 +20,8 @@
 #include "QuICC/Transform/Poly/Tools.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
+#include "QuICC/Resolutions/Tools/RegularSHlIndexCounter.hpp"
+#include "QuICC/Resolutions/Tools/RegularSHmIndexCounter.hpp"
 
 namespace QuICC {
 
@@ -49,19 +51,21 @@ namespace SpatialScheme {
          ierr = MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
          QuICCEnv().check(ierr, 813);
 
+         const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA1D);
+
          // Initialise the ranks with local rank
          std::vector<std::set<int> >  ranks;
-         ArrayI modes(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+         ArrayI modes(tRes.dim<Dimensions::Data::DAT3D>());
          std::map<int, int>  mapModes;
          int k_ = 0;
          for(int k = 0; k < spRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL); ++k)
          {
             ranks.push_back(std::set<int>());
-            if(k_ < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>() && k == spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k_))
+            if(k_ < tRes.dim<Dimensions::Data::DAT3D>() && k == tRes.idx<Dimensions::Data::DAT3D>(k_))
             {
                ranks.back().insert(QuICCEnv().id());
-               modes(k_) = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k_);
-               mapModes.insert(std::make_pair(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k_),k));
+               modes(k_) = tRes.idx<Dimensions::Data::DAT3D>(k_);
+               mapModes.insert(std::make_pair(tRes.idx<Dimensions::Data::DAT3D>(k_),k));
                k_++;
             }
          }
@@ -126,7 +130,7 @@ namespace SpatialScheme {
             QuICCEnv().synchronize();
          }
 
-         MpiFramework::initSubComm(MpiFramework::SPECTRAL, spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+         MpiFramework::initSubComm(MpiFramework::SPECTRAL, tRes.dim<Dimensions::Data::DAT3D>());
 
          std::set<int>  subRanks;
          int i_ = 0;
@@ -185,7 +189,7 @@ namespace SpatialScheme {
 
             MpiFramework::setSubComm(MpiFramework::SPECTRAL, i_, subRanks);
 
-            if(i_ < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>() && i == static_cast<size_t>(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i_)))
+            if(i_ < tRes.dim<Dimensions::Data::DAT3D>() && i == static_cast<size_t>(tRes.idx<Dimensions::Data::DAT3D>(i_)))
             {
                i_++;
             }
@@ -214,8 +218,10 @@ namespace SpatialScheme {
 
    Transform::Poly::SharedSetup WLFmBuilder::spSetup1D(SharedResolution spRes) const
    {
+      const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA1D);
+
       // Get physical size of polynomial transform
-      int size = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
+      int size = tRes.dim<Dimensions::Data::DATF1D>();
 
       // Get spectral size of the polynomial transform
       int specSize = spRes->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -223,13 +229,9 @@ namespace SpatialScheme {
       auto spSetup = std::make_shared<Transform::Poly::Setup>(size, specSize, this->purpose());
 
       // Get number of transforms and list of indexes
-      for(int j = 0; j < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); j++)
+      for(int i = 0; i < tRes.dim<Dimensions::Data::DAT3D>(); i++)
       {
-
-         for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(j); i++)
-         {
-            spSetup->addIndex(spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(i,j), 1);
-         }
+         spSetup->addIndex(tRes.idx<Dimensions::Data::DAT3D>(i), tRes.dim<Dimensions::Data::DAT2D>(i));
       }
 
       spSetup->lock();
@@ -239,8 +241,10 @@ namespace SpatialScheme {
 
    Transform::Poly::ALegendre::SharedSetup WLFmBuilder::spSetup2D(SharedResolution spRes) const
    {
+      const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA2D);
+
       // Get physical size of polynomial transform
-      int size = spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DATF1D>();
+      int size = tRes.dim<Dimensions::Data::DATF1D>();
 
       // Get spectral size of the polynomial transform
       int specSize = spRes->sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
@@ -248,9 +252,9 @@ namespace SpatialScheme {
       auto spSetup = std::make_shared<Transform::Poly::ALegendre::Setup>(size, specSize, this->purpose());
 
       // Get number of transforms and list of indexes
-      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT3D>(); i++)
+      for(int i = 0; i < tRes.dim<Dimensions::Data::DAT3D>(); i++)
       {
-         spSetup->addIndex(spRes->cpu()->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DAT3D>(i), spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i));
+         spSetup->addIndex(tRes.idx<Dimensions::Data::DAT3D>(i), tRes.dim<Dimensions::Data::DAT2D>(i));
       }
 
       spSetup->lock();
@@ -260,17 +264,19 @@ namespace SpatialScheme {
 
    Transform::Fft::Fourier::Mixed::SharedSetup WLFmBuilder::spSetup3D(SharedResolution spRes) const
    {
+      const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA3D);
+
       // Get size of FFT transform
-      int size = spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>();
+      int size = tRes.dim<Dimensions::Data::DATF1D>();
 
       // Get spectral size of the FFT
       int specSize = spRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Get number of transforms
       int blockSize = 0;
-      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>(); i++)
+      for(int i = 0; i < tRes.dim<Dimensions::Data::DAT3D>(); i++)
       {
-         blockSize += spRes->cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(i);
+         blockSize += tRes.dim<Dimensions::Data::DAT2D>(i);
       }
 
       auto spSetup = std::make_shared<Transform::Fft::Fourier::Mixed::Setup>(size, blockSize, specSize, this->purpose());
@@ -281,12 +287,17 @@ namespace SpatialScheme {
    }
 
    WLFmBuilder::WLFmBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegularSHmBuilder(dim, purpose)
+      : IRegularSHmlBuilder(dim, purpose)
    {
    }
 
    WLFmBuilder::~WLFmBuilder()
    {
+   }
+
+   bool WLFmBuilder::sameSpectralOrdering() const
+   {
+      return false;
    }
 
    void WLFmBuilder::setDimensions()
@@ -325,6 +336,22 @@ namespace SpatialScheme {
       }
 
       //
+      // Initialise spectral space
+      //
+
+      // Initialise forward dimension of first transform
+      this->setDimension(traSize(0), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of first transform
+      this->setDimension(traSize(0), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATB1D);
+
+      // Initialise second dimension of first transform
+      this->setDimension(traSize(1), Dimensions::Transform::SPECTRAL, Dimensions::Data::DAT2D);
+
+      // Initialise third dimension of first transform
+      this->setDimension(traSize(2), Dimensions::Transform::SPECTRAL, Dimensions::Data::DAT3D);
+
+      //
       // Initialise first transform
       //
 
@@ -335,10 +362,10 @@ namespace SpatialScheme {
       this->setDimension(this->mI+8, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
-      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of first transform
-      this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
+      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
       //
       // Initialise second transform

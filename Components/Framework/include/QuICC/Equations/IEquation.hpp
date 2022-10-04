@@ -342,6 +342,7 @@ namespace Equations {
       // Create pointer to sparse operator
       const TOperator * op = &eq.explicitOperator<TOperator>(opId, compId, fieldId, matIdx);
 
+      const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
          typename Eigen::Matrix<T,Eigen::Dynamic,1>  tmp(op->cols());
@@ -356,11 +357,11 @@ namespace Equations {
                   eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123) &&
                   eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
             {
-               corrDim = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
+               corrDim = tRes.idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
             }
             for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
             {
-               j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+               j_ = tRes.idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                if(corrDim > 0)
                {
                   j_ -= corrDim;
@@ -400,7 +401,7 @@ namespace Equations {
       } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
          // Get mode indexes
-         ArrayI mode = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         ArrayI mode = tRes.mode(matIdx);
 
          // Assert correct sizes
          assert(op->cols() == explicitField.slice(mode(0)).rows());
@@ -432,12 +433,12 @@ namespace Equations {
                break;
          }
 
-         for(int k = 0; k < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
          {
-            k_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+            k_ = tRes.idx<Dimensions::Data::DAT3D>(k)*dimK;
             for(int j = 0; j < explicitField.slice(k).cols(); j++)
             {
-               j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+               j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
                for(int i = 0; i < explicitField.slice(k).rows(); i++)
                {
                   // Compute correct position

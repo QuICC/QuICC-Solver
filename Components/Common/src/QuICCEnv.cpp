@@ -1,6 +1,6 @@
 /** 
- * @file IEnvironment.cpp
- * @brief Source of generic environment
+ * @file QuICCEnv.cpp
+ * @brief Source of static environment
  */
 
 // Configuration includes
@@ -31,6 +31,7 @@ namespace QuICC {
    Environment::IEnvironment& QuICCEnv()
    {
       static QUICC_ENVIMPL env;
+
       return env;
    }
 

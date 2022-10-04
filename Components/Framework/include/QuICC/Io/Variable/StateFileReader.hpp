@@ -258,9 +258,10 @@ namespace Variable {
    {
       if(this->res().sim().ss().has(SpatialScheme::Feature::FourierIndex23))
       {
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
          {
-            if(this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0, k) == 0 && this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) > this->res().sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2)
+            if(tRes.idx<Dimensions::Data::DAT2D>(0, k) == 0 && tRes.idx<Dimensions::Data::DAT3D>(k) > this->res().sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2)
             {
                rField.setProfile(Eigen::Matrix<T, Eigen::Dynamic, 1>::Zero(this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)), 0, k);
             }

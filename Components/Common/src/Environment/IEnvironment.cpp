@@ -31,14 +31,6 @@ namespace Environment {
 
    int IEnvironment::mId = -99;
 
-   IEnvironment::IEnvironment()
-   {
-   }
-
-   IEnvironment::~IEnvironment()
-   {
-   }
-
    int IEnvironment::ioRank() const
    {
       return this->mIoRank;

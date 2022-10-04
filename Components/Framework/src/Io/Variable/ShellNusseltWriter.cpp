@@ -46,16 +46,17 @@ namespace Variable {
    void ShellNusseltWriter::init()
    {
       this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123);
+      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
 
       int m0, l0;
       if(this->mHasMOrdering)
       {
-         m0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         l0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0);
+         m0 = tRes.idx<Dimensions::Data::DAT3D>(0);
+         l0 = tRes.idx<Dimensions::Data::DAT2D>(0,0);
       } else
       {
-         l0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         m0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0);
+         l0 = tRes.idx<Dimensions::Data::DAT3D>(0);
+         m0 = tRes.idx<Dimensions::Data::DAT2D>(0,0);
       }
 
       // Look for l = 0, m = 0 mode

@@ -29,6 +29,7 @@
 // Project includes
 //
 #include "QuICC/QuICCEnv.hpp"
+#include "QuICC/QuICCTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/RuntimeStatus/GoOn.hpp"
@@ -64,9 +65,6 @@ namespace QuICC {
 
       StageTimer::stage("Starting simulation");
 
-      // Reset timers after first step to ignore initialization
-      bool resetFirstStep = true;
-
       // Start main loop of simulation
       while(this->mSimRunCtrl.status() == RuntimeStatus::GoOn::id())
       {
@@ -86,18 +84,10 @@ namespace QuICC {
          QuICCEnv().synchronize();
 
          // Update simulation run control
-         this->mSimRunCtrl.updateCluster(this->mExecutionTimer.queryTime(ExecutionTimer::TOTAL));
+         this->mSimRunCtrl.updateCluster(QuICCTimer().queryTime(ExecutionTimer::TOTAL));
 
-         // Reset profiler
-         if(resetFirstStep)
-         {
-            // Separate timing for first iteration
-            this->mExecutionTimer.stop();
-            this->mExecutionTimer.update(ExecutionTimer::FIRSTSTEP);
-            this->mExecutionTimer.start();
-
-            resetFirstStep = false;
-         }
+         // Increase iteration counter for timer
+         QuICCTimer().iteration();
       }
 
       // Profile storage

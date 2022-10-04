@@ -70,9 +70,9 @@ namespace Parallel {
 
          // All-to-all data exchange
          #if defined QUICC_MPIPACK_MANUAL
-            MPI_Alltoallv(this->mspBBuffers->data(), this->mBCommSizes.data(), this->mspBBuffers->zero(), this->mBCommTypes[0], this->mspFBuffers->data(), this->mFCommSizes.data(), this->mspFBuffers->zero(), this->mFCommTypes[0], MpiFramework::transformComm(this->mTraId));
+            MPI_Alltoallv(this->mspBBuffers->data(), this->mBCommSizes.data(), this->mspBBuffers->zero(), this->mBCommTypes[0], this->mspFBuffers->data(), this->mFCommSizes.data(), this->mspFBuffers->zero(), this->mFCommTypes[0], QuICCEnv().comm(this->mTraId));
          #else
-            MPI_Alltoallw(this->mspBBuffers->data(), this->mBCommSizes.data(), this->mspBBuffers->zero(), &this->mBCommTypes[0], this->mspFBuffers->data(), this->mFCommSizes.data(), this->mspFBuffers->zero(), &this->mFCommTypes[0], MpiFramework::transformComm(this->mTraId));
+            MPI_Alltoallw(this->mspBBuffers->data(), this->mBCommSizes.data(), this->mspBBuffers->zero(), &this->mBCommTypes[0], this->mspFBuffers->data(), this->mFCommSizes.data(), this->mspFBuffers->zero(), &this->mFCommTypes[0], QuICCEnv().comm(this->mTraId));
          #endif //defined QUICC_MPIPACK_MANUAL
       }
    }
@@ -97,9 +97,9 @@ namespace Parallel {
 
          // All-to-all data exchange
          #if defined QUICC_MPIPACK_MANUAL
-            MPI_Alltoallv(this->mspFBuffers->data(), this->mFCommSizes.data(), this->mspFBuffers->zero(), this->mFCommTypes[0], this->mspBBuffers->data(), this->mBCommSizes.data(), this->mspBBuffers->zero(), this->mBCommTypes[0], MpiFramework::transformComm(this->mTraId));
+            MPI_Alltoallv(this->mspFBuffers->data(), this->mFCommSizes.data(), this->mspFBuffers->zero(), this->mFCommTypes[0], this->mspBBuffers->data(), this->mBCommSizes.data(), this->mspBBuffers->zero(), this->mBCommTypes[0], QuICCEnv().comm(this->mTraId));
          #else
-            MPI_Alltoallw(this->mspFBuffers->data(), this->mFCommSizes.data(), this->mspFBuffers->zero(), &this->mFCommTypes[0], this->mspBBuffers->data(), this->mBCommSizes.data(), this->mspBBuffers->zero(), &this->mBCommTypes[0], MpiFramework::transformComm(this->mTraId));
+            MPI_Alltoallw(this->mspFBuffers->data(), this->mFCommSizes.data(), this->mspFBuffers->zero(), &this->mFCommTypes[0], this->mspBBuffers->data(), this->mBCommSizes.data(), this->mspBBuffers->zero(), &this->mBCommTypes[0], QuICCEnv().comm(this->mTraId));
          #endif //defined QUICC_MPIPACK_MANUAL
       }
    }

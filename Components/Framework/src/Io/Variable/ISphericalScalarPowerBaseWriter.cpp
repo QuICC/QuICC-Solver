@@ -48,40 +48,70 @@ namespace Variable {
       this->mShowParity = true;
    }
 
-   void ISphericalScalarPowerBaseWriter::compute(Transform::TransformCoordinatorType& coord)
+   void ISphericalScalarPowerBaseWriter::prepareInput(Transform::TransformCoordinatorType& coord)
    {
       scalar_iterator_range sRange = this->scalarRange();
       assert(std::distance(sRange.first, sRange.second) == 1);
+      auto&& field = sRange.first->second;
+
+      constexpr auto TId = Dimensions::Transform::TRA1D;
+      const int packs = 1;
+      coord.communicator().converter<TId>().setupCommunication(packs, TransformDirection::BACKWARD);
+
+      coord.communicator().converter<TId>().prepareBackwardReceive();
+
 
       // Dealias variable data
-      std::visit([&](auto&& p){coord.communicator().dealiasSpectral(p->rDom(0).rTotal());}, sRange.first->second);
+      std::visit(
+            [&](auto&& p)
+            {
+               coord.communicator().transferForward(Dimensions::Transform::SPECTRAL, p->rDom(0).rTotal(), false);
+            },
+            field);
+
+      coord.communicator().converter<TId>().initiateForwardSend();
+   }
+
+   void ISphericalScalarPowerBaseWriter::compute(Transform::TransformCoordinatorType& coord)
+   {
+      constexpr auto TId = Dimensions::Transform::TRA1D;
+
+      // Prepare spectral data for transform
+      this->prepareInput(coord);
 
       // Recover dealiased BWD data
-      auto pInVar = coord.ss().bwdPtr(Dimensions::Transform::TRA1D);
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().recoverBwd(pInVar);
+      auto pInVar = coord.ss().bwdPtr(TId);
+      coord.communicator().receiveBackward(TId, pInVar);
+
+      const auto& tRes = *this->res().cpu()->dim(TId);
 
       // Size of spectrum
       auto size = std::visit([](auto&& p)->std::pair<int,int>{return std::make_pair(0,p->data().cols());}, pInVar);
       int l_;
       if(this->mHasMOrdering)
       {
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               l_ = std::min(l_, this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k));
+               l_ = std::min(l_, tRes.idx<Dimensions::Data::DAT2D>(j, k));
             }
          }
       }
       else
       {
-         l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
+         l_ = tRes.idx<Dimensions::Data::DAT3D>(0);
       }
       size.first = this->res().counter().dimensions(Dimensions::Space::SPECTRAL, l_)(0);
 
       // Compute power reduction
       Matrix spectrum(size.first, size.second);
-      std::visit([&](auto&& p){coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::PowerR2::id());}, pInVar);
+      std::visit(
+            [&](auto&& p)
+            {
+               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::PowerR2::id());
+            },
+            pInVar);
 
       this->resetPower();
 
@@ -90,9 +120,9 @@ namespace Variable {
       if(this->mHasMOrdering)
       {
          // Loop over harmonic order m
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int m_ = tRes.idx<Dimensions::Data::DAT3D>(k);
             // m = 0, no factor of two
             if(m_ == 0)
             {
@@ -102,9 +132,9 @@ namespace Variable {
                factor = 2.0;
             }
 
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
 
                for(int i = 0; i < this->res().counter().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL, l_); i++)
                {
@@ -116,14 +146,14 @@ namespace Variable {
       } else
       {
          // Loop over harmonic degree l
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int l_ = tRes.idx<Dimensions::Data::DAT3D>(k);
 
             // m = 0, no factor of two
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+               int m_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
                // m = 0, no factor of two
                if(m_ == 0)
                {
@@ -143,7 +173,7 @@ namespace Variable {
       }
 
       // Free BWD storage
-      coord.communicator().storage<Dimensions::Transform::TRA1D>().freeBwd(pInVar);
+      coord.communicator().storage<TId>().freeBwd(pInVar);
    }
 
 }
