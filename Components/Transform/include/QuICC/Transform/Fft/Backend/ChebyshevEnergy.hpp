@@ -22,7 +22,9 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
+#include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
+
 
 namespace QuICC {
 
@@ -65,49 +67,65 @@ namespace Backend {
          void setSpectralOperator(const SparseMatrix& mat) const;
 
          /**
-          * @brief Set input
+          * @brief Copy input and pad
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
           */
-         void input(const Matrix& in, const bool needPadding = false) const;
+         void input(Matrix& tmp, const Matrix& in) const;
 
          /**
-          * @brief Set input
+          * @brief Copy input real or imaginary part and shift
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param shift
           */
-         void input(const MatrixZ& in, const bool useReal, const bool needPadding = false) const;
+         void input(Matrix& tmp, const Matrix& in, const int shift) const;
+
+         /**
+          * @brief Copy input real or imaginary part and pad
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param useReal flag to extract real or im part
+          */
+         void input(Matrix& tmp, const MatrixZ& in, const bool useReal) const;
+
+         /**
+          * @brief Copy input real or imaginary part and shift
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param shift
+          * @param useReal flag to extract real or im part
+          */
+         void input(Matrix& tmp, const MatrixZ& in, const int shift, const bool useReal) const;
 
          /**
           * @brief Square intermediate result
           */
-         void square(const bool isFirst) const;
+         void square(Matrix& tmp, const Matrix& in, const bool isFirst) const;
 
          /**
           * @brief Set output
           */
-         void output(Matrix& rOut) const;
+         void output(Matrix& rOut, const Matrix& tmp) const;
 
          /**
           * @brief Set output mutliplied by scalar operator
           */
-         void outputSpectral(Matrix& rOut) const;
-
-         /**
-          * @brief Set input and output to internal temporary storage
-          */
-         void io() const;
-
-         /**
-          * @brief Set input and output data pointers for FFT (R2R)
-          */
-         void io(MHDFloat* out, const MHDFloat* in) const;
+         void outputSpectral(Matrix& rOut, const Matrix& tmp) const;
 
          /**
           * @brief Apply FFT
           */
-         void applyFft() const;
+         void applyFft(Matrix& phys, const Matrix& mods) const;
 
          /**
           * @brief Apply forward FFT
           */
-         void applyFwdFft() const;
+         void applyFwdFft(Matrix& mods, const Matrix& phys) const;
 
          /**
           * @brief Add new linear solver
@@ -125,7 +143,12 @@ namespace Backend {
           * @brief Get solution from solver
           *
           */
-         void getSolution(const int zeroRows = 0, const int extraRows = 0) const;
+         void getSolution(Matrix& tmp, const int zeroRows = 0, const int extraRows = 0) const;
+
+         /**
+          * @brief Get the temporary storage
+          */
+         Matrix& getStorage(const StorageKind = StorageKind::in) const;
          
       protected:
 

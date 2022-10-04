@@ -37,24 +37,20 @@ namespace Reductor {
    {
    }
 
-   void Energy::applyPreOperator(const Matrix& in) const
+   void Energy::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
-      this->mBackend.input(in, true);
-
-      this->mBackend.io();
+      this->mBackend.input(tmp, in);
    }
 
-   void Energy::applyPostOperator(Matrix& rOut) const
+   void Energy::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
    {
       assert(rOut.cols() == 1);
-      this->mBackend.output(rOut);
+      this->mBackend.output(rOut, tmp);
    }
 
-   void Energy::applyPreOperator(const MatrixZ& in, const bool useReal) const
+   void Energy::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
-      this->mBackend.input(in, useReal, true);
-
-      this->mBackend.io();
+      this->mBackend.input(tmp, in, useReal);
    }
 
 }

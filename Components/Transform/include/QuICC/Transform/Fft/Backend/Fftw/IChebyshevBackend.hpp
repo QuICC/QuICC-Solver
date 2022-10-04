@@ -6,21 +6,13 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_ICHEBYSHEVBACKEND_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_ICHEBYSHEVBACKEND_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
+#include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/IFftwBackend.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
 
@@ -32,6 +24,7 @@ namespace Fft {
 
 namespace Backend {
 
+/// This namespace provides all the Fftw related code.
 namespace Fftw {
 
    /**
@@ -62,16 +55,52 @@ namespace Fftw {
          virtual void init(const SetupType& setup) const;
 
          /**
-          * @brief Set input and output data pointers for FFT (R2R)
+          * @brief Copy input and pad
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
           */
-         virtual void io(MHDFloat* out, const MHDFloat* in) const;
+         void input(Matrix& tmp, const Matrix& in) const;
+
+         /**
+          * @brief Copy input real or imaginary part and shift
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param shift
+          */
+         void input(Matrix& tmp, const Matrix& in, const int shift) const;
+
+         /**
+          * @brief Copy input real or imaginary part and pad
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param useReal flag to extract real or im part
+          */
+         void input(Matrix& tmp, const MatrixZ& in, const bool useReal) const;
+
+         /**
+          * @brief Copy input real or imaginary part and shift
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param shift
+          * @param useReal flag to extract real or im part
+          */
+         void input(Matrix& tmp, const MatrixZ& in, const int shift, const bool useReal) const;
+
+         /**
+          * @brief Apply padding
+          */
+         virtual void applyPadding(Matrix& rData, const int extraRows = 0) const;
 
          /**
           * @brief Get the temporary storage
           *
           * @param getOut return input or ouput storage
           */
-         Matrix& getStorage(const bool getOut = false) const;
+         virtual Matrix& getStorage(const StorageKind = StorageKind::in) const;
          
       protected:
          /**
@@ -85,6 +114,11 @@ namespace Fftw {
          mutable int mBlockSize;
 
          /**
+          * @brief Padding size
+          */
+         mutable int mPadSize = 0;
+
+         /**
           * @brief Temporary data
           */
          mutable Matrix  mTmp;
@@ -93,16 +127,6 @@ namespace Fftw {
           * @brief Temporary data for component wise operations
           */
          mutable Matrix  mTmpComp;
-
-         /**
-          * @brief Input data pointer
-          */
-         mutable const MHDFloat* mpIn;
-
-         /**
-          * @brief Out data pointer
-          */
-         mutable MHDFloat* mpOut;
 
       private:
    };

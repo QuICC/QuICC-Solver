@@ -62,6 +62,12 @@ namespace Backend {
       this->mpImpl->input(tmp, in);
    }
 
+   void ChebyshevProjector::input(Matrix& tmp, const Matrix& in,
+      const int shift) const
+   {
+      this->mpImpl->input(tmp, in, shift);
+   }
+
    void ChebyshevProjector::input(Matrix& tmp, const MatrixZ& in,
       const bool useReal) const
    {
@@ -72,11 +78,6 @@ namespace Backend {
       const int shift, const bool useReal) const
    {
       this->mpImpl->input(tmp, in, shift, useReal);
-   }
-
-   void ChebyshevProjector::output(Matrix& rOut) const
-   {
-      this->mpImpl->output(rOut);
    }
 
    void ChebyshevProjector::output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
@@ -114,9 +115,9 @@ namespace Backend {
       return this->mpImpl->solver();
    }
 
-   Matrix& ChebyshevProjector::getStorage(const bool getOut) const
+   Matrix& ChebyshevProjector::getStorage(const StorageKind kind) const
    {
-      return this->mpImpl->getStorage(getOut);
+      return this->mpImpl->getStorage(kind);
    }
 
 }

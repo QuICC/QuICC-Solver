@@ -101,21 +101,21 @@ namespace Reductor {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyPreOperator(const Matrix& in) const = 0;
+         virtual void applyPreOperator(Matrix& tmp, const Matrix& in) const = 0;
 
          /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(Matrix& rOut) const = 0;
+         virtual void applyPostOperator(Matrix& rOut, const Matrix& tmp) const = 0;
 
          /**
           * @brief Apply pre FFT operator for component wise operations
           *
           * @param in   Input values
           */
-         virtual void applyPreOperator(const MatrixZ& in, const bool useReal) const = 0;
+         virtual void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const = 0;
 
          /**
           * @brief Compute transform R2C (disabled)

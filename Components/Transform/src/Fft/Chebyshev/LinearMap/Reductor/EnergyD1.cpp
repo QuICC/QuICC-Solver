@@ -7,9 +7,6 @@
 //
 #include <cassert>
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/EnergyD1.hpp"
@@ -55,28 +52,22 @@ namespace Reductor {
       this->mBackend.addSolver();
    }
 
-   void EnergyD1::applyPreOperator(const Matrix& in) const
+   void EnergyD1::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
-      this->mBackend.solver().input(in, 1);
-
-      this->mBackend.getSolution(1, 1);
-
-      this->mBackend.io();
+      this->mBackend.input(tmp, in, 1);
+      this->mBackend.getSolution(tmp, 1, 1);
    }
 
-   void EnergyD1::applyPostOperator(Matrix& rOut) const
+   void EnergyD1::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
    {
       assert(rOut.cols() == 1);
-      this->mBackend.output(rOut);
+      this->mBackend.output(rOut, tmp);
    }
 
-   void EnergyD1::applyPreOperator(const MatrixZ& in, const bool useReal) const
+   void EnergyD1::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
-      this->mBackend.solver().input(in, 1, useReal);
-
-      this->mBackend.getSolution(1, 1);
-
-      this->mBackend.io();
+      this->mBackend.input(tmp, in, 1, useReal);
+      this->mBackend.getSolution(tmp, 1, 1);
    }
 
 }

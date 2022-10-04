@@ -51,8 +51,8 @@ namespace Projector {
       assert(rOut.rows() == this->outRows());
       assert(in.cols() <= rOut.cols());
 
-      auto& tmpIn = this->mBackend.getStorage();
-      auto& tmpOut = this->mBackend.getStorage(true);
+      auto& tmpIn = this->mBackend.getStorage(StorageKind::in);
+      auto& tmpOut = this->mBackend.getStorage(StorageKind::out);
       this->applyPreOperator(tmpIn, in, true);
       this->mBackend.applyFft(tmpOut, tmpIn);
       this->applyPostOperator(rOut, tmpOut, true);

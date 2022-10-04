@@ -29,7 +29,6 @@ namespace Backend {
 namespace Fftw {
 
    ChebyshevIntegrator::ChebyshevIntegrator()
-      : mOutMap(NULL,0,0)
    {
    }
 
@@ -51,6 +50,7 @@ namespace Fftw {
 
       // Initialize temporary storage
       this->mTmp.setZero(fwdSize, blockSize);
+      this->mTmpComp.setZero(fwdSize, blockSize);
 
       // Set sizes
       this->mBwdSize = setup.bwdSize();
@@ -71,43 +71,6 @@ namespace Fftw {
       }
    }
 
-   void ChebyshevIntegrator::io(MHDFloat* out, const MHDFloat* in) const
-   {
-      IChebyshevBackend::io(out, in);
-
-      new (&this->mOutMap) Eigen::Map<Matrix>(this->mpOut, this->mBwdSize, this->mBlockSize);
-   }
-
-   void ChebyshevIntegrator::io(Matrix& rOut, const Matrix& in) const
-   {
-      if(rOut.rows() == this->mBwdSize)
-      {
-         this->io(rOut.data(), in.data());
-      } else
-      {
-         this->mTmp.resize(this->mBwdSize, this->mBlockSize);
-         this->io(this->mTmp.data(), in.data());
-      }
-   }
-
-   void ChebyshevIntegrator::input(const MatrixZ& in, const bool useReal) const
-   {
-      if(useReal)
-      {
-         this->mTmpComp = in.real();
-      } else
-      {
-         this->mTmpComp = in.imag();
-      }
-
-      this->io(this->mTmp.data(), this->mTmpComp.data());
-   }
-
-   void ChebyshevIntegrator::applyFft() const
-   {
-      fftw_execute_r2r(this->mPlan, const_cast<MHDFloat *>(this->mpIn), this->mpOut);
-   }
-
    void ChebyshevIntegrator::setSpectralOperator(const SparseMatrix& mat) const
    {
       this->mSpecOp = mat;
@@ -120,54 +83,54 @@ namespace Fftw {
 
    void ChebyshevIntegrator::output(Matrix& rOut) const
    {
-      rOut.topRows(this->mSpecSize) = this->mFftScaling*this->mOutMap.topRows(this->mSpecSize);
+      rOut.topRows(this->mSpecSize) = this->mFftScaling*rOut.topRows(this->mSpecSize);
    }
 
    void ChebyshevIntegrator::outputSpectral(Matrix& rOut) const
    {
       if(this->mMeanOp.size() > 0)
       {
-         rOut.block(0, 0, this->mSpecSize, 1) = this->mFftScaling*this->mMeanOp*this->mOutMap.block(0,0,this->mMeanOp.cols(),1);
-         rOut.block(0, 1, this->mSpecSize, rOut.cols()-1) = this->mFftScaling*this->mSpecOp*this->mOutMap.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
+         rOut.block(0, 0, this->mSpecSize, 1) = this->mFftScaling*this->mMeanOp*rOut.block(0,0,this->mMeanOp.cols(),1);
+         rOut.block(0, 1, this->mSpecSize, rOut.cols()-1) = this->mFftScaling*this->mSpecOp*rOut.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
       } else
       {
-         rOut.topRows(this->mSpecSize) = this->mFftScaling*this->mSpecOp*this->mOutMap.topRows(this->mSpecOp.cols());
+         rOut.topRows(this->mSpecSize) = this->mFftScaling*this->mSpecOp*rOut.topRows(this->mSpecOp.cols());
       }
    }
 
-   void ChebyshevIntegrator::output(MatrixZ& rOut, const bool useReal) const
+   void ChebyshevIntegrator::output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
       if(this->mMeanOp.size() > 0)
       {
          if(useReal)
          {
-            rOut.block(0, 0, this->mSpecSize, 1).real() = this->mFftScaling*this->mMeanOp*this->mOutMap.block(0,0,this->mMeanOp.cols(),1);
-            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).real() = this->mFftScaling*this->mSpecOp*this->mOutMap.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
+            rOut.block(0, 0, this->mSpecSize, 1).real() = this->mFftScaling*this->mMeanOp*tmp.block(0,0,this->mMeanOp.cols(),1);
+            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).real() = this->mFftScaling*this->mSpecOp*tmp.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
          } else
          {
-            rOut.block(0, 0, this->mSpecSize, 1).imag() = this->mFftScaling*this->mMeanOp*this->mOutMap.block(0,0,this->mMeanOp.cols(),1);
-            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).imag() = this->mFftScaling*this->mSpecOp*this->mOutMap.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
+            rOut.block(0, 0, this->mSpecSize, 1).imag() = this->mFftScaling*this->mMeanOp*tmp.block(0,0,this->mMeanOp.cols(),1);
+            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).imag() = this->mFftScaling*this->mSpecOp*tmp.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
          }
       } else
       {
          if(useReal)
          {
-            rOut.topRows(this->mSpecSize).real() = this->mFftScaling*this->mOutMap.topRows(this->mSpecSize);
+            rOut.topRows(this->mSpecSize).real() = this->mFftScaling*tmp.topRows(this->mSpecSize);
          } else
          {
-            rOut.topRows(this->mSpecSize).imag() = this->mFftScaling*this->mOutMap.topRows(this->mSpecSize);
+            rOut.topRows(this->mSpecSize).imag() = this->mFftScaling*tmp.topRows(this->mSpecSize);
          }
       }
    }
 
-   void ChebyshevIntegrator::outputSpectral(MatrixZ& rOut, const bool useReal) const
+   void ChebyshevIntegrator::outputSpectral(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
       if(useReal)
       {
-         rOut.topRows(this->mSpecSize).real() = this->mFftScaling*this->mSpecOp*this->mOutMap.topRows(this->mSpecOp.cols());
+         rOut.topRows(this->mSpecSize).real() = this->mFftScaling*this->mSpecOp*tmp.topRows(this->mSpecOp.cols());
       } else
       {
-         rOut.topRows(this->mSpecSize).imag() = this->mFftScaling*this->mSpecOp*this->mOutMap.topRows(this->mSpecOp.cols());
+         rOut.topRows(this->mSpecSize).imag() = this->mFftScaling*this->mSpecOp*tmp.topRows(this->mSpecOp.cols());
       }
    }
 

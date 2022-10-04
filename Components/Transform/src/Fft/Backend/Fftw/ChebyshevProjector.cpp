@@ -68,47 +68,9 @@ namespace Fftw {
       }
    }
 
-   void ChebyshevProjector::input(Matrix& tmp, const Matrix& in) const
-   {
-      tmp.topRows(this->mSpecSize) = in.topRows(this->mSpecSize);
-
-      this->applyPadding(tmp);
-   }
-
    void ChebyshevProjector::setScaler(const Array& scaler) const
    {
       this->mScaler = scaler;
-   }
-
-   void ChebyshevProjector::input(Matrix& tmp, const MatrixZ& in,
-      const bool useReal) const
-   {
-      if(useReal)
-      {
-         tmp.topRows(this->mSpecSize) = in.real().topRows(this->mSpecSize);
-      } else
-      {
-         tmp.topRows(this->mSpecSize) = in.imag().topRows(this->mSpecSize);
-      }
-
-      this->applyPadding(tmp);
-   }
-
-   void ChebyshevProjector::input(Matrix& tmp, const MatrixZ& in,
-      const int shift, const bool useReal) const
-   {
-      if(useReal)
-      {
-         tmp.topRows(this->mSpecSize - shift) = in.real().block(shift, 0, this->mSpecSize - shift, in.cols());
-      } else
-      {
-         tmp.topRows(this->mSpecSize - shift) = in.imag().block(shift, 0, this->mSpecSize - shift, in.cols());
-      }
-   }
-
-   void ChebyshevProjector::output(Matrix& rOut) const
-   {
-      this->io(rOut.data(), this->mTmp.data());
    }
 
    void ChebyshevProjector::output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
@@ -150,11 +112,6 @@ namespace Fftw {
       }
    }
 
-   void ChebyshevProjector::applyFft(Matrix& phys, const Matrix& mods) const
-   {
-      fftw_execute_r2r(this->mPlan, const_cast<MHDFloat *>(mods.data()), phys.data());
-   }
-
    void ChebyshevProjector::addSolver(const int extraRows) const
    {
       this->mspSolver = std::make_shared<DifferentialSolver>(this->mSpecSize, this->mBlockSize, extraRows);
@@ -162,12 +119,8 @@ namespace Fftw {
 
    void ChebyshevProjector::getSolution(Matrix& tmp, const int zeroRows, const int extraRows, const bool updateSolver) const
    {
-      this->solver().solve(zeroRows, tmp);
+      this->solver().solve(tmp, zeroRows);
       this->applyPadding(tmp, extraRows);
-      if(updateSolver)
-      {
-         this->solver().input(tmp, 0);
-      }
    }
 
    DifferentialSolver& ChebyshevProjector::solver() const

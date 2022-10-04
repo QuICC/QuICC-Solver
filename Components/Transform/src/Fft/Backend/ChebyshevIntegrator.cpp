@@ -52,24 +52,14 @@ namespace Backend {
       this->mpImpl->init(setup);
    }
 
-   void ChebyshevIntegrator::io(MHDFloat* out, const MHDFloat* in) const
+   void ChebyshevIntegrator::input(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
-      this->mpImpl->io(out, in);
+      this->mpImpl->input(tmp, in, useReal);
    }
 
-   void ChebyshevIntegrator::io(Matrix& rOut, const Matrix& in) const
+   void ChebyshevIntegrator::applyFft(Matrix& mods, const Matrix& phys) const
    {
-      this->mpImpl->io(rOut, in);
-   }
-
-   void ChebyshevIntegrator::input(const MatrixZ& in, const bool useReal) const
-   {
-      this->mpImpl->input(in, useReal);
-   }
-
-   void ChebyshevIntegrator::applyFft() const
-   {
-      this->mpImpl->applyFft();
+      this->mpImpl->applyFft(mods, phys);
    }
 
    void ChebyshevIntegrator::setSpectralOperator(const SparseMatrix& mat) const
@@ -92,14 +82,19 @@ namespace Backend {
       this->mpImpl->outputSpectral(rOut);
    }
 
-   void ChebyshevIntegrator::output(MatrixZ& rOut, const bool useReal) const
+   void ChebyshevIntegrator::output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      this->mpImpl->output(rOut, useReal);
+      this->mpImpl->output(rOut, tmp, useReal);
    }
 
-   void ChebyshevIntegrator::outputSpectral(MatrixZ& rOut, const bool useReal) const
+   void ChebyshevIntegrator::outputSpectral(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      this->mpImpl->outputSpectral(rOut, useReal);
+      this->mpImpl->outputSpectral(rOut, tmp, useReal);
+   }
+
+   Matrix& ChebyshevIntegrator::getStorage(const StorageKind kind) const
+   {
+      return this->mpImpl->getStorage(kind);
    }
 
 }

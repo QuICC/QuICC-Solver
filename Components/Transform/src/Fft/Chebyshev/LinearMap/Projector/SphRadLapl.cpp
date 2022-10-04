@@ -69,9 +69,10 @@ namespace Projector {
 
    void SphRadLapl::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
-      this->mBackend.solver().input(in, 1);
+      this->mBackend.input(tmp, in, 1);
       this->mBackend.getSolution(tmp, 3, -1, true);
-      this->mBackend.solver().inputSpectral(1);
+      auto specOp = this->mBackend.solver().getSpectralOperator();
+      tmp.topRows(specOp.rows()) = specOp * tmp.topRows(specOp.cols());
       this->mBackend.getSolution(tmp, 1, 2);
    }
 
@@ -82,9 +83,10 @@ namespace Projector {
 
    void SphRadLapl::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
-      this->mBackend.solver().input(in, 1, useReal);
+      this->mBackend.input(tmp, in, 1, useReal);
       this->mBackend.getSolution(tmp, 3, -1, true);
-      this->mBackend.solver().inputSpectral(1);
+      auto specOp = this->mBackend.solver().getSpectralOperator();
+      tmp.topRows(specOp.rows()) = specOp * tmp.topRows(specOp.cols());
       this->mBackend.getSolution(tmp, 1, 2);
    }
 

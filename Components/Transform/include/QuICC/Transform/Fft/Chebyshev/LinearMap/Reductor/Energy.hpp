@@ -49,7 +49,7 @@ namespace Reductor {
          /**
           * @brief Destructor
           */
-         virtual ~Energy();
+         ~Energy();
          
       protected:
 
@@ -60,14 +60,14 @@ namespace Reductor {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyPreOperator(const Matrix& in) const;
+         void applyPreOperator(Matrix& tmp, const Matrix& in) const  final;
 
          /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(Matrix& rOut) const;
+         void applyPostOperator(Matrix& rOut, const Matrix& tmp) const  final;
 
          /**
           * @brief Apply pre FFT operator for component wise openerations
@@ -75,7 +75,7 @@ namespace Reductor {
           * @param in   Input values
           * @param useReal Real vs Imag flag
           */
-         virtual void applyPreOperator(const MatrixZ& in, const bool useReal) const;
+         void applyPreOperator(Matrix& tmp, const MatrixZ& in, const  bool useReal) const final;
    };
 
 }

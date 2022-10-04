@@ -57,49 +57,52 @@ namespace Backend {
       this->mpImpl->setSpectralOperator(mat);
    }
 
-   void ChebyshevEnergy::input(const Matrix& in, const bool needPadding) const
+   void ChebyshevEnergy::input(Matrix& tmp, const Matrix& in) const
    {
-      this->mpImpl->input(in, needPadding);
+      this->mpImpl->input(tmp, in);
    }
 
-   void ChebyshevEnergy::input(const MatrixZ& in, const bool useReal, const bool needPadding) const
+   void ChebyshevEnergy::input(Matrix& tmp, const Matrix& in,
+      const int shift) const
    {
-      this->mpImpl->input(in, useReal, needPadding);
+      this->mpImpl->input(tmp, in, shift);
    }
 
-   void ChebyshevEnergy::square(const bool isFirst) const
+   void ChebyshevEnergy::input(Matrix& tmp, const MatrixZ& in,
+      const bool useReal) const
    {
-      this->mpImpl->square(isFirst);
+      this->mpImpl->input(tmp, in, useReal);
    }
 
-   void ChebyshevEnergy::output(Matrix& rOut) const
+   void ChebyshevEnergy::input(Matrix& tmp, const MatrixZ& in,
+      const int shift, const bool useReal) const
    {
-      this->mpImpl->output(rOut);
+      this->mpImpl->input(tmp, in, shift, useReal);
    }
 
-   void ChebyshevEnergy::outputSpectral(Matrix& rOut) const
+   void ChebyshevEnergy::square(Matrix& tmp, const Matrix& in,const bool isFirst) const
    {
-      this->mpImpl->outputSpectral(rOut);
+      this->mpImpl->square(tmp, in, isFirst);
    }
 
-   void ChebyshevEnergy::io() const
+   void ChebyshevEnergy::output(Matrix& rOut, const Matrix& tmp) const
    {
-      this->mpImpl->io();
+      this->mpImpl->output(rOut, tmp);
    }
 
-   void ChebyshevEnergy::io(MHDFloat* out, const MHDFloat* in) const
+   void ChebyshevEnergy::outputSpectral(Matrix& rOut, const Matrix& tmp) const
    {
-      this->mpImpl->io(out, in);
+      this->mpImpl->outputSpectral(rOut, tmp);
    }
 
-   void ChebyshevEnergy::applyFft() const
+   void ChebyshevEnergy::applyFft(Matrix& phys, const Matrix& mods) const
    {
-      this->mpImpl->applyFft();
+      this->mpImpl->applyFft(phys, mods);
    }
 
-   void ChebyshevEnergy::applyFwdFft() const
+   void ChebyshevEnergy::applyFwdFft(Matrix& mods, const Matrix& phys) const
    {
-      this->mpImpl->applyFwdFft();
+      this->mpImpl->applyFwdFft(mods, phys);
    }
 
    void ChebyshevEnergy::addSolver(const int extraRows) const
@@ -107,9 +110,14 @@ namespace Backend {
       this->mpImpl->addSolver(extraRows);
    }
 
-   void ChebyshevEnergy::getSolution(const int zeroRows, const int extraRows) const
+   void ChebyshevEnergy::getSolution(Matrix& tmp, const int zeroRows, const int extraRows) const
    {
-      this->mpImpl->getSolution(zeroRows, extraRows);
+      this->mpImpl->getSolution(tmp, zeroRows, extraRows);
+   }
+
+   Matrix& ChebyshevEnergy::getStorage(const StorageKind kind) const
+   {
+      return this->mpImpl->getStorage(kind);
    }
 
    Fftw::DifferentialSolver& ChebyshevEnergy::solver() const

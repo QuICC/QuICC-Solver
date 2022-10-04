@@ -103,47 +103,9 @@ namespace Fftw {
       rData.bottomRows(this->mFwdSize+this->mPadSize-extraRows).setZero();
    }
 
-   void ChebyshevEnergy::applyFft() const
+   void ChebyshevEnergy::applyFwdFft(Matrix& mods, const Matrix& phys) const
    {
-      fftw_execute_r2r(this->mPlan, const_cast<MHDFloat *>(this->mpIn), this->mpOut);
-   }
-
-   void ChebyshevEnergy::applyFwdFft() const
-   {
-      fftw_execute_r2r(this->mFwdPlan, const_cast<MHDFloat *>(this->mpIn), this->mpOut);
-   }
-
-   void ChebyshevEnergy::input(const Matrix& in, const bool needPadding) const
-   {
-      this->mTmp.topRows(this->mSpecSize) = in.topRows(this->mSpecSize);
-
-      // Apply padding if required
-      if(needPadding)
-      {
-         this->applyPadding(this->mTmp);
-      }
-   }
-
-   void ChebyshevEnergy::input(const MatrixZ& in, const bool useReal, const bool needPadding) const
-   {
-      if(useReal)
-      {
-         this->mTmp.topRows(this->mSpecSize) = in.real().topRows(this->mSpecSize);
-      } else
-      {
-         this->mTmp.topRows(this->mSpecSize) = in.imag().topRows(this->mSpecSize);
-      }
-
-      // Apply padding if required
-      if(needPadding)
-      {
-         this->applyPadding(this->mTmp);
-      }
-   }
-
-   void ChebyshevEnergy::io() const
-   {
-      this->io(this->mTmpComp.data(), this->mTmp.data());
+      fftw_execute_r2r(this->mFwdPlan, const_cast<MHDFloat *>(phys.data()), mods.data());
    }
 
    void ChebyshevEnergy::setSpectralOperator(const SparseMatrix& mat) const
@@ -151,29 +113,28 @@ namespace Fftw {
       this->mSpecOp = mat;
    }
 
-   void ChebyshevEnergy::outputSpectral(Matrix& rOut) const
+   void ChebyshevEnergy::outputSpectral(Matrix& rOut, const Matrix& tmp) const
    {
-      assert(this->mSpecOp.cols() <= this->mTmp.rows());
+      assert(this->mSpecOp.cols() <= tmp.rows());
       assert(this->mSpecOp.rows() <= this->mEWeights.rows());
-      rOut.transpose() = this->mFftScaling*this->mEWeights.topRows(this->mSpecOp.rows()).transpose()*this->mSpecOp*this->mTmp.topRows(2*this->mSpecSize);
+      rOut.transpose() = this->mFftScaling*this->mEWeights.topRows(this->mSpecOp.rows()).transpose()*this->mSpecOp*tmp.topRows(2*this->mSpecSize);
    }
 
-   void ChebyshevEnergy::output(Matrix& rOut) const
+   void ChebyshevEnergy::output(Matrix& rOut, const Matrix& tmp) const
    {
       int rows = 2*this->mSpecSize;
-      rOut.transpose() = this->mFftScaling*this->mEWeights.topRows(rows).transpose()*this->mTmp.topRows(rows);
+      rOut.transpose() = this->mFftScaling*this->mEWeights.topRows(rows).transpose()*tmp.topRows(rows);
    }
 
-   void ChebyshevEnergy::square(const bool isFirst) const
+   void ChebyshevEnergy::square(Matrix& tmp, const Matrix& in,const bool isFirst) const
    {
       if(isFirst)
       {
-         this->mTmpMid = this->mTmpComp.array().pow(2);
+         tmp = in.array().pow(2);
       } else
       {
-         this->mTmpMid.array() += this->mTmpComp.array().pow(2);
+         tmp.array() += in.array().pow(2);
       }
-      this->io(this->mTmp.data(), this->mTmpMid.data());
    }
 
    void ChebyshevEnergy::addSolver(const int extraRows) const
@@ -181,10 +142,25 @@ namespace Fftw {
       this->mspSolver = std::make_shared<DifferentialSolver>(this->mSpecSize, this->mBlockSize, extraRows);
    }
 
-   void ChebyshevEnergy::getSolution(const int zeroRows, const int extraRows) const
+   void ChebyshevEnergy::getSolution(Matrix& tmp, const int zeroRows, const int extraRows) const
    {
-      this->solver().solve(zeroRows, this->mTmp);
-      this->applyPadding(this->mTmp, extraRows);
+      this->solver().solve(tmp, zeroRows);
+      this->applyPadding(tmp, extraRows);
+   }
+
+   Matrix& ChebyshevEnergy::getStorage(const StorageKind kind) const
+   {
+      switch(kind)
+      {
+         case StorageKind::in:
+            return this->mTmp;
+
+         case StorageKind::out:
+            return this->mTmpComp;
+
+         default:
+            return this->mTmpMid;
+      }
    }
 
    DifferentialSolver& ChebyshevEnergy::solver() const

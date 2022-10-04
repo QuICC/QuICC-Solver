@@ -61,7 +61,9 @@ namespace Projector {
 
    void D1Y1::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
-      this->mBackend.solver().inputSpectral(in);
+      this->mBackend.input(tmp, in);
+      auto specOp = this->mBackend.solver().getSpectralOperator();
+      tmp.topRows(specOp.rows()) = specOp * tmp.topRows(specOp.cols());
       this->mBackend.getSolution(tmp, 1, 1);
    }
 
@@ -71,7 +73,9 @@ namespace Projector {
 
    void D1Y1::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
-      this->mBackend.solver().inputSpectral(in, useReal);
+      this->mBackend.input(tmp, in, useReal);
+      auto specOp = this->mBackend.solver().getSpectralOperator();
+      tmp.topRows(specOp.rows()) = specOp * tmp.topRows(specOp.cols());
       this->mBackend.getSolution(tmp, 1, 1);
    }
 

@@ -100,7 +100,7 @@ namespace Projector {
           */
          void applyPreOperator(Matrix& tmp, const Matrix& in) const final
          {
-            this->mBackend.solver().input(in, DO);
+            this->mBackend.input(tmp, in, DO);
             this->mBackend.getSolution(tmp, DO);
          }
 
@@ -120,7 +120,7 @@ namespace Projector {
           */
          void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const final
          {
-            this->mBackend.solver().input(in, DO, useReal);
+            this->mBackend.input(tmp, in, DO, useReal);
             this->mBackend.getSolution(tmp, DO);
          }
 

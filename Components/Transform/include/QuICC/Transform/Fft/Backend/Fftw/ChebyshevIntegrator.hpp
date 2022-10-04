@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_CHEBYSHEVINTEGRATOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_CHEBYSHEVINTEGRATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -47,27 +38,12 @@ namespace Fftw {
          /**
           * @brief Destructor
           */
-         virtual ~ChebyshevIntegrator();
+         ~ChebyshevIntegrator();
          
          /**
           * @brief Initialise the FFTW transforms
           */
-         virtual void init(const SetupType& setup) const override;
-
-         /**
-          * @brief Set input and output data pointers for FFT (R2R)
-          */
-         virtual void io(MHDFloat* out, const MHDFloat* in) const override;
-
-         /**
-          * @brief Set input and output data pointers for FFT (R2R)
-          */
-         virtual void io(Matrix& out, const Matrix& in) const;
-
-         /**
-          * @brief Set input and output data pointers for FFT (R2R)
-          */
-         virtual void input(const MatrixZ& out, const bool useReal) const;
+         void init(const SetupType& setup) const final;
 
          /**
           * @brief Set output
@@ -77,7 +53,7 @@ namespace Fftw {
          /**
           * @brief Set output
           */
-         void output(MatrixZ& rOut, const bool useReal) const;
+         void output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
           * @brief Set output multiplied aby spectral operator
@@ -87,12 +63,7 @@ namespace Fftw {
          /**
           * @brief Set output multiplied aby spectral operator
           */
-         void outputSpectral(MatrixZ& rOut, const bool useReal) const;
-
-         /**
-          * @brief Apply FFT
-          */
-         virtual void applyFft() const override;
+         void outputSpectral(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
           * @brief Set spectral operator
@@ -116,11 +87,6 @@ namespace Fftw {
           * @brief FFT scaling factor
           */
          mutable MHDFloat mFftScaling;
-
-         /**
-          * @brief Map for output data
-          */
-         mutable Eigen::Map<Matrix> mOutMap;
 
          /**
           * @brief Spectral operator

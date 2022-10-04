@@ -6,22 +6,14 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CHEBYSHEVPROJECTOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_CHEBYSHEVPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
+#include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
 
 namespace QuICC {
@@ -73,6 +65,15 @@ namespace Backend {
           * @param in input spectral coefficients
           */
          void input(Matrix& tmp, const Matrix& in) const;
+
+         /**
+          * @brief Copy input real or imaginary part and shift
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param shift
+          */
+         void input(Matrix& tmp, const Matrix& in, const int shift) const;
 
          /**
           * @brief Copy input real or imaginary part and pad
@@ -141,7 +142,7 @@ namespace Backend {
          /**
           * @brief Get the temporary storage
           */
-         Matrix& getStorage(const bool getOut = false) const;
+         Matrix& getStorage(const StorageKind = StorageKind::in) const;
          
       protected:
 

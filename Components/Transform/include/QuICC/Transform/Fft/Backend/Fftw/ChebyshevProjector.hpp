@@ -62,38 +62,6 @@ namespace Fftw {
          void setScaler(const Array& scaler) const;
 
          /**
-          * @brief Copy input and pad
-          *
-          * @param tmp temporary storage
-          * @param in input spectral coefficients
-          */
-         void input(Matrix& tmp, const Matrix& in) const;
-
-         /**
-          * @brief Copy input real or imaginary part and pad
-          *
-          * @param tmp temporary storage
-          * @param in input spectral coefficients
-          * @param useReal flag to extract real or im part
-          */
-         void input(Matrix& tmp, const MatrixZ& in, const bool useReal) const;
-
-         /**
-          * @brief Copy input real or imaginary part and shift
-          *
-          * @param tmp temporary storage
-          * @param in input spectral coefficients
-          * @param shift
-          * @param useReal flag to extract real or im part
-          */
-         void input(Matrix& tmp, const MatrixZ& in, const int shift, const bool useReal) const;
-
-         /**
-          * @brief Set output
-          */
-         void output(Matrix& rOut) const;
-
-         /**
           * @brief Set output
           */
          void output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
@@ -107,11 +75,6 @@ namespace Fftw {
           * @brief Set output scaled by array
           */
          void outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
-
-         /**
-          * @brief Apply FFT spectral to physical space
-          */
-         void applyFft(Matrix& phys, const Matrix& mods) const override;
 
          /**
           * @brief Add new linear solver
@@ -133,18 +96,13 @@ namespace Fftw {
             const int extraRows = 0,
             const bool updateSolver = false) const;
          
-      protected:
-
-      private:
          /**
           * @brief Apply padding
           */
-         void applyPadding(Matrix& rData, const int extraRows = 0) const;
+         void applyPadding(Matrix& rData, const int extraRows = 0) const final;
+      protected:
 
-         /**
-          * @brief Padding size
-          */
-         mutable int mPadSize;
+      private:
 
          /**
           * @brief Solver for differential operators
