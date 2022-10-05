@@ -1,0 +1,79 @@
+/**
+ * @file @Scheme@TransformCoordinatorTest.cpp
+ * @brief Tests for the communiator
+ */
+
+
+// Configuration includes
+//
+
+// System includes
+//
+
+#include "QuICC/Enums/Dimensions.hpp"
+#include "QuICC/Enums/FieldIds.hpp"
+#include "QuICC/QuICCEnv.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
+#include "QuICC/SpatialScheme/3D/@Scheme@.hpp"
+#include "QuICC/PhysicalNames/registerAll.hpp"
+#include "QuICC/Arithmetics/registerAll.hpp"
+#include "QuICC/TransformCoordinators/TransformCoordinator.hpp"
+#include "QuICC/TestSuite/Framework/TransformCoordinator/TestArgs.hpp"
+#include "QuICC/TestSuite/Framework/TransformCoordinator/TestHelper.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Framework::TCoord;
+
+static const auto badValueOut = std::numeric_limits<QuICC::MHDFloat>::max();
+
+TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
+
+   // Init Environment
+   QuICC::QuICCEnv();
+   #ifdef QUICC_MPI
+      {  
+         int size;
+         MPI_Comm_size(MPI_COMM_WORLD, &size);
+         QuICC::QuICCEnv().setup(size);
+      }
+   #else
+      QuICC::QuICCEnv().setup(1);
+   #endif
+
+   // Register IDs
+   QuICC::PhysicalNames::registerAll();
+   QuICC::Arithmetics::registerAll();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   QuICC::ArrayI dim = currentts::processCmdLine();
+
+   // Create LoadSplitter, SpatialScheme and generate resolution
+   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper);
+   auto&& descr = best.second;
+
+   for(auto id: currentts::args().params)
+   {
+      currentts::Test test;
+      test.spRes = best.first;
+      test.configure(id);
+      test.maxUlp = currentts::args().ulp;
+
+      currentts::initVariables(test);
+
+      currentts::initKernels(test);
+
+      currentts::initTrees(test);
+
+      currentts::initCoordinator(test, descr);
+
+      currentts::setVariables(test);
+
+      currentts::backward(test);
+
+      currentts::scrambleVariables(test);
+
+      currentts::nonlinearAndForward(test);
+
+      currentts::checkVariables(test);
+   }
+}
