@@ -1,10 +1,7 @@
-/** 
+/**
  * @file Sin_1D1Sin.cpp
- * @brief Source of backward projection operator Sin_1D1Sin 
+ * @brief Source of the backward transform operator Backard::Sin_1D1Sin
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Backward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Backward {
       return "Bwd::Sin_1D1Sin";
    }
 
-   const std::size_t& Sin_1D1Sin::id()
+   std::string Sin_1D1Sin::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<Sin_1D1Sin>(Sin_1D1Sin::sTag());
-      return *i;
+      return "Backard::Sin_1D1Sin";
    }
 
    Sin_1D1Sin::Sin_1D1Sin()
-      : IOperator(Sin_1D1Sin::sTag())
+      : IRegisterId<Sin_1D1Sin>(Sin_1D1Sin::sTag(), Sin_1D1Sin::sFormatted())
    {
    }
 
-   Sin_1D1Sin::~Sin_1D1Sin()
-   {
-   }
-
-}
-}
-}
+} // Backward
+} // Transform
+} // QuICC

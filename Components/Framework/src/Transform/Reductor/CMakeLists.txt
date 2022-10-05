@@ -12,5 +12,4 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   RadialPower.cpp
   RadialPowerDivR1.cpp
   RadialPowerDivR1D1R1.cpp
-  IOperator.cpp
 )

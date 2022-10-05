@@ -1,10 +1,7 @@
-/** 
+/**
  * @file EnergySLAPLR2.cpp
- * @brief Source of reductor projection operator EnergySLAPLR2 
+ * @brief Source of the reductor transform operator Reductor::EnergySLAPLR2
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Reductor/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Reductor {
       return "Red::EnergySLAPLR2";
    }
 
-   const std::size_t& EnergySLAPLR2::id()
+   std::string EnergySLAPLR2::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<EnergySLAPLR2>(EnergySLAPLR2::sTag());
-      return *i;
+      return "Reductor::EnergySLAPLR2";
    }
 
    EnergySLAPLR2::EnergySLAPLR2()
-      : IOperator(EnergySLAPLR2::sTag())
+      : IRegisterId<EnergySLAPLR2>(EnergySLAPLR2::sTag(), EnergySLAPLR2::sFormatted())
    {
    }
 
-   EnergySLAPLR2::~EnergySLAPLR2()
-   {
-   }
-
-}
-}
-}
+} // Reductor
+} // Transform
+} // QuICC

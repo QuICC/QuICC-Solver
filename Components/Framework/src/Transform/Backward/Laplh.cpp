@@ -1,10 +1,7 @@
-/** 
+/**
  * @file Laplh.cpp
- * @brief Source of backward projection operator Laplh 
+ * @brief Source of the backward transform operator Backard::Laplh
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Backward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Backward {
       return "Bwd::Laplh";
    }
 
-   const std::size_t& Laplh::id()
+   std::string Laplh::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<Laplh>(Laplh::sTag());
-      return *i;
+      return "Backard::Laplh";
    }
 
    Laplh::Laplh()
-      : IOperator(Laplh::sTag())
+      : IRegisterId<Laplh>(Laplh::sTag(), Laplh::sFormatted())
    {
    }
 
-   Laplh::~Laplh()
-   {
-   }
-
-}
-}
-}
+} // Backward
+} // Transform
+} // QuICC

@@ -8,7 +8,6 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   D3.cpp
   DfLaplh.cpp
   DsLaplh.cpp
-  IOperator.cpp
   Laplh.cpp
   LaplhZR_1D1R1.cpp
   P0.cpp

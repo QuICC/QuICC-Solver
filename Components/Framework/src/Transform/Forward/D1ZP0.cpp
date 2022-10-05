@@ -1,10 +1,7 @@
-/** 
+/**
  * @file D1ZP0.cpp
- * @brief Source of forward projection operator D1ZP0 
+ * @brief Source of the forward transform operator Forward::D1ZP0
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Forward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Forward {
       return "Fwd::D1ZP0";
    }
 
-   const std::size_t& D1ZP0::id()
+   std::string D1ZP0::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<D1ZP0>(D1ZP0::sTag());
-      return *i;
+      return "Forward::D1ZP0";
    }
 
    D1ZP0::D1ZP0()
-      : IOperator(D1ZP0::sTag())
+      : IRegisterId<D1ZP0>(D1ZP0::sTag(), D1ZP0::sFormatted())
    {
    }
 
-   D1ZP0::~D1ZP0()
-   {
-   }
-
-}
-}
-}
+} // Forward
+} // Transform
+} // QuICC

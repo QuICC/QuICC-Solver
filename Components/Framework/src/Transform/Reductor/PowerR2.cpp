@@ -1,10 +1,7 @@
-/** 
+/**
  * @file PowerR2.cpp
- * @brief Source of reductor projection operator PowerR2 
+ * @brief Source of the reductor transform operator Reductor::PowerR2
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Reductor/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Reductor {
       return "Red::PowerR2";
    }
 
-   const std::size_t& PowerR2::id()
+   std::string PowerR2::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<PowerR2>(PowerR2::sTag());
-      return *i;
+      return "Reductor::PowerR2";
    }
 
    PowerR2::PowerR2()
-      : IOperator(PowerR2::sTag())
+      : IRegisterId<PowerR2>(PowerR2::sTag(), PowerR2::sFormatted())
    {
    }
 
-   PowerR2::~PowerR2()
-   {
-   }
-
-}
-}
-}
+} // Reductor
+} // Transform
+} // QuICC

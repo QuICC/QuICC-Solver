@@ -1,10 +1,7 @@
 /**
  * @file SLapl.cpp
- * @brief Source of backward projection operator SLapl
+ * @brief Source of the backward transform operator Backard::SLapl
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Backward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Backward {
       return "Bwd::SLapl";
    }
 
-   const std::size_t& SLapl::id()
+   std::string SLapl::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<SLapl>(SLapl::sTag());
-      return *i;
+      return "Backard::SLapl";
    }
 
    SLapl::SLapl()
-      : IOperator(SLapl::sTag())
+      : IRegisterId<SLapl>(SLapl::sTag(), SLapl::sFormatted())
    {
    }
 
-   SLapl::~SLapl()
-   {
-   }
-
-}
-}
-}
+} // Backward
+} // Transform
+} // QuICC

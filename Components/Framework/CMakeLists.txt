@@ -5,6 +5,10 @@ set(QUICC_CURRENT_COMPONENT_LIB ${QUICC_FRAMEWORK_COMPONENT_LIB})
 # Set library sources visibility
 set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
 
+include(cmake.d/setup/RegisterTransformForward.cmake)
+include(cmake.d/setup/RegisterTransformBackward.cmake)
+include(cmake.d/setup/RegisterTransformReductor.cmake)
+
 # Create component library
 add_library(${QUICC_CURRENT_COMPONENT_LIB} "")
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB} PROPERTIES LINKER_LANGUAGE CXX)

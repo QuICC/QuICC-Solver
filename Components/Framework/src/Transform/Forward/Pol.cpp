@@ -1,10 +1,7 @@
-/** 
+/**
  * @file Pol.cpp
- * @brief Source of forward projection operator Pol 
+ * @brief Source of the forward transform operator Forward::Pol
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Forward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Forward {
       return "Fwd::Pol";
    }
 
-   const std::size_t& Pol::id()
+   std::string Pol::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<Pol>(Pol::sTag());
-      return *i;
+      return "Forward::Pol";
    }
 
    Pol::Pol()
-      : IOperator(Pol::sTag())
+      : IRegisterId<Pol>(Pol::sTag(), Pol::sFormatted())
    {
    }
 
-   Pol::~Pol()
-   {
-   }
-
-}
-}
-}
+} // Forward
+} // Transform
+} // QuICC

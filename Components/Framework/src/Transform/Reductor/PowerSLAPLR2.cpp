@@ -1,10 +1,7 @@
-/** 
+/**
  * @file PowerSLAPLR2.cpp
- * @brief Source of reductor projection operator PowerSLAPLR2 
+ * @brief Source of the reductor transform operator Reductor::PowerSLAPLR2
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Reductor/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Reductor {
       return "Red::PowerSLAPLR2";
    }
 
-   const std::size_t& PowerSLAPLR2::id()
+   std::string PowerSLAPLR2::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<PowerSLAPLR2>(PowerSLAPLR2::sTag());
-      return *i;
+      return "Reductor::PowerSLAPLR2";
    }
 
    PowerSLAPLR2::PowerSLAPLR2()
-      : IOperator(PowerSLAPLR2::sTag())
+      : IRegisterId<PowerSLAPLR2>(PowerSLAPLR2::sTag(), PowerSLAPLR2::sFormatted())
    {
    }
 
-   PowerSLAPLR2::~PowerSLAPLR2()
-   {
-   }
-
-}
-}
-}
+} // Reductor
+} // Transform
+} // QuICC

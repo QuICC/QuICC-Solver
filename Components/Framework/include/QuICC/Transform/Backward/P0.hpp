@@ -1,6 +1,6 @@
 /**
  * @file P0.hpp
- * @brief Backward projection operator P0 
+ * @brief Backward transform operator Backard::P0
  */
 
 #ifndef QUICC_TRANSFORM_BACKWARD_P0_HPP
@@ -14,8 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Backward/IOperator.hpp"
+#include "QuICC/Transform/Backward/IRegisterId.hpp"
 
 namespace QuICC {
 
@@ -24,9 +23,9 @@ namespace Transform {
 namespace Backward {
 
    /**
-    * @brief Backward projection operator P0
+    * @brief Backward transform operator Backard::P0
     */
-   class P0: public IOperator
+   class P0: public IRegisterId<P0>
    {
       public:
          /**
@@ -34,16 +33,8 @@ namespace Backward {
           */
          P0();
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~P0();
+         friend class IRegisterId<P0>;
 
-         /**
-          * @brief Unique id
-          */
-         static const std::size_t& id();
-      
       protected:
 
       private:
@@ -51,10 +42,15 @@ namespace Backward {
           * @brief Unique tag
           */
          static std::string sTag();
+
+         /**
+          * @brief Formatted name
+          */
+         static std::string sFormatted();
    };
 
-}
-}
-}
+} // Backward
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_BACKWARD_P0_HPP

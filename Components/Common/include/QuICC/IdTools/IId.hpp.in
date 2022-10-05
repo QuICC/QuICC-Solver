@@ -1,10 +1,10 @@
 /**
- * @file I@idID@.hpp
+ * @file @idID@.hpp
  * @brief Interface for a generic @idID@
  */
 
-#ifndef QUICC_@IDNS@_I@IDID@_HPP
-#define QUICC_@IDNS@_I@IDID@_HPP
+#ifndef QUICC_@IDNS@_@IDID@_HPP
+#define QUICC_@IDNS@_@IDID@_HPP
 
 // System includes
 //
@@ -19,23 +19,23 @@
 
 namespace QuICC {
 
-namespace @idNS@ {
+@cxxNS@
 
    /**
     * @brief Interface for a generic @idID@
     */
-   class I@idID@
+   class @idID@
    {
       public:
          /**
           * @brief Constructor
           */
-         I@idID@(const std::string tag, const std::string formatted);
+         @idID@(const std::string tag, const std::string formatted);
 
          /**
           * @brief Destructor
           */
-         virtual ~I@idID@() = default;
+         virtual ~@idID@() = default;
 
          /**
           * @brief Tag of the @idID@
@@ -62,24 +62,24 @@ namespace @idNS@ {
    };
 
    /// Typedef for shared_pointer @idID@
-   typedef std::shared_ptr<I@idID@> SharedI@idID@;
+   typedef std::shared_ptr<@idID@> Shared@idID@;
 
-   inline I@idID@::I@idID@(const std::string tag, const std::string formatted)
+   inline @idID@::@idID@(const std::string tag, const std::string formatted)
       : mTag(tag), mFormatted(formatted)
    {
    }
 
-   inline std::string I@idID@::tag() const
+   inline std::string @idID@::tag() const
    {
       return this->mTag;
    }
 
-   inline std::string I@idID@::formatted() const
+   inline std::string @idID@::formatted() const
    {
       return this->mFormatted;
    }
 
-}
+@cxxNS_@
 }
 
-#endif // QUICC_@IDNS@_I@IDID@_HPP
+#endif // QUICC_@IDNS@_@IDID@_HPP

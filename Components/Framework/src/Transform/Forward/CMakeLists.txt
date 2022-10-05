@@ -17,7 +17,6 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I6R_1D1R1.cpp
   I6R_1D1R1ZI4.cpp
   I6R_1Pm.cpp
-  IOperator.cpp
   Sin_1.cpp
   LaplhSin_1.cpp
   Laplh_1Sin_1.cpp

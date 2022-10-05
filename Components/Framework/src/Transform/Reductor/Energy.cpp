@@ -1,10 +1,7 @@
-/** 
+/**
  * @file Energy.cpp
- * @brief Source of reductor projection operator Energy 
+ * @brief Source of the reductor transform operator Reductor::Energy
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Reductor/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Reductor {
       return "Red::Energy";
    }
 
-   const std::size_t& Energy::id()
+   std::string Energy::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<Energy>(Energy::sTag());
-      return *i;
+      return "Reductor::Energy";
    }
 
    Energy::Energy()
-      : IOperator(Energy::sTag())
+      : IRegisterId<Energy>(Energy::sTag(), Energy::sFormatted())
    {
    }
 
-   Energy::~Energy()
-   {
-   }
-
-}
-}
-}
+} // Reductor
+} // Transform
+} // QuICC

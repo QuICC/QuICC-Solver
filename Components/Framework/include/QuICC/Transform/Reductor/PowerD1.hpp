@@ -1,6 +1,6 @@
 /**
  * @file PowerD1.hpp
- * @brief Reductor operator PowerD1 
+ * @brief Reductor transform operator Reductor::PowerD1
  */
 
 #ifndef QUICC_TRANSFORM_REDUCTOR_POWERD1_HPP
@@ -14,8 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Reductor/IOperator.hpp"
+#include "QuICC/Transform/Reductor/IRegisterId.hpp"
 
 namespace QuICC {
 
@@ -24,9 +23,9 @@ namespace Transform {
 namespace Reductor {
 
    /**
-    * @brief Reductor projection operator PowerD1
+    * @brief Reductor transform operator Reductor::PowerD1
     */
-   class PowerD1: public IOperator
+   class PowerD1: public IRegisterId<PowerD1>
    {
       public:
          /**
@@ -34,16 +33,8 @@ namespace Reductor {
           */
          PowerD1();
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~PowerD1();
+         friend class IRegisterId<PowerD1>;
 
-         /**
-          * @brief Unique id
-          */
-         static const std::size_t& id();
-      
       protected:
 
       private:
@@ -51,10 +42,15 @@ namespace Reductor {
           * @brief Unique tag
           */
          static std::string sTag();
+
+         /**
+          * @brief Formatted name
+          */
+         static std::string sFormatted();
    };
 
-}
-}
-}
+} // Reductor
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_REDUCTOR_POWERD1_HPP

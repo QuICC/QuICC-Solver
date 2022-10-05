@@ -1,6 +1,6 @@
 /**
  * @file Laplh.hpp
- * @brief Backward projection operator Laplh 
+ * @brief Backward transform operator Backard::Laplh
  */
 
 #ifndef QUICC_TRANSFORM_BACKWARD_LAPLH_HPP
@@ -14,8 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Backward/IOperator.hpp"
+#include "QuICC/Transform/Backward/IRegisterId.hpp"
 
 namespace QuICC {
 
@@ -24,9 +23,9 @@ namespace Transform {
 namespace Backward {
 
    /**
-    * @brief Backward projection operator Laplh
+    * @brief Backward transform operator Backard::Laplh
     */
-   class Laplh: public IOperator
+   class Laplh: public IRegisterId<Laplh>
    {
       public:
          /**
@@ -34,16 +33,8 @@ namespace Backward {
           */
          Laplh();
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~Laplh();
+         friend class IRegisterId<Laplh>;
 
-         /**
-          * @brief Unique id
-          */
-         static const std::size_t& id();
-      
       protected:
 
       private:
@@ -51,10 +42,15 @@ namespace Backward {
           * @brief Unique tag
           */
          static std::string sTag();
+
+         /**
+          * @brief Formatted name
+          */
+         static std::string sFormatted();
    };
 
-}
-}
-}
+} // Backward
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_BACKWARD_LAPLH_HPP

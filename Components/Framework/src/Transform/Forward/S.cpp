@@ -1,10 +1,7 @@
-/** 
+/**
  * @file S.cpp
- * @brief Source of forward projection operator S 
+ * @brief Source of the forward transform operator Forward::S
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Forward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Forward {
       return "Fwd::S";
    }
 
-   const std::size_t& S::id()
+   std::string S::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<S>(S::sTag());
-      return *i;
+      return "Forward::S";
    }
 
    S::S()
-      : IOperator(S::sTag())
+      : IRegisterId<S>(S::sTag(), S::sFormatted())
    {
    }
 
-   S::~S()
-   {
-   }
-
-}
-}
-}
+} // Forward
+} // Transform
+} // QuICC

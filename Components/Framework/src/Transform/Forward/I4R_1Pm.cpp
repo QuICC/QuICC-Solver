@@ -1,10 +1,7 @@
-/** 
+/**
  * @file I4R_1Pm.cpp
- * @brief Source of forward projection operator I4R_1Pm 
+ * @brief Source of the forward transform operator Forward::I4R_1Pm
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Forward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Forward {
       return "Fwd::I4R_1Pm";
    }
 
-   const std::size_t& I4R_1Pm::id()
+   std::string I4R_1Pm::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<I4R_1Pm>(I4R_1Pm::sTag());
-      return *i;
+      return "Forward::I4R_1Pm";
    }
 
    I4R_1Pm::I4R_1Pm()
-      : IOperator(I4R_1Pm::sTag())
+      : IRegisterId<I4R_1Pm>(I4R_1Pm::sTag(), I4R_1Pm::sFormatted())
    {
    }
 
-   I4R_1Pm::~I4R_1Pm()
-   {
-   }
-
-}
-}
-}
+} // Forward
+} // Transform
+} // QuICC

@@ -1,6 +1,6 @@
 /**
  * @file RadialPower.hpp
- * @brief Reductor operator RadialPower
+ * @brief Reductor transform operator Reductor::RadialPower
  */
 
 #ifndef QUICC_TRANSFORM_REDUCTOR_RADIALPOWER_HPP
@@ -14,8 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Reductor/IOperator.hpp"
+#include "QuICC/Transform/Reductor/IRegisterId.hpp"
 
 namespace QuICC {
 
@@ -24,9 +23,9 @@ namespace Transform {
 namespace Reductor {
 
    /**
-    * @brief Reductor projection operator RadialPower
+    * @brief Reductor transform operator Reductor::RadialPower
     */
-   class RadialPower: public IOperator
+   class RadialPower: public IRegisterId<RadialPower>
    {
       public:
          /**
@@ -34,16 +33,8 @@ namespace Reductor {
           */
          RadialPower();
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~RadialPower();
+         friend class IRegisterId<RadialPower>;
 
-         /**
-          * @brief Unique id
-          */
-         static const std::size_t& id();
-      
       protected:
 
       private:
@@ -51,10 +42,15 @@ namespace Reductor {
           * @brief Unique tag
           */
          static std::string sTag();
+
+         /**
+          * @brief Formatted name
+          */
+         static std::string sFormatted();
    };
 
-}
-}
-}
+} // Reductor
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_REDUCTOR_RADIALPOWER_HPP

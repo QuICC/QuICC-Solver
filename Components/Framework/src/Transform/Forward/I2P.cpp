@@ -1,10 +1,7 @@
 /**
  * @file I2P.cpp
- * @brief Source of forward projection operator I2P
+ * @brief Source of the forward transform operator Forward::I2P
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Forward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Forward {
       return "Fwd::I2P";
    }
 
-   const std::size_t& I2P::id()
+   std::string I2P::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<I2P>(I2P::sTag());
-      return *i;
+      return "Forward::I2P";
    }
 
    I2P::I2P()
-      : IOperator(I2P::sTag())
+      : IRegisterId<I2P>(I2P::sTag(), I2P::sFormatted())
    {
    }
 
-   I2P::~I2P()
-   {
-   }
-
-}
-}
-}
+} // Forward
+} // Transform
+} // QuICC

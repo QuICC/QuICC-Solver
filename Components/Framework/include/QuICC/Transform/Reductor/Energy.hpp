@@ -1,6 +1,6 @@
 /**
  * @file Energy.hpp
- * @brief Reductor operator Energy 
+ * @brief Reductor transform operator Reductor::Energy
  */
 
 #ifndef QUICC_TRANSFORM_REDUCTOR_ENERGY_HPP
@@ -14,8 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Reductor/IOperator.hpp"
+#include "QuICC/Transform/Reductor/IRegisterId.hpp"
 
 namespace QuICC {
 
@@ -24,9 +23,9 @@ namespace Transform {
 namespace Reductor {
 
    /**
-    * @brief Reductor projection operator Energy
+    * @brief Reductor transform operator Reductor::Energy
     */
-   class Energy: public IOperator
+   class Energy: public IRegisterId<Energy>
    {
       public:
          /**
@@ -34,16 +33,8 @@ namespace Reductor {
           */
          Energy();
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~Energy();
+         friend class IRegisterId<Energy>;
 
-         /**
-          * @brief Unique id
-          */
-         static const std::size_t& id();
-      
       protected:
 
       private:
@@ -51,10 +42,15 @@ namespace Reductor {
           * @brief Unique tag
           */
          static std::string sTag();
+
+         /**
+          * @brief Formatted name
+          */
+         static std::string sFormatted();
    };
 
-}
-}
-}
+} // Reductor
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_REDUCTOR_ENERGY_HPP

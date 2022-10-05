@@ -1,10 +1,7 @@
-/** 
+/**
  * @file D3.cpp
- * @brief Source of backward projection operator D3 
+ * @brief Source of the backward transform operator Backard::D3
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Backward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Backward {
       return "Bwd::D3";
    }
 
-   const std::size_t& D3::id()
+   std::string D3::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<D3>(D3::sTag());
-      return *i;
+      return "Backard::D3";
    }
 
    D3::D3()
-      : IOperator(D3::sTag())
+      : IRegisterId<D3>(D3::sTag(), D3::sFormatted())
    {
    }
 
-   D3::~D3()
-   {
-   }
-
-}
-}
-}
+} // Backward
+} // Transform
+} // QuICC

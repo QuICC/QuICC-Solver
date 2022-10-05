@@ -14,21 +14,21 @@
 
 // Project includes
 //
-@idHeader@
+@_idHeader@
 
 namespace QuICC {
 
-namespace @idNS@ {
+@cxxNS@
 
    void registerAll();
 
    inline void registerAll()
    {
-      @idList@
+      @_idList@
 
    }
 
-}
+@cxxNS_@
 }
 
 #endif // QUICC_@IDNS@_REGISTERALL_HPP

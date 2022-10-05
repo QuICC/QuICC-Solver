@@ -1,6 +1,6 @@
 /**
  * @file I2T.hpp
- * @brief Forward projection operator I2T
+ * @brief Forward transform operator Forward::I2T
  */
 
 #ifndef QUICC_TRANSFORM_FORWARD_I2T_HPP
@@ -14,8 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Forward/IOperator.hpp"
+#include "QuICC/Transform/Forward/IRegisterId.hpp"
 
 namespace QuICC {
 
@@ -24,9 +23,9 @@ namespace Transform {
 namespace Forward {
 
    /**
-    * @brief Forward projection operator I2T
+    * @brief Forward transform operator Forward::I2T
     */
-   class I2T: public IOperator
+   class I2T: public IRegisterId<I2T>
    {
       public:
          /**
@@ -34,15 +33,7 @@ namespace Forward {
           */
          I2T();
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~I2T();
-
-         /**
-          * @brief Unique id
-          */
-         static const std::size_t& id();
+         friend class IRegisterId<I2T>;
 
       protected:
 
@@ -51,10 +42,15 @@ namespace Forward {
           * @brief Unique tag
           */
          static std::string sTag();
+
+         /**
+          * @brief Formatted name
+          */
+         static std::string sFormatted();
    };
 
-}
-}
-}
+} // Forward
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_FORWARD_I2T_HPP

@@ -1,10 +1,7 @@
 /**
  * @file P.cpp
- * @brief Source of backward projection operator P
+ * @brief Source of the backward transform operator Backard::P
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Backward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Backward {
       return "Bwd::P";
    }
 
-   const std::size_t& P::id()
+   std::string P::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<P>(P::sTag());
-      return *i;
+      return "Backard::P";
    }
 
    P::P()
-      : IOperator(P::sTag())
+      : IRegisterId<P>(P::sTag(), P::sFormatted())
    {
    }
 
-   P::~P()
-   {
-   }
-
-}
-}
-}
+} // Backward
+} // Transform
+} // QuICC

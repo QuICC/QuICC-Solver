@@ -1,6 +1,6 @@
 /**
  * @file Laplh2.hpp
- * @brief Forward projection operator Laplh2 
+ * @brief Forward transform operator Forward::Laplh2
  */
 
 #ifndef QUICC_TRANSFORM_FORWARD_LAPLH2_HPP
@@ -14,8 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Forward/IOperator.hpp"
+#include "QuICC/Transform/Forward/IRegisterId.hpp"
 
 namespace QuICC {
 
@@ -24,9 +23,9 @@ namespace Transform {
 namespace Forward {
 
    /**
-    * @brief Forward projection operator Laplh2
+    * @brief Forward transform operator Forward::Laplh2
     */
-   class Laplh2: public IOperator
+   class Laplh2: public IRegisterId<Laplh2>
    {
       public:
          /**
@@ -34,16 +33,8 @@ namespace Forward {
           */
          Laplh2();
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~Laplh2();
+         friend class IRegisterId<Laplh2>;
 
-         /**
-          * @brief Unique id
-          */
-         static const std::size_t& id();
-      
       protected:
 
       private:
@@ -51,10 +42,15 @@ namespace Forward {
           * @brief Unique tag
           */
          static std::string sTag();
+
+         /**
+          * @brief Formatted name
+          */
+         static std::string sFormatted();
    };
 
-}
-}
-}
+} // Forward
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_FORWARD_LAPLH2_HPP

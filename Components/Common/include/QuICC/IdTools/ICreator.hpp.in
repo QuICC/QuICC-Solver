@@ -16,11 +16,11 @@
 // Project includes
 //
 #include "QuICC/BasicTypes.hpp"
-#include "QuICC/@idNS@/I@idID@.hpp"
+#include "QuICC/@idNS@/@idID@.hpp"
 
 namespace QuICC {
 
-namespace @idNS@ {
+@cxxNS@
 
    /**
     * @brief @idID@ creator interface
@@ -41,13 +41,13 @@ namespace @idNS@ {
          /**
           * @brief Create @idID@ shared pointer
           */
-         virtual SharedI@idID@ create(@idSIG@) const = 0;
+         virtual Shared@idID@ create(@_idSIG@) const = 0;
    };
 
    /// Typedef for a shared pointer ICreator
    typedef std::shared_ptr<ICreator> SharedICreator;
 
-}
+@cxxNS_@
 }
 
 #endif // QUICC_@IDNS@_ICREATOR_HPP

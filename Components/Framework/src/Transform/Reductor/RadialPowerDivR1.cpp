@@ -1,10 +1,7 @@
-/** 
+/**
  * @file RadialPowerDivR1.cpp
- * @brief Source of reductor projection operator RadialPowerDivR1 
+ * @brief Source of the reductor transform operator Reductor::RadialPowerDivR1
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Reductor/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Reductor {
       return "Red::RadialPowerDivR1";
    }
 
-   const std::size_t& RadialPowerDivR1::id()
+   std::string RadialPowerDivR1::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<RadialPowerDivR1>(RadialPowerDivR1::sTag());
-      return *i;
+      return "Reductor::RadialPowerDivR1";
    }
 
    RadialPowerDivR1::RadialPowerDivR1()
-      : IOperator(RadialPowerDivR1::sTag())
+      : IRegisterId<RadialPowerDivR1>(RadialPowerDivR1::sTag(), RadialPowerDivR1::sFormatted())
    {
    }
 
-   RadialPowerDivR1::~RadialPowerDivR1()
-   {
-   }
-
-}
-}
-}
+} // Reductor
+} // Transform
+} // QuICC

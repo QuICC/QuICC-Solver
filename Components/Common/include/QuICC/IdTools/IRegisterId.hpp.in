@@ -15,24 +15,24 @@
 // Project includes
 //
 #include "QuICC/Hasher.hpp"
-#include "QuICC/@idNS@/I@idID@.hpp"
+#include "QuICC/@idNS@/@idID@.hpp"
 #include "QuICC/@idNS@/Coordinator.hpp"
 #include "QuICC/@idNS@/CreatorImpl.hpp"
 
 namespace QuICC {
 
-namespace @idNS@ {
+@cxxNS@
 
    /**
     * @brief Register @idID@
     */
-   template <typename T> class IRegisterId: public I@idID@
+   template <typename T> class IRegisterId: public @idID@
    {
       public:
          /**
           * @brief Constructor
           */
-         IRegisterId(@idSIG@@idCOMMA@const std::string tag, const std::string formatted);
+         IRegisterId(@_idSIG@@_idCOMMA@const std::string tag, const std::string formatted);
 
          /**
           * @brief Destructor
@@ -64,8 +64,8 @@ namespace @idNS@ {
       return id;
    }
 
-   template <typename T> IRegisterId<T>::IRegisterId(@idSIG@@idCOMMA@const std::string tag, const std::string formatted)
-      : I@idID@(@idARG@@idCOMMA@tag, formatted)
+   template <typename T> IRegisterId<T>::IRegisterId(@_idSIG@@_idCOMMA@const std::string tag, const std::string formatted)
+      : @idID@(@idARG@@_idCOMMA@tag, formatted)
    {
    }
 
@@ -76,7 +76,7 @@ namespace @idNS@ {
       return *i;
    }
 
-}
+@cxxNS_@
 }
 
 #endif // QUICC_@IDNS@_IREGISTERID_HPP

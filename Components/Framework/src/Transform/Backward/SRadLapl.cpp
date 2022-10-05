@@ -1,10 +1,7 @@
-/** 
+/**
  * @file SRadLapl.cpp
- * @brief Source of backward projection operator SRadLapl 
+ * @brief Source of the backward transform operator Backard::SRadLapl
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Backward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Backward {
       return "Bwd::SRadLapl";
    }
 
-   const std::size_t& SRadLapl::id()
+   std::string SRadLapl::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<SRadLapl>(SRadLapl::sTag());
-      return *i;
+      return "Backard::SRadLapl";
    }
 
    SRadLapl::SRadLapl()
-      : IOperator(SRadLapl::sTag())
+      : IRegisterId<SRadLapl>(SRadLapl::sTag(), SRadLapl::sFormatted())
    {
    }
 
-   SRadLapl::~SRadLapl()
-   {
-   }
-
-}
-}
-}
+} // Backward
+} // Transform
+} // QuICC

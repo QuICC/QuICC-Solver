@@ -1,10 +1,7 @@
-/** 
+/**
  * @file DfLaplh_1.cpp
- * @brief Source of forward projection operator DfLaplh_1 
+ * @brief Source of the forward transform operator Forward::DfLaplh_1
  */
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -18,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Forward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -31,22 +27,16 @@ namespace Forward {
       return "Fwd::DfLaplh_1";
    }
 
-   const std::size_t& DfLaplh_1::id()
+   std::string DfLaplh_1::sFormatted()
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<DfLaplh_1>(DfLaplh_1::sTag());
-      return *i;
+      return "Forward::DfLaplh_1";
    }
 
    DfLaplh_1::DfLaplh_1()
-      : IOperator(DfLaplh_1::sTag())
+      : IRegisterId<DfLaplh_1>(DfLaplh_1::sTag(), DfLaplh_1::sFormatted())
    {
    }
 
-   DfLaplh_1::~DfLaplh_1()
-   {
-   }
-
-}
-}
-}
+} // Forward
+} // Transform
+} // QuICC

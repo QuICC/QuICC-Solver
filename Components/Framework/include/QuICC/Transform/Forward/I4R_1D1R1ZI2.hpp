@@ -1,6 +1,6 @@
 /**
  * @file I4R_1D1R1ZI2.hpp
- * @brief Forward projection operator I4R_1D1R1ZI2 
+ * @brief Forward transform operator Forward::I4R_1D1R1ZI2
  */
 
 #ifndef QUICC_TRANSFORM_FORWARD_I4R_1D1R1ZI2_HPP
@@ -14,8 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Forward/IOperator.hpp"
+#include "QuICC/Transform/Forward/IRegisterId.hpp"
 
 namespace QuICC {
 
@@ -24,9 +23,9 @@ namespace Transform {
 namespace Forward {
 
    /**
-    * @brief Forward projection operator I4R_1D1R1ZI2
+    * @brief Forward transform operator Forward::I4R_1D1R1ZI2
     */
-   class I4R_1D1R1ZI2: public IOperator
+   class I4R_1D1R1ZI2: public IRegisterId<I4R_1D1R1ZI2>
    {
       public:
          /**
@@ -34,16 +33,8 @@ namespace Forward {
           */
          I4R_1D1R1ZI2();
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~I4R_1D1R1ZI2();
+         friend class IRegisterId<I4R_1D1R1ZI2>;
 
-         /**
-          * @brief Unique id
-          */
-         static const std::size_t& id();
-      
       protected:
 
       private:
@@ -51,10 +42,15 @@ namespace Forward {
           * @brief Unique tag
           */
          static std::string sTag();
+
+         /**
+          * @brief Formatted name
+          */
+         static std::string sFormatted();
    };
 
-}
-}
-}
+} // Forward
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_FORWARD_I4R_1D1R1ZI2_HPP
