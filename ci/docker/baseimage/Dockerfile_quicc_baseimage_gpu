@@ -1,8 +1,8 @@
 # Build stage with Spack pre-installed and ready to be used
 ARG CSCS_REGISTRY_PATH
-FROM $CSCS_REGISTRY_PATH/ubuntu-spack:22.04-0.18.0 as builder
+FROM $CSCS_REGISTRY_PATH/cuda-ubuntu-spack:11.7.1-22.04-0.18.0 as builder
 
-ARG NUM_PROCS=16
+ARG NUM_PROCS 16
 
 # Install OS packages needed to build the software
 RUN apt-get -yqq update && apt-get -yqq upgrade \
@@ -19,13 +19,19 @@ RUN mkdir /opt/spack-environment \
 &&   echo "  - cmake" \
 &&   echo "  - openblas" \
 &&   echo "  - boost@1.78.0" \
+&&   echo "  - kokkos +wrapper+cuda_lambda" \
 &&   echo "  - py-scipy" \
 &&   echo "  - reframe" \
-&&   echo "  - kokkos-kernels" \
+&&   echo "  - kokkos-kernels"\
 &&   echo "  - mpich@3.1.4 netmod=tcp device=ch3" \
 &&   echo "  packages:" \
+&&   echo "    cuda:" \
+&&   echo "      externals:" \
+&&   echo "      - spec: cuda@11.7.1%gcc@11.2.0 arch=linux-ubuntu22.04-x86_64" \
+&&   echo "        prefix: /usr/local/cuda" \
+&&   echo "      buildable: false" \
 &&   echo "    all:" \
-&&   echo "      variants: +openmp +mpi build_type=Release" \
+&&   echo "      variants: +cuda +openmp +mpi cuda_arch=60 build_type=Release" \
 &&   echo "      providers:" \
 &&   echo "        mpi:" \
 &&   echo "        - mpich@3.1.4" \
@@ -43,7 +49,6 @@ RUN cd /opt/spack-environment && spack env activate . \
   && make -j$NUM_PROCS SPACK_COLOR=always --output-sync=recurse \
   && spack gc -y
 
-
 # Strip all the binaries
 RUN find -L /opt/view/* -type f -exec readlink -f '{}' \; | \
     xargs file -i | \
@@ -58,7 +63,7 @@ RUN cd /opt/spack-environment && \
 
 
 # Bare OS image to run the installed executables
-FROM docker.io/ubuntu:22.04
+FROM docker.io/nvidia/cuda:11.7.1-devel-ubuntu22.04
 
 COPY --from=builder /opt/spack-environment /opt/spack-environment
 COPY --from=builder /opt/software /opt/software
@@ -74,6 +79,12 @@ RUN apt-get -yqq update && apt-get -yqq upgrade \
 RUN (echo "/opt/view/lib" \
 &&   echo "/opt/view/lib64") > /etc/ld.so.conf.d/spack.conf \
 && ldconfig
+
+# set default compile options in nvcc_wrapper
+RUN sed -i -e 's/default_arch="sm_35"/default_arch="sm_60"/' \
+           -e 's/DEFAULT_COMPILER:-"g++"/DEFAULT_COMPILER:-"mpic++"/' \
+           -e 's/^cuda_args=""$/cuda_args="--extended-lambda"/' \
+           /opt/software/linux-ubuntu22.04-x86_64/gcc-11.2.0/kokkos*/bin/nvcc_wrapper
 
 ENTRYPOINT ["/bin/bash", "--rcfile", "/etc/profile", "-l", "-c"]
 CMD ["/bin/bash"]

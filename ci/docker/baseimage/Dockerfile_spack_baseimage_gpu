@@ -1,4 +1,4 @@
-FROM docker.io/ubuntu:22.04
+FROM docker.io/nvidia/cuda:11.7.1-devel-ubuntu22.04
 
 MAINTAINER Andreas Fink <andreas.fink@cscs.ch>
 
