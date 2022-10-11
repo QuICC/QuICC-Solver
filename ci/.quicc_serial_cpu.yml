@@ -18,6 +18,7 @@ build-quicc_serial:
   variables:
     DOCKERFILE: ci/docker/Dockerfile_serial
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_serial:latest
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/ubuntu-quicc-buildbase:22.04"]'
 test-quicc-lib_serial:
   extends:
   - .test-lib

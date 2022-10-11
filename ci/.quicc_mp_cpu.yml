@@ -18,6 +18,7 @@ build-quicc_mp:
   variables:
     DOCKERFILE: ci/docker/Dockerfile_mp
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mp:latest
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/ubuntu-quicc-buildbase:22.04"]'
 test-quicc-lib_mp:
   extends:
   - .test-lib

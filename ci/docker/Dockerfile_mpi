@@ -1,4 +1,5 @@
-FROM finkandreas/ubuntu-quicc-buildbase:20.04
+ARG BASEIMAGE
+FROM $BASEIMAGE
 
 COPY . /QuICC.src
 
