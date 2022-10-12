@@ -44,7 +44,7 @@ namespace SparseSM {
    SparseMatrix ISparseSMOperator::mat() const
    {
       internal::SparseMatrix mat;
-      this->buildOp(mat);
+      this->buildOpImpl(mat);
 
       return mat.cast<MHDFloat>();
    }
@@ -57,7 +57,7 @@ namespace SparseSM {
       return bd.cast<MHDFloat>();
    }
 
-   void ISparseSMOperator::buildOp(internal::SparseMatrix& mat) const
+   void ISparseSMOperator::buildOpImpl(internal::SparseMatrix& mat) const
    {
       // Build triplets
       TripletList_t list;
@@ -69,7 +69,7 @@ namespace SparseSM {
       mat.makeCompressed();
    }
 
-   void ISparseSMOperator::buildOp(internal::Matrix& bd) const
+   void ISparseSMOperator::buildOpImpl(internal::Matrix& bd) const
    {
       unsigned int kL, kU;
       this->buildBanded(bd, kL, kU);
