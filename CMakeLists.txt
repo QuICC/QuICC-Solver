@@ -6,12 +6,14 @@ cmake_minimum_required(VERSION 3.16.3)
 
 # Add release with assert
 include(cmake.d/AddRelWithAssert.cmake)
+# Add release for Valgrind
+include(cmake.d/AddRelForValgrind.cmake)
 # Set default build type
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build,
-options are: Debug Release RelWithDebInfo MinSizeRel.")
+options are: Debug Release RelWithDebInfo RelWithAssert RelForValgrind MinSizeRel.")
 # Toggle-able build type
 set_property(CACHE CMAKE_BUILD_TYPE
-  PROPERTY STRINGS "Debug;Release;RelWithDebInfo;RelWithAssert;MinSizeRel")
+  PROPERTY STRINGS "Debug;Release;RelWithDebInfo;RelWithAssert;RelForValgrind;MinSizeRel")
 
 project(QuICC CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
