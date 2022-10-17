@@ -13,7 +13,7 @@ options are: Debug Release RelWithDebInfo MinSizeRel.")
 set_property(CACHE CMAKE_BUILD_TYPE
   PROPERTY STRINGS "Debug;Release;RelWithDebInfo;RelWithAssert;MinSizeRel")
 
-project(QuICC CXX)
+project(QuICC CXX C)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set CMake module path

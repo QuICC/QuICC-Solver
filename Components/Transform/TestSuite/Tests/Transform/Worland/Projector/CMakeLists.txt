@@ -27,7 +27,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 8 34 49 51
-  MPULP 1 1 2 1
+  MPULP 1 1 2 2
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}

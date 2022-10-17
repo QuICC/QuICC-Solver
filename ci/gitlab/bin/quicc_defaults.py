@@ -1,7 +1,7 @@
 #
 # Default models for QuICC model tests
 #
-from typing import NamedTuple
+from typing import NamedTuple, List
 
 class config(NamedTuple):
     name: str
@@ -9,7 +9,7 @@ class config(NamedTuple):
     test: bool
     tasks: int = 4
     variant: str = ''
-    ignore: list[str] = []
+    ignore: List[str] = []
 
     def fullname(self):
         """Combine model name and tag into full name"""

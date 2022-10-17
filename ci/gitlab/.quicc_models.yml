@@ -8,7 +8,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereDynamoExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build/Models/BoussinesqSphereDynamo/TestSuite/Benchmarks/_data/Explicit
@@ -24,7 +24,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoImplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoImplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereDynamoImplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoImplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoImplicit/build/Models/BoussinesqSphereDynamo/TestSuite/Benchmarks/_data/Implicit_single2d
@@ -40,7 +40,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellDynamoExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoExplicit/build/Models/BoussinesqShellDynamo/TestSuite/Benchmarks/_data/Explicit
@@ -56,7 +56,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoImplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoImplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellDynamoImplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoImplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoImplicit/build/Models/BoussinesqShellDynamo/TestSuite/Benchmarks/_data/Implicit_single2d
@@ -72,7 +72,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Explicit_serial
@@ -88,7 +88,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Explicit_single1d
@@ -104,7 +104,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Explicit_single2d
@@ -120,7 +120,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Explicit_tubular
@@ -136,7 +136,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCImplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Implicit_serial
@@ -152,7 +152,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCImplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Implicit_single1d
@@ -168,7 +168,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCImplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Implicit_single2d
@@ -184,7 +184,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCImplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Implicit_tubular
@@ -200,7 +200,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTCExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/TestSuite/Benchmarks/_data/Explicit_serial
@@ -216,7 +216,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTCExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/TestSuite/Benchmarks/_data/Explicit_single1d
@@ -232,7 +232,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTCExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/TestSuite/Benchmarks/_data/Explicit_single2d
@@ -248,7 +248,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTCExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/TestSuite/Benchmarks/_data/Explicit_tubular
@@ -264,7 +264,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTCImplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build/Models/BoussinesqShellRTC/TestSuite/Benchmarks/_data/Implicit_serial
@@ -280,7 +280,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTCImplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build/Models/BoussinesqShellRTC/TestSuite/Benchmarks/_data/Implicit_single2d
@@ -296,7 +296,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTCExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTCExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellTCExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTCExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTCExplicit/build/Models/BoussinesqShellTC/TestSuite/Benchmarks/_data/Explicit
@@ -312,7 +312,7 @@
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
   - mkdir -p ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTCExplicit/build
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTCExplicit/build
-  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/lib/cmake/quicc
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake
     && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereTCExplicit'"
   - export PYTHONPATH=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTCExplicit/build/lib/python
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTCExplicit/build/Models/BoussinesqSphereTC/TestSuite/Benchmarks/_data/Explicit

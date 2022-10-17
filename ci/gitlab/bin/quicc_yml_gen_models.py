@@ -30,7 +30,7 @@ def populateYaml(cnf):
                 'mkdir -p '+modelPath+'/build',
                 'cd '+modelPath+'/build',
                 # echo command is added to make lock unique per each pipeline
-                '/QuICC.src/ci/gitlab/bin/mpi_lock.sh \"cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL='+cnf.name+' -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR='+libPath+'/lib/cmake/quicc && bash -c \'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_'+cnf.name+cnf.tag+'\'\"',
+                '/QuICC.src/ci/gitlab/bin/mpi_lock.sh \"cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL='+cnf.name+' -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR='+libPath+'/share/quicc/cmake && bash -c \'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_'+cnf.name+cnf.tag+'\'\"',
 
             ],
         }

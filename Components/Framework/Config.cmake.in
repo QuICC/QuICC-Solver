@@ -1,19 +1,50 @@
 @PACKAGE_INIT@
 
-# Find dependencies
-if("@QUICC_BESSEL_IMPL@" STREQUAL "Boost")
-   set(BOOST_ROOT @BOOST_ROOT@)
-   find_package(Boost REQUIRED)
-endif()
+# Store install location
+set(QUICC_LIBRARY_ROOT @CMAKE_INSTALL_PREFIX@
+  CACHE STRING "This is the lib root directory")
+
 
 # Force some project variables to match framework
 set(QUICC_USE_MPI @QUICC_USE_MPI@
   CACHE BOOL "This is set by the framework" FORCE)
 set(QUICC_MULTPRECISION @QUICC_MULTPRECISION@
   CACHE BOOL "This is set by the framework" FORCE)
+set(QUICC_PROFILE_BACKEND @QUICC_PROFILE_BACKEND@
+  CACHE STRING "This is set by the framework" FORCE)
+set(QUICC_PROFILE_NATIVE_WRITER @QUICC_PROFILE_NATIVE_WRITER@
+  CACHE STRING "This is set by the framework" FORCE)
+set(QUICC_PROFILE_LEVEL @QUICC_PROFILE_LEVEL@
+  CACHE STRING "This is set by the framework" FORCE)
 
 # Hide them since they should not be changed
-mark_as_advanced(FORCE QUICC_USE_MPI QUICC_MULTPRECISION)
+mark_as_advanced(FORCE
+  QUICC_USE_MPI
+  QUICC_MULTPRECISION
+  QUICC_PROFILE_BACKEND
+  QUICC_PROFILE_NATIVE_WRITER
+  QUICC_PROFILE_LEVEL
+)
+
+# Find dependencies
+
+# Boost (optional)
+if("@QUICC_BESSEL_IMPL@" STREQUAL "Boost")
+   set(BOOST_ROOT @BOOST_ROOT@)
+   find_package(Boost REQUIRED)
+endif()
+
+# Eigen (required), already part of the framework
+set(QUICC_USE_SYSTEM_EIGEN ON
+  CACHE BOOL "This is set by the framework" FORCE)
+set(Eigen3_DIR "${QUICC_LIBRARY_ROOT}/share/eigen3/cmake")
+
+# HighFive (optional), already part of the framework
+if(QUICC_PROFILE_NATIVE_WRITER STREQUAL "HighFive")
+  set(QUICC_USE_SYSTEM_HIGHFIVE ON
+    CACHE BOOL "This is set by the framework" FORCE)
+  set(HighFive_DIR "${QUICC_LIBRARY_ROOT}/share/HighFive/CMake")
+endif()
 
 # Setup
 include(setup/global)
