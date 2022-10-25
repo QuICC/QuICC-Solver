@@ -17,11 +17,61 @@
 #     list of ulps, should match IDS size
 # DISABLED
 #     if set to true, set test as disabled
+# STEPS
+#     number of steps for the profiling test, -1 means no profiling
+# SPLITS
+#     list of cpus:rank pairs, should match IDS size
+# PERFONLY
+#     if true add only perf test
 #
+
+# support function
+function(__add_test _testname)
+  # parse inputs
+  set(oneValueArgs DIS PRF)
+  set(multiValueArgs COMM STP)
+  cmake_parse_arguments(_QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+  message(DEBUG "__add_test")
+  list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+  message(DEBUG "target: ${target}")
+  message(DEBUG "_QAT_COMM: ${_QAT_COMM}")
+  message(DEBUG "_QAT_DIS: ${_QAT_DIS}")
+  message(DEBUG "_QAT_STP: ${_QAT_STP}")
+  message(DEBUG "_QAT_PRF: ${_QAT_PRF}")
+
+  # performance only test
+  if(NOT _QAT_PRF)
+    add_test(
+      NAME ${_testname}
+      COMMAND ${_QAT_COMM}
+      WORKING_DIRECTORY
+      "${QUICC_WORK_DIR}"
+    )
+  endif()
+  if(_QAT_DIS)
+    set_tests_properties(${_testname} PROPERTIES DISABLED ${_QAT_DIS})
+  endif()
+  # perf test only if number of steps is defined
+  if(_QAT_STP)
+    if(${_QAT_STP} GREATER "0")
+      add_test(
+        NAME prof_${_testname}
+        COMMAND ${_QAT_COMM} --timeOnly --iter ${_QAT_STP}
+        WORKING_DIRECTORY
+        "${QUICC_WORK_DIR}"
+      )
+    endif()
+  endif()
+endfunction()
+
+
+# main funtion
 function(quicc_add_test target)
   # parse inputs
-  set(oneValueArgs COMMAND KEYWORD ULP DISABLED)
-  set(multiValueArgs TYPES IDS ULPS)
+  set(options DISABLED PERFONLY)
+  set(oneValueArgs COMMAND KEYWORD ULP)
+  set(multiValueArgs TYPES IDS ULPS STEPS SPLITS)
   cmake_parse_arguments(QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_test")
@@ -33,7 +83,10 @@ function(quicc_add_test target)
   message(DEBUG "QAT_KEYWORD: ${QAT_KEYWORD} : ${${QAT_KEYWORD}}")
   message(DEBUG "QAT_ULP: ${QAT_ULP}")
   message(DEBUG "QAT_ULPS: ${QAT_ULPS}")
+  message(DEBUG "QAT_STEPS: ${QAT_STEPS}")
+  message(DEBUG "QAT_SPLITS: ${QAT_SPLITS}")
   message(DEBUG "QAT_DISABLED: ${QAT_DISABLED}")
+  message(DEBUG "QAT_PERFONLY: ${QAT_PERFONLY}")
 
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${target}.cpp")
     message(VERBOSE "Adding ${target}")
@@ -99,54 +152,67 @@ function(quicc_add_test target)
   if(${_types_len} LESS 1 AND ${_ids_len} LESS 1)
     set(_testname "${QAT_COMMAND}_${_keyword}${_ulp_name}" )
     message(DEBUG "_testname: ${_testname}")
-    add_test(
-      NAME ${_testname}
-      COMMAND ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests ${_ulp_cmd}
-      WORKING_DIRECTORY
-      "${QUICC_WORK_DIR}"
+    __add_test(${_testname}
+      COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests ${_ulp_cmd}
+      DIS ${QAT_DISABLED}
+      STP ${QAT_STEPS}
+      PRF ${QAT_PERFONLY}
     )
-    if(QAT_DISABLED)
-      set_tests_properties(${_testname} PROPERTIES DISABLED ${QAT_DISABLED})
-    endif()
   elseif(${_ids_len} LESS 1)
     foreach(_type ${QAT_TYPES})
       set(_testname "${QAT_COMMAND}_${_keyword}_type${_type}${_ulp_name}" )
       message(DEBUG "_testname: ${_testname}")
-      add_test(
-      NAME ${_testname}
-      COMMAND ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests --type=${_type} ${_ulp_cmd}
-      WORKING_DIRECTORY
-      "${QUICC_WORK_DIR}"
+      __add_test(${_testname}
+        COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests --type=${_type} ${_ulp_cmd}
+        DIS ${QAT_DISABLED}
+        STP ${QAT_STEPS}
+        PRF ${QAT_PERFONLY}
       )
-      if(QAT_DISABLED)
-        set_tests_properties(${_testname} PROPERTIES DISABLED ${QAT_DISABLED})
-      endif()
     endforeach()
   elseif(${_types_len} LESS 1)
     list(LENGTH QAT_ULPS _ulps_len)
+    list(LENGTH QAT_SPLITS _splits_len)
+    # init loop index
+    set(_counter "0")
     foreach(_id ${QAT_IDS})
+      message(DEBUG "_id: ${_id}")
       # check for custom ulp
-      if(_ulps_len GREATER 1)
+      if(_ulps_len GREATER 0)
         if(NOT _ulps_len EQUAL _ids_len)
-          message(SEND_ERROR "ULPS and IDS must have the same")
+          message(SEND_ERROR "ULPS and IDS must have the same length")
         endif()
-        # get current index
-        list(FIND QAT_IDS ${_id} _index)
-        list(GET QAT_ULPS ${_index} _ulp)
+        list(GET QAT_ULPS ${_counter} _ulp)
+        list(GET QAT_STEPS ${_counter} _steps)
         set(_ulp_cmd "--ulp ${_ulp}")
         set(_ulp_name "_ulp${_ulp}")
       endif()
-      set(_testname "${QAT_COMMAND}_${_keyword}_id${_id}${_ulp_name}" )
-      message(DEBUG "_testname: ${_testname}")
-      add_test(
-      NAME ${_testname}
-      COMMAND ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests --id=${_id} ${_ulp_cmd}
-      WORKING_DIRECTORY
-      "${QUICC_WORK_DIR}"
-      )
-      if(QAT_DISABLED)
-        set_tests_properties(${_testname} PROPERTIES DISABLED ${QAT_DISABLED})
+      # check for custom split
+      if(_splits_len GREATER 0)
+        if(NOT _splits_len EQUAL _ids_len)
+          message(SEND_ERROR "SPLITS and IDS must have the same length")
+        endif()
+        list(GET QAT_SPLITS ${_counter} _split)
+        set(_split_name "_split${_split}")
+        string(REGEX REPLACE ":" "_" _split_name ${_split_name})
+        # parse split
+        string(REGEX REPLACE ":" ";" _split ${_split})
+        list(GET _split 0 _np)
+        list(GET _split 1 _rank)
+        set(_split_cmd "--np ${_np}" "--rank ${_rank}")
       endif()
+
+
+      set(_testname "${QAT_COMMAND}_${_keyword}_id${_id}${_ulp_name}${_split_name}" )
+      message(DEBUG "_testname: ${_testname}")
+      __add_test(${_testname}
+        COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests --id=${_id} ${_ulp_cmd} ${_split_cmd}
+        DIS ${QAT_DISABLED}
+        STP ${_steps}
+        PRF ${QAT_PERFONLY}
+      )
+
+      # loop index
+      math(EXPR _counter "${_counter}+1")
     endforeach()
   endif()
 

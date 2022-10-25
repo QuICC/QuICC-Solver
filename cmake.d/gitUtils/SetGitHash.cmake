@@ -4,7 +4,7 @@
 message(DEBUG "SetGitHash")
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
-function(GitWriteHash git_hash)
+function(GitWriteHash git_hash COMPONENT)
     set(_file "${CMAKE_CURRENT_BINARY_DIR}/${HASH_FILE}")
     string(TOUPPER "${HASH_FILE}" HFUP)
     string(REPLACE "." "_" HFUP ${HFUP})
@@ -15,10 +15,10 @@ function(GitWriteHash git_hash)
 #define ${HFUP}\n\n\
 namespace QuICC\n\
 {\n\
-namespace ${SGH_COMPONENT}\n\
+namespace ${COMPONENT}\n\
 {\n\
     const char gitHash[10] = \"${git_hash}\"\;\n\
-} // namespace ${SGH_COMPONENT} \n\
+} // namespace ${COMPONENT} \n\
 } // namespace QuICC \n\
 #endif // ${HFUP}\n\
 ")
@@ -52,6 +52,7 @@ function(CheckGitHash)
         )
     message(DEBUG "GIT_HASH: ${GIT_HASH}")
     message(DEBUG "HASH_FILE: ${HASH_FILE}")
+    message(DEBUG "COMPONENT: ${COMPONENT}")
 
     GitReadHash(GIT_HASH_CACHE)
     message(DEBUG "GIT_HASH_CACHE: ${GIT_HASH_CACHE}")
@@ -59,7 +60,7 @@ function(CheckGitHash)
     if (NOT ${GIT_HASH} STREQUAL ${GIT_HASH_CACHE})
         message(DEBUG "git hash does not match")
         # Overwrite
-        GitWriteHash(${GIT_HASH})
+        GitWriteHash(${GIT_HASH} ${COMPONENT})
     else()
         message(DEBUG "git hash matches")
     endif ()
@@ -72,11 +73,14 @@ function(SetGitHash HASH_FILE)
     cmake_parse_arguments(SGH "${options}" "${oneValueArgs}"
                           "${multiValueArgs}" ${ARGN})
 
+    set(COMPONENT ${SGH_COMPONENT})
 
+    # pass arguments in a way that works for the external process
     add_custom_target(AlwaysCheckGit COMMAND ${CMAKE_COMMAND}
         -DRUN_CHECK_GIT_HASH=1
         -DGIT_HASH_CACHE=${GIT_HASH_CACHE}
         -DHASH_FILE=${HASH_FILE}
+        -DCOMPONENT=${COMPONENT}
         -P ${CMAKE_SOURCE_DIR}/cmake.d/gitUtils/SetGitHash.cmake
         )
     CheckGitHash()

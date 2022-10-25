@@ -14,7 +14,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULP 100
+    ULP 125
   )
 endforeach()
 
@@ -26,7 +26,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULP 200
+    ULP 261
   )
 endforeach()
 
@@ -40,6 +40,20 @@ foreach(_test ${_tests})
     KEYWORD Algorithm::Operator:type
     IDS  204 205  206   207
     ULPS 400 4500 19000 180000
+    STEPS -1 -1 500 500
+  )
+endforeach()
+
+# Perf test
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:type
+    IDS  108 108
+    ULPS 20800 20800
+    SPLITS 96:0 288:0
+    STEPS 500 500
+    PERFONLY
   )
 endforeach()
 

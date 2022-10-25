@@ -63,6 +63,11 @@ namespace Transform {
           */
          void setUlp(const unsigned int ulp);
 
+         /**
+          * @brief Set number of iterations
+          */
+         void setIter(const unsigned int iter);
+
       protected:
          /**
           * @brief Enum of data content type
@@ -179,6 +184,11 @@ namespace Transform {
          unsigned int mMaxUlp;
 
          /**
+          * @brief Number of iterations
+          */
+         unsigned int mIter;
+
+         /**
           * @brief Datatype epsilon
           */
          MHDFloat mEpsilon;
@@ -195,7 +205,7 @@ namespace Transform {
    };
 
    template <typename TOp> TesterBase<TOp>::TesterBase(const std::string& fname, const bool keepData, const bool usePointScale)
-      : mKeepData(keepData), mUsePointScale(usePointScale), mMaxUlp(11), mEpsilon(std::numeric_limits<MHDFloat>::epsilon()), mBasename(fname), mPath("Transform/")
+      : mKeepData(keepData), mUsePointScale(usePointScale), mMaxUlp(11), mIter(1),  mEpsilon(std::numeric_limits<MHDFloat>::epsilon()), mBasename(fname), mPath("Transform/")
    {
    }
 
@@ -221,6 +231,7 @@ namespace Transform {
             infoType = "bfloop";
             break;
       }
+
       outData = this->testOperator(param, type);
 
       if(not timeOnly)
@@ -263,6 +274,11 @@ namespace Transform {
    template <typename TOp> void TesterBase<TOp>::setUlp(const unsigned int ulp)
    {
       this->mMaxUlp = ulp;
+   }
+
+   template <typename TOp> void TesterBase<TOp>::setIter(const unsigned int iter)
+   {
+      this->mIter = iter;
    }
 
    template <typename TOp> std::string TesterBase<TOp>::makeFilename(const ParameterType& param, const std::string& root, const TestType type, const ContentType ctype) const
@@ -309,7 +325,11 @@ namespace Transform {
 
    template <typename TOp> Matrix TesterBase<TOp>::testOperator(const ParameterType& param, const TestType type) const
    {
-      Matrix outData = this->applyOperator(param, type);
+      Matrix outData;
+      for (unsigned int i = 0; i < this->mIter; ++i)
+      {
+         outData = this->applyOperator(param, type);
+      }
 
       if(this->mKeepData)
       {

@@ -24,6 +24,11 @@ test-quicc-lib_serial:
   - .test-lib
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:latest
+time-quicc-lib_serial:
+  extends:
+  - .time-lib
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_serial:latest
 ci-cache-cleanup:
   extends: .daint
   stage: cleanup
@@ -39,6 +44,7 @@ BoussinesqSphereDynamoExplicit_serial:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial
 BoussinesqSphereDynamoImplicit_single2d_serial:
   extends:
@@ -49,6 +55,7 @@ BoussinesqSphereDynamoImplicit_single2d_serial:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial
 BoussinesqShellDynamoExplicit_serial:
   extends:
@@ -59,6 +66,7 @@ BoussinesqShellDynamoExplicit_serial:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial
 BoussinesqShellDynamoImplicit_single2d_serial:
   extends:
@@ -69,6 +77,7 @@ BoussinesqShellDynamoImplicit_single2d_serial:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial
 BoussinesqSphereRTCExplicit_serial_serial:
   extends:
@@ -79,6 +88,7 @@ BoussinesqSphereRTCExplicit_serial_serial:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial
 BoussinesqSphereRTCImplicit_serial_serial:
   extends:
@@ -89,6 +99,7 @@ BoussinesqSphereRTCImplicit_serial_serial:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial
 BoussinesqShellRTCExplicit_serial_serial:
   extends:
@@ -99,6 +110,7 @@ BoussinesqShellRTCExplicit_serial_serial:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial
 BoussinesqShellRTCImplicit_serial_serial:
   extends:
@@ -109,6 +121,7 @@ BoussinesqShellRTCImplicit_serial_serial:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial
 BoussinesqShellTCExplicit_serial:
   extends:
@@ -119,6 +132,7 @@ BoussinesqShellTCExplicit_serial:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial
 BoussinesqSphereTCExplicit_serial:
   extends:
@@ -129,4 +143,5 @@ BoussinesqSphereTCExplicit_serial:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial

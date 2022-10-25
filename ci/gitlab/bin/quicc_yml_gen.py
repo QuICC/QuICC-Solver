@@ -14,6 +14,7 @@ class config(NamedTuple):
 
 def populateYaml(cnf):
     imageLocation = '$CSCS_REGISTRY_PATH'
+    baseImage = 'ubuntu-quicc-buildbase:22.04'
     image = 'quicc_'+cnf.tag+':latest'
     csBaseYml = 'https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.cscs.yml'
     configIn = {
@@ -45,7 +46,8 @@ def populateYaml(cnf):
                 'variables':
                     {
                         'DOCKERFILE': 'ci/docker/Dockerfile_'+cnf.tag,
-                        'PERSIST_IMAGE_NAME': imageLocation+'/'+image
+                        'PERSIST_IMAGE_NAME': imageLocation+'/'+image,
+                        'DOCKER_BUILD_ARGS': f"""["BASEIMAGE={imageLocation}/{baseImage}"]"""
                     },
             },
         'test-quicc-lib_'+cnf.tag:
@@ -53,6 +55,15 @@ def populateYaml(cnf):
                 'extends':
                     [
                         '.test-lib',
+                        '.'+cnf.backend
+                    ],
+                'image': imageLocation+'/'+image
+            },
+        'time-quicc-lib_'+cnf.tag:
+            {
+                'extends':
+                    [
+                        '.time-lib',
                         '.'+cnf.backend
                     ],
                 'image': imageLocation+'/'+image
@@ -90,6 +101,7 @@ def populateYaml(cnf):
                         'PULL_IMAGE': 'NO',
                         'SLURM_NTASKS': tasks,
                         'SLURM_NTASKS_PER_NODE': tasks,
+                        'SLURM_CPUS_PER_TASK': str(72//int(tasks)),
                         'QUICC_VERSION_TAG': cnf.tag
                     },
                 }

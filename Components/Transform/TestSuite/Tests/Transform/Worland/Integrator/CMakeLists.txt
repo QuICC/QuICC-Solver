@@ -18,7 +18,7 @@ set(_tests
   Poly::R1_Zero:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 8 6 50 28 33
+  ULP 16 7 115 80 78
   MPULP 3 2 2 2 2
   )
 foreach(_test ${_tests})
@@ -34,7 +34,7 @@ set(_tests
   Poly::DivR1_Zero:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 32 51 81 62 66 32 42 53 39 42
+  ULP 32 51 226 172 191 32 42 148 75 73
   MPULP 2 2 2 2 2 3 3 3 3 3
   )
 foreach(_test ${_tests})
@@ -51,7 +51,7 @@ set(_tests
   Poly::I2_Zero:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 13 17 170 59 36
+  ULP 13 20 170 59 36
   MPULP 1 4 8 4 3
   )
 foreach(_test ${_tests})
@@ -83,7 +83,7 @@ set(_tests
   Poly::I4DivR1_Zero:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 77 99 599 38 91 74 615 453 48 51
+  ULP 77 111 599 38 91 74 615 453 48 51
   MPULP 2 11 121 9 4 2 127 93 4 6
   )
 foreach(_test ${_tests})
@@ -99,7 +99,7 @@ set(_tests
   Poly::I6DivR1_Zero:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 53 160 1578 76 51 48 607 1258 66 104
+  ULP 53 160 1578 76 51 48 846 1258 66 104
   MPULP 2 11 147 6 8 2 165 92 2 10
   )
 foreach(_test ${_tests})
@@ -115,7 +115,7 @@ set(_tests
   Poly::DivR1D1R1_Zero:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 435 56 54 61 46 605 55 56 51 55
+  ULP 435 94 87 88 91 605 97 88 99 95
   MPULP 6 2 1 1 1 9 2 1 2 1
   )
 foreach(_test ${_tests})
@@ -131,7 +131,7 @@ set(_tests
   Poly::I2DivR1D1R1_Zero:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 20 383 1340 1104 1196 21 214 1017 374 925
+  ULP 30 383 1340 1104 1196 32 214 1017 374 925
   MPULP 2 17 64 42 40 2 10 44 31 24
   )
 foreach(_test ${_tests})
@@ -167,7 +167,7 @@ set(_tests
   Poly::P:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 111 304 1331 2009 3377
+  ULP 111 346 1331 2240 12000
   MPULP 2 2 3 4 6
   )
 foreach(_test ${_tests})
@@ -220,7 +220,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULPS 5 2 13 10 10 3 4 7 6 5
+    ULPS 5 5 13 10 10 5 5 7 6 5
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()
@@ -262,7 +262,7 @@ set(_tests
   Fft::I4DivR1_Zero:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 55 22 732 59 51 46 518 582 44 22
+  ULP 55 22 732 59 51 46 602 582 44 22
   MPULP 17 16 102 9 19 11 209 280 11 9
   )
 foreach(_test ${_tests})

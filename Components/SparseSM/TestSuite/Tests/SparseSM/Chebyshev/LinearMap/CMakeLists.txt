@@ -79,7 +79,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:type
     IDS 0 1 10 11
-    ULPS 18 58 11 11
+    ULPS 18 58 11 36
   )
 endforeach()
 

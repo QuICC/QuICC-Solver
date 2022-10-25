@@ -2,7 +2,7 @@
 .BoussinesqSphereDynamoExplicit:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -18,7 +18,7 @@
 .BoussinesqSphereDynamoImplicit_single2d:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -34,7 +34,7 @@
 .BoussinesqShellDynamoExplicit:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -50,7 +50,7 @@
 .BoussinesqShellDynamoImplicit_single2d:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -66,7 +66,7 @@
 .BoussinesqSphereRTCExplicit_serial:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -82,7 +82,7 @@
 .BoussinesqSphereRTCExplicit_single1d:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -98,7 +98,7 @@
 .BoussinesqSphereRTCExplicit_single2d:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -114,7 +114,7 @@
 .BoussinesqSphereRTCExplicit_tubular:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -130,7 +130,7 @@
 .BoussinesqSphereRTCImplicit_serial:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -146,7 +146,7 @@
 .BoussinesqSphereRTCImplicit_single1d:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -162,7 +162,7 @@
 .BoussinesqSphereRTCImplicit_single2d:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -178,7 +178,7 @@
 .BoussinesqSphereRTCImplicit_tubular:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -194,7 +194,7 @@
 .BoussinesqShellRTCExplicit_serial:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -210,7 +210,7 @@
 .BoussinesqShellRTCExplicit_single1d:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -226,7 +226,7 @@
 .BoussinesqShellRTCExplicit_single2d:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -242,7 +242,7 @@
 .BoussinesqShellRTCExplicit_tubular:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -258,7 +258,7 @@
 .BoussinesqShellRTCImplicit_serial:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -274,7 +274,7 @@
 .BoussinesqShellRTCImplicit_single2d:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -290,7 +290,7 @@
 .BoussinesqShellTCExplicit:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
@@ -306,7 +306,7 @@
 .BoussinesqSphereTCExplicit:
   stage: model-build-and-test
   script:
-  - hostname
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF
     -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"

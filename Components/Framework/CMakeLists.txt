@@ -18,6 +18,10 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
+# Add fancy flags as requirement for the library
+target_compile_options(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
+  ${CMAKE_CXX_FLAGS})
+
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   ${QUICC_TRANSFORM_COMPONENT_LIB}
   ${QUICC_POLYNOMIAL_COMPONENT_LIB}

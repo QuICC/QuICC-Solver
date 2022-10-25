@@ -47,6 +47,9 @@ namespace Transform {
       /// MPI rank
       unsigned int rank;
 
+      /// Number of ierations
+      unsigned int iter;
+
       /// Test parameters
       std::vector<double> params;
 

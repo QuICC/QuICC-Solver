@@ -14,7 +14,7 @@ def populateYaml(cnf):
             'stage': 'model-build-and-test',
             'script':
             [
-                'hostname',
+                '/QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname',
                 # first install the library to the shared folder
                 # note, only one model per pipeline does this step
                 'cd /QuICC.src/build',

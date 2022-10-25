@@ -13,7 +13,7 @@ cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
 -DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
 -DQUICC_MODEL=<GreatSimulation>
 
-make <GreatSimulation><Implementation>
+make
 ```
 
 # Piz-Daint on MC nodes
@@ -31,7 +31,7 @@ cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
 -DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
 -DQUICC_MODEL=<GreatSimulation>
 
-make <GreatSimulation><Implementation>
+make
 ```
 
 # Euler
@@ -44,7 +44,7 @@ cmake </path/to/QuICC> -DQUICC_USE_MPI=ON \
 -DQUICC_MULTPRECISION=ON \
 -DQUICC_MODEL=<GreatSimulation>
 
-make <GreatSimulation>
+make
 ```
 the default `h5py` is built with the incorrect hdf5 library, we need to install it ourselves
 

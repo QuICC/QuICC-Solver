@@ -22,8 +22,6 @@ namespace currentts = ::QuICC::TestSuite::Transform::ALegendre;
 
 TEST_CASE( "@Algorithm@::Error for @Operator@ projector", "[@Algorithm@::@Operator@:@type@]" ){
 
-   QuICC::Profiler::Initialize();
-
    // Set default arguments if required
    if(currentts::args().useDefault)
    {
@@ -44,6 +42,7 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ projector", "[@Algorithm@::@Operat
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
+   tester.setIter(currentts::args().iter);
 
    Tester::ParameterType params = {-1};
 
@@ -58,7 +57,5 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ projector", "[@Algorithm@::@Operat
       params.at(0) = id;
       tester.validate(params, currentts::args().type, currentts::args().timeOnly);
    }
-
-   QuICC::Profiler::Finalize();
 
 }

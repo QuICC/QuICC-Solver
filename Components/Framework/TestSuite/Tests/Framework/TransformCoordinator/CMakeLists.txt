@@ -29,8 +29,8 @@ set(_tests
   WLFm
   )
 quicc_set_ulp(_ulp
-  ULP 775 770 215000 107000 107000
-  MPULP 11 11 13700 3650 3650
+  ULP 775 868 215000 107000 107000
+  MPULP 11 11 13700 8544 8544
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -47,7 +47,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 139 110 53500 22245 22245
-  MPULP 11 11 1850 1450 1450
+  MPULP 11 11 1850 1919 1919
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}

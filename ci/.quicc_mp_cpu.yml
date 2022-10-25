@@ -24,6 +24,11 @@ test-quicc-lib_mp:
   - .test-lib
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mp:latest
+time-quicc-lib_mp:
+  extends:
+  - .time-lib
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_mp:latest
 ci-cache-cleanup:
   extends: .daint
   stage: cleanup

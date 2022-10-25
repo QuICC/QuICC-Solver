@@ -10,7 +10,7 @@ set(_tests
   Poly::P:projector
   )
 quicc_set_ulp(_ulp
-  ULP 8 77 49 53
+  ULP 8 94 55 60
   MPULP 1 1 2 1
   )
 foreach(_test ${_tests})
@@ -26,7 +26,7 @@ set(_tests
   Poly::DivR1_Zero:projector
   )
 quicc_set_ulp(_ulp
-  ULP 8 34 49 51
+  ULP 8 48 49 51
   MPULP 1 1 2 2
   )
 foreach(_test ${_tests})
@@ -42,7 +42,7 @@ set(_tests
   Poly::D1:projector
   )
 quicc_set_ulp(_ulp
-  ULP 8 51 40 39
+  ULP 8 60 40 39
   MPULP 1 1 2 1
   )
 foreach(_test ${_tests})
@@ -58,7 +58,7 @@ set(_tests
   Poly::DivR1D1R1_Zero:projector
   )
 quicc_set_ulp(_ulp
-  ULP 9 51 40 42
+  ULP 9 60 40 42
   MPULP 1 1 1 1
   )
 foreach(_test ${_tests})
@@ -90,7 +90,7 @@ set(_tests
   Poly::DivR1D1R1:projector
   )
 quicc_set_ulp(_ulp
-  ULP 9 51 40 39
+  ULP 9 60 40 39
   MPULP 1 1 1 1
   )
 foreach(_test ${_tests})
@@ -151,7 +151,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULPS 4 12 3 3
+    ULPS 4 17 5 5
     IDS  0 1 2 3
   )
 endforeach()
@@ -199,7 +199,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULPS 1 2 5 3
+    ULPS 1 3 5 3
     IDS  0 1 2 3
   )
 endforeach()

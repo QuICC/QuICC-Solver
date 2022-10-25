@@ -25,7 +25,7 @@ RUN mkdir /opt/spack-environment \
 &&   echo "  - mpich@3.1.4 netmod=tcp device=ch3" \
 &&   echo "  packages:" \
 &&   echo "    all:" \
-&&   echo "      variants: +openmp +mpi build_type=Release" \
+&&   echo "      variants: +openmp +mpi build_type=Release target=broadwell" \
 &&   echo "      providers:" \
 &&   echo "        mpi:" \
 &&   echo "        - mpich@3.1.4" \

@@ -2,28 +2,35 @@
   variables:
     TEST_NCPU: 'grep processor /proc/cpuinfo | wc -l'
   script:
+    - pwd
     # the tests are not installed, so we need to run them from the build directory
     - cd /QuICC.src/build
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R PolynomialQuadratureTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Jacobi
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformFourierTests_Complex_.*_integrator"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformFourierTests_Complex_.*_projector"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformFourierTests_Mixed_.*_integrator"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformFourierTests_Mixed_.*_projector"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformFourierTests_Mixed_.*_bfloop"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_integrator"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_projector"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_bfloop"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformChebyshevTests_.*_reductor"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformWorlandTests_.*"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_integrator"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_projector"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_integrator"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_projector"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_bfloop"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_integrator"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_projector"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_bfloop"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_reductor"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformWorlandTests_.*"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ProfilerTest
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R TrackerTest
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_integrator_ulp"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_integrator_id"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_projector_ulp"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "TransformALegendreTests_Poly_.*_projector_id"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_integrator_ulp"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_integrator_id"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_projector_ulp"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_projector_id"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkLoadSplitterTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkCommunicatorTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
+
+.time-lib:
+  script:
+    - pwd
+    - export QUICC_ROOT=/QuICC.src
+    - reframe -c $QUICC_ROOT/ci/reframe/quicc_library.py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local --keep-stage-files

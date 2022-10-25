@@ -24,7 +24,7 @@ endforeach()
 if(QUICC_MULTPRECISION)
   set(_ulp 60)
 else()
-  set(_ulp 25)
+  set(_ulp 33)
 endif()
 
 set(_tests

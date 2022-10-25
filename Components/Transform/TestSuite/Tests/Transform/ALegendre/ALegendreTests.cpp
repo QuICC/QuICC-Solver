@@ -52,6 +52,9 @@ int main( int argc, char* argv[] )
       | Opt( test::args().timeOnly )         // Add timing only
          ["--timeOnly"] 
          ("Only time execution, don't check results")
+      | Opt( test::args().iter, "iter" )     // Number of iterations
+         ["--iter"]
+         ("Iterations")
       | Opt( test::args().dumpData )         // Add keep output data option
          ["--dumpData"]
          ("Write output data to file?");

@@ -10,7 +10,7 @@ set(_tests
   Poly::P:bfloop
   )
 quicc_set_ulp(_ulp
-  ULP 16 13 63 39 130 478 1963 3870 7625
+  ULP 16 18 153 88 130 560 1963 5211 19780
   MPULP 3 2 2 2 2 2 3 6 12
   )
 foreach(_test ${_tests})
@@ -31,6 +31,6 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
     IDS 0 1 2 3 204 205 206 207 208 209 210
-    ULPS 2 3 5 3 4 6 8 16 21 28 41
+    ULPS 5 5 6 5 5 6 11 16 21 28 41
   )
 endforeach()

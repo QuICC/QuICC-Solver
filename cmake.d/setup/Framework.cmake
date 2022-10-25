@@ -108,6 +108,8 @@ if(QUICC_PROFILE_BACKEND STREQUAL "native")
   endif()
   set(QUICC_PROFILE_NATIVE_SAMPLE 100 CACHE STRING "Native profiler sample size.")
   mark_as_advanced(QUICC_PROFILE_NATIVE_WRITER)
+else()
+  unset(QUICC_PROFILE_NATIVE_WRITER CACHE)
 endif()
 
 quicc_create_option(NAME QUICC_PROFILE_LEVEL

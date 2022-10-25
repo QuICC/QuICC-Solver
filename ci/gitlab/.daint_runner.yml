@@ -7,14 +7,16 @@
     USE_MPI: 'YES'
     SLURM_NNODES: 1
     SLURM_NTASKS_PER_NODE: 1
-    SLURM_TIMELIMIT: '20:00'
+    SLURM_TIMELIMIT: '30:00'
 
 .cpu:
   extends: .daint_runner
   variables:
     SLURM_CONSTRAINT: 'mc'
+    SLURM_CPUS_PER_TASK: 72
 
 .gpu:
   extends: .daint_runner
   variables:
     SLURM_CONSTRAINT: 'gpu'
+    SLURM_CPUS_PER_TASK: 24

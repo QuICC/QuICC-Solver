@@ -17,7 +17,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULP 100
+    ULP 130
   )
 endforeach()
 
@@ -54,7 +54,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
     IDS  204 205 206 207  208
-    ULPS 30  120 370 1300 7200
+    ULPS 30  120 370 1612 7925
   )
 endforeach()
 
