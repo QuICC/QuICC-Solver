@@ -7,7 +7,6 @@ import numpy as np
 import scipy.sparse as spsp
 
 import quicc.geometry.spherical.sphere_radius_boundary_worland as radbc
-from quicc.geometry.spherical.sphere_radius_boundary_worland import no_bc
 
 def standard_truncation(nr, l):
     """Impose standard truncation in radial direction"""

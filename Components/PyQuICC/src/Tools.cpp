@@ -309,5 +309,205 @@ namespace PyQuICC {
       }
    }
 
+   PyObject* Tools::nparr2List(PyObject *pArr)
+   {
+      PyObject *pTmp, *pList;
+      pTmp = PyObject_CallMethod(pArr, (char *)"flatten", "s", (char *)"F");
+      pList = PyObject_CallMethod(pTmp, (char *)"tolist", NULL);
+      Py_DECREF(pTmp);
+
+      return pList;
+   }
+
+   PyObject* Tools::sparse2triplets(PyObject *pSpMat)
+   {
+      // Make sure matrix is in COO format
+      PyObject *pTmp, *pArgs;
+      PyObject *pCooMat;
+      pTmp = PyObject_GetAttrString(pSpMat, (char *)"format");
+      std::string format = std::string(PyBytes_AsString(PyUnicode_AsASCIIString(pTmp)));
+      if(format == "coo")
+      {
+         pCooMat= pSpMat;
+      }
+      else
+      {
+         pCooMat = PyObject_CallMethod(pSpMat, (char *)"tocoo", NULL);
+      }
+
+      // Extra position of nonzero entries
+      pArgs = PyTuple_New(3);
+      pTmp = PyObject_GetAttrString(pCooMat, (char *)"row");
+      PyTuple_SetItem(pArgs, 0, pTmp);
+      pTmp = PyObject_GetAttrString(pCooMat, (char *)"col");
+      PyTuple_SetItem(pArgs, 1, pTmp);
+      pTmp = PyObject_GetAttrString(pCooMat, (char *)"data");
+      PyTuple_SetItem(pArgs, 2, pTmp);
+      PyObject *pBuiltins = PyEval_GetBuiltins(); 
+      PyObject *pFct = PyDict_GetItemString(pBuiltins , "zip");
+      if(! (pFct && PyCallable_Check(pFct)))
+      {
+         if(PyErr_Occurred())
+         {
+            PyErr_Print();
+         }
+         throw std::logic_error("Python function loading error!");
+      }
+      PyObject *pZip = PyObject_CallObject(pFct, pArgs);
+      Py_DECREF(pArgs);
+
+      // Create list of triplets
+      PyObject *pIterator = PyObject_GetIter(pZip);
+      PyObject *pTriplet;
+      PyObject *pList = PyList_New(0);
+      while ((pTriplet = PyIter_Next(pIterator)))
+      {
+         PyList_Append(pList, pTriplet);
+         Py_DECREF(pTriplet);
+      }
+
+      Py_DECREF(pIterator);
+
+      return pList;
+   }
+
+   void Tools::fillArray(Array& rArray, PyObject* pPyArray)
+   {
+      PyObject *pValue;
+
+      // Get matrix size
+      pValue = PyObject_GetAttrString(pPyArray, (char *)"shape");
+      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
+      Py_DECREF(pValue);
+
+      // Allocate matrix
+      rArray.resize(rows);
+
+      // Convert Python matrix into a list
+      pValue = Tools::nparr2List(pPyArray);
+
+      long int count = 0;
+      for (int i = 0; i < rows; i++)
+      {
+         rArray(i) = PyFloat_AsDouble(PyList_GetItem(pValue, count));
+         count += 1;
+      }
+
+      Py_DECREF(pValue);
+   }
+
+   void Tools::fillMatrix(Matrix& rMatrix, PyObject* pPyMat)
+   {
+      PyObject *pValue;
+
+      // Get matrix size
+      pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
+      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
+      long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
+      Py_DECREF(pValue);
+
+      // Allocate matrix
+      rMatrix.resize(rows,cols);
+
+      // Convert Python matrix into a list
+      pValue = Tools::nparr2List(pPyMat);
+
+      long int count = 0;
+      for(int j = 0; j < cols; j++)
+      {
+         for (int i = 0; i < rows; i++)
+         {
+            rMatrix(i, j) = PyFloat_AsDouble(PyList_GetItem(pValue, count));
+            count += 1;
+         }
+      }
+      Py_DECREF(pValue);
+   }
+
+   void Tools::fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat)
+   {
+      PyObject *pValue, *pTmp;
+
+      // Get matrix size
+      pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
+      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
+      long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
+      Py_DECREF(pValue);
+
+      // Convert Python matrix into triplets
+      pValue = Tools::sparse2triplets(pPyMat);
+
+      long int len = PyList_Size(pValue);
+      std::vector<Triplet> triplets;
+      triplets.reserve(len);
+      long int row;
+      long int col;
+      MHDFloat val;
+      for(int i = 0; i < len; i++)
+      {
+         pTmp = PyList_GetItem(pValue, i);
+         row = PyLong_AsLong(PyTuple_GetItem(pTmp,0));
+         col = PyLong_AsLong(PyTuple_GetItem(pTmp,1));
+         val = PyFloat_AsDouble(PyTuple_GetItem(pTmp,2));
+         triplets.push_back(Triplet(row,col,val));
+      }
+      Py_DECREF(pValue);
+
+      // Build matrix
+      rMatrix.resize(rows,cols);
+      rMatrix.setFromTriplets(triplets.begin(), triplets.end());
+   }
+
+   void Tools::fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat)
+   {
+      PyObject *pValue, *pTmp;
+
+      // Get matrix size
+      pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
+      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
+      long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
+      Py_DECREF(pValue);
+
+      // Convert Python matrix into triplets
+      pValue = Tools::sparse2triplets(pPyMat);
+
+      long int len = PyList_Size(pValue);
+      std::vector<Triplet> realTriplets;
+      std::vector<Triplet> imagTriplets;
+      realTriplets.reserve(len);
+      imagTriplets.reserve(len);
+      long int row;
+      long int col;
+      MHDFloat val;
+      for(int i = 0; i < len; i++)
+      {
+         pTmp = PyList_GetItem(pValue, i);
+         row = PyLong_AsLong(PyTuple_GetItem(pTmp,0));
+         col = PyLong_AsLong(PyTuple_GetItem(pTmp,1));
+         if(PyComplex_Check(PyTuple_GetItem(pTmp,2)))
+         {
+            val = PyComplex_RealAsDouble(PyTuple_GetItem(pTmp,2));
+            realTriplets.push_back(Triplet(row,col,val));
+            val = PyComplex_ImagAsDouble(PyTuple_GetItem(pTmp,2));
+            imagTriplets.push_back(Triplet(row,col,val));
+         } else
+         {
+            val = PyFloat_AsDouble(PyTuple_GetItem(pTmp,2));
+            realTriplets.push_back(Triplet(row,col,val));
+         }
+      }
+      Py_DECREF(pValue);
+
+      // Build matrix
+      rMatrix.real().resize(rows,cols);
+      rMatrix.imag().resize(rows,cols);
+      rMatrix.real().setFromTriplets(realTriplets.begin(), realTriplets.end());
+
+      if(imagTriplets.size() > 0)
+      {
+         rMatrix.imag().setFromTriplets(imagTriplets.begin(), imagTriplets.end());
+      }
+   }
+
 }
 }

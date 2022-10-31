@@ -29,6 +29,12 @@ def sh_coeff(coeff):
     if coeff == 'laplh':
         def fct(x):
             return x*(x + 1.0)
+    elif coeff == 'laplh-2':
+        def fct(x):
+            return x*(x + 1.0)-2.0
+    elif coeff == 'laplh2':
+        def fct(x):
+            return (x*(x + 1.0))**2.0
     elif coeff == 'invlaplh':
         def fct(x):
             if x == 0:

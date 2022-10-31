@@ -9,7 +9,6 @@ import scipy.sparse as spsp
 import quicc.base.utils as utils
 import quicc.geometry.worland.wnl as wnl
 
-
 def no_bc():
     """Get a no boundary condition flag"""
 
@@ -66,49 +65,6 @@ def constrain(mat, l, bc, location = 't'):
         bc_mat = bc_mat.tocoo()
 
     return bc_mat
-
-def apply_tau(mat, l, bc, location = 't'):
-    """Add Tau lines to the matrix"""
-
-    nbc = bc[0]//10
-
-    if bc[0] == 10:
-        cond = tau_value(mat.shape[0], l, bc.get('c',None))
-    elif bc[0] == 11:
-        cond = tau_diff(mat.shape[0], l, bc.get('c',None))
-    elif bc[0] == 12:
-        cond = tau_rdiffdivr(mat.shape[0], l, bc.get('c',None))
-    elif bc[0] == 13:
-        cond = tau_insulating(mat.shape[0], l, bc.get('c',None))
-    elif bc[0] == 14:
-        cond = tau_diff2(mat.shape[0], l, bc.get('c',None))
-    elif bc[0] == 15:
-        cond = tau_diff3(mat.shape[0], l, bc.get('c',None))
-    elif bc[0] == 16:
-        cond = tau_diff4(mat.shape[0], l, bc.get('c',None))
-    elif bc[0] == 20:
-        cond = tau_value_diff(mat.shape[0], l, bc.get('c',None))
-    elif bc[0] == 21:
-        cond = tau_value_diff2(mat.shape[0], l, bc.get('c',None))
-    # Set last modes to zero
-    elif bc[0] > 990 and bc[0] < 1000:
-        cond = tau_last(mat.shape[1], bc[0]-990)
-        nbc = bc[0]-990
-
-    if not spsp.isspmatrix_coo(mat):
-        mat = mat.tocoo()
-    if location == 't':
-        s = 0
-    elif location == 'b':
-        s = mat.shape[0]-nbc
-
-    conc = np.concatenate
-    for i,c in enumerate(cond):
-        mat.data = conc((mat.data, c))
-        mat.row = conc((mat.row, [s+i]*mat.shape[1]))
-        mat.col = conc((mat.col, np.arange(0,mat.shape[1])))
-
-    return mat
 
 def tau_value(nr, l, coeffs = None):
     """Create the boundary value tau line(s)"""
@@ -238,23 +194,47 @@ def tau_last(nr, nrow):
 
     return cond
 
-def stencil(nr, l, bc):
-    """Create a Galerkin stencil matrix"""
+# Tau line map
+tau_map = dict()
+tau_map[10] = (lambda nr, l, bc: tau_value(nr, l, bc.get('c',None)))
+tau_map[11] = (lambda nr, l, bc: tau_diff(nr, l, bc.get('c',None)))
+tau_map[12] = (lambda nr, l, bc: tau_rdiffdivr(nr, l, bc.get('c',None)))
+tau_map[13] = (lambda nr, l, bc: tau_insulating(nr, l, bc.get('c',None)))
+tau_map[14] = (lambda nr, l, bc: tau_diff2(nr, l, bc.get('c',None)))
+tau_map[15] = (lambda nr, l, bc: tau_diff3(nr, l, bc.get('c',None)))
+tau_map[16] = (lambda nr, l, bc: tau_diff4(nr, l, bc.get('c',None)))
+tau_map[20] = (lambda nr, l, bc: tau_value_diff(nr, l, bc.get('c',None)))
+tau_map[21] = (lambda nr, l, bc: tau_value_diff2(nr, l, bc.get('c',None)))
 
-    if bc[0] == -10:
-        mat = stencil_value(nr, l, bc.get('c',None))
-    elif bc[0] == -11:
-        mat = stencil_diff(nr, l, bc.get('c',None))
-    elif bc[0] == -12:
-        mat = stencil_rdiffdivr(nr, l, bc.get('c',None))
-    elif bc[0] == -13:
-        mat = stencil_insulating(nr, l, bc.get('c',None))
-    elif bc[0] == -20:
-        mat = stencil_value_diff(nr, l, bc.get('c',None))
-    elif bc[0] == -21:
-        mat = stencil_value_diff2(nr, l, bc.get('c',None))
-    elif bc[0] < -1 and bc[0] > -5:
-        mat = restrict_eye(nr, 'cr', -bc[0])
+def apply_tau(mat, l, bc, location = 't'):
+    """Add Tau lines to the matrix"""
+
+    global tau_map
+    nbc = bc[0]//10
+
+    # Set last modes to zero
+    if bc[0] > 990 and bc[0] < 1000:
+        cond = tau_last(mat.shape[1], bc[0]-990)
+        nbc = bc[0]-990
+    # Apply condition from map
+    elif bc[0] > 0:
+        fct = tau_map.get(bc[0], None)
+        if fct is None:
+            raise RuntimeError("Unknown tau line " + str(bc[0]))
+        cond = fct(mat.shape[0], l, bc)
+
+    if not spsp.isspmatrix_coo(mat):
+        mat = mat.tocoo()
+    if location == 't':
+        s = 0
+    elif location == 'b':
+        s = mat.shape[0]-nbc
+
+    conc = np.concatenate
+    for i,c in enumerate(cond):
+        mat.data = conc((mat.data, c))
+        mat.row = conc((mat.row, [s+i]*mat.shape[1]))
+        mat.col = conc((mat.col, np.arange(0,mat.shape[1])))
 
     return mat
 
@@ -338,3 +318,24 @@ def stencil_value_diff2(nr, l, coeffs = None):
     diags, offsets = wnl.stencil_value_diff2_diags(nr, l)
 
     return spsp.diags(diags, offsets, (nr,nr+offsets[0]))
+
+# Galerkin stencil map
+stencil_map = dict()
+stencil_map[-10] = stencil_value
+stencil_map[-11] = stencil_diff
+stencil_map[-12] = stencil_rdiffdivr
+stencil_map[-13] = stencil_insulating
+stencil_map[-20] = stencil_value_diff
+stencil_map[-21] = stencil_value_diff2
+
+def stencil(nr, l, bc):
+    """Create a Galerkin stencil matrix"""
+
+    global stencil_map
+
+    if bc[0] < -1 and bc[0] > -5:
+        mat = restrict_eye(nr, 'cr', -bc[0])
+    elif bc[0] < 0:
+        mat = stencil_map[bc[0]](nr, l, bc.get('c',None))
+
+    return mat

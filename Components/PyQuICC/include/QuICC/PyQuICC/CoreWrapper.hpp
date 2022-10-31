@@ -83,6 +83,16 @@ namespace PyQuICC {
          static PyObject* callMethod(PyObject* pArgs);
 
          /**
+          * @brief Fill Array with NumPy array data
+          */
+         static void fillArray(Array& rArray, PyObject* pPyArr);
+
+         /**
+          * @brief Fill Matrix with NumPy 2D array data
+          */
+         static void fillMatrix(Matrix& rMatrix, PyObject* pPyMat);
+
+         /**
           * @brief Fill sparse matrix with data from Python call
           */
          static void fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat);
