@@ -32,6 +32,9 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
 # Additional configuration
 include(setup/Worland_configure)
 
+# Install python files
+add_dependencies(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CURRENT_COMPONENT_LIB}_updatepy)
+
 # Add source directory
 add_subdirectory(src)
 
