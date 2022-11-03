@@ -27,9 +27,9 @@
 #include "QuICC/Transform/Forward/Pm.hpp"
 #include "QuICC/Transform/Forward/D1.hpp"
 #include "QuICC/Transform/Forward/D1ZP0.hpp"
-#include "QuICC/Transform/Forward/DfLaplh_1.hpp"
+#include "QuICC/Transform/Forward/DfOverlaplh.hpp"
 #include "QuICC/Transform/Forward/Laplh.hpp"
-#include "QuICC/Transform/Forward/Laplh_1.hpp"
+#include "QuICC/Transform/Forward/Overlaplh.hpp"
 #include "QuICC/Transform/Forward/I2P.hpp"
 #include "QuICC/Transform/Forward/I2D1.hpp"
 #include "QuICC/Transform/Forward/I2ZI2D1.hpp"
@@ -109,18 +109,18 @@ namespace Transform {
             // Extract Toroidal component
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
             transform.back().addEdge(Forward::D1::id());
-            transform.back().addEdge(Forward::Laplh_1::id());
+            transform.back().addEdge(Forward::Overlaplh::id());
             transform.back().addEdge(Forward::P::id(), curlId, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::Y, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::DfLaplh_1::id());
+            transform.back().addEdge(Forward::DfOverlaplh::id());
             transform.back().addEdge(Forward::P::id(), curlId, Arithmetics::Sub::id());
 
             // Extract Poloidal component
             transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::Laplh_1::id());
+            transform.back().addEdge(Forward::Overlaplh::id());
             transform.back().addEdge(Forward::P::id(), curlcurlId, Arithmetics::Sub::id());
 
             // Extract X mean into Toroidal component

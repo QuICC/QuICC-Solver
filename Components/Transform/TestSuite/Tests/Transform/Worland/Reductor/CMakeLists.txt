@@ -9,10 +9,10 @@ include(ConfigureTests)
 set(_tests
   Poly::EnergyR2:reductor
   Poly::Energy:reductor
-  Poly::EnergySLAPLR2:reductor
+  Poly::EnergySLaplR2:reductor
   Fft::EnergyR2:reductor
   Fft::Energy:reductor
-  Fft::EnergySLAPLR2:reductor
+  Fft::EnergySLaplR2:reductor
 )
 quicc_set_ulp(_ulp
   ULP 30 36 30
@@ -97,8 +97,8 @@ foreach(_test ${_tests})
 endforeach()
 
 set(_tests
-  Poly::PowerSLAPLR2:reductor
-  Fft::PowerSLAPLR2:reductor
+  Poly::PowerSLaplR2:reductor
+  Fft::PowerSLaplR2:reductor
 )
 quicc_set_ulp(_ulp
   ULP 30 100 250

@@ -23,7 +23,7 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Transform/Reductor/Energy.hpp"
-#include "QuICC/Transform/Reductor/EnergySLAPLR2.hpp"
+#include "QuICC/Transform/Reductor/EnergySlaplR2.hpp"
 #include "QuICC/Transform/Reductor/EnergyD1R1.hpp"
 #include "QuICC/Io/Variable/Tags/Enstrophy.hpp"
 
@@ -237,7 +237,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergySLAPLR2::id());
+               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergySlaplR2::id());
             },
             pInVarPolS);
 

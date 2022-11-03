@@ -17,7 +17,7 @@ bc_temp = 0 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 # Create parameters
 m = 7 
 res = [64, 0, 64]
-eq_params = {'prandtl':1, 'rayleigh':5e3, 'ro':1.0, 'rratio':0.35, 'heating':0, 'scale3d':2.0}
+eq_params = {'prandtl':1, 'rayleigh':5e3, 'ro':1.0, 'r_ratio':0.35, 'heating':0, 'scale3d':2.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Wave number function from single "index" (k perpendicular)

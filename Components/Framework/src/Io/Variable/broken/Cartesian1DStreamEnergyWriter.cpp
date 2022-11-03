@@ -23,8 +23,8 @@
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/PhysicalNames/VelocityZ.hpp"
 #include "QuICC/Io/Variable/EnergyTags.hpp"
 #include "QuICC/PyQuICC/CoreWrapper.hpp"
@@ -63,9 +63,9 @@ namespace Variable {
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // .. set bounds
-      pValue = PyFloat_FromDouble(this->mPhysical.find(NonDimensional::Lower1D::id())->second->value());
+      pValue = PyFloat_FromDouble(this->mPhysical.find(NonDimensional::Lower1d::id())->second->value());
       PyTuple_SetItem(pArgs, 1, pValue);
-      pValue = PyFloat_FromDouble(this->mPhysical.find(NonDimensional::Upper1D::id())->second->value());
+      pValue = PyFloat_FromDouble(this->mPhysical.find(NonDimensional::Upper1d::id())->second->value());
       PyTuple_SetItem(pArgs, 2, pValue);
 
       // Call avg

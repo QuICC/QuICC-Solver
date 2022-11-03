@@ -1,10 +1,16 @@
-set(excluded 
-  "Typedefs.hpp"
-  )
+set(tags
+  Boundary
+  ExplicitLinear
+  ExplicitNextstep
+  ExplicitNonlinear
+  ImplicitLinear
+  Stencil
+  Time
+)
 
 include(RegisterTags)
 quicc_register_tags(
   NAMESPACE "ModelOperator"
   BASECLASS "IModelOperator"
-  EXCLUDED ${excluded}
+  TAGS ${tags}
   )

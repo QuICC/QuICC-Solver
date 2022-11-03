@@ -25,7 +25,7 @@ eq_params = {'prandtl':1, 'rayleigh':100, 'theta':0.0, 'scale1d':2.0}
 # Set wave number
 phi = 90
 
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocity_z':0, 'temperature':0}
 
 # Generic Wave number function from single "index" (k perpendicular) and angle
 def generic_wave(kp, phi):

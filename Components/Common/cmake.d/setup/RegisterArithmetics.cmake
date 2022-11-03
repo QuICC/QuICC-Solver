@@ -1,10 +1,14 @@
-set(excluded 
-  "Typedefs.hpp"
+set(tags 
+  Add
+  None
+  Set
+  SetNeg
+  Sub
   )
 
 include(RegisterTags)
 quicc_register_tags(
   NAMESPACE "Arithmetics"
   BASECLASS "IArithmetics"
-  EXCLUDED ${excluded}
+  TAGS ${tags}
   )

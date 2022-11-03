@@ -22,13 +22,13 @@ class BoussinesqIWShell(base_model.BaseModel):
     def nondimensional_parameters(self):
         """Get the list of nondimensional parameters"""
 
-        return ["taylor", "rratio"]
+        return ['taylor', 'r_ratio']
 
     def automatic_parameters(self, eq_params):
         """Extend parameters with automatically computable values"""
 
         # Unit gap width
-        d = {"ro":1.0/(1.0 - eq_params["rratio"])}
+        d = {"ro":1.0/(1.0 - eq_params['r_ratio'])}
 
         return d
 
@@ -131,7 +131,7 @@ class BoussinesqIWShell(base_model.BaseModel):
         """Convert simulation input boundary conditions to ID"""
 
         ro = self.automatic_parameters(eq_params)['ro']
-        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(ro, eq_params['r_ratio'])
 
         # Solver: no tau boundary conditions
         if bcs["bcType"] == self.SOLVER_NO_TAU and not self.use_galerkin:
@@ -187,7 +187,7 @@ class BoussinesqIWShell(base_model.BaseModel):
                 elif bcId == 1:
                     if field_col == ("velocity","tor"):
                         ro = self.automatic_parameters(eq_params)['ro']
-                        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
+                        a, b = geo.rad.linear_r2x(ro, eq_params['r_ratio'])
                         bc = {0:-22, 'rt':2, 'c':{'a':a, 'b':b}}
                     elif field_col == ("velocity","pol"):
                         bc = {0:-41, 'rt':4}
@@ -214,7 +214,7 @@ class BoussinesqIWShell(base_model.BaseModel):
         m = int(eigs[0])
 
         ro = self.automatic_parameters(eq_params)['ro']
-        a, b = geo.linear_r2x(ro, eq_params['rratio'])
+        a, b = geo.linear_r2x(ro, eq_params['r_ratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -232,7 +232,7 @@ class BoussinesqIWShell(base_model.BaseModel):
         m = int(eigs[0])
 
         ro = self.automatic_parameters(eq_params)['ro']
-        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(ro, eq_params['r_ratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -258,7 +258,7 @@ class BoussinesqIWShell(base_model.BaseModel):
         m = int(eigs[0])
 
         ro = self.automatic_parameters(eq_params)['ro']
-        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(ro, eq_params['r_ratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_col)
@@ -293,7 +293,7 @@ class BoussinesqIWShell(base_model.BaseModel):
         m = int(eigs[0])
 
         ro = self.automatic_parameters(eq_params)['ro']
-        a, b = geo.rad.linear_r2x(ro, eq_params['rratio'])
+        a, b = geo.rad.linear_r2x(ro, eq_params['r_ratio'])
 
         mat = None
         bc = self.convert_bc(eq_params,eigs,bcs,field_row,field_row)

@@ -86,7 +86,7 @@ model = mod_vpt.BoussinesqRotConv2DBoxVPT()
 model.linearize = True
 model.use_galerkin = False
 fields = model.stability_fields()
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityz':bc_vel, 'pressure':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':bc_vel, 'velocity_z':bc_vel, 'pressure':bc_vel, 'temperature':bc_temp}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)

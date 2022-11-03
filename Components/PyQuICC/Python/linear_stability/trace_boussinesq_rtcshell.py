@@ -107,7 +107,7 @@ Ta = 1e12; Rac = 7.4758215298779; mc = 245
 #res = [1024, 1024, 0]
 
 # Create parameters (rescaling to proper nondimensionalisation)
-ro = model.automatic_parameters({'rratio':rratio})['ro']
+ro = model.automatic_parameters({'r_ratio':rratio})['ro']
 if mc is None:
     m = np.int(0.3029*Ta**(1./6.)) # Asymptotic prediction for minimum
 else:
@@ -118,7 +118,7 @@ else:
     Ra = Rac
 
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
-eq_params = {'taylor':Ta*(1.0-rratio)**4, 'prandtl':1, 'rayleigh':Ra, 'rratio':rratio, 'heating':heating}
+eq_params = {'taylor':Ta*(1.0-rratio)**4, 'prandtl':1, 'rayleigh':Ra, 'r_ratio':rratio, 'heating':heating}
 eq_params.update(model.automatic_parameters(eq_params))
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 

@@ -22,8 +22,8 @@
 //
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Math/Constants.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Heating.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/Nusselt.hpp"
@@ -62,8 +62,8 @@ namespace Variable {
       // Look for l = 0, m = 0 mode
       if(m0 == 0 && l0 == 0)
       {
-         auto ro = this->mPhysical.find(NonDimensional::Upper1D::id())->second->value();
-         auto ri = this->mPhysical.find(NonDimensional::Lower1D::id())->second->value();
+         auto ro = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
+         auto ri = this->mPhysical.find(NonDimensional::Lower1d::id())->second->value();
          auto a = (ro - ri)/2.0;
 
          this->mBackground.resize(2);

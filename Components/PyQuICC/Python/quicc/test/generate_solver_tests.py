@@ -298,7 +298,7 @@ def rb1dboxvc(nx, ny, nz, restriction = None):
     ky = (kp**2-kx**2)**0.5;
     eq_params = {'prandtl':1, 'rayleigh':657.5113645, 'scale1d':1.0}
     eigs = [kx, ky]
-    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':bc_vel, 'velocity_y':bc_vel, 'velocity_z':bc_vel, 'temperature':bc_temp}
     A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
     bcs['bcType'] = model.SOLVER_NO_TAU
     B = model.time(res, eq_params, eigs, bcs, fields)
@@ -320,7 +320,7 @@ def rrb1dboxvc(nx, ny, nz, restriction = None):
     ky = 2.710
     eq_params = {'prandtl':1, 'rayleigh':1676.12, 'taylor':1e3, 'scale1d':1.0}
     eigs = [kx, ky]
-    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':bc_vel, 'velocity_y':bc_vel, 'velocity_z':bc_vel, 'temperature':bc_temp}
     A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
     bcs['bcType'] = model.SOLVER_NO_TAU
     B = model.time(res, eq_params, eigs, bcs, fields)
@@ -340,7 +340,7 @@ def rb2dboxvc(nx, ny, nz, restriction = None):
     bc_temp = 1
     eigs = [3]
     eq_params = {'prandtl':1, 'rayleigh':10823.2, 'scale1d':1.0, 'scale3d':1.0} # m = 3, n = 1, aspect ration 1:1
-    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':bc_vel, 'velocity_y':bc_vel, 'velocity_z':bc_vel, 'temperature':bc_temp}
     A = model.implicit_linear(res, eq_params, eigs, bcs, fields, restriction = restriction)
     bcs['bcType'] = model.SOLVER_NO_TAU
     B = model.time(res, eq_params, eigs, bcs, fields, restriction = restriction)
@@ -360,7 +360,7 @@ def rrb2dboxvc(nx, ny, nz, restriction = None):
     bc_temp = 1
     eigs = [5]
     eq_params = {'prandtl':1, 'rayleigh':1e5, 'taylor':1e3, 'scale1d':1.0, 'scale3d':1.0} # m = 1, n = 1, aspect ration 1:1
-    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':bc_vel, 'velocity_y':bc_vel, 'velocity_z':bc_vel, 'temperature':bc_temp}
     A = model.implicit_linear(res, eq_params, eigs, bcs, fields, restriction = restriction)
     bcs['bcType'] = model.SOLVER_NO_TAU
     B = model.time(res, eq_params, eigs, bcs, fields, restriction = restriction)
@@ -379,7 +379,7 @@ def rb3dboxvc(nx, ny, nz, restriction = None):
     bc_vel = 6
     bc_temp = 4
     eq_params = {'prandtl':1, 'rayleigh':1315.022729, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1, m = 1, n = 1, aspect ration 1:1:1
-    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':bc_vel, 'velocity_y':bc_vel, 'velocity_z':bc_vel, 'temperature':bc_temp}
     eigs = []
     A = model.implicit_linear(res, eq_params, eigs, bcs, fields, restriction = restriction)
     bcs['bcType'] = model.SOLVER_NO_TAU
@@ -399,7 +399,7 @@ def rrb3dboxvc(nx, ny, nz, restriction = None):
     bc_vel = 6
     bc_temp = 4
     eq_params = {'prandtl':1, 'rayleigh':779.2727283, 'taylor':1e3, 'scale1d':1.0, 'scale2d':1.0, 'scale3d':1.0} # l = 1|0, m = 0|1, n = 1, aspect ration 1:1:1
-    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+    bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':bc_vel, 'velocity_y':bc_vel, 'velocity_z':bc_vel, 'temperature':bc_temp}
     eigs = []
     A = model.implicit_linear(res, eq_params, eigs, bcs, fields, restriction = restriction)
     bcs['bcType'] = model.SOLVER_NO_TAU

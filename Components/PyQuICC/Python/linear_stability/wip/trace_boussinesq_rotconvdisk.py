@@ -12,9 +12,9 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [30, 0, 0]
-eq_params = {'taylor':1e4, 'prandtl':1, 'rayleigh':5.5, 'ro':1, 'rratio':0.35}
+eq_params = {'taylor':1e4, 'prandtl':1, 'rayleigh':5.5, 'ro':1, 'r_ratio':0.35}
 eigs = [1]
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':0, 'velocityy':0, 'temperature':0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':0, 'velocity_y':0, 'temperature':0}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)

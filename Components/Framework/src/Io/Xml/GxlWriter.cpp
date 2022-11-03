@@ -175,7 +175,7 @@ namespace Xml {
             oss.str("");
             pNode->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(field.c_str(),0)));
 
-            oss << PhysicalNames::Coordinator::formatted(nameIt->first) << " ";
+            oss << PhysicalNames::Coordinator::tag(nameIt->first) << " ";
             if(dir == TransformDirection::FORWARD)
             {
                oss << Tools::IdToHuman::toString(static_cast<FieldComponents::Physical::Id>(pathIt->startId()));
@@ -291,7 +291,7 @@ namespace Xml {
          oss.str("");
          pNode->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(root.c_str(),0)));
 
-         oss << PhysicalNames::Coordinator::formatted(treeIt->name()) << " ";
+         oss << PhysicalNames::Coordinator::tag(treeIt->name()) << " ";
          if(dir == TransformDirection::FORWARD)
          {
             oss << Tools::IdToHuman::toString(treeIt->comp<FieldComponents::Physical::Id>());

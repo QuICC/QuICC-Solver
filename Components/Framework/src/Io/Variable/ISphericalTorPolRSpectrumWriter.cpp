@@ -25,8 +25,8 @@
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 #include "QuICC/Transform/Reductor/RadialPower.hpp"
-#include "QuICC/Transform/Reductor/RadialPowerDivR1.hpp"
-#include "QuICC/Transform/Reductor/RadialPowerDivR1D1R1.hpp"
+#include "QuICC/Transform/Reductor/RadialPowerOverr1.hpp"
+#include "QuICC/Transform/Reductor/RadialPowerOverr1D1R1.hpp"
 #include "QuICC/Io/Variable/Tags/Spectrum.hpp"
 
 namespace QuICC {
@@ -191,7 +191,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::RadialPowerDivR1::id());
+               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::RadialPowerOverr1::id());
             },
             pInVarPolQ);
 
@@ -267,7 +267,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::RadialPowerDivR1D1R1::id());
+               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::RadialPowerOverr1D1R1::id());
             },
             pInVarPolS);
 

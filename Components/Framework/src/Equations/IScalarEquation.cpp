@@ -23,7 +23,7 @@
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
-#include "QuICC/Transform/Path/I2ScalarNL.hpp"
+#include "QuICC/Transform/Path/I2ScalarNl.hpp"
 
 namespace QuICC {
 
@@ -110,7 +110,7 @@ namespace Equations {
    {
       if(this->mForwardPathsType == FWD_IS_NONLINEAR)
       {
-         this->addNLComponent(FieldComponents::Spectral::SCALAR, Transform::Path::I2ScalarNL::id());
+         this->addNLComponent(FieldComponents::Spectral::SCALAR, Transform::Path::I2ScalarNl::id());
       }
       else if(this->mForwardPathsType == FWD_IS_FIELD)
       {

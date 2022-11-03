@@ -43,26 +43,26 @@
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/D1.hpp"
 #include "QuICC/Transform/Forward/LaplhD1.hpp"
-#include "QuICC/Transform/Forward/Laplh_1D1.hpp"
-#include "QuICC/Transform/Forward/Sin_1.hpp"
-#include "QuICC/Transform/Forward/LaplhSin_1.hpp"
-#include "QuICC/Transform/Forward/Laplh_1Sin_1.hpp"
+#include "QuICC/Transform/Forward/OverlaplhD1.hpp"
+#include "QuICC/Transform/Forward/Oversin.hpp"
+#include "QuICC/Transform/Forward/LaplhOversin.hpp"
+#include "QuICC/Transform/Forward/OverlaplhOversin.hpp"
 #include "QuICC/Transform/Forward/Laplh.hpp"
 #include "QuICC/Transform/Forward/Laplh2.hpp"
-#include "QuICC/Transform/Forward/Laplh_1.hpp"
-#include "QuICC/Transform/Forward/Sin_1Dphi.hpp"
-#include "QuICC/Transform/Forward/LaplhSin_1Dphi.hpp"
-#include "QuICC/Transform/Forward/Laplh_1Sin_1Dphi.hpp"
+#include "QuICC/Transform/Forward/Overlaplh.hpp"
+#include "QuICC/Transform/Forward/OversinDphi.hpp"
+#include "QuICC/Transform/Forward/LaplhOversinDphi.hpp"
+#include "QuICC/Transform/Forward/OverlaplhOversinDphi.hpp"
 
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/Laplh.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
 #include "QuICC/Transform/Backward/D1Laplh.hpp"
-#include "QuICC/Transform/Backward/Sin_1.hpp"
-#include "QuICC/Transform/Backward/Sin_1Dphi.hpp"
-#include "QuICC/Transform/Backward/Sin_1Laplh.hpp"
-#include "QuICC/Transform/Backward/Sin_1LaplhDphi.hpp"
-#include "QuICC/Transform/Backward/Sin_1D1Sin.hpp"
+#include "QuICC/Transform/Backward/Oversin.hpp"
+#include "QuICC/Transform/Backward/OversinDphi.hpp"
+#include "QuICC/Transform/Backward/OversinLaplh.hpp"
+#include "QuICC/Transform/Backward/OversinLaplhDphi.hpp"
+#include "QuICC/Transform/Backward/OversinD1Sin.hpp"
                                          
 namespace QuICC {
 
@@ -107,26 +107,26 @@ namespace Transform {
       this->mImpl.addOperator<Poly::ALegendre::Projector::Ll>(Backward::Laplh::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::D1>(Backward::D1::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::LlD1>(Backward::D1Laplh::id());
-      this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1>(Backward::Sin_1::id());
-      this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1Dp>(Backward::Sin_1Dphi::id());
-      this->mImpl.addOperator<Poly::ALegendre::Projector::LlDivS1>(Backward::Sin_1Laplh::id());
-      this->mImpl.addOperator<Poly::ALegendre::Projector::LlDivS1Dp>(Backward::Sin_1LaplhDphi::id());
-      this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1D1S1>(Backward::Sin_1D1Sin::id());
+      this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1>(Backward::Oversin::id());
+      this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1Dp>(Backward::OversinDphi::id());
+      this->mImpl.addOperator<Poly::ALegendre::Projector::LlDivS1>(Backward::OversinLaplh::id());
+      this->mImpl.addOperator<Poly::ALegendre::Projector::LlDivS1Dp>(Backward::OversinLaplhDphi::id());
+      this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1D1S1>(Backward::OversinD1Sin::id());
 
       // Reserve storage for the weighted projectors, 1/sin projectors and derivative
       this->mImpl.addOperator<Poly::ALegendre::Integrator::P>(Forward::P::id());
-      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivLl>(Forward::Laplh_1::id());
+      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivLl>(Forward::Overlaplh::id());
       this->mImpl.addOperator<Poly::ALegendre::Integrator::Ll>(Forward::Laplh::id());
       this->mImpl.addOperator<Poly::ALegendre::Integrator::Ll2>(Forward::Laplh2::id());
-      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivS1>(Forward::Sin_1::id());
-      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivLlDivS1>(Forward::Laplh_1Sin_1::id());
-      this->mImpl.addOperator<Poly::ALegendre::Integrator::LlDivS1>(Forward::LaplhSin_1::id());
+      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivS1>(Forward::Oversin::id());
+      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivLlDivS1>(Forward::OverlaplhOversin::id());
+      this->mImpl.addOperator<Poly::ALegendre::Integrator::LlDivS1>(Forward::LaplhOversin::id());
       this->mImpl.addOperator<Poly::ALegendre::Integrator::D1>(Forward::D1::id());
-      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivLlD1>(Forward::Laplh_1D1::id());
+      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivLlD1>(Forward::OverlaplhD1::id());
       this->mImpl.addOperator<Poly::ALegendre::Integrator::LlD1>(Forward::LaplhD1::id());
-      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivS1Dp>(Forward::Sin_1Dphi::id());
-      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivLlDivS1Dp>(Forward::Laplh_1Sin_1Dphi::id());
-      this->mImpl.addOperator<Poly::ALegendre::Integrator::LlDivS1Dp>(Forward::LaplhSin_1Dphi::id());
+      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivS1Dp>(Forward::OversinDphi::id());
+      this->mImpl.addOperator<Poly::ALegendre::Integrator::DivLlDivS1Dp>(Forward::OverlaplhOversinDphi::id());
+      this->mImpl.addOperator<Poly::ALegendre::Integrator::LlDivS1Dp>(Forward::LaplhOversinDphi::id());
    }
 
    void ALegendreTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)

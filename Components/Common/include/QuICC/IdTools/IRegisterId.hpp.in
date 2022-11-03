@@ -32,7 +32,7 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         IRegisterId(@_idSIG@@_idCOMMA@const std::string tag, const std::string formatted);
+         IRegisterId(@_idSIG@@_idCOMMA@const std::string tag);
 
          /**
           * @brief Destructor
@@ -42,7 +42,7 @@ namespace QuICC {
          /**
           * @brief Unique id
           */
-         static const std::size_t& id();
+         static std::size_t id();
       
       protected:
 
@@ -53,10 +53,10 @@ namespace QuICC {
     * @brief Register new @idID@
     */
    template <typename T> static std::size_t registerId(const std::string tag);
+   template <typename T> static std::size_t registerId(const std::size_t id);
 
-   template <typename T> std::size_t registerId(const std::string s)
+   template <typename T> std::size_t registerId(const std::size_t id)
    {
-      std::size_t id = Hasher::makeId(s);
       std::shared_ptr<CreatorImpl<T> >  spFactory = std::make_shared<CreatorImpl<T> >();
 
       Coordinator::map().insert(std::make_pair(id,spFactory));
@@ -64,16 +64,22 @@ namespace QuICC {
       return id;
    }
 
-   template <typename T> IRegisterId<T>::IRegisterId(@_idSIG@@_idCOMMA@const std::string tag, const std::string formatted)
-      : @idID@(@idARG@@_idCOMMA@tag, formatted)
+   template <typename T> std::size_t registerId(const std::string s)
    {
+      std::size_t id = Hasher::makeId(s);
+      return registerId<T>(id);
    }
 
-   template <typename T> const std::size_t& IRegisterId<T>::id()
+   template <typename T> IRegisterId<T>::IRegisterId(@_idSIG@@_idCOMMA@const std::string tag)
+      : @idID@(@idARG@@_idCOMMA@tag)
    {
-      static std::size_t *i = new std::size_t();
-      *i = registerId<T>(T::sTag());
-      return *i;
+      registerId<T>(this->hash());
+   }
+
+   template <typename T> std::size_t IRegisterId<T>::id()
+   {
+      static T id;
+      return id.hash();
    }
 
 @cxxNS_@

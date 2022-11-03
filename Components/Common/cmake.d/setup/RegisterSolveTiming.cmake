@@ -1,10 +1,12 @@
-set(excluded 
-  "Typedefs.hpp"
+set(tags 
+  After
+  Before
+  Prognostic
   )
 
 include(RegisterTags)
 quicc_register_tags(
   NAMESPACE "SolveTiming"
   BASECLASS "ISolveTiming"
-  EXCLUDED ${excluded}
+  TAGS ${tags}
   )

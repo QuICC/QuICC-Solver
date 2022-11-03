@@ -22,10 +22,10 @@
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/T.hpp"
-#include "QuICC/Transform/Forward/Laplh_1.hpp"
+#include "QuICC/Transform/Forward/Overlaplh.hpp"
 #include "QuICC/Transform/Forward/R1.hpp"
-#include "QuICC/Transform/Forward/Laplh_1D1.hpp"
-#include "QuICC/Transform/Forward/Laplh_1Sin_1Dphi.hpp"
+#include "QuICC/Transform/Forward/OverlaplhD1.hpp"
+#include "QuICC/Transform/Forward/OverlaplhOversinDphi.hpp"
 #include "QuICC/Transform/Forward/I4Q.hpp"
 #include "QuICC/Transform/Forward/I4S.hpp"
 #include "QuICC/Transform/Forward/I2Q.hpp"
@@ -81,19 +81,19 @@ void createTorPolTree(std::vector<::QuICC::Transform::TransformPath>& t)
 
    t.push_back(TP(::QuICC::FieldComponents::Physical::THETA, ::QuICC::FieldType::VECTOR));
    t.back().addEdge(ns_QT::Forward::P::id());
-   t.back().addEdge(ns_QT::Forward::Laplh_1Sin_1Dphi::id());
+   t.back().addEdge(ns_QT::Forward::OverlaplhOversinDphi::id());
    t.back().addEdge(ns_QT::Forward::P::id(), ::QuICC::FieldComponents::Spectral::TOR, ::QuICC::Arithmetics::Add::id());
 
    t.push_back(TP(::QuICC::FieldComponents::Physical::PHI, ::QuICC::FieldType::VECTOR));
    t.back().addEdge(ns_QT::Forward::P::id());
-   t.back().addEdge(ns_QT::Forward::Laplh_1D1::id());
+   t.back().addEdge(ns_QT::Forward::OverlaplhD1::id());
    t.back().addEdge(ns_QT::Forward::P::id(), ::QuICC::FieldComponents::Spectral::TOR, ::QuICC::Arithmetics::Sub::id());
 
    // Poloidal
 
    t.push_back(TP(::QuICC::FieldComponents::Physical::R, ::QuICC::FieldType::VECTOR));
    t.back().addEdge(ns_QT::Forward::P::id());
-   t.back().addEdge(ns_QT::Forward::Laplh_1::id());
+   t.back().addEdge(ns_QT::Forward::Overlaplh::id());
    t.back().addEdge(ns_QT::Forward::R1::id(), ::QuICC::FieldComponents::Spectral::POL, ::QuICC::Arithmetics::Add::id());
 }
 
@@ -106,12 +106,12 @@ void createTorPolNLTree(std::vector<::QuICC::Transform::TransformPath>& t)
 
    t.push_back(TP(::QuICC::FieldComponents::Physical::THETA, ::QuICC::FieldType::VECTOR));
    t.back().addEdge(ns_QT::Forward::P::id());
-   t.back().addEdge(ns_QT::Forward::Laplh_1Sin_1Dphi::id());
+   t.back().addEdge(ns_QT::Forward::OverlaplhOversinDphi::id());
    t.back().addEdge(ns_QT::Forward::T::id(), ::QuICC::FieldComponents::Spectral::TOR, ::QuICC::Arithmetics::Add::id());
 
    t.push_back(TP(::QuICC::FieldComponents::Physical::PHI, ::QuICC::FieldType::VECTOR));
    t.back().addEdge(ns_QT::Forward::P::id());
-   t.back().addEdge(ns_QT::Forward::Laplh_1D1::id());
+   t.back().addEdge(ns_QT::Forward::OverlaplhD1::id());
    t.back().addEdge(ns_QT::Forward::T::id(), ::QuICC::FieldComponents::Spectral::TOR, ::QuICC::Arithmetics::Sub::id());
 
    // Poloidal
@@ -123,11 +123,11 @@ void createTorPolNLTree(std::vector<::QuICC::Transform::TransformPath>& t)
 
    t.push_back(TP(::QuICC::FieldComponents::Physical::THETA, ::QuICC::FieldType::VECTOR));
    t.back().addEdge(ns_QT::Forward::P::id());
-   t.back().addEdge(ns_QT::Forward::Laplh_1D1::id());
+   t.back().addEdge(ns_QT::Forward::OverlaplhD1::id());
    t.back().addEdge(ns_QT::Forward::I4S::id(), ::QuICC::FieldComponents::Spectral::POL, ::QuICC::Arithmetics::Add::id());
 
    t.push_back(TP(::QuICC::FieldComponents::Physical::PHI, ::QuICC::FieldType::VECTOR));
    t.back().addEdge(ns_QT::Forward::P::id());
-   t.back().addEdge(ns_QT::Forward::Laplh_1Sin_1Dphi::id());
+   t.back().addEdge(ns_QT::Forward::OverlaplhOversinDphi::id());
    t.back().addEdge(ns_QT::Forward::I4S::id(), ::QuICC::FieldComponents::Spectral::POL, ::QuICC::Arithmetics::Add::id());
 }

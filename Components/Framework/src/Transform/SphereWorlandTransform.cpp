@@ -37,12 +37,12 @@
 #include "QuICC/Transform/Poly/Worland/Integrator/I2DivR1_Zero.hpp"
 #include "QuICC/Transform/Poly/Worland/Integrator/I2DivR1D1R1_Zero.hpp"
 
-#include "QuICC/Transform/Poly/Worland/Reductor/EnergySLAPLR2.hpp"
+#include "QuICC/Transform/Poly/Worland/Reductor/EnergySLaplR2.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/EnergyD1R1.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/EnergyR2.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/Energy.hpp"
 
-#include "QuICC/Transform/Poly/Worland/Reductor/PowerSLAPLR2.hpp"
+#include "QuICC/Transform/Poly/Worland/Reductor/PowerSLaplR2.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/PowerD1R1.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/Power.hpp"
@@ -51,11 +51,11 @@
 #include "QuICC/Transform/Poly/Worland/Reductor/RadialPowerDivR1D1R1.hpp"
 
 #include "QuICC/Transform/Backward/P.hpp"
-#include "QuICC/Transform/Backward/R_1.hpp"
+#include "QuICC/Transform/Backward/Overr1.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
 #include "QuICC/Transform/Backward/D1R1.hpp"
-#include "QuICC/Transform/Backward/R_1D1R1.hpp"
-#include "QuICC/Transform/Backward/SLapl.hpp"
+#include "QuICC/Transform/Backward/Overr1D1R1.hpp"
+#include "QuICC/Transform/Backward/Slapl.hpp"
 
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/I2P.hpp"
@@ -73,16 +73,16 @@
 #include "QuICC/Transform/Reductor/Energy.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
 #include "QuICC/Transform/Reductor/EnergyD1R1.hpp"
-#include "QuICC/Transform/Reductor/EnergySLAPLR2.hpp"
+#include "QuICC/Transform/Reductor/EnergySlaplR2.hpp"
 
 #include "QuICC/Transform/Reductor/Power.hpp"
 #include "QuICC/Transform/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Reductor/PowerD1R1.hpp"
-#include "QuICC/Transform/Reductor/PowerSLAPLR2.hpp"
+#include "QuICC/Transform/Reductor/PowerSlaplR2.hpp"
 
 #include "QuICC/Transform/Reductor/RadialPower.hpp"
-#include "QuICC/Transform/Reductor/RadialPowerDivR1.hpp"
-#include "QuICC/Transform/Reductor/RadialPowerDivR1D1R1.hpp"
+#include "QuICC/Transform/Reductor/RadialPowerOverr1.hpp"
+#include "QuICC/Transform/Reductor/RadialPowerOverr1D1R1.hpp"
 
 #include "Profiler/Interface.hpp"
 
@@ -126,11 +126,11 @@ namespace Transform {
    {
       // Create projectors
       this->mImpl.addOperator<Poly::Worland::Projector::P>(Backward::P::id());
-      this->mImpl.addOperator<Poly::Worland::Projector::DivR1_Zero>(Backward::R_1::id());
+      this->mImpl.addOperator<Poly::Worland::Projector::DivR1_Zero>(Backward::Overr1::id());
       this->mImpl.addOperator<Poly::Worland::Projector::D1>(Backward::D1::id());
       this->mImpl.addOperator<Poly::Worland::Projector::D1R1>(Backward::D1R1::id());
-      this->mImpl.addOperator<Poly::Worland::Projector::DivR1D1R1_Zero>(Backward::R_1D1R1::id());
-      this->mImpl.addOperator<Poly::Worland::Projector::SphLapl>(Backward::SLapl::id());
+      this->mImpl.addOperator<Poly::Worland::Projector::DivR1D1R1_Zero>(Backward::Overr1D1R1::id());
+      this->mImpl.addOperator<Poly::Worland::Projector::SphLapl>(Backward::Slapl::id());
 
       // Create integrators
       this->mImpl.addOperator<Poly::Worland::Integrator::P>(Forward::P::id());
@@ -146,17 +146,17 @@ namespace Transform {
       this->mImpl.addOperator<Poly::Worland::Integrator::I4DivR1D1R1_Zero>(Forward::I4S::id());
 
       // Create reductors
-      this->mImpl.addOperator<Poly::Worland::Reductor::EnergySLAPLR2>(Reductor::EnergySLAPLR2::id());
+      this->mImpl.addOperator<Poly::Worland::Reductor::EnergySLaplR2>(Reductor::EnergySlaplR2::id());
       this->mImpl.addOperator<Poly::Worland::Reductor::EnergyD1R1>(Reductor::EnergyD1R1::id());
       this->mImpl.addOperator<Poly::Worland::Reductor::EnergyR2>(Reductor::EnergyR2::id());
       this->mImpl.addOperator<Poly::Worland::Reductor::Energy>(Reductor::Energy::id());
-      this->mImpl.addOperator<Poly::Worland::Reductor::PowerSLAPLR2>(Reductor::PowerSLAPLR2::id());
+      this->mImpl.addOperator<Poly::Worland::Reductor::PowerSLaplR2>(Reductor::PowerSlaplR2::id());
       this->mImpl.addOperator<Poly::Worland::Reductor::PowerD1R1>(Reductor::PowerD1R1::id());
       this->mImpl.addOperator<Poly::Worland::Reductor::PowerR2>(Reductor::PowerR2::id());
       this->mImpl.addOperator<Poly::Worland::Reductor::Power>(Reductor::Power::id());
       this->mImpl.addOperator<Poly::Worland::Reductor::RadialPower>(Reductor::RadialPower::id());
-      this->mImpl.addOperator<Poly::Worland::Reductor::RadialPowerDivR1>(Reductor::RadialPowerDivR1::id());
-      this->mImpl.addOperator<Poly::Worland::Reductor::RadialPowerDivR1D1R1>(Reductor::RadialPowerDivR1D1R1::id());
+      this->mImpl.addOperator<Poly::Worland::Reductor::RadialPowerDivR1>(Reductor::RadialPowerOverr1::id());
+      this->mImpl.addOperator<Poly::Worland::Reductor::RadialPowerDivR1D1R1>(Reductor::RadialPowerOverr1D1R1::id());
    }
 
    void SphereWorlandTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)

@@ -21,12 +21,12 @@
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/SolveTiming/After.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
-#include "QuICC/NonDimensional/Lower2D.hpp"
-#include "QuICC/NonDimensional/Upper2D.hpp"
-#include "QuICC/NonDimensional/Lower3D.hpp"
-#include "QuICC/NonDimensional/Upper3D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
+#include "QuICC/NonDimensional/Lower2d.hpp"
+#include "QuICC/NonDimensional/Upper2d.hpp"
+#include "QuICC/NonDimensional/Lower3d.hpp"
+#include "QuICC/NonDimensional/Upper3d.hpp"
 
 #include <iostream>
 namespace QuICC {
@@ -186,7 +186,7 @@ namespace Equations {
          Array mP(5); mP(0) = -5.0; mP(1) = 4.0; mP(2) = 3.0; mP(3) = -3.0; mP(4) = 1.0;
 
          // Chebyshev rescaling
-         MHDFloat scale = 2.0/(this->eqParams().nd(NonDimensional::Upper1D::id()) - this->eqParams().nd(NonDimensional::Lower1D::id()));
+         MHDFloat scale = 2.0/(this->eqParams().nd(NonDimensional::Upper1d::id()) - this->eqParams().nd(NonDimensional::Lower1d::id()));
 
          int nK = this->res().cpu()->dim(Dimensions::Transform::TRAND)->dim<Dimensions::Data::DAT3D>();
          for(int iK = 0; iK < nK; ++iK)

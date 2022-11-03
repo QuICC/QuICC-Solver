@@ -149,7 +149,7 @@ namespace Tools {
                   (*scalEqIt)->setSolverIndex(compId, doneSEqIt->couplingInfo(compId).solverIndex());
 
                   // Debug statements
-                  DebuggerMacro_msg("Identified coupled scalar solver: " + PhysicalNames::Coordinator::formatted((*scalEqIt)->name()), 2);
+                  DebuggerMacro_msg("Identified coupled scalar solver: " + PhysicalNames::Coordinator::tag((*scalEqIt)->name()), 2);
                   DebuggerMacro_showValue("---> solver index: ", 2, (*scalEqIt)->couplingInfo(compId).solverIndex());
                   DebuggerMacro_showValue("---> is complex? ", 2, (*scalEqIt)->couplingInfo(compId).isComplex());
 
@@ -189,7 +189,7 @@ namespace Tools {
             }
 
             // Debug statements
-            DebuggerMacro_msg("Identified first scalar solver: " + PhysicalNames::Coordinator::formatted((*scalEqIt)->name()), 2);
+            DebuggerMacro_msg("Identified first scalar solver: " + PhysicalNames::Coordinator::tag((*scalEqIt)->name()), 2);
             DebuggerMacro_showValue("---> solver index: ", 2, (*scalEqIt)->couplingInfo(compId).solverIndex());
             DebuggerMacro_showValue("---> is complex? ", 2, (*scalEqIt)->couplingInfo(compId).isComplex());
          }
@@ -221,7 +221,7 @@ namespace Tools {
                      (*vectEqIt)->setSolverIndex(compIt, doneSEqIt->couplingInfo(FieldComponents::Spectral::SCALAR).solverIndex());
 
                      // Debug statements
-                     DebuggerMacro_msg("Identified coupled vector solver: " + PhysicalNames::Coordinator::formatted((*vectEqIt)->name()), 2);
+                     DebuggerMacro_msg("Identified coupled vector solver: " + PhysicalNames::Coordinator::tag((*vectEqIt)->name()), 2);
                      DebuggerMacro_showValue("---> component: ", 2, compIt);
                      DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compIt).solverIndex());
                      DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compIt).isComplex());
@@ -267,7 +267,7 @@ namespace Tools {
                            (*vectEqIt)->setSolverIndex(compIt, doneVEqIt->couplingInfo(doneIt).solverIndex());
 
                            // Debug statements
-                           DebuggerMacro_msg("Identified coupled vector solver: " + PhysicalNames::Coordinator::formatted((*vectEqIt)->name()), 2);
+                           DebuggerMacro_msg("Identified coupled vector solver: " + PhysicalNames::Coordinator::tag((*vectEqIt)->name()), 2);
                            DebuggerMacro_showValue("---> component: ", 2, compIt);
                            DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compIt).solverIndex());
                            DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compIt).isComplex());
@@ -327,7 +327,7 @@ namespace Tools {
                      (*vectEqIt)->setSolverIndex(compIt, (*vectEqIt)->couplingInfo(coupledComp).solverIndex());
 
                      // Debug statements
-                     DebuggerMacro_msg("Identified coupled vector solver: " + PhysicalNames::Coordinator::formatted((*vectEqIt)->name()), 2);
+                     DebuggerMacro_msg("Identified coupled vector solver: " + PhysicalNames::Coordinator::tag((*vectEqIt)->name()), 2);
                      DebuggerMacro_showValue("---> component: ", 2, compIt);
                      DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compIt).solverIndex());
                      DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compIt).isComplex());
@@ -356,7 +356,7 @@ namespace Tools {
                      }
 
                      // Debug statements
-                     DebuggerMacro_msg("Identified first vector solver: " + PhysicalNames::Coordinator::formatted((*vectEqIt)->name()), 2);
+                     DebuggerMacro_msg("Identified first vector solver: " + PhysicalNames::Coordinator::tag((*vectEqIt)->name()), 2);
                      DebuggerMacro_showValue("---> component: ", 2, compIt);
                      DebuggerMacro_showValue("---> solver index: ", 2, (*vectEqIt)->couplingInfo(compIt).solverIndex());
                      DebuggerMacro_showValue("---> is complex? ", 2, (*vectEqIt)->couplingInfo(compIt).isComplex());

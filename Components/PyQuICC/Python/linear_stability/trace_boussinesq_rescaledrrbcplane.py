@@ -14,7 +14,7 @@ model.use_galerkin = False
 # Set resolution, parameters, boundary conditions
 res = [1024, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':8.6957, 'ekman':1e-11, 'scale1d':2.0}
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':1, 'velocityz':0, 'temperature':0, 'pressure':1}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':1, 'velocity_z':0, 'temperature':0, 'pressure':1}
 phi = 0
 kp = 1.3048
 

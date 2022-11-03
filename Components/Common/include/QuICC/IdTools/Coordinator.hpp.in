@@ -39,11 +39,6 @@ namespace QuICC {
           */
          static std::string  tag(const std::size_t id);
 
-         /**
-          * @brief Get formatted string
-          */
-         static std::string  formatted(const std::size_t id);
-
       protected:
 
       private:
@@ -67,11 +62,6 @@ namespace QuICC {
    inline std::string Coordinator::tag(const std::size_t id)
    {
       return Coordinator::map().find(id)->second->create(@_idNAN@)->tag();
-   }
-
-   inline std::string Coordinator::formatted(const std::size_t id)
-   {
-      return Coordinator::map().find(id)->second->create(@_idNAN@)->formatted();
    }
 
 @cxxNS_@

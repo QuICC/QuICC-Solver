@@ -1,10 +1,13 @@
-set(excluded 
-  "Typedefs.hpp"
-  )
+set(tags
+  Diagnostic
+  Prognostic
+  Trivial
+  Wrapper
+)
 
 include(RegisterTags)
 quicc_register_tags(
   NAMESPACE "PseudospectralTag"
   BASECLASS "IPseudospectralTag"
-  EXCLUDED ${excluded}
+  TAGS ${tags}
   )

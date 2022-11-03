@@ -15,8 +15,8 @@
 // Project includes
 //
 #include "QuICC/Enums/Dimensions.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
 #include "QuICC/TestSuite/Framework/TransformCoordinator/TestHelper.hpp"
 #include "QuICC/TransformCoordinators/TransformCoordinatorTools.hpp"
@@ -234,8 +234,8 @@ namespace TCoord {
 
       // Initialize coordinator
       std::map<std::size_t,NonDimensional::SharedINumber> runOptions;
-      runOptions.emplace(NonDimensional::Lower1D::id(), std::make_shared<NonDimensional::Lower1D>(0.3));
-      runOptions.emplace(NonDimensional::Upper1D::id(), std::make_shared<NonDimensional::Lower1D>(1.3));
+      runOptions.emplace(NonDimensional::Lower1d::id(), std::make_shared<NonDimensional::Lower1d>(0.3));
+      runOptions.emplace(NonDimensional::Upper1d::id(), std::make_shared<NonDimensional::Lower1d>(1.3));
       Transform::TransformCoordinatorTools::init(test.coord, test.spFwdGrouper, test.spBwdGrouper, test.fwdTree, test.bwdTree, test.spRes, runOptions);
    }
 

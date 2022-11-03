@@ -27,21 +27,21 @@
 #include "QuICC/Transform/Forward/I2P.hpp"
 #include "QuICC/Transform/Forward/I4P.hpp"
 #include "QuICC/Transform/Forward/I4D1.hpp"
-#include "QuICC/Transform/Forward/Laplh_1.hpp"
-#include "QuICC/Transform/Forward/I4R_1Pm.hpp"
-#include "QuICC/Transform/Forward/I4R_1D1R1ZI2.hpp"
-#include "QuICC/Transform/Forward/I6R_1Pm.hpp"
-#include "QuICC/Transform/Forward/I6R_1D1R1ZI4.hpp"
+#include "QuICC/Transform/Forward/Overlaplh.hpp"
+#include "QuICC/Transform/Forward/I4Overr1Pm.hpp"
+#include "QuICC/Transform/Forward/I4Overr1D1R1ZI2.hpp"
+#include "QuICC/Transform/Forward/I6Overr1Pm.hpp"
+#include "QuICC/Transform/Forward/I6Overr1D1R1ZI4.hpp"
 #include "QuICC/Transform/Forward/I6LaplhZI4D1R1.hpp"
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
 #include "QuICC/Transform/Backward/D2.hpp"
-#include "QuICC/Transform/Backward/R_1D1R1.hpp"
-#include "QuICC/Transform/Backward/R_1Pm.hpp"
+#include "QuICC/Transform/Backward/Overr1D1R1.hpp"
+#include "QuICC/Transform/Backward/Overr1Pm.hpp"
 #include "QuICC/Transform/Backward/D1ZP.hpp"
-#include "QuICC/Transform/Backward/R_1LaplhPm.hpp"
-#include "QuICC/Transform/Backward/LaplhZR_1D1R1.hpp"
-#include "QuICC/Transform/Backward/D1LaplhZD1R_1D1R1.hpp"
+#include "QuICC/Transform/Backward/Overr1LaplhPm.hpp"
+#include "QuICC/Transform/Backward/LaplhZOverr1D1R1.hpp"
+#include "QuICC/Transform/Backward/D1LaplhZD1Overr1D1R1.hpp"
 
 namespace QuICC {
 
@@ -109,18 +109,18 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::D1::id());
-            transform.back().addEdge(Forward::Laplh_1::id(), curlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::Overlaplh::id(), curlId, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::Laplh_1::id(), curlId, Arithmetics::Sub::id());
+            transform.back().addEdge(Forward::Overlaplh::id(), curlId, Arithmetics::Sub::id());
 
             // Compute Poloidal component
             transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::Laplh_1::id(), curlcurlId, Arithmetics::Sub::id());
+            transform.back().addEdge(Forward::Overlaplh::id(), curlcurlId, Arithmetics::Sub::id());
          } else
          {
             throw std::logic_error("Requested an unknown vector forward transform");
@@ -165,12 +165,12 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
             transform.back().addEdge(Forward::I2P::id());
             transform.back().addEdge(Forward::D1::id());
-            transform.back().addEdge(Forward::I4R_1Pm::id(), curlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::I4Overr1Pm::id(), curlId, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(Forward::I2P::id());
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::I4R_1D1R1ZI2::id(), curlId, Arithmetics::Sub::id());
+            transform.back().addEdge(Forward::I4Overr1D1R1ZI2::id(), curlId, Arithmetics::Sub::id());
          } else
          {
             throw std::logic_error("Requested an unknown vector forward transform");
@@ -183,13 +183,13 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
             transform.back().addEdge(Forward::I4D1::id());
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::I6R_1D1R1ZI4::id(), curlcurlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::I6Overr1D1R1ZI4::id(), curlcurlId, Arithmetics::Add::id());
 
             // Compute curlcurl S component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(Forward::I4D1::id());
             transform.back().addEdge(Forward::D1::id());
-            transform.back().addEdge(Forward::I6R_1Pm::id(), curlcurlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::I6Overr1Pm::id(), curlcurlId, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
             transform.back().addEdge(Forward::I4P::id());
@@ -204,13 +204,13 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
             transform.back().addEdge(Forward::I4D1::id());
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::I6R_1D1R1ZI4::id(), curlcurlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::I6Overr1D1R1ZI4::id(), curlcurlId, Arithmetics::Add::id());
 
             // Compute curlcurl S component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(Forward::I4D1::id());
             transform.back().addEdge(Forward::D1::id());
-            transform.back().addEdge(Forward::I6R_1Pm::id(), curlcurlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::I6Overr1Pm::id(), curlcurlId, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::Z, FieldType::VECTOR));
             transform.back().addEdge(Forward::I4P::id());
@@ -268,7 +268,7 @@ namespace Transform {
       if(req.find(FieldComponents::Physical::THETA)->second)
       {
          transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
-         transform.back().addEdge(Backward::R_1Pm::id());
+         transform.back().addEdge(Backward::Overr1Pm::id());
          transform.back().addEdge(Backward::D1::id());
          transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
       }
@@ -357,7 +357,7 @@ namespace Transform {
          if(req.find(FieldComponents::Physical::R)->second)
          {
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
-            transform.back().addEdge(Backward::R_1Pm::id());
+            transform.back().addEdge(Backward::Overr1Pm::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
 
@@ -375,7 +375,7 @@ namespace Transform {
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Sub::id());
 
             transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
-            transform.back().addEdge(Backward::R_1Pm::id());
+            transform.back().addEdge(Backward::Overr1Pm::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::D1::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
          }
@@ -383,7 +383,7 @@ namespace Transform {
          if(req.find(FieldComponents::Physical::Z)->second)
          {
             transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
-            transform.back().addEdge(Backward::LaplhZR_1D1R1::id());
+            transform.back().addEdge(Backward::LaplhZOverr1D1R1::id());
             transform.back().addEdge(Backward::P::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::Z, Arithmetics::Sub::id());
          }
@@ -434,7 +434,7 @@ namespace Transform {
          if(req.find(FieldComponents::Physical::THETA)->second)
          {
             transform.push_back(TransformPath(id, FieldType::GRADIENT));
-            transform.back().addEdge(Backward::R_1Pm::id());
+            transform.back().addEdge(Backward::Overr1Pm::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
          }
@@ -459,7 +459,7 @@ namespace Transform {
          if(req.find(FieldComponents::Physical::THETA)->second)
          {
             transform.push_back(TransformPath(id, FieldType::GRADIENT));
-            transform.back().addEdge(Backward::R_1Pm::id());
+            transform.back().addEdge(Backward::Overr1Pm::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
          }
@@ -490,12 +490,12 @@ namespace Transform {
             transform.back().addEdge(Backward::D1::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
-            transform.back().addEdge(Backward::R_1LaplhPm::id());
+            transform.back().addEdge(Backward::Overr1LaplhPm::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Sub::id());
 
             transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
-            transform.back().addEdge(Backward::R_1Pm::id());
+            transform.back().addEdge(Backward::Overr1Pm::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::D2::id(), FieldComponents::Physical::R, Arithmetics::Sub::id());
          }
@@ -504,13 +504,13 @@ namespace Transform {
          {
             // Toroidal part
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
-            transform.back().addEdge(Backward::R_1Pm::id());
+            transform.back().addEdge(Backward::Overr1Pm::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::D1::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
 
             // Poloidal part
             transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
-            transform.back().addEdge(Backward::D1LaplhZD1R_1D1R1::id());
+            transform.back().addEdge(Backward::D1LaplhZD1Overr1D1R1::id());
             transform.back().addEdge(Backward::P::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
 
@@ -525,7 +525,7 @@ namespace Transform {
          {
             // Toroidal part
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
-            transform.back().addEdge(Backward::LaplhZR_1D1R1::id());
+            transform.back().addEdge(Backward::LaplhZOverr1D1R1::id());
             transform.back().addEdge(Backward::P::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::Z, Arithmetics::Sub::id());
          }
@@ -539,7 +539,7 @@ namespace Transform {
             transform.back().addEdge(Backward::D1::id(), FieldComponents::Physical::R, Arithmetics::Sub::id());
 
             transform.push_back(TransformPath(FieldComponents::Spectral::Z, FieldType::CURL));
-            transform.back().addEdge(Backward::R_1Pm::id());
+            transform.back().addEdge(Backward::Overr1Pm::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
          }
@@ -560,12 +560,12 @@ namespace Transform {
          if(req.find(FieldComponents::Physical::Z)->second)
          {
             transform.push_back(TransformPath(FieldComponents::Spectral::R, FieldType::CURL));
-            transform.back().addEdge(Backward::R_1Pm::id());
+            transform.back().addEdge(Backward::Overr1Pm::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::Z, Arithmetics::Sub::id());
 
             transform.push_back(TransformPath(FieldComponents::Spectral::THETA, FieldType::CURL));
-            transform.back().addEdge(Backward::R_1D1R1::id());
+            transform.back().addEdge(Backward::Overr1D1R1::id());
             transform.back().addEdge(Backward::P::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::Z, Arithmetics::Add::id());
          }
@@ -585,12 +585,12 @@ namespace Transform {
       } else
       {
          transform.push_back(TransformPath(FieldComponents::Spectral::R, FieldType::DIVERGENCE));
-         transform.back().addEdge(Backward::R_1D1R1::id());
+         transform.back().addEdge(Backward::Overr1D1R1::id());
          transform.back().addEdge(Backward::P::id());
          transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::SCALAR, Arithmetics::Add::id());
 
          transform.push_back(TransformPath(FieldComponents::Spectral::THETA, FieldType::DIVERGENCE));
-         transform.back().addEdge(Backward::R_1Pm::id());
+         transform.back().addEdge(Backward::Overr1Pm::id());
          transform.back().addEdge(Backward::D1::id());
          transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::SCALAR, Arithmetics::Add::id());
 

@@ -114,7 +114,7 @@ def proj(nr, a, b, r):
 
 if __name__=="__main__":
 
-    eq_params = {'rratio':0.333333}
+    eq_params = {'r_ratio':0.333333}
     #x = np.array([[0.8, 0.2, 0.0], [0.9, 0.2, 0.3]])
     x1 = np.array([0.9,0.95,1.])
     #x2 = np.array([0.7,0.8,0.9,1.])

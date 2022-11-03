@@ -17,12 +17,12 @@
 // Project includes
 //
 #include "QuICC/Math/Constants.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
-#include "QuICC/NonDimensional/Lower2D.hpp"
-#include "QuICC/NonDimensional/Upper2D.hpp"
-#include "QuICC/NonDimensional/Lower3D.hpp"
-#include "QuICC/NonDimensional/Upper3D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
+#include "QuICC/NonDimensional/Lower2d.hpp"
+#include "QuICC/NonDimensional/Upper2d.hpp"
+#include "QuICC/NonDimensional/Lower3d.hpp"
+#include "QuICC/NonDimensional/Upper3d.hpp"
 
 namespace QuICC {
 
@@ -79,18 +79,18 @@ namespace LinearMap {
    {
       if(dimId == Dimensions::Transform::TRA1D)
       {
-         list.insert(NonDimensional::Lower1D::id());
-         list.insert(NonDimensional::Upper1D::id());
+         list.insert(NonDimensional::Lower1d::id());
+         list.insert(NonDimensional::Upper1d::id());
 
       } else if(dimId == Dimensions::Transform::TRA2D)
       {
-         list.insert(NonDimensional::Lower2D::id());
-         list.insert(NonDimensional::Upper2D::id());
+         list.insert(NonDimensional::Lower2d::id());
+         list.insert(NonDimensional::Upper2d::id());
 
       } else if(dimId == Dimensions::Transform::TRA3D)
       {
-         list.insert(NonDimensional::Lower3D::id());
-         list.insert(NonDimensional::Upper3D::id());
+         list.insert(NonDimensional::Lower3d::id());
+         list.insert(NonDimensional::Upper3d::id());
       }
    }
 
@@ -98,24 +98,24 @@ namespace LinearMap {
    {
       if(dimId == Dimensions::Transform::TRA1D)
       {
-         assert(options.count(NonDimensional::Lower1D::id()) == 1);
-         this->mLower = options.find(NonDimensional::Lower1D::id())->second->value();
-         assert(options.count(NonDimensional::Upper1D::id()) == 1);
-         this->mUpper = options.find(NonDimensional::Upper1D::id())->second->value();
+         assert(options.count(NonDimensional::Lower1d::id()) == 1);
+         this->mLower = options.find(NonDimensional::Lower1d::id())->second->value();
+         assert(options.count(NonDimensional::Upper1d::id()) == 1);
+         this->mUpper = options.find(NonDimensional::Upper1d::id())->second->value();
 
       } else if(dimId == Dimensions::Transform::TRA2D)
       {
-         assert(options.count(NonDimensional::Lower2D::id()) == 1);
-         this->mLower = options.find(NonDimensional::Lower2D::id())->second->value();
-         assert(options.count(NonDimensional::Upper2D::id()) == 1);
-         this->mUpper = options.find(NonDimensional::Upper2D::id())->second->value();
+         assert(options.count(NonDimensional::Lower2d::id()) == 1);
+         this->mLower = options.find(NonDimensional::Lower2d::id())->second->value();
+         assert(options.count(NonDimensional::Upper2d::id()) == 1);
+         this->mUpper = options.find(NonDimensional::Upper2d::id())->second->value();
 
       } else if(dimId == Dimensions::Transform::TRA3D)
       {
-         assert(options.count(NonDimensional::Lower3D::id()) == 1);
-         this->mLower = options.find(NonDimensional::Lower3D::id())->second->value();
-         assert(options.count(NonDimensional::Upper3D::id()) == 1);
-         this->mUpper = options.find(NonDimensional::Upper3D::id())->second->value();
+         assert(options.count(NonDimensional::Lower3d::id()) == 1);
+         this->mLower = options.find(NonDimensional::Lower3d::id())->second->value();
+         assert(options.count(NonDimensional::Upper3d::id()) == 1);
+         this->mUpper = options.find(NonDimensional::Upper3d::id())->second->value();
       }
 
       // Set bounds and lock setup

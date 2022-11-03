@@ -3,6 +3,7 @@
  * @brief Interface for a general @idID@
  */
 
+#include <limits>
 #ifndef QUICC_@IDNS@_@IDID@_HPP
 #define QUICC_@IDNS@_@IDID@_HPP
 
@@ -11,12 +12,10 @@
 #include <string>
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/BasicTypes.hpp"
+#include "QuICC/Hasher.hpp"
 
 namespace QuICC {
 
@@ -33,7 +32,7 @@ namespace QuICC {
           *
           * @param value Value of the @idID@
           */
-         @idID@(const MHDFloat value, const std::string tag, const std::string formatted);
+         @idID@(const MHDFloat value, const std::string tag);
 
          /**
           * @brief Destructor
@@ -51,9 +50,9 @@ namespace QuICC {
          std::string tag() const;
 
          /**
-          * @brief Formatted name of the @idID@
+          * @brief Tag of the @idID@
           */
-         std::string formatted() const;
+         std::size_t hash() const;
          
       protected:
 
@@ -69,6 +68,11 @@ namespace QuICC {
          const std::string mTag;
 
          /**
+          * @brief Hash of @idID@
+          */
+         const std::size_t mHash;
+
+         /**
           * @brief Formatted name of @idID@
           */
          const std::string mFormatted;
@@ -77,8 +81,8 @@ namespace QuICC {
    /// Typedef for shared_pointer @idID@
    typedef std::shared_ptr<@idID@> Shared@idID@;
 
-   inline @idID@::@idID@(const MHDFloat value, const std::string tag, const std::string formatted)
-      : mValue(value), mTag(tag), mFormatted(formatted)
+   inline @idID@::@idID@(const MHDFloat value, const std::string tag)
+      : mValue(value), mTag(tag), mHash(Hasher::makeId(tag))
    {
    }
 
@@ -92,9 +96,9 @@ namespace QuICC {
       return this->mTag;
    }
 
-   inline std::string @idID@::formatted() const
+   inline std::size_t @idID@::hash() const
    {
-      return this->mFormatted;
+      return this->mHash;
    }
 
 @cxxNS_@

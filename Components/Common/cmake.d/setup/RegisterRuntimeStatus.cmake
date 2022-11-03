@@ -1,10 +1,11 @@
-set(excluded 
-  "Typedefs.hpp"
+set(tags 
+  GoOn
+  Stop
   )
 
 include(RegisterTags)
 quicc_register_tags(
   NAMESPACE "RuntimeStatus"
   BASECLASS "IRuntimeStatus"
-  EXCLUDED ${excluded}
+  TAGS ${tags}
   )

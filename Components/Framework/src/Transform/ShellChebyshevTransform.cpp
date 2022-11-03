@@ -48,13 +48,13 @@
 #include "QuICC/Transform/Forward/I2T.hpp"
 
 #include "QuICC/Transform/Backward/P.hpp"
-#include "QuICC/Transform/Backward/R_1.hpp"
-#include "QuICC/Transform/Backward/R_2.hpp"
+#include "QuICC/Transform/Backward/Overr1.hpp"
+#include "QuICC/Transform/Backward/Overr2.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
 #include "QuICC/Transform/Backward/D1R1.hpp"
 #include "QuICC/Transform/Backward/D2.hpp"
-#include "QuICC/Transform/Backward/R_1D1R1.hpp"
-#include "QuICC/Transform/Backward/SRadLapl.hpp"
+#include "QuICC/Transform/Backward/Overr1D1R1.hpp"
+#include "QuICC/Transform/Backward/Slaplr.hpp"
 
 #include "QuICC/Transform/Reductor/Energy.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
@@ -100,13 +100,13 @@ namespace Transform {
    {
       // Create projectors
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::P>(Backward::P::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1>(Backward::R_1::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2>(Backward::R_2::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1>(Backward::Overr1::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2>(Backward::Overr2::id());
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::D1>(Backward::D1::id());
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::D1Y1>(Backward::D1R1::id());
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::D2>(Backward::D2::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D1Y1>(Backward::R_1D1R1::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::SphRadLapl>(Backward::SRadLapl::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D1Y1>(Backward::Overr1D1R1::id());
+      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::SphRadLapl>(Backward::Slaplr::id());
 
       // Create integrators
       this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::P>(Forward::P::id());

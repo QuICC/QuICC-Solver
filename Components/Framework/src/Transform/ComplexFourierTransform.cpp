@@ -44,8 +44,8 @@
 #include "QuICC/Transform/Forward/D1ZP0.hpp"
 #include "QuICC/Transform/Forward/D2.hpp"
 #include "QuICC/Transform/Forward/Laplh.hpp"
-#include "QuICC/Transform/Forward/Laplh_1.hpp"
-#include "QuICC/Transform/Forward/DfLaplh_1.hpp"
+#include "QuICC/Transform/Forward/Overlaplh.hpp"
+#include "QuICC/Transform/Forward/DfOverlaplh.hpp"
 
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/P0.hpp"
@@ -109,8 +109,8 @@ namespace Transform {
 
       this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::D1>(Forward::D1::id());
       this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::D2>(Forward::D2::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Df1InvLapl2D>(Forward::DfLaplh_1::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::InvLapl2D>(Forward::Laplh_1::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Df1InvLapl2D>(Forward::DfOverlaplh::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::InvLapl2D>(Forward::Overlaplh::id());
       this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Lapl2D>(Forward::Laplh::id());
       this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Mean>(Forward::P0::id());
    }

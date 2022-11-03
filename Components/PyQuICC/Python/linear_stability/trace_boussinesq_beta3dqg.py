@@ -17,11 +17,11 @@ eq_params = {'prandtl':1, 'rayleigh':700.0, 'gamma':1, 'chi':chi}
 eigs = [2.221403788]
 
 # No-slip/No-slip
-#bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'temperature':0, 'velocityz':1} 
+#bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'temperature':0, 'velocity_z':1} 
 # Stress-free/Stress-free
-#bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':1, 'temperature':0, 'velocityz':1}
+#bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':1, 'temperature':0, 'velocity_z':1}
 # Stress-free/No-slip (simple Beta)
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':2, 'temperature':0, 'velocityz':2, 'vorticityz':2}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':2, 'temperature':0, 'velocity_z':2, 'vorticity_z':2}
 
 # Wave number function from single "index"
 def wave(k):

@@ -23,8 +23,8 @@
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
 #include "QuICC/Io/Variable/NusseltTags.hpp"
 #include "QuICC/PyQuICC/CoreWrapper.hpp"
@@ -61,9 +61,9 @@ namespace Variable {
       // Get resolution
       pValue = PyLong_FromLong(sit->second->dom(0).res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL));
       PyTuple_SetItem(pArgs, 0, pValue);
-      pTmp = PyFloat_FromDouble(this->mPhysical.find(NonDimensional::Lower1D::id())->second->value());
+      pTmp = PyFloat_FromDouble(this->mPhysical.find(NonDimensional::Lower1d::id())->second->value());
       PyTuple_SetItem(pArgs, 1, pTmp);
-      pTmp = PyFloat_FromDouble(this->mPhysical.find(NonDimensional::Upper1D::id())->second->value());
+      pTmp = PyFloat_FromDouble(this->mPhysical.find(NonDimensional::Upper1d::id())->second->value());
       PyTuple_SetItem(pArgs, 2, pTmp);
 
       // Set boundary condition

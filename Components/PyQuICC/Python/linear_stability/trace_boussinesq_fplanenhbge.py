@@ -15,7 +15,7 @@ model.use_galerkin = False
 res = [128, 0, 0]
 #eq_params = {'eady':-1, 'prandtl':1.0, 'rayleigh':8.69, 'ekman':1e-9, 'mean_flow':0, 'scale1d':2.0} # No mean flow, unstable
 eq_params = {'eady':1, 'prandtl':1.0, 'rayleigh':13.53, 'ekman':1e-9, 'gamma':1, 'scale1d':2.0} # Mean flow, stable
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocity_z':0, 'temperature':0}
 phi = 0
 kp = 1.304807403014
 
