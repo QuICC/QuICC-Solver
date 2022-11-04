@@ -2,6 +2,7 @@ set(tags
   Diagnostic
   Prognostic
   Trivial
+  Uninitialized
   Wrapper
 )
 

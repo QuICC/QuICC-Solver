@@ -44,6 +44,11 @@ namespace QuICC {
           */
          T end() const;
 
+         /**
+          * @brief Get length of range
+          */
+         std::size_t size() const;
+
       private:
          /**
           * @brief Storage for begin iterator
@@ -80,6 +85,11 @@ namespace QuICC {
    template <typename T> T IteratorRange<T>::end() const
    {
       return this->mE;
+   }
+
+   template <typename T> std::size_t IteratorRange<T>::size() const
+   {
+      return std::distance(this->mB, this->mE);
    }
 
    template <typename T> IteratorRange<T> make_range(T b, T e)
