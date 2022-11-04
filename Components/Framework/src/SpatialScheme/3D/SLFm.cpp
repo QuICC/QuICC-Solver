@@ -20,9 +20,9 @@
 #include "QuICC/Transform/ShellChebyshevTransform.hpp"
 #include "QuICC/Transform/ALegendreTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
-#include "QuICC/Communicators/Converters/SHmIndexConv.hpp"
+#include "QuICC/Communicators/Converters/SHm2lIndexConv.hpp"
+#include "QuICC/Communicators/Converters/SHlIndexConv.hpp"
 #include "QuICC/Communicators/Converters/NoIndexConv.hpp"
-#include "QuICC/Communicators/Converters/PassthroughIndexConv.hpp"
 #include "QuICC/Equations/Tools/SHm.hpp"
 
 namespace QuICC {
@@ -49,7 +49,8 @@ namespace SpatialScheme {
          this->mSpec.add(FieldComponents::Spectral::TOR);
          this->mSpec.add(FieldComponents::Spectral::POL);
          this->mSpec.add(FieldComponents::Spectral::NOTUSED);
-      } else if(formulation == VectorFormulation::QST)
+      }
+      else if(formulation == VectorFormulation::QST)
       {
          this->mSpec.add(FieldComponents::Spectral::Q);
          this->mSpec.add(FieldComponents::Spectral::S);
@@ -61,7 +62,7 @@ namespace SpatialScheme {
       this->enable(Feature::FourierIndex3);
       this->enable(Feature::SpectralMatrix2D);
       this->enable(Feature::SpectralOrdering123);
-      this->enable(Feature::TransformSpectralOrdering123);
+      this->enable(Feature::TransformSpectralOrdering132);
       this->enable(Feature::ComplexSpectrum);
    }
 
@@ -132,10 +133,10 @@ namespace SpatialScheme {
       switch(id)
       {
          case Dimensions::Transform::TRA1D:
-            spConv = std::make_shared<Parallel::PassthroughIndexConv>();
+            spConv = std::make_shared<Parallel::SHm2lIndexConv>();
             break;
          case Dimensions::Transform::TRA2D:
-            spConv = std::make_shared<Parallel::SHmIndexConv>();
+            spConv = std::make_shared<Parallel::SHlIndexConv>();
             break;
          case Dimensions::Transform::TRA3D:
             spConv = std::make_shared<Parallel::NoIndexConv>();

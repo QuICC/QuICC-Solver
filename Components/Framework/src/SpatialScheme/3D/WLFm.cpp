@@ -49,7 +49,8 @@ namespace SpatialScheme {
          this->mSpec.add(FieldComponents::Spectral::TOR);
          this->mSpec.add(FieldComponents::Spectral::POL);
          this->mSpec.add(FieldComponents::Spectral::NOTUSED);
-      } else if(formulation == VectorFormulation::QST)
+      }
+      else if(formulation == VectorFormulation::QST)
       {
          this->mSpec.add(FieldComponents::Spectral::Q);
          this->mSpec.add(FieldComponents::Spectral::S);

@@ -23,6 +23,8 @@
 #include "QuICC/Transform/Poly/Tools.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
+#include "QuICC/Resolutions/Tools/RegularSHlIndexCounter.hpp"
+#include "QuICC/Resolutions/Tools/RegularSHmIndexCounter.hpp"
 
 namespace QuICC {
 
@@ -34,7 +36,6 @@ namespace SpatialScheme {
       
       // Create spectral space sub communicators
       #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-
          // MPI error code
          int ierr;
 
@@ -252,12 +253,17 @@ namespace SpatialScheme {
    }
 
    SLFmBuilder::SLFmBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegularSHmBuilder(dim, purpose)
+      : IRegularSHmlBuilder(dim, purpose)
    {
    }
 
    SLFmBuilder::~SLFmBuilder()
    {
+   }
+
+   bool SLFmBuilder::sameSpectralOrdering() const
+   {
+      return false;
    }
 
    void SLFmBuilder::setDimensions()
@@ -324,10 +330,10 @@ namespace SpatialScheme {
       this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
 
       // Initialise second dimension of first transform
-      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+      this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
 
       // Initialise third dimension of first transform
-      this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
+      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
 
       //
       // Initialise second transform

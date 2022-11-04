@@ -41,7 +41,7 @@ namespace SpatialScheme {
    Transform::Poly::SharedSetup WLFlBuilder::spSetup1D(SharedResolution spRes) const
    {
       const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA1D);
-         ;
+
       // Get physical size of polynomial transform
       int size = tRes.dim<Dimensions::Data::DATF1D>();
 
