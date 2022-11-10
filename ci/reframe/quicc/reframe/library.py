@@ -50,7 +50,7 @@ class testBase(rfm.RunOnlyRegressionTest):
             'dom': {'omp': '12', '-c': '24'},
             'manali': {'omp': '16', '-c': '32'},
         }
-        if(self.system.name in ['daint', 'manali', 'dom']):
+        if(self.system.name in self.cscs_systems):
             self.job.launcher.options = [
                 '-n', str(self.num_tasks), '--cpu-bind=cores'
             ]
@@ -76,10 +76,15 @@ class testBase(rfm.RunOnlyRegressionTest):
     def set_perf_reference(self):
         proc = self.current_partition.processor
         pname = self.current_partition.fullname
+        arch = proc.arch
+
+        # fix for gpu systems
         if pname in ('daint:gpu', 'dom:gpu'):
             arch = 'p100'
-        else:
-            arch = proc.arch
+        # fix for CI
+        elif pname == 'generic:default':
+            if(arch == 'haswell'):
+                arch = 'p100'
 
         with contextlib.suppress(KeyError):
             self.reference = {
@@ -132,57 +137,4 @@ class testBase(rfm.RunOnlyRegressionTest):
     @performance_function('s')
     def applyOperatorsMax(self):
         return self.report_time_max('applyOperators')
-
-
-# actual tests
-@rfm.simple_test
-class testALegendreTests_Poly_P_projector_id206(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_projector_id206_ulp19000'
-    steps = 500
-    refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.00012, -0.15, 0.3, 's'),
-                },
-                'broadwell': {
-                    'applyOperatorsAvg': (0.000138504, -0.15, 0.2, 's'),
-                },
-            }
-
-@rfm.simple_test
-class testALegendreTests_Poly_P_projector_id207(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_projector_id207_ulp180000'
-    steps = 500
-    refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.0013, -0.15, 0.3, 's'),
-                },
-                'broadwell': {
-                    'applyOperatorsAvg': (0.000935358, -0.15, 0.2, 's'),
-                },
-            }
-
-@rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_ulp20800_split96_0(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_projector_id108_ulp20800_split96_0'
-    steps = 500
-    refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.00930405, -0.1, 0.1, 's'),
-                },
-                'broadwell': {
-                    'applyOperatorsAvg': (0.0100948, -0.1, 0.1, 's'),
-                },
-            }
-
-@rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_ulp20800_split288_0(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_projector_id108_ulp20800_split288_0'
-    steps = 500
-    refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.00367698, -0.1, 0.1, 's'),
-                },
-                'broadwell': {
-                    'applyOperatorsAvg': (0.00395184, -0.1, 0.1, 's'),
-                },
-            }
-
-
-
 

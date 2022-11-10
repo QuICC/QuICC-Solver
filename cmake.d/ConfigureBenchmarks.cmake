@@ -9,8 +9,6 @@
 #     directory for storing the archive
 # WORKDIR
 #     working directory
-# RUNID
-#     additional ID for run
 # STARTFILES
 #     list of files required to start
 # TOOLS
@@ -21,12 +19,13 @@
 #
 function(quicc_add_benchmark target)
   # parse inputs
-  set(oneValueArgs MODEL ARCHIVEDIR WORKDIR RUNID TIMEOUT GITTAG MPIRANKS)
+  set(oneValueArgs MODEL ARCHIVEDIR WORKDIR TIMEOUT GITTAG MPIRANKS)
   set(multiValueArgs STARTFILES TOOLS VARIANTS)
   cmake_parse_arguments(QAB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_benchmark")
   list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+  message(DEBUG "target: ${target}")
   message(DEBUG "QAB_MODEL: ${QAB_MODEL}")
   message(DEBUG "QAB_WORKDIR: ${QAB_WORKDIR}")
   message(DEBUG "QAB_ARCHIVEDIR: ${QAB_ARCHIVEDIR}")
@@ -50,31 +49,57 @@ function(quicc_add_benchmark target)
   endif()
   message(DEBUG "QAB_TOOLS: ${QAB_TOOLS}")
 
-  if(NOT QAB_RUNID)
-    foreach(_variant IN ITEMS ${QAB_VARIANTS})
-      string(REGEX REPLACE ":" ";" _vlist "${_variant}")
-      list(GET _vlist 1 _value)
-      string(APPEND QAB_RUNID "_${_value}")
-    endforeach()
-  endif()
-  message(DEBUG "QAB_RUNID: ${QAB_RUNID}")
-
+  # default configs
   if(QUICC_MPI)
     set(_mpi_ranks ${QAB_MPIRANKS})
+    set(_comm_algo "tubular")
   else()
     set(_mpi_ranks 1)
+    set(_comm_algo "serial")
   endif()
+
+  # Active variant filter
+  set(_filterid "algorithm")
+  # Check if there is an active variant or if we need to set the default
+  set(_no_active_variant "True")
+  foreach(_variant IN ITEMS ${QAB_VARIANTS})
+    string(REGEX REPLACE ":" ";" _item "${_variant}")
+    list(POP_BACK _item _value)
+    string(REGEX REPLACE "/" ";" _item "${_item}")
+    list(POP_BACK _item _name)
+    list(FIND _filterid ${_name} _pos)
+    if(_pos GREATER -1)
+      set(_no_active_variant "False")
+    endif()
+  endforeach()
+
+  message(DEBUG "QAB_VARIANTS: ${QAB_VARIANTS}")
+  if(_no_active_variant)
+    list(PREPEND QAB_VARIANTS "framework/parallel/algorithm:${_comm_algo}")
+  endif()
+
   list(PREPEND QAB_VARIANTS "framework/parallel/grouper:transform")
-  list(PREPEND QAB_VARIANTS "framework/parallel/algorithm:tubular")
   list(PREPEND QAB_VARIANTS "framework/parallel/cpus:${_mpi_ranks}")
   message(DEBUG "QAB_VARIANTS: ${QAB_VARIANTS}")
 
+  foreach(_variant IN ITEMS ${QAB_VARIANTS})
+    string(REGEX REPLACE ":" ";" _item "${_variant}")
+    list(POP_BACK _item _value)
+    string(REGEX REPLACE "/" ";" _item "${_item}")
+    list(POP_BACK _item _name)
+    list(FIND _filterid ${_name} _pos)
+    if(_pos GREATER -1)
+      string(APPEND _runid "_${_value}")
+    endif()
+  endforeach()
+  message(DEBUG "_runid: ${_runid}")
+
   set(_exe "${QAB_MODEL}${target}Model")
   if(TARGET ${_exe})
-    set(_bench "Benchmark${_exe}${QAB_RUNID}")
+    set(_bench "Benchmark${_exe}${_runid}")
 
     set(_refdir "${QAB_WORKDIR}/_refdata/${target}")
-    set(_rundir "${QAB_WORKDIR}/_data/${target}${QAB_RUNID}")
+    set(_rundir "${QAB_WORKDIR}/_data/${target}${_runid}")
     message(VERBOSE "_rundir: ${_rundir}")
     set(_binsdir "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_MODEL_DIR}/Executables")
     message(VERBOSE "_binsdir: ${_binsdir}")

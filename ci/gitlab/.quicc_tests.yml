@@ -30,9 +30,9 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "PyQuICCTests"
 
-.time-lib:
+.time-lib-cpu:
   script:
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
-    - reframe -c $QUICC_ROOT/ci/reframe/quicc_library.py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local --exec-policy=serial --keep-stage-files
+    - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_cpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local --exec-policy=serial --keep-stage-files

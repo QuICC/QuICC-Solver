@@ -3,13 +3,11 @@ include:
 - remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.cscs.yml
 - /ci/gitlab/.daint_runner.yml
 - /ci/gitlab/.quicc_tests.yml
-- /ci/gitlab/.quicc_models.yml
 stages:
 - build
 - test
-- model-build-and-test
 - cleanup
-build-quicc_mp:
+build-quicc:
   tags:
   - docker_jfrog
   stage: build
@@ -19,14 +17,9 @@ build-quicc_mp:
     DOCKERFILE: ci/docker/Dockerfile_mp
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mp:latest
     DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/ubuntu-quicc-buildbase:22.04"]'
-test-quicc-lib_mp:
+test-quicc-lib:
   extends:
   - .test-lib
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mp:latest
-time-quicc-lib_mp:
-  extends:
-  - .time-lib
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mp:latest
 ci-cache-cleanup:

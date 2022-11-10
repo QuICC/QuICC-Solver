@@ -9,7 +9,7 @@ stages:
 - test
 - model-build-and-test
 - cleanup
-build-quicc_mpi:
+build-quicc:
   tags:
   - docker_jfrog
   stage: build
@@ -19,25 +19,19 @@ build-quicc_mpi:
     DOCKERFILE: ci/docker/Dockerfile_mpi
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi:latest
     DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/ubuntu-quicc-buildbase:22.04"]'
-test-quicc-lib_mpi:
+test-quicc-lib:
   extends:
   - .test-lib
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
-time-quicc-lib_mpi:
+time-quicc-lib:
   extends:
-  - .time-lib
+  - .time-lib-cpu
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
-ci-cache-cleanup:
-  extends: .daint
-  stage: cleanup
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
-  script:
-  - rm -Rf $CI_CACHE_FOLDER/*
-BoussinesqSphereDynamoExplicit_mpi:
+BoussinesqSphereDynamoExplicit_tubular:
   extends:
-  - .BoussinesqSphereDynamoExplicit
+  - .BoussinesqSphereDynamoExplicit_tubular
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
@@ -46,7 +40,7 @@ BoussinesqSphereDynamoExplicit_mpi:
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '18'
     QUICC_VERSION_TAG: mpi
-BoussinesqSphereDynamoImplicit_single2d_mpi:
+BoussinesqSphereDynamoImplicit_single2d:
   extends:
   - .BoussinesqSphereDynamoImplicit_single2d
   - .cpu
@@ -57,9 +51,9 @@ BoussinesqSphereDynamoImplicit_single2d_mpi:
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '18'
     QUICC_VERSION_TAG: mpi
-BoussinesqShellDynamoExplicit_mpi:
+BoussinesqShellDynamoExplicit_tubular:
   extends:
-  - .BoussinesqShellDynamoExplicit
+  - .BoussinesqShellDynamoExplicit_tubular
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
@@ -68,7 +62,7 @@ BoussinesqShellDynamoExplicit_mpi:
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '18'
     QUICC_VERSION_TAG: mpi
-BoussinesqShellDynamoImplicit_single2d_mpi:
+BoussinesqShellDynamoImplicit_single2d:
   extends:
   - .BoussinesqShellDynamoImplicit_single2d
   - .cpu
@@ -79,7 +73,7 @@ BoussinesqShellDynamoImplicit_single2d_mpi:
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '18'
     QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCExplicit_single1d_mpi:
+BoussinesqSphereRTCExplicit_single1d:
   extends:
   - .BoussinesqSphereRTCExplicit_single1d
   - .cpu
@@ -90,7 +84,7 @@ BoussinesqSphereRTCExplicit_single1d_mpi:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCExplicit_single2d_mpi:
+BoussinesqSphereRTCExplicit_single2d:
   extends:
   - .BoussinesqSphereRTCExplicit_single2d
   - .cpu
@@ -101,7 +95,7 @@ BoussinesqSphereRTCExplicit_single2d_mpi:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCExplicit_tubular_mpi:
+BoussinesqSphereRTCExplicit_tubular:
   extends:
   - .BoussinesqSphereRTCExplicit_tubular
   - .cpu
@@ -112,7 +106,7 @@ BoussinesqSphereRTCExplicit_tubular_mpi:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCImplicit_single1d_mpi:
+BoussinesqSphereRTCImplicit_single1d:
   extends:
   - .BoussinesqSphereRTCImplicit_single1d
   - .cpu
@@ -123,7 +117,7 @@ BoussinesqSphereRTCImplicit_single1d_mpi:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCImplicit_single2d_mpi:
+BoussinesqSphereRTCImplicit_single2d:
   extends:
   - .BoussinesqSphereRTCImplicit_single2d
   - .cpu
@@ -134,7 +128,7 @@ BoussinesqSphereRTCImplicit_single2d_mpi:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCImplicit_tubular_mpi:
+BoussinesqSphereRTCImplicit_tubular:
   extends:
   - .BoussinesqSphereRTCImplicit_tubular
   - .cpu
@@ -145,7 +139,7 @@ BoussinesqSphereRTCImplicit_tubular_mpi:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
-BoussinesqShellRTCExplicit_single1d_mpi:
+BoussinesqShellRTCExplicit_single1d:
   extends:
   - .BoussinesqShellRTCExplicit_single1d
   - .cpu
@@ -156,7 +150,7 @@ BoussinesqShellRTCExplicit_single1d_mpi:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
-BoussinesqShellRTCExplicit_single2d_mpi:
+BoussinesqShellRTCExplicit_single2d:
   extends:
   - .BoussinesqShellRTCExplicit_single2d
   - .cpu
@@ -167,7 +161,7 @@ BoussinesqShellRTCExplicit_single2d_mpi:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
-BoussinesqShellRTCExplicit_tubular_mpi:
+BoussinesqShellRTCExplicit_tubular:
   extends:
   - .BoussinesqShellRTCExplicit_tubular
   - .cpu
@@ -178,7 +172,7 @@ BoussinesqShellRTCExplicit_tubular_mpi:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
-BoussinesqShellRTCImplicit_single2d_mpi:
+BoussinesqShellRTCImplicit_single2d:
   extends:
   - .BoussinesqShellRTCImplicit_single2d
   - .cpu
@@ -189,9 +183,9 @@ BoussinesqShellRTCImplicit_single2d_mpi:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
-BoussinesqShellTCExplicit_mpi:
+BoussinesqSphereTCExplicit_tubular:
   extends:
-  - .BoussinesqShellTCExplicit
+  - .BoussinesqSphereTCExplicit_tubular
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
@@ -200,9 +194,9 @@ BoussinesqShellTCExplicit_mpi:
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '18'
     QUICC_VERSION_TAG: mpi
-BoussinesqSphereTCExplicit_mpi:
+BoussinesqShellTCExplicit_tubular:
   extends:
-  - .BoussinesqSphereTCExplicit
+  - .BoussinesqShellTCExplicit_tubular
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
   variables:
@@ -211,3 +205,9 @@ BoussinesqSphereTCExplicit_mpi:
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '18'
     QUICC_VERSION_TAG: mpi
+ci-cache-cleanup:
+  extends: .daint
+  stage: cleanup
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  script:
+  - rm -Rf $CI_CACHE_FOLDER/*

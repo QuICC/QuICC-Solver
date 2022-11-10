@@ -49,10 +49,11 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    IDS  108 108
-    ULPS 20800 20800
-    SPLITS 96:0 288:0
-    STEPS 500 500
+    IDS  108 108 108 108 108 108
+    ULPS 20800 20800 20800 20800 20800 20800
+    # node:rank, node*12:rank, node*36:rank
+    SPLITS 8:0 96:0 288:0 256:0 3072:0 9216:0
+    STEPS 500 500 500 500 500 500
     PERFONLY
   )
 endforeach()
