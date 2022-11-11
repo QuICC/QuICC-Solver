@@ -90,7 +90,7 @@ namespace Variable {
 
       // Size of spectrum
       auto size = std::visit([](auto&& p)->std::pair<int,int>{return std::make_pair(0,p->data().cols());}, pInVarTor);
-      int l_;
+      int l_ = 0;
       if(this->mHasMOrdering)
       {
          for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
