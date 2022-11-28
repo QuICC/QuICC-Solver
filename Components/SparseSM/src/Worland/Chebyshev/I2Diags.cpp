@@ -31,10 +31,6 @@ namespace Chebyshev {
    {
    }
 
-   I2Diags::~I2Diags()
-   {
-   }
-
    I2Diags::ACoeff_t I2Diags::d_2(const ACoeff_t& n) const
    {
       auto l1 = this->l();
@@ -65,9 +61,10 @@ namespace Chebyshev {
    I2Diags::ACoeff_t I2Diags::d0(const ACoeff_t& n) const
    {
       auto l1 = this->l();
+      auto l2 = l1*l1;
       ACoeff_t val;
 
-      val = 2.0*(2.0*l1*l1 - 4.0*l1*n - 4.0*n.pow(2) + 1.0)/((l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0));
+      val = 2.0*(2.0*l2 - 4.0*l1*n - 4.0*n.pow(2) + 1.0)/((l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0));
 
       return this->normalizeDiag(n,0)*val;
    }

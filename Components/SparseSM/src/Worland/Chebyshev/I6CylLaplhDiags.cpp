@@ -31,10 +31,6 @@ namespace Chebyshev {
    {
    }
 
-   I6CylLaplhDiags::~I6CylLaplhDiags()
-   {
-   }
-
    I6CylLaplhDiags::ACoeff_t I6CylLaplhDiags::d_5(const ACoeff_t& n) const
    {
       auto l1 = this->l();

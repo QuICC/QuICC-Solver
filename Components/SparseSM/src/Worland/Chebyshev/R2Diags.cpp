@@ -31,10 +31,6 @@ namespace Chebyshev {
    {
    }
 
-   R2Diags::~R2Diags()
-   {
-   }
-
    R2Diags::ACoeff_t R2Diags::d_1(const ACoeff_t& n) const
    {
       auto l1 = this->l();

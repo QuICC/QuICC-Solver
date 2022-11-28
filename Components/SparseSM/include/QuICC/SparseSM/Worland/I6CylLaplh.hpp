@@ -52,7 +52,7 @@ namespace Worland {
          /**
           * @brief Build triplet representation of matrix
           */
-         virtual void buildTriplets(TripletList_t& list) const;
+         void buildTriplets(TripletList_t& list) const final;
 
          /**
           * @brief Implementation of the diagonals

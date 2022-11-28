@@ -1,0 +1,34 @@
+/** 
+ * @file I4Lapl2Diags.cpp
+ * @brief Source of the implementation of the full sphere Worland I4Lapl2 sparse operator
+ */
+
+// System includes
+//
+#include <cassert>
+#include <stdexcept>
+
+// External includes
+//
+
+// Class include
+//
+#include "QuICC/SparseSM/Worland/I4Lapl2Diags.hpp"
+
+// Project includes
+//
+
+namespace QuICC {
+
+namespace SparseSM {
+
+namespace Worland {
+
+   I4Lapl2Diags::I4Lapl2Diags(const Scalar_t alpha, const Scalar_t dBeta, const int l)
+      : IDiags(alpha, dBeta, l)
+   {
+   }
+
+}
+}
+}

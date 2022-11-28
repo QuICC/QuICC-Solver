@@ -1,10 +1,10 @@
 /**
- * @file I2Diags.hpp
- * @brief Interface to I2 diagonals for full sphere Worland I2 sparse operator
+ * @file I4Lapl2Diags.hpp
+ * @brief Interface to I4Lapl2 diagonals for full sphere Worland I4Lapl2 sparse operator
  */
 
-#ifndef QUICC_SPARSESM_WORLAND_CHEBYSHEV_I2DIAGS_HPP
-#define QUICC_SPARSESM_WORLAND_CHEBYSHEV_I2DIAGS_HPP
+#ifndef QUICC_SPARSESM_WORLAND_CHEBYSHEV_I4LAPL2DIAGS_HPP
+#define QUICC_SPARSESM_WORLAND_CHEBYSHEV_I4LAPL2DIAGS_HPP
 
 // Debug includes
 //
@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/SparseSM/Worland/I2Diags.hpp"
+#include "QuICC/SparseSM/Worland/I4Lapl2Diags.hpp"
 
 namespace QuICC {
 
@@ -32,20 +32,20 @@ namespace Worland {
 namespace Chebyshev {
 
    /**
-    * @brief Implementation of the full sphere Worland I2 sparse operator
+    * @brief Implementation of the full sphere Worland I4Lapl2 sparse operator
     */
-   class I2Diags: public QuICC::SparseSM::Worland::I2Diags
+   class I4Lapl2Diags: public QuICC::SparseSM::Worland::I4Lapl2Diags
    {
       public:
          /**
           * @brief Constructor
           */
-         I2Diags(const Scalar_t alpha, const int l);
+         I4Lapl2Diags(const Scalar_t alpha, const int l);
 
          /**
           * @brief Destructor
           */
-         virtual ~I2Diags() = default;
+         virtual ~I4Lapl2Diags() = default;
 
          /**
           * @brief 2. subdiagonal
@@ -82,4 +82,4 @@ namespace Chebyshev {
 }
 }
 
-#endif // QUICC_SPARSESM_WORLAND_CHEBYSHEV_I2DIAGS_HPP
+#endif // QUICC_SPARSESM_WORLAND_CHEBYSHEV_I4LAPL2DIAGS_HPP

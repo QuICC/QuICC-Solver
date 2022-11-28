@@ -1,10 +1,10 @@
 /**
- * @file I2.hpp
- * @brief Implementation of the full sphere Worland I2 sparse operator
+ * @file I2Lapl.hpp
+ * @brief Implementation of the full sphere Worland I2Lapl sparse operator
  */
 
-#ifndef QUICC_SPARSESM_WORLAND_I2_HPP
-#define QUICC_SPARSESM_WORLAND_I2_HPP
+#ifndef QUICC_SPARSESM_WORLAND_I2LAPL_HPP
+#define QUICC_SPARSESM_WORLAND_I2LAPL_HPP
 
 // Debug includes
 //
@@ -22,7 +22,7 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/SparseSM/IWorlandOperator.hpp"
-#include "QuICC/SparseSM/Worland/I2Diags.hpp"
+#include "QuICC/SparseSM/Worland/I2LaplDiags.hpp"
 
 namespace QuICC {
 
@@ -31,20 +31,20 @@ namespace SparseSM {
 namespace Worland {
 
    /**
-    * @brief Implementation of the full sphere Worland I2 sparse operator
+    * @brief Implementation of the full sphere Worland I2Lapl sparse operator
     */
-   class I2: public IWorlandOperator
+   class I2Lapl: public IWorlandOperator
    {
       public:
          /**
           * @brief Constructor
           */
-         I2(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l);
+         I2Lapl(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l);
 
          /**
           * @brief Destructor
           */
-         virtual ~I2();
+         virtual ~I2Lapl() = default;
 
       protected:
 
@@ -62,11 +62,11 @@ namespace Worland {
          /**
           * @brief Implementation of the diagonals
           */
-         std::shared_ptr<I2Diags> mpImpl;
+         std::shared_ptr<I2LaplDiags> mpImpl;
    };
 
 }
 }
 }
 
-#endif // QUICC_SPARSESM_WORLAND_I2_HPP
+#endif // QUICC_SPARSESM_WORLAND_I2LAPL_HPP

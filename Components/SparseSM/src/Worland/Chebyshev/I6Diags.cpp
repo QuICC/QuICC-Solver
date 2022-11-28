@@ -31,10 +31,6 @@ namespace Chebyshev {
    {
    }
 
-   I6Diags::~I6Diags()
-   {
-   }
-
    I6Diags::ACoeff_t I6Diags::d_6(const ACoeff_t& n) const
    {
       auto l1 = this->l();

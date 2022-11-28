@@ -31,10 +31,6 @@ namespace Chebyshev {
    {
    }
 
-   I4Diags::~I4Diags()
-   {
-   }
-
    I4Diags::ACoeff_t I4Diags::d_4(const ACoeff_t& n) const
    {
       auto l1 = this->l();
@@ -87,9 +83,9 @@ namespace Chebyshev {
    I4Diags::ACoeff_t I4Diags::d0(const ACoeff_t& n) const
    {
       auto l1 = this->l();
-      auto l2 = precision::pow(l1, 2);
-      auto l3 = precision::pow(l1, 3);
-      auto l4 = precision::pow(l1, 4);
+      auto l2 = l1*l1;
+      auto l3 = l1*l2;
+      auto l4 = l2*l2;
       ACoeff_t val;
 
       val = 2.0*(8.0*l4 - 96.0*l3*n - 48.0*l2*n.pow(2) + 100.0*l2 + 96.0*l1*n.pow(3) - 120.0*l1*n + 48.0*n.pow(4) - 120.0*n.pow(2) + 27.0)/((l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0));

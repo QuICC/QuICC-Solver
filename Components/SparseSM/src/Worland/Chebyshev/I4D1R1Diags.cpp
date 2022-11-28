@@ -31,10 +31,6 @@ namespace Chebyshev {
    {
    }
 
-   I4D1R1Diags::~I4D1R1Diags()
-   {
-   }
-
    I4D1R1Diags::ACoeff_t I4D1R1Diags::d_3(const ACoeff_t& n) const
    {
       ACoeff_t val;

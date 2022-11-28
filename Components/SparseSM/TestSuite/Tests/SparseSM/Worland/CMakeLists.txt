@@ -38,7 +38,10 @@ include(ConfigureTests)
 set(_tests
   R2:sparse
   I2:sparse
+  I2Lapl:sparse
   I4:sparse
+  I4Lapl:sparse
+  I4Lapl2:sparse
   I6:sparse
   )
 foreach(_test ${_tests})
@@ -66,6 +69,7 @@ endforeach()
 # Create Chebyshev basis tests targets
 set(_tests
   I2:sparse
+  I2Lapl:sparse
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -79,6 +83,8 @@ endforeach()
 # Create Chebyshev basis tests targets
 set(_tests
   I4:sparse
+  I4Lapl:sparse
+  I4Lapl2:sparse
   I6:sparse
   )
 foreach(_test ${_tests})

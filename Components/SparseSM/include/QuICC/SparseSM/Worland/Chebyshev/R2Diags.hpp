@@ -1,4 +1,4 @@
-/** 
+/**
  * @file R2Diags.hpp
  * @brief Interface to R2 diagonals for full sphere Worland R2 sparse operator
  */
@@ -33,7 +33,7 @@ namespace Chebyshev {
 
    /**
     * @brief Implementation of the full sphere Worland R2 sparse operator
-    */ 
+    */
    class R2Diags: public QuICC::SparseSM::Worland::R2Diags
    {
       public:
@@ -45,23 +45,23 @@ namespace Chebyshev {
          /**
           * @brief Destructor
           */
-         virtual ~R2Diags();
+         virtual ~R2Diags() = default;
 
          /**
           * @brief 1. subdiagonal
           */
-         virtual ACoeff_t d_1(const ACoeff_t& n) const; 
+         ACoeff_t d_1(const ACoeff_t& n) const final;
 
          /**
           * @brief Main diagonal
           */
-         virtual ACoeff_t d0(const ACoeff_t& n) const; 
+         ACoeff_t d0(const ACoeff_t& n) const final;
 
          /**
           * @brief 1. superdiagonal
           */
-         virtual ACoeff_t d1(const ACoeff_t& n) const; 
-         
+         ACoeff_t d1(const ACoeff_t& n) const final;
+
       protected:
 
       private:
