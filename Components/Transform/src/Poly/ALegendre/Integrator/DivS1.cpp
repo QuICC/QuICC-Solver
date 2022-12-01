@@ -37,7 +37,7 @@ namespace Integrator {
    {
    }
 
-   void DivS1::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void DivS1::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
    {
       int m = this->mspSetup->slow(i);
       int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;

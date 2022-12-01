@@ -20,7 +20,6 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Integrator/P.hpp"
 
 namespace QuICC {
@@ -36,7 +35,7 @@ namespace Integrator {
    /**
     * @brief Implementation of the associated Legendre based 1/(l(l+1)) P integrator
     */ 
-   class DivLl: public P
+   class DivLl: public P<>
    {
       public:
          /**
@@ -55,12 +54,12 @@ namespace Integrator {
          /**
           * @brief Apply ith operator
           */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
+         void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const final;
 
          /**
           * @brief l(l+1) scaling factors
           */
-         virtual void initSpecial() const;
+         void initSpecial() const;
 
          /**
           * @brief Storage for 1/l(l+1) factors

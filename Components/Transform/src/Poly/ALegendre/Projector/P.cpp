@@ -29,15 +29,18 @@ namespace ALegendre {
 
 namespace Projector {
 
-   P::P()
+   template<typename OpTypes>
+   P<OpTypes>::P()
    {
    }
 
-   P::~P()
+   template<typename OpTypes>
+   P<OpTypes>::~P()
    {
    }
 
-   void P::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   template<typename OpTypes>
+   void P<OpTypes>::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
    {
       int m = this->mspSetup->slow(i);
       int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;
@@ -46,22 +49,25 @@ namespace Projector {
       op.resize(igrid.size(), nPoly);
       namespace ev = Polynomial::ALegendre::Evaluator;
       Polynomial::ALegendre::Plm plm;
-      plm.compute<MHDFloat>(op, nPoly, m, igrid, internal::Array(), ev::Set());
+      plm.compute<MHDFloat>(op, nPoly, m, igrid, OpArray(), ev::Set());
    }
 
-   void P::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
+   template<typename OpTypes>
+   void P<OpTypes>::applyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const
    {
       #if defined QUICC_ALEGENDRE_PROJIMPL_OTF
          int m = this->mspSetup->slow(i);
          int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;
          namespace ev = Polynomial::ALegendre::Evaluator;
          Polynomial::ALegendre::Plm plm;
-         plm.compute<MHDComplex>(rOut, nPoly, m, this->mGrid, internal::Array(), ev::OuterProduct<MHDComplex>(in));
+         plm.compute<MHDComplex>(rOut, nPoly, m, this->mGrid, OpArray(), ev::OuterProduct<MHDComplex>(in));
       #elif defined QUICC_ALEGENDRE_PROJIMPL_MATRIX
          rOut = this->mOps.at(i).transpose()*in;
       #endif //defined QUICC_ALEGENDRE_PROJIMPL_OTF
    }
 
+   template class P<IALegendreOperatorTypes>;
+   template class P<PIALegendreOperatorTypes>;
 }
 }
 }

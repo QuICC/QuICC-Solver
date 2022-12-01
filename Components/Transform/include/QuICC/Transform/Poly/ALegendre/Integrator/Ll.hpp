@@ -36,7 +36,7 @@ namespace Integrator {
    /**
     * @brief Implementation of the associated Legendre based l(l+1) P integrator
     */ 
-   class Ll: public P
+   class Ll: public P<>
    {
       public:
          /**
@@ -55,12 +55,12 @@ namespace Integrator {
          /**
           * @brief Apply ith operator
           */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
+         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief l(l+1) scaling factors
           */
-         virtual void initSpecial() const;
+         virtual void initSpecial() const override;
 
          /**
           * @brief Storage for l(l+1) factors

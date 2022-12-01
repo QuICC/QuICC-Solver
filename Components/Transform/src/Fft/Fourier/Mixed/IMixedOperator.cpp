@@ -36,13 +36,18 @@ namespace Mixed {
    {
    }
 
-   void IMixedOperator::init(IMixedOperator::SharedSetupType spSetup) const
+   void IMixedOperator::init(SharedTransformSetup spSetup) const
    {
       // Store the shared pointer to setup object
-      this->mspSetup = spSetup;
+      this->mspSetup = std::dynamic_pointer_cast<IMixedOperator::SetupType>(spSetup);
 
       //
       this->initBase();
+   }
+
+   void IMixedOperator::init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const
+   {
+      throw std::logic_error("Unused interface");
    }
 
 }

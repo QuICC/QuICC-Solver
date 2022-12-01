@@ -1,0 +1,147 @@
+# This file is generated, do not modify!
+include:
+- remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.cscs.yml
+- /ci/gitlab/.daint_runner.yml
+- /ci/gitlab/.quicc_tests.yml
+- /ci/gitlab/.quicc_models.yml
+stages:
+- build
+- test
+- model-build-and-test
+- cleanup
+build-quicc:
+  tags:
+  - docker_jfrog
+  stage: build
+  script:
+  - 'true'
+  variables:
+    DOCKERFILE: ci/docker/Dockerfile_kk
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kk:latest
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/ubuntu-quicc-buildbase:22.04"]'
+test-quicc-lib:
+  extends:
+  - .test-lib
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+time-quicc-lib:
+  extends:
+  - .time-lib-cpu
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+BoussinesqSphereDynamoExplicit_serial:
+  extends:
+  - .BoussinesqSphereDynamoExplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: kk
+BoussinesqSphereDynamoImplicit_serial:
+  extends:
+  - .BoussinesqSphereDynamoImplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: kk
+BoussinesqShellDynamoExplicit_serial:
+  extends:
+  - .BoussinesqShellDynamoExplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: kk
+BoussinesqShellDynamoImplicit_serial:
+  extends:
+  - .BoussinesqShellDynamoImplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: kk
+BoussinesqSphereRTCExplicit_serial:
+  extends:
+  - .BoussinesqSphereRTCExplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: kk
+BoussinesqSphereRTCImplicit_serial:
+  extends:
+  - .BoussinesqSphereRTCImplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: kk
+BoussinesqShellRTCExplicit_serial:
+  extends:
+  - .BoussinesqShellRTCExplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: kk
+BoussinesqShellRTCImplicit_serial:
+  extends:
+  - .BoussinesqShellRTCImplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: kk
+BoussinesqSphereTCExplicit_serial:
+  extends:
+  - .BoussinesqSphereTCExplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: kk
+BoussinesqShellTCExplicit_serial:
+  extends:
+  - .BoussinesqShellTCExplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: kk
+ci-cache-cleanup:
+  extends: .daint
+  stage: cleanup
+  image: $CSCS_REGISTRY_PATH/quicc_kk:latest
+  script:
+  - rm -Rf $CI_CACHE_FOLDER/*

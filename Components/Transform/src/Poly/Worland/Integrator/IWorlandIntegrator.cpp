@@ -84,6 +84,11 @@ namespace Integrator {
       }
    }
 
+   void IWorlandIntegrator::applyOperators(Matrix& rOut, const MatrixZ& in) const
+   {
+      throw std::logic_error("Interface not used");
+   }
+
    MHDFloat IWorlandIntegrator::requiredStorage() const
    {
       MHDFloat mem = 0.0;

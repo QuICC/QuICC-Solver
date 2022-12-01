@@ -19,4 +19,5 @@
   extends: .daint_runner
   variables:
     SLURM_CONSTRAINT: 'gpu'
+    SLURM_TIMELIMIT: '01:20:00'
     SLURM_CPUS_PER_TASK: 24

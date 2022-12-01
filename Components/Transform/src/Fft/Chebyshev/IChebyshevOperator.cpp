@@ -34,13 +34,18 @@ namespace Chebyshev {
    {
    }
 
-   void IChebyshevOperator::init(IChebyshevOperator::SharedSetupType spSetup) const
+   void IChebyshevOperator::init(SharedTransformSetup spSetup) const
    {
       // Store the shared pointer to setup object
-      this->mspSetup = spSetup;
+      this->mspSetup = std::dynamic_pointer_cast<IChebyshevOperator::SetupType>(spSetup);
 
       //
       this->initBase();
+   }
+
+   void IChebyshevOperator::init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const
+   {
+      throw std::logic_error("Unused interface");
    }
 
 }

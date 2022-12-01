@@ -137,4 +137,3 @@ class testBase(rfm.RunOnlyRegressionTest):
     @performance_function('s')
     def applyOperatorsMax(self):
         return self.report_time_max('applyOperators')
-

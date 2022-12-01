@@ -103,6 +103,14 @@ namespace Reductor {
           * @param in   Input spectral coefficients
           */
          virtual void applyOperators(Matrix& rOut, const MatrixZ& in) const override;
+
+         /**
+          * @brief Compute power (integral of squared values)
+          *
+          * @param rOut Output physical values
+          * @param in   Input spectral coefficients
+          */
+         virtual void applyOperators(MatrixZ& rOut, const MatrixZ& in) const override;
    };
 
 }

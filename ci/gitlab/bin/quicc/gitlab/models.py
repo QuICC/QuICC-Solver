@@ -36,6 +36,8 @@ class variant(NamedTuple):
 default_variants = {
                     'serial' : variant('serial', 1),
                     'mpi' : variant('tubular', 4),
+                    'kk' : variant('serial', 1),
+                    'kkgpu' : variant('serial', 1),
                     'perf' : variant('', -1),
                         }
 
@@ -44,11 +46,15 @@ configurations = {  'BoussinesqSphereDynamo': {
                         'Explicit' : {
                             'serial' : [variant()],
                             'mpi' : [variant()],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
                             'perf' : [variant()]
                         },
                         'Implicit' : {
                             'serial' : [variant()],
                             'mpi' : [variant('single2d', 4)],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
                             'perf' : [variant()]
                         }
                     },
@@ -56,11 +62,15 @@ configurations = {  'BoussinesqSphereDynamo': {
                         'Explicit' : {
                             'serial' : [variant()],
                             'mpi' : [variant()],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
                             'perf' : [variant()]
                         },
                         'Implicit' : {
                             'serial' : [variant()],
                             'mpi' : [variant('single2d', 4)],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
                             'perf' : [variant('none', -1)]
                         }
                     },
@@ -68,11 +78,15 @@ configurations = {  'BoussinesqSphereDynamo': {
                         'Explicit' : {
                             'serial' : [variant()],
                             'mpi' : [variant('single1d', 6), variant('single2d', 6), variant('tubular', 6) ],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
                             'perf' : [variant()]
                         },
                         'Implicit' : {
                             'serial' : [variant()],
                             'mpi' : [variant('single1d', 6), variant('single2d', 6), variant('tubular', 6) ],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
                             'perf' : [variant()]
                         }
                     },
@@ -80,11 +94,15 @@ configurations = {  'BoussinesqSphereDynamo': {
                         'Explicit' : {
                             'serial' : [variant()],
                             'mpi' : [variant('single1d', 6), variant('single2d', 6), variant('tubular', 6) ],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
                             'perf' : [variant()]
                         },
                         'Implicit' : {
                             'serial' : [variant()],
                             'mpi' : [variant('single2d', 6)],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
                             'perf' : [variant('none', -1)]
                         }
                     },
@@ -92,13 +110,17 @@ configurations = {  'BoussinesqSphereDynamo': {
                         'Explicit' : {
                             'serial' : [variant()],
                             'mpi' : [variant() ],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
                             'perf' : [variant()]
                         }
                     },
                     'BoussinesqShellTC': {
                         'Explicit' : {
                             'serial' : [variant()],
-                            'mpi' : [variant() ],
+                            'mpi' : [variant()],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
                             'perf' : [variant()]
                         }
                     }

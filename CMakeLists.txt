@@ -15,6 +15,10 @@ options are: Debug Release RelWithDebInfo RelWithAssert RelForValgrind MinSizeRe
 set_property(CACHE CMAKE_BUILD_TYPE
   PROPERTY STRINGS "Debug;Release;RelWithDebInfo;RelWithAssert;RelForValgrind;MinSizeRel")
 
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+  set(CMAKE_CUDA_ARCHITECTURES 60)
+endif()
+
 project(QuICC CXX C)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -40,7 +44,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_CXX_EXTENSIONS OFF) # Use standard C++
 # Set CUDA C++ standard
-set(CMAKE_CUDA_STANDARD 14) # Should be changed to 17. Needs CMake 3.18
+set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED TRUE)
 
 

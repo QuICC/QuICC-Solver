@@ -86,6 +86,11 @@ namespace Projector {
       }
    }
 
+   void IWorlandProjector::applyOperators(Matrix& rOut, const MatrixZ& in) const
+   {
+      throw std::logic_error("Interface not used");
+   }
+
    MHDFloat IWorlandProjector::requiredStorage() const
    {
       MHDFloat mem = 0.0;

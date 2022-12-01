@@ -1,5 +1,8 @@
 # CMake setup for Common component
 set(QUICC_CURRENT_COMPONENT_DIR Components/Common)
+# This library has a non-conventional setup to isolate kokkos
+# compilation.
+# It can be improved by splitting the components in common
 set(QUICC_CURRENT_COMPONENT_LIB ${QUICC_COMMON_COMPONENT_LIB})
 
 # Set library sources visibility

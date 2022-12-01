@@ -40,12 +40,12 @@ namespace Worland {
    {
    }
 
-   void IWorlandOperator::init(IWorlandOperator::SharedSetupType spSetup, const internal::Array& igrid, const internal::Array& iweights) const
+   void IWorlandOperator::init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const
    {
       // Store the shared pointer to setup object
       if(spSetup)
       {
-         this->mspSetup = spSetup;
+         this->mspSetup = std::dynamic_pointer_cast<IWorlandOperator::SetupType>(spSetup);
       } else
       {
          throw std::logic_error("Setup object is not initialized!");
@@ -56,6 +56,11 @@ namespace Worland {
 
       // Set initialization flag
       this->mIsInitialized = true;
+   }
+
+   void IWorlandOperator::init(SharedTransformSetup spSetup) const
+   {
+      throw std::logic_error("Unused interface");
    }
 
    void IWorlandOperator::transform(MatrixZ& rOut, const MatrixZ& in) const

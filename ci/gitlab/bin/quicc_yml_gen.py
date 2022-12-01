@@ -19,6 +19,8 @@ if __name__ == '__main__':
     model_confs = [
         config('serial', 'cpu'),
         config('mpi', 'cpu'),
+        config('kk', 'cpu'),
+        config('kkgpu', 'gpu')
         ]
     for c in model_confs:
         pipe = model_pipeline(c)

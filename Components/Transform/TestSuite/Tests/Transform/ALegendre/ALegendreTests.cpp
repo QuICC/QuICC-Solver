@@ -13,7 +13,6 @@
 #include <catch2/catch.hpp>
 
 // Project includes
-//
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/TestSuite/Transform/ALegendre/TestArgs.hpp"
 #include "Profiler/Interface.hpp"
@@ -22,6 +21,7 @@ namespace test = QuICC::TestSuite::Transform::ALegendre;
 
 int main( int argc, char* argv[] )
 {
+   // Environment fixture
    QuICC::QuICCEnv();
 
    QuICC::Profiler::Initialize();
@@ -78,9 +78,9 @@ int main( int argc, char* argv[] )
       test::args().useDefault = false;
    }
 
-   auto ret = session.run();
+   returnCode = session.run();
 
    QuICC::Profiler::Finalize();
 
-   return ret;
+   return returnCode;
 }

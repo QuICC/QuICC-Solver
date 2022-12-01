@@ -20,10 +20,13 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
 #include "QuICC/Precision.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Setup.hpp"
 #include "QuICC/Transform/ITransformOperator.hpp"
+#include "QuICC/Transform/Poly/ALegendre/IALegendreOperatorTypes.hpp"
+#include "QuICC/Transform/Poly/ALegendre/PIALegendreOperatorTypes.hpp"
+#include "QuICC/Transform/Poly/ALegendre/CudaIALegendreOperatorTypes.hpp"
+#include "QuICC/Transform/Poly/ALegendre/CudaIALegendreOperatorGemmUtils.hpp"
 
 namespace QuICC {
 
@@ -36,6 +39,7 @@ namespace ALegendre {
    /**
     * @brief Interface for a associated Legendre based operator
     */ 
+   template<typename OpTypes = IALegendreOperatorTypes>
    class IALegendreOperator: public ITransformOperator
    {
       public:
@@ -44,6 +48,10 @@ namespace ALegendre {
 
          /// Typedef for the configuration class as a shared pointer
          typedef SharedSetup SharedSetupType;
+
+         using OpArray = typename OpTypes::OpArray;
+         using OpMatrix = typename OpTypes::OpMatrix;
+         using OpMatrixZ = typename OpTypes::OpMatrixZ;
 
          /**
           * @brief Constructor
@@ -60,7 +68,9 @@ namespace ALegendre {
           *
           * @param spSetup   Shared setup object for the transform
           */
-         void init(SharedSetupType spSetup, const internal::Array& igrid, const internal::Array& iweights) const;
+         virtual void init(SharedTransformSetup spSetup, const OpArray& igrid, const OpArray& iweights) const override;
+
+         void init(SharedTransformSetup spSetup) const override;
 
          /**
           * @brief Compute polynomial transform
@@ -68,7 +78,7 @@ namespace ALegendre {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in) const;
+         virtual void transform(OpMatrixZ& rOut, const OpMatrixZ& in) const override;
 
          /**
           * @brief Compute polynomial transform
@@ -76,7 +86,7 @@ namespace ALegendre {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(Matrix& rOut, const MatrixZ& in) const;
+         void transform(OpMatrix& rOut, const OpMatrixZ& in) const;
 
          /**
           * @brief Rows of output data
@@ -91,7 +101,7 @@ namespace ALegendre {
          /**
           * @brief Get the memory requirements
           */
-         virtual MHDFloat requiredStorage() const;
+         virtual MHDFloat requiredStorage() const override;
          
       protected:
          /**
@@ -103,7 +113,7 @@ namespace ALegendre {
          /**
           * @brief Initialise the operators
           */
-         virtual void initOperators(const internal::Array& igrid, const internal::Array& iweights) const = 0;
+         virtual void initOperators(const OpArray& igrid, const OpArray& iweights) const = 0;
 
          /**
           * @brief Apply operators
@@ -111,15 +121,7 @@ namespace ALegendre {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyOperators(MatrixZ& rOut, const MatrixZ& in) const;
-
-         /**
-          * @brief Apply operators
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         virtual void applyOperators(Matrix& rOut, const MatrixZ& in) const;
+         virtual void applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const;
    };
 
 }

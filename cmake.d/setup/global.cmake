@@ -242,4 +242,10 @@ endif(QUICC_OPTIMIZE_TREE)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development NumPy)
 
+#
+# Kokkos
+#
+include(setup/Kokkos)
+
 list(POP_BACK CMAKE_MESSAGE_INDENT)
+

@@ -74,6 +74,15 @@ namespace Reductor {
           * @param in   Input spectral coefficients
           */
          virtual void applyOperators(Matrix& rOut, const MatrixZ& in) const override;
+
+	 /**
+          * @brief Compute energy (integral of squared values)
+          *
+          * @param rOut Output physical values
+          * @param in   Input spectral coefficients
+          */
+         virtual void applyOperators(MatrixZ& rOut, const MatrixZ& in) const override;
+
    };
 
    template <typename T> void EnergyReductor<T>::applyOperators(Matrix& rOut, const MatrixZ& in) const
@@ -97,6 +106,12 @@ namespace Reductor {
          start += cols;
       }
    }
+
+   template <typename T> void EnergyReductor<T>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   {
+      throw std::logic_error("Unused interface");	   
+   }
+
 
    template <typename T> void EnergyReductor<T>::defaultApplyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {

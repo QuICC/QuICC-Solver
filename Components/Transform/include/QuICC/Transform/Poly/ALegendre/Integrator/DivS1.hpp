@@ -36,7 +36,7 @@ namespace Integrator {
    /**
     * @brief Implementation of the associated Legendre based 1/Sin integrator
     */ 
-   class DivS1: public IALegendreIntegrator
+   class DivS1: public IALegendreIntegrator<>
    {
       public:
          /**
@@ -53,13 +53,13 @@ namespace Integrator {
          /**
           * @brief Apply ith operator
           */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
+         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const override;
 
-      private:
+       private:
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const;
+         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const override;
    };
 
 }

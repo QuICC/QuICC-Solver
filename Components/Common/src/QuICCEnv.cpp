@@ -28,6 +28,9 @@
 
 namespace QuICC {
 
+   /**
+    * @brief Enviroment singleton
+    */
    Environment::IEnvironment& QuICCEnv()
    {
       static QUICC_ENVIMPL env;

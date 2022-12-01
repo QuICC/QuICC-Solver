@@ -19,6 +19,7 @@
 #include "QuICC/Polynomial/ALegendre/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/ALegendre/Evaluator/InnerProduct.hpp"
 
+
 namespace QuICC {
 
 namespace Transform {
@@ -29,15 +30,18 @@ namespace ALegendre {
 
 namespace Integrator {
 
-   P::P()
+   template<typename OpTypes>
+   P<OpTypes>::P()
    {
    }
 
-   P::~P()
+   template<typename OpTypes>
+   P<OpTypes>::~P()
    {
    }
 
-   void P::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   template<typename OpTypes>
+   void P<OpTypes>::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
    {
       int m = this->mspSetup->slow(i);
       int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;
@@ -49,7 +53,8 @@ namespace Integrator {
       plm.compute<MHDFloat>(op, nPoly, m, igrid, iweights, ev::Set());
    }
 
-   void P::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
+   template<typename OpTypes>
+   void P<OpTypes>::applyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const
    {
       #if defined QUICC_ALEGENDRE_INTGIMPL_OTF
          int m = this->mspSetup->slow(i);
@@ -62,6 +67,8 @@ namespace Integrator {
       #endif //defined QUICC_ALEGENDRE_INTGIMPL_OTF
    }
 
+   template class P<IALegendreOperatorTypes>;
+   template class P<PIALegendreOperatorTypes>;
 }
 }
 }

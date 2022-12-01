@@ -43,10 +43,10 @@ namespace ALegendre {
    {
       public:
          /// Typedef for the configuration class
-         typedef IALegendreOperator::SetupType SetupType;
+         typedef IALegendreOperator<>::SetupType SetupType;
 
          /// Typedef for the configuration class as a shared pointer
-         typedef IALegendreOperator::SharedSetupType SharedSetupType;
+         typedef IALegendreOperator<>::SharedSetupType SharedSetupType;
 
          /**
           * @brief Constructor
@@ -92,7 +92,7 @@ namespace ALegendre {
           * @param in   Input values
           * @param op   Transform operator
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in, const IALegendreOperator& op);
+         void transform(MatrixZ& rOut, const MatrixZ& in, const ITransformOperator& op);
 
          /**
           * @brief Compute transform (Complex -> Complex) mapped to ID
@@ -144,7 +144,7 @@ namespace ALegendre {
          /**
           * @brief Store transform operator to ID mapping
           */
-         std::map<std::size_t,std::shared_ptr<IALegendreOperator> > mOps;
+         std::map<std::size_t,std::shared_ptr<ITransformOperator> > mOps;
    };
 
    template <typename TOp> void Transform::addOperator(const std::size_t id)

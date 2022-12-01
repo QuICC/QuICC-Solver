@@ -36,7 +36,7 @@ namespace Projector {
    /**
     * @brief Implementation of the associated Legendre based l(l+1) P projector
     */ 
-   class Ll: public P
+   class Ll: public P<>
    {
       public:
          /**

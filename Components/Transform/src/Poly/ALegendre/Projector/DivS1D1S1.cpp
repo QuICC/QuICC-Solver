@@ -35,7 +35,7 @@ namespace Projector {
    {
    }
 
-   void DivS1D1S1::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void DivS1D1S1::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
    {
       throw std::logic_error("Operator is not implemented!");
    }

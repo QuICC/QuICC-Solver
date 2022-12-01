@@ -80,9 +80,9 @@ namespace Fourier {
          /**
           * @brief Read data from file
           */
-         void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+         void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const override;
 
-         void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+         void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const override;
 
          template <typename TData> void dbReadFile(TData& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
 

@@ -21,10 +21,9 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 
 # Add fancy flags as requirement for the library
 target_compile_options(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  ${CMAKE_CXX_FLAGS})
+  "SHELL:${CMAKE_CXX_FLAGS}")
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  ${QUICC_TRANSFORM_COMPONENT_LIB}
   ${QUICC_POLYNOMIAL_COMPONENT_LIB}
   ${QUICC_PYQUICC_COMPONENT_LIB}
   QuICC::Io
@@ -32,8 +31,35 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   QuICC::Profiling
   )
 
+# Transform component
+add_library(${QUICC_CURRENT_COMPONENT_LIB}_transform "")
+target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_transform PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+  )
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_transform PUBLIC QuICC::Transform)
+
+# Link to main lib
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC ${QUICC_CURRENT_COMPONENT_LIB}_transform)
+
+# Export info
+quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}_transform
+  COMPONENT FrameworkTransform
+  DIRECTORIES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/QuICC
+    ${PROJECT_BINARY_DIR}/include/QuICC
+    )
+
 # Add source directory
 add_subdirectory(src)
+
+# Kokkos
+if(QUICC_USE_KOKKOS)
+  include(setup/KokkosAddLibrary)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_transform PRIVATE QuICC::Kokkos)
+  # fix file properties
+  quicc_fix_target_sources_kokkos(${QUICC_CURRENT_COMPONENT_LIB}_transform)
+endif()
 
 # Teststuite
 include(cmake.d/setup/TestSuite.cmake)

@@ -63,7 +63,11 @@ namespace Reductor {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
+ 	 virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
+
+	 virtual void transform(Matrix& rOut, const Matrix& in) const override;
+         virtual void transform(MatrixZ& rOut, const Matrix& in) const override;
+
 
          /**
           * @brief Rows of output data
@@ -134,6 +138,16 @@ namespace Reductor {
       assert(this->isInitialized());
 
       this->mOp.transform(rOut, in);
+   }
+
+   template <typename T> void IEnergyWrapper<T>::transform(Matrix& rOut, const Matrix& in) const
+   {
+      throw std::logic_error("Unused interface");
+   }
+
+   template <typename T> void IEnergyWrapper<T>::transform(MatrixZ& rOut, const Matrix& in) const
+   {
+      throw std::logic_error("Unused interface");
    }
 
    template <typename T> int IEnergyWrapper<T>::outRows() const

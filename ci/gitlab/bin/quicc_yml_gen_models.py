@@ -6,8 +6,10 @@ from quicc.gitlab.model_pipelines import perf_model, test_model
 
 if __name__ == '__main__':
     # Test pipeline
-    # print(default_configs('serial')+default_configs('mpi'))
-    pipe = test_model(default_configs('serial')+default_configs('mpi'))
+    model_test_configs = []
+    for t in ['serial', 'mpi', 'kk', 'kkgpu']:
+        model_test_configs.extend(default_configs(t))
+    pipe = test_model(model_test_configs)
     pipe.write()
 
     # Perf pipeline

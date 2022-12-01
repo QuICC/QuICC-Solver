@@ -1,4 +1,4 @@
-quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
+target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   Hasher.cpp
   Precision.cpp
   QuICCEnv.cpp

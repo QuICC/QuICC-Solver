@@ -83,7 +83,7 @@ set(_tests
   Poly::I4DivR1_Zero:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 77 111 599 38 91 74 615 453 48 51
+  ULP 77 127 666 55 91 74 615 453 48 70
   MPULP 2 11 121 9 4 2 127 93 4 6
   )
 foreach(_test ${_tests})
@@ -208,7 +208,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULPS 3 3 6 4 5
+    ULPS 4 4 6 4 5
     IDS 0 1 2 3 4
   )
 endforeach()
@@ -220,7 +220,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULPS 5 5 13 10 10 5 5 7 6 5
+    ULPS 5 5 20 10 10 5 5 8 6 5
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()
@@ -246,7 +246,7 @@ set(_tests
   Fft::I2DivR1_Zero:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 16 23 189 48 78 11 213 205 40 59
+  ULP 16 23 189 48 78 13 213 205 40 59
   MPULP 10 5 33 13 19 7 54 76 9 7
   )
 foreach(_test ${_tests})
@@ -281,7 +281,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:type
-    ULPS 11 4 3 3 3 10 8 3 4 3
+    ULPS 11 6 5 4 3 13 8 3 4 3
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()

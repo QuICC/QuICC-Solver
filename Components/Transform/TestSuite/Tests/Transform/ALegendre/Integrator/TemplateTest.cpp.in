@@ -19,7 +19,8 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::ALegendre;
 
-TEST_CASE( "@Algorithm@::Error for @Operator@ integrator", "[@Algorithm@::@Operator@:@type@]" )
+TEST_CASE( "@Algorithm@::Error for @Operator@@Template@ integrator",
+   "[@CatchTestName@]" )
 {
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -36,7 +37,8 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ integrator", "[@Algorithm@::@Opera
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::@Algorithm@::ALegendre::Integrator::@Operator@ Integrator;
+   using namespace ::QuICC::Transform::@Algorithm@::ALegendre;
+   typedef Integrator::@Operator@@Template@ Integrator;
    typedef typename currentts::Tester<Integrator> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);

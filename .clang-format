@@ -1,0 +1,32 @@
+# BasedOnStyle: Google
+
+---
+Language: Cpp
+IndentWidth: 3
+ContinuationIndentWidth: 3
+MaxEmptyLinesToKeep: 2
+AllowShortBlocksOnASingleLine: Empty
+
+AlignAfterOpenBracket: DontAlign
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  # AfterClass:      true
+  # AfterControlStatement: true
+  AfterControlStatement: Always
+  # AfterEnum:       true/false
+  # AfterFunction:   true
+  # AfterNamespace:  true/false
+  # AfterObjCDeclaration: true/false
+  # AfterStruct:     true/false
+  # AfterUnion:      true/false
+  # BeforeCatch:     true/false
+  BeforeElse:      false
+  # IndentBraces:    true/false
+
+SpaceBeforeParens: Never
+SpacesInParentheses: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeRangeBasedForLoopColon: false
+
+NamespaceIndentation: None

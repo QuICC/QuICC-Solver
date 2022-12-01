@@ -36,7 +36,7 @@ namespace Projector {
    /**
     * @brief Implementation of the associated Legendre based 1/sin D sin projector
     */ 
-   class DivS1D1S1: public IALegendreProjector
+   class DivS1D1S1: public IALegendreProjector<>
    {
       public:
          /**
@@ -55,7 +55,7 @@ namespace Projector {
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const;
+         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const;
 
          /**
           * @brief Apply ith operator

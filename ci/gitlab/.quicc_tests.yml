@@ -36,3 +36,10 @@
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
     - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_cpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local --exec-policy=serial --keep-stage-files
+
+.time-lib-gpu:
+  script:
+    - pwd
+    - export QUICC_ROOT=/QuICC.src
+    - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
+    - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_gpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local --exec-policy=serial --keep-stage-files

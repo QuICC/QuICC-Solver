@@ -13,6 +13,7 @@ endfunction()
 
 quicc_add_component(Git)
 quicc_add_component(Profiling)
+quicc_add_component(Kokkos)
 quicc_add_component(Common)
 quicc_add_component(Io)
 quicc_add_component(Polynomial)

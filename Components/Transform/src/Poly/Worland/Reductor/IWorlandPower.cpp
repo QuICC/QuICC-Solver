@@ -98,6 +98,11 @@ namespace Reductor {
       }
    }
 
+   void IWorlandPower::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   {
+      throw std::logic_error("Unused interface");
+   }
+
    void IWorlandPower::defaultApplyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {
       rOut = (this->mEOps.at(i).leftCols(rOut.rows()).transpose()*this->mOps.at(i)*in).array().abs2();

@@ -5,16 +5,12 @@
 
 // System includes
 //
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/ALegendre/Setup.hpp"
+#include "Kokkos.hpp"
 
 // Project includes
 //
+#include "QuICC/Transform/Poly/ALegendre/Setup.hpp"
+
 
 namespace QuICC {
 
@@ -27,6 +23,8 @@ namespace ALegendre {
    Setup::Setup(const int size, const int specSize, const GridPurpose::Id purpose)
       : ::QuICC::Transform::Poly::Setup(size, specSize, purpose)
    {
+      // Initialize fixtures
+      ExternalLibrary::Kokkos::getInstance();
    }
 
    Setup::~Setup()

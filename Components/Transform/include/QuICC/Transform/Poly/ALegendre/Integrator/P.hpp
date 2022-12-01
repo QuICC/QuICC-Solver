@@ -1,4 +1,4 @@
-/** 
+/**
  * @file P.hpp
  * @brief Implementation of the associated Legendre based P integrator
  */
@@ -20,7 +20,6 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Integrator/IALegendreIntegrator.hpp"
 
 namespace QuICC {
@@ -35,31 +34,38 @@ namespace Integrator {
 
    /**
     * @brief Implementation of the associated Legendre based P integrator
-    */ 
-   class P: public IALegendreIntegrator
+    */
+   template<typename OpTypes = IALegendreOperatorTypes>
+   class P: public IALegendreIntegrator<OpTypes>
    {
       public:
-         /**
-          * @brief Constructor
-          */
-         P();
+        // using Array = typename OpTypes::Array;
+        using OpArray = typename OpTypes::OpArray;
+        using OpMatrix = typename OpTypes::OpMatrix;
+        using OpMatrixR = typename OpTypes::OpMatrixR;
+        using OpMatrixCR = typename OpTypes::OpMatrixCR;
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~P();
-         
+        /**
+         * @brief Constructor
+         */
+        P();
+
+        /**
+         * @brief Destructor
+         */
+        virtual ~P();
+
       protected:
          /**
           * @brief Apply ith operator
           */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
+         virtual void applyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const;
 
-      private:
+       private:
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const;
+         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const;
 
    };
 

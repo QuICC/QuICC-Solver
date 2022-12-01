@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IEnvironment.cpp
  * @brief Source of generic environment
  */

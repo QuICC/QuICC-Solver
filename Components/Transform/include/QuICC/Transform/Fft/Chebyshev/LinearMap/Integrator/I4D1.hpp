@@ -38,7 +38,7 @@ namespace Integrator {
    /**
     * @brief Implementation of the Chebyshev based I^4 of D integrator, with y = ax + b
     */
-   class I4D1: public IChebyshevIntegrator
+   class I4D1 final : public IChebyshevIntegrator
    {
       public:
          /**

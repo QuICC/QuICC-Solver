@@ -36,9 +36,15 @@ namespace Projector {
    /**
     * @brief Implementation of the associated Legendre based P projector
     */ 
-   class P: public IALegendreProjector
+   template<typename OpTypes = IALegendreOperatorTypes>
+   class P: public IALegendreProjector<OpTypes>
    {
       public:
+        using OpArray = typename OpTypes::OpArray;
+        using OpMatrix = typename OpTypes::OpMatrix;
+        using OpMatrixR = typename OpTypes::OpMatrixR;
+        using OpMatrixCR = typename OpTypes::OpMatrixCR;
+
          /**
           * @brief Constructor
           */
@@ -53,13 +59,13 @@ namespace Projector {
          /**
           * @brief Apply ith operator
           */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
+         virtual void applyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const;
 
       private:
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const;
+         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const;
    };
 
 }

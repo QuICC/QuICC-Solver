@@ -58,12 +58,12 @@ namespace Variable {
          /**
           * @brief Compute power
           */
-         void compute(Transform::TransformCoordinatorType& coord);
+         void compute(Transform::TransformCoordinatorType& coord) override;
 
          /**
           * @brief Requires heavy calculation?
           */
-         virtual bool isHeavy() const;
+         virtual bool isHeavy() const override;
          
       protected:
          /**

@@ -131,6 +131,11 @@ namespace Integrator {
       IWorlandOperator::transform(rOut, in);
    }
 
+   void IWorlandIntegrator::transform(MatrixZ& rOut, const Matrix& in) const
+   {
+      IWorlandOperator::transform(rOut, in);
+   }
+
 }
 }
 }

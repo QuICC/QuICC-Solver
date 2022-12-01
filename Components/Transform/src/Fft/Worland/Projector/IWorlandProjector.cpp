@@ -131,6 +131,11 @@ namespace Projector {
       IWorlandOperator::transform(rOut, in);
    }
 
+   void IWorlandProjector::transform(MatrixZ& rOut, const Matrix& in) const
+   {
+      IWorlandOperator::transform(rOut, in);
+   }
+
 }
 }
 }

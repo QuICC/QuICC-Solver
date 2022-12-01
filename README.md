@@ -110,6 +110,7 @@ cmake </path/to/QuICC> --log-level=VERBOSE
 
 For instructions about known clusters refer to `README_clusters.md`.
 
+
 ### General optimization
 It is always better to compile for the target architecture (this is not necessary on Piz-Daint as CC will do it for you)
 ```bash

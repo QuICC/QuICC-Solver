@@ -22,6 +22,8 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Precision.hpp"
+#include "QuICC/Transform/TransformSetup.hpp"
+
 
 namespace QuICC {
 
@@ -42,6 +44,28 @@ namespace Transform {
           * @brief Destructor
           */
          virtual ~ITransformOperator();
+
+         /**
+          * @brief Initialise the polynomial transform
+          *
+          * @param spSetup   Shared setup object for the transform
+          */
+         virtual void init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const;
+
+         /**
+          * @brief Initialise the fft transform
+          *
+          * @param spSetup   Shared setup object for the transform
+          */
+         virtual void init(SharedTransformSetup spSetup) const;
+
+         /**
+          * @brief Compute transform
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          */
+         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const;
 
          /**
           * @brief

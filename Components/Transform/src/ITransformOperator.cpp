@@ -52,6 +52,19 @@ namespace Transform {
       return this->mIsInitialized;
    }
 
+   void ITransformOperator::init(SharedTransformSetup spSetup, const internal::Array &igrid,
+             const internal::Array &iweights) const
+   {
+      throw std::logic_error("init needs to be implemented by the derived class");
+   }
+
+   void ITransformOperator::init(SharedTransformSetup spSetup) const
+   {
+      throw std::logic_error("init needs to be implemented by the derived class");
+   }
+
+   void ITransformOperator::transform(MatrixZ &rOut, const MatrixZ &in) const {}
+
    MHDFloat ITransformOperator::requiredStorage() const
    {
       MHDFloat mem = 0.0;

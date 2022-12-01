@@ -1,6 +1,7 @@
 # CMake setup for Transform component
 set(QUICC_CURRENT_COMPONENT_DIR Components/Transform)
-set(QUICC_CURRENT_COMPONENT_LIB ${QUICC_TRANSFORM_COMPONENT_LIB})
+set(QUICC_CURRENT_COMPONENT_LIB ${QUICC_TRANSFORM_COMPONENT_LIB}_nonkokkos)
+set(QUICC_CURRENT_COMPONENT_LIB_KK ${QUICC_TRANSFORM_COMPONENT_LIB}_kokkos)
 
 # Set library sources visibility
 set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
@@ -25,7 +26,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"  )
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  ${QUICC_COMMON_COMPONENT_LIB}
+  QuICC::Common
   ${QUICC_SPARSESM_COMPONENT_LIB}
   ${QUICC_POLYNOMIAL_COMPONENT_LIB}
   QuICC::Profiling
@@ -51,18 +52,53 @@ if(FFTW_IS_USED)
   target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE FFTW::FFTW)
   quicc_target_add_definition(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE OPTION QUICC_FFTPLAN)
 endif()
-# match_any cuFFT
 
+if(QUICC_USE_KOKKOS)
+  include(setup/KokkosAddLibrary)
+  quicc_add_library_kokkos(${QUICC_CURRENT_COMPONENT_LIB_KK} "")
+else()
+  add_library(${QUICC_CURRENT_COMPONENT_LIB_KK} "")
+endif()
+
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB_KK}
+  PUBLIC
+    ${QUICC_CURRENT_COMPONENT_LIB}
+    QuICC::KokkosWrapper
+)
 
 # Add source directory
 add_subdirectory(src)
+
+if(QUICC_USE_KOKKOS)
+  # fix file properties
+  quicc_fix_target_sources_kokkos(${QUICC_CURRENT_COMPONENT_LIB_KK})
+endif()
+
+# Group components
+add_library(${QUICC_TRANSFORM_COMPONENT_LIB} INTERFACE)
+target_link_libraries(${QUICC_TRANSFORM_COMPONENT_LIB} INTERFACE
+  ${QUICC_CURRENT_COMPONENT_LIB}
+  ${QUICC_CURRENT_COMPONENT_LIB_KK})
+add_library(QuICC::Transform ALIAS ${QUICC_TRANSFORM_COMPONENT_LIB})
 
 # Teststuite
 include(setup/TestSuite)
 
 # Export info
+quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB_KK}
+  COMPONENT TransformKokkos
+  DIRECTORIES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/QuICC
+    )
+
 quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
   COMPONENT Transform
+  DIRECTORIES
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/QuICC
+    )
+
+quicc_export_target(${QUICC_TRANSFORM_COMPONENT_LIB}
+  COMPONENT TransformAll
   DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/QuICC
     )

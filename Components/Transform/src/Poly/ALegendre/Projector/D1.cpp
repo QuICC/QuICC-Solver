@@ -37,7 +37,7 @@ namespace Projector {
    {
    }
 
-   void D1::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void D1::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
    {
       int m = this->mspSetup->slow(i);
       int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;
@@ -46,7 +46,7 @@ namespace Projector {
       op.resize(igrid.size(), nPoly);
       namespace ev = Polynomial::ALegendre::Evaluator;
       Polynomial::ALegendre::dPlm dplm;
-      dplm.compute<MHDFloat>(op, nPoly, m, igrid, internal::Array(), ev::Set());
+      dplm.compute<MHDFloat>(op, nPoly, m, igrid, OpArray(), ev::Set());
    }
 
    void D1::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
@@ -56,7 +56,7 @@ namespace Projector {
          int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;
          namespace ev = Polynomial::ALegendre::Evaluator;
          Polynomial::ALegendre::dPlm dplm;
-         dplm.compute<MHDComplex>(rOut, nPoly, m, this->mGrid, internal::Array(), ev::OuterProduct<MHDComplex>(in));
+         dplm.compute<MHDComplex>(rOut, nPoly, m, this->mGrid, OpArray(), ev::OuterProduct<MHDComplex>(in));
       #elif defined QUICC_ALEGENDRE_PROJIMPL_MATRIX
          rOut = this->mOps.at(i).transpose()*in;
       #endif //defined QUICC_ALEGENDRE_PROJIMPL_OTF

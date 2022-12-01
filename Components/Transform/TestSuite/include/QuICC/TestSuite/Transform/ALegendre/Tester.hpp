@@ -65,12 +65,12 @@ namespace ALegendre {
          /**
           * @brief Read real data from file
           */
-         virtual void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+         virtual void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const override;
 
          /**
           * @brief Read complex data from file
           */
-         virtual void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+         virtual void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const override;
 
          /**
           * @brief Read data from database file

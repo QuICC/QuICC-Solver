@@ -36,7 +36,7 @@ namespace Projector {
    /**
     * @brief Implementation of the associated Legendre based D projector
     */ 
-   class D1: public IALegendreProjector
+   class D1: public IALegendreProjector<>
    {
       public:
          /**
@@ -59,7 +59,7 @@ namespace Projector {
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const;
+         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const;
    };
 
 }

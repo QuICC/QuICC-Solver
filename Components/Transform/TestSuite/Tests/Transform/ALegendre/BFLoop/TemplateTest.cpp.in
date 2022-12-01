@@ -37,8 +37,8 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ backward-forward loop", "[@Algorit
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::@Algorithm@::ALegendre::Projector::@Operator@ Projector;
-   typedef ::QuICC::Transform::@Algorithm@::ALegendre::Integrator::P Integrator;
+   typedef ::QuICC::Transform::@Algorithm@::ALegendre::Projector::@Operator@@Template@ Projector;
+   typedef ::QuICC::Transform::@Algorithm@::ALegendre::Integrator::P@Template@ Integrator;
    typedef typename currentts::Tester<Projector,Integrator> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);

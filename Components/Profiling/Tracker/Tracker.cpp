@@ -65,6 +65,13 @@ void Tracker::stop(const std::string& regionName)
 
     auto count = std::get<tracking::count>(reg->second);
     // time
+    #if defined __NVCC__
+    // sync cuda kernel
+    // WARNING
+    // this does not allow for kernel overlap
+    // to be substituted with cudaEventCreate/Record/Sync/Elapsed
+    cudaDeviceSynchronize();
+    #endif
     auto id = count % collectSize;
     std::get<tracking::time>(reg->second)[id] =
         std::get<tracking::timTracker>(reg->second).time();

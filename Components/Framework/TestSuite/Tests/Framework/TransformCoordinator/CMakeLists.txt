@@ -46,7 +46,7 @@ set(_tests
   SLFm
   )
 quicc_set_ulp(_ulp
-  ULP 139 110 53500 22245 22245
+  ULP 155 110 53500 25090 25090
   MPULP 11 11 1850 1919 1919
   )
 foreach(_test ${_tests})

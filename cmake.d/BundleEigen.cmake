@@ -24,6 +24,7 @@ else()
                 GIT_TAG ${QUICC_EIGEN_VERSION}
                 GIT_SHALLOW TRUE
                 GIT_PROGRESS TRUE
+                PATCH_COMMAND "${CMAKE_SOURCE_DIR}/cmake.d/patch/apply.bash" "${CMAKE_SOURCE_DIR}/cmake.d/patch/eigen_warnings.patch"
             )
 
         # save CMAKE_POLICY_DEFAULT_CMP0077

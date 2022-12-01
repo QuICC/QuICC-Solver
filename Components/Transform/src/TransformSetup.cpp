@@ -6,9 +6,6 @@
 // System includes
 //
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/Transform/TransformSetup.hpp"

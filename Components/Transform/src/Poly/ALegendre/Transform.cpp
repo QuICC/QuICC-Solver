@@ -48,6 +48,7 @@ namespace ALegendre {
 
    void Transform::init(Transform::SharedSetupType spSetup)
    {
+
       // Store the shared pointer to setup object
       this->mspSetup = spSetup;
 
@@ -113,7 +114,7 @@ namespace ALegendre {
       this->mIWeights.array() *= 2.0*Precision::PI;
    }
 
-   void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const IALegendreOperator& op)
+   void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const ITransformOperator& op)
    {
       if(!op.isInitialized())
       {
@@ -132,7 +133,7 @@ namespace ALegendre {
          this->transform(rOut, in, *(it->second));
       } else
       {
-         throw std::logic_error("Requested ALegendre transform operator is not avaible");
+         throw std::logic_error("Requested ALegendre transform operator is not available");
       }
    }
 

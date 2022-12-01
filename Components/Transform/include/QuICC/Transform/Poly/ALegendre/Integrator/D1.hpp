@@ -1,4 +1,4 @@
-/** 
+/**
  * @file D1.hpp
  * @brief Implementation of the associated Legendre based D integrator
  */
@@ -35,8 +35,8 @@ namespace Integrator {
 
    /**
     * @brief Implementation of the associated Legendre based D integrator
-    */ 
-   class D1: public IALegendreIntegrator
+    */
+   class D1: public IALegendreIntegrator<>
    {
       public:
          /**
@@ -48,7 +48,7 @@ namespace Integrator {
           * @brief Destructor
           */
          virtual ~D1();
-         
+
       protected:
          /**
           * @brief Apply ith operator
@@ -59,7 +59,7 @@ namespace Integrator {
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const;
+         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const;
    };
 
 }

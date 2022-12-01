@@ -1,0 +1,147 @@
+# This file is generated, do not modify!
+include:
+- remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.cscs.yml
+- /ci/gitlab/.daint_runner.yml
+- /ci/gitlab/.quicc_tests.yml
+- /ci/gitlab/.quicc_models.yml
+stages:
+- build
+- test
+- model-build-and-test
+- cleanup
+build-quicc:
+  tags:
+  - docker_jfrog
+  stage: build
+  script:
+  - 'true'
+  variables:
+    DOCKERFILE: ci/docker/Dockerfile_kkgpu
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/cuda-ubuntu-quicc-buildbase:11.7.1-22.04"]'
+test-quicc-lib:
+  extends:
+  - .test-lib
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+time-quicc-lib:
+  extends:
+  - .time-lib-gpu
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+BoussinesqSphereDynamoExplicit_serial:
+  extends:
+  - .BoussinesqSphereDynamoExplicit_serial
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqSphereDynamoImplicit_serial:
+  extends:
+  - .BoussinesqSphereDynamoImplicit_serial
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqShellDynamoExplicit_serial:
+  extends:
+  - .BoussinesqShellDynamoExplicit_serial
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqShellDynamoImplicit_serial:
+  extends:
+  - .BoussinesqShellDynamoImplicit_serial
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqSphereRTCExplicit_serial:
+  extends:
+  - .BoussinesqSphereRTCExplicit_serial
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqSphereRTCImplicit_serial:
+  extends:
+  - .BoussinesqSphereRTCImplicit_serial
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqShellRTCExplicit_serial:
+  extends:
+  - .BoussinesqShellRTCExplicit_serial
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqShellRTCImplicit_serial:
+  extends:
+  - .BoussinesqShellRTCImplicit_serial
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqSphereTCExplicit_serial:
+  extends:
+  - .BoussinesqSphereTCExplicit_serial
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqShellTCExplicit_serial:
+  extends:
+  - .BoussinesqShellTCExplicit_serial
+  - .gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
+ci-cache-cleanup:
+  extends: .daint
+  stage: cleanup
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu:latest
+  script:
+  - rm -Rf $CI_CACHE_FOLDER/*

@@ -1,4 +1,4 @@
-quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
+quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB_KK} ${QUICC_CMAKE_SRC_VISIBILITY}
   D1.cpp
   DivLl.cpp
   DivLlD1.cpp
@@ -14,3 +14,23 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   LlDivS1Dp.cpp
   P.cpp
 )
+
+if(QUICC_USE_KOKKOS)
+  quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB_KK} ${QUICC_CMAKE_SRC_VISIBILITY}
+    PIALegendreIntegrator.cpp
+    PP.cpp
+    Cuda/PP.cpp
+    Cuda/PD1.cpp
+    Cuda/PLl.cpp
+    Cuda/PLlDivS1.cpp
+    Cuda/PLlDivS1Dp.cpp
+    Cuda/PLl2.cpp
+    Cuda/PDivLl.cpp
+    Cuda/PLlD1.cpp
+    Cuda/PDivLlD1.cpp
+    Cuda/PDivS1.cpp
+    Cuda/PDivS1Dp.cpp
+    Cuda/PDivLlDivS1.cpp
+    Cuda/PDivLlDivS1Dp.cpp
+  )
+endif(QUICC_USE_KOKKOS)
