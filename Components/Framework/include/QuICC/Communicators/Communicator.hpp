@@ -35,7 +35,6 @@
 #include "QuICC/Communicators/Converters/MpiConverter.hpp"
 #endif // QUICC_MPI
 
-#include <iostream>
 namespace QuICC {
 
 namespace Parallel {

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ImExRK3.hpp
  * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order ~3
  */
@@ -43,7 +43,7 @@ namespace Timestep {
          /**
           * @brief Destructor
           */
-         virtual ~ImExRK3();
+         virtual ~ImExRK3() = default;
 
          /**
           * @brief Get factor for mass matrix on LHS
@@ -132,12 +132,12 @@ namespace Timestep {
           */
          std::string name() const;
 
+      protected:
          /**
-          * @brief Initialize
+          * @brief Initialize coefficients
           */
          void init();
-         
-      protected:
+
          /**
           * @brief Storage for the alpha parameters
           */

@@ -32,13 +32,18 @@ namespace Equations {
    {
    }
 
-   void IFieldEquation::applyConstraint(FieldComponents::Spectral::Id compId)
+   bool IFieldEquation::applyConstraint(FieldComponents::Spectral::Id compId)
    {
+      bool changedSolution = false;
+
       // Use source kernel
       if(this->mConstraintKernel.count(compId) > 0)
       {
-         return this->mConstraintKernel.find(compId)->second->apply();
+         changedSolution = true;
+         this->mConstraintKernel.find(compId)->second->apply();
       }
+
+      return changedSolution;
    }
 
    MHDVariant IFieldEquation::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const

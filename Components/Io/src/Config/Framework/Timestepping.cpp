@@ -44,6 +44,7 @@ namespace Framework {
       this->fTags().addTag("time", -1.0);
       this->fTags().addTag("timestep", -1.0);
       this->fTags().addTag("error", -1.0);
+      this->sTags().addTag("scheme", "imex_rk_cb2");
    }
 
    void Timestepping::checkData()

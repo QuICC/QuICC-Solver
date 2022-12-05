@@ -26,10 +26,6 @@ namespace Timestep {
    {
    }
 
-   IScheme::~IScheme()
-   {
-   }
-
    // Use scheme's embedded lower order scheme?
    bool IScheme::useEmbedded() const
    {

@@ -1,5 +1,7 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   IDiags.cpp
+  Id.cpp
+  IdDiags.cpp
   I2.cpp
   I2Diags.cpp
   I2Lapl.cpp
@@ -20,6 +22,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   R2Diags.cpp
 )
 
+add_subdirectory(Boundary)
 add_subdirectory(Chebyshev)
 add_subdirectory(Legendre)
 add_subdirectory(CylEnergy)

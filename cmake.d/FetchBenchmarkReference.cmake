@@ -28,7 +28,7 @@ function(quicc_fetch_benchmark_reference target)
   message(DEBUG "QFB_DATADIR: ${QFB_DATADIR}")
 
   if(NOT QFB_GITTAG)
-    set(QFB_GITTAG "v0.0.22")
+    set(QFB_GITTAG "v0.1.0")
   endif()
   message(DEBUG "QFB_GITTAG: ${QFB_GITTAG}")
 

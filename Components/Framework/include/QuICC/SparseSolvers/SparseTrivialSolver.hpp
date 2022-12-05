@@ -46,7 +46,7 @@ namespace Solver {
          /**
           * @brief Get the number of systems in solver
           */
-         int nSystem() const;
+         std::size_t nSystem() const;
 
          /**
           * @brief Add RHS and solution data storage
@@ -60,6 +60,11 @@ namespace Solver {
           * @brief Initialise solution after data was copied
           */
          virtual void initSolutions();
+
+         /**
+          * @brief Update solver after updated solution was copied
+          */
+         virtual void updateSolutions();
 
          /**
           * @brief Set solver RHS data to zero
@@ -128,6 +133,10 @@ namespace Solver {
    {
    }
 
+   template <typename TOperator,typename TData,template <typename> class TSolver> void SparseTrivialSolver<TOperator,TData,TSolver>::updateSolutions()
+   {
+   }
+
    template <typename TOperator,typename TData,template <typename> class TSolver> void SparseTrivialSolver<TOperator,TData,TSolver>::zeroSolver()
    {
       // Set solver RHS to zero
@@ -137,7 +146,7 @@ namespace Solver {
       }
    }
 
-   template <typename TOperator,typename TData,template <typename> class TSolver> int SparseTrivialSolver<TOperator,TData,TSolver>::nSystem() const
+   template <typename TOperator,typename TData,template <typename> class TSolver> std::size_t SparseTrivialSolver<TOperator,TData,TSolver>::nSystem() const
    {
       return this->mSolution.size();
    }

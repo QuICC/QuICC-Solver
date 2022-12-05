@@ -34,6 +34,7 @@
 #include "QuICC/Diagnostics/SphereCflWrapper.hpp"
 #include "QuICC/Diagnostics/StreamVerticalWrapper.hpp"
 #include "QuICC/Diagnostics/CartesianCflWrapper.hpp"
+#include "QuICC/Timestep/Constants.hpp"
 
 namespace QuICC {
 
@@ -45,7 +46,7 @@ namespace Diagnostics {
 #endif //QUICC_MPI
 
    Coordinator::Coordinator()
-      : MAXSTEP_LOCATION(-101), MINSTEP_LOCATION(-102), FIXEDSTEP_LOCATION(-100), mcMaxStep(0.1), mcMinStep(1e-10), mFixedStep(-1), mMaxError(-1.0), mCfl(2,1), mStartTime(0.0), mStartTimestep(0.0)
+      : mcMaxStep(Timestep::LIMIT_MAXSTEP), mcMinStep(Timestep::LIMIT_MINSTEP), mFixedStep(-1), mMaxError(-1.0), mCfl(2,1), mStartTime(0.0), mStartTimestep(0.0)
    {
       this->mCfl.setZero();
    }
@@ -167,12 +168,12 @@ namespace Diagnostics {
       if(this->mFixedStep > 0 && this->mMaxError > 0)
       {
          this->mCfl(0,0) = this->mcMinStep;
-         this->mCfl(1,0) = MINSTEP_LOCATION;
+         this->mCfl(1,0) = Timestep::MINSTEP_LOCATION;
 
       } else if(this->mFixedStep > 0)
       {
          this->mCfl(0,0) = this->mFixedStep;
-         this->mCfl(1,0) = FIXEDSTEP_LOCATION;
+         this->mCfl(1,0) = Timestep::FIXEDSTEP_LOCATION;
 
       // Compute initial CFL condition
       } else if(this->mspCflWrapper)
@@ -183,7 +184,7 @@ namespace Diagnostics {
          if(this->mcMinStep < this->mCfl(0,0))
          {
             this->mCfl(0,0) = this->mcMinStep;
-            this->mCfl(1,0) = MINSTEP_LOCATION;
+            this->mCfl(1,0) = Timestep::MINSTEP_LOCATION;
          }
       }
    }
@@ -194,7 +195,7 @@ namespace Diagnostics {
       if(this->mFixedStep > 0)
       {
          this->mCfl(0,0) = this->mFixedStep;
-         this->mCfl(1,0) = FIXEDSTEP_LOCATION;
+         this->mCfl(1,0) = Timestep::FIXEDSTEP_LOCATION;
 
       // Compute CFL condition
       } else if(this->mspCflWrapper)
@@ -208,13 +209,13 @@ namespace Diagnostics {
          if(this->mcMaxStep < this->mCfl(0,0))
          {
             this->mCfl(0,0) = this->mcMaxStep;
-            this->mCfl(1,0) = MAXSTEP_LOCATION;
+            this->mCfl(1,0) = Timestep::MAXSTEP_LOCATION;
          }
 
          if(-this->mFixedStep < this->mCfl(0,0))
          {
             this->mCfl(0,0) = -this->mFixedStep;
-            this->mCfl(1,0) = FIXEDSTEP_LOCATION;
+            this->mCfl(1,0) = Timestep::FIXEDSTEP_LOCATION;
          }
       }
    }

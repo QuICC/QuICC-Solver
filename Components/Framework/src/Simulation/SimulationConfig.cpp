@@ -17,6 +17,8 @@
 // Project includes
 //
 #include "QuICC/Enums/SplittingTools.hpp"
+#include "QuICC/Timestep/Id/Coordinator.hpp"
+#include "QuICC/Timestep/Id/registerAll.hpp"
 
 namespace QuICC {
 
@@ -216,5 +218,35 @@ namespace QuICC {
       tstep(2) = spTime->fTags().value("error");
 
       return tstep;
+   }
+
+   std::size_t SimulationConfig::timestepper() const
+   {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
+      auto s = this->mspCfgFile->spFramework()->spNode(Io::Config::Framework::TIMESTEPPING)->sTags().value("scheme");
+      std::string tag = s;
+      std::transform(s.cbegin(), s.cend(), tag.begin(), [](unsigned char c) { return std::tolower(c); });
+
+      // Register all timestepper IDs
+      Timestep::Id::registerAll();
+
+      std::size_t id = 0;
+      for(auto&& e: Timestep::Id::Coordinator::map())
+      {
+         if(Timestep::Id::Coordinator::tag(e.first) == tag)
+         {
+            id = e.first;
+            break;
+         }
+      }
+
+      if(id == 0)
+      {
+         throw std::logic_error("timestepper scheme was not recognized");
+      }
+
+      return id;
    }
 }

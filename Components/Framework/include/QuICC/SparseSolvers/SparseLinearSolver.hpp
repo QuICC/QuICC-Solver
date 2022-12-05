@@ -20,9 +20,12 @@
 // Project includes
 //
 #include "QuICC/Math/Constants.hpp"
+#include "QuICC/ModelOperator/ImplicitLinear.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
 #include "QuICC/SparseSolvers/SparseSolverBase.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolverTools.hpp"
+#include "QuICC/Register/Solution.hpp"
+#include "QuICC/Register/Rhs.hpp"
 
 namespace QuICC {
 
@@ -76,6 +79,11 @@ namespace Solver {
          void initSolver();
 
          /**
+          * @brief Update solver after updated solution was copied
+          */
+         virtual void updateSolutions();
+
+         /**
           * @brief Update solver
           */
          void updateSolver();
@@ -103,7 +111,7 @@ namespace Solver {
          /**
           * @brief Get the number of linear systems in solver
           */
-         int nSystem() const;
+         std::size_t nSystem() const;
 
          /**
           * @brief Set LHS matrix
@@ -182,6 +190,25 @@ namespace Solver {
          typedef std::vector<SharedSolverType, Eigen::aligned_allocator<SharedSolverType> > VectorSharedSolverType;
 
          /**
+          * @brief Get storage register
+          */
+         std::vector<TData>& reg(const std::size_t);
+
+         /**
+          * @brief Get storage register
+          */
+         const std::vector<TData>& reg(const std::size_t) const;
+
+         /**
+          * @brief Add RHS and solution data storage
+          *
+          * @param rows Number of rows of matrix
+          * @param cols Number of columns required
+          * @param ids  Register IDs
+          */
+         void addRegister(const int rows, const int cols, const std::vector<std::size_t>& ids);
+
+         /**
           * @brief Initialise the solver matrices storage
           *
           * @param n Size of matrices
@@ -209,14 +236,9 @@ namespace Solver {
          std::map<MHDFloat, std::vector<TOperator> >  mLHSMatrix;
 
          /**
-          * @brief Storage for linear solve's RHS
+          * @brief Storage for field
           */
-         std::vector<TData>  mRHSData;
-
-         /**
-          * @brief Storage for solution of linear solve
-          */
-         std::vector<TData>  mSolution;
+         std::map<std::size_t, std::vector<TData> > mStorage;
 
          /**
           * @brief Storage for inhomogeneous boundary conditions
@@ -255,13 +277,45 @@ namespace Solver {
       return true;
    }
 
+   template <typename TOperator,typename TData,template <typename> class TSolver> std::vector<TData>& SparseLinearSolver<TOperator,TData,TSolver>::reg(const std::size_t id)
+   {
+      assert(this->mStorage.count(id) > 0);
+
+      return this->mStorage.at(id);
+   }
+
+   template <typename TOperator,typename TData,template <typename> class TSolver> const std::vector<TData>& SparseLinearSolver<TOperator,TData,TSolver>::reg(const std::size_t id) const
+   {
+      assert(this->mStorage.count(id) > 0);
+
+      return this->mStorage.at(id);
+   }
+
+   template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::addRegister(const int rows, const int cols, const std::vector<std::size_t>& ids)
+   {
+      // Assert for non zero rows and columns
+      assert(rows > 0);
+      assert(cols > 0);
+
+      for(auto id: ids)
+      {
+         if(this->mStorage.count(id) == 0)
+         {
+            this->mStorage.emplace(id, std::vector<TData>());
+         }
+
+         this->reg(id).push_back(TData(rows,cols));
+         this->reg(id).back().setZero();
+      }
+    }
+
    template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::addInhomogeneous()
    {
-      for(size_t i = 0; i < this->mRHSData.size(); i++)
+      for(size_t i = 0; i < this->nSystem(); i++)
       {
          if(this->mInhomogeneous.at(i).nonZeros() > 0)
          {
-            Solver::internal::addCorrection(this->mRHSData.at(i), this->mInhomogeneous.at(i));
+            Solver::internal::addCorrection(this->reg(Register::Rhs::id()).at(i), this->mInhomogeneous.at(i));
          }
       }
    }
@@ -275,19 +329,23 @@ namespace Solver {
          // Set unused modes to zero
          for(int i = 0; i < this->mZeroIdx; ++i)
          {
-            this->mSolution.at(i).setZero();
+            this->reg(Register::Solution::id()).at(i).setZero();
          }
 
          // Solve other modes
+         assert(this->mSolver.count(this->mId) > 0);
          typename std::map<MHDFloat, VectorSharedSolverType>::iterator sIt = this->mSolver.find(this->mId);
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
             #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
                MpiFramework::syncSubComm(MpiFramework::SPECTRAL, i);
             #endif //define QUICC_MPI && defined QUICC_MPISPSOLVE
 
-            //internal::solveWrapper<TOperator,TData>(this->mSolution.at(i), this->mSolver.at(i+start), this->mRHSData.at(i));
-            internal::solveWrapper(this->mSolution.at(i), sIt->second.at(i), this->mRHSData.at(i));
+            assert(this->reg(Register::Solution::id()).size() > i);
+            assert(sIt->second.size() > i);
+            assert(this->nSystem() > i);
+
+            internal::solveWrapper(this->reg(Register::Solution::id()).at(i), sIt->second.at(i), this->reg(Register::Rhs::id()).at(i));
 
             // Stop simulation if solve failed
             if(sIt->second.at(i)->info() != Eigen::Success)
@@ -314,9 +372,9 @@ namespace Solver {
    template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::zeroSolver()
    {
       // Set solver RHS to zero
-      for(unsigned int i = 0; i < this->mRHSData.size(); ++i)
+      for(std::size_t i = 0; i < this->nSystem(); ++i)
       {
-         this->mRHSData.at(i).setZero();
+         this->reg(Register::Rhs::id()).at(i).setZero();
       }
    }
 
@@ -354,9 +412,9 @@ namespace Solver {
       for(auto it = this->mLHSMatrix.begin(); it != this->mLHSMatrix.end(); ++it)
       {
          // Compute factorisation
-         for(size_t i = 0; i < it->second.size(); i++)
+         for(std::size_t i = 0; i < it->second.size(); i++)
          {
-            if(static_cast<int>(i) % this->nSystem() >= this->mZeroIdx)
+            if(i % this->nSystem() >= static_cast<std::size_t>(this->mZeroIdx))
             {
                #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
                   MpiFramework::syncSubComm(MpiFramework::SPECTRAL, i);
@@ -420,19 +478,20 @@ namespace Solver {
       // Nothing to be done in general.
    }
 
+   template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::updateSolutions()
+   {
+      // Nothing to be done in general.
+   }
+
    template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::addStorage(const int rows, const int cols)
    {
       // Assert for non zero rows and columns
       assert(rows > 0);
       assert(cols > 0);
 
-      // Add storage for RHS data
-      this->mRHSData.push_back(TData(rows,cols));
-      this->mRHSData.back().setZero();
-
-      // Add storage for solution
-      this->mSolution.push_back(TData(rows,cols));
-      this->mSolution.back().setZero();
+      // Add additional registers for RHS data and solution
+      std::vector<std::size_t> ids = {Register::Solution::id(), Register::Rhs::id()};
+      this->addRegister(rows, cols, ids);
 
       // Add storage for inhomogeneous boundary value
       this->mInhomogeneous.push_back(Eigen::SparseMatrix<typename TData::Scalar>(rows,cols));
@@ -446,9 +505,16 @@ namespace Solver {
       Solver::internal::addOperators(this->rLHSMatrix(0, idx), 1.0, iOpA->second);
    }
 
-   template <typename TOperator,typename TData,template <typename> class TSolver> int SparseLinearSolver<TOperator,TData,TSolver>::nSystem() const
+   template <typename TOperator,typename TData,template <typename> class TSolver> std::size_t SparseLinearSolver<TOperator,TData,TSolver>::nSystem() const
    {
-      return this->mRHSData.size();
+      if(this->mStorage.count(Register::Rhs::id()) > 0)
+      {
+         return this->reg(Register::Rhs::id()).size();
+      }
+      else
+      {
+         return 0;
+      }
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> TOperator& SparseLinearSolver<TOperator,TData,TSolver>::rLHSMatrix(const MHDFloat id, const int idx)
@@ -458,17 +524,17 @@ namespace Solver {
 
    template <typename TOperator,typename TData,template <typename> class TSolver> TData& SparseLinearSolver<TOperator,TData,TSolver>::rRHSData(const int idx)
    {
-      return this->mRHSData.at(idx);
+      return this->reg(Register::Rhs::id()).at(idx);
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> const TData& SparseLinearSolver<TOperator,TData,TSolver>::solution(const int idx) const
    {
-      return this->mSolution.at(idx);
+      return this->reg(Register::Solution::id()).at(idx);
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> TData& SparseLinearSolver<TOperator,TData,TSolver>::rSolution(const int idx)
    {
-      return this->mSolution.at(idx);
+      return this->reg(Register::Solution::id()).at(idx);
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> const Eigen::SparseMatrix<typename TData::Scalar>& SparseLinearSolver<TOperator,TData,TSolver>::inhomogeneous(const int idx) const

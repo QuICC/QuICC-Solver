@@ -75,6 +75,11 @@ namespace Solver {
           */
          template <typename TSolverIt> void buildSolverMatrices(Equations::SharedIEquation spEq, const SpectralFieldId id, const TSolverIt solveIt);
 
+         /**
+          * @brief Solve all the linear systems
+          */
+         void solveSystems();
+
       protected:
          /**
           * @brief create solvers
@@ -96,11 +101,6 @@ namespace Solver {
           * @brief Compute (coupled) matrices
           */
          void createMatrices(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp);
-
-         /**
-          * @brief Solve all the linear systems
-          */
-         void solveSystems();
 
          /**
           * @brief Build the real operator

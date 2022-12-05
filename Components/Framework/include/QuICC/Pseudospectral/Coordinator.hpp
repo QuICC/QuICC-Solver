@@ -305,8 +305,10 @@ namespace Pseudospectral {
 
          /**
           * @brief Prepare time evolution
+          *
+          * @param schemeId ID of timestepping scheme
           */
-         void prepareEvolution();
+         void prepareEvolution(const std::size_t schemeId);
 
          /**
           * @brief Pre solve equations for full initialisation

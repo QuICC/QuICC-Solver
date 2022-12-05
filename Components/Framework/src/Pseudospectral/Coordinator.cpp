@@ -367,7 +367,7 @@ namespace Pseudospectral {
       this->mDiagnostics.useStateTime(time, timestep);
    }
 
-   void Coordinator::prepareEvolution()
+   void Coordinator::prepareEvolution(const std::size_t schemeId)
    {
       // Update equation time
       this->updateEquationTime(this->mDiagnostics.startTime(), false);
@@ -384,7 +384,7 @@ namespace Pseudospectral {
       // Init timestepper using clf/100 as starting timestep
       auto sP = this->scalarRange(PseudospectralTag::Prognostic::id());
       auto vP = this->vectorRange(PseudospectralTag::Prognostic::id());
-      this->mTimestepCoordinator.init(this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), sP, vP);
+      this->mTimestepCoordinator.init(schemeId, this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), sP, vP);
 
       // Compute physical space values if required
       this->mspImposedBwdGrouper->transform(this->mImposedScalarVariables, this->mImposedVectorVariables, *this->mspImposedTransformCoordinator);

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IImExOldScheme.hpp
  * @brief Interface for a generic implicit/explicit scheme based on old setup
  */
@@ -38,7 +38,7 @@ namespace Timestep {
          /**
           * @brief Destructor
           */
-         virtual ~IImExOldScheme();
+         virtual ~IImExOldScheme() = default;
 
          /**
           * @brief Get factor for mass matrix on LHS
@@ -106,7 +106,7 @@ namespace Timestep {
           * @brief Number of previous nonlinear terms required
           */
          virtual int nonlinearMemory() const = 0;
-         
+
       protected:
 
       private:

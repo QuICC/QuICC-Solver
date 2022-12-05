@@ -20,6 +20,7 @@
 // Project includes
 //
 #include "QuICC/Timestep/ISparseImExRKnRTimestepper.hpp"
+#include "QuICC/Register/Solution.hpp"
 
 namespace QuICC {
 
@@ -42,7 +43,7 @@ namespace Timestep {
          /**
           * @brief Destructor
           */
-         virtual ~SparseImExRK2RTimestepper();
+         virtual ~SparseImExRK2RTimestepper() = default;
 
          /**
           * @brief Prepare fields for implicit solve
@@ -66,18 +67,14 @@ namespace Timestep {
    {
    }
 
-   template <typename TOperator,typename TData,template <typename> class TSolver> SparseImExRK2RTimestepper<TOperator,TData,TSolver>::~SparseImExRK2RTimestepper()
-   {
-   }
-
    template <typename TOperator,typename TData,template <typename> class TSolver> bool SparseImExRK2RTimestepper<TOperator,TData,TSolver>::preSolve()
    {
       if(this->mHasExplicit)
       {
          // Update explicit term with explicit (nonlinear) values
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->mExSolution.at(i), this->mRHSData.at(i));
+            internal::computeSet(this->reg(Register::Explicit::id()).at(i), this->reg(Register::Rhs::id()).at(i));
          }
       }
 
@@ -86,9 +83,9 @@ namespace Timestep {
          // Update intermediate solution
          MHDFloat bIm = this->mspScheme->bIm(this->mStep)*this->mDt;
          MHDFloat bEx = -this->mspScheme->bEx(this->mStep)*this->mDt;
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeAMXPBYPZ(this->mIntSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+            internal::computeAMXPBYPZ(this->reg(Register::Intermediate::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
          }
 
          // Embedded lower order scheme solution
@@ -96,9 +93,9 @@ namespace Timestep {
          {
             bIm = this->mspScheme->bImErr(this->mStep)*this->mDt;
             bEx = -this->mspScheme->bExErr(this->mStep)*this->mDt;
-            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeAMXPBYPZ(this->mErrSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+               internal::computeAMXPBYPZ(this->reg(Register::Error::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
             }
          }
 
@@ -115,36 +112,37 @@ namespace Timestep {
          }
 
          // Build RHS for implicit term
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeMV(this->mRHSData.at(i), this->mRHSMatrix.at(i), this->mIntSolution.at(i));
+            internal::computeMV(this->reg(Register::Rhs::id()).at(i), this->mRHSMatrix.at(i), this->reg(Register::Intermediate::id()).at(i));
          }
 
          // Set ID for solver
          this->mId = this->mspScheme->aIm(this->mStep, this->mStep);
 
-         this->mRegisterId = SparseImExRK2RTimestepper<TOperator,TData,TSolver>::IMPLICIT_REGISTER;
+         this->mRegisterId = Register::Implicit::id();
 
          return true;
 
+      }
       // Last step has no implicit solve
-      } else if(this->mStep == this->mspScheme->steps())
+      else if(this->mStep == this->mspScheme->steps())
       {
-         if(this->mRegisterId == SparseImExRK2RTimestepper<TOperator,TData,TSolver>::SOLUTION_REGISTER)
+         if(this->mRegisterId == Register::Solution::id())
          {
             // Compute error estimate using embedded scheme
             if(this->mspScheme->useEmbedded())
             {
-               for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+               for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
                {
-                  internal::computeSet(this->mRHSData.at(i), this->mErrSolution.at(i));
+                  internal::computeSet(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Error::id()).at(i));
                }
 
                // Set mass matrix ID for solver
                this->mId = 0.0;
 
                // Set explicit store register for solution
-               this->mRegisterId = SparseImExRK2RTimestepper<TOperator,TData,TSolver>::ERROR_REGISTER;
+               this->mRegisterId = Register::Error::id();
 
                // Include inhomogeneous boundary conditions
                this->addInhomogeneous();
@@ -152,9 +150,9 @@ namespace Timestep {
                return true;
             } else
             {
-               for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+               for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
                {
-                  internal::computeSet(this->mSolution.at(i), this->mIntSolution.at(i));
+                  internal::computeSet(this->reg(Register::Solution::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
                }
 
                // Explicit nonlinear term at next step
@@ -164,22 +162,22 @@ namespace Timestep {
                this->mStep = 0;
 
                // Reset register ID
-               this->mRegisterId = SparseImExRK2RTimestepper<TOperator,TData,TSolver>::IMPLICIT_REGISTER;
+               this->mRegisterId = Register::Implicit::id();
 
                return false;
             }
-         } else if(this->mRegisterId == SparseImExRK2RTimestepper<TOperator,TData,TSolver>::ERROR_REGISTER)
+         } else if(this->mRegisterId == Register::Error::id())
          {
-            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeSet(this->mSolution.at(i), this->mIntSolution.at(i));
+               internal::computeSet(this->reg(Register::Solution::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
             }
 
-            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeError(this->mError, this->mIntSolution.at(i), this->mErrSolution.at(i));
+               internal::computeError(this->mError, this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Error::id()).at(i));
 
-               internal::computeSet(this->mErrSolution.at(i), this->mIntSolution.at(i));
+               internal::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
             }
 
             // Explicit nonlinear term at next step
@@ -189,21 +187,21 @@ namespace Timestep {
             this->mStep = 0;
 
             // Reset register ID
-            this->mRegisterId = SparseImExRK2RTimestepper<TOperator,TData,TSolver>::IMPLICIT_REGISTER;
+            this->mRegisterId = Register::Implicit::id();
 
             return false;
          } else
          {
-            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeSet(this->mRHSData.at(i), this->mIntSolution.at(i));
+               internal::computeSet(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
             }
 
             // Set mass matrix ID for solver
             this->mId = 0.0;
 
             // Set explicit store register for solution
-            this->mRegisterId = SparseImExRK2RTimestepper<TOperator,TData,TSolver>::SOLUTION_REGISTER;
+            this->mRegisterId = Register::Solution::id();
 
             // Include inhomogeneous boundary conditions
             this->addInhomogeneous();
@@ -212,39 +210,39 @@ namespace Timestep {
          }
       } else
       {
-         if(this->mRegisterId == SparseImExRK2RTimestepper<TOperator,TData,TSolver>::IMPLICIT_REGISTER)
+         if(this->mRegisterId == Register::Implicit::id())
          {
             // Build RHS for implicit term
             MHDFloat aIm = (this->mspScheme->aIm(this->mStep, this->mStep-1) - this->mspScheme->bIm(this->mStep-1))*this->mDt;
             MHDFloat aEx = -(this->mspScheme->aEx(this->mStep, this->mStep-1) - this->mspScheme->bEx(this->mStep-1))*this->mDt;
-            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeAMXPYPBZ(this->mExSolution.at(i), this->mMassMatrix.at(i), aIm, this->mImSolution.at(i), this->mIntSolution.at(i), aEx);
-               internal::computeSet(this->mRHSData.at(i), this->mExSolution.at(i));
+               internal::computeAMXPYPBZ(this->reg(Register::Explicit::id()).at(i), this->mMassMatrix.at(i), aIm, this->reg(Register::Implicit::id()).at(i), this->reg(Register::Intermediate::id()).at(i), aEx);
+               internal::computeSet(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Explicit::id()).at(i));
             }
 
             // Set mass matrix ID for solver
             this->mId = 0.0;
 
             // Set explicit store register for solution
-            this->mRegisterId = SparseImExRK2RTimestepper<TOperator,TData,TSolver>::EXPLICIT_REGISTER;
+            this->mRegisterId = Register::Explicit::id();
 
             // Include inhomogeneous boundary conditions
             this->addInhomogeneous();
 
-         } else if(this->mRegisterId == SparseImExRK2RTimestepper<TOperator,TData,TSolver>::EXPLICIT_REGISTER)
+         } else if(this->mRegisterId == Register::Explicit::id())
          {
             // Update explicit term
-            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeMV(this->mRHSData.at(i), this->mRHSMatrix.at(i), this->mExSolution.at(i));
+               internal::computeMV(this->reg(Register::Rhs::id()).at(i), this->mRHSMatrix.at(i), this->reg(Register::Explicit::id()).at(i));
             }
 
             // Set ID for solver
             this->mId = this->mspScheme->aIm(this->mStep, this->mStep);
 
             // Set implicit store register for solution
-            this->mRegisterId = SparseImExRK2RTimestepper<TOperator,TData,TSolver>::IMPLICIT_REGISTER;
+            this->mRegisterId = Register::Implicit::id();
          }
 
          return true;
@@ -253,12 +251,12 @@ namespace Timestep {
 
    template <typename TOperator,typename TData,template <typename> class TSolver> bool SparseImExRK2RTimestepper<TOperator,TData,TSolver>::postSolve()
    {
-      if(this->mRegisterId == SparseImExRK2RTimestepper<TOperator,TData,TSolver>::EXPLICIT_REGISTER)
+      if(this->mRegisterId == Register::Explicit::id())
       {
          // Update explicit term
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->mExSolution.at(i), this->mSolution.at(i));
+            internal::computeSet(this->reg(Register::Explicit::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
 
          // Loop back to presolve but without new nonlinear term
@@ -266,20 +264,20 @@ namespace Timestep {
 
          return true;
 
-      } else if(this->mRegisterId == SparseImExRK2RTimestepper<TOperator,TData,TSolver>::IMPLICIT_REGISTER)
+      } else if(this->mRegisterId == Register::Implicit::id())
       {
          // Update implicit term
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->mImSolution.at(i), this->mSolution.at(i));
+            internal::computeSet(this->reg(Register::Implicit::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
 
-      } else if(this->mRegisterId == SparseImExRK2RTimestepper<TOperator,TData,TSolver>::SOLUTION_REGISTER)
+      } else if(this->mRegisterId == Register::Solution::id())
       {
          // Update intermediate term
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->mIntSolution.at(i), this->mSolution.at(i));
+            internal::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
 
          // Loop back to presolve but without new nonlinear term
@@ -287,12 +285,12 @@ namespace Timestep {
 
          return true;
 
-      } else if(this->mRegisterId == SparseImExRK2RTimestepper<TOperator,TData,TSolver>::ERROR_REGISTER)
+      } else if(this->mRegisterId == Register::Error::id())
       {
          // Update error term
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->mErrSolution.at(i), this->mSolution.at(i));
+            internal::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
 
          // Loop back to presolve but without new nonlinear term
@@ -306,9 +304,9 @@ namespace Timestep {
          // Update intermediate solution
          MHDFloat bIm = this->mspScheme->bIm(this->mStep)*this->mDt;
          MHDFloat bEx = -this->mspScheme->bEx(this->mStep)*this->mDt;
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeAMXPBYPMZ(this->mIntSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+            internal::computeAMXPBYPMZ(this->reg(Register::Intermediate::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
          }
 
          // Embedded lower order scheme solution
@@ -316,9 +314,9 @@ namespace Timestep {
          {
             bIm = this->mspScheme->bImErr(this->mStep)*this->mDt;
             bEx = -this->mspScheme->bExErr(this->mStep)*this->mDt;
-            for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+            for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeAMXPBYPMZ(this->mErrSolution.at(i), this->mMassMatrix.at(i), bIm, this->mImSolution.at(i), bEx, this->mExSolution.at(i));
+               internal::computeAMXPBYPMZ(this->reg(Register::Error::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
             }
          }
 
@@ -330,13 +328,14 @@ namespace Timestep {
 
          return true;
 
-      } else
+      }
+      else
       {
          // Prepare solution for new nonlinear term
          MHDFloat aIm = this->mspScheme->aIm(this->mStep, this->mStep)*this->mDt;
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeXPAY(this->mSolution.at(i), this->mExSolution.at(i), aIm);
+            internal::computeXPAY(this->reg(Register::Solution::id()).at(i), this->reg(Register::Explicit::id()).at(i), aIm);
          }
 
          // Next step will have nonlinear term

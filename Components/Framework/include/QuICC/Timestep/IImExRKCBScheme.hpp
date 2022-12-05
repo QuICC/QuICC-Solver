@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IImExRKCBScheme.hpp
  * @brief Interface for a generic implicit/explicit Runge-Kutta scheme (Cavaglieri & Bewley, 2015)
  */
@@ -33,12 +33,12 @@ namespace Timestep {
          /**
           * @brief Constructor
           */
-         IImExRKCBScheme();
+         IImExRKCBScheme() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IImExRKCBScheme();
+         virtual ~IImExRKCBScheme() = default;
 
          /**
           * @brief Butcher's tableau a_ij factor for implicit scheme
@@ -74,7 +74,7 @@ namespace Timestep {
           * @brief Butcher's tableau b_i factor for explicit embedded lower order scheme
           */
          virtual MHDFloat bExErr(const int i) const = 0;
-         
+
       protected:
 
       private:

@@ -3,21 +3,13 @@
  * @brief Source of angular momentum conservation kernel in a sphere
  */
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Class include
 //
 #include "QuICC/SpectralKernels/Sphere/ConserveAngularMomentum.hpp"
-
-// Project includes
-//
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Polynomial/Worland/Operators.hpp"
@@ -124,6 +116,8 @@ namespace Sphere {
       {
          std::visit([&](auto&& f){
             mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM1j, this->mM1k));
+            DebuggerMacro_showValue("Angular momentum correction m = 1: ", 2,
+                  std::abs(mom(0) - f->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR).point(0, this->mM1j,this->mM1k)));
             f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM1j,this->mM1k);
          }, field);
       }
@@ -132,6 +126,8 @@ namespace Sphere {
       {
          std::visit([&](auto&& f){
             mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM0j, this->mM0k));
+            DebuggerMacro_showValue("Angular momentum correction m = 0: ", 2,
+                  std::abs(mom(0) - f->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR).point(0, this->mM0j,this->mM0k)));
             f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM0j, this->mM0k);
          }, field);
       }

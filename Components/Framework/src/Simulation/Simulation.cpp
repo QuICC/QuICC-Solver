@@ -99,7 +99,7 @@ namespace QuICC {
       StageTimer stage;
       stage.start("Prepare time evolution");
 
-      this->mPseudospectral.prepareEvolution();
+      this->mPseudospectral.prepareEvolution(this->mSimIoCtrl.config().timestepper());
 
       // Print timestepper information
       this->mPseudospectral.printInfo(std::cout);

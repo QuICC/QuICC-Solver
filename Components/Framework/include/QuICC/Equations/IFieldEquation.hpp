@@ -55,8 +55,9 @@ namespace Equations {
           * @brief Apply generic constraint on spectral data
           *
           * @param compId  ID of the spectral component
+          * @return contraint changed solution?
           */
-         virtual void applyConstraint(FieldComponents::Spectral::Id compId);
+         virtual bool applyConstraint(FieldComponents::Spectral::Id compId);
 
          /**
           * @brief Generic source term implementation

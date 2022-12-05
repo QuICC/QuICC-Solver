@@ -19,7 +19,6 @@
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/TypeSelectors/TimeSchemeSelector.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
@@ -336,13 +335,28 @@ namespace Solver {
       std::advance(solIt, idx);
 
       // Get solver output
-      for(int i = 0; i < (*solIt)->nSystem(); i++)
+      for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
       {
          spEq->storeSolution(id.second, (*solIt)->solution(i), i, (*solIt)->startRow(id,i));
       }
 
       // Apply constraint on solution
-      spEq->applyConstraint(id.second);
+      auto changedSolution = spEq->applyConstraint(id.second);
+
+      // Update solver solution if constraint modified it
+      if(changedSolution)
+      {
+         for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
+         {
+            std::visit(
+                  [&](auto&& p)
+                  {
+                  Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true);
+                  }, spEq->spUnknown());
+         }
+
+         (*solIt)->updateSolutions();
+      }
    }
 
    template <template <class,class,template <class> class> class TSolver,typename TSolverIt> void initSolvers(SparseCoordinatorData<TSolver>& coord)
@@ -442,7 +456,7 @@ namespace Solver {
       std::advance(solIt, idx);
 
       // Get solver input
-      for(int i = 0; i < (*solIt)->nSystem(); i++)
+      for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
       {
          if(spEq->couplingInfo(id.second).isGalerkin())
          {
@@ -486,7 +500,7 @@ namespace Solver {
    template <typename TSolverIt,typename TEq> void computeExplicitSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::size_t opId, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalVar, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectVar)
    {
       // Get timestep input
-      for(int i = 0; i < (*solveIt)->nSystem(); i++)
+      for(std::size_t i = 0; i < (*solveIt)->nSystem(); i++)
       {
          // Loop over explicit fields
          for(auto& fIt: make_range(spEq->couplingInfo(id.second).explicitRange(opId)))
@@ -505,7 +519,7 @@ namespace Solver {
    template <typename TSolverIt,typename TEq> void computeSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>&, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>&)
    {
       // Get timestep input
-      for(int i = 0; i < (*solveIt)->nSystem(); i++)
+      for(std::size_t i = 0; i < (*solveIt)->nSystem(); i++)
       {
          // Copy field values into solver input
          Equations::copyNonlinear(*spEq, id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));

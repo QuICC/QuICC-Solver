@@ -21,6 +21,7 @@
 // Project includes
 //
 #include "QuICC/QuICCEnv.hpp"
+#include "QuICC/Timestep/Constants.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Ascii/CflTags.hpp"
 
@@ -74,13 +75,13 @@ namespace Ascii {
             if(this->mDt(j,0) == -1)
             {
                this->mFile << std::setfill(' ') << std::string(3, ' ') + "global";
-            } else if(this->mDt(j,0) == -100)
+            } else if(this->mDt(j,0) == Timestep::FIXEDSTEP_LOCATION)
             {
                this->mFile << std::setfill(' ') << std::string(3, ' ') + "fixed";
-            } else if(this->mDt(j,0) == -101)
+            } else if(this->mDt(j,0) == Timestep::MAXSTEP_LOCATION)
             {
                this->mFile<< std::setfill(' ') << std::string(3, ' ') + "max";
-            } else if(this->mDt(j,0) == -102)
+            } else if(this->mDt(j,0) == Timestep::MINSTEP_LOCATION)
             {
                this->mFile << std::setfill(' ') << std::string(3, ' ') + "min";
             } else

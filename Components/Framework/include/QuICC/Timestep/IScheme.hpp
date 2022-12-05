@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IScheme.hpp
  * @brief Interface for a generic implicit/explicit Runge-Kutta scheme (Cavaglieri & Bewley, 2015)
  */
@@ -37,12 +37,12 @@ namespace Timestep {
          /**
           * @brief Destructor
           */
-         virtual ~IScheme();
+         virtual ~IScheme() = default;
 
          /**
           * @brief Number of substeps for final step (this is +1 compared to theoretical value due to implementation)
           */
-         virtual int steps() const = 0; 
+         virtual int steps() const = 0;
 
          /**
           * @brief Order of the scheme
@@ -53,11 +53,6 @@ namespace Timestep {
           * @brief Name of the scheme
           */
          virtual std::string name() const = 0;
-
-         /**
-          * @brief Initialize Butcher's tableau
-          */
-         virtual void init() = 0;
 
          /**
           * @brief Scheme has embedded lower order scheme?
@@ -73,7 +68,7 @@ namespace Timestep {
           * @brief Enable embedded scheme
           */
          void enableEmbedded();
-         
+
       protected:
 
       private:

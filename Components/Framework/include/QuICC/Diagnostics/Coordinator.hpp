@@ -98,21 +98,6 @@ namespace Diagnostics {
 
       private:
          /**
-          * @brief Special CFL location value for max step condition
-          */
-         const MHDFloat MAXSTEP_LOCATION;
-
-         /**
-          * @brief Special CFL location value for min step condition
-          */
-         const MHDFloat MINSTEP_LOCATION;
-
-         /**
-          * @brief Special CFL location value for fixed step condition
-          */
-         const MHDFloat FIXEDSTEP_LOCATION;
-
-         /**
           * @brief Maximum timestep
           */
          const MHDFloat mcMaxStep;

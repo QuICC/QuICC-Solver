@@ -55,10 +55,7 @@ namespace Timestep {
       mBImErr(Eigen::Array<MHDFloat,4,1>::Zero()),
       mBExErr(Eigen::Array<MHDFloat,4,1>::Zero())
    {
-   }
-
-   ImExRKCB3c::~ImExRKCB3c()
-   {
+      this->init();
    }
 
    MHDFloat ImExRKCB3c::aIm(const int i, const int j) const

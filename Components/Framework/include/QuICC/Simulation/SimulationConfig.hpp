@@ -105,6 +105,11 @@ namespace QuICC {
           */
          Array timestepping() const;
 
+         /**
+          * @brief ID of the timestepper
+          */
+         std::size_t timestepper() const;
+
       protected:
 
       private:
