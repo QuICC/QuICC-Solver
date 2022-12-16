@@ -99,6 +99,40 @@ namespace Hdf5 {
 
       H5Gclose(loc);
    }
+
+   void IHdf5Writer::writeString(hid_t loc, const std::string dsname, const std::string str)
+   {
+      // Get correct data type
+      hid_t type = H5Tcopy(Hdf5Types::type<std::string>());
+      H5Tset_size(type, str.size());
+
+      // Compute size of the dataspace
+      hsize_t dims = 1;
+
+      // Create file dataspace
+      hid_t filespace = H5Screate_simple(1, &dims, NULL);
+
+      // Create dataset in file
+      hid_t dataset = H5Dcreate(loc, dsname.c_str(), type, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+      // Set memory space
+      hid_t memspace = H5Screate_simple(1, &dims, NULL);
+
+      // Write memory
+      if(QuICCEnv().allowsIO())
+      {
+         H5Dwrite(dataset, type, memspace, filespace, H5P_DEFAULT, str.c_str());
+      }
+
+      // Close memspace
+      H5Sclose(memspace);
+
+      // Close filespace
+      H5Sclose(filespace);
+
+      // Close Dataset
+      H5Dclose(dataset);
+   }
 }
 }
 }

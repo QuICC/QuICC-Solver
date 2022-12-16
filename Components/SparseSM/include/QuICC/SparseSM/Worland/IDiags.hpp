@@ -6,21 +6,13 @@
 #ifndef QUICC_SPARSESM_WORLAND_IDIAGS_HPP
 #define QUICC_SPARSESM_WORLAND_IDIAGS_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
 #include "QuICC/Precision.hpp"
+#include "QuICC/SparseSM/Worland/WorlandKind.hpp"
 
 namespace QuICC {
 
@@ -42,13 +34,18 @@ namespace Worland {
 
          /**
           * @brief Constructor
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
+          * @param l       Harmonic degree l
+          * @param q       Truncation q (only consider rows - q equations)
           */
-         IDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l);
+         IDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q);
 
          /**
           * @brief Destructor
           */
-         virtual ~IDiags();
+         virtual ~IDiags() = default;
          
       protected:
          /**
@@ -96,6 +93,21 @@ namespace Worland {
           * @param p Shift in l
           */
          ACoeff_t normalizeDiag(const ACoeff_t& n, const int k, const int p = 0) const;
+
+         /**
+          * @brief Zero last n entries of diagonal
+          */
+         void zeroLast(ACoeff_t& val, const int n) const;
+
+         /**
+          * @brief Type of Worland implementation
+          */
+         Worland::WorlandKind type() const;
+
+         /**
+          * @brief Truncation
+          */
+         const int mQ;
 
       private:
          /**

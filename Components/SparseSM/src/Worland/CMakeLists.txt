@@ -20,6 +20,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I6CylLaplhDiags.cpp
   R2.cpp
   R2Diags.cpp
+  Tools.cpp
 )
 
 add_subdirectory(Boundary)
@@ -27,3 +28,4 @@ add_subdirectory(Chebyshev)
 add_subdirectory(Legendre)
 add_subdirectory(CylEnergy)
 add_subdirectory(SphEnergy)
+add_subdirectory(Stencil)

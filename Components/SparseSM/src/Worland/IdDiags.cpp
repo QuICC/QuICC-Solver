@@ -8,9 +8,6 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/SparseSM/Worland/IdDiags.hpp"
@@ -25,7 +22,7 @@ namespace SparseSM {
 namespace Worland {
 
    IdDiags::IdDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
-      : IDiags(alpha, dBeta, l), mQ(q)
+      : IDiags(alpha, dBeta, l, q)
    {
    }
 

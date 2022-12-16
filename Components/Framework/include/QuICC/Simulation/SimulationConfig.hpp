@@ -46,11 +46,6 @@ namespace QuICC {
          ArrayI transformSetup() const;
 
          /**
-          * @brief Get the boundary setup flags
-          */
-         ArrayI boundarySetup() const;
-
-         /**
           * @brief Get the box scale read from the configuration file
           */
          Array boxScale() const;
@@ -88,7 +83,7 @@ namespace QuICC {
          /**
           * @brief Get the map of boundary conditions read from the configuration file
           */
-         const std::map<std::string, int>& boundary() const;
+         std::map<std::string, std::size_t> boundary() const;
 
          /**
           * @brief Get the map of boundary conditions read from the configuration file
@@ -109,6 +104,11 @@ namespace QuICC {
           * @brief ID of the timestepper
           */
          std::size_t timestepper() const;
+
+         /**
+          * @brief ID of the boundary condition scheme
+          */
+         std::size_t bcScheme() const;
 
       protected:
 

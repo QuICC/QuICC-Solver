@@ -1,5 +1,5 @@
 /** 
- * @file Diff2.cpp
+ * @file D2.cpp
  * @brief Source of the implementation of boundary value of second derivative
  */
 
@@ -11,7 +11,7 @@
 
 // Class include
 //
-#include "QuICC/SparseSM/Worland/Boundary/Diff2.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/D2.hpp"
 
 // Project includes
 //
@@ -24,12 +24,12 @@ namespace Worland {
 
 namespace Boundary {
 
-   Diff2::Diff2(const Scalar_t alpha, const Scalar_t dBeta, const int l)
-      : IDiags(alpha, dBeta, l), mBCk0(alpha, dBeta, l), mBCk1(alpha, dBeta, l+1), mBCk2(alpha, dBeta, l+2)
+   D2::D2(const Scalar_t alpha, const Scalar_t dBeta, const int l)
+      : IDiags(alpha, dBeta, l, 0), mBCk0(alpha, dBeta, l), mBCk1(alpha, dBeta, l+1), mBCk2(alpha, dBeta, l+2)
    {
    }
 
-   Diff2::ACoeff_t Diff2::compute(const int maxN)
+   D2::ACoeff_t D2::compute(const int maxN)
    {
       auto ab1 = this->alpha() + this->beta(this->l()) + MHD_MP(1.0);
       auto ab2 = this->alpha() + this->beta(this->l()) + MHD_MP(2.0);

@@ -26,9 +26,13 @@ namespace Worland {
 
 namespace Chebyshev {
 
-   I6CylLaplhDiags::I6CylLaplhDiags(const Scalar_t alpha, const int l)
-      : QuICC::SparseSM::Worland::I6CylLaplhDiags(alpha, MHD_MP(-0.5), l)
+   I6CylLaplhDiags::I6CylLaplhDiags(const Scalar_t alpha, const int l, const int q)
+      : QuICC::SparseSM::Worland::I6CylLaplhDiags(alpha, MHD_MP(-0.5), l, q)
    {
+      if(q > 0)
+      {
+         throw std::logic_error("I6CylLaplh: truncation for q>0 is not implemented");
+      }
    }
 
    I6CylLaplhDiags::ACoeff_t I6CylLaplhDiags::d_5(const ACoeff_t& n) const

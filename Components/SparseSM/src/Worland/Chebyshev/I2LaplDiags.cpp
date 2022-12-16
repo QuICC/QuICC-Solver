@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2LaplDiags.cpp
  * @brief Source of the implementation of the full sphere Worland I2LaplDiags sparse operator
  */
@@ -26,9 +26,15 @@ namespace Worland {
 
 namespace Chebyshev {
 
-   I2LaplDiags::I2LaplDiags(const Scalar_t alpha, const int l)
-      : QuICC::SparseSM::Worland::I2LaplDiags(alpha, MHD_MP(-0.5), l)
+   I2LaplDiags::I2LaplDiags(const Scalar_t alpha, const int l, const int q)
+      : QuICC::SparseSM::Worland::I2LaplDiags(alpha, MHD_MP(-0.5), l, q)
    {
+      // q <= 1 is equivalent to no truncation (already zero rows)
+
+      if(q > 1)
+      {
+         throw std::logic_error("I2Lapl: Truncation for q>1 is not implemented");
+      }
    }
 
    I2LaplDiags::ACoeff_t I2LaplDiags::d_1(const ACoeff_t& n) const

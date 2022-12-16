@@ -26,13 +26,13 @@ namespace Worland {
 
 namespace SphEnergy {
 
-   R2Diags::R2Diags(const Scalar_t alpha, const int l)
-      : QuICC::SparseSM::Worland::R2Diags(alpha, MHD_MP(0.5), l)
+   R2Diags::R2Diags(const Scalar_t alpha, const int l, const int q)
+      : QuICC::SparseSM::Worland::R2Diags(alpha, MHD_MP(0.5), l, q)
    {
-   }
-
-   R2Diags::~R2Diags()
-   {
+      if(q > 0)
+      {
+         throw std::logic_error("Truncation for q>0 is not implemented");
+      }
    }
 
    R2Diags::ACoeff_t R2Diags::d_1(const ACoeff_t& n) const

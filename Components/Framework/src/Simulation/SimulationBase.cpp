@@ -29,6 +29,7 @@
 #include "QuICC/QuICCTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Simulation/SimulationIoTools.hpp"
+#include "QuICC/Bc/Scheme/Galerkin.hpp"
 
 namespace QuICC {
 
@@ -88,7 +89,7 @@ namespace QuICC {
 
       cfg = this->config().physical();
 
-      if(this->config().boundarySetup()(0) == 1)
+      if(this->config().bcScheme() == Bc::Scheme::Galerkin::id())
       {
          features.insert(SpatialScheme::Feature::GalerkinBasis);
       }

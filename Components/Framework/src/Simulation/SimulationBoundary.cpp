@@ -21,7 +21,7 @@
 
 namespace QuICC {
 
-   SimulationBoundary::SimulationBoundary(const std::map<std::string,int>& bcIds)
+   SimulationBoundary::SimulationBoundary(const std::map<std::string,std::size_t>& bcIds)
    {
       this->convert(bcIds);
    }
@@ -30,7 +30,7 @@ namespace QuICC {
    {
    }
 
-   void SimulationBoundary::convert(const std::map<std::string,int>& bcIds)
+   void SimulationBoundary::convert(const std::map<std::string,std::size_t>& bcIds)
    {
       for(auto mapIt = bcIds.cbegin(); mapIt != bcIds.cend(); ++mapIt)
       {
@@ -41,19 +41,12 @@ namespace QuICC {
 
    }
 
-   std::map<std::string,int>  SimulationBoundary::getTagMap() const
+   const std::map<std::size_t,std::size_t>& SimulationBoundary::map() const
    {
-      std::map<std::string,int>  tagMap;
-
-      for(auto mapIt = this->mBcs.cbegin(); mapIt != this->mBcs.cend(); ++mapIt)
-      {
-         tagMap.insert(std::make_pair(PhysicalNames::Coordinator::tag(mapIt->first), mapIt->second));
-      }
-
-      return tagMap;
+      return this->mBcs;
    }
 
-   int  SimulationBoundary::bcId(const std::size_t id) const
+   std::size_t SimulationBoundary::bcId(const std::size_t id) const
    {
       assert(this->mBcs.count(id) > 0);
       return this->mBcs.at(id);

@@ -26,13 +26,13 @@ namespace Worland {
 
 namespace CylEnergy {
 
-   I4Diags::I4Diags(const Scalar_t alpha, const int l)
-      : QuICC::SparseSM::Worland::I4Diags(alpha, MHD_MP(0.0), l)
+   I4Diags::I4Diags(const Scalar_t alpha, const int l, const int q)
+      : QuICC::SparseSM::Worland::I4Diags(alpha, MHD_MP(0.0), l, q)
    {
-   }
-
-   I4Diags::~I4Diags()
-   {
+      if(q > 0)
+      {
+         throw std::logic_error("Truncation for q>0 is not implemented");
+      }
    }
 
    I4Diags::ACoeff_t I4Diags::d_4(const ACoeff_t& n) const

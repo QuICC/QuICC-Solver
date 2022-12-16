@@ -22,7 +22,7 @@
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
-#include "QuICC/SparseSM/Worland/Boundary/Diff2.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/D2.hpp"
 #include "QuICC/SparseSM/Worland/Id.hpp"
 #include "QuICC/SparseSM/Worland/I2.hpp"
 #include "QuICC/SparseSM/Worland/I4.hpp"
@@ -161,7 +161,7 @@ namespace Timestep {
             std::vector<Eigen::Triplet<MHDFloat> > coeffs;
             SparseSM::Worland::Boundary::Value bcValue(w_a, w_db, l);
             auto bcVal = bcValue.compute(nN-1).cast<MHDFloat>();
-            SparseSM::Worland::Boundary::Diff2 bcDiff2(w_a, w_db, l);
+            SparseSM::Worland::Boundary::D2 bcDiff2(w_a, w_db, l);
             auto bcD2 = bcDiff2.compute(nN-1).cast<MHDFloat>();
             for(int i = 0; i < nN; i++)
             {

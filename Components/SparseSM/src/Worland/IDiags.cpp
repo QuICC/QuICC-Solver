@@ -19,6 +19,7 @@
 // Project includes
 //
 #include "QuICC/Math/Constants.hpp"
+#include "QuICC/SparseSM/Worland/Tools.hpp"
 
 namespace QuICC {
 
@@ -26,13 +27,21 @@ namespace SparseSM {
 
 namespace Worland {
 
-   IDiags::IDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l)
-      : mAlpha(alpha), mDBeta(dBeta), mL(static_cast<Scalar_t>(l))
+   IDiags::IDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
+      : mQ(q), mAlpha(alpha), mDBeta(dBeta), mL(static_cast<Scalar_t>(l))
    {
    }
 
-   IDiags::~IDiags()
+   void IDiags::zeroLast(IDiags::ACoeff_t& val, const int n) const
    {
+      if(this->mQ > 0)
+      {
+         if(n > 0)
+         {
+            int size = val.size();
+            val.bottomRows(std::min(size, n)).setZero();
+         }
+      }
    }
 
    IDiags::Scalar_t IDiags::alpha() const
@@ -120,6 +129,11 @@ namespace Worland {
       ACoeff_t norm = -MHD_MP(0.5)*(MHD_MP(2.0)*(MHD_MP(2.0)*n + b + MHD_MP(1.0))).log();
 
       return norm;
+   }
+
+   WorlandKind IDiags::type() const
+   {
+      return Tools::identifyBasis(this->mAlpha, this->mDBeta);
    }
 
 }

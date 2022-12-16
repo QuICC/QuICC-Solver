@@ -11,6 +11,8 @@ include(cmake.d/setup/RegisterTransformReductor.cmake)
 include(cmake.d/setup/RegisterTransformPath.cmake)
 include(cmake.d/setup/RegisterTimestepId.cmake)
 include(cmake.d/setup/RegisterTimestepRegister.cmake)
+include(cmake.d/setup/RegisterBcScheme.cmake)
+include(cmake.d/setup/RegisterBcName.cmake)
 
 # Create component library
 add_library(${QUICC_CURRENT_COMPONENT_LIB} "")

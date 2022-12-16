@@ -8,9 +8,6 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/SparseSM/Worland/I4D1R1.hpp"
@@ -28,7 +25,7 @@ namespace SparseSM {
 
 namespace Worland {
 
-   I4D1R1::I4D1R1(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l)
+   I4D1R1::I4D1R1(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
       : IWorlandOperator(rows, cols, alpha, dBeta)
    {
       if(l != 1)
@@ -38,20 +35,20 @@ namespace Worland {
 
       switch(this->type())
       {
-         case CHEBYSHEV:
-            this->mpImpl = std::make_shared<Chebyshev::I4D1R1Diags>(alpha, l);
+         case WorlandKind::CHEBYSHEV:
+            this->mpImpl = std::make_shared<Chebyshev::I4D1R1Diags>(alpha, l, q);
             break;
-         case LEGENDRE:
+         case WorlandKind::LEGENDRE:
             throw std::logic_error("Operator is not implemented for Legendre type");
-            //this->mpImpl = std::make_shared<Legendre::I4D1R1Diags>(alpha, l);
+            //this->mpImpl = std::make_shared<Legendre::I4D1R1Diags>(alpha, l, q);
             break;
-         case CYLENERGY:
+         case WorlandKind::CYLENERGY:
             throw std::logic_error("Operator is not implemented for CylEnergy type");
-            //this->mpImpl = std::make_shared<CylEnergy::I4D1R1Diags>(alpha, l);
+            //this->mpImpl = std::make_shared<CylEnergy::I4D1R1Diags>(alpha, l, q);
             break;
-         case SPHENERGY:
+         case WorlandKind::SPHENERGY:
             throw std::logic_error("Operator is not implemented for SphEnergy type");
-            //this->mpImpl = std::make_shared<SphEnergy::I4D1R1Diags>(alpha, l);
+            //this->mpImpl = std::make_shared<SphEnergy::I4D1R1Diags>(alpha, l, q);
             break;
       }
    }

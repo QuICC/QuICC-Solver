@@ -8,9 +8,6 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/SparseSM/Worland/I2Lapl.hpp"
@@ -28,23 +25,23 @@ namespace SparseSM {
 
 namespace Worland {
 
-   I2Lapl::I2Lapl(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l)
+   I2Lapl::I2Lapl(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
       : IWorlandOperator(rows, cols, alpha, dBeta)
    {
       switch(this->type())
       {
-         case CHEBYSHEV:
-            this->mpImpl = std::make_shared<Chebyshev::I2LaplDiags>(alpha, l);
+         case WorlandKind::CHEBYSHEV:
+            this->mpImpl = std::make_shared<Chebyshev::I2LaplDiags>(alpha, l, q);
             break;
-         case LEGENDRE:
+         case WorlandKind::LEGENDRE:
             //this->mpImpl = std::make_shared<Legendre::I2LaplDiags>(alpha, l);
             throw std::logic_error("Not yet implemented");
             break;
-         case CYLENERGY:
+         case WorlandKind::CYLENERGY:
             //this->mpImpl = std::make_shared<CylEnergy::I2LaplDiags>(alpha, l);
             throw std::logic_error("Not yet implemented");
             break;
-         case SPHENERGY:
+         case WorlandKind::SPHENERGY:
             //this->mpImpl = std::make_shared<SphEnergy::I2LaplDiags>(alpha, l);
             throw std::logic_error("Not yet implemented");
             break;

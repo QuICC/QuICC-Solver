@@ -82,10 +82,6 @@ namespace QuICC {
    typedef Eigen::SparseMatrix<MHDComplex>   SparseMatrixZ;
    /// Typedef for a decoupled real/imaginary complex sparse matrix
    typedef Datatypes::DecoupledComplex<SparseMatrix> DecoupledZSparse;
-   /// Typedef for the real triplets used to initialise sparse real matrices
-   typedef Eigen::Triplet<MHDFloat>   Triplet;
-   /// Typedef for the complex triplets used to initialise sparse complex matrices
-   typedef Eigen::Triplet<MHDComplex>   TripletZ;
    //@}
 
    /**

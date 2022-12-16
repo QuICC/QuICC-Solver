@@ -42,7 +42,7 @@ namespace Variable {
       return this->mSpaceId;
    }
 
-   void IVariableAsciiWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,int>& boundary)
+   void IVariableAsciiWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,std::size_t>& boundary)
    {
       // Convert parameters to NonDimensional numbers
       for(auto it = parameters.cbegin(); it != parameters.cend(); ++it)

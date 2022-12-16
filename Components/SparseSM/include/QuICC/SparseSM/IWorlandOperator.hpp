@@ -16,13 +16,11 @@
 //
 #include <vector>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/SparseSM/ISparseSMOperator.hpp"
+#include "QuICC/SparseSM/Worland/WorlandKind.hpp"
 
 namespace QuICC {
 
@@ -45,23 +43,16 @@ namespace SparseSM {
          virtual ~IWorlandOperator();
          
       protected:
-         enum WorlandType {
-            CHEBYSHEV,
-            LEGENDRE,
-            CYLENERGY,
-            SPHENERGY,
-         };
-
          /**
           * @brief Type of Worland implementation
           */
-         WorlandType type() const;
+         Worland::WorlandKind type() const;
 
       private:
          /**
           * Type of Worland implementation
           */
-         WorlandType mType;
+         Worland::WorlandKind mType;
    };
 
 }

@@ -426,6 +426,8 @@ namespace PyQuICC {
 
    void Tools::fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat)
    {
+      typedef Eigen::Triplet<MHDFloat>   Triplet;
+
       PyObject *pValue, *pTmp;
 
       // Get matrix size
@@ -460,6 +462,8 @@ namespace PyQuICC {
 
    void Tools::fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat)
    {
+      typedef Eigen::Triplet<MHDFloat>   Triplet;
+
       PyObject *pValue, *pTmp;
 
       // Get matrix size

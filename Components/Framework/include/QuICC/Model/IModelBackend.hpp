@@ -41,7 +41,7 @@ namespace Model {
          /// List of field ids
          typedef std::vector<SpectralFieldId> SpectralFieldIds;
          /// Map for boundary conditions
-         typedef std::map<std::string,int> BcMap;
+         typedef std::map<std::size_t,std::size_t> BcMap;
 
          /**
           * @brief Constructor

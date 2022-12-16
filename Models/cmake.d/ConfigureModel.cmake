@@ -48,6 +48,17 @@ function(quicc_add_model target)
     target_link_libraries(${modLib} PUBLIC
       ${QUICC_CURRENT_MODEL_LIB}
       )
+
+    string(TOUPPER "QUICC_MODEL_${modName}_${type}_BACKEND" _modBackend)
+    quicc_create_option(
+      NAME ${_modBackend}
+      OPTS "Python" "CPP"
+      LABEL "Backend used for model definition"
+      )
+    if(${_modBackend} STREQUAL "CPP")
+      quicc_target_add_definition(${modLib}
+        PUBLIC OPTION ${_modBackend})
+    endif()
   endforeach()
 
   # Update python files

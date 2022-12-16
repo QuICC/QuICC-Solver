@@ -8,15 +8,13 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/SparseSM/Worland/I2.hpp"
 
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/WorlandKind.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/I2Diags.hpp"
 #include "QuICC/SparseSM/Worland/Legendre/I2Diags.hpp"
 #include "QuICC/SparseSM/Worland/CylEnergy/I2Diags.hpp"
@@ -28,22 +26,22 @@ namespace SparseSM {
 
 namespace Worland {
 
-   I2::I2(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l)
+   I2::I2(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
       : IWorlandOperator(rows, cols, alpha, dBeta)
    {
       switch(this->type())
       {
-         case CHEBYSHEV:
-            this->mpImpl = std::make_shared<Chebyshev::I2Diags>(alpha, l);
+         case WorlandKind::CHEBYSHEV:
+            this->mpImpl = std::make_shared<Chebyshev::I2Diags>(alpha, l, q);
             break;
-         case LEGENDRE:
-            this->mpImpl = std::make_shared<Legendre::I2Diags>(alpha, l);
+         case WorlandKind::LEGENDRE:
+            this->mpImpl = std::make_shared<Legendre::I2Diags>(alpha, l, q);
             break;
-         case CYLENERGY:
-            this->mpImpl = std::make_shared<CylEnergy::I2Diags>(alpha, l);
+         case WorlandKind::CYLENERGY:
+            this->mpImpl = std::make_shared<CylEnergy::I2Diags>(alpha, l, q);
             break;
-         case SPHENERGY:
-            this->mpImpl = std::make_shared<SphEnergy::I2Diags>(alpha, l);
+         case WorlandKind::SPHENERGY:
+            this->mpImpl = std::make_shared<SphEnergy::I2Diags>(alpha, l, q);
             break;
       }
    }

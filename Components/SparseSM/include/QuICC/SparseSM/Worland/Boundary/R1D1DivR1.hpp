@@ -1,10 +1,10 @@
 /** 
- * @file Diff2.hpp
- * @brief Implementation of the boundary value of second derivative for Worland polynomials
+ * @file R1D1DivR1.hpp
+ * @brief Implementation of the boundary value of r D 1/r for Worland polynomials
  */
 
-#ifndef QUICC_SPARSESM_WORLAND_BOUNDARY_DIFF2_HPP
-#define QUICC_SPARSESM_WORLAND_BOUNDARY_DIFF2_HPP
+#ifndef QUICC_SPARSESM_WORLAND_BOUNDARY_R1D1DIVR1_HPP
+#define QUICC_SPARSESM_WORLAND_BOUNDARY_R1D1DIVR1_HPP
 
 // System includes
 //
@@ -12,8 +12,8 @@
 // Project includes
 //
 #include "QuICC/Precision.hpp"
-#include "QuICC/SparseSM//Worland/I2Diags.hpp"
-#include "QuICC/SparseSM//Worland/Boundary/Value.hpp"
+#include "QuICC/SparseSM/Worland/I2Diags.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
 
 namespace QuICC {
 
@@ -24,20 +24,24 @@ namespace Worland {
 namespace Boundary {
 
    /**
-    * @brief Implementation of the boundary value of second derivative for Worland polynomial
+    * @brief Implementation of the boundary value of r D 1/r for Worland polynomial
     */ 
-   class Diff2: public IDiags
+   class R1D1DivR1: public IDiags
    {
       public:
          /**
           * @brief Constructor for specific alpha,beta pair
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
+          * @param l       Harmonic degree l
           */
-         Diff2(const Scalar_t alpha, const Scalar_t dBeta, const int l);
+         R1D1DivR1(const Scalar_t alpha, const Scalar_t dBeta, const int l);
 
          /**
           * @brief Destructor
           */
-         ~Diff2() = default;
+         ~R1D1DivR1() = default;
 
          /**
           * @brief Compute list of boundary values
@@ -57,11 +61,6 @@ namespace Boundary {
           */
          Value mBCk1;
 
-         /**
-          * @brief Boundary value for k = 2, l = l+2
-          */
-         Value mBCk2;
-
    };
 
 } // Boundary
@@ -69,4 +68,4 @@ namespace Boundary {
 } // SparseSM
 } // QuICC
 
-#endif // QUICC_SPARSESM_WORLAND_BOUNDARY_DIFF2_HPP
+#endif // QUICC_SPARSESM_WORLAND_BOUNDARY_R1D1DIVR1_HPP

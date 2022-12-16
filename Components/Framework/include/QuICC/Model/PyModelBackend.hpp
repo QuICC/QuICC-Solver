@@ -96,6 +96,11 @@ namespace Model {
 
       protected:
          /**
+          * @brief Convert to boundary condition map to Python IDs
+          */
+         std::map<std::string,int> getPyBcMap(const BcMap& bcs) const;
+
+         /**
           * @brief Build base arguments for Python wrapper
           */
          PyObject*  baseArguments(const int tupleSize, const std::size_t bcType, const Resolution& res, const std::vector<MHDFloat>& eigs, BcMap bcs, const NonDimensional::NdMap& nds) const;

@@ -6,16 +6,7 @@
 #ifndef QUICC_SPARSESM_WORLAND_CHEBYSHEV_I2LAPLDIAGS_HPP
 #define QUICC_SPARSESM_WORLAND_CHEBYSHEV_I2LAPLDIAGS_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -39,8 +30,12 @@ namespace Chebyshev {
       public:
          /**
           * @brief Constructor
+          *
+          * @param alpha   Jacobi alpha
+          * @param l       Harmonic degree
+          * @param q       Truncation q
           */
-         I2LaplDiags(const Scalar_t alpha, const int l);
+         I2LaplDiags(const Scalar_t alpha, const int l, const int q);
 
          /**
           * @brief Destructor
@@ -49,16 +44,22 @@ namespace Chebyshev {
 
          /**
           * @brief 1. subdiagonal
+          *
+          * @param n Array of n indexes
           */
          ACoeff_t d_1(const ACoeff_t& n) const final;
 
          /**
           * @brief Main diagonal
+          *
+          * @param n Array of n indexes
           */
          ACoeff_t d0(const ACoeff_t& n) const final;
 
          /**
           * @brief 1. superdiagonal
+          *
+          * @param n Array of n indexes
           */
          ACoeff_t d1(const ACoeff_t& n) const final;
 

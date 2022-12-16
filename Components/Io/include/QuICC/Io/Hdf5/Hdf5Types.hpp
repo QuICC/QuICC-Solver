@@ -97,6 +97,14 @@ namespace Hdf5 {
    }
 
    /**
+    * @brief Specialised method for std:string type
+    */
+   template <> inline hid_t Hdf5Types::type<std::string>()
+   {
+      return H5T_C_S1;
+   }
+
+   /**
     * @brief Specialised method for float type
     */
    template <> inline hid_t Hdf5Types::type<float>()

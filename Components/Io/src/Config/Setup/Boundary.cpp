@@ -41,7 +41,7 @@ namespace Setup {
 
    void Boundary::init()
    {
-      this->iTags().addTag("scheme", 0);
+      this->sTags().addTag("scheme", "tau");
    }
 
    void Boundary::checkData()

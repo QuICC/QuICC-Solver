@@ -19,6 +19,10 @@
 #include "QuICC/Enums/SplittingTools.hpp"
 #include "QuICC/Timestep/Id/Coordinator.hpp"
 #include "QuICC/Timestep/Id/registerAll.hpp"
+#include "QuICC/Bc/Scheme/Coordinator.hpp"
+#include "QuICC/Bc/Scheme/registerAll.hpp"
+#include "QuICC/Bc/Name/Coordinator.hpp"
+#include "QuICC/Bc/Name/registerAll.hpp"
 
 namespace QuICC {
 
@@ -70,25 +74,6 @@ namespace QuICC {
       }
 
       return impl;
-   }
-
-   ArrayI SimulationConfig::boundarySetup() const
-   {
-      auto nodeId = Io::Config::Setup::BOUNDARY;
-
-      // Get map
-      int dim = this->mspCfgFile->spSetup()->spNode(nodeId)->iTags().size();
-
-      ArrayI tags(dim);
-      int i = 0;
-      auto range = this->mspCfgFile->spSetup()->spNode(nodeId)->iTags().crange();
-      for(auto it = range.first; it != range.second; ++it)
-      {
-         tags(i) = it->second;
-         i++;
-      }
-
-      return tags;
    }
 
    Array SimulationConfig::boxScale() const
@@ -167,12 +152,42 @@ namespace QuICC {
       return this->mspCfgFile->rspSimulation()->rspNode(Io::Config::Simulation::PHYSICAL)->fTags().rMap();
    }
 
-   const std::map<std::string, int>& SimulationConfig::boundary() const
+   std::map<std::string, std::size_t> SimulationConfig::boundary() const
    {
       // Safety assert for non NULL pointer
       assert(this->mspCfgFile);
 
-      return this->mspCfgFile->spSimulation()->spNode(Io::Config::Simulation::BOUNDARY)->iTags().map();
+      auto s = this->mspCfgFile->spSimulation()->spNode(Io::Config::Simulation::BOUNDARY)->sTags().map();
+      std::map<std::string, std::size_t> bcMap;
+
+      // Register all boundary condition names
+      Bc::Name::registerAll();
+
+      for(auto bc: s)
+      {
+         auto s = bc.second;
+         std::string tag = s;
+         std::transform(s.cbegin(), s.cend(), tag.begin(), [](unsigned char c) { return std::tolower(c); });
+
+         std::size_t id = 0;
+         for(auto&& e: Bc::Name::Coordinator::map())
+         {
+            if(Bc::Name::Coordinator::tag(e.first) == tag)
+            {
+               id = e.first;
+               break;
+            }
+         }
+
+         if(id == 0)
+         {
+            throw std::logic_error("boundary condition was not recognized");
+         }
+
+         bcMap.emplace(std::make_pair(bc.first, id));
+      }
+
+      return bcMap;
    }
 
    const std::map<std::string, int>& SimulationConfig::model(const std::string tag) const
@@ -245,6 +260,36 @@ namespace QuICC {
       if(id == 0)
       {
          throw std::logic_error("timestepper scheme was not recognized");
+      }
+
+      return id;
+   }
+
+   std::size_t SimulationConfig::bcScheme() const
+   {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
+      auto s = this->mspCfgFile->spSetup()->spNode(Io::Config::Setup::BOUNDARY)->sTags().value("scheme");
+      std::string tag = s;
+      std::transform(s.cbegin(), s.cend(), tag.begin(), [](unsigned char c) { return std::tolower(c); });
+
+      // Register all boundary condition scheme IDs
+      Bc::Scheme::registerAll();
+
+      std::size_t id = 0;
+      for(auto&& e: Bc::Scheme::Coordinator::map())
+      {
+         if(Bc::Scheme::Coordinator::tag(e.first) == tag)
+         {
+            id = e.first;
+            break;
+         }
+      }
+
+      if(id == 0)
+      {
+         throw std::logic_error("boundary condition scheme was not recognized");
       }
 
       return id;

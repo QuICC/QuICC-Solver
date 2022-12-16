@@ -188,7 +188,7 @@ namespace QuICC {
 
       // Create physical parameters map
       std::map<std::string,MHDFloat> phys = this->config().physical();
-      std::map<std::string,int> boundary = this->config().boundary();
+      std::map<std::string,std::size_t> boundary = this->config().boundary();
 
       // Iterate over all ASCII writer
       for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)

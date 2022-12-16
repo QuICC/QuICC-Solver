@@ -30,6 +30,11 @@
 #include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/Tools/IdToHuman.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
+#include "QuICC/Bc/Name/NoSlip.hpp"
+#include "QuICC/Bc/Name/StressFree.hpp"
+#include "QuICC/Bc/Name/FixedTemperature.hpp"
+#include "QuICC/Bc/Name/FixedFlux.hpp"
+#include "QuICC/Bc/Name/Insulating.hpp"
 
 namespace QuICC {
 
@@ -189,6 +194,45 @@ namespace Model {
       Py_DECREF(pValue);
    }
 
+   std::map<std::string,int> PyModelBackend::getPyBcMap(const BcMap& bcs) const
+   {
+      std::map<std::string,int> m;
+
+      for(auto bc: bcs)
+      {
+         auto physId = PhysicalNames::Coordinator::tag(bc.first);
+         int bcVal = -1;
+         if(bc.second == Bc::Name::NoSlip::id())
+         {
+            bcVal = 0;
+         }
+         else if(bc.second == Bc::Name::StressFree::id())
+         {
+            bcVal = 1;
+         }
+         else if(bc.second == Bc::Name::FixedTemperature::id())
+         {
+            bcVal = 0;
+         }
+         else if(bc.second == Bc::Name::FixedFlux::id())
+         {
+            bcVal = 1;
+         }
+         else if(bc.second == Bc::Name::Insulating::id())
+         {
+            bcVal = 0;
+         }
+         else
+         {
+            throw std::logic_error("Conversion of boundary condition name to python flag is unknown");
+         }
+
+         m.emplace(std::pair(physId, bcVal));
+      }
+
+      return m;
+   }
+
    void PyModelBackend::operatorInfo(ArrayI& tauN, ArrayI& galN, MatrixI& galShift, ArrayI& rhsCols, ArrayI& sysN, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs) const
    {
       PyObject *pArgs, *pTmp, *pValue;
@@ -197,7 +241,8 @@ namespace Model {
       pArgs = PyTuple_New(4);
 
       // Get boundary conditions
-      pValue = PyQuICC::Tools::makeDict(bcs);
+      auto pyBcs = this->getPyBcMap(bcs);
+      pValue = PyQuICC::Tools::makeDict(pyBcs);
       PyTuple_SetItem(pArgs, 2, pValue);
 
       // Get field
@@ -263,7 +308,8 @@ namespace Model {
       PyTuple_SetItem(pArgs, 2, pValue);
 
       // Get boundary conditions
-      pValue = PyQuICC::Tools::makeDict(bcs);
+      auto pyBcs = this->getPyBcMap(bcs);
+      pValue = PyQuICC::Tools::makeDict(pyBcs);
       // ... append boundary type
       std::map<std::string,std::string> bcsStr;
       bcsStr.insert(std::make_pair("bcType", ModelOperatorBoundary::Coordinator::tag(bcType)));

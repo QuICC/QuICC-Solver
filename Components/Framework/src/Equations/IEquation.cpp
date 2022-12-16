@@ -360,7 +360,7 @@ namespace Equations {
       MatrixI galerkinShifts(nMat, 3);
       ArrayI rhsCols(nMat);
       ArrayI systemNs(nMat);
-      this->backend().operatorInfo(tauNs, galerkinNs, galerkinShifts, rhsCols, systemNs, fId, res, infoIt.first->second.couplingTools(), this->bcIds().getTagMap());
+      this->backend().operatorInfo(tauNs, galerkinNs, galerkinShifts, rhsCols, systemNs, fId, res, infoIt.first->second.couplingTools(), this->bcIds().map());
 
       infoIt.first->second.couplingTools().setTauN(tauNs, res);
       infoIt.first->second.couplingTools().setGalerkinN(galerkinNs, res);
@@ -374,19 +374,19 @@ namespace Equations {
       // Get list of implicit fields
       CouplingInformation::FieldId_range imRange = this->couplingInfo(compId).implicitRange();
 
-      this->backend().modelMatrix(rModelMatrix, opId, imRange, matIdx, bcType, res, eigs, this->bcIds().getTagMap(), this->eqParams().map());
+      this->backend().modelMatrix(rModelMatrix, opId, imRange, matIdx, bcType, res, eigs, this->bcIds().map(), this->eqParams().map());
    }
 
    void IEquation::dispatchGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const Resolution& res, const std::vector<MHDFloat>& eigs, const bool makeSquare) const
    {
       auto fId = std::make_pair(this->name(), compId);
-      this->backend().galerkinStencil(mat, fId, matIdx, res, eigs, makeSquare, this->bcIds().getTagMap(), this->eqParams().map());
+      this->backend().galerkinStencil(mat, fId, matIdx, res, eigs, makeSquare, this->bcIds().map(), this->eqParams().map());
    }
 
    void IEquation::dispatchExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::size_t opId,  const SpectralFieldId fieldId, const int matIdx, const Resolution& res, const std::vector<MHDFloat>& eigs) const
    {
       auto fId = std::make_pair(this->name(), compId);
-      this->backend().explicitBlock(mat, fId, opId, fieldId, matIdx, res, eigs, this->bcIds().getTagMap(), this->eqParams().map());
+      this->backend().explicitBlock(mat, fId, opId, fieldId, matIdx, res, eigs, this->bcIds().map(), this->eqParams().map());
    }
 
    void IEquation::setGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const

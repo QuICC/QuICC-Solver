@@ -8,9 +8,6 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/SparseSM/Worland/I6CylLaplhDiags.hpp"
@@ -24,12 +21,8 @@ namespace SparseSM {
 
 namespace Worland {
 
-   I6CylLaplhDiags::I6CylLaplhDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l)
-      : IDiags(alpha, dBeta, l)
-   {
-   }
-
-   I6CylLaplhDiags::~I6CylLaplhDiags()
+   I6CylLaplhDiags::I6CylLaplhDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
+      : IDiags(alpha, dBeta, l, q)
    {
    }
 

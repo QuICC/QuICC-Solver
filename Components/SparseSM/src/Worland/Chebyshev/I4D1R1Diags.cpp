@@ -26,9 +26,13 @@ namespace Worland {
 
 namespace Chebyshev {
 
-   I4D1R1Diags::I4D1R1Diags(const Scalar_t alpha, const int l)
-      : QuICC::SparseSM::Worland::I4D1R1Diags(alpha, MHD_MP(-0.5), l)
+   I4D1R1Diags::I4D1R1Diags(const Scalar_t alpha, const int l, const int q)
+      : QuICC::SparseSM::Worland::I4D1R1Diags(alpha, MHD_MP(-0.5), l, q)
    {
+      if(q > 0)
+      {
+         throw std::logic_error("I4D1R1: truncation for q>0 is not implemented");
+      }
    }
 
    I4D1R1Diags::ACoeff_t I4D1R1Diags::d_3(const ACoeff_t& n) const

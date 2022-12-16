@@ -6,16 +6,7 @@
 #ifndef QUICC_SPARSESM_WORLAND_IDDIAGS_HPP
 #define QUICC_SPARSESM_WORLAND_IDDIAGS_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -37,6 +28,11 @@ namespace Worland {
       public:
          /**
           * @brief Constructor
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
+          * @param l       Harmonic degree l
+          * @param q       Truncation q (only consider rows - q equations)
           */
          IdDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q);
 
@@ -47,14 +43,12 @@ namespace Worland {
 
          /**
           * @brief Main diagonal
+          *
+          * @param n Array of n indexes
           */
          virtual ACoeff_t d0(const ACoeff_t& n) const;
 
       protected:
-         /**
-          * @brief Restriction size
-          */
-         const int mQ;
 
       private:
    };

@@ -24,6 +24,7 @@
 #include "QuICC/NonDimensional/Coordinator.hpp"
 #include "QuICC/Io/Variable/Tags/VariableHdf5.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
+#include "QuICC/Bc/Name/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -45,7 +46,7 @@ namespace Variable {
       return this->mSpaceId;
    }
 
-   void IVariableHdf5NWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,int>& boundary)
+   void IVariableHdf5NWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,std::size_t>& boundary)
    {
       // Convert parameters to NonDimensional numbers
       for(auto it = parameters.cbegin(); it != parameters.cend(); ++it)
@@ -288,7 +289,7 @@ namespace Variable {
       for(auto it = this->mBoundary.cbegin(); it != this->mBoundary.cend(); ++it)
       {
          // Write reached simulation time to file
-         this->writeScalar(group, it->first, it->second);
+         this->writeString(group, it->first, Bc::Name::Coordinator::tag(it->second));
       }
 
       // close group

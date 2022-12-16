@@ -42,7 +42,7 @@ namespace Stats {
       return this->mSpaceId;
    }
 
-   void IStatisticsAsciiWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,int>& boundary)
+   void IStatisticsAsciiWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,std::size_t>& boundary)
    {
       // Convert parameters to NonDimensional numbers
       for(auto it = parameters.cbegin(); it != parameters.cend(); ++it)

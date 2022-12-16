@@ -26,13 +26,13 @@ namespace Worland {
 
 namespace CylEnergy {
 
-   I6Diags::I6Diags(const Scalar_t alpha, const int l)
-      : QuICC::SparseSM::Worland::I6Diags(alpha, MHD_MP(0.0), l)
+   I6Diags::I6Diags(const Scalar_t alpha, const int l, const int q)
+      : QuICC::SparseSM::Worland::I6Diags(alpha, MHD_MP(0.0), l, q)
    {
-   }
-
-   I6Diags::~I6Diags()
-   {
+      if(q > 0)
+      {
+         throw std::logic_error("Truncation for q>0 is not implemented");
+      }
    }
 
    I6Diags::ACoeff_t I6Diags::d_6(const ACoeff_t& n) const

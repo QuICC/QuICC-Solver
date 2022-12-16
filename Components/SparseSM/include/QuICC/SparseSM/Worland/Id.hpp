@@ -6,16 +6,7 @@
 #ifndef QUICC_SPARSESM_WORLAND_ID_HPP
 #define QUICC_SPARSESM_WORLAND_ID_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -38,8 +29,16 @@ namespace Worland {
       public:
          /**
           * @brief Constructor
+          *
+          * @param rows    Number of row
+          * @param cols    Number of cols
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
+          * @param l       Harmonic degree l
+          * @param q       Truncation q (only consider rows - q equations)
+          * @param s Shift of main diagonal
           */
-         Id(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q);
+         Id(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q = 0, const int s = 0);
 
          /**
           * @brief Destructor
@@ -51,6 +50,8 @@ namespace Worland {
       private:
          /**
           * @brief Build triplet representation of matrix
+          *
+          * @param list List of triplets (row, col, value)
           */
          virtual void buildTriplets(TripletList_t& list) const override;
 
@@ -58,6 +59,11 @@ namespace Worland {
           * @brief Implementation of the diagonals
           */
          std::shared_ptr<IdDiags> mpImpl;
+
+         /**
+          * @brief Shift of main diagonal
+          */
+         int mShift;
    };
 
 }

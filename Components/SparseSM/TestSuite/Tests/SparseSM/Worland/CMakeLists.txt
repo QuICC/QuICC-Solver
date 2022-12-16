@@ -33,7 +33,7 @@ quicc_fetch_test_reference(
 
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
-# Create Chebyshev basis tests targets
+# Create Worland basis tests targets
 include(ConfigureTests)
 set(_tests
   R2:sparse
@@ -53,7 +53,7 @@ foreach(_test ${_tests})
   )
 endforeach()
 
-# Create Chebyshev basis tests targets
+# Create Worland basis tests targets
 set(_tests
   R2:sparse
   )
@@ -66,7 +66,7 @@ foreach(_test ${_tests})
   )
 endforeach()
 
-# Create Chebyshev basis tests targets
+# Create Worland basis tests targets
 set(_tests
   I2:sparse
   I2Lapl:sparse
@@ -80,7 +80,7 @@ foreach(_test ${_tests})
   )
 endforeach()
 
-# Create Chebyshev basis tests targets
+# Create Worland basis tests targets
 set(_tests
   I4:sparse
   I4Lapl:sparse

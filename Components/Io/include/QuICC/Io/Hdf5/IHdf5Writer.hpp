@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IHdf5Writer.hpp
  * @brief Interface to a general HDF5 writer
  */
@@ -67,7 +67,7 @@ namespace Hdf5 {
           * @brief Finalise the file
           */
          virtual void finalize() = 0;
-         
+
       protected:
          /**
           * @brief Number of blocks to read
@@ -93,6 +93,17 @@ namespace Hdf5 {
           * @brief Create the file info (header, type and version)
           */
          void createFileInfo();
+
+         /**
+          * @brief Write std::string dataset
+          *
+          * \warning In the MPI case only the IO node is going to write data
+          *
+          * @param loc     Base location in HDF5 file
+          * @param dsname  HDF5 dataset name
+          * @param str     String to write
+          */
+         void writeString(hid_t loc, const std::string dsname, const std::string str);
 
          /**
           * @brief Write scalar dataset
@@ -213,7 +224,7 @@ namespace Hdf5 {
       {
          H5Dwrite(dataset, type, memspace, filespace, H5P_DEFAULT, arr.data());
       }
-      
+
       // Close memspace
       H5Sclose(memspace);
 
@@ -248,7 +259,7 @@ namespace Hdf5 {
       {
          H5Dwrite(dataset, type, memspace, filespace, H5P_DEFAULT, mat.data());
       }
-      
+
       // Close memspace
       H5Sclose(memspace);
 
@@ -273,7 +284,7 @@ namespace Hdf5 {
       // Create dataset in file
       hid_t dataset = H5Dcreate(loc, dsname.c_str(), type, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-      // Memory dataspace 
+      // Memory dataspace
       hid_t  memspace;
 
       // Create offset storage
@@ -369,7 +380,7 @@ namespace Hdf5 {
       // Create dataset in file
       hid_t dataset = H5Dcreate(loc, dsname.c_str(), type, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-      // Memory dataspace 
+      // Memory dataspace
       hid_t  memspace;
 
       // Create offset storage
@@ -434,7 +445,7 @@ namespace Hdf5 {
       //
       // Add some ZERO IO calls to allow for collective writes
       //
-      
+
       // Create zero memory space
       iDims[0] = 1;
       memspace = H5Screate_simple(1, iDims, NULL);
