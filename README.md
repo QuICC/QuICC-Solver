@@ -37,27 +37,27 @@
 
 4. Compile the model executables
    ```bash
-   make <GreatSimulation>
+   make && make install
    ```
 5. Create configuration XML
    ```bash
-   ./<GreatSimulation>Config
+   </path/to/Builds>/bin/<GreatSimulation>Config
    mv parameters_GEOMETRY.cfg parameters.cfg
    edit parameters.cfg
    ```
 6. Create initial state
    ```bash
-   ./<GreatSimulation>State
+   </path/to/Builds>/bin/<GreatSimulation>State
    mv state0000.hdf5 state_initial.hdf5
    ```
 7. Run simulation
    ```bash
-   ./<GreatSimulation>Model
+   </path/to/Builds>/bin/<GreatSimulation>Model
    ```
 8. Create physical space data for visualization
    ```bash
    ln -s state0042.hdf5 state4Visu.hdf5
-   ./<GreatSimulation>Visu
+   </path/to/Builds>/bin/<GreatSimulation>Visu
    ```
 9. visualize *visState0000.hdf5*
 
