@@ -7,22 +7,13 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/Simulation/SimulationIoControl.hpp"
 
 // Project includes
 //
-#include "QuICC/Version/Common.hpp"
-#include "QuICC/Version/Framework.hpp"
-#include "QuICC/Version/Io.hpp"
-#include "QuICC/Version/Polynomial.hpp"
-#include "QuICC/Version/PyQuICC.hpp"
-#include "QuICC/Version/SparseSM.hpp"
-#include "QuICC/Version/Transform.hpp"
+#include "Framework/gitHash.hpp"
 
 namespace QuICC {
 
@@ -44,7 +35,7 @@ namespace QuICC {
       this->mspCfg = std::make_shared<SimulationConfig>(this->mspCfgFile);
    }
 
-   void SimulationIoControl::init()
+   void SimulationIoControl::init(const std::string modelVersion)
    {
       // Init configuration file
       this->initCfg();
@@ -60,13 +51,8 @@ namespace QuICC {
       Tools::Formatter::printLine(std::cout, '=');
       Tools::Formatter::printCentered(std::cout, "QuICC", '*');
       Tools::Formatter::printLine(std::cout, '-');
-      Tools::Formatter::printCentered(std::cout, "Common: " + Version::Common::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "Framework: " + Version::Framework::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "Io: " + Version::Io::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "Polynomial: " + Version::Polynomial::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "PyQuICC: " + Version::PyQuICC::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "SparseSM: " + Version::SparseSM::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "Transform: " + Version::Transform::version(), ' ');
+      Tools::Formatter::printCentered(std::cout, "Framework: " + std::string(Framework::gitHash), ' ');
+      Tools::Formatter::printCentered(std::cout, "Model: " + modelVersion, ' ');
       Tools::Formatter::printLine(std::cout, '=');
       Tools::Formatter::printNewline(std::cout);
    }

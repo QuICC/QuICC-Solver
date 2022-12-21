@@ -18,7 +18,7 @@
 #endif
 
 #include "PeakRss.hpp"
-#include "gitHash.hpp"
+#include "Framework/gitHash.hpp"
 
 namespace QuICC {
 namespace Profiler {

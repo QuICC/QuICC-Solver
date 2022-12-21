@@ -32,6 +32,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   ${QUICC_PYQUICC_COMPONENT_LIB}
   QuICC::Io
   QuICC::Common
+  QuICC::Framework::GitHash
   QuICC::Profiling
   )
 

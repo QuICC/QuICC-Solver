@@ -62,6 +62,11 @@ namespace Model {
          virtual VectorFormulation::Id SchemeFormulation() = 0;
 
          /**
+          * @brief Version string of model
+          */
+         virtual std::string version() const = 0;
+
+         /**
           * @brief XML configuration tags for model
           */
          virtual std::map<std::string,std::map<std::string,int> > configTags() const;

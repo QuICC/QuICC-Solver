@@ -8,18 +8,39 @@ function(GitWriteHash git_hash COMPONENT)
     set(_file "${CMAKE_CURRENT_BINARY_DIR}/${HASH_FILE}")
     string(TOUPPER "${HASH_FILE}" HFUP)
     string(REPLACE "." "_" HFUP ${HFUP})
+    string(REPLACE "/" "_" HFUP ${HFUP})
+    string(PREPEND HFUP "QUICC_")
     message(DEBUG "HFUP: ${HFUP}")
     message(DEBUG "write _file: ${_file} with ${git_hash}")
+    string(REPLACE "/" ";" _list "${COMPONENT}")
+    # Generate namespace opening and closing statements
+    foreach(_comp IN LISTS _list)
+      message(DEBUG ${_comp})
+        STRING(APPEND _header_ns_open
+"namespace ${_comp}\n\
+{\n\
+")
+        STRING(APPEND _header_ns_close
+          "} // namespace ${_comp}\n\
+")
+    endforeach()
+    # Top part of file
     set(_header_file
     "#ifndef ${HFUP}\n\
 #define ${HFUP}\n\n\
 namespace QuICC\n\
 {\n\
-namespace ${COMPONENT}\n\
-{\n\
-    const char gitHash[10] = \"${git_hash}\"\;\n\
-} // namespace ${COMPONENT} \n\
-} // namespace QuICC \n\
+")
+    # Opening namespaces
+    string(APPEND _header_file "${_header_ns_open}")
+    string(APPEND _header_file
+"    const char gitHash[10] = \"${git_hash}\"\;\n\
+")
+    # Closing namespaces
+    string(APPEND _header_file "${_header_ns_close}")
+    # Bottom part of file
+    string(APPEND _header_file
+"} // namespace QuICC\n\
 #endif // ${HFUP}\n\
 ")
     message(DEBUG ${_header_file})
@@ -73,10 +94,11 @@ function(SetGitHash HASH_FILE)
     cmake_parse_arguments(SGH "${options}" "${oneValueArgs}"
                           "${multiValueArgs}" ${ARGN})
 
-    set(COMPONENT ${SGH_COMPONENT})
+    set(COMPONENT "${SGH_COMPONENT}")
+    string(REPLACE "/" "" _tgt "${SGH_COMPONENT}")
 
     # pass arguments in a way that works for the external process
-    add_custom_target(AlwaysCheckGit COMMAND ${CMAKE_COMMAND}
+    add_custom_target(${_tgt}_AlwaysCheckGit COMMAND ${CMAKE_COMMAND}
         -DRUN_CHECK_GIT_HASH=1
         -DGIT_HASH_CACHE=${GIT_HASH_CACHE}
         -DHASH_FILE=${HASH_FILE}

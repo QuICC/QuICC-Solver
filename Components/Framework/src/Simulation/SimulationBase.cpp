@@ -16,9 +16,6 @@
 #include <algorithm>
 #include <stdexcept>
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/Simulation/SimulationBase.hpp"
@@ -82,10 +79,10 @@ namespace QuICC {
       this->mSimIoCtrl.setConfigurationFile(spCfgFile);
    }
 
-   void SimulationBase::getConfig(std::map<std::string,MHDFloat>& cfg, std::set<SpatialScheme::Feature>& features)
+   void SimulationBase::getConfig(std::map<std::string,MHDFloat>& cfg, std::set<SpatialScheme::Feature>& features, const std::string modelVersion)
    {
       // Initialise the IO system
-      this->mSimIoCtrl.init();
+      this->mSimIoCtrl.init(modelVersion);
 
       cfg = this->config().physical();
 

@@ -6,15 +6,9 @@
 #ifndef QUICC_SIMULATIONBASE_HPP
 #define QUICC_SIMULATIONBASE_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -57,8 +51,11 @@ namespace QuICC {
 
          /**
           * @brief Initialise the configuration read from file
+          *
+          * @param features   Features of model
+          * @param modelHash  Version string of the model
           */
-         void getConfig(std::map<std::string,MHDFloat>& cfg, std::set<SpatialScheme::Feature>& features);
+         void getConfig(std::map<std::string,MHDFloat>& cfg, std::set<SpatialScheme::Feature>& features, const std::string modelVersion);
 
          /**
           * @brief Initialise the configuration read from file

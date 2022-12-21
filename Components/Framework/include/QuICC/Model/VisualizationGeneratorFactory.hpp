@@ -77,7 +77,7 @@ namespace QuICC {
       // Initialise simulation
       std::map<std::string,MHDFloat> cfg;
       std::set<SpatialScheme::Feature> features;
-      spVis->getConfig(cfg, features);
+      spVis->getConfig(cfg, features, model.version());
       spScheme->enable(features);
       model.configure(spScheme->features());
       spVis->updateConfig(model.backend().automaticParameters(cfg));
