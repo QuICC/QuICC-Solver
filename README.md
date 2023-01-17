@@ -158,3 +158,60 @@ cmake </path/to/QuICC> -DQUICC_PROFILE_BACKEND=native -DQUICC_PROFILE_LEVEL=0
 ```
 ### barrier
 By setting the enviroment variable `QUICC_PROFILE_MPI_BARRIER` to either `after` and/or `before` a mpi barrier will be set before and/or after each region
+
+# Use docker image
+
+In order to simplify setting up a local version of QuICC, a docker image with required dependencies installed is provided. The latest image can be found on docker hub at [quicc/buildbase](https://hub.docker.com/repository/docker/quicc/buildbase/general). The setup described below will mount the `</path/to/QuICC_mnt>` directory into the container. Everything that needs to remain even after stopping the docker container should be stored in this directory. For example, source and build directory should be created in `</path/to/QuICC_mnt>`. In the commands below, `</path/to/QuICC_mnt>` needs to be replaced with an actual path.
+
+## Linux and MacOS
+
+### Setup docker
+
+The following steps should produce a working environment:
+ 1. Install docker:
+    - *Linux:* Follow instructions for your distribution.
+    - *MacOS:* Install docker desktop from [Install on Mac](https://docs.docker.com/desktop/install/mac-install/).
+ 2. Add your SSH keys to the SSH agent if not already present, i.e. for each key you need, run:
+    ```bash
+    ssh-add </path/to/SSH_KEY>
+    ```
+ 3. Start docker
+ 4. Open Terminal:
+    - Pull docker image from hub
+     ```bash
+     docker pull quicc/buildbase:latest
+     ```
+    - Create directory where sources and builds will be kept. This directory is persistent and will be mounted into the container.
+    ```bash
+    mkdir </path/to/QuICC_mnt>
+    ```
+    - Clone QuICC repository into `<path/to/QuICC_mnt>`, for example to clone the `main` branch:
+    ```bash
+    git clone -b main git@github.com:QuICC/QuICC </path/to/QuICC_mnt>/QuICC
+    ```
+    
+### Run docker image in Linux
+
+The directory `</path/to/QuICC_mnt>` will be mounted into the container under `/QuICC`. The content of this directory is persistent and will not disappear when the container is deleted.
+```bash
+docker run --rm -it \
+-v </path/to/QuICC_mnt>:/QuICC \
+--mount type=bind,src="$SSH_AUTH_SOCK",target=/run/host-services/ssh-auth.sock \
+-e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
+quicc/buildbase:latest
+```
+
+If everything worked, you should now be inside the container. Create a build directory in `/QuICC` and proceed as usual to configure, build and run QuICC.
+    
+### Run docker image in MacOS
+
+The directory `</path/to/QuICC_mnt>` will be mounted into the container under `/QuICC`. The content of this directory is persistent and will not disappear when the container is deleted.
+```bash
+docker run --rm -it \
+-v </path/to/QuICC_mnt>:/QuICC \
+--mount type=bind,src="/run/host-services/ssh-auth.sock",target=/run/host-services/ssh-auth.sock \
+-e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
+quicc/buildbase:latest
+```
+
+If everything worked, you should now be inside the container. Create a build directory in `/QuICC` and proceed as usual to configure, build and run QuICC.
