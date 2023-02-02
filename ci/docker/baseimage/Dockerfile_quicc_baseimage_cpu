@@ -3,6 +3,7 @@ ARG CSCS_REGISTRY_PATH
 FROM $CSCS_REGISTRY_PATH/ubuntu-spack:22.04-0.18.0 as builder
 
 ARG NUM_PROCS=16
+ARG TARGET=broadwell
 
 # Install OS packages needed to build the software
 RUN apt-get -yqq update && apt-get -yqq upgrade \
@@ -25,7 +26,7 @@ RUN mkdir /opt/spack-environment \
 &&   echo "  - mpich@3.1.4 netmod=tcp device=ch3" \
 &&   echo "  packages:" \
 &&   echo "    all:" \
-&&   echo "      variants: +openmp +mpi build_type=Release target=broadwell" \
+&&   echo "      variants: +openmp +mpi build_type=Release target=$TARGET" \
 &&   echo "      providers:" \
 &&   echo "        mpi:" \
 &&   echo "        - mpich@3.1.4" \

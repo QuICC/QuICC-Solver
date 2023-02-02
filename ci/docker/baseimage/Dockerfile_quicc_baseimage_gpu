@@ -3,6 +3,7 @@ ARG CSCS_REGISTRY_PATH
 FROM $CSCS_REGISTRY_PATH/cuda-ubuntu-spack:11.7.1-22.04-0.18.0 as builder
 
 ARG NUM_PROCS 16
+ARG TARGET=haswell
 
 # Install OS packages needed to build the software
 RUN apt-get -yqq update && apt-get -yqq upgrade \
@@ -22,7 +23,7 @@ RUN mkdir /opt/spack-environment \
 &&   echo "  - kokkos +wrapper+cuda_lambda" \
 &&   echo "  - py-scipy" \
 &&   echo "  - reframe" \
-&&   echo "  - kokkos-kernels"\
+&&   echo "  - kokkos-kernels" \
 &&   echo "  - mpich@3.1.4 netmod=tcp device=ch3" \
 &&   echo "  packages:" \
 &&   echo "    cuda:" \
@@ -31,7 +32,7 @@ RUN mkdir /opt/spack-environment \
 &&   echo "        prefix: /usr/local/cuda" \
 &&   echo "      buildable: false" \
 &&   echo "    all:" \
-&&   echo "      variants: +cuda +openmp +mpi cuda_arch=60 build_type=Release target=haswell" \
+&&   echo "      variants: +cuda +openmp +mpi cuda_arch=60 build_type=Release target=$TARGET" \
 &&   echo "      providers:" \
 &&   echo "        mpi:" \
 &&   echo "        - mpich@3.1.4" \
