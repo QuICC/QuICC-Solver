@@ -15,6 +15,10 @@ options are: Debug Release RelWithDebInfo RelWithAssert RelForValgrind MinSizeRe
 set_property(CACHE CMAKE_BUILD_TYPE
   PROPERTY STRINGS "Debug;Release;RelWithDebInfo;RelWithAssert;RelForValgrind;MinSizeRel")
 
+# set CUDA debug 
+set(CMAKE_CUDA_FLAGS_DEBUG_INIT "-G --source-in-ptx")
+set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO_INIT "--generate-line-info --source-in-ptx")
+
 if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   set(CMAKE_CUDA_ARCHITECTURES 60)
 endif()

@@ -137,6 +137,8 @@ function (quicc_export_target TGT)
   message(DEBUG "QET_DIRECTORIES: ${QET_DIRECTORIES}")
   message(DEBUG "QET_FILES_MATCHING_PATTERN: ${QET_FILES_MATCHING_PATTERN}")
 
+  string(REGEX REPLACE "::" "/" _component_path ${QET_COMPONENT})
+
   # Export info
   install(TARGETS ${TGT}
     EXPORT QuICCExpTargets
@@ -144,6 +146,7 @@ function (quicc_export_target TGT)
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${_component_path}
   )
 
   # Set filter to default if not set
