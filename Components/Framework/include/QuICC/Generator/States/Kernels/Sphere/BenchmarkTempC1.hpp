@@ -6,22 +6,13 @@
 #ifndef QUICC_PHYSICAL_KERNEL_SPHERE_BENCHMARKTEMPC1_HPP
 #define QUICC_PHYSICAL_KERNEL_SPHERE_BENCHMARKTEMPC1_HPP
 
-// First include
-//
-
-// Configuration includes
+// System includes
 //
 #include <memory>
 
-// System includes
-//
-
-// External includes
-//
-
 // Project includes
 //
-#include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
+#include "QuICC/Generator/States/Kernels/Sphere/ScalarYllPerturbation.hpp"
 
 namespace QuICC {
 
@@ -34,7 +25,7 @@ namespace Sphere {
    /**
     * @brief Temperature benchmark state C1 generator kernel
     */
-   class BenchmarkTempC1: public IPhysicalKernel
+   class BenchmarkTempC1: public ScalarYllPerturbation
    {
       public:
          /**
@@ -45,7 +36,7 @@ namespace Sphere {
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BenchmarkTempC1();
+         virtual ~BenchmarkTempC1() = default;
 
          /**
           * @brief Initialize kernel
@@ -55,31 +46,14 @@ namespace Sphere {
           */
          void init(const MHDFloat amplitude_bg, const MHDFloat epsilon);
 
-         /**
-          * @brief Compute the physical kernel
-          *
-          * @param rNLComp Nonlinear term component
-          * @param id      ID of the component (allows for a more general implementation)
-          */
-         virtual void compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const;
-
       protected:
 
       private:
-         /**
-          * @brief Amplitude of background state
-          */
-         MHDFloat mBg;
-
-         /**
-          * @brief Amplitude of perturbation
-          */
-         MHDFloat mEpsilon;
    };
 
-}
-}
-}
-}
+} // Sphere
+} // Kernel
+} // Physical
+} // QuICC
 
 #endif // QUICC_PHYSICAL_KERNEL_SPHERE_BENCHMARKTEMPC1_HPP

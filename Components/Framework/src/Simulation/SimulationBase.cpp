@@ -274,6 +274,12 @@ namespace QuICC {
          {
             (*asciiIt)->addVector((*vectIt));
          }
+
+         // Set mesh
+         if((*asciiIt)->space() == Dimensions::Space::PHYSICAL)
+         {
+            (*asciiIt)->setMesh(this->mPseudospectral.transformCoordinator().mesh());
+         }
       }
 
       // Loop over all HDF5 files added to the simulation control
@@ -304,6 +310,7 @@ namespace QuICC {
             (*hdf5It)->addVector((*vectIt));
          }
 
+         // Set physical mesh
          if((*hdf5It)->space() == Dimensions::Space::PHYSICAL)
          {
             (*hdf5It)->setMesh(this->mPseudospectral.transformCoordinator().mesh());

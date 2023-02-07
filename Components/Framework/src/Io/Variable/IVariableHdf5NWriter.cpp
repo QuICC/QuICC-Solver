@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the generic variable to HDF5 file writer
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/IVariableHdf5NWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/IVariableHdf5NWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Hasher.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
@@ -34,10 +25,6 @@ namespace Variable {
 
    IVariableHdf5NWriter::IVariableHdf5NWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const bool isRegular)
       : IHdf5NWriter(name, ext, header, type, version), mTime(-1.0), mTimestep(-1.0), mIsRegular(isRegular), mSpaceId(id)
-   {
-   }
-
-   IVariableHdf5NWriter::~IVariableHdf5NWriter()
    {
    }
 

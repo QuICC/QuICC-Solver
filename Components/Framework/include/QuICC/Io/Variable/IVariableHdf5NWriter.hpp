@@ -51,7 +51,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~IVariableHdf5NWriter();
+         virtual ~IVariableHdf5NWriter() = default;
 
          /**
           * @brief Add name of expected variable to be added

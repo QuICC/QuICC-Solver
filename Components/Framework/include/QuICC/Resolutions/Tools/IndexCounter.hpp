@@ -66,7 +66,7 @@ namespace QuICC {
           *
           * This version uses the internally stored simulation resolution
           *
-          * @param spaceId Spacial the resolution represent
+          * @param spaceId Space the resolution represent
           */
          virtual ArrayI orderedDimensions(const Dimensions::Space::Id spaceId) const = 0;
 

@@ -1,27 +1,19 @@
 /**
  * @file BenchmarkTempC1.hpp
- * @brief Temperature benchmark state C1 generator kernel
+ * @brief Temperature benchmark state from Christensen's C1 test case generator kernel
+ *        DOI: https://doi.org/10.1016/S0031-9201(01)00275-8
  */
 
 #ifndef QUICC_PHYSICAL_KERNEL_SHELL_BENCHMARKTEMPC1_HPP
 #define QUICC_PHYSICAL_KERNEL_SHELL_BENCHMARKTEMPC1_HPP
 
-// First include
-//
-
-// Configuration includes
+// System includes
 //
 #include <memory>
 
-// System includes
-//
-
-// External includes
-//
-
 // Project includes
 //
-#include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
+#include "QuICC/Generator/States/Kernels/Shell/ScalarYllPerturbation.hpp"
 
 namespace QuICC {
 
@@ -34,7 +26,7 @@ namespace Shell {
    /**
     * @brief Temperature benchmark state C1 generator kernel
     */
-   class BenchmarkTempC1: public IPhysicalKernel
+   class BenchmarkTempC1: public ScalarYllPerturbation
    {
       public:
          /**
@@ -45,7 +37,7 @@ namespace Shell {
          /**
           * @brief Simple empty destructor
           */
-         virtual ~BenchmarkTempC1();
+         virtual ~BenchmarkTempC1() = default;
 
          /**
           * @brief Initialize kernel
@@ -55,31 +47,14 @@ namespace Shell {
           */
          void init(const MHDFloat ri, const MHDFloat ro);
 
-         /**
-          * @brief Compute the physical kernel
-          *
-          * @param rNLComp Nonlinear term component
-          * @param id      ID of the component (allows for a more general implementation)
-          */
-         virtual void compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const;
-
       protected:
 
       private:
-         /**
-          * @brief Inner radius of spherical shell
-          */
-         MHDFloat mRi;
-
-         /**
-          * @brief Outer radius of spherical shell
-          */
-         MHDFloat mRo;
    };
 
-}
-}
-}
-}
+} // Shell
+} // Kernel
+} // Physical
+} // QuICC
 
 #endif // QUICC_PHYSICAL_KERNEL_SHELL_BENCHMARKTEMPC1_HPP

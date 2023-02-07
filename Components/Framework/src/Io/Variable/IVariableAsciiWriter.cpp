@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the generic variable to ASCII file writer
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Hasher.hpp"
 #include "QuICC/NonDimensional/Coordinator.hpp"
@@ -30,10 +21,6 @@ namespace Variable {
 
    IVariableAsciiWriter::IVariableAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
       : IAsciiWriter(name, ext, header, type, version, mode), mTime(-1.0), mTimestep(-1.0), mSpaceId(id)
-   {
-   }
-
-   IVariableAsciiWriter::~IVariableAsciiWriter()
    {
    }
 
@@ -58,6 +45,11 @@ namespace Variable {
    const Resolution& IVariableAsciiWriter::res() const
    {
       return *this->mspRes;
+   }
+
+   void IVariableAsciiWriter::setMesh(const std::vector<Array>& mesh)
+   {
+      this->mMesh = mesh;
    }
 
    void IVariableAsciiWriter::setSimTime(const MHDFloat time, const MHDFloat timestep)

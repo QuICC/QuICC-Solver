@@ -6,6 +6,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   Energy.cpp
   Enstrophy.cpp
   EnstrophySpectrum.cpp
+  FieldProbe.cpp
   Nusselt.cpp
   Power.cpp
   Spectrum.cpp
