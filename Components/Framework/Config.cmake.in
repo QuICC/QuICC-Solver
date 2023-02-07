@@ -67,4 +67,4 @@ include(setup/global)
 # Framework setup
 include(setup/Framework)
 
-include("${CMAKE_CURRENT_LIST_DIR}/QuICCExpTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/QuICCTargets.cmake")

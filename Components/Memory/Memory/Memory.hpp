@@ -39,7 +39,7 @@ public:
         _mem_res(std::exchange(old._mem_res, nullptr)) {}
     
     /// @brief ctor
-    /// @param size number of elements of type type 
+    /// @param size number of elements of type type
     /// @param mem memory resource pointer
     explicit MemBlock(std::size_t size, memory_resource* mem) : 
         _mem_res(mem) 
@@ -73,11 +73,11 @@ public:
     /// @brief access raw data pointer with const qualifier
     /// @return _data
     const T* operator*() const {return _data;}
-    
+
     /// @brief access raw data pointer
     /// @return _data
     T* operator*() {return _data;}
-    
+
     /// @brief access raw data pointer with const qualifier
     /// @return _data
     const T* data() const {return _data;}

@@ -78,8 +78,8 @@ quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
 )
 
 # Export targets
-install(EXPORT QuICCExpTargets
-  FILE QuICCExpTargets.cmake
+install(EXPORT QuICCTargets
+  FILE QuICCTargets.cmake
   NAMESPACE ${QUICC_NAMESPACE}
   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/quicc/cmake
 )

@@ -16,8 +16,8 @@
 namespace QuICC {
 namespace Memory {
 
-/** @brief This class is an abstract interface to an unbounded set of classes 
- * encapsulating memory resources. 
+/** @brief This class is an abstract interface to an unbounded set of classes
+ * encapsulating memory resources.
  * It is used instead of a std::memory_resource so that it can be extended to be used in device functions.
  * https://en.cppreference.com/w/cpp/memory/memory_resource
  */
