@@ -4,7 +4,7 @@
 
 TEST_CASE("ViewOneDimDense", "[ViewOneDimDense]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t S = 5;
     std::array<double, S> data = {1,2,3,4,5};
@@ -27,7 +27,7 @@ TEST_CASE("ViewOneDimDense", "[ViewOneDimDense]")
 
 TEST_CASE("ViewTwoDimDenseColMaj", "[ViewTwoDimDenseColMaj]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t S = 3*2;
     std::array<double, S> data = {1,2,3,4,5,6};
@@ -53,7 +53,7 @@ TEST_CASE("ViewTwoDimDenseColMaj", "[ViewTwoDimDenseColMaj]")
 
 TEST_CASE("ViewTwoDimDenseRowMaj", "[ViewTwoDimDenseRowMaj]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t S = 3*2;
     std::array<double, S> data = {1,2,3,4,5,6};
@@ -79,7 +79,7 @@ TEST_CASE("ViewTwoDimDenseRowMaj", "[ViewTwoDimDenseRowMaj]")
 
 TEST_CASE("ViewThreeDimDenseLayMaj", "[ViewThreeDimDenseLayMaj]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t M = 3;
     constexpr size_t N = 2;

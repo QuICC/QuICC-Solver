@@ -18,7 +18,7 @@
 #include "View/Attributes.hpp"
 
 namespace QuICC {
-namespace View {
+namespace Memory {
 
    /// @brief Specialized template for sparse view with attributes
    /// @tparam Scalar element type
@@ -40,12 +40,12 @@ namespace View {
       using OrderType = typename Attributes<Args...>::order;
 
    private:
-      /// @brief statically defined view rank 
+      /// @brief statically defined view rank
       static constexpr std::size_t _rank = std::variant_size_v<LevelType>;
 
       /// @brief check that attribute sizes matches
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       static_assert(_rank == std::variant_size_v<OrderType>, "attributes size mismatch");
 
       /// @brief logical dimension c-array
@@ -65,10 +65,10 @@ namespace View {
       virtual ~View() = default;
 
       /// @brief Generic constructor
-      /// @param data 
-      /// @param dimensions 
-      /// @param pointers 
-      /// @param indices 
+      /// @param data
+      /// @param dimensions
+      /// @param pointers
+      /// @param indices
       View(const span<Scalar>& data,
          const std::array<IndexType, _rank> dimensions,
          const std::array<std::vector<IndexType>, _rank>& pointers,
@@ -77,9 +77,9 @@ namespace View {
       /// @brief Native types constructor
       /// @param data pointer to actual data
       /// @param size size of raw/compressed data
-      /// @param dimensions 
-      /// @param pointers 
-      /// @param indices 
+      /// @param dimensions
+      /// @param pointers
+      /// @param indices
       View(const Scalar* data,
          const std::size_t size,
          const IndexType* dimensions,
@@ -89,15 +89,15 @@ namespace View {
       /// @brief get view rank
       /// @return _rank
       QUICC_CUDA_HOSTDEV static constexpr std::size_t rank() {return _rank;}
-      
+
       /// @brief get pointer to logical dimensions c-array
       /// @return pointer to _dimensions
       QUICC_CUDA_HOSTDEV const IndexType* dims() const {return _dimensions;}
-      
+
       /// @brief get pointer to pointers c-array
       /// @return pointer to _pointers
       QUICC_CUDA_HOSTDEV const ViewBase<IndexType>* pointers() const {return _pointers;};
-      
+
       /// @brief get pointer to indices c-array
       /// @return pointer to _indices
       QUICC_CUDA_HOSTDEV const ViewBase<IndexType>* indices() const {return _indices;};
@@ -117,20 +117,20 @@ namespace View {
       /// @param j second logical index
       /// @return element
       ScalarType& operator()(const IndexType i, const IndexType j);
-      
+
       /// @brief 2D accessor
       /// @param i first logical index
       /// @param j second logical index
       /// @return element with const qualifier
       const ScalarType& operator()(const IndexType i, const IndexType j) const;
-      
+
       /// @brief 3D accessor
       /// @param i first logical index
       /// @param j second logical index
       /// @param k third logical index
       /// @return element
       ScalarType& operator()(const IndexType i, const IndexType j, const IndexType k);
-      
+
       /// @brief 3D accessor
       /// @param i first logical index
       /// @param j second logical index
@@ -172,10 +172,10 @@ namespace View {
       for (std::size_t i = 0; i < _rank; ++i)
       {
          /// \todo check space consistency
-         // assert(QuICC::Cuda::isDeviceMemory(data) == 
-         //    QuICC::Cuda::isDeviceMemory(pointers[i]) || 
+         // assert(QuICC::Cuda::isDeviceMemory(data) ==
+         //    QuICC::Cuda::isDeviceMemory(pointers[i]) ||
          //    pointers[i] == nullptr);
-         
+
          _dimensions[i] = dimensions[i];
          _pointers[i] = pointers[i];
          _indices[i] = indices[i];
@@ -283,7 +283,7 @@ namespace View {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
             // column major
-            
+
             // this can be improved with a binary search
             for (IndexType idn = _pointers[1][k]; idn < _pointers[1][k+1]; ++idn)
             {
@@ -363,5 +363,5 @@ namespace View {
       return const_cast<Scalar &>(std::as_const(*this).operator()(i, j, k));
    }
 
-} // namespace View
+} // namespace Memory
 } // namespace QuICC

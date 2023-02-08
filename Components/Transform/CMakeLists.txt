@@ -30,6 +30,8 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   ${QUICC_SPARSESM_COMPONENT_LIB}
   ${QUICC_POLYNOMIAL_COMPONENT_LIB}
   QuICC::Profiling
+  QuICC::Memory
+  QuICC::Fft
   BLAS::BLAS # banded/tridiag solve/mul TODO: remove dep
   )
 
@@ -102,3 +104,4 @@ quicc_export_target(${QUICC_TRANSFORM_COMPONENT_LIB}
   DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/QuICC
     )
+

@@ -18,6 +18,7 @@
 // Project includes
 //
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -46,6 +47,8 @@ namespace Projector {
 
    void IMixedProjector::transform(Matrix& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<2> fix("IMixedProjector::transform");
+
       assert(this->isInitialized());
       assert(in.cols() <= rOut.cols());
       assert(rOut.cols() == this->outCols());

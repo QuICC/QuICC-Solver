@@ -64,7 +64,7 @@ namespace Fftw {
 
       // Create the physical to spectral plan
       const fftw_r2r_kind fwdKind[] = {FFTW_REDFT10};
-      this->mPlan = fftw_plan_many_r2r(1, fftSize, blockSize, tmpF.data(), NULL, 1, fwdSize, tmpB.data(), NULL, 1, bwdSize, fwdKind, Library::planFlag());
+      this->mPlan = fftw_plan_many_r2r(1, fftSize, blockSize, tmpF.data(), NULL, 1, fwdSize, tmpB.data(), NULL, 1, bwdSize, fwdKind, QuICC::Fft::Fftw::Library::planFlag());
       if(this->mPlan == NULL)
       {
          throw  std::logic_error("FFTW plan failed!");

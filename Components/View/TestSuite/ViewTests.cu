@@ -8,7 +8,7 @@
 #include "View/ViewUtils.hpp"
 
 
-using namespace QuICC::View;
+using namespace QuICC::Memory;
 using dense1D = DimLevelType<dense_t>;
 using dense2D = DimLevelType<dense_t, dense_t>;
 
@@ -45,11 +45,11 @@ TEST_CASE("ViewOneDimDenseCuda", "[ViewOneDimDenseCuda]")
     cudaErrChk(cudaMemcpy(in_d.data(), in_h.data(),
         S*sizeof(double), cudaMemcpyHostToDevice));
 
-    // Invoke kernel 
+    // Invoke kernel
     const unsigned int blockSize = 32;
     const unsigned int numBlocks = (S + blockSize - 1) / blockSize;
     add1<<<numBlocks, blockSize>>>(Vout, Vin);
-    
+
     // copy back and check
     cudaErrChk(cudaMemcpy(out_h.data(), out_d.data(),
         S*sizeof(double), cudaMemcpyDeviceToHost));
@@ -111,12 +111,12 @@ TEST_CASE("ViewOneDimSparseCuda", "[ViewOneDimSparseCuda]")
     pointers_d[0] = ViewBase<std::uint32_t>(reinterpret_cast<std::uint32_t*>(allData_d.data()+off_d[1]), 2);
     ViewBase<std::uint32_t> indices_d[rank];
     indices_d[0] = ViewBase<std::uint32_t>(reinterpret_cast<std::uint32_t*>(allData_d.data()+off_d[2]), S);
-    
+
     CHECK(QuICC::Cuda::isDeviceMemory(pointers_d[0].data()) == true);
     CHECK(QuICC::Cuda::isDeviceMemory(indices_d[0].data()) == true);
 
     // Device View
-    View<double, Attributes<sparse1D>> gpuView (reinterpret_cast<double*>(allData_d.data()), S, dimensions.data(), 
+    View<double, Attributes<sparse1D>> gpuView (reinterpret_cast<double*>(allData_d.data()), S, dimensions.data(),
         pointers_d, indices_d);
 
     // Copy to gpu
@@ -127,11 +127,11 @@ TEST_CASE("ViewOneDimSparseCuda", "[ViewOneDimSparseCuda]")
     cudaErrChk(cudaMemcpy(gpuView.indices()[0].data(), indices_h[0].data(),
         S*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
 
-    // Invoke kernel 
+    // Invoke kernel
     const unsigned int blockSize = 32;
     const unsigned int numBlocks = (S + blockSize - 1) / blockSize;
     setI<<<numBlocks, blockSize>>>(gpuView);
-    
+
     // Copy back and check
     cudaErrChk(cudaMemcpy(data_h.data(), allData_d.data(),
         S*sizeof(double), cudaMemcpyDeviceToHost));
@@ -180,7 +180,7 @@ TEST_CASE("ViewTwoDimDenseColMajCuda", "[ViewTwoDimDenseColMajCuda]")
     cudaErrChk(cudaMemcpy(in_d.data(), in_h.data(),
         S*sizeof(double), cudaMemcpyHostToDevice));
 
-    // Invoke kernel 
+    // Invoke kernel
     dim3 blockSize;
     blockSize.x = 8;
     blockSize.y = 8;
@@ -191,7 +191,7 @@ TEST_CASE("ViewTwoDimDenseColMajCuda", "[ViewTwoDimDenseColMajCuda]")
     numBlocks.z = 1;
 
     addColumn<<<numBlocks, blockSize>>>(Vout, Vin);
-    
+
     // copy back and check
     cudaErrChk(cudaMemcpy(out_h.data(), out_d.data(),
         S*sizeof(double), cudaMemcpyDeviceToHost));

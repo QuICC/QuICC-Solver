@@ -6,25 +6,14 @@
 // System includes
 //
 #include <stdexcept>
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/Library.hpp"
+#include <fftw3.h>
 
 // Project includes
 //
+#include "Library.hpp"
 
 namespace QuICC {
-
-namespace Transform {
-
 namespace Fft {
-
-namespace Backend {
-
 namespace Fftw {
 
   // Fastest FFTW plan creation
@@ -47,15 +36,12 @@ namespace Fftw {
    Library::Library()
    {
       #if defined QUICC_THREADS_PTHREADS || defined QUICC_THREADS_OPENMP
-      if(Library::sCounter == 0)
-      {
-         // Initialize FFTW's threads
-         int error = fftw_init_threads();
+      // Initialize FFTW's threads
+      int error = fftw_init_threads();
 
-         if(error == 0)
-         {
-            throw std::logic_error("FFTW's threads initialization failed!");
-         }
+      if(error == 0)
+      {
+         throw std::logic_error("FFTW's threads initialization failed!");
       }
 
       // Number of threads
@@ -78,8 +64,6 @@ namespace Fftw {
    }
 
 
-}
-}
-}
-}
-}
+} // namespace Fftw
+} // namespace Fft
+} // namespace QuICC

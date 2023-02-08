@@ -42,7 +42,7 @@ namespace Fftw {
    void IFftwBackend::initLibrary() const
    {
       // FFTW Fixture
-      Library::getInstance();
+      QuICC::Fft::Fftw::Library::getInstance();
    }
 
    void IFftwBackend::applyFft(Matrix& phys, const Matrix& mods) const

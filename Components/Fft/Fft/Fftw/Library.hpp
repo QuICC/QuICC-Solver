@@ -1,38 +1,22 @@
 /**
  * @file Library.hpp
- * @brief Static interface to the global features of the FFTW library  
+ * @brief Static interface to the global features of the FFTW library
  */
-
-#ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_LIBRARY_HPP
-#define QUICC_TRANSFORM_FFT_BACKEND_FFTW_LIBRARY_HPP
-
-// Configuration includes
-//
-
-// System includes
-//
+#ifndef QUICC_FFT_FFTW_LIBRARY_HPP
+#define QUICC_FFT_FFTW_LIBRARY_HPP
 
 // External includes
 //
-#include <fftw3.h>
 
 // Project includes
 //
 
 namespace QuICC {
-
-namespace Transform {
-
 namespace Fft {
-
-namespace Backend {
-
 namespace Fftw {
-
-
    /**
-    * @brief Static interface to the global features of the FFTW library 
-    */ 
+    * @brief Static interface to the global features of the FFTW library
+    */
    class Library
    {
       public:
@@ -64,13 +48,11 @@ namespace Fftw {
          /**
           * @brief Empty destructor
           */
-         ~Library(); 
+         ~Library();
    };
 
-}
-}
-}
-}
-}
+} // namespace Fftw
+} // namespace Fft
+} // namespace QuICC
 
-#endif // QUICC_TRANSFORM_FFT_BACKEND_FFTW_LIBRARY_HPP
+#endif // QUICC_FFT_FFTW_LIBRARY_HPP

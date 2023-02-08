@@ -61,7 +61,7 @@ namespace Fftw {
       MatrixZ   tmpCplxB(bwdSize, blockSize);
 
       // Create plan
-      this->mPlan = fftw_plan_many_dft(1, fftSize, blockSize, reinterpret_cast<fftw_complex* >(tmpCplxA.data()), NULL, 1, fwdSize, reinterpret_cast<fftw_complex* >(tmpCplxB.data()), NULL, 1, bwdSize, FFTW_FORWARD, Library::planFlag());
+      this->mPlan = fftw_plan_many_dft(1, fftSize, blockSize, reinterpret_cast<fftw_complex* >(tmpCplxA.data()), NULL, 1, fwdSize, reinterpret_cast<fftw_complex* >(tmpCplxB.data()), NULL, 1, bwdSize, FFTW_FORWARD, QuICC::Fft::Fftw::Library::planFlag());
       if(this->mPlan == NULL)
       {
          throw  std::logic_error("FFTW plan failed!");

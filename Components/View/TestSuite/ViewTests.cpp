@@ -7,7 +7,7 @@
 
 TEST_CASE("Attributes", "[Attributes]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     using levelTypeC_t = DimLevelType<compressed_t>;
     levelTypeC_t c;

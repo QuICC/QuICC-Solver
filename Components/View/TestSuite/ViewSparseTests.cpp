@@ -5,7 +5,7 @@
 
 TEST_CASE("ViewOneDimSparse", "[ViewOneDimSparse]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t SF = 10;
     std::array<double, SF> fullData = {0,0,3,4,5,0,7,0,0,10};
@@ -38,7 +38,7 @@ TEST_CASE("ViewOneDimSparse", "[ViewOneDimSparse]")
 
 TEST_CASE("ViewTwoDimCSRrowMaj", "[ViewTwoDimCSRrowMaj]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t M = 3;
     constexpr size_t N = 4;
@@ -73,7 +73,7 @@ TEST_CASE("ViewTwoDimCSRrowMaj", "[ViewTwoDimCSRrowMaj]")
 
 TEST_CASE("ViewTwoDimCSRcolMaj", "[ViewTwoDimCSRcolMaj]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t M = 3;
     constexpr size_t N = 4;
@@ -108,7 +108,7 @@ TEST_CASE("ViewTwoDimCSRcolMaj", "[ViewTwoDimCSRcolMaj]")
 
 TEST_CASE("ViewThreeDimCscColMaj", "[ViewThreeDimCscColMaj]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t M = 3;
     constexpr size_t N = 2;
@@ -158,7 +158,7 @@ TEST_CASE("ViewThreeDimCscColMaj", "[ViewThreeDimCscColMaj]")
 
 TEST_CASE("ViewThreeDimDtrClColMaj", "[ViewThreeDimDtrClColMaj]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t M = 3;
     constexpr size_t N = 2;
@@ -209,7 +209,7 @@ TEST_CASE("ViewThreeDimDtrClColMaj", "[ViewThreeDimDtrClColMaj]")
 
 TEST_CASE("ViewThreeDimCtrClColMaj", "[ViewThreeDimCtrClColMaj]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t M = 4;
     constexpr size_t N = 2;
@@ -259,7 +259,7 @@ TEST_CASE("ViewThreeDimCtrClColMaj", "[ViewThreeDimCtrClColMaj]")
 
 TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer ColMaj", "[ViewThreeDimDCCSCColMaj]")
 {
-    using namespace QuICC::View;
+    using namespace QuICC::Memory;
 
     constexpr size_t M = 4;
     constexpr size_t N = 2;

@@ -1,6 +1,6 @@
 /**
  * @file ViewUtils.hpp
- * @brief 
+ * @brief
  */
 
 #pragma once
@@ -16,10 +16,10 @@
 #include "View/View.hpp"
 
 namespace QuICC {
-namespace View {
+namespace Memory {
 
 /// @brief compute storage requirements of view
-/// @tparam ViewType, either dense or compressed 
+/// @tparam ViewType, either dense or compressed
 /// @param v View
 /// @return storage size in bytes
 template <class ViewType>
@@ -34,7 +34,7 @@ template <class ViewType>
 QUICC_CUDA_HOST std::array<std::size_t, 4> memOffsets(ViewType v);
 
 /// @brief compute offset in bytes from data pointer to indices pointer
-/// and from data pointer to pointers pointer assuming they need to be 
+/// and from data pointer to pointers pointer assuming they need to be
 /// in the same memblock
 /// @tparam ViewType, compressed only
 /// @param v View
@@ -43,7 +43,7 @@ template <class ViewType>
 QUICC_CUDA_HOST std::array<std::size_t, 4> memBlockOffsets(ViewType v);
 
 
-// 
+//
 // Definitions
 //
 
@@ -53,8 +53,8 @@ std::size_t memBlockSize(ViewType v)
 {
    // dense and compressed
    std::size_t size = sizeof(typename ViewType::ScalarType) * v.size();
-   
-   // compressed only 
+
+   // compressed only
    if constexpr (!isLevelTypeFullyDense_v<typename ViewType::LevelType>)
    {
       for (std::size_t i = 0; i < v.rank(); ++i)
@@ -65,7 +65,7 @@ std::size_t memBlockSize(ViewType v)
    }
    return size;
 }
-   
+
 // offsets
 template <class ViewType>
 std::array<std::size_t, 4> memOffsets(ViewType v)
@@ -101,5 +101,5 @@ std::array<std::size_t, 4> memBlockOffsets(ViewType v)
    return offsets;
 }
 
-} // namespace View
+} // namespace Memory
 } // namespace QuICC

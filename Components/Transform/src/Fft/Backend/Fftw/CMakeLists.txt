@@ -39,7 +39,6 @@ endif()
 if(_use_FFTW)
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   IFftwBackend.cpp
-  Library.cpp
   Tools.cpp
 )
 endif()

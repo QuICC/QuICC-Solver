@@ -14,6 +14,7 @@
 
 // System includes
 //
+#include <fftw3.h>
 
 // External includes
 //
@@ -21,7 +22,7 @@
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Backend/Fftw/Library.hpp"
+#include "Fft/Fftw/Library.hpp"
 
 namespace QuICC {
 

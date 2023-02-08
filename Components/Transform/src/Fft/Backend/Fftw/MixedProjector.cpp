@@ -60,7 +60,7 @@ namespace Fftw {
       MatrixZ   tmpCplx(bwdSize, blockSize);
 
       // Create the complex to real plan
-      this->mPlan = fftw_plan_many_dft_c2r(1, fftSize, blockSize, reinterpret_cast<fftw_complex* >(tmpCplx.data()), NULL, 1, bwdSize, tmpReal.data(), NULL, 1, fwdSize, Library::planFlag());
+      this->mPlan = fftw_plan_many_dft_c2r(1, fftSize, blockSize, reinterpret_cast<fftw_complex* >(tmpCplx.data()), NULL, 1, bwdSize, tmpReal.data(), NULL, 1, fwdSize, QuICC::Fft::Fftw::Library::planFlag());
       if(this->mPlan == NULL)
       {
          throw  std::logic_error("FFTW plan failed!");

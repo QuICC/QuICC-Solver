@@ -18,7 +18,7 @@
 #include "View/Attributes.hpp"
 
 namespace QuICC {
-namespace View {
+namespace Memory {
 
    /// @brief Generic template for a dense (structured) view
    /// @tparam Scalar element type
@@ -46,16 +46,16 @@ namespace View {
       using OrderType = typename Attributes<Args...>::order;
 
    protected:
-      /// @brief statically defined view rank 
+      /// @brief statically defined view rank
       static constexpr std::size_t _rank = std::variant_size_v<LevelType>;
       /// @brief check that attribute sizes matches
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       static_assert(_rank == std::variant_size_v<OrderType>, "attributes size mismatch");
 
       /// @brief logical dimension
       IndexType _dimensions[_rank];
-      
+
       /// @brief strides in memory
       IndexType _strides[_rank];
 
@@ -64,7 +64,7 @@ namespace View {
       ViewDenseBase() = delete;
       /// @brief dtor
       virtual ~ViewDenseBase() = default;
-      
+
       /// @brief import base ctors
       using ViewBase<Scalar>::ViewBase;
 
@@ -88,28 +88,28 @@ namespace View {
    public:
       /// @brief deleted ctor
       View() = delete;
-      
+
       /// @brief dtor
       ~View() = default;
 
       /// @brief i/// @brief imported from ViewDenseBase
       using typename ViewDenseBase<Scalar, Attributes<dense1D_t, Args...>>::IndexType;
-      
+
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using ViewDenseBase<Scalar, Attributes<dense1D_t, Args...>>::_rank;
-   
+
       /// @brief /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using ViewDenseBase<Scalar, Attributes<dense1D_t, Args...>>::_dimensions;
 
       /// @brief 1D fully dense ctor
       /// @param data span ref, useful to accept braced initializer list
       /// @param dimensions std::array of logical dimensions, useful to accept braced initializer list
       View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions);
-      
+
       /// @brief 1D fully dense ctor
       // @param data span ref, useful to accept braced initializer list
       /// @param dimensions pointer to array of logical dimensions
@@ -141,30 +141,30 @@ namespace View {
       ~View() = default;
 
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using typename ViewDenseBase<Scalar, Attributes<dense2D_t, Args...>>::IndexType;
-      
+
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using typename ViewDenseBase<Scalar, Attributes<dense2D_t, Args...>>::OrderType;
-      
+
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using ViewDenseBase<Scalar, Attributes<dense2D_t, Args...>>::_rank;
-      
+
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using ViewDenseBase<Scalar, Attributes<dense2D_t, Args...>>::_dimensions;
-      
+
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using ViewDenseBase<Scalar, Attributes<dense2D_t, Args...>>::_strides;
-      
+
       /// @brief 2D fully dense ctor
       /// @param data span ref, useful to accept braced initializer list
       /// @param dimensions std::array of logical dimensions, useful to accept braced initializer list
@@ -201,28 +201,28 @@ namespace View {
       ~View() = default;
 
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using typename ViewDenseBase<Scalar, Attributes<dense3D_t, Args...>>::IndexType;
 
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using typename ViewDenseBase<Scalar, Attributes<dense3D_t, Args...>>::OrderType;
 
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using ViewDenseBase<Scalar, Attributes<dense3D_t, Args...>>::_rank;
 
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using ViewDenseBase<Scalar, Attributes<dense3D_t, Args...>>::_dimensions;
 
       /// @brief imported from ViewDenseBase
-      /// @tparam Scalar 
-      /// @tparam ...Args 
+      /// @tparam Scalar
+      /// @tparam ...Args
       using ViewDenseBase<Scalar, Attributes<dense3D_t, Args...>>::_strides;
 
       /// @brief 3D fully dense ctor
@@ -253,7 +253,7 @@ namespace View {
 
    // 1D dense_t ctor
    template <class Scalar, class... Args>
-   View<Scalar, Attributes<dense1D_t, Args... >>::View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions) : 
+   View<Scalar, Attributes<dense1D_t, Args... >>::View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions) :
       ViewDenseBase<Scalar, Attributes<dense1D_t, Args... >>(data.data(), data.size())
    {
       for (std::size_t i = 0; i < _rank; ++i)
@@ -263,7 +263,7 @@ namespace View {
    }
 
    template <class Scalar, class... Args>
-   View<Scalar, Attributes<dense1D_t, Args... >>::View(const span<Scalar>& data, const IndexType* dimensions) : 
+   View<Scalar, Attributes<dense1D_t, Args... >>::View(const span<Scalar>& data, const IndexType* dimensions) :
       ViewDenseBase<Scalar, Attributes<dense1D_t, Args... >>(data.data(), data.size())
    {
       for (std::size_t i = 0; i < _rank; ++i)
@@ -431,5 +431,5 @@ namespace View {
       return this->_data[i*_strides[0] + j*_strides[1] + k*_strides[2]];
    }
 
-} // namespace View
+} // namespace Memory
 } // namespace QuICC

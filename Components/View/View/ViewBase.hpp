@@ -18,7 +18,7 @@
 
 #ifdef __CUDACC__
 #define QUICC_CUDA_HOSTDEV __host__ __device__
-#define QUICC_CUDA_HOST __host__ 
+#define QUICC_CUDA_HOST __host__
 #else
 #define QUICC_CUDA_HOSTDEV
 #define QUICC_CUDA_HOST
@@ -26,7 +26,7 @@
 
 namespace QuICC {
 /// @brief This namespace provides all the View related code
-namespace View {
+namespace Memory {
 
    /// @brief Generic template for a View
    /// @tparam Scalar element type
@@ -38,7 +38,7 @@ namespace View {
    template <class T, std::size_t E = boost::dynamic_extent>
       using span = boost::span<T, E>;
 
-   /** @brief Base class for a view data structure. Represent simply a memory block (pointer and size).  
+   /** @brief Base class for a view data structure. Represent simply a memory block (pointer and size).
     * Similar to a std::span, it is not the owner of the memory.
     * It is used instead of a std/boost span so that it can be used in device functions.
     * @tparam Scalar element type
@@ -57,12 +57,12 @@ namespace View {
       /// @brief dtor
       virtual ~ViewBase() = default;
       /// @brief ctor
-      /// @param data pointer to memory location 
+      /// @param data pointer to memory location
       /// @param size in number of elements
       ViewBase(Scalar* data, std::size_t size) : _data(data), _size(size) {};
 
       /// @brief copy view from std::vector
-      /// @param in input vector 
+      /// @param in input vector
       /// @return *this
       QUICC_CUDA_HOST ViewBase& operator=(const std::vector<Scalar>& in)
       {
@@ -72,7 +72,7 @@ namespace View {
       }
 
       /// @brief access element in ViewBase
-      /// @param i index 
+      /// @param i index
       /// @return reference to element
       QUICC_CUDA_HOSTDEV  Scalar& operator[](std::size_t i) const
       {
@@ -83,11 +83,11 @@ namespace View {
       /// @brief get size of ViewBase in number of elements
       /// @return _size
       QUICC_CUDA_HOSTDEV std::size_t size() const {return _size;}
-      
+
       /// @brief get raw pointer to memory
       /// @return _data
       QUICC_CUDA_HOSTDEV constexpr Scalar* data() const {return _data;}
    };
 
-} // namespace View
+} // namespace Memory
 } // namespace QuICC
