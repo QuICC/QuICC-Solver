@@ -11,6 +11,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <vector>
+#include <utility>
 
 // Project includes
 //
