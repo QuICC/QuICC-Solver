@@ -28,8 +28,13 @@ docker push $DOCKERHUB_USERNAME/ubuntu-spack:22.04-0.18.0
 ```
 ## Cpu QuICC baseimage
 ```sh
-docker build --pull --force-rm --build-arg CSCS_REGISTRY_PATH=$DOCKERHUB_USERNAME --build-arg NUM_PROCS=2 --build-arg TARGET=none -f <path-to-quicc>/ci/docker/baseimage/Dockerfile_quicc_baseimage_cpu -t $DOCKERHUB_USERNAME/ubuntu-spack:22.04-0.18.0 .
+docker build --pull --force-rm --build-arg CSCS_REGISTRY_PATH=$DOCKERHUB_USERNAME --build-arg NUM_PROCS=2 --build-arg TARGET=none -f <path-to-quicc>/ci/docker/baseimage/Dockerfile_quicc_baseimage_cpu -t $DOCKERHUB_USERNAME/ubuntu-quicc-buildbase:22.04 .
 docker push $DOCKERHUB_USERNAME/ubuntu-quicc-buildbase:22.04
+```
+## Cpu QuICC linear stability
+```sh
+docker build --pull --force-rm --build-arg CSCS_REGISTRY_PATH=$DOCKERHUB_USERNAME --build-arg NUM_PROCS=2 --build-arg TARGET=none -f <path-to-quicc>/ci/docker/baseimage/Dockerfile_quicc_stability_cpu -t $DOCKERHUB_USERNAME/ubuntu-quicc-stability:22.04 .
+docker push $DOCKERHUB_USERNAME/ubuntu-quicc-stability:22.04
 ```
 
 ## Gpu spack baseimage
