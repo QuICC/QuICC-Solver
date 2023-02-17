@@ -215,3 +215,37 @@ quicc/buildbase:latest
 ```
 
 If everything worked, you should now be inside the container. Create a build directory in `/QuICC` and proceed as usual to configure, build and run QuICC.
+
+# Linear stability calculations
+
+QuICC provides a set of Python scripts to do linear stability calculations. The tools require PETSc and SLEPc, as well as their Python bindings petsc4py and slepc4py. As those library are quite complex and provide a lot of different options during installation, obtaining the right setup can be challenging. In order to simplify the setup, a docker image which contains all dependencies is provided. The image is available on the docker hub as "quicc/stability". In order to use it, follow the instructions above to setup docker but use "quicc/stability" in place of "quicc/buildbase".
+
+## Run the marginal curve tracing tool
+
+Let's assume the configured build directory is called `build_dir` and the model used is `BoussinesqSphereRTC`. To trace a marginal curve do the following:
+ 1. Change to build directory
+    ```bash
+    cd /path/to/build_dir
+    ```
+ 2. Copy linear stability files to build directory
+    ```bash
+    make quicc_pyquicc quicc_boussinesqspherertc_updatepy
+    ```
+ 3. The scripts are installed under `lib64/python/linear_stability`
+    ```bash
+    cd lib64/python/linear_stability/boussinesq/sphere/rtc/
+    ```
+ 4. Define the parameters and options in `trace_marginal.py`. The script contains a few examples for different parameters, resolutions, etc. At the bottom of the file are the main options for the tracing tool. The options are described in `lib64/python/quicc/linear_stability/marginal_curve.py` in `default_options` line 597. The main options are
+    - `marginal_options['curve']`: True/False trace marginal curve
+    - `marginal_options['minimum']`: True/False compute minimum
+    - `marginal_options['solve']`: True/False compute single point
+    - `marginal_options['solve_nev']`: Number of eigenvalues to compute
+    - `marginal_options['curve_points']`: list of modes where to compute the marginal curve
+ 5. Tell Python where to find the modules
+    ```bash
+    export PYTHONPATH=/path/to/build_dir/lib64/python
+    ```
+ 6. Run the marginal curve tracing script:
+    ```bash
+    python trace_marginal.py -st_type sinvert -eps_target 0 -eps_target_real
+    ```

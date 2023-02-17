@@ -65,7 +65,7 @@ Create the new manifest:
 docker manifest create \
 $DOCKERHUB_USERNAME/buildbase:latest \
 --amend $DOCKERHUB_USERNAME/buildbase:amd64-broadwell \
---ammed $DOCKERHUB_USERNAME/buildbase:arm64-v8
+--amend $DOCKERHUB_USERNAME/buildbase:arm64-v8
 ```
 
 Push the new manifest:
