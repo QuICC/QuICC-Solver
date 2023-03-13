@@ -29,15 +29,7 @@ namespace Mixed {
 
 namespace Integrator {
 
-   P::P()
-   {
-   }
-
-   P::~P()
-   {
-   }
-
-   void P::applyPostOperator(MatrixZ& rOut) const
+   void P<base_t>::applyPostOperator(MatrixZ& rOut) const
    {
       this->mBackend.output(rOut);
    }

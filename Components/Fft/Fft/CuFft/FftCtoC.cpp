@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "Fft.hpp"
+#include "Fft/FftTypes.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -89,15 +90,7 @@ void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>
 }
 
 // Explicit instantiations
-/// Complex dense 2D tensor, input modes view type
-using CmodsDense2D_t = View<std::complex<double>, dense2D>;
-/// Complex dense 2D tensor, output phys view type
-using CphysDense2D_t = View<std::complex<double>, dense2D>;
 template class FftOp<CphysDense2D_t, CmodsDense2D_t>;
-/// Complex compressed sparse layer 3D tensor, input modes view type
-using CmodsDCCSC3D_t = View<std::complex<double>, DCCSC3D>;
-/// Complex compressed sparse layer 3D tensor, output phys view type
-using CphysDCCSC3D_t = View<std::complex<double>, DCCSC3D>;
 template class FftOp<CphysDCCSC3D_t, CmodsDCCSC3D_t>;
 
 

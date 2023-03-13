@@ -326,10 +326,7 @@ namespace Transform {
    template <typename TOp> Matrix TesterBase<TOp>::testOperator(const ParameterType& param, const TestType type) const
    {
       Matrix outData;
-      for (unsigned int i = 0; i < this->mIter; ++i)
-      {
-         outData = this->applyOperator(param, type);
-      }
+      outData = this->applyOperator(param, type);
 
       if(this->mKeepData)
       {

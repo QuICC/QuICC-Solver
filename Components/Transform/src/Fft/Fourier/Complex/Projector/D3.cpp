@@ -7,16 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Projector/D3.hpp"
-
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "QuICC/Transform/Fft/Fourier/Complex/Projector/D3Base.hpp"
 
 namespace QuICC {
 
@@ -30,15 +23,7 @@ namespace Complex {
 
 namespace Projector {
 
-   D3::D3()
-   {
-   }
-
-   D3::~D3()
-   {
-   }
-
-   void D3::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
+   void D3<base_t>::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
    {
       this->mBackend.inputDiff(tmp, in, 3, this->mspSetup->boxScale());
    }

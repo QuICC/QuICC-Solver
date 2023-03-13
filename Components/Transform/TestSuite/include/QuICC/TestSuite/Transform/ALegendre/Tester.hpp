@@ -231,9 +231,14 @@ namespace ALegendre {
       internal::Array igrid;
       this->initOperator(op, igrid, spSetup);
 
-      MatrixZ outData = MatrixZ::Zero(op.outRows(), op.outCols());
+      MatrixZ outData;
 
-      op.transform(outData, inData);
+      for (unsigned int i = 0; i < this->mIter; ++i)
+      {
+         outData = MatrixZ::Zero(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+      }
+
       bool isReversed = (igrid(igrid.size()-1) < igrid(0));
       if(isReversed)
       {

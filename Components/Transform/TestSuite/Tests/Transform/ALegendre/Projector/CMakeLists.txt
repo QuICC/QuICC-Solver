@@ -103,7 +103,7 @@ foreach(_test ${_tests_templated})
     ULPS 20800 20800 20800 20800 20800 20800
     # node:rank, node*12:rank, node*36:rank
     SPLITS 8:0 96:0 288:0 256:0 3072:0 9216:0
-    STEPS 500 500 500 500 500 500
+    STEPS 500 500 500 500 500 1000
     PERFONLY
   )
 endforeach()

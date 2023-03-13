@@ -47,6 +47,14 @@ namespace Mixed {
          Setup(const int size, const int blockSize, const int specSize, const GridPurpose::Id purpose);
 
          /**
+          * @brief Constructor
+          *
+          * @param size       Size of the transform
+          * @param specSize   Spectral output size (i.e without the padding)
+          */
+         Setup(const int size, const int specSize, const GridPurpose::Id purpose);
+
+         /**
           * @brief Empty destructor
           */
          virtual ~Setup();

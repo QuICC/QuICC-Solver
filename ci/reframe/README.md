@@ -18,7 +18,9 @@ reframe -C $QUICC_ROOT/ci/reframe/settings.py -c $QUICC_ROOT/ci/reframe/quicc.py
 ```
 ## Test
 ```sh
-reframe -C $QUICC_ROOT/ci/reframe/settings.py -c $QUICC_ROOT/ci/reframe/quicc_library.py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local
+export PYTHONPATH=$QUICC_ROOT/build/lib/python:$PYTHONPATH
+export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
+reframe -C $QUICC_ROOT/ci/reframe/settings.py -c $QUICC_ROOT/ci/reframe/quicc_library_[cpu|gpu].py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local --exec-policy=serial
 ```
 
 # CI
@@ -32,5 +34,5 @@ reframe -c $QUICC_ROOT/ci/reframe/quicc.py -r -S quicc_root=$QUICC_ROOT
 ## Test
 ```sh
 export QUICC_ROOT=</path/to/QuICC>
-reframe -c $QUICC_ROOT/ci/reframe/quicc_library.py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local
+reframe -c $QUICC_ROOT/ci/reframe/quicc_library_[cpu|gpu].py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local --exec-policy=serial
 ```

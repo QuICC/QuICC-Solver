@@ -1,8 +1,9 @@
 # Create component library
 set(QUICC_CURRENT_SUBCOMPONENT_LIB Fftw)
 add_library(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} STATIC
-  FftCtoR.cpp
   FftCtoC.cpp
+  FftCtoR.cpp
+  FftRtoC.cpp
   Library.cpp
 )
 

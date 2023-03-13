@@ -331,7 +331,18 @@ namespace Memory {
    // Common formats
    //
 
-   /** @brief 2D CSC column major matrix (N,K) which elements are 1D dense vectors,
+   /**
+    * @brief 1D dense tensor
+    */
+   using dense1D = Attributes<DimLevelType<dense_t>>;
+
+   /**
+    * @brief 2D dense tensor with column major memory layout
+    */
+   using dense2D = Attributes<DimLevelType<dense_t, dense_t>>;
+
+   /**
+    * @brief 2D CSC column major matrix (N,K) which elements are 1D dense vectors,
     * i.e a 3D tensor (M,N,K) with fully populated columns
     */
    using DCCSC3D = Attributes<DimLevelType<dense_t, CSC_t, CSC_t>>;

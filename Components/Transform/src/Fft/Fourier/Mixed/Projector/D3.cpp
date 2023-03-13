@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Fourier/Mixed/Projector/D3.hpp"
+#include "QuICC/Transform/Fft/Fourier/Mixed/Projector/D3Base.hpp"
 
 // Project includes
 //
@@ -29,15 +29,7 @@ namespace Mixed {
 
 namespace Projector {
 
-   D3::D3()
-   {
-   }
-
-   D3::~D3()
-   {
-   }
-
-   void D3::applyPreOperator(MatrixZ& out, const MatrixZ& in) const
+   void D3<base_t>::applyPreOperator(MatrixZ& out, const MatrixZ& in) const
    {
       this->mBackend.inputDiff(out, in, 3, this->mspSetup->boxScale());
    }

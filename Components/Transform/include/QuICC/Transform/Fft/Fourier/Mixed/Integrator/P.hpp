@@ -1,72 +1,20 @@
-/** 
+/**
  * @file P.hpp
- * @brief Implementation of the Fourier based P integrator
+ * @brief Implementation of the Fourier based mixed P integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_P_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_P_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/IMixedIntegrator.hpp"
-
-namespace QuICC {
-
-namespace Transform {
-
-namespace Fft {
-
-namespace Fourier {
-
-namespace Mixed {
-
-namespace Integrator {
-
-   /**
-    * @brief Implementation of the Fourier based P integrator
-    */ 
-   class P: public IMixedIntegrator
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         P();
-
-         /**
-          * @brief Destructor
-          */
-         ~P();
-         
-      protected:
-
-      private:
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         void applyPostOperator(MatrixZ& rOut) const final;
-   };
-
-}
-}
-}
-}
-}
-}
+#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/PBase.hpp"
+#include "QuICC/Transform/Wrappers/Mixed/Integrator/PviewCpu_t.hpp.inc"
+#ifdef QUICC_USE_CUFFT
+#include "QuICC/Transform/Wrappers/Mixed/Integrator/PviewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_P_HPP

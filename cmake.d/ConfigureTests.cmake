@@ -69,8 +69,8 @@ endfunction()
 # main funtion
 function(quicc_add_test target)
   # parse inputs
-  set(options DISABLED PERFONLY)
-  set(oneValueArgs COMMAND KEYWORD ULP)
+  set(options PERFONLY)
+  set(oneValueArgs COMMAND KEYWORD ULP DISABLED)
   set(multiValueArgs TYPES IDS ULPS STEPS SPLITS)
   cmake_parse_arguments(QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 

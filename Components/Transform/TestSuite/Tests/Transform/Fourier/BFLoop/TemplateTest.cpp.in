@@ -15,12 +15,12 @@
 //
 #include "QuICC/TestSuite/Transform/Fourier/TestArgs.hpp"
 #include "QuICC/TestSuite/Transform/Fourier/Tester.hpp"
-#include "QuICC/Transform/Fft/Fourier/@Space@/Integrator/P.hpp"
+#include "QuICC/Transform/Fft/Fourier/@Space@/Integrator/@Operator@.hpp"
 #include "QuICC/Transform/Fft/Fourier/@Space@/Projector/@Operator@.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Transform::Fourier;
 
-TEST_CASE( "@Space@::Error for @Operator@ backward-forward loop", "[@Space@::@Operator@:@type@]" ){
+TEST_CASE( "@Space@::Error for @Operator@@Template@ backward-forward loop", "[@CatchTestName@]" ){
 
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -37,8 +37,9 @@ TEST_CASE( "@Space@::Error for @Operator@ backward-forward loop", "[@Space@::@Op
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::Fft::Fourier::@Space@::Projector::@Operator@ Projector;
-   typedef ::QuICC::Transform::Fft::Fourier::@Space@::Integrator::P Integrator;
+   using namespace ::QuICC::Transform::Fft::Fourier;
+   typedef @Space@::Projector::@Operator@@Template@ Projector;
+   typedef @Space@::Integrator::@Operator@@Template@ Integrator;
    typedef typename currentts::Tester<Projector,Integrator> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);

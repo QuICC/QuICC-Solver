@@ -19,8 +19,9 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::Fourier;
 
-TEST_CASE( "@Space@::Error for @Operator@ projector", "[@Space@::@Operator@:@type@]" )
+TEST_CASE( "@Space@::Error for @Operator@@Template@ projector", "[@CatchTestName@]" )
 {
+
    // Set default arguments if required
    if(currentts::args().useDefault)
    {
@@ -32,15 +33,18 @@ TEST_CASE( "@Space@::Error for @Operator@ projector", "[@Space@::@Operator@:@typ
    // Set type
    currentts::args().setType("@type@");
 
+
    REQUIRE( (currentts::args().type == ::QuICC::TestSuite::Transform::TestType::PROJECTOR && "Test type is projector") );
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::Fft::Fourier::@Space@::Projector::@Operator@ Projector;
+   using namespace ::QuICC::Transform::Fft::Fourier;
+   typedef @Space@::Projector::@Operator@@Template@ Projector;
    typedef typename currentts::Tester<Projector> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
+   tester.setIter(currentts::args().iter);
 
    Tester::ParameterType params = {-1};
 

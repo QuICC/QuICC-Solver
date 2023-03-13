@@ -1,5 +1,5 @@
 /**
- * @file Fft.cpp
+ * @file FftCtoR.cpp
  * @brief CuFft Complex to Real backend
  */
 
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "Fft.hpp"
+#include "Fft/FftTypes.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -89,15 +90,7 @@ void FftOp<View<double, AttOut>, View<std::complex<double>, AttIn>>::applyImpl(V
 }
 
 // Explicit instantiations
-/// Complex dense 2D tensor, input modes view type
-using CmodsDense2D_t = View<std::complex<double>, dense2D>;
-/// Real dense 2D tensor, output phys view type
-using RphysDense2D_t = View<double, dense2D>;
 template class FftOp<RphysDense2D_t, CmodsDense2D_t>;
-/// Complex compressed sparse layer 3D tensor, input modes view type
-using CmodsDCCSC3D_t = View<std::complex<double>, DCCSC3D>;
-/// Real compressed sparse layer 3D tensor, output phys view type
-using RphysDCCSC3D_t = View<double, DCCSC3D>;
 template class FftOp<RphysDCCSC3D_t, CmodsDCCSC3D_t>;
 
 

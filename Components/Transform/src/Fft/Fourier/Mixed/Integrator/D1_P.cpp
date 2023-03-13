@@ -29,15 +29,7 @@ namespace Mixed {
 
 namespace Integrator {
 
-   D1_P::D1_P()
-   {
-   }
-
-   D1_P::~D1_P()
-   {
-   }
-
-   void D1_P::applyPostOperator(MatrixZ& rOut) const
+   void D1_P<base_t>::applyPostOperator(MatrixZ& rOut) const
    {
       std::map<int,MHDComplex> mod = { {0, 1.0} };
       this->mBackend.outputDiff(rOut, 1, this->mspSetup->boxScale(), mod);

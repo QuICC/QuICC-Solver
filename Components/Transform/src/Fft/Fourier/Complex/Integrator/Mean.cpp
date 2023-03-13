@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/Mean.hpp"
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/MeanBase.hpp"
 
 // Project includes
 //
@@ -29,20 +29,12 @@ namespace Complex {
 
 namespace Integrator {
 
-   Mean::Mean()
-   {
-   }
-
-   Mean::~Mean()
-   {
-   }
-
-   void Mean::initOperator() const
+   void Mean<base_t>::initOperator() const
    {
       this->mBackend.initMeanBlocks(this->mspSetup->idBlocks());
    }
 
-   void Mean::applyPostOperator(MatrixZ& rOut) const
+   void Mean<base_t>::applyPostOperator(MatrixZ& rOut) const
    {
       this->mBackend.outputMean(rOut);
    }

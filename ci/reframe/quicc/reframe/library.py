@@ -12,6 +12,7 @@ class testBase(rfm.RunOnlyRegressionTest):
     exe_path = ''
     target_executable = variable(str, value='ctest')
     test = ''
+    region = ''
     csv_rpt = variable(str, value='rpt.csv')
     steps = 100
     cscs_systems = ['daint:mc', 'manali:mc', 'dom:gpu', 'dom:mc']
@@ -111,7 +112,7 @@ class testBase(rfm.RunOnlyRegressionTest):
 47:      memory delta (MB)         :             0           0           0
 47:      time (s)                  :      0.001117     0.00185  0.00130549
         """
-        regex = r'applyOperators[\s\S]*time \(s\) [\D]*(\S+)[\D]*(\S+)[\D]*(\S+)'
+        regex = r"{}".format(region)+r'[\s\S]*?time \(s\) [\D]*(\S+)[\D]*(\S+)[\D]*(\S+)'
 
         # third group is average value
         return sn.extractsingle(regex, self.stdout, group, float)
@@ -128,12 +129,12 @@ class testBase(rfm.RunOnlyRegressionTest):
 
     @performance_function('s')
     def applyOperatorsAvg(self):
-        return self.report_time_avg('applyOperators')
+        return self.report_time_avg(self.region)
 
     @performance_function('s')
     def applyOperatorsMin(self):
-        return self.report_time_min('applyOperators')
+        return self.report_time_min(self.region)
 
     @performance_function('s')
     def applyOperatorsMax(self):
-        return self.report_time_max('applyOperators')
+        return self.report_time_max(self.region)

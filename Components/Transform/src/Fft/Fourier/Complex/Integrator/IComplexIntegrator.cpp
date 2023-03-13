@@ -8,16 +8,11 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/IComplexIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/IComplexIntegrator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -46,6 +41,8 @@ namespace Integrator {
 
    void IComplexIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<2> fix("IComplexIntegrator::transform");
+
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == in.rows());
       assert(rOut.cols() == this->outCols());

@@ -30,8 +30,8 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   ${QUICC_SPARSESM_COMPONENT_LIB}
   ${QUICC_POLYNOMIAL_COMPONENT_LIB}
   QuICC::Profiling
+  QuICC::ViewOps
   QuICC::Memory
-  QuICC::Fft
   BLAS::BLAS # banded/tridiag solve/mul TODO: remove dep
   )
 
@@ -67,6 +67,9 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB_KK}
     ${QUICC_CURRENT_COMPONENT_LIB}
     QuICC::KokkosWrapper
 )
+
+# View Operator wrappers
+add_subdirectory(Wrappers)
 
 # Add source directory
 add_subdirectory(src)

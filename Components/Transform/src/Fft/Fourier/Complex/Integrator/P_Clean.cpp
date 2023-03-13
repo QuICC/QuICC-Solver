@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/P_Clean.hpp"
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/P_CleanBase.hpp"
 
 // Project includes
 //
@@ -29,20 +29,12 @@ namespace Complex {
 
 namespace Integrator {
 
-   P_Clean::P_Clean()
-   {
-   }
-
-   P_Clean::~P_Clean()
-   {
-   }
-
-   void P_Clean::initOperator() const
+   void P_Clean<base_t>::initOperator() const
    {
       this->mBackend.initMeanBlocks(this->mspSetup->idBlocks());
    }
 
-   void P_Clean::applyPostOperator(MatrixZ& rOut) const
+   void P_Clean<base_t>::applyPostOperator(MatrixZ& rOut) const
    {
       this->mBackend.zeroMean(rOut);
       this->mBackend.output(rOut);

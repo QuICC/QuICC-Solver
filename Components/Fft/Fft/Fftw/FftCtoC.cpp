@@ -13,6 +13,7 @@
 // Project includes
 //
 #include "Fft.hpp"
+#include "Fft/FftTypes.hpp"
 #include "Library.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -20,12 +21,14 @@
 namespace QuICC {
 namespace Fft {
 namespace Fftw {
+
 template<class AttIn, class AttOut>
 FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>::FftOp()
 {
     // FFTW Fixture
     Library::getInstance();
 }
+
 template<class AttIn, class AttOut>
 FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>::~FftOp()
 {
@@ -90,20 +93,12 @@ void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>
     Profiler::RegionFixture<4> fix("FftOp::applyFft");
     fftw_execute_dft(static_cast<fftw_plan>(_plan),
         reinterpret_cast<fftw_complex* >(
-        const_cast<Cmods_t::ScalarType *>(mods.data())),
+        const_cast<std::complex<double>* >(mods.data())),
         reinterpret_cast<fftw_complex* >(phys.data()));
 }
 
 // Explicit instantiations
-/// Complex dense 2D tensor, input modes view type
-using CmodsDense2D_t = View<std::complex<double>, dense2D>;
-/// Complex dense 2D tensor, output phys view type
-using CphysDense2D_t = View<std::complex<double>, dense2D>;
 template class FftOp<CphysDense2D_t, CmodsDense2D_t>;
-/// Complex compressed sparse layer 3D tensor, input modes view type
-using CmodsDCCSC3D_t = View<std::complex<double>, DCCSC3D>;
-/// Complex compressed sparse layer 3D tensor, output phys view type
-using CphysDCCSC3D_t = View<std::complex<double>, DCCSC3D>;
 template class FftOp<CphysDCCSC3D_t, CmodsDCCSC3D_t>;
 
 } // namespace Fftw

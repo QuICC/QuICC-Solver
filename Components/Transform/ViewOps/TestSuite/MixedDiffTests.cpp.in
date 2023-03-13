@@ -1,0 +1,730 @@
+#include <catch2/catch.hpp>
+#include <complex>
+
+#include "View/View.hpp"
+#include "View/ViewUtils.hpp"
+#include "ViewOps/Fourier/Mixed/Diff.hpp"
+@Header@
+
+using namespace QuICC::Memory;
+using namespace QuICC::Transform::Fourier;
+
+using mods_t = View<std::complex<double>, DCCSC3D>;
+
+TEST_CASE("Mixed Diff 0 Backwards @Tag@", "[MixedDiff0Bwd@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 0, bwd_t>>();
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    CHECK(modsOutV(0,0,0) == modsInV(0,0,0));
+    CHECK(modsOutV(1,0,0) == modsInV(1,0,0));
+    CHECK(modsOutV(2,1,0) == modsInV(2,1,0));
+    CHECK(modsOutV(4,1,0) == modsInV(4,1,0));
+    CHECK(modsOutV(0,0,4) == modsInV(0,0,4));
+    CHECK(modsOutV(1,0,4) == modsInV(1,0,4));
+    CHECK(modsOutV(2,0,4) == modsInV(2,0,4));
+    CHECK(modsOutV(4,0,4) == modsInV(4,0,4));
+
+}
+
+TEST_CASE("Mixed Diff 0 Forwards @Tag@", "[MixedDiff0Fwd@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 0, fwd_t>>();
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    auto scale = 1.0 / static_cast<double>((M-1)*2);
+    CHECK(modsOutV(0,0,0) == modsInV(0,0,0)*scale);
+    CHECK(modsOutV(1,0,0) == modsInV(1,0,0)*scale);
+    CHECK(modsOutV(2,1,0) == modsInV(2,1,0)*scale);
+    CHECK(modsOutV(4,1,0) == modsInV(4,1,0)*scale);
+
+}
+
+TEST_CASE("Mixed Diff 1 Backwards @Tag@", "[MixedDiff1Bwd@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 1, bwd_t>>();
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    std::complex<double> i(0,1);
+
+    CHECK(modsOutV(0,0,0) == 0.0);
+    CHECK(modsOutV(1,0,0) == i);
+    CHECK(modsOutV(2,1,0) == 2.0*i);
+    CHECK(modsOutV(4,1,0) == 4.0*i);
+
+}
+
+TEST_CASE("Mixed Diff 1 Forwards @Tag@", "[MixedDiff1Fwd@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 1, fwd_t>>();
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    auto scale = 1.0 / static_cast<double>((M-1)*2);
+    std::complex<double> i(0, scale);
+    CHECK(modsOutV(0,0,0) == 0.0);
+    CHECK(modsOutV(1,0,0) == i);
+    CHECK(modsOutV(2,1,0) == 2.0*i);
+    CHECK(modsOutV(4,1,0) == 4.0*i);
+
+}
+
+TEST_CASE("Mixed/Diff 1 Backwards Scaled @Tag@", "[MixedDiff1Scale@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 1, bwd_t>>(2.0);
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    std::complex<double> i(0,1);
+
+    CHECK(modsOutV(0,0,0) == 0.0);
+    CHECK(modsOutV(1,0,0) == 2.0*i);
+    CHECK(modsOutV(2,1,0) == 4.0*i);
+    CHECK(modsOutV(4,1,0) == 8.0*i);
+
+}
+
+TEST_CASE("Mixed Diff 1 Forwards with P zero mode @Tag@", "[MixedDiff1ZeroPFwd@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_t>>();
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    auto scale = 1.0 / static_cast<double>((M-1)*2);
+    std::complex<double> i(0, scale);
+    CHECK(modsOutV(0,0,0) ==  modsInV(0,0,0)*scale);
+    CHECK(modsOutV(1,0,0) == i);
+    CHECK(modsOutV(2,1,0) == 2.0*i);
+    CHECK(modsOutV(4,1,0) == 4.0*i);
+    CHECK(modsOutV(0,0,4) == modsInV(0,0,4)*scale);
+    CHECK(modsOutV(1,0,4) == i);
+    CHECK(modsOutV(2,0,4) == 2.0*i);
+    CHECK(modsOutV(4,0,4) == 4.0*i);
+
+}
+
+TEST_CASE("Mixed Diff 1 Forwards with -P zero mode @Tag@", "[MixedDiff1ZeroMinusPFwd@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_t>>();
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    auto scale = 1.0 / static_cast<double>((M-1)*2);
+    std::complex<double> i(0, scale);
+    CHECK(modsOutV(0,0,0) == -modsInV(0,0,0)*scale);
+    CHECK(modsOutV(1,0,0) == i);
+    CHECK(modsOutV(2,1,0) == 2.0*i);
+    CHECK(modsOutV(4,1,0) == 4.0*i);
+    CHECK(modsOutV(0,0,4) == -modsInV(0,0,4)*scale);
+    CHECK(modsOutV(1,0,4) == i);
+    CHECK(modsOutV(2,0,4) == 2.0*i);
+    CHECK(modsOutV(4,0,4) == 4.0*i);
+
+}
+
+TEST_CASE("Mixed/Diff2@Tag@", "[MixedDiff2@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 2, bwd_t>>();
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    std::complex<double> cOne(1,0);
+
+    CHECK(modsOutV(0,0,0) == 0.0);
+    CHECK(modsOutV(1,0,0) == -cOne);
+    CHECK(modsOutV(2,1,0) == -2.0*2.0*cOne);
+    CHECK(modsOutV(4,1,0) == -4.0*4.0*cOne);
+
+}
+
+TEST_CASE("Mixed/Diff2Scale@Tag@", "[MixedDiff2Scale@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 2, bwd_t>>(2.0);
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    std::complex<double> cOne(1,0);
+
+    CHECK(modsOutV(0,0,0) == 0.0);
+    CHECK(modsOutV(1,0,0) == -2.0*2.0*cOne);
+    CHECK(modsOutV(2,1,0) == -4.0*4.0*cOne);
+    CHECK(modsOutV(4,1,0) == -8.0*8.0*cOne);
+
+}
+
+TEST_CASE("Mixed/Diff 2nd order, forward, with Scaling @Tag@", "[MixedDiff2FwdScale@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 2, fwd_t>>(2.0);
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    auto scale = 1.0 / static_cast<double>((M-1)*2);
+    std::complex<double> cOne(scale,0);
+    CHECK(modsOutV(0,0,0) == 0.0);
+    CHECK(modsOutV(1,0,0) == -2.0*2.0*cOne);
+    CHECK(modsOutV(2,1,0) == -4.0*4.0*cOne);
+    CHECK(modsOutV(4,1,0) == -8.0*8.0*cOne);
+
+}
+
+
+TEST_CASE("Mixed/Diff3@Tag@", "[MixedDiff3@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 3, bwd_t>>();
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    std::complex<double> i(0,1);
+
+    CHECK(modsOutV(0,0,0) == 0.0);
+    CHECK(modsOutV(1,0,0) == -i);
+    CHECK(modsOutV(2,1,0) == -2.0*2.0*2.0*i);
+    CHECK(modsOutV(4,1,0) == -4.0*4.0*4.0*i);
+
+}
+
+TEST_CASE("Mixed/Diff4@Tag@", "[MixedDiff4@Tag@]")
+{
+    using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
+
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 4, bwd_t>>();
+
+    // mods dims
+    constexpr std::size_t M = 5;
+    constexpr std::size_t N = 3;
+    constexpr std::size_t K = 5;
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+
+    // mods storage
+    constexpr std::size_t S = 20;
+    std::vector<typename mods_t::ScalarType> modsIn(S);
+    std::vector<typename mods_t::ScalarType> modsOut(S);
+
+    // set input modes
+    std::size_t m = 0;
+    for(; m < M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 2*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 3*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+    for(; m < 4*M; ++m)
+    {
+        modsIn[m] = 1.0;
+    }
+
+    // host view
+    std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+    std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+
+    @View3D@
+
+    // apply
+    diffOp->apply(modsOutV, modsInV);
+
+    @CopyBack3D@
+
+    // check
+    std::complex<double> cOne(1,0);
+
+    CHECK(modsOutV(0,0,0) == 0.0);
+    CHECK(modsOutV(1,0,0) == cOne);
+    CHECK(modsOutV(2,1,0) == 2.0*2.0*2.0*2.0*cOne);
+    CHECK(modsOutV(4,1,0) == 4.0*4.0*4.0*4.0*cOne);
+
+}

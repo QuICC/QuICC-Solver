@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/D1.hpp"
+#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/D1Base.hpp"
 
 // Project includes
 //
@@ -29,15 +29,7 @@ namespace Mixed {
 
 namespace Integrator {
 
-   D1::D1()
-   {
-   }
-
-   D1::~D1()
-   {
-   }
-
-   void D1::applyPostOperator(MatrixZ& rOut) const
+   void D1<base_t>::applyPostOperator(MatrixZ& rOut) const
    {
       this->mBackend.outputDiff(rOut, 1, this->mspSetup->boxScale());
    }

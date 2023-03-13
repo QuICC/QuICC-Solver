@@ -7,16 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/Df1InvLapl2D.hpp"
-
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/Df1InvLapl2DBase.hpp"
 
 namespace QuICC {
 
@@ -30,15 +23,7 @@ namespace Complex {
 
 namespace Integrator {
 
-   Df1InvLapl2D::Df1InvLapl2D()
-   {
-   }
-
-   Df1InvLapl2D::~Df1InvLapl2D()
-   {
-   }
-
-   void Df1InvLapl2D::applyPostOperator(MatrixZ& rOut) const
+   void Df1InvLapl2D<base_t>::applyPostOperator(MatrixZ& rOut) const
    {
       std::vector<std::pair<int,int> > orders = { {2,0}, {0,2} };
       int invId = this->mBackend.computeDiff2D(orders, this->mspSetup->boxScale(), this->mspSetup->idBlocks(), true);

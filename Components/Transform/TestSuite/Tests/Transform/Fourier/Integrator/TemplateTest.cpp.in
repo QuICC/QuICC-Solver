@@ -19,8 +19,9 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::Fourier;
 
-TEST_CASE( "@Space@::Error for @Operator@ integrator", "[@Space@::@Operator@:@type@]" )
+TEST_CASE( "@Space@::Error for @Operator@@Template@ integrator", "[@CatchTestName@]" )
 {
+
    // Set default arguments if required
    if(currentts::args().useDefault)
    {
@@ -36,11 +37,13 @@ TEST_CASE( "@Space@::Error for @Operator@ integrator", "[@Space@::@Operator@:@ty
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::Fft::Fourier::@Space@::Integrator::@Operator@ Integrator;
+   using namespace ::QuICC::Transform::Fft::Fourier;
+   typedef @Space@::Integrator::@Operator@@Template@ Integrator;
    typedef typename currentts::Tester<Integrator> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
+   tester.setIter(currentts::args().iter);
 
    Tester::ParameterType params = {-1};
 

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file MixedFourierTransform.cpp
  * @brief Source of the implementation of the FFTW mixed transform
  */
@@ -79,15 +79,16 @@ namespace Transform {
 
    void MixedFourierTransform::initOperators()
    {
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::P>(Backward::P::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D1>(Backward::D1::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D2>(Backward::D2::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D3>(Backward::D3::id());
+      using namespace QuICC::Transform::Fft::Fourier;
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::P<base_t>>(Backward::P::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D1<base_t>>(Backward::D1::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D2<base_t>>(Backward::D2::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D3<base_t>>(Backward::D3::id());
 
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::P>(Forward::P::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D1>(Forward::D1::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D1_P>(Forward::D1ZP0::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D2>(Forward::D2::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::P<base_t>>(Forward::P::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D1<base_t>>(Forward::D1::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D1_P<base_t>>(Forward::D1ZP0::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D2<base_t>>(Forward::D2::id());
    }
 
    void MixedFourierTransform::forward(MatrixZ& rOut, const Matrix& in, const std::size_t id)

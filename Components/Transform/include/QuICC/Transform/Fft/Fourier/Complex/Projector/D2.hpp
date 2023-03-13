@@ -1,73 +1,20 @@
-/** 
+/**
  * @file D2.hpp
- * @brief Implementation of the Fourier based D^2 projector
+ * @brief Implementation of the Fourier based D projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_D2_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_D2_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Fourier/Complex/Projector/IComplexProjector.hpp"
-
-namespace QuICC {
-
-namespace Transform {
-
-namespace Fft {
-
-namespace Fourier {
-
-namespace Complex {
-
-namespace Projector {
-
-   /**
-    * @brief Implementation of the Fourier based D^2 projector
-    */ 
-   class D2: public IComplexProjector
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         D2();
-
-         /**
-          * @brief Destructor
-          */
-         ~D2();
-         
-      protected:
-
-      private:
-         /**
-          * @brief Apply pre FFT operator
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const final;
-   };
-
-}
-}
-}
-}
-}
-}
+#include "QuICC/Transform/Fft/Fourier/Complex/Projector/D2Base.hpp"
+#include "QuICC/Transform/Wrappers/Complex/Projector/D2viewCpu_t.hpp.inc"
+#ifdef QUICC_USE_CUFFT
+#include "QuICC/Transform/Wrappers/Complex/Projector/D2viewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_D2_HPP

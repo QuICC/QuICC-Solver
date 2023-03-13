@@ -33,6 +33,12 @@ namespace Mixed {
    {
    }
 
+   Setup::Setup(const int size, const int specSize, const GridPurpose::Id purpose)
+      : ::QuICC::Transform::Fft::Setup(size, specSize, purpose)
+   {
+   }
+
+
    Setup::~Setup()
    {
    }

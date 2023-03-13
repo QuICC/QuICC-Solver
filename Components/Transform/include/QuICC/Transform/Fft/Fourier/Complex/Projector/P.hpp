@@ -1,4 +1,4 @@
-/** 
+/**
  * @file P.hpp
  * @brief Implementation of the Fourier based P projector
  */
@@ -6,68 +6,15 @@
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_P_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_P_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
+// Project includes
 //
-
-// Pect includes
-//
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Fourier/Complex/Projector/IComplexProjector.hpp"
-
-namespace QuICC {
-
-namespace Transform {
-
-namespace Fft {
-
-namespace Fourier {
-
-namespace Complex {
-
-namespace Projector {
-
-   /**
-    * @brief Implementation of the Fourier based P projector
-    */ 
-   class P: public IComplexProjector
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         P();
-
-         /**
-          * @brief Destructor
-          */
-         ~P();
-         
-      protected:
-
-      private:
-         /**
-          * @brief Apply pre FFT operator
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const;
-   };
-
-}
-}
-}
-}
-}
-}
+#include "QuICC/Transform/Fft/Fourier/Complex/Projector/PBase.hpp"
+#include "QuICC/Transform/Wrappers/Complex/Projector/PviewCpu_t.hpp.inc"
+#ifdef QUICC_USE_CUFFT
+#include "QuICC/Transform/Wrappers/Complex/Projector/PviewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_P_HPP

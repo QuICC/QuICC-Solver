@@ -13,6 +13,8 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 )
 
 set(PHS
+  Fft/Fft.hpp
+  Fft/FftTypes.hpp
 )
 
 # Add public header

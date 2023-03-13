@@ -1,5 +1,5 @@
 /**
- * @file ViewUnstructured.hpp
+ * @file ViewSparse.hpp
  * @brief A view is a n-dimensional dense or sparse tensor reference to a block of memory.
  * It is not the owner of the memory resource.
  */

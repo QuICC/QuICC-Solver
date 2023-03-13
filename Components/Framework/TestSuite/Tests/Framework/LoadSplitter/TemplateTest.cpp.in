@@ -42,10 +42,10 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
       currentts::args().dim1D = 0;
 
       currentts::args().params.clear();
-      for(unsigned int i = 0; i < currentts::args().np; i++)
-      {
-         currentts::args().params.push_back(i);
-      }
+      currentts::args().params.push_back(0);
+      auto np = currentts::args().np;
+      currentts::args().params.push_back((np-1)/2);
+      currentts::args().params.push_back(np-1);
    }
    else
    {

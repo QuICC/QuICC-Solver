@@ -51,7 +51,10 @@ namespace LoadSplitter {
       /// Dimension 1D
       unsigned int dim3D;
 
-      /// MPI stage to look at
+      /** 
+       * @brief MPI stage to look at
+       * 0: radial, 1: AL, 2:FFT, 3: spectral
+       */
       unsigned int stage;
 
       /// MPI ranks for which to compute splitting

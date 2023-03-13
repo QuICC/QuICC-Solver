@@ -1,8 +1,9 @@
 # Create component library
 set(QUICC_CURRENT_SUBCOMPONENT_LIB CuFft)
 add_library(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} STATIC
-  FftCtoR.cpp
   FftCtoC.cpp
+  FftCtoR.cpp
+  FftRtoC.cpp
 )
 
 target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
@@ -21,9 +22,9 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
   QuICC::Operator
   QuICC::Profiling
 )
-  
+
 # CuFft
-target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} PUBLIC 
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} PUBLIC
   CUDA::cufft
   QuICC::Cuda
 )

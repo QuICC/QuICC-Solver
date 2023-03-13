@@ -7,16 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/D1_Neg.hpp"
-
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/D1_NegBase.hpp"
 
 namespace QuICC {
 
@@ -30,20 +23,12 @@ namespace Complex {
 
 namespace Integrator {
 
-   D1_Neg::D1_Neg()
-   {
-   }
-
-   D1_Neg::~D1_Neg()
-   {
-   }
-
-   void D1_Neg::initOperator() const
+   void D1_Neg<base_t>::initOperator() const
    {
       this->mBackend.initMeanBlocks(this->mspSetup->idBlocks());
    }
 
-   void D1_Neg::applyPostOperator(MatrixZ& rOut) const
+   void D1_Neg<base_t>::applyPostOperator(MatrixZ& rOut) const
    {
       this->mBackend.extractMean(rOut);
 

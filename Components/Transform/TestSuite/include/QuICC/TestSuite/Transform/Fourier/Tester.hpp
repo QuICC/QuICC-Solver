@@ -239,9 +239,13 @@ namespace Fourier {
          TOp op;
          this->initOperator(op, spSetup);
 
-         FwdType outData(op.outRows(), op.outCols());
+         FwdType outData;
 
-         op.transform(outData, inData);
+         for (unsigned int i = 0; i < this->mIter; ++i)
+         {
+            outData = FwdType(op.outRows(), op.outCols());
+            op.transform(outData, inData);
+         }
 
          if constexpr(std::is_same_v<FwdType,MatrixZ>)
          {
@@ -280,9 +284,13 @@ namespace Fourier {
          TOp op;
          this->initOperator(op, spSetup);
 
-         BwdType outData(spSetup->bwdSize(), op.outCols());
+         BwdType outData;
 
-         op.transform(outData, inData);
+         for (unsigned int i = 0; i < this->mIter; ++i)
+         {
+            outData = BwdType(spSetup->bwdSize(), op.outCols());
+            op.transform(outData, inData);
+         }
 
          // note, we check only "dealiased" values
          MatrixZ outDealias(op.outRows(),outData.cols());
@@ -401,7 +409,15 @@ namespace Fourier {
       int nMeta = 2;
       int specN = meta(0);
       int physN = meta(1);
-      auto spSetup = std::make_shared<typename TOp::SetupType>(physN, meta.size()-nMeta, specN, GridPurpose::SIMULATION);
+      if (std::is_same_v<typename TOp::SetupType,transf::Mixed::Setup> &&
+            (type == TestType::PROJECTOR || type == TestType::INTEGRATOR)
+         )
+      {
+         // the metadata generated automatically is the aliased size
+         // but the test was setup for dealiased data
+         specN = physN / 3;
+      }
+      auto spSetup = std::make_shared<typename TOp::SetupType>(physN, specN, GridPurpose::SIMULATION);
       spSetup->setBoxScale(1.0);
 
       // Gather indices

@@ -1,72 +1,20 @@
-/** 
+/**
  * @file P.hpp
- * @brief Implementation of the Fourier based P integrator
+ * @brief Implementation of the Fourier based P Integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_INTEGRATOR_P_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_INTEGRATOR_P_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/IComplexIntegrator.hpp"
-
-namespace QuICC {
-
-namespace Transform {
-
-namespace Fft {
-
-namespace Fourier {
-
-namespace Complex {
-
-namespace Integrator {
-
-   /**
-    * @brief Implementation of the Fourier based P integrator
-    */ 
-   class P: public IComplexIntegrator
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         P();
-
-         /**
-          * @brief Destructor
-          */
-         ~P();
-         
-      protected:
-
-      private:
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         void applyPostOperator(MatrixZ& rOut) const final;
-   };
-
-}
-}
-}
-}
-}
-}
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/PBase.hpp"
+#include "QuICC/Transform/Wrappers/Complex/Integrator/PviewCpu_t.hpp.inc"
+#ifdef QUICC_USE_CUFFT
+#include "QuICC/Transform/Wrappers/Complex/Integrator/PviewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_INTEGRATOR_P_HPP

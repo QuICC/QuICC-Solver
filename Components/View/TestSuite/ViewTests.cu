@@ -9,11 +9,9 @@
 
 
 using namespace QuICC::Memory;
-using dense1D = DimLevelType<dense_t>;
-using dense2D = DimLevelType<dense_t, dense_t>;
 
 __global__
-void add1(View<double, Attributes<dense1D>> out, View<double, Attributes<dense1D>> in)
+void add1(View<double, dense1D> out, View<double, dense1D> in)
 {
     auto n = out.size();
     const std::size_t index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -35,8 +33,8 @@ TEST_CASE("ViewOneDimDenseCuda", "[ViewOneDimDenseCuda]")
     QuICC::Memory::MemBlock<double> in_d(S, &mem_res);
     QuICC::Memory::MemBlock<double> out_d(S, &mem_res);
 
-    View<double, Attributes<dense1D>> Vin (in_d, dimensions);
-    View<double, Attributes<dense1D>> Vout (out_d, dimensions);
+    View<double, dense1D> Vin (in_d, dimensions);
+    View<double, dense1D> Vout (out_d, dimensions);
 
     CHECK(Vin.rank() == 1);
     CHECK(Vin.dims()[0] == S);
@@ -144,7 +142,7 @@ TEST_CASE("ViewOneDimSparseCuda", "[ViewOneDimSparseCuda]")
 
 
 __global__
-void addColumn(View<double, Attributes<dense2D>> out, View<double, Attributes<dense2D>> in)
+void addColumn(View<double, dense2D> out, View<double, dense2D> in)
 {
     auto m = out.dims()[0];
     auto n = out.dims()[1];
@@ -169,8 +167,8 @@ TEST_CASE("ViewTwoDimDenseColMajCuda", "[ViewTwoDimDenseColMajCuda]")
     QuICC::Memory::MemBlock<double> in_d(S, &mem_res);
     QuICC::Memory::MemBlock<double> out_d(S, &mem_res);
 
-    View<double, Attributes<dense2D>> Vin (in_d, dimensions);
-    View<double, Attributes<dense2D>> Vout (out_d, dimensions);
+    View<double, dense2D> Vin (in_d, dimensions);
+    View<double, dense2D> Vout (out_d, dimensions);
 
     CHECK(Vin.rank() == 2);
     CHECK(Vin.dims()[0] == M);
