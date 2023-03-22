@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Worland/Boundary/R1D1DivR1.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/Boundary/R1D1DivR1.hpp"
 
 namespace QuICC {
 

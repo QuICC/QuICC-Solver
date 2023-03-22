@@ -6,18 +6,9 @@
 #ifndef QUICC_SPARSESM_CHEBYSHEV_ILINEARMAPOPERATOR_HPP
 #define QUICC_SPARSESM_CHEBYSHEV_ILINEARMAPOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
-
-// External includes
-//
 
 // Project includes
 //

@@ -7,9 +7,6 @@
 #define QUICC_TESTSUITE_SPARSESM_WORLAND_TESTER_HPP
 
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -104,8 +101,14 @@ namespace Worland {
       auto alpha = meta(2);
       auto dbeta = meta(3);
       auto l = meta(4);
+      int q = 0;
+      // Check for truncation in meta data
+      if(meta.size() > 5)
+      {
+         q = meta(5);
+      }
 
-      TOp op(rows, cols, alpha, dbeta, l);
+      TOp op(rows, cols, alpha, dbeta, l, q);
       mat = op.mat();
    }
 
@@ -118,8 +121,14 @@ namespace Worland {
       auto alpha = meta(2);
       auto dbeta = meta(3);
       auto l = meta(4);
+      int q = 0;
+      // Check for truncation in meta data
+      if(meta.size() > 5)
+      {
+         q = meta(5);
+      }
 
-      TOp op(rows, cols, alpha, dbeta, l);
+      TOp op(rows, cols, alpha, dbeta, l, q);
       unsigned int KL, KU;
       mat = op.banded(KL, KU);
    }

@@ -44,7 +44,7 @@ namespace Worland {
          /**
           * @brief Destructor
           */
-         virtual ~I2();
+         virtual ~I2() = default;
 
       protected:
 

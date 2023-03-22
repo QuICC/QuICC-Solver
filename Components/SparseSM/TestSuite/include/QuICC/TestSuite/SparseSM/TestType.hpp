@@ -6,9 +6,6 @@
 #ifndef QUICC_TESTSUITE_SPARSESM_TESTTYPE_HPP
 #define QUICC_TESTSUITE_SPARSESM_TESTTYPE_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 
@@ -27,6 +24,8 @@ namespace SparseSM {
    enum class TestType {
       SPARSE = 0,
       BANDED,
+      BOUNDARY,
+      STENCIL,
    };
 
 }

@@ -7,20 +7,21 @@
 #define QUICC_TESTSUITE_SPARSESM_CHEBYSHEV_LINEARMAP_TESTER_HPP
 
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
 #include <string>
 #include <set>
 #include <sstream>
+#include <type_traits>
 
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/ISphericalOperator.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/ICondition.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/Operator.hpp"
 #include "QuICC/TestSuite/SparseSM/TesterBase.hpp"
 
 namespace QuICC {
@@ -101,27 +102,88 @@ namespace LinearMap {
    {
       Array meta = this->readMeta(param, type);
 
-      int rows = static_cast<int>(meta(0));
-      int cols = static_cast<int>(meta(1));
-      auto lower = meta(2);
-      auto upper = meta(3);
+      if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::LinearMap::ISphericalOperator, TOp>)
+      {
+         assert(meta.size() == 5);
+         int rows = static_cast<int>(meta(0));
+         int cols = static_cast<int>(meta(1));
+         auto lower = meta(2);
+         auto upper = meta(3);
+         auto l = meta(4);
 
-      TOp op(rows, cols, lower, upper);
-      mat = op.mat();
+         TOp op(rows, cols, lower, upper, l);
+         mat = op.mat();
+      }
+      else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::ILinearMapOperator, TOp>)
+      {
+         assert(meta.size() == 4);
+         int rows = static_cast<int>(meta(0));
+         int cols = static_cast<int>(meta(1));
+         auto lower = meta(2);
+         auto upper = meta(3);
+
+         TOp op(rows, cols, lower, upper);
+         mat = op.mat();
+      }
+      else
+      {
+         throw std::logic_error("Could not build sparse operator");
+      }
    }
 
    template <typename TOp> void Tester<TOp>::buildOperator(Matrix& mat, const ParameterType& param, const TestType type) const
    {
       Array meta = this->readMeta(param, type);
 
-      int rows = static_cast<int>(meta(0));
-      int cols = static_cast<int>(meta(1));
-      auto lower = meta(2);
-      auto upper = meta(3);
-
-      TOp op(rows, cols, lower, upper);
       unsigned int KL, KU;
-      mat = op.banded(KL, KU);
+      if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::LinearMap::ISphericalOperator, TOp>)
+      {
+         int rows = static_cast<int>(meta(0));
+         int cols = static_cast<int>(meta(1));
+         auto lower = meta(2);
+         auto upper = meta(3);
+
+         assert(meta.size() == 5);
+         auto l = meta(4);
+         TOp op(rows, cols, lower, upper, l);
+         mat = op.banded(KL, KU);
+      }
+      else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::ILinearMapOperator, TOp>)
+      {
+         int rows = static_cast<int>(meta(0));
+         int cols = static_cast<int>(meta(1));
+         auto lower = meta(2);
+         auto upper = meta(3);
+
+         TOp op(rows, cols, lower, upper);
+         mat = op.banded(KL, KU);
+      }
+      else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::LinearMap::Boundary::ICondition, TOp>)
+      {
+         auto lower = meta(0);
+         auto upper = meta(1);
+         int pos = static_cast<int>(meta(2));
+         int maxN = static_cast<int>(meta(3));
+
+         QuICC::SparseSM::Chebyshev::LinearMap::Boundary::Operator bcOp(1, maxN+1, lower, upper);
+
+         if constexpr(std::is_constructible_v<TOp, internal::MHDFloat, internal::MHDFloat, typename TOp::Position, int>)
+         {
+            assert(meta.size() == 5);
+            auto l = meta(4);
+            bcOp.addRow<TOp>(static_cast<typename TOp::Position>(pos), l);
+            mat = bcOp.mat();
+         }
+         else
+         {
+            bcOp.addRow<TOp>(static_cast<typename TOp::Position>(pos));
+            mat = bcOp.mat();
+         }
+      }
+      else
+      {
+         throw std::logic_error("Could not build dense operator");
+      }
    }
 
    template <typename TOp> std::string Tester<TOp>::resname(const ParameterType& param) const

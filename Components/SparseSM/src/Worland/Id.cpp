@@ -8,12 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// Class include
-//
-#include "QuICC/SparseSM/Worland/Id.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/Id.hpp"
 #include "QuICC/SparseSM/Worland/IdDiags.hpp"
 
 namespace QuICC {

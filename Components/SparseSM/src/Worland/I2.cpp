@@ -8,12 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// Class include
-//
-#include "QuICC/SparseSM/Worland/I2.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/I2.hpp"
 #include "QuICC/SparseSM/Worland/WorlandKind.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/I2Diags.hpp"
 #include "QuICC/SparseSM/Worland/Legendre/I2Diags.hpp"
@@ -46,15 +43,15 @@ namespace Worland {
       }
    }
 
-   I2::~I2()
-   {
-   }
-
    void I2::buildTriplets(TripletList_t& list) const
    {
       const int dShift = 1;
       ACoeffI ni = ACoeffI::LinSpaced(this->rows()-1, 1, this->rows()-1);
       ACoeff_t n = (ni + dShift).cast<Scalar_t>();
+
+      // Precompute the normalization factors
+      int maxN = this->rows()-1 + dShift + 2;
+      this->mpImpl->precomputeNorm(maxN, 0);
 
       if(n.size() > 0)
       {

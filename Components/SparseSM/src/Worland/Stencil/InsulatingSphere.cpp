@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Worland/Stencil/InsulatingSphere.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/Stencil/InsulatingSphere.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/Chebyshev/InsulatingSphereDiags.hpp"
 //#include "QuICC/SparseSM/Worland/Legendre/InsulatingSphereDiags.hpp"
 //#include "QuICC/SparseSM/Worland/CylEnergy/InsulatingSphereDiags.hpp"

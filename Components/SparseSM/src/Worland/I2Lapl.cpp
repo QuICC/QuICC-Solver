@@ -8,12 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// Class include
-//
-#include "QuICC/SparseSM/Worland/I2Lapl.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/I2Lapl.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/I2LaplDiags.hpp"
 //#include "QuICC/SparseSM/Worland/Legendre/I2LaplDiags.hpp"
 //#include "QuICC/SparseSM/Worland/CylEnergy/I2LaplDiags.hpp"
@@ -54,9 +51,13 @@ namespace Worland {
       ACoeffI ni = ACoeffI::LinSpaced(this->rows()-1, 1, this->rows()-1);
       ACoeff_t n = (ni + dShift).cast<Scalar_t>();
 
+      // Precompute the normalization factors
+      int maxN = this->rows()-1 + dShift + 1;
+      this->mpImpl->precomputeNorm(maxN, 0);
+
       if(n.size() > 0)
       {
-         list.reserve(5*std::max(this->rows(),this->cols()));
+         list.reserve(3*std::max(this->rows(),this->cols()));
          this->convertToTriplets(list, -1 + dShift, ni, this->mpImpl->d_1(n));
          this->convertToTriplets(list, 0 + dShift, ni, this->mpImpl->d0(n));
          this->convertToTriplets(list, 1 + dShift, ni, this->mpImpl->d1(n));

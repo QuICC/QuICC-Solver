@@ -6,6 +6,10 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I2Diags.cpp
   I2Lapl.cpp
   I2LaplDiags.cpp
+  I2Qp.cpp
+  I2QpDiags.cpp
+  I2Qm.cpp
+  I2QmDiags.cpp
   I4.cpp
   I4Diags.cpp
   I4D1R1.cpp
@@ -14,6 +18,10 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I4LaplDiags.cpp
   I4Lapl2.cpp
   I4Lapl2Diags.cpp
+  I4Qm.cpp
+  I4QmDiags.cpp
+  I4Qp.cpp
+  I4QpDiags.cpp
   I6.cpp
   I6Diags.cpp
   I6CylLaplh.cpp

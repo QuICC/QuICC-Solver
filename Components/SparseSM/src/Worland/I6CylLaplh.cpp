@@ -8,12 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// Class include
-//
-#include "QuICC/SparseSM/Worland/I6CylLaplh.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/I6CylLaplh.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/I6CylLaplhDiags.hpp"
 //#include "QuICC/SparseSM/Worland/Legendre/I6CylLaplhDiags.hpp"
 //#include "QuICC/SparseSM/Worland/CylEnergy/I6CylLaplhDiags.hpp"
@@ -46,10 +43,6 @@ namespace Worland {
             //this->mpImpl = std::make_shared<SphEnergy::I6CylLaplhDiags>(alpha, l, q);
             break;
       }
-   }
-
-   I6CylLaplh::~I6CylLaplh()
-   {
    }
 
    void I6CylLaplh::buildTriplets(TripletList_t& list) const

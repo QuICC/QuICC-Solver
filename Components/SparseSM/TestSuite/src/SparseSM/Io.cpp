@@ -3,12 +3,6 @@
  * @brief Source of the useful functions for SparseSM tests
  */
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <iostream>
@@ -17,9 +11,6 @@
 #include <string>
 #include <fstream>
 #include <unsupported/Eigen/SparseExtra>
-
-// External includes
-//
 
 // Project includes
 //

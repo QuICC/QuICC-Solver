@@ -7,16 +7,11 @@
 //
 #include <cassert>
 #include <stdexcept>
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Chebyshev/ILinearMapOperator.hpp"
+#include <limits>
 
 // Project includes
 //
+#include "QuICC/SparseSM/Chebyshev/ILinearMapOperator.hpp"
 
 namespace QuICC {
 
@@ -25,7 +20,7 @@ namespace SparseSM {
 namespace Chebyshev {
 
    ILinearMapOperator::ILinearMapOperator(const int rows, const int cols, const Scalar_t lower, const Scalar_t upper)
-      : IChebyshevOperator(rows, cols), mA(-4242.0), mB(-4242.0)
+      : IChebyshevOperator(rows, cols), mA(std::numeric_limits<Scalar_t>::max()), mB(std::numeric_limits<Scalar_t>::max())
    {
       this->setBounds(lower,upper);
    }

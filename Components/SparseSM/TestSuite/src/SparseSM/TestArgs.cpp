@@ -3,9 +3,6 @@
  * @brief Source of test arguments
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
@@ -34,6 +31,14 @@ namespace SparseSM {
       else if(type == "banded")
       {
          this->type = TestType::BANDED;
+      }
+      else if(type == "boundary")
+      {
+         this->type = TestType::BOUNDARY;
+      }
+      else if(type == "stencil")
+      {
+         this->type = TestType::STENCIL;
       }
       else
       {

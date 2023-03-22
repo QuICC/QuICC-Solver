@@ -42,7 +42,7 @@ namespace Worland {
          /**
           * @brief Destructor
           */
-         virtual ~I6CylLaplh();
+         virtual ~I6CylLaplh() = default;
          
       protected:
 

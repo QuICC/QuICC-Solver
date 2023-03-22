@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y3D1Y1.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y3D1Y1.hpp"
 
 namespace QuICC {
 

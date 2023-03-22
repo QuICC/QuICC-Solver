@@ -46,6 +46,14 @@ namespace Worland {
           * @brief Destructor
           */
          virtual ~IDiags() = default;
+
+         /**
+          * @brief Precompute normalization
+          *
+          * @param maxN Highest radial n
+          * @param p    Shift in l
+          */
+         void precomputeNorm(const int maxN, const int p);
          
       protected:
          /**
@@ -140,6 +148,11 @@ namespace Worland {
           * @brief l
           */
          Scalar_t mL;
+
+         /**
+          * @brief Storage for normalization
+          */
+         std::map<Scalar_t,ACoeff_t> mNorm;
    };
 
 }

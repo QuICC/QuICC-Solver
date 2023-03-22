@@ -6,12 +6,6 @@
 #ifndef QUICC_SPARSESM_IWORLANDOPERATOR_HPP
 #define QUICC_SPARSESM_IWORLANDOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
@@ -34,13 +28,18 @@ namespace SparseSM {
       public:
          /**
           * @brief Constructor
+          *
+          * @param rows    Number of rows
+          * @param cols    Number of columns
+          * @param alpha   Jacobi alpha parameter
+          * @param veta    Jacobi alpha parameter
           */
          IWorlandOperator(const int rows, const int cols, const Scalar_t  alpha, const Scalar_t dBeta);
 
          /**
           * @brief Destructor
           */
-         virtual ~IWorlandOperator();
+         virtual ~IWorlandOperator() = default;
          
       protected:
          /**

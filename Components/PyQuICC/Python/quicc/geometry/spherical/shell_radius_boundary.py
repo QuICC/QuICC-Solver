@@ -413,7 +413,7 @@ def restrict_eye(nr, t, q):
 def stencil_value(nr, ri, ro, pos, coeffs = None):
     """Create stencil matrix for a zero boundary value"""
 
-    assert(coeffs.get('c', None) is None)
+    assert(coeffs is None)
 
     ns = np.arange(0,nr,1)
     if pos == 0:
@@ -440,7 +440,7 @@ def stencil_value(nr, ri, ro, pos, coeffs = None):
 def stencil_diff(nr, ri, ro, pos, coeffs = None):
     """Create stencil matrix for a zero 1st derivative"""
 
-    assert(coeffs.get('c', None) is None)
+    assert(coeffs is None)
 
     ns = np.arange(0,nr,1)
     if pos == 0:
@@ -467,7 +467,7 @@ def stencil_diff(nr, ri, ro, pos, coeffs = None):
 def stencil_rdiffdivr(nr, ri, ro, pos, coeffs = None):
     """Create stencil matrix for a zero r D 1/r derivative"""
 
-    assert(coeffs.get('c', None) is None)
+    assert(coeffs is None)
     assert(pos == 0)
 
     a,b = linear_map(ri, ro)
@@ -573,7 +573,7 @@ def stencil_insulating(nr, ri, ro, pos, coeffs = None):
 def stencil_diff2(nr, ri, ro, pos, coeffs = None):
     """Create stencil matrix for a zero 2nd derivative"""
 
-    assert(coeffs.get('c', None) is None)
+    assert(coeffs is None)
 
     ns = np.arange(0,nr,1)
     if pos == 0:
@@ -603,7 +603,7 @@ def stencil_diff2(nr, ri, ro, pos, coeffs = None):
 def stencil_value_diff(nr, ri, ro, pos, coeffs = None):
     """Create stencil matrix for a zero boundary value and a zero 1st derivative"""
 
-    assert(coeffs.get('c', None) is None)
+    assert(coeffs is None)
     assert(pos == 0)
 
     ns = np.arange(0,nr,1)
@@ -644,7 +644,7 @@ def stencil_value_diff(nr, ri, ro, pos, coeffs = None):
 def stencil_value_diff2(nr, ri, ro, pos, coeffs = None):
     """Create stencil matrix for a zero boundary value and a zero 2nd derivative"""
 
-    assert(coeffs.get('c', None) is None)
+    assert(coeffs is None)
     assert(pos == 0)
 
     ns = np.arange(0,nr,1)

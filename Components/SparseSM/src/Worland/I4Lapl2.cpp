@@ -8,12 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// Class include
-//
-#include "QuICC/SparseSM/Worland/I4Lapl2.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/I4Lapl2.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/I4Lapl2Diags.hpp"
 //#include "QuICC/SparseSM/Worland/Legendre/I4Lapl2Diags.hpp"
 //#include "QuICC/SparseSM/Worland/CylEnergy/I4Lapl2Diags.hpp"
@@ -53,6 +50,10 @@ namespace Worland {
       const int dShift = 2;
       ACoeffI ni = ACoeffI::LinSpaced(this->rows()-2, 2, this->rows()-1);
       ACoeff_t n = (ni + dShift).cast<Scalar_t>();
+
+      // Precompute the normalization factors
+      int maxN = this->rows()-1 + dShift + 2;
+      this->mpImpl->precomputeNorm(maxN, 0);
 
       if(n.size() > 0)
       {

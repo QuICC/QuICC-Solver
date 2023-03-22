@@ -8,12 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// Class include
-//
-#include "QuICC/SparseSM/Worland/I4D1R1.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/I4D1R1.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/I4D1R1Diags.hpp"
 //#include "QuICC/SparseSM/Worland/Legendre/I4D1R1Diags.hpp"
 //#include "QuICC/SparseSM/Worland/CylEnergy/I4D1R1Diags.hpp"
@@ -53,15 +50,15 @@ namespace Worland {
       }
    }
 
-   I4D1R1::~I4D1R1()
-   {
-   }
-
    void I4D1R1::buildTriplets(TripletList_t& list) const
    {
       const int dShift = 2;
       ACoeffI ni = ACoeffI::LinSpaced(this->rows()-2, 2, this->rows()-1);
       ACoeff_t n = (ni + dShift).cast<Scalar_t>();
+
+      // Precompute the normalization factors
+      int maxN = this->rows()-1 + dShift + 4;
+      this->mpImpl->precomputeNorm(maxN, 0);
 
       if(n.size() > 0)
       {

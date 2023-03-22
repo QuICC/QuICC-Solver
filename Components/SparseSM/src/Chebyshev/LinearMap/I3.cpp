@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Chebyshev/LinearMap/I3.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I3.hpp"
 
 namespace QuICC {
 
@@ -28,10 +22,6 @@ namespace LinearMap {
 
    I3::I3(const int rows, const int cols, const Scalar_t lower, const Scalar_t upper)
       : ILinearMapOperator(rows, cols, lower, upper)
-   {
-   }
-
-   I3::~I3()
    {
    }
 

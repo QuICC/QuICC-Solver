@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/ISparseSMOperator.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/ISparseSMOperator.hpp"
 
 namespace QuICC {
 
@@ -24,10 +18,6 @@ namespace SparseSM {
 
    ISparseSMOperator::ISparseSMOperator(const int rows, const int cols)
       : mRows(rows), mCols(cols)
-   {
-   }
-
-   ISparseSMOperator::~ISparseSMOperator()
    {
    }
 

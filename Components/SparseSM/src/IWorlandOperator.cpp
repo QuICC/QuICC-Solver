@@ -7,9 +7,6 @@
 //
 #include <cassert>
 #include <stdexcept>
-
-// External includes
-//
 #include <unsupported/Eigen/SpecialFunctions>
 
 // Project includes
@@ -26,10 +23,6 @@ namespace SparseSM {
       : ISparseSMOperator(rows, cols)
    {
       this->mType = Worland::Tools::identifyBasis(alpha, dBeta);
-   }
-
-   IWorlandOperator::~IWorlandOperator()
-   {
    }
 
    Worland::WorlandKind IWorlandOperator::type() const

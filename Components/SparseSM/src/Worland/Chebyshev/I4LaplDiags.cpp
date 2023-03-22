@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Worland/Chebyshev/I4LaplDiags.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/Chebyshev/I4LaplDiags.hpp"
 
 #include <iostream>
 namespace QuICC {
@@ -200,6 +194,9 @@ namespace Chebyshev {
             break;
          case 5:
             g = this->mI4.d4(m);
+            break;
+         default:
+            throw std::logic_error("Unknown diagonal for computing correction");
             break;
       }
       ACoeff_t ng = g/this->normalizeDiag(m, k);

@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Worland/Stencil/ValueD2.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/Stencil/ValueD2.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/Chebyshev/ValueD2Diags.hpp"
 //#include "QuICC/SparseSM/Worland/Legendre/ValueD2Diags.hpp"
 //#include "QuICC/SparseSM/Worland/CylEnergy/ValueD2Diags.hpp"

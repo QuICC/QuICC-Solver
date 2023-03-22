@@ -8,12 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// Class include
-//
-#include "QuICC/SparseSM/Worland/R2.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/R2.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/R2Diags.hpp"
 #include "QuICC/SparseSM/Worland/Legendre/R2Diags.hpp"
 #include "QuICC/SparseSM/Worland/CylEnergy/R2Diags.hpp"
@@ -43,10 +40,6 @@ namespace Worland {
             this->mpImpl = std::make_shared<SphEnergy::R2Diags>(alpha, l, q);
             break;
       }
-   }
-
-   R2::~R2()
-   {
    }
 
    void R2::buildTriplets(ISparseSMOperator::TripletList_t& list) const

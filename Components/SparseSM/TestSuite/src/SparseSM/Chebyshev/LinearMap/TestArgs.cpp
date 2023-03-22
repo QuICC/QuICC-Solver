@@ -3,9 +3,6 @@
  * @brief Source of test arguments
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 

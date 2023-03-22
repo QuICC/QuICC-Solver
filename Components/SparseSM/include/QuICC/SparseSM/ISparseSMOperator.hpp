@@ -6,18 +6,9 @@
 #ifndef QUICC_SPARSESM_ISPARSESMPERATOR_HPP
 #define QUICC_SPARSESM_ISPARSESMPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
-
-// External includes
-//
 
 // Project includes
 //
@@ -52,13 +43,16 @@ namespace SparseSM {
 
          /**
           * @brief Constructor
+          *
+          * @param rows Number of rows
+          * @param cols Number of columns
           */
          ISparseSMOperator(const int rows, const int cols);
 
          /**
           * @brief Destructor
           */
-         virtual ~ISparseSMOperator();
+         virtual ~ISparseSMOperator() = default;
 
          /**
           * @brief Get sparse matrix
