@@ -27,7 +27,7 @@ namespace details
     using namespace QuICC::Transform::Fourier::details;
 
     /// Cuda kernel
-    template<std::size_t Order, class Direction, class Treatment>
+    template<std::size_t Order, class Direction, std::uint16_t Treatment>
     __global__ void diffKernel(mods_t out, const mods_t in, const double scale)
     {
         constexpr bool isComplex = Order % 2;
@@ -35,6 +35,13 @@ namespace details
 
         const auto M = out.dims()[0];
         const auto N = out.dims()[1];
+
+        // dealias bounds
+        std::size_t nDealias = M;
+        if constexpr (Treatment & dealias_m)
+        {
+            nDealias *= dealias::rule;
+        }
 
         double fftScaling = 1.0;
         if constexpr (std::is_same_v<Direction, fwd_t>)
@@ -59,14 +66,18 @@ namespace details
         // Get total number of columns to loop over
         auto indices = in.indices()[1];
         auto columns = indices.size();
-        if(m < M)
+
+        // skip copy if p bwd is in place
+        const std::size_t mStart = dealias::getMstart<mods_t, mods_t, Order, Direction, Treatment>(out, in);
+
+        if(m >= mStart && m < M)
         {
             cuDoubleComplex tmpR = {static_cast<double>(sgn) *
                 fast_pow<Order>(static_cast<double>(m)*scale), 0.0};
 
             auto tmpC = cuCmul(c, tmpR);
 
-            if constexpr (std::is_same_v<Treatment, zeroP_t>)
+            if constexpr (Treatment & zeroP_m)
             {
                 if (m == 0)
                 {
@@ -74,11 +85,19 @@ namespace details
                 }
             }
 
-            if constexpr (std::is_same_v<Treatment, zeroMinusP_t>)
+            if constexpr (Treatment & zeroMinusP_m)
             {
                 if (m == 0)
                 {
                     tmpC = {-fftScaling, 0.0};
+                }
+            }
+
+            if constexpr (Treatment & dealias_m)
+            {
+                if (m >= nDealias)
+                {
+                    tmpC = {0.0, 0.0};
                 }
             }
 
@@ -100,10 +119,10 @@ namespace details
 
 }
 
-template<class Tout, class Tin, std::size_t Order, class Direction, class Treatment>
+template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
 DiffOp<Tout, Tin, Order, Direction, Treatment>::DiffOp(ScaleType scale) : mScale(scale){};
 
-template<class Tout, class Tin, std::size_t Order, class Direction, class Treatment>
+template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
 void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
     Profiler::RegionFixture<4> fix("DiffOp::applyImpl");
@@ -114,7 +133,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     assert(QuICC::Cuda::isDeviceMemory(out.data()));
 
     if constexpr (std::is_same_v<Direction, bwd_t> &&
-        std::is_same_v<Treatment, void> &&  Order == 0)
+        Treatment == none_m &&  Order == 0)
     {
         // if the diff is in place it is a noop
         if(out.data() == in.data())
@@ -139,16 +158,21 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
 // explicit instantations
 template class DiffOp<mods_t, mods_t, 0, fwd_t>;
 template class DiffOp<mods_t, mods_t, 1, fwd_t>;
-template class DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_t>;
-template class DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_t>;
+template class DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_m>;
+template class DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_m>;
 template class DiffOp<mods_t, mods_t, 2, fwd_t>;
 template class DiffOp<mods_t, mods_t, 3, fwd_t>;
 template class DiffOp<mods_t, mods_t, 4, fwd_t>;
 template class DiffOp<mods_t, mods_t, 0, bwd_t>;
+template class DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 1, bwd_t>;
+template class DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 2, bwd_t>;
+template class DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 3, bwd_t>;
+template class DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 4, bwd_t>;
+template class DiffOp<mods_t, mods_t, 4, bwd_t, dealias_m>;
 
 } // namespace Cuda
 } // namespace Mixed

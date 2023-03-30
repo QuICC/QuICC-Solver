@@ -23,10 +23,10 @@ namespace Cpu {
 
 using namespace QuICC::Memory;
 
-template<class Tout, class Tin, std::size_t Order, class Direction, class Treatment>
+template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
 DiffOp<Tout, Tin, Order, Direction, Treatment>::DiffOp(ScaleType scale) : mScale(scale){};
 
-template<class Tout, class Tin, std::size_t Order, class Direction, class Treatment>
+template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
 void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
     Profiler::RegionFixture<4> fix("DiffOp::applyImpl");
@@ -40,7 +40,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     #endif
 
     if constexpr (std::is_same_v<Direction, bwd_t> &&
-        std::is_same_v<Treatment, void> &&  Order == 0)
+        Treatment == none_m && Order == 0)
     {
         // if the diff is in place it is a noop
         if(out.data() == in.data())
@@ -58,6 +58,19 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
 
     const auto M = in.dims()[0];
 
+    // dealias bounds
+    std::size_t nDealias = M;
+    if constexpr (Treatment & dealias_m)
+    {
+        nDealias *= dealias::rule;
+    }
+
+    // positive / negative coeff bounds
+    const auto negM = M / 2;
+    const auto posM = negM + M % 2;
+    const auto negDealias = nDealias / 2;
+    const auto posDealias = negDealias + nDealias % 2;
+
     float_t fftScaling = 1.0;
     if constexpr (std::is_same_v<Direction, fwd_t>)
     {
@@ -71,8 +84,6 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     {
         c = fftScaling;
     }
-    const auto negM = M / 2;
-    const auto posM = negM + M % 2;
 
     using namespace QuICC::Transform::Fourier::details;
 
@@ -89,7 +100,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
         std::size_t nk = col*M;
         std::size_t m = 0;
 
-        if constexpr (std::is_same_v<Treatment, zeroP_t>)
+        if constexpr (Treatment & zeroP_m)
         {
             if (col < nColumnsK0)
             {
@@ -98,7 +109,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
             }
         }
 
-        if constexpr (std::is_same_v<Treatment, zeroMinusP_t>)
+        if constexpr (Treatment & zeroMinusP_m)
         {
             if (col < nColumnsK0)
             {
@@ -107,7 +118,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
             }
         }
 
-        if constexpr (std::is_same_v<Treatment, zeroResetMean_t>)
+        if constexpr (Treatment & zeroResetMean_m)
         {
             if (col < nColumnsK0)
             {
@@ -121,24 +132,32 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
             }
             else
             {
-                for (; m < posM; ++m)
+                for (; m < posDealias; ++m)
                 {
                     out.data()[nk+m] = in.data()[nk+m] * c * static_cast<float_t>(sgn) *
                         fast_pow<Order>(static_cast<float_t>(m)*mScale);
+                }
+                for (; m < posM; ++m)
+                {
+                    out.data()[nk+m] = 0.0;
                 }
             }
         }
         else
         {
-            for (; m < posM; ++m)
+            for (; m < posDealias; ++m)
             {
                 out.data()[nk+m] = in.data()[nk+m] * c * static_cast<float_t>(sgn) *
                     fast_pow<Order>(static_cast<float_t>(m)*mScale);
             }
+            for (; m < posM; ++m)
+            {
+                out.data()[nk+m] = 0.0;
+            }
         }
 
         // this is repeated to retain contiguos memory access on m
-        if constexpr (std::is_same_v<Treatment, zeroP_t>)
+        if constexpr (Treatment & zeroP_m)
         {
             if (col < nColumnsK0)
             {
@@ -147,7 +166,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
             }
         }
 
-        if constexpr (std::is_same_v<Treatment, zeroMinusP_t>)
+        if constexpr (Treatment & zeroMinusP_m)
         {
             if (col < nColumnsK0)
             {
@@ -156,7 +175,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
             }
         }
 
-        if constexpr (std::is_same_v<Treatment, zeroResetMean_t>)
+        if constexpr (Treatment & zeroResetMean_m)
         {
             if (col < nColumnsK0)
             {
@@ -170,6 +189,10 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
             }
             else
             {
+                for (; m < M - negDealias; ++m)
+                {
+                    out.data()[nk+m] = 0.0;
+                }
                 for (; m < M; ++m)
                 {
                     out.data()[nk+m] = in.data()[nk+m] * c * static_cast<float_t>(sgn) *
@@ -179,6 +202,10 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
         }
         else
         {
+            for (; m < M - negDealias; ++m)
+            {
+                out.data()[nk+m] = 0.0;
+            }
             for (; m < M; ++m)
             {
                 out.data()[nk+m] = in.data()[nk+m] * c * static_cast<float_t>(sgn) *
@@ -192,18 +219,23 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
 // explicit instantations
 using mods_t = View<std::complex<double>, DCCSC3D>;
 template class DiffOp<mods_t, mods_t, 0, fwd_t>;
-template class DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_t>;
+template class DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_m>;
 template class DiffOp<mods_t, mods_t, 1, fwd_t>;
-template class DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_t>;
-template class DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_t>;
+template class DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_m>;
+template class DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_m>;
 template class DiffOp<mods_t, mods_t, 2, fwd_t>;
 template class DiffOp<mods_t, mods_t, 3, fwd_t>;
 template class DiffOp<mods_t, mods_t, 4, fwd_t>;
 template class DiffOp<mods_t, mods_t, 0, bwd_t>;
+template class DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 1, bwd_t>;
+template class DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 2, bwd_t>;
+template class DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 3, bwd_t>;
+template class DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 4, bwd_t>;
+template class DiffOp<mods_t, mods_t, 4, bwd_t, dealias_m>;
 
 } // namespace Cpu
 } // namespace Complex

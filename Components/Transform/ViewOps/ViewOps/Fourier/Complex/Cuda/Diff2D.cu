@@ -30,7 +30,7 @@ namespace details
 
     /// Cuda kernel
     template<std::size_t Ofi, std::size_t Ofj, std::size_t Osi, std::size_t Osj,
-        class Direction, class Treatment>
+        class Direction, std::uint16_t Treatment>
     __global__ void diff2DKernel(mods_t out, const mods_t in, const double scale)
     {
         assert(out.dims()[0] == in.dims()[0]);
@@ -44,15 +44,28 @@ namespace details
 
         const auto M = in.dims()[0];
 
+        // dealias bounds
+        std::size_t nDealias = M;
+        if constexpr (Treatment & dealias_m)
+        {
+            nDealias *= dealias::rule;
+        }
+
+        // positive / negative coeff bounds
+        const auto negM = M / 2;
+        const auto posM = negM + M % 2;
+        const auto negDealias = nDealias / 2;
+        const auto posDealias = negDealias + nDealias % 2;
+
         double fftScaling = 1.0;
         if constexpr (std::is_same_v<Direction, fwd_t> &&
-            !std::is_same_v<Treatment, inverse_t>)
+            !(Treatment & inverse_m))
         {
             fftScaling = 1.0 / static_cast<double>(M);
         }
 
         if constexpr (std::is_same_v<Direction, fwd_t> &&
-            std::is_same_v<Treatment, inverse_t>)
+            Treatment & inverse_m)
         {
             fftScaling = static_cast<double>(M);
         }
@@ -83,8 +96,6 @@ namespace details
 
         // Column major
         // Get columns, rows, layers
-        const auto negM = M / 2;
-        const auto posM = negM + M % 2;
         auto pointers = in.pointers()[1];
         auto indices = in.indices()[1];
         auto columns = indices.size();
@@ -111,6 +122,16 @@ namespace details
                     fast_pow<Osi>(-static_cast<double>(M-m)*scale), 0.0};
             }
 
+            // dealias
+            if constexpr (Treatment & dealias_m)
+            {
+                if(m >= posDealias && m < M - negDealias)
+                {
+                    tmpFm = {0.0, 0.0};
+                    tmpSm = {0.0, 0.0};
+                }
+            }
+
             std::size_t k = 0;
             #pragma unroll
             for (std::size_t nnCol = 0; nnCol < tCF; ++nnCol)
@@ -134,7 +155,7 @@ namespace details
                     auto tmpF = cuCmul(tmpFm, tmpFk);
                     auto tmpS = cuCmul(tmpSm, tmpSk);
                     auto tmpC = cuCadd(tmpF, tmpS);
-                    if constexpr (std::is_same_v<Treatment, inverse_t>)
+                    if constexpr (Treatment & inverse_m)
                     {
                         if (k == 0 && n == 0 && (m == 0 || m == posM))
                         {
@@ -161,11 +182,11 @@ namespace details
 }
 
 template<class Tout, class Tin, std::size_t Ofi, std::size_t Ofj,
-    std::size_t Osi, std::size_t Osj, class Direction, class Treatment>
+    std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment>
 Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::Diff2DOp(ScaleType scale) : mScale(scale){};
 
 template<class Tout, class Tin, std::size_t Ofi, std::size_t Ofj,
-    std::size_t Osi, std::size_t Osj, class Direction, class Treatment>
+    std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment>
 void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
     static_assert(std::is_same_v<typename Tin::LevelType, DCCSC3D::level>,
@@ -192,11 +213,11 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
 // explicit instantations
 template class Diff2DOp<mods_t, mods_t, 1, 0, 0, 0, fwd_t>;
 template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t>;
-template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_t>;
+template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>;
 template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t>;
 template class Diff2DOp<mods_t, mods_t, 3, 0, 1, 2, bwd_t>;
 template class Diff2DOp<mods_t, mods_t, 2, 1, 0, 3, bwd_t>;
-template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_t>;
+template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_m>;
 
 } // namespace Cuda
 } // namespace Complex

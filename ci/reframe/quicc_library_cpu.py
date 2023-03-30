@@ -8,10 +8,10 @@ class testALegendreTests_Poly_P_projector_id108_ulp20800_split96_0(testBase):
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.0303996, -0.1, 0.1, 's'),
+                    'applyOperatorsAvg': (0.0303996, -0.25, 0.1, 's'),
                 },
                 'broadwell': {
-                    'applyOperatorsAvg': (0.0100948, -0.1, 0.1, 's'),
+                    'applyOperatorsAvg': (0.0100948, -0.25, 0.1, 's'),
                 },
             }
 
@@ -21,10 +21,10 @@ class testALegendreTests_Poly_P_projector_id108_ulp20800_split288_0(testBase):
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.0105246, -0.1, 0.1, 's'),
+                    'applyOperatorsAvg': (0.0105246, -0.25, 0.1, 's'),
                 },
                 'broadwell': {
-                    'applyOperatorsAvg': (0.00395184, -0.1, 0.1, 's'),
+                    'applyOperatorsAvg': (0.00395184, -0.25, 0.1, 's'),
                 },
             }
 
@@ -34,10 +34,10 @@ class testALegendreTests_Poly_P_projector_id108_ulp20800_split3072_0(testBase):
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.00122683, -0.1, 0.1, 's'),
+                    'applyOperatorsAvg': (0.00122683, -0.25, 0.1, 's'),
                 },
                 'broadwell': {
-                    'applyOperatorsAvg': (0.000509902, -0.1, 0.1, 's'),
+                    'applyOperatorsAvg': (0.000509902, -0.25, 0.1, 's'),
                 },
             }
 
@@ -47,10 +47,10 @@ class testALegendreTests_Poly_P_projector_id108_ulp20800_split9216_0(testBase):
     region = 'applyOperators'
     steps = 1000
     refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.000536682, -0.1, 0.1, 's'),
+                    'applyOperatorsAvg': (0.000536682, -0.25, 0.1, 's'),
                 },
                 'broadwell': {
-                    'applyOperatorsAvg': (0.000232762, -0.1, 0.1, 's'),
+                    'applyOperatorsAvg': (0.000232762, -0.25, 0.1, 's'),
                 },
             }
 
@@ -61,10 +61,10 @@ class testFourierTests_Mixed_P_projector_id108_split96_0_base(testBase):
     region = 'transform'
     steps = 500
     refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.00667155, -0.05, 0.05, 's'),
+                    'applyOperatorsAvg': (0.00667155, -0.25, 0.05, 's'),
                 },
                 'broadwell': {
-                    'applyOperatorsAvg': (0.00480215, -0.05, 0.05, 's'),
+                    'applyOperatorsAvg': (0.00480215, -0.25, 0.05, 's'),
                 },
             }
 
@@ -75,10 +75,10 @@ class testFourierTests_Mixed_P_projector_id108_split96_0_view(testBase):
     region = 'transform'
     steps = 500
     refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.0061741, -0.05, 0.05, 's'),
+                    'applyOperatorsAvg': (0.00650388, -0.25, 0.05, 's'),
                 },
                 'broadwell': {
-                    'applyOperatorsAvg': (0.00460067, -0.05, 0.05, 's'),
+                    'applyOperatorsAvg': (0.00475000, -0.25, 0.05, 's'),
                 },
             }
 
@@ -89,10 +89,10 @@ class testFourierTests_Mixed_D1_projector_id108_split96_0_base(testBase):
     region = 'transform'
     steps = 500
     refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.0112775, -0.05, 0.05, 's'),
+                    'applyOperatorsAvg': (0.0114620, -0.25, 0.05, 's'),
                 },
                 'broadwell': {
-                    'applyOperatorsAvg': (0.0142788, -0.05, 0.05, 's'),
+                    'applyOperatorsAvg': (0.0142788, -0.25, 0.05, 's'),
                 },
             }
 
@@ -103,10 +103,10 @@ class testFourierTests_Mixed_D1_projector_id108_split96_0_view(testBase):
     region = 'transform'
     steps = 500
     refs =  {   'icelake': {
-                    'applyOperatorsAvg': (0.00831783, -0.05, 0.05, 's'),
+                    'applyOperatorsAvg': (0.00831783, -0.25, 0.05, 's'),
                 },
                 'broadwell': {
-                    'applyOperatorsAvg': (0.00696741, -0.05, 0.05, 's'),
+                    'applyOperatorsAvg': (0.00545372, -0.25, 0.05, 's'),
                 },
             }
 

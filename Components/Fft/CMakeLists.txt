@@ -36,9 +36,9 @@ message(VERBOSE "Fftw backend not available")
 endif()
 
 # CuFft
-# option(QUICC_USE_CUFFT "Enable CuFft backend" OFF)
+option(QUICC_USE_CUFFT "Enable CuFft backend" OFF)
 find_package(CUDAToolkit)
-if(TARGET CUDA::cufft)
+if(TARGET CUDA::cufft AND QUICC_USE_CUFFT)
   message(VERBOSE "Cufft backend available")
   add_subdirectory(Fft/CuFft)
   target_compile_definitions("${QUICC_CURRENT_COMPONENT_LIB}"

@@ -33,17 +33,24 @@ set(IntegratorArgInType "phys_t")
 set(IntegratorArgOutType "mods_t")
 
 # Copy to padded
-set(viewCpu_tProjectorMixedCopyPad "mPadded.topRows(in.rows()) = in.topRows(in.rows());")
-set(viewGpu_tProjectorMixedCopyPad "// cpu -> gpu data
+set(viewCpu_tProjectorMixedCopyPad "// dealias with 2/3 rule
+    std::size_t nDealias = mPadded.rows() * dealias::rule;
+    mPadded.topRows(nDealias) = in.topRows(nDealias);")
+set(viewGpu_tProjectorMixedCopyPad "// dealias with 2/3 rule
+    std::size_t nDealias = mPadded.rows() * dealias::rule;
+
+    // cpu -> gpu data
     auto dSz = sizeof(decltype(mMods_d)::type);
     cudaErrChk(cudaMemcpy2D(mMods_d.data(), mPadded.rows()*dSz, in.data(), in.rows()*dSz,
-        in.rows()*dSz, in.cols(), cudaMemcpyHostToDevice));")
+        nDealias*dSz, in.cols(), cudaMemcpyHostToDevice));")
 set(viewGpu_tIntegratorMixedCopyPad "// cpu -> gpu data
     auto dSz = sizeof(decltype(mPhys_d)::type);
     cudaErrChk(cudaMemcpy(mPhys_d.data(), in.data(), mPhys_d.size()*dSz,
         cudaMemcpyHostToDevice));")
-set(viewCpu_tProjectorComplexCopyPad "auto negN = in.rows() / 2;
-    auto posN = negN + in.rows() % 2;
+set(viewCpu_tProjectorComplexCopyPad "// dealias with 2/3 rule
+    std::size_t nDealias = mPadded.rows() * dealias::rule;
+    auto negN = nDealias / 2;
+    auto posN = negN + nDealias % 2;
     mPadded.topRows(posN) = in.topRows(posN);
     mPadded.bottomRows(negN) = in.bottomRows(negN);")
 set(viewGpu_tProjectorComplexCopyPad "${viewCpu_tProjectorComplexCopyPad}
@@ -64,10 +71,10 @@ set(ViewAttribute "Attributes<DimLevelType<dense_t, CSC_t, CSC_t>>")
 # P - Projector
 set(ProjectorPviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::DiffOp<mods_t, mods_t, 0, bwd_t>>")
+            Cpu::DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>>")
 set(ProjectorPviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-            Cuda::DiffOp<mods_t, mods_t, 0, bwd_t>>")
+            Cuda::DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>>")
 
 # P - Integrator
 set(IntegratorPviewCpu_tPtrParam "DOp<mods_t, phys_t,
@@ -81,19 +88,19 @@ set(IntegratorPviewGpu_tPtrParam "DOp<mods_t, phys_t,
 # P_Clean - Integrator
 set(IntegratorP_CleanviewCpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
-            Cpu::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_t>>")
+            Cpu::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_m>>")
 
 set(IntegratorP_CleanviewGpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
-            Cuda::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_t>>")
+            Cuda::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_m>>")
 
 # D1 - Projector
 set(ProjectorD1viewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::DiffOp<mods_t, mods_t, 1, bwd_t>>")
+            Cpu::DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>>")
 set(ProjectorD1viewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-            Cuda::DiffOp<mods_t, mods_t, 1, bwd_t>>")
+            Cuda::DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>>")
 
 # D1 - Integrator
 set(IntegratorD1viewCpu_tPtrParam "DOp<mods_t, phys_t,
@@ -106,26 +113,26 @@ set(IntegratorD1viewGpu_tPtrParam "DOp<mods_t, phys_t,
 # D1_P - Integrator
 set(IntegratorD1_PviewCpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
-            Cpu::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_t>>")
+            Cpu::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_m>>")
 set(IntegratorD1_PviewGpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
-            Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_t>>")
+            Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_m>>")
 
 # D1_Neg - Integrator
 set(IntegratorD1_NegviewCpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
-            Cpu::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_t>>")
+            Cpu::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_m>>")
 set(IntegratorD1_NegviewGpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
-            Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_t>>")
+            Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_m>>")
 
 # D2 - Projector
 set(ProjectorD2viewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::DiffOp<mods_t, mods_t, 2, bwd_t>>")
+            Cpu::DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>>")
 set(ProjectorD2viewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-            Cuda::DiffOp<mods_t, mods_t, 2, bwd_t>>")
+            Cuda::DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>>")
 
 # D2 - Integrator
 set(IntegratorD2viewCpu_tPtrParam "DOp<mods_t, phys_t,
@@ -138,10 +145,10 @@ set(IntegratorD2viewGpu_tPtrParam "DOp<mods_t, phys_t,
 # D3 - Projector
 set(ProjectorD3viewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::DiffOp<mods_t, mods_t, 3, bwd_t>>")
+            Cpu::DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>>")
 set(ProjectorD3viewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-            Cuda::DiffOp<mods_t, mods_t, 3, bwd_t>>")
+            Cuda::DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>>")
 
 # D3 - Integrator
 set(IntegratorD3viewCpu_tPtrParam "DOp<mods_t, phys_t,
@@ -178,19 +185,19 @@ set(IntegratorLapl2DviewGpu_tPtrParam "DOp<phys_t, mods_t,
 # InvLapl2D - Integrator
 set(IntegratorInvLapl2DviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_t>>")
+            Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>>")
 set(IntegratorInvLapl2DviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-            Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_t>>")
+            Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>>")
 
 # Df1InvLapl2D - Integrator
 set(IntegratorDf1InvLapl2DviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_t>,
+            Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_m>,
             Cpu::DiffOp<mods_t, mods_t, 1, fwd_t>>")
 set(IntegratorDf1InvLapl2DviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-            Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_t>,
+            Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_m>,
             Cuda::DiffOp<mods_t, mods_t, 1, fwd_t>>")
 
 # Df1Lapl2D - Projector

@@ -26,8 +26,8 @@ using namespace QuICC::Operator;
 /// @tparam Tin input modes type
 /// @tparam Order of differentiation
 /// @tparam Direction Fft direction tag
-/// @tparam Treatment special treatment tag, typically of mode zero
-template<class Tout, class Tin, std::size_t Order, class Direction, class Treatment = void>
+/// @tparam Treatment special treatment mask, typically of mode zero or dealiasing
+template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment = 0>
 class DiffOp : public BaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin> {
 public:
     /// @brief Type of scale parameter, i.e. float 32/64 bits

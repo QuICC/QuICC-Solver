@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/MixedFourierTransform.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/MixedFourierTransform.hpp"
 
 #include "QuICC/Transform/Fft/Fourier/Mixed/Projector/D1.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/Projector/D2.hpp"
@@ -80,15 +74,20 @@ namespace Transform {
    void MixedFourierTransform::initOperators()
    {
       using namespace QuICC::Transform::Fft::Fourier;
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::P<base_t>>(Backward::P::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D1<base_t>>(Backward::D1::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D2<base_t>>(Backward::D2::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D3<base_t>>(Backward::D3::id());
+      #ifdef QUICC_USE_CUFFT
+         using backend_t = viewGpu_t;
+      #else
+         using backend_t = viewCpu_t;
+      #endif
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::P<backend_t>>(Backward::P::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D1<backend_t>>(Backward::D1::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D2<backend_t>>(Backward::D2::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D3<backend_t>>(Backward::D3::id());
 
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::P<base_t>>(Forward::P::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D1<base_t>>(Forward::D1::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D1_P<base_t>>(Forward::D1ZP0::id());
-      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D2<base_t>>(Forward::D2::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::P<backend_t>>(Forward::P::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D1<backend_t>>(Forward::D1::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D1_P<backend_t>>(Forward::D1ZP0::id());
+      this->mImpl.addOperator<Fft::Fourier::Mixed::Integrator::D2<backend_t>>(Forward::D2::id());
    }
 
    void MixedFourierTransform::forward(MatrixZ& rOut, const Matrix& in, const std::size_t id)

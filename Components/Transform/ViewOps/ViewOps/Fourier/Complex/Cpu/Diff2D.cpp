@@ -21,11 +21,11 @@ namespace Cpu {
 using namespace QuICC::Memory;
 
 template<class Tout, class Tin, std::size_t Ofi, std::size_t Ofj,
-    std::size_t Osi, std::size_t Osj, class Direction, class Treatment>
+    std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment>
 Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::Diff2DOp(ScaleType scale) : mScale(scale){};
 
 template<class Tout, class Tin, std::size_t Ofi, std::size_t Ofj,
-    std::size_t Osi, std::size_t Osj, class Direction, class Treatment>
+    std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment>
 void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
     static_assert(std::is_same_v<typename Tin::LevelType, DCCSC3D::level>,
@@ -48,15 +48,28 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
 
     const auto M = in.dims()[0];
 
+    // dealias bounds
+    std::size_t nDealias = M;
+    if constexpr (Treatment & dealias_m)
+    {
+        nDealias *= dealias::rule;
+    }
+
+    // positive / negative coeff bounds
+    const auto negM = M / 2;
+    const auto posM = negM + M % 2;
+    const auto negDealias = nDealias / 2;
+    const auto posDealias = negDealias + nDealias % 2;
+
     float_t fftScaling = 1.0;
     if constexpr (std::is_same_v<Direction, fwd_t> &&
-        !std::is_same_v<Treatment, inverse_t>)
+        !(Treatment & inverse_m))
     {
         fftScaling = 1.0 / static_cast<float_t>(M);
     }
 
     if constexpr (std::is_same_v<Direction, fwd_t> &&
-        std::is_same_v<Treatment, inverse_t>)
+        Treatment & inverse_m)
     {
         fftScaling = static_cast<float_t>(M);
     }
@@ -87,8 +100,6 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
 
     // Column major
     // Get columns, rows, layers
-    const auto negM = M / 2;
-    const auto posM = negM + M % 2;
     auto pointers = in.pointers()[1];
     auto indices = in.indices()[1];
 
@@ -102,7 +113,7 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
             // linear index (:,n,k)
             std::size_t nk = idn*M;
             std::size_t m = 0;
-            if constexpr (std::is_same_v<Treatment, inverse_t>)
+            if constexpr (Treatment & inverse_m)
             {
                 if (k == 0 && n == 0)
                 {
@@ -110,7 +121,7 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
                     ++m;
                 }
             }
-            for (; m < posM; ++m)
+            for (; m < posDealias; ++m)
             {
                 auto coeff = (
                     cF * static_cast<float_t>(sgnFirst) *
@@ -120,19 +131,27 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
                         fast_pow<Osi>(static_cast<float_t>(m)*mScale) *
                         fast_pow<Osj>(static_cast<float_t>(k)*mScale));
 
-                if constexpr (std::is_same_v<Treatment, inverse_t>)
+                if constexpr (Treatment & inverse_m)
                 {
                    coeff = 1.0 / coeff;
                 }
                 out.data()[nk+m] = in.data()[nk+m] * coeff;
             }
-            if constexpr (std::is_same_v<Treatment, inverse_t>)
+            for (; m < posM; ++m)
+            {
+                out.data()[nk+m] = 0.0;
+            }
+            if constexpr (Treatment & inverse_m)
             {
                 if (k == 0 && n == 0)
                 {
                     out.data()[nk+m] = 0.0;
                     ++m;
                 }
+            }
+            for (; m < M - negDealias; ++m)
+            {
+                out.data()[nk+m] = 0.0;
             }
             for (; m < M; ++m)
             {
@@ -144,7 +163,7 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
                         fast_pow<Osi>(-static_cast<float_t>(M-m)*mScale) *
                         fast_pow<Osj>(static_cast<float_t>(k)*mScale));
 
-                if constexpr (std::is_same_v<Treatment, inverse_t>)
+                if constexpr (Treatment & inverse_m)
                 {
                    coeff = 1.0 / coeff;
                 }
@@ -158,11 +177,11 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
 using mods_t = View<std::complex<double>, DCCSC3D>;
 template class Diff2DOp<mods_t, mods_t, 1, 0, 0, 0, fwd_t>;
 template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t>;
-template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_t>;
+template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>;
 template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t>;
 template class Diff2DOp<mods_t, mods_t, 3, 0, 1, 2, bwd_t>;
 template class Diff2DOp<mods_t, mods_t, 2, 1, 0, 3, bwd_t>;
-template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_t>;
+template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_m>;
 
 } // namespace Cpu
 } // namespace Complex

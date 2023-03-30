@@ -32,12 +32,12 @@
 #
 
 # Default branch for known models
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.3.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.3.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.3.1")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.3.1")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.4.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.4.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.3.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.3.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.3.1")
 
 # Cache value, may be overwritten manually
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo

@@ -29,9 +29,9 @@ using namespace QuICC::Operator;
 /// @tparam Osi Order of differentiation, second term, first direction
 /// @tparam Osj Order of differentiation, second term, second direction
 /// @tparam Direction Fft direction
-/// @tparam Treatment special treatment tag, typically of mode zero
+/// @tparam Treatment special treatment mask, typically of mode zero or dealiasing
 template<class Tout, class Tin, std::size_t Ofi, std::size_t Ofj,
-    std::size_t Osi, std::size_t Osj, class Direction, class Treatment = void>
+    std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment = 0>
 class Diff2DOp : public BaseOp<Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>, Tout, Tin> {
 public:
     using ScaleType = typename Tout::ScalarType::value_type;

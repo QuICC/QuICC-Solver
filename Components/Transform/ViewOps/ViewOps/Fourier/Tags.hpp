@@ -26,23 +26,35 @@ struct fwd_t {};
 /// Backwards i.e. modal to physical
 struct bwd_t {};
 
-/// @brief tag type for special treatment.
-/// zero mode is always zero just projection
-struct zeroP_t {};
+/// @brief mask for special treatment.
+/// none
+constexpr std::uint16_t none_m = 0;
 
-/// @brief tag type for special treatment.
+/// @brief mask for special treatment.
+/// dealias
+constexpr std::uint16_t dealias_m = 1;
+
+/// @brief mask for special treatment.
+/// pass every option but dealias
+constexpr std::uint16_t allButDealias_m = 0xFFFF - dealias_m;
+
+/// @brief mask for special treatment.
+/// zero mode is always zero just projection
+constexpr std::uint16_t zeroP_m = 1 << 1;
+
+/// @brief mask for special treatment.
 /// zero mode is always zero just projection
 /// with negated sign
-struct zeroMinusP_t {};
+constexpr std::uint16_t zeroMinusP_m = 1 << 2;
 
-/// @brief tag type for special treatment.
+/// @brief mask for special treatment.
 /// m = 0, k = 0 n != 0 rest to zero,
 /// i.e. keep mean only
-struct zeroResetMean_t {};
+constexpr std::uint16_t zeroResetMean_m = 1 << 3;
 
-/// @brief tag type for special treatment.
+/// @brief mask for special treatment.
 /// inverse (1/coeff)
-struct inverse_t {};
+constexpr std::uint16_t inverse_m = 1 << 4;
 
 
 } // namespace Fourier

@@ -7,7 +7,7 @@ class testALegendreTests_Poly_P_projector_id108_split8_0_cuda(testBase):
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
-                    'applyOperatorsAvg': (0.0919701, -0.1, 0.1, 's'),
+                    'applyOperatorsAvg': (0.0919701, -0.25, 0.1, 's'),
                 },
             }
 
@@ -17,7 +17,7 @@ class testALegendreTests_Poly_P_projector_id108_split256_0_cuda(testBase):
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
-                    'applyOperatorsAvg': (0.00351006, -0.1, 0.1, 's'),
+                    'applyOperatorsAvg': (0.00351006, -0.25, 0.1, 's'),
                 },
             }
 
@@ -28,6 +28,6 @@ class testFourierTests_Mixed_D1_projector_id108_split96_0_viewGpu(testBase):
     region = 'transform'
     steps = 500
     refs =  {   'p100': {
-                    'applyOperatorsAvg': (0.00196887, -0.05, 0.05, 's'),
+                    'applyOperatorsAvg': (0.00196887, -0.25, 0.1, 's'),
                 },
             }

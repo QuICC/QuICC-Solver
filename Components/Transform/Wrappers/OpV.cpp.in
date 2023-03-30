@@ -5,6 +5,7 @@
 #include "QuICC/Transform/Wrappers/@Space@/@Kind@/@Op@@Tag@.hpp.inc"
 #include "Fft/Fft.hpp"
 #include "ViewOps/Fourier/Tags.hpp"
+#include "ViewOps/Fourier/Util.hpp"
 #include "ViewOps/Fourier/@Space@/@Kind@/D.hpp"
 #include "ViewOps/Fourier/@Space@/Diff.hpp"
 @CppHeader@
@@ -39,6 +40,8 @@ void @Op@<@Tag@>::initBackend() const
 void @Op@<@Tag@>::transform(@OutMatrixType@& rOut, const @InMatrixType@& in) const
 {
     Profiler::RegionFixture<2> fix("@Op@<@Tag@>::transform");
+
+    using namespace QuICC::Transform::Fourier;
 
     @CopyPad@
 

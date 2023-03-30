@@ -44,9 +44,12 @@ namespace details
         constexpr int rank = 1;
         constexpr int istride = 1;
         constexpr int ostride = 1;
-        const int bwdSize = std::floor(fwdSize/2) + 1;
-        auto err = cufftPlanMany(plan, rank, const_cast<int*>(&fwdSize), NULL, istride,
-            bwdSize, NULL, ostride, fwdSize, CUFFT_D2Z, blockSize);
+        const int idist = fwdSize;
+        const int odist = std::floor(fwdSize/2) + 1;
+        auto err = cufftPlanMany(plan, rank, const_cast<int*>(&fwdSize),
+            NULL, istride, idist,
+            NULL, ostride, odist,
+            CUFFT_D2Z, blockSize);
         if(err != CUFFT_SUCCESS)
         {
             throw  std::logic_error("CuFFT plan failed! error code: "+std::to_string(err) );

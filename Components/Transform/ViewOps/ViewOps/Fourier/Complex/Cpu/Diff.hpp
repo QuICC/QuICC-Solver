@@ -27,7 +27,7 @@ using namespace QuICC::Operator;
 /// @tparam Order of differentiation
 /// @tparam Direction Fft direction tag
 /// @tparam Treatment special treatment tag, typically of mode zero
-template<class Tout, class Tin, std::size_t Order, class Direction, class Treatment = void>
+template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment = 0>
 class DiffOp : public BaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin> {
 public:
     using ScaleType = typename Tout::ScalarType::value_type;

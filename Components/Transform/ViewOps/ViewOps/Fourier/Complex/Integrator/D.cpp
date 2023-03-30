@@ -83,16 +83,16 @@ template class DOp<mods_t, phys_t,
     Cpu::DiffOp<mods_t, mods_t, 0, fwd_t>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
-    Cpu::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_t>>;
+    Cpu::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_m>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
     Cpu::DiffOp<mods_t, mods_t, 1, fwd_t>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
-    Cpu::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_t>>;
+    Cpu::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_m>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
-    Cpu::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_t>>;
+    Cpu::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_m>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
     Cpu::DiffOp<mods_t, mods_t, 2, fwd_t>>;
@@ -107,10 +107,10 @@ template class DOp<phys_t, mods_t,
     Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-    Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_t>>;
+    Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-    Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_t>,
+    Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_m>,
     Cpu::DiffOp<mods_t, mods_t, 1, fwd_t>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
@@ -122,16 +122,16 @@ template class DOp<mods_t, phys_t,
     Cuda::DiffOp<mods_t, mods_t, 0, fwd_t>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
-    Cuda::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_t>>;
+    Cuda::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_m>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
     Cuda::DiffOp<mods_t, mods_t, 1, fwd_t>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
-    Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_t>>;
+    Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_m>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
-    Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_t>>;
+    Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_m>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
     Cuda::DiffOp<mods_t, mods_t, 2, fwd_t>>;
@@ -146,10 +146,10 @@ template class DOp<phys_t, mods_t,
     Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-    Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_t>>;
+    Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-    Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_t>,
+    Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_m>,
     Cuda::DiffOp<mods_t, mods_t, 1, fwd_t>>;
 template class DOp<mods_t, phys_t,
     QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
