@@ -69,6 +69,10 @@ endif()
 # Teststuite
 include(cmake.d/setup/TestSuite.cmake)
 
+# Alias
+add_library(${QUICC_NAMESPACE}Framework
+  ALIAS ${QUICC_CURRENT_COMPONENT_LIB})
+
 # Export info
 quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
   COMPONENT Framework
@@ -101,7 +105,3 @@ install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/quiccConfigVersion.cmake"
   DESTINATION ${CMAKE_INSTALL_PREFIX}/share/quicc/cmake
 )
-
-# Add library alias (as the imported one)
-add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}
-  ALIAS ${QUICC_CURRENT_COMPONENT_LIB})

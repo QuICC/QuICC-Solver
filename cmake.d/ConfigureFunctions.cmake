@@ -139,6 +139,9 @@ function (quicc_export_target TGT)
 
   string(REGEX REPLACE "::" "/" _component_path ${QET_COMPONENT})
 
+  # Set consistent export name
+  set_target_properties(${TGT} PROPERTIES EXPORT_NAME ${QET_COMPONENT})
+
   # Export info
   install(TARGETS ${TGT}
     EXPORT QuICCTargets

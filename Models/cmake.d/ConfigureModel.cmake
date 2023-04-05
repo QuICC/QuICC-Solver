@@ -34,7 +34,7 @@ function(quicc_add_model target)
     ${PROJECT_BINARY_DIR}/${QUICC_CURRENT_MODEL_DIR}/Git
     )
   target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
-    QuICC::quicc_framework
+    QuICC::Framework
     )
 
   # Create model implementations libraries
