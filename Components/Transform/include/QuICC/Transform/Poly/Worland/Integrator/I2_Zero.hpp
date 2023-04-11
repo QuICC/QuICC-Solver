@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I2_ZERO_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I2_ZERO_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -47,7 +38,7 @@ namespace Integrator {
          /**
           * @brief Destructor
           */
-         virtual ~I2_Zero();
+         virtual ~I2_Zero() = default;
          
       protected:
 

@@ -26,6 +26,7 @@
 #include "QuICC/SparseSolvers/SparseLinearSolverTools.hpp"
 #include "QuICC/Register/Solution.hpp"
 #include "QuICC/Register/Rhs.hpp"
+#include "QuICC/Tag/Operator/Lhs.hpp"
 
 namespace QuICC {
 
@@ -190,6 +191,39 @@ namespace Solver {
          typedef std::vector<SharedSolverType, Eigen::aligned_allocator<SharedSolverType> > VectorSharedSolverType;
 
          /**
+          * @brief Has solver matrix?
+          *
+          * @param opId Operator ID
+          */
+         bool hasSolverMatrix(const std::size_t opId) const;
+
+         /**
+          * @brief Has solver matrix?
+          *
+          * @param opId Operator ID
+          * @param id   ID of matrix
+          */
+         bool hasSolverMatrix(const std::size_t opId, const MHDFloat id) const;
+
+         /**
+          * @brief Set solver matrix
+          *
+          * @param opId Operator ID
+          * @param id   ID of matrix
+          * @param idx Index of the matrix
+          */
+         TOperator& solverMatrix(const std::size_t, const MHDFloat id, const int idx);
+
+         /**
+          * @brief Get solver matrix
+          *
+          * @param opId Operator ID
+          * @param id   ID of matrix
+          * @param idx Index of the matrix
+          */
+         const TOperator& solverMatrix(const std::size_t, const MHDFloat id, const int idx) const;
+
+         /**
           * @brief Get storage register
           */
          std::vector<TData>& reg(const std::size_t);
@@ -213,7 +247,29 @@ namespace Solver {
           *
           * @param n Size of matrices
           */
+         void initMatrices(const std::size_t opId, const MHDFloat id, const int n);
+
+         /**
+          * @brief Initialise the LHS matrices storage
+          *
+          * @param id Matrix id of matrices
+          * @param n  Size of matrices
+          */
          void initMatrices(const MHDFloat id, const int n);
+
+         /**
+          * @brief Initialise solver for given ID
+          *
+          * @param opId Operator ID
+          */
+         void initSolver(const std::size_t opId);
+
+         /**
+          * @brief Update solver for given ID
+          *
+          * @param opId Operator ID
+          */
+         void updateSolver(const std::size_t opId);
 
          /**
           * @brief Additional updates after solver update
@@ -226,14 +282,19 @@ namespace Solver {
          virtual int correctSolution(const int iteration);
 
          /**
+          * @brief Current operator ID of the solvers
+          */
+         std::size_t mOpId;
+
+         /**
           * @brief Current ID of the solvers
           */
          MHDFloat mId;
 
          /**
-          * @brief LHS operators
+          * @brief Operators used by solver
           */
-         std::map<MHDFloat, std::vector<TOperator> >  mLHSMatrix;
+         std::map<std::size_t, std::map<MHDFloat, std::vector<TOperator> > >  mSolverMatrix;
 
          /**
           * @brief Storage for field
@@ -248,13 +309,13 @@ namespace Solver {
          /**
           * @brief Create sparse solvers
           */
-         std::map<MHDFloat,VectorSharedSolverType>  mSolver;
+         std::map<std::size_t, std::map<MHDFloat,VectorSharedSolverType> >  mSolver;
 
       private:
    };
 
    template <typename TOperator,typename TData,template <typename> class TSolver> SparseLinearSolver<TOperator,TData,TSolver>::SparseLinearSolver(const int start, const std::size_t timeId)
-      : SparseSolverBase(start, timeId), mId(0.0)
+      : SparseSolverBase(start, timeId), mOpId(Tag::Operator::Lhs::id()), mId(0.0)
    {
    }
 
@@ -333,8 +394,9 @@ namespace Solver {
          }
 
          // Solve other modes
-         assert(this->mSolver.count(this->mId) > 0);
-         typename std::map<MHDFloat, VectorSharedSolverType>::iterator sIt = this->mSolver.find(this->mId);
+         assert(this->mSolver.count(this->mOpId) > 0);
+         assert(this->mSolver.at(this->mOpId).count(this->mId) > 0);
+         typename std::map<MHDFloat, VectorSharedSolverType>::iterator sIt = this->mSolver.at(this->mOpId).find(this->mId);
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
             #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
@@ -380,12 +442,31 @@ namespace Solver {
 
    template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::initSolver()
    {
-      // Loop over matrices
-      for(auto it = this->mLHSMatrix.begin(); it != this->mLHSMatrix.end(); ++it)
+      for(auto it = this->mSolverMatrix.begin(); it != this->mSolverMatrix.end(); ++it)
       {
-         this->mSolver.insert(std::make_pair(it->first, VectorSharedSolverType()));
+         this->initSolver(it->first);
+      }
+   }
 
-         typename std::map<MHDFloat, VectorSharedSolverType>::iterator sIt = this->mSolver.find(it->first);
+   template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::initSolver(const std::size_t opId)
+   {
+      // Loop over matrices
+      assert(this->mSolverMatrix.count(opId) > 0);
+      auto&& lhsMatrix = this->mSolverMatrix.at(opId);
+
+      // Create operator map
+      if(this->mSolver.count(opId) == 0)
+      {
+         this->mSolver.emplace(opId, std::map<MHDFloat, VectorSharedSolverType>());
+      }
+
+      // Initialize solvers with matrices
+      for(auto it = lhsMatrix.begin(); it != lhsMatrix.end(); ++it)
+      {
+         auto&& solver = this->mSolver.at(opId);
+         solver.insert(std::make_pair(it->first, VectorSharedSolverType()));
+
+         typename std::map<MHDFloat, VectorSharedSolverType>::iterator sIt = solver.find(it->first);
          sIt->second.reserve(it->second.size());
 
          for(size_t i = 0; i < it->second.size(); ++i)
@@ -404,12 +485,23 @@ namespace Solver {
       }
 
       // Compute pattern and factorisation
-      this->updateSolver();
+      this->updateSolver(opId);
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::updateSolver()
    {
-      for(auto it = this->mLHSMatrix.begin(); it != this->mLHSMatrix.end(); ++it)
+      for(auto it = this->mSolverMatrix.begin(); it != this->mSolverMatrix.end(); ++it)
+      {
+         this->updateSolver(it->first);
+      }
+   }
+
+   template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::updateSolver(const std::size_t opId)
+   {
+      assert(this->mSolverMatrix.count(opId) > 0);
+
+      auto&& lhsMatrix = this->mSolverMatrix.at(opId);
+      for(auto it = lhsMatrix.begin(); it != lhsMatrix.end(); ++it)
       {
          // Compute factorisation
          for(std::size_t i = 0; i < it->second.size(); i++)
@@ -420,7 +512,9 @@ namespace Solver {
                   MpiFramework::syncSubComm(MpiFramework::SPECTRAL, i);
                #endif //define QUICC_MPI && defined QUICC_MPISPSOLVE
 
-               typename std::map<MHDFloat, VectorSharedSolverType>::iterator sIt = this->mSolver.find(it->first);
+               assert(this->mSolver.count(opId) > 0);
+               auto&& solver = this->mSolver.at(opId);
+               typename std::map<MHDFloat, VectorSharedSolverType>::iterator sIt = solver.find(it->first);
                // Safety assert to make sur matrix is compressed
                assert(it->second.at(i).isCompressed());
 
@@ -446,20 +540,32 @@ namespace Solver {
 
    template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::initMatrices(const int n)
    {
-      this->initMatrices(0, n);
+      this->initMatrices(Tag::Operator::Lhs::id(), 0, n);
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::initMatrices(const MHDFloat id, const int n)
    {
-      // Do not reinitialise if work already done by other field
-      if(this->mLHSMatrix.count(id) == 0 || this->mLHSMatrix.find(id)->second.size() == 0)
+      this->initMatrices(Tag::Operator::Lhs::id(), id, n);
+   }
+
+   template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::initMatrices(const std::size_t opId, const MHDFloat id, const int n)
+   {
+      // Create operator ID
+      if(this->mSolverMatrix.count(opId) == 0)
       {
-         if(this->mLHSMatrix.count(id) == 0)
+         this->mSolverMatrix.emplace(opId, std::map<MHDFloat, std::vector<TOperator>>());
+      }
+
+      // Do not reinitialise if work already done by other field
+      auto&& lhsMatrix = this->mSolverMatrix.at(opId);
+      if(lhsMatrix.count(id) == 0 || lhsMatrix.find(id)->second.size() == 0)
+      {
+         if(lhsMatrix.count(id) == 0)
          {
-            this->mLHSMatrix.insert(std::make_pair(id, std::vector<TOperator>()));
+            lhsMatrix.insert(std::make_pair(id, std::vector<TOperator>()));
          }
 
-         typename std::map<MHDFloat,std::vector<TOperator> >::iterator it = this->mLHSMatrix.find(id);
+         typename std::map<MHDFloat,std::vector<TOperator> >::iterator it = lhsMatrix.find(id);
 
          // Reserve space for the LHS matrices
          it->second.reserve(n);
@@ -517,9 +623,39 @@ namespace Solver {
       }
    }
 
+   template <typename TOperator,typename TData,template <typename> class TSolver> bool SparseLinearSolver<TOperator,TData,TSolver>::hasSolverMatrix(const std::size_t opId) const
+   {
+      bool res = (this->mSolverMatrix.count(opId) > 0);
+      return res;
+   }
+
+   template <typename TOperator,typename TData,template <typename> class TSolver> bool SparseLinearSolver<TOperator,TData,TSolver>::hasSolverMatrix(const std::size_t opId, const MHDFloat id) const
+   {
+      bool res = (this->hasSolverMatrix(opId) && this->mSolverMatrix.at(opId).count(id) > 0);
+      return res;
+   }
+
+   template <typename TOperator,typename TData,template <typename> class TSolver> TOperator& SparseLinearSolver<TOperator,TData,TSolver>::solverMatrix(const std::size_t opId, const MHDFloat id, const int idx)
+   {
+      assert(this->mSolverMatrix.count(opId) > 0);
+      assert(this->mSolverMatrix.at(opId).count(id) > 0);
+      assert(this->mSolverMatrix.at(opId).at(id).size() > static_cast<std::size_t>(idx));
+
+      return this->mSolverMatrix.at(opId).at(id).at(idx);
+   }
+
+   template <typename TOperator,typename TData,template <typename> class TSolver> const TOperator& SparseLinearSolver<TOperator,TData,TSolver>::solverMatrix(const std::size_t opId, const MHDFloat id, const int idx) const
+   {
+      assert(this->mSolverMatrix.count(opId) > 0);
+      assert(this->mSolverMatrix.at(opId).count(id) > 0);
+      assert(this->mSolverMatrix.at(opId).at(id).size() > static_cast<std::size_t>(idx));
+
+      return this->mSolverMatrix.at(opId).at(id).at(idx);
+   }
+
    template <typename TOperator,typename TData,template <typename> class TSolver> TOperator& SparseLinearSolver<TOperator,TData,TSolver>::rLHSMatrix(const MHDFloat id, const int idx)
    {
-      return this->mLHSMatrix.find(id)->second.at(idx);
+      return this->solverMatrix(Tag::Operator::Lhs::id(), id, idx);
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> TData& SparseLinearSolver<TOperator,TData,TSolver>::rRHSData(const int idx)

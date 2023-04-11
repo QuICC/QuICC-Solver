@@ -86,9 +86,16 @@ namespace QuICC {
 
       cfg = this->config().physical();
 
+      // Add Galerkin basis feature
       if(this->config().bcScheme() == Bc::Scheme::Galerkin::id())
       {
          features.insert(SpatialScheme::Feature::GalerkinBasis);
+      }
+
+      // Add split fourth order equation feature
+      if(this->config().splitEquation())
+      {
+         features.insert(SpatialScheme::Feature::SplitFourthOrder);
       }
    }
 

@@ -6,25 +6,25 @@
 #ifndef QUICC_TIMESTEP_ISPARSETIMESTEPPER_HPP
 #define QUICC_TIMESTEP_ISPARSETIMESTEPPER_HPP
 
-// Configuration includes
+// System includes
 //
 #include <memory>
 #include <map>
 #include <set>
-
-// System includes
-//
-
-// External includes
-//
+#include <Eigen/Dense>
 
 // Project includes
 //
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/ModelOperator/Boundary.hpp"
+#include "QuICC/ModelOperator/SplitImplicitLinear.hpp"
+#include "QuICC/ModelOperator/SplitBoundary.hpp"
+#include "QuICC/ModelOperator/SplitBoundaryValue.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolver.hpp"
 #include "QuICC/Register/Implicit.hpp"
+#include "QuICC/Register/Influence.hpp"
+#include "QuICC/Tag/Operator/Influence.hpp"
 
 namespace QuICC {
 
@@ -152,6 +152,56 @@ namespace Timestep {
        */
       void computeError(MHDFloat& err, const DecoupledZMatrix& x, const DecoupledZMatrix& y);
 
+      /**
+       * @brief Initialize influence matrix kernel and boundary condition
+       *
+       * @param kernel     3 parts, initialize boundary condition and boundary value
+       * @param val        Boundary value of inhomogeneous problem
+       * @param bc         Boundary conditions
+       */
+      template <typename TData> void initInfluence(TData& kernel, const DecoupledZSparse& val, const DecoupledZSparse& bc);
+
+      /**
+       * @brief Initialize influence matrix kernel and boundary condition
+       *
+       * @param kernel     3 parts, initialize boundary condition and boundary value
+       * @param val        Boundary value of inhomogeneous problem
+       * @param bc         Boundary conditions
+       */
+      void initInfluence(DecoupledZMatrix& kernel, const DecoupledZSparse& val, const DecoupledZSparse& bc);
+
+      /**
+       * @brief Store influence matrix kernel and boundary condition
+       *
+       * @param reg  Kernel storage with 3 parts: kernel, boundary value and boundary condition
+       * @param x    Kernel solution to store
+       */
+      template <typename TData> void computeSetInfluence(TData& reg, const TData& x);
+
+      /**
+       * @brief Store influence matrix kernel and boundary condition
+       *
+       * @param reg  Kernel storage with 3 parts: kernel, boundary value and boundary condition
+       * @param x    Kernel solution to store
+       */
+      void computeSetInfluence(DecoupledZMatrix& reg, const DecoupledZMatrix& x);
+
+      /**
+       * @brief Compute correction from influence matrix (Green's function)
+       *
+       * @param y Split solution to correct
+       * @param x 3 parts of influence matrix solution
+       */
+      template <typename TData> void computeInfluenceCorrection(TData& y, const TData& x);
+
+      /**
+       * @brief Compute correction from influence matrix (Green's function)
+       *
+       * @param y Split solution to correct
+       * @param x 3 parts of influence matrix solution
+       */
+      void computeInfluenceCorrection(DecoupledZMatrix& y, const DecoupledZMatrix& x);
+
    }
 
    /**
@@ -220,6 +270,11 @@ namespace Timestep {
           * @brief Number of substeps
           */
          virtual int steps() const = 0;
+
+         /**
+          * @brief
+          */
+         virtual void postSolverUpdate();
 
          /**
           * @brief Implicit coefficient a for linear operator
@@ -296,63 +351,68 @@ namespace Timestep {
       std::set<MHDFloat> filter;
       for(int step = 0; step < this->steps(); ++step)
       {
-         filter.insert(this->aIm(step));
+         const auto a = this->aIm(step);
+         filter.insert(a);
       }
 
-      // Loop of IDs
-      for(auto a: filter)
+      // Loop over all operator IDs
+      for(auto opIt = this->mSolverMatrix.begin(); opIt != this->mSolverMatrix.end(); ++opIt)
       {
-         // Update is only required if aIm is not zero
-         if(a != 0.0)
+         // Loop of step IDs
+         for(auto a: filter)
          {
-            // Loop over matrices within same step
-            for(std::size_t i = 0; i < this->nSystem(); ++i)
+            // Update is only required if aIm is not zero
+            if(opIt->second.count(a) > 0 && a != 0.0)
             {
-               // Get the number of nonzero elements in time dependence
-               size_t nnz = this->mRHSMatrix.at(i).nonZeros();
-
-               // Update LHS and RHS matrices
-               for (size_t k = 0; k < static_cast<size_t>(this->mRHSMatrix.at(i).outerSize()); ++k)
+               // Loop over matrices within same step
+               for(std::size_t i = 0; i < this->nSystem(); ++i)
                {
-                  typename TOperator::InnerIterator lhsIt(this->rLHSMatrix(a, i),k);
-                  for(typename TOperator::InnerIterator timeIt(this->mRHSMatrix.at(i),k); timeIt; ++timeIt)
+                  // Get the number of nonzero elements in time dependence
+                  size_t nnz = this->mRHSMatrix.at(i).nonZeros();
+
+                  // Update LHS and RHS matrices
+                  for (size_t k = 0; k < static_cast<size_t>(this->mRHSMatrix.at(i).outerSize()); ++k)
                   {
-                     // Only keep going if nonzero elements are left
-                     if(nnz > 0)
+                     typename TOperator::InnerIterator lhsIt(this->solverMatrix(opIt->first, a, i),k);
+                     for(typename TOperator::InnerIterator timeIt(this->mRHSMatrix.at(i),k); timeIt; ++timeIt)
                      {
-                        assert(lhsIt.col() == timeIt.col());
-                        assert(lhsIt.row() <= timeIt.row());
-
-                        // LHS matrix might have additional nonzero entries
-                        while(lhsIt.row() < timeIt.row() && lhsIt)
+                        // Only keep going if nonzero elements are left
+                        if(nnz > 0)
                         {
+                           assert(lhsIt.col() == timeIt.col());
+                           assert(lhsIt.row() <= timeIt.row());
+
+                           // LHS matrix might have additional nonzero entries
+                           while(lhsIt.row() < timeIt.row() && lhsIt)
+                           {
+                              ++lhsIt;
+                           }
+
+                           // Update LHS matrix
+                           if(timeIt.row() == lhsIt.row())
+                           {
+                              // Update values
+                              lhsIt.valueRef() += a*(oldDt - this->mDt)*timeIt.value();
+
+                              // Update nonzero counter
+                              nnz--;
+                           }
+
+                           // Update LHS iterators and counters
                            ++lhsIt;
-                        }
 
-                        // Update LHS matrix
-                        if(timeIt.row() == lhsIt.row())
+                        } else
                         {
-                           // Update values
-                           lhsIt.valueRef() += a*(oldDt - this->mDt)*timeIt.value();
-
-                           // Update nonzero counter
-                           nnz--;
+                           break;
                         }
-
-                        // Update LHS iterators and counters
-                        ++lhsIt;
-
-                     } else
-                     {
-                        break;
                      }
                   }
-               }
 
-               // Abort if some nonzero entries where not updated
-               if(nnz != 0)
-               {
-                  throw std::logic_error("Update of timestepping matrices failed");
+                  // Abort if some nonzero entries where not updated
+                  if(nnz != 0)
+                  {
+                     throw std::logic_error("Update of timestepping matrices failed");
+                  }
                }
             }
          }
@@ -407,6 +467,12 @@ namespace Timestep {
       std::map<std::size_t,DecoupledZSparse>::const_iterator iOpB = ops.find(ModelOperator::Time::id());
       std::map<std::size_t,DecoupledZSparse>::const_iterator iOpC = ops.find(ModelOperator::Boundary::id());
 
+      // Check if equation is solved in split form
+      bool isSplit = (ops.count(ModelOperator::SplitImplicitLinear::id()) > 0);
+      std::map<std::size_t,DecoupledZSparse>::const_iterator iOpSC = ops.find(ModelOperator::SplitBoundary::id());
+      std::map<std::size_t,DecoupledZSparse>::const_iterator iOpSA = ops.find(ModelOperator::SplitImplicitLinear::id());
+      std::map<std::size_t,DecoupledZSparse>::const_iterator iOpSCV = ops.find(ModelOperator::SplitBoundaryValue::id());
+
       // Update timestep
       this->mDt = dt;
 
@@ -424,10 +490,65 @@ namespace Timestep {
          MHDFloat a = this->aIm(i);
 
          // Set LHS matrix
-         this->rLHSMatrix(a, idx).resize(size, size);
-         Solver::internal::addOperators(this->rLHSMatrix(a, idx), 1.0, iOpB->second);
-         Solver::internal::addOperators(this->rLHSMatrix(a, idx), -a*this->mDt, iOpA->second);
-         Solver::internal::addOperators(this->rLHSMatrix(a, idx), 1.0, iOpC->second);
+         auto&& lhsMat = this->rLHSMatrix(a, idx);
+         lhsMat.resize(size, size);
+         Solver::internal::addOperators(lhsMat, 1.0, iOpB->second);
+         Solver::internal::addOperators(lhsMat, -a*this->mDt, iOpA->second);
+         Solver::internal::addOperators(lhsMat, 1.0, iOpC->second);
+
+         if(isSplit)
+         {
+            // Initialise influence matrices
+            MHDFloat aInf = 0.0;
+            Solver::SparseLinearSolver<TOperator,TData,TSolver>::initMatrices(Tag::Operator::Influence::id(), aInf, this->mSolverMatrix.at(Tag::Operator::Lhs::id()).at(a).size());
+
+            // Set other LHS matrix
+            auto&& infMatrix = this->solverMatrix(Tag::Operator::Influence::id(), aInf, idx);
+            infMatrix.resize(size, size);
+            Solver::internal::addOperators(infMatrix, 1.0, iOpSA->second);
+            Solver::internal::addOperators(infMatrix, 1.0, iOpSC->second);
+         }
+      }
+
+      if(isSplit)
+      {
+         // Store information for particular solution
+         auto&& infRhs = this->reg(Register::Influence::id()).at(idx);
+         internal::initInfluence(infRhs, iOpSCV->second, iOpSC->second);
+      }
+   }
+
+   template <typename TOperator,typename TData,template <typename> class TSolver> void ISparseTimestepper<TOperator,TData,TSolver>::postSolverUpdate()
+   {
+      const auto lhsId = Tag::Operator::Lhs::id();
+      const auto opId = Tag::Operator::Influence::id();
+
+      if(this->mSolver.count(lhsId) > 0 && this->mSolver.count(opId) > 0)
+      {
+         // Solver for both stages
+         auto sIt1 = this->mSolver.at(opId).find(0.0);
+         auto sIt2 = this->mSolver.at(lhsId).begin();
+
+         // Compute green's functions for each index
+         for(std::size_t idx = this->mZeroIdx; idx < sIt1->second.size(); idx++)
+         {
+            auto&& infKernel = this->reg(Register::Influence::id()).at(idx);
+            assert(infKernel.real().rows() == infKernel.imag().rows());
+            assert(infKernel.real().cols() == infKernel.imag().cols());
+            auto rows = infKernel.real().rows();
+            auto cols = infKernel.real().cols()/3;
+            TData rhs(rows,cols);
+            for(int i = 0; i < cols; i++)
+            {
+               rhs.real().col(i) = infKernel.real().col(3*i+2);
+               rhs.imag().col(i) = infKernel.imag().col(3*i+2);
+            }
+            TData sol(rows,cols);
+            Solver::internal::solveWrapper(sol, sIt1->second.at(idx), rhs);
+            internal::computeMV(rhs, this->mMassMatrix.at(idx), sol);
+            Solver::internal::solveWrapper(sol, sIt2->second.at(idx), rhs);
+            internal::computeSetInfluence(infKernel, sol);
+         }
       }
    }
 
@@ -735,8 +856,149 @@ namespace Timestep {
          err = std::max(err, ((x.imag().array() - y.imag().array())/(1.0 + x.imag().array().abs())).abs().maxCoeff());
       }
 
+      template <typename TData> inline void initInfluence(TData& y, const DecoupledZSparse& val, const DecoupledZSparse& bc)
+      {
+         throw std::logic_error("Not yet implemented");
+//         auto cols = val.cols();
+//         y.resize(val.rows(), 2*cols);
+//
+//         for(int i = 0; i < cols; i++)
+//         {
+//            y.col(2*i) = val.col(i);
+//            y.col(2*i+1) = bc.row(i).transpose();
+//         }
+      }
+
+      inline void initInfluence(DecoupledZMatrix& y, const DecoupledZSparse& val, const DecoupledZSparse& bc)
+      {
+         assert(bc.real().rows() >= val.real().cols());
+
+         y.real().resize(val.real().rows(), 3*val.real().cols());
+
+         for(int i = 0; i < val.real().cols(); i++)
+         {
+            y.real().col(3*i+1) = bc.real().row(i).transpose();
+            y.real().col(3*i+2) = val.real().col(i);
+         }
+
+         y.imag().resize(val.imag().rows(), 3*val.imag().cols());
+
+         for(int i = 0; i < val.imag().cols(); i++)
+         {
+            y.imag().col(3*i+1) = bc.real().row(i).transpose();
+            y.imag().col(3*i+2) = val.imag().col(i);
+         }
+      }
+
+      template <typename TData> inline void computeSetInfluence(TData& reg, const TData& x)
+      {
+         assert(reg.cols() == x.cols()*3);
+
+         for(int i = 0; i < x.cols(); i++)
+         {
+            reg.col(3*i) = x.col(i);
+         }
+      }
+
+      inline void computeSetInfluence(DecoupledZMatrix& reg, const DecoupledZMatrix& x)
+      {
+         assert(reg.real().cols() == 3*x.real().cols());
+         assert(reg.imag().cols() == 3*x.imag().cols());
+
+         for(int i = 0; i < x.real().cols(); i++)
+         {
+            reg.real().col(3*i) = x.real().col(i);
+         }
+
+         for(int i = 0; i < x.imag().cols(); i++)
+         {
+            reg.imag().col(3*i) = x.imag().col(i);
+         }
+      }
+
+      template <typename TData> void computeInfluenceCorrection(TData& y, const TData& x)
+      {
+         assert(x.cols()%3 == 0);
+
+         // compute influence matrix
+         int nBC = x.cols()/3;
+         TData mat(nBC, nBC);
+         for(int j = 0; j < nBC; j++)
+         {
+            const auto bc = x.col(3*j+1).transpose();
+            for(int k = 0; k < nBC; k++)
+            {
+               mat(j,k) = bc*x.col(3*k);
+            }
+         }
+         mat = mat.inverse();
+
+         TData bcVal(nBC, 1);
+         for(int j = 0; j < y.cols(); j++)
+         {
+            for(int k = 0; k < nBC; k++)
+            {
+               bcVal(k,0) = x.col(3*k+1).transpose() * y.col(j);
+            }
+            bcVal = mat*bcVal;
+            for(int k = 0; k < nBC; k++)
+            {
+               y.col(j) -= bcVal(k)*x.col(3*k);
+            }
+         }
+      }
+
+      inline void computeInfluenceCorrection(DecoupledZMatrix& y, const DecoupledZMatrix& x)
+      {
+         assert(x.real().cols()%3 == 0);
+         assert(x.imag().cols()%3 == 0);
+
+         // compute influence matrix
+         int nBC = x.real().cols()/3;
+         Matrix mat(nBC, nBC);
+         for(int j = 0; j < nBC; j++)
+         {
+            const auto bc = x.real().col(3*j+1).transpose();
+            for(int k = 0; k < nBC; k++)
+            {
+               mat(j,k) = bc*x.real().col(3*k);
+            }
+         }
+         mat = mat.inverse();
+
+         Matrix bcVal(nBC, 1);
+         for(int j = 0; j < y.real().cols(); j++)
+         {
+            for(int k = 0; k < nBC; k++)
+            {
+               auto bc = x.real().col(3*k+1).transpose();
+               bcVal(k,0) =  bc * y.real().col(j);
+            }
+            bcVal = mat*bcVal;
+            for(int k = 0; k < nBC; k++)
+            {
+               y.real().col(j) -= bcVal(k)*x.real().col(3*k);
+            }
+         }
+
+         for(int j = 0; j < y.imag().cols(); j++)
+         {
+            for(int k = 0; k < nBC; k++)
+            {
+               auto bc = x.imag().col(3*k+1).transpose();
+               bcVal(k,0) =  bc * y.imag().col(j);
+            }
+            bcVal = mat*bcVal;
+            for(int k = 0; k < nBC; k++)
+            {
+               y.imag().col(j) -= bcVal(k)*x.imag().col(3*k);
+            }
+         }
+      }
+
    }
-}
-}
+
+} // Timestep
+} // QuICC
 
 #endif // QUICC_TIMESTEP_ISPARSETIMESTEPPER_HPP

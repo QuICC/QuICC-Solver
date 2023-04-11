@@ -6,26 +6,20 @@
 #ifndef QUICC_TIMESTEP_TIMESTEPSOLVERCOORDINATOR_HPP
 #define QUICC_TIMESTEP_TIMESTEPSOLVERCOORDINATOR_HPP
 
-// Configuration includes
-//
-
-// Debug includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-
 // System includes
 //
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/ModelOperator/Boundary.hpp"
+#include "QuICC/ModelOperator/SplitImplicitLinear.hpp"
+#include "QuICC/ModelOperator/SplitBoundary.hpp"
+#include "QuICC/ModelOperator/SplitBoundaryValue.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverHasBc.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverNoTau.hpp"
 #include "QuICC/SparseSolvers/SparseLinearCoordinatorBase.hpp"
@@ -100,6 +94,8 @@ namespace Timestep {
    {
       std::map<std::size_t, DecoupledZSparse> ops;
 
+      bool isSplit = spEq->couplingInfo(comp).isSplitEquation();
+
       // Compute model's linear operator (without Tau lines)
       ops.insert(std::make_pair(ModelOperator::ImplicitLinear::id(), DecoupledZSparse()));
       spEq->buildModelMatrix(ops.find(ModelOperator::ImplicitLinear::id())->second, ModelOperator::ImplicitLinear::id(), comp, idx, ModelOperatorBoundary::SolverNoTau::id());
@@ -109,6 +105,25 @@ namespace Timestep {
       // Compute model's tau line boundary operator
       ops.insert(std::make_pair(ModelOperator::Boundary::id(), DecoupledZSparse()));
       spEq->buildModelMatrix(ops.find(ModelOperator::Boundary::id())->second, ModelOperator::Boundary::id(), comp, idx, ModelOperatorBoundary::SolverHasBc::id());
+
+      // If equation was split into two lower order systems
+      if(isSplit)
+      {
+         // Compute model's split linear operator (without Tau lines)
+         auto id = ModelOperator::SplitImplicitLinear::id();
+         ops.insert(std::make_pair(id, DecoupledZSparse()));
+         spEq->buildModelMatrix(ops.find(id)->second, id, comp, idx, ModelOperatorBoundary::SolverNoTau::id());
+
+         // Compute model's tau line boundary operator for split operator
+         id = ModelOperator::SplitBoundary::id();
+         ops.insert(std::make_pair(id, DecoupledZSparse()));
+         spEq->buildModelMatrix(ops.find(id)->second, id, comp, idx, ModelOperatorBoundary::SolverHasBc::id());
+
+         // Compute model's tau line boundary value for split operator
+         id = ModelOperator::SplitBoundaryValue::id();
+         ops.insert(std::make_pair(id, DecoupledZSparse()));
+         spEq->buildModelMatrix(ops.find(id)->second, id, comp, idx, ModelOperatorBoundary::SolverHasBc::id());
+      }
 
       // Let the timestepper build the right operators
       spSolver->buildOperators(idx, ops, dt, spEq->couplingInfo(comp).systemN(idx));
@@ -154,7 +169,7 @@ namespace Timestep {
       this->initCoordSolvers(scalEq, vectEq);
    }
 
-}
-}
+} // Timestep
+} // QuICC
 
 #endif // QUICC_TIMESTEP_TIMESTEPSOLVERCOORDINATOR_HPP

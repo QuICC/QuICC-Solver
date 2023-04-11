@@ -11,8 +11,10 @@ include(cmake.d/setup/RegisterTransformReductor.cmake)
 include(cmake.d/setup/RegisterTransformPath.cmake)
 include(cmake.d/setup/RegisterTimestepId.cmake)
 include(cmake.d/setup/RegisterTimestepRegister.cmake)
+include(cmake.d/setup/RegisterTagOperator.cmake)
 include(cmake.d/setup/RegisterBcScheme.cmake)
 include(cmake.d/setup/RegisterBcName.cmake)
+include(cmake.d/setup/RegisterTagGeneric.cmake)
 
 # Create component library
 add_library(${QUICC_CURRENT_COMPONENT_LIB} "")
@@ -35,6 +37,14 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   QuICC::Framework::GitHash
   QuICC::Profiling
   )
+
+# Add debug option for operator output
+set( _debugModelMatrix "QUICC_DEBUG_OUTPUT_MODEL_MATRIX")
+option(${_debugModelMatrix} "Output model matrices to MatrixMarket files" OFF)
+mark_as_advanced(${_debugModelMatrix})
+if(${_debugModelMatrix})
+  target_compile_definitions(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC ${_debugModelMatrix})
+endif()
 
 # Transform component
 add_library(${QUICC_CURRENT_COMPONENT_LIB}_transform "")

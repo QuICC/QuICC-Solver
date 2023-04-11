@@ -92,6 +92,11 @@ namespace Config {
 
       protected:
          /**
+          * @brief Maximum length of string tags
+          */
+         static const unsigned int MAX_STRING_LENGTH;
+
+         /**
           * @brief Framework part of configuration file
           */
          std::shared_ptr<Framework::Block>  mspFramework;
@@ -167,6 +172,8 @@ namespace Config {
    {
       return this->mspModel;
    }
+
+   template <typename TBase> const unsigned int IConfigurationFile<TBase>::MAX_STRING_LENGTH = 200;
 
    template <typename TBase> const std::string IConfigurationFile<TBase>::EXTENSION = ".cfg";
 
@@ -253,16 +260,15 @@ namespace Config {
       this->mspModel->gatherParameters(iData, fData, sData);
 
       // Pad the strings
-      const unsigned int maxSize = 20;
       for(auto it = sData.begin(); it != sData.end(); it++)
       {
-         if(it->size() > maxSize)
+         if(it->size() > IConfigurationFile<TBase>::MAX_STRING_LENGTH)
          {
-            throw std::logic_error("parameter " + *it + " is longer the maximum string size " + std::to_string(maxSize));
+            throw std::logic_error("parameter " + *it + " is longer the maximum string size " + std::to_string(IConfigurationFile<TBase>::MAX_STRING_LENGTH));
          }
          else
          {
-            *it = *it + std::string(maxSize - it->size(), ' ');
+            *it = *it + std::string(IConfigurationFile<TBase>::MAX_STRING_LENGTH - it->size(), ' ');
          }
       }
 

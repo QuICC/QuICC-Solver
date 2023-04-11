@@ -6,6 +6,9 @@ set(tags
   ImplicitLinear
   Stencil
   Time
+  SplitBoundary
+  SplitBoundaryValue
+  SplitImplicitLinear
 )
 
 include(RegisterTags)

@@ -66,6 +66,11 @@ namespace Integrator {
 
       protected:
          /**
+          * @brief Truncate Quasi-inverse ?
+          */
+         const bool mcTruncQI;
+
+         /**
           * @brief Default implementation to apply ith operator
           */
          void defaultApplyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;

@@ -27,6 +27,8 @@
 #include "QuICC/NonDimensional/Typedefs.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
+#include "QuICC/Model/EquationInfo.hpp"
+#include "QuICC/Model/OperatorInfo.hpp"
 
 namespace QuICC {
 
@@ -46,7 +48,7 @@ namespace Model {
          /**
           * @brief Constructor
           */
-         IModelBackend() = default;
+         IModelBackend();
 
          /**
           * @brief Destructor
@@ -79,9 +81,40 @@ namespace Model {
          virtual std::vector<bool> isPeriodicBox() const = 0;
 
          /**
-          * @brief Enable galerkin basis
+          * @brief Enable galerkin basis?
+          *
+          * @param flag True/False to enable option
           */
-         virtual void enableGalerkin(const bool flag) = 0;
+         virtual void enableGalerkin(const bool flag);
+
+         /**
+          * @brief Use Galerkin basis?
+          */
+         bool useGalerkin() const;
+
+         /**
+          * @brief Enable split equation 4th order equation into two second order
+          *
+          * @param flag True/False to enable option
+          */
+         virtual void enableSplitEquation(const bool flag);
+
+         /**
+          * @brief Split high order equations?
+          */
+         bool useSplitEquation() const;
+
+         /**
+          * @brief Enable linearized equation
+          *
+          * @param flag True/False to enable option
+          */
+         virtual void enableLinearized(const bool flag);
+
+         /**
+          * @brief Use linearized equations?
+          */
+         bool useLinearized() const;
 
          /**
           * @brief Get automatically computed parameters
@@ -91,12 +124,12 @@ namespace Model {
          /**
           * @brief Get equation information
           */
-         virtual void equationInfo(bool& isComplex, SpectralFieldIds& im, SpectralFieldIds& exL, SpectralFieldIds& exNL, SpectralFieldIds& exNS, int& indexMode, const SpectralFieldId& fId, const Resolution& res) const = 0;
+         virtual void equationInfo(EquationInfo& info, const SpectralFieldId& fId, const Resolution& res) const = 0;
 
          /**
           * @brief Get operator information
           */
-         virtual void operatorInfo(ArrayI& tauN, ArrayI& galN, MatrixI& galShift, ArrayI& rhsCols, ArrayI& sysN, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs) const = 0;
+         virtual void operatorInfo(OperatorInfo& info, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs) const = 0;
 
          /**
           * @brief Build model matrix
@@ -125,6 +158,20 @@ namespace Model {
          void checkParamNames(const std::vector<std::string>& names) const;
 
       private:
+         /**
+          * @brief Use Galerkin basis?
+          */
+         bool mUseGalerkin;
+
+         /**
+          * @brief Split high order equation?
+          */
+         bool mUseSplitEquation;
+
+         /**
+          * @brief Use linearized equations?
+          */
+         bool mUseLinearized;
    };
 
 }

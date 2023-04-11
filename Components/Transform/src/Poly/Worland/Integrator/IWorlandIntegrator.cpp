@@ -29,7 +29,12 @@ namespace Worland {
 namespace Integrator {
 
    IWorlandIntegrator::IWorlandIntegrator()
-      : IWorlandOperator()
+      : IWorlandOperator(),
+#ifdef QUICC_TRANSFORM_WORLAND_TRUNCATE_QI
+        mcTruncQI(true)
+#else
+        mcTruncQI(false)
+#endif // QUICC_TRANSFORM_WORLAND_TRUNCATE_QI
    {
       this->mProfileTag += "-Integrator";
    }

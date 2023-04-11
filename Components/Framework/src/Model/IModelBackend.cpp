@@ -30,6 +30,11 @@ namespace QuICC {
 
 namespace Model {
 
+   IModelBackend::IModelBackend()
+      : mUseGalerkin(false), mUseSplitEquation(false), mUseLinearized(false)
+   {
+   }
+
    std::vector<std::size_t> IModelBackend::fieldIds() const
    {
       std::vector<std::size_t> ids;
@@ -83,6 +88,36 @@ namespace Model {
             throw std::logic_error("Requested PhysicalName <"+ *it +"> is not implemented!");
          }
       }
+   }
+
+   bool IModelBackend::useGalerkin() const
+   {
+      return this->mUseGalerkin;
+   }
+
+   void IModelBackend::enableGalerkin(const bool flag)
+   {
+      this->mUseGalerkin = flag;
+   }
+
+   bool IModelBackend::useSplitEquation() const
+   {
+      return this->mUseSplitEquation;
+   }
+
+   void IModelBackend::enableSplitEquation(const bool tag)
+   {
+      this->mUseSplitEquation = tag;
+   }
+
+   bool IModelBackend::useLinearized() const
+   {
+      return this->mUseLinearized;
+   }
+
+   void IModelBackend::enableLinearized(const bool flag)
+   {
+      this->mUseLinearized = flag;
    }
 }
 }

@@ -23,6 +23,7 @@
 #include "QuICC/Bc/Scheme/registerAll.hpp"
 #include "QuICC/Bc/Name/Coordinator.hpp"
 #include "QuICC/Bc/Name/registerAll.hpp"
+#include "QuICC/Tag/Generic/registerAll.hpp"
 
 namespace QuICC {
 
@@ -262,6 +263,12 @@ namespace QuICC {
          throw std::logic_error("timestepper scheme was not recognized");
       }
 
+      // For the time being only the Predictor-correct scheme supports split equations
+      if(this->splitEquation() && (id != Timestep::Id::ImexPc2::id()))
+      {
+         throw std::logic_error("Split equations are only supported with PC2 scheme");
+      }
+
       return id;
    }
 
@@ -293,5 +300,37 @@ namespace QuICC {
       }
 
       return id;
+   }
+
+   bool SimulationConfig::splitEquation() const
+   {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
+      auto s = this->mspCfgFile->spSetup()->spNode(Io::Config::Setup::MODEL)->sTags().value("split_equation");
+      std::string tag = s;
+      std::transform(s.cbegin(), s.cend(), tag.begin(), [](unsigned char c) { return std::tolower(c); });
+
+      // Register all boundary condition scheme IDs
+      Tag::Generic::registerAll();
+
+      std::size_t id = 0;
+      for(auto&& e: Tag::Generic::Coordinator::map())
+      {
+         if(Tag::Generic::Coordinator::tag(e.first) == tag)
+         {
+            id = e.first;
+            break;
+         }
+      }
+
+      if(id == 0)
+      {
+         throw std::logic_error("on/off tag for split_equation was not recognized");
+      }
+
+      bool enable = (Tag::Generic::On::id() == id);
+
+      return enable;
    }
 }

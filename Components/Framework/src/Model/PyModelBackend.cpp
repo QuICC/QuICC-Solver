@@ -53,6 +53,16 @@ namespace Model {
       this->mpWrapper->enableGalerkin(flag);
    }
 
+   void PyModelBackend::enableSplitEquation(const bool flag)
+   {
+      this->mpWrapper->enableSplitEquation(flag);
+   }
+
+   void PyModelBackend::enableLinearized(const bool flag)
+   {
+      this->mpWrapper->enableLinearized(flag);
+   }
+
    std::vector<std::string> PyModelBackend::fieldNames() const
    {
       // Prepare Python call arguments
@@ -143,7 +153,7 @@ namespace Model {
       return extra;
    }
 
-   void PyModelBackend::equationInfo(bool& isComplex, SpectralFieldIds& im, SpectralFieldIds& exL, SpectralFieldIds& exNL, SpectralFieldIds& exNS, int& indexMode, const SpectralFieldId& fId, const Resolution& res) const
+   void PyModelBackend::equationInfo(EquationInfo& info, const SpectralFieldId& fId, const Resolution& res) const
    {
       // Prepare Python call arguments
       PyObject *pArgs, *pTmp, *pValue;
@@ -168,27 +178,30 @@ namespace Model {
 
       // Get Complex solver flag
       pTmp = PyTuple_GetItem(pValue, 0);
-      isComplex = PyObject_IsTrue(pTmp);
+      info.isComplex = PyObject_IsTrue(pTmp);
 
       // Get Implicit fields
       pTmp = PyTuple_GetItem(pValue, 1);
-      PyQuICC::Tools::getList(im, pTmp);
+      PyQuICC::Tools::getList(info.im, pTmp);
 
       // Get Explicit linear fields
       pTmp = PyTuple_GetItem(pValue, 2);
-      PyQuICC::Tools::getList(exL, pTmp);
+      PyQuICC::Tools::getList(info.exL, pTmp);
 
       // Get Explicit nonlinear fields
       pTmp = PyTuple_GetItem(pValue, 3);
-      PyQuICC::Tools::getList(exNL, pTmp);
+      PyQuICC::Tools::getList(info.exNL, pTmp);
 
       // Get Explicit nextstep fields
       pTmp = PyTuple_GetItem(pValue, 4);
-      PyQuICC::Tools::getList(exNS, pTmp);
+      PyQuICC::Tools::getList(info.exNS, pTmp);
 
       // Get index mode
       pTmp = PyTuple_GetItem(pValue, 5);
-      indexMode = PyLong_AsLong(pTmp);
+      info.indexMode = PyLong_AsLong(pTmp);
+
+      // Use split equation
+      info.isSplitEquation = false;
 
       // Finalise Python interpreter
       Py_DECREF(pValue);
@@ -233,8 +246,14 @@ namespace Model {
       return m;
    }
 
-   void PyModelBackend::operatorInfo(ArrayI& tauN, ArrayI& galN, MatrixI& galShift, ArrayI& rhsCols, ArrayI& sysN, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs) const
+   void PyModelBackend::operatorInfo(OperatorInfo& info, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs) const
    {
+      auto&& tauN = info.tauN;
+      auto&& galN = info.galN;
+      auto&& galShift = info.galShift;
+      auto&& rhsCols = info.rhsCols;
+      auto&& sysN = info.sysN;
+
       PyObject *pArgs, *pTmp, *pValue;
 
       // Prepare Python call

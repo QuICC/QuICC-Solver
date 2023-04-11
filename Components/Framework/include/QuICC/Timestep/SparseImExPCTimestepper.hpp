@@ -6,13 +6,7 @@
 #ifndef QUICC_TIMESTEP_SPARSEIMEXPCTIMESTEPPER_HPP
 #define QUICC_TIMESTEP_SPARSEIMEXPCTIMESTEPPER_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -171,10 +165,32 @@ namespace Timestep {
       // Add additional registers
       std::vector<std::size_t> ids = {Register::Error::id(), Register::Explicit::id(), Register::Intermediate::id()};
       this->addRegister(rows, cols, ids);
+
+      // Register for influence kernels
+      ids = {Register::Influence::id()};
+      this->addRegister(1, 1, ids);
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> bool SparseImExPCTimestepper<TOperator,TData,TSolver>::preSolve()
    {
+      const bool hasInfluence = this->hasSolverMatrix(Tag::Operator::Influence::id());
+
+      // Use influence matrix
+      if(hasInfluence)
+      {
+         const bool isFirstPass = (this->mOpId == Tag::Operator::Lhs::id());
+         if(isFirstPass)
+         {
+            this->mOpId = Tag::Operator::Influence::id();
+            this->mId = 0.0;
+
+            return true;
+         } else
+         {
+            this->mOpId = Tag::Operator::Lhs::id();
+         }
+      }
+
       // First step
       if(this->mStep == 0)
       {
@@ -227,6 +243,32 @@ namespace Timestep {
 
    template <typename TOperator,typename TData,template <typename> class TSolver> bool SparseImExPCTimestepper<TOperator,TData,TSolver>::postSolve()
    {
+      const bool hasInfluence = this->hasSolverMatrix(Tag::Operator::Influence::id());
+
+      if(hasInfluence)
+      {
+         const bool isFirstPass = (this->mOpId == Tag::Operator::Influence::id());
+
+         if(isFirstPass)
+         {
+            // Apply quasi-inverse
+            for(std::size_t i = this->mZeroIdx; i < this->nSystem(); i++)
+            {
+               internal::computeMV(this->reg(Register::Rhs::id()).at(i), this->mMassMatrix.at(i), this->reg(Register::Solution::id()).at(i));
+            }
+
+            return true;
+         }
+         else
+         {
+            // Correct solution with green's function
+            for(std::size_t i = this->mZeroIdx; i < this->nSystem(); i++)
+            {
+               internal::computeInfluenceCorrection(this->reg(Register::Solution::id()).at(i), this->reg(Register::Influence::id()).at(i));
+            }
+         }
+      }
+
       if(this->mStep == 0)
       {
          // Store predictor solution
@@ -267,7 +309,8 @@ namespace Timestep {
 
       return false;
    }
-}
-}
+
+} // Timestep
+} // QuICC
 
 #endif // QUICC_TIMESTEP_SPARSEIMEXPCTIMESTEPPER_HPP

@@ -6,6 +6,7 @@ set(tags
   Rhs
   Solution
   Temporary
+  Influence
   )
 
 include(RegisterTags)

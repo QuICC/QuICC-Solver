@@ -65,6 +65,16 @@ namespace Model {
          virtual void enableGalerkin(const bool flag) override;
 
          /**
+          * @brief Enable split equation
+          */
+         virtual void enableSplitEquation(const bool flag) override;
+
+         /**
+          * @brief Enable linearized equation
+          */
+         virtual void enableLinearized(const bool flag) override;
+
+         /**
           * @brief Get vector of bools about periodic box
           */
          virtual std::map<std::string,MHDFloat> automaticParameters(const std::map<std::string,MHDFloat>& cfg) const override;
@@ -72,12 +82,12 @@ namespace Model {
          /**
           * @brief Get equation information
           */
-         virtual void equationInfo(bool& isComplex, SpectralFieldIds& im, SpectralFieldIds& exL, SpectralFieldIds& exNL, SpectralFieldIds& exNS, int& indexMode, const SpectralFieldId& fId, const Resolution& res) const override;
+         virtual void equationInfo(EquationInfo& info, const SpectralFieldId& fId, const Resolution& res) const override;
 
          /**
           * @brief Get operator information
           */
-         virtual void operatorInfo(ArrayI& tauN, ArrayI& galN, MatrixI& galShift, ArrayI& rhsCols, ArrayI& sysN, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs) const override;
+         virtual void operatorInfo(OperatorInfo& info, const SpectralFieldId& fId, const Resolution& res, const Equations::Tools::ICoupling& coupling, const BcMap& bcs) const override;
 
          /**
           * @brief Build model matrix

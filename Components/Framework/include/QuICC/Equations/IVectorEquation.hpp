@@ -174,9 +174,13 @@ namespace Equations {
    {
       // Create temporary storage for tau data
       TData tmp(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      std::visit([&](auto&& p){Equations::copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);}, eq.spUnknown());
+      std::visit(
+            [&](auto&& p)
+            {
+               Equations::copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);
+            }, eq.spUnknown());
       TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      if(eq.res().sim().ss().has(SpatialScheme::Feature::CylinderGeometry))
+      if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
       {
          Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), eq.couplingInfo(compId).galerkinShift(matIdx, 0), tmp);
       } else

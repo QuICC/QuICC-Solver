@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I4DIVR1D1R1_I2_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I4DIVR1D1R1_I2_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -47,7 +38,7 @@ namespace Integrator {
          /**
           * @brief Destructor
           */
-         virtual ~I4DivR1D1R1_I2();
+         virtual ~I4DivR1D1R1_I2() = default;
          
       protected:
 

@@ -110,6 +110,11 @@ namespace QuICC {
           */
          std::size_t bcScheme() const;
 
+         /**
+          * @brief Use split equation model setup
+          */
+         bool splitEquation() const;
+
       protected:
 
       private:

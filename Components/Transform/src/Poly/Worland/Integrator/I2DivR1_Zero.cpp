@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Integrator/I2DivR1_Zero.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Integrator/I2DivR1_Zero.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
@@ -41,10 +35,6 @@ namespace Integrator {
       this->setProfileTag();
    }
 
-   I2DivR1_Zero::~I2DivR1_Zero()
-   {
-   }
-
    void I2DivR1_Zero::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
@@ -61,7 +51,7 @@ namespace Integrator {
          Polynomial::Worland::Wnl wnl;
 
          // Internal computation uses dealiased modes
-         const int extraN = 3; // I2 has 3 superdiagonals
+         const int extraN = 3*(!this->mcTruncQI); // I2 has 3 superdiagonals
          int nN = nPoly + extraN;
          this->checkGridSize(nN, l, igrid.size());
 
@@ -102,7 +92,7 @@ namespace Integrator {
          // Multiply by Quasi-inverse
          auto a = wnl.alpha(l);
          auto b = wnl.dBeta();
-         ::QuICC::SparseSM::Worland::I2 spasm(nN, nN, a, b, l);
+         ::QuICC::SparseSM::Worland::I2 spasm(nN, nN, a, b, l, 1*this->mcTruncQI);
          tOp = (spasm.mat()*tOp.transpose()).transpose();
          op = tOp.cast<MHDFloat>().leftCols(nPoly);
 
@@ -138,7 +128,7 @@ namespace Integrator {
 
             MHDFloat a = static_cast<MHDFloat>(wnl.alpha(l));
             MHDFloat b = static_cast<MHDFloat>(wnl.dBeta());
-            ::QuICC::SparseSM::Worland::I2 spasm(nPoly, nPoly, a, b, l);
+            ::QuICC::SparseSM::Worland::I2 spasm(nPoly, nPoly, a, b, l, 1*this->mcTruncQI);
             rOut = spasm.mat()*rOut;
          }
       #endif //defined QUICC_WORLAND_INTGIMPL_MATRIX

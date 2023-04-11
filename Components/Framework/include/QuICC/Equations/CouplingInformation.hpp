@@ -97,6 +97,11 @@ namespace Equations {
          bool isComplex() const;
 
          /**
+          * @brief Is high order equation split into two?
+          */
+         bool isSplitEquation() const;
+
+         /**
           * @brief Is Galerkin system?
           */
          bool isGalerkin() const;
@@ -203,7 +208,7 @@ namespace Equations {
           * @param isComplex  Complex flag of solver
           * @param fieldStart Start index of the filed
           */
-         void setGeneral(const CouplingInformation::EquationTypeId typeId, const bool isComplex, const int fieldStart);
+         void setGeneral(const CouplingInformation::EquationTypeId typeId, const bool isComplex, const int fieldStart, const bool isSplitEquation);
 
          /**
           * @brief Set nonlinear flags
@@ -314,6 +319,11 @@ namespace Equations {
           * @brief Storage for the complex flag
           */
          bool mIsComplex;
+
+         /**
+          * @brief Storage for the split equation flag
+          */
+         bool mIsSplitEquation;
 
          /**
           * @brief Storage for the galerkin flag

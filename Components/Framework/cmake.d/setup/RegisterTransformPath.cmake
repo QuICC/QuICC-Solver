@@ -4,7 +4,8 @@ set(tags
   I2CurlCurlNl
   I2CurlNl
   I2ScalarNl
-  I4CurlCurlNl
+  NegI2CurlCurlNl
+  NegI4CurlCurlNl
   Scalar
   ScalarNl
   TorPol

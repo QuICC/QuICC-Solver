@@ -100,6 +100,36 @@ namespace PyQuICC {
       }
    }
 
+   void ModelWrapper::enableSplitEquation(const bool flag)
+   {
+      // Split equation are not implemented in Python backend
+      if(flag)
+      {
+         throw std::logic_error("Python backend does not implemented the split equations");
+      }
+
+//      // Set the split equation flag for the python dispatchers
+//      if(flag)
+//      {
+//         PyObject_SetAttrString(this->mpModel, (char *)"use_splitequation", Py_True);
+//      } else
+//      {
+//         PyObject_SetAttrString(this->mpModel, (char *)"use_splitequation", Py_False);
+//      }
+   }
+
+   void ModelWrapper::enableLinearized(const bool flag)
+   {
+      // Set the galerkin flag for the python dispatchers
+      if(flag)
+      {
+         PyObject_SetAttrString(this->mpModel, (char *)"linearize", Py_True);
+      } else
+      {
+         PyObject_SetAttrString(this->mpModel, (char *)"linearize", Py_False);
+      }
+   }
+
    void ModelWrapper::createModel(const std::string& model, const std::string& specialization)
    {
       // Check module is setup

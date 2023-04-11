@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I2_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I2_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -47,7 +38,7 @@ namespace Integrator {
          /**
           * @brief Destructor
           */
-         virtual ~I2();
+         virtual ~I2() = default;
          
       protected:
 
@@ -63,10 +54,10 @@ namespace Integrator {
          virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
    };
 
-}
-}
-}
-}
-}
+} // Integrator
+} // Worland
+} // Poly
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I2_HPP

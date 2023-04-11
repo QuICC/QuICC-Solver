@@ -48,6 +48,16 @@ namespace PyQuICC {
          void enableGalerkin(const bool flag);
 
          /**
+          * @brief Enable split equation?
+          */
+         void enableSplitEquation(const bool flag);
+
+         /**
+          * @brief Enable linearized equation?
+          */
+         void enableLinearized(const bool flag);
+
+         /**
           * @brief Import the Python module
           */
          void import(const std::string& module);

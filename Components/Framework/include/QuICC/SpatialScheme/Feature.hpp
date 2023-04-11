@@ -63,6 +63,10 @@ namespace SpatialScheme {
       RealSpectrum,
       /// Complex valued spectrum
       ComplexSpectrum,
+      /// Solve fourth order equation as is
+      SolveFourthOrder,
+      /// Split fourth order equation into 2 second order
+      SplitFourthOrder,
    };
 }
 }
