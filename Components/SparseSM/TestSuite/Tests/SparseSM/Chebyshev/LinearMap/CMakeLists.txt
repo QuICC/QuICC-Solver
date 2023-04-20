@@ -40,6 +40,7 @@ set(_tests
   Y2:sparse
   I1:sparse
   I2:sparse
+  I2Lapl:sparse
   I2Y1:sparse
   I2Y2:sparse
   I2Y2D1:sparse
@@ -49,6 +50,8 @@ set(_tests
   I3:sparse
   I4:sparse
   I4D1:sparse
+  I4Lapl:sparse
+  I4Lapl2:sparse
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -134,6 +137,21 @@ foreach(_test ${_tests})
     ULPS 18 58 11 36
   )
 endforeach()
+
+set(_tests
+  I2Lapl:sparse
+  I4Lapl:sparse
+  I4Lapl2:sparse
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 20 21
+    ULP 11
+  )
+endforeach()
+
 
 add_subdirectory(Boundary)
 add_subdirectory(Stencil)

@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/IRegular3DBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/3D/IRegular3DBuilder.hpp"
 #include "QuICC/SpatialScheme/Tools/Regular.hpp"
 
 namespace QuICC {
@@ -27,10 +21,6 @@ namespace SpatialScheme {
       : IBuilder(dim.size(), purpose), mI(dim(0)), mJ(dim(1)), mK(dim(2))
    {
       assert(dim.size() == 3);
-   }
-
-   IRegular3DBuilder::~IRegular3DBuilder()
-   {
    }
 
    ArrayI IRegular3DBuilder::resolution() const
@@ -105,7 +95,7 @@ namespace SpatialScheme {
       if(flag == Splitting::Locations::FIRST)
       {
          // Get total size for first transform
-         if(transId == Dimensions::Transform::TRA1D)
+         if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
          {
             return this->dim(transId, Dimensions::Data::DAT2D)*this->dim(transId, Dimensions::Data::DAT3D);
 
@@ -124,7 +114,7 @@ namespace SpatialScheme {
       } else if(flag == Splitting::Locations::SECOND)
       {
          // Get total size for first transform
-         if(transId == Dimensions::Transform::TRA1D)
+         if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
          {
             return this->dim(transId, Dimensions::Data::DAT2D);
          // Get total size for second transform
@@ -142,7 +132,7 @@ namespace SpatialScheme {
       } else if(flag == Splitting::Locations::BOTH)
       {
          // Get total size for first transform
-         if(transId == Dimensions::Transform::TRA1D)
+         if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
          {
             return this->dim(transId, Dimensions::Data::DAT3D);
 
@@ -161,7 +151,7 @@ namespace SpatialScheme {
       } else if(flag == Splitting::Locations::COUPLED2D)
       {
          // Get total size for first transform
-         if(transId == Dimensions::Transform::TRA1D)
+         if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
          {
             return this->dim(transId, Dimensions::Data::DAT3D);
 
@@ -248,7 +238,7 @@ namespace SpatialScheme {
       int cN = -1;
 
       // Create index list for first transform
-      if(transId == Dimensions::Transform::TRA1D)
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
       {
          k0 = 0;
          kN = this->dim(transId, Dimensions::Data::DAT3D);
@@ -291,7 +281,7 @@ namespace SpatialScheme {
       int cN = -1;
 
       // Create index list for first transform
-      if(transId == Dimensions::Transform::TRA1D)
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
       {
             k0 = n0(0);
             kN = nN(0);
@@ -334,7 +324,7 @@ namespace SpatialScheme {
       int cN = -1;
 
       // Create index list for first transform
-      if(transId == Dimensions::Transform::TRA1D)
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
       {
          k0 = n0(0);
          kN = nN(0);
@@ -367,5 +357,5 @@ namespace SpatialScheme {
       // Generate map for regular indexes
       Tools::Regular::buildMap(modes, k0, kN, j0, jN, c0, cN);
    }
-}
-}
+} // SpatialScheme
+} // QuICC

@@ -20,6 +20,7 @@
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/ISphericalOperator.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/IPlaneOperator.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/ICondition.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/Operator.hpp"
 #include "QuICC/TestSuite/SparseSM/TesterBase.hpp"
@@ -114,6 +115,19 @@ namespace LinearMap {
          TOp op(rows, cols, lower, upper, l);
          mat = op.mat();
       }
+      else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::LinearMap::IPlaneOperator, TOp>)
+      {
+         assert(meta.size() == 6);
+         int rows = static_cast<int>(meta(0));
+         int cols = static_cast<int>(meta(1));
+         auto lower = meta(2);
+         auto upper = meta(3);
+         auto k1 = meta(4);
+         auto k2 = meta(5);
+
+         TOp op(rows, cols, lower, upper, k1, k2);
+         mat = op.mat();
+      }
       else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::ILinearMapOperator, TOp>)
       {
          assert(meta.size() == 4);
@@ -146,6 +160,19 @@ namespace LinearMap {
          assert(meta.size() == 5);
          auto l = meta(4);
          TOp op(rows, cols, lower, upper, l);
+         mat = op.banded(KL, KU);
+      }
+      else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::LinearMap::IPlaneOperator, TOp>)
+      {
+         int rows = static_cast<int>(meta(0));
+         int cols = static_cast<int>(meta(1));
+         auto lower = meta(2);
+         auto upper = meta(3);
+
+         assert(meta.size() == 6);
+         auto k1 = meta(4);
+         auto k2 = meta(5);
+         TOp op(rows, cols, lower, upper, k1, k2);
          mat = op.banded(KL, KU);
       }
       else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::ILinearMapOperator, TOp>)

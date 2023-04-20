@@ -6,13 +6,7 @@
 #ifndef QUICC_SPATIALSCHEME_IREGULAR3DBUILDER_HPP
 #define QUICC_SPATIALSCHEME_IREGULAR3DBUILDER_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -42,7 +36,7 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         virtual ~IRegular3DBuilder();
+         virtual ~IRegular3DBuilder() = default;
 
          /**
           * @brief Get spatial scheme dimensions
@@ -135,7 +129,7 @@ namespace SpatialScheme {
       private:
    };
 
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_IREGULAR3DBUILDER_HPP

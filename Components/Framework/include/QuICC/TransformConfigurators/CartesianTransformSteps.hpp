@@ -41,7 +41,7 @@ namespace QuICC {
             /**
              * @brief Constructor
              */
-            virtual ~CartesianTransformSteps();
+            virtual ~CartesianTransformSteps() = default;
 
             /**
              * @brief Is implementation applicable to scheme?

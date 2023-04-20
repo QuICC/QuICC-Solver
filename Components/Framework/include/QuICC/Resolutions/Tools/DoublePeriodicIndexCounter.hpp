@@ -6,15 +6,9 @@
 #ifndef QUICC_DOUBLEPERIODICINDEXCOUNTER_HPP
 #define QUICC_DOUBLEPERIODICINDEXCOUNTER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -38,7 +32,7 @@ namespace QuICC {
          /**
           * @brief Empty destructor
           */
-         ~DoublePeriodicIndexCounter();
+         ~DoublePeriodicIndexCounter() = default;
 
          /**
           * @brief Reorder dimensions from fast to slow
@@ -78,6 +72,6 @@ namespace QuICC {
    /// Typedef for an smart reference counting pointer for a DoublePeriodicIndexCounter
    typedef std::shared_ptr<DoublePeriodicIndexCounter>   SharedDoublePeriodicIndexCounter;
 
-}
+} // QuICC
 
 #endif // QUICC_DOUBLEPERIODICINDEXCOUNTER_HPP

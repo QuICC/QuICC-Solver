@@ -7,15 +7,9 @@
 //
 #include <set>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/SLFlBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/3D/SLFlBuilder.hpp"
 #include "QuICC/Transform/Poly/Tools.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
 
@@ -104,10 +98,6 @@ namespace SpatialScheme {
 
    SLFlBuilder::SLFlBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
       : IRegularSHlBuilder(dim, purpose)
-   {
-   }
-
-   SLFlBuilder::~SLFlBuilder()
    {
    }
 
@@ -249,5 +239,5 @@ namespace SpatialScheme {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

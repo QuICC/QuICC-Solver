@@ -7,15 +7,9 @@
 //
 #include <set>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/WLFmBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/3D/WLFmBuilder.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Transform/Poly/Tools.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
@@ -291,10 +285,6 @@ namespace SpatialScheme {
    {
    }
 
-   WLFmBuilder::~WLFmBuilder()
-   {
-   }
-
    bool WLFmBuilder::sameSpectralOrdering() const
    {
       return false;
@@ -436,5 +426,5 @@ namespace SpatialScheme {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

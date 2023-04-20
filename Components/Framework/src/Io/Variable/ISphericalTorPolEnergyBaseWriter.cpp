@@ -3,22 +3,13 @@
  * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for toroidal/poloidal field in a spherical geometry
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ISphericalTorPolEnergyBaseWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ISphericalTorPolEnergyBaseWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
@@ -34,10 +25,6 @@ namespace Io {
 namespace Variable {
    ISphericalTorPolEnergyBaseWriter::ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
       : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
-   {
-   }
-
-   ISphericalTorPolEnergyBaseWriter::~ISphericalTorPolEnergyBaseWriter()
    {
    }
 
@@ -295,6 +282,6 @@ namespace Variable {
       coord.communicator().storage<TId>().freeBwd(pInVarPolS);
    }
 
-}
-}
-}
+} // Variable
+} // Io
+} // QuICC

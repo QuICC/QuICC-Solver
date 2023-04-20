@@ -1,5 +1,11 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   FieldProbeWriter.cpp
+  ICartesian1DScalarEnergyBaseWriter.cpp
+  ICartesian1DScalarEnergyWriter.cpp
+  ICartesian1DTorPolEnergyBaseWriter.cpp
+  ICartesian1DTorPolEnergyWriter.cpp
+  Cartesian1DScalarEnergyWriter.cpp
+  Cartesian1DTorPolEnergyWriter.cpp
   ISphericalScalarEnergyBaseWriter.cpp
   ISphericalScalarEnergyWriter.cpp
   ISphericalScalarLSpectrumWriter.cpp

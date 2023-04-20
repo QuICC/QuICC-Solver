@@ -37,10 +37,6 @@ namespace Equations {
    {
    }
 
-   SphereExactScalarState::~SphereExactScalarState()
-   {
-   }
-
    void SphereExactScalarState::setIdentity(const std::size_t name)
    {
       // Set the name

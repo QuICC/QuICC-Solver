@@ -6,13 +6,7 @@
 #ifndef QUICC_SPATIALSCHEME_3D_SLFMBUILDER_HPP
 #define QUICC_SPATIALSCHEME_3D_SLFMBUILDER_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -51,7 +45,7 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         virtual ~SLFmBuilder();
+         virtual ~SLFmBuilder() = default;
 
          /**
           * @brief Add the transform setups to resolution
@@ -101,7 +95,7 @@ namespace SpatialScheme {
          Transform::Fft::Fourier::Mixed::SharedSetup  spSetup3D(SharedResolution spRes) const;
    };
 
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_3D_SLFMBUILDER_HPP

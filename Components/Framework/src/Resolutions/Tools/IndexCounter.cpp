@@ -7,24 +7,14 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
+// Project includes
 //
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 
-// Project includes
-//
-
 namespace QuICC {
 
    IndexCounter::IndexCounter()
-   {
-   }
-
-   IndexCounter::~IndexCounter()
    {
    }
 
@@ -132,4 +122,4 @@ namespace QuICC {
       return key;
    }
 
-}
+} // QuICC

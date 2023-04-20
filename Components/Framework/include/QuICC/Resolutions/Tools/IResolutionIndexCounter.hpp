@@ -6,15 +6,9 @@
 #ifndef QUICC_IRESOLUTIONINDEXCOUNTER_HPP
 #define QUICC_IRESOLUTIONINDEXCOUNTER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -40,7 +34,7 @@ namespace QuICC {
          /**
           * @brief Empty destructor
           */
-         virtual ~IResolutionIndexCounter();
+         virtual ~IResolutionIndexCounter() = default;
 
          /**
           * @brief Get simulation's dimensions
@@ -72,6 +66,6 @@ namespace QuICC {
 
    };
 
-}
+} // QuICC
 
 #endif // QUICC_IRESOLUTIONINDEXCOUNTER_HPP

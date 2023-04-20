@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/SLFm.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/3D/SLFm.hpp"
 #include "QuICC/SpatialScheme/Coordinator.hpp"
 #include "QuICC/SpatialScheme/3D/SLFmBuilder.hpp"
 #include "QuICC/Transform/ShellChebyshevTransform.hpp"
@@ -64,10 +58,6 @@ namespace SpatialScheme {
       this->enable(Feature::SpectralOrdering123);
       this->enable(Feature::TransformSpectralOrdering132);
       this->enable(Feature::ComplexSpectrum);
-   }
-
-   SLFm::~SLFm()
-   {
    }
 
    std::shared_ptr<IBuilder> SLFm::createBuilder(ArrayI& dim, const bool needInterpretation) const
@@ -219,5 +209,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/WLFl.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/3D/WLFl.hpp"
 #include "QuICC/SpatialScheme/Coordinator.hpp"
 #include "QuICC/SpatialScheme/3D/WLFlBuilder.hpp"
 #include "QuICC/SpatialScheme/3D/WLFlfftBuilder.hpp"
@@ -53,7 +47,8 @@ namespace SpatialScheme {
          this->mSpec.add(FieldComponents::Spectral::TOR);
          this->mSpec.add(FieldComponents::Spectral::POL);
          this->mSpec.add(FieldComponents::Spectral::NOTUSED);
-      } else if(formulation == VectorFormulation::QST)
+      }
+      else if(formulation == VectorFormulation::QST)
       {
          this->mSpec.add(FieldComponents::Spectral::Q);
          this->mSpec.add(FieldComponents::Spectral::S);
@@ -67,10 +62,6 @@ namespace SpatialScheme {
       this->enable(Feature::SpectralOrdering132);
       this->enable(Feature::TransformSpectralOrdering132);
       this->enable(Feature::ComplexSpectrum);
-   }
-
-   WLFl::~WLFl()
-   {
    }
 
    std::shared_ptr<IBuilder> WLFl::createBuilder(ArrayI& dim, const bool needInterpretation) const
@@ -184,11 +175,13 @@ namespace SpatialScheme {
       {
          auto spCoupling = std::make_shared<Equations::Tools::SHl>();
          return spCoupling;
-      } else if(indexType == Equations::CouplingIndexType::MODE)
+      }
+      else if(indexType == Equations::CouplingIndexType::MODE)
       {
          auto spCoupling = std::make_shared<Equations::Tools::SHlm>();
          return spCoupling;
-      } else
+      }
+      else
       {
          throw std::logic_error("Unknown coupling tools");
       }
@@ -254,5 +247,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

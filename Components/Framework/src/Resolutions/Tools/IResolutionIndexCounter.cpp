@@ -6,25 +6,15 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Resolutions/Tools/IResolutionIndexCounter.hpp"
-
 // Project includes
 //
+#include "QuICC/Resolutions/Tools/IResolutionIndexCounter.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
 namespace QuICC {
 
    IResolutionIndexCounter::IResolutionIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
       : IndexCounter(), mspSim(spSim), mspCpu(spCpu)
-   {
-   }
-
-   IResolutionIndexCounter::~IResolutionIndexCounter()
    {
    }
 
@@ -42,4 +32,4 @@ namespace QuICC {
       }
       return dim;
    }
-}
+} // QuICC

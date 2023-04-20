@@ -6,16 +6,10 @@
 #ifndef QUICC_REGULARSHMLINDEXCOUNTER_HPP
 #define QUICC_REGULARSHMLINDEXCOUNTER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
 #include <tuple>
-
-// External includes
-//
 
 // Project includes
 //
@@ -39,7 +33,7 @@ namespace QuICC {
          /**
           * @brief Empty destructor
           */
-         ~RegularSHmlIndexCounter();
+         ~RegularSHmlIndexCounter() = default;
 
          /**
           * @brief Reorder dimensions from fast to slow
@@ -89,6 +83,6 @@ namespace QuICC {
    /// Typedef for an smart reference counting pointer for a RegularSHmlIndexCounter
    typedef std::shared_ptr<RegularSHmlIndexCounter>   SharedSHmIndexCounter;
 
-}
+} // QuICC
 
 #endif // QUICC_REGULARSHMLINDEXCOUNTER_HPP

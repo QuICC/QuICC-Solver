@@ -65,10 +65,6 @@ namespace Transform {
    {
    }
 
-   ShellTransformSteps::~ShellTransformSteps()
-   {
-   }
-
    bool ShellTransformSteps::applicable(std::shared_ptr<const SpatialScheme::ISpatialScheme> spScheme)
    {
       return spScheme->has(SpatialScheme::Feature::ShellGeometry);
@@ -155,7 +151,8 @@ namespace Transform {
          {
             throw std::logic_error("Requested an unknown vector forward transform");
          }
-      } else
+      }
+      else
       {
          assert(components.size() == 3);
 

@@ -7,15 +7,9 @@
 //
 #include <set>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/TFFBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/3D/TFFBuilder.hpp"
 #include "QuICC/Resolutions/Tools/DoublePeriodicIndexCounter.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
 
@@ -128,16 +122,12 @@ namespace SpatialScheme {
    {
    }
 
-   TFFBuilder::~TFFBuilder()
-   {
-   }
-
    void TFFBuilder::setDimensions()
    {
       //
       // Set transform space sizes
       //
-      /// \mhdBug possible aliasing issue, check for correct dealiased FFT 
+      /// \mhdBug possible aliasing issue, check for correct dealiased FFT
       ArrayI traSize(3);
       traSize(0) = this->mI + 1;
       traSize(1) = this->mJ + 1;
@@ -162,6 +152,22 @@ namespace SpatialScheme {
       int nZ = Transform::Fft::Tools::dealiasMixedFft(this->mK+1);
       // Check for optimised FFT sizes
       nZ = Transform::Fft::Tools::optimizeFft(nZ);
+
+      //
+      // Initialise spectral space
+      //
+
+      // Initialise forward dimension of first transform
+      this->setDimension(traSize(0), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of first transform
+      this->setDimension(traSize(0), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATB1D);
+
+      // Initialise second dimension of first transform
+      this->setDimension(traSize(2), Dimensions::Transform::SPECTRAL, Dimensions::Data::DAT2D);
+
+      // Initialise third dimension of first transform
+      this->setDimension(traSize(1), Dimensions::Transform::SPECTRAL, Dimensions::Data::DAT3D);
 
       //
       // Initialise first transform

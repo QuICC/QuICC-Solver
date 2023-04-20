@@ -3,22 +3,13 @@
  * @brief Source of the implementation of the equation to generate an exact scalar solution in a spherical shell
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Generator/States/ShellExactScalarState.hpp"
-
 // Project includes
 //
+#include "QuICC/Generator/States/ShellExactScalarState.hpp"
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/SolveTiming/After.hpp"
@@ -26,7 +17,6 @@
 #include "QuICC/PhysicalKernels/MakeConstant.hpp"
 #include "QuICC/PhysicalKernels/MakeRandom.hpp"
 #include "QuICC/SpectralKernels/Set3DModes.hpp"
-#include "QuICC/Generator/States/Kernels/Shell/ScalarHarmonic.hpp"
 
 namespace QuICC {
 
@@ -34,10 +24,6 @@ namespace Equations {
 
    ShellExactScalarState::ShellExactScalarState(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend)
       : IScalarEquation(spEqParams,spScheme,spBackend)
-   {
-   }
-
-   ShellExactScalarState::~ShellExactScalarState()
    {
    }
 

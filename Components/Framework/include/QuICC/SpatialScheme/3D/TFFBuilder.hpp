@@ -6,13 +6,7 @@
 #ifndef QUICC_SPATIALSCHEME_3D_TFFBUILDER_HPP
 #define QUICC_SPATIALSCHEME_3D_TFFBUILDER_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -51,7 +45,7 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         virtual ~TFFBuilder();
+         virtual ~TFFBuilder() = default;
 
          /**
           * @brief Add the transform setups to resolution
@@ -102,7 +96,7 @@ namespace SpatialScheme {
 
    };
 
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_3D_TFFBUILDER_HPP

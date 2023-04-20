@@ -6,16 +6,10 @@
 #ifndef QUICC_TRIANGULARSHMINDEXCOUNTER_HPP
 #define QUICC_TRIANGULARSHMINDEXCOUNTER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
 #include <tuple>
-
-// External includes
-//
 
 // Project includes
 //
@@ -39,7 +33,7 @@ namespace QuICC {
          /**
           * @brief Empty destructor
           */
-         ~TriangularSHmIndexCounter();
+         ~TriangularSHmIndexCounter() = default;
 
          /**
           * @brief Get simulation's dimensions
@@ -97,6 +91,6 @@ namespace QuICC {
    /// Typedef for an smart reference counting pointer for a TriangularSHmIndexCounter
    typedef std::shared_ptr<TriangularSHmIndexCounter>   SharedSHmIndexCounter;
 
-}
+} // QuICC
 
 #endif // QUICC_TRIANGULARSHMINDEXCOUNTER_HPP

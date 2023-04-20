@@ -3,25 +3,26 @@
  * @brief Source of the implementation of the cartesian transform steps
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/TransformConfigurators/CartesianTransformSteps.hpp"
-
 // Project includes
 //
+#include "QuICC/TransformConfigurators/CartesianTransformSteps.hpp"
 #include "QuICC/Arithmetics/Add.hpp"
 #include "QuICC/Arithmetics/Sub.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
+#include "QuICC/Transform/Path/Scalar.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
+#include "QuICC/Transform/Path/ScalarNl.hpp"
+#include "QuICC/Transform/Path/CurlNl.hpp"
+#include "QuICC/Transform/Path/CurlCurlNl.hpp"
+#include "QuICC/Transform/Path/I2ScalarNl.hpp"
+#include "QuICC/Transform/Path/I2CurlNl.hpp"
+#include "QuICC/Transform/Path/I2CurlCurlNl.hpp"
+#include "QuICC/Transform/Path/NegI2CurlCurlNl.hpp"
+#include "QuICC/Transform/Path/NegI4CurlCurlNl.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/P0.hpp"
 #include "QuICC/Transform/Forward/Pm.hpp"
@@ -53,10 +54,6 @@ namespace Transform {
    {
    }
 
-   CartesianTransformSteps::~CartesianTransformSteps()
-   {
-   }
-
    bool CartesianTransformSteps::applicable(std::shared_ptr<const SpatialScheme::ISpatialScheme> spScheme)
    {
       return spScheme->has(SpatialScheme::Feature::CartesianGeometry);
@@ -68,11 +65,19 @@ namespace Transform {
       std::vector<TransformPath> transform;
 
       FieldComponents::Spectral::Id scalId = components.at(0).first;
+      auto flag = components.at(0).second;
 
-      transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
-      if(this->ss().dimension() > 2) transform.back().addEdge(Forward::P::id());
-      if(this->ss().dimension() > 1) transform.back().addEdge(Forward::P::id());
-      transform.back().addEdge(Forward::P::id(), scalId, Arithmetics::Add::id());
+      if(flag == Path::Scalar::id())
+      {
+         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+         if(this->ss().dimension() > 2) transform.back().addEdge(Forward::P::id());
+         if(this->ss().dimension() > 1) transform.back().addEdge(Forward::P::id());
+         transform.back().addEdge(Forward::P::id(), scalId, Arithmetics::Add::id());
+      }
+      else
+      {
+         throw std::logic_error("Requested an unknown scalar forward transform");
+      }
 
       return transform;
    }
@@ -83,11 +88,20 @@ namespace Transform {
       std::vector<TransformPath> transform;
 
       FieldComponents::Spectral::Id scalId = components.at(0).first;
+      auto flag = components.at(0).second;
 
-      transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
-      if(this->ss().dimension() > 2) transform.back().addEdge(Forward::P::id());
-      if(this->ss().dimension() > 1) transform.back().addEdge(Forward::P::id());
-      transform.back().addEdge(Forward::P::id(), scalId, Arithmetics::Add::id());
+      // Without quasi-inverse
+      if(flag == Path::ScalarNl::id())
+      {
+         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+         if(this->ss().dimension() > 2) transform.back().addEdge(Forward::P::id());
+         if(this->ss().dimension() > 1) transform.back().addEdge(Forward::P::id());
+         transform.back().addEdge(Forward::P::id(), scalId, Arithmetics::Add::id());
+      }
+      else
+      {
+         throw std::logic_error("Requested an unknown scalar forward transform");
+      }
 
       return transform;
    }
@@ -104,7 +118,7 @@ namespace Transform {
          FieldComponents::Spectral::Id curlcurlId = components.at(1).first;
          auto curlcurlFlag = components.at(1).second;
 
-         if(curlFlag == 0 && curlcurlFlag == 0)
+         if(curlFlag == Path::TorPol::id() && curlcurlFlag == Path::TorPol::id())
          {
             // Extract Toroidal component
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
@@ -134,13 +148,16 @@ namespace Transform {
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::P0::id());
             transform.back().addEdge(Forward::P::id(), curlcurlId, Arithmetics::Add::id());
-         } else
+         }
+         else
          {
             throw std::logic_error("Requested an unknown vector forward transform");
          }
-      } else
+      }
+      else
       {
          assert(components.size() == 3);
+
          transform.push_back(TransformPath(this->ss().physical().ONE(), FieldType::VECTOR));
          if(this->ss().dimension() > 2) transform.back().addEdge(Forward::P::id());
          if(this->ss().dimension() > 1) transform.back().addEdge(Forward::P::id());
@@ -179,7 +196,7 @@ namespace Transform {
          auto curlcurlFlag = components.at(1).second;
 
          // Integrate for standard second order equation
-         if(curlFlag == 0)
+         if(curlFlag == Path::I2CurlNl::id())
          {
             // Compute curl component and mean in X
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
@@ -193,7 +210,8 @@ namespace Transform {
             transform.back().addEdge(Forward::I2P::id(), curlId, Arithmetics::Sub::id());
 
             // Integrate for curl of nonlinear and mean Y (induction)
-         } else if(curlFlag == 1)
+         }
+         else if(curlFlag == 1)
          {
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
             transform.back().addEdge(Forward::D1ZP0::id());
@@ -205,13 +223,14 @@ namespace Transform {
             transform.back().addEdge(Forward::D1::id());
             transform.back().addEdge(Forward::I2P::id(), curlId, Arithmetics::Sub::id());
 
-         } else
+         }
+         else
          {
             throw std::logic_error("Requested an unknown vector forward transform");
          }
 
          // Integrate for standard fourth order double curl equation
-         if(curlcurlFlag == 0)
+         if(curlcurlFlag == Path::NegI4CurlCurlNl::id())
          {
             // Compute curlcurl with Dz component and mean in Y
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
@@ -230,8 +249,9 @@ namespace Transform {
             transform.back().addEdge(Forward::Laplh::id());
             transform.back().addEdge(Forward::I4P::id(), curlcurlId, Arithmetics::Sub::id());
 
-            // Integrate for double curl of nonlinear term and mean X (induction)
-         } else if(curlcurlFlag == 1)
+         // Integrate for double curl of nonlinear term and mean X (induction)
+         }
+         else if(curlcurlFlag == Path::I2CurlCurlNl::id())
          {
             // Compute curlcurl with Dz component
             transform.push_back(TransformPath(FieldComponents::Physical::X, FieldType::VECTOR));
@@ -250,15 +270,16 @@ namespace Transform {
             transform.back().addEdge(Forward::Laplh::id());
             transform.back().addEdge(Forward::I2P::id(), curlcurlId, Arithmetics::Add::id());
 
-         } else
+         }
+         else
          {
             throw std::logic_error("Requested an unknown vector forward transform");
          }
-
-         // The following assumes the physical values are obtained from a Toroidal/Poloidal decomposition
-      } else
+      }
+      else
       {
          assert(components.size() == 3);
+
          transform.push_back(TransformPath(this->ss().physical().ONE(), FieldType::VECTOR));
          if(this->ss().dimension() > 2) transform.back().addEdge(Forward::P::id());
          if(this->ss().dimension() > 1) transform.back().addEdge(Forward::P::id());
@@ -308,7 +329,8 @@ namespace Transform {
          if(this->ss().dimension() > 1)
          {
             transform.back().addEdge(Backward::P::id(), this->ss().physical().ONE(), Arithmetics::Add::id());
-         } else
+         }
+         else
          {
             transform.back().addEdge(Backward::D1::id(), this->ss().physical().ONE(), Arithmetics::Add::id());
          }
@@ -322,7 +344,8 @@ namespace Transform {
          {
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::P::id(), this->ss().physical().TWO(), Arithmetics::Add::id());
-         } else
+         }
+         else
          {
             transform.back().addEdge(Backward::D1::id(), this->ss().physical().TWO(), Arithmetics::Add::id());
          }
@@ -353,7 +376,8 @@ namespace Transform {
          if(this->ss().dimension() > 1)
          {
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
-         } else
+         }
+         else
          {
             transform.back().addEdge(Backward::D2::id(), pairId, Arithmetics::Add::id());
          }
@@ -370,7 +394,8 @@ namespace Transform {
             {
                transform.back().addEdge(Backward::D1::id());
                transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
-            } else
+            }
+            else
             {
                transform.back().addEdge(Backward::D1::id(), pairId, Arithmetics::Add::id());
             }
@@ -400,7 +425,8 @@ namespace Transform {
             {
                transform.back().addEdge(Backward::D2::id());
                transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
-            } else
+            }
+            else
             {
                transform.back().addEdge(Backward::D2::id(), pairId, Arithmetics::Add::id());
             }
@@ -487,7 +513,8 @@ namespace Transform {
             transform.back().addEdge(Backward::Laplh::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::Z, Arithmetics::Sub::id());
          }
-      } else
+      }
+      else
       {
          if(req.find(this->ss().physical().ONE())->second)
          {
@@ -530,7 +557,8 @@ namespace Transform {
       if(this->ss().formulation() == VectorFormulation::TORPOL)
       {
          throw std::logic_error("Vector gradient for Toroidal/Poloidal field not implemented");
-      } else
+      }
+      else
       {
          if(req.find(this->ss().physical().ONE())->second)
          {
@@ -540,7 +568,8 @@ namespace Transform {
             if(this->ss().dimension() > 1)
             {
                transform.back().addEdge(Backward::P::id(), this->ss().physical().ONE(), Arithmetics::Add::id());
-            } else
+            }
+            else
             {
                transform.back().addEdge(Backward::D1::id(), this->ss().physical().ONE(), Arithmetics::Add::id());
             }
@@ -556,7 +585,8 @@ namespace Transform {
                {
                   transform.back().addEdge(Backward::D1::id());
                   transform.back().addEdge(Backward::P::id(), this->ss().physical().TWO(), Arithmetics::Add::id());
-               } else
+               }
+               else
                {
                   transform.back().addEdge(Backward::D1::id(), this->ss().physical().TWO(), Arithmetics::Add::id());
                }
@@ -643,7 +673,8 @@ namespace Transform {
             transform.back().addEdge(Backward::Laplh::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::Z, Arithmetics::Sub::id());
          }
-      } else
+      }
+      else
       {
          if(this->ss().dimension() != 3)
          {
@@ -701,7 +732,8 @@ namespace Transform {
       {
          // The divergence is zero be construction in this case!
          throw std::logic_error("Divergence should not be used in Toroidal/Poloidal expansion");
-      } else
+      }
+      else
       {
          transform.push_back(TransformPath(this->ss().spectral().ONE(), FieldType::DIVERGENCE));
          if(this->ss().dimension() > 1) transform.back().addEdge(Backward::D1::id());
@@ -709,7 +741,8 @@ namespace Transform {
          if(this->ss().dimension() > 1)
          {
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::SCALAR, Arithmetics::Add::id());
-         } else
+         }
+         else
          {
             transform.back().addEdge(Backward::D1::id(), FieldComponents::Physical::SCALAR, Arithmetics::Add::id());
          }
@@ -722,7 +755,8 @@ namespace Transform {
             {
                transform.back().addEdge(Backward::D1::id());
                transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::SCALAR, Arithmetics::Add::id());
-            } else
+            }
+            else
             {
                transform.back().addEdge(Backward::D1::id(), FieldComponents::Physical::SCALAR, Arithmetics::Add::id());
             }

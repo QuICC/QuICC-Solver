@@ -6,16 +6,10 @@
 #ifndef QUICC_INDEXCOUNTER_HPP
 #define QUICC_INDEXCOUNTER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <tuple>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -44,7 +38,7 @@ namespace QuICC {
          /**
           * @brief Empty destructor
           */
-         virtual ~IndexCounter();
+         virtual ~IndexCounter() = default;
 
          /**
           * @brief Get simulation's dimensions
@@ -119,6 +113,6 @@ namespace QuICC {
    /// Typedef for an smart reference counting pointer for a IndexCounter
    typedef std::shared_ptr<IndexCounter>   SharedIndexCounter;
 
-}
+} // QuICC
 
 #endif // QUICC_INDEXCOUNTER_HPP

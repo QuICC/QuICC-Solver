@@ -3,23 +3,14 @@
  * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for scalar field in a spherical geometry
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ISphericalScalarEnergyBaseWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ISphericalScalarEnergyBaseWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
@@ -35,10 +26,6 @@ namespace Variable {
 
    ISphericalScalarEnergyBaseWriter::ISphericalScalarEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
       : IVariableAsciiWriter(name, ext ,header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
-   {
-   }
-
-   ISphericalScalarEnergyBaseWriter::~ISphericalScalarEnergyBaseWriter()
    {
    }
 
@@ -152,6 +139,6 @@ namespace Variable {
       coord.communicator().storage<TId>().freeBwd(pInVar);
    }
 
-}
-}
-}
+} // Variable
+} // Io
+} // QuICC

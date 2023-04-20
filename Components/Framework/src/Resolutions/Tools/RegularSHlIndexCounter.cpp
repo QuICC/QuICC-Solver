@@ -6,24 +6,14 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Resolutions/Tools/RegularSHlIndexCounter.hpp"
-
 // Project includes
 //
+#include "QuICC/Resolutions/Tools/RegularSHlIndexCounter.hpp"
 
 namespace QuICC {
 
    RegularSHlIndexCounter::RegularSHlIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
       : IResolutionIndexCounter(spSim,spCpu)
-   {
-   }
-
-   RegularSHlIndexCounter::~RegularSHlIndexCounter()
    {
    }
 
@@ -55,9 +45,9 @@ namespace QuICC {
                oDims(1)++;
             }
          }
-      
-      //  Physical space ordering is 3D, 2D, 1D
-      } else //if(spaceId == Dimensions::Space::PHYSICAL)
+      }
+      // Physical space ordering is 3D, 2D, 1D
+      else //if(spaceId == Dimensions::Space::PHYSICAL)
       {
          for(int i = 0; i < dims.size(); ++i)
          {
@@ -124,7 +114,6 @@ namespace QuICC {
                blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, l_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
             }
          }
-
       }
       //  Physical space offset computation (regular)
       else //if(spaceId == Dimensions::Space::PHYSICAL)
@@ -159,4 +148,4 @@ namespace QuICC {
          }
       }
    }
-}
+} // QuICC

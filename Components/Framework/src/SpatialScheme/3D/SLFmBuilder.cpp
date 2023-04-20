@@ -3,22 +3,13 @@
  * @brief Source of the spherical Chebyshev(FFT) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation with m spectral ordering
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <set>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/SLFmBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/3D/SLFmBuilder.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Transform/Poly/Tools.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
@@ -257,10 +248,6 @@ namespace SpatialScheme {
    {
    }
 
-   SLFmBuilder::~SLFmBuilder()
-   {
-   }
-
    bool SLFmBuilder::sameSpectralOrdering() const
    {
       return false;
@@ -404,5 +391,5 @@ namespace SpatialScheme {
       this->setMemory(1.0, Dimensions::Transform::TRA3D);
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC
