@@ -3,9 +3,6 @@
  * @brief Source of test arguments
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
@@ -22,7 +19,7 @@ namespace Framework {
 namespace LoadSplitter {
 
    TestArgs::TestArgs()
-      : useDefault(true), dumpData(false), op("P"), db(0), np(0), dim1D(0), dim2D(0), dim3D(0), stage(1)
+      : useDefault(true), dumpData(false), dumpDetails(false), op("P"), algorithm("tubular"), db(0), np(0), dim1D(0), dim2D(0), dim3D(0), stage(1)
    {
    }
 
@@ -33,7 +30,7 @@ namespace LoadSplitter {
       return a;
    }
 
-}
-}
-}
-}
+} // LoadSplitter
+} // Framework
+} // TestSuite
+} // QuICC

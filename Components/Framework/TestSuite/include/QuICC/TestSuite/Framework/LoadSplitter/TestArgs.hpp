@@ -6,9 +6,6 @@
 #ifndef QUICC_TESTSUITE_FRAMEWORK_LOADSPLITTER_TESTARGS_HPP
 #define QUICC_TESTSUITE_FRAMEWORK_LOADSPLITTER_TESTARGS_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
@@ -33,8 +30,14 @@ namespace LoadSplitter {
       /// Write output data to file
       bool dumpData;
 
+      /// Write detailed output data to file
+      bool dumpDetails;
+
       /// operator name
       std::string op;
+
+      /// algorithm name
+      std::string algorithm;
 
       /// ID of database file
       unsigned int db;

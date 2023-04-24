@@ -23,6 +23,8 @@
 #     list of cpus:rank pairs, should match IDS size
 # PERFONLY
 #     if true add only perf test
+# OPTIONS
+#     add generic options given as cmd:value converted to --cmd value
 #
 
 # support function
@@ -71,7 +73,7 @@ function(quicc_add_test target)
   # parse inputs
   set(options PERFONLY)
   set(oneValueArgs COMMAND KEYWORD ULP DISABLED)
-  set(multiValueArgs TYPES IDS ULPS STEPS SPLITS)
+  set(multiValueArgs TYPES IDS ULPS STEPS SPLITS OPTIONS)
   cmake_parse_arguments(QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_test")
@@ -87,6 +89,7 @@ function(quicc_add_test target)
   message(DEBUG "QAT_SPLITS: ${QAT_SPLITS}")
   message(DEBUG "QAT_DISABLED: ${QAT_DISABLED}")
   message(DEBUG "QAT_PERFONLY: ${QAT_PERFONLY}")
+  message(DEBUG "QAT_OPTIONS: ${QAT_OPTIONS}")
 
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${target}.cpp")
     message(VERBOSE "Adding ${target}")
@@ -139,6 +142,18 @@ function(quicc_add_test target)
     ${testfile}
   )
 
+  # Process generic options
+  set(_opt_cmd )
+  set(_opt_name "")
+  foreach(_opt_key ${QAT_OPTIONS})
+    string(REGEX REPLACE ":" " " _opt ${_opt_key})
+    list(APPEND _opt_cmd "--${_opt}")
+    string(REGEX REPLACE ":" "-" _opt ${_opt_key})
+    set(_opt_name "${_opt_name}_${_opt}")
+  endforeach()
+  message(DEBUG "_opt_cmd: ${_opt_cmd}")
+  message(DEBUG "_opt_name: ${_opt_name}")
+
   # check for variants
   if(NOT ${QAT_ULP} STREQUAL "")
     set(_ulp_cmd "--ulp ${QAT_ULP}")
@@ -150,20 +165,20 @@ function(quicc_add_test target)
   list(LENGTH QAT_IDS _ids_len)
   message(DEBUG "_ids_len: ${_ids_len}")
   if(${_types_len} LESS 1 AND ${_ids_len} LESS 1)
-    set(_testname "${QAT_COMMAND}_${_keyword}${_ulp_name}" )
+    set(_testname "${QAT_COMMAND}_${_keyword}${_ulp_name}${_opt_name}" )
     message(DEBUG "_testname: ${_testname}")
     __add_test(${_testname}
-      COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests ${_ulp_cmd}
+      COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests ${_opt_cmd} ${_ulp_cmd}
       DIS ${QAT_DISABLED}
       STP ${QAT_STEPS}
       PRF ${QAT_PERFONLY}
     )
   elseif(${_ids_len} LESS 1)
     foreach(_type ${QAT_TYPES})
-      set(_testname "${QAT_COMMAND}_${_keyword}_type${_type}${_ulp_name}" )
+      set(_testname "${QAT_COMMAND}_${_keyword}_type${_type}${_ulp_name}${_opt_name}" )
       message(DEBUG "_testname: ${_testname}")
       __add_test(${_testname}
-        COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests --type=${_type} ${_ulp_cmd}
+        COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests ${_opt_cmd} --type=${_type} ${_ulp_cmd}
         DIS ${QAT_DISABLED}
         STP ${QAT_STEPS}
         PRF ${QAT_PERFONLY}
@@ -202,10 +217,10 @@ function(quicc_add_test target)
       endif()
 
 
-      set(_testname "${QAT_COMMAND}_${_keyword}_id${_id}${_ulp_name}${_split_name}" )
+      set(_testname "${QAT_COMMAND}_${_keyword}_id${_id}${_ulp_name}${_split_name}${_opt_name}" )
       message(DEBUG "_testname: ${_testname}")
       __add_test(${_testname}
-        COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests --id=${_id} ${_ulp_cmd} ${_split_cmd}
+        COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests ${_opt_cmd} --id=${_id} ${_ulp_cmd} ${_split_cmd}
         DIS ${QAT_DISABLED}
         STP ${_steps}
         PRF ${QAT_PERFONLY}

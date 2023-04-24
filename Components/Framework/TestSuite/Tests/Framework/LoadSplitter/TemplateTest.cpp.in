@@ -1,11 +1,7 @@
 /**
- * @file @Algorithm@SplittingTest.cpp
- * @brief Tests for the @Algorithm@ splitting
+ * @file @Scheme@SplittingTest.cpp
+ * @brief Tests for the @Scheme@ load splitting
  */
-
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -14,16 +10,20 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Splitting.hpp"
+#include "QuICC/Enums/SplittingTools.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/LoadSplitter/LoadSplitter.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/3D/@Scheme@.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Enums/VectorFormulation.hpp"
 #include "QuICC/TestSuite/Framework/LoadSplitter/TestArgs.hpp"
+#include "QuICC/TestSuite/Framework/LoadSplitter/TestHelper.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Framework::LoadSplitter;
 
-TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
+TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
    // Init Environment
    QuICC::QuICCEnv();
 
@@ -55,6 +55,16 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
       }
    }
 
+   // Compute all ranks
+   if(currentts::args().params.size() == 1 && currentts::args().params.at(0) == currentts::args().np)
+   {
+      currentts::args().params.clear();
+      for(int i = 0; i < currentts::args().np; i++)
+      {
+         currentts::args().params.push_back(i);
+      }
+   }
+
    int dbId = currentts::args().db - 100;
    if((currentts::args().dim1D == 0) && (dbId > 0) && (dbId < 20))
    {
@@ -69,6 +79,8 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
       throw std::logic_error("Dimensions are not set properly");
    }
 
+   bool testAllRanks = (currentts::args().params.size() == currentts::args().np);
+
    // Get splitting stage
    QuICC::Dimensions::Transform::Id stageId = static_cast<QuICC::Dimensions::Transform::Id>(currentts::args().stage);
 
@@ -82,107 +94,82 @@ TEST_CASE( "Tubular splitting test", "[@Algorithm@::@Scheme@]" ){
    dim(1) = currentts::args().dim2D;
    dim(2) = currentts::args().dim3D;
 
-   // Count all modes
-   std::vector<int> tot;
-
-   int refMult = -1;
+   std::multimap<int,int> modes;
    for(int id: currentts::args().params)
    {
+      // Create scheme
       QuICC::Parallel::LoadSplitter splitter(id, np);
       auto spScheme = std::make_shared<QuICC::SpatialScheme::@Scheme@>(QuICC::VectorFormulation::TORPOL, QuICC::GridPurpose::SIMULATION);
+
       auto spBuilder = spScheme->createBuilder(dim, false);
-      std::set<QuICC::Splitting::Algorithms::Id> algos = {QuICC::Splitting::Algorithms::TUBULAR};
+      std::set<QuICC::Splitting::Algorithms::Id> algos = {QuICC::Splitting::getAlgorithmId(currentts::args().algorithm)};
       auto grp = QuICC::Splitting::Groupers::TRANSFORM;
       splitter.init(spBuilder, algos, grp);
       auto best = splitter.bestSplitting(false);
       auto spRes = best.first;
 
-      if(tot.size() == 0)
+      auto& tRes = *spRes->cpu()->dim(stageId);
+
+      // filename and path data
+      std::string algoPrefix;
+      if(best.second.algorithm == QuICC::Splitting::Algorithms::SERIAL)
       {
-         int totModes = -1;
-         switch(stageId)
-         {
-            case QuICC::Dimensions::Transform::TRA1D:
-               refMult = currentts::args().dim3D+1;
-               totModes = currentts::args().dim2D+1;
-               break;
-            case QuICC::Dimensions::Transform::TRA2D:
-               refMult = spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA1D)->dim<QuICC::Dimensions::Data::DATF1D>();
-               totModes = currentts::args().dim3D+1;
-               break;
-            case QuICC::Dimensions::Transform::TRA3D:
-               refMult = spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA2D)->dim<QuICC::Dimensions::Data::DATF1D>();
-               totModes = spRes->cpu()->dim(QuICC::Dimensions::Transform::TRA1D)->dim<QuICC::Dimensions::Data::DATF1D>();
-               break;
-            default:
-               throw std::logic_error("Unkown splitting stage");
-               break;
-         }
-         tot = std::vector<int>(totModes, 0);
+         algoPrefix = "Serial/";
       }
+      else if(best.second.algorithm == QuICC::Splitting::Algorithms::SINGLE1D)
+      {
+         algoPrefix = "Single1D/";
+      }
+      else if(best.second.algorithm == QuICC::Splitting::Algorithms::SINGLE2D)
+      {
+         algoPrefix = "Single2D/";
+      }
+      else if(best.second.algorithm == QuICC::Splitting::Algorithms::TUBULAR)
+      {
+         algoPrefix = "Tubular/";
+      }
+      const std::string refPrefix =  "_refdata/Framework/LoadSplitter/@Scheme@/" + algoPrefix;
+      const std::string dataPrefix =  "_data/Framework/LoadSplitter/@Scheme@/" + algoPrefix;
+      std::stringstream ss;
+      ss << "_id" << db;
+      ss << "_np" << np;
+      ss << "_r" << id;
+      ss << "_stage" << static_cast<int>(stageId);
+      std::string fname = op + ss.str() + "_full_meta.dat";
 
-      int nModes = spRes->cpu()->dim(stageId)->dim<QuICC::Dimensions::Data::DAT3D>();
+      // Check data against reference
+      std::string path = refPrefix + fname;
+      currentts::collectModes(tRes, modes);
+      currentts::checkReference(path, tRes);
 
-      std::ofstream metaFile;
       if(currentts::args().dumpData)
       {
-         std::stringstream ss;
-         ss << "_id" << db;
-         ss << "_np" << np;
-         ss << "_r" << id;
-         std::string fname = op + ss.str() + "_meta.dat";
-         metaFile.open(fname);
-         if(! metaFile.is_open())
-         {
-            throw std::logic_error("Couldn't open output file!");
-         }
-
-         metaFile << 2+2*nModes << std::endl;
-         metaFile << spRes->cpu()->dim(stageId)->dim<QuICC::Dimensions::Data::DATB1D>() << std::endl;
-         metaFile << spRes->cpu()->dim(stageId)->dim<QuICC::Dimensions::Data::DATF1D>() << std::endl;
+         fname = op + ss.str() + "_meta.dat";
+         path = dataPrefix + fname;
+         currentts::writeData(path, tRes, false);
       }
 
-      for(int i = 0; i < nModes; i++)
+      if(currentts::args().dumpDetails)
       {
-         int m = spRes->cpu()->dim(stageId)->idx<QuICC::Dimensions::Data::DAT3D>(i);
-         int mult = spRes->cpu()->dim(stageId)->dim<QuICC::Dimensions::Data::DAT2D>(i);
-         // Accumulate modes
-         tot.at(m) += mult;
-
-         if(metaFile.is_open())
-         {
-            metaFile << m << std::endl;
-            metaFile << mult << std::endl;
-         }
-      }
-
-      if(metaFile.is_open())
-      {
-         metaFile.close();
+         fname = op + ss.str() + "_full_meta.dat";
+         path = dataPrefix + fname;
+         currentts::writeData(path, tRes, true);
       }
    }
 
-   // If all ID are computed, check total
-   if(currentts::args().params.size() == currentts::args().np)
+   // If all ranks are computed, check against serial reference
+   if(testAllRanks)
    {
-      CHECK( refMult > 0 );
+      const std::string refPrefix =  "_refdata/Framework/LoadSplitter/@Scheme@/Serial/";
+      std::stringstream ss;
+      ss << "_id" << db;
+      ss << "_np" << 1;
+      ss << "_r" << 0;
+      ss << "_stage" << static_cast<int>(stageId);
+      std::string fname = op + ss.str() + "_full_meta.dat";
 
-      INFO( "ref:  " << refMult );
-      for(std::size_t m = 0; m < tot.size(); m++)
-      {
-         INFO( "m: " << m );
-         // Triangular truncation for l,m pairs
-         if(stageId == QuICC::Dimensions::Transform::TRA1D)
-         {
-            CHECK(tot.at(m) == static_cast<int>(m+1));
-         } else
-         {
-            CHECK(tot.at(m) == refMult);
-         }
-      }
-   }
-   else
-   {
-      CHECK( true );
+      // Check data against serial reference
+      std::string path = refPrefix + fname;
+      currentts::checkSerialReference(path, modes);
    }
 }

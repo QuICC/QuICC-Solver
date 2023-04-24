@@ -195,7 +195,7 @@ namespace SpatialScheme {
       int cN = -1;
 
       // Create index list for first transform
-      if(transId == Dimensions::Transform::TRA1D)
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
       {
          k0 = 0;
          kN = this->dim(transId, Dimensions::Data::DAT3D);
