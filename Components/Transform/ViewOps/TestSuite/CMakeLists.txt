@@ -2,7 +2,12 @@ include(BundleCatch2)
 
 add_executable(ViewOpsTest "")
 
-set(Tags "Cpu;Cuda")
+set(Tags "Cpu")
+
+if(TARGET CUDA::cufft AND QUICC_USE_CUFFT)
+    list(APPEND Tags "Cuda")
+endif()
+
 
 set(CpuExtension "cpp")
 set(CudaExtension "cu")

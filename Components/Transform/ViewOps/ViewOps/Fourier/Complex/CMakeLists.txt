@@ -4,10 +4,16 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} 
   Cpu/Diff.cpp
   Cpu/Diff2D.cpp
   Cpu/Mean.cpp
-  Cuda/Diff.cu
-  Cuda/Diff2D.cu
-  Cuda/Mean.cu
 )
+
+if(TARGET CUDA::cufft AND QUICC_USE_CUFFT)
+  target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} PRIVATE
+    Cuda/Diff.cu
+    Cuda/Diff2D.cu
+    Cuda/Mean.cu
+
+  )
+endif()
 
 # Add public header
 set(PHS

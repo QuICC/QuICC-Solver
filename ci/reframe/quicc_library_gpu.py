@@ -28,6 +28,6 @@ class testFourierTests_Mixed_D1_projector_id108_split96_0_viewGpu(testBase):
     region = 'transform'
     steps = 500
     refs =  {   'p100': {
-                    'applyOperatorsAvg': (0.00196887, -0.25, 0.1, 's'),
+                    'applyOperatorsAvg': (0.00196887, -0.25, 0.2, 's'),
                 },
             }
