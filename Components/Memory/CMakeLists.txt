@@ -29,6 +29,13 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
     PUBLIC_HEADER "${PHS}"
 )
 
+# Fix for clang and derived compilers
+message(VERBOSE "Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	target_compile_options(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE -fsized-deallocation)
+endif()
+
+
 # Cuda
 if(TARGET QuICC::Cuda)
     target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} QuICC::Cuda)

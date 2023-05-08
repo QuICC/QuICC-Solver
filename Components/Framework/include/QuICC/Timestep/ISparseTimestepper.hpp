@@ -928,7 +928,7 @@ namespace Timestep {
             const auto bc = x.col(3*j+1).transpose();
             for(int k = 0; k < nBC; k++)
             {
-               mat(j,k) = bc*x.col(3*k);
+               mat(j,k) = (bc*x.col(3*k)).value();
             }
          }
          mat = mat.inverse();
@@ -938,7 +938,7 @@ namespace Timestep {
          {
             for(int k = 0; k < nBC; k++)
             {
-               bcVal(k,0) = x.col(3*k+1).transpose() * y.col(j);
+               bcVal(k,0) = (x.col(3*k+1).transpose() * y.col(j)).value();
             }
             bcVal = mat*bcVal;
             for(int k = 0; k < nBC; k++)
