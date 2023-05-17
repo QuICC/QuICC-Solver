@@ -6,10 +6,6 @@
 #ifndef QUICC_TESTSUITE_TRANSFORM_ALEGENDRE_TESTER_HPP
 #define QUICC_TESTSUITE_TRANSFORM_ALEGENDRE_TESTER_HPP
 
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -267,7 +263,7 @@ namespace ALegendre {
       internal::Array igrid;
       this->initOperator(op, igrid, spSetup);
 
-      MatrixZ outData = MatrixZ::Zero(op.outRows(), op.outCols());
+      MatrixZ outData;
 
       bool isReversed = (igrid(igrid.size()-1) < igrid(0));
       if(isReversed)
@@ -275,7 +271,11 @@ namespace ALegendre {
          this->reverseData(inData);
       }
 
-      op.transform(outData, inData);
+      for (unsigned int i = 0; i < this->mIter; ++i)
+      {
+         outData = MatrixZ::Zero(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+      }
 
       Matrix out(2*outData.rows(),outData.cols());
       out.topRows(outData.rows()) = outData.real();

@@ -43,6 +43,7 @@ TEST_CASE( "@Algorithm@::Error for @Operator@@Template@ integrator",
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
+   tester.setIter(currentts::args().iter);
 
    Tester::ParameterType params = {-1};
 

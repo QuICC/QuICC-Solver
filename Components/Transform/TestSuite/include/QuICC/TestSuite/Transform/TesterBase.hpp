@@ -246,11 +246,13 @@ namespace Transform {
             INFO( "reference data was not found" );
             CHECK( false );
          }
-
-         // Compare data to reference
-         INFO( "type: " + infoType );
-         INFO( this->formatParameter(param));
-         this->computeError(outData, refData);
+         else
+         {
+            // Compare data to reference
+            INFO( "type: " + infoType );
+            INFO( this->formatParameter(param) );
+            this->computeError(outData, refData);
+         }
       }
    }
 

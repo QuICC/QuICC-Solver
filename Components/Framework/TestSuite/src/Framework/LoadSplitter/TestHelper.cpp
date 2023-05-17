@@ -43,9 +43,18 @@ namespace LoadSplitter {
       }
 
       metaFile << 3 + 2*nModes + nIndexes << std::endl;
-      metaFile << tRes.dim<QuICC::Dimensions::Data::DATB1D>() << std::endl;
-      metaFile << tRes.dim<QuICC::Dimensions::Data::DATF1D>() << std::endl;
-      metaFile << nModes << std::endl;
+      if(nModes > 0)
+      {
+         metaFile << tRes.dim<QuICC::Dimensions::Data::DATB1D>() << std::endl;
+         metaFile << tRes.dim<QuICC::Dimensions::Data::DATF1D>() << std::endl;
+         metaFile << nModes << std::endl;
+      }
+      else
+      {
+         metaFile << 0 << std::endl;;
+         metaFile << 0 << std::endl;;
+         metaFile << 0 << std::endl;;
+      }
 
       for(int i = 0; i < nModes; i++)
       {
@@ -136,8 +145,16 @@ namespace LoadSplitter {
          // Check 1D sizes
          {
             INFO( "Checking 1D arrays sizes" );
-            CHECK( ref.at(0) == tRes.dim<QuICC::Dimensions::Data::DATB1D>() );
-            CHECK( ref.at(1) == tRes.dim<QuICC::Dimensions::Data::DATF1D>() );
+            if(tRes.dim<QuICC::Dimensions::Data::DAT3D>() > 0)
+            {
+               CHECK( ref.at(0) == tRes.dim<QuICC::Dimensions::Data::DATB1D>() );
+               CHECK( ref.at(1) == tRes.dim<QuICC::Dimensions::Data::DATF1D>() );
+            }
+            else
+            {
+               CHECK( ref.at(0) == 0 );
+               CHECK( ref.at(1) == 0 );
+            }
          }
 
          // Check number of 3D modes
@@ -172,10 +189,18 @@ namespace LoadSplitter {
             for(int j = 0; j < tRes.dim<QuICC::Dimensions::Data::DAT2D>(k); j++)
             {
                auto j_ = tRes.idx<QuICC::Dimensions::Data::DAT2D>(j, k);
-               auto ref_j_ = ref.at(h);
-               INFO( "ref j = " << ref_j_ );
-               INFO( "j = " << j_ );
-               CHECK( ref.at(h) == j_ );
+               if(static_cast<std::size_t>(h) < ref.size())
+               {
+                  auto ref_j_ = ref.at(h);
+                  INFO( "ref j = " << ref_j_ );
+                  INFO( "j = " << j_ );
+                  CHECK( ref.at(h) == j_ );
+               }
+               else
+               {
+                  INFO( "Point missing in reference" );
+                  CHECK( false );
+               }
                h++;
             }
          }
@@ -244,7 +269,7 @@ namespace LoadSplitter {
       }
    }
 
-}
-}
-}
-}
+} // LoadSplitter
+} // Framework
+} // TestSuite
+} // QuICC

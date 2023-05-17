@@ -59,7 +59,7 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
    if(currentts::args().params.size() == 1 && currentts::args().params.at(0) == currentts::args().np)
    {
       currentts::args().params.clear();
-      for(int i = 0; i < currentts::args().np; i++)
+      for(unsigned int i = 0; i < currentts::args().np; i++)
       {
          currentts::args().params.push_back(i);
       }
@@ -107,6 +107,8 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
       splitter.init(spBuilder, algos, grp);
       auto best = splitter.bestSplitting(false);
       auto spRes = best.first;
+
+      std::cerr << "Selectd factors: " << best.second.factors.transpose() << std::endl; 
 
       auto& tRes = *spRes->cpu()->dim(stageId);
 

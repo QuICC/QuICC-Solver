@@ -10,9 +10,6 @@
 #include <map>
 #include <stdexcept>
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/LoadSplitter/Algorithms/SplittingTools.hpp"
@@ -32,14 +29,15 @@ namespace Parallel {
          // Add factor
          cpuFactors.push_back(nCpu);
 
+      }
       // Factorise CPUs into two groups
-      } else if(nFactors == 2)
+      else if(nFactors == 2)
       {
          // Get the maximum factor
          int factor = static_cast<int>(std::sqrt(nCpu));
 
          // Compute smaller factors
-         while(factor > 0)
+         while(factor > 0 && cpuFactors.size() < static_cast<std::size_t>(nFactors*SplittingTools::mcMaxDecompositions))
          {
             if(nCpu % factor == 0)
             {
@@ -61,7 +59,8 @@ namespace Parallel {
             }
             --factor;
          }
-      } else
+      }
+      else
       {
          throw std::logic_error("No factorisation algorithm available for requested factors!");
       }
@@ -73,7 +72,7 @@ namespace Parallel {
       std::list<int>::iterator  it = cpuFactors.begin();
       std::list<int>::iterator  itF;
 
-      ArrayI factors(nFactors);
+      std::vector<int> factors(nFactors);
       bool suitable;
 
       // Loop over all known factors
@@ -83,7 +82,7 @@ namespace Parallel {
          itF = it;
          for(int i = 0; i < nFactors; i++)
          {
-            factors(i) = *itF;
+            factors.at(i) = *itF;
             itF++;
          }
 
@@ -107,13 +106,13 @@ namespace Parallel {
       }
    }
 
-   bool SplittingTools::confirmFactors(const ArrayI& factors, const int nCpu)
+   bool SplittingTools::confirmFactors(const std::vector<int>& factors, const int nCpu)
    {
       // Loop over all factors
-      for(int i =0; i < factors.size(); i++)
+      for(std::size_t i = 0; i < factors.size(); i++)
       {
          // We don't want the extrem cases (no splitting in one direction)
-         if(factors(i) == 1 && nCpu > 1)
+         if(factors.at(i) == 1 && nCpu > 1)
          {
             return false;
          }

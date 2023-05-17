@@ -6,10 +6,6 @@
 #ifndef QUICC_TESTSUITE_TRANSFORM_WORLAND_TESTER_HPP
 #define QUICC_TESTSUITE_TRANSFORM_WORLAND_TESTER_HPP
 
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -250,9 +246,14 @@ namespace Worland {
       internal::Array igrid;
       this->initOperator(op, igrid, spSetup);
 
-      MatrixZ outData(op.outRows(), op.outCols());
+      MatrixZ outData;
 
-      op.transform(outData, inData);
+      for (unsigned int i = 0; i < this->mIter; ++i)
+      {
+         outData = MatrixZ::Zero(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+      }
+
       bool isReversed = (igrid(igrid.size()-1) < igrid(0));
       if(isReversed)
       {
@@ -281,7 +282,7 @@ namespace Worland {
       internal::Array igrid;
       this->initOperator(op, igrid, spSetup);
 
-      MatrixZ outData(op.outRows(), op.outCols());
+      MatrixZ outData;
 
       bool isReversed = (igrid(igrid.size()-1) < igrid(0));
       if(isReversed)
@@ -289,7 +290,11 @@ namespace Worland {
          this->reverseData(inData);
       }
 
-      op.transform(outData, inData);
+      for (unsigned int i = 0; i < this->mIter; ++i)
+      {
+         outData = MatrixZ::Zero(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+      }
 
       Matrix out(2*outData.rows(),outData.cols());
       out.topRows(outData.rows()) = outData.real();
@@ -426,15 +431,24 @@ namespace Worland {
 
    template <typename TOp, typename TOp2> std::shared_ptr<typename TOp::SetupType> Tester<TOp,TOp2>::buildSetup(const ParameterType& param, const TestType type) const
    {
+      ParameterType dbParam(param.begin(), param.begin()+1);
+
       // Read metadata
       Array meta(0);
-      std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+      std::string fullname = this->makeFilename(dbParam, this->refRoot(), type, ContentType::META);
       readList(meta, fullname);
 
-      // Create setup
-      int nMeta = 2;
+      // Get spectral and physical sizes from DB file (not from distributed setup)
       int specN = meta(0);
       int physN = meta(1);
+
+      // Read (distributed) metadata
+      meta.resize(0);
+      fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+      readList(meta, fullname);
+
+      // Create setup, three special lines: specN, physN, nModes
+      int nMeta = 3;
       auto spSetup = std::make_shared<typename TOp::SetupType>(physN, specN, GridPurpose::SIMULATION);
 
       // Gather indices
@@ -473,9 +487,9 @@ namespace Worland {
       data.colwise().reverseInPlace();
    }
 
-}
-}
-}
-}
+} // Worland
+} // Transform
+} // TestSuite
+} // QuICC
 
 #endif //QUICC_TESTSUITE_TRANSFORM_WORLAND_TESTER_HPP

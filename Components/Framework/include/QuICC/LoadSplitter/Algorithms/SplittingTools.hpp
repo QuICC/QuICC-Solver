@@ -87,17 +87,22 @@ namespace Parallel {
           * @param factors CPU factors
           * @param nCpu    Number of CPUs
           */
-         static bool confirmFactors(const ArrayI& factors, const int nCpu);
+         static bool confirmFactors(const std::vector<int>& factors, const int nCpu);
+
+         /**
+          * @brief Maximum number of factors to test
+          */
+         static const int mcMaxDecompositions = 3;
 
          /**
           * @brief Constructor
           */
-         SplittingTools();
+         SplittingTools() = default;
 
          /**
           * @brief Destructor
           */
-         ~SplittingTools();
+         ~SplittingTools() = default;
    };
 
 }

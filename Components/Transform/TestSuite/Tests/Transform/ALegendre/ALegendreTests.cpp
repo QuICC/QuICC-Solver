@@ -50,7 +50,7 @@ int main( int argc, char* argv[] )
          ["--type"]
          ("Test type: projector, integrator, reductor, bfloop")
       | Opt( test::args().timeOnly )         // Add timing only
-         ["--timeOnly"] 
+         ["--timeOnly"]
          ("Only time execution, don't check results")
       | Opt( test::args().iter, "iter" )     // Number of iterations
          ["--iter"]
