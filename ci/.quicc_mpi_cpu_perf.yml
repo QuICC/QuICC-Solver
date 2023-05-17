@@ -1,27 +1,31 @@
 # This file is generated, do not modify!
 include:
-- remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.cscs.yml
+- remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
 - /ci/gitlab/.daint_runner.yml
 - /ci/gitlab/.quicc_models_perf.yml
 stages:
+- build_base
 - build
 - model-build-and-test
 - cleanup
+build-quicc-base:
+  extends: .container-builder
+  stage: build_base
+  variables:
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_cpu
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:f631eda0079f0b0550e3518425832036
 build-quicc:
-  tags:
-  - docker_jfrog
+  extends: .container-builder
   stage: build
-  script:
-  - 'true'
   variables:
     DOCKERFILE: ci/docker/Dockerfile_mpi
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi:latest
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/ubuntu-quicc-buildbase:22.04"]'
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:f631eda0079f0b0550e3518425832036"]'
 BoussinesqSphereDynamoExplicit:
   extends:
   - .BoussinesqSphereDynamoExplicit
   - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -31,7 +35,7 @@ BoussinesqSphereDynamoImplicit:
   extends:
   - .BoussinesqSphereDynamoImplicit
   - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -41,7 +45,7 @@ BoussinesqShellDynamoExplicit:
   extends:
   - .BoussinesqShellDynamoExplicit
   - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -51,7 +55,7 @@ BoussinesqSphereRTCExplicit:
   extends:
   - .BoussinesqSphereRTCExplicit
   - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -61,7 +65,7 @@ BoussinesqSphereRTCImplicit:
   extends:
   - .BoussinesqSphereRTCImplicit
   - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -71,7 +75,7 @@ BoussinesqShellRTCExplicit:
   extends:
   - .BoussinesqShellRTCExplicit
   - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -81,7 +85,7 @@ BoussinesqSphereTCExplicit:
   extends:
   - .BoussinesqSphereTCExplicit
   - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -91,15 +95,15 @@ BoussinesqShellTCExplicit:
   extends:
   - .BoussinesqShellTCExplicit
   - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
     SLURM_CPUS_PER_TASK: '2'
     QUICC_VERSION_TAG: mpi
 ci-cache-cleanup:
-  extends: .daint
+  extends: .container-runner-daint-gpu
   stage: cleanup
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:latest
+  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
   script:
   - rm -Rf $CI_CACHE_FOLDER/*

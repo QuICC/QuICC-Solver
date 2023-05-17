@@ -1,5 +1,5 @@
 .daint_runner:
-  extends: .daint
+  extends: .container-runner-daint
   variables:
     PULL_IMAGE: 'YES'
     PULL_ON_HOST_MACHINE: 'NO'

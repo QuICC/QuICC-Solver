@@ -1,81 +1,32 @@
-# Build stage with Spack pre-installed and ready to be used
-ARG CSCS_REGISTRY_PATH
-FROM $CSCS_REGISTRY_PATH/ubuntu-spack:22.04-0.18.0 as builder
+# Depend on CSCS official spack base container helpers
+FROM docker.io/finkandreas/spack:0.18.1-ubuntu22.04 as builder
 
 ARG NUM_PROCS=16
 ARG TARGET=broadwell
 
-# Install OS packages needed to build the software
-RUN apt-get -yqq update && apt-get -yqq upgrade \
- && apt-get -yqq install less vim python3-dev python-is-python3 \
- && rm -rf /var/lib/apt/lists/*
-
-# What we want to install and how we want to install it
-# is specified in a manifest file (spack.yaml)
-RUN mkdir /opt/spack-environment \
-&&  (echo "spack:" \
-&&   echo "  specs:" \
-&&   echo "  - fftw" \
-&&   echo "  - hdf5" \
-&&   echo "  - cmake" \
-&&   echo "  - openblas" \
-&&   echo "  - boost@1.78.0" \
-&&   echo "  - py-scipy" \
-&&   echo "  - reframe" \
-&&   echo "  - kokkos-kernels" \
-&&   echo "  - mpich@3.1.4 netmod=tcp device=ch3" \
-&&   echo "  packages:" \
-&&   echo "    all:" \
-&&   echo "      variants: +openmp +mpi build_type=Release target=$TARGET" \
-&&   echo "      providers:" \
-&&   echo "        mpi:" \
-&&   echo "        - mpich@3.1.4" \
-&&   echo "  concretizer:" \
-&&   echo "    unify: true" \
-&&   echo "  config:" \
-&&   echo "    install_tree: /opt/software" \
-&&   echo "    build_jobs: $NUM_PROCS" \
-&&   echo "  view: /opt/view") > /opt/spack-environment/spack.yaml
-
-# Install the software, remove unnecessary deps
-RUN cd /opt/spack-environment && spack env activate . \
-  && spack -e . concretize \
-  && spack -e . env depfile > Makefile \
-  && make -j$NUM_PROCS SPACK_COLOR=always --output-sync=recurse \
-  && spack gc -y
-
-
-# Strip all the binaries
-RUN find -L /opt/view/* -type f -exec readlink -f '{}' \; | \
-    xargs file -i | \
-    grep 'charset=binary' | \
-    grep 'x-executable\|x-archive\|x-sharedlib' | \
-    awk -F: '{print $1}' | xargs strip -s || true
-
-# Modifications to the environment that are necessary to run
-RUN cd /opt/spack-environment && \
-    spack env activate --sh -d . >> /etc/profile.d/z10_spack_environment.sh && \
-    echo 'export CPATH=/opt/view/include:$CPATH' >> /etc/profile.d/z10_spack_environment.sh
+RUN spack-install-helper daint-mc \
+    fftw \
+    hdf5 \
+    cmake \
+    openblas \
+    "boost@1.78.0" \
+    py-scipy \
+    reframe \
+    kokkos-kernels
 
 
 # Bare OS image to run the installed executables
-FROM docker.io/ubuntu:22.04
+FROM docker.io/finkandreas/spack:base-ubuntu22.04
 
+# it is important to keep the paths, otherwise your installation is broken
+# all these paths are created with the above `spack-install-helper` invocation
 COPY --from=builder /opt/spack-environment /opt/spack-environment
 COPY --from=builder /opt/software /opt/software
 COPY --from=builder /opt/._view /opt/._view
 COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
 
-RUN ln -s /opt/._view/* /opt/view
+RUN fix_spack_install
 
 RUN apt-get -yqq update && apt-get -yqq upgrade \
  && apt-get -yqq install build-essential git gcc g++ gfortran vim less \
  && rm -rf /var/lib/apt/lists/*
-
-RUN (echo "/opt/view/lib" \
-&&   echo "/opt/view/lib64") > /etc/ld.so.conf.d/spack.conf \
-&& ldconfig
-
-ENTRYPOINT ["/bin/bash", "--rcfile", "/etc/profile", "-l", "-c"]
-CMD ["/bin/bash"]
-SHELL ["/bin/bash", "--rcfile", "/etc/profile", "-l", "-c"]

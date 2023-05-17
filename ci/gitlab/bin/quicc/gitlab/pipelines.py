@@ -1,6 +1,7 @@
 #
 # Base and derived classes to generate yml pipelines for QuICC
 #
+import hashlib
 from typing import NamedTuple
 from quicc.gitlab.models import default_configs
 from quicc.gitlab.yaml import base_yaml
@@ -13,19 +14,20 @@ class config(NamedTuple):
 class base_pipeline(base_yaml):
     def __init__(self, cnf):
         image_location = '$CSCS_REGISTRY_PATH'
-        self.cs_base_yml = 'https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.cscs.yml'
-        self.base_image = 'ubuntu-quicc-buildbase:22.04'
+        self.cs_base_yml = 'https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml'
+        self.base_docker = 'ci/docker/baseimage/Dockerfile_quicc_baseimage_cpu'
         self.cpus_full_node = 72
         if (cnf.backend == 'gpu'):
-            self.base_image = 'cuda-ubuntu-quicc-buildbase:11.7.1-22.04'
+            self.base_docker = 'ci/docker/baseimage/Dockerfile_quicc_baseimage_gpu'
             self.cpus_full_node = 24
+        base_md5sum = hashlib.md5(open(self.base_docker[3:], 'rb').read()).hexdigest()
         self.backend = cnf.backend
         self.tag = cnf.tag
 
-        image = 'quicc_'+cnf.tag+':latest'
+        image = 'quicc_'+cnf.tag+':$CI_COMMIT_SHA'
         self.path_image = image_location+'/'+image
+        self.base_path_image = f'{image_location}/baseimage/quicc_baseimage_{cnf.backend}:{base_md5sum}'
         self.docker = 'ci/docker/Dockerfile_'+cnf.tag
-        self.path_base_image = image_location+'/'+self.base_image
 
         # pipeline actions
         self.actions = [ self.base_yaml ]
@@ -48,24 +50,28 @@ class base_pipeline(base_yaml):
                 ],
             'stages':
                 [
-                    'build', # build stage is running on the Kubernetes cluster
+                    'build_base',
+                    'build', # build stages are running on the Kubernetes cluster
                 ],
+            'build-quicc-base':
+                {
+                    'extends': '.container-builder',
+                    'stage': 'build_base',
+                    'variables':
+                        {
+                            'DOCKERFILE': self.base_docker,
+                            'PERSIST_IMAGE_NAME': self.base_path_image,
+                        },
+                },
             'build-quicc':
                 {
-                    'tags':
-                        [
-                            'docker_jfrog'
-                        ],
+                    'extends': '.container-builder',
                     'stage': 'build',
-                    'script':
-                        [
-                            'true'
-                        ],
                     'variables':
                         {
                             'DOCKERFILE': self.docker,
                             'PERSIST_IMAGE_NAME': self.path_image,
-                            'DOCKER_BUILD_ARGS': f"""["BASEIMAGE={self.path_base_image}"]"""
+                            'DOCKER_BUILD_ARGS': f"""["BASEIMAGE={self.base_path_image}"]"""
                         },
                 },
             }
@@ -77,7 +83,7 @@ class base_pipeline(base_yaml):
                 ],
             )
         self.config['ci-cache-cleanup'] = {
-            'extends': '.daint',
+            'extends': '.container-runner-daint-gpu',
             'stage': 'cleanup',
             'image': self.path_image,
             'script':
