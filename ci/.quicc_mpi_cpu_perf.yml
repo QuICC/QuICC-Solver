@@ -13,14 +13,14 @@ build-quicc-base:
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_cpu
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:f631eda0079f0b0550e3518425832036
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:ea227d69901a9f2a1afdbe889b5cd3eb
 build-quicc:
   extends: .container-builder
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_mpi
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:f631eda0079f0b0550e3518425832036"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:ea227d69901a9f2a1afdbe889b5cd3eb"]'
 BoussinesqSphereDynamoExplicit:
   extends:
   - .BoussinesqSphereDynamoExplicit
