@@ -4,12 +4,11 @@
  */
 
 
-// Configuration includes
-//
-
 // System includes
 //
 
+// Project includes
+//
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/QuICCEnv.hpp"
@@ -20,6 +19,7 @@
 #include "QuICC/TransformCoordinators/TransformCoordinator.hpp"
 #include "QuICC/TestSuite/Framework/TransformCoordinator/TestArgs.hpp"
 #include "QuICC/TestSuite/Framework/TransformCoordinator/TestHelper.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Framework::TCoord;
 
@@ -30,7 +30,7 @@ TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
    // Init Environment
    QuICC::QuICCEnv();
    #ifdef QUICC_MPI
-      {  
+      {
          int size;
          MPI_Comm_size(MPI_COMM_WORLD, &size);
          QuICC::QuICCEnv().setup(size);
@@ -38,6 +38,8 @@ TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
    #else
       QuICC::QuICCEnv().setup(1);
    #endif
+
+   QuICC::Profiler::Initialize();
 
    // Register IDs
    QuICC::PhysicalNames::registerAll();
@@ -76,4 +78,6 @@ TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
 
       currentts::checkVariables(test);
    }
+
+   QuICC::Profiler::Finalize();
 }

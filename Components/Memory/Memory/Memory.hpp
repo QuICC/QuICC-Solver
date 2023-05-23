@@ -37,12 +37,12 @@ public:
         _data(std::exchange(old._data, nullptr)),
         _size(std::exchange(old._size, 0)),
         _mem_res(std::exchange(old._mem_res, nullptr)) {}
-    
+
     /// @brief ctor
     /// @param size number of elements of type type
     /// @param mem memory resource pointer
-    explicit MemBlock(std::size_t size, memory_resource* mem) : 
-        _mem_res(mem) 
+    explicit MemBlock(std::size_t size, memory_resource* mem) :
+        _mem_res(mem)
     {
         _data = reinterpret_cast<T*>(_mem_res->allocate(size*sizeof(T)));
         _size = size;
@@ -51,11 +51,7 @@ public:
     /// @brief dtor, release memory resource
     ~MemBlock()
     {
-        if (_data != nullptr)
-        {
-            _mem_res->deallocate(_data, _size*sizeof(T));
-            _size = 0;
-        }
+        _release();
     }
     
     /// @brief delete copy assignment
@@ -63,7 +59,7 @@ public:
     /// @brief move assignement
     MemBlock& operator=(MemBlock&& old)
     {
-        assert(_data == nullptr);
+        _release();
         _data = std::exchange(old._data, nullptr);
         _size = std::exchange(old._size, 0);
         _mem_res = std::exchange(old._mem_res, nullptr);
@@ -91,6 +87,17 @@ public:
     std::size_t size() const {return _size;}
 
 private:
+
+    /// @brief release resource if needed
+    void _release()
+    {
+        if (_data != nullptr)
+        {
+            _mem_res->deallocate(_data, _size*sizeof(T));
+            _size = 0;
+            _data = nullptr;
+        }
+    }
 
     /// @brief pointer to raw data
     T* _data{nullptr};

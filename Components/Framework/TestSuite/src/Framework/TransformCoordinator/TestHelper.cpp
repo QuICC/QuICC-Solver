@@ -3,9 +3,6 @@
  * @brief Setup helpers for the TransformCoordinator
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -221,7 +218,7 @@ namespace TCoord {
          throw std::logic_error("Test for this transform path is not implemented");
       }
 
-      Transform::TransformTreeTools::generateTrees(test.fwdTree, mt, TransformDirection::FORWARD, "forward");
+      Transform::TransformTreeTools::generateTrees(test.fwdTree, mt, TransformDirection::FORWARD);
 
       // Create backward transform tree based on variables
       RequirementTools::buildBackwardTree(test.bwdTree, test.scalars, test.vectors);

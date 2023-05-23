@@ -33,12 +33,11 @@ void* Malloc::do_allocate(std::size_t bytes, std::size_t alignment)
 void Malloc::do_deallocate(void* ptr, std::size_t bytes, std::size_t alignment)
 {
     if(ptr != nullptr)
-    {    
+    {
         #ifndef NDEBUG
         std::cout << "cudaFree, bytes: " << bytes << '\n';
         #endif
         cudaErrChk(cudaFree(ptr));
-        ptr = nullptr;
     }
 }
 

@@ -1,7 +1,7 @@
 include(ConfigureLibrary)
 quicc_add_library(config
   PARENT ${QUICC_CURRENT_COMPONENT_LIB}
-  LINK PUBLIC QuICC::Common
+  LINK PUBLIC QuICC::Common ${QUICC_CURRENT_COMPONENT_LIB}_xml
   INCLUDE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../include
   SRC
     ConfigurationReader.cpp

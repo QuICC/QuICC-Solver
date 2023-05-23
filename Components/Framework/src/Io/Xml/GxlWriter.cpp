@@ -3,9 +3,6 @@
  * @brief Source of the implementation of the GXL format file writer
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <set>
@@ -31,6 +28,7 @@
 #include "QuICC/Tools/IdToHuman.hpp"
 #include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/Transform/Backward/Coordinator.hpp"
+#include "QuICC/Transform/Forward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -207,7 +205,13 @@ namespace Xml {
 
                // Add edge
                this->createAttr(pEdge, "color", color.at(i));
-               oss << pathIt->edge(i).opId();
+               if(dir == TransformDirection::FORWARD)
+               {
+                  oss << Transform::Forward::Coordinator::tag(pathIt->edge(i).opId());
+               } else
+               {
+                  oss << Transform::Backward::Coordinator::tag(pathIt->edge(i).opId());
+               }
                this->createAttr(pEdge, "label", oss.str());
                oss.str("");
                pGraph->append_node(pEdge);
@@ -329,7 +333,14 @@ namespace Xml {
 
          // Add edge
          this->createAttr(pEdge, "color", *colorIt);
-         oss << edgeIt->opId();
+
+         if(dir == TransformDirection::FORWARD)
+         {
+            oss << Transform::Forward::Coordinator::tag(edgeIt->opId());
+         } else
+         {
+            oss << Transform::Backward::Coordinator::tag(edgeIt->opId());
+         }
          if(edgeIt->recoverInput() && edgeIt->holdInput())
          {
             oss << std::endl << "(R,H)";

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file TriangularSHlIndexCounter.cpp
  * @brief Source of spherical harmonic index counter with l spectral ordering with triangular radial truncation
  */
@@ -58,7 +58,7 @@ namespace QuICC {
                oDims(1)++;
             }
          }
-      
+
       }
       //  Physical space ordering is 3D, 2D, 1D
       else //if(spaceId == Dimensions::Space::PHYSICAL)
@@ -81,12 +81,11 @@ namespace QuICC {
    {
       Dimensions::Transform::Id transId;
       Dimensions::Simulation::Id simId;
-      
+
       // Clear the vector of offsets
       offsets.clear();
       std::vector<OffsetType>  offV;
 
-      auto&& tRes = *this->mspCpu->dim(transId);
 
       // In spectral space offset computation, spherical harmonic triangular truncation make it complicated
       if(spaceId == Dimensions::Space::SPECTRAL)
@@ -94,7 +93,9 @@ namespace QuICC {
          transId = Dimensions::Transform::SPECTRAL;
          simId = Dimensions::Simulation::SIM2D;
 
-         // Loop over all local harmonic degrees l 
+         auto&& tRes = *this->mspCpu->dim(transId);
+
+         // Loop over all local harmonic degrees l
          OffsetType offset = 0;
          int l0 = 0;
          for(int iL = 0; iL < tRes.dim<Dimensions::Data::DAT3D>(); ++iL)
@@ -104,11 +105,11 @@ namespace QuICC {
             {
                // Compute the offset to the local harmonic degree l - 1
                for(int l = l0; l < l_; ++l)
-               {  
+               {
                   for(int m = 0; m < std::min(l+1,spRef->dim(Dimensions::Simulation::SIM3D,spaceId)); ++m)
                   {
                      offset++;
-                  }  
+                  }
                }
 
                // Compute offset for the local m
@@ -137,6 +138,8 @@ namespace QuICC {
       {
          transId = Dimensions::Transform::TRA3D;
          simId = Dimensions::Simulation::SIM1D;
+
+         auto&& tRes = *this->mspCpu->dim(transId);
 
          offV.push_back(0);
          offV.push_back(0);

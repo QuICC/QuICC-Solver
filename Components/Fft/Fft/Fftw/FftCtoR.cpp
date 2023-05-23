@@ -72,7 +72,7 @@ void FftOp<View<double, AttOut>, View<std::complex<double>, AttIn>>::applyImpl(V
     assert(std::floor(phys.dims()[0]/2) + 1 == mods.dims()[0]);
     if(_plan == nullptr)
     {
-        Profiler::RegionFixture<4> fix("FftOp::initFft");
+        Profiler::RegionFixture<4> fix("Fftw::FftOp::initFft-CtoR");
         int columns = 0;
         if constexpr(std::is_same_v<AttIn, dense2D>)
         {
@@ -90,7 +90,7 @@ void FftOp<View<double, AttOut>, View<std::complex<double>, AttIn>>::applyImpl(V
         }
         _plan = details::setPlanCtoR(phys.dims()[0], columns);
     }
-    Profiler::RegionFixture<4> fix("FftOp::applyFft");
+    Profiler::RegionFixture<4> fix("Fftw::FftOp::applyFft-CtoR");
     fftw_execute_dft_c2r(static_cast<fftw_plan>(_plan),
         reinterpret_cast<fftw_complex* >(
         const_cast<std::complex<double>*>(mods.data())), phys.data());

@@ -34,7 +34,7 @@ DOp<Tout, Tin, FftBackend, DiffBackend>::DOp() : mFft(std::make_unique<FftBacken
 template<class Tout, class Tin, class FftBackend, class DiffBackend>
 void DOp<Tout, Tin, FftBackend, DiffBackend>::applyImpl(Tout& out, Tin& in)
 {
-    Profiler::RegionFixture<4> fix("DOp::applyImpl");
+    Profiler::RegionFixture<4> fix("Fourier::Mixed::Projector::DOp::applyImpl");
 
     // differentiate in place
     mDiff->apply(in, in);
