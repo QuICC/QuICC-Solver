@@ -32,11 +32,11 @@
 #
 
 # Default branch for known models
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.5.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.6.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.5.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.5.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.6.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.5.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.5.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.6.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.5.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "main")
 

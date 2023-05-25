@@ -122,8 +122,10 @@ namespace Equations {
 
          /**
           * @brief Initialize constraint kernels
+          *
+          * @param spMesh  Physical mesh
           */
-         virtual void initConstraintKernel();
+         virtual void initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh);
 
          /**
           * @brief Set spectral source kernel

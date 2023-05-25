@@ -486,7 +486,7 @@ namespace debug {
       throw std::logic_error("Called dummy implementation of buildModelMatrix!");
    }
 
-   void IEquation::initConstraintKernel()
+   void IEquation::initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh)
    {
       for(auto it = this->mConstraintKernel.begin(); it != this->mConstraintKernel.end(); ++it)
       {

@@ -687,11 +687,14 @@ namespace Pseudospectral {
 
    void Coordinator::setupEquations()
    {
+      // Get mesh from transform coordinator
+      auto spMesh = std::make_shared<std::vector<Array> >(this->mTransformCoordinator.mesh());
+
       // Loop over all scalar equations
       for(auto scalEqIt = this->mScalarEquations.begin(); scalEqIt < this->mScalarEquations.end(); ++scalEqIt)
       {
          (*scalEqIt)->initSpectralMatrices();
-         (*scalEqIt)->initConstraintKernel();
+         (*scalEqIt)->initConstraintKernel(spMesh);
          (*scalEqIt)->initSrcKernel();
       }
 
@@ -699,7 +702,7 @@ namespace Pseudospectral {
       for(auto vectEqIt = this->mVectorEquations.begin(); vectEqIt < this->mVectorEquations.end(); ++vectEqIt)
       {
          (*vectEqIt)->initSpectralMatrices();
-         (*vectEqIt)->initConstraintKernel();
+         (*vectEqIt)->initConstraintKernel(spMesh);
          (*vectEqIt)->initSrcKernel();
       }
    }
