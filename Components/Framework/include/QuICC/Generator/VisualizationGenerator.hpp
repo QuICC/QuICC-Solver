@@ -6,15 +6,9 @@
 #ifndef QUICC_VISUALIZATIONGENERATOR_HPP
 #define QUICC_VISUALIZATIONGENERATOR_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -31,12 +25,12 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         VisualizationGenerator();
+         VisualizationGenerator() = default;
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~VisualizationGenerator();
+         virtual ~VisualizationGenerator() = default;
 
       protected:
 

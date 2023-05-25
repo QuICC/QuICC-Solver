@@ -86,7 +86,6 @@ namespace QuICC {
       offsets.clear();
       std::vector<OffsetType>  offV;
 
-
       // In spectral space offset computation, spherical harmonic triangular truncation make it complicated
       if(spaceId == Dimensions::Space::SPECTRAL)
       {

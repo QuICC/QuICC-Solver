@@ -6,15 +6,9 @@
 #ifndef QUICC_PSEUDOSPECTRAL_COORDINATOR_HPP
 #define QUICC_PSEUDOSPECTRAL_COORDINATOR_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -104,12 +98,17 @@ namespace Pseudospectral {
          /**
           * @brief Constructor
           */
-         Coordinator();
+         Coordinator() = default;
 
          /**
-          * @brief Simple empty destructor
+          * @brief Destructor
           */
-         virtual ~Coordinator();
+         virtual ~Coordinator() = default;
+
+         /**
+          * @brief Get iteration indexes
+          */
+         const std::set<int>& it() const;
 
          /**
           * @brief Get integration time
@@ -145,43 +144,37 @@ namespace Pseudospectral {
 
          /**
           * @brief Add scalar equation to solver
+          *
+          * @param spEq Equation
+          * @param it   Iteration index
           */
-         void addEquation(Equations::SharedIScalarEquation spEq);
+         void addEquation(Equations::SharedIScalarEquation spEq, const int it);
 
          /**
           * @brief Add scalar equation to solver
+          *
+          * @param spEq       Equation
+          * @param eqId       Equation ID
+          * @param it         Iteration index
           */
-         void addEquation(Equations::SharedIScalarEquation spEq, const std::size_t eqId, const bool addToList = true);
+         void addEquation(Equations::SharedIScalarEquation spEq, const std::size_t eqId, const int it);
 
          /**
           * @brief Add vector equation to solver
+          *
+          * @param spEq Equation
+          * @param it   Iteration index
           */
-         void addEquation(Equations::SharedIVectorEquation spEq);
+         void addEquation(Equations::SharedIVectorEquation spEq, const int it);
 
          /**
           * @brief Add vector equation to solver
+          *
+          * @param spEq       Equation
+          * @param eqId       Equation ID
+          * @param it         Iteration index
           */
-         void addEquation(Equations::SharedIVectorEquation spEq, const std::size_t eqId, const bool addToList = true);
-
-         /**
-          * @brief Get scalar equation range
-          */
-         ScalarEquation_range scalarRange(const std::size_t eqId);
-
-         /**
-          * @brief Get vector equation range
-          */
-         VectorEquation_range vectorRange(const std::size_t eqId);
-
-         /**
-          * @brief Get scalar equation range
-          */
-         SharedIScalarEquation scalarEq(const std::size_t eqId, const int i = 0);
-
-         /**
-          * @brief Get vector equation range
-          */
-         SharedIVectorEquation vectorEq(const std::size_t eqId, const int i = 0);
+         void addEquation(Equations::SharedIVectorEquation spEq, const std::size_t eqId, const int it);
 
          /**
           * @brief Initialise the transforms
@@ -240,23 +233,35 @@ namespace Pseudospectral {
 
          /**
           * @brief Update physical space fields
+          *
+          * @param it Iteration index
           */
-         void updatePhysical();
+         void updatePhysical(const int it);
 
          /**
           * @brief Update spectral space fields
+          *
+          * @param it Iteration index
           */
-         void updateSpectral();
+         void updateSpectral(const int it);
 
          /**
           * @brief Update spectral space fields
+          *
+          * @param isTrivial        Update trivial equations?
+          * @param isDiagnostic     Update diagnostic equations?
+          * @param isPrognostic     Update prognostic equations?
+          * @param isWrapper        Update wrapper equations?
+          * @param it               Iteration index
           */
-         void updateSpectral(const bool isTrivial, const bool isDiagnostic, const bool isPrognostic, const bool isWrapper);
+         void updateSpectral(const bool isTrivial, const bool isDiagnostic, const bool isPrognostic, const bool isWrapper, const int it);
 
          /**
           * @brief Compute the nonlinear terms
+          *
+          * @param it   Iteration index
           */
-         void computeNonlinear();
+         void computeNonlinear(const int it);
 
          /**
           * @brief Explicit linear the trivial equations
@@ -265,8 +270,11 @@ namespace Pseudospectral {
 
          /**
           * @brief Explicit linear the trivial equations
+          *
+          * @param opId Operator ID
+          * @param it   Iteration index
           */
-         void explicitTrivialEquations(const std::size_t opId);
+         void explicitTrivialEquations(const std::size_t opId, const int it);
 
          /**
           * @brief Explicit linear for the diagnostic equations
@@ -275,8 +283,11 @@ namespace Pseudospectral {
 
          /**
           * @brief Explicit linear for the diagnostic equations
+          *
+          * @param opId Operator ID
+          * @param it   Iteration index
           */
-         void explicitDiagnosticEquations(const std::size_t opId);
+         void explicitDiagnosticEquations(const std::size_t opId, const int it);
 
          /**
           * @brief Solve the trivial equations
@@ -285,8 +296,11 @@ namespace Pseudospectral {
 
          /**
           * @brief Solve the trivial equations
+          *
+          * @param timeId  Timing ID
+          * @param it      Iteration index
           */
-         void solveTrivialEquations(const std::size_t timeId);
+         void solveTrivialEquations(const std::size_t timeId, const int it);
 
          /**
           * @brief Solve the diagnostic equations
@@ -295,13 +309,18 @@ namespace Pseudospectral {
 
          /**
           * @brief Solve the diagnostic equations
+          *
+          * @param timeId  Timing ID
+          * @param it      Iteration index
           */
-         void solveDiagnosticEquations(const std::size_t timeId);
+         void solveDiagnosticEquations(const std::size_t timeId, const int it);
 
          /**
           * @brief Explicit linear term for all equations
+          *
+          * @param it   Iteration index
           */
-         void explicitEquations();
+         void explicitEquations(const int it);
 
          /**
           * @brief Prepare time evolution
@@ -317,8 +336,23 @@ namespace Pseudospectral {
 
          /**
           * @brief Solve all equations
+          *
+          * @param it   Iteration index
           */
-         void solveEquations();
+         void solveEquations(const int it);
+
+         /**
+          * @brief Update equations
+          *
+          * @param it         Iteration index
+          * @param isFinished full timestep computed?
+          */
+         void updateEquations(const int it, const bool isFinished) const;
+
+         /**
+          * @brief Finalize timestep iteration
+          */
+         void finalizeTimestep();
 
          /**
           * @brief Update the time stored in each equation
@@ -332,8 +366,10 @@ namespace Pseudospectral {
 
          /**
           * @brief Explicit linear for the prognostic equations
+          *
+          * @param it   Iteration index
           */
-         void explicitPrognosticEquations(const std::size_t opId);
+         void explicitPrognosticEquations(const std::size_t opId, const int it);
 
          /**
           * @brief Timestep the prognostic equations
@@ -342,8 +378,10 @@ namespace Pseudospectral {
 
          /**
           * @brief Timestep the prognostic equations
+          *
+          * @param it   Iteration index
           */
-         void solvePrognosticEquations();
+         void solvePrognosticEquations(const int it);
 
          /**
           * @brief Get the memory requirements
@@ -355,11 +393,61 @@ namespace Pseudospectral {
           */
          virtual void profileStorage() const;
 
+         /**
+          * @brief Write equation diagnostics
+          *
+          * @param isAsciiTime   ASCII writing time?
+          * @param isHdf5Time    HDF5 writing time?
+          */
+         void writeDiagnostics(const bool isAsciiTime, const bool isHdf5Time) const;
+
       protected:
+         /// Typedef for map of equations indexed by type ID and iteration index
+         template <typename TEquation> using EquationTypeMapType = std::map<std::pair<std::size_t,int>, std::vector<std::shared_ptr<TEquation> > >;
+
+         /// Typedef for map of equations indexed by iteration
+         template <typename TEquation> using EquationIterMapType = std::map<int, std::vector<std::shared_ptr<TEquation> > >;
+
+         /**
+          * @brief Get scalar equation range
+          *
+          * @param eqId Equation ID
+          * @param it   Iteration index
+          */
+         ScalarEquation_range scalarRange(const std::size_t eqId, const int it);
+
+         /**
+          * @brief Get vector equation range
+          *
+          * @param eqId Equation ID
+          * @param it   Iteration index
+          */
+         VectorEquation_range vectorRange(const std::size_t eqId, const int it);
+
+         /**
+          * @brief Get scalar equation range
+          *
+          * @param eqId Equation ID
+          * @param it   Iteration index
+          */
+         SharedIScalarEquation scalarEq(const std::size_t eqId, const int it, const int i = 0);
+
+         /**
+          * @brief Get vector equation range
+          *
+          * @param eqId Equation ID
+          * @param it   Iteration index
+          */
+         SharedIVectorEquation vectorEq(const std::size_t eqId, const int it, const int i = 0);
          /**
           * @brief Initialise the imposed components of the simulation
           */
          void initImposed();
+
+         /**
+          * @brief Iteration indexes
+          */
+         std::set<int> mIt;
 
          /**
           * @brief Shared resolution
@@ -374,12 +462,12 @@ namespace Pseudospectral {
          /**
           * @brief Scalar equation ranges
           */
-         std::map<std::size_t, std::vector<SharedIScalarEquation> > mScalarEqMap;
+         EquationTypeMapType<IScalarEquation> mScalarEqMap;
 
          /**
           * @brief Vector equation ranges
           */
-         std::map<std::size_t, std::vector<SharedIVectorEquation> > mVectorEqMap;
+         EquationTypeMapType<IVectorEquation> mVectorEqMap;
 
          /**
           * @brief Trivial solver coordinator
@@ -409,12 +497,12 @@ namespace Pseudospectral {
          /**
           * @brief Storage for scalar equations
           */
-         std::vector<SharedIScalarEquation> mScalarEquations;
+         EquationIterMapType<IScalarEquation> mScalarEquations;
 
          /**
           * @brief Storage for vector equations
           */
-         std::vector<SharedIVectorEquation> mVectorEquations;
+         EquationIterMapType<IVectorEquation> mVectorEquations;
 
          /**
           * @brief Map between name and pointer for the scalar variables
@@ -442,9 +530,19 @@ namespace Pseudospectral {
          VectorVariable_map  mImposedVectorVariables;
 
          /**
-          * @brief Map between name and physical kernels
+          * @brief Map between name and physical kernels for each iteration
           */
-         std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel>  mPhysicalKernels;
+         std::map<int, std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel> >  mPhysicalKernels;
+
+         /**
+          * @brief Backward transform trees
+          */
+         std::map<int, std::vector<Transform::TransformTree> > mBwdTree;
+
+         /**
+          * @brief Forward transform trees
+          */
+         std::map<int, std::vector<Transform::TransformTree> > mFwdTree;
 
          /**
           * @brief Storage for a shared forward transform grouper
@@ -468,12 +566,24 @@ namespace Pseudospectral {
 
       private:
          /**
-          * @brief Initialise the transform coordinator
-          *
-          * @param integratorTree   Transform integrator tree
-          * @param projectorTree    Transform projector tree
+          * @brief If at least one equation is present in range
           */
-         void initTransformCoordinator(const std::vector<Transform::TransformTree>& integratorTree, const std::vector<Transform::TransformTree>& projectorTree);
+         bool atLeastOne(ScalarEquation_range s, VectorEquation_range v) const;
+
+         /**
+          * @brief Add equation range to equation map
+          */
+         void addToMap(const std::size_t eqId, const int it, const ScalarEquation_range& r);
+
+         /**
+          * @brief Add equation range to equation map
+          */
+         void addToMap(const std::size_t eqId, const int it, const VectorEquation_range& r);
+
+         /**
+          * @brief Initialise the transform coordinator
+          */
+         void initTransformCoordinator();
 
          /**
           * @brief Initialise the equations (generate operators, etc)

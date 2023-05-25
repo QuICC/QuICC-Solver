@@ -123,13 +123,13 @@ namespace QuICC {
       offsets.clear();
       std::vector<OffsetType>  offV;
 
-      auto&& tRes = *this->mspCpu->dim(transId);
-
       // In spectral space offset computation, spherical harmonic triangular truncation make it complicated
       if(spaceId == Dimensions::Space::SPECTRAL)
       {
          transId = Dimensions::Transform::SPECTRAL;
          simId = Dimensions::Simulation::SIM3D;
+
+         auto&& tRes = *this->mspCpu->dim(transId);
 
          // Loop over all local harmonic order m 
          OffsetType offset = 0;
@@ -174,6 +174,8 @@ namespace QuICC {
       {
          transId = Dimensions::Transform::TRA3D;
          simId = Dimensions::Simulation::SIM1D;
+
+         auto&& tRes = *this->mspCpu->dim(transId);
 
          offV.push_back(0);
          offV.push_back(0);

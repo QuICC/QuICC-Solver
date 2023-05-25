@@ -10,9 +10,6 @@
 //
 #include <map>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Equations/IScalarEquation.hpp"
@@ -51,10 +48,10 @@ namespace Tools {
     *
     * @param scalarRange   Range of scalar equations of same type
     * @param vectorRange   Range of vector equations of same type
-    *
-    * \mhdBug This implementation is very BAD! Needs a cleanup as soon as possible
+    * @param dStart        Start index of real solvers
+    * @param zStart        Start index of complex solvers
     */
-   template <typename TScalar, typename TVector> void identifySolver(const std::pair<TScalar,TScalar>& scalarRange, const std::pair<TVector,TVector>& vectorRange);
+   template <typename TScalar, typename TVector> std::pair<int,int> identifySolver(const std::pair<TScalar,TScalar>& scalarRange, const std::pair<TVector,TVector>& vectorRange, const int dStart = 0, const int zStart = 0);
 
    /**
     * @brief Create a small sparse matrix to select matrix block through Kronecker product
@@ -117,11 +114,11 @@ namespace Tools {
       }
    }
 
-   template <typename TScalar, typename TVector> void identifySolver(const std::pair<TScalar,TScalar>& scalarRange, const std::pair<TVector,TVector>& vectorRange)
+   template <typename TScalar, typename TVector> std::pair<int,int> identifySolver(const std::pair<TScalar,TScalar>& scalarRange, const std::pair<TVector,TVector>& vectorRange, const int dStart, const int zStart)
    {
       // Current solver indexes for real and complex solvers
-      int dIdx = 0;
-      int zIdx = 0;
+      int dIdx = dStart;
+      int zIdx = zStart;
 
       // Coupling flag
       bool coupled = false;
@@ -371,6 +368,8 @@ namespace Tools {
          // Reset coupling flag
          counter.setConstant(0);
       }
+
+      return std::make_pair(dIdx, zIdx);
    }
 
    template <typename TIt> void getNonlinearKernels(std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel>& rKernels, TIt first, TIt last)
@@ -381,8 +380,8 @@ namespace Tools {
          rKernels.insert(std::make_pair((*eqIt)->name(), (*eqIt)->spNLKernel()));
       }
    }
-}
-}
-}
+} // Tools
+} // Equations
+} // QuICC
 
 #endif // QUICC_EQUATIONS_TOOLS_EQUATIONTOOLS_HPP

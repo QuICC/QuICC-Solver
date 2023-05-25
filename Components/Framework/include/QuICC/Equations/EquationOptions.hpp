@@ -25,11 +25,16 @@ namespace Equations {
    {
       public:
          /**
+          * @brief Default constructor
+          */
+         EquationOptions();
+
+         /**
           * @brief Simple constructor
           *
           * @param it Iteration index
           */
-         explicit EquationOptions(const int it = 0);
+         explicit EquationOptions(const int it);
 
          /**
           * @brief Simple empty destructor

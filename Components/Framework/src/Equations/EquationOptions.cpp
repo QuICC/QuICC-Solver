@@ -15,6 +15,11 @@ namespace QuICC {
 
 namespace Equations {
 
+   EquationOptions::EquationOptions()
+      : EquationOptions(0)
+   {
+   }
+
    EquationOptions::EquationOptions(const int it)
       : mIt(it)
    {

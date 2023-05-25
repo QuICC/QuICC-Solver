@@ -33,6 +33,9 @@ namespace QuICC {
 
 namespace Equations {
 
+   /// Forward declaration of IEquation
+   class IEquation;
+
    /**
     * @brief Base building block for the implementation of an equation
     */
@@ -144,6 +147,30 @@ namespace Equations {
           * @brief Initialize source kernels
           */
          virtual void initSrcKernel();
+
+         /**
+          * @brief Link with other equation
+          *
+          * @param spEq Equation to link to
+          */
+         virtual void linkEquation(std::shared_ptr<IEquation> spEq);
+
+         /**
+          * @brief Write equation diagnostic
+          *
+          * @param isAsciiTime  Is ASCII writing time?
+          * @param isHdf5Time   Is HDF5 writing time?
+          */
+         virtual void writeDiagnostics(const bool isAsciiTime, const bool isHdf5Time) const;
+
+         /**
+          * @brief Update constraint kernels
+          *
+          * @param time       Simulation time
+          * @param timestep   Simulation timestep
+          * @param isFinished Full timestep was computed?
+          */
+         virtual void updateConstraintKernel(const MHDFloat time, const MHDFloat timestep, const bool isFinished);
 
       protected:
          /**

@@ -233,7 +233,9 @@ namespace TCoord {
       std::map<std::size_t,NonDimensional::SharedINumber> runOptions;
       runOptions.emplace(NonDimensional::Lower1d::id(), std::make_shared<NonDimensional::Lower1d>(0.3));
       runOptions.emplace(NonDimensional::Upper1d::id(), std::make_shared<NonDimensional::Lower1d>(1.3));
-      Transform::TransformCoordinatorTools::init(test.coord, test.spFwdGrouper, test.spBwdGrouper, test.fwdTree, test.bwdTree, test.spRes, runOptions);
+      std::vector<ArrayI> packs;
+      Transform::TransformCoordinatorTools::computePacks(packs, test.spFwdGrouper, test.spBwdGrouper, {{0, test.fwdTree}}, {{0, test.bwdTree}}, {0}, test.spRes);
+      Transform::TransformCoordinatorTools::init(test.coord, test.spFwdGrouper, test.spBwdGrouper, packs, test.spRes, runOptions);
    }
 
    MHDComplex unitReference(const Test& test, const int i, const int j, const int k)
@@ -527,11 +529,13 @@ namespace TCoord {
 
    void backward(Test& test)
    {
+      test.coord.defineBwdTransforms(test.bwdTree);
       test.spBwdGrouper->transform(test.scalars, test.vectors, test.coord);
    }
 
    void nonlinearAndForward(Test& test)
    {
+      test.coord.defineFwdTransforms(test.fwdTree);
       test.spFwdGrouper->transform(test.scalars, test.vectors, test.kernels, test.coord);
    }
 

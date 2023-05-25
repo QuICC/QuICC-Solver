@@ -23,21 +23,13 @@ namespace QuICC {
 
 namespace Transform {
 
-   TransformCoordinatorTools::TransformCoordinatorTools()
-   {
-   }
-
-   TransformCoordinatorTools::~TransformCoordinatorTools()
-   {
-   }
-
-   void TransformCoordinatorTools::init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<Transform::TransformTree>& forwardTree, const std::vector<Transform::TransformTree>& backwardTree, SharedResolution spRes, const std::map<std::size_t,NonDimensional::SharedINumber>& runOptions)
+   void TransformCoordinatorTools::init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<ArrayI>& packs, SharedResolution spRes, const std::map<std::size_t,NonDimensional::SharedINumber>& runOptions)
    {
       StageTimer stage;
       stage.start("initializing transforms");
 
       // Initialise the transform coordinator
-      rCoord.defineTransforms(forwardTree, backwardTree, spRes->sim().spSpatialScheme());
+      rCoord.setScheme(spRes->sim().spSpatialScheme());
       for(int i = 0; i < spRes->sim().ss().dimension(); i++)
       {
          Dimensions::Transform::Id id = static_cast<Dimensions::Transform::Id>(i);
@@ -79,22 +71,59 @@ namespace Transform {
       stage.done();
       stage.start("initializing converters");
 
-      std::vector<ArrayI>  packs;
-      // Get the buffer pack sizes for first dimension
-      packs.push_back(spFwdGrouper->packs1D(forwardTree));
-      packs.push_back(spBwdGrouper->packs1D(backwardTree));
-
-      if(spRes->sim().ss().dimension() == 3)
-      {
-         // Get the buffer pack sizes for second dimension
-         packs.push_back(spFwdGrouper->packs2D(forwardTree));
-         packs.push_back(spBwdGrouper->packs2D(backwardTree));
-      }
-
       // Initialise the converters
       rCoord.communicator().initConverter(spRes, packs, spFwdGrouper->split);
 
       stage.done();
+   }
+
+   void TransformCoordinatorTools::addSet(std::vector<ArrayI>& packs, const std::set<int>& packSet)
+   {
+      packs.push_back(ArrayI(packSet.size()));
+      ArrayI& pack = packs.back();
+      int pi = 0;
+      for(auto k : packSet)
+      {
+         pack(pi) = k;
+         pi++;
+      }
+   }
+
+   void TransformCoordinatorTools::computePacks(std::vector<ArrayI>& packs, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::map<int, std::vector<Transform::TransformTree> >& forwardTrees, const std::map<int, std::vector<Transform::TransformTree> >& backwardTrees, const std::set<int>& keys,  SharedResolution spRes)
+   {
+      // Compute pack sizes
+      std::set<int>  fwdSet;
+      std::set<int>  bwdSet;
+      // Get the buffer pack sizes for first dimension
+      for(auto j: keys)
+      {
+         fillSet<stage_1D>(fwdSet, spFwdGrouper, forwardTrees.at(j));
+
+         fillSet<stage_1D>(bwdSet, spBwdGrouper, backwardTrees.at(j));
+      }
+
+      // Add sets as packs
+      addSet(packs, fwdSet);
+      addSet(packs, bwdSet);
+
+      // second dimension
+      if(spRes->sim().ss().dimension() == 3)
+      {
+         fwdSet.clear();
+         bwdSet.clear();
+
+         // Get the buffer pack sizes for second dimension
+         for(auto j: keys)
+         {
+            // Fill pack sets
+            fillSet<stage_2D>(fwdSet, spFwdGrouper, forwardTrees.at(j));
+            fillSet<stage_2D>(bwdSet, spBwdGrouper, backwardTrees.at(j));
+         }
+
+         // Add sets as packs
+         addSet(packs, fwdSet);
+         addSet(packs, bwdSet);
+      }
    }
 }
 }

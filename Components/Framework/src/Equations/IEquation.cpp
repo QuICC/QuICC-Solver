@@ -11,6 +11,10 @@
 //
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Equations/IEquation.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+#include "QuICC/PhysicalNames/Coordinator.hpp"
+#endif
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
@@ -535,6 +539,21 @@ namespace debug {
       assert(this->mSrcKernel.count(compId) > 0);
 
       return this->mSrcKernel.find(compId)->second;
+   }
+
+   void IEquation::writeDiagnostics(const bool, const bool) const
+   {
+   }
+
+   void IEquation::linkEquation(std::shared_ptr<IEquation> spEq)
+   {
+      // Default does nothing
+   }
+
+   void IEquation::updateConstraintKernel(const MHDFloat time, const MHDFloat timestep, const bool isFinished)
+   {
+      DebuggerMacro_msg("(Nothing to update for " + PhysicalNames::Coordinator::tag(this->name()) + "(it = " + std::to_string(this->options().it()) + "))", 5);
+      // Default does nothing
    }
 } // Equations
 } // QuICC

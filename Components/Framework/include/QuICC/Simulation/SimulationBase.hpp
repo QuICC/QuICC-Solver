@@ -12,6 +12,7 @@
 
 // Project includes
 //
+#include "QuICC/Equations/EquationOptions.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Timers/ExecutionTimer.hpp"
@@ -289,13 +290,18 @@ namespace QuICC {
 
    template <typename TEquation> std::shared_ptr<TEquation> SimulationBase::addEquation()
    {
+      // Create a null backend
       auto spBackend = std::shared_ptr<Model::IModelBackend>();
+
+      // Create default options
+      auto spOptions = std::make_shared<Equations::EquationOptions>();
 
       return this->addEquation<TEquation>(spBackend);
    }
 
    template <typename TEquation, typename TOptions> std::shared_ptr<TEquation> SimulationBase::addEquation(std::shared_ptr<TOptions> spOptions)
    {
+      // Create default backend
       auto spBackend = std::shared_ptr<Model::IModelBackend>();
 
       return this->addEquation<TEquation>(spBackend, spOptions);
@@ -306,8 +312,11 @@ namespace QuICC {
       // Create shared equation
       std::shared_ptr<TEquation>  spEq = std::make_shared<TEquation>(this->mspEqParams, this->mspRes->sim().spSpatialScheme(), spBackend);
 
+      // Create default options
+      auto spOptions = std::make_shared<Equations::EquationOptions>();
+
       // Add shared equation
-      this->mPseudospectral.addEquation(spEq);
+      this->mPseudospectral.addEquation(spEq, spOptions->it());
 
       return spEq;
    }
@@ -318,7 +327,7 @@ namespace QuICC {
       std::shared_ptr<TEquation>  spEq = std::make_shared<TEquation>(this->mspEqParams, this->mspRes->sim().spSpatialScheme(), spBackend, spOptions);
 
       // Add shared equation
-      this->mPseudospectral.addEquation(spEq);
+      this->mPseudospectral.addEquation(spEq, spOptions->it());
 
       return spEq;
    }

@@ -6,15 +6,9 @@
 #ifndef QUICC_STATEGENERATOR_HPP
 #define QUICC_STATEGENERATOR_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -31,12 +25,12 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         StateGenerator();
+         StateGenerator() = default;
 
          /**
           * @brief Simple empty destructor
           */
-         virtual ~StateGenerator();
+         virtual ~StateGenerator() = default;
 
       protected:
 
