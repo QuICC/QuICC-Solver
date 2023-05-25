@@ -3,21 +3,12 @@
  * @brief Source of vector equation interface
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/IVectorEquation.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/IVectorEquation.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
@@ -32,7 +23,8 @@ namespace Equations {
    {
    }
 
-   IVectorEquation::~IVectorEquation()
+   IVectorEquation::IVectorEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions)
+      : IFieldEquation(spEqParams, spScheme, spBackend, spOptions)
    {
    }
 
@@ -165,5 +157,5 @@ namespace Equations {
       return paths;
    }
 
-}
-}
+} // Equations
+} // QuICC

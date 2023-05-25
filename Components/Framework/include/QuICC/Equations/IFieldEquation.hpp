@@ -6,18 +6,9 @@
 #ifndef QUICC_EQUATIONS_IFIELDEQUATION_HPP
 #define QUICC_EQUATIONS_IFIELDEQUATION_HPP
 
-// First include
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -42,14 +33,26 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * \param spEqParams Shared equation parameters
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
           */
          explicit IFieldEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend);
 
          /**
+          * @brief Simple constructor
+          *
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
+          * @param spOptions  Additional options
+          */
+         explicit IFieldEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions);
+
+         /**
           * @brief Simple empty destructor
           */
-         virtual ~IFieldEquation();
+         virtual ~IFieldEquation() = default;
 
          /**
           * @brief Apply generic constraint on spectral data
@@ -1238,7 +1241,7 @@ namespace Equations {
       }
    }
 
-}
-}
+} // Equations
+} // QuICC
 
 #endif // QUICC_EQUATIONS_IFIELDEQUATION_HPP

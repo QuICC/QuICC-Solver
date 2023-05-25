@@ -7,16 +7,10 @@
 #ifndef QUICC_EQUATIONS_ISCALAREQUATION_HPP
 #define QUICC_EQUATIONS_ISCALAREQUATION_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
 #include <stdexcept>
-
-// External includes
-//
 
 // Project includes
 //
@@ -42,14 +36,26 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * \param spEqParams Shared equation parameters
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
           */
          explicit IScalarEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend);
 
          /**
+          * @brief Simple constructor
+          *
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
+          * @param spOptions  Additional options
+          */
+         explicit IScalarEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions);
+
+         /**
           * @brief Simple empty destructor
           */
-         virtual ~IScalarEquation();
+         virtual ~IScalarEquation() = default;
 
          /**
           * @brief Set the shared pointer to the unknown field
@@ -245,7 +251,7 @@ namespace Equations {
          std::visit([&](auto&& p){copyUnknown(eq, p->dom(0).perturbation(), compId, storage, matIdx, start, true, false);}, eq.spUnknown());
       }
    }
-}
-}
+} // Equations
+} // QuICC
 
 #endif // QUICC_EQUATIONS_ISCALAREQUATION_HPP

@@ -6,17 +6,12 @@
 #ifndef QUICC_EQUATIONS_IVECTOREQUATION_HPP
 #define QUICC_EQUATIONS_IVECTOREQUATION_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
 #include <memory>
 #include <stdexcept>
 
-// External includes
-//
 
 // Project includes
 //
@@ -48,14 +43,26 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * \param spEqParams Shared equation parameters
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
           */
          explicit IVectorEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend);
 
          /**
+          * @brief Simple constructor
+          *
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
+          * @param spOptions  Additional options
+          */
+         explicit IVectorEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions);
+
+         /**
           * @brief Simple empty destructor
           */
-         virtual ~IVectorEquation();
+         virtual ~IVectorEquation() = default;
 
          /**
           * @brief Set the smart pointer to the unknown field
@@ -231,7 +238,7 @@ namespace Equations {
       }
    }
 
-}
-}
+} // Equations
+} // QuICC
 
 #endif // QUICC_EQUATIONS_IVECTOREQUATION_HPP

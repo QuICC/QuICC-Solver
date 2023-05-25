@@ -88,7 +88,8 @@ namespace debug {
    {
    }
 
-   IEquation::~IEquation()
+   IEquation::IEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions)
+      : EquationData(spEqParams, spScheme, spBackend, spOptions)
    {
    }
 
@@ -535,5 +536,5 @@ namespace debug {
 
       return this->mSrcKernel.find(compId)->second;
    }
-}
-}
+} // Equations
+} // QuICC

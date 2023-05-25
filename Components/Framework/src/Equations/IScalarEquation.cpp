@@ -3,21 +3,12 @@
  * @brief Source of scalar equation interface
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/IScalarEquation.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
@@ -34,7 +25,8 @@ namespace Equations {
    {
    }
 
-   IScalarEquation::~IScalarEquation()
+   IScalarEquation::IScalarEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions)
+      : IFieldEquation(spEqParams, spScheme, spBackend, spOptions)
    {
    }
 
@@ -158,5 +150,5 @@ namespace Equations {
    {
       this->setSrcKernel(FieldComponents::Spectral::SCALAR, spKernel);
    }
-}
-}
+} // Equations
+} // QuICC

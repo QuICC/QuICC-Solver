@@ -3,21 +3,12 @@
  * @brief Source of generic field equation interface
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/IFieldEquation.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/IFieldEquation.hpp"
 
 namespace QuICC {
 
@@ -28,7 +19,8 @@ namespace Equations {
    {
    }
 
-   IFieldEquation::~IFieldEquation()
+   IFieldEquation::IFieldEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions)
+      : IEquation(spEqParams, spScheme, spBackend, spOptions)
    {
    }
 
@@ -68,5 +60,5 @@ namespace Equations {
 
       return MHDVariant();
    }
-}
-}
+} // Equations
+} // QuICC

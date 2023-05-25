@@ -36,10 +36,6 @@ namespace QuICC {
       QuICCTimer().start();
    }
 
-   SimulationBase::~SimulationBase()
-   {
-   }
-
    SharedSimulationBoundary SimulationBase::createBoundary()
    {
       // Create shared simulation boundary
