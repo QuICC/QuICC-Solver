@@ -6,28 +6,13 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSolvers/SparseTrivialCoordinator.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSolvers/SparseTrivialCoordinator.hpp"
 
 namespace QuICC {
 
 namespace Solver {
-
-   SparseTrivialCoordinator::SparseTrivialCoordinator()
-      : SparseCoordinatorBase<SparseTrivialSolver>()
-   {
-   }
-
-   SparseTrivialCoordinator::~SparseTrivialCoordinator()
-   {
-   }
 
    void SparseTrivialCoordinator::solve(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
@@ -47,7 +32,6 @@ namespace Solver {
       // Create real/complex solvers
       //
 
-      DebuggerMacro_start("Trivial: create solvers", 2);
       // Loop over all scalar equations
       for(auto& scalEqIt: make_range(scalEq))
       {
@@ -64,13 +48,11 @@ namespace Solver {
             this->createSolver(vectEqIt, compIt);
          }
       }
-      DebuggerMacro_stop("Trivial: create solvers t = ", 2);
 
       //
       // Initialise the solver storage
       //
 
-      DebuggerMacro_start("Trivial: create storage", 2);
       // Loop over all scalar equations
       for(auto& scalEqIt: make_range(scalEq))
       {
@@ -90,7 +72,6 @@ namespace Solver {
 
       // Initialise the start rows
       this->initStartRow();
-      DebuggerMacro_stop("Trivial: create storage t = ", 2);
 
       //
       // Initialise the solvers initial state
@@ -100,5 +81,5 @@ namespace Solver {
       this->initSolution(scalEq, vectEq);
    }
 
-}
-}
+} // Solver
+} // QuICC

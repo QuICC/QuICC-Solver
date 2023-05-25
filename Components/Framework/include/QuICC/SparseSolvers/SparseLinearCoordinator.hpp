@@ -6,13 +6,6 @@
 #ifndef QUICC_SOLVER_SPARSELINEARCOORDINATOR_HPP
 #define QUICC_SOLVER_SPARSELINEARCOORDINATOR_HPP
 
-// Configuration includes
-//
-
-// Debug includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-
 // System includes
 //
 #include <memory>
@@ -22,6 +15,7 @@
 
 // Project includes
 //
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverHasBc.hpp"
 #include "QuICC/SparseSolvers/SparseLinearCoordinatorBase.hpp"
@@ -60,12 +54,12 @@ namespace Solver {
          /**
           * @brief Constructor
           */
-         SparseLinearCoordinator();
+         SparseLinearCoordinator() = default;
 
          /**
           * @brief Destructor
           */
-         ~SparseLinearCoordinator();
+         virtual ~SparseLinearCoordinator() = default;
 
          /**
           * @brief Solve the equations
@@ -115,15 +109,19 @@ namespace Solver {
       std::map<std::size_t, DecoupledZSparse> ops;
 
       // Get model's linear operator with tau lines
+      DebuggerMacro_msg("building " + ModelOperator::Coordinator::tag(ModelOperator::ImplicitLinear::id()) + " matrix", 3);
       ops.insert(std::make_pair(ModelOperator::ImplicitLinear::id(), DecoupledZSparse()));
       spEq->buildModelMatrix(ops.find(ModelOperator::ImplicitLinear::id())->second, ModelOperator::ImplicitLinear::id(), comp, idx, ModelOperatorBoundary::SolverHasBc::id());
+      DebuggerMacro_msg("... done", 3);
 
+      DebuggerMacro_msg("building solver operators", 3);
       spSolver->buildOperators(idx, ops, spEq->couplingInfo(comp).systemN(idx));
+      DebuggerMacro_msg("... done", 3);
 
       // Solver is initialized
       spSolver->setInitialized();
    }
-}
-}
+} // Solver
+} // QuICC
 
 #endif // QUICC_SOLVER_SPARSELINEARCOORDINATOR_HPP

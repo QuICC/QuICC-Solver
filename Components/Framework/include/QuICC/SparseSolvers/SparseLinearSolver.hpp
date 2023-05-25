@@ -6,16 +6,10 @@
 #ifndef QUICC_SOLVER_SPARSELINEARSOLVER_HPP
 #define QUICC_SOLVER_SPARSELINEARSOLVER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
 #include <stdexcept>
-
-// External includes
-//
 
 // Project includes
 //
@@ -60,7 +54,7 @@ namespace Solver {
          /**
           * @brief Destructor
           */
-         virtual ~SparseLinearSolver();
+         virtual ~SparseLinearSolver() = default;
 
          /**
           * @brief Initialise the solver matrices storage
@@ -188,7 +182,7 @@ namespace Solver {
          /// Typedef for shared solver
          typedef std::shared_ptr< TSolver<TOperator> > SharedSolverType;
          /// Typedef for vector of shared solvers
-         typedef std::vector<SharedSolverType, Eigen::aligned_allocator<SharedSolverType> > VectorSharedSolverType;
+         typedef std::vector<SharedSolverType> VectorSharedSolverType;
 
          /**
           * @brief Has solver matrix?
@@ -316,10 +310,6 @@ namespace Solver {
 
    template <typename TOperator,typename TData,template <typename> class TSolver> SparseLinearSolver<TOperator,TData,TSolver>::SparseLinearSolver(const int start, const std::size_t timeId)
       : SparseSolverBase(start, timeId), mOpId(Tag::Operator::Lhs::id()), mId(0.0)
-   {
-   }
-
-   template <typename TOperator,typename TData,template <typename> class TSolver> SparseLinearSolver<TOperator,TData,TSolver>::~SparseLinearSolver()
    {
    }
 
@@ -471,13 +461,12 @@ namespace Solver {
 
          for(size_t i = 0; i < it->second.size(); ++i)
          {
-            Eigen::aligned_allocator< TSolver<TOperator> > alloc;
             #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
                MpiFramework::syncSubComm(MpiFramework::SPECTRAL, i);
 
-               std::shared_ptr< TSolver<TOperator> >  solver = std::allocate_shared< TSolver<TOperator> >(alloc, MpiFramework::getSubComm(MpiFramework::SPECTRAL, i));
+               std::shared_ptr< TSolver<TOperator> >  solver = std::make_shared< TSolver<TOperator> >(MpiFramework::getSubComm(MpiFramework::SPECTRAL, i));
             #else
-               std::shared_ptr< TSolver<TOperator> >  solver = std::allocate_shared< TSolver<TOperator> >(alloc);
+               std::shared_ptr< TSolver<TOperator> >  solver = std::make_shared< TSolver<TOperator> >();
             #endif //define QUICC_MPI && defined QUICC_MPISPSOLVE
 
             sIt->second.push_back(solver);
@@ -736,7 +725,7 @@ namespace Solver {
          rVal += corr;
       }
    }
-}
-}
+} // Solver
+} // QuICC
 
 #endif // QUICC_SOLVER_SPARSELINEARSOLVER_HPP

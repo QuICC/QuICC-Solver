@@ -6,18 +6,9 @@
 #ifndef QUICC_SPECTRAL_KERNEL_ISPECTRALKERNEL_HPP
 #define QUICC_SPECTRAL_KERNEL_ISPECTRALKERNEL_HPP
 
-// First include
-//
-
-// Configuration includes
-//
-#include <memory>
-
 // System includes
 //
-
-// External includes
-//
+#include <memory>
 
 // Project includes
 //
@@ -46,7 +37,7 @@ namespace Kernel {
          /**
           * @brief Simple empty destructor
           */
-         virtual ~ISpectralKernel();
+         virtual ~ISpectralKernel() = default;
 
          /**
           * @brief Set the smart pointer to the scalar field
@@ -82,9 +73,9 @@ namespace Kernel {
          /**
           * @brief Apply kernel
           *
-          * @param id   Component ID
+          * @param timeId   Timing ID
           */
-         virtual void apply();
+         virtual void apply(const std::size_t timeId);
          
       protected:
          /**
@@ -137,8 +128,8 @@ namespace Kernel {
    /// Typedef for a smart ISpectralKernel
    typedef std::shared_ptr<ISpectralKernel> SharedISpectralKernel;
    
-}
-}
-}
+} // Kernel
+} // Spectral
+} // QuICC
 
 #endif // QUICC_SPECTRAL_KERNEL_ISPECTRALKERNEL_HPP

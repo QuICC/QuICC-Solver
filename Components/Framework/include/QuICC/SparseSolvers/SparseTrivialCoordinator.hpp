@@ -6,17 +6,7 @@
 #ifndef QUICC_SOLVER_SPARSETRIVIALCOORDINATOR_HPP
 #define QUICC_SOLVER_SPARSETRIVIALCOORDINATOR_HPP
 
-// Configuration includes
-//
-
-// Debug includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -51,12 +41,12 @@ namespace Solver {
          /**
           * @brief Constructor
           */
-         SparseTrivialCoordinator();
+         SparseTrivialCoordinator() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~SparseTrivialCoordinator();
+         virtual ~SparseTrivialCoordinator() = default;
 
          /**
           * @brief Initialise solver coordinator
@@ -80,7 +70,7 @@ namespace Solver {
 
       private:
    };
-}
-}
+} // Solver
+} // QuICC
 
 #endif // QUICC_SOLVER_SPARSETRIVIALCOORDINATORBASE_HPP

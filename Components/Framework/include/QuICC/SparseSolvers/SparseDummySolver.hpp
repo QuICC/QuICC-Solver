@@ -6,18 +6,13 @@
 #ifndef QUICC_SOLVER_SPARSEDUMMYSOLVER_HPP
 #define QUICC_SOLVER_SPARSEDUMMYSOLVER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Typedefs.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 
 namespace QuICC {
@@ -82,8 +77,9 @@ namespace Solver {
 
    typedef std::shared_ptr<SparseDummySolverComplexType> SharedSparseDummySolverComplexType;
 
-   typedef std::vector<SharedSparseDummySolverComplexType, Eigen::aligned_allocator<SharedSparseDummySolverComplexType> >::iterator ComplexDummy_iterator;
-}
-}
+   typedef std::vector<SharedSparseDummySolverComplexType>::iterator ComplexDummy_iterator;
+
+} // Solver
+} // QuICC
 
 #endif // QUICC_SOLVER_SPARSEDUMMYSOLVER_HPP

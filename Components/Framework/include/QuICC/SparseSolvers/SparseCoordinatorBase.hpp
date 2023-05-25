@@ -6,13 +6,7 @@
 #ifndef QUICC_SOLVER_SPARSECOORDINATORBASE_HPP
 #define QUICC_SOLVER_SPARSECOORDINATORBASE_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -150,6 +144,8 @@ namespace Solver {
 
    template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorBase<TSolver>::createSolver(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
    {
+      DebuggerMacro_msg("Creating solver for " + PhysicalNames::Coordinator::tag(spEq->name()) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(comp)) + ")", 2);
+
       // System has a complex operator
       if(spEq->couplingInfo(comp).isComplex())
       {
@@ -162,10 +158,14 @@ namespace Solver {
          typename SparseCoordinatorBase<TSolver>::RealSolver_iterator solIt;
          this->addSolver(solIt, spEq->couplingInfo(comp).solverIndex(), spEq->couplingInfo(comp).fieldStart(), spEq->solveTiming());
       }
+
+      DebuggerMacro_msg("... done", 2);
    }
 
    template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorBase<TSolver>::createStorage(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
    {
+      DebuggerMacro_msg("Creating storage for solver for " + PhysicalNames::Coordinator::tag(spEq->name()) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(comp)) + ")", 2);
+
       // ID of the current field
       SpectralFieldId myId = std::make_pair(spEq->name(),comp);
 
@@ -182,6 +182,8 @@ namespace Solver {
       {
          setupSolverStorage<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, spEq, myIdx, myId);
       }
+
+      DebuggerMacro_msg("... done", 2);
    }
 
    template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorBase<TSolver>::transferOutput(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
@@ -400,7 +402,7 @@ namespace Solver {
          }
       }
    }
-}
-}
+} // Solver
+} // QuICC
 
 #endif // QUICC_SOLVER_SPARSECOORDINATORBASE_HPP

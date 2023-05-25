@@ -6,32 +6,17 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSolvers/SparseLinearCoordinator.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSolvers/SparseLinearCoordinator.hpp"
 
 namespace QuICC {
 
 namespace Solver {
 
-   SparseLinearCoordinator::SparseLinearCoordinator()
-      : SparseLinearCoordinatorBase<SparseLinearSolver>()
-   {
-   }
-
-   SparseLinearCoordinator::~SparseLinearCoordinator()
-   {
-   }
-
    void SparseLinearCoordinator::solve(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
-      // Update the equation input to the timestepper
+      // Update the equation input to the linear solver
       this->getInput(scalEq, vectEq, scalVar, vectVar);
 
       // Solve all the linear systems

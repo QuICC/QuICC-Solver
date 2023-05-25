@@ -9,6 +9,12 @@
 // Project includes
 //
 #include "QuICC/Equations/IFieldEquation.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+   #include "QuICC/PhysicalNames/Coordinator.hpp"
+   #include "QuICC/SolveTiming/Coordinator.hpp"
+   #include "QuICC/Tools/IdToHuman.hpp"
+#endif // QUICC_DEBUG
 
 namespace QuICC {
 
@@ -24,15 +30,17 @@ namespace Equations {
    {
    }
 
-   bool IFieldEquation::applyConstraint(FieldComponents::Spectral::Id compId)
+   bool IFieldEquation::applyConstraint(FieldComponents::Spectral::Id compId, const std::size_t timeId)
    {
       bool changedSolution = false;
 
       // Use source kernel
       if(this->mConstraintKernel.count(compId) > 0)
       {
+         DebuggerMacro_msg("Apply constraint kernel for " + PhysicalNames::Coordinator::tag(this->name()) + "(" + QuICC::Tools::IdToHuman::toString(compId) + ") at " + SolveTiming::Coordinator::tag(timeId) , 6);
+
          changedSolution = true;
-         this->mConstraintKernel.find(compId)->second->apply();
+         this->mConstraintKernel.find(compId)->second->apply(timeId);
       }
 
       return changedSolution;

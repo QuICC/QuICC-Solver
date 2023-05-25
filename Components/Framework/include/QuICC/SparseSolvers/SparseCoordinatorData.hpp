@@ -6,19 +6,21 @@
 #ifndef QUICC_SOLVER_SPARSECOORDINATORDATA_HPP
 #define QUICC_SOLVER_SPARSECOORDINATORDATA_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+#include "QuICC/PhysicalNames/Coordinator.hpp"
+#include "QuICC/ModelOperator/Coordinator.hpp"
+#include "QuICC/Tools/IdToHuman.hpp"
+#endif
 #include "QuICC/Typedefs.hpp"
+#include "QuICC/SolveTiming/Before.hpp"
+#include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
@@ -49,10 +51,10 @@ namespace Solver {
          typedef typename std::shared_ptr<ComplexSolverType >  SharedComplexSolverType;
 
          /// Typedef for an iterator to a real operator solver
-         typedef typename std::vector<SharedRealSolverType, Eigen::aligned_allocator<SharedRealSolverType> >::iterator   RealSolver_iterator;
+         typedef typename std::vector<SharedRealSolverType>::iterator   RealSolver_iterator;
 
          /// Typedef for an iterator to a complex operator solver
-         typedef typename std::vector<SharedComplexSolverType, Eigen::aligned_allocator<SharedComplexSolverType> >::iterator   ComplexSolver_iterator;
+         typedef typename std::vector<SharedComplexSolverType>::iterator   ComplexSolver_iterator;
 
          /// Typedef for a shared scalar variable map
          typedef std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>  ScalarVariable_map;
@@ -63,40 +65,44 @@ namespace Solver {
          /**
           * @brief Constructor
           */
-         SparseCoordinatorData();
+         SparseCoordinatorData() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~SparseCoordinatorData();
+         virtual ~SparseCoordinatorData() = default;
 
          /**
           * @brief Set iterator for real operator solver
           *
-          * \mhdBug Should not be public
+          * @param solIt   Solver iterator
+          * @param idx     Index
           */
-         void setIterator(RealSolver_iterator& solIt);
+         void setIterator(RealSolver_iterator& solIt, const int idx = 0);
 
          /**
           * @brief Set iterator for complex operator solver
           *
-          * \mhdBug Should not be public
+          * @param solIt   Solver iterator
+          * @param idx     Index
           */
-         void setIterator(ComplexSolver_iterator& solIt);
+         void setIterator(ComplexSolver_iterator& solIt, const int idx = 0);
 
          /**
-          * @brief Set end iterator for real operator solver
+          * @brief Set iterator range for real operator solver
           *
-          * \mhdBug Should not be public
+          * @param begIt   Begin iterator
+          * @param endIt   End iterator
           */
-         void setEndIterator(RealSolver_iterator& solIt);
+         void setRange(RealSolver_iterator& begIt, RealSolver_iterator& endIt);
 
          /**
-          * @brief Set end iterator for complex operator solver
+          * @brief Set iterator range for complex operator solver
           *
-          * \mhdBug Should not be public
+          * @param begIt   Begin iterator
+          * @param endIt   End iterator
           */
-         void setEndIterator(ComplexSolver_iterator& solIt);
+         void setRange(ComplexSolver_iterator& begIt, ComplexSolver_iterator& endIt);
 
          /**
           * @brief Get current solver time
@@ -137,12 +143,12 @@ namespace Solver {
          /**
           * @brief Vector of (coupled) real operator
           */
-         std::vector<SharedRealSolverType, Eigen::aligned_allocator<SharedRealSolverType> > mRealSolvers;
+         std::vector<SharedRealSolverType> mRealSolvers;
 
          /**
           * @brief Vector of (coupled) complex operator
           */
-         std::vector<SharedComplexSolverType, Eigen::aligned_allocator<SharedComplexSolverType> > mComplexSolvers;
+         std::vector<SharedComplexSolverType> mComplexSolvers;
 
          /**
           * @brief Storage for the current solve time
@@ -216,14 +222,6 @@ namespace Solver {
    //
    //
 
-   template <template <class,class,template <class> class> class TSolver> SparseCoordinatorData<TSolver>::SparseCoordinatorData()
-   {
-   }
-
-   template <template <class,class,template <class> class> class TSolver> SparseCoordinatorData<TSolver>::~SparseCoordinatorData()
-   {
-   }
-
    template <template <class,class,template <class> class> class TSolver> std::size_t SparseCoordinatorData<TSolver>::solveTime() const
    {
       return this->mSolveTime;
@@ -236,22 +234,40 @@ namespace Solver {
 
    template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::addSolver(typename SparseCoordinatorData<TSolver>::RealSolver_iterator, const int idx, const int start, const std::size_t timeId)
    {
-      if(idx > static_cast<int>(this->mRealSolvers.size()) - 1)
+      DebuggerMacro_msg("Creating real solver for idx = " + std::to_string(idx) + "/" + std::to_string(this->mRealSolvers.size()), 3);
+
+      for(int i = static_cast<int>(this->mRealSolvers.size()); i <= idx; i++)
+      {
+         this->mRealSolvers.push_back(nullptr);
+      }
+
+      if(this->mRealSolvers.at(idx) == nullptr)
       {
          auto spSolver = std::make_shared<SparseCoordinatorData<TSolver>::RealSolverType>(start,timeId);
 
-         this->mRealSolvers.push_back(spSolver);
+         this->mRealSolvers.at(idx) = spSolver;
       }
+
+      DebuggerMacro_msg("... current number of real solvers = " + std::to_string(this->mRealSolvers.size()), 3);
    }
 
    template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::addSolver(typename SparseCoordinatorData<TSolver>::ComplexSolver_iterator, const int idx, const int start, const std::size_t timeId)
    {
-      if(idx > static_cast<int>(this->mComplexSolvers.size()) - 1)
+      DebuggerMacro_msg("Creating complex solver for idx = " + std::to_string(idx) + "/" + std::to_string(this->mComplexSolvers.size()), 3);
+
+      for(int i = static_cast<int>(this->mComplexSolvers.size()); i <= idx; i++)
+      {
+         this->mComplexSolvers.push_back(nullptr);
+      }
+
+      if(this->mComplexSolvers.at(idx) == nullptr)
       {
          auto spSolver = std::make_shared<SparseCoordinatorData<TSolver>::ComplexSolverType>(start,timeId);
 
-         this->mComplexSolvers.push_back(spSolver);
+         this->mComplexSolvers.at(idx) = spSolver;
       }
+
+      DebuggerMacro_msg("... current number of complex solvers = " + std::to_string(this->mComplexSolvers.size()), 3);
    }
 
    template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::initStartRow()
@@ -271,12 +287,18 @@ namespace Solver {
    {
       for(auto rIt = this->mRealSolvers.begin(); rIt != this->mRealSolvers.end(); ++rIt)
       {
-         (*rIt)->zeroSolver();
+         if((*rIt)->solveTiming() == this->solveTime())
+         {
+            (*rIt)->zeroSolver();
+         }
       }
 
       for(auto zIt = this->mComplexSolvers.begin(); zIt != this->mComplexSolvers.end(); ++zIt)
       {
-         (*zIt)->zeroSolver();
+         if((*zIt)->solveTiming() == this->solveTime())
+         {
+            (*zIt)->zeroSolver();
+         }
       }
    }
 
@@ -291,24 +313,30 @@ namespace Solver {
       }
    }
 
-   template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::setIterator(typename SparseCoordinatorData<TSolver>::RealSolver_iterator& solIt)
+   template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::setIterator(typename SparseCoordinatorData<TSolver>::RealSolver_iterator& solIt, const int idx)
    {
       solIt = this->mRealSolvers.begin();
+      assert(std::distance(solIt, this->mRealSolvers.end()) > idx);
+      std::advance(solIt, idx);
    }
 
-   template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::setIterator(typename SparseCoordinatorData<TSolver>::ComplexSolver_iterator& solIt)
+   template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::setIterator(typename SparseCoordinatorData<TSolver>::ComplexSolver_iterator& solIt, const int idx)
    {
       solIt = this->mComplexSolvers.begin();
+      assert(std::distance(solIt, this->mComplexSolvers.end()) > idx);
+      std::advance(solIt, idx);
    }
 
-   template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::setEndIterator(typename SparseCoordinatorData<TSolver>::RealSolver_iterator& solIt)
+   template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::setRange(typename SparseCoordinatorData<TSolver>::RealSolver_iterator& begIt, typename SparseCoordinatorData<TSolver>::RealSolver_iterator& endIt)
    {
-      solIt = this->mRealSolvers.end();
+      begIt = this->mRealSolvers.begin();
+      endIt = this->mRealSolvers.end();
    }
 
-   template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::setEndIterator(typename SparseCoordinatorData<TSolver>::ComplexSolver_iterator& solIt)
+   template <template <class,class,template <class> class> class TSolver> void SparseCoordinatorData<TSolver>::setRange(typename SparseCoordinatorData<TSolver>::ComplexSolver_iterator& begIt, typename SparseCoordinatorData<TSolver>::ComplexSolver_iterator& endIt)
    {
-      solIt = this->mComplexSolvers.end();
+      begIt = this->mComplexSolvers.begin();
+      endIt = this->mComplexSolvers.end();
    }
 
    //
@@ -320,8 +348,7 @@ namespace Solver {
    {
       // Create iterator to current solver
       TSolverIt solIt;
-      coord.setIterator(solIt);
-      std::advance(solIt, idx);
+      coord.setIterator(solIt, idx);
 
       // setup storage and information
       setupStorage(spEq, id, solIt);
@@ -331,8 +358,9 @@ namespace Solver {
    {
       // Create iterator to current solver
       TSolverIt solIt;
-      coord.setIterator(solIt);
-      std::advance(solIt, idx);
+      coord.setIterator(solIt, idx);
+
+      DebuggerMacro_msg("Get solver solution for " + PhysicalNames::Coordinator::tag(id.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(id.second)) + ")", 6);
 
       // Get solver output
       for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
@@ -341,7 +369,7 @@ namespace Solver {
       }
 
       // Apply constraint on solution
-      auto changedSolution = spEq->applyConstraint(id.second);
+      auto changedSolution = spEq->applyConstraint(id.second, SolveTiming::After::id());
 
       // Update solver solution if constraint modified it
       if(changedSolution)
@@ -363,9 +391,8 @@ namespace Solver {
    {
       // Create iterator to current solver
       TSolverIt solIt;
-      coord.setIterator(solIt);
       TSolverIt endIt;
-      coord.setEndIterator(endIt);
+      coord.setRange(solIt, endIt);
 
       for(; solIt != endIt; ++solIt)
       {
@@ -377,9 +404,8 @@ namespace Solver {
    {
       // Create iterator to current solver
       TSolverIt solIt;
-      coord.setIterator(solIt);
       TSolverIt endIt;
-      coord.setEndIterator(endIt);
+      coord.setRange(solIt, endIt);
 
       for(; solIt != endIt; ++solIt)
       {
@@ -391,9 +417,8 @@ namespace Solver {
    {
       // Create iterator to current solver
       TSolverIt solIt;
-      coord.setIterator(solIt);
       TSolverIt endIt;
-      coord.setEndIterator(endIt);
+      coord.setRange(solIt, endIt);
 
       std::pair<bool,MHDFloat>  status = std::make_pair(false, -1.0);
       for(; solIt != endIt; ++solIt)
@@ -401,6 +426,7 @@ namespace Solver {
          if((*solIt)->solveTiming() == coord.solveTime())
          {
             bool solving = false;
+            DebuggerMacro_msg("Looping over Solvers", 8);
             do
             {
                // Prepare solve of linear system
@@ -408,6 +434,8 @@ namespace Solver {
 
                if(needSolve)
                {
+                  DebuggerMacro_msg("...solving", 9);
+
                   // Solve linear system
                   (*solIt)->solve();
 
@@ -437,9 +465,8 @@ namespace Solver {
    {
       // Create iterator to current solver
       TSolverIt solIt;
-      coord.setIterator(solIt);
       TSolverIt endIt;
-      coord.setEndIterator(endIt);
+      coord.setRange(solIt, endIt);
 
       for(; solIt != endIt; ++solIt)
       {
@@ -452,8 +479,7 @@ namespace Solver {
    {
       // Create iterator to current solver
       TSolverIt solIt;
-      coord.setIterator(solIt);
-      std::advance(solIt, idx);
+      coord.setIterator(solIt, idx);
 
       // Get solver input
       for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
@@ -475,8 +501,9 @@ namespace Solver {
    {
       // Create iterator to current complex field solver
       TSolverIt solIt;
-      coord.setIterator(solIt);
-      std::advance(solIt, idx);
+      coord.setIterator(solIt, idx);
+
+      DebuggerMacro_msg("Get explicit solver input for " + PhysicalNames::Coordinator::tag(id.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(id.second)) + ")", 6);
 
       // Get solver input
       computeExplicitSolverInput<TSolverIt,TEq>(spEq, id, solIt, opId, scalVar, vectVar);
@@ -484,10 +511,14 @@ namespace Solver {
 
    template <template <class,class,template <class> class> class TSolver,typename TSolverIt,typename TEq> void getSolverInput(SparseCoordinatorData<TSolver>& coord, TEq spEq, const int idx, SpectralFieldId id, const typename SparseCoordinatorData<TSolver>::ScalarVariable_map& scalVar, const typename SparseCoordinatorData<TSolver>::VectorVariable_map& vectVar)
    {
+      // Apply constraint on solution
+      spEq->applyConstraint(id.second, SolveTiming::Before::id());
+
       // Create iterator to current complex field solver
       TSolverIt solIt;
-      coord.setIterator(solIt);
-      std::advance(solIt, idx);
+      coord.setIterator(solIt, idx);
+
+      DebuggerMacro_msg("Get solver input for " + PhysicalNames::Coordinator::tag(id.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(id.second)) + ")", 6);
 
       // Get solver input
       computeSolverInput<TSolverIt,TEq>(spEq, id, solIt, scalVar, vectVar);
@@ -499,11 +530,23 @@ namespace Solver {
 
    template <typename TSolverIt,typename TEq> void computeExplicitSolverInput(const TEq spEq, const SpectralFieldId id, const TSolverIt solveIt, const std::size_t opId, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalVar, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectVar)
    {
-      // Get timestep input
-      for(std::size_t i = 0; i < (*solveIt)->nSystem(); i++)
+      // Build range of operator
+      auto r = make_range(spEq->couplingInfo(id.second).explicitRange(opId));
+
+#ifdef QUICC_DEBUG
+      if(r.size() == 0)
       {
-         // Loop over explicit fields
-         for(auto& fIt: make_range(spEq->couplingInfo(id.second).explicitRange(opId)))
+         DebuggerMacro_msg("(Nothing)", 7);
+      }
+#endif // QUICC_DEBUG
+
+      // Loop over explicit fields
+      for(auto& fIt: r)
+      {
+         DebuggerMacro_msg("Add " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(fIt.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(fIt.second)) + ")", 7);
+
+         // Get explicit input
+         for(std::size_t i = 0; i < (*solveIt)->nSystem(); i++)
          {
             if(fIt.second == FieldComponents::Spectral::SCALAR)
             {
@@ -566,7 +609,7 @@ namespace Solver {
       (*solveIt)->addInformation(id, spEq->couplingInfo(id.second).fieldIndex(), startRow);
    }
 
-}
-}
+} // Solver
+} // QuICC
 
 #endif // QUICC_SOLVER_SPARSECOORDINATORDATA_HPP

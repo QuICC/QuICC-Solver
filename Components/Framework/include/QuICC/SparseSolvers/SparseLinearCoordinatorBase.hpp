@@ -6,23 +6,14 @@
 #ifndef QUICC_SOLVER_SPARSELINEARCOORDINATORBASE_HPP
 #define QUICC_SOLVER_SPARSELINEARCOORDINATORBASE_HPP
 
-// Debug includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 #include <Eigen/Sparse>
 #include <Eigen/IterativeLinearSolvers>
 
 // Project includes
 //
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/SparseSolvers/SparseCoordinatorBase.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
@@ -58,7 +49,7 @@ namespace Solver {
          /**
           * @brief Destructor
           */
-         virtual ~SparseLinearCoordinatorBase();
+         virtual ~SparseLinearCoordinatorBase() = default;
 
          /**
           * @brief Initialise solver coordinator
@@ -157,10 +148,6 @@ namespace Solver {
    {
    }
 
-   template <template <class,class,template <class> class> class TSolver> SparseLinearCoordinatorBase<TSolver>::~SparseLinearCoordinatorBase()
-   {
-   }
-
    template <template <class,class,template <class> class> class TSolver> void SparseLinearCoordinatorBase<TSolver>::createCoordSolvers(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
    {
       StageTimer  stage;
@@ -173,8 +160,6 @@ namespace Solver {
       // Loop over all scalar equations
       for(auto& scalEqIt: make_range(scalEq))
       {
-         DebuggerMacro_msg("---> scalar solver", 2);
-
          // Get type information for the linear solvers
          this->createSolver(scalEqIt, FieldComponents::Spectral::SCALAR);
       }
@@ -182,8 +167,6 @@ namespace Solver {
       // Loop over all vector equations
       for(auto& vectEqIt: make_range(vectEq))
       {
-         DebuggerMacro_msg("---> vector solver", 2);
-
          // Get type information for the linear solvers
          for(auto& compIt: make_range(vectEqIt->spectralRange()))
          {
@@ -206,8 +189,6 @@ namespace Solver {
       // Loop over all scalar equations
       for(auto& scalEqIt: make_range(scalEq))
       {
-         DebuggerMacro_msg("---> scalar storage", 2);
-
          // Create storage
          this->createStorage(scalEqIt, FieldComponents::Spectral::SCALAR);
       }
@@ -215,8 +196,6 @@ namespace Solver {
       // Loop over all vector equations
       for(auto& vectEqIt: make_range(vectEq))
       {
-         DebuggerMacro_msg("---> vector storage", 2);
-
          // Create storage
          for(auto& compIt: make_range(vectEqIt->spectralRange()))
          {
@@ -238,8 +217,6 @@ namespace Solver {
       // Loop over all scalar equations
       for(auto& scalEqIt: make_range(scalEq))
       {
-         DebuggerMacro_msg("---> scalar operators", 2);
-
          // Create (coupled) matrices
          this->createMatrices(scalEqIt, FieldComponents::Spectral::SCALAR);
       }
@@ -247,8 +224,6 @@ namespace Solver {
       // Loop over all vector equations
       for(auto& vectEqIt: make_range(vectEq))
       {
-         DebuggerMacro_msg("---> vector operators", 2);
-
          // Create (coupled) matrices
          for(auto& compIt: make_range(vectEqIt->spectralRange()))
          {
@@ -294,6 +269,8 @@ namespace Solver {
 
    template <template <class,class,template <class> class> class TSolver> void SparseLinearCoordinatorBase<TSolver>::createMatrices(Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp)
    {
+      DebuggerMacro_msg("creating operators for " + PhysicalNames::Coordinator::tag(spEq->name()) + "(" + std::to_string(comp) + ")", 2);
+
       // ID of the current field
       SpectralFieldId myId = std::make_pair(spEq->name(),comp);
 
@@ -310,6 +287,8 @@ namespace Solver {
       {
          buildSolverMatricesSolver<TSolver,typename SparseCoordinatorBase<TSolver>::RealSolver_iterator>(*this, spEq, myIdx, myId);
       }
+
+      DebuggerMacro_msg("... done", 2);
    }
 
    template <template <class,class,template <class> class> class TSolver> void SparseLinearCoordinatorBase<TSolver>::solveSystems()
@@ -336,8 +315,7 @@ namespace Solver {
    {
       // Create iterator to current solver
       TSolverIt solIt;
-      coord.setIterator(solIt);
-      std::advance(solIt, idx);
+      coord.setIterator(solIt, idx);
 
       // Build solver matrices
       if(! (*solIt)->isInitialized())
@@ -345,7 +323,7 @@ namespace Solver {
          coord.buildSolverMatrices(spEq, id, solIt);
       }
    }
-}
-}
+} // Solver
+} // QuICC
 
 #endif // QUICC_SOLVER_SPARSELINEARCOORDINATORBASE_HPP

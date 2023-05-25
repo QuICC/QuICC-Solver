@@ -3,21 +3,12 @@
  * @brief Source of building block for the implementation of a spectral kernel
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpectralKernels/ISpectralKernel.hpp"
-
 // Project includes
 //
+#include "QuICC/SpectralKernels/ISpectralKernel.hpp"
 
 namespace QuICC {
 
@@ -27,10 +18,6 @@ namespace Kernel {
 
    ISpectralKernel::ISpectralKernel(const bool isComplex)
       : mIsComplex(isComplex)
-   {
-   }
-
-   ISpectralKernel::~ISpectralKernel()
    {
    }
 
@@ -53,7 +40,7 @@ namespace Kernel {
       return *this->mspRes;
    }
 
-   void ISpectralKernel::apply()
+   void ISpectralKernel::apply(const std::size_t timeId)
    {
    }
 
@@ -89,6 +76,6 @@ namespace Kernel {
       return this->mVectors.find(name)->second;
    }
 
-}
-}
-}
+} // Kernel
+} // Spectral
+} // QuICC

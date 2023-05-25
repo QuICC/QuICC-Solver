@@ -13,6 +13,7 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Polynomial/Worland/Operators.hpp"
+#include "QuICC/SolveTiming/After.hpp"
 
 namespace QuICC {
 
@@ -24,10 +25,6 @@ namespace Sphere {
 
    ConserveAngularMomentum::ConserveAngularMomentum(const bool isComplex)
       : ISpectralKernel(isComplex), mHasM0(false), mHasM1(false), mM0j(-1), mM0k(-1), mM1j(-1), mM1k(-1)
-   {
-   }
-
-   ConserveAngularMomentum::~ConserveAngularMomentum()
    {
    }
 
@@ -49,7 +46,8 @@ namespace Sphere {
                   this->mM0j = j;
                   this->mM0k = k;
                   this->mHasM0 = true;
-               } else if(l_ == 1 && m_ == 1)
+               }
+               else if(l_ == 1 && m_ == 1)
                {
                   this->mM1j = j;
                   this->mM1k = k;
@@ -57,7 +55,8 @@ namespace Sphere {
                }
             }
          }
-      } else
+      }
+      else
       {
          // Loop over harmonic degree l
          for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
@@ -99,41 +98,41 @@ namespace Sphere {
       if(this->mIsComplex)
       {
          return MHDComplex(0,0);
-      } else
+      }
+      else
       {
          return 0.0;
       }
    }
 
-   void ConserveAngularMomentum::apply()
+   void ConserveAngularMomentum::apply(const std::size_t timeId)
    {
-      assert(this->mScalars.size() == 0);
-      assert(this->mVectors.size() == 1);
-      auto& field = this->mVectors.begin()->second;
-
-      ArrayZ mom;
-      if(this->mHasM1)
+      if(timeId == SolveTiming::After::id())
       {
-         std::visit([&](auto&& f){
-            mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM1j, this->mM1k));
-            DebuggerMacro_showValue("Angular momentum correction m = 1: ", 2,
-                  std::abs(mom(0) - f->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR).point(0, this->mM1j,this->mM1k)));
-            f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM1j,this->mM1k);
-         }, field);
-      }
+         assert(this->mScalars.size() == 0);
+         assert(this->mVectors.size() == 1);
+         auto& field = this->mVectors.begin()->second;
 
-      if(this->mHasM0)
-      {
-         std::visit([&](auto&& f){
-            mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM0j, this->mM0k));
-            DebuggerMacro_showValue("Angular momentum correction m = 0: ", 2,
-                  std::abs(mom(0) - f->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR).point(0, this->mM0j,this->mM0k)));
-            f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM0j, this->mM0k);
-         }, field);
+         ArrayZ mom;
+         if(this->mHasM1)
+         {
+            std::visit([&](auto&& f){
+                  mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM1j, this->mM1k));
+                  f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM1j,this->mM1k);
+                  }, field);
+         }
+
+         if(this->mHasM0)
+         {
+            std::visit([&](auto&& f){
+                  mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM0j, this->mM0k));
+                  f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM0j, this->mM0k);
+                  }, field);
+         }
       }
    }
 
-}
-}
-}
-}
+} // Sphere
+} // Kernel
+} // Spectral
+} // QuICC

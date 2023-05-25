@@ -58,9 +58,10 @@ namespace Equations {
           * @brief Apply generic constraint on spectral data
           *
           * @param compId  ID of the spectral component
+          * @param timeId  Timing of the constraint
           * @return contraint changed solution?
           */
-         virtual bool applyConstraint(FieldComponents::Spectral::Id compId);
+         virtual bool applyConstraint(FieldComponents::Spectral::Id compId, const std::size_t timeId);
 
          /**
           * @brief Generic source term implementation
