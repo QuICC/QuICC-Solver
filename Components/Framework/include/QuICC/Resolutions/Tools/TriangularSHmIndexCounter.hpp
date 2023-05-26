@@ -41,7 +41,7 @@ namespace QuICC {
           * @param simId  ID of the simulation dimension (SIM1D, SIM2D, SIM3D)
           * @param spaceId ID of the space (PHYSICAL, SPECTRAL)
           */
-         virtual int dim(const Dimensions::Simulation::Id simId, const Dimensions::Space::Id spaceId, const MHDFloat idx) const;
+         int dim(const Dimensions::Simulation::Id simId, const Dimensions::Space::Id spaceId, const MHDFloat idx) const final;
 
          /**
           * @brief Reorder dimensions from fast to slow
@@ -50,7 +50,7 @@ namespace QuICC {
           *
           * @param spaceId Spacial the resolution represent
           */
-         virtual ArrayI orderedDimensions(const Dimensions::Space::Id spaceId) const;
+         ArrayI orderedDimensions(const Dimensions::Space::Id spaceId) const final;
 
          /**
           * @brief Reorder dimensions from fast to slow
@@ -60,27 +60,27 @@ namespace QuICC {
           * @param dims    Array of dimensions to reorder (1D, 2D, 3D, ...)
           * @param spaceId Spacial the resolution represent
           */
-         virtual ArrayI orderedDimensions(const ArrayI& dims, const Dimensions::Space::Id spaceId) const;
+         ArrayI orderedDimensions(const ArrayI& dims, const Dimensions::Space::Id spaceId) const final;
 
          /**
           * @brief Comput the offsets for the local modes
           */
-         virtual void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const;
+         void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const final;
 
          /**
           * @brief Compute the offsets for the local modes by comparing to a reference simulation
           */
-         virtual void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const;
+         void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const final;
 
          /**
           * @brief Generate index key as vector
           */
-         virtual std::vector<int> makeVKey(const Dimensions::Transform::Id id, const int i, const int j, const int k) const;
+         std::vector<int> makeVKey(const Dimensions::Transform::Id id, const int i, const int j, const int k) const final;
 
          /**
           * @brief Generate index key
           */
-         virtual std::tuple<int,int,int> makeKey(const Dimensions::Transform::Id id, const int i, const int j, const int k) const;
+         std::tuple<int,int,int> makeKey(const Dimensions::Transform::Id id, const int i, const int j, const int k) const final;
          
       protected:
 

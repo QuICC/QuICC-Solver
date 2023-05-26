@@ -39,7 +39,7 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         virtual ~FFF();
+         ~FFF();
 
          /**
           * @brief Unique id
@@ -49,42 +49,42 @@ namespace SpatialScheme {
          /**
           * @brief Create the scheme builder
           */
-         virtual std::shared_ptr<IBuilder> createBuilder(ArrayI& dim, const bool needInterpretation) const override;
+         std::shared_ptr<IBuilder> createBuilder(ArrayI& dim, const bool needInterpretation) const final;
 
          /**
           * @brief Create transform for given dimension
           */
-         virtual std::shared_ptr<Transform::ITransform> createTransform(const Dimensions::Transform::Id id, std::shared_ptr<Transform::TransformSetup> spSetup) const override;
+         std::shared_ptr<Transform::ITransform> createTransform(const Dimensions::Transform::Id id, std::shared_ptr<Transform::TransformSetup> spSetup) const final;
 
          /**
           * @brief Create index converter for given dimension
           */
-         virtual std::shared_ptr<Parallel::IIndexConv> createIndexConv(const Dimensions::Transform::Id id) const override;
+         std::shared_ptr<Parallel::IIndexConv> createIndexConv(const Dimensions::Transform::Id id) const final;
 
          /**
           * @brief Create spectral decomposition tools
           */
-         virtual std::shared_ptr<Equations::Tools::ICoupling> createCouplingTools(const Equations::CouplingIndexType indexType) const override;
+         std::shared_ptr<Equations::Tools::ICoupling> createCouplingTools(const Equations::CouplingIndexType indexType) const final;
 
          /**
           * @brief Get variant forward transform data type with correct type ininitialized
           */
-         virtual VariantTransformDataPointer fwdPtr(const Dimensions::Transform::Id id) const override;
+         VariantTransformDataPointer fwdPtr(const Dimensions::Transform::Id id) const final;
 
          /**
           * @brief Get variant forward transform data type with correct type ininitialized
           */
-         virtual VariantTransformDataPointer bwdPtr(const Dimensions::Transform::Id id) const override;
+         VariantTransformDataPointer bwdPtr(const Dimensions::Transform::Id id) const final;
 
          /**
           * @brief Create variant scalar variable
           */
-         virtual ScalarVariable createSVar(std::shared_ptr<Resolution> spRes) const override;
+         ScalarVariable createSVar(std::shared_ptr<Resolution> spRes) const final;
 
          /**
           * @brief Create variant vector variable
           */
-         virtual VectorVariable createVVar(std::shared_ptr<Resolution> spRes) const override;
+         VectorVariable createVVar(std::shared_ptr<Resolution> spRes) const final;
 
       protected:
 

@@ -52,6 +52,12 @@ int main( int argc, char* argv[] )
       | Opt( test::args().params, "id" )      // Add test id option
          ["--id"]
          ("MPI rank for which to generate splitting data")
+      | Opt( test::args().factors, "factor" )   // Add imposed factor option
+         ["--factor"]
+         ("Factor to use in decomposition")
+      | Opt( test::args().checkRanks )          // Add checkRanks option
+         ["--checkRanks"]
+         ("Check ranks individually?")
       | Opt( test::args().dumpData )          // Add dumpData option
          ["--dumpData"]
          ("Write output data to file?")

@@ -32,7 +32,7 @@ namespace SpatialScheme {
          /**
           * @brief Tune the shared resolution used by simulation
           */
-         void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr) override;
+         void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr) final;
 
          /**
           * @brief Constructor
@@ -45,38 +45,38 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         virtual ~WLFmBuilder() = default;
+         ~WLFmBuilder() = default;
 
          /**
           * @brief Add the transform setups to resolution
           */
-         virtual void addTransformSetups(SharedResolution spRes) const override;
+         void addTransformSetups(SharedResolution spRes) const final;
 
          /**
           * @brief Spectral ordering is different from transform
           */
-         bool sameSpectralOrdering() const override;
+         bool sameSpectralOrdering() const final;
 
       protected:
          /**
           * @brief Initialise the domain dimensions
           */
-         virtual void setDimensions() override;
+         void setDimensions() final;
 
          /**
           * @brief Set transform costs
           */
-         virtual void setCosts() override;
+         void setCosts() final;
 
          /**
           * @brief Set transform scalings
           */
-         virtual void setScalings() override;
+         void setScalings() final;
 
          /**
           * @brief Set transform memory footprint
           */
-         virtual void setMemoryScore() override;
+         void setMemoryScore() final;
 
       private:
          /**

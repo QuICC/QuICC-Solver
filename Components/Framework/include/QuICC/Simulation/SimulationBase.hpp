@@ -260,7 +260,7 @@ namespace QuICC {
 
       // Initialise the load splitter
       auto  spBuilder = spScheme->createBuilder(dim, true);
-      splitter.init(spBuilder, {this->mSimIoCtrl.config().algorithm()}, this->mSimIoCtrl.config().grouper());
+      splitter.init(spBuilder, {this->mSimIoCtrl.config().algorithm()}, this->mSimIoCtrl.config().grouper(), this->mSimIoCtrl.config().cpuFactors());
 
       stage.done();
       stage.start("extracting communication structure");

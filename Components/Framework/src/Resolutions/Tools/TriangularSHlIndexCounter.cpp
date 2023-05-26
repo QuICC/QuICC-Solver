@@ -9,7 +9,7 @@
 // Project includes
 //
 #include "QuICC/Resolutions/Tools/TriangularSHlIndexCounter.hpp"
-#include "QuICC/SpatialScheme/Tools/Triangular.hpp"
+#include "QuICC/SpatialScheme/Tools/TriangularSH.hpp"
 
 namespace QuICC {
 
@@ -22,7 +22,8 @@ namespace QuICC {
    {
       if(simId == Dimensions::Simulation::SIM1D && spaceId != Dimensions::Space::PHYSICAL)
       {
-         return SpatialScheme::Tools::Triangular::truncation(this->mspSim->dim(simId, spaceId), static_cast<int>(l));
+         SpatialScheme::Tools::TriangularSH t;
+         return t.truncationBwd(this->mspSim->dim(simId, spaceId), static_cast<int>(l));
       }
       else
       {
@@ -79,7 +80,6 @@ namespace QuICC {
 
    void TriangularSHlIndexCounter::computeOffsets(std::vector<TriangularSHlIndexCounter::OffsetType>& blocks, std::vector<std::vector<TriangularSHlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
    {
-      Dimensions::Transform::Id transId;
       Dimensions::Simulation::Id simId;
 
       // Clear the vector of offsets
@@ -89,10 +89,8 @@ namespace QuICC {
       // In spectral space offset computation, spherical harmonic triangular truncation make it complicated
       if(spaceId == Dimensions::Space::SPECTRAL)
       {
-         transId = Dimensions::Transform::SPECTRAL;
+         const auto& tRes = *this->mspCpu->dim(Dimensions::Transform::SPECTRAL);
          simId = Dimensions::Simulation::SIM2D;
-
-         auto&& tRes = *this->mspCpu->dim(transId);
 
          // Loop over all local harmonic degrees l
          OffsetType offset = 0;
@@ -130,15 +128,12 @@ namespace QuICC {
                blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, l_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
             }
          }
-
       }
       // Physical space offset computation (regular)
       else //if(spaceId == Dimensions::Space::PHYSICAL)
       {
-         transId = Dimensions::Transform::TRA3D;
+         const auto& tRes = *this->mspCpu->dim(Dimensions::Transform::TRA3D);
          simId = Dimensions::Simulation::SIM1D;
-
-         auto&& tRes = *this->mspCpu->dim(transId);
 
          offV.push_back(0);
          offV.push_back(0);

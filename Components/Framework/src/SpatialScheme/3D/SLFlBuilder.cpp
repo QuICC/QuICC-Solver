@@ -12,6 +12,7 @@
 #include "QuICC/SpatialScheme/3D/SLFlBuilder.hpp"
 #include "QuICC/Transform/Poly/Tools.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
+#include "QuICC/Transform/Setup/Uniform.hpp"
 
 namespace QuICC {
 
@@ -97,8 +98,9 @@ namespace SpatialScheme {
    }
 
    SLFlBuilder::SLFlBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegularSHlBuilder(dim, purpose)
+      : IRegularSHlBuilder(dim, purpose, {})
    {
+      this->mOptions.at(0).push_back(Transform::Setup::Uniform::id());
    }
 
    void SLFlBuilder::setDimensions()

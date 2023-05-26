@@ -110,7 +110,7 @@ namespace SpatialScheme {
    }
 
    FFFBuilder::FFFBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegular3DBuilder(dim, purpose)
+      : IRegular3DBuilder(dim, purpose, {})
    {
    }
 

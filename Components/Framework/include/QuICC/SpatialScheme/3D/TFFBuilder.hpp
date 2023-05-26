@@ -45,38 +45,38 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         virtual ~TFFBuilder() = default;
+         ~TFFBuilder() = default;
 
          /**
           * @brief Add the transform setups to resolution
           */
-         virtual void addTransformSetups(SharedResolution spRes) const;
+         void addTransformSetups(SharedResolution spRes) const final;
 
          /**
           * @brief Add index counter to shared resolution
           */
-         virtual void addIndexCounter(SharedResolution spRes);
+         void addIndexCounter(SharedResolution spRes) final;
 
       protected:
          /**
           * @brief Initialise the domain dimensions
           */
-         virtual void setDimensions();
+         void setDimensions() final;
 
          /**
           * @brief Set transform costs
           */
-         virtual void setCosts();
+         void setCosts() final;
 
          /**
           * @brief Set transform scalings
           */
-         virtual void setScalings();
+         void setScalings() final;
 
          /**
           * @brief Set transform memory footprint
           */
-         virtual void setMemoryScore();
+         void setMemoryScore() final;
 
       private:
          /**

@@ -16,6 +16,7 @@
 #include "QuICC/Framework/MpiFramework.hpp"
 #include "QuICC/Resolutions/Tools/RegularSHlIndexCounter.hpp"
 #include "QuICC/Resolutions/Tools/RegularSHmIndexCounter.hpp"
+#include "QuICC/Transform/Setup/Uniform.hpp"
 
 namespace QuICC {
 
@@ -244,8 +245,9 @@ namespace SpatialScheme {
    }
 
    SLFmBuilder::SLFmBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegularSHmlBuilder(dim, purpose)
+      : IRegularSHmlBuilder(dim, purpose, {})
    {
+      this->mOptions.at(0).push_back(Transform::Setup::Uniform::id());
    }
 
    bool SLFmBuilder::sameSpectralOrdering() const

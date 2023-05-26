@@ -12,9 +12,6 @@
 #include <memory>
 #include <variant>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
@@ -87,7 +84,7 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         virtual ~ISpatialScheme();
+         virtual ~ISpatialScheme() = default;
 
          /**
           * @brief Formulation used for vector fields
@@ -157,7 +154,7 @@ namespace SpatialScheme {
          /**
           * @brief Set implementation type
           */
-         void setImplementation(const ArrayI& type);
+         virtual void setImplementation(const std::map<std::size_t,std::vector<std::size_t>>& type);
 
          /**
           * @brief Create the scheme builder
@@ -203,7 +200,7 @@ namespace SpatialScheme {
          /**
           * @brief Implementation type of transforms
           */
-         ArrayI mImplType;
+         std::map<std::size_t,std::vector<std::size_t>> mImplType;
 
          /**
           * @brief Physical component aliases
@@ -257,7 +254,8 @@ namespace SpatialScheme {
 
    /// Typedef for shared_pointer spatial scheme
    typedef std::shared_ptr<const ISpatialScheme> SharedCISpatialScheme;
-}
-}
+
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_ISPATIALSCHEME_HPP

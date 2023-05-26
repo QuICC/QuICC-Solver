@@ -134,6 +134,13 @@ namespace Parallel {
          double balancingScore(SharedResolution spRes, Array& balance);
 
          /**
+          * @brief Manually set factorization
+          *
+          * @param f list of factors to use
+          */
+         void useFactorization(const std::list<int>& f);
+
+         /**
           * @brief Get id of core
           */
          int id() const;

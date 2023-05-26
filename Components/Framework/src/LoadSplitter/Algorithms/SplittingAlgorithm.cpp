@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SplittingAlgorithm.cpp
  * @brief Source of the base of the implementation of the load splitting algorithms
  */
@@ -63,6 +63,25 @@ namespace Parallel {
       assert(i < this->mFactors.size());
 
       return this->mFactors(i);
+   }
+
+   void SplittingAlgorithm::useFactorization(const std::list<int>& f)
+   {
+      // Use imposed factors is not empty
+      if(f.size() > 0)
+      {
+         // Check size
+         if(f.size() % this->mFactors.size() != 0)
+         {
+            throw std::logic_error("List of factors is not compatible");
+         }
+
+         this->mNCpuFactors.clear();
+         this->mNCpuFactors = f;
+
+         // Check factorization
+         SplittingTools::filterFactors(this->mNCpuFactors, this->mFactors.size(), this->nCpu(), false);
+      }
    }
 
    const ArrayI& SplittingAlgorithm::factors() const
@@ -220,7 +239,7 @@ namespace Parallel {
       SplittingTools::factorizeNCpu(this->mNCpuFactors, nFactors, this->nCpu());
 
       // Filter the factors
-      SplittingTools::filterFactors(this->mNCpuFactors, nFactors, this->nCpu());
+      SplittingTools::filterFactors(this->mNCpuFactors, nFactors, this->nCpu(), true);
    }
 
    bool SplittingAlgorithm::useNextFactors()
@@ -405,7 +424,7 @@ namespace Parallel {
          // Position iterator for insert calls
          std::set<Coordinate>::iterator   mapPos;
 
-         // Loop over possible data exchanges 
+         // Loop over possible data exchanges
          std::vector<Dimensions::Transform::Id> exchanges = {Dimensions::Transform::TRA1D};
          for(auto exId: exchanges)
          {
@@ -504,7 +523,7 @@ namespace Parallel {
                   ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                   QuICCEnv().check(ierr, 712);
 
-               // Remote CPU   
+               // Remote CPU
                } else
                {
                   // Get size
@@ -515,7 +534,7 @@ namespace Parallel {
                   // Get remote keys as matrix
                   matRemote.resize(2, toMatch);
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 714);
 
                   // Compare received data to stored indexes
@@ -584,7 +603,7 @@ namespace Parallel {
 
                      // Get remote keys as matrix
                      QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                      QuICCEnv().check(ierr, 717);
 
                   } else
@@ -597,7 +616,7 @@ namespace Parallel {
                      // Get remote keys as matrix
                      matRemote.resize(2, filterSize);
                      QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                      QuICCEnv().check(ierr, 719);
 
                      for(int i = 0; i < filterSize; ++i)
@@ -635,7 +654,7 @@ namespace Parallel {
          // Position iterator for insert calls
          std::set<Coordinate>::iterator   mapPos;
 
-         // Loop over possible data exchanges 
+         // Loop over possible data exchanges
          std::vector<Dimensions::Transform::Id> exchanges = {Dimensions::Transform::TRA1D,Dimensions::Transform::TRA2D,Dimensions::Transform::SPECTRAL};
          for(auto exId: exchanges)
          {
@@ -744,10 +763,10 @@ namespace Parallel {
 
                   // Broadcast data
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 721);
 
-               // Remote CPU   
+               // Remote CPU
                } else
                {
                   // Get size
@@ -758,7 +777,7 @@ namespace Parallel {
                   // Get remote keys as matrix
                   matRemote.resize(3, toMatch);
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 723);
 
                   // Compare received data to stored indexes
@@ -827,7 +846,7 @@ namespace Parallel {
 
                      // Get remote keys as matrix
                      QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                      QuICCEnv().check(ierr, 726);
 
                   } else
@@ -840,7 +859,7 @@ namespace Parallel {
                      // Get remote keys as matrix
                      matRemote.resize(2, filterSize);
                      QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                      QuICCEnv().check(ierr, 728);
 
                      for(int i = 0; i < filterSize; ++i)

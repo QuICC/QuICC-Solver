@@ -50,7 +50,7 @@ namespace SpatialScheme {
    }
 
    TBuilder::TBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegular1DBuilder(dim, purpose)
+      : IRegular1DBuilder(dim, purpose, {})
    {
    }
 

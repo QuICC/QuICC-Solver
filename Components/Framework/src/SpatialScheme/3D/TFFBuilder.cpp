@@ -12,6 +12,7 @@
 #include "QuICC/SpatialScheme/3D/TFFBuilder.hpp"
 #include "QuICC/Resolutions/Tools/DoublePeriodicIndexCounter.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
+#include "QuICC/Transform/Setup/Uniform.hpp"
 
 namespace QuICC {
 
@@ -118,8 +119,9 @@ namespace SpatialScheme {
    }
 
    TFFBuilder::TFFBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegular3DBuilder(dim, purpose)
+      : IRegular3DBuilder(dim, purpose, {})
    {
+      this->mOptions.at(0).push_back(Transform::Setup::Uniform::id());
    }
 
    void TFFBuilder::setDimensions()

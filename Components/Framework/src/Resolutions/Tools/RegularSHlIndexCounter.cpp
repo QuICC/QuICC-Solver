@@ -65,7 +65,6 @@ namespace QuICC {
 
    void RegularSHlIndexCounter::computeOffsets(std::vector<RegularSHlIndexCounter::OffsetType>& blocks, std::vector<std::vector<RegularSHlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
    {
-      Dimensions::Transform::Id transId;
       Dimensions::Simulation::Id simId;
       
       // Clear the vector of offsets
@@ -115,12 +114,11 @@ namespace QuICC {
             }
          }
       }
-      //  Physical space offset computation (regular)
+      // Physical space offset computation (regular)
       else //if(spaceId == Dimensions::Space::PHYSICAL)
       {
-         transId = Dimensions::Transform::TRA3D;
+         const auto& tRes = *this->mspCpu->dim(Dimensions::Transform::TRA3D);
          simId = Dimensions::Simulation::SIM1D;
-         const auto& tRes = *this->mspCpu->dim(transId);
 
          offV.push_back(0);
          offV.push_back(0);

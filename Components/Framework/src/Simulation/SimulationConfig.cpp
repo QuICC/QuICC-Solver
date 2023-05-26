@@ -19,6 +19,7 @@
 #include "QuICC/Enums/SplittingTools.hpp"
 #include "QuICC/Timestep/Id/Coordinator.hpp"
 #include "QuICC/Timestep/Id/registerAll.hpp"
+#include "QuICC/Transform/Setup/registerAll.hpp"
 #include "QuICC/Bc/Scheme/Coordinator.hpp"
 #include "QuICC/Bc/Scheme/registerAll.hpp"
 #include "QuICC/Bc/Name/Coordinator.hpp"
@@ -58,19 +59,65 @@ namespace QuICC {
       return dim;
    }
 
-   ArrayI SimulationConfig::transformSetup() const
+   std::map<std::size_t, std::vector<std::size_t>> SimulationConfig::transformSetup() const
    {
-      auto nodeId = Io::Config::Setup::TRANSFORM;
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
 
-      // Get map
-      int dim = this->mspCfgFile->spSetup()->spNode(nodeId)->iTags().size();
+      std::map<std::size_t,std::vector<std::size_t>> impl;
 
-      ArrayI impl(dim);
+      const auto nodeId = Io::Config::Setup::TRANSFORM;
+
+      // Get size
+      int dim = this->mspCfgFile->spSetup()->spNode(nodeId)->sTags().size();
+
+      // Register all transform implementation IDs
+      Transform::Setup::registerAll();
+
       int i = 0;
-      auto range = this->mspCfgFile->spSetup()->spNode(nodeId)->iTags().crange();
-      for(auto it = range.first; it != range.second; ++it)
+      auto range = this->mspCfgFile->spSetup()->spNode(nodeId)->sTags().crange();
+      for(auto sit = range.first; sit != range.second; ++sit)
       {
-         impl(i) = it->second;
+         auto it = impl.emplace(i, std::vector<std::size_t>());
+
+         std::string tag = sit->second;
+         std::transform(sit->second.cbegin(), sit->second.cend(), tag.begin(), [](unsigned char c) { return std::tolower(c); });
+
+         if(tag.size() > 0)
+         {
+            std::string tag_;
+            std::size_t start = 0;
+            // Extract individual tags from comma separated list
+            do
+            {
+               std::size_t pos = tag.find(',', start);
+               if(pos == std::string::npos)
+               {
+                  pos = tag.size();
+               }
+               tag_ = tag.substr(start, pos-start);
+               start = pos + 1;
+
+               // Get ID for tag
+               std::size_t id = 0;
+               for(auto&& e: Transform::Setup::Coordinator::map())
+               {
+                  if(Transform::Setup::Coordinator::tag(e.first) == tag_)
+                  {
+                     id = e.first;
+                     break;
+                  }
+               }
+
+               if(id == 0)
+               {
+                  throw std::logic_error("transform setup was not recognized");
+               }
+
+               it.first->second.push_back(id);
+            }
+            while(start < tag.size()-1);
+         }
          i++;
       }
 
@@ -135,6 +182,48 @@ namespace QuICC {
       auto id = Splitting::getGrouperId(tag);
 
       return id;
+   }
+
+   std::list<int>  SimulationConfig::cpuFactors() const
+   {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
+      auto tag = this->mspCfgFile->spFramework()->spNode(Io::Config::Framework::PARALLEL)->sTags().value("decomposition");
+      std::transform(tag.cbegin(), tag.cend(), tag.begin(), [](unsigned char c) { return std::tolower(c); });
+
+      std::list<int> factorList;
+      if(tag != "auto" && tag.size() > 0)
+      {
+         std::string tag_;
+         std::size_t start = 0;
+         // Extract individual factors from comma separated list
+         do
+         {
+            std::size_t pos = tag.find(',', start);
+            if(pos == std::string::npos)
+            {
+               pos = tag.size();
+            }
+            tag_ = tag.substr(start, pos-start);
+            start = pos + 1;
+
+            // Get ID for tag
+            int f;
+            try
+            {
+               f = std::stoi(tag_);
+            }
+            catch(const std::invalid_argument& e)
+            {
+               throw std::logic_error("Decomposition format is wrong. It should be 'auto' or a comma separated list of factors");
+            }
+            factorList.emplace_back(f);
+         }
+         while(start < tag.size());
+      }
+
+      return factorList;
    }
 
    const std::map<std::string, MHDFloat>& SimulationConfig::physical() const

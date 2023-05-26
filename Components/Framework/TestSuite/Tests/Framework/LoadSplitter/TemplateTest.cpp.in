@@ -18,6 +18,7 @@
 #include "QuICC/SpatialScheme/3D/@Scheme@.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Enums/VectorFormulation.hpp"
+#include "QuICC/Transform/Setup/Default.hpp"
 #include "QuICC/TestSuite/Framework/LoadSplitter/TestArgs.hpp"
 #include "QuICC/TestSuite/Framework/LoadSplitter/TestHelper.hpp"
 
@@ -81,6 +82,8 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
 
    bool testAllRanks = (currentts::args().params.size() == currentts::args().np);
 
+   bool checkRanks = currentts::args().checkRanks;
+
    // Get splitting stage
    QuICC::Dimensions::Transform::Id stageId = static_cast<QuICC::Dimensions::Transform::Id>(currentts::args().stage);
 
@@ -94,17 +97,27 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
    dim(1) = currentts::args().dim2D;
    dim(2) = currentts::args().dim3D;
 
+   // convert factor vector to list
+   std::list<int> factorList(currentts::args().factors.begin(), currentts::args().factors.end());
+
    std::multimap<int,int> modes;
    for(int id: currentts::args().params)
    {
       // Create scheme
       QuICC::Parallel::LoadSplitter splitter(id, np);
       auto spScheme = std::make_shared<QuICC::SpatialScheme::@Scheme@>(QuICC::VectorFormulation::TORPOL, QuICC::GridPurpose::SIMULATION);
+      std::map<std::size_t,std::vector<std::size_t>> transformSetup;
+      for(int i = 0; i < dim.size(); i++)
+      {
+         std::vector<std::size_t> opt = {QuICC::Transform::Setup::Default::id()};
+         transformSetup.emplace(i, opt);
+      }
+      spScheme->setImplementation(transformSetup);
 
       auto spBuilder = spScheme->createBuilder(dim, false);
       std::set<QuICC::Splitting::Algorithms::Id> algos = {QuICC::Splitting::getAlgorithmId(currentts::args().algorithm)};
       auto grp = QuICC::Splitting::Groupers::TRANSFORM;
-      splitter.init(spBuilder, algos, grp);
+      splitter.init(spBuilder, algos, grp, factorList);
       auto best = splitter.bestSplitting(false);
       auto spRes = best.first;
 
@@ -142,7 +155,10 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
       // Check data against reference
       std::string path = refPrefix + fname;
       currentts::collectModes(tRes, modes);
-      currentts::checkReference(path, tRes);
+      if(checkRanks)
+      {
+         currentts::checkReference(path, tRes);
+      }
 
       if(currentts::args().dumpData)
       {

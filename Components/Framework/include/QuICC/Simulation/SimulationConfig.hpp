@@ -43,7 +43,7 @@ namespace QuICC {
          /**
           * @brief Get the transform implementation
           */
-         ArrayI transformSetup() const;
+         std::map<std::size_t,std::vector<std::size_t>> transformSetup() const;
 
          /**
           * @brief Get the box scale read from the configuration file
@@ -64,6 +64,11 @@ namespace QuICC {
           * @brief Get the parallel communication grouping algorithm read from the configuration file
           */
          Splitting::Groupers::Id grouper() const;
+
+         /**
+          * @brief List of CPU factorization to test for decomposition
+          */
+         std::list<int> cpuFactors() const;
 
          /**
           * @brief Get the map of physical values read from the configuration file

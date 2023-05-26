@@ -51,6 +51,9 @@ namespace Communicators {
       /// ???
       std::vector<double> params;
 
+      /// Imposed CPU factors
+      std::vector<int> factors;
+
       /**
        * @brief Constructor
        */

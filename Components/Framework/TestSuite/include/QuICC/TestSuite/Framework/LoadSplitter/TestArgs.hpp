@@ -60,8 +60,16 @@ namespace LoadSplitter {
        */
       unsigned int stage;
 
+      /**
+       * @brief Check rank decomposition individually
+       */
+      bool checkRanks;
+
       /// MPI ranks for which to compute splitting
       std::vector<double> params;
+
+      /// Imposed CPU factors
+      std::vector<int> factors;
 
       /**
        * @brief Constructor

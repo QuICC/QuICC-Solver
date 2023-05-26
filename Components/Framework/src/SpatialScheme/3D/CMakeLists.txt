@@ -1,9 +1,8 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
+  I3DBuilder.cpp
   IRegular3DBuilder.cpp
   IRegularSHlBuilder.cpp
-  IRegularSHmBuilder.cpp
   IRegularSHmlBuilder.cpp
-  ITriangularSHlBuilder.cpp
   TTT.cpp
   TTTBuilder.cpp
   TFT.cpp
@@ -22,8 +21,6 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   SLFmBuilder.cpp
   WLFl.cpp
   WLFlBuilder.cpp
-  WLFlfftBuilder.cpp
-  WLFlTriangularBuilder.cpp
   WLFm.cpp
   WLFmBuilder.cpp
 )

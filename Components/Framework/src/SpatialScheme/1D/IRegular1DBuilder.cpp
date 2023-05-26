@@ -8,28 +8,20 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/1D/IRegular1DBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/1D/IRegular1DBuilder.hpp"
+#include "QuICC/SpatialScheme/Tools/Uniform3D1D.hpp"
+#include "QuICC/Transform/Setup/Uniform.hpp"
 
 namespace QuICC {
 
 namespace SpatialScheme {
 
-   IRegular1DBuilder::IRegular1DBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IBuilder(dim.size(), purpose), mI(dim(0))
+   IRegular1DBuilder::IRegular1DBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options)
+      : IBuilder(dim.size(), purpose, options), mI(dim(0))
    {
-      assert(dim.size() == 1);
-   }
-
-   IRegular1DBuilder::~IRegular1DBuilder()
-   {
+      assert(dim.size() == 3);
    }
 
    ArrayI IRegular1DBuilder::resolution() const
@@ -40,15 +32,15 @@ namespace SpatialScheme {
       return space;
    }
 
-   int IRegular1DBuilder::fillIndexes(Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Splitting::Locations::Id flag)
+   int IRegular1DBuilder::fillIndexes(Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
    {
+      // Safety assertions
+      assert( id.size() > 0 );
+      assert( bins.size() > 0 );
+      assert( id.size() == bins.size() );
+
       // Assert for right transform (1D case)
       assert(transId == Dimensions::Transform::TRA1D);
-
-      // Safety assertions for default values
-      assert( bins.size() == n0.size() );
-      assert( n0.size() == nN.size() );
-      assert( (bins.size() == 0) || (flag != Splitting::Locations::NONE) );
 
       // Set unused third dimension
       idx3D.resize(1);
@@ -86,6 +78,27 @@ namespace SpatialScheme {
    int IRegular1DBuilder::splittableTotal(Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
    {
       throw std::logic_error("There is no splitting algorithm for 1D problems!");
+   }
+
+   std::shared_ptr<Tools::IBase> IRegular1DBuilder::truncationTools(const Dimensions::Transform::Id transId) const
+   {
+      // Setup truncation tools
+      std::shared_ptr<Tools::IBase> spTools;
+
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
+      {
+         spTools = std::make_shared<Tools::Uniform3D1D>();
+      }
+      else if(transId == Dimensions::Transform::TRA2D)
+      {
+         throw std::logic_error("Tried to work on second dimension in 1D case");
+      }
+      else if(transId == Dimensions::Transform::TRA3D)
+      {
+         throw std::logic_error("Tried to work on third dimension in 1D case");
+      }
+
+      return spTools;
    }
 
 }

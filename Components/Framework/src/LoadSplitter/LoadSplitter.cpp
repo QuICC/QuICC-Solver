@@ -3,38 +3,24 @@
  * @brief Source of the workload splitter
  */
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <sstream>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/LoadSplitter/LoadSplitter.hpp"
-
 // Project includes
 //
+#include "QuICC/LoadSplitter/LoadSplitter.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Tools/Formatter.hpp"
-
+#include "QuICC/Io/Xml/GxlWriter.hpp"
+#include "QuICC/Io/Xml/VtpWriter.hpp"
 // Splitting algorithms
 #include "QuICC/LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SerialSplitting.hpp"
-#include "QuICC/LoadSplitter/Algorithms/SingleSplitting.hpp"
 #include "QuICC/LoadSplitter/Algorithms/TubularSplitting.hpp"
 #include "QuICC/LoadSplitter/Algorithms/Coupled2DSplitting.hpp"
-#include "QuICC/Io/Xml/GxlWriter.hpp"
-#include "QuICC/Io/Xml/VtpWriter.hpp"
 
 namespace QuICC {
 
@@ -45,11 +31,7 @@ namespace Parallel {
    {
    }
 
-   LoadSplitter::~LoadSplitter()
-   {
-   }
-
-   void LoadSplitter::initAlgorithms(const ArrayI& dim, const std::set<Splitting::Algorithms::Id>& enabled)
+   void LoadSplitter::initAlgorithms(const ArrayI& dim, const std::set<Splitting::Algorithms::Id>& enabled, const std::list<int>& factors)
    {
       // Check for serial version of code request
       if(this->mNCpu == 1)
@@ -65,7 +47,7 @@ namespace Parallel {
             // Add the single splitting algorithm for first data exchange
             if(enabled.count(Splitting::Algorithms::SINGLE1D) == 1)
             {
-               this->mAlgorithms.push_back(std::make_shared<SingleSplitting>(this->mId, this->mNCpu, dim, Splitting::Locations::FIRST));
+               this->mAlgorithms.push_back(std::make_shared<TubularSplitting>(this->mId, this->mNCpu, dim, Splitting::Algorithms::SINGLE1D, factors));
             }
 
             // Add the single splitting algorithm for first data exchange for coupled dimensions
@@ -81,13 +63,13 @@ namespace Parallel {
                // Add the single splitting algorithm for second data exchange
                if(enabled.count(Splitting::Algorithms::SINGLE2D) == 1)
                {
-                  this->mAlgorithms.push_back(std::make_shared<SingleSplitting>(this->mId, this->mNCpu, dim, Splitting::Locations::SECOND));
+                  this->mAlgorithms.push_back(std::make_shared<TubularSplitting>(this->mId, this->mNCpu, dim, Splitting::Algorithms::SINGLE2D, factors));
                }
 
                // Add the tubular splitting algorithm
                if(enabled.count(Splitting::Algorithms::TUBULAR) == 1)
                {
-                  this->mAlgorithms.push_back(std::make_shared<TubularSplitting>(this->mId, this->mNCpu, dim, Splitting::Locations::BOTH));
+                  this->mAlgorithms.push_back(std::make_shared<TubularSplitting>(this->mId, this->mNCpu, dim, Splitting::Algorithms::TUBULAR, factors));
                }
             }
 
@@ -105,10 +87,10 @@ namespace Parallel {
       }
    }
 
-   void LoadSplitter::init(SpatialScheme::SharedIBuilder spBuilder, const std::set<Splitting::Algorithms::Id>& enabled, const Splitting::Groupers::Id grp)
+   void LoadSplitter::init(SpatialScheme::SharedIBuilder spBuilder, const std::set<Splitting::Algorithms::Id>& enabled, const Splitting::Groupers::Id grp, const std::list<int>& factors)
    {
       // Initialise the splitting algorithms
-      this->initAlgorithms(spBuilder->resolution(), enabled);
+      this->initAlgorithms(spBuilder->resolution(), enabled, factors);
 
       // Loop over all initialised algorithms
       for(auto it = this->mAlgorithms.begin(); it != this->mAlgorithms.end(); it++)

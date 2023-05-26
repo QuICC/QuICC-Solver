@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/LoadSplitter/Algorithms/SerialSplitting.hpp"
-
 // Project includes
 //
+#include "QuICC/LoadSplitter/Algorithms/SerialSplitting.hpp"
 
 namespace QuICC {
 
@@ -27,10 +21,6 @@ namespace Parallel {
       this->initFactors(1);
    }
 
-   SerialSplitting::~SerialSplitting()
-   {
-   }
-
    bool SerialSplitting::applicable() const
    {
       // As long as there is a single CPU it should be applicable
@@ -41,6 +31,10 @@ namespace Parallel {
 
    SharedTransformResolution  SerialSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status)
    {
+      // Create arrays for the IDs and bins
+      std::vector<int> ids = {0,0};
+      std::vector<int> bins = {1,1};
+
       // Storage for the forward 1D indexes
       std::vector<ArrayI>  fwd1D;
       // Storage for the backward 1D indexes
@@ -51,7 +45,7 @@ namespace Parallel {
       ArrayI  idx3D;
 
       // Compute the indexes
-      status = this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D);
+      status = this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, bins);
 
       // Create TransformResolution object
       auto spTraRes = std::make_shared<TransformResolution>(fwd1D, bwd1D, idx2D, idx3D);

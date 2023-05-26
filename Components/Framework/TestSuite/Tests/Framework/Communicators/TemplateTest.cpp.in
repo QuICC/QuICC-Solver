@@ -51,8 +51,11 @@ TEST_CASE( "Communicator initialization for @Scheme@", "[@Scheme@]" ){
    currentts::Test test;
    QuICC::Parallel::SplittingDescription::store = true;
 
+   // convert factor vector to list
+   std::list<int> factorList(currentts::args().factors.begin(), currentts::args().factors.end());
+
    // Create LoadSplitter, SpatialScheme and generate resolution
-   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper);
+   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList);
    test.spRes = best.first;
    auto&& descr = best.second;
 

@@ -77,7 +77,7 @@ namespace SpatialScheme {
    }
 
    FFBuilder::FFBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegular2DBuilder(dim, purpose)
+      : IRegular2DBuilder(dim, purpose, {})
    {
    }
 

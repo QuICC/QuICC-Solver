@@ -278,7 +278,7 @@ namespace SpatialScheme {
    }
 
    WFTBuilder::WFTBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegular3DBuilder(dim, purpose)
+      : IRegular3DBuilder(dim, purpose, {})
    {
    }
 

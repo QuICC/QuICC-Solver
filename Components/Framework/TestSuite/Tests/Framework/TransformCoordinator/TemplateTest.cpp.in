@@ -49,8 +49,11 @@ TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
 
    QuICC::ArrayI dim = currentts::processCmdLine();
 
+   // convert factor vector to list
+   std::list<int> factorList(currentts::args().factors.begin(), currentts::args().factors.end());
+
    // Create LoadSplitter, SpatialScheme and generate resolution
-   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper);
+   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList);
    auto&& descr = best.second;
 
    for(auto id: currentts::args().params)

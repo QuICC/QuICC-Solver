@@ -93,7 +93,7 @@ namespace Worland {
       bool notValid = (n > allowedN);
       if(notValid)
       {
-         throw std::logic_error("Worland grid is too small! (" + std::to_string(n) + " > " + std::to_string(allowedN) + ")");
+         throw std::logic_error("Worland grid is too small! (" + std::to_string(n) + " > " + std::to_string(allowedN) + ", n = " + std::to_string(n) + ", l = " + std::to_string(l) + ", gN = " + std::to_string(gN) + ")");
       }
    }
 

@@ -57,6 +57,9 @@ namespace TCoord {
       /// ID of the tests
       std::vector<int> params;
 
+      /// Imposed CPU factors
+      std::vector<int> factors;
+
       /**
        * @brief Constructor
        */

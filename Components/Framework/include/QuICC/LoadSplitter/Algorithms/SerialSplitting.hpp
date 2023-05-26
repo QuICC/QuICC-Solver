@@ -11,9 +11,6 @@
 #include <utility>
 #include <vector>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
@@ -42,12 +39,12 @@ namespace Parallel {
          /**
           * @brief Destructor
           */
-         virtual ~SerialSplitting();
+         ~SerialSplitting() = default;
 
          /**
           * @brief Check if factorisation is applicable to scheme
           */
-         virtual bool applicable() const;
+         bool applicable() const final;
          
       protected:
          /**
@@ -57,14 +54,14 @@ namespace Parallel {
           * @param cpuId   ID of the CPU
           * @param status  Status output
           */
-         virtual SharedTransformResolution splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status);
+         SharedTransformResolution splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status) final;
 
          /**
           * @brief Compute the score of the Resolution
           *
           * @param spResolution Shared resolution object
           */
-         virtual Array computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp);
+         Array computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp) final;
 
       private:
    };

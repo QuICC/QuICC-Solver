@@ -28,6 +28,7 @@
 #include "QuICC/TransformGroupers/IBackwardGrouper.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/VectorFields/VectorField.hpp"
+#include "QuICC/Transform/Setup/Default.hpp"
 
 namespace QuICC {
 
@@ -167,8 +168,13 @@ namespace TCoord {
 
    /**
     * @brief Create distributed resolution object
+    *
+    * @param dim        Spectral dimensions
+    * @param algorithm  Splitting algorithm
+    * @param grouper    Communication grouping algorithm
+    * @param factors    Imposed CPU factorization
     */
-   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper);
+   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper, const std::list<int>& factors);
 
    /**
     * @brief Process command line and generate dimension array
@@ -245,12 +251,23 @@ namespace TCoord {
     */
    ErrorType computeUlp(const MHDFloat data, const MHDFloat ref, const MHDFloat refMod, const MHDFloat tol, const MHDFloat eps);
 
-   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper)
+   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper, const std::list<int>& factors)
    {
       INFO( "MPI rank: " << QuICC::QuICCEnv().id() );
       INFO( "MPI size: " << QuICC::QuICCEnv().size() );
       QuICC::Parallel::LoadSplitter splitter(QuICC::QuICCEnv().id(), QuICC::QuICCEnv().size());
+
+      // Create spatial scheme
       auto spScheme = std::make_shared<TScheme>(QuICC::VectorFormulation::TORPOL, QuICC::GridPurpose::SIMULATION);
+      std::map<std::size_t,std::vector<std::size_t>> transformSetup;
+      for(int i = 0; i < dim.size(); i++)
+      {
+         std::vector<std::size_t> opt = {QuICC::Transform::Setup::Default::id()};
+         transformSetup.emplace(i, opt);
+      }
+      spScheme->setImplementation(transformSetup);
+
+      // Create scheme's builder
       auto spBuilder = spScheme->createBuilder(dim, false);
 
       // Select splitting algorithm
@@ -259,7 +276,7 @@ namespace TCoord {
       INFO( "Comm algorithm: " << algorithm );
       INFO( "Comm grouper: " << grouper );
       std::set<QuICC::Splitting::Algorithms::Id> algos = {algoId};
-      splitter.init(spBuilder, algos, grouperId);
+      splitter.init(spBuilder, algos, grouperId, factors);
 
       // Generate resolution
       auto best = splitter.bestSplitting(true);

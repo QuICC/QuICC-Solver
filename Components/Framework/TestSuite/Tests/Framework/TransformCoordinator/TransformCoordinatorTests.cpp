@@ -46,6 +46,9 @@ int main( int argc, char* argv[] )
       | Opt( test::args().grouper, "" )      // Add test grouper option
          ["--grouper"]
          ("Comm grouping algorithm")
+      | Opt( test::args().factors, "factor" )   // Add imposed factor option
+         ["--factor"]
+         ("Factor to use in decomposition")
       | Opt( test::args().dumpData )         // Add dumpData option
          ["--dumpData"]
          ("Write output data to file?");

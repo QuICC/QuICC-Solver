@@ -6,16 +6,10 @@
 #ifndef QUICC_PARALLEL_LOADSPLITTER_HPP
 #define QUICC_PARALLEL_LOADSPLITTER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
 #include <set>
-
-// External includes
-//
 
 // Project includes
 //
@@ -45,15 +39,17 @@ namespace Parallel {
          /**
           * @brief Destructor
           */
-         ~LoadSplitter();
+         ~LoadSplitter() = default;
 
          /**
           * @brief Initialise the algorithms
           *
           * @param spBuilder  Spatial scheme builder
-          * @param enabled  List of enabled algorithms
+          * @param enabled    List of enabled algorithms
+          * @param grp        Communication grouper
+          * @param factors    Imposed factorization of CPU
           */
-         void init(SpatialScheme::SharedIBuilder spBuilder, const std::set<Splitting::Algorithms::Id>& enabled, const Splitting::Groupers::Id grp);
+         void init(SpatialScheme::SharedIBuilder spBuilder, const std::set<Splitting::Algorithms::Id>& enabled, const Splitting::Groupers::Id grp, const std::list<int>& factors = {});
 
          /**
           * @brief Get splitting information of the best splitting
@@ -99,8 +95,10 @@ namespace Parallel {
           * @brief Initialise the splitting algorithms
           *
           * @param dim     Dimensions (spectral)
+          * @param enabled List of enabled algorithms
+          * @param factors Imposed factorization of nCPU
           */
-         void initAlgorithms(const ArrayI& dim, const std::set<Splitting::Algorithms::Id>& enabled);
+         void initAlgorithms(const ArrayI& dim, const std::set<Splitting::Algorithms::Id>& enabled, const std::list<int>& factors);
 
          /**
           * @brief Initialise the scores and corresponding splitting

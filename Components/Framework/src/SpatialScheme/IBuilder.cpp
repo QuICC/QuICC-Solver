@@ -36,13 +36,17 @@ namespace SpatialScheme {
       this->tuneMpiResolution(descr);
    }
 
-   IBuilder::IBuilder(const int dims,  const GridPurpose::Id purpose)
-      : ICosts(dims), mPurpose(purpose), mDims(dims)
+   IBuilder::IBuilder(const int dims,  const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options)
+      : ICosts(dims), mOptions(options), mPurpose(purpose), mDims(dims)
    {
-   }
-
-   IBuilder::~IBuilder()
-   {
+      // Initialize options if none was given
+      if(this->mOptions.size() == 0)
+      {
+         for(std::size_t i = 0; i < static_cast<std::size_t>(dims); i++)
+         {
+            this->mOptions.emplace(i, std::vector<std::size_t>());
+         }
+      }
    }
 
    bool IBuilder::sameSpectralOrdering() const

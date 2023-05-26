@@ -104,7 +104,7 @@ namespace SpatialScheme {
    }
 
    AFTBuilder::AFTBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegular3DBuilder(dim, purpose)
+      : IRegular3DBuilder(dim, purpose, {})
    {
    }
 

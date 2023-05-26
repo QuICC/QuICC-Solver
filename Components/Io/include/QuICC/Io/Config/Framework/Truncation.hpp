@@ -6,16 +6,10 @@
 #ifndef QUICC_IO_CONFIG_FRAMEWORK_TRUNCATION_HPP
 #define QUICC_IO_CONFIG_FRAMEWORK_TRUNCATION_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <string>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -40,14 +34,15 @@ namespace Framework {
          /**
           * @brief Constructor
           *
-          * @param dim Dimensionality of truncation
+          * @param dim           Dimensionality of truncation
+          * @param isPeriodicBox Is dimension periodic?
           */
          explicit Truncation(const int dim, const std::vector<bool>& isPeriodicBox);
 
          /**
           * @brief Destructor
           */
-         virtual ~Truncation();
+         virtual ~Truncation() = default;
 
          /**
           * @brief Check compatibility of data
@@ -79,9 +74,9 @@ namespace Framework {
    /// Typedef for a const shared pointer of a truncation node
    typedef std::shared_ptr<const Truncation> SharedCTruncation;
 
-}
-}
-}
-}
+} // Framework
+} // Config
+} // Io
+} // QuICC
 
 #endif // QUICC_IO_CONFIG_FRAMEWORK_TRUNCATION_HPP
