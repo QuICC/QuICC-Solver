@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Variables/RequirementTools.hpp"
-
 // Project includes
 //
+#include "QuICC/Variables/RequirementTools.hpp"
 
 namespace QuICC {
 
@@ -451,4 +445,4 @@ namespace QuICC {
       return paths;
    }
 
-}
+} // QuICC

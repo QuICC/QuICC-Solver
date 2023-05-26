@@ -19,6 +19,11 @@
 
 // Project includes
 //
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+   #include "QuICC/PhysicalNames/Coordinator.hpp"
+   #include "QuICC/Tools/IdToHuman.hpp"
+#endif // QUICC_DEBUG
 #include "QuICC/TransformGroupers/IBackwardGrouper.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -115,6 +120,9 @@ namespace Transform {
             // Transform scalar variable
             if(it->comp<FieldComponents::Spectral::Id>() == FieldComponents::Spectral::SCALAR)
             {
+               DebuggerMacro_msg("Backward transform for " + PhysicalNames::Coordinator::tag(it->name()), 5);
+               Profiler::RegionFixture<1> fix("transformBwdScalar");
+
                auto scalIt = scalars.find(it->name());
 
                // Setup the first exchange communication step for scalar fields
@@ -145,6 +153,9 @@ namespace Transform {
             // Transform vector variable
             else
             {
+               DebuggerMacro_msg("Backward transform for " + PhysicalNames::Coordinator::tag(it->name()) + "(" + Tools::IdToHuman::toString(it->comp<FieldComponents::Spectral::Id>()) + ")", 5);
+               Profiler::RegionFixture<1> fix("transformBwdVector");
+
                auto vectIt = vectors.find(it->name());
 
                // Setup the first exchange communication step for scalar fields

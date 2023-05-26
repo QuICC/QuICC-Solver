@@ -310,7 +310,7 @@ namespace QuICC {
    template <typename TEquation> std::shared_ptr<TEquation> SimulationBase::addEquation(std::shared_ptr<Model::IModelBackend> spBackend)
    {
       // Create shared equation
-      std::shared_ptr<TEquation>  spEq = std::make_shared<TEquation>(this->mspEqParams, this->mspRes->sim().spSpatialScheme(), spBackend);
+      std::shared_ptr<TEquation> spEq = std::make_shared<TEquation>(this->mspEqParams, this->mspRes->sim().spSpatialScheme(), spBackend);
 
       // Create default options
       auto spOptions = std::make_shared<Equations::EquationOptions>();

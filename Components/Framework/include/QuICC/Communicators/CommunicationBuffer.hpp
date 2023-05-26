@@ -165,7 +165,7 @@ namespace Parallel {
    {
       // Create CPU group buffers
       this->mTotal = 0;
-      for(size_t id = 0; id < std::min(aSizes.size(), bSizes.size()); ++id)
+      for(std::size_t id = 0; id < std::min(aSizes.size(), bSizes.size()); ++id)
       {
          // Create zero position and initialize position
          this->mZero.push_back(this->mTotal);
@@ -177,7 +177,7 @@ namespace Parallel {
       // Deal with different number of CPUs in groups
       if(aSizes.size() > bSizes.size())
       {
-         for(size_t id = bSizes.size(); id < aSizes.size(); ++id)
+         for(std::size_t id = bSizes.size(); id < aSizes.size(); ++id)
          {
             // Create zero position and initialize position
             this->mZero.push_back(this->mTotal);
@@ -187,7 +187,7 @@ namespace Parallel {
          }
       } else if(bSizes.size() > aSizes.size())
       {
-         for(size_t id = aSizes.size(); id < bSizes.size(); ++id)
+         for(std::size_t id = aSizes.size(); id < bSizes.size(); ++id)
          {
             // Create zero position and initialize position
             this->mZero.push_back(this->mTotal);
@@ -214,16 +214,22 @@ namespace Parallel {
 
    template <typename TData> inline TData* CommunicationBuffer<TData>::data()
    {
+      assert(this->mData != nullptr);
+
       return this->mData;
    }
 
    template <typename TData> inline int* CommunicationBuffer<TData>::zero()
    {
+      assert(this->mZero.size() > 0);
+
       return &this->mZero[0];
    }
 
    template <typename TData> inline TData* CommunicationBuffer<TData>::at(const int id)
    {
+      assert(this->mData != nullptr);
+
       return (this->mData + this->mZero.at(id));
    }
 
@@ -238,7 +244,7 @@ namespace Parallel {
    template <typename TData> inline int& CommunicationBuffer<TData>::pos(const int id)
    {
       // Safety assert
-      assert(this->mPos.size() > static_cast<size_t>(id));
+      assert(this->mPos.size() > static_cast<std::size_t>(id));
 
       return this->mPos.at(id);
    }

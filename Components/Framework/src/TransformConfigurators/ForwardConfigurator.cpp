@@ -22,6 +22,9 @@
 #include "QuICC/Arithmetics/SetNeg.hpp"
 #include "QuICC/Arithmetics/None.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
+#ifdef QUICC_DEBUG
+#include "QuICC/Transform/Forward/Coordinator.hpp"
+#endif // QUICC_DEBUG
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -49,7 +52,7 @@ namespace Transform {
    void ForwardConfigurator::integrateND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       // Debugger message
-      DebuggerMacro_msg("Integrate ND", 4);
+      DebuggerMacro_msg("Integrate ND with operator (" + Forward::Coordinator::tag(edge.opId()) + ")", 6);
 
       const std::string profRegion = "Fwd-integrateND";
       const auto traId = static_cast<Dimensions::Transform::Id>(coord.ss().dimension()-1);
@@ -60,7 +63,7 @@ namespace Transform {
    void ForwardConfigurator::integrate2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       // Debugger message
-      DebuggerMacro_msg("Integrate 2D", 4);
+      DebuggerMacro_msg("Integrate 2D with operator (" + Forward::Coordinator::tag(edge.opId()) + ")", 6);
 
       const std::string profRegion = "Fwd-integrate2D";
       const auto traId = Dimensions::Transform::TRA2D;
@@ -71,7 +74,7 @@ namespace Transform {
    void ForwardConfigurator::integrate1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       // Debugger message
-      DebuggerMacro_msg("Integrate 1D", 4);
+      DebuggerMacro_msg("Integrate 1D with operator (" + Forward::Coordinator::tag(edge.opId()) + ")", 6);
 
       const std::string profRegion = "Fwd-integrate1D";
       const auto traId = Dimensions::Transform::TRA1D;

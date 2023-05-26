@@ -48,15 +48,16 @@ namespace Integrator {
          op.setZero();
       } else
       {
-         namespace ev = Polynomial::Worland::Evaluator;
-         Polynomial::Worland::Wnl wnl;
-
          // Internal computation uses dealiased modes
          const int extraN = 3*(!this->mcTruncQI); // I2 has 3 superdiagonals
          int nN = nPoly + extraN;
          this->checkGridSize(nN, l, igrid.size());
 
          internal::Matrix tOp(igrid.size(), nN);
+
+         namespace ev = Polynomial::Worland::Evaluator;
+         Polynomial::Worland::Wnl wnl;
+
 #ifdef QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
          // **************************************************
          // Formulation without explicit grid:

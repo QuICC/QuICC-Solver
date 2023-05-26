@@ -17,6 +17,11 @@
 
 // Project includes
 //
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+   #include "QuICC/PhysicalNames/Coordinator.hpp"
+   #include "QuICC/Tools/IdToHuman.hpp"
+#endif // QUICC_DEBUG
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
 #include "QuICC/TransformGroupers/IForwardGrouper.hpp"
 #include "Profiler/Interface.hpp"
@@ -118,6 +123,7 @@ namespace Transform {
             // Transform scalar equation variable
             if(it->comp<FieldComponents::Physical::Id>() == FieldComponents::Physical::SCALAR)
             {
+               DebuggerMacro_msg("Nonlinear kernel and forward transform for " + PhysicalNames::Coordinator::tag(it->name()), 5);
                Profiler::RegionFixture<1> fix("transformFwdScalar");
 
                auto scalIt = scalars.find(it->name());
@@ -150,6 +156,7 @@ namespace Transform {
             // Transform vector equation
             else
             {
+               DebuggerMacro_msg("Nonlinear kernel and forward transform for " + PhysicalNames::Coordinator::tag(it->name()) + "(" + Tools::IdToHuman::toString(it->comp<FieldComponents::Physical::Id>()) + ")", 5);
                Profiler::RegionFixture<1> fix("transformFwdVector");
 
                auto vectIt = vectors.find(it->name());

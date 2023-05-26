@@ -207,7 +207,7 @@ namespace Transform {
 
    template <Dimensions::Transform::Id TId> inline void BackwardTubularConfigurator::setupCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Bwd-setupCommunication");
+      Profiler::RegionFixture<2> fix("Bwd-setupCommunication-" + std::to_string(static_cast<int>(TId)+1) + "D");
 
       coord.communicator().converter<TId>().setupCommunication(packs, TransformDirection::BACKWARD);
 
@@ -216,7 +216,7 @@ namespace Transform {
 
    template <Dimensions::Transform::Id TId> inline void BackwardTubularConfigurator::initiateCommunication(TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Bwd-initiateCommunication");
+      Profiler::RegionFixture<2> fix("Bwd-initiateCommunication-" + std::to_string(static_cast<int>(TId)+1) + "D");
 
       coord.communicator().converter<TId>().initiateForwardSend();
    }

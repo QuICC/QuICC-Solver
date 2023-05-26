@@ -23,6 +23,9 @@
 #include "QuICC/Arithmetics/SetNeg.hpp"
 #include "QuICC/Arithmetics/None.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
+#ifdef QUICC_DEBUG
+#include "QuICC/Transform/Backward/Coordinator.hpp"
+#endif // QUICC_DEBUG
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -118,7 +121,7 @@ namespace Transform {
    void BackwardConfigurator::project1D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       // Debugger message
-      DebuggerMacro_msg("Project 1D", 4);
+      DebuggerMacro_msg("Project 1D with operator (" + Backward::Coordinator::tag(edge.opId()) + ")", 6);
 
       const std::string profRegion = "Bwd-project1D";
       const auto traId = Dimensions::Transform::TRA1D;
@@ -129,7 +132,7 @@ namespace Transform {
    void BackwardConfigurator::project2D(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
       // Debugger message
-      DebuggerMacro_msg("Project 2D", 4);
+      DebuggerMacro_msg("Project 2D with operator (" + Backward::Coordinator::tag(edge.opId()) + ")", 6);
 
       const std::string profRegion = "Bwd-project2D";
       const auto traId = Dimensions::Transform::TRA2D;
@@ -141,7 +144,7 @@ namespace Transform {
    {
 
       // Debugger message
-      DebuggerMacro_msg("Project ND", 4);
+      DebuggerMacro_msg("Project ND with operator (" + Backward::Coordinator::tag(edge.opId()) + ")", 6);
 
       const std::string profRegion = "Bwd-projectND";
       const auto traId = static_cast<Dimensions::Transform::Id>(coord.ss().dimension()-1);

@@ -45,14 +45,16 @@ namespace Integrator {
       if(l == 0)
       {
          l = 1;
-         namespace ev = Polynomial::Worland::Evaluator;
-         Polynomial::Worland::Wnl wnl;
 
          // Internal computation uses dealiased modes
-         int nN = nPoly + 0*(!this->mcTruncQI);
+         const int extraN = 3*(!this->mcTruncQI); // I2 has 3 superdiagonals
+         int nN = nPoly + extraN;
          this->checkGridSize(nN, l, igrid.size());
 
          internal::Matrix tOp(igrid.size(), nN);
+
+         namespace ev = Polynomial::Worland::Evaluator;
+         Polynomial::Worland::Wnl wnl;
 
          wnl.compute<internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
@@ -63,14 +65,16 @@ namespace Integrator {
          op = tOp.cast<MHDFloat>().leftCols(nPoly);
       } else
       {
-         namespace ev = Polynomial::Worland::Evaluator;
-         Polynomial::Worland::Wnl wnl;
-
          // Internal computation uses dealiased modes
-         int nN = nPoly + 0;
+         const int extraN = 6*(!this->mcTruncQI); // I4 has 6 superdiagonals
+         int nN = nPoly + extraN;
          this->checkGridSize(nN, l, igrid.size());
 
          internal::Matrix tOp(igrid.size(), nN);
+
+         namespace ev = Polynomial::Worland::Evaluator;
+         Polynomial::Worland::Wnl wnl;
+
 #if defined QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
          // **************************************************
          // Formulation without explicit grid:

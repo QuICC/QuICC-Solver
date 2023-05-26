@@ -25,9 +25,9 @@
 #include "QuICC/TransformCoordinators/TransformCoordinatorTools.hpp"
 #include "QuICC/Equations/Tools/EquationTools.hpp"
 #include "QuICC/Simulation/SimulationIoTools.hpp"
-#include "QuICC/PseudospectralTag/Trivial.hpp"
 #include "QuICC/PseudospectralTag/Diagnostic.hpp"
 #include "QuICC/PseudospectralTag/Prognostic.hpp"
+#include "QuICC/PseudospectralTag/Trivial.hpp"
 #include "QuICC/PseudospectralTag/Uninitialized.hpp"
 #include "QuICC/PseudospectralTag/Wrapper.hpp"
 #include "Profiler/Interface.hpp"
@@ -736,7 +736,7 @@ namespace Pseudospectral {
 
    void Coordinator::solvePrognosticEquations(ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
    {
-      Profiler::RegionFixture fix("Prognostic-solve");
+      Profiler::RegionFixture fix("Prognostic-Timestep");
 
       // Only step forward if equations are present
       if(this->atLeastOne(scalarEq_range, vectorEq_range))

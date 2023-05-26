@@ -70,7 +70,8 @@ namespace Sphere {
                   this->mM0j = j;
                   this->mM0k = k;
                   this->mHasM0 = true;
-               } else if(l_ == 1 && m_ == 1)
+               }
+               else if(l_ == 1 && m_ == 1)
                {
                   this->mM1j = j;
                   this->mM1k = k;

@@ -114,7 +114,7 @@ namespace Transform {
 
    template <Dimensions::Transform::Id TId> inline void ForwardSingle1DConfigurator::setupCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Fwd-setupCommunication");
+      Profiler::RegionFixture<2> fix("Fwd-setupCommunication-" + std::to_string(static_cast<int>(TId)+1) + "D");
 
       if constexpr(TId == Dimensions::Transform::TRA1D || TId == Dimensions::Transform::TRA2D)
       {
@@ -126,7 +126,7 @@ namespace Transform {
 
    template <Dimensions::Transform::Id TId> inline void ForwardSingle1DConfigurator::initiateCommunication(TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Fwd-initiateCommunication");
+      Profiler::RegionFixture<2> fix("Fwd-initiateCommunication-" + std::to_string(static_cast<int>(TId)+1) + "D");
 
       if constexpr(TId == Dimensions::Transform::TRA1D || TId == Dimensions::Transform::TRA2D)
       {

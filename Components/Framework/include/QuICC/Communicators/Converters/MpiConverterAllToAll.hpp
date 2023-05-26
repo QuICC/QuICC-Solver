@@ -165,6 +165,7 @@ namespace Parallel {
    {
       // Should be in backward direction
       assert(this->mDirection == TransformDirection::BACKWARD);
+      assert(this->mspFBuffers);
 
       // Pack data into send buffer
       for(int id = 0; id < this->nFCpu(); ++id)
@@ -182,6 +183,7 @@ namespace Parallel {
    {
       // Should be in backward direction
       assert(this->mDirection == TransformDirection::FORWARD);
+      assert(this->mspBBuffers);
 
       // Pack data into send buffer
       for(int id = 0; id < this->nBCpu(); ++id)

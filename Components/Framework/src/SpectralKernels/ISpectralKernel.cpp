@@ -40,7 +40,7 @@ namespace Kernel {
       return *this->mspRes;
    }
 
-   void ISpectralKernel::apply(const std::size_t timeId)
+   void ISpectralKernel::apply(const std::size_t)
    {
    }
 

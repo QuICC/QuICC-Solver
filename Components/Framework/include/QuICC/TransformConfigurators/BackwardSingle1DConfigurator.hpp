@@ -215,7 +215,7 @@ namespace Transform {
 
    template <Dimensions::Transform::Id TId> inline void BackwardSingle1DConfigurator::setupCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Bwd-setupCommunication");
+      Profiler::RegionFixture<2> fix("Bwd-setupCommunication-" + std::to_string(static_cast<int>(TId)+1) + "D");
 
       if constexpr(TId == Dimensions::Transform::TRA1D || TId == Dimensions::Transform::TRA2D)
       {
@@ -228,7 +228,7 @@ namespace Transform {
 
    template <Dimensions::Transform::Id TId> inline void BackwardSingle1DConfigurator::initiateCommunication(TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Bwd-initiateCommunication");
+      Profiler::RegionFixture<2> fix("Bwd-initiateCommunication-" + std::to_string(static_cast<int>(TId)+1) + "D");
 
       if constexpr(TId == Dimensions::Transform::TRA1D || TId == Dimensions::Transform::TRA2D)
       {

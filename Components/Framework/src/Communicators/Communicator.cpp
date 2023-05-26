@@ -49,6 +49,9 @@ namespace Parallel {
             case Dimensions::Transform::TRA3D:
                StorageProfilerMacro_update(Debug::StorageProfiler::TEMPTRA3D, mem);
                break;
+            case Dimensions::Transform::SPECTRAL:
+               StorageProfilerMacro_update(Debug::StorageProfiler::TEMPSPECTRAL, mem);
+               break;
          }
          StorageProfilerMacro_update(Debug::StorageProfiler::TEMPORARIES, mem);
       #endif // QUICC_STORAGEPROFILE
@@ -93,6 +96,7 @@ namespace Parallel {
          // Load splitting has been done on first dimension
          if(split == Splitting::Locations::FIRST || split == Splitting::Locations::COUPLED2D)
          {
+            assert(packs.size() > 1);
             this->createMpiConverter<Dimensions::Transform::TRA2D>(spRes, packs.at(0), packs.at(1));
 
          // Load splitting has been done on second dimension
@@ -139,11 +143,13 @@ namespace Parallel {
       // Load splitting has been done on second dimension
       } else if(split == Splitting::Locations::SECOND)
       {
+         assert(packs.size() == 4);
          this->createMpiConverter<Dimensions::Transform::TRA3D>(spRes, packs.at(2), packs.at(3));
 
          // Load splitting has been done on two dimensions
       } else if(split == Splitting::Locations::BOTH)
       {
+         assert(packs.size() == 4);
          this->createMpiConverter<Dimensions::Transform::TRA2D>(spRes, packs.at(0), packs.at(1));
          this->createMpiConverter<Dimensions::Transform::TRA3D>(spRes, packs.at(2), packs.at(3));
          // A better implementation using only 3 buffers is possible but requires some cross transform synchronization

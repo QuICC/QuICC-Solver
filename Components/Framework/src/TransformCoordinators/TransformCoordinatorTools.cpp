@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/TransformCoordinators/TransformCoordinatorTools.hpp"
-
 // Project includes
 //
+#include "QuICC/TransformCoordinators/TransformCoordinatorTools.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 
 namespace QuICC {
@@ -125,5 +119,5 @@ namespace Transform {
          addSet(packs, bwdSet);
       }
    }
-}
-}
+} // Transform
+} // QuICC

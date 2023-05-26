@@ -148,6 +148,9 @@ namespace QuICC {
 
       // Write initial ASCII and HDF5 output files if applicable
       this->mSimIoCtrl.writeFiles(this->mPseudospectral.time(), this->mPseudospectral.timestep());
+
+      // Write equation diagnotics
+      this->mPseudospectral.writeDiagnostics(this->mSimIoCtrl.isAsciiTime(), this->mSimIoCtrl.isHdf5Time());
    }
 
    void Simulation::postRun()

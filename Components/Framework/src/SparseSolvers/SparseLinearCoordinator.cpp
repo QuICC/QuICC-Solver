@@ -16,7 +16,7 @@ namespace Solver {
 
    void SparseLinearCoordinator::solve(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
-      // Update the equation input to the linear solver
+      // Update the equation input to linear solver
       this->getInput(scalEq, vectEq, scalVar, vectVar);
 
       // Solve all the linear systems

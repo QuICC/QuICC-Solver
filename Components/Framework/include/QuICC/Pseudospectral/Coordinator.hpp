@@ -439,6 +439,7 @@ namespace Pseudospectral {
           * @param it   Iteration index
           */
          SharedIVectorEquation vectorEq(const std::size_t eqId, const int it, const int i = 0);
+
          /**
           * @brief Initialise the imposed components of the simulation
           */
@@ -532,7 +533,7 @@ namespace Pseudospectral {
          /**
           * @brief Map between name and physical kernels for each iteration
           */
-         std::map<int, std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel> >  mPhysicalKernels;
+         std::map<int, std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel> > mPhysicalKernels;
 
          /**
           * @brief Backward transform trees

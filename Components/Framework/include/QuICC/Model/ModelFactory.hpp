@@ -21,6 +21,7 @@
 // Project includes
 //
 #include "QuICC/Enums/GridPurpose.hpp"
+#include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Simulation/Simulation.hpp"
 #include "QuICC/Model/IPhysicalModel.hpp"
 
@@ -89,17 +90,27 @@ namespace QuICC {
       // Initialise resolution
       spSim->initResolution(spScheme);
 
+      StageTimer stage;
+
       // Add equations
+      stage.start("adding model equations");
       model.addEquations(spSim);
+      stage.done();
 
       // Add ASCII output files
+      stage.start("adding model ASCII output");
       model.addAsciiOutputFiles(spSim);
+      stage.done();
 
       // Add HDF5 output files
+      stage.start("adding model HDF5 output");
       model.addHdf5OutputFiles(spSim);
+      stage.done();
 
       // Add statistics output files
+      stage.start("adding model Stats output");
       model.addStatsOutputFiles(spSim);
+      stage.done();
 
       // Set the boundary conditions
       SharedSimulationBoundary spBcs = spSim->createBoundary();
