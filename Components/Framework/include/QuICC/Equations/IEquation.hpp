@@ -28,6 +28,7 @@
 #include "QuICC/SpectralKernels/ISpectralKernel.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformPath.hpp"
+#include "QuICC/TransformConfigurators/ITransformSteps.hpp"
 
 namespace QuICC {
 
@@ -187,6 +188,16 @@ namespace Equations {
           * @brief Set the default nonlinear components
           */
          virtual void setNLComponents() = 0;
+
+         /**
+          * @brief Transform steps object
+          */
+         virtual std::shared_ptr<Transform::ITransformSteps> transformSteps() const;
+
+         /**
+          * @brief Get backward transform paths
+          */
+         virtual std::vector<bool> disabledBackwardPaths() const = 0;
 
          /**
           * @brief Initialise the spectral equation matrices for given component

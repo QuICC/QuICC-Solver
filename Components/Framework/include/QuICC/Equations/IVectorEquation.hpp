@@ -127,6 +127,11 @@ namespace Equations {
 
       protected:
          /**
+          * @brief Get backward transform paths
+          */
+         virtual std::vector<bool> disabledBackwardPaths() const override;
+
+         /**
           * @brief Set the galerkin stencil
           */
          virtual void setGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const override;

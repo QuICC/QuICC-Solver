@@ -65,14 +65,15 @@ namespace LinearMap {
    {
    }
 
-   Transform::~Transform()
-   {
-   }
-
    void Transform::init(Transform::SharedSetupType spSetup)
    {
       // Store the shared pointer to setup object
       this->mspSetup = spSetup;
+   }
+
+   void Transform::addOperator(const MapFunctor& f)
+   {
+      f(this->mOps);
    }
 
    void Transform::requiredOptions(std::set<std::size_t>& list, const Dimensions::Transform::Id dimId) const
@@ -168,7 +169,7 @@ namespace LinearMap {
          this->transform(rOut, in, *(it->second));
       } else
       {
-         throw std::logic_error("Requested Chebyshev LinearMap transform operator is not avaible");
+         throw std::logic_error("Requested Chebyshev LinearMap transform operator is not available");
       }
    }
 
@@ -181,7 +182,7 @@ namespace LinearMap {
          this->transform(rOut, in, *(it->second));
       } else
       {
-         throw std::logic_error("Requested Chebyshev LinearMap transform operator is not avaible");
+         throw std::logic_error("Requested Chebyshev LinearMap transform operator is not available");
       }
    }
 
@@ -194,7 +195,7 @@ namespace LinearMap {
          this->transform(rOut, in, *(it->second));
       } else
       {
-         throw std::logic_error("Requested Chebyshev LinearMap transform operator is not avaible");
+         throw std::logic_error("Requested Chebyshev LinearMap transform operator is not available");
       }
    }
 

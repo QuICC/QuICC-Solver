@@ -110,16 +110,36 @@ namespace Equations {
       }
    }
 
+   std::vector<bool> IScalarEquation::disabledBackwardPaths() const
+   {
+      std::vector<bool> disabled = {false, false, false};
+
+      return disabled;
+   }
+
    std::vector<Transform::TransformPath> IScalarEquation::backwardPaths()
    {
+      // Disable some paths
+      auto disabled = this->disabledBackwardPaths();
+      const bool& disabledPhys = disabled.at(0);
+      const bool& disabledGrad = disabled.at(1);
+      const bool& disabledGrad2 = disabled.at(2);
+
       std::vector<Transform::TransformPath> paths;
 
-      std::shared_ptr<Transform::ITransformSteps>  spSteps = Transform::createTransformSteps(this->res().sim().spSpatialScheme());
+      auto spSteps = this->transformSteps();
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, this->spUnknown()))
       {
          std::map<FieldComponents::Physical::Id,bool> compsMap;
          compsMap.insert(std::make_pair(FieldComponents::Physical::SCALAR, true));
+         if(disabledPhys)
+         {
+            for(auto&& c: compsMap)
+            {
+               c.second = false;
+            }
+         }
          auto b = spSteps->backwardScalar(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
@@ -127,6 +147,13 @@ namespace Equations {
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad());}, this->spUnknown()))
       {
          auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).grad().enabled());}, this->spUnknown());
+         if(disabledGrad)
+         {
+            for(auto&& c: compsMap)
+            {
+               c.second = false;
+            }
+         }
          auto b = spSteps->backwardGradient(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
@@ -134,6 +161,13 @@ namespace Equations {
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad2());}, this->spUnknown()))
       {
          auto compsMap = std::visit([&](auto&& p)->std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>{return (p->dom(0).grad2().enabled());}, this->spUnknown());
+         if(disabledGrad2)
+         {
+            for(auto&& c: compsMap)
+            {
+               c.second = false;
+            }
+         }
          auto b = spSteps->backwardGradient2(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }

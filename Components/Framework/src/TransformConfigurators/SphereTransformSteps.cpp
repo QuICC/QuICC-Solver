@@ -3,22 +3,14 @@
  * @brief Source of the implementation of the physical <-> spectral transform steps in a whole shell
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/TransformConfigurators/SphereTransformSteps.hpp"
-
 // Project includes
 //
+#include "QuICC/TransformConfigurators/SphereTransformSteps.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Arithmetics/Add.hpp"
 #include "QuICC/Arithmetics/Sub.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
@@ -91,7 +83,7 @@ namespace Transform {
       }
       else
       {
-         throw std::logic_error("Requested an unknown scalar forward transform");
+         throw std::logic_error("Requested an unknown scalar forward transform (ID = " + std::to_string(flag) + ")");
       }
 
       return transform;
@@ -104,6 +96,8 @@ namespace Transform {
 
       FieldComponents::Spectral::Id scalId = components.at(0).first;
       auto flag = components.at(0).second;
+
+      DebuggerMacro_msg("Using SphereTransformSteps for forwardNLScalar", 1);
 
       // Without quasi-inverse
       if(flag == Path::ScalarNl::id())
@@ -123,7 +117,7 @@ namespace Transform {
       }
       else
       {
-         throw std::logic_error("Requested an unknown nonlinear scalar forward transform");
+         throw std::logic_error("Requested an unknown nonlinear scalar forward transform (ID = " + std::to_string(flag) + ")");
       }
 
       return transform;
@@ -162,7 +156,7 @@ namespace Transform {
          }
          else
          {
-            throw std::logic_error("Requested an unknown vector forward transform");
+            throw std::logic_error("Requested an unknown vector forward transform (ID = " + std::to_string(curlFlag) + ")");
          }
       } else
       {
@@ -193,6 +187,8 @@ namespace Transform {
 
       if(this->ss().formulation() == VectorFormulation::TORPOL)
       {
+         DebuggerMacro_msg("Using SphereTransformSteps for Toroidal/Poloidal forwardNLVector", 1);
+
          assert(components.size() == 2);
          FieldComponents::Spectral::Id curlId = components.at(0).first;
          auto curlFlag = components.at(0).second;
@@ -229,7 +225,7 @@ namespace Transform {
          }
          else
          {
-            throw std::logic_error("Requested an unknown curl nonlinear vector forward transform");
+            throw std::logic_error("Requested an unknown curl nonlinear vector forward transform (ID = " + std::to_string(curlFlag) + ")");
          }
 
          // Integrate fourth order spherical equation with negative sign
@@ -291,7 +287,6 @@ namespace Transform {
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
             transform.back().addEdge(Forward::I2S::id(), curlcurlId, Arithmetics::Sub::id());
-
          }
          // transform without quasi-inverse
          else if(curlcurlFlag == Path::CurlCurlNl::id())
@@ -315,13 +310,15 @@ namespace Transform {
          }
          else
          {
-            throw std::logic_error("Requested an unknown curlcurl vector forward transform");
+            throw std::logic_error("Requested an unknown curlcurl vector forward transform (ID = " + std::to_string(curlcurlFlag) + ")");
          }
 
       }
       // The following assumes the physical values are obtained from a primitive formulation
       else
       {
+         DebuggerMacro_msg("Using SphereTransformSteps for Primitive forwardNLVector", 1);
+
          assert(components.size() == 3);
 
          transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
@@ -339,6 +336,7 @@ namespace Transform {
          transform.back().addEdge(Forward::P::id());
          transform.back().addEdge(Forward::P::id(), FieldComponents::Spectral::PHI, Arithmetics::Add::id());
       }
+      DebuggerMacro_msg("... done", 1);
 
       return transform;
    }
@@ -698,5 +696,5 @@ namespace Transform {
       return transform;
    }
 
-}
-}
+} // Transform
+} // QuICC

@@ -109,11 +109,18 @@ namespace debug {
       this->setNLComponents();
    }
 
+   std::shared_ptr<Transform::ITransformSteps> IEquation::transformSteps() const
+   {
+      auto  spSteps = Transform::createTransformSteps(this->res().sim().spSpatialScheme());
+
+      return spSteps;
+   }
+
    std::vector<Transform::TransformPath> IEquation::forwardPaths()
    {
       std::vector<Transform::TransformPath> paths;
 
-      std::shared_ptr<Transform::ITransformSteps>  spSteps = Transform::createTransformSteps(this->res().sim().spSpatialScheme());
+      auto spSteps = this->transformSteps();
 
       if(this->requirements(this->name()).isScalar())
       {
@@ -123,16 +130,19 @@ namespace debug {
             {
                paths = spSteps->forwardScalar(this->nlComponents());
 
-            } else if(this->mForwardPathsType == FWD_IS_NONLINEAR)
+            }
+            else if(this->mForwardPathsType == FWD_IS_NONLINEAR)
             {
                paths = spSteps->forwardNLScalar(this->nlComponents());
 
-            } else
+            }
+            else
             {
                throw std::logic_error("Custom forward path selected but not defined");
             }
          }
-      } else
+      }
+      else
       {
          if(this->couplingInfo(this->res().sim().ss().spectral().ONE()).hasNonlinear())
          {
@@ -140,11 +150,13 @@ namespace debug {
             {
                paths = spSteps->forwardVector(this->nlComponents());
 
-            } else if(this->mForwardPathsType == FWD_IS_NONLINEAR)
+            }
+            else if(this->mForwardPathsType == FWD_IS_NONLINEAR)
             {
                paths = spSteps->forwardNLVector(this->nlComponents());
 
-            } else
+            }
+            else
             {
                throw std::logic_error("Custom forward path selected but not defined");
             }

@@ -6,23 +6,14 @@
 #ifndef QUICC_TRANSFORM_CARTESIANCHEBYSHEVTRANSFORM_HPP
 #define QUICC_TRANSFORM_CARTESIANCHEBYSHEVTRANSFORM_HPP
 
-// Debug includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <set>
 #include <map>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Transform/ITransform.hpp"
@@ -47,12 +38,12 @@ namespace Transform {
          /**
           * @brief Very basic constructor
           */
-         CartesianChebyshevTransform();
+         CartesianChebyshevTransform() = default;
 
          /**
           * @brief Destroy the FFTW plans
           */
-         ~CartesianChebyshevTransform();
+         ~CartesianChebyshevTransform() = default;
 
          /**
           * @brief Initialise the FFT computations (plans, etc)

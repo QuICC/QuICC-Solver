@@ -8,49 +8,14 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/AnnulusChebyshevTransform.hpp"
-
 // Project includes
 //
-
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY1.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY2.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D.hpp"
-//NOt IMPLEMENTED YET #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY1D1.hpp"
-//NOt IMPLEMENTED YET#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1DivY1.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
-                                              
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
-
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Energy.hpp"
-
-#include "QuICC/Transform/Forward/P.hpp"
-
-#include "QuICC/Transform/Backward/P.hpp"
-#include "QuICC/Transform/Backward/Overr1.hpp"
-#include "QuICC/Transform/Backward/Overr2.hpp"
-#include "QuICC/Transform/Backward/D1.hpp"
-//NOt IMPLEMENTED YET#include "QuICC/Transform/Backward/Overr1D1.hpp"
-//NOt IMPLEMENTED YET#include "QuICC/Transform/Backward/D1Overr1.hpp"
-
-#include "QuICC/Transform/Reductor/Energy.hpp"
+#include "QuICC/Transform/AnnulusChebyshevTransform.hpp"
+#include "QuICC/Transform/RegisterAnnulusChebyshevMap.hpp"
 
 namespace QuICC {
 
 namespace Transform {
-
-   AnnulusChebyshevTransform::AnnulusChebyshevTransform()
-   {
-   }
-
-   AnnulusChebyshevTransform::~AnnulusChebyshevTransform()
-   {
-   }
 
    void AnnulusChebyshevTransform::requiredOptions(std::set<std::size_t>& list, const Dimensions::Transform::Id dimId) const
    {
@@ -78,19 +43,10 @@ namespace Transform {
 
    void AnnulusChebyshevTransform::initOperators()
    {
-      // Create projectors
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::P>(Backward::P::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1>(Backward::Overr1::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2>(Backward::Overr2::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::D1>(Backward::D1::id());
-      //NOT IMPLEMENTED YET this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::D1>(Backward::Overr1D1::id());
-      //NOT IMPLEMENTED YET this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::D1>(Backward::D1Overr1::id());
-
-      // Create integrators
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::P>(Forward::P::id());
-
-      // Create reductors
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Reductor::Energy>(Reductor::Energy::id());
+      for(const auto& f: RegisterAnnulusChebyshevMap::mapper())
+      {
+         this->mImpl.addOperator(*f);
+      }
    }                                                 
 
    void AnnulusChebyshevTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)

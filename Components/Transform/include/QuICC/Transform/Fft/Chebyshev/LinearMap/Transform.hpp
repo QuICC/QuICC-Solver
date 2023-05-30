@@ -6,27 +6,19 @@
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_TRANSFORM_HPP
 #define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_TRANSFORM_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
 // System includes
 //
 #include <set>
 #include <map>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/IChebyshevOperator.hpp"
+#include "QuICC/Transform/ITransformMap.hpp"
 
 namespace QuICC {
 
@@ -50,6 +42,12 @@ namespace LinearMap {
          /// Typedef for the configuration class as a shared pointer
          typedef IChebyshevOperator::SharedSetupType SharedSetupType;
 
+         /// Typedef for the configuration class as a shared pointer
+         typedef ITransformMap<IChebyshevOperator> MapFunctor;
+
+         /// Typedef for the configuration class as a shared pointer
+         typedef ITransformMap<IChebyshevOperator>::MapType MapType;
+
          /**
           * @brief Constructor
           */
@@ -58,7 +56,7 @@ namespace LinearMap {
          /**
           * @brief Destructor
           */
-         virtual ~Transform();
+         virtual ~Transform() = default;
 
          /**
           * @brief Initialise the polynomial transform
@@ -70,7 +68,7 @@ namespace LinearMap {
          /**
           * @brief Map transform operator to ID
           */
-         template <typename TOp> void addOperator(const std::size_t id = 0);
+         void addOperator(const MapFunctor& f);
 
          /**
           * @brief set list of required options
@@ -166,28 +164,13 @@ namespace LinearMap {
          /**
           * @brief Store transform operator to ID mapping
           */
-         std::map<std::size_t,std::shared_ptr<IChebyshevOperator> > mOps;
+         MapType mOps;
    };
 
-   template <typename TOp> void Transform::addOperator(const std::size_t id)
-   {
-      std::size_t lid;
-
-      if(id == 0)
-      {
-         lid = this->mOps.size();
-      } else
-      {
-         lid = id;
-      }
-
-      this->mOps.insert(std::make_pair(lid, std::make_shared<TOp>()));
-   }
-
-}
-}
-}
-}
-}
+} // LinearMap
+} // Chebyshev
+} // Fft
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_TRANSFORM_HPP
