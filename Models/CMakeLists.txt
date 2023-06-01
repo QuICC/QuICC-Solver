@@ -39,6 +39,8 @@ set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.7.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.7.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.7.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "main")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereModifiedTaylor
+  "devel_latest_merged")
 
 # Cache value, may be overwritten manually
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo
@@ -55,6 +57,8 @@ set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC
     ${_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC} CACHE STRING "Model repository branch.")
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC
     ${_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC} CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereModifiedTaylor
+    ${_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereModifiedTaylor} CACHE STRING "Model repository branch.")
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.d")

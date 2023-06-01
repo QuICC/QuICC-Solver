@@ -123,6 +123,15 @@ configurations = {  'BoussinesqSphereDynamo': {
                             'kkgpu' : [variant()],
                             'perf' : [variant()]
                         }
+                    },
+                    'BoussinesqSphereModifiedTaylor': {
+                        'Linear' : {
+                            'serial' : [variant()],
+                            'mpi' : [variant('single2d', 4)],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
+                            'perf' : [variant('none', -1)]
+                        }
                     }
                 }
 

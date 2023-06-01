@@ -33,8 +33,9 @@ def formatTiming(t, timings, tabs):
     t_min = np.min(ts)
     t_avg = np.average(ts)
     t_max = np.max(ts)
+    t_tot = t_avg*count
     opName = t.split('-')[-1]
-    print('\t'*tabs+f'{opName+":":<30} {t_min:.2e} / {t_avg:.2e} / {t_max:.2e}')
+    print('\t'*tabs+f'{opName+":":<30} {t_min:.2e} / {t_avg:.2e} / {t_max:.2e} | {t_tot:.1e}')
 
 def readProfile(name):
     # Get file handle
@@ -63,10 +64,7 @@ def readProfile(name):
     reportTimings('Diagnostic', timings, 2)
 
     # Prognostic
-    reportTimings('Prognostic', timings, 2)
-
-    # Timestep
-    reportTimings('Timestep', timings, 2)
+    reportTimings('Prognostic', timings, 3)
 
     # Control
     reportTimings('Control', timings, 2)

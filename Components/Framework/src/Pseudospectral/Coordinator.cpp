@@ -283,6 +283,8 @@ namespace Pseudospectral {
 
    void Coordinator::updateSpectral(const bool isTrivial, const bool isDiagnostic, const bool isPrognostic, const bool isWrapper, const int it)
    {
+#warning "This needs to be checked. It is currently not doing anything"
+
       std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel> kernels;
 
       // Get kernels from trivial equations
@@ -770,7 +772,8 @@ namespace Pseudospectral {
 
    void Coordinator::preSolveEquations()
    {
-#warning "THIS NEEDS TO BE CHECK"
+#warning "This needs to be checked"
+
       StageTimer stage;
       stage.start("initializing fields");
 
