@@ -74,6 +74,32 @@ namespace SpatialScheme {
          std::shared_ptr<Tools::IBase> truncationTools(const Dimensions::Transform::Id transId) const;
 
          /**
+          * @brief Initialise the domain dimensions
+          */
+         virtual void setDimensions() override;
+
+         /**
+          * @brief Set transform costs
+          *
+          * @param shift   Shift of the dimensions
+          */
+         virtual void setCosts() override;
+
+         /**
+          * @brief Set transform scalings
+          *
+          * @param shift   Shift of the dimensions
+          */
+         virtual void setScalings() override;
+
+         /**
+          * @brief Set transform memory footprint
+          *
+          * @param shift   Shift of the dimensions
+          */
+         virtual void setMemoryScore() override;
+
+         /**
           * @brief First truncation
           */
          int   mI;

@@ -6,16 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/2D/FF.hpp"
-
 // Project includes
 //
-#include "QuICC/SpatialScheme/Coordinator.hpp"
+#include "QuICC/Hasher.hpp"
+#include "QuICC/SpatialScheme/2D/FF.hpp"
 #include "QuICC/SpatialScheme/2D/FFBuilder.hpp"
 #include "QuICC/Transform/ComplexFourierTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
@@ -29,7 +23,7 @@ namespace SpatialScheme {
 
    const std::string FF::sFormatted = "FF";
 
-   const std::size_t FF::sId = registerId<FF>(FF::sTag);
+   const std::size_t FF::sId = Hasher::makeId(FF::sTag);
 
    FF::FF(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 2, FF::sId, FF::sTag, FF::sFormatted)
@@ -53,13 +47,9 @@ namespace SpatialScheme {
       this->enable(Feature::ComplexSpectrum);
    }
 
-   FF::~FF()
-   {
-   }
-
    std::shared_ptr<IBuilder> FF::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<FFBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<FFBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }
@@ -165,5 +155,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

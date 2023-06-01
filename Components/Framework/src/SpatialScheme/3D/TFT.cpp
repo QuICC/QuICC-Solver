@@ -6,16 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/TFT.hpp"
-
 // Project includes
 //
-#include "QuICC/SpatialScheme/Coordinator.hpp"
+#include "QuICC/Hasher.hpp"
+#include "QuICC/SpatialScheme/3D/TFT.hpp"
 #include "QuICC/SpatialScheme/3D/TFTBuilder.hpp"
 #include "QuICC/Transform/CartesianChebyshevTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
@@ -30,7 +24,7 @@ namespace SpatialScheme {
 
    const std::string TFT::sFormatted = "TFT";
 
-   const std::size_t TFT::sId = registerId<TFT>(TFT::sTag);
+   const std::size_t TFT::sId = Hasher::makeId(TFT::sTag);
 
    TFT::TFT(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 3, TFT::sId, TFT::sTag, TFT::sFormatted)
@@ -55,13 +49,9 @@ namespace SpatialScheme {
       this->enable(Feature::ComplexSpectrum);
    }
 
-   TFT::~TFT()
-   {
-   }
-
    std::shared_ptr<IBuilder> TFT::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<TFTBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<TFTBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }
@@ -199,5 +189,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

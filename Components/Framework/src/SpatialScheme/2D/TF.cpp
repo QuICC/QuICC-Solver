@@ -6,16 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/2D/TF.hpp"
-
 // Project includes
 //
-#include "QuICC/SpatialScheme/Coordinator.hpp"
+#include "QuICC/Hasher.hpp"
+#include "QuICC/SpatialScheme/2D/TF.hpp"
 #include "QuICC/SpatialScheme/2D/TFBuilder.hpp"
 #include "QuICC/Transform/CartesianChebyshevTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
@@ -30,7 +24,7 @@ namespace SpatialScheme {
 
    const std::string TF::sFormatted = "TF";
 
-   const std::size_t TF::sId = registerId<TF>(TF::sTag);
+   const std::size_t TF::sId = Hasher::makeId(TF::sTag);
 
    TF::TF(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 2, TF::sId, TF::sTag, TF::sFormatted)
@@ -55,13 +49,9 @@ namespace SpatialScheme {
       this->enable(Feature::ComplexSpectrum);
    }
 
-   TF::~TF()
-   {
-   }
-
    std::shared_ptr<IBuilder> TF::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<TFBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<TFBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }
@@ -178,5 +168,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

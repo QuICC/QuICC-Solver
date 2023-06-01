@@ -20,7 +20,7 @@ namespace SpatialScheme {
    {
       // Initialize default implementation options
       std::vector<std::size_t> def = {Transform::Setup::Default::id()};
-      for(std::size_t i = 0; i < dimension; i++)
+      for(int i = 0; i < dimension; i++)
       {
          this->mImplType.emplace(i, def);
       }
@@ -97,6 +97,11 @@ namespace SpatialScheme {
    const std::set<Feature>& ISpatialScheme::features() const
    {
       return this->mFeatures;
+   }
+
+   void ISpatialScheme::useCustomMesher(std::shared_ptr<IMesher> m)
+   {
+      this->mspCustomMesher = m;
    }
 
 } // SpatialScheme

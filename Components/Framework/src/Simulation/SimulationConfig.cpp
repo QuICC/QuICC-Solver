@@ -68,9 +68,6 @@ namespace QuICC {
 
       const auto nodeId = Io::Config::Setup::TRANSFORM;
 
-      // Get size
-      int dim = this->mspCfgFile->spSetup()->spNode(nodeId)->sTags().size();
-
       // Register all transform implementation IDs
       Transform::Setup::registerAll();
 

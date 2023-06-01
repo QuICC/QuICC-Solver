@@ -9,9 +9,6 @@
 // System includes
 //
 
-// External includes
-//
-
 // Project includes
 //
 
@@ -68,7 +65,7 @@ namespace SpatialScheme {
       /// Split fourth order equation into 2 second order
       SplitFourthOrder,
    };
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_FEATURE_HPP

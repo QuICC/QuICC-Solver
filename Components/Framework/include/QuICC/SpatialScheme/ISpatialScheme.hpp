@@ -22,6 +22,7 @@
 #include "QuICC/Tools/ComponentAlias.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
+#include "QuICC/SpatialScheme/IMesher.hpp"
 #include "QuICC/Equations/CouplingIndexType.hpp"
 
 // forward declarations
@@ -60,7 +61,7 @@ namespace QuICC {
 namespace SpatialScheme {
 
    /**
-    * @brief Interface for a spatial scheme name 
+    * @brief Interface for a spatial scheme name
     */
    class ISpatialScheme
    {
@@ -195,7 +196,12 @@ namespace SpatialScheme {
           * @brief Create variant vector variable
           */
          virtual VectorVariable createVVar(std::shared_ptr<Resolution> spRes) const = 0;
-         
+
+         /**
+          * @brief Use custom mesher
+          */
+         void useCustomMesher(std::shared_ptr<IMesher> m);
+
       protected:
          /**
           * @brief Implementation type of transforms
@@ -211,6 +217,11 @@ namespace SpatialScheme {
           * @brief Physical component aliases
           */
          Tools::ComponentAlias<FieldComponents::Spectral::Id>  mSpec;
+
+         /**
+          * @brief Custom mesher
+          */
+         std::shared_ptr<IMesher> mspCustomMesher;
 
       private:
          /**

@@ -8,8 +8,8 @@
 
 // Project includes
 //
+#include "QuICC/Hasher.hpp"
 #include "QuICC/SpatialScheme/3D/SLFl.hpp"
-#include "QuICC/SpatialScheme/Coordinator.hpp"
 #include "QuICC/SpatialScheme/3D/SLFlBuilder.hpp"
 #include "QuICC/Transform/ShellChebyshevTransform.hpp"
 #include "QuICC/Transform/ALegendreTransform.hpp"
@@ -28,7 +28,7 @@ namespace SpatialScheme {
 
    const std::string SLFl::sFormatted = "SLFl";
 
-   const std::size_t SLFl::sId = registerId<SLFl>(SLFl::sTag);
+   const std::size_t SLFl::sId = Hasher::makeId(SLFl::sTag);
 
    SLFl::SLFl(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 3, SLFl::sId, SLFl::sTag, SLFl::sFormatted)
@@ -62,7 +62,7 @@ namespace SpatialScheme {
 
    std::shared_ptr<IBuilder> SLFl::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<SLFlBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<SLFlBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }

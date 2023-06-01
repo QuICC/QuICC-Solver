@@ -292,7 +292,7 @@ namespace Tools {
          keys.push_back(bs.at(k).front());
          bs.at(k).pop_front();
       }
-      if(keys.size() != n)
+      if(keys.size() != static_cast<std::size_t>(n))
       {
          throw std::logic_error("DID NOT reorder ALL MODES");
       }
@@ -386,7 +386,7 @@ namespace Tools {
                auto range = lmap.equal_range(-1);
 
                // process full mode
-               if(lmap.count(l) <= curLoad)
+               if(lmap.count(l) <= static_cast<std::size_t>(curLoad))
                {
                   range = lmap.equal_range(l);
                }

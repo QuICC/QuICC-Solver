@@ -6,17 +6,11 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/TFF.hpp"
-
 // Project includes
 //
+#include "QuICC/Hasher.hpp"
+#include "QuICC/SpatialScheme/3D/TFF.hpp"
 #include "QuICC/Communicators/Converters/PassthroughIndexConv.hpp"
-#include "QuICC/SpatialScheme/Coordinator.hpp"
 #include "QuICC/SpatialScheme/3D/TFFBuilder.hpp"
 #include "QuICC/Transform/CartesianChebyshevTransform.hpp"
 #include "QuICC/Transform/ComplexFourierTransform.hpp"
@@ -34,7 +28,7 @@ namespace SpatialScheme {
 
    const std::string TFF::sFormatted = "TFF";
 
-   const std::size_t TFF::sId = registerId<TFF>(TFF::sTag);
+   const std::size_t TFF::sId = Hasher::makeId(TFF::sTag);
 
    TFF::TFF(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 3, TFF::sId, TFF::sTag, TFF::sFormatted)
@@ -70,7 +64,7 @@ namespace SpatialScheme {
 
    std::shared_ptr<IBuilder> TFF::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<TFFBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<TFFBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }
@@ -219,5 +213,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

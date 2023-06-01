@@ -128,5 +128,5 @@ namespace SpatialScheme {
 
       return spTools;
    }
-}
-}
+} // SpatialScheme
+} // QuICC

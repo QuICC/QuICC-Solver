@@ -64,6 +64,11 @@ namespace SpatialScheme {
          
       protected:
          /**
+          * @brief Initialise the domain dimensions with default setup
+          */
+         virtual void setDimensions() override;
+
+         /**
           * @brief Validate mode splitting
           *
           * @param modes   Modes
@@ -85,6 +90,21 @@ namespace SpatialScheme {
           * @param transId Transform stage to compute splittin for
           */
          void split(std::multimap<int,int>& modes, const std::vector<int>& id, const std::vector<int>& bins, const Dimensions::Transform::Id transId);
+
+         /**
+          * @brief Set transform costs
+          */
+         virtual void setCosts() override;
+
+         /**
+          * @brief Set transform scalings
+          */
+         virtual void setScalings() override;
+
+         /**
+          * @brief Set transform memory footprint
+          */
+         virtual void setMemoryScore() override;
 
       private:
    };

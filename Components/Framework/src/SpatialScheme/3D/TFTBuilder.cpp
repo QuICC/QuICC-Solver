@@ -7,16 +7,11 @@
 //
 #include <set>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/TFTBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/3D/TFTBuilder.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
+#include "QuICC/SpatialScheme/3D/TFTMesher.hpp"
 
 namespace QuICC {
 
@@ -103,129 +98,23 @@ namespace SpatialScheme {
       return spSetup;
    }
 
-   TFTBuilder::TFTBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegular3DBuilder(dim, purpose, {})
-   {
-   }
-
-   TFTBuilder::~TFTBuilder()
+   TFTBuilder::TFTBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options)
+      : IRegular3DBuilder(dim, purpose, options)
    {
    }
 
    void TFTBuilder::setDimensions()
    {
-      //
-      // Set transform space sizes
-      //
-      ArrayI traSize(3);
-      traSize(0) = this->mI + 1;
-      traSize(1) = this->mJ + 1;
-      traSize(2) = this->mK + 1;
-      this->setTransformSpace(traSize);
+      // Set default mesher
+      auto m = std::make_shared<TFTMesher>(this->purpose());
+      this->setMesher(m, false);
+      // ... initialize mesher
+      std::vector<int> d = {this->mI, this->mJ, this->mK};
+      this->mesher().init(d, this->mOptions);
 
-      //
-      // Compute sizes
-      //
-
-      // Get standard dealiased FFT size
-      int nX = Transform::Fft::Tools::dealiasCosFft(this->mI+1);
-      // Check for optimised FFT sizes
-      nX = Transform::Fft::Tools::optimizeFft(nX);
-
-      // Get mixed dealiased FFT size
-      int nY = Transform::Fft::Tools::dealiasMixedFft(this->mJ+1);
-      // Check for optimised FFT sizes
-      nY = Transform::Fft::Tools::optimizeFft(nY);
-
-      // Get standard dealiased FFT size
-      int nZ = Transform::Fft::Tools::dealiasCosFft(this->mK+1);
-      // Check for optimised FFT sizes
-      nZ = Transform::Fft::Tools::optimizeFft(nZ);
-
-      //
-      // Initialise first transform
-      //
-
-      // Initialise forward dimension of first transform
-      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
-
-      // Initialise backward dimension of first transform
-      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
-
-      // Initialise second dimension of first transform
-      this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
-
-      // Initialise third dimension of first transform
-      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
-
-      //
-      // Initialise second transform
-      //
-
-      // Initialise forward dimension of second transform
-      this->setDimension(nY, Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
-
-      // Initialise backward dimension of second transform
-      this->setDimension(nY/2 + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
-
-      // Initialise second dimension of second transform
-      this->setDimension(nX, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
-
-      // Initialise third dimension of second transform
-      this->setDimension(traSize(2), Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
-
-      //
-      // Initialise third transform
-      //
-
-      // Initialise forward dimension of third transform
-      this->setDimension(nZ, Dimensions::Transform::TRA3D, Dimensions::Data::DATF1D);
-
-      // Initialise backward dimension of third transform
-      this->setDimension(nZ, Dimensions::Transform::TRA3D, Dimensions::Data::DATB1D);
-
-      // Initialise second dimension of third transform
-      this->setDimension(nY, Dimensions::Transform::TRA3D, Dimensions::Data::DAT2D);
-
-      // Initialise third dimension of third transform
-      this->setDimension(nX, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
+      // Set dimensions using mesher
+      I3DBuilder::setDimensions();
    }
 
-   void TFTBuilder::setCosts()
-   {
-      // Set first transform cost
-      this->setCost(1.0, Dimensions::Transform::TRA1D);
-
-      // Set second transform cost
-      this->setCost(1.0, Dimensions::Transform::TRA2D);
-
-      // Set third transform cost
-      this->setCost(1.0, Dimensions::Transform::TRA3D);
-   }
-
-   void TFTBuilder::setScalings()
-   {
-      // Set first transform scaling
-      this->setScaling(1.0, Dimensions::Transform::TRA1D);
-
-      // Set second transform scaling
-      this->setScaling(1.0, Dimensions::Transform::TRA2D);
-
-      // Set third transform scaling
-      this->setScaling(1.0, Dimensions::Transform::TRA3D);
-   }
-
-   void TFTBuilder::setMemoryScore()
-   {
-      // Set first transform memory footprint
-      this->setMemory(1.0, Dimensions::Transform::TRA1D);
-
-      // Set second transform memory footprint
-      this->setMemory(1.0, Dimensions::Transform::TRA2D);
-
-      // Set third transform memory footprint
-      this->setMemory(1.0, Dimensions::Transform::TRA3D);
-   }
-
-}
-}
+} // SpatialScheme
+} // QuICC

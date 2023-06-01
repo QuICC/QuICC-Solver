@@ -6,13 +6,7 @@
 #ifndef QUICC_SPATIALSCHEME_3D_TTT_HPP
 #define QUICC_SPATIALSCHEME_3D_TTT_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -39,7 +33,7 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         ~TTT();
+         ~TTT() = default;
 
          /**
           * @brief Unique id
@@ -100,7 +94,7 @@ namespace SpatialScheme {
          static const std::string sFormatted;
    };
 
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_3D_TTT_HPP

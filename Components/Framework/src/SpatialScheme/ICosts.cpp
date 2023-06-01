@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/ICosts.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/ICosts.hpp"
 
 namespace QuICC {
 
@@ -22,10 +16,6 @@ namespace SpatialScheme {
 
    ICosts::ICosts(const int dims)
       : mCosts(dims), mScalings(dims), mMemory(dims)
-   {
-   }
-
-   ICosts::~ICosts()
    {
    }
 
@@ -122,5 +112,5 @@ namespace SpatialScheme {
       this->mMemory(static_cast<int>(id)) = c;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

@@ -3,23 +3,14 @@
  * @brief Source of the base for the scheme builder implementations
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <set>
 #include <vector>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/IBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/IBuilder.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Tools/RegularIndexCounter.hpp"
 
@@ -190,5 +181,41 @@ namespace SpatialScheme {
       #endif //defined QUICC_MPI
    }
 
-}
-}
+   void IBuilder::setMesher(std::shared_ptr<IMesher> m, const bool isCustom)
+   {
+      // Mesher already set
+      if(this->mspMesher)
+      {
+         if(isCustom)
+         {
+            throw std::logic_error("Spatial scheme mesher was already set");
+         }
+      // Use provided mesher
+      } else
+      {
+         this->mspMesher = m;
+      }
+   }
+
+   const IMesher& IBuilder::mesher() const
+   {
+      if(this->mspMesher == nullptr)
+      {
+         throw std::logic_error("Spatial scheme mesher not setup");
+      }
+
+      return *this->mspMesher;
+   }
+
+   IMesher& IBuilder::mesher()
+   {
+      if(this->mspMesher == nullptr)
+      {
+         throw std::logic_error("Spatial scheme mesher not setup");
+      }
+
+      return *this->mspMesher;
+   }
+
+} // SpatialScheme
+} // QuICC

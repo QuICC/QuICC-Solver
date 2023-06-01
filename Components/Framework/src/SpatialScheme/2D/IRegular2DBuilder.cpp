@@ -117,5 +117,82 @@ namespace SpatialScheme {
       spTools->buildBalancedMap(modes, n2D, n3D, id, bins, n0_, nN_);
    }
 
-}
-}
+   void IRegular2DBuilder::setCosts()
+   {
+      // Set first transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA1D);
+
+      // Set second transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA2D);
+   }
+
+   void IRegular2DBuilder::setScalings()
+   {
+      // Set first transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA1D);
+
+      // Set second transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA2D);
+   }
+
+   void IRegular2DBuilder::setMemoryScore()
+   {
+      // Set first transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA1D);
+
+      // Set second transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA2D);
+   }
+
+   void IRegular2DBuilder::setDimensions()
+   {
+      //
+      // Set transform space sizes
+      //
+      ArrayI traSize(2);
+      traSize(0) = this->mesher().nSpec1D();
+      traSize(1) = this->mesher().nSpec2D();
+      this->setTransformSpace(traSize);
+
+      //
+      // Initialise spectral space
+      //
+
+      // Initialise forward dimension of first transform
+      this->setDimension(this->mesher().nSpec1D(), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of first transform
+      this->setDimension(this->mesher().nSpec1D(), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATB1D);
+
+      // Initialise second dimension of first transform
+      this->setDimension(this->mesher().nSpec2D(), Dimensions::Transform::SPECTRAL, Dimensions::Data::DAT2D);
+
+      //
+      // Initialise first transform
+      //
+
+      // Initialise forward dimension of first transform
+      this->setDimension(this->mesher().nPhys1D(), Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of first transform
+      this->setDimension(this->mesher().nDealias1D(), Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+
+      // Initialise second dimension of first transform
+      this->setDimension(this->mesher().nSpec2D(), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+
+      //
+      // Initialise second transform
+      //
+
+      // Initialise forward dimension of second transform
+      this->setDimension(this->mesher().nPhys2D(), Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of second transform
+      this->setDimension(this->mesher().nDealias2D(), Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
+
+      // Initialise second dimension of second transform
+      this->setDimension(this->mesher().nPhys1D(), Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
+   }
+
+} // SpatialScheme
+} // QuICC

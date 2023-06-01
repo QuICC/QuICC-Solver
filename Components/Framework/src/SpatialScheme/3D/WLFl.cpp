@@ -8,8 +8,8 @@
 
 // Project includes
 //
+#include "QuICC/Hasher.hpp"
 #include "QuICC/SpatialScheme/3D/WLFl.hpp"
-#include "QuICC/SpatialScheme/Coordinator.hpp"
 #include "QuICC/SpatialScheme/3D/WLFlBuilder.hpp"
 #include "QuICC/Transform/SphereWorlandTransform.hpp"
 #include "QuICC/Transform/SphereFftWorlandTransform.hpp"
@@ -33,7 +33,7 @@ namespace SpatialScheme {
 
    const std::string WLFl::sFormatted = "WLFl";
 
-   const std::size_t WLFl::sId = registerId<WLFl>(WLFl::sTag);
+   const std::size_t WLFl::sId = Hasher::makeId(WLFl::sTag);
 
    WLFl::WLFl(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 3, WLFl::sId, WLFl::sTag, WLFl::sFormatted)
@@ -119,7 +119,7 @@ namespace SpatialScheme {
 
    std::shared_ptr<IBuilder> WLFl::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<WLFlBuilder>(dim, this->purpose(), needInterpretation, this->mImplType);
+      auto spBuilder = makeBuilder<WLFlBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }

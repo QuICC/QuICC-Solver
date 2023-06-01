@@ -32,6 +32,7 @@ namespace SpatialScheme {
           *
           * @param dim     Spectral dimensions
           * @param purpose Grid purpose
+          * @param options Scheme options
           */
          explicit WLFlBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options);
 
@@ -50,21 +51,6 @@ namespace SpatialScheme {
           * @brief Initialise the domain dimensions
           */
          void setDimensions() final;
-
-         /**
-          * @brief Set transform costs
-          */
-         void setCosts() final;
-
-         /**
-          * @brief Set transform scalings
-          */
-         void setScalings() final;
-
-         /**
-          * @brief Set transform memory footprint
-          */
-         void setMemoryScore() final;
 
       private:
          /**

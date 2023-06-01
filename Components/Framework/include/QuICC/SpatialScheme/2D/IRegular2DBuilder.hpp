@@ -85,6 +85,26 @@ namespace SpatialScheme {
          void split(std::multimap<int,int>& modes, const std::vector<int>& id, const std::vector<int>& bins, const Dimensions::Transform::Id transId);
 
          /**
+          * @brief Initialise the domain dimensions
+          */
+         virtual void setDimensions() override;
+
+         /**
+          * @brief Set transform costs
+          */
+         virtual void setCosts() override;
+
+         /**
+          * @brief Set transform scalings
+          */
+         virtual void setScalings() override;
+
+         /**
+          * @brief Set transform memory footprint
+          */
+         virtual void setMemoryScore() override;
+
+         /**
           * @brief First truncation
           */
          int   mI;

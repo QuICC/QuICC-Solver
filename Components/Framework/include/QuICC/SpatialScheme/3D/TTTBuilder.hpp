@@ -6,13 +6,7 @@
 #ifndef QUICC_SPATIALSCHEME_3D_TTTBUILDER_HPP
 #define QUICC_SPATIALSCHEME_3D_TTTBUILDER_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -43,13 +37,14 @@ namespace SpatialScheme {
           *
           * @param dim     Spectral dimensions
           * @param purpose Grid purpose
+          * @param options Scheme options
           */
-         explicit TTTBuilder(const ArrayI& dim, const GridPurpose::Id purpose);
+         explicit TTTBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options);
 
          /**
           * @brief Destructor
           */
-         ~TTTBuilder();
+         ~TTTBuilder() = default;
 
          /**
           * @brief Add the transform setups to resolution
@@ -61,21 +56,6 @@ namespace SpatialScheme {
           * @brief Initialise the domain dimensions
           */
          void setDimensions() final;
-
-         /**
-          * @brief Set transform costs
-          */
-         void setCosts() final;
-
-         /**
-          * @brief Set transform scalings
-          */
-         void setScalings() final;
-
-         /**
-          * @brief Set transform memory footprint
-          */
-         void setMemoryScore() final;
 
       private:
          /**

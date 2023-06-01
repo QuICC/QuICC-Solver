@@ -55,11 +55,20 @@ namespace Model {
          virtual ~IPhysicalModel() = default;
 
          /**
+          * @brief Tune the spatial scheme (for example change mesher)
+          *
+          * @param spScheme   Spatial scheme
+          */
+         virtual void tuneScheme(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme) {};
+
+         /**
           * @brief Initialize model
           */
          virtual void init();
 
-         /// Formulation used for vector fields
+         /**
+          * @brief Formulation used for vector fields
+          */
          virtual VectorFormulation::Id SchemeFormulation() = 0;
 
          /**

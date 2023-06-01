@@ -6,16 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/2D/TT.hpp"
-
 // Project includes
 //
-#include "QuICC/SpatialScheme/Coordinator.hpp"
+#include "QuICC/Hasher.hpp"
+#include "QuICC/SpatialScheme/2D/TT.hpp"
 #include "QuICC/SpatialScheme/2D/TTBuilder.hpp"
 #include "QuICC/Transform/CartesianChebyshevTransform.hpp"
 #include "QuICC/Communicators/Converters/NoIndexConv.hpp"
@@ -29,7 +23,7 @@ namespace SpatialScheme {
 
    const std::string TT::sFormatted = "TT";
 
-   const std::size_t TT::sId = registerId<TT>(TT::sTag);
+   const std::size_t TT::sId = Hasher::makeId(TT::sTag);
 
    TT::TT(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 2, TT::sId, TT::sTag, TT::sFormatted)
@@ -53,13 +47,9 @@ namespace SpatialScheme {
       this->enable(Feature::RealSpectrum);
    }
 
-   TT::~TT()
-   {
-   }
-
    std::shared_ptr<IBuilder> TT::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<TTBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<TTBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }
@@ -176,5 +166,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

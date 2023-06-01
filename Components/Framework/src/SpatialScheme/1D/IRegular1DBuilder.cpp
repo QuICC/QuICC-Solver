@@ -101,5 +101,53 @@ namespace SpatialScheme {
       return spTools;
    }
 
-}
-}
+   void IRegular1DBuilder::setCosts()
+   {
+      // Set first transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA1D);
+   }
+
+   void IRegular1DBuilder::setScalings()
+   {
+      // Set first transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA1D);
+   }
+
+   void IRegular1DBuilder::setMemoryScore()
+   {
+      // Set first transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA1D);
+   }
+
+   void IRegular1DBuilder::setDimensions()
+   {
+      //
+      // Set transform space sizes
+      //
+      ArrayI traSize(1);
+      traSize(0) = this->mesher().nSpec1D();
+      this->setTransformSpace(traSize);
+
+      //
+      // Initialise spectral space
+      //
+
+      // Initialise forward dimension of first transform
+      this->setDimension(this->mesher().nSpec1D(), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of first transform
+      this->setDimension(this->mesher().nSpec1D(), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATB1D);
+
+      //
+      // Initialise first transform
+      //
+
+      // Initialise forward dimension of first transform
+      this->setDimension(this->mesher().nPhys1D(), Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of first transform
+      this->setDimension(this->mesher().nDealias1D(), Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+   }
+
+} // SpatialScheme
+} // QuICC

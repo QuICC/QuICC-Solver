@@ -6,13 +6,7 @@
 #ifndef QUICC_SPATIALSCHEME_3D_FFF_HPP
 #define QUICC_SPATIALSCHEME_3D_FFF_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -39,7 +33,7 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         ~FFF();
+         ~FFF() = default;
 
          /**
           * @brief Unique id
@@ -100,7 +94,7 @@ namespace SpatialScheme {
          static const std::string sFormatted;
    };
 
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_3D_FFF_HPP

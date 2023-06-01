@@ -41,6 +41,11 @@ namespace SpatialScheme {
          static const std::size_t sId;
 
          /**
+          * @brief Set implementation type
+          */
+         void setImplementation(const std::map<std::size_t,std::vector<std::size_t>>& type) final;
+
+         /**
           * @brief Create the scheme builder
           */
          std::shared_ptr<IBuilder> createBuilder(ArrayI& dim, const bool needInterpretation) const final;

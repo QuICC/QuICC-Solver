@@ -6,16 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/TTT.hpp"
-
 // Project includes
 //
-#include "QuICC/SpatialScheme/Coordinator.hpp"
+#include "QuICC/Hasher.hpp"
+#include "QuICC/SpatialScheme/3D/TTT.hpp"
 #include "QuICC/SpatialScheme/3D/TTTBuilder.hpp"
 #include "QuICC/Transform/CartesianChebyshevTransform.hpp"
 #include "QuICC/Communicators/Converters/NoIndexConv.hpp"
@@ -29,7 +23,7 @@ namespace SpatialScheme {
 
    const std::string TTT::sFormatted = "TTT";
 
-   const std::size_t TTT::sId = registerId<TTT>(TTT::sTag);
+   const std::size_t TTT::sId = Hasher::makeId(TTT::sTag);
 
    TTT::TTT(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 3, TTT::sId, TTT::sTag, TTT::sFormatted)
@@ -53,13 +47,9 @@ namespace SpatialScheme {
       this->enable(Feature::RealSpectrum);
    }
 
-   TTT::~TTT()
-   {
-   }
-
    std::shared_ptr<IBuilder> TTT::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<TTTBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<TTTBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }
@@ -197,5 +187,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC
