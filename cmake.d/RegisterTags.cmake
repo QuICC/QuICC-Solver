@@ -15,10 +15,12 @@
 #     add prefix to tag
 # VALUE
 #     tags also carries a numerical value
+# REGISTRATOR
+#     name of convenience header to register all tags. registerAll by default
 #
 function(quicc_register_tags)
   # parse inputs
-  set(oneValueArgs NAMESPACE BASECLASS COMMON_DIR PREFIX VALUE)
+  set(oneValueArgs NAMESPACE BASECLASS COMMON_DIR PREFIX VALUE REGISTRATOR)
   set(multiValueArgs EXCLUDED TAGS)
   cmake_parse_arguments(QRT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -32,6 +34,10 @@ function(quicc_register_tags)
   endif()
   if(QRT_PREFIX)
     message(DEBUG "${QRT_PREFIX}")
+  endif()
+
+  if(NOT QRT_REGISTRATOR)
+    set(QRT_REGISTRATOR "registerAll")
   endif()
 
   if(NOT QRT_COMMON_DIR)
@@ -122,10 +128,11 @@ function(quicc_register_tags)
     endif()
   endforeach(fullname)
 
-  # Configure registration file
+  set(_registrator ${QRT_REGISTRATOR})
+  string(TOUPPER "${_registrator}" _REGISTRATOR)
   configure_file(
     "${QRT_COMMON_DIR}/include/QuICC/IdTools/registerAll.hpp.in"
-    "${PROJECT_BINARY_DIR}/include/QuICC/${QRT_NAMESPACE}/registerAll.hpp"
+    "${PROJECT_BINARY_DIR}/include/QuICC/${QRT_NAMESPACE}/${QRT_REGISTRATOR}.hpp"
     )
 
   # Configure ID interface registration files

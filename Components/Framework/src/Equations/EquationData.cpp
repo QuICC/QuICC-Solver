@@ -10,6 +10,7 @@
 // Project includes
 //
 #include "QuICC/Equations/EquationData.hpp"
+#include "QuICC/PhysicalNames/Undefined.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
@@ -24,7 +25,7 @@ namespace Equations {
    }
 
    EquationData::EquationData(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions)
-      : mForwardPathsType(FWD_IS_CUSTOM), mspEqParams(spEqParams), mspSpatialScheme(spScheme), mspBackend(spBackend), mspOptions(spOptions), mTime(-1.0)
+      : mForwardPathsType(FWD_IS_CUSTOM), mspEqParams(spEqParams), mspSpatialScheme(spScheme), mspBackend(spBackend), mspOptions(spOptions), mTime(-1.0), mName(PhysicalNames::Undefined::id())
    {
    }
 
