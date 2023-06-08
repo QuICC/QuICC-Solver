@@ -30,6 +30,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
+    IDS 0 1 2 3 4
     ULP 70
   )
 endforeach()
