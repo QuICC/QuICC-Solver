@@ -64,7 +64,9 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     float_t fftScaling = 1.0;
     if constexpr (std::is_same_v<Direction, fwd_t>)
     {
-        fftScaling = 1.0 / static_cast<float_t>((M-1)*2);
+        int sze = (M-1)*2;
+        sze = sze + (sze%3>0)*(3-sze%3);
+        fftScaling = 1.0 / static_cast<float_t>(sze);
     }
 
     if constexpr (isComplex)
