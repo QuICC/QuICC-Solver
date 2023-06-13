@@ -17,7 +17,9 @@
 //
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
+#include "QuICC/ModelOperator/Boundary.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverHasBc.hpp"
+#include "QuICC/ModelOperatorBoundary/SolverNoTau.hpp"
 #include "QuICC/SparseSolvers/SparseLinearCoordinatorBase.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolver.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
@@ -111,7 +113,12 @@ namespace Solver {
       // Get model's linear operator with tau lines
       DebuggerMacro_msg("building " + ModelOperator::Coordinator::tag(ModelOperator::ImplicitLinear::id()) + " matrix", 3);
       ops.insert(std::make_pair(ModelOperator::ImplicitLinear::id(), DecoupledZSparse()));
-      spEq->buildModelMatrix(ops.find(ModelOperator::ImplicitLinear::id())->second, ModelOperator::ImplicitLinear::id(), comp, idx, ModelOperatorBoundary::SolverHasBc::id());
+      spEq->buildModelMatrix(ops.find(ModelOperator::ImplicitLinear::id())->second, ModelOperator::ImplicitLinear::id(), comp, idx, ModelOperatorBoundary::SolverNoTau::id());
+      DebuggerMacro_msg("... done", 3);
+      // Compute model's tau line boundary operator
+      DebuggerMacro_msg("building " + ModelOperator::Coordinator::tag(ModelOperator::Boundary::id()) + " matrix", 3);
+      ops.insert(std::make_pair(ModelOperator::Boundary::id(), DecoupledZSparse()));
+      spEq->buildModelMatrix(ops.find(ModelOperator::Boundary::id())->second, ModelOperator::Boundary::id(), comp, idx, ModelOperatorBoundary::SolverHasBc::id());
       DebuggerMacro_msg("... done", 3);
 
       DebuggerMacro_msg("building solver operators", 3);
