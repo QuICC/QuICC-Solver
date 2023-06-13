@@ -15,6 +15,7 @@
 //
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
+#include "QuICC/ModelOperator/Boundary.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
 #include "QuICC/SparseSolvers/SparseSolverBase.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolverTools.hpp"
@@ -596,8 +597,12 @@ namespace Solver {
    template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::buildOperators(const int idx, const std::map<std::size_t,DecoupledZSparse>& ops, const int size)
    {
       std::map<std::size_t,DecoupledZSparse>::const_iterator iOpA = ops.find(ModelOperator::ImplicitLinear::id());
-      this->rLHSMatrix(0, idx).resize(size, size);
-      Solver::internal::addOperators(this->rLHSMatrix(0, idx), 1.0, iOpA->second);
+      std::map<std::size_t,DecoupledZSparse>::const_iterator iOpC = ops.find(ModelOperator::Boundary::id());
+
+      auto&& lhsMat = this->rLHSMatrix(0, idx);
+      lhsMat.resize(size, size);
+      Solver::internal::addOperators(lhsMat, 1.0, iOpA->second);
+      Solver::internal::addOperators(lhsMat, 1.0, iOpC->second);
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> std::size_t SparseLinearSolver<TOperator,TData,TSolver>::nSystem() const
