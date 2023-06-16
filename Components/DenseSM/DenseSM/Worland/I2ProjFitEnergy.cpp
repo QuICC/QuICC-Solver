@@ -70,7 +70,7 @@ namespace Worland {
       }
       else
       {
-         mat.setZero(nbar, nbar);
+         mat.setZero(rows, rows);
       }
    }
 
