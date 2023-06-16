@@ -1,0 +1,47 @@
+/**
+ * @file @Operator@Test.cpp
+ * @brief Tests for the Worland @Operator@ DenseSM operator
+ */
+
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <iostream>
+
+// Project includes
+//
+#include "TestSuite/DenseSM/Worland/TestArgs.hpp"
+#include "DenseSM/Worland/@Operator@.hpp"
+#include "QuICC/Polynomial/Worland/WorlandBase.hpp"
+
+namespace currentts = ::QuICC::TestSuite::DenseSM::Worland;
+
+TEST_CASE( "Error for @Operator@ operator", "[@Operator@:@type@]" )
+{
+
+   // Set default arguments if required
+   if(currentts::args().useDefault)
+   {
+      currentts::args().params = {0,1,2,3,4,10,11,12,13,14};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   // Set type
+   currentts::args().setType("@type@");
+
+   REQUIRE( currentts::args().params.size() > 0 );
+
+   typedef ::QuICC::DenseSM::Worland::@Operator@ Operator;
+
+   auto a = ::QuICC::Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;                                                                                                                           
+   auto b = ::QuICC::Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
+
+   Operator op(12, 13, 13, a, b, 1);
+
+   auto mat = op.mat();
+
+   std::cerr << mat.rows() << " x " << mat.cols() << std::endl;
+   std::cerr << mat << std::endl;;
+}
