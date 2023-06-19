@@ -1,6 +1,6 @@
 /** 
- * @file I2ProjFitEnergy.cpp
- * @brief Source of the implementation of the full sphere Worland projection operator onto best energy fit with I2 quasi-inverse
+ * @file I2ProjFitEnergyPol.cpp
+ * @brief Source of the implementation of the full sphere Worland projection operator onto best energy fit for poloidal scalar with I2 quasi-inverse
  */
 
 // System includes
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "I2ProjFitEnergy.hpp"
+#include "I2ProjFitEnergyPol.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandLegendreRule.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
@@ -26,12 +26,12 @@ namespace DenseSM {
 
 namespace Worland {
 
-   I2ProjFitEnergy::I2ProjFitEnergy(const int outRows, const std::size_t bcId, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
+   I2ProjFitEnergyPol::I2ProjFitEnergyPol(const int outRows, const std::size_t bcId, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
       : IWorlandOperator(rows, cols, alpha, dBeta), mOutRows(outRows), mL(l), mProj(outRows, bcId, rows, cols, alpha, dBeta, l, q)
    {
    }
 
-   void I2ProjFitEnergy::buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const
+   void I2ProjFitEnergyPol::buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const
    {
       switch(this->type())
       {
@@ -50,7 +50,7 @@ namespace Worland {
       }
    }
 
-   void I2ProjFitEnergy::buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const
+   void I2ProjFitEnergyPol::buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const
    {
       const auto& nbar = this->mOutRows;
 

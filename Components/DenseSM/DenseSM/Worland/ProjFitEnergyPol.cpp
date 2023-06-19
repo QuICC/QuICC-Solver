@@ -1,6 +1,6 @@
 /** 
- * @file ProjFitEnergy.cpp
- * @brief Source of the implementation of the full sphere Worland projection operator onto best energy fit
+ * @file ProjFitEnergyPol.cpp
+ * @brief Source of the implementation of the full sphere Worland projection operator onto best energy fit for poloidal scalar
  */
 
 // System includes
@@ -11,29 +11,30 @@
 
 // Project includes
 //
-#include "ProjFitEnergy.hpp"
+#include "ProjFitEnergyPol.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandLegendreRule.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
+#include "QuICC/Polynomial/Worland/drWnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
-#include "QuICC/SparseSM/Worland/Stencil/Value.hpp"
-#include "QuICC/SparseSM/Worland/Stencil/D1.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/InsulatingSphere.hpp"
 #include "QuICC/SparseSM/Worland/I2.hpp"
-#include "QuICC/Bc/Name/FixedTemperature.hpp"
-#include "QuICC/Bc/Name/FixedFlux.hpp"
+#include "QuICC/Bc/Name/Insulating.hpp"
 
+#include <iostream>
 namespace QuICC {
 
 namespace DenseSM {
 
 namespace Worland {
 
-   ProjFitEnergy::ProjFitEnergy(const int outRows, const std::size_t bcId, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
+   ProjFitEnergyPol::ProjFitEnergyPol(const int outRows, const std::size_t bcId, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
       : IWorlandOperator(rows, cols, alpha, dBeta), mOutRows(outRows), mL(l), mBcId(bcId)
    {
    }
 
-   void ProjFitEnergy::buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const
+   void ProjFitEnergyPol::buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const
    {
       switch(this->type())
       {
@@ -52,7 +53,7 @@ namespace Worland {
       }
    }
 
-   void ProjFitEnergy::buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const
+   void ProjFitEnergyPol::buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const
    {
       const auto& nbar = this->mOutRows;
 
@@ -61,6 +62,7 @@ namespace Worland {
          const auto a = Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
          const auto db = Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
          const auto& l = this->mL;
+         const auto ll1 = l*(l+1.0);
          Polynomial::Quadrature::WorlandLegendreRule wquad;
 
          int rp = 2*rows + static_cast<int>(l);
@@ -71,21 +73,28 @@ namespace Worland {
 
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::Wnl wnl;
+         Polynomial::Worland::drWnl drwnl;
+
          internal::Matrix tmpBwd(igrid.size(), rows);
          wnl.compute<MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
          internal::Matrix tmpFwd(igrid.size(), rows);
-         wnl.compute<MHDFloat>(tmpFwd, rows, l, igrid, iweights.array()*igrid.array().abs2(), ev::Set());
-         internal::Matrix matW = tmpFwd.transpose()*tmpBwd;
+         wnl.compute<MHDFloat>(tmpFwd, rows, l, igrid, iweights.array(), ev::Set());
+         internal::Matrix matW = ll1*ll1*(tmpFwd.transpose()*tmpBwd);
+
+         drwnl.compute<MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
+         drwnl.compute<MHDFloat>(tmpFwd, rows, l, igrid, iweights.array(), ev::Set());
+         matW += ll1*(tmpFwd.transpose()*tmpBwd);
+
+         SparseSM::Worland::Boundary::Value bc(a, db, l);
+         internal::Matrix bcVal = bc.compute(rows-1).matrix();
+         internal::Matrix bcMat = (l*ll1*bcVal)*bcVal.transpose();
+
+         matW += bcMat;
 
          SparseMatrix matS;
-         if(this->mBcId == Bc::Name::FixedTemperature::id())
+         if(this->mBcId == Bc::Name::Insulating::id())
          {
-            SparseSM::Worland::Stencil::Value S(nbar, nbar-1, a, db, l);
-            matS = S.mat();
-         }
-         else if(this->mBcId == Bc::Name::FixedFlux::id())
-         {
-            SparseSM::Worland::Stencil::D1 S(nbar, nbar-1, a, db, l);
+            SparseSM::Worland::Stencil::InsulatingSphere S(nbar, nbar-1, a, db, l);
             matS = S.mat();
          }
          else
@@ -93,10 +102,9 @@ namespace Worland {
             throw std::logic_error("Unknown boundary condition");
          }
 
-
          Matrix matWbar = (matS.transpose()*matW.block(0,0,nbar,nbar)*matS);
          mat.resize(rows, cols);
-         mat.topRows(nbar) = matS*matWbar.inverse()*matS.transpose()*matW.topRows(this->mOutRows);
+         mat.topRows(nbar) = matS*matWbar.inverse()*matS.transpose()*matW.topRows(nbar);
          mat.bottomRows(rows-nbar).setZero();
       }
       else

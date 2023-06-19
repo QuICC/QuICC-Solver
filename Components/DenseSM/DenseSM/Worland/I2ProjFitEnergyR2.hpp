@@ -1,10 +1,11 @@
 /** 
- * @file ProjFitEnergy.hpp
- * @brief Implementation of the full sphere Worland projection operator onto best energy fit
+ * @file I2ProjFitEnergyR2.hpp
+ * @brief Implementation of the full sphere Worland projection operator onto best energy fit with I2 quas-inverse
+ *
  */
 
-#ifndef QUICC_DENSESM_WORLAND_PROJFITENERGY_HPP
-#define QUICC_DENSESM_WORLAND_PROJFITENERGY_HPP
+#ifndef QUICC_DENSESM_WORLAND_I2PROJFITENERGYR2_HPP
+#define QUICC_DENSESM_WORLAND_I2PROJFITENERGYR2_HPP
 
 // System includes
 //
@@ -13,6 +14,7 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "DenseSM/IWorlandOperator.hpp"
+#include "DenseSM/Worland/ProjFitEnergyR2.hpp"
 
 namespace QuICC {
 
@@ -21,9 +23,9 @@ namespace DenseSM {
 namespace Worland {
 
    /**
-    * @brief Implementation of the full sphere Worland projection operator onto best energy fit
+    * @brief Implementation of the full sphere Worland projection operator onto best energy fit with I2 quasi-inverse
     */ 
-   class ProjFitEnergy: public IWorlandOperator
+   class I2ProjFitEnergyR2: public IWorlandOperator
    {
       public:
          /**
@@ -38,12 +40,12 @@ namespace Worland {
           * @param l       Harmonic degree l
           * @param q       Truncation q (only consider rows - q equations)
           */
-         ProjFitEnergy(const int outRows, const std::size_t bcId, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q = 0);
+         I2ProjFitEnergyR2(const int outRows, const std::size_t bcId, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q = 0);
 
          /**
           * @brief Destructor
           */
-         virtual ~ProjFitEnergy() = default;
+         virtual ~I2ProjFitEnergyR2() = default;
          
       protected:
          /**
@@ -54,6 +56,12 @@ namespace Worland {
           * @param cols cols of matrix
           */
          void buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const final;
+
+      private:
+         /**
+          * @brief Build Chebyshev type operator
+          */
+         void buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const;
 
          /**
           * @brief Output truncation
@@ -66,19 +74,13 @@ namespace Worland {
          Scalar_t mL;
 
          /**
-          * @brief Boundary condition
+          * @Brief Energy fit projector
           */
-         std::size_t mBcId;
-
-      private:
-         /**
-          * @brief Build Chebyshev type operator
-          */
-         void buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const;
+         ProjFitEnergyR2 mProj;
    };
 
 } // Worland
 } // DenseSM
 } // QuICC
 
-#endif // QUICC_DENSESM_WORLAND_PROJFITENERGY_HPP
+#endif // QUICC_DENSESM_WORLAND_I2PROJFITENERGYR2_HPP
