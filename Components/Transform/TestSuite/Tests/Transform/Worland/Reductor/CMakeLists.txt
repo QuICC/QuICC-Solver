@@ -27,6 +27,23 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+set(_tests
+  Poly::RadialPower:reductor
+  Poly::RadialPowerDivR1:reductor
+  Poly::RadialPowerDivR1D1R1:reductor
+)
+quicc_set_ulp(_ulp
+  ULP 60 120 120
+  MPULP 11 11 11
+)
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:type
+    IDS 0 1 2
+    ULPS ${_ulp}
+  )
+endforeach()
 
 set(_tests
   Poly::EnergyD1R1:reductor

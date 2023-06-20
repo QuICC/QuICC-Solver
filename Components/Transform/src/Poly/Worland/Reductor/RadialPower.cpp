@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Reductor/RadialPower.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Reductor/RadialPower.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/InnerProduct.hpp"
@@ -35,10 +29,6 @@ namespace Reductor {
       : IWorlandRadialPower()
    {
       this->setProfileTag();
-   }
-
-   RadialPower::~RadialPower()
-   {
    }
 
    void RadialPower::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
@@ -69,8 +59,8 @@ namespace Reductor {
       #endif //defined QUICC_WORLAND_REDUIMPL_MATRIX
    }
 
-}
-}
-}
-}
-}
+} // Reductor
+} // Worland
+} // Poly
+} // Transform
+} // QuICC

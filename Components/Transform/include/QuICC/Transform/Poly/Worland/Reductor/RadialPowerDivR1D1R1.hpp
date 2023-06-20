@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_RADIALPOWERDIVR1D1R1_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_RADIALPOWERDIVR1D1R1_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -47,25 +38,34 @@ namespace Reductor {
          /**
           * @brief Destructor
           */
-         virtual ~RadialPowerDivR1D1R1();
+         virtual ~RadialPowerDivR1D1R1() = default;
          
       protected:
          /**
           * @brief Apply ith operator
+          *
+          * @param rOut Output radial power
+          * @param i    3D mode index
+          * @param in   Input spectrum
           */
          virtual void applyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const override;
 
       private:
          /**
           * @brief Make operator
+          *
+          * @param op         Storage for operator
+          * @param igrid      quadrature grid
+          * @param iweights   quadrature weights
+          * @param i          3D mode index
           */
          virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const override;
    };
 
-}
-}
-}
-}
-}
+} // Reductor
+} // Worland
+} // Poly
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_RADIALPOWERDIVR1D1R1_HPP
