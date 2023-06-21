@@ -15,7 +15,7 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
-#include "QuICC/Hdf5Typedefs.hpp"
+#include "QuICC/Io/Hdf5Typedefs.hpp"
 
 namespace QuICC {
 
@@ -30,7 +30,7 @@ namespace QuICC {
    {
       public:
          /// Typedef for the offsets
-         typedef QuICC_hsize_t OffsetType;
+         typedef Io::QuICC_hsize_t OffsetType;
 
          /**
           * @brief Constructor
