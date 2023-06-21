@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Reductor/IWorlandRadialPower.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Reductor/IWorlandRadialPower.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
@@ -31,10 +25,6 @@ namespace Worland {
 namespace Reductor {
 
    IWorlandRadialPower::IWorlandRadialPower()
-   {
-   }
-
-   IWorlandRadialPower::~IWorlandRadialPower()
    {
    }
 
@@ -106,8 +96,8 @@ namespace Reductor {
       return this->mspSetup->blockSize();
    }
 
-}
-}
-}
-}
-}
+} // Reductor
+} // Worland
+} // Poly
+} // Transform
+} // QuICC

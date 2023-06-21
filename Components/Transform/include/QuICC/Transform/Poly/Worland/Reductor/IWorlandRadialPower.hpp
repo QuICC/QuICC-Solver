@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_IWORLANDRADIALPOWER_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_IWORLANDRADIALPOWER_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -47,7 +38,7 @@ namespace Reductor {
          /**
           * @brief Destructor
           */
-         virtual ~IWorlandRadialPower();
+         virtual ~IWorlandRadialPower() = default;
 
          /**
           * @brief Rows of output data
@@ -98,10 +89,10 @@ namespace Reductor {
          virtual void applyOperators(MatrixZ& rOut, const MatrixZ& in) const override;
    };
 
-}
-}
-}
-}
-}
+} // Reductor
+} // Worland
+} // Poly
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_IWORLANDRADIALPOWER_HPP

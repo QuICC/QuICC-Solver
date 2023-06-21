@@ -383,12 +383,14 @@ namespace Worland {
       ss.precision(10);
       ss << "_id" << id;
 
+      // Distributed data meta file
       if(param.size() == 3)
       {
          int np = param.at(1);
          ss << "_np" << np;
          int r = param.at(2);
          ss << "_r" << r;
+         ss << "_stage0";
       }
 
       return ss.str();
