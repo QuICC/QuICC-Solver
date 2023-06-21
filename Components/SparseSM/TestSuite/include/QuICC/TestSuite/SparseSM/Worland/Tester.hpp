@@ -19,6 +19,8 @@
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/TestSuite/SparseSM/TesterBase.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/ICondition.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/Operator.hpp"
 
 namespace QuICC {
 
@@ -96,41 +98,59 @@ namespace Worland {
    {
       Array meta = this->readMeta(param, type);
 
-      int rows = static_cast<int>(meta(0));
-      int cols = static_cast<int>(meta(1));
-      auto alpha = meta(2);
-      auto dbeta = meta(3);
-      auto l = meta(4);
-      int q = 0;
-      // Check for truncation in meta data
-      if(meta.size() > 5)
+      if constexpr(std::is_base_of_v<QuICC::SparseSM::IWorlandOperator, TOp>)
       {
-         q = meta(5);
-      }
+         int rows = static_cast<int>(meta(0));
+         int cols = static_cast<int>(meta(1));
+         auto alpha = meta(2);
+         auto dbeta = meta(3);
+         auto l = meta(4);
+         int q = 0;
+         // Check for truncation in meta data
+         if(meta.size() > 5)
+         {
+            q = meta(5);
+         }
 
-      TOp op(rows, cols, alpha, dbeta, l, q);
-      mat = op.mat();
+         TOp op(rows, cols, alpha, dbeta, l, q);
+         mat = op.mat();
+      }
    }
 
    template <typename TOp> void Tester<TOp>::buildOperator(Matrix& mat, const ParameterType& param, const TestType type) const
    {
       Array meta = this->readMeta(param, type);
 
-      int rows = static_cast<int>(meta(0));
-      int cols = static_cast<int>(meta(1));
-      auto alpha = meta(2);
-      auto dbeta = meta(3);
-      auto l = meta(4);
-      int q = 0;
-      // Check for truncation in meta data
-      if(meta.size() > 5)
+      if constexpr(std::is_base_of_v<QuICC::SparseSM::IWorlandOperator, TOp>)
       {
-         q = meta(5);
-      }
+         int rows = static_cast<int>(meta(0));
+         int cols = static_cast<int>(meta(1));
+         auto alpha = meta(2);
+         auto dbeta = meta(3);
+         auto l = meta(4);
+         int q = 0;
+         // Check for truncation in meta data
+         if(meta.size() > 5)
+         {
+            q = meta(5);
+         }
 
-      TOp op(rows, cols, alpha, dbeta, l, q);
-      unsigned int KL, KU;
-      mat = op.banded(KL, KU);
+         TOp op(rows, cols, alpha, dbeta, l, q);
+         unsigned int KL, KU;
+         mat = op.banded(KL, KU);
+      }
+      else if constexpr(std::is_base_of_v<QuICC::SparseSM::Worland::Boundary::ICondition, TOp>)
+      {
+         auto alpha = meta(0);
+         auto dbeta = meta(1);
+         auto l = meta(2);
+         int maxN = static_cast<int>(meta(3));
+
+         QuICC::SparseSM::Worland::Boundary::Operator bcOp(1, maxN+1, alpha, dbeta, l, true);
+
+         bcOp.addRow<TOp>();
+         mat = bcOp.mat();
+      }
    }
 
    template <typename TOp> std::string Tester<TOp>::resname(const ParameterType& param) const

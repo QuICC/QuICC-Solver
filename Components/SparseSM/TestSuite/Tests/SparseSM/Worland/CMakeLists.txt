@@ -193,4 +193,6 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+add_subdirectory(Boundary)
+
 list(POP_BACK CMAKE_MESSAGE_INDENT)
