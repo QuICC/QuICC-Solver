@@ -60,6 +60,11 @@ namespace SparseSM {
          SparseMatrix mat() const;
 
          /**
+          * @brief Get sparse matrix embedded in larger matrix
+          */
+         SparseMatrix embedded(const int rows, const int cols) const;
+
+         /**
           * @brief Get BLAS banded storage matrix and KL, KU
           */
          Matrix banded(unsigned int& kL, unsigned int& kU) const;
@@ -74,7 +79,7 @@ namespace SparseSM {
          template<class T, typename std::enable_if_t<std::is_same_v<Scalar_t, MHDFloat>, bool> = true>
          void buildOp(T& mat) const
          {
-            this->buildOpImpl(mat);
+            this->buildOpImpl(mat, this->rows(), this->cols());
          }
 
          /**
@@ -89,7 +94,7 @@ namespace SparseSM {
          void buildOp(T& mat) const
          {
             internal::SparseMatrix imat;
-            this->buildOpImpl(imat);
+            this->buildOpImpl(imat, this->rows(), this->cols());
             mat = imat.cast<MHDFloat>();
          }
 
@@ -105,7 +110,7 @@ namespace SparseSM {
          void buildOp(T& mat) const
          {
             internal::Matrix imat;
-            this->buildOpImpl(imat);
+            this->buildOpImpl(imat, this->rows(), this->cols());
             mat = imat.cast<MHDFloat>();
          }
 
@@ -124,13 +129,13 @@ namespace SparseSM {
           * @brief Implementation of build sparse matrix operator
           * @param output operator
           */
-         void buildOpImpl(internal::SparseMatrix& mat) const;
+         void buildOpImpl(internal::SparseMatrix& mat, const int rows, const int cols) const;
 
          /**
           * @brief Implementation of build banded matrix operator
           * @param output operator
           */
-         void buildOpImpl(internal::Matrix& mat) const;
+         void buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const;
 
          /**
           * @brief Convert diagonal to triplets

@@ -49,6 +49,13 @@ namespace Boundary {
           */
          template <typename TCondition> void addRow();
 
+         /**
+          * @brief Embed boundary tau row in bigger size
+          *
+          * @param n Truncation of BC row
+          */
+         template <typename TCondition> void embedRow(const int n);
+
       private:
          /**
           * @brief Compute list of boundary values
@@ -88,6 +95,18 @@ namespace Boundary {
       TCondition bc(this->mAlpha, this->mDBeta, this->mL);
 
       auto val = bc.compute(this->cols() - 1);
+      this->mBcs.emplace_back(val);
+   }
+
+   template <typename TCondition> void Operator::embedRow(const int n)
+   {
+      TCondition bc(this->mAlpha, this->mDBeta, this->mL);
+
+      auto val = bc.compute(this->cols() - 1);
+      if(this->cols() - n > 0)
+      {
+         val.bottomRows(this->cols()-n).setZero();
+      }
       this->mBcs.emplace_back(val);
    }
 
