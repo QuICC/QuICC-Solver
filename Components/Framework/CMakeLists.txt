@@ -30,6 +30,9 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 target_compile_options(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   "SHELL:${CMAKE_CXX_FLAGS}")
 
+# Set HDF5 typedef depending on version
+include(cmake.d/setup/SetHdf5Typedef.cmake)
+
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   ${QUICC_POLYNOMIAL_COMPONENT_LIB}
   ${QUICC_PYQUICC_COMPONENT_LIB}

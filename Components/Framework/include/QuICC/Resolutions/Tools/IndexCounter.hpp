@@ -15,6 +15,7 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
+#include "QuICC/Io/Hdf5Typedefs.hpp"
 
 namespace QuICC {
 
@@ -28,8 +29,9 @@ namespace QuICC {
    class IndexCounter
    {
       public:
-         /// Typedef for a very large unsigned int for the offsets (to avoid including hdf5.h)
-         typedef long long unsigned int OffsetType;
+         /// Typedef for the offsets
+         typedef Io::QuICC_hsize_t OffsetType;
+
          /**
           * @brief Constructor
           */
