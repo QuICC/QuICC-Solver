@@ -24,7 +24,6 @@ endforeach()
 # Create BFLoop tests targets
 set(_tests
   Mixed::P:<base_t>:bfloop
-  Mixed::P:<viewCpu_t>:bfloop
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
