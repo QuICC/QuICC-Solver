@@ -8,7 +8,7 @@
 #include "QuICC/Transform/Fft/Fourier/@Space@/@Kind@/I@Space@@Kind@.hpp"
 #include "QuICC/Transform/Fft/Fourier/Tags.hpp"
 #include "View/View.hpp"
-#include "Operator/Interface.hpp"
+#include "Operator/Unary.hpp"
 @CuhHeader@
 
 namespace QuICC {
@@ -58,7 +58,7 @@ private:
     using @ArgOutType@ = View<@OutMatrixType@::Scalar, ViewAttribute_t>;
 
     /// @brief Operator base class pointer
-    mutable std::unique_ptr<QuICC::Operator::InterfaceOp<@ArgsType@>> mOp;
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<@ArgsType@>> mOp;
 
     /// @brief Temporary storage for padding input
     mutable MatrixZ mPadded;

@@ -1,6 +1,6 @@
 /**
- * @file Interface.hpp
- * @brief Operator interface
+ * @file Unary.hpp
+ * @brief Operator unary interface
  */
 #pragma once
 
@@ -15,7 +15,7 @@ namespace Operator {
  *  @tparam Tin input type, in pratice always a View
  */
 template<class Tout, class Tin>
-class InterfaceOp
+class UnaryOp
 {
 public:
     /// @brief apply action of the unary operator
@@ -29,7 +29,7 @@ public:
     virtual void apply(Tout& out, Tin& in) = 0;
 
     /// @brief dtor
-    virtual ~InterfaceOp() = default;
+    virtual ~UnaryOp() = default;
 };
 
 /** @brief CRTP base class of a generic unary operator.
@@ -38,7 +38,7 @@ public:
  *  @tparam Tin input type, in pratice always a View
  */
 template <class Derived, class Tout, class Tin>
-class BaseOp : public InterfaceOp<Tout, Tin>
+class UnaryBaseOp : public UnaryOp<Tout, Tin>
 {
 public:
     /// @brief apply action of the unary operator by dispatching to derived class implementation

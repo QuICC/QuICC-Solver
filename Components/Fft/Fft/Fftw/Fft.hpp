@@ -10,7 +10,7 @@
 
 // Project includes
 //
-#include "Operator/Interface.hpp"
+#include "Operator/Unary.hpp"
 #include "View/View.hpp"
 
 namespace QuICC {
@@ -26,7 +26,7 @@ using namespace QuICC::Memory;
 /// @tparam Tout
 /// @tparam Tin
 template<class Tout, class Tin>
-class FftOp : public BaseOp<FftOp<Tout, Tin>, Tout, Tin>
+class FftOp : public UnaryBaseOp<FftOp<Tout, Tin>, Tout, Tin>
 {
 public:
     /// @brief action implementation, default to no implementation
@@ -40,7 +40,7 @@ public:
 /// @tparam AttOut attributes describing the output View
 template<class AttIn, class AttOut>
 class FftOp<View<double, AttOut>, View<std::complex<double>, AttIn>> :
-    public BaseOp<FftOp<View<double, AttOut>, View<std::complex<double>, AttIn>>,
+    public UnaryBaseOp<FftOp<View<double, AttOut>, View<std::complex<double>, AttIn>>,
         View<double, AttOut>, View<std::complex<double>, AttIn>>
 {
 public:
@@ -62,7 +62,7 @@ private:
 /// @tparam AttOut attributes describing the output View
 template<class AttIn, class AttOut>
 class FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>> :
-    public BaseOp<FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>,
+    public UnaryBaseOp<FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>,
         View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>
 {
 public:
@@ -84,7 +84,7 @@ private:
 /// @tparam AttOut attributes describing the output View
 template<class AttIn, class AttOut>
 class FftOp<View<std::complex<double>, AttOut>, View<double, AttIn>> :
-    public BaseOp<FftOp<View<std::complex<double>, AttOut>, View<double, AttIn>>,
+    public UnaryBaseOp<FftOp<View<std::complex<double>, AttOut>, View<double, AttIn>>,
         View<std::complex<double>, AttOut>, View<double, AttIn>>
 {
 public:

@@ -5,53 +5,10 @@ include(ConfigureTests)
 
 set(_tests
   Mixed::P:<base_t>:integrator
-  Mixed::P:<viewCpu_t>:integrator
-  Mixed::D1:<base_t>:integrator
-  Mixed::D1:<viewCpu_t>:integrator
-  Mixed::D1_P:<base_t>:integrator
-  Mixed::D1_P:<viewCpu_t>:integrator
-  Mixed::D1_Neg:<base_t>:integrator
-  Mixed::D1_Neg:<viewCpu_t>:integrator
-  Mixed::D2:<base_t>:integrator
-  Mixed::D2:<viewCpu_t>:integrator
-)
-
-if(TARGET QuICC::Fft::CuFft)
-  list(APPEND _tests
-    Mixed::P:<viewGpu_t>:integrator
-    Mixed::D1:<viewGpu_t>:integrator
-    Mixed::D1_P:<viewGpu_t>:integrator
-    Mixed::D1_Neg:<viewGpu_t>:integrator
-    Mixed::D2:<viewGpu_t>:integrator
-  )
-endif()
-
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Space::Operator:Template:type
-    IDS 0 1 2
-    ULP 70
-  )
-endforeach()
-
-set(_tests
-  Mixed::P:<base_t>:integrator
   Mixed::D1:<base_t>:integrator
   Mixed::D1_P:<base_t>:integrator
   Mixed::D1_Neg:<base_t>:integrator
   Mixed::D2:<base_t>:integrator
-)
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Space::Operator:Template:type
-    IDS 3 4 5 6
-    ULP 70
-  )
-endforeach()
-
-set(_tests
   Mixed::P:<viewCpu_t>:integrator
   Mixed::D1:<viewCpu_t>:integrator
   Mixed::D1_P:<viewCpu_t>:integrator
@@ -73,9 +30,8 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
-    IDS 3 4 5 6
+    IDS 0 1 2 3 4 5 6
     ULP 70
-    DISABLED ON
   )
 endforeach()
 

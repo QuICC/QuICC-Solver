@@ -10,7 +10,7 @@
 
 // Project includes
 //
-#include "Operator/Interface.hpp"
+#include "Operator/Unary.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -26,7 +26,7 @@ using namespace QuICC::Operator;
 /// @tparam Tin input modes type
 /// @tparam Direction Fft direction
 template<class Tout, class Tin, class Direction>
-class MeanOp : public BaseOp<MeanOp<Tout, Tin, Direction>, Tout, Tin> {
+class MeanOp : public UnaryBaseOp<MeanOp<Tout, Tin, Direction>, Tout, Tin> {
 public:
     using ScaleType = typename Tout::ScalarType::value_type;
     /// @brief Constructor with user defined scaling factor
@@ -42,7 +42,7 @@ private:
     /// @param in modes
     void applyImpl(Tout& out, const Tin& in);
     /// @brief give access to base class
-    friend BaseOp<MeanOp<Tout, Tin, Direction>, Tout, Tin>;
+    friend UnaryBaseOp<MeanOp<Tout, Tin, Direction>, Tout, Tin>;
     /// @brief scaling factor, i.e. domain size
     ScaleType mScale{1.0};
 };

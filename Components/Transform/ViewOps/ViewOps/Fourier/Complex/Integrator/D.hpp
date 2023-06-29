@@ -10,7 +10,7 @@
 
 // Project includes
 //
-#include "Operator/Interface.hpp"
+#include "Operator/Unary.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -28,7 +28,7 @@ using namespace QuICC::Operator;
 /// @tparam FftBackend  type of FFT operator
 /// @tparam DiffBackend type of operator
 template<class Tout, class Tin, class FftBackend, class DiffBackend, class DiffBackend2 = void>
-class DOp : public BaseOp<DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>, Tout, Tin> {
+class DOp : public UnaryBaseOp<DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>, Tout, Tin> {
 public:
     /// @brief Type of scale parameter, i.e. float 32/64 bits
     using ScaleType = typename Tout::ScalarType::value_type;
@@ -49,13 +49,13 @@ private:
     /// @param in input physical space coefficient
     void applyImpl(Tout& out, Tin& in);
     /// @brief pointer to FFT operator
-    std::unique_ptr<InterfaceOp<Tout, Tin>> mFft;
+    std::unique_ptr<UnaryOp<Tout, Tin>> mFft;
     /// @brief pointer to differentiation operator
-    std::unique_ptr<InterfaceOp<Tout, Tout>> mDiff;
+    std::unique_ptr<UnaryOp<Tout, Tout>> mDiff;
     /// @brief pointer to differentiation operator, second step
-    std::unique_ptr<InterfaceOp<Tout, Tout>> mDiff2;
+    std::unique_ptr<UnaryOp<Tout, Tout>> mDiff2;
     /// @brief Give access to base class
-    friend BaseOp<DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>, Tout, Tin>;
+    friend UnaryBaseOp<DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>, Tout, Tin>;
 };
 
 } // namespace Integrator

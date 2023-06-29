@@ -23,7 +23,7 @@ template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_
 DiffOp<Tout, Tin, Order, Direction, Treatment>::DiffOp(ScaleType scale) : mScale(scale){};
 
 template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
-void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
+void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const Tin& in, const ScaleType fftScaling)
 {
     Profiler::RegionFixture<4> fix("DiffOp::applyImpl");
 
@@ -59,12 +59,6 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     if constexpr (Treatment & dealias_m)
     {
         nDealias *= dealias::rule;
-    }
-
-    float_t fftScaling = 1.0;
-    if constexpr (std::is_same_v<Direction, fwd_t>)
-    {
-        fftScaling = 1.0 / static_cast<float_t>((M-1)*2);
     }
 
     if constexpr (isComplex)
