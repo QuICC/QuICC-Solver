@@ -37,7 +37,7 @@ void DOp<Tout, Tin, FftBackend, DiffBackend>::applyImpl(Tout& out, Tin& in)
     Profiler::RegionFixture<4> fix("Fourier::Mixed::Projector::DOp::applyImpl");
 
     // differentiate in place
-    mDiff->apply(in, in);
+    mDiff->apply(in, in, 1.0);
 
     // FFT
     mFft->apply(out, in);

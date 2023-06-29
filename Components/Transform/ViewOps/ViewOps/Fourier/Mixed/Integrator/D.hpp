@@ -10,7 +10,8 @@
 
 // Project includes
 //
-#include "Operator/Interface.hpp"
+#include "Operator/Unary.hpp"
+#include "Operator/Binary.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -27,7 +28,7 @@ using namespace QuICC::Operator;
 /// @tparam FftBackend  type of FFT operator
 /// @tparam DiffBackend type of operator
 template<class Tout, class Tin, class FftBackend, class DiffBackend>
-class DOp : public BaseOp<DOp<Tout, Tin, FftBackend, DiffBackend>, Tout, Tin> {
+class DOp : public UnaryBaseOp<DOp<Tout, Tin, FftBackend, DiffBackend>, Tout, Tin> {
 public:
     /// @brief type of scale parameter, i.e. float 32/64 bits
     using ScaleType = typename Tin::ScalarType;
@@ -48,11 +49,11 @@ private:
     /// @param in input physical grid values
     void applyImpl(Tout& out, Tin& in);
     /// @brief pointer to FFT operator
-    std::unique_ptr<InterfaceOp<Tout, Tin>> mFft;
+    std::unique_ptr<UnaryOp<Tout, Tin>> mFft;
     /// @brief pointer to differentiation operator
-    std::unique_ptr<InterfaceOp<Tout, Tout>> mDiff;
+    std::unique_ptr<BinaryOp<Tout, Tout, ScaleType>> mDiff;
     /// @brief give access to base class
-    friend BaseOp<DOp<Tout, Tin, FftBackend, DiffBackend>, Tout, Tin>;
+    friend UnaryBaseOp<DOp<Tout, Tin, FftBackend, DiffBackend>, Tout, Tin>;
 };
 
 } // namespace Integrator
