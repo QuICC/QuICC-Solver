@@ -26,7 +26,8 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
-    ULP 70
+    IDS 0 1 2 3 4
+    ULPS 70 70 70 7000 15500
   )
 endforeach()
 
@@ -61,7 +62,8 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:type
-    ULP 250
+    IDS 0 1 2 3 4
+    ULPS 70 70 250 250 500
   )
 endforeach()
 
@@ -95,7 +97,8 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
-    ULP 190
+    IDS 0 1 2 3 4
+    ULPS 190 190 190 190 1050
   )
 endforeach()
 
@@ -118,7 +121,6 @@ endforeach()
 set(_tests
   Complex::Lapl2D:<base_t>:projector
   Complex::Lapl2D:<viewCpu_t>:projector
-  Complex::Df1Lapl2D:<base_t>:projector
   Complex::Df1Lapl2D:<viewCpu_t>:projector
   Complex::Ds1Lapl2D:<base_t>:projector
   Complex::Ds1Lapl2D:<viewCpu_t>:projector
@@ -136,7 +138,20 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
+    IDS 0 1 2 3
     ULP 70
+  )
+endforeach()
+
+set(_tests
+  Complex::Df1Lapl2D:<base_t>:projector
+)
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Space::Operator:Template:type
+    IDS 0 1 2 3
+    ULPS 70 70 70 1100
   )
 endforeach()
 
