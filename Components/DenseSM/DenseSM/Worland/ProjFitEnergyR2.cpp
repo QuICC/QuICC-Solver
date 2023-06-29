@@ -64,7 +64,7 @@ namespace Worland {
          const auto& l = this->mL;
          Polynomial::Quadrature::WorlandLegendreRule wquad;
 
-         int rp = 2*rows + static_cast<int>(l);
+         int rp = 2*rows + l;
          int pts = rp + 2 + (rp + 2)%2;
          internal::Array igrid;
          internal::Array iweights;
@@ -73,9 +73,9 @@ namespace Worland {
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::Wnl wnl;
          internal::Matrix tmpBwd(igrid.size(), rows);
-         wnl.compute<MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
+         wnl.compute<internal::MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
          internal::Matrix tmpFwd(igrid.size(), rows);
-         wnl.compute<MHDFloat>(tmpFwd, rows, l, igrid, iweights.array()*igrid.array().abs2(), ev::Set());
+         wnl.compute<internal::MHDFloat>(tmpFwd, rows, l, igrid, iweights.array()*igrid.array().abs2(), ev::Set());
          internal::Matrix matW = tmpFwd.transpose()*tmpBwd;
 
          SparseMatrix matS;
@@ -95,7 +95,7 @@ namespace Worland {
          }
 
 
-         Matrix matWbar = (matS.transpose()*matW.block(0,0,nbar,nbar)*matS);
+         internal::Matrix matWbar = (matS.transpose()*matW.block(0,0,nbar,nbar)*matS);
          mat.resize(rows, cols);
          mat.topRows(nbar) = matS*matWbar.inverse()*matS.transpose()*matW.topRows(nbar);
          mat.bottomRows(rows-nbar).setZero();

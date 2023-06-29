@@ -36,7 +36,8 @@ list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 # Create Worland basis tests targets
 include(ConfigureTests)
 set(_tests
-  MaxEnergy:dense
+  ProjFitEnergyR2:dense
+  ProjFitEnergyPol:dense
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}

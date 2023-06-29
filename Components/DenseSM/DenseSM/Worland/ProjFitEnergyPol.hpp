@@ -63,7 +63,7 @@ namespace Worland {
          /**
           * @brief Spherical harmonic degree
           */
-         Scalar_t mL;
+         int mL;
 
          /**
           * @brief Boundary condition

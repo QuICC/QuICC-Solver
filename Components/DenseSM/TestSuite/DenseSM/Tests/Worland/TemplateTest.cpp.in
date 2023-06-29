@@ -14,6 +14,10 @@
 #include "TestSuite/DenseSM/Worland/TestArgs.hpp"
 #include "DenseSM/Worland/@Operator@.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
+#include "QuICC/Bc/Name/FixedTemperature.hpp"
+
+#include "QuICC/SparseSM/Worland/Stencil/Value.hpp"
+#include "QuICC/Polynomial/Worland/Wnl.hpp"
 
 namespace currentts = ::QuICC::TestSuite::DenseSM::Worland;
 
@@ -38,10 +42,21 @@ TEST_CASE( "Error for @Operator@ operator", "[@Operator@:@type@]" )
    auto a = ::QuICC::Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;                                                                                                                           
    auto b = ::QuICC::Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
 
-   Operator op(12, 13, 13, a, b, 1);
+   int nN = 13;
+   int oN = 7;
+   int l = 1;
+   Operator op(oN, ::QuICC::Bc::Name::FixedTemperature::id(), nN, nN, a, b, l);
 
    auto mat = op.mat();
 
    std::cerr << mat.rows() << " x " << mat.cols() << std::endl;
-   std::cerr << mat << std::endl;;
+   std::cerr << mat << std::endl;
+
+   ::QuICC::SparseSM::Worland::Stencil::Value S(nN, nN-1, a, b, l);
+   auto bcIn = ::QuICC::Array::Random(nN-1);
+   ::QuICC::Array in = S.mat()*bcIn;
+   ::QuICC::Array out = mat*in;
+
+   std::cerr << in.transpose() << std::endl;
+   std::cerr << out.transpose() << std::endl;
 }

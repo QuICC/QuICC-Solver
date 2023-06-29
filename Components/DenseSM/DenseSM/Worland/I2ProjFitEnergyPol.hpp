@@ -71,7 +71,7 @@ namespace Worland {
          /**
           * @brief Spherical harmonic degree
           */
-         Scalar_t mL;
+         int mL;
 
          /**
           * @Brief Energy fit projector

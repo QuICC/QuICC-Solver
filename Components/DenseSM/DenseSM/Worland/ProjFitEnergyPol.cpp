@@ -62,10 +62,11 @@ namespace Worland {
          const auto a = Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
          const auto db = Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
          const auto& l = this->mL;
-         const auto ll1 = l*(l+1.0);
+         const auto& dl = static_cast<internal::MHDFloat>(this->mL);
+         const auto ll1 = dl*(dl+MHD_MP(1.0));
          Polynomial::Quadrature::WorlandLegendreRule wquad;
 
-         int rp = 2*rows + static_cast<int>(l);
+         int rp = 2*rows + l;
          int pts = rp + 2 + (rp + 2)%2;
          internal::Array igrid;
          internal::Array iweights;
@@ -76,18 +77,18 @@ namespace Worland {
          Polynomial::Worland::drWnl drwnl;
 
          internal::Matrix tmpBwd(igrid.size(), rows);
-         wnl.compute<MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
+         wnl.compute<internal::MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
          internal::Matrix tmpFwd(igrid.size(), rows);
-         wnl.compute<MHDFloat>(tmpFwd, rows, l, igrid, iweights.array(), ev::Set());
+         wnl.compute<internal::MHDFloat>(tmpFwd, rows, l, igrid, iweights.array(), ev::Set());
          internal::Matrix matW = ll1*ll1*(tmpFwd.transpose()*tmpBwd);
 
-         drwnl.compute<MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
-         drwnl.compute<MHDFloat>(tmpFwd, rows, l, igrid, iweights.array(), ev::Set());
+         drwnl.compute<internal::MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
+         drwnl.compute<internal::MHDFloat>(tmpFwd, rows, l, igrid, iweights.array(), ev::Set());
          matW += ll1*(tmpFwd.transpose()*tmpBwd);
 
          SparseSM::Worland::Boundary::Value bc(a, db, l);
          internal::Matrix bcVal = bc.compute(rows-1).matrix();
-         internal::Matrix bcMat = (l*ll1*bcVal)*bcVal.transpose();
+         internal::Matrix bcMat = (dl*ll1*bcVal)*bcVal.transpose();
 
          matW += bcMat;
 
@@ -102,7 +103,7 @@ namespace Worland {
             throw std::logic_error("Unknown boundary condition");
          }
 
-         Matrix matWbar = (matS.transpose()*matW.block(0,0,nbar,nbar)*matS);
+         internal::Matrix matWbar = (matS.transpose()*matW.block(0,0,nbar,nbar)*matS);
          mat.resize(rows, cols);
          mat.topRows(nbar) = matS*matWbar.inverse()*matS.transpose()*matW.topRows(nbar);
          mat.bottomRows(rows-nbar).setZero();
