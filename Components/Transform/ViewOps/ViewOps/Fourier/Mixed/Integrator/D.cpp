@@ -39,7 +39,8 @@ void DOp<Tout, Tin, FftBackend, DiffBackend>::applyImpl(Tout& out, Tin& in)
     mFft->apply(out, in);
 
     // differentiate in place
-    mDiff->apply(out, out);
+    ScaleType fftScaling = 1.0 / static_cast<ScaleType>(in.dims()[0]);
+    mDiff->apply(out, out, fftScaling);
 }
 
 template<class Tout, class Tin, class FftBackend, class DiffBackend>

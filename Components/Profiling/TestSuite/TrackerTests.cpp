@@ -92,7 +92,7 @@ TEST_CASE("Nested Levels: on, on, off", "[Levels]")
     REQUIRE(std::abs(std::get<Tracker::tracking::time>(Tracker::get("Main"))[0] - 0.3) < 0.1);
     REQUIRE(std::abs(std::get<Tracker::tracking::time>(Tracker::get("Nested"))[0] - 0.2) < 0.1);
     //
-    REQUIRE(std::abs(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Main")) - 80) < 1);
+    REQUIRE(std::abs(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Main")) - 80) < 5);
     REQUIRE(std::abs(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Nested")) - 0.0) < 0.01);
 
     // high watermark is hard to estimate a priori

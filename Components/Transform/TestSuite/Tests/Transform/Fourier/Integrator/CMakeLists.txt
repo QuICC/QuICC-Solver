@@ -5,14 +5,14 @@ include(ConfigureTests)
 
 set(_tests
   Mixed::P:<base_t>:integrator
-  Mixed::P:<viewCpu_t>:integrator
   Mixed::D1:<base_t>:integrator
-  Mixed::D1:<viewCpu_t>:integrator
   Mixed::D1_P:<base_t>:integrator
-  Mixed::D1_P:<viewCpu_t>:integrator
   Mixed::D1_Neg:<base_t>:integrator
-  Mixed::D1_Neg:<viewCpu_t>:integrator
   Mixed::D2:<base_t>:integrator
+  Mixed::P:<viewCpu_t>:integrator
+  Mixed::D1:<viewCpu_t>:integrator
+  Mixed::D1_P:<viewCpu_t>:integrator
+  Mixed::D1_Neg:<viewCpu_t>:integrator
   Mixed::D2:<viewCpu_t>:integrator
 )
 
@@ -30,7 +30,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
-    IDS 0 1 2 3 4
+    IDS 0 1 2 3 4 5 6
     ULP 70
   )
 endforeach()
@@ -98,6 +98,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
+    IDS 0 1 2 3 4 5 6
     ULP 70
   )
 endforeach()

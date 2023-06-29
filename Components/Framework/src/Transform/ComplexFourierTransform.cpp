@@ -95,25 +95,30 @@ namespace Transform {
    void ComplexFourierTransform::initOperators()
    {
       using namespace ::QuICC::Transform::Fft::Fourier;
-      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::P<base_t>>(Backward::P::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::Mean<base_t>>(Backward::P0::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::D1<base_t>>(Backward::D1::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::D2<base_t>>(Backward::D2::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::D3<base_t>>(Backward::D3::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::Df1Lapl2D<base_t>>(Backward::DfLaplh::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::Ds1Lapl2D<base_t>>(Backward::DsLaplh::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::Lapl2D<base_t>>(Backward::Laplh::id());
+      #ifdef QUICC_USE_CUFFT
+         using backend_t = viewGpu_t;
+      #else
+         using backend_t = viewCpu_t;
+      #endif
+      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::P<backend_t>>(Backward::P::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::Mean<backend_t>>(Backward::P0::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::D1<backend_t>>(Backward::D1::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::D2<backend_t>>(Backward::D2::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::D3<backend_t>>(Backward::D3::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::Df1Lapl2D<backend_t>>(Backward::DfLaplh::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::Ds1Lapl2D<backend_t>>(Backward::DsLaplh::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Projector::Lapl2D<backend_t>>(Backward::Laplh::id());
 
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::P<base_t>>(Forward::P::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::P_Clean<base_t>>(Forward::Pm::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::D1_P<base_t>>(Forward::D1ZP0::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::P<backend_t>>(Forward::P::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::P_Clean<backend_t>>(Forward::Pm::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::D1_P<backend_t>>(Forward::D1ZP0::id());
 
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::D1<base_t>>(Forward::D1::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::D2<base_t>>(Forward::D2::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Df1InvLapl2D<base_t>>(Forward::DfOverlaplh::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::InvLapl2D<base_t>>(Forward::Overlaplh::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Lapl2D<base_t>>(Forward::Laplh::id());
-      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Mean<base_t>>(Forward::P0::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::D1<backend_t>>(Forward::D1::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::D2<backend_t>>(Forward::D2::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Df1InvLapl2D<backend_t>>(Forward::DfOverlaplh::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::InvLapl2D<backend_t>>(Forward::Overlaplh::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Lapl2D<backend_t>>(Forward::Laplh::id());
+      this->mImpl.addOperator<Fft::Fourier::Complex::Integrator::Mean<backend_t>>(Forward::P0::id());
    }
 
    void ComplexFourierTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)

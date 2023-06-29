@@ -28,7 +28,8 @@ namespace details
 
     /// Cuda kernel
     template<std::size_t Order, class Direction, std::uint16_t Treatment>
-    __global__ void diffKernel(mods_t out, const mods_t in, const double scale)
+    __global__ void diffKernel(mods_t out, const mods_t in,
+        const double scale, const double fftScaling)
     {
         constexpr bool isComplex = Order % 2;
         constexpr int sgn = 1 - 2*static_cast<int>((Order/2) % 2);
@@ -41,14 +42,6 @@ namespace details
         if constexpr (Treatment & dealias_m)
         {
             nDealias *= dealias::rule;
-        }
-
-        double fftScaling = 1.0;
-        if constexpr (std::is_same_v<Direction, fwd_t>)
-        {
-            int sze = (M-1)*2;
-            sze = sze + (sze%3>0)*(3-sze%3);
-            fftScaling = 1.0 / static_cast<double>(sze);
         }
 
         cuDoubleComplex c;
@@ -125,7 +118,7 @@ template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_
 DiffOp<Tout, Tin, Order, Direction, Treatment>::DiffOp(ScaleType scale) : mScale(scale){};
 
 template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
-void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
+void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const Tin& in, const ScaleType fftScaling)
 {
     Profiler::RegionFixture<4> fix("DiffOp::applyImpl");
 
@@ -154,7 +147,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     auto columns = indices.size();
     numBlocks.y = (columns + tCF - 1) / tCF;
     numBlocks.z = 1;
-    details::diffKernel<Order, Direction, Treatment><<<numBlocks, blockSize>>>(out, in, mScale);
+    details::diffKernel<Order, Direction, Treatment><<<numBlocks, blockSize>>>(out, in, mScale, fftScaling);
 }
 
 // explicit instantations

@@ -10,7 +10,7 @@
 
 // Project includes
 //
-#include "Operator/Interface.hpp"
+#include "Operator/Unary.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -28,7 +28,7 @@ using namespace QuICC::Operator;
 /// @tparam Direction Fft direction tag
 /// @tparam Treatment special treatment tag, typically of mode zero
 template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment = 0>
-class DiffOp : public BaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin> {
+class DiffOp : public UnaryBaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin> {
 public:
     using ScaleType = typename Tout::ScalarType::value_type;
     /// @brief Constructor with user defined scaling factor
@@ -44,7 +44,7 @@ private:
     /// @param in modes
     void applyImpl(Tout& out, const Tin& in);
     /// @brief give access to base class
-    friend BaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin>;
+    friend UnaryBaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin>;
     /// @brief scaling factor, i.e. domain size
     ScaleType mScale{1.0};
 };
