@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IALegendreProjector.hpp
  * @brief Interface for a associated Legendre based projector
  */
@@ -34,16 +34,13 @@ namespace Projector {
 
    /**
     * @brief Interface for a associated Legendre based projector
-    */ 
-    template<typename OpTypes = IALegendreOperatorTypes>
-   class IALegendreProjector: public IALegendreOperator<OpTypes>
+    */
+   class IALegendreProjector: public IALegendreOperator
    {
       public:
-         using OpArray = typename OpTypes::OpArray;
-         using OpMatrix = typename OpTypes::OpMatrix;
-         using OpMatrixZ = typename OpTypes::OpMatrixZ;
-         using OpMatrixR = typename OpTypes::OpMatrixR;
-         using OpMatrixCR = typename OpTypes::OpMatrixCR;
+
+         using OpMatrixR = Eigen::Ref<MatrixZ>;;
+         using OpMatrixCR = Eigen::Ref<const MatrixZ>;
 
          /**
           * @brief Constructor
@@ -53,7 +50,7 @@ namespace Projector {
          /**
           * @brief Destructor
           */
-         virtual ~IALegendreProjector();
+         virtual ~IALegendreProjector() = default;
 
          /**
           * @brief Rows of output data
@@ -69,10 +66,10 @@ namespace Projector {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
-          * @brief Storage for the operators 
+          * @brief Storage for the operators
           */
          mutable std::vector<OpMatrix>  mOps;
 

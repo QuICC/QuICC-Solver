@@ -12,9 +12,9 @@
 // Project includes
 //
 #include "QuICC/Transform/Fft/Fourier/Complex/Projector/D3Base.hpp"
-#include "QuICC/Transform/Wrappers/Complex/Projector/D3viewCpu_t.hpp.inc"
+#include "QuICC/Transform/Wrappers/Fourier/Complex/Projector/D3viewCpu_t.hpp.inc"
 #ifdef QUICC_USE_CUFFT
-#include "QuICC/Transform/Wrappers/Complex/Projector/D3viewGpu_t.hpp.inc"
+#include "QuICC/Transform/Wrappers/Fourier/Complex/Projector/D3viewGpu_t.hpp.inc"
 #endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_D3_HPP

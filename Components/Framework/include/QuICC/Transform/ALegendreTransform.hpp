@@ -6,20 +6,10 @@
 #ifndef QUICC_TRANSFORM_ALEGENDRETRANSFORM_HPP
 #define QUICC_TRANSFORM_ALEGENDRETRANSFORM_HPP
 
-// Debug includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <set>
 #include <map>
-
-// External includes
-//
 
 // Project includes
 //
@@ -27,6 +17,7 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Transform/ITransform.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Transform.hpp"
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 
 namespace QuICC {
 
@@ -47,12 +38,12 @@ namespace Transform {
          /**
           * @brief Constructor
           */
-         ALegendreTransform();
+         ALegendreTransform() = default;
 
          /**
           * @brief Destructor
           */
-         ~ALegendreTransform();
+         ~ALegendreTransform() = default;
 
          /**
           * @brief set list of required options

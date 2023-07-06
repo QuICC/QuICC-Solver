@@ -1,32 +1,20 @@
-/** 
+/**
  * @file Tags.hpp
- * @brief Implementation of the Fourier based D projector
+ * @brief Fourier operators backends
  */
 
-#ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_TAGS_HPP
-#define QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_TAGS_HPP
-
-// Debug includes
-//
-
-// Configuration includes
-//
+#ifndef QUICC_TRANSFORM_FFT_FOURIER_TAGS_HPP
+#define QUICC_TRANSFORM_FFT_FOURIER_TAGS_HPP
 
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
 
 namespace QuICC {
-
 namespace Transform {
-
 namespace Fft {
-
 namespace Fourier {
 
     /// old implementaion tag
@@ -38,10 +26,10 @@ namespace Fourier {
     /// view gpu implementation tag
     struct viewGpu_t {};
 
-}
-}
-}
-}
+} // namespace Fourier
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC
 
 
-#endif // QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_TAGS_HPP
+#endif // QUICC_TRANSFORM_FFT_FOURIER_TAGS_HPP

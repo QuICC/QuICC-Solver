@@ -1,71 +1,18 @@
-/** 
+/**
  * @file DivS1.hpp
  * @brief Implementation of the associated Legendre based 1/Sin integrator
  */
 
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_INTEGRATOR_DIVS1_HPP
 #define QUICC_TRANSFORM_POLY_ALEGENDRE_INTEGRATOR_DIVS1_HPP
-
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Poly/ALegendre/Integrator/IALegendreIntegrator.hpp"
-
-namespace QuICC {
-
-namespace Transform {
-
-namespace Poly {
-
-namespace ALegendre {
-
-namespace Integrator {
-
-   /**
-    * @brief Implementation of the associated Legendre based 1/Sin integrator
-    */ 
-   class DivS1: public IALegendreIntegrator<>
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         DivS1();
-
-         /**
-          * @brief Destructor
-          */
-         virtual ~DivS1();
-         
-      protected:
-         /**
-          * @brief Apply ith operator
-          */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const override;
-
-       private:
-         /**
-          * @brief Make operator
-          */
-         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const override;
-   };
-
-}
-}
-}
-}
-}
+#include "QuICC/Transform/Poly/ALegendre/Integrator/Base/DivS1.hpp"
+#ifdef QUICC_USE_KOKKOS
+#include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/DivS1.hpp"
+#endif
 
 #endif // QUICC_TRANSFORM_POLY_ALEGENDRE_INTEGRATOR_DIVS1_HPP

@@ -29,19 +29,12 @@ namespace ALegendre {
 
 namespace Projector {
 
-   template<typename OpTypes>
-   IALegendreProjector<OpTypes>::IALegendreProjector()
-      : IALegendreOperator<OpTypes>()
+   IALegendreProjector::IALegendreProjector()
+      : IALegendreOperator()
    {
    }
 
-   template<typename OpTypes>
-   IALegendreProjector<OpTypes>::~IALegendreProjector()
-   {
-   }
-
-   template<typename OpTypes>
-   void IALegendreProjector<OpTypes>::initOperators(const OpArray& igrid, const OpArray& iweights) const
+   void IALegendreProjector::initOperators(const OpArray& igrid, const OpArray& iweights) const
    {
       // Initit specialized data for operators
       this->initSpecial();
@@ -68,8 +61,7 @@ namespace Projector {
       #endif //defined QUICC_ALEGENDRE_PROJIMPL_MATRIX
    }
 
-   template<typename OpTypes>
-   void IALegendreProjector<OpTypes>::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
+   void IALegendreProjector::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreProjector::applyOperators");
 
@@ -93,25 +85,21 @@ namespace Projector {
       }
    }
 
-   template<typename OpTypes>
-   void IALegendreProjector<OpTypes>::initSpecial() const
+   void IALegendreProjector::initSpecial() const
    {
    }
 
-   template<typename OpTypes>
-   int IALegendreProjector<OpTypes>::outRows() const
+   int IALegendreProjector::outRows() const
    {
       return this->mspSetup->fwdSize();
    }
 
-   template<typename OpTypes>
-   int IALegendreProjector<OpTypes>::outCols() const
+   int IALegendreProjector::outCols() const
    {
       return this->mspSetup->blockSize();
    }
 
-   template<typename OpTypes>
-   MHDFloat IALegendreProjector<OpTypes>::requiredStorage() const
+   MHDFloat IALegendreProjector::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 
@@ -132,9 +120,6 @@ namespace Projector {
       return mem;
    }
 
-   template class IALegendreProjector<IALegendreOperatorTypes>;
-   template class IALegendreProjector<PIALegendreOperatorTypes>;
-   template class IALegendreProjector<CudaIALegendreOperatorTypes>;
 }
 }
 }

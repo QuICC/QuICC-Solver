@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IALegendreOperator.hpp
  * @brief Interface for a associated Legendre based operator
  */
@@ -23,10 +23,6 @@
 #include "QuICC/Precision.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Setup.hpp"
 #include "QuICC/Transform/ITransformOperator.hpp"
-#include "QuICC/Transform/Poly/ALegendre/IALegendreOperatorTypes.hpp"
-#include "QuICC/Transform/Poly/ALegendre/PIALegendreOperatorTypes.hpp"
-#include "QuICC/Transform/Poly/ALegendre/CudaIALegendreOperatorTypes.hpp"
-#include "QuICC/Transform/Poly/ALegendre/CudaIALegendreOperatorGemmUtils.hpp"
 
 namespace QuICC {
 
@@ -38,8 +34,7 @@ namespace ALegendre {
 
    /**
     * @brief Interface for a associated Legendre based operator
-    */ 
-   template<typename OpTypes = IALegendreOperatorTypes>
+    */
    class IALegendreOperator: public ITransformOperator
    {
       public:
@@ -49,9 +44,9 @@ namespace ALegendre {
          /// Typedef for the configuration class as a shared pointer
          typedef SharedSetup SharedSetupType;
 
-         using OpArray = typename OpTypes::OpArray;
-         using OpMatrix = typename OpTypes::OpMatrix;
-         using OpMatrixZ = typename OpTypes::OpMatrixZ;
+         using OpArray = internal::Array;
+         using OpMatrix = QuICC::Matrix;
+         using OpMatrixZ = QuICC::MatrixZ;
 
          /**
           * @brief Constructor
@@ -61,7 +56,7 @@ namespace ALegendre {
          /**
           * @brief Destructor
           */
-         virtual ~IALegendreOperator();
+         virtual ~IALegendreOperator() = default;
 
          /**
           * @brief Initialise the polynomial transform
@@ -102,7 +97,7 @@ namespace ALegendre {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
           * @brief Polynomial setup object providing the sizes

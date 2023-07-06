@@ -4,7 +4,7 @@ import reframe as rfm
 
 @rfm.simple_test
 class testALegendreTests_Poly_P_projector_id108_ulp20800_split96_0(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<\>_projector_id108_ulp20800_split96_0'
+    test = 'prof_TransformALegendreTests_Poly_P_\<base_t\>_projector_id108_ulp20800_split96_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -17,7 +17,7 @@ class testALegendreTests_Poly_P_projector_id108_ulp20800_split96_0(testBase):
 
 @rfm.simple_test
 class testALegendreTests_Poly_P_projector_id108_ulp20800_split288_0(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<\>_projector_id108_ulp20800_split288_0'
+    test = 'prof_TransformALegendreTests_Poly_P_\<base_t\>_projector_id108_ulp20800_split288_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -30,7 +30,7 @@ class testALegendreTests_Poly_P_projector_id108_ulp20800_split288_0(testBase):
 
 @rfm.simple_test
 class testALegendreTests_Poly_P_projector_id108_ulp20800_split3072_0(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<\>_projector_id108_ulp20800_split3072_0'
+    test = 'prof_TransformALegendreTests_Poly_P_\<base_t\>_projector_id108_ulp20800_split3072_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -43,7 +43,7 @@ class testALegendreTests_Poly_P_projector_id108_ulp20800_split3072_0(testBase):
 
 @rfm.simple_test
 class testALegendreTests_Poly_P_projector_id108_ulp20800_split9216_0(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<\>_projector_id108_ulp20800_split9216_0'
+    test = 'prof_TransformALegendreTests_Poly_P_\<base_t\>_projector_id108_ulp20800_split9216_0'
     region = 'applyOperators'
     steps = 1000
     refs =  {   'icelake': {

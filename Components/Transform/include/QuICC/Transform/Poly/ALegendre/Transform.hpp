@@ -43,10 +43,10 @@ namespace ALegendre {
    {
       public:
          /// Typedef for the configuration class
-         typedef IALegendreOperator<>::SetupType SetupType;
+         typedef IALegendreOperator::SetupType SetupType;
 
          /// Typedef for the configuration class as a shared pointer
-         typedef IALegendreOperator<>::SharedSetupType SharedSetupType;
+         typedef IALegendreOperator::SharedSetupType SharedSetupType;
 
          /**
           * @brief Constructor
