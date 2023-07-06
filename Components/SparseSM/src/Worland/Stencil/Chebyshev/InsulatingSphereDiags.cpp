@@ -32,7 +32,7 @@ namespace Chebyshev {
       auto l1 = this->l();
 
       ACoeff_t num = -2.0*n*(4.0*(-1.0 + n)*(-1.0 + n) + l1*(-2.0 + 4.0*n) + 1.0);
-      ACoeff_t den = (-1.0 + 2.0*n)*(2.0*l1 + 1.0 + 4.0*1l*n + 4.0*n*n);
+      ACoeff_t den = (-1.0 + 2.0*n)*(2.0*l1 + 1.0 + 4.0*l1*n + 4.0*n*n);
 
       ACoeff_t val = num/den;
 

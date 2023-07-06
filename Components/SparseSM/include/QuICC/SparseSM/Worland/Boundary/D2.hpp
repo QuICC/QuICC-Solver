@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/Precision.hpp"
-#include "QuICC/SparseSM/Worland/I2Diags.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/ICondition.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
 
 namespace QuICC {
@@ -26,7 +26,7 @@ namespace Boundary {
    /**
     * @brief Implementation of the boundary value of second derivative for Worland polynomial
     */ 
-   class D2: public IDiags
+   class D2: public ICondition
    {
       public:
          /**

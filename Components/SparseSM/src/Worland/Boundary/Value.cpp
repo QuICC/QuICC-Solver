@@ -19,7 +19,7 @@ namespace Worland {
 namespace Boundary {
 
    Value::Value(const Scalar_t alpha, const Scalar_t dBeta, const int l)
-      : IDiags(alpha, dBeta, l, 0)
+      : ICondition(alpha, dBeta, l, 0)
    {
    }
 

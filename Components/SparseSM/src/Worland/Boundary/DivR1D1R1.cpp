@@ -1,14 +1,14 @@
 /** 
- * @file R1D1DivR1.cpp
- * @brief Source of the implementation of boundary value of r D 1/r
+ * @file DivR1D1R1.cpp
+ * @brief Source of the implementation of boundary value
  */
 
 // System includes
 //
 
-// Project includes
+// Project include
 //
-#include "QuICC/SparseSM/Worland/Boundary/R1D1DivR1.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/DivR1D1R1.hpp"
 
 namespace QuICC {
 
@@ -18,12 +18,12 @@ namespace Worland {
 
 namespace Boundary {
 
-   R1D1DivR1::R1D1DivR1(const Scalar_t alpha, const Scalar_t dBeta, const int l)
+   DivR1D1R1::DivR1D1R1(const Scalar_t alpha, const Scalar_t dBeta, const int l)
       : ICondition(alpha, dBeta, l, 0), mBCk0(alpha, dBeta, l), mBCk1(alpha, dBeta, l+1)
    {
    }
 
-   R1D1DivR1::ACoeff_t R1D1DivR1::compute(const int maxN)
+   DivR1D1R1::ACoeff_t DivR1D1R1::compute(const int maxN)
    {
       auto ab1 = this->alpha() + this->beta(this->l()) + MHD_MP(1.0);
 
@@ -37,7 +37,7 @@ namespace Boundary {
       }
 
       auto bcVal = this->mBCk0.compute(maxN, 0, false);
-      val += (this->l() - 1.0)*bcVal;
+      val += (this->l() + 1.0)*bcVal;
 
       n = (ACoeffI::LinSpaced(maxN+1, 0, maxN)).cast<Scalar_t>();
       return this->invnorm(n)*val;
@@ -45,5 +45,5 @@ namespace Boundary {
  
 } // Boundary
 } // Worland
-} // SparseSM
+} // Polynomial
 } // QuICC

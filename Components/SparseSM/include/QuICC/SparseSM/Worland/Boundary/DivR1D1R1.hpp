@@ -1,10 +1,10 @@
-/** 
- * @file R1D1DivR1.hpp
- * @brief Implementation of the boundary value of r D 1/r for Worland polynomials
+/**
+ * @file DivR1D1R1.hpp
+ * @brief Implementation of the boundary condition for 1/r D r for Worland polynomials
  */
 
-#ifndef QUICC_SPARSESM_WORLAND_BOUNDARY_R1D1DIVR1_HPP
-#define QUICC_SPARSESM_WORLAND_BOUNDARY_R1D1DIVR1_HPP
+#ifndef QUICC_SPARSESM_WORLAND_BOUNDARY_DIVR1D1R1_HPP
+#define QUICC_SPARSESM_WORLAND_BOUNDARY_DIVR1D1R1_HPP
 
 // System includes
 //
@@ -24,9 +24,9 @@ namespace Worland {
 namespace Boundary {
 
    /**
-    * @brief Implementation of the boundary value of r D 1/r for Worland polynomial
-    */ 
-   class R1D1DivR1: public ICondition
+    * @brief Implementation of the boundary condition for 1/r D r for Worland polynomial
+    */
+   class DivR1D1R1: public ICondition
    {
       public:
          /**
@@ -36,17 +36,17 @@ namespace Boundary {
           * @param dBeta   Jacobi beta = l + dBeta
           * @param l       Harmonic degree l
           */
-         R1D1DivR1(const Scalar_t alpha, const Scalar_t dBeta, const int l);
+         DivR1D1R1(const Scalar_t alpha, const Scalar_t dBeta, const int l);
 
          /**
           * @brief Destructor
           */
-         ~R1D1DivR1() = default;
+         ~DivR1D1R1() = default;
 
          /**
           * @brief Compute list of boundary values
           *
-          * @param maxN Highest polynomial 
+          * @param maxN Highest polynomial
           */
          ACoeff_t compute(const int maxN);
 
@@ -60,7 +60,6 @@ namespace Boundary {
           * @brief Boundary value for k = 1, l = l+1
           */
          Value mBCk1;
-
    };
 
 } // Boundary
@@ -68,4 +67,4 @@ namespace Boundary {
 } // SparseSM
 } // QuICC
 
-#endif // QUICC_SPARSESM_WORLAND_BOUNDARY_R1D1DIVR1_HPP
+#endif // QUICC_SPARSESM_WORLAND_BOUNDARY_DIVR1D1R1_HPP

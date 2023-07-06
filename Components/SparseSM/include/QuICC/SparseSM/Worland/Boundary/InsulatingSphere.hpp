@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/Precision.hpp"
-#include "QuICC/SparseSM/Worland/I2Diags.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/ICondition.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
 
 namespace QuICC {
@@ -26,7 +26,7 @@ namespace Boundary {
    /**
     * @brief Implementation of the boundary condition for insulating spehre for Worland polynomial
     */
-   class InsulatingSphere: public IDiags
+   class InsulatingSphere: public ICondition
    {
       public:
          /**
