@@ -4,7 +4,7 @@
 import os
 from typing import NamedTuple
 from quicc.gitlab.pipelines import config, libtest_pipeline, \
-    model_pipeline, perf_pipeline
+    model_pipeline, model_pipeline_notiming, perf_pipeline
 
 if __name__ == '__main__':
     # Base pipelines
@@ -15,9 +15,16 @@ if __name__ == '__main__':
         pipe = libtest_pipeline(c)
         pipe.write()
 
-    # Model pipelines
+    # Model without timing pipelines
+    model_notiming_confs = [
+        config('serial', 'cpu')
+        ]
+    for c in model_notiming_confs:
+        pipe = model_pipeline_notiming(c)
+        pipe.write()
+
+    # Model and Timing pipelines
     model_confs = [
-        config('serial', 'cpu'),
         config('mpi', 'cpu'),
         config('kk', 'cpu'),
         config('kkgpu', 'gpu')

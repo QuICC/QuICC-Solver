@@ -28,11 +28,6 @@ test-quicc-lib:
   - .test-lib
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
-time-quicc-lib:
-  extends:
-  - .time-lib-cpu
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
 BoussinesqSphereDynamoExplicit_serial:
   extends:
   - .BoussinesqSphereDynamoExplicit_serial

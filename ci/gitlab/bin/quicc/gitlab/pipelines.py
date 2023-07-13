@@ -172,6 +172,43 @@ class model_pipeline(libtime_pipeline):
                     },
                 }
 
+"""Add model testing to the libtest pipeline"""
+class model_pipeline_notiming(libtest_pipeline):
+    def __init__(self, cnf):
+        super(model_pipeline_notiming, self).__init__(cnf)
+        self.actions.extend([self.model_yaml])
+
+    def model_yaml(self):
+        self.config['include'].extend(
+                [
+                    '/ci/gitlab/.quicc_models.yml',
+                ],
+            )
+        self.config['stages'].extend(
+                [
+                    'model-build-and-test',
+                ],
+            )
+        for mode_config in default_configs(self.tag):
+            model = mode_config.fullname()
+            tasks = str(mode_config.tasks)
+            self.config[model] = {
+                    'extends':
+                        [
+                            '.'+model,
+                            '.'+self.backend
+                        ],
+                    'image': self.path_image,
+                    'variables':
+                    {
+                        # the image is pulled in the lib test stage
+                        'PULL_IMAGE': 'NO',
+                        'SLURM_NTASKS': tasks,
+                        'SLURM_NTASKS_PER_NODE': tasks,
+                        'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks)),
+                        'QUICC_VERSION_TAG': self.tag
+                    },
+                }
 
 
 """Add model timing to the base pipeline and changes default name of the yml file"""

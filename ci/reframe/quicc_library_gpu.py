@@ -7,7 +7,7 @@ class testALegendreTests_Poly_P_projector_id108_split8_0_cuda(testBase):
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
-                    'applyOperatorsAvg': (0.0919701, -0.25, 0.1, 's'),
+                    'applyOperatorsAvg': (0.0454438, -0.25, 0.1, 's'),
                 },
             }
 
@@ -17,7 +17,7 @@ class testALegendreTests_Poly_P_projector_id108_split256_0_cuda(testBase):
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
-                    'applyOperatorsAvg': (0.00351006, -0.25, 0.1, 's'),
+                    'applyOperatorsAvg': (0.00190451, -0.25, 0.1, 's'),
                 },
             }
 
