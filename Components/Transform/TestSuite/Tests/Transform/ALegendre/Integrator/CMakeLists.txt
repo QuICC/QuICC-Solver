@@ -87,6 +87,34 @@ foreach(_test ${_tests_templated})
     )
 endforeach()
 
+# Split integrator tests
+
+set(_split_tests_templated
+    Poly::P:<base_t>:integrator
+)
+
+if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
+    list(APPEND _split_tests_templated
+        Poly::P:<kokkos_t>:integrator
+    )
+endif()
+
+if(QUICC_USE_KOKKOS_CUDA)
+    list(APPEND _split_tests_templated
+        Poly::P:<kokkos_t>:integrator
+    )
+endif()
+
+foreach(_test ${_split_tests_templated})
+    quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Algorithm::Operator:Template:type
+        IDS  204 204 204 204 204 204
+        ULPS 50 50 50 50 50 50
+        SPLITS 4:0 4:1 4:3 8:0 8:3 8:7
+    )
+endforeach()
+
 # The following datasets need to be generated
 # if(QUICC_MULTPRECISION)
   set(_disabled True)

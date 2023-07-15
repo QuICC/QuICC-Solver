@@ -10,6 +10,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Enums/SplittingTools.hpp"
 #include "QuICC/QuICCEnv.hpp"
@@ -124,6 +125,18 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
       std::cerr << "Selectd factors: " << best.second.factors.transpose() << std::endl; 
 
       auto& tRes = *spRes->cpu()->dim(stageId);
+      currentts::SimRes sRes;
+      QuICC::Dimensions::Simulation::Id simId;
+      if(stageId != QuICC::Dimensions::Transform::SPECTRAL)
+      {
+         simId = static_cast<QuICC::Dimensions::Simulation::Id>(static_cast<int>(stageId));
+      }
+      else
+      {
+         simId = QuICC::Dimensions::Simulation::SIM1D;
+      }
+      sRes.nSpec = spRes->sim().dim(simId, QuICC::Dimensions::Space::SPECTRAL);
+      sRes.nPhys = spRes->sim().dim(simId, QuICC::Dimensions::Space::PHYSICAL);
 
       // filename and path data
       std::string algoPrefix;
@@ -164,14 +177,14 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
       {
          fname = op + ss.str() + "_meta.dat";
          path = dataPrefix + fname;
-         currentts::writeData(path, tRes, false);
+         currentts::writeData(path, sRes, tRes, false);
       }
 
       if(currentts::args().dumpDetails)
       {
          fname = op + ss.str() + "_full_meta.dat";
          path = dataPrefix + fname;
-         currentts::writeData(path, tRes, true);
+         currentts::writeData(path, sRes, tRes, true);
       }
    }
 

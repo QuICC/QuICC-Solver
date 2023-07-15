@@ -24,13 +24,24 @@ namespace Framework {
 namespace LoadSplitter {
 
    /**
+    * Data structure to pass simulation wide truncation
+    */
+   struct SimRes
+   {
+      /// number of spectral modes
+      int nSpec;
+      /// number of physical grid points
+      int nPhys;
+   };
+
+   /**
     * @brief Write resolution data to file
     *
     * @param fname      Filename
     * @param tRes       Resolution
     * @param isDetailed Write detailed output? (summary vs mode list)
     */
-   void writeData(const std::string fname, const TransformResolution& tRes, const bool isDetailed);
+   void writeData(const std::string fname, const SimRes& sRes, const TransformResolution& tRes, const bool isDetailed);
 
    /**
     * @brief Read reference data

@@ -78,6 +78,30 @@ foreach(_test ${_tests_templated})
     )
 endforeach()
 
+set(_split_tests_templated
+    Poly::P:<base_t>:projector
+)
+if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
+    list(APPEND _split_tests_templated
+        Poly::P:<kokkos_t>:projector
+    )
+endif()
+
+if(QUICC_USE_KOKKOS_CUDA)
+    list(APPEND _split_tests_templated
+        Poly::P:<kokkos_t>:projector
+    )
+endif()
+foreach(_test ${_split_tests_templated})
+    quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Algorithm::Operator:Template:type
+        IDS  204 204 204 204 204 204
+        ULPS 900 900 400 400 400 900
+        SPLITS 4:0 4:1 4:3 8:0 8:3 8:7
+    )
+endforeach()
+
 # Perf test
 foreach(_test ${_tests_templated})
     quicc_add_test(${_test}

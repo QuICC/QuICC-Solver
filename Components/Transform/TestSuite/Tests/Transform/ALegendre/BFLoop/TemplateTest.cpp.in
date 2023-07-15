@@ -20,7 +20,7 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::ALegendre;
 
-TEST_CASE( "@Algorithm@::Error for @Operator@ backward-forward loop", "[@Algorithm@::@Operator@:@type@]" ){
+TEST_CASE( "@Algorithm@::Error for @Operator@@Template@ backward-forward loop", "[@CatchTestName@]" ){
 
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -44,6 +44,7 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ backward-forward loop", "[@Algorit
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
+   tester.setIter(currentts::args().iter);
 
    Tester::ParameterType params = {-1};
 
