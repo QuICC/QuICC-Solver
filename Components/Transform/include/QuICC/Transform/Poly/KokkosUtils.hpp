@@ -15,7 +15,7 @@
 #ifdef QUICC_USE_KOKKOS
 #include "KokkosTypedefs.hpp"
 #include<KokkosBlas3_gemm.hpp>
-#include "QuICC/Transform/Poly/ALegendre/PIALegendreOperatorTypes.hpp"
+#include "QuICC/Transform/Poly/ALegendre/KokkosIALegendreOperatorTypes.hpp"
 
 namespace QuICC {
 

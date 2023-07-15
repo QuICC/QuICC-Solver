@@ -35,25 +35,22 @@ namespace Integrator {
    /**
     * @brief Interface for a associated Legendre based integrator
     */
-   template<typename OpTypes = IALegendreOperatorTypes>
-   class IALegendreIntegrator: public IALegendreOperator<OpTypes>
+   class IALegendreIntegrator: public IALegendreOperator
    {
       public:
-         using OpArray = typename OpTypes::OpArray;
-         using OpMatrix = typename OpTypes::OpMatrix;
-         using OpMatrixZ = typename OpTypes::OpMatrixZ;
-         using OpMatrixR = typename OpTypes::OpMatrixR;
-         using OpMatrixCR = typename OpTypes::OpMatrixCR;
+
+         using OpMatrixR = Eigen::Ref<MatrixZ>;
+         using OpMatrixCR = Eigen::Ref<const MatrixZ>;
 
          /**
           * @brief Constructor
           */
-         IALegendreIntegrator();
+         IALegendreIntegrator() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IALegendreIntegrator();
+         virtual ~IALegendreIntegrator() = default;
 
          /**
           * @brief Rows of output data
@@ -69,7 +66,7 @@ namespace Integrator {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
           * @brief Storage for the operators

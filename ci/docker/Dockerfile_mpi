@@ -5,7 +5,7 @@ COPY . /QuICC.src
 
 RUN mkdir -p /QuICC.src/build \
   && cd /QuICC.src/build \
-  && cmake .. -DCMAKE_BUILD_TYPE=RelWithAssert \
+  && cmake .. -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE \
     -DQUICC_MPI_CI=ON \
     -DQUICC_USE_MPI=ON \

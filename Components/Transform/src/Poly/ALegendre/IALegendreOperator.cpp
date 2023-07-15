@@ -27,19 +27,12 @@ namespace Poly {
 
 namespace ALegendre {
 
-   template<typename OpTypes>
-   IALegendreOperator<OpTypes>::IALegendreOperator()
+   IALegendreOperator::IALegendreOperator()
       : ITransformOperator()
    {
    }
 
-   template<typename OpTypes>
-   IALegendreOperator<OpTypes>::~IALegendreOperator()
-   {
-   }
-
-   template<typename OpTypes>
-   void IALegendreOperator<OpTypes>::init(SharedTransformSetup spSetup, const OpArray& igrid, const OpArray& iweights) const
+   void IALegendreOperator::init(SharedTransformSetup spSetup, const OpArray& igrid, const OpArray& iweights) const
    {
       // Store the shared pointer to setup object
       this->mspSetup = std::dynamic_pointer_cast<IALegendreOperator::SetupType>(spSetup);
@@ -51,36 +44,31 @@ namespace ALegendre {
       this->mIsInitialized = true;
    }
 
-   template<typename OpTypes>
-   void IALegendreOperator<OpTypes>::init(SharedTransformSetup spSetup) const
+   void IALegendreOperator::init(SharedTransformSetup spSetup) const
    {
       throw std::logic_error("Unused interface");
    }
 
-   template<typename OpTypes>
-   void IALegendreOperator<OpTypes>::transform(OpMatrixZ& rOut, const OpMatrixZ& in) const
+   void IALegendreOperator::transform(OpMatrixZ& rOut, const OpMatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreOperator::transformZ");
       assert(this->isInitialized());
       this->applyOperators(rOut, in);
    }
 
-   template<typename OpTypes>
-   void IALegendreOperator<OpTypes>::transform(OpMatrix& rOut, const OpMatrixZ& in) const
+   void IALegendreOperator::transform(OpMatrix& rOut, const OpMatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreOperator::transform");
       assert(this->isInitialized());
       throw std::logic_error("Data is not compatible with ALegendre operator");
    }
 
-   template<typename OpTypes>
-   void IALegendreOperator<OpTypes>::applyOperators(OpMatrixZ&, const OpMatrixZ&) const
+   void IALegendreOperator::applyOperators(OpMatrixZ&, const OpMatrixZ&) const
    {
       throw std::logic_error("Data is not compatible with ALegendre operator");
    }
 
-   template<typename OpTypes>
-   MHDFloat IALegendreOperator<OpTypes>::requiredStorage() const
+   MHDFloat IALegendreOperator::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 
@@ -92,9 +80,6 @@ namespace ALegendre {
       return mem;
    }
 
-   template class IALegendreOperator<IALegendreOperatorTypes>;
-   template class IALegendreOperator<PIALegendreOperatorTypes>;
-   template class IALegendreOperator<CudaIALegendreOperatorTypes>;
 }
 }
 }

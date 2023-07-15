@@ -28,19 +28,7 @@ namespace ALegendre {
 
 namespace Integrator {
 
-   template<typename OpTypes>
-   IALegendreIntegrator<OpTypes>::IALegendreIntegrator()
-   {
-   }
-
-   template<typename OpTypes>
-   IALegendreIntegrator<OpTypes>::~IALegendreIntegrator()
-   {
-   }
-
-
-   template<typename OpTypes>
-   void IALegendreIntegrator<OpTypes>::initOperators(const OpArray& igrid, const OpArray& iweights) const
+   void IALegendreIntegrator::initOperators(const OpArray& igrid, const OpArray& iweights) const
    {
       // Initit specialized data for operators
       this->initSpecial();
@@ -65,8 +53,7 @@ namespace Integrator {
       #endif //defined QUICC_ALEGENDRE_INTGIMPL_MATRIX
    }
 
-   template<typename OpTypes>
-   void IALegendreIntegrator<OpTypes>::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
+   void IALegendreIntegrator::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreIntegrator::applyOperators");
 
@@ -91,25 +78,21 @@ namespace Integrator {
       }
    }
 
-   template<typename OpTypes>
-   void IALegendreIntegrator<OpTypes>::initSpecial() const
+   void IALegendreIntegrator::initSpecial() const
    {
    }
 
-   template<typename OpTypes>
-   int IALegendreIntegrator<OpTypes>::outRows() const
+   int IALegendreIntegrator::outRows() const
    {
       return this->mspSetup->fastSize(0);
    }
 
-   template<typename OpTypes>
-   int IALegendreIntegrator<OpTypes>::outCols() const
+   int IALegendreIntegrator::outCols() const
    {
       return this->mspSetup->blockSize();
    }
 
-   template<typename OpTypes>
-   MHDFloat IALegendreIntegrator<OpTypes>::requiredStorage() const
+   MHDFloat IALegendreIntegrator::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 
@@ -130,9 +113,6 @@ namespace Integrator {
       return mem;
    }
 
-   template class IALegendreIntegrator<IALegendreOperatorTypes>;
-   template class IALegendreIntegrator<PIALegendreOperatorTypes>;
-   template class IALegendreIntegrator<CudaIALegendreOperatorTypes>;
 }
 }
 }

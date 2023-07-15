@@ -5,6 +5,7 @@ message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_
 
 # components
 add_subdirectory(ViewOps/Fourier)
+add_subdirectory(ViewOps/ALegendre)
 
 add_library(${QUICC_CURRENT_COMPONENT_LIB} INTERFACE)
 
@@ -24,10 +25,11 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
 )
 
 # View
-target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE 
-  QuICC::View 
+target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
+  QuICC::View
   QuICC::Operator
   QuICC::ViewOps::Fourier
+  QuICC::ViewOps::ALegendre
 )
 
 # Alias

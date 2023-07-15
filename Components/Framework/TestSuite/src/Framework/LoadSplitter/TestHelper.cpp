@@ -12,6 +12,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/TestSuite/Framework/LoadSplitter/TestHelper.hpp"
 
 namespace QuICC {
@@ -22,7 +23,7 @@ namespace Framework {
 
 namespace LoadSplitter {
 
-   void writeData(const std::string fname, const QuICC::TransformResolution& tRes, const bool isDetailed)
+   void writeData(const std::string fname, const SimRes& sRes, const QuICC::TransformResolution& tRes, const bool isDetailed)
    {
       int nModes = tRes.dim<QuICC::Dimensions::Data::DAT3D>();
 
@@ -45,8 +46,8 @@ namespace LoadSplitter {
       metaFile << 3 + 2*nModes + nIndexes << std::endl;
       if(nModes > 0)
       {
-         metaFile << tRes.dim<QuICC::Dimensions::Data::DATB1D>() << std::endl;
-         metaFile << tRes.dim<QuICC::Dimensions::Data::DATF1D>() << std::endl;
+         metaFile << sRes.nSpec << std::endl;
+         metaFile << sRes.nPhys << std::endl;
          metaFile << nModes << std::endl;
       }
       else

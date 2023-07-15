@@ -1,31 +1,20 @@
 /**
- * @file PIALegendreOperatorUtils.hpp
+ * @file CudaIALegendreOperatorGemmUtils.hpp
  * @brief Associated Legendre based operator cuda irregular block gemm utils
  */
 
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_CUDAIALEGENDREOPERATORGEMMUTILS_HPP
 #define QUICC_TRANSFORM_POLY_ALEGENDRE_CUDAIALEGENDREOPERATORGEMMUTILS_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
 
-#ifdef QUICC_USE_KOKKOS_CUDA
 #include "QuICC/Transform/Poly/KokkosUtils.hpp"
 #include <cuComplex.h>
 #include "CudaIALegendreOperatorTypes.hpp"
-#endif
 
 namespace QuICC {
 
@@ -35,7 +24,6 @@ namespace Poly {
 
 namespace ALegendre {
 
-#ifdef QUICC_USE_KOKKOS_CUDA
 /* using DataType = cuDoubleComplex; */
 
 //GEMM UTILS
@@ -659,7 +647,6 @@ void iBlockGemmExperimental(const M &d_A, const L &d_B, const L &d_C,
    cudaEventElapsedTime(&milliseconds, start, stop);
 }
 } // namespace Experimental
-#endif
 } // namespace ALegendre
 } // namespace Poly
 } // namespace Transform

@@ -12,9 +12,9 @@
 // Project includes
 //
 #include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/D1_PBase.hpp"
-#include "QuICC/Transform/Wrappers/Mixed/Integrator/D1_PviewCpu_t.hpp.inc"
+#include "QuICC/Transform/Wrappers/Fourier/Mixed/Integrator/D1_PviewCpu_t.hpp.inc"
 #ifdef QUICC_USE_CUFFT
-#include "QuICC/Transform/Wrappers/Mixed/Integrator/D1_PviewGpu_t.hpp.inc"
+#include "QuICC/Transform/Wrappers/Fourier/Mixed/Integrator/D1_PviewGpu_t.hpp.inc"
 #endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_D1_P_HPP
