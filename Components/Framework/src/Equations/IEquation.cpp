@@ -437,7 +437,7 @@ namespace debug {
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
       auto opName = ModelOperator::Coordinator::tag(opId);
       auto tags =  std::vector<SpectralFieldId>(imRange.first, imRange.second);
-      debug::writeModelMatrix(rModelMatrix, opName, tags, matIdx);
+      debug::writeModelMatrix(rModelMatrix, opName, tags, res.cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT3D>(matIdx));
 #endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    }
 
@@ -453,7 +453,7 @@ namespace debug {
          opName += "_sq";
       }
       std::vector<SpectralFieldId> tags = {fId};
-      debug::writeModelMatrix(mat, opName, tags, matIdx);
+      debug::writeModelMatrix(mat, opName, tags, res.cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT3D>(matIdx));
 #endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    }
 
@@ -465,7 +465,7 @@ namespace debug {
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
       auto opName = ModelOperator::Coordinator::tag(opId);
       std::vector<SpectralFieldId> tags = {fId, fieldId};
-      debug::writeModelMatrix(mat, opName, tags, matIdx);
+      debug::writeModelMatrix(mat, opName, tags, res.cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT3D>(matIdx));
 #endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    }
 
