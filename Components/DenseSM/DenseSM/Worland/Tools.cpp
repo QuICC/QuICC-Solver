@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Tools.cpp
  * @brief Source of the tools for full sphere Worland operator
  */

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ProjFitEnergyPol.hpp
  * @brief Implementation of the full sphere Worland projection operator onto best energy fit for poloidal scalar
  */
@@ -22,7 +22,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the full sphere Worland projection operator onto best energy fit for poloidal scalar
-    */ 
+    */
    class ProjFitEnergyPol: public IWorlandOperator
    {
       public:
@@ -44,7 +44,7 @@ namespace Worland {
           * @brief Destructor
           */
          virtual ~ProjFitEnergyPol() = default;
-         
+
       protected:
          /**
           * @brief Implementation of build dense matrix operator

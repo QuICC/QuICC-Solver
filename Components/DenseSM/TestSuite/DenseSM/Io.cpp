@@ -40,6 +40,19 @@ namespace DenseSM {
       outfile.close();
    }
 
+   void writeData(const std::string& path, const MatrixZ& outData)
+   {
+      std::ofstream outfile;
+      outfile.open(path + "z");
+      if(! outfile.is_open())
+      {
+         throw std::logic_error("Couldn't open output file!");
+      }
+      outfile << std::setprecision(15) << outData.real() << std::endl;
+      outfile << std::setprecision(15) << outData.imag() << std::endl;
+      outfile.close();
+   }
+
    void readData(SparseMatrix& inData, const std::string& path)
    {
       // Check if file exists
@@ -84,6 +97,44 @@ namespace DenseSM {
             for(int j = 0; j < inData.cols(); ++j)
             {
                infile >> inData(i,j);
+            }
+         }
+         infile.close();
+      }
+   }
+
+   void readData(MatrixZ& inData, const std::string& path)
+   {
+      std::ifstream infile;
+      infile.open(path, std::ios::in | std::ios::binary);
+      if(! infile.is_open())
+      {
+         std::cerr << "*****************************************************************" << std::endl;
+         std::cerr << "*****************************************************************" << std::endl;
+         std::cerr << "  Couldn't open complex input file: " + path << std::endl;
+         std::cerr << "*****************************************************************" << std::endl;
+         std::cerr << "*****************************************************************" << std::endl;
+         inData.resize(0,0);
+      } else
+      {
+         MHDFloat val;
+         // Loop over real part
+         for(int i = 0; i < inData.rows(); ++i)
+         {
+            for(int j = 0; j < inData.cols(); ++j)
+            {
+               infile >> val;
+               inData(i,j) = val;
+            }
+         }
+
+         // Loop over imaginary part
+         for(int i = 0; i < inData.rows(); ++i)
+         {
+            for(int j = 0; j < inData.cols(); ++j)
+            {
+               infile >> val;
+               inData(i,j) += val*Math::cI;
             }
          }
          infile.close();

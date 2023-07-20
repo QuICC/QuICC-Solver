@@ -11,8 +11,10 @@
 
 // Project includes
 //
+#include "QuICC/Precision.hpp"
 #include "TestSuite/DenseSM/Worland/TestArgs.hpp"
 #include "DenseSM/Worland/@Operator@.hpp"
+#include "TestSuite/DenseSM/Worland/Tester.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
 
@@ -27,7 +29,7 @@ TEST_CASE( "Error for @Operator@ operator", "[@Operator@:@type@]" )
    // Set default arguments if required
    if(currentts::args().useDefault)
    {
-      currentts::args().params = {0,1,2,3,4,10,11,12,13,14};
+      currentts::args().params = {0,1,2,3};
    }
 
    Catch::StringMaker<double>::precision = 15;
@@ -38,25 +40,17 @@ TEST_CASE( "Error for @Operator@ operator", "[@Operator@:@type@]" )
    REQUIRE( currentts::args().params.size() > 0 );
 
    typedef ::QuICC::DenseSM::Worland::@Operator@ Operator;
+   typedef typename currentts::Tester<Operator> Tester;
 
-   auto a = ::QuICC::Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;                                                                                                                           
-   auto b = ::QuICC::Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
+   Tester tester("@Operator@.dat", currentts::args().dumpData);
+   tester.setUlp(currentts::args().ulp);
 
-   int nN = 13;
-   int oN = 7;
-   int l = 1;
-   Operator op(oN, ::QuICC::Bc::Name::FixedTemperature::id(), nN, nN, a, b, l);
+   Tester::ParameterType params = {-1};
 
-   auto mat = op.mat();
-
-   std::cerr << mat.rows() << " x " << mat.cols() << std::endl;
-   std::cerr << mat << std::endl;
-
-   ::QuICC::SparseSM::Worland::Stencil::Value S(nN, nN-1, a, b, l);
-   auto bcIn = ::QuICC::Array::Random(nN-1);
-   ::QuICC::Array in = S.mat()*bcIn;
-   ::QuICC::Array out = mat*in;
-
-   std::cerr << in.transpose() << std::endl;
-   std::cerr << out.transpose() << std::endl;
+   for(auto id: currentts::args().params)
+   {
+      params.at(0) = id;
+      tester.validate(params, currentts::args().type, currentts::args().timeOnly);
+   
+   }
 }

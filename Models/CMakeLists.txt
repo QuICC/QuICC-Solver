@@ -40,7 +40,7 @@ set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.7.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.7.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "main")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereModifiedTaylor
-  "v1.0.1")
+  "v1.1.0")
 
 # Cache value, may be overwritten manually
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo

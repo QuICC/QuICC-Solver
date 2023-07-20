@@ -29,11 +29,23 @@ namespace DenseSM {
       /// Write output data to file
       bool dumpData;
 
+      /// Only time execution, don't check data
+      bool timeOnly;
+
       /// Test type
       TestType type;
 
       /// Max ulp
       unsigned int ulp;
+
+      /// Number of MPI ranks
+      unsigned int np;
+
+      /// MPI rank
+      unsigned int rank;
+
+      /// Number of ierations
+      unsigned int iter;
 
       /// Test parameters
       std::vector<double> params;

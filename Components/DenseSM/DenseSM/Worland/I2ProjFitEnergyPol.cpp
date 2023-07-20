@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2ProjFitEnergyPol.cpp
  * @brief Source of the implementation of the full sphere Worland projection operator onto best energy fit for poloidal scalar with I2 quasi-inverse
  */

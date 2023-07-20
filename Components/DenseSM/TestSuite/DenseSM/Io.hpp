@@ -37,6 +37,11 @@ namespace DenseSM {
    void writeData(const std::string& path, const Matrix& outData);
 
    /**
+    * @brief Write complex data to file
+    */
+   void writeData(const std::string& path, const MatrixZ& outData);
+
+   /**
     * @brief Read real data from file
     */
    void readData(SparseMatrix& inData, const std::string& path);
@@ -45,6 +50,11 @@ namespace DenseSM {
     * @brief Read real data from file
     */
    void readData(Matrix& inData, const std::string& path);
+
+   /**
+    * @brief Read complex data from file
+    */
+   void readData(MatrixZ& inData, const std::string& path);
 
    /**
     * @brief Read real data from file

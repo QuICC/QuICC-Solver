@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2ProjFitEnergyR2.cpp
  * @brief Source of the implementation of the full sphere Worland projection operator onto best energy fit with I2 quasi-inverse
  */

@@ -18,7 +18,7 @@ namespace TestSuite {
 namespace DenseSM {
 
    TestArgs::TestArgs()
-      : useDefault(true), dumpData(false), type(TestType::DENSE), ulp(11)
+      : useDefault(true), dumpData(false), timeOnly(false), type(TestType::DENSE), ulp(11), np(0), rank(0), iter(1)
    {
    }
 

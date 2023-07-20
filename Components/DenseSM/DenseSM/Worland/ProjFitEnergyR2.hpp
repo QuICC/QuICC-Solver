@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ProjFitEnergyR2.hpp
  * @brief Implementation of the full sphere Worland projection operator onto best energy fit
  */
@@ -22,7 +22,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the full sphere Worland projection operator onto best energy fit
-    */ 
+    */
    class ProjFitEnergyR2: public IWorlandOperator
    {
       public:
@@ -44,7 +44,7 @@ namespace Worland {
           * @brief Destructor
           */
          virtual ~ProjFitEnergyR2() = default;
-         
+
       protected:
          /**
           * @brief Implementation of build dense matrix operator

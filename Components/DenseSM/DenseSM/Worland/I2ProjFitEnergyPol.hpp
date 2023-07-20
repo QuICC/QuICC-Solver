@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2ProjFitEnergyPol.hpp
  * @brief Implementation of the full sphere Worland projection operator onto best energy fit for poloidal scalar with I2 quas-inverse
  *
@@ -24,7 +24,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the full sphere Worland projection operator onto best energy fit for poloidal scalar with I2 quasi-inverse
-    */ 
+    */
    class I2ProjFitEnergyPol: public IWorlandOperator
    {
       public:
@@ -46,7 +46,7 @@ namespace Worland {
           * @brief Destructor
           */
          virtual ~I2ProjFitEnergyPol() = default;
-         
+
       protected:
          /**
           * @brief Implementation of build dense matrix operator

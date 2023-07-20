@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ProjFitEnergyR2.cpp
  * @brief Source of the implementation of the full sphere Worland projection operator onto best energy fit
  */

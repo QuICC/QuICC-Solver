@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ProjFitEnergyPol.cpp
  * @brief Source of the implementation of the full sphere Worland projection operator onto best energy fit for poloidal scalar
  */
@@ -22,7 +22,6 @@
 #include "QuICC/SparseSM/Worland/I2.hpp"
 #include "QuICC/Bc/Name/Insulating.hpp"
 
-#include <iostream>
 namespace QuICC {
 
 namespace DenseSM {

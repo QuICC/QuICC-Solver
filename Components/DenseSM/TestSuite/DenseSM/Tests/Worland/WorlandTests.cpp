@@ -11,11 +11,28 @@
 
 // Project includes
 //
+#include "QuICC/QuICCEnv.hpp"
 #include "TestSuite/DenseSM/Worland/TestArgs.hpp"
+#include "Profiler/Interface.hpp"
+
 namespace test = QuICC::TestSuite::DenseSM::Worland;
 
 int main( int argc, char* argv[] )
 {
+   // Environment fixture
+   QuICC::QuICCEnv();
+   #ifdef QUICC_MPI
+      {
+         int size;
+         MPI_Comm_size(MPI_COMM_WORLD, &size);
+         QuICC::QuICCEnv().setup(size);
+      }
+   #else
+      QuICC::QuICCEnv().setup(1);
+   #endif
+
+   QuICC::Profiler::Initialize();
+
    Catch::Session session; // There must be exactly one instance
 
    std::string testType = "";
@@ -56,5 +73,9 @@ int main( int argc, char* argv[] )
       test::args().useDefault = false;
    }
 
-   return session.run();
+   returnCode = session.run();
+
+   QuICC::Profiler::Finalize();
+
+   return returnCode;
 }
