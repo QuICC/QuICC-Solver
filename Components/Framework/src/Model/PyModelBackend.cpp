@@ -30,6 +30,7 @@
 #include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/Tools/IdToHuman.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
+#include "QuICC/Bc/Name/NoPenetration.hpp"
 #include "QuICC/Bc/Name/NoSlip.hpp"
 #include "QuICC/Bc/Name/StressFree.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
@@ -222,6 +223,10 @@ namespace Model {
          else if(bc.second == Bc::Name::StressFree::id())
          {
             bcVal = 1;
+         }
+         else if(bc.second == Bc::Name::NoPenetration::id())
+         {
+            bcVal = 2;
          }
          else if(bc.second == Bc::Name::FixedTemperature::id())
          {

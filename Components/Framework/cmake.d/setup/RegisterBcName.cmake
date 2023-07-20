@@ -1,4 +1,5 @@
 set(tags 
+  NoPenetration
   NoSlip 
   StressFree
   FixedTemperature
