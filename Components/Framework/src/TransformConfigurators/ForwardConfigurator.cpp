@@ -3,22 +3,13 @@
  * @brief Source of the implementation of the base forward configurator in xD space
  */
 
-// Configuration includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/TransformConfigurators/ForwardConfigurator.hpp"
-
 // Project includes
 //
+#include "QuICC/TransformConfigurators/ForwardConfigurator.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Arithmetics/SetNeg.hpp"
 #include "QuICC/Arithmetics/None.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
@@ -36,7 +27,7 @@ namespace Transform {
       // Debugger message
       DebuggerMacro_msg("nonlinearTerm", 4);
 
-      Profiler::RegionFixture<2> fix("Fwd-nonlinearTerm");
+      Profiler::RegionFixture<1> fix("Transform::ForwardConfigurator::nonlinearTerm");
 
       // Get physical storage
       auto pNLComp = coord.ss().fwdPtr(static_cast<Dimensions::Transform::Id>(coord.ss().dimension()-1));
@@ -54,7 +45,7 @@ namespace Transform {
       // Debugger message
       DebuggerMacro_msg("Integrate ND with operator (" + Forward::Coordinator::tag(edge.opId()) + ")", 6);
 
-      const std::string profRegion = "Fwd-integrateND";
+      const std::string profRegion = "Transform::ForwardConfigurator::integrateND";
       const auto traId = static_cast<Dimensions::Transform::Id>(coord.ss().dimension()-1);
       const bool processOutput = true;
       ForwardConfigurator::genericIntegrate(edge, coord, traId, processOutput, profRegion);
@@ -65,7 +56,7 @@ namespace Transform {
       // Debugger message
       DebuggerMacro_msg("Integrate 2D with operator (" + Forward::Coordinator::tag(edge.opId()) + ")", 6);
 
-      const std::string profRegion = "Fwd-integrate2D";
+      const std::string profRegion = "Transform::ForwardConfigurator::integrate2D";
       const auto traId = Dimensions::Transform::TRA2D;
       const bool processOutput = true;
       ForwardConfigurator::genericIntegrate(edge, coord, traId, processOutput, profRegion);
@@ -76,7 +67,7 @@ namespace Transform {
       // Debugger message
       DebuggerMacro_msg("Integrate 1D with operator (" + Forward::Coordinator::tag(edge.opId()) + ")", 6);
 
-      const std::string profRegion = "Fwd-integrate1D";
+      const std::string profRegion = "Transform::ForwardConfigurator::integrate1D";
       const auto traId = Dimensions::Transform::TRA1D;
       const bool processOutput = false;
       ForwardConfigurator::genericIntegrate(edge, coord, traId, processOutput, profRegion);
@@ -225,10 +216,10 @@ namespace Transform {
 
    void ForwardConfigurator::updateEquation(const TransformTreeEdge& edge, Framework::Selector::VariantSharedScalarVariable& rScalar, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Fwd-updateEquation");
-
       // Debugger message
       DebuggerMacro_msg("updateEquation (scalar)", 4);
+
+      Profiler::RegionFixture<2> fix("Transform::ForwardConfigurator::updateEquation");
 
       const auto transId = Dimensions::Transform::SPECTRAL;
 
@@ -282,10 +273,10 @@ namespace Transform {
 
    void ForwardConfigurator::updateEquation(const TransformTreeEdge& edge, Framework::Selector::VariantSharedVectorVariable& rVector, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Fwd-updateEquation");
-
       // Debugger message
       DebuggerMacro_msg("updateEquation (vector)", 4);
+
+      Profiler::RegionFixture<2> fix("Transform::ForwardConfigurator::updateEquation");
 
       const auto transId = Dimensions::Transform::SPECTRAL;
 

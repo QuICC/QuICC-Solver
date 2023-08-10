@@ -7,33 +7,21 @@
 //
 #include "QuICC/Equations/Tools/EquationTools.hpp"
 
-// Debug includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-
-// Configuration includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
 // System includes
 //
 #include <algorithm>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Simulation/Simulation.hpp"
-
 // Project includes
 //
+#include "QuICC/Simulation/Simulation.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/QuICCTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/RuntimeStatus/GoOn.hpp"
 #include "QuICC/Simulation/SimulationIoTools.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -61,7 +49,7 @@ namespace QuICC {
 
    void Simulation::mainRun()
    {
-      QuICC::Profiler::RegionFixture<1> simFix("Simulation::mainRun");
+      Profiler::RegionFixture<1> simFix("Simulation::mainRun");
 
       StageTimer::stage("Starting simulation");
 
@@ -96,6 +84,8 @@ namespace QuICC {
 
    void Simulation::preRun()
    {
+      Profiler::RegionFixture<1> simFix("Simulation::preRun");
+
       StageTimer stage;
       stage.start("Prepare time evolution");
 
@@ -136,7 +126,7 @@ namespace QuICC {
 
    void Simulation::writeOutput()
    {
-      Profiler::RegionFixture fix("IO");
+      Profiler::RegionFixture<1> fix("Simulation::writeOutput");
 
       this->mSimIoCtrl.writeStats();
 
@@ -155,6 +145,8 @@ namespace QuICC {
 
    void Simulation::postRun()
    {
+      Profiler::RegionFixture<1> simFix("Simulation::postRun");
+
       this->mSimIoCtrl.writeStats();
 
       StageTimer::stage("Post simulation");

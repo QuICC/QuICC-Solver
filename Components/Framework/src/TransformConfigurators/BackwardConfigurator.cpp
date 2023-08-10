@@ -34,7 +34,7 @@ namespace Transform {
 
    void BackwardConfigurator::prepareSpectral(const TransformTree& tree, Framework::Selector::VariantSharedScalarVariable& rScalar, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Bwd-prepareSpectral");
+      Profiler::RegionFixture<2> fix("Transform::BackwardConfigurator::prepareSpectral");
 
       // Debugger message
       DebuggerMacro_msg("prepareSpectral (scalar)", 4);
@@ -53,10 +53,10 @@ namespace Transform {
 
    void BackwardConfigurator::prepareSpectral(const TransformTree& tree, Framework::Selector::VariantSharedVectorVariable& rVector, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Bwd-prepareSpectral");
-
       // Debugger message
       DebuggerMacro_msg("prepareSpectral (vector)", 4);
+
+      Profiler::RegionFixture<2> fix("Transform::BackwardConfigurator::prepareSpectral");
 
       // Safety assert
       assert(tree.comp<FieldComponents::Spectral::Id>() != FieldComponents::Spectral::SCALAR);
@@ -72,7 +72,7 @@ namespace Transform {
 
    void BackwardConfigurator::preparePhysical(const TransformTree&, const TransformTreeEdge& edge, Framework::Selector::VariantSharedScalarVariable& rScalar, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Bwd-preparePhysical");
+      Profiler::RegionFixture<2> fix("Transform::BackwardConfigurator::preparePhysical");
 
       // Debugger message
       DebuggerMacro_msg("preparePhysical (scalar)", 4);
@@ -96,7 +96,7 @@ namespace Transform {
 
    void BackwardConfigurator::preparePhysical(const TransformTree& tree, const TransformTreeEdge& edge, Framework::Selector::VariantSharedVectorVariable& rVector, TransformCoordinatorType& coord)
    {
-      Profiler::RegionFixture<2> fix("Bwd-preparePhysical");
+      Profiler::RegionFixture<2> fix("Transform::BackwardConfigurator::preparePhysical");
 
       // Debugger message
       DebuggerMacro_msg("preparePhysical (vector)", 4);
@@ -123,7 +123,7 @@ namespace Transform {
       // Debugger message
       DebuggerMacro_msg("Project 1D with operator (" + Backward::Coordinator::tag(edge.opId()) + ")", 6);
 
-      const std::string profRegion = "Bwd-project1D";
+      const std::string profRegion = "Transform::BackwardConfigurator::project1D";
       const auto traId = Dimensions::Transform::TRA1D;
       const bool processOutput = true;
       BackwardConfigurator::genericProjection(edge, coord, traId, processOutput, profRegion);
@@ -134,7 +134,7 @@ namespace Transform {
       // Debugger message
       DebuggerMacro_msg("Project 2D with operator (" + Backward::Coordinator::tag(edge.opId()) + ")", 6);
 
-      const std::string profRegion = "Bwd-project2D";
+      const std::string profRegion = "Transform::BackwardConfigurator::project2D";
       const auto traId = Dimensions::Transform::TRA2D;
       const bool processOutput = true;
       BackwardConfigurator::genericProjection(edge, coord, traId, processOutput, profRegion);
@@ -142,11 +142,10 @@ namespace Transform {
 
    void BackwardConfigurator::projectND(const TransformTreeEdge& edge, TransformCoordinatorType& coord)
    {
-
       // Debugger message
       DebuggerMacro_msg("Project ND with operator (" + Backward::Coordinator::tag(edge.opId()) + ")", 6);
 
-      const std::string profRegion = "Bwd-projectND";
+      const std::string profRegion = "Transform::BackwardConfigurator::projectND";
       const auto traId = static_cast<Dimensions::Transform::Id>(coord.ss().dimension()-1);
       const bool processOutput = false;
       BackwardConfigurator::genericProjection(edge, coord, traId, processOutput, profRegion);

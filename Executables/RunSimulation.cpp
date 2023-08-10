@@ -34,7 +34,7 @@
  */
 int run()
 {
-   QuICC::Profiler::RegionFixture runFix("run");
+   QuICC::Profiler::RegionFixture<1> runFix("Walltime");
 
    int status = 0;
 

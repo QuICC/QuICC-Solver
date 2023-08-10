@@ -6,15 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Simulation/SimulationIoTools.hpp"
-
 // Project includes
 //
+#include "QuICC/Simulation/SimulationIoTools.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -28,6 +23,8 @@ namespace QuICC {
 
    void SimulationIoTools::updateHeavyAscii(SimulationIoTools::ascii_iterator asciiBegin,  SimulationIoTools::ascii_iterator asciiEnd, Transform::TransformCoordinatorType& coord)
    {
+      Profiler::RegionFixture<1> fix("SimulationIoTools::updateHeavyAscii");
+
       ascii_iterator it;
       for(it = asciiBegin; it != asciiEnd; ++it)
       {
