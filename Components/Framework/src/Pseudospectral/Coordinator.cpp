@@ -30,6 +30,7 @@
 #include "QuICC/PseudospectralTag/Trivial.hpp"
 #include "QuICC/PseudospectralTag/Uninitialized.hpp"
 #include "QuICC/PseudospectralTag/Wrapper.hpp"
+#include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -596,12 +597,14 @@ namespace Pseudospectral {
 
    void Coordinator::updateEquations(const int it, const bool isFinished) const
    {
-      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::updateEquations");
+      const std::string profRegion = "Pseudospectral::Coordinator::updateEquations";
+      Profiler::RegionFixture<1> fix(profRegion);
 
       // Loop over all scalar equations
       assert(this->mScalarEquations.count(it) == 1);
       for(auto scalEqIt = this->mScalarEquations.at(it).begin(); scalEqIt < this->mScalarEquations.at(it).end(); ++scalEqIt)
       {
+         Profiler::RegionFixture<2> fixId(profRegion+"-"+PhysicalNames::Coordinator::tag((*scalEqIt)->name()));
          (*scalEqIt)->updateConstraintKernel(this->time(), this->timestep(), isFinished);
       }
 
@@ -609,6 +612,7 @@ namespace Pseudospectral {
       assert(this->mVectorEquations.count(it) == 1);
       for(auto vectEqIt = this->mVectorEquations.at(it).begin(); vectEqIt < this->mVectorEquations.at(it).end(); ++vectEqIt)
       {
+         Profiler::RegionFixture<2> fixId(profRegion+"-"+PhysicalNames::Coordinator::tag((*vectEqIt)->name()));
          (*vectEqIt)->updateConstraintKernel(this->time(), this->timestep(), isFinished);
       }
    }

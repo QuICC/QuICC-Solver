@@ -16,6 +16,7 @@
 #ifdef QUICC_DEBUG
 #include "QuICC/Transform/Forward/Coordinator.hpp"
 #endif // QUICC_DEBUG
+#include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -27,7 +28,9 @@ namespace Transform {
       // Debugger message
       DebuggerMacro_msg("nonlinearTerm", 4);
 
-      Profiler::RegionFixture<1> fix("Transform::ForwardConfigurator::nonlinearTerm");
+      const std::string profRegion = "Transform::ForwardConfigurator::nonlinearTerm";
+      Profiler::RegionFixture<1> fix(profRegion);
+      Profiler::RegionFixture<2> fixId(profRegion + "-" + PhysicalNames::Coordinator::tag(tree.name()));
 
       // Get physical storage
       auto pNLComp = coord.ss().fwdPtr(static_cast<Dimensions::Transform::Id>(coord.ss().dimension()-1));

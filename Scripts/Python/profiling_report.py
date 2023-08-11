@@ -9,7 +9,8 @@ import numpy as np
 def printHeader(name, tabs):
     print('\t'*tabs+f'{name+":":<20}')
 
-def printTiming(name, tag, db, tabs, debug = True):
+def printTiming(name, tag, db, tabs, debug = True, global_tot = None):
+    t_tot = None
     if tag in db:
         timings = db[tag]
         count = timings['count'][()]
@@ -18,15 +19,19 @@ def printTiming(name, tag, db, tabs, debug = True):
         t_min = np.min(ts)
         t_avg = np.average(ts)
         t_max = np.max(ts)
+        msg = f'{name+":":<20} {t_tot:.2e}'
+        if global_tot is not None:
+            msg += f' ({100*t_tot/global_tot:.1f} %)'
         if count > 1:
-            print('\t'*tabs+f'{name+":":<20} {t_tot:.2e} ({count}, {t_min:.2e} / {t_avg:.2e} / {t_max:.2e})')
-        else:
-            print('\t'*tabs+f'{name+":":<20} {t_tot:.2e}')
+            msg += f' [{count}, {t_min:.2e} / {t_avg:.2e} / {t_max:.2e}]'
+        print('\t'*tabs+f'{msg}')
     else:
         if debug:
             print('!'*60)
             print(f'Timing for "{tag}" not found')
             print('!'*60)
+
+    return t_tot
 
 def readProfile(name, max_lvl):
     # Get file handle
@@ -57,67 +62,75 @@ def readProfile(name, max_lvl):
 
     # Computation
     indent = 0
-    printTiming('Computation', 'Simulation::mainRun', db, indent)
-    printTiming('evolve', 'Pseudospectral::Coordinator::evolve', db, indent+1)
-    printTiming('explicitEquations', 'Pseudospectral::Coordinator::explicitEquations', db, indent+2)
+    tot = printTiming('Computation', 'Simulation::mainRun', db, indent)
+    printTiming('evolve', 'Pseudospectral::Coordinator::evolve', db, indent+1, global_tot = tot)
+    printTiming('explicitEquations', 'Pseudospectral::Coordinator::explicitEquations', db, indent+2, global_tot = tot)
     if max_lvl > 1:
-        printTiming('trivial', 'Pseudospectral::Coordinator::explicitEquations-trivial', db, indent+3)
-        printTiming('diagnostic', 'Pseudospectral::Coordinator::explicitEquations-diagnostic', db, indent+3)
-        printTiming('prognostic', 'Pseudospectral::Coordinator::explicitEquations-prognostic', db, indent+3)
-    printTiming('computeNonlinear', 'Pseudospectral::Coordinator::computeNonlinear', db, indent+2)
-    printTiming('updatePhysical', 'Pseudospectral::Coordinator::updatePhysical', db, indent+3)
+        printTiming('trivial', 'Pseudospectral::Coordinator::explicitEquations-trivial', db, indent+3, global_tot = tot)
+        printTiming('diagnostic', 'Pseudospectral::Coordinator::explicitEquations-diagnostic', db, indent+3, global_tot = tot)
+        printTiming('prognostic', 'Pseudospectral::Coordinator::explicitEquations-prognostic', db, indent+3, global_tot = tot)
+    printTiming('computeNonlinear', 'Pseudospectral::Coordinator::computeNonlinear', db, indent+2, global_tot = tot)
+    printTiming('updatePhysical', 'Pseudospectral::Coordinator::updatePhysical', db, indent+3, global_tot = tot)
     if max_lvl > 1:
-        printTiming('prepareSpectral', 'Transform::BackwardConfigurator::prepareSpectral', db, indent+4)
-        printTiming('project1D', 'Transform::BackwardConfigurator::project1D', db, indent+4)
+        printTiming('prepareSpectral', 'Transform::BackwardConfigurator::prepareSpectral', db, indent+4, global_tot = tot)
+        printTiming('project1D', 'Transform::BackwardConfigurator::project1D', db, indent+4, global_tot = tot)
         if max_lvl > 2:
-            printTiming('pre', 'Transform::BackwardConfigurator::project1D-pre', db, indent+5)
-            printTiming('transform', 'Transform::BackwardConfigurator::project1D-transform', db, indent+5)
-            printTiming('post', 'Transform::BackwardConfigurator::project1D-post', db, indent+5)
-        printTiming('project2D', 'Transform::BackwardConfigurator::project2D', db, indent+4)
+            printTiming('pre', 'Transform::BackwardConfigurator::project1D-pre', db, indent+5, global_tot = tot)
+            printTiming('transform', 'Transform::BackwardConfigurator::project1D-transform', db, indent+5, global_tot = tot)
+            printTiming('post', 'Transform::BackwardConfigurator::project1D-post', db, indent+5, global_tot = tot)
+        printTiming('project2D', 'Transform::BackwardConfigurator::project2D', db, indent+4, global_tot = tot)
         if max_lvl > 2:
-            printTiming('pre', 'Transform::BackwardConfigurator::project2D-pre', db, indent+5)
-            printTiming('transform', 'Transform::BackwardConfigurator::project2D-transform', db, indent+5)
-            printTiming('post', 'Transform::BackwardConfigurator::project2D-post', db, indent+5)
-        printTiming('preparePhysical', 'Transform::BackwardConfigurator::preparePhysical', db, indent+4)
-        printTiming('projectND', 'Transform::BackwardConfigurator::projectND', db, indent+4)
+            printTiming('pre', 'Transform::BackwardConfigurator::project2D-pre', db, indent+5, global_tot = tot)
+            printTiming('transform', 'Transform::BackwardConfigurator::project2D-transform', db, indent+5, global_tot = tot)
+            printTiming('post', 'Transform::BackwardConfigurator::project2D-post', db, indent+5, global_tot = tot)
+        printTiming('preparePhysical', 'Transform::BackwardConfigurator::preparePhysical', db, indent+4, global_tot = tot)
+        printTiming('projectND', 'Transform::BackwardConfigurator::projectND', db, indent+4, global_tot = tot)
         if max_lvl > 2:
-            printTiming('pre', 'Transform::BackwardConfigurator::projectND-pre', db, indent+5)
-            printTiming('transform', 'Transform::BackwardConfigurator::projectND-transform', db, indent+5)
-            printTiming('post', 'Transform::BackwardConfigurator::projectND-post', db, indent+5)
-    printTiming('nonlinearTerm', 'Transform::ForwardConfigurator::nonlinearTerm', db, indent+3)
-    printTiming('updateSpectral', 'Pseudospectral::Coordinator::updateSpectral', db, indent+3)
+            printTiming('pre', 'Transform::BackwardConfigurator::projectND-pre', db, indent+5, global_tot = tot)
+            printTiming('transform', 'Transform::BackwardConfigurator::projectND-transform', db, indent+5, global_tot = tot)
+            printTiming('post', 'Transform::BackwardConfigurator::projectND-post', db, indent+5, global_tot = tot)
+    tag = 'Transform::ForwardConfigurator::nonlinearTerm'
+    printTiming('nonlinearTerm', tag, db, indent+3, global_tot = tot)
+    for t in db:
+        if t.startswith(tag + '-'):
+            printTiming(t.split(tag + '-')[1], t, db, indent+4, global_tot = tot)
+    printTiming('updateSpectral', 'Pseudospectral::Coordinator::updateSpectral', db, indent+3, global_tot = tot)
     if max_lvl > 1:
-        printTiming('integrateND', 'Transform::ForwardConfigurator::integrateND', db, indent+4)
+        printTiming('integrateND', 'Transform::ForwardConfigurator::integrateND', db, indent+4, global_tot = tot)
         if max_lvl > 2:
-            printTiming('pre', 'Transform::ForwardConfigurator::integrateND-pre', db, indent+5)
-            printTiming('transform', 'Transform::ForwardConfigurator::integrateND-transform', db, indent+5)
-            printTiming('post', 'Transform::ForwardConfigurator::integrateND-post', db, indent+5)
-        printTiming('integrate2D', 'Transform::ForwardConfigurator::integrate2D', db, indent+4)
+            printTiming('pre', 'Transform::ForwardConfigurator::integrateND-pre', db, indent+5, global_tot = tot)
+            printTiming('transform', 'Transform::ForwardConfigurator::integrateND-transform', db, indent+5, global_tot = tot)
+            printTiming('post', 'Transform::ForwardConfigurator::integrateND-post', db, indent+5, global_tot = tot)
+        printTiming('integrate2D', 'Transform::ForwardConfigurator::integrate2D', db, indent+4, global_tot = tot)
         if max_lvl > 2:
-            printTiming('pre', 'Transform::ForwardConfigurator::integrate2D-pre', db, indent+5)
-            printTiming('transform', 'Transform::ForwardConfigurator::integrate2D-transform', db, indent+5)
-            printTiming('post', 'Transform::ForwardConfigurator::integrate2D-post', db, indent+5)
-        printTiming('integrate1D', 'Transform::ForwardConfigurator::integrate1D', db, indent+4)
+            printTiming('pre', 'Transform::ForwardConfigurator::integrate2D-pre', db, indent+5, global_tot = tot)
+            printTiming('transform', 'Transform::ForwardConfigurator::integrate2D-transform', db, indent+5, global_tot = tot)
+            printTiming('post', 'Transform::ForwardConfigurator::integrate2D-post', db, indent+5, global_tot = tot)
+        printTiming('integrate1D', 'Transform::ForwardConfigurator::integrate1D', db, indent+4, global_tot = tot)
         if max_lvl > 2:
-            printTiming('pre', 'Transform::ForwardConfigurator::integrate1D-pre', db, indent+5)
-            printTiming('transform', 'Transform::ForwardConfigurator::integrate1D-transform', db, indent+5)
-            printTiming('post', 'Transform::ForwardConfigurator::integrate1D-post', db, indent+5)
-        printTiming('updateEquation', 'Transform::ForwardConfigurator::updateEquation', db, indent+4)
-    printTiming('solveEquations', 'Pseudospectral::Coordinator::solveEquations', db, indent+2)
+            printTiming('pre', 'Transform::ForwardConfigurator::integrate1D-pre', db, indent+5, global_tot = tot)
+            printTiming('transform', 'Transform::ForwardConfigurator::integrate1D-transform', db, indent+5, global_tot = tot)
+            printTiming('post', 'Transform::ForwardConfigurator::integrate1D-post', db, indent+5, global_tot = tot)
+        printTiming('updateEquation', 'Transform::ForwardConfigurator::updateEquation', db, indent+4, global_tot = tot)
+    printTiming('solveEquations', 'Pseudospectral::Coordinator::solveEquations', db, indent+2, global_tot = tot)
     if max_lvl > 1:
-        printTiming('trivial-before', 'Pseudospectral::Coordinator::solveEquations-trivialBefore', db, indent+3)
-        printTiming('diagnostic-before', 'Pseudospectral::Coordinator::solveEquations-diagnosticBefore', db, indent+3)
-        printTiming('prognostic', 'Pseudospectral::Coordinator::solveEquations-prognostic', db, indent+3)
-        printTiming('diagnostic-after', 'Pseudospectral::Coordinator::solveEquations-diagnosticAfter', db, indent+3)
-        printTiming('trivial-after', 'Pseudospectral::Coordinator::solveEquations-trivialAfter', db, indent+3)
-    printTiming('updateEquations', 'Pseudospectral::Coordinator::updateEquations', db, indent+2)
-    printTiming('finalizeTimestep', 'Pseudospectral::Coordinator::finalizeTimestep', db, indent+2)
-    printTiming('IO', 'Simulation::writeOutput', db, indent+1)
-    printTiming('Stats', 'SimulationIoControl::writeStats', db, indent+2)
-    printTiming('updateHeavyAscii', 'SimulationIoTools::updateHeavyAscii', db, indent+2)
-    printTiming('Ascii', 'SimulationIoControl::writeAscii', db, indent+2)
-    printTiming('Hdf5', 'SimulationIoControl::writeHdf5', db, indent+2)
-    printTiming('Diagnostics', 'Pseudospectral::Coordinator::writeDiagnostics', db, indent+2)
+        printTiming('trivial-before', 'Pseudospectral::Coordinator::solveEquations-trivialBefore', db, indent+3, global_tot = tot)
+        printTiming('diagnostic-before', 'Pseudospectral::Coordinator::solveEquations-diagnosticBefore', db, indent+3, global_tot = tot)
+        printTiming('prognostic', 'Pseudospectral::Coordinator::solveEquations-prognostic', db, indent+3, global_tot = tot)
+        printTiming('diagnostic-after', 'Pseudospectral::Coordinator::solveEquations-diagnosticAfter', db, indent+3, global_tot = tot)
+        printTiming('trivial-after', 'Pseudospectral::Coordinator::solveEquations-trivialAfter', db, indent+3, global_tot = tot)
+    tag = 'Pseudospectral::Coordinator::updateEquations'
+    printTiming('updateEquations', tag, db, indent+2, global_tot = tot)
+    for t in db:
+        if t.startswith(tag + '-'):
+            printTiming(t.split(tag + '-')[1], t, db, indent+4, global_tot = tot)
+    printTiming('finalizeTimestep', 'Pseudospectral::Coordinator::finalizeTimestep', db, indent+2, global_tot = tot)
+    printTiming('IO', 'Simulation::writeOutput', db, indent+1, global_tot = tot)
+    printTiming('Stats', 'SimulationIoControl::writeStats', db, indent+2, global_tot = tot)
+    printTiming('updateHeavyAscii', 'SimulationIoTools::updateHeavyAscii', db, indent+2, global_tot = tot)
+    printTiming('Ascii', 'SimulationIoControl::writeAscii', db, indent+2, global_tot = tot)
+    printTiming('Hdf5', 'SimulationIoControl::writeHdf5', db, indent+2, global_tot = tot)
+    printTiming('Diagnostics', 'Pseudospectral::Coordinator::writeDiagnostics', db, indent+2, global_tot = tot)
 
     # Cleanup
     indent = 0
