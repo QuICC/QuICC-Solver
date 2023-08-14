@@ -5,68 +5,11 @@
 
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_PROJECTOR_DIVR1CYLLAPLH_ZERO_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_PROJECTOR_DIVR1CYLLAPLH_ZERO_HPP
-
-// Debug includes
-//
-
-// Configuration includes
-//
-
-// System includes
-//
-
 // External includes
 //
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Poly/Worland/Projector/IWorlandProjector.hpp"
-
-namespace QuICC {
-
-namespace Transform {
-
-namespace Poly {
-
-namespace Worland {
-
-namespace Projector {
-
-   /**
-    * @brief Implementation of the Worland based 1/R cylindrical horizontal laplacian projector but 0 mode is zeroed
-    */
-   class DivR1CylLaplh_Zero: public IWorlandProjector
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         DivR1CylLaplh_Zero();
-
-         /**
-          * @brief Destructor
-          */
-         virtual ~DivR1CylLaplh_Zero();
-
-      protected:
-
-      private:
-         /**
-          * @brief Make operator
-          */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const;
-
-         /**
-          * @brief Apply ith operator
-          */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
-   };
-
-}
-}
-}
-}
-}
+#include "QuICC/Transform/Poly/Worland/Projector/Base/DivR1CylLaplh_Zero.hpp"
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_PROJECTOR_DIVR1CYLLAPLH_ZERO_HPP

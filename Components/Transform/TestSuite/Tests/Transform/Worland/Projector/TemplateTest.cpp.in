@@ -19,7 +19,7 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::Worland;
 
-TEST_CASE( "@Algorithm@::Error for @Operator@ projector", "[@Algorithm@::@Operator@:@type@]" ){
+TEST_CASE( "@Algorithm@::Error for @Operator@@Template@ projector", "[@CatchTestName@]" ){
 
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -36,7 +36,8 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ projector", "[@Algorithm@::@Operat
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::@Algorithm@::Worland::Projector::@Operator@ Projector;
+   using namespace ::QuICC::Transform::@Algorithm@::Worland;
+   typedef Projector::@Operator@@Template@ Projector;
    typedef typename currentts::Tester<Projector> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);

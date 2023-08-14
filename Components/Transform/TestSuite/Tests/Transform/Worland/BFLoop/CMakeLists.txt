@@ -7,7 +7,7 @@ include(SetUlp)
 include(ConfigureTests)
 
 set(_tests
-  Poly::P:bfloop
+  Poly::P:<base_t>:bfloop
   )
 quicc_set_ulp(_ulp
   ULP 160 220 16000 88 130 560 1963 5211 19780
@@ -16,7 +16,7 @@ quicc_set_ulp(_ulp
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     IDS 0 1 2 3 204 205 206 207 208
     ULPS ${_ulp}
   )

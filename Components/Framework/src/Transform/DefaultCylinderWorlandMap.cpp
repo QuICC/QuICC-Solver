@@ -53,25 +53,28 @@ namespace Transform {
 
    void DefaultCylinderWorlandMap::operator()(MapType& m) const
    {
-      // Reserve storage for the projectors
-      this->addOperator<Poly::Worland::Projector::P>(m, Backward::P::id());
-      this->addOperator<Poly::Worland::Projector::DivR1_Zero>(m, Backward::Overr1Pm::id());
-      this->addOperator<Poly::Worland::Projector::D1>(m, Backward::D1::id());
-      this->addOperator<Poly::Worland::Projector::D1_P>(m, Backward::D1ZP::id());
-      this->addOperator<Poly::Worland::Projector::DivR1D1R1>(m, Backward::Overr1D1R1::id());
-      this->addOperator<Poly::Worland::Projector::CylLaplh>(m, Backward::Laplh::id());
-      this->addOperator<Poly::Worland::Projector::CylLaplh_DivR1D1R1>(m, Backward::LaplhZOverr1D1R1::id());
-      this->addOperator<Poly::Worland::Projector::DivR1CylLaplh_Zero>(m, Backward::Overr1LaplhPm::id());
-      this->addOperator<Poly::Worland::Projector::D1CylLaplh>(m, Backward::D1Laplh::id());
-      this->addOperator<Poly::Worland::Projector::D1CylLaplh_D1DivR1D1R1>(m, Backward::D1LaplhZD1Overr1D1R1::id());
+      using namespace Poly::Worland;
+      using backend_t = base_t;
 
-      // Reserve storage for the weighted projectors 
-      this->addOperator<Poly::Worland::Integrator::P>(m, Forward::P::id());
-      this->addOperator<Poly::Worland::Integrator::I4DivR1_Zero>(m, Forward::I4Overr1Pm::id());
-      this->addOperator<Poly::Worland::Integrator::I4DivR1D1R1_I2>(m, Forward::I4Overr1D1R1ZI2::id());
-      this->addOperator<Poly::Worland::Integrator::I6DivR1_Zero>(m, Forward::I6Overr1Pm::id());
-      this->addOperator<Poly::Worland::Integrator::I6DivR1D1R1_I4>(m, Forward::I6Overr1D1R1ZI4::id());
-      this->addOperator<Poly::Worland::Integrator::I6CylLaplh_I4D1R1>(m, Forward::I6LaplhZI4D1R1::id());
+      // Reserve storage for the projectors
+      this->addOperator<Projector::P<backend_t>>(m, Backward::P::id());
+      this->addOperator<Projector::DivR1_Zero<backend_t>>(m, Backward::Overr1Pm::id());
+      this->addOperator<Projector::D1<backend_t>>(m, Backward::D1::id());
+      this->addOperator<Projector::D1_P<backend_t>>(m, Backward::D1ZP::id());
+      this->addOperator<Projector::DivR1D1R1<backend_t>>(m, Backward::Overr1D1R1::id());
+      this->addOperator<Projector::CylLaplh<backend_t>>(m, Backward::Laplh::id());
+      this->addOperator<Projector::CylLaplh_DivR1D1R1<backend_t>>(m, Backward::LaplhZOverr1D1R1::id());
+      this->addOperator<Projector::DivR1CylLaplh_Zero<backend_t>>(m, Backward::Overr1LaplhPm::id());
+      this->addOperator<Projector::D1CylLaplh<backend_t>>(m, Backward::D1Laplh::id());
+      this->addOperator<Projector::D1CylLaplh_D1DivR1D1R1<backend_t>>(m, Backward::D1LaplhZD1Overr1D1R1::id());
+
+      // Reserve storage for the weighted projectors
+      this->addOperator<Integrator::P<backend_t>>(m, Forward::P::id());
+      this->addOperator<Integrator::I4DivR1_Zero<backend_t>>(m, Forward::I4Overr1Pm::id());
+      this->addOperator<Integrator::I4DivR1D1R1_I2<backend_t>>(m, Forward::I4Overr1D1R1ZI2::id());
+      this->addOperator<Integrator::I6DivR1_Zero<backend_t>>(m, Forward::I6Overr1Pm::id());
+      this->addOperator<Integrator::I6DivR1D1R1_I4<backend_t>>(m, Forward::I6Overr1D1R1ZI4::id());
+      this->addOperator<Integrator::I6CylLaplh_I4D1R1<backend_t>>(m, Forward::I6LaplhZI4D1R1::id());
    }
 
 }
