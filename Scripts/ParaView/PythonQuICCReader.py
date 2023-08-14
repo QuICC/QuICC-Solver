@@ -1,3 +1,12 @@
+# This reader is used to read the HDF5 output of the QuICC simulation code
+#
+# https://www.pasc-ch.org/projects/2021-2024/aqua-d/
+#
+# initial version provided by Philippe Marty (ETH-Zurich) to run serially
+# This version was extended by Jean M. Favre, CSCS, to run in parallel
+# Tested with ParaView v5.11
+# Thu  6 Jul 10:42:48 CEST 2023
+
 # This is the module to import. It provides VTKPythonAlgorithmBase, the base class
 # for all python-based vtkAlgorithm subclasses in VTK and decorators used to
 # 'register' the algorithm with ParaView along with information about UI.
@@ -114,6 +123,12 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         else:
             assert(len(timesteps) > 0)
             return timesteps[0]
+            
+    def _get_update_extent(self, outInfo):
+        executive = self.GetExecutive()
+        if outInfo.Has(executive.UPDATE_EXTENT()):
+            exts = outInfo.Get(executive.UPDATE_EXTENT())
+            return exts
 
     def _get_scalar_fields(self):
         """Get names of scalar fields"""
@@ -162,14 +177,17 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
 
         raise RuntimeError('Adding cells to mesh is not implemented')
 
-    def _add_scalar_pointdata(self, mesh, raw_data):
+    def _add_scalar_pointdata(self, mesh, raw_data, exts):
         """Add scalar field point data to VTK grid"""
 
         for grp,s in self._get_scalar_fields():
             if self._arrayselection.ArrayIsEnabled(s):
-                mesh.GetPointData().AddArray(dsa.numpyTovtkDataArray(raw_data[grp][s][()].ravel(), s))
+                mesh.GetPointData().AddArray(dsa.numpyTovtkDataArray(raw_data[grp][s][()]
+                                             # this is the partitioned subset selection for parallel reading
+                                             [exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]+1].ravel(),
+                                             s))
 
-    def _add_vector_pointdata(self, mesh, raw_data, mgrid):
+    def _add_vector_pointdata(self, mesh, raw_data, mgrid, exts):
         """Add vector field (X,Y,Z) point data to VTK mesh"""
 
         for v in self._get_vector_fields():
@@ -177,17 +195,20 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
                 tmp = np.zeros((mgrid[0].size, 3))
                 comps = list()
                 for i,c in enumerate(self._components):
-                    comps.append(raw_data[v][f'{v}_{c}'][()])
+                    comps.append(raw_data[v][f'{v}_{c}'][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]+1])
                 for i,c in enumerate(list(['z','x','y'])):
                     tmp[:,i] = self._vcomp[c](comps, mgrid).ravel()
                 mesh.GetPointData().AddArray(dsa.numpyTovtkDataArray(tmp, v))
 
-    def _add_vcomponent_pointdata(self, mesh, raw_data):
+    def _add_vcomponent_pointdata(self, mesh, raw_data, exts):
         """Add vector field components from data geometry point data to VTK grid"""
 
         for grp,v in self._get_vector_components():
             if self._arrayselection.ArrayIsEnabled(v):
-                mesh.GetPointData().AddArray(dsa.numpyTovtkDataArray(raw_data[grp][v][()].ravel(), v))
+                mesh.GetPointData().AddArray(dsa.numpyTovtkDataArray(raw_data[grp][v][()]
+                                             # this is the partitioned subset selection for parallel reading
+                                             [exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]+1].ravel(),
+                                             v))
 
     def _get_array_selection(self):
         return self._arrayselection
@@ -239,9 +260,11 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
 
     def RequestData(self, request, inInfoVec, outInfoVec):
         data_time = self._get_update_time(outInfoVec.GetInformationObject(0))
+        exts = self._get_update_extent(outInfoVec.GetInformationObject(0))
         raw_data = self._get_raw_data(data_time)
-        grid = [raw_data['mesh'][f'grid_{c}'][()] for c in self._components]
-
+        grid = [raw_data['mesh'][f'grid_r'][()][exts[4]:exts[5]+1],
+                raw_data['mesh'][f'grid_theta'][()][exts[2]:exts[3]+1],
+                raw_data['mesh'][f'grid_phi'][()][exts[0]:exts[1]+1]]
         mgrid = np.meshgrid(*grid, indexing="ij")
         X, Y, Z = self._make_mesh_coordinates(*mgrid)
 
@@ -255,13 +278,13 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         self._add_mesh_cells(grid, output)
 
         # Scalar data
-        self._add_scalar_pointdata(output, raw_data)
+        self._add_scalar_pointdata(output, raw_data, exts)
 
         # Vector field data
-        self._add_vector_pointdata(output, raw_data, mgrid)
+        self._add_vector_pointdata(output, raw_data, mgrid, exts)
 
         # Vector field components data
-        self._add_vcomponent_pointdata(output, raw_data)
+        self._add_vcomponent_pointdata(output, raw_data, exts)
 
         if data_time is not None:
             output.GetInformation().Set(output.DATA_TIME_STEP(), data_time)
@@ -364,7 +387,6 @@ class PythonQuICCStructuredReader(PythonQuICCReaderBase):
         executive = self.GetExecutive()
         outInfo = executive.GetOutputInformation(0)
         exts = [executive.UPDATE_EXTENT().Get(outInfo, i) for i in range(6)]
-
         mesh = vtk.vtkStructuredGrid.GetData(outInfoVec,0)
         mesh.SetExtent(exts)
 

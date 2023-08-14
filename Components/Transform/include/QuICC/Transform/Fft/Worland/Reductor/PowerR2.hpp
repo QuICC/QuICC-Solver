@@ -1,4 +1,4 @@
-/** 
+/**
  * @file PowerR2.hpp
  * @brief Implementation of the Worland based energy operator
  */
@@ -36,8 +36,8 @@ namespace Reductor {
 
    /**
     * @brief Implementation of the Worland based R^2 energy operator
-    */ 
-   class PowerR2: public IEnergyWrapper<Poly::Worland::Reductor::PowerR2>
+    */
+   class PowerR2: public IEnergyWrapper<Poly::Worland::Reductor::PowerR2<Poly::Worland::base_t>>
    {
       public:
          /**
@@ -49,7 +49,7 @@ namespace Reductor {
           * @brief Destructor
           */
          virtual ~PowerR2() = default;
-         
+
       protected:
 
       private:

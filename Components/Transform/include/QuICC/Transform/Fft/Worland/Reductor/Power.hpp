@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Power.hpp
  * @brief Implementation of the Worland based energy operator
  */
@@ -22,7 +22,7 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Worland/Reductor/IEnergyWrapper.hpp"
-#include "QuICC/Transform/Poly/Worland/Reductor/Power.hpp"
+#include "QuICC/Transform/Poly/Worland/Reductor/Base/Power.hpp"
 
 namespace QuICC {
 
@@ -36,8 +36,8 @@ namespace Reductor {
 
    /**
     * @brief Implementation of the Worland based R^2 energy operator
-    */ 
-   class Power: public IEnergyWrapper<Poly::Worland::Reductor::Power>
+    */
+   class Power: public IEnergyWrapper<Poly::Worland::Reductor::Power<Poly::Worland::base_t>>
    {
       public:
          /**
@@ -49,7 +49,7 @@ namespace Reductor {
           * @brief Destructor
           */
          virtual ~Power() = default;
-         
+
       protected:
 
       private:
