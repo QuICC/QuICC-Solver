@@ -1,10 +1,10 @@
 include(BundleCatch2)
 
 
-add_executable(ViewTest 
+add_executable(ViewTest
     ViewTests.cpp
-    ViewDenseTests.cpp 
-    ViewSparseTests.cpp 
+    ViewDenseTests.cpp
+    ViewSparseTests.cpp
     ViewTests.cu
 )
 target_link_libraries(ViewTest
