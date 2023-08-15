@@ -3,25 +3,17 @@
  * @brief Source of the CFL constraint wrapper in a spherical geometry
  */
 
-// Debug includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Diagnostics/ISphericalCflWrapper.hpp"
-
 // Project includes
 //
+#include "QuICC/Diagnostics/ISphericalCflWrapper.hpp"
 #include "QuICC/NonDimensional/CflTorsional.hpp"
 #include "QuICC/NonDimensional/CflInertial.hpp"
 #include "QuICC/NonDimensional/CflAlfvenDamping.hpp"
 #include "QuICC/NonDimensional/CflAlfvenScale.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
 
 namespace QuICC {
 
@@ -77,10 +69,6 @@ namespace Diagnostics {
       }
    }
 
-   ISphericalCflWrapper::~ISphericalCflWrapper()
-   {
-   }
-
    void ISphericalCflWrapper::init(const std::vector<Array>& mesh)
    {
       // Initialize the mesh
@@ -105,23 +93,58 @@ namespace Diagnostics {
       Array& dr = this->mMeshSpacings.at(1);
       Array& r_ll1 = this->mMeshSpacings.at(2);
 
-      // Compute grid spacings
-      for(int j = 0; j < r.size(); ++j)
+      // Compute magnetic grid
+      int nB = 3*this->mspVelocity->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)/4 + 1;
+      internal::Array igrid, iweights;
+      Polynomial::Quadrature::WorlandChebyshevRule wquad;
+      wquad.computeQuadrature(igrid, iweights, nB);
+      Array rB = igrid.cast<MHDFloat>();
+      Array drB = Array(rB.size());
+
+      // Compute B grid spacings
+      for(int j = 0; j < rB.size(); ++j)
       {
          // Get internal points grid spacing
-         if(j > 0 && j < r.size() - 1)
+         if(j > 0 && j < rB.size() - 1)
          {
-            dr(j) = std::min(std::abs(r(j) - r(j-1)), std::abs(r(j) - r(j+1)));
-
+            drB(j) = std::min(std::abs(rB(j) - rB(j-1)), std::abs(rB(j) - rB(j+1)));
+         }
          // Get left endpoint grid spacing
-         } else if(j > 0)
+         else if(j > 0)
          {
-            dr(j) = std::abs(r(j) - r(j-1));
+            drB(j) = std::abs(rB(j) - rB(j-1));
 
-            // Get right endpoint grid spacing
-         } else
+         }
+         // Get right endpoint grid spacing
+         else
          {
-            dr(j) = std::abs(r(j) - r(j+1));
+            drB(j) = std::abs(rB(j) - rB(j+1));
+         }
+      }
+
+      // Compute grid spacings
+      int jB = 0;
+      for(int j = 0; j < r.size(); ++j)
+      {
+         // Grid position is smaller than B grid
+         if(r(j) <= rB(jB) || jB == rB.size()-1)
+         {
+            dr(j) = drB(jB);
+         }
+         // Move to next
+         else if(r(j) <= rB(jB+1))
+         {
+            jB++;
+            dr(j) = drB(jB);
+         }
+         // At end of B grid
+         else if(jB == rB.size()-1)
+         {
+            dr(j) = drB(jB);
+         }
+         else
+         {
+            throw std::logic_error("Mapping to radial B grid failed");
          }
 
          // Compute average horizontal grid spacing
@@ -191,10 +214,17 @@ namespace Diagnostics {
             int iR = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(i);
 
             // Radial CFL
+#if 0
             aD = std::pow(this->mcAlfvenDamping/dr(iR),2);
             p = this->mspMagnetic->one().slice(i).array().pow(2)*this->mcAlfvenScale;
             effVel = (p.array()/(p.array() + aD).array().sqrt() + this->mspVelocity->one().slice(i).array().abs()).maxCoeff();
             newCfl = dr(iR)/effVel;
+#else
+            //effVel = (this->mspMagnetic->one().slice(i).array().abs()).maxCoeff();
+            //newCfl = std::pow(dr(iR)/effVel,2);
+            effVel = (dr(iR)*this->mspMagnetic->one().slice(i).array().abs()).maxCoeff();
+            newCfl = std::pow(effVel,2);
+#endif
             if(newCfl < cfl(0,iCfl))
             {
                cfl(0,iCfl) = newCfl;
@@ -202,10 +232,17 @@ namespace Diagnostics {
             }
 
             // Horizontal CFL
+#if 0
             aD = std::pow(this->mcAlfvenDamping/r_ll1(iR),2);
             p = (this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2))*this->mcAlfvenScale;
             effVel = (p.array()/(p.array() + aD).array().sqrt() + (this->mspVelocity->two().slice(i).array().pow(2) + this->mspVelocity->three().slice(i).array().pow(2)).array().sqrt()).maxCoeff();
             newCfl = r_ll1(iR)/effVel;
+#else
+            //effVel = ((this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2)).array().sqrt()).maxCoeff();
+            //newCfl = std::pow(r_ll1(iR)/effVel,2);
+            effVel = (r_ll1(iR)/(this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2)).array().sqrt()).maxCoeff();
+            newCfl = std::pow(effVel,2);
+#endif
             if(newCfl < cfl(0,iCfl+1))
             {
                cfl(0,iCfl+1) = newCfl;

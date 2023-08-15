@@ -6,15 +6,9 @@
 #ifndef QUICC_DIAGNOSTICS_ISPHERICALCFLWRAPPER_HPP
 #define QUICC_DIAGNOSTICS_ISPHERICALCFLWRAPPER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -50,7 +44,7 @@ namespace Diagnostics {
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalCflWrapper();
+         virtual ~ISphericalCflWrapper() = default;
 
          /**
           * @brief Initialize wrapper

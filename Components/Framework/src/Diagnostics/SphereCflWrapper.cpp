@@ -3,21 +3,12 @@
  * @brief Source of the CFL constraint wrapper in a full sphere
  */
 
-// Debug includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Diagnostics/SphereCflWrapper.hpp"
-
 // Project includes
 //
+#include "QuICC/Diagnostics/SphereCflWrapper.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 
 namespace QuICC {
@@ -34,14 +25,11 @@ namespace Diagnostics {
    {
    }
 
-   SphereCflWrapper::~SphereCflWrapper()
-   {
-   }
-
    MHDFloat SphereCflWrapper::effectiveMaxL(const MHDFloat r) const
    {
       MHDFloat l = 0;
-      for(; l < static_cast<MHDFloat>(this->mspVelocity->res().sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)); l++)
+      int lB = this->mspVelocity->res().sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2+1;
+      for(; l < static_cast<MHDFloat>(lB); l++)
       {
          if(r < this->jacobiRoot(l))
          {
