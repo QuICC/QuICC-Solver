@@ -1,0 +1,215 @@
+/**
+ * @file @Op@@Tag@.cpp
+ * @brief Wrapper of the Alegender @Op@ @Kind@
+ */
+
+// System includes
+//
+
+// Project includes
+//
+#include "QuICC/Transform/Wrappers/ALegendre/@Kind@/@Op@@Tag@.hpp.inc"
+#include "QuICC/Polynomial/ALegendre/@PolyBuilder@.hpp"
+
+#include "View/ViewSparse.hpp"
+#include "Memory/Cpu/NewDelete.hpp"
+#include "ViewOps/ALegendre/Op.hpp"
+#include "ViewOps/ALegendre/Impl.hpp"
+#include "ViewOps/ALegendre/Tags.hpp"
+#include "ViewOps/ALegendre/Builder.hpp"
+#include "Profiler/Interface.hpp"
+@CppHeaders@
+
+namespace QuICC {
+namespace Transform {
+namespace Poly {
+namespace ALegendre {
+namespace @Kind@ {
+
+
+void @Op@<@Tag@>::initOperators(const OpArray& igrid, const OpArray& iweights) const
+{
+    Profiler::RegionFixture<3> fix("@Op@<@Tag@>::initOperators");
+
+    std::uint32_t M = igrid.size();
+    std::uint32_t K = static_cast<std::uint32_t>(this->mspSetup->fastSize(0) + this->mspSetup->slow(0));
+
+    std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
+
+    ///\todo this should be the full matrix size
+    std::uint32_t P = static_cast<std::uint32_t>(this->mspSetup->slow(nLayers-1)) + 1;
+
+    constexpr size_t rank = 3;
+    /// dim 0 - L  - harmonic degree
+    /// dim 1 - Nl - longitudinal points
+    /// dim 2 - M  - harmonic order
+    std::array<std::uint32_t, rank> dimensions {K, M, P};
+
+    // Make view operator
+    using namespace QuICC::Transform::ALegendre;
+    using backend_t = @BackendNamespace@::ImplOp<mods_t, phys_t, op_t,
+        QuICC::Transform::ALegendre::@Treatment@>;
+    using derived_t = Op<mods_t, phys_t, op_t, backend_t>;
+    auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
+
+    std::vector<std::uint32_t> layers(nLayers);
+    for(std::uint32_t p = 0; p < nLayers; ++p)
+    {
+        layers[p] = this->mspSetup->slow(p);
+    }
+
+    mOp = std::make_unique<derived_t>(dimensions, layers, mem);
+    derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
+    auto opView = derivedOp.getOp();
+    builder<op_t, Polynomial::ALegendre::@PolyBuilder@, OpArray::Scalar, @Diff@>(opView, igrid, iweights);
+
+    ///\todo move view setups to init
+
+    // alloc in/out dataspace
+    // indices/pointers are the same for In/Out
+    mDataPointers.resize(P+1);
+    mDataPointers[0] = 0;
+
+    std::uint32_t N = 0;
+    std::uint32_t nCols = 0;
+    std::uint32_t inFlatSize = 0;
+    std::uint32_t layerCtr = 0;
+    for (std::uint32_t i = 0; i < P; ++i)
+    {
+        std::uint32_t blockWidth = 0;
+        std::uint32_t blockSize = 0;
+        if (static_cast<std::uint32_t>(this->mspSetup->slow(layerCtr)) == i )
+        {
+
+            int m = this->mspSetup->slow(layerCtr);
+            int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(layerCtr)-1, layerCtr) - m + 1 ;
+            blockWidth = static_cast<std::uint32_t>(this->mspSetup->mult(layerCtr));
+            blockSize = blockWidth*nPoly;
+            ++layerCtr;
+        }
+
+        nCols += blockWidth;
+        mDataPointers[i+1] = nCols;
+        inFlatSize += blockSize;
+
+        /// make up indices, we don't know them and
+        /// the exact value is needed only for the comm stage
+        for (std::uint32_t idx = 0; idx < blockWidth; idx++)
+        {
+            mDataIndices.push_back(idx);
+        }
+
+        N = std::max(N, blockWidth);
+    }
+
+    /// dim 0 - L  - harmonic degree
+    /// dim 1 - Nr - radial points
+    /// dim 2 - M  - harmonic order
+    std::array<std::uint32_t, rank> modsDims = {K, N, P};
+    mModsFlat.resize(inFlatSize);
+
+    /// dim 0 - Nl - longitudinal points
+    /// dim 1 - Nr - radial points
+    /// dim 2 - M  - harmonic order
+    std::array<std::uint32_t, rank> physDims = {M, N, P};
+    mPhysFlat.resize(M * nCols);
+
+    @SetDataViews@
+}
+
+void @Op@<@Tag@>::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
+{
+    Profiler::RegionFixture<2> fix("@Op@<@Tag@>::applyOperators");
+
+    assert(static_cast<std::size_t>(in.rows()) == mPhysView.dims()[0]);
+    assert(static_cast<std::size_t>(in.cols()) == mPhysView.indices()[1].size());
+    assert(static_cast<std::size_t>(rOut.rows()) <= mModsView.dims()[0]); // full size might be bigger
+    assert(static_cast<std::size_t>(rOut.cols()) == mModsView.indices()[1].size());
+
+    std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
+
+    /// copy data to view
+    int start = 0;
+    std::int64_t offSet = 0;
+    int inRows = this->mspSetup->fwdSize();
+    for(std::uint32_t p = 0; p < nLayers; ++p)
+    {
+        int cols = this->mspSetup->mult(p);
+        const OpMatrixCR inB = in.block(0, start, inRows, cols);
+
+        for (std::int64_t j = 0; j < inB.cols(); ++j)
+        {
+            for (std::int64_t i = 0; i < inB.rows(); ++i)
+            {
+                #ifdef QUICC_AL_ROW_MAJOR
+                // copy from padded to flattened and transpose
+                mPhysFlat[offSet + i*inB.cols()+j] = inB.data()[i+j*in.rows()];
+                #else
+                // copy from padded to flattened column
+                mPhysFlat[offSet + i+j*inB.rows()] = inB.data()[i+j*in.rows()];
+                #endif
+            }
+        }
+        offSet += inB.size();
+        start += cols;
+    }
+
+    @HostToDevice@
+
+    /// apply
+    mOp->apply(mModsView, mPhysView);
+
+    /// copy back
+
+    @DeviceToHost@
+
+    start = 0;
+    offSet = 0;
+    for(std::uint32_t p = 0; p < nLayers; p++)
+    {
+        int cols = this->mspSetup->mult(p);
+        int m = this->mspSetup->slow(p);
+        int outRows = this->mspSetup->fast(this->mspSetup->fastSize(p)-1,p) - m + 1;
+
+        OpMatrixR outB = rOut.block(0, start, outRows, cols);
+
+        #ifdef QUICC_AL_ROW_MAJOR
+        for (std::int64_t j = 0; j < outB.cols(); ++j)
+        {
+            for (std::int64_t i = 0; i < outB.rows(); ++i)
+            {
+                // copy to padded from flattened column and transpose
+                outB.data()[i+j*rOut.rows()]= mModsFlat[offSet + i*outB.cols()+j];
+            }
+        }
+        #else
+        for (std::int64_t j = 0; j < outB.cols(); ++j)
+        {
+            for (std::int64_t i = 0; i < outB.rows(); ++i)
+            {
+                // copy to padded from flattened column
+                outB.data()[i+j*rOut.rows()]= mModsFlat[offSet + i+j*outB.rows()];
+            }
+        }
+        #endif
+
+        offSet += outB.size();
+        start += cols;
+    }
+}
+
+void @Op@<@Tag@>::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
+{
+    throw std::logic_error("view AL operator should never call this");
+}
+
+void @Op@<@Tag@>::applyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const
+{
+    throw std::logic_error("view AL operator should never call this");
+}
+
+} // namespace @Kind@
+} // namespace ALegendre
+} // namespace Poly
+} // namespace Transform
+} // namespace QuICC

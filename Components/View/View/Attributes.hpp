@@ -26,15 +26,9 @@ namespace Memory {
    /// @brief tag type for compressed level
    struct compressed_t {};
 
-   /// @brief tag type for dense columns with implicit start from zero
-   /// and the column length is implicity defined by the next logical index
-   /// marked as triangular
-   struct triDense_t {};
-
-   ///  @brief tag type for sparse columns with implicit start from zero
-   /// and the column length is implicity defined by the next logical index marked
-   /// as triangular
-   struct triCompressed_t {};
+   /// @brief tag type for dense direction with implicit start from zero
+   /// and the length is implicity equal to K (3rd) index
+   struct triK_t {};
 
    /// @brief tag type block structured compression akin a 2D sparse matrix which elements
    /// are dense 1D array
@@ -53,13 +47,9 @@ namespace Memory {
    template <>
    struct isLevelType<compressed_t> : std::true_type{};
 
-   /// @brief enable triDense_t tag
+   /// @brief enable triK_t tag
    template <>
-   struct isLevelType<triDense_t> : std::true_type{};
-
-   /// @brief enable triCompressed_t tag
-   template <>
-   struct isLevelType<triCompressed_t> : std::true_type{};
+   struct isLevelType<triK_t> : std::true_type{};
 
    /// @brief enable CSC_t tag
    template <>
@@ -407,10 +397,58 @@ namespace Memory {
    using dense2D = Attributes<DimLevelType<dense_t, dense_t>>;
 
    /**
+    * @brief 2D dense tensor with row major memory layout
+    */
+   using dense2DRM = Attributes<DimLevelType<dense_t, dense_t>, LoopOrderType<j_t, i_t>>;
+
+   /**
     * @brief 2D CSC column major matrix (N,K) which elements are 1D dense vectors,
     * i.e a 3D tensor (M,N,K) with fully populated columns
+    *
+    * used as
+    * AL projector output type on cpu
+    * FFT in/out types on cpu / gpu
+    *
     */
    using DCCSC3D = Attributes<DimLevelType<dense_t, CSC_t, CSC_t>>;
+
+   /**
+    * @brief 2D CSC column major matrix (N,K) which elements are 1D dense vectors,
+    * i.e a 3D tensor (M,N,K) with fully populated columns
+    *
+    * used as
+    * AL projector output type on gpu
+    *
+    */
+   using DCCSC3DJIK = Attributes<DimLevelType<dense_t, CSC_t, CSC_t>,
+      LoopOrderType<j_t, i_t, k_t>>;
+
+   /**
+    * @brief AL projector operator type on cpu
+    *  Compressed triangular row layer
+    */
+   using CTRRL3DJIK = Attributes<DimLevelType<dense_t, triK_t, compressed_t>,
+      LoopOrderType<j_t, i_t, k_t>>;
+
+   /**
+    * @brief AL projector operator type on gpu
+    *  Compressed triangular row layer
+    */
+   using CTRRL3D = Attributes<DimLevelType<dense_t, triK_t, compressed_t>>;
+
+   /**
+    * @brief AL projector input type on cpu
+    * Triangular column layer, with (N,K) plane a 2D CSC column major matrix
+    */
+   using TRCLCSC3D = Attributes<DimLevelType<triK_t, CSC_t, CSC_t>>;
+
+   /**
+    * @brief AL projector input type on gpu
+    * Triangular column layer, with (N,K) plane a 2D CSC column major matrix
+    */
+   using TRCLCSC3DJIK = Attributes<DimLevelType<triK_t, CSC_t, CSC_t>,
+      LoopOrderType<j_t, i_t, k_t>>;
+
 
 } // namespace Memory
 } // namespave QuICC

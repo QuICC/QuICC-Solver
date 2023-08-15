@@ -53,7 +53,7 @@ public:
     {
         _release();
     }
-    
+
     /// @brief delete copy assignment
     MemBlock& operator=(const MemBlock&) = delete;
     /// @brief move assignement

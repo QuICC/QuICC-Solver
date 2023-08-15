@@ -8,13 +8,11 @@
 
 // System includes
 //
-// #include <span>
 #include <limits>
-#include <boost/core/span.hpp>
-
 
 // Project includes
 //
+#include "Cpp/Span.hpp"
 
 #ifdef __CUDACC__
 #define QUICC_CUDA_HOSTDEV __host__ __device__
@@ -23,6 +21,8 @@
 #define QUICC_CUDA_HOSTDEV
 #define QUICC_CUDA_HOST
 #endif
+
+using QuICC::Patch::std::span;
 
 namespace QuICC {
 /// @brief This namespace provides all the View related code
@@ -33,10 +33,6 @@ namespace Memory {
    /// @tparam ...Args
    template <class Scalar, class... Args>
    class View;
-
-   /// Typedef for boost implementation of span (until c++20)
-   template <class T, std::size_t E = boost::dynamic_extent>
-      using span = boost::span<T, E>;
 
    /** @brief Base class for a view data structure. Represent simply a memory block (pointer and size).
     * Similar to a std::span, it is not the owner of the memory.
@@ -52,6 +48,8 @@ namespace Memory {
       /// @brief _size number of data elements in the memory block
       std::size_t _size{0};
    public:
+      /// @brief typedef for pointed data type
+      using ScalarType = Scalar;
       /// @brief ctor, empty ViewBase
       ViewBase() = default;
       /// @brief dtor
@@ -77,6 +75,7 @@ namespace Memory {
       QUICC_CUDA_HOSTDEV  Scalar& operator[](std::size_t i) const
       {
          assert(_data != nullptr);
+         assert(i < _size);
          return _data[i];
       }
 

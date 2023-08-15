@@ -305,9 +305,16 @@ namespace Transform {
             break;
       }
 
+      std::string filename = pre + this->mBasename;
+
       switch(ctype)
       {
          case ContentType::META:
+            if (type == TestType::PROJECTOR)
+            {
+               // use P meta data for all ops
+               filename = pre + "P.dat";
+            }
             post = "_meta";
             break;
          case ContentType::INPUT:
@@ -319,7 +326,6 @@ namespace Transform {
       }
 
       std::string ext = resname(param);
-      std::string filename = pre + this->mBasename;
       std::string fullname = root + sub + filename.insert(filename.length()-4, ext+post);
 
       return fullname;

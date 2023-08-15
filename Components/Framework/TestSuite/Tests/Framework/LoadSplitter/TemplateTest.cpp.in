@@ -122,7 +122,7 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
       auto best = splitter.bestSplitting(false);
       auto spRes = best.first;
 
-      std::cerr << "Selectd factors: " << best.second.factors.transpose() << std::endl; 
+      std::cerr << "Selectd factors: " << best.second.factors.transpose() << std::endl;
 
       auto& tRes = *spRes->cpu()->dim(stageId);
       currentts::SimRes sRes;

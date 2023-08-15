@@ -3,12 +3,15 @@
 
 #include "Memory/Memory.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
+#include "Memory/Pensieve.hpp"
+
+using namespace QuICC::Memory;
 
 TEST_CASE("MemoryBlock", "[MemoryBlock]")
 {
     constexpr std::size_t S = 10;
-    QuICC::Memory::Cpu::NewDelete mem_res;
-    QuICC::Memory::MemBlock<double> block_h(S, &mem_res);
+    Cpu::NewDelete mem_res;
+    MemBlock<double> block_h(S, &mem_res);
 
     // set to ones
     for (std::size_t i = 0; i < S; ++i)
@@ -26,8 +29,8 @@ TEST_CASE("MemoryBlock", "[MemoryBlock]")
 TEST_CASE("MemoryBlockByte", "[MemoryBlockByte]")
 {
     constexpr std::size_t S = 10;
-    QuICC::Memory::Cpu::NewDelete mem_res;
-    QuICC::Memory::MemBlock<std::byte> block_h(S*sizeof(double), &mem_res);
+    Cpu::NewDelete mem_res;
+    MemBlock<std::byte> block_h(S*sizeof(double), &mem_res);
 
     // set to ones
     for (std::size_t i = 0; i < S; ++i)
@@ -45,10 +48,10 @@ TEST_CASE("MemoryBlockByte", "[MemoryBlockByte]")
 TEST_CASE("MemoryBlockMove", "[MemoryBlockMove]")
 {
     constexpr std::size_t S = 10;
-    QuICC::Memory::Cpu::NewDelete mem_res;
-    QuICC::Memory::MemBlock<double> block_h(S, &mem_res);
+    Cpu::NewDelete mem_res;
+    MemBlock<double> block_h(S, &mem_res);
 
-    QuICC::Memory::MemBlock<double> block_h2;
+    MemBlock<double> block_h2;
 
     CHECK(block_h2.data() == nullptr);
     CHECK(block_h2.size() == 0);
@@ -60,4 +63,11 @@ TEST_CASE("MemoryBlockMove", "[MemoryBlockMove]")
 
     CHECK(block_h2.data() != nullptr);
     CHECK(block_h2.size() == S);
+}
+
+TEST_CASE("Pensieve", "[Pensieve]")
+{
+    [[maybe_unused]] auto& mem = Pensieve<Cpu::NewDelete>::getInstance().getMem();
+    // this should trigger a static assert
+    // [[maybe_unused]] auto& mem2 = Pensieve<double>::getInstance().getMem();
 }

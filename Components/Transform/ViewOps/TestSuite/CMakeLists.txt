@@ -95,3 +95,24 @@ add_test(
     WORKING_DIRECTORY
     "${QUICC_WORK_DIR}"
 )
+
+#
+# View Memory Utils Tests
+#
+
+add_executable(ViewMemoryUtilsTest
+    ViewMemoryUtilsTests.cpp
+)
+
+target_link_libraries(ViewMemoryUtilsTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewMemoryUtilsTest
+    COMMAND ViewMemoryUtilsTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)

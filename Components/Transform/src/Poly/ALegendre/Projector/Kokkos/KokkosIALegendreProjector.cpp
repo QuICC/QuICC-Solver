@@ -103,7 +103,7 @@ namespace Projector {
       auto total = hostScan(slowSize);
       auto col_size = this->mspSetup->mult(0);
 
-      // TODO: This needs to be done once in the beggining not need to be done
+      // TODO: This needs to be done once in the beginning not need to be done
       // multiple times here.
       OpMatrixLZ inView("inView", total, col_size);
       DeepCopyEigen(inView, in, hostScan, col_size);

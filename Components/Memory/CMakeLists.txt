@@ -4,9 +4,9 @@ set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")
 message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}" )
 
 
-add_library(${QUICC_CURRENT_COMPONENT_LIB} STATIC 
+add_library(${QUICC_CURRENT_COMPONENT_LIB} STATIC
   Memory/Cpu/NewDelete.cpp
-  Memory/Cuda/Malloc.cu  
+  Memory/Cuda/Malloc.cu
 )
 
 target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
@@ -19,6 +19,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 set(PHS
   Memory/Memory.hpp
   Memory/MemoryResource.hpp
+  Memory/Pensieve.hpp
   Memory/Cpu/NewDelete.hpp
   Memory/Cuda/Malloc.hpp
 )

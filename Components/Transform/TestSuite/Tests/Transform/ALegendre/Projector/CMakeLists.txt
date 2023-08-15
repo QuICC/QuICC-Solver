@@ -10,10 +10,29 @@ set(_tests_templated
     Poly::LlD1:<base_t>:projector
     Poly::LlDivS1:<base_t>:projector
     Poly::LlDivS1Dp:<base_t>:projector
+    Poly::P:<viewCpu_t>:projector
+    Poly::D1:<viewCpu_t>:projector
+    Poly::Ll:<viewCpu_t>:projector
+    Poly::LlD1:<viewCpu_t>:projector
+    Poly::LlDivS1:<viewCpu_t>:projector
+    Poly::LlDivS1Dp:<viewCpu_t>:projector
 )
+
+# \todo add separate switch
+if(TARGET QuICC::Fft::CuFft)
+    list(APPEND _tests_templated
+        Poly::P:<viewGpu_t>:projector
+        Poly::D1:<viewGpu_t>:projector
+        Poly::Ll:<viewGpu_t>:projector
+        Poly::LlD1:<viewGpu_t>:projector
+        Poly::LlDivS1:<viewGpu_t>:projector
+        Poly::LlDivS1Dp:<viewGpu_t>:projector
+    )
+endif()
 
 if(QUICC_USE_KOKKOS_CUDA)
     list(APPEND _tests_templated
+        Poly::P:<kokkos_t>:projector
         Poly::D1:<kokkos_t>:projector
         Poly::Ll:<kokkos_t>:projector
         Poly::LlD1:<kokkos_t>:projector
@@ -34,7 +53,17 @@ endforeach()
 set(_tests_templated
     Poly::DivS1:<base_t>:projector
     Poly::DivS1Dp:<base_t>:projector
+    Poly::DivS1:<viewCpu_t>:projector
+    Poly::DivS1Dp:<viewCpu_t>:projector
 )
+
+# \todo add separate switch
+if(TARGET QuICC::Fft::CuFft)
+    list(APPEND _tests_templated
+        Poly::DivS1:<viewGpu_t>:projector
+        Poly::DivS1Dp:<viewGpu_t>:projector
+    )
+endif()
 
 if(QUICC_USE_KOKKOS_CUDA)
     list(APPEND _tests_templated
@@ -54,7 +83,15 @@ endforeach()
 # Special projector tests
 set(_tests_templated
     Poly::P:<base_t>:projector
+    Poly::P:<viewCpu_t>:projector
 )
+
+# \todo add separate switch
+if(TARGET QuICC::Fft::CuFft)
+    list(APPEND _tests_templated
+        Poly::P:<viewGpu_t>:projector
+    )
+endif()
 
 if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
     list(APPEND _tests_templated
@@ -80,7 +117,16 @@ endforeach()
 
 set(_split_tests_templated
     Poly::P:<base_t>:projector
+    Poly::P:<viewCpu_t>:projector
 )
+
+# \todo add separate switch
+if(TARGET QuICC::Fft::CuFft)
+    list(APPEND _split_tests_templated
+        Poly::P:<viewGpu_t>:projector
+    )
+endif()
+
 if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
     list(APPEND _split_tests_templated
         Poly::P:<kokkos_t>:projector
@@ -92,6 +138,7 @@ if(QUICC_USE_KOKKOS_CUDA)
         Poly::P:<kokkos_t>:projector
     )
 endif()
+
 foreach(_test ${_split_tests_templated})
     quicc_add_test(${_test}
         COMMAND ${TestExe}
@@ -103,6 +150,28 @@ foreach(_test ${_split_tests_templated})
 endforeach()
 
 # Perf test
+list(APPEND _tests_templated
+    Poly::Ll:<base_t>:projector
+    Poly::LlDivS1Dp:<base_t>:projector
+    Poly::Ll:<viewCpu_t>:projector
+    Poly::LlDivS1Dp:<viewCpu_t>:projector
+)
+
+# \todo add separate switch
+if(TARGET QuICC::Fft::CuFft)
+    list(APPEND _tests_templated
+        Poly::Ll:<viewGpu_t>:projector
+        Poly::LlDivS1Dp:<viewGpu_t>:projector
+    )
+endif()
+
+if(QUICC_USE_KOKKOS_CUDA)
+    list(APPEND _tests_templated
+        Poly::Ll:<kokkos_t>:projector
+        Poly::LlDivS1Dp:<kokkos_t>:projector
+    )
+endif()
+
 foreach(_test ${_tests_templated})
     quicc_add_test(${_test}
         COMMAND ${TestExe}

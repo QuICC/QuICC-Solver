@@ -12,6 +12,7 @@ function(quicc_add_component component)
 endfunction()
 
 quicc_add_component(Git)
+quicc_add_component(Cpp)
 quicc_add_component(Cuda)
 quicc_add_component(Memory)
 quicc_add_component(View)

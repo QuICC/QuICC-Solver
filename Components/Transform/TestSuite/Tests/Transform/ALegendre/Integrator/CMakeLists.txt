@@ -16,7 +16,37 @@ set(_tests_templated
     Poly::LlD1:<base_t>:integrator
     Poly::LlDivS1:<base_t>:integrator
     Poly::LlDivS1Dp:<base_t>:integrator
+    Poly::P:<viewCpu_t>:integrator
+    Poly::D1:<viewCpu_t>:integrator
+    Poly::DivLl:<viewCpu_t>:integrator
+    Poly::DivLlD1:<viewCpu_t>:integrator
+    Poly::DivLlDivS1:<viewCpu_t>:integrator
+    Poly::DivLlDivS1Dp:<viewCpu_t>:integrator
+    Poly::DivS1:<viewCpu_t>:integrator
+    Poly::DivS1Dp:<viewCpu_t>:integrator
+    Poly::Ll:<viewCpu_t>:integrator
+    Poly::LlD1:<viewCpu_t>:integrator
+    Poly::LlDivS1:<viewCpu_t>:integrator
+    Poly::LlDivS1Dp:<viewCpu_t>:integrator
 )
+
+# \todo add separate switch
+if(TARGET QuICC::Fft::CuFft)
+    list(APPEND _tests_templated
+        Poly::P:<viewGpu_t>:integrator
+        Poly::D1:<viewGpu_t>:integrator
+        Poly::DivLl:<viewGpu_t>:integrator
+        Poly::DivLlD1:<viewGpu_t>:integrator
+        Poly::DivLlDivS1:<viewGpu_t>:integrator
+        Poly::DivLlDivS1Dp:<viewGpu_t>:integrator
+        Poly::DivS1:<viewGpu_t>:integrator
+        Poly::DivS1Dp:<viewGpu_t>:integrator
+        Poly::Ll:<viewGpu_t>:integrator
+        Poly::LlD1:<viewGpu_t>:integrator
+        Poly::LlDivS1:<viewGpu_t>:integrator
+        Poly::LlDivS1Dp:<viewGpu_t>:integrator
+    )
+endif()
 
 if(QUICC_USE_KOKKOS_CUDA)
     list(APPEND _tests_templated
@@ -64,7 +94,15 @@ endforeach()
 
 set(_tests_templated
     Poly::P:<base_t>:integrator
+    Poly::P:<viewCpu_t>:integrator
 )
+
+# \todo add separate switch
+if(TARGET QuICC::Fft::CuFft)
+    list(APPEND _tests_templated
+        Poly::P:<viewGpu_t>:integrator
+    )
+endif()
 
 if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
     list(APPEND _tests_templated
@@ -91,7 +129,15 @@ endforeach()
 
 set(_split_tests_templated
     Poly::P:<base_t>:integrator
+    Poly::P:<viewCpu_t>:integrator
 )
+
+# \todo add separate switch
+if(TARGET QuICC::Fft::CuFft)
+    list(APPEND _split_tests_templated
+        Poly::P:<viewGpu_t>:integrator
+    )
+endif()
 
 if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
     list(APPEND _split_tests_templated
@@ -112,6 +158,21 @@ foreach(_test ${_split_tests_templated})
         IDS  204 204 204 204 204 204
         ULPS 50 50 50 50 50 50
         SPLITS 4:0 4:1 4:3 8:0 8:3 8:7
+    )
+endforeach()
+
+# Split integrator performance tests
+
+foreach(_test ${_split_tests_templated})
+    quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Algorithm::Operator:Template:type
+        IDS  108 108 108 108 108 108
+        ULPS 20800 20800 20800 20800 20800 20800
+        # node:rank, node*12:rank, node*36:rank
+        SPLITS 8:0 96:0 288:0 256:0 3072:0 9216:0
+        STEPS 500 500 500 500 500 1000
+        PERFONLY
     )
 endforeach()
 

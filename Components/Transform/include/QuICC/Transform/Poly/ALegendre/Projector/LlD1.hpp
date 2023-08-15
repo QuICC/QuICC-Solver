@@ -15,5 +15,9 @@
 #ifdef QUICC_USE_KOKKOS
 #include "QuICC/Transform/Poly/ALegendre/Projector/Kokkos/LlD1.hpp"
 #endif
+#include "QuICC/Transform/Wrappers/ALegendre/Projector/LlD1viewCpu_t.hpp.inc"
+#ifdef QUICC_USE_CUFFT
+#include "QuICC/Transform/Wrappers/ALegendre/Projector/LlD1viewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_LLD1_HPP

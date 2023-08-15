@@ -5,13 +5,38 @@ add_library(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} STA
 target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
-add_subdirectory(Projector)
+target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} PRIVATE
+  Op.cpp
+)
+
+# Add public header
+set(PHS
+  Op.hpp
+  Builder.hpp
+)
+
+set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+  PROPERTIES
+    PUBLIC_HEADER "${PHS}"
+)
+
+add_subdirectory(Cpu)
+if(TARGET QuICC::Cuda)
+  add_subdirectory(Cuda)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+    PUBLIC
+      QuICC::Cuda
+  )
+endif()
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PUBLIC
+    QuICC::Cpp
     QuICC::View
     QuICC::Operator
     QuICC::Profiling
+    QuICC::Memory
+    Eigen3::Eigen
 )
 
 

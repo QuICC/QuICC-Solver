@@ -10,6 +10,7 @@ TEST_CASE("Level", "[Level]")
 {
     CHECK(isLevelType_v<dense_t> == true);
     CHECK(isLevelType_v<compressed_t> == true);
+    CHECK(isLevelType_v<triK_t> == true);
     CHECK(isLevelType_v<CSC_t> == true);
     CHECK(isLevelType_v<double> == false);
 
@@ -18,6 +19,7 @@ TEST_CASE("Level", "[Level]")
 
     CHECK(isLevelTypeDense_v<dense_t> == true);
     CHECK(isLevelTypeDense_v<compressed_t> == false);
+    CHECK(isLevelTypeDense_v<triK_t> == false);
     CHECK(isLevelTypeDense_v<CSC_t> == false);
     // this should trigger a static assert
     // CHECK(isLevelTypeDense_v<double> == false);
