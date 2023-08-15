@@ -207,24 +207,13 @@ namespace Diagnostics {
 
       if(this->mspVelocity && this->mspMagnetic)
       {
-         MHDFloat aD;
-         Matrix p;
          for(int i = 0; i < nR; ++i)
          {
             int iR = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(i);
 
             // Radial CFL
-#if 0
-            aD = std::pow(this->mcAlfvenDamping/dr(iR),2);
-            p = this->mspMagnetic->one().slice(i).array().pow(2)*this->mcAlfvenScale;
-            effVel = (p.array()/(p.array() + aD).array().sqrt() + this->mspVelocity->one().slice(i).array().abs()).maxCoeff();
-            newCfl = dr(iR)/effVel;
-#else
-            //effVel = (this->mspMagnetic->one().slice(i).array().abs()).maxCoeff();
-            //newCfl = std::pow(dr(iR)/effVel,2);
-            effVel = (dr(iR)*this->mspMagnetic->one().slice(i).array().abs()).maxCoeff();
+            effVel = (dr(iR)/this->mspMagnetic->one().slice(i).array().abs()).minCoeff();
             newCfl = std::pow(effVel,2);
-#endif
             if(newCfl < cfl(0,iCfl))
             {
                cfl(0,iCfl) = newCfl;
@@ -232,17 +221,8 @@ namespace Diagnostics {
             }
 
             // Horizontal CFL
-#if 0
-            aD = std::pow(this->mcAlfvenDamping/r_ll1(iR),2);
-            p = (this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2))*this->mcAlfvenScale;
-            effVel = (p.array()/(p.array() + aD).array().sqrt() + (this->mspVelocity->two().slice(i).array().pow(2) + this->mspVelocity->three().slice(i).array().pow(2)).array().sqrt()).maxCoeff();
-            newCfl = r_ll1(iR)/effVel;
-#else
-            //effVel = ((this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2)).array().sqrt()).maxCoeff();
-            //newCfl = std::pow(r_ll1(iR)/effVel,2);
-            effVel = (r_ll1(iR)/(this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2)).array().sqrt()).maxCoeff();
+            effVel = (r_ll1(iR)/(this->mspMagnetic->two().slice(i).array().pow(2) + this->mspMagnetic->three().slice(i).array().pow(2)).array().sqrt()).minCoeff();
             newCfl = std::pow(effVel,2);
-#endif
             if(newCfl < cfl(0,iCfl+1))
             {
                cfl(0,iCfl+1) = newCfl;
