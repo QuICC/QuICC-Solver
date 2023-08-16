@@ -7,13 +7,11 @@
 //
 #include <stdexcept>
 
-// Class include
-//
-#include "QuICC/Simulation/SimulationIoControl.hpp"
-
 // Project includes
 //
+#include "QuICC/Simulation/SimulationIoControl.hpp"
 #include "Framework/gitHash.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -227,6 +225,8 @@ namespace QuICC {
 
    void SimulationIoControl::writeAscii(const MHDFloat time, const MHDFloat timestep)
    {
+      Profiler::RegionFixture<1> fix("SimulationIoControl::writeAscii");
+
       // Iterate over all ASCII writer
       SimulationIoControl::ascii_iterator it;
       for(it = this->mAsciiWriters.begin(); it < this->mAsciiWriters.end(); it++)
@@ -238,6 +238,8 @@ namespace QuICC {
 
    void SimulationIoControl::writeHdf5(const MHDFloat time, const MHDFloat timestep)
    {
+      Profiler::RegionFixture<1> fix("SimulationIoControl::writeHdf5");
+
       // Iterate over all HDF5 writer
       SimulationIoControl::hdf5_iterator it;
       for(it = this->mHdf5Writers.begin(); it < this->mHdf5Writers.end(); it++)
@@ -259,6 +261,8 @@ namespace QuICC {
 
    void SimulationIoControl::writeStats()
    {
+      Profiler::RegionFixture<1> fix("SimulationIoControl::writeStats");
+
       if(this->mActiveStatsWrite)
       {
          // Iterate over all statistics writer

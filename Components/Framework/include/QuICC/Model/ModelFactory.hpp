@@ -6,16 +6,7 @@
 #ifndef QUICC_MODELFACTORY_HPP
 #define QUICC_MODELFACTORY_HPP
 
-// First include
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -24,6 +15,7 @@
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Simulation/Simulation.hpp"
 #include "QuICC/Model/IPhysicalModel.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -54,6 +46,8 @@ namespace QuICC {
 
    template <class TModel> SharedSimulation ModelFactory<TModel>::createSimulation()
    {
+      Profiler::RegionFixture<1> simFix("createSimulation");
+
       // Create model
       TModel model;
       model.init();

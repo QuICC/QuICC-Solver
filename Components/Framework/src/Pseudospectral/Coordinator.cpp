@@ -30,6 +30,7 @@
 #include "QuICC/PseudospectralTag/Trivial.hpp"
 #include "QuICC/PseudospectralTag/Uninitialized.hpp"
 #include "QuICC/PseudospectralTag/Wrapper.hpp"
+#include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -175,7 +176,7 @@ namespace Pseudospectral {
    void Coordinator::evolve()
    {
       DebuggerMacro_msg("Evolving equations", 1);
-      Profiler::RegionFixture fix("evolve");
+      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::evolve");
 
       bool isIntegrating = true;
       while(isIntegrating)
@@ -262,7 +263,7 @@ namespace Pseudospectral {
 
    void Coordinator::updatePhysical(const int it)
    {
-      Profiler::RegionFixture fix("updatePhysical");
+      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::updatePhysical");
 
       // Define transform trees
       this->mTransformCoordinator.defineBwdTransforms(this->mBwdTree.at(it));
@@ -273,7 +274,7 @@ namespace Pseudospectral {
 
    void Coordinator::updateSpectral(const int it)
    {
-      Profiler::RegionFixture fix("updateSpectral");
+      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::updateSpectral");
 
       // Define transform trees
       this->mTransformCoordinator.defineFwdTransforms(this->mFwdTree.at(it));
@@ -596,10 +597,14 @@ namespace Pseudospectral {
 
    void Coordinator::updateEquations(const int it, const bool isFinished) const
    {
+      const std::string profRegion = "Pseudospectral::Coordinator::updateEquations";
+      Profiler::RegionFixture<1> fix(profRegion);
+
       // Loop over all scalar equations
       assert(this->mScalarEquations.count(it) == 1);
       for(auto scalEqIt = this->mScalarEquations.at(it).begin(); scalEqIt < this->mScalarEquations.at(it).end(); ++scalEqIt)
       {
+         Profiler::RegionFixture<2> fixId(profRegion+"-"+PhysicalNames::Coordinator::tag((*scalEqIt)->name()));
          (*scalEqIt)->updateConstraintKernel(this->time(), this->timestep(), isFinished);
       }
 
@@ -607,12 +612,15 @@ namespace Pseudospectral {
       assert(this->mVectorEquations.count(it) == 1);
       for(auto vectEqIt = this->mVectorEquations.at(it).begin(); vectEqIt < this->mVectorEquations.at(it).end(); ++vectEqIt)
       {
+         Profiler::RegionFixture<2> fixId(profRegion+"-"+PhysicalNames::Coordinator::tag((*vectEqIt)->name()));
          (*vectEqIt)->updateConstraintKernel(this->time(), this->timestep(), isFinished);
       }
    }
 
    void Coordinator::writeDiagnostics(const bool isAsciiTime, const bool isHdf5Time) const
    {
+      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::writeDiagnostics");
+
       for(auto j: this->it())
       {
          // Loop over all scalar equations
@@ -633,7 +641,7 @@ namespace Pseudospectral {
 
    void Coordinator::computeNonlinear(const int it)
    {
-      Profiler::RegionFixture fix("computeNonlinear");
+      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::computeNonlinear");
 
       // Compute backward transform
       this->updatePhysical(it);
@@ -644,8 +652,6 @@ namespace Pseudospectral {
 
    void Coordinator::explicitTrivialEquations(const std::size_t opId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
    {
-      Profiler::RegionFixture<2> fix("Trivial-explicit");
-
       if(this->atLeastOne(scalarEq_range, vectorEq_range))
       {
          DebuggerMacro_msg("Explicit term for trivial equations for operator " + ModelOperator::Coordinator::tag(opId), 5);
@@ -662,8 +668,6 @@ namespace Pseudospectral {
 
    void Coordinator::explicitDiagnosticEquations(const std::size_t opId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
    {
-      Profiler::RegionFixture<2> fix("Diagnostic-explicit");
-
       if(this->atLeastOne(scalarEq_range, vectorEq_range))
       {
          DebuggerMacro_msg("Explicit term for diagnostic equations for operator " + ModelOperator::Coordinator::tag(opId), 5);
@@ -680,8 +684,6 @@ namespace Pseudospectral {
 
    void Coordinator::explicitPrognosticEquations(const std::size_t opId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
    {
-      Profiler::RegionFixture<2> fix("Prognostic-explicit");
-
       if(this->atLeastOne(scalarEq_range, vectorEq_range))
       {
          DebuggerMacro_msg("Explicit term for prognostic equations for operator " + ModelOperator::Coordinator::tag(opId), 5);
@@ -698,8 +700,6 @@ namespace Pseudospectral {
 
    void Coordinator::solveTrivialEquations(const std::size_t timeId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
    {
-      Profiler::RegionFixture<2> fix("Trivial-solve");
-
       if(this->atLeastOne(scalarEq_range, vectorEq_range))
       {
          DebuggerMacro_msg("Solve trivial equations at time " + SolveTiming::Coordinator::tag(timeId), 5);
@@ -717,8 +717,6 @@ namespace Pseudospectral {
 
    void Coordinator::solveDiagnosticEquations(const std::size_t timeId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
    {
-      Profiler::RegionFixture<2> fix("Diagnostic-solve");
-
       if(this->atLeastOne(scalarEq_range, vectorEq_range))
       {
          DebuggerMacro_msg("Solve diagnostic equations at time " + SolveTiming::Coordinator::tag(timeId), 5);
@@ -736,8 +734,6 @@ namespace Pseudospectral {
 
    void Coordinator::solvePrognosticEquations(ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
    {
-      Profiler::RegionFixture fix("Prognostic-Timestep");
-
       // Only step forward if equations are present
       if(this->atLeastOne(scalarEq_range, vectorEq_range))
       {
@@ -756,16 +752,22 @@ namespace Pseudospectral {
 
    void Coordinator::explicitEquations(const int it)
    {
-      Profiler::RegionFixture fix("explicitEquations");
+      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::explicitEquations");
 
       // Explicit trivial equations
+      Profiler::RegionStart<2> ("Pseudospectral::Coordinator::explicitEquations-trivial");
       this->explicitTrivialEquations(ModelOperator::ExplicitLinear::id(), it);
+      Profiler::RegionStop<2> ("Pseudospectral::Coordinator::explicitEquations-trivial");
 
       // Explicit diagnostic equations
+      Profiler::RegionStart<2> ("Pseudospectral::Coordinator::explicitEquations-diagnostic");
       this->explicitDiagnosticEquations(ModelOperator::ExplicitLinear::id(), it);
+      Profiler::RegionStop<2> ("Pseudospectral::Coordinator::explicitEquations-diagnostic");
 
       // Explicit prognostic equations
+      Profiler::RegionStart<2> ("Pseudospectral::Coordinator::explicitEquations-prognostic");
       this->explicitPrognosticEquations(ModelOperator::ExplicitLinear::id(), it);
+      Profiler::RegionStop<2> ("Pseudospectral::Coordinator::explicitEquations-prognostic");
    }
 
    void Coordinator::preSolveEquations()
@@ -816,33 +818,44 @@ namespace Pseudospectral {
 
    void Coordinator::solveEquations(const int it)
    {
-      Profiler::RegionFixture fix("solveEquations");
+      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::solveEquations");
 
       // Solve trivial equations
+      Profiler::RegionStart<2> ("Pseudospectral::Coordinator::solveEquations-trivialBefore");
       this->explicitTrivialEquations(ModelOperator::ExplicitNonlinear::id(), it);
       this->solveTrivialEquations(SolveTiming::Before::id(), it);
+      Profiler::RegionStop<2> ("Pseudospectral::Coordinator::solveEquations-trivialBefore");
 
       // Solve diagnostic equations
+      Profiler::RegionStart<2> ("Pseudospectral::Coordinator::solveEquations-diagnosticBefore");
       this->explicitDiagnosticEquations(ModelOperator::ExplicitNonlinear::id(), it);
       this->solveDiagnosticEquations(SolveTiming::Before::id(), it);
+      Profiler::RegionStop<2> ("Pseudospectral::Coordinator::solveEquations-diagnosticBefore");
 
       // Solve prognostic equations (timestep)
+      Profiler::RegionStart<2> ("Pseudospectral::Coordinator::solveEquations-prognostic");
       this->explicitPrognosticEquations(ModelOperator::ExplicitNonlinear::id(), it);
       this->solvePrognosticEquations(it);
+      Profiler::RegionStop<2> ("Pseudospectral::Coordinator::solveEquations-prognostic");
 
       // Solve diagnostic equations
+      Profiler::RegionStart<2> ("Pseudospectral::Coordinator::solveEquations-diagnosticAfter");
       this->explicitDiagnosticEquations(ModelOperator::ExplicitNextstep::id(), it);
       this->solveDiagnosticEquations(SolveTiming::After::id(), it);
+      Profiler::RegionStop<2> ("Pseudospectral::Coordinator::solveEquations-diagnosticAfter");
 
       // Solve trivial equations
+      Profiler::RegionStart<2> ("Pseudospectral::Coordinator::solveEquations-trivialAfter");
       this->explicitTrivialEquations(ModelOperator::ExplicitNextstep::id(), it);
       this->solveTrivialEquations(SolveTiming::After::id(), it);
+      Profiler::RegionStop<2> ("Pseudospectral::Coordinator::solveEquations-trivialAfter");
    }
 
    void Coordinator::finalizeTimestep()
    {
+      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::finalizeTimestep");
+
       // Update conditions at the end of timestep
-      Profiler::RegionStart ("Control");
       if(this->mTimestepCoordinator.finishedStep())
       {
          // Update timestepper
@@ -868,7 +881,6 @@ namespace Pseudospectral {
          auto vP = std::make_pair(vEqs.begin(), vEqs.end());
          this->mTimestepCoordinator.adaptTimestep(this->mDiagnostics.cfl(), sP, vP);
       }
-      Profiler::RegionStop ("Control");
    }
 
    void Coordinator::setupEquations()

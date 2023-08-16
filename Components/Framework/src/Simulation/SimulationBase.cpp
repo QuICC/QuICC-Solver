@@ -3,30 +3,22 @@
  * @brief Source of the high level simulation base
  */
 
-// Debug includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-
-// Configuration includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
 // System includes
 //
 #include <algorithm>
 #include <stdexcept>
 
-// Class include
-//
-#include "QuICC/Simulation/SimulationBase.hpp"
-
 // Project includes
 //
+#include "QuICC/Simulation/SimulationBase.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/QuICCTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Simulation/SimulationIoTools.hpp"
 #include "QuICC/Bc/Scheme/Galerkin.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -139,6 +131,8 @@ namespace QuICC {
 
    void SimulationBase::run()
    {
+      Profiler::RegionFixture<1> simFix("SimulationBase::run");
+
       // Final initialisation of the solvers
       this->mPseudospectral.initSolvers();
 
