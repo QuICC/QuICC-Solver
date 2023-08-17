@@ -125,6 +125,8 @@ function(quicc_add_test target)
     message(DEBUG "CatchTestName: ${CatchTestName}")
     string(REGEX REPLACE "::" "/" _cppname ${CatchTestName})
     string(REGEX REPLACE ":" "_" _cppname ${_cppname})
+    string(REGEX REPLACE "<" "" _cppname ${_cppname})
+    string(REGEX REPLACE ">" "" _cppname ${_cppname})
     message(DEBUG "_cppname: ${_cppname}")
 
     string(REGEX REPLACE ":+" "_" _keyword ${CatchTestName})
