@@ -16,7 +16,7 @@
 #include "QuICC/Transform/Poly/ALegendre/Projector/Kokkos/DivS1Dp.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/ALegendre/Projector/DivS1DpviewCpu_t.hpp.inc"
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "QuICC/Transform/Wrappers/ALegendre/Projector/DivS1DpviewGpu_t.hpp.inc"
 #endif
 

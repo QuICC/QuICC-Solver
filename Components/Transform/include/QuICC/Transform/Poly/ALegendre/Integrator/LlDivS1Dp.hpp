@@ -16,7 +16,7 @@
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/LlDivS1Dp.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/ALegendre/Integrator/LlDivS1DpviewCpu_t.hpp.inc"
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "QuICC/Transform/Wrappers/ALegendre/Integrator/LlDivS1DpviewGpu_t.hpp.inc"
 #endif
 

@@ -15,7 +15,7 @@
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/DivLl.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/ALegendre/Integrator/DivLlviewCpu_t.hpp.inc"
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "QuICC/Transform/Wrappers/ALegendre/Integrator/DivLlviewGpu_t.hpp.inc"
 #endif
 

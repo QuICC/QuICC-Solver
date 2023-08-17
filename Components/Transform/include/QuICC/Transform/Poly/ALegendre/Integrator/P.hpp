@@ -16,7 +16,7 @@
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/P.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/ALegendre/Integrator/PviewCpu_t.hpp.inc"
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "QuICC/Transform/Wrappers/ALegendre/Integrator/PviewGpu_t.hpp.inc"
 #endif
 

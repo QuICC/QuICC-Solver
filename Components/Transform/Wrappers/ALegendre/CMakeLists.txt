@@ -1,6 +1,6 @@
 set(Backends "Cpu")
 
-if(TARGET CUDA::cufft AND QUICC_USE_CUFFT)
+if(TARGET QuICC::Cuda)
     list(APPEND Backends "Gpu")
 endif()
 

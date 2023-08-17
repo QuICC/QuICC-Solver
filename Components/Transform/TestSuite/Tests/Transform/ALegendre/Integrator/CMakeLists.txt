@@ -30,8 +30,7 @@ set(_tests_templated
     Poly::LlDivS1Dp:<viewCpu_t>:integrator
 )
 
-# \todo add separate switch
-if(TARGET QuICC::Fft::CuFft)
+if(TARGET QuICC::Cuda)
     list(APPEND _tests_templated
         Poly::P:<viewGpu_t>:integrator
         Poly::D1:<viewGpu_t>:integrator
@@ -97,8 +96,7 @@ set(_tests_templated
     Poly::P:<viewCpu_t>:integrator
 )
 
-# \todo add separate switch
-if(TARGET QuICC::Fft::CuFft)
+if(TARGET QuICC::Cuda)
     list(APPEND _tests_templated
         Poly::P:<viewGpu_t>:integrator
     )
@@ -132,8 +130,7 @@ set(_split_tests_templated
     Poly::P:<viewCpu_t>:integrator
 )
 
-# \todo add separate switch
-if(TARGET QuICC::Fft::CuFft)
+if(TARGET QuICC::Cuda)
     list(APPEND _split_tests_templated
         Poly::P:<viewGpu_t>:integrator
     )

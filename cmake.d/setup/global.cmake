@@ -73,7 +73,7 @@ include(setup/Kokkos)
 #
 # Cuda
 #
-find_package(CUDAToolkit)
+find_package(CUDAToolkit 11.3)
 
 ###################################################
 #------------ THREADS PARALLELISATION ------------#

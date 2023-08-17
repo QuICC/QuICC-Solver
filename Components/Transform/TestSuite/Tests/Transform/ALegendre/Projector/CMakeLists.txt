@@ -18,8 +18,7 @@ set(_tests_templated
     Poly::LlDivS1Dp:<viewCpu_t>:projector
 )
 
-# \todo add separate switch
-if(TARGET QuICC::Fft::CuFft)
+if(TARGET QuICC::Cuda)
     list(APPEND _tests_templated
         Poly::P:<viewGpu_t>:projector
         Poly::D1:<viewGpu_t>:projector
@@ -57,8 +56,7 @@ set(_tests_templated
     Poly::DivS1Dp:<viewCpu_t>:projector
 )
 
-# \todo add separate switch
-if(TARGET QuICC::Fft::CuFft)
+if(TARGET QuICC::Cuda)
     list(APPEND _tests_templated
         Poly::DivS1:<viewGpu_t>:projector
         Poly::DivS1Dp:<viewGpu_t>:projector
@@ -86,8 +84,7 @@ set(_tests_templated
     Poly::P:<viewCpu_t>:projector
 )
 
-# \todo add separate switch
-if(TARGET QuICC::Fft::CuFft)
+if(TARGET QuICC::Cuda)
     list(APPEND _tests_templated
         Poly::P:<viewGpu_t>:projector
     )
@@ -120,8 +117,7 @@ set(_split_tests_templated
     Poly::P:<viewCpu_t>:projector
 )
 
-# \todo add separate switch
-if(TARGET QuICC::Fft::CuFft)
+if(TARGET QuICC::Cuda)
     list(APPEND _split_tests_templated
         Poly::P:<viewGpu_t>:projector
     )
@@ -157,8 +153,7 @@ list(APPEND _tests_templated
     Poly::LlDivS1Dp:<viewCpu_t>:projector
 )
 
-# \todo add separate switch
-if(TARGET QuICC::Fft::CuFft)
+if(TARGET QuICC::Cuda)
     list(APPEND _tests_templated
         Poly::Ll:<viewGpu_t>:projector
         Poly::LlDivS1Dp:<viewGpu_t>:projector

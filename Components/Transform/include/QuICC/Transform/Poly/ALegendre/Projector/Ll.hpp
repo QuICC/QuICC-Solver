@@ -16,7 +16,7 @@
 #include "QuICC/Transform/Poly/ALegendre/Projector/Kokkos/Ll.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/ALegendre/Projector/LlviewCpu_t.hpp.inc"
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "QuICC/Transform/Wrappers/ALegendre/Projector/LlviewGpu_t.hpp.inc"
 #endif
 
