@@ -98,7 +98,7 @@ namespace Transform {
       #ifdef QUICC_USE_CUFFT
          using backend_t = viewGpu_t;
       #else
-         using backend_t = viewCpu_t;
+         using backend_t = base_t;
       #endif
       this->mImpl.addOperator<Fft::Fourier::Complex::Projector::P<backend_t>>(Backward::P::id());
       this->mImpl.addOperator<Fft::Fourier::Complex::Projector::Mean<backend_t>>(Backward::P0::id());
