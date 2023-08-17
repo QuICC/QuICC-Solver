@@ -21,7 +21,7 @@ namespace Diagnostics {
 
    ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const std::map<std::size_t,NonDimensional::SharedINumber>& params)
       : ICflWrapper(spVelocity),
-        mcCourant(0.65),
+        mcCourant(0.4),
         mcAlfvenScale(0),
         mcAlfvenDamping(0),
         mGlobalCfl(2)
@@ -46,7 +46,7 @@ namespace Diagnostics {
 
    ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic, const std::map<std::size_t,NonDimensional::SharedINumber>& params)
       : ICflWrapper(spVelocity, spMagnetic),
-        mcCourant(0.65),
+        mcCourant(0.4),
         mcAlfvenScale(params.find(NonDimensional::CflAlfvenScale::id())->second->value()),
         mcAlfvenDamping(params.find(NonDimensional::CflAlfvenDamping::id())->second->value()),
         mGlobalCfl(2)
