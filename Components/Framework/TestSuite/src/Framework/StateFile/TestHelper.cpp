@@ -1,6 +1,6 @@
 /**
  * @file TestHelper.cpp
- * @brief Setup helpers for the TransformCoordinator
+ * @brief Setup helpers for the StateFile tests
  */
 
 // System includes
@@ -11,14 +11,12 @@
 
 // Project includes
 //
+#include "QuICC/TestSuite/Framework/StateFile/TestHelper.hpp"
+#include "QuICC/TestSuite/Framework/StateFile/TestArgs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
-#include "QuICC/TestSuite/Framework/TransformCoordinator/TestHelper.hpp"
-#include "QuICC/TransformCoordinators/TransformCoordinatorTools.hpp"
-#include "QuICC/TransformConfigurators/TransformTreeTools.hpp"
-#include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
@@ -27,7 +25,8 @@
 #include "QuICC/Variables/FieldRequirement.hpp"
 #include "QuICC/Variables/RequirementTools.hpp"
 #include "QuICC/PhysicalKernels/Passthrough.hpp"
-#include "QuICC/TestSuite/Framework/TransformCoordinator/TestArgs.hpp"
+#include "QuICC/Io/Variable/StateFileReader.hpp"
+#include "QuICC/Io/Variable/StateFileWriter.hpp"
 
 namespace QuICC {
 
@@ -35,7 +34,7 @@ namespace TestSuite {
 
 namespace Framework {
 
-namespace TCoord {
+namespace StateFile {
 
    Test::Test()
       : epsilon(std::numeric_limits<MHDFloat>::epsilon()), maxUlp(11)
@@ -53,33 +52,23 @@ namespace TCoord {
       {
          case 0:
             this->fieldId = FieldId::SCALAR;
-            this->kernelId = KernelId::PASSTHROUGH;
-            this->pathId = PathId::BFLOOP;
-            this->spectrumId = SpectrumId::UNIT;
+            this->spectrumId = SpectrumId::TAG;
             break;
          case 1:
             this->fieldId = FieldId::TOR;
-            this->kernelId = KernelId::PASSTHROUGH;
-            this->pathId = PathId::BFLOOP;
-            this->spectrumId = SpectrumId::UNIT;
+            this->spectrumId = SpectrumId::TAG;
             break;
          case 2:
             this->fieldId = FieldId::POL;
-            this->kernelId = KernelId::PASSTHROUGH;
-            this->pathId = PathId::BFLOOP;
-            this->spectrumId = SpectrumId::UNIT;
+            this->spectrumId = SpectrumId::TAG;
             break;
          case 3:
             this->fieldId = FieldId::TORPOL;
-            this->kernelId = KernelId::PASSTHROUGH;
-            this->pathId = PathId::BFLOOP;
-            this->spectrumId = SpectrumId::UNIT;
+            this->spectrumId = SpectrumId::TAG;
             break;
          case 4:
             this->fieldId = FieldId::SCALAR_AND_TORPOL;
-            this->kernelId = KernelId::PASSTHROUGH;
-            this->pathId = PathId::BFLOOP;
-            this->spectrumId = SpectrumId::UNIT;
+            this->spectrumId = SpectrumId::TAG;
             break;
          default:
             throw std::logic_error("Undefined test case was requested");
@@ -91,9 +80,9 @@ namespace TCoord {
       // Set default arguments if required
       if(args().useDefault)
       {
-         args().dim1D = 15;
-         args().dim2D = 31;
-         args().dim3D = 31;
+         args().dim1D = 63;
+         args().dim2D = 127;
+         args().dim3D = 127;
 
          if(args().algorithm == "")
          {
@@ -131,6 +120,9 @@ namespace TCoord {
       INFO( "dim1D: " << dim(0) );
       INFO( "dim2D: " << dim(1) );
       INFO( "dim3D: " << dim(2) );
+      CHECK( dim(0) > 0 );
+      CHECK( dim(1) > 0 );
+      CHECK( dim(2) > 0 );
 
       if(args().params.size() == 0)
       {
@@ -167,94 +159,23 @@ namespace TCoord {
       RequirementTools::initVariables(test.scalars, test.vectors, info, test.spRes);
    }
 
-   void initKernels(Test& test)
-   {
-      if(test.kernelId == Test::KernelId::PASSTHROUGH)
-      {
-         // Use passthrough kernel for scalars
-         for(auto&& f: test.scalars)
-         {
-            auto spKernel = std::make_shared<Physical::Kernel::Passthrough>();
-            spKernel->setField(f.first, f.second);
-            test.kernels.emplace(f.first, spKernel);
-         }
-
-         // Use passthrough kernel for vectors
-         for(auto&& f: test.vectors)
-         {
-            auto spKernel = std::make_shared<Physical::Kernel::Passthrough>();
-            spKernel->setField(f.first, f.second);
-            test.kernels.emplace(f.first, spKernel);
-         }
-      }
-   }
-
-   void initTrees(Test& test)
-   {
-      std::map<size_t, std::vector<Transform::TransformPath> > mt;
-
-      auto spSteps = Transform::createTransformSteps(test.spRes->sim().spSpatialScheme());
-
-      if(test.pathId == Test::PathId::BFLOOP)
-      {
-         for(auto&& f: test.scalars)
-         {
-            // Create forward scalar transform tree
-            std::vector<Transform::ITransformSteps::PathId> comps = {{FieldComponents::Spectral::SCALAR,Transform::Path::Scalar::id()}};
-            auto t = spSteps->forwardScalar(comps);
-            mt.insert(std::make_pair(f.first, t));
-         }
-
-         for(auto&& f: test.vectors)
-         {
-            // Create forward vector transform tree
-            std::vector<Transform::ITransformSteps::PathId> comps = {{FieldComponents::Spectral::TOR,Transform::Path::TorPol::id()},{FieldComponents::Spectral::POL,Transform::Path::TorPol::id()}};
-            auto t = spSteps->forwardVector(comps);
-            mt.insert(std::make_pair(f.first, t));
-         }
-      }
-      else
-      {
-         throw std::logic_error("Test for this transform path is not implemented");
-      }
-
-      Transform::TransformTreeTools::generateTrees(test.fwdTree, mt, TransformDirection::FORWARD);
-
-      // Create backward transform tree based on variables
-      RequirementTools::buildBackwardTree(test.bwdTree, test.scalars, test.vectors);
-   }
-
-   void initCoordinator(Test& test, const Parallel::SplittingDescription& descr)
-   {
-      // Set grouper
-      Parallel::setGrouper(descr, test.spFwdGrouper, test.spBwdGrouper);
-
-      // Initialize coordinator
-      std::map<std::size_t,NonDimensional::SharedINumber> runOptions;
-      runOptions.emplace(NonDimensional::Lower1d::id(), std::make_shared<NonDimensional::Lower1d>(0.3));
-      runOptions.emplace(NonDimensional::Upper1d::id(), std::make_shared<NonDimensional::Lower1d>(1.3));
-      std::vector<ArrayI> packs;
-      Transform::TransformCoordinatorTools::computePacks(packs, test.spFwdGrouper, test.spBwdGrouper, {{0, test.fwdTree}}, {{0, test.bwdTree}}, {0}, test.spRes);
-      Transform::TransformCoordinatorTools::init(test.coord, test.spFwdGrouper, test.spBwdGrouper, packs, test.spRes, runOptions);
-   }
-
-   MHDComplex unitReference(const Test& test, const int i, const int j, const int k)
+   MHDComplex tagReference(const Test& test, const int i, const int j, const int k)
    {
       auto&& ss = test.spRes->sim().ss();
       if(ss.has(SpatialScheme::Feature::SphereGeometry) || ss.has(SpatialScheme::Feature::ShellGeometry))
       {
          if(ss.has(SpatialScheme::Feature::SpectralOrdering123))
          {
-            return unitReferenceSH(i,j,k);
+            return tagReferenceSH(i,j,k);
          }
          else
          {
-            return unitReferenceSH(i,k,j);
+            return tagReferenceSH(i,k,j);
          }
       }
       else if(ss.has(SpatialScheme::Feature::CartesianGeometry) && ss.has(SpatialScheme::Feature::FourierIndex23))
       {
-         return unitReferenceFF(i,j,k);
+         return tagReferenceFF(i,j,k);
       }
       else
       {
@@ -262,23 +183,16 @@ namespace TCoord {
       }
    }
 
-   MHDComplex unitReferenceSH(const int n, const int l, const int m)
+   MHDComplex tagReferenceSH(const int n, const int l, const int m)
    {
-      MHDComplex ref(std::sqrt(2.0),-std::sqrt(2.0));
-
-      if(l == 0)
-      {
-         ref = 0.0;
-      }
-      else if(m == 0)
-      {
-         ref.imag(0.0);
-      }
+      MHDFloat rTag = static_cast<MHDFloat>(n) + static_cast<MHDFloat>(l)/1e4 + static_cast<MHDFloat>(m)/1e8;
+      MHDFloat iTag = static_cast<MHDFloat>(l) + static_cast<MHDFloat>(m)/1e4 + static_cast<MHDFloat>(n)/1e8;
+      MHDComplex ref(rTag,iTag);
 
       return ref;
    }
 
-   MHDComplex unitReferenceFF(const int n, const int k1, const int k2)
+   MHDComplex tagReferenceFF(const int n, const int k1, const int k2)
    {
       MHDComplex ref(std::sqrt(2.0),-std::sqrt(2.0));
 
@@ -293,9 +207,9 @@ namespace TCoord {
    void setVariables(Test& test)
    {
       MHDComplex (*refFct)(const Test& tet, int,int,int);
-      if(test.spectrumId == Test::SpectrumId::UNIT)
+      if(test.spectrumId == Test::SpectrumId::TAG)
       {
-         refFct = &unitReference;
+         refFct = &tagReference;
       }
       else
       {
@@ -368,62 +282,71 @@ namespace TCoord {
       }
    }
 
-   void scrambleVariables(Test& test)
+   void writeStateFile(Test& test)
    {
-      // Set unit spectrum for scalar fields
-      for(auto&& f: test.scalars)
+      auto& ss = *test.spRes->sim().spSpatialScheme();
+
+      auto spState = std::make_shared<Io::Variable::StateFileWriter>(ss.tag(), ss.has(SpatialScheme::Feature::RegularSpectrum));
+
+      // Add scalars
+      for(auto const& f: test.scalars)
       {
-         std::visit(
-               [&](auto&& p)
-               {
-                  MHDComplex val = std::numeric_limits<MHDFloat>::max()/2.0;
-                  const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
-                  for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
-                  {
-                     for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
-                     {
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
-                        {
-                           p->rDom(0).rPerturbation().setPoint(val, i,j,k);
-                        }
-                     }
-                  }
-               },
-            f.second);
+         spState->expect(f.first);
+         spState->addScalar(f);
       }
 
-      // Set unit spectrum for vector fields
-      for(auto&& f: test.vectors)
+      // Add vectors
+      for(auto const& f: test.vectors)
       {
-         std::visit(
-               [&](auto&& p)
-               {
-                  MHDComplex val = std::numeric_limits<MHDFloat>::max()/2.0;
-                  const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
-                  for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
-                  {
-                     for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
-                     {
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
-                        {
-                           p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(val, i,j,k);
-                           p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(val, i,j,k);
-                        }
-                     }
-                  }
-               },
-            f.second);
+         spState->expect(f.first);
+         spState->addVector(f);
       }
+
+      if(!spState->isFull())
+      {
+         throw std::logic_error("Fields are missing in HDF5 file");
+      }
+      spState->init();
+      spState->setSimTime(1.0, 1e-3);
+      spState->write();
+      spState->finalize();
+   }
+
+   void readStateFile(Test& test)
+   {
+      auto& ss = *test.spRes->sim().spSpatialScheme();
+
+      auto spState = std::make_shared<Io::Variable::StateFileReader>("_"+ss.tag(), ss.tag(), ss.has(SpatialScheme::Feature::RegularSpectrum));
+
+      // Add scalars
+      for(auto const& f: test.scalars)
+      {
+         spState->expect(f.first);
+         spState->addScalar(f);
+      }
+
+      // Add vectors
+      for(auto const& f: test.vectors)
+      {
+         spState->expect(f.first);
+         spState->addVector(f);
+      }
+
+      if(!spState->isFull())
+      {
+         throw std::logic_error("Fields are missing in HDF5 file");
+      }
+      spState->init();
+      spState->read();
+      spState->finalize();
    }
 
    void checkVariables(Test& test)
    {
       MHDComplex (*refFct)(const Test& tet, int,int,int);
-      if(test.spectrumId == Test::SpectrumId::UNIT)
+      if(test.spectrumId == Test::SpectrumId::TAG)
       {
-         refFct = &unitReference;
+         refFct = &tagReference;
       }
       else
       {
@@ -527,18 +450,6 @@ namespace TCoord {
       }
    }
 
-   void backward(Test& test)
-   {
-      test.coord.defineBwdTransforms(test.bwdTree);
-      test.spBwdGrouper->transform(test.scalars, test.vectors, test.coord);
-   }
-
-   void nonlinearAndForward(Test& test)
-   {
-      test.coord.defineFwdTransforms(test.fwdTree);
-      test.spFwdGrouper->transform(test.scalars, test.vectors, test.kernels, test.coord);
-   }
-
    ErrorType computeUlp(const MHDComplex data, const MHDComplex ref, const MHDFloat refMod, const MHDFloat tol, const MHDFloat eps)
    {
       auto errReal = computeUlp(data.real(), ref.real(), refMod, tol, eps);
@@ -577,7 +488,7 @@ namespace TCoord {
       return std::make_tuple(isEqual, ulp, diff);
    }
 
-}
-}
-}
-}
+} // StateFile
+} // Framework
+} // TestSuite
+} // QuICC

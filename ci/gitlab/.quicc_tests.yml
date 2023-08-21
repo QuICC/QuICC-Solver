@@ -32,6 +32,7 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapStencilTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkLoadSplitterTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkCommunicatorTests_
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^FrameworkStateFileTests_.*serial"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "PyQuICCTests"
 

@@ -23,6 +23,19 @@ site_configuration = {
             ]
         },
         {
+            'name': 'ph-fangorn',
+            'descr': 'Philippe\'s Dell XPS',
+            'hostnames': ['fangorn'],
+            'partitions': [
+                {
+                    'name': 'default',
+                    'scheduler': 'local',
+                    'launcher': 'mpirun',
+                    'environs': ['builtin']
+                }
+            ]
+        },
+        {
             'name': 'generic',
             'descr': 'Generic example system',
             'hostnames': ['.*'],
