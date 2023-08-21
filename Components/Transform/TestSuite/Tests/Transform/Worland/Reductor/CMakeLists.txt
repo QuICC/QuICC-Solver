@@ -25,14 +25,14 @@ foreach(_test ${_tests_templated})
 endforeach()
 
 set(_tests
-  Fft::EnergyR2:reductor
-  Fft::Energy:reductor
-  Fft::EnergySLaplR2:reductor
+  Fft::EnergyR2:<base_t>:reductor
+  Fft::Energy:<base_t>:reductor
+  Fft::EnergySLaplR2:<base_t>:reductor
 )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     IDS 0 1 2
     ULPS ${_ulp}
   )
@@ -73,12 +73,12 @@ foreach(_test ${_tests_templated})
 endforeach()
 
 set(_tests
-  Fft::EnergyD1R1:reductor
+  Fft::EnergyD1R1:<base_t>:reductor
 )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     IDS 0 1 2
     ULPS ${_ulp}
   )
@@ -101,13 +101,13 @@ foreach(_test ${_tests_templated})
 endforeach()
 
 set(_tests
-  Fft::PowerD1R1:reductor
+  Fft::PowerD1R1:<base_t>:reductor
 )
 
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     IDS 0 1 2
     ULPS ${_ulp}
   )
@@ -130,12 +130,12 @@ foreach(_test ${_tests})
 endforeach()
 
 set(_tests
-  Fft::PowerR2:reductor
+  Fft::PowerR2:<base_t>:reductor
 )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     IDS 0 1 2
     ULPS ${_ulp}
   )
@@ -158,12 +158,12 @@ foreach(_test ${_tests})
 endforeach()
 
 set(_tests
-  Fft::Power:reductor
+  Fft::Power:<base_t>:reductor
 )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     IDS 0 1 2
     ULPS ${_ulp}
   )
@@ -187,13 +187,13 @@ foreach(_test ${_tests})
 endforeach()
 
 set(_tests
-  Fft::PowerSLaplR2:reductor
+  Fft::PowerSLaplR2:<base_t>:reductor
 )
 
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     IDS 0 1 2
     ULPS ${_ulp}
   )

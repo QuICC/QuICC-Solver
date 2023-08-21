@@ -24,12 +24,12 @@ endforeach()
 
 # Create BFLoop tests targets
 set(_tests
-  Fft::P:bfloop
+  Fft::P:<base_t>:bfloop
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     IDS 0 1 2 3 204 205 206 207 208 209 210
     ULPS 5 5 12 5 5 6 11 16 21 28 41
   )

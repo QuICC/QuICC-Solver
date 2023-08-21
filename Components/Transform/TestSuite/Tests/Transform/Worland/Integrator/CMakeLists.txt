@@ -200,34 +200,34 @@ endforeach()
 ######################
 
 set(_tests_templated
-  Fft::P:integrator
-  Fft::P_Zero:integrator
-  Fft::R1_Zero:integrator
+  Fft::P:<base_t>:integrator
+  Fft::P_Zero:<base_t>:integrator
+  Fft::R1_Zero:<base_t>:integrator
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS 4 4 6 4 5
     IDS 0 1 2 3 4
   )
 endforeach()
 
 set(_tests_templated
-  Fft::DivR1_Zero:integrator
+  Fft::DivR1_Zero:<base_t>:integrator
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS 5 5 20 10 10 5 5 8 6 5
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()
 
 set(_tests_templated
-  Fft::I2:integrator
-  Fft::I2_Zero:integrator
+  Fft::I2:<base_t>:integrator
+  Fft::I2_Zero:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
   ULP 17 22 176 65 31
@@ -236,14 +236,14 @@ quicc_set_ulp(_ulp
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
     IDS 0 1 2 3 4
   )
 endforeach()
 
 set(_tests_templated
-  Fft::I2DivR1_Zero:integrator
+  Fft::I2DivR1_Zero:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
   ULP 16 23 189 48 78 13 213 205 40 59
@@ -252,14 +252,14 @@ quicc_set_ulp(_ulp
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()
 
 set(_tests_templated
-  Fft::I4DivR1_Zero:integrator
+  Fft::I4DivR1_Zero:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
   ULP 55 22 732 59 51 46 602 582 44 22
@@ -268,26 +268,26 @@ quicc_set_ulp(_ulp
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()
 
 set(_tests_templated
-  Fft::DivR1D1R1_Zero:integrator
+  Fft::DivR1D1R1_Zero:<base_t>:integrator
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS 11 6 5 4 3 13 8 3 4 3
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()
 
 set(_tests_templated
-  Fft::I2DivR1D1R1_Zero:integrator
+  Fft::I2DivR1D1R1_Zero:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
   ULP 10 353 1359 1067 1258 11 193 1111 393 884
@@ -296,14 +296,14 @@ quicc_set_ulp(_ulp
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()
 
 set(_tests_templated
-  Fft::I4DivR1D1R1_Zero:integrator
+  Fft::I4DivR1D1R1_Zero:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
   ULP 44 1213 10190 2217 1803 38 658 6820 1591 2111
@@ -312,7 +312,7 @@ quicc_set_ulp(_ulp
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
     IDS 0 1 2 3 4 10 11 12 13 14
   )
@@ -323,19 +323,19 @@ endforeach()
 #-----------------
 
 set(_tests_templated
-  Fft::P:integrator
+  Fft::P:<base_t>:integrator
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS 6 6 9 12 21
     IDS 204 205 206 207 208
   )
 endforeach()
 
 set(_tests_templated
-  Fft::I2:integrator
+  Fft::I2:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
   ULP 54 130 472 1145
@@ -344,7 +344,7 @@ quicc_set_ulp(_ulp
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
     IDS 204 205 206 207
   )

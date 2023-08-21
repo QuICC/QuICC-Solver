@@ -145,60 +145,60 @@ endforeach()
 ######################
 
 set(_tests
-  Fft::P:projector
+  Fft::P:<base_t>:projector
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS 4 17 5 5
     IDS  0 1 2 3
   )
 endforeach()
 
 set(_tests
-  Fft::DivR1_Zero:projector
+  Fft::DivR1_Zero:<base_t>:projector
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS 5 6 5 4
     IDS  0 1 2 3
   )
 endforeach()
 
 set(_tests
-  Fft::D1:projector
+  Fft::D1:<base_t>:projector
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS 5 4 4 4
     IDS  0 1 2 3
   )
 endforeach()
 
 set(_tests
-  Fft::DivR1D1R1_Zero:projector
+  Fft::DivR1D1R1_Zero:<base_t>:projector
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS 5 4 3 4
     IDS  0 1 2 3
   )
 endforeach()
 
 set(_tests
-  Fft::SphLapl:projector
+  Fft::SphLapl:<base_t>:projector
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:type
+    KEYWORD Algorithm::Operator:Template:type
     ULPS 1 3 5 3
     IDS  0 1 2 3
   )
