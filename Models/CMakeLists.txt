@@ -36,7 +36,7 @@ set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.7.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.7.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.7.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.7.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.7.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.8.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.7.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "main")
 
