@@ -53,6 +53,8 @@ namespace Variable {
 
       // Normalize by sphere volume: 4/3*pi*r_o^3
       this->mVolume = (4.0/3.0)*Math::PI;
+      // Normalize by horizontal integral / spherical harmonic Y_0^0 normalization
+      this->mVolume /= (4.0*Math::PI)/(2.0*std::sqrt(Math::PI));
 
       // Look for l = 0, m = 0 mode
       if(m0 == 0 && l0 == 0)
@@ -76,8 +78,8 @@ namespace Variable {
          // Temperature background state T_b = 1/2(1-r^2)
          if(this->scalarRange().first->first == PhysicalNames::Temperature::id())
          {
-            this->mBg(0) = std::sqrt(Math::PI/32.0);
-            this->mBg(1) = -std::sqrt(Math::PI/64.0);
+            this->mBg(0) = Math::PI/std::sqrt(8.0);
+            this->mBg(1) = -Math::PI/4.0;
          }
       }
       else
