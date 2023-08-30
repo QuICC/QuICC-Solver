@@ -1,4 +1,4 @@
-from quicc.reframe.library import testBase
+from quicc.reframe.library import testTransform
 import reframe as rfm
 
 #
@@ -6,8 +6,8 @@ import reframe as rfm
 #
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split8_0_cuda(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<kokkos_t\>_projector_id108_ulp.*_split8_0'
+class testALegendreTests_Poly_P_projector_id108_split8_0_cuda(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_kokkos_t_projector_id108_ulp.*_split8_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
@@ -16,8 +16,8 @@ class testALegendreTests_Poly_P_projector_id108_split8_0_cuda(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split8_0_viewGpu(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<viewGpu_t\>_projector_id108_ulp.*_split8_0'
+class testALegendreTests_Poly_P_projector_id108_split8_0_viewGpu(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_viewGpu_t_projector_id108_ulp.*_split8_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
@@ -26,8 +26,8 @@ class testALegendreTests_Poly_P_projector_id108_split8_0_viewGpu(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split256_0_cuda(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<kokkos_t\>_projector_id108_ulp.*_split256_0'
+class testALegendreTests_Poly_P_projector_id108_split256_0_cuda(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_kokkos_t_projector_id108_ulp.*_split256_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
@@ -36,8 +36,8 @@ class testALegendreTests_Poly_P_projector_id108_split256_0_cuda(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split256_0_viewGpu(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<viewGpu_t\>_projector_id108_ulp.*_split256_0'
+class testALegendreTests_Poly_P_projector_id108_split256_0_viewGpu(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_viewGpu_t_projector_id108_ulp.*_split256_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
@@ -46,8 +46,8 @@ class testALegendreTests_Poly_P_projector_id108_split256_0_viewGpu(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split8_0_cuda(testBase):
-    test = 'prof_TransformALegendreTests_Poly_LlDivS1Dp_\<kokkos_t\>_projector_id108_ulp.*_split8_0'
+class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split8_0_cuda(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_LlDivS1Dp_kokkos_t_projector_id108_ulp.*_split8_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
@@ -56,8 +56,8 @@ class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split8_0_cuda(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split8_0_viewGpu(testBase):
-    test = 'prof_TransformALegendreTests_Poly_LlDivS1Dp_\<viewGpu_t\>_projector_id108_ulp.*_split8_0'
+class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split8_0_viewGpu(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_LlDivS1Dp_viewGpu_t_projector_id108_ulp.*_split8_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
@@ -66,8 +66,8 @@ class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split8_0_viewGpu(testBas
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_integrator_id108_split8_0_cuda(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<kokkos_t\>_integrator_id108_ulp.*_split8_0'
+class testALegendreTests_Poly_P_integrator_id108_split8_0_cuda(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_kokkos_t_integrator_id108_ulp.*_split8_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
@@ -76,8 +76,8 @@ class testALegendreTests_Poly_P_integrator_id108_split8_0_cuda(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_integrator_id108_split8_0_viewGpu(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<viewGpu_t\>_integrator_id108_ulp.*_split8_0'
+class testALegendreTests_Poly_P_integrator_id108_split8_0_viewGpu(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_viewGpu_t_integrator_id108_ulp.*_split8_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'p100': {
@@ -90,8 +90,8 @@ class testALegendreTests_Poly_P_integrator_id108_split8_0_viewGpu(testBase):
 #
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split8_0_noCopy_cuda(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<kokkos_t\>_projector_id108_ulp.*_split8_0'
+class testALegendreTests_Poly_P_projector_id108_split8_0_noCopy_cuda(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_kokkos_t_projector_id108_ulp.*_split8_0'
     region = 'applyUnitOperator'
     steps = 500
     refs =  {   'p100': {
@@ -100,8 +100,8 @@ class testALegendreTests_Poly_P_projector_id108_split8_0_noCopy_cuda(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split8_0_noCopy_viewGpu(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<viewGpu_t\>_projector_id108_ulp.*_split8_0'
+class testALegendreTests_Poly_P_projector_id108_split8_0_noCopy_viewGpu(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_viewGpu_t_projector_id108_ulp.*_split8_0'
     region = 'ImplOp::applyImpl'
     steps = 500
     refs =  {   'p100': {
@@ -114,8 +114,8 @@ class testALegendreTests_Poly_P_projector_id108_split8_0_noCopy_viewGpu(testBase
 #
 
 @rfm.simple_test
-class testFourierTests_Mixed_D1_projector_id108_split96_0_viewGpu(testBase):
-    test = 'prof_TransformFourierTests_Mixed_D1_\<viewGpu_t\>_projector_id108_ulp.*_split96_0'
+class testFourierTests_Mixed_D1_projector_id108_split96_0_viewGpu(testTransform):
+    test = 'prof_TransformFourierTests_Mixed_D1_viewGpu_t_projector_id108_ulp.*_split96_0'
     region = 'transform'
     steps = 500
     refs =  {   'p100': {

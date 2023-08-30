@@ -6,8 +6,8 @@ import reframe as rfm
 #
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split96_0_base(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<base_t\>_projector_id108_ulp.*_split96_0'
+class testALegendreTests_Poly_P_projector_id108_split96_0_base(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_base_t_projector_id108_ulp.*_split96_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -25,8 +25,8 @@ class testALegendreTests_Poly_P_projector_id108_split96_0_base(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split96_0_viewCpu(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<viewCpu_t\>_projector_id108_ulp.*_split96_0'
+class testALegendreTests_Poly_P_projector_id108_split96_0_viewCpu(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_viewCpu_t_projector_id108_ulp.*_split96_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -41,8 +41,8 @@ class testALegendreTests_Poly_P_projector_id108_split96_0_viewCpu(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split288_0_base(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<base_t\>_projector_id108_ulp.*_split288_0'
+class testALegendreTests_Poly_P_projector_id108_split288_0_base(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_base_t_projector_id108_ulp.*_split288_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -57,8 +57,8 @@ class testALegendreTests_Poly_P_projector_id108_split288_0_base(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split3072_0_base(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<base_t\>_projector_id108_ulp.*_split3072_0'
+class testALegendreTests_Poly_P_projector_id108_split3072_0_base(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_base_t_projector_id108_ulp.*_split3072_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -73,8 +73,8 @@ class testALegendreTests_Poly_P_projector_id108_split3072_0_base(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_projector_id108_split9216_0_base(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<base_t\>_projector_id108_ulp.*_split9216_0'
+class testALegendreTests_Poly_P_projector_id108_split9216_0_base(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_base_t_projector_id108_ulp.*_split9216_0'
     region = 'applyOperators'
     steps = 1000
     refs =  {   'icelake': {
@@ -89,8 +89,8 @@ class testALegendreTests_Poly_P_projector_id108_split9216_0_base(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split96_0_base(testBase):
-    test = 'prof_TransformALegendreTests_Poly_LlDivS1Dp_\<base_t\>_projector_id108_ulp.*_split96_0'
+class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split96_0_base(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_LlDivS1Dp_base_t_projector_id108_ulp.*_split96_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -105,8 +105,8 @@ class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split96_0_base(testBase)
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split96_0_viewCpu(testBase):
-    test = 'prof_TransformALegendreTests_Poly_LlDivS1Dp_\<viewCpu_t\>_projector_id108_ulp.*_split96_0'
+class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split96_0_viewCpu(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_LlDivS1Dp_viewCpu_t_projector_id108_ulp.*_split96_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -122,8 +122,8 @@ class testALegendreTests_Poly_LlDivS1Dp_projector_id108_split96_0_viewCpu(testBa
 
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_integrator_id108_split96_0_base(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<base_t\>_integrator_id108_ulp.*_split96_0'
+class testALegendreTests_Poly_P_integrator_id108_split96_0_base(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_base_t_integrator_id108_ulp.*_split96_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -138,8 +138,8 @@ class testALegendreTests_Poly_P_integrator_id108_split96_0_base(testBase):
             }
 
 @rfm.simple_test
-class testALegendreTests_Poly_P_integrator_id108_split96_0_viewCpu(testBase):
-    test = 'prof_TransformALegendreTests_Poly_P_\<viewCpu_t\>_integrator_id108_ulp.*_split96_0'
+class testALegendreTests_Poly_P_integrator_id108_split96_0_viewCpu(testTransform):
+    test = 'prof_TransformALegendreTests_Poly_P_viewCpu_t_integrator_id108_ulp.*_split96_0'
     region = 'applyOperators'
     steps = 500
     refs =  {   'icelake': {
@@ -159,7 +159,7 @@ class testALegendreTests_Poly_P_integrator_id108_split96_0_viewCpu(testBase):
 
 @rfm.simple_test
 class testFourierTests_Mixed_P_projector_id108_split96_0_base(testTransform):
-    test = 'prof_TransformFourierTests_Mixed_P_\<base_t\>_projector_id108_ulp.*_split96_0'
+    test = 'prof_TransformFourierTests_Mixed_P_base_t_projector_id108_ulp.*_split96_0'
     region = 'transform'
     steps = 500
     refs =  {   'icelake': {
@@ -176,7 +176,7 @@ class testFourierTests_Mixed_P_projector_id108_split96_0_base(testTransform):
 
 @rfm.simple_test
 class testFourierTests_Mixed_P_projector_id108_split96_0_view(testTransform):
-    test = 'prof_TransformFourierTests_Mixed_P_\<viewCpu_t\>_projector_id108_ulp.*_split96_0'
+    test = 'prof_TransformFourierTests_Mixed_P_viewCpu_t_projector_id108_ulp.*_split96_0'
     region = 'transform'
     steps = 500
     refs =  {   'icelake': {
@@ -193,7 +193,7 @@ class testFourierTests_Mixed_P_projector_id108_split96_0_view(testTransform):
 
 @rfm.simple_test
 class testFourierTests_Mixed_D1_projector_id108_split96_0_base(testTransform):
-    test = 'prof_TransformFourierTests_Mixed_D1_\<base_t\>_projector_id108_ulp.*_split96_0'
+    test = 'prof_TransformFourierTests_Mixed_D1_base_t_projector_id108_ulp.*_split96_0'
     region = 'transform'
     steps = 500
     refs =  {   'icelake': {
@@ -210,7 +210,7 @@ class testFourierTests_Mixed_D1_projector_id108_split96_0_base(testTransform):
 
 @rfm.simple_test
 class testFourierTests_Mixed_D1_projector_id108_split96_0_view(testTransform):
-    test = 'prof_TransformFourierTests_Mixed_D1_\<viewCpu_t\>_projector_id108_ulp.*_split96_0'
+    test = 'prof_TransformFourierTests_Mixed_D1_viewCpu_t_projector_id108_ulp.*_split96_0'
     region = 'transform'
     steps = 500
     refs =  {   'icelake': {

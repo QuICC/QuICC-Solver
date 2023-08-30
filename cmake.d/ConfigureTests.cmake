@@ -91,6 +91,10 @@ function(quicc_add_test target)
   message(DEBUG "QAT_PERFONLY: ${QAT_PERFONLY}")
   message(DEBUG "QAT_OPTIONS: ${QAT_OPTIONS}")
 
+  set(CatchTestName ${${QAT_KEYWORD}})
+  string(REGEX REPLACE "<" "" CatchTestName ${CatchTestName})
+  string(REGEX REPLACE ">" "" CatchTestName ${CatchTestName})
+
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${target}.cpp")
     message(VERBOSE "Adding ${target}")
     set(_keyword ${${QAT_KEYWORD}})
@@ -121,12 +125,8 @@ function(quicc_add_test target)
       endforeach()
     endif()
 
-    set(CatchTestName ${${QAT_KEYWORD}})
-    message(DEBUG "CatchTestName: ${CatchTestName}")
     string(REGEX REPLACE "::" "/" _cppname ${CatchTestName})
     string(REGEX REPLACE ":" "_" _cppname ${_cppname})
-    string(REGEX REPLACE "<" "" _cppname ${_cppname})
-    string(REGEX REPLACE ">" "" _cppname ${_cppname})
     message(DEBUG "_cppname: ${_cppname}")
 
     string(REGEX REPLACE ":+" "_" _keyword ${CatchTestName})
@@ -170,7 +170,7 @@ function(quicc_add_test target)
     set(_testname "${QAT_COMMAND}_${_keyword}${_ulp_name}${_opt_name}" )
     message(DEBUG "_testname: ${_testname}")
     __add_test(${_testname}
-      COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests ${_opt_cmd} ${_ulp_cmd}
+      COMM ${QAT_COMMAND} [${CatchTestName}] -w NoTests ${_opt_cmd} ${_ulp_cmd}
       DIS ${QAT_DISABLED}
       STP ${QAT_STEPS}
       PRF ${QAT_PERFONLY}
@@ -180,7 +180,7 @@ function(quicc_add_test target)
       set(_testname "${QAT_COMMAND}_${_keyword}_type${_type}${_ulp_name}${_opt_name}" )
       message(DEBUG "_testname: ${_testname}")
       __add_test(${_testname}
-        COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests ${_opt_cmd} --type=${_type} ${_ulp_cmd}
+        COMM ${QAT_COMMAND} [${CatchTestName}] -w NoTests ${_opt_cmd} --type=${_type} ${_ulp_cmd}
         DIS ${QAT_DISABLED}
         STP ${QAT_STEPS}
         PRF ${QAT_PERFONLY}
@@ -222,7 +222,7 @@ function(quicc_add_test target)
       set(_testname "${QAT_COMMAND}_${_keyword}_id${_id}${_ulp_name}${_split_name}${_opt_name}" )
       message(DEBUG "_testname: ${_testname}")
       __add_test(${_testname}
-        COMM ${QAT_COMMAND} [${${QAT_KEYWORD}}] -w NoTests ${_opt_cmd} --id=${_id} ${_ulp_cmd} ${_split_cmd}
+        COMM ${QAT_COMMAND} [${CatchTestName}] -w NoTests ${_opt_cmd} --id=${_id} ${_ulp_cmd} ${_split_cmd}
         DIS ${QAT_DISABLED}
         STP ${_steps}
         PRF ${QAT_PERFONLY}
