@@ -349,3 +349,20 @@ foreach(_test ${_tests_templated})
     IDS 204 205 206 207
   )
 endforeach()
+
+# Split integrator tests
+
+set(_split_tests_templated
+    Poly::P:<base_t>:integrator
+)
+
+foreach(_test ${_split_tests_templated})
+    quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Algorithm::Operator:Template:type
+        IDS  108 108 108 108 108 108
+        ULPS 13000 11000 11000 12000 11000 11000
+        # node:rank, node*12:rank, node*36:rank
+        SPLITS 8:0 96:0 288:0 256:0 3072:0 9216:0
+    )
+endforeach()

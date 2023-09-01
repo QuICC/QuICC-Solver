@@ -203,3 +203,20 @@ foreach(_test ${_tests})
     IDS  0 1 2 3
   )
 endforeach()
+
+# Split projector tests
+
+set(_split_tests_templated
+    Poly::P:<base_t>:projector
+)
+
+foreach(_test ${_split_tests_templated})
+    quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Algorithm::Operator:Template:type
+        IDS  108 108 108 108 108 108
+        ULPS 15000 15000 15000 15000 15000 15000
+        # node:rank, node*12:rank, node*36:rank
+        SPLITS 8:0 96:0 288:0 256:0 3072:0 9216:0
+    )
+endforeach()

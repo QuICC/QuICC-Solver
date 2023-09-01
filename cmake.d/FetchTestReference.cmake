@@ -32,7 +32,7 @@ function(quicc_fetch_test_reference target)
     FILENAME "${QAT_FILENAME}"
     ARCHIVEDIR "${QAT_ARCHIVEDIR}"
     DATADIR "${QAT_DATADIR}"
-    GITTAG "v1.0.46"
+    GITTAG "v1.0.47"
     GITURL "https://gitlab.ethz.ch/quicc/test-testdata"
     )
 

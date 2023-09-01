@@ -526,32 +526,13 @@ namespace Transform {
    {
       bool isEqual = false;
       double ulp = 0;
-#if 0
-      auto x = ref;
-      auto y = data;
-      if (std::abs(x) < std::abs(y))
-      {
-         std::swap(x, y);
-      }
-      auto diff = std::abs(x-y);
 
-      // epsilon subnormal
-      auto eps = std::numeric_limits<double>::denorm_min();
-
-      if(diff <= eps)
-      {
-         isEqual = true;
-      }
-
-      auto ulp = diff/eps;
-#else
-      // check that subnormal was flushed to zero
-      if (data == 0.0)
+      // check that subnormal was flushed to zero or subnormal
+      if (data == 0.0 || data < std::numeric_limits<MHDFloat>::min())
       {
          isEqual = true;
          ulp = 1;
       }
-#endif
       return std::make_tuple(isEqual, ulp, 0);
    }
 
