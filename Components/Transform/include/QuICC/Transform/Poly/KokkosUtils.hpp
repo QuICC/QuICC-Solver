@@ -12,7 +12,6 @@
 // System includes
 //
 
-#ifdef QUICC_USE_KOKKOS
 #include "KokkosTypedefs.hpp"
 #include<KokkosBlas3_gemm.hpp>
 #include "QuICC/Transform/Poly/ALegendre/KokkosIALegendreOperatorTypes.hpp"
@@ -371,5 +370,4 @@ bool equal_data(
 
 } // namespace QuICC
 
-#endif
 #endif // QUICC_TYPEDEFS_HPP

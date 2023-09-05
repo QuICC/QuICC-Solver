@@ -41,11 +41,11 @@ set(viewGpu_tProjectorMixedCopyPad "// dealias with 2/3 rule
 
     // cpu -> gpu data
     auto dSz = sizeof(decltype(mMods_d)::type);
-    cudaErrChk(cudaMemcpy2D(mMods_d.data(), mPadded.rows()*dSz, in.data(), in.rows()*dSz,
+    cudaErrChk(cudaMemcpy2DAsync(mMods_d.data(), mPadded.rows()*dSz, in.data(), in.rows()*dSz,
         nDealias*dSz, in.cols(), cudaMemcpyHostToDevice));")
 set(viewGpu_tIntegratorMixedCopyPad "// cpu -> gpu data
     auto dSz = sizeof(decltype(mPhys_d)::type);
-    cudaErrChk(cudaMemcpy(mPhys_d.data(), in.data(), mPhys_d.size()*dSz,
+    cudaErrChk(cudaMemcpyAsync(mPhys_d.data(), in.data(), mPhys_d.size()*dSz,
         cudaMemcpyHostToDevice));")
 set(viewCpu_tProjectorComplexCopyPad "// dealias with 2/3 rule
     std::size_t nDealias = mPadded.rows() * dealias::rule;
@@ -57,12 +57,12 @@ set(viewGpu_tProjectorComplexCopyPad "${viewCpu_tProjectorComplexCopyPad}
 
     // cpu -> gpu data
     auto dSz = sizeof(decltype(mMods_d)::type);
-    cudaErrChk(cudaMemcpy(mMods_d.data(), mPadded.data(), mMods_d.size()*dSz,
+    cudaErrChk(cudaMemcpyAsync(mMods_d.data(), mPadded.data(), mMods_d.size()*dSz,
         cudaMemcpyHostToDevice));"
     )
 set(viewGpu_tIntegratorComplexCopyPad "// cpu -> gpu data
     auto dSz = sizeof(decltype(mPhys_d)::type);
-    cudaErrChk(cudaMemcpy(mPhys_d.data(), in.data(), mPhys_d.size()*dSz,
+    cudaErrChk(cudaMemcpyAsync(mPhys_d.data(), in.data(), mPhys_d.size()*dSz,
         cudaMemcpyHostToDevice));"
     )
 
@@ -280,9 +280,9 @@ set(ProjectorviewGpu_tViewStorage "
         dimPhys.data(), pointers_d, indices_d);
 
     // cpu -> gpu metadata
-    cudaErrChk(cudaMemcpy(mods.pointers()[1].data(), pointers[1].data(),
+    cudaErrChk(cudaMemcpyAsync(mods.pointers()[1].data(), pointers[1].data(),
         psz*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
-    cudaErrChk(cudaMemcpy(mods.indices()[1].data(), indices[1].data(),
+    cudaErrChk(cudaMemcpyAsync(mods.indices()[1].data(), indices[1].data(),
         isz*sizeof(std::uint32_t), cudaMemcpyHostToDevice));"
 )
 
@@ -310,9 +310,9 @@ set(IntegratorviewGpu_tViewStorage "
         dimPhys.data(), pointers_d, indices_d);
 
     // cpu -> gpu metadata
-    cudaErrChk(cudaMemcpy(mods.pointers()[1].data(), pointers[1].data(),
+    cudaErrChk(cudaMemcpyAsync(mods.pointers()[1].data(), pointers[1].data(),
         psz*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
-    cudaErrChk(cudaMemcpy(mods.indices()[1].data(), indices[1].data(),
+    cudaErrChk(cudaMemcpyAsync(mods.indices()[1].data(), indices[1].data(),
         isz*sizeof(std::uint32_t), cudaMemcpyHostToDevice));"
 )
 

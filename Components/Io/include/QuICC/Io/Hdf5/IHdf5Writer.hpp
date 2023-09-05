@@ -24,6 +24,7 @@
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Io/Hdf5/Hdf5Types.hpp"
 #include "QuICC/Io/Hdf5/Hdf5File.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -272,6 +273,8 @@ namespace Hdf5 {
 
    template <typename T> void IHdf5Writer::writeRegularField(hid_t loc, const std::string dsname, const std::vector<std::tuple<int, int, const T *> >& storage)
    {
+      Profiler::RegionFixture<4> fix("IHdf5Writer::writeRegularField");
+
       // Get dimensionality of file data
       int nDims = this->mRegularDims.size();
 
@@ -368,6 +371,8 @@ namespace Hdf5 {
 
    template <typename T> void IHdf5Writer::writeIrregularField(hid_t loc, const std::string dsname, const std::vector<std::tuple<int, int, const T *> >& storage)
    {
+      Profiler::RegionFixture<4> fix("IHdf5Writer::writeIrregularField");
+
       // Get dimensionality of file data
       int nDims = this->mRegularDims.size();
 

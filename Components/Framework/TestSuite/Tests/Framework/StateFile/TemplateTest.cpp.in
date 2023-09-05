@@ -1,0 +1,78 @@
+/**
+ * @file @Scheme@WriteTest.cpp
+ * @brief Tests for the StateFile
+ */
+
+
+// System includes
+//
+
+// Project includes
+//
+#include "QuICC/Enums/Dimensions.hpp"
+#include "QuICC/Enums/FieldIds.hpp"
+#include "QuICC/QuICCEnv.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
+#include "QuICC/SpatialScheme/3D/@Scheme@.hpp"
+#include "QuICC/PhysicalNames/registerAll.hpp"
+#include "QuICC/Arithmetics/registerAll.hpp"
+#include "QuICC/TestSuite/Framework/StateFile/TestArgs.hpp"
+#include "QuICC/TestSuite/Framework/StateFile/TestHelper.hpp"
+#include "Profiler/Interface.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Framework::StateFile;
+
+static const auto badValueOut = std::numeric_limits<QuICC::MHDFloat>::max();
+
+TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
+
+   // Register IDs
+   QuICC::PhysicalNames::registerAll();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   QuICC::ArrayI dim = currentts::processCmdLine();
+
+   // convert factor vector to list
+   std::list<int> factorList(currentts::args().factors.begin(), currentts::args().factors.end());
+
+   // Create LoadSplitter, SpatialScheme and generate resolution
+   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList);
+
+   for(auto id: currentts::args().params)
+   {
+      currentts::Test test;
+      test.spRes = best.first;
+      test.configure(id);
+      test.maxUlp = currentts::args().ulp;
+
+      currentts::initVariables(test);
+
+      currentts::setVariables(test);
+
+      if(std::string("@Mode@").compare("write") == 0)
+      {
+         for(unsigned int it = 0; it <currentts::args().iter; it++)
+         {
+            currentts::writeStateFile(test);
+         }
+      }
+      else if(std::string("@Mode@").compare("read") == 0)
+      {
+         for(unsigned int it = 0; it <currentts::args().iter; it++)
+         {
+            currentts::readStateFile(test);
+         }
+
+         if(!currentts::args().timeOnly)
+         {
+            currentts::checkVariables(test);
+         }
+      }
+      else
+      {
+         throw std::logic_error("Unknown StateFile mode");
+      }
+
+   }
+}

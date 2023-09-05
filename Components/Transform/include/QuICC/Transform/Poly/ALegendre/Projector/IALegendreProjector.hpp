@@ -100,7 +100,7 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         void applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const override;
+         virtual void applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const override;
 
          /**
           * @brief Apply ith operator

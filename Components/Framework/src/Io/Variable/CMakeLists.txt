@@ -17,6 +17,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ISphericalTorPolEnergyWriter.cpp
   ISphericalTorPolLSpectrumWriter.cpp
   ISphericalTorPolMSpectrumWriter.cpp
+  ISphericalTorPolModeSpectrumWriter.cpp
   ISphericalTorPolNSpectrumWriter.cpp
   ISphericalTorPolRSpectrumWriter.cpp
   ISphericalTorPolPowerBaseWriter.cpp
@@ -36,7 +37,9 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ShellTorPolMSpectrumWriter.cpp
   ShellTorPolEnstrophyWriter.cpp
   SphereAngularMomentumWriter.cpp
+  SphereMaxAbsoluteFieldValueWriter.cpp
   SphereNusseltWriter.cpp
+  SphereScalarMeanWriter.cpp
   SphereScalarEnergyWriter.cpp
   SphereScalarLSpectrumWriter.cpp
   SphereScalarMSpectrumWriter.cpp
@@ -45,6 +48,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   SphereTorPolEnergyWriter.cpp
   SphereTorPolLSpectrumWriter.cpp
   SphereTorPolMSpectrumWriter.cpp
+  SphereTorPolModeSpectrumWriter.cpp
   SphereTorPolNSpectrumWriter.cpp
   SphereTorPolRSpectrumWriter.cpp
   SphereTorPolEnstrophyWriter.cpp

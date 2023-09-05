@@ -53,8 +53,8 @@ endif()
 if(NOT BOOST_ROOT)
   message(VERBOSE "setting BOOST_ROOT")
   list(APPEND _ALL_PATHS $ENV{CPATH} $ENV{C_INCLUDE_PATH} $ENV{CPLUS_INCLUDE_PATH})
-  if(NOT ${_ALL_PATHS} STREQUAL "")
-    string(REPLACE ":" ";" _ALL_PATHS ${_ALL_PATHS})
+  if(NOT "${_ALL_PATHS}" STREQUAL "")
+    string(REPLACE ":" ";" _ALL_PATHS "${_ALL_PATHS}")
     include(ListFindRegex)
     quicc_list(FIND_REGEX _ALL_PATHS "boost" BOOST_ROOT)
     message(VERBOSE "BOOST_ROOT: ${BOOST_ROOT}")
@@ -73,7 +73,7 @@ include(setup/Kokkos)
 #
 # Cuda
 #
-find_package(CUDAToolkit)
+find_package(CUDAToolkit 11.3)
 
 ###################################################
 #------------ THREADS PARALLELISATION ------------#

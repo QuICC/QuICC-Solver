@@ -28,10 +28,15 @@ class NewDelete : public memory_resource
 public:
     /// @brief ctor
     explicit NewDelete() = default;
-
     /// @brief dtor
     ~NewDelete() = default;
-
+    /// @brief delete copy ctor
+    /// @param
+    NewDelete (const NewDelete&) = delete;
+    /// @brief delete assignment operator
+    /// @param
+    /// @return
+    NewDelete& operator= (const NewDelete&) = delete;
 protected:
     /// @brief allocates memory
     /// @param bytes  size in bytes of the memory to be allocated
@@ -49,7 +54,6 @@ protected:
     /// @param other ref to memory resource
     /// @return true if equivalent
     bool do_is_equal(const QuICC::Memory::memory_resource& other) const noexcept override;
-
 };
 
 } // namespace Cpu

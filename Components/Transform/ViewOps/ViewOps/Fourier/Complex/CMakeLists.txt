@@ -6,7 +6,7 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} 
   Cpu/Mean.cpp
 )
 
-if(TARGET CUDA::cufft AND QUICC_USE_CUFFT)
+if(TARGET QuICC::Fft::CuFft)
   target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} PRIVATE
     Cuda/Diff.cu
     Cuda/Diff2D.cu

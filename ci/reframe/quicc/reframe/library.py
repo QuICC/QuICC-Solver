@@ -16,9 +16,10 @@ class testBase(rfm.RunOnlyRegressionTest):
     csv_rpt = variable(str, value='rpt.csv')
     steps = 100
     cscs_systems = ['daint:mc', 'manali:mc', 'dom:gpu', 'dom:mc']
-    local_systems = ['generic', 'g-X1']
+    local_systems = ['generic', 'g-X1', 'ph-fangorn']
     valid_systems = cscs_systems + local_systems
     valid_prog_environs = ['PrgEnv-cray', 'PrgEnv-gnu', 'builtin']
+    is_serial_test = True
     # only PrgEnv-cray supports affinity correctly
     use_multithreading = False
     system = rt.runtime().system
@@ -71,6 +72,10 @@ class testBase(rfm.RunOnlyRegressionTest):
                 'echo "SLURM_JOBID=$SLURM_JOBID"',
                 # f'# dims={self.dims} ',
                 # 'rm -f core*',
+            ]
+        elif(not self.is_serial_test):
+            self.job.launcher.options = [
+                '-n', str(self.num_tasks_per_node)
             ]
 
     @run_before('run')
@@ -126,6 +131,9 @@ class testBase(rfm.RunOnlyRegressionTest):
     def report_time_max(self, region):
         return self.report_time(region, 2)
 
+class testTransform(testBase):
+    """QuICC transform performance test
+    """
 
     @performance_function('s')
     def applyOperatorsAvg(self):
@@ -138,3 +146,43 @@ class testBase(rfm.RunOnlyRegressionTest):
     @performance_function('s')
     def applyOperatorsMax(self):
         return self.report_time_max(self.region)
+
+class testStateFile(testBase):
+    """QuICC transform performance test
+    """
+
+    @performance_function('s')
+    def perfIoAvg(self):
+        return self.report_time_avg(self.region)
+
+    @performance_function('s')
+    def perfIoMin(self):
+        return self.report_time_min(self.region)
+
+    @performance_function('s')
+    def perfIoMax(self):
+        return self.report_time_max(self.region)
+
+    @performance_function('s')
+    def perfIoScalarsAvg(self):
+        return self.report_time_avg(self.region+'-scalars')
+
+    @performance_function('s')
+    def perfIoScalarsMin(self):
+        return self.report_time_min(self.region+'-scalars')
+
+    @performance_function('s')
+    def perfIoScalarsMax(self):
+        return self.report_time_max(self.region+'-scalars')
+
+    @performance_function('s')
+    def perfIoVectorsAvg(self):
+        return self.report_time_avg(self.region+'-vectors')
+
+    @performance_function('s')
+    def perfIoVectorsMin(self):
+        return self.report_time_min(self.region+'-vectors')
+
+    @performance_function('s')
+    def perfIoVectorsMax(self):
+        return self.report_time_max(self.region+'-vectors')

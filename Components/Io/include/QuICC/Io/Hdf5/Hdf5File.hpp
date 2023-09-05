@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Hdf5File.hpp
  * @brief Implementation of a general HDF5 file
  */
@@ -11,9 +11,6 @@
 #include <string>
 #include <vector>
 #include <hdf5.h>
-
-// External includes
-//
 
 // Project includes
 //
@@ -50,7 +47,7 @@ namespace Hdf5 {
           * @brief Get filename
           */
          std::string  filename() const;
-         
+
       protected:
          /**
           * @brief Get the name
@@ -121,8 +118,10 @@ namespace Hdf5 {
 
          /**
           * @brief Get the dataset property list
+          *
+          * @param isRegular  Has regular access pattern?
           */
-         hid_t datasetPList(const bool isCollective);
+         hid_t datasetPList(const bool isRegular);
 
          /**
           * @brief Get the file property list
@@ -183,8 +182,8 @@ namespace Hdf5 {
          hid_t  mFile;
    };
 
-}
-}
-}
+} // Hdf5
+} // Io
+} // QuICC
 
 #endif // QUICC_IO_HDF5_HDF5FILE_HPP

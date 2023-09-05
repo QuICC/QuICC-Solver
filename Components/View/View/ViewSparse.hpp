@@ -60,8 +60,8 @@ namespace Memory {
       ViewBase<IndexType> _indices[_rank];
 
    public:
-      /// @brief deleted ctor
-      View() = delete;
+      /// @brief default ctor for empty view
+      View() = default;
       /// @brief dtor
       virtual ~View() = default;
 
@@ -194,6 +194,7 @@ namespace Memory {
       {
          if (_indices[0][i] == index)
          {
+            assert(i < this->_size);
             return this->_data[i];
          }
       }
@@ -230,6 +231,7 @@ namespace Memory {
          {
             if (_indices[1][idx] == jj)
             {
+               assert(idx < this->_size);
                return this->_data[idx];
             }
          }
@@ -259,17 +261,18 @@ namespace Memory {
       assert(j < _dimensions[1]);
       assert(k < _dimensions[2]);
 
-      if constexpr (std::is_same_v<LevelType, DimLevelType<compressed_t,dense_t,dense_t>>)
+      if constexpr (std::is_same_v<LevelType, DimLevelType<dense_t,dense_t,compressed_t>>)
       {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
             // column major
-            auto n_col = j + k*_dimensions[1];
-            for (IndexType idx = _pointers[0][n_col]; idx < _pointers[0][n_col+1]; ++idx)
+            for (IndexType idx = _pointers[2][0]; idx < _pointers[2][1]; ++idx)
             {
-               if (_indices[0][idx] == i)
+               if (_indices[2][idx] == k)
                {
-                  return this->_data[idx];
+                  auto kmn = idx*_dimensions[0]*_dimensions[1];
+                  assert(i+j*_dimensions[0]+kmn < this->_size);
+                  return this->_data[i+j*_dimensions[0]+kmn];
                }
             }
          }
@@ -290,8 +293,37 @@ namespace Memory {
             {
                if (_indices[1][idn] == j)
                {
+                  assert(i+idn*_dimensions[0] < this->_size);
                   return this->_data[i+idn*_dimensions[0]];
                }
+            }
+         }
+         else if constexpr (std::is_same_v<OrderType, LoopOrderType<j_t, i_t, k_t>>)
+         {
+            // JIK
+
+            // this can be improved with a binary search
+            IndexType jj = 0;
+            for (IndexType idn = _pointers[1][k]; idn < _pointers[1][k+1]; ++idn)
+            {
+               if (_indices[1][idn] == j)
+               {
+
+                  // compute layer shift
+                  IndexType kmn = 0;
+                  for (IndexType kk = 0; kk < k; ++kk)
+                  {
+
+                     kmn += _dimensions[0]* (_pointers[1][kk+1] - _pointers[1][kk]);
+                  }
+
+                  IndexType rowSize = _pointers[1][k+1] - _pointers[1][k];
+                  IndexType ijk = i*rowSize + jj + kmn;
+
+                  assert(ijk < this->_size);
+                  return this->_data[ijk];
+               }
+               ++jj;
             }
          }
          else
@@ -300,7 +332,7 @@ namespace Memory {
          }
          throw std::logic_error("Trying to refer to an implicit zero.");
       }
-      else if constexpr (std::is_same_v<LevelType, DimLevelType<triDense_t,dense_t,triDense_t>>)
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<triK_t, dense_t, dense_t>>)
       {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
@@ -315,6 +347,7 @@ namespace Memory {
                   kmn += _dimensions[0]-ii;
                }
                kmn *= _dimensions[1];
+               assert(i + j*m + kmn < this->_size);
                return this->_data[i + j*m + kmn];
             }
 
@@ -325,24 +358,161 @@ namespace Memory {
          }
          throw std::logic_error("Trying to refer to an implicit zero.");
       }
-      else if constexpr (std::is_same_v<LevelType, DimLevelType<triDense_t,dense_t,triCompressed_t>>)
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<triK_t, dense_t, compressed_t>>)
       {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
             // column major
             // use the knowledge that the column always start from zero and its size depends on the layer
             std::size_t kmn = 0;
+            const auto n = _dimensions[1];
             for (IndexType idx = _pointers[2][0]; idx < _pointers[2][1]; ++idx)
             {
                auto m = _dimensions[0]-k;
                auto p = _indices[2][idx];
                if ( p == k && i < m)
                {
-                  kmn *= _dimensions[1];
+                  kmn *= n;
+                  assert(i + j*m + kmn < this->_size);
                   return this->_data[i + j*m + kmn];
                }
+               // comulative m
                kmn += _dimensions[0]-p;
             }
+         }
+         else if constexpr (std::is_same_v<OrderType, LoopOrderType<j_t, i_t, k_t>>)
+         {
+            // i and j are swapped in memory
+            std::size_t kmn = 0;
+            const auto n = _dimensions[1];
+            for (IndexType idx = _pointers[2][0]; idx < _pointers[2][1]; ++idx)
+            {
+               auto m = _dimensions[0]-k;
+               auto p = _indices[2][idx];
+               if ( p == k && i < m)
+               {
+                  kmn *= n;
+                  assert(j + i*n + kmn < this->_size);
+                  return this->_data[j + i*n + kmn];
+               }
+               // comulative m
+               kmn += _dimensions[0]-p;
+            }
+         }
+         else
+         {
+            throw std::logic_error("Not implemented yet.");
+         }
+         throw std::logic_error("Trying to refer to an implicit zero.");
+      }
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<dense_t, triK_t, compressed_t>>)
+      {
+         if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
+         {
+            // column major
+            // use the knowledge that the row always start from zero and its size depends on the layer
+            std::size_t kmn = 0;
+            const auto m = _dimensions[0];
+            for (IndexType idx = _pointers[2][0]; idx < _pointers[2][1]; ++idx)
+            {
+               auto n = _dimensions[1]-k;
+               auto p = _indices[2][idx];
+               if ( p == k && j < n)
+               {
+                  kmn *= m;
+                  assert(i + j*m + kmn < this->_size);
+                  return this->_data[i + j*m + kmn];
+               }
+               // comulative n
+               kmn += _dimensions[1]-p;
+            }
+         }
+         else if constexpr (std::is_same_v<OrderType, LoopOrderType<j_t, i_t, k_t>>)
+         {
+            // i and j are swapped in memory
+            std::size_t kmn = 0;
+            const auto m = _dimensions[0];
+            for (IndexType idx = _pointers[2][0]; idx < _pointers[2][1]; ++idx)
+            {
+               auto n = _dimensions[1]-k;
+               auto p = _indices[2][idx];
+               if ( p == k && j < n)
+               {
+                  kmn *= m;
+                  assert(j + i*n + kmn < this->_size);
+                  return this->_data[j + i*n + kmn];
+               }
+               // comulative n
+               kmn += _dimensions[1]-p;
+            }
+         }
+         else
+         {
+            throw std::logic_error("Not implemented yet.");
+         }
+         throw std::logic_error("Trying to refer to an implicit zero.");
+      }
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<triK_t, CSC_t, CSC_t>>)
+      {
+         if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
+         {
+            // column major
+            // use the knowledge that the column always start from zero and its size depends on the layer
+
+            const auto M = _dimensions[0];
+            const auto K = _dimensions[2];
+            assert(_pointers[1].size() == K+1);
+
+            IndexType kmn = 0;
+            for (IndexType idx = _pointers[1][k]; idx < _pointers[1][k+1]; ++idx)
+            {
+               IndexType currColSize = M - k;
+               if (j == _indices[1][idx] && i < currColSize)
+               {
+                  // compute column shift
+                  for (IndexType kk = 0; kk < k; ++kk)
+                  {
+                     IndexType colSize = M - kk;
+                     kmn += colSize* (_pointers[1][kk+1] - _pointers[1][kk]);
+                  }
+                  assert(i + kmn < this->_size);
+                  return this->_data[i + kmn];
+               }
+               kmn += currColSize;
+            }
+         }
+         else if constexpr (std::is_same_v<OrderType, LoopOrderType<j_t, i_t, k_t>>)
+         {
+            // JIK
+            // use the knowledge that the column always start from zero and its size depends on the layer
+
+            const auto M = _dimensions[0];
+            const auto K = _dimensions[2];
+            assert(_pointers[1].size() == K+1);
+
+            // compute row shift
+            IndexType jj = 0;
+            for (IndexType idx = _pointers[1][k]; idx < _pointers[1][k+1]; ++idx)
+            {
+               IndexType currColSize = M - k;
+               IndexType currRowSize = _pointers[1][k+1] - _pointers[1][k];
+               if (j == _indices[1][idx] && i < currColSize)
+               {
+
+                  // compute layer shift
+                  IndexType kmn = 0;
+                  for (IndexType kk = 0; kk < k; ++kk)
+                  {
+                     IndexType colSize = M - kk;
+                     kmn += colSize* (_pointers[1][kk+1] - _pointers[1][kk]);
+                  }
+
+                  assert(i*currRowSize + jj + kmn < this->_size);
+                  return this->_data[i*currRowSize + jj + kmn];
+               }
+               ++jj;
+            }
+
          }
          else
          {

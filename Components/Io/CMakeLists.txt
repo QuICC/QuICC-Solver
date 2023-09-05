@@ -9,9 +9,6 @@ set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
 # Add source directory
 add_subdirectory(src)
 
-# Teststuite
-include(cmake.d/setup/TestSuite.cmake)
-
 # Inteface target for all components
 add_library("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE)
 target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"

@@ -55,7 +55,7 @@ std::size_t memBlockSize(ViewType v)
    std::size_t size = sizeof(typename ViewType::ScalarType) * v.size();
 
    // compressed only
-   if constexpr (!isLevelTypeFullyDense_v<typename ViewType::LevelType>)
+   if constexpr (!isDimLevelTypeDense_v<typename ViewType::LevelType>)
    {
       for (std::size_t i = 0; i < v.rank(); ++i)
       {
@@ -70,7 +70,7 @@ std::size_t memBlockSize(ViewType v)
 template <class ViewType>
 std::array<std::size_t, 4> memOffsets(ViewType v)
 {
-   static_assert(!isLevelTypeFullyDense_v<typename ViewType::LevelType>);
+   static_assert(!isDimLevelTypeDense_v<typename ViewType::LevelType>);
 
    std::array<std::size_t, 4> offsets;
    offsets[0] = 0;
@@ -85,7 +85,7 @@ std::array<std::size_t, 4> memOffsets(ViewType v)
 template <class ViewType>
 std::array<std::size_t, 4> memBlockOffsets(ViewType v)
 {
-   static_assert(!isLevelTypeFullyDense_v<typename ViewType::LevelType>);
+   static_assert(!isDimLevelTypeDense_v<typename ViewType::LevelType>);
 
    std::array<std::size_t, 4> offsets;
    offsets[0] = 0;

@@ -60,8 +60,8 @@ namespace Memory {
       IndexType _strides[_rank];
 
    public:
-      /// @brief deleted ctor
-      ViewDenseBase() = delete;
+      /// @brief default ctor for empty view
+      ViewDenseBase() = default;
       /// @brief dtor
       virtual ~ViewDenseBase() = default;
 

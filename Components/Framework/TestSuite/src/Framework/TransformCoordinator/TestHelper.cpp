@@ -134,7 +134,7 @@ namespace TCoord {
 
       if(args().params.size() == 0)
       {
-         std::cerr << "Seting zero" << std::endl;
+         std::cerr << "Setting zero" << std::endl;
          args().params.push_back(0);
       }
 

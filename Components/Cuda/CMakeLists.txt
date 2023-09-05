@@ -31,8 +31,12 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
   INTERFACE CUDA::cudart)
 
+  target_compile_definitions(${QUICC_CURRENT_COMPONENT_LIB}
+    INTERFACE QUICC_HAS_CUDA_BACKEND)
+
 # Alias
-add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS "${QUICC_CURRENT_COMPONENT_LIB}")
+add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS
+  "${QUICC_CURRENT_COMPONENT_LIB}")
 
 # # Teststuite
 # option(QUICC_TESTSUITE_Cuda "Enable Cuda component testsuite?" OFF)

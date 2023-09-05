@@ -3,9 +3,7 @@
 ```bash
 module load daint-gpu
 module switch PrgEnv-cray PrgEnv-gnu
-module load cray-fftw cray-hdf5-parallel cray-python cray-tpsl Boost
-module use /apps/daint/UES/eurohack/modules/all
-module load CMake/3.21.2
+module load cray-fftw cray-hdf5-parallel cray-python cray-tpsl Boost CMake
 
 cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
 -DQUICC_USE_MPI=ON \
@@ -55,9 +53,7 @@ make
 ```bash
 module load daint-mc
 module switch PrgEnv-cray PrgEnv-gnu
-module load cray-fftw cray-hdf5-parallel cray-python cray-tpsl Boost
-module use /apps/daint/UES/eurohack/modules/all
-module load CMake/3.21.2
+module load cray-fftw cray-hdf5-parallel cray-python cray-tpsl Boost CMake
 
 cmake </path/to/QuICC> -DCMAKE_CXX_COMPILER=CC \
 -DQUICC_USE_MPI=ON \

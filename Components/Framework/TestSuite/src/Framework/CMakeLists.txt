@@ -4,6 +4,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_TEST_LIB} ${QUICC_CMAKE_SRC_VISIB
 
 add_subdirectory(Communicators)
 add_subdirectory(LoadSplitter)
+add_subdirectory(StateFile)
 add_subdirectory(Timestep)
 add_subdirectory(Transform)
 add_subdirectory(TransformConfigurators)
