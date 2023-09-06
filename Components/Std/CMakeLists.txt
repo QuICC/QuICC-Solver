@@ -1,6 +1,6 @@
 
 # CMake setup for c++ std/boost wrappers
-set(QUICC_CURRENT_COMPONENT_LIB Cpp)
+set(QUICC_CURRENT_COMPONENT_LIB Std)
 set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")
 message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}" )
 
@@ -14,7 +14,8 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 )
 
 set(PHS
-  Cpp/Span.hpp
+  Std/Span.hpp
+  Std/Cuda/Utility.hpp
 )
 
 # Add public header

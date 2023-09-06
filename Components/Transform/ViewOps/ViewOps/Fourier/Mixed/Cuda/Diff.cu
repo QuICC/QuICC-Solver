@@ -34,15 +34,11 @@ namespace details
         constexpr bool isComplex = Order % 2;
         constexpr int sgn = 1 - 2*static_cast<int>((Order/2) % 2);
 
-        const auto M = out.dims()[0];
-        const auto N = out.dims()[1];
+        const auto M = in.lds();
+        const auto N = in.dims()[1];
 
         // dealias bounds
-        std::size_t nDealias = M;
-        if constexpr (Treatment & dealias_m)
-        {
-            nDealias *= dealias::rule;
-        }
+        const auto nDealias = in.dims()[0];
 
         cuDoubleComplex c;
         if constexpr (isComplex)
@@ -88,12 +84,9 @@ namespace details
                 }
             }
 
-            if constexpr (Treatment & dealias_m)
+            if (m >= nDealias)
             {
-                if (m >= nDealias)
-                {
-                    tmpC = {0.0, 0.0};
-                }
+                tmpC = {0.0, 0.0};
             }
 
             // map y blocks to columns loop with thread coarsening
@@ -122,16 +115,17 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
 {
     Profiler::RegionFixture<4> fix("DiffOp::applyImpl");
 
+    assert(out.size() == in.size());
     assert(out.dims()[0] == in.dims()[0]);
     assert(out.dims()[1] == in.dims()[1]);
     assert(out.dims()[2] == in.dims()[2]);
     assert(QuICC::Cuda::isDeviceMemory(out.data()));
 
     if constexpr (std::is_same_v<Direction, bwd_t> &&
-        Treatment == none_m &&  Order == 0)
+        Treatment == none_m && Order == 0)
     {
         // if the diff is in place it is a noop
-        if(out.data() == in.data())
+        if(out.data() == in.data() && out.dims()[0] == out.lds())
         {
             return;
         }
@@ -142,7 +136,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     blockSize.y = 1;
     blockSize.z = 1;
     dim3 numBlocks;
-    numBlocks.x = (in.dims()[0] + blockSize.x - 1) / blockSize.x;
+    numBlocks.x = (in.lds() + blockSize.x - 1) / blockSize.x;
     auto indices = in.indices()[1];
     auto columns = indices.size();
     numBlocks.y = (columns + tCF - 1) / tCF;
@@ -159,15 +153,10 @@ template class DiffOp<mods_t, mods_t, 2, fwd_t>;
 template class DiffOp<mods_t, mods_t, 3, fwd_t>;
 template class DiffOp<mods_t, mods_t, 4, fwd_t>;
 template class DiffOp<mods_t, mods_t, 0, bwd_t>;
-template class DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 1, bwd_t>;
-template class DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 2, bwd_t>;
-template class DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 3, bwd_t>;
-template class DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 4, bwd_t>;
-template class DiffOp<mods_t, mods_t, 4, bwd_t, dealias_m>;
 
 } // namespace Cuda
 } // namespace Mixed

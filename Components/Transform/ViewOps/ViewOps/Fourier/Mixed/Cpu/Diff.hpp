@@ -22,11 +22,12 @@ namespace Cpu {
 using namespace QuICC::Operator;
 
 /// @brief Derived classes implement the differentiation in modal space
+/// the padded region is set to zero
 /// @tparam Tout differentiated modes type
 /// @tparam Tin input modes type
 /// @tparam Order of differentiation
 /// @tparam Direction Fft direction tag
-/// @tparam Treatment special treatment mask, typically of mode zero or dealiasing
+/// @tparam Treatment special treatment mask, typically of mode zero
 template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment = 0>
 class DiffOp : public BinaryBaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin, typename Tout::ScalarType::value_type> {
 public:

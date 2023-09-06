@@ -17,8 +17,8 @@ namespace Integrator {
 
 using namespace QuICC::Memory;
 
-using mods_t = View<std::complex<double>, DCCSC3D>;
-using phys_t = View<std::complex<double>, DCCSC3D>;
+using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
+using phys_t = View<std::complex<double>, DCCSC3DInOrder>;
 
 template<class Tout, class Tin, class FftBackend, class DiffBackend, class DiffBackend2>
 DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>::DOp(ScaleType scale) : mFft(std::make_unique<FftBackend>()),

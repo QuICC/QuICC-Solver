@@ -21,18 +21,25 @@ namespace Memory {
    //
 
    /// @brief tag type for dense level
+   /// a dense level has implicit coordinates
+   /// zeros are stored explicitly
    struct dense_t {};
 
    /// @brief tag type for compressed level
+   /// a compressed level has explicit coordinates
    struct compressed_t {};
 
-   /// @brief tag type for dense direction with implicit start from zero
-   /// and the length is implicity equal to K (3rd) index
-   struct triK_t {};
+   /// @brief tag type for sparse level
+   /// a sparse level has implicit coordinates
+   /// zeros are not stored explicitly
+   /// for instance <sparse_t, compressed_t> -> CSR
+   /// this tag needs always be associated with a compressed_t tag
+   struct sparse_t {};
 
-   /// @brief tag type block structured compression akin a 2D sparse matrix which elements
-   /// are dense 1D array
-   struct CSC_t {};
+   /// @brief tag type for dense level with implicit start from zero
+   /// and the length is implicity equal to K (3rd) index
+   /// \todo template on tag index
+   struct triK_t {};
 
    /// @brief check if a type is a valid level type attribute
    /// @tparam T type to be checked
@@ -47,13 +54,13 @@ namespace Memory {
    template <>
    struct isLevelType<compressed_t> : std::true_type{};
 
+   /// @brief enable sparse_t tag
+   template <>
+   struct isLevelType<sparse_t> : std::true_type{};
+
    /// @brief enable triK_t tag
    template <>
    struct isLevelType<triK_t> : std::true_type{};
-
-   /// @brief enable CSC_t tag
-   template <>
-   struct isLevelType<CSC_t> : std::true_type{};
 
    /// @brief helper
    /// @tparam T level tag
@@ -195,6 +202,10 @@ namespace Memory {
 
    /// @brief tag type for logical first index
    struct i_t {};
+   /// @brief tag type for logical first index
+   /// with in-order mapping (complex DFT) [-N...N] -> [0...N,-N...-1]
+   /// which requires special mapping for padding
+   struct iInOrder_t {};
    /// @brief tag type for logical second index
    struct j_t {};
    /// @brief tag type for logical third index
@@ -210,6 +221,10 @@ namespace Memory {
    /// @brief enable i_t
    template <>
    struct isLoopType<i_t> : std::true_type{};
+
+   /// @brief enable iInOrder_t
+   template <>
+   struct isLoopType<iInOrder_t> : std::true_type{};
 
    /// @brief enable j_t
    template <>
@@ -410,7 +425,20 @@ namespace Memory {
     * FFT in/out types on cpu / gpu
     *
     */
-   using DCCSC3D = Attributes<DimLevelType<dense_t, CSC_t, CSC_t>>;
+   using DCCSC3D = Attributes<DimLevelType<dense_t, compressed_t, sparse_t>>;
+
+   /**
+    * @brief 2D CSC column major matrix (N,K) which elements are 1D dense vectors,
+    * i.e a 3D tensor (M,N,K) with fully populated columns
+    *
+    * used as
+    * AL projector output type on cpu
+    * FFT in/out types on cpu / gpu
+    *
+    */
+   using DCCSC3DInOrder = Attributes<DimLevelType<dense_t, compressed_t, sparse_t>,
+      LoopOrderType<iInOrder_t, j_t, k_t>>;
+
 
    /**
     * @brief 2D CSC column major matrix (N,K) which elements are 1D dense vectors,
@@ -420,7 +448,7 @@ namespace Memory {
     * AL projector output type on gpu
     *
     */
-   using DCCSC3DJIK = Attributes<DimLevelType<dense_t, CSC_t, CSC_t>,
+   using DCCSC3DJIK = Attributes<DimLevelType<dense_t, compressed_t, sparse_t>,
       LoopOrderType<j_t, i_t, k_t>>;
 
    /**
@@ -440,13 +468,13 @@ namespace Memory {
     * @brief AL projector input type on cpu
     * Triangular column layer, with (N,K) plane a 2D CSC column major matrix
     */
-   using TRCLCSC3D = Attributes<DimLevelType<triK_t, CSC_t, CSC_t>>;
+   using TRCLCSC3D = Attributes<DimLevelType<triK_t, compressed_t, sparse_t>>;
 
    /**
     * @brief AL projector input type on gpu
     * Triangular column layer, with (N,K) plane a 2D CSC column major matrix
     */
-   using TRCLCSC3DJIK = Attributes<DimLevelType<triK_t, CSC_t, CSC_t>,
+   using TRCLCSC3DJIK = Attributes<DimLevelType<triK_t, compressed_t, sparse_t>,
       LoopOrderType<j_t, i_t, k_t>>;
 
 

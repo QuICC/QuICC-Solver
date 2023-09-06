@@ -12,15 +12,8 @@
 
 // Project includes
 //
-#include "Cpp/Span.hpp"
-
-#ifdef __CUDACC__
-#define QUICC_CUDA_HOSTDEV __host__ __device__
-#define QUICC_CUDA_HOST __host__
-#else
-#define QUICC_CUDA_HOSTDEV
-#define QUICC_CUDA_HOST
-#endif
+#include "Std/Span.hpp"
+#include "View/ViewMacros.hpp"
 
 using QuICC::Patch::std::span;
 

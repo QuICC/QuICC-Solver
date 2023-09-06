@@ -69,18 +69,19 @@ namespace details
 template<class AttIn, class AttOut>
 void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>::applyImpl(View<std::complex<double>, AttOut>& phys, const View<std::complex<double>, AttIn>& mods)
 {
-    assert(phys.dims()[0] == mods.dims()[0]);
     if(_plan == nullptr)
     {
         Profiler::RegionFixture<4> fix("Fftw::FftOp::initFft-CtoC");
         int columns = 0;
         if constexpr(std::is_same_v<AttIn, dense2D>)
         {
+            assert(phys.dims()[0] == mods.dims()[0]);
             assert(phys.dims()[1] == mods.dims()[1]);
             columns = phys.dims()[1];
         }
-        else if constexpr(std::is_same_v<AttIn, DCCSC3D>)
+        else if constexpr(std::is_same_v<AttIn, DCCSC3DInOrder>)
         {
+            assert(phys.dims()[0] == mods.lds());
             assert(phys.indices()[1].size() == mods.indices()[1].size());
             columns = phys.indices()[1].size();
         }
@@ -99,7 +100,7 @@ void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>
 
 // Explicit instantiations
 template class FftOp<CphysDense2D_t, CmodsDense2D_t>;
-template class FftOp<CphysDCCSC3D_t, CmodsDCCSC3D_t>;
+template class FftOp<CphysDCCSC3DInOrder_t, CmodsDCCSC3DInOrder_t>;
 
 } // namespace Fftw
 } // namespace Fft

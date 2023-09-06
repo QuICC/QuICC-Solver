@@ -3,6 +3,41 @@
 #include "View/ViewSparse.hpp"
 
 
+TEST_CASE("ViewOneDimSparse", "[ViewOneDimSparse]")
+{
+    using namespace QuICC::Memory;
+
+    constexpr size_t SF = 10;
+    std::array<double, SF> fullData = {0,0,3,4,5,0,7,0,0,10};
+    constexpr size_t S = 5;
+    std::array<double, S> data = {3,4,5,7,10};
+    std::array<std::uint32_t, 1> dimensions {SF};
+    std::array<std::vector<std::uint32_t>, 1> pointers = {{{0,5}}};
+    std::array<std::vector<std::uint32_t>, 1> indices = {{{2,3,4,6,9}}};
+
+    using sparse1D = DimLevelType<compressed_t>;
+    View<double, Attributes<sparse1D>> someView (data, dimensions, pointers, indices);
+
+    CHECK(someView.rank() == 1);
+    CHECK(someView.dims()[0] == SF);
+    CHECK(someView.lds() == 0);
+
+    // check data
+    for (std::size_t i = 0; i < S; ++i)
+    {
+        CHECK(data[i] == someView.data()[i]);
+    }
+
+    for (std::size_t i = 0; i < S; ++i)
+    {
+        CHECK(fullData[indices[0][i]] == someView(indices[0][i]));
+    }
+
+    CHECK_THROWS(fullData[0] == someView(0));
+}
+
+
+
 TEST_CASE("ViewCopy", "[ViewCopy]")
 {
     using namespace QuICC::Memory;
@@ -24,6 +59,7 @@ TEST_CASE("ViewCopy", "[ViewCopy]")
 
     CHECK(someView.rank() == 1);
     CHECK(someView.dims()[0] == SF);
+    CHECK(someView.lds() == 0);
 
     // check data
     for (std::size_t i = 0; i < S; ++i)
@@ -40,41 +76,7 @@ TEST_CASE("ViewCopy", "[ViewCopy]")
 
 }
 
-
-TEST_CASE("ViewOneDimSparse", "[ViewOneDimSparse]")
-{
-    using namespace QuICC::Memory;
-
-    constexpr size_t SF = 10;
-    std::array<double, SF> fullData = {0,0,3,4,5,0,7,0,0,10};
-    constexpr size_t S = 5;
-    std::array<double, S> data = {3,4,5,7,10};
-    std::array<std::uint32_t, 1> dimensions {SF};
-    std::array<std::vector<std::uint32_t>, 1> pointers = {{{0,5}}};
-    std::array<std::vector<std::uint32_t>, 1> indices = {{{2,3,4,6,9}}};
-
-    using sparse1D = DimLevelType<compressed_t>;
-    View<double, Attributes<sparse1D>> someView (data, dimensions, pointers, indices);
-
-    CHECK(someView.rank() == 1);
-    CHECK(someView.dims()[0] == SF);
-
-    // check data
-    for (std::size_t i = 0; i < S; ++i)
-    {
-        CHECK(data[i] == someView.data()[i]);
-    }
-
-    for (std::size_t i = 0; i < S; ++i)
-    {
-        CHECK(fullData[indices[0][i]] == someView(indices[0][i]));
-    }
-
-    CHECK_THROWS(fullData[0] == someView(0));
-
-}
-
-TEST_CASE("ViewTwoDimCSRrowMaj", "[ViewTwoDimCSRrowMaj]")
+TEST_CASE("View Two Diminsional CSR", "[ViewTwoDimCSR]")
 {
     using namespace QuICC::Memory;
 
@@ -86,16 +88,16 @@ TEST_CASE("ViewTwoDimCSRrowMaj", "[ViewTwoDimCSRrowMaj]")
     constexpr size_t S = 3;
     std::array<double, S> data = {1,3,2};
 
-    using CSR = DimLevelType<dense_t, compressed_t>;
-    using rowMaj = LoopOrderType<j_t, i_t>;
+    using CSR = DimLevelType<sparse_t, compressed_t>;
     std::array<std::uint32_t, 2> dimensions {M, N};
     std::array<std::vector<std::uint32_t>, 2> pointers = {{ {}, {0,2,2,3}}};
     std::array<std::vector<std::uint32_t>, 2> indices = {{ {}, {0,3,0}}};
-    View<double, Attributes<CSR, rowMaj>> someView (data, dimensions, pointers, indices);
+    View<double, Attributes<CSR>> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 2);
     CHECK(someView.dims()[0] == M);
     CHECK(someView.dims()[1] == N);
+    CHECK(someView.lds() == 0);
 
     for (std::size_t l = 0; l < S; ++l)
     {
@@ -109,7 +111,7 @@ TEST_CASE("ViewTwoDimCSRrowMaj", "[ViewTwoDimCSRrowMaj]")
     CHECK_THROWS(fullData[1] == someView(1, 0));
 }
 
-TEST_CASE("ViewTwoDimCSRcolMaj", "[ViewTwoDimCSRcolMaj]")
+TEST_CASE("View Two Dimensional CSC", "[ViewTwoDimCSC]")
 {
     using namespace QuICC::Memory;
 
@@ -121,16 +123,16 @@ TEST_CASE("ViewTwoDimCSRcolMaj", "[ViewTwoDimCSRcolMaj]")
     constexpr size_t S = 3;
     std::array<double, S> data = {1,2,3};
 
-    using CSR = DimLevelType<dense_t, compressed_t>;
-    using colMaj = LoopOrderType<i_t, j_t>;
+    using CSC = DimLevelType<compressed_t, sparse_t>;
     std::array<std::uint32_t, 2> dimensions {M, N};
-    std::array<std::vector<std::uint32_t>, 2> pointers = {{ {}, {0,2,2,2,3}}};
-    std::array<std::vector<std::uint32_t>, 2> indices = {{ {}, {0,2,0}}};
-    View<double, Attributes<CSR, colMaj>> someView (data, dimensions, pointers, indices);
+    std::array<std::vector<std::uint32_t>, 2> pointers = {{ {0,2,2,2,3}, {}}};
+    std::array<std::vector<std::uint32_t>, 2> indices = {{ {0,2,0}, {}}};
+    View<double, Attributes<CSC>> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 2);
     CHECK(someView.dims()[0] == M);
     CHECK(someView.dims()[1] == N);
+    CHECK(someView.lds() == 0);
 
     for (std::size_t l = 0; l < S; ++l)
     {
@@ -342,7 +344,6 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer ColMaj ", 
 
     // Akin distributed AL op
     // Dense column, dense triangular row, compressed triangular layer
-    using CTRRL3D = Attributes<DimLevelType<dense_t, triK_t, compressed_t>>;
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {0,2}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {}, {0,3}}};
@@ -394,17 +395,16 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer, Row Colum
 
     // Akin distributed AL op
     // Dense column, dense triangular row, compressed triangular layer
-    using CTRRL3D = DimLevelType<dense_t, triK_t, compressed_t>;
-    using JIK = LoopOrderType<j_t, i_t, k_t>;
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {0,2}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {}, {0,3}}};
-    View<double, Attributes<CTRRL3D, JIK>> someView (data, dimensions, pointers, indices);
+    View<double, CTRRL3DJIK> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 3);
     CHECK(someView.dims()[0] == M);
     CHECK(someView.dims()[1] == N);
     CHECK(someView.dims()[2] == K);
+    CHECK(someView.lds() == 0);
 
     for (std::size_t l = 0; l < S; ++l)
     {
@@ -447,17 +447,16 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer, Row Colum
 
     // Akin distributed AL op
     // Dense column, dense triangular row, compressed triangular layer
-    using CTRRL3D = DimLevelType<dense_t, triK_t, compressed_t>;
-    using JIK = LoopOrderType<j_t, i_t, k_t>;
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {0,2}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {}, {1,3}}};
-    View<double, Attributes<CTRRL3D, JIK>> someView (data, dimensions, pointers, indices);
+    View<double, CTRRL3DJIK> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 3);
     CHECK(someView.dims()[0] == M);
     CHECK(someView.dims()[1] == N);
     CHECK(someView.dims()[2] == K);
+    CHECK(someView.lds() == 0);
 
     for (std::size_t l = 0; l < S; ++l)
     {
@@ -510,6 +509,59 @@ TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer ColMaj", "[ViewThreeDimDCCSCC
     CHECK(someView.dims()[0] == M);
     CHECK(someView.dims()[1] == N);
     CHECK(someView.dims()[2] == K);
+    CHECK(someView.lds() == M);
+
+    for (std::size_t l = 0; l < S; ++l)
+    {
+        CHECK(data[l] == someView.data()[l]);
+    }
+
+    CHECK(fullData[0] == someView(0, 0, 0));
+    CHECK(fullData[2] == someView(2, 0, 0));
+    CHECK(fullData[1+M*0+M*N*1] == someView(1, 0, 1));
+    CHECK(fullData[0+M*1+M*N*3] == someView(0, 1, 3));
+
+    CHECK_THROWS(fullData[0+M*1] == someView(0, 1, 0));
+}
+
+TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer ColMaj Padded", "[ViewThreeDimDCCSCColMajPadded]")
+{
+    using namespace QuICC::Memory;
+
+    constexpr size_t M = 4;
+    constexpr size_t N = 2;
+    constexpr size_t K = 4;
+    constexpr size_t lds = 6;
+    constexpr size_t SF = M*N*K;
+    std::array<double, SF> fullData = {1,2,3,4,
+                                       0,0,0,0,
+                                         5,6,7,8,
+                                         0,0,0,0,
+                                           0,0,0,0,
+                                           0,0,0,0,
+                                             9,10,11,12,
+                                             13,14,15,16};
+
+    constexpr size_t S = lds*N*2;
+    std::array<double, S> data = {1,2,3,4,0,0,
+                                  5,6,7,8,0,0,
+                                        9,10,11,12,0,0,
+                                        13,14,15,16,0,0};
+
+
+    // Akin distributed Fourier op
+    // 2D CSC column major matrix (N,K) which elements are 1D dense vectors,
+    // i.e a 3D tensor (M,N,K) with fully populated columns
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+    std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {0,1,2,2,4}, {}}};
+    std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {0,0,0,1}, {}}};
+    View<double, DCCSC3D> someView (data, dimensions, pointers, indices, lds);
+
+    CHECK(someView.rank() == 3);
+    CHECK(someView.dims()[0] == M);
+    CHECK(someView.dims()[1] == N);
+    CHECK(someView.dims()[2] == K);
+    CHECK(someView.lds() == lds);
 
     for (std::size_t l = 0; l < S; ++l)
     {

@@ -20,7 +20,7 @@ namespace Cuda {
 using namespace QuICC::Memory;
 
 /// @brief Compressed sparse layer 3D tensor (Implicit column major)
-using mods_t = View<std::complex<double>, DCCSC3D>;
+using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
 
 /// @brief thread coarsening factor
 constexpr std::size_t tCF = 8;
@@ -37,7 +37,7 @@ namespace details
         assert(out.dims()[1] == in.dims()[1]);
         assert(out.dims()[2] == in.dims()[2]);
 
-        const auto M = in.dims()[0];
+        const auto M = in.lds();
 
         double fftScaling = 1.0;
         if constexpr (std::is_same_v<Direction, fwd_t> )
@@ -103,7 +103,7 @@ template<class Tout, class Tin, class Direction>
 void MeanOp<Tout, Tin, Direction>::applyImpl(Tout& out, const Tin& in)
 {
     static_assert(std::is_same_v<typename Tin::LevelType, DCCSC3D::level>,
-        "implementation assumes dense, CSC, CSC");
+        "implementation assumes dense, compressed, sparse");
 
     Profiler::RegionFixture<4> fix("MeanOp::applyImpl");
 

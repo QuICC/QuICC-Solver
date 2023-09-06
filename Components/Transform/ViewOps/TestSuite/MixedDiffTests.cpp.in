@@ -77,34 +77,36 @@ TEST_CASE("Mixed Diff 0 Backwards @Tag@ with dealiasing", "[MixedDiff0Bwd@Tag@De
 {
     using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
 
-    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>>();
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 0, bwd_t>>();
 
     // mods dims
-    constexpr std::size_t M = 10;
+    constexpr double rule = 3./2.;
+    constexpr std::size_t lds = 10;
+    constexpr std::size_t M = lds/rule;
     constexpr std::size_t N = 3;
     constexpr std::size_t K = 5;
     std::array<std::uint32_t, 3> dimensions {M, N, K};
 
     // mods storage
-    constexpr std::size_t S = M*4;
+    constexpr std::size_t S = lds*4;
     std::vector<typename mods_t::ScalarType> modsIn(S);
     std::vector<typename mods_t::ScalarType> modsOut(S);
 
     // set input modes
     std::size_t m = 0;
-    for(; m < M; ++m)
+    for(; m < lds; ++m)
     {
         modsIn[m] = 1.0;
     }
-    for(; m < 2*M; ++m)
+    for(; m < 2*lds; ++m)
     {
         modsIn[m] = 1.0;
     }
-    for(; m < 3*M; ++m)
+    for(; m < 3*lds; ++m)
     {
         modsIn[m] = 1.0;
     }
-    for(; m < 4*M; ++m)
+    for(; m < 4*lds; ++m)
     {
         modsIn[m] = 1.0;
     }
@@ -113,10 +115,10 @@ TEST_CASE("Mixed Diff 0 Backwards @Tag@ with dealiasing", "[MixedDiff0Bwd@Tag@De
     // host view
     std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
     std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
-    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
-    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+    mods_t modsInV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices, lds);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices, lds);
 
-    @View3D@
+    @View3DDealias@
 
     // apply
     diffOp->apply(modsOutV, modsInV, 1.0);
@@ -129,16 +131,20 @@ TEST_CASE("Mixed Diff 0 Backwards @Tag@ with dealiasing", "[MixedDiff0Bwd@Tag@De
     CHECK(modsOutV(2,1,0) == modsInV(2,1,0));
     CHECK(modsOutV(4,1,0) == modsInV(4,1,0));
 
-    CHECK(modsOutV(M/3*2,1,0) == 0.0);
-    CHECK(modsOutV(M-1,1,0) == 0.0);
+    // CHECK(modsOutV(M,1,0) == 0.0); // triggers assert
+    CHECK(modsOutV.data()[M+lds] == 0.0);
+    // CHECK(modsOutV(lds-1,1,0) == 0.0); // triggers assert
+    CHECK(modsOutV.data()[lds-1+lds] == 0.0);
 
     CHECK(modsOutV(0,0,4) == modsInV(0,0,4));
     CHECK(modsOutV(1,0,4) == modsInV(1,0,4));
     CHECK(modsOutV(2,0,4) == modsInV(2,0,4));
     CHECK(modsOutV(4,0,4) == modsInV(4,0,4));
 
-    CHECK(modsOutV(M/3*2,0,4) == 0.0);
-    CHECK(modsOutV(M-1,0,4) == 0.0);
+    // CHECK(modsOutV(M,0,4) == 0.0); // triggers assert
+    CHECK(modsOutV.data()[M+lds*3] == 0.0);
+    // CHECK(modsOutV(lds-1,0,4) == 0.0); // triggers assert
+    CHECK(modsOutV.data()[lds-1+lds*3] == 0.0);
 
 }
 
@@ -146,34 +152,36 @@ TEST_CASE("Mixed Diff 0 Backwards @Tag@ with dealiasing in place", "[MixedDiff0B
 {
     using namespace QuICC::Transform::Fourier::Mixed::@Tag@;
 
-    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>>();
+    auto diffOp = std::make_unique<DiffOp<mods_t, mods_t, 0, bwd_t>>();
 
     // mods dims
-    constexpr std::size_t M = 10;
+    constexpr double rule = 3./2.;
+    constexpr std::size_t lds = 10;
+    constexpr std::size_t M = lds/rule;
     constexpr std::size_t N = 3;
     constexpr std::size_t K = 5;
     std::array<std::uint32_t, 3> dimensions {M, N, K};
 
     // mods storage
-    constexpr std::size_t S = M*4;
+    constexpr std::size_t S = lds*4;
     std::vector<typename mods_t::ScalarType> modsIn(S);
     std::vector<typename mods_t::ScalarType> modsOut(S);
 
     // set input modes
     std::size_t m = 0;
-    for(; m < M; ++m)
+    for(; m < lds; ++m)
     {
         modsIn[m] = 1.0;
     }
-    for(; m < 2*M; ++m)
+    for(; m < 2*lds; ++m)
     {
         modsIn[m] = 1.0;
     }
-    for(; m < 3*M; ++m)
+    for(; m < 3*lds; ++m)
     {
         modsIn[m] = 1.0;
     }
-    for(; m < 4*M; ++m)
+    for(; m < 4*lds; ++m)
     {
         modsIn[m] = 1.0;
     }
@@ -187,10 +195,10 @@ TEST_CASE("Mixed Diff 0 Backwards @Tag@ with dealiasing in place", "[MixedDiff0B
     std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
     std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
     mods_t modsRefV({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
-    mods_t modsInV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
-    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+    mods_t modsInV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices, lds);
+    mods_t modsOutV({modsOut.data(), modsOut.size()}, dimensions, pointers, indices, lds);
 
-    @View3D@
+    @View3DDealias@
 
     // apply
     diffOp->apply(modsOutV, modsInV, 1.0);
@@ -203,16 +211,20 @@ TEST_CASE("Mixed Diff 0 Backwards @Tag@ with dealiasing in place", "[MixedDiff0B
     CHECK(modsOutV(2,1,0) == modsRefV(2,1,0));
     CHECK(modsOutV(4,1,0) == modsRefV(4,1,0));
 
-    CHECK(modsOutV(M/3*2,1,0) == 0.0);
-    CHECK(modsOutV(M-1,1,0) == 0.0);
+    // CHECK(modsOutV(M,1,0) == 0.0); // triggers assert
+    CHECK(modsOutV.data()[M+lds] == 0.0);
+    // CHECK(modsOutV(lds-1,1,0) == 0.0); // triggers assert
+    CHECK(modsOutV.data()[lds-1+lds] == 0.0);
 
     CHECK(modsOutV(0,0,4) == modsRefV(0,0,4));
     CHECK(modsOutV(1,0,4) == modsRefV(1,0,4));
     CHECK(modsOutV(2,0,4) == modsRefV(2,0,4));
     CHECK(modsOutV(4,0,4) == modsRefV(4,0,4));
 
-    CHECK(modsOutV(M/3*2,0,4) == 0.0);
-    CHECK(modsOutV(M-1,0,4) == 0.0);
+    // CHECK(modsOutV(M,0,4) == 0.0); // triggers assert
+    CHECK(modsOutV.data()[M+lds*3] == 0.0);
+    // CHECK(modsOutV(lds-1,0,4) == 0.0); // triggers assert
+    CHECK(modsOutV.data()[lds-1+lds*3] == 0.0);
 
 }
 

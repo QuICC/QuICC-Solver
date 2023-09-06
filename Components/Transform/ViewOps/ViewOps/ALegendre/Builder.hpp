@@ -15,7 +15,7 @@
 #include "QuICC/Polynomial/ALegendre/Evaluator/OuterProduct.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 #include "ViewOps/ALegendre/TypeTraits.hpp"
-#include "Cpp/Span.hpp"
+#include "Std/Span.hpp"
 
 namespace QuICC {
 namespace Transform {

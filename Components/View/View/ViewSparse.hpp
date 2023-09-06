@@ -17,6 +17,8 @@
 //
 #include "View/ViewBase.hpp"
 #include "View/Attributes.hpp"
+#include "View/ViewMaps.hpp"
+#include "Std/Cuda/Utility.hpp"
 
 namespace QuICC {
 namespace Memory {
@@ -52,12 +54,19 @@ namespace Memory {
       /// @brief logical dimension c-array
       IndexType _dimensions[_rank];
 
+      /// @brief leading dimensions size
+      /// allows for padding of leading dimension in memory
+      /// to be used instead of _dim[leading index]
+      /// \todo WARNING not all types are implemented/tested
+      IndexType _lds;
+
       /// @brief c-array of pointers
       /// ref.: https://arxiv.org/abs/2202.04305
       ViewBase<IndexType> _pointers[_rank];
 
       /// @brief c-array of indices
       ViewBase<IndexType> _indices[_rank];
+
 
    public:
       /// @brief default ctor for empty view
@@ -70,10 +79,12 @@ namespace Memory {
       /// @param dimensions
       /// @param pointers
       /// @param indices
+      /// @param lds leading dimension size
       View(const span<Scalar>& data,
          const std::array<IndexType, _rank> dimensions,
          const std::array<std::vector<IndexType>, _rank>& pointers,
-         const std::array<std::vector<IndexType>, _rank>& indices);
+         const std::array<std::vector<IndexType>, _rank>& indices,
+         const IndexType lds = 0);
 
       /// @brief Native types constructor
       /// @param data pointer to actual data
@@ -81,11 +92,13 @@ namespace Memory {
       /// @param dimensions
       /// @param pointers
       /// @param indices
+      /// @param lds leading dimension size
       View(const Scalar* data,
          const std::size_t size,
          const IndexType* dimensions,
          const ViewBase<IndexType>* pointers,
-         const ViewBase<IndexType>* indices);
+         const ViewBase<IndexType>* indices,
+         const IndexType lds = 0);
 
       /// @brief get view rank
       /// @return _rank
@@ -94,6 +107,10 @@ namespace Memory {
       /// @brief get pointer to logical dimensions c-array
       /// @return pointer to _dimensions
       QUICC_CUDA_HOSTDEV const IndexType* dims() const {return _dimensions;}
+
+      /// @brief get in memory leading size
+      /// @return _lds value
+      QUICC_CUDA_HOSTDEV const IndexType lds() const {return _lds;}
 
       /// @brief get pointer to pointers c-array
       /// @return pointer to _pointers
@@ -150,7 +167,8 @@ namespace Memory {
    View<Scalar, Attributes<Args... >>::View(const span<Scalar>& data,
       const std::array<IndexType, _rank> dimensions,
       const std::array<std::vector<IndexType>, _rank>& pointers,
-      const std::array<std::vector<IndexType>, _rank>& indices) :
+      const std::array<std::vector<IndexType>, _rank>& indices,
+      const IndexType lds) :
             ViewBase<Scalar>(data.data(), data.size())
    {
       for (std::size_t i = 0; i < _rank; ++i)
@@ -159,6 +177,57 @@ namespace Memory {
          _pointers[i] = pointers[i];
          _indices[i] = indices[i];
       }
+      // padded leading dimension makes sense only for dense dimensions
+      _lds = 0;
+      if constexpr (
+         std::is_same_v<i_t,   std::variant_alternative_t<0, OrderType>> ||
+         std::is_same_v<iInOrder_t,   std::variant_alternative_t<0, OrderType>>)
+      {
+         if constexpr (std::is_same_v<dense_t, std::variant_alternative_t<0, LevelType>>)
+         {
+            if (lds == 0)
+            {
+               _lds = _dimensions[0];
+            }
+            else
+            {
+               _lds = lds;
+            }
+         }
+      }
+      else if constexpr (std::is_same_v<j_t,   std::variant_alternative_t<0, OrderType>>)
+      {
+         if constexpr (std::is_same_v<dense_t, std::variant_alternative_t<1, LevelType>>)
+         {
+            if (lds == 0)
+            {
+               _lds = _dimensions[1];
+            }
+            else
+            {
+               _lds = lds;
+            }
+         }
+      }
+      else if constexpr  (std::is_same_v<k_t,   std::variant_alternative_t<0, OrderType>>)
+      {
+         if constexpr (std::is_same_v<dense_t, std::variant_alternative_t<2, LevelType>>)
+         {
+            if (lds == 0)
+            {
+               _lds = _dimensions[2];
+            }
+            else
+            {
+               _lds = lds;
+            }
+         }
+      }
+      else
+      {
+         assert(lds == 0);
+      }
+      assert(_lds <= this->_size);
    };
 
    template <class Scalar, class... Args>
@@ -166,9 +235,11 @@ namespace Memory {
       const std::size_t size,
       const IndexType* dimensions,
       const ViewBase<IndexType>* pointers,
-      const ViewBase<IndexType>* indices) :
+      const ViewBase<IndexType>* indices,
+      const IndexType lds) :
             ViewBase<Scalar>(const_cast<Scalar*>(data), size)
    {
+      /// \todo collapse ctors implementations
 
       for (std::size_t i = 0; i < _rank; ++i)
       {
@@ -180,6 +251,57 @@ namespace Memory {
          _dimensions[i] = dimensions[i];
          _pointers[i] = pointers[i];
          _indices[i] = indices[i];
+      }
+
+      // padded leading dimension makes sense only for dense dimensions
+      _lds = 0;
+      if constexpr (
+         std::is_same_v<i_t,   std::variant_alternative_t<0, OrderType>> ||
+         std::is_same_v<iInOrder_t,   std::variant_alternative_t<0, OrderType>>)
+      {
+         if constexpr (std::is_same_v<dense_t, std::variant_alternative_t<0, LevelType>>)
+         {
+            if (lds == 0)
+            {
+               _lds = _dimensions[0];
+            }
+            else
+            {
+               _lds = lds;
+            }
+         }
+      }
+      else if constexpr (std::is_same_v<j_t,   std::variant_alternative_t<0, OrderType>>)
+      {
+         if constexpr (std::is_same_v<dense_t, std::variant_alternative_t<1, LevelType>>)
+         {
+            if (lds == 0)
+            {
+               _lds = _dimensions[1];
+            }
+            else
+            {
+               _lds = lds;
+            }
+         }
+      }
+      else if constexpr  (std::is_same_v<k_t,   std::variant_alternative_t<0, OrderType>>)
+      {
+         if constexpr (std::is_same_v<dense_t, std::variant_alternative_t<2, LevelType>>)
+         {
+            if (lds == 0)
+            {
+               _lds = _dimensions[2];
+            }
+            else
+            {
+               _lds = lds;
+            }
+         }
+      }
+      else
+      {
+         assert(lds == 0);
       }
    };
 
@@ -204,7 +326,7 @@ namespace Memory {
    template <class Scalar, class... Args>
    Scalar& View<Scalar, Attributes<Args... >>::operator()(const IndexType index)
    {
-      return const_cast<Scalar &>(std::as_const(*this).operator()(index));
+      return const_cast<Scalar &>(cuda::std::as_const(*this).operator()(index));
    }
 
 
@@ -215,32 +337,42 @@ namespace Memory {
       static_assert(_rank == 2, "This method is available only to rank 2 Views");
       assert(i < _dimensions[0]);
       assert(j < _dimensions[1]);
-      if constexpr (std::is_same_v<LevelType, DimLevelType<dense_t,compressed_t>>)
+      if constexpr (std::is_same_v<LevelType, DimLevelType<sparse_t,compressed_t>>)
       {
          // CSR
-         auto ii = i;
-         auto jj = j;
-         if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t>>)
-         {
-            // column major
-            std::swap(ii, jj);
-         }
-         // row major
+         static_assert(std::is_same_v<OrderType, LoopOrderType<i_t, j_t>>, "only default mem layout");
+         assert(_pointers[1].data() != nullptr);
+         assert(_indices[1].data() != nullptr);
          // this can be improved with a binary search
-         for (IndexType idx = _pointers[1][ii]; idx < _pointers[1][ii+1]; ++idx)
+         for (IndexType idx = _pointers[1][i]; idx < _pointers[1][i+1]; ++idx)
          {
-            if (_indices[1][idx] == jj)
+            if (_indices[1][idx] == j)
             {
                assert(idx < this->_size);
                return this->_data[idx];
             }
          }
-
          throw std::logic_error("Trying to refer to an implicit zero.");
       }
-      else if constexpr (std::is_same_v<LevelType, DimLevelType<compressed_t,dense_t>>)
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<compressed_t, sparse_t>>)
       {
-         /// CSC
+         // CSC
+         static_assert(std::is_same_v<OrderType, LoopOrderType<i_t, j_t>>, "only default mem layout");
+         assert(_pointers[0].data() != nullptr);
+         assert(_indices[0].data() != nullptr);
+         // this can be improved with a binary search
+         for (IndexType idx = _pointers[0][j]; idx < _pointers[0][j+1]; ++idx)
+         {
+            if (_indices[0][idx] == i)
+            {
+               assert(idx < this->_size);
+               return this->_data[idx];
+            }
+         }
+         throw std::logic_error("Trying to refer to an implicit zero.");
+      }
+      else
+      {
          throw std::logic_error("Not implemented yet.");
       }
    }
@@ -248,7 +380,7 @@ namespace Memory {
    template <class Scalar, class... Args>
    Scalar& View<Scalar, Attributes<Args... >>::operator()(const IndexType i, const IndexType j)
    {
-      return const_cast<Scalar &>(std::as_const(*this).operator()(i, j));
+      return const_cast<Scalar &>(cuda::std::as_const(*this).operator()(i, j));
    }
 
    // 3D accessor
@@ -282,19 +414,28 @@ namespace Memory {
          }
          throw std::logic_error("Trying to refer to an implicit zero.");
       }
-      else if constexpr (std::is_same_v<LevelType, DimLevelType<dense_t, CSC_t, CSC_t>>)
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<dense_t, compressed_t, sparse_t>>)
       {
-         if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
+         if constexpr (
+            std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>> ||
+            std::is_same_v<OrderType, LoopOrderType<iInOrder_t, j_t, k_t>>)
          {
             // column major
+
+            // map i if needed
+            IndexType ii = i;
+            if constexpr (std::is_same_v<iInOrder_t, std::variant_alternative_t<0, OrderType>>)
+            {
+               ii = mapInOrderIndex(i, _dimensions[0], _lds);
+            }
 
             // this can be improved with a binary search
             for (IndexType idn = _pointers[1][k]; idn < _pointers[1][k+1]; ++idn)
             {
                if (_indices[1][idn] == j)
                {
-                  assert(i+idn*_dimensions[0] < this->_size);
-                  return this->_data[i+idn*_dimensions[0]];
+                  assert(ii+idn*_lds < this->_size);
+                  return this->_data[ii+idn*_lds];
                }
             }
          }
@@ -452,7 +593,7 @@ namespace Memory {
          }
          throw std::logic_error("Trying to refer to an implicit zero.");
       }
-      else if constexpr (std::is_same_v<LevelType, DimLevelType<triK_t, CSC_t, CSC_t>>)
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<triK_t, compressed_t, sparse_t>>)
       {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
@@ -531,7 +672,7 @@ namespace Memory {
    Scalar& View<Scalar, Attributes<Args... >>::operator()
       (const IndexType i, const IndexType j, const IndexType k)
    {
-      return const_cast<Scalar &>(std::as_const(*this).operator()(i, j, k));
+      return const_cast<Scalar &>(cuda::std::as_const(*this).operator()(i, j, k));
    }
 
 } // namespace Memory

@@ -29,7 +29,7 @@ template<class Tout, class Tin, std::size_t Ofi, std::size_t Ofj,
 void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
     static_assert(std::is_same_v<typename Tin::LevelType, DCCSC3D::level>,
-        "implementation assumes dense, CSC, CSC");
+        "implementation assumes dense, compressed, sparse");
 
     Profiler::RegionFixture<4> fix("Diff2DOp::applyImpl");
 
@@ -46,20 +46,15 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
     constexpr int sgnOfj = 1 - 2*static_cast<int>((Ofj/2) % 2);
     constexpr int sgnFirst = sgnOfi * sgnOfj;
 
-    const auto M = in.dims()[0];
-
     // dealias bounds
-    std::size_t nDealias = M;
-    if constexpr (Treatment & dealias_m)
-    {
-        nDealias *= dealias::rule;
-    }
+    const auto M = in.lds();
+    const auto MDealias = in.dims()[0];
 
     // positive / negative coeff bounds
     const auto negM = M / 2;
     const auto posM = negM + M % 2;
-    const auto negDealias = nDealias / 2;
-    const auto posDealias = negDealias + nDealias % 2;
+    const auto negDealias = MDealias / 2;
+    const auto posDealias = negDealias + MDealias % 2;
 
     float_t fftScaling = 1.0;
     if constexpr (std::is_same_v<Direction, fwd_t> &&
@@ -174,7 +169,7 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
 }
 
 // explicit instantations
-using mods_t = View<std::complex<double>, DCCSC3D>;
+using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
 template class Diff2DOp<mods_t, mods_t, 1, 0, 0, 0, fwd_t>;
 template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t>;
 template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>;

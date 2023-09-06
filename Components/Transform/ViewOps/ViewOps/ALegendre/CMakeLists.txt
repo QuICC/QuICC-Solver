@@ -31,7 +31,7 @@ endif()
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PUBLIC
-    QuICC::Cpp
+    QuICC::Std
     QuICC::View
     QuICC::Operator
     QuICC::Profiling

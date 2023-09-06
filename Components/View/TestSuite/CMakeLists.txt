@@ -3,9 +3,10 @@ include(BundleCatch2)
 
 add_executable(ViewTest
     ViewTests.cpp
+    ViewTests.cu
     ViewDenseTests.cpp
     ViewSparseTests.cpp
-    ViewTests.cu
+    ViewMapsTests.cpp
 )
 target_link_libraries(ViewTest
     ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}
