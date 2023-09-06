@@ -1,0 +1,13 @@
+# Add public header
+set(PHS
+  Cuda/Gemm.hpp
+)
+
+set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+  PROPERTIES
+    PUBLIC_HEADER "${PHS}"
+)
+
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+  INTERFACE
+    QuICC::Cuda)

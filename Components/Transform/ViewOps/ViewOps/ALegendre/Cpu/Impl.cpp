@@ -8,7 +8,7 @@
 #include "ViewOps/ALegendre/Tags.hpp"
 #include "ViewOps/ALegendre/Types.hpp"
 #include "ViewOps/ALegendre/TypeTraits.hpp"
-#include "ViewOps/ALegendre/Cpu/Gemm.hpp"
+#include "ViewOps/Blas/Cpu/Gemm.hpp"
 
 namespace QuICC {
 namespace Transform {

@@ -6,7 +6,7 @@
 #include "Impl.hpp"
 #include "View/View.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
-#include "ViewOps/ALegendre/Cuda/Gemm.hpp"
+#include "ViewOps/Blas/Cuda/Gemm.hpp"
 #include "ViewOps/ALegendre/Tags.hpp"
 #include "ViewOps/ALegendre/Types.hpp"
 #include "ViewOps/ALegendre/TypeTraits.hpp"

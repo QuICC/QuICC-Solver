@@ -1,17 +1,37 @@
+/**
+ * @file Gemm.hpp
+ * @brief Different implementations of Cpu Gemm operations on Views
+ */
 #pragma once
 
+// External includes
+//
 #include <Eigen/Core>
 
+// Project includes
+//
 #include "View/View.hpp"
 
 namespace QuICC {
+/// @brief namespace for Blas type operations
 namespace Blas {
+/// @brief namespace for cpu backends
 namespace Cpu {
 
 using namespace QuICC::Memory;
 
+/// @brief namespace for Naive implementations
 namespace Naive {
 
+/// @brief Naive matmul with mixed types
+/// @tparam TA row major
+/// @tparam TB column major
+/// @tparam TC column major
+/// @tparam Talpha
+/// @param C
+/// @param A
+/// @param B
+/// @param alpha
 template <class TA, class TB, class TC, class Talpha>
 inline void matmul(View<TC, dense2D>& C,
     const View<TA, dense2DRM>& A,
@@ -42,6 +62,15 @@ inline void matmul(View<TC, dense2D>& C,
     }
 }
 
+/// @brief Naive matmul with mixed types
+/// @tparam TA column major
+/// @tparam TB row major
+/// @tparam TC row major
+/// @tparam Talpha
+/// @param C
+/// @param A
+/// @param B
+/// @param alpha
 template <class TA, class TB, class TC, class Talpha>
 inline void matmul(View<TC, dense2DRM>& C,
     const View<TA, dense2D>& A,
@@ -74,8 +103,18 @@ inline void matmul(View<TC, dense2DRM>& C,
 
 } // namespace Naive
 
+/// @brief namespace for Eigen backend
 namespace Eigen {
 
+/// @brief Eigen matmul with mixed types
+/// @tparam TA row major
+/// @tparam TB column major
+/// @tparam TC column major
+/// @tparam Talpha
+/// @param C
+/// @param A
+/// @param B
+/// @param alpha
 template <class TA, class TB, class TC, class Talpha>
 inline void matmul(View<TC, dense2D>& C,
     const View<TA, dense2DRM>& A,
@@ -98,9 +137,19 @@ inline void matmul(View<TC, dense2D>& C,
     ::Eigen::Map<BMatrixZ> eB(B.data(), K, N);
     ::Eigen::Map<CMatrixZ> eC(C.data(), M, N);
 
+    // Order of operations is important with mixed (complex/real) types!
     eC = eA * eB * alpha;
 }
 
+/// @brief Eigen matmul with mixed types
+/// @tparam TA column major
+/// @tparam TB row major
+/// @tparam TC row major
+/// @tparam Talpha
+/// @param C
+/// @param A
+/// @param B
+/// @param alpha
 template <class TA, class TB, class TC, class Talpha>
 inline void matmul(View<TC, dense2DRM>& C,
     const View<TA, dense2D>& A,
@@ -123,6 +172,7 @@ inline void matmul(View<TC, dense2DRM>& C,
     ::Eigen::Map<BMatrixZRM> eB(B.data(), K, N);
     ::Eigen::Map<CMatrixZRM> eC(C.data(), M, N);
 
+    // Order of operations is important with mixed (complex/real) types!
     eC = eA * eB * alpha;
 }
 
