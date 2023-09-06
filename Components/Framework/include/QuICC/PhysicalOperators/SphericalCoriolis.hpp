@@ -21,7 +21,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 
 namespace QuICC {
 

@@ -1,18 +1,65 @@
 @PACKAGE_INIT@
 
-# Find dependencies
-if("@QUICC_BESSEL_IMPL@" STREQUAL "Boost")
-   find_package(Boost REQUIRED)
-endif()
+# Store install location
+set(QUICC_LIBRARY_ROOT @CMAKE_INSTALL_PREFIX@
+  CACHE STRING "This is the lib root directory")
 
 # Force some project variables to match framework
 set(QUICC_USE_MPI @QUICC_USE_MPI@
   CACHE BOOL "This is set by the framework" FORCE)
 set(QUICC_MULTPRECISION @QUICC_MULTPRECISION@
   CACHE BOOL "This is set by the framework" FORCE)
+set(QUICC_PROFILE_BACKEND @QUICC_PROFILE_BACKEND@
+  CACHE STRING "This is set by the framework" FORCE)
+set(QUICC_PROFILE_NATIVE_WRITER @QUICC_PROFILE_NATIVE_WRITER@
+  CACHE STRING "This is set by the framework" FORCE)
+set(QUICC_PROFILE_LEVEL @QUICC_PROFILE_LEVEL@
+  CACHE STRING "This is set by the framework" FORCE)
+set(QUICC_USE_KOKKOS @QUICC_USE_KOKKOS@
+  CACHE BOOL "This is set by the framework" FORCE)
+set(QUICC_USE_KOKKOS_CUDA @QUICC_USE_KOKKOS_CUDA@
+  CACHE BOOL "This is set by the framework" FORCE)
+set(QUICC_USE_KOKKOS_KERNELS @QUICC_USE_KOKKOS_KERNELS@
+  CACHE BOOL "This is set by the framework" FORCE)
+
 
 # Hide them since they should not be changed
-mark_as_advanced(FORCE QUICC_USE_MPI QUICC_MULTPRECISION)
+mark_as_advanced(FORCE
+  QUICC_USE_MPI
+  QUICC_MULTPRECISION
+  QUICC_PROFILE_BACKEND
+  QUICC_PROFILE_NATIVE_WRITER
+  QUICC_PROFILE_LEVEL
+  QUICC_USE_KOKKOS
+  QUICC_USE_KOKKOS_CUDA
+  QUICC_USE_KOKKOS_KERNELS
+)
+
+# Find dependencies
+
+# Boost (optional)
+if("@QUICC_BESSEL_IMPL@" STREQUAL "Boost")
+   set(BOOST_ROOT @BOOST_ROOT@)
+   find_package(Boost REQUIRED)
+endif()
+
+# Eigen (required), already part of the framework
+set(QUICC_USE_SYSTEM_EIGEN ON
+  CACHE BOOL "This is set by the framework" FORCE)
+set(Eigen3_DIR "${QUICC_LIBRARY_ROOT}/share/eigen3/cmake")
+
+# HighFive (optional), already part of the framework
+if(QUICC_PROFILE_NATIVE_WRITER STREQUAL "HighFive")
+  set(QUICC_USE_SYSTEM_HIGHFIVE ON
+    CACHE BOOL "This is set by the framework" FORCE)
+  set(HighFive_DIR "${QUICC_LIBRARY_ROOT}/share/HighFive/CMake")
+endif()
+
+# Kokkos
+if(QUICC_USE_KOKKOS)
+  set(TRILINOS_DIR @TRILINOS_DIR@)
+  set(KOKKOS_DIR @KOKKOS_DIR@)
+endif()
 
 # Setup
 include(setup/global)
@@ -20,23 +67,4 @@ include(setup/global)
 # Framework setup
 include(setup/Framework)
 
-# Order is important!
-set(_quicc_components
-  Profiling_Interface
-  Profiling_Timers
-  Profiling
-  quicc_common
-  quicc_polynomial_Bessel
-  quicc_polynomial
-  quicc_sparsesm
-  quicc_transform
-  quicc_pyquicc
-  quicc_io
-  quicc_framework
-  )
-
-# Include all components
-foreach(_comp ${_quicc_components})
-  include("${CMAKE_CURRENT_LIST_DIR}/${_comp}Targets.cmake")
-endforeach()
-
+include("${CMAKE_CURRENT_LIST_DIR}/QuICCTargets.cmake")

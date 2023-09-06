@@ -3,21 +3,18 @@
  * @brief Source of generic field equation interface
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/IFieldEquation.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/IFieldEquation.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+   #include "QuICC/PhysicalNames/Coordinator.hpp"
+   #include "QuICC/SolveTiming/Coordinator.hpp"
+   #include "QuICC/Tools/IdToHuman.hpp"
+#endif // QUICC_DEBUG
 
 namespace QuICC {
 
@@ -28,17 +25,25 @@ namespace Equations {
    {
    }
 
-   IFieldEquation::~IFieldEquation()
+   IFieldEquation::IFieldEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions)
+      : IEquation(spEqParams, spScheme, spBackend, spOptions)
    {
    }
 
-   void IFieldEquation::applyConstraint(FieldComponents::Spectral::Id compId)
+   bool IFieldEquation::applyConstraint(FieldComponents::Spectral::Id compId, const std::size_t timeId)
    {
+      bool changedSolution = false;
+
       // Use source kernel
       if(this->mConstraintKernel.count(compId) > 0)
       {
-         return this->mConstraintKernel.find(compId)->second->apply();
+         DebuggerMacro_msg("Apply constraint kernel for " + PhysicalNames::Coordinator::tag(this->name()) + "(" + QuICC::Tools::IdToHuman::toString(compId) + ") at " + SolveTiming::Coordinator::tag(timeId) , 6);
+
+         changedSolution = true;
+         this->mConstraintKernel.find(compId)->second->apply(timeId);
       }
+
+      return changedSolution;
    }
 
    MHDVariant IFieldEquation::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
@@ -63,5 +68,5 @@ namespace Equations {
 
       return MHDVariant();
    }
-}
-}
+} // Equations
+} // QuICC

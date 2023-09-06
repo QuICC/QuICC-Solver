@@ -15,6 +15,7 @@
 // Project includes
 //
 #include "QuICC/NonDimensional/@NonDimensional@.hpp"
+#include "QuICC/NonDimensional/Coordinator.hpp"
 
 TEST_CASE( "Check hash for @NonDimensional@ nondimensional number", "[@NonDimensional@]" ){
 
@@ -22,4 +23,6 @@ TEST_CASE( "Check hash for @NonDimensional@ nondimensional number", "[@NonDimens
 
    REQUIRE( ns_nd::@NonDimensional@::id() > 0 );
 
+   ns_nd::@NonDimensional@ id;
+   CHECK(ns_nd::Coordinator::tag(ns_nd::@NonDimensional@::id()) == id.tag());
 }

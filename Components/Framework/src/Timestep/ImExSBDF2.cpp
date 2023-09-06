@@ -23,10 +23,7 @@ namespace Timestep {
 
    ImExSBDF2::ImExSBDF2()
    {
-   }
-
-   ImExSBDF2::~ImExSBDF2()
-   {
+      this->init();
    }
 
    // Scheme requires single step

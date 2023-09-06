@@ -8,7 +8,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 // System includes
 //
@@ -19,7 +18,7 @@
 // Project includes
 //
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 
@@ -65,13 +64,6 @@ namespace Transform {
          static void integrateND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute the integration transform for the single dimension case
-          *
-          * @param coord   Transform coordinator
-          */
-         static void integrate1ND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
-
-         /**
           * @brief Update scalar variable from dealiased data
           *
           * @param rScalar Scalar variable
@@ -98,6 +90,12 @@ namespace Transform {
          virtual ~ForwardConfigurator() {};
 
       private:
+         /**
+          * @brief Generic implementation of a integration (forward transform)
+          *
+          * @param coord   Transform coordinator
+          */
+         static void genericIntegrate(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const Dimensions::Transform::Id, const bool processOuput, const std::string profRegion);
    };
 
 }

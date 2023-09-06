@@ -6,16 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/AFT.hpp"
-
 // Project includes
 //
-#include "QuICC/SpatialScheme/Coordinator.hpp"
+#include "QuICC/Hasher.hpp"
+#include "QuICC/SpatialScheme/3D/AFT.hpp"
 #include "QuICC/SpatialScheme/3D/AFTBuilder.hpp"
 #include "QuICC/Transform/AnnulusChebyshevTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
@@ -31,7 +25,7 @@ namespace SpatialScheme {
 
    const std::string AFT::sFormatted = "AFT";
 
-   const std::size_t AFT::sId = registerId<AFT>(AFT::sTag);
+   const std::size_t AFT::sId = Hasher::makeId(AFT::sTag);
 
    AFT::AFT(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 3, AFT::sId, AFT::sTag, AFT::sFormatted)
@@ -60,16 +54,13 @@ namespace SpatialScheme {
       this->enable(Feature::RegularSpectrum);
       this->enable(Feature::SpectralMatrix2D);
       this->enable(Feature::SpectralOrdering132);
+      this->enable(Feature::TransformSpectralOrdering132);
       this->enable(Feature::ComplexSpectrum);
-   }
-
-   AFT::~AFT()
-   {
    }
 
    std::shared_ptr<IBuilder> AFT::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<AFTBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<AFTBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }
@@ -207,5 +198,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

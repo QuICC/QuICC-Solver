@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Fourier/Complex/Projector/D1.hpp"
+#include "QuICC/Transform/Fft/Fourier/Complex/Projector/D1Base.hpp"
 
 // Project includes
 //
@@ -30,23 +30,9 @@ namespace Complex {
 
 namespace Projector {
 
-   D1::D1()
+   void D1<base_t>::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
    {
-   }
-
-   D1::~D1()
-   {
-   }
-
-   void D1::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      this->mBackend.inputDiff(in, 1, this->mspSetup->boxScale());
-
-      this->mBackend.output(rOut.data());
-   }
-
-   void D1::applyPostOperator(MatrixZ&) const
-   {
+      this->mBackend.inputDiff(tmp, in, 1, this->mspSetup->boxScale());
    }
 
 }

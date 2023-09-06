@@ -10,9 +10,6 @@
 //
 #include <map>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/NonDimensional/INumber.hpp"
@@ -34,31 +31,79 @@ namespace Transform {
    {
       public:
          /**
+          * @brief Compute number of packs
+          *
+          * @param packs            Packs
+          * @param spFwdGrouper     Forward transform communication grouper
+          * @param spBwdGrouper     Backward transform communication grouper
+          * @param forwardTrees     Transform integrator trees
+          * @param backwardTrees    Transform projector trees
+          * @param keys             Keys for tree maps
+          * @param spRes            Shared resolution
+          */
+         static void computePacks(std::vector<ArrayI>& packs, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::map<int, std::vector<Transform::TransformTree> >& forwardTree, const std::map<int, std::vector<Transform::TransformTree> >& backwardTree, const std::set<int>& keys, SharedResolution spRes);
+
+         /**
           * @brief Initialise the transform coordinator
           *
           * @param rCoord           Transform coordinator
           * @param spFwdGrouper     Forward transform communication grouper
           * @param spBwdGrouper     Backward transform communication grouper
-          * @param forwardTree   Transform integrator tree
-          * @param backwardTree    Transform projector tree
+          * @param packs            pack sizes
           * @param spRes            Shared resolution
           * @param runOptions       Available run options map
           */
-         static void init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<Transform::TransformTree>& forwardTree, const std::vector<Transform::TransformTree>& backwardTree, SharedResolution spRes, const std::map<std::size_t,NonDimensional::SharedINumber>& runOptions);
+         static void init(TransformCoordinatorType& rCoord, SharedIForwardGrouper spFwdGrouper, SharedIBackwardGrouper spBwdGrouper, const std::vector<ArrayI>& packs, SharedResolution spRes, const std::map<std::size_t,NonDimensional::SharedINumber>& runOptions);
 
       protected:
 
       private:
          /**
+          * @brief Add set of packs as ArrayI to packs
+          */
+         static void addSet(std::vector<ArrayI>& packs, const std::set<int>& packSet);
+
+         /// Tag type for fillSet, stage 1D
+         struct stage_1D {};
+         /// Tag type for fillSet, stage 2D
+         struct stage_2D {};
+
+         /**
+          * @brief Fill set with pack size
+          */
+         template <typename TStage, typename TGrouper> static void fillSet(std::set<int>& packSet, TGrouper spGrouper, const std::vector<Transform::TransformTree>& tree);
+         /**
           * @brief Constructor
           */
-         TransformCoordinatorTools();
+         TransformCoordinatorTools() = default;
 
          /**
           * @brief Destructor
           */
-         ~TransformCoordinatorTools();
+         ~TransformCoordinatorTools() = default;
    };
+
+   template <typename TStage, typename TGrouper> void TransformCoordinatorTools::fillSet(std::set<int>& packSet, TGrouper spGrouper, const std::vector<Transform::TransformTree>& tree)
+   {
+      ArrayI p;
+      if constexpr(std::is_same_v<TStage,stage_1D>)
+      {
+         p = spGrouper->packs1D(tree);
+      }
+      else if constexpr(std::is_same_v<TStage,stage_2D>)
+      {
+         p = spGrouper->packs2D(tree);
+      }
+      else
+      {
+         static_assert( sizeof(TStage) && false, "unknown stage type");
+      }
+
+      for(int i = 0; i < p.size(); i++)
+      {
+         packSet.insert(p(i));
+      }
+   }
 
 }
 }

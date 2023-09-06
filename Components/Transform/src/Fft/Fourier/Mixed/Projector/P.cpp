@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Fourier/Mixed/Projector/P.hpp"
+#include "QuICC/Transform/Fft/Fourier/Mixed/Projector/PBase.hpp"
 
 // Project includes
 //
@@ -29,25 +29,10 @@ namespace Mixed {
 
 namespace Projector {
 
-   P::P()
+   void P<base_t>::applyPreOperator(MatrixZ& out, const MatrixZ& in) const
    {
+      this->mBackend.input(out, in);
    }
-
-   P::~P()
-   {
-   }
-
-   void P::applyPreOperator(Matrix& rOut, const MatrixZ& in) const
-   {
-      this->mBackend.input(in);
-
-      this->mBackend.output(rOut.data());
-   }
-
-   void P::applyPostOperator(Matrix&) const
-   {
-   }
-
 }
 }
 }

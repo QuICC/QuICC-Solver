@@ -7,16 +7,10 @@
 #ifndef QUICC_EQUATIONS_ISCALAREQUATION_HPP
 #define QUICC_EQUATIONS_ISCALAREQUATION_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
 #include <stdexcept>
-
-// External includes
-//
 
 // Project includes
 //
@@ -25,8 +19,8 @@
 #include "QuICC/Equations/IFieldEquation.hpp"
 #include "QuICC/DecoupledComplexInternal.hpp"
 #include "QuICC/Equations/CouplingFeature.hpp"
-#include "QuICC/Framework/Selector/SparseSolver.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/Solver/SparseSolver.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolverTools.hpp"
 
 namespace QuICC {
@@ -42,14 +36,26 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * \param spEqParams Shared equation parameters
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
           */
          explicit IScalarEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend);
 
          /**
+          * @brief Simple constructor
+          *
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
+          * @param spOptions  Additional options
+          */
+         explicit IScalarEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions);
+
+         /**
           * @brief Simple empty destructor
           */
-         virtual ~IScalarEquation();
+         virtual ~IScalarEquation() = default;
 
          /**
           * @brief Set the shared pointer to the unknown field
@@ -121,6 +127,11 @@ namespace Equations {
          virtual void setNLComponents() override;
 
          /**
+          * @brief Get backward transform paths
+          */
+         virtual std::vector<bool> disabledBackwardPaths() const override;
+
+         /**
           * @brief Set the galerkin stencil
           */
          virtual void setGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const override;
@@ -179,9 +190,13 @@ namespace Equations {
    {
       // Create temporary storage for tau data
       TData tmp(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      std::visit([&](auto&& p){Equations::copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);}, eq.spUnknown());
+      std::visit(
+            [&](auto&& p)
+            {
+            Equations::copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);
+            }, eq.spUnknown());
       TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      if(eq.res().sim().ss().has(SpatialScheme::Feature::CylinderGeometry))
+      if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
       {
          Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), eq.couplingInfo(compId).galerkinShift(matIdx, 0), tmp);
       } else
@@ -241,7 +256,7 @@ namespace Equations {
          std::visit([&](auto&& p){copyUnknown(eq, p->dom(0).perturbation(), compId, storage, matIdx, start, true, false);}, eq.spUnknown());
       }
    }
-}
-}
+} // Equations
+} // QuICC
 
 #endif // QUICC_EQUATIONS_ISCALAREQUATION_HPP

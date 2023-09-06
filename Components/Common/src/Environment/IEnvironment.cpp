@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IEnvironment.cpp
  * @brief Source of generic environment
  */
@@ -30,14 +30,6 @@ namespace Environment {
    int IEnvironment::mSize = -99;
 
    int IEnvironment::mId = -99;
-
-   IEnvironment::IEnvironment()
-   {
-   }
-
-   IEnvironment::~IEnvironment()
-   {
-   }
 
    int IEnvironment::ioRank() const
    {

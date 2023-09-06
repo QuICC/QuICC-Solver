@@ -61,6 +61,16 @@ namespace Tags {
          static const std::string   NBASENAME;
 
          /**
+          * @brief BASENAME of mode energy spectrum files
+          */
+         static const std::string   MODEBASENAME;
+
+         /**
+          * @brief BASENAME of radial energy spectrum files
+          */
+         static const std::string   RBASENAME;
+
+         /**
           * @brief EXTENSION of energy spectrum files
           */
          static const std::string   EXTENSION;

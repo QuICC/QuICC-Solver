@@ -6,13 +6,7 @@
 #ifndef QUICC_SPATIALSCHEME_3D_SLFLBUILDER_HPP
 #define QUICC_SPATIALSCHEME_3D_SLFLBUILDER_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -40,39 +34,25 @@ namespace SpatialScheme {
           *
           * @param dim     Spectral dimensions
           * @param purpose Grid purpose
+          * @param options Scheme options
           */
-         explicit SLFlBuilder(const ArrayI& dim, const GridPurpose::Id purpose);
+         explicit SLFlBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options);
 
          /**
           * @brief Destructor
           */
-         virtual ~SLFlBuilder();
+         ~SLFlBuilder() = default;
 
          /**
           * @brief Add the transform setups to resolution
           */
-         virtual void addTransformSetups(SharedResolution spRes) const;
+         void addTransformSetups(SharedResolution spRes) const final;
 
       protected:
          /**
           * @brief Initialise the domain dimensions
           */
-         virtual void setDimensions();
-
-         /**
-          * @brief Set transform costs
-          */
-         virtual void setCosts();
-
-         /**
-          * @brief Set transform scalings
-          */
-         virtual void setScalings();
-
-         /**
-          * @brief Set transform memory footprint
-          */
-         virtual void setMemoryScore();
+         void setDimensions() final;
 
       private:
          /**
@@ -91,7 +71,7 @@ namespace SpatialScheme {
          Transform::Fft::Fourier::Mixed::SharedSetup  spSetup3D(SharedResolution spRes) const;
    };
 
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_3D_SLFLBUILDER_HPP

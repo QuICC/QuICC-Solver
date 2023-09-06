@@ -33,11 +33,11 @@ if(NOT TARGET ${_BLAS_TARGET})
   message(VERBOSE "BLAS target is missing")
   add_library(${_BLAS_TARGET} INTERFACE IMPORTED)
 else()
-  message(VERBOSE "BLAS target exists")
-  # check tgt properties
-  get_target_property(BLAS_INTERFACE_LINK_LIBS ${_BLAS_TARGET} INTERFACE_LINK_LIBRARIES)
-  message(DEBUG "BLAS_INTERFACE_LINK_LIBS: ${BLAS_INTERFACE_LINK_LIBS}")
-  get_target_property(BLAS_INTERFACE_INCLUDE_DIRECTORIES ${_BLAS_TARGET} INTERFACE_INCLUDE_DIRECTORIES)
+message(VERBOSE "BLAS target exists")
+# check tgt properties
+get_target_property(BLAS_INTERFACE_LINK_LIBS ${_BLAS_TARGET} INTERFACE_LINK_LIBRARIES)
+message(DEBUG "BLAS_INTERFACE_LINK_LIBS: ${BLAS_INTERFACE_LINK_LIBS}")
+get_target_property(BLAS_INTERFACE_INCLUDE_DIRECTORIES ${_BLAS_TARGET} INTERFACE_INCLUDE_DIRECTORIES)
   message(DEBUG "BLAS_INTERFACE_INCLUDE_DIRECTORIES: ${BLAS_INTERFACE_INCLUDE_DIRECTORIES}")
   # set tgt properties
   set_property(TARGET ${_BLAS_TARGET} PROPERTY INTERFACE_LINK_LIBRARIES ${BLAS_LIBRARIES})
@@ -47,6 +47,33 @@ endif()
 if(_BLAS_MKL)
     target_compile_definitions(${_BLAS_TARGET} INTERFACE "QUICC_USING_MKL_BLAS")
 endif()
+#
+# Boost
+#
+if(NOT BOOST_ROOT)
+  message(VERBOSE "setting BOOST_ROOT")
+  list(APPEND _ALL_PATHS $ENV{CPATH} $ENV{C_INCLUDE_PATH} $ENV{CPLUS_INCLUDE_PATH})
+  if(NOT "${_ALL_PATHS}" STREQUAL "")
+    string(REPLACE ":" ";" _ALL_PATHS "${_ALL_PATHS}")
+    include(ListFindRegex)
+    quicc_list(FIND_REGEX _ALL_PATHS "boost" BOOST_ROOT)
+    message(VERBOSE "BOOST_ROOT: ${BOOST_ROOT}")
+  endif()
+endif()
+find_package(Boost 1.78)
+if(NOT Boost_FOUND)
+  message(FATAL_ERROR "Could not find Boost, required >= 1.78, try to specify path: -DBOOST_ROOT=</path/to/boost>")
+endif()
+
+#
+# Kokkos
+#
+include(setup/Kokkos)
+
+#
+# Cuda
+#
+find_package(CUDAToolkit 11.3)
 
 ###################################################
 #------------ THREADS PARALLELISATION ------------#
@@ -242,4 +269,6 @@ endif(QUICC_OPTIMIZE_TREE)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development NumPy)
 
+
 list(POP_BACK CMAKE_MESSAGE_INDENT)
+

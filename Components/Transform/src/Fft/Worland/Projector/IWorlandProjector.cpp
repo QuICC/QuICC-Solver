@@ -16,13 +16,12 @@
 
 // Class include
 //
-#include "QuICC/Debug/Profiler/BreakPoint.hpp"
 #include "QuICC/Transform/Fft/Worland/Projector/IWorlandProjector.hpp"
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -36,6 +35,7 @@ namespace Projector {
 
    IWorlandProjector::IWorlandProjector()
    {
+      this->mProfileTag += "-Projector";
    }
 
    IWorlandProjector::~IWorlandProjector()
@@ -51,39 +51,37 @@ namespace Projector {
 
    void IWorlandProjector::transformBlock(MatrixZ& rOut, const MatrixZ& in, const bool isEven, const bool useReal) const
    {
-      ProfilerMacro_start_lvl3(this->mProfileId, 1);
+      Profiler::RegionStart<3> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven, useReal);
-      ProfilerMacro_stop_lvl3(this->mProfileId, 1);
+      Profiler::RegionStop<3> (this->mProfileTag + "-pre");
 
-      ProfilerMacro_start_lvl3(this->mProfileId, 2);
+      Profiler::RegionStart<3> (this->mProfileTag + "-fft");
       this->mBackend.applyFft();
-      ProfilerMacro_stop_lvl3(this->mProfileId, 2);
+      Profiler::RegionStop<3> (this->mProfileTag + "-fft");
 
-      ProfilerMacro_start_lvl3(this->mProfileId, 3);
+      Profiler::RegionStart<3> (this->mProfileTag + "-post");
       this->applyPostOperator(rOut, isEven, useReal);
-      ProfilerMacro_stop_lvl3(this->mProfileId, 3);
+      Profiler::RegionStop<3> (this->mProfileTag + "-post");
    }
 
    void IWorlandProjector::transformBlock(Matrix& rOut, const Matrix& in, const bool isEven) const
    {
-      ProfilerMacro_start_lvl3(this->mProfileId, 1);
+      Profiler::RegionStart<3> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven);
-      ProfilerMacro_stop_lvl3(this->mProfileId, 1);
+      Profiler::RegionStop<3> (this->mProfileTag + "-pre");
 
-      ProfilerMacro_start_lvl3(this->mProfileId, 2);
+      Profiler::RegionStart<3> (this->mProfileTag + "-fft");
       this->mBackend.applyFft();
-      ProfilerMacro_stop_lvl3(this->mProfileId, 2);
+      Profiler::RegionStop<3> (this->mProfileTag + "-fft");
 
-      ProfilerMacro_start_lvl3(this->mProfileId, 3);
+      Profiler::RegionStart<3> (this->mProfileTag + "-post");
       this->applyPostOperator(rOut, isEven);
-      ProfilerMacro_stop_lvl3(this->mProfileId, 3);
+      Profiler::RegionStop<3> (this->mProfileTag + "-post");
    }
 
    void IWorlandProjector::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
-      ProfilerMacro_start(Debug::Profiler::WORLANDTRA);
-      ProfilerMacro_start(Debug::Profiler::WORLANDPROJ);
-      ProfilerMacro_start(this->mProfileId);
+      Profiler::RegionFixture<2> fix(this->mProfileTag);
 
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == rOut.rows());
@@ -93,17 +91,11 @@ namespace Projector {
       this->transformBlock(rOut, in, true, false);
       this->transformBlock(rOut, in, false, true);
       this->transformBlock(rOut, in, false, false);
-
-      ProfilerMacro_stop(this->mProfileId);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDPROJ);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDTRA);
    }
 
    void IWorlandProjector::transform(Matrix& rOut, const Matrix& in) const
    {
-      ProfilerMacro_start(Debug::Profiler::WORLANDTRA);
-      ProfilerMacro_start(Debug::Profiler::WORLANDPROJ);
-      ProfilerMacro_start(this->mProfileId);
+      Profiler::RegionFixture<2> fix(this->mProfileTag);
 
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == rOut.rows());
@@ -111,10 +103,6 @@ namespace Projector {
 
       this->transformBlock(rOut, in, true);
       this->transformBlock(rOut, in, false);
-
-      ProfilerMacro_stop(this->mProfileId);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDPROJ);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDTRA);
    }
 
    int IWorlandProjector::outRows() const
@@ -139,6 +127,11 @@ namespace Projector {
    }
 
    void IWorlandProjector::transform(Matrix& rOut, const MatrixZ& in) const
+   {
+      IWorlandOperator::transform(rOut, in);
+   }
+
+   void IWorlandProjector::transform(MatrixZ& rOut, const Matrix& in) const
    {
       IWorlandOperator::transform(rOut, in);
    }

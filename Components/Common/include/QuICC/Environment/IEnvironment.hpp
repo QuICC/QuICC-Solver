@@ -10,6 +10,7 @@
 //
 #include <cassert>
 #include <string>
+#include <vector>
 #include <map>
 
 // External includes
@@ -17,6 +18,7 @@
 
 // Project includes
 //
+#include "QuICC/Environment/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -31,12 +33,12 @@ namespace Environment {
          /**
           * @brief Constructor
           */
-         IEnvironment();
+         IEnvironment() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IEnvironment();
+         virtual ~IEnvironment() = default;
 
          /**
           * @brief Get the local ID
@@ -44,9 +46,19 @@ namespace Environment {
          virtual int id() const;
 
          /**
+          * @brief Get rank in sub-communicator
+          */
+         virtual int id(const std::size_t id) const = 0;
+
+         /**
           * @brief Size of environement (i.e CPUs, threads, etc)
           */
          virtual int size() const;
+
+         /**
+          * @brief Size of environement of sub-communicator (i.e CPUs, threads, etc)
+          */
+         virtual int size(const std::size_t id) const = 0;
 
          /**
           * @brief Get the IO rank
@@ -69,19 +81,44 @@ namespace Environment {
          virtual void synchronize() = 0;
 
          /**
+          * @brief Synchronize sub-communicator
+          */
+         virtual void synchronize(const std::size_t id) const = 0;
+
+         /**
           * @brief Check error code for success
           */
          virtual void check(const int ierr, const int code) = 0;
 
          /**
+          * @brief Check error code for success
+          */
+         virtual void check(const int ierr, const std::string msg) = 0;
+
+         /**
           * @brief Abort with error code
           */
-         virtual void abort(const int code) = 0;
+         virtual void abort(const int code) const = 0;
 
          /**
           * @brief Abort with message
           */
-         virtual void abort(const std::string msg) = 0;
+         virtual void abort(const std::string msg) const = 0;
+
+         /**
+          * @brief Add CPU group IDs
+          */
+         virtual void addCommunicator(const std::size_t id, const std::vector<int>& ids) = 0;
+
+         /**
+          * @brief Get WORLD ranks in sub-communicator group
+          */
+         virtual const std::vector<int>& groupIds(const std::size_t id) const = 0;
+
+         /**
+          * @brief Get MPI sub-communicator
+          */
+         virtual CommType comm(const std::size_t id) const = 0;
 
       protected:
 

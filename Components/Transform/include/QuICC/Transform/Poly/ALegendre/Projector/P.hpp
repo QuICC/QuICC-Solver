@@ -1,4 +1,4 @@
-/** 
+/**
  * @file P.hpp
  * @brief Implementation of the associated Legendre based P projector
  */
@@ -6,66 +6,19 @@
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_P_HPP
 #define QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_P_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Poly/ALegendre/Projector/IALegendreProjector.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Projector/Base/P.hpp"
+#ifdef QUICC_USE_KOKKOS
+#include "QuICC/Transform/Poly/ALegendre/Projector/Kokkos/P.hpp"
+#endif
+#include "QuICC/Transform/Wrappers/ALegendre/Projector/PviewCpu_t.hpp.inc"
+#ifdef QUICC_HAS_CUDA_BACKEND
+#include "QuICC/Transform/Wrappers/ALegendre/Projector/PviewGpu_t.hpp.inc"
+#endif
 
-namespace QuICC {
-
-namespace Transform {
-
-namespace Poly {
-
-namespace ALegendre {
-
-namespace Projector {
-
-   /**
-    * @brief Implementation of the associated Legendre based P projector
-    */ 
-   class P: public IALegendreProjector
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         P();
-
-         /**
-          * @brief Destructor
-          */
-         virtual ~P();
-         
-      protected:
-         /**
-          * @brief Apply ith operator
-          */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
-
-      private:
-         /**
-          * @brief Make operator
-          */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const;
-   };
-
-}
-}
-}
-}
-}
 
 #endif // QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_P_HPP

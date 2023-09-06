@@ -6,16 +6,10 @@
 #ifndef QUICC_EQUATIONS_EQUATIONDATA_HPP
 #define QUICC_EQUATIONS_EQUATIONDATA_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <limits>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -25,7 +19,8 @@
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/EquationParameters.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/Equations/EquationOptions.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/Variables/VariableRequirement.hpp"
 #include "QuICC/Simulation/SimulationBoundary.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
@@ -43,14 +38,26 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * \param spEqParams Shared equation parameters
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
           */
          explicit EquationData(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend);
 
          /**
+          * @brief Simple constructor
+          *
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
+          * @param spOptions  Additional options
+          */
+         explicit EquationData(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions);
+
+         /**
           * @brief Simple empty destructor
           */
-         virtual ~EquationData();
+         virtual ~EquationData() = default;
 
          /**
           * @brief Get name ID of the unknown
@@ -98,6 +105,7 @@ namespace Equations {
          /**
           * @brief Check if real explicit matrices exist
           *
+          * @param opId    Operator ID
           * @param compId  Field component ID
           * @param fieldId Spectral field ID
           */
@@ -106,6 +114,7 @@ namespace Equations {
          /**
           * @brief Check if complex explicit matrices exist
           *
+          * @param opId    Operator ID
           * @param compId  Field component ID
           * @param fieldId Spectral field ID
           */
@@ -122,6 +131,7 @@ namespace Equations {
          /**
           * @brief Get the explicit matrices
           *
+          * @param opId    Operator ID
           * @param compId  Field component ID
           * @param fieldId Spectral field ID
           * @param j       Matrix index
@@ -176,8 +186,11 @@ namespace Equations {
 
          /**
           * @brief Set the solver index for the coupling information
+          *
+          * @param compId Spectral component IDa
+          * @param idx    Matrix index
           */
-         void setSolverIndex(const FieldComponents::Spectral::Id, const int idx);
+         void setSolverIndex(const FieldComponents::Spectral::Id compId, const int idx);
 
          /**
           * @brief Timing of the solver for the equation
@@ -212,6 +225,11 @@ namespace Equations {
           */
          void cleanupBackend();
 
+         /**
+          * @brief Get equation options
+          */
+         const EquationOptions& options() const;
+
       protected:
          enum ForwardPathsId
          {
@@ -244,6 +262,11 @@ namespace Equations {
           * @brief Get model backend
           */
          const Model::IModelBackend& backend() const;
+
+         /**
+          * @brief Get equation options pointer
+          */
+         std::shared_ptr<EquationOptions> spOptions() const;
 
          /**
           * @brief Add a nonlinear integration component
@@ -350,6 +373,11 @@ namespace Equations {
          std::shared_ptr<Model::IModelBackend> mspBackend;
 
          /**
+          * @brief Equation options
+          */
+         std::shared_ptr<EquationOptions> mspOptions;
+
+         /**
           * @brief Name ID of the unknown
           */
          MHDFloat mTime;
@@ -428,7 +456,7 @@ namespace Equations {
    {
       return avg;
    }
-}
-}
+} // Equations
+} // QuICC
 
 #endif // QUICC_EQUATIONS_EQUATIONDATA_HPP

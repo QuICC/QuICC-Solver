@@ -7,9 +7,6 @@
 #define QUICC_TESTSUITE_SPARSESM_TESTERBASE_HPP
 
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -217,10 +214,15 @@ namespace SparseSM {
       switch(type)
       {
          case TestType::SPARSE:
+         case TestType::STENCIL:
             this->validateData<SparseMatrix>(param, type);
             break;
          case TestType::BANDED:
+         case TestType::BOUNDARY:
             this->validateData<Matrix>(param, type);
+            break;
+         default:
+            throw std::logic_error("Unknown operator type to test");
             break;
       }
    }
@@ -238,6 +240,15 @@ namespace SparseSM {
             break;
          case TestType::BANDED:
             infoType = "BLAS banded";
+            break;
+         case TestType::BOUNDARY:
+            infoType = "Boundary condition";
+            break;
+         case TestType::STENCIL:
+            infoType = "Boundary stencil";
+            break;
+         default:
+            throw std::logic_error("Unknown operator type to test");
             break;
       }
 
@@ -296,6 +307,15 @@ namespace SparseSM {
             break;
          case TestType::BANDED:
             sub = "Banded/";
+            break;
+         case TestType::BOUNDARY:
+            sub = "Boundary/";
+            break;
+         case TestType::STENCIL:
+            sub = "Stencil/";
+            break;
+         default:
+            throw std::logic_error("Unknown operator type to test");
             break;
       }
 

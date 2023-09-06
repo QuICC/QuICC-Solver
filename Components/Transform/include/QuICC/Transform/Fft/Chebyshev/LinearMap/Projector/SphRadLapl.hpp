@@ -84,7 +84,7 @@ namespace Projector {
           * @param in   Input values
           * @param useReal Real vs Imag flag
           */
-         virtual void applyPreOperator(const MatrixZ& in, const bool useReal) const override;
+         virtual void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const override;
 
          /**
           * @brief Apply post FFT operator for component wise operations
@@ -92,7 +92,7 @@ namespace Projector {
           * @param rOut Output values
           * @param useReal Real vs Imag flag
           */
-         virtual void applyPostOperator(MatrixZ& rOut, const bool useReal) const override;
+         virtual void applyPostOperator(MatrixZ& rOut, const Matrix& tmp,  const bool useReal) const override;
    };
 
 }

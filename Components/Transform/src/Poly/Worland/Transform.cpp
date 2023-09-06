@@ -7,15 +7,9 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Transform.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Transform.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 
 namespace QuICC {
@@ -38,14 +32,6 @@ namespace Worland {
       return igrid.cast<MHDFloat>();
    }
 
-   Transform::Transform()
-   {
-   }
-
-   Transform::~Transform()
-   {
-   }
-
    void Transform::init(Transform::SharedSetupType spSetup)
    {
       // Store the shared pointer to setup object
@@ -56,6 +42,11 @@ namespace Worland {
 
       // Lock setup
       this->mspSetup->lock();
+   }
+
+   void Transform::addOperator(const MapFunctor& f)
+   {
+      f(this->mOps);
    }
 
    void Transform::requiredOptions(std::set<std::size_t>&, const Dimensions::Transform::Id) const
@@ -173,7 +164,7 @@ namespace Worland {
       return mem;
    }
 
-}
-}
-}
-}
+} // Worland
+} // Poly
+} // Transform
+} // QuICC

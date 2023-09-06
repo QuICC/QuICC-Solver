@@ -43,12 +43,7 @@ namespace QuICC {
          /**
           * @brief Get the transform implementation
           */
-         ArrayI transformSetup() const;
-
-         /**
-          * @brief Get the boundary setup flags
-          */
-         ArrayI boundarySetup() const;
+         std::map<std::size_t,std::vector<std::size_t>> transformSetup() const;
 
          /**
           * @brief Get the box scale read from the configuration file
@@ -71,6 +66,11 @@ namespace QuICC {
          Splitting::Groupers::Id grouper() const;
 
          /**
+          * @brief List of CPU factorization to test for decomposition
+          */
+         std::list<int> cpuFactors() const;
+
+         /**
           * @brief Get the map of physical values read from the configuration file
           */
          const std::map<std::string, MHDFloat>& physical() const;
@@ -88,7 +88,7 @@ namespace QuICC {
          /**
           * @brief Get the map of boundary conditions read from the configuration file
           */
-         const std::map<std::string, int>& boundary() const;
+         std::map<std::string, std::size_t> boundary() const;
 
          /**
           * @brief Get the map of boundary conditions read from the configuration file
@@ -104,6 +104,21 @@ namespace QuICC {
           * @brief Get the timestepping options read from the configuration file
           */
          Array timestepping() const;
+
+         /**
+          * @brief ID of the timestepper
+          */
+         std::size_t timestepper() const;
+
+         /**
+          * @brief ID of the boundary condition scheme
+          */
+         std::size_t bcScheme() const;
+
+         /**
+          * @brief Use split equation model setup
+          */
+         bool splitEquation() const;
 
       protected:
 

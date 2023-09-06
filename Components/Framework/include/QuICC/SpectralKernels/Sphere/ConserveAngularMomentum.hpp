@@ -6,18 +6,9 @@
 #ifndef QUICC_SPECTRAL_KERNEL_SPHERE_CONSERVEANGULARMOMENTUM_HPP
 #define QUICC_SPECTRAL_KERNEL_SPHERE_CONSERVEANGULARMOMENTUM_HPP
 
-// First include
-//
-
-// Configuration includes
-//
-#include <memory>
-
 // System includes
 //
-
-// External includes
-//
+#include <memory>
 
 // Project includes
 //
@@ -45,7 +36,7 @@ namespace Sphere {
          /**
           * @brief Simple empty destructor
           */
-         virtual ~ConserveAngularMomentum();
+         virtual ~ConserveAngularMomentum() = default;
 
          /**
           * @brief Initialize kernel
@@ -65,7 +56,7 @@ namespace Sphere {
          /**
           * @brief Apply kernel to field
           */
-         virtual void apply() final;
+         virtual void apply(const std::size_t timeId) final;
          
       protected:
 
@@ -110,9 +101,9 @@ namespace Sphere {
    /// Typedef for a smart ConserveAngularMomentum
    typedef std::shared_ptr<ConserveAngularMomentum> SharedConserveAngularMomentum;
    
-}
-}
-}
-}
+} // Sphere
+} // Kernel
+} // Spectral
+} // QuICC
 
 #endif // QUICC_SPECTRAL_KERNEL_SPHERE_CONSERVEANGULARMOMENTUM_HPP

@@ -90,7 +90,7 @@ def coriolisp(maxnl, m, coeff = 1.0):
 
     # Generate 1st superdiagonal
     def d1(l):
-        return  -l*(l + 2.0)*np.sqrt(((l - m + 1.0)*(l + m + 1.0))/((2.0*l + 1.0)*(2.0*l + 3.0)))
+        return -l*(l + 2.0)*np.sqrt(((l - m + 1.0)*(l + m + 1.0))/((2.0*l + 1.0)*(2.0*l + 3.0)))
 
     ds = [d1]
     diags, offsets = utils.build_diagonals(ls, nzrow, ds, offsets, None, False)

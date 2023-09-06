@@ -3,23 +3,14 @@
  * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for toroidal/poloidal field in a spherical geometry
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ISphericalTorPolEnergyWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ISphericalTorPolEnergyWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
@@ -39,11 +30,7 @@ namespace Variable {
       this->mPolEnergy.setConstant(-1);
    }
 
-   ISphericalTorPolEnergyWriter::~ISphericalTorPolEnergyWriter()
-   {
-   }
-
-   void ISphericalTorPolEnergyWriter::initializeEnergy()
+   void ISphericalTorPolEnergyWriter::resetEnergy()
    {
       this->mTorEnergy.setZero();
       this->mPolEnergy.setZero();
@@ -150,6 +137,6 @@ namespace Variable {
       }
    }
 
-}
-}
-}
+} // Variable
+} // Io
+} // QuICC

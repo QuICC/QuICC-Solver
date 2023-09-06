@@ -1,0 +1,39 @@
+/**
+ * @file @idCLASS@.hpp
+ * @brief @idCLASS@ ID
+ */
+
+#ifndef QUICC_@IDNS@_@IDCLASS@_HPP
+#define QUICC_@IDNS@_@IDCLASS@_HPP
+
+// System includes
+//
+
+// Project includes
+//
+#include "QuICC/BasicTypes.hpp"
+#include "QuICC/@idNS@/IRegisterId.hpp"
+
+namespace QuICC {
+
+@cxxNS@
+
+   /**
+    * @brief @idCLASS@ ID
+    */
+   class @idCLASS@: public IRegisterId<@idCLASS@>
+   {
+      public:
+         /**
+          * @brief Constructor
+          */
+         @idCLASS@(@_idSIG@@_idARGDefault@)
+            : IRegisterId<@idCLASS@>(@idARG@@_idCOMMA@"@idTAG@")
+         {
+         };
+   };
+
+@cxxNS_@
+} // QuICC
+
+#endif // QUICC_@IDNS@_@IDCLASS@_HPP

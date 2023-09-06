@@ -34,7 +34,7 @@ namespace Setup {
    /**
     * @name Enum for framework configuration block
     */
-   enum NodeId {PARALLEL, TRANSFORM, TIMESTEPPER, BOUNDARY};
+   enum NodeId {PARALLEL, TRANSFORM, TIMESTEPPER, BOUNDARY, MODEL};
 
    /**
     * @brief Implementation of the base for a configuration file

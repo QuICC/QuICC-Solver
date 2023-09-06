@@ -44,16 +44,17 @@ namespace Variable {
    void SphereAngularMomentumWriter::init()
    {
       this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123);
+      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
 
       if(this->mHasMOrdering)
       {
          // Loop over harmonic order m
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            int m_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
 
                if(l_ == 1 && m_ == 0)
                {
@@ -71,12 +72,12 @@ namespace Variable {
       } else
       {
          // Loop over harmonic degree l
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            int l_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+               int m_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
                if(l_ == 1 && m_ == 0)
                {
                   this->mM0j = j;

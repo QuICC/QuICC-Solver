@@ -1,4 +1,4 @@
-/** 
+/**
  * @file D1.hpp
  * @brief Implementation of the associated Legendre based D projector
  */
@@ -6,66 +6,18 @@
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_D1_HPP
 #define QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_D1_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Poly/ALegendre/Projector/IALegendreProjector.hpp"
-
-namespace QuICC {
-
-namespace Transform {
-
-namespace Poly {
-
-namespace ALegendre {
-
-namespace Projector {
-
-   /**
-    * @brief Implementation of the associated Legendre based D projector
-    */ 
-   class D1: public IALegendreProjector
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         D1();
-
-         /**
-          * @brief Destructor
-          */
-         virtual ~D1();
-         
-      protected:
-         /**
-          * @brief Apply ith operator
-          */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
-
-      private:
-         /**
-          * @brief Make operator
-          */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const;
-   };
-
-}
-}
-}
-}
-}
+#include "QuICC/Transform/Poly/ALegendre/Projector/Base/D1.hpp"
+#ifdef QUICC_USE_KOKKOS
+#include "QuICC/Transform/Poly/ALegendre/Projector/Kokkos/D1.hpp"
+#endif
+#include "QuICC/Transform/Wrappers/ALegendre/Projector/D1viewCpu_t.hpp.inc"
+#ifdef QUICC_HAS_CUDA_BACKEND
+#include "QuICC/Transform/Wrappers/ALegendre/Projector/D1viewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_D1_HPP

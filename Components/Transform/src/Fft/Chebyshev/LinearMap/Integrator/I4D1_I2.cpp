@@ -53,24 +53,19 @@ namespace Integrator {
       }
    }
 
-   void I4D1_I2::applyPreOperator(Matrix& rOut, const Matrix& in) const
-   {
-      this->mBackend.io(rOut, in);
-   }
-
    void I4D1_I2::applyPostOperator(Matrix& rOut) const
    {
       this->mBackend.outputSpectral(rOut);
    }
 
-   void I4D1_I2::applyPreOperator(const MatrixZ& in, const bool useReal) const
+   void I4D1_I2::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
-      this->mBackend.input(in, useReal);
+      this->mBackend.input(tmp, in, useReal);
    }
 
-   void I4D1_I2::applyPostOperator(MatrixZ& rOut, const bool useReal) const
+   void I4D1_I2::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      this->mBackend.outputSpectral(rOut, useReal);
+      this->mBackend.outputSpectral(rOut, tmp, useReal);
    }
 
 }

@@ -45,7 +45,7 @@ namespace Variable {
       // Normalize by sphere volume: 4/3*pi*r_o^3
       this->mVolume = (4.0/3.0)*Math::PI;
 
-      this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123);
+      this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::TransformSpectralOrdering123);
 
       ISphericalScalarLSpectrumWriter::init();
    }

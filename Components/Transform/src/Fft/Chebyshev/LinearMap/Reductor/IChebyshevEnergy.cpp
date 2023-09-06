@@ -50,14 +50,17 @@ namespace Reductor {
       assert(rOut.cols() == this->outCols());
       assert(rOut.rows() == this->outRows());
 
-      this->applyPreOperator(in, true);
-      this->mBackend.applyFft();
-      this->mBackend.square(true);
-      this->applyPreOperator(in, false);
-      this->mBackend.applyFft();
-      this->mBackend.square(false);
-      this->mBackend.applyFwdFft();
-      this->applyPostOperator(rOut);
+      auto& tmpIn = this->mBackend.getStorage(StorageKind::in);
+      auto& tmpOut = this->mBackend.getStorage(StorageKind::out);
+      auto& tmpSquare = this->mBackend.getStorage(StorageKind::mid);
+      this->applyPreOperator(tmpIn, in, true);
+      this->mBackend.applyFft(tmpOut, tmpIn);
+      this->mBackend.square(tmpSquare, tmpOut, true);
+      this->applyPreOperator(tmpIn, in, false);
+      this->mBackend.applyFft(tmpOut, tmpIn);
+      this->mBackend.square(tmpSquare, tmpOut, false);
+      this->mBackend.applyFwdFft(tmpOut, tmpSquare);
+      this->applyPostOperator(rOut, tmpOut);
    }
 
    void IChebyshevEnergy::transform(Matrix& rOut, const Matrix& in) const
@@ -66,11 +69,14 @@ namespace Reductor {
       assert(rOut.cols() == this->outCols());
       assert(rOut.rows() == this->outRows());
 
-      this->applyPreOperator(in);
-      this->mBackend.applyFft();
-      this->mBackend.square(true);
-      this->mBackend.applyFwdFft();
-      this->applyPostOperator(rOut);
+      auto& tmpIn = this->mBackend.getStorage(StorageKind::in);
+      auto& tmpOut = this->mBackend.getStorage(StorageKind::out);
+      auto& tmpSquare = this->mBackend.getStorage(StorageKind::mid);
+      this->applyPreOperator(tmpIn, in);
+      this->mBackend.applyFft(tmpOut, tmpIn);
+      this->mBackend.square(tmpSquare, tmpOut, true);
+      this->mBackend.applyFwdFft(tmpOut, tmpSquare);
+      this->applyPostOperator(rOut, tmpOut);
    }
 
    void IChebyshevEnergy::transform(MatrixZ&, const MatrixZ&) const

@@ -47,7 +47,7 @@ namespace Parallel {
          /**
           * @brief Destructor
           */
-         virtual ~SplittingAlgorithm();
+         virtual ~SplittingAlgorithm() = default;
 
          /**
           * @brief Compute splitting and the corresponding score
@@ -76,7 +76,7 @@ namespace Parallel {
           *
           * @param spRes   Shared resolution object
           */
-         static void buildCommunicationStructure(const int localId, SharedResolution spRes, std::vector<std::multimap<int,int> >& commStructure);
+         static void buildCommunicationStructure(const int localId, SharedResolution spRes, std::map<Dimensions::Transform::Id,std::multimap<int,int> >& commStructure);
          
       protected:
          /**
@@ -132,6 +132,13 @@ namespace Parallel {
           * @param balance Details of the load balancing (on input they contain weights)
           */
          double balancingScore(SharedResolution spRes, Array& balance);
+
+         /**
+          * @brief Manually set factorization
+          *
+          * @param f list of factors to use
+          */
+         void useFactorization(const std::list<int>& f);
 
          /**
           * @brief Get id of core

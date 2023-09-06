@@ -44,7 +44,7 @@ namespace Simulation {
       // Get iterator over vector
       for(auto it = names.cbegin(); it != names.cend(); it++)
       {
-         this->iTags().addTag(*it, -1);
+         this->sTags().addTag(*it, "invalid");
       }
    }
 

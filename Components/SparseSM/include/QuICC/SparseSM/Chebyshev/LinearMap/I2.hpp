@@ -6,16 +6,7 @@
 #ifndef QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_I2_HPP
 #define QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_I2_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -39,34 +30,47 @@ namespace LinearMap {
       public:
          /**
           * @brief Constructor
+          *
+          * @param rows    Number of rows
+          * @param cols    Number of columns
+          * @param lower   Lower bound of domain
+          * @param upper   Upper bound of domain
           */
          I2(const int rows, const int cols, const Scalar_t lower, const Scalar_t upper);
 
          /**
           * @brief Destructor
           */
-         virtual ~I2();
+         virtual ~I2() = default;
          
       protected:
 
       private:
          /**
           * @brief 2nd subdiagonal
+          *
+          * @param n mode indexes
           */
          ACoeff_t d_2(const ACoeff_t& n) const; 
 
          /**
           * @brief diagonal
+          *
+          * @param n mode indexes
           */
          ACoeff_t d0(const ACoeff_t& n) const; 
 
          /**
           * @brief 2nd superdiagonal
+          *
+          * @param n mode indexes
           */
          ACoeff_t d2(const ACoeff_t& n) const; 
 
          /**
           * @brief Build triplet representation of matrix
+          *
+          * @param[out] list containing triplets
           */
          virtual void buildTriplets(TripletList_t& list) const;
    };

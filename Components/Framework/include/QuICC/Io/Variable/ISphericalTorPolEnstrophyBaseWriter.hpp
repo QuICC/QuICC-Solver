@@ -69,6 +69,11 @@ namespace Variable {
          
       protected:
          /**
+          * @brief Prepare spectral field data for computation
+          */
+         void prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord);
+
+         /**
           * @brief Data ordering is m slowest
           */
          bool mHasMOrdering;
@@ -85,9 +90,9 @@ namespace Variable {
 
       private:
          /**
-          * @brief Initialize enstrophy storage
+          * @brief Reset enstrophy storage
           */
-         virtual void initializeEnstrophy() = 0;
+         virtual void resetEnstrophy() = 0;
 
          /**
           * @brief Store enstrophy from Q component

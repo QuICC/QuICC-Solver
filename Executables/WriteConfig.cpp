@@ -29,9 +29,6 @@
 #include "QuICC/Io/Config/Simulation/Boundary.hpp"
 #include MODELHEADER
 
-// Check Model and Framework compatiblity
-#include "QuICC/Version/ModelChecker.h"
-
 typedef QuICC::Model::QUICC_RUNSIM_CPPMODEL::PhysicalModel PModel;
 
 /**
@@ -43,8 +40,9 @@ int run()
    PModel model;
    model.init();
 
-   // Create spatial scheme
+   // Create and tune spatial scheme
    auto spScheme = std::make_shared<typename PModel::SchemeType>(model.SchemeFormulation(), QuICC::GridPurpose::SIMULATION);
+   model.tuneScheme(spScheme);
 
    // Set dimension
    int dim = spScheme->dimension();

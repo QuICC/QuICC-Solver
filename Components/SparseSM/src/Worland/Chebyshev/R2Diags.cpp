@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Worland/Chebyshev/R2Diags.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/Chebyshev/R2Diags.hpp"
 
 namespace QuICC {
 
@@ -26,12 +20,8 @@ namespace Worland {
 
 namespace Chebyshev {
 
-   R2Diags::R2Diags(const Scalar_t alpha, const int l)
-      : QuICC::SparseSM::Worland::R2Diags(alpha, MHD_MP(-0.5), l)
-   {
-   }
-
-   R2Diags::~R2Diags()
+   R2Diags::R2Diags(const Scalar_t alpha, const int l, const int q)
+      : QuICC::SparseSM::Worland::R2Diags(alpha, MHD_MP(-0.5), l, q)
    {
    }
 

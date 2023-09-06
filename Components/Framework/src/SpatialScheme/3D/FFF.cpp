@@ -6,16 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/FFF.hpp"
-
 // Project includes
 //
-#include "QuICC/SpatialScheme/Coordinator.hpp"
+#include "QuICC/Hasher.hpp"
+#include "QuICC/SpatialScheme/3D/FFF.hpp"
 #include "QuICC/SpatialScheme/3D/FFFBuilder.hpp"
 #include "QuICC/Transform/ComplexFourierTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
@@ -31,7 +25,7 @@ namespace SpatialScheme {
 
    const std::string FFF::sFormatted = "FFF";
 
-   const std::size_t FFF::sId = registerId<FFF>(FFF::sTag);
+   const std::size_t FFF::sId = Hasher::makeId(FFF::sTag);
 
    FFF::FFF(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 3, FFF::sId, FFF::sTag, FFF::sFormatted)
@@ -52,16 +46,13 @@ namespace SpatialScheme {
       this->enable(Feature::RegularSpectrum);
       this->enable(Feature::SpectralMatrix1D);
       this->enable(Feature::SpectralOrdering123);
+      this->enable(Feature::TransformSpectralOrdering123);
       this->enable(Feature::ComplexSpectrum);
-   }
-
-   FFF::~FFF()
-   {
    }
 
    std::shared_ptr<IBuilder> FFF::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<FFFBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<FFFBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }
@@ -199,5 +190,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

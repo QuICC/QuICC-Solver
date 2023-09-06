@@ -19,6 +19,7 @@
 // Project includes
 //
 #include "QuICC/Io/Config/Setup/Boundary.hpp"
+#include "QuICC/Io/Config/Setup/Model.hpp"
 #include "QuICC/Io/Config/Setup/Parallel.hpp"
 #include "QuICC/Io/Config/Setup/Timestepper.hpp"
 #include "QuICC/Io/Config/Setup/Transform.hpp"
@@ -54,6 +55,10 @@ namespace Setup {
 
       //
       // Create setup content
+
+      // Add model part
+      spNode = std::make_shared<Model>();
+      this->addNode(static_cast<NodeMap::key_type>(MODEL), spNode);
 
       // Add boundary part
       spNode = std::make_shared<Boundary>();

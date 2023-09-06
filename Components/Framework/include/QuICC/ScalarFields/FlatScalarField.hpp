@@ -369,8 +369,7 @@ namespace Datatypes {
    template <typename TData> inline const typename FlatScalarField<TData>::StorageType& FlatScalarField<TData>::data() const
    {
       // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      assert(this->mspField);
 
       return *this->mspField;
    }
@@ -378,8 +377,7 @@ namespace Datatypes {
    template <typename TData> inline typename FlatScalarField<TData>::StorageType& FlatScalarField<TData>::rData()
    {
       // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      assert(this->mspField);
 
       return *this->mspField;
    }
@@ -561,8 +559,8 @@ namespace Datatypes {
    template <typename TData> template<typename Derived> void FlatScalarField<TData>::setData(const Eigen::MatrixBase<Derived>& field)
    {
       // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      assert(this->mspField->rows() == field.rows());
+      assert(this->mspField->cols() == field.cols());
 
       // Assert for positive sizes
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) = field;
@@ -571,8 +569,8 @@ namespace Datatypes {
    template <typename TData> template<typename Derived> void FlatScalarField<TData>::addData(const Eigen::MatrixBase<Derived>& field)
    {
       // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      assert(this->mspField->rows() == field.rows());
+      assert(this->mspField->cols() == field.cols());
 
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) += field;
    }
@@ -580,8 +578,8 @@ namespace Datatypes {
    template <typename TData> template<typename Derived> void FlatScalarField<TData>::subData(const Eigen::MatrixBase<Derived>& field)
    {
       // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      assert(this->mspField->rows() == field.rows());
+      assert(this->mspField->cols() == field.cols());
 
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) -= field;
    }

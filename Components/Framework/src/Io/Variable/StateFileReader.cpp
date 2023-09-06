@@ -3,22 +3,13 @@
  * @brief Source of the implementation of HDF5 state file reader
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/StateFileReader.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/StateFileReader.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/SpatialScheme/3D/TFF.hpp"
@@ -26,6 +17,7 @@
 #include "QuICC/Io/Variable/Tags/StateFile.hpp"
 #include "QuICC/Io/Variable/Tags/VariableHdf5.hpp"
 #include "QuICC/Tools/IdToHuman.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -44,6 +36,8 @@ namespace Variable {
 
    void StateFileReader::read()
    {
+      Profiler::RegionFixture<2> fix("StateFileReader::read");
+
       // Read the truncation information
       this->readTruncation();
 
@@ -57,28 +51,48 @@ namespace Variable {
       this->readRun();
 
       // Read all the scalars
+      Profiler::RegionStart<3>("StateFileReader::read-scalars");
       StateFileReader::scalar_iterator_range sRange = this->scalarRange();
       StateFileReader::scalar_iterator sit;
       for(sit = sRange.first; sit != sRange.second; ++sit)
       {
          // Make sure full field is zero
-         std::visit([&](auto&& p){p->setZeros();}, sit->second);
+         std::visit(
+               [&](auto&& p)
+               {
+                  p->setZeros();
+               }, sit->second);
 
          // Read field values
-         std::visit([&](auto&& p){this->readSpectralScalar(PhysicalNames::Coordinator::tag(sit->first), p->rDom(0).rPerturbation(), this->isRequired(sit->first));}, sit->second);
+         std::visit(
+               [&](auto&& p)
+               {
+                  this->readSpectralScalar(PhysicalNames::Coordinator::tag(sit->first), p->rDom(0).rPerturbation(), this->isRequired(sit->first));
+               }, sit->second);
       }
+      Profiler::RegionStop<3>("StateFileReader::read-scalars");
 
       // Read all the vectors
+      Profiler::RegionStart<3>("StateFileReader::read-vectors");
       StateFileReader::vector_iterator_range vRange = this->vectorRange();
       StateFileReader::vector_iterator vit;
       for(vit = vRange.first; vit != vRange.second; ++vit)
       {
          // Make sure full field is zero
-         std::visit([&](auto&& p){p->setZeros();}, vit->second);
+         std::visit(
+               [&](auto&& p)
+               {
+                  p->setZeros();
+               }, vit->second);
 
          // Read field values
-         std::visit([&](auto&& p){this->readSpectralVector(PhysicalNames::Coordinator::tag(vit->first), p->rDom(0).rPerturbation().rData(), this->isRequired(vit->first));}, vit->second);
+         std::visit(
+               [&](auto&& p)
+               {
+                  this->readSpectralVector(PhysicalNames::Coordinator::tag(vit->first), p->rDom(0).rPerturbation().rData(), this->isRequired(vit->first));
+               }, vit->second);
       }
+      Profiler::RegionStop<3>("StateFileReader::read-vectors");
    }
 
    void StateFileReader::readSetup()

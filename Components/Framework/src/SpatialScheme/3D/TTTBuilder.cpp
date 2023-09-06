@@ -3,27 +3,19 @@
  * @brief Source of the Chebyshev(FFT) + Chebyshev(FFT) + Chebyshev(FFT) scheme implementation
  */
 
-// Configuration includes
-//
-#include "QuICC/Framework/MpiFramework.hpp"
-
 // System includes
 //
 #include <set>
 #include <vector>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/TTTBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/3D/TTTBuilder.hpp"
+#include "QuICC/Framework/MpiFramework.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Tools/RegularIndexCounter.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
+#include "QuICC/SpatialScheme/3D/TTTMesher.hpp"
 
 namespace QuICC {
 
@@ -33,6 +25,7 @@ namespace SpatialScheme {
    {
       // Create single rank communicator
       #ifdef QUICC_MPI
+         #pragma message("TTTBuilder seems to be broken in MPI mode!")
          std::vector<int>  ranks;
 
          // Make single core communicator unless MPI sparse solver is used
@@ -41,7 +34,6 @@ namespace SpatialScheme {
          #endif //QUICC_MPISPSOLVE
 
          //MpiFramework::setSpectralComm(ranks);
-#pragma message("TTTBuilder seems to be broken in MPI mode!")
       #endif //QUICC_MPI
    }
 
@@ -126,129 +118,23 @@ namespace SpatialScheme {
       return spSetup;
    }
 
-   TTTBuilder::TTTBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegular3DBuilder(dim, purpose)
-   {
-   }
-
-   TTTBuilder::~TTTBuilder()
+   TTTBuilder::TTTBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options)
+      : IRegular3DBuilder(dim, purpose, options)
    {
    }
 
    void TTTBuilder::setDimensions()
    {
-      //
-      // Set transform space sizes
-      //
-      ArrayI traSize(3);
-      traSize(0) = this->mI + 1;
-      traSize(1) = this->mJ + 1;
-      traSize(2) = this->mK + 1;
-      this->setTransformSpace(traSize);
+      // Set default mesher
+      auto m = std::make_shared<TTTMesher>(this->purpose());
+      this->setMesher(m, false);
+      // ... initialize mesher
+      std::vector<int> d = {this->mI, this->mJ, this->mK};
+      this->mesher().init(d, this->mOptions);
 
-      //
-      // Compute sizes
-      //
-
-      // Get standard dealiased FFT size
-      int nX = Transform::Fft::Tools::dealiasCosFft(this->mI+1);
-      // Check for optimised FFT sizes
-      nX = Transform::Fft::Tools::optimizeFft(nX);
-
-      // Get standard dealiased FFT size
-      int nY = Transform::Fft::Tools::dealiasCosFft(this->mJ+1);
-      // Check for optimised FFT sizes
-      nY = Transform::Fft::Tools::optimizeFft(nY);
-
-      // Get standard dealiased FFT size
-      int nZ = Transform::Fft::Tools::dealiasCosFft(this->mK+1);
-      // Check for optimised FFT sizes
-      nZ = Transform::Fft::Tools::optimizeFft(nZ);
-
-      //
-      // Initialise first transform
-      //
-
-      // Initialise forward dimension of first transform
-      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
-
-      // Initialise backward dimension of first transform
-      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
-
-      // Initialise second dimension of first transform
-      this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
-
-      // Initialise third dimension of first transform
-      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
-
-      //
-      // Initialise second transform
-      //
-
-      // Initialise forward dimension of second transform
-      this->setDimension(nY, Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
-
-      // Initialise backward dimension of second transform
-      this->setDimension(nY, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
-
-      // Initialise second dimension of second transform
-      this->setDimension(nX, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
-
-      // Initialise third dimension of second transform
-      this->setDimension(traSize(2), Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
-
-      //
-      // Initialise third transform
-      //
-
-      // Initialise forward dimension of third transform
-      this->setDimension(nZ, Dimensions::Transform::TRA3D, Dimensions::Data::DATF1D);
-
-      // Initialise backward dimension of third transform
-      this->setDimension(nZ, Dimensions::Transform::TRA3D, Dimensions::Data::DATB1D);
-
-      // Initialise second dimension of third transform
-      this->setDimension(nY, Dimensions::Transform::TRA3D, Dimensions::Data::DAT2D);
-
-      // Initialise third dimension of third transform
-      this->setDimension(nX, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
+      // Set dimensions using mesher
+      I3DBuilder::setDimensions();
    }
 
-   void TTTBuilder::setCosts()
-   {
-      // Set first transform cost
-      this->setCost(1.0, Dimensions::Transform::TRA1D);
-
-      // Set second transform cost
-      this->setCost(1.0, Dimensions::Transform::TRA2D);
-
-      // Set third transform cost
-      this->setCost(1.0, Dimensions::Transform::TRA3D);
-   }
-
-   void TTTBuilder::setScalings()
-   {
-      // Set first transform scaling
-      this->setScaling(1.0, Dimensions::Transform::TRA1D);
-
-      // Set second transform scaling
-      this->setScaling(1.0, Dimensions::Transform::TRA2D);
-
-      // Set third transform scaling
-      this->setScaling(1.0, Dimensions::Transform::TRA3D);
-   }
-
-   void TTTBuilder::setMemoryScore()
-   {
-      // Set first transform memory footprint
-      this->setMemory(1.0, Dimensions::Transform::TRA1D);
-
-      // Set second transform memory footprint
-      this->setMemory(1.0, Dimensions::Transform::TRA2D);
-
-      // Set third transform memory footprint
-      this->setMemory(1.0, Dimensions::Transform::TRA3D);
-   }
-
-}
-}
+} // SpatialScheme
+} // QuICC

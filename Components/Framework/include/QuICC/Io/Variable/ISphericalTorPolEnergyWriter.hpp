@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYWRITER_HPP
 #define QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYWRITER_HPP
 
-// Configuration includes
-//
-#include <memory>
-
 // System includes
 //
-
-// External includes
-//
+#include <memory>
 
 // Project includes
 //
@@ -45,7 +39,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalTorPolEnergyWriter();
+         virtual ~ISphericalTorPolEnergyWriter() = default;
          
       protected:
          /**
@@ -65,28 +59,40 @@ namespace Variable {
          Array mPolEnergy;
 
          /**
-          * @brief Initialize energy storage
+          * @brief Reset energy storage
           */
-         virtual void initializeEnergy();
+         virtual void resetEnergy();
 
          /**
           * @brief Store energy from Q component
+          *
+          * @param l      Harmonic degree
+          * @param m      Harmonic order
+          * @param energy  Energy of mode
           */
          virtual void storeQEnergy(const int l, const int m, const MHDFloat energy);
 
          /**
           * @brief Store energy from S component
+          *
+          * @param l      Harmonic degree
+          * @param m      Harmonic order
+          * @param energy  Energy of mode
           */
          virtual void storeSEnergy(const int l, const int m, const MHDFloat energy);
 
          /**
           * @brief Store energy from T component
+          *
+          * @param l      Harmonic degree
+          * @param m      Harmonic order
+          * @param energy  Energy of mode
           */
          virtual void storeTEnergy(const int l, const int m, const MHDFloat energy);
    };
 
-}
-}
-}
+} // Variable
+} // Io
+} // QuICC
 
 #endif // QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYWRITER_HPP

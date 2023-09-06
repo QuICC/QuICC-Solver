@@ -6,18 +6,9 @@
 #ifndef QUICC_SPARSESM_ICHEBYSHEVOPERATOR_HPP
 #define QUICC_SPARSESM_ICHEBYSHEVOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
-
-// External includes
-//
 
 // Project includes
 //
@@ -36,17 +27,25 @@ namespace SparseSM {
       public:
          /**
           * @brief Constructor
+          *
+          * @param rows Number of rows
+          * @param cols Number of columns
           */
          IChebyshevOperator(const int rows, const int cols);
 
          /**
           * @brief Destructor
           */
-         virtual ~IChebyshevOperator();
+         virtual ~IChebyshevOperator() = default;
          
       protected:
          /**
           * @brief Wrap around negative column indexes into the matrix
+          *
+          * @param list    List of Triplets representating the matrix
+          * @param row     Row index
+          * @param col     Column index
+          * @param value   New value
           */
          virtual void leftOutOfMatrix(TripletList_t& list, const int row, const int col, const Scalar_t value) const;
 

@@ -150,6 +150,14 @@ namespace Projector {
           * @param in   Input values
           */
          virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
+
+         /**
+          * @brief Compute transform
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          */
+         virtual void transform(MatrixZ& rOut, const Matrix& in) const override;
    };
 
 }

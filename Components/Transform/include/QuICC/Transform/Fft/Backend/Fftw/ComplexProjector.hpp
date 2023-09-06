@@ -48,38 +48,37 @@ namespace Fftw {
          /**
           * @brief Destructor
           */
-         virtual ~ComplexProjector();
+         ~ComplexProjector();
          
          /**
           * @brief Initialise the FFT transforms
           */
-         virtual void init(const SetupType& setup) const override;
+         void init(const SetupType& setup) const override;
 
          /**
-          * @brief Copy field into backend
+          * @brief Copy and pad FFT temporary input
           */
-         void input(const MatrixZ& in) const;
-         using IComplexBackend::input;
+         void input(MatrixZ& tmp, const MatrixZ& in) const;
 
          /**
           * @brief Copy mean of field into backend
           */
-         void inputMean(const MatrixZ& in) const;
+         void inputMean(MatrixZ& tmp, const MatrixZ& in) const;
 
          /**
           * @brief Scale with fast index dependent function
           */
-         void inputDiff(const MatrixZ& rData, const int order, const MHDFloat scale) const;
+         void inputDiff(MatrixZ& tmp, const MatrixZ& in, const int order, const MHDFloat scale) const;
 
          /**
           * @brief Scale with fast and slow index dependent functin
           */
-         void inputDiff2D(const MatrixZ& rData, const std::vector<std::pair<int,int> >& orders, const MHDFloat scale, const MatrixI& idBlocks) const;
+         void inputDiff2D(MatrixZ& tmp, const MatrixZ& rData, const std::vector<std::pair<int,int> >& orders, const MHDFloat scale, const MatrixI& idBlocks) const;
 
          /**
           * @brief Apply FFT
           */
-         virtual void applyFft() const override;
+         void applyFft(MatrixZ& phys, const MatrixZ& mods) const final;
 
       protected:
 

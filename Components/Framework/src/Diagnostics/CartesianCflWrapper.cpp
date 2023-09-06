@@ -80,20 +80,24 @@ namespace Diagnostics {
 
       // Assume a velocity of 100 to avoid problems with "zero" starting values
       MHDFloat newCfl;
-      newCfl = this->mcCourant*dx1.minCoeff()/100.;
+      int idx;
+      newCfl = this->mcCourant*dx1.minCoeff(&idx)/100.;
       if(newCfl < cfl(0,1))
       {
          cfl(0,1) = newCfl;
+         cfl(1,1) = dx1(idx);
       }
-      newCfl = this->mcCourant*dx2.minCoeff()/100.;
+      newCfl = this->mcCourant*dx2.minCoeff(&idx)/100.;
       if(newCfl < cfl(0,2))
       {
          cfl(0,2) = newCfl;
+         cfl(1,2) = dx2(idx);
       }
-      newCfl = this->mcCourant*dx3.minCoeff()/100.;
+      newCfl = this->mcCourant*dx3.minCoeff(&idx)/100.;
       if(newCfl < cfl(0,3))
       {
          cfl(0,3) = newCfl;
+         cfl(1,3) = dx3(idx);
       }
 
       this->updateCflMatrix(cfl);
@@ -105,7 +109,7 @@ namespace Diagnostics {
    {
       // Compute most stringent CFL condition
       MHDFloat newCfl;
-      Matrix cfl = Matrix::Constant(1,4, std::numeric_limits<MHDFloat>::max());
+      Matrix cfl = Matrix::Constant(2,4, std::numeric_limits<MHDFloat>::max());
 
       const Array& dx1 = this->mMeshSpacings.at(0);
       const Array& dx2 = this->mMeshSpacings.at(1);
@@ -121,6 +125,7 @@ namespace Diagnostics {
          if(newCfl < cfl(0,1))
          {
             cfl(0,1) = newCfl;
+            cfl(1,1) = 0;
          }
       }
 
@@ -135,6 +140,7 @@ namespace Diagnostics {
             if(newCfl < cfl(0,2))
             {
                cfl(0,2) = newCfl;
+               cfl(1,2) = 0;
             }
          }
       }
@@ -152,6 +158,7 @@ namespace Diagnostics {
                if(newCfl < cfl(0,3))
                {
                   cfl(0,3) = newCfl;
+                  cfl(1,3) = 0;
                }
             }
          }

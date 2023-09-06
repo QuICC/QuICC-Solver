@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Projector/Mean.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Complex/Projector/MeanBase.hpp"
 
 namespace QuICC {
 
@@ -29,23 +23,9 @@ namespace Complex {
 
 namespace Projector {
 
-   Mean::Mean()
+   void Mean<base_t>::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
    {
-   }
-
-   Mean::~Mean()
-   {
-   }
-
-   void Mean::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      this->mBackend.inputMean(in);
-
-      this->mBackend.output(rOut.data());
-   }
-
-   void Mean::applyPostOperator(MatrixZ&) const
-   {
+      this->mBackend.inputMean(tmp, in);
    }
 
 }

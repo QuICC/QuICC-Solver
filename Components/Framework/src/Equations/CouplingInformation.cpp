@@ -31,7 +31,7 @@ namespace QuICC {
 namespace Equations {
 
    CouplingInformation::CouplingInformation()
-      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mHasBoundaryValue(false), mIsComplex(true), mIsGalerkin(false), mIndexType(CouplingIndexType::SLOWEST_SINGLE_RHS), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
+      : mEquationType(TRIVIAL), mHasNonlinear(false), mHasQuasiInverse(false), mHasSource(false), mHasBoundaryValue(false), mIsComplex(true), mIsSplitEquation(false), mIsGalerkin(false), mIndexType(CouplingIndexType::SLOWEST_SINGLE_RHS), mNSystems(0), mFieldIndex(-1), mSolverIndex(-1), mFieldStart(-1)
    {
    }
 
@@ -67,6 +67,11 @@ namespace Equations {
    bool CouplingInformation::isComplex() const
    {
       return this->mIsComplex;
+   }
+
+   bool CouplingInformation::isSplitEquation() const
+   {
+      return this->mIsSplitEquation;
    }
 
    bool CouplingInformation::isGalerkin() const
@@ -172,13 +177,15 @@ namespace Equations {
 
    }
 
-   void CouplingInformation::setGeneral(const CouplingInformation::EquationTypeId typeId, const bool isComplex, const int fieldStart)
+   void CouplingInformation::setGeneral(const CouplingInformation::EquationTypeId typeId, const bool isComplex, const int fieldStart, const bool isSplitEquation)
    {
       this->mEquationType = typeId;
 
       this->mIsComplex = isComplex;
 
       this->mFieldStart = fieldStart;
+
+      this->mIsSplitEquation = isSplitEquation;
    }
 
    void CouplingInformation::setNonlinear(const bool hasNonlinear, const bool hasQuasiInverse)

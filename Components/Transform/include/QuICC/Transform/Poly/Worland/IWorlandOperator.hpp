@@ -60,7 +60,14 @@ namespace Worland {
           *
           * @param spSetup   Shared setup object for the transform
           */
-         void init(SharedSetupType spSetup, const internal::Array& igrid, const internal::Array& iweights) const;
+         void init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const override;
+
+         /**
+          * @brief Initialise the polynomial transform
+          *
+          * @param spSetup   Shared setup object for the transform
+          */
+         void init(SharedTransformSetup spSetup) const override;
 
          /**
           * @brief Compute polynomial transform
@@ -68,7 +75,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in) const;
+         void transform(MatrixZ& rOut, const MatrixZ& in) const override;
 
          /**
           * @brief Compute polynomial transform
@@ -81,7 +88,7 @@ namespace Worland {
          /**
           * @brief Get the memory requirements
           */
-         virtual MHDFloat requiredStorage() const;
+         virtual MHDFloat requiredStorage() const override;
 
          /**
           * @brief Rows of output data

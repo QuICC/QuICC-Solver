@@ -19,7 +19,7 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::Worland;
 
-TEST_CASE( "@Algorithm@::Error for @Operator@ integrator", "[@Algorithm@::@Operator@:@type@]" ){
+TEST_CASE( "@Algorithm@::Error for @Operator@@Template@ integrator", "[@CatchTestName@]" ){
 
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -36,11 +36,13 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ integrator", "[@Algorithm@::@Opera
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::@Algorithm@::Worland::Integrator::@Operator@ Integrator;
+   using namespace ::QuICC::Transform::@Algorithm@::Worland;
+   typedef Integrator::@Operator@@Template@ Integrator;
    typedef typename currentts::Tester<Integrator> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
+   tester.setIter(currentts::args().iter);
 
    Tester::ParameterType params = {-1};
 
@@ -53,7 +55,7 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ integrator", "[@Algorithm@::@Opera
    for(auto id: currentts::args().params)
    {
       params.at(0) = id;
-      tester.validate(params, currentts::args().type);
+      tester.validate(params, currentts::args().type, currentts::args().timeOnly);
    }
 
 }

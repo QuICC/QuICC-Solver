@@ -12,9 +12,6 @@
 #include <memory>
 #include <variant>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
@@ -23,8 +20,9 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Tools/ComponentAlias.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
+#include "QuICC/SpatialScheme/IMesher.hpp"
 #include "QuICC/Equations/CouplingIndexType.hpp"
 
 // forward declarations
@@ -63,7 +61,7 @@ namespace QuICC {
 namespace SpatialScheme {
 
    /**
-    * @brief Interface for a spatial scheme name 
+    * @brief Interface for a spatial scheme name
     */
    class ISpatialScheme
    {
@@ -87,7 +85,7 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         virtual ~ISpatialScheme();
+         virtual ~ISpatialScheme() = default;
 
          /**
           * @brief Formulation used for vector fields
@@ -157,7 +155,7 @@ namespace SpatialScheme {
          /**
           * @brief Set implementation type
           */
-         void setImplementation(const ArrayI& type);
+         virtual void setImplementation(const std::map<std::size_t,std::vector<std::size_t>>& type);
 
          /**
           * @brief Create the scheme builder
@@ -198,12 +196,17 @@ namespace SpatialScheme {
           * @brief Create variant vector variable
           */
          virtual VectorVariable createVVar(std::shared_ptr<Resolution> spRes) const = 0;
-         
+
+         /**
+          * @brief Use custom mesher
+          */
+         void useCustomMesher(std::shared_ptr<IMesher> m);
+
       protected:
          /**
           * @brief Implementation type of transforms
           */
-         ArrayI mImplType;
+         std::map<std::size_t,std::vector<std::size_t>> mImplType;
 
          /**
           * @brief Physical component aliases
@@ -214,6 +217,11 @@ namespace SpatialScheme {
           * @brief Physical component aliases
           */
          Tools::ComponentAlias<FieldComponents::Spectral::Id>  mSpec;
+
+         /**
+          * @brief Custom mesher
+          */
+         std::shared_ptr<IMesher> mspCustomMesher;
 
       private:
          /**
@@ -257,7 +265,8 @@ namespace SpatialScheme {
 
    /// Typedef for shared_pointer spatial scheme
    typedef std::shared_ptr<const ISpatialScheme> SharedCISpatialScheme;
-}
-}
+
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_ISPATIALSCHEME_HPP

@@ -17,11 +17,11 @@
 // Project includes
 //
 #include "QuICC/@idNS@/ICreator.hpp"
-#include "QuICC/@idNS@/I@idID@.hpp"
+#include "QuICC/@idNS@/@idID@.hpp"
 
 namespace QuICC {
 
-namespace @idNS@ {
+@cxxNS@
 
    /**
     * @brief @idID@ creator implementation
@@ -42,7 +42,7 @@ namespace @idNS@ {
          /**
           * @brief Create @idID@ shared pointer
           */
-         virtual SharedI@idID@ create(@idSIG@) const;
+         virtual Shared@idID@ create(@_idSIG@) const;
    };
 
    template <typename TName> CreatorImpl<TName>::CreatorImpl()
@@ -53,14 +53,14 @@ namespace @idNS@ {
    {
    }
 
-   template <typename TName> SharedI@idID@ CreatorImpl<TName>::create(@idSIG@) const
+   template <typename TName> Shared@idID@ CreatorImpl<TName>::create(@_idSIG@) const
    {
       std::shared_ptr<TName> spName = std::make_shared<TName>(@idARG@);
 
       return spName;
    }
 
-}
+@cxxNS_@
 }
 
 #endif // QUICC_@IDNS@_CREATORIMPL_HPP

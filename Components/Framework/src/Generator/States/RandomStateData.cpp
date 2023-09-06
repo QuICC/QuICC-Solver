@@ -16,6 +16,7 @@
 
 // Class include
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Generator/States/RandomStateData.hpp"
 
 // Project includes
@@ -138,9 +139,10 @@ namespace Equations {
 
       val.real(tmp);
 
+      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       if(this->res().sim().ss().has(SpatialScheme::Feature::FourierIndex3))
       {
-         if(this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
+         if(tRes.idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             this->makeRandom(tmp, i, j, k, comp);
             val.imag(tmp);
@@ -150,13 +152,13 @@ namespace Equations {
          }
       } else if(this->res().sim().ss().has(SpatialScheme::Feature::FourierIndex23))
       {
-         if(this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 0 && this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
+         if(tRes.idx<Dimensions::Data::DAT2D>(j,k) == 0 && tRes.idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             unsigned int seed = 2;
-            seed += this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATF1D>(i,k);
+            seed += tRes.idx<Dimensions::Data::DATF1D>(i,k);
 
-            int n2D = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-            int k2D = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int n2D = tRes.dim<Dimensions::Data::DAT3D>();
+            int k2D = tRes.idx<Dimensions::Data::DAT3D>(k);
             if(k2D < n2D/2)
             {
                seed += k2D;
@@ -176,7 +178,7 @@ namespace Equations {
                val.imag(-tmp);
             }
 
-         } else if(this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
+         } else if(tRes.idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             this->makeRandom(tmp, i, j, k, comp);
             val.imag(tmp);
@@ -186,7 +188,7 @@ namespace Equations {
          }
       } else if(this->res().sim().ss().has(SpatialScheme::Feature::FourierIndex2))
       {
-         if(this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k) != 0)
+         if(tRes.idx<Dimensions::Data::DAT2D>(j, k) != 0)
          {
             this->makeRandom(tmp, i, j, k, comp);
             val.imag(tmp);
@@ -199,6 +201,7 @@ namespace Equations {
 
    MHDVariant RandomStateData::sourceTerm(FieldComponents::Spectral::Id compId, const int i, const int j, const int k) const
    {
+      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       if(this->res().sim().ss().dimension() == 3)
       {
          // Get first dimension
@@ -209,8 +212,8 @@ namespace Equations {
          int n3D = this->res().sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
          // Get simulation wide indexes
-         int j_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-         int k_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         int j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
+         int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
 
          int z1D = 4;
          int z2D = 4;
@@ -257,7 +260,7 @@ namespace Equations {
          int n2D = this->res().sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
 
          // Get simulation wide indexes
-         int j_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j);
+         int j_ = tRes.idx<Dimensions::Data::DAT2D>(j);
 
          int z1D = 4;
          int z2D = 4;

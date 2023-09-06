@@ -8,7 +8,6 @@
 
 // Configuration includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 // System includes
 //
@@ -18,7 +17,7 @@
 
 // Project includes
 //
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 
@@ -92,14 +91,6 @@ namespace Transform {
          static void projectND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
 
          /**
-          * @brief Compute the projection transform for 1D case
-          *
-          * @param edge    Transform tree edge
-          * @param coord   Transform coordinator
-          */
-         static void project1ND(const TransformTreeEdge& edge, TransformCoordinatorType& coord);
-
-         /**
           * @brief Empty constructor
           */
          BackwardConfigurator() {};
@@ -110,6 +101,12 @@ namespace Transform {
          virtual ~BackwardConfigurator() {};
 
       private:
+         /**
+          * @brief Generic implementation of projection (backward transform)
+          *
+          * @param coord   Transform coordinator
+          */
+         static void genericProjection(const TransformTreeEdge& edge, TransformCoordinatorType& coord, const Dimensions::Transform::Id, const bool processOutput, const std::string profRegion);
    };
 
 }

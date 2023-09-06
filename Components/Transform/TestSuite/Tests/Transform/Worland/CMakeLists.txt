@@ -30,6 +30,13 @@ quicc_fetch_test_reference(
   ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
   DATADIR ${QUICC_WORK_DIR}
 )
+quicc_fetch_test_reference(
+  ${TestExe}
+  COMPONENT Transform
+  FILENAME "Worland_distributed.tar.gz"
+  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+  DATADIR ${QUICC_WORK_DIR}
+)
 
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 

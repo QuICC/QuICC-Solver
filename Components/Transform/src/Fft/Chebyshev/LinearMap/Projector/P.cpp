@@ -7,9 +7,6 @@
 //
 #include <cassert>
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
@@ -37,27 +34,23 @@ namespace Projector {
    {
    }
 
-   void P::applyPreOperator(Matrix& rOut, const Matrix& in) const
+   void P::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
-      this->mBackend.input(in, true);
-
-      this->mBackend.output(rOut);
+      this->mBackend.input(tmp, in);
    }
 
    void P::applyPostOperator(Matrix&) const
    {
    }
 
-   void P::applyPreOperator(const MatrixZ& in, const bool useReal) const
+   void P::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
-      this->mBackend.input(in, useReal, true);
-
-      this->mBackend.io();
+      this->mBackend.input(tmp, in, useReal);
    }
 
-   void P::applyPostOperator(MatrixZ& rOut, const bool useReal) const
+   void P::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      this->mBackend.output(rOut, useReal);
+      this->mBackend.output(rOut, tmp, useReal);
    }
 
 }

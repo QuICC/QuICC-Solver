@@ -98,10 +98,10 @@ namespace Projector {
          /**
           * @brief Apply pre FFT operator
           *
-          * @param rOut Output values
+          * @param tmp  Temporary padded modal values
           * @param in   Input values
           */
-         virtual void applyPreOperator(Matrix& rOut, const Matrix& in) const = 0;
+         virtual void applyPreOperator(Matrix& tmp, const Matrix& in) const = 0;
 
          /**
           * @brief Apply post FFT operator
@@ -113,16 +113,18 @@ namespace Projector {
          /**
           * @brief Apply pre FFT operator for component wise operations
           *
-          * @param in   Input values
+          * @param tmp Temporary padded modal values, either real or im part only
+          * @param in Input values
+          * @param useReal 1 -> extract real part, 0 -> extract im part
           */
-         virtual void applyPreOperator(const MatrixZ& in, const bool useReal) const = 0;
+         virtual void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const = 0;
 
          /**
           * @brief Apply post FFT operator for component wise operations
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(MatrixZ& rOut, const bool useReal) const = 0;
+         virtual void applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const = 0;
 
          /**
           * @brief Compute transform R2C (disabled)

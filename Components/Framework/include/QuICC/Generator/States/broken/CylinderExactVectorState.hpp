@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
 #include "QuICC/Generator/States/CylinderExactStateIds.hpp"
 

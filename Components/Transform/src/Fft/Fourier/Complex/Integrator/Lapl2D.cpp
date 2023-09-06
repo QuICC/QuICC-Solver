@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/Lapl2D.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/Lapl2DBase.hpp"
 
 namespace QuICC {
 
@@ -29,20 +23,7 @@ namespace Complex {
 
 namespace Integrator {
 
-   Lapl2D::Lapl2D()
-   {
-   }
-
-   Lapl2D::~Lapl2D()
-   {
-   }
-
-   void Lapl2D::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      this->mBackend.io(rOut, in);
-   }
-
-   void Lapl2D::applyPostOperator(MatrixZ& rOut) const
+   void Lapl2D<base_t>::applyPostOperator(MatrixZ& rOut) const
    {
       std::vector<std::pair<int,int> > orders = { {2,0}, {0,2} };
       int id = this->mBackend.computeDiff2D(orders, this->mspSetup->boxScale(), this->mspSetup->idBlocks());
@@ -50,9 +31,9 @@ namespace Integrator {
       this->mBackend.destroyDiff2D(id);
    }
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace Complex
+} // namespace Fourier
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

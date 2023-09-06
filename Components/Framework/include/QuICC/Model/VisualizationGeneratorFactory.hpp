@@ -59,8 +59,9 @@ namespace QuICC {
       // Create simulation
       auto spVis = std::make_shared<VisualizationGenerator>();
 
-      // Set spatial scheme
+      // Set and tune spatial scheme
       auto spScheme = std::make_shared<typename TModel::SchemeType>(model.SchemeFormulation(), GridPurpose::VISUALIZATION);
+      model.tuneScheme(spScheme);
 
       // Create list of field ID strings for boundary conditions
       std::vector<std::string> bcNames = model.backend().fieldNames();
@@ -77,7 +78,7 @@ namespace QuICC {
       // Initialise simulation
       std::map<std::string,MHDFloat> cfg;
       std::set<SpatialScheme::Feature> features;
-      spVis->getConfig(cfg, features);
+      spVis->getConfig(cfg, features, model.version());
       spScheme->enable(features);
       model.configure(spScheme->features());
       spVis->updateConfig(model.backend().automaticParameters(cfg));

@@ -21,8 +21,8 @@
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/NonDimensional/Theta.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/TypeSelectors/TransformSelector.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
@@ -89,8 +89,8 @@ namespace Equations {
       int nK = this->res().sim().dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
       int nJ;
       int nI;
-      MHDFloat zi = this->eqParams().nd(NonDimensional::Lower1D::id());
-      MHDFloat zo = this->eqParams().nd(NonDimensional::Upper1D::id());
+      MHDFloat zi = this->eqParams().nd(NonDimensional::Lower1d::id());
+      MHDFloat zo = this->eqParams().nd(NonDimensional::Upper1d::id());
       Array gK = Transform::TransformSelector<Dimensions::Transform::TRA1D>::Type::generateGrid(nK, zi, zo);
 
       MHDFloat k_;

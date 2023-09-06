@@ -21,7 +21,7 @@
 #include "QuICC/Variables/VariableRequirement.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
 #include "QuICC/TransformConfigurators/TransformTreeTools.hpp"
@@ -39,18 +39,20 @@ namespace QuICC {
          /**
           * @brief Merge variable requirements from equations
           *
+          * @param req           Current requirement
           * @param scalarEqs     Scalar equations
           * @param vectorEqs     Vector equations
           */
-         static VariableRequirement mergeRequirements(const std::vector<std::shared_ptr<Equations::IScalarEquation> >& scalarEqs, const std::vector<std::shared_ptr<Equations::IVectorEquation> >& vectorEqs);
+         static void mergeRequirements(VariableRequirement& req, const std::vector<std::shared_ptr<Equations::IScalarEquation> >& scalarEqs, const std::vector<std::shared_ptr<Equations::IVectorEquation> >& vectorEqs);
 
          /**
           * @brief Merge imposed variable requirements from equations
           *
+          * @param req           Current requirement
           * @param scalarEqs     Scalar equations
           * @param vectorEqs     Vector equations
           */
-         static VariableRequirement mergeImposedRequirements(const std::vector<std::shared_ptr<Equations::IScalarEquation> >& scalarEqs, const std::vector<std::shared_ptr<Equations::IVectorEquation> >& vectorEqs);
+         static void mergeImposedRequirements(VariableRequirement& req, const std::vector<std::shared_ptr<Equations::IScalarEquation> >& scalarEqs, const std::vector<std::shared_ptr<Equations::IVectorEquation> >& vectorEqs);
 
          /**
           * @brief Initialise variables and variable requirements from equations

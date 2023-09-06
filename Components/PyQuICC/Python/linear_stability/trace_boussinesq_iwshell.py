@@ -44,7 +44,7 @@ res = [384, 256, 0]
 # Create parameters (rescaling to proper nondimensionalisation)
 m = 0 #
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
-eq_params = {'taylor':Ta*(1.0-rratio)**4, 'ro':ro, 'rratio':rratio, 'rayleigh':0}
+eq_params = {'taylor':Ta*(1.0-rratio)**4, 'ro':ro, 'r_ratio':rratio, 'rayleigh':0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel}
 
 # Wave number function from single "index" (k perpendicular)

@@ -3,22 +3,14 @@
  * @brief Source of building block for the implementation of a time dependend evolution equation
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/EquationData.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/EquationData.hpp"
+#include "QuICC/PhysicalNames/Undefined.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
@@ -28,11 +20,12 @@ namespace QuICC {
 namespace Equations {
 
    EquationData::EquationData(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend)
-      : mForwardPathsType(FWD_IS_CUSTOM), mspEqParams(spEqParams), mspSpatialScheme(spScheme), mspBackend(spBackend), mTime(-1.0)
+      : EquationData(spEqParams, spScheme, spBackend, std::make_shared<EquationOptions>())
    {
    }
 
-   EquationData::~EquationData()
+   EquationData::EquationData(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions)
+      : mForwardPathsType(FWD_IS_CUSTOM), mspEqParams(spEqParams), mspSpatialScheme(spScheme), mspBackend(spBackend), mspOptions(spOptions), mTime(-1.0), mName(PhysicalNames::Undefined::id())
    {
    }
 
@@ -94,6 +87,16 @@ namespace Equations {
    const Model::IModelBackend& EquationData::backend() const
    {
       return *this->mspBackend;
+   }
+
+   const EquationOptions& EquationData::options() const
+   {
+      return *this->mspOptions;
+   }
+
+   std::shared_ptr<EquationOptions> EquationData::spOptions() const
+   {
+      return this->mspOptions;
    }
 
    void EquationData::cleanupBackend()
@@ -364,6 +367,7 @@ namespace Equations {
    CouplingInformation::EquationTypeId EquationData::equationType() const
    {
       auto it = this->mCouplingInfos.cbegin();
+      assert(it != this->mCouplingInfos.cend());
       CouplingInformation::EquationTypeId id = it->second.equationType();
       ++it;
 
@@ -402,5 +406,5 @@ namespace Equations {
       return std::numeric_limits<MHDFloat>::quiet_NaN();
    }
 
-}
-}
+} // Equations
+} // QuICC

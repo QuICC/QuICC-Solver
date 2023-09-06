@@ -6,16 +6,7 @@
 #ifndef QUICC_SPARSESM_WORLAND_I6CYLLAPLH_HPP
 #define QUICC_SPARSESM_WORLAND_I6CYLLAPLH_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -38,21 +29,30 @@ namespace Worland {
       public:
          /**
           * @brief Constructor
+          *
+          * @param rows    Number of row
+          * @param cols    Number of cols
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
+          * @param l       Harmonic degree l
+          * @param q       Truncation q (only consider rows - q equations)
           */
-         I6CylLaplh(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l);
+         I6CylLaplh(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q = 0);
 
          /**
           * @brief Destructor
           */
-         virtual ~I6CylLaplh();
+         virtual ~I6CylLaplh() = default;
          
       protected:
 
       private:
          /**
           * @brief Build triplet representation of matrix
+          *
+          * @param list List of triplets (row, col, value)
           */
-         virtual void buildTriplets(TripletList_t& list) const;
+         void buildTriplets(TripletList_t& list) const final;
 
          /**
           * @brief Implementation of the diagonals

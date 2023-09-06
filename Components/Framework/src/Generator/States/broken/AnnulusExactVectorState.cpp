@@ -22,10 +22,10 @@
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/SolveTiming/After.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
-#include "QuICC/NonDimensional/Lower3D.hpp"
-#include "QuICC/NonDimensional/Upper3D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
+#include "QuICC/NonDimensional/Lower3d.hpp"
+#include "QuICC/NonDimensional/Upper3d.hpp"
 
 namespace QuICC {
 

@@ -8,16 +8,11 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Projector/IComplexProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Complex/Projector/IComplexProjector.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -46,14 +41,16 @@ namespace Projector {
 
    void IComplexProjector::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<2> fix("IComplexProjector::transform");
+
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
       assert(rOut.rows() == this->outRows());
       assert(in.cols() <= rOut.cols());
 
-      this->applyPreOperator(rOut, in);
-      this->mBackend.applyFft();
-      this->applyPostOperator(rOut);
+      auto& tmp = this->mBackend.getStorage();
+      this->applyPreOperator(tmp, in);
+      this->mBackend.applyFft(rOut, tmp);
    }
 
    void IComplexProjector::transform(Matrix&, const Matrix&) const

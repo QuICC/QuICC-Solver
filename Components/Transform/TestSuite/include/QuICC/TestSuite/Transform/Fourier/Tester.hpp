@@ -62,7 +62,7 @@ namespace Fourier {
          /*
           * @brief Destructor
           */
-         virtual ~Tester() = default;
+         ~Tester() = default;
 
       protected:
          /// Typedef ContentType from base
@@ -75,26 +75,26 @@ namespace Fourier {
          /**
           * @brief Build filename extension with resolution information
           */
-         virtual std::string resname(const ParameterType& param) const override;
+         std::string resname(const ParameterType& param) const override;
 
          /**
           * @brief Read data from file
           */
-         virtual void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+         void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const override;
 
-         virtual void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+         void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const override;
 
          template <typename TData> void dbReadFile(TData& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
 
          /**
           * @brief Test operator
           */
-         virtual Matrix applyOperator(const ParameterType& param, const TestType type) const override;
+         Matrix applyOperator(const ParameterType& param, const TestType type) const override;
 
          /**
           * @brief Format the parameters
           */
-         virtual std::string formatParameter(const ParameterType& param) const override;
+         std::string formatParameter(const ParameterType& param) const override;
 
       private:
          /**
@@ -105,17 +105,17 @@ namespace Fourier {
          /**
           * @brief Test projector
           */
-         virtual Matrix applyProjector(const ParameterType& param) const;
+         Matrix applyProjector(const ParameterType& param) const;
 
          /**
           * @brief Test integrator
           */
-         virtual Matrix applyIntegrator(const ParameterType& param) const;
+         Matrix applyIntegrator(const ParameterType& param) const;
 
          /**
           * @brief Test backward-forward loop
           */
-         virtual Matrix applyBFLoop(const ParameterType& param) const;
+         Matrix applyBFLoop(const ParameterType& param) const;
 
          /**
           * @brief Initialize Poly operator
@@ -239,9 +239,13 @@ namespace Fourier {
          TOp op;
          this->initOperator(op, spSetup);
 
-         FwdType outData(op.outRows(), op.outCols());
+         FwdType outData;
 
-         op.transform(outData, inData);
+         for (unsigned int i = 0; i < this->mIter; ++i)
+         {
+            outData = FwdType(op.outRows(), op.outCols());
+            op.transform(outData, inData);
+         }
 
          if constexpr(std::is_same_v<FwdType,MatrixZ>)
          {
@@ -280,13 +284,22 @@ namespace Fourier {
          TOp op;
          this->initOperator(op, spSetup);
 
-         BwdType outData(op.outRows(), op.outCols());
+         BwdType outData;
 
-         op.transform(outData, inData);
+         for (unsigned int i = 0; i < this->mIter; ++i)
+         {
+            outData = BwdType(spSetup->bwdSize(), op.outCols());
+            op.transform(outData, inData);
+         }
 
-         Matrix out(2*outData.rows(),outData.cols());
-         out.topRows(outData.rows()) = outData.real();
-         out.bottomRows(outData.rows()) = outData.imag();
+         // note, we check only "dealiased" values
+         MatrixZ outDealias(op.outRows(),outData.cols());
+         op.dealias(outDealias, outData);
+
+         // extract real/im
+         Matrix out(2*op.outRows(),outData.cols());
+         out.topRows(op.outRows()) = outDealias.real();
+         out.bottomRows(op.outRows()) = outDealias.imag();
 
          return out;
       } else
@@ -311,7 +324,7 @@ namespace Fourier {
          // Create setup
          auto spSetup = this->buildSetup(param, type);
 
-         // Input data
+         // Input mods data
          BwdType inData(spSetup->specSize(),spSetup->blockSize());
          this->readFile(inData, param, type, ContentType::INPUT);
 
@@ -325,13 +338,14 @@ namespace Fourier {
          TOp2 opF;
          this->initOperator(opF, spSetup);
 
-         BwdType outData(opF.outRows(), opF.outCols());
+         BwdType outData(spSetup->bwdSize(), opF.outCols());
 
          opF.transform(outData, tmpData);
 
-         Matrix out(2*outData.rows(),outData.cols());
-         out.topRows(outData.rows()) = outData.real();
-         out.bottomRows(outData.rows()) = outData.imag();
+         // note, we check only "dealiased" values
+         Matrix out(2*opF.outRows(),outData.cols());
+         out.topRows(opF.outRows()) = outData.real().topRows(opF.outRows());
+         out.bottomRows(opF.outRows()) = outData.imag().topRows(opF.outRows());
 
          return out;
       }
@@ -395,7 +409,15 @@ namespace Fourier {
       int nMeta = 2;
       int specN = meta(0);
       int physN = meta(1);
-      auto spSetup = std::make_shared<typename TOp::SetupType>(physN, meta.size()-nMeta, specN, GridPurpose::SIMULATION);
+      if (std::is_same_v<typename TOp::SetupType,transf::Mixed::Setup> &&
+            (type == TestType::PROJECTOR || type == TestType::INTEGRATOR)
+         )
+      {
+         // the metadata generated automatically is the aliased size
+         // but the test was setup for dealiased data
+         specN = physN / 3;
+      }
+      auto spSetup = std::make_shared<typename TOp::SetupType>(physN, specN, GridPurpose::SIMULATION);
       spSetup->setBoxScale(1.0);
 
       // Gather indices

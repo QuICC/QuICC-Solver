@@ -6,21 +6,16 @@
 #ifndef QUICC_INDEXCOUNTER_HPP
 #define QUICC_INDEXCOUNTER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <tuple>
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
+#include "QuICC/Io/Hdf5Typedefs.hpp"
 
 namespace QuICC {
 
@@ -34,8 +29,9 @@ namespace QuICC {
    class IndexCounter
    {
       public:
-         /// Typedef for a very large unsigned int for the offsets (to avoid including hdf5.h)
-         typedef long long unsigned int OffsetType;
+         /// Typedef for the offsets
+         typedef Io::QuICC_hsize_t OffsetType;
+
          /**
           * @brief Constructor
           */
@@ -44,7 +40,7 @@ namespace QuICC {
          /**
           * @brief Empty destructor
           */
-         virtual ~IndexCounter();
+         virtual ~IndexCounter() = default;
 
          /**
           * @brief Get simulation's dimensions
@@ -66,7 +62,7 @@ namespace QuICC {
           *
           * This version uses the internally stored simulation resolution
           *
-          * @param spaceId Spacial the resolution represent
+          * @param spaceId Space the resolution represent
           */
          virtual ArrayI orderedDimensions(const Dimensions::Space::Id spaceId) const = 0;
 
@@ -119,6 +115,6 @@ namespace QuICC {
    /// Typedef for an smart reference counting pointer for a IndexCounter
    typedef std::shared_ptr<IndexCounter>   SharedIndexCounter;
 
-}
+} // QuICC
 
 #endif // QUICC_INDEXCOUNTER_HPP

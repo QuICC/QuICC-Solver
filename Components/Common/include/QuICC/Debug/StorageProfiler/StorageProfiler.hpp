@@ -61,6 +61,7 @@ namespace Debug {
                TEMPTRA1D = TEMPORARIES + 1*LVL1,
                TEMPTRA2D = TEMPORARIES + 2*LVL1,
                TEMPTRA3D = TEMPORARIES + 3*LVL1,
+               TEMPSPECTRAL = TEMPORARIES + 4*LVL1,
             EQUATIONS = 4*LVL0,
                TRIVIALEQUATION = EQUATIONS + 1*LVL1,
                DIAGNOSTICEQUATION = EQUATIONS + 2*LVL1,

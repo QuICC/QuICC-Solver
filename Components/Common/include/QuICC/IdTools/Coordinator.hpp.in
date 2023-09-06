@@ -21,7 +21,7 @@
 
 namespace QuICC {
 
-namespace @idNS@ {
+@cxxNS@
 
    /**
     * @brief @idID@ coordinator
@@ -38,11 +38,6 @@ namespace @idNS@ {
           * @brief Get tag
           */
          static std::string  tag(const std::size_t id);
-
-         /**
-          * @brief Get formatted string
-          */
-         static std::string  formatted(const std::size_t id);
 
       protected:
 
@@ -66,15 +61,10 @@ namespace @idNS@ {
 
    inline std::string Coordinator::tag(const std::size_t id)
    {
-      return Coordinator::map().find(id)->second->create(@idNAN@)->tag();
+      return Coordinator::map().find(id)->second->create(@_idNAN@)->tag();
    }
 
-   inline std::string Coordinator::formatted(const std::size_t id)
-   {
-      return Coordinator::map().find(id)->second->create(@idNAN@)->formatted();
-   }
-
-}
+@cxxNS_@
 }
 
 #endif // QUICC_@IDNS@_COORDINATOR_HPP

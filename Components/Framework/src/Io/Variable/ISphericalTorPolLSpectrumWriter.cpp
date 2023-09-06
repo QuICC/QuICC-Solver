@@ -50,7 +50,7 @@ namespace Variable {
       ISphericalTorPolEnergyBaseWriter::init();
    }
 
-   void ISphericalTorPolLSpectrumWriter::initializeEnergy()
+   void ISphericalTorPolLSpectrumWriter::resetEnergy()
    {
       this->mTorEnergy.setZero();
       this->mPolEnergy.setZero();

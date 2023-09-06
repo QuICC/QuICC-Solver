@@ -86,6 +86,8 @@ namespace internal {
 
    template <typename TSolver> inline void solveWrapper(Eigen::Matrix<typename TSolver::MatrixType::Scalar, Eigen::Dynamic, Eigen::Dynamic>& rSolution, std::shared_ptr<TSolver> spSolver, const Eigen::Matrix<typename TSolver::MatrixType::Scalar, Eigen::Dynamic, Eigen::Dynamic>& rhs)
    {
+      assert(spSolver != nullptr);
+
       rSolution = spSolver->solve(rhs);
 
       // Safety assert for successful solve
@@ -94,6 +96,8 @@ namespace internal {
 
    template <typename TSolver> inline void solveWrapper(Eigen::Matrix<std::complex<typename TSolver::MatrixType::Scalar>, Eigen::Dynamic, Eigen::Dynamic>& rSolution, std::shared_ptr<TSolver> spSolver, const Eigen::Matrix<std::complex<typename TSolver::MatrixType::Scalar>, Eigen::Dynamic, Eigen::Dynamic>& rhs)
    {
+      assert(spSolver != nullptr);
+
       Matrix tmp(rhs.rows(), rhs.cols());
       tmp = rhs.real();
       rSolution.real() = spSolver->solve(tmp);
@@ -110,6 +114,8 @@ namespace internal {
 
    template <typename TSolver> inline void solveWrapper(DecoupledZMatrix& rSolution, std::shared_ptr<TSolver> spSolver, const DecoupledZMatrix& rhs)
    {
+      assert(spSolver != nullptr);
+
       rSolution.real() = spSolver->solve(rhs.real());
 
       // Safety assert for successful solve

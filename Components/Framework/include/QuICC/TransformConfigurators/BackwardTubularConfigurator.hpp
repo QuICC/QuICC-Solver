@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/BackwardConfigurator.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -36,6 +36,17 @@ namespace Transform {
           * @brief Location of the splitting
           */
          static const Splitting::Locations::Id  SplitLocation = Splitting::Locations::BOTH;
+
+         /**
+          * @brief Compute the spectral step in the backward transform
+          *
+          * @param tree       Transform projector tree
+          * @param rVariable  Variable corresponding to the name
+          * @param coord      Transform coordinator
+          *
+          * \tparam TVariable Type of the physical variable
+          */
+         template <typename TVariable> static void spectralStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the first step in the backward transform
@@ -71,24 +82,31 @@ namespace Transform {
          template <typename TVariable> static void lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
-          * @brief Setup first exchange communication
+          * @brief Setup exchange communication
+          *
+          * TId = TRA1D: Communication between Spectral and first transform
+          * TId = TRA2D: Communication between first and second transform
+          * TId = TRA3D: Communication between second and third transform
+          *
+          * @param packs Number of components to pack in single communication
+          * @param coord Transform coordinator holding communicators and transforms
+          *
+          * @tparam TId Communication/transpose stage ID
           */
-         static void setup1DCommunication(const int packs, TransformCoordinatorType& coord);
+         template <Dimensions::Transform::Id TId> static void setupCommunication(const int packs, TransformCoordinatorType& coord);
 
          /**
-          * @brief Setup second exchange communication
+          * @brief Initiate exchange communication
+          *
+          * TId = TRA1D: Communication between Spectral and first transform
+          * TId = TRA2D: Communication between first and second transform
+          * TId = TRA3D: Communication between second and third transform
+          *
+          * @param coord Transform coordinator holding communicators and transforms
+          *
+          * @tparam TId Communication/transpose stage ID
           */
-         static void setup2DCommunication(const int packs, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Initiate first exchange communication
-          */
-         static void initiate1DCommunication(TransformCoordinatorType& coord);
-
-         /**
-          * @brief Initiate second exchange communication
-          */
-         static void initiate2DCommunication(TransformCoordinatorType& coord);
+         template <Dimensions::Transform::Id TId> static void initiateCommunication(TransformCoordinatorType& coord);
 
       protected:
          /**
@@ -104,10 +122,17 @@ namespace Transform {
       private:
    };
 
+   template <typename TVariable> void BackwardTubularConfigurator::spectralStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
+   {
+      Profiler::RegionFixture<1> fix("BwdSpectralStep");
+
+      // Prepare required spectral data
+      BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
+   }
+
    template <typename TVariable> void BackwardTubularConfigurator::firstStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<1> fix("BwdFirstStep");
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -115,27 +140,17 @@ namespace Transform {
       // Ranges for the vector of edges for the three transforms
       TransformTreeEdge::EdgeType_crange range1D = tree.root().edgeRange();
 
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
-
-      // Prepare required spectral data
-      BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
-
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
-
       // Loop over first transform
       for(it1D = range1D.first; it1D != range1D.second; ++it1D)
       {
          // Compute first transform
          BackwardConfigurator::project1D(*it1D, coord);
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    template <typename TVariable> void BackwardTubularConfigurator::secondStep(const TransformTree& tree, TVariable&, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<1> fix("BwdSecondStep");
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -155,14 +170,11 @@ namespace Transform {
             BackwardConfigurator::project2D(*it2D, coord);
          }
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    template <typename TVariable> void BackwardTubularConfigurator::lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
       Profiler::RegionFixture<1> fix("BwdLastStep");
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       // Iterators for the three transforms
       TransformTreeEdge::EdgeType_citerator it1D;
@@ -191,50 +203,22 @@ namespace Transform {
             }
          }
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
-   inline void BackwardTubularConfigurator::setup1DCommunication(const int packs, TransformCoordinatorType& coord)
+   template <Dimensions::Transform::Id TId> inline void BackwardTubularConfigurator::setupCommunication(const int packs, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Bwd-setupCommunication-" + std::to_string(static_cast<int>(TId)+1) + "D");
 
-      coord.communicator().converter<Dimensions::Transform::TRA2D>().setupCommunication(packs, TransformDirection::BACKWARD);
+      coord.communicator().converter<TId>().setupCommunication(packs, TransformDirection::BACKWARD);
 
-      coord.communicator().converter<Dimensions::Transform::TRA2D>().prepareBackwardReceive();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
+      coord.communicator().converter<TId>().prepareBackwardReceive();
    }
 
-   inline void BackwardTubularConfigurator::setup2DCommunication(const int packs, TransformCoordinatorType& coord)
+   template <Dimensions::Transform::Id TId> inline void BackwardTubularConfigurator::initiateCommunication(TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<2> fix("Bwd-initiateCommunication-" + std::to_string(static_cast<int>(TId)+1) + "D");
 
-      coord.communicator().converter<Dimensions::Transform::TRA3D>().setupCommunication(packs, TransformDirection::BACKWARD);
-
-      coord.communicator().converter<Dimensions::Transform::TRA3D>().prepareBackwardReceive();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
-   }
-
-   inline void BackwardTubularConfigurator::initiate1DCommunication(TransformCoordinatorType& coord)
-   {
-      Profiler::RegionFixture<2> fix("BackwardTubularConfigurator::initiate1DCommunication");
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
-
-      coord.communicator().converter<Dimensions::Transform::TRA2D>().initiateForwardSend();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
-   }
-
-   inline void BackwardTubularConfigurator::initiate2DCommunication(TransformCoordinatorType& coord)
-   {
-      Profiler::RegionFixture<2> fix("BackwardTubularConfigurator::initiate2DCommunication");
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
-
-      coord.communicator().converter<Dimensions::Transform::TRA3D>().initiateForwardSend();
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
+      coord.communicator().converter<TId>().initiateForwardSend();
    }
 
 }

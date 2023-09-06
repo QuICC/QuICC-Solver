@@ -7,16 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/D1_P.hpp"
-
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/D1_PBase.hpp"
 
 namespace QuICC {
 
@@ -30,36 +23,23 @@ namespace Complex {
 
 namespace Integrator {
 
-   D1_P::D1_P()
-   {
-   }
-
-   D1_P::~D1_P()
-   {
-   }
-
-   void D1_P::initOperator() const
+   void D1_P<base_t>::initOperator() const
    {
       this->mBackend.initMeanBlocks(this->mspSetup->idBlocks());
    }
 
-   void D1_P::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
+   void D1_P<base_t>::applyPostOperator(MatrixZ& rOut) const
    {
-      this->mBackend.io(rOut, in);
-   }
-
-   void D1_P::applyPostOperator(MatrixZ& rOut) const
-   {
-      this->mBackend.extractMean();
+      this->mBackend.extractMean(rOut);
 
       this->mBackend.outputDiff(rOut, 1, this->mspSetup->boxScale());
 
       this->mBackend.setMean(rOut, 1.0);
    }
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace Complex
+} // namespace Fourier
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

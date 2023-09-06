@@ -23,8 +23,8 @@
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/Transform/Reductor/Energy.hpp"
 #include "QuICC/Io/Variable/EnergyTags.hpp"
 
@@ -46,8 +46,8 @@ namespace Variable {
    void Cartesian1DPrimitiveEnergyWriter::init()
    {
       // Normalize by Cartesian volume V = (2*pi*Box1D/k1D)*(2*pi*Box2D/k2D)*(zo-zi) but FFT already includes 1/(2*pi)
-      MHDFloat zi = this->mPhysical.find(NonDimensional::Lower1D::id())->second->value();
-      MHDFloat zo = this->mPhysical.find(NonDimensional::Upper1D::id())->second->value();
+      MHDFloat zi = this->mPhysical.find(NonDimensional::Lower1d::id())->second->value();
+      MHDFloat zo = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
       this->mVolume = (zo-zi)/(this->res().sim().boxScale(Dimensions::Simulation::SIM2D)*this->res().sim().boxScale(Dimensions::Simulation::SIM3D));
 
       IVariableAsciiWriter::init();

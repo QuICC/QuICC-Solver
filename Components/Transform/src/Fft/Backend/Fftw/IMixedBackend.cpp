@@ -59,6 +59,11 @@ namespace Fftw {
       return mem;
    }
 
+   MatrixZ& IMixedBackend::getStorage() const
+   {
+      return this->mTmp;
+   }
+
 }
 }
 }

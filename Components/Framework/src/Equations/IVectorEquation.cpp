@@ -3,21 +3,12 @@
  * @brief Source of vector equation interface
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/IVectorEquation.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/IVectorEquation.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
@@ -32,7 +23,8 @@ namespace Equations {
    {
    }
 
-   IVectorEquation::~IVectorEquation()
+   IVectorEquation::IVectorEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions)
+      : IFieldEquation(spEqParams, spScheme, spBackend, spOptions)
    {
    }
 
@@ -119,15 +111,35 @@ namespace Equations {
       this->dispatchExplicitBlock(compId, mat, opId, fieldId, matIdx, this->res(), this->couplingInfo(compId).couplingTools().getIndexes(this->res(), matIdx));
    }
 
+   std::vector<bool> IVectorEquation::disabledBackwardPaths() const
+   {
+      std::vector<bool> disabled = {false, false, false};
+
+      return disabled;
+   }
+
    std::vector<Transform::TransformPath> IVectorEquation::backwardPaths()
    {
+      // Disable some paths
+      auto disabled = this->disabledBackwardPaths();
+      const bool& disabledPhys = disabled.at(0);
+      const bool& disabledGrad = disabled.at(1);
+      const bool& disabledCurl = disabled.at(2);
+
       std::vector<Transform::TransformPath> paths;
 
-      std::shared_ptr<Transform::ITransformSteps>  spSteps = Transform::createTransformSteps(this->res().sim().spSpatialScheme());
+      auto spSteps = this->transformSteps();
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, this->spUnknown()))
       {
          auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).phys().enabled());}, this->spUnknown());
+         if(disabledPhys)
+         {
+            for(auto&& c: compsMap)
+            {
+               c.second = false;
+            }
+         }
          auto branches = spSteps->backwardVector(compsMap);
          paths.insert(paths.end(), branches.begin(), branches.end());
       }
@@ -138,6 +150,13 @@ namespace Equations {
          for(auto it = range.first; it != range.second; ++it)
          {
             auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).grad(*it).enabled());}, this->spUnknown());
+            if(disabledGrad)
+            {
+               for(auto&& c: compsMap)
+               {
+                  c.second = false;
+               }
+            }
             auto b = spSteps->backwardVGradient(*it, compsMap);
             paths.insert(paths.end(), b.begin(), b.end());
          }
@@ -158,6 +177,13 @@ namespace Equations {
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasCurl());}, this->spUnknown()))
       {
          auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).curl().enabled());}, this->spUnknown());
+         if(disabledCurl)
+         {
+            for(auto&& c: compsMap)
+            {
+               c.second = false;
+            }
+         }
          auto b = spSteps->backwardCurl(compsMap);
          paths.insert(paths.end(),b.begin(), b.end());
       }
@@ -165,5 +191,5 @@ namespace Equations {
       return paths;
    }
 
-}
-}
+} // Equations
+} // QuICC

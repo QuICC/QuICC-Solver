@@ -6,23 +6,16 @@
 #ifndef QUICC_MODELFACTORY_HPP
 #define QUICC_MODELFACTORY_HPP
 
-// First include
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
 #include "QuICC/Enums/GridPurpose.hpp"
+#include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Simulation/Simulation.hpp"
 #include "QuICC/Model/IPhysicalModel.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -53,6 +46,8 @@ namespace QuICC {
 
    template <class TModel> SharedSimulation ModelFactory<TModel>::createSimulation()
    {
+      Profiler::RegionFixture<1> simFix("createSimulation");
+
       // Create model
       TModel model;
       model.init();
@@ -60,8 +55,9 @@ namespace QuICC {
       // Create simulation
       auto spSim = std::make_shared<Simulation>();
 
-      // Set spatial scheme
+      // Set and tune spatial scheme
       auto spScheme = std::make_shared<typename TModel::SchemeType>(model.SchemeFormulation(), GridPurpose::SIMULATION);
+      model.tuneScheme(spScheme);
 
       // Create list of field ID strings for boundary conditions
       std::vector<std::string> bcNames = model.backend().fieldNames();
@@ -78,7 +74,7 @@ namespace QuICC {
       // Initialise simulation
       std::map<std::string,MHDFloat> cfg;
       std::set<SpatialScheme::Feature> features;
-      spSim->getConfig(cfg, features);
+      spSim->getConfig(cfg, features, model.version());
       spScheme->enable(features);
       model.configure(spScheme->features());
       spSim->updateConfig(model.backend().automaticParameters(cfg));
@@ -89,17 +85,27 @@ namespace QuICC {
       // Initialise resolution
       spSim->initResolution(spScheme);
 
+      StageTimer stage;
+
       // Add equations
+      stage.start("adding model equations");
       model.addEquations(spSim);
+      stage.done();
 
       // Add ASCII output files
+      stage.start("adding model ASCII output");
       model.addAsciiOutputFiles(spSim);
+      stage.done();
 
       // Add HDF5 output files
+      stage.start("adding model HDF5 output");
       model.addHdf5OutputFiles(spSim);
+      stage.done();
 
       // Add statistics output files
+      stage.start("adding model Stats output");
       model.addStatsOutputFiles(spSim);
+      stage.done();
 
       // Set the boundary conditions
       SharedSimulationBoundary spBcs = spSim->createBoundary();

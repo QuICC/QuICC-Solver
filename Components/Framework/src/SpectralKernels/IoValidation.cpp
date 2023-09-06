@@ -18,6 +18,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
 namespace QuICC {
@@ -42,18 +43,18 @@ namespace Kernel {
 
    MHDVariant IoValidation::compute(const int i, const int j, const int k) const
    {
+      const auto& tRes = *this->spRes()->cpu()->dim(Dimensions::Transform::SPECTRAL);
       // Create key
       std::pair<int,int>   key;
       if(this->spRes()->sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
       {
-         key = std::make_pair(this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k),this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k));
+         key = std::make_pair(tRes.idx<Dimensions::Data::DAT3D>(k),tRes.idx<Dimensions::Data::DAT2D>(j,k));
       } else
       {
-         key = std::make_pair(this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k),this->spRes()->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k));
+         key = std::make_pair(tRes.idx<Dimensions::Data::DAT2D>(j,k),tRes.idx<Dimensions::Data::DAT3D>(k));
       }
 
-      MHDFloat range = 1000;
-      MHDFloat idVal = key.first*range*range + key.second*range + i;
+      MHDFloat idVal = key.first*this->mRange*this->mRange + key.second*this->mRange + i;
 
       // Set value
       if(this->mIsComplex)

@@ -3,9 +3,6 @@
  * @brief Source of the implementation of the GXL format file writer
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <set>
@@ -17,6 +14,7 @@
 
 // Class include
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Io/Xml/GxlWriter.hpp"
 
 // Project includes
@@ -29,6 +27,8 @@
 #include "QuICC/Arithmetics/Sub.hpp"
 #include "QuICC/Tools/IdToHuman.hpp"
 #include "QuICC/PhysicalNames/Coordinator.hpp"
+#include "QuICC/Transform/Backward/Coordinator.hpp"
+#include "QuICC/Transform/Forward/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -45,24 +45,41 @@ namespace Xml {
    {
    }
 
-   void GxlWriter::graphCommunication(const std::vector<std::multimap<int,int> >& structure)
+   void GxlWriter::graphCommunication(const std::map<Dimensions::Transform::Id,std::multimap<int,int> >& structure)
    {
       std::stringstream oss;
 
       // Set subgraph long identifier
-      std::vector<std::string> lName;
-      lName.push_back("cluster_A");
-      lName.push_back("cluster_B");
+      std::map<Dimensions::Transform::Id,std::string> lName = {
+         {Dimensions::Transform::TRA1D,"cluster_A"},
+         {Dimensions::Transform::TRA2D,"cluster_B"},
+         {Dimensions::Transform::TRA3D,"cluster_C"},
+         {Dimensions::Transform::SPECTRAL,"cluster_D"}
+      };
 
       // Set subgraph short identifier
-      std::vector<std::string> sName;
-      sName.push_back("A");
-      sName.push_back("B");
+      std::map<Dimensions::Transform::Id,std::string> sName = {
+         {Dimensions::Transform::TRA1D,"A"},
+         {Dimensions::Transform::TRA2D,"B"},
+         {Dimensions::Transform::TRA3D,"C"},
+         {Dimensions::Transform::SPECTRAL,"S"}
+      };
 
       // Set subgraph colors
-      std::vector<std::string> color;
-      color.push_back("blue");
-      color.push_back("green");
+      std::map<Dimensions::Transform::Id,std::string> color = {
+         {Dimensions::Transform::TRA1D,"blue"},
+         {Dimensions::Transform::TRA2D,"green"},
+         {Dimensions::Transform::TRA3D,"orange"},
+         {Dimensions::Transform::SPECTRAL,"red"}
+      };
+
+      // Set label
+      std::map<Dimensions::Transform::Id,std::string> labels = {
+         {Dimensions::Transform::TRA1D, "Transpose 1D/2D"},
+         {Dimensions::Transform::TRA2D, "Transpose 2D/3D"},
+         {Dimensions::Transform::TRA3D, "Transpose 3D/NL"},
+         {Dimensions::Transform::SPECTRAL, "Transpose Spectral/1D"}
+      };
 
       // Create master graph
       rapidxml::xml_node<> *pGraph = this->mXML.allocate_node(rapidxml::node_element, "graph");
@@ -70,33 +87,32 @@ namespace Xml {
       this->mpRoot->append_node(pGraph);
 
       // Loop over the two transposes
-      for(size_t i = 0; i < structure.size(); i++)
+      for(const auto& st: structure)
       {
+         const auto& lN = lName.at(st.first);
+         const auto& sN = sName.at(st.first);
+         const auto& cN = color.at(st.first);
+         const auto& lb = labels.at(st.first);
+
          // Create subgraph
          rapidxml::xml_node<> *pNSubgraph = this->mXML.allocate_node(rapidxml::node_element, "node");
-         oss << "N_" << lName.at(i);
+         oss << "N_" << lN;
          pNSubgraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(oss.str().c_str(),0)));
          oss.str("");
          rapidxml::xml_node<> *pSubgraph = this->mXML.allocate_node(rapidxml::node_element, "graph");
-         pSubgraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(lName.at(i).c_str(),0)));
+         pSubgraph->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(lN.c_str(),0)));
 
-         if(static_cast<Dimensions::Transform::Id>(i) == Dimensions::Transform::TRA1D)
-         {
-            this->createAttr(pSubgraph, "label", "Transpose 1D/2D");
-         } else
-         {
-            this->createAttr(pSubgraph, "label", "Transpose 2D/3D");
-         }
-         this->createAttr(pSubgraph, "color", color.at(i));
+         this->createAttr(pSubgraph, "label", lb);
+         this->createAttr(pSubgraph, "color", cN);
 
          pNSubgraph->append_node(pSubgraph);
          pGraph->append_node(pNSubgraph);
 
          // Loop over the CPUs
-         for(auto itCpu = structure.at(i).cbegin(); itCpu != structure.at(i).cend(); itCpu = structure.at(i).upper_bound(itCpu->first))
+         for(auto itCpu = st.second.cbegin(); itCpu != st.second.cend(); itCpu = st.second.upper_bound(itCpu->first))
          {
             rapidxml::xml_node<> *pCpu = this->mXML.allocate_node(rapidxml::node_element, "node");
-            oss << "cpu" << itCpu->first << sName.at(i);
+            oss << "cpu" << itCpu->first << sN;
             pCpu->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(oss.str().c_str(),0)));
             oss.str("");
 
@@ -108,21 +124,21 @@ namespace Xml {
          }
 
          // Loop over the CPUs
-         for(auto itCpu = structure.at(i).cbegin(); itCpu != structure.at(i).cend(); ++itCpu)
+         for(auto itCpu = st.second.cbegin(); itCpu != st.second.cend(); ++itCpu)
          {
             // Set "from" attribute
             rapidxml::xml_node<> *pEdge = this->mXML.allocate_node(rapidxml::node_element, "edge");
-            oss << "cpu" << itCpu->first << sName.at(i);
+            oss << "cpu" << itCpu->first << sN;
             pEdge->append_attribute(this->mXML.allocate_attribute("from", this->mXML.allocate_string(oss.str().c_str(),0)));
             oss.str("");
 
             // Set "to" attribute
-            oss << "cpu" << itCpu->second << sName.at(i);
+            oss << "cpu" << itCpu->second << sN;
             pEdge->append_attribute(this->mXML.allocate_attribute("to", this->mXML.allocate_string(oss.str().c_str(),0)));
             oss.str("");
 
             // Add edge
-            this->createAttr(pEdge, "color", color.at(i));
+            this->createAttr(pEdge, "color", cN);
             pSubgraph->append_node(pEdge);
          }
       }
@@ -157,7 +173,7 @@ namespace Xml {
             oss.str("");
             pNode->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(field.c_str(),0)));
 
-            oss << PhysicalNames::Coordinator::formatted(nameIt->first) << " ";
+            oss << PhysicalNames::Coordinator::tag(nameIt->first) << " ";
             if(dir == TransformDirection::FORWARD)
             {
                oss << Tools::IdToHuman::toString(static_cast<FieldComponents::Physical::Id>(pathIt->startId()));
@@ -189,7 +205,13 @@ namespace Xml {
 
                // Add edge
                this->createAttr(pEdge, "color", color.at(i));
-               oss << pathIt->edge(i).opId();
+               if(dir == TransformDirection::FORWARD)
+               {
+                  oss << Transform::Forward::Coordinator::tag(pathIt->edge(i).opId());
+               } else
+               {
+                  oss << Transform::Backward::Coordinator::tag(pathIt->edge(i).opId());
+               }
                this->createAttr(pEdge, "label", oss.str());
                oss.str("");
                pGraph->append_node(pEdge);
@@ -273,7 +295,7 @@ namespace Xml {
          oss.str("");
          pNode->append_attribute(this->mXML.allocate_attribute("id", this->mXML.allocate_string(root.c_str(),0)));
 
-         oss << PhysicalNames::Coordinator::formatted(treeIt->name()) << " ";
+         oss << PhysicalNames::Coordinator::tag(treeIt->name()) << " ";
          if(dir == TransformDirection::FORWARD)
          {
             oss << Tools::IdToHuman::toString(treeIt->comp<FieldComponents::Physical::Id>());
@@ -311,7 +333,14 @@ namespace Xml {
 
          // Add edge
          this->createAttr(pEdge, "color", *colorIt);
-         oss << edgeIt->opId();
+
+         if(dir == TransformDirection::FORWARD)
+         {
+            oss << Transform::Forward::Coordinator::tag(edgeIt->opId());
+         } else
+         {
+            oss << Transform::Backward::Coordinator::tag(edgeIt->opId());
+         }
          if(edgeIt->recoverInput() && edgeIt->holdInput())
          {
             oss << std::endl << "(R,H)";

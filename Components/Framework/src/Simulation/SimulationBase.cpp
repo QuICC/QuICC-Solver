@@ -3,42 +3,29 @@
  * @brief Source of the high level simulation base
  */
 
-// Debug includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-
-// Configuration includes
-//
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
 // System includes
 //
 #include <algorithm>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Simulation/SimulationBase.hpp"
-
 // Project includes
 //
+#include "QuICC/Simulation/SimulationBase.hpp"
 #include "QuICC/QuICCEnv.hpp"
+#include "QuICC/QuICCTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Simulation/SimulationIoTools.hpp"
+#include "QuICC/Bc/Scheme/Galerkin.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
    SimulationBase::SimulationBase()
-      : mExecutionTimer(true), mSimRunCtrl()
+      : mSimRunCtrl()
    {
-   }
-
-   SimulationBase::~SimulationBase()
-   {
+      QuICCTimer().start();
    }
 
    SharedSimulationBoundary SimulationBase::createBoundary()
@@ -80,16 +67,23 @@ namespace QuICC {
       this->mSimIoCtrl.setConfigurationFile(spCfgFile);
    }
 
-   void SimulationBase::getConfig(std::map<std::string,MHDFloat>& cfg, std::set<SpatialScheme::Feature>& features)
+   void SimulationBase::getConfig(std::map<std::string,MHDFloat>& cfg, std::set<SpatialScheme::Feature>& features, const std::string modelVersion)
    {
       // Initialise the IO system
-      this->mSimIoCtrl.init();
+      this->mSimIoCtrl.init(modelVersion);
 
       cfg = this->config().physical();
 
-      if(this->config().boundarySetup()(0) == 1)
+      // Add Galerkin basis feature
+      if(this->config().bcScheme() == Bc::Scheme::Galerkin::id())
       {
          features.insert(SpatialScheme::Feature::GalerkinBasis);
+      }
+
+      // Add split fourth order equation feature
+      if(this->config().splitEquation())
+      {
+         features.insert(SpatialScheme::Feature::SplitFourthOrder);
       }
    }
 
@@ -137,15 +131,17 @@ namespace QuICC {
 
    void SimulationBase::run()
    {
+      Profiler::RegionFixture<1> simFix("SimulationBase::run");
+
       // Final initialisation of the solvers
       this->mPseudospectral.initSolvers();
 
       // Stop timer and update initialisation time
-      this->mExecutionTimer.stop();
-      this->mExecutionTimer.update(ExecutionTimer::INIT);
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::INIT);
 
       // Start timer
-      this->mExecutionTimer.start();
+      QuICCTimer().start();
 
       // Execute pre-run steps
       this->preRun();
@@ -154,32 +150,32 @@ namespace QuICC {
       this->mPseudospectral.cleanupForRun();
 
       // Stop pre-run timing
-      this->mExecutionTimer.stop();
-      this->mExecutionTimer.update(ExecutionTimer::PRERUN);
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::PRERUN);
 
       // Synchronize computation nodes
       QuICCEnv().synchronize();
       StageTimer::completed("Simulation initialisation successfull");
 
       // Start timer
-      this->mExecutionTimer.start();
+      QuICCTimer().start();
 
       // Do main loop
       this->mainRun();
 
       // Stop main loop timing
-      this->mExecutionTimer.stop();
-      this->mExecutionTimer.update(ExecutionTimer::RUN);
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::RUN);
 
       // Start timer
-      this->mExecutionTimer.start();
+      QuICCTimer().start();
 
       // Execute post-run operations
       this->postRun();
 
       // Stop post-run timing
-      this->mExecutionTimer.stop();
-      this->mExecutionTimer.update(ExecutionTimer::POSTRUN);
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::POSTRUN);
 
       // Synchronise computation nodes
       QuICCEnv().synchronize();
@@ -191,10 +187,7 @@ namespace QuICC {
       this->mSimRunCtrl.printInfo(std::cout);
 
       // Print execution timer infos
-      this->mExecutionTimer.printInfo(std::cout);
-
-      // Print profiling infos (if required)
-      ProfilerMacro_printInfo();
+      QuICCTimer().printInfo(std::cout);
 
       // Print storage profiling infos (if required)
       StorageProfilerMacro_printInfo();
@@ -278,6 +271,12 @@ namespace QuICC {
          {
             (*asciiIt)->addVector((*vectIt));
          }
+
+         // Set mesh
+         if((*asciiIt)->space() == Dimensions::Space::PHYSICAL)
+         {
+            (*asciiIt)->setMesh(this->mPseudospectral.transformCoordinator().mesh());
+         }
       }
 
       // Loop over all HDF5 files added to the simulation control
@@ -308,6 +307,7 @@ namespace QuICC {
             (*hdf5It)->addVector((*vectIt));
          }
 
+         // Set physical mesh
          if((*hdf5It)->space() == Dimensions::Space::PHYSICAL)
          {
             (*hdf5It)->setMesh(this->mPseudospectral.transformCoordinator().mesh());

@@ -3,22 +3,13 @@
  * @brief Source of the implementation of the truncation node of the configuration
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Config/Framework/Truncation.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Config/Framework/Truncation.hpp"
 
 namespace QuICC {
 
@@ -34,10 +25,6 @@ namespace Framework {
       : IConfigurationNode(Truncation::PARENTTAG)
    {
       this->init(dim, isPeriodicBox);
-   }
-
-   Truncation::~Truncation()
-   {
    }
 
    void Truncation::init(const int dim, const std::vector<bool>& isPeriodicBox)
@@ -86,7 +73,7 @@ namespace Framework {
    {
    }
 
-}
-}
-}
-}
+} // Framework
+} // Config
+} // Io
+} // QuICC

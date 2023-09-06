@@ -18,7 +18,6 @@
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 
 #define QUICC_IWORLANDBACKEND_BLAS 0
 #define QUICC_IWORLANDBACKEND_SCALAR 1

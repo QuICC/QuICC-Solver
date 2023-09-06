@@ -41,7 +41,7 @@ namespace QuICC {
             /**
              * @brief Constructor
              */
-            virtual ~ShellTransformSteps();
+            virtual ~ShellTransformSteps() = default;
 
             /**
              * @brief Is implementation applicable to scheme?

@@ -1,6 +1,7 @@
 /**
  * @file BenchmarkMagC1.hpp
- * @brief Magnetic benchmark state C1 generator kernel
+ * @brief Magnetic benchmark state from Christensen's C1 test case generator kernel
+ *        DOI: https://doi.org/10.1016/S0031-9201(01)00275-8
  */
 
 #ifndef QUICC_PHYSICAL_KERNEL_SHELL_BENCHMARKMAGC1_HPP

@@ -6,10 +6,6 @@
 #ifndef QUICC_PARALLEL_SERIALCONVERTERBASE_HPP
 #define QUICC_PARALLEL_SERIALCONVERTERBASE_HPP
 
-// Debug includes
-//
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
-
 // Configuration includes
 //
 
@@ -31,6 +27,24 @@
 namespace QuICC {
 
 namespace Parallel {
+
+   namespace internal
+   {
+      /**
+       * @brief Reorder 3D data
+       */
+      template<typename T, Dimensions::Data::Id TId> void reorder3D(T* pOut, const T& in, const TransformResolution& tRes, const IIndexConv& outConv, const IIndexConv& inConv);
+
+      /**
+       * @brief Reorder 2D data
+       */
+      template<typename T, Dimensions::Data::Id TId> void reorder2D(T* pOut, const T& in, const TransformResolution& tRes, const IIndexConv& outConv, const IIndexConv& inConv);
+
+      /**
+       * @brief Reorder 1D data
+       */
+      template<typename T, Dimensions::Data::Id TId> void reorder1D(T* pOut, const T& in, const TransformResolution& tRes, const IIndexConv& outConv, const IIndexConv& inConv);
+   }
 
    /**
     * @brief Implementation of the serial data converter base.
@@ -84,32 +98,17 @@ namespace Parallel {
          /**
           * @brief Templated convert data from Fwd to Bwd
           */
-         template <typename T> void convertFwdImpl(const T& in, DynamicPairProvider &storage);
+         template <typename T, Dimensions::Data::Id TDataID> void processFwdImpl(const T& in, DynamicPairProvider &storage, const IIndexConv& outConv, const IIndexConv& inConv);
 
          /**
-          * @brief Templated convert data from Bwd to Fwd
+          * @brief Templated convert data from Fwd to Bwd
           */
-         template <typename T> void convertBwdImpl(const T& in, DynamicPairProvider &storage);
+         template <typename T, Dimensions::Data::Id TDataID> void processBwdImpl(const T& in, DynamicPairProvider &storage, const IIndexConv& outConv, const IIndexConv& inConv);
 
          /**
-          * @brief Get point data from Bwd scalar (might involve modification of indexes)
-          *
-          * @param in   Input data
-          * @param i    First index of Bwd extracted from Fwd
-          * @param j    Second index of Bwd extracted from Fwd
-          * @param k    Third index of Bwd extracted from Fwd
+          * @brief Templated reorder data
           */
-         template <typename T> typename T::PointType bwdPoint(const T& in, const int i, const int j = 0, const int k = 0);
-
-         /**
-          * @brief Set point data from Bwd scalar (might involve modification of indexes)
-          *
-          * @param rOut Output data
-          * @param i    First index of Bwd extracted from Fwd
-          * @param j    Second index of Bwd extracted from Fwd
-          * @param k    Third index of Bwd extracted from Fwd
-          */
-         template <typename T> typename T::PointType& rBwdPoint(T& rOut, const int i, const int j = 0, const int k = 0);
+         template <typename T, Dimensions::Data::Id TDataId> void reorderImpl(T* pOut, const T& in, const TransformResolution& tRes, const IIndexConv& outConv, const IIndexConv& inConv);
 
          /**
           * @brief Store the local transform resolution of the first transform
@@ -118,184 +117,100 @@ namespace Parallel {
       private:
    };
 
-   template <typename T>
-      void SerialConverterBase::convertBwdImpl(const T& in, DynamicPairProvider& storage)
+   template <typename T, Dimensions::Data::Id TDataId>
+      void SerialConverterBase::reorderImpl(T* pOut, const T& in, const TransformResolution& tRes, const IIndexConv& outConv, const IIndexConv& inConv)
+   {
+      // 3D case
+      if(this->mDimensions == 3)
+      {
+         internal::reorder3D<T,TDataId>(pOut, in, tRes, outConv, inConv);
+      }
+      // 2D case
+      else if(this->mDimensions == 2)
+      {
+         internal::reorder2D<T,TDataId>(pOut, in, tRes, outConv, inConv);
+      }
+      // 1D case
+      else if(this->mDimensions == 1)
+      {
+         internal::reorder1D<T,TDataId>(pOut, in, tRes, outConv, inConv);
+      }
+      else
+      {
+         throw std::logic_error("Dimension of converter was not set properly!");
+      }
+   }
+
+   template <typename T, Dimensions::Data::Id TDataId>
+      void SerialConverterBase::processFwdImpl(const T& in, DynamicPairProvider& storage, const IIndexConv& outConv, const IIndexConv& inConv)
    {
       // Get storage for output value
       T *pOut;
       storage.provideFwd(pOut);
 
-      // 3D case
-      if(this->mDimensions == 3)
-      {
-         // Loop over slowest direction of output
-         for(int k = 0; k < this->mspTRes->template dim<Dimensions::Data::DAT3D>(); k++)
-         {
-            // Loop over slow direction of output
-            for(int j = 0; j < this->mspTRes->template dim<Dimensions::Data::DAT2D>(k); j++)
-            {
-               // Loop over fast direction of output
-               for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(k); i++)
-               {
-                  pOut->rPoint(i,j,k) = this->bwdPoint(in, i, j, k);
-               }
-            }
-         }
-
-      // 2D case
-      } else if(this->mDimensions == 2)
-      {
-         // Loop over slow direction of output
-         for(int j = 0; j < this->mspTRes->template dim<Dimensions::Data::DAT2D>(); j++)
-         {
-            // Loop over fast direction of output
-            for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(); i++)
-            {
-               pOut->rPoint(i,j) = this->bwdPoint(in, i, j);
-            }
-         }
-
-      // 1D case
-      } else if(this->mDimensions == 1)
-      {
-         //
-         // No work is required in 1D
-         //
-         //
-      } else
-      {
-         throw std::logic_error("Dimension of converter was not set properly!");
-      }
+      this->reorderImpl<T,TDataId>(pOut, in, *this->mspTRes, outConv, inConv);
 
       // Hold the output data
       storage.holdFwd(*pOut);
    }
 
-   template <typename T>
-      void SerialConverterBase::convertFwdImpl(const T& in, DynamicPairProvider& storage)
+   template <typename T, Dimensions::Data::Id TDataId>
+      void SerialConverterBase::processBwdImpl(const T& in, DynamicPairProvider& storage, const IIndexConv& outConv, const IIndexConv& inConv)
    {
       // Get storage for output value
       T *pOut;
       storage.provideBwd(pOut);
 
-      // 3D case
-      if(this->mDimensions == 3)
-      {
-         // Loop over slowest direction of input
-         for(int k = 0; k < this->mspTRes->template dim<Dimensions::Data::DAT3D>(); k++)
-         {
-            // Loop over slow direction of input
-            for(int j = 0; j < this->mspTRes->template dim<Dimensions::Data::DAT2D>(k); j++)
-            {
-               // Loop over fast direction of input
-               for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(k); i++)
-               {
-                  this->rBwdPoint(*pOut, i,j,k) = in.point(i,j,k);
-               }
-            }
-         }
-
-      // 2D case
-      } else if(this->mDimensions == 2)
-      {
-         // Loop over slow direction of output
-         for(int j = 0; j < this->mspTRes->template dim<Dimensions::Data::DAT2D>(); j++)
-         {
-            for(int i = 0; i < this->mspTRes->template dim<Dimensions::Data::DATF1D>(); i++)
-            {
-               this->rBwdPoint(*pOut, i,j) = in.point(i,j);
-            }
-         }
-
-      // 1D case
-      } else if(this->mDimensions == 1)
-      {
-         //
-         // No work is required in 1D
-         //
-      } else
-      {
-         throw std::logic_error("Dimension of converter was not set properly!");
-      }
+      this->reorderImpl<T,TDataId>(pOut, in, *this->mspTRes, outConv, inConv);
 
       // Hold the output data
       storage.holdBwd(*pOut);
    }
 
-   template <typename T>
-      typename T::PointType SerialConverterBase::bwdPoint(const T& in, const int i, const int j, const int k)
+   namespace internal
    {
-      #ifdef QUICC_MPI
-         if(this->mDimensions == 3)
+      template<typename T, Dimensions::Data::Id TId> void reorder3D(T* pOut, const T& in, const TransformResolution& tRes, const IIndexConv& outConv, const IIndexConv& inConv)
+      {
+         // Loop over slowest direction of output
+         for(int k = 0; k < tRes.template dim<Dimensions::Data::DAT3D>(); k++)
          {
-            int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i,k);
-            int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j,k);
-            int idxK = this->mspTRes->template idx<Dimensions::Data::DAT3D>(k);
-            return in.point(this->idxConv().i(i,j,k,idxI,idxJ,idxK),this->idxConv().j(i,j,k,idxI,idxJ,idxK),this->idxConv().k(i,j,k,idxI,idxJ,idxK));
-
-         } else if(this->mDimensions == 2)
-         {
-            int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i);
-            int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j);
-            return in.point(this->idxConv().i(i,j,idxI,idxJ),this->idxConv().j(i,j,idxI,idxJ));
-
-         } else
-         {
-            return in.point(this->idxConv().i(i));
+            int idxK = tRes.template idx<Dimensions::Data::DAT3D>(k);
+            // Loop over slow direction of output
+            for(int j = 0; j < tRes.template dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               int idxJ = tRes.template idx<Dimensions::Data::DAT2D>(j,k);
+               // Loop over fast direction of output
+               for(int i = 0; i < tRes.template dim<TId>(k); i++)
+               {
+                  int idxI = tRes.template idx<TId>(i,k);
+                  pOut->rPoint(outConv.i(i,j,k,idxI,idxJ,idxK),outConv.j(i,j,k,idxI,idxJ,idxK),outConv.k(i,j,k,idxI,idxJ,idxK)) = in.point(inConv.i(i,j,k,idxI,idxJ,idxK),inConv.j(i,j,k,idxI,idxJ,idxK),inConv.k(i,j,k,idxI,idxJ,idxK));
+               }
+            }
          }
-      #else
-         if(this->mDimensions == 3)
-         {
-            return in.point(this->idxConv().iS(i,j,k),this->idxConv().jS(i,j,k),this->idxConv().kS(i,j,k));
+      }
 
-         } else if(this->mDimensions == 2)
+      template<typename T, Dimensions::Data::Id TId> void reorder2D(T* pOut, const T& in, const TransformResolution& tRes, const IIndexConv& outConv, const IIndexConv& inConv)
+      {
+         // Loop over slow direction of output
+         for(int j = 0; j < tRes.template dim<Dimensions::Data::DAT2D>(); j++)
          {
-            return in.point(this->idxConv().iS(i,j),this->idxConv().jS(i,j));
-
-         } else
-         {
-            return in.point(this->idxConv().i(i));
+            int idxJ = tRes.template idx<Dimensions::Data::DAT2D>(j);
+            // Loop over fast direction of output
+            for(int i = 0; i < tRes.template dim<TId>(); i++)
+            {
+               int idxI = tRes.template idx<TId>(i);
+               pOut->rPoint(outConv.i(i,j,idxI,idxJ),outConv.j(i,j,idxI,idxJ)) = in.point(inConv.i(i,j,idxI,idxJ),inConv.j(i,j,idxI,idxJ));
+            }
          }
-      #endif //QUICC_MPI
+      }
+
+      template<typename T, Dimensions::Data::Id TId> void reorder1D(T* pOut, const T& in, const TransformResolution& tRes, const IIndexConv& outConv, const IIndexConv& inConv)
+      {
+         //
+         // No work is required in 1D
+         //
+      }
    }
-
-   template <typename T> typename T::PointType& SerialConverterBase::rBwdPoint(T& rOut, const int i, const int j, const int k)
-   {
-      #ifdef QUICC_MPI
-         if(this->mDimensions == 3)
-         {
-            int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i,k);
-            int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j,k);
-            int idxK = this->mspTRes->template idx<Dimensions::Data::DAT3D>(k);
-
-            return rOut.rPoint(this->idxConv().i(i,j,k,idxI,idxJ,idxK),this->idxConv().j(i,j,k,idxI,idxJ,idxK),this->idxConv().k(i,j,k,idxI,idxJ,idxK));
-
-         } else if(this->mDimensions == 2)
-         {
-            int idxI = this->mspTRes->template idx<Dimensions::Data::DATF1D>(i);
-            int idxJ = this->mspTRes->template idx<Dimensions::Data::DAT2D>(j);
-            return rOut.rPoint(this->idxConv().i(i,j,idxI,idxJ),this->idxConv().j(i,j,idxI,idxJ));
-
-         } else
-         {
-            return rOut.rPoint(this->idxConv().i(i));
-         }
-      #else
-         if(this->mDimensions == 3)
-         {
-            return rOut.rPoint(this->idxConv().iS(i,j,k),this->idxConv().jS(i,j,k),this->idxConv().kS(i,j,k));
-
-         } else if(this->mDimensions == 2)
-         {
-            return rOut.rPoint(this->idxConv().iS(i,j),this->idxConv().jS(i,j));
-
-         } else
-         {
-            return rOut.rPoint(this->idxConv().i(i));
-         }
-      #endif //QUICC_MPI
-   }
-
 }
 }
 

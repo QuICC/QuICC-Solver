@@ -6,15 +6,9 @@
 #ifndef QUICC_REGULARINDEXCOUNTER_HPP
 #define QUICC_REGULARINDEXCOUNTER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -38,7 +32,7 @@ namespace QuICC {
          /**
           * @brief Empty destructor
           */
-         ~RegularIndexCounter();
+         ~RegularIndexCounter() = default;
 
          /**
           * @brief Reorder dimensions from fast to slow
@@ -78,6 +72,6 @@ namespace QuICC {
    /// Typedef for an smart reference counting pointer for a RegularIndexCounter
    typedef std::shared_ptr<RegularIndexCounter>   SharedRegularIndexCounter;
 
-}
+} // QuICC
 
 #endif // QUICC_REGULARINDEXCOUNTER_HPP

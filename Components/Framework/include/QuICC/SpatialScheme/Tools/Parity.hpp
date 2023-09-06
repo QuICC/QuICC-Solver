@@ -6,16 +6,10 @@
 #ifndef QUICC_SPATIALSCHEME_TOOLS_PARITY_HPP
 #define QUICC_SPATIALSCHEME_TOOLS_PARITY_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
 #include <map>
-
-// External includes
-//
 
 // Project includes
 //
@@ -45,8 +39,8 @@ namespace Tools {
          static void splitParityM(SharedResolution spRes, const Dimensions::Transform::Id traId, ArrayI& blockSize, MatrixI& evenBlocks, MatrixI& oddBlocks);
 
    };
-}
-}
-}
+} // Tools
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_TOOLS_PARITY_HPP

@@ -7,17 +7,13 @@
 //
 #include <set>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/SLFlBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/3D/SLFlBuilder.hpp"
 #include "QuICC/Transform/Poly/Tools.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
+#include "QuICC/Transform/Setup/Uniform.hpp"
+#include "QuICC/SpatialScheme/3D/SLFMesher.hpp"
 
 namespace QuICC {
 
@@ -46,7 +42,7 @@ namespace SpatialScheme {
       // Get spectral size of the FFT
       int specSize = spRes->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
-      // Get number of transforms
+      // Get number of transforms and list of indexes
       int blockSize = 0;
       for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
@@ -69,7 +65,7 @@ namespace SpatialScheme {
 
       auto spSetup = std::make_shared<Transform::Poly::ALegendre::Setup>(size, specSize, this->purpose());
 
-      // Add m transforms
+      // Get number of transforms and list of indexes
       for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT3D>(); i++)
       {
          spSetup->addIndex(spRes->cpu()->dim(Dimensions::Transform::TRA2D)->idx<Dimensions::Data::DAT3D>(i), spRes->cpu()->dim(Dimensions::Transform::TRA2D)->dim<Dimensions::Data::DAT2D>(i));
@@ -102,136 +98,24 @@ namespace SpatialScheme {
       return spSetup;
    }
 
-   SLFlBuilder::SLFlBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegularSHlBuilder(dim, purpose)
+   SLFlBuilder::SLFlBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options)
+      : IRegularSHlBuilder(dim, purpose, options)
    {
-   }
-
-   SLFlBuilder::~SLFlBuilder()
-   {
+      this->mOptions.at(0).push_back(Transform::Setup::Uniform::id());
    }
 
    void SLFlBuilder::setDimensions()
    {
-      //
-      // Set transform space sizes
-      //
-      ArrayI traSize(3);
-      traSize(0) = this->mI + 1;
-      traSize(1) = this->mL + 1;
-      traSize(2) = this->mM + 1;
-      this->setTransformSpace(traSize);
+      // Set default mesher
+      auto m = std::make_shared<SLFMesher>(this->purpose());
+      this->setMesher(m, false);
+      // ... initialize mesher
+      std::vector<int> d = {this->mI, this->mL, this->mM};
+      this->mesher().init(d, this->mOptions);
 
-      //
-      // Compute sizes
-      //
-
-      // Get standard dealiased FFT size
-      int nR = Transform::Fft::Tools::dealiasCosFft(this->mI+1+8);
-      // Check for optimised FFT sizes
-      nR = Transform::Fft::Tools::optimizeFft(nR);
-
-      // Get dealiased associated Legendre transform size
-      int nTh = Transform::Poly::Tools::dealias(this->mL+1);
-
-      // Get standard dealiased FFT size
-      int nPh = Transform::Fft::Tools::dealiasMixedFft(this->mM+1);
-      // Check for optimised FFT sizes
-      nPh = Transform::Fft::Tools::optimizeFft(nPh);
-
-      // Modify grid size for visualiation
-      if(this->purpose() == GridPurpose::VISUALIZATION)
-      {
-         // Make space for theta = 0 and  theta = pi
-         nTh += 2;
-         // Make space for r = 0, r = 1
-         nR += 2;
-      }
-
-      //
-      // Initialise first transform
-      //
-
-      // Initialise forward dimension of first transform
-      this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
-
-      // Initialise backward dimension of first transform
-      this->setDimension(nR, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
-
-      // Initialise second dimension of first transform
-      this->setDimension(traSize(2), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
-
-      // Initialise third dimension of first transform
-      this->setDimension(traSize(1), Dimensions::Transform::TRA1D, Dimensions::Data::DAT3D);
-
-      //
-      // Initialise second transform
-      //
-
-      // Initialise forward dimension of second transform
-      this->setDimension(nTh, Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
-
-      // Initialise backward dimension of second transform
-      this->setDimension(this->mL + 1, Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
-
-      // Initialise second dimension of second transform
-      this->setDimension(nR, Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
-
-      // Initialise third dimension of second transform
-      this->setDimension(traSize(2), Dimensions::Transform::TRA2D, Dimensions::Data::DAT3D);
-
-      //
-      // Initialise third transform
-      //
-
-      // Initialise forward dimension of third transform
-      this->setDimension(nPh, Dimensions::Transform::TRA3D, Dimensions::Data::DATF1D);
-
-      // Initialise backward dimension of third transform
-      this->setDimension(nPh/2 + 1, Dimensions::Transform::TRA3D, Dimensions::Data::DATB1D);
-
-      // Initialise second dimension of third transform
-      this->setDimension(nTh, Dimensions::Transform::TRA3D, Dimensions::Data::DAT2D);
-
-      // Initialise third dimension of third transform
-      this->setDimension(nR, Dimensions::Transform::TRA3D, Dimensions::Data::DAT3D);
+      // Set dimensions using mesher
+      I3DBuilder::setDimensions();
    }
 
-   void SLFlBuilder::setCosts()
-   {
-      // Set first transform cost
-      this->setCost(1.0, Dimensions::Transform::TRA1D);
-
-      // Set second transform cost
-      this->setCost(1.0, Dimensions::Transform::TRA2D);
-
-      // Set third transform cost
-      this->setCost(1.0, Dimensions::Transform::TRA3D);
-   }
-
-   void SLFlBuilder::setScalings()
-   {
-      // Set first transform scaling
-      this->setScaling(1.0, Dimensions::Transform::TRA1D);
-
-      // Set second transform scaling
-      this->setScaling(1.0, Dimensions::Transform::TRA2D);
-
-      // Set third transform scaling
-      this->setScaling(1.0, Dimensions::Transform::TRA3D);
-   }
-
-   void SLFlBuilder::setMemoryScore()
-   {
-      // Set first transform memory footprint
-      this->setMemory(1.0, Dimensions::Transform::TRA1D);
-
-      // Set second transform memory footprint
-      this->setMemory(1.0, Dimensions::Transform::TRA2D);
-
-      // Set third transform memory footprint
-      this->setMemory(1.0, Dimensions::Transform::TRA3D);
-   }
-
-}
-}
+} // SpatialScheme
+} // QuICC

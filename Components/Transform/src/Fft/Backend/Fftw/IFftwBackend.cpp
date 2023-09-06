@@ -42,7 +42,12 @@ namespace Fftw {
    void IFftwBackend::initLibrary() const
    {
       // FFTW Fixture
-      Library::getInstance();
+      QuICC::Fft::Fftw::Library::getInstance();
+   }
+
+   void IFftwBackend::applyFft(Matrix& phys, const Matrix& mods) const
+   {
+      fftw_execute_r2r(this->mPlan, const_cast<MHDFloat *>(mods.data()), phys.data());
    }
 
    void IFftwBackend::cleanupFft()
@@ -65,6 +70,12 @@ namespace Fftw {
 
       return mem;
    }
+
+   // to be removed
+   void IFftwBackend::applyFft() const {std::logic_error("Backend not implemented.");};
+   void IFftwBackend::applyFft(Matrix&, const MatrixZ&) const {std::logic_error("Backend not implemented.");};
+   void IFftwBackend::applyFft(MatrixZ&, const Matrix&) const {std::logic_error("Backend not implemented.");};
+   void IFftwBackend::applyFft(MatrixZ&, const MatrixZ&) const {std::logic_error("Backend not implemented.");};
 
 }
 }

@@ -58,44 +58,29 @@ namespace Backend {
       this->mpImpl->initMeanBlocks(idBlocks);
    }
 
-   void ComplexProjector::applyFft() const
+   void ComplexProjector::applyFft(MatrixZ& phys, const MatrixZ& mods) const
    {
-      this->mpImpl->applyFft();
+      this->mpImpl->applyFft(phys, mods);
    }
 
-   void ComplexProjector::input(const MatrixZ& in) const
+   void ComplexProjector::input(MatrixZ& tmp, const MatrixZ& in) const
    {
-      this->mpImpl->input(in);
+      this->mpImpl->input(tmp, in);
    }
 
-   void ComplexProjector::inputMean(const MatrixZ& in) const
+   void ComplexProjector::inputMean(MatrixZ& tmp, const MatrixZ& in) const
    {
-      this->mpImpl->inputMean(in);
+      this->mpImpl->inputMean(tmp, in);
    }
 
-   void ComplexProjector::inputDiff(const MatrixZ& in, const int order, const MHDFloat scale) const
+   void ComplexProjector::inputDiff(MatrixZ& tmp, const MatrixZ& in, const int order, const MHDFloat scale) const
    {
-      this->mpImpl->inputDiff(in, order, scale);
+      this->mpImpl->inputDiff(tmp, in, order, scale);
    }
 
-   void ComplexProjector::inputDiff2D(const MatrixZ& in, const std::vector<std::pair<int,int> >& orders, const MHDFloat scale, const MatrixI& idBlocks) const
+   void ComplexProjector::inputDiff2D(MatrixZ& tmp, const MatrixZ& in, const std::vector<std::pair<int,int> >& orders, const MHDFloat scale, const MatrixI& idBlocks) const
    {
-      this->mpImpl->inputDiff2D(in, orders, scale, idBlocks);
-   }
-
-   void ComplexProjector::input(const MHDComplex* in) const
-   {
-      this->mpImpl->input(in);
-   }
-
-   void ComplexProjector::output(MHDComplex* out) const
-   {
-      this->mpImpl->output(out);
-   }
-
-   void ComplexProjector::io(MHDComplex* out, const MHDComplex* in) const
-   {
-      this->mpImpl->io(out, in);
+      this->mpImpl->inputDiff2D(tmp, in, orders, scale, idBlocks);
    }
 
    MHDFloat ComplexProjector::requiredStorage() const
@@ -108,6 +93,11 @@ namespace Backend {
 #endif // QUICC_STORAGEPROFILE
 
       return mem;
+   }
+
+   MatrixZ& ComplexProjector::getStorage() const
+   {
+      return this->mpImpl->getStorage();
    }
 
 }

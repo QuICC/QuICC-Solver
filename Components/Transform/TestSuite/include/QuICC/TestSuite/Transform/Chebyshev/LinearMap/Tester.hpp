@@ -83,9 +83,9 @@ namespace LinearMap {
          /**
           * @brief Read data from file
           */
-         virtual void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+         virtual void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const override;
 
-         virtual void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+         virtual void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const override;
 
          template <typename TData> void dbReadFile(TData& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
 

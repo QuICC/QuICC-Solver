@@ -1,80 +1,20 @@
-/** 
+/**
  * @file Mean.hpp
- * @brief Implementation of the Fourier based mean projector
+ * @brief Implementation of the Fourier based D projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_MEAN_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_MEAN_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Fourier/Complex/Projector/IComplexProjector.hpp"
-
-namespace QuICC {
-
-namespace Transform {
-
-namespace Fft {
-
-namespace Fourier {
-
-namespace Complex {
-
-namespace Projector {
-
-   /**
-    * @brief Implementation of the Fourier based mean projector
-    */ 
-   class Mean: public IComplexProjector
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         Mean();
-
-         /**
-          * @brief Destructor
-          */
-         virtual ~Mean();
-         
-      protected:
-
-      private:
-         /**
-          * @brief Apply pre FFT operator
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         virtual void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const;
-
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         virtual void applyPostOperator(MatrixZ& rOut) const;
-   };
-
-}
-}
-}
-}
-}
-}
+#include "QuICC/Transform/Fft/Fourier/Complex/Projector/MeanBase.hpp"
+#include "QuICC/Transform/Wrappers/Fourier/Complex/Projector/MeanviewCpu_t.hpp.inc"
+#ifdef QUICC_USE_CUFFT
+#include "QuICC/Transform/Wrappers/Fourier/Complex/Projector/MeanviewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_MEAN_HPP

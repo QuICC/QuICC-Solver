@@ -6,15 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/1D/FBuilder.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/1D/FBuilder.hpp"
+#include "QuICC/SpatialScheme/1D/FMesher.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
 
 namespace QuICC {
@@ -49,61 +44,23 @@ namespace SpatialScheme {
       return spSetup;
    }
 
-   FBuilder::FBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IRegular1DBuilder(dim, purpose)
-   {
-   }
-
-   FBuilder::~FBuilder()
+   FBuilder::FBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options)
+      : IRegular1DBuilder(dim, purpose, options)
    {
    }
 
    void FBuilder::setDimensions()
    {
-      //
-      // Set transform space sizes
-      //
-      ArrayI traSize(1);
-      traSize(0) = this->mI + 1;
-      this->setTransformSpace(traSize);
+      // Set default mesher
+      auto m = std::make_shared<FMesher>(this->purpose());
+      this->setMesher(m, false);
+      // ... initialize mesher
+      std::vector<int> d = {this->mI};
+      this->mesher().init(d, this->mOptions);
 
-      //
-      // Compute sizes
-      //
-
-      // Get standard dealiased FFT size
-      int nX = Transform::Fft::Tools::dealiasMixedFft(this->mI+1);
-      // Check for optimised FFT sizes
-      nX = Transform::Fft::Tools::optimizeFft(nX);
-
-      //
-      // Initialise first transform
-      //
-
-      // Initialise forward dimension of first transform
-      this->setDimension(nX, Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
-
-      // Initialise backward dimension of first transform
-      this->setDimension(nX/2 + 1, Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+      // Set dimensions using mesher
+      IRegular1DBuilder::setDimensions();
    }
 
-   void FBuilder::setCosts()
-   {
-      // Set first transform cost
-      this->setCost(1.0, Dimensions::Transform::TRA1D);
-   }
-
-   void FBuilder::setScalings()
-   {
-      // Set first transform scaling
-      this->setScaling(1.0, Dimensions::Transform::TRA1D);
-   }
-
-   void FBuilder::setMemoryScore()
-   {
-      // Set first transform memory footprint
-      this->setMemory(1.0, Dimensions::Transform::TRA1D);
-   }
-
-}
-}
+} // SpatialScheme
+} // QuICC

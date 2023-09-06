@@ -36,34 +36,78 @@ namespace Environment {
           */
          ~Serial();
 
+         using IEnvironment::id;
+
+         /**
+          * @brief Get rank in sub-communicator
+          */
+         int id(const std::size_t id) const final;
+
+         using IEnvironment::size;
+
+         /**
+          * @brief Size of environement of sub-communicator (i.e CPUs, threads, etc)
+          */
+         int size(const std::size_t id) const final;
+
          /**
           * @brief Setup the environment
           */
-         virtual void setup(const int size) override;
+         void setup(const int size) final;
 
          /**
           * @brief Synchronise
           */
-         virtual void synchronize() override;
+         void synchronize() final;
+
+         /**
+          * @brief Synchronize sub-communicator
+          */
+         void synchronize(const std::size_t id) const final;
 
          /**
           * @brief Check error code for success
           */
-         virtual void check(const int ierr, const int code) override;
+         void check(const int ierr, const int code) final;
+
+         /**
+          * @brief Check error code for success
+          */
+         void check(const int ierr, const std::string msg) final;
 
          /**
           * @brief Abort with error code
           */
-         virtual void abort(const int code) override;
+         void abort(const int code) const final;
 
          /**
           * @brief Abort with message
           */
-         virtual void abort(const std::string msg) override;
+         void abort(const std::string msg) const final;
+
+         /**
+          * @brief Add CPU group IDs
+          */
+         void addCommunicator(const std::size_t id, const std::vector<int>& ids) final;
+
+         /**
+          * @brief Get WORLD ranks in sub-communicator group
+          */
+         const std::vector<int>& groupIds(const std::size_t id) const final;
+
+         /**
+          * @brief Get MPI sub-communicator
+          */
+         CommType comm(const std::size_t id) const final;
 
       protected:
 
       private:
+
+         /**
+          * @brief Check for known mpi launchers
+          */
+         void checkMpiLauncher();
    };
 
 }

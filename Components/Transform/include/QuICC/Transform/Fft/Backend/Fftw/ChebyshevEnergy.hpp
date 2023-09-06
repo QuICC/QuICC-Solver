@@ -22,6 +22,7 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/IChebyshevBackend.hpp"
+#include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
 
 namespace QuICC {
@@ -48,12 +49,12 @@ namespace Fftw {
          /**
           * @brief Destructor
           */
-         virtual ~ChebyshevEnergy();
+         ~ChebyshevEnergy();
          
          /**
           * @brief Initialise the FFTW transforms
           */
-         virtual void init(const SetupType& setup) const override;
+         void init(const SetupType& setup) const final;
 
          /**
           * @brief set spectral operator
@@ -61,45 +62,24 @@ namespace Fftw {
          void setSpectralOperator(const SparseMatrix& mat) const;
 
          /**
-          * @brief Set input
-          */
-         void input(const Matrix& in, const bool needPadding = false) const;
-
-         /**
-          * @brief Set input
-          */
-         void input(const MatrixZ& in, const bool useReal, const bool needPadding = false) const;
-
-         /**
           * @brief Square intermediate result
           */
-         void square(const bool isFirst) const;
+         void square(Matrix& tmp, const Matrix& in, const bool isFirst) const;
 
          /**
           * @brief Set output
           */
-         void output(Matrix& rOut) const;
+         void output(Matrix& rOut, const Matrix& tmp) const;
 
          /**
           * @brief Set output mutliplied by scalar operator
           */
-         void outputSpectral(Matrix& rOut) const;
-
-         /**
-          * @brief Set input and output to internal temporary storage
-          */
-         void io() const;
-         using IChebyshevBackend::io;
-
-         /**
-          * @brief Apply FFT
-          */
-         virtual void applyFft() const override;
+         void outputSpectral(Matrix& rOut, const Matrix& tmp) const;
 
          /**
           * @brief Apply forward FFT
           */
-         void applyFwdFft() const;
+         void applyFwdFft(Matrix& mods, const Matrix& phys) const;
 
          /**
           * @brief Add new linear solver
@@ -117,15 +97,22 @@ namespace Fftw {
           * @brief Get solution from solver
           *
           */
-         void getSolution(const int zeroRows = 0, const int extraRows = 0) const;
-         
-      protected:
+         void getSolution(Matrix& tmp, const int zeroRows = 0, const int extraRows = 0) const;
 
-      private:
+         /**
+          * @brief Get the temporary storage
+          *
+          * @param getOut return input or ouput storage
+          */
+         Matrix& getStorage(const StorageKind = StorageKind::in) const final;
+         
          /**
           * @brief Apply padding
           */
-         void applyPadding(Matrix& rData, const int extraRows = 0) const;
+         void applyPadding(Matrix& rData, const int extraRows = 0) const final;
+      protected:
+
+      private:
 
          /**
           * @brief Compute energy weights

@@ -33,7 +33,7 @@ namespace QuICC {
          /**
           * @brief Constructor
           */
-         SimulationBoundary(const std::map<std::string,int>& bcIds);
+         SimulationBoundary(const std::map<std::string,std::size_t>& bcIds);
 
          /**
           * @brief Destructor
@@ -43,12 +43,12 @@ namespace QuICC {
          /**
           * @brief Get tag map
           */
-         std::map<std::string,int> getTagMap() const;
+         const std::map<std::size_t,std::size_t>& map() const;
 
          /**
           * @brief Get tag map
           */
-         int bcId(const std::size_t id) const;
+         std::size_t bcId(const std::size_t id) const;
 
       protected:
 
@@ -58,12 +58,12 @@ namespace QuICC {
           *
           * @param bcIds   Tag map
           */
-         void convert(const std::map<std::string,int>& bcIds);
+         void convert(const std::map<std::string,std::size_t>& bcIds);
 
          /**
           * @brief Storage for the boundary conditions
           */
-         std::map<std::size_t,int> mBcs;
+         std::map<std::size_t,std::size_t> mBcs;
    };
 
    /// Typedef for a shared pointer to a SimulationBoundary object

@@ -18,6 +18,7 @@
 
 // Project includes
 //
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Enums/DimensionTools.hpp"
@@ -77,7 +78,7 @@ namespace Parallel {
          /**
           * @brief Transfer forward data to next step
           */
-         template <typename T> void transferForward(Dimensions::Transform::Id tId, T& rData);
+         template <typename T> void transferForward(Dimensions::Transform::Id tId, T& rData, const bool freeData = true);
 
          /**
           * @brief Transfer backward data to next step
@@ -104,21 +105,6 @@ namespace Parallel {
           */
          template <typename T> void holdPhysical(T& rData);
 
-         /**
-          * @brief Dealias the spectral data
-          */
-         template <typename T> void dealiasSpectral(const T& rData);
-
-         /**
-          * @brief Update the spectral data
-          */
-         void updateSpectral(const StorageType::FwdProvider::VariantDataPointer& pData, const std::size_t arithId);
-
-         /**
-          * @brief Update the spectral data
-          */
-         template <typename T> void updateSpectral(const T& rData, const std::size_t arithId);
-
       protected:
 
       private:
@@ -143,11 +129,16 @@ namespace Parallel {
    template <typename T>
       void Communicator::receiveForward(Dimensions::Transform::Id tId, T& pData)
    {
+      // Debugger message
+      DebuggerMacro_msg("receiveForward ID = " + std::to_string(static_cast<int>(tId)), 5);
+
       if(this->hasConverter(Dimensions::jump(tId,1)))
       {
+         DebuggerMacro_msg("has converter", 6);
          this->converter(Dimensions::jump(tId,1)).getFwd(pData, this->storage(tId));
       } else
       {
+         DebuggerMacro_msg("without converter", 6);
          this->storage(tId).recoverFwd(pData);
       }
    }
@@ -155,30 +146,66 @@ namespace Parallel {
    template <typename T>
       void Communicator::receiveBackward(Dimensions::Transform::Id tId, T& pData)
    {
-      this->converter(tId).getBwd(pData, this->storage(tId));
+      // Debugger message
+      DebuggerMacro_msg("receiveBackward ID = " + std::to_string(static_cast<int>(tId)), 5);
+
+      if(this->hasConverter(tId))
+      {
+         DebuggerMacro_msg("has converter", 6);
+         this->converter(tId).getBwd(pData, this->storage(tId));
+      }
+      else
+      {
+         DebuggerMacro_msg("without converter", 6);
+         this->storage(tId).recoverBwd(pData);
+      }
    }
 
    template <typename T>
-      void Communicator::transferForward(Dimensions::Transform::Id tId, T& rData)
+      void Communicator::transferForward(Dimensions::Transform::Id tId, T& rData, const bool freeInput)
    {
-      if(this->hasConverter(Dimensions::jump(tId,1)))
-      {
-          // Convert data
-          this->converter(Dimensions::jump(tId,1)).convertFwd(rData, this->storage(Dimensions::jump(tId,1)));
+      // Debugger message
+      DebuggerMacro_msg("transferForward ID = " + std::to_string(static_cast<int>(tId)), 5);
 
-          // Free input data
-          this->storage(tId).freeFwd(rData);
+      auto traId = Dimensions::jump(tId,1);
+      if(this->hasConverter(traId))
+      {
+         DebuggerMacro_msg("has converter", 6);
+         // Convert data
+         this->converter(traId).convertFwd(rData, this->storage(traId));
+
+         // Free input data
+         if(freeInput)
+         {
+            this->storage(tId).freeFwd(rData);
+         }
+      }
+      else
+      {
+         DebuggerMacro_msg("NEEDS FIX: transferForward is not consistent here", 5);
+         DebuggerMacro_msg("transferForward ID = " + std::to_string(static_cast<int>(tId)), 5);
       }
    }
 
    template <typename T>
       void Communicator::transferBackward(Dimensions::Transform::Id tId, T& rData)
    {
-      // Convert data
-      this->converter(tId).convertBwd(rData, this->storage(Dimensions::jump(tId,-1)));
+      // Debugger message
+      DebuggerMacro_msg("transferBackward ID = " + std::to_string(static_cast<int>(tId)), 5);
 
-      // Free input data
-      this->storage(tId).freeBwd(rData);
+      if(this->hasConverter(tId))
+      {
+         DebuggerMacro_msg("has converter", 6);
+         // Convert data
+         this->converter(tId).convertBwd(rData, this->storage(Dimensions::jump(tId,-1)));
+
+         // Free input data
+         this->storage(tId).freeBwd(rData);
+      }
+      else
+      {
+         throw std::logic_error("Something went wrong with the transfer setup");
+      }
    }
 
    template <typename T>
@@ -193,72 +220,18 @@ namespace Parallel {
       this->lastStorage().holdFwd(rData);
    }
 
-   template <typename T>
-      void Communicator::dealiasSpectral(const T& rInData)
-   {
-      // Get dealiased storage scalar
-      T *pOutData;
-      this->storage(Dimensions::Transform::TRA1D).provideBwd(pOutData);
-
-      // Dealias the data
-      // (copy will be removed)
-      pOutData->rData().topRows(rInData.data().rows()) = rInData.data();
-
-      // Hold the input data
-      this->storage(Dimensions::Transform::TRA1D).holdBwd(*pOutData);
-   }
-
-   inline void Communicator::updateSpectral(const StorageType::FwdProvider::VariantDataPointer& pData, const std::size_t arithId)
-   {
-      std::visit([&](auto&& p){this->updateSpectral(*p, arithId);}, pData);
-   }
-
-   template <typename T>
-      void Communicator::updateSpectral(const T& rInData, const std::size_t arithId)
-   {
-      // Get dealiased storage scalar
-      T *pOutData;
-      this->storage(Dimensions::Transform::TRA1D).recoverBwd(pOutData);
-
-      // Assert dealiasing has taken place!
-      assert(pOutData->data().rows() <= rInData.data().rows());
-      assert(pOutData->data().cols() == rInData.data().cols());
-
-      if(arithId == Arithmetics::Set::id())
-      {
-         // Copy values over into unknown
-         pOutData->setData(rInData.data().topRows(pOutData->data().rows()));
-
-      } else if(arithId == Arithmetics::SetNeg::id())
-      {
-         // Copy negative values over into unknown
-         pOutData->setData(-rInData.data().topRows(pOutData->data().rows()));
-      } else if(arithId == Arithmetics::Add::id())
-      {
-         // Add values to unknown
-         pOutData->addData(rInData.data().topRows(pOutData->data().rows()));
-      } else if(arithId == Arithmetics::Sub::id())
-      {
-         // Substract values from unknown
-         pOutData->subData(rInData.data().topRows(pOutData->data().rows()));
-      }
-
-      //
-      // This implementation assumes the storage recovered belong the variable.
-      // pOutData should NOT be freed
-      //
-   }
-
    template <Dimensions::Transform::Id TId>
       void Communicator::createSerialConverter(SharedResolution spRes)
    {
       // Create shared serial converter
       auto spConv = std::make_shared<SerialConverter>();
       auto spIdxConv = spRes->sim().ss().createIndexConv(TId);
-      spIdxConv->init(*spRes, Dimensions::TransformJump<TId,-1>::id);
+
+      const Dimensions::Transform::Id jid = Dimensions::jump(TId,-1);
+      spIdxConv->init(*spRes, jid);
 
       // Initialise shared converter
-      spConv->init(spRes, Dimensions::TransformJump<TId,-1>::id, spIdxConv);
+      spConv->init(spRes, jid, spIdxConv);
 
       // Set 1D/2D converter
       this->addConverter(TId, spConv);
@@ -271,15 +244,22 @@ namespace Parallel {
       // Create shared MPI converter
       auto spConv = std::make_shared<MpiConverter>();
       auto spIdxConv = spRes->sim().ss().createIndexConv(TId);
-      spIdxConv->init(*spRes, Dimensions::TransformJump<TId,-1>::id);
+
+      const Dimensions::Transform::Id jid = Dimensions::jump(TId,-1);
+      spIdxConv->init(*spRes, jid);
 
       // Initialise the MPI converter
-      auto pFTmp = spRes->sim().ss().fwdPtr(Dimensions::TransformJump<TId,-1>::id);
-      this-> storage(Dimensions::TransformJump<TId,-1>::id).provideFwd(pFTmp);
+      auto pFTmp = spRes->sim().ss().fwdPtr(jid);
+      this-> storage(jid).provideFwd(pFTmp);
       auto pBTmp = spRes->sim().ss().bwdPtr(TId);
       this->storage(TId).provideBwd(pBTmp);
-      std::visit([&](auto && pF, auto && pB){spConv->init(spRes, Dimensions::TransformJump<TId,-1>::id, *pF, *pB, packsFwd, packsBwd, spIdxConv);}, pFTmp, pBTmp);
-      this->storage(Dimensions::TransformJump<TId,-1>::id).freeFwd(pFTmp);
+      std::visit(
+            [&](auto && pF, auto && pB)
+            {
+               spConv->init(spRes, jid, *pF, *pB, packsFwd, packsBwd, spIdxConv);
+            }
+            , pFTmp, pBTmp);
+      this->storage(jid).freeFwd(pFTmp);
       this->storage(TId).freeBwd(pBTmp);
 
       QuICCEnv().synchronize();
@@ -307,16 +287,16 @@ namespace Parallel {
       }
       int max = std::max(pFwd, pBwd);
 
-      // Allocate first 2D buffers
+      // Allocate first buffers
       spBufferOne->allocate(spConv->fwdSizes(), max);
 
-      // Allocate second 2D buffers
+      // Allocate second buffers
       spBufferTwo->allocate(spConv->bwdSizes(), max);
 
       // Set communication buffers
       spConv->setBuffers(spBufferOne, spBufferTwo);
 
-      // Set the 1D/2D converter
+      // Set the converter
       this->addConverter(TId, spConv);
    }
 #endif // QUICC_MPI

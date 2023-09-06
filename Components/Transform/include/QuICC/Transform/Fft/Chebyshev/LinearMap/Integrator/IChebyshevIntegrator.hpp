@@ -96,14 +96,6 @@ namespace Integrator {
 
       private:
          /**
-          * @brief Apply pre FFT operator
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         virtual void applyPreOperator(Matrix& rOut, const Matrix& in) const = 0;
-
-         /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
@@ -115,14 +107,14 @@ namespace Integrator {
           *
           * @param in   Input values
           */
-         virtual void applyPreOperator(const MatrixZ& in, const bool useReal) const = 0;
+         virtual void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const = 0;
 
          /**
           * @brief Apply post FFT operator for component wise operations
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(MatrixZ& rOut, const bool useReal) const = 0;
+         virtual void applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const = 0;
 
          /**
           * @brief Compute transform R2C (disabled)

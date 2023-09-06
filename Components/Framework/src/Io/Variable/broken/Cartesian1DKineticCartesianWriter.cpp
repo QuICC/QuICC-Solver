@@ -23,8 +23,8 @@
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/PhysicalNames/VelocityX.hpp"
 #include "QuICC/PhysicalNames/VelocityY.hpp"
 #include "QuICC/Io/Variable/EnergyTags.hpp"
@@ -64,7 +64,7 @@ namespace Variable {
       PyTuple_SetItem(pArgs, 0, pValue);
 
       // .. set scale factor
-      MHDFloat cscale = 2.0/(this->mPhysical.find(NonDimensional::Upper1D::id())->second->value() - this->mPhysical.find(NonDimensional::Lower1D::id())->second->value());
+      MHDFloat cscale = 2.0/(this->mPhysical.find(NonDimensional::Upper1d::id())->second->value() - this->mPhysical.find(NonDimensional::Lower1d::id())->second->value());
       pValue = PyFloat_FromDouble(cscale);
       PyTuple_SetItem(pArgs, 1, pValue);
 

@@ -3,27 +3,14 @@
  * @brief Source of the high level state generator
  */
 
-// Debug includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-
-// Configuration includes
-//
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Generator/StateGenerator.hpp"
-
 // Project includes
 //
+#include "QuICC/Generator/StateGenerator.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/SolveTiming/Before.hpp"
@@ -31,36 +18,30 @@
 
 namespace QuICC {
 
-   StateGenerator::StateGenerator()
-      : SimulationBase()
-   {
-   }
-
-   StateGenerator::~StateGenerator()
-   {
-   }
-
    void StateGenerator::preRun()
    {
    }
 
    void StateGenerator::mainRun()
    {
-      // Solve trivial equations
-      this->mPseudospectral.solveTrivialEquations(SolveTiming::Before::id());
+      for(auto j: this->mPseudospectral.it())
+      {
+         // Solve trivial equations
+         this->mPseudospectral.solveTrivialEquations(SolveTiming::Before::id(), j);
 
-      // Compute nonlinear terms
-      this->mPseudospectral.computeNonlinear();
+         // Compute nonlinear terms
+         this->mPseudospectral.computeNonlinear(j);
 
-/// \mhdBug Problem with equations for generating exact states
-      // Solve trivial equations
-      this->mPseudospectral.solveTrivialEquations(SolveTiming::After::id());
+         /// \mhdBug Problem with equations for generating exact states
+         // Solve trivial equations
+         this->mPseudospectral.solveTrivialEquations(SolveTiming::After::id(), j);
 
-      // Solve diagnostic equations
-//      this->solveDiagnosticEquations(SolveTiming::After::id());
+         // Solve diagnostic equations
+         //      this->solveDiagnosticEquations(SolveTiming::After::id());
 
-      // Synchronise computation nodes
-      QuICCEnv().synchronize();
+         // Synchronise computation nodes
+         QuICCEnv().synchronize();
+      }
    }
 
    void StateGenerator::postRun()

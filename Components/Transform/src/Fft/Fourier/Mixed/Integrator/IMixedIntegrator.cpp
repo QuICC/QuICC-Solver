@@ -55,8 +55,7 @@ namespace Integrator {
       assert(rOut.rows() >= this->outRows());
       assert(in.cols() <= rOut.cols());
 
-      this->applyPreOperator(rOut, in);
-      this->mBackend.applyFft();
+      this->mBackend.applyFft(rOut, in);
       this->applyPostOperator(rOut);
    }
 
@@ -95,6 +94,15 @@ namespace Integrator {
 
       return mem;
    }
+
+   void IMixedIntegrator::dealias(MatrixZ& deAliased, const MatrixZ& aliased)const
+   {
+      int specSize = this->mspSetup->specSize();
+      assert(deAliased.rows() == specSize);
+
+      deAliased = aliased.topRows(specSize);
+   }
+
 
 }
 }

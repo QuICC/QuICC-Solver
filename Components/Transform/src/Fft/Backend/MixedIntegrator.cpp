@@ -68,19 +68,9 @@ namespace Backend {
       this->mpImpl->outputDiff(rOut, order, scale, mod);
    }
 
-   void MixedIntegrator::io(MatrixZ& rOut, const Matrix& in) const
+   void MixedIntegrator::applyFft(MatrixZ& mods, const Matrix& phys) const
    {
-      this->mpImpl->io(rOut, in);
-   }
-
-   void MixedIntegrator::io(MHDComplex* out, const MHDFloat* in) const
-   {
-      this->mpImpl->io(out, in);
-   }
-
-   void MixedIntegrator::applyFft() const
-   {
-      this->mpImpl->applyFft();
+      this->mpImpl->applyFft(mods, phys);
    }
 
    MHDFloat MixedIntegrator::requiredStorage() const

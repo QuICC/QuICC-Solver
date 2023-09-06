@@ -1,31 +1,30 @@
 /**
- * @file I@idID@.hpp
+ * @file @idID@.hpp
  * @brief Interface for a general @idID@
  */
 
-#ifndef QUICC_@IDNS@_I@IDID@_HPP
-#define QUICC_@IDNS@_I@IDID@_HPP
+#include <limits>
+#ifndef QUICC_@IDNS@_@IDID@_HPP
+#define QUICC_@IDNS@_@IDID@_HPP
 
 // System includes
 //
 #include <string>
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/BasicTypes.hpp"
+#include "QuICC/Hasher.hpp"
 
 namespace QuICC {
 
-namespace @idNS@ {
+@cxxNS@
 
    /**
     * @brief Interface for a general @idID@
     */
-   class I@idID@
+   class @idID@
    {
       public:
          /**
@@ -33,12 +32,12 @@ namespace @idNS@ {
           *
           * @param value Value of the @idID@
           */
-         I@idID@(const MHDFloat value, const std::string tag, const std::string formatted);
+         @idID@(const MHDFloat value, const std::string tag);
 
          /**
           * @brief Destructor
           */
-         virtual ~I@idID@() = default;
+         virtual ~@idID@() = default;
 
          /**
           * @brief Value of @idID@
@@ -51,9 +50,9 @@ namespace @idNS@ {
          std::string tag() const;
 
          /**
-          * @brief Formatted name of the @idID@
+          * @brief Tag of the @idID@
           */
-         std::string formatted() const;
+         std::size_t hash() const;
          
       protected:
 
@@ -69,35 +68,40 @@ namespace @idNS@ {
          const std::string mTag;
 
          /**
+          * @brief Hash of @idID@
+          */
+         const std::size_t mHash;
+
+         /**
           * @brief Formatted name of @idID@
           */
          const std::string mFormatted;
    };
 
    /// Typedef for shared_pointer @idID@
-   typedef std::shared_ptr<I@idID@> SharedI@idID@;
+   typedef std::shared_ptr<@idID@> Shared@idID@;
 
-   inline I@idID@::I@idID@(const MHDFloat value, const std::string tag, const std::string formatted)
-      : mValue(value), mTag(tag), mFormatted(formatted)
+   inline @idID@::@idID@(const MHDFloat value, const std::string tag)
+      : mValue(value), mTag(tag), mHash(Hasher::makeId(tag))
    {
    }
 
-   inline MHDFloat I@idID@::value() const
+   inline MHDFloat @idID@::value() const
    {
       return this->mValue;
    }
 
-   inline std::string I@idID@::tag() const
+   inline std::string @idID@::tag() const
    {
       return this->mTag;
    }
 
-   inline std::string I@idID@::formatted() const
+   inline std::size_t @idID@::hash() const
    {
-      return this->mFormatted;
+      return this->mHash;
    }
 
-}
+@cxxNS_@
 }
 
-#endif // QUICC_@IDNS@_I@IDID@_HPP
+#endif // QUICC_@IDNS@_@IDID@_HPP

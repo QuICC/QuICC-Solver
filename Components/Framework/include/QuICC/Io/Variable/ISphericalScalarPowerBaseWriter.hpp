@@ -69,6 +69,11 @@ namespace Variable {
          
       protected:
          /**
+          * @brief Prepare spectral field data for computation
+          */
+         void prepareInput(Transform::TransformCoordinatorType& coord);
+
+         /**
           * @brief Data ordering is m slowest
           */
          bool mHasMOrdering;
@@ -85,9 +90,9 @@ namespace Variable {
 
       private:
          /**
-          * @brief Initialize power storage
+          * @brief Reset power storage
           */
-         virtual void initializePower() = 0;
+         virtual void resetPower() = 0;
 
          /**
           * @brief Store power

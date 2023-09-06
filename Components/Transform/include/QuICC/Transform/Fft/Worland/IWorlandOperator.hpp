@@ -59,7 +59,14 @@ namespace Worland {
           *
           * @param spSetup   Shared setup object for the transform
           */
-         void init(SharedSetupType spSetup) const;
+         void init(SharedTransformSetup spSetup) const override;
+
+         /**
+          * @brief Initialise the transform
+          *
+          * @param spSetup   Shared setup object for the transform
+          */
+         void init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const override;
 
          /**
           * @brief Compute transform
@@ -91,14 +98,13 @@ namespace Worland {
           */
          mutable SharedSetup    mspSetup;
 
-      private:
          /**
           * @brief Compute transform R2C (disabled)
           *
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const Matrix& in) const;
+         virtual void transform(MatrixZ& rOut, const Matrix& in) const override;
    };
 
 }

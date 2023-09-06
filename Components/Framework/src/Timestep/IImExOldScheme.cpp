@@ -25,9 +25,5 @@ namespace Timestep {
    {
    }
 
-   IImExOldScheme::~IImExOldScheme()
-   {
-   }
-
 }
 }

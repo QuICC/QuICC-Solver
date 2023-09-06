@@ -21,6 +21,7 @@
 //
 #include "QuICC/PyQuICC/Config.hpp"
 #include "QuICC/PyQuICC/Coordinator.hpp"
+#include "QuICC/PyQuICC/Tools.hpp"
 
 namespace QuICC {
 
@@ -222,99 +223,24 @@ namespace PyQuICC {
       return pValue;
    }
 
+   void CoreWrapper::fillArray(Array& rArray, PyObject* pPyArray)
+   {
+      Tools::fillArray(rArray, pPyArray);
+   }
+
+   void CoreWrapper::fillMatrix(Matrix& rMatrix, PyObject* pPyMat)
+   {
+      Tools::fillMatrix(rMatrix, pPyMat);
+   }
+
    void CoreWrapper::fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat)
    {
-      PyObject *pArgs, *pValue, *pTmp;
-
-      // Get matrix size
-      pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
-      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
-      long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
-      Py_DECREF(pValue);
-
-      // Convert Python matrix into triplets
-      pArgs = PyTuple_New(1);
-      Py_INCREF(pPyMat);
-      PyTuple_SetItem(pArgs, 0, pPyMat);
-      CoreWrapper::setFunction("triplets", "utils");
-      pValue = CoreWrapper::callFunction(pArgs);
-      Py_DECREF(pArgs);
-
-      long int len = PyList_Size(pValue);
-      std::vector<Triplet> triplets;
-      triplets.reserve(len);
-      long int row;
-      long int col;
-      MHDFloat val;
-      for(int i = 0; i < len; i++)
-      {
-         pTmp = PyList_GetItem(pValue, i);
-         row = PyLong_AsLong(PyTuple_GetItem(pTmp,0));
-         col = PyLong_AsLong(PyTuple_GetItem(pTmp,1));
-         val = PyFloat_AsDouble(PyTuple_GetItem(pTmp,2));
-         triplets.push_back(Triplet(row,col,val));
-      }
-      Py_DECREF(pValue);
-
-      // Build matrix
-      rMatrix.resize(rows,cols);
-      rMatrix.setFromTriplets(triplets.begin(), triplets.end());
+      Tools::fillMatrix(rMatrix, pPyMat);
    }
 
    void CoreWrapper::fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat)
    {
-      PyObject *pArgs, *pValue, *pTmp;
-
-      // Get matrix size
-      pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
-      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
-      long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
-      Py_DECREF(pValue);
-
-      // Convert Python matrix into triplets
-      pArgs = PyTuple_New(1);
-      Py_INCREF(pPyMat);
-      PyTuple_SetItem(pArgs, 0, pPyMat);
-      CoreWrapper::setFunction("triplets", "utils");
-      pValue = CoreWrapper::callFunction(pArgs);
-      Py_DECREF(pArgs);
-
-      long int len = PyList_Size(pValue);
-      std::vector<Triplet> realTriplets;
-      std::vector<Triplet> imagTriplets;
-      realTriplets.reserve(len);
-      imagTriplets.reserve(len);
-      long int row;
-      long int col;
-      MHDFloat val;
-      for(int i = 0; i < len; i++)
-      {
-         pTmp = PyList_GetItem(pValue, i);
-         row = PyLong_AsLong(PyTuple_GetItem(pTmp,0));
-         col = PyLong_AsLong(PyTuple_GetItem(pTmp,1));
-         if(PyComplex_Check(PyTuple_GetItem(pTmp,2)))
-         {
-            val = PyComplex_RealAsDouble(PyTuple_GetItem(pTmp,2));
-            realTriplets.push_back(Triplet(row,col,val));
-            val = PyComplex_ImagAsDouble(PyTuple_GetItem(pTmp,2));
-            imagTriplets.push_back(Triplet(row,col,val));
-         } else
-         {
-            val = PyFloat_AsDouble(PyTuple_GetItem(pTmp,2));
-            realTriplets.push_back(Triplet(row,col,val));
-         }
-      }
-      Py_DECREF(pValue);
-
-      // Build matrix
-      rMatrix.real().resize(rows,cols);
-      rMatrix.imag().resize(rows,cols);
-      rMatrix.real().setFromTriplets(realTriplets.begin(), realTriplets.end());
-
-      if(imagTriplets.size() > 0)
-      {
-         rMatrix.imag().setFromTriplets(imagTriplets.begin(), imagTriplets.end());
-      }
+      Tools::fillMatrix(rMatrix, pPyMat);
    }
 
    void CoreWrapper::cleanup()

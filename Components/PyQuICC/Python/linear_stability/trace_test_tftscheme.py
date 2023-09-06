@@ -18,7 +18,7 @@ eigs = [k]
 
 bc_vel = 0
 bc_temp = 0
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':bc_vel, 'velocity_y':bc_vel, 'velocity_z':bc_vel, 'temperature':bc_temp}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 print("Constructing matrix A:")

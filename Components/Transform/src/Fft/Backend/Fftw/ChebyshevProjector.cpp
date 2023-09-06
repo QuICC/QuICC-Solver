@@ -61,21 +61,10 @@ namespace Fftw {
 
       // Create the spectral to physical plan
       const fftw_r2r_kind bwdKind[] = {FFTW_REDFT01};
-      this->mPlan = fftw_plan_many_r2r(1, fftSize, blockSize, tmpB.data(), NULL, 1, bwdSize, tmpF.data(), NULL, 1, fwdSize, bwdKind, Library::planFlag());
+      this->mPlan = fftw_plan_many_r2r(1, fftSize, blockSize, tmpB.data(), NULL, 1, bwdSize, tmpF.data(), NULL, 1, fwdSize, bwdKind, QuICC::Fft::Fftw::Library::planFlag());
       if(this->mPlan == NULL)
       {
          throw  std::logic_error("FFTW plan failed!");
-      }
-   }
-
-   void ChebyshevProjector::input(const Matrix& in, const bool needPadding) const
-   {
-      this->mTmp.topRows(this->mSpecSize) = in.topRows(this->mSpecSize);
-
-      // Apply padding if required
-      if(needPadding)
-      {
-         this->applyPadding(this->mTmp);
       }
    }
 
@@ -84,41 +73,14 @@ namespace Fftw {
       this->mScaler = scaler;
    }
 
-   void ChebyshevProjector::input(const MatrixZ& in, const bool useReal, const bool needPadding) const
+   void ChebyshevProjector::output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
       if(useReal)
       {
-         this->mTmp.topRows(this->mSpecSize) = in.real().topRows(this->mSpecSize);
+         rOut.real() = tmp;
       } else
       {
-         this->mTmp.topRows(this->mSpecSize) = in.imag().topRows(this->mSpecSize);
-      }
-
-      // Apply padding if required
-      if(needPadding)
-      {
-         this->applyPadding(this->mTmp);
-      }
-   }
-
-   void ChebyshevProjector::io() const
-   {
-      this->io(this->mTmpComp.data(), this->mTmp.data());
-   }
-
-   void ChebyshevProjector::output(Matrix& rOut) const
-   {
-      this->io(rOut.data(), this->mTmp.data());
-   }
-
-   void ChebyshevProjector::output(MatrixZ& rOut, const bool useReal) const
-   {
-      if(useReal)
-      {
-         rOut.real() = this->mTmpComp;
-      } else
-      {
-         rOut.imag() = this->mTmpComp;
+         rOut.imag() = tmp;
       }
    }
 
@@ -127,14 +89,14 @@ namespace Fftw {
       rOut = this->mScaler.asDiagonal()*rOut;
    }
 
-   void ChebyshevProjector::outputScale(MatrixZ& rOut, const bool useReal) const
+   void ChebyshevProjector::outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
       if(useReal)
       {
-         rOut.real() = this->mScaler.asDiagonal()*this->mTmpComp;
+         rOut.real() = this->mScaler.asDiagonal()*tmp;
       } else
       {
-         rOut.imag() = this->mScaler.asDiagonal()*this->mTmpComp;
+         rOut.imag() = this->mScaler.asDiagonal()*tmp;
       }
    }
 
@@ -150,24 +112,15 @@ namespace Fftw {
       }
    }
 
-   void ChebyshevProjector::applyFft() const
-   {
-      fftw_execute_r2r(this->mPlan, const_cast<MHDFloat *>(this->mpIn), this->mpOut);
-   }
-
    void ChebyshevProjector::addSolver(const int extraRows) const
    {
       this->mspSolver = std::make_shared<DifferentialSolver>(this->mSpecSize, this->mBlockSize, extraRows);
    }
 
-   void ChebyshevProjector::getSolution(const int zeroRows, const int extraRows, const bool updateSolver) const
+   void ChebyshevProjector::getSolution(Matrix& tmp, const int zeroRows, const int extraRows, const bool updateSolver) const
    {
-      this->solver().solve(zeroRows, this->mTmp);
-      this->applyPadding(this->mTmp, extraRows);
-      if(updateSolver)
-      {
-         this->solver().input(this->mTmp, 0);
-      }
+      this->solver().solve(tmp, zeroRows);
+      this->applyPadding(tmp, extraRows);
    }
 
    DifferentialSolver& ChebyshevProjector::solver() const

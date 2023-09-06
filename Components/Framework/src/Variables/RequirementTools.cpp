@@ -6,54 +6,40 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
+// Project includes
 //
 #include "QuICC/Variables/RequirementTools.hpp"
 
-// Project includes
-//
-
 namespace QuICC {
 
-   VariableRequirement RequirementTools::mergeRequirements(const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs)
+   void RequirementTools::mergeRequirements(VariableRequirement& req, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs)
    {
-      VariableRequirement mergedInfo;
-
       // Loop over all scalar equations
       for(auto scalEqIt = scalarEqs.cbegin(); scalEqIt < scalarEqs.cend(); scalEqIt++)
       {
-         mergedInfo.merge((*scalEqIt)->requirements());
+         req.merge((*scalEqIt)->requirements());
       }
 
       // Loop over all vector equations
       for(auto vectEqIt = vectorEqs.cbegin(); vectEqIt < vectorEqs.cend(); vectEqIt++)
       {
-         mergedInfo.merge((*vectEqIt)->requirements());
+         req.merge((*vectEqIt)->requirements());
       }
-
-      return mergedInfo;
    }
 
-   VariableRequirement RequirementTools::mergeImposedRequirements(const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs)
+   void RequirementTools::mergeImposedRequirements(VariableRequirement& req, const std::vector<Equations::SharedIScalarEquation>& scalarEqs, const std::vector<Equations::SharedIVectorEquation>& vectorEqs)
    {
-      VariableRequirement mergedInfo;
-
       // Loop over all scalar equations
       for(auto scalEqIt = scalarEqs.cbegin(); scalEqIt < scalarEqs.cend(); scalEqIt++)
       {
-         mergedInfo.merge((*scalEqIt)->imposedRequirements());
+         req.merge((*scalEqIt)->imposedRequirements());
       }
 
       // Loop over all vector equations
       for(auto vectEqIt = vectorEqs.cbegin(); vectEqIt < vectorEqs.cend(); vectEqIt++)
       {
-         mergedInfo.merge((*vectEqIt)->imposedRequirements());
+         req.merge((*vectEqIt)->imposedRequirements());
       }
-
-      return mergedInfo;
    }
 
    void RequirementTools::initVariables(std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& rScalarVars, std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& rVectorVars, const VariableRequirement& varInfo, SharedResolution spRes)
@@ -459,4 +445,4 @@ namespace QuICC {
       return paths;
    }
 
-}
+} // QuICC

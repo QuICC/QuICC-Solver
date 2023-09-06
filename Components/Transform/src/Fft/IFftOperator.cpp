@@ -64,6 +64,11 @@ namespace Fft {
       return mem;
    }
 
+   void IFftOperator::dealias(MatrixZ& deAliased, const MatrixZ& aliased) const
+   {
+      std::logic_error("method not implemented!");
+   }
+
 }
 }
 }

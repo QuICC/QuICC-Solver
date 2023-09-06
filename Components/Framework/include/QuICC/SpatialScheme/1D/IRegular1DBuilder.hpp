@@ -6,13 +6,7 @@
 #ifndef QUICC_SPATIALSCHEME_IREGULAR1DBUILDER_HPP
 #define QUICC_SPATIALSCHEME_IREGULAR1DBUILDER_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -21,6 +15,7 @@
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/IBuilder.hpp"
+#include "QuICC/SpatialScheme/Tools/IBase.hpp"
 
 namespace QuICC {
 
@@ -35,19 +30,21 @@ namespace SpatialScheme {
          /**
           * @brief Constructor
           *
-          * @param dim     Chebyshev truncations
+          * @param dim Dimension truncations 
+          * @param purpose Setup purpose: simulation, visualization
+          * @param options Options for builder
           */
-         explicit IRegular1DBuilder(const ArrayI& dim, const GridPurpose::Id purpose);
+         explicit IRegular1DBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options);
 
          /**
           * @brief Destructor
           */
-         virtual ~IRegular1DBuilder();
+         virtual ~IRegular1DBuilder() = default;
 
          /**
           * @brief Get spatial scheme dimensions
           */
-         virtual ArrayI resolution() const;
+         virtual ArrayI resolution() const override;
 
          /**
           * @brief Create indexes for a possibly restricted set
@@ -59,11 +56,8 @@ namespace SpatialScheme {
           * @param idx3D   Storage for forward indexes of third dimension
           * @param id      ID of the bin
           * @param bins    Total number of bins (useful to build efficient pairs)
-          * @param n0      Starting index of restricted set
-          * @param nN      Length of restricted set
-          * @param flag    Flag to specify location of splitting
           */
-         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), const Splitting::Locations::Id flag = Splitting::Locations::NONE);
+         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::vector<int>& id, const std::vector<int>& bins) override;
 
          /**
           * @brief Get total of splittable indexes 
@@ -71,9 +65,40 @@ namespace SpatialScheme {
           * @param transId Transform ID
           * @param flag    Flag to specify location of splitting
           */
-         virtual int splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag);
+         virtual int splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag) override;
          
       protected:
+         /**
+          * @brief Get truncation tool
+          */
+         std::shared_ptr<Tools::IBase> truncationTools(const Dimensions::Transform::Id transId) const;
+
+         /**
+          * @brief Initialise the domain dimensions
+          */
+         virtual void setDimensions() override;
+
+         /**
+          * @brief Set transform costs
+          *
+          * @param shift   Shift of the dimensions
+          */
+         virtual void setCosts() override;
+
+         /**
+          * @brief Set transform scalings
+          *
+          * @param shift   Shift of the dimensions
+          */
+         virtual void setScalings() override;
+
+         /**
+          * @brief Set transform memory footprint
+          *
+          * @param shift   Shift of the dimensions
+          */
+         virtual void setMemoryScore() override;
+
          /**
           * @brief First truncation
           */
@@ -82,7 +107,7 @@ namespace SpatialScheme {
       private:
    };
 
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_IREGULAR1DBUILDER_HPP

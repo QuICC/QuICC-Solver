@@ -20,7 +20,7 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::ALegendre;
 
-TEST_CASE( "@Algorithm@::Error for @Operator@ backward-forward loop", "[@Algorithm@::@Operator@:@type@]" ){
+TEST_CASE( "@Algorithm@::Error for @Operator@@Template@ backward-forward loop", "[@CatchTestName@]" ){
 
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -37,12 +37,14 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ backward-forward loop", "[@Algorit
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::@Algorithm@::ALegendre::Projector::@Operator@ Projector;
-   typedef ::QuICC::Transform::@Algorithm@::ALegendre::Integrator::P Integrator;
+   using namespace ::QuICC::Transform::@Algorithm@::ALegendre;
+   typedef Projector::@Operator@@Template@ Projector;
+   typedef Integrator::P@Template@ Integrator;
    typedef typename currentts::Tester<Projector,Integrator> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
+   tester.setIter(currentts::args().iter);
 
    Tester::ParameterType params = {-1};
 
@@ -55,7 +57,7 @@ TEST_CASE( "@Algorithm@::Error for @Operator@ backward-forward loop", "[@Algorit
    for(auto id: currentts::args().params)
    {
       params.at(0) = id;
-      tester.validate(params, currentts::args().type);
+      tester.validate(params, currentts::args().type, currentts::args().timeOnly);
    }
 
 }

@@ -9,7 +9,7 @@
 // Configuration includes
 //
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 
 // System includes
 //
@@ -59,6 +59,20 @@ namespace Transform {
           * @param projectorTree Transform projector tree
           */
          virtual ArrayI packs2D(const std::vector<TransformTree>& projectorTree) = 0;
+
+         /**
+          * @brief Get the packet sizes for given tree for the first exchange
+          *
+          * @param tree Transform tree
+          */
+         int packs1D(const TransformTree& tree);
+
+         /**
+          * @brief Get the packet sizes of tree for the second exchange
+          *
+          * @param tree Transform tree
+          */
+         int packs2D(const TransformTree& tree);
 
          /**
           * @brief Location of the split in the configurator

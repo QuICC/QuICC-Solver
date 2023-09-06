@@ -1,23 +1,14 @@
-/** 
+/**
  * @file Hdf5File.cpp
  * @brief Source of the implementation of a general HDF5 file
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Hdf5/Hdf5File.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Hdf5/Hdf5File.hpp"
 
 namespace QuICC {
 
@@ -38,57 +29,54 @@ namespace Hdf5 {
 
    hid_t Hdf5File::filePList()
    {
-      // 
-      // Default options are fine for serial case
-      //
 
       #ifdef QUICC_MPI
          // Create file access property list
          hid_t fPList = H5Pcreate(H5P_FILE_ACCESS);
 
-         #ifdef QUICC_ON_JANUS
-            // Deactivate incompatible ROMIO features
-            MPI_Info info;
-            MPI_Info_create(&info);
-            MPI_Info_set(info, (char *)"romio_ds_write", (char *)"disable");
-            MPI_Info_set(info, (char *)"romio_ds_read", (char *)"disable");
-
-            // Create the MPI IO access property
-            H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, info);
-
-            // Free info
-            MPI_Info_free(&info);
-         #else
-            // Create the MPI IO access property
-            H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, MPI_INFO_NULL);
-         #endif // QUICC_ON_JANUS
+         // Create the MPI IO access property
+         H5Pset_fapl_mpio(fPList, MPI_COMM_WORLD, MPI_INFO_NULL);
       #else
+         //
+         // Default options are fine for serial case
+         //
          hid_t fPList(H5P_DEFAULT);
       #endif // QUICC_MPI
 
       return fPList;
    }
 
-   hid_t Hdf5File::datasetPList(const bool isCollective)
+   hid_t Hdf5File::datasetPList(const bool isRegular)
    {
-      // 
-      // Default options are fine for serial case
-      //
 
       #ifdef QUICC_MPI
          // Create dataset transfer property list
          hid_t dsPList = H5Pcreate(H5P_DATASET_XFER);
 
-         // Set the transfer property to collective IO
-         if(isCollective)
+         if(isRegular)
          {
-            H5Pset_dxpl_mpio(dsPList, H5FD_MPIO_COLLECTIVE);
-         } else
-         {
-            // ... or set the transfer property to independent IO
+#ifdef QUICC_MPIO_REGULAR_FORCE_INDEPENDENT
+            // Set the transfer property to collective IO
             H5Pset_dxpl_mpio(dsPList, H5FD_MPIO_INDEPENDENT);
+#else
+            // Set the transfer property to independent IO
+            H5Pset_dxpl_mpio(dsPList, H5FD_MPIO_COLLECTIVE);
+#endif
+         }
+         else
+         {
+#ifdef QUICC_MPIO_IRREGULAR_FORCE_INDEPENDENT
+            // Set the transfer property to collective IO
+            H5Pset_dxpl_mpio(dsPList, H5FD_MPIO_INDEPENDENT);
+#else
+            // Set the transfer property to independent IO
+            H5Pset_dxpl_mpio(dsPList, H5FD_MPIO_COLLECTIVE);
+#endif
          }
       #else
+         //
+         // Default options are fine for serial case
+         //
          hid_t dsPList(H5P_DEFAULT);
       #endif // QUICC_MPI
 
@@ -146,7 +134,7 @@ namespace Hdf5 {
       return Hdf5File::VERSION_TAG;
    }
 
-   std::string Hdf5File::version() const 
+   std::string Hdf5File::version() const
    {
       return this->mVersion;
    }
@@ -166,6 +154,6 @@ namespace Hdf5 {
    const std::string Hdf5File::TYPE_TAG = "type";
 
    const std::string Hdf5File::VERSION_TAG = "version";
-}
-}
-}
+} // Hdf5
+} // Io
+} // QuICC

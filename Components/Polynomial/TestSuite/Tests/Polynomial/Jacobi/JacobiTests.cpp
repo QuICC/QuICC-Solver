@@ -72,7 +72,7 @@ int main( int argc, char* argv[] )
    }
    else
    {
-      for(int i = 0; i < alpha.size(); i++)
+      for(std::size_t i = 0; i < alpha.size(); i++)
       {
          test::args().params.push_back(alpha.at(i));
          test::args().params.push_back(beta.at(i));

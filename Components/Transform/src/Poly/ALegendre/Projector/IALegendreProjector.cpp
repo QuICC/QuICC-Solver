@@ -34,11 +34,7 @@ namespace Projector {
    {
    }
 
-   IALegendreProjector::~IALegendreProjector()
-   {
-   }
-
-   void IALegendreProjector::initOperators(const internal::Array& igrid, const internal::Array& iweights) const
+   void IALegendreProjector::initOperators(const OpArray& igrid, const OpArray& iweights) const
    {
       // Initit specialized data for operators
       this->initSpecial();
@@ -65,7 +61,7 @@ namespace Projector {
       #endif //defined QUICC_ALEGENDRE_PROJIMPL_MATRIX
    }
 
-   void IALegendreProjector::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   void IALegendreProjector::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreProjector::applyOperators");
 

@@ -6,13 +6,7 @@
 #ifndef QUICC_SPATIALSCHEME_TTBUILDER_HPP
 #define QUICC_SPATIALSCHEME_TTBUILDER_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -36,45 +30,32 @@ namespace SpatialScheme {
          /**
           * @brief Tune the shared resolution used by simulation
           */
-         void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr);
+         void tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr) override;
 
          /**
           * @brief Constructor
           *
-          * @param dim Chebyshev truncations
+          * @param dim Dimension truncations 
+          * @param purpose Setup purpose: simulation, visualization
+          * @param options Options for builder
           */
-         explicit TTBuilder(const ArrayI& dim, const GridPurpose::Id purpose);
+         explicit TTBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options);
 
          /**
           * @brief Destructor
           */
-         virtual ~TTBuilder();
+         ~TTBuilder() = default;
 
          /**
           * @brief Add the transform setups to resolution
           */
-         virtual void addTransformSetups(SharedResolution spRes) const;
+         void addTransformSetups(SharedResolution spRes) const final;
          
       protected:
          /**
           * @brief Initialise the domain dimensions
           */
-         virtual void setDimensions();
-
-         /**
-          * @brief Set transform costs
-          */
-         virtual void setCosts();
-
-         /**
-          * @brief Set transform scalings
-          */
-         virtual void setScalings();
-
-         /**
-          * @brief Set transform memory footprint
-          */
-         virtual void setMemoryScore();
+         void setDimensions() final;
 
       private:
          /**
@@ -88,7 +69,7 @@ namespace SpatialScheme {
          Transform::Fft::Chebyshev::SharedSetup  spSetup2D(SharedResolution spRes) const;
    };
 
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_TTBUILDER_HPP

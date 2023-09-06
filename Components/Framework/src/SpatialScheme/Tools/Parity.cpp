@@ -9,15 +9,9 @@
 #include <map>
 #include <tuple>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/Tools/Parity.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/Tools/Parity.hpp"
 
 namespace QuICC {
 
@@ -153,6 +147,6 @@ namespace Tools {
       blockSize(1) = oddBlocks.col(1).sum();
    }
 
-}
-}
-}
+} // Tools
+} // SpatialScheme
+} // QuICC

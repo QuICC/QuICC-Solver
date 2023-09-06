@@ -24,6 +24,7 @@
 #include "QuICC/Enums/VectorFormulation.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
 #include "QuICC/Io/Variable/StateFileWriter.hpp"
+#include "QuICC/Io/Variable/StateFileReader.hpp"
 #include "QuICC/Arithmetics/registerAll.hpp"
 #include "QuICC/ModelOperator/registerAll.hpp"
 #include "QuICC/ModelOperatorBoundary/registerAll.hpp"
@@ -54,12 +55,26 @@ namespace Model {
          virtual ~IPhysicalModel() = default;
 
          /**
+          * @brief Tune the spatial scheme (for example change mesher)
+          *
+          * @param spScheme   Spatial scheme
+          */
+         virtual void tuneScheme(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme) {};
+
+         /**
           * @brief Initialize model
           */
          virtual void init();
 
-         /// Formulation used for vector fields
+         /**
+          * @brief Formulation used for vector fields
+          */
          virtual VectorFormulation::Id SchemeFormulation() = 0;
+
+         /**
+          * @brief Version string of model
+          */
+         virtual std::string version() const = 0;
 
          /**
           * @brief XML configuration tags for model
@@ -202,7 +217,11 @@ namespace Model {
 
    template <typename TSim, typename TState, typename TVis> void IPhysicalModel<TSim,TState,TVis>::configure(const std::set<SpatialScheme::Feature>& f)
    {
+      // Propagate Galerkin flag
       this->mpBackend->enableGalerkin(f.count(SpatialScheme::Feature::GalerkinBasis));
+
+      // Propagate split 4th order equations flag
+      this->mpBackend->enableSplitEquation(f.count(SpatialScheme::Feature::SplitFourthOrder));
    }
 
    template <typename TSim, typename TState, typename TVis> void IPhysicalModel<TSim,TState,TVis>::setVisualizationState(std::shared_ptr<TVis> spVis)

@@ -7,17 +7,11 @@
 //
 #include <cassert>
 #include <stdexcept>
-
-// External includes
-//
 #include <unsupported/Eigen/SpecialFunctions>
-
-// Class include
-//
-#include "QuICC/SparseSM/IChebyshevOperator.hpp"
 
 // Project includes
 //
+#include "QuICC/SparseSM/IChebyshevOperator.hpp"
 #include "QuICC/Math/Constants.hpp"
 
 namespace QuICC {
@@ -26,10 +20,6 @@ namespace SparseSM {
 
    IChebyshevOperator::IChebyshevOperator(const int rows, const int cols)
       : ISparseSMOperator(rows, cols)
-   {
-   }
-
-   IChebyshevOperator::~IChebyshevOperator()
    {
    }
 

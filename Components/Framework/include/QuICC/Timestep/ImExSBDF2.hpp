@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ImExSBDF2.hpp
  * @brief Implementation of an implicit/explicit SBDF scheme of order 2
  */
@@ -42,7 +42,7 @@ namespace Timestep {
          /**
           * @brief Destructor
           */
-         virtual ~ImExSBDF2();
+         virtual ~ImExSBDF2() = default;
 
          /**
           * @brief Get factor for mass matrix on LHS
@@ -131,12 +131,11 @@ namespace Timestep {
           */
          std::string name() const;
 
+      protected:
          /**
           * @brief Initialize Butcher's tableau
           */
          void init();
-         
-      protected:
 
       private:
 

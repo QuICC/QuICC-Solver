@@ -78,7 +78,7 @@ namespace Parallel {
          // Can only happen if something went really wrong
          if(!flag)
          {
-            QuICCEnv().abort(982+10*static_cast<int>(this->mTraId));
+            QuICCEnv().abort("Setting up MPI requests for forward received failed for ID = " + std::to_string(static_cast<int>(this->mTraId)));
          }
 
          // Prepost the receive calls
@@ -95,7 +95,7 @@ namespace Parallel {
       if(this->mPacks > 0)
       {
       	// Synchronize
-     	   MpiFramework::syncTransform(this->mTraId);
+         QuICCEnv().synchronize(this->mTraId);
 
          // Make sure calls are posted at the right moment
          int flag;
@@ -105,7 +105,7 @@ namespace Parallel {
          // Can only happen if something went really wrong
          if(!flag)
          {
-            QuICCEnv().abort(983+10*static_cast<int>(this->mTraId));
+            QuICCEnv().abort("Starting MPI communicationr for forward send requests failed for ID = " + std::to_string(static_cast<int>(this->mTraId)));
          }
 
          // Post non blocking send calls
@@ -132,7 +132,7 @@ namespace Parallel {
          // Can only happen if something went really wrong
          if(!flag)
          {
-            QuICCEnv().abort(984+10*static_cast<int>(this->mTraId));
+            QuICCEnv().abort("Setting up MPI requests for backward received failed for ID = " + std::to_string(static_cast<int>(this->mTraId)));
          }
 
          // Prepost the receive calls
@@ -149,7 +149,7 @@ namespace Parallel {
       if(this->mPacks > 0)
       {
       	// Synchronize
-     	   MpiFramework::syncTransform(this->mTraId);
+         QuICCEnv().synchronize(mTraId);
 
          // Make sure calls are posted at the right moment
          int flag;
@@ -159,7 +159,7 @@ namespace Parallel {
          // Can only happen if something went really wrong
          if(!flag)
          {
-            QuICCEnv().abort(985+10*static_cast<int>(this->mTraId));
+            QuICCEnv().abort("Starting MPI communicationr for forward send requests failed for ID = " + std::to_string(static_cast<int>(this->mTraId)));
          }
 
          // Post non blocking send calls
@@ -332,7 +332,7 @@ namespace Parallel {
          tagShift = QuICCEnv().size();
       } else
       {
-         QuICCEnv().abort(991);
+         QuICCEnv().abort("Settig up MPI requests failed");
       }
 
       // MPI error code
@@ -365,7 +365,7 @@ namespace Parallel {
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), MpiFramework::transformId(this->mTraId)));
+            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), QuICCEnv().id(this->mTraId)));
 
             // Get source index in CPU group
             grpSrc = this->recvSrc(id, grpMe, this->nFCpu());
@@ -382,10 +382,10 @@ namespace Parallel {
 
             // initialise the Recv request
             #if defined QUICC_MPIPACK_MANUAL
-               ierr = MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MpiTypes::type<FwdBufferType::DataType>(), src, tag, MpiFramework::transformComm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
+               ierr = MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MpiTypes::type<FwdBufferType::DataType>(), src, tag, QuICCEnv().comm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
                QuICCEnv().check(ierr, 981);
             #else
-               ierr = MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, MpiFramework::transformComm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
+               ierr = MPI_Recv_init(this->mspFBuffers->at(grpSrc), packs*this->mFSizes.at(grpSrc), MPI_PACKED, src, tag, QuICCEnv().comm(this->mTraId), &(this->mRecvFRequests.at(packs).at(grpSrc)));
                QuICCEnv().check(ierr, 981);
             #endif //defined QUICC_MPIPACK_MANUAL
          }
@@ -394,10 +394,10 @@ namespace Parallel {
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), MpiFramework::transformId(this->mTraId)));
+            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), QuICCEnv().id(this->mTraId)));
 
             // Set shifted MPI tag to make it unique
-            tag = MpiFramework::transformId(this->mTraId) + tagShift;
+            tag = QuICCEnv().id(this->mTraId) + tagShift;
 
             // Get destination index in CPU group
             grpDest = this->sendDest(id, grpMe, this->nBCpu());
@@ -411,10 +411,10 @@ namespace Parallel {
 
             // initialise the Send request
             #if defined QUICC_MPIPACK_MANUAL
-               ierr = MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MpiTypes::type<BwdBufferType::DataType>(), dest, tag, MpiFramework::transformComm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
+               ierr = MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MpiTypes::type<BwdBufferType::DataType>(), dest, tag, QuICCEnv().comm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
                QuICCEnv().check(ierr, 982);
             #else
-               ierr = MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, MpiFramework::transformComm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
+               ierr = MPI_Send_init(this->mspBBuffers->at(grpDest), packs*this->mBSizes.at(grpDest), MPI_PACKED, dest, tag, QuICCEnv().comm(this->mTraId), &(this->mSendBRequests.at(packs).at(grpDest)));
                QuICCEnv().check(ierr, 982);
             #endif //defined QUICC_MPIPACK_MANUAL
          }
@@ -444,7 +444,7 @@ namespace Parallel {
          for(int id = 0; id < this->nBCpu(); ++id)
          {
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), MpiFramework::transformId(this->mTraId)));
+            grpMe = (*std::find(this->mBCpuGroup.begin(), this->mBCpuGroup.end(), QuICCEnv().id(this->mTraId)));
 
             // Get source index in CPU group
             grpSrc = this->recvSrc(id, grpMe, this->nBCpu());
@@ -457,9 +457,9 @@ namespace Parallel {
 
             // initialise the Recv request
             #if defined QUICC_MPIPACK_MANUAL
-               ierr = MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MpiTypes::BwdBufferType::DataType>(), src, tag, MpiFramework::transformComm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
+               ierr = MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MpiTypes::BwdBufferType::DataType>(), src, tag, QuICCEnv().comm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
             #else
-               ierr = MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, MpiFramework::transformComm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
+               ierr = MPI_Recv_init(this->mspBBuffers->at(grpSrc), packs*this->mBSizes.at(grpSrc), MPI_PACKED, src, tag, QuICCEnv().comm(this->mTraId), &(this->mRecvBRequests.at(packs).at(grpSrc)));
             #endif //defined QUICC_MPIPACK_MANUAL
             QuICCEnv().check(ierr, 983);
          }
@@ -468,10 +468,10 @@ namespace Parallel {
          for(int id = 0; id < this->nFCpu(); ++id)
          {
             // Get CPU group index of local node
-            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), MpiFramework::transformId(this->mTraId)));
+            grpMe = (*std::find(this->mFCpuGroup.begin(), this->mFCpuGroup.end(), QuICCEnv().id(this->mTraId)));
 
             // Set shifted MPI tag to make it unique
-            tag = MpiFramework::transformId(this->mTraId) + tagShift;
+            tag = QuICCEnv().id(this->mTraId) + tagShift;
 
             // Get destination index in CPU group
             grpDest = this->sendDest(id, grpMe, this->nFCpu());
@@ -481,9 +481,9 @@ namespace Parallel {
 
             // initialise the Send request
             #if defined QUICC_MPIPACK_MANUAL
-               ierr = MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MpiTypes::type<FwdBufferType::DataType>(), dest, tag, MpiFramework::transformComm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
+               ierr = MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MpiTypes::type<FwdBufferType::DataType>(), dest, tag, QuICCEnv().comm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
             #else
-               ierr = MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, MpiFramework::transformComm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
+               ierr = MPI_Send_init(this->mspFBuffers->at(grpDest), packs*this->mFSizes.at(grpDest), MPI_PACKED, dest, tag, QuICCEnv().comm(this->mTraId), &(this->mSendFRequests.at(packs).at(grpDest)));
                QuICCEnv().check(ierr, 984);
             #endif //defined QUICC_MPIPACK_MANUAL
          }

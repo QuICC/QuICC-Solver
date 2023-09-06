@@ -3,8 +3,8 @@
  * @brief Implementation of the ASCII spherical harmonics power spectrum calculation for a Toroidal/Poloidal field in a spherical geometry
  */
 
-#ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLPOWERWBASERITER_HPP
-#define QUICC_IO_VARIABLE_ISPHERICALTORPOLPOWERWBASERITER_HPP
+#ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLPOWERBASEWRITER_HPP
+#define QUICC_IO_VARIABLE_ISPHERICALTORPOLPOWERBASEWRITER_HPP
 
 // Configuration includes
 //
@@ -69,6 +69,11 @@ namespace Variable {
          
       protected:
          /**
+          * @brief Prepare spectral field data for computation
+          */
+         void prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord);
+
+         /**
           * @brief Data ordering is m slowest
           */
          bool mHasMOrdering;
@@ -85,9 +90,9 @@ namespace Variable {
 
       private:
          /**
-          * @brief Initialize power storage
+          * @brief Reset power storage
           */
-         virtual void initializePower() = 0;
+         virtual void resetPower() = 0;
 
          /**
           * @brief Store power from Q component

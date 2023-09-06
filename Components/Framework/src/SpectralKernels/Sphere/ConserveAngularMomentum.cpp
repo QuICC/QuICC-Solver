@@ -3,23 +3,17 @@
  * @brief Source of angular momentum conservation kernel in a sphere
  */
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Class include
 //
 #include "QuICC/SpectralKernels/Sphere/ConserveAngularMomentum.hpp"
-
-// Project includes
-//
+#include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Polynomial/Worland/Operators.hpp"
+#include "QuICC/SolveTiming/After.hpp"
 
 namespace QuICC {
 
@@ -34,28 +28,26 @@ namespace Sphere {
    {
    }
 
-   ConserveAngularMomentum::~ConserveAngularMomentum()
-   {
-   }
-
    void ConserveAngularMomentum::init(const bool hasMOrdering)
    {
+      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       if(hasMOrdering)
       {
          // Loop over harmonic order m
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            int m_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
+               int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
 
                if(l_ == 1 && m_ == 0)
                {
                   this->mM0j = j;
                   this->mM0k = k;
                   this->mHasM0 = true;
-               } else if(l_ == 1 && m_ == 1)
+               }
+               else if(l_ == 1 && m_ == 1)
                {
                   this->mM1j = j;
                   this->mM1k = k;
@@ -63,21 +55,23 @@ namespace Sphere {
                }
             }
          }
-      } else
+      }
+      else
       {
          // Loop over harmonic degree l
-         for(int k = 0; k < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
-            int l_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
-            for(int j = 0; j < this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); j++)
+            int l_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int m_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+               int m_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
                if(l_ == 1 && m_ == 0)
                {
                   this->mM0j = j;
                   this->mM0k = k;
                   this->mHasM0 = true;
-               } else if(l_ == 1 && m_ == 1)
+               }
+               else if(l_ == 1 && m_ == 1)
                {
                   this->mM1j = j;
                   this->mM1k = k;
@@ -105,37 +99,41 @@ namespace Sphere {
       if(this->mIsComplex)
       {
          return MHDComplex(0,0);
-      } else
+      }
+      else
       {
          return 0.0;
       }
    }
 
-   void ConserveAngularMomentum::apply()
+   void ConserveAngularMomentum::apply(const std::size_t timeId)
    {
-      assert(this->mScalars.size() == 0);
-      assert(this->mVectors.size() == 1);
-      auto& field = this->mVectors.begin()->second;
-
-      ArrayZ mom;
-      if(this->mHasM1)
+      if(timeId == SolveTiming::After::id())
       {
-         std::visit([&](auto&& f){
-            mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM1j, this->mM1k));
-            f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM1j,this->mM1k);
-         }, field);
-      }
+         assert(this->mScalars.size() == 0);
+         assert(this->mVectors.size() == 1);
+         auto& field = this->mVectors.begin()->second;
 
-      if(this->mHasM0)
-      {
-         std::visit([&](auto&& f){
-            mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM0j, this->mM0k));
-            f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM0j, this->mM0k);
-         }, field);
+         ArrayZ mom;
+         if(this->mHasM1)
+         {
+            std::visit([&](auto&& f){
+                  mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM1j, this->mM1k));
+                  f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM1j,this->mM1k);
+                  }, field);
+         }
+
+         if(this->mHasM0)
+         {
+            std::visit([&](auto&& f){
+                  mom = (this->mOp.transpose()*f->dom(0).total().comp(FieldComponents::Spectral::TOR).profile(this->mM0j, this->mM0k));
+                  f->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(mom(0), 0, this->mM0j, this->mM0k);
+                  }, field);
+         }
       }
    }
 
-}
-}
-}
-}
+} // Sphere
+} // Kernel
+} // Spectral
+} // QuICC

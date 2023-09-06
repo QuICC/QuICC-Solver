@@ -22,7 +22,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Diagnostics/ICflWrapper.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 
 namespace QuICC {
 
@@ -97,21 +97,6 @@ namespace Diagnostics {
       protected:
 
       private:
-         /**
-          * @brief Special CFL location value for max step condition
-          */
-         const MHDFloat MAXSTEP_LOCATION;
-
-         /**
-          * @brief Special CFL location value for min step condition
-          */
-         const MHDFloat MINSTEP_LOCATION;
-
-         /**
-          * @brief Special CFL location value for fixed step condition
-          */
-         const MHDFloat FIXEDSTEP_LOCATION;
-
          /**
           * @brief Maximum timestep
           */

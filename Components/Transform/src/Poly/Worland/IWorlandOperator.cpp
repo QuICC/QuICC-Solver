@@ -16,12 +16,10 @@
 
 // Class include
 //
-#include "QuICC/Debug/Profiler/BreakPoint.hpp"
 #include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
 namespace QuICC {
@@ -35,18 +33,19 @@ namespace Worland {
    IWorlandOperator::IWorlandOperator()
       : ITransformOperator()
    {
+      this->mProfileTag = "Worland::Poly";
    }
 
    IWorlandOperator::~IWorlandOperator()
    {
    }
 
-   void IWorlandOperator::init(IWorlandOperator::SharedSetupType spSetup, const internal::Array& igrid, const internal::Array& iweights) const
+   void IWorlandOperator::init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const
    {
       // Store the shared pointer to setup object
       if(spSetup)
       {
-         this->mspSetup = spSetup;
+         this->mspSetup = std::dynamic_pointer_cast<IWorlandOperator::SetupType>(spSetup);
       } else
       {
          throw std::logic_error("Setup object is not initialized!");
@@ -59,26 +58,23 @@ namespace Worland {
       this->mIsInitialized = true;
    }
 
+   void IWorlandOperator::init(SharedTransformSetup spSetup) const
+   {
+      throw std::logic_error("Unused interface");
+   }
+
    void IWorlandOperator::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
-      ProfilerMacro_start(Debug::Profiler::WORLANDTRA);
-
       assert(this->isInitialized());
 
       this->applyOperators(rOut, in);
-
-      ProfilerMacro_stop(Debug::Profiler::WORLANDTRA);
    }
 
    void IWorlandOperator::transform(Matrix& rOut, const MatrixZ& in) const
    {
-      ProfilerMacro_start(Debug::Profiler::WORLANDTRA);
-
       assert(this->isInitialized());
 
       this->applyOperators(rOut, in);
-
-      ProfilerMacro_stop(Debug::Profiler::WORLANDTRA);
    }
 
    void IWorlandOperator::applyOperators(MatrixZ&, const MatrixZ&) const
@@ -97,7 +93,7 @@ namespace Worland {
       bool notValid = (n > allowedN);
       if(notValid)
       {
-         throw std::logic_error("Worland grid is too small! (" + std::to_string(n) + " > " + std::to_string(allowedN) + ")");
+         throw std::logic_error("Worland grid is too small! (" + std::to_string(n) + " > " + std::to_string(allowedN) + ", n = " + std::to_string(n) + ", l = " + std::to_string(l) + ", gN = " + std::to_string(gN) + ")");
       }
    }
 

@@ -6,18 +6,13 @@
 #ifndef QUICC_SIMULATIONBASE_HPP
 #define QUICC_SIMULATIONBASE_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Equations/EquationOptions.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Timers/ExecutionTimer.hpp"
@@ -27,7 +22,7 @@
 #include "QuICC/Simulation/SimulationBoundary.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
 #include "QuICC/Io/Config/ConfigurationReader.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
 #include "QuICC/TypeSelectors/ParallelSelector.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
@@ -53,12 +48,15 @@ namespace QuICC {
          /**
           * @brief Simple empty destructor
           */
-         virtual ~SimulationBase();
+         virtual ~SimulationBase() = default;
 
          /**
           * @brief Initialise the configuration read from file
+          *
+          * @param features   Features of model
+          * @param modelHash  Version string of the model
           */
-         void getConfig(std::map<std::string,MHDFloat>& cfg, std::set<SpatialScheme::Feature>& features);
+         void getConfig(std::map<std::string,MHDFloat>& cfg, std::set<SpatialScheme::Feature>& features, const std::string modelVersion);
 
          /**
           * @brief Initialise the configuration read from file
@@ -104,13 +102,25 @@ namespace QuICC {
 
          /**
           * @brief Add equation to solver
+          *
+          * @param spOtions   Equation options
+          */
+         template <typename TEquation, typename TOptions> std::shared_ptr<TEquation> addEquation(std::shared_ptr<TOptions> spOptions);
+
+         /**
+          * @brief Add equation to solver
+          *
+          * @param spBackend Model backend
           */
          template <typename TEquation> std::shared_ptr<TEquation> addEquation(std::shared_ptr<Model::IModelBackend> spBackend);
 
          /**
-          * @brief Add equation with timing information to solver
+          * @brief Add equation to solver
+          *
+          * @param spBackend Model backend
+          * @param spBackend Equation options
           */
-         template <typename TEquation> std::shared_ptr<TEquation> addEquation(std::shared_ptr<Model::IModelBackend> spBackend, const std::size_t timeId);
+         template <typename TEquation, typename TOptions> std::shared_ptr<TEquation> addEquation(std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<TOptions> spOptions);
 
          /**
           * @brief Set the base simulation configuration file and parameters
@@ -163,11 +173,6 @@ namespace QuICC {
          const SimulationConfig& config() const;
 
       protected:
-         /**
-          * @brief Execution timer
-          */
-         ExecutionTimer mExecutionTimer;
-
          /**
           * @brief Shared resolution
           */
@@ -255,7 +260,7 @@ namespace QuICC {
 
       // Initialise the load splitter
       auto  spBuilder = spScheme->createBuilder(dim, true);
-      splitter.init(spBuilder, {this->mSimIoCtrl.config().algorithm()}, this->mSimIoCtrl.config().grouper());
+      splitter.init(spBuilder, {this->mSimIoCtrl.config().algorithm()}, this->mSimIoCtrl.config().grouper(), this->mSimIoCtrl.config().cpuFactors());
 
       stage.done();
       stage.start("extracting communication structure");
@@ -285,28 +290,44 @@ namespace QuICC {
 
    template <typename TEquation> std::shared_ptr<TEquation> SimulationBase::addEquation()
    {
+      // Create a null backend
       auto spBackend = std::shared_ptr<Model::IModelBackend>();
+
+      // Create default options
+      auto spOptions = std::make_shared<Equations::EquationOptions>();
+
       return this->addEquation<TEquation>(spBackend);
+   }
+
+   template <typename TEquation, typename TOptions> std::shared_ptr<TEquation> SimulationBase::addEquation(std::shared_ptr<TOptions> spOptions)
+   {
+      // Create default backend
+      auto spBackend = std::shared_ptr<Model::IModelBackend>();
+
+      return this->addEquation<TEquation>(spBackend, spOptions);
    }
 
    template <typename TEquation> std::shared_ptr<TEquation> SimulationBase::addEquation(std::shared_ptr<Model::IModelBackend> spBackend)
    {
-      // Create shared scalar equation
-      std::shared_ptr<TEquation>  spEq = std::make_shared<TEquation>(this->mspEqParams,this->mspRes->sim().spSpatialScheme(), spBackend);
+      // Create shared equation
+      std::shared_ptr<TEquation> spEq = std::make_shared<TEquation>(this->mspEqParams, this->mspRes->sim().spSpatialScheme(), spBackend);
 
-      // Add share scalar equation
-      this->mPseudospectral.addEquation(spEq);
+      // Create default options
+      auto spOptions = std::make_shared<Equations::EquationOptions>();
+
+      // Add shared equation
+      this->mPseudospectral.addEquation(spEq, spOptions->it());
 
       return spEq;
    }
 
-   template <typename TEquation> std::shared_ptr<TEquation> SimulationBase::addEquation(std::shared_ptr<Model::IModelBackend> spBackend, const std::size_t timeId)
+   template <typename TEquation, typename TOptions> std::shared_ptr<TEquation> SimulationBase::addEquation(std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<TOptions> spOptions)
    {
-      // Create shared scalar equation
-      std::shared_ptr<TEquation>  spEq = std::make_shared<TEquation>(this->mspEqParams,this->mspRes->sim().spSpatialScheme(), spBackend, timeId);
+      // Create shared equation
+      std::shared_ptr<TEquation> spEq = std::make_shared<TEquation>(this->mspEqParams, this->mspRes->sim().spSpatialScheme(), spBackend, spOptions);
 
-      // Add share scalar equation
-      this->mPseudospectral.addEquation(spEq);
+      // Add shared equation
+      this->mPseudospectral.addEquation(spEq, spOptions->it());
 
       return spEq;
    }
@@ -314,6 +335,6 @@ namespace QuICC {
    /// Typedef for a shared pointer of a SimulationBase
    typedef std::shared_ptr<SimulationBase> SharedSimulationBase;
 
-}
+} // QuICC
 
 #endif // QUICC_SIMULATIONBASE_HPP

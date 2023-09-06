@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IBuilder.hpp
  * @brief Implementation of the basic components of the spatial scheme builder
  */
@@ -6,23 +6,18 @@
 #ifndef QUICC_SPATIALSCHEME_IBUILDER_HPP
 #define QUICC_SPATIALSCHEME_IBUILDER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <assert.h>
 #include <vector>
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/SpatialScheme/ICosts.hpp"
+#include "QuICC/SpatialScheme/IMesher.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingDescription.hpp"
 
 namespace QuICC {
@@ -44,13 +39,15 @@ namespace SpatialScheme {
           * @brief Constructor
           *
           * @param dims Dimension of the domain
+          * @param purpose Grid purpose
+          * @param options Scheme options
           */
-         explicit IBuilder(const int dims, const GridPurpose::Id purpose);
+         explicit IBuilder(const int dims, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options);
 
          /**
           * @brief Destructor
           */
-         virtual ~IBuilder();
+         virtual ~IBuilder() = default;
 
          /**
           * @brief Tune the shared resolution used by simulation
@@ -72,14 +69,11 @@ namespace SpatialScheme {
           * @param idx3D   Storage for forward indexes of third dimension
           * @param id      ID of the bin (process/rank)
           * @param bins    Total number of bins (useful to build efficient pairs)
-          * @param n0      Starting index of restricted set
-          * @param nN      Length of restricted set
-          * @param flag    Flag to specify location of splitting
           */
-         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id = ArrayI(), const ArrayI& bins = ArrayI(), const ArrayI& n0 = ArrayI(), const ArrayI& nN = ArrayI(), const Splitting::Locations::Id flag = Splitting::Locations::NONE) = 0;
+         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::vector<int>& id, const std::vector<int>& bins) = 0;
 
          /**
-          * @brief Get total of splittable indexes 
+          * @brief Get total of splittable indexes
           *
           * @param transId Transform ID
           * @param flag    Flag to specify location of splitting
@@ -105,7 +99,17 @@ namespace SpatialScheme {
           * @brief Add index counter to shared resolution
           */
          virtual void addIndexCounter(SharedResolution spRes);
-         
+
+         /**
+          * @brief Mesher
+          */
+         void  setMesher(std::shared_ptr<IMesher> m, const bool isCustom);
+
+         /**
+          * @brief Spectral space and transform have different ordering?
+          */
+         virtual bool sameSpectralOrdering() const;
+
       protected:
          /**
           * @brief Main purpose of the grid values
@@ -146,6 +150,21 @@ namespace SpatialScheme {
           */
          void tuneMpiResolution(const Parallel::SplittingDescription& descr);
 
+         /**
+          * @brief Mesher
+          */
+         const IMesher& mesher() const;
+
+         /**
+          * @brief Mesher
+          */
+         IMesher& mesher();
+
+         /**
+          * @brief Scheme options (Poly vs FFT, Uniform vs Triangular, etc)
+          */
+         std::map<std::size_t,std::vector<std::size_t>> mOptions;
+
       private:
          /**
           * @brief Main purpose of the grid values
@@ -166,6 +185,11 @@ namespace SpatialScheme {
           * @brief Full dimensions of the domain
           */
          std::vector<ArrayI>   mDimensions;
+
+         /**
+          * @brief Mesher
+          */
+         std::shared_ptr<IMesher> mspMesher;
    };
 
    /// Typedef for a shared pointer to a IBuilder object
@@ -174,23 +198,28 @@ namespace SpatialScheme {
    /**
     * @brief Template builder factory
     */
-   template <typename TBuilder> std::shared_ptr<TBuilder> makeBuilder(ArrayI& dim, const GridPurpose::Id purpose, const bool needInterpretation);
+   template <typename TBuilder> std::shared_ptr<TBuilder> makeBuilder(ArrayI& dim, const GridPurpose::Id purpose, const bool needInterpretation, const std::map<std::size_t,std::vector<std::size_t>>& options, std::shared_ptr<IMesher> m);
 
    //
    //
    //
-   template <typename TBuilder> std::shared_ptr<TBuilder> makeBuilder(ArrayI& dim, const GridPurpose::Id purpose, const bool needInterpretation)
+   template <typename TBuilder> std::shared_ptr<TBuilder> makeBuilder(ArrayI& dim, const GridPurpose::Id purpose, const bool needInterpretation, const std::map<std::size_t,std::vector<std::size_t>>& options, std::shared_ptr<IMesher> m)
    {
       if(needInterpretation)
       {
          TBuilder::interpretConfigDimensions(dim);
       }
 
-      std::shared_ptr<TBuilder> spBuilder = std::make_shared<TBuilder>(dim, purpose);
+      std::shared_ptr<TBuilder> spBuilder = std::make_shared<TBuilder>(dim, purpose, options);
+      if(m)
+      {
+         spBuilder->setMesher(m, true);
+      }
       spBuilder->init();
       return spBuilder;
    }
-}
-}
+
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_IBUILDER_HPP

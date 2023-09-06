@@ -31,21 +31,18 @@ namespace Parallel {
    class SplittingDescription
    {
       public:
+         /// Flag to enable or disable storing distribution
+         static bool store;
+
          /**
           * @brief Constructor
-          *
-          * @param algorithm  ID of the algorithm
-          * @param grouper    ID of the transform grouper
-          * @param dims       Number of dimensions
-          * @param factors    CPU splitting factors
-          * @param score      Score 
           */
-         SplittingDescription();
+         SplittingDescription() = default;
 
          /**
           * @brief Destructor
           */
-         ~SplittingDescription();
+         ~SplittingDescription() = default;
 
          /**
           * @brief ID of the algorithm
@@ -75,18 +72,30 @@ namespace Parallel {
          /**
           * @brief Communication structure
           */
-         std::vector<std::multimap<int,int> >   structure;
+         std::map<Dimensions::Transform::Id,std::multimap<int,int> >   structure;
 
-         #ifdef QUICC_DEBUG
          /**
-          * @brief Storage for data distribution visualization files
+          * @brief Add stage to description
           */
-         std::vector<Io::Xml::SharedVtpWriter> vtpFiles;
-         #endif //QUICC_DEBUG
+         void addStage(const int stageId, const SharedTransformResolution spTRes, const int cpuId);
+
+         /**
+          * @brief Save stage descriptions
+          */
+         void save();
          
       protected:
 
       private:
+         /**
+          * @brief Name stages based on ID
+          */
+         std::string nameStage(const int stageId) const;
+
+         /**
+          * @brief Storage for data distribution visualization files
+          */
+         std::map<int,Io::Xml::SharedVtpWriter> vtpFiles;
    };
 
 }

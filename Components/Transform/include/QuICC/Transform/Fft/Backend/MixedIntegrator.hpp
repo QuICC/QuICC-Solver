@@ -51,7 +51,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         virtual ~MixedIntegrator();
+         ~MixedIntegrator();
          
          /**
           * @brief Initialise the FFT transforms
@@ -60,8 +60,11 @@ namespace Backend {
          
          /**
           * @brief Apply FFT
+          *
+          * @param phys FFT input
+          * @param mods FFT output
           */
-         void applyFft() const;
+         void applyFft(MatrixZ& mods, const Matrix& phys) const;
 
          /**
           * @brief Set input and output data pointers for FFT
@@ -77,16 +80,6 @@ namespace Backend {
           * @brief Apply derivative to ouput of given order, modified values can be specified for mixed operators
           */
          void outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale, const std::map<int,MHDComplex>& mod) const;
-
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         void io(MatrixZ& out, const Matrix& in) const;
-
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         void io(MHDComplex* out, const MHDFloat* in) const;
 
          /**
           * @brief Get the memory requirements

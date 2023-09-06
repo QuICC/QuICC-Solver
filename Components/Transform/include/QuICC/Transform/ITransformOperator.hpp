@@ -22,7 +22,8 @@
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Precision.hpp"
-#include "QuICC/Debug/Profiler/BreakPoint.hpp"
+#include "QuICC/Transform/TransformSetup.hpp"
+
 
 namespace QuICC {
 
@@ -45,6 +46,28 @@ namespace Transform {
          virtual ~ITransformOperator();
 
          /**
+          * @brief Initialise the polynomial transform
+          *
+          * @param spSetup   Shared setup object for the transform
+          */
+         virtual void init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const;
+
+         /**
+          * @brief Initialise the fft transform
+          *
+          * @param spSetup   Shared setup object for the transform
+          */
+         virtual void init(SharedTransformSetup spSetup) const;
+
+         /**
+          * @brief Compute transform
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          */
+         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const;
+
+         /**
           * @brief
           */
          bool isInitialized() const;
@@ -56,9 +79,19 @@ namespace Transform {
 
       protected:
          /**
-          * @brief Profiling ID
+          * @brief Get operator name from typeid
           */
-         Debug::Profiler::BreakPoint mProfileId;
+         std::string opName() const;
+
+         /**
+          * @brief Set profiling tag based on operator name
+          */
+         void setProfileTag();
+
+         /**
+          * @brief Profiling tag
+          */
+         std::string mProfileTag;
 
          /**
           * @brief Need initialization?

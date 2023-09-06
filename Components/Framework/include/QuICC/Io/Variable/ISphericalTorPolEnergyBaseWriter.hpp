@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYWBASERITER_HPP
 #define QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYWBASERITER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -50,7 +44,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalTorPolEnergyBaseWriter();
+         virtual ~ISphericalTorPolEnergyBaseWriter() = default;
 
          /**
           * @brief Activate output of parity splitting in energy output
@@ -69,6 +63,11 @@ namespace Variable {
          
       protected:
          /**
+          * @brief Prepare spectral field data for computation
+          */
+         void prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord);
+
+         /**
           * @brief Data ordering is m slowest
           */
          bool mHasMOrdering;
@@ -85,22 +84,34 @@ namespace Variable {
 
       private:
          /**
-          * @brief Initialize energy storage
+          * @brief Reset energy storage
           */
-         virtual void initializeEnergy() = 0;
+         virtual void resetEnergy() = 0;
 
          /**
           * @brief Store energy from Q component
+          *
+          * @param l      Harmonic degree
+          * @param m      Harmonic order
+          * @param energy  Energy of mode
           */
          virtual void storeQEnergy(const int l, const int m, const MHDFloat energy) = 0;
 
          /**
           * @brief Store energy from S component
+          *
+          * @param l      Harmonic degree
+          * @param m      Harmonic order
+          * @param energy  Energy of mode
           */
          virtual void storeSEnergy(const int l, const int m, const MHDFloat energy) = 0;
 
          /**
           * @brief Store energy from T component
+          *
+          * @param l      Harmonic degree
+          * @param m      Harmonic order
+          * @param energy  Energy of mode
           */
          virtual void storeTEnergy(const int l, const int m, const MHDFloat energy) = 0;
    };
@@ -110,8 +121,8 @@ namespace Variable {
       return true;
    }
 
-}
-}
-}
+} // Variable
+} // Io
+} // QuICC
 
 #endif // QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYBASEWRITER_HPP

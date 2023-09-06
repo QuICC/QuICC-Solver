@@ -37,10 +37,6 @@ namespace Equations {
    {
    }
 
-   SphereExactVectorState::~SphereExactVectorState()
-   {
-   }
-
    void SphereExactVectorState::setIdentity(const std::size_t name)
    {
       // Set the name

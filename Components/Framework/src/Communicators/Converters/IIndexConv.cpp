@@ -23,14 +23,6 @@ namespace QuICC {
 
 namespace Parallel {
 
-   IIndexConv::IIndexConv()
-   {
-   }
-
-   IIndexConv::~IIndexConv()
-   {
-   }
-
    void IIndexConv::init(const Resolution&, const Dimensions::Transform::Id)
    {
    }

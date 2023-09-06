@@ -36,6 +36,10 @@ namespace Tags {
 
    const std::string Spectrum::NBASENAME = "_n_spectrum";
 
+   const std::string Spectrum::MODEBASENAME = "_mode_spectrum";
+
+   const std::string Spectrum::RBASENAME = "_r_spectrum";
+
    const std::string Spectrum::EXTENSION = ".dat";
 }
 }

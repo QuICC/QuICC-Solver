@@ -55,8 +55,10 @@ namespace QuICC {
 
          /**
           * @brief Initialise the IO system
+          *
+          * @param modelVersion  Model version string
           */
-         void init();
+         void init(const std::string modelVersion);
 
          /**
           * @brief Cleanup unused memory from IO system

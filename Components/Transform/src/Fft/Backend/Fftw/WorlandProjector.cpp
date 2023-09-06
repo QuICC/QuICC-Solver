@@ -17,7 +17,6 @@
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Math/Constants.hpp"
 
 namespace QuICC {
@@ -70,7 +69,7 @@ namespace Fftw {
 
       // Create the spectral to physical plan
       const fftw_r2r_kind bwdKind[] = {FFTW_REDFT01};
-      this->mPlan = fftw_plan_many_r2r(1, fftSize, blockSize, tmpB.data(), NULL, 1, bwdSize, tmpF.data(), NULL, 1, fwdSize, bwdKind, Library::planFlag());
+      this->mPlan = fftw_plan_many_r2r(1, fftSize, blockSize, tmpB.data(), NULL, 1, bwdSize, tmpF.data(), NULL, 1, fwdSize, bwdKind, QuICC::Fft::Fftw::Library::planFlag());
       if(this->mPlan == NULL)
       {
          throw  std::logic_error("FFTW plan failed!");
@@ -83,7 +82,7 @@ namespace Fftw {
 
       // Create the odd physical to spectral plan
       const fftw_r2r_kind ofwdKind[] = {FFTW_REDFT11};
-      this->mOddPlan = fftw_plan_many_r2r(1, fftSize, blockSize, tmpF.data(), NULL, 1, fwdSize, tmpB.data(), NULL, 1, bwdSize, ofwdKind, Library::planFlag());
+      this->mOddPlan = fftw_plan_many_r2r(1, fftSize, blockSize, tmpF.data(), NULL, 1, fwdSize, tmpB.data(), NULL, 1, bwdSize, ofwdKind, QuICC::Fft::Fftw::Library::planFlag());
       if(this->mOddPlan == NULL)
       {
          throw  std::logic_error("FFTW plan failed!");

@@ -12,11 +12,11 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [500, 0, 0]
-eq_params = {'prandtl':1, 'rayleigh':20412, 'ro':1, 'rratio':0.35}
+eq_params = {'prandtl':1, 'rayleigh':20412, 'ro':1, 'r_ratio':0.35}
 eigs = [4]
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':bc_vel, 'velocity_y':bc_vel, 'temperature':bc_temp}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 A = model.implicit_linear(res, eq_params, eigs, bcs, fields)
@@ -62,7 +62,7 @@ if solve_evp:
         sol_u = evp_vec[0:res[0],mode]
         sol_v = evp_vec[res[0]:2*res[0],mode]
         # Extract continuity from velocity 
-        a, b = mod.annulus.linear_r2x(eq_params['ro'], eq_params['rratio'])
+        a, b = mod.annulus.linear_r2x(eq_params['ro'], eq_params['r_ratio'])
         sol_c = mod.annulus.x1div(res[0], a, b, mod.no_bc(), zr = 0)*sol_u + 1j*eigs[0]*sol_v
         intg_c = mod.annulus.i1x1div(res[0], a, b, mod.no_bc())*sol_u + mod.annulus.i1(res[0], a, b, mod.no_bc(), 1j*eigs[0])*sol_v
         print("Eigenvalue: " + str(evp_lmb[mode]) + ", Max continuity: " + str(np.max(np.abs(sol_c))) + ", Max integrated continuity: " + str(np.max(np.abs(intg_c))))
@@ -76,7 +76,7 @@ if show_solution:
     sol_t = evp_vec[2*res[0]:3*res[0],viz_mode]
     sol_p = evp_vec[3*res[0]:4*res[0],viz_mode]
     # Extract continuity from velocity 
-    a, b = mod.annulus.linear_r2x(eq_params['ro'], eq_params['rratio'])
+    a, b = mod.annulus.linear_r2x(eq_params['ro'], eq_params['r_ratio'])
     sol_c = mod.annulus.x1div(res[0], a, b, mod.no_bc(), zr = 0)*sol_u + 1j*eigs[0]*sol_v
     intg_c = mod.annulus.i1x1div(res[0], a, b, mod.no_bc())*sol_u + mod.annulus.i1(res[0], a, b, mod.no_bc(), 1j*eigs[0])*sol_v
     

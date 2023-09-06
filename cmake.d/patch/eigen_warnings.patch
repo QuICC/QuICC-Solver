@@ -1,0 +1,81 @@
+diff --git a/Eigen/src/Core/util/DisableStupidWarnings.h b/Eigen/src/Core/util/DisableStupidWarnings.h
+index fe0cfec..28005a8 100755
+--- a/Eigen/src/Core/util/DisableStupidWarnings.h
++++ b/Eigen/src/Core/util/DisableStupidWarnings.h
+@@ -74,25 +74,34 @@
+ #endif
+ 
+ #if defined __NVCC__
+-  #pragma diag_suppress boolean_controlling_expr_is_constant
++  #define EIGEN_MAKE_PRAGMA(X) _Pragma(#X)
++  #if defined __NVCC_DIAG_PRAGMA_SUPPORT__
++    #define EIGEN_NV_DIAG_SUPPRESS(X) EIGEN_MAKE_PRAGMA(nv_diag_suppress X)
++  #else
++    #define EIGEN_NV_DIAG_SUPPRESS(X) EIGEN_MAKE_PRAGMA(diag_suppress X)
++  #endif
++
++  EIGEN_NV_DIAG_SUPPRESS(boolean_controlling_expr_is_constant)
+   // Disable the "statement is unreachable" message
+-  #pragma diag_suppress code_is_unreachable
++  EIGEN_NV_DIAG_SUPPRESS(code_is_unreachable)
+   // Disable the "dynamic initialization in unreachable code" message
+-  #pragma diag_suppress initialization_not_reachable
++  EIGEN_NV_DIAG_SUPPRESS(initialization_not_reachable)
+   // Disable the "invalid error number" message that we get with older versions of nvcc
+-  #pragma diag_suppress 1222
++  EIGEN_NV_DIAG_SUPPRESS(1222)
+   // Disable the "calling a __host__ function from a __host__ __device__ function is not allowed" messages (yes, there are many of them and they seem to change with every version of the compiler)
+-  #pragma diag_suppress 2527
+-  #pragma diag_suppress 2529
+-  #pragma diag_suppress 2651
+-  #pragma diag_suppress 2653
+-  #pragma diag_suppress 2668
+-  #pragma diag_suppress 2669
+-  #pragma diag_suppress 2670
+-  #pragma diag_suppress 2671
+-  #pragma diag_suppress 2735
+-  #pragma diag_suppress 2737
+-  #pragma diag_suppress 2739
++  EIGEN_NV_DIAG_SUPPRESS(2527)
++  EIGEN_NV_DIAG_SUPPRESS(2529)
++  EIGEN_NV_DIAG_SUPPRESS(2651)
++  EIGEN_NV_DIAG_SUPPRESS(2653)
++  EIGEN_NV_DIAG_SUPPRESS(2668)
++  EIGEN_NV_DIAG_SUPPRESS(2669)
++  EIGEN_NV_DIAG_SUPPRESS(2670)
++  EIGEN_NV_DIAG_SUPPRESS(2671)
++  EIGEN_NV_DIAG_SUPPRESS(2735)
++  EIGEN_NV_DIAG_SUPPRESS(2737)
++  EIGEN_NV_DIAG_SUPPRESS(2739)
++  #undef EIGEN_NV_DIAG_SUPPRESS
++  #undef EIGEN_MAKE_PRAGMA
+ #endif
+ 
+ #else
+diff --git a/Eigen/src/Core/util/ReenableStupidWarnings.h b/Eigen/src/Core/util/ReenableStupidWarnings.h
+index 1ce6fd1..06acf2b 100644
+--- a/Eigen/src/Core/util/ReenableStupidWarnings.h
++++ b/Eigen/src/Core/util/ReenableStupidWarnings.h
+@@ -20,10 +20,18 @@
+ //    Don't reenable the diagnostic messages, as it turns out these messages need
+ //    to be disabled at the point of the template instantiation (i.e the user code)
+ //    otherwise they'll be triggered by nvcc.
+-//    #pragma diag_default code_is_unreachable
+-//    #pragma diag_default initialization_not_reachable
+-//    #pragma diag_default 2651
+-//    #pragma diag_default 2653
++//    #define EIGEN_MAKE_PRAGMA(X) _Pragma(#X)
++//    #if __NVCC_DIAG_PRAGMA_SUPPORT__
++//      #define EIGEN_NV_DIAG_DEFAULT(X) EIGEN_MAKE_PRAGMA(nv_diag_default X)
++//    #else
++//      #define EIGEN_NV_DIAG_DEFAULT(X) EIGEN_MAKE_PRAGMA(diag_default X)
++//    #endif
++//    EIGEN_NV_DIAG_DEFAULT(code_is_unreachable)
++//    EIGEN_NV_DIAG_DEFAULT(initialization_not_reachable)
++//    EIGEN_NV_DIAG_DEFAULT(2651)
++//    EIGEN_NV_DIAG_DEFAULT(2653)
++//    #undef EIGEN_NV_DIAG_DEFAULT
++//    #undef EIGEN_MAKE_PRAGMA
+   #endif
+ 
+ #endif

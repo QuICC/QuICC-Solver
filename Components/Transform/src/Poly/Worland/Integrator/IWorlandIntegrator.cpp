@@ -15,7 +15,6 @@
 
 // Project includes
 //
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -30,8 +29,14 @@ namespace Worland {
 namespace Integrator {
 
    IWorlandIntegrator::IWorlandIntegrator()
-      : IWorlandOperator()
+      : IWorlandOperator(),
+#ifdef QUICC_TRANSFORM_WORLAND_TRUNCATE_QI
+        mcTruncQI(true)
+#else
+        mcTruncQI(false)
+#endif // QUICC_TRANSFORM_WORLAND_TRUNCATE_QI
    {
+      this->mProfileTag += "-Integrator";
    }
 
    IWorlandIntegrator::~IWorlandIntegrator()
@@ -63,10 +68,7 @@ namespace Integrator {
 
    void IWorlandIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
-      Profiler::RegionFixture<3> fix("IWorlandIntegrator::applyOperators");
-
-      ProfilerMacro_start(Debug::Profiler::WORLANDINTG);
-      ProfilerMacro_start(this->mProfileId);
+      Profiler::RegionFixture<3> fix(this->mProfileTag);
 
       // assert right sizes for input matrix
       assert(in.rows() == this->mspSetup->fwdSize());
@@ -85,9 +87,11 @@ namespace Integrator {
 
          start += cols;
       }
+   }
 
-      ProfilerMacro_stop(this->mProfileId);
-      ProfilerMacro_stop(Debug::Profiler::WORLANDINTG);
+   void IWorlandIntegrator::applyOperators(Matrix& rOut, const MatrixZ& in) const
+   {
+      throw std::logic_error("Interface not used");
    }
 
    MHDFloat IWorlandIntegrator::requiredStorage() const

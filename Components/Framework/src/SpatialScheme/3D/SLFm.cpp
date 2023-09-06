@@ -6,21 +6,16 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/SLFm.hpp"
-
 // Project includes
 //
-#include "QuICC/SpatialScheme/Coordinator.hpp"
+#include "QuICC/Hasher.hpp"
+#include "QuICC/SpatialScheme/3D/SLFm.hpp"
 #include "QuICC/SpatialScheme/3D/SLFmBuilder.hpp"
 #include "QuICC/Transform/ShellChebyshevTransform.hpp"
 #include "QuICC/Transform/ALegendreTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
-#include "QuICC/Communicators/Converters/SHmIndexConv.hpp"
+#include "QuICC/Communicators/Converters/SHm2lIndexConv.hpp"
+#include "QuICC/Communicators/Converters/SHlIndexConv.hpp"
 #include "QuICC/Communicators/Converters/NoIndexConv.hpp"
 #include "QuICC/Equations/Tools/SHm.hpp"
 
@@ -32,7 +27,7 @@ namespace SpatialScheme {
 
    const std::string SLFm::sFormatted = "SLFm";
 
-   const std::size_t SLFm::sId = registerId<SLFm>(SLFm::sTag);
+   const std::size_t SLFm::sId = Hasher::makeId(SLFm::sTag);
 
    SLFm::SLFm(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 3, SLFm::sId, SLFm::sTag, SLFm::sFormatted)
@@ -48,7 +43,8 @@ namespace SpatialScheme {
          this->mSpec.add(FieldComponents::Spectral::TOR);
          this->mSpec.add(FieldComponents::Spectral::POL);
          this->mSpec.add(FieldComponents::Spectral::NOTUSED);
-      } else if(formulation == VectorFormulation::QST)
+      }
+      else if(formulation == VectorFormulation::QST)
       {
          this->mSpec.add(FieldComponents::Spectral::Q);
          this->mSpec.add(FieldComponents::Spectral::S);
@@ -60,16 +56,13 @@ namespace SpatialScheme {
       this->enable(Feature::FourierIndex3);
       this->enable(Feature::SpectralMatrix2D);
       this->enable(Feature::SpectralOrdering123);
+      this->enable(Feature::TransformSpectralOrdering132);
       this->enable(Feature::ComplexSpectrum);
-   }
-
-   SLFm::~SLFm()
-   {
    }
 
    std::shared_ptr<IBuilder> SLFm::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<SLFmBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<SLFmBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }
@@ -129,8 +122,11 @@ namespace SpatialScheme {
 
       switch(id)
       {
+         case Dimensions::Transform::TRA1D:
+            spConv = std::make_shared<Parallel::SHm2lIndexConv>();
+            break;
          case Dimensions::Transform::TRA2D:
-            spConv = std::make_shared<Parallel::SHmIndexConv>();
+            spConv = std::make_shared<Parallel::SHlIndexConv>();
             break;
          case Dimensions::Transform::TRA3D:
             spConv = std::make_shared<Parallel::NoIndexConv>();
@@ -166,6 +162,9 @@ namespace SpatialScheme {
          case Dimensions::Transform::TRA3D:
             v = std::forward<SLFm::RealTransformDataType *>(0);
             break;
+         case Dimensions::Transform::SPECTRAL:
+            v = std::forward<SLFm::ComplexTransformDataType *>(0);
+            break;
          default:
             throw std::logic_error("Requested forward pointer for unknown dimension");
       }
@@ -184,6 +183,9 @@ namespace SpatialScheme {
             v = std::forward<SLFm::ComplexTransformDataType *>(0);
             break;
          case Dimensions::Transform::TRA3D:
+            v = std::forward<SLFm::ComplexTransformDataType *>(0);
+            break;
+         case Dimensions::Transform::SPECTRAL:
             v = std::forward<SLFm::ComplexTransformDataType *>(0);
             break;
          default:
@@ -207,5 +209,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

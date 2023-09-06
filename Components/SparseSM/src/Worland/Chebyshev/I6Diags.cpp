@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Worland/Chebyshev/I6Diags.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/Chebyshev/I6Diags.hpp"
 
 namespace QuICC {
 
@@ -26,12 +20,8 @@ namespace Worland {
 
 namespace Chebyshev {
 
-   I6Diags::I6Diags(const Scalar_t alpha, const int l)
-      : QuICC::SparseSM::Worland::I6Diags(alpha, MHD_MP(-0.5), l)
-   {
-   }
-
-   I6Diags::~I6Diags()
+   I6Diags::I6Diags(const Scalar_t alpha, const int l, const int q)
+      : QuICC::SparseSM::Worland::I6Diags(alpha, MHD_MP(-0.5), l, q)
    {
    }
 
@@ -49,6 +39,9 @@ namespace Chebyshev {
          val = 64.0*(l1 + n - 6.0)*(l1 + n - 5.0)*(l1 + n - 4.0)*(l1 + n - 3.0)*(l1 + n - 2.0)*(l1 + n - 1.0)/((l1 + 2.0*n - 12.0)*(l1 + 2.0*n - 11.0)*(l1 + 2.0*n - 10.0)*(l1 + 2.0*n - 9.0)*(l1 + 2.0*n - 8.0)*(l1 + 2.0*n - 7.0)*(l1 + 2.0*n - 6.0)*(l1 + 2.0*n - 5.0)*(l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0));
       }
 
+      // Truncate operator
+      this->zeroLast(val, this->mQ-3);
+
       return this->normalizeDiag(n, -6)*val;
    }
 
@@ -57,7 +50,10 @@ namespace Chebyshev {
       auto l1 = this->l();
       ACoeff_t val;
 
-         val = -384.0*l1*(l1 + n - 5.0)*(l1 + n - 4.0)*(l1 + n - 3.0)*(l1 + n - 2.0)*(l1 + n - 1.0)/((l1 + 2.0*n - 11.0)*(l1 + 2.0*n - 10.0)*(l1 + 2.0*n - 9.0)*(l1 + 2.0*n - 8.0)*(l1 + 2.0*n - 7.0)*(l1 + 2.0*n - 6.0)*(l1 + 2.0*n - 5.0)*(l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0));
+      val = -384.0*l1*(l1 + n - 5.0)*(l1 + n - 4.0)*(l1 + n - 3.0)*(l1 + n - 2.0)*(l1 + n - 1.0)/((l1 + 2.0*n - 11.0)*(l1 + 2.0*n - 10.0)*(l1 + 2.0*n - 9.0)*(l1 + 2.0*n - 8.0)*(l1 + 2.0*n - 7.0)*(l1 + 2.0*n - 6.0)*(l1 + 2.0*n - 5.0)*(l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0));
+
+      // Truncate operator
+      this->zeroLast(val, this->mQ-2);
 
       return this->normalizeDiag(n, -5)*val;
    }
@@ -72,6 +68,9 @@ namespace Chebyshev {
 
       val = 96.0*(ln - 4.0)*(ln - 3.0)*(ln - 2.0)*(ln - 1.0)*(10.0*l2 - 4.0*l1*n + 8.0*l1 - 4.0*n.pow(2) + 16.0*n + 9.0)/((l2n - 10.0)*(l2n - 9.0)*(l2n - 8.0)*(l2n - 7.0)*(l2n - 6.0)*(l2n - 5.0)*(l2n - 4.0)*(l2n - 3.0)*(l2n - 2.0)*(l2n - 1.0)*(l2n + 1.0)*(l2n + 2.0));
 
+      // Truncate operator
+      this->zeroLast(val, this->mQ-1);
+
       return this->normalizeDiag(n, -4)*val;
    }
 
@@ -82,6 +81,9 @@ namespace Chebyshev {
       ACoeff_t val;
 
       val = -160.0*l1*(l1 + n - 3.0)*(l1 + n - 2.0)*(l1 + n - 1.0)*(8.0*l2 - 12.0*l1*n + 18.0*l1 - 12.0*n.pow(2) + 36.0*n + 37.0)/((l1 + 2.0*n - 9.0)*(l1 + 2.0*n - 8.0)*(l1 + 2.0*n - 7.0)*(l1 + 2.0*n - 6.0)*(l1 + 2.0*n - 5.0)*(l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0));
+
+      // Truncate operator
+      this->zeroLast(val, this->mQ);
 
       return this->normalizeDiag(n, -3)*val;
    }
@@ -96,6 +98,9 @@ namespace Chebyshev {
 
       val = 60.0*(l1 + n - 2.0)*(l1 + n - 1.0)*(16.0*l4 - 64.0*l3*n + 64.0*l3 - 48.0*l2*n.pow(2) + 96.0*l2*n + 236.0*l2 + 32.0*l1*n.pow(3) - 96.0*l1*n.pow(2) - 40.0*l1*n + 104.0*l1 + 16.0*n.pow(4) - 64.0*n.pow(3) - 40.0*n.pow(2) + 208.0*n + 105.0)/((l1 + 2.0*n - 8.0)*(l1 + 2.0*n - 7.0)*(l1 + 2.0*n - 6.0)*(l1 + 2.0*n - 5.0)*(l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0));
 
+      // Truncate operator
+      this->zeroLast(val, this->mQ+1);
+
       return this->normalizeDiag(n, -2)*val;
    }
 
@@ -108,6 +113,9 @@ namespace Chebyshev {
       ACoeff_t val;
 
       val = -48.0*l1*(l1 + n - 1.0)*(8.0*l4 - 80.0*l3*n + 40.0*l3 + 280.0*l2 + 160.0*l1*n.pow(3) - 240.0*l1*n.pow(2) - 440.0*l1*n + 260.0*l1 + 80.0*n.pow(4) - 160.0*n.pow(3) - 440.0*n.pow(2) + 520.0*n + 537.0)/((l1 + 2.0*n - 7.0)*(l1 + 2.0*n - 6.0)*(l1 + 2.0*n - 5.0)*(l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0)*(l1 + 2.0*n + 5.0));
+
+      // Truncate operator
+      this->zeroLast(val, this->mQ+2);
 
       return this->normalizeDiag(n, -1)*val;
    }
@@ -124,6 +132,9 @@ namespace Chebyshev {
 
       val = 4.0*(16.0*l6 - 480.0*l5*n + 960.0*l4*n.pow(2) + 1120.0*l4 + 2560.0*l3*n.pow(3) - 7840.0*l3*n + 480.0*l2*n.pow(4) - 5040.0*l2*n.pow(2) + 5614.0*l2 - 960.0*l1*n.pow(5) + 5600.0*l1*n.pow(3) - 5180.0*l1*n - 320.0*n.pow(6) + 2800.0*n.pow(4) - 5180.0*n.pow(2) + 1125.0)/((l1 + 2.0*n - 6.0)*(l1 + 2.0*n - 5.0)*(l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0)*(l1 + 2.0*n + 5.0)*(l1 + 2.0*n + 6.0));
 
+      // Truncate operator
+      this->zeroLast(val, this->mQ+3);
+
       return this->normalizeDiag(n, 0)*val;
    }
 
@@ -136,6 +147,9 @@ namespace Chebyshev {
       ACoeff_t val;
 
       val = 12.0*l1*(2.0*n + 1.0)*(2.0*l1 + 2.0*n + 1.0)*(8.0*l4 - 80.0*l3*n - 40.0*l3 + 280.0*l2 + 160.0*l1*n.pow(3) + 240.0*l1*n.pow(2) - 440.0*l1*n - 260.0*l1 + 80.0*n.pow(4) + 160.0*n.pow(3) - 440.0*n.pow(2) - 520.0*n + 537.0)/((l1 + n)*(l1 + 2.0*n - 5.0)*(l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0)*(l1 + 2.0*n + 5.0)*(l1 + 2.0*n + 6.0)*(l1 + 2.0*n + 7.0));
+
+      // Truncate operator
+      this->zeroLast(val, this->mQ+4);
 
       return this->normalizeDiag(n, 1)*val;
    }
@@ -150,6 +164,9 @@ namespace Chebyshev {
 
       val = 15.0*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*l1 + 2.0*n + 1.0)*(2.0*l1 + 2.0*n + 3.0)*(16.0*l4 - 64.0*l3*n - 64.0*l3 - 48.0*l2*n.pow(2) - 96.0*l2*n + 236.0*l2 + 32.0*l1*n.pow(3) + 96.0*l1*n.pow(2) - 40.0*l1*n - 104.0*l1 + 16.0*n.pow(4) + 64.0*n.pow(3) - 40.0*n.pow(2) - 208.0*n + 105.0)/(4.0*(l1 + n)*(l1 + n + 1.0)*(l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0)*(l1 + 2.0*n + 5.0)*(l1 + 2.0*n + 6.0)*(l1 + 2.0*n + 7.0)*(l1 + 2.0*n + 8.0));
 
+      // Truncate operator
+      this->zeroLast(val, this->mQ+5);
+
       return this->normalizeDiag(n, 2)*val;
    }
 
@@ -160,6 +177,9 @@ namespace Chebyshev {
       ACoeff_t val;
 
       val = 5.0*l1*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*l1 + 2.0*n + 1.0)*(2.0*l1 + 2.0*n + 3.0)*(2.0*l1 + 2.0*n + 5.0)*(8.0*l2 - 12.0*l1*n - 18.0*l1 - 12.0*n.pow(2) - 36.0*n + 37.0)/(2.0*(l1 + n)*(l1 + n + 1.0)*(l1 + n + 2.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0)*(l1 + 2.0*n + 5.0)*(l1 + 2.0*n + 6.0)*(l1 + 2.0*n + 7.0)*(l1 + 2.0*n + 8.0)*(l1 + 2.0*n + 9.0));
+
+      // Truncate operator
+      this->zeroLast(val, this->mQ+6);
 
       return this->normalizeDiag(n, 3)*val;
    }
@@ -172,6 +192,9 @@ namespace Chebyshev {
 
       val = 3.0*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*n + 7.0)*(2.0*l1 + 2.0*n + 1.0)*(2.0*l1 + 2.0*n + 3.0)*(2.0*l1 + 2.0*n + 5.0)*(2.0*l1 + 2.0*n + 7.0)*(10.0*l2 - 4.0*l1*n - 8.0*l1 - 4.0*n.pow(2) - 16.0*n + 9.0)/(8.0*(l1 + n)*(l1 + n + 1.0)*(l1 + n + 2.0)*(l1 + n + 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0)*(l1 + 2.0*n + 5.0)*(l1 + 2.0*n + 6.0)*(l1 + 2.0*n + 7.0)*(l1 + 2.0*n + 8.0)*(l1 + 2.0*n + 9.0)*(l1 + 2.0*n + 10.0));
 
+      // Truncate operator
+      this->zeroLast(val, this->mQ+7);
+
       return this->normalizeDiag(n, 4)*val;
    }
 
@@ -182,6 +205,9 @@ namespace Chebyshev {
 
       val = 3.0*l1*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*n + 7.0)*(2.0*n + 9.0)*(2.0*l1 + 2.0*n + 1.0)*(2.0*l1 + 2.0*n + 3.0)*(2.0*l1 + 2.0*n + 5.0)*(2.0*l1 + 2.0*n + 7.0)*(2.0*l1 + 2.0*n + 9.0)/(8.0*(l1 + n)*(l1 + n + 1.0)*(l1 + n + 2.0)*(l1 + n + 3.0)*(l1 + n + 4.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0)*(l1 + 2.0*n + 5.0)*(l1 + 2.0*n + 6.0)*(l1 + 2.0*n + 7.0)*(l1 + 2.0*n + 8.0)*(l1 + 2.0*n + 9.0)*(l1 + 2.0*n + 10.0)*(l1 + 2.0*n + 11.0));
 
+      // Truncate operator
+      this->zeroLast(val, this->mQ+8);
+
       return this->normalizeDiag(n, 5)*val;
    }
 
@@ -191,6 +217,9 @@ namespace Chebyshev {
       ACoeff_t val;
 
       val = (2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0)*(2.0*n + 7.0)*(2.0*n + 9.0)*(2.0*n + 11.0)*(2.0*l1 + 2.0*n + 1.0)*(2.0*l1 + 2.0*n + 3.0)*(2.0*l1 + 2.0*n + 5.0)*(2.0*l1 + 2.0*n + 7.0)*(2.0*l1 + 2.0*n + 9.0)*(2.0*l1 + 2.0*n + 11.0)/(64.0*(l1 + n)*(l1 + n + 1.0)*(l1 + n + 2.0)*(l1 + n + 3.0)*(l1 + n + 4.0)*(l1 + n + 5.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0)*(l1 + 2.0*n + 5.0)*(l1 + 2.0*n + 6.0)*(l1 + 2.0*n + 7.0)*(l1 + 2.0*n + 8.0)*(l1 + 2.0*n + 9.0)*(l1 + 2.0*n + 10.0)*(l1 + 2.0*n + 11.0)*(l1 + 2.0*n + 12.0));
+
+      // Truncate operator
+      this->zeroLast(val, this->mQ+9);
 
       return this->normalizeDiag(n, 6)*val;
    }

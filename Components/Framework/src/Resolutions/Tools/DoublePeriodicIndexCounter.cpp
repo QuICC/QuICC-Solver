@@ -6,24 +6,14 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Resolutions/Tools/DoublePeriodicIndexCounter.hpp"
-
 // Project includes
 //
+#include "QuICC/Resolutions/Tools/DoublePeriodicIndexCounter.hpp"
 
 namespace QuICC {
 
    DoublePeriodicIndexCounter::DoublePeriodicIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
       : IResolutionIndexCounter(spSim, spCpu)
-   {
-   }
-
-   DoublePeriodicIndexCounter::~DoublePeriodicIndexCounter()
    {
    }
 
@@ -47,9 +37,9 @@ namespace QuICC {
          {
             oDims(i) = dims(dims.size()-i);
          }
-      
+      }
       //  Physical space ordering is 3D, 2D, 1D
-      } else //if(spaceId == Dimensions::Space::PHYSICAL)
+      else //if(spaceId == Dimensions::Space::PHYSICAL)
       {
          for(int i = 0; i < dims.size(); ++i)
          {
@@ -73,10 +63,11 @@ namespace QuICC {
       // Select transform dimension depending on dimension space
       if(spaceId == Dimensions::Space::SPECTRAL || spaceId == Dimensions::Space::TRANSFORM)
       {
-         transId = Dimensions::Transform::TRA1D;
+         transId = Dimensions::Transform::SPECTRAL;
          simId = Dimensions::Simulation::SIM2D;
 
-      } else //if(spaceId == Dimensions::Space::PHYSICAL)
+      }
+      else //if(spaceId == Dimensions::Space::PHYSICAL)
       {
          transId = Dimensions::Transform::TRA3D;
          simId = Dimensions::Simulation::SIM1D;
@@ -90,6 +81,8 @@ namespace QuICC {
       offV.push_back(0);
       offV.push_back(0);
 
+      auto&& tRes = *this->mspCpu->dim(transId);
+
       // Select transform dimension depending on dimension space
       if(spaceId == Dimensions::Space::SPECTRAL)
       {
@@ -99,9 +92,9 @@ namespace QuICC {
          int ref3D = spRef->dim(simId,spaceId)/2 + 1;
          int min3D = std::min(sim3D,ref3D);
 
-         for(int i=0; i < this->mspCpu->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
+         for(int i=0; i < tRes.dim<Dimensions::Data::DAT3D>(); ++i)
          {
-            int i_ = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
+            int i_ = tRes.idx<Dimensions::Data::DAT3D>(i);
             // Check if value is available in file
             if(i_ < min3D)
             {
@@ -109,7 +102,7 @@ namespace QuICC {
                offV.at(0) = i_;
 
                // Compute offset for second dimension
-               offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
+               offV.at(1) = tRes.idx<Dimensions::Data::DAT2D>(0,i);
 
                // Store 3D index
                offV.at(2) = i;
@@ -118,13 +111,14 @@ namespace QuICC {
 
                // 1D blocks
                blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, i_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
-            } else if(dat3D - i_ < min3D)
+            }
+            else if(dat3D - i_ < min3D)
             {
                // Compute offset for third dimension
                offV.at(0) = i_ - (dat3D - spRef->dim(simId,spaceId));
 
                // Compute offset for second dimension
-               offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
+               offV.at(1) = tRes.idx<Dimensions::Data::DAT2D>(0,i);
 
                // Store 3D index
                offV.at(2) = i;
@@ -135,12 +129,12 @@ namespace QuICC {
                blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, i_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
             }
          }
-
-      } else //if(spaceId == Dimensions::Space::PHYSICAL || spaceId == Dimensions::Space::TRANSFORM)
+      }
+      else //if(spaceId == Dimensions::Space::PHYSICAL || spaceId == Dimensions::Space::TRANSFORM)
       {
-         for(int i=0; i < this->mspCpu->dim(transId)->dim<Dimensions::Data::DAT3D>(); ++i)
+         for(int i=0; i < tRes.dim<Dimensions::Data::DAT3D>(); ++i)
          {
-            int i_ = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT3D>(i);
+            int i_ = tRes.idx<Dimensions::Data::DAT3D>(i);
             // Check if value is available in file
             if(i_ < spRef->dim(simId,spaceId))
             {
@@ -148,7 +142,7 @@ namespace QuICC {
                offV.at(0) = i_;
 
                // Compute offset for second dimension
-               offV.at(1) = this->mspCpu->dim(transId)->idx<Dimensions::Data::DAT2D>(0,i);
+               offV.at(1) = tRes.idx<Dimensions::Data::DAT2D>(0,i);
 
                // Store 3D index
                offV.at(2) = i;
@@ -161,4 +155,4 @@ namespace QuICC {
          }
       }
    }
-}
+} // QuICC

@@ -40,9 +40,10 @@ namespace Tools {
    {
       int nMat = 0;
 
-      for(int i = 0; i < res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++i)
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      for(int i = 0; i < tRes.dim<Dimensions::Data::DAT3D>(); ++i)
       {
-         nMat += res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i)*res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATB1D>(i);
+         nMat += tRes.dim<Dimensions::Data::DAT2D>(i)*tRes.dim<Dimensions::Data::DATB1D>(i);
       }
 
       return nMat;

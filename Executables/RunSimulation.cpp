@@ -29,15 +29,12 @@
 #include MODELHEADER
 #include "Profiler/Interface.hpp"
 
-// Check Model and Framework compatiblity
-#include "QuICC/Version/ModelChecker.h"
-
 /**
  * @brief Setup and run the simulation
  */
 int run()
 {
-   QuICC::Profiler::RegionFixture runFix("run");
+   QuICC::Profiler::RegionFixture<1> runFix("Walltime");
 
    int status = 0;
 
@@ -54,7 +51,14 @@ int run()
    // If exception is thrown, finalise (close files) and return
    catch(std::logic_error& e)
    {
-      std::cerr << e.what() << std::endl;
+      try
+      {
+         QuICC::QuICCEnv().abort(e.what());
+      }
+      catch(std::logic_error& ee)
+      {
+         std::cerr << ee.what() << std::endl;
+      }
 
       status = -1;
    }

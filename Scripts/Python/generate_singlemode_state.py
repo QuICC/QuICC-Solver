@@ -77,7 +77,7 @@ if 'ekman' in phys_params.keys():
 tmp = np.genfromtxt(inputfile, skip_header = 1)
 nz  = tmp.shape[0]
 grid = np.array([np.cos(i*np.pi/(nz - 1.0)) for i in range(0,nz)])
-fields = ["mean_temperature", "dz_meantemperature", "velocityz", "streamfunction", "temperature"]
+fields = ["mean_temperature", "dz_mean_temperature", "velocity_z", "streamfunction", "temperature"]
 data = dict()
 for i,field in enumerate(fields):
     data[field] = tmp[:,i]
@@ -105,7 +105,7 @@ for f in fields:
 
 if sim_type in ["RRBCPlane", "RRBCPlaneMean", "RRBCPlaneDMean"]:
     data["velocity_tor"] = -data["streamfunction"]
-    data["velocity_pol"] = (1.0/kx**2)*data["velocityz"]
+    data["velocity_pol"] = (1.0/kx**2)*data["velocity_z"]
 
 # Write HDF5 header attributes
 hdf5_file = tables.open_file(outputfile, mode = 'w')
@@ -170,8 +170,8 @@ def writeVector(name, comp, coeff = None):
 if sim_type == "FPlane3DQG":
     writeScalar("temperature")
     writeScalar("streamfunction")
-    writeMean("dz_meantemperature")
-    writeScalar("velocityz")
+    writeMean("dz_mean_temperature")
+    writeScalar("velocity_z")
 
 ############################################
 # Write HDF5 RRBCPlane fields
@@ -183,14 +183,14 @@ if sim_type == "RRBCPlane":
 # Write HDF5 RRBCPlaneMean fields
 if sim_type == "RRBCPlaneMean":
     writeScalar("temperature")
-    writeMean("meantemperature")
+    writeMean("mean_temperature")
     writeVector("velocity", ["tor","pol"])
 
 ############################################
 # Write HDF5 RRBCPlaneDMean fields
 if sim_type == "RRBCPlaneDMean":
     writeScalar("temperature")
-    writeMean("dz_meantemperature")
+    writeMean("dz_mean_temperature")
     writeVector("velocity", ["tor","pol"])
 
 hdf5_file.close()

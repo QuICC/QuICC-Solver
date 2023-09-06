@@ -156,6 +156,8 @@ namespace Debug {
             return "Transform 2D";
          case TEMPTRA3D:
             return "Transform 3D";
+         case TEMPSPECTRAL:
+            return "Transform Spectral";
 
          //////////////////////////
          case EQUATIONS:

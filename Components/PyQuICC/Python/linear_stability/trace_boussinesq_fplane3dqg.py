@@ -16,7 +16,7 @@ res = [64, 0, 0]
 eq_params = {'prandtl':1, 'rayleigh':8.6957, 'scale1d':2.0}
 #res = [64, 0, 0]
 #eq_params = {'prandtl':7, 'rayleigh':8.6957, 'scale1d':2.0}
-bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocityz':0, 'temperature':0}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'streamfunction':0, 'velocity_z':0, 'temperature':0}
 phi = 0
 kp = 1.304807403014
 

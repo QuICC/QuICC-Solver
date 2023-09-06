@@ -8,29 +8,21 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/2D/IRegular2DBuilder.hpp"
-
 // Project includes
 //
-#include "QuICC/SpatialScheme/Tools/Regular.hpp"
+#include "QuICC/SpatialScheme/2D/IRegular2DBuilder.hpp"
+#include "QuICC/SpatialScheme/Tools/Uniform3D1D.hpp"
+#include "QuICC/SpatialScheme/Tools/Uniform3D2D.hpp"
+#include "QuICC/Transform/Setup/Uniform.hpp"
 
 namespace QuICC {
 
 namespace SpatialScheme {
 
-   IRegular2DBuilder::IRegular2DBuilder(const ArrayI& dim, const GridPurpose::Id purpose)
-      : IBuilder(dim.size(), purpose), mI(dim(0)), mJ(dim(1))
+   IRegular2DBuilder::IRegular2DBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options)
+      : IBuilder(dim.size(), purpose, options), mI(dim(0)), mJ(dim(1))
    {
-      assert(dim.size() == 2);
-   }
-
-   IRegular2DBuilder::~IRegular2DBuilder()
-   {
+      assert(dim.size() == 3);
    }
 
    ArrayI IRegular2DBuilder::resolution() const
@@ -41,13 +33,14 @@ namespace SpatialScheme {
       return space;
    }
 
-   int IRegular2DBuilder::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const ArrayI& id, const ArrayI& bins, const ArrayI& n0, const ArrayI& nN, const Splitting::Locations::Id flag)
+   int IRegular2DBuilder::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
    {
-      // Safety assertions for default values
-      assert( (id.size() == 0) || (bins.size() > 0) );
+      throw std::logic_error("2D scheme splitting not fully implemented");
+
+      // Safety assertions
+      assert( id.size() > 0 );
+      assert( bins.size() > 0 );
       assert( id.size() == bins.size() );
-      assert( n0.size() == nN.size() );
-      assert( (bins.size() == 0) || (flag != Splitting::Locations::NONE) );
 
       // Make sure we start with empty indexes
       fwd1D.clear();
@@ -57,22 +50,16 @@ namespace SpatialScheme {
       // Multimap for the modes
       std::multimap<int,int> modes;
 
-      // No splitting
-      if(flag == Splitting::Locations::NONE)
-      {
-         this->splitSerial(modes, transId);
+      this->split(modes, id, bins, transId);
 
-      // Splitting is on first transform
-      } else if(flag == Splitting::Locations::FIRST || flag == Splitting::Locations::COUPLED2D)
-      {
-         this->splitSingle1D(modes, n0, nN, transId);
-      }
+      // Truncation tools
+      auto spTools = this->truncationTools(transId);
 
       // Fill indexes for 2D and 3D
-      Tools::Regular::fillIndexes2D3D(idx2D, idx3D, modes);
+      spTools->fillIndexes2D3D(idx2D, idx3D, modes);
 
       // Fill indexes for 1D
-      Tools::Regular::fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
+      spTools->fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
 
       // Set status (0 for success, 1 for failure)
       int status = 0;
@@ -97,53 +84,115 @@ namespace SpatialScheme {
       return -1;
    }
 
-   void IRegular2DBuilder::splitSerial(std::multimap<int,int>& modes, const Dimensions::Transform::Id transId)
+   std::shared_ptr<Tools::IBase> IRegular2DBuilder::truncationTools(const Dimensions::Transform::Id transId) const
    {
-      if(transId == Dimensions::Transform::TRA3D)
+      // Setup truncation tools
+      std::shared_ptr<Tools::IBase> spTools;
+
+      if(transId == Dimensions::Transform::TRA1D || transId == Dimensions::Transform::SPECTRAL)
+      {
+         spTools = std::make_shared<Tools::Uniform3D1D>();
+      }
+      else if(transId == Dimensions::Transform::TRA2D)
+      {
+         spTools = std::make_shared<Tools::Uniform3D2D>();
+      }
+      else if(transId == Dimensions::Transform::TRA3D)
       {
          throw std::logic_error("Tried to work on third dimension in 2D case");
       }
 
-      ArrayI j0 = ArrayI::Zero(1);
-      ArrayI jN = ArrayI::Constant(1, this->dim(transId, Dimensions::Data::DAT2D));
-      int c0 = 0;
-      int cN = this->dim(transId, Dimensions::Data::DAT2D);
-
-      // Generate map for regular indexes
-      Tools::Regular::buildMap(modes, 0, 1, j0, jN, c0, cN);
+      return spTools;
    }
 
-   void IRegular2DBuilder::splitSingle1D(std::multimap<int,int>& modes, const ArrayI& n0, const ArrayI& nN, const Dimensions::Transform::Id transId)
+   void IRegular2DBuilder::split(std::multimap<int,int>& modes, const std::vector<int>& id, const std::vector<int>& bins, const Dimensions::Transform::Id transId)
    {
-      ArrayI j0, jN;
-      int c0 = -1;
-      int cN = -1;
+      auto spTools = this->truncationTools(transId);
+      std::vector<int> n0_, nN_;
 
-      // Create index list for first transform
-      if(transId == Dimensions::Transform::TRA1D)
-      {
-         j0 = ArrayI::Constant(1, n0(0));
-         jN = ArrayI::Constant(1, nN(0));
-         c0 = 0;
-         cN = nN(0);
+      auto n2D = this->dim(transId, Dimensions::Data::DAT2D);
+      auto n3D = this->dim(transId, Dimensions::Data::DAT3D);
 
-      // Create index list for second transform
-      } else if(transId == Dimensions::Transform::TRA2D)
-      {
-         j0 = ArrayI::Constant(1, n0(0));
-         jN = ArrayI::Constant(1, nN(0));
-         c0 = 0;
-         cN = nN(0);
-
-      // Create index list for third transform
-      } else if(transId == Dimensions::Transform::TRA3D)
-      {
-         throw std::logic_error("Tried to work on third dimension in 2D case");
-      }
-
-      // Generate map for regular indexes
-      Tools::Regular::buildMap(modes, 0, 1, j0, jN, c0, cN);
+      // Create list of modes
+      spTools->buildBalancedMap(modes, n2D, n3D, id, bins, n0_, nN_);
    }
 
-}
-}
+   void IRegular2DBuilder::setCosts()
+   {
+      // Set first transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA1D);
+
+      // Set second transform cost
+      this->setCost(1.0, Dimensions::Transform::TRA2D);
+   }
+
+   void IRegular2DBuilder::setScalings()
+   {
+      // Set first transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA1D);
+
+      // Set second transform scaling
+      this->setScaling(1.0, Dimensions::Transform::TRA2D);
+   }
+
+   void IRegular2DBuilder::setMemoryScore()
+   {
+      // Set first transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA1D);
+
+      // Set second transform memory footprint
+      this->setMemory(1.0, Dimensions::Transform::TRA2D);
+   }
+
+   void IRegular2DBuilder::setDimensions()
+   {
+      //
+      // Set transform space sizes
+      //
+      ArrayI traSize(2);
+      traSize(0) = this->mesher().nSpec1D();
+      traSize(1) = this->mesher().nSpec2D();
+      this->setTransformSpace(traSize);
+
+      //
+      // Initialise spectral space
+      //
+
+      // Initialise forward dimension of first transform
+      this->setDimension(this->mesher().nSpec1D(), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of first transform
+      this->setDimension(this->mesher().nSpec1D(), Dimensions::Transform::SPECTRAL, Dimensions::Data::DATB1D);
+
+      // Initialise second dimension of first transform
+      this->setDimension(this->mesher().nSpec2D(), Dimensions::Transform::SPECTRAL, Dimensions::Data::DAT2D);
+
+      //
+      // Initialise first transform
+      //
+
+      // Initialise forward dimension of first transform
+      this->setDimension(this->mesher().nPhys1D(), Dimensions::Transform::TRA1D, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of first transform
+      this->setDimension(this->mesher().nDealias1D(), Dimensions::Transform::TRA1D, Dimensions::Data::DATB1D);
+
+      // Initialise second dimension of first transform
+      this->setDimension(this->mesher().nSpec2D(), Dimensions::Transform::TRA1D, Dimensions::Data::DAT2D);
+
+      //
+      // Initialise second transform
+      //
+
+      // Initialise forward dimension of second transform
+      this->setDimension(this->mesher().nPhys2D(), Dimensions::Transform::TRA2D, Dimensions::Data::DATF1D);
+
+      // Initialise backward dimension of second transform
+      this->setDimension(this->mesher().nDealias2D(), Dimensions::Transform::TRA2D, Dimensions::Data::DATB1D);
+
+      // Initialise second dimension of second transform
+      this->setDimension(this->mesher().nPhys1D(), Dimensions::Transform::TRA2D, Dimensions::Data::DAT2D);
+   }
+
+} // SpatialScheme
+} // QuICC

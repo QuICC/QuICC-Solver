@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_ISPHERICALSCALARENERGYBASEWRITER_HPP
 #define QUICC_IO_VARIABLE_ISPHERICALSCALARENERGYBASEWRITER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -50,7 +44,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalScalarEnergyBaseWriter();
+         virtual ~ISphericalScalarEnergyBaseWriter() = default;
 
          /**
           * @brief Activate output of parity splitting in energy output
@@ -69,6 +63,11 @@ namespace Variable {
          
       protected:
          /**
+          * @brief Prepare spectral field data for computation
+          */
+         void prepareInput(Transform::TransformCoordinatorType& coord);
+
+         /**
           * @brief Data ordering is m slowest
           */
          bool mHasMOrdering;
@@ -85,12 +84,16 @@ namespace Variable {
 
       private:
          /**
-          * @brief Initialize energy storage
+          * @brief Reset energy storage
           */
-         virtual void initializeEnergy() = 0;
+         virtual void resetEnergy() = 0;
 
          /**
           * @brief Store energy
+          *
+          * @param l      Harmonic degree
+          * @param m      Harmonic order
+          * @param energy  Energy of mode
           */
          virtual void storeEnergy(const int l, const int m, const MHDFloat energy) = 0;
    };
@@ -100,8 +103,8 @@ namespace Variable {
       return true;
    }
 
-}
-}
-}
+} // Variable
+} // Io
+} // QuICC
 
 #endif // QUICC_IO_VARIABLE_ISPHERICALSCALARENERGYBASEWRITER_HPP

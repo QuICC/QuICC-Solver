@@ -66,6 +66,11 @@ namespace Integrator {
 
       protected:
          /**
+          * @brief Truncate Quasi-inverse ?
+          */
+         const bool mcTruncQI;
+
+         /**
           * @brief Default implementation to apply ith operator
           */
          void defaultApplyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
@@ -103,6 +108,14 @@ namespace Integrator {
           * @param in   Input physical values
           */
          void applyOperators(MatrixZ& rPhysVal, const MatrixZ& specVal) const override;
+
+         /**
+          * @brief Compute polynomial projection
+          *
+          * @param rOut Output physical values
+          * @param in   Input spectral coefficients
+          */
+         void applyOperators(Matrix& rOut, const MatrixZ& in) const override;
 
          /**
           * @brief Apply ith operator

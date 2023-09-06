@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Fourier/Complex/Projector/Lapl2D.hpp"
+#include "QuICC/Transform/Fft/Fourier/Complex/Projector/Lapl2DBase.hpp"
 
 // Project includes
 //
@@ -29,24 +29,11 @@ namespace Complex {
 
 namespace Projector {
 
-   Lapl2D::Lapl2D()
-   {
-   }
-
-   Lapl2D::~Lapl2D()
-   {
-   }
-
-   void Lapl2D::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
+   void Lapl2D<base_t>::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
    {
       std::vector<std::pair<int,int> > orders = { {2,0}, {0,2} };
-      this->mBackend.inputDiff2D(in, orders, this->mspSetup->boxScale(), this->mspSetup->idBlocks());
+      this->mBackend.inputDiff2D(tmp, in, orders, this->mspSetup->boxScale(), this->mspSetup->idBlocks());
 
-      this->mBackend.output(rOut.data());
-   }
-
-   void Lapl2D::applyPostOperator(MatrixZ&) const
-   {
    }
 
 }

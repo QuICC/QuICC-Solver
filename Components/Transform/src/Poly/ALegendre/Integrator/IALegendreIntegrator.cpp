@@ -28,15 +28,7 @@ namespace ALegendre {
 
 namespace Integrator {
 
-   IALegendreIntegrator::IALegendreIntegrator()
-   {
-   }
-
-   IALegendreIntegrator::~IALegendreIntegrator()
-   {
-   }
-
-   void IALegendreIntegrator::initOperators(const internal::Array& igrid, const internal::Array& iweights) const
+   void IALegendreIntegrator::initOperators(const OpArray& igrid, const OpArray& iweights) const
    {
       // Initit specialized data for operators
       this->initSpecial();
@@ -61,7 +53,7 @@ namespace Integrator {
       #endif //defined QUICC_ALEGENDRE_INTGIMPL_MATRIX
    }
 
-   void IALegendreIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   void IALegendreIntegrator::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreIntegrator::applyOperators");
 

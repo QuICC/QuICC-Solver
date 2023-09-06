@@ -43,17 +43,17 @@ namespace Setup {
    {
       if(dim > 0)
       {
-         this->iTags().addTag("dim1D", 0);
+         this->sTags().addTag("dim1D", "default");
       }
 
       if(dim > 1)
       {
-         this->iTags().addTag("dim2D", 0);
+         this->sTags().addTag("dim2D", "default");
       }
 
       if(dim > 2)
       {
-         this->iTags().addTag("dim3D", 0);
+         this->sTags().addTag("dim3D", "default");
       }
    }
 

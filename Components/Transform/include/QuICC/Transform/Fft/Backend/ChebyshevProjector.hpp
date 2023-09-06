@@ -6,22 +6,14 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CHEBYSHEVPROJECTOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_CHEBYSHEVPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
+#include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
 
 namespace QuICC {
@@ -34,6 +26,8 @@ namespace Backend {
 
    /**
     * @brief Interface for a generic API Chebyshev projector
+    *
+    * Backward transform, spectral to physical space
     */ 
    class ChebyshevProjector
    {
@@ -52,7 +46,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         virtual ~ChebyshevProjector();
+         ~ChebyshevProjector();
          
          /**
           * @brief Initialise the FFT transforms
@@ -65,24 +59,40 @@ namespace Backend {
          void setScaler(const Array& scaler) const;
 
          /**
-          * @brief Set input
+          * @brief Copy input and pad
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
           */
-         void input(const Matrix& in, const bool needPadding = false) const;
+         void input(Matrix& tmp, const Matrix& in) const;
 
          /**
-          * @brief Set input
+          * @brief Copy input real or imaginary part and shift
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param shift
           */
-         void input(const MatrixZ& in, const bool useReal, const bool needPadding = false) const;
+         void input(Matrix& tmp, const Matrix& in, const int shift) const;
 
          /**
-          * @brief Set input and output to internal temporary storage
+          * @brief Copy input real or imaginary part and pad
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param useReal flag to extract real or im part
           */
-         void io() const;
+         void input(Matrix& tmp, const MatrixZ& in, const bool useReal) const;
 
          /**
-          * @brief Set input and output data pointers for FFT (R2R)
+          * @brief Copy input real or imaginary part and shift
+          *
+          * @param tmp temporary storage
+          * @param in input spectral coefficients
+          * @param shift
+          * @param useReal flag to extract real or im part
           */
-         void io(MHDFloat* out, const MHDFloat* in) const;
+         void input(Matrix& tmp, const MatrixZ& in, const int shift, const bool useReal) const;
 
          /**
           * @brief Set output
@@ -92,7 +102,7 @@ namespace Backend {
          /**
           * @brief Set output
           */
-         void output(MatrixZ& rOut, const bool useReal) const;
+         void output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
           * @brief Set output scaled by array
@@ -102,12 +112,12 @@ namespace Backend {
          /**
           * @brief Set output scaled by array
           */
-         void outputScale(MatrixZ& rOut, const bool useReal) const;
+         void outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
-          * @brief Apply FFT
+          * @brief Apply FFT spectral to physical space
           */
-         void applyFft() const;
+         void applyFft(Matrix& phys, const Matrix& mods) const;
 
          /**
           * @brief Add new linear solver
@@ -125,7 +135,14 @@ namespace Backend {
           * @brief Get solution from solver
           *
           */
-         void getSolution(const int zeroRows = 0, const int extraRows = 0, const bool updateSolver = false) const;
+         void getSolution(Matrix& tmp, const int zeroRows = 0,
+            const int extraRows = 0,
+            const bool updateSolver = false) const;
+
+         /**
+          * @brief Get the temporary storage
+          */
+         Matrix& getStorage(const StorageKind = StorageKind::in) const;
          
       protected:
 

@@ -49,6 +49,9 @@ namespace Parallel {
             case Dimensions::Transform::TRA3D:
                StorageProfilerMacro_update(Debug::StorageProfiler::TEMPTRA3D, mem);
                break;
+            case Dimensions::Transform::SPECTRAL:
+               StorageProfilerMacro_update(Debug::StorageProfiler::TEMPSPECTRAL, mem);
+               break;
          }
          StorageProfilerMacro_update(Debug::StorageProfiler::TEMPORARIES, mem);
       #endif // QUICC_STORAGEPROFILE
@@ -56,6 +59,24 @@ namespace Parallel {
 
    void Communicator::initConverter(SharedResolution spRes, const std::vector<ArrayI>& packs, Splitting::Locations::Id split)
    {
+      /////////////////////////////////////////////////////////////////////////////////
+      // Initialise spectral/1D converter
+      //
+      #ifdef QUICC_MPI
+         if(split == Splitting::Locations::FIRST || split == Splitting::Locations::BOTH)
+         {
+            this->createMpiConverter<Dimensions::Transform::TRA1D>(spRes, packs.at(0), packs.at(1));
+         }
+         else
+         {
+            this->createSerialConverter<Dimensions::Transform::TRA1D>(spRes);
+         }
+      #else
+         this->createSerialConverter<Dimensions::Transform::TRA1D>(spRes);
+      #endif
+      this->converter(Dimensions::Transform::TRA1D).setup();
+
+
       /////////////////////////////////////////////////////////////////////////////////
       // Initialise 1D/2D converter
       //
@@ -75,6 +96,7 @@ namespace Parallel {
          // Load splitting has been done on first dimension
          if(split == Splitting::Locations::FIRST || split == Splitting::Locations::COUPLED2D)
          {
+            assert(packs.size() > 1);
             this->createMpiConverter<Dimensions::Transform::TRA2D>(spRes, packs.at(0), packs.at(1));
 
          // Load splitting has been done on second dimension
@@ -121,11 +143,13 @@ namespace Parallel {
       // Load splitting has been done on second dimension
       } else if(split == Splitting::Locations::SECOND)
       {
+         assert(packs.size() == 4);
          this->createMpiConverter<Dimensions::Transform::TRA3D>(spRes, packs.at(2), packs.at(3));
 
          // Load splitting has been done on two dimensions
       } else if(split == Splitting::Locations::BOTH)
       {
+         assert(packs.size() == 4);
          this->createMpiConverter<Dimensions::Transform::TRA2D>(spRes, packs.at(0), packs.at(1));
          this->createMpiConverter<Dimensions::Transform::TRA3D>(spRes, packs.at(2), packs.at(3));
          // A better implementation using only 3 buffers is possible but requires some cross transform synchronization

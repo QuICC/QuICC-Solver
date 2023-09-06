@@ -36,6 +36,7 @@ namespace Fftw {
 
    /**
     * @brief Interface for a generic Chebyshev FFTW based projector
+    * Backward transform, spectral to physical space
     */ 
    class ChebyshevProjector: public IChebyshevBackend
    {
@@ -48,12 +49,12 @@ namespace Fftw {
          /**
           * @brief Destructor
           */
-         virtual ~ChebyshevProjector();
+         ~ChebyshevProjector();
          
          /**
           * @brief Initialise the FFTW transforms
           */
-         virtual void init(const SetupType& setup) const override;
+         void init(const SetupType& setup) const final;
 
          /**
           * @brief Set Scaler array
@@ -61,30 +62,9 @@ namespace Fftw {
          void setScaler(const Array& scaler) const;
 
          /**
-          * @brief Set input
-          */
-         void input(const Matrix& in, const bool needPadding = false) const;
-
-         /**
-          * @brief Set input
-          */
-         void input(const MatrixZ& in, const bool useReal, const bool needPadding = false) const;
-
-         /**
-          * @brief Set input and output to internal temporary storage
-          */
-         void io() const;
-         using IChebyshevBackend::io;
-
-         /**
           * @brief Set output
           */
-         void output(Matrix& rOut) const;
-
-         /**
-          * @brief Set output
-          */
-         void output(MatrixZ& rOut, const bool useReal) const;
+         void output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
           * @brief Set output scaled by array
@@ -94,12 +74,7 @@ namespace Fftw {
          /**
           * @brief Set output scaled by array
           */
-         void outputScale(MatrixZ& rOut, const bool useReal) const;
-
-         /**
-          * @brief Apply FFT
-          */
-         virtual void applyFft() const override;
+         void outputScale(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
           * @brief Add new linear solver
@@ -117,20 +92,17 @@ namespace Fftw {
           * @brief Get solution from solver
           *
           */
-         void getSolution(const int zeroRows = 0, const int extraRows = 0, const bool updateSolver = false) const;
+         void getSolution(Matrix& tmp, const int zeroRows = 0,
+            const int extraRows = 0,
+            const bool updateSolver = false) const;
          
-      protected:
-
-      private:
          /**
           * @brief Apply padding
           */
-         void applyPadding(Matrix& rData, const int extraRows = 0) const;
+         void applyPadding(Matrix& rData, const int extraRows = 0) const final;
+      protected:
 
-         /**
-          * @brief Padding size
-          */
-         mutable int mPadSize;
+      private:
 
          /**
           * @brief Solver for differential operators

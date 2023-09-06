@@ -127,7 +127,15 @@ namespace Variable {
    void IVariableHdf5Reader::setReadArguments()
    {
       // Get dimensions ordered by index access speed (fast -> slow)
-      ArrayI oDims = this->res().counter().orderedDimensions(this->mSpaceId);
+      ArrayI oDims;
+      if(this->mSpaceId == Dimensions::Space::SPECTRAL)
+      {
+         oDims = this->res().counter().orderedDimensions(this->mSpaceId);
+      }
+      else
+      {
+         oDims = this->res().counter().orderedDimensions(this->mSpaceId);
+      }
 
       int nDims = oDims.size();
       for(int i = 0; i < nDims; ++i)
@@ -137,7 +145,14 @@ namespace Variable {
       }
 
       // Compute offsets
-      this->res().counter().computeOffsets(this->mBlock, this->mFileOffsets, this->mSpaceId, this->mspFileRes);
+      if(this->mSpaceId == Dimensions::Space::SPECTRAL)
+      {
+         this->res().counter().computeOffsets(this->mBlock, this->mFileOffsets, this->mSpaceId, this->mspFileRes);
+      }
+      else
+      {
+         this->res().counter().computeOffsets(this->mBlock, this->mFileOffsets, this->mSpaceId, this->mspFileRes);
+      }
 
       // Get the "global" local minimum for MPI code
       this->mCollIoRead = this->mFileOffsets.size();

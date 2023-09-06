@@ -6,16 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/3D/WFT.hpp"
-
 // Project includes
 //
-#include "QuICC/SpatialScheme/Coordinator.hpp"
+#include "QuICC/Hasher.hpp"
+#include "QuICC/SpatialScheme/3D/WFT.hpp"
 #include "QuICC/SpatialScheme/3D/WFTBuilder.hpp"
 #include "QuICC/Transform/CylinderWorlandTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
@@ -31,7 +25,7 @@ namespace SpatialScheme {
 
    const std::string WFT::sFormatted = "WFT";
 
-   const std::size_t WFT::sId = registerId<WFT>(WFT::sTag);
+   const std::size_t WFT::sId = Hasher::makeId(WFT::sTag);
 
    WFT::WFT(const VectorFormulation::Id formulation, const GridPurpose::Id purpose)
       : ISpatialScheme(formulation, purpose, 3, WFT::sId, WFT::sTag, WFT::sFormatted)
@@ -60,16 +54,13 @@ namespace SpatialScheme {
       this->enable(Feature::RegularSpectrum);
       this->enable(Feature::SpectralMatrix2D);
       this->enable(Feature::SpectralOrdering132);
+      this->enable(Feature::TransformSpectralOrdering132);
       this->enable(Feature::ComplexSpectrum);
-   }
-
-   WFT::~WFT()
-   {
    }
 
    std::shared_ptr<IBuilder> WFT::createBuilder(ArrayI& dim, const bool needInterpretation) const
    {
-      auto spBuilder = makeBuilder<WFTBuilder>(dim, this->purpose(), needInterpretation);
+      auto spBuilder = makeBuilder<WFTBuilder>(dim, this->purpose(), needInterpretation, this->mImplType, this->mspCustomMesher);
 
       return spBuilder;
    }
@@ -207,5 +198,5 @@ namespace SpatialScheme {
       return p;
    }
 
-}
-}
+} // SpatialScheme
+} // QuICC

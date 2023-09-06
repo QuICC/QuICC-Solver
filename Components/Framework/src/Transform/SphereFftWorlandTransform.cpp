@@ -37,22 +37,22 @@
 #include "QuICC/Transform/Fft/Worland/Integrator/I2DivR1_Zero.hpp"
 #include "QuICC/Transform/Fft/Worland/Integrator/I2DivR1D1R1_Zero.hpp"
 
-#include "QuICC/Transform/Fft/Worland/Reductor/EnergySLAPLR2.hpp"
+#include "QuICC/Transform/Fft/Worland/Reductor/EnergySLaplR2.hpp"
 #include "QuICC/Transform/Fft/Worland/Reductor/EnergyD1R1.hpp"
 #include "QuICC/Transform/Fft/Worland/Reductor/EnergyR2.hpp"
 #include "QuICC/Transform/Fft/Worland/Reductor/Energy.hpp"
 
-#include "QuICC/Transform/Fft/Worland/Reductor/PowerSLAPLR2.hpp"
+#include "QuICC/Transform/Fft/Worland/Reductor/PowerSLaplR2.hpp"
 #include "QuICC/Transform/Fft/Worland/Reductor/PowerD1R1.hpp"
 #include "QuICC/Transform/Fft/Worland/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Fft/Worland/Reductor/Power.hpp"
 
 #include "QuICC/Transform/Backward/P.hpp"
-#include "QuICC/Transform/Backward/R_1.hpp"
+#include "QuICC/Transform/Backward/Overr1.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
 #include "QuICC/Transform/Backward/D1R1.hpp"
-#include "QuICC/Transform/Backward/R_1D1R1.hpp"
-#include "QuICC/Transform/Backward/SLapl.hpp"
+#include "QuICC/Transform/Backward/Overr1D1R1.hpp"
+#include "QuICC/Transform/Backward/Slapl.hpp"
 
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/I2P.hpp"
@@ -70,12 +70,12 @@
 #include "QuICC/Transform/Reductor/Energy.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
 #include "QuICC/Transform/Reductor/EnergyD1R1.hpp"
-#include "QuICC/Transform/Reductor/EnergySLAPLR2.hpp"
+#include "QuICC/Transform/Reductor/EnergySlaplR2.hpp"
 
 #include "QuICC/Transform/Reductor/Power.hpp"
 #include "QuICC/Transform/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Reductor/PowerD1R1.hpp"
-#include "QuICC/Transform/Reductor/PowerSLAPLR2.hpp"
+#include "QuICC/Transform/Reductor/PowerSlaplR2.hpp"
 
 namespace QuICC {
 
@@ -115,36 +115,38 @@ namespace Transform {
 
    void SphereFftWorlandTransform::initOperators()
    {
+      using backend_t = Fft::Worland::base_t;
+
       // Create projectors
-      this->mImpl.addOperator<Fft::Worland::Projector::P>(Backward::P::id());
-      this->mImpl.addOperator<Fft::Worland::Projector::DivR1_Zero>(Backward::R_1::id());
-      this->mImpl.addOperator<Fft::Worland::Projector::D1>(Backward::D1::id());
-//      this->mImpl.addOperator<Fft::Worland::Projector::D1R1>(Backward::D1R1::id());
-      this->mImpl.addOperator<Fft::Worland::Projector::DivR1D1R1_Zero>(Backward::R_1D1R1::id());
-      this->mImpl.addOperator<Fft::Worland::Projector::SphLapl>(Backward::SLapl::id());
+      this->mImpl.addOperator<Fft::Worland::Projector::P<backend_t>>(Backward::P::id());
+      this->mImpl.addOperator<Fft::Worland::Projector::DivR1_Zero<backend_t>>(Backward::Overr1::id());
+      this->mImpl.addOperator<Fft::Worland::Projector::D1<backend_t>>(Backward::D1::id());
+//      this->mImpl.addOperator<Fft::Worland::Projector::D1R1<backend_t>>(Backward::D1R1::id());
+      this->mImpl.addOperator<Fft::Worland::Projector::DivR1D1R1_Zero<backend_t>>(Backward::Overr1D1R1::id());
+      this->mImpl.addOperator<Fft::Worland::Projector::SphLapl<backend_t>>(Backward::Slapl::id());
 
       // Create integrators
-      this->mImpl.addOperator<Fft::Worland::Integrator::P>(Forward::P::id());
-      this->mImpl.addOperator<Fft::Worland::Integrator::R1_Zero>(Forward::Pol::id());
-      this->mImpl.addOperator<Fft::Worland::Integrator::DivR1_Zero>(Forward::Q::id());
-      this->mImpl.addOperator<Fft::Worland::Integrator::DivR1D1R1_Zero>(Forward::S::id());
-      this->mImpl.addOperator<Fft::Worland::Integrator::P_Zero>(Forward::T::id());
-      this->mImpl.addOperator<Fft::Worland::Integrator::I2>(Forward::I2P::id());
-      this->mImpl.addOperator<Fft::Worland::Integrator::I2DivR1_Zero>(Forward::I2Q::id());
-      this->mImpl.addOperator<Fft::Worland::Integrator::I2DivR1D1R1_Zero>(Forward::I2S::id());
-      this->mImpl.addOperator<Fft::Worland::Integrator::I2_Zero>(Forward::I2T::id());
-      this->mImpl.addOperator<Fft::Worland::Integrator::I4DivR1_Zero>(Forward::I4Q::id());
-      this->mImpl.addOperator<Fft::Worland::Integrator::I4DivR1D1R1_Zero>(Forward::I4S::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::P<backend_t>>(Forward::P::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::R1_Zero<backend_t>>(Forward::Pol::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::DivR1_Zero<backend_t>>(Forward::Q::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::DivR1D1R1_Zero<backend_t>>(Forward::S::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::P_Zero<backend_t>>(Forward::T::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I2<backend_t>>(Forward::I2P::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I2DivR1_Zero<backend_t>>(Forward::I2Q::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I2DivR1D1R1_Zero<backend_t>>(Forward::I2S::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I2_Zero<backend_t>>(Forward::I2T::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I4DivR1_Zero<backend_t>>(Forward::I4Q::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I4DivR1D1R1_Zero<backend_t>>(Forward::I4S::id());
 
       // Create reductors
-      this->mImpl.addOperator<Fft::Worland::Reductor::EnergySLAPLR2>(Reductor::EnergySLAPLR2::id());
-      this->mImpl.addOperator<Fft::Worland::Reductor::EnergyD1R1>(Reductor::EnergyD1R1::id());
-      this->mImpl.addOperator<Fft::Worland::Reductor::EnergyR2>(Reductor::EnergyR2::id());
-      this->mImpl.addOperator<Fft::Worland::Reductor::Energy>(Reductor::Energy::id());
-      this->mImpl.addOperator<Fft::Worland::Reductor::PowerSLAPLR2>(Reductor::PowerSLAPLR2::id());
-      this->mImpl.addOperator<Fft::Worland::Reductor::PowerD1R1>(Reductor::PowerD1R1::id());
-      this->mImpl.addOperator<Fft::Worland::Reductor::PowerR2>(Reductor::PowerR2::id());
-      this->mImpl.addOperator<Fft::Worland::Reductor::Power>(Reductor::Power::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::EnergySLaplR2<backend_t>>(Reductor::EnergySlaplR2::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::EnergyD1R1<backend_t>>(Reductor::EnergyD1R1::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::EnergyR2<backend_t>>(Reductor::EnergyR2::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::Energy<backend_t>>(Reductor::Energy::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::PowerSLaplR2<backend_t>>(Reductor::PowerSlaplR2::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::PowerD1R1<backend_t>>(Reductor::PowerD1R1::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::PowerR2<backend_t>>(Reductor::PowerR2::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::Power<backend_t>>(Reductor::Power::id());
    }
 
    void SphereFftWorlandTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)

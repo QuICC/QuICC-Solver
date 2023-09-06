@@ -1,0 +1,76 @@
+/**
+ * @file @Op@.hpp
+ * @brief Wrapper of the Fourier @Space@ @Op@ @Kind@
+ */
+#ifndef QUICC_TRANSFORM_FFT_FOURIER_@Space@_@Kind@_@Op@@Tag@V_HPP
+#define QUICC_TRANSFORM_FFT_FOURIER_@Space@_@Kind@_@Op@@Tag@V_HPP
+
+#include "QuICC/Transform/Fft/Fourier/@Space@/@Kind@/I@Space@@Kind@.hpp"
+#include "QuICC/Transform/Fft/Fourier/Tags.hpp"
+#include "View/View.hpp"
+#include "Operator/Unary.hpp"
+@CuhHeader@
+
+namespace QuICC {
+namespace Transform {
+namespace Fft {
+namespace Fourier {
+namespace @Space@ {
+namespace @Kind@ {
+
+using namespace QuICC::Memory;
+
+template<class Impl>
+class @Op@;
+
+/**
+ * @brief Implementation of wrapper to the View @Space@ @Op@ @Kind@ op
+ */
+template<>
+class @Op@<@Tag@>: public I@Space@@Kind@
+{
+public:
+    /**
+     * @brief Constructor
+     */
+    @Op@() = default;
+
+    /**
+     * @brief Destructor
+     */
+    ~@Op@() = default;
+
+    void transform(@OutMatrixType@& rOut, const @InMatrixType@& in) const final;
+
+    /**
+     * @brief Initialise View Op
+     */
+    void initBackend() const final;
+
+protected:
+
+private:
+    @PreOp@
+    @PostOp@
+
+    using ViewAttribute_t = @ViewAttribute@;
+    using @ArgInType@ = View<@InMatrixType@::Scalar, ViewAttribute_t>;
+    using @ArgOutType@ = View<@OutMatrixType@::Scalar, ViewAttribute_t>;
+
+    /// @brief Operator base class pointer
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<@ArgsType@>> mOp;
+
+    /// @brief Temporary storage for padding input
+    mutable MatrixZ mPadded;
+
+    @MemBlock@
+};
+
+} // namespace @Kind@
+} // namespace @Space@
+} // namespace Fourier
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC
+
+#endif // QUICC_TRANSFORM_FFT_FOURIER_@Space@_@Kind@_@Op@@Tag@V_HPP

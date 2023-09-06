@@ -6,23 +6,15 @@
 #ifndef QUICC_SPARSESM_IWORLANDOPERATOR_HPP
 #define QUICC_SPARSESM_IWORLANDOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
-
-// External includes
-//
 
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/SparseSM/ISparseSMOperator.hpp"
+#include "QuICC/SparseSM/Worland/WorlandKind.hpp"
 
 namespace QuICC {
 
@@ -36,32 +28,30 @@ namespace SparseSM {
       public:
          /**
           * @brief Constructor
+          *
+          * @param rows    Number of rows
+          * @param cols    Number of columns
+          * @param alpha   Jacobi alpha parameter
+          * @param veta    Jacobi alpha parameter
           */
          IWorlandOperator(const int rows, const int cols, const Scalar_t  alpha, const Scalar_t dBeta);
 
          /**
           * @brief Destructor
           */
-         virtual ~IWorlandOperator();
+         virtual ~IWorlandOperator() = default;
          
       protected:
-         enum WorlandType {
-            CHEBYSHEV,
-            LEGENDRE,
-            CYLENERGY,
-            SPHENERGY,
-         };
-
          /**
           * @brief Type of Worland implementation
           */
-         WorlandType type() const;
+         Worland::WorlandKind type() const;
 
       private:
          /**
           * Type of Worland implementation
           */
-         WorlandType mType;
+         Worland::WorlandKind mType;
    };
 
 }

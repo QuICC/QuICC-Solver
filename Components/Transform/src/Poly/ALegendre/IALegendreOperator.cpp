@@ -32,14 +32,10 @@ namespace ALegendre {
    {
    }
 
-   IALegendreOperator::~IALegendreOperator()
-   {
-   }
-
-   void IALegendreOperator::init(IALegendreOperator::SharedSetupType spSetup, const internal::Array& igrid, const internal::Array& iweights) const
+   void IALegendreOperator::init(SharedTransformSetup spSetup, const OpArray& igrid, const OpArray& iweights) const
    {
       // Store the shared pointer to setup object
-      this->mspSetup = spSetup;
+      this->mspSetup = std::dynamic_pointer_cast<IALegendreOperator::SetupType>(spSetup);
 
       // Initialise the operators
       this->initOperators(igrid, iweights);
@@ -48,26 +44,26 @@ namespace ALegendre {
       this->mIsInitialized = true;
    }
 
-   void IALegendreOperator::transform(MatrixZ& rOut, const MatrixZ& in) const
+   void IALegendreOperator::init(SharedTransformSetup spSetup) const
+   {
+      throw std::logic_error("Unused interface");
+   }
+
+   void IALegendreOperator::transform(OpMatrixZ& rOut, const OpMatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreOperator::transformZ");
       assert(this->isInitialized());
       this->applyOperators(rOut, in);
    }
 
-   void IALegendreOperator::transform(Matrix& rOut, const MatrixZ& in) const
+   void IALegendreOperator::transform(OpMatrix& rOut, const OpMatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreOperator::transform");
       assert(this->isInitialized());
-      this->applyOperators(rOut, in);
-   }
-
-   void IALegendreOperator::applyOperators(MatrixZ&, const MatrixZ&) const
-   {
       throw std::logic_error("Data is not compatible with ALegendre operator");
    }
 
-   void IALegendreOperator::applyOperators(Matrix&, const MatrixZ&) const
+   void IALegendreOperator::applyOperators(OpMatrixZ&, const OpMatrixZ&) const
    {
       throw std::logic_error("Data is not compatible with ALegendre operator");
    }

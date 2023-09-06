@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the generic variable to ASCII file writer
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Hasher.hpp"
 #include "QuICC/NonDimensional/Coordinator.hpp"
@@ -33,16 +24,12 @@ namespace Variable {
    {
    }
 
-   IVariableAsciiWriter::~IVariableAsciiWriter()
-   {
-   }
-
    Dimensions::Space::Id IVariableAsciiWriter::space() const
    {
       return this->mSpaceId;
    }
 
-   void IVariableAsciiWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,int>& boundary)
+   void IVariableAsciiWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,std::size_t>& boundary)
    {
       // Convert parameters to NonDimensional numbers
       for(auto it = parameters.cbegin(); it != parameters.cend(); ++it)
@@ -58,6 +45,11 @@ namespace Variable {
    const Resolution& IVariableAsciiWriter::res() const
    {
       return *this->mspRes;
+   }
+
+   void IVariableAsciiWriter::setMesh(const std::vector<Array>& mesh)
+   {
+      this->mMesh = mesh;
    }
 
    void IVariableAsciiWriter::setSimTime(const MHDFloat time, const MHDFloat timestep)

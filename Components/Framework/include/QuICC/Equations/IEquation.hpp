@@ -6,18 +6,9 @@
 #ifndef QUICC_EQUATIONS_IEQUATION_HPP
 #define QUICC_EQUATIONS_IEQUATION_HPP
 
-// First include
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -35,12 +26,16 @@
 #include "QuICC/Simulation/SimulationBoundary.hpp"
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
 #include "QuICC/SpectralKernels/ISpectralKernel.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformPath.hpp"
+#include "QuICC/TransformConfigurators/ITransformSteps.hpp"
 
 namespace QuICC {
 
 namespace Equations {
+
+   /// Forward declaration of IEquation
+   class IEquation;
 
    /**
     * @brief Base building block for the implementation of an equation
@@ -51,14 +46,26 @@ namespace Equations {
          /**
           * @brief Simple constructor
           *
-          * \param spEqParams Shared equation parameters
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
           */
          explicit IEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend);
 
          /**
+          * @brief Simple constructor
+          *
+          * @param spEqParams Equation parameters
+          * @param spScheme   Spatial scheme
+          * @param spBackend  Model backend
+          * @param spOptions  Additional options
+          */
+         explicit IEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions);
+
+         /**
           * @brief Simple empty destructor
           */
-         virtual ~IEquation();
+         virtual ~IEquation() = default;
 
          /**
           * @brief Access the shared resolution
@@ -122,8 +129,10 @@ namespace Equations {
 
          /**
           * @brief Initialize constraint kernels
+          *
+          * @param spMesh  Physical mesh
           */
-         virtual void initConstraintKernel();
+         virtual void initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh);
 
          /**
           * @brief Set spectral source kernel
@@ -140,6 +149,30 @@ namespace Equations {
           */
          virtual void initSrcKernel();
 
+         /**
+          * @brief Link with other equation
+          *
+          * @param spEq Equation to link to
+          */
+         virtual void linkEquation(std::shared_ptr<IEquation> spEq);
+
+         /**
+          * @brief Write equation diagnostic
+          *
+          * @param isAsciiTime  Is ASCII writing time?
+          * @param isHdf5Time   Is HDF5 writing time?
+          */
+         virtual void writeDiagnostics(const bool isAsciiTime, const bool isHdf5Time) const;
+
+         /**
+          * @brief Update constraint kernels
+          *
+          * @param time       Simulation time
+          * @param timestep   Simulation timestep
+          * @param isFinished Full timestep was computed?
+          */
+         virtual void updateConstraintKernel(const MHDFloat time, const MHDFloat timestep, const bool isFinished);
+
       protected:
          /**
           * @brief Set the equation variable requirements
@@ -155,6 +188,16 @@ namespace Equations {
           * @brief Set the default nonlinear components
           */
          virtual void setNLComponents() = 0;
+
+         /**
+          * @brief Transform steps object
+          */
+         virtual std::shared_ptr<Transform::ITransformSteps> transformSteps() const;
+
+         /**
+          * @brief Get backward transform paths
+          */
+         virtual std::vector<bool> disabledBackwardPaths() const = 0;
 
          /**
           * @brief Initialise the spectral equation matrices for given component
@@ -342,6 +385,7 @@ namespace Equations {
       // Create pointer to sparse operator
       const TOperator * op = &eq.explicitOperator<TOperator>(opId, compId, fieldId, matIdx);
 
+      const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
          typename Eigen::Matrix<T,Eigen::Dynamic,1>  tmp(op->cols());
@@ -356,11 +400,11 @@ namespace Equations {
                   eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123) &&
                   eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
             {
-               corrDim = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
+               corrDim = tRes.idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
             }
             for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
             {
-               j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+               j_ = tRes.idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                if(corrDim > 0)
                {
                   j_ -= corrDim;
@@ -400,7 +444,7 @@ namespace Equations {
       } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
          // Get mode indexes
-         ArrayI mode = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+         ArrayI mode = tRes.mode(matIdx);
 
          // Assert correct sizes
          assert(op->cols() == explicitField.slice(mode(0)).rows());
@@ -432,12 +476,12 @@ namespace Equations {
                break;
          }
 
-         for(int k = 0; k < eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); k++)
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
          {
-            k_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k)*dimK;
+            k_ = tRes.idx<Dimensions::Data::DAT3D>(k)*dimK;
             for(int j = 0; j < explicitField.slice(k).cols(); j++)
             {
-               j_ = eq.res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
+               j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
                for(int i = 0; i < explicitField.slice(k).rows(); i++)
                {
                   // Compute correct position
@@ -454,7 +498,7 @@ namespace Equations {
       }
    }
 
-}
-}
+} // Equations
+} // QuICC
 
 #endif // QUICC_EQUATIONS_IEQUATION_HPP

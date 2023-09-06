@@ -240,36 +240,36 @@ namespace Timestep {
 
       if(this->mspScheme->fieldMemory() == 0 && this->mspScheme->nonlinearMemory() == 0)
       {
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeMVPAY<TOperator,TData>(this->mRHSData.at(i), this->rRHSMatrix(rhsId,i), this->mSolution.at(i), this->mspScheme->rhsN(0, this->mStep));
+            internal::computeMVPAY<TOperator,TData>(this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->mspScheme->rhsN(0, this->mStep));
          }
 
       } else if(this->mspScheme->fieldMemory() == 0)
       {
          TData tmp;
 
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeRHSNoFieldMemory<TOperator,TData>(this->mStep, this->mRHSData.at(i), this->rRHSMatrix(rhsId,i), this->mSolution.at(i), this->mOldRHS.at(i), tmp, this->mspScheme);
+            internal::computeRHSNoFieldMemory<TOperator,TData>(this->mStep, this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->mOldRHS.at(i), tmp, this->mspScheme);
          }
 
       } else if(this->mspScheme->nonlinearMemory() == 0)
       {
          TData tmp;
 
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeRHSNoNLMemory<TOperator,TData>(this->mStep, this->mRHSData.at(i), this->rRHSMatrix(rhsId,i), this->mSolution.at(i), this->rOldRHSMatrices(rhsId,i), this->mOldSolution.at(i), tmp, this->mspScheme);
+            internal::computeRHSNoNLMemory<TOperator,TData>(this->mStep, this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->rOldRHSMatrices(rhsId,i), this->mOldSolution.at(i), tmp, this->mspScheme);
          }
 
       } else
       {
          TData tmp;
 
-         for(size_t i = this->mZeroIdx; i < this->mRHSData.size(); i++)
+         for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeRHSMemory<TOperator,TData>(this->mStep, this->mRHSData.at(i), this->rRHSMatrix(rhsId,i), this->mSolution.at(i), this->rOldRHSMatrices(rhsId,i), this->mOldSolution.at(i), this->mOldRHS.at(i), tmp, tmp, this->mspScheme);
+            internal::computeRHSMemory<TOperator,TData>(this->mStep, this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->rOldRHSMatrices(rhsId,i), this->mOldSolution.at(i), this->mOldRHS.at(i), tmp, tmp, this->mspScheme);
          }
       }
 
@@ -288,7 +288,7 @@ namespace Timestep {
       for(int step = 0; step < this->mspScheme->steps(); ++step)
       {
          // Loop over matrices within same step
-         for(int i = 0; i < this->nSystem(); ++i)
+         for(std::size_t i = 0; i < this->nSystem(); ++i)
          {
             // Get the number of nonzero elements in time dependence
             size_t nnz = this->mTMatrix.at(i).nonZeros();
@@ -405,7 +405,7 @@ namespace Timestep {
       {
          for(size_t j = 0; j < this->mOldSolution.at(k).size(); ++j)
          {
-            this->mOldSolution.at(k).at(j) = this->mSolution.at(k);
+            this->mOldSolution.at(k).at(j) = this->reg(Register::Solution::id()).at(k);
          }
       }
    }

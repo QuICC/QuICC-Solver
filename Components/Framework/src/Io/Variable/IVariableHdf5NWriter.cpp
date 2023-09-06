@@ -3,27 +3,19 @@
  * @brief Source of the implementation of the generic variable to HDF5 file writer
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/IVariableHdf5NWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/IVariableHdf5NWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Hasher.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 #include "QuICC/NonDimensional/Coordinator.hpp"
 #include "QuICC/Io/Variable/Tags/VariableHdf5.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
+#include "QuICC/Bc/Name/Coordinator.hpp"
 
 namespace QuICC {
 
@@ -36,16 +28,12 @@ namespace Variable {
    {
    }
 
-   IVariableHdf5NWriter::~IVariableHdf5NWriter()
-   {
-   }
-
    Dimensions::Space::Id IVariableHdf5NWriter::space() const
    {
       return this->mSpaceId;
    }
 
-   void IVariableHdf5NWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,int>& boundary)
+   void IVariableHdf5NWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,std::size_t>& boundary)
    {
       // Convert parameters to NonDimensional numbers
       for(auto it = parameters.cbegin(); it != parameters.cend(); ++it)
@@ -156,7 +144,15 @@ namespace Variable {
    void IVariableHdf5NWriter::setDatasetSize()
    {
       // Get dimensions ordered by index access speed (fast -> slow)
-      ArrayI oDims = this->res().counter().orderedDimensions(this->mSpaceId);
+      ArrayI oDims;
+      if(this->mSpaceId == Dimensions::Space::SPECTRAL)
+      {
+         oDims = this->res().counter().orderedDimensions(this->mSpaceId);
+      }
+      else
+      {
+         oDims = this->res().counter().orderedDimensions(this->mSpaceId);
+      }
 
       int nDims = oDims.size();
       for(int i = 0; i < nDims; ++i)
@@ -169,7 +165,14 @@ namespace Variable {
    void IVariableHdf5NWriter::setDatasetOffsets()
    {
       // Compute the offsets
-      this->res().counter().computeOffsets(this->mBlock, this->mFileOffsets, this->mSpaceId);
+      if(this->mSpaceId == Dimensions::Space::SPECTRAL)
+      {
+         this->res().counter().computeOffsets(this->mBlock, this->mFileOffsets, this->mSpaceId);
+      }
+      else
+      {
+         this->res().counter().computeOffsets(this->mBlock, this->mFileOffsets, this->mSpaceId);
+      }
    }
 
    void IVariableHdf5NWriter::setCollIo()
@@ -273,7 +276,7 @@ namespace Variable {
       for(auto it = this->mBoundary.cbegin(); it != this->mBoundary.cend(); ++it)
       {
          // Write reached simulation time to file
-         this->writeScalar(group, it->first, it->second);
+         this->writeString(group, it->first, Bc::Name::Coordinator::tag(it->second));
       }
 
       // close group

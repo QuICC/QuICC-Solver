@@ -12,13 +12,13 @@ fields = model.stability_fields()
 
 # Set resolution, parameters, boundary conditions
 res = [20, 0, 20]
-eq_params = {'prandtl':1, 'rayleigh':1, 'ro':1.0, 'rratio':0.35}
+eq_params = {'prandtl':1, 'rayleigh':1, 'ro':1.0, 'r_ratio':0.35}
 m = 1
 eigs = [m]
 
 bc_vel = 0
 bc_temp = 0
-bcs = {'bcType':model.SOLVER_HAS_BC, 'velocityx':bc_vel, 'velocityy':bc_vel, 'velocityz':bc_vel, 'temperature':bc_temp}
+bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity_x':bc_vel, 'velocity_y':bc_vel, 'velocity_z':bc_vel, 'temperature':bc_temp}
 
 # Generate the operator A for the generalized EVP Ax = sigm B x
 print("Constructing matrix A:")
@@ -70,7 +70,7 @@ if show_solution:
     sol_w = evp_vec[2*res[0]*res[2]:3*res[0]*res[2],mode]
     sol_t = evp_vec[3*res[0]*res[2]:4*res[0]*res[2],mode]
     # Extract continuity from velocity 
-    a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['rratio'])
+    a, b = mod.annulus.rad.linear_r2x(eq_params['ro'], eq_params['r_ratio'])
     sol_c = mod.annulus.x1div(res[0], res[2], a, b, mod.no_bc(), sz = 0)*sol_u + 1j*m*sol_v + mod.annulus.x1e1(res[0], res[2], a, b, mod.no_bc(), sr = 0)*sol_w
     
     # Create spectrum plots

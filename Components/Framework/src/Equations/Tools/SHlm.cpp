@@ -15,6 +15,7 @@
 // Class include
 //
 #include "QuICC/Equations/Tools/SHlm.hpp"
+#include "QuICC/Enums/Dimensions.hpp"
 
 // Project includes
 //
@@ -30,7 +31,7 @@ namespace Tools {
       std::vector<MHDFloat> eigs;
 
       // Get mode indexes
-      ArrayI mode = res.cpu()->dim(Dimensions::Transform::TRA1D)->mode(matIdx);
+      ArrayI mode = res.cpu()->dim(Dimensions::Transform::SPECTRAL)->mode(matIdx);
 
       eigs.push_back(static_cast<MHDFloat>(mode(2)));
       eigs.push_back(static_cast<MHDFloat>(mode(3)));
@@ -42,9 +43,10 @@ namespace Tools {
    {
       int nMat = 0;
 
-      for(int i = 0; i < res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++i)
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      for(int i = 0; i < tRes.dim<Dimensions::Data::DAT3D>(); ++i)
       {
-         nMat += res.cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
+         nMat += tRes.dim<Dimensions::Data::DAT2D>(i);
       }
 
       return nMat;

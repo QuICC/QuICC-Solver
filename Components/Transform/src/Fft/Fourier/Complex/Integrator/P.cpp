@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/P.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/PBase.hpp"
 
 namespace QuICC {
 
@@ -29,27 +23,14 @@ namespace Complex {
 
 namespace Integrator {
 
-   P::P()
-   {
-   }
-
-   P::~P()
-   {
-   }
-
-   void P::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      this->mBackend.io(rOut, in);
-   }
-
-   void P::applyPostOperator(MatrixZ& rOut) const
+   void P<base_t>::applyPostOperator(MatrixZ& rOut) const
    {
       this->mBackend.output(rOut);
    }
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace Complex
+} // namespace Fourier
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

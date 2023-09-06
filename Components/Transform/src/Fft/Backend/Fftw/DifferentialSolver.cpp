@@ -42,7 +42,7 @@ namespace Fftw {
    };
 
    DifferentialSolver::DifferentialSolver(const int specSize, const int blockSize, const int extraRows)
-      : mSpecSize(specSize), mBlockSize(blockSize)
+      : mSpecSize(specSize), mBlockSize(blockSize), mExtraRows(extraRows)
    {
       // Initializer solver storage
       this->mTmp.setZero(this->mSpecSize + extraRows, this->mBlockSize);
@@ -107,11 +107,16 @@ namespace Fftw {
       this->mSpecOp = mat.bottomRows(mat.rows() - shift);
    }
 
-   void DifferentialSolver::solve(const int zeroRows, Matrix& rOut)
+   SparseMatrix& DifferentialSolver::getSpectralOperator()
    {
-      this->mTmp.bottomRows(zeroRows).setZero();
-      Matrix x = this->mpSolverImpl->get().solve(this->mTmp);
-      rOut.topRows(this->mTmp.rows()) = x;
+      return this->mSpecOp;
+   }
+
+   void DifferentialSolver::solve(Matrix& tmp, const int zeroRows)
+   {
+      tmp.middleRows(this->mSpecSize + this->mExtraRows - zeroRows, zeroRows).setZero();
+      Matrix x = this->mpSolverImpl->get().solve(tmp.topRows(this->mSpecSize + this->mExtraRows));
+      tmp.topRows(this->mSpecSize + this->mExtraRows) = x;
    }
 
 }

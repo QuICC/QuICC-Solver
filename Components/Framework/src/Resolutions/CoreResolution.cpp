@@ -19,8 +19,8 @@
 
 namespace QuICC {
 
-   CoreResolution::CoreResolution(const std::vector<SharedTransformResolution>& transformRes)
-      : mTransforms(transformRes)
+   CoreResolution::CoreResolution(const std::vector<SharedTransformResolution>& transformRes, SharedTransformResolution spSpectralRes)
+      : mTransforms(transformRes), mspSpectral(spSpectralRes)
    {
    }
 
@@ -45,11 +45,18 @@ namespace QuICC {
 
    SharedCTransformResolution CoreResolution::dim(const Dimensions::Transform::Id id) const
    {
-      // Check for correct sizes
-      assert(static_cast<int>(id) >= 0);
-      assert(static_cast<size_t>(id) < this->mTransforms.size());
+      if(id == Dimensions::Transform::SPECTRAL)
+      {
+         return this->mspSpectral;
+      }
+      else
+      {
+         // Check for correct sizes
+         assert(static_cast<int>(id) >= 0);
+         assert(static_cast<size_t>(id) < this->mTransforms.size());
 
-      return this->mTransforms.at(static_cast<int>(id));
+         return this->mTransforms.at(static_cast<int>(id));
+      }
    }
 
 }

@@ -58,26 +58,6 @@ namespace Backend {
       this->mpImpl->initMeanBlocks(idBlocks);
    }
 
-   void ComplexIntegrator::input(const MHDComplex* in) const
-   {
-      this->mpImpl->input(in);
-   }
-
-   void ComplexIntegrator::output(MHDComplex* out) const
-   {
-      this->mpImpl->output(out);
-   }
-
-   void ComplexIntegrator::io(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      this->mpImpl->io(rOut, in);
-   }
-
-   void ComplexIntegrator::io(MHDComplex* out, const MHDComplex* in) const
-   {
-      this->mpImpl->io(out, in);
-   }
-
    void ComplexIntegrator::output(MatrixZ& rOut) const
    {
       this->mpImpl->output(rOut);
@@ -88,9 +68,9 @@ namespace Backend {
       this->mpImpl->outputDiff(rOut, order, scale);
    }
 
-   void ComplexIntegrator::outputZeroMean(MatrixZ& rOut) const
+   void ComplexIntegrator::zeroMean(MatrixZ& rOut) const
    {
-      this->mpImpl->outputZeroMean(rOut);
+      this->mpImpl->zeroMean(rOut);
    }
 
    void ComplexIntegrator::outputMean(MatrixZ& rOut) const
@@ -98,14 +78,14 @@ namespace Backend {
       this->mpImpl->outputMean(rOut);
    }
 
-   void ComplexIntegrator::applyFft() const
+   void ComplexIntegrator::applyFft(MatrixZ& mods, const MatrixZ& phys) const
    {
-      this->mpImpl->applyFft();
+      this->mpImpl->applyFft(mods, phys);
    }
 
-   void ComplexIntegrator::extractMean() const
+   void ComplexIntegrator::extractMean(const MatrixZ& rOut) const
    {
-      this->mpImpl->extractMean();
+      this->mpImpl->extractMean(rOut);
    }
 
    void ComplexIntegrator::setMean(MatrixZ& rOut, const MHDFloat scale) const

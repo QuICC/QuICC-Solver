@@ -6,21 +6,12 @@
 #ifndef QUICC_TRANSFORM_ANNULUSCHEBYSHEVTRANSFORM_HPP
 #define QUICC_TRANSFORM_ANNULUSCHEBYSHEVTRANSFORM_HPP
 
-// Debug includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Transform/ITransform.hpp"
@@ -45,12 +36,12 @@ namespace Transform {
          /**
           * @brief Very basic constructor
           */
-         AnnulusChebyshevTransform();
+         AnnulusChebyshevTransform() = default;
 
          /**
           * @brief Destroy the FFTW plans
           */
-         ~AnnulusChebyshevTransform();
+         ~AnnulusChebyshevTransform() = default;
 
          /**
           * @brief set list of required options

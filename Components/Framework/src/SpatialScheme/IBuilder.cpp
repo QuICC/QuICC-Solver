@@ -3,25 +3,16 @@
  * @brief Source of the base for the scheme builder implementations
  */
 
-// Configuration includes
-//
-
 // System includes
 //
+#include <set>
 #include <vector>
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/IBuilder.hpp"
 
 // Project includes
 //
+#include "QuICC/SpatialScheme/IBuilder.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Tools/RegularIndexCounter.hpp"
-#include "QuICC/Framework/MpiFramework.hpp"
 
 namespace QuICC {
 
@@ -36,13 +27,22 @@ namespace SpatialScheme {
       this->tuneMpiResolution(descr);
    }
 
-   IBuilder::IBuilder(const int dims,  const GridPurpose::Id purpose)
-      : ICosts(dims), mPurpose(purpose), mDims(dims)
+   IBuilder::IBuilder(const int dims,  const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options)
+      : ICosts(dims), mOptions(options), mPurpose(purpose), mDims(dims)
    {
+      // Initialize options if none was given
+      if(this->mOptions.size() == 0)
+      {
+         for(std::size_t i = 0; i < static_cast<std::size_t>(dims); i++)
+         {
+            this->mOptions.emplace(i, std::vector<std::size_t>());
+         }
+      }
    }
 
-   IBuilder::~IBuilder()
+   bool IBuilder::sameSpectralOrdering() const
    {
+      return true;
    }
 
    void IBuilder::addIndexCounter(SharedResolution spRes)
@@ -50,7 +50,6 @@ namespace SpatialScheme {
       auto spCounter = std::make_shared<RegularIndexCounter>(spRes->spSim(), spRes->spCpu());
 
       spRes->setIndexCounter(spCounter);
-
    }
 
    GridPurpose::Id IBuilder::purpose() const
@@ -61,7 +60,7 @@ namespace SpatialScheme {
    void IBuilder::init()
    {
       // Initialise Storage for the dimensions
-      for(int i = 0; i < this->dims(); i++)
+      for(int i = 0; i < this->dims()+1; i++)
       {
          this->mDimensions.push_back(ArrayI(this->dims()+1));
       }
@@ -82,7 +81,7 @@ namespace SpatialScheme {
    int IBuilder::dim(const Dimensions::Transform::Id transId, const Dimensions::Data::Id dataId) const
    {
       // Assert for domain dimensions
-      assert(static_cast<int>(transId) < this->mDims);
+      assert(static_cast<int>(transId) < this->mDimensions.size());
 
       // Assert for dimension size
       assert(this->mDimensions.at(static_cast<int>(transId)).size() > static_cast<int>(dataId));
@@ -109,7 +108,7 @@ namespace SpatialScheme {
       assert(n > 0);
 
       // Assert for domain dimensions
-      assert(static_cast<int>(transId) < this->mDims);
+      assert(static_cast<int>(transId) < this->mDims || transId == Dimensions::Transform::SPECTRAL);
 
       // Assert for dimension size
       assert(this->mDimensions.at(static_cast<int>(transId)).size() > static_cast<int>(dataId));
@@ -125,27 +124,55 @@ namespace SpatialScheme {
    void IBuilder::tuneMpiResolution(const Parallel::SplittingDescription& descr)
    {
       #if defined QUICC_MPI
-         MpiFramework::initTransformComm(descr.structure.size());
-         for(auto vIt = descr.structure.cbegin(); vIt != descr.structure.cend(); ++vIt)
+         for(const auto& st: descr.structure)
          {
             // Extract the communication group from structure
             std::set<int> filter;
             filter.insert(QuICCEnv().id());
-            for(auto it = vIt->equal_range(QuICCEnv().id()).first; it != vIt->equal_range(QuICCEnv().id()).second; ++it)
+            auto sze = filter.size();
+
+            // Loop to check for nodes only reachable via another node
+            for(auto lvl = 0; lvl < 10; lvl++)
             {
-               filter.insert(it->second);
+               std::set<int> prev = filter;
+               for(auto fi: prev)
+               {
+                  // Get oneway communication nodes
+                  for(auto&& p: st.second)
+                  {
+                     if(p.second == fi)
+                     {
+                        filter.insert(p.first);
+                     }
+                  }
+
+                  // Get nodes with direct communication
+                  auto seq = st.second.equal_range(fi);
+                  for(auto it = seq.first; it != seq.second; ++it)
+                  {
+                     filter.insert(it->second);
+                  }
+               }
+
+               if(sze == filter.size())
+               {
+                  break;
+               }
+               else
+               {
+                  sze = filter.size();
+               }
             }
 
             // Convert set to array of CPUs in group
-            ArrayI groupCpu(filter.size());
-            int i = 0;
+            std::vector<int> groupCpu;
+            groupCpu.reserve(filter.size());
             for(auto it = filter.begin(); it != filter.end(); ++it)
             {
-               groupCpu(i) = *it;
-               ++i;
+               groupCpu.push_back(*it);
             }
 
-            MpiFramework::addTransformComm(groupCpu);
+            QuICCEnv().addCommunicator(st.first, groupCpu);
 
             // Synchronize
             QuICCEnv().synchronize();
@@ -154,5 +181,41 @@ namespace SpatialScheme {
       #endif //defined QUICC_MPI
    }
 
-}
-}
+   void IBuilder::setMesher(std::shared_ptr<IMesher> m, const bool isCustom)
+   {
+      // Mesher already set
+      if(this->mspMesher)
+      {
+         if(isCustom)
+         {
+            throw std::logic_error("Spatial scheme mesher was already set");
+         }
+      // Use provided mesher
+      } else
+      {
+         this->mspMesher = m;
+      }
+   }
+
+   const IMesher& IBuilder::mesher() const
+   {
+      if(this->mspMesher == nullptr)
+      {
+         throw std::logic_error("Spatial scheme mesher not setup");
+      }
+
+      return *this->mspMesher;
+   }
+
+   IMesher& IBuilder::mesher()
+   {
+      if(this->mspMesher == nullptr)
+      {
+         throw std::logic_error("Spatial scheme mesher not setup");
+      }
+
+      return *this->mspMesher;
+   }
+
+} // SpatialScheme
+} // QuICC

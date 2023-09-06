@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Worland/I6CylLaplh.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/I6CylLaplh.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/I6CylLaplhDiags.hpp"
 //#include "QuICC/SparseSM/Worland/Legendre/I6CylLaplhDiags.hpp"
 //#include "QuICC/SparseSM/Worland/CylEnergy/I6CylLaplhDiags.hpp"
@@ -28,31 +22,27 @@ namespace SparseSM {
 
 namespace Worland {
 
-   I6CylLaplh::I6CylLaplh(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l)
+   I6CylLaplh::I6CylLaplh(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
       : IWorlandOperator(rows, cols, dBeta, l)
    {
       switch(this->type())
       {
-         case CHEBYSHEV:
-            this->mpImpl = std::make_shared<Chebyshev::I6CylLaplhDiags>(alpha, l);
+         case WorlandKind::CHEBYSHEV:
+            this->mpImpl = std::make_shared<Chebyshev::I6CylLaplhDiags>(alpha, l, q);
             break;
-         case LEGENDRE:
+         case WorlandKind::LEGENDRE:
             throw std::logic_error("Operator is not implemented for Legendre type");
-            //this->mpImpl = std::make_shared<Legendre::I6CylLaplhDiags>(alpha, l);
+            //this->mpImpl = std::make_shared<Legendre::I6CylLaplhDiags>(alpha, l, q);
             break;
-         case CYLENERGY:
+         case WorlandKind::CYLENERGY:
             throw std::logic_error("Operator is not implemented for CylEnergy type");
-            //this->mpImpl = std::make_shared<CylEnergy::I6CylLaplhDiags>(alpha, l);
+            //this->mpImpl = std::make_shared<CylEnergy::I6CylLaplhDiags>(alpha, l, q);
             break;
-         case SPHENERGY:
+         case WorlandKind::SPHENERGY:
             throw std::logic_error("Operator is not implemented for SphEnergy type");
-            //this->mpImpl = std::make_shared<SphEnergy::I6CylLaplhDiags>(alpha, l);
+            //this->mpImpl = std::make_shared<SphEnergy::I6CylLaplhDiags>(alpha, l, q);
             break;
       }
-   }
-
-   I6CylLaplh::~I6CylLaplh()
-   {
    }
 
    void I6CylLaplh::buildTriplets(TripletList_t& list) const

@@ -18,9 +18,10 @@
 // Project includes
 //
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TransformConfigurators/TransformTree.hpp"
 #include "QuICC/TransformConfigurators/BackwardConfigurator.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -36,6 +37,17 @@ namespace Transform {
           * @brief Location of the splitting
           */
          static const Splitting::Locations::Id  SplitLocation = Splitting::Locations::NONE;
+
+         /**
+          * @brief Compute the spectral step in the backward transform
+          *
+          * @param tree       Transform projector tree
+          * @param rVariable  Variable corresponding to the name
+          * @param coord      Transform coordinator
+          *
+          * \tparam TVariable Type of the physical variable
+          */
+         template <typename TVariable> static void spectralStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
           * @brief Compute the first step in the backward transform
@@ -71,24 +83,31 @@ namespace Transform {
          template <typename TVariable> static void lastStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord);
 
          /**
-          * @brief Setup first exchange communication
+          * @brief Setup exchange communication
+          *
+          * TId = TRA1D: Communication between Spectral and first transform
+          * TId = TRA2D: Communication between first and second transform
+          * TId = TRA3D: Communication between second and third transform
+          *
+          * @param packs Number of components to pack in single communication
+          * @param coord Transform coordinator holding communicators and transforms
+          *
+          * @tparam TId Communication/transpose stage ID
           */
-         static void setup1DCommunication(const int packs, TransformCoordinatorType& coord);
+         template <Dimensions::Transform::Id TId> static void setupCommunication(const int packs, TransformCoordinatorType& coord);
 
          /**
-          * @brief Setup second exchange communication
+          * @brief Initiate exchange communication
+          *
+          * TId = TRA1D: Communication between Spectral and first transform
+          * TId = TRA2D: Communication between first and second transform
+          * TId = TRA3D: Communication between second and third transform
+          *
+          * @param coord Transform coordinator holding communicators and transforms
+          *
+          * @tparam TId Communication/transpose stage ID
           */
-         static void setup2DCommunication(const int packs, TransformCoordinatorType& coord);
-
-         /**
-          * @brief Initiate first exchange communication
-          */
-         static void initiate1DCommunication(TransformCoordinatorType& coord);
-
-         /**
-          * @brief Initiate second exchange communication
-          */
-         static void initiate2DCommunication(TransformCoordinatorType& coord);
+         template <Dimensions::Transform::Id TId> static void initiateCommunication(TransformCoordinatorType& coord);
 
       protected:
          /**
@@ -104,25 +123,21 @@ namespace Transform {
       private:
    };
 
-   inline void BackwardSerialConfigurator::setup1DCommunication(const int, TransformCoordinatorType&)
+   template <Dimensions::Transform::Id TId> inline void BackwardSerialConfigurator::setupCommunication(const int, TransformCoordinatorType&)
    {
    }
 
-   inline void BackwardSerialConfigurator::setup2DCommunication(const int, TransformCoordinatorType&)
+   template <Dimensions::Transform::Id TId> inline void BackwardSerialConfigurator::initiateCommunication(TransformCoordinatorType&)
    {
    }
 
-   inline void BackwardSerialConfigurator::initiate1DCommunication(TransformCoordinatorType&)
-   {
-   }
-
-   inline void BackwardSerialConfigurator::initiate2DCommunication(TransformCoordinatorType&)
+   template <typename TVariable> void BackwardSerialConfigurator::spectralStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
    }
 
    template <typename TVariable> void BackwardSerialConfigurator::firstStep(const TransformTree& tree, TVariable& rVariable, TransformCoordinatorType& coord)
    {
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
+      Profiler::RegionFixture<1> fix("BwdFirstStep");
 
       // Iterators for the transforms
       TransformTreeEdge::EdgeType_citerator itSpec;
@@ -132,12 +147,8 @@ namespace Transform {
       TransformTreeEdge::EdgeType_crange rangeSpec = tree.root().edgeRange();
       TransformTreeEdge::EdgeType_crange rangePhys;
 
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
-
       // Prepare required spectral data
       BackwardConfigurator::prepareSpectral(tree, rVariable, coord);
-
-      ProfilerMacro_start(Debug::Profiler::BWDTRANSFORM);
 
       if(coord.ss().dimension() == 3)
       {
@@ -190,21 +201,11 @@ namespace Transform {
          }
       } else if(coord.ss().dimension() == 1)
       {
-         // Loop over first transform
-         for(itSpec = rangeSpec.first; itSpec != rangeSpec.second; ++itSpec)
-         {
-            // Prepare physical output data
-            BackwardConfigurator::preparePhysical(tree, *itSpec, rVariable, coord);
-
-            // Compute third transform
-            BackwardConfigurator::project1ND(*itSpec, coord);
-         }
+         throw std::logic_error("1D case is not implemented");
       } else
       {
          throw std::logic_error("Transform with more than 3 dimensions are not implemented");
       }
-
-      ProfilerMacro_stop(Debug::Profiler::BWDTRANSFORM);
    }
 
    template <typename TVariable> void BackwardSerialConfigurator::secondStep(const TransformTree&, TVariable&, TransformCoordinatorType&)

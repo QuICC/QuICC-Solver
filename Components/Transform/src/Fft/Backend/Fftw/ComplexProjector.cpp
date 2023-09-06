@@ -59,65 +59,65 @@ namespace Fftw {
       MatrixZ   tmpCplxA(fwdSize, blockSize);
       MatrixZ   tmpCplxB(bwdSize, blockSize);
 
-      this->mPlan = fftw_plan_many_dft(1, fftSize, blockSize, reinterpret_cast<fftw_complex* >(tmpCplxB.data()), NULL, 1, bwdSize, reinterpret_cast<fftw_complex* >(tmpCplxA.data()), NULL, 1, fwdSize, FFTW_BACKWARD, Library::planFlag() | FFTW_DESTROY_INPUT);
+      this->mPlan = fftw_plan_many_dft(1, fftSize, blockSize, reinterpret_cast<fftw_complex* >(tmpCplxB.data()), NULL, 1, bwdSize, reinterpret_cast<fftw_complex* >(tmpCplxA.data()), NULL, 1, fwdSize, FFTW_BACKWARD, QuICC::Fft::Fftw::Library::planFlag() | FFTW_DESTROY_INPUT);
       if(this->mPlan == NULL)
       {
          throw  std::logic_error("FFTW plan failed!");
       }
    }
 
-   void ComplexProjector::applyFft() const
+   void ComplexProjector::applyFft(MatrixZ& phys, const MatrixZ& mods) const
    {
-      fftw_execute_dft(this->mPlan, reinterpret_cast<fftw_complex *>(const_cast<MHDComplex*>(this->mpIn)), reinterpret_cast<fftw_complex *>(this->mpOut));
+      fftw_execute_dft(this->mPlan, reinterpret_cast<fftw_complex *>(const_cast<MHDComplex*>(mods.data())), reinterpret_cast<fftw_complex *>(phys.data()));
    }
 
-   void ComplexProjector::input(const MatrixZ& in) const
+   void ComplexProjector::input(MatrixZ& tmp, const MatrixZ& in) const
    {
-      this->mTmp.topRows(this->mPosN) = in.topRows(this->mPosN);
-      this->mTmp.bottomRows(this->mNegN) = in.bottomRows(this->mNegN);
+      tmp.topRows(this->mPosN) = in.topRows(this->mPosN);
+      tmp.bottomRows(this->mNegN) = in.bottomRows(this->mNegN);
 
-      this->forceConjugate(this->mTmp);
-      this->applyPadding(this->mTmp);
+      this->forceConjugate(tmp);
+      this->applyPadding(tmp);
    }
 
-   void ComplexProjector::inputMean(const MatrixZ& in) const
+   void ComplexProjector::inputMean(MatrixZ& tmp, const MatrixZ& in) const
    {
       // Initialize to zero
-      this->mTmp.setZero();
+      tmp.setZero();
 
       // Set the mean
       for(auto it = this->mMeanBlocks.cbegin(); it != this->mMeanBlocks.cend(); ++it)
       {
-         this->mTmp.block(0, it->first, 1, it->second) = in.block(0, it->first, 1, it->second);
+         tmp.block(0, it->first, 1, it->second) = in.block(0, it->first, 1, it->second);
       }
    }
 
-   void ComplexProjector::inputDiff(const MatrixZ& in, const int order, const MHDFloat scale) const
+   void ComplexProjector::inputDiff(MatrixZ& tmp, const MatrixZ& in, const int order, const MHDFloat scale) const
    {
       // Odd order is complex
       if(order%2 == 1)
       {
          MHDComplex sgn = std::pow(-1.0,((order-1)/2)%2)*Math::cI;
-         this->mTmp.topRows(this->mPosN) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*in.topRows(this->mPosN);
-         this->mTmp.bottomRows(this->mNegN) = (sgn*(scale*this->negativeK()).array().pow(order).matrix()).asDiagonal()*in.bottomRows(this->mNegN);
+         tmp.topRows(this->mPosN) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*in.topRows(this->mPosN);
+         tmp.bottomRows(this->mNegN) = (sgn*(scale*this->negativeK()).array().pow(order).matrix()).asDiagonal()*in.bottomRows(this->mNegN);
       } else
       {
          MHDFloat sgn = std::pow(-1.0,(order/2)%2);
-         this->mTmp.topRows(this->mPosN) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*in.topRows(this->mPosN);
-         this->mTmp.bottomRows(this->mNegN) = (sgn*(scale*this->negativeK()).array().pow(order).matrix()).asDiagonal()*in.bottomRows(this->mNegN);
+         tmp.topRows(this->mPosN) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*in.topRows(this->mPosN);
+         tmp.bottomRows(this->mNegN) = (sgn*(scale*this->negativeK()).array().pow(order).matrix()).asDiagonal()*in.bottomRows(this->mNegN);
       }
 
-      this->forceConjugate(this->mTmp);
-      this->applyPadding(this->mTmp);
+      this->forceConjugate(tmp);
+      this->applyPadding(tmp);
    }
 
-   void ComplexProjector::inputDiff2D(const MatrixZ& in, const std::vector<std::pair<int,int> >& orders, const MHDFloat scale, const MatrixI& idBlocks) const
+   void ComplexProjector::inputDiff2D(MatrixZ& tmp, const MatrixZ& in, const std::vector<std::pair<int,int> >& orders, const MHDFloat scale, const MatrixI& idBlocks) const
    {
       assert(idBlocks.rows() > 0);
       assert(this->mPosN + this->mNegN <= in.rows());
 
-      this->mTmp.topRows(this->mPosN).setZero();
-      this->mTmp.bottomRows(this->mNegN).setZero();
+      tmp.topRows(this->mPosN).setZero();
+      tmp.bottomRows(this->mNegN).setZero();
 
       bool isComplex;
       MHDFloat sgn;
@@ -183,12 +183,12 @@ namespace Fftw {
             // Split positive and negative frequencies
             if(isComplex)
             {
-               this->mTmp.block(0, start, this->mPosN, idBlocks(i,1)) += sZp.asDiagonal()*in.block(0, start, this->mPosN, idBlocks(i,1));
-               this->mTmp.block(negRow, start, this->mNegN, idBlocks(i,1)) += sZn.asDiagonal()*in.block(this->mPosN, start, this->mNegN, idBlocks(i,1));
+               tmp.block(0, start, this->mPosN, idBlocks(i,1)) += sZp.asDiagonal()*in.block(0, start, this->mPosN, idBlocks(i,1));
+               tmp.block(negRow, start, this->mNegN, idBlocks(i,1)) += sZn.asDiagonal()*in.block(this->mPosN, start, this->mNegN, idBlocks(i,1));
             } else
             {
-               this->mTmp.block(0, start, this->mPosN, idBlocks(i,1)) += (k*fp.array()).matrix().asDiagonal()*in.block(0, start, this->mPosN, idBlocks(i,1));
-               this->mTmp.block(negRow, start, this->mNegN, idBlocks(i,1)) += (k*fn.array()).matrix().asDiagonal()*in.block(this->mPosN, start, this->mNegN, idBlocks(i,1));
+               tmp.block(0, start, this->mPosN, idBlocks(i,1)) += (k*fp.array()).matrix().asDiagonal()*in.block(0, start, this->mPosN, idBlocks(i,1));
+               tmp.block(negRow, start, this->mNegN, idBlocks(i,1)) += (k*fn.array()).matrix().asDiagonal()*in.block(this->mPosN, start, this->mNegN, idBlocks(i,1));
             }
 
             // Increment block counter
@@ -196,8 +196,8 @@ namespace Fftw {
          }
       }
 
-      this->forceConjugate(this->mTmp);
-      this->applyPadding(this->mTmp);
+      this->forceConjugate(tmp);
+      this->applyPadding(tmp);
    }
 
    void ComplexProjector::forceConjugate(MatrixZ& rData) const

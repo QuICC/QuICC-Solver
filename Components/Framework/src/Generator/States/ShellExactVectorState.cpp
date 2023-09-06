@@ -37,10 +37,6 @@ namespace Equations {
    {
    }
 
-   ShellExactVectorState::~ShellExactVectorState()
-   {
-   }
-
    void ShellExactVectorState::setIdentity(const std::size_t name)
    {
       // Set the name
@@ -75,7 +71,6 @@ namespace Equations {
       spKernel->init(modes);
       this->setSrcKernel(compId, spKernel);
    }
-
 
    void ShellExactVectorState::setCoupling()
    {

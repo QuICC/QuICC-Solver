@@ -48,6 +48,16 @@ namespace PyQuICC {
          void enableGalerkin(const bool flag);
 
          /**
+          * @brief Enable split equation?
+          */
+         void enableSplitEquation(const bool flag);
+
+         /**
+          * @brief Enable linearized equation?
+          */
+         void enableLinearized(const bool flag);
+
+         /**
           * @brief Import the Python module
           */
          void import(const std::string& module);
@@ -98,6 +108,16 @@ namespace PyQuICC {
          PyObject* callMethod(PyObject* pArgs);
 
          /**
+          * @brief Fill array with data from Python call
+          */
+         void fillArray(Array& rArray, PyObject* pPyArray);
+
+         /**
+          * @brief Fill dense matrix with data from Python call
+          */
+         void fillMatrix(Matrix& rMatrix, PyObject* pPyMat);
+
+         /**
           * @brief Fill sparse matrix with data from Python call
           */
          void fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat);
@@ -106,16 +126,6 @@ namespace PyQuICC {
           * @brief Fill sparse matrix with data from Python call
           */
          void fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat);
-
-         /**
-          * @brief Fill dense matrix with data from Python call
-          */
-         void fillMatrix(Matrix& rMatrix, PyObject* pPyMat);
-
-         /**
-          * @brief Fill array with data from Python call
-          */
-         void fillArray(Array& rArray, PyObject* pPyArray);
   
          /**
           * @brief Cleanup wrapper

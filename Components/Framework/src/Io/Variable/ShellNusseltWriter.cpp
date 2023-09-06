@@ -22,8 +22,8 @@
 //
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Math/Constants.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Heating.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/Nusselt.hpp"
@@ -46,23 +46,24 @@ namespace Variable {
    void ShellNusseltWriter::init()
    {
       this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123);
+      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
 
       int m0, l0;
       if(this->mHasMOrdering)
       {
-         m0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         l0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0);
+         m0 = tRes.idx<Dimensions::Data::DAT3D>(0);
+         l0 = tRes.idx<Dimensions::Data::DAT2D>(0,0);
       } else
       {
-         l0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0);
-         m0 = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0);
+         l0 = tRes.idx<Dimensions::Data::DAT3D>(0);
+         m0 = tRes.idx<Dimensions::Data::DAT2D>(0,0);
       }
 
       // Look for l = 0, m = 0 mode
       if(m0 == 0 && l0 == 0)
       {
-         auto ro = this->mPhysical.find(NonDimensional::Upper1D::id())->second->value();
-         auto ri = this->mPhysical.find(NonDimensional::Lower1D::id())->second->value();
+         auto ro = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
+         auto ri = this->mPhysical.find(NonDimensional::Lower1d::id())->second->value();
          auto a = (ro - ri)/2.0;
 
          this->mBackground.resize(2);

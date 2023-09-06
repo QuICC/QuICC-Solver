@@ -45,28 +45,9 @@ namespace Parallel {
           * @param cpuFactors CPU factors
           * @param nFactors   Number of factors in factorisation
           * @param nCpu       Number of CPUs
+          * @param ignoreExtreme Ignore end members in factorization
           */
-         static void filterFactors(std::list<int>& cpuFactors, const int nFactors, const int nCpu);
-
-         /**
-          * @brief Compute a simple balanced split of the elements with regard to the given number of parts
-          *
-          * @param n0      Output start index
-          * @param nN      Output number of indexes
-          * @param tot     Total number of indexes
-          * @param parts   Number of parts to split total into
-          * @param id      ID of the CPU
-          */
-         static void balancedSplit(int &n0, int &nN, const int tot, const int parts, const int id);
-
-         /**
-          * @brief Extract splitting from mapped indexes
-          *
-          * @param mapped  Mapped indexes to extract from
-          * @param rIdx    Output storage to put the indexes in
-          * @param id      ID of the CPU
-          */
-         static void splitMapped(const std::multimap<int, int>& mapped, ArrayI &rIdx, const int id);
+         static void filterFactors(std::list<int>& cpuFactors, const int nFactors, const int nCpu, const bool ignoreExtreme);
 
          /**
           * @brief Convert ID to \f$F_{i}\f$ groupd ID
@@ -85,18 +66,24 @@ namespace Parallel {
           *
           * @param factors CPU factors
           * @param nCpu    Number of CPUs
+          * @param ignoreExtreme Ignore end members in factorization
           */
-         static bool confirmFactors(const ArrayI& factors, const int nCpu);
+         static bool confirmFactors(const std::vector<int>& factors, const int nCpu,  const bool ignoreExtreme);
+
+         /**
+          * @brief Maximum number of factors to test
+          */
+         static const int mcMaxDecompositions = 3;
 
          /**
           * @brief Constructor
           */
-         SplittingTools();
+         SplittingTools() = default;
 
          /**
           * @brief Destructor
           */
-         ~SplittingTools();
+         ~SplittingTools() = default;
    };
 
 }

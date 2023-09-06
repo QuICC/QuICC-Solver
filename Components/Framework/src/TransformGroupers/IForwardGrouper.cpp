@@ -33,6 +33,27 @@ namespace Transform {
    {
    }
 
+   int IForwardGrouper::packs1D(const TransformTree& tree)
+   {
+      int packs;
+      if(tree.depth() == 3)
+      {
+         packs = tree.nEdges(1);
+      } else
+      {
+         packs = tree.nEdges(0);
+      }
+
+      return packs;
+   }
+
+   int IForwardGrouper::packs2D(const TransformTree& tree)
+   {
+      int packs = tree.nEdges(0);
+
+      return packs;
+   }
+
    ArrayI IForwardGrouper::namePacks1D(const std::vector<TransformTree>& integratorTree)
    {
       // Create list of packet sizes
@@ -40,14 +61,7 @@ namespace Transform {
 
       for(auto treeIt = integratorTree.cbegin(); treeIt != integratorTree.cend(); ++treeIt)
       {
-         int counter;
-         if(treeIt->depth() == 3)
-         {
-            counter = treeIt->nEdges(1);
-         } else
-         {
-            counter = treeIt->nEdges(0);
-         }
+         int counter = this->packs1D(*treeIt);
          list.insert(counter);
 
          this->mNamedPacks1D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp<FieldComponents::Physical::Id>()), counter));
@@ -91,7 +105,7 @@ namespace Transform {
       // Loop over all edges
       for(auto treeIt = integratorTree.cbegin(); treeIt != integratorTree.cend(); ++treeIt)
       {
-         int counter = treeIt->nEdges(0);
+         int counter = this->packs2D(*treeIt);
          list.insert(counter);
 
          this->mNamedPacks2D.insert(std::make_pair(std::make_pair(treeIt->name(),treeIt->comp<FieldComponents::Physical::Id>()), counter));

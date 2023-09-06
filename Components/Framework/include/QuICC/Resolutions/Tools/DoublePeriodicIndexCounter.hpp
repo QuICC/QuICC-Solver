@@ -6,15 +6,9 @@
 #ifndef QUICC_DOUBLEPERIODICINDEXCOUNTER_HPP
 #define QUICC_DOUBLEPERIODICINDEXCOUNTER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -38,7 +32,7 @@ namespace QuICC {
          /**
           * @brief Empty destructor
           */
-         ~DoublePeriodicIndexCounter();
+         ~DoublePeriodicIndexCounter() = default;
 
          /**
           * @brief Reorder dimensions from fast to slow
@@ -47,7 +41,7 @@ namespace QuICC {
           *
           * @param spaceId Spacial the resolution represent
           */
-         virtual ArrayI orderedDimensions(const Dimensions::Space::Id spaceId) const;
+         ArrayI orderedDimensions(const Dimensions::Space::Id spaceId) const final;
 
          /**
           * @brief Reorder dimensions from fast to slow
@@ -57,17 +51,17 @@ namespace QuICC {
           * @param dims    Array of dimensions to reorder (1D, 2D, 3D, ...)
           * @param spaceId Spacial the resolution represent
           */
-         virtual ArrayI orderedDimensions(const ArrayI& dims, const Dimensions::Space::Id spaceId) const;
+         ArrayI orderedDimensions(const ArrayI& dims, const Dimensions::Space::Id spaceId) const final;
 
          /**
           * @brief Compute the offsets for the local modes
           */
-         virtual void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const;
+         void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const final;
 
          /**
           * @brief Compute the offsets for the local modes by comparing to a reference simulation
           */
-         virtual void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const;
+         void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const final;
          
       protected:
 
@@ -78,6 +72,6 @@ namespace QuICC {
    /// Typedef for an smart reference counting pointer for a DoublePeriodicIndexCounter
    typedef std::shared_ptr<DoublePeriodicIndexCounter>   SharedDoublePeriodicIndexCounter;
 
-}
+} // QuICC
 
 #endif // QUICC_DOUBLEPERIODICINDEXCOUNTER_HPP

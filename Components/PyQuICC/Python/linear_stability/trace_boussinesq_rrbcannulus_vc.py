@@ -12,18 +12,18 @@ model.use_galerkin = False
 
 ## Set resolution, parameters, boundary conditions
 #res = [14, 0, 14]
-#eq_params = {'prandtl':7, 'rayleigh':3.440597e4, 'taylor':1e6, 'ro':2.0, 'rratio':0.75, 'scale3d':2.0}
+#eq_params = {'prandtl':7, 'rayleigh':3.440597e4, 'taylor':1e6, 'ro':2.0, 'r_ratio':0.75, 'scale3d':2.0}
 #eigs = [0]
-#eq_params = {'prandtl':7, 'rayleigh':3.56674e4, 'taylor':1e6, 'ro':2.0, 'rratio':0.75, 'scale3d':2.0}
-#eq_params = {'prandtl':1, 'rayleigh':3.5e6, 'taylor':1e10, 'ro':1.0, 'rratio':0.35, 'scale3d':2.0}
-#eq_params = {'prandtl':1, 'rayleigh':5e4, 'taylor':1e6, 'ro':1.0, 'rratio':0.35, 'scale3d':2.0}
+#eq_params = {'prandtl':7, 'rayleigh':3.56674e4, 'taylor':1e6, 'ro':2.0, 'r_ratio':0.75, 'scale3d':2.0}
+#eq_params = {'prandtl':1, 'rayleigh':3.5e6, 'taylor':1e10, 'ro':1.0, 'r_ratio':0.35, 'scale3d':2.0}
+#eq_params = {'prandtl':1, 'rayleigh':5e4, 'taylor':1e6, 'ro':1.0, 'r_ratio':0.35, 'scale3d':2.0}
 bc_vel = 0 # 0: NS/NS, 1: SF/SF, 2: SF/NS, 3: SF/NS
 bc_temp = 2 # 0: FT/FT, 1: FF/FF, 2: FF/FT, 3: FT/FF
 
 # Create parameters
 m = 7 
 res = [64, 0, 64]
-eq_params = {'taylor':1e6, 'prandtl':1, 'rayleigh':6e3, 'ro':1.0, 'rratio':0.35, 'scale3d':2.0}
+eq_params = {'taylor':1e6, 'prandtl':1, 'rayleigh':6e3, 'ro':1.0, 'r_ratio':0.35, 'scale3d':2.0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 
 # Wave number function from single "index" (k perpendicular)

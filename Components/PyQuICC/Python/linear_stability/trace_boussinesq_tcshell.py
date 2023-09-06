@@ -14,22 +14,22 @@ model.use_galerkin = False
 #res = [64, 0, 0]
 #bc_vel = 0 # 0: NS/NS
 #bc_temp = 0 # 0: FT/FT
-#l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.2, 'heating':0}
-#l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.3, 'heating':0}
-#l = 3; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.4, 'heating':0}
-#l = 4; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.5, 'heating':0}
-#l = 6; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.6, 'heating':0}
-#l = 14; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.8, 'heating':0}
+#l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.2, 'heating':0}
+#l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.3, 'heating':0}
+#l = 3; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.4, 'heating':0}
+#l = 4; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.5, 'heating':0}
+#l = 6; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.6, 'heating':0}
+#l = 14; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.8, 'heating':0}
 
 res = [64, 0, 0]
 bc_vel = 1 # SF/SF
 bc_temp = 0 # 0: FT/FT
-#l = 1; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.2, 'heating':0}
-#l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.3, 'heating':0}
-#l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.4, 'heating':0}
-#l = 3; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.5, 'heating':0}
-#l = 4; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.6, 'heating':0}
-l = 10; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'rratio':0.8, 'heating':0}
+#l = 1; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.2, 'heating':0}
+#l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.3, 'heating':0}
+#l = 2; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.4, 'heating':0}
+#l = 3; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.5, 'heating':0}
+#l = 4; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.6, 'heating':0}
+l = 10; eq_params = {'prandtl':1, 'rayleigh':3.0468e4, 'ro':1, 'r_ratio':0.8, 'heating':0}
 
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel, 'temperature':bc_temp}
 

@@ -1,26 +1,2 @@
-set(QUICC_CURRENT_COMPONENT_LIB gitHash)
-
-set(HASH_FILE "gitHash.hpp")
-
-include(gitUtils/SetGitHash)
-SetGitHash(${HASH_FILE} COMPONENT Framework)
-
-add_library(${QUICC_CURRENT_COMPONENT_LIB} INTERFACE)
-target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
-  INTERFACE
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"  )
-add_dependencies(${QUICC_CURRENT_COMPONENT_LIB} AlwaysCheckGit)
-
-# Alias
-add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}
-  ALIAS ${QUICC_CURRENT_COMPONENT_LIB})
-
-# Export info
-quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
-  COMPONENT ${QUICC_CURRENT_COMPONENT_LIB}
-  DIRECTORIES
-    ${CMAKE_CURRENT_BINARY_DIR}
-  FILES_MATCHING_PATTERN "*.hpp"
-    )
-
+include(gitUtils/AddGitHashLib)
+AddGitHashLib(NAMESPACE Framework)

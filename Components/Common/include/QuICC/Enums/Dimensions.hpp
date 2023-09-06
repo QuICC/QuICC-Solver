@@ -36,6 +36,8 @@ namespace Dimensions {
          TRA2D,
          /// Third transform space
          TRA3D,
+         /// Spectral space
+         SPECTRAL,
       };
    };
 

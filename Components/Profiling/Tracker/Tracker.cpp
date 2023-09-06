@@ -18,7 +18,7 @@
 #endif
 
 #include "PeakRss.hpp"
-#include "gitHash.hpp"
+#include "Framework/gitHash.hpp"
 
 namespace QuICC {
 namespace Profiler {
@@ -65,6 +65,13 @@ void Tracker::stop(const std::string& regionName)
 
     auto count = std::get<tracking::count>(reg->second);
     // time
+    #if defined __NVCC__
+    // sync cuda kernel
+    // WARNING
+    // this does not allow for kernel overlap
+    // to be substituted with cudaEventCreate/Record/Sync/Elapsed
+    cudaDeviceSynchronize();
+    #endif
     auto id = count % collectSize;
     std::get<tracking::time>(reg->second)[id] =
         std::get<tracking::timTracker>(reg->second).time();
@@ -83,6 +90,11 @@ void Tracker::stop(const std::string& regionName)
 Tracker::tracking_t Tracker::get(const std::string& regionName)
 {
     auto reg = mRegions.find(regionName);
+    if (reg == mRegions.end())
+    {
+        // not found return object set to zero
+        return Tracker::tracking_t{};
+    }
     return reg->second;
 }
 
@@ -114,9 +126,13 @@ void Tracker::print_hdf5()
     std::vector<size_t> dimScalar(1);
     dimScalar[0] = std::size_t(1);
     DataSet dataRanks = gi.createDataSet<int>("ranks", DataSpace(dimScalar));
-    dataRanks.write(nRanks);
     DataSet dataCommit = gi.createDataSet<char[10]>("git-commit", DataSpace(dimScalar));
-    dataCommit.write(Framework::gitHash);
+
+    if (rank == 0)
+    {
+        dataRanks.write(nRanks);
+        dataCommit.write(Framework::gitHash);
+    }
 
     // Write timings
     auto gT = file.createGroup("timings");
@@ -128,13 +144,17 @@ void Tracker::print_hdf5()
 
         // scalars
         auto gR = gT.createGroup(reg->first);
-        gR.createDataSet<std::uint32_t>("count", DataSpace::From(count)).write(count);
-        gR.createDataSet<std::uint32_t>("sampleSize", DataSpace::From(sampleSize))
-            .write(sampleSize);
-        gR.createDataSet<double>("memory", DataSpace::From(dimScalar))
-            .write(&std::get<tracking::memory>(reg->second));
-        gR.createDataSet<double>("memoryDelta", DataSpace::From(dimScalar))
-            .write(&std::get<tracking::memoryDelta>(reg->second));
+        DataSet dataCount = gR.createDataSet<std::uint32_t>("count", DataSpace::From(count));
+        DataSet dataSampleSize = gR.createDataSet<std::uint32_t>("sampleSize", DataSpace::From(sampleSize));
+        DataSet dataMemory = gR.createDataSet<double>("memory", DataSpace::From(dimScalar));
+        DataSet dataMemoryDelta = gR.createDataSet<double>("memoryDelta", DataSpace::From(dimScalar));
+        if (rank == 0)
+        {
+            dataCount.write(count);
+            dataSampleSize.write(sampleSize);
+            dataMemory.write(&std::get<tracking::memory>(reg->second));
+            dataMemoryDelta.write(&std::get<tracking::memoryDelta>(reg->second));
+        }
 
         // timings
         std::vector<size_t> dimSample = {nRanks*sampleSize};
@@ -142,19 +162,23 @@ void Tracker::print_hdf5()
             .select({std::size_t(rank)*sampleSize}, {sampleSize})
             .write(std::get<tracking::time>(reg->second).data());
 
+        #if QUICC_MPI
         // wait for everyone to be done
         MPI_Barrier(mComm);
+        #endif
     }
 #endif
 }
 
-#ifdef QUICC_MPI
 void Tracker::print(std::ostream& os)
 {
 
-    int rank, nRanks;
+    int rank = 0;
+    #ifdef QUICC_MPI
+    int nRanks = 1;
     MPI_Comm_rank(mComm, &rank);
     MPI_Comm_size(mComm, &nRanks);
+    #endif
 
     for (auto reg = mRegions.begin(); reg != mRegions.end(); ++reg)
     {
@@ -181,6 +205,9 @@ void Tracker::print(std::ostream& os)
         data[tracking::memory] = std::get<tracking::memory>(reg->second);
         data[tracking::memoryDelta] = std::get<tracking::memoryDelta>(reg->second);
         data[tracking::time] = timeMin;
+
+        #ifdef QUICC_MPI
+        // reduce across processes
         MPI_Reduce(data.data(), data_min.data(), stat_size, MPI_DOUBLE, MPI_MIN, 0, mComm);
         data[tracking::time] = timeMax;
         MPI_Reduce(data.data(), data_max.data(), stat_size, MPI_DOUBLE, MPI_MAX, 0, mComm);
@@ -190,12 +217,20 @@ void Tracker::print(std::ostream& os)
         {
             d /= nRanks;
         }
+        #else
+        // serial case
+        data_avg[tracking::memory] = data[tracking::memory];
+        data_avg[tracking::memoryDelta] = data[tracking::memoryDelta];
+        data_min[tracking::time] = timeMin;
+        data_max[tracking::time] = timeMax;
+        data_avg[tracking::time] = timeAvg;
+        #endif
 
         if (rank == 0)
         {
             os << reg->first
                 << '\t' << std::get<tracking::count>(reg->second) << " times\n"
-                << "\t stats by rank                         min             max             avg\n"
+                << "\t stats                                 min             max             avg\n"
                 << "\t high watermark memory (MB):"
                 << '\t' << std::setw(10) << data_min[tracking::memory]
                 << '\t' << std::setw(10) << data_max[tracking::memory]
@@ -214,35 +249,6 @@ void Tracker::print(std::ostream& os)
         }
     }
 }
-#else
-void Tracker::print(std::ostream& os)
-{
-    for (auto reg = mRegions.begin(); reg != mRegions.end(); ++reg)
-    {
-        // average time
-        auto count = std::get<tracking::count>(reg->second);
-        auto sampleSize = (count > collectSize) ? collectSize : count;
-        double timeAvg{};
-        for (std::size_t i = 0; i < sampleSize; ++i)
-        {
-            timeAvg += std::get<tracking::time>(reg->second)[i];
-        }
-        timeAvg /= sampleSize;
-
-        os << reg->first
-            << '\t' << std::get<tracking::count>(reg->second) << " times\n"
-            << "\t high watermark memory (MB):"
-            << '\t' << std::setw(10) << std::get<tracking::memory>(reg->second)
-            << '\n'
-            << "\t memory delta (MB)         :"
-            << '\t' << std::setw(10) << std::get<tracking::memoryDelta>(reg->second)
-            << '\n'
-            << "\t time (s)                  :"
-            << '\t' << std::setw(10) << timeAvg
-            << '\n';
-    }
-}
-#endif
 
 // static members init
 std::map<std::string, Tracker::tracking_t>

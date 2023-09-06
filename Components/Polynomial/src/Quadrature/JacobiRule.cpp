@@ -7,10 +7,7 @@
 //
 #include <iostream>
 
-// External includes
-//
-
-// Class include
+// Project includes
 //
 #include "QuICC/Polynomial/Quadrature/JacobiRule.hpp"
 #include "QuICC/Polynomial/Quadrature/PrueferAlgorithm.hpp"
@@ -18,9 +15,6 @@
 #include "QuICC/Polynomial/Jacobi/dPnab.hpp"
 #include "QuICC/Polynomial/Jacobi/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Jacobi/JacobiAsymptotic.hpp"
-
-// Project includes
-//
 
 namespace QuICC {
 
@@ -124,7 +118,7 @@ namespace Quadrature {
       else
       {
          std::array<MHDFloat,2> vals{};
-         constexpr std::uint32_t bndSize = 10;
+         constexpr int bndSize = 10;
 
          auto epsilon = std::numeric_limits<MHDFloat>::epsilon();
          static constexpr std::uint32_t ulp = 4;

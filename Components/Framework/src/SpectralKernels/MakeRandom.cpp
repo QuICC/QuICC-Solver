@@ -15,6 +15,7 @@
 
 // Class include
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/SpectralKernels/MakeRandom.hpp"
 
 // Project includes
@@ -147,6 +148,7 @@ namespace Kernel {
       // Initalize to zero
       val = T(0.0);
 
+      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       if(this->res().sim().ss().dimension() == 3)
       {
          // Get first dimension
@@ -157,8 +159,8 @@ namespace Kernel {
          const int n3D = this->res().sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
          // Get simulation wide indexes
-         int j_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k);
-         int k_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+         int j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
+         int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
 
          const int z1D = this->mZeros.at(0);
          int z2D = this->mZeros.at(1);
@@ -202,7 +204,7 @@ namespace Kernel {
          const int n2D = this->res().sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
 
          // Get simulation wide indexes
-         int j_ = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j);
+         int j_ = tRes.idx<Dimensions::Data::DAT2D>(j);
 
          const int z1D = this->mZeros.at(0);
          const int z2D = this->mZeros.at(1);
@@ -249,23 +251,24 @@ namespace Kernel {
 
    void MakeRandom::constrain(MHDComplex& val, const int i, const int j, const int k) const
    {
+      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       // Force real value for k = 0 Fourier modes
       if(this->res().sim().ss().has(SpatialScheme::Feature::FourierIndex3))
       {
-         if(this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
+         if(tRes.idx<Dimensions::Data::DAT3D>(k) == 0)
          {
             val.imag(0.0);
          }
       // Force real value for k = 0
       } else if(this->res().sim().ss().has(SpatialScheme::Feature::FourierIndex23))
       {
-         if(this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k) == 0 && this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) != 0)
+         if(tRes.idx<Dimensions::Data::DAT2D>(j,k) == 0 && tRes.idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             unsigned int seed = 2;
-            seed += this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DATF1D>(i,k);
+            seed += tRes.idx<Dimensions::Data::DATF1D>(i,k);
 
-            int n2D = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>();
-            int k2D = this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+            int n2D = tRes.dim<Dimensions::Data::DAT3D>();
+            int k2D = tRes.idx<Dimensions::Data::DAT3D>(k);
             if(k2D < n2D/2)
             {
                seed += k2D;
@@ -286,13 +289,13 @@ namespace Kernel {
                val.imag(-tmp);
             }
 
-         } else if(this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
+         } else if(tRes.idx<Dimensions::Data::DAT3D>(k) == 0)
          {
             val.imag(0.0);
          }
       } else if(this->res().sim().ss().has(SpatialScheme::Feature::FourierIndex2))
       {
-         if(this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k) == 0)
+         if(tRes.idx<Dimensions::Data::DAT2D>(j, k) == 0)
          {
             val.imag(0.0);
          }
@@ -301,7 +304,7 @@ namespace Kernel {
       // Assume spherical harmonic for shell and shere
       if(this->res().sim().ss().has(SpatialScheme::Feature::SphereGeometry) || this->res().sim().ss().has(SpatialScheme::Feature::SphereGeometry))
       {
-         if(this->res().cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k) == 0)
+         if(tRes.idx<Dimensions::Data::DAT3D>(k) == 0)
          {
             val = 0.0;
          }

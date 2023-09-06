@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SplittingAlgorithm.cpp
  * @brief Source of the base of the implementation of the load splitting algorithms
  */
@@ -28,6 +28,7 @@
 // Project includes
 //
 #include "QuICC/QuICCEnv.hpp"
+#include "QuICC/Enums/DimensionTools.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingTools.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
@@ -38,10 +39,6 @@ namespace Parallel {
 
    SplittingAlgorithm::SplittingAlgorithm(const int id, const int nCpu, const ArrayI& dim, const Splitting::Algorithms::Id algo)
       : mAlgo(algo), mGrouper(Splitting::Groupers::EQUATION), mId(id), mNCpu(nCpu), mDims(dim.size()), mSimDim(dim)
-   {
-   }
-
-   SplittingAlgorithm::~SplittingAlgorithm()
    {
    }
 
@@ -66,6 +63,25 @@ namespace Parallel {
       assert(i < this->mFactors.size());
 
       return this->mFactors(i);
+   }
+
+   void SplittingAlgorithm::useFactorization(const std::list<int>& f)
+   {
+      // Use imposed factors is not empty
+      if(f.size() > 0)
+      {
+         // Check size
+         if(f.size() % this->mFactors.size() != 0)
+         {
+            throw std::logic_error("List of factors is not compatible");
+         }
+
+         this->mNCpuFactors.clear();
+         this->mNCpuFactors = f;
+
+         // Check factorization
+         SplittingTools::filterFactors(this->mNCpuFactors, this->mFactors.size(), this->nCpu(), false);
+      }
    }
 
    const ArrayI& SplittingAlgorithm::factors() const
@@ -128,9 +144,8 @@ namespace Parallel {
                break;
             }
 
-            #ifdef QUICC_DEBUG
-               descr.vtpFiles.at(j)->representResolution(spTRes, id);
-            #endif //QUICC_DEBUG
+            // Add stage to description
+            descr.addStage(j, spTRes, id);
 
             // Clear unused indexes for remote resolutions
             if(id != this->id())
@@ -147,8 +162,31 @@ namespace Parallel {
             break;
          }
 
+         // Create spectral resolution
+         SharedTransformResolution  spSpectralRes = this->splitDimension(Dimensions::Transform::SPECTRAL, id, status);
+
+         QuICCEnv().synchronize();
+         #ifdef QUICC_MPI
+            MPI_Allreduce(MPI_IN_PLACE, &status, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+         #endif //QUICC_MPI
+
+         // Splitting fail, abort
+         if(status != 0)
+         {
+            break;
+         }
+
+         // Add stage to description
+         descr.addStage(static_cast<int>(Dimensions::Transform::SPECTRAL), spSpectralRes, id);
+
+         // Clear unused indexes for remote resolutions
+         if(id != this->id())
+         {
+            spSpectralRes->clearIndexes();
+         }
+
          // Create new shared core resolution
-         coreRes.push_back(std::make_shared<CoreResolution>(transformRes));
+         coreRes.push_back(std::make_shared<CoreResolution>(transformRes, spSpectralRes));
       }
 
       stage.done();
@@ -184,7 +222,7 @@ namespace Parallel {
       descr.dims = this->mDims;
       descr.factors = this->mFactors;
       descr.score = score;
-      descr.structure = std::vector<std::multimap<int,int> >();
+      descr.structure = std::map<Dimensions::Transform::Id, std::multimap<int,int> >();
 
       stage.done();
 
@@ -201,7 +239,7 @@ namespace Parallel {
       SplittingTools::factorizeNCpu(this->mNCpuFactors, nFactors, this->nCpu());
 
       // Filter the factors
-      SplittingTools::filterFactors(this->mNCpuFactors, nFactors, this->nCpu());
+      SplittingTools::filterFactors(this->mNCpuFactors, nFactors, this->nCpu(), true);
    }
 
    bool SplittingAlgorithm::useNextFactors()
@@ -355,15 +393,10 @@ namespace Parallel {
       return score;
    }
 
-   void SplittingAlgorithm::buildCommunicationStructure(const int localId, SharedResolution spRes, std::vector<std::multimap<int,int> >& commStructure)
+   void SplittingAlgorithm::buildCommunicationStructure(const int localId, SharedResolution spRes, std::map<Dimensions::Transform::Id,std::multimap<int,int> >& commStructure)
    {
-      #ifdef QUICC_MPI
-         // MPI error code
-         int ierr;
-      #endif // QUICC_MPI
-
       // Clear the communication structure
-      std::vector<std::multimap<int,int> >().swap(commStructure);
+      std::map<Dimensions::Transform::Id,std::multimap<int,int> >().swap(commStructure);
 
       Dimensions::Transform::Id dimId;
       int i_;
@@ -391,25 +424,27 @@ namespace Parallel {
          // Position iterator for insert calls
          std::set<Coordinate>::iterator   mapPos;
 
-         // Loop over possible data exchanges 
-         for(int ex = 0; ex < spRes->cpu(0)->nDim()-1; ex++)
+         // Loop over possible data exchanges
+         std::vector<Dimensions::Transform::Id> exchanges = {Dimensions::Transform::TRA1D};
+         for(auto exId: exchanges)
          {
             // Create storage for structure
-            commStructure.push_back(std::multimap<int,int>());
+            commStructure.emplace(exId,std::multimap<int,int>());
 
             // initialise the position hint for inserts
             mapPos = bwdMap.begin();
 
-            dimId = static_cast<Dimensions::Transform::Id>(ex+1);
+            dimId = Dimensions::jump(exId,1);
+            const auto& bwdTRes = *spRes->cpu()->dim(dimId);
             // Loop over second dimension
-            for(int j = 0; j < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DAT2D>(); j++)
+            for(int j = 0; j < bwdTRes.dim<Dimensions::Data::DAT2D>(); j++)
             {
-               j_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DAT2D>(j);
+               j_ = bwdTRes.idx<Dimensions::Data::DAT2D>(j);
 
                // Loop over backward dimension
-               for(int i = 0; i < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DATB1D>(); i++)
+               for(int i = 0; i < bwdTRes.dim<Dimensions::Data::DATB1D>(); i++)
                {
-                  i_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DATB1D>(i);
+                  i_ = bwdTRes.idx<Dimensions::Data::DATB1D>(i);
 
                   // Generate point information
                   point = spRes->counter().makeKey(dimId, i_, j_);
@@ -424,7 +459,8 @@ namespace Parallel {
             int matched = 0;
             int toMatch = -1;
             std::set<std::pair<int,int> > filter;
-            dimId = static_cast<Dimensions::Transform::Id>(ex);
+            dimId = exId;
+            const auto& fwdTRes = *spRes->cpu()->dim(dimId);
             for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
             {
                matched = 0;
@@ -433,14 +469,14 @@ namespace Parallel {
                if(cpu == localId)
                {
                   // Loop over second dimension
-                  for(int j = 0; j < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DAT2D>(); j++)
+                  for(int j = 0; j < fwdTRes.dim<Dimensions::Data::DAT2D>(); j++)
                   {
-                     j_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DAT2D>(j);
+                     j_ = fwdTRes.idx<Dimensions::Data::DAT2D>(j);
 
                      // Loop over forward dimension
-                     for(int i = 0; i < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DATF1D>(); i++)
+                     for(int i = 0; i < fwdTRes.dim<Dimensions::Data::DATF1D>(); i++)
                      {
-                        i_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DATF1D>(i);
+                        i_ = fwdTRes.idx<Dimensions::Data::DATF1D>(i);
 
                         // Generate point information
                         point = spRes->counter().makeKey(dimId, i_, j_);
@@ -479,7 +515,7 @@ namespace Parallel {
 
                   // Broadcast size
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  int ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 711);
 
                   // Broadcast data
@@ -487,18 +523,18 @@ namespace Parallel {
                   ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
                   QuICCEnv().check(ierr, 712);
 
-               // Remote CPU   
+               // Remote CPU
                } else
                {
                   // Get size
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  int ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 713);
 
                   // Get remote keys as matrix
                   matRemote.resize(2, toMatch);
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 714);
 
                   // Compare received data to stored indexes
@@ -531,7 +567,7 @@ namespace Parallel {
             #ifdef QUICC_MPI
                // Gather total number of match entries
                QuICCEnv().synchronize();
-               ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+               int ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
                QuICCEnv().check(ierr, 715);
             #endif // QUICC_MPI
 
@@ -567,7 +603,7 @@ namespace Parallel {
 
                      // Get remote keys as matrix
                      QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                      QuICCEnv().check(ierr, 717);
 
                   } else
@@ -580,7 +616,7 @@ namespace Parallel {
                      // Get remote keys as matrix
                      matRemote.resize(2, filterSize);
                      QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                      QuICCEnv().check(ierr, 719);
 
                      for(int i = 0; i < filterSize; ++i)
@@ -594,7 +630,7 @@ namespace Parallel {
             // Store obtained minimized structure
             for(auto filIt = filter.begin(); filIt != filter.end(); filIt++)
             {
-               commStructure.at(ex).insert(*filIt);
+               commStructure.at(exId).insert(*filIt);
             }
 
             // Clear all the data for next loop
@@ -618,30 +654,32 @@ namespace Parallel {
          // Position iterator for insert calls
          std::set<Coordinate>::iterator   mapPos;
 
-         // Loop over possible data exchanges 
-         for(int ex = 0; ex < spRes->cpu(0)->nDim()-1; ex++)
+         // Loop over possible data exchanges
+         std::vector<Dimensions::Transform::Id> exchanges = {Dimensions::Transform::TRA1D,Dimensions::Transform::TRA2D,Dimensions::Transform::SPECTRAL};
+         for(auto exId: exchanges)
          {
             // Create storage for structure
-            commStructure.push_back(std::multimap<int,int>());
+            commStructure.emplace(exId, std::multimap<int,int>());
 
             // initialise the position hint for inserts
             mapPos = bwdMap.begin();
 
-            dimId = static_cast<Dimensions::Transform::Id>(ex+1);
+            dimId = Dimensions::jump(exId, 1);
+            const auto& fwdTRes = *spRes->cpu()->dim(dimId);
             // Loop over third dimension
-            for(int k = 0; k < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DAT3D>(); k++)
+            for(int k = 0; k < fwdTRes.dim<Dimensions::Data::DAT3D>(); k++)
             {
-               k_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DAT3D>(k);
+               k_ = fwdTRes.idx<Dimensions::Data::DAT3D>(k);
 
                // Loop over second dimension
-               for(int j = 0; j < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DAT2D>(k); j++)
+               for(int j = 0; j < fwdTRes.dim<Dimensions::Data::DAT2D>(k); j++)
                {
-                  j_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DAT2D>(j,k);
+                  j_ = fwdTRes.idx<Dimensions::Data::DAT2D>(j,k);
 
                   // Loop over backward dimension
-                  for(int i = 0; i < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DATB1D>(k); i++)
+                  for(int i = 0; i < fwdTRes.dim<Dimensions::Data::DATB1D>(k); i++)
                   {
-                     i_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DATB1D>(i,k);
+                     i_ = fwdTRes.idx<Dimensions::Data::DATB1D>(i,k);
 
                      // Generate point information
                      point = spRes->counter().makeKey(dimId, i_, j_, k_);
@@ -657,7 +695,8 @@ namespace Parallel {
             int matched = 0;
             int toMatch = -1;
             std::set<std::pair<int,int> > filter;
-            dimId = static_cast<Dimensions::Transform::Id>(ex);
+            dimId = exId;
+            const auto& bwdTRes = *spRes->cpu()->dim(dimId);
             for(int cpu = 0; cpu < spRes->nCpu(); cpu++)
             {
                matched = 0;
@@ -666,19 +705,19 @@ namespace Parallel {
                if(cpu == localId)
                {
                   // Loop over third dimension
-                  for(int k = 0; k < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DAT3D>(); k++)
+                  for(int k = 0; k < bwdTRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
-                     k_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DAT3D>(k);
+                     k_ = bwdTRes.idx<Dimensions::Data::DAT3D>(k);
 
                      // Loop over second dimension
-                     for(int j = 0; j < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DAT2D>(k); j++)
+                     for(int j = 0; j < bwdTRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
-                        j_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DAT2D>(j,k);
+                        j_ = bwdTRes.idx<Dimensions::Data::DAT2D>(j,k);
 
                         // Loop over forward dimension
-                        for(int i = 0; i < spRes->cpu()->dim(dimId)->dim<Dimensions::Data::DATF1D>(k); i++)
+                        for(int i = 0; i < bwdTRes.dim<Dimensions::Data::DATF1D>(k); i++)
                         {
-                           i_ = spRes->cpu()->dim(dimId)->idx<Dimensions::Data::DATF1D>(i,k);
+                           i_ = bwdTRes.idx<Dimensions::Data::DATF1D>(i,k);
 
                            // Generate point information
                            point = spRes->counter().makeKey(dimId, i_, j_, k_);
@@ -719,26 +758,26 @@ namespace Parallel {
 
                   // Broadcast size
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  int ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 720);
 
                   // Broadcast data
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 721);
 
-               // Remote CPU   
+               // Remote CPU
                } else
                {
                   // Get size
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  int ierr = MPI_Bcast(&toMatch, 1, MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 722);
 
                   // Get remote keys as matrix
                   matRemote.resize(3, toMatch);
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 723);
 
                   // Compare received data to stored indexes
@@ -771,7 +810,7 @@ namespace Parallel {
             #ifdef QUICC_MPI
                // Gather total number of match entries
                QuICCEnv().synchronize();
-               ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+               int ierr = MPI_Allreduce(MPI_IN_PLACE, &matched, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
                QuICCEnv().check(ierr, 724);
             #endif // QUICC_MPI
 
@@ -807,7 +846,7 @@ namespace Parallel {
 
                      // Get remote keys as matrix
                      QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(locFilter.data(), locFilter.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                      QuICCEnv().check(ierr, 726);
 
                   } else
@@ -820,7 +859,7 @@ namespace Parallel {
                      // Get remote keys as matrix
                      matRemote.resize(2, filterSize);
                      QuICCEnv().synchronize();
-                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                     ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                      QuICCEnv().check(ierr, 728);
 
                      for(int i = 0; i < filterSize; ++i)
@@ -832,9 +871,9 @@ namespace Parallel {
             #endif // QUICC_MPI
 
             // Store obtained minimized structure
-            for(auto filIt = filter.begin(); filIt != filter.end(); filIt++)
+            for(auto&& fId: filter)
             {
-               commStructure.at(ex).insert(*filIt);
+               commStructure.at(exId).insert(fId);
             }
 
             // Clear all the data for next loop

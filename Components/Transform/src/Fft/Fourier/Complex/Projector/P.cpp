@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Fourier/Complex/Projector/P.hpp"
+#include "QuICC/Transform/Fft/Fourier/Complex/Projector/PBase.hpp"
 
 // Pect includes
 //
@@ -29,23 +29,9 @@ namespace Complex {
 
 namespace Projector {
 
-   P::P()
+   void P<base_t>::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
    {
-   }
-
-   P::~P()
-   {
-   }
-
-   void P::applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const
-   {
-      this->mBackend.input(in);
-
-      this->mBackend.output(rOut.data());
-   }
-
-   void P::applyPostOperator(MatrixZ&) const
-   {
+      this->mBackend.input(tmp, in);
    }
 
 }

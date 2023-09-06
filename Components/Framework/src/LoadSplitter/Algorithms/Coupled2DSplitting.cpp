@@ -48,14 +48,9 @@ namespace Parallel {
 
    SharedTransformResolution  Coupled2DSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status)
    {
-      // Get size of the splittable dimension(s)
-      int tot = this->mspScheme->splittableTotal(transId, Splitting::Locations::COUPLED2D);
-
       // Build a simple balanced split
-      ArrayI ids(1);
-      ArrayI n0(1);
-      ArrayI nN(1);
-      SplittingTools::balancedSplit(n0(0), nN(0), tot, this->factor(0), cpuId);
+      std::vector<int > ids = {0,0};
+      std::vector<int > bins = {1,1};
 
       // Storage for the forward 1D indexes
       std::vector<ArrayI>  fwd1D;
@@ -67,8 +62,9 @@ namespace Parallel {
       ArrayI  idx3D;
 
       // Compute the indexes
-      ids(0) = cpuId;
-      status = this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, this->factors(), n0, nN, Splitting::Locations::COUPLED2D);
+      ids.at(0) = cpuId;
+      bins.at(0) = this->factors()(0);
+      status = this->mspScheme->fillIndexes(transId, fwd1D, bwd1D, idx2D, idx3D, ids, bins);
 
       // Create TransformResolution object
       auto spTraRes = std::make_shared<TransformResolution>(fwd1D, bwd1D, idx2D, idx3D);

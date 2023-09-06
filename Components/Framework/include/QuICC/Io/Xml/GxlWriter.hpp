@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Xml/IXmlWriter.hpp"
@@ -59,7 +60,7 @@ namespace Xml {
          /**
           * @brief Create communication graph
           */
-         void graphCommunication(const std::vector<std::multimap<int,int> >& structure);
+         void graphCommunication(const std::map<Dimensions::Transform::Id,std::multimap<int,int> >& structure);
 
          /**
           * @brief Create transform path graph

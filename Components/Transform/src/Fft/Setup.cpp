@@ -47,7 +47,6 @@ namespace Fft {
          // Safety assert
          assert(this->mBwdSize >= this->mSpecSize);
          assert(this->mFwdSize >= this->mBwdSize);
-         assert(this->mBoxScale != -4242);
 
          TransformSetup::lock();
       }

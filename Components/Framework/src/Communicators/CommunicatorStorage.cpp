@@ -45,7 +45,7 @@ namespace Parallel {
    {
       this->mStorages.insert(std::make_pair(id,StorageType()));
 
-      if(static_cast<int>(id) > static_cast<int>(this->mLastStorageId))
+      if(id != Dimensions::Transform::SPECTRAL && static_cast<int>(id) > static_cast<int>(this->mLastStorageId))
       {
          this->mLastStorageId = id;
       }

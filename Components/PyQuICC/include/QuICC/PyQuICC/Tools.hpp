@@ -119,6 +119,26 @@ namespace PyQuICC {
          static void getDict(std::map<std::string,MHDFloat> &rMap, PyObject *pDict, const bool replace);
 
          /**
+          * @brief Convert NumPy array to list
+          */
+         static PyObject* nparr2List(PyObject *pArr);
+
+         /**
+          * @brief Convert Scipy sparse matrix to triplets
+          */
+         static PyObject* sparse2triplets(PyObject *pSpMat);
+
+         /**
+          * @brief Fill Array with NumPy array data
+          */
+         static void fillArray(Array& rArray, PyObject* pPyArr);
+
+         /**
+          * @brief Fill Matrix with NumPy 2D array data
+          */
+         static void fillMatrix(Matrix& rMatrix, PyObject* pPyMat);
+
+         /**
           * @brief Fill sparse matrix with data from Python call
           */
          static void fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat);

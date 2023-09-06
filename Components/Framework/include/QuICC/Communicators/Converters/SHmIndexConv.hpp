@@ -17,7 +17,6 @@
 
 // Project includes
 //
-#include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Communicators/Converters/IIndexConv.hpp"
 
 namespace QuICC {
@@ -26,6 +25,8 @@ namespace Parallel {
 
    /**
     * @brief Implementation of the index converter for spherical harmonics with m spectral ordering
+    *
+    * The input data has ordering (NLM), ie. m ordering, and the corresponding indexes for (LNM) ordering are computed.
     */
    class SHmIndexConv: public IIndexConv
    {
@@ -33,12 +34,12 @@ namespace Parallel {
          /**
           * @brief Constructor
           */
-         SHmIndexConv();
+         SHmIndexConv() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~SHmIndexConv();
+         virtual ~SHmIndexConv() = default;
 
          /**
           * @brief Compute shift due to central padding
@@ -51,6 +52,8 @@ namespace Parallel {
          /**
           * @brief Convert first index (3D)
           *
+          * Takes data index (i,j,k) and physical mode indexes (idxI, idxJ, idxK) from input data type, to compute corresponding data index i for output data
+          *
           * @param i    Array index off first dimension
           * @param j    Array index of second dimension
           * @param k    Array index of third dimension
@@ -61,16 +64,9 @@ namespace Parallel {
          int i(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK) const override;
 
          /**
-          * @brief Convert first index (3D) (specialised serial version)
-          *
-          * @param i    Array index off first dimension
-          * @param j    Array index of second dimension
-          * @param k    Array index of third dimension
-          */
-         int iS(const int i, const int j, const int k) const override;
-
-         /**
           * @brief Convert first index (2D)
+          *
+          * Takes data index (i,j) and physical mode indexes (idxI, idxJ) from input data type, to compute corresponding data index i for output data
           *
           * @param i    Array index off first dimension
           * @param j    Array index of second dimension
@@ -80,15 +76,9 @@ namespace Parallel {
          int i(const int i, const int j, const int idxI, const int idxJ) const override;
 
          /**
-          * @brief Convert first index (2D) (specialised serial version)
-          *
-          * @param i    Array index off first dimension
-          * @param j    Array index of second dimension
-          */
-         int iS(const int i, const int j) const override;
-
-         /**
           * @brief Convert first index (1D)
+          *
+          * No reodering is possible in 1D
           *
           * @param i    Array index off first dimension
           */
@@ -96,6 +86,8 @@ namespace Parallel {
 
          /**
           * @brief Convert second index (3D)
+          *
+          * Takes data index (i,j,k) and physical mode indexes (idxI, idxJ, idxK) from input data type, to compute corresponding data index j for output data
           *
           * @param i    Array index off first dimension
           * @param j    Array index of second dimension
@@ -107,16 +99,9 @@ namespace Parallel {
          int j(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK) const override;
 
          /**
-          * @brief Convert second index (3D) (specialised serial version)
-          *
-          * @param i    Array index off first dimension
-          * @param j    Array index of second dimension
-          * @param k    Array index of third dimension
-          */
-         int jS(const int i, const int j, const int k) const override;
-
-         /**
           * @brief Convert second index (2D)
+          *
+          * Takes data index (i,j) and physical mode indexes (idxI, idxJ) from input data type, to compute corresponding data index j for output data
           *
           * @param i    Array index off first dimension
           * @param j    Array index of second dimension
@@ -126,15 +111,9 @@ namespace Parallel {
          int j(const int i, const int j, const int idxI, const int idxJ) const override;
 
          /**
-          * @brief Convert second index (2D) (specialised serial version)
-          *
-          * @param i    Array index off first dimension
-          * @param j    Array index of second dimension
-          */
-         int jS(const int i, const int j) const override;
-
-         /**
           * @brief Convert second index (3D)
+          *
+          * Takes data index (i,j,k) and physical mode indexes (idxI, idxJ, idxK) from input data type, to compute corresponding data index k for output data
           *
           * @param i    Array index off first dimension
           * @param j    Array index of second dimension
@@ -144,15 +123,6 @@ namespace Parallel {
           * @param idxK Physical index of third dimension
           */
          int k(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK) const override;
-
-         /**
-          * @brief Convert third index (3D) (specialised serial version)
-          *
-          * @param i    Array index off first dimension
-          * @param j    Array index of second dimension
-          * @param k    Array index of third dimension
-          */
-         int kS(const int i, const int j, const int k) const override;
    };
 
    inline int SHmIndexConv::centralPadding(const int idx, const int k) const
@@ -165,19 +135,9 @@ namespace Parallel {
       return idxJ - idxK;
    }
 
-   inline int SHmIndexConv::iS(const int i, const int j, const int k) const
-   {
-      return j;
-   }
-
    inline int SHmIndexConv::i(const int i, const int j, const int idxI, const int idxJ) const
    {
       return idxI;
-   }
-
-   inline int SHmIndexConv::iS(const int i, const int j) const
-   {
-      return this->i(i,j,i,j);
    }
 
    inline int SHmIndexConv::i(const int i) const
@@ -190,29 +150,14 @@ namespace Parallel {
       return i;
    }
 
-   inline int SHmIndexConv::jS(const int i, const int j, const int k) const
-   {
-      return this->j(i,j,k,i,j,k);
-   }
-
    inline int SHmIndexConv::j(const int i, const int j, const int idxI, const int idxJ) const
    {
       return i;
    }
 
-   inline int SHmIndexConv::jS(const int i, const int j) const
-   {
-      return this->j(i,j,i,j);
-   }
-
    inline int SHmIndexConv::k(const int i, const int j, const int k, const int idxI, const int idxJ, const int idxK) const
    {
       return k;
-   }
-
-   inline int SHmIndexConv::kS(const int i, const int j, const int k) const
-   {
-      return this->k(i,j,k,i,j,k);
    }
 
 }

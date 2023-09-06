@@ -47,17 +47,17 @@ namespace Fftw {
          /**
           * @brief Destructor
           */
-         virtual ~MixedIntegrator();
+         ~MixedIntegrator();
          
          /**
           * @brief Initialise the FFTW transforms
           */
-         virtual void init(const SetupType& setup) const override;
+         void init(const SetupType& setup) const override;
          
          /**
           * @brief Apply FFT
           */
-         virtual void applyFft() const override;
+         void applyFft(MatrixZ& mods, const Matrix& phys) const override;
 
          /**
           * @brief Set input and output data pointers for FFT
@@ -74,29 +74,9 @@ namespace Fftw {
           */
          void outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale, const std::map<int,MHDComplex>& mod) const;
 
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         void io(MatrixZ& out, const Matrix& in) const;
-
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         void io(MHDComplex* out, const MHDFloat* in) const;
-
       protected:
 
       private:
-         /**
-          * @brief Input data pointer
-          */
-         mutable const MHDFloat* mpIn;
-
-         /**
-          * @brief Out data pointer
-          */
-         mutable MHDComplex* mpOut;
-
          /**
           * @brief Bwd size
           */
@@ -112,10 +92,6 @@ namespace Fftw {
           */
          mutable MHDFloat mFftScaling;
 
-         /**
-          * @brief Map for output data
-          */
-         mutable Eigen::Map<MatrixZ> mOutMap;
    };
 
 }

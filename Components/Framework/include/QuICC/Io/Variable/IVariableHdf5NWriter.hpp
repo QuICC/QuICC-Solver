@@ -21,7 +21,7 @@
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Hdf5/IHdf5NWriter.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 
 namespace QuICC {
 
@@ -51,7 +51,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~IVariableHdf5NWriter();
+         virtual ~IVariableHdf5NWriter() = default;
 
          /**
           * @brief Add name of expected variable to be added
@@ -71,7 +71,7 @@ namespace Variable {
           * @param parameters Physical parameters
           * @param boundary Boundary flags
           */
-         void setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,int>& boundary);
+         void setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,std::size_t>& boundary);
 
          /**
           * @brief Set the mesh grid arrays
@@ -173,7 +173,7 @@ namespace Variable {
          /**
           * @brief Boundary flags of the simulation
           */
-         std::map<std::string,int> mBoundary;
+         std::map<std::string,std::size_t> mBoundary;
 
          /**
           * @brief Storage for the mesh

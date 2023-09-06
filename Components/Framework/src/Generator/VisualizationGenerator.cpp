@@ -3,45 +3,23 @@
  * @brief Source of the high level state generator
  */
 
-// First includes
-//
-
-// Debug includes
-//
-
 // Configuration includes
 //
 #include "QuICC/Debug/DebuggerMacro.h"
-#include "QuICC/Debug/Profiler/ProfilerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Generator/VisualizationGenerator.hpp"
-
 // Project includes
 //
+#include "QuICC/Generator/VisualizationGenerator.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 
 namespace QuICC {
-
-   VisualizationGenerator::VisualizationGenerator()
-      : SimulationBase()
-   {
-   }
-
-   VisualizationGenerator::~VisualizationGenerator()
-   {
-   }
 
    void VisualizationGenerator::preRun()
    {
@@ -50,15 +28,18 @@ namespace QuICC {
 
    void VisualizationGenerator::mainRun()
    {
-      // Solve the trivial equations
-      this->mPseudospectral.explicitTrivialEquations(ModelOperator::ExplicitLinear::id());
-      this->mPseudospectral.solveTrivialEquations(SolveTiming::After::id());
+      for(auto j: this->mPseudospectral.it())
+      {
+         // Solve the trivial equations
+         this->mPseudospectral.explicitTrivialEquations(ModelOperator::ExplicitLinear::id(), j);
+         this->mPseudospectral.solveTrivialEquations(SolveTiming::After::id(), j);
 
-      // Compute nonlinear terms
-      this->mPseudospectral.computeNonlinear();
+         // Compute nonlinear terms
+         this->mPseudospectral.computeNonlinear(j);
 
-      // Synchronise computation nodes
-      QuICCEnv().synchronize();
+         // Synchronise computation nodes
+         QuICCEnv().synchronize();
+      }
    }
 
    void VisualizationGenerator::postRun()

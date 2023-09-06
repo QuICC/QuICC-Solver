@@ -6,24 +6,15 @@
 #ifndef QUICC_TRANSFORMCOORDINATOR_HPP
 #define QUICC_TRANSFORMCOORDINATOR_HPP
 
-// Debug includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
-// Configuration includes
-//
-
 // System includes
 //
 #include<set>
 #include<map>
 #include<memory>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
@@ -49,12 +40,12 @@ namespace QuICC {
          /**
           * @brief Very basic constructor
           */
-         TransformCoordinator();
+         TransformCoordinator() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~TransformCoordinator();
+         virtual ~TransformCoordinator() = default;
 
          /**
           * @brief Add a transform
@@ -62,13 +53,25 @@ namespace QuICC {
          void addTransform(const Dimensions::Transform::Id id, std::shared_ptr<Transform::ITransform>  spTransform);
 
          /**
-          * @brief Initialise transforms
+          * @brief Set spatial scheme
           *
-          * @param spRes         Resolution information object
-          * @param forwardTree   Transform forward tree
-          * @param backwardTree  Transform backward tree
+          * @param spScheme Spatial scheme
           */
-         void defineTransforms(const std::vector<Transform::TransformTree>& forwardTree, const std::vector<Transform::TransformTree>& backwardTree, SpatialScheme::SharedCISpatialScheme spScheme);
+         void setScheme(SpatialScheme::SharedCISpatialScheme spScheme);
+
+         /**
+          * @brief Set forward transforms
+          *
+          * @param tree   Transform tree
+          */
+         void defineFwdTransforms(const std::vector<Transform::TransformTree>& tree);
+
+         /**
+          * @brief Set backward transforms
+          *
+          * @param tree   Transform tree
+          */
+         void defineBwdTransforms(const std::vector<Transform::TransformTree>& tree);
 
          /**
           * @brief Initialise the data communicator
@@ -236,32 +239,34 @@ namespace QuICC {
    }
 
    template <typename TComm>
-      TransformCoordinator<TComm>::TransformCoordinator()
-   {
-   }
-
-   template <typename TComm>
-      TransformCoordinator<TComm>::~TransformCoordinator()
-   {
-   }
-
-   template <typename TComm>
       void TransformCoordinator<TComm>::addTransform(const Dimensions::Transform::Id id, std::shared_ptr<Transform::ITransform> spTransform)
    {
       this->mTransforms.insert(std::make_pair(id, spTransform));
    }
 
    template <typename TComm>
-      void TransformCoordinator<TComm>::defineTransforms(const std::vector<Transform::TransformTree>& forwardTree, const std::vector<Transform::TransformTree>& backwardTree, SpatialScheme::SharedCISpatialScheme spScheme)
+      void TransformCoordinator<TComm>::setScheme(SpatialScheme::SharedCISpatialScheme spScheme)
    {
-      // Store the forward transform tree
-      this->mForwardTree = forwardTree;
-
-      // Store the backward transform tree
-      this->mBackwardTree = backwardTree;
-
       // Store spatial sscheme
       this->mspSS = spScheme;
+   }
+
+   template <typename TComm>
+      void TransformCoordinator<TComm>::defineFwdTransforms(const std::vector<Transform::TransformTree>& tree)
+   {
+      assert(this->mspSS);
+
+      // Store the forward transform tree
+      this->mForwardTree = tree;
+   }
+
+   template <typename TComm>
+      void TransformCoordinator<TComm>::defineBwdTransforms(const std::vector<Transform::TransformTree>& tree)
+   {
+      assert(this->mspSS);
+
+      // Store the backward transform tree
+      this->mBackwardTree = tree;
    }
 
    template <typename TComm>
@@ -272,6 +277,7 @@ namespace QuICC {
       {
          this->mCommunicator.init(it->first, spRes->spFwdSetup(it->first), spRes->spBwdSetup(it->first));
       }
+      this->mCommunicator.init(Dimensions::Transform::SPECTRAL, spRes->spSpectralSetup(), spRes->spSpectralSetup());
    }
 
    template <typename TComm>

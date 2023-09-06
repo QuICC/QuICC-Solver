@@ -21,6 +21,7 @@
 //
 #include "QuICC/PyQuICC/Config.hpp"
 #include "QuICC/PyQuICC/Coordinator.hpp"
+#include "QuICC/PyQuICC/Tools.hpp"
 
 namespace QuICC {
 
@@ -96,6 +97,36 @@ namespace PyQuICC {
       } else
       {
          PyObject_SetAttrString(this->mpModel, (char *)"use_galerkin", Py_False);
+      }
+   }
+
+   void ModelWrapper::enableSplitEquation(const bool flag)
+   {
+      // Split equation are not implemented in Python backend
+      if(flag)
+      {
+         throw std::logic_error("Python backend does not implemented the split equations");
+      }
+
+//      // Set the split equation flag for the python dispatchers
+//      if(flag)
+//      {
+//         PyObject_SetAttrString(this->mpModel, (char *)"use_splitequation", Py_True);
+//      } else
+//      {
+//         PyObject_SetAttrString(this->mpModel, (char *)"use_splitequation", Py_False);
+//      }
+   }
+
+   void ModelWrapper::enableLinearized(const bool flag)
+   {
+      // Set the galerkin flag for the python dispatchers
+      if(flag)
+      {
+         PyObject_SetAttrString(this->mpModel, (char *)"linearize", Py_True);
+      } else
+      {
+         PyObject_SetAttrString(this->mpModel, (char *)"linearize", Py_False);
       }
    }
 
@@ -260,162 +291,24 @@ namespace PyQuICC {
       return pValue;
    }
 
-   void ModelWrapper::fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat) 
+   void ModelWrapper::fillArray(Array& rArray, PyObject* pPyArray)
    {
-      PyObject *pArgs, *pValue, *pTmp;
-
-      // Get matrix size
-      pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
-      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
-      long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
-      Py_DECREF(pValue);
-
-      // Convert Python matrix into triplets
-      pArgs = PyTuple_New(1);
-      Py_INCREF(pPyMat);
-      PyTuple_SetItem(pArgs, 0, pPyMat);
-      this->setFunction("triplets", "utils");
-      pValue = this->callFunction(pArgs);
-      Py_DECREF(pArgs);
-
-      long int len = PyList_Size(pValue);
-      std::vector<Triplet> triplets;
-      triplets.reserve(len);
-      long int row;
-      long int col;
-      MHDFloat val;
-      for(int i = 0; i < len; i++)
-      {
-         pTmp = PyList_GetItem(pValue, i);
-         row = PyLong_AsLong(PyTuple_GetItem(pTmp,0));
-         col = PyLong_AsLong(PyTuple_GetItem(pTmp,1));
-         val = PyFloat_AsDouble(PyTuple_GetItem(pTmp,2));
-         triplets.push_back(Triplet(row,col,val));
-      }
-      Py_DECREF(pValue);
-
-      // Build matrix
-      rMatrix.resize(rows,cols);
-      rMatrix.setFromTriplets(triplets.begin(), triplets.end());
-   }
-
-   void ModelWrapper::fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat) 
-   {
-      PyObject *pArgs, *pValue, *pTmp;
-
-      // Get matrix size
-      pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
-      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
-      long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
-      Py_DECREF(pValue);
-
-      // Convert Python matrix into triplets
-      pArgs = PyTuple_New(1);
-      Py_INCREF(pPyMat);
-      PyTuple_SetItem(pArgs, 0, pPyMat);
-      this->setFunction("triplets", "utils");
-      pValue = this->callFunction(pArgs);
-      Py_DECREF(pArgs);
-
-      long int len = PyList_Size(pValue);
-      std::vector<Triplet> realTriplets;
-      std::vector<Triplet> imagTriplets;
-      realTriplets.reserve(len);
-      imagTriplets.reserve(len);
-      long int row;
-      long int col;
-      MHDFloat val;
-      for(int i = 0; i < len; i++)
-      {
-         pTmp = PyList_GetItem(pValue, i);
-         row = PyLong_AsLong(PyTuple_GetItem(pTmp,0));
-         col = PyLong_AsLong(PyTuple_GetItem(pTmp,1));
-         if(PyComplex_Check(PyTuple_GetItem(pTmp,2)))
-         {
-            val = PyComplex_RealAsDouble(PyTuple_GetItem(pTmp,2));
-            realTriplets.push_back(Triplet(row,col,val));
-            val = PyComplex_ImagAsDouble(PyTuple_GetItem(pTmp,2));
-            imagTriplets.push_back(Triplet(row,col,val));
-         } else
-         {
-            val = PyFloat_AsDouble(PyTuple_GetItem(pTmp,2));
-            realTriplets.push_back(Triplet(row,col,val));
-         }
-      }
-      Py_DECREF(pValue);
-
-      // Build matrix
-      rMatrix.real().resize(rows,cols);
-      rMatrix.imag().resize(rows,cols);
-      rMatrix.real().setFromTriplets(realTriplets.begin(), realTriplets.end());
-
-      if(imagTriplets.size() > 0)
-      {
-         rMatrix.imag().setFromTriplets(imagTriplets.begin(), imagTriplets.end());
-      }
+      Tools::fillArray(rArray, pPyArray);
    }
 
    void ModelWrapper::fillMatrix(Matrix& rMatrix, PyObject* pPyMat)
    {
-      PyObject *pArgs, *pValue;
-
-      // Get matrix size
-      pValue = PyObject_GetAttrString(pPyMat, (char *)"shape");
-      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
-      long int cols = PyLong_AsLong(PyTuple_GetItem(pValue, 1));
-      Py_DECREF(pValue);
-
-      // Allocate matrix
-      rMatrix.resize(rows,cols);
-
-      // Convert Python matrix into a list
-      pArgs = PyTuple_New(1);
-      Py_INCREF(pPyMat);
-      PyTuple_SetItem(pArgs, 0, pPyMat);
-      this->setFunction("nparr2list", "utils");
-      pValue = this->callFunction(pArgs);
-      Py_DECREF(pArgs);
-
-      long int count = 0;
-      for(int j = 0; j < cols; j++)
-      {
-         for (int i = 0; i < rows; i++)
-         {
-            rMatrix(i, j) = PyFloat_AsDouble(PyList_GetItem(pValue, count));
-            count += 1;
-         }
-      }
-      Py_DECREF(pValue);
+      Tools::fillMatrix(rMatrix, pPyMat);
    }
 
-   void ModelWrapper::fillArray(Array& rArray, PyObject* pPyArray)
+   void ModelWrapper::fillMatrix(SparseMatrix& rMatrix, PyObject* pPyMat) 
    {
-      PyObject *pArgs, *pValue;
+      Tools::fillMatrix(rMatrix, pPyMat);
+   }
 
-      // Get matrix size
-      pValue = PyObject_GetAttrString(pPyArray, (char *)"shape");
-      long int rows = PyLong_AsLong(PyTuple_GetItem(pValue, 0));
-      Py_DECREF(pValue);
-
-      // Allocate matrix
-      rArray.resize(rows);
-
-      // Convert Python matrix into a list
-      pArgs = PyTuple_New(1);
-      Py_INCREF(pPyArray);
-      PyTuple_SetItem(pArgs, 0, pPyArray);
-      this->setFunction("nparr2list", "utils");
-      pValue = this->callFunction(pArgs);
-      Py_DECREF(pArgs);
-
-      long int count = 0;
-      for (int i = 0; i < rows; i++)
-      {
-         rArray(i) = PyFloat_AsDouble(PyList_GetItem(pValue, count));
-         count += 1;
-      }
-
-      Py_DECREF(pValue);
+   void ModelWrapper::fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat) 
+   {
+      Tools::fillMatrix(rMatrix, pPyMat);
    }
 
    void ModelWrapper::checkModule()

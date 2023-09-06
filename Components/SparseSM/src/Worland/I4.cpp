@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Worland/I4.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/I4.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/I4Diags.hpp"
 #include "QuICC/SparseSM/Worland/Legendre/I4Diags.hpp"
 #include "QuICC/SparseSM/Worland/CylEnergy/I4Diags.hpp"
@@ -28,28 +22,24 @@ namespace SparseSM {
 
 namespace Worland {
 
-   I4::I4(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l)
+   I4::I4(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
       : IWorlandOperator(rows, cols, alpha, dBeta)
    {
       switch(this->type())
       {
-         case CHEBYSHEV:
-            this->mpImpl = std::make_shared<Chebyshev::I4Diags>(alpha, l);
+         case WorlandKind::CHEBYSHEV:
+            this->mpImpl = std::make_shared<Chebyshev::I4Diags>(alpha, l, q);
             break;
-         case LEGENDRE:
-            this->mpImpl = std::make_shared<Legendre::I4Diags>(alpha, l);
+         case WorlandKind::LEGENDRE:
+            this->mpImpl = std::make_shared<Legendre::I4Diags>(alpha, l, q);
             break;
-         case CYLENERGY:
-            this->mpImpl = std::make_shared<CylEnergy::I4Diags>(alpha, l);
+         case WorlandKind::CYLENERGY:
+            this->mpImpl = std::make_shared<CylEnergy::I4Diags>(alpha, l, q);
             break;
-         case SPHENERGY:
-            this->mpImpl = std::make_shared<SphEnergy::I4Diags>(alpha, l);
+         case WorlandKind::SPHENERGY:
+            this->mpImpl = std::make_shared<SphEnergy::I4Diags>(alpha, l, q);
             break;
       }
-   }
-
-   I4::~I4()
-   {
    }
 
    void I4::buildTriplets(TripletList_t& list) const
@@ -57,6 +47,10 @@ namespace Worland {
       const int dShift = 2;
       ACoeffI ni = ACoeffI::LinSpaced(this->rows()-2, 2, this->rows()-1);
       ACoeff_t n = (ni + dShift).cast<Scalar_t>();
+
+      // Precompute the normalization factors
+      int maxN = this->rows()-1 + dShift + 4;
+      this->mpImpl->precomputeNorm(maxN, 0);
 
       if(n.size() > 0)
       {

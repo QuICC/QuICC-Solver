@@ -6,6 +6,8 @@
 // System includes
 //
 #include <cassert>
+#include <boost/core/demangle.hpp>
+#include <typeinfo>
 
 // External includes
 //
@@ -23,7 +25,7 @@ namespace QuICC {
 namespace Transform {
 
    ITransformOperator::ITransformOperator()
-      : mProfileId(Debug::Profiler::BLACKHOLE), mIsInitialized(false)
+      : mProfileTag(""), mIsInitialized(false)
    {
    }
 
@@ -31,10 +33,37 @@ namespace Transform {
    {
    }
 
+   std::string ITransformOperator::opName() const
+   {
+      std::string full = boost::core::demangle(typeid(*this).name());
+      std::size_t pos = full.rfind(':');
+      std::string op = full.substr(pos+1, full.size()-pos);
+
+      return op;
+   }
+
+   void ITransformOperator::setProfileTag()
+   {
+      this->mProfileTag += "-" + this->opName();
+   }
+
    bool ITransformOperator::isInitialized() const
    {
       return this->mIsInitialized;
    }
+
+   void ITransformOperator::init(SharedTransformSetup spSetup, const internal::Array &igrid,
+             const internal::Array &iweights) const
+   {
+      throw std::logic_error("init needs to be implemented by the derived class");
+   }
+
+   void ITransformOperator::init(SharedTransformSetup spSetup) const
+   {
+      throw std::logic_error("init needs to be implemented by the derived class");
+   }
+
+   void ITransformOperator::transform(MatrixZ &rOut, const MatrixZ &in) const {}
 
    MHDFloat ITransformOperator::requiredStorage() const
    {

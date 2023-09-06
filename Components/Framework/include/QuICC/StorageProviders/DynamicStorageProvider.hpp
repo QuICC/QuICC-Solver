@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 
 namespace QuICC {
 
@@ -144,6 +144,13 @@ namespace QuICC {
 
    template <typename T> inline void DynamicStorageProvider<T>::free(DataType &tmp)
    {
+      // Check if data is part of pool
+      assert(std::any_of(this->mPool.begin(), this->mPool.end(),
+            [&](const DataType& d)
+            {
+               return &d == &tmp;
+            }));
+
       this->mAvailable.push(&tmp);
    }
 

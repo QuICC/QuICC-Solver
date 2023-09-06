@@ -30,9 +30,10 @@
 #include "QuICC/MpiTypes.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/DimensionTools.hpp"
+#include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Communicators/Converters/IIndexConv.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
 namespace QuICC {
@@ -63,45 +64,24 @@ namespace Parallel {
          static void buildLocalBwdMap(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const IIndexConv& idxConv);
 
          /**
-          * @brief Build a forward MPI Datatype
+          * @brief Build a MPI Datatype
           *
           * @param spRes   Shared Resolution
           * @param fwdDim  Dimension index for forward transform
           * @param data    Input data
           * @param cpuId   ID of the CPU
           */
-         template <typename TData> static MPI_Datatype buildFwdDatatype(const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Framework::Selector::ScalarField<TData> &data, const int cpuId);
+         template <typename TData, Dimensions::Data::Id TDataId = Dimensions::Data::DATF1D> static MPI_Datatype buildDatatype(const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const Dimensions::Transform::Id keyId, TData& data, const int cpuId);
 
          /**
-          * @brief Build a backward MPI Datatype
+          * @brief Build manual packing description for Datatype
           *
           * @param spRes   Shared Resolution
           * @param fwdDim  Dimension index for forward transform
           * @param data    Input data
           * @param cpuId   ID of the CPU
           */
-         template <typename TData> static MPI_Datatype buildBwdDatatype(const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Framework::Selector::ScalarField<TData> &data, const int cpuId);
-
-         /**
-          * @brief Build manual packing description for forward Datatype
-          *
-          * @param spRes   Shared Resolution
-          * @param fwdDim  Dimension index for forward transform
-          * @param data    Input data
-          * @param cpuId   ID of the CPU
-          */
-         template <typename TData> static void buildFwdDatatype(CoordinateVector& coords, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Framework::Selector::ScalarField<TData> &data, const int cpuId);
-
-
-         /**
-          * @brief Build manual packing description for backward Datatype
-          *
-          * @param spRes   Shared Resolution
-          * @param fwdDim  Dimension index for forward transform
-          * @param data    Input data
-          * @param cpuId   ID of the CPU
-          */
-         template <typename TData> static void buildBwdDatatype(CoordinateVector& coords, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Framework::Selector::ScalarField<TData> &data, const int cpuId);
+         template <typename TData, Dimensions::Data::Id TDataId = Dimensions::Data::DATF1D> static void buildDatatype(CoordinateVector& coords, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const Dimensions::Transform::Id keyId, TData& data, const int cpuId);
 
          /**
           * @brief Pack data into buffer
@@ -145,92 +125,49 @@ namespace Parallel {
          /**
           * @brief Build local cpu map of forward 3D data
           */
-         static void buildLocalFwdMap3D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim);
+         template <Dimensions::Data::Id TDataId> static void buildLocalMap3D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const IIndexConv& idxConv);
 
          /**
-          * @brief Build local cpu map of forward 2D data
+          * @brief Build local cpu map of 2D data
           */
-         static void buildLocalFwdMap2D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim);
-
+         template <Dimensions::Data::Id TDataId> static void buildLocalMap1D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const IIndexConv& idxConv);
          /**
-          * @brief Build local cpu map of forward 1D data
+          * @brief Build local cpu map of 1D data
           */
-         static void buildLocalFwdMap1D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim);
-
-         /**
-          * @brief Build local cpu map of backward 3D data
-          */
-         static void buildLocalBwdMap3D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const IIndexConv& idxConv);
-
-         /**
-          * @brief Build local cpu map of backward 2D data
-          */
-         static void buildLocalBwdMap2D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim);
-
-         /**
-          * @brief Build local cpu map of backward 1D data
-          */
-         static void buildLocalBwdMap1D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim);
+         template <Dimensions::Data::Id TDataId> static void buildLocalMap2D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const IIndexConv& idxConv);
 
          /**
           * @brief Build a forward 3D MPI Datatype
           *
           * @param spRes   Shared Resolution
-          * @param fwdDim  Dimension index for forward transform
+          * @param tId     Dimension index for transform
+          * @param keyId   Dimension index for data keys
           * @param data    Input data
           * @param cpuId   ID of the CPU
           */
-         static void buildFwdCpuMap3D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const int cpuId);
+         template <Dimensions::Data::Id TDataId> static void buildCpuMap3D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const Dimensions::Transform::Id keyId, const int cpuId);
 
          /**
           * @brief Build a forward 2D MPI Datatype
           *
           * @param spRes   Shared Resolution
-          * @param fwdDim  Dimension index for forward transform
+          * @param tId     Dimension index for transform
+          * @param keyId   Dimension index for data keys
           * @param data    Input data
           * @param cpuId   ID of the CPU
           */
-         static void buildFwdCpuMap2D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const int cpuId);
+         template <Dimensions::Data::Id TDataId> static void buildCpuMap2D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const Dimensions::Transform::Id keyId, const int cpuId);
 
          /**
           * @brief Build a forward 1D MPI Datatype
           *
           * @param spRes   Shared Resolution
-          * @param fwdDim  Dimension index for forward transform
+          * @param tId     Dimension index for transform
+          * @param keyId   Dimension index for data keys
           * @param data    Input data
           * @param cpuId   ID of the CPU
           */
-         static void buildFwdCpuMap1D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const int cpuId);
-
-         /**
-          * @brief Build a backward 3D MPI Datatype
-          *
-          * @param spRes   Shared Resolution
-          * @param fwdDim  Dimension index for forward transform
-          * @param data    Input data
-          * @param cpuId   ID of the CPU
-          */
-         static void buildBwdCpuMap3D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const int cpuId);
-
-         /**
-          * @brief Build a backward 2D MPI Datatype
-          *
-          * @param spRes   Shared Resolution
-          * @param fwdDim  Dimension index for forward transform
-          * @param data    Input data
-          * @param cpuId   ID of the CPU
-          */
-         static void buildBwdCpuMap2D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const int cpuId);
-
-         /**
-          * @brief Build a backward 1D MPI Datatype
-          *
-          * @param spRes   Shared Resolution
-          * @param fwdDim  Dimension index for forward transform
-          * @param data    Input data
-          * @param cpuId   ID of the CPU
-          */
-         static void buildBwdCpuMap1D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const int cpuId);
+         template <Dimensions::Data::Id TDataId> static void buildCpuMap1D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const Dimensions::Transform::Id keyId, const int cpuId);
 
          /**
           * @brief Extract shared indexes
@@ -367,23 +304,23 @@ namespace Parallel {
       return type;
    }
 
-   template <typename TData>
-      void MpiConverterTools::buildFwdDatatype(CoordinateVector& coords, const CoordinateMap&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Framework::Selector::ScalarField<TData> &data, const int cpuId)
+   template <typename TData, Dimensions::Data::Id TDataId>
+      void MpiConverterTools::buildDatatype(CoordinateVector& coords, const CoordinateMap&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const Dimensions::Transform::Id keyId, TData& data, const int cpuId)
    {
-      CoordinateMap  sharedMap;
+      CoordinateMap sharedMap;
       switch(spRes->sim().ss().dimension())
       {
          case 3:
-            MpiConverterTools::buildFwdCpuMap3D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
+            MpiConverterTools::buildCpuMap3D<TDataId>(sharedMap, localIdxMap, spRes, fwdDim, keyId, cpuId);
             break;
          case 2:
-            MpiConverterTools::buildFwdCpuMap2D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
+            MpiConverterTools::buildCpuMap2D<TDataId>(sharedMap, localIdxMap, spRes, fwdDim, keyId, cpuId);
             break;
          case 1:
-            MpiConverterTools::buildFwdCpuMap1D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
+            MpiConverterTools::buildCpuMap1D<TDataId>(sharedMap, localIdxMap, spRes, fwdDim, keyId, cpuId);
             break;
          default:
-            throw std::logic_error("Tried to build CPU forward coordinate map for unimplemented dimension!");
+            throw std::logic_error("Tried to build CPU coordinate map for unimplemented dimension!");
       }
 
       coords.clear();
@@ -394,50 +331,23 @@ namespace Parallel {
       }
    }
 
-   template <typename TData>
-      void MpiConverterTools::buildBwdDatatype(CoordinateVector& coords, const CoordinateMap&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Framework::Selector::ScalarField<TData> &data, const int cpuId)
+   template <typename TData, Dimensions::Data::Id TDataId>
+      MPI_Datatype MpiConverterTools::buildDatatype(const CoordinateMap&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, const Dimensions::Transform::Id keyId, TData& data, const int cpuId)
    {
       CoordinateMap sharedMap;
       switch(spRes->sim().ss().dimension())
       {
          case 3:
-            MpiConverterTools::buildBwdCpuMap3D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
+            MpiConverterTools::buildCpuMap3D<TDataId>(sharedMap, localIdxMap, spRes, fwdDim, keyId, cpuId);
             break;
          case 2:
-            MpiConverterTools::buildBwdCpuMap2D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
+            MpiConverterTools::buildCpuMap2D<TDataId>(sharedMap, localIdxMap, spRes, fwdDim, keyId, cpuId);
             break;
          case 1:
-            MpiConverterTools::buildBwdCpuMap1D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
+            MpiConverterTools::buildCpuMap1D<TDataId>(sharedMap, localIdxMap, spRes, fwdDim, keyId, cpuId);
             break;
          default:
-         throw std::logic_error("Tried to build CPU forward coordinate map for unimplemented dimension!");
-      }
-
-      coords.clear();
-      coords.reserve(sharedMap.size());
-      for(auto it = sharedMap.cbegin(); it != sharedMap.cend(); ++it)
-      {
-         coords.push_back(it->second);
-      }
-   }
-
-   template <typename TData>
-      MPI_Datatype MpiConverterTools::buildBwdDatatype(const CoordinateMap&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Framework::Selector::ScalarField<TData> &data, const int cpuId)
-   {
-      CoordinateMap sharedMap;
-      switch(spRes->sim().ss().dimension())
-      {
-         case 3:
-            MpiConverterTools::buildBwdCpuMap3D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
-            break;
-         case 2:
-            MpiConverterTools::buildBwdCpuMap2D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
-            break;
-         case 1:
-            MpiConverterTools::buildBwdCpuMap1D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
-            break;
-         default:
-            throw std::logic_error("Tried to build CPU forward coordinate map for unimplemented dimension!");
+            throw std::logic_error("Tried to build CPU coordinate map for unimplemented dimension!");
       }
 
       // Create the datatype
@@ -453,37 +363,339 @@ namespace Parallel {
       return type;
    }
 
-   template <typename TData>
-      MPI_Datatype MpiConverterTools::buildFwdDatatype(const CoordinateMap&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id fwdDim, typename Framework::Selector::ScalarField<TData> &data, const int cpuId)
+   template <Dimensions::Data::Id TDataId> void MpiConverterTools::buildLocalMap3D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const IIndexConv& idxConv)
    {
-      CoordinateMap  sharedMap;
-      switch(spRes->sim().ss().dimension())
+      // Make sure key map is empty
+      rLocalIdxMap.clear();
+
+      // Storage for the simulation wide indexes
+      int i_, j_, k_;
+
+      //
+      // Create the list of local indexes
+      //
+
+      const auto& tRes = *spRes->cpu()->dim(tId);
+      // Loop over slow data dimension
+      for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         case 3:
-            MpiConverterTools::buildFwdCpuMap3D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
-            break;
-         case 2:
-            MpiConverterTools::buildFwdCpuMap2D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
-            break;
-         case 1:
-            MpiConverterTools::buildFwdCpuMap1D(sharedMap, localIdxMap, spRes, fwdDim, cpuId);
-            break;
-         default:
-            throw std::logic_error("Tried to build CPU forward coordinate map for unimplemented dimension!");
+         // Extract "physical" index of slow data dimension
+         k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+
+         // Loop over middle data dimension
+         for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); ++j)
+         {
+            // Extract "physical" index of middle data dimension
+            j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
+
+            // Loop over fast data dimension
+            for(int i = 0; i < tRes.dim<TDataId>(k); ++i)
+            {
+               // Extract "physical" index of fast data dimension
+               i_ = tRes.idx<TDataId>(i,k);
+
+               // Combine array indexes into coordinate tuple
+               Coordinate coord = {i + idxConv.centralPadding(i_, k), j, k};
+
+               // Create key
+               Coordinate key = spRes->counter().makeVKey(tId, i_, j_, k_);
+
+               // add key->coordinate to map
+               rLocalIdxMap.insert(std::make_pair(key, coord));
+            }
+         }
+      }
+   }
+
+   template <Dimensions::Data::Id TDataId> void MpiConverterTools::buildLocalMap2D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const IIndexConv& idxConv)
+   {
+      // Make sure key map is empty
+      rLocalIdxMap.clear();
+
+      // Storage for the simulation wide indexes
+      int i_, j_;
+
+      //
+      // Create the list of local indexes
+      //
+
+      const auto& tRes = *spRes->cpu()->dim(tId);
+      // Loop over middle data dimension
+      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(); ++j)
+      {
+         // Extract "physical" index of middle data dimension
+         j_ = tRes.idx<Dimensions::Data::DAT2D>(j);
+
+         // Loop over fast data dimension
+         for(int i = 0; i < tRes.dim<TDataId>(); ++i)
+         {
+            // Extract "physical" index of fast data dimension
+            i_ = tRes.idx<TDataId>(i);
+
+            // Combine array indexes into coordinate tuple
+            Coordinate coord = {i, j};
+
+            // Create key
+            Coordinate key = spRes->counter().makeVKey(tId, i_, j_);
+
+            // add key->coordinate to map
+            rLocalIdxMap.insert(std::make_pair(key, coord));
+         }
+      }
+   }
+
+   template <Dimensions::Data::Id TDataId> void MpiConverterTools::buildLocalMap1D(CoordinateMap& rLocalIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const IIndexConv& idxConv)
+   {
+      // Make sure key map is empty
+      rLocalIdxMap.clear();
+
+      // Storage for the simulation wide indexes
+      int i_;
+
+      //
+      // Create the list of local indexes
+      //
+
+      // Loop ver backward fast dimension
+      for(int i=0; i < spRes->cpu(QuICCEnv().id())->dim(tId)->dim<TDataId>(); ++i)
+      {
+         // Extract "physical" index of fast data dimension
+         i_ = spRes->cpu(QuICCEnv().id())->dim(tId)->idx<TDataId>(i);
+
+         // Set coordinate
+         Coordinate coord = {i};
+
+         // Set key
+         Coordinate key = {i_};
+
+         // add key->coordinate to map
+         rLocalIdxMap.insert(std::make_pair(key, coord));
       }
 
-      // Create the datatype
-      MPI_Datatype type = MpiConverterTools::buildType(data, sharedMap);
-
-#ifdef QUICC_STORAGEPROFILE
-      MHDFloat mem = 22*Debug::MemorySize<MPI_Aint>::BYTES*sharedMap.size();
-      StorageProfilerMacro_update(StorageProfilerMacro::MPIBTYPES, mem);
-      StorageProfilerMacro_update(StorageProfilerMacro::MPITYPES, mem);
-      StorageProfilerMacro_update(StorageProfilerMacro::MPI, mem);
-#endif //QUICC_STORAGEPROFILE
-
-      return type;
    }
+
+   template <Dimensions::Data::Id TDataId> void MpiConverterTools::buildCpuMap3D(CoordinateMap& sharedMap, const CoordinateMap&  localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const Dimensions::Transform::Id keyId, const int cpuId)
+   {
+      // List of remote keys
+      std::set<Coordinate>  remoteKeys;
+
+      // Storage for the simulation wide indexes
+      int i_, j_, k_;
+
+      // MPI error code
+      int ierr;
+
+      // Number of coordinates
+      int nCoords = -1;
+
+      //
+      // Create the list of remote indexes
+      //
+
+      // Remote is also local CPU
+      MatrixI  matRemote;
+      if(cpuId == QuICCEnv().id(tId))
+      {
+         const auto& tRes = *spRes->cpu()->dim(keyId);
+         // Loop over slow data dimension
+         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
+         {
+            // Extract "physical" index of slow data dimension
+            k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+
+            // Loop over middle data dimension
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); ++j)
+            {
+               // Extract "physical" index of middle data dimension
+               j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
+
+               // Loop over fast data dimension
+               for(int i = 0; i < tRes.dim<TDataId>(k); ++i)
+               {
+                  // Extract "physical" index of fast data dimension
+                  i_ = tRes.idx<TDataId>(i,k);
+
+                  // Create key
+                  Coordinate key = spRes->counter().makeVKey(keyId, i_, j_, k_);
+
+                  // Add key to remote set
+                  remoteKeys.insert(key);
+               }
+            }
+         }
+
+         // Convert remote keys to matrix to send through MPI
+         matRemote.resize(3, remoteKeys.size());
+         int col = 0;
+         for(auto it = remoteKeys.begin(); it != remoteKeys.end(); ++it)
+         {
+            matRemote(0,col) = it->at(0);
+            matRemote(1,col) = it->at(1);
+            matRemote(2,col) = it->at(2);
+            col++;
+         }
+
+         // Broadcast size
+         nCoords = remoteKeys.size();
+         QuICCEnv().synchronize(tId);
+         ierr = MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, QuICCEnv().comm(tId));
+         QuICCEnv().check(ierr, "Broadcast of sizes in 3D remote index map failed");
+
+         // Broadcast data
+         QuICCEnv().synchronize(tId);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, QuICCEnv().comm(tId));
+         QuICCEnv().check(ierr, "Broadcast of 3D remote index map failed");
+
+      // Remote CPU needs to generate list
+      } else
+      {
+         // Get size
+         QuICCEnv().synchronize(tId);
+         ierr = MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, QuICCEnv().comm(tId));
+         QuICCEnv().check(ierr, "Receiving broadcast of sizes of 3D remote index map failed");
+
+         matRemote.resize(3, nCoords);
+
+         // Get remote keys as matrix
+         QuICCEnv().synchronize(tId);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, QuICCEnv().comm(tId));
+         QuICCEnv().check(ierr, "Receiving broadcast of 3D remote index map failed");
+
+         // Convert matrix to remoteKeys set
+         for(int i = 0; i < matRemote.cols(); i++)
+         {
+            Coordinate key = {matRemote(0,i), matRemote(1,i), matRemote(2,i)};
+            remoteKeys.insert(key);
+         }
+      }
+
+      // Extract map of shared indexes (stored as keys)
+      sharedMap.clear();
+      MpiConverterTools::extractShared(sharedMap, localIdxMap, remoteKeys);
+   }
+
+   template <Dimensions::Data::Id TDataId> void MpiConverterTools::buildCpuMap2D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const Dimensions::Transform::Id keyId, const int cpuId)
+   {
+      // List of remote keys
+      std::set<Coordinate>  remoteKeys;
+
+      // Storage for the simulation wide indexes
+      int i_, j_;
+
+      // MPI error code
+      int ierr;
+
+      // Number of coordinates
+      int nCoords = -1;
+
+      //
+      // Create the list of remote indexes in next transform
+      //
+
+      // Remote is also local CPU
+      MatrixI  matRemote;
+      if(cpuId == QuICCEnv().id(tId))
+      {
+         const auto& tRes = *spRes->cpu()->dim(keyId);
+         // Loop over middle data dimension
+         for(int j=0; j < tRes.dim<Dimensions::Data::DAT2D>(); ++j)
+         {
+            // Extract "physical" index of middle data dimension
+            j_ = tRes.idx<Dimensions::Data::DAT2D>(j);
+
+            // Loop over backward data dimension
+            for(int i=0; i < tRes.dim<TDataId>(); ++i)
+            {
+               // Extract "physical" index of backward data dimension
+               i_ = tRes.idx<TDataId>(i);
+
+               // Create key as (2D, 3D, 1D) indexes (i.e. data gets transposed during communication)
+               Coordinate key = spRes->counter().makeVKey(keyId, i_, j_);
+
+               // Add key to remote set
+               remoteKeys.insert(key);
+            }
+         }
+
+         // Convert remote keys to matrix to send througg MPI
+         matRemote.resize(2, remoteKeys.size());
+         int col = 0;
+         for(auto it = remoteKeys.begin(); it != remoteKeys.end(); ++it)
+         {
+            matRemote(0,col) = it->at(0);
+            matRemote(1,col) = it->at(1);
+            col++;
+         }
+
+         // Broadcast size
+         nCoords = remoteKeys.size();
+         QuICCEnv().synchronize(tId);
+         ierr = MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, QuICCEnv().comm(tId));
+         QuICCEnv().check(ierr, "Broadcast of sizes in 2D remote index map failed");
+
+         // Broadcast data
+         QuICCEnv().synchronize(tId);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, QuICCEnv().comm(tId));
+         QuICCEnv().check(ierr, "Broadcast of 2D remote index map failed");
+
+      // Remote CPU needs to generate list
+      } else
+      {
+         // Get size
+         QuICCEnv().synchronize(tId);
+         ierr = MPI_Bcast(&nCoords, 1, MPI_INT, cpuId, QuICCEnv().comm(tId));
+         QuICCEnv().check(ierr, "Receiving broadcast of sizes of 2D remote index map failed");
+
+         matRemote.resize(2, nCoords);
+
+         // Get remote keys as matrix
+         QuICCEnv().synchronize(tId);
+         ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpuId, QuICCEnv().comm(tId));
+         QuICCEnv().check(ierr, "Receiving broadcast of 2D remote index map failed");
+
+         // Convert matrix to remoteKeys set
+         for(int i = 0; i < matRemote.cols(); i++)
+         {
+            Coordinate key = {matRemote(0,i), matRemote(1,i)};
+            remoteKeys.insert(key);
+         }
+      }
+
+      // Extract map of shared indexes (stored as keys)
+      sharedMap.clear();
+      MpiConverterTools::extractShared(sharedMap, localIdxMap, remoteKeys);
+   }
+
+   template <Dimensions::Data::Id TDataId> void MpiConverterTools::buildCpuMap1D(CoordinateMap& sharedMap, const CoordinateMap& localIdxMap, SharedResolution spRes, const Dimensions::Transform::Id tId, const Dimensions::Transform::Id keyId, const int cpuId)
+   {
+      // List of remote keys
+      std::set<Coordinate>  remoteKeys;
+
+      // Storage for the simulation wide indexes
+      int i_;
+
+      //
+      // Create the list of remote indexes in next transform
+      //
+
+      // Loop over backward data dimension
+      for(int i=0; i < spRes->cpu(cpuId)->dim(keyId)->dim<TDataId>(); ++i)
+      {
+         // Extract "physical" index of backward data dimension
+         i_ = spRes->cpu(cpuId)->dim(keyId)->idx<TDataId>(i);
+
+         // Set key
+         Coordinate key = {i_};
+
+         // Add key to remote set
+         remoteKeys.insert(key);
+      }
+
+      // Extract map of shared indexes (stored as keys)
+      sharedMap.clear();
+      MpiConverterTools::extractShared(sharedMap, localIdxMap, remoteKeys);
+   }
+
 }
 }
 

@@ -82,8 +82,8 @@ namespace QuICC {
          }
          inline double elapsedSeconds(const std::chrono::steady_clock::time_point& Final) const
          {
-            return static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(
-               Final - mInit).count()) * 1e-6;
+            return static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(
+               Final - mInit).count()) * 1e-9;
          }
    };
 

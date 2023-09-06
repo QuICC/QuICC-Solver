@@ -37,24 +37,19 @@ namespace Integrator {
    {
    }
 
-   void P::applyPreOperator(Matrix& rOut, const Matrix& in) const
-   {
-      this->mBackend.io(rOut, in);
-   }
-
    void P::applyPostOperator(Matrix& rOut) const
    {
       this->mBackend.output(rOut);
    }
 
-   void P::applyPreOperator(const MatrixZ& in, const bool useReal) const
+   void P::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
-      this->mBackend.input(in, useReal);
+      this->mBackend.input(tmp, in, useReal);
    }
 
-   void P::applyPostOperator(MatrixZ& rOut, const bool useReal) const
+   void P::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      this->mBackend.output(rOut, useReal);
+      this->mBackend.output(rOut, tmp, useReal);
    }
 
 }

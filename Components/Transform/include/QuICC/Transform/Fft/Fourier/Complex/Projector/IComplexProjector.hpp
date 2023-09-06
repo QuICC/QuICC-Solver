@@ -96,13 +96,6 @@ namespace Projector {
          virtual void applyPreOperator(MatrixZ& rOut, const MatrixZ& in) const = 0;
 
          /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         virtual void applyPostOperator(MatrixZ& rOut) const = 0;
-
-         /**
           * @brief Compute transform C2R (disabled)
           *
           * @param rOut Output values

@@ -31,7 +31,6 @@ namespace Backend {
 namespace Fftw {
 
    MixedIntegrator::MixedIntegrator()
-      : mOutMap(NULL,0,0)
    {
    }
 
@@ -63,7 +62,7 @@ namespace Fftw {
       MatrixZ   tmpCplx(bwdSize, blockSize);
 
       // Create the real to complex plan
-      this->mPlan = fftw_plan_many_dft_r2c(1, fftSize, blockSize, tmpReal.data(), NULL, 1, fwdSize, reinterpret_cast<fftw_complex* >(tmpCplx.data()), NULL, 1, bwdSize, Library::planFlag());
+      this->mPlan = fftw_plan_many_dft_r2c(1, fftSize, blockSize, tmpReal.data(), NULL, 1, fwdSize, reinterpret_cast<fftw_complex* >(tmpCplx.data()), NULL, 1, bwdSize, QuICC::Fft::Fftw::Library::planFlag());
       if(this->mPlan == NULL)
       {
          throw  std::logic_error("FFTW plan failed!");
@@ -72,7 +71,7 @@ namespace Fftw {
 
    void MixedIntegrator::output(MatrixZ& rOut) const
    {
-      rOut.topRows(this->mSpecSize) = this->mFftScaling*this->mOutMap.topRows(this->mSpecSize);
+      rOut *= this->mFftScaling;
    }
 
    void MixedIntegrator::outputDiff(MatrixZ& rOut, const int order, const MHDFloat scale) const
@@ -81,11 +80,11 @@ namespace Fftw {
       if(order%2 == 1)
       {
          MHDComplex sgn = std::pow(-1.0,((order-1)/2)%2)*this->mFftScaling*Math::cI;
-         rOut.topRows(this->mSpecSize) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*this->mOutMap.topRows(this->mSpecSize);
+         rOut.topRows(this->mSpecSize) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*rOut.topRows(this->mSpecSize);
       } else
       {
          MHDFloat sgn = std::pow(-1.0,(order/2)%2)*this->mFftScaling;
-         rOut.topRows(this->mSpecSize) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*this->mOutMap.topRows(this->mSpecSize);
+         rOut.topRows(this->mSpecSize) = (sgn*(scale*this->positiveK()).array().pow(order).matrix()).asDiagonal()*rOut.topRows(this->mSpecSize);
       }
    }
 
@@ -100,7 +99,7 @@ namespace Fftw {
          {
             factor(m.first) = m.second*this->mFftScaling;
          }
-         rOut.topRows(this->mSpecSize) = factor.asDiagonal()*this->mOutMap.topRows(this->mSpecSize);
+         rOut.topRows(this->mSpecSize) = factor.asDiagonal()*rOut.topRows(this->mSpecSize);
       } else
       {
          MHDFloat sgn = std::pow(-1.0,(order/2)%2)*this->mFftScaling;
@@ -110,38 +109,19 @@ namespace Fftw {
             assert(m.second.imag() == 0);
             factor(m.first) = m.second.real()*this->mFftScaling;
          }
-         rOut.topRows(this->mSpecSize) = factor.asDiagonal()*this->mOutMap.topRows(this->mSpecSize);
+         rOut.topRows(this->mSpecSize) = factor.asDiagonal()*rOut.topRows(this->mSpecSize);
       }
    }
 
-   void MixedIntegrator::io(MatrixZ& rOut, const Matrix& in) const
-   {
-      if(rOut.rows() == this->mBwdSize)
-      {
-         this->io(rOut.data(), in.data());
-      } else
-      {
-         this->mTmp.resize(this->mBwdSize, this->mBlockSize);
-         this->io(this->mTmp.data(), in.data());
-      }
-   }
-
-   void MixedIntegrator::io(MHDComplex* out, const MHDFloat* in) const
-   {
-      this->mpOut = out;
-      this->mpIn = in;
-
-      new (&this->mOutMap) Eigen::Map<MatrixZ>(this->mpOut, this->mBwdSize, this->mBlockSize);
-   }
-
-   void MixedIntegrator::applyFft() const
+   void MixedIntegrator::applyFft(MatrixZ& mods, const Matrix& phys) const
    {
       Profiler::RegionFixture<4> fix("MixedIntegrator::applyFft");
-      fftw_execute_dft_r2c(this->mPlan, const_cast<MHDFloat*>(this->mpIn), reinterpret_cast<fftw_complex* >(this->mpOut));
+      fftw_execute_dft_r2c(this->mPlan, const_cast<MHDFloat*>(phys.data()), reinterpret_cast<fftw_complex* >(mods.data()));
+
    }
 
-}
-}
-}
-}
-}
+} // namespace Fftw
+} // namespace Backend
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

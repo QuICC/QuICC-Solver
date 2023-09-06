@@ -37,27 +37,27 @@
 
 4. Compile the model executables
    ```bash
-   make <GreatSimulation>
+   make && make install
    ```
 5. Create configuration XML
    ```bash
-   ./<GreatSimulation>Config
+   </path/to/Builds>/bin/<GreatSimulation>Config
    mv parameters_GEOMETRY.cfg parameters.cfg
    edit parameters.cfg
    ```
 6. Create initial state
    ```bash
-   ./<GreatSimulation>State
+   </path/to/Builds>/bin/<GreatSimulation>State
    mv state0000.hdf5 state_initial.hdf5
    ```
 7. Run simulation
    ```bash
-   ./<GreatSimulation>Model
+   </path/to/Builds>/bin/<GreatSimulation>Model
    ```
 8. Create physical space data for visualization
    ```bash
    ln -s state0042.hdf5 state4Visu.hdf5
-   ./<GreatSimulation>Visu
+   </path/to/Builds>/bin/<GreatSimulation>Visu
    ```
 9. visualize *visState0000.hdf5*
 
@@ -110,6 +110,7 @@ cmake </path/to/QuICC> --log-level=VERBOSE
 
 For instructions about known clusters refer to `README_clusters.md`.
 
+
 ### General optimization
 It is always better to compile for the target architecture (this is not necessary on Piz-Daint as CC will do it for you)
 ```bash
@@ -157,3 +158,94 @@ cmake </path/to/QuICC> -DQUICC_PROFILE_BACKEND=native -DQUICC_PROFILE_LEVEL=0
 ```
 ### barrier
 By setting the enviroment variable `QUICC_PROFILE_MPI_BARRIER` to either `after` and/or `before` a mpi barrier will be set before and/or after each region
+
+# Use docker image
+
+In order to simplify setting up a local version of QuICC, a docker image with required dependencies installed is provided. The latest image can be found on docker hub at [quicc/buildbase](https://hub.docker.com/repository/docker/quicc/buildbase/general). The setup described below will mount the `</path/to/QuICC_mnt>` directory into the container. Everything that needs to remain even after stopping the docker container should be stored in this directory. For example, source and build directory should be created in `</path/to/QuICC_mnt>`. In the commands below, `</path/to/QuICC_mnt>` needs to be replaced with an actual path.
+
+## Linux and MacOS
+
+### Setup docker
+
+The following steps should produce a working environment:
+ 1. Install docker:
+    - *Linux:* Follow instructions for your distribution.
+    - *MacOS:* Install docker desktop from [Install on Mac](https://docs.docker.com/desktop/install/mac-install/).
+ 2. Add your SSH keys to the SSH agent if not already present, i.e. for each key you need, run:
+    ```bash
+    ssh-add </path/to/SSH_KEY>
+    ```
+ 3. Start docker
+ 4. Open Terminal:
+    - Pull docker image from hub
+     ```bash
+     docker pull quicc/buildbase:latest
+     ```
+    - Create directory where sources and builds will be kept. This directory is persistent and will be mounted into the container.
+    ```bash
+    mkdir </path/to/QuICC_mnt>
+    ```
+    - Clone QuICC repository into `<path/to/QuICC_mnt>`, for example to clone the `main` branch:
+    ```bash
+    git clone -b main git@github.com:QuICC/QuICC </path/to/QuICC_mnt>/QuICC
+    ```
+    
+### Run docker image in Linux
+
+The directory `</path/to/QuICC_mnt>` will be mounted into the container under `/QuICC`. The content of this directory is persistent and will not disappear when the container is deleted.
+```bash
+docker run --rm -it \
+-v </path/to/QuICC_mnt>:/QuICC \
+--mount type=bind,src="$SSH_AUTH_SOCK",target=/run/host-services/ssh-auth.sock \
+-e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
+quicc/buildbase:latest
+```
+
+If everything worked, you should now be inside the container. Create a build directory in `/QuICC` and proceed as usual to configure, build and run QuICC.
+    
+### Run docker image in MacOS
+
+The directory `</path/to/QuICC_mnt>` will be mounted into the container under `/QuICC`. The content of this directory is persistent and will not disappear when the container is deleted.
+```bash
+docker run --rm -it \
+-v </path/to/QuICC_mnt>:/QuICC \
+--mount type=bind,src="/run/host-services/ssh-auth.sock",target=/run/host-services/ssh-auth.sock \
+-e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
+quicc/buildbase:latest
+```
+
+If everything worked, you should now be inside the container. Create a build directory in `/QuICC` and proceed as usual to configure, build and run QuICC.
+
+# Linear stability calculations
+
+QuICC provides a set of Python scripts to do linear stability calculations. The tools require PETSc and SLEPc, as well as their Python bindings petsc4py and slepc4py. As those library are quite complex and provide a lot of different options during installation, obtaining the right setup can be challenging. In order to simplify the setup, a docker image which contains all dependencies is provided. The image is available on the docker hub as "quicc/stability". In order to use it, follow the instructions above to setup docker but use "quicc/stability" in place of "quicc/buildbase".
+
+## Run the marginal curve tracing tool
+
+Let's assume the configured build directory is called `build_dir` and the model used is `BoussinesqSphereRTC`. To trace a marginal curve do the following:
+ 1. Change to build directory
+    ```bash
+    cd /path/to/build_dir
+    ```
+ 2. Copy linear stability files to build directory
+    ```bash
+    make quicc_pyquicc quicc_boussinesqspherertc_updatepy
+    ```
+ 3. The scripts are installed under `lib64/python/linear_stability`
+    ```bash
+    cd lib64/python/linear_stability/boussinesq/sphere/rtc/
+    ```
+ 4. Define the parameters and options in `trace_marginal.py`. The script contains a few examples for different parameters, resolutions, etc. At the bottom of the file are the main options for the tracing tool. The options are described in `lib64/python/quicc/linear_stability/marginal_curve.py` in `default_options` line 597. The main options are
+    - `marginal_options['curve']`: True/False trace marginal curve
+    - `marginal_options['minimum']`: True/False compute minimum
+    - `marginal_options['solve']`: True/False compute single point
+    - `marginal_options['solve_nev']`: Number of eigenvalues to compute
+    - `marginal_options['curve_points']`: list of modes where to compute the marginal curve
+ 5. Tell Python where to find the modules
+    ```bash
+    export PYTHONPATH=/path/to/build_dir/lib64/python
+    ```
+ 6. Run the marginal curve tracing script:
+    ```bash
+    python trace_marginal.py -st_type sinvert -eps_target 0 -eps_target_real
+    ```

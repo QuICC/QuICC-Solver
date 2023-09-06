@@ -51,13 +51,15 @@ namespace Projector {
       assert(rOut.rows() == this->outRows());
       assert(in.cols() <= rOut.cols());
 
-      this->applyPreOperator(in, true);
-      this->mBackend.applyFft();
-      this->applyPostOperator(rOut, true);
+      auto& tmpIn = this->mBackend.getStorage(StorageKind::in);
+      auto& tmpOut = this->mBackend.getStorage(StorageKind::out);
+      this->applyPreOperator(tmpIn, in, true);
+      this->mBackend.applyFft(tmpOut, tmpIn);
+      this->applyPostOperator(rOut, tmpOut, true);
 
-      this->applyPreOperator(in, false);
-      this->mBackend.applyFft();
-      this->applyPostOperator(rOut, false);
+      this->applyPreOperator(tmpIn, in, false);
+      this->mBackend.applyFft(tmpOut, tmpIn);
+      this->applyPostOperator(rOut, tmpOut, false);
    }
 
    void IChebyshevProjector::transform(Matrix& rOut, const Matrix& in) const
@@ -67,8 +69,9 @@ namespace Projector {
       assert(rOut.rows() == this->outRows());
       assert(in.cols() <= rOut.cols());
 
-      this->applyPreOperator(rOut, in);
-      this->mBackend.applyFft();
+      auto& tmp = this->mBackend.getStorage();
+      this->applyPreOperator(tmp, in);
+      this->mBackend.applyFft(rOut, tmp);
       this->applyPostOperator(rOut);
    }
 

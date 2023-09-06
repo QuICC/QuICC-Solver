@@ -6,27 +6,20 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_TRANSFORM_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_TRANSFORM_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 
 // System includes
 //
 #include <set>
 #include <map>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
+#include "QuICC/Transform/ITransformMap.hpp"
 
 namespace QuICC {
 
@@ -48,15 +41,21 @@ namespace Worland {
          /// Typedef for the configuration class as a shared pointer
          typedef IWorlandOperator::SharedSetupType SharedSetupType;
 
+         /// Typedef for the configuration class as a shared pointer
+         typedef ITransformMap<IWorlandOperator> MapFunctor;
+
+         /// Typedef for the configuration class as a shared pointer
+         typedef ITransformMap<IWorlandOperator>::MapType MapType;
+
          /**
           * @brief Constructor
           */
-         Transform();
+         Transform() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~Transform();
+         virtual ~Transform() = default;
 
          /**
           * @brief Initialise the polynomial transform
@@ -68,7 +67,7 @@ namespace Worland {
          /**
           * @brief Map transform operator to ID
           */
-         template <typename TOp> void addOperator(const std::size_t id = 0);
+         void addOperator(const MapFunctor& f);
 
          /**
           * @brief set list of required options
@@ -157,29 +156,8 @@ namespace Worland {
          /**
           * @brief Store transform operator to ID mapping
           */
-         std::map<std::size_t,std::shared_ptr<IWorlandOperator> > mOps;
+         MapType mOps;
    };
-
-   template <typename TOp> void Transform::addOperator(const std::size_t id)
-   {
-      std::size_t lid;
-
-      if(id == 0)
-      {
-         lid = this->mOps.size();
-      } else
-      {
-         lid = id;
-      }
-
-      std::shared_ptr<TOp> spOp = std::make_shared<TOp>();
-      auto ret = this->mOps.try_emplace(lid, spOp);
-
-      if(!ret.second)
-      {
-         throw std::logic_error("Worland operator could not be added to transform");
-      }
-   }
 
 }
 }

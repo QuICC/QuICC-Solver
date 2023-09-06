@@ -155,6 +155,18 @@ def qid(nr, l, q, bc, coeff = 1.0):
     mat.col = mat.row
     return radbc.constrain(mat, l, bc)
 
+def tid(nr, l, q, bc, coeff = 1.0):
+    """Create a tau identity block of order q"""
+
+    mat = spsp.coo_matrix((nr,nr))
+    if coeff != 1.0:
+        mat.data = coeff*np.ones((nr-q))
+    else:
+        mat.data = np.ones((nr-q))
+    mat.row = np.arange(0,nr-q)
+    mat.col = mat.row
+    return radbc.constrain(mat, l, bc)
+
 def stencil(nr, l, bc, make_square):
     """Create a galerkin stencil matrix"""
 

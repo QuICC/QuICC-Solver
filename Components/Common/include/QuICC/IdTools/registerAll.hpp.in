@@ -1,10 +1,10 @@
 /**
- * @file registerAll.hpp
+ * @file @_registrator@.hpp
  * @brief Register all known @idID@
  */
 
-#ifndef QUICC_@IDNS@_REGISTERALL_HPP
-#define QUICC_@IDNS@_REGISTERALL_HPP
+#ifndef QUICC_@IDNS@_@_REGISTRATOR@_HPP
+#define QUICC_@IDNS@_@_REGISTRATOR@_HPP
 
 // System includes
 //
@@ -14,21 +14,21 @@
 
 // Project includes
 //
-@idHeader@
+@_idHeader@
 
 namespace QuICC {
 
-namespace @idNS@ {
+@cxxNS@
 
-   void registerAll();
+   void @_registrator@();
 
-   inline void registerAll()
+   inline void @_registrator@()
    {
-      @idList@
+      @_idList@
 
    }
 
-}
+@cxxNS_@
 }
 
-#endif // QUICC_@IDNS@_REGISTERALL_HPP
+#endif // QUICC_@IDNS@_@_REGISTRATOR@_HPP

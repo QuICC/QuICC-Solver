@@ -1,3 +1,5 @@
+include(BundleCatch2)
+
 # Data directories
 file(MAKE_DIRECTORY
     "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite/Python/data/geometry/spherical/sphere_worland_chebyshev")
@@ -26,7 +28,7 @@ add_library(${QUICC_CURRENT_COMPONENT_TEST_LIB} "")
 set_target_properties(${QUICC_CURRENT_COMPONENT_TEST_LIB} PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(${QUICC_CURRENT_COMPONENT_TEST_LIB} PUBLIC "include" "Tests")
 target_link_libraries(${QUICC_CURRENT_COMPONENT_TEST_LIB}
-  ${QUICC_CURRENT_COMPONENT_LIB}
+  ${QUICC_CURRENT_COMPONENT_LIB} Catch2::Catch2
 )
 
 # Copy component TestSuite Python files

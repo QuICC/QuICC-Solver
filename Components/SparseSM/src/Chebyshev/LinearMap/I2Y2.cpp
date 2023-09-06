@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y2.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y2.hpp"
 
 namespace QuICC {
 
@@ -28,10 +22,6 @@ namespace LinearMap {
 
    I2Y2::I2Y2(const int rows, const int cols, const Scalar_t lower, const Scalar_t upper)
       : ILinearMapOperator(rows, cols, lower, upper)
-   {
-   }
-
-   I2Y2::~I2Y2()
    {
    }
 
@@ -106,7 +96,7 @@ namespace LinearMap {
       }
    }
 
-}
-}
-}
-}
+} // LinearMap
+} // Chebyshev
+} // SparseSM
+} // QuICC

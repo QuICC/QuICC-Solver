@@ -49,7 +49,7 @@ namespace Integrator {
          /**
           * @brief Destructor
           */
-         virtual ~Y1();
+         ~Y1();
 
       protected:
          /**
@@ -61,30 +61,23 @@ namespace Integrator {
          /**
           * @brief Initialize solver operators
           */
-         virtual void initOperator() const;
-
-         /**
-          * @brief Apply pre FFT operator
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         virtual void applyPreOperator(Matrix& rOut, const Matrix& in) const;
+         void initOperator() const final;
 
          /**
           * @brief Apply post FFT operator
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(Matrix& rOut) const;
+         void applyPostOperator(Matrix& rOut) const final;
 
          /**
           * @brief Apply pre FFT operator for component wise openerations
           *
+          * @param tmp Extracted Input real or imag values
           * @param in   Input values
           * @param useReal Real vs Imag flag
           */
-         virtual void applyPreOperator(const MatrixZ& in, const bool useReal) const;
+         void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const final;
 
          /**
           * @brief Apply post FFT operator for component wise operations
@@ -92,7 +85,7 @@ namespace Integrator {
           * @param rOut Output values
           * @param useReal Real vs Imag flag
           */
-         virtual void applyPostOperator(MatrixZ& rOut, const bool useReal) const;
+         void applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const final;
    };
 
 }

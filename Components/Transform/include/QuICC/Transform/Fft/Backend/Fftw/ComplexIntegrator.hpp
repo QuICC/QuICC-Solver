@@ -48,38 +48,29 @@ namespace Fftw {
          /**
           * @brief Destructor
           */
-         virtual ~ComplexIntegrator();
+         ~ComplexIntegrator();
          
          /**
           * @brief Initialise the FFT transforms
           */
-         virtual void init(const SetupType& setup) const override;
+         void init(const SetupType& setup) const override;
 
          /**
-          * @brief Set input and output data pointers for FFT
-          */
-         virtual void io(MHDComplex* out, const MHDComplex* in) const override;
-
-         /**
-          * @brief Set input and output data pointers for FFT
-          */
-         void io(MatrixZ& rOut, const MatrixZ& in) const;
-
-         /**
-          * @brief Copy field out of backend
+          * @brief Scale field
           */
          void output(MatrixZ& rOut) const;
-         using IComplexBackend::output;
 
          /**
           * @brief Copy mean of field out of backend
+          *
+          * @param rOut dims: N_k1 x (N_k2 x N_r)
           */
          void outputMean(MatrixZ& rOut) const;
 
          /**
-          * @brief Copy field out of backend zeroing the mean
+          * @brief Zero the mean
           */
-         void outputZeroMean(MatrixZ& rOut) const;
+         void zeroMean(MatrixZ& rOut) const;
 
          /**
           * @brief Scale with fast index dependent function
@@ -89,7 +80,7 @@ namespace Fftw {
          /**
           * @brief Extract the mean
           */
-         void extractMean() const;
+         void extractMean(const MatrixZ& rOut) const;
 
          /**
           * @brief Set the mean
@@ -99,7 +90,7 @@ namespace Fftw {
          /**
           * @brief Apply FFT
           */
-         virtual void applyFft() const override;
+         void applyFft(MatrixZ& mods, const MatrixZ& phys) const final;
 
          /**
           * @brief Compute 2D derivative operator
@@ -150,11 +141,6 @@ namespace Fftw {
           * @brief Next Diff2DOp id
           */
          mutable int mNextDiff2DId;
-
-         /**
-          * @brief Map for output data
-          */
-         mutable Eigen::Map<MatrixZ> mOutMap;
 
          /**
           * @brief Operators for 2D derivatives

@@ -31,7 +31,7 @@ namespace QuICC {
          /**
           * @brief Create list of possible timing intervals
           */
-         enum BreakPoint {INIT, PRERUN, FIRSTSTEP, RUN, POSTRUN, TOTAL};
+         enum BreakPoint {INIT, PRERUN, FIRSTSTEP, RUN, POSTRUN, TOTAL, FIRST_RUN, FIRST_TIMESTEP, FIRST_NONLINEAR, TIMESTEP, NONLINEAR, NBREAKPOINT};
 
          /**
           * @brief Constructor
@@ -44,6 +44,11 @@ namespace QuICC {
           * @brief Destructor
           */
          ~ExecutionTimer();
+
+         /**
+          * @brief Increment iteration
+          */
+         void iteration();
 
          /**
           * @brief Update the timing of given region. 
@@ -82,9 +87,19 @@ namespace QuICC {
          Array mTimes;
 
          /**
+          * @brief Iteration counter
+          */
+         std::size_t mCount;
+
+         /**
           * @brief Analyze the measured times
           */
          void analyze(Array& min, Array& max);
+
+         /**
+          * @brief Format timing for output
+          */
+         void formatTiming(std::ostream& stream, const std::string name, const BreakPoint pt, const Array& min, const Array& max, const int spaces, const int digits, const int base);
    };
 
 }

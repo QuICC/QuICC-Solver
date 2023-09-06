@@ -8,16 +8,11 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/IComplexIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Complex/Integrator/IComplexIntegrator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -46,14 +41,15 @@ namespace Integrator {
 
    void IComplexIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<2> fix("IComplexIntegrator::transform");
+
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == in.rows());
       assert(rOut.cols() == this->outCols());
       assert(rOut.rows() >= this->outRows());
       assert(in.cols() <= rOut.cols());
 
-      this->applyPreOperator(rOut, in);
-      this->mBackend.applyFft();
+      this->mBackend.applyFft(rOut, in);
       this->applyPostOperator(rOut);
    }
 
@@ -91,6 +87,18 @@ namespace Integrator {
 #endif // QUICC_STORAGEPROFILE
 
       return mem;
+   }
+
+   void IComplexIntegrator::dealias(MatrixZ& deAliased, const MatrixZ& aliased)const
+   {
+      int specSize = this->mspSetup->specSize();
+      assert(deAliased.rows() == specSize);
+
+      int negN = specSize/2;
+      int posN = negN + (specSize%2);
+
+      deAliased.topRows(posN) = aliased.topRows(posN);
+      deAliased.bottomRows(negN) = aliased.bottomRows(negN);
    }
 
 }

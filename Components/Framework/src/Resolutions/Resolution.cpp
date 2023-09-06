@@ -16,6 +16,7 @@
 
 // Class include
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 
 // Project includes
@@ -175,60 +176,66 @@ namespace QuICC {
 
    std::shared_ptr<Datatypes::ScalarFieldSetup> Resolution::spFwdSetup(const Dimensions::Transform::Id id) const
    {
+      const auto& tRes = *this->cpu()->dim(id);
+
       // Get forward dimensions
-      auto spDim1D = std::make_shared<ArrayI>(this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>());
+      auto spDim1D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
       for(int i = 0; i < spDim1D->size(); ++i)
       {
-         (*spDim1D)(i) = this->cpu()->dim(id)->dim<Dimensions::Data::DATF1D>(i);
+         (*spDim1D)(i) = tRes.dim<Dimensions::Data::DATF1D>(i);
       }
 
       // Get 2D dimensions
-      auto spDim2D = std::make_shared<ArrayI>(this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>());
+      auto spDim2D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
       for(int i = 0; i < spDim2D->size(); ++i)
       {
-         (*spDim2D)(i) = this->cpu()->dim(id)->dim<Dimensions::Data::DAT2D>(i);
+         (*spDim2D)(i) = tRes.dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return std::make_shared<Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>());
+      return std::make_shared<Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, tRes.dim<Dimensions::Data::DAT3D>());
    }
 
    std::shared_ptr<Datatypes::ScalarFieldSetup> Resolution::spBwdSetup(const Dimensions::Transform::Id id) const
    {
+      const auto& tRes = *this->cpu()->dim(id);
+
       // Get backward dimensions
-      auto spDim1D = std::make_shared<ArrayI>(this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>());
+      auto spDim1D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
       for(int i = 0; i < spDim1D->size(); ++i)
       {
-         (*spDim1D)(i) = this->cpu()->dim(id)->dim<Dimensions::Data::DATB1D>(i);
+         (*spDim1D)(i) = tRes.dim<Dimensions::Data::DATB1D>(i);
       }
 
       // Get 2D dimensions
-      auto spDim2D = std::make_shared<ArrayI>(this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>());
+      auto spDim2D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
       for(int i = 0; i < spDim2D->size(); ++i)
       {
-         (*spDim2D)(i) = this->cpu()->dim(id)->dim<Dimensions::Data::DAT2D>(i);
+         (*spDim2D)(i) = tRes.dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return std::make_shared<Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, this->cpu()->dim(id)->dim<Dimensions::Data::DAT3D>());
+      return std::make_shared<Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, tRes.dim<Dimensions::Data::DAT3D>());
    }
 
    std::shared_ptr<Datatypes::ScalarFieldSetup> Resolution::spSpectralSetup() const
    {
+      const auto& tRes = *this->cpu()->dim(Dimensions::Transform::SPECTRAL);
+
       // Get backward dimensions
-      auto spDim1D = std::make_shared<ArrayI>(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+      auto spDim1D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
       spDim1D->setConstant(this->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::TRANSFORM));
       for(int i = 0; i < spDim1D->size(); ++i)
       {
-         (*spDim1D)(i) = this->counter().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL, this->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i));
+         (*spDim1D)(i) = this->counter().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL, tRes.idx<Dimensions::Data::DAT3D>(i));
       }
 
       // Get 2D dimensions
-      auto spDim2D = std::make_shared<ArrayI>(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+      auto spDim2D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
       for(int i = 0; i < spDim2D->size(); ++i)
       {
-         (*spDim2D)(i) = this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
+         (*spDim2D)(i) = tRes.dim<Dimensions::Data::DAT2D>(i);
       }
 
-      return std::make_shared<Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+      return std::make_shared<Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, tRes.dim<Dimensions::Data::DAT3D>());
    }
 
    std::shared_ptr<Datatypes::ScalarFieldSetup> Resolution::spPhysicalSetup() const
@@ -243,28 +250,29 @@ namespace QuICC {
       rMiddle.clear();
 
       #ifdef QUICC_MPISPSOLVE
+         const auto& tRes = *this->cpu()->dim(Dimensions::Transform::SPECTRAL);
          // Three dimensional matrices
          if(this->sim().ss().has(SpatialScheme::Feature::SpectralMatrix3D))
          {
             int k_;
             int j_;
-            rSlow.reserve(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
-            rMiddle.reserve(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>());
+            rSlow.reserve(tRes.dim<Dimensions::Data::DAT3D>());
+            rMiddle.reserve(tRes.dim<Dimensions::Data::DAT3D>());
 
-            for(int k=0; k < this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); ++k)
+            for(int k=0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
             {
                // Extract "physical" index of slow data dimension
-               k_ = this->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(k);
+               k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
 
                rSlow.push_back(k_);
                rMiddle.push_back(std::vector<int>());
-               rMiddle.back().reserve(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k));
+               rMiddle.back().reserve(tRes.dim<Dimensions::Data::DAT2D>(k));
 
                // Loop over middle data dimension
-               for(int j=0; j < this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+               for(int j=0; j < tRes.dim<Dimensions::Data::DAT2D>(k); ++j)
                {
                   // Extract "physical" index of middle data dimension
-                  j_ = this->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j,k);
+                  j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
 
                   rMiddle.back().push_back(j_);
                }
@@ -276,11 +284,11 @@ namespace QuICC {
             // Make sure middle is empty
             rMiddle.clear();
 
-            rSlow.reserve(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k));
+            rSlow.reserve(tRes.dim<Dimensions::Data::DAT2D>(k));
 
-            for(int j = 0; j < this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); ++j)
             {
-               rSlow.push_back(this->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k));
+               rSlow.push_back(tRes.idx<Dimensions::Data::DAT2D>(j, k));
             }
 
          // Two dimensional matrices in 2D simulation
@@ -289,11 +297,11 @@ namespace QuICC {
             // Make sure middle is empty
             rMiddle.clear();
 
-            rSlow.reserve(this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k));
+            rSlow.reserve(tRes.dim<Dimensions::Data::DAT2D>(k));
 
-            for(int j = 0; j < this->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(k); ++j)
+            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); ++j)
             {
-               rSlow.push_back(this->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(j, k));
+               rSlow.push_back(tRes.idx<Dimensions::Data::DAT2D>(j, k));
             }
 
          } else

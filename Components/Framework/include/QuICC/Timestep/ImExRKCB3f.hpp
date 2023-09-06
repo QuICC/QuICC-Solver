@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ImExRKCB3f.hpp
  * @brief Implementation of an implicit/explicit Runge-Kutta scheme of order 3f (Cavaglieri & Bewley, 2015)
  */
@@ -43,7 +43,7 @@ namespace Timestep {
          /**
           * @brief Destructor
           */
-         virtual ~ImExRKCB3f();
+         virtual ~ImExRKCB3f() = default;
 
          /**
           * @brief Butcher's tableau a_ij factor for implicit scheme
@@ -83,7 +83,7 @@ namespace Timestep {
          /**
           * @brief Number of substeps for final step (this is +1 compared to theoretical value due to implementation)
           */
-         int steps() const; 
+         int steps() const;
 
          /**
           * @brief Order of the scheme
@@ -100,12 +100,12 @@ namespace Timestep {
           */
          std::string name() const;
 
+      protected:
          /**
           * @brief Initialize Butcher's tableau
           */
          void init();
-         
-      protected:
+
          /**
           * @brief Storage for the implicit a factors
           */

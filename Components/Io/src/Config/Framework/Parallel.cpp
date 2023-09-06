@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the parallel node of the configuration
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Config/Framework/Parallel.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Config/Framework/Parallel.hpp"
 
 namespace QuICC {
 
@@ -35,22 +26,19 @@ namespace Framework {
       this->init();
    }
 
-   Parallel::~Parallel()
-   {
-   }
-
    void Parallel::init()
    {
       this->iTags().addTag("cpus", -1);
       this->sTags().addTag("algorithm", "serial");
       this->sTags().addTag("grouper", "transform");
+      this->sTags().addTag("decomposition", "auto");
    }
 
    void Parallel::checkData()
    {
    }
 
-}
-}
-}
-}
+} // Framework
+} // Config
+} // Io
+} // QuICC

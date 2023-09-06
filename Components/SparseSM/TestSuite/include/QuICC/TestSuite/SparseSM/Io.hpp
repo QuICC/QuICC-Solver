@@ -6,9 +6,6 @@
 #ifndef QUICC_TESTSUITE_SPARSESM_IO_HPP
 #define QUICC_TESTSUITE_SPARSESM_IO_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iostream>

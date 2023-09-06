@@ -3,20 +3,14 @@
  * @brief Source of the implementation of the full sphere Worland I6 sparse operator
  */
 
-// Systethis->l() includes
+// System includes
 //
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/Worland/I6.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/Worland/I6.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/I6Diags.hpp"
 #include "QuICC/SparseSM/Worland/Legendre/I6Diags.hpp"
 #include "QuICC/SparseSM/Worland/CylEnergy/I6Diags.hpp"
@@ -28,28 +22,24 @@ namespace SparseSM {
 
 namespace Worland {
 
-   I6::I6(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l)
+   I6::I6(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
       : IWorlandOperator(rows, cols, alpha, dBeta)
    {
       switch(this->type())
       {
-         case CHEBYSHEV:
-            this->mpImpl = std::make_shared<Chebyshev::I6Diags>(alpha, l);
+         case WorlandKind::CHEBYSHEV:
+            this->mpImpl = std::make_shared<Chebyshev::I6Diags>(alpha, l, q);
             break;
-         case LEGENDRE:
-            this->mpImpl = std::make_shared<Legendre::I6Diags>(alpha, l);
+         case WorlandKind::LEGENDRE:
+            this->mpImpl = std::make_shared<Legendre::I6Diags>(alpha, l, q);
             break;
-         case CYLENERGY:
-            this->mpImpl = std::make_shared<CylEnergy::I6Diags>(alpha, l);
+         case WorlandKind::CYLENERGY:
+            this->mpImpl = std::make_shared<CylEnergy::I6Diags>(alpha, l, q);
             break;
-         case SPHENERGY:
-            this->mpImpl = std::make_shared<SphEnergy::I6Diags>(alpha, l);
+         case WorlandKind::SPHENERGY:
+            this->mpImpl = std::make_shared<SphEnergy::I6Diags>(alpha, l, q);
             break;
       }
-   }
-
-   I6::~I6()
-   {
    }
 
    void I6::buildTriplets(TripletList_t& list) const
@@ -57,6 +47,10 @@ namespace Worland {
       const int dShift = 3;
       ACoeffI ni = ACoeffI::LinSpaced(this->rows()-3, 3, this->rows()-1);
       ACoeff_t n = (ni + dShift).cast<Scalar_t>();
+
+      // Precompute the normalization factors
+      int maxN = this->rows()-1 + dShift + 6;
+      this->mpImpl->precomputeNorm(maxN, 0);
 
       if(n.size() > 0)
       {

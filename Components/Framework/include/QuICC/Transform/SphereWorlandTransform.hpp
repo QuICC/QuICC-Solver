@@ -6,21 +6,12 @@
 #ifndef QUICC_TRANSFORM_SPHEREWORLANDTRANSFORM_HPP
 #define QUICC_TRANSFORM_SPHEREWORLANDTRANSFORM_HPP
 
-// Debug includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Transform/ITransform.hpp"
@@ -45,12 +36,12 @@ namespace Transform {
          /**
           * @brief Constructor
           */
-         SphereWorlandTransform();
+         SphereWorlandTransform() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~SphereWorlandTransform();
+         virtual ~SphereWorlandTransform() = default;
 
          /**
           * @brief set list of required options
@@ -174,7 +165,7 @@ namespace Transform {
          virtual void reduce(Matrix& rOut, const Matrix& in, const std::size_t id) override;
    };
 
-}
-}
+} // Transform
+} // QuICC
 
 #endif // QUICC_TRANSFORM_SPHEREWORLANDTRANSFORM_HPP

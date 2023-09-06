@@ -6,9 +6,6 @@
 #ifndef QUICC_TESTSUITE_FRAMEWORK_LOADSPLITTER_TESTARGS_HPP
 #define QUICC_TESTSUITE_FRAMEWORK_LOADSPLITTER_TESTARGS_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
@@ -33,8 +30,14 @@ namespace LoadSplitter {
       /// Write output data to file
       bool dumpData;
 
+      /// Write detailed output data to file
+      bool dumpDetails;
+
       /// operator name
       std::string op;
+
+      /// algorithm name
+      std::string algorithm;
 
       /// ID of database file
       unsigned int db;
@@ -51,11 +54,22 @@ namespace LoadSplitter {
       /// Dimension 1D
       unsigned int dim3D;
 
-      /// MPI stage to look at
+      /** 
+       * @brief MPI stage to look at
+       * 0: radial, 1: AL, 2:FFT, 3: spectral
+       */
       unsigned int stage;
+
+      /**
+       * @brief Check rank decomposition individually
+       */
+      bool checkRanks;
 
       /// MPI ranks for which to compute splitting
       std::vector<double> params;
+
+      /// Imposed CPU factors
+      std::vector<int> factors;
 
       /**
        * @brief Constructor

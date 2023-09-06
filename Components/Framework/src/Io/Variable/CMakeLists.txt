@@ -1,15 +1,25 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
+  FieldProbeWriter.cpp
+  ICartesian1DScalarEnergyBaseWriter.cpp
+  ICartesian1DScalarEnergyWriter.cpp
+  ICartesian1DTorPolEnergyBaseWriter.cpp
+  ICartesian1DTorPolEnergyWriter.cpp
+  Cartesian1DScalarEnergyWriter.cpp
+  Cartesian1DTorPolEnergyWriter.cpp
   ISphericalScalarEnergyBaseWriter.cpp
   ISphericalScalarEnergyWriter.cpp
   ISphericalScalarLSpectrumWriter.cpp
   ISphericalScalarMSpectrumWriter.cpp
   ISphericalScalarNSpectrumWriter.cpp
+  ISphericalScalarRSpectrumWriter.cpp
   ISphericalScalarPowerBaseWriter.cpp
   ISphericalTorPolEnergyBaseWriter.cpp
   ISphericalTorPolEnergyWriter.cpp
   ISphericalTorPolLSpectrumWriter.cpp
   ISphericalTorPolMSpectrumWriter.cpp
+  ISphericalTorPolModeSpectrumWriter.cpp
   ISphericalTorPolNSpectrumWriter.cpp
+  ISphericalTorPolRSpectrumWriter.cpp
   ISphericalTorPolPowerBaseWriter.cpp
   ISphericalTorPolEnstrophyBaseWriter.cpp
   ISphericalTorPolEnstrophyWriter.cpp
@@ -27,15 +37,20 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ShellTorPolMSpectrumWriter.cpp
   ShellTorPolEnstrophyWriter.cpp
   SphereAngularMomentumWriter.cpp
+  SphereMaxAbsoluteFieldValueWriter.cpp
   SphereNusseltWriter.cpp
+  SphereScalarMeanWriter.cpp
   SphereScalarEnergyWriter.cpp
   SphereScalarLSpectrumWriter.cpp
   SphereScalarMSpectrumWriter.cpp
   SphereScalarNSpectrumWriter.cpp
+  SphereScalarRSpectrumWriter.cpp
   SphereTorPolEnergyWriter.cpp
   SphereTorPolLSpectrumWriter.cpp
   SphereTorPolMSpectrumWriter.cpp
+  SphereTorPolModeSpectrumWriter.cpp
   SphereTorPolNSpectrumWriter.cpp
+  SphereTorPolRSpectrumWriter.cpp
   SphereTorPolEnstrophyWriter.cpp
   SphereTorPolEnstrophyLSpectrumWriter.cpp
   SphereTorPolEnstrophyMSpectrumWriter.cpp

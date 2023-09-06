@@ -6,10 +6,6 @@
 #ifndef QUICC_TESTSUITE_TRANSFORM_WORLAND_TESTER_HPP
 #define QUICC_TESTSUITE_TRANSFORM_WORLAND_TESTER_HPP
 
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -79,12 +75,12 @@ namespace Worland {
          /**
           * @brief Read real data from file
           */
-         virtual void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+         virtual void readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const override;
 
          /**
           * @brief Read complex data from file
           */
-         virtual void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const;
+         virtual void readFile(MatrixZ& data, const ParameterType& param, const TestType type, const ContentType ctype) const override;
 
          /**
           * @brief Read data from database file
@@ -189,7 +185,17 @@ namespace Worland {
       // Read database file
       ParameterType dbParam = {param.at(0)};
       auto spDbSetup = this->buildSetup(dbParam, type);
-      TData dbData = TData::Zero(data.rows(), spDbSetup->slowSize());
+      int dbRows;
+      if(type == TestType::PROJECTOR && ctype == ContentType::INPUT)
+      {
+         dbRows = spDbSetup->fastSize(0);
+      }
+      else
+      {
+         dbRows = data.rows();
+      }
+
+      TData dbData = TData::Zero(dbRows, spDbSetup->slowSize());
       std::string fullname = this->makeFilename(dbParam, this->refRoot(), type, ctype);
       readData(dbData, fullname);
 
@@ -198,13 +204,14 @@ namespace Worland {
 
       // Loop over indexes
       int col = 0;
+      const int dataRows = data.rows();
       for(int j = 0; j < spSetup->slowSize(); j++)
       {
          int j_ = spSetup->slow(j);
          // Loop over multiplier
          for(int i = 0; i < spSetup->mult(j); i++)
          {
-            data.col(col) = dbData.col(j_);
+            data.block(0, col, dataRows, 1) = dbData.block(0, j_, dataRows, 1);
             col++;
          }
       }
@@ -243,16 +250,21 @@ namespace Worland {
       auto spSetup = this->buildSetup(param, type);
 
       // Input data
-      MatrixZ inData(spSetup->specSize(),spSetup->blockSize());
+      MatrixZ inData = MatrixZ::Zero(spSetup->specSize(),spSetup->blockSize());
       this->readFile(inData, param, type, ContentType::INPUT);
 
       TOp op;
       internal::Array igrid;
       this->initOperator(op, igrid, spSetup);
 
-      MatrixZ outData(op.outRows(), op.outCols());
+      MatrixZ outData;
 
-      op.transform(outData, inData);
+      for (unsigned int i = 0; i < this->mIter; ++i)
+      {
+         outData = MatrixZ::Zero(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+      }
+
       bool isReversed = (igrid(igrid.size()-1) < igrid(0));
       if(isReversed)
       {
@@ -274,14 +286,14 @@ namespace Worland {
       auto spSetup = this->buildSetup(param, type);
 
       // Input data
-      MatrixZ inData(spSetup->fwdSize(),spSetup->blockSize());
+      MatrixZ inData = MatrixZ::Zero(spSetup->fwdSize(),spSetup->blockSize());
       this->readFile(inData, param, type, ContentType::INPUT);
 
       TOp op;
       internal::Array igrid;
       this->initOperator(op, igrid, spSetup);
 
-      MatrixZ outData(op.outRows(), op.outCols());
+      MatrixZ outData;
 
       bool isReversed = (igrid(igrid.size()-1) < igrid(0));
       if(isReversed)
@@ -289,11 +301,25 @@ namespace Worland {
          this->reverseData(inData);
       }
 
-      op.transform(outData, inData);
+      for (unsigned int i = 0; i < this->mIter; ++i)
+      {
+         outData = MatrixZ::Zero(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+      }
 
-      Matrix out(2*outData.rows(),outData.cols());
-      out.topRows(outData.rows()) = outData.real();
-      out.bottomRows(outData.rows()) = outData.imag();
+      Matrix out;
+      if(param.size() == 1)
+      {
+         out.resize(2*outData.rows(),outData.cols());
+         out.topRows(outData.rows()) = outData.real();
+         out.bottomRows(outData.rows()) = outData.imag();
+      }
+      else
+      {
+         out = Matrix::Zero(2*spSetup->specSize(),outData.cols());
+         out.topRows(outData.rows()) = outData.real();
+         out.block(spSetup->specSize(), 0, outData.rows(), outData.cols()) = outData.imag();
+      }
 
       return out;
    }
@@ -344,21 +370,21 @@ namespace Worland {
          auto spSetup = this->buildSetup(param, type);
 
          // Input data
-         MatrixZ inData(spSetup->specSize(),spSetup->blockSize());
+         MatrixZ inData = MatrixZ::Zero(spSetup->specSize(),spSetup->blockSize());
          this->readFile(inData, param, type, ContentType::INPUT);
 
          TOp opB;
          internal::Array igrid;
          this->initOperator(opB, igrid, spSetup);
 
-         MatrixZ tmpData(opB.outRows(), opB.outCols());
+         MatrixZ tmpData = MatrixZ::Zero(opB.outRows(), opB.outCols());
 
          opB.transform(tmpData, inData);
 
          TOp2 opF;
          this->initOperator(opF, igrid, spSetup);
 
-         MatrixZ outData(opF.outRows(), opF.outCols());
+         MatrixZ outData = MatrixZ::Zero(opF.outRows(), opF.outCols());
 
          opF.transform(outData, tmpData);
 
@@ -378,12 +404,14 @@ namespace Worland {
       ss.precision(10);
       ss << "_id" << id;
 
+      // Distributed data meta file
       if(param.size() == 3)
       {
          int np = param.at(1);
          ss << "_np" << np;
          int r = param.at(2);
          ss << "_r" << r;
+         ss << "_stage0";
       }
 
       return ss.str();
@@ -426,13 +454,23 @@ namespace Worland {
 
    template <typename TOp, typename TOp2> std::shared_ptr<typename TOp::SetupType> Tester<TOp,TOp2>::buildSetup(const ParameterType& param, const TestType type) const
    {
-      // Read metadata
+      // Read DB metadata
+      ParameterType dbParam(param.begin(), param.begin()+1);
+      Array dbMeta(0);
+      std::string fullname = this->makeFilename(dbParam, this->refRoot(), type, ContentType::META);
+      readList(dbMeta, fullname);
+
+      // Read (distributed) metadata
       Array meta(0);
-      std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+      fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
       readList(meta, fullname);
 
-      // Create setup
-      int nMeta = 2;
+      // Create setup, three special lines: specN, physN, nModes
+      int nMeta = 3;
+      if(dbMeta(0) != meta(0) || dbMeta(1) != meta(1))
+      {
+         throw std::logic_error("Distributed data doesn't match database");
+      }
       int specN = meta(0);
       int physN = meta(1);
       auto spSetup = std::make_shared<typename TOp::SetupType>(physN, specN, GridPurpose::SIMULATION);
@@ -473,9 +511,9 @@ namespace Worland {
       data.colwise().reverseInPlace();
    }
 
-}
-}
-}
-}
+} // Worland
+} // Transform
+} // TestSuite
+} // QuICC
 
 #endif //QUICC_TESTSUITE_TRANSFORM_WORLAND_TESTER_HPP

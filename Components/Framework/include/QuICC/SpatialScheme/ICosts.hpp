@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ICosts.hpp
  * @brief Base implementation of a cost based spatial scheme
  */
@@ -6,18 +6,12 @@
 #ifndef QUICC_SPATIALSCHEME_ICOSTS_HPP
 #define QUICC_SPATIALSCHEME_ICOSTS_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
 #include <deque>
 #include <queue>
 #include <map>
-
-// External includes
-//
 
 // Project includes
 //
@@ -44,7 +38,7 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         virtual ~ICosts();
+         virtual ~ICosts() = default;
 
          /**
           * @brief Get load balancing weights
@@ -55,7 +49,7 @@ namespace SpatialScheme {
           * @brief Get memory related score weight
           */
          virtual double memoryScore(SharedResolution spRes);
-         
+
       protected:
          /**
           * @brief Set transform costs
@@ -143,7 +137,7 @@ namespace SpatialScheme {
          Array   mMemory;
 
    };
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_ICOSTS_HPP

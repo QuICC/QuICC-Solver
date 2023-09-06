@@ -6,16 +6,10 @@
 #ifndef QUICC_IO_CONFIG_FRAMEWORK_PARALLEL_HPP
 #define QUICC_IO_CONFIG_FRAMEWORK_PARALLEL_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <string>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -43,7 +37,7 @@ namespace Framework {
          /**
           * @brief Destructor
           */
-         virtual ~Parallel();
+         virtual ~Parallel() = default;
 
          /**
           * @brief Check compatibility of data
@@ -72,9 +66,9 @@ namespace Framework {
    /// Typedef for a const shared pointer of a parallel node
    typedef std::shared_ptr<const Parallel> SharedCParallel;
 
-}
-}
-}
-}
+} // Framework
+} // Config
+} // Io
+} // QuICC
 
 #endif // QUICC_IO_CONFIG_FRAMEWORK_PARALLEL_HPP

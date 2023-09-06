@@ -1,80 +1,20 @@
-/** 
+/**
  * @file D1_Neg.hpp
- * @brief Implementation of the Fourier based D* integrator, but 0 mode is -P integrator
+ * @brief Implementation of the Fourier based mixed D1_Neg integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_D1_NEG_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_D1_NEG_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/IMixedIntegrator.hpp"
-
-namespace QuICC {
-
-namespace Transform {
-
-namespace Fft {
-
-namespace Fourier {
-
-namespace Mixed {
-
-namespace Integrator {
-
-   /**
-    * @brief Implementation of the Fourier based D* integrator, but 0 mode is -P integrator
-    */ 
-   class D1_Neg: public IMixedIntegrator
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         D1_Neg();
-
-         /**
-          * @brief Destructor
-          */
-         virtual ~D1_Neg();
-         
-      protected:
-
-      private:
-         /**
-          * @brief Apply pre FFT operator
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          */
-         virtual void applyPreOperator(MatrixZ& rOut, const Matrix& in) const;
-
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         virtual void applyPostOperator(MatrixZ& rOut) const;
-   };
-
-}
-}
-}
-}
-}
-}
+#include "QuICC/Transform/Fft/Fourier/Mixed/Integrator/D1_NegBase.hpp"
+#include "QuICC/Transform/Wrappers/Fourier/Mixed/Integrator/D1_NegviewCpu_t.hpp.inc"
+#ifdef QUICC_USE_CUFFT
+#include "QuICC/Transform/Wrappers/Fourier/Mixed/Integrator/D1_NegviewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_D1_NEG_HPP

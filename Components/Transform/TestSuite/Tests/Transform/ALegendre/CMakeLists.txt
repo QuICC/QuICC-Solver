@@ -9,6 +9,7 @@ target_link_libraries(${TestExe}
   ${QUICC_CURRENT_COMPONENT_TEST_LIB}
 )
 
+
 set(QUICC_WORK_DIR "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite")
 
 set_target_properties(
@@ -43,5 +44,10 @@ list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 add_subdirectory(Projector)
 add_subdirectory(Integrator)
 add_subdirectory(BFLoop)
+
+if(QUICC_USE_KOKKOS)
+  target_link_libraries(${TestExe} QuICC::Kokkos)
+  quicc_fix_target_sources_kokkos(${TestExe})
+endif()
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)

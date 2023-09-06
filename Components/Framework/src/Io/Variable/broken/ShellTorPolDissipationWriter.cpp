@@ -26,8 +26,8 @@
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/Io/Variable/DissipationTags.hpp"
 #include "QuICC/PyQuICC/CoreWrapper.hpp"
 #include "QuICC/SpatialScheme/3D/SLFm.hpp"
@@ -49,8 +49,8 @@ namespace QuICC {
 
       void ShellTorPolDissipationWriter::init() {
          // Spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
-         MHDFloat ri = this->mPhysical.find(NonDimensional::Lower1D::id())->second->value();
-         MHDFloat ro = this->mPhysical.find(NonDimensional::Upper1D::id())->second->value();
+         MHDFloat ri = this->mPhysical.find(NonDimensional::Lower1d::id())->second->value();
+         MHDFloat ro = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
          this->mVolume = (4.0 / 3.0) * Math::PI * (std::pow(ro, 3) - std::pow(ri, 3));
 
          // Initialise python wrapper
@@ -129,7 +129,7 @@ namespace QuICC {
          Transform::TransformCoordinatorType::CommunicatorType::Fwd1DType &rOutVarPolRadLapl2 = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
          // Compute projection transform for first dimension
-         coord.transform1D().backward(rOutVarPolRadLapl.rData(), rInVarPol.data(), Transform::Backward::SRadLapl::id());
+         coord.transform1D().backward(rOutVarPolRadLapl.rData(), rInVarPol.data(), Transform::Backward::Slaplr::id());
 
          // Compute |f|^2
          rOutVarPolRadLapl2.rData() =
@@ -411,7 +411,7 @@ namespace QuICC {
          rOutVarPol = coord.communicator().storage<Dimensions::Transform::TRA1D>().provideFwd();
 
          // Compute projection transform for first dimension
-         coord.transform1D().backward(rOutVarPol.rData(), rInVarPol.data(), Transform::Backward::R_1::id());
+         coord.transform1D().backward(rOutVarPol.rData(), rInVarPol.data(), Transform::Backward::Overr1::id());
 
          // Compute |f|^2
          rOutVarPol.rData() = rOutVarPol.rData().array() * rOutVarPol.rData().conjugate().array();

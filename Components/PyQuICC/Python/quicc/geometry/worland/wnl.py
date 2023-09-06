@@ -179,8 +179,8 @@ def eval_bc_rdiffdivr(nr, l):
         a = jacobi_alpha(l)
         b = jacobi_beta(l)
         ab1 = a + b + 1.0
-        ns = np.arange(1,nr)
         if nr > 1:
+            ns = np.arange(1,nr)
             val[1:] = 2.0*(ab1 + ns)*eval_bc_poly(nr-1, l+1, 1, False)
         val += (l-1.0)*eval_bc_poly(nr, l, 0, False)
 
@@ -198,6 +198,7 @@ def eval_bc_divrdiffr(nr, l):
         b = jacobi_beta(l)
         ab1 = a + b + 1.0
         if nr > 1:
+            ns = np.arange(1,nr)
             val[1:] = 2.0*(ab1 + ns)*eval_bc_poly(nr-1, l+1, 1, False)
         val += (l+1.0)*eval_bc_poly(nr, l, 0, False)
 

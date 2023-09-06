@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 
 namespace QuICC {
 

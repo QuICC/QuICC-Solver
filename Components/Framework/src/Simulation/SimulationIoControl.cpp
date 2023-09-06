@@ -7,22 +7,11 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Simulation/SimulationIoControl.hpp"
-
 // Project includes
 //
-#include "QuICC/Version/Common.hpp"
-#include "QuICC/Version/Framework.hpp"
-#include "QuICC/Version/Io.hpp"
-#include "QuICC/Version/Polynomial.hpp"
-#include "QuICC/Version/PyQuICC.hpp"
-#include "QuICC/Version/SparseSM.hpp"
-#include "QuICC/Version/Transform.hpp"
+#include "QuICC/Simulation/SimulationIoControl.hpp"
+#include "Framework/gitHash.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -44,7 +33,7 @@ namespace QuICC {
       this->mspCfg = std::make_shared<SimulationConfig>(this->mspCfgFile);
    }
 
-   void SimulationIoControl::init()
+   void SimulationIoControl::init(const std::string modelVersion)
    {
       // Init configuration file
       this->initCfg();
@@ -60,13 +49,8 @@ namespace QuICC {
       Tools::Formatter::printLine(std::cout, '=');
       Tools::Formatter::printCentered(std::cout, "QuICC", '*');
       Tools::Formatter::printLine(std::cout, '-');
-      Tools::Formatter::printCentered(std::cout, "Common: " + Version::Common::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "Framework: " + Version::Framework::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "Io: " + Version::Io::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "Polynomial: " + Version::Polynomial::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "PyQuICC: " + Version::PyQuICC::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "SparseSM: " + Version::SparseSM::version(), ' ');
-      Tools::Formatter::printCentered(std::cout, "Transform: " + Version::Transform::version(), ' ');
+      Tools::Formatter::printCentered(std::cout, "Framework: " + std::string(Framework::gitHash), ' ');
+      Tools::Formatter::printCentered(std::cout, "Model: " + modelVersion, ' ');
       Tools::Formatter::printLine(std::cout, '=');
       Tools::Formatter::printNewline(std::cout);
    }
@@ -188,7 +172,7 @@ namespace QuICC {
 
       // Create physical parameters map
       std::map<std::string,MHDFloat> phys = this->config().physical();
-      std::map<std::string,int> boundary = this->config().boundary();
+      std::map<std::string,std::size_t> boundary = this->config().boundary();
 
       // Iterate over all ASCII writer
       for(itAscii = this->mAsciiWriters.begin(); itAscii < this->mAsciiWriters.end(); itAscii++)
@@ -241,6 +225,8 @@ namespace QuICC {
 
    void SimulationIoControl::writeAscii(const MHDFloat time, const MHDFloat timestep)
    {
+      Profiler::RegionFixture<1> fix("SimulationIoControl::writeAscii");
+
       // Iterate over all ASCII writer
       SimulationIoControl::ascii_iterator it;
       for(it = this->mAsciiWriters.begin(); it < this->mAsciiWriters.end(); it++)
@@ -252,6 +238,8 @@ namespace QuICC {
 
    void SimulationIoControl::writeHdf5(const MHDFloat time, const MHDFloat timestep)
    {
+      Profiler::RegionFixture<1> fix("SimulationIoControl::writeHdf5");
+
       // Iterate over all HDF5 writer
       SimulationIoControl::hdf5_iterator it;
       for(it = this->mHdf5Writers.begin(); it < this->mHdf5Writers.end(); it++)
@@ -273,6 +261,8 @@ namespace QuICC {
 
    void SimulationIoControl::writeStats()
    {
+      Profiler::RegionFixture<1> fix("SimulationIoControl::writeStats");
+
       if(this->mActiveStatsWrite)
       {
          // Iterate over all statistics writer

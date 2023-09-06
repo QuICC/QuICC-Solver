@@ -6,21 +6,13 @@
 #ifndef QUICC_SPARSESM_WORLAND_IDIAGS_HPP
 #define QUICC_SPARSESM_WORLAND_IDIAGS_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
 #include "QuICC/Precision.hpp"
+#include "QuICC/SparseSM/Worland/WorlandKind.hpp"
 
 namespace QuICC {
 
@@ -42,13 +34,26 @@ namespace Worland {
 
          /**
           * @brief Constructor
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
+          * @param l       Harmonic degree l
+          * @param q       Truncation q (only consider rows - q equations)
           */
-         IDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l);
+         IDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q);
 
          /**
           * @brief Destructor
           */
-         virtual ~IDiags();
+         virtual ~IDiags() = default;
+
+         /**
+          * @brief Precompute normalization
+          *
+          * @param maxN Highest radial n
+          * @param p    Shift in l
+          */
+         void precomputeNorm(const int maxN, const int p);
          
       protected:
          /**
@@ -97,6 +102,21 @@ namespace Worland {
           */
          ACoeff_t normalizeDiag(const ACoeff_t& n, const int k, const int p = 0) const;
 
+         /**
+          * @brief Zero last n entries of diagonal
+          */
+         void zeroLast(ACoeff_t& val, const int n) const;
+
+         /**
+          * @brief Type of Worland implementation
+          */
+         Worland::WorlandKind type() const;
+
+         /**
+          * @brief Truncation
+          */
+         const int mQ;
+
       private:
          /**
           * @brief Natural log of norm for alpha = -0.5
@@ -128,6 +148,11 @@ namespace Worland {
           * @brief l
           */
          Scalar_t mL;
+
+         /**
+          * @brief Storage for normalization
+          */
+         std::map<Scalar_t,ACoeff_t> mNorm;
    };
 
 }

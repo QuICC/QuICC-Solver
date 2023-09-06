@@ -59,10 +59,7 @@ namespace Timestep {
       mZeta(Eigen::Array<MHDFloat,3,1>(0., -17./60., -5./12.)),
       mCEx(Eigen::Array<MHDFloat,3,1>(0., 0., 1.))
    {
-   }
-
-   ImExRK3::~ImExRK3()
-   {
+      this->init();
    }
 
    MHDFloat ImExRK3::lhsT(const int step) const

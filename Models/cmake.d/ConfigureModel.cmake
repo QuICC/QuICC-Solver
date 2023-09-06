@@ -31,9 +31,10 @@ function(quicc_add_model target)
   set_target_properties(${QUICC_CURRENT_MODEL_LIB} PROPERTIES LINKER_LANGUAGE CXX)
   target_include_directories(${QUICC_CURRENT_MODEL_LIB} PUBLIC
     include/
+    ${PROJECT_BINARY_DIR}/${QUICC_CURRENT_MODEL_DIR}/Git
     )
   target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
-    QuICC::quicc_framework
+    QuICC::Framework
     )
 
   # Create model implementations libraries
@@ -48,6 +49,17 @@ function(quicc_add_model target)
     target_link_libraries(${modLib} PUBLIC
       ${QUICC_CURRENT_MODEL_LIB}
       )
+
+    string(TOUPPER "QUICC_MODEL_${modName}_${type}_BACKEND" _modBackend)
+    quicc_create_option(
+      NAME ${_modBackend}
+      OPTS "Python" "CPP"
+      LABEL "Backend used for model definition"
+      )
+    if(${_modBackend} STREQUAL "CPP")
+      quicc_target_add_definition(${modLib}
+        PUBLIC OPTION ${_modBackend})
+    endif()
   endforeach()
 
   # Update python files
@@ -63,6 +75,16 @@ function(quicc_add_model target)
 
   add_subdirectory(src)
 
+  # Generate git hash library
+  include(gitUtils/AddGitHashLib)
+  string(REPLACE "/" "::" _tgt_nmsp "Model/${target}")
+  AddGitHashLib(NAMESPACE ${_tgt_nmsp})
+  # Link
+  target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
+    "${QUICC_NAMESPACE}${_tgt_nmsp}::GitHash"
+  )
+
+
   # Create model executables
   foreach(type ${QAM_TYPES})
     set(ModelId "${target}/${type}")
@@ -73,6 +95,7 @@ function(quicc_add_model target)
     quicc_create_model_exe(${ModelId} "${modLib}")
     quicc_create_visu_exe(${ModelId} "${modLib}")
   endforeach()
+
   unset(QUICC_CURRENT_MODEL_LIB)
   unset(modName)
   unset(QAM_TYPES)

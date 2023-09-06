@@ -21,12 +21,12 @@
 #include "QuICC/Typedefs.hpp"
 #include "QuICC/Math/Constants.hpp"
 #include "QuICC/SolveTiming/After.hpp"
-#include "QuICC/NonDimensional/Lower1D.hpp"
-#include "QuICC/NonDimensional/Upper1D.hpp"
-#include "QuICC/NonDimensional/Lower2D.hpp"
-#include "QuICC/NonDimensional/Upper2D.hpp"
-#include "QuICC/NonDimensional/Lower3D.hpp"
-#include "QuICC/NonDimensional/Upper3D.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
+#include "QuICC/NonDimensional/Lower2d.hpp"
+#include "QuICC/NonDimensional/Upper2d.hpp"
+#include "QuICC/NonDimensional/Lower3d.hpp"
+#include "QuICC/NonDimensional/Upper3d.hpp"
 
 namespace QuICC {
 
@@ -342,20 +342,20 @@ namespace Equations {
 //            this->buildGrid(gI, gJ, gK);
 //            #if defined QUICC_SPATIALSCHEME_FFF
 //            #elif defined QUICC_SPATIALSCHEME_TFF
-//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower1D::id());
-//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper1D::id());
+//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower1d::id());
+//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper1d::id());
 //            #elif defined QUICC_SPATIALSCHEME_TFT
-//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1D::id());
-//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1D::id());
-//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3D::id());
-//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3D::id());
+//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1d::id());
+//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1d::id());
+//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3d::id());
+//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3d::id());
 //            #elif defined QUICC_SPATIALSCHEME_TTT
-//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1D::id());
-//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1D::id());
-//               MHDFloat yi = this->eqParams().nd(NonDimensional::Lower2D::id());
-//               MHDFloat yo = this->eqParams().nd(NonDimensional::Upper2D::id());
-//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3D::id());
-//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3D::id());
+//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1d::id());
+//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1d::id());
+//               MHDFloat yi = this->eqParams().nd(NonDimensional::Lower2d::id());
+//               MHDFloat yo = this->eqParams().nd(NonDimensional::Upper2d::id());
+//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3d::id());
+//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3d::id());
 //            #endif //defined QUICC_SPATIALSCHEME_FFF
 //
 //            MHDFloat k_;
@@ -444,20 +444,20 @@ namespace Equations {
 //            this->buildGrid(gI, gJ, gK);
 //            #if defined QUICC_SPATIALSCHEME_FFF
 //            #elif defined QUICC_SPATIALSCHEME_TFF
-//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower1D::id());
-//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper1D::id());
+//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower1d::id());
+//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper1d::id());
 //            #elif defined QUICC_SPATIALSCHEME_TFT
-//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1D::id());
-//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1D::id());
-//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3D::id());
-//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3D::id());
+//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1d::id());
+//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1d::id());
+//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3d::id());
+//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3d::id());
 //            #elif defined QUICC_SPATIALSCHEME_TTT
-//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1D::id());
-//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1D::id());
-//               MHDFloat yi = this->eqParams().nd(NonDimensional::Lower2D::id());
-//               MHDFloat yo = this->eqParams().nd(NonDimensional::Upper2D::id());
-//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3D::id());
-//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3D::id());
+//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1d::id());
+//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1d::id());
+//               MHDFloat yi = this->eqParams().nd(NonDimensional::Lower2d::id());
+//               MHDFloat yo = this->eqParams().nd(NonDimensional::Upper2d::id());
+//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3d::id());
+//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3d::id());
 //            #endif //defined QUICC_SPATIALSCHEME_FFF
 //
 //            MHDFloat k_;
@@ -547,21 +547,21 @@ namespace Equations {
 //            this->buildGrid(gI, gJ, gK);
 //            #if defined QUICC_SPATIALSCHEME_FFF
 //            #elif defined QUICC_SPATIALSCHEME_TFF
-//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower1D::id());
-//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper1D::id());
+//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower1d::id());
+//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper1d::id());
 //               MHDFloat dz = zo - zi;
 //            #elif defined QUICC_SPATIALSCHEME_TFT
-//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1D::id());
-//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1D::id());
-//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3D::id());
-//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3D::id());
+//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1d::id());
+//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1d::id());
+//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3d::id());
+//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3d::id());
 //            #elif defined QUICC_SPATIALSCHEME_TTT
-//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1D::id());
-//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1D::id());
-//               MHDFloat yi = this->eqParams().nd(NonDimensional::Lower2D::id());
-//               MHDFloat yo = this->eqParams().nd(NonDimensional::Upper2D::id());
-//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3D::id());
-//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3D::id());
+//               MHDFloat xi = this->eqParams().nd(NonDimensional::Lower1d::id());
+//               MHDFloat xo = this->eqParams().nd(NonDimensional::Upper1d::id());
+//               MHDFloat yi = this->eqParams().nd(NonDimensional::Lower2d::id());
+//               MHDFloat yo = this->eqParams().nd(NonDimensional::Upper2d::id());
+//               MHDFloat zi = this->eqParams().nd(NonDimensional::Lower3d::id());
+//               MHDFloat zo = this->eqParams().nd(NonDimensional::Upper3d::id());
 //            #endif //defined QUICC_SPATIALSCHEME_FFF
 //
 //            MHDFloat k_;

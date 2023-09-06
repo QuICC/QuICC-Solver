@@ -1,0 +1,76 @@
+/**
+ * @file I2DivR1_Zero.hpp
+ * @brief Implementation of the Worland based I2DivR1 integrator and zero l = 0 mode
+ */
+
+#ifndef QUICC_TRANSFORM_FFT_WORLAND_INTEGRATOR_BASE_I2DIVR1_ZERO_HPP
+#define QUICC_TRANSFORM_FFT_WORLAND_INTEGRATOR_BASE_I2DIVR1_ZERO_HPP
+
+// External includes
+//
+
+// Project includes
+//
+#include "QuICC/Transform/Fft/Worland/Tags.hpp"
+#include "QuICC/Transform/Fft/Worland/Integrator/DivR1.hpp"
+
+namespace QuICC {
+
+namespace Transform {
+
+namespace Fft {
+
+namespace Worland {
+
+namespace Integrator {
+
+   template <class Impl>
+   class I2DivR1_Zero;
+
+   /**
+    * @brief Implementation of the Worland based I2DivR1 integrator and zero l = 0 mode
+    */
+   template <>
+   class I2DivR1_Zero<base_t>: public DivR1<base_t>
+   {
+      public:
+         /**
+          * @brief Constructor
+          */
+         I2DivR1_Zero();
+
+         /**
+          * @brief Destructor
+          */
+         ~I2DivR1_Zero() = default;
+
+      protected:
+         /**
+          * @brief Initialise FFT backend
+          */
+         void initBackend() const final;
+
+      private:
+         /**
+          * @brief Apply post FFT operator
+          *
+          * @param rOut Output values
+          */
+         void applyPostOperator(Matrix& rOut, const bool isEven) const final;
+
+         /**
+          * @brief Apply post FFT operator for component wise operations
+          *
+          * @param rOut Output values
+          * @param useReal Real vs Imag flag
+          */
+         void applyPostOperator(MatrixZ& rOut, const bool useReal, const bool isEven) const final;
+   };
+
+}
+}
+}
+}
+}
+
+#endif // QUICC_TRANSFORM_FFT_WORLAND_INTEGRATOR_BASE_I2DIVR1_ZERO_HPP

@@ -6,28 +6,24 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SpatialScheme/ISpatialScheme.hpp"
-
 // Project includes
 //
+#include "QuICC/SpatialScheme/ISpatialScheme.hpp"
+#include "QuICC/Transform/Setup/Default.hpp"
 
 namespace QuICC {
 
 namespace SpatialScheme {
 
    ISpatialScheme::ISpatialScheme(const VectorFormulation::Id formulation, const GridPurpose::Id purpose, const int dimension, const std::size_t id, const std::string tag, const std::string formatted)
-      : mImplType(dimension), mFormulation(formulation), mPurpose(purpose), mDimension(dimension), mId(id), mTag(tag), mFormatted(formatted)
+      : mFormulation(formulation), mPurpose(purpose), mDimension(dimension), mId(id), mTag(tag), mFormatted(formatted)
    {
-      this->mImplType.setZero();
-   }
-
-   ISpatialScheme::~ISpatialScheme()
-   {
+      // Initialize default implementation options
+      std::vector<std::size_t> def = {Transform::Setup::Default::id()};
+      for(int i = 0; i < dimension; i++)
+      {
+         this->mImplType.emplace(i, def);
+      }
    }
 
    VectorFormulation::Id ISpatialScheme::formulation() const
@@ -70,7 +66,7 @@ namespace SpatialScheme {
       return this->mSpec;
    }
 
-   void ISpatialScheme::setImplementation(const ArrayI& type)
+   void ISpatialScheme::setImplementation(const std::map<std::size_t,std::vector<std::size_t>>& type)
    {
       this->mImplType = type;
    }
@@ -103,5 +99,10 @@ namespace SpatialScheme {
       return this->mFeatures;
    }
 
-}
-}
+   void ISpatialScheme::useCustomMesher(std::shared_ptr<IMesher> m)
+   {
+      this->mspCustomMesher = m;
+   }
+
+} // SpatialScheme
+} // QuICC

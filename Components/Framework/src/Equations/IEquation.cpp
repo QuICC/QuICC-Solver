@@ -3,22 +3,18 @@
  * @brief Source of building block for the implementation of a time dependend evolution equation
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/IEquation.hpp"
-
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
+#include "QuICC/Equations/IEquation.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
+#ifdef QUICC_DEBUG
+#include "QuICC/PhysicalNames/Coordinator.hpp"
+#endif
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
@@ -28,16 +24,76 @@
 #include "QuICC/PhysicalKernels/DoNothing.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
 
+#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+#include "QuICC/PhysicalNames/Coordinator.hpp"
+#include "QuICC/ModelOperator/ImplicitLinear.hpp"
+#include "QuICC/ModelOperator/Time.hpp"
+#include "QuICC/ModelOperator/Boundary.hpp"
+#include <unsupported/Eigen/SparseExtra>
+#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+
 namespace QuICC {
 
 namespace Equations {
+
+#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+namespace debug {
+   /// Create filename to write model operator to MatrixMarket file
+   void filenameWriteModelMatrix(const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx);
+
+   /// Write decoupled complex model operator to MatrixMarket file
+   void writeModelMatrix(const DecoupledZSparse& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx);
+
+   /// Write real model operator to MatrixMarket file
+   void writeModelMatrix(const SparseMatrix& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx);
+
+   std::string filenameModelMatrix(const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx)
+   {
+      std::stringstream ss;
+      ss << opName;
+      for(const auto& f: tags)
+      {
+         ss << "_" << PhysicalNames::Coordinator::tag(f.first);
+         if(f.second == FieldComponents::Spectral::TOR)
+         {
+            ss <<  "_tor";
+         }
+         else if(f.second == FieldComponents::Spectral::POL)
+         {
+            ss <<  "_pol";
+         }
+      }
+      ss << "_" << matIdx;
+
+      return ss.str();
+   }
+
+   void writeModelMatrix(const DecoupledZSparse& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx)
+   {
+      auto baseName = filenameModelMatrix(opName, tags, matIdx);
+
+      std::string matName = baseName + "_re.mtx";
+      Eigen::saveMarket(mat.real(), matName);
+      matName = baseName + "_im.mtx";
+      Eigen::saveMarket(mat.imag(), matName);
+   }
+
+   void writeModelMatrix(const SparseMatrix& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx)
+   {
+      auto baseName = filenameModelMatrix(opName, tags, matIdx);
+      std::string matName = baseName + ".mtx";
+      Eigen::saveMarket(mat, matName);
+   }
+}
+#endif
 
    IEquation::IEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend)
       : EquationData(spEqParams, spScheme, spBackend)
    {
    }
 
-   IEquation::~IEquation()
+   IEquation::IEquation(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<EquationOptions> spOptions)
+      : EquationData(spEqParams, spScheme, spBackend, spOptions)
    {
    }
 
@@ -53,11 +109,18 @@ namespace Equations {
       this->setNLComponents();
    }
 
+   std::shared_ptr<Transform::ITransformSteps> IEquation::transformSteps() const
+   {
+      auto  spSteps = Transform::createTransformSteps(this->res().sim().spSpatialScheme());
+
+      return spSteps;
+   }
+
    std::vector<Transform::TransformPath> IEquation::forwardPaths()
    {
       std::vector<Transform::TransformPath> paths;
 
-      std::shared_ptr<Transform::ITransformSteps>  spSteps = Transform::createTransformSteps(this->res().sim().spSpatialScheme());
+      auto spSteps = this->transformSteps();
 
       if(this->requirements(this->name()).isScalar())
       {
@@ -67,16 +130,19 @@ namespace Equations {
             {
                paths = spSteps->forwardScalar(this->nlComponents());
 
-            } else if(this->mForwardPathsType == FWD_IS_NONLINEAR)
+            }
+            else if(this->mForwardPathsType == FWD_IS_NONLINEAR)
             {
                paths = spSteps->forwardNLScalar(this->nlComponents());
 
-            } else
+            }
+            else
             {
                throw std::logic_error("Custom forward path selected but not defined");
             }
          }
-      } else
+      }
+      else
       {
          if(this->couplingInfo(this->res().sim().ss().spectral().ONE()).hasNonlinear())
          {
@@ -84,11 +150,13 @@ namespace Equations {
             {
                paths = spSteps->forwardVector(this->nlComponents());
 
-            } else if(this->mForwardPathsType == FWD_IS_NONLINEAR)
+            }
+            else if(this->mForwardPathsType == FWD_IS_NONLINEAR)
             {
                paths = spSteps->forwardNLVector(this->nlComponents());
 
-            } else
+            }
+            else
             {
                throw std::logic_error("Custom forward path selected but not defined");
             }
@@ -260,14 +328,9 @@ namespace Equations {
       bool hasBoundaryValue = features.at(CouplingFeature::BoundaryValue);
       bool allowExplicit = features.at(CouplingFeature::AllowExplicit);
 
-      bool isComplex;
-      std::vector<std::pair<std::size_t,FieldComponents::Spectral::Id> >  imFields;
-      std::vector<std::pair<std::size_t,FieldComponents::Spectral::Id> >  exLFields;
-      std::vector<std::pair<std::size_t,FieldComponents::Spectral::Id> >  exNLFields;
-      std::vector<std::pair<std::size_t,FieldComponents::Spectral::Id> >  exNSFields;
-      int indexMode;
+      Model::EquationInfo eqInfo;
       auto fId = std::make_pair(this->name(), compId);
-      this->backend().equationInfo(isComplex, imFields, exLFields, exNLFields, exNSFields, indexMode, fId, res);
+      this->backend().equationInfo(eqInfo, fId, res);
 
       // Initialise coupling information
       std::pair<std::map<FieldComponents::Spectral::Id, CouplingInformation>::iterator,bool> infoIt;
@@ -278,7 +341,8 @@ namespace Equations {
       int cpuIZero = iZero;
       if(iZero == 1)
       {
-         if(res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(0) == 0 && res.cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT2D>(0,0) == 0)
+         const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+         if(tRes.idx<Dimensions::Data::DAT3D>(0) == 0 && tRes.idx<Dimensions::Data::DAT2D>(0,0) == 0)
          {
             cpuIZero = 1;
          } else
@@ -291,7 +355,7 @@ namespace Equations {
       }
 
       // General setup: equation type? real/complex solver? start from m = ?
-      infoIt.first->second.setGeneral(eqType, isComplex, cpuIZero);
+      infoIt.first->second.setGeneral(eqType, eqInfo.isComplex, cpuIZero, eqInfo.isSplitEquation);
 
       // Set source flag: has source term?
       infoIt.first->second.setSource(hasSource);
@@ -300,12 +364,12 @@ namespace Equations {
       infoIt.first->second.setBoundaryValue(hasBoundaryValue);
 
       // Set index type: SLOWEST_SINGLE_RHS, SLOWEST_MULTI_RHS, MODE, SINGLE
-      auto idxType = safe_CouplingIndexType_cast(indexMode);
+      auto idxType = safe_CouplingIndexType_cast(eqInfo.indexMode);
       auto spCoupling = res.sim().ss().createCouplingTools(idxType);
       infoIt.first->second.setIndexType(idxType, spCoupling);
 
       // Create implicit field coupling
-      for(auto fIt = imFields.cbegin(); fIt != imFields.cend(); ++fIt)
+      for(auto fIt = eqInfo.im.cbegin(); fIt != eqInfo.im.cend(); ++fIt)
       {
          infoIt.first->second.addImplicitField(fIt->first, fIt->second);
       }
@@ -315,13 +379,13 @@ namespace Equations {
       if(allowExplicit)
       {
          // explicit linear
-         for(auto fIt = exLFields.cbegin(); fIt != exLFields.cend(); ++fIt)
+         for(auto fIt = eqInfo.exL.cbegin(); fIt != eqInfo.exL.cend(); ++fIt)
          {
             infoIt.first->second.addExplicitField(fIt->first, fIt->second, ModelOperator::ExplicitLinear::id());
          }
 
          // explicit nonlinear
-         for(auto fIt = exNLFields.cbegin(); fIt != exNLFields.cend(); ++fIt)
+         for(auto fIt = eqInfo.exNL.cbegin(); fIt != eqInfo.exNL.cend(); ++fIt)
          {
             if(!(fIt->first == this->name() && fIt->second == compId))
             {
@@ -330,14 +394,14 @@ namespace Equations {
          }
 
          // explicit nextstep
-         for(auto fIt = exNSFields.cbegin(); fIt != exNSFields.cend(); ++fIt)
+         for(auto fIt = eqInfo.exNS.cbegin(); fIt != eqInfo.exNS.cend(); ++fIt)
          {
             infoIt.first->second.addExplicitField(fIt->first, fIt->second, ModelOperator::ExplicitNextstep::id());
          }
 
          // Extract quasi inverse
-         auto fIt = std::find(exNLFields.begin(), exNLFields.end(), std::make_pair(this->name(), compId));
-         if(fIt != exNLFields.end())
+         auto fIt = std::find(eqInfo.exNL.begin(), eqInfo.exNL.end(), std::make_pair(this->name(), compId));
+         if(fIt != eqInfo.exNL.end())
          {
             hasQI = true;
          }
@@ -353,18 +417,14 @@ namespace Equations {
       int nMat = infoIt.first->second.couplingTools().nMat(res);
 
       // Set field coupling information
-      ArrayI tauNs(nMat);
-      ArrayI galerkinNs(nMat);
-      MatrixI galerkinShifts(nMat, 3);
-      ArrayI rhsCols(nMat);
-      ArrayI systemNs(nMat);
-      this->backend().operatorInfo(tauNs, galerkinNs, galerkinShifts, rhsCols, systemNs, fId, res, infoIt.first->second.couplingTools(), this->bcIds().getTagMap());
+      Model::OperatorInfo opInfo(nMat);
+      this->backend().operatorInfo(opInfo, fId, res, infoIt.first->second.couplingTools(), this->bcIds().map());
 
-      infoIt.first->second.couplingTools().setTauN(tauNs, res);
-      infoIt.first->second.couplingTools().setGalerkinN(galerkinNs, res);
-      infoIt.first->second.couplingTools().setRhsN(rhsCols, res);
-      infoIt.first->second.couplingTools().setSystemN(systemNs, res);
-      infoIt.first->second.setSizes(nMat, tauNs, galerkinNs, galerkinShifts, rhsCols, systemNs);
+      infoIt.first->second.couplingTools().setTauN(opInfo.tauN, res);
+      infoIt.first->second.couplingTools().setGalerkinN(opInfo.galN, res);
+      infoIt.first->second.couplingTools().setRhsN(opInfo.rhsCols, res);
+      infoIt.first->second.couplingTools().setSystemN(opInfo.sysN, res);
+      infoIt.first->second.setSizes(nMat, opInfo.tauN, opInfo.galN, opInfo.galShift, opInfo.rhsCols, opInfo.sysN);
    }
 
    void  IEquation::dispatchModelMatrix(DecoupledZSparse& rModelMatrix, const std::size_t opId, FieldComponents::Spectral::Id compId, const int matIdx, const std::size_t bcType, const Resolution& res, const std::vector<MHDFloat>& eigs) const
@@ -372,19 +432,41 @@ namespace Equations {
       // Get list of implicit fields
       CouplingInformation::FieldId_range imRange = this->couplingInfo(compId).implicitRange();
 
-      this->backend().modelMatrix(rModelMatrix, opId, imRange, matIdx, bcType, res, eigs, this->bcIds().getTagMap(), this->eqParams().map());
+      this->backend().modelMatrix(rModelMatrix, opId, imRange, matIdx, bcType, res, eigs, this->bcIds().map(), this->eqParams().map());
+
+#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+      auto opName = ModelOperator::Coordinator::tag(opId);
+      auto tags =  std::vector<SpectralFieldId>(imRange.first, imRange.second);
+      debug::writeModelMatrix(rModelMatrix, opName, tags, matIdx);
+#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    }
 
    void IEquation::dispatchGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx, const Resolution& res, const std::vector<MHDFloat>& eigs, const bool makeSquare) const
    {
       auto fId = std::make_pair(this->name(), compId);
-      this->backend().galerkinStencil(mat, fId, matIdx, res, eigs, makeSquare, this->bcIds().getTagMap(), this->eqParams().map());
+      this->backend().galerkinStencil(mat, fId, matIdx, res, eigs, makeSquare, this->bcIds().map(), this->eqParams().map());
+
+#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+      std::string opName = "galerkin_stencil";
+      if(makeSquare)
+      {
+         opName += "_sq";
+      }
+      std::vector<SpectralFieldId> tags = {fId};
+      debug::writeModelMatrix(mat, opName, tags, matIdx);
+#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    }
 
    void IEquation::dispatchExplicitBlock(FieldComponents::Spectral::Id compId, DecoupledZSparse& mat, const std::size_t opId,  const SpectralFieldId fieldId, const int matIdx, const Resolution& res, const std::vector<MHDFloat>& eigs) const
    {
       auto fId = std::make_pair(this->name(), compId);
-      this->backend().explicitBlock(mat, fId, opId, fieldId, matIdx, res, eigs, this->bcIds().getTagMap(), this->eqParams().map());
+      this->backend().explicitBlock(mat, fId, opId, fieldId, matIdx, res, eigs, this->bcIds().map(), this->eqParams().map());
+
+#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+      auto opName = ModelOperator::Coordinator::tag(opId);
+      std::vector<SpectralFieldId> tags = {fId, fieldId};
+      debug::writeModelMatrix(mat, opName, tags, matIdx);
+#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    }
 
    void IEquation::setGalerkinStencil(FieldComponents::Spectral::Id compId, SparseMatrix &mat, const int matIdx) const
@@ -421,7 +503,7 @@ namespace Equations {
       throw std::logic_error("Called dummy implementation of buildModelMatrix!");
    }
 
-   void IEquation::initConstraintKernel()
+   void IEquation::initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh)
    {
       for(auto it = this->mConstraintKernel.begin(); it != this->mConstraintKernel.end(); ++it)
       {
@@ -470,5 +552,20 @@ namespace Equations {
 
       return this->mSrcKernel.find(compId)->second;
    }
-}
-}
+
+   void IEquation::writeDiagnostics(const bool, const bool) const
+   {
+   }
+
+   void IEquation::linkEquation(std::shared_ptr<IEquation> spEq)
+   {
+      // Default does nothing
+   }
+
+   void IEquation::updateConstraintKernel(const MHDFloat time, const MHDFloat timestep, const bool isFinished)
+   {
+      DebuggerMacro_msg("(Nothing to update for " + PhysicalNames::Coordinator::tag(this->name()) + "(it = " + std::to_string(this->options().it()) + "))", 5);
+      // Default does nothing
+   }
+} // Equations
+} // QuICC

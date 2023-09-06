@@ -14,6 +14,7 @@
 
 // System includes
 //
+#include <fftw3.h>
 
 // External includes
 //
@@ -21,7 +22,7 @@
 // Project includes
 //
 #include "QuICC/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Backend/Fftw/Library.hpp"
+#include "Fft/Fftw/Library.hpp"
 
 namespace QuICC {
 
@@ -51,8 +52,38 @@ namespace Fftw {
 
          /**
           * @brief Apply FFT
+          *
+          * deprecated
           */
-         virtual void applyFft() const = 0;
+         virtual void applyFft() const;
+
+         /**
+          * @brief Apply FFT
+          *
+          * Real to real
+          */
+         virtual void applyFft(Matrix&, const Matrix&) const; //
+
+         /**
+          * @brief Apply FFT
+          *
+          * Complex to real
+          */
+         virtual void applyFft(Matrix&, const MatrixZ&) const; // =0?
+
+         /**
+          * @brief Apply FFT
+          *
+          * Real to complex
+          */
+         virtual void applyFft(MatrixZ&, const Matrix&) const; // =0?
+
+         /**
+          * @brief Apply FFT
+          *
+          * Complex to complex
+          */
+         virtual void applyFft(MatrixZ&, const MatrixZ&) const; // =0?
 
          /**
           * @brief Get the memory requirements

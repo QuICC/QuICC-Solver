@@ -56,12 +56,17 @@ namespace Transform {
          /**
           * @brief Validate implementation against reference
           */
-         void validate(const ParameterType& param, const TestType type) const;
+         void validate(const ParameterType& param, const TestType type, const bool timeOnly) const;
 
          /**
           * @brief Set max acceptable ulp
           */
          void setUlp(const unsigned int ulp);
+
+         /**
+          * @brief Set number of iterations
+          */
+         void setIter(const unsigned int iter);
 
       protected:
          /**
@@ -179,6 +184,11 @@ namespace Transform {
          unsigned int mMaxUlp;
 
          /**
+          * @brief Number of iterations
+          */
+         unsigned int mIter;
+
+         /**
           * @brief Datatype epsilon
           */
          MHDFloat mEpsilon;
@@ -195,11 +205,11 @@ namespace Transform {
    };
 
    template <typename TOp> TesterBase<TOp>::TesterBase(const std::string& fname, const bool keepData, const bool usePointScale)
-      : mKeepData(keepData), mUsePointScale(usePointScale), mMaxUlp(11), mEpsilon(std::numeric_limits<MHDFloat>::epsilon()), mBasename(fname), mPath("Transform/")
+      : mKeepData(keepData), mUsePointScale(usePointScale), mMaxUlp(11), mIter(1),  mEpsilon(std::numeric_limits<MHDFloat>::epsilon()), mBasename(fname), mPath("Transform/")
    {
    }
 
-   template <typename TOp> void TesterBase<TOp>::validate(const ParameterType& param, const TestType type) const
+   template <typename TOp> void TesterBase<TOp>::validate(const ParameterType& param, const TestType type, const bool timeOnly) const
    {
       Matrix outData;
       std::string filename = this->mBasename;
@@ -221,9 +231,8 @@ namespace Transform {
             infoType = "bfloop";
             break;
       }
-      outData = this->testOperator(param, type);
 
-      auto timeOnly = true;
+      outData = this->testOperator(param, type);
 
       if(not timeOnly)
       {
@@ -237,11 +246,13 @@ namespace Transform {
             INFO( "reference data was not found" );
             CHECK( false );
          }
-
-         // Compare data to reference
-         INFO( "type: " + infoType );
-         INFO( this->formatParameter(param));
-         this->computeError(outData, refData);
+         else
+         {
+            // Compare data to reference
+            INFO( "type: " + infoType );
+            INFO( this->formatParameter(param) );
+            this->computeError(outData, refData);
+         }
       }
    }
 
@@ -267,6 +278,11 @@ namespace Transform {
       this->mMaxUlp = ulp;
    }
 
+   template <typename TOp> void TesterBase<TOp>::setIter(const unsigned int iter)
+   {
+      this->mIter = iter;
+   }
+
    template <typename TOp> std::string TesterBase<TOp>::makeFilename(const ParameterType& param, const std::string& root, const TestType type, const ContentType ctype) const
    {
       std::string pre = "";
@@ -289,9 +305,16 @@ namespace Transform {
             break;
       }
 
+      std::string filename = pre + this->mBasename;
+
       switch(ctype)
       {
          case ContentType::META:
+            if (type == TestType::PROJECTOR)
+            {
+               // use P meta data for all ops
+               filename = pre + "P.dat";
+            }
             post = "_meta";
             break;
          case ContentType::INPUT:
@@ -303,7 +326,6 @@ namespace Transform {
       }
 
       std::string ext = resname(param);
-      std::string filename = pre + this->mBasename;
       std::string fullname = root + sub + filename.insert(filename.length()-4, ext+post);
 
       return fullname;
@@ -311,7 +333,8 @@ namespace Transform {
 
    template <typename TOp> Matrix TesterBase<TOp>::testOperator(const ParameterType& param, const TestType type) const
    {
-      Matrix outData = this->applyOperator(param, type);
+      Matrix outData;
+      outData = this->applyOperator(param, type);
 
       if(this->mKeepData)
       {
@@ -503,32 +526,13 @@ namespace Transform {
    {
       bool isEqual = false;
       double ulp = 0;
-#if 0
-      auto x = ref;
-      auto y = data;
-      if (std::abs(x) < std::abs(y))
-      {
-         std::swap(x, y);
-      }
-      auto diff = std::abs(x-y);
 
-      // epsilon subnormal
-      auto eps = std::numeric_limits<double>::denorm_min();
-
-      if(diff <= eps)
-      {
-         isEqual = true;
-      }
-
-      auto ulp = diff/eps;
-#else
-      // check that subnormal was flushed to zero
-      if (data == 0.0)
+      // check that subnormal was flushed to zero or subnormal
+      if (data == 0.0 || data < std::numeric_limits<MHDFloat>::min())
       {
          isEqual = true;
          ulp = 1;
       }
-#endif
       return std::make_tuple(isEqual, ulp, 0);
    }
 

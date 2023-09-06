@@ -8,59 +8,14 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/CartesianChebyshevTransform.hpp"
-
 // Project includes
 //
-
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D4.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D3.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D2.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
-
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I2.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I4.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I2D1.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I4D1.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I2_I2D1.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I4D1_I2.hpp"
-
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Energy.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/EnergyD1.hpp"
-
-#include "QuICC/Transform/Backward/P.hpp"
-#include "QuICC/Transform/Backward/D1.hpp"
-#include "QuICC/Transform/Backward/D2.hpp"
-
-#include "QuICC/Transform/Forward/P.hpp"
-#include "QuICC/Transform/Forward/I2P.hpp"
-#include "QuICC/Transform/Forward/I2D1.hpp"
-#include "QuICC/Transform/Forward/I2ZI2D1.hpp"
-#include "QuICC/Transform/Forward/I4P.hpp"
-#include "QuICC/Transform/Forward/I4D1.hpp"
-#include "QuICC/Transform/Forward/I4D1ZI2.hpp"
-
-#include "QuICC/Transform/Reductor/Energy.hpp"
-#include "QuICC/Transform/Reductor/EnergyD1.hpp"
+#include "QuICC/Transform/CartesianChebyshevTransform.hpp"
+#include "QuICC/Transform/RegisterCartesianChebyshevMap.hpp"
 
 namespace QuICC {
 
 namespace Transform {
-
-   CartesianChebyshevTransform::CartesianChebyshevTransform()
-   {
-   }
-
-   CartesianChebyshevTransform::~CartesianChebyshevTransform()
-   {
-   }
 
    void CartesianChebyshevTransform::requiredOptions(std::set<std::size_t>& list, const Dimensions::Transform::Id dimId) const
    {
@@ -88,23 +43,10 @@ namespace Transform {
 
    void CartesianChebyshevTransform::initOperators()
    {
-      // Create projectors
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::D1>(Backward::D1::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::D2>(Backward::D2::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Projector::P>(Backward::P::id());
-
-      // Create integrators
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::P>(Forward::P::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2>(Forward::I2P::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I4>(Forward::I4P::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2D1>(Forward::I2D1::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I4D1>(Forward::I4D1::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I2_I2D1>(Forward::I2ZI2D1::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Integrator::I4D1_I2>(Forward::I4D1ZI2::id());
-
-      // Create reductors
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Reductor::Energy>(Reductor::Energy::id());
-      this->mImpl.addOperator<Fft::Chebyshev::LinearMap::Reductor::EnergyD1>(Reductor::EnergyD1::id());
+      for(const auto& f: RegisterCartesianChebyshevMap::mapper())
+      {
+         this->mImpl.addOperator(*f);
+      }
    }                                                 
 
    void CartesianChebyshevTransform::forward(Matrix& rOut, const Matrix& in, const std::size_t id)

@@ -9,9 +9,6 @@
 // System includes
 //
 
-// External includes
-//
-
 // Project includes
 //
 
@@ -35,6 +32,10 @@ namespace SpatialScheme {
       SpectralOrdering123,
       /// Spectral matrix ordering is 1,3,2 (SLFl -> R, L, M -> ordering R, M, L)
       SpectralOrdering132,
+      /// Spectral ordering in transform is 1,2,3 (SLFm -> R, L, M -> ordering R, L, M)
+      TransformSpectralOrdering123,
+      /// Spectral ordering in transform is 1,3,2 (SLFl -> R, L, M -> ordering R, M, L)
+      TransformSpectralOrdering132,
       /// Cartesian geometry
       CartesianGeometry,
       /// Full sphere geometry
@@ -59,8 +60,12 @@ namespace SpatialScheme {
       RealSpectrum,
       /// Complex valued spectrum
       ComplexSpectrum,
+      /// Solve fourth order equation as is
+      SolveFourthOrder,
+      /// Split fourth order equation into 2 second order
+      SplitFourthOrder,
    };
-}
-}
+} // SpatialScheme
+} // QuICC
 
 #endif // QUICC_SPATIALSCHEME_FEATURE_HPP

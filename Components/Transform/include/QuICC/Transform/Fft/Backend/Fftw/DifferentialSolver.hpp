@@ -83,9 +83,15 @@ namespace Fftw {
          void setSpectralOperator(const SparseMatrix& mat, const int shift = 0);
 
          /**
+          * @brief Return solver operator
+          *
+          */
+         SparseMatrix& getSpectralOperator();
+
+         /**
           * @brief Set solver operator
           */
-         void solve(const int zeroRows, Matrix& rOut);
+         void solve(Matrix& rOut, const int zeroRows);
 
       private:
          /**
@@ -97,6 +103,11 @@ namespace Fftw {
           * @brief Block size
           */
          int mBlockSize;
+
+         /**
+          * @brief Additional rows to Spec
+          */
+         int mExtraRows;
 
          /**
           * @brief Storage for solver input/output

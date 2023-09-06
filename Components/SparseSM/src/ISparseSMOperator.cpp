@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/SparseSM/ISparseSMOperator.hpp"
-
 // Project includes
 //
+#include "QuICC/SparseSM/ISparseSMOperator.hpp"
 
 namespace QuICC {
 
@@ -24,10 +18,6 @@ namespace SparseSM {
 
    ISparseSMOperator::ISparseSMOperator(const int rows, const int cols)
       : mRows(rows), mCols(cols)
-   {
-   }
-
-   ISparseSMOperator::~ISparseSMOperator()
    {
    }
 
@@ -44,7 +34,15 @@ namespace SparseSM {
    SparseMatrix ISparseSMOperator::mat() const
    {
       internal::SparseMatrix mat;
-      this->buildOp(mat);
+      this->buildOpImpl(mat, this->rows(), this->cols());
+
+      return mat.cast<MHDFloat>();
+   }
+
+   SparseMatrix ISparseSMOperator::embedded(const int r, const int c) const
+   {
+      internal::SparseMatrix mat;
+      this->buildOpImpl(mat, r, c);
 
       return mat.cast<MHDFloat>();
    }
@@ -57,19 +55,19 @@ namespace SparseSM {
       return bd.cast<MHDFloat>();
    }
 
-   void ISparseSMOperator::buildOp(internal::SparseMatrix& mat) const
+   void ISparseSMOperator::buildOpImpl(internal::SparseMatrix& mat, const int r, const int c) const
    {
       // Build triplets
       TripletList_t list;
       this->buildTriplets(list);
 
       // Build sparse matrix
-      mat.resize(this->rows(), this->cols());
+      mat.resize(r, c);
       mat.setFromTriplets(list.begin(), list.end());
       mat.makeCompressed();
    }
 
-   void ISparseSMOperator::buildOp(internal::Matrix& bd) const
+   void ISparseSMOperator::buildOpImpl(internal::Matrix& bd, const int r, const int c) const
    {
       unsigned int kL, kU;
       this->buildBanded(bd, kL, kU);

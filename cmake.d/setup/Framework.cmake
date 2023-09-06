@@ -71,22 +71,6 @@ endif(QUICC_MPI)
 
 
 ###################################################
-#--------------- TIME INTEGRATORS ----------------#
-###################################################
-
-#
-# Choose the type of time integration the code is using.
-# Possible options are: ImExRKCB2, ImExRKCB3a, ImExRKCB3b, ImExRKCB3c, ImExRKCB3d, ImExRKCB3e, ImExRKCB3f, ImExRKCB4, ImExRK3, ImExSBDF2
-#
-quicc_create_option(NAME QUICC_TIMESTEPPER
-                    OPTS "ImExRKCB2" "ImExRKCB3a" "ImExRKCB3b" "ImExRKCB3c" "ImExRKCB3d" "ImExRKCB3e" "ImExRKCB3f" "ImExRKCB4" "ImExRK3" "ImExSBDF2"
-                    LABEL "Time integrator")
-quicc_add_definition(QUICC_TIMESTEPPER)
-
-
-
-
-###################################################
 #------------------- PROFILING -------------------#
 ###################################################
 quicc_create_option(NAME QUICC_PROFILE_BACKEND
@@ -108,6 +92,8 @@ if(QUICC_PROFILE_BACKEND STREQUAL "native")
   endif()
   set(QUICC_PROFILE_NATIVE_SAMPLE 100 CACHE STRING "Native profiler sample size.")
   mark_as_advanced(QUICC_PROFILE_NATIVE_WRITER)
+else()
+  unset(QUICC_PROFILE_NATIVE_WRITER CACHE)
 endif()
 
 quicc_create_option(NAME QUICC_PROFILE_LEVEL

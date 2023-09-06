@@ -44,7 +44,7 @@ res = [119, 239, 1]
 # Create parameters (rescaling to proper nondimensionalisation)
 m = 1 #
 res = [res[0], res[1]+m, 0] # Extend harmonic degree by harmonic order (fixed number of modes)
-eq_params = {'ekman':E, 'rossby':Ro, 'ro':ro, 'rratio':rratio, 'rayleigh':0}
+eq_params = {'ekman':E, 'rossby':Ro, 'ro':ro, 'r_ratio':rratio, 'rayleigh':0}
 bcs = {'bcType':model.SOLVER_HAS_BC, 'velocity':bc_vel}
 
 # Wave number function from single "index" (k perpendicular)

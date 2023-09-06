@@ -21,7 +21,7 @@
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Ascii/IAsciiWriter.hpp"
-#include "QuICC/Framework/Selector/ScalarField.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/TypeSelectors/TransformCommSelector.hpp"
 
 namespace QuICC {
@@ -72,7 +72,7 @@ namespace Stats {
           * @param parameters Physical parameters
           * @param boundary Boundary flags
           */
-         void setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,int>& boundary);
+         void setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,std::size_t>& boundary);
 
          /**
           * @brief Set the mesh grid arrays
@@ -166,7 +166,7 @@ namespace Stats {
          /**
           * @brief Boundary flags of the simulation
           */
-         std::map<std::string,int> mBoundary;
+         std::map<std::string,std::size_t> mBoundary;
 
          /**
           * @brief Storage for the mesh
