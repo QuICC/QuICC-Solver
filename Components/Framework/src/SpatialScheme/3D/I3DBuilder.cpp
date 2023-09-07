@@ -38,7 +38,7 @@ namespace SpatialScheme {
       return status;
    }
 
-   int I3DBuilder::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
+   int I3DBuilder::fillIndexes(const Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int>>& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
    {
       // Safety assertions
       assert( id.size() > 0 );
@@ -62,7 +62,7 @@ namespace SpatialScheme {
       spTools->fillIndexes2D3D(idx2D, idx3D, modes);
 
       // Fill indexes for 1D
-      spTools->fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
+      spTools->fillIndexes1D(fwd1D, bwd1D, idx2D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
 
       // Set status (0 for success, 1 for failure)
       int status = checkModes(modes, transId);

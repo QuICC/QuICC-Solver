@@ -33,7 +33,7 @@ namespace SpatialScheme {
       return space;
    }
 
-   int IRegular2DBuilder::fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
+   int IRegular2DBuilder::fillIndexes(const Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
    {
       throw std::logic_error("2D scheme splitting not fully implemented");
 
@@ -59,7 +59,7 @@ namespace SpatialScheme {
       spTools->fillIndexes2D3D(idx2D, idx3D, modes);
 
       // Fill indexes for 1D
-      spTools->fillIndexes1D(fwd1D, bwd1D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
+      spTools->fillIndexes1D(fwd1D, bwd1D, idx2D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
 
       // Set status (0 for success, 1 for failure)
       int status = 0;

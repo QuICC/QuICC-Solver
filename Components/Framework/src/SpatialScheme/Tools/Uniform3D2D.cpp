@@ -18,17 +18,17 @@ namespace SpatialScheme {
 
 namespace Tools {
 
-   int Uniform3D2D::truncationFwd(const int nN, const int l)
+   int Uniform3D2D::truncationFwd(const int nN, const int j, const int k)
    {
       return nN;
    }
 
-   int Uniform3D2D::truncationBwd(const int nN, const int l)
+   int Uniform3D2D::truncationBwd(const int nN, const int j, const int k)
    {
       return nN;
    }
 
-   int Uniform3D2D::index(const int i, const int k)
+   int Uniform3D2D::index(const int i, const int j, const int k)
    {
       return i;
    }

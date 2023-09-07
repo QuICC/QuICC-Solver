@@ -3,22 +3,13 @@
  * @brief Source of the tools for schemes with spherical harmonic expansions with l spectral ordering
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
+// Project includes
 //
 #include "QuICC/Equations/Tools/SHlm.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
-
-// Project includes
-//
 
 namespace QuICC {
 
@@ -67,7 +58,7 @@ namespace Tools {
       // Python setup is sufficient
    }
 
-   void SHlm::interpretSystemN(ArrayI&, const Resolution&) const
+   void SHlm::interpretSystemN(ArrayI&, const Resolution&, const int) const
    {
       // Python setup is sufficient
    }

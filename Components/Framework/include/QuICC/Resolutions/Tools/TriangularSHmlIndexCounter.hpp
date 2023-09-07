@@ -1,10 +1,10 @@
 /** 
- * @file RegularSHmlIndexCounter.hpp
- * @brief Implementation of spherical harmonic index counter with m spectral ordering, regular radial truncation, and l transform ordering
+ * @file TriangularSHmlIndexCounter.hpp
+ * @brief Implementation of spherical harmonic index counter with m spectral ordering, triangular radial truncation, and l transform ordering
  */
 
-#ifndef QUICC_REGULARSHMLINDEXCOUNTER_HPP
-#define QUICC_REGULARSHMLINDEXCOUNTER_HPP
+#ifndef QUICC_TRIANGULARSHMLINDEXCOUNTER_HPP
+#define QUICC_TRIANGULARSHMLINDEXCOUNTER_HPP
 
 // System includes
 //
@@ -20,20 +20,28 @@
 namespace QuICC {
 
    /**
-    * @brief Implementation of spherical harmonic index counter with m spectral ordering, regular radial truncation and l transform ordering
+    * @brief Implementation of spherical harmonic index counter with m spectral ordering, triangular radial truncation and l transform ordering
     */ 
-   class RegularSHmlIndexCounter: public IResolutionIndexCounter
+   class TriangularSHmlIndexCounter: public IResolutionIndexCounter
    {
       public:
          /**
           * @brief Constructor
           */
-         RegularSHmlIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu);
+         TriangularSHmlIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu);
 
          /**
           * @brief Empty destructor
           */
-         ~RegularSHmlIndexCounter() = default;
+         ~TriangularSHmlIndexCounter() = default;
+
+         /**
+          * @brief Get simulation's dimensions
+          *
+          * @param simId  ID of the simulation dimension (SIM1D, SIM2D, SIM3D)
+          * @param spaceId ID of the space (PHYSICAL, SPECTRAL)
+          */
+         int dim(const Dimensions::Simulation::Id simId, const Dimensions::Space::Id spaceId, const MHDFloat idx) const final;
 
          /**
           * @brief Reorder dimensions from fast to slow
@@ -80,9 +88,9 @@ namespace QuICC {
 
    };
 
-   /// Typedef for an smart reference counting pointer for a RegularSHmlIndexCounter
-   typedef std::shared_ptr<RegularSHmlIndexCounter>   SharedRegularSHmlIndexCounter;
+   /// Typedef for an smart reference counting pointer for a TriangularSHmlIndexCounter
+   typedef std::shared_ptr<TriangularSHmlIndexCounter>   SharedTriangularSHmlIndexCounter;
 
 } // QuICC
 
-#endif // QUICC_REGULARSHMLINDEXCOUNTER_HPP
+#endif // QUICC_TRIANGULARSHMLINDEXCOUNTER_HPP

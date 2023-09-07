@@ -3,21 +3,12 @@
  * @brief Source of the interface to the eigen direction tools
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/Tools/ICoupling.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/Tools/ICoupling.hpp"
 
 namespace QuICC {
 
@@ -50,9 +41,9 @@ namespace Tools {
       this->interpretRhsN(rRhsCols, res);
    }
 
-   void ICoupling::setSystemN(ArrayI& rSystemNs, const Resolution& res) const
+   void ICoupling::setSystemN(ArrayI& rSystemNs, const Resolution& res, const int nFields) const
    {
-      this->interpretSystemN(rSystemNs, res);
+      this->interpretSystemN(rSystemNs, res, nFields);
    }
 
 }

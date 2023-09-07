@@ -6,19 +6,10 @@
 #ifndef QUICC_TRANSFORMRESOLUTION_HPP
 #define QUICC_TRANSFORMRESOLUTION_HPP
 
-// Configuration includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -43,12 +34,20 @@ namespace QuICC {
           * @param idx2D Set of indexes for 2D
           * @param idx3D Set of indexes for 3D
           */
-         TransformResolution(const std::vector<ArrayI>& fwd, const std::vector<ArrayI>& bwd, const std::vector<ArrayI>& idx2D, const ArrayI& idx3D);
+         TransformResolution(const std::vector<std::vector<std::vector<int> > >& fwd, const std::vector<std::vector<std::vector<int> > >& bwd, const std::vector<std::vector<int> >& idx2D, const std::vector<int>& idx3D);
 
          /**
           * @brief Empty Destructor
           */
-         ~TransformResolution();
+         ~TransformResolution() = default;
+
+         /**
+          * @brief Get dimension
+          *
+          * @param j Index of the second dimension
+          * @param k Index of the last dimension
+          */
+         template <Dimensions::Data::Id TDim> int dim(const int j, const int k) const;
 
          /**
           * @brief Get dimension
@@ -61,6 +60,15 @@ namespace QuICC {
           * @brief Get dimension
           */
          template <Dimensions::Data::Id TDim> int dim() const;
+
+         /**
+          * @brief Get index mapping to full resolution
+          *
+          * @param i Index of dimension
+          * @param i Index of second dimension
+          * @param k Index of the last dimension
+          */
+         template <Dimensions::Data::Id TDim> int idx(const int i, const int j, const int k) const;
 
          /**
           * @brief Get index mapping to full resolution
@@ -105,43 +113,51 @@ namespace QuICC {
          /**
           * @brief Set of indexes describing the first dimensions (forward direction)
           */
-         std::vector<ArrayI>   mFwd;
+         std::vector<std::vector<std::vector<int> > >   mFwd;
 
          /**
           * @brief Set of indexes describing the first dimensions (backward direction)
           */
-         std::vector<ArrayI>   mBwd;
+         std::vector<std::vector<std::vector<int> > >   mBwd;
 
          /**
           * @brief Set of indexes describing the second dimensions
           */
-         std::vector<ArrayI>   mIdx2D;
+         std::vector<std::vector<int> >   mIdx2D;
 
          /**
           * @brief Set of indexes describing the third dimensions
           */
-         ArrayI   mIdx3D;
+         std::vector<int>  mIdx3D;
 
          /**
           * @brief Dimension of the first dimension (forward direction)
           */
-         ArrayI   mDimF1D;
+         std::vector<std::vector<int> >  mDimF1D;
 
          /**
           * @brief Dimension of the first dimension (backward direction)
           */
-         ArrayI   mDimB1D;
+         std::vector<std::vector<int> >  mDimB1D;
 
          /**
           * @brief Dimension of the second dimension
           */
-         ArrayI   mDim2D;
+         std::vector<int>  mDim2D;
 
          /**
           * @brief Dimension of the third dimension
           */
          int mDim3D;
    };
+
+   template <Dimensions::Data::Id TID> int TransformResolution::dim(const int j, const int k) const
+   {
+      // This should never by used
+      static_assert(TID == -99);
+
+      return -1;
+   }
 
    template <Dimensions::Data::Id TID> int TransformResolution::dim(const int k) const
    {
@@ -176,7 +192,11 @@ namespace QuICC {
    }
 
    /// Specialised for DATF1D
+   template  <> int TransformResolution::dim<Dimensions::Data::DATF1D>(const int j, const int k) const;
+   /// Specialised for DATF1D
    template  <> int TransformResolution::dim<Dimensions::Data::DATF1D>(const int k) const;
+   /// Specialised for DATB1D
+   template  <> int TransformResolution::dim<Dimensions::Data::DATB1D>(const int j, const int k) const;
    /// Specialised for DATB1D
    template  <> int TransformResolution::dim<Dimensions::Data::DATB1D>(const int k) const;
    /// Specialised for DAT2D
@@ -191,7 +211,11 @@ namespace QuICC {
    template  <> int TransformResolution::dim<Dimensions::Data::DAT3D>() const;
 
    /// Specialised for DATF1D
+   template  <> int TransformResolution::idx<Dimensions::Data::DATF1D>(const int i, const int j, const int k) const;
+   /// Specialised for DATF1D
    template  <> int TransformResolution::idx<Dimensions::Data::DATF1D>(const int i, const int k) const;
+   /// Specialised for DATB1D
+   template  <> int TransformResolution::idx<Dimensions::Data::DATB1D>(const int i, const int j, const int k) const;
    /// Specialised for DATB1D
    template  <> int TransformResolution::idx<Dimensions::Data::DATB1D>(const int i, const int k) const;
    /// Specialised for DAT2D

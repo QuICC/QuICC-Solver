@@ -39,17 +39,17 @@ namespace Tools {
          /**
           * @brief Compute trapezoidal forward truncation
           */
-         int truncationFwd(const int nN, const int l) final;
+         int truncationFwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Compute trapezoidal backward truncation
           */
-         int truncationBwd(const int nN, const int l) final;
+         int truncationBwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Compute index
           */
-         int index(const int nN, const int k) final;
+         int index(const int nN, const int j, const int k) final;
 
          /**
           * @brief Check if chosen resolution is optimal
@@ -60,7 +60,7 @@ namespace Tools {
          /**
           * @brief Minimal truncation for highest modes
           */
-         static const int MIN_TRUNCATION;
+         static constexpr const int MIN_TRUNCATION = 3;
 
    };
 

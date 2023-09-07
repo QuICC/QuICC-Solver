@@ -41,17 +41,17 @@ namespace Tools {
          /**
           * @brief Compute uniform forward truncation
           */
-         int truncationFwd(const int nN, const int l) final;
+         int truncationFwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Compute uniform backward truncation
           */
-         int truncationBwd(const int nN, const int l) final;
+         int truncationBwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Compute index
           */
-         int index(const int nN, const int k) final;
+         int index(const int nN, const int j, const int k) final;
 
          /**
           * @brief Check if chosen resolution is optimal

@@ -180,9 +180,9 @@ namespace Parallel {
             {
                int idxJ = tRes.template idx<Dimensions::Data::DAT2D>(j,k);
                // Loop over fast direction of output
-               for(int i = 0; i < tRes.template dim<TId>(k); i++)
+               for(int i = 0; i < tRes.template dim<TId>(j,k); i++)
                {
-                  int idxI = tRes.template idx<TId>(i,k);
+                  int idxI = tRes.template idx<TId>(i,j,k);
                   pOut->rPoint(outConv.i(i,j,k,idxI,idxJ,idxK),outConv.j(i,j,k,idxI,idxJ,idxK),outConv.k(i,j,k,idxI,idxJ,idxK)) = in.point(inConv.i(i,j,k,idxI,idxJ,idxK),inConv.j(i,j,k,idxI,idxJ,idxK),inConv.k(i,j,k,idxI,idxJ,idxK));
                }
             }

@@ -40,8 +40,12 @@ namespace Tools {
 
          /**
           * @brief Compute forward truncation (calls truncationBwd)
+          *
+          * @param nN   Reference truncation
+          * @param j    second dimension
+          * @param k    third dimension
           */
-         int truncationFwd(const int nN, const int l) final;
+         int truncationFwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Build load balance map of indexes for a generic spherical harmonic spatial schemes

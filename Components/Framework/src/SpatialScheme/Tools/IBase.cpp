@@ -49,7 +49,7 @@ namespace Tools {
       }
    }
 
-   void IBase::fillIndexes2D3D(std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::multimap<int,int>& modes)
+   void IBase::fillIndexes2D3D(std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::multimap<int,int>& modes)
    {
       // Set to extract the 3D indexes
       std::set<int>  filter;
@@ -61,56 +61,71 @@ namespace Tools {
       }
 
       // Set third dimension
-      idx3D.resize(filter.size());
+      idx3D.clear();
+      int sze = filter.size();
+      idx3D.reserve(sze);
 
       // Make full list of index in third dimension
       auto setIt = filter.begin();
-      for(int k = 0; k < idx3D.size(); k++)
+      for(auto setIt = filter.cbegin(); setIt != filter.cend(); setIt++)
       {
-         idx3D(k) = *setIt;
-         ++setIt;
+         idx3D.push_back(*setIt);
       }
 
       // Make full list of indexes for second dimension
-      for(int k = 0; k < idx3D.size(); k++)
+      for(int k = 0; k < sze; k++)
       {
          // Create storage for indexes
-         idx2D.push_back(ArrayI(modes.count(idx3D(k))));
+         idx2D.push_back(std::vector<int>());
+         idx2D.back().reserve(modes.count(idx3D.at(k)));
 
          // Get range
-         auto mapRange = modes.equal_range(idx3D(k));
+         auto mapRange = modes.equal_range(idx3D.at(k));
 
          // Loop over range
-         int j = 0;
          for(auto mapIt = mapRange.first; mapIt != mapRange.second; ++mapIt)
          {
-            idx2D.at(k)(j) = mapIt->second;
-            j++;
+            idx2D.at(k).push_back(mapIt->second);
          }
       }
    }
 
-   void IBase::fillIndexes1D(std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, const ArrayI& idx3D, const int nF1D, const int nB1D)
+   void IBase::fillIndexes1D(std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, const std::vector<std::vector<int> >& idx2D, const std::vector<int>& idx3D, const int nF1D, const int nB1D)
    {
       // Make full list of indexes for first dimension
-      for(int k = 0; k < idx3D.size(); k++)
+      int sze3D = idx3D.size();
+      fwd1D.reserve(sze3D);
+      bwd1D.reserve(sze3D);
+      for(int k = 0; k < sze3D; k++)
       {
-         // Create storage for indexes of forward transform
-         fwd1D.push_back(ArrayI(this->truncationFwd(nF1D, idx3D(k))));
-
-         // Fill array with indexes of forward transform
-         for(int i = 0; i < fwd1D.at(k).size(); i++)
+         int sze2D = idx2D.at(k).size();
+         fwd1D.push_back(std::vector<std::vector<int> >());
+         fwd1D.back().reserve(sze2D);
+         bwd1D.push_back(std::vector<std::vector<int> >());
+         bwd1D.back().reserve(sze2D);
+         for(int j = 0; j < sze2D; j++)
          {
-            fwd1D.at(k)(i) = i;
-         }
+            // Create storage for indexes of forward transform
+            fwd1D.at(k).push_back(std::vector<int>());
+            int sze1D = this->truncationFwd(nF1D, idx2D.at(k).at(j), idx3D.at(k));
+            fwd1D.at(k).back().reserve(sze1D);
 
-         // Create storage for indexes of backward transform
-         bwd1D.push_back(ArrayI(this->truncationBwd(nB1D, idx3D(k))));
+            // Fill array with indexes of forward transform
+            for(int i = 0; i < sze1D; i++)
+            {
+               fwd1D.at(k).at(j).push_back(i);
+            }
 
-         // Fill array with indexes of backward transform
-         for(int i = 0; i < bwd1D.at(k).size(); i++)
-         {
-            bwd1D.at(k)(i) = this->index(i, idx3D(k));
+            // Create storage for indexes of backward transform
+            bwd1D.at(k).push_back(std::vector<int>());
+            sze1D = this->truncationBwd(nB1D, idx2D.at(k).at(j), idx3D.at(k));
+            bwd1D.at(k).back().reserve(sze1D);
+
+            // Fill array with indexes of backward transform
+            for(int i = 0; i < sze1D; i++)
+            {
+               bwd1D.at(k).at(j).push_back(this->index(i, idx2D.at(k).at(j), idx3D.at(k)));
+            }
          }
       }
    }

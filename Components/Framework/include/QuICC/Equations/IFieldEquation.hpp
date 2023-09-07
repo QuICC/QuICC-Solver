@@ -230,7 +230,11 @@ namespace Equations {
                int k = 0;
                for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
                {
-                  for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
+                  // Effective rows in case of non-uniform truncation
+                  int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+                  assert( explicitField.slice(matIdx).rows() >= usedRows );
+
+                  for(int i = 0; i < usedRows; i++)
                   {
                      // Copy slice into flat array
                      tmp(k) = explicitField.point(i,j,matIdx);
@@ -332,6 +336,7 @@ namespace Equations {
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
          int rows = field.comp(compId).slice(matIdx).rows();
+         assert( rows == tRes.dim<Dimensions::Data::DATB1D>(0, matIdx) );
          int cols = field.comp(compId).slice(matIdx).cols();
 
          //Safety assertion
@@ -397,7 +402,11 @@ namespace Equations {
             {
                for(int j = zeroCol; j < cols; j++)
                {
-                  for(int i = zeroRow; i < rows; i++)
+                  // Effective rows in case of non-uniform truncation
+                  int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+                  assert( rows >= usedRows );
+
+                  for(int i = zeroRow; i < usedRows; i++)
                   {
                      // Copy field value into storage
                      Datatypes::internal::setScalar(storage, k, field.comp(compId).point(i,j,matIdx));
@@ -410,7 +419,11 @@ namespace Equations {
             {
                for(int j = zeroCol; j < cols; j++)
                {
-                  for(int i = zeroRow; i < rows; i++)
+                  // Effective rows in case of non-uniform truncation
+                  int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+                  assert( rows >= usedRows );
+
+                  for(int i = zeroRow; i < usedRows; i++)
                   {
                      // Copy field value into storage
                      Datatypes::internal::addScalar(storage, k, field.comp(compId).point(i,j,matIdx));
@@ -586,6 +599,7 @@ namespace Equations {
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
             int rows = field.comp(compId).slice(matIdx).rows();
+            assert( rows == tRes.dim<Dimensions::Data::DATB1D>(0, matIdx) );
             int cols = field.comp(compId).slice(matIdx).cols();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
             int zeroCol;
@@ -633,7 +647,11 @@ namespace Equations {
                int k = start;
                for(int j = zeroCol; j < cols; j++)
                {
-                  for(int i = zeroRow; i < rows; i++)
+                  // Effective rows in case of non-uniform truncation
+                  int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+                  assert( rows >= usedRows );
+
+                  for(int i = zeroRow; i < usedRows; i++)
                   {
                      // Add source term
                      Datatypes::internal::addScalar(storage, k, eq.sourceTerm(compId, i, j, matIdx));
@@ -764,6 +782,7 @@ namespace Equations {
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
             int rows = field.comp(compId).slice(matIdx).rows();
+            assert( rows == tRes.dim<Dimensions::Data::DATB1D>(0, matIdx) );
             int cols = field.comp(compId).slice(matIdx).cols();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
             int zeroCol;
@@ -811,7 +830,11 @@ namespace Equations {
                int k = start;
                for(int j = zeroCol; j < cols; j++)
                {
-                  for(int i = zeroRow; i < rows; i++)
+                  // Effective rows in case of non-uniform truncation
+                  int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+                  assert( rows >= usedRows );
+
+                  for(int i = zeroRow; i < usedRows; i++)
                   {
                      // Add source term
                      Datatypes::internal::setScalar(storage, k, eq.boundaryValue(compId, i, j, matIdx));
@@ -944,6 +967,7 @@ namespace Equations {
             }
          #else
             int rows = field.comp(compId).slice(matIdx).rows();
+            assert( rows == tRes.dim<Dimensions::Data::DATB1D>(0, matIdx) );
             int cols = field.comp(compId).slice(matIdx).cols();
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
             int zeroCol;
@@ -959,7 +983,11 @@ namespace Equations {
             int k = start;
             for(int j = zeroCol; j < cols; j++)
             {
-               for(int i = zeroRow; i < rows; i++)
+               // Effective rows in case of non-uniform truncation
+               int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+               assert( rows >= usedRows );
+
+               for(int i = zeroRow; i < usedRows; i++)
                {
                   // Set field to zero
                   Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
@@ -1108,6 +1136,7 @@ namespace Equations {
       if(this->couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
          int rows = field.comp(compId).slice(matIdx).rows();
+         assert( rows == tRes.dim<Dimensions::Data::DATB1D>(0, matIdx) );
          int cols = field.comp(compId).slice(matIdx).cols();
 
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
@@ -1145,7 +1174,11 @@ namespace Equations {
             int k = solStart;
             for(int j = 0; j < cols; j++)
             {
-               for(int i = 0; i < rows; i++)
+               // Effective rows in case of non-uniform truncation
+               int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+               assert( rows >= usedRows );
+
+               for(int i = 0; i < usedRows; i++)
                {
                   // Copy timestep output into field
                   MHDVariant dataPoint = Datatypes::internal::getScalar(*solution, k);

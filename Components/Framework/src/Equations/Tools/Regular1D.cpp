@@ -3,21 +3,12 @@
  * @brief Source of the tools for schemes with a single eigen direction
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/Tools/Regular1D.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/Tools/Regular1D.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
@@ -83,7 +74,7 @@ namespace Tools {
       // Python setup is sufficient
    }
 
-   void Regular1D::interpretSystemN(ArrayI&, const Resolution&) const
+   void Regular1D::interpretSystemN(ArrayI&, const Resolution&, const int) const
    {
       // Python setup is sufficient
    }

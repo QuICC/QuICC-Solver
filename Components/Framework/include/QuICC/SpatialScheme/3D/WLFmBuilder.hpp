@@ -15,9 +15,7 @@
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/3D/IRegularSHmlBuilder.hpp"
-#include "QuICC/Transform/Poly/Setup.hpp"
-#include "QuICC/Transform/Poly/ALegendre/Setup.hpp"
-#include "QuICC/Transform/Fft/Fourier/Mixed/Setup.hpp"
+#include "QuICC/Transform/TransformSetup.hpp"
 
 namespace QuICC {
 
@@ -68,17 +66,17 @@ namespace SpatialScheme {
          /**
           * @brief Construct setup object for first transform
           */
-         Transform::Poly::SharedSetup  spSetup1D(SharedResolution spRes) const;
+         Transform::SharedTransformSetup  spSetup1D(SharedResolution spRes) const;
 
          /**
           * @brief Construct setup object for second transform
           */
-         Transform::Poly::ALegendre::SharedSetup  spSetup2D(SharedResolution spRes) const;
+         Transform::SharedTransformSetup  spSetup2D(SharedResolution spRes) const;
 
          /**
           * @brief Construct setup object for third transform
           */
-         Transform::Fft::Fourier::Mixed::SharedSetup  spSetup3D(SharedResolution spRes) const;
+         Transform::SharedTransformSetup  spSetup3D(SharedResolution spRes) const;
    };
 
 } // SpatialScheme

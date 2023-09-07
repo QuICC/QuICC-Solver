@@ -77,9 +77,8 @@ namespace Equations {
       }
 
       auto features = defaultCouplingFeature();
-      features.at(CouplingFeature::Nonlinear) = true;
-      features.at(CouplingFeature::AllowExplicit) = false;
-      features.at(CouplingFeature::AllowExplicit) = false;
+      features.at(CouplingFeature::Nonlinear) = hasNL;
+      features.at(CouplingFeature::AllowExplicit) = hasSource;
 
       if(this->ss().spectral().ONE() != FieldComponents::Spectral::NOTUSED)
       {

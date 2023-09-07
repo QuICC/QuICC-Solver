@@ -389,10 +389,10 @@ namespace Parallel {
             j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
 
             // Loop over fast data dimension
-            for(int i = 0; i < tRes.dim<TDataId>(k); ++i)
+            for(int i = 0; i < tRes.dim<TDataId>(j,k); ++i)
             {
                // Extract "physical" index of fast data dimension
-               i_ = tRes.idx<TDataId>(i,k);
+               i_ = tRes.idx<TDataId>(i,j,k);
 
                // Combine array indexes into coordinate tuple
                Coordinate coord = {i + idxConv.centralPadding(i_, k), j, k};
@@ -510,10 +510,10 @@ namespace Parallel {
                j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
 
                // Loop over fast data dimension
-               for(int i = 0; i < tRes.dim<TDataId>(k); ++i)
+               for(int i = 0; i < tRes.dim<TDataId>(j,k); ++i)
                {
                   // Extract "physical" index of fast data dimension
-                  i_ = tRes.idx<TDataId>(i,k);
+                  i_ = tRes.idx<TDataId>(i,j,k);
 
                   // Create key
                   Coordinate key = spRes->counter().makeVKey(keyId, i_, j_, k_);

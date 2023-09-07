@@ -6,16 +6,10 @@
 #ifndef QUICC_EQUATIONS_TOOLS_SHM_HPP
 #define QUICC_EQUATIONS_TOOLS_SHM_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include<vector>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -75,8 +69,12 @@ namespace Tools {
 
          /**
           * @brief Interpret system size provided by python code
+          *
+          * @param rSystemNs  System sizes
+          * @param res        Resolution object
+          * @param nFields    Number of coupled fields in system
           */
-         virtual void interpretSystemN(ArrayI& rSystemNs, const Resolution& res) const;
+         virtual void interpretSystemN(ArrayI& rSystemNs, const Resolution& res, const int nFields) const;
    };
 
    /// Typedef for a shared SHm

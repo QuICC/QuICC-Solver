@@ -32,7 +32,7 @@ namespace SpatialScheme {
       return space;
    }
 
-   int IRegular1DBuilder::fillIndexes(Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
+   int IRegular1DBuilder::fillIndexes(Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins)
    {
       // Safety assertions
       assert( id.size() > 0 );
@@ -43,8 +43,8 @@ namespace SpatialScheme {
       assert(transId == Dimensions::Transform::TRA1D);
 
       // Set unused third dimension
-      idx3D.resize(1);
-      idx3D.setZero();
+      idx3D.clear();
+      idx3D = std::vector<int>(1, 0);
 
       // Clear second dimension
       idx2D.clear();
@@ -55,21 +55,25 @@ namespace SpatialScheme {
       bwd1D.clear();
 
       // Create single forward storage for indexes
-      fwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATF1D)));
+      fwd1D.push_back(std::vector<std::vector<int>>(1));
+      int sze = this->dim(transId, Dimensions::Data::DATF1D);
+      fwd1D.back().back().reserve(sze);
 
       // Fill array with indexes
-      for(int i = 0; i < fwd1D.at(0).size(); i++)
+      for(int i = 0; i < sze; i++)
       {
-         fwd1D.at(0)(i) = i;
+         fwd1D.back().back().push_back(i);
       }
 
       // Create single backward storage for indexes
-      bwd1D.push_back(ArrayI(this->dim(transId, Dimensions::Data::DATB1D)));
+      bwd1D.push_back(std::vector<std::vector<int>>(1));
+      sze = this->dim(transId, Dimensions::Data::DATB1D);
+      bwd1D.back().back().reserve(sze);
 
       // Fill array with indexes
-      for(int i = 0; i < bwd1D.at(0).size(); i++)
+      for(int i = 0; i < sze; i++)
       {
-         bwd1D.at(0)(i) = i;
+         bwd1D.back().back().push_back(i);
       }
 
       return 0;

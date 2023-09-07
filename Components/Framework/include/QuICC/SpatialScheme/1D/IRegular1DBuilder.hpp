@@ -57,7 +57,7 @@ namespace SpatialScheme {
           * @param id      ID of the bin
           * @param bins    Total number of bins (useful to build efficient pairs)
           */
-         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::vector<int>& id, const std::vector<int>& bins) override;
+         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins) override;
 
          /**
           * @brief Get total of splittable indexes 
