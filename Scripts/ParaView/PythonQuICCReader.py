@@ -2,10 +2,12 @@
 #
 # https://www.pasc-ch.org/projects/2021-2024/aqua-d/
 #
-# initial version provided by Philippe Marty (ETH-Zurich) to run serially
+# initial version provided by Philippe Marti (ETH-Zurich) to run serially
 # This version was extended by Jean M. Favre, CSCS, to run in parallel
 # Tested with ParaView v5.11
 # Thu  6 Jul 10:42:48 CEST 2023
+# This version was extended by Philippe Marti (ETH-Zurich) to deal with 
+# missing phi point
 
 # This is the module to import. It provides VTKPythonAlgorithmBase, the base class
 # for all python-based vtkAlgorithm subclasses in VTK and decorators used to
@@ -42,6 +44,7 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         from vtkmodules.vtkCommonCore import vtkDataArraySelection
         self._arrayselection = vtkDataArraySelection()
         self._arrayselection.AddObserver("ModifiedEvent", createModifiedCallback(self))
+        self._expand_phi = False
 
     def _get_raw_data(self, requested_time=None):
         if self._current_file is not None:
@@ -123,12 +126,18 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         else:
             assert(len(timesteps) > 0)
             return timesteps[0]
-            
+
     def _get_update_extent(self, outInfo):
         executive = self.GetExecutive()
         if outInfo.Has(executive.UPDATE_EXTENT()):
             exts = outInfo.Get(executive.UPDATE_EXTENT())
             return exts
+
+    def _get_whole_extent(self, outInfo):
+        executive = self.GetExecutive()
+        if outInfo.Has(executive.WHOLE_EXTENT()):
+            dims = outInfo.Get(executive.WHOLE_EXTENT())
+            return dims
 
     def _get_scalar_fields(self):
         """Get names of scalar fields"""
@@ -172,19 +181,37 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         pts.SetData(dsa.numpyTovtkDataArray(coordinates,'Points'))
         mesh.SetPoints(pts)
 
-    def _add_mesh_cells(self, grid, mesh):
+    def _add_mesh_cells(self, exts, dims, mesh):
         """Add cells to mesh"""
 
         raise RuntimeError('Adding cells to mesh is not implemented')
+
+    def _has_phi_boundary(self, exts, raw_data):
+        """Check if extents contain phi boundary"""
+
+        val = False
+        # Check if phi is expanded and boundary is in expand
+        if self._expand_phi and exts[1] == raw_data['mesh'][f'grid_phi'].size:
+            val = True
+
+        return val
 
     def _add_scalar_pointdata(self, mesh, raw_data, exts):
         """Add scalar field point data to VTK grid"""
 
         for grp,s in self._get_scalar_fields():
             if self._arrayselection.ArrayIsEnabled(s):
-                mesh.GetPointData().AddArray(dsa.numpyTovtkDataArray(raw_data[grp][s][()]
-                                             # this is the partitioned subset selection for parallel reading
-                                             [exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]+1].ravel(),
+                if self._has_phi_boundary(exts, raw_data):
+                    # this is the partitioned subset selection for parallel reading
+                    # and append 2pi data
+                    data = np.append(
+                            raw_data[grp][s][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]],
+                            raw_data[grp][s][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, 0:1],
+                            2)
+                else:
+                    # this is the partitioned subset selection for parallel reading
+                    data = raw_data[grp][s][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]+1]
+                mesh.GetPointData().AddArray(dsa.numpyTovtkDataArray(data.ravel(),
                                              s))
 
     def _add_vector_pointdata(self, mesh, raw_data, mgrid, exts):
@@ -195,7 +222,14 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
                 tmp = np.zeros((mgrid[0].size, 3))
                 comps = list()
                 for i,c in enumerate(self._components):
-                    comps.append(raw_data[v][f'{v}_{c}'][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]+1])
+                    if self._has_phi_boundary(exts, raw_data):
+                        data = np.append(
+                                raw_data[v][f'{v}_{c}'][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]],
+                                raw_data[v][f'{v}_{c}'][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, 0:1],
+                                2)
+                    else:
+                        data = raw_data[v][f'{v}_{c}'][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]+1]
+                    comps.append(data)
                 for i,c in enumerate(list(['z','x','y'])):
                     tmp[:,i] = self._vcomp[c](comps, mgrid).ravel()
                 mesh.GetPointData().AddArray(dsa.numpyTovtkDataArray(tmp, v))
@@ -205,9 +239,15 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
 
         for grp,v in self._get_vector_components():
             if self._arrayselection.ArrayIsEnabled(v):
-                mesh.GetPointData().AddArray(dsa.numpyTovtkDataArray(raw_data[grp][v][()]
-                                             # this is the partitioned subset selection for parallel reading
-                                             [exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]+1].ravel(),
+                if self._has_phi_boundary(exts, raw_data):
+                    data = np.append(
+                            raw_data[grp][v][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]],
+                            raw_data[grp][v][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, 0:1],
+                           2)
+                else:
+                    # this is the partitioned subset selection for parallel reading
+                    data = raw_data[grp][v][()][exts[4]:exts[5]+1, exts[2]:exts[3]+1, exts[0]:exts[1]+1]
+                mesh.GetPointData().AddArray(dsa.numpyTovtkDataArray(data.ravel(),
                                              v))
 
     def _get_array_selection(self):
@@ -252,6 +292,9 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         size_r = raw_data['mesh']['grid_r'].size
         size_theta = raw_data['mesh']['grid_theta'].size
         size_phi = raw_data['mesh']['grid_phi'].size
+        # Expand phi grid by one to close domain
+        if self._expand_phi:
+            size_phi += 1
         dims = [size_phi, size_theta, size_r]
         outInfo.Set(executive.WHOLE_EXTENT(), 0, dims[0]-1 , 0, dims[1]-1 , 0, dims[2]-1)
         outInfo.Set(self.CAN_PRODUCE_SUB_EXTENT(), 1)
@@ -262,9 +305,14 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         data_time = self._get_update_time(outInfoVec.GetInformationObject(0))
         exts = self._get_update_extent(outInfoVec.GetInformationObject(0))
         raw_data = self._get_raw_data(data_time)
+        # Add 2pi to grid if extent contains last grid point
+        if self._has_phi_boundary(exts, raw_data):
+            phi_grid = np.concatenate((raw_data['mesh'][f'grid_phi'][()][exts[0]:exts[1]], np.array([2*np.pi])))
+        else:
+            phi_grid = raw_data['mesh'][f'grid_phi'][()][exts[0]:exts[1]+1]
         grid = [raw_data['mesh'][f'grid_r'][()][exts[4]:exts[5]+1],
                 raw_data['mesh'][f'grid_theta'][()][exts[2]:exts[3]+1],
-                raw_data['mesh'][f'grid_phi'][()][exts[0]:exts[1]+1]]
+                phi_grid]
         mgrid = np.meshgrid(*grid, indexing="ij")
         X, Y, Z = self._make_mesh_coordinates(*mgrid)
 
@@ -275,7 +323,8 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         self._add_mesh_points(Z, X, Y, output)
 
         # Create cells of mesh
-        self._add_mesh_cells(grid, output)
+        whole_exts = self._get_whole_extent(outInfoVec.GetInformationObject(0))
+        self._add_mesh_cells(exts, (whole_exts[1]+1, whole_exts[3]+1, whole_exts[5]+1), output)
 
         # Scalar data
         self._add_scalar_pointdata(output, raw_data, exts)
@@ -353,6 +402,7 @@ class PythonQuICCStructuredReader(PythonQuICCReaderBase):
     """A reader that reads QuICC's physical space HDF5 files and creates a structured grid."""
     def __init__(self):
         PythonQuICCReaderBase.__init__(self, nInputPorts=0, nOutputPorts=1, outputType='vtkStructuredGrid')
+        self._expand_phi = True
 
     @smproperty.stringvector(name="FileNames",
                                 label="File Names",
@@ -376,7 +426,7 @@ class PythonQuICCStructuredReader(PythonQuICCReaderBase):
     def GetDataArraySelection(self):
         return self._GetDataArraySelection()
 
-    def _add_mesh_cells(self, grid, mesh):
+    def _add_mesh_cells(self, exts, dims, mesh):
         """Add cells to mesh"""
 
         # Nothing to do for structured grid
@@ -402,6 +452,7 @@ class PythonQuICCUnstructuredReader(PythonQuICCReaderBase):
     """A reader that reads QuICC's physical space HDF5 files and creates an unstructured grid."""
     def __init__(self):
         PythonQuICCReaderBase.__init__(self, nInputPorts=0, nOutputPorts=1, outputType='vtkUnstructuredGrid')
+        self._expand_phi = False
 
     @smproperty.stringvector(name="FileNames",
                                 label="File Names",
@@ -425,23 +476,26 @@ class PythonQuICCUnstructuredReader(PythonQuICCReaderBase):
     def GetDataArraySelection(self):
         return self._GetDataArraySelection()
 
-    def _add_mesh_cells(self, grid, mesh):
+    def _add_mesh_cells(self, exts, dims, mesh):
         """Add cells to mesh"""
 
         hex = vtk.vtkHexahedron()
         cells = vtk.vtkCellArray()
-        nS, nM, nF = [g.size for g in grid]
+        nF, nM, nS = (exts[1]-exts[0]+1, exts[3]-exts[2]+1, exts[5]-exts[4]+1)
+        nF_ = nF - 1
+        if nF == dims[0]:
+            nF_ = dims[0]
         for k in range(0, nS-1):
             for j in range(0, nM-1):
-                for i in range(0, nF):
+                for i in range(0, nF_):
                     hex.GetPointIds().SetId(0,i + j*nF + k*(nF*nM))
                     hex.GetPointIds().SetId(1,(i + 1)%nF + j*nF + k*(nF*nM))
                     hex.GetPointIds().SetId(2,(i + 1)%nF + (j+1)*nF + k*(nF*nM))
                     hex.GetPointIds().SetId(3,i + (j+1)*nF + k*(nF*nM))
-                    hex.GetPointIds().SetId(4,i + nF*(nM+j) + k*(nF*nM))
-                    hex.GetPointIds().SetId(5,(i + 1)%nF + nF*(nM+j) + k*(nF*nM))
-                    hex.GetPointIds().SetId(6,(i + 1)%nF + nF*(nM+j+1) + k*(nF*nM))
-                    hex.GetPointIds().SetId(7,i + nF*(nM+j+1) + k*(nF*nM))
+                    hex.GetPointIds().SetId(4,i + j*nF + (k+1)*(nF*nM))
+                    hex.GetPointIds().SetId(5,(i + 1)%nF + j*nF + (k+1)*(nF*nM))
+                    hex.GetPointIds().SetId(6,(i + 1)%nF + (j+1)*nF + (k+1)*(nF*nM))
+                    hex.GetPointIds().SetId(7,i + (j+1)*nF + (k+1)*(nF*nM))
                     cells.InsertNextCell(hex)
         mesh.SetCells(vtk.VTK_HEXAHEDRON, cells)
 
