@@ -239,16 +239,18 @@ namespace Chebyshev {
                break;
          }
          // First part of correction
-         if(k < 5)
+         auto i_ = val.size() - (k+4);
+         if(k < 5 && i_ >= 0)
          {
             ng = (ncA*g)/this->normalizeDiag(m, k, 1);
-            val(val.size() - (k+4)) -= ng(0);
+            val(i_) -= ng(0);
          }
          // Second part of correction
-         if(k > -3)
+         auto j_ = val.size() - (k+3);
+         if(k > -3 && j_ >= 0)
          {
             ng = (ncB*h2 + ncC*h1)/this->normalizeDiag(m1, k, 1);
-            val(val.size() - (k+3)) -= ng(0);
+            val(j_) -= ng(0);
          }
       }
    }

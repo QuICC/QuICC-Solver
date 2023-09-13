@@ -91,8 +91,11 @@ namespace Chebyshev {
 
    void I2QpDiags::correctQ1(ACoeff_t& val, const ACoeff_t& n, const int k) const
    {
+      // Index where to apply correction in val
+      auto i_ = val.size() - (k+2);
+
       // Only correct if truncation q == 1
-      if(this->mQ == 1)
+      if(this->mQ == 1 && i_ >= 0)
       {
          auto l1 = this->l();
          ACoeff_t m = n.bottomRows(1) + 1.0;
@@ -122,7 +125,7 @@ namespace Chebyshev {
          }
          ACoeff_t ng = g/this->normalizeDiag(m, k, 1);
 
-         val(val.size() - (k+2)) -= (nf*ng)(0);
+         val(i_) -= (nf*ng)(0);
       }
    }
 

@@ -148,8 +148,11 @@ namespace Chebyshev {
 
    void I4QmDiags::correctQ2(ACoeff_t& val, const ACoeff_t& n, const int k) const
    {
+      // Index where to apply correction in val
+      auto i_ = val.size() - (k+3);
+
       // Only correct if truncation q == 2
-      if(this->mQ == 2)
+      if(this->mQ == 2 && i_ >= 0)
       {
          auto l1 = this->l();
          ACoeff_t m = n.bottomRows(1)-1;
@@ -191,7 +194,7 @@ namespace Chebyshev {
          }
          ACoeff_t ng = g/this->normalizeDiag(m, k, -1);
 
-         val(val.size() - (k+3)) -= (nf*ng)(0);
+         val(i_) -= (nf*ng)(0);
       }
    }
 
