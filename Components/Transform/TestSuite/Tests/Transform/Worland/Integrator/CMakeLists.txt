@@ -360,9 +360,9 @@ foreach(_test ${_split_tests_templated})
     quicc_add_test(${_test}
         COMMAND ${TestExe}
         KEYWORD Algorithm::Operator:Template:type
-        IDS  108 108 108 108 108 108
-        ULPS 13000 11000 11000 12000 11000 11000
+        IDS  104 104 108 108 108 108 108 108
+        ULPS 120 120 13000 11000 11000 12000 11000 11000
         # node:rank, node*12:rank, node*36:rank
-        SPLITS 8:0 96:0 288:0 256:0 3072:0 9216:0
+        SPLITS 4:0 8:0 8:0 96:0 288:0 256:0 3072:0 9216:0
     )
 endforeach()
