@@ -704,15 +704,15 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane ColMaj", "[ViewT
     std::array<double, SF> fullData = {1,2,3,4,
                                        0,0,0,0,
                                        5,6,7,8,
-                                         0,0,0,
-                                         0,0,0,
-                                         0,0,0,
-                                           0,0,
-                                           0,0,
-                                           0,0,
-                                             9,
-                                             0,
-                                             0};
+                                         0,0,0,0,
+                                         0,0,0,0,
+                                         0,0,0,0,
+                                           0,0,0,0,
+                                           0,0,0,0,
+                                           0,0,0,0,
+                                             9,0,0,0,
+                                             0,0,0,0,
+                                             0,0,0,0};
 
     constexpr size_t S = M*2+1;
     std::array<double, S> data = {1,2,3,4,
@@ -739,7 +739,7 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane ColMaj", "[ViewT
 
     CHECK(fullData[2] == someView(2, 0, 0));
     CHECK(fullData[3+M*2] == someView(3, 2, 0));
-    CHECK(fullData[0+M*3+(M-1)*3+(M-2)*3] == someView(0, 0, 3));
+    CHECK(fullData[0+M*N*3] == someView(0, 0, 3));
 
     CHECK_THROWS(fullData[0+M*1+M*N*1] == someView(0, 1, 1));
     CHECK_THROWS(fullData[0+M*1+M*N*1] == someView(1, 0, 3));
@@ -761,9 +761,15 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane JIK", "[ViewThre
                                          0,0,0,
                                          0,0,0,
                                          0,0,0,
+                                         0,0,0,
                                            0,0,0,
                                            0,0,0,
-                                             9,0,0};
+                                           0,0,0,
+                                           0,0,0,
+                                             9,0,0,
+                                             0,0,0,
+                                             0,0,0,
+                                             0,0,0};
 
     constexpr size_t S = M*2+1;
     std::array<double, S> data = {1,5,
@@ -792,7 +798,7 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane JIK", "[ViewThre
 
     CHECK(fullData[2*N] == someView(2, 0, 0));
     CHECK(fullData[3*N+2] == someView(3, 2, 0));
-    CHECK(fullData[M*3+(M-1)*3+(M-2)*3] == someView(0, 0, 3));
+    CHECK(fullData[M*N*3] == someView(0, 0, 3));
 
     CHECK_THROWS(fullData[0+M*1+M*N*1] == someView(0, 1, 1));
     CHECK_THROWS(fullData[0+M*1+M*N*1] == someView(1, 0, 3));
