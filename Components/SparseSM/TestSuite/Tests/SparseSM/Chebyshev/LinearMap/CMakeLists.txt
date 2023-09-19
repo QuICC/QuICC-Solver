@@ -113,6 +113,7 @@ endforeach()
 
 # Create basis tests targets
 set(_tests
+  I4Y1:sparse
   I4Y3:sparse
   I4Y4D1:sparse
   )
