@@ -13,12 +13,12 @@
 // Project includes
 //
 #include "QuICC/Enums/Dimensions.hpp"
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/IEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
-#include "QuICC/DecoupledComplexInternal.hpp"
+#include "Types/DecoupledComplexInternal.hpp"
 
 namespace QuICC {
 
@@ -594,7 +594,7 @@ namespace Equations {
       // Add source term if required
       if(eq.couplingInfo(compId).hasSource())
       {
-         const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL); 
+         const auto& tRes = *eq.res().cpu()->dim(Dimensions::Transform::SPECTRAL);
          // matIdx is the index of the slowest varying direction with a single RHS
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {

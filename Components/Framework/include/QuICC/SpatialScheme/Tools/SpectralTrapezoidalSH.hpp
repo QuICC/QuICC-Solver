@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SpectralTrapezoidalSH.hpp
  * @brief Implementation of the tools for the trapezoidal + spherical harmonic spatial schemes
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/Tools/IBaseSH.hpp"
 
 namespace QuICC {

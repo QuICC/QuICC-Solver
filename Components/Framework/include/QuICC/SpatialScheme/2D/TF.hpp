@@ -1,4 +1,4 @@
-/** 
+/**
  * @file TF.hpp
  * @brief Implementation of the Chebyshev(FFT) + Fourier scheme
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/SpatialScheme/IBuilder.hpp"
 
@@ -33,7 +33,7 @@ namespace SpatialScheme {
          /**
           * @brief Destructor
           */
-         ~TF() = default; 
+         ~TF() = default;
 
          /**
           * @brief Unique id
@@ -79,7 +79,7 @@ namespace SpatialScheme {
           * @brief Create variant vector variable
           */
          VectorVariable createVVar(std::shared_ptr<Resolution> spRes) const final;
-         
+
       protected:
 
       private:

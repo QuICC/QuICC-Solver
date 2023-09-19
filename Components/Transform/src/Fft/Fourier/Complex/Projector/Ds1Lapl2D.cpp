@@ -10,7 +10,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Fft/Fourier/Complex/Projector/Ds1Lapl2DBase.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 
 namespace QuICC {
 

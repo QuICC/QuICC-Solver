@@ -1,4 +1,4 @@
-/** 
+/**
  * @file D.hpp
  * @brief Implementation of the Chebyshev based D projector, with linear map y = ax + b
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/IChebyshevProjector.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I1.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2.hpp"

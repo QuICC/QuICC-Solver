@@ -1,4 +1,4 @@
-/** 
+/**
  * @file DoublePeriodicIndexCounter.hpp
  * @brief Implementation of index counter for doubly periodic schemes
  */
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Resolutions/Tools/IResolutionIndexCounter.hpp"
 
@@ -20,7 +20,7 @@ namespace QuICC {
 
    /**
     * @brief Implementation of regular index counter
-    */ 
+    */
    class DoublePeriodicIndexCounter: public IResolutionIndexCounter
    {
       public:
@@ -62,7 +62,7 @@ namespace QuICC {
           * @brief Compute the offsets for the local modes by comparing to a reference simulation
           */
          void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const final;
-         
+
       protected:
 
       private:

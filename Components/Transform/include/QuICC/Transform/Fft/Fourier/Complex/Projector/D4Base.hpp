@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Projector/IComplexProjector.hpp"
 #include "QuICC/Transform/Fft/Fourier/Tags.hpp"
 

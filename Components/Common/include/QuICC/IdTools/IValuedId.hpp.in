@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/BasicTypes.hpp"
+#include "Types/BasicTypes.hpp"
 #include "QuICC/Hasher.hpp"
 
 namespace QuICC {
@@ -53,7 +53,7 @@ namespace QuICC {
           * @brief Tag of the @idID@
           */
          std::size_t hash() const;
-         
+
       protected:
 
       private:

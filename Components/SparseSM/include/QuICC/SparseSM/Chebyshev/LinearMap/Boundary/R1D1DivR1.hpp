@@ -1,4 +1,4 @@
-/** 
+/**
  * @file R1D1DivR1.hpp
  * @brief Implementation of the boundary value of r D 1/r for Chebyshev linear map polynomials
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/ICondition.hpp"
 
 namespace QuICC {
@@ -26,7 +26,7 @@ namespace Boundary {
 
    /**
     * @brief Implementation of the boundary value of r D 1/r for Worland polynomial
-    */ 
+    */
    class R1D1DivR1: public ICondition
    {
       public:
@@ -47,7 +47,7 @@ namespace Boundary {
          /**
           * @brief Compute list of boundary values
           *
-          * @param maxN Highest polynomial 
+          * @param maxN Highest polynomial
           */
          ACoeff_t compute(const int maxN);
 

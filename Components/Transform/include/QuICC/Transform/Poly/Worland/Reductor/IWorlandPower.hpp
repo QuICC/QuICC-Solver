@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/IWorlandReductor.hpp"
 
 namespace QuICC {

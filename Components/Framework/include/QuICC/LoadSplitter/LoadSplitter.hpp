@@ -1,4 +1,4 @@
-/** 
+/**
  * @file LoadSplitter.hpp
  * @brief Implementation of the workload splitter over the available CPUs
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/IBuilder.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingDescription.hpp"
@@ -62,7 +62,7 @@ namespace Parallel {
           * @param n Maximum number of splittings to show
           */
          void showSplittings(const int n) const;
-         
+
       protected:
 
       private:

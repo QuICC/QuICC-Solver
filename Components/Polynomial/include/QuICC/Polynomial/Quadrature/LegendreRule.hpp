@@ -1,4 +1,4 @@
-/** 
+/**
  * @file LegendreRule.hpp
  * @brief Implementation of a Legendre quadrature rule
  */
@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/Quadrature/PrueferAlgorithm.hpp"
 
 namespace QuICC {
@@ -33,7 +33,7 @@ namespace Quadrature {
           * @brief Compute the quadrature
           */
          void computeQuadrature(internal::Array& igrid, internal::Array& iweights, const int size);
-         
+
       protected:
          /**
           * @brief Get p polynomial

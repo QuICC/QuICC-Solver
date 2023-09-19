@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Setup.hpp
  * @brief Implementation of the polynomial transform setup class
  */
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Poly/Setup.hpp"
 
 namespace QuICC {
@@ -31,7 +31,7 @@ namespace ALegendre {
 
    /**
     * @brief Specialization of the polynomial transform setup class for associated Legendre transforms
-    */ 
+    */
    class Setup: public ::QuICC::Transform::Poly::Setup
    {
       public:

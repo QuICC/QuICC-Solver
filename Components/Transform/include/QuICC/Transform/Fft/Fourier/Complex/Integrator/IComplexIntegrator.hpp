@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IComplexIntegrator.hpp
- * @brief Interface for a generic complex FFTW based integrator 
+ * @brief Interface for a generic complex FFTW based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_INTEGRATOR_ICOMPLEXINTEGRATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/IComplexOperator.hpp"
 #include "QuICC/Transform/Fft/Backend/ComplexIntegrator.hpp"
 
@@ -38,7 +38,7 @@ namespace Integrator {
 
    /**
     * @brief Interface for a generic complex FFTW based integrator
-    */ 
+    */
    class IComplexIntegrator: public IComplexOperator
    {
       public:
@@ -83,7 +83,7 @@ namespace Integrator {
           */
          void dealias(MatrixZ& deAliased, const MatrixZ& aliased) const final;
 
-         
+
       protected:
          /**
           * @brief FFT backend

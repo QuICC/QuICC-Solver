@@ -17,10 +17,10 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 
 #ifdef QUICC_MULTPRECISION
-   #include "QuICC/MpTypedefs.hpp"
+   #include "Types/MpTypedefs.hpp"
 
    /// Define a small macro to replace float constants to strings in the case of MP computations
    #define MHD_MP(c) MHDMpFloat(#c)

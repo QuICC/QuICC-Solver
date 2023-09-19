@@ -1,6 +1,6 @@
 /**
  * @file Tools.hpp
- * @brief Definition of some useful constants and tools for CUDA cuFFT 
+ * @brief Definition of some useful constants and tools for CUDA cuFFT
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CUFFT_TOOLS_HPP
@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -58,7 +58,7 @@ namespace CuFft {
           * @brief Maximul extension width to consider for optimization
           */
          static const double OPTIMIZATION_WIDTH;
-         
+
       protected:
 
       private:

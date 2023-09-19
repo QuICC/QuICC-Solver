@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ICondition.hpp
  * @brief Implementation of the generic interface for a boundary condition for the Cheyshev sparse operator based on a linear map y = ax + b, x = [-1, 1] (natural chebyshev grid)
  */
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 
@@ -26,7 +26,7 @@ namespace Boundary {
 
    /**
     * @brief Implementation of the generic interface for a boundary condition for the Cheyshev sparse operator based on a linear map y = ax + b, x = [-1, 1] (natural chebyshev grid)
-    */ 
+    */
    class ICondition
    {
       public:
@@ -41,10 +41,10 @@ namespace Boundary {
 
          /**
           * @brief Constructor
-          * 
+          *
           * @param lower   Lower bound of y
           * @param upper   Upper bound of y
-          * @param position   Boundary position     
+          * @param position   Boundary position
           */
          ICondition(const Scalar_t lower, const Scalar_t upper, const Position pos);
 
@@ -52,7 +52,7 @@ namespace Boundary {
           * @brief Destructor
           */
          virtual ~ICondition() = default;
-         
+
       protected:
          /**
           * @brief Get position

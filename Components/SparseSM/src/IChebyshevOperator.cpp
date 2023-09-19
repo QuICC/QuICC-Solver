@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IChebyshevOperator.cpp
  * @brief Source of the implementation of generic interface to a Chebyshev based sparse operator
  */
@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/IChebyshevOperator.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 
 namespace QuICC {
 

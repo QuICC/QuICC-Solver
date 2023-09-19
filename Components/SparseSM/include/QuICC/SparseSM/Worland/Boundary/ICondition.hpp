@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ICondition.hpp
  * @brief Interface to generic Worland boundary condition
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/SparseSM/Worland/IDiags.hpp"
 
 namespace QuICC {
@@ -24,7 +24,7 @@ namespace Boundary {
 
    /**
     * @brief Interface to generic Worland boundary condition
-    */ 
+    */
    class ICondition: public IDiags
    {
       public:
@@ -42,7 +42,7 @@ namespace Boundary {
           * @brief Destructor
           */
          virtual ~ICondition() = default;
-         
+
       protected:
 
       private:

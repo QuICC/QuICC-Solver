@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ComplexProjector.hpp
- * @brief Backend for a generic API for complex projector 
+ * @brief Backend for a generic API for complex projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_COMPLEXPROJECTOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Setup.hpp"
 
 namespace QuICC {
@@ -33,7 +33,7 @@ namespace Backend {
 
    /**
     * @brief Backend for a generic API for complex projector
-    */ 
+    */
    class ComplexProjector
    {
       public:
@@ -52,7 +52,7 @@ namespace Backend {
           * @brief Destructor
           */
          ~ComplexProjector();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */

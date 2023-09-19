@@ -20,7 +20,7 @@
 // Project includes
 //
 #include "QuICC/Enums/Dimensions.hpp"
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Xml/IXmlWriter.hpp"
 #include "QuICC/Io/Xml/IGxlFile.hpp"

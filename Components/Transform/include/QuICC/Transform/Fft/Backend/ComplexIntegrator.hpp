@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ComplexIntegrator.hpp
- * @brief Interface for a generic API for complex integrator 
+ * @brief Interface for a generic API for complex integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_COMPLEXINTEGRATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Setup.hpp"
 
 namespace QuICC {
@@ -33,7 +33,7 @@ namespace Backend {
 
    /**
     * @brief Interface for a generic API for complex integrator
-    */ 
+    */
    class ComplexIntegrator
    {
       public:
@@ -52,7 +52,7 @@ namespace Backend {
           * @brief Destructor
           */
          ~ComplexIntegrator();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */
@@ -122,7 +122,7 @@ namespace Backend {
           * @brief Get the memory requirements
           */
          MHDFloat requiredStorage() const;
-         
+
       protected:
 
       private:

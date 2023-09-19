@@ -1,4 +1,4 @@
-/** 
+/**
  * @file InnerProduct.hpp
  * @brief Implementation of a simple on-the-fly function to set matrix column
  */
@@ -20,8 +20,8 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Precision.hpp"
+#include "Types/Constants.hpp"
 
 namespace QuICC {
 
@@ -33,7 +33,7 @@ namespace Evaluator {
 
    /**
     * @brief Implementation of the ALegendre polynomial
-    */ 
+    */
    template <typename T> class InnerProduct
    {
       public:

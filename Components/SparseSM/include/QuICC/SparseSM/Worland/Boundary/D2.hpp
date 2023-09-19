@@ -1,4 +1,4 @@
-/** 
+/**
  * @file D2.hpp
  * @brief Implementation of the boundary value of second derivative for Worland polynomials
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/ICondition.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
 
@@ -25,7 +25,7 @@ namespace Boundary {
 
    /**
     * @brief Implementation of the boundary value of second derivative for Worland polynomial
-    */ 
+    */
    class D2: public ICondition
    {
       public:
@@ -46,7 +46,7 @@ namespace Boundary {
          /**
           * @brief Compute list of boundary values
           *
-          * @param maxN Highest polynomial 
+          * @param maxN Highest polynomial
           */
          ACoeff_t compute(const int maxN);
 

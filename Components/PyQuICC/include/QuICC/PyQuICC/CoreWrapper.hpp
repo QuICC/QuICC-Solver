@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 
 namespace QuICC {

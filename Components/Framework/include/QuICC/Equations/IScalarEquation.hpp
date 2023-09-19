@@ -14,10 +14,10 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/IFieldEquation.hpp"
-#include "QuICC/DecoupledComplexInternal.hpp"
+#include "Types/DecoupledComplexInternal.hpp"
 #include "QuICC/Equations/CouplingFeature.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"

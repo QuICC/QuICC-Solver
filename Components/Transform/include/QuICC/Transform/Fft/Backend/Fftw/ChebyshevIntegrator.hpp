@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ChebyshevIntegrator.hpp
- * @brief Interface for a generic Chebyshev FFTW based integrator 
+ * @brief Interface for a generic Chebyshev FFTW based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_CHEBYSHEVINTEGRATOR_HPP
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/IChebyshevBackend.hpp"
 
 namespace QuICC {
@@ -26,7 +26,7 @@ namespace Fftw {
 
    /**
     * @brief Interface for a generic Chebyshev FFTW based integrator
-    */ 
+    */
    class ChebyshevIntegrator: public IChebyshevBackend
    {
       public:
@@ -39,7 +39,7 @@ namespace Fftw {
           * @brief Destructor
           */
          ~ChebyshevIntegrator();
-         
+
          /**
           * @brief Initialise the FFTW transforms
           */
@@ -74,7 +74,7 @@ namespace Fftw {
           * @brief Set spectral operator
           */
          void setMeanOperator(const SparseMatrix& mat) const;
-         
+
       protected:
 
       private:

@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ChebyshevIntegrator.hpp
- * @brief Interface for a generic API for Chebyshev integrator 
+ * @brief Interface for a generic API for Chebyshev integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CHEBYSHEVINTEGRATOR_HPP
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
 
@@ -25,7 +25,7 @@ namespace Backend {
 
    /**
     * @brief Interface for a generic API for Chebyshev integrator
-    */ 
+    */
    class ChebyshevIntegrator
    {
       public:
@@ -44,7 +44,7 @@ namespace Backend {
           * @brief Destructor
           */
          virtual ~ChebyshevIntegrator();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */
@@ -101,7 +101,7 @@ namespace Backend {
           * @brief Get the temporary storage
           */
          Matrix& getStorage(const StorageKind = StorageKind::in) const;
-         
+
       protected:
 
       private:

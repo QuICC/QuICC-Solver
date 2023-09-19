@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Set.hpp
  * @brief Evaluator to create matrix operator of polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 
@@ -32,7 +32,7 @@ namespace Evaluator {
 
    /**
     * @brief Evaluator to create matrix operator of polynomial
-    */ 
+    */
    class Set
    {
       public:

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IHdf5Reader.hpp
  * @brief Interface to a general HDF5 file reader
  */
@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Io/Hdf5/Hdf5Types.hpp"
 #include "QuICC/Io/Hdf5/Hdf5File.hpp"
@@ -69,7 +69,7 @@ namespace Hdf5 {
           * @brief Finalise the file
           */
          virtual void finalize();
-         
+
       protected:
          /**
           * @brief Number of blocks to read
@@ -217,7 +217,7 @@ namespace Hdf5 {
             throw std::logic_error("Provided storage for HDF5 data has wrong size!");
          }
 
-         // memory dataspace 
+         // memory dataspace
          hid_t memspace = H5Screate_simple(1, &dim, NULL);
 
          // Read data from file
@@ -271,7 +271,7 @@ namespace Hdf5 {
             throw std::logic_error("Provided storage for HDF5 data has wrong size!");
          }
 
-         // memory dataspace 
+         // memory dataspace
          hid_t memspace = H5Screate_simple(2, dims, NULL);
 
          // Read data from file
@@ -319,7 +319,7 @@ namespace Hdf5 {
          hsize_t fDims[nDims];
          H5Sget_simple_extent_dims(filespace, fDims, NULL);
 
-         // memory dataspace 
+         // memory dataspace
          hid_t  memspace;
 
          // Create offset storage
@@ -463,7 +463,7 @@ namespace Hdf5 {
          // Get file dataspace
          hid_t  filespace = H5Dget_space(dataset);
 
-         // memory dataspace 
+         // memory dataspace
          hid_t  memspace;
 
          // Storage for the memory offsets

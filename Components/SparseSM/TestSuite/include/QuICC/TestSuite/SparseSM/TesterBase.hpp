@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "Timers/TimerMacro.h"
 #include "QuICC/TestSuite/SparseSM/TestType.hpp"
 #include "QuICC/TestSuite/SparseSM/Io.hpp"

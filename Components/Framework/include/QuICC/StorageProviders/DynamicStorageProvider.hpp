@@ -1,4 +1,4 @@
-/** 
+/**
  * @file DynamicStorageProvider.hpp
  * @brief Templated implementation of a data storage provider adapting its size dynamically.
  */
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 
 namespace QuICC {
@@ -97,7 +97,7 @@ namespace QuICC {
          * @brief Get the memory requirements
          */
          MHDFloat requiredStorage() const;
-         
+
       protected:
 
       private:

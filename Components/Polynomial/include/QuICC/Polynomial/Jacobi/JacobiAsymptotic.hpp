@@ -1,4 +1,4 @@
-/** 
+/**
  * @file JacobiBase.hpp
  * @brief Implementation of the Jacobi polynomial base
  */
@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "QuICC/Polynomial/Jacobi/JacobiBase.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 
 namespace QuICC {
 

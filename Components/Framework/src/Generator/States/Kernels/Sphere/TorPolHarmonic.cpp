@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/SpectralKernels/Typedefs.hpp"
 #include "QuICC/Generator/States/Kernels/Tools/SphericalHarmonic.hpp"
 #include "Profiler/Interface.hpp"

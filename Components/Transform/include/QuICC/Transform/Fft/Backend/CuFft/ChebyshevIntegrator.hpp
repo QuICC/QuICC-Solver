@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ChebyshevIntegrator.hpp
- * @brief Interface for a generic Chebyshev cuFFT based integrator 
+ * @brief Interface for a generic Chebyshev cuFFT based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CUFFT_CHEBYSHEVINTEGRATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/IChebyshevBackend.hpp"
 
 namespace QuICC {
@@ -35,7 +35,7 @@ namespace CuFft {
 
    /**
     * @brief Interface for a generic Chebyshev cuFFT based integrator
-    */ 
+    */
    class ChebyshevIntegrator: public IChebyshevBackend
    {
       public:
@@ -48,7 +48,7 @@ namespace CuFft {
           * @brief Destructor
           */
          virtual ~ChebyshevIntegrator();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */
@@ -103,7 +103,7 @@ namespace CuFft {
           * @brief Set spectral operator
           */
          void setMeanOperator(const SparseMatrix& mat) const;
-         
+
       protected:
 
       private:

@@ -1,6 +1,6 @@
-/** 
+/**
  * @file MixedProjector.hpp
- * @brief Interface for a generic mixed FFTW based projector 
+ * @brief Interface for a generic mixed FFTW based projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_MIXEDPROJECTOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/IMixedBackend.hpp"
 
 namespace QuICC {
@@ -35,7 +35,7 @@ namespace Fftw {
 
    /**
     * @brief Interface for a generic mixed FFTW based projector
-    */ 
+    */
    class MixedProjector: public IMixedBackend
    {
       public:
@@ -48,7 +48,7 @@ namespace Fftw {
           * @brief Destructor
           */
          ~MixedProjector();
-         
+
          /**
           * @brief Initialise the FFTW transforms
           */
@@ -69,7 +69,7 @@ namespace Fftw {
           * @brief Apply FFT
           */
          void applyFft(Matrix& phys, const MatrixZ& mods) const override;
-         
+
       protected:
 
       private:

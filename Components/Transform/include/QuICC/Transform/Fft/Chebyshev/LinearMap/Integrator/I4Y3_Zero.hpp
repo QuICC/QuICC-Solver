@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4Y3_Zero.hpp
  * @brief Implementation of the Chebyshev based I^4 Y^3 integrator, but 0 mode is zeroed, with linear map y = ax + b
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/IChebyshevIntegrator.hpp"
 
 namespace QuICC {
@@ -37,7 +37,7 @@ namespace Integrator {
 
    /**
     * @brief Implementation of the Chebyshev based I^4 Y^4 of 1/Y integrator, but 0 mode is zeroed, with linear map y = ax + b
-    */ 
+    */
    class I4Y3_Zero: public IChebyshevIntegrator
    {
       public:
@@ -50,7 +50,7 @@ namespace Integrator {
           * @brief Destructor
           */
          ~I4Y3_Zero();
-         
+
       protected:
          /**
           * @brief Sparse matrix operator

@@ -12,7 +12,7 @@
 //
 #include "QuICC/Io/Variable/SphereScalarMeanWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/Mean.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"

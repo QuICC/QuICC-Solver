@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Timestep/SparseOldImExTimestepper.hpp"
 
 namespace QuICC {

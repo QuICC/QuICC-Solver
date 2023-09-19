@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 
@@ -147,17 +147,17 @@ namespace PyQuICC {
           * @brief Fill sparse matrix with data from Python call
           */
          static void fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat);
-  
+
          /**
           * @brief Cleanup wrapper without finalize
           */
          static void cleanup();
-  
+
          /**
           * @brief Finalise the Python interpreter
           */
          static void finalize();
-         
+
       protected:
 
       private:

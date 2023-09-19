@@ -1,4 +1,4 @@
-/** 
+/**
  * @file D4.hpp
  * @brief Implementation of the Fourier based D^4 projector
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/Projector/IMixedProjector.hpp"
 
 namespace QuICC {
@@ -37,7 +37,7 @@ namespace Projector {
 
    /**
     * @brief Implementation of the Fourier based D^4 projector
-    */ 
+    */
    class D4: public IMixedProjector
    {
       public:

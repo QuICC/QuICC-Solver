@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SplittingAlgorithm.hpp
  * @brief Base of the implementation of the load splitting algorithms
  */
@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/IBuilder.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingDescription.hpp"
@@ -77,7 +77,7 @@ namespace Parallel {
           * @param spRes   Shared resolution object
           */
          static void buildCommunicationStructure(const int localId, SharedResolution spRes, std::map<Dimensions::Transform::Id,std::multimap<int,int> >& commStructure);
-         
+
       protected:
          /**
           * @brief ID of the algorithm

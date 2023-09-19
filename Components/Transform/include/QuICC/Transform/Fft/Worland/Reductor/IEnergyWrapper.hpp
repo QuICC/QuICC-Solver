@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IEnergyWrapper.hpp
  * @brief Wrapper to call Poly implementation in FFT transform
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Worland/IWorlandOperator.hpp"
 
 namespace QuICC {
@@ -35,7 +35,7 @@ namespace Reductor {
 
    /**
     * @brief Interface for a generic Worland FFT based energy operator
-    */ 
+    */
    template <typename T> class IEnergyWrapper: public IWorlandOperator
    {
       public:
@@ -83,7 +83,7 @@ namespace Reductor {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
           * @brief Initialise FFT backend
@@ -91,7 +91,7 @@ namespace Reductor {
          virtual void initBackend() const override;
 
          /**
-          * @brief Poly setup 
+          * @brief Poly setup
           */
          mutable std::shared_ptr<typename T::SetupType> mspPSetup;
 

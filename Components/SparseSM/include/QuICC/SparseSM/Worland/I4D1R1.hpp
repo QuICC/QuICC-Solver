@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4D1R1.hpp
  * @brief Implementation of the full sphere Worland I4D1R1 sparse operator
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/IWorlandOperator.hpp"
 #include "QuICC/SparseSM/Worland/I4D1R1Diags.hpp"
 
@@ -23,7 +23,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the full sphere Worland I4D1R1 sparse operator
-    */ 
+    */
    class I4D1R1: public IWorlandOperator
    {
       public:
@@ -43,7 +43,7 @@ namespace Worland {
           * @brief Destructor
           */
          virtual ~I4D1R1() = default;
-         
+
       protected:
 
       private:

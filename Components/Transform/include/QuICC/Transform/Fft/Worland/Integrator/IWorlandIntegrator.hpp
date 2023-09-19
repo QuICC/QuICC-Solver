@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IWorlandIntegrator.hpp
- * @brief Interface for a generic Worland FFT based integrator 
+ * @brief Interface for a generic Worland FFT based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_WORLAND_INTEGRATOR_IWORLANDINTEGRATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Worland/IWorlandOperator.hpp"
 #include "QuICC/Transform/Fft/Backend/WorlandIntegrator.hpp"
 
@@ -36,7 +36,7 @@ namespace Integrator {
 
    /**
     * @brief Interface for a generic Worland FFT based integrator
-    */ 
+    */
    class IWorlandIntegrator: public IWorlandOperator
    {
       public:
@@ -80,7 +80,7 @@ namespace Integrator {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
           * @brief Initialise FFT backend

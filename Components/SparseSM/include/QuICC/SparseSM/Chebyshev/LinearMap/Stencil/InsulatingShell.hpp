@@ -1,4 +1,4 @@
-/** 
+/**
  * @file InsulatingShell.hpp
  * @brief Implementation of the boundary insulating shell stencil
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/ISphericalOperator.hpp"
 
 namespace QuICC {
@@ -26,7 +26,7 @@ namespace Stencil {
 
    /**
     * @brief Implementation of the boundary insulating shell stencil
-    */ 
+    */
    class InsulatingShell: public ISphericalOperator
    {
       public:
@@ -45,7 +45,7 @@ namespace Stencil {
           * @brief Destructor
           */
          virtual ~InsulatingShell() = default;
-         
+
       protected:
 
       private:
@@ -54,21 +54,21 @@ namespace Stencil {
           *
           * @param n mode indexes
           */
-         ACoeff_t d_2(const ACoeff_t& n) const; 
+         ACoeff_t d_2(const ACoeff_t& n) const;
 
          /**
           * @brief 1st subdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d_1(const ACoeff_t& n) const; 
+         ACoeff_t d_1(const ACoeff_t& n) const;
 
          /**
           * @brief diagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d0(const ACoeff_t& n) const; 
+         ACoeff_t d0(const ACoeff_t& n) const;
 
          /**
           * @brief Build triplet representation of matrix

@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ComplexIntegrator.hpp
- * @brief Interface for a generic complex FFTW based integrator 
+ * @brief Interface for a generic complex FFTW based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_COMPLEXINTEGRATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/IComplexBackend.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Setup.hpp"
 
@@ -36,7 +36,7 @@ namespace Fftw {
 
    /**
     * @brief Interface for a generic complex FFTW based integrator
-    */ 
+    */
    class ComplexIntegrator: public IComplexBackend
    {
       public:
@@ -49,7 +49,7 @@ namespace Fftw {
           * @brief Destructor
           */
          ~ComplexIntegrator();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */
@@ -111,7 +111,7 @@ namespace Fftw {
           * @brief Destroy 2D derivative operator
           */
          void destroyDiff2D(const int id) const;
-         
+
       protected:
          /**
           * brief Initialize new 2D derivative operator

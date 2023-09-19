@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Set.hpp
  * @brief Evaluator to compute matrix operator of polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 
@@ -32,7 +32,7 @@ namespace Evaluator {
 
    /**
     * @brief Evaluator to compute matrix operator of polynomial
-    */ 
+    */
    class Set
    {
       public:
@@ -48,12 +48,12 @@ namespace Evaluator {
    };
 
    template <typename T> inline void Set::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i)
-   {  
+   {
       rOut.col(i) = Precision::cast(ipolycol);
    }
 
    template <typename T> inline void Set::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i, const bool isEven)
-   {  
+   {
       int gN = ipolycol.rows();
 
       rOut.col(i).topRows(gN) = Precision::cast(ipolycol);

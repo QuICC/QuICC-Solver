@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/TestSuite/Transform/TesterBase.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Setup.hpp"

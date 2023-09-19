@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "QuICC/QuICCEnv.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/AngularMomentum.hpp"
 #include "QuICC/Polynomial/Worland/Operators.hpp"

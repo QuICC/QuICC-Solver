@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2Y2SphLapl.hpp
  * @brief Implementation of the I^2 Y^2 spherical laplacian sparse operator, with y = ax + b
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/ISphericalOperator.hpp"
 
 namespace QuICC {
@@ -24,7 +24,7 @@ namespace LinearMap {
 
    /**
     * @brief Implementation of the I^2 Y^2 spherical laplacian sparse operator, with y = ax + b
-    */ 
+    */
    class I2Y2SphLapl: public ISphericalOperator
    {
       public:
@@ -43,7 +43,7 @@ namespace LinearMap {
           * @brief Destructor
           */
          virtual ~I2Y2SphLapl() = default;
-         
+
       protected:
 
       private:
@@ -52,35 +52,35 @@ namespace LinearMap {
           *
           * @param n mode indexes
           */
-         ACoeff_t d_2(const ACoeff_t& n) const; 
+         ACoeff_t d_2(const ACoeff_t& n) const;
 
          /**
           * @brief 1st subdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d_1(const ACoeff_t& n) const; 
+         ACoeff_t d_1(const ACoeff_t& n) const;
 
          /**
           * @brief diagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d0(const ACoeff_t& n) const; 
+         ACoeff_t d0(const ACoeff_t& n) const;
 
          /**
           * @brief 1st superdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d1(const ACoeff_t& n) const; 
+         ACoeff_t d1(const ACoeff_t& n) const;
 
          /**
           * @brief 2nd superdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d2(const ACoeff_t& n) const; 
+         ACoeff_t d2(const ACoeff_t& n) const;
 
          /**
           * @brief Build triplet representation of matrix

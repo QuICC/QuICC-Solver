@@ -1,4 +1,4 @@
-/** 
+/**
  * @file R1D1DivR1.hpp
  * @brief Implementation of the boundary value of r D 1/r stencil
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/ILinearMapOperator.hpp"
 
 namespace QuICC {
@@ -26,7 +26,7 @@ namespace Stencil {
 
    /**
     * @brief Implementation of the boundary value of r D 1/r stencil
-    */ 
+    */
    class R1D1DivR1: public ILinearMapOperator
    {
       public:
@@ -44,7 +44,7 @@ namespace Stencil {
           * @brief Destructor
           */
          virtual ~R1D1DivR1() = default;
-         
+
       protected:
 
       private:
@@ -53,21 +53,21 @@ namespace Stencil {
           *
           * @param n mode indexes
           */
-         ACoeff_t d_2(const ACoeff_t& n) const; 
+         ACoeff_t d_2(const ACoeff_t& n) const;
 
          /**
           * @brief 1st subdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d_1(const ACoeff_t& n) const; 
+         ACoeff_t d_1(const ACoeff_t& n) const;
 
          /**
           * @brief diagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d0(const ACoeff_t& n) const; 
+         ACoeff_t d0(const ACoeff_t& n) const;
 
          /**
           * @brief Build triplet representation of matrix

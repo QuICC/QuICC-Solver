@@ -1,4 +1,4 @@
-/** 
+/**
  * @file D1.hpp
  * @brief Implementation of the boundary derivative stencil
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/ILinearMapOperator.hpp"
 
 namespace QuICC {
@@ -26,7 +26,7 @@ namespace Stencil {
 
    /**
     * @brief Implementation of the boundary derivative stencil
-    */ 
+    */
    class D1: public ILinearMapOperator
    {
       public:
@@ -44,7 +44,7 @@ namespace Stencil {
           * @brief Destructor
           */
          virtual ~D1() = default;
-         
+
       protected:
 
       private:
@@ -53,14 +53,14 @@ namespace Stencil {
           *
           * @param n mode indexes
           */
-         ACoeff_t d_2(const ACoeff_t& n) const; 
+         ACoeff_t d_2(const ACoeff_t& n) const;
 
          /**
           * @brief diagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d0(const ACoeff_t& n) const; 
+         ACoeff_t d0(const ACoeff_t& n) const;
 
          /**
           * @brief Build triplet representation of matrix

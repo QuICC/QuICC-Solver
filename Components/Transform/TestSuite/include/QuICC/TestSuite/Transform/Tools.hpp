@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Tools.hpp
  * @brief Useful utility functions for tests
  */
@@ -22,8 +22,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Precision.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 
@@ -47,7 +47,7 @@ namespace Transform {
    /// Compute error
    template <typename TData> ErrorDataType compareData(const TData& outData, const TData& refData, const MHDFloat relThreshold)
    {
-      // Compute relative error. Subnormal values are forced to optimal precision (epsilon) 
+      // Compute relative error. Subnormal values are forced to optimal precision (epsilon)
       // as relative errors doesn't make sense in this case
       ErrorDataType error;
       for(int j = 0; j < refData.cols(); j++)

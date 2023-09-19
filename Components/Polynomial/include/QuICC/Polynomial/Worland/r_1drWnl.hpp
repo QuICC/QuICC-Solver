@@ -1,4 +1,4 @@
-/** 
+/**
  * @file r_1drWnl.hpp
  * @brief Implementation of the 1/r D r Worland polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 
@@ -32,7 +32,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the 1/r D r Worland polynomial
-    */ 
+    */
    class r_1drWnl: public WorlandBase
    {
       public:

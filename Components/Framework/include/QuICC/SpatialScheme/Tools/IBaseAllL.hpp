@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IBaseAllL.hpp
  * @brief Implementation of the base tools for the radial + spherical harmonics schemes with all harmonic degrees gathered
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/Tools/IBaseSH.hpp"
 
 namespace QuICC {

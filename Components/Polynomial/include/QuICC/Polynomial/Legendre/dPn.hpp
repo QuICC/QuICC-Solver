@@ -1,4 +1,4 @@
-/** 
+/**
  * @file dPn.hpp
  * @brief Implementation of the D Legendre polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/Legendre/LegendreBase.hpp"
 
 namespace QuICC {
@@ -31,7 +31,7 @@ namespace Legendre {
 
    /**
     * @brief Implementation of the D Legendre polynomial
-    */ 
+    */
    class dPn: public LegendreBase
    {
       public:

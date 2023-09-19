@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IVariableHdf5Reader.hpp
  * @brief Implementation of a generic variable data file reader
  */
@@ -16,7 +16,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Hdf5/IHdf5Reader.hpp"
@@ -95,7 +95,7 @@ namespace Variable {
           * @brief Read physical parameters from file
           */
          void getParameters(std::map<std::string, MHDFloat>& rParams) const;
-         
+
       protected:
          /// Typedef for the scalar const iterator
          typedef std::map<std::size_t,Framework::Selector::VariantSharedScalarVariable>::iterator  scalar_iterator;
@@ -147,7 +147,7 @@ namespace Variable {
       private:
          /**
           * @brief Set the resolution and use it for preliminary initialisation
-          * 
+          *
           * @param spRes      Resolution information
           */
          void setResolution(SharedResolution spRes);

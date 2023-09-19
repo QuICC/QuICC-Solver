@@ -1,4 +1,4 @@
-/** 
+/**
  * @file P.hpp
  * @brief Implementation of the Fourier based mixed P projector (i.e. from phyiscal to modal space)
  */
@@ -20,7 +20,7 @@
 
 // Pect includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/Projector/IMixedProjector.hpp"
 #include "QuICC/Transform/Fft/Fourier/Tags.hpp"
 
@@ -42,7 +42,7 @@ namespace Projector {
    /**
     * @brief Implementation of the Fourier based mixed P projector
     * (i.e. from modal to physical space)
-    */ 
+    */
    template<>
    class P<base_t>: public IMixedProjector
    {

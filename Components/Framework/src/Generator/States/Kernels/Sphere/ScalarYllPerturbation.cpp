@@ -9,7 +9,7 @@
 
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Generator/States/Kernels/Sphere/ScalarYllPerturbation.hpp"
 
 namespace QuICC {

@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/SpatialScheme/ICosts.hpp"
 #include "QuICC/SpatialScheme/IMesher.hpp"

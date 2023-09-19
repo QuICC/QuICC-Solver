@@ -1,6 +1,6 @@
 /**
  * @file PrueferAlgorithm.hpp
- * @brief Implementation of a Pruefer algorithm to compute a quadrature rule 
+ * @brief Implementation of a Pruefer algorithm to compute a quadrature rule
  */
 
 #ifndef QUICC_POLYNOMIAL_QUADRATURE_PRUEFERALGORITHM_HPP
@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 
@@ -29,7 +29,7 @@ namespace Quadrature {
     * iterations are then used to reach high accuracy. It does not require any linear algebra solvers, removing the
     * issues coming from the lack of special matrix solvers in Eigen. Computation can be done in multiple precision.
     *
-    * The implemented algorithms are based on the paper by Glaser, Liu & Rohklin, 2007. "A fast algorithm for the 
+    * The implemented algorithms are based on the paper by Glaser, Liu & Rohklin, 2007. "A fast algorithm for the
     * calculation of the roots of special functions"
     */
    class PrueferAlgorithm

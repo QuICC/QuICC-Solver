@@ -1,4 +1,4 @@
-/** 
+/**
  * @file r_1claplhWnl.hpp
  * @brief Implementation of the 1/r cylindrical laplacian Worland polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 
@@ -32,7 +32,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the 1/r cylindrical laplacian Worland polynomial
-    */ 
+    */
    class r_1claplhWnl: public WorlandBase
    {
       public:
@@ -79,7 +79,7 @@ namespace Worland {
       {
          // Compute DP_1
          this->computeW0l(idpnab.col(0), l-1, a1, b1, igrid, WorlandBase::normWDP0ab());
-         idpnab.col(0) *= MHD_MP(2.0)*(dl + MHD_MP(1.0)); 
+         idpnab.col(0) *= MHD_MP(2.0)*(dl + MHD_MP(1.0));
          if(scale.size() > 0)
          {
             idpnab.col(0).array() *= scale.array();

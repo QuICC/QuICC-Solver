@@ -19,8 +19,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"

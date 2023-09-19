@@ -1,4 +1,4 @@
-/** 
+/**
  * @file slaplWnl.hpp
  * @brief Implementation of the spherical laplacian of Worland polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 
@@ -32,7 +32,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the spherical laplacian of Worland polynomial
-    */ 
+    */
    class slaplWnl: public WorlandBase
    {
       public:
@@ -80,7 +80,7 @@ namespace Worland {
       {
          // Compute DP_1
          this->computeW0l(idpnab.col(0), l, a1, b1, igrid, WorlandBase::normWDP0ab());
-         idpnab.col(0) *= (MHD_MP(2.0)*dl + MHD_MP(3.0)); 
+         idpnab.col(0) *= (MHD_MP(2.0)*dl + MHD_MP(3.0));
          if(scale.size() > 0)
          {
             idpnab.col(0).array() *= scale.segment(0,gN).array();

@@ -19,8 +19,8 @@
 // Project includes
 //
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/PhysicalKernels/DoNothing.hpp"
 #include "QuICC/PhysicalKernels/MakeConstant.hpp"

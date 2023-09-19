@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2Lapl.hpp
  * @brief Implementation of the I^2 plane layer cartesian laplaciana operator
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/IPlaneOperator.hpp"
 
 namespace QuICC {
@@ -24,7 +24,7 @@ namespace LinearMap {
 
    /**
     * @brief Implementation of the I^2 plane layer cartesian laplacian operator
-    */ 
+    */
    class I2Lapl: public IPlaneOperator
    {
       public:
@@ -44,7 +44,7 @@ namespace LinearMap {
           * @brief Destructor
           */
          virtual ~I2Lapl() = default;
-         
+
       protected:
 
       private:
@@ -53,21 +53,21 @@ namespace LinearMap {
           *
           * @param n mode indexes
           */
-         ACoeff_t d_2(const ACoeff_t& n) const; 
+         ACoeff_t d_2(const ACoeff_t& n) const;
 
          /**
           * @brief diagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d0(const ACoeff_t& n) const; 
+         ACoeff_t d0(const ACoeff_t& n) const;
 
          /**
           * @brief 2nd superdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d2(const ACoeff_t& n) const; 
+         ACoeff_t d2(const ACoeff_t& n) const;
 
          /**
           * @brief Build triplet representation of matrix

@@ -16,7 +16,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/TestSuite/SparseSM/TesterBase.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/ICondition.hpp"

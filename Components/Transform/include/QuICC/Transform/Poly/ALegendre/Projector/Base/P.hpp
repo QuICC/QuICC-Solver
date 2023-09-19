@@ -10,7 +10,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/IALegendreProjector.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Tags.hpp"
 

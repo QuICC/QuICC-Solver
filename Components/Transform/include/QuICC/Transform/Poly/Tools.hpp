@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Tools.hpp
  * @brief Definition of some useful constants and tools for polynomial transforms
  */
@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -34,7 +34,7 @@ namespace Poly {
           * @param size Size to dealias
           */
          static int dealias(const int size);
-         
+
       protected:
 
       private:

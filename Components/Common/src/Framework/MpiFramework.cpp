@@ -1,4 +1,4 @@
-/** 
+/**
  * @file MpiFramework.cpp
  * @brief Source of the implementation of an MPI framework
  */
@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/QuICCEnv.hpp"
 
 namespace QuICC {

@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/IWorlandOperator.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/InsulatingSphereDiags.hpp"
 

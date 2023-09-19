@@ -9,7 +9,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/DivLlDivS1Dp.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Polynomial/ALegendre/sin_1Plm.hpp"
 #include "QuICC/Transform/Poly/KokkosUtils.hpp"
 #include "QuICC/Transform/Poly/ALegendre/CudaIALegendreOperatorGemmUtils.hpp"

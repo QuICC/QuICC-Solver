@@ -1,4 +1,4 @@
-/** 
+/**
  * @file EnergyD1Y1.hpp
  * @brief Implementation of the Chebyshev based D1^1 Y^1 energy reductor, with linear map y = ax + b
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/IChebyshevEnergy.hpp"
 
 namespace QuICC {
@@ -37,7 +37,7 @@ namespace Reductor {
 
    /**
     * @brief Implementation of the Chebyshev based D^1 Y^1 energy reductor, with linear map y = ax + b
-    */ 
+    */
    class EnergyD1Y1: public IChebyshevEnergy
    {
       public:
@@ -50,7 +50,7 @@ namespace Reductor {
           * @brief Destructor
           */
          ~EnergyD1Y1();
-         
+
       protected:
          /**
           * @brief Initialise operator

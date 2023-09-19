@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SimulationResolution.hpp
  * @brief Definition of a simulation resolution object
  */
@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 
 // Forward declarations

@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Poly/ALegendre/@Kind@/IALegendre@Kind@.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Tags.hpp"
 #include "View/View.hpp"

@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Poly/Worland/Reductor/IWorlandReductor.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -109,7 +109,7 @@ namespace Reductor {
 
    template <typename T> void EnergyReductor<T>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
-      throw std::logic_error("Unused interface");	   
+      throw std::logic_error("Unused interface");
    }
 
 

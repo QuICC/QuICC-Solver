@@ -1,4 +1,4 @@
-/** 
+/**
  * @file UniformSH.hpp
  * @brief Implementation of the tools for the uniform + spherical harmonics schemes
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/Tools/IBaseSH.hpp"
 
 namespace QuICC {

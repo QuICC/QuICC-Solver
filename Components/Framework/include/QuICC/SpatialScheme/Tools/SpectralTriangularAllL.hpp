@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SpectralTriangularAllL.hpp
  * @brief Implementation of the tools for the triangular + spherical harmonics schemes with all harmonic degrees gathered
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/Tools/IBaseAllL.hpp"
 
 namespace QuICC {

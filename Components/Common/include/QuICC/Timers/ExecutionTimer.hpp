@@ -1,6 +1,6 @@
 /**
  * @file ExecutionTimer.hpp
- * @brief Implementation of an execution timer 
+ * @brief Implementation of an execution timer
  */
 
 #ifndef QUICC_EXECUTIONTIMER_HPP
@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "Timers/TimerMacro.h"
 
 namespace QuICC {
@@ -51,7 +51,7 @@ namespace QuICC {
          void iteration();
 
          /**
-          * @brief Update the timing of given region. 
+          * @brief Update the timing of given region.
           *
           * The possible breakpoints are defined in the BreakPoint enum
           *
@@ -60,14 +60,14 @@ namespace QuICC {
          void update(BreakPoint point);
 
          /**
-          * @brief Query current time of given region. 
+          * @brief Query current time of given region.
           *
           * The possible breakpoints are defined in the BreakPoint enum
           *
           * @param point Breakpoint for which the timing has to be updated
           */
          double queryTime(BreakPoint point) const;
-         
+
          /**
           * @brief Print execution time information to stream
           *

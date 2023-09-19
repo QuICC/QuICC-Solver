@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IPlaneOperator.hpp
  * @brief Base implementation of a plane layer operator, with y = ax + b and k1, k2 Fourier modes
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/ILinearMapOperator.hpp"
 
 namespace QuICC {
@@ -24,7 +24,7 @@ namespace LinearMap {
 
    /**
     * @brief Base implementation of a plane layer operator, with y = ax + b and k1, k2 Fourier modes
-    */ 
+    */
    class IPlaneOperator: public ILinearMapOperator
    {
       public:
@@ -44,7 +44,7 @@ namespace LinearMap {
           * @brief Destructor
           */
          virtual ~IPlaneOperator() = default;
-         
+
       protected:
          /**
           * @brief Fourier mode in first direction

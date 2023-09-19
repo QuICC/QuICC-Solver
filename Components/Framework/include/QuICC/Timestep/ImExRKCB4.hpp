@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Timestep/IImExRKCBScheme.hpp"
 #include "QuICC/Timestep/SparseImExRK3RTimestepper.hpp"
 

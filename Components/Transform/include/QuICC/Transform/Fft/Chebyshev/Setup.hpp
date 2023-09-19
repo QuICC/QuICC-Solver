@@ -1,6 +1,6 @@
 /**
  * @file Setup.hpp
- * @brief Implementation of the Chebyshev FFT setup class 
+ * @brief Implementation of the Chebyshev FFT setup class
  */
 
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSEV_SETUP_HPP
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Setup.hpp"
 
 namespace QuICC {
@@ -31,7 +31,7 @@ namespace Chebyshev {
 
    /**
     * @brief Implementation of the Chebyshev FFT setup class
-    */ 
+    */
    class Setup: public ::QuICC::Transform::Fft::Setup
    {
       public:
@@ -66,7 +66,7 @@ namespace Chebyshev {
           * @brief Empty destructor
           */
          virtual ~Setup();
-         
+
       protected:
 
       private:

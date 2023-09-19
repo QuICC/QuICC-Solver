@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/TestSuite/Polynomial/Quadrature/Tester.hpp"
 #include "QuICC/TestSuite/Polynomial/Quadrature/TestArgs.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandSphEnergyRule.hpp"

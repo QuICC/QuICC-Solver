@@ -13,7 +13,7 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/SolveTiming/Prognostic.hpp"

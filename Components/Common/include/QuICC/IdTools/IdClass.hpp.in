@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/BasicTypes.hpp"
+#include "Types/BasicTypes.hpp"
 #include "QuICC/@idNS@/IRegisterId.hpp"
 
 namespace QuICC {

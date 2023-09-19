@@ -15,7 +15,7 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Io/Variable/FieldProbeWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/FieldProbe.hpp"
 

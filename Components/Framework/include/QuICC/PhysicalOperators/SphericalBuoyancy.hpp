@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
@@ -34,7 +34,7 @@ namespace Physical {
    {
       public:
          /**
-          * @brief Set S 
+          * @brief Set S
           */
          static void set(Framework::Selector::PhysicalScalarField &rS, FieldComponents::Physical::Id compId, const Resolution& res, const Array& r, const Framework::Selector::PhysicalScalarField &q, const MHDFloat c = 1.0);
 

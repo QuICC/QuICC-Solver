@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2D1.hpp
  * @brief Implementation of the I^2 D sparse operator, with y = ax + b
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/ILinearMapOperator.hpp"
 
 namespace QuICC {
@@ -24,7 +24,7 @@ namespace LinearMap {
 
    /**
     * @brief Implementation of the I^2 D sparse operator, with y = ax + b
-    */ 
+    */
    class I2D1: public ILinearMapOperator
    {
       public:
@@ -42,7 +42,7 @@ namespace LinearMap {
           * @brief Destructor
           */
          virtual ~I2D1();
-         
+
       protected:
 
       private:
@@ -51,14 +51,14 @@ namespace LinearMap {
           *
           * @param n mode indexes
           */
-         ACoeff_t d_1(const ACoeff_t& n) const; 
+         ACoeff_t d_1(const ACoeff_t& n) const;
 
          /**
           * @brief 1st superdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d1(const ACoeff_t& n) const; 
+         ACoeff_t d1(const ACoeff_t& n) const;
 
          /**
           * @brief Build triplet representation of matrix

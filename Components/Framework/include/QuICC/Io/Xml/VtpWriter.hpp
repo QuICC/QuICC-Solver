@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Xml/IXmlWriter.hpp"
 #include "QuICC/Io/Xml/IVtpFile.hpp"

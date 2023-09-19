@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Tools.hpp
  * @brief Tools specific to FFT based Worland transform
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file WorlandChebyshevRule.hpp
  * @brief Implementation of the Worland Chebyshev quadrature rule
  */
@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 

@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IWorlandProjector.hpp
- * @brief Interface for a generic Worland FFT based projector 
+ * @brief Interface for a generic Worland FFT based projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_WORLAND_PROJECTOR_IWORLANDPROJECTOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Worland/IWorlandOperator.hpp"
 #include "QuICC/Transform/Fft/Backend/WorlandProjector.hpp"
 
@@ -36,7 +36,7 @@ namespace Projector {
 
    /**
     * @brief Interface for a generic Worland FFT based projector
-    */ 
+    */
    class IWorlandProjector: public IWorlandOperator
    {
       public:
@@ -80,7 +80,7 @@ namespace Projector {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
           * @brief Initialise FFT backend

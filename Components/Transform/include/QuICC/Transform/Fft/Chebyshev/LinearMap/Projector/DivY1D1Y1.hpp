@@ -1,4 +1,4 @@
-/** 
+/**
  * @file DivY1D1Y1.hpp
  * @brief Implementation of the Chebyshev based 1/Y D Y projector, with linear map y = ax + b
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/IChebyshevProjector.hpp"
 
 namespace QuICC {
@@ -37,7 +37,7 @@ namespace Projector {
 
    /**
     * @brief Implementation of the Chebyshev based 1/Y D Y projector, with linear map y = ax +  b
-    */ 
+    */
    class DivY1D1Y1: public IChebyshevProjector
    {
       public:
@@ -50,7 +50,7 @@ namespace Projector {
           * @brief Destructor
           */
          ~DivY1D1Y1();
-         
+
       protected:
          /**
           * @brief Initialize storage

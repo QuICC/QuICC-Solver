@@ -1,4 +1,4 @@
-/** 
+/**
  * @file OperatorInfo.hpp
  * @brief Information describing operators from backend
  */
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 

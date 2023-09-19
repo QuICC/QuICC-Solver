@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Worland/I2QpDiags.hpp"
 #include "QuICC/SparseSM/Worland/Chebyshev/I2Diags.hpp"
 

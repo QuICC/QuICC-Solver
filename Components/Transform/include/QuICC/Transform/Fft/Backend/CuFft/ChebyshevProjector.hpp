@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ChebyshevProjector.hpp
- * @brief Interface for a generic Chebyshev cuFFT based projector 
+ * @brief Interface for a generic Chebyshev cuFFT based projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CUFFT_CHEBYSHEVPROJECTOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/IChebyshevBackend.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
 
@@ -36,7 +36,7 @@ namespace CuFft {
 
    /**
     * @brief Interface for a generic Chebyshev cuFFT based projector
-    */ 
+    */
    class ChebyshevProjector: public IChebyshevBackend
    {
       public:
@@ -49,7 +49,7 @@ namespace CuFft {
           * @brief Destructor
           */
          virtual ~ChebyshevProjector();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */
@@ -118,7 +118,7 @@ namespace CuFft {
           *
           */
          void getSolution(const int zeroRows = 0, const int extraRows = 0, const bool updateSolver = false) const;
-         
+
       protected:
 
       private:

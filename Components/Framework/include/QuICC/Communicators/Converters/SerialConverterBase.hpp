@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/StorageProviders/DynamicPairProvider.hpp"
 #include "QuICC/Communicators/Converters/IConverter.hpp"

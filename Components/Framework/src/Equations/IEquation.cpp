@@ -19,7 +19,7 @@
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Equations/CouplingIndexType.hpp"
 #include "QuICC/PhysicalKernels/DoNothing.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"

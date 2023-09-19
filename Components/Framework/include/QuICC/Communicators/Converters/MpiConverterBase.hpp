@@ -25,7 +25,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/MpiTypes.hpp"
 #include "QuICC/Enums/TransformDirection.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"

@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IComplexBackend.hpp
- * @brief Backend for a generic complex FFTW based projector 
+ * @brief Backend for a generic complex FFTW based projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_ICOMPLEXBACKEND_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/IFftwBackend.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Setup.hpp"
 
@@ -36,7 +36,7 @@ namespace Fftw {
 
    /**
     * @brief Backend for a generic complex FFTW based projector
-    */ 
+    */
    class IComplexBackend: public IFftwBackend
    {
       public:
@@ -55,7 +55,7 @@ namespace Fftw {
           * @brief Destructor
           */
          virtual ~IComplexBackend();
-         
+
          /**
           * @brief Initialise the FFTW transforms
           */

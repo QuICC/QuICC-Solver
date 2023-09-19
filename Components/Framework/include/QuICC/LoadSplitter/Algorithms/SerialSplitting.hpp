@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SerialSplitting.hpp
  * @brief Implementation of a serial "load splitting" algorithm
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
 #include "QuICC/Resolutions/TransformResolution.hpp"
 
@@ -45,7 +45,7 @@ namespace Parallel {
           * @brief Check if factorisation is applicable to scheme
           */
          bool applicable() const final;
-         
+
       protected:
          /**
           * @brief Split ith dimension transform

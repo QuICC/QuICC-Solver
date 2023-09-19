@@ -1,6 +1,6 @@
 /**
  * @file Typedefs.hpp
- * @brief Some general typedefs used in the whole project 
+ * @brief Some general typedefs used in the whole project
  */
 
 #ifndef QUICC_TYPEDEFS_HPP
@@ -25,8 +25,8 @@
 
 // Project includes
 //
-#include "QuICC/BasicTypes.hpp"
-#include "QuICC/DecoupledComplex.hpp"
+#include "Types/BasicTypes.hpp"
+#include "Types/DecoupledComplex.hpp"
 
 namespace QuICC {
 

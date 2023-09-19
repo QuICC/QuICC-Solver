@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Uniform3D2D.hpp
  * @brief Implementation of the tools for the uniform + uniform + uniform schemes (3D), 2D transform stage
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/Tools/IBase.hpp"
 
 namespace QuICC {

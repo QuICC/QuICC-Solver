@@ -18,7 +18,7 @@
 #include "QuICC/ModelOperator/Coordinator.hpp"
 #include "QuICC/Tools/IdToHuman.hpp"
 #endif
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SolveTiming/Before.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file WorlandCylEnergyRule.hpp
  * @brief Implementation of the Worland cylindrical energy quadrature rule
  */
@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 
 namespace QuICC {

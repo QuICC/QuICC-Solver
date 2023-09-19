@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IRegularSHmlBuilder.hpp
  * @brief Implementation of the Regular basis + Spherical Harmonics scheme with m spectral ordering and l spectral transform ordering
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/3D/I3DBuilder.hpp"
@@ -51,7 +51,7 @@ namespace SpatialScheme {
           * @brief Add index counter to shared resolution
           */
          virtual void addIndexCounter(SharedResolution spRes) override;
-         
+
       protected:
          /**
           * @brief Validate mode splitting

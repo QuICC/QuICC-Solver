@@ -1,4 +1,4 @@
-/** 
+/**
  * @file d2Pnab.hpp
  * @brief Implementation of the D^2 Jacobi polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Jacobi/JacobiBase.hpp"
 

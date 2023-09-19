@@ -1,4 +1,4 @@
-/** 
+/**
  * @file DifferentialSolver.hpp
  * @brief Interface for a differentiate by linear solver
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 

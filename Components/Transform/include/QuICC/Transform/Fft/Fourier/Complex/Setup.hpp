@@ -1,6 +1,6 @@
 /**
  * @file Setup.hpp
- * @brief Implementation of the Complex FFT setup class 
+ * @brief Implementation of the Complex FFT setup class
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_SETUP_HPP
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Setup.hpp"
 
 namespace QuICC {
@@ -33,7 +33,7 @@ namespace Complex {
 
    /**
     * @brief Implementation of the Complex FFT setup class
-    */ 
+    */
    class Setup: public ::QuICC::Transform::Fft::Setup
    {
       public:
@@ -67,8 +67,8 @@ namespace Complex {
          /**
           * @brief Get the block distribution with 3D index
           */
-         const MatrixI& idBlocks() const; 
-         
+         const MatrixI& idBlocks() const;
+
       protected:
 
       private:

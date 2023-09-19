@@ -1,4 +1,4 @@
-/** 
+/**
  * @file TransformSetup.hpp
  * @brief Implementation of base class for a generalized transform setup
  */
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 
 namespace QuICC {
@@ -27,7 +27,7 @@ namespace Transform {
 
    /**
     * @brief Implementation of base class for a generalized transform setup
-    */ 
+    */
    class TransformSetup
    {
       public:
@@ -122,7 +122,7 @@ namespace Transform {
           * @brief Get the multipliers
           */
          int mult(const int i) const;
-         
+
       protected:
          /**
           * @brief Purpose of grid values in transform

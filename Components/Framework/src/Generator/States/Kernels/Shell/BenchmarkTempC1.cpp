@@ -8,7 +8,7 @@
 
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Generator/States/Kernels/Shell/BenchmarkTempC1.hpp"
 
 namespace QuICC {

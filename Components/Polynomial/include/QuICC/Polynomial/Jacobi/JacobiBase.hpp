@@ -1,4 +1,4 @@
-/** 
+/**
  * @file JacobiBase.hpp
  * @brief Implementation of the Jacobi polynomial base
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/Quadrature/traits.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 

@@ -1,6 +1,6 @@
 /**
  * @file Setup.hpp
- * @brief Implementation of the FFT setup class 
+ * @brief Implementation of the FFT setup class
  */
 
 #ifndef QUICC_TRANSFORM_FFT_SETUP_HPP
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/BasicTypes.hpp"
+#include "Types/BasicTypes.hpp"
 #include "QuICC/Transform/TransformSetup.hpp"
 
 namespace QuICC {
@@ -29,7 +29,7 @@ namespace Fft {
 
    /**
     * @brief Implementation of the FFT setup class
-    */ 
+    */
    class Setup: public TransformSetup
    {
       public:
@@ -79,7 +79,7 @@ namespace Fft {
           * @brief Get box size scaling factor
           */
          MHDFloat boxScale() const;
-         
+
       protected:
          /**
           * @brief Size of the backward transform

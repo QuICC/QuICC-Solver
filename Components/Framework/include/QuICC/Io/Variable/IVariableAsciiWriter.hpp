@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IVariableAsciiWriter.hpp
  * @brief Implementation of a generic variable to ASCII file writer
  */
@@ -16,7 +16,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
@@ -199,7 +199,7 @@ namespace Variable {
 
          /**
           * @brief Resolution information
-          * 
+          *
           * @param spRes      Resolution information
           */
          SharedResolution mspRes;

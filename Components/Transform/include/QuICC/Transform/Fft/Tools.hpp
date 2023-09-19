@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/Tools.hpp"
 
 namespace QuICC {
@@ -63,7 +63,7 @@ namespace Fft {
           * @param size Current size of the FFT
           */
          static int optimizeFft(const int size);
-         
+
       protected:
          /// Tools backend
          typedef Backend::Fftw::Tools Backend;

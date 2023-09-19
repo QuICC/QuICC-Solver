@@ -1,6 +1,6 @@
-/** 
+/**
  * @file MixedProjector.hpp
- * @brief Interface for a generic mixed cuFFT based projector 
+ * @brief Interface for a generic mixed cuFFT based projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CUFFT_MIXEDPROJECTOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/IMixedBackend.hpp"
 
 namespace QuICC {
@@ -35,7 +35,7 @@ namespace CuFft {
 
    /**
     * @brief Interface for a generic mixed cuFFT based projector
-    */ 
+    */
    class MixedProjector: public IMixedBackend
    {
       public:
@@ -48,7 +48,7 @@ namespace CuFft {
           * @brief Destructor
           */
          virtual ~MixedProjector();
-         
+
          /**
           * @brief Initialise the cuFFT transforms
           */
@@ -78,7 +78,7 @@ namespace CuFft {
           * @brief Apply FFT
           */
          virtual void applyFft() const override;
-         
+
       protected:
 
       private:

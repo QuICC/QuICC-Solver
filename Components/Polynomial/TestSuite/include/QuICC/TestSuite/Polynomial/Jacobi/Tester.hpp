@@ -18,8 +18,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Precision.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/Quadrature/JacobiRule.hpp"
 #include "QuICC/Polynomial/Jacobi/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Jacobi/Evaluator/InnerProduct.hpp"

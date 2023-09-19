@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4Lapl2.hpp
  * @brief Implementation of the I^4  plane layer bilaplacian sparse operator, with y = ax + b
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/IPlaneOperator.hpp"
 
 namespace QuICC {
@@ -24,7 +24,7 @@ namespace LinearMap {
 
    /**
     * @brief Implementation of the I^4 plane layer bilaplacian sparse operator, with y = ax + b
-    */ 
+    */
    class I4Lapl2: public IPlaneOperator
    {
       public:
@@ -44,7 +44,7 @@ namespace LinearMap {
           * @brief Destructor
           */
          virtual ~I4Lapl2() = default;
-         
+
       protected:
 
       private:
@@ -53,35 +53,35 @@ namespace LinearMap {
           *
           * @param n mode indexes
           */
-         ACoeff_t d_4(const ACoeff_t& n) const; 
+         ACoeff_t d_4(const ACoeff_t& n) const;
 
          /**
           * @brief 2nd subdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d_2(const ACoeff_t& n) const; 
+         ACoeff_t d_2(const ACoeff_t& n) const;
 
          /**
           * @brief diagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d0(const ACoeff_t& n) const; 
+         ACoeff_t d0(const ACoeff_t& n) const;
 
          /**
           * @brief 2nd superdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d2(const ACoeff_t& n) const; 
+         ACoeff_t d2(const ACoeff_t& n) const;
 
          /**
           * @brief 4th superdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d4(const ACoeff_t& n) const; 
+         ACoeff_t d4(const ACoeff_t& n) const;
 
          /**
           * @brief Build triplet representation of matrix

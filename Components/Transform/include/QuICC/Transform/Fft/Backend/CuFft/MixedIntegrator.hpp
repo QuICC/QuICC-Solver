@@ -1,6 +1,6 @@
-/** 
+/**
  * @file MixedIntegrator.hpp
- * @brief Interface for a generic mixed cuFFT based integrator 
+ * @brief Interface for a generic mixed cuFFT based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CUFFT_MIXEDINTEGRATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/IMixedBackend.hpp"
 
 namespace QuICC {
@@ -35,7 +35,7 @@ namespace CuFft {
 
    /**
     * @brief Interface for a generic mixed cuFFT based integrator
-    */ 
+    */
    class MixedIntegrator: public IMixedBackend
    {
       public:
@@ -48,12 +48,12 @@ namespace CuFft {
           * @brief Destructor
           */
          virtual ~MixedIntegrator();
-         
+
          /**
           * @brief Initialise the cuFFT transforms
           */
          virtual void init(const SetupType& setup) const override;
-         
+
          /**
           * @brief Apply FFT
           */

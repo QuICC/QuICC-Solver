@@ -1,6 +1,6 @@
 /**
  * @file Cartesian1DTorPolEnergyWriter.cpp
- * @brief Source of the implementation of the ASCII Chebysehv energy calculation for scalar field in a plane layer 
+ * @brief Source of the implementation of the ASCII Chebysehv energy calculation for scalar field in a plane layer
  */
 
 // System includes
@@ -10,7 +10,7 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/Cartesian1DTorPolEnergyWriter.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"

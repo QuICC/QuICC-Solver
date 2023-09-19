@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IWorlandOperator.cpp
  * @brief Source of the implementation of generic interface to a full sphere Worland sparse operator
  */
@@ -13,7 +13,7 @@
 //
 #include "QuICC/SparseSM/IWorlandOperator.hpp"
 #include "QuICC/SparseSM/Worland/Tools.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 
 namespace QuICC {
 

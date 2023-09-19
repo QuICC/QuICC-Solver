@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ILinearMapOperator.hpp
  * @brief Implementation of the generic interface to the Cheyshev sparse operator based on a linear map y = ax + b, x = [-1, 1] (natural chebyshev grid)
  */
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/IChebyshevOperator.hpp"
 
 namespace QuICC {
@@ -23,15 +23,15 @@ namespace Chebyshev {
 
    /**
     * @brief Implementation of the generic interface to the Chebyshev sparse operator based on a linear map y = ax + b, x = [-1, 1] (natural chebyshev grid)
-    */ 
+    */
    class ILinearMapOperator: public IChebyshevOperator
    {
       public:
          /**
           * @brief Constructor
-          * 
+          *
           * @param rows    Number of rows
-          * @param cols    Number of columns 
+          * @param cols    Number of columns
           * @param lower   Lower bound of y
           * @param upper   Lower bound of y
           */
@@ -41,7 +41,7 @@ namespace Chebyshev {
           * @brief Destructor
           */
          virtual ~ILinearMapOperator();
-         
+
       protected:
          /**
           * @brief Get mapping a coefficient from y = ax + b

@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
 #include "QuICC/ModelOperator/Boundary.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"

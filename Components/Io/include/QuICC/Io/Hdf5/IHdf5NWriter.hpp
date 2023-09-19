@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IHdf5NWriter.hpp
  * @brief Interface to a numbering HDF5 file
  */
@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Io/Hdf5/IHdf5Writer.hpp"
 
 namespace QuICC {
@@ -67,7 +67,7 @@ namespace Hdf5 {
           * @param base New basename
           */
          void changeBasename(std::string base);
-         
+
       protected:
          /**
           * @brief Update the filename with new number

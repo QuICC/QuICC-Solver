@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IBase.hpp
  * @brief Implementation of the base tools for the spatial schemes
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 
 namespace QuICC {
