@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Precision.cpp
  * @brief Implementation of precision related constants and routines
  */
@@ -11,11 +11,11 @@
 
 // Class include
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 
 namespace QuICC {
 

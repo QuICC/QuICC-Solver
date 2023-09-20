@@ -1,4 +1,4 @@
-/** 
+/**
  * @file WorlandBase.hpp
  * @brief Implementation of the Worland polynomial base
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 
 namespace QuICC {
@@ -31,7 +31,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the Worland polynomial base
-    */ 
+    */
    class WorlandBase
    {
       public:

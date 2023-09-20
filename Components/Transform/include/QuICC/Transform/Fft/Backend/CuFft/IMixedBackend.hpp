@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IMixedBackend.hpp
- * @brief Interface for a generic mixed cuFFT based backend 
+ * @brief Interface for a generic mixed cuFFT based backend
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CUFFT_IMIXEDBACKEND_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/ICuFftBackend.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/Setup.hpp"
 
@@ -36,8 +36,8 @@ namespace CuFft {
 
    /**
     * @brief Interface for a generic mixed cuFFT based backend
-    */ 
-   class IMixedBackend: public ICuFftBackend 
+    */
+   class IMixedBackend: public ICuFftBackend
    {
       public:
          /// Typedef for the configuration class
@@ -60,12 +60,12 @@ namespace CuFft {
           * @brief Destructor
           */
          virtual ~IMixedBackend();
-         
+
          /**
           * @brief Initialise the cuFFT transforms
           */
          virtual void init(const SetupType& setup) const;
-         
+
       protected:
          /**
           * @brief Minimum number of blocks per batch

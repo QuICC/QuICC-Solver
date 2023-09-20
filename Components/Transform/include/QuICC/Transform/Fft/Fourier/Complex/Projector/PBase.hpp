@@ -1,4 +1,4 @@
-/** 
+/**
  * @file P.hpp
  * @brief Implementation of the Fourier based P projector
  */
@@ -20,7 +20,7 @@
 
 // Pect includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Projector/IComplexProjector.hpp"
 #include "QuICC/Transform/Fft/Fourier/Tags.hpp"
 
@@ -41,7 +41,7 @@ namespace Projector {
 
    /**
     * @brief Implementation of the Fourier based P projector
-    */ 
+    */
    template<>
    class P<base_t>: public IComplexProjector
    {
@@ -55,7 +55,7 @@ namespace Projector {
           * @brief Destructor
           */
          ~P() = default;
-         
+
       protected:
 
       private:

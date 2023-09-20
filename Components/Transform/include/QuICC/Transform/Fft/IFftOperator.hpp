@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IFftOperator.hpp
- * @brief Interface for a generic FFT based operator 
+ * @brief Interface for a generic FFT based operator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_IFFTOPERATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/ITransformOperator.hpp"
 
 namespace QuICC {
@@ -31,7 +31,7 @@ namespace Fft {
 
    /**
     * @brief Interface for a generic FFT based operator
-    */ 
+    */
    class IFftOperator: public ITransformOperator
    {
       public:
@@ -104,7 +104,7 @@ namespace Fft {
           * @param extended   values
           */
          virtual void dealias(MatrixZ& deAliased, const MatrixZ& aliased) const;
-         
+
       protected:
          /**
           * @brief Initialize base

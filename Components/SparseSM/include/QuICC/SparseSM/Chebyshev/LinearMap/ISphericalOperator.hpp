@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ISphericalOperator.hpp
  * @brief Base implementation of a spherical operator, with y = ax + b and needing the harmonic degree l
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/ILinearMapOperator.hpp"
 
 namespace QuICC {
@@ -24,7 +24,7 @@ namespace LinearMap {
 
    /**
     * @brief Base implementation of a spherical operator, with y = ax + b and needing the harmonic degree l
-    */ 
+    */
    class ISphericalOperator: public ILinearMapOperator
    {
       public:
@@ -43,7 +43,7 @@ namespace LinearMap {
           * @brief Destructor
           */
          virtual ~ISphericalOperator() = default;
-         
+
       protected:
          /**
           * @brief Harmonic degree

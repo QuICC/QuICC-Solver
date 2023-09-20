@@ -17,17 +17,17 @@ namespace SpatialScheme {
 
 namespace Tools {
 
-   int UniformSH::truncationFwd(const int nN, const int l)
+   int UniformSH::truncationFwd(const int nN, const int j, const int k)
    {
       return nN;
    }
 
-   int UniformSH::truncationBwd(const int nN, const int l)
+   int UniformSH::truncationBwd(const int nN, const int j, const int k)
    {
       return nN;
    }
 
-   int UniformSH::index(const int i, const int k)
+   int UniformSH::index(const int i, const int j, const int k)
    {
       return i;
    }

@@ -48,7 +48,7 @@ namespace SpatialScheme {
 
       // Get spectral size of the polynomial transform
       int specSize = spRes->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-      
+
       Transform::SharedTransformSetup spSetup;
 
       const auto& opt = this->mOptions.at(0);
@@ -70,7 +70,8 @@ namespace SpatialScheme {
       for(int i = 0; i < tRes.dim<Dimensions::Data::DAT3D>(); i++)
       {
          auto l = tRes.idx<Dimensions::Data::DAT3D>(i);
-         auto nN = spRes->counter().dimensions(Dimensions::Space::SPECTRAL, l)(0);
+         auto nN = tRes.dim<Dimensions::Data::DATB1D>(0,i);
+
          spSetup->addIndex(l, tRes.dim<Dimensions::Data::DAT2D>(i), nN);
       }
 

@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
 
 namespace QuICC {

@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 
 namespace QuICC {

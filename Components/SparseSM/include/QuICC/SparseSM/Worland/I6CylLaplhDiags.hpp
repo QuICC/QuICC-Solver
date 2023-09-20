@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I6CylLaplhDiags.hpp
  * @brief Interface to I6CylLaplh diagonals for full sphere Worland I6CylLaplh sparse operator
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Worland/IDiags.hpp"
 
 namespace QuICC {
@@ -22,7 +22,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the full sphere Worland I6CylLaplh sparse operator
-    */ 
+    */
    class I6CylLaplhDiags: public IDiags
    {
       public:
@@ -46,78 +46,78 @@ namespace Worland {
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d_5(const ACoeff_t& n) const = 0; 
+         virtual ACoeff_t d_5(const ACoeff_t& n) const = 0;
 
          /**
           * @brief 4. subdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d_4(const ACoeff_t& n) const = 0; 
+         virtual ACoeff_t d_4(const ACoeff_t& n) const = 0;
 
          /**
           * @brief 3. subdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d_3(const ACoeff_t& n) const = 0; 
+         virtual ACoeff_t d_3(const ACoeff_t& n) const = 0;
 
          /**
           * @brief 2. subdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d_2(const ACoeff_t& n) const = 0; 
+         virtual ACoeff_t d_2(const ACoeff_t& n) const = 0;
 
          /**
           * @brief 1. subdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d_1(const ACoeff_t& n) const = 0; 
+         virtual ACoeff_t d_1(const ACoeff_t& n) const = 0;
 
          /**
           * @brief Main diagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d0(const ACoeff_t& n) const = 0; 
+         virtual ACoeff_t d0(const ACoeff_t& n) const = 0;
 
          /**
           * @brief 1. superdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d1(const ACoeff_t& n) const = 0; 
+         virtual ACoeff_t d1(const ACoeff_t& n) const = 0;
 
          /**
           * @brief 2. superdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d2(const ACoeff_t& n) const = 0; 
+         virtual ACoeff_t d2(const ACoeff_t& n) const = 0;
 
          /**
           * @brief 3. superdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d3(const ACoeff_t& n) const = 0; 
+         virtual ACoeff_t d3(const ACoeff_t& n) const = 0;
 
          /**
           * @brief 4. superdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d4(const ACoeff_t& n) const = 0; 
+         virtual ACoeff_t d4(const ACoeff_t& n) const = 0;
 
          /**
           * @brief 5. superdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d5(const ACoeff_t& n) const = 0; 
-         
+         virtual ACoeff_t d5(const ACoeff_t& n) const = 0;
+
       protected:
 
       private:

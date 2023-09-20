@@ -1,4 +1,4 @@
-/** 
+/**
  * @file StorageProfilerTools.hpp
  * @brief Implementation of some tools for the storage profiler
  */
@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -38,7 +38,7 @@ namespace Debug {
           * @brief Define the unit of the memory requirements
           */
          static void setUnit(MHDFloat value, std::string &ext, MHDFloat &factor);
-         
+
       protected:
 
       private:

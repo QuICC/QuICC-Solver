@@ -1,4 +1,4 @@
-/** 
+/**
  * @file InnerProduct.hpp
  * @brief Evaluator to compute inner product with polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 
@@ -32,7 +32,7 @@ namespace Evaluator {
 
    /**
     * @brief Evaluator to compute inner product with polynomial
-    */ 
+    */
    template <typename T> class InnerProduct
    {
       public:

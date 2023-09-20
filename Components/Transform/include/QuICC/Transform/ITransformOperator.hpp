@@ -20,8 +20,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Precision.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Transform/TransformSetup.hpp"
 
 

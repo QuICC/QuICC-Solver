@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/ISphericalOperator.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/IPlaneOperator.hpp"

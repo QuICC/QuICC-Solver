@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Io/Xml/IXmlReader.hpp"
 #include "QuICC/Io/Config/IConfigurationFile.hpp"
 

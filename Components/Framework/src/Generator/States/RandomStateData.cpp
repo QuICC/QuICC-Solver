@@ -21,8 +21,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
 namespace QuICC {
@@ -155,7 +155,7 @@ namespace Equations {
          if(tRes.idx<Dimensions::Data::DAT2D>(j,k) == 0 && tRes.idx<Dimensions::Data::DAT3D>(k) != 0)
          {
             unsigned int seed = 2;
-            seed += tRes.idx<Dimensions::Data::DATF1D>(i,k);
+            seed += tRes.idx<Dimensions::Data::DATF1D>(i, j, k);
 
             int n2D = tRes.dim<Dimensions::Data::DAT3D>();
             int k2D = tRes.idx<Dimensions::Data::DAT3D>(k);

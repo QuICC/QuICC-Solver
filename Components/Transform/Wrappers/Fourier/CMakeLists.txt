@@ -33,11 +33,11 @@ set(IntegratorArgInType "phys_t")
 set(IntegratorArgOutType "mods_t")
 
 # Copy to padded
-set(viewCpu_tProjectorMixedCopyPad "// dealias with 2/3 rule
-    std::size_t nDealias = mPadded.rows() * dealias::rule;
+set(viewCpu_tProjectorMixedCopyPad "// dealias or overintegration
+    std::size_t nDealias = mspSetup->specSize();
     mPadded.topRows(nDealias) = in.topRows(nDealias);")
-set(viewGpu_tProjectorMixedCopyPad "// dealias with 2/3 rule
-    std::size_t nDealias = mPadded.rows() * dealias::rule;
+set(viewGpu_tProjectorMixedCopyPad "// dealias or overintegration
+    std::size_t nDealias = mspSetup->specSize();
 
     // cpu -> gpu data
     auto dSz = sizeof(decltype(mMods_d)::type);
@@ -47,8 +47,8 @@ set(viewGpu_tIntegratorMixedCopyPad "// cpu -> gpu data
     auto dSz = sizeof(decltype(mPhys_d)::type);
     cudaErrChk(cudaMemcpyAsync(mPhys_d.data(), in.data(), mPhys_d.size()*dSz,
         cudaMemcpyHostToDevice));")
-set(viewCpu_tProjectorComplexCopyPad "// dealias with 2/3 rule
-    std::size_t nDealias = mPadded.rows() * dealias::rule;
+set(viewCpu_tProjectorComplexCopyPad "// dealias or overintegration
+    std::size_t nDealias = mspSetup->specSize();
     auto negN = nDealias / 2;
     auto posN = negN + nDealias % 2;
     mPadded.topRows(posN) = in.topRows(posN);
@@ -66,15 +66,16 @@ set(viewGpu_tIntegratorComplexCopyPad "// cpu -> gpu data
         cudaMemcpyHostToDevice));"
     )
 
-set(ViewAttribute "Attributes<DimLevelType<dense_t, CSC_t, CSC_t>>")
+set(MixedViewAttribute "DCCSC3D")
+set(ComplexViewAttribute "DCCSC3DInOrder")
 
 # P - Projector
 set(ProjectorPviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>>")
+            Cpu::DiffOp<mods_t, mods_t, 0, bwd_t>>")
 set(ProjectorPviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-            Cuda::DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>>")
+            Cuda::DiffOp<mods_t, mods_t, 0, bwd_t>>")
 
 # P - Integrator
 set(IntegratorPviewCpu_tPtrParam "DOp<mods_t, phys_t,
@@ -97,10 +98,10 @@ set(IntegratorP_CleanviewGpu_tPtrParam "DOp<mods_t, phys_t,
 # D1 - Projector
 set(ProjectorD1viewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>>")
+            Cpu::DiffOp<mods_t, mods_t, 1, bwd_t>>")
 set(ProjectorD1viewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-            Cuda::DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>>")
+            Cuda::DiffOp<mods_t, mods_t, 1, bwd_t>>")
 
 # D1 - Integrator
 set(IntegratorD1viewCpu_tPtrParam "DOp<mods_t, phys_t,
@@ -129,10 +130,10 @@ set(IntegratorD1_NegviewGpu_tPtrParam "DOp<mods_t, phys_t,
 # D2 - Projector
 set(ProjectorD2viewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>>")
+            Cpu::DiffOp<mods_t, mods_t, 2, bwd_t>>")
 set(ProjectorD2viewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-            Cuda::DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>>")
+            Cuda::DiffOp<mods_t, mods_t, 2, bwd_t>>")
 
 # D2 - Integrator
 set(IntegratorD2viewCpu_tPtrParam "DOp<mods_t, phys_t,
@@ -145,10 +146,10 @@ set(IntegratorD2viewGpu_tPtrParam "DOp<mods_t, phys_t,
 # D3 - Projector
 set(ProjectorD3viewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>>")
+            Cpu::DiffOp<mods_t, mods_t, 3, bwd_t>>")
 set(ProjectorD3viewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-            Cuda::DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>>")
+            Cuda::DiffOp<mods_t, mods_t, 3, bwd_t>>")
 
 # D3 - Integrator
 set(IntegratorD3viewCpu_tPtrParam "DOp<mods_t, phys_t,
@@ -237,8 +238,8 @@ set(IntegratorMeanviewGpu_tPtrParam "DOp<phys_t, mods_t,
 set(ProjectorviewCpu_tViewStorage "// views
     mods_t mods({const_cast<std::remove_reference_t<decltype(in)>::Scalar*>(mPadded.data()),
         static_cast<std::size_t>(mPadded.size())},
-        {{static_cast<std::uint32_t>(mPadded.rows()),
-            columns, layers}}, pointers, indices);
+        {{static_cast<std::uint32_t>(nDealias),
+            columns, layers}}, pointers, indices, mPadded.rows());
     phys_t phys({rOut.data(),
         static_cast<std::size_t>(rOut.size())},
             {{static_cast<std::uint32_t>(rOut.rows()),
@@ -420,6 +421,7 @@ void applyPostOperator(MatrixZ& rOut) const final {};"
 
 # loop
 foreach(Space IN LISTS Spaces)
+    set(ViewAttribute "${${Space}ViewAttribute}")
     foreach(Kind IN LISTS Kinds)
         set(Ops "${${Kind}${Space}Ops}")
         set(OutMatrixType "${${Kind}${Space}OutMatrixType}")

@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/Generator/Visualizers/Kernels/Spherical/CylindricalRadialField.hpp"
 

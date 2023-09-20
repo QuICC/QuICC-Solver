@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IModelBackend.hpp
  * @brief Interface for a model backend
  */
@@ -22,7 +22,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/Typedefs.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"

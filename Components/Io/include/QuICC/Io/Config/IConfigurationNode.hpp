@@ -1,5 +1,5 @@
-/** 
- * @file IConfigurationNode.hpp 
+/**
+ * @file IConfigurationNode.hpp
  * @brief Implementation of a configuration node of the configuration file
  */
 
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Io/Config/IConfigurationTag.hpp"
 
 namespace QuICC {
@@ -94,7 +94,7 @@ namespace Config {
           * @brief Output run information
           */
          virtual void printInfo() const;
-         
+
       protected:
 
       private:

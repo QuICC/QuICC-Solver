@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Worland/IDiags.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/SparseSM/Worland/Tools.hpp"
 
 namespace QuICC {

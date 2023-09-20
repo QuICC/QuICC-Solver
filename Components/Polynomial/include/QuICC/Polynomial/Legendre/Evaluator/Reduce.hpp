@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Reduce.hpp
  * @brief Evaluator to compute column sum reduction of polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 
@@ -32,7 +32,7 @@ namespace Evaluator {
 
    /**
     * @brief Evaluator to compute column sum reduction of polynomial
-    */ 
+    */
    class Reduce
    {
       public:

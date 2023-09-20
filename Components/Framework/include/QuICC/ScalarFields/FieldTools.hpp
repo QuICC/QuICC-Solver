@@ -23,7 +23,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Arithmetics/Add.hpp"
 #include "QuICC/Arithmetics/Sub.hpp"
 #include "Profiler/Interface.hpp"

@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/BasicTypes.hpp"
+#include "Types/BasicTypes.hpp"
 #include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
 #include "QuICC/Io/Ascii/CflWriter.hpp"

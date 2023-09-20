@@ -6,20 +6,14 @@
 #ifndef QUICC_EQUATIONS_TOOLS_REGULAR1D_HPP
 #define QUICC_EQUATIONS_TOOLS_REGULAR1D_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include<vector>
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Equations/Tools/ICoupling.hpp"
 
 namespace QuICC {
@@ -74,8 +68,12 @@ namespace Tools {
 
          /**
           * @brief Interpret system size provided by python code
+          *
+          * @param rSystemNs  System sizes
+          * @param res        Resolution object
+          * @param nFields    Number of coupled fields in system
           */
-         virtual void interpretSystemN(ArrayI& rSystemNs, const Resolution& res) const;
+         virtual void interpretSystemN(ArrayI& rSystemNs, const Resolution& res, const int nFields) const;
    };
 
    /// Typedef for a shared Regular1D

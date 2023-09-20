@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IWorlandOperator.hpp
  * @brief Implementation of the generic interface to the full sphere Worland sparse operator
  */
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/ISparseSMOperator.hpp"
 #include "QuICC/SparseSM/Worland/WorlandKind.hpp"
 
@@ -22,7 +22,7 @@ namespace SparseSM {
 
    /**
     * @brief Implementation of the generic interface to the full sphere Worland sparse operator
-    */ 
+    */
    class IWorlandOperator: public ISparseSMOperator
    {
       public:
@@ -40,7 +40,7 @@ namespace SparseSM {
           * @brief Destructor
           */
          virtual ~IWorlandOperator() = default;
-         
+
       protected:
          /**
           * @brief Type of Worland implementation

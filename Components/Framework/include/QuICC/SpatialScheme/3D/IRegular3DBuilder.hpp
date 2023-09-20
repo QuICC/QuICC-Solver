@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IRegular3DBuilder.hpp
  * @brief Implementation of a generic regular 3D scheme
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/3D/I3DBuilder.hpp"
@@ -30,7 +30,7 @@ namespace SpatialScheme {
          /**
           * @brief Constructor
           *
-          * @param dim Dimension truncations 
+          * @param dim Dimension truncations
           * @param purpose Setup purpose: simulation, visualization
           * @param options Options for builder
           */
@@ -45,7 +45,7 @@ namespace SpatialScheme {
           * @brief Get spatial scheme dimensions
           */
          virtual ArrayI resolution() const override;
-         
+
       protected:
          /**
           * @brief Get truncation tool

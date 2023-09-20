@@ -16,6 +16,7 @@
 //
 #include "View/ViewBase.hpp"
 #include "View/Attributes.hpp"
+#include "Std/Cuda/Utility.hpp"
 
 namespace QuICC {
 namespace Memory {
@@ -75,6 +76,10 @@ namespace Memory {
       /// @brief get pointer to logical dimensions c-array
       /// @return pointer to _dimensions
       QUICC_CUDA_HOSTDEV const IndexType* dims() const {return _dimensions;}
+
+      /// @brief get pointer to in memory strides c-array
+      /// @return pointer to _strides
+      QUICC_CUDA_HOSTDEV const IndexType* strides() const {return _strides;}
    };
 
    using dense1D_t = DimLevelType<dense_t>;
@@ -99,11 +104,6 @@ namespace Memory {
       /// @tparam Scalar
       /// @tparam ...Args
       using ViewDenseBase<Scalar, Attributes<dense1D_t, Args...>>::_rank;
-
-      /// @brief /// @brief imported from ViewDenseBase
-      /// @tparam Scalar
-      /// @tparam ...Args
-      using ViewDenseBase<Scalar, Attributes<dense1D_t, Args...>>::_dimensions;
 
       /// @brief 1D fully dense ctor
       /// @param data span ref, useful to accept braced initializer list
@@ -168,12 +168,12 @@ namespace Memory {
       /// @brief 2D fully dense ctor
       /// @param data span ref, useful to accept braced initializer list
       /// @param dimensions std::array of logical dimensions, useful to accept braced initializer list
-      View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions);
+      View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions, const std::array<IndexType, _rank> strides = std::array<IndexType, _rank>{0,0});
 
       /// @brief 2D fully dense ctor
       /// @param data span ref, useful to accept braced initializer list
       /// @param dimensions pointer to array of logical dimensions
-      View(const span<Scalar>& data, const IndexType* dimensions);
+      View(const span<Scalar>& data, const IndexType* dimensions, const IndexType* strides = nullptr);
 
       /// @brief 2D accessor
       /// @param i first logical index
@@ -228,7 +228,7 @@ namespace Memory {
       /// @brief 3D fully dense ctor
       /// @param data span ref, useful to accept braced initializer list
       /// @param dimensions std::array of logical dimensions, useful to accept braced initializer list
-      View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions);
+      View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions, const std::array<IndexType, _rank> strides = std::array<IndexType, _rank>{0,0,0});
 
       /// @brief 3D fully dense ctor
       /// @param data span ref, useful to accept braced initializer list
@@ -256,9 +256,10 @@ namespace Memory {
    View<Scalar, Attributes<dense1D_t, Args... >>::View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions) :
       ViewDenseBase<Scalar, Attributes<dense1D_t, Args... >>(data.data(), data.size())
    {
+      this->_strides[0] = 1;
       for (std::size_t i = 0; i < _rank; ++i)
       {
-         _dimensions[i] = dimensions[i];
+         this->_dimensions[i] = dimensions[i];
       }
    }
 
@@ -266,67 +267,107 @@ namespace Memory {
    View<Scalar, Attributes<dense1D_t, Args... >>::View(const span<Scalar>& data, const IndexType* dimensions) :
       ViewDenseBase<Scalar, Attributes<dense1D_t, Args... >>(data.data(), data.size())
    {
+      this->_strides[0] = 1;
       for (std::size_t i = 0; i < _rank; ++i)
       {
-         _dimensions[i] = dimensions[i];
+         this->_dimensions[i] = dimensions[i];
       }
    }
 
    // 1D accessor
    template <class Scalar, class... Args>
-   const Scalar& View<Scalar, Attributes<dense1D_t, Args... >>::operator()(const IndexType index) const
+   const Scalar& View<Scalar, Attributes<dense1D_t, Args... >>::operator()(const IndexType i) const
    {
       // static_assert(_rank == 1, "This method is available only to rank 1 Views");
-      assert(index < _dimensions[0]);
-      return this->_data[index];
+      assert(i < this->_dimensions[0]);
+      auto idx = i*this->_strides[0];
+      assert(idx < this->_size);
+      return this->_data[i];
    }
 
    template <class Scalar, class... Args>
    Scalar& View<Scalar, Attributes<dense1D_t, Args... >>::operator()(const IndexType index)
    {
-      assert(index < _dimensions[0]);
-      return this->_data[index];
+      return const_cast<Scalar &>(cuda::std::as_const(*this).operator()(index));
    }
-
 
    // 2D dense_t ctor
    template <class Scalar, class... Args>
-   View<Scalar, Attributes<dense2D_t, Args... >>::View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions) :
+   View<Scalar, Attributes<dense2D_t, Args... >>::View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions, const std::array<IndexType, _rank> strides) :
       ViewDenseBase<Scalar, Attributes<dense2D_t, Args... >>(data.data(), data.size())
    {
       for (std::size_t i = 0; i < _rank; ++i)
       {
          _dimensions[i] = dimensions[i];
       }
+
       if constexpr(std::is_same_v<OrderType, LoopOrderType<i_t, j_t>>)
       {
-         _strides[0] = 1;
-         _strides[1] = _dimensions[0];
+         if (strides[0] == 0 && strides[1] == 0)
+         {
+            _strides[0] = 1;
+            _strides[1] = _dimensions[0];
+         }
+         else
+         {
+            assert(strides[0] < strides[1]);
+            _strides[0] = strides[0];
+            _strides[1] = strides[1];
+         }
       }
       else if constexpr(std::is_same_v<OrderType, LoopOrderType<j_t, i_t>>)
       {
-         _strides[1] = 1;
-         _strides[0] = _dimensions[1];
+         if (strides[0] == 0 && strides[1] == 0)
+         {
+            _strides[1] = 1;
+            _strides[0] = _dimensions[1];
+         }
+         else
+         {
+            assert(strides[0] > strides[1]);
+            _strides[0] = strides[0];
+            _strides[1] = strides[1];
+         }
       }
    }
 
    template <class Scalar, class... Args>
-   View<Scalar, Attributes<dense2D_t, Args... >>::View(const span<Scalar>& data, const IndexType* dimensions) :
+   View<Scalar, Attributes<dense2D_t, Args... >>::View(const span<Scalar>& data, const IndexType* dimensions, const IndexType* strides) :
       ViewDenseBase<Scalar, Attributes<dense2D_t, Args... >>(data.data(), data.size())
    {
+      /// \todo remove duplicate ctor implementation
       for (std::size_t i = 0; i < _rank; ++i)
       {
          _dimensions[i] = dimensions[i];
       }
+
       if constexpr(std::is_same_v<OrderType, LoopOrderType<i_t, j_t>>)
       {
-         _strides[0] = 1;
-         _strides[1] = _dimensions[0];
+         if (strides == nullptr)
+         {
+            _strides[0] = 1;
+            _strides[1] = _dimensions[0];
+         }
+         else
+         {
+            assert(strides[0] < strides[1]);
+            _strides[0] = strides[0];
+            _strides[1] = strides[1];
+         }
       }
       else if constexpr(std::is_same_v<OrderType, LoopOrderType<j_t, i_t>>)
       {
-         _strides[1] = 1;
-         _strides[0] = _dimensions[1];
+         if (strides == nullptr)
+         {
+            _strides[1] = 1;
+            _strides[0] = _dimensions[1];
+         }
+         else
+         {
+            assert(strides[0] > strides[1]);
+            _strides[0] = strides[0];
+            _strides[1] = strides[1];
+         }
       }
    }
 
@@ -339,23 +380,20 @@ namespace Memory {
       assert(i < _dimensions[0]);
       assert(j < _dimensions[1]);
 
-      // dense
-      return this->_data[i*_strides[0] + j*_strides[1]];
+      const auto ij = i*_strides[0] + j*_strides[1];
+      assert(ij < this->_size);
+      return this->_data[ij];
    }
 
    template <class Scalar, class... Args>
    Scalar& View<Scalar, Attributes<dense2D_t, Args... >>::operator()(const IndexType i, const IndexType j)
    {
-      assert(i < _dimensions[0]);
-      assert(j < _dimensions[1]);
-
-      // dense
-      return this->_data[i*_strides[0] + j*_strides[1]];
+      return const_cast<Scalar &>(cuda::std::as_const(*this).operator()(i, j));
    }
 
    // 3D dense_t ctor
    template <class Scalar, class... Args>
-   View<Scalar, Attributes<dense3D_t, Args... >>::View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions) :
+   View<Scalar, Attributes<dense3D_t, Args... >>::View(const span<Scalar>& data, const std::array<IndexType, _rank> dimensions, const std::array<IndexType, _rank> strides) :
       ViewDenseBase<Scalar, Attributes<dense3D_t, Args... >>(data.data(), data.size())
    {
       for (std::size_t i = 0; i < _rank; ++i)
@@ -364,16 +402,35 @@ namespace Memory {
       }
       if constexpr(std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
       {
-         _strides[0] = 1;
-         _strides[1] = _dimensions[0];
-         _strides[2] = _dimensions[0]*_dimensions[1];
+         if (strides[0] == 0 && strides[1] == 0 && strides[2] == 0)
+         {
+            _strides[0] = 1;
+            _strides[1] = _dimensions[0];
+            _strides[2] = _dimensions[0]*_dimensions[1];
+         }
+         else
+         {
+            assert(strides[0] < strides[1] && strides[1] < strides[2]);
+            _strides[0] = strides[0];
+            _strides[1] = strides[1];
+            _strides[2] = strides[2];
+         }
       }
       else if constexpr(std::is_same_v<OrderType, LoopOrderType<k_t, j_t, i_t>>)
       {
-
-         _strides[2] = 1;
-         _strides[1] = _dimensions[2];
-         _strides[0] = _dimensions[2]*_dimensions[1];
+         if (strides[0] == 0 && strides[1] == 0 && strides[2] == 0)
+         {
+            _strides[2] = 1;
+            _strides[1] = _dimensions[2];
+            _strides[0] = _dimensions[2]*_dimensions[1];
+         }
+         else
+         {
+            assert(strides[0] > strides[1] && strides[1] > strides[2]);
+            _strides[0] = strides[0];
+            _strides[1] = strides[1];
+            _strides[2] = strides[2];
+         }
       }
       else
       {
@@ -417,18 +474,16 @@ namespace Memory {
       assert(j < _dimensions[1]);
       assert(k < _dimensions[2]);
 
-      return this->_data[i*_strides[0] + j*_strides[1] + k*_strides[2]];
+      const auto ijk = i*_strides[0] + j*_strides[1] + k*_strides[2];
+      assert(ijk < this->_size);
+      return this->_data[ijk];
    }
 
    template <class Scalar, class... Args>
    Scalar& View<Scalar, Attributes<dense3D_t, Args... >>::operator()
       (const IndexType i, const IndexType j, const IndexType k)
    {
-      assert(i < _dimensions[0]);
-      assert(j < _dimensions[1]);
-      assert(k < _dimensions[2]);
-
-      return this->_data[i*_strides[0] + j*_strides[1] + k*_strides[2]];
+      return const_cast<Scalar &>(cuda::std::as_const(*this).operator()(i, j, k));
    }
 
 } // namespace Memory

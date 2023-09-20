@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ComplexProjector.hpp
- * @brief Backend for a generic complex cuFFT based projector 
+ * @brief Backend for a generic complex cuFFT based projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CUFFT_COMPLEXPROJECTOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/IComplexBackend.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Setup.hpp"
 
@@ -36,7 +36,7 @@ namespace CuFft {
 
    /**
     * @brief Backend for a generic complex cuFFT based projector
-    */ 
+    */
    class ComplexProjector: public IComplexBackend
    {
       public:
@@ -49,7 +49,7 @@ namespace CuFft {
           * @brief Destructor
           */
          virtual ~ComplexProjector();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */

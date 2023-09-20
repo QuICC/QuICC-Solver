@@ -1,16 +1,38 @@
+/**
+ * @file Gemm.hpp
+ * @brief Different implementations of Cuda Gemm operations
+ */
 #pragma once
 
+// External includes
+//
 #include <cuda/std/complex>
 
+// Project includes
+//
+
 namespace QuICC {
+/// @brief namespace for Blas type operations
 namespace Blas {
+/// @brief namespace for Cuda backends
 namespace Cuda {
 
 using namespace QuICC::Memory;
 
+/// @brief namespace for naive backend
 namespace Naive {
 
-/// cuda kernel naive matmul
+
+/// @brief Cuda kernel for naive matmul with mixed types
+/// @tparam T
+/// @tparam Talpha
+/// @param c complex, row major
+/// @param a real, col major
+/// @param b complex, row major
+/// @param M
+/// @param K
+/// @param N
+/// @param alpha
 template <class T, class Talpha>
 inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::std::complex<T>* b,
     const std::size_t M, const std::size_t K, const std::size_t N,
@@ -36,10 +58,20 @@ inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::
 
 } // namespace Naive
 
+/// @brief namespace for one level blocked backend
 namespace Blocked
 {
 
-/// cuda kernel blocked matmul
+/// @brief Cuda kernel for one level blocked matmul with mixed types
+/// @tparam T
+/// @tparam Talpha
+/// @param c complex, row major
+/// @param a real, col major
+/// @param b complex, row major
+/// @param M
+/// @param K
+/// @param N
+/// @param alpha
 template <class T, class Talpha, unsigned int TileSize>
 inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::std::complex<T>* b,
     const std::size_t M, const std::size_t K, const std::size_t N,
@@ -102,12 +134,21 @@ inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::
 
 } // namespace Blocked
 
-
+/// @brief namespace for join tiling and register backend
 namespace Vad
 {
 
-/// cuda kernel vad matmul
+/// @brief Cuda kernel vad matmul
 /// joint tiling register / shared memory implementation (Volkov and Demmel)
+/// @tparam T
+/// @tparam Talpha
+/// @param c complex, row major
+/// @param a real, col major
+/// @param b complex, row major
+/// @param M
+/// @param K
+/// @param N
+/// @param alpha
 template <class T, class Talpha, unsigned int Nthreads, unsigned int CoarseFactor>
 inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::std::complex<T>* b,
     const std::size_t M, const std::size_t K, const std::size_t N,
@@ -198,9 +239,6 @@ inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::
 
 } // namespace Vad
 
-
 } // namespace Cuda
 } // namespace Blas
 } // namespace QuICC
-
-#undef LIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS

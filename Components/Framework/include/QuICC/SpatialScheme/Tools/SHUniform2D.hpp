@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SHUniform2D.hpp
  * @brief Implementation of the tools for the spherical harmonic + uniform + uniform based schemes
  */
@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/Tools/IBase.hpp"
 
 namespace QuICC {
@@ -44,18 +44,30 @@ namespace Tools {
 
          /**
           * @brief Compute forward truncation
+          *
+          * @param nN   Reference truncation
+          * @param j    second dimension
+          * @param k    third dimension
           */
-         int truncationFwd(const int nN, const int l) final;
+         int truncationFwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Compute backward truncation
+          *
+          * @param nN   Reference truncation
+          * @param j    second dimension
+          * @param k    third dimension
           */
-         int truncationBwd(const int nN, const int l) final;
+         int truncationBwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Compute index
+          *
+          * @param nN   Reference truncation
+          * @param j    second dimension
+          * @param k    third dimension
           */
-         int index(const int nN, const int k) final;
+         int index(const int nN, const int j, const int k) final;
 
          /**
           * @brief Check if chosen resolution is optimal

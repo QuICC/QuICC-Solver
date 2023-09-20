@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IChebyshevProjector.hpp
- * @brief Interface for a generic Chebyshev FFT based projector 
+ * @brief Interface for a generic Chebyshev FFT based projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVPROJECTOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/IChebyshevOperator.hpp"
 #include "QuICC/Transform/Fft/Backend/ChebyshevProjector.hpp"
 
@@ -38,7 +38,7 @@ namespace Projector {
 
    /**
     * @brief Interface for a generic Chebyshev FFT based projector
-    */ 
+    */
    class IChebyshevProjector: public IChebyshevOperator
    {
       public:
@@ -82,7 +82,7 @@ namespace Projector {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
           * @brief Initialise FFT backend

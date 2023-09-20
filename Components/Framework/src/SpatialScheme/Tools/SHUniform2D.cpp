@@ -21,17 +21,17 @@ namespace Tools {
    {
    }
 
-   int SHUniform2D::truncationFwd(const int nN, const int k)
+   int SHUniform2D::truncationFwd(const int nN, const int j, const int k)
    {
       return nN;
    }
 
-   int SHUniform2D::truncationBwd(const int nN, const int k)
+   int SHUniform2D::truncationBwd(const int nN, const int j, const int k)
    {
       return nN - k;
    }
 
-   int SHUniform2D::index(const int i, const int k)
+   int SHUniform2D::index(const int i, const int j, const int k)
    {
       return i + k;
    }

@@ -90,22 +90,22 @@ namespace Variable {
 
       // Size of spectrum
       auto size = std::visit([](auto&& p)->std::pair<int,int>{return std::make_pair(0,p->data().cols());}, pInVarTor);
-      int l_ = 0;
+      int nN = 0;
       if(this->mHasMOrdering)
       {
          for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
          {
             for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               l_ = std::min(l_, tRes.idx<Dimensions::Data::DAT2D>(j, k));
+               std::max(nN, tRes.dim<Dimensions::Data::DATB1D>(j,k));
             }
          }
       }
       else
       {
-         l_ = tRes.idx<Dimensions::Data::DAT3D>(0);
+         nN = tRes.dim<Dimensions::Data::DATB1D>();
       }
-      size.first = this->res().counter().dimensions(Dimensions::Space::SPECTRAL, l_)(0);
+      size.first = nN;
 
       // Compute power reduction
       spectrum.resize(size.first, size.second);

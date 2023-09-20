@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "Timers/TimerMacro.h"
 #include "QuICC/TestSuite/Polynomial/TestType.hpp"
 #include "QuICC/TestSuite/Polynomial/Io.hpp"

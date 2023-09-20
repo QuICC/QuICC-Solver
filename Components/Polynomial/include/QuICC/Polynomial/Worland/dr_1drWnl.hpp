@@ -1,4 +1,4 @@
-/** 
+/**
  * @file dr_1drWnl.hpp
  * @brief Implementation of the D 1/r D r Worland polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 
@@ -32,7 +32,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the D 1/r D r Worland polynomial
-    */ 
+    */
    class dr_1drWnl: public WorlandBase
    {
       public:
@@ -76,7 +76,7 @@ namespace Worland {
 
       // Compute P_0
       this->computeW0l(ipnab.col(0), l-2, a, b, igrid, WorlandBase::normWP0ab());
-      ipnab.col(0) *= (dl - MHD_MP(1.0))*(dl + MHD_MP(1.0)); 
+      ipnab.col(0) *= (dl - MHD_MP(1.0))*(dl + MHD_MP(1.0));
       if(scale.size() > 0)
       {
          ipnab.col(0).array() *= scale.array();
@@ -102,7 +102,7 @@ namespace Worland {
 
          // Compute DP_1
          this->computeW0l(idpnab.col(0), l, a1, b1, igrid, WorlandBase::normWDP0ab());
-         idpnab.col(0) *= MHD_MP(2.0)*(dl + MHD_MP(1.0)); 
+         idpnab.col(0) *= MHD_MP(2.0)*(dl + MHD_MP(1.0));
          if(scale.size() > 0)
          {
             idpnab.col(0).array() *= scale.array();
@@ -165,7 +165,7 @@ namespace Worland {
 
          // Compute e P + 2(x+1) DP
          if(l == 1)
-         { 
+         {
             evaluator(rOut, idpnab.col(1) + id2pnab.col(1), 3);
          } else
          {

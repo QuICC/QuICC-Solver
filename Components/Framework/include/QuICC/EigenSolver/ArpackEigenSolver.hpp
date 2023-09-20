@@ -1,6 +1,6 @@
 /**
  * @file ArpackEigenSolver.hpp
- * @brief Definition of an interface to the ARPACK sparse eigen solver 
+ * @brief Definition of an interface to the ARPACK sparse eigen solver
  */
 
 #ifndef QUICC_ARPACKEIGENSOLVER_HPP
@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 
 namespace QuICC {
@@ -75,7 +75,7 @@ namespace QuICC {
           * @brief Set the type of eigenvalues to look for
           */
          void setWhich(const std::string& which);
-         
+
       protected:
 
       private:

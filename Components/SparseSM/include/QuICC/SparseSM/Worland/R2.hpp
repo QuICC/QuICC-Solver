@@ -1,4 +1,4 @@
-/** 
+/**
  * @file R2.hpp
  * @brief Implementation of the full sphere Worland R2 sparse operator
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/IWorlandOperator.hpp"
 #include "QuICC/SparseSM/Worland/R2Diags.hpp"
 
@@ -23,7 +23,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the full sphere Worland R2 sparse operator
-    */ 
+    */
    class R2: public IWorlandOperator
    {
       public:
@@ -43,7 +43,7 @@ namespace Worland {
           * @brief Destructor
           */
          virtual ~R2() = default;
-         
+
       protected:
 
       private:

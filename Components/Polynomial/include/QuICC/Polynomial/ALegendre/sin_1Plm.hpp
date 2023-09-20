@@ -1,4 +1,4 @@
-/** 
+/**
  * @file sin_1Plm.hpp
  * @brief Implementation of the associated Legendre polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/ALegendre/ALegendreBase.hpp"
 
 namespace QuICC {
@@ -31,7 +31,7 @@ namespace ALegendre {
 
    /**
     * @brief Implementation of the associated Legendre polynomial
-    */ 
+    */
    class sin_1Plm: public ALegendreBase
    {
       public:

@@ -1,6 +1,6 @@
 /**
  * @file ISpectralKernel.hpp
- * @brief Base building block for the implementation of a spectral kernel 
+ * @brief Base building block for the implementation of a spectral kernel
  */
 
 #ifndef QUICC_SPECTRAL_KERNEL_ISPECTRALKERNEL_HPP
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
@@ -76,7 +76,7 @@ namespace Kernel {
           * @param timeId   Timing ID
           */
          virtual void apply(const std::size_t timeId);
-         
+
       protected:
          /**
           * @brief Get scalar variable
@@ -127,7 +127,7 @@ namespace Kernel {
 
    /// Typedef for a smart ISpectralKernel
    typedef std::shared_ptr<ISpectralKernel> SharedISpectralKernel;
-   
+
 } // Kernel
 } // Spectral
 } // QuICC

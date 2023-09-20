@@ -24,7 +24,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/ScalarFields/ScalarFieldSetup.hpp"
 
 namespace QuICC {

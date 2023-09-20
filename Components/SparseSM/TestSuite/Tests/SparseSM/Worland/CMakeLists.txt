@@ -110,6 +110,22 @@ endforeach()
 
 # Create Worland basis tests targets
 set(_tests
+  I2:sparse
+  I2Qm:sparse
+  I2Qp:sparse
+  I2Lapl:sparse
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 22 23 24 25 26 27 28 29
+    ULP 75
+  )
+endforeach()
+
+# Create Worland basis tests targets
+set(_tests
   I4:sparse
   I4Lapl:sparse
   I4Lapl2:sparse
@@ -120,6 +136,23 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:type
     IDS 10 11 12 13 14
+    ULP 95
+  )
+endforeach()
+
+# Create Worland basis tests targets
+set(_tests
+  I4:sparse
+  I4Qm:sparse
+  I4Qp:sparse
+  I4Lapl:sparse
+  I4Lapl2:sparse
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 23 24 25 26 27 28 29
     ULP 95
   )
 endforeach()
@@ -190,6 +223,39 @@ foreach(_test ${_tests})
     KEYWORD Operator:type
     IDS 110 111 112 113
     ULP 75
+  )
+endforeach()
+
+# Create tests for truncated operators
+set(_tests
+  I2:sparse
+  I2Qm:sparse
+  I2Qp:sparse
+  I2Lapl:sparse
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 122 123 124 125 126 127 128 129
+    ULP 80
+  )
+endforeach()
+
+# Create tests for truncated operators
+set(_tests
+  I4:sparse
+  I4Qm:sparse
+  I4Qp:sparse
+  I4Lapl:sparse
+  I4Lapl2:sparse
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 123 124 125 126 127 128 129
+    ULP 200
   )
 endforeach()
 

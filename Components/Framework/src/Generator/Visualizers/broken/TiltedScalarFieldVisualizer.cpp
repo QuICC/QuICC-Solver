@@ -18,8 +18,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/NonDimensional/Theta.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
@@ -102,7 +102,7 @@ namespace Equations {
          nJ = this->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iK);
          for(int iJ = 0; iJ < nJ; ++iJ)
          {
-            nI = this->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATB1D>(iK);
+            nI = this->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATB1D>(iJ, iK);
             for(int iI = 0; iI < nI; ++iI)
             {
                tmp(iI, m) = std::exp(MHDComplex(0.0, -k_*iI*(eta2/eta3)))*tmp(iI,m);

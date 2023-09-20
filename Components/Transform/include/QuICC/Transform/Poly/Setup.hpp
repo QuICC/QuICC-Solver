@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Setup.hpp
  * @brief Implementation of the polynomial transform setup class
  */
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/TransformSetup.hpp"
 
 namespace QuICC {
@@ -29,7 +29,7 @@ namespace Poly {
 
    /**
     * @brief Implementation of the polynomial transform setup class
-    */ 
+    */
    class Setup: public TransformSetup
    {
       public:

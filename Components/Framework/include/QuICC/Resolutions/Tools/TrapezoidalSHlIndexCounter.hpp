@@ -1,4 +1,4 @@
-/** 
+/**
  * @file TrapezoidalSHlIndexCounter.hpp
  * @brief Implementation of spherical harmonic index counter with l spectral ordering and trapezoidal radial truncation
  */
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Resolutions/Tools/IResolutionIndexCounter.hpp"
 
@@ -20,7 +20,7 @@ namespace QuICC {
 
    /**
     * @brief Implementation of spherical harmonic index counter with l spectral ordering
-    */ 
+    */
    class TrapezoidalSHlIndexCounter: public IResolutionIndexCounter
    {
       public:
@@ -70,7 +70,7 @@ namespace QuICC {
           * @brief Compute the offsets for the local modes by comparing to a reference simulation
           */
          void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const final;
-         
+
       protected:
 
       private:

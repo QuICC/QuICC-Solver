@@ -1,4 +1,4 @@
-/** 
+/**
  * @file P.hpp
  * @brief Implementation of the Chebyshev based P projector, with linear map y = ax + b
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/IChebyshevProjector.hpp"
 
 namespace QuICC {
@@ -28,7 +28,7 @@ namespace Projector {
 
    /**
     * @brief Implementation of the Chebyshev based P projector, with linear map y = ax + b
-    */ 
+    */
    class P: public IChebyshevProjector
    {
       public:
@@ -41,7 +41,7 @@ namespace Projector {
           * @brief Destructor
           */
          virtual ~P();
-         
+
       protected:
 
       private:

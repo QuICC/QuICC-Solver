@@ -1,4 +1,4 @@
-/** 
+/**
  * @file WLFmBuilder.cpp
  * @brief Source of the sphere Worland(poly) + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation with spectral m ordering
  */
@@ -12,6 +12,13 @@
 #include "QuICC/SpatialScheme/3D/WLFmBuilder.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
+#include "QuICC/Transform/Fft/Fourier/Mixed/Setup.hpp"
+#include "QuICC/Transform/Fft/Worland/Setup.hpp"
+#include "QuICC/Transform/Poly/Setup.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Setup.hpp"
+#include "QuICC/Transform/Setup/GaussianQuadrature.hpp"
+#include "QuICC/Transform/Setup/Fft.hpp"
+#include "QuICC/Transform/Setup/Triangular.hpp"
 #include "QuICC/SpatialScheme/3D/WLFMesher.hpp"
 #include "QuICC/Resolutions/Tools/RegularSHlIndexCounter.hpp"
 #include "QuICC/Resolutions/Tools/RegularSHmIndexCounter.hpp"
@@ -24,7 +31,7 @@ namespace SpatialScheme {
    void WLFmBuilder::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
       this->tuneMpiResolution(descr);
-      
+
       // Create spectral space sub communicators
       #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
          // MPI error code
@@ -67,7 +74,7 @@ namespace SpatialScheme {
          // Loop over all cpus
          int commId;
          int globalCpu = QuICCEnv().id();
-         ierr = MPI_Comm_rank(comm, &commId); 
+         ierr = MPI_Comm_rank(comm, &commId);
          QuICCEnv().check(ierr, 814);
          ArrayI tmp;
          for(int commCpu = 0; commCpu < MpiFramework::transformCpus(0).size(); ++commCpu)
@@ -81,7 +88,7 @@ namespace SpatialScheme {
                QuICCEnv().check(ierr, 815);
                MPI_Barrier(comm);
 
-               // Send global CPU rank 
+               // Send global CPU rank
                globalCpu = QuICCEnv().id();
                ierr = MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
                QuICCEnv().check(ierr, 816);
@@ -98,7 +105,7 @@ namespace SpatialScheme {
                QuICCEnv().check(ierr, 818);
                MPI_Barrier(comm);
 
-               // Get global CPU rank 
+               // Get global CPU rank
                ierr = MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
                QuICCEnv().check(ierr, 819);
                MPI_Barrier(comm);
@@ -188,7 +195,7 @@ namespace SpatialScheme {
                i_++;
             }
          }
-         
+
          // Free communicator
          ierr = MPI_Comm_free(&comm);
          QuICCEnv().check(ierr, 825);
@@ -198,19 +205,19 @@ namespace SpatialScheme {
    void WLFmBuilder::addTransformSetups(SharedResolution spRes) const
    {
       // Add setup for first transform
-      Transform::Poly::SharedSetup  spS1D = this->spSetup1D(spRes);
+      auto  spS1D = this->spSetup1D(spRes);
       spRes->addTransformSetup(Dimensions::Transform::TRA1D, spS1D);
 
       // Add setup for second transform
-      Transform::Poly::ALegendre::SharedSetup  spS2D = this->spSetup2D(spRes);
+      auto  spS2D = this->spSetup2D(spRes);
       spRes->addTransformSetup(Dimensions::Transform::TRA2D, spS2D);
 
       // Add setup for third transform
-      Transform::Fft::Fourier::Mixed::SharedSetup  spS3D = this->spSetup3D(spRes);
+      auto  spS3D = this->spSetup3D(spRes);
       spRes->addTransformSetup(Dimensions::Transform::TRA3D, spS3D);
    }
 
-   Transform::Poly::SharedSetup WLFmBuilder::spSetup1D(SharedResolution spRes) const
+   Transform::SharedTransformSetup WLFmBuilder::spSetup1D(SharedResolution spRes) const
    {
       const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA1D);
 
@@ -220,12 +227,30 @@ namespace SpatialScheme {
       // Get spectral size of the polynomial transform
       int specSize = spRes->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
-      auto spSetup = std::make_shared<Transform::Poly::Setup>(size, specSize, this->purpose());
+      Transform::SharedTransformSetup spSetup;
+
+      const auto& opt = this->mOptions.at(0);
+
+      // Poly algorithm setup
+      if(std::find(opt.begin(), opt.end(), Transform::Setup::GaussianQuadrature::id()) != opt.end())
+      {
+         auto spPolySetup = std::make_shared<Transform::Poly::Setup>(size, specSize, this->purpose());
+         spSetup = spPolySetup;
+      }
+      // FFT algorithm setup
+      else if(std::find(opt.begin(), opt.end(), Transform::Setup::Fft::id()) != opt.end())
+      {
+         auto spFftSetup = std::make_shared<Transform::Fft::Worland::Setup>(size, specSize, this->purpose());
+         spSetup = spFftSetup;
+      }
 
       // Get number of transforms and list of indexes
       for(int i = 0; i < tRes.dim<Dimensions::Data::DAT3D>(); i++)
       {
-         spSetup->addIndex(tRes.idx<Dimensions::Data::DAT3D>(i), tRes.dim<Dimensions::Data::DAT2D>(i));
+         auto l = tRes.idx<Dimensions::Data::DAT3D>(i);
+         auto nN = tRes.dim<Dimensions::Data::DATB1D>(0,i);
+
+         spSetup->addIndex(l, tRes.dim<Dimensions::Data::DAT2D>(i), nN);
       }
 
       spSetup->lock();
@@ -233,8 +258,12 @@ namespace SpatialScheme {
       return spSetup;
    }
 
-   Transform::Poly::ALegendre::SharedSetup WLFmBuilder::spSetup2D(SharedResolution spRes) const
+   Transform::SharedTransformSetup WLFmBuilder::spSetup2D(SharedResolution spRes) const
    {
+      // Check options consistency
+      const auto& opt = this->mOptions.at(1);
+      assert(opt.size() == 1 && std::find(opt.begin(), opt.end(), Transform::Setup::GaussianQuadrature::id()) != opt.end());
+
       const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA2D);
 
       // Get physical size of polynomial transform
@@ -256,8 +285,12 @@ namespace SpatialScheme {
       return spSetup;
    }
 
-   Transform::Fft::Fourier::Mixed::SharedSetup WLFmBuilder::spSetup3D(SharedResolution spRes) const
+   Transform::SharedTransformSetup WLFmBuilder::spSetup3D(SharedResolution spRes) const
    {
+      // Check options consistency
+      const auto& opt = this->mOptions.at(2);
+      assert(opt.size() == 1 && std::find(opt.begin(), opt.end(), Transform::Setup::Fft::id()) != opt.end());
+
       const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA3D);
 
       // Get size of FFT transform
@@ -283,7 +316,6 @@ namespace SpatialScheme {
    WLFmBuilder::WLFmBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options)
       : IRegularSHmlBuilder(dim, purpose, options)
    {
-      this->mOptions.at(0).push_back(Transform::Setup::Uniform::id());
    }
 
    bool WLFmBuilder::sameSpectralOrdering() const

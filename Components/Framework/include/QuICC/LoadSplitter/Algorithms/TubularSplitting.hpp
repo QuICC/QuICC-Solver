@@ -1,4 +1,4 @@
-/** 
+/**
  * @file TubularSplitting.hpp
  * @brief Implementation of a double load splitting algorithm, aka "Tubular" splitting
  */
@@ -14,7 +14,7 @@
 // Project includes
 //
 #include "QuICC/Enums/Splitting.hpp"
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
 #include "QuICC/Resolutions/TransformResolution.hpp"
@@ -49,7 +49,7 @@ namespace Parallel {
           * @brief Check if factorisation is applicable to scheme
           */
          bool applicable() const final;
-         
+
       protected:
          /**
           * @brief Split ith dimension transform

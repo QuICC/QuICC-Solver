@@ -18,8 +18,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Precision.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/TestSuite/Polynomial/TesterBase.hpp"
 
 namespace QuICC {
@@ -176,7 +176,7 @@ namespace Quadrature {
 
 } // Quadrature
 } // Polynomial
-} // TestSuite 
+} // TestSuite
 } // QuICC
 
 #endif //QUICC_TESTSUITE_POLYNOMIAL_QUADRATURE_TESTER_HPP

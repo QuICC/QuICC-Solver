@@ -26,7 +26,10 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"  )
 
-target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" QuICC::Profiling::Timers)
+target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
+  QuICC::Types
+  QuICC::Profiling::Timers
+)
 
 # Add MPI dependency
 if(QUICC_MPI)

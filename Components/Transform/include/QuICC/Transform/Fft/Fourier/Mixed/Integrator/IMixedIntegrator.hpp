@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IMixedIntegrator.hpp
- * @brief Interface for a generic mixed FFTW based integrator 
+ * @brief Interface for a generic mixed FFTW based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_IMIXEDINTEGRATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/IMixedOperator.hpp"
 #include "QuICC/Transform/Fft/Backend/MixedIntegrator.hpp"
 
@@ -38,7 +38,7 @@ namespace Integrator {
 
    /**
     * @brief Interface for a generic mixed FFTW based integrator
-    */ 
+    */
    class IMixedIntegrator: public IMixedOperator
    {
       public:
@@ -82,7 +82,7 @@ namespace Integrator {
           * @param extended   values
           */
          virtual void dealias(MatrixZ& deAliased, const MatrixZ& aliased) const override;
-         
+
       protected:
          /**
           * @brief FFT backend

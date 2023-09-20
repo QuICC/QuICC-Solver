@@ -156,7 +156,7 @@ namespace Parallel {
       int pad = 0;
       if(idx >= this->mSimN/2 + (this->mSimN % 2))
       {
-         pad = this->mspTResBwd->dim<Dimensions::Data::DATB1D>(k) - this->mSimN;
+         pad = this->mspTResBwd->dim<Dimensions::Data::DATB1D>(0, k) - this->mSimN;
       }
 
       return pad;

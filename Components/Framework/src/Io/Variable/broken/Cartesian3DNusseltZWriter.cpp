@@ -25,7 +25,7 @@
 #include "QuICC/ScalarFields/FieldTools.hpp"
 #include "QuICC/Io/Variable/NusseltTags.hpp"
 #include "QuICC/PyQuICC/CoreWrapper.hpp"
-#include "QuICC/DecoupledComplexInternal.hpp"
+#include "Types/DecoupledComplexInternal.hpp"
 
 namespace QuICC {
 

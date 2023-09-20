@@ -48,10 +48,8 @@ namespace Chebyshev {
 
       val = -32.0*(l1 + n - 2.0)*(l1 + n - 1.0)*(4.0*l2 - 6.0*l1 - 4.0*n.pow(2) + 8.0*n + 5.0)/((l1 + 2.0*n - 5.0)*(l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0));
 
-      if(this->mQ == 2)
-      {
-         this->correctQ2(val, n, -2);
-      }
+      // Correct if q == 2
+      this->correctQ2(val, n, -2);
 
       return this->normalizeDiag(n, -2)*val;
    }
@@ -65,10 +63,8 @@ namespace Chebyshev {
 
       val = 8.0*(l1 + n - 1.0)*(8.0*l3 - 40.0*l2*n - 4.0*l2 - 56.0*l1*n.pow(2) + 80.0*l1*n + 62.0*l1 - 8.0*n.pow(3) + 36.0*n.pow(2) - 22.0*n - 21.0)/((l1 + 2.0*n - 4.0)*(l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0));
 
-      if(this->mQ == 2)
-      {
-         this->correctQ2(val, n, -1);
-      }
+      // Correct if q == 2
+      this->correctQ2(val, n, -1);
 
       return this->normalizeDiag(n, -1)*val;
    }
@@ -82,10 +78,8 @@ namespace Chebyshev {
 
       val = 16.0*(16.0*l3*n + 4.0*l3 - 24.0*l2*n - 24.0*l2 - 32.0*l1*n.pow(3) - 24.0*l1*n.pow(2) + 40.0*l1*n + 14.0*l1 - 16.0*n.pow(4) + 40.0*n.pow(2) - 9.0)/((l1 + 2.0*n - 3.0)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0));
 
-      if(this->mQ == 2)
-      {
-         this->correctQ2(val, n, 0);
-      }
+      // Correct if q == 2
+      this->correctQ2(val, n, 0);
 
       return this->normalizeDiag(n, 0)*val;
    }
@@ -98,10 +92,8 @@ namespace Chebyshev {
 
       val = 2.0*(2.0*n + 1.0)*(2.0*l1 + 2.0*n + 1.0)*(48.0*l2*n + 48.0*l2 + 32.0*l1*n.pow(2) + 8.0*l1*n - 84.0*l1 - 8.0*n.pow(3) - 36.0*n.pow(2) - 22.0*n + 21.0)/((l1 + n)*(l1 + 2.0*n - 2.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0));
 
-      if(this->mQ == 2)
-      {
-         this->correctQ2(val, n, 1);
-      }
+      // Correct if q == 2
+      this->correctQ2(val, n, 1);
 
       return this->normalizeDiag(n, 1)*val;
    }
@@ -113,10 +105,8 @@ namespace Chebyshev {
 
       val = 2.0*(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*l1 + 2.0*n + 1.0)*(2.0*l1 + 2.0*n + 3.0)*(8.0*l1*n + 14.0*l1 + 4.0*n.pow(2) + 8.0*n - 5.0)/((l1 + n)*(l1 + n + 1.0)*(l1 + 2.0*n - 1.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0)*(l1 + 2.0*n + 5.0));
 
-      if(this->mQ == 2)
-      {
-         this->correctQ2(val, n, 2);
-      }
+      // Correct if q == 2
+      this->correctQ2(val, n, 2);
 
       return this->normalizeDiag(n, 2)*val;
    }
@@ -128,10 +118,8 @@ namespace Chebyshev {
 
       val = (2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0).pow(2)*(2.0*l1 + 2.0*n + 1.0)*(2.0*l1 + 2.0*n + 3.0)*(2.0*l1 + 2.0*n + 5.0)/(2.0*(l1 + n)*(l1 + n + 1.0)*(l1 + n + 2.0)*(l1 + 2.0*n + 1.0)*(l1 + 2.0*n + 2.0)*(l1 + 2.0*n + 3.0)*(l1 + 2.0*n + 4.0)*(l1 + 2.0*n + 5.0)*(l1 + 2.0*n + 6.0));
 
-      if(this->mQ == 2)
-      {
-         this->correctQ2(val, n, 3);
-      }
+      // Correct if q == 2
+      this->correctQ2(val, n, 3);
 
       return this->normalizeDiag(n, 3)*val;
    }
@@ -140,10 +128,8 @@ namespace Chebyshev {
    {
       ACoeff_t val = ACoeff_t::Zero(n.size());
 
-      if(this->mQ == 2)
-      {
-         this->correctQ2(val, n, 4);
-      }
+      // Correct if q == 2
+      this->correctQ2(val, n, 4);
 
       return this->normalizeDiag(n, 4)*val;
    }
@@ -152,56 +138,61 @@ namespace Chebyshev {
    {
       ACoeff_t val = ACoeff_t::Zero(n.size());
 
-      if(this->mQ == 2)
-      {
-         this->correctQ2(val, n, 5);
-      }
+      // Correct if q == 2
+      this->correctQ2(val, n, 5);
 
       return this->normalizeDiag(n, 5)*val;
    }
 
    void I4LaplDiags::correctQ2(ACoeff_t& val, const ACoeff_t& n, const int k) const
    {
-      auto l1 = this->l();
-      ACoeff_t m = n.bottomRows(1) + 1.0;
-      ACoeff_t f = 2.0*(-8.0 + l1 + 2.0*m)*(-7.0 + l1 + 2.0*m)*(-5.0 + 2.0*l1 + 2.0*m)/(-4.0 + l1 + m);
-      ACoeff_t nf = (this->normalizeDiag(m, -3)/this->normalizeDiag(m, -4))*f;
+      // Index where to apply correction in val
+      auto i_ = val.size() - (k+3);
 
-      m = n.bottomRows(1) - static_cast<Scalar_t>(k + 2);
-      ACoeff_t g;
-      switch(k)
+      // Only correct if truncation q == 2
+      if(this->mQ == 2 && i_ >= 0)
       {
-         case -2:
-            g = this->mI4.d_3(m);
-            break;
-         case -1:
-            g = this->mI4.d_2(m);
-            break;
-         case 0:
-            g = this->mI4.d_1(m);
-            break;
-         case 1:
-            g = this->mI4.d0(m);
-            break;
-         case 2:
-            g = this->mI4.d1(m);
-            break;
-         case 3:
-            g = this->mI4.d2(m);
-            break;
-         case 4:
-            g = this->mI4.d3(m);
-            break;
-         case 5:
-            g = this->mI4.d4(m);
-            break;
-         default:
-            throw std::logic_error("Unknown diagonal for computing correction");
-            break;
-      }
-      ACoeff_t ng = g/this->normalizeDiag(m, k);
+         auto l1 = this->l();
+         ACoeff_t m = n.bottomRows(1) + 1.0;
+         ACoeff_t f = 2.0*(-8.0 + l1 + 2.0*m)*(-7.0 + l1 + 2.0*m)*(-5.0 + 2.0*l1 + 2.0*m)/(-4.0 + l1 + m);
+         ACoeff_t nf = (this->normalizeDiag(m, -3)/this->normalizeDiag(m, -4))*f;
 
-      val(val.size() - (k+3)) -= (nf*ng)(0);
+         m = n.bottomRows(1) - static_cast<Scalar_t>(k + 2);
+         ACoeff_t g;
+         switch(k)
+         {
+            case -2:
+               g = this->mI4.d_3(m);
+               break;
+            case -1:
+               g = this->mI4.d_2(m);
+               break;
+            case 0:
+               g = this->mI4.d_1(m);
+               break;
+            case 1:
+               g = this->mI4.d0(m);
+               break;
+            case 2:
+               g = this->mI4.d1(m);
+               break;
+            case 3:
+               g = this->mI4.d2(m);
+               break;
+            case 4:
+               g = this->mI4.d3(m);
+               break;
+            case 5:
+               g = this->mI4.d4(m);
+               break;
+            default:
+               throw std::logic_error("Unknown diagonal for computing correction");
+               break;
+         }
+         ACoeff_t ng = g/this->normalizeDiag(m, k);
+
+         val(i_) -= (nf*ng)(0);
+      }
    }
 
 }

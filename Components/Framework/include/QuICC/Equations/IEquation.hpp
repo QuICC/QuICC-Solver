@@ -12,8 +12,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/MatrixOperationsInternal.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/MatrixOperationsInternal.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"

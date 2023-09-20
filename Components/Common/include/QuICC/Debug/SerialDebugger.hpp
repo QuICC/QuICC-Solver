@@ -1,6 +1,6 @@
 /**
  * @file SerialDebugger.hpp
- * @brief Implementation of a very simple serial debugger 
+ * @brief Implementation of a very simple serial debugger
  */
 
 #ifndef QUICC_DEBUG_SERIALDEBUGGER_HPP
@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "Timers/TimerMacro.h"
 
 namespace QuICC {
@@ -65,7 +65,7 @@ namespace Debug {
           * @brief Timer to use for debugging
           */
          static TimerMacro timer;
-         
+
       protected:
 
       private:

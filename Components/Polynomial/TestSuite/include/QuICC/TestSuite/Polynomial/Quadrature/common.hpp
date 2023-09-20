@@ -20,8 +20,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Precision.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/TestSuite/Polynomial/Io.hpp"
 
 namespace QuICC {
@@ -40,7 +40,7 @@ namespace Quadrature {
     */
    std::string resname(const int physN, const std::map<std::string,MHDFloat>& params);
 
-   /// 
+   ///
    template <typename TOp, int TN> ErrorDataType maxOperatorError(const int size, const std::map<std::string,MHDFloat>& params, const std::string& fname, const bool keepData);
 
    template <typename TQuad> Matrix computeRule(const int size, const std::string& fname);

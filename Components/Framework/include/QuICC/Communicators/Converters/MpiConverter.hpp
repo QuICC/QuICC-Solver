@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Communicators/Converters/MpiConverterImpl.hpp"
 #include "QuICC/Communicators/Converters/MpiConverterTools.hpp"
 #include "QuICC/StorageProviders/DynamicPairProvider.hpp"

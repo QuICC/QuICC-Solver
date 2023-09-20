@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ChebyshevRule.hpp
  * @brief Implementation of the Chebyshev quadrature rule
  */
@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/Quadrature/traits.hpp"
 
 namespace QuICC {

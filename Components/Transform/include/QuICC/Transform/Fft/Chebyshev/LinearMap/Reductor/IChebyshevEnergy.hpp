@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IChebyshevEnergy.hpp
- * @brief Interface for a generic Chebyshev FFT based energy reductor 
+ * @brief Interface for a generic Chebyshev FFT based energy reductor
  */
 
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVENERGY_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/IChebyshevOperator.hpp"
 #include "QuICC/Transform/Fft/Backend/ChebyshevEnergy.hpp"
 
@@ -38,7 +38,7 @@ namespace Reductor {
 
    /**
     * @brief Interface for a generic Chebyshev FFT based energy reductor
-    */ 
+    */
    class IChebyshevEnergy: public IChebyshevOperator
    {
       public:
@@ -82,7 +82,7 @@ namespace Reductor {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
           * @brief Initialise FFT backend

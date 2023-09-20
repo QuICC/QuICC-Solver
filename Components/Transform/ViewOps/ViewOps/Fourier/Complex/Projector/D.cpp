@@ -17,8 +17,8 @@ namespace Projector {
 
 using namespace QuICC::Memory;
 
-using mods_t = View<std::complex<double>, DCCSC3D>;
-using phys_t = View<std::complex<double>, DCCSC3D>;
+using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
+using phys_t = View<std::complex<double>, DCCSC3DInOrder>;
 
 template<class Tout, class Tin, class FftBackend, class DiffBackend>
 DOp<Tout, Tin, FftBackend, DiffBackend>::DOp(ScaleType scale) : mFft(std::make_unique<FftBackend>()),
@@ -68,26 +68,13 @@ template class DOp<phys_t, mods_t,
     Cpu::DiffOp<mods_t, mods_t, 0, bwd_t>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-    Cpu::DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>>;
-template class DOp<phys_t, mods_t,
-    QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
     Cpu::DiffOp<mods_t, mods_t, 1, bwd_t>>;
-
-template class DOp<phys_t, mods_t,
-    QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-    Cpu::DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
     Cpu::DiffOp<mods_t, mods_t, 2, bwd_t>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-    Cpu::DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>>;
-template class DOp<phys_t, mods_t,
-    QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
     Cpu::DiffOp<mods_t, mods_t, 3, bwd_t>>;
-template class DOp<phys_t, mods_t,
-    QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-    Cpu::DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
     Cpu::DiffOp<mods_t, mods_t, 4, bwd_t>>;
@@ -109,25 +96,13 @@ template class DOp<phys_t, mods_t,
     Cuda::DiffOp<mods_t, mods_t, 0, bwd_t>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-    Cuda::DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>>;
-template class DOp<phys_t, mods_t,
-    QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
     Cuda::DiffOp<mods_t, mods_t, 1, bwd_t>>;
-template class DOp<phys_t, mods_t,
-    QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-    Cuda::DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
     Cuda::DiffOp<mods_t, mods_t, 2, bwd_t>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-    Cuda::DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>>;
-template class DOp<phys_t, mods_t,
-    QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
     Cuda::DiffOp<mods_t, mods_t, 3, bwd_t>>;
-template class DOp<phys_t, mods_t,
-    QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
-    Cuda::DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>>;
 template class DOp<phys_t, mods_t,
     QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
     Cuda::DiffOp<mods_t, mods_t, 4, bwd_t>>;

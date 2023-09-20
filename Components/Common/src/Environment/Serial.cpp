@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Serial.cpp
  * @brief Source of implementation of serial environment
  */
@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 

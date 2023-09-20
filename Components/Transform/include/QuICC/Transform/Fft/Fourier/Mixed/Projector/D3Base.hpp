@@ -1,4 +1,4 @@
-/** 
+/**
  * @file D3.hpp
  * @brief Implementation of the Fourier based D^3 projector
  */
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/Projector/IMixedProjector.hpp"
 #include "QuICC/Transform/Fft/Fourier/Tags.hpp"
 
@@ -33,7 +33,7 @@ namespace Projector {
 
    /**
     * @brief Implementation of the Fourier based D^3 projector
-    */ 
+    */
    template <>
    class D3<base_t>: public IMixedProjector
    {

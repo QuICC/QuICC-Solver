@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/3D/IRegularSHmlBuilder.hpp"

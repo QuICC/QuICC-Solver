@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/ICondition.hpp"
 
 namespace QuICC {

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Io.cpp
  * @brief Source of the useful functions for transform tests
  */
@@ -22,7 +22,7 @@
 
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/TestSuite/Polynomial/Io.hpp"
 
 namespace QuICC {

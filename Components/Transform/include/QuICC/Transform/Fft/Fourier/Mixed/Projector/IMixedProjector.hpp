@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IMixedProjector.hpp
- * @brief Interface for a generic mixed FFTW based projector 
+ * @brief Interface for a generic mixed FFTW based projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_IMIXEDPROJECTOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/IMixedOperator.hpp"
 #include "QuICC/Transform/Fft/Backend/MixedProjector.hpp"
 
@@ -38,7 +38,7 @@ namespace Projector {
 
    /**
     * @brief Interface for a generic mixed FFTW based projector
-    */ 
+    */
    class IMixedProjector: public IMixedOperator
    {
       public:
@@ -74,7 +74,7 @@ namespace Projector {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
           * @brief FFT backend

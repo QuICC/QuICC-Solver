@@ -19,7 +19,7 @@
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Equations/CouplingIndexType.hpp"
 #include "QuICC/PhysicalKernels/DoNothing.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
@@ -369,6 +369,7 @@ namespace debug {
       infoIt.first->second.setIndexType(idxType, spCoupling);
 
       // Create implicit field coupling
+      int nFields = std::distance(eqInfo.im.begin(), eqInfo.im.end());
       for(auto fIt = eqInfo.im.cbegin(); fIt != eqInfo.im.cend(); ++fIt)
       {
          infoIt.first->second.addImplicitField(fIt->first, fIt->second);
@@ -423,7 +424,7 @@ namespace debug {
       infoIt.first->second.couplingTools().setTauN(opInfo.tauN, res);
       infoIt.first->second.couplingTools().setGalerkinN(opInfo.galN, res);
       infoIt.first->second.couplingTools().setRhsN(opInfo.rhsCols, res);
-      infoIt.first->second.couplingTools().setSystemN(opInfo.sysN, res);
+      infoIt.first->second.couplingTools().setSystemN(opInfo.sysN, res, nFields);
       infoIt.first->second.setSizes(nMat, opInfo.tauN, opInfo.galN, opInfo.galShift, opInfo.rhsCols, opInfo.sysN);
    }
 

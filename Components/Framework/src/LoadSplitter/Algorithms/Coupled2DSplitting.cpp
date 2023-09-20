@@ -53,13 +53,13 @@ namespace Parallel {
       std::vector<int > bins = {1,1};
 
       // Storage for the forward 1D indexes
-      std::vector<ArrayI>  fwd1D;
+      std::vector<std::vector<std::vector<int> > >  fwd1D;
       // Storage for the backward 1D indexes
-      std::vector<ArrayI>  bwd1D;
+      std::vector<std::vector<std::vector<int> > >  bwd1D;
       // Storage for the 2D indexes
-      std::vector<ArrayI>  idx2D;
+      std::vector<std::vector<int> >  idx2D;
       // Storage for the 3D indexes
-      ArrayI  idx3D;
+      std::vector<int>  idx3D;
 
       // Compute the indexes
       ids.at(0) = cpuId;

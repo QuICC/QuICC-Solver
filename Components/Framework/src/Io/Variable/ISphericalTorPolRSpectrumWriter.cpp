@@ -140,7 +140,7 @@ namespace Variable {
                int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = l_*(l_+1.0);
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeTPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -167,7 +167,7 @@ namespace Variable {
                   factor = 2.0;
                }
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeTPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -217,7 +217,7 @@ namespace Variable {
                int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = std::pow(l_*(l_+1.0),2);
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeQPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -243,7 +243,7 @@ namespace Variable {
                   factor = 2.0;
                }
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeQPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -293,7 +293,7 @@ namespace Variable {
                int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = l_*(l_+1.0);
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeSPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -319,7 +319,7 @@ namespace Variable {
                   factor = 2.0;
                }
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeSPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }

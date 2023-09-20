@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SphRadLapl.hpp
  * @brief Implementation of the Chebyshev based radial part of spherical Laplacian 1/Y^2 D Y^2 D projector, with linear map y = ax + b
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/IChebyshevProjector.hpp"
 
 namespace QuICC {
@@ -37,7 +37,7 @@ namespace Projector {
 
    /**
     * @brief Implementation of the Chebyshev based radial part of spherical Laplacian 1/Y^2 D Y^2 D projector, with linear map y = ax + b
-    */ 
+    */
    class SphRadLapl: public IChebyshevProjector
    {
       public:
@@ -50,7 +50,7 @@ namespace Projector {
           * @brief Destructor
           */
          virtual ~SphRadLapl();
-         
+
       protected:
          /**
           * @brief Initialize storage

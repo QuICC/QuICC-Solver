@@ -18,8 +18,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Precision.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/InnerProduct.hpp"

@@ -23,7 +23,7 @@ namespace QuICC {
       if(simId == Dimensions::Simulation::SIM1D && spaceId != Dimensions::Space::PHYSICAL)
       {
          SpatialScheme::Tools::TriangularSH t;
-         return t.truncationBwd(this->mspSim->dim(simId, spaceId), static_cast<int>(l));
+         return t.truncationBwd(this->mspSim->dim(simId, spaceId), 0, static_cast<int>(l));
       }
       else
       {

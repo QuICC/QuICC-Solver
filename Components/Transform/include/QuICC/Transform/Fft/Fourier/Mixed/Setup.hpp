@@ -1,6 +1,6 @@
 /**
  * @file Setup.hpp
- * @brief Implementation of the Mixed FFT setup class 
+ * @brief Implementation of the Mixed FFT setup class
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_SETUP_HPP
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Setup.hpp"
 
 namespace QuICC {
@@ -33,7 +33,7 @@ namespace Mixed {
 
    /**
     * @brief Implementation of the Mixed FFT setup class
-    */ 
+    */
    class Setup: public ::QuICC::Transform::Fft::Setup
    {
       public:
@@ -58,7 +58,7 @@ namespace Mixed {
           * @brief Empty destructor
           */
          virtual ~Setup();
-         
+
       protected:
 
       private:

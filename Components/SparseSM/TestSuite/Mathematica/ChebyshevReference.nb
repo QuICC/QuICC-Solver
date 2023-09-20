@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[    155987,       3988]
-NotebookOptionsPosition[    152301,       3920]
-NotebookOutlinePosition[    152700,       3936]
-CellTagsIndexPosition[    152657,       3933]
+NotebookDataLength[    150597,       3784]
+NotebookOptionsPosition[    149225,       3760]
+NotebookOutlinePosition[    149644,       3776]
+CellTagsIndexPosition[    149601,       3773]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -1553,6 +1553,72 @@ Cell[BoxData[{
       "\[IndentingNewLine]", "s"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
+   RowBox[{"i4y1", "[", 
+    RowBox[{
+    "row_", ",", "nN_", ",", "a_", ",", "b_", ",", "gfunc_", ",", " ", 
+     "wfunc_"}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"grid", ",", "wgts", ",", "s", ",", "gN", ",", "p"}], "}"}], 
+     ",", " ", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"gN", "=", 
+       RowBox[{"Max", "[", 
+        RowBox[{
+         RowBox[{"Ceiling", "[", 
+          RowBox[{"3", 
+           RowBox[{"nN", "/", "2"}]}], "]"}], ",", "10"}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"grid", "=", 
+       RowBox[{"gfunc", "[", "gN", "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"wgts", "=", 
+       RowBox[{"wfunc", "[", "gN", "]"}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"s", "=", " ", 
+       RowBox[{
+        RowBox[{"dctnorm", "[", 
+         RowBox[{"row", ",", "a", ",", "b"}], "]"}], 
+        SuperscriptBox["a", "4"], 
+        RowBox[{"Integrate", "[", 
+         RowBox[{
+          RowBox[{"yTnab", "[", 
+           RowBox[{"row", ",", "a", ",", "b", ",", " ", "x"}], "]"}], ",", 
+          "x", ",", "x", ",", "x", ",", "x"}], "]"}]}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"p", "=", 
+       RowBox[{"s", "/.", 
+        RowBox[{"{", 
+         RowBox[{"x", "->", "grid"}], "}"}]}]}], ";", "\[IndentingNewLine]", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"!", 
+         RowBox[{"VectorQ", "[", "p", "]"}]}], ",", 
+        RowBox[{"p", "=", 
+         RowBox[{"0", " ", "grid"}]}]}], "]"}], ";", "\[IndentingNewLine]", 
+      RowBox[{"s", " ", "=", " ", 
+       RowBox[{"Table", "[", 
+        RowBox[{"0", ",", " ", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", "1", ",", "nN"}], "}"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"s", "[", 
+        RowBox[{"[", 
+         RowBox[{"5", ";;"}], "]"}], "]"}], "=", 
+       RowBox[{"ParallelTable", "[", 
+        RowBox[{
+         RowBox[{"Dot", "[", 
+          RowBox[{
+           RowBox[{"wgts", " ", 
+            RowBox[{"Tnab", "[", 
+             RowBox[{"i", ",", "a", ",", "b", ",", "grid"}], "]"}]}], ",", 
+           "p"}], "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"i", ",", "4", ",", 
+           RowBox[{"nN", "-", "1"}]}], "}"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", "s"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
    RowBox[{"i4y3", "[", 
     RowBox[{
     "row_", ",", "nN_", ",", "a_", ",", "b_", ",", "gfunc_", ",", " ", 
@@ -2325,7 +2391,7 @@ Cell[BoxData[{
    3.885464613233554*^9}, {3.885465071857102*^9, 3.88546514621595*^9}, {
    3.885465630507496*^9, 3.885465839899291*^9}, {3.886759091718109*^9, 
    3.8867591881770077`*^9}, 3.886759270267459*^9, {3.889763898322007*^9, 
-   3.889764321867077*^9}},
+   3.889764321867077*^9}, {3.903767220999982*^9, 3.903767229573542*^9}},
  CellLabel->"In[1]:=",ExpressionUUID->"596ae811-cce4-436d-bb23-76baa09df52f"],
 
 Cell[BoxData[
@@ -2506,9 +2572,7 @@ FYy01RDVnslSaG9wEbvG34Ph9XNFKLRZWtXwqU3DwttVR9bCIc8ccN/zoWIm
 qRGmLjqJ617uPjtPPOPbrvGHP/p1MqiyKgKh9m+mW5hL6OaUieEXrkErqA==
 
   "],
- CellLabel->"In[69]:=",ExpressionUUID->"d2252707-bca5-427e-bb0d-e866c6111559"],
-
-Cell[CellGroupData[{
+ CellLabel->"In[70]:=",ExpressionUUID->"d2252707-bca5-427e-bb0d-e866c6111559"],
 
 Cell[BoxData[{
  RowBox[{
@@ -2524,8 +2588,12 @@ Cell[BoxData[{
      RowBox[{"ab", "[", 
       RowBox[{"[", "2", "]"}], "]"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{
-   RowBox[{"id", " ", "=", " ", "0"}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"id", " ", "=", " ", "0"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"testOperator", "[", 
+   RowBox[{
+   "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", ",", 
+    "\"\<I4Y1\>\""}], "]"}], "\[IndentingNewLine]", 
   RowBox[{"(*", 
    RowBox[{
     RowBox[{"testOperator", "[", 
@@ -2576,6 +2644,10 @@ Cell[BoxData[{
      RowBox[{
      "meta", ",", "id", ",", "i4", ",", "chebgrid", ",", "chebweights", ",", 
       "\"\<I4\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Y1\>\""}], "]"}], ";", "\[IndentingNewLine]", 
     RowBox[{"testOperator", "[", 
      RowBox[{
      "meta", ",", "id", ",", "i4y3", ",", "chebgrid", ",", "chebweights", 
@@ -2625,24 +2697,24 @@ Cell[BoxData[{
       "chebweights", ",", "\"\<I4Y4SphLapl2\>\""}], "]"}], ";"}], 
    "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"meta", " ", "=", " ", 
-   RowBox[{"Append", "[", 
-    RowBox[{"meta", ",", " ", "3"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
+  RowBox[{
+   RowBox[{"meta", " ", "=", " ", 
+    RowBox[{"Append", "[", 
+     RowBox[{"meta", ",", " ", "3"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
    RowBox[{
-   "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I2Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I2Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"Clear", "[", 
    RowBox[{"ab", ",", " ", "meta", ",", " ", "id"}], "]"}], ";"}]}], "Input",
@@ -2662,60 +2734,10 @@ Cell[BoxData[{
    3.885373020361466*^9}, {3.8867591960957823`*^9, 3.8867592211959467`*^9}, {
    3.886759294029516*^9, 3.886759305620463*^9}, {3.886759591927414*^9, 
    3.8867595989477386`*^9}, {3.889764427922242*^9, 3.8897644654487743`*^9}, {
-   3.88976469476681*^9, 3.889764699315674*^9}, 3.889765153530325*^9},
- CellLabel->
-  "In[124]:=",ExpressionUUID->"38f66280-530f-46f3-8e2d-4b2638d011d1"],
-
-Cell[CellGroupData[{
-
-Cell[BoxData["\<\"{xi,xo} -> {0.538462, 1.53846}\"\>"], "Print",
- CellChangeTimes->{3.8897647057736063`*^9, 3.8897651558704243`*^9},
- CellLabel->
-  "During evaluation of \
-In[124]:=",ExpressionUUID->"37741a3d-e257-46e0-ab28-9ab4ab16cd48"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I2Lapl Chebyshev LinearMap operator of size 10 x 10 for a = \
-0.5, b = 1.03846...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:19:21)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.8897647057736063`*^9, 3.889765161310268*^9},
- CellLabel->
-  "During evaluation of \
-In[124]:=",ExpressionUUID->"fe64b7d2-bb27-460e-89f9-05182e7b2519"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl Chebyshev LinearMap operator of size 10 x 10 for a = \
-0.5, b = 1.03846...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:19:27)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.8897647057736063`*^9, 3.889765167094851*^9},
- CellLabel->
-  "During evaluation of \
-In[124]:=",ExpressionUUID->"6c466058-4daa-4c93-bd0a-dd7d1627ca66"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl2 Chebyshev LinearMap operator of size 10 x 10 for a = \
-0.5, b = 1.03846...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:19:33)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.8897647057736063`*^9, 3.889765173362816*^9},
- CellLabel->
-  "During evaluation of \
-In[124]:=",ExpressionUUID->"02e13fae-bbc2-430c-a667-a373236f6401"]
-}, Open  ]]
-}, Open  ]],
-
-Cell[CellGroupData[{
+   3.88976469476681*^9, 3.889764699315674*^9}, 3.889765153530325*^9, {
+   3.903767321599518*^9, 3.9037673291380663`*^9}, {3.9037674007924833`*^9, 
+   3.903767411251441*^9}},
+ CellLabel->"In[71]:=",ExpressionUUID->"38f66280-530f-46f3-8e2d-4b2638d011d1"],
 
 Cell[BoxData[{
  RowBox[{
@@ -2731,8 +2753,13 @@ Cell[BoxData[{
      RowBox[{"ab", "[", 
       RowBox[{"[", "2", "]"}], "]"}]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
+  RowBox[{"id", " ", "=", " ", "1"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
   RowBox[{
-   RowBox[{"id", " ", "=", " ", "1"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"testOperator", "[", 
+    RowBox[{
+    "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", ",", 
+     "\"\<I4Y1\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
   RowBox[{"(*", 
    RowBox[{
     RowBox[{"testOperator", "[", 
@@ -2783,6 +2810,10 @@ Cell[BoxData[{
      RowBox[{
      "meta", ",", "id", ",", "i4", ",", "chebgrid", ",", "chebweights", ",", 
       "\"\<I4\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Y1\>\""}], "]"}], ";", "\[IndentingNewLine]", 
     RowBox[{"testOperator", "[", 
      RowBox[{
      "meta", ",", "id", ",", "i4y3", ",", "chebgrid", ",", "chebweights", 
@@ -2832,88 +2863,38 @@ Cell[BoxData[{
       "chebweights", ",", "\"\<I4Y4SphLapl2\>\""}], "]"}], ";"}], 
    "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"meta", " ", "=", " ", 
-   RowBox[{"Append", "[", 
-    RowBox[{"meta", ",", " ", "2"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
+  RowBox[{
+   RowBox[{"meta", " ", "=", " ", 
+    RowBox[{"Append", "[", 
+     RowBox[{"meta", ",", " ", "2"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
    RowBox[{
-   "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I2Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I2Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"Clear", "[", 
    RowBox[{"ab", ",", " ", "meta", ",", " ", "id"}], "]"}], ";"}]}], "Input",
  CellChangeTimes->CompressedData["
-1:eJxTTMoPSmViYGAQB2IQnR8h/nPDnjeODRd5mDYC6WtN69Q3A+mqEzz6IPrK
+1:eJxTTMoPSmViYGCQBGIQnR8h/nPDnjeODRd5mDYC6WtN69Q3A+mqEzz6IPrK
 5ichIJqjPToWLB6z5yiIfiV++jiINrt2Zv2NvW8cl7PmbQDRQnevbAXRUkE/
 wHSGgELS6pNvHHf+jQPTXju/NIHozEfXmkF0VP2RThDNYbu/D0QLnVv0Aiy/
 0ucviH58X3TVWiDtx/sMTKsulOJfB6SXVU4C03fynbvWA+mMLxVgWu5d02EQ
 veTgxxMgel3i9nV7P71xPCe+bT2I/iXT93U/kG6syP8ForfZ+LMeANICd4LB
 tMP7qj2HgPQGXea9IPrAt0OnQDSzP+NpEJ0WlbE5/esbxx++rDtA9B2pV5dA
-dMvzI5dB9OqYVn7l328c6/SyhUG0Rn6DLoie0PkMTAMAx8Da/w==
+dMvzI5dB9OqYVn7l328c6/SyhUG0Rn6DLoie0PkMTE/+9CPlhuhbxyMzD6WC
+6I71C/NBtIR0VQGIBgBhXOw2
   "],
- CellLabel->"In[87]:=",ExpressionUUID->"6609da65-ac7a-41fd-9d07-a08fbeb3a4fd"],
-
-Cell[CellGroupData[{
-
-Cell[BoxData["\<\"{xi,xo} -> {0.538462, 1.53846}\"\>"], "Print",
- CellChangeTimes->{3.889764720216976*^9},
- CellLabel->
-  "During evaluation of \
-In[87]:=",ExpressionUUID->"b72764b5-dabe-4118-913b-17d5b622e0cf"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I2Lapl Chebyshev LinearMap operator of size 21 x 21 for a = \
-0.5, b = 1.03846...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:12:00)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.889764720837654*^9},
- CellLabel->
-  "During evaluation of \
-In[87]:=",ExpressionUUID->"089f957a-ea11-4801-87a1-262b7e8825ca"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl Chebyshev LinearMap operator of size 21 x 21 for a = \
-0.5, b = 1.03846...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:12:01)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.8897647216862392`*^9},
- CellLabel->
-  "During evaluation of \
-In[87]:=",ExpressionUUID->"bb2f046a-1ea0-460d-84be-4e11a9f2db19"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl2 Chebyshev LinearMap operator of size 21 x 21 for a = \
-0.5, b = 1.03846...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:12:03)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.88976472335294*^9},
- CellLabel->
-  "During evaluation of \
-In[87]:=",ExpressionUUID->"a67bdc3d-7dec-4103-969a-52f1a66afe7e"]
-}, Open  ]]
-}, Open  ]],
-
-Cell[CellGroupData[{
+ CellLabel->"In[78]:=",ExpressionUUID->"6609da65-ac7a-41fd-9d07-a08fbeb3a4fd"],
 
 Cell[BoxData[{
  RowBox[{
@@ -2922,8 +2903,13 @@ Cell[BoxData[{
     RowBox[{"10", ",", "10", ",", "1", ",", "0"}], "}"}]}], 
   ";"}], "\[IndentingNewLine]", 
  RowBox[{
+  RowBox[{"id", " ", "=", " ", "10"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
   RowBox[{
-   RowBox[{"id", " ", "=", " ", "10"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"testOperator", "[", 
+    RowBox[{
+    "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", ",", 
+     "\"\<I4Y1\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
   RowBox[{"(*", 
    RowBox[{
     RowBox[{"testOperator", "[", 
@@ -2976,6 +2962,10 @@ Cell[BoxData[{
       "\"\<I4\>\""}], "]"}], ";", "\[IndentingNewLine]", 
     RowBox[{"testOperator", "[", 
      RowBox[{
+     "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Y1\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
      "meta", ",", "id", ",", "i4y3", ",", "chebgrid", ",", "chebweights", 
       ",", "\"\<I4Y3\>\""}], "]"}], ";", "\[IndentingNewLine]", 
     RowBox[{"testOperator", "[", 
@@ -2996,27 +2986,27 @@ Cell[BoxData[{
       ",", "\"\<I4Y3D1Y1\>\""}], "]"}], ";"}], 
    "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"meta", " ", "=", " ", 
-   RowBox[{"Append", "[", 
-    RowBox[{
-     RowBox[{"Append", "[", 
-      RowBox[{"meta", ",", " ", "1"}], "]"}], ",", "2"}], "]"}]}], 
-  ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
+  RowBox[{
+   RowBox[{"meta", " ", "=", " ", 
+    RowBox[{"Append", "[", 
+     RowBox[{
+      RowBox[{"Append", "[", 
+       RowBox[{"meta", ",", " ", "1"}], "]"}], ",", "2"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
    RowBox[{
-   "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I2Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I2Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"Clear", "[", 
    RowBox[{"ab", ",", " ", "meta", ",", " ", "id"}], "]"}], ";"}]}], "Input",
@@ -3036,53 +3026,9 @@ Cell[BoxData[{
    3.8853748134097023`*^9}, {3.886759415376964*^9, 3.886759447217642*^9}, {
    3.8867595615323677`*^9, 3.88675956884838*^9}, {3.889764551320201*^9, 
    3.889764558378788*^9}, {3.889764672172749*^9, 3.889764678523056*^9}, 
-   3.889764726907234*^9},
- CellLabel->"In[96]:=",ExpressionUUID->"eb2a6268-5818-4bd0-8b81-b7d2ece172d1"],
-
-Cell[CellGroupData[{
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I2Lapl Chebyshev LinearMap operator of size 10 x 10 for a = \
-1., b = 0....\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:12:10)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.889764730363441*^9},
- CellLabel->
-  "During evaluation of \
-In[96]:=",ExpressionUUID->"5eaba75f-1ed6-4dda-b94a-26baae0d7657"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl Chebyshev LinearMap operator of size 10 x 10 for a = \
-1., b = 0....\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:12:11)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.889764731238892*^9},
- CellLabel->
-  "During evaluation of \
-In[96]:=",ExpressionUUID->"a2a8dc2d-bcb1-4916-ac5f-af43d9d55ec3"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl2 Chebyshev LinearMap operator of size 10 x 10 for a = \
-1., b = 0....\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:12:12)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.889764732323091*^9},
- CellLabel->
-  "During evaluation of \
-In[96]:=",ExpressionUUID->"59a884ac-83c4-4efe-aa1e-d81c0a98e970"]
-}, Open  ]]
-}, Open  ]],
-
-Cell[CellGroupData[{
+   3.889764726907234*^9, {3.903767347339216*^9, 3.903767355638101*^9}, {
+   3.903767438367117*^9, 3.90376744374074*^9}},
+ CellLabel->"In[85]:=",ExpressionUUID->"eb2a6268-5818-4bd0-8b81-b7d2ece172d1"],
 
 Cell[BoxData[{
  RowBox[{
@@ -3091,8 +3037,13 @@ Cell[BoxData[{
     RowBox[{"21", ",", "21", ",", "1", ",", "0"}], "}"}]}], 
   ";"}], "\[IndentingNewLine]", 
  RowBox[{
+  RowBox[{"id", " ", "=", " ", "11"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
   RowBox[{
-   RowBox[{"id", " ", "=", " ", "11"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"testOperator", "[", 
+    RowBox[{
+    "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", ",", 
+     "\"\<I4Y1\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
   RowBox[{"(*", 
    RowBox[{
     RowBox[{"testOperator", "[", 
@@ -3145,6 +3096,10 @@ Cell[BoxData[{
       "\"\<I4\>\""}], "]"}], ";", "\[IndentingNewLine]", 
     RowBox[{"testOperator", "[", 
      RowBox[{
+     "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Y1\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
      "meta", ",", "id", ",", "i4y3", ",", "chebgrid", ",", "chebweights", 
       ",", "\"\<I4Y3\>\""}], "]"}], ";", "\[IndentingNewLine]", 
     RowBox[{"testOperator", "[", 
@@ -3165,27 +3120,27 @@ Cell[BoxData[{
       ",", "\"\<I4Y3D1Y1\>\""}], "]"}], ";"}], 
    "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"meta", " ", "=", " ", 
-   RowBox[{"Append", "[", 
-    RowBox[{
-     RowBox[{"Append", "[", 
-      RowBox[{"meta", ",", " ", "6"}], "]"}], ",", "3"}], "]"}]}], 
-  ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
+  RowBox[{
+   RowBox[{"meta", " ", "=", " ", 
+    RowBox[{"Append", "[", 
+     RowBox[{
+      RowBox[{"Append", "[", 
+       RowBox[{"meta", ",", " ", "6"}], "]"}], ",", "3"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
    RowBox[{
-   "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I2Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I2Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"Clear", "[", 
    RowBox[{"ab", ",", " ", "meta", ",", " ", "id"}], "]"}], ";"}]}], "Input",
@@ -3204,54 +3159,9 @@ Cell[BoxData[{
    3.885374801113102*^9, 3.885374806288142*^9}, {3.886759454867429*^9, 
    3.88675948733683*^9}, {3.886759550248258*^9, 3.886759557407742*^9}, {
    3.889764570349888*^9, 3.889764575238488*^9}, {3.8897646580447206`*^9, 
-   3.889764665420706*^9}, 3.889764735307951*^9},
- CellLabel->
-  "In[103]:=",ExpressionUUID->"ac1762c1-1f6b-4366-9064-afb31d8296ea"],
-
-Cell[CellGroupData[{
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I2Lapl Chebyshev LinearMap operator of size 21 x 21 for a = \
-1., b = 0....\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:12:19)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.88976473953973*^9},
- CellLabel->
-  "During evaluation of \
-In[103]:=",ExpressionUUID->"39f234a6-e06a-41f2-8c3b-8ed978492896"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl Chebyshev LinearMap operator of size 21 x 21 for a = \
-1., b = 0....\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:12:23)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.889764743125173*^9},
- CellLabel->
-  "During evaluation of \
-In[103]:=",ExpressionUUID->"8e0ea01b-f2ff-46a0-9476-28caa109b4d9"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl2 Chebyshev LinearMap operator of size 21 x 21 for a = \
-1., b = 0....\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:12:28)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.889764748280531*^9},
- CellLabel->
-  "During evaluation of \
-In[103]:=",ExpressionUUID->"91974479-0905-4afe-a874-d4d3b0eb807f"]
-}, Open  ]]
-}, Open  ]],
-
-Cell[CellGroupData[{
+   3.889764665420706*^9}, 3.889764735307951*^9, {3.903767359949335*^9, 
+   3.9037673670157623`*^9}, {3.903767448832369*^9, 3.9037674580739727`*^9}},
+ CellLabel->"In[90]:=",ExpressionUUID->"ac1762c1-1f6b-4366-9064-afb31d8296ea"],
 
 Cell[BoxData[{
  RowBox[{
@@ -3261,8 +3171,13 @@ Cell[BoxData[{
      FractionBox["1", "2"], ",", 
      FractionBox["1", "2"]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
+  RowBox[{"id", " ", "=", " ", "20"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
   RowBox[{
-   RowBox[{"id", " ", "=", " ", "20"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"testOperator", "[", 
+    RowBox[{
+    "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", ",", 
+     "\"\<I4Y1\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
   RowBox[{"(*", 
    RowBox[{
     RowBox[{"testOperator", "[", 
@@ -3315,6 +3230,10 @@ Cell[BoxData[{
       "\"\<I4\>\""}], "]"}], ";", "\[IndentingNewLine]", 
     RowBox[{"testOperator", "[", 
      RowBox[{
+     "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Y1\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
      "meta", ",", "id", ",", "i4y3", ",", "chebgrid", ",", "chebweights", 
       ",", "\"\<I4Y3\>\""}], "]"}], ";", "\[IndentingNewLine]", 
     RowBox[{"testOperator", "[", 
@@ -3335,27 +3254,27 @@ Cell[BoxData[{
       ",", "\"\<I4Y3D1Y1\>\""}], "]"}], ";"}], 
    "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"meta", " ", "=", " ", 
-   RowBox[{"Append", "[", 
-    RowBox[{
-     RowBox[{"Append", "[", 
-      RowBox[{"meta", ",", " ", "1"}], "]"}], ",", "2"}], "]"}]}], 
-  ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
+  RowBox[{
+   RowBox[{"meta", " ", "=", " ", 
+    RowBox[{"Append", "[", 
+     RowBox[{
+      RowBox[{"Append", "[", 
+       RowBox[{"meta", ",", " ", "1"}], "]"}], ",", "2"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
    RowBox[{
-   "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I2Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I2Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"Clear", "[", 
    RowBox[{"ab", ",", " ", "meta", ",", " ", "id"}], "]"}], ";"}]}], "Input",
@@ -3376,54 +3295,9 @@ Cell[BoxData[{
    3.8867595615323677`*^9, 3.88675956884838*^9}, {3.889764551320201*^9, 
    3.889764558378788*^9}, {3.889764672172749*^9, 3.889764678523056*^9}, 
    3.889764726907234*^9, {3.889764766240329*^9, 3.889764766421584*^9}, {
-   3.889764828183042*^9, 3.889764830468004*^9}},
- CellLabel->
-  "In[110]:=",ExpressionUUID->"ad1e881c-1cc0-4792-a51c-df2955da53f4"],
-
-Cell[CellGroupData[{
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I2Lapl Chebyshev LinearMap operator of size 10 x 10 for a = \
-0.5, b = 0.5...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:14:03)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.889764843137712*^9},
- CellLabel->
-  "During evaluation of \
-In[110]:=",ExpressionUUID->"3ad8c222-980a-4c56-8bbd-6b12b458210a"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl Chebyshev LinearMap operator of size 10 x 10 for a = \
-0.5, b = 0.5...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:14:05)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.8897648458471518`*^9},
- CellLabel->
-  "During evaluation of \
-In[110]:=",ExpressionUUID->"591599b5-6461-41fa-819e-91536912c474"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl2 Chebyshev LinearMap operator of size 10 x 10 for a = \
-0.5, b = 0.5...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:14:08)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.889764848909399*^9},
- CellLabel->
-  "During evaluation of \
-In[110]:=",ExpressionUUID->"535a2ea4-7b27-4dd4-9ffb-4322ad22eaaf"]
-}, Open  ]]
-}, Open  ]],
-
-Cell[CellGroupData[{
+   3.889764828183042*^9, 3.889764830468004*^9}, {3.903767370582931*^9, 
+   3.903767377491085*^9}, {3.903767465468175*^9, 3.903767470870462*^9}},
+ CellLabel->"In[95]:=",ExpressionUUID->"ad1e881c-1cc0-4792-a51c-df2955da53f4"],
 
 Cell[BoxData[{
  RowBox[{
@@ -3433,8 +3307,13 @@ Cell[BoxData[{
      FractionBox["1", "2"], ",", 
      FractionBox["1", "2"]}], "}"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
+  RowBox[{"id", " ", "=", " ", "21"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
   RowBox[{
-   RowBox[{"id", " ", "=", " ", "21"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"testOperator", "[", 
+    RowBox[{
+    "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", ",", 
+     "\"\<I4Y1\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
   RowBox[{"(*", 
    RowBox[{
     RowBox[{"testOperator", "[", 
@@ -3487,6 +3366,10 @@ Cell[BoxData[{
       "\"\<I4\>\""}], "]"}], ";", "\[IndentingNewLine]", 
     RowBox[{"testOperator", "[", 
      RowBox[{
+     "meta", ",", "id", ",", "i4y1", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Y1\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
      "meta", ",", "id", ",", "i4y3", ",", "chebgrid", ",", "chebweights", 
       ",", "\"\<I4Y3\>\""}], "]"}], ";", "\[IndentingNewLine]", 
     RowBox[{"testOperator", "[", 
@@ -3507,85 +3390,42 @@ Cell[BoxData[{
       ",", "\"\<I4Y3D1Y1\>\""}], "]"}], ";"}], 
    "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"meta", " ", "=", " ", 
-   RowBox[{"Append", "[", 
-    RowBox[{
-     RowBox[{"Append", "[", 
-      RowBox[{"meta", ",", " ", "6"}], "]"}], ",", "3"}], "]"}]}], 
-  ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
+  RowBox[{
+   RowBox[{"meta", " ", "=", " ", 
+    RowBox[{"Append", "[", 
+     RowBox[{
+      RowBox[{"Append", "[", 
+       RowBox[{"meta", ",", " ", "6"}], "]"}], ",", "3"}], "]"}]}], ";"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", 
    RowBox[{
-   "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I2Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"testOperator", "[", 
-   RowBox[{
-   "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
-    ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i2lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I2Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl\>\""}], "]"}], ";", "\[IndentingNewLine]", 
+    RowBox[{"testOperator", "[", 
+     RowBox[{
+     "meta", ",", "id", ",", "i4lapl2", ",", "chebgrid", ",", "chebweights", 
+      ",", "\"\<I4Lapl2\>\""}], "]"}], ";"}], "*)"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"Clear", "[", 
    RowBox[{"ab", ",", " ", "meta", ",", " ", "id"}], "]"}], ";"}]}], "Input",
  CellChangeTimes->CompressedData["
-1:eJxTTMoPSmViYGCQAGIQnR8h/nPDnjeODRd5mDYC6WtN69Q3A+mqEzz6IPrK
+1:eJxTTMoPSmViYGCQAmIQnR8h/nPDnjeODRd5mDYC6WtN69Q3A+mqEzz6IPrK
 5ichIJqjPToWLB6z5yiIfiV++jiINrt2Zv2NvW8cl7PmbQDRQnevbAXRUkE/
 wHSGgELS6pNvHHf+jQPTXju/NIHozEfXmkF0VP2RThDNYbu/D0QLnVv0Aiy/
 0ucviH58X3TVWiDtx/sMTKsulOJfB6SXVU4C03fynbvWA+mMLxVgWu5d02EQ
 veTgxxMg2q8q6TqI5rljdRNEB7yNPnvo0xvHDt0NF0H0jWcB30F0zfU/YLpj
 nvKqw0C6zOIkmP518Pbh9K9AfcdfHQfRuz8ePw+iLXnWXgDRHkbe0sq/3zhu
-WvgcTEflOaqB6JwyXXUQvefWS30Q/awtxRhE92T62oBope2nwTQAviPlYQ==
-
+WvgcTEflOaqB6JwyXXUQvefWS30Q/awtxRhE92T62oBope2nwfQikdtZN0Tf
+OtZOnZMNoh/UHygD0R84eSpANACHPfX1
   "],
  CellLabel->
-  "In[117]:=",ExpressionUUID->"5909fd3b-03f7-4f57-bad1-e3fece75f879"],
-
-Cell[CellGroupData[{
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I2Lapl Chebyshev LinearMap operator of size 21 x 21 for a = \
-0.5, b = 0.5...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:14:16)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.88976485635498*^9},
- CellLabel->
-  "During evaluation of \
-In[117]:=",ExpressionUUID->"49c8c9a2-8118-41ca-84f4-ce4a8886d74f"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl Chebyshev LinearMap operator of size 21 x 21 for a = \
-0.5, b = 0.5...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:14:25)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.889764865177816*^9},
- CellLabel->
-  "During evaluation of \
-In[117]:=",ExpressionUUID->"5246622d-aa2c-406b-8e8d-13262bebe373"],
-
-Cell[BoxData[
- TemplateBox[{
-  "\"Exporting I4Lapl2 Chebyshev LinearMap operator of size 21 x 21 for a = \
-0.5, b = 0.5...\"", 
-   StyleBox[
-   "\" Done(Thu 6 Apr 2023 12:14:35)\"", FontColor -> RGBColor[0, 1, 0], 
-    StripOnInput -> False]},
-  "RowDefault"]], "Print",
- CellChangeTimes->{3.889764875841856*^9},
- CellLabel->
-  "During evaluation of \
-In[117]:=",ExpressionUUID->"7056cec4-a62d-4d90-b537-11a00cba82f4"]
-}, Open  ]]
-}, Open  ]],
+  "In[100]:=",ExpressionUUID->"5909fd3b-03f7-4f57-bad1-e3fece75f879"],
 
 Cell[BoxData[
  RowBox[{
@@ -3918,8 +3758,8 @@ Tg2WG7vM4Lrkl6grmDwgl5onBrciriIWKX6I/z+HDJI=
   
   "],ExpressionUUID->"dd3c090a-4c05-492b-9077-47279b8bd50d"]
 },
-WindowSize->{1152., 625.5},
-WindowMargins->{{-2880, Automatic}, {Automatic, 22.5}},
+WindowSize->{1152., 639.483870967742},
+WindowMargins->{{0, Automatic}, {97.01052631578943, Automatic}},
 FrontEndVersion->"12.3 for Linux x86 (64-bit) (June 30, 2021)",
 StyleDefinitions->"Default.nb",
 ExpressionUUID->"e3c1d7d5-1ad9-4b51-aac4-4707e7d47be3"
@@ -3935,61 +3775,17 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 86724, 2308, 6556, "Input",ExpressionUUID->"596ae811-cce4-436d-bb23-76baa09df52f"],
-Cell[87285, 2330, 7290, 178, 587, "Input",ExpressionUUID->"d2252707-bca5-427e-bb0d-e866c6111559"],
-Cell[CellGroupData[{
-Cell[94600, 2512, 6944, 154, 644, "Input",ExpressionUUID->"38f66280-530f-46f3-8e2d-4b2638d011d1"],
-Cell[CellGroupData[{
-Cell[101569, 2670, 238, 4, 23, "Print",ExpressionUUID->"37741a3d-e257-46e0-ab28-9ab4ab16cd48"],
-Cell[101810, 2676, 445, 11, 23, "Print",ExpressionUUID->"fe64b7d2-bb27-460e-89f9-05182e7b2519"],
-Cell[102258, 2689, 445, 11, 23, "Print",ExpressionUUID->"6c466058-4daa-4c93-bd0a-dd7d1627ca66"],
-Cell[102706, 2702, 446, 11, 23, "Print",ExpressionUUID->"02e13fae-bbc2-430c-a667-a373236f6401"]
-}, Open  ]]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[103201, 2719, 6169, 145, 644, "Input",ExpressionUUID->"6609da65-ac7a-41fd-9d07-a08fbeb3a4fd"],
-Cell[CellGroupData[{
-Cell[109395, 2868, 211, 4, 23, "Print",ExpressionUUID->"b72764b5-dabe-4118-913b-17d5b622e0cf"],
-Cell[109609, 2874, 420, 11, 23, "Print",ExpressionUUID->"089f957a-ea11-4801-87a1-262b7e8825ca"],
-Cell[110032, 2887, 422, 11, 23, "Print",ExpressionUUID->"bb2f046a-1ea0-460d-84be-4e11a9f2db19"],
-Cell[110457, 2900, 420, 11, 23, "Print",ExpressionUUID->"a67bdc3d-7dec-4103-969a-52f1a66afe7e"]
-}, Open  ]]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[110926, 2917, 5674, 122, 504, "Input",ExpressionUUID->"eb2a6268-5818-4bd0-8b81-b7d2ece172d1"],
-Cell[CellGroupData[{
-Cell[116625, 3043, 414, 11, 23, "Print",ExpressionUUID->"5eaba75f-1ed6-4dda-b94a-26baae0d7657"],
-Cell[117042, 3056, 414, 11, 23, "Print",ExpressionUUID->"a2a8dc2d-bcb1-4916-ac5f-af43d9d55ec3"],
-Cell[117459, 3069, 415, 11, 23, "Print",ExpressionUUID->"59a884ac-83c4-4efe-aa1e-d81c0a98e970"]
-}, Open  ]]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[117923, 3086, 5621, 122, 504, "Input",ExpressionUUID->"ac1762c1-1f6b-4366-9064-afb31d8296ea"],
-Cell[CellGroupData[{
-Cell[123569, 3212, 414, 11, 23, "Print",ExpressionUUID->"39f234a6-e06a-41f2-8c3b-8ed978492896"],
-Cell[123986, 3225, 415, 11, 23, "Print",ExpressionUUID->"8e0ea01b-f2ff-46a0-9476-28caa109b4d9"],
-Cell[124404, 3238, 416, 11, 23, "Print",ExpressionUUID->"91974479-0905-4afe-a874-d4d3b0eb807f"]
-}, Open  ]]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[124869, 3255, 5819, 125, 520, "Input",ExpressionUUID->"ad1e881c-1cc0-4792-a51c-df2955da53f4"],
-Cell[CellGroupData[{
-Cell[130713, 3384, 417, 11, 23, "Print",ExpressionUUID->"3ad8c222-980a-4c56-8bbd-6b12b458210a"],
-Cell[131133, 3397, 419, 11, 23, "Print",ExpressionUUID->"591599b5-6461-41fa-819e-91536912c474"],
-Cell[131555, 3410, 418, 11, 23, "Print",ExpressionUUID->"535a2ea4-7b27-4dd4-9ffb-4322ad22eaaf"]
-}, Open  ]]
-}, Open  ]],
-Cell[CellGroupData[{
-Cell[132022, 3427, 5008, 117, 520, "Input",ExpressionUUID->"5909fd3b-03f7-4f57-bad1-e3fece75f879"],
-Cell[CellGroupData[{
-Cell[137055, 3548, 416, 11, 23, "Print",ExpressionUUID->"49c8c9a2-8118-41ca-84f4-ce4a8886d74f"],
-Cell[137474, 3561, 417, 11, 23, "Print",ExpressionUUID->"5246622d-aa2c-406b-8e8d-13262bebe373"],
-Cell[137894, 3574, 418, 11, 23, "Print",ExpressionUUID->"7056cec4-a62d-4d90-b537-11a00cba82f4"]
-}, Open  ]]
-}, Open  ]],
-Cell[138339, 3589, 9722, 217, 709, "Input",ExpressionUUID->"06c7f542-703e-4c32-a0ed-65354507ff89"],
-Cell[148064, 3808, 2110, 54, 232, "Input",ExpressionUUID->"95e5a8e3-af44-483d-b9b1-65e34c2fd349"],
-Cell[150177, 3864, 2120, 54, 232, "Input",ExpressionUUID->"dd3c090a-4c05-492b-9077-47279b8bd50d"]
+Cell[558, 20, 89166, 2374, 6637, "Input",ExpressionUUID->"596ae811-cce4-436d-bb23-76baa09df52f"],
+Cell[89727, 2396, 7290, 178, 578, "Input",ExpressionUUID->"d2252707-bca5-427e-bb0d-e866c6111559"],
+Cell[97020, 2576, 7448, 163, 675, "Input",ExpressionUUID->"38f66280-530f-46f3-8e2d-4b2638d011d1"],
+Cell[104471, 2741, 6628, 155, 675, "Input",ExpressionUUID->"6609da65-ac7a-41fd-9d07-a08fbeb3a4fd"],
+Cell[111102, 2898, 6197, 132, 538, "Input",ExpressionUUID->"eb2a6268-5818-4bd0-8b81-b7d2ece172d1"],
+Cell[117302, 3032, 6145, 131, 538, "Input",ExpressionUUID->"ac1762c1-1f6b-4366-9064-afb31d8296ea"],
+Cell[123450, 3165, 6339, 134, 553, "Input",ExpressionUUID->"ad1e881c-1cc0-4792-a51c-df2955da53f4"],
+Cell[129792, 3301, 5468, 126, 553, "Input",ExpressionUUID->"5909fd3b-03f7-4f57-bad1-e3fece75f879"],
+Cell[135263, 3429, 9722, 217, 690, "Input",ExpressionUUID->"06c7f542-703e-4c32-a0ed-65354507ff89"],
+Cell[144988, 3648, 2110, 54, 232, "Input",ExpressionUUID->"95e5a8e3-af44-483d-b9b1-65e34c2fd349"],
+Cell[147101, 3704, 2120, 54, 232, "Input",ExpressionUUID->"dd3c090a-4c05-492b-9077-47279b8bd50d"]
 }
 ]
 *)

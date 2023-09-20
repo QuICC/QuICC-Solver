@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Setup.hpp"
 #include "QuICC/Transform/ITransformOperator.hpp"
 

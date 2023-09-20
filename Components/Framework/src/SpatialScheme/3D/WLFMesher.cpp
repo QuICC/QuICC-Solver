@@ -1,4 +1,4 @@
-/** 
+/**
  * @file WLFMesher.cpp
  * @brief Source of the WLF spatial scheme mesher
  */
@@ -14,7 +14,10 @@
 #include "QuICC/Transform/Setup/GaussianQuadrature.hpp"
 #include "QuICC/Transform/Setup/Fft.hpp"
 #include "QuICC/Transform/Setup/Triangular.hpp"
+#include "QuICC/Transform/Setup/Trapezoidal.hpp"
 #include "QuICC/SpatialScheme/Tools/TriangularSH.hpp"
+#include "QuICC/SpatialScheme/Tools/TrapezoidalSH.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
 
 namespace QuICC {
 
@@ -35,14 +38,22 @@ namespace SpatialScheme {
       int& M = this->mDims.at(2);
       int& nN_ = this->mNdealias;
 
+      // Safety check
+      if(L < M)
+      {
+         throw std::logic_error("Max harmonic degree L cannot be smaller than max harmonic order M");
+      }
+
       const auto& opt = options.at(0);
 
       int nR_ = 0;
-      // Poly algorithm setup with triangular truncation
+      // Poly algorithm setup with triangular radial truncation
       if(
-            std::find(opt.begin(), opt.end(), Transform::Setup::GaussianQuadrature::id()) != opt.end() && 
+            std::find(opt.begin(), opt.end(), Transform::Setup::GaussianQuadrature::id()) != opt.end() &&
             std::find(opt.begin(), opt.end(), Transform::Setup::Triangular::id()) != opt.end())
       {
+         DebuggerMacro_msg("Setting up triangular radial truncation", 1);
+
          Tools::TriangularSH t;
 
          // Check if resolution is compatible with triangular truncation
@@ -54,23 +65,54 @@ namespace SpatialScheme {
          // radial spectral resolution
          nN_ = N + 1;
 
-         // radial grid resolution
-         nR_ = (2*(t.truncationBwd(nN_+7,0)-1) + 1)/2;
-         // ... check against max L requirements
-         nR_ = std::max(nR_, (2*(t.truncationBwd(nN_ + 7, L) - 1) + L + 1)/2);
+         // radial grid resolution from l = 0
+         const int Nat0 = t.truncationBwd(nN_+7,0,0) - 1;
+         nR_ = (2*Nat0 + 1)/2;
+         // ... check against l = L requirements
+         const int NatL = t.truncationBwd(nN_ + 7, 0, L) - 1;
+         nR_ = std::max(nR_, (2*NatL + L + 1)/2);
       }
-      // Poly algorithm setup (uniform truncation)
+      // Poly algorithm setup with trapezoidal radial truncation
+      else if(
+            std::find(opt.begin(), opt.end(), Transform::Setup::GaussianQuadrature::id()) != opt.end() &&
+            std::find(opt.begin(), opt.end(), Transform::Setup::Trapezoidal::id()) != opt.end())
+      {
+         DebuggerMacro_msg("Setting up trapezoidal radial truncation", 1);
+
+         Tools::TrapezoidalSH t;
+
+         // Check if resolution is compatible with trapezoidal truncation
+         if(!t.isOptimal(N + 1,L))
+         {
+            throw std::logic_error("Trapezoidal truncation requires L+1 < 2(N-1)");
+         }
+
+         // radial spectral resolution
+         nN_ = N + 1;
+
+         // radial grid resolution from l = 0
+         const int Nat0 = t.truncationBwd(nN_ + 7, 0, 0) - 1;
+         nR_ = (2*Nat0 + 1)/2;
+         // ... check against l = L requirements
+         const int NatL = t.truncationBwd(nN_ + 7, 0, L) - 1;
+         nR_ = std::max(nR_, (2*NatL + L + 1)/2);
+      }
+      // Poly algorithm setup with uniform radial truncation
       else if(std::find(opt.begin(), opt.end(), Transform::Setup::GaussianQuadrature::id()) != opt.end())
       {
+         DebuggerMacro_msg("Setting up uniform radial truncation", 1);
+
          // radial spectral resolution
-         nN_ = N + 8;
+         nN_ = N + 1;
 
          // radial grid resolution
          nR_ = N + L/2 + 8;
       }
-      // FFT algorithm setup
+      // FFT algorithm setup with uniform radial truncation
       else if(std::find(opt.begin(), opt.end(), Transform::Setup::Fft::id()) != opt.end())
       {
+         DebuggerMacro_msg("Setting up uniform radial truncation with FFT Worland transform" , 1);
+
          // radial spectral resolution
          nN_ = N + 1;
 

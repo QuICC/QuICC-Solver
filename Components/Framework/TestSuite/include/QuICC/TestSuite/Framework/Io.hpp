@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Io.hpp
  * @brief Useful I/O functions for tests
  */
@@ -25,8 +25,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Precision.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 

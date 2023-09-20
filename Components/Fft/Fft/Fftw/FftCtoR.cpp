@@ -69,18 +69,19 @@ namespace details
 template<class AttIn, class AttOut>
 void FftOp<View<double, AttOut>, View<std::complex<double>, AttIn>>::applyImpl(View<double, AttOut>& phys, const View<std::complex<double>, AttIn>& mods)
 {
-    assert(std::floor(phys.dims()[0]/2) + 1 == mods.dims()[0]);
     if(_plan == nullptr)
     {
         Profiler::RegionFixture<4> fix("Fftw::FftOp::initFft-CtoR");
         int columns = 0;
         if constexpr(std::is_same_v<AttIn, dense2D>)
         {
+            assert(std::floor(phys.dims()[0]/2) + 1 == mods.dims()[0]);
             assert(phys.dims()[1] == mods.dims()[1]);
             columns = phys.dims()[1];
         }
         else if constexpr(std::is_same_v<AttIn, DCCSC3D>)
         {
+            assert(std::floor(phys.dims()[0]/2) + 1 == mods.lds());
             assert(phys.indices()[1].size() == mods.indices()[1].size());
             columns = phys.indices()[1].size();
         }

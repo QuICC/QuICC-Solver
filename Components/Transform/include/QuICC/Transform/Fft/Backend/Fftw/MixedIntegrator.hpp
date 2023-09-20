@@ -1,6 +1,6 @@
-/** 
+/**
  * @file MixedIntegrator.hpp
- * @brief Interface for a generic mixed FFTW based integrator 
+ * @brief Interface for a generic mixed FFTW based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_MIXEDINTEGRATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/IMixedBackend.hpp"
 
 namespace QuICC {
@@ -35,7 +35,7 @@ namespace Fftw {
 
    /**
     * @brief Interface for a generic mixed FFTW based integrator
-    */ 
+    */
    class MixedIntegrator: public IMixedBackend
    {
       public:
@@ -48,12 +48,12 @@ namespace Fftw {
           * @brief Destructor
           */
          ~MixedIntegrator();
-         
+
          /**
           * @brief Initialise the FFTW transforms
           */
          void init(const SetupType& setup) const override;
-         
+
          /**
           * @brief Apply FFT
           */

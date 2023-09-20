@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ThreeTermRecurrence.hpp
  * @brief General implementation for three term recurrence relations
  */
@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 
 namespace QuICC {
 
@@ -29,26 +29,26 @@ namespace Polynomial {
 
    /**
     * @brief Implementation of the three term recurrence relations
-    */ 
+    */
    class ThreeTermRecurrence
    {
       public:
-         /// Typedef for the function signature of an n independent constant normalizer 
+         /// Typedef for the function signature of an n independent constant normalizer
          typedef std::function<internal::Array()> NormalizerC;
 
-         /// Typedef for the function signature of an n dependent constant normalizer 
+         /// Typedef for the function signature of an n dependent constant normalizer
          typedef std::function<internal::Array(const internal::MHDFloat)> NormalizerNC;
 
-         /// Typedef for the function signature of an n independent one parameter normalizer 
+         /// Typedef for the function signature of an n independent one parameter normalizer
          typedef std::function<internal::Array(const internal::MHDFloat)> NormalizerA;
 
-         /// Typedef for the function signature of an n dependent one parameter normalizer 
+         /// Typedef for the function signature of an n dependent one parameter normalizer
          typedef std::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat)> NormalizerNA;
 
-         /// Typedef for the function signature of an n independent two parameter normalizer 
+         /// Typedef for the function signature of an n independent two parameter normalizer
          typedef std::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat)> NormalizerAB;
 
-         /// Typedef for the function signature of an n dependent two parameter normalizer 
+         /// Typedef for the function signature of an n dependent two parameter normalizer
          typedef std::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat, const internal::MHDFloat)> NormalizerNAB;
 
          /**

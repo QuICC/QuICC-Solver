@@ -11,7 +11,7 @@
 //
 #include "QuICC/Io/Variable/Cartesian1DScalarEnergyWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"

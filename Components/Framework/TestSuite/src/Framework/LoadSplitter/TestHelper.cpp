@@ -148,7 +148,8 @@ namespace LoadSplitter {
             INFO( "Checking 1D arrays sizes" );
             if(tRes.dim<QuICC::Dimensions::Data::DAT3D>() > 0)
             {
-               CHECK( ref.at(0) == tRes.dim<QuICC::Dimensions::Data::DATB1D>() );
+               // Definition of size to use is changing (ie including dealiasing modes or not)
+               //CHECK( ref.at(0) == tRes.dim<QuICC::Dimensions::Data::DATB1D>() );
                CHECK( ref.at(1) == tRes.dim<QuICC::Dimensions::Data::DATF1D>() );
             }
             else

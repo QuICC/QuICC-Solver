@@ -203,9 +203,9 @@ namespace Communicators {
                   for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                   {
                      j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
-                     for(int i = 0; i < tRes.dim<Dimensions::Data::DATB1D>(k); i++)
+                     for(int i = 0; i < tRes.dim<Dimensions::Data::DATB1D>(j, k); i++)
                      {
-                        i_ = tRes.idx<Dimensions::Data::DATB1D>(i,k);
+                        i_ = tRes.idx<Dimensions::Data::DATB1D>(i, j, k);
                         MHDFloat modeId = (*si) + 1 + (*sj)*scale + (*sk)*scale*scale;
                         // Safety check to make sure modeId is never 0
                         CHECK( modeId != 0 );
@@ -263,10 +263,10 @@ namespace Communicators {
                   for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                   {
                      j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
-                     CHECK( tRes.dim<Dimensions::Data::DATB1D>(k) >= cnt.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL, *sj) );
+                     CHECK( tRes.dim<Dimensions::Data::DATB1D>(j, k) >= cnt.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL, *sj) );
                      for(int i = 0; i < cnt.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL, *sj); i++)
                      {
-                        i_ = tRes.idx<Dimensions::Data::DATB1D>(i,k);
+                        i_ = tRes.idx<Dimensions::Data::DATB1D>(i, j, k);
                         MHDFloat modeId = (*si) + 1 + (*sj)*scale + (*sk)*scale*scale;
                         INFO( "i,j,k: " << i << "," << j << "," << k );
                         INFO( "si,sj,sk: " << *si << "," << *sj << "," << *sk );
@@ -317,9 +317,9 @@ namespace Communicators {
                   for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                   {
                      j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
-                     for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+                     for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                      {
-                        i_ = tRes.idx<Dimensions::Data::DATF1D>(i,k);
+                        i_ = tRes.idx<Dimensions::Data::DATF1D>(i, j, k);
                         MHDFloat modeId = (*si) + 1 + (*sj)*scale + (*sk)*scale*scale;
                         // Safety check to make sure modeId is never 0
                         CHECK( modeId != 0 );
@@ -371,9 +371,9 @@ namespace Communicators {
                   for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                   {
                      j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
-                     for(int i = 0; i < tRes.dim<Dimensions::Data::DATB1D>(k); i++)
+                     for(int i = 0; i < tRes.dim<Dimensions::Data::DATB1D>(j, k); i++)
                      {
-                        i_ = tRes.idx<Dimensions::Data::DATB1D>(i,k);
+                        i_ = tRes.idx<Dimensions::Data::DATB1D>(i, j, k);
                         MHDFloat modeId = (*si) + 1 + (*sj)*scale + (*sk)*scale*scale;
                         CHECK( std::abs(p->point(i,j,k)) == modeId );
                      }
@@ -413,9 +413,9 @@ namespace Communicators {
                   for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                   {
                      j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
-                     for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+                     for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                      {
-                        i_ = tRes.idx<Dimensions::Data::DATF1D>(i,k);
+                        i_ = tRes.idx<Dimensions::Data::DATF1D>(i, j, k);
                         MHDFloat modeId = (*si) + 1 + (*sj)*scale + (*sk)*scale*scale;
                         // Safety check to make sure modeId is never 0
                         CHECK( modeId != 0 );
@@ -470,15 +470,15 @@ namespace Communicators {
                      // Check transfered modes
                      for(int i = 0; i < res.sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL); i++)
                      {
-                        i_ = tRes.idx<Dimensions::Data::DATB1D>(i,k);
+                        i_ = tRes.idx<Dimensions::Data::DATB1D>(i, j, k);
                         MHDFloat modeId = (*si) + 1 + (*sj)*scale + (*sk)*scale*scale;
                         CHECK( std::abs(p->point(i,j,k)) == modeId );
                      }
 
                      // Check dealiased modes
-                     for(int i = res.sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL); i < tRes.dim<Dimensions::Data::DATB1D>(k); i++)
+                     for(int i = res.sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL); i < tRes.dim<Dimensions::Data::DATB1D>(j, k); i++)
                      {
-                        i_ = tRes.idx<Dimensions::Data::DATB1D>(i,k);
+                        i_ = tRes.idx<Dimensions::Data::DATB1D>(i, j, k);
                         CHECK( std::abs(p->point(i,j,k)) == badValueIn );
                      }
                   }

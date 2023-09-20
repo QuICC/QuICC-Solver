@@ -17,26 +17,24 @@ namespace SpatialScheme {
 
 namespace Tools {
 
-   const int TriangularSH::MIN_TRUNCATION = 3;
-
-   int TriangularSH::truncationFwd(const int nN, const int l)
+   int TriangularSH::truncationFwd(const int nN, const int j, const int k)
    {
       return nN;
    }
 
-   int TriangularSH::truncationBwd(const int nN, const int l)
+   int TriangularSH::truncationBwd(const int nN, const int j, const int k)
    {
-      return std::max(nN - l/2, MIN_TRUNCATION);
+      return std::max(nN - k/2, MIN_TRUNCATION);
    }
 
-   int TriangularSH::index(const int i, const int l)
+   int TriangularSH::index(const int i, const int j, const int k)
    {
       return i;
    }
 
    bool TriangularSH::isOptimal(const int nN, const int maxL)
    {
-      return ((nN - maxL/2) == this->truncationBwd(nN, maxL));
+      return (MIN_TRUNCATION == nN - maxL/2);
    }
 
 } // Tools

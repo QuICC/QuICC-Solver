@@ -638,8 +638,9 @@ namespace Parallel {
             fwdMap.clear();
          }
 
+      }
       // Handle 3D resolution
-      } else if(spRes->cpu(0)->nDim() == 3)
+      else if(spRes->cpu(0)->nDim() == 3)
       {
          // Simplify syntax
          typedef std::tuple<int,int,int>   Coordinate;
@@ -677,9 +678,9 @@ namespace Parallel {
                   j_ = fwdTRes.idx<Dimensions::Data::DAT2D>(j,k);
 
                   // Loop over backward dimension
-                  for(int i = 0; i < fwdTRes.dim<Dimensions::Data::DATB1D>(k); i++)
+                  for(int i = 0; i < fwdTRes.dim<Dimensions::Data::DATB1D>(j,k); i++)
                   {
-                     i_ = fwdTRes.idx<Dimensions::Data::DATB1D>(i,k);
+                     i_ = fwdTRes.idx<Dimensions::Data::DATB1D>(i, j, k);
 
                      // Generate point information
                      point = spRes->counter().makeKey(dimId, i_, j_, k_);
@@ -715,9 +716,9 @@ namespace Parallel {
                         j_ = bwdTRes.idx<Dimensions::Data::DAT2D>(j,k);
 
                         // Loop over forward dimension
-                        for(int i = 0; i < bwdTRes.dim<Dimensions::Data::DATF1D>(k); i++)
+                        for(int i = 0; i < bwdTRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
                         {
-                           i_ = bwdTRes.idx<Dimensions::Data::DATF1D>(i,k);
+                           i_ = bwdTRes.idx<Dimensions::Data::DATF1D>(i, j, k);
 
                            // Generate point information
                            point = spRes->counter().makeKey(dimId, i_, j_, k_);

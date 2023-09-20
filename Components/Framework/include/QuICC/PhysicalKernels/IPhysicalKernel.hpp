@@ -1,6 +1,6 @@
 /**
  * @file IPhysicalKernel.hpp
- * @brief Base building block for the implementation of a physical kernel 
+ * @brief Base building block for the implementation of a physical kernel
  */
 
 #ifndef QUICC_PHYSICAL_KERNEL_IPHYSICALKERNEL_HPP
@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
@@ -89,7 +89,7 @@ namespace Kernel {
           * @param id      ID of the component (allows for a more general implementation)
           */
          virtual void compute(Framework::Selector::ComplexScalarField& rNLComp, FieldComponents::Physical::Id id) const;
-         
+
       protected:
          /**
           * @brief Get scalar variable
@@ -140,7 +140,7 @@ namespace Kernel {
 
    /// Typedef for a smart IPhysicalKernel
    typedef std::shared_ptr<IPhysicalKernel> SharedIPhysicalKernel;
-   
+
 }
 }
 }

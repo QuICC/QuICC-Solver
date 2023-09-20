@@ -24,6 +24,8 @@
 #include "QuICC/SpatialScheme/Tools/SHUniform2D.hpp"
 #include "QuICC/SpatialScheme/Tools/Uniform3D3D.hpp"
 #include "QuICC/Resolutions/Tools/RegularSHmlIndexCounter.hpp"
+#include "QuICC/Resolutions/Tools/TriangularSHmlIndexCounter.hpp"
+#include "QuICC/Resolutions/Tools/TrapezoidalSHmlIndexCounter.hpp"
 #include "QuICC/Transform/Setup/Uniform.hpp"
 #include "QuICC/Transform/Setup/Triangular.hpp"
 #include "QuICC/Transform/Setup/Trapezoidal.hpp"
@@ -48,7 +50,29 @@ namespace SpatialScheme {
 
    void IRegularSHmlBuilder::addIndexCounter(SharedResolution spRes)
    {
-      auto spCounter = std::make_shared<RegularSHmlIndexCounter>(spRes->spSim(), spRes->spCpu());
+      std::shared_ptr<IndexCounter> spCounter;
+
+      const auto& opt = this->mOptions.at(0);
+
+      // Uniform truncation
+      if(std::find(opt.begin(), opt.end(), Transform::Setup::Uniform::id()) != opt.end())
+      {
+         spCounter = std::make_shared<RegularSHmlIndexCounter>(spRes->spSim(), spRes->spCpu());
+      }
+      // Strict triangular truncation
+      else if(std::find(opt.begin(), opt.end(), Transform::Setup::Triangular::id()) != opt.end())
+      {
+         spCounter = std::make_shared<TriangularSHmlIndexCounter>(spRes->spSim(), spRes->spCpu());
+      }
+      // Trapezoidal truncation
+      else if(std::find(opt.begin(), opt.end(), Transform::Setup::Trapezoidal::id()) != opt.end())
+      {
+         spCounter = std::make_shared<TrapezoidalSHmlIndexCounter>(spRes->spSim(), spRes->spCpu());
+      }
+      else
+      {
+         throw std::logic_error("Unknown truncation ID");
+      }
 
       spRes->setIndexCounter(spCounter);
    }

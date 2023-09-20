@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IResolutionIndexCounter.hpp
  * @brief Implementation of index counter with resolution objects
  */
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 #include "QuICC/Resolutions/SimulationResolution.hpp"
@@ -22,7 +22,7 @@ namespace QuICC {
 
    /**
     * @brief Implementation ofr index counter with resolution objectbs
-    */ 
+    */
    class IResolutionIndexCounter: public IndexCounter
    {
       public:

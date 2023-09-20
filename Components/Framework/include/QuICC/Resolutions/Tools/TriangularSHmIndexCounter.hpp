@@ -1,4 +1,4 @@
-/** 
+/**
  * @file TriangularSHmIndexCounter.hpp
  * @brief Implementation of spherical harmonic index counter with m spectral ordering with triangular radial truncation
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Resolutions/Tools/IResolutionIndexCounter.hpp"
 
@@ -21,7 +21,7 @@ namespace QuICC {
 
    /**
     * @brief Implementation of spherical harmonic index counter with m spectral ordering
-    */ 
+    */
    class TriangularSHmIndexCounter: public IResolutionIndexCounter
    {
       public:
@@ -81,7 +81,7 @@ namespace QuICC {
           * @brief Generate index key
           */
          std::tuple<int,int,int> makeKey(const Dimensions::Transform::Id id, const int i, const int j, const int k) const final;
-         
+
       protected:
 
       private:

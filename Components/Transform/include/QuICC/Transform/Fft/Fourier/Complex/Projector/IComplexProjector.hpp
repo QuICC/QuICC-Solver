@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IComplexProjector.hpp
- * @brief Interface for a generic complex Fourier based projector 
+ * @brief Interface for a generic complex Fourier based projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_PROJECTOR_ICOMPLEXPROJECTOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/IComplexOperator.hpp"
 #include "QuICC/Transform/Fft/Backend/ComplexProjector.hpp"
 
@@ -38,7 +38,7 @@ namespace Projector {
 
    /**
     * @brief Interface for a generic complex Fourier projector
-    */ 
+    */
    class IComplexProjector: public IComplexOperator
    {
       public:
@@ -74,7 +74,7 @@ namespace Projector {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
           * @brief FFT backend

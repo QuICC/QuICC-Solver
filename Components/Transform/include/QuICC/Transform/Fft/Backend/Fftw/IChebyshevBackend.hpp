@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IChebyshevBackend.hpp
- * @brief Interface for a generic Chebyshev FFTW based integrator 
+ * @brief Interface for a generic Chebyshev FFTW based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_ICHEBYSHEVBACKEND_HPP
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/IFftwBackend.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
@@ -29,7 +29,7 @@ namespace Fftw {
 
    /**
     * @brief Interface for a generic Chebyshev FFTW based integrator
-    */ 
+    */
    class IChebyshevBackend: public IFftwBackend
    {
       public:
@@ -48,7 +48,7 @@ namespace Fftw {
           * @brief Destructor
           */
          virtual ~IChebyshevBackend();
-         
+
          /**
           * @brief Initialise the FFTW transforms
           */
@@ -101,7 +101,7 @@ namespace Fftw {
           * @param getOut return input or ouput storage
           */
          virtual Matrix& getStorage(const StorageKind = StorageKind::in) const;
-         
+
       protected:
          /**
           * @brief Spec size

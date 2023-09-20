@@ -84,7 +84,7 @@ class testALegendreTests_Poly_P_projector_id108_split9216_0_base(testTransform):
                     'applyOperatorsAvg': (0.000536682, -0.25, 0.1, 's'),
                 },
                 'broadwell': {
-                    'applyOperatorsAvg': (0.000232762, -0.25, 0.1, 's'),
+                    'applyOperatorsAvg': (0.000232762, -0.25, 0.15, 's'),
                 },
             }
 

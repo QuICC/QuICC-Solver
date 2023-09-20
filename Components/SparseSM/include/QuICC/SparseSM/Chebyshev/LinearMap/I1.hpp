@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I1.hpp
  * @brief Implementation of the I sparse integraiton operator
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/ILinearMapOperator.hpp"
 
 namespace QuICC {
@@ -28,7 +28,7 @@ namespace LinearMap {
     * Setup the relation between the spectral coefficients of a function and the spectral
     * coefficients of its first order derivative in a form suitable to initialize a sparse
     * matrix
-    */ 
+    */
    class I1: public ILinearMapOperator
    {
       public:
@@ -46,7 +46,7 @@ namespace LinearMap {
           * @brief Destructor
           */
          virtual ~I1() = default;
-         
+
       protected:
 
       private:
@@ -55,14 +55,14 @@ namespace LinearMap {
           *
           * @param n mode indexes
           */
-         ACoeff_t d_1(const ACoeff_t& n) const; 
+         ACoeff_t d_1(const ACoeff_t& n) const;
 
          /**
           * @brief 1st superdiagonal
           *
           * @param n mode indexes
           */
-         ACoeff_t d1(const ACoeff_t& n) const; 
+         ACoeff_t d1(const ACoeff_t& n) const;
 
          /**
           * @brief Build triplet representation of matrix

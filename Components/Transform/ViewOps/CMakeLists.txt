@@ -4,6 +4,7 @@ set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")
 message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}" )
 
 # components
+add_subdirectory(ViewOps/Blas)
 add_subdirectory(ViewOps/Fourier)
 add_subdirectory(ViewOps/ALegendre)
 

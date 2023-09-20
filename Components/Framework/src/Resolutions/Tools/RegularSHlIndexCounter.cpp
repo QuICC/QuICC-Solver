@@ -13,7 +13,7 @@
 namespace QuICC {
 
    RegularSHlIndexCounter::RegularSHlIndexCounter(SharedCSimulationResolution spSim, SharedCCoreResolution spCpu)
-      : IResolutionIndexCounter(spSim,spCpu)
+      : IResolutionIndexCounter(spSim, spCpu)
    {
    }
 

@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IMixedOperator.hpp
- * @brief Interface for a generic Mixed FFT based operator 
+ * @brief Interface for a generic Mixed FFT based operator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_IMIXEDOPERATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/Setup.hpp"
 #include "QuICC/Transform/Fft/IFftOperator.hpp"
 
@@ -36,7 +36,7 @@ namespace Mixed {
 
    /**
     * @brief Interface for a generic Mixed FFT based operator
-    */ 
+    */
    class IMixedOperator: public IFftOperator
    {
       public:
@@ -69,7 +69,7 @@ namespace Mixed {
           * @param spSetup   Shared setup object for the transform
           */
          void init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const override;
-         
+
       protected:
          /**
           * @brief Polynomial setup object providing the sizes

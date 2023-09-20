@@ -15,7 +15,7 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Io/Variable/FieldProbeWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/FieldProbe.hpp"
 
@@ -114,10 +114,11 @@ namespace Variable {
       {
          found = false;
          const auto k = this->mIndexes.front();
+         const auto j = this->mIndexes.at(1);
          const auto& coordIdx = indexes.at(2);
-         for(auto i = 0;i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+         for(auto i = 0;i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
          {
-            auto i_ = tRes.idx<Dimensions::Data::DATF1D>(i,k);
+            auto i_ = tRes.idx<Dimensions::Data::DATF1D>(i,j,k);
             if(i_ == coordIdx)
             {
                found = true;

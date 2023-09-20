@@ -31,14 +31,6 @@ struct bwd_t {};
 constexpr std::uint16_t none_m = 0;
 
 /// @brief mask for special treatment.
-/// dealias
-constexpr std::uint16_t dealias_m = 1;
-
-/// @brief mask for special treatment.
-/// pass every option but dealias
-constexpr std::uint16_t allButDealias_m = 0xFFFF - dealias_m;
-
-/// @brief mask for special treatment.
 /// zero mode is always zero just projection
 constexpr std::uint16_t zeroP_m = 1 << 1;
 

@@ -64,9 +64,6 @@ namespace details {
 
 namespace dealias {
 
-    /// @brief fraction of coefficients to be kept
-    constexpr double rule = 2.0/3.0;
-
     /// @brief get starting coeff to skip copy for p bwd in place
     /// @tparam Tout
     /// @tparam Tin
@@ -79,13 +76,12 @@ namespace dealias {
     template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
     QUICC_CUDA_HOSTDEV inline std::size_t getMstart(Tout& out, const Tin& in)
     {
-        if constexpr (std::is_same_v<Direction, bwd_t> &&
-            Treatment == dealias_m &&  Order == 0)
+        if constexpr (std::is_same_v<Direction, bwd_t> && Order == 0)
         {
             // the diff is null and in place, we can skip the coeff to be kept
             if(out.data() == in.data())
             {
-                return in.dims()[0]*rule;
+                return in.dims()[0];
             }
         }
         return 0;

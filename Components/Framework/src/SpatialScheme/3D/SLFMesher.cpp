@@ -30,6 +30,12 @@ namespace SpatialScheme {
       int& L = this->mDims.at(1);
       int& M = this->mDims.at(2);
 
+      // Safety check
+      if(L < M)
+      {
+         throw std::logic_error("Max harmonic degree L cannot be smaller than max harmonic order M");
+      }
+
       // Get dealiased Worland transform size
       this->mNr = Transform::Poly::Tools::dealias(N + 1 + 8);
       // Check for optimised FFT sizes

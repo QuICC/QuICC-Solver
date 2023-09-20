@@ -27,6 +27,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
 {
     Profiler::RegionFixture<4> fix("DiffOp::applyImpl");
 
+    assert(out.size() == in.size());
     assert(out.dims()[0] == in.dims()[0]);
     assert(out.dims()[1] == in.dims()[1]);
     assert(out.dims()[2] == in.dims()[2]);
@@ -36,10 +37,11 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     #endif
 
     if constexpr (std::is_same_v<Direction, bwd_t> &&
-        Treatment == none_m &&  Order == 0)
+        Treatment == none_m && Order == 0)
     {
-        // if the diff is null and in place it is a noop
-        if(out.data() == in.data())
+        // if the diff is null and in place and there are no modes
+        // to be zeroed then it is a noop
+        if(out.data() == in.data() && out.dims()[0] == out.lds())
         {
             return;
         }
@@ -51,15 +53,6 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     using complex_t = typename Tin::ScalarType;
     using float_t = typename DiffOp<Tout, Tin, Order, Direction, Treatment>::ScaleType;
     std::conditional_t<isComplex, complex_t, float_t> c;
-
-    const auto M = in.dims()[0];
-
-    // dealias bound
-    std::size_t nDealias = M;
-    if constexpr (Treatment & dealias_m)
-    {
-        nDealias *= dealias::rule;
-    }
 
     if constexpr (isComplex)
     {
@@ -80,6 +73,8 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     // skip copy if p bwd is in place
     const std::size_t mStart = dealias::getMstart<Tout, Tin, Order, Direction, Treatment>(out, in);
 
+    const auto M = in.lds();
+    const auto nDealias = in.dims()[0];
     for (std::size_t col = 0; col < columns ; ++col)
     {
         // linear index (:,n,k)
@@ -103,13 +98,11 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
                 fast_pow<Order>(static_cast<float_t>(m)*mScale);
         }
 
-        if constexpr (Treatment & dealias_m)
+        for (; m < M; ++m)
         {
-            for (; m < M; ++m)
-            {
-                out.data()[nk+m] = 0.0;
-            }
+            out.data()[nk+m] = 0.0;
         }
+
     }
 
 }
@@ -124,15 +117,10 @@ template class DiffOp<mods_t, mods_t, 2, fwd_t>;
 template class DiffOp<mods_t, mods_t, 3, fwd_t>;
 template class DiffOp<mods_t, mods_t, 4, fwd_t>;
 template class DiffOp<mods_t, mods_t, 0, bwd_t>;
-template class DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 1, bwd_t>;
-template class DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 2, bwd_t>;
-template class DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 3, bwd_t>;
-template class DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 4, bwd_t>;
-template class DiffOp<mods_t, mods_t, 4, bwd_t, dealias_m>;
 
 } // namespace Cpu
 } // namespace Mixed

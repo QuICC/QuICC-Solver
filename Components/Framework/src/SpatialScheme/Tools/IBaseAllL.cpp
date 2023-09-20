@@ -17,9 +17,9 @@ namespace SpatialScheme {
 
 namespace Tools {
 
-   int IBaseAllL::truncationFwd(const int nN, const int l)
+   int IBaseAllL::truncationFwd(const int nN, const int j, const int k)
    {
-      return this->truncationBwd(nN, l);
+      return this->truncationBwd(nN, j, k);
    }
 
    void IBaseAllL::buildBalancedMap(std::multimap<int,int>& modes, const int n2D, const int n3D, const std::vector<int>& id, const std::vector<int>& bins, const std::vector<int>&, const std::vector<int>&)

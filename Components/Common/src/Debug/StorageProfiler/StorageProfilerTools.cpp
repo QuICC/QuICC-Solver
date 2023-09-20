@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "QuICC/QuICCEnv.hpp"
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 
 namespace QuICC {
