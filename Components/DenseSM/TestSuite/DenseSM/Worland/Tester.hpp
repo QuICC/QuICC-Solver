@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"

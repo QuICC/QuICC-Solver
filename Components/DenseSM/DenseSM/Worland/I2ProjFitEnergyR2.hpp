@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "DenseSM/IWorlandOperator.hpp"
 #include "DenseSM/Worland/ProjFitEnergyR2.hpp"
 

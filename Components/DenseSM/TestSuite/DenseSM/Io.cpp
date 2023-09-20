@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Constants.hpp"
 #include "TestSuite/DenseSM/Io.hpp"
 
 namespace QuICC {

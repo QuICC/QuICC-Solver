@@ -8,7 +8,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "DenseSM/Worland/WorlandKind.hpp"
 
 namespace QuICC {

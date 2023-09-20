@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "DenseSM/IDenseSMOperator.hpp"
 #include "DenseSM/Worland/WorlandKind.hpp"
 

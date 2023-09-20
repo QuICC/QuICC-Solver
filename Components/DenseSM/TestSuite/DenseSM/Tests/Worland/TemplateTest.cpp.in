@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Precision.hpp"
 #include "TestSuite/DenseSM/Worland/TestArgs.hpp"
 #include "DenseSM/Worland/@Operator@.hpp"
 #include "TestSuite/DenseSM/Worland/Tester.hpp"
