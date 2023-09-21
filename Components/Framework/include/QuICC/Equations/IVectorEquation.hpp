@@ -230,7 +230,11 @@ namespace Equations {
          tmp = TData(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
 
          // simply copy values from unknown
-         std::visit([&](auto&& p){copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);}, eq.spUnknown());
+         std::visit(
+               [&](auto&& p)
+               {
+                  copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);
+               }, eq.spUnknown());
 
          // Multiply nonlinear term by quasi-inverse
          applyQuasiInverse(eq, compId, storage, start, matIdx, 0, tmp);
@@ -239,7 +243,11 @@ namespace Equations {
       } else if(eq.couplingInfo(compId).hasNonlinear())
       {
          // simply copy values from unknown
-         std::visit([&](auto&& p){copyUnknown(eq, p->dom(0).perturbation(), compId, storage, matIdx, start, true, false);}, eq.spUnknown());
+         std::visit(
+               [&](auto&& p)
+               {
+                  copyUnknown(eq, p->dom(0).perturbation(), compId, storage, matIdx, start, true, false);
+               }, eq.spUnknown());
       }
    }
 

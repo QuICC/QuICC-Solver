@@ -51,12 +51,12 @@ namespace QuICC {
       return oDims;
    }
 
-   void RegularIndexCounter::computeOffsets(std::vector<RegularIndexCounter::OffsetType>& blocks, std::vector<std::vector<RegularIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const
+   void RegularIndexCounter::computeOffsets(std::vector<std::vector<RegularIndexCounter::OffsetType>>& blocks, std::vector<std::vector<RegularIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const
    {
       this->computeOffsets(blocks, offsets, spaceId, this->mspSim);
    }
 
-   void RegularIndexCounter::computeOffsets(std::vector<RegularIndexCounter::OffsetType>& blocks, std::vector<std::vector<RegularIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
+   void RegularIndexCounter::computeOffsets(std::vector<std::vector<RegularIndexCounter::OffsetType>>& blocks, std::vector<std::vector<RegularIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
    {
       Dimensions::Transform::Id transId;
       Dimensions::Simulation::Id simId;
@@ -103,7 +103,9 @@ namespace QuICC {
                offsets.push_back(offV);
 
                // 1D blocks
-               blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, i_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               std::vector<RegularIndexCounter::OffsetType> blk;
+               blk.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, i_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               blocks.push_back(blk);
             }
          }
       }
@@ -130,7 +132,9 @@ namespace QuICC {
                offsets.push_back(offV);
 
                // 1D blocks
-               blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, j_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               std::vector<RegularIndexCounter::OffsetType> blk;
+               blk.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, j_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               blocks.push_back(blk);
             }
          }
       }
@@ -148,7 +152,9 @@ namespace QuICC {
          offsets.push_back(offV);
 
          // 1D blocks
-         blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, 0), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+         std::vector<RegularIndexCounter::OffsetType> blk;
+         blk.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, 0), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+         blocks.push_back(blk);
       }
    }
 } // QuICC

@@ -50,18 +50,20 @@ set(_schemes
 foreach(_scheme ${_schemes})
   foreach(_alg serial)
     foreach(_mode read write)
-      quicc_add_test(${_scheme}:${_mode}
+      quicc_add_test(${_scheme}:${_mode}:default
         COMMAND ${TestExe}
-        KEYWORD Scheme:Mode
+        KEYWORD Scheme:Mode:Impl1D
         ID 0
         OPTIONS algorithm:${_alg}
       )
     endforeach()
     add_test(
       NAME ${TestExe}_${_scheme}_validate_algorithm-${_alg}
-      COMMAND h5diff -q state0000.hdf5 state_${_scheme}.hdf5
+      COMMAND h5diff -q state_${_scheme}0000.hdf5 state_${_scheme}.hdf5
       WORKING_DIRECTORY "${QUICC_WORK_DIR}"
       )
+    set_tests_properties(${TestExe}_${_scheme}_validate_algorithm-${_alg}
+      PROPERTIES DEPENDS "${TestExe}_${_scheme}_write_default_algorithm-${_alg}")
   endforeach()
 endforeach()
 
@@ -75,15 +77,39 @@ endif()
 foreach(_scheme ${_schemes})
   foreach(_alg ${_algs})
     foreach(_mode read write)
-      quicc_add_test(${_scheme}:${_mode}
+      quicc_add_test(${_scheme}:${_mode}:default
         COMMAND ${TestExe}
-        KEYWORD Scheme:Mode
+        KEYWORD Scheme:Mode:Impl1D
         ID 0
         OPTIONS algorithm:${_alg}
         STEPS 10
         PERFONLY
       )
     endforeach()
+  endforeach()
+endforeach()
+
+set(_schemes
+  WLFl
+  WLFm
+  )
+foreach(_scheme ${_schemes})
+  foreach(_alg serial)
+    foreach(_mode read write)
+      quicc_add_test(${_scheme}:${_mode}:gq_triangular
+        COMMAND ${TestExe}
+        KEYWORD Scheme:Mode:Impl1D
+        ID 0
+        OPTIONS algorithm:${_alg}
+      )
+    endforeach()
+    add_test(
+      NAME ${TestExe}_${_scheme}_triangular_validate_algorithm-${_alg}
+      COMMAND h5diff -r state_${_scheme}_triangular0000.hdf5 state_${_scheme}_triangular.hdf5
+      WORKING_DIRECTORY "${QUICC_WORK_DIR}"
+      )
+    set_tests_properties(${TestExe}_${_scheme}_triangular_validate_algorithm-${_alg}
+      PROPERTIES DEPENDS "${TestExe}_${_scheme}_write_gq_triangular_algorithm-${_alg}")
   endforeach()
 endforeach()
 

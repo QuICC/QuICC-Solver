@@ -37,7 +37,7 @@ namespace Framework {
 namespace StateFile {
 
    Test::Test()
-      : epsilon(std::numeric_limits<MHDFloat>::epsilon()), maxUlp(11)
+      : epsilon(std::numeric_limits<MHDFloat>::epsilon()), maxUlp(11), fileTag(""), refFileTag("")
    {
    }
 
@@ -223,16 +223,24 @@ namespace StateFile {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                        for(int i = 0; i < tRes.dim<Dimensions::Data::DATB1D>(j,k); i++)
                         {
                            auto val = (*refFct)(test, i, j_, k_);
+                           p->rDom(0).rPerturbation().setPoint(val, i,j,k);
+                        }
+
+                        // Fill extra space with bad values for non-uniform
+                        // truncation
+                        for(int i = tRes.dim<Dimensions::Data::DATB1D>(j,k); i < p->rDom(0).rPerturbation().slice(k).rows(); i++)
+                        {
+                           auto val = (*refFct)(test, i, j_, k_);
+                           val = std::numeric_limits<MHDFloat>::max();
                            p->rDom(0).rPerturbation().setPoint(val, i,j,k);
                         }
                      }
@@ -248,16 +256,56 @@ namespace StateFile {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
+                        auto iN = tRes.dim<Dimensions::Data::DATB1D>(j,k);
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                        for(int i = 0; i < iN; i++)
                         {
                            auto val = (*refFct)(test, i, j_, k_);
+
+                           // Toroidal component
+                           if(test.fieldId == Test::FieldId::TOR ||
+                              test.fieldId == Test::FieldId::TORPOL ||
+                              test.fieldId == Test::FieldId::SCALAR_AND_TORPOL)
+                           {
+                              p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(val, i,j,k);
+                           }
+
+                           // Poloidal component
+                           if(test.fieldId == Test::FieldId::POL ||
+                              test.fieldId == Test::FieldId::TORPOL ||
+                              test.fieldId == Test::FieldId::SCALAR_AND_TORPOL)
+                           {
+                              p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(val, i,j,k);
+                           }
+                        }
+
+                        // Fill extra space with bad values for non-uniform
+                        // truncation
+                        int sN = 0;
+                        // Toroidal component
+                        if(test.fieldId == Test::FieldId::TOR ||
+                           test.fieldId == Test::FieldId::TORPOL ||
+                           test.fieldId == Test::FieldId::SCALAR_AND_TORPOL)
+                        {
+                           sN = p->dom(0).perturbation().comp(FieldComponents::Spectral::TOR).slice(k).rows();
+                        }
+
+                        // Poloidal component
+                        if(test.fieldId == Test::FieldId::POL ||
+                           test.fieldId == Test::FieldId::TORPOL ||
+                           test.fieldId == Test::FieldId::SCALAR_AND_TORPOL)
+                        {
+                           sN = p->dom(0).perturbation().comp(FieldComponents::Spectral::POL).slice(k).rows();
+                        }
+                        for(int i = iN; i < sN; i++)
+                        {
+                           auto val = (*refFct)(test, i, j_, k_);
+                           val = std::numeric_limits<MHDFloat>::max();
 
                            // Toroidal component
                            if(test.fieldId == Test::FieldId::TOR ||
@@ -286,7 +334,8 @@ namespace StateFile {
    {
       auto& ss = *test.spRes->sim().spSpatialScheme();
 
-      auto spState = std::make_shared<Io::Variable::StateFileWriter>(ss.tag(), ss.has(SpatialScheme::Feature::RegularSpectrum));
+      std::string postfix = "_" + ss.tag() + test.fileTag;
+      auto spState = std::make_shared<Io::Variable::StateFileWriter>(postfix, ss.tag(), ss.has(SpatialScheme::Feature::RegularSpectrum));
 
       // Add scalars
       for(auto const& f: test.scalars)
@@ -316,7 +365,8 @@ namespace StateFile {
    {
       auto& ss = *test.spRes->sim().spSpatialScheme();
 
-      auto spState = std::make_shared<Io::Variable::StateFileReader>("_"+ss.tag(), ss.tag(), ss.has(SpatialScheme::Feature::RegularSpectrum));
+      std::string postfix = "_" + ss.tag() + test.fileTag + test.refFileTag;
+      auto spState = std::make_shared<Io::Variable::StateFileReader>(postfix, ss.tag(), ss.has(SpatialScheme::Feature::RegularSpectrum));
 
       // Add scalars
       for(auto const& f: test.scalars)
@@ -361,20 +411,38 @@ namespace StateFile {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+                     const int sN = p->dom(0).perturbation().slice(k).rows();
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                        const int iN = tRes.dim<Dimensions::Data::DATB1D>(j,k);
+                        for(int i = 0; i < iN; i++)
                         {
                            auto ref = (*refFct)(test, i, j_, k_);
                            INFO( "Checking Scalar" );
                            auto data = p->dom(0).perturbation().point(i,j,k);
                            auto err = computeUlp(data, ref, std::abs(ref), test.tolerance(), test.epsilon);
                            worstUlp = std::max(worstUlp, std::get<1>(err));
+                           INFO( "i,j,k: " << i << "," << j_ << "," << k_ );
+                           INFO( "data: " << std::scientific << std::setprecision(16) << data );
+                           INFO( "ref: " << std::scientific << std::setprecision(16) << ref );
+                           INFO( "max ulp: " << test.maxUlp);
+                           INFO( "measured ulp: " << std::get<1>(err) );
+                           CHECK( std::get<0>(err) );
+                        }
+
+                        // Checking unused storage
+                        for(int i = iN; i < sN; i++)
+                        {
+                           auto ref = 0.0;
+                           INFO( "Checking Scalar" );
+                           auto data = p->dom(0).perturbation().point(i,j,k);
+                           auto err = computeUlp(data, ref, std::abs(ref), test.tolerance(), test.epsilon);
+                           worstUlp = std::max(worstUlp, std::get<1>(err));
+                           INFO( "Unused storage shoud be zero" );
                            INFO( "i,j,k: " << i << "," << j_ << "," << k_ );
                            INFO( "data: " << std::scientific << std::setprecision(16) << data );
                            INFO( "ref: " << std::scientific << std::setprecision(16) << ref );
@@ -398,14 +466,15 @@ namespace StateFile {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+                     const int sN = p->dom(0).perturbation().comp(FieldComponents::Spectral::TOR).slice(k).rows();
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                        const int iN = tRes.dim<Dimensions::Data::DATB1D>(j,k);
+                        for(int i = 0; i < iN; i++)
                         {
                            auto ref = (*refFct)(test, i, j_, k_);
 
@@ -440,6 +509,31 @@ namespace StateFile {
                            }
                            checkFct(FieldComponents::Spectral::TOR, refTor, scaleTor, worstUlpTor, "Toroidal");
                            checkFct(FieldComponents::Spectral::POL, refPol, scalePol, worstUlpPol, "Poloidal");
+                        }
+
+                        // Checking unused storage
+                        for(int i = iN; i < sN; i++)
+                        {
+                           auto ref = 0.0;
+                           auto scale= 1.0;
+
+                           auto checkFct = [&](auto comp, auto ref, auto scale, auto& worstUlp, const std::string name)
+                           {
+                              auto data = p->dom(0).perturbation().comp(comp).point(i,j,k);
+                              auto err = computeUlp(data, ref, std::abs(scale), test.tolerance(), test.epsilon);
+                              worstUlp = std::max(worstUlp, std::get<1>(err));
+                              INFO( "Checking " + name + " component" );
+                              INFO( "Unused storage shoud be zero" );
+                              INFO( "i,j,k: " << i << "," << j_ << "," << k_ );
+                              INFO( "data: " << std::scientific << std::setprecision(16) << data );
+                              INFO( "ref: " << std::scientific << std::setprecision(16) << ref );
+                              INFO( "max ulp: " << test.maxUlp);
+                              INFO( "measured ulp: " << std::get<1>(err) );
+                              CHECK( std::get<0>(err) );
+                           };
+
+                           checkFct(FieldComponents::Spectral::TOR, ref, scale, worstUlpTor, "Toroidal");
+                           checkFct(FieldComponents::Spectral::POL, ref, scale, worstUlpPol, "Poloidal");
                         }
                      }
                   }

@@ -487,10 +487,14 @@ namespace Solver {
          if(spEq->couplingInfo(id.second).isGalerkin())
          {
             Equations::solveStencilUnknown(*spEq, id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i));
-
-         } else
+         }
+         else
          {
-            std::visit([&](auto&& p){Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true);}, spEq->spUnknown());
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     Equations::copyUnknown(*spEq, p->dom(0).perturbation(), id.second, (*solIt)->rSolution(i), i, (*solIt)->startRow(id,i), true, true);
+                  }, spEq->spUnknown());
          }
       }
 
@@ -568,13 +572,21 @@ namespace Solver {
          Equations::copyNonlinear(*spEq, id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
 
          // Add source term
-         std::visit([&](auto&& p){Equations::addSource(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));}, spEq->spUnknown());
+         std::visit(
+               [&](auto&& p)
+               {
+                  Equations::addSource(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rRHSData(i), i, (*solveIt)->startRow(id,i));
+               }, spEq->spUnknown());
 
          // If required set inhomogenous boundary condition value
          if(spEq->couplingInfo(id.second).hasBoundaryValue())
          {
             // Set boundary value
-            std::visit([&](auto&& p){Equations::setBoundaryValue(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));}, spEq->spUnknown());
+            std::visit(
+                  [&](auto&& p)
+                  {
+                     Equations::setBoundaryValue(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
+                  }, spEq->spUnknown());
          }
       }
    }

@@ -1,5 +1,5 @@
 /**
- * @file @Scheme@WriteTest.cpp
+ * @file @Scheme@@Mode@Test.cpp
  * @brief Tests for the StateFile
  */
 
@@ -19,12 +19,15 @@
 #include "QuICC/TestSuite/Framework/StateFile/TestArgs.hpp"
 #include "QuICC/TestSuite/Framework/StateFile/TestHelper.hpp"
 #include "Profiler/Interface.hpp"
+#include "QuICC/Transform/Setup/Default.hpp"
+#include "QuICC/Transform/Setup/GaussianQuadrature.hpp"
+#include "QuICC/Transform/Setup/Triangular.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Framework::StateFile;
 
 static const auto badValueOut = std::numeric_limits<QuICC::MHDFloat>::max();
 
-TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
+TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile with @Impl1D@ 1D implementation", "[@Scheme@:@Mode@:@Impl1D@]" ){
 
    // Register IDs
    QuICC::PhysicalNames::registerAll();
@@ -37,7 +40,32 @@ TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
    std::list<int> factorList(currentts::args().factors.begin(), currentts::args().factors.end());
 
    // Create LoadSplitter, SpatialScheme and generate resolution
-   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList);
+   std::string fileTag = "";
+   std::string refFileTag = "";
+   std::vector<std::size_t> opt1D;
+   if("@Impl1D@" == "default")
+   {
+      opt1D.push_back(QuICC::Transform::Setup::Default::id());
+   }
+   else if("@Impl1D@" == "gq_triangular")
+   {
+      opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
+      opt1D.push_back(QuICC::Transform::Setup::Triangular::id());
+
+      // Adapt default truncation for triangular setup
+      if(currentts::args().useDefault)
+      {
+         dim(0) += 2;
+      }
+
+      fileTag = "_triangular";
+      refFileTag = "_bad";
+   }
+   else
+   {
+      throw std::logic_error("Unknown 1D transform implementation");
+   }
+   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D);
 
    for(auto id: currentts::args().params)
    {
@@ -45,6 +73,8 @@ TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
       test.spRes = best.first;
       test.configure(id);
       test.maxUlp = currentts::args().ulp;
+      test.fileTag = fileTag;
+      test.refFileTag = refFileTag;
 
       currentts::initVariables(test);
 

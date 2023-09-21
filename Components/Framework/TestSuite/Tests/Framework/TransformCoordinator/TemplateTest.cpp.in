@@ -20,12 +20,16 @@
 #include "QuICC/TestSuite/Framework/TransformCoordinator/TestArgs.hpp"
 #include "QuICC/TestSuite/Framework/TransformCoordinator/TestHelper.hpp"
 #include "Profiler/Interface.hpp"
+#include "QuICC/Transform/Setup/Default.hpp"
+#include "QuICC/Transform/Setup/GaussianQuadrature.hpp"
+#include "QuICC/Transform/Setup/Uniform.hpp"
+#include "QuICC/Transform/Setup/Triangular.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Framework::TCoord;
 
 static const auto badValueOut = std::numeric_limits<QuICC::MHDFloat>::max();
 
-TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
+TEST_CASE( "Full transform loop for @Scheme@ with @Impl1D@ 1D implementation", "[@Scheme@:@Impl1D@]" ){
 
    // Init Environment
    QuICC::QuICCEnv();
@@ -53,7 +57,27 @@ TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
    std::list<int> factorList(currentts::args().factors.begin(), currentts::args().factors.end());
 
    // Create LoadSplitter, SpatialScheme and generate resolution
-   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList);
+   std::vector<std::size_t> opt1D;
+   if("@Impl1D@" == "default")
+   {
+      opt1D.push_back(QuICC::Transform::Setup::Default::id());
+   }
+   else if("@Impl1D@" == "gq_triangular")
+   {
+      opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
+      opt1D.push_back(QuICC::Transform::Setup::Triangular::id());
+
+      // Adapt default truncation for triangular setup
+      if(currentts::args().useDefault)
+      {
+         dim(0) += 2;
+      }
+   }
+   else
+   {
+      throw std::logic_error("Unknown 1D transform implementation");
+   }
+   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D);
    auto&& descr = best.second;
 
    for(auto id: currentts::args().params)
@@ -70,6 +94,8 @@ TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
       currentts::initTrees(test);
 
       currentts::initCoordinator(test, descr);
+
+      currentts::scrambleVariables(test);
 
       currentts::setVariables(test);
 

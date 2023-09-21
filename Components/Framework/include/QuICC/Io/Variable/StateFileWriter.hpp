@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_STATEFILEWRITER_HPP
 #define QUICC_IO_VARIABLE_STATEFILEWRITER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -46,9 +40,18 @@ namespace Variable {
          StateFileWriter(std::string type, bool isRegular);
 
          /**
+          * @brief Constructor
+          *
+          * @param name       name extension of the file
+          * @param type       Type of the file (typically scheme name)
+          * @param isRegular  Is data regular?
+          */
+         StateFileWriter(std::string name, std::string type, bool isRegular);
+
+         /**
           * @brief Destructor
           */
-         virtual ~StateFileWriter();
+         virtual ~StateFileWriter() = default;
 
          /**
           * @brief Write State to file

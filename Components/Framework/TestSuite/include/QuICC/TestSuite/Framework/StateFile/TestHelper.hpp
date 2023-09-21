@@ -103,6 +103,16 @@ namespace StateFile {
        * @brief Test input spectrum ID
        */
       SpectrumId spectrumId;
+
+      /**
+       * @brief Additional tag for filename
+       */
+      std::string fileTag;
+
+      /**
+       * @brief Additional tag for reference filename
+       */
+      std::string refFileTag;
    };
 
    /**
@@ -112,8 +122,9 @@ namespace StateFile {
     * @param algorithm  Splitting algorithm
     * @param grouper    Communication grouping algorithm
     * @param factors    Imposed CPU factorization
+    * @param opt1D      Truncation ID for 1D
     */
-   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper, const std::list<int>& factors);
+   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper, const std::list<int>& factors, const std::vector<std::size_t>& opt1D);
 
    /**
     * @brief Process command line and generate dimension array
@@ -170,7 +181,7 @@ namespace StateFile {
     */
    ErrorType computeUlp(const MHDFloat data, const MHDFloat ref, const MHDFloat refMod, const MHDFloat tol, const MHDFloat eps);
 
-   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper, const std::list<int>& factors)
+   template <typename TScheme> std::pair<SharedResolution,Parallel::SplittingDescription> initResolution(ArrayI& dim, const std::string algorithm, const std::string grouper, const std::list<int>& factors, const std::vector<std::size_t>& opt1D)
    {
       INFO( "MPI rank: " << QuICC::QuICCEnv().id() );
       INFO( "MPI size: " << QuICC::QuICCEnv().size() );
@@ -179,7 +190,11 @@ namespace StateFile {
       // Create spatial scheme
       auto spScheme = std::make_shared<TScheme>(QuICC::VectorFormulation::TORPOL, QuICC::GridPurpose::SIMULATION);
       std::map<std::size_t,std::vector<std::size_t>> transformSetup;
-      for(int i = 0; i < dim.size(); i++)
+
+      // Set 1D implementation
+      transformSetup.emplace(0, opt1D);
+      // Set other dimensions
+      for(int i = 1; i < dim.size(); i++)
       {
          std::vector<std::size_t> opt = {QuICC::Transform::Setup::Default::id()};
          transformSetup.emplace(i, opt);

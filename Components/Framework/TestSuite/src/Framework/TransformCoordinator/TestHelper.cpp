@@ -232,7 +232,7 @@ namespace TCoord {
       // Initialize coordinator
       std::map<std::size_t,NonDimensional::SharedINumber> runOptions;
       runOptions.emplace(NonDimensional::Lower1d::id(), std::make_shared<NonDimensional::Lower1d>(0.3));
-      runOptions.emplace(NonDimensional::Upper1d::id(), std::make_shared<NonDimensional::Lower1d>(1.3));
+      runOptions.emplace(NonDimensional::Upper1d::id(), std::make_shared<NonDimensional::Upper1d>(1.3));
       std::vector<ArrayI> packs;
       Transform::TransformCoordinatorTools::computePacks(packs, test.spFwdGrouper, test.spBwdGrouper, {{0, test.fwdTree}}, {{0, test.bwdTree}}, {0}, test.spRes);
       Transform::TransformCoordinatorTools::init(test.coord, test.spFwdGrouper, test.spBwdGrouper, packs, test.spRes, runOptions);
@@ -309,14 +309,13 @@ namespace TCoord {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                        for(int i = 0; i < tRes.dim<Dimensions::Data::DATB1D>(j,k); i++)
                         {
                            auto val = (*refFct)(test, i, j_, k_);
                            p->rDom(0).rPerturbation().setPoint(val, i,j,k);
@@ -334,14 +333,13 @@ namespace TCoord {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                        for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
                         {
                            auto val = (*refFct)(test, i, j_, k_);
 
@@ -352,6 +350,10 @@ namespace TCoord {
                            {
                               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(val, i,j,k);
                            }
+                           else
+                           {
+                              p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(MHDComplex(0.0), i,j,k);
+                           }
 
                            // Poloidal component
                            if(test.fieldId == Test::FieldId::POL ||
@@ -359,6 +361,10 @@ namespace TCoord {
                               test.fieldId == Test::FieldId::SCALAR_AND_TORPOL)
                            {
                               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(val, i,j,k);
+                           }
+                           else
+                           {
+                              p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(MHDComplex(0.0), i,j,k);
                            }
                         }
                      }
@@ -370,7 +376,7 @@ namespace TCoord {
 
    void scrambleVariables(Test& test)
    {
-      // Set unit spectrum for scalar fields
+      // Set bad values for scalar fields
       for(auto&& f: test.scalars)
       {
          std::visit(
@@ -378,12 +384,14 @@ namespace TCoord {
                {
                   MHDComplex val = std::numeric_limits<MHDFloat>::max()/2.0;
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                        // Get rows from profile data (partially unused for
+                        // non-uniform truncation
+                        const int sN = p->dom(0).perturbation().profile(j,k).rows();
+                        for(int i = 0; i < sN; i++)
                         {
                            p->rDom(0).rPerturbation().setPoint(val, i,j,k);
                         }
@@ -393,7 +401,7 @@ namespace TCoord {
             f.second);
       }
 
-      // Set unit spectrum for vector fields
+      // Set bad values for vector fields
       for(auto&& f: test.vectors)
       {
          std::visit(
@@ -401,12 +409,14 @@ namespace TCoord {
                {
                   MHDComplex val = std::numeric_limits<MHDFloat>::max()/2.0;
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                        // Get rows from profile data (partially unused for
+                        // non-uniform truncation
+                        const int sN = p->dom(0).perturbation().comp(FieldComponents::Spectral::TOR).profile(j,k).rows();
+                        for(int i = 0; i < sN; i++)
                         {
                            p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(val, i,j,k);
                            p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(val, i,j,k);
@@ -438,14 +448,13 @@ namespace TCoord {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                        for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
                         {
                            auto ref = (*refFct)(test, i, j_, k_);
                            INFO( "Checking Scalar" );
@@ -475,14 +484,13 @@ namespace TCoord {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
-                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
+                        for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
                         {
                            auto ref = (*refFct)(test, i, j_, k_);
 

@@ -30,10 +30,6 @@ namespace Variable {
    {
    }
 
-   StateFileReader::~StateFileReader()
-   {
-   }
-
    void StateFileReader::read()
    {
       Profiler::RegionFixture<2> fix("StateFileReader::read");

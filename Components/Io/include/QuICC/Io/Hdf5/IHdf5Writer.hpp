@@ -6,17 +6,11 @@
 #ifndef QUICC_IO_HDF5_IHDF5WRITER_HPP
 #define QUICC_IO_HDF5_IHDF5WRITER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <string>
 #include <tuple>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -52,7 +46,7 @@ namespace Hdf5 {
          /**
           * @brief Destructor
           */
-         virtual ~IHdf5Writer();
+         virtual ~IHdf5Writer() = default;
 
          /**
           * @brief Initialise the file
@@ -73,7 +67,7 @@ namespace Hdf5 {
          /**
           * @brief Number of blocks to read
           */
-         std::vector<hsize_t>  mBlock;
+         std::vector<std::vector<hsize_t> >  mBlock;
 
          /**
           * @brief Max collective IO Write operations over all CPUs
@@ -382,8 +376,14 @@ namespace Hdf5 {
       // Create file dataspace
       hid_t filespace = H5Screate_simple(nDims, &(this->mRegularDims.front()), NULL);
 
+      // Create dataset creation properties list
+      hid_t dcpl = H5Pcreate(H5P_DATASET_CREATE);
+      // Set fill value to zero
+      T fillVal = 0.0;
+      H5Pset_fill_value(dcpl, type, &fillVal);
+
       // Create dataset in file
-      hid_t dataset = H5Dcreate(loc, dsname.c_str(), type, filespace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      hid_t dataset = H5Dcreate(loc, dsname.c_str(), type, filespace, H5P_DEFAULT, dcpl, H5P_DEFAULT);
 
       // Memory dataspace
       hid_t  memspace;
@@ -410,9 +410,30 @@ namespace Hdf5 {
          memRows = std::max(memRows, std::get<0>(storage.at(i)));
       }
 
+      // Block sizes
+      std::vector<hsize_t> blk;
+
       // Loop over matrices to store in file
       for(unsigned int i = 0; i < storage.size() ; ++i)
       {
+         // Extract block sizes
+         if(this->mBlock.at(i).size() == 1)
+         {
+            // Uniform block
+            blk = std::vector<hsize_t>(this->mFileOffsets.at(i).size(), this->mBlock.at(i).at(0));
+         }
+         else
+         {
+            // Non uniform block
+            blk = this->mBlock.at(i);
+         }
+
+         if(std::get<1>(storage.at(i)) != this->mFileOffsets.at(i).size())
+         {
+            throw std::logic_error("Dimensions of memory and file space don't match");
+         }
+         assert(this->mFileOffsets.at(i).size() == blk.size());
+
          // Create rectangular memory space
          iDims[0] = std::get<1>(storage.at(i));
          iDims[1] = memRows;
@@ -420,10 +441,10 @@ namespace Hdf5 {
 
          // Select columns
          H5Sselect_none(memspace);
-         iDims[1] = this->mBlock.at(i);
          iDims[0] = 1;
          for(int j = 0; j < std::get<1>(storage.at(i)); ++j)
          {
+            iDims[1] = blk.at(j);
             memOffset[0] = j;
             H5Sselect_hyperslab(memspace, H5S_SELECT_OR, memOffset, NULL, iDims, NULL);
          }
@@ -433,6 +454,7 @@ namespace Hdf5 {
          iDims[0] = 1;
          for(unsigned int j =0; j < this->mFileOffsets.at(i).size(); ++j)
          {
+            iDims[1] = blk.at(j);
             pOffset[0] = this->mFileOffsets.at(i).at(j);
             H5Sselect_hyperslab(filespace, H5S_SELECT_OR, pOffset, NULL, iDims, NULL);
          }

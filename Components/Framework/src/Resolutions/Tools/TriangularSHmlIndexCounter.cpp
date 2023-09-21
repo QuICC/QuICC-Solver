@@ -136,12 +136,12 @@ namespace QuICC {
       return oDims;
    }
 
-   void TriangularSHmlIndexCounter::computeOffsets(std::vector<TriangularSHmlIndexCounter::OffsetType>& blocks, std::vector<std::vector<TriangularSHmlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const
+   void TriangularSHmlIndexCounter::computeOffsets(std::vector<std::vector<TriangularSHmlIndexCounter::OffsetType>>& blocks, std::vector<std::vector<TriangularSHmlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const
    {
       this->computeOffsets(blocks, offsets, spaceId, this->mspSim);
    }
 
-   void TriangularSHmlIndexCounter::computeOffsets(std::vector<TriangularSHmlIndexCounter::OffsetType>& blocks, std::vector<std::vector<TriangularSHmlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
+   void TriangularSHmlIndexCounter::computeOffsets(std::vector<std::vector<TriangularSHmlIndexCounter::OffsetType>>& blocks, std::vector<std::vector<TriangularSHmlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
    {
       Dimensions::Transform::Id transId;
       Dimensions::Simulation::Id simId;
@@ -175,12 +175,16 @@ namespace QuICC {
 
                // Compute offset for the local l
                offV.clear();
+               std::vector<TriangularSHmlIndexCounter::OffsetType> blk;
                for(int iL = 0; iL < tRes.dim<Dimensions::Data::DAT2D>(iM); ++iL)
                {
                   int l_ = tRes.idx<Dimensions::Data::DAT2D>(iL, iM);
                   if(l_ < spRef->dim(Dimensions::Simulation::SIM2D,spaceId))
                   {
                      offV.push_back(offset + l_ - m_);
+
+                     // Get non-uniform radial truncation
+                     blk.push_back(std::min(tRes.dim<Dimensions::Data::DATB1D>(iL, iM), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
                   }
                }
 
@@ -188,8 +192,8 @@ namespace QuICC {
 
                m0 = tRes.idx<Dimensions::Data::DAT3D>(iM);
 
-               // 1D blocks
-               blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, m_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               // add blocks
+               blocks.push_back(blk);
             }
          }
       }
@@ -217,7 +221,9 @@ namespace QuICC {
                offsets.push_back(offV);
 
                // 1D blocks
-               blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, i_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               std::vector<TriangularSHmlIndexCounter::OffsetType> blk;
+               blk.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, i_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               blocks.push_back(blk);
             }
          }
       }

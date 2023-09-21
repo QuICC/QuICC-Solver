@@ -33,15 +33,17 @@ quicc_set_ulp(_ulp
   MPULP 11 11 13700 8544 8544
   )
 foreach(_test ${_tests})
-  foreach(_alg tubular single1d single2d)
-    quicc_add_test(${_test}
-      COMMAND ${TestExe}
-      KEYWORD Scheme
-      ULPS ${_ulp}
-      IDS 0 1 2 3 4
-      OPTIONS algorithm:${_alg}
-    )
-  endforeach()
+  foreach(_impl1d default gq_triangular)
+    foreach(_alg tubular single1d single2d)
+      quicc_add_test(${_test}:${_impl1d}
+        COMMAND ${TestExe}
+        KEYWORD Scheme:Impl1D
+        ULPS ${_ulp}
+        IDS 0 1 2 3 4
+        OPTIONS algorithm:${_alg}
+      )
+    endforeach()
+endforeach()
 endforeach()
 
 set(_tests
@@ -54,9 +56,9 @@ quicc_set_ulp(_ulp
   )
 foreach(_test ${_tests})
   foreach(_alg tubular single1d single2d)
-    quicc_add_test(${_test}
+    quicc_add_test(${_test}:default
       COMMAND ${TestExe}
-      KEYWORD Scheme
+      KEYWORD Scheme:Impl1D
       ULPS ${_ulp}
       IDS 0 1 2 3 4
       OPTIONS algorithm:${_alg}
@@ -72,9 +74,9 @@ quicc_set_ulp(_ulp
   MPULP 11 11 11 11 11
   )
 foreach(_test ${_tests})
-  quicc_add_test(${_test}
+  quicc_add_test(${_test}:default
     COMMAND ${TestExe}
-    KEYWORD Scheme
+    KEYWORD Scheme:Impl1D
     ULPS ${_ulp}
     IDS 0 1 2 3 4
     DISABLED ON

@@ -8,15 +8,9 @@
 #include <sstream>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Hdf5/IHdf5Reader.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Hdf5/IHdf5Reader.hpp"
 
 namespace QuICC {
 
@@ -26,10 +20,6 @@ namespace Hdf5 {
 
    IHdf5Reader::IHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version)
       : Hdf5File(name, ext, header, type, version), mCollIoRead(0)
-   {
-   }
-
-   IHdf5Reader::~IHdf5Reader()
    {
    }
 
