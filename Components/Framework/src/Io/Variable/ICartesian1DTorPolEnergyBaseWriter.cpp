@@ -85,7 +85,6 @@ namespace Variable {
       const auto& tRes = *this->res().cpu()->dim(TId);
 
       // Compute integral over Chebyshev expansion and sum Fourier coefficients
-      MHDFloat factor = 1.0;
       int idx = 0;
       const auto box2D = this->res().sim().boxScale(Dimensions::Simulation::SIM2D);
       const auto box3D = this->res().sim().boxScale(Dimensions::Simulation::SIM3D);

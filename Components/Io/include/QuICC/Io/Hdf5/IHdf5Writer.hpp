@@ -428,7 +428,7 @@ namespace Hdf5 {
             blk = this->mBlock.at(i);
          }
 
-         if(std::get<1>(storage.at(i)) != this->mFileOffsets.at(i).size())
+         if(static_cast<std::size_t>(std::get<1>(storage.at(i))) != this->mFileOffsets.at(i).size())
          {
             throw std::logic_error("Dimensions of memory and file space don't match");
          }

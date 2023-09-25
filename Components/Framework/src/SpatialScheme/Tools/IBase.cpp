@@ -66,7 +66,6 @@ namespace Tools {
       idx3D.reserve(sze);
 
       // Make full list of index in third dimension
-      auto setIt = filter.begin();
       for(auto setIt = filter.cbegin(); setIt != filter.cend(); setIt++)
       {
          idx3D.push_back(*setIt);
