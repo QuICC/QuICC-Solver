@@ -17,9 +17,19 @@ namespace SpatialScheme {
 
 namespace Tools {
 
+   SpectralTrapezoidalAllL::SpectralTrapezoidalAllL()
+      : IBaseAllL(static_cast<int>(MinimalTruncation::Triangular))
+   {
+   }
+
+   SpectralTrapezoidalAllL::SpectralTrapezoidalAllL(const int min)
+      : IBaseAllL(min)
+   {
+   }
+
    int SpectralTrapezoidalAllL::truncationBwd(const int nN, const int j, const int k)
    {
-      return std::max(nN - j/2, MIN_TRUNCATION);
+      return std::max(nN - j/2, this->min());
    }
 
    int SpectralTrapezoidalAllL::index(const int i, const int j, const int k)
@@ -29,7 +39,7 @@ namespace Tools {
 
    bool SpectralTrapezoidalAllL::isOptimal(const int nN, const int maxL)
    {
-      return (this->truncationBwd(nN, maxL, 0) > MIN_TRUNCATION);
+      return (nN - maxL/2 >= this->min());
    }
 
 } // Tools

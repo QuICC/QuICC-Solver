@@ -17,6 +17,11 @@ namespace SpatialScheme {
 
 namespace Tools {
 
+   IBaseAllL::IBaseAllL(const int min)
+      : IBaseSH(min)
+   {
+   }
+
    int IBaseAllL::truncationFwd(const int nN, const int j, const int k)
    {
       return this->truncationBwd(nN, j, k);

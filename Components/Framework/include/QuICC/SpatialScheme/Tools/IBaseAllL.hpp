@@ -34,6 +34,13 @@ namespace Tools {
          IBaseAllL() = default;
 
          /**
+          * @brief ctor with explicit min truncation
+          *
+          * @param min  Minimal truncation
+          */
+         IBaseAllL(const int min);
+
+         /**
           * @brief Default dtor
           */
          ~IBaseAllL() = default;

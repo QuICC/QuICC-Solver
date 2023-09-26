@@ -31,6 +31,9 @@ int main( int argc, char* argv[] )
       | Opt( test::args().algorithm, "algorithm" ) // Add test algorithm option
          ["--algorithm"]
          ("Splitting algorithm")
+      | Opt( test::args().truncation, "" )      // Add test truncation scheme option
+         ["--truncation"]
+         ("Truncation scheme")
       | Opt( test::args().np, "np" )      // Add test np option
          ["--np"]
          ("# MPI ranks")

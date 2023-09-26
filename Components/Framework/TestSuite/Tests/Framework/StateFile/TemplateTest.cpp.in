@@ -3,7 +3,6 @@
  * @brief Tests for the StateFile
  */
 
-
 // System includes
 //
 
@@ -22,12 +21,13 @@
 #include "QuICC/Transform/Setup/Default.hpp"
 #include "QuICC/Transform/Setup/GaussianQuadrature.hpp"
 #include "QuICC/Transform/Setup/Triangular.hpp"
+#include "QuICC/Transform/Setup/Trapezoidal.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Framework::StateFile;
 
 static const auto badValueOut = std::numeric_limits<QuICC::MHDFloat>::max();
 
-TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile with @Impl1D@ 1D implementation", "[@Scheme@:@Mode@:@Impl1D@]" ){
+TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile", "[@Scheme@:@Mode@]" ){
 
    // Register IDs
    QuICC::PhysicalNames::registerAll();
@@ -43,27 +43,29 @@ TEST_CASE( "@Mode@ test for @Scheme@ scheme StateFile with @Impl1D@ 1D implement
    std::string fileTag = "";
    std::string refFileTag = "";
    std::vector<std::size_t> opt1D;
-   if("@Impl1D@" == "default")
+   if(currentts::args().truncation == "uniform")
    {
       opt1D.push_back(QuICC::Transform::Setup::Default::id());
    }
-   else if("@Impl1D@" == "gq_triangular")
+   else if(currentts::args().truncation == "triangular")
    {
       opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
       opt1D.push_back(QuICC::Transform::Setup::Triangular::id());
 
-      // Adapt default truncation for triangular setup
-      if(currentts::args().useDefault)
-      {
-         dim(0) += 2;
-      }
-
       fileTag = "_triangular";
+      refFileTag = "_bad";
+   }
+   else if(currentts::args().truncation == "trapezoidal")
+   {
+      opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
+      opt1D.push_back(QuICC::Transform::Setup::Trapezoidal::id());
+
+      fileTag = "_trapezoidal";
       refFileTag = "_bad";
    }
    else
    {
-      throw std::logic_error("Unknown 1D transform implementation");
+      throw std::logic_error("Unknown 1D truncation scheme");
    }
    auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D);
 

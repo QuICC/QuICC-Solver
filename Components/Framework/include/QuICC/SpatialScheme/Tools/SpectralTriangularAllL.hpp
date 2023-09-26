@@ -14,7 +14,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "QuICC/SpatialScheme/Tools/IBaseAllL.hpp"
+#include "QuICC/SpatialScheme/Tools/SpectralTrapezoidalAllL.hpp"
 
 namespace QuICC {
 
@@ -25,7 +25,7 @@ namespace Tools {
    /**
     * @brief Implementation of the tools for the triangular + spherical harmonic spatial schemes with all harmonic degrees gathered
     */
-   class SpectralTriangularAllL: public IBaseAllL
+   class SpectralTriangularAllL: public SpectralTrapezoidalAllL
    {
       public:
          /**
@@ -34,19 +34,16 @@ namespace Tools {
          SpectralTriangularAllL() = default;
 
          /**
+          * @brief ctor with explicit min truncation
+          *
+          * @param min  Minimal truncation
+          */
+         SpectralTriangularAllL(const int min);
+
+         /**
           * @brief Default dtor
           */
          ~SpectralTriangularAllL() = default;
-
-         /**
-          * @brief Compute backward truncation
-          */
-         int truncationBwd(const int nN, const int j, const int k) final;
-
-         /**
-          * @brief Compute index
-          */
-         int index(const int nN, const int j, const int k) final;
 
          /**
           * @brief Check if chosen resolution is optimal
@@ -54,10 +51,6 @@ namespace Tools {
          bool isOptimal(const int nN, const int maxL) final;
 
       private:
-         /**
-          * @brief Minimal truncation for highest modes
-          */
-         static constexpr const int MIN_TRUNCATION = 3;
    };
 
 } // Tools

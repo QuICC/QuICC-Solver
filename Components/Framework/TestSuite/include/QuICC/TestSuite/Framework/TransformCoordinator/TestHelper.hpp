@@ -288,10 +288,12 @@ namespace TCoord {
       auto spRes = best.first;
       spBuilder->tuneResolution(spRes, best.second);
 
+      // Set boxscale
       Array box(3);
       box << 1.0,1.0,1.0;
       spRes->setBoxScale(box);
 
+      // Pass spatial scheme to resolution
       spRes->setSpatialScheme(spScheme);
 
       return best;

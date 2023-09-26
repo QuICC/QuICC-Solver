@@ -27,6 +27,8 @@
 #include "QuICC/PhysicalKernels/Passthrough.hpp"
 #include "QuICC/Io/Variable/StateFileReader.hpp"
 #include "QuICC/Io/Variable/StateFileWriter.hpp"
+#include "QuICC/SpatialScheme/Tools/SpectralTriangularSH.hpp"
+#include "QuICC/SpatialScheme/Tools/SpectralTrapezoidalSH.hpp"
 
 namespace QuICC {
 
@@ -93,6 +95,24 @@ namespace StateFile {
          {
             args().grouper = "transform";
          }
+
+         if(args().truncation == "")
+         {
+            args().truncation = "uniform";
+         }
+
+         if(args().truncation == "triangular")
+         {
+            SpatialScheme::Tools::SpectralTriangularSH t;
+
+            args().dim1D = args().dim2D/2 + t.min() - 1;
+         }
+         else if(args().truncation == "trapezoidal")
+         {
+            SpatialScheme::Tools::SpectralTrapezoidalSH t;
+
+            args().dim1D = args().dim2D/2 + t.min() - 1;
+         }
       }
       else
       {
@@ -104,6 +124,11 @@ namespace StateFile {
          if(args().grouper == "")
          {
             args().grouper = "equation";
+         }
+
+         if(args().truncation == "")
+         {
+            args().grouper = "uniform";
          }
       }
 

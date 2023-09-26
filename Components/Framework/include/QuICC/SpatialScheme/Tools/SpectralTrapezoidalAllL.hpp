@@ -31,7 +31,14 @@ namespace Tools {
          /**
           * @brief Default ctor
           */
-         SpectralTrapezoidalAllL() = default;
+         SpectralTrapezoidalAllL();
+
+         /**
+          * @brief ctor with explicit min truncation
+          *
+          * @param min  Minimal truncation
+          */
+         SpectralTrapezoidalAllL(const int min);
 
          /**
           * @brief Default dtor
@@ -51,13 +58,9 @@ namespace Tools {
          /**
           * @brief Check if chosen resolution is optimal
           */
-         bool isOptimal(const int nN, const int maxL) final;
+         virtual bool isOptimal(const int nN, const int maxL);
 
       private:
-         /**
-          * @brief Minimal truncation for highest modes
-          */
-         static constexpr const int MIN_TRUNCATION = 3;
    };
 
 } // Tools

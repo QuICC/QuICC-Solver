@@ -17,19 +17,14 @@ namespace SpatialScheme {
 
 namespace Tools {
 
-   int SpectralTriangularAllL::truncationBwd(const int nN, const int j, const int k)
+   SpectralTriangularAllL::SpectralTriangularAllL(const int min)
+      : SpectralTrapezoidalAllL(min)
    {
-      return std::max(nN - j/2, MIN_TRUNCATION);
-   }
-
-   int SpectralTriangularAllL::index(const int i, const int j, const int k)
-   {
-      return i;
    }
 
    bool SpectralTriangularAllL::isOptimal(const int nN, const int maxL)
    {
-      return (MIN_TRUNCATION == nN - maxL/2);
+      return (this->min() == nN - maxL/2);
    }
 
 } // Tools

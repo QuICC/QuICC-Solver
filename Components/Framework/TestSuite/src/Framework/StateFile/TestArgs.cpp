@@ -19,7 +19,7 @@ namespace Framework {
 namespace StateFile {
 
    TestArgs::TestArgs()
-      : useDefault(true), dumpData(false), timeOnly(false), ulp(11), dim1D(0), dim2D(0), dim3D(0), iter(1), algorithm(""), grouper("")
+      : useDefault(true), dumpData(false), timeOnly(false), ulp(11), dim1D(0), dim2D(0), dim3D(0), iter(1), algorithm(""), grouper(""), truncation("")
    {
    }
 

@@ -50,11 +50,11 @@ set(_schemes
 foreach(_scheme ${_schemes})
   foreach(_alg serial)
     foreach(_mode read write)
-      quicc_add_test(${_scheme}:${_mode}:default
+      quicc_add_test(${_scheme}:${_mode}
         COMMAND ${TestExe}
-        KEYWORD Scheme:Mode:Impl1D
+        KEYWORD Scheme:Mode
         ID 0
-        OPTIONS algorithm:${_alg}
+        OPTIONS algorithm:${_alg} truncation:uniform
       )
     endforeach()
     add_test(
@@ -77,11 +77,11 @@ endif()
 foreach(_scheme ${_schemes})
   foreach(_alg ${_algs})
     foreach(_mode read write)
-      quicc_add_test(${_scheme}:${_mode}:default
+      quicc_add_test(${_scheme}:${_mode}
         COMMAND ${TestExe}
-        KEYWORD Scheme:Mode:Impl1D
+        KEYWORD Scheme:Mode
         ID 0
-        OPTIONS algorithm:${_alg}
+        OPTIONS algorithm:${_alg} truncation:uniform
         STEPS 10
         PERFONLY
       )
@@ -96,11 +96,11 @@ set(_schemes
 foreach(_scheme ${_schemes})
   foreach(_alg serial)
     foreach(_mode read write)
-      quicc_add_test(${_scheme}:${_mode}:gq_triangular
+      quicc_add_test(${_scheme}:${_mode}
         COMMAND ${TestExe}
-        KEYWORD Scheme:Mode:Impl1D
+        KEYWORD Scheme:Mode
         ID 0
-        OPTIONS algorithm:${_alg}
+        OPTIONS algorithm:${_alg} truncation:triangular
       )
     endforeach()
     add_test(

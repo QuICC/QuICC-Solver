@@ -12,7 +12,6 @@
 //
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/Splitting.hpp"
-#include "QuICC/Enums/SplittingTools.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/LoadSplitter/LoadSplitter.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
@@ -22,6 +21,8 @@
 #include "QuICC/Transform/Setup/Default.hpp"
 #include "QuICC/TestSuite/Framework/LoadSplitter/TestArgs.hpp"
 #include "QuICC/TestSuite/Framework/LoadSplitter/TestHelper.hpp"
+#include "QuICC/SpatialScheme/Tools/SpectralTriangularSH.hpp"
+#include "QuICC/SpatialScheme/Tools/SpectralTrapezoidalSH.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Framework::LoadSplitter;
 
@@ -48,6 +49,11 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
       auto np = currentts::args().np;
       currentts::args().params.push_back((np-1)/2);
       currentts::args().params.push_back(np-1);
+
+      if(currentts::args().truncation == "")
+      {
+         currentts::args().truncation = "uniform";
+      }
    }
    else
    {
@@ -74,6 +80,19 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
       currentts::args().dim1D = nM/2 - 1;
       currentts::args().dim2D = nM - 1;
       currentts::args().dim3D = nM - 1;
+
+      if(currentts::args().truncation == "triangular")
+      {
+         QuICC::SpatialScheme::Tools::SpectralTriangularSH t;
+
+         currentts::args().dim1D = currentts::args().dim2D/2 + t.min() - 1;
+      }
+      else if(currentts::args().truncation == "trapezoidal")
+      {
+         QuICC::SpatialScheme::Tools::SpectralTrapezoidalSH t;
+
+         currentts::args().dim1D = currentts::args().dim2D/2 + t.min() - 1;
+      }
    }
 
    if(currentts::args().dim1D == 0 || currentts::args().dim2D == 0 || currentts::args().dim3D == 0)
@@ -104,22 +123,29 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
    std::multimap<int,int> modes;
    for(int id: currentts::args().params)
    {
-      // Create scheme
-      QuICC::Parallel::LoadSplitter splitter(id, np);
-      auto spScheme = std::make_shared<QuICC::SpatialScheme::@Scheme@>(QuICC::VectorFormulation::TORPOL, QuICC::GridPurpose::SIMULATION);
-      std::map<std::size_t,std::vector<std::size_t>> transformSetup;
-      for(int i = 0; i < dim.size(); i++)
-      {
-         std::vector<std::size_t> opt = {QuICC::Transform::Setup::Default::id()};
-         transformSetup.emplace(i, opt);
-      }
-      spScheme->setImplementation(transformSetup);
+      std::string grouper = "transform";
 
-      auto spBuilder = spScheme->createBuilder(dim, false);
-      std::set<QuICC::Splitting::Algorithms::Id> algos = {QuICC::Splitting::getAlgorithmId(currentts::args().algorithm)};
-      auto grp = QuICC::Splitting::Groupers::TRANSFORM;
-      splitter.init(spBuilder, algos, grp, factorList);
-      auto best = splitter.bestSplitting(false);
+      // Create LoadSplitter, SpatialScheme and generate resolution
+      std::vector<std::size_t> opt1D;
+      if(currentts::args().truncation == "uniform")
+      {
+         opt1D.push_back(QuICC::Transform::Setup::Default::id());
+      }
+      else if(currentts::args().truncation == "triangular")
+      {
+         opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
+         opt1D.push_back(QuICC::Transform::Setup::Triangular::id());
+      }
+      else if(currentts::args().truncation == "trapezoidal")
+      {
+         opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
+         opt1D.push_back(QuICC::Transform::Setup::Trapezoidal::id());
+      }
+      else
+      {
+         throw std::logic_error("Unknown 1D transform implementation");
+      }
+      auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(id, np, dim, currentts::args().algorithm, grouper, factorList, opt1D);
       auto spRes = best.first;
 
       std::cerr << "Selectd factors: " << best.second.factors.transpose() << std::endl;

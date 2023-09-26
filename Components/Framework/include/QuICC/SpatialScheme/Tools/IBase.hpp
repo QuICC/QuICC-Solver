@@ -29,9 +29,29 @@ namespace Tools {
    {
       public:
          /**
+          * @brief Named minimal truncation
+          */
+         enum class MinimalTruncation
+         {
+            /// Single mode as minimum
+            Single = 1,
+            /// A minimum of 4 modes is required
+            /// to satisfy boundary condition and stable
+            /// timestepping
+            Triangular = 4,
+         };
+
+         /**
           * @brief Default ctor
           */
-         IBase() = default;
+         IBase();
+
+         /**
+          * @brief ctor with explicit min truncation
+          *
+          * @param min  Minimal truncation
+          */
+         IBase(const int min);
 
          /**
           * @brief Default dtor
@@ -55,6 +75,11 @@ namespace Tools {
           * @param k    index of third dimension
           */
          virtual int truncationFwd(const int nN, const int j, const int k) = 0;
+
+         /**
+          * @Brief Minimal truncation
+          */
+         virtual int min() const;
 
          /**
           * @brief Compute index
@@ -111,6 +136,12 @@ namespace Tools {
           * @param allowEmpty Allow some parts to be empty
           */
          void balancedSplit(int &n0, int &nN, const int tot, const int parts, const int id, const bool allowEmpty = false);
+
+      protected:
+         /**
+          * @brief Minimal truncation
+          */
+         const int mcMin;
 
    };
 

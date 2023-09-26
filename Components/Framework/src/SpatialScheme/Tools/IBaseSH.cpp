@@ -19,6 +19,11 @@ namespace SpatialScheme {
 
 namespace Tools {
 
+   IBaseSH::IBaseSH(const int min)
+      : IBase(min)
+   {
+   }
+
    int IBaseSH::totalModes(const int n2D, const int n3D, Splitting::Locations::Id split)
    {
       int nModes = 0;

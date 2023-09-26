@@ -24,12 +24,13 @@
 #include "QuICC/Transform/Setup/GaussianQuadrature.hpp"
 #include "QuICC/Transform/Setup/Uniform.hpp"
 #include "QuICC/Transform/Setup/Triangular.hpp"
+#include "QuICC/Transform/Setup/Trapezoidal.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Framework::TCoord;
 
 static const auto badValueOut = std::numeric_limits<QuICC::MHDFloat>::max();
 
-TEST_CASE( "Full transform loop for @Scheme@ with @Impl1D@ 1D implementation", "[@Scheme@:@Impl1D@]" ){
+TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
 
    // Init Environment
    QuICC::QuICCEnv();
@@ -58,24 +59,23 @@ TEST_CASE( "Full transform loop for @Scheme@ with @Impl1D@ 1D implementation", "
 
    // Create LoadSplitter, SpatialScheme and generate resolution
    std::vector<std::size_t> opt1D;
-   if("@Impl1D@" == "default")
+   if(currentts::args().truncation == "uniform")
    {
       opt1D.push_back(QuICC::Transform::Setup::Default::id());
    }
-   else if("@Impl1D@" == "gq_triangular")
+   else if(currentts::args().truncation == "triangular")
    {
       opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
       opt1D.push_back(QuICC::Transform::Setup::Triangular::id());
-
-      // Adapt default truncation for triangular setup
-      if(currentts::args().useDefault)
-      {
-         dim(0) += 2;
-      }
+   }
+   else if(currentts::args().truncation == "trapezoidal")
+   {
+      opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
+      opt1D.push_back(QuICC::Transform::Setup::Trapezoidal::id());
    }
    else
    {
-      throw std::logic_error("Unknown 1D transform implementation");
+      throw std::logic_error("Unknown 1D truncation scheme");
    }
    auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D);
    auto&& descr = best.second;

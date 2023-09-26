@@ -39,6 +39,9 @@ namespace LoadSplitter {
       /// algorithm name
       std::string algorithm;
 
+      /// Truncation scheme
+      std::string truncation;
+
       /// ID of database file
       unsigned int db;
 
