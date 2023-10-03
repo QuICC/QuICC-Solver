@@ -4,9 +4,10 @@
  */
 #pragma once
 
-// External includes
+// System includes
 //
 #include <memory>
+#include <cstdint>
 
 // Project includes
 //
