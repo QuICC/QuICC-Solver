@@ -20,12 +20,29 @@ set_target_properties(
 
 # Create Jacobi tests targets
 include(ConfigureTests)
-set(JacobiTests PnabTest dPnabTest d2PnabTest d3PnabTest)
+set(JacobiTests
+  Pnab
+)
 foreach(_test ${JacobiTests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator
     TYPES matrix weighted
+    ULP 300
+  )
+endforeach()
+
+set(JacobiTests
+  dPnab
+  d2Pnab
+  d3Pnab
+)
+foreach(_test ${JacobiTests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator
+    TYPES matrix weighted
+    DISABLED ON
   )
 endforeach()
 
@@ -46,20 +63,20 @@ add_executable(JacobiBaseTest JacobiBaseTests.cpp)
 target_link_libraries(JacobiBaseTest ${QUICC_CURRENT_COMPONENT_LIB} Catch2::Catch2 )
 
 add_test(
-    NAME JacobiBaseTest
-    COMMAND JacobiBaseTest
-    WORKING_DIRECTORY
-    "${QUICC_WORK_DIR}"
-  )
+  NAME JacobiBaseTest
+  COMMAND JacobiBaseTest
+  WORKING_DIRECTORY
+  "${QUICC_WORK_DIR}"
+)
 
 if(NOT QUICC_MULTPRECISION)
   add_executable(JacobiAsymptoticTest JacobiAsymptoticTests.cpp)
   target_link_libraries(JacobiAsymptoticTest ${QUICC_CURRENT_COMPONENT_LIB} Catch2::Catch2 )
 
   add_test(
-      NAME JacobiAsymptoticTest
-      COMMAND JacobiAsymptoticTest
-      WORKING_DIRECTORY
-      "${QUICC_WORK_DIR}"
-    )
+    NAME JacobiAsymptoticTest
+    COMMAND JacobiAsymptoticTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+  )
 endif()

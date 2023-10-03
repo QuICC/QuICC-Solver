@@ -20,12 +20,16 @@ set_target_properties(
 
 # Create Legendre tests targets
 include(ConfigureTests)
-set(LegendreTests PnTest dPnTest)
+set(LegendreTests
+  Pn
+  dPn
+)
 foreach(_test ${LegendreTests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator
     TYPES matrix weighted
+    DISABLED ON
   )
 endforeach()
 

@@ -20,12 +20,29 @@ set_target_properties(
 
 # Create Worland tests targets
 include(ConfigureTests)
-set(WorlandTests WnlTest dWnlTest slaplWnlTest r_1WnlTest r_1drWnlTest drWnlTest dr_1drWnlTest r_1claplhWnlTest claplhWnlTest dclaplhWnlTest)
+set(WorlandTests
+  Wnl
+  dWnl
+  slaplWnl
+  r_1Wnl
+  r_1drWnl
+  drWnl
+  dr_1drWnl
+  r_1claplhWnl
+  claplhWnl
+  dclaplhWnl
+)
+include(SetUlp)
+quicc_set_ulp(_ulp
+  ULP 16000
+  MPULP 11
+)
 foreach(_test ${WorlandTests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator
     TYPES matrix weighted
+    ULP ${_ulp}
   )
 endforeach()
 

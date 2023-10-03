@@ -1,4 +1,4 @@
-/** 
+/**
  * @file JacobiRule.cpp
  * @brief Source of the Jacobi quadrature
  */
@@ -56,7 +56,8 @@ namespace Quadrature {
       auto factor = Jacobi::JacobiBase::normFact(n, a, b);
 
       #ifndef QUICC_MULTPRECISION
-      if(size <= 32)
+      constexpr int asySwitchLimit = 32;
+      if(size <= asySwitchLimit)
       {
       #endif
          // Naive implementation, high error at high n due to clustering
@@ -135,6 +136,9 @@ namespace Quadrature {
                h = k + 1;
             }
 
+            // This approximation is technically valid only for a,b in [-1/2,1/2] and away from the boundary, see Hale and Towsend 2013
+            /// \todo to enable higher beta a better initial guess needs
+            /// to be implemented
             auto C = (2*h+a-.5)*Math::PI/(2*n+a+b+1);
             auto T = C + 1/((2*n+a+b+1)*(2*n+a+b+1))
                * ((.25-a*a)/std::tan(.5*C) - (.25-b*b)*std::tan(.5*C));

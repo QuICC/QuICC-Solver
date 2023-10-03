@@ -76,6 +76,10 @@ class dPnab
          if(nPoly > 1)
          {
             ThreeTermRecurrence::P1(idiff.col(1), alpha, beta, igrid, &JacobiBase::dP2ab<normalizationTag_t>);
+            if(scale.size() > 0)
+            {
+               idiff.col(1).array() *= scale.array();
+            }
             evaluator(rOut, idiff.col(1), 2);
          }
 
@@ -89,10 +93,15 @@ class dPnab
 
          for(int i = 3; i < nPoly+1; ++i)
          {
+            // Pi
             ThreeTermRecurrence::Pn(idiff.col(0), i, alpha, beta, idiff.col(1), idiff.col(0), igrid,
                &JacobiBase::Pnab<normalizationTag_t>);
             idiff.col(0).swap(idiff.col(1));
-            ThreeTermRecurrence::dPn(idiff.col(2), nPoly, alpha, beta, idiff.col(1), idiff.col(0), igrid, &JacobiBase::dPnabPnab<normalizationTag_t>);
+            ThreeTermRecurrence::dPn(idiff.col(2), i, alpha, beta, idiff.col(1), idiff.col(0), igrid, &JacobiBase::dPnabPnab<normalizationTag_t>);
+            if(scale.size() > 0)
+            {
+               idiff.col(2).array() *= scale.array();
+            }
             evaluator(rOut, idiff.col(2), i);
          }
       }

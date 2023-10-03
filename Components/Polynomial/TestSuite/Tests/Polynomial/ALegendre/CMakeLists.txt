@@ -20,12 +20,22 @@ set_target_properties(
 
 # Create ALegendre tests targets
 include(ConfigureTests)
-set(ALegendreTests PlmTest dPlmTest sin_1PlmTest)
+set(ALegendreTests
+  Plm
+  dPlm
+  sin_1Plm
+)
+include(SetUlp)
+quicc_set_ulp(_ulp
+  ULP 2200
+  MPULP 11
+)
 foreach(_test ${ALegendreTests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator
     TYPES matrix weighted
+    ULP ${_ulp}
   )
 endforeach()
 

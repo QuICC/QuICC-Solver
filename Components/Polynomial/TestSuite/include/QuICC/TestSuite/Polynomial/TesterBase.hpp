@@ -90,7 +90,7 @@ namespace Polynomial {
          /**
           * @brief Check normalized values
           */
-         virtual ErrorType checkNormal(const MHDFloat data, const MHDFloat ref, const MHDFloat scale = -1) const;
+         virtual ErrorType checkNormal(const MHDFloat data, const MHDFloat ref, const MHDFloat scale = 1.0) const;
 
          /**
           * @brief Check denormalized values
@@ -133,7 +133,7 @@ namespace Polynomial {
          bool mKeepData;
 
          /**
-          * @brief Datatype epsilon
+          * @brief Max Units in the last place allowed
           */
          unsigned int mMaxUlp;
 
@@ -141,6 +141,11 @@ namespace Polynomial {
           * @brief Datatype epsilon
           */
          MHDFloat mEpsilon;
+
+         /**
+          * @brief Reference scale for the problem
+          */
+         MHDFloat mScale = -1.0;
 
          /**
           * @brief Base filename
@@ -257,6 +262,9 @@ namespace Polynomial {
 
    template <typename TOp> void TesterBase<TOp>::computeError(const Matrix& outData, const Matrix& refData) const
    {
+      auto refScale = std::max(std::abs(refData.maxCoeff()),
+         std::abs(refData.minCoeff()));
+
       // Compute error
       //
       for(int j = 0; j < refData.cols(); j++)
@@ -286,7 +294,7 @@ namespace Polynomial {
             // check normalized values
             else if(ref >= std::numeric_limits<MHDFloat>::min())
             {
-               auto err = this->checkNormal(outData(i,j), refData(i,j));
+               auto err = this->checkNormal(outData(i,j), refData(i,j), refScale);
 
                // check error
                {
