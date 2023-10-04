@@ -144,6 +144,14 @@ namespace Transform {
          inData.setConstant(std::numeric_limits<MHDFloat>::max());
       } else
       {
+         // Ignore header
+         int s = infile.peek();
+         while(s == '#')
+         {
+            infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            s = infile.peek();
+         }
+
          // Get size from first value
          if(inData.size() == 0)
          {

@@ -49,10 +49,10 @@ namespace LoadSplitter {
     * @brief Write resolution data to file
     *
     * @param fname      Filename
-    * @param tRes       Resolution
-    * @param isDetailed Write detailed output? (summary vs mode list)
+    * @param sRes       Simulation resolution
+    * @param tRes       Transform resolution
     */
-   void writeData(const std::string fname, const SimRes& sRes, const TransformResolution& tRes, const bool isDetailed);
+   void writeData(const std::string fname, const SimRes& sRes, const TransformResolution& tRes);
 
    /**
     * @brief Read reference data
@@ -74,9 +74,10 @@ namespace LoadSplitter {
     * @brief Check transform resolution against distributed reference data
     *
     * @param fname   Filename of reference
+    * @param sRes    Simulation resolution
     * @param tRes    Transform resolution
     */
-   void checkReference(const std::string fname, const TransformResolution& tRes);
+   void checkReference(const std::string fname, const SimRes& sRes, const TransformResolution& tRes);
 
    /**
     * @brief Check transform resolution against full serial reference data

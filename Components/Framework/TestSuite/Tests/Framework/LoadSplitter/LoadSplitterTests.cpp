@@ -63,10 +63,7 @@ int main( int argc, char* argv[] )
          ("Check ranks individually?")
       | Opt( test::args().dumpData )          // Add dumpData option
          ["--dumpData"]
-         ("Write output data to file?")
-      | Opt( test::args().dumpDetails )       // Add dumpDetails option
-         ["--dumpDetails"]
-         ("Write detailed output data to file?");
+         ("Write output data to file?");
 
    // Now pass the new composite back to Catch so it uses that
    session.cli( cli );

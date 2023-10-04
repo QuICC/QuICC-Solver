@@ -334,14 +334,14 @@ namespace Worland {
          auto spSetup = this->buildSetup(param, type);
 
          // Input data
-         MatrixZ inData(spSetup->specSize(), spSetup->blockSize());
+         MatrixZ inData = MatrixZ::Zero(spSetup->specSize(), spSetup->blockSize());
          this->readFile(inData, param, type, ContentType::INPUT);
 
          TOp op;
          internal::Array igrid;
          this->initOperator(op, igrid, spSetup);
 
-         Matrix outData(op.outRows(), op.outCols());
+         Matrix outData = Matrix::Zero(op.outRows(), op.outCols());
 
          op.transform(outData, inData);
 
@@ -473,33 +473,52 @@ namespace Worland {
       }
       int specN = meta(0);
       int physN = meta(1);
+      int nModes = meta(2);
       auto spSetup = std::make_shared<typename TOp::SetupType>(physN, specN, GridPurpose::SIMULATION);
 
       // Gather indices
-      std::map<int,int> indices;
-      if(param.size() == 1)
+      std::map<int,std::pair<int,int> > indices;
+      assert((meta.size() - nMeta - 2*nModes) % 2 == 0);
+      int nModes2D = 0;
+      int h = nMeta;
+
+      // Create mode list
+      for(int i = 0; i < nModes; i++)
       {
-         for(int i = nMeta; i < meta.size(); i++)
-         {
-            int k_ = static_cast<int>(meta(i));
-            indices[k_]++;
-         }
+         int k_ = static_cast<int>(meta(h));
+         int mult = static_cast<int>(meta(h+1));
+         indices.insert(std::pair(k_,std::make_pair(mult,0)));
+         h += 2;
+         nModes2D += mult;
       }
-      else
+
+      // Check meta data size
+      if(meta.size() - nMeta - 2*nModes - 2*nModes2D != 0)
       {
-         assert((meta.size() - nMeta) % 2 == 0);
-         for(int i = nMeta; i < meta.size(); i += 2)
+         throw std::logic_error("Meta data format is not supported (file: " + fullname + ")");
+      }
+
+      // Set truncation (possibly non-uniform)
+      for(auto& [k_, p]: indices)
+      {
+         // Get 1D truncation of first 2D mode
+         p.second = meta(h+1);
+
+         // Check all 2D modes have same truncation
+         for(int j = 0; j < p.first; j++)
          {
-            int k_ = static_cast<int>(meta(i));
-            int mult = static_cast<int>(meta(i+1));
-            indices.insert(std::pair(k_,mult));
+            if(p.second != meta(h+1))
+            {
+               throw std::logic_error("Meta data format is not supported (file: " + fullname + ")");
+            }
+            h += 2;
          }
       }
 
       // Add indices with multiplier
-      for(const auto& [k_, mult]: indices)
+      for(const auto& [k_, p]: indices)
       {
-         spSetup->addIndex(k_, mult);
+         spSetup->addIndex(k_, p.first, p.second);
       }
       spSetup->lock();
 

@@ -109,9 +109,9 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
 
    Catch::StringMaker<double>::precision = 15;
 
-   auto op = currentts::args().op;
-   auto db = currentts::args().db;
-   auto np = currentts::args().np;
+   const auto& op = currentts::args().op;
+   const auto& db = currentts::args().db;
+   const auto& np = currentts::args().np;
    QuICC::ArrayI dim(3);
    dim(0) = currentts::args().dim1D;
    dim(1) = currentts::args().dim2D;
@@ -120,31 +120,36 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
    // convert factor vector to list
    std::list<int> factorList(currentts::args().factors.begin(), currentts::args().factors.end());
 
+   // Create LoadSplitter, SpatialScheme and generate resolution
+   std::vector<std::size_t> opt1D;
+   if(currentts::args().truncation == "uniform")
+   {
+      opt1D.push_back(QuICC::Transform::Setup::Default::id());
+   }
+   else if(currentts::args().truncation == "triangular")
+   {
+      opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
+      opt1D.push_back(QuICC::Transform::Setup::Triangular::id());
+
+      currentts::args().db += 1000;
+   }
+   else if(currentts::args().truncation == "trapezoidal")
+   {
+      opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
+      opt1D.push_back(QuICC::Transform::Setup::Trapezoidal::id());
+
+      currentts::args().db += 2000;
+   }
+   else
+   {
+      throw std::logic_error("Unknown 1D transform implementation");
+   }
+
    std::multimap<int,int> modes;
    for(int id: currentts::args().params)
    {
       std::string grouper = "transform";
 
-      // Create LoadSplitter, SpatialScheme and generate resolution
-      std::vector<std::size_t> opt1D;
-      if(currentts::args().truncation == "uniform")
-      {
-         opt1D.push_back(QuICC::Transform::Setup::Default::id());
-      }
-      else if(currentts::args().truncation == "triangular")
-      {
-         opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
-         opt1D.push_back(QuICC::Transform::Setup::Triangular::id());
-      }
-      else if(currentts::args().truncation == "trapezoidal")
-      {
-         opt1D.push_back(QuICC::Transform::Setup::GaussianQuadrature::id());
-         opt1D.push_back(QuICC::Transform::Setup::Trapezoidal::id());
-      }
-      else
-      {
-         throw std::logic_error("Unknown 1D transform implementation");
-      }
       auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(id, np, dim, currentts::args().algorithm, grouper, factorList, opt1D);
       auto spRes = best.first;
 
@@ -189,28 +194,20 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
       ss << "_np" << np;
       ss << "_r" << id;
       ss << "_stage" << static_cast<int>(stageId);
-      std::string fname = op + ss.str() + "_full_meta.dat";
+      std::string fname = op + ss.str() + "_meta.dat";
 
       // Check data against reference
       std::string path = refPrefix + fname;
       currentts::collectModes(tRes, modes);
       if(checkRanks)
       {
-         currentts::checkReference(path, tRes);
+         currentts::checkReference(path, sRes, tRes);
       }
 
       if(currentts::args().dumpData)
       {
-         fname = op + ss.str() + "_meta.dat";
          path = dataPrefix + fname;
-         currentts::writeData(path, sRes, tRes, false);
-      }
-
-      if(currentts::args().dumpDetails)
-      {
-         fname = op + ss.str() + "_full_meta.dat";
-         path = dataPrefix + fname;
-         currentts::writeData(path, sRes, tRes, true);
+         currentts::writeData(path, sRes, tRes);
       }
    }
 
@@ -223,7 +220,7 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
       ss << "_np" << 1;
       ss << "_r" << 0;
       ss << "_stage" << static_cast<int>(stageId);
-      std::string fname = op + ss.str() + "_full_meta.dat";
+      std::string fname = op + ss.str() + "_meta.dat";
 
       // Check data against serial reference
       std::string path = refPrefix + fname;

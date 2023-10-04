@@ -12,14 +12,14 @@ set(_tests_templated
   Poly::EnergySLaplR2:<base_t>:reductor
 )
 quicc_set_ulp(_ulp
-  ULP 30 36 30
-  MPULP 11 11 11
+  ULP 30 36 30 32 30 120 120 50
+  MPULP 11 11 11 11 11 11 11 11
 )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -33,7 +33,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -44,14 +44,14 @@ set(_tests
   Poly::RadialPowerDivR1D1R1:<base_t>:reductor
 )
 quicc_set_ulp(_ulp
-  ULP 60 120 120
-  MPULP 11 11 11
+  ULP 60 120 120 120 60 220 120 130
+  MPULP 11 11 11 11 1000 1001 1002 1003
 )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -60,14 +60,14 @@ set(_tests_templated
   Poly::EnergyD1R1:<base_t>:reductor
 )
 quicc_set_ulp(_ulp
-  ULP 30 201 230
-  MPULP 11 11 11
+  ULP 30 201 230 240 30 200 230 240
+  MPULP 11 11 11 11 1000 1001 1002 1003
 )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -79,7 +79,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -88,14 +88,14 @@ set(_tests_templated
   Poly::PowerD1R1:<base_t>:reductor
 )
 quicc_set_ulp(_ulp
-  ULP 30 500 800
-  MPULP 11 11 11
+  ULP 30 500 800 140 30 500 800 120
+  MPULP 11 11 11 11 11 11 11 11
 )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -108,7 +108,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -117,14 +117,14 @@ set(_tests
   Poly::PowerR2:<base_t>:reductor
 )
 quicc_set_ulp(_ulp
-  ULP 30 300 1600
-  MPULP 11 15 70
+  ULP 30 300 1600 140 30 300 1600 120
+  MPULP 11 15 70 11 11 11 11 11
 )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -136,7 +136,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -145,14 +145,14 @@ set(_tests
   Poly::Power:<base_t>:reductor
 )
 quicc_set_ulp(_ulp
-  ULP 30 350 500
-  MPULP 11 30 50
+  ULP 30 350 500 100 30 350 500 60
+  MPULP 11 30 50 11 11 11 11 11
 )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -164,7 +164,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -174,14 +174,14 @@ set(_tests
   Poly::PowerSLaplR2:<base_t>:reductor
 )
 quicc_set_ulp(_ulp
-  ULP 30 100 250
-  MPULP 11 11 11
+  ULP 30 140 250 65 30 140 250 100
+  MPULP 11 11 11 11 11 11 11 11
 )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()
@@ -194,7 +194,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    IDS 0 1 2
+    IDS 0 1 2 3 1000 1001 1002 1003
     ULPS ${_ulp}
   )
 endforeach()

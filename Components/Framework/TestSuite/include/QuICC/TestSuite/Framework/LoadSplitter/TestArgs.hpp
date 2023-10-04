@@ -30,9 +30,6 @@ namespace LoadSplitter {
       /// Write output data to file
       bool dumpData;
 
-      /// Write detailed output data to file
-      bool dumpDetails;
-
       /// operator name
       std::string op;
 
