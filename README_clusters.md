@@ -103,3 +103,32 @@ afterwards you'll only need to activate the python env
 ```bash
 . quicc_env/bin/activate
 ```
+
+# LUMI-C
+
+## Modules
+```sh
+module load LUMI
+module load PrgEnv-gnu
+module load cray-python
+module load cray-fftw
+module load cray-hdf5-parallel
+module load Boost
+module load buildtools
+module load craype-x86-milan
+```
+
+## Compilation
+```sh
+salloc --nodes=1 --account=PROJECT --partition=standard --time=01:00:00
+srun --ntasks=1 cmake .. -GNinja \
+-DCMAKE_CXX_COMPILER=CC \
+-DQUICC_USE_MPI=ON \
+-DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
+-DQUICC_MODEL=MODEL \
+-DQUICC_PROFILE_LEVEL=0 \
+-DQUICC_PROFILE_BACKEND=none \
+-DCMAKE_CXX_FLAGS=-noopenmp
+
+srun --ntasks=1 --cpus-per-task=64 ninja
+```
