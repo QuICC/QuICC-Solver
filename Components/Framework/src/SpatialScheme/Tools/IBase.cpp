@@ -17,6 +17,21 @@ namespace SpatialScheme {
 
 namespace Tools {
 
+   IBase::IBase(const int min)
+      : mcMin(min)
+   {
+   }
+
+   IBase::IBase()
+      : IBase(static_cast<int>(MinimalTruncation::Single))
+   {
+   }
+
+   int IBase::min() const
+   {
+      return this->mcMin;
+   }
+
    void IBase::buildMap(std::multimap<int,int>& modes, const int k0, const int kN, const std::vector<int>& j0, const std::vector<int>& jN, const int c0, const int cN)
    {
       // Counter
@@ -66,7 +81,6 @@ namespace Tools {
       idx3D.reserve(sze);
 
       // Make full list of index in third dimension
-      auto setIt = filter.begin();
       for(auto setIt = filter.cbegin(); setIt != filter.cend(); setIt++)
       {
          idx3D.push_back(*setIt);

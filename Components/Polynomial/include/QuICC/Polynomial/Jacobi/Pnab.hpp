@@ -75,6 +75,10 @@ class Pnab
          {
             ThreeTermRecurrence::P1(ipoly.col(1), alpha, beta, igrid,
                &JacobiBase::P1ab<normalizationTag_t>);
+            if(scale.size() > 0)
+            {
+               ipoly.col(1).array() *= scale.array();
+            }
             evaluator(rOut, ipoly.col(1), 1);
          }
 

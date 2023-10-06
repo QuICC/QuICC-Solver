@@ -12,6 +12,7 @@
 #include <string>
 #include <set>
 #include <sstream>
+#include <functional>
 
 // Project includes
 //
@@ -185,34 +186,51 @@ namespace Worland {
       // Read database file
       ParameterType dbParam = {param.at(0)};
       auto spDbSetup = this->buildSetup(dbParam, type);
-      int dbRows;
+      int dbRows = data.rows();
+      int dbCols = spDbSetup->slowSize();
       if(type == TestType::PROJECTOR && ctype == ContentType::INPUT)
       {
          dbRows = spDbSetup->fastSize(0);
       }
-      else
-      {
-         dbRows = data.rows();
-      }
 
-      TData dbData = TData::Zero(dbRows, spDbSetup->slowSize());
+      TData dbData = TData::Zero(dbRows, dbCols);
       std::string fullname = this->makeFilename(dbParam, this->refRoot(), type, ctype);
       readData(dbData, fullname);
 
       // Create setup
       auto spSetup = this->buildSetup(param, type);
 
+      int nModes = 0;
+      for(int j = 0; j < spSetup->slowSize(); j++)
+      {
+         nModes += spSetup->mult(j);
+      }
+
+      std::function<void(TData&, const TData&, const int, const int)> fillData = [](TData& data, const TData& db, const int idx, const int j_)
+      {
+         const int dataRows = data.rows();
+         data.block(0, idx, dataRows, 1) = db.block(0, j_, dataRows, 1);
+      };
+
+      // Special case for energy reduction
+      if(type == TestType::REDUCTOR && ctype == ContentType::REFERENCE && data.rows() == nModes && data.cols() == 1)
+      {
+         fillData = [](TData& data, const TData& db, const int idx, const int j_)
+         {
+            data(idx,0) = db(0, j_);
+         };
+      }
+
       // Loop over indexes
-      int col = 0;
-      const int dataRows = data.rows();
+      int idx = 0;
       for(int j = 0; j < spSetup->slowSize(); j++)
       {
          int j_ = spSetup->slow(j);
          // Loop over multiplier
          for(int i = 0; i < spSetup->mult(j); i++)
          {
-            data.block(0, col, dataRows, 1) = dbData.block(0, j_, dataRows, 1);
-            col++;
+            fillData(data, dbData, idx, j_);
+            idx++;
          }
       }
    }
@@ -334,14 +352,14 @@ namespace Worland {
          auto spSetup = this->buildSetup(param, type);
 
          // Input data
-         MatrixZ inData(spSetup->specSize(), spSetup->blockSize());
+         MatrixZ inData = MatrixZ::Zero(spSetup->specSize(), spSetup->blockSize());
          this->readFile(inData, param, type, ContentType::INPUT);
 
          TOp op;
          internal::Array igrid;
          this->initOperator(op, igrid, spSetup);
 
-         Matrix outData(op.outRows(), op.outCols());
+         Matrix outData = Matrix::Zero(op.outRows(), op.outCols());
 
          op.transform(outData, inData);
 
@@ -473,33 +491,52 @@ namespace Worland {
       }
       int specN = meta(0);
       int physN = meta(1);
+      int nModes = meta(2);
       auto spSetup = std::make_shared<typename TOp::SetupType>(physN, specN, GridPurpose::SIMULATION);
 
       // Gather indices
-      std::map<int,int> indices;
-      if(param.size() == 1)
+      std::map<int,std::pair<int,int> > indices;
+      assert((meta.size() - nMeta - 2*nModes) % 2 == 0);
+      int nModes2D = 0;
+      int h = nMeta;
+
+      // Create mode list
+      for(int i = 0; i < nModes; i++)
       {
-         for(int i = nMeta; i < meta.size(); i++)
-         {
-            int k_ = static_cast<int>(meta(i));
-            indices[k_]++;
-         }
+         int k_ = static_cast<int>(meta(h));
+         int mult = static_cast<int>(meta(h+1));
+         indices.insert(std::pair(k_,std::make_pair(mult,0)));
+         h += 2;
+         nModes2D += mult;
       }
-      else
+
+      // Check meta data size
+      if(meta.size() - nMeta - 2*nModes - 2*nModes2D != 0)
       {
-         assert((meta.size() - nMeta) % 2 == 0);
-         for(int i = nMeta; i < meta.size(); i += 2)
+         throw std::logic_error("Meta data format is not supported (file: " + fullname + ")");
+      }
+
+      // Set truncation (possibly non-uniform)
+      for(auto& [k_, p]: indices)
+      {
+         // Get 1D truncation of first 2D mode
+         p.second = meta(h+1);
+
+         // Check all 2D modes have same truncation
+         for(int j = 0; j < p.first; j++)
          {
-            int k_ = static_cast<int>(meta(i));
-            int mult = static_cast<int>(meta(i+1));
-            indices.insert(std::pair(k_,mult));
+            if(p.second != meta(h+1))
+            {
+               throw std::logic_error("Meta data format is not supported (file: " + fullname + ")");
+            }
+            h += 2;
          }
       }
 
       // Add indices with multiplier
-      for(const auto& [k_, mult]: indices)
+      for(const auto& [k_, p]: indices)
       {
-         spSetup->addIndex(k_, mult);
+         spSetup->addIndex(k_, p.first, p.second);
       }
       spSetup->lock();
 

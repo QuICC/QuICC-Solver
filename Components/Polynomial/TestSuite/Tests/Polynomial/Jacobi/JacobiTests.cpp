@@ -44,7 +44,7 @@ int main( int argc, char* argv[] )
       | Opt( beta, "jacobi_b" )               // Add jacobi beta option
          ["--jacobi_b"]
          ("Jacobi beta")
-      | Opt( testType, "test type" )                          // Add test type
+      | Opt( testType, "test type" )          // Add test type
          ["--type"]
          ("Test type: matrix, weighted, otf_innner, otf_outer, otf_reduce")
       | Opt( test::args().dumpData )          // Add keep output data option

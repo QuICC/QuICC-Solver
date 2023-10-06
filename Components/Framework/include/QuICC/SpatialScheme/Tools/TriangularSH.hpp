@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "QuICC/SpatialScheme/Tools/IBaseSH.hpp"
+#include "QuICC/SpatialScheme/Tools/TrapezoidalSH.hpp"
 
 namespace QuICC {
 
@@ -23,7 +23,7 @@ namespace Tools {
    /**
     * @brief Implementation of the tools for the triangular + spherical harmonic spatial schemes
     */
-   class TriangularSH: public IBaseSH
+   class TriangularSH: public TrapezoidalSH
    {
       public:
          /**
@@ -32,24 +32,14 @@ namespace Tools {
          TriangularSH() = default;
 
          /**
+          * @brief ctor with explicit min truncation
+          */
+         TriangularSH(const int min);
+
+         /**
           * @brief Default dtor
           */
          ~TriangularSH() = default;
-
-         /**
-          * @brief Compute triangular forward truncation
-          */
-         int truncationFwd(const int nN, const int j, const int k) final;
-
-         /**
-          * @brief Compute triangular backward truncation
-          */
-         int truncationBwd(const int nN, const int j, const int k) final;
-
-         /**
-          * @brief Compute index
-          */
-         int index(const int nN, const int j, const int k) final;
 
          /**
           * @brief Check if chosen resolution is optimal
@@ -57,10 +47,6 @@ namespace Tools {
          bool isOptimal(const int nN, const int maxL) final;
 
       private:
-         /**
-          * @brief Minimal truncation for highest modes
-          */
-         static constexpr const int MIN_TRUNCATION = 3;
    };
 
 } // Tools

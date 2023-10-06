@@ -210,14 +210,16 @@ namespace Equations {
                {
                   corrDim = tRes.template idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
                }
-               for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+               const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
+               for(int j = 0; j < cols; j++)
                {
                   j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                   if(corrDim > 0)
                   {
                      j_ -= corrDim;
                   }
-                  for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
+                  int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+                  for(int i = 0; i < rows; i++)
                   {
                      // Compute correct position
                      l = j_ + i;
@@ -228,11 +230,11 @@ namespace Equations {
                }
             #else
                int k = 0;
-               for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+               const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
+               for(int j = 0; j < cols; j++)
                {
                   // Effective rows in case of non-uniform truncation
                   int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-                  assert( explicitField.slice(matIdx).rows() >= usedRows );
 
                   for(int i = 0; i < usedRows; i++)
                   {
@@ -247,13 +249,13 @@ namespace Equations {
 
             // Apply operator to field
             Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, tmp);
-
-         } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
+         }
+         else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
          {
             // Apply operator to field
             Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(matIdx));
-
-         } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
+         }
+         else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
          {
             // Get mode indexes
             ArrayI mode = tRes.mode(matIdx);
@@ -295,10 +297,12 @@ namespace Equations {
             for(int k = 0; k < tRes.template dim<Dimensions::Data::DAT3D>(); k++)
             {
                k_ = tRes.template idx<Dimensions::Data::DAT3D>(k)*dimK;
-               for(int j = 0; j < explicitField.slice(k).cols(); j++)
+               const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
+               for(int j = 0; j < cols; j++)
                {
                   j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
-                  for(int i = 0; i < explicitField.slice(k).rows(); i++)
+                  const int usedRows = tRes.template dim<Dimensions::Data::DATB1D>(j,k);
+                  for(int i = 0; i < usedRows; i++)
                   {
                      // Compute correct position
                      l = k_ + j_ + i;
@@ -325,7 +329,8 @@ namespace Equations {
          if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
          {
             zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,2);
-         } else
+         }
+         else
          {
             zeroCol = eq.couplingInfo(compId).galerkinShift(matIdx,1);
          }
@@ -335,9 +340,7 @@ namespace Equations {
       // matIdx is the index of the slowest varying direction with a single RHS
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
-         int rows = field.comp(compId).slice(matIdx).rows();
-         assert( rows == tRes.dim<Dimensions::Data::DATB1D>(0, matIdx) );
-         int cols = field.comp(compId).slice(matIdx).cols();
+         int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
 
          //Safety assertion
          assert(start >= 0);
@@ -363,6 +366,7 @@ namespace Equations {
                for(int j = zeroCol; j < cols; j++)
                {
                   j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
                   if(corrDim > 0)
                   {
                      j_ -= corrDim;
@@ -376,11 +380,13 @@ namespace Equations {
                      Datatypes::internal::setScalar(storage, l, field.comp(compId).point(i,j,matIdx));
                   }
                }
-            } else
+            }
+            else
             {
                for(int j = zeroCol; j < cols; j++)
                {
                   j_ = tRes.template idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
+                  const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
                   if(corrDim > 0)
                   {
                      j_ -= corrDim;
@@ -404,7 +410,6 @@ namespace Equations {
                {
                   // Effective rows in case of non-uniform truncation
                   int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-                  assert( rows >= usedRows );
 
                   for(int i = zeroRow; i < usedRows; i++)
                   {
@@ -415,13 +420,13 @@ namespace Equations {
                      k++;
                   }
                }
-            } else
+            }
+            else
             {
                for(int j = zeroCol; j < cols; j++)
                {
                   // Effective rows in case of non-uniform truncation
                   int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-                  assert( rows >= usedRows );
 
                   for(int i = zeroRow; i < usedRows; i++)
                   {
@@ -434,12 +439,11 @@ namespace Equations {
                }
             }
          #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
-
+      }
       // matIdx is the index of the slowest varying direction with multiple RHS
-      } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
+      else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
-         int rows = field.comp(compId).slice(matIdx).rows();
-         int cols = field.comp(compId).slice(matIdx).cols();
+         int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
 
          //Safety assertion
          assert(start >= 0);
@@ -449,16 +453,19 @@ namespace Equations {
          {
             for(int j = zeroCol; j < cols; j++)
             {
+               const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
                for(int i = zeroRow; i < rows; i++)
                {
                   // Copy field value into storage
                   Datatypes::internal::setScalar(storage, i - zeroRow + start, j - zeroCol, field.comp(compId).point(i,j,matIdx));
                }
             }
-         } else
+         }
+         else
          {
             for(int j = zeroCol; j < cols; j++)
             {
+               const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
                for(int i = zeroRow; i < rows; i++)
                {
                   // Copy field value into storage
@@ -466,9 +473,9 @@ namespace Equations {
                }
             }
          }
-
+      }
       // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
-      } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
+      else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
          //Safety assertion
          assert(start >= 0);
@@ -482,7 +489,8 @@ namespace Equations {
          {
             // Filter out complex conjugate modes to be safe
             isUsed = !(mode(3) == 0 && mode(2) > eq.res().sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2);
-         } else
+         }
+         else
          {
             isUsed = true;
          }
@@ -501,7 +509,8 @@ namespace Equations {
                   // increase storage counter
                   k++;
                }
-            } else
+            }
+            else
             {
                for(int i = zeroRow; i < rows; i++)
                {
@@ -513,13 +522,14 @@ namespace Equations {
                }
             }
 
-         } else
+         }
+         else
          {
             setZeroNonlinear(eq, field, compId, storage, matIdx, start);
          }
-
+      }
       // There is a single matrix
-      } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
+      else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
       {
          assert(matIdx == 0);
 
@@ -567,7 +577,8 @@ namespace Equations {
                   }
                }
             }
-         } else
+         }
+         else
          {
             for(int k = 0; k < tRes.template dim<Dimensions::Data::DAT3D>(); k++)
             {
@@ -598,9 +609,7 @@ namespace Equations {
          // matIdx is the index of the slowest varying direction with a single RHS
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
-            int rows = field.comp(compId).slice(matIdx).rows();
-            assert( rows == tRes.dim<Dimensions::Data::DATB1D>(0, matIdx) );
-            int cols = field.comp(compId).slice(matIdx).cols();
+            int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
             int zeroCol;
             if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
@@ -633,6 +642,7 @@ namespace Equations {
                   {
                      j_ -= corrDim;
                   }
+                  const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
                   for(int i = zeroRow; i < rows; i++)
                   {
                      // Compute correct position
@@ -649,7 +659,6 @@ namespace Equations {
                {
                   // Effective rows in case of non-uniform truncation
                   int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-                  assert( rows >= usedRows );
 
                   for(int i = zeroRow; i < usedRows; i++)
                   {
@@ -661,12 +670,11 @@ namespace Equations {
                   }
                }
             #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
-
+         }
          // matIdx is the index of the slowest varying direction with multiple RHS
-         } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
+         else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
          {
-            int rows = field.comp(compId).slice(matIdx).rows();
-            int cols = field.comp(compId).slice(matIdx).cols();
+            int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
             int zeroCol;
             if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
@@ -683,15 +691,16 @@ namespace Equations {
             // Copy data
             for(int j = zeroCol; j < cols; j++)
             {
+               int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
                for(int i = zeroRow; i < rows; i++)
                {
                   // Add source term
                   Datatypes::internal::addScalar(storage, i - zeroRow + start, j - zeroCol, eq.sourceTerm(compId, i, j, matIdx));
                }
             }
-
+         }
          // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
-         } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
+         else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
          {
             //Safety assertion
             assert(start >= 0);
@@ -781,9 +790,7 @@ namespace Equations {
          // matIdx is the index of the slowest varying direction with a single RHS
          if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
          {
-            int rows = field.comp(compId).slice(matIdx).rows();
-            assert( rows == tRes.dim<Dimensions::Data::DATB1D>(0, matIdx) );
-            int cols = field.comp(compId).slice(matIdx).cols();
+            int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
             int zeroCol;
             if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
@@ -816,6 +823,7 @@ namespace Equations {
                   {
                      j_ -= corrDim;
                   }
+                  const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
                   for(int i = zeroRow; i < rows; i++)
                   {
                      // Compute correct position
@@ -832,7 +840,6 @@ namespace Equations {
                {
                   // Effective rows in case of non-uniform truncation
                   int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-                  assert( rows >= usedRows );
 
                   for(int i = zeroRow; i < usedRows; i++)
                   {
@@ -844,12 +851,11 @@ namespace Equations {
                   }
                }
             #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
-
+         }
          // matIdx is the index of the slowest varying direction with multiple RHS
-         } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
+         else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
          {
-            int rows = field.comp(compId).slice(matIdx).rows();
-            int cols = field.comp(compId).slice(matIdx).cols();
+            const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
             int zeroCol;
             if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
@@ -866,15 +872,16 @@ namespace Equations {
             // Copy data
             for(int j = zeroCol; j < cols; j++)
             {
+               const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
                for(int i = zeroRow; i < rows; i++)
                {
                   // Add source term
                   Datatypes::internal::setScalar(storage, i - zeroRow + start, j - zeroCol, eq.boundaryValue(compId, i, j, matIdx));
                }
             }
-
+         }
          // matIdx is the index of a 2D mode, conversion to the two (k,m) mode indexes required
-         } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
+         else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
          {
             //Safety assertion
             assert(start >= 0);
@@ -966,9 +973,7 @@ namespace Equations {
                Datatypes::internal::setScalar(storage, k + start, typename TData::Scalar(0.0));
             }
          #else
-            int rows = field.comp(compId).slice(matIdx).rows();
-            assert( rows == tRes.dim<Dimensions::Data::DATB1D>(0, matIdx) );
-            int cols = field.comp(compId).slice(matIdx).cols();
+            int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
             int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
             int zeroCol;
             if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
@@ -985,7 +990,6 @@ namespace Equations {
             {
                // Effective rows in case of non-uniform truncation
                int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-               assert( rows >= usedRows );
 
                for(int i = zeroRow; i < usedRows; i++)
                {
@@ -1001,8 +1005,7 @@ namespace Equations {
       // matIdx is the index of the slowest varying direction with multiple RHS
       } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
-         int rows = field.comp(compId).slice(matIdx).rows();
-         int cols = field.comp(compId).slice(matIdx).cols();
+         const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
          int zeroRow = eq.couplingInfo(compId).galerkinShift(matIdx,0);
          int zeroCol;
          if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering132))
@@ -1019,6 +1022,7 @@ namespace Equations {
          // Set data to zero
          for(int j = zeroCol; j < cols; j++)
          {
+            const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
             for(int i = zeroRow; i < rows; i++)
             {
                // Set field to zero
@@ -1112,6 +1116,11 @@ namespace Equations {
    template<typename TData, typename TField>
       void IFieldEquation::storeSolutionImpl(TField& field, FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start)
    {
+      if(matIdx == 0)
+      {
+         field.rComp(compId).rData().setConstant(42.42);
+      }
+
       const TData * solution;
       TData tmp;
       int solStart;
@@ -1135,9 +1144,7 @@ namespace Equations {
       const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
       if(this->couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
-         int rows = field.comp(compId).slice(matIdx).rows();
-         assert( rows == tRes.dim<Dimensions::Data::DATB1D>(0, matIdx) );
-         int cols = field.comp(compId).slice(matIdx).cols();
+         int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
 
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             // Add source data
@@ -1158,6 +1165,7 @@ namespace Equations {
                {
                   j_ -= corrDim;
                }
+               const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
                for(int i = 0; i < rows; i++)
                {
                   // Compute correct position
@@ -1176,7 +1184,6 @@ namespace Equations {
             {
                // Effective rows in case of non-uniform truncation
                int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
-               assert( rows >= usedRows );
 
                for(int i = 0; i < usedRows; i++)
                {
@@ -1190,15 +1197,15 @@ namespace Equations {
                }
             }
          #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
-
-      } else if(this->couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
+      }
+      else if(this->couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
-         int rows = field.comp(compId).slice(matIdx).rows();
-         int cols = field.comp(compId).slice(matIdx).cols();
+         const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
 
          // Copy data
          for(int j = 0; j < cols; j++)
          {
+            const int rows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
             for(int i = 0; i < rows; i++)
             {
                // Copy timestep output into field
@@ -1208,7 +1215,8 @@ namespace Equations {
             }
          }
 
-      } else if(this->couplingInfo(compId).indexType() == CouplingIndexType::MODE)
+      }
+      else if(this->couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
          // Get mode indexes
          ArrayI mode = tRes.mode(matIdx);

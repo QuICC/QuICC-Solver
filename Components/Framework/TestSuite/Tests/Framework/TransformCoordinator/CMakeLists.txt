@@ -33,15 +33,17 @@ quicc_set_ulp(_ulp
   MPULP 11 11 13700 8544 8544
   )
 foreach(_test ${_tests})
-  foreach(_alg tubular single1d single2d)
-    quicc_add_test(${_test}
-      COMMAND ${TestExe}
-      KEYWORD Scheme
-      ULPS ${_ulp}
-      IDS 0 1 2 3 4
-      OPTIONS algorithm:${_alg}
-    )
-  endforeach()
+  foreach(_impl1d uniform triangular)
+    foreach(_alg tubular single1d single2d)
+      quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Scheme
+        ULPS ${_ulp}
+        IDS 0 1 2 3 4
+        OPTIONS algorithm:${_alg} truncation:${_impl1d}
+      )
+    endforeach()
+endforeach()
 endforeach()
 
 set(_tests
@@ -59,7 +61,7 @@ foreach(_test ${_tests})
       KEYWORD Scheme
       ULPS ${_ulp}
       IDS 0 1 2 3 4
-      OPTIONS algorithm:${_alg}
+      OPTIONS algorithm:${_alg} truncation:uniform
     )
   endforeach()
 endforeach()

@@ -76,7 +76,7 @@ namespace SparseSM {
           *
           * Backend has no MP, call directly
           */
-         template<class T, typename std::enable_if_t<std::is_same_v<Scalar_t, MHDFloat>, bool> = true>
+         template<class T, typename TScalar = Scalar_t, typename std::enable_if_t<std::is_same_v<TScalar, MHDFloat>, bool> = true>
          void buildOp(T& mat) const
          {
             this->buildOpImpl(mat, this->rows(), this->cols());
@@ -89,7 +89,7 @@ namespace SparseSM {
           *
           * Backend has MP, needs casting before returning the operator
           */
-         template<class T, typename std::enable_if_t<!std::is_same_v<Scalar_t, MHDFloat> &&
+         template<class T, typename TScalar = Scalar_t, typename std::enable_if_t<!std::is_same_v<TScalar, MHDFloat> &&
             std::is_same_v<T, SparseMatrix>, bool> = true>
          void buildOp(T& mat) const
          {
@@ -105,7 +105,7 @@ namespace SparseSM {
           *
           * Backend has MP, needs casting before returning the operator
           */
-         template<class T, typename std::enable_if_t<!std::is_same_v<Scalar_t, MHDFloat> &&
+         template<class T, typename TScalar = Scalar_t, typename std::enable_if_t<!std::is_same_v<TScalar, MHDFloat> &&
             std::is_same_v<T, Matrix>, bool> = true>
          void buildOp(T& mat) const
          {

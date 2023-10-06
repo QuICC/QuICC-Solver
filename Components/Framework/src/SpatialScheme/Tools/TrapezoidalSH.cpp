@@ -17,6 +17,16 @@ namespace SpatialScheme {
 
 namespace Tools {
 
+   TrapezoidalSH::TrapezoidalSH()
+      : IBaseSH(static_cast<int>(MinimalTruncation::Triangular))
+   {
+   }
+
+   TrapezoidalSH::TrapezoidalSH(const int min)
+      : IBaseSH(min)
+   {
+   }
+
    int TrapezoidalSH::truncationFwd(const int nN, const int j, const int k)
    {
       return nN;
@@ -24,7 +34,7 @@ namespace Tools {
 
    int TrapezoidalSH::truncationBwd(const int nN, const int j, const int k)
    {
-      return std::max(nN - k/2, MIN_TRUNCATION);
+      return std::max(nN - k/2, this->min());
    }
 
    int TrapezoidalSH::index(const int i, const int j, const int k)
@@ -34,7 +44,7 @@ namespace Tools {
 
    bool TrapezoidalSH::isOptimal(const int nN, const int maxL)
    {
-      return (this->truncationBwd(nN, 0, maxL) > MIN_TRUNCATION);
+      return (nN - maxL/2 >= this->min());
    }
 
 } // Tools

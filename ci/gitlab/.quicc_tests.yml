@@ -7,7 +7,7 @@
     - cd /QuICC.src/build
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Memory
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^View
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R PolynomialQuadratureTests_
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Polynomial
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Jacobi
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_integrator"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_projector"

@@ -18,15 +18,15 @@ set(_tests_templated_templated
   Poly::R1_Zero:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 16 7 115 80 78
-  MPULP 3 2 2 2 2
+  ULP 16 7 115 80 78 16 7 115 80 78
+  MPULP 3 2 2 2 2 3 2 2 2 2
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
-    IDS 0 1 2 3 4
+    IDS 0 1 2 3 4 1000 1001 1002 1003 1004
   )
 endforeach()
 
@@ -51,15 +51,15 @@ set(_tests_templated
   Poly::I2_Zero:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 13 20 170 59 36
-  MPULP 1 4 8 4 3
+  ULP 13 20 170 59 36 18 20 170 59 120
+  MPULP 1 4 8 4 3 2 8 26 10 5
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
-    IDS 0 1 2 3 4
+    IDS 0 1 2 3 4 1000 1001 1002 1003 1004
   )
 endforeach()
 
@@ -167,15 +167,15 @@ set(_tests_templated
   Poly::P:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 111 346 1331 2240 12000
-  MPULP 2 2 3 4 6
+  ULP 111 346 1331 2240 12000 111 346 1331 3500 12000
+  MPULP 8 20 12 18 20 2 2 3 4 6
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
-    IDS 204 205 206 207 208
+    IDS 104 105 106 107 108 1104 1105 1106 1107 1108
   )
 endforeach()
 
@@ -183,15 +183,15 @@ set(_tests_templated
   Poly::I2:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 68 150 476 1176
-  MPULP 8 6 8 9
+  ULP 68 150 476 1176 180 180 476 1176
+  MPULP 8 6 8 9 8 6 8 9
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
-    IDS 204 205 206 207
+    IDS 104 105 106 107 1104 1105 1106 1107
   )
 endforeach()
 
@@ -329,8 +329,8 @@ foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    ULPS 6 6 9 12 21
-    IDS 204 205 206 207 208
+    ULPS 8 16 14 19 21
+    IDS 104 105 106 107 108
   )
 endforeach()
 
@@ -346,7 +346,7 @@ foreach(_test ${_tests_templated})
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
-    IDS 204 205 206 207
+    IDS 104 105 106 107
   )
 endforeach()
 

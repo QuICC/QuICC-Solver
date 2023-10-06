@@ -54,6 +54,9 @@ namespace TCoord {
       /// Comm grouping algorithm
       std::string grouper;
 
+      /// Truncation scheme
+      std::string truncation;
+
       /// ID of the tests
       std::vector<int> params;
 

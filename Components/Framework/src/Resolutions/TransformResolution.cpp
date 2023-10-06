@@ -153,7 +153,7 @@ namespace QuICC {
       ArrayI mode(4); // 0 -> index 3D, 1 -> index 2D, 2 -> mode 3D, 3 -> mode 2D
 
       int current = 0;
-      for(mode(0) = 0; mode(0) < this->mIdx3D.size(); ++mode(0))
+      for(mode(0) = 0; static_cast<std::size_t>(mode(0)) < this->mIdx3D.size(); ++mode(0))
       {
          mode(1) = i-current;
          if(static_cast<std::size_t>(mode(1)) < this->mIdx2D.at(mode(0)).size())

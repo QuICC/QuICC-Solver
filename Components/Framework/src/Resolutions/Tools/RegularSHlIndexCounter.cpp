@@ -58,12 +58,12 @@ namespace QuICC {
       return oDims;
    }
 
-   void RegularSHlIndexCounter::computeOffsets(std::vector<RegularSHlIndexCounter::OffsetType>& blocks, std::vector<std::vector<RegularSHlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const
+   void RegularSHlIndexCounter::computeOffsets(std::vector<std::vector<RegularSHlIndexCounter::OffsetType>>& blocks, std::vector<std::vector<RegularSHlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const
    {
       this->computeOffsets(blocks, offsets, spaceId, this->mspSim);
    }
 
-   void RegularSHlIndexCounter::computeOffsets(std::vector<RegularSHlIndexCounter::OffsetType>& blocks, std::vector<std::vector<RegularSHlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
+   void RegularSHlIndexCounter::computeOffsets(std::vector<std::vector<RegularSHlIndexCounter::OffsetType>>& blocks, std::vector<std::vector<RegularSHlIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
    {
       Dimensions::Simulation::Id simId;
       
@@ -110,7 +110,9 @@ namespace QuICC {
                l0 = tRes.idx<Dimensions::Data::DAT3D>(iL);
 
                // 1D blocks
-               blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, l_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               std::vector<RegularSHlIndexCounter::OffsetType> blk;
+               blk.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, l_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               blocks.push_back(blk);
             }
          }
       }
@@ -141,7 +143,9 @@ namespace QuICC {
                offsets.push_back(offV);
 
                // 1D blocks
-               blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, i_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               std::vector<RegularSHlIndexCounter::OffsetType> blk;
+               blk.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, i_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               blocks.push_back(blk);
             }
          }
       }

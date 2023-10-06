@@ -9,6 +9,7 @@
 //
 #include <variant>
 #include <type_traits>
+#include <cstdint>
 
 // Project includes
 //

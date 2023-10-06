@@ -389,6 +389,7 @@ namespace Equations {
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
          typename Eigen::Matrix<T,Eigen::Dynamic,1>  tmp(op->cols());
+         const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             // Initialise storage to zero
             tmp.setZero();
@@ -402,14 +403,15 @@ namespace Equations {
             {
                corrDim = tRes.idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
             }
-            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+            for(int j = 0; j < cols; j++)
             {
                j_ = tRes.idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                if(corrDim > 0)
                {
                   j_ -= corrDim;
                }
-               for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
+               const int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+               for(int i = 0; i < useRows; i++)
                {
                   // Compute correct position
                   l = j_ + i;
@@ -420,9 +422,12 @@ namespace Equations {
             }
          #else
             int k = 0;
-            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+            for(int j = 0; j < cols; j++)
             {
-               for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
+               // Effective rows in case of non-uniform truncation
+               int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+
+               for(int i = 0; i < usedRows; i++)
                {
                   // Copy slice into flat array
                   tmp(k) = explicitField.point(i,j,matIdx);
@@ -479,10 +484,12 @@ namespace Equations {
          for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
          {
             k_ = tRes.idx<Dimensions::Data::DAT3D>(k)*dimK;
-            for(int j = 0; j < explicitField.slice(k).cols(); j++)
+            const int cols = tRes.dim<Dimensions::Data::DAT2D>(k);
+            for(int j = 0; j < cols; j++)
             {
                j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
-               for(int i = 0; i < explicitField.slice(k).rows(); i++)
+               const int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, k);
+               for(int i = 0; i < usedRows; i++)
                {
                   // Compute correct position
                   l = k_ + j_ + i;

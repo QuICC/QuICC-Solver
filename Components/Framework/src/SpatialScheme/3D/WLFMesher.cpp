@@ -59,7 +59,7 @@ namespace SpatialScheme {
          // Check if resolution is compatible with triangular truncation
          if(!t.isOptimal(N + 1,L))
          {
-            throw std::logic_error("Triangular truncation requires L+1 = 2(N-1)");
+            throw std::logic_error("Triangular truncation requires N - L/2 = " + std::to_string(t.min()-1));
          }
 
          // radial spectral resolution
@@ -84,7 +84,7 @@ namespace SpatialScheme {
          // Check if resolution is compatible with trapezoidal truncation
          if(!t.isOptimal(N + 1,L))
          {
-            throw std::logic_error("Trapezoidal truncation requires L+1 < 2(N-1)");
+            throw std::logic_error("Trapezoidal truncation requires N - L/2 >= " + std::to_string(t.min()-1));
          }
 
          // radial spectral resolution
