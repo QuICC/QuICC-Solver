@@ -1,6 +1,6 @@
 ---
 Language: Cpp
-AccessModifierOffset: -4
+AccessModifierOffset: -3
 AlignAfterOpenBracket: DontAlign
 AllowAllArgumentsOnNextLine: false
 AllowShortBlocksOnASingleLine: Empty
@@ -22,7 +22,7 @@ BraceWrapping:
 BreakBeforeBraces: Custom
 BreakConstructorInitializers: AfterColon
 ColumnLimit:     80
-ContinuationIndentWidth: 4
+ContinuationIndentWidth: 3
 IncludeBlocks: Regroup
 IncludeIsMainRegex: '(Tests)?$'
 IncludeIsMainSourceRegex: '(.*\/)*[-]'
@@ -44,3 +44,4 @@ SpaceBeforeParens: ControlStatements
 SpacesInParentheses: false
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeRangeBasedForLoopColon: false
+PackConstructorInitializers: NextLine
