@@ -4,7 +4,7 @@
  */
 
 /// Set the path to the simulation implementation
-#define MODELPATH QuICC/Model/QUICC_RUNSIM_PATH/PhysicalModel.hpp
+#define MODELPATH Model/QUICC_RUNSIM_PATH/PhysicalModel.hpp
 /// Define small macros allowing to convert to string
 #define MAKE_STR_X( _P ) # _P
 /// Define small macros allowing to convert to string
