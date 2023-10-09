@@ -33,7 +33,7 @@ IncludeCategories:
   - Regex:           '^<.*>'
     Priority:        -1
     SortPriority:    -1
-IndentWidth: 4
+IndentWidth: 3
 MaxEmptyLinesToKeep: 2
 NamespaceIndentation: None
 FixNamespaceComments: true
