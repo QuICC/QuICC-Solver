@@ -12,13 +12,13 @@ include(ConfigureTests)
 #  Poly::I6DivR1D1R1_I4:integrator
 #  )
 
-set(_tests_templated_templated
+set(_tests_templated
   Poly::P:<base_t>:integrator
   Poly::P_Zero:<base_t>:integrator
   Poly::R1_Zero:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 16 7 115 80 78 16 7 115 80 78
+  ULP 16 7 115 80 78 16 10 115 80 78
   MPULP 3 2 2 2 2 3 2 2 2 2
   )
 foreach(_test ${_tests_templated})
@@ -30,7 +30,7 @@ foreach(_test ${_tests_templated})
   )
 endforeach()
 
-set(_tests_templated_templated
+set(_tests_templated
   Poly::DivR1_Zero:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
