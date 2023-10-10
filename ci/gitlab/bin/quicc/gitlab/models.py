@@ -123,6 +123,11 @@ configurations = {  'BoussinesqSphereDynamo': {
                             'kkgpu' : [variant()],
                             'perf' : [variant()]
                         }
+                    },
+                    'BoussinesqPlaneRBC': {
+                        'Explicit' : {
+                            'serial' : [variant('build_only', 1)]
+                        }
                     }
                 }
 
@@ -137,7 +142,8 @@ def default_configs(pipeline):
                         if v.tag == 'none':
                             continue
                         elif v.tag == 'build_only':
-                            confs.append(config(model, model_tag,))
+                            confs.append(config(model, model_tag, False,
+                                default_variants[pipe_tag].tasks, default_variants[pipe_tag].tag))
                         elif v.tag == 'default':
                             confs.append(config(model, model_tag, True,
                                 default_variants[pipe_tag].tasks, default_variants[pipe_tag].tag))
