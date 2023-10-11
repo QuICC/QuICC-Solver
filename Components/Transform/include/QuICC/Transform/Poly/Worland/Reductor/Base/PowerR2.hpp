@@ -54,7 +54,7 @@ namespace Reductor {
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, Matrix& eop, const internal::Array& igrid, const internal::Array& iweights, const int i) const override;
+         virtual void makeOperator(Matrix& op, Matrix& eop, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const override;
    };
 
 }

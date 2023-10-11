@@ -52,7 +52,7 @@ namespace Projector {
       ::QuICC::SparseSM::Chebyshev::LinearMap::Y2 spasmY2(this->mspSetup->specSize()+2,this->mspSetup->specSize()+2, this->mspSetup->lower(), this->mspSetup->upper());
       this->mBackend.solver().setSpectralOperator(spasmY2.mat(), 1);
 
-      internal::Array igrid, iweights;
+      Internal::Array igrid, iweights;
       Polynomial::Quadrature::ChebyshevRule quad;
       quad.computeQuadrature(igrid, iweights, this->mspSetup->fwdSize(), this->mspSetup->lower(), this->mspSetup->upper());
       this->mBackend.setScaler(igrid.array().pow(-2).cast<MHDFloat>().matrix());

@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/TestSuite/SparseSM/Io.hpp"
 
 namespace QuICC {

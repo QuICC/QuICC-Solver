@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Y2.cpp
  * @brief Source of the implementation of the Y^2 sparse operator
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Y2.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -31,7 +32,7 @@ namespace LinearMap {
 
    Y2::ACoeff_t Y2::d_2(const ACoeff_t& n) const
    {
-      return ACoeff_t::Constant(n.size(), precision::pow(this->a(),2)/4.0);
+      return ACoeff_t::Constant(n.size(), Internal::Math::pow(this->a(),2)/4.0);
    }
 
    Y2::ACoeff_t Y2::d_1(const ACoeff_t& n) const
@@ -41,7 +42,7 @@ namespace LinearMap {
 
    Y2::ACoeff_t Y2::d0(const ACoeff_t& n) const
    {
-      return ACoeff_t::Constant(n.size(), (precision::pow(this->a(),2) + 2.0*precision::pow(this->b(),2))/2.0);
+      return ACoeff_t::Constant(n.size(), (Internal::Math::pow(this->a(),2) + 2.0*Internal::Math::pow(this->b(),2))/2.0);
    }
 
    Y2::ACoeff_t Y2::d1(const ACoeff_t& n) const

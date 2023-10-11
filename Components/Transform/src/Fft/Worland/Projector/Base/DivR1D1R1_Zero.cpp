@@ -10,7 +10,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Fft/Worland/Projector/Base/DivR1D1R1_Zero.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 
 namespace QuICC {
 

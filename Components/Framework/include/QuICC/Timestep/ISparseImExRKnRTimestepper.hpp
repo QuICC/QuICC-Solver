@@ -122,11 +122,11 @@ namespace Timestep {
    {
       for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
       {
-         internal::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
+         details::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
 
          if(this->mspScheme->useEmbedded())
          {
-            internal::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
+            details::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
       }
    }

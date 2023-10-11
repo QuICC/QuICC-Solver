@@ -66,7 +66,7 @@ namespace Worland {
           *
           * @param spSetup   Shared setup object for the transform
           */
-         void init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const override;
+         void init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const override;
 
          /**
           * @brief Compute transform

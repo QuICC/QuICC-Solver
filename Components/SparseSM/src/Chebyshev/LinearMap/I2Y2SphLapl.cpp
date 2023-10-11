@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2Y2SphLapl.cpp
  * @brief Source of the implementation of the I^2 Y^2 spherical laplacian sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y2SphLapl.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 

@@ -31,7 +31,7 @@ namespace Reductor {
       this->setProfileTag();
    }
 
-   void RadialPowerDivR1<base_t>::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void RadialPowerDivR1<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
 
@@ -46,7 +46,7 @@ namespace Reductor {
       {
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::r_1Wnl wnl;
-         wnl.compute<MHDFloat>(op, nPoly, l, igrid, internal::Array(), ev::Set());
+         wnl.compute<MHDFloat>(op, nPoly, l, igrid, Internal::Array(), ev::Set());
       }
    }
 
@@ -66,7 +66,7 @@ namespace Reductor {
             namespace ev = Polynomial::Worland::Evaluator;
             Polynomial::Worland::r_1Wnl wnl;
             MatrixZ tmp(this->mGrid.size(), in.cols());
-            wnl.compute<MHDComplex>(tmp, nPoly, l, this->mGrid, internal::Array(), ev::OuterProduct(in));
+            wnl.compute<MHDComplex>(tmp, nPoly, l, this->mGrid, Internal::Array(), ev::OuterProduct(in));
             rOut = tmp.array().abs2();
          }
       #endif //defined QUICC_WORLAND_REDUIMPL_MATRIX

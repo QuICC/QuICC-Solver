@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Value.cpp
  * @brief Source of the implementation of boundary value
  */
@@ -9,6 +9,7 @@
 // Project include
 //
 #include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -101,7 +102,7 @@ namespace Boundary {
       // value depends only on alpha and n
       return this->valueLegendre(maxN, k);
    }
- 
+
 } // Boundary
 } // Worland
 } // Polynomial

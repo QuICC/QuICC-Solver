@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/Quadrature/PrueferAlgorithm.hpp"
 
 namespace QuICC {
@@ -32,12 +32,12 @@ namespace Quadrature {
          /**
           * @brief Empty constructor
           */
-         JacobiRule(const internal::MHDFloat alpha, const internal::MHDFloat beta);
+         JacobiRule(const Internal::MHDFloat alpha, const Internal::MHDFloat beta);
 
          /**
           * @brief Compute the quadrature
           */
-         void computeQuadrature(internal::Array& igrid, internal::Array& iweights, const int size);
+         void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size);
 
       protected:
          /**
@@ -46,7 +46,7 @@ namespace Quadrature {
           * @param xi   Grid value
           * @param diff Order of the derivative
           */
-         virtual internal::MHDLong   p(const internal::MHDLong xi, const int diff);
+         virtual Internal::MHDLong   p(const Internal::MHDLong xi, const int diff);
 
          /**
           * @brief Get q polynomial
@@ -54,7 +54,7 @@ namespace Quadrature {
           * @param xi   Grid value
           * @param diff Order of the derivative
           */
-         virtual internal::MHDLong   q(const internal::MHDLong xi, const int diff);
+         virtual Internal::MHDLong   q(const Internal::MHDLong xi, const int diff);
 
          /**
           * @brief Get r polynomial
@@ -62,35 +62,35 @@ namespace Quadrature {
           * @param size Size of the grid
           * @param diff Order of the derivative
           */
-         virtual internal::MHDLong   r(const int n, const int diff);
+         virtual Internal::MHDLong   r(const int n, const int diff);
 
          /**
           * @brief Compute polynomial value
           */
-         virtual internal::MHDLong   u(const internal::MHDLong x, const int n);
+         virtual Internal::MHDLong   u(const Internal::MHDLong x, const int n);
 
          /**
           * @brief Compute first derivative value
           */
-         virtual internal::MHDLong  du(const internal::MHDLong x, const int n);
+         virtual Internal::MHDLong  du(const Internal::MHDLong x, const int n);
 
          /**
           * @brief Estimate first zero
           *
           * Theorem 1 from D. Dimitrov, G. Nikolov, Sharp bounds for the extreme zeros of classical orthogonal polynomials, Journal of Approximation Theory, 2010
           */
-         internal::MHDLong  estimateFirstZero(const int n);
+         Internal::MHDLong  estimateFirstZero(const int n);
 
       private:
          /**
           * @brief Alpha
           */
-         internal::MHDFloat mAlpha;
+         Internal::MHDFloat mAlpha;
 
          /**
           * @brief Beta
           */
-         internal::MHDFloat mBeta;
+         Internal::MHDFloat mBeta;
    };
 
 }

@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/IChebyshevOperator.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 
 namespace QuICC {
 

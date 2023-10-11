@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2Y1D1Y1.cpp
  * @brief Source of the implementation of the I^2 Y D Y sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y1D1Y1.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -31,12 +32,12 @@ namespace LinearMap {
 
    I2Y1D1Y1::ACoeff_t I2Y1D1Y1::d_3(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,3)*(n - 2.0)/(n*(n - 1.0));
+      return Internal::Math::pow(this->a()/2.0,3)*(n - 2.0)/(n*(n - 1.0));
    }
 
    I2Y1D1Y1::ACoeff_t I2Y1D1Y1::d_2(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,2)*this->b()*(2.0*n - 3.0)/(n*(n - 1.0));
+      return Internal::Math::pow(this->a()/2.0,2)*this->b()*(2.0*n - 3.0)/(n*(n - 1.0));
    }
 
    I2Y1D1Y1::ACoeff_t I2Y1D1Y1::d_1(const ACoeff_t& n) const
@@ -67,7 +68,7 @@ namespace LinearMap {
 
    I2Y1D1Y1::ACoeff_t I2Y1D1Y1::d3(const ACoeff_t& n) const
    {
-      return -precision::pow(this->a(),3)*(n + 2.0)/(8.0*n*(n + 1.0));
+      return -Internal::Math::pow(this->a(),3)*(n + 2.0)/(8.0*n*(n + 1.0));
    }
 
    void I2Y1D1Y1::buildTriplets(TripletList_t& list) const

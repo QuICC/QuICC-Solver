@@ -20,10 +20,10 @@ std::pair<bool,T> checkNormal(const T data, const T ref, T refMod = 1.0)
     auto tol = maxUlp * epsilon;
 
     bool isEqual = false;
-    auto diff = precision::abs(data-ref);
+    auto diff = Internal::Math::abs(data-ref);
     if(ref != 0.0)
     {
-        refMod = precision::abs(ref);
+        refMod = Internal::Math::abs(ref);
     }
 
     if(diff < tol)
@@ -50,7 +50,7 @@ constexpr uint digits = 16;
 template<int N>
 struct refHolder
 {
-    using type = QuICC::internal::MHDFloat;
+    using type = QuICC::Internal::MHDFloat;
     type a, b;
     std::array<type, N> res;
 };
@@ -273,7 +273,7 @@ TEST_CASE("Normalization Factor", "[NormFact]")
 {
     struct refHolderN
     {
-        using type = QuICC::internal::MHDFloat;
+        using type = QuICC::Internal::MHDFloat;
         type n, a, b, res;
     };
 

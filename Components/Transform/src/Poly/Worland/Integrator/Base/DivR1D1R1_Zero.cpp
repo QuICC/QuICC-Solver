@@ -32,7 +32,7 @@ namespace Integrator {
       this->setProfileTag();
    }
 
-   void DivR1D1R1_Zero<base_t>::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void DivR1D1R1_Zero<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
 
@@ -51,7 +51,7 @@ namespace Integrator {
          int nN = nPoly + 0;
          this->checkGridSize(nN, l, igrid.size());
 
-         internal::Matrix tOp(igrid.size(), nN);
+         Internal::Matrix tOp(igrid.size(), nN);
 #if 1
          // **************************************************
          // Formulation without explicit grid:
@@ -61,16 +61,16 @@ namespace Integrator {
          int n_in = nN + 1;
          this->checkGridSize(n_in, l_in, igrid.size());
 
-         internal::Matrix opA(igrid.size(), n_in);
-         wnl.compute<internal::MHDFloat>(opA, n_in, l_in, igrid, iweights, ev::Set());
+         Internal::Matrix opA(igrid.size(), n_in);
+         wnl.compute<Internal::MHDFloat>(opA, n_in, l_in, igrid, iweights, ev::Set());
 
-         internal::Matrix opB(igrid.size(), n_in);
+         Internal::Matrix opB(igrid.size(), n_in);
          Polynomial::Worland::r_1drWnl r_1drWnl;
-         r_1drWnl.compute<internal::MHDFloat>(opB, n_in, l_in, igrid, internal::Array(), ev::Set());
+         r_1drWnl.compute<Internal::MHDFloat>(opB, n_in, l_in, igrid, Internal::Array(), ev::Set());
 
-         internal::Matrix opC(igrid.size(), nN);
+         Internal::Matrix opC(igrid.size(), nN);
          Polynomial::Worland::Wnl wnlB;
-         wnlB.compute<internal::MHDFloat>(opC, nN, l_out, igrid, iweights, ev::Set());
+         wnlB.compute<Internal::MHDFloat>(opC, nN, l_out, igrid, iweights, ev::Set());
 
          tOp = (opC.transpose()*opB*opA.transpose()).transpose();
 #else
@@ -78,15 +78,15 @@ namespace Integrator {
          // Alternative formulation of operators:
          // This version uses explicit radial factor to work on l polynomials
 
-         internal::Matrix opA(igrid.size(), nN);
-         wnl.compute<internal::MHDFloat>(opA, nN, l, igrid, iweights.array()*igrid.array(), ev::Set());
+         Internal::Matrix opA(igrid.size(), nN);
+         wnl.compute<Internal::MHDFloat>(opA, nN, l, igrid, iweights.array()*igrid.array(), ev::Set());
 
-         internal::Matrix opB(igrid.size(), nN);
+         Internal::Matrix opB(igrid.size(), nN);
          Polynomial::Worland::dWnl dWnl;
-         dWnl.compute<internal::MHDFloat>(opB, nN, l, igrid, internal::Array(), ev::Set());
+         dWnl.compute<Internal::MHDFloat>(opB, nN, l, igrid, Internal::Array(), ev::Set());
 
-         internal::Matrix opC(igrid.size(), nN);
-         wnl.compute<internal::MHDFloat>(opC, nN, l, igrid, iweights.array()*igrid.array().pow(-1), ev::Set());
+         Internal::Matrix opC(igrid.size(), nN);
+         wnl.compute<Internal::MHDFloat>(opC, nN, l, igrid, iweights.array()*igrid.array().pow(-1), ev::Set());
 
          tOp = (opC.transpose()*opB*opA.transpose()).transpose();
 #endif
@@ -118,7 +118,7 @@ namespace Integrator {
 
             MatrixZ tmp(in.rows(), in.cols());
             Polynomial::Worland::r_1drWnl r_1drWnl;
-            r_1drWnl.compute<MHDComplex>(tmp, nPoly, l_in, this->mGrid, internal::Array(), ev::OuterProduct<MHDComplex>(rOut));
+            r_1drWnl.compute<MHDComplex>(tmp, nPoly, l_in, this->mGrid, Internal::Array(), ev::OuterProduct<MHDComplex>(rOut));
 
             wnl.compute<MHDComplex>(rOut, nPoly, l, this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(tmp));
          }

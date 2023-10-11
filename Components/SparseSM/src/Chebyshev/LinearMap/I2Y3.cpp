@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2Y3.cpp
  * @brief Source of the implementation of the I^2 Y^3 sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y3.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -27,31 +28,31 @@ namespace LinearMap {
 
    I2Y3::ACoeff_t I2Y3::d_5(const ACoeff_t& n) const
    {
-      const auto c = precision::pow(this->a()/2.0,5);
+      const auto c = Internal::Math::pow(this->a()/2.0,5);
       return c/(n*(n - 1.0));
    }
 
    I2Y3::ACoeff_t I2Y3::d_4(const ACoeff_t& n) const
    {
-      const auto& b1 = this->b(); 
-      const auto c = precision::pow(this->a()/2.0,4);
+      const auto& b1 = this->b();
+      const auto c = Internal::Math::pow(this->a()/2.0,4);
       return c*3.0*b1/(n*(n - 1.0));
    }
 
    I2Y3::ACoeff_t I2Y3::d_3(const ACoeff_t& n) const
    {
-      const auto a2 = this->a()*this->a(); 
-      const auto b2 = this->b()*this->b(); 
-      const auto c = precision::pow(this->a()/2.0,3);
+      const auto a2 = this->a()*this->a();
+      const auto b2 = this->b()*this->b();
+      const auto c = Internal::Math::pow(this->a()/2.0,3);
       return c*(a2*(n + 3.0) + 12.0*b2*(n + 1.0))/(4.0*n*(n - 1.0)*(n + 1.0));
    }
 
    I2Y3::ACoeff_t I2Y3::d_2(const ACoeff_t& n) const
    {
-      const auto& b1 = this->b(); 
+      const auto& b1 = this->b();
       const auto a2 = this->a()*this->a();
       const auto b2 = this->b()*this->b();
-      const auto c = precision::pow(this->a()/2.0, 2);
+      const auto c = Internal::Math::pow(this->a()/2.0, 2);
       return c*b1*(3.0*a2 + 2.0*b2*(n + 1.0))/(2.0*n*(n - 1.0)*(n + 1.0));
    }
 
@@ -86,22 +87,22 @@ namespace LinearMap {
 
    I2Y3::ACoeff_t I2Y3::d3(const ACoeff_t& n) const
    {
-      const auto a2 = this->a()*this->a(); 
-      const auto b2 = this->b()*this->b(); 
-      const auto c = precision::pow(this->a()/2.0,3);
+      const auto a2 = this->a()*this->a();
+      const auto b2 = this->b()*this->b();
+      const auto c = Internal::Math::pow(this->a()/2.0,3);
       return c*(a2*(n - 3.0) + 12.0*b2*(n - 1.0))/(4.0*n*(n - 1.0)*(n + 1.0));
    }
 
    I2Y3::ACoeff_t I2Y3::d4(const ACoeff_t& n) const
    {
       const auto& b1 = this->b();
-      const auto c = precision::pow(this->a()/2.0,4);
+      const auto c = Internal::Math::pow(this->a()/2.0,4);
       return c*3.0*b1/(n*(n + 1.0));
    }
 
    I2Y3::ACoeff_t I2Y3::d5(const ACoeff_t& n) const
    {
-      const auto c = precision::pow(this->a()/2.0,5);
+      const auto c = Internal::Math::pow(this->a()/2.0,5);
       return c/(n*(n + 1.0));
    }
 

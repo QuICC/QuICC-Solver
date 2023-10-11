@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4Y1.cpp
  * @brief Source of the implementation of the I^4 Y sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y1.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -27,57 +28,57 @@ namespace LinearMap {
 
    I4Y1::ACoeff_t I4Y1::d_5(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,5)/(n*(n - 3.0)*(n - 2.0)*(n - 1.0));
+      return Internal::Math::pow(this->a()/2.0,5)/(n*(n - 3.0)*(n - 2.0)*(n - 1.0));
    }
 
    I4Y1::ACoeff_t I4Y1::d_4(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,4)*this->b()/(n*(n - 3.0)*(n - 2.0)*(n - 1.0));
+      return Internal::Math::pow(this->a()/2.0,4)*this->b()/(n*(n - 3.0)*(n - 2.0)*(n - 1.0));
    }
 
    I4Y1::ACoeff_t I4Y1::d_3(const ACoeff_t& n) const
    {
-      return -3.0*precision::pow(this->a()/2.0,5)/(n*(n - 2.0)*(n - 1.0)*(n + 1.0));
+      return -3.0*Internal::Math::pow(this->a()/2.0,5)/(n*(n - 2.0)*(n - 1.0)*(n + 1.0));
    }
 
    I4Y1::ACoeff_t I4Y1::d_2(const ACoeff_t& n) const
    {
-      return -precision::pow(this->a(),4)*this->b()/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0));
+      return -Internal::Math::pow(this->a(),4)*this->b()/(4.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0));
    }
 
    I4Y1::ACoeff_t I4Y1::d_1(const ACoeff_t& n) const
    {
-      return 2.0*precision::pow(this->a()/2.0,5)*(n - 8.0)/(n*(n - 3.0)*(n - 2.0)*(n + 1.0)*(n + 2.0));
+      return 2.0*Internal::Math::pow(this->a()/2.0,5)*(n - 8.0)/(n*(n - 3.0)*(n - 2.0)*(n + 1.0)*(n + 2.0));
    }
 
    I4Y1::ACoeff_t I4Y1::d0(const ACoeff_t& n) const
    {
-      return 6.0*precision::pow(this->a()/2.0,4)*this->b()/((n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0));
+      return 6.0*Internal::Math::pow(this->a()/2.0,4)*this->b()/((n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0));
    }
 
    I4Y1::ACoeff_t I4Y1::d1(const ACoeff_t& n) const
    {
-      return 2.0*precision::pow(this->a()/2.0,5)*(n + 8.0)/(n*(n - 2.0)*(n - 1.0)*(n + 2.0)*(n + 3.0));
+      return 2.0*Internal::Math::pow(this->a()/2.0,5)*(n + 8.0)/(n*(n - 2.0)*(n - 1.0)*(n + 2.0)*(n + 3.0));
    }
 
    I4Y1::ACoeff_t I4Y1::d2(const ACoeff_t& n) const
    {
-      return -4.0*precision::pow(this->a()/2.0,4)*this->b()/(n*(n - 1.0)*(n + 1.0)*(n + 3.0));
+      return -4.0*Internal::Math::pow(this->a()/2.0,4)*this->b()/(n*(n - 1.0)*(n + 1.0)*(n + 3.0));
    }
 
    I4Y1::ACoeff_t I4Y1::d3(const ACoeff_t& n) const
    {
-      return -3.0*precision::pow(this->a()/2.0,5)/(n*(n - 1.0)*(n + 1.0)*(n + 2.0));
+      return -3.0*Internal::Math::pow(this->a()/2.0,5)/(n*(n - 1.0)*(n + 1.0)*(n + 2.0));
    }
 
    I4Y1::ACoeff_t I4Y1::d4(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,4)*this->b()/(n*(n + 1.0)*(n + 2.0)*(n + 3.0));
+      return Internal::Math::pow(this->a()/2.0,4)*this->b()/(n*(n + 1.0)*(n + 2.0)*(n + 3.0));
    }
 
    I4Y1::ACoeff_t I4Y1::d5(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,5)/(n*(n + 1.0)*(n + 2.0)*(n + 3.0));
+      return Internal::Math::pow(this->a()/2.0,5)/(n*(n + 1.0)*(n + 2.0)*(n + 3.0));
    }
 
    void I4Y1::buildTriplets(TripletList_t& list) const

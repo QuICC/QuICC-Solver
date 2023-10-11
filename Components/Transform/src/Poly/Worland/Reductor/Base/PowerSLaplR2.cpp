@@ -32,7 +32,7 @@ namespace Reductor {
       this->setProfileTag();
    }
 
-   void PowerSLaplR2<base_t>::makeOperator(Matrix& op, Matrix& eop, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void PowerSLaplR2<base_t>::makeOperator(Matrix& op, Matrix& eop, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
       int nPoly = this->mspSetup->fastSize(i);
@@ -41,7 +41,7 @@ namespace Reductor {
       op.resize(igrid.size(), nPoly);
       namespace ev = Polynomial::Worland::Evaluator;
       Polynomial::Worland::slaplWnl bwnl;
-      bwnl.compute<MHDFloat>(op, nPoly, l, igrid, internal::Array(), ev::Set());
+      bwnl.compute<MHDFloat>(op, nPoly, l, igrid, Internal::Array(), ev::Set());
 
       Polynomial::Worland::Wnl fwnl(Polynomial::Worland::Wnl::ALPHA_SPHENERGY,Polynomial::Worland::Wnl::DBETA_SPHENERGY);
 
@@ -60,7 +60,7 @@ namespace Reductor {
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::slaplWnl bwnl;
          MatrixZ tmp(this->mGrid.size(), in.cols());
-         bwnl.compute<MHDComplex>(tmp, nPoly, l, this->mGrid, internal::Array(), ev::OuterProduct<MHDComplex>(in));
+         bwnl.compute<MHDComplex>(tmp, nPoly, l, this->mGrid, Internal::Array(), ev::OuterProduct<MHDComplex>(in));
 
          Polynomial::Worland::Wnl fwnl(Polynomial::Worland::Wnl::ALPHA_SPHENERGY,Polynomial::Worland::Wnl::DBETA_SPHENERGY);
          MatrixZ tmpB(nPoly, in.cols());

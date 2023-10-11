@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "QuICC/QuICCEnv.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Heating.hpp"

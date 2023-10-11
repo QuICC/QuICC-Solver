@@ -25,7 +25,7 @@ namespace Worland {
 
 namespace Projector {
 
-   void D1_P<base_t>::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void D1_P<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
 
@@ -36,11 +36,11 @@ namespace Projector {
       if(l == 0)
       {
          Polynomial::Worland::Wnl wnl;
-         wnl.compute<MHDFloat>(op, nPoly, 1, igrid, internal::Array(), ev::Set());
+         wnl.compute<MHDFloat>(op, nPoly, 1, igrid, Internal::Array(), ev::Set());
       } else
       {
          Polynomial::Worland::dWnl wnl;
-         wnl.compute<MHDFloat>(op, nPoly, l, igrid, internal::Array(), ev::Set());
+         wnl.compute<MHDFloat>(op, nPoly, l, igrid, Internal::Array(), ev::Set());
       }
    }
 
@@ -55,11 +55,11 @@ namespace Projector {
          if(l == 0)
          {
             Polynomial::Worland::Wnl wnl;
-            wnl.compute<MHDComplex>(rOut, nPoly, 1, this->mGrid, internal::Array(), ev::OuterProduct(in));
+            wnl.compute<MHDComplex>(rOut, nPoly, 1, this->mGrid, Internal::Array(), ev::OuterProduct(in));
          } else
          {
             Polynomial::Worland::dWnl wnl;
-            wnl.compute<MHDComplex>(rOut, nPoly, l, this->mGrid, internal::Array(), ev::OuterProduct(in));
+            wnl.compute<MHDComplex>(rOut, nPoly, l, this->mGrid, Internal::Array(), ev::OuterProduct(in));
          }
       #endif //defined QUICC_WORLAND_PROJIMPL_MATRIX
    }

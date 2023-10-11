@@ -63,7 +63,7 @@ namespace Reductor {
           * @param iweights   quadrature weights
           * @param i          3D mode index
           */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const override;
+         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const override;
    };
 
 } // Reductor

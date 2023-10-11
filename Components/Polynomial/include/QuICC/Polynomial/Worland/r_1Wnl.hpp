@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 
@@ -36,10 +36,10 @@ namespace Worland {
    class r_1Wnl: public WorlandBase
    {
       public:
-         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator);
+         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 
-   template <typename T, typename TEvaluator> void r_1Wnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator)
+   template <typename T, typename TEvaluator> void r_1Wnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       int gN = igrid.rows();
 
@@ -58,10 +58,10 @@ namespace Worland {
          throw std::logic_error("Operator matrix does not mach grid size");
       }
 
-      internal::Matrix ipoly(gN,2);
+      Internal::Matrix ipoly(gN,2);
 
-      internal::MHDFloat a = this->alpha(l);
-      internal::MHDFloat b = this->beta(l);
+      Internal::MHDFloat a = this->alpha(l);
+      Internal::MHDFloat b = this->beta(l);
 
       this->computeW0l(ipoly.col(0), l-1, a, b, igrid, WorlandBase::normWP0ab());
       if(scale.size() > 0)
@@ -71,7 +71,7 @@ namespace Worland {
       evaluator(rOut, ipoly.col(0), 0);
 
       // Make X grid in [-1, 1]
-      internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+      Internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
 
       if(nPoly > 1)
       {

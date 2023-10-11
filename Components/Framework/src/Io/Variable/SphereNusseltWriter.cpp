@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "QuICC/QuICCEnv.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/Nusselt.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
@@ -68,13 +68,13 @@ namespace Variable {
       // Look for l = 0, m = 0 mode
       if(m0 == 0 && l0 == 0)
       {
-         internal::Array grid = internal::Array::Zero(1);
+         Internal::Array grid = Internal::Array::Zero(1);
          int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          Matrix poly(grid.size(), nN);
-         internal::Matrix  ipoly(grid.size(), nN);
+         Internal::Matrix  ipoly(grid.size(), nN);
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::Wnl wnl;
-         wnl.compute<MHDFloat>(poly, nN, 0, grid, internal::Array(), ev::Set());
+         wnl.compute<MHDFloat>(poly, nN, 0, grid, Internal::Array(), ev::Set());
          this->mOrigin = poly.transpose();
          this->mOrigin /= std::sqrt(4.0*Math::PI);
       } else

@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 
 namespace QuICC {
 

@@ -22,7 +22,7 @@
 
 // Project includes
 //
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/TestSuite/Framework/Io.hpp"
 
 namespace QuICC {

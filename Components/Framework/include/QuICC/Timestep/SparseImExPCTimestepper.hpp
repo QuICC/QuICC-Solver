@@ -132,11 +132,11 @@ namespace Timestep {
    {
       for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
       {
-         internal::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
+         details::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
 
          if(this->mspScheme->useEmbedded())
          {
-            internal::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
+            details::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
       }
    }
@@ -145,11 +145,11 @@ namespace Timestep {
    {
       for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
       {
-         internal::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
+         details::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
 
          if(this->mspScheme->useEmbedded())
          {
-            internal::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
+            details::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
       }
    }
@@ -208,11 +208,11 @@ namespace Timestep {
          {
             if(this->mHasExplicit)
             {
-               internal::computeSet(this->reg(Register::Explicit::id()).at(i), -1.0, this->reg(Register::Rhs::id()).at(i));
-               internal::computeSet(this->reg(Register::Rhs::id()).at(i), aN, this->reg(Register::Explicit::id()).at(i));
+               details::computeSet(this->reg(Register::Explicit::id()).at(i), -1.0, this->reg(Register::Rhs::id()).at(i));
+               details::computeSet(this->reg(Register::Rhs::id()).at(i), aN, this->reg(Register::Explicit::id()).at(i));
             }
-            internal::computeAMXPY(this->reg(Register::Rhs::id()).at(i), this->mMassMatrix.at(i), aMass, this->reg(Register::Intermediate::id()).at(i));
-            internal::computeAMXPY(this->reg(Register::Rhs::id()).at(i), this->mRHSMatrix.at(i), aIm, this->reg(Register::Intermediate::id()).at(i));
+            details::computeAMXPY(this->reg(Register::Rhs::id()).at(i), this->mMassMatrix.at(i), aMass, this->reg(Register::Intermediate::id()).at(i));
+            details::computeAMXPY(this->reg(Register::Rhs::id()).at(i), this->mRHSMatrix.at(i), aIm, this->reg(Register::Intermediate::id()).at(i));
          }
 
          this->mId = this->mspScheme->aIm(this->mStep);
@@ -228,11 +228,11 @@ namespace Timestep {
          {
             if(this->mHasExplicit)
             {
-               internal::computeSet(this->reg(Register::Error::id()).at(i), aNold, this->reg(Register::Explicit::id()).at(i));
-               internal::computeSet(this->reg(Register::Explicit::id()).at(i), -1.0, this->reg(Register::Rhs::id()).at(i));
-               internal::computeSet(this->reg(Register::Rhs::id()).at(i), aNnew, this->reg(Register::Explicit::id()).at(i));
+               details::computeSet(this->reg(Register::Error::id()).at(i), aNold, this->reg(Register::Explicit::id()).at(i));
+               details::computeSet(this->reg(Register::Explicit::id()).at(i), -1.0, this->reg(Register::Rhs::id()).at(i));
+               details::computeSet(this->reg(Register::Rhs::id()).at(i), aNnew, this->reg(Register::Explicit::id()).at(i));
             }
-            internal::computeXPAY(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Error::id()).at(i), 1.0);
+            details::computeXPAY(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Error::id()).at(i), 1.0);
          }
 
          this->mId = this->mspScheme->aIm(this->mStep);
@@ -254,7 +254,7 @@ namespace Timestep {
             // Apply quasi-inverse
             for(std::size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeMV(this->reg(Register::Rhs::id()).at(i), this->mMassMatrix.at(i), this->reg(Register::Solution::id()).at(i));
+               details::computeMV(this->reg(Register::Rhs::id()).at(i), this->mMassMatrix.at(i), this->reg(Register::Solution::id()).at(i));
             }
 
             return true;
@@ -264,7 +264,7 @@ namespace Timestep {
             // Correct solution with green's function
             for(std::size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeInfluenceCorrection(this->reg(Register::Solution::id()).at(i), this->reg(Register::Influence::id()).at(i));
+               details::computeInfluenceCorrection(this->reg(Register::Solution::id()).at(i), this->reg(Register::Influence::id()).at(i));
             }
          }
       }
@@ -274,7 +274,7 @@ namespace Timestep {
          // Store predictor solution
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
+            details::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
 
          this->mStep += 1;
@@ -284,9 +284,9 @@ namespace Timestep {
          // Build corrected solution
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
-            internal::computeXPAY(this->reg(Register::Solution::id()).at(i), this->reg(Register::Intermediate::id()).at(i), 1.0);
-            internal::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
+            details::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
+            details::computeXPAY(this->reg(Register::Solution::id()).at(i), this->reg(Register::Intermediate::id()).at(i), 1.0);
+            details::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
 
          // Compute error
@@ -294,7 +294,7 @@ namespace Timestep {
          {
             for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeErrorFromDiff(this->mError, this->reg(Register::Error::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
+               details::computeErrorFromDiff(this->mError, this->reg(Register::Error::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
             }
          }
 

@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 
 namespace QuICC {
 
@@ -44,7 +44,7 @@ namespace Evaluator {
          /**
           * @brief Apply evaluator
           */
-         void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i);
+         void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i);
 
       protected:
 
@@ -61,9 +61,9 @@ namespace Evaluator {
    {
    }
 
-   template <typename T> inline void InnerProduct<T>::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i)
+   template <typename T> inline void InnerProduct<T>::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i)
    {
-      rOut.row(i) = Precision::cast(ipolycol).transpose()*this->mIn;
+      rOut.row(i) = Internal::cast(ipolycol).transpose()*this->mIn;
    }
 }
 }

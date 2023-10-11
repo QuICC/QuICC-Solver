@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 
 namespace QuICC {
 
@@ -44,17 +44,17 @@ namespace Evaluator {
          /**
           * @brief Prepare grid for polynomial calculation
           */
-         internal::Array prepareGrid(const internal::Array& fullGrid) const;
+         Internal::Array prepareGrid(const Internal::Array& fullGrid) const;
 
          /**
           * @brief Apply evaluator
           */
-         void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i);
+         void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i);
 
          /**
           * @brief Apply operation assuming even or odd symmetry
           */
-         void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i, const bool isEven);
+         void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i, const bool isEven);
 
       protected:
 
@@ -70,22 +70,22 @@ namespace Evaluator {
    {
    }
 
-   template <typename T> inline void OuterProduct<T>::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i)
+   template <typename T> inline void OuterProduct<T>::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i)
    {
       if(i == 0)
       {
-         rOut = Precision::cast(ipolycol)*this->mIn.row(i);
+         rOut = Internal::cast(ipolycol)*this->mIn.row(i);
       } else
       {
-         rOut += Precision::cast(ipolycol)*this->mIn.row(i);
+         rOut += Internal::cast(ipolycol)*this->mIn.row(i);
       }
    }
 
-   template <typename T> inline void OuterProduct<T>::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i, const bool isEven)
+   template <typename T> inline void OuterProduct<T>::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i, const bool isEven)
    {
       int gN = ipolycol.rows();
 
-      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> tmp = Precision::cast(ipolycol)*this->mIn.row(i);
+      Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> tmp = Internal::cast(ipolycol)*this->mIn.row(i);
       if(i == 0)
       {
          if(isEven)

@@ -28,7 +28,7 @@ namespace QuICC {
 
 namespace Timestep {
 
-   namespace internal
+   namespace details
    {
       template <typename TOperator,typename TData> void computeMVPAY(TData& y, const TOperator& A, const TData& x, const MHDFloat a);
 
@@ -242,7 +242,7 @@ namespace Timestep {
       {
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeMVPAY<TOperator,TData>(this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->mspScheme->rhsN(0, this->mStep));
+            details::computeMVPAY<TOperator,TData>(this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->mspScheme->rhsN(0, this->mStep));
          }
 
       } else if(this->mspScheme->fieldMemory() == 0)
@@ -251,7 +251,7 @@ namespace Timestep {
 
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeRHSNoFieldMemory<TOperator,TData>(this->mStep, this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->mOldRHS.at(i), tmp, this->mspScheme);
+            details::computeRHSNoFieldMemory<TOperator,TData>(this->mStep, this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->mOldRHS.at(i), tmp, this->mspScheme);
          }
 
       } else if(this->mspScheme->nonlinearMemory() == 0)
@@ -260,7 +260,7 @@ namespace Timestep {
 
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeRHSNoNLMemory<TOperator,TData>(this->mStep, this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->rOldRHSMatrices(rhsId,i), this->mOldSolution.at(i), tmp, this->mspScheme);
+            details::computeRHSNoNLMemory<TOperator,TData>(this->mStep, this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->rOldRHSMatrices(rhsId,i), this->mOldSolution.at(i), tmp, this->mspScheme);
          }
 
       } else
@@ -269,7 +269,7 @@ namespace Timestep {
 
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeRHSMemory<TOperator,TData>(this->mStep, this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->rOldRHSMatrices(rhsId,i), this->mOldSolution.at(i), this->mOldRHS.at(i), tmp, tmp, this->mspScheme);
+            details::computeRHSMemory<TOperator,TData>(this->mStep, this->reg(Register::Rhs::id()).at(i), this->rRHSMatrix(rhsId,i), this->reg(Register::Solution::id()).at(i), this->rOldRHSMatrices(rhsId,i), this->mOldSolution.at(i), this->mOldRHS.at(i), tmp, tmp, this->mspScheme);
          }
       }
 
@@ -475,30 +475,30 @@ namespace Timestep {
 
       // Set time matrix
       this->rTMatrix(idx).resize(size, size);
-      Solver::internal::addOperators(this->rTMatrix(idx), 1.0, iOpB->second);
+      Solver::details::addOperators(this->rTMatrix(idx), 1.0, iOpB->second);
 
       // Set implicit and explicit matrices
       for(int i = 0; i < this->mspScheme->steps(); ++i)
       {
          // Set implicit matrix
          this->rLHSMatrix(this->mspScheme->lhsT(i), idx).resize(size, size);
-         Solver::internal::addOperators(this->rLHSMatrix(this->mspScheme->lhsT(i), idx), this->mspScheme->lhsL(i), iOpA->second);
-         Solver::internal::addOperators(this->rLHSMatrix(this->mspScheme->lhsT(i), idx), -this->mspScheme->lhsT(i)/this->mDt, iOpB->second);
-         Solver::internal::addOperators(this->rLHSMatrix(this->mspScheme->lhsT(i), idx), 1.0, iOpC->second);
+         Solver::details::addOperators(this->rLHSMatrix(this->mspScheme->lhsT(i), idx), this->mspScheme->lhsL(i), iOpA->second);
+         Solver::details::addOperators(this->rLHSMatrix(this->mspScheme->lhsT(i), idx), -this->mspScheme->lhsT(i)/this->mDt, iOpB->second);
+         Solver::details::addOperators(this->rLHSMatrix(this->mspScheme->lhsT(i), idx), 1.0, iOpC->second);
 
          // Set explicit matrix
          this->rRHSMatrix(this->mspScheme->rhsT(0,i), idx).resize(size, size);
          this->rRHSMatrix(this->mspScheme->rhsT(0,i), idx).resize(size, size);
-         Solver::internal::addOperators(this->rRHSMatrix(this->mspScheme->rhsT(0,i), idx), -this->mspScheme->rhsL(0,i), iOpA->second);
-         Solver::internal::addOperators(this->rRHSMatrix(this->mspScheme->rhsT(0,i), idx), -this->mspScheme->rhsT(0,i)/this->mDt, iOpB->second);
+         Solver::details::addOperators(this->rRHSMatrix(this->mspScheme->rhsT(0,i), idx), -this->mspScheme->rhsL(0,i), iOpA->second);
+         Solver::details::addOperators(this->rRHSMatrix(this->mspScheme->rhsT(0,i), idx), -this->mspScheme->rhsT(0,i)/this->mDt, iOpB->second);
 
          // Set explicit matrix for t_(n-i)
          for(int j = 0; j < this->mspScheme->fieldMemory(); j++)
          {
             this->rOldRHSMatrix(this->mspScheme->rhsT(0,i), idx, j).resize(size, size);
             this->rOldRHSMatrix(this->mspScheme->rhsT(0,i), idx, j).resize(size, size);
-            Solver::internal::addOperators(this->rOldRHSMatrix(this->mspScheme->rhsT(0,i), idx, j), -this->mspScheme->rhsL(j+1,i), iOpA->second);
-            Solver::internal::addOperators(this->rOldRHSMatrix(this->mspScheme->rhsT(0,i), idx, j), -this->mspScheme->rhsT(j+1,i)/this->mDt, iOpB->second);
+            Solver::details::addOperators(this->rOldRHSMatrix(this->mspScheme->rhsT(0,i), idx, j), -this->mspScheme->rhsL(j+1,i), iOpA->second);
+            Solver::details::addOperators(this->rOldRHSMatrix(this->mspScheme->rhsT(0,i), idx, j), -this->mspScheme->rhsT(j+1,i)/this->mDt, iOpB->second);
          }
       }
    }
@@ -558,7 +558,7 @@ namespace Timestep {
       }
    }
 
-   namespace internal
+   namespace details
    {
       template <typename TOperator,typename TData> inline void computeMVPAY(TData& y, const TOperator& A, const TData& x, const MHDFloat a)
       {

@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {

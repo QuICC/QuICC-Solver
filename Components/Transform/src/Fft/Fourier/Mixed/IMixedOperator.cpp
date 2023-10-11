@@ -45,7 +45,7 @@ namespace Mixed {
       this->initBase();
    }
 
-   void IMixedOperator::init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const
+   void IMixedOperator::init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       throw std::logic_error("Unused interface");
    }

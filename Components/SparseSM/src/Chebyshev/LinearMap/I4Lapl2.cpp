@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4Lapl2.cpp
  * @brief Source of the implementation of the I^4 sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4Lapl2.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -27,7 +28,7 @@ namespace LinearMap {
 
    I4Lapl2::ACoeff_t I4Lapl2::d_4(const ACoeff_t& n) const
    {
-      auto c = precision::pow(this->a()/2.0,4);
+      auto c = Internal::Math::pow(this->a()/2.0,4);
       auto laplh = -(this->k1()*this->k1() + this->k2()*this->k2());
       return laplh*laplh*c/(n*(n - 3.0)*(n - 2.0)*(n - 1.0));
    }
@@ -35,7 +36,7 @@ namespace LinearMap {
    I4Lapl2::ACoeff_t I4Lapl2::d_2(const ACoeff_t& n) const
    {
       // Horizontal part
-      auto c = precision::pow(this->a()/2.0,4);
+      auto c = Internal::Math::pow(this->a()/2.0,4);
       auto laplh = -(this->k1()*this->k1() + this->k2()*this->k2());
       auto hz = -laplh*laplh*c*4.0/(n*(n - 3.0)*(n - 1.0)*(n + 1.0));
 
@@ -43,13 +44,13 @@ namespace LinearMap {
       auto a2 = this->a()*this->a();
       auto diff = 2.0*laplh*a2/(4.0*n*(n - 1.0));
 
-      return hz + diff; 
+      return hz + diff;
    }
 
    I4Lapl2::ACoeff_t I4Lapl2::d0(const ACoeff_t& n) const
    {
-      // Horizontal part 
-      auto c = precision::pow(this->a()/2.0,4);
+      // Horizontal part
+      auto c = Internal::Math::pow(this->a()/2.0,4);
       auto laplh = -(this->k1()*this->k1() + this->k2()*this->k2());
       auto hz = laplh*laplh*c*6.0/((n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0));
 
@@ -62,8 +63,8 @@ namespace LinearMap {
 
    I4Lapl2::ACoeff_t I4Lapl2::d2(const ACoeff_t& n) const
    {
-      // Horizontal part 
-      auto c = precision::pow(this->a()/2.0,4);
+      // Horizontal part
+      auto c = Internal::Math::pow(this->a()/2.0,4);
       auto laplh = -(this->k1()*this->k1() + this->k2()*this->k2());
       auto hz = -laplh*laplh*c*4.0/(n*(n - 1.0)*(n + 1.0)*(n + 3.0));
 
@@ -76,7 +77,7 @@ namespace LinearMap {
 
    I4Lapl2::ACoeff_t I4Lapl2::d4(const ACoeff_t& n) const
    {
-      auto c = precision::pow(this->a()/2.0,4);
+      auto c = Internal::Math::pow(this->a()/2.0,4);
       auto laplh = -(this->k1()*this->k1() + this->k2()*this->k2());
       return laplh*laplh*c/(n*(n + 1.0)*(n + 2.0)*(n + 3.0));
    }

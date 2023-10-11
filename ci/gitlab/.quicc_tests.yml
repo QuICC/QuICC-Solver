@@ -5,6 +5,7 @@
     - pwd
     # the tests are not installed, so we need to run them from the build directory
     - cd /QuICC.src/build
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Types
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Memory
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^View
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Polynomial

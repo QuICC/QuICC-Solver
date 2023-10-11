@@ -18,7 +18,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/PhysicalNames/Streamfunction.hpp"
 #include "QuICC/PhysicalNames/Vorticity.hpp"

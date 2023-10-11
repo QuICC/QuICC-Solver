@@ -1,4 +1,4 @@
-/** 
+/**
  * @file WorlandChebyshevRule.cpp
  * @brief Source of the Worland Chebyshev quadrature
  */
@@ -6,15 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
-
 // Project includes
 //
+#include "Types/Internal/Math.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
 
 namespace QuICC {
 
@@ -22,7 +17,7 @@ namespace Polynomial {
 
 namespace Quadrature {
 
-   void WorlandChebyshevRule::computeQuadrature(internal::Array& igrid, internal::Array& iweights, const int size)
+   void WorlandChebyshevRule::computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size)
    {
       // Internal grid and weights arrays
       igrid.resize(size);
@@ -30,8 +25,8 @@ namespace Quadrature {
 
       for(int k = 0; k < size/2; k++)
       {
-         internal::MHDFloat theta = Precision::PI_long*(internal::MHDFloat(2*k + 1))/internal::MHDFloat(4*size);
-         igrid(k) = precision::sin(theta);
+         Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(2*k + 1))/Internal::MHDFloat(4*size);
+         igrid(k) = Internal::Math::sin(theta);
       }
 
       for(int k = size/2; k < size; k++)
@@ -39,14 +34,14 @@ namespace Quadrature {
          // Reverse grid r = (0, 1)
          int k_ = size-k;
 
-         internal::MHDFloat theta = Precision::PI_long*(internal::MHDFloat(2*k_ - 1))/internal::MHDFloat(4*size);
-         igrid(k) = precision::cos(theta);
+         Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(2*k_ - 1))/Internal::MHDFloat(4*size);
+         igrid(k) = Internal::Math::cos(theta);
       }
 
-      iweights.setConstant(Precision::PI/(MHD_MP(2.0)*internal::MHDFloat(size)));
+      iweights.setConstant(Internal::Math::PI/(MHD_MP(2.0)*Internal::MHDFloat(size)));
    }
 
-   void WorlandChebyshevRule::computeXQuadrature(internal::Array& igrid, internal::Array& iweights, const int size)
+   void WorlandChebyshevRule::computeXQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size)
    {
       // Internal grid and weights arrays
       igrid.resize(size);
@@ -57,8 +52,8 @@ namespace Quadrature {
          // Reverse grid r = (0, 1)
          int k_ = size-k;
 
-         internal::MHDFloat theta = Precision::PI_long*(internal::MHDFloat(2*k_ - 1))/internal::MHDFloat(2*size);
-         igrid(k) = precision::cos(theta);
+         Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(2*k_ - 1))/Internal::MHDFloat(2*size);
+         igrid(k) = Internal::Math::cos(theta);
       }
 
       for(int k = size/3; k < 2*size/3; k++)
@@ -66,8 +61,8 @@ namespace Quadrature {
          // Reverse grid r = (0, 1)
          int k_ = size-k;
 
-         internal::MHDFloat theta = Precision::PI_long*(internal::MHDFloat(size-2*k_ + 1))/internal::MHDFloat(2*size);
-         igrid(k) = precision::sin(theta);
+         Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(size-2*k_ + 1))/Internal::MHDFloat(2*size);
+         igrid(k) = Internal::Math::sin(theta);
       }
 
       for(int k = 2*size/3; k < size; k++)
@@ -75,11 +70,11 @@ namespace Quadrature {
          // Reverse grid r = (0, 1)
          int k_ = size-k;
 
-         internal::MHDFloat theta = Precision::PI_long*(internal::MHDFloat(2*k_ - 1))/internal::MHDFloat(2*size);
-         igrid(k) = precision::cos(theta);
+         Internal::MHDFloat theta = Internal::Math::PI_long*(Internal::MHDFloat(2*k_ - 1))/Internal::MHDFloat(2*size);
+         igrid(k) = Internal::Math::cos(theta);
       }
 
-      iweights.setConstant(Precision::PI/(MHD_MP(2.0)*internal::MHDFloat(size)));
+      iweights.setConstant(Internal::Math::PI/(MHD_MP(2.0)*Internal::MHDFloat(size)));
    }
 
 }

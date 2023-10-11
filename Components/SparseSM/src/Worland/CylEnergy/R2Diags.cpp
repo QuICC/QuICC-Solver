@@ -1,4 +1,4 @@
-/** 
+/**
  * @file R2Diags.cpp
  * @brief Source of the implementation of the full sphere Worland R2Diags sparse operator
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Worland/CylEnergy/R2Diags.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -42,7 +43,7 @@ namespace CylEnergy {
    R2Diags::ACoeff_t R2Diags::d0(const ACoeff_t& n) const
    {
       auto l1 = this->l();
-      auto l2 = precision::pow(l1, 2);
+      auto l2 = Internal::Math::pow(l1, 2);
       ACoeff_t val;
 
       if(l1 == 0)

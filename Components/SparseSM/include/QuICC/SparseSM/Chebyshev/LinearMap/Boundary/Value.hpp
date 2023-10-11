@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/ICondition.hpp"
 
 namespace QuICC {

@@ -30,7 +30,7 @@ namespace Integrator {
       this->setProfileTag();
    }
 
-   void P<base_t>::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void P<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
 
@@ -43,9 +43,9 @@ namespace Integrator {
       int nN = nPoly;
       this->checkGridSize(nN, l, igrid.size());
 
-      internal::Matrix tOp(igrid.size(), nN);
+      Internal::Matrix tOp(igrid.size(), nN);
 
-      wnl.compute<internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
+      wnl.compute<Internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
       op = tOp.cast<MHDFloat>().leftCols(nPoly);
    }

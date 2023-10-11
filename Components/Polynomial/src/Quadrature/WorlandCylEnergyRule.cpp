@@ -1,4 +1,4 @@
-/** 
+/**
  * @file WorlandCylEnergyRule.cpp
  * @brief Source of the Worland cylindrical energy quadrature
  */
@@ -22,14 +22,14 @@ namespace Polynomial {
 
 namespace Quadrature {
 
-   void WorlandCylEnergyRule::computeQuadrature(internal::Array& igrid, internal::Array& iweights, const int size)
+   void WorlandCylEnergyRule::computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size)
    {
       // Internal grid and weights arrays
       igrid.resize(size);
       iweights.resize(size);
       int jsize = size;
-      internal::Array jgrid(jsize);
-      internal::Array jweights(jsize);
+      Internal::Array jgrid(jsize);
+      Internal::Array jweights(jsize);
       LegendreRule::computeQuadrature(jgrid, jweights, jsize);
 
       igrid = (jgrid.array() + MHD_MP(1.0))/MHD_MP(2.0);

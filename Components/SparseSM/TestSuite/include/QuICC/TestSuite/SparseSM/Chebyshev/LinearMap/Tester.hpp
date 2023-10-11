@@ -194,7 +194,7 @@ namespace LinearMap {
 
          QuICC::SparseSM::Chebyshev::LinearMap::Boundary::Operator bcOp(1, maxN+1, lower, upper);
 
-         if constexpr(std::is_constructible_v<TOp, internal::MHDFloat, internal::MHDFloat, typename TOp::Position, int>)
+         if constexpr(std::is_constructible_v<TOp, Internal::MHDFloat, Internal::MHDFloat, typename TOp::Position, int>)
          {
             assert(meta.size() == 5);
             auto l = meta(4);

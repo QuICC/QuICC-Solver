@@ -12,7 +12,7 @@
 //
 #include "QuICC/Io/Variable/SphereScalarMeanWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/Mean.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
@@ -61,16 +61,16 @@ namespace Variable {
       {
          int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          int nR = 2*nN;
-         internal::Array igrid,iweights;
+         Internal::Array igrid,iweights;
          Polynomial::Quadrature::LegendreRule lrule;
          lrule.computeQuadrature(igrid, iweights, nR);
          igrid = (igrid.array() + MHD_MP(1.0))/MHD_MP(2.0);
          iweights *= MHD_MP(0.5);
          Matrix poly(igrid.size(), nN);
-         internal::Matrix  ipoly(igrid.size(), nN);
+         Internal::Matrix  ipoly(igrid.size(), nN);
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::Wnl wnl;
-         wnl.compute<internal::MHDFloat>(ipoly, nN, 0, igrid, (iweights.array()*igrid.array().pow(2)).matrix(), ev::Set());
+         wnl.compute<Internal::MHDFloat>(ipoly, nN, 0, igrid, (iweights.array()*igrid.array().pow(2)).matrix(), ev::Set());
          this->mProjector = ipoly.cast<MHDFloat>().transpose();
          this->mProjector /= this->mVolume;
 

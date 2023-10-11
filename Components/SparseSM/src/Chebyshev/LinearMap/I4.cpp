@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4.cpp
  * @brief Source of the implementation of the I^4 sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -27,27 +28,27 @@ namespace LinearMap {
 
    I4::ACoeff_t I4::d_4(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,4)/(n*(n - 3.0)*(n - 2.0)*(n - 1.0));
+      return Internal::Math::pow(this->a()/2.0,4)/(n*(n - 3.0)*(n - 2.0)*(n - 1.0));
    }
 
    I4::ACoeff_t I4::d_2(const ACoeff_t& n) const
    {
-      return -precision::pow(this->a()/2.0,4)*4.0/(n*(n - 3.0)*(n - 1.0)*(n + 1.0)); 
+      return -Internal::Math::pow(this->a()/2.0,4)*4.0/(n*(n - 3.0)*(n - 1.0)*(n + 1.0));
    }
 
    I4::ACoeff_t I4::d0(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,4)*6.0/((n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0));
+      return Internal::Math::pow(this->a()/2.0,4)*6.0/((n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0));
    }
 
    I4::ACoeff_t I4::d2(const ACoeff_t& n) const
    {
-      return -precision::pow(this->a()/2.0,4)*4.0/(n*(n - 1.0)*(n + 1.0)*(n + 3.0));
+      return -Internal::Math::pow(this->a()/2.0,4)*4.0/(n*(n - 1.0)*(n + 1.0)*(n + 3.0));
    }
 
    I4::ACoeff_t I4::d4(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,4)/(n*(n + 1.0)*(n + 2.0)*(n + 3.0));
+      return Internal::Math::pow(this->a()/2.0,4)/(n*(n + 1.0)*(n + 2.0)*(n + 3.0));
    }
 
    void I4::buildTriplets(TripletList_t& list) const

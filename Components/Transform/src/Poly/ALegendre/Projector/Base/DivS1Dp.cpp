@@ -9,7 +9,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/ALegendre/Projector/Base/DivS1Dp.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/Polynomial/ALegendre/sin_1Plm.hpp"
 
 namespace QuICC {

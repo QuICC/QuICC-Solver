@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Jacobi/JacobiBase.hpp"
 
@@ -42,7 +42,7 @@ class Pnab
        *
        * Internal computation can be done in multiple precision
        */
-      template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator)
+      template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::MHDFloat alpha, const Internal::MHDFloat beta, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
       {
          int gN = igrid.rows();
 
@@ -61,7 +61,7 @@ class Pnab
             throw std::logic_error("Operator matrix does not mach grid size");
          }
 
-         internal::Matrix ipoly(gN,2);
+         Internal::Matrix ipoly(gN,2);
 
          ThreeTermRecurrence::P0(ipoly.col(0), alpha, beta, igrid,
             &JacobiBase::P0ab<normalizationTag_t>);

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2Y3SphLapl.cpp
  * @brief Source of the implementation of the I^2 Y^3 spherical laplacian sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y3SphLapl.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -28,7 +29,7 @@ namespace LinearMap {
    I2Y3SphLapl::ACoeff_t I2Y3SphLapl::d_3(const ACoeff_t& n) const
    {
       const auto& l1 = this->l();
-      const auto c = precision::pow(this->a()/2.0,3);
+      const auto c = Internal::Math::pow(this->a()/2.0,3);
       return -c*(l1 - n + 3.0)*(l1 + n - 2.0)/(n*(n - 1.0));
    }
 
@@ -37,7 +38,7 @@ namespace LinearMap {
       const auto& l1 = this->l();
       const auto l2 = l1*l1;
       const auto& b1 = this->b();
-      const auto c = precision::pow(this->a()/2.0,2);
+      const auto c = Internal::Math::pow(this->a()/2.0,2);
       return -c*b1*(l2 + l1 - 3.0*n.pow(2) + 11.0*n - 10.0)/(n*(n - 1.0));
    }
 
@@ -76,14 +77,14 @@ namespace LinearMap {
       const auto& l1 = this->l();
       const auto l2 = l1*l1;
       const auto& b1 = this->b();
-      const auto c = precision::pow(this->a()/2.0,2);
+      const auto c = Internal::Math::pow(this->a()/2.0,2);
       return -c*b1*(l2 + l1 - 3.0*n.pow(2) - 11.0*n - 10.0)/(n*(n + 1.0));
    }
 
    I2Y3SphLapl::ACoeff_t I2Y3SphLapl::d3(const ACoeff_t& n) const
    {
       const auto& l1 = this->l();
-      const auto c = precision::pow(this->a()/2.0,3);
+      const auto c = Internal::Math::pow(this->a()/2.0,3);
       return -c*(l1 - n - 2.0)*(l1 + n + 3.0)/(n*(n + 1.0));
    }
 

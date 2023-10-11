@@ -26,7 +26,7 @@ namespace Worland {
 
 namespace Integrator {
 
-   void I6CylLaplh_I4D1R1<base_t>::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void I6CylLaplh_I4D1R1<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
 
@@ -40,9 +40,9 @@ namespace Integrator {
       int nN = nPoly + 0;
       this->checkGridSize(nN, l, igrid.size());
 
-      internal::Matrix tOp(igrid.size(), nN);
+      Internal::Matrix tOp(igrid.size(), nN);
 
-      wnl.compute<internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
+      wnl.compute<Internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
       if(l == 0)
       {
          auto a = wnl.alpha(l);

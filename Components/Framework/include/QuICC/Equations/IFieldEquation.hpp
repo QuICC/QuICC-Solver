@@ -18,7 +18,7 @@
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/IEquation.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
-#include "Types/DecoupledComplexInternal.hpp"
+#include "Types/DecoupledComplexUtils.hpp"
 
 namespace QuICC {
 
@@ -248,12 +248,12 @@ namespace Equations {
             #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
             // Apply operator to field
-            Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, tmp);
+            Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, tmp);
          }
          else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
          {
             // Apply operator to field
-            Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(matIdx));
+            Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(matIdx));
          }
          else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
          {
@@ -264,7 +264,7 @@ namespace Equations {
             assert(op->cols() == explicitField.slice(mode(0)).rows());
 
             // Apply operator to field
-            Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
+            Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
 
          } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
          {
@@ -314,7 +314,7 @@ namespace Equations {
             }
 
             // Apply operator to field
-            Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, tmp);
+            Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, tmp);
          }
       }
    }
@@ -377,7 +377,7 @@ namespace Equations {
                      l = start + j_ + i;
 
                      // Copy field value into storage
-                     Datatypes::internal::setScalar(storage, l, field.comp(compId).point(i,j,matIdx));
+                     Datatypes::details::setScalar(storage, l, field.comp(compId).point(i,j,matIdx));
                   }
                }
             }
@@ -397,7 +397,7 @@ namespace Equations {
                      l = start + j_ + i;
 
                      // Copy field value into storage
-                     Datatypes::internal::addScalar(storage, l, field.comp(compId).point(i,j,matIdx));
+                     Datatypes::details::addScalar(storage, l, field.comp(compId).point(i,j,matIdx));
                   }
                }
             }
@@ -414,7 +414,7 @@ namespace Equations {
                   for(int i = zeroRow; i < usedRows; i++)
                   {
                      // Copy field value into storage
-                     Datatypes::internal::setScalar(storage, k, field.comp(compId).point(i,j,matIdx));
+                     Datatypes::details::setScalar(storage, k, field.comp(compId).point(i,j,matIdx));
 
                      // increase storage counter
                      k++;
@@ -431,7 +431,7 @@ namespace Equations {
                   for(int i = zeroRow; i < usedRows; i++)
                   {
                      // Copy field value into storage
-                     Datatypes::internal::addScalar(storage, k, field.comp(compId).point(i,j,matIdx));
+                     Datatypes::details::addScalar(storage, k, field.comp(compId).point(i,j,matIdx));
 
                      // increase storage counter
                      k++;
@@ -457,7 +457,7 @@ namespace Equations {
                for(int i = zeroRow; i < rows; i++)
                {
                   // Copy field value into storage
-                  Datatypes::internal::setScalar(storage, i - zeroRow + start, j - zeroCol, field.comp(compId).point(i,j,matIdx));
+                  Datatypes::details::setScalar(storage, i - zeroRow + start, j - zeroCol, field.comp(compId).point(i,j,matIdx));
                }
             }
          }
@@ -469,7 +469,7 @@ namespace Equations {
                for(int i = zeroRow; i < rows; i++)
                {
                   // Copy field value into storage
-                  Datatypes::internal::addScalar(storage, i - zeroRow + start, j - zeroCol, field.comp(compId).point(i,j,matIdx));
+                  Datatypes::details::addScalar(storage, i - zeroRow + start, j - zeroCol, field.comp(compId).point(i,j,matIdx));
                }
             }
          }
@@ -504,7 +504,7 @@ namespace Equations {
                for(int i = zeroRow; i < rows; i++)
                {
                   // Copy field value into storage
-                  Datatypes::internal::setScalar(storage, k, field.comp(compId).point(i,mode(1),mode(0)));
+                  Datatypes::details::setScalar(storage, k, field.comp(compId).point(i,mode(1),mode(0)));
 
                   // increase storage counter
                   k++;
@@ -515,7 +515,7 @@ namespace Equations {
                for(int i = zeroRow; i < rows; i++)
                {
                   // Copy field value into storage
-                  Datatypes::internal::addScalar(storage, k, field.comp(compId).point(i,mode(1),mode(0)));
+                  Datatypes::details::addScalar(storage, k, field.comp(compId).point(i,mode(1),mode(0)));
 
                   // increase storage counter
                   k++;
@@ -573,7 +573,7 @@ namespace Equations {
                      l = start + k_ + j_ + i;
 
                      // Copy field value into storage
-                     Datatypes::internal::setScalar(storage, l, field.comp(compId).point(i,j,k));
+                     Datatypes::details::setScalar(storage, l, field.comp(compId).point(i,j,k));
                   }
                }
             }
@@ -592,7 +592,7 @@ namespace Equations {
                      l = start + k_ + j_ + i;
 
                      // Copy field value into storage
-                     Datatypes::internal::addScalar(storage, l, field.comp(compId).point(i,j,k));
+                     Datatypes::details::addScalar(storage, l, field.comp(compId).point(i,j,k));
                   }
                }
             }
@@ -649,7 +649,7 @@ namespace Equations {
                      l = start + j_ + i;
 
                      // Add source term
-                     Datatypes::internal::addScalar(storage, l, eq.sourceTerm(compId, i, j, matIdx));
+                     Datatypes::details::addScalar(storage, l, eq.sourceTerm(compId, i, j, matIdx));
                   }
                }
             #else
@@ -663,7 +663,7 @@ namespace Equations {
                   for(int i = zeroRow; i < usedRows; i++)
                   {
                      // Add source term
-                     Datatypes::internal::addScalar(storage, k, eq.sourceTerm(compId, i, j, matIdx));
+                     Datatypes::details::addScalar(storage, k, eq.sourceTerm(compId, i, j, matIdx));
 
                      // increase storage counter
                      k++;
@@ -695,7 +695,7 @@ namespace Equations {
                for(int i = zeroRow; i < rows; i++)
                {
                   // Add source term
-                  Datatypes::internal::addScalar(storage, i - zeroRow + start, j - zeroCol, eq.sourceTerm(compId, i, j, matIdx));
+                  Datatypes::details::addScalar(storage, i - zeroRow + start, j - zeroCol, eq.sourceTerm(compId, i, j, matIdx));
                }
             }
          }
@@ -715,7 +715,7 @@ namespace Equations {
             for(int i = zeroRow; i < rows; i++)
             {
                // Add source term
-               Datatypes::internal::addScalar(storage, k, eq.sourceTerm(compId, i, mode(1), mode(0)));
+               Datatypes::details::addScalar(storage, k, eq.sourceTerm(compId, i, mode(1), mode(0)));
 
                // increase storage counter
                k++;
@@ -768,7 +768,7 @@ namespace Equations {
                      l = start + k_ + j_ + i;
 
                      // Add source term
-                     Datatypes::internal::addScalar(storage, l, eq.sourceTerm(compId, i, j, k));
+                     Datatypes::details::addScalar(storage, l, eq.sourceTerm(compId, i, j, k));
                   }
                }
             }
@@ -830,7 +830,7 @@ namespace Equations {
                      l = start + j_ + i;
 
                      // Add source term
-                     Datatypes::internal::setScalar(storage, l, eq.boundaryValue(compId, i, j, matIdx));
+                     Datatypes::details::setScalar(storage, l, eq.boundaryValue(compId, i, j, matIdx));
                   }
                }
             #else
@@ -844,7 +844,7 @@ namespace Equations {
                   for(int i = zeroRow; i < usedRows; i++)
                   {
                      // Add source term
-                     Datatypes::internal::setScalar(storage, k, eq.boundaryValue(compId, i, j, matIdx));
+                     Datatypes::details::setScalar(storage, k, eq.boundaryValue(compId, i, j, matIdx));
 
                      // increase storage counter
                      k++;
@@ -876,7 +876,7 @@ namespace Equations {
                for(int i = zeroRow; i < rows; i++)
                {
                   // Add source term
-                  Datatypes::internal::setScalar(storage, i - zeroRow + start, j - zeroCol, eq.boundaryValue(compId, i, j, matIdx));
+                  Datatypes::details::setScalar(storage, i - zeroRow + start, j - zeroCol, eq.boundaryValue(compId, i, j, matIdx));
                }
             }
          }
@@ -896,7 +896,7 @@ namespace Equations {
             for(int i = zeroRow; i < rows; i++)
             {
                // Add source term
-               Datatypes::internal::setScalar(storage, k, eq.boundaryValue(compId, i, mode(1), mode(0)));
+               Datatypes::details::setScalar(storage, k, eq.boundaryValue(compId, i, mode(1), mode(0)));
 
                // increase storage counter
                k++;
@@ -949,7 +949,7 @@ namespace Equations {
                      l = start + k_ + j_ + i;
 
                      // Add source term
-                     Datatypes::internal::setScalar(storage, l, eq.boundaryValue(compId, i, j, k));
+                     Datatypes::details::setScalar(storage, l, eq.boundaryValue(compId, i, j, k));
                   }
                }
             }
@@ -970,7 +970,7 @@ namespace Equations {
             for(int k = 0; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
             {
                // Set field to zero
-               Datatypes::internal::setScalar(storage, k + start, typename TData::Scalar(0.0));
+               Datatypes::details::setScalar(storage, k + start, typename TData::Scalar(0.0));
             }
          #else
             int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
@@ -994,7 +994,7 @@ namespace Equations {
                for(int i = zeroRow; i < usedRows; i++)
                {
                   // Set field to zero
-                  Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
+                  Datatypes::details::setScalar(storage, k, typename TData::Scalar(0.0));
 
                   // increase storage counter
                   k++;
@@ -1026,7 +1026,7 @@ namespace Equations {
             for(int i = zeroRow; i < rows; i++)
             {
                // Set field to zero
-               Datatypes::internal::setScalar(storage, i - zeroRow + start, j - zeroCol, typename TData::Scalar(0.0));
+               Datatypes::details::setScalar(storage, i - zeroRow + start, j - zeroCol, typename TData::Scalar(0.0));
             }
          }
 
@@ -1046,7 +1046,7 @@ namespace Equations {
          for(int i = zeroRow; i < rows; i++)
          {
             // Set field to zero
-            Datatypes::internal::setScalar(storage, k, typename TData::Scalar(0.0));
+            Datatypes::details::setScalar(storage, k, typename TData::Scalar(0.0));
 
             // increase storage counter
             k++;
@@ -1062,7 +1062,7 @@ namespace Equations {
             for(int k = 0; k < eq.couplingInfo(compId).galerkinN(matIdx); ++k)
             {
                // Set field to zero
-               Datatypes::internal::setScalar(storage, k + start, typename TData::Scalar(0.0));
+               Datatypes::details::setScalar(storage, k + start, typename TData::Scalar(0.0));
             }
          #else
             // Set data to zero
@@ -1100,7 +1100,7 @@ namespace Equations {
                      l = start + k_ + j_ + i;
 
                      // Set field to zero
-                     Datatypes::internal::setScalar(storage, l, typename TData::Scalar(0.0));
+                     Datatypes::details::setScalar(storage, l, typename TData::Scalar(0.0));
                   }
                }
             }
@@ -1172,7 +1172,7 @@ namespace Equations {
                   l = start + j_ + i;
 
                   // Copy timestep output into field
-                  MHDVariant dataPoint = Datatypes::internal::getScalar(*solution, l);
+                  MHDVariant dataPoint = Datatypes::details::getScalar(*solution, l);
                   dataPoint = this->updateStoredSolution(dataPoint, compId, i, j, matIdx);
                   field.rComp(compId).setPoint(dataPoint,i,j,matIdx);
                }
@@ -1188,7 +1188,7 @@ namespace Equations {
                for(int i = 0; i < usedRows; i++)
                {
                   // Copy timestep output into field
-                  MHDVariant dataPoint = Datatypes::internal::getScalar(*solution, k);
+                  MHDVariant dataPoint = Datatypes::details::getScalar(*solution, k);
                   dataPoint = this->updateStoredSolution(dataPoint, compId, i, j, matIdx);
                   field.rComp(compId).setPoint(dataPoint,i,j,matIdx);
 
@@ -1209,7 +1209,7 @@ namespace Equations {
             for(int i = 0; i < rows; i++)
             {
                // Copy timestep output into field
-               MHDVariant dataPoint = Datatypes::internal::getScalar(*solution, i + solStart,j);
+               MHDVariant dataPoint = Datatypes::details::getScalar(*solution, i + solStart,j);
                dataPoint = this->updateStoredSolution(dataPoint, compId, i, j, matIdx);
                field.rComp(compId).setPoint(dataPoint,i,j,matIdx);
             }
@@ -1227,7 +1227,7 @@ namespace Equations {
          for(int i = 0; i < rows; i++)
          {
             // Copy timestep output into field
-            MHDVariant dataPoint = Datatypes::internal::getScalar(*solution, k);
+            MHDVariant dataPoint = Datatypes::details::getScalar(*solution, k);
             dataPoint = this->updateStoredSolution(dataPoint, compId, i, mode(1), mode(0));
             field.rComp(compId).setPoint(dataPoint,i,mode(1),mode(0));
 
@@ -1274,7 +1274,7 @@ namespace Equations {
                   l = solStart + k_ + j_ + i;
 
                   // Copy timestep output into field
-                  MHDVariant dataPoint = Datatypes::internal::getScalar(*solution, l);
+                  MHDVariant dataPoint = Datatypes::details::getScalar(*solution, l);
                   dataPoint = this->updateStoredSolution(dataPoint, compId, i, j, k);
                   field.rComp(compId).setPoint(dataPoint,i,j,k);
                }

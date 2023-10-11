@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 #include "QuICC/SparseSM/Worland/WorlandKind.hpp"
 
 namespace QuICC {
@@ -27,10 +27,10 @@ namespace Worland {
    {
       public:
          /// Typedef for scalar
-         typedef internal::MHDFloat Scalar_t;
+         typedef Internal::MHDFloat Scalar_t;
 
          /// Typedef for coefficient array
-         typedef internal::ACoeff ACoeff_t;
+         typedef Internal::ACoeff ACoeff_t;
 
          /**
           * @brief Constructor

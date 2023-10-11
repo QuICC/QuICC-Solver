@@ -9,12 +9,9 @@
 // System includes
 //
 
-// External includes
-//
-
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -31,12 +28,12 @@ namespace Quadrature {
          /**
           * @brief Compute the quadrature for r in [0, 1]
           */
-         void computeQuadrature(internal::Array& igrid, internal::Array& iweights, const int size);
+         void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size);
 
          /**
           * @brief Compute the quadrature for x = 2r^2 - 1 in [-1, 1]
           */
-         void computeXQuadrature(internal::Array& igrid, internal::Array& iweights, const int size);
+         void computeXQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size);
    };
 
 }

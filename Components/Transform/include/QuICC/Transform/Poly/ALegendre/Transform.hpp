@@ -124,12 +124,12 @@ namespace ALegendre {
          /**
           * @brief Storage for the quadrature points x = [-1, 1] with internal precision
           */
-         internal::Array mIGrid;
+         Internal::Array mIGrid;
 
          /**
           * @brief Storage for the quadrature weights with internal precision
           */
-         internal::Array mIWeights;
+         Internal::Array mIWeights;
 
          /**
           * @brief Storage for the quadrature points x = [-1, 1] with internal precision

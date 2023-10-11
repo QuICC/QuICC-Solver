@@ -17,7 +17,7 @@
 #include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/IFieldEquation.hpp"
-#include "Types/DecoupledComplexInternal.hpp"
+#include "Types/DecoupledComplexUtils.hpp"
 #include "QuICC/Equations/CouplingFeature.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
@@ -198,10 +198,10 @@ namespace Equations {
       TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
       if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
       {
-         Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), eq.couplingInfo(compId).galerkinShift(matIdx, 0), tmp);
+         Datatypes::details::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), eq.couplingInfo(compId).galerkinShift(matIdx, 0), tmp);
       } else
       {
-         Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
+         Datatypes::details::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
       }
 
       // Get a restricted stencil matrix
@@ -226,8 +226,8 @@ namespace Equations {
 
       // solve for galerkin expansion
       TData lhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      Solver::internal::solveWrapper(lhs, solver, rhs);
-      Datatypes::internal::setTopBlock(storage, start, eq.couplingInfo(compId).galerkinN(matIdx), lhs);
+      Solver::details::solveWrapper(lhs, solver, rhs);
+      Datatypes::details::setTopBlock(storage, start, eq.couplingInfo(compId).galerkinN(matIdx), lhs);
    }
 
    template <typename TData> void copyNonlinear(const IScalarEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)

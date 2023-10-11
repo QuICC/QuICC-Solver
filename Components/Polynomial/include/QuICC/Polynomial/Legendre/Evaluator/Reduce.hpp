@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 
 namespace QuICC {
 
@@ -39,24 +39,24 @@ namespace Evaluator {
          /**
           * @brief Apply evaluator
           */
-         template <typename T> void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i);
+         template <typename T> void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i);
 
          /**
           * @brief Apply evaluator assuming even/odd symmetry
           */
-         template <typename T> void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i, const bool isEven);
+         template <typename T> void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i, const bool isEven);
    };
 
-   template <typename T> void Reduce::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i)
+   template <typename T> void Reduce::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i)
    {
-      rOut(i,0) = Precision::cast(ipolycol.sum());
+      rOut(i,0) = Internal::cast(ipolycol.sum());
    }
 
-   template <typename T> void Reduce::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i, const bool isEven)
+   template <typename T> void Reduce::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i, const bool isEven)
    {
       if(isEven)
       {
-         rOut(i,0) = 2.0*Precision::cast(ipolycol.sum());
+         rOut(i,0) = 2.0*Internal::cast(ipolycol.sum());
       } else
       {
          rOut(i,0) = 0.0;

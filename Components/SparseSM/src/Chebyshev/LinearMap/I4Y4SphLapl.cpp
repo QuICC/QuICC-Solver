@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4Y4SphLapl.cpp
  * @brief Source of the implementation of the I^4 Y^4 spherical laplacian sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y4SphLapl.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 

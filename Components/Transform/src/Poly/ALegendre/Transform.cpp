@@ -7,15 +7,10 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/ALegendre/Transform.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/ALegendre/Transform.hpp"
+#include "Types/Internal/Math.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 
 namespace QuICC {
@@ -29,8 +24,8 @@ namespace ALegendre {
    Array Transform::generateGrid(const int size)
    {
       // Initialise grid storage
-      internal::Array igrid(size);
-      internal::Array itmp(size);
+      Internal::Array igrid(size);
+      Internal::Array itmp(size);
 
       Polynomial::Quadrature::LegendreRule quad;
       quad.computeQuadrature(igrid, itmp, size);
@@ -93,14 +88,14 @@ namespace ALegendre {
 
       } else if(this->mspSetup->purpose() == GridPurpose::VISUALIZATION)
       {
-         internal::Array iGrid, iWeights;
+         Internal::Array iGrid, iWeights;
 
          // Set the grid and weights
          Polynomial::Quadrature::LegendreRule quad;
          quad.computeQuadrature(iGrid, iWeights, this->mspSetup->fwdSize()-2);
 
          this->mIGrid.resize(this->mspSetup->fwdSize());
-         this->mIWeights = internal::Array::Zero(this->mspSetup->fwdSize());
+         this->mIWeights = Internal::Array::Zero(this->mspSetup->fwdSize());
          this->mIGrid.segment(1, iGrid.size()) = iGrid;
          this->mIGrid(0) = -1;
          this->mIGrid(iGrid.size()+1) = 1;
@@ -111,7 +106,7 @@ namespace ALegendre {
       this->mThGrid = this->mIGrid.array().acos().cast<MHDFloat>();
 
       // Normalise weights by 2*pi for spherical harmonics
-      this->mIWeights.array() *= 2.0*Precision::PI;
+      this->mIWeights.array() *= 2.0*Internal::Math::PI;
    }
 
    void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const ITransformOperator& op)

@@ -13,7 +13,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/MatrixOperationsInternal.hpp"
+#include "Types/MatrixOperations.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
@@ -317,7 +317,7 @@ namespace Equations {
          int cols = rField.cols();
          int rhsRows = op->cols();
 
-         Datatypes::internal::addMatrixProduct(rField, start, *op, rhs.block(rhsStart, 0, rhsRows, cols));
+         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.block(rhsStart, 0, rhsRows, cols));
 
       } else if(eq.hasQIZ(compId))
       {
@@ -328,7 +328,7 @@ namespace Equations {
          int cols = rField.cols();
          int rhsRows = op->cols();
 
-         Datatypes::internal::addMatrixProduct(rField, start, *op, rhs.block(rhsStart, 0, rhsRows, cols));
+         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.block(rhsStart, 0, rhsRows, cols));
       }
    }
 
@@ -346,7 +346,7 @@ namespace Equations {
          int cols = rField.real().cols();
          int rhsRows = op->cols();
 
-         Datatypes::internal::addMatrixProduct(rField, start, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
+         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
 
       } else if(eq.hasQIZ(compId))
       {
@@ -357,7 +357,7 @@ namespace Equations {
          int cols = rField.real().cols();
          int rhsRows = op->cols();
 
-         Datatypes::internal::addMatrixProduct(rField, start, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
+         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
       }
    }
 
@@ -366,7 +366,7 @@ namespace Equations {
       // Create pointer to sparse operator
       const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
 
-      Datatypes::internal::setMatrixProduct(rField, 0, *op, rhs.block(start, 0, op->cols(), rhs.cols()));
+      Datatypes::details::setMatrixProduct(rField, 0, *op, rhs.block(start, 0, op->cols(), rhs.cols()));
    }
 
    template <> inline void applyGalerkinStencil<DecoupledZMatrix>(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& rField, const int start, const int matIdx, const DecoupledZMatrix& rhs)
@@ -377,7 +377,7 @@ namespace Equations {
       // Create pointer to sparse operator
       const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
 
-      Datatypes::internal::setMatrixProduct(rField, 0, *op, rhs.real().block(start, 0, op->cols(), rhs.real().cols()), rhs.imag().block(start, 0, op->cols(), rhs.imag().cols()));
+      Datatypes::details::setMatrixProduct(rField, 0, *op, rhs.real().block(start, 0, op->cols(), rhs.real().cols()), rhs.imag().block(start, 0, op->cols(), rhs.imag().cols()));
    }
 
    template <typename T, typename TOperator,typename TData> void computeExplicitTerm(const IEquation& eq, const std::size_t opId, FieldComponents::Spectral::Id compId, TData& rSolverField, const int eqStart, SpectralFieldId fieldId, const typename Framework::Selector::ScalarField<T>& explicitField, const int matIdx)
@@ -439,12 +439,12 @@ namespace Equations {
          #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
          // Apply operator to field
-         Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, tmp);
+         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, tmp);
 
       } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
          // Apply operator to field
-         Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(matIdx));
+         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(matIdx));
 
       } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
@@ -455,7 +455,7 @@ namespace Equations {
          assert(op->cols() == explicitField.slice(mode(0)).rows());
 
          // Apply operator to field
-         Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
+         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
 
       } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
       {
@@ -501,7 +501,7 @@ namespace Equations {
          }
 
          // Apply operator to field
-         Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, tmp);
+         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, tmp);
       }
    }
 

@@ -78,7 +78,7 @@ namespace Reductor {
          /**
           * @brief Compute power quadrature
           */
-         void computePowerQuadrature(internal::Array& igrid, internal::Array& iweights, const int gSize) const;
+         void computePowerQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize) const;
 
          /**
           * @brief Apply ith operator
@@ -89,12 +89,12 @@ namespace Reductor {
          /**
           * @brief Initialise the operators
           */
-         virtual void initOperators(const internal::Array& igrid, const internal::Array& iweights) const override;
+         virtual void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const override;
 
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, Matrix& eop, const internal::Array& igrid, const internal::Array& iweights, const int i) const = 0;
+         virtual void makeOperator(Matrix& op, Matrix& eop, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const = 0;
 
          /**
           * @brief Compute power (integral of squared values)

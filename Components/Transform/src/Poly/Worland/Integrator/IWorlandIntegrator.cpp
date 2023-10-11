@@ -43,7 +43,7 @@ namespace Integrator {
    {
    }
 
-   void IWorlandIntegrator::initOperators(const internal::Array& igrid, const internal::Array& iweights) const
+   void IWorlandIntegrator::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       #if defined QUICC_WORLAND_INTGIMPL_MATRIX
          // Reserve storage for the operators

@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 
@@ -36,11 +36,11 @@ namespace Worland {
    class slaplWnl: public WorlandBase
    {
       public:
-         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator);
+         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
 
    };
 
-   template <typename T, typename TEvaluator> void slaplWnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator)
+   template <typename T, typename TEvaluator> void slaplWnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       int gN = igrid.rows();
 
@@ -59,18 +59,18 @@ namespace Worland {
          throw std::logic_error("Operator matrix does not mach grid size");
       }
 
-      internal::MHDFloat a1 = this->alpha(l) + MHD_MP(1.0);
-      internal::MHDFloat b1 = this->beta(l) + MHD_MP(1.0);
-      internal::MHDFloat a2 = this->alpha(l) + MHD_MP(2.0);
-      internal::MHDFloat b2 = this->beta(l) + MHD_MP(2.0);
-      internal::MHDFloat dl = internal::MHDFloat(l);
+      Internal::MHDFloat a1 = this->alpha(l) + MHD_MP(1.0);
+      Internal::MHDFloat b1 = this->beta(l) + MHD_MP(1.0);
+      Internal::MHDFloat a2 = this->alpha(l) + MHD_MP(2.0);
+      Internal::MHDFloat b2 = this->beta(l) + MHD_MP(2.0);
+      Internal::MHDFloat dl = Internal::MHDFloat(l);
 
       // Make X grid in [-1, 1]
-      internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+      Internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
 
       // Storage for P_n^{(alpha,beta)} and dP_n{(alpha,beta)}
-      internal::Matrix idpnab(gN,2);
-      internal::Matrix id2pnab(gN,2);
+      Internal::Matrix idpnab(gN,2);
+      Internal::Matrix id2pnab(gN,2);
 
       // Compute spherical laplacian P_0
       idpnab.col(0).setZero();

@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Jacobi/JacobiBase.hpp"
 
@@ -42,7 +42,7 @@ class d3Pnab
        *
        * Internal computation can be done in multiple precision
        */
-      template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator)
+      template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::MHDFloat alpha, const Internal::MHDFloat beta, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
       {
          int gN = igrid.rows();
 
@@ -61,10 +61,10 @@ class d3Pnab
             throw std::logic_error("Operator matrix does not mach grid size");
          }
 
-         internal::Matrix idiff(gN,2);
+         Internal::Matrix idiff(gN,2);
 
-         internal::MHDFloat a3 = alpha + MHD_MP(3.0);
-         internal::MHDFloat b3 = beta + MHD_MP(3.0);
+         Internal::MHDFloat a3 = alpha + MHD_MP(3.0);
+         Internal::MHDFloat b3 = beta + MHD_MP(3.0);
 
          idiff.col(0).setZero();
          evaluator(rOut, idiff.col(0), 0);

@@ -3,13 +3,10 @@
  * @brief Store complex numbers as two independent matrices
  */
 
-#ifndef QUICC_DATATYPES_DECOUPLEDCOMPLEX_HPP
-#define QUICC_DATATYPES_DECOUPLEDCOMPLEX_HPP
+#ifndef QUICC_TYPES_DECOUPLEDCOMPLEX_HPP
+#define QUICC_TYPES_DECOUPLEDCOMPLEX_HPP
 
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -17,122 +14,123 @@
 
 namespace QuICC {
 
-namespace Datatypes  {
+namespace Datatypes {
+
+/**
+ * @brief Store complex numbers as two independent matrices
+ */
+template <typename TData> class DecoupledComplex
+{
+public:
+   /// Typedef for the Scalar type (This is NOT the internal scalar type, it is
+   /// for compatibility with Eigen's matrices)
+   typedef std::complex<double> Scalar;
 
    /**
-    * @brief Store complex numbers as two independent matrices
+    * @brief Constructor for empty matrices
     */
-   template <typename TData> class DecoupledComplex
-   {
-      public:
-         /// Typedef for the Scalar type (This is NOT the internal scalar type, it is for compatibility with Eigen's matrices)
-         typedef std::complex<double> Scalar;
+   DecoupledComplex();
 
-         /**
-          * @brief Constructor for empty matrices
-          */
-         DecoupledComplex();
+   /**
+    * @brief Constructor with identical real and imaginary sizes
+    */
+   DecoupledComplex(const int rows, const int cols);
 
-         /**
-          * @brief Constructor with identical real and imaginary sizes
-          */
-         DecoupledComplex(const int rows, const int cols);
+   /**
+    * @brief Constructor with different real and imaginary sizes
+    */
+   DecoupledComplex(const int rowsR, const int colsR, const int rowsI,
+      const int colsI);
 
-         /**
-          * @brief Constructor with different real and imaginary sizes
-          */
-         DecoupledComplex(const int rowsR, const int colsR, const int rowsI, const int colsI);
+   /**
+    * @brief Empty Destructor
+    */
+   ~DecoupledComplex();
 
-         /**
-          * @brief Empty Destructor
-          */
-         ~DecoupledComplex();
+   /**
+    * @brief Get real component
+    */
+   const TData& real() const;
 
-         /**
-          * @brief Get real component
-          */
-         const TData& real() const;
+   /**
+    * @brief Get imaginary component
+    */
+   const TData& imag() const;
 
-         /**
-          * @brief Get imaginary component
-          */
-         const TData& imag() const;
+   /**
+    * @brief Set real component
+    */
+   TData& real();
 
-         /**
-          * @brief Set real component
-          */
-         TData& real();
+   /**
+    * @brief Set imaginary component
+    */
+   TData& imag();
 
-         /**
-          * @brief Set imaginary component
-          */
-         TData& imag();
+   /**
+    * @brief Set both components to zero
+    */
+   void setZero();
 
-         /**
-          * @brief Set both components to zero
-          */
-         void setZero();
-         
-      protected:
+protected:
+private:
+   /**
+    * @brief Real component
+    */
+   TData mReal;
 
-      private:
-         /**
-          * @brief Real component
-          */
-         TData mReal;
+   /**
+    * @brief Imaginary component
+    */
+   TData mImag;
+};
 
-         /**
-          * @brief Imaginary component
-          */
-         TData mImag;
-   };
-
-   template <typename TData> inline const TData& DecoupledComplex<TData>::real() const
-   {
-      return this->mReal;
-   }
-
-   template <typename TData> inline const TData& DecoupledComplex<TData>::imag() const
-   {
-      return this->mImag;
-   }
-
-   template <typename TData> inline TData& DecoupledComplex<TData>::real()
-   {
-      return this->mReal;
-   }
-
-   template <typename TData> inline TData& DecoupledComplex<TData>::imag()
-   {
-      return this->mImag;
-   }
-
-   template <typename TData> inline void DecoupledComplex<TData>::setZero()
-   {
-      this->mReal.setZero();
-      this->mImag.setZero();
-   }
-
-   template <typename TData> DecoupledComplex<TData>::DecoupledComplex()
-      : mReal(), mImag()
-   {
-   }
-
-   template <typename TData> DecoupledComplex<TData>::DecoupledComplex(const int rows, const int cols)
-      : mReal(rows,cols), mImag(rows,cols)
-   {
-   }
-
-   template <typename TData> DecoupledComplex<TData>::DecoupledComplex(const int rowsR, const int colsR, const int rowsI, const int colsI)
-      : mReal(rowsR,rowsR), mImag(rowsI,colsI)
-   {
-   }
-
-   template <typename TData> DecoupledComplex<TData>::~DecoupledComplex()
-   {
-   }
-
-}
+template <typename TData>
+inline const TData& DecoupledComplex<TData>::real() const
+{
+   return this->mReal;
 }
 
-#endif // QUICC_DATATYPES_DECOUPLEDCOMPLEX_HPP
+template <typename TData>
+inline const TData& DecoupledComplex<TData>::imag() const
+{
+   return this->mImag;
+}
+
+template <typename TData> inline TData& DecoupledComplex<TData>::real()
+{
+   return this->mReal;
+}
+
+template <typename TData> inline TData& DecoupledComplex<TData>::imag()
+{
+   return this->mImag;
+}
+
+template <typename TData> inline void DecoupledComplex<TData>::setZero()
+{
+   this->mReal.setZero();
+   this->mImag.setZero();
+}
+
+template <typename TData>
+DecoupledComplex<TData>::DecoupledComplex() : mReal(), mImag()
+{}
+
+template <typename TData>
+DecoupledComplex<TData>::DecoupledComplex(const int rows, const int cols) :
+    mReal(rows, cols), mImag(rows, cols)
+{}
+
+template <typename TData>
+DecoupledComplex<TData>::DecoupledComplex(const int rowsR, const int colsR,
+   const int rowsI, const int colsI) :
+    mReal(rowsR, rowsR), mImag(rowsI, colsI)
+{}
+
+template <typename TData> DecoupledComplex<TData>::~DecoupledComplex() {}
+
+} // namespace Datatypes
+} // namespace QuICC
+
+#endif // QUICC_TYPES_DECOUPLEDCOMPLEX_HPP

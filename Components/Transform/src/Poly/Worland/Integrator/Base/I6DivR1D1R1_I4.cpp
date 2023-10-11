@@ -28,7 +28,7 @@ namespace Worland {
 
 namespace Integrator {
 
-   void I6DivR1D1R1_I4<base_t>::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void I6DivR1D1R1_I4<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
 
@@ -66,17 +66,17 @@ namespace Integrator {
          int nN = nPoly + 0;
          this->checkGridSize(nN, l, igrid.size());
 
-         internal::Matrix tOp(igrid.size(), nN);
+         Internal::Matrix tOp(igrid.size(), nN);
 
-         wnl.compute<internal::MHDFloat>(tOp, nN, l_in, igrid, iweights, ev::Set());
+         wnl.compute<Internal::MHDFloat>(tOp, nN, l_in, igrid, iweights, ev::Set());
 
-         internal::Matrix opA(igrid.size(), nN);
+         Internal::Matrix opA(igrid.size(), nN);
          Polynomial::Worland::r_1drWnl r_1drWnl;
-         r_1drWnl.compute<internal::MHDFloat>(opA, nN, l_in, igrid, internal::Array(), ev::Set());
+         r_1drWnl.compute<Internal::MHDFloat>(opA, nN, l_in, igrid, Internal::Array(), ev::Set());
 
-         internal::Matrix opB(igrid.size(), nN);
+         Internal::Matrix opB(igrid.size(), nN);
          Polynomial::Worland::Wnl wnlB;
-         wnlB.compute<internal::MHDFloat>(opB, nN, l, igrid, iweights, ev::Set());
+         wnlB.compute<Internal::MHDFloat>(opB, nN, l, igrid, iweights, ev::Set());
 
          auto a = wnl.alpha(l);
          auto b = wnl.dBeta();
@@ -112,7 +112,7 @@ namespace Integrator {
 
             MatrixZ tmp(in.rows(), in.cols());
             Polynomial::Worland::r_1drWnl r_1drWnl;
-            r_1drWnl.compute<MHDComplex>(tmp, nPoly, l_in, this->mGrid, internal::Array(), ev::OuterProduct<MHDComplex>(rOut));
+            r_1drWnl.compute<MHDComplex>(tmp, nPoly, l_in, this->mGrid, Internal::Array(), ev::OuterProduct<MHDComplex>(rOut));
 
             wnl.compute<MHDComplex>(rOut, nPoly, l, this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(tmp));
 

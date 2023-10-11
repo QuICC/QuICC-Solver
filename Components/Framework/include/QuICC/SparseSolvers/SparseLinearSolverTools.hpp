@@ -24,7 +24,7 @@ namespace QuICC {
 
 namespace Solver {
 
-namespace internal {
+namespace details {
 
    /**
     * @brief Simpler wrapper around solver solve call
@@ -41,7 +41,7 @@ namespace internal {
    template <typename TSolver> void solveWrapper(DecoupledZMatrix& rSolution, std::shared_ptr<TSolver> spSolver, const DecoupledZMatrix& rhs);
 }
 
-namespace internal {
+namespace details {
 
    template <typename TSolver>  inline void solveWrapper(Eigen::Matrix<typename TSolver::MatrixType::Scalar, Eigen::Dynamic, Eigen::Dynamic>& rSolution, TSolver& solver, const Eigen::Matrix<typename TSolver::MatrixType::Scalar, Eigen::Dynamic, Eigen::Dynamic>& rhs)
    {

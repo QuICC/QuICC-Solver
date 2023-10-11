@@ -1,4 +1,4 @@
-/** 
+/**
  * @file WorlandBase.cpp
  * @brief Source of the implementation of the base for the Jones-Worland polynomial base
  */
@@ -7,15 +7,10 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Polynomial/Worland/WorlandBase.hpp"
-
 // Project includes
 //
+#include "QuICC/Polynomial/Worland/WorlandBase.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -23,17 +18,17 @@ namespace Polynomial {
 
 namespace Worland {
 
-   const internal::MHDFloat WorlandBase::ALPHA_CHEBYSHEV = -MHD_MP(0.5);
-   const internal::MHDFloat WorlandBase::DBETA_CHEBYSHEV = -MHD_MP(0.5);
+   const Internal::MHDFloat WorlandBase::ALPHA_CHEBYSHEV = -MHD_MP(0.5);
+   const Internal::MHDFloat WorlandBase::DBETA_CHEBYSHEV = -MHD_MP(0.5);
 
-   const internal::MHDFloat WorlandBase::ALPHA_LEGENDRE = MHD_MP(0.0);;
-   const internal::MHDFloat WorlandBase::DBETA_LEGENDRE = -MHD_MP(0.5);
+   const Internal::MHDFloat WorlandBase::ALPHA_LEGENDRE = MHD_MP(0.0);;
+   const Internal::MHDFloat WorlandBase::DBETA_LEGENDRE = -MHD_MP(0.5);
 
-   const internal::MHDFloat WorlandBase::ALPHA_CYLENERGY = MHD_MP(0.0);
-   const internal::MHDFloat WorlandBase::DBETA_CYLENERGY = MHD_MP(0.0);
+   const Internal::MHDFloat WorlandBase::ALPHA_CYLENERGY = MHD_MP(0.0);
+   const Internal::MHDFloat WorlandBase::DBETA_CYLENERGY = MHD_MP(0.0);
 
-   const internal::MHDFloat WorlandBase::ALPHA_SPHENERGY = MHD_MP(0.0);
-   const internal::MHDFloat WorlandBase::DBETA_SPHENERGY = MHD_MP(0.5);
+   const Internal::MHDFloat WorlandBase::ALPHA_SPHENERGY = MHD_MP(0.0);
+   const Internal::MHDFloat WorlandBase::DBETA_SPHENERGY = MHD_MP(0.5);
 
    WorlandBase::WorlandBase()
    {
@@ -54,7 +49,7 @@ namespace Worland {
       #endif //QUICC_WORLAND_TYPE_CHEBYSHEV
    }
 
-   WorlandBase::WorlandBase(const internal::MHDFloat alpha, const internal::MHDFloat dBeta)
+   WorlandBase::WorlandBase(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta)
       : mAlpha(alpha), mDBeta(dBeta)
    {
    }
@@ -63,24 +58,24 @@ namespace Worland {
    {
    }
 
-   internal::MHDFloat WorlandBase::alpha(const int)
+   Internal::MHDFloat WorlandBase::alpha(const int)
    {
       return this->mAlpha;
    }
 
-   internal::MHDFloat WorlandBase::dBeta()
+   Internal::MHDFloat WorlandBase::dBeta()
    {
       return this->mDBeta;
    }
 
-   internal::MHDFloat WorlandBase::beta(const int l)
+   Internal::MHDFloat WorlandBase::beta(const int l)
    {
-      return internal::MHDFloat(l) + this->dBeta();
+      return Internal::MHDFloat(l) + this->dBeta();
    }
 
-   void WorlandBase::computeW0l(Eigen::Ref<internal::Matrix> iw0l, const int l, const internal::MHDFloat alpha, const internal::MHDFloat beta, const internal::Array& igrid, ThreeTermRecurrence::NormalizerAB norm)
+   void WorlandBase::computeW0l(Eigen::Ref<Internal::Matrix> iw0l, const int l, const Internal::MHDFloat alpha, const Internal::MHDFloat beta, const Internal::Array& igrid, ThreeTermRecurrence::NormalizerAB norm)
    {
-      internal::Array cs = norm(alpha, beta);
+      Internal::Array cs = norm(alpha, beta);
 
       if(l == 0)
       {
@@ -100,7 +95,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWPnab;
-      #else 
+      #else
          return &WorlandBase::naturalWPnab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -109,7 +104,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWP1ab;
-      #else 
+      #else
          return &WorlandBase::naturalWP1ab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -118,7 +113,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWP0ab;
-      #else 
+      #else
          return &WorlandBase::naturalWP0ab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -127,7 +122,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWDPnab;
-      #else 
+      #else
          return &WorlandBase::naturalWDPnab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -136,7 +131,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWDP1ab;
-      #else 
+      #else
          return &WorlandBase::naturalWDP1ab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -145,7 +140,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWDP0ab;
-      #else 
+      #else
          return &WorlandBase::naturalWDP0ab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -154,7 +149,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWD2Pnab;
-      #else 
+      #else
          return &WorlandBase::naturalWD2Pnab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -163,7 +158,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWD2P1ab;
-      #else 
+      #else
          return &WorlandBase::naturalWD2P1ab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -172,7 +167,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWD2P0ab;
-      #else 
+      #else
          return &WorlandBase::naturalWD2P0ab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -181,7 +176,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWD3Pnab;
-      #else 
+      #else
          return &WorlandBase::naturalWD3Pnab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -190,7 +185,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWD3P1ab;
-      #else 
+      #else
          return &WorlandBase::naturalWD3P1ab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -199,7 +194,7 @@ namespace Worland {
    {
       #ifdef QUICC_WORLAND_NORM_UNITY
          return &WorlandBase::unitWD3P0ab;
-      #else 
+      #else
          return &WorlandBase::naturalWD3P0ab;
       #endif //QUICC_WORLAND_NORM_UNITY
    }
@@ -208,44 +203,44 @@ namespace Worland {
    // Unit Worland polynomial normalizers
    //
 
-   internal::Array WorlandBase::unitWPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWPnab(const Internal::MHDFloat n, const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(4);
+      Internal::Array cs(4);
 
-      cs(0) = -(MHD_MP(2.0)*n + a + b)/(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))*precision::sqrt((n - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))/(n + a + b));
+      cs(0) = -(MHD_MP(2.0)*n + a + b)/(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))*Internal::Math::sqrt((n - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))/(n + a + b));
       if (n > MHD_MP(2.0))
       {
-         cs(0) *= precision::sqrt((n + a + b - MHD_MP(1.0))/(MHD_MP(2.0)*n + a + b - MHD_MP(3.0)));
+         cs(0) *= Internal::Math::sqrt((n + a + b - MHD_MP(1.0))/(MHD_MP(2.0)*n + a + b - MHD_MP(3.0)));
       }
-      cs(1) = ((MHD_MP(2.0)*n + a + b)/MHD_MP(2.0))*precision::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b));
-      cs(2) = (a*a - b*b)/(MHD_MP(2.0)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)))*precision::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b));
-      cs(3) = precision::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(n*(n + a)*(n + b)));
+      cs(1) = ((MHD_MP(2.0)*n + a + b)/MHD_MP(2.0))*Internal::Math::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b));
+      cs(2) = (a*a - b*b)/(MHD_MP(2.0)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)))*Internal::Math::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b));
+      cs(3) = Internal::Math::sqrt((MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(n*(n + a)*(n + b)));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::unitWP1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWP1ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(3);
+      Internal::Array cs(3);
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
-      cs(2) = precision::sqrt((a + b + MHD_MP(3.0))/(MHD_MP(4.0)*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))));
+      cs(2) = Internal::Math::sqrt((a + b + MHD_MP(3.0))/(MHD_MP(4.0)*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::unitWP0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWP0ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
-      cs(0) = precision::sqrt(MHD_MP(2.0))*precision::exp(MHD_MP(0.5)*(precision::lgamma(a + b + MHD_MP(2.0)) - precision::lgamma(a + MHD_MP(1.0)) - precision::lgamma(b + MHD_MP(1.0))));
+      cs(0) = Internal::Math::sqrt(MHD_MP(2.0))*Internal::Math::exp(MHD_MP(0.5)*(Internal::Math::lgamma(a + b + MHD_MP(2.0)) - Internal::Math::lgamma(a + MHD_MP(1.0)) - Internal::Math::lgamma(b + MHD_MP(1.0))));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
@@ -253,41 +248,41 @@ namespace Worland {
    //
    // Unit Worland first derivative normalizers
    //
-   internal::Array WorlandBase::unitWDPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWDPnab(const Internal::MHDFloat n, const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(4);
+      Internal::Array cs(4);
 
-      cs(0) = -((MHD_MP(2.0)*n + a + b)/(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)))*precision::sqrt((n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(n + a + b - MHD_MP(1.0))/(n*(n + a + b - MHD_MP(2.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(3.0))));
-      cs(1) = ((MHD_MP(2.0)*n + a + b)/(MHD_MP(2.0)*n))*precision::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b - MHD_MP(1.0)));
-      cs(2) = ((a*a - b*b)/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))))*precision::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b - MHD_MP(1.0)));
-      cs(3) = precision::sqrt((n + MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/((n + a)*(n + b)));
+      cs(0) = -((MHD_MP(2.0)*n + a + b)/(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)))*Internal::Math::sqrt((n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(n + a + b - MHD_MP(1.0))/(n*(n + a + b - MHD_MP(2.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(3.0))));
+      cs(1) = ((MHD_MP(2.0)*n + a + b)/(MHD_MP(2.0)*n))*Internal::Math::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b - MHD_MP(1.0)));
+      cs(2) = ((a*a - b*b)/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))))*Internal::Math::sqrt((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n + a + b - MHD_MP(1.0)));
+      cs(3) = Internal::Math::sqrt((n + MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/((n + a)*(n + b)));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::unitWDP1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWDP1ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(3);
+      Internal::Array cs(3);
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
 
-      cs(2) = precision::sqrt((a + b + MHD_MP(1.0))*(a + b + MHD_MP(3.0))/(MHD_MP(2.0)*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))*(a + b)));
+      cs(2) = Internal::Math::sqrt((a + b + MHD_MP(1.0))*(a + b + MHD_MP(3.0))/(MHD_MP(2.0)*(a + MHD_MP(1.0))*(b + MHD_MP(1.0))*(a + b)));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::unitWDP0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWDP0ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
-      cs(0) = MHD_MP(2.0)*precision::sqrt(MHD_MP(2.0)*(a+b))*precision::exp(MHD_MP(0.5)*(precision::lgamma(a + b + MHD_MP(2.0)) - precision::lgamma(a + MHD_MP(1.0)) - precision::lgamma(b + MHD_MP(1.0))));
+      cs(0) = MHD_MP(2.0)*Internal::Math::sqrt(MHD_MP(2.0)*(a+b))*Internal::Math::exp(MHD_MP(0.5)*(Internal::Math::lgamma(a + b + MHD_MP(2.0)) - Internal::Math::lgamma(a + MHD_MP(1.0)) - Internal::Math::lgamma(b + MHD_MP(1.0))));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
@@ -295,40 +290,40 @@ namespace Worland {
    //
    // Unit Worland second derivative normalizers
    //
-   internal::Array WorlandBase::unitWD2Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWD2Pnab(const Internal::MHDFloat n, const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(4);
+      Internal::Array cs(4);
 
-      cs(0) = -((MHD_MP(2.0)*n + a + b)*(n + a + b - MHD_MP(1.0))/((MHD_MP(2.0)*n + a + b - MHD_MP(2.0))))*precision::sqrt((n+1)*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))/((n + a + b - MHD_MP(3.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(3.0))));
-      cs(1) = ((MHD_MP(2.0)*n + a + b)/(MHD_MP(2.0)))*precision::sqrt(MHD_MP(2.0)*n + a + b - MHD_MP(1.0));
-      cs(2) = ((a*a - b*b)/(MHD_MP(2.0)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))))*precision::sqrt(MHD_MP(2.0)*n + a + b - MHD_MP(1.0));
-      cs(3) = precision::sqrt((n + MHD_MP(2.0))*(MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(n*n*(n + a)*(n + b)*(n + a + b - MHD_MP(2.0))));
+      cs(0) = -((MHD_MP(2.0)*n + a + b)*(n + a + b - MHD_MP(1.0))/((MHD_MP(2.0)*n + a + b - MHD_MP(2.0))))*Internal::Math::sqrt((n+1)*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))/((n + a + b - MHD_MP(3.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(3.0))));
+      cs(1) = ((MHD_MP(2.0)*n + a + b)/(MHD_MP(2.0)))*Internal::Math::sqrt(MHD_MP(2.0)*n + a + b - MHD_MP(1.0));
+      cs(2) = ((a*a - b*b)/(MHD_MP(2.0)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))))*Internal::Math::sqrt(MHD_MP(2.0)*n + a + b - MHD_MP(1.0));
+      cs(3) = Internal::Math::sqrt((n + MHD_MP(2.0))*(MHD_MP(2.0)*n + a + b + MHD_MP(1.0))/(n*n*(n + a)*(n + b)*(n + a + b - MHD_MP(2.0))));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::unitWD2P1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWD2P1ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(3);
+      Internal::Array cs(3);
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
-      cs(2) = (precision::sqrt(MHD_MP(3.0))/MHD_MP(2.0))*precision::sqrt((a + b + MHD_MP(1.0))*(a + b + MHD_MP(3.0))/((a + MHD_MP(1.0))*(b + MHD_MP(1.0))*(a + b - MHD_MP(1.0))));
+      cs(2) = (Internal::Math::sqrt(MHD_MP(3.0))/MHD_MP(2.0))*Internal::Math::sqrt((a + b + MHD_MP(1.0))*(a + b + MHD_MP(3.0))/((a + MHD_MP(1.0))*(b + MHD_MP(1.0))*(a + b - MHD_MP(1.0))));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::unitWD2P0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWD2P0ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
-      cs(0) = MHD_MP(8.0)*precision::sqrt((a + b)*(a + b - MHD_MP(1.0)))*precision::exp(MHD_MP(0.5)*(precision::lgamma(a + b + MHD_MP(2.0)) - precision::lgamma(a + MHD_MP(1.0)) - precision::lgamma(b + MHD_MP(1.0))));
+      cs(0) = MHD_MP(8.0)*Internal::Math::sqrt((a + b)*(a + b - MHD_MP(1.0)))*Internal::Math::exp(MHD_MP(0.5)*(Internal::Math::lgamma(a + b + MHD_MP(2.0)) - Internal::Math::lgamma(a + MHD_MP(1.0)) - Internal::Math::lgamma(b + MHD_MP(1.0))));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
@@ -336,40 +331,40 @@ namespace Worland {
    //
    // Unit Worland third derivative normalizers
    //
-   internal::Array WorlandBase::unitWD3Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWD3Pnab(const Internal::MHDFloat n, const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(4);
+      Internal::Array cs(4);
 
-      cs(0) = -((MHD_MP(2.0)*n + a + b)*(n + a + b - MHD_MP(1.0))/((MHD_MP(2.0)*n + a + b - MHD_MP(2.0))))*precision::sqrt((n+2)*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))/((n + a + b - MHD_MP(4.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(3.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(1.0))));
+      cs(0) = -((MHD_MP(2.0)*n + a + b)*(n + a + b - MHD_MP(1.0))/((MHD_MP(2.0)*n + a + b - MHD_MP(2.0))))*Internal::Math::sqrt((n+2)*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))/((n + a + b - MHD_MP(4.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(3.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(1.0))));
       cs(1) = ((MHD_MP(2.0)*n + a + b)/(MHD_MP(2.0)));
       cs(2) = ((a*a - b*b)/(MHD_MP(2.0)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0))));
-      cs(3) = precision::sqrt((n + MHD_MP(3.0))*(MHD_MP(2.0)*n + a + b + MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n*n*(n + a)*(n + b)*(n + a + b - MHD_MP(3.0))));
+      cs(3) = Internal::Math::sqrt((n + MHD_MP(3.0))*(MHD_MP(2.0)*n + a + b + MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(1.0))/(n*n*(n + a)*(n + b)*(n + a + b - MHD_MP(3.0))));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::unitWD3P1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWD3P1ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(3);
+      Internal::Array cs(3);
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
-      cs(2) = precision::sqrt((a + b + MHD_MP(1.0))*(a + b + MHD_MP(3.0))/((a + MHD_MP(1.0))*(b + MHD_MP(1.0))*(a + b - MHD_MP(2.0))));
+      cs(2) = Internal::Math::sqrt((a + b + MHD_MP(1.0))*(a + b + MHD_MP(3.0))/((a + MHD_MP(1.0))*(b + MHD_MP(1.0))*(a + b - MHD_MP(2.0))));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::unitWD3P0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::unitWD3P0ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
-      cs(0) = MHD_MP(16.0)*precision::sqrt(MHD_MP(3.0)*(a + b)*(a + b - MHD_MP(1.0))*(a + b - MHD_MP(2.0)))*precision::exp(MHD_MP(0.5)*(precision::lgamma(a + b + MHD_MP(2.0)) - precision::lgamma(a + MHD_MP(1.0)) - precision::lgamma(b + MHD_MP(1.0))));
+      cs(0) = MHD_MP(16.0)*Internal::Math::sqrt(MHD_MP(3.0)*(a + b)*(a + b - MHD_MP(1.0))*(a + b - MHD_MP(2.0)))*Internal::Math::exp(MHD_MP(0.5)*(Internal::Math::lgamma(a + b + MHD_MP(2.0)) - Internal::Math::lgamma(a + MHD_MP(1.0)) - Internal::Math::lgamma(b + MHD_MP(1.0))));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
@@ -377,40 +372,40 @@ namespace Worland {
    //
    // Natural polynomial normalizer
    //
-   internal::Array WorlandBase::naturalWPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWPnab(const Internal::MHDFloat n, const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(4);
+      Internal::Array cs(4);
 
       cs(0) = -((n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n*(n + a + b));
       cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(n + a + b)*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0);
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::naturalWP1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWP1ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(3);
+      Internal::Array cs(3);
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
       cs(2) = MHD_MP(0.5);
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::naturalWP0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWP0ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
       cs(0) = MHD_MP(1.0);
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
@@ -418,40 +413,40 @@ namespace Worland {
    //
    // Natural first derivative normalizer
    //
-   internal::Array WorlandBase::naturalWDPnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWDPnab(const Internal::MHDFloat n, const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(4);
+      Internal::Array cs(4);
 
       cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b - MHD_MP(2.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
       cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(1.0));
 
-      assert(!precision::isnan(cs.sum()));
-      
+      assert(!Internal::Math::isnan(cs.sum()));
+
       return cs;
    }
 
-   internal::Array WorlandBase::naturalWDP1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWDP1ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(3);
+      Internal::Array cs(3);
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
       cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::naturalWDP0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWDP0ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
       cs(0) = MHD_MP(2.0)*(a + b);
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
@@ -459,40 +454,40 @@ namespace Worland {
    //
    // Natural second derivative normalizer
    //
-   internal::Array WorlandBase::naturalWD2Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWD2Pnab(const Internal::MHDFloat n, const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(4);
+      Internal::Array cs(4);
 
       cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b - MHD_MP(3.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
       cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(2.0));
 
-      assert(!precision::isnan(cs.sum()));
-      
+      assert(!Internal::Math::isnan(cs.sum()));
+
       return cs;
    }
 
-   internal::Array WorlandBase::naturalWD2P1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWD2P1ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(3);
+      Internal::Array cs(3);
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
       cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(1.0)));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::naturalWD2P0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWD2P0ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
       cs(0) = MHD_MP(4.0)*(a + b)*(a + b - MHD_MP(1.0));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
@@ -500,40 +495,40 @@ namespace Worland {
    //
    // Natural third derivative normalizer
    //
-   internal::Array WorlandBase::naturalWD3Pnab(const internal::MHDFloat n, const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWD3Pnab(const Internal::MHDFloat n, const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(4);
+      Internal::Array cs(4);
 
       cs(0) = -((n + a + b - MHD_MP(1.0))*(n + a - MHD_MP(1.0))*(n + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(n*(n + a + b - MHD_MP(4.0))*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(1) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(MHD_MP(2.0)*n + a + b))/(MHD_MP(2.0)*n);
       cs(2) = ((MHD_MP(2.0)*n + a + b - MHD_MP(1.0))*(a*a - b*b))/(MHD_MP(2.0)*n*(MHD_MP(2.0)*n + a + b - MHD_MP(2.0)));
       cs(3) = MHD_MP(1.0)/(n + a + b - MHD_MP(3.0));
 
-      assert(!precision::isnan(cs.sum()));
-      
+      assert(!Internal::Math::isnan(cs.sum()));
+
       return cs;
    }
 
-   internal::Array WorlandBase::naturalWD3P1ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWD3P1ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(3);
+      Internal::Array cs(3);
 
       cs(0) = (a + b + MHD_MP(2.0));
       cs(1) = (a - b);
       cs(2) = (a + b + MHD_MP(1.0))/(MHD_MP(2.0)*(a + b - MHD_MP(2.0)));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }
 
-   internal::Array WorlandBase::naturalWD3P0ab(const internal::MHDFloat a, const internal::MHDFloat b)
+   Internal::Array WorlandBase::naturalWD3P0ab(const Internal::MHDFloat a, const Internal::MHDFloat b)
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
       cs(0) = MHD_MP(8.0)*(a + b)*(a + b - MHD_MP(1.0))*(a + b - MHD_MP(2.0));
 
-      assert(!precision::isnan(cs.sum()));
+      assert(!Internal::Math::isnan(cs.sum()));
 
       return cs;
    }

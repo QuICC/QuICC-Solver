@@ -27,7 +27,7 @@ add_subdirectory(Bessel)
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   QuICC::Common
   Polynomial::Bessel
-  )
+)
 
 # Additional configuration
 include(setup/Worland_configure)

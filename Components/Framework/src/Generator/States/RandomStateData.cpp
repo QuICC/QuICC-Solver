@@ -22,7 +22,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 
 namespace QuICC {

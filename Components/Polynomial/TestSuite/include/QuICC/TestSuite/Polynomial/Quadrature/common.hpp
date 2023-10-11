@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Precision.hpp"
+#include "Types/Internal/Casts.hpp"
 #include "QuICC/TestSuite/Polynomial/Io.hpp"
 
 namespace QuICC {
@@ -82,8 +82,8 @@ namespace Quadrature {
 
    template <typename TQuad> Matrix computeRule(const int size, const std::string& fname)
    {
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       TQuad quad;
       quad.computeQuadrature(igrid, iweights, size);
 
@@ -104,8 +104,8 @@ namespace Quadrature {
 
    template <typename TQuad> Matrix computeRule(const int size, const std::string& fname, const MHDFloat a, const MHDFloat b)
    {
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       TQuad quad(a, b);
       quad.computeQuadrature(igrid, iweights, size);
 

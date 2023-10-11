@@ -22,7 +22,7 @@
 
 // Project includes
 //
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/TestSuite/Polynomial/Io.hpp"
 
 namespace QuICC {

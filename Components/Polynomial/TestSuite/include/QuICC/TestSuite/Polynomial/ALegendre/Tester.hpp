@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/ALegendre/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/ALegendre/Evaluator/InnerProduct.hpp"
@@ -142,8 +142,8 @@ namespace ALegendre {
       int m = static_cast<int>(param.at(0));
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::LegendreRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
@@ -155,7 +155,7 @@ namespace ALegendre {
          op.template compute<MHDFloat>(outData, specN, m, igrid, iweights, current::Evaluator::Set());
       } else
       {
-         op.template compute<MHDFloat>(outData, specN, m, igrid, internal::Array(), current::Evaluator::Set());
+         op.template compute<MHDFloat>(outData, specN, m, igrid, Internal::Array(), current::Evaluator::Set());
       }
 
       return outData;
@@ -167,8 +167,8 @@ namespace ALegendre {
       int m = static_cast<int>(param.at(0));
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::LegendreRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
@@ -176,7 +176,7 @@ namespace ALegendre {
       Matrix outData(physN, specN);
       Matrix inData = Matrix::Identity(specN, specN);
 
-      op.template compute<MHDFloat>(outData, specN, m, igrid, internal::Array(), current::Evaluator::OuterProduct<MHDFloat>(inData));
+      op.template compute<MHDFloat>(outData, specN, m, igrid, Internal::Array(), current::Evaluator::OuterProduct<MHDFloat>(inData));
 
       return outData;
    }
@@ -187,15 +187,15 @@ namespace ALegendre {
       int m = static_cast<int>(param.at(0));
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::LegendreRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
       TOp op;
       Matrix outData(specN, specN);
       Matrix inData(physN, specN);
-      op.template compute<MHDFloat>(inData, specN, m, igrid, internal::Array(), current::Evaluator::Set());
+      op.template compute<MHDFloat>(inData, specN, m, igrid, Internal::Array(), current::Evaluator::Set());
 
       op.template compute<MHDFloat>(outData, specN, m, igrid, iweights, current::Evaluator::InnerProduct<MHDFloat>(inData));
       Matrix outDataT = outData.transpose();
@@ -209,15 +209,15 @@ namespace ALegendre {
       int m = static_cast<int>(param.at(0));
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::LegendreRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
       TOp op;
       Matrix outData(specN, 1);
 
-      op.template compute<MHDFloat>(outData, specN, m, igrid, internal::Array(), current::Evaluator::Reduce());
+      op.template compute<MHDFloat>(outData, specN, m, igrid, Internal::Array(), current::Evaluator::Reduce());
 
       return outData;
    }

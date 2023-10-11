@@ -30,7 +30,7 @@ namespace QuICC {
 
 namespace Timestep {
 
-   namespace internal
+   namespace details
    {
       /**
        * @brief Compute z = y
@@ -478,11 +478,11 @@ namespace Timestep {
 
       // Set explicit matrix
       this->rRHSMatrix(idx).resize(size, size);
-      Solver::internal::addOperators(this->rRHSMatrix(idx), 1.0, iOpA->second);
+      Solver::details::addOperators(this->rRHSMatrix(idx), 1.0, iOpA->second);
 
       // Set mass matrix
       this->mMassMatrix.at(idx).resize(size, size);
-      Solver::internal::addOperators(this->mMassMatrix.at(idx), 1.0, iOpB->second);
+      Solver::details::addOperators(this->mMassMatrix.at(idx), 1.0, iOpB->second);
 
       // Set implicit matrix
       for(int i = 0; i < this->steps(); ++i)
@@ -492,9 +492,9 @@ namespace Timestep {
          // Set LHS matrix
          auto&& lhsMat = this->rLHSMatrix(a, idx);
          lhsMat.resize(size, size);
-         Solver::internal::addOperators(lhsMat, 1.0, iOpB->second);
-         Solver::internal::addOperators(lhsMat, -a*this->mDt, iOpA->second);
-         Solver::internal::addOperators(lhsMat, 1.0, iOpC->second);
+         Solver::details::addOperators(lhsMat, 1.0, iOpB->second);
+         Solver::details::addOperators(lhsMat, -a*this->mDt, iOpA->second);
+         Solver::details::addOperators(lhsMat, 1.0, iOpC->second);
 
          if(isSplit)
          {
@@ -505,8 +505,8 @@ namespace Timestep {
             // Set other LHS matrix
             auto&& infMatrix = this->solverMatrix(Tag::Operator::Influence::id(), aInf, idx);
             infMatrix.resize(size, size);
-            Solver::internal::addOperators(infMatrix, 1.0, iOpSA->second);
-            Solver::internal::addOperators(infMatrix, 1.0, iOpSC->second);
+            Solver::details::addOperators(infMatrix, 1.0, iOpSA->second);
+            Solver::details::addOperators(infMatrix, 1.0, iOpSC->second);
          }
       }
 
@@ -514,7 +514,7 @@ namespace Timestep {
       {
          // Store information for particular solution
          auto&& infRhs = this->reg(Register::Influence::id()).at(idx);
-         internal::initInfluence(infRhs, iOpSCV->second, iOpSC->second);
+         details::initInfluence(infRhs, iOpSCV->second, iOpSC->second);
       }
    }
 
@@ -544,15 +544,15 @@ namespace Timestep {
                rhs.imag().col(i) = infKernel.imag().col(3*i+2);
             }
             TData sol(rows,cols);
-            Solver::internal::solveWrapper(sol, sIt1->second.at(idx), rhs);
-            internal::computeMV(rhs, this->mMassMatrix.at(idx), sol);
-            Solver::internal::solveWrapper(sol, sIt2->second.at(idx), rhs);
-            internal::computeSetInfluence(infKernel, sol);
+            Solver::details::solveWrapper(sol, sIt1->second.at(idx), rhs);
+            details::computeMV(rhs, this->mMassMatrix.at(idx), sol);
+            Solver::details::solveWrapper(sol, sIt2->second.at(idx), rhs);
+            details::computeSetInfluence(infKernel, sol);
          }
       }
    }
 
-   namespace internal
+   namespace details
    {
       template <typename TData> inline void computeSet(TData& y, const TData& x)
       {

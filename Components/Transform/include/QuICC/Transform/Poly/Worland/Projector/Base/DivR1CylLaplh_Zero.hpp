@@ -50,7 +50,7 @@ namespace Projector {
          /**
           * @brief Make operator
           */
-         void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const final;
+         void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const final;
 
          /**
           * @brief Apply ith operator

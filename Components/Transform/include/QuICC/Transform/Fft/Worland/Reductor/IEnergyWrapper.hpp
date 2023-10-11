@@ -121,7 +121,7 @@ namespace Reductor {
       }
       this->mspPSetup->lock();
 
-      internal::Array igrid, iweights;
+      Internal::Array igrid, iweights;
       igrid.resize(this->mspPSetup->fwdSize());
       this->mOp.init(this->mspPSetup, igrid, iweights);
    }

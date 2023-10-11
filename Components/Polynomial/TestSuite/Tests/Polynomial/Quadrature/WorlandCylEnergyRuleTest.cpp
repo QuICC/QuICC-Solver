@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Math.hpp"
 #include "QuICC/TestSuite/Polynomial/Quadrature/Tester.hpp"
 #include "QuICC/TestSuite/Polynomial/Quadrature/TestArgs.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandCylEnergyRule.hpp"
@@ -27,7 +27,7 @@ TEST_CASE( "Error for Worland-Cylindrical energy quadrature rule", "[WorlandCylE
    {
       currentts::args().gridN.clear();
       currentts::args().gridN.push_back(16);
-      if(QuICC::Precision::hasMP)
+      if(QuICC::Internal::isMP)
       {
          currentts::args().gridN.push_back(47);
          currentts::args().gridN.push_back(48);

@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/NonDimensional/Theta.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"

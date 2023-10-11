@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4Lapl2.cpp
  * @brief Source of the implementation of the full sphere Worland I4Lapl2 sparse operator
  */
@@ -66,7 +66,7 @@ namespace Worland {
       }
    }
 
-   void I4Lapl2::buildBanded(internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
+   void I4Lapl2::buildBanded(Internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
    {
       kL = 2;
       kU = 6;

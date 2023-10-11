@@ -51,7 +51,7 @@ T besselJ(const T nu, const T x)
     constexpr int MM = 30;
 
     // avg frequency.
-    auto pp = (.5*nu+.25)*precision::PI;
+    auto pp = (.5*nu+.25)*Internal::Math::PI;
 
     // coefficients
     auto a = 1.;
@@ -84,7 +84,7 @@ T besselJ(const T nu, const T x)
     right *= sinW;
 
     // combine
-    auto res = std::sqrt(2./precision::PI)*(1./std::sqrt(x))*(left - right);
+    auto res = std::sqrt(2./Internal::Math::PI)*(1./std::sqrt(x))*(left - right);
 
     return res;
 }

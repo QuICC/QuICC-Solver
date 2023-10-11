@@ -85,7 +85,7 @@ namespace Sphere {
       if(this->mHasM0 || this->mHasM1)
       {
          int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-         internal::Matrix iop;
+         Internal::Matrix iop;
          Polynomial::Worland::Operators::integrateRpWnl(iop, 1, 3, nN);
          iop.col(0).bottomRows(iop.rows()-1) /= -iop(0,0);
          iop(0,0) = MHD_MP(0);

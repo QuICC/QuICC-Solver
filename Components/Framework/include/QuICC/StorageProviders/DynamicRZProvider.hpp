@@ -187,7 +187,7 @@ namespace QuICC {
          ComplexStorage mComplex;
    };
 
-   namespace internal {
+   namespace details {
       /// Visitor for free call
       struct FreeVisitor {
          FreeVisitor(DynamicRZProvider& p): storage(p) {};
@@ -230,7 +230,7 @@ namespace QuICC {
 
    inline void DynamicRZProvider::free(VariantDataPointer &pTmp)
    {
-      std::visit(internal::FreeVisitor(*this), pTmp);
+      std::visit(details::FreeVisitor(*this), pTmp);
    }
 
    inline void DynamicRZProvider::free(RealStorage::DataType &tmp)
@@ -245,7 +245,7 @@ namespace QuICC {
 
    inline void DynamicRZProvider::hold(VariantDataPointer &pTmp)
    {
-      std::visit(internal::HoldVisitor(*this), pTmp);
+      std::visit(details::HoldVisitor(*this), pTmp);
    }
 
    inline void DynamicRZProvider::hold(RealStorage::DataType &tmp)
@@ -260,7 +260,7 @@ namespace QuICC {
 
    inline void DynamicRZProvider::hold(VariantDataPointer &pTmp, const int id)
    {
-      std::visit(internal::HoldIdVisitor(*this,id), pTmp);
+      std::visit(details::HoldIdVisitor(*this,id), pTmp);
    }
 
    inline void DynamicRZProvider::hold(RealStorage::DataType &tmp, const int id)
@@ -275,7 +275,7 @@ namespace QuICC {
 
    inline void DynamicRZProvider::provide(VariantDataPointer& pTmp)
    {
-      std::visit(internal::ProvideVisitor(*this), pTmp);
+      std::visit(details::ProvideVisitor(*this), pTmp);
    }
 
    inline void DynamicRZProvider::provide(RealStorage::DataType *& pTmp)
@@ -290,7 +290,7 @@ namespace QuICC {
 
    inline void DynamicRZProvider::recover(VariantDataPointer& pTmp)
    {
-      std::visit(internal::RecoverVisitor(*this), pTmp);
+      std::visit(details::RecoverVisitor(*this), pTmp);
    }
 
    inline void DynamicRZProvider::recover(RealStorage::DataType *& pTmp)
@@ -305,7 +305,7 @@ namespace QuICC {
 
    inline void DynamicRZProvider::recover(VariantDataPointer& pTmp ,const int id)
    {
-      std::visit(internal::RecoverIdVisitor(*this,id), pTmp);
+      std::visit(details::RecoverIdVisitor(*this,id), pTmp);
    }
 
    inline void DynamicRZProvider::recover(RealStorage::DataType *& pTmp ,const int id)

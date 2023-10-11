@@ -6,21 +6,12 @@
 #ifndef QUICC_POLYNOMIAL_WORLAND_OPERATORS_HPP
 #define QUICC_POLYNOMIAL_WORLAND_OPERATORS_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -33,7 +24,7 @@ namespace Operators {
 /**
 * @brief Integrate r^p Wnl over r
 */
-void integrateRpWnl(internal::Matrix& iop, const int l, const int p, const int size);
+void integrateRpWnl(Internal::Matrix& iop, const int l, const int p, const int size);
 
 }
 }

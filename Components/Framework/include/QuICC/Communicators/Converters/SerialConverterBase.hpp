@@ -28,7 +28,7 @@ namespace QuICC {
 
 namespace Parallel {
 
-   namespace internal
+   namespace details
    {
       /**
        * @brief Reorder 3D data
@@ -123,17 +123,17 @@ namespace Parallel {
       // 3D case
       if(this->mDimensions == 3)
       {
-         internal::reorder3D<T,TDataId>(pOut, in, tRes, outConv, inConv);
+         details::reorder3D<T,TDataId>(pOut, in, tRes, outConv, inConv);
       }
       // 2D case
       else if(this->mDimensions == 2)
       {
-         internal::reorder2D<T,TDataId>(pOut, in, tRes, outConv, inConv);
+         details::reorder2D<T,TDataId>(pOut, in, tRes, outConv, inConv);
       }
       // 1D case
       else if(this->mDimensions == 1)
       {
-         internal::reorder1D<T,TDataId>(pOut, in, tRes, outConv, inConv);
+         details::reorder1D<T,TDataId>(pOut, in, tRes, outConv, inConv);
       }
       else
       {
@@ -167,7 +167,7 @@ namespace Parallel {
       storage.holdBwd(*pOut);
    }
 
-   namespace internal
+   namespace details
    {
       template<typename T, Dimensions::Data::Id TId> void reorder3D(T* pOut, const T& in, const TransformResolution& tRes, const IIndexConv& outConv, const IIndexConv& inConv)
       {

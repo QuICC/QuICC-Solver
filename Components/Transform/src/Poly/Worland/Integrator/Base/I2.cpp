@@ -30,7 +30,7 @@ namespace Integrator {
       this->setProfileTag();
    }
 
-   void I2<base_t>::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void I2<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
 
@@ -42,11 +42,11 @@ namespace Integrator {
       int nN = nPoly + extraN;
       this->checkGridSize(nN, l, igrid.size());
 
-      internal::Matrix tOp(igrid.size(), nN);
+      Internal::Matrix tOp(igrid.size(), nN);
 
       namespace ev = Polynomial::Worland::Evaluator;
       Polynomial::Worland::Wnl wnl;
-      wnl.compute<internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
+      wnl.compute<Internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
       auto a = wnl.alpha(l);
       auto b = wnl.dBeta();

@@ -28,7 +28,7 @@ namespace Reductor {
    {
    }
 
-   void IWorlandRadialPower::initOperators(const internal::Array& igrid, const internal::Array& iweights) const
+   void IWorlandRadialPower::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       #if defined QUICC_WORLAND_REDUIMPL_MATRIX
          // Reserve storage for the operators

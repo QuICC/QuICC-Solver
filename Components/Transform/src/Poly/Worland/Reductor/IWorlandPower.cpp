@@ -41,10 +41,10 @@ namespace Reductor {
    {
    }
 
-   void IWorlandPower::initOperators(const internal::Array& icompgrid, const internal::Array& icompweights) const
+   void IWorlandPower::initOperators(const Internal::Array& icompgrid, const Internal::Array& icompweights) const
    {
       // Energy calculation requires a different quadrature
-      internal::Array igrid, iweights;
+      Internal::Array igrid, iweights;
       this->computePowerQuadrature(igrid, iweights, icompgrid.size());
 
       #if defined QUICC_WORLAND_REDUIMPL_MATRIX
@@ -68,7 +68,7 @@ namespace Reductor {
       #endif //defined QUICC_WORLAND_REDUIMPL_MATRIX
    }
 
-   void IWorlandPower::computePowerQuadrature(internal::Array& igrid, internal::Array& iweights, const int gSize) const
+   void IWorlandPower::computePowerQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize) const
    {
       int nrgSize = gSize + 2*this->mcShift;
 

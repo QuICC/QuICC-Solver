@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/GpuDctTools.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/GpuMatrix.hpp"
 

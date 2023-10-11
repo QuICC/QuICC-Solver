@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/ALegendre/ALegendreBase.hpp"
 
 namespace QuICC {
@@ -35,13 +35,13 @@ namespace ALegendre {
    class dPlm: public ALegendreBase
    {
       public:
-         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator);
+         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
 
-         template <typename T, typename TEvaluator> void computedPl0(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator);
+         template <typename T, typename TEvaluator> void computedPl0(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
 
    };
 
-   template <typename T, typename TEvaluator> void dPlm::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator)
+   template <typename T, typename TEvaluator> void dPlm::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       int gN = igrid.rows();
 
@@ -56,10 +56,10 @@ namespace ALegendre {
       }
 
       // Storage for P_l^{m-1} and P_l^{m+1}
-      internal::Matrix iplm_1(gN, 2);
-      internal::Matrix iplm1(gN, 2);
+      Internal::Matrix iplm_1(gN, 2);
+      Internal::Matrix iplm1(gN, 2);
 
-      internal::Matrix idiff(gN,1);
+      Internal::Matrix idiff(gN,1);
       if(m > 0)
       {
          // Initialize P_l^{m-1}
@@ -130,7 +130,7 @@ namespace ALegendre {
       }
    }
 
-   template <typename T, typename TEvaluator> void dPlm::computedPl0(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator)
+   template <typename T, typename TEvaluator> void dPlm::computedPl0(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       int gN = igrid.rows();
 
@@ -140,8 +140,8 @@ namespace ALegendre {
       }
 
       // Storage for P_l^{m-1} and P_l^{m+1}
-      internal::Matrix iplm1(gN, 2);
-      internal::Matrix idiff(gN,1);
+      Internal::Matrix iplm1(gN, 2);
+      Internal::Matrix idiff(gN,1);
 
       // Initialize \partial_theta P_l^m
       idiff.col(0).setZero();
