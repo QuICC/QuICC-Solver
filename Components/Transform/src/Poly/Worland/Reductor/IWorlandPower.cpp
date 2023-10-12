@@ -47,7 +47,6 @@ namespace Reductor {
       Internal::Array igrid, iweights;
       this->computePowerQuadrature(igrid, iweights, icompgrid.size());
 
-      #if defined QUICC_WORLAND_REDUIMPL_MATRIX
       // Reserve storage for the operators
       this->mOps.reserve(this->mspSetup->slowSize());
       this->mEOps.reserve(this->mspSetup->slowSize());
@@ -60,12 +59,6 @@ namespace Reductor {
          this->mEOps.push_back(Matrix(igrid.size(), 1));
          this->makeOperator(this->mOps.back(), this->mEOps.back(), igrid, iweights, i);
       }
-      #elif defined QUICC_WORLAND_REDUIMPL_OTF
-
-      this->mGrid = igrid.cast<MHDFloat>();
-      this->mWeights = iweights.cast<MHDFloat>();
-
-      #endif //defined QUICC_WORLAND_REDUIMPL_MATRIX
    }
 
    void IWorlandPower::computePowerQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize) const

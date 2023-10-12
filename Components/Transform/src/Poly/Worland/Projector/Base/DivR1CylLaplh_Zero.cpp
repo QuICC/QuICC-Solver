@@ -44,20 +44,7 @@ namespace Projector {
 
    void DivR1CylLaplh_Zero<base_t>::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {
-      #if defined QUICC_WORLAND_PROJIMPL_MATRIX
-         this->defaultApplyOperator(rOut, i, in);
-      #elif defined QUICC_WORLAND_PROJIMPL_OTF
-         int l = this->mspSetup->slow(i);
-         if(l == 0)
-         {
-            rOut.setZero();
-         } else
-         {
-            namespace ev = Polynomial::Worland::Evaluator;
-            Polynomial::Worland::r_1claplhWnl wnl;
-            wnl.compute<MHDComplex>(rOut, this->mspSetup->fastSize(i), l, this->mGrid, Internal::Array(), ev::OuterProduct(in));
-         }
-      #endif //defined QUICC_WORLAND_PROJIMPL_MATRIX
+      this->defaultApplyOperator(rOut, i, in);
    }
 
 }

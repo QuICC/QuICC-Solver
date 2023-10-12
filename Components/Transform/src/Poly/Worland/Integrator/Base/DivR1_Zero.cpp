@@ -95,30 +95,7 @@ namespace Integrator {
 
    void DivR1_Zero<base_t>::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {
-      #if defined QUICC_WORLAND_INTGIMPL_MATRIX
-         this->defaultApplyOperator(rOut, i, in);
-      #elif defined QUICC_WORLAND_INTGIMPL_OTF
-         int l = this->mspSetup->slow(i);
-         if(l == 0)
-         {
-            rOut.setZero();
-         } else
-         {
-            int nPoly = this->mspSetup->fastSize(i);
-            int l_in = std::abs(l-1);
-
-            namespace ev = Polynomial::Worland::Evaluator;
-            Polynomial::Worland::Wnl wnl;
-
-            wnl.compute<MHDComplex>(rOut, nPoly, l_in, this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(in));
-
-            MatrixZ tmp(in.rows(), in.cols());
-            Polynomial::Worland::r_1Wnl r_1Wnl;
-            r_1Wnl.compute<MHDComplex>(tmp, nPoly, l_in, this->mGrid, Internal::Array(), ev::OuterProduct<MHDComplex>(rOut));
-
-            wnl.compute<MHDComplex>(rOut, nPoly, l, this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(tmp));
-         }
-      #endif //defined QUICC_WORLAND_INTGIMPL_MATRIX
+      this->defaultApplyOperator(rOut, i, in);
    }
 
 }

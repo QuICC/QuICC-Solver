@@ -52,13 +52,7 @@ namespace Integrator {
 
    void P<base_t>::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {
-      #if defined QUICC_WORLAND_INTGIMPL_MATRIX
-         this->defaultApplyOperator(rOut, i, in);
-      #elif defined QUICC_WORLAND_INTGIMPL_OTF
-         namespace ev = Polynomial::Worland::Evaluator;
-         Polynomial::Worland::Wnl wnl;
-         wnl.compute<MHDComplex>(rOut, this->mspSetup->fastSize(i), this->mspSetup->slow(i), this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(in));
-      #endif //defined QUICC_WORLAND_INTGIMPL_MATRIX
+      this->defaultApplyOperator(rOut, i, in);
    }
 
 }

@@ -45,18 +45,7 @@ namespace Reductor {
 
    void RadialPower<base_t>::applyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {
-      #if defined QUICC_WORLAND_REDUIMPL_MATRIX
-         this->defaultApplyOperator(rOut, i, in);
-      #elif defined QUICC_WORLAND_REDUIMPL_OTF
-         int l = this->mspSetup->slow(i);
-         int nPoly = this->mspSetup->fastSize(i);
-
-         namespace ev = Polynomial::Worland::Evaluator;
-         Polynomial::Worland::Wnl wnl;
-         MatrixZ tmp(this->mGrid.size(), in.cols());
-         wnl.compute<MHDComplex>(tmp, nPoly, l, this->mGrid, Internal::Array(), ev::OuterProduct(in));
-         rOut = tmp.array().abs2();
-      #endif //defined QUICC_WORLAND_REDUIMPL_MATRIX
+      this->defaultApplyOperator(rOut, i, in);
    }
 
 } // Reductor

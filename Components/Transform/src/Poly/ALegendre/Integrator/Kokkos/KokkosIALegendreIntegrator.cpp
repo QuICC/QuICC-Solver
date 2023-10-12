@@ -41,7 +41,6 @@ namespace Integrator {
       // Initit specialized data for operators
       this->initSpecial();
 
-      #if defined QUICC_ALEGENDRE_INTGIMPL_MATRIX
       auto total = 0;
       auto slowSize = this->mspSetup->slowSize();
       std::vector<Integer> scan(slowSize + 1, 0);
@@ -67,14 +66,6 @@ namespace Integrator {
       }
 
       Kokkos::deep_copy(vmOps, vmOpsHost);
-
-      #elif defined QUICC_ALEGENDRE_INTGIMPL_OTF
-
-         // Store grid and weights
-         this->mGrid = igrid;
-         this->mWeights = iweights;
-
-      #endif //defined QUICC_ALEGENDRE_INTGIMPL_MATRIX
    }
 
    void KokkosIALegendreIntegrator::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
