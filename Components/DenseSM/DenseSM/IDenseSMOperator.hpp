@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -25,10 +25,10 @@ namespace DenseSM {
    {
       public:
          /// Typedef for scalar
-         typedef internal::MHDFloat Scalar_t;
+         typedef Internal::MHDFloat Scalar_t;
 
          /// Typedef for coefficient array
-         typedef internal::ACoeff ACoeff_t;
+         typedef Internal::ACoeff ACoeff_t;
 
          /**
           * @brief Constructor
@@ -77,7 +77,7 @@ namespace DenseSM {
             std::is_same_v<T, Matrix>, bool> = true>
          void buildOp(T& mat) const
          {
-            internal::Matrix imat;
+            Internal::Matrix imat;
             this->buildOpImpl(imat, this->rows(), this->cols());
             mat = imat.cast<MHDFloat>();
          }
@@ -97,7 +97,7 @@ namespace DenseSM {
           * @brief Implementation of build sparse matrix operator
           * @param output operator
           */
-         virtual void buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const = 0;
+         virtual void buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const = 0;
 
       private:
          /**

@@ -8,6 +8,7 @@
 #include <catch2/catch.hpp>
 #include <iostream>
 #include <fstream>
+#include <limits>
 #include <set>
 
 // Project includes
@@ -23,17 +24,14 @@ namespace Framework {
 
 namespace LoadSplitter {
 
-   void writeData(const std::string fname, const SimRes& sRes, const QuICC::TransformResolution& tRes, const bool isDetailed)
+   void writeData(const std::string fname, const SimRes& sRes, const QuICC::TransformResolution& tRes)
    {
       int nModes = tRes.dim<QuICC::Dimensions::Data::DAT3D>();
 
       std::size_t nIndexes = 0;
-      if(isDetailed)
+      for(auto k = 0; k < tRes.dim<QuICC::Dimensions::Data::DAT3D>(); k++)
       {
-         for(auto k = 0; k < tRes.dim<QuICC::Dimensions::Data::DAT3D>(); k++)
-         {
-            nIndexes += tRes.dim<QuICC::Dimensions::Data::DAT2D>(k);
-         }
+         nIndexes += tRes.dim<QuICC::Dimensions::Data::DAT2D>(k);
       }
 
       std::ofstream metaFile;
@@ -43,7 +41,18 @@ namespace LoadSplitter {
          throw std::logic_error("Couldn't open output file!");
       }
 
-      metaFile << 3 + 2*nModes + nIndexes << std::endl;
+      // Write header
+      metaFile << "# Format description" << std::endl;
+      metaFile << "# line 1: number of lines" << std::endl;
+      metaFile << "# line 2: simulation modal size" << std::endl;
+      metaFile << "# line 3: simulation physical size" << std::endl;
+      metaFile << "# line 4: number of modes nK" << std::endl;
+      metaFile << "# line 5 + 2*k: mode" << std::endl;
+      metaFile << "# line 6 + 2*k: number of 2D modes" << std::endl;
+      metaFile << "# line (5 + 2*nK) + 2*j: 2D mode" << std::endl;
+      metaFile << "# line (6 + 2*nK) + 2*j: number of 1D modes" << std::endl;
+
+      metaFile << 3 + 2*nModes + 2*nIndexes << std::endl;
       if(nModes > 0)
       {
          metaFile << sRes.nSpec << std::endl;
@@ -69,15 +78,14 @@ namespace LoadSplitter {
          }
       }
 
-      if(isDetailed)
+      for(auto k = 0; k < tRes.dim<QuICC::Dimensions::Data::DAT3D>(); k++)
       {
-         for(auto k = 0; k < tRes.dim<QuICC::Dimensions::Data::DAT3D>(); k++)
+         for(int j = 0; j < tRes.dim<QuICC::Dimensions::Data::DAT2D>(k); j++)
          {
-            for(int j = 0; j < tRes.dim<QuICC::Dimensions::Data::DAT2D>(k); j++)
-            {
-               auto j_ = tRes.idx<QuICC::Dimensions::Data::DAT2D>(j, k);
-               metaFile << j_ << std::endl;
-            }
+            auto j_ = tRes.idx<QuICC::Dimensions::Data::DAT2D>(j, k);
+            auto nN = tRes.dim<QuICC::Dimensions::Data::DATB1D>(j, k);
+            metaFile << j_ << std::endl;
+            metaFile << nN << std::endl;
          }
       }
 
@@ -103,8 +111,15 @@ namespace LoadSplitter {
       }
       else
       {
+         // Ignore header
+         int s = infile.peek();
+         while(s == '#')
+         {
+            infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            s = infile.peek();
+         }
+
          // Read size and prepare storage
-         int s;
          infile >> s;
          data.reserve(s);
 
@@ -133,7 +148,7 @@ namespace LoadSplitter {
       }
    }
 
-   void checkReference(const std::string fname, const QuICC::TransformResolution& tRes)
+   void checkReference(const std::string fname, const SimRes& sRes, const QuICC::TransformResolution& tRes)
    {
       std::vector<int> ref;
       readData(fname, ref);
@@ -149,8 +164,8 @@ namespace LoadSplitter {
             if(tRes.dim<QuICC::Dimensions::Data::DAT3D>() > 0)
             {
                // Definition of size to use is changing (ie including dealiasing modes or not)
-               //CHECK( ref.at(0) == tRes.dim<QuICC::Dimensions::Data::DATB1D>() );
-               CHECK( ref.at(1) == tRes.dim<QuICC::Dimensions::Data::DATF1D>() );
+               CHECK( ref.at(0) == sRes.nSpec );
+               CHECK( ref.at(1) == sRes.nPhys );
             }
             else
             {
@@ -178,7 +193,7 @@ namespace LoadSplitter {
                INFO( "ref k = " << ref_k_ );
                INFO( "k = " << k_ );
                CHECK( ref_k_ == k_ );
-               INFO( "refnJ = " << ref_nJ );
+               INFO( "ref nJ = " << ref_nJ );
                INFO( "nJ = " << nJ );
                CHECK( ref_nJ == nJ );
             }
@@ -191,19 +206,24 @@ namespace LoadSplitter {
             for(int j = 0; j < tRes.dim<QuICC::Dimensions::Data::DAT2D>(k); j++)
             {
                auto j_ = tRes.idx<QuICC::Dimensions::Data::DAT2D>(j, k);
+               auto nI = tRes.dim<QuICC::Dimensions::Data::DATB1D>(j, k);
                if(static_cast<std::size_t>(h) < ref.size())
                {
                   auto ref_j_ = ref.at(h);
+                  auto ref_nI = ref.at(h+1);
                   INFO( "ref j = " << ref_j_ );
                   INFO( "j = " << j_ );
-                  CHECK( ref.at(h) == j_ );
+                  CHECK( ref_j_ == j_ );
+                  INFO( "ref nI = " << ref_nI );
+                  INFO( "nI = " << nI );
+                  CHECK( ref_nI == nI );
                }
                else
                {
                   INFO( "Point missing in reference" );
                   CHECK( false );
                }
-               h++;
+               h += 2;
             }
          }
       }
@@ -264,7 +284,7 @@ namespace LoadSplitter {
                   INFO( "ref j = " << ref_j_ );
                   INFO( "j = " << j_ );
                   CHECK( ref_j_ == j_ );
-                  h++;
+                  h += 2;
                }
             }
          }

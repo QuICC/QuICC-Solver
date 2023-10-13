@@ -10,7 +10,6 @@ set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/Components/Transform/cmake.d")
 
 # Setup for the different transforms
-include(setup/ALegendre)
 include(setup/Worland)
 include(setup/SparseLinearAlgebra)
 include(setup/FFT)

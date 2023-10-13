@@ -78,23 +78,23 @@ namespace Projector {
          /**
           * @brief Storage for the quadrature grid
           */
-         mutable internal::Array  mGrid;
+         mutable Internal::Array  mGrid;
 
          /**
           * @brief Storage for the quadrature weights
           */
-         mutable internal::Array  mWeights;
+         mutable Internal::Array  mWeights;
 
       private:
          /**
           * @brief Initialise the operators
           */
-         virtual void initOperators(const internal::Array& igrid, const internal::Array& iweights) const override;
+         virtual void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const override;
 
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const = 0;
+         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const = 0;
 
          /**
           * @brief Compute polynomial projection

@@ -29,7 +29,14 @@ namespace Tools {
          /**
           * @brief Default ctor
           */
-         TrapezoidalSH() = default;
+         TrapezoidalSH();
+
+         /**
+          * @brief ctor with explicit minimum
+          *
+          * @param min  Minimal truncation
+          */
+         TrapezoidalSH(const int min);
 
          /**
           * @brief Default dtor
@@ -54,13 +61,9 @@ namespace Tools {
          /**
           * @brief Check if chosen resolution is optimal
           */
-         bool isOptimal(const int nN, const int maxL) final;
+         virtual bool isOptimal(const int nN, const int maxL);
 
       private:
-         /**
-          * @brief Minimal truncation for highest modes
-          */
-         static constexpr const int MIN_TRUNCATION = 3;
 
    };
 

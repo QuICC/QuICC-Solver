@@ -51,13 +51,13 @@ namespace Worland {
           * @param rows rows of matrix
           * @param cols cols of matrix
           */
-         void buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const final;
+         void buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const final;
 
       private:
          /**
           * @brief Build Chebyshev type operator
           */
-         void buildChebyshevOp(internal::Matrix& mat, const int rows) const;
+         void buildChebyshevOp(Internal::Matrix& mat, const int rows) const;
    };
 
 } // Worland

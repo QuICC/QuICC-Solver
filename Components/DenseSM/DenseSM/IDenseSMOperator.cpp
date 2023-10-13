@@ -33,7 +33,7 @@ namespace DenseSM {
 
    Matrix IDenseSMOperator::mat() const
    {
-      internal::Matrix mat;
+      Internal::Matrix mat;
       this->buildOpImpl(mat, this->rows(), this->cols());
 
       return mat.cast<MHDFloat>();
@@ -41,7 +41,7 @@ namespace DenseSM {
 
    Matrix IDenseSMOperator::embedded(const int r, const int c) const
    {
-      internal::Matrix mat;
+      Internal::Matrix mat;
       this->buildOpImpl(mat, r, c);
 
       return mat.cast<MHDFloat>();

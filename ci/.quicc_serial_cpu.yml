@@ -138,6 +138,17 @@ BoussinesqShellTCExplicit_serial:
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: serial
+BoussinesqPlaneRBCExplicit_serial:
+  extends:
+  - .BoussinesqPlaneRBCExplicit_serial
+  - .cpu
+  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: serial
 ci-cache-cleanup:
   extends: .container-runner-daint-gpu
   stage: cleanup

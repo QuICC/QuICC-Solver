@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Precision.hpp"
+#include "Types/Internal/Casts.hpp"
 #include "QuICC/TestSuite/Polynomial/TesterBase.hpp"
 
 namespace QuICC {
@@ -111,8 +111,8 @@ namespace Quadrature {
       assert(type == TestType::QUADRATURE);
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
 
       TOp quad = this->createQuad<>(param);
       quad.computeQuadrature(igrid, iweights, physN);

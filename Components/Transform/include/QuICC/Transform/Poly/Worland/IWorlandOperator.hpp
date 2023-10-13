@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Transform/Poly/Setup.hpp"
 #include "QuICC/Transform/ITransformOperator.hpp"
 
@@ -60,7 +60,7 @@ namespace Worland {
           *
           * @param spSetup   Shared setup object for the transform
           */
-         void init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const override;
+         void init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const override;
 
          /**
           * @brief Initialise the polynomial transform
@@ -115,7 +115,7 @@ namespace Worland {
          /**
           * @brief Initialise the operators
           */
-         virtual void initOperators(const internal::Array& igrid, const internal::Array& iweights) const = 0;
+         virtual void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const = 0;
 
          /**
           * @brief Apply operators

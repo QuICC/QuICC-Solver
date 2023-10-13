@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2Qp.cpp
  * @brief Source of the implementation of the full sphere Worland I2Qp sparse operator
  */
@@ -67,7 +67,7 @@ namespace Worland {
       }
    }
 
-   void I2Qp::buildBanded(internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
+   void I2Qp::buildBanded(Internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
    {
       throw std::logic_error("Banded matrix is not yet implemented");
 

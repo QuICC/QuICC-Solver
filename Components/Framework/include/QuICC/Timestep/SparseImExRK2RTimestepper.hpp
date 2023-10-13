@@ -74,7 +74,7 @@ namespace Timestep {
          // Update explicit term with explicit (nonlinear) values
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->reg(Register::Explicit::id()).at(i), this->reg(Register::Rhs::id()).at(i));
+            details::computeSet(this->reg(Register::Explicit::id()).at(i), this->reg(Register::Rhs::id()).at(i));
          }
       }
 
@@ -85,7 +85,7 @@ namespace Timestep {
          MHDFloat bEx = -this->mspScheme->bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeAMXPBYPZ(this->reg(Register::Intermediate::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
+            details::computeAMXPBYPZ(this->reg(Register::Intermediate::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
          }
 
          // Embedded lower order scheme solution
@@ -95,7 +95,7 @@ namespace Timestep {
             bEx = -this->mspScheme->bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeAMXPBYPZ(this->reg(Register::Error::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
+               details::computeAMXPBYPZ(this->reg(Register::Error::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
             }
          }
 
@@ -114,7 +114,7 @@ namespace Timestep {
          // Build RHS for implicit term
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeMV(this->reg(Register::Rhs::id()).at(i), this->mRHSMatrix.at(i), this->reg(Register::Intermediate::id()).at(i));
+            details::computeMV(this->reg(Register::Rhs::id()).at(i), this->mRHSMatrix.at(i), this->reg(Register::Intermediate::id()).at(i));
          }
 
          // Set ID for solver
@@ -135,7 +135,7 @@ namespace Timestep {
             {
                for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
                {
-                  internal::computeSet(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Error::id()).at(i));
+                  details::computeSet(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Error::id()).at(i));
                }
 
                // Set mass matrix ID for solver
@@ -152,7 +152,7 @@ namespace Timestep {
             {
                for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
                {
-                  internal::computeSet(this->reg(Register::Solution::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
+                  details::computeSet(this->reg(Register::Solution::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
                }
 
                // Explicit nonlinear term at next step
@@ -170,14 +170,14 @@ namespace Timestep {
          {
             for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeSet(this->reg(Register::Solution::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
+               details::computeSet(this->reg(Register::Solution::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
             }
 
             for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeError(this->mError, this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Error::id()).at(i));
+               details::computeError(this->mError, this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Error::id()).at(i));
 
-               internal::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
+               details::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
             }
 
             // Explicit nonlinear term at next step
@@ -194,7 +194,7 @@ namespace Timestep {
          {
             for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeSet(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
+               details::computeSet(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Intermediate::id()).at(i));
             }
 
             // Set mass matrix ID for solver
@@ -217,8 +217,8 @@ namespace Timestep {
             MHDFloat aEx = -(this->mspScheme->aEx(this->mStep, this->mStep-1) - this->mspScheme->bEx(this->mStep-1))*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeAMXPYPBZ(this->reg(Register::Explicit::id()).at(i), this->mMassMatrix.at(i), aIm, this->reg(Register::Implicit::id()).at(i), this->reg(Register::Intermediate::id()).at(i), aEx);
-               internal::computeSet(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Explicit::id()).at(i));
+               details::computeAMXPYPBZ(this->reg(Register::Explicit::id()).at(i), this->mMassMatrix.at(i), aIm, this->reg(Register::Implicit::id()).at(i), this->reg(Register::Intermediate::id()).at(i), aEx);
+               details::computeSet(this->reg(Register::Rhs::id()).at(i), this->reg(Register::Explicit::id()).at(i));
             }
 
             // Set mass matrix ID for solver
@@ -235,7 +235,7 @@ namespace Timestep {
             // Update explicit term
             for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeMV(this->reg(Register::Rhs::id()).at(i), this->mRHSMatrix.at(i), this->reg(Register::Explicit::id()).at(i));
+               details::computeMV(this->reg(Register::Rhs::id()).at(i), this->mRHSMatrix.at(i), this->reg(Register::Explicit::id()).at(i));
             }
 
             // Set ID for solver
@@ -256,7 +256,7 @@ namespace Timestep {
          // Update explicit term
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->reg(Register::Explicit::id()).at(i), this->reg(Register::Solution::id()).at(i));
+            details::computeSet(this->reg(Register::Explicit::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
 
          // Loop back to presolve but without new nonlinear term
@@ -269,7 +269,7 @@ namespace Timestep {
          // Update implicit term
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->reg(Register::Implicit::id()).at(i), this->reg(Register::Solution::id()).at(i));
+            details::computeSet(this->reg(Register::Implicit::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
 
       } else if(this->mRegisterId == Register::Solution::id())
@@ -277,7 +277,7 @@ namespace Timestep {
          // Update intermediate term
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
+            details::computeSet(this->reg(Register::Intermediate::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
 
          // Loop back to presolve but without new nonlinear term
@@ -290,7 +290,7 @@ namespace Timestep {
          // Update error term
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
+            details::computeSet(this->reg(Register::Error::id()).at(i), this->reg(Register::Solution::id()).at(i));
          }
 
          // Loop back to presolve but without new nonlinear term
@@ -306,7 +306,7 @@ namespace Timestep {
          MHDFloat bEx = -this->mspScheme->bEx(this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeAMXPBYPMZ(this->reg(Register::Intermediate::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
+            details::computeAMXPBYPMZ(this->reg(Register::Intermediate::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
          }
 
          // Embedded lower order scheme solution
@@ -316,7 +316,7 @@ namespace Timestep {
             bEx = -this->mspScheme->bExErr(this->mStep)*this->mDt;
             for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
             {
-               internal::computeAMXPBYPMZ(this->reg(Register::Error::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
+               details::computeAMXPBYPMZ(this->reg(Register::Error::id()).at(i), this->mMassMatrix.at(i), bIm, this->reg(Register::Implicit::id()).at(i), bEx, this->reg(Register::Explicit::id()).at(i));
             }
          }
 
@@ -335,7 +335,7 @@ namespace Timestep {
          MHDFloat aIm = this->mspScheme->aIm(this->mStep, this->mStep)*this->mDt;
          for(size_t i = this->mZeroIdx; i < this->nSystem(); i++)
          {
-            internal::computeXPAY(this->reg(Register::Solution::id()).at(i), this->reg(Register::Explicit::id()).at(i), aIm);
+            details::computeXPAY(this->reg(Register::Solution::id()).at(i), this->reg(Register::Explicit::id()).at(i), aIm);
          }
 
          // Next step will have nonlinear term

@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Setup.hpp"
 #include "QuICC/Transform/ITransformOperator.hpp"
 
@@ -44,7 +44,7 @@ namespace ALegendre {
          /// Typedef for the configuration class as a shared pointer
          typedef SharedSetup SharedSetupType;
 
-         using OpArray = internal::Array;
+         using OpArray = Internal::Array;
          using OpMatrix = QuICC::Matrix;
          using OpMatrixZ = QuICC::MatrixZ;
 

@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 
 namespace QuICC {
 

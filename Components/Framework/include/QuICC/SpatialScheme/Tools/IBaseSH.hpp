@@ -34,6 +34,13 @@ namespace Tools {
          IBaseSH() = default;
 
          /**
+          * @brief ctor with explicit min truncation
+          *
+          * @param min  Minimal truncation
+          */
+         IBaseSH(const int min);
+
+         /**
           * @brief Default dtor
           */
          ~IBaseSH() = default;

@@ -19,7 +19,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Equations/IFieldEquation.hpp"
-#include "Types/DecoupledComplexInternal.hpp"
+#include "Types/DecoupledComplexUtils.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolverTools.hpp"
@@ -194,10 +194,10 @@ namespace Equations {
       TData rhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
       if(eq.res().sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
       {
-         Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), eq.couplingInfo(compId).galerkinShift(matIdx, 0), tmp);
+         Datatypes::details::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), eq.res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL), eq.couplingInfo(compId).galerkinShift(matIdx, 0), tmp);
       } else
       {
-         Datatypes::internal::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
+         Datatypes::details::setTopBlock(rhs, 0, eq.couplingInfo(compId).galerkinN(matIdx), tmp);
       }
 
       // Get a restricted stencil matrix
@@ -216,8 +216,8 @@ namespace Equations {
 
       // solve for galerkin expansion
       TData lhs(eq.couplingInfo(compId).galerkinN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
-      Solver::internal::solveWrapper(lhs, solver, rhs);
-      Datatypes::internal::setTopBlock(storage, start, eq.couplingInfo(compId).galerkinN(matIdx), lhs);
+      Solver::details::solveWrapper(lhs, solver, rhs);
+      Datatypes::details::setTopBlock(storage, start, eq.couplingInfo(compId).galerkinN(matIdx), lhs);
    }
 
    template <typename TData> void copyNonlinear(const IVectorEquation& eq, FieldComponents::Spectral::Id compId, TData& storage, const int matIdx, const int start)
@@ -230,7 +230,11 @@ namespace Equations {
          tmp = TData(eq.couplingInfo(compId).tauN(matIdx), eq.couplingInfo(compId).rhsCols(matIdx));
 
          // simply copy values from unknown
-         std::visit([&](auto&& p){copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);}, eq.spUnknown());
+         std::visit(
+               [&](auto&& p)
+               {
+                  copyUnknown(eq, p->dom(0).perturbation(), compId, tmp, matIdx, 0, false, true);
+               }, eq.spUnknown());
 
          // Multiply nonlinear term by quasi-inverse
          applyQuasiInverse(eq, compId, storage, start, matIdx, 0, tmp);
@@ -239,7 +243,11 @@ namespace Equations {
       } else if(eq.couplingInfo(compId).hasNonlinear())
       {
          // simply copy values from unknown
-         std::visit([&](auto&& p){copyUnknown(eq, p->dom(0).perturbation(), compId, storage, matIdx, start, true, false);}, eq.spUnknown());
+         std::visit(
+               [&](auto&& p)
+               {
+                  copyUnknown(eq, p->dom(0).perturbation(), compId, storage, matIdx, start, true, false);
+               }, eq.spUnknown());
       }
    }
 

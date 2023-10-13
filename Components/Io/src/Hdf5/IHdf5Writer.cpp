@@ -3,22 +3,13 @@
  * @brief Source of the general HDF5 writer
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Hdf5/IHdf5Writer.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Hdf5/IHdf5Writer.hpp"
 
 namespace QuICC {
 
@@ -28,10 +19,6 @@ namespace Hdf5 {
 
    IHdf5Writer::IHdf5Writer(std::string name, std::string ext, std::string header, std::string type, std::string version)
       : Hdf5File(name, ext, header, type, version), mCollIoWrite(10000)
-   {
-   }
-
-   IHdf5Writer::~IHdf5Writer()
    {
    }
 

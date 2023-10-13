@@ -50,7 +50,7 @@ namespace Worland {
           * @param rows rows of matrix
           * @param cols cols of matrix
           */
-         void buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const final;
+         void buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const final;
 
          /**
           * @brief Max radial truncation
@@ -86,7 +86,7 @@ namespace Worland {
          /**
           * @brief Build Chebyshev type operator
           */
-         void buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const;
+         void buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const;
    };
 
 } // Worland

@@ -13,7 +13,7 @@
 //
 #include "QuICC/SparseSM/IWorlandOperator.hpp"
 #include "QuICC/SparseSM/Worland/Tools.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 
 namespace QuICC {
 

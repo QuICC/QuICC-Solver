@@ -12,7 +12,6 @@
 //
 #include "DenseSM/IWorlandOperator.hpp"
 #include "DenseSM/Worland/Tools.hpp"
-#include "Types/Constants.hpp"
 
 namespace QuICC {
 

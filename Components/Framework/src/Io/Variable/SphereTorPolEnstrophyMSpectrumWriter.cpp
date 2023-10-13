@@ -20,7 +20,7 @@
 //
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
 
 namespace QuICC {

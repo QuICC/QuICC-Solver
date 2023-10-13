@@ -6,18 +6,12 @@
 #ifndef QUICC_IO_HDF5_IHDF5READER_HPP
 #define QUICC_IO_HDF5_IHDF5READER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <string>
 #include <tuple>
 #include <memory>
 #include <stdexcept>
-
-// External includes
-//
 
 // Project includes
 //
@@ -52,7 +46,7 @@ namespace Hdf5 {
          /**
          * @brief Destructor
          */
-         virtual ~IHdf5Reader();
+         virtual ~IHdf5Reader() = default;
 
          /**
           * @brief Initialise the file
@@ -74,7 +68,7 @@ namespace Hdf5 {
          /**
           * @brief Number of blocks to read
           */
-         std::vector<hsize_t>  mBlock;
+         std::vector<std::vector<hsize_t> >  mBlock;
 
          /**
           * @brief Max collective IO read operations over all CPUs
@@ -332,7 +326,7 @@ namespace Hdf5 {
          // Always read one block of the slowest dimension
          dims[0] = 1;
          // Fastest read dimension is minimum between file and memory sizes
-         dims[nDims-1] = this->mBlock.at(0);
+         dims[nDims-1] = this->mBlock.at(0).at(0);
 
          // Compute size of the memory dataspace
          hsize_t iDims[2];
@@ -367,7 +361,7 @@ namespace Hdf5 {
             {
                iDims[0] = 0;
             }
-            iDims[1] = this->mBlock.at(0);
+            iDims[1] = this->mBlock.at(0).at(0);
             H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
 
             // Set offsets
@@ -405,7 +399,7 @@ namespace Hdf5 {
 
             // Select memory hyperslabs
             iDims[0] = std::min(std::get<1>(storage.at(sidx)), static_cast<int>(fDims[nDims-2]));
-            iDims[1] = this->mBlock.at(0);
+            iDims[1] = this->mBlock.at(0).at(0);
             H5Sselect_hyperslab(memspace, H5S_SELECT_SET, memOffset, NULL, iDims, NULL);
 
             // Set offsets
@@ -488,11 +482,27 @@ namespace Hdf5 {
             memRows = std::max(memRows, std::get<0>(storage.at(i)));
          }
 
+         // Block sizes
+         std::vector<hsize_t> blk;
+
          //
          // First do the collective reads
          //
          for(int i = 0; i < this->mCollIoRead; ++i)
          {
+            // Extract block sizes
+            if(this->mBlock.at(i).size() == 1)
+            {
+               // Uniform block
+               blk = std::vector<hsize_t>(this->mFileOffsets.at(i).size(), this->mBlock.at(i).at(0));
+            }
+            else
+            {
+               // Non uniform block
+               blk = this->mBlock.at(i);
+            }
+            assert(this->mFileOffsets.at(i).size() == blk.size());
+
             // Set full memory space
             iDims[0] = std::get<1>(storage.at(i));
             iDims[1] = memRows;
@@ -501,10 +511,10 @@ namespace Hdf5 {
             // Set size of read block (file resolution and memory resolution might be different)
             // Select memory hyperslabs
             H5Sselect_none(memspace);
-            iDims[1] = this->mBlock.at(i);
             iDims[0] = 1;
             for(size_t j = 0; j < this->mFileOffsets.at(i).size(); ++j)
             {
+               iDims[1] = blk.at(j);
                memOffset[0] = j;
                H5Sselect_hyperslab(memspace, H5S_SELECT_OR, memOffset, NULL, iDims, NULL);
             }
@@ -514,6 +524,7 @@ namespace Hdf5 {
             iDims[0] = 1;
             for(unsigned int j =0; j < this->mFileOffsets.at(i).size(); ++j)
             {
+               iDims[1] = blk.at(j);
                pOffset[0] = this->mFileOffsets.at(i).at(j);
                H5Sselect_hyperslab(filespace, H5S_SELECT_OR, pOffset, NULL, iDims, NULL);
             }
@@ -533,17 +544,32 @@ namespace Hdf5 {
          //
          for(unsigned int i = this->mCollIoRead; i < this->mFileOffsets.size(); ++i)
          {
+            // Extract block sizes
+            if(this->mBlock.at(i).size() == 1)
+            {
+               // Uniform block
+               blk = std::vector<hsize_t>(this->mFileOffsets.at(i).size(), this->mBlock.at(i).at(0));
+            }
+            else
+            {
+               // Non uniform block
+               blk = this->mBlock.at(i);
+            }
+
             // Set full memory space
             iDims[0] = std::get<1>(storage.at(i));
             iDims[1] = memRows;
             memspace = H5Screate_simple(2, iDims, NULL);
 
+            // Check block size
+            assert(this->mBlock.at(i).size() == this->mFileOffsets.at(i).size());
+
             // Select memory hyperslabs
             H5Sselect_none(memspace);
-            iDims[1] = this->mBlock.at(i);
             iDims[0] = 1;
             for(size_t j = 0; j < this->mFileOffsets.at(i).size(); ++j)
             {
+               iDims[1] = blk.at(j);
                memOffset[0] = j;
                H5Sselect_hyperslab(memspace, H5S_SELECT_OR, memOffset, NULL, iDims, NULL);
             }
@@ -553,6 +579,7 @@ namespace Hdf5 {
             iDims[0] = 1;
             for(unsigned int j =0; j < this->mFileOffsets.at(i).size(); ++j)
             {
+               iDims[1] = blk.at(j);
                pOffset[0] = this->mFileOffsets.at(i).at(j);
                H5Sselect_hyperslab(filespace, H5S_SELECT_OR, pOffset, NULL, iDims, NULL);
             }

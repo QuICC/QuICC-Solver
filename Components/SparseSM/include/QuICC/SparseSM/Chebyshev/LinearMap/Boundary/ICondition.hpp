@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -31,10 +31,10 @@ namespace Boundary {
    {
       public:
          /// Typedef for scalar
-         typedef internal::MHDFloat Scalar_t;
+         typedef Internal::MHDFloat Scalar_t;
 
          /// Typedef for coefficient array
-         typedef internal::ACoeff ACoeff_t;
+         typedef Internal::ACoeff ACoeff_t;
 
          /// Position enum
          enum class Position { BOTTOM = -1, TOP = 1 };

@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -36,13 +36,13 @@ namespace ALegendre {
    {
       public:
          /// Typedef for a m dependent normalizer
-         typedef std::function<internal::Array(const internal::MHDFloat)> NormalizerM;
+         typedef std::function<Internal::Array(const Internal::MHDFloat)> NormalizerM;
 
          /// Typedef for a l dependent normalizer
-         typedef std::function<internal::Array(const internal::MHDFloat)> NormalizerL;
+         typedef std::function<Internal::Array(const Internal::MHDFloat)> NormalizerL;
 
          /// Typedef for a m and l dependent normalizer
-         typedef std::function<internal::Array(const internal::MHDFloat, const internal::MHDFloat)> NormalizerML;
+         typedef std::function<Internal::Array(const Internal::MHDFloat, const Internal::MHDFloat)> NormalizerML;
          /**
           * @brief Constructor
           */
@@ -58,7 +58,7 @@ namespace ALegendre {
           *
           * Internal computation can be done in multiple precision
           */
-         static void Plm(Eigen::Ref<internal::Matrix> iplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl_1m, const Eigen::Ref<const internal::Matrix>& ipl_2m, const internal::Array& igrid, NormalizerML norm);
+         static void Plm(Eigen::Ref<Internal::Matrix> iplm, const int m, const int l, const Eigen::Ref<const Internal::Matrix>& ipl_1m, const Eigen::Ref<const Internal::Matrix>& ipl_2m, const Internal::Array& igrid, NormalizerML norm);
 
          /**
           * @brief Compute the associated Legendre \f$\frac{P_l^m (\cos\theta)}{\sin\theta}\f$
@@ -72,42 +72,42 @@ namespace ALegendre {
           *
           * Internal computation can be done in multiple precision
           */
-         static void Pmm(Eigen::Ref<internal::Matrix> ipmm, const int m, const internal::Array& igrid, NormalizerM norm);
+         static void Pmm(Eigen::Ref<Internal::Matrix> ipmm, const int m, const Internal::Array& igrid, NormalizerM norm);
 
          /**
           * @brief Compute the associated Legendre \f$P_{m+1}^m (\cos\theta)\f$
           *
           * Internal computation can be done in multiple precision
           */
-         static void Pm1m(Eigen::Ref<internal::Matrix> ipm1m, const int m, const Eigen::Ref<const internal::Matrix>& ipmm, const internal::Array& igrid, NormalizerM norm);
+         static void Pm1m(Eigen::Ref<Internal::Matrix> ipm1m, const int m, const Eigen::Ref<const Internal::Matrix>& ipmm, const Internal::Array& igrid, NormalizerM norm);
 
          /**
           * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_l^m (\cos\theta)\f$ (scheme B)
           *
           * Internal computation can be done in multiple precision. Uses recurrence relation for the wanted expression.
           */
-         static void dPlm(Eigen::Ref<internal::Matrix> idplm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& iplm_1, const Eigen::Ref<const internal::Matrix>& iplm1, NormalizerML norm);
+         static void dPlm(Eigen::Ref<Internal::Matrix> idplm, const int m, const int l, const Eigen::Ref<const Internal::Matrix>& iplm_1, const Eigen::Ref<const Internal::Matrix>& iplm1, NormalizerML norm);
 
          /**
           * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_l (\cos\theta)\f$
           *
           * Internal computation can be done in multiple precision. Uses recurrence relation for the wanted expression.
           */
-         static void dPl0(Eigen::Ref<internal::Matrix> idplm, const int l, const Eigen::Ref<const internal::Matrix>& iplm1, NormalizerL norm);
+         static void dPl0(Eigen::Ref<Internal::Matrix> idplm, const int l, const Eigen::Ref<const Internal::Matrix>& iplm1, NormalizerL norm);
 
          /**
           * @brief Compute the associated Legendre \f$\frac{d}{d_\theta} P_m^m (\cos\theta)\f$ (scheme B)
           *
           * Internal computation can be done in multiple precision
           */
-         static void dPmm(Eigen::Ref<internal::Array> op, const int m, const Eigen::Ref<const internal::Array>& iplm_1, NormalizerM norm);
+         static void dPmm(Eigen::Ref<Internal::Array> op, const int m, const Eigen::Ref<const Internal::Array>& iplm_1, NormalizerM norm);
 
          /**
           * @brief Compute the associated Legendre \f$1/\sin\theta P_m^m (\cos\theta)\f$
           *
           * Internal computation can be done in multiple precision
           */
-         static void sin_1Plm(Eigen::Ref<internal::Matrix> isin_1plm, const int m, const int l, const Eigen::Ref<const internal::Matrix>& ipl1m1, const Eigen::Ref<const internal::Matrix>& ipl1m_1, NormalizerML norm);
+         static void sin_1Plm(Eigen::Ref<Internal::Matrix> isin_1plm, const int m, const int l, const Eigen::Ref<const Internal::Matrix>& ipl1m1, const Eigen::Ref<const Internal::Matrix>& ipl1m_1, NormalizerML norm);
 
          static NormalizerM normPmm();
          static NormalizerM normPm1m();
@@ -126,72 +126,72 @@ namespace ALegendre {
          /**
           * @brief Polynomial normalizer for unit Associated Legendre normalization
           */
-         static internal::Array unitPmm(const internal::MHDFloat dm);
+         static Internal::Array unitPmm(const Internal::MHDFloat dm);
 
          /**
           * @brief Polynomial normalizer for unit Associated Legendre normalization
           */
-         static internal::Array unitPm1m(const internal::MHDFloat dm);
+         static Internal::Array unitPm1m(const Internal::MHDFloat dm);
 
          /**
           * @brief Polynomial normalizer for unit Associated Legendre normalization
           */
-         static internal::Array unitPlm(const internal::MHDFloat dm, const internal::MHDFloat dl);
+         static Internal::Array unitPlm(const Internal::MHDFloat dm, const Internal::MHDFloat dl);
 
          /**
           * @brief Polynomial normalizer for unit Associated Legendre normalization
           */
-         static internal::Array unitdPl0(const internal::MHDFloat dl);
+         static Internal::Array unitdPl0(const Internal::MHDFloat dl);
 
          /**
           * @brief Polynomial normalizer for unit Associated Legendre normalization
           */
-         static internal::Array unitdPmm(const internal::MHDFloat dm);
+         static Internal::Array unitdPmm(const Internal::MHDFloat dm);
 
          /**
           * @brief Polynomial normalizer for unit Associated Legendre normalization
           */
-         static internal::Array unitdPlm(const internal::MHDFloat dm, const internal::MHDFloat dl);
+         static Internal::Array unitdPlm(const Internal::MHDFloat dm, const Internal::MHDFloat dl);
 
          /**
           * @brief Polynomial normalizer for unit Associated Legendre normalization
           */
-         static internal::Array unitsin_1Plm(const internal::MHDFloat dm, const internal::MHDFloat dl);
+         static Internal::Array unitsin_1Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl);
 
          /**
           * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
           */
-         static internal::Array schmidtPmm(const internal::MHDFloat dm);
+         static Internal::Array schmidtPmm(const Internal::MHDFloat dm);
 
          /**
           * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
           */
-         static internal::Array schmidtPm1m(const internal::MHDFloat dm);
+         static Internal::Array schmidtPm1m(const Internal::MHDFloat dm);
 
          /**
           * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
           */
-         static internal::Array schmidtPlm(const internal::MHDFloat dm, const internal::MHDFloat dl);
+         static Internal::Array schmidtPlm(const Internal::MHDFloat dm, const Internal::MHDFloat dl);
 
          /**
           * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
           */
-         static internal::Array schmidtdPl0(const internal::MHDFloat dl);
+         static Internal::Array schmidtdPl0(const Internal::MHDFloat dl);
 
          /**
           * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
           */
-         static internal::Array schmidtdPmm(const internal::MHDFloat dm);
+         static Internal::Array schmidtdPmm(const Internal::MHDFloat dm);
 
          /**
           * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
           */
-         static internal::Array schmidtdPlm(const internal::MHDFloat dm, const internal::MHDFloat dl);
+         static Internal::Array schmidtdPlm(const Internal::MHDFloat dm, const Internal::MHDFloat dl);
 
          /**
           * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
           */
-         static internal::Array schmidtsin_1Plm(const internal::MHDFloat dm, const internal::MHDFloat dl);
+         static Internal::Array schmidtsin_1Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl);
 
       private:
 

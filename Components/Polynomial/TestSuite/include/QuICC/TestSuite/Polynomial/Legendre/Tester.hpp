@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/Legendre/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Legendre/Evaluator/InnerProduct.hpp"
@@ -139,8 +139,8 @@ namespace Legendre {
    template <typename TOp> Matrix Tester<TOp>::buildMatrix(const int specN, const int physN, const ParameterType& param, const bool isWeighted) const
    {
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::LegendreRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
@@ -153,7 +153,7 @@ namespace Legendre {
       }
       else
       {
-         op.template compute<MHDFloat>(outData, specN, igrid, internal::Array(), current::Evaluator::Set());
+         op.template compute<MHDFloat>(outData, specN, igrid, Internal::Array(), current::Evaluator::Set());
       }
 
       return outData;
@@ -162,15 +162,15 @@ namespace Legendre {
    template <typename TOp> Matrix Tester<TOp>::buildOuter(const int specN, const int physN, const ParameterType& param) const
    {
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::LegendreRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
       TOp op;
       Matrix outData(physN, specN);
       Matrix inData = Matrix::Identity(specN, specN);
-      op.template compute<MHDFloat>(outData, specN, igrid, internal::Array(), current::Evaluator::OuterProduct<MHDFloat>(inData));
+      op.template compute<MHDFloat>(outData, specN, igrid, Internal::Array(), current::Evaluator::OuterProduct<MHDFloat>(inData));
 
       return outData;
    }
@@ -178,15 +178,15 @@ namespace Legendre {
    template <typename TOp> Matrix Tester<TOp>::buildInner(const int specN, const int physN, const ParameterType& param) const
    {
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::LegendreRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
       TOp op;
       Matrix outData(specN, specN);
       Matrix inData(physN, specN);
-      op.template compute<MHDFloat>(inData, specN, igrid, internal::Array(), current::Evaluator::Set());
+      op.template compute<MHDFloat>(inData, specN, igrid, Internal::Array(), current::Evaluator::Set());
       op.template compute<MHDFloat>(outData, specN, igrid, iweights, current::Evaluator::InnerProduct<MHDFloat>(inData));
 
       Matrix outDataT = outData.transpose();
@@ -197,14 +197,14 @@ namespace Legendre {
    template <typename TOp> Matrix Tester<TOp>::buildReduce(const int specN, const int physN, const ParameterType& param) const
    {
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::LegendreRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
       TOp op;
       Matrix outData(specN, 1);
-      op.template compute<MHDFloat>(outData, specN, igrid, internal::Array(), current::Evaluator::Reduce());
+      op.template compute<MHDFloat>(outData, specN, igrid, Internal::Array(), current::Evaluator::Reduce());
 
       return outData;
    }

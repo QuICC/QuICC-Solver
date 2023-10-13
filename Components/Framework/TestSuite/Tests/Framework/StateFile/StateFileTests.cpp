@@ -61,6 +61,9 @@ int main( int argc, char* argv[] )
       | Opt( test::args().grouper, "" )      // Add test grouper option
          ["--grouper"]
          ("Comm grouping algorithm")
+      | Opt( test::args().truncation, "" )      // Add test truncation scheme option
+         ["--truncation"]
+         ("Truncation scheme")
       | Opt( test::args().factors, "factor" )   // Add imposed factor option
          ["--factor"]
          ("Factor to use in decomposition")

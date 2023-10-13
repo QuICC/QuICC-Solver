@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 #include "QuICC/Polynomial/Legendre/LegendreBase.hpp"
 
 namespace QuICC {
@@ -38,10 +38,10 @@ namespace Legendre {
          /**
           * @brief Compute polynomial through recurrence relation
           */
-         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator);
+         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 
-   template <typename T, typename TEvaluator> void dPn::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator)
+   template <typename T, typename TEvaluator> void dPn::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       int gN = igrid.rows();
 
@@ -50,8 +50,8 @@ namespace Legendre {
          throw std::logic_error("Operator matrix should have at least 1 column");
       }
 
-      internal::Matrix ipn(gN, 2);
-      internal::Matrix idpn(gN, 2);
+      Internal::Matrix ipn(gN, 2);
+      Internal::Matrix idpn(gN, 2);
 
       idpn.col(0).setZero();
       evaluator(rOut, idpn.col(0), 0);

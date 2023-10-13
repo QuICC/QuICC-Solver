@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4Y4SphLapl2.cpp
  * @brief Source of the implementation of the I^4 Y^4 spherical bilaplacian sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y4SphLapl2.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -28,7 +29,7 @@ namespace LinearMap {
    I4Y4SphLapl2::ACoeff_t I4Y4SphLapl2::d_4(const ACoeff_t& n) const
    {
       const auto& l1 = this->l();
-      const auto c = precision::pow(this->a()/2.0,4);
+      const auto c = Internal::Math::pow(this->a()/2.0,4);
       return (c*(l1 - n + 6.0)*(l1 + n - 5.0)*(l1 - n + 4.0)*(l1 + n - 3.0))/(n*(n - 3.0)*(n - 1.0)*(n - 2.0));
    }
 

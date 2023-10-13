@@ -21,7 +21,7 @@
 // Project includes
 //
 #include "QuICC/Polynomial/Jacobi/JacobiBase.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 
 namespace QuICC {
 

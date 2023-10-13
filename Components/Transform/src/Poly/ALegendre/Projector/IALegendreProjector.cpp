@@ -39,7 +39,6 @@ namespace Projector {
       // Initit specialized data for operators
       this->initSpecial();
 
-      #if defined QUICC_ALEGENDRE_PROJIMPL_MATRIX
       // reserve storage
       this->mOps.reserve(this->mspSetup->slowSize());
 
@@ -52,13 +51,6 @@ namespace Projector {
          this->makeOperator(op, igrid, iweights, i);
          this->mOps.back() = op.transpose();
       }
-      #elif defined QUICC_ALEGENDRE_PROJIMPL_OTF
-
-         // Store grid and weights
-         this->mGrid = igrid;
-         this->mWeights = iweights;
-
-      #endif //defined QUICC_ALEGENDRE_PROJIMPL_MATRIX
    }
 
    void IALegendreProjector::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const

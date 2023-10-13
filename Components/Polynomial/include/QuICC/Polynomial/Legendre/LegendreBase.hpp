@@ -6,22 +6,13 @@
 #ifndef QUICC_POLYNOMIAL_LEGENDRE_LEGENDREBASE_HPP
 #define QUICC_POLYNOMIAL_LEGENDRE_LEGENDREBASE_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <functional>
 
-// External includes
-//
-
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -36,10 +27,10 @@ namespace Legendre {
    {
       public:
          /// Typedef for a constant normalizer
-         typedef std::function<internal::Array()> Normalizer;
+         typedef std::function<Internal::Array()> Normalizer;
 
          /// Typedef for a n dependent normalizer
-         typedef std::function<internal::Array(const internal::MHDFloat)> NormalizerN;
+         typedef std::function<Internal::Array(const Internal::MHDFloat)> NormalizerN;
 
          /**
           * @brief Constructor
@@ -56,35 +47,35 @@ namespace Legendre {
           *
           * Internal computation can be done in multiple precision
           */
-         static void P0(Eigen::Ref<internal::Matrix> ip0, Normalizer norm);
+         static void P0(Eigen::Ref<Internal::Matrix> ip0, Normalizer norm);
 
          /**
           * @brief Compute the Legendre \f$P_1 (x)\f$
           *
           * Internal computation can be done in multiple precision
           */
-         static void P1(Eigen::Ref<internal::Matrix> ip1, const internal::Array& igrid, Normalizer norm);
+         static void P1(Eigen::Ref<Internal::Matrix> ip1, const Internal::Array& igrid, Normalizer norm);
 
          /**
           * @brief Compute the Legendre \f$P_n (x)\f$
           *
           * Internal computation can be done in multiple precision
           */
-         static void Pn(Eigen::Ref<internal::Matrix> ipn, const int n, const Eigen::Ref<const internal::Matrix>& ipn_1, const Eigen::Ref<const internal::Matrix>& ipn_2, const internal::Array& igrid, NormalizerN norm);
+         static void Pn(Eigen::Ref<Internal::Matrix> ipn, const int n, const Eigen::Ref<const Internal::Matrix>& ipn_1, const Eigen::Ref<const Internal::Matrix>& ipn_2, const Internal::Array& igrid, NormalizerN norm);
 
          /**
           * @brief Compute the Legendre \f$\frac{d}{dx} P_n (x)\f$
           *
           * Internal computation can be done in multiple precision.
           */
-         static void dP1(Eigen::Ref<internal::Matrix> idp1, const Eigen::Ref<const internal::Matrix>& ipn_1, Normalizer norm);
+         static void dP1(Eigen::Ref<Internal::Matrix> idp1, const Eigen::Ref<const Internal::Matrix>& ipn_1, Normalizer norm);
 
          /**
           * @brief Compute the Legendre \f$\frac{d}{dx} P_n (x)\f$
           *
           * Internal computation can be done in multiple precision.
           */
-         static void dPn(Eigen::Ref<internal::Matrix> idpn, const int n, const Eigen::Ref<const internal::Matrix>& ipn_1, const Eigen::Ref<const internal::Matrix>& idpn_1, const internal::Array& igrid, NormalizerN norm);
+         static void dPn(Eigen::Ref<Internal::Matrix> idpn, const int n, const Eigen::Ref<const Internal::Matrix>& ipn_1, const Eigen::Ref<const Internal::Matrix>& idpn_1, const Internal::Array& igrid, NormalizerN norm);
 
          static Normalizer normP0();
          static Normalizer normP1();
@@ -96,52 +87,52 @@ namespace Legendre {
          /**
           * @brief Polynomial normalizer for unit Legendre normalization
           */
-         static internal::Array unitP0();
+         static Internal::Array unitP0();
 
          /**
           * @brief Polynomial normalizer for unit Legendre normalization
           */
-         static internal::Array unitP1();
+         static Internal::Array unitP1();
 
          /**
           * @brief Polynomial normalizer for unit Legendre normalization
           */
-         static internal::Array unitPn(const internal::MHDFloat dn);
+         static Internal::Array unitPn(const Internal::MHDFloat dn);
 
          /**
           * @brief Polynomial normalizer for unit Legendre normalization
           */
-         static internal::Array unitdP1();
+         static Internal::Array unitdP1();
 
          /**
           * @brief Polynomial normalizer for unit Legendre normalization
           */
-         static internal::Array unitdPn(const internal::MHDFloat dn);
+         static Internal::Array unitdPn(const Internal::MHDFloat dn);
 
          /**
           * @brief Polynomial normalizer for natural Legendre normalization
           */
-         static internal::Array naturalP0();
+         static Internal::Array naturalP0();
 
          /**
           * @brief Polynomial normalizer for natural Legendre normalization
           */
-         static internal::Array naturalP1();
+         static Internal::Array naturalP1();
 
          /**
           * @brief Polynomial normalizer for natural Legendre normalization
           */
-         static internal::Array naturalPn(const internal::MHDFloat dn);
+         static Internal::Array naturalPn(const Internal::MHDFloat dn);
 
          /**
           * @brief Polynomial normalizer for natural Legendre normalization
           */
-         static internal::Array naturaldP1();
+         static Internal::Array naturaldP1();
 
          /**
           * @brief Polynomial normalizer for natural Legendre normalization
           */
-         static internal::Array naturaldPn(const internal::MHDFloat dn);
+         static Internal::Array naturaldPn(const Internal::MHDFloat dn);
 
       private:
 

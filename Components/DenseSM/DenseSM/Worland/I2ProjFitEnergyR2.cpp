@@ -31,7 +31,7 @@ namespace Worland {
    {
    }
 
-   void I2ProjFitEnergyR2::buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const
+   void I2ProjFitEnergyR2::buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const
    {
       switch(this->type())
       {
@@ -50,7 +50,7 @@ namespace Worland {
       }
    }
 
-   void I2ProjFitEnergyR2::buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const
+   void I2ProjFitEnergyR2::buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const
    {
       const auto& nbar = this->mOutRows;
 

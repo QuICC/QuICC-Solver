@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4Y4.cpp
  * @brief Source of the implementation of the I^4 Y^4 sparse operator, with y = ax + b
  */
@@ -11,7 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y4.hpp"
-
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -28,13 +28,13 @@ namespace LinearMap {
 
    I4Y4::ACoeff_t I4Y4::d_8(const ACoeff_t& n) const
    {
-      const auto a8 = precision::pow(this->a(),8);
+      const auto a8 = Internal::Math::pow(this->a(),8);
       return a8/(256.0*n*(n - 1.0)*(n - 2.0)*(n - 3.0));
    }
 
    I4Y4::ACoeff_t I4Y4::d_7(const ACoeff_t& n) const
    {
-      const auto a7 = precision::pow(this->a(),7);
+      const auto a7 = Internal::Math::pow(this->a(),7);
       const auto& b1 = this->b();
       return (a7*b1)/(32.0*n*(n - 1.0)*(n - 2.0)*(n - 3.0));
    }

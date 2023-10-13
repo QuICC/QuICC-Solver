@@ -12,13 +12,13 @@
 // Project includes
 //
 #include "Geostrophic2Tor.hpp"
+#include "Types/Internal/Math.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/ALegendre/dPlm.hpp"
 #include "QuICC/Polynomial/ALegendre/Evaluator/Set.hpp"
-#include "Types/Precision.hpp"
 
 namespace QuICC {
 
@@ -31,7 +31,7 @@ namespace Worland {
    {
    }
 
-   void Geostrophic2Tor::buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const
+   void Geostrophic2Tor::buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const
    {
       switch(this->type())
       {
@@ -50,7 +50,7 @@ namespace Worland {
       }
    }
 
-   void Geostrophic2Tor::buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const
+   void Geostrophic2Tor::buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const
    {
       const auto& nN = this->mNn;
       const auto& maxnl = this->mMaxnl;
@@ -61,21 +61,21 @@ namespace Worland {
       const auto& a = this->mcUgAlpha;
       const auto& b = this->mcUgDBeta;
 
-      internal::Array igrid, iweights;
+      Internal::Array igrid, iweights;
       Polynomial::Quadrature::WorlandChebyshevRule wquad;
       wquad.computeQuadrature(igrid, iweights, nR);
 
-      mat = internal::Matrix::Zero(maxnl*nN, maxNug+1);
+      mat = Internal::Matrix::Zero(maxnl*nN, maxNug+1);
 
-      std::map<int,internal::Matrix> matP;
+      std::map<int,Internal::Matrix> matP;
       for(int l = 0; l < maxnl; l++)
       {
          if(l % 2 == 1)
          {
             int nN_ = std::min(nli(l), nN-1);
-            internal::Matrix ipoly(igrid.size(), nN_ + 1);
+            Internal::Matrix ipoly(igrid.size(), nN_ + 1);
             Polynomial::Worland::Wnl wnl;
-            wnl.compute<internal::MHDFloat>(ipoly, nN_ + 1, l, igrid, iweights, Polynomial::Worland::Evaluator::Set());
+            wnl.compute<Internal::MHDFloat>(ipoly, nN_ + 1, l, igrid, iweights, Polynomial::Worland::Evaluator::Set());
             matP.try_emplace(l,ipoly);
          }
       }
@@ -83,22 +83,22 @@ namespace Worland {
       // Create Legendre grid and weights
       int nAlPoly = maxnl;
       int nTh = 3*(nAlPoly+1)/2;
-      internal::Array ialgrid, ialweights;
+      Internal::Array ialgrid, ialweights;
       Polynomial::Quadrature::LegendreRule lquad;
       lquad.computeQuadrature(ialgrid, ialweights, nTh);
 
       // Compute Legendre operator
       Polynomial::ALegendre::dPlm dplm;
       namespace evAL = Polynomial::ALegendre::Evaluator;
-      internal::Matrix alOp(ialgrid.size(), nAlPoly);;
-      dplm.compute<internal::MHDFloat>(alOp, nAlPoly, 0, ialgrid, ialweights, evAL::Set());
-      internal::Array invLaplh = internal::Array::LinSpaced(nAlPoly, 0, nAlPoly-1);
+      Internal::Matrix alOp(ialgrid.size(), nAlPoly);;
+      dplm.compute<Internal::MHDFloat>(alOp, nAlPoly, 0, ialgrid, ialweights, evAL::Set());
+      Internal::Array invLaplh = Internal::Array::LinSpaced(nAlPoly, 0, nAlPoly-1);
       invLaplh = (invLaplh.array()*(invLaplh.array() + 1.0)).pow(-1);
       invLaplh(0) = 0.0;
 
       // Create basis for geostrophic flow (used with l = 1)
-      internal::MHDFloat ugA;
-      internal::MHDFloat ugDB;
+      Internal::MHDFloat ugA;
+      Internal::MHDFloat ugDB;
       if(this->isUgBasis(this->mcUgAlpha, this->mcUgDBeta))
       {
          // Using \tilde{\Lambda}(s) basis
@@ -112,26 +112,26 @@ namespace Worland {
          ugA = MHD_MP(0.5);
          ugDB = MHD_MP(0);
       }
-      internal::MHDFloat ugB = ugDB + MHD_MP(1);
+      Internal::MHDFloat ugB = ugDB + MHD_MP(1);
       Polynomial::Worland::Wnl ugWnl(ugA, ugDB);
 
-      internal::Array iugGrid(ialgrid.size());
+      Internal::Array iugGrid(ialgrid.size());
       for(int n_: nIdx)
       {
          // Normalization (includes 2\pi from Fourier)
-         internal::MHDFloat scale = this->Cn(n_)*(MHD_MP(2)*Precision::PI)/this->Cnab(n_, ugA, ugB);
+         Internal::MHDFloat scale = this->Cn(n_)*(MHD_MP(2)*Internal::Math::PI)/this->Cnab(n_, ugA, ugB);
 
          // Convert geostrophic flow into 2D spherical flow (r, l)
          // (spectral theta, ignore phi direction)
-         internal::Matrix tPoly = internal::Matrix::Zero(igrid.size(), nAlPoly);
+         Internal::Matrix tPoly = Internal::Matrix::Zero(igrid.size(), nAlPoly);
          for(int tk = 0; tk < igrid.size(); tk++)
          {
             // Convert cylidrical s to (r,theta)
             iugGrid = igrid(tk)*ialgrid.array().acos().sin();
 
             // Evaluate geostrophic flow in (r,theta)
-            internal::Matrix ipoly(iugGrid.size(), n_+1);
-            ugWnl.compute<internal::MHDFloat>(ipoly, n_+1, 1, iugGrid, internal::Array(), Polynomial::Worland::Evaluator::Set());
+            Internal::Matrix ipoly(iugGrid.size(), n_+1);
+            ugWnl.compute<Internal::MHDFloat>(ipoly, n_+1, 1, iugGrid, Internal::Array(), Polynomial::Worland::Evaluator::Set());
 
             tPoly.row(tk) = -(invLaplh.asDiagonal()*(alOp.transpose()*(scale*ipoly.rightCols(1)))).transpose();
          }
@@ -140,7 +140,7 @@ namespace Worland {
             if(l%2 == 1)
             {
                // Compute Worland expansion
-               internal::Matrix tmp = matP.at(l).transpose()*(tPoly.col(l));
+               Internal::Matrix tmp = matP.at(l).transpose()*(tPoly.col(l));
 
                mat.block(l*nN, n_, tmp.rows(), 1) = tmp;
             }

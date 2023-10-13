@@ -12,7 +12,8 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -25,10 +26,10 @@ namespace SparseSM {
    {
       public:
          /// Typedef for scalar
-         typedef internal::MHDFloat Scalar_t;
+         typedef Internal::MHDFloat Scalar_t;
 
          /// Typedef for coefficient array
-         typedef internal::ACoeff ACoeff_t;
+         typedef Internal::ACoeff ACoeff_t;
 
          /**
           * @brief Typedef for a triplets
@@ -76,7 +77,7 @@ namespace SparseSM {
           *
           * Backend has no MP, call directly
           */
-         template<class T, typename std::enable_if_t<std::is_same_v<Scalar_t, MHDFloat>, bool> = true>
+         template<class T, typename TScalar = Scalar_t, typename std::enable_if_t<std::is_same_v<TScalar, MHDFloat>, bool> = true>
          void buildOp(T& mat) const
          {
             this->buildOpImpl(mat, this->rows(), this->cols());
@@ -89,11 +90,11 @@ namespace SparseSM {
           *
           * Backend has MP, needs casting before returning the operator
           */
-         template<class T, typename std::enable_if_t<!std::is_same_v<Scalar_t, MHDFloat> &&
+         template<class T, typename TScalar = Scalar_t, typename std::enable_if_t<!std::is_same_v<TScalar, MHDFloat> &&
             std::is_same_v<T, SparseMatrix>, bool> = true>
          void buildOp(T& mat) const
          {
-            internal::SparseMatrix imat;
+            Internal::SparseMatrix imat;
             this->buildOpImpl(imat, this->rows(), this->cols());
             mat = imat.cast<MHDFloat>();
          }
@@ -105,11 +106,11 @@ namespace SparseSM {
           *
           * Backend has MP, needs casting before returning the operator
           */
-         template<class T, typename std::enable_if_t<!std::is_same_v<Scalar_t, MHDFloat> &&
+         template<class T, typename TScalar = Scalar_t, typename std::enable_if_t<!std::is_same_v<TScalar, MHDFloat> &&
             std::is_same_v<T, Matrix>, bool> = true>
          void buildOp(T& mat) const
          {
-            internal::Matrix imat;
+            Internal::Matrix imat;
             this->buildOpImpl(imat, this->rows(), this->cols());
             mat = imat.cast<MHDFloat>();
          }
@@ -129,13 +130,13 @@ namespace SparseSM {
           * @brief Implementation of build sparse matrix operator
           * @param output operator
           */
-         void buildOpImpl(internal::SparseMatrix& mat, const int rows, const int cols) const;
+         void buildOpImpl(Internal::SparseMatrix& mat, const int rows, const int cols) const;
 
          /**
           * @brief Implementation of build banded matrix operator
           * @param output operator
           */
-         void buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const;
+         void buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const;
 
          /**
           * @brief Convert diagonal to triplets
@@ -156,7 +157,7 @@ namespace SparseSM {
          /**
           * @brief Create triplet representation of matrix
           */
-         virtual void buildBanded(internal::Matrix& bd, unsigned int& kL, unsigned int& kU) const;
+         virtual void buildBanded(Internal::Matrix& bd, unsigned int& kL, unsigned int& kU) const;
 
          /**
           * @brief Handle entries to the left of the matrix (negative column index)

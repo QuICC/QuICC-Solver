@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/ALegendre/ALegendreBase.hpp"
 
 namespace QuICC {
@@ -35,14 +35,14 @@ namespace ALegendre {
    class sin_1Plm: public ALegendreBase
    {
       public:
-         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const internal::Array& ifullgrid, const internal::Array& scale, TEvaluator evaluator);
+         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const Internal::Array& ifullgrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 
-   template <typename T, typename TEvaluator> void sin_1Plm::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const internal::Array& ifullgrid, const internal::Array& scale, TEvaluator evaluator)
+   template <typename T, typename TEvaluator> void sin_1Plm::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const Internal::Array& ifullgrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       // Extract required part of grid
       int gN = (ifullgrid.rows()/2 + ifullgrid.rows()%2);
-      internal::Array igrid = ifullgrid.segment(0, gN);
+      Internal::Array igrid = ifullgrid.segment(0, gN);
 
       if (m < 0)
       {
@@ -57,7 +57,7 @@ namespace ALegendre {
       // Polynomials is set to zero for m=0 as it only appears combined with \partial_\phi
       if(m == 0)
       {
-         internal::Matrix ipoly(gN, 1);
+         Internal::Matrix ipoly(gN, 1);
          ipoly.col(0).setZero();
          for(int i = 0; i < nPoly; ++i)
          {
@@ -67,9 +67,9 @@ namespace ALegendre {
       } else
       {
          // Storage for P_{l+1}^{m+1} and P_{l+1}^{m-1}
-         internal::Matrix ipoly(gN,1);
-         internal::Matrix ipl1m1(gN,2);
-         internal::Matrix ipl1m_1(gN,2);
+         Internal::Matrix ipoly(gN,1);
+         Internal::Matrix ipl1m1(gN,2);
+         Internal::Matrix ipl1m_1(gN,2);
 
          // Initialize P_{l+1}^{m+1}
          ALegendreBase::Pmm(ipl1m1.col(0), m+1, igrid, ALegendreBase::normPmm());

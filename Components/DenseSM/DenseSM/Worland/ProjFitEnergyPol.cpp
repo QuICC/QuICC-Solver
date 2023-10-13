@@ -33,7 +33,7 @@ namespace Worland {
    {
    }
 
-   void ProjFitEnergyPol::buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const
+   void ProjFitEnergyPol::buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const
    {
       switch(this->type())
       {
@@ -52,7 +52,7 @@ namespace Worland {
       }
    }
 
-   void ProjFitEnergyPol::buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const
+   void ProjFitEnergyPol::buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const
    {
       const auto& nbar = this->mOutRows;
 
@@ -61,33 +61,33 @@ namespace Worland {
          const auto a = Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
          const auto db = Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
          const auto& l = this->mL;
-         const auto& dl = static_cast<internal::MHDFloat>(this->mL);
+         const auto& dl = static_cast<Internal::MHDFloat>(this->mL);
          const auto ll1 = dl*(dl+MHD_MP(1.0));
          Polynomial::Quadrature::WorlandLegendreRule wquad;
 
          int rp = 2*rows + l;
          int pts = rp + 2 + (rp + 2)%2;
-         internal::Array igrid;
-         internal::Array iweights;
+         Internal::Array igrid;
+         Internal::Array iweights;
          wquad.computeQuadrature(igrid, iweights, pts);
 
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::Wnl wnl;
          Polynomial::Worland::drWnl drwnl;
 
-         internal::Matrix tmpBwd(igrid.size(), rows);
-         wnl.compute<internal::MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
-         internal::Matrix tmpFwd(igrid.size(), rows);
-         wnl.compute<internal::MHDFloat>(tmpFwd, rows, l, igrid, iweights.array(), ev::Set());
-         internal::Matrix matW = ll1*ll1*(tmpFwd.transpose()*tmpBwd);
+         Internal::Matrix tmpBwd(igrid.size(), rows);
+         wnl.compute<Internal::MHDFloat>(tmpBwd, rows, l, igrid, Internal::Array(), ev::Set());
+         Internal::Matrix tmpFwd(igrid.size(), rows);
+         wnl.compute<Internal::MHDFloat>(tmpFwd, rows, l, igrid, iweights.array(), ev::Set());
+         Internal::Matrix matW = ll1*ll1*(tmpFwd.transpose()*tmpBwd);
 
-         drwnl.compute<internal::MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
-         drwnl.compute<internal::MHDFloat>(tmpFwd, rows, l, igrid, iweights.array(), ev::Set());
+         drwnl.compute<Internal::MHDFloat>(tmpBwd, rows, l, igrid, Internal::Array(), ev::Set());
+         drwnl.compute<Internal::MHDFloat>(tmpFwd, rows, l, igrid, iweights.array(), ev::Set());
          matW += ll1*(tmpFwd.transpose()*tmpBwd);
 
          SparseSM::Worland::Boundary::Value bc(a, db, l);
-         internal::Matrix bcVal = bc.compute(rows-1).matrix();
-         internal::Matrix bcMat = (dl*ll1*bcVal)*bcVal.transpose();
+         Internal::Matrix bcVal = bc.compute(rows-1).matrix();
+         Internal::Matrix bcMat = (dl*ll1*bcVal)*bcVal.transpose();
 
          matW += bcMat;
 
@@ -102,7 +102,7 @@ namespace Worland {
             throw std::logic_error("Unknown boundary condition");
          }
 
-         internal::Matrix matWbar = (matS.transpose()*matW.block(0,0,nbar,nbar)*matS);
+         Internal::Matrix matWbar = (matS.transpose()*matW.block(0,0,nbar,nbar)*matS);
          mat.resize(rows, cols);
          mat.topRows(nbar) = matS*matWbar.inverse()*matS.transpose()*matW.topRows(nbar);
          mat.bottomRows(rows-nbar).setZero();

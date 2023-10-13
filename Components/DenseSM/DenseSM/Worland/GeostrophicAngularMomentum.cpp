@@ -12,6 +12,7 @@
 // Project includes
 //
 #include "GeostrophicAngularMomentum.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -24,7 +25,7 @@ namespace Worland {
    {
    }
 
-   void GeostrophicAngularMomentum::buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const
+   void GeostrophicAngularMomentum::buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const
    {
       assert(cols == 1);
       switch(this->type())
@@ -44,25 +45,25 @@ namespace Worland {
       }
    }
 
-   void GeostrophicAngularMomentum::buildChebyshevOp(internal::Matrix& mat, const int rows) const
+   void GeostrophicAngularMomentum::buildChebyshevOp(Internal::Matrix& mat, const int rows) const
    {
-      mat = internal::Matrix::Zero(rows, 1);
+      mat = Internal::Matrix::Zero(rows, 1);
 
       if(this->isUgBasis(this->mcUgAlpha, this->mcUgDBeta))
       {
          const auto a = this->mcUgAlpha;
          const auto b = this->mcUgDBeta + MHD_MP(1);
          const int nr = rows + 1;
-         internal::Array angMom = internal::Array::Zero(nr);
+         Internal::Array angMom = Internal::Array::Zero(nr);
 
-         internal::MHDFloat piFactor = precision::pow(Precision::PI,MHD_MP(1.5));
+         Internal::MHDFloat piFactor = Internal::Math::pow(Internal::Math::PI,MHD_MP(1.5));
          for(int n = 0; n < nr; n++)
          {
-            internal::MHDFloat t = 0;
+            Internal::MHDFloat t = 0;
             for(int j = 0; j < n+1; j++)
             {
-               internal::MHDFloat dj = static_cast<internal::MHDFloat>(j);
-               t += piFactor*this->Bjnab(j, n, a, b)*precision::exp(precision::lgamma(dj+MHD_MP(2))-precision::lgamma(dj+MHD_MP(3.5)));
+               Internal::MHDFloat dj = static_cast<Internal::MHDFloat>(j);
+               t += piFactor*this->Bjnab(j, n, a, b)*Internal::Math::exp(Internal::Math::lgamma(dj+MHD_MP(2))-Internal::Math::lgamma(dj+MHD_MP(3.5)));
             }
             angMom(n) = t;
          }

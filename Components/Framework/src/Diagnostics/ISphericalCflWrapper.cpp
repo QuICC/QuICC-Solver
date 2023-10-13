@@ -95,7 +95,7 @@ namespace Diagnostics {
 
       // Compute magnetic grid
       int nB = 3*this->mspVelocity->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)/4 + 1;
-      internal::Array igrid, iweights;
+      Internal::Array igrid, iweights;
       Polynomial::Quadrature::WorlandChebyshevRule wquad;
       wquad.computeQuadrature(igrid, iweights, nB);
       Array rB = igrid.cast<MHDFloat>();

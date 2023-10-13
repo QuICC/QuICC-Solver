@@ -15,7 +15,8 @@
 
 // Project includes
 //
-#include "Types/Typedefs.hpp"
+#include "Types/BasicTypes.hpp"
+#include "Types/Internal/Typedefs.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
@@ -123,8 +124,8 @@ namespace Worland {
 
          int nN = meta(0) + 1;
          int maxnl = meta(1) + 1;
-         QuICC::internal::MHDFloat ugAlpha = static_cast<QuICC::internal::MHDFloat>(meta(2));
-         QuICC::internal::MHDFloat ugDBeta = static_cast<QuICC::internal::MHDFloat>(meta(3));
+         QuICC::Internal::MHDFloat ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         QuICC::Internal::MHDFloat ugDBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
 
          int nR = int(((maxnl + 1) - (maxnl + 1) % 2) / 2 + 2) + 1;
          int maxNug = int(((maxnl - 2) - (maxnl - 2) % 2) / 2);
@@ -175,8 +176,8 @@ namespace Worland {
 
          int nN = meta(0) + 1;
          int maxnl = meta(1) + 1;
-         QuICC::internal::MHDFloat ugAlpha = static_cast<QuICC::internal::MHDFloat>(meta(2));
-         QuICC::internal::MHDFloat ugDBeta = static_cast<QuICC::internal::MHDFloat>(meta(3));
+         QuICC::Internal::MHDFloat ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         QuICC::Internal::MHDFloat ugDBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
 
          int nr = (maxnl - 3)/2 + 1;
 

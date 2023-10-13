@@ -79,12 +79,12 @@ namespace QuICC {
          /**
           * @brief Compute the offset for local modes
           */
-         virtual void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const = 0;
+         virtual void computeOffsets(std::vector<std::vector<OffsetType> >& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const = 0;
 
          /**
           * @brief Compute the offset for local modes by comparing to a reference simulation
           */
-         virtual void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const = 0;
+         virtual void computeOffsets(std::vector<std::vector<OffsetType> >& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const = 0;
 
          /**
           * @brief Generate index key as vector

@@ -32,15 +32,15 @@
 #
 
 # Default branch for known models
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.8.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.8.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.8.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.8.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.9.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.8.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "main")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.10.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.10.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.10.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.10.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.11.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.9.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "v1.1.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereModifiedTaylor
-  "v1.1.0")
+  "simpler_tree")
 
 # Cache value, may be overwritten manually
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo

@@ -11,7 +11,6 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/ICondition.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
 

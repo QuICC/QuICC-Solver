@@ -13,7 +13,7 @@
 //
 #include "QuICC/Io/Variable/SphereMaxAbsoluteFieldValueWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/MaxAbsoluteFieldValue.hpp"
 
