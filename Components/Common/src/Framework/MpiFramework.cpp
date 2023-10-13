@@ -19,7 +19,6 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
 #include "QuICC/QuICCEnv.hpp"
 
 namespace QuICC {

@@ -44,7 +44,7 @@ namespace Projector {
       // Check for division by 0!
       assert(this->mspSetup->lower() > 0.0 || this->mspSetup->upper() < 0.0);
 
-      internal::Array igrid, iweights;
+      Internal::Array igrid, iweights;
       Polynomial::Quadrature::ChebyshevRule quad;
       quad.computeQuadrature(igrid, iweights, this->mspSetup->fwdSize(), this->mspSetup->lower(), this->mspSetup->upper());
       this->mBackend.setScaler(igrid.array().pow(-2).cast<MHDFloat>().matrix());

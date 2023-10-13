@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/Quadrature/JacobiRule.hpp"
 #include "QuICC/Polynomial/Jacobi/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Jacobi/Evaluator/InnerProduct.hpp"
@@ -143,8 +143,8 @@ namespace Jacobi {
       MHDFloat b = param.at(1);
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::JacobiRule quad(a, b);
       quad.computeQuadrature(igrid, iweights, physN);
 
@@ -157,7 +157,7 @@ namespace Jacobi {
       }
       else
       {
-         op.template compute<MHDFloat>(outData, specN, a, b, igrid, internal::Array(), current::Evaluator::Set());
+         op.template compute<MHDFloat>(outData, specN, a, b, igrid, Internal::Array(), current::Evaluator::Set());
       }
 
       return outData;
@@ -170,15 +170,15 @@ namespace Jacobi {
       MHDFloat b = param.at(1);
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::JacobiRule quad(a, b);
       quad.computeQuadrature(igrid, iweights, physN);
 
       TOp op;
       Matrix outData(physN, specN);
       Matrix inData = Matrix::Identity(specN, specN);
-      op.template compute<MHDFloat>(outData, specN, a, b, igrid, internal::Array(), current::Evaluator::OuterProduct<MHDFloat>(inData));
+      op.template compute<MHDFloat>(outData, specN, a, b, igrid, Internal::Array(), current::Evaluator::OuterProduct<MHDFloat>(inData));
 
       return outData;
    }
@@ -190,15 +190,15 @@ namespace Jacobi {
       MHDFloat b = param.at(1);
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::JacobiRule quad(a, b);
       quad.computeQuadrature(igrid, iweights, physN);
 
       TOp op;
       Matrix outData(specN, physN);
       Matrix inData = Matrix::Identity(physN, physN);
-      op.template compute<MHDFloat>(outData, specN, a, b, igrid, internal::Array(), current::Evaluator::InnerProduct<MHDFloat>(inData));
+      op.template compute<MHDFloat>(outData, specN, a, b, igrid, Internal::Array(), current::Evaluator::InnerProduct<MHDFloat>(inData));
 
       Matrix outDataT = outData.transpose();
 
@@ -212,14 +212,14 @@ namespace Jacobi {
       MHDFloat b = param.at(1);
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::JacobiRule quad(a, b);
       quad.computeQuadrature(igrid, iweights, physN);
 
       TOp op;
       Matrix outData(specN, 1);
-      op.template compute<MHDFloat>(outData, specN, a, b, igrid, internal::Array(), current::Evaluator::Reduce());
+      op.template compute<MHDFloat>(outData, specN, a, b, igrid, Internal::Array(), current::Evaluator::Reduce());
 
       return outData;
    }

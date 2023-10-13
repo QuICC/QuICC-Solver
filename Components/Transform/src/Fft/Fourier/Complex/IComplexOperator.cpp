@@ -45,7 +45,7 @@ namespace Complex {
       this->initBase();
    }
 
-   void IComplexOperator::init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const
+   void IComplexOperator::init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       throw std::logic_error("Unused interface");
    }

@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "Types/Typedefs.hpp"
+#include "Types/Internal/Typedefs.hpp"
 #include "DenseSM/IWorlandOperator.hpp"
 
 namespace QuICC {
@@ -58,27 +58,27 @@ namespace Worland {
          /**
           * @brief Akj coefficient used for geostrophic to toroidal projection (Jiawen's thesis: (C.3))
           */
-         internal::MHDFloat Akj(const int k, const int j) const;
+         Internal::MHDFloat Akj(const int k, const int j) const;
 
          /**
           * @brief Bjn coefficient used for geostrophic to toroidal projection (Jiawen's thesis: (3.28) but using Cn in place of Cnab)
           */
-         internal::MHDFloat Bjn(const int j, const int n) const;
+         Internal::MHDFloat Bjn(const int j, const int n) const;
 
          /**
           * @brief Bjnab coefficient used for geostrophic to toroidal projection (Jiawen's thesis: (3.28))
           */
-         internal::MHDFloat Bjnab(const int j, const int n, const internal::MHDFloat a, const internal::MHDFloat b) const;
+         Internal::MHDFloat Bjnab(const int j, const int n, const Internal::MHDFloat a, const Internal::MHDFloat b) const;
 
          /**
           * @Brief Normalization coefficient for $\Lambda_n(s)$ (Jiawen's thesis (3.20))
           */
-         internal::MHDFloat Cnab(const int n, const Scalar_t a, const Scalar_t b) const;
+         Internal::MHDFloat Cnab(const int n, const Scalar_t a, const Scalar_t b) const;
 
          /**
           * @Brief Normalization coefficient for $\tilde{\Lambda}_n(s)$ (Jiawen's thesis (3.23))
           */
-         internal::MHDFloat Cn(const int n) const;
+         Internal::MHDFloat Cn(const int n) const;
 
          /**
           * @brief Geostrophic alpha

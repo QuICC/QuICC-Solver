@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2Lapl.cpp
  * @brief Source of the implementation of the I^2 plane layer Cartesian laplacian sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2Lapl.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -36,7 +37,7 @@ namespace LinearMap {
    {
       auto laplh = -(this->k1()*this->k1() + this->k2()*this->k2());
       auto a2 = this->a()*this->a();
-      return -a2*laplh/(2.0*(n - 1.0)*(n + 1.0)) + 1.0; 
+      return -a2*laplh/(2.0*(n - 1.0)*(n + 1.0)) + 1.0;
    }
 
    I2Lapl::ACoeff_t I2Lapl::d2(const ACoeff_t& n) const

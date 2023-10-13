@@ -9,6 +9,7 @@
 
 // Project includes
 //
+#include "Types/Internal/Math.hpp"
 #include "QuICC/Polynomial/Quadrature/JacobiRule.hpp"
 #include "QuICC/Polynomial/Quadrature/PrueferAlgorithm.hpp"
 #include "QuICC/Polynomial/Jacobi/Pnab.hpp"
@@ -22,37 +23,37 @@ namespace Polynomial {
 
 namespace Quadrature {
 
-   JacobiRule::JacobiRule(const internal::MHDFloat alpha, const internal::MHDFloat beta)
+   JacobiRule::JacobiRule(const Internal::MHDFloat alpha, const Internal::MHDFloat beta)
       : mAlpha(alpha), mBeta(beta)
    {
    }
 
-   internal::MHDLong JacobiRule::estimateFirstZero(const int n)
+   Internal::MHDLong JacobiRule::estimateFirstZero(const int n)
    {
-      internal::MHDLong a = static_cast<internal::MHDLong>(this->mAlpha);
-      internal::MHDLong b = static_cast<internal::MHDLong>(this->mBeta);
-      internal::MHDLong dn = static_cast<internal::MHDLong>(n);
+      Internal::MHDLong a = static_cast<Internal::MHDLong>(this->mAlpha);
+      Internal::MHDLong b = static_cast<Internal::MHDLong>(this->mBeta);
+      Internal::MHDLong dn = static_cast<Internal::MHDLong>(n);
 
       // Compute lower bound on first zero
-      internal::MHDLong B = (b - a)*((a + b + MHD_MP_LONG(6.0))*dn + MHD_MP_LONG(2.0)*(a + b));
-      internal::MHDLong A = (MHD_MP_LONG(2.0)*dn + a + b)*(dn*(MHD_MP_LONG(2.0)*dn + a + b) + MHD_MP_LONG(2.0)*(a + b + MHD_MP_LONG(2.0)));
-      internal::MHDLong D = dn*dn*precision::pow(dn + a + b + MHD_MP_LONG(1.0),MHD_MP_LONG(2.0)) + (a + MHD_MP_LONG(1.0))*(b + MHD_MP_LONG(1.0))*(dn*dn + (a + b + MHD_MP_LONG(4.0))*dn + MHD_MP_LONG(2.0)*(a + b));
-      internal::MHDLong lbound = (B - MHD_MP_LONG(4.0)*(dn - MHD_MP_LONG(1.0))*precision::sqrt(D))/A;
+      Internal::MHDLong B = (b - a)*((a + b + MHD_MP_LONG(6.0))*dn + MHD_MP_LONG(2.0)*(a + b));
+      Internal::MHDLong A = (MHD_MP_LONG(2.0)*dn + a + b)*(dn*(MHD_MP_LONG(2.0)*dn + a + b) + MHD_MP_LONG(2.0)*(a + b + MHD_MP_LONG(2.0)));
+      Internal::MHDLong D = dn*dn*Internal::Math::pow(dn + a + b + MHD_MP_LONG(1.0),MHD_MP_LONG(2.0)) + (a + MHD_MP_LONG(1.0))*(b + MHD_MP_LONG(1.0))*(dn*dn + (a + b + MHD_MP_LONG(4.0))*dn + MHD_MP_LONG(2.0)*(a + b));
+      Internal::MHDLong lbound = (B - MHD_MP_LONG(4.0)*(dn - MHD_MP_LONG(1.0))*Internal::Math::sqrt(D))/A;
 
       return lbound;
    }
 
-   void JacobiRule::computeQuadrature(internal::Array& igrid, internal::Array& iweights, const int size)
+   void JacobiRule::computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size)
    {
       // Internal grid and weights arrays
-      internal::ArrayL ig(size);
+      Internal::ArrayL ig(size);
       ig.setZero();
-      internal::ArrayL iw(size);
+      Internal::ArrayL iw(size);
       iw.setZero();
 
-      auto a = static_cast<internal::MHDLong>(this->mAlpha);
-      auto b = static_cast<internal::MHDLong>(this->mBeta);
-      auto n = static_cast<internal::MHDLong>(size);
+      auto a = static_cast<Internal::MHDLong>(this->mAlpha);
+      auto b = static_cast<Internal::MHDLong>(this->mBeta);
+      auto n = static_cast<Internal::MHDLong>(size);
       auto factor = Jacobi::JacobiBase::normFact(n, a, b);
 
       #ifndef QUICC_MULTPRECISION
@@ -61,13 +62,13 @@ namespace Quadrature {
       {
       #endif
          // Naive implementation, high error at high n due to clustering
-         auto epsilon = std::numeric_limits<internal::MHDFloat>::epsilon();
+         auto epsilon = std::numeric_limits<Internal::MHDFloat>::epsilon();
          static constexpr int ulp = 2;
          static constexpr int maxIter = 20;
          for(int k = 0; k < size; ++k)
          {
             // Asymptotic formula (WKB) - works only for positive x.
-            internal::MHDFloat r = MHD_MP(0.0);
+            Internal::MHDFloat r = MHD_MP(0.0);
             int h = size - k;
             auto half = floor(size/2);
             if (k < half)
@@ -76,11 +77,11 @@ namespace Quadrature {
                h = k + 1;
             }
 
-            auto C = (2*h+a-.5)*Precision::PI/(2*n+a+b+1);
-            auto tanC_2 = precision::tan(.5*C);
+            auto C = (2*h+a-.5)*Internal::Math::PI/(2*n+a+b+1);
+            auto tanC_2 = Internal::Math::tan(.5*C);
             auto T = C + 1/((2*n+a+b+1)*(2*n+a+b+1))
                * ((.25-a*a)/tanC_2 - (.25-b*b)*tanC_2);
-            r = precision::cos(T);
+            r = Internal::Math::cos(T);
 
             if (k < floor(size/2))
             {
@@ -96,8 +97,8 @@ namespace Quadrature {
 
                r += delta;
 
-               auto tol = epsilon * precision::abs(r) * ulp;
-               if(precision::abs(delta) <= tol)
+               auto tol = epsilon * Internal::Math::abs(r) * ulp;
+               if(Internal::Math::abs(delta) <= tol)
                {
                   break;
                }
@@ -110,9 +111,9 @@ namespace Quadrature {
          }
 
          // Convert derivative to weights
-         igrid = ig.cast<internal::MHDFloat>();
+         igrid = ig.cast<Internal::MHDFloat>();
          iweights = (factor * (MHD_MP_LONG(1.0) - ig.array().square()).array().inverse()
-            *iw.array().square().inverse()).cast<internal::MHDFloat>();
+            *iw.array().square().inverse()).cast<Internal::MHDFloat>();
 
       #ifndef QUICC_MULTPRECISION
       }
@@ -127,7 +128,7 @@ namespace Quadrature {
          for(int k = 0; k < size; ++k)
          {
             // Asymptotic formula (WKB) - works only for positive x.
-            internal::MHDFloat r = MHD_MP(0.0);
+            Internal::MHDFloat r = MHD_MP(0.0);
             std::uint32_t h = size - k;
             auto half = floor(size/2);
             if (k < half)
@@ -195,8 +196,8 @@ namespace Quadrature {
          }
 
          // Convert derivative to weights
-         igrid = ig.cast<internal::MHDFloat>();
-         iweights = (factor*iw).cast<internal::MHDFloat>();
+         igrid = ig.cast<Internal::MHDFloat>();
+         iweights = (factor*iw).cast<Internal::MHDFloat>();
 
       }
       #endif
@@ -205,7 +206,7 @@ namespace Quadrature {
       this->sortQuadrature(igrid, iweights);
    }
 
-   internal::MHDLong   JacobiRule::p(const internal::MHDLong xi, const int diff)
+   Internal::MHDLong   JacobiRule::p(const Internal::MHDLong xi, const int diff)
    {
       // Safety asserts
       assert(diff >= 0);
@@ -231,13 +232,13 @@ namespace Quadrature {
       }
    }
 
-   internal::MHDLong   JacobiRule::q(const internal::MHDLong xi, const int diff)
+   Internal::MHDLong   JacobiRule::q(const Internal::MHDLong xi, const int diff)
    {
       // Safety asserts
       assert(diff >= 0);
 
-      internal::MHDLong a = static_cast<internal::MHDLong>(this->mAlpha);
-      internal::MHDLong b = static_cast<internal::MHDLong>(this->mBeta);
+      Internal::MHDLong a = static_cast<Internal::MHDLong>(this->mAlpha);
+      Internal::MHDLong b = static_cast<Internal::MHDLong>(this->mBeta);
 
       // Get q polynomial
       if(diff == 0)
@@ -260,18 +261,18 @@ namespace Quadrature {
       }
    }
 
-   internal::MHDLong   JacobiRule::r(const int n, const int diff)
+   Internal::MHDLong   JacobiRule::r(const int n, const int diff)
    {
       // Safety asserts
       assert(diff >= 0);
 
-      internal::MHDLong a = static_cast<internal::MHDLong>(this->mAlpha);
-      internal::MHDLong b = static_cast<internal::MHDLong>(this->mBeta);
+      Internal::MHDLong a = static_cast<Internal::MHDLong>(this->mAlpha);
+      Internal::MHDLong b = static_cast<Internal::MHDLong>(this->mBeta);
 
       // Get r polynomial
       if(diff == 0)
       {
-         internal::MHDLong dn = static_cast<internal::MHDLong>(n);
+         Internal::MHDLong dn = static_cast<Internal::MHDLong>(n);
 
          return dn*(dn + a + b + MHD_MP_LONG(1.0));
 
@@ -291,26 +292,26 @@ namespace Quadrature {
       }
    }
 
-   internal::MHDLong   JacobiRule::u(const internal::MHDLong x, const int n)
+   Internal::MHDLong   JacobiRule::u(const Internal::MHDLong x, const int n)
    {
       Jacobi::Pnab jz;
-      internal::Array zgrid(1);
-      internal::Matrix ztmp(1,n+1);
+      Internal::Array zgrid(1);
+      Internal::Matrix ztmp(1,n+1);
 
       zgrid(0) = x;
-      jz.compute<internal::MHDFloat>(ztmp, n+1, this->mAlpha, this->mBeta, zgrid, internal::Array(0), Jacobi::Evaluator::Set());
+      jz.compute<Internal::MHDFloat>(ztmp, n+1, this->mAlpha, this->mBeta, zgrid, Internal::Array(0), Jacobi::Evaluator::Set());
 
       return ztmp(0,n);
    }
 
-   internal::MHDLong   JacobiRule::du(const internal::MHDLong x, const int n)
+   Internal::MHDLong   JacobiRule::du(const Internal::MHDLong x, const int n)
    {
       Jacobi::dPnab djz;
-      internal::Array zgrid(1);
-      internal::Matrix ztmp(1,n+1);
+      Internal::Array zgrid(1);
+      Internal::Matrix ztmp(1,n+1);
 
       zgrid(0) = x;
-      djz.compute<internal::MHDFloat>(ztmp, n, this->mAlpha, this->mBeta, zgrid, internal::Array(0), Jacobi::Evaluator::Set());
+      djz.compute<Internal::MHDFloat>(ztmp, n, this->mAlpha, this->mBeta, zgrid, Internal::Array(0), Jacobi::Evaluator::Set());
 
       return ztmp(0,n);
    }

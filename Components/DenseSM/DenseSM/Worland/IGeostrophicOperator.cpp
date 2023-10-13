@@ -11,6 +11,7 @@
 
 // Project includes
 //
+#include "Types/Internal/Math.hpp"
 #include "IGeostrophicOperator.hpp"
 
 namespace QuICC {
@@ -36,83 +37,83 @@ namespace Worland {
       return isBasis;
    }
 
-   internal::MHDFloat IGeostrophicOperator::Akj(const int k, const int j) const
+   Internal::MHDFloat IGeostrophicOperator::Akj(const int k, const int j) const
    {
-      internal::MHDFloat dk = static_cast<internal::MHDFloat>(k);
-      internal::MHDFloat dj = static_cast<internal::MHDFloat>(j);
+      Internal::MHDFloat dk = static_cast<Internal::MHDFloat>(k);
+      Internal::MHDFloat dj = static_cast<Internal::MHDFloat>(j);
 
-      internal::MHDFloat tmp = 0;
+      Internal::MHDFloat tmp = 0;
       for(int n = k; n < j+1; n++)
       {
-         internal::MHDFloat dn = static_cast<internal::MHDFloat>(n);
-         tmp += precision::pow(MHD_MP(-1),n)*precision::exp(precision::lgamma(dj+MHD_MP(1)) - precision::lgamma(dj-dn+MHD_MP(1))) / (MHD_MP(2)*dn+MHD_MP(1)) * precision::exp(precision::lgamma(MHD_MP(2)*dn+MHD_MP(2)) + precision::lgamma(dn+dk+MHD_MP(2)) - precision::lgamma(dn+MHD_MP(1)) - precision::lgamma(dn-dk+MHD_MP(1)) - precision::lgamma(MHD_MP(2)*dk+MHD_MP(2)*dn+MHD_MP(4)));
+         Internal::MHDFloat dn = static_cast<Internal::MHDFloat>(n);
+         tmp += Internal::Math::pow(MHD_MP(-1),n)*Internal::Math::exp(Internal::Math::lgamma(dj+MHD_MP(1)) - Internal::Math::lgamma(dj-dn+MHD_MP(1))) / (MHD_MP(2)*dn+MHD_MP(1)) * Internal::Math::exp(Internal::Math::lgamma(MHD_MP(2)*dn+MHD_MP(2)) + Internal::Math::lgamma(dn+dk+MHD_MP(2)) - Internal::Math::lgamma(dn+MHD_MP(1)) - Internal::Math::lgamma(dn-dk+MHD_MP(1)) - Internal::Math::lgamma(MHD_MP(2)*dk+MHD_MP(2)*dn+MHD_MP(4)));
       }
 
-      return 2*Precision::PI*precision::sqrt((MHD_MP(4)*dk+MHD_MP(3)) / (MHD_MP(4)*Precision::PI)) * precision::pow(MHD_MP(2),(2*k+2)) * tmp;
+      return 2*Internal::Math::PI*Internal::Math::sqrt((MHD_MP(4)*dk+MHD_MP(3)) / (MHD_MP(4)*Internal::Math::PI)) * Internal::Math::pow(MHD_MP(2),(2*k+2)) * tmp;
    }
 
-   internal::MHDFloat IGeostrophicOperator::Bjnab(const int j, const int n, const internal::MHDFloat a, const internal::MHDFloat b) const
+   Internal::MHDFloat IGeostrophicOperator::Bjnab(const int j, const int n, const Internal::MHDFloat a, const Internal::MHDFloat b) const
    {
-      internal::MHDFloat dj = static_cast<internal::MHDFloat>(j);
-      internal::MHDFloat dn = static_cast<internal::MHDFloat>(n);
+      Internal::MHDFloat dj = static_cast<Internal::MHDFloat>(j);
+      Internal::MHDFloat dn = static_cast<Internal::MHDFloat>(n);
 
-      auto Cn = [&](const internal::MHDFloat dn)
+      auto Cn = [&](const Internal::MHDFloat dn)
       {
          // normalisation factor
-         return precision::sqrt((MHD_MP(2)*(MHD_MP(2)*dn+a+b+MHD_MP(1)))*precision::exp(precision::lgamma(dn+a+b+MHD_MP(1))+precision::lgamma(dn+MHD_MP(1))-precision::lgamma(dn+a+MHD_MP(1))-precision::lgamma(dn+b+MHD_MP(1))));
+         return Internal::Math::sqrt((MHD_MP(2)*(MHD_MP(2)*dn+a+b+MHD_MP(1)))*Internal::Math::exp(Internal::Math::lgamma(dn+a+b+MHD_MP(1))+Internal::Math::lgamma(dn+MHD_MP(1))-Internal::Math::lgamma(dn+a+MHD_MP(1))-Internal::Math::lgamma(dn+b+MHD_MP(1))));
       };
 
-      internal::MHDFloat tmp = 0;
+      Internal::MHDFloat tmp = 0;
       for(int m = j; m < n+1; m++)
       {
-         internal::MHDFloat dm = static_cast<internal::MHDFloat>(m);
-         internal::MHDFloat bFactor = precision::exp(precision::lgamma(dn+MHD_MP(2)) + precision::lgamma(dm+MHD_MP(2))-precision::lgamma(dn-dm+MHD_MP(1))-precision::lgamma(dm+MHD_MP(1))-precision::lgamma(dm-dj+MHD_MP(1))-precision::lgamma(dj+MHD_MP(1)));
-         tmp += MHD_MP(1)/((dn+1)*(dm+1))*bFactor*precision::exp(precision::lgamma(a+b+dn+dm+MHD_MP(1)) - precision::lgamma(a+dm+MHD_MP(1))) * precision::pow(-MHD_MP(1),m-j);
+         Internal::MHDFloat dm = static_cast<Internal::MHDFloat>(m);
+         Internal::MHDFloat bFactor = Internal::Math::exp(Internal::Math::lgamma(dn+MHD_MP(2)) + Internal::Math::lgamma(dm+MHD_MP(2))-Internal::Math::lgamma(dn-dm+MHD_MP(1))-Internal::Math::lgamma(dm+MHD_MP(1))-Internal::Math::lgamma(dm-dj+MHD_MP(1))-Internal::Math::lgamma(dj+MHD_MP(1)));
+         tmp += MHD_MP(1)/((dn+1)*(dm+1))*bFactor*Internal::Math::exp(Internal::Math::lgamma(a+b+dn+dm+MHD_MP(1)) - Internal::Math::lgamma(a+dm+MHD_MP(1))) * Internal::Math::pow(-MHD_MP(1),m-j);
       }
 
-      internal::MHDFloat ret = Cn(dn) * precision::exp(precision::lgamma(a+dn+MHD_MP(1)) - precision::lgamma(dn+MHD_MP(1)) - precision::lgamma(a+b+dn+MHD_MP(1))) * tmp;
+      Internal::MHDFloat ret = Cn(dn) * Internal::Math::exp(Internal::Math::lgamma(a+dn+MHD_MP(1)) - Internal::Math::lgamma(dn+MHD_MP(1)) - Internal::Math::lgamma(a+b+dn+MHD_MP(1))) * tmp;
       return ret;
    }
 
-   internal::MHDFloat IGeostrophicOperator::Bjn(const int j, const int n) const
+   Internal::MHDFloat IGeostrophicOperator::Bjn(const int j, const int n) const
    {
-      internal::MHDFloat a = MHD_MP(0.5);
-      internal::MHDFloat b = MHD_MP(1);
-      internal::MHDFloat dj = static_cast<internal::MHDFloat>(j);
-      internal::MHDFloat dn = static_cast<internal::MHDFloat>(n);
+      Internal::MHDFloat a = MHD_MP(0.5);
+      Internal::MHDFloat b = MHD_MP(1);
+      Internal::MHDFloat dj = static_cast<Internal::MHDFloat>(j);
+      Internal::MHDFloat dn = static_cast<Internal::MHDFloat>(n);
 
-      internal::MHDFloat tmp = 0;
+      Internal::MHDFloat tmp = 0;
       for(int m = j; m < n+1; m++)
       {
-         internal::MHDFloat dm = static_cast<internal::MHDFloat>(m);
-         internal::MHDFloat bFactor = precision::exp(precision::lgamma(dn+MHD_MP(2)) + precision::lgamma(dm+MHD_MP(2))-precision::lgamma(dn-dm+MHD_MP(1))-precision::lgamma(dm+MHD_MP(1))-precision::lgamma(dm-dj+MHD_MP(1))-precision::lgamma(dj+MHD_MP(1)));
-         tmp += MHD_MP(1)/((dn+1)*(dm+1))*bFactor*precision::exp(precision::lgamma(a+b+dn+dm+MHD_MP(1)) - precision::lgamma(a+dm+MHD_MP(1))) * precision::pow(-MHD_MP(1),m-j);
+         Internal::MHDFloat dm = static_cast<Internal::MHDFloat>(m);
+         Internal::MHDFloat bFactor = Internal::Math::exp(Internal::Math::lgamma(dn+MHD_MP(2)) + Internal::Math::lgamma(dm+MHD_MP(2))-Internal::Math::lgamma(dn-dm+MHD_MP(1))-Internal::Math::lgamma(dm+MHD_MP(1))-Internal::Math::lgamma(dm-dj+MHD_MP(1))-Internal::Math::lgamma(dj+MHD_MP(1)));
+         tmp += MHD_MP(1)/((dn+1)*(dm+1))*bFactor*Internal::Math::exp(Internal::Math::lgamma(a+b+dn+dm+MHD_MP(1)) - Internal::Math::lgamma(a+dm+MHD_MP(1))) * Internal::Math::pow(-MHD_MP(1),m-j);
       }
 
-      internal::MHDFloat ret = precision::sqrt((MHD_MP(2)*dn+MHD_MP(3))*(MHD_MP(4)*dn+MHD_MP(5))/(MHD_MP(8)*Precision::PI*(dn+MHD_MP(1))))*precision::exp(precision::lgamma(a+dn+MHD_MP(1)) - precision::lgamma(dn+MHD_MP(1)) - precision::lgamma(a+b+dn+MHD_MP(1))) * tmp;
+      Internal::MHDFloat ret = Internal::Math::sqrt((MHD_MP(2)*dn+MHD_MP(3))*(MHD_MP(4)*dn+MHD_MP(5))/(MHD_MP(8)*Internal::Math::PI*(dn+MHD_MP(1))))*Internal::Math::exp(Internal::Math::lgamma(a+dn+MHD_MP(1)) - Internal::Math::lgamma(dn+MHD_MP(1)) - Internal::Math::lgamma(a+b+dn+MHD_MP(1))) * tmp;
       return ret;
    }
 
-   internal::MHDFloat IGeostrophicOperator::Cnab(const int n, const Scalar_t a, const Scalar_t b) const
+   Internal::MHDFloat IGeostrophicOperator::Cnab(const int n, const Scalar_t a, const Scalar_t b) const
    {
-      internal::MHDFloat dn = static_cast<internal::MHDFloat>(n);
-      internal::MHDFloat ret = precision::sqrt(
+      Internal::MHDFloat dn = static_cast<Internal::MHDFloat>(n);
+      Internal::MHDFloat ret = Internal::Math::sqrt(
             (MHD_MP(2)*(MHD_MP(2)*dn + a + b + MHD_MP(1)))
-            )*precision::exp(
+            )*Internal::Math::exp(
                MHD_MP(0.5)*(
-               precision::lgamma(dn + a + b + MHD_MP(1))
-               + precision::lgamma(dn + MHD_MP(1))
-               - precision::lgamma(dn + a + MHD_MP(1))
-               - precision::lgamma(dn + b + MHD_MP(1)))
+               Internal::Math::lgamma(dn + a + b + MHD_MP(1))
+               + Internal::Math::lgamma(dn + MHD_MP(1))
+               - Internal::Math::lgamma(dn + a + MHD_MP(1))
+               - Internal::Math::lgamma(dn + b + MHD_MP(1)))
                );
       return ret;
    }
 
-   internal::MHDFloat IGeostrophicOperator::Cn(const int n) const
+   Internal::MHDFloat IGeostrophicOperator::Cn(const int n) const
    {
-      internal::MHDFloat dn = static_cast<internal::MHDFloat>(n);
-      internal::MHDFloat ret = precision::sqrt(
-            (MHD_MP(2)*dn + MHD_MP(3))*(MHD_MP(4)*dn + MHD_MP(5))/(MHD_MP(8)*Precision::PI*(dn + MHD_MP(1)))
+      Internal::MHDFloat dn = static_cast<Internal::MHDFloat>(n);
+      Internal::MHDFloat ret = Internal::Math::sqrt(
+            (MHD_MP(2)*dn + MHD_MP(3))*(MHD_MP(4)*dn + MHD_MP(5))/(MHD_MP(8)*Internal::Math::PI*(dn + MHD_MP(1)))
             );
       return ret;
    }

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file WorlandLegendreRule.cpp
  * @brief Source of the Worland Legendre quadrature
  */
@@ -22,14 +22,14 @@ namespace Polynomial {
 
 namespace Quadrature {
 
-   void WorlandLegendreRule::computeQuadrature(internal::Array& igrid, internal::Array& iweights, const int size)
+   void WorlandLegendreRule::computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size)
    {
       // Internal grid and weights arrays
       igrid.resize(size);
       iweights.resize(size);
       int jsize = 2*size;
-      internal::Array jgrid(jsize);
-      internal::Array jweights(jsize);
+      Internal::Array jgrid(jsize);
+      Internal::Array jweights(jsize);
       LegendreRule::computeQuadrature(jgrid, jweights, jsize);
 
       igrid = jgrid.bottomRows(size);

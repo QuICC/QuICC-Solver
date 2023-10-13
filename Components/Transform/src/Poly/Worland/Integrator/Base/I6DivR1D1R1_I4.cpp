@@ -28,7 +28,7 @@ namespace Worland {
 
 namespace Integrator {
 
-   void I6DivR1D1R1_I4<base_t>::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void I6DivR1D1R1_I4<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
 
@@ -66,17 +66,17 @@ namespace Integrator {
          int nN = nPoly + 0;
          this->checkGridSize(nN, l, igrid.size());
 
-         internal::Matrix tOp(igrid.size(), nN);
+         Internal::Matrix tOp(igrid.size(), nN);
 
-         wnl.compute<internal::MHDFloat>(tOp, nN, l_in, igrid, iweights, ev::Set());
+         wnl.compute<Internal::MHDFloat>(tOp, nN, l_in, igrid, iweights, ev::Set());
 
-         internal::Matrix opA(igrid.size(), nN);
+         Internal::Matrix opA(igrid.size(), nN);
          Polynomial::Worland::r_1drWnl r_1drWnl;
-         r_1drWnl.compute<internal::MHDFloat>(opA, nN, l_in, igrid, internal::Array(), ev::Set());
+         r_1drWnl.compute<Internal::MHDFloat>(opA, nN, l_in, igrid, Internal::Array(), ev::Set());
 
-         internal::Matrix opB(igrid.size(), nN);
+         Internal::Matrix opB(igrid.size(), nN);
          Polynomial::Worland::Wnl wnlB;
-         wnlB.compute<internal::MHDFloat>(opB, nN, l, igrid, iweights, ev::Set());
+         wnlB.compute<Internal::MHDFloat>(opB, nN, l, igrid, iweights, ev::Set());
 
          auto a = wnl.alpha(l);
          auto b = wnl.dBeta();
@@ -88,40 +88,7 @@ namespace Integrator {
 
    void I6DivR1D1R1_I4<base_t>::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {
-      #if defined QUICC_WORLAND_INTGIMPL_MATRIX
-         this->defaultApplyOperator(rOut, i, in);
-      #elif defined QUICC_WORLAND_INTGIMPL_OTF
-         int l = this->mspSetup->slow(i);
-         int nPoly = this->mspSetup->fastSize(i);
-         namespace ev = Polynomial::Worland::Evaluator;
-         Polynomial::Worland::Wnl wnl;
-         if(l == 0)
-         {
-            l = 1;
-            wnl.compute<MHDComplex>(rOut, nPoly, l, this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(in));
-
-            MHDFloat a = static_cast<MHDFloat>(wnl.alpha(l));
-            MHDFloat b = static_cast<MHDFloat>(wnl.dBeta());
-            ::QuICC::SparseSM::Worland::I4 spasm(nPoly, nPoly, a, b, l);
-            rOut = spasm.mat()*rOut;
-         } else
-         {
-            int l_in = std::abs(l-1);
-
-            wnl.compute<MHDComplex>(rOut, nPoly, l_in, this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(in));
-
-            MatrixZ tmp(in.rows(), in.cols());
-            Polynomial::Worland::r_1drWnl r_1drWnl;
-            r_1drWnl.compute<MHDComplex>(tmp, nPoly, l_in, this->mGrid, internal::Array(), ev::OuterProduct<MHDComplex>(rOut));
-
-            wnl.compute<MHDComplex>(rOut, nPoly, l, this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(tmp));
-
-            MHDFloat a = static_cast<MHDFloat>(wnl.alpha(l));
-            MHDFloat b = static_cast<MHDFloat>(wnl.dBeta());
-            ::QuICC::SparseSM::Worland::I6 spasm(nPoly, nPoly, a, b, l);
-            rOut = spasm.mat()*rOut;
-         }
-      #endif //defined QUICC_WORLAND_INTGIMPL_MATRIX
+      this->defaultApplyOperator(rOut, i, in);
    }
 
 }

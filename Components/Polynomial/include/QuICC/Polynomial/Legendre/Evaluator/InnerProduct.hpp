@@ -20,8 +20,8 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Internal/BasicTypes.hpp"
+#include "Types/Math.hpp"
 
 namespace QuICC {
 
@@ -45,12 +45,12 @@ namespace Evaluator {
          /**
           * @brief Apply evaluator
           */
-         inline void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i);
+         inline void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i);
 
          /**
           * @brief Apply evaluator assuming even or odd symetry
           */
-         inline void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i, const bool isEven);
+         inline void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i, const bool isEven);
 
       protected:
 
@@ -83,23 +83,23 @@ namespace Evaluator {
       }
    }
 
-   template <typename T> void InnerProduct<T>::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i)
+   template <typename T> void InnerProduct<T>::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i)
    {
-      rOut.row(i) = Precision::cast(ipolycol).transpose()*this->mIn;
+      rOut.row(i) = Internal::cast(ipolycol).transpose()*this->mIn;
    }
 
-   template <typename T> void InnerProduct<T>::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i, const bool isEven)
+   template <typename T> void InnerProduct<T>::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i, const bool isEven)
    {
       if(isEven)
       {
          assert(ipolycol.rows() == this->mEven.rows());
 
-         rOut.row(i) = Precision::cast(ipolycol).transpose()*this->mEven;
+         rOut.row(i) = Internal::cast(ipolycol).transpose()*this->mEven;
       } else
       {
          assert(ipolycol.rows() == this->mOdd.rows());
 
-         rOut.row(i) = Precision::cast(ipolycol).transpose()*this->mOdd;
+         rOut.row(i) = Internal::cast(ipolycol).transpose()*this->mOdd;
       }
    }
 }

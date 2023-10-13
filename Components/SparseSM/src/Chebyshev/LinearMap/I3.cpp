@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I3.cpp
  * @brief Source of the implementation of the I^3 sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I3.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -27,22 +28,22 @@ namespace LinearMap {
 
    I3::ACoeff_t I3::d_3(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,3)/(n*(n - 2.0)*(n - 1.0));
+      return Internal::Math::pow(this->a()/2.0,3)/(n*(n - 2.0)*(n - 1.0));
    }
 
    I3::ACoeff_t I3::d_1(const ACoeff_t& n) const
    {
-      return -precision::pow(this->a()/2.0,3)*3.0/(n*(n - 2.0)*(n + 1.0));
+      return -Internal::Math::pow(this->a()/2.0,3)*3.0/(n*(n - 2.0)*(n + 1.0));
    }
 
    I3::ACoeff_t I3::d1(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,3)*3.0/(n*(n - 1.0)*(n + 2.0));
+      return Internal::Math::pow(this->a()/2.0,3)*3.0/(n*(n - 1.0)*(n + 2.0));
    }
 
    I3::ACoeff_t I3::d3(const ACoeff_t& n) const
    {
-      return -precision::pow(this->a()/2.0,3)/(n*(n + 1.0)*(n + 2.0));
+      return -Internal::Math::pow(this->a()/2.0,3)/(n*(n + 1.0)*(n + 2.0));
    }
 
    void I3::buildTriplets(TripletList_t& list) const

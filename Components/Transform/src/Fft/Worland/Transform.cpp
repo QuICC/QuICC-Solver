@@ -59,7 +59,7 @@ namespace Worland {
 
    Array Transform::meshGrid() const
    {
-      internal::Array grid;
+      Internal::Array grid;
       Tools::computeGrid(grid, this->mspSetup->fwdSize());
       return grid.cast<MHDFloat>();
    }

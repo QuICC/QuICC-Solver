@@ -27,7 +27,7 @@
 template<class>
 struct sfinae_true : std::true_type{};
 
-namespace internal{
+namespace details{
      template<typename C, typename... Args>
           static auto test_transform(int)
                 -> sfinae_true<decltype(std::declval<C>().transform(std::declval<Args>()...))>;
@@ -36,7 +36,7 @@ namespace internal{
 }
 
 template <typename T, typename... Args>
-class has_transform: public decltype(internal::test_transform<T, Args...>(0)){};
+class has_transform: public decltype(details::test_transform<T, Args...>(0)){};
 
 namespace transf = ::QuICC::Transform;
 
@@ -127,12 +127,12 @@ namespace Worland {
          /**
           * @brief Initialize Poly operator
           */
-         template <typename T> void initOperator(T& op, internal::Array& igrid, const transf::Poly::SharedSetup spSetup) const;
+         template <typename T> void initOperator(T& op, Internal::Array& igrid, const transf::Poly::SharedSetup spSetup) const;
 
          /**
           * @brief Initialize FFT operator
           */
-         template <typename T> void initOperator(T& op, internal::Array& igrid, const transf::Fft::Worland::SharedSetup spSetup) const;
+         template <typename T> void initOperator(T& op, Internal::Array& igrid, const transf::Fft::Worland::SharedSetup spSetup) const;
 
          /**
           * @brief Build transform operator setup
@@ -272,7 +272,7 @@ namespace Worland {
       this->readFile(inData, param, type, ContentType::INPUT);
 
       TOp op;
-      internal::Array igrid;
+      Internal::Array igrid;
       this->initOperator(op, igrid, spSetup);
 
       MatrixZ outData;
@@ -308,7 +308,7 @@ namespace Worland {
       this->readFile(inData, param, type, ContentType::INPUT);
 
       TOp op;
-      internal::Array igrid;
+      Internal::Array igrid;
       this->initOperator(op, igrid, spSetup);
 
       MatrixZ outData;
@@ -356,7 +356,7 @@ namespace Worland {
          this->readFile(inData, param, type, ContentType::INPUT);
 
          TOp op;
-         internal::Array igrid;
+         Internal::Array igrid;
          this->initOperator(op, igrid, spSetup);
 
          Matrix outData = Matrix::Zero(op.outRows(), op.outCols());
@@ -392,7 +392,7 @@ namespace Worland {
          this->readFile(inData, param, type, ContentType::INPUT);
 
          TOp opB;
-         internal::Array igrid;
+         Internal::Array igrid;
          this->initOperator(opB, igrid, spSetup);
 
          MatrixZ tmpData = MatrixZ::Zero(opB.outRows(), opB.outCols());
@@ -453,17 +453,17 @@ namespace Worland {
       return ss.str();
    }
 
-   template <typename TOp, typename TOp2> template <typename T> void Tester<TOp,TOp2>::initOperator(T& op, internal::Array& igrid, const transf::Poly::SharedSetup spSetup) const
+   template <typename TOp, typename TOp2> template <typename T> void Tester<TOp,TOp2>::initOperator(T& op, Internal::Array& igrid, const transf::Poly::SharedSetup spSetup) const
    {
       // Create quadrature
-      internal::Array iweights;
+      Internal::Array iweights;
       ::QuICC::Polynomial::Quadrature::WorlandRule quad;
       quad.computeQuadrature(igrid, iweights, spSetup->fwdSize());
 
       op.init(spSetup, igrid, iweights);
    }
 
-   template <typename TOp, typename TOp2> template <typename T> void Tester<TOp,TOp2>::initOperator(T& op, internal::Array& igrid, const transf::Fft::Worland::SharedSetup spSetup) const
+   template <typename TOp, typename TOp2> template <typename T> void Tester<TOp,TOp2>::initOperator(T& op, Internal::Array& igrid, const transf::Fft::Worland::SharedSetup spSetup) const
    {
       ::QuICC::Transform::Fft::Worland::Tools::computeGrid(igrid, spSetup->fwdSize());
 

@@ -61,7 +61,7 @@ namespace Worland {
           * @param kL   Number of lower diagonals
           * @param kU   Number of upper diagonals
           */
-         virtual void buildBanded(internal::Matrix& bd, unsigned int& kL, unsigned int& kU) const override;
+         virtual void buildBanded(Internal::Matrix& bd, unsigned int& kL, unsigned int& kU) const override;
 
          /**
           * @brief Implementation of the diagonals

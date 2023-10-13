@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2Y2D1.cpp
  * @brief Source of the implementation of the I^2 Y^2 D sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project include
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y2D1.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -26,8 +27,8 @@ namespace LinearMap {
    }
 
    I2Y2D1::ACoeff_t I2Y2D1::d_3(const ACoeff_t& n) const
-   { 
-      const auto c = precision::pow(this->a()/2.0, 3);
+   {
+      const auto c = Internal::Math::pow(this->a()/2.0, 3);
       return c*(n - 3.0)/(n*(n - 1.0));
    }
 
@@ -70,7 +71,7 @@ namespace LinearMap {
 
    I2Y2D1::ACoeff_t I2Y2D1::d3(const ACoeff_t& n) const
    {
-      const auto c = precision::pow(this->a()/2.0, 3);
+      const auto c = Internal::Math::pow(this->a()/2.0, 3);
       return -c*(n + 3.0)/(n*(n + 1.0));
    }
 

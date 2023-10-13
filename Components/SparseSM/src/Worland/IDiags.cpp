@@ -12,7 +12,8 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Worland/IDiags.hpp"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
+#include "Types/Internal/Math.hpp"
 #include "QuICC/SparseSM/Worland/Tools.hpp"
 
 namespace QuICC {
@@ -122,10 +123,10 @@ namespace Worland {
 
       if(l == 0)
       {
-         norm = -precision::log(MHD_MP(2.0)) + (n + MHD_MP(0.5)).lgamma() - (n + MHD_MP(1.0)).lgamma();
+         norm = -Internal::Math::log(MHD_MP(2.0)) + (n + MHD_MP(0.5)).lgamma() - (n + MHD_MP(1.0)).lgamma();
          if(n(0) == 0)
          {
-            norm(0) = MHD_MP(0.5)*(precision::log(Precision::PI) - precision::log(MHD_MP(2.0)));
+            norm(0) = MHD_MP(0.5)*(Internal::Math::log(Internal::Math::PI) - Internal::Math::log(MHD_MP(2.0)));
          }
       } else
       {

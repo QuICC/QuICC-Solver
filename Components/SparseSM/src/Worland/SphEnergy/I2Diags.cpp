@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2.cpp
  * @brief Source of the implementation of the full sphere Worland I2 sparse operator
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Worland/SphEnergy/I2Diags.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -54,7 +55,7 @@ namespace SphEnergy {
    I2Diags::ACoeff_t I2Diags::d0(const ACoeff_t& n) const
    {
       auto l1 = this->l();
-      auto l2 = precision::pow(l1, 2);
+      auto l2 = Internal::Math::pow(l1, 2);
       ACoeff_t val;
 
       val = 16.0*(4.0*l2 - 8.0*l1*n - 8.0*n.pow(2) - 12.0*n - 1.0)/((2.0*l1 + 4.0*n - 1.0)*(2.0*l1 + 4.0*n + 1.0)*(2.0*l1 + 4.0*n + 5.0)*(2.0*l1 + 4.0*n + 7.0));

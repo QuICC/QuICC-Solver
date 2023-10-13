@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Math.hpp"
 #include "QuICC/TestSuite/Polynomial/Quadrature/Tester.hpp"
 #include "QuICC/TestSuite/Polynomial/Quadrature/TestArgs.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
@@ -32,7 +32,7 @@ TEST_CASE( "Error for Legendre quadrature rule", "[LegendreRule]" ){
       currentts::args().gridN.push_back(511);
       currentts::args().gridN.push_back(512);
       currentts::args().gridN.push_back(1024);
-      if(QuICC::Precision::hasMP)
+      if(QuICC::Internal::isMP)
       {
          currentts::args().gridN.push_back(1022);
       }

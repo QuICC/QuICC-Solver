@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Wnl.cpp
  * @brief Source of the implementation of Wnl
  */
@@ -22,7 +22,7 @@ namespace Polynomial {
 
 namespace Worland {
 
-   Wnl::Wnl(const internal::MHDFloat alpha, const internal::MHDFloat dBeta)
+   Wnl::Wnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta)
       : WorlandBase(alpha, dBeta)
    {
    }

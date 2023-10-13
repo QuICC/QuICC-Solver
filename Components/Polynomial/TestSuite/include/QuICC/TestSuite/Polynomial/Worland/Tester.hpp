@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/InnerProduct.hpp"
@@ -152,8 +152,8 @@ namespace Worland {
       int l = static_cast<int>(param.at(0));
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::WorlandRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
@@ -165,7 +165,7 @@ namespace Worland {
          op.template compute<MHDFloat>(outData, specN+1, l, igrid, iweights, current::Evaluator::Set());
       } else
       {
-         op.template compute<MHDFloat>(outData, specN+1, l, igrid, internal::Array(), current::Evaluator::Set());
+         op.template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::Set());
       }
 
       return outData;
@@ -177,8 +177,8 @@ namespace Worland {
       int l = static_cast<int>(param.at(0));
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::WorlandRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
@@ -186,7 +186,7 @@ namespace Worland {
       Matrix outData(physN, specN+1);
       Matrix inData = Matrix::Identity(specN+1, specN+1);
 
-      op.template compute<MHDFloat>(outData, specN+1, l, igrid, internal::Array(), current::Evaluator::OuterProduct<MHDFloat>(inData));
+      op.template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::OuterProduct<MHDFloat>(inData));
 
       return outData;
    }
@@ -197,8 +197,8 @@ namespace Worland {
       int l = static_cast<int>(param.at(0));
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::WorlandRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
@@ -207,7 +207,7 @@ namespace Worland {
       Matrix inData = Matrix::Identity(physN, specN+1);
       op.template compute<MHDFloat>(inData, specN+1, l, igrid, iweights, current::Evaluator::Set());
 
-      op.template compute<MHDFloat>(outData, specN+1, l, igrid, internal::Array(), current::Evaluator::InnerProduct<MHDFloat>(inData));
+      op.template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::InnerProduct<MHDFloat>(inData));
 
       Matrix outDataT = outData.transpose();
 
@@ -220,15 +220,15 @@ namespace Worland {
       int l = static_cast<int>(param.at(0));
 
       // Create quadrature
-      internal::Array igrid;
-      internal::Array iweights;
+      Internal::Array igrid;
+      Internal::Array iweights;
       poly::Quadrature::WorlandRule quad;
       quad.computeQuadrature(igrid, iweights, physN);
 
       TOp op;
       Matrix outData(specN+1, 1);
 
-      op.template compute<MHDFloat>(outData, specN+1, l, igrid, internal::Array(), current::Evaluator::Reduce());
+      op.template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::Reduce());
 
       return outData;
    }

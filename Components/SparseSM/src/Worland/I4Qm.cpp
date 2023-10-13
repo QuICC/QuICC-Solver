@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4Qm.cpp
  * @brief Source of the implementation of the full sphere Worland I4Qm sparse operator
  */
@@ -71,7 +71,7 @@ namespace Worland {
       }
    }
 
-   void I4Qm::buildBanded(internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
+   void I4Qm::buildBanded(Internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
    {
       throw std::logic_error("Banded matrix is not yet implemented");
 

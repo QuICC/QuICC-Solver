@@ -35,7 +35,7 @@ namespace Worland {
       PyQuICC::CoreWrapper::finalize();
    }
 
-   void PyGeostrophic2Tor::buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const
+   void PyGeostrophic2Tor::buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const
    {
       switch(this->type())
       {
@@ -54,7 +54,7 @@ namespace Worland {
       }
    }
 
-   void PyGeostrophic2Tor::buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const
+   void PyGeostrophic2Tor::buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const
    {
       const bool isTriangular = true;
       const auto& nN = this->mNn;
@@ -93,7 +93,7 @@ namespace Worland {
          PyQuICC::CoreWrapper::cleanup();
       }
 
-      mat = pyMat.cast<internal::MHDFloat>();
+      mat = pyMat.cast<Internal::MHDFloat>();
    }
 
 } // Worland

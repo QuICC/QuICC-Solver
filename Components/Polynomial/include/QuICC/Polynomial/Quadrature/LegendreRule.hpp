@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 #include "QuICC/Polynomial/Quadrature/PrueferAlgorithm.hpp"
 
 namespace QuICC {
@@ -32,7 +32,7 @@ namespace Quadrature {
          /**
           * @brief Compute the quadrature
           */
-         void computeQuadrature(internal::Array& igrid, internal::Array& iweights, const int size);
+         void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size);
 
       protected:
          /**
@@ -41,7 +41,7 @@ namespace Quadrature {
           * @param xi   Grid value
           * @param diff Order of the derivative
           */
-         virtual internal::MHDLong   p(const internal::MHDLong xi, const int diff) override;
+         virtual Internal::MHDLong   p(const Internal::MHDLong xi, const int diff) override;
 
          /**
           * @brief Get q polynomial
@@ -49,7 +49,7 @@ namespace Quadrature {
           * @param xi   Grid value
           * @param diff Order of the derivative
           */
-         virtual internal::MHDLong   q(const internal::MHDLong xi, const int diff) override;
+         virtual Internal::MHDLong   q(const Internal::MHDLong xi, const int diff) override;
 
          /**
           * @brief Get r polynomial
@@ -57,24 +57,24 @@ namespace Quadrature {
           * @param size Size of the grid
           * @param diff Order of the derivative
           */
-         virtual internal::MHDLong   r(const int size, const int diff) override;
+         virtual Internal::MHDLong   r(const int size, const int diff) override;
 
          /**
           * @brief Node estimate
           *
           * @param k Index of the node to estimate
           */
-         internal::MHDLong   estimateNode(const int k, const int size);
+         Internal::MHDLong   estimateNode(const int k, const int size);
 
          /**
           * @brief Compute polynomial value at 0
           */
-         internal::MHDLong   zeroPoly(const int size);
+         Internal::MHDLong   zeroPoly(const int size);
 
          /**
           * @brief Compute first derivative value at 0
           */
-         internal::MHDLong   zeroDiff(const int size);
+         Internal::MHDLong   zeroDiff(const int size);
 
       private:
    };

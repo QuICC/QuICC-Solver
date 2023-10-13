@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
 #include "QuICC/ModelOperator/Boundary.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
@@ -27,7 +27,7 @@ namespace QuICC {
 
 namespace Solver {
 
-   namespace internal {
+   namespace details {
 
       void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat);
 
@@ -367,7 +367,7 @@ namespace Solver {
       {
          if(this->mInhomogeneous.at(i).nonZeros() > 0)
          {
-            Solver::internal::addCorrection(this->reg(Register::Rhs::id()).at(i), this->mInhomogeneous.at(i));
+            Solver::details::addCorrection(this->reg(Register::Rhs::id()).at(i), this->mInhomogeneous.at(i));
          }
       }
    }
@@ -398,7 +398,7 @@ namespace Solver {
             assert(sIt->second.size() > i);
             assert(this->nSystem() > i);
 
-            internal::solveWrapper(this->reg(Register::Solution::id()).at(i), sIt->second.at(i), this->reg(Register::Rhs::id()).at(i));
+            details::solveWrapper(this->reg(Register::Solution::id()).at(i), sIt->second.at(i), this->reg(Register::Rhs::id()).at(i));
 
             // Stop simulation if solve failed
             if(sIt->second.at(i)->info() != Eigen::Success)
@@ -601,8 +601,8 @@ namespace Solver {
 
       auto&& lhsMat = this->rLHSMatrix(0, idx);
       lhsMat.resize(size, size);
-      Solver::internal::addOperators(lhsMat, 1.0, iOpA->second);
-      Solver::internal::addOperators(lhsMat, 1.0, iOpC->second);
+      Solver::details::addOperators(lhsMat, 1.0, iOpA->second);
+      Solver::details::addOperators(lhsMat, 1.0, iOpC->second);
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> std::size_t SparseLinearSolver<TOperator,TData,TSolver>::nSystem() const
@@ -677,7 +677,7 @@ namespace Solver {
       return this->mInhomogeneous.at(idx);
    }
 
-   namespace internal {
+   namespace details {
 
       inline void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat)
       {

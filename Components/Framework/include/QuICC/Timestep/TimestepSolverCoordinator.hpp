@@ -13,7 +13,7 @@
 // Project includes
 //
 #include "QuICC/Debug/DebuggerMacro.h"
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/ModelOperator/ImplicitLinear.hpp"
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/ModelOperator/Boundary.hpp"

@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "Types/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/SparseSM/Worland/I2.hpp"
 #include "QuICC/SparseSM/Worland/I4.hpp"
 
@@ -343,8 +343,8 @@ namespace Fftw {
          int l = std::get<4>(loc);
          int cols = std::get<2>(loc);
          int r = this->lSize(l);
-         internal::MHDFloat a = -MHD_MP(0.5);
-         internal::MHDFloat b = -MHD_MP(0.5);
+         Internal::MHDFloat a = -MHD_MP(0.5);
+         Internal::MHDFloat b = -MHD_MP(0.5);
          ::QuICC::SparseSM::Worland::I2 spasm(r, r, a, b, l);
 
          Matrix bd;
@@ -364,8 +364,8 @@ namespace Fftw {
          int l = std::get<4>(loc);
          int cols = std::get<2>(loc);
          int r = this->lSize(l);
-         internal::MHDFloat a = -MHD_MP(0.5);
-         internal::MHDFloat b = -MHD_MP(0.5);
+         Internal::MHDFloat a = -MHD_MP(0.5);
+         Internal::MHDFloat b = -MHD_MP(0.5);
          ::QuICC::SparseSM::Worland::I4 spasm(r, r, a, b, l);
 
          Matrix bd;

@@ -34,7 +34,7 @@ namespace Worland {
    {
    }
 
-   void ProjFitEnergyR2::buildOpImpl(internal::Matrix& mat, const int rows, const int cols) const
+   void ProjFitEnergyR2::buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const
    {
       switch(this->type())
       {
@@ -53,7 +53,7 @@ namespace Worland {
       }
    }
 
-   void ProjFitEnergyR2::buildChebyshevOp(internal::Matrix& mat, const int rows, const int cols) const
+   void ProjFitEnergyR2::buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const
    {
       const auto& nbar = this->mOutRows;
 
@@ -66,17 +66,17 @@ namespace Worland {
 
          int rp = 2*rows + l;
          int pts = rp + 2 + (rp + 2)%2;
-         internal::Array igrid;
-         internal::Array iweights;
+         Internal::Array igrid;
+         Internal::Array iweights;
          wquad.computeQuadrature(igrid, iweights, pts);
 
          namespace ev = Polynomial::Worland::Evaluator;
          Polynomial::Worland::Wnl wnl;
-         internal::Matrix tmpBwd(igrid.size(), rows);
-         wnl.compute<internal::MHDFloat>(tmpBwd, rows, l, igrid, internal::Array(), ev::Set());
-         internal::Matrix tmpFwd(igrid.size(), rows);
-         wnl.compute<internal::MHDFloat>(tmpFwd, rows, l, igrid, iweights.array()*igrid.array().abs2(), ev::Set());
-         internal::Matrix matW = tmpFwd.transpose()*tmpBwd;
+         Internal::Matrix tmpBwd(igrid.size(), rows);
+         wnl.compute<Internal::MHDFloat>(tmpBwd, rows, l, igrid, Internal::Array(), ev::Set());
+         Internal::Matrix tmpFwd(igrid.size(), rows);
+         wnl.compute<Internal::MHDFloat>(tmpFwd, rows, l, igrid, iweights.array()*igrid.array().abs2(), ev::Set());
+         Internal::Matrix matW = tmpFwd.transpose()*tmpBwd;
 
          SparseMatrix matS;
          if(this->mBcId == Bc::Name::FixedTemperature::id() || this->mBcId == Bc::Name::Insulating::id())
@@ -95,7 +95,7 @@ namespace Worland {
          }
 
 
-         internal::Matrix matWbar = (matS.transpose()*matW.block(0,0,nbar,nbar)*matS);
+         Internal::Matrix matWbar = (matS.transpose()*matW.block(0,0,nbar,nbar)*matS);
          mat.resize(rows, cols);
          mat.topRows(nbar) = matS*matWbar.inverse()*matS.transpose()*matW.topRows(nbar);
          mat.bottomRows(rows-nbar).setZero();

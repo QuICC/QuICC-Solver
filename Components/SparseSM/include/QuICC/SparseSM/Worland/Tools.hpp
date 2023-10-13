@@ -8,7 +8,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/SparseSM/Worland/WorlandKind.hpp"
 
 namespace QuICC {
@@ -24,7 +24,7 @@ namespace Worland {
    {
       public:
          /// Typedef for scalar
-         typedef internal::MHDFloat Scalar_t;
+         typedef Internal::MHDFloat Scalar_t;
 
          /**
           * @brief Identify type of Worland basis

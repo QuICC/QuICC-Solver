@@ -66,6 +66,11 @@ if(NOT Boost_FOUND)
 endif()
 
 #
+# Eigen
+#
+include(BundleEigen)
+
+#
 # Kokkos
 #
 include(setup/Kokkos)
@@ -102,15 +107,6 @@ endif()
 quicc_create_option(NAME QUICC_FFTPLAN
                     OPTS Fast Medium Slow
                     LABEL "FFT plan")
-
-###################################################
-#--------- LINEAR ALGEBRA IMPLEMENTATION ---------#
-###################################################
-
-quicc_create_option(NAME QUICC_LINALG
-                    OPTS Eigen
-                    LABEL "Linear algebra")
-quicc_add_definition(QUICC_LINALG)
 
 ###################################################
 #----- SPARSE LINEAR ALGEBRA IMPLEMENTATION ------#
@@ -152,10 +148,6 @@ quicc_add_definition(QUICC_SPTRILINALG)
 
 # Look for linear algebra libraries that are in use
 include(MatchAny)
-match_any(NAME "QUICC_" STRING "Eigen")
-if(Eigen_IS_USED)
-  include(BundleEigen)
-endif()
 
 match_any(NAME "QUICC_" STRING "UmfPack")
 if(UmfPack_IS_USED)

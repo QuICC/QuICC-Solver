@@ -37,17 +37,7 @@ namespace Integrator {
 
    void DivS1<base_t>::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {
-
-      #if defined QUICC_ALEGENDRE_INTGIMPL_OTF
-         int m = this->mspSetup->slow(i);
-         int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;
-         namespace ev = Polynomial::ALegendre::Evaluator;
-         Polynomial::ALegendre::sin_1Plm dplm;
-         dplm.compute<MHDComplex>(rOut, nPoly, m, this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(in));
-      #elif defined QUICC_ALEGENDRE_INTGIMPL_MATRIX
-         rOut = this->mOps.at(i).transpose()*in;
-      #endif //defined QUICC_ALEGENDRE_INTGIMPL_OTF
-
+      rOut = this->mOps.at(i).transpose()*in;
    }
 
 }

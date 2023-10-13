@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 
 namespace QuICC {
@@ -32,7 +32,7 @@ namespace Quadrature {
          /**
           * @brief Compute the quadrature
           */
-         void computeQuadrature(internal::Array& igrid, internal::Array& iweights, const int size);
+         void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int size);
    };
 
 }

@@ -3,23 +3,14 @@
  * @brief Source of implementation of serial environment
  */
 
-// Configuration includes
-//
-
 // System includes
 //
+#include <stdexcept>
 #include <string>
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Environment/Serial.hpp"
 
 // Project includes
 //
-#include "Types/Precision.hpp"
+#include "QuICC/Environment/Serial.hpp"
 
 namespace QuICC {
 

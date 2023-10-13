@@ -33,7 +33,6 @@ namespace Integrator {
       // Initit specialized data for operators
       this->initSpecial();
 
-      #if defined QUICC_ALEGENDRE_INTGIMPL_MATRIX
       // reserve storage
       this->mOps.reserve(this->mspSetup->slowSize());
 
@@ -44,13 +43,6 @@ namespace Integrator {
          this->mOps.push_back(Matrix(igrid.size(), this->mspSetup->fastSize(i)));
          this->makeOperator(this->mOps.back(), igrid, iweights, i);
       }
-      #elif defined QUICC_ALEGENDRE_INTGIMPL_OTF
-
-         // Store grid and weights
-         this->mGrid = igrid;
-         this->mWeights = iweights;
-
-      #endif //defined QUICC_ALEGENDRE_INTGIMPL_MATRIX
    }
 
    void IALegendreIntegrator::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
