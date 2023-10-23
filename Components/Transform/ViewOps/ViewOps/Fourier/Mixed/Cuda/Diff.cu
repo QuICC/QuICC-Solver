@@ -6,6 +6,7 @@
 #include "View/View.hpp"
 #include "ViewOps/Fourier/Util.hpp"
 #include "ViewOps/Fourier/Tags.hpp"
+#include "ViewOps/Fourier/Mixed/Types.hpp"
 #include "Cuda/CudaUtil.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -14,10 +15,6 @@ namespace Transform {
 namespace Fourier {
 namespace Mixed {
 namespace Cuda {
-
-using namespace QuICC::Memory;
-
-using mods_t = View<std::complex<double>, DCCSC3D>;
 
 /// @brief thread coarsening factor
 constexpr std::size_t tCF = 8;

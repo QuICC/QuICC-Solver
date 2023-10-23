@@ -6,6 +6,7 @@
 #include "View/View.hpp"
 #include "ViewOps/Fourier/Util.hpp"
 #include "ViewOps/Fourier/Tags.hpp"
+#include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Profiler/Interface.hpp"
 
 #ifdef QUICC_USE_CUFFT
@@ -17,8 +18,6 @@ namespace Transform {
 namespace Fourier {
 namespace Complex {
 namespace Cpu {
-
-using namespace QuICC::Memory;
 
 template<class Tout, class Tin, class Direction>
 MeanOp<Tout, Tin, Direction>::MeanOp(ScaleType scale) : mScale(scale){};
@@ -99,7 +98,6 @@ void MeanOp<Tout, Tin, Direction>::applyImpl(Tout& out, const Tin& in)
 }
 
 // explicit instantations
-using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
 template class MeanOp<mods_t, mods_t, fwd_t>;
 template class MeanOp<mods_t, mods_t, bwd_t>;
 

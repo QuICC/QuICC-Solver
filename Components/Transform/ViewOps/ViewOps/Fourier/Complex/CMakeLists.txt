@@ -22,6 +22,7 @@ set(PHS
   Complex/Diff.hpp
   Complex/Diff2D.hpp
   Complex/Mean.hpp
+  Complex/Types.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}

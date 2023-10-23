@@ -4,6 +4,7 @@
 #include "D.hpp"
 #include "View/View.hpp"
 #include "ViewOps/Fourier/Mixed/Diff.hpp"
+#include "ViewOps/Fourier/Mixed/Types.hpp"
 #include "Fft/Fft.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -12,11 +13,6 @@ namespace Transform {
 namespace Fourier {
 namespace Mixed {
 namespace Integrator {
-
-using namespace QuICC::Memory;
-
-using mods_t = View<std::complex<double>, DCCSC3D>;
-using phys_t = View<double, DCCSC3D>;
 
 template<class Tout, class Tin, class FftBackend, class DiffBackend>
 DOp<Tout, Tin, FftBackend, DiffBackend>::DOp(ScaleType scale) : mFft(std::make_unique<FftBackend>()),

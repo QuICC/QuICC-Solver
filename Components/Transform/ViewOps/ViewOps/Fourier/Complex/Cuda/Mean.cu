@@ -7,6 +7,7 @@
 #include "View/View.hpp"
 #include "ViewOps/Fourier/Util.hpp"
 #include "ViewOps/Fourier/Tags.hpp"
+#include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Cuda/CudaUtil.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -17,14 +18,8 @@ namespace Fourier {
 namespace Complex {
 namespace Cuda {
 
-using namespace QuICC::Memory;
-
-/// @brief Compressed sparse layer 3D tensor (Implicit column major)
-using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
-
 /// @brief thread coarsening factor
 constexpr std::size_t tCF = 8;
-
 namespace details
 {
     using namespace QuICC::Transform::Fourier::details;

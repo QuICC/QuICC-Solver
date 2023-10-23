@@ -16,6 +16,7 @@ set(PHS
   Mixed/Projector/D.hpp
   Mixed/Integrator/D.hpp
   Mixed/Diff.hpp
+  Mixed/Types.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}

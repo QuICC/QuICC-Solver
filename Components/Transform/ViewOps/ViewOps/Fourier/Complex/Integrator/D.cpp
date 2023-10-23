@@ -6,6 +6,7 @@
 #include "ViewOps/Fourier/Complex/Diff.hpp"
 #include "ViewOps/Fourier/Complex/Diff2D.hpp"
 #include "ViewOps/Fourier/Complex/Mean.hpp"
+#include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Fft/Fft.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -14,11 +15,6 @@ namespace Transform {
 namespace Fourier {
 namespace Complex {
 namespace Integrator {
-
-using namespace QuICC::Memory;
-
-using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
-using phys_t = View<std::complex<double>, DCCSC3DInOrder>;
 
 template<class Tout, class Tin, class FftBackend, class DiffBackend, class DiffBackend2>
 DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>::DOp(ScaleType scale) : mFft(std::make_unique<FftBackend>()),
