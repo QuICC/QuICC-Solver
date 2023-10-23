@@ -40,7 +40,7 @@ set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.11.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.9.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "v1.1.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereModifiedTaylor
-  "fix/radial_dialiasing")
+  "v1.3.0")
 
 # Cache value, may be overwritten manually
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo
