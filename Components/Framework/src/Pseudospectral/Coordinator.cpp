@@ -10,6 +10,7 @@
 
 // Project includes
 //
+#include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
@@ -173,62 +174,94 @@ namespace Pseudospectral {
       return eqIt->second.at(i);
    }
 
+   void Coordinator::evolveBefore(const int curJ)
+   {
+      // Compute explicit linear terms
+      DebuggerMacro_msg("Explicit equations", 4);
+      this->explicitEquations(curJ);
+
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::RUN);
+      QuICCTimer().start();
+
+      // Compute the nonlinear terms
+      DebuggerMacro_msg("Transform loop", 4);
+      this->computeNonlinear(curJ);
+
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::NONLINEAR);
+      QuICCTimer().update(ExecutionTimer::RUN);
+      QuICCTimer().start();
+
+      // Solve equations before prognostic
+      this->solveEquationsBefore(curJ);
+   }
+
+   void Coordinator::evolveEndIteration(const int tIt)
+   {
+      // Solve equations after prognostic
+      this->solveEquationsAfter(tIt);
+
+      QuICCTimer().stop();
+      QuICCTimer().update(ExecutionTimer::TIMESTEP);
+      QuICCTimer().update(ExecutionTimer::RUN);
+      QuICCTimer().start();
+   }
+
+   void Coordinator::evolveAfterPrognostic(const bool finishedStep)
+   {
+      auto tIt = *this->it().rbegin();
+
+      this->evolveEndIteration(tIt);
+
+      // Update the equations
+      for(auto j: this->it())
+      {
+         DebuggerMacro_msg("Update equations", 4);
+         this->updateEquations(j, finishedStep);
+      }
+   }
+
+   void Coordinator::evolveUntilPrognostic(const bool finishedStep)
+   {
+      // Update equation time
+      this->updateEquationTime(this->time(), finishedStep);
+
+      // Loop over sub-steps
+      for(auto j: this->it())
+      {
+         DebuggerMacro_showValue("Equation sub-iteration ", 3, j);
+
+         // Evolve before prognostic
+         this->evolveBefore(j);
+
+         if(this->hasPrognostic(j))
+         {
+            // Solve prognostic equations (timestep)
+            Profiler::RegionStart<2> ("Pseudospectral::Coordinator::solveEquations-prognostic");
+            this->explicitPrognosticEquations(ModelOperator::ExplicitNonlinear::id(), j);
+            Profiler::RegionStop<2> ("Pseudospectral::Coordinator::solveEquations-prognostic");
+            break;
+         }
+
+         // End iteration
+         this->evolveEndIteration(j);
+      }
+   }
+
    void Coordinator::evolve()
    {
       DebuggerMacro_msg("Evolving equations", 1);
       Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::evolve");
 
-      bool isIntegrating = true;
-      while(isIntegrating)
-      {
-         DebuggerMacro_msg("Time integration sub-step", 2);
-         // Update equation time
-         this->updateEquationTime(this->time(), this->mTimestepCoordinator.finishedStep());
+      // Solve prognostic equations (timestep)
+      auto tIt = *this->it().rbegin();
+      Profiler::RegionStart<2> ("Pseudospectral::Coordinator::solveEquations-prognostic");
+      this->solvePrognosticEquations(tIt);
+      Profiler::RegionStop<2> ("Pseudospectral::Coordinator::solveEquations-prognostic");
 
-         // Loop over sub-steps
-         for(auto j: this->it())
-         {
-            DebuggerMacro_showValue("Equation sub-iteration ", 3, j);
-
-            // Compute explicit linear terms
-            DebuggerMacro_msg("Explicit equations", 4);
-            this->explicitEquations(j);
-
-            QuICCTimer().stop();
-            QuICCTimer().update(ExecutionTimer::RUN);
-            QuICCTimer().start();
-
-            // Compute the nonlinear terms
-            DebuggerMacro_msg("Transform loop", 4);
-            this->computeNonlinear(j);
-
-            QuICCTimer().stop();
-            QuICCTimer().update(ExecutionTimer::NONLINEAR);
-            QuICCTimer().update(ExecutionTimer::RUN);
-            QuICCTimer().start();
-
-            // Timestep the equations
-            DebuggerMacro_msg("Solve equations", 4);
-            this->solveEquations(j);
-
-            QuICCTimer().stop();
-            QuICCTimer().update(ExecutionTimer::TIMESTEP);
-            QuICCTimer().update(ExecutionTimer::RUN);
-            QuICCTimer().start();
-         }
-
-         // Update the equations
-         for(auto j: this->it())
-         {
-            DebuggerMacro_msg("Update equations", 4);
-            this->updateEquations(j, this->mTimestepCoordinator.finishedStep());
-         }
-
-         // Finish timestep iteration
-         this->finalizeTimestep();
-
-         isIntegrating = !this->mTimestepCoordinator.finishedStep();
-      }
+      // Finish timestep iteration
+      this->finalizeTimestep();
    }
 
    void Coordinator::initTransformCoordinator()
@@ -453,7 +486,7 @@ namespace Pseudospectral {
       }
       auto sP = std::make_pair(sEqs.begin(), sEqs.end());
       auto vP = std::make_pair(vEqs.begin(), vEqs.end());
-      this->mTimestepCoordinator.init(schemeId, this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), sP, vP);
+      this->mTimestepCoordinator.init(schemeId, this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), sP, vP, *this);
 
       // Compute physical space values if required
       this->mspImposedBwdGrouper->transform(this->mImposedScalarVariables, this->mImposedVectorVariables, *this->mspImposedTransformCoordinator);
@@ -732,13 +765,19 @@ namespace Pseudospectral {
       this->solveDiagnosticEquations(timeId, sD, vD);
    }
 
+   bool Coordinator::hasPrognostic(const int it) const
+   {
+      auto sP = const_cast<Coordinator *>(this)->scalarRange(PseudospectralTag::Prognostic::id(), it);
+      auto vP = const_cast<Coordinator *>(this)->vectorRange(PseudospectralTag::Prognostic::id(), it);
+      return this->atLeastOne(sP, vP);
+   }
+
    void Coordinator::solvePrognosticEquations(ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
    {
       // Only step forward if equations are present
       if(this->atLeastOne(scalarEq_range, vectorEq_range))
       {
          DebuggerMacro_msg("Timestep prognostic equations", 5);
-         this->mTimestepCoordinator.setSolveTime(SolveTiming::Prognostic::id());
          this->mTimestepCoordinator.stepForward(scalarEq_range, vectorEq_range, this->mScalarVariables, this->mVectorVariables);
       }
    }
@@ -816,9 +855,9 @@ namespace Pseudospectral {
       QuICCEnv().synchronize();
    }
 
-   void Coordinator::solveEquations(const int it)
+   void Coordinator::solveEquationsBefore(const int it)
    {
-      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::solveEquations");
+      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::solveEquationsBefore");
 
       // Solve trivial equations
       Profiler::RegionStart<2> ("Pseudospectral::Coordinator::solveEquations-trivialBefore");
@@ -831,12 +870,11 @@ namespace Pseudospectral {
       this->explicitDiagnosticEquations(ModelOperator::ExplicitNonlinear::id(), it);
       this->solveDiagnosticEquations(SolveTiming::Before::id(), it);
       Profiler::RegionStop<2> ("Pseudospectral::Coordinator::solveEquations-diagnosticBefore");
+   }
 
-      // Solve prognostic equations (timestep)
-      Profiler::RegionStart<2> ("Pseudospectral::Coordinator::solveEquations-prognostic");
-      this->explicitPrognosticEquations(ModelOperator::ExplicitNonlinear::id(), it);
-      this->solvePrognosticEquations(it);
-      Profiler::RegionStop<2> ("Pseudospectral::Coordinator::solveEquations-prognostic");
+   void Coordinator::solveEquationsAfter(const int it)
+   {
+      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::solveEquationsAfter");
 
       // Solve diagnostic equations
       Profiler::RegionStart<2> ("Pseudospectral::Coordinator::solveEquations-diagnosticAfter");
@@ -855,32 +893,28 @@ namespace Pseudospectral {
    {
       Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::finalizeTimestep");
 
-      // Update conditions at the end of timestep
-      if(this->mTimestepCoordinator.finishedStep())
+      // Update timestepper
+      this->mTimestepCoordinator.update();
+
+      // Update CFL condition
+      this->mDiagnostics.updateCfl();
+
+      // Synchronise diagnostics
+      this->mDiagnostics.synchronize();
+
+      // Adapt timestepper time step
+      std::vector<SharedIScalarEquation> sEqs;
+      std::vector<SharedIVectorEquation> vEqs;
+      for(auto j: this->it())
       {
-         // Update timestepper
-         this->mTimestepCoordinator.update();
-
-         // Update CFL condition
-         this->mDiagnostics.updateCfl();
-
-         // Synchronise diagnostics
-         this->mDiagnostics.synchronize();
-
-         // Adapt timestepper time step
-         std::vector<SharedIScalarEquation> sEqs;
-         std::vector<SharedIVectorEquation> vEqs;
-         for(auto j: this->it())
-         {
-            auto sP = this->scalarRange(PseudospectralTag::Prognostic::id(), j);
-            sEqs.insert(sEqs.end(), sP.first, sP.second);
-            auto vP = this->vectorRange(PseudospectralTag::Prognostic::id(), j);
-            vEqs.insert(vEqs.end(), vP.first, vP.second);
-         }
-         auto sP = std::make_pair(sEqs.begin(), sEqs.end());
-         auto vP = std::make_pair(vEqs.begin(), vEqs.end());
-         this->mTimestepCoordinator.adaptTimestep(this->mDiagnostics.cfl(), sP, vP);
+         auto sP = this->scalarRange(PseudospectralTag::Prognostic::id(), j);
+         sEqs.insert(sEqs.end(), sP.first, sP.second);
+         auto vP = this->vectorRange(PseudospectralTag::Prognostic::id(), j);
+         vEqs.insert(vEqs.end(), vP.first, vP.second);
       }
+      auto sP = std::make_pair(sEqs.begin(), sEqs.end());
+      auto vP = std::make_pair(vEqs.begin(), vEqs.end());
+      this->mTimestepCoordinator.adaptTimestep(this->mDiagnostics.cfl(), sP, vP);
    }
 
    void Coordinator::setupEquations()

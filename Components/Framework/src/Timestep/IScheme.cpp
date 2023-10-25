@@ -7,15 +7,9 @@
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Timestep/IScheme.hpp"
-
 // Project includes
 //
+#include "QuICC/Timestep/IScheme.hpp"
 
 namespace QuICC {
 

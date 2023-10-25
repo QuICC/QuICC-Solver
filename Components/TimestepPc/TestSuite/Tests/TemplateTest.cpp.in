@@ -1,0 +1,44 @@
+/**
+ * @file @Scheme@TimestepTest.cpp
+ * @brief Tests for the @Scheme@ timestepper
+ */
+
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <fstream>
+
+// Project includes
+//
+#include "QuICC/QuICCEnv.hpp"
+#include "Timestep/PredictorCorrector/@Scheme@.hpp"
+#include "TestSuite/Timestep/PredictorCorrector/TestArgs.hpp"
+#include "TestSuite/Timestep/PredictorCorrector/TestHelper.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Timestep::PredictorCorrector;
+typedef ::QuICC::Timestep::PredictorCorrector::@Scheme@ SchemeType;
+
+TEST_CASE( "@Scheme@ timestepper test", "[@Scheme@]" ){
+
+   // Init Environment
+   QuICC::QuICCEnv();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   for(auto&& id: currentts::args().params)
+   {
+      currentts::Test test(id);
+
+      auto spStepper = currentts::createTimestepper<SchemeType>(test);
+      currentts::setupTimestepper<SchemeType>(test, spStepper);
+
+      // Test a single step forward
+      currentts::singleStepForward<SchemeType>(test, spStepper);
+
+      // Test multiple steps forward
+      currentts::multiStepForward<SchemeType>(test, spStepper, 4);
+
+      CHECK( true );
+   }
+}

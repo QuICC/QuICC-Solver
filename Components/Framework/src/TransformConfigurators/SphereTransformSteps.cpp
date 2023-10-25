@@ -19,11 +19,13 @@
 #include "QuICC/Transform/Path/ScalarNl.hpp"
 #include "QuICC/Transform/Path/CurlNl.hpp"
 #include "QuICC/Transform/Path/CurlCurlNl.hpp"
+#include "QuICC/Transform/Path/NegCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/I2ScalarNl.hpp"
 #include "QuICC/Transform/Path/I2CurlNl.hpp"
 #include "QuICC/Transform/Path/I2CurlCurlNl.hpp"
 #include "QuICC/Transform/Path/NegI2CurlCurlNl.hpp"
 #include "QuICC/Transform/Path/NegI4CurlCurlNl.hpp"
+#include "QuICC/Transform/Path/NegCurlCurlNl.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/I2P.hpp"
 #include "QuICC/Transform/Forward/Overlaplh.hpp"
@@ -307,6 +309,26 @@ namespace Transform {
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
             transform.back().addEdge(Forward::S::id(), curlcurlId, Arithmetics::Sub::id());
+         }
+         // transform without quasi-inverse
+         else if(curlcurlFlag == Path::NegCurlCurlNl::id())
+         {
+            // Compute curlcurl Q component
+            transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::Q::id(), curlcurlId, Arithmetics::Sub::id());
+
+            // Compute curlcurl S component
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::OverlaplhD1::id());
+            transform.back().addEdge(Forward::S::id(), curlcurlId, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
+            transform.back().addEdge(Forward::S::id(), curlcurlId, Arithmetics::Add::id());
          }
          else
          {

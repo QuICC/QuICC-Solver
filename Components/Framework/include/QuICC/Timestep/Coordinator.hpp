@@ -14,10 +14,14 @@
 //
 #include "QuICC/Equations/IScalarEquation.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
-#include "QuICC/Timestep/IScheme.hpp"
 #include "QuICC/Timestep/Interface.hpp"
 
 namespace QuICC {
+
+// Forward declaration
+namespace Pseudospectral {
+   class Coordinator;
+}
 
 namespace Timestep {
 
@@ -64,8 +68,9 @@ namespace Timestep {
           * @param error      Max error allowed during timestep
           * @param scalEq     Shared scalar equations
           * @param vectEq     Shared vector equations
+          * @param pseudo     Pseudospectral coordinator
           */
-         void init(const std::size_t schemeId, const MHDFloat time, const Matrix& cfl, const MHDFloat maxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq);
+         void init(const std::size_t schemeId, const MHDFloat time, const Matrix& cfl, const MHDFloat maxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, Pseudospectral::Coordinator& pseudo);
 
          /**
           * @brief Tune adaptive timestepper
