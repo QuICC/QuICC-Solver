@@ -16,5 +16,8 @@
 #ifdef QUICC_USE_CUFFT
 #include "QuICC/Transform/Wrappers/Fourier/Complex/Integrator/InvLapl2DviewGpu_t.hpp.inc"
 #endif
+#ifdef QUICC_USE_VKFFT
+#include "QuICC/Transform/Wrappers/Fourier/Complex/Integrator/InvLapl2DviewGpuVkFFT_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_INTEGRATOR_INVLAPL2D_HPP

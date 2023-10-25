@@ -86,6 +86,35 @@ template class DOp<phys_t, mods_t,
 template class DOp<phys_t, mods_t,
     QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
     Cpu::Diff2DOp<mods_t, mods_t, 2, 1, 0, 3, bwd_t>>;
+#ifdef QUICC_USE_VKFFT
+template class DOp<phys_t, mods_t,
+    QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+    Cuda::DiffOp<mods_t, mods_t, 0, bwd_t>>;
+template class DOp<phys_t, mods_t,
+    QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+    Cuda::DiffOp<mods_t, mods_t, 1, bwd_t>>;
+template class DOp<phys_t, mods_t,
+    QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+    Cuda::DiffOp<mods_t, mods_t, 2, bwd_t>>;
+template class DOp<phys_t, mods_t,
+    QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+    Cuda::DiffOp<mods_t, mods_t, 3, bwd_t>>;
+template class DOp<phys_t, mods_t,
+    QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+    Cuda::DiffOp<mods_t, mods_t, 4, bwd_t>>;
+template class DOp<phys_t, mods_t,
+    QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+    Cuda::MeanOp<mods_t, mods_t, bwd_t>>;
+template class DOp<phys_t, mods_t,
+    QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+    Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t>>;
+template class DOp<phys_t, mods_t,
+    QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+    Cuda::Diff2DOp<mods_t, mods_t, 3, 0, 1, 2, bwd_t>>;
+template class DOp<phys_t, mods_t,
+    QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+    Cuda::Diff2DOp<mods_t, mods_t, 2, 1, 0, 3, bwd_t>>;
+#endif
 #ifdef QUICC_USE_CUFFT
 template class DOp<phys_t, mods_t,
     QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,

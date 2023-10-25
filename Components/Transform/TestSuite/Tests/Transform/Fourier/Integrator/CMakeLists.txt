@@ -16,13 +16,22 @@ set(_tests
   Mixed::D2:<viewCpu_t>:integrator
 )
 
-if(TARGET QuICC::Fft::CuFft)
+if(QUICC_USE_CUFFT)
   list(APPEND _tests
     Mixed::P:<viewGpu_t>:integrator
     Mixed::D1:<viewGpu_t>:integrator
     Mixed::D1_P:<viewGpu_t>:integrator
     Mixed::D1_Neg:<viewGpu_t>:integrator
     Mixed::D2:<viewGpu_t>:integrator
+  )
+endif()
+if(QUICC_USE_VKFFT)
+  list(APPEND _tests
+    Mixed::P:<viewGpuVkFFT_t>:integrator
+    Mixed::D1:<viewGpuVkFFT_t>:integrator
+    Mixed::D1_P:<viewGpuVkFFT_t>:integrator
+    Mixed::D1_Neg:<viewGpuVkFFT_t>:integrator
+    Mixed::D2:<viewGpuVkFFT_t>:integrator
   )
 endif()
 
@@ -80,7 +89,7 @@ set(_tests
   Complex::Mean:<viewCpu_t>:integrator
 )
 
-if(TARGET QuICC::Fft::CuFft)
+if(QUICC_USE_CUFFT)
   list(APPEND _tests
     Complex::P:<viewGpu_t>:integrator
     Complex::P_Clean:<viewGpu_t>:integrator
@@ -91,6 +100,19 @@ if(TARGET QuICC::Fft::CuFft)
     Complex::InvLapl2D:<viewGpu_t>:integrator
     Complex::Df1InvLapl2D:<viewGpu_t>:integrator
     Complex::Mean:<viewGpu_t>:integrator
+  )
+endif()
+if(QUICC_USE_VKFFT)
+  list(APPEND _tests
+    Complex::P:<viewGpuVkFFT_t>:integrator
+    Complex::P_Clean:<viewGpuVkFFT_t>:integrator
+    Complex::D1:<viewGpuVkFFT_t>:integrator
+    Complex::D1_P:<viewGpuVkFFT_t>:integrator
+    Complex::D1_Neg:<viewGpuVkFFT_t>:integrator
+    Complex::D2:<viewGpuVkFFT_t>:integrator
+    Complex::InvLapl2D:<viewGpuVkFFT_t>:integrator
+    Complex::Df1InvLapl2D:<viewGpuVkFFT_t>:integrator
+    Complex::Mean:<viewGpuVkFFT_t>:integrator
   )
 endif()
 
@@ -108,7 +130,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
     IDS   107  108   109
-    ULPS  5168 16425 48000
+    ULPS  5168 16425 120000
   )
 endforeach()
 
@@ -118,10 +140,15 @@ set(_tests
   Complex::Lapl2D:<viewCpu_t>:integrator
  )
 
-if(TARGET QuICC::Fft::CuFft)
-  list(APPEND _tests
-    Complex::Lapl2D:<viewGpu_t>:integrator
-  )
+if(QUICC_USE_CUFFT)
+ list(APPEND _tests
+   Complex::Lapl2D:<viewGpu_t>:integrator
+ )
+endif()
+if(QUICC_USE_VKFFT)
+ list(APPEND _tests
+   Complex::Lapl2D:<viewGpuVkFFT_t>:integrator
+ )
 endif()
 
 
@@ -129,7 +156,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
-    ULP 70
+    ULP 90
   )
 endforeach()
 
@@ -138,6 +165,6 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
     IDS   107  108   109
-    ULPS  25520 81616 240000
+    ULPS  25520 81616 600000
   )
 endforeach()

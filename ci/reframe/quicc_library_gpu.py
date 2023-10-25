@@ -24,7 +24,7 @@ class testALegendreTests_Poly_P_projector_id108_split8_0_viewGpu(testTransform):
                     'applyOperatorsAvg': (0.0396912, -0.25, 0.1, 's'),
                 },
             }
-
+            
 @rfm.simple_test
 class testALegendreTests_Poly_P_projector_id108_split256_0_cuda(testTransform):
     test = 'prof_TransformALegendreTests_Poly_P_kokkos_t_projector_id108_ulp.*_split256_0'
@@ -119,6 +119,17 @@ class testFourierTests_Mixed_D1_projector_id108_split96_0_viewGpu(testTransform)
     region = 'transform'
     steps = 500
     refs =  {   'p100': {
-                    'applyOperatorsAvg': (0.00196887, -0.25, 0.2, 's'),
+                    'applyOperatorsMin': (0.00196887, -0.25, 0.2, 's'),
                 },
             }
+
+@rfm.simple_test
+class testFourierTests_Mixed_D1_projector_id108_split96_0_viewGpuVkFFT(testTransform):
+    test = 'prof_TransformFourierTests_Mixed_D1_viewGpuVkFFT_t_projector_id108_ulp.*_split96_0'
+    region = 'transform'
+    steps = 500
+    refs =  {   'p100': {
+                    'applyOperatorsMin': (0.00196887, -0.25, 0.2, 's'),
+                },
+            }
+            

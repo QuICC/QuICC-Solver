@@ -8,6 +8,7 @@ RUN mkdir -p /QuICC.src/build \
   && cmake .. -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE \
     -DCMAKE_CUDA_COMPILER=nvcc \
+    -DQUICC_USE_VKFFT=ON \
     -DQUICC_USE_CUFFT=ON \
     -DQUICC_USE_KOKKOS=ON \
     -DQUICC_USE_KOKKOS_CUDA=ON \

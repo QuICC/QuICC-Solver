@@ -96,7 +96,7 @@ if(QUICC_USE_KOKKOS)
         if(NOT DEFINED Kokkos_ENABLE_CUDA OR NOT ${Kokkos_ENABLE_CUDA})
             message(
                 FATAL_ERROR
-                    "Enable Kokkos Cuda or unset QUICC_USE_CUDA to continue with OpenMP!"
+                    "Enable Kokkos Cuda or unset QUICC_HAS_CUDA_BACKEND to continue with OpenMP!"
             )
         endif()
         message(VERBOSE "Kokkos CUDA Enabled = ${Kokkos_ENABLE_CUDA}")

@@ -35,9 +35,28 @@ else()
 message(VERBOSE "Fftw backend not available")
 endif()
 
+# VkFFT
+option(QUICC_USE_VKFFT "Enable VkFft backend" OFF)
 # CuFft
 option(QUICC_USE_CUFFT "Enable CuFft backend" OFF)
+
 find_package(CUDAToolkit)
+
+if(TARGET VkFFT AND QUICC_USE_VKFFT)
+  message(VERBOSE "VkFFT backend available")
+  add_subdirectory(Fft/VkFft)
+  target_compile_definitions("${QUICC_CURRENT_COMPONENT_LIB}"
+    INTERFACE QUICC_USE_VKFFT)
+  target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
+    QuICC::Fft::VkFft
+    QuICC::Cuda
+  )
+  target_compile_definitions("${QUICC_CURRENT_COMPONENT_LIB}"
+      INTERFACE "QUICC_HAS_CUDA_BACKEND")
+else()
+  message(VERBOSE "VkFFT backend not available")
+endif()
+
 if(TARGET CUDA::cufft AND QUICC_USE_CUFFT)
   message(VERBOSE "Cufft backend available")
   add_subdirectory(Fft/CuFft)
@@ -46,8 +65,10 @@ if(TARGET CUDA::cufft AND QUICC_USE_CUFFT)
   target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
       QuICC::Fft::CuFft
   )
+  target_compile_definitions("${QUICC_CURRENT_COMPONENT_LIB}"
+      INTERFACE "QUICC_HAS_CUDA_BACKEND")
 else()
-message(VERBOSE "Cufft backend not available")
+  message(VERBOSE "Cufft backend not available")
 endif()
 
 # Alias

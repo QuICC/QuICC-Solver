@@ -9,7 +9,7 @@
 #include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Profiler/Interface.hpp"
 
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #endif
 
@@ -30,7 +30,7 @@ void MeanOp<Tout, Tin, Direction>::applyImpl(Tout& out, const Tin& in)
 
     Profiler::RegionFixture<4> fix("MeanOp::applyImpl");
 
-    #ifdef QUICC_USE_CUFFT
+    #ifdef QUICC_HAS_CUDA_BACKEND
     assert(!QuICC::Cuda::isDeviceMemory(out.data()));
     #endif
 

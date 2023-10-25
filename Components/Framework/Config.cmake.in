@@ -21,7 +21,8 @@ set(QUICC_USE_KOKKOS_CUDA @QUICC_USE_KOKKOS_CUDA@
   CACHE BOOL "This is set by the framework" FORCE)
 set(QUICC_USE_KOKKOS_KERNELS @QUICC_USE_KOKKOS_KERNELS@
   CACHE BOOL "This is set by the framework" FORCE)
-
+set(QUICC_USE_VKFFT @QUICC_USE_VKFFT@
+  CACHE BOOL "This is set by the framework" FORCE)
 
 # Hide them since they should not be changed
 mark_as_advanced(FORCE
@@ -59,6 +60,16 @@ endif()
 if(QUICC_USE_KOKKOS)
   set(TRILINOS_DIR @TRILINOS_DIR@)
   set(KOKKOS_DIR @KOKKOS_DIR@)
+endif()
+
+# VkFFT
+if(QUICC_USE_VKFFT)
+  set(QUICC_USE_SYSTEM_VKFFT ON
+    CACHE BOOL "This is set by the framework" FORCE)
+  set(VKFFT_SOURCE_DIR @VKFFT_SOURCE_DIR@
+    CACHE BOOL "This is set by the framework" FORCE)
+  set(VKFFT_KERNELS_DIR @VKFFT_KERNELS_DIR@
+    CACHE BOOL "This is set by the framework" FORCE)
 endif()
 
 # Setup

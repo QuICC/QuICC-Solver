@@ -9,7 +9,7 @@
 #include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Profiler/Interface.hpp"
 
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #endif
 
@@ -32,7 +32,7 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
 
     Profiler::RegionFixture<4> fix("Diff2DOp::applyImpl");
 
-    #ifdef QUICC_USE_CUFFT
+    #ifdef QUICC_HAS_CUDA_BACKEND
     assert(!QuICC::Cuda::isDeviceMemory(out.data()));
     #endif
 

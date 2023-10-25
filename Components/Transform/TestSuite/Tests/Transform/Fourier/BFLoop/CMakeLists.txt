@@ -7,9 +7,14 @@ set(_tests
   Mixed::P:<base_t>:bfloop
   Mixed::P:<viewCpu_t>:bfloop
   )
-if(TARGET QuICC::Fft::CuFft)
+if(QUICC_USE_CUFFT)
   list(APPEND _tests
     Mixed::P:<viewGpu_t>:bfloop
+  )
+endif()
+if(QUICC_USE_VKFFT)
+  list(APPEND _tests
+    Mixed::P:<viewGpuVkFFT_t>:bfloop
   )
 endif()
 foreach(_test ${_tests})
@@ -38,9 +43,14 @@ endforeach()
 set(_tests
   Mixed::P:<viewCpu_t>:bfloop
   )
-if(TARGET QuICC::Fft::CuFft)
+if(QUICC_USE_CUFFT)
   list(APPEND _tests
     Mixed::P:<viewGpu_t>:bfloop
+  )
+endif()
+if(QUICC_USE_VKFFT)
+  list(APPEND _tests
+    Mixed::P:<viewGpuVkFFT_t>:bfloop
   )
 endif()
 foreach(_test ${_tests})

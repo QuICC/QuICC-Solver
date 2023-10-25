@@ -16,5 +16,8 @@
 #ifdef QUICC_USE_CUFFT
 #include "QuICC/Transform/Wrappers/Fourier/Mixed/Projector/D1viewGpu_t.hpp.inc"
 #endif
+#ifdef QUICC_USE_VKFFT
+#include "QuICC/Transform/Wrappers/Fourier/Mixed/Projector/D1viewGpuVkFFT_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_D1_HPP

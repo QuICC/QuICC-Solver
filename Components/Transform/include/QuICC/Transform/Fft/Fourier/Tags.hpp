@@ -26,6 +26,9 @@ namespace Fourier {
     /// view gpu implementation tag
     struct viewGpu_t {};
 
+    /// view gpu VkFFT implementation tag
+    struct viewGpuVkFFT_t {};
+
 } // namespace Fourier
 } // namespace Fft
 } // namespace Transform

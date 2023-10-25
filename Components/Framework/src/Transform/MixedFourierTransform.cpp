@@ -74,11 +74,18 @@ namespace Transform {
    void MixedFourierTransform::initOperators()
    {
       using namespace QuICC::Transform::Fft::Fourier;
-      #ifdef QUICC_USE_CUFFT
-         using backend_t = viewGpu_t;
+      #ifdef QUICC_HAS_CUDA_BACKEND
+         #ifdef QUICC_USE_VKFFT
+            using backend_t = viewGpuVkFFT_t;
+         #else
+            #ifdef QUICC_USE_CUFFT
+               using backend_t = viewGpu_t;
+            #endif
+         #endif
       #else
          using backend_t = viewCpu_t;
       #endif
+
       this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::P<backend_t>>(Backward::P::id());
       this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D1<backend_t>>(Backward::D1::id());
       this->mImpl.addOperator<Fft::Fourier::Mixed::Projector::D2<backend_t>>(Backward::D2::id());

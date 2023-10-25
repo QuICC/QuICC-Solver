@@ -109,6 +109,14 @@ quicc_create_option(NAME QUICC_FFTPLAN
                     LABEL "FFT plan")
 
 ###################################################
+#------------ VKFFT FFT IMPLEMENTATION -----------#
+###################################################
+
+if(QUICC_USE_VKFFT)
+  include(BundleVkFFT)
+endif()
+
+###################################################
 #----- SPARSE LINEAR ALGEBRA IMPLEMENTATION ------#
 ###################################################
 

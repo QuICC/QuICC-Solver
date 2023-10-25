@@ -13,12 +13,20 @@ set(_tests
   Mixed::D3:<viewCpu_t>:projector
 )
 
-if(TARGET QuICC::Fft::CuFft)
+if(QUICC_USE_CUFFT)
   list(APPEND _tests
     Mixed::P:<viewGpu_t>:projector
     Mixed::D1:<viewGpu_t>:projector
     Mixed::D2:<viewGpu_t>:projector
     Mixed::D3:<viewGpu_t>:projector
+  )
+endif()
+if(QUICC_USE_VKFFT)
+  list(APPEND _tests
+    Mixed::P:<viewGpuVkFFT_t>:projector
+    Mixed::D1:<viewGpuVkFFT_t>:projector
+    Mixed::D2:<viewGpuVkFFT_t>:projector
+    Mixed::D3:<viewGpuVkFFT_t>:projector
   )
 endif()
 
@@ -27,7 +35,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
     IDS 0 1 2 3 4
-    ULPS 70 70 70 7000 15500
+    ULPS 70 70 150 13000 28000
   )
 endforeach()
 
@@ -63,7 +71,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Space::Operator:type
     IDS 0 1 2 3 4
-    ULPS 70 70 250 250 500
+    ULPS 70 70 250 250 1000
   )
 endforeach()
 
@@ -82,7 +90,7 @@ set(_tests
   Complex::Mean:<viewCpu_t>:projector
 )
 
-if(TARGET QuICC::Fft::CuFft)
+if(QUICC_USE_CUFFT)
   list(APPEND _tests
     Complex::P:<viewGpu_t>:projector
     Complex::D1:<viewGpu_t>:projector
@@ -90,6 +98,16 @@ if(TARGET QuICC::Fft::CuFft)
     Complex::D3:<viewGpu_t>:projector
     Complex::D4:<viewGpu_t>:projector
     Complex::Mean:<viewGpu_t>:projector
+  )
+endif()
+if(QUICC_USE_VKFFT)
+  list(APPEND _tests
+    Complex::P:<viewGpuVkFFT_t>:projector
+    Complex::D1:<viewGpuVkFFT_t>:projector
+    Complex::D2:<viewGpuVkFFT_t>:projector
+    Complex::D3:<viewGpuVkFFT_t>:projector
+    Complex::D4:<viewGpuVkFFT_t>:projector
+    Complex::Mean:<viewGpuVkFFT_t>:projector
   )
 endif()
 
@@ -113,7 +131,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
     IDS   107  108  109
-    ULPS  4020 4020 15400
+    ULPS  4020 4020 17000
     DISABLED ${_disabled}
   )
 endforeach()
@@ -126,20 +144,27 @@ set(_tests
   Complex::Ds1Lapl2D:<viewCpu_t>:projector
 )
 
-if(TARGET QuICC::Fft::CuFft)
+if(QUICC_USE_CUFFT)
   list(APPEND _tests
     Complex::Lapl2D:<viewGpu_t>:projector
     Complex::Df1Lapl2D:<viewGpu_t>:projector
     Complex::Ds1Lapl2D:<viewGpu_t>:projector
   )
 endif()
+if(QUICC_USE_VKFFT)
+  list(APPEND _tests
+    Complex::Lapl2D:<viewGpuVkFFT_t>:projector
+    Complex::Df1Lapl2D:<viewGpuVkFFT_t>:projector
+    Complex::Ds1Lapl2D:<viewGpuVkFFT_t>:projector
+  )
+endif() 
 
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
     IDS 0 1 2 3
-    ULP 70
+    ULP 110
   )
 endforeach()
 

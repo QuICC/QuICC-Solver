@@ -11,3 +11,4 @@
 //
 #include "Fft/Fftw/Fft.hpp"
 #include "Fft/CuFft/Fft.hpp"
+#include "Fft/VkFft/Fft.hpp"

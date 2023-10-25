@@ -4,7 +4,7 @@ add_executable(ViewOpsTest "")
 
 set(Tags "Cpu")
 
-if(TARGET CUDA::cufft AND QUICC_USE_CUFFT)
+if((TARGET QuICC::Fft::CuFft AND QUICC_USE_CUFFT) OR (TARGET QuICC::Fft::VkFft AND QUICC_USE_VKFFT))
     list(APPEND Tags "Cuda")
 endif()
 

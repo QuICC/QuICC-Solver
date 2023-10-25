@@ -9,8 +9,11 @@ set(ProjectorComplexOps "P;D1;D2;D3;D4;Lapl2D;Df1Lapl2D;Ds1Lapl2D;Mean")
 set(IntegratorComplexOps "P;P_Clean;D1;D1_P;D1_Neg;D2;Lapl2D;InvLapl2D;Df1InvLapl2D;Mean")
 
 set(Tags "viewCpu_t")
-if(TARGET QuICC::Fft::CuFft)
+if(QUICC_USE_CUFFT)
     list(APPEND Tags "viewGpu_t")
+endif()
+if(QUICC_USE_VKFFT)
+    list(APPEND Tags "viewGpuVkFFT_t")
 endif()
 
 # Old interface output type
@@ -43,10 +46,12 @@ set(viewGpu_tProjectorMixedCopyPad "// dealias or overintegration
     auto dSz = sizeof(decltype(mMods_d)::type);
     cudaErrChk(cudaMemcpy2DAsync(mMods_d.data(), mPadded.rows()*dSz, in.data(), in.rows()*dSz,
         nDealias*dSz, in.cols(), cudaMemcpyHostToDevice));")
+set(viewGpuVkFFT_tProjectorMixedCopyPad "${viewGpu_tProjectorMixedCopyPad}")
 set(viewGpu_tIntegratorMixedCopyPad "// cpu -> gpu data
     auto dSz = sizeof(decltype(mPhys_d)::type);
     cudaErrChk(cudaMemcpyAsync(mPhys_d.data(), in.data(), mPhys_d.size()*dSz,
         cudaMemcpyHostToDevice));")
+set(viewGpuVkFFT_tIntegratorMixedCopyPad "${viewGpu_tIntegratorMixedCopyPad}")
 set(viewCpu_tProjectorComplexCopyPad "// dealias or overintegration
     std::size_t nDealias = mspSetup->specSize();
     auto negN = nDealias / 2;
@@ -60,11 +65,13 @@ set(viewGpu_tProjectorComplexCopyPad "${viewCpu_tProjectorComplexCopyPad}
     cudaErrChk(cudaMemcpyAsync(mMods_d.data(), mPadded.data(), mMods_d.size()*dSz,
         cudaMemcpyHostToDevice));"
     )
+set(viewGpuVkFFT_tProjectorComplexCopyPad "${viewGpu_tProjectorComplexCopyPad}")
 set(viewGpu_tIntegratorComplexCopyPad "// cpu -> gpu data
     auto dSz = sizeof(decltype(mPhys_d)::type);
     cudaErrChk(cudaMemcpyAsync(mPhys_d.data(), in.data(), mPhys_d.size()*dSz,
         cudaMemcpyHostToDevice));"
     )
+set(viewGpuVkFFT_tIntegratorComplexCopyPad "${viewGpu_tIntegratorComplexCopyPad}")
 
 set(MixedViewAttribute "DCCSC3D")
 set(ComplexViewAttribute "DCCSC3DInOrder")
@@ -72,167 +79,286 @@ set(ComplexViewAttribute "DCCSC3DInOrder")
 # P - Projector
 set(ProjectorPviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::DiffOp<mods_t, mods_t, 0, bwd_t>>")
+Cpu::DiffOp<mods_t, mods_t, 0, bwd_t>>")
+if(QUICC_USE_VKFFT)
+set(ProjectorPviewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::DiffOp<mods_t, mods_t, 0, bwd_t>>")        
+endif()
+if(QUICC_USE_CUFFT)
 set(ProjectorPviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::DiffOp<mods_t, mods_t, 0, bwd_t>>")
-
+endif()
 # P - Integrator
 set(IntegratorPviewCpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
             Cpu::DiffOp<mods_t, mods_t, 0, fwd_t>>")
-
+if(QUICC_USE_VKFFT)
+set(IntegratorPviewGpuVkFFT_tPtrParam "DOp<mods_t, phys_t,
+        QuICC::Fft::VkFft::FftOp<mods_t, phys_t>,
+            Cuda::DiffOp<mods_t, mods_t, 0, fwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorPviewGpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
             Cuda::DiffOp<mods_t, mods_t, 0, fwd_t>>")
-
+endif()
 # P_Clean - Integrator
 set(IntegratorP_CleanviewCpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
             Cpu::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_m>>")
-
+if(QUICC_USE_VKFFT)
+set(IntegratorP_CleanviewGpuVkFFT_tPtrParam "DOp<mods_t, phys_t,
+        QuICC::Fft::VkFft::FftOp<mods_t, phys_t>,
+            Cuda::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_m>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorP_CleanviewGpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
             Cuda::DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_m>>")
-
+endif()
 # D1 - Projector
 set(ProjectorD1viewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
-            Cpu::DiffOp<mods_t, mods_t, 1, bwd_t>>")
+Cpu::DiffOp<mods_t, mods_t, 1, bwd_t>>")
+if(QUICC_USE_VKFFT)
+set(ProjectorD1viewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::DiffOp<mods_t, mods_t, 1, bwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(ProjectorD1viewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::DiffOp<mods_t, mods_t, 1, bwd_t>>")
-
+endif()
 # D1 - Integrator
 set(IntegratorD1viewCpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
             Cpu::DiffOp<mods_t, mods_t, 1, fwd_t>>")
+if(QUICC_USE_VKFFT)
+set(IntegratorD1viewGpuVkFFT_tPtrParam "DOp<mods_t, phys_t,
+        QuICC::Fft::VkFft::FftOp<mods_t, phys_t>,
+            Cuda::DiffOp<mods_t, mods_t, 1, fwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorD1viewGpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
             Cuda::DiffOp<mods_t, mods_t, 1, fwd_t>>")
-
+endif()
 # D1_P - Integrator
 set(IntegratorD1_PviewCpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
             Cpu::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_m>>")
+if(QUICC_USE_VKFFT)
+set(IntegratorD1_PviewGpuVkFFT_tPtrParam "DOp<mods_t, phys_t,
+        QuICC::Fft::VkFft::FftOp<mods_t, phys_t>,
+            Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_m>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorD1_PviewGpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
             Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroP_m>>")
-
+endif()
 # D1_Neg - Integrator
 set(IntegratorD1_NegviewCpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
             Cpu::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_m>>")
+if(QUICC_USE_VKFFT)
+set(IntegratorD1_NegviewGpuVkFFT_tPtrParam "DOp<mods_t, phys_t,
+        QuICC::Fft::VkFft::FftOp<mods_t, phys_t>,
+            Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_m>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorD1_NegviewGpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
             Cuda::DiffOp<mods_t, mods_t, 1, fwd_t, zeroMinusP_m>>")
-
+endif()
 # D2 - Projector
 set(ProjectorD2viewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::DiffOp<mods_t, mods_t, 2, bwd_t>>")
+if(QUICC_USE_VKFFT)
+set(ProjectorD2viewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::DiffOp<mods_t, mods_t, 2, bwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(ProjectorD2viewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::DiffOp<mods_t, mods_t, 2, bwd_t>>")
-
+endif()
 # D2 - Integrator
 set(IntegratorD2viewCpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
             Cpu::DiffOp<mods_t, mods_t, 2, fwd_t>>")
+if(QUICC_USE_VKFFT)
+set(IntegratorD2viewGpuVkFFT_tPtrParam "DOp<mods_t, phys_t,
+        QuICC::Fft::VkFft::FftOp<mods_t, phys_t>,
+            Cuda::DiffOp<mods_t, mods_t, 2, fwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorD2viewGpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::CuFft::FftOp<mods_t, phys_t>,
             Cuda::DiffOp<mods_t, mods_t, 2, fwd_t>>")
-
+endif()
 # D3 - Projector
 set(ProjectorD3viewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::DiffOp<mods_t, mods_t, 3, bwd_t>>")
+if(QUICC_USE_VKFFT)
+set(ProjectorD3viewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::DiffOp<mods_t, mods_t, 3, bwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(ProjectorD3viewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::DiffOp<mods_t, mods_t, 3, bwd_t>>")
-
+endif()
 # D3 - Integrator
 set(IntegratorD3viewCpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::Fftw::FftOp<mods_t, phys_t>,
             Cpu::DiffOp<mods_t, mods_t, 3, fwd_t>>")
+if(QUICC_USE_VKFFT)
+set(IntegratorD3viewGpuVkFFT_tPtrParam "DOp<mods_t, phys_t,
+        QuICC::Fft::VkFft::FftOp<<mods_t, phys_t>,
+            Cuda::DiffOp<mods_t, mods_t, 3, fwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorD3viewGpu_tPtrParam "DOp<mods_t, phys_t,
         QuICC::Fft::CuFft::FftOp<<mods_t, phys_t>,
             Cuda::DiffOp<mods_t, mods_t, 3, fwd_t>>")
-
+endif()
 # D4 - Projector
 set(ProjectorD4viewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::DiffOp<mods_t, mods_t, 4, bwd_t>>")
+if(QUICC_USE_VKFFT)
+set(ProjectorD4viewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::DiffOp<mods_t, mods_t, 4, bwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(ProjectorD4viewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::DiffOp<mods_t, mods_t, 4, bwd_t>>")
-
+endif()
 # Lapl2D - Projector
 set(ProjectorLapl2DviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t>>")
+if(QUICC_USE_VKFFT)
+set(ProjectorLapl2DviewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(ProjectorLapl2DviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t>>")
-
+endif()
 # Lapl2D - Integrator
 set(IntegratorLapl2DviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t>>")
+if(QUICC_USE_VKFFT)
+set(IntegratorLapl2DviewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorLapl2DviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t>>")
-
+endif()
 # InvLapl2D - Integrator
 set(IntegratorInvLapl2DviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>>")
+if(QUICC_USE_VKFFT)
+set(IntegratorInvLapl2DviewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorInvLapl2DviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>>")
-
+endif()
 # Df1InvLapl2D - Integrator
 set(IntegratorDf1InvLapl2DviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_m>,
             Cpu::DiffOp<mods_t, mods_t, 1, fwd_t>>")
+if(QUICC_USE_VKFFT)
+set(IntegratorDf1InvLapl2DviewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_m>,
+            Cuda::DiffOp<mods_t, mods_t, 1, fwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorDf1InvLapl2DviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, bwd_t, inverse_m>,
             Cuda::DiffOp<mods_t, mods_t, 1, fwd_t>>")
-
+endif()
 # Df1Lapl2D - Projector
 set(ProjectorDf1Lapl2DviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::Diff2DOp<mods_t, mods_t, 3, 0, 1, 2, bwd_t>>")
+if(QUICC_USE_VKFFT)
+set(ProjectorDf1Lapl2DviewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::Diff2DOp<mods_t, mods_t, 3, 0, 1, 2, bwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(ProjectorDf1Lapl2DviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::Diff2DOp<mods_t, mods_t, 3, 0, 1, 2, bwd_t>>")
-
+endif()
 # Ds1Lapl2D - Projector
 set(ProjectorDs1Lapl2DviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::Diff2DOp<mods_t, mods_t, 2, 1, 0, 3, bwd_t>>")
+if(QUICC_USE_VKFFT)
+set(ProjectorDs1Lapl2DviewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::Diff2DOp<mods_t, mods_t, 2, 1, 0, 3, bwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(ProjectorDs1Lapl2DviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::Diff2DOp<mods_t, mods_t, 2, 1, 0, 3, bwd_t>>")
-
+endif()
 # Mean - Projector
 set(ProjectorMeanviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::MeanOp<mods_t, mods_t, bwd_t>>")
+if(QUICC_USE_VKFFT)
+set(ProjectorMeanviewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::MeanOp<mods_t, mods_t, bwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(ProjectorMeanviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::MeanOp<mods_t, mods_t, bwd_t>>")
-
+endif()
 # Mean - Integrator
 set(IntegratorMeanviewCpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::Fftw::FftOp<phys_t, mods_t>,
             Cpu::MeanOp<mods_t, mods_t, fwd_t>>")
+if(QUICC_USE_VKFFT)
+set(IntegratorMeanviewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
+        QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
+            Cuda::MeanOp<mods_t, mods_t, fwd_t>>")
+endif()
+if(QUICC_USE_CUFFT)
 set(IntegratorMeanviewGpu_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::CuFft::FftOp<phys_t, mods_t>,
             Cuda::MeanOp<mods_t, mods_t, fwd_t>>")
-
+endif()
 
 # View Cpu - Projector
 set(ProjectorviewCpu_tViewStorage "// views
@@ -286,6 +412,7 @@ set(ProjectorviewGpu_tViewStorage "
     cudaErrChk(cudaMemcpyAsync(mods.indices()[1].data(), indices[1].data(),
         isz*sizeof(std::uint32_t), cudaMemcpyHostToDevice));"
 )
+set(ProjectorviewGpuVkFFT_tViewStorage ${ProjectorviewGpu_tViewStorage})
 
 set(IntegratorviewGpu_tViewStorage "
     // device mem for metadata
@@ -316,15 +443,18 @@ set(IntegratorviewGpu_tViewStorage "
     cudaErrChk(cudaMemcpyAsync(mods.indices()[1].data(), indices[1].data(),
         isz*sizeof(std::uint32_t), cudaMemcpyHostToDevice));"
 )
+set(IntegratorviewGpuVkFFT_tViewStorage ${IntegratorviewGpu_tViewStorage})
 
 set(ProjectorviewGpu_tCopyBack "// gpu -> cpu
     cudaErrChk(cudaMemcpy(rOut.data(), mPhys_d.data(),
         mPhys_d.size()*sizeof(decltype(mPhys_d)::type), cudaMemcpyDeviceToHost));")
+set(ProjectorviewGpuVkFFT_tCopyBack ${ProjectorviewGpu_tCopyBack})
 
 
 set(IntegratorviewGpu_tCopyBack "// gpu -> cpu
     cudaErrChk(cudaMemcpy(rOut.data(), mMods_d.data(),
         mMods_d.size()*sizeof(decltype(mMods_d)::type), cudaMemcpyDeviceToHost));")
+set(IntegratorviewGpuVkFFT_tCopyBack ${IntegratorviewGpu_tCopyBack})
 
 # Indices/Pointers
 set(ComplexIndicesPointers "// get 3D dimensions
@@ -445,15 +575,18 @@ foreach(Space IN LISTS Spaces)
 #include \"Memory/Memory.hpp\"
 #include \"Memory/Cuda/Malloc.hpp\""
         )
+        set(viewGpuVkFFT_tCuhHeader "${viewGpu_tCuhHeader}")
 
         set(viewGpu_tMemBlock "/// Device memory
     mutable std::unique_ptr<QuICC::Memory::memory_resource> mMemRes;
     mutable QuICC::Memory::MemBlock<cuDoubleComplex> mMods_d;
     mutable QuICC::Memory::MemBlock<${${Space}PhysMatrixType}::Scalar> mPhys_d;")
+        set(viewGpuVkFFT_tMemBlock "${viewGpu_tMemBlock}")
 
         set(viewGpu_tCuHeader "#include <cuda_runtime_api.h>
     #include \"Cuda/CudaUtil.hpp\""
         )
+        set(viewGpuVkFFT_tCuHeader "${viewGpu_tCuHeader}")
 
         set(viewGpu_tAlloc "// Alloc device memory
     mMemRes = std::make_unique<QuICC::Memory::Cuda::Malloc>();
@@ -466,6 +599,7 @@ foreach(Space IN LISTS Spaces)
         mMods_d.size()*sizeof(decltype(mMods_d)::type), cudaMemcpyHostToDevice));
         "
         )
+        set(viewGpuVkFFT_tAlloc "${viewGpu_tAlloc}")
 
             foreach(Op IN LISTS Ops)
             foreach(Tag IN LISTS Tags)

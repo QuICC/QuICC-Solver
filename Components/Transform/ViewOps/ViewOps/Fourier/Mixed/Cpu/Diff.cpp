@@ -8,7 +8,7 @@
 #include "ViewOps/Fourier/Mixed/Types.hpp"
 #include "Profiler/Interface.hpp"
 
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #endif
 
@@ -31,7 +31,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     assert(out.dims()[1] == in.dims()[1]);
     assert(out.dims()[2] == in.dims()[2]);
 
-    #ifdef QUICC_USE_CUFFT
+    #ifdef QUICC_HAS_CUDA_BACKEND
     assert(!QuICC::Cuda::isDeviceMemory(out.data()));
     #endif
 
