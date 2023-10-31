@@ -42,6 +42,11 @@ namespace Polynomial {
    /**
     * @brief Read real data from file
     */
+   void readList(Array& inData, const std::string& path);
+
+   /**
+    * @brief Read real data from file
+    */
    void readData(Matrix& inData, const std::string& path);
 
    /**

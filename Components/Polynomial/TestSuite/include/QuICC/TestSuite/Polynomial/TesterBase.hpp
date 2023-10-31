@@ -52,6 +52,11 @@ namespace Polynomial {
          virtual ~TesterBase() = default;
 
          /**
+          * @brief Validate implementation against reference single parameter input. Setup is read from meta data
+          */
+         void validate(const ParameterType& param, const TestType type) const;
+
+         /**
           * @brief Validate implementation against reference
           */
          void validate(const int specN, const int physN, const ParameterType& param, const TestType type) const;
@@ -95,7 +100,7 @@ namespace Polynomial {
          /**
           * @brief Check denormalized values
           */
-         virtual ErrorType checkSubnormal(const MHDFloat data, const MHDFloat ref) const;
+         virtual ErrorType checkSubnormal(const MHDFloat data, const MHDFloat ref, const MHDFloat scale = 1.0) const;
 
          /**
           * @brief Get data root
@@ -161,6 +166,32 @@ namespace Polynomial {
    template <typename TOp> TesterBase<TOp>::TesterBase(const std::string& fname, const bool keepData)
       : mKeepData(keepData), mMaxUlp(11), mEpsilon(std::numeric_limits<MHDFloat>::epsilon()), mBasename(fname), mPath("Polynomial/")
    {
+   }
+
+   template <typename TOp> void TesterBase<TOp>::validate(const ParameterType& param, const TestType type) const
+   {
+      assert(param.size() == 1);
+
+      // Read metadata
+      std::string filename = this->mBasename;
+
+      if(type == TestType::WEIGHTED_MATRIX)
+      {
+            filename = "weighted_" +  filename;
+      }
+      std::string ext = "_id" + std::to_string(static_cast<int>(param.at(0))) + "_meta";
+      std::string fullname = this->refRoot() + filename.insert(filename.length()-4, ext);
+      Array meta;
+      readList(meta, fullname);
+
+      assert(meta.size() == 3);
+      int specN = static_cast<int>(meta(0));
+      int physN = static_cast<int>(meta(1));
+
+      ParameterType runParam;
+      runParam.push_back(meta(2));
+
+      this->validate(specN, physN, param, type);
    }
 
    template <typename TOp> void TesterBase<TOp>::validate(const int specN, const int physN, const ParameterType& param, const TestType type) const
@@ -308,7 +339,7 @@ namespace Polynomial {
             // Check subnormal values
             else
             {
-               auto err = this->checkSubnormal(outData(i,j), refData(i,j));
+               auto err = this->checkSubnormal(outData(i,j), refData(i,j), refScale);
 
                // check error
                {
@@ -368,36 +399,24 @@ namespace Polynomial {
       return std::make_pair(isEqual, ulp);
    }
 
-   template <typename TOp> typename TesterBase<TOp>::ErrorType TesterBase<TOp>::checkSubnormal(const MHDFloat data, const MHDFloat ref) const
+   template <typename TOp> typename TesterBase<TOp>::ErrorType TesterBase<TOp>::checkSubnormal(const MHDFloat data, const MHDFloat ref, const MHDFloat scale) const
    {
       bool isEqual = false;
       double ulp = 0;
-#if 0
-      auto x = ref;
-      auto y = data;
-      if (std::abs(x) < std::abs(y))
-      {
-         std::swap(x, y);
-      }
-      auto diff = std::abs(x-y);
 
-      // epsilon subnormal
-      auto eps = std::numeric_limits<double>::denorm_min();
-
-      if(diff <= eps)
-      {
-         isEqual = true;
-      }
-
-      auto ulp = diff/eps;
-#else
-      // check that subnormal was flushed to zero
-      if (data == 0.0)
+      // check that subnormal was flushed to zero or subnormal
+      if (data == 0.0 || data < std::numeric_limits<MHDFloat>::min())
       {
          isEqual = true;
          ulp = 1;
       }
-#endif
+      else
+      {
+         auto err = checkNormal(data, ref, scale);
+         isEqual = err.first;
+         ulp = err.second;
+      }
+
       return std::make_pair(isEqual, ulp);
    }
 

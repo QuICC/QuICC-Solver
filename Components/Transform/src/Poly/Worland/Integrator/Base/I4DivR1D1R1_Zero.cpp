@@ -58,40 +58,13 @@ namespace Integrator {
 
          Internal::Matrix tOp(igrid.size(), nN);
 
-#if defined QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
-         // **************************************************
-         // Formulation without explicit grid:
-         // Operates on polynomials with l = l-1
-         int l_in = std::abs(l-1);
-         int n_in = nN + 1;
-         this->checkGridSize(n_in, l_in, igrid.size());
-
-         Internal::Matrix opA(igrid.size(), n_in);
-         wnl.compute<Internal::MHDFloat>(opA, n_in, l_in, igrid, iweights, ev::Set());
-
-         Internal::Matrix opB(igrid.size(), n_in);
-         Polynomial::Worland::r_1drWnl r_1drWnl;
-         r_1drWnl.compute<Internal::MHDFloat>(opB, n_in, l_in, igrid, Internal::Array(), ev::Set());
-
-         Internal::Matrix opC(igrid.size(), nN);
-         Polynomial::Worland::Wnl wnlB;
-         wnlB.compute<Internal::MHDFloat>(opC, nN, l, igrid, iweights, ev::Set());
-
-         tOp = (opC.transpose()*opB*opA.transpose()).transpose();
+#ifdef QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
+         using poly_t = QuICC::Polynomial::Worland::implicit_t;
 #else
-         // **************************************************
-         // Alternative formulation of operators:
-         // This version uses explicit radial factor to work on l polynomials
-
-         Internal::Matrix opA(igrid.size(), nN);
-         wnl.compute<Internal::MHDFloat>(opA, nN, l, igrid, iweights, ev::Set());
-
-         Internal::Matrix opB(igrid.size(), nN);
-         Polynomial::Worland::dWnl dWnl;
-         dWnl.compute<Internal::MHDFloat>(opB, nN, l, igrid, Internal::Array(), ev::Set());
-
-         tOp = (opA.transpose()*igrid.array().pow(-1).matrix().asDiagonal()*opB*opA.transpose()*igrid.asDiagonal()).transpose();
+         using poly_t = QuICC::Polynomial::Worland::explicit_t;
 #endif
+         Polynomial::Worland::r_1drWnl<poly_t> r_1drWnl;
+         r_1drWnl.compute<Internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
          // Multiply by Quasi-inverse
          auto a = wnl.alpha(l);

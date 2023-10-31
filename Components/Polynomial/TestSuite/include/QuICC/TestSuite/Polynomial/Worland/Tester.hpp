@@ -129,15 +129,6 @@ namespace Worland {
          case TestType::WEIGHTED_MATRIX:
             outData = this->buildMatrix(specN, physN, param, true);
             break;
-         case TestType::OTF_INNER:
-            outData = this->buildInner(specN, physN, param);
-            break;
-         case TestType::OTF_OUTER:
-            outData = this->buildOuter(specN, physN, param);
-            break;
-         case TestType::OTF_REDUCE:
-            outData = this->buildReduce(specN, physN, param);
-            break;
          default:
             throw std::logic_error("Test type not implemented");
             break;

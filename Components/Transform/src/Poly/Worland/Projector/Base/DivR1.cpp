@@ -37,7 +37,7 @@ namespace Projector {
       int nPoly = this->mspSetup->fastSize(i);
       op.resize(igrid.size(), nPoly);
       namespace ev = Polynomial::Worland::Evaluator;
-      Polynomial::Worland::r_1Wnl wnl;
+      Polynomial::Worland::r_1Wnl<QuICC::Polynomial::Worland::recurrence_t> wnl;
       wnl.compute<MHDFloat>(op, nPoly, l, igrid, Internal::Array(), ev::Set());
    }
 

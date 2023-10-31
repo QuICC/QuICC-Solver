@@ -41,48 +41,44 @@ namespace Integrator {
          Polynomial::Worland::Wnl wnl;
 
          // Internal computation uses dealiased modes
-         int nN = nPoly + 0;
+         const int extraN = 6*(!this->mcTruncQI); // I4 has 6 superdiagonals
+         int nN = nPoly + extraN;
          this->checkGridSize(nN, l, igrid.size());
 
-         Matrix tOp(igrid.size(), nN);
+         Internal::Matrix tOp(igrid.size(), nN);
 
-         wnl.compute<MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
+         wnl.compute<Internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
          MHDFloat a = static_cast<MHDFloat>(wnl.alpha(l));
          MHDFloat b = static_cast<MHDFloat>(wnl.dBeta());
          ::QuICC::SparseSM::Worland::I4 spasm(nN, nN, a, b, l);
          tOp = (spasm.mat()*tOp.transpose()).transpose();
-         op = tOp.leftCols(nPoly);
-      } else
+         op = tOp.cast<MHDFloat>().leftCols(nPoly);
+      }
+      else
       {
-         // **************************************************
-         // Formulation without explicit grid:
-         // Operates on polynomials with l = l-1
-         int l_in = std::abs(l-1);
-
          Polynomial::Worland::Wnl wnl;
 
          // Internal computation uses dealiased modes
-         int nN = nPoly + 0;
+         const int extraN = 9; // I6 has 9 superdiagonals
+         int nN = nPoly + extraN;
          this->checkGridSize(nN, l, igrid.size());
 
          Internal::Matrix tOp(igrid.size(), nN);
 
-         wnl.compute<Internal::MHDFloat>(tOp, nN, l_in, igrid, iweights, ev::Set());
+         using poly_t = QuICC::Polynomial::Worland::implicit_t;
+         Polynomial::Worland::r_1drWnl<poly_t> r_1drWnl;
+         r_1drWnl.compute<Internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
-         Internal::Matrix opA(igrid.size(), nN);
-         Polynomial::Worland::r_1drWnl r_1drWnl;
-         r_1drWnl.compute<Internal::MHDFloat>(opA, nN, l_in, igrid, Internal::Array(), ev::Set());
-
-         Internal::Matrix opB(igrid.size(), nN);
-         Polynomial::Worland::Wnl wnlB;
-         wnlB.compute<Internal::MHDFloat>(opB, nN, l, igrid, iweights, ev::Set());
-
+         // Multiply by Quasi-inverse
          auto a = wnl.alpha(l);
          auto b = wnl.dBeta();
          ::QuICC::SparseSM::Worland::I6 spasm(nN, nN, a, b, l);
-         tOp = (spasm.mat()*opB.transpose()*opA*tOp.transpose()).transpose();
+         tOp = (spasm.mat()*tOp.transpose()).transpose();
          op = tOp.cast<MHDFloat>().leftCols(nPoly);
+
+         assert(op.rows() == igrid.size());
+         assert(op.cols() == nPoly);
       }
    }
 

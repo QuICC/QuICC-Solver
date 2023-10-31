@@ -24,8 +24,6 @@ set(WorlandTests
   Wnl
   dWnl
   slaplWnl
-  r_1Wnl
-  r_1drWnl
   drWnl
   dr_1drWnl
   r_1claplhWnl
@@ -42,6 +40,57 @@ foreach(_test ${WorlandTests})
     COMMAND ${TestExe}
     KEYWORD Operator
     TYPES matrix weighted
+    ULP ${_ulp}
+  )
+endforeach()
+
+set(WorlandTestsTemplated
+  r_1Wnl:recurrence_t
+  r_1Wnl:explicit_t
+)
+quicc_set_ulp(_ulp
+  ULP 10000
+  MPULP 11
+)
+foreach(_test ${WorlandTestsTemplated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:Template
+    TYPES matrix weighted
+    ULP ${_ulp}
+  )
+endforeach()
+
+set(WorlandTestsTemplated
+  r_1drWnl:recurrence_t
+)
+quicc_set_ulp(_ulp
+  ULP 10000
+  MPULP 11
+)
+foreach(_test ${WorlandTestsTemplated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:Template
+    TYPES matrix
+    ULP ${_ulp}
+  )
+endforeach()
+
+quicc_set_ulp(_ulp
+  ULP 20000
+  MPULP 11
+)
+set(WorlandTestsTemplated
+  r_1Wnl:implicit_t
+  r_1drWnl:explicit_t
+  r_1drWnl:implicit_t
+)
+foreach(_test ${WorlandTestsTemplated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:Template
+    TYPES weighted
     ULP ${_ulp}
   )
 endforeach()

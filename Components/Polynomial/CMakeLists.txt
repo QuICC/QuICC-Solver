@@ -1,6 +1,6 @@
 # CMake setup for Polynomial component
 set(QUICC_CURRENT_COMPONENT_DIR Components/Polynomial)
-set(QUICC_CURRENT_COMPONENT_LIB ${QUICC_POLYNOMIAL_COMPONENT_LIB})
+set(QUICC_CURRENT_COMPONENT_LIB Polynomial)
 
 # Set library sources visibility
 set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
@@ -14,18 +14,19 @@ include(setup/Jacobi)
 include(setup/Legendre)
 include(setup/Worland)
 
-
 # Create component library
 add_library(${QUICC_CURRENT_COMPONENT_LIB} "")
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB} PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"  )
 
+# Components
 add_subdirectory(Bessel)
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  QuICC::Common
+  QuICC::Types
   Polynomial::Bessel
 )
 
@@ -38,12 +39,16 @@ add_dependencies(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CURRENT_COMPONENT_LIB}_u
 # Add source directory
 add_subdirectory(src)
 
+# Alias
+add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS
+  "${QUICC_CURRENT_COMPONENT_LIB}")
+
 # Testsuite
 include(setup/TestSuite)
 
 # Export info
 quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
-  COMPONENT Polynomial
+  COMPONENT ${QUICC_CURRENT_COMPONENT_LIB}
   DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/QuICC
     )

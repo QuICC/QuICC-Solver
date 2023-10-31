@@ -45,6 +45,9 @@ namespace Polynomial {
       /// Max ulp
       unsigned int ulp;
 
+      /// Test metadata IDs
+      std::vector<int> ids;
+
       /// Harmonic degree
       std::vector<double> params;
 

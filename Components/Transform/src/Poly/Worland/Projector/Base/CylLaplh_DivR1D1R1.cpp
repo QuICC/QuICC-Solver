@@ -35,7 +35,7 @@ namespace Projector {
       namespace ev = Polynomial::Worland::Evaluator;
       if(l == 0)
       {
-         Polynomial::Worland::r_1drWnl wnl;
+         Polynomial::Worland::r_1drWnl<QuICC::Polynomial::Worland::recurrence_t> wnl;
          wnl.compute<MHDFloat>(op, nPoly, 1, igrid, Internal::Array(), ev::Set());
       } else
       {

@@ -18,35 +18,59 @@
 #include "QuICC/TestSuite/Polynomial/Worland/Tester.hpp"
 #include "QuICC/Polynomial/Worland/@Operator@.hpp"
 
+#cmakedefine01 Template
+#if Template == 1
+#define OPERATOR @Operator@<@Template@>
+#define FNAME "@Operator@_@Template@.dat"
+#else
+#define OPERATOR @Operator@
+#define FNAME "@Operator@.dat"
+#endif
+#undef Template
+
 namespace currentts = ::QuICC::TestSuite::Polynomial::Worland;
 
-TEST_CASE( "Error for @Operator@ operator", "[@Operator@]" ){
+TEST_CASE( "Error for @Operator@_@Template@ operator", "[@CatchTestName@]" ){
    // Set default arguments if required
    if(currentts::args().useDefault)
    {
-      currentts::args().specN = 128;
-      currentts::args().physN = 256;
-      currentts::args().params = {0,1,2,5,20,128};
+      currentts::args().params.clear();
+      currentts::args().ids = {0,1,2,5,20,128};
    }
 
    Catch::StringMaker<double>::precision = 15;
 
-   REQUIRE( currentts::args().specN > 0 );
-   REQUIRE( currentts::args().physN > 0 );
-   REQUIRE( currentts::args().params.size() > 0 );
+   if( currentts::args().ids.size() == 0)
+   {
+      REQUIRE( currentts::args().specN > 0 );
+      REQUIRE( currentts::args().physN > 0 );
+      REQUIRE( currentts::args().params.size() > 0 );
+   }
 
    // Typedef for used operator
-   typedef ::QuICC::Polynomial::Worland::@Operator@ Operator;
+   using namespace QuICC::Polynomial::Worland;
+   typedef OPERATOR Operator;
    typedef typename currentts::Tester<Operator> Tester;
 
-   Tester tester("@Operator@.dat", currentts::args().dumpData);
+   Tester tester(FNAME, currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
 
    Tester::ParameterType params = {-1};
 
-   for(int l: currentts::args().params)
+   if(currentts::args().ids.size() > 0)
    {
-      params.at(0) = l;
-      tester.validate(currentts::args().specN, currentts::args().physN, params, currentts::args().type);
+      for(int i: currentts::args().ids)
+      {
+         params.at(0) = i;
+         tester.validate(params, currentts::args().type);
+      }
+   }
+   else
+   {
+      for(int l: currentts::args().params)
+      {
+         params.at(0) = l;
+         tester.validate(currentts::args().specN, currentts::args().physN, params, currentts::args().type);
+      }
    }
 }

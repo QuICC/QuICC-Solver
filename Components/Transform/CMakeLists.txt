@@ -30,7 +30,7 @@ include(setup/TruncateQI)
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   QuICC::Common
   ${QUICC_SPARSESM_COMPONENT_LIB}
-  ${QUICC_POLYNOMIAL_COMPONENT_LIB}
+  QuICC::Polynomial
   QuICC::Profiling
   QuICC::ViewOps
   QuICC::Memory

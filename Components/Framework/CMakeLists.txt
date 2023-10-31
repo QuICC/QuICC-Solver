@@ -33,7 +33,7 @@ target_compile_options(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
 include(cmake.d/setup/SetHdf5Typedef.cmake)
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  ${QUICC_POLYNOMIAL_COMPONENT_LIB}
+  QuICC::Polynomial
   ${QUICC_PYQUICC_COMPONENT_LIB}
   QuICC::Io
   QuICC::Common

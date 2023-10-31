@@ -12,6 +12,7 @@
 // System includes
 //
 #include <vector>
+#include <cstdint>
 
 // Project includes
 //
