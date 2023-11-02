@@ -1,0 +1,117 @@
+/**
+ * @file @Op@@Tag@.hpp.inc
+ * @brief Wrapper of the Worland @Op@ @Kind@
+ */
+#pragma once
+@Layout@
+
+// System includes
+//
+#include <vector>
+#include <complex>
+@HppHeaders@
+
+// Project includes
+//
+#include "Types/Typedefs.hpp"
+#include "QuICC/Transform/Poly/Worland/@Kind@/IWorland@Kind@.hpp"
+#include "QuICC/Transform/Poly/Worland/Tags.hpp"
+#include "View/View.hpp"
+#include "Operator/Unary.hpp"
+
+namespace QuICC {
+namespace Transform {
+namespace Poly {
+namespace Worland {
+namespace @Kind@ {
+
+using namespace QuICC::Memory;
+template <class Impl>
+class @Op@;
+
+/**
+* @brief Implementation of the Worland based @Op@ @Kind@
+*/
+template<>
+class @Op@<@Tag@>: public IWorland@Kind@
+{
+public:
+
+    /**
+     * @brief Constructor
+     */
+    @Op@() = default;
+
+    /**
+     * @brief Destructor
+     */
+    ~@Op@() = default;
+
+private:
+    /// @brief Replace base @Kind@ init
+    /// we need to be able to propagate igrid/iweights to view ctor
+    /// @param igrid
+    /// @param iweights
+    void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const final;
+
+
+    /// @brief Make operator
+    /// this is not used in the view implementations
+    /// @param op
+    /// @param igrid
+    /// @param iweights
+    /// @param i
+    void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const final;
+
+    /// @brief
+    /// @param rOut
+    /// @param in
+    void applyOperators(MatrixZ& rOut, const MatrixZ& in) const final;
+
+    /// @brief Apply ith operator
+    /// this is not used in the view implementations
+    /// @param rOut
+    /// @param i
+    /// @param in
+    void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const final;
+
+    // Uniform truncation
+    #ifdef QUICC_AL_ROW_MAJOR
+    using mods_t = View<std::complex<double>, DCCSC3DJIK>;
+    using phys_t = View<std::complex<double>, DCCSC3DJIK>;
+    using op_t = View<double, @OpAttribute@>;
+    #else
+    using mods_t = View<std::complex<double>, DCCSC3D>;
+    using phys_t = View<std::complex<double>, DCCSC3D>;
+    using op_t = View<double, @OpAttribute@JIK>;
+    #endif
+
+    /// @brief Operator backend class pointer
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<@OpInOut@>> mOp;
+
+    /// @brief Output View
+    mutable mods_t mModsView;
+
+    /// @brief Input View
+    mutable phys_t mPhysView;
+
+    /// @brief Temporary storage for flattened output
+    mutable std::vector<std::complex<double>> mModsFlat;
+
+    /// @brief Temporary storage for flattened input
+    mutable std::vector<std::complex<double>> mPhysFlat;
+
+    /// @brief Data pointers
+    mutable std::vector<std::uint32_t> mDataPointers;
+
+    /// @brief Data indices
+    mutable std::vector<std::uint32_t> mDataIndices;
+
+    @Storage@
+};
+
+} // namespace @Kind@
+} // namespace Worland
+} // namespace Poly
+} // namespace Transform
+} // namespace QuICC

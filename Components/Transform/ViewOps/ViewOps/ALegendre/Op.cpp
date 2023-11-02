@@ -63,7 +63,7 @@ Op<Tout, Tin, Top, Backend>::Op(span<const typename Top::IndexType> dimensions,
     }
     else
     {
-        static_assert("ctor for this type is not implemented yet");
+        throw std::logic_error("ctor for this type is not implemented yet");
     }
 
     std::size_t varSize = 0;

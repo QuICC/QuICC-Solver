@@ -7,9 +7,9 @@
 
 // System includes
 //
-#include <variant>
+#include <stdexcept>
 #include <type_traits>
-#include <cstdint>
+#include <variant>
 
 // Project includes
 //
@@ -38,9 +38,14 @@ namespace Memory {
    struct sparse_t {};
 
    /// @brief tag type for dense level with implicit start from zero
-   /// and the length is implicity equal to K (3rd) index
-   /// \todo template on tag index
-   struct triK_t {};
+   /// and the length is implicity equal to the full dimension minus K (3rd index)
+   /// \todo template on tag index and coeff?
+   struct step1K_t {};
+
+   /// @brief tag type for dense level with implicit start from zero
+   /// and the length is implicity equal to the full dimension minus 2*K (3rd index)
+   /// \todo template on tag index and coeff?
+   struct step2K_t {};
 
    /// @brief check if a type is a valid level type attribute
    /// @tparam T type to be checked
@@ -59,9 +64,13 @@ namespace Memory {
    template <>
    struct isLevelType<sparse_t> : std::true_type{};
 
-   /// @brief enable triK_t tag
+   /// @brief enable step1K_t tag
    template <>
-   struct isLevelType<triK_t> : std::true_type{};
+   struct isLevelType<step1K_t> : std::true_type{};
+
+   /// @brief enable step2K_t tag
+   template <>
+   struct isLevelType<step2K_t> : std::true_type{};
 
    /// @brief helper
    /// @tparam T level tag
@@ -279,11 +288,7 @@ namespace Memory {
    /// @brief generic template for default loop order, i.e. column major (leftmost index has stride 1)
    /// @tparam I
    template <std::uint32_t I>
-   struct DefaultLoopOrder
-   {
-      static_assert("default loop order not implemented for this rank");
-   };
-
+   struct DefaultLoopOrder;
 
    /// @brief specialized 1D default loop order
    template <>
@@ -452,31 +457,76 @@ namespace Memory {
    using DCCSC3DJIK = Attributes<DimLevelType<dense_t, compressed_t, sparse_t>,
       LoopOrderType<j_t, i_t, k_t>>;
 
+
+   /**
+    * @brief JW projector/integrator operator type on cpu
+    *  with uniform truncation
+    *  1D compressed array with 2D dense elements
+    *  i.e a 3D tensor (M,N,K) with fully populated layers
+    */
+   using CSL3DJIK = Attributes<DimLevelType<dense_t, dense_t, compressed_t>,
+      LoopOrderType<j_t, i_t, k_t>>;
+
+   /**
+    * @brief JW projector/integrator operator type on gpu
+    *  with uniform truncation
+    *  1D compressed array with 2D dense elements
+    *  i.e a 3D tensor (M,N,K) with fully populated layers
+    */
+   using CSL3D = Attributes<DimLevelType<dense_t, dense_t, compressed_t>>;
+
    /**
     * @brief AL projector operator type on cpu
-    *  Compressed triangular row layer
+    *  Compressed step 1 row layer
     */
-   using CTRRL3DJIK = Attributes<DimLevelType<dense_t, triK_t, compressed_t>,
+   using CS1RL3DJIK = Attributes<DimLevelType<dense_t, step1K_t, compressed_t>,
       LoopOrderType<j_t, i_t, k_t>>;
 
    /**
     * @brief AL projector operator type on gpu
-    *  Compressed triangular row layer
+    *  Compressed step 1 row layer
     */
-   using CTRRL3D = Attributes<DimLevelType<dense_t, triK_t, compressed_t>>;
+   using CS1RL3D = Attributes<DimLevelType<dense_t, step1K_t, compressed_t>>;
 
    /**
     * @brief AL projector input type on cpu
-    * Triangular column layer, with (N,K) plane a 2D CSC column major matrix
+    * Step 1 column layer, with (N,K) plane a 2D CSC column major matrix
     */
-   using TRCLCSC3D = Attributes<DimLevelType<triK_t, compressed_t, sparse_t>>;
+   using S1CLCSC3D = Attributes<DimLevelType<step1K_t, compressed_t, sparse_t>>;
 
    /**
     * @brief AL projector input type on gpu
-    * Triangular column layer, with (N,K) plane a 2D CSC column major matrix
+    * Step 1 column layer, with (N,K) plane a 2D CSC column major matrix
     */
-   using TRCLCSC3DJIK = Attributes<DimLevelType<triK_t, compressed_t, sparse_t>,
+   using S1CLCSC3DJIK = Attributes<DimLevelType<step1K_t, compressed_t, sparse_t>,
       LoopOrderType<j_t, i_t, k_t>>;
+
+   /**
+    * @brief AL projector operator type on cpu
+    *  Compressed step 2 row layer
+    */
+   using CS2RL3DJIK = Attributes<DimLevelType<dense_t, step2K_t, compressed_t>,
+      LoopOrderType<j_t, i_t, k_t>>;
+
+   /**
+    * @brief AL projector operator type on gpu
+    *  Compressed step 2 row layer
+    */
+   using CS2RL3D = Attributes<DimLevelType<dense_t, step2K_t, compressed_t>>;
+
+   /**
+    * @brief JW projector input type on cpu
+    * Step 2 column layer, with (N,K) plane a 2D CSC column major matrix
+    */
+   using S2CLCSC3D = Attributes<DimLevelType<step2K_t, compressed_t, sparse_t>>;
+
+   /**
+    * @brief JW projector input type on gpu
+    * Step 2 column layer, with (N,K) plane a 2D CSC column major matrix
+    */
+   using S2CLCSC3DJIK = Attributes<DimLevelType<step2K_t, compressed_t, sparse_t>,
+      LoopOrderType<j_t, i_t, k_t>>;
+
 
 
 } // namespace Memory

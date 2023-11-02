@@ -54,7 +54,7 @@ namespace details
         }
         else
         {
-            static_assert("batched kernel for these types is not implemented.");
+            assert(false && "batched kernel for these types is not implemented.");
         }
 
         // mats pointers
@@ -123,7 +123,7 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
         }
         else
         {
-            static_assert("backend for these types is not implemented.");
+            assert(false && "backend for these types is not implemented.");
         }
 
         // copy back to cpu for preprocessing
@@ -205,7 +205,7 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
             }
             else
             {
-                static_assert("backend for these types is not implemented.");
+                assert(false && "backend for these types is not implemented.");
             }
 
             vOffSetA[h+1] = vOffSetA[h] + M*K;
@@ -228,7 +228,7 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
     }
     else
     {
-        static_assert("backend for these types is not implemented.");
+        assert(false && "backend for these types is not implemented.");
     }
 
     const IndexType N = _N;

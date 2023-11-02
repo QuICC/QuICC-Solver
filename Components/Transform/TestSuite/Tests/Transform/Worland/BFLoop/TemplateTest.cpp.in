@@ -20,7 +20,7 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::Worland;
 
-TEST_CASE( "@Algorithm@::Error for @Operator@ backward-forward loop", "[@CatchTestName@]" ){
+TEST_CASE( "@Algorithm@::Error for @Operator@@Template@ backward-forward loop", "[@CatchTestName@]" ){
 
    // Set default arguments if required
    if(currentts::args().useDefault)

@@ -11,5 +11,6 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Projector/Base/DivR1CylLaplh_Zero.hpp"
+#include "QuICC/Transform/Wrappers/Worland/Projector/DivR1CylLaplh_ZeroviewCpu_t.hpp.inc"
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_PROJECTOR_DIVR1CYLLAPLH_ZERO_HPP

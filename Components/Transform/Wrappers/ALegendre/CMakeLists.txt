@@ -9,8 +9,8 @@ set(Kinds "Projector;Integrator")
 set(ProjectorOps "P;D1;Ll;LlD1;DivS1;DivS1Dp;LlDivS1;LlDivS1Dp")
 set(IntegratorOps "P;D1;Ll;LlD1;DivS1;DivS1Dp;LlDivS1;LlDivS1Dp;Ll2;DivLl;DivLlD1;DivLlDivS1;DivLlDivS1Dp")
 
-set(IntegratorOpAttribute "TRCLCSC3D")
-set(ProjectorOpAttribute "CTRRL3D")
+set(IntegratorOpAttribute "S1CLCSC3D")
+set(ProjectorOpAttribute "CS1RL3D")
 set(IntegratorOpInOut "mods_t, phys_t")
 set(ProjectorOpInOut "phys_t, mods_t")
 

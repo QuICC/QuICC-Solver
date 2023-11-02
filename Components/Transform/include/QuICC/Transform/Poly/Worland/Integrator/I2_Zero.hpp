@@ -12,5 +12,6 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Integrator/Base/I2_Zero.hpp"
+#include "QuICC/Transform/Wrappers/Worland/Integrator/I2_ZeroviewCpu_t.hpp.inc"
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I2_ZERO_HPP

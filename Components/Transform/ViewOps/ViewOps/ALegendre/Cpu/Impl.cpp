@@ -1,7 +1,6 @@
 
 #include <complex>
 #include <iostream>
-#include <Eigen/Core>
 
 #include "Impl.hpp"
 #include "View/View.hpp"
@@ -35,7 +34,7 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
     }
     else
     {
-        static_assert("backend for these types is not implemented.");
+        throw std::logic_error("backend for these types is not implemented.");
     }
 
     // cache populated layers
@@ -82,8 +81,13 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
         }
         else
         {
-            static_assert("backend for these types is not implemented.");
+            throw std::logic_error("backend for these types is not implemented.");
         }
+
+        // check mem bounds
+        assert(offSetA + M*K <= op.size());
+        assert(offSetB + K*N <= in.size());
+        assert(offSetC + M*N <= out.size());
 
         // set dense views
         View<typename Top::ScalarType, opSliceAtt_t> A ({op.data() + offSetA, M*K}, {M, K});

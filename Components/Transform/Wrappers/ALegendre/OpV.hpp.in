@@ -77,11 +77,11 @@ private:
     void applyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const final;
 
     #ifdef QUICC_AL_ROW_MAJOR
-    using mods_t = View<std::complex<double>, TRCLCSC3DJIK>;
+    using mods_t = View<std::complex<double>, S1CLCSC3DJIK>;
     using phys_t = View<std::complex<double>, DCCSC3DJIK>;
     using op_t = View<double, @OpAttribute@>;
     #else
-    using mods_t = View<std::complex<double>, TRCLCSC3D>;
+    using mods_t = View<std::complex<double>, S1CLCSC3D>;
     using phys_t = View<std::complex<double>, DCCSC3D>;
     using op_t = View<double, @OpAttribute@JIK>;
     #endif

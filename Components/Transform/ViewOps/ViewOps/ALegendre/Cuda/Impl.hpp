@@ -25,7 +25,7 @@ namespace Cuda {
 using namespace QuICC::Operator;
 using namespace QuICC::Memory;
 
-/// @brief Derived classes implement Associate Legendre operators.
+/// @brief Derived classes implement Associated Legendre operators.
 /// In practice it boils down to a batched matmul with each batch having different sizes.
 /// @tparam Tout differentiated modes type
 /// @tparam Tin input modes type

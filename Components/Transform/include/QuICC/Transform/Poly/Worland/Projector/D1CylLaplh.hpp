@@ -12,5 +12,6 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Projector/Base/D1CylLaplh.hpp"
+#include "QuICC/Transform/Wrappers/Worland/Projector/D1CylLaplhviewCpu_t.hpp.inc"
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_PROJECTOR_D1CYLLAPLH_HPP

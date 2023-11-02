@@ -16,27 +16,54 @@ set(_tests_templated
   Poly::P:<base_t>:integrator
   Poly::P_Zero:<base_t>:integrator
   Poly::R1_Zero:<base_t>:integrator
-  )
+  Poly::P:<viewCpu_t>:integrator
+  Poly::P_Zero:<viewCpu_t>:integrator
+  Poly::R1_Zero:<viewCpu_t>:integrator
+)
 quicc_set_ulp(_ulp
-  ULP 16 7 115 80 78 16 10 115 80 78
-  MPULP 3 2 2 2 2 3 2 2 2 2
+  ULP 16 7 115 80 78
+  MPULP 3 2 2 2 2
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
-    IDS 0 1 2 3 4 1000 1001 1002 1003 1004
+    IDS 0 1 2 3 4
   )
 endforeach()
 
+# triangular truncation tests
+set(_tests_templated
+  Poly::P:<base_t>:integrator
+  Poly::P_Zero:<base_t>:integrator
+  Poly::R1_Zero:<base_t>:integrator
+  # Poly::P:<viewCpu_t>:integrator
+  # Poly::P_Zero:<viewCpu_t>:integrator
+  # Poly::R1_Zero:<viewCpu_t>:integrator
+)
+quicc_set_ulp(_ulp
+  ULP 16 10 115 80 78
+  MPULP 3 2 2 2 2
+  )
+foreach(_test ${_tests_templated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:Template:type
+    ULPS ${_ulp}
+    IDS 1000 1001 1002 1003 1004
+  )
+endforeach()
+
+
 set(_tests_templated
   Poly::DivR1_Zero:<base_t>:integrator
-  )
+  Poly::DivR1_Zero:<viewCpu_t>:integrator
+)
 quicc_set_ulp(_ulp
   ULP 32 51 226 172 191 32 42 148 75 73
   MPULP 2 2 2 2 2 3 3 3 3 3
-  )
+)
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -49,27 +76,52 @@ endforeach()
 set(_tests_templated
   Poly::I2:<base_t>:integrator
   Poly::I2_Zero:<base_t>:integrator
-  )
+  Poly::I2:<viewCpu_t>:integrator
+  Poly::I2_Zero:<viewCpu_t>:integrator
+)
 quicc_set_ulp(_ulp
-  ULP 13 20 170 59 36 18 20 170 59 120
-  MPULP 1 4 8 4 3 2 8 26 10 5
+  ULP 13 20 170 59 36
+  MPULP 1 4 8 4 3
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
-    IDS 0 1 2 3 4 1000 1001 1002 1003 1004
+    IDS 0 1 2 3 4
   )
 endforeach()
 
+# triangular truncation tests
+set(_tests_templated
+  Poly::I2:<base_t>:integrator
+  Poly::I2_Zero:<base_t>:integrator
+  # Poly::I2:<viewCpu_t>:integrator
+  # Poly::I2_Zero:<viewCpu_t>:integrator
+)
+quicc_set_ulp(_ulp
+  ULP 18 20 170 59 120
+  MPULP 2 8 26 10 5
+  )
+foreach(_test ${_tests_templated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:Template:type
+    ULPS ${_ulp}
+    IDS 1000 1001 1002 1003 1004
+  )
+endforeach()
+
+
+
 set(_tests_templated
   Poly::I2DivR1_Zero:<base_t>:integrator
-  )
+  Poly::I2DivR1_Zero:<viewCpu_t>:integrator
+)
 quicc_set_ulp(_ulp
   ULP 40 47 145 73 86 41 206 191 41 51
   MPULP 2 3 14 4 3 1 10 11 2 3
-  )
+)
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -81,11 +133,12 @@ endforeach()
 
 set(_tests_templated
   Poly::I4DivR1_Zero:<base_t>:integrator
-  )
+  Poly::I4DivR1_Zero:<viewCpu_t>:integrator
+)
 quicc_set_ulp(_ulp
   ULP 77 127 666 55 91 74 615 453 48 70
   MPULP 2 11 121 9 4 2 127 93 4 6
-  )
+)
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -97,11 +150,12 @@ endforeach()
 
 set(_tests_templated
   Poly::I6DivR1_Zero:<base_t>:integrator
-  )
+  Poly::I6DivR1_Zero:<viewCpu_t>:integrator
+)
 quicc_set_ulp(_ulp
   ULP 53 160 1578 76 51 48 846 1258 66 104
   MPULP 2 11 147 6 8 2 165 92 2 10
-  )
+)
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -113,11 +167,12 @@ endforeach()
 
 set(_tests_templated
   Poly::DivR1D1R1_Zero:<base_t>:integrator
-  )
+  Poly::DivR1D1R1_Zero:<viewCpu_t>:integrator
+)
 quicc_set_ulp(_ulp
   ULP 435 94 87 88 91 605 97 88 99 95
   MPULP 6 2 1 1 1 9 2 1 2 1
-  )
+)
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -129,11 +184,12 @@ endforeach()
 
 set(_tests_templated
   Poly::I2DivR1D1R1_Zero:<base_t>:integrator
-  )
+  Poly::I2DivR1D1R1_Zero:<viewCpu_t>:integrator
+)
 quicc_set_ulp(_ulp
   ULP 30 383 1340 1104 1196 32 214 1017 374 925
   MPULP 2 17 64 42 40 2 10 44 31 24
-  )
+)
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -145,11 +201,12 @@ endforeach()
 
 set(_tests_templated
   Poly::I4DivR1D1R1_Zero:<base_t>:integrator
-  )
+  Poly::I4DivR1D1R1_Zero:<viewCpu_t>:integrator
+)
 quicc_set_ulp(_ulp
   ULP 73 1262 10831 2375 2005 73 699 6655 1747 2191
   MPULP 2 79 464 121 55 2 58 328 49 51
-  )
+)
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -165,19 +222,39 @@ endforeach()
 
 set(_tests_templated
   Poly::P:<base_t>:integrator
-  )
+  Poly::P:<viewCpu_t>:integrator
+)
 quicc_set_ulp(_ulp
-  ULP 111 346 1331 2240 12000 111 346 1331 3500 12000
-  MPULP 8 20 12 18 20 2 2 3 4 6
+  ULP 111 346 1331 2240 12000
+  MPULP 8 20 12 18 20
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
-    IDS 104 105 106 107 108 1104 1105 1106 1107 1108
+    IDS 104 105 106 107 108
   )
 endforeach()
+
+# triangular truncation
+set(_tests_templated
+  Poly::P:<base_t>:integrator
+  # Poly::P:<viewCpu_t>:integrator
+)
+quicc_set_ulp(_ulp
+  ULP 111 346 1331 3500 12000
+  MPULP 2 2 3 4 6
+  )
+foreach(_test ${_tests_templated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:Template:type
+    ULPS ${_ulp}
+    IDS 1104 1105 1106 1107 1108
+  )
+endforeach()
+
 
 set(_tests_templated
   Poly::I2:<base_t>:integrator
@@ -353,16 +430,17 @@ endforeach()
 # Split integrator tests
 
 set(_split_tests_templated
-    Poly::P:<base_t>:integrator
+  Poly::P:<base_t>:integrator
+  Poly::P:<viewCpu_t>:integrator
 )
 
 foreach(_test ${_split_tests_templated})
-    quicc_add_test(${_test}
-        COMMAND ${TestExe}
-        KEYWORD Algorithm::Operator:Template:type
-        IDS  104 104 108 108 108 108 108 108
-        ULPS 120 120 13000 11000 11000 12000 11000 11000
-        # node:rank, node*12:rank, node*36:rank
-        SPLITS 4:0 8:0 8:0 96:0 288:0 256:0 3072:0 9216:0
-    )
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:Template:type
+    IDS  104 104 108 108 108 108 108 108
+    ULPS 120 120 13000 11000 11000 12000 11000 11000
+    # node:rank, node*12:rank, node*36:rank
+    SPLITS 4:0 8:0 8:0 96:0 288:0 256:0 3072:0 9216:0
+  )
 endforeach()

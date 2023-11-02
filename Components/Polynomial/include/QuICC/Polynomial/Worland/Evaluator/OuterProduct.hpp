@@ -6,21 +6,12 @@
 #ifndef QUICC_POLYNOMIAL_WORLAND_EVALUATOR_OUTERPRODUCT_HPP
 #define QUICC_POLYNOMIAL_WORLAND_EVALUATOR_OUTERPRODUCT_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "Types/Internal/BasicTypes.hpp"
+#include "Types/Internal/Casts.hpp"
 
 namespace QuICC {
 

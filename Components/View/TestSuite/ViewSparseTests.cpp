@@ -173,7 +173,7 @@ TEST_CASE("ViewThreeDimDtrClColMaj", "[ViewThreeDimDtrClColMaj]")
 
     // Akin full AL op
     // Dense triangular column/layer
-    using DTRCL3D = Attributes<DimLevelType<triK_t, dense_t, dense_t>>;
+    using DTRCL3D = Attributes<DimLevelType<step1K_t, dense_t, dense_t>>;
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {}, {}}};
@@ -198,7 +198,7 @@ TEST_CASE("ViewThreeDimDtrClColMaj", "[ViewThreeDimDtrClColMaj]")
     CHECK_THROWS(fullData[2+M*1+M*N*1] == someView(2, 1, 1));
 }
 
-TEST_CASE("ViewThreeDim Compressed triangular Column Layer ColMaj", "[ViewThreeDimCtrClColMaj]")
+TEST_CASE("ViewThreeDim Compressed step 1 Column Layer ColMaj", "[ViewThreeDimCtrClColMaj]")
 {
     using namespace QuICC::Memory;
 
@@ -224,7 +224,7 @@ TEST_CASE("ViewThreeDim Compressed triangular Column Layer ColMaj", "[ViewThreeD
 
     // Akin distributed AL op
     // Dense triangular column, dense row, compressed triangular layer
-    using CTRCL3D = Attributes<DimLevelType<triK_t, dense_t, compressed_t>>;
+    using CTRCL3D = Attributes<DimLevelType<step1K_t, dense_t, compressed_t>>;
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {0,2}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {}, {0,3}}};
@@ -248,7 +248,7 @@ TEST_CASE("ViewThreeDim Compressed triangular Column Layer ColMaj", "[ViewThreeD
     CHECK_THROWS(fullData[2+M*1+M*N*1] == someView(2, 1, 1));
 }
 
-TEST_CASE("ViewThreeDim Compressed triangular Column Layer, Row Column Layer layout",
+TEST_CASE("ViewThreeDim Compressed step 1 Column Layer, Row Column Layer layout",
     "[ViewThreeDimCtrClJIK]")
 {
     using namespace QuICC::Memory;
@@ -285,7 +285,7 @@ TEST_CASE("ViewThreeDim Compressed triangular Column Layer, Row Column Layer lay
     // Akin distributed AL op
     // Dense triangular column, dense row, compressed triangular layer
     // row, column, layer layout in memory
-    using CTRCL3D = DimLevelType<triK_t, dense_t, compressed_t>;
+    using CTRCL3D = DimLevelType<step1K_t, dense_t, compressed_t>;
     using JIK = LoopOrderType<j_t, i_t, k_t>;
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {0,2}}};
@@ -310,7 +310,7 @@ TEST_CASE("ViewThreeDim Compressed triangular Column Layer, Row Column Layer lay
     CHECK_THROWS(fullData[2*N+1+M*N*1] == someView(2, 1, 1));
 }
 
-TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer ColMaj ", "[ViewThreeDimCtrRlColMaj]")
+TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer ColMaj ", "[ViewThreeDimCtrRlColMaj]")
 {
     using namespace QuICC::Memory;
 
@@ -347,7 +347,7 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer ColMaj ", 
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {0,2}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {}, {0,3}}};
-    View<double, CTRRL3D> someView (data, dimensions, pointers, indices);
+    View<double, CS1RL3D> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 3);
     CHECK(someView.dims()[0] == M);
@@ -368,7 +368,7 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer ColMaj ", 
     CHECK_THROWS(fullData[2+M*1+M*N*1] == someView(1, 1, 1));
 }
 
-TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer, Row Column Layer layout ",
+TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column Layer layout ",
     "[ViewThreeDimCtrRlJIK]")
 {
     using namespace QuICC::Memory;
@@ -398,7 +398,7 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer, Row Colum
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {0,2}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {}, {0,3}}};
-    View<double, CTRRL3DJIK> someView (data, dimensions, pointers, indices);
+    View<double, CS1RL3DJIK> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 3);
     CHECK(someView.dims()[0] == M);
@@ -420,7 +420,7 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer, Row Colum
     CHECK_THROWS(fullData[1*N+1+M*N*1] == someView(1, 1, 1));
 }
 
-TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer, Row Column Layer layout #2",
+TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column Layer layout #2",
     "[ViewThreeDimCtrRlJIK2]")
 {
     using namespace QuICC::Memory;
@@ -450,7 +450,7 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed triangular row/layer, Row Colum
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {0,2}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {}, {1,3}}};
-    View<double, CTRRL3DJIK> someView (data, dimensions, pointers, indices);
+    View<double, CS1RL3DJIK> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 3);
     CHECK(someView.dims()[0] == M);
@@ -666,14 +666,68 @@ TEST_CASE("ViewThreeDim Dense Column/Row compressed layer ColMaj", "[ViewThreeDi
                                         13,14,15,16};
 
 
-    // Akin distributed AL projector output
+    // Akin distributed JW projector operator
     // 1D compressed array with 2D dense elements
     // i.e a 3D tensor (M,N,K) with fully populated layers
-    using CSL3D = Attributes<DimLevelType<dense_t, dense_t, compressed_t>>;
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {0,2}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {}, {0,3}}};
     View<double, CSL3D> someView (data, dimensions, pointers, indices);
+
+    CHECK(someView.rank() == 3);
+    CHECK(someView.dims()[0] == M);
+    CHECK(someView.dims()[1] == N);
+    CHECK(someView.dims()[2] == K);
+
+    for (std::size_t l = 0; l < S; ++l)
+    {
+        CHECK(data[l] == someView.data()[l]);
+    }
+
+    CHECK(fullData[0] == someView(0, 0, 0));
+    CHECK(fullData[2] == someView(2, 0, 0));
+    CHECK(fullData[1+M*1+0] == someView(1, 1, 0));
+    CHECK(fullData[2+M*1+M*N*3] == someView(2, 1, 3));
+
+    CHECK_THROWS(fullData[0+M*1+M*N*1] == someView(0, 1, 1));
+}
+
+TEST_CASE("ViewThreeDim Dense Column/Row compressed layer Row Major", "[ViewThreeDimCsl3DRowMaj]")
+{
+    using namespace QuICC::Memory;
+
+    constexpr size_t M = 4;
+    constexpr size_t N = 2;
+    constexpr size_t K = 4;
+    constexpr size_t SF = M*N*K;
+    std::array<double, SF> fullData = {1,2,3,4,
+                                       5,6,7,8,
+                                         0,0,0,0,
+                                         0,0,0,0,
+                                           0,0,0,0,
+                                           0,0,0,0,
+                                             9,10,11,12,
+                                             13,14,15,16};
+
+
+    constexpr size_t S = M*N*2;
+    std::array<double, S> data = {1,5,
+                                  2,6,
+                                  3,7,
+                                  4,8,
+                                        9,13,
+                                        10,14,
+                                        11,15,
+                                        12,16};
+
+
+    // Akin distributed JW projector operator
+    // 1D compressed array with 2D dense elements
+    // i.e a 3D tensor (M,N,K) with fully populated layers
+    std::array<std::uint32_t, 3> dimensions {M, N, K};
+    std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {}, {0,2}}};
+    std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {}, {0,3}}};
+    View<double, CSL3DJIK> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 3);
     CHECK(someView.dims()[0] == M);
@@ -721,11 +775,11 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane ColMaj", "[ViewT
 
 
     // Akin distributed AL projector input on cpu
-    // Triangular column layer, with (N,K) plane a 2D CSC column major matrix
+    // Step 1 column layer, with (N,K) plane a 2D CSC column major matrix
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {0,2,2,2,3}, {}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {0,2,0}, {}}};
-    View<double, TRCLCSC3D> someView (data, dimensions, pointers, indices);
+    View<double, S1CLCSC3D> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 3);
     CHECK(someView.dims()[0] == M);
@@ -780,11 +834,11 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane JIK", "[ViewThre
 
 
     // Akin distributed AL projector input on cpu
-    // Triangular column layer, with (N,K) plane a 2D CSC column major matrix
+    // Step 1 column layer, with (N,K) plane a 2D CSC column major matrix
     std::array<std::uint32_t, 3> dimensions {M, N, K};
     std::array<std::vector<std::uint32_t>, 3> pointers = {{{}, {0,2,2,2,3}, {}}};
     std::array<std::vector<std::uint32_t>, 3> indices = {{{}, {0,2,0}, {}}};
-    View<double, TRCLCSC3DJIK> someView (data, dimensions, pointers, indices);
+    View<double, S1CLCSC3DJIK> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 3);
     CHECK(someView.dims()[0] == M);

@@ -12,5 +12,6 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Integrator/Base/P.hpp"
+#include "QuICC/Transform/Wrappers/Worland/Integrator/PviewCpu_t.hpp.inc"
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_P_HPP
