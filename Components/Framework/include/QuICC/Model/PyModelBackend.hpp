@@ -6,18 +6,12 @@
 #ifndef QUICC_MODEL_PYMODELBACKEND_HPP
 #define QUICC_MODEL_PYMODELBACKEND_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //

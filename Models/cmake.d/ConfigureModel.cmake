@@ -58,7 +58,7 @@ function(quicc_add_model target)
     string(TOUPPER "QUICC_MODEL_${modName}_${type}_BACKEND" _modBackend)
     quicc_create_option(
       NAME ${_modBackend}
-      OPTS "Python" "CPP"
+      OPTS "CPP" "Python"
       LABEL "Backend used for model definition"
       )
     if(${_modBackend} STREQUAL "CPP")

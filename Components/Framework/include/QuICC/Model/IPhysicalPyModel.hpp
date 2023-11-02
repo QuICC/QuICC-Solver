@@ -6,22 +6,13 @@
 #ifndef QUICC_MODEL_IPHYSICALPYMODEL_HPP
 #define QUICC_MODEL_IPHYSICALPYMODEL_HPP
 
-// First includes
-//
-#include "QuICC/PyQuICC/SystemHeader.hpp"
-
-// Configuration includes
-//
-
 // System includes
 //
+#include "QuICC/PyQuICC/SystemHeader.hpp"
 #include <string>
 #include <vector>
 #include <set>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //

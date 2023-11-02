@@ -33,3 +33,7 @@ cmake-build-debug/
 # Python bytecode #
 ###################
 *.pyc
+
+# Build directory #
+###################
+build

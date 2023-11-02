@@ -79,6 +79,8 @@ namespace Timestep {
          virtual void buildSolverMatrix(typename TimestepSolverCoordinator<TSolver>::SharedComplexSolverType spSolver, Equations::SharedIEquation spEq, FieldComponents::Spectral::Id comp, const int idx);
 
       private:
+         using Solver::SparseLinearCoordinatorBase<TSolver>::init;
+
          /**
           * @brief Current timestep
           */

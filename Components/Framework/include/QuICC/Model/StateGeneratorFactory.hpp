@@ -6,16 +6,7 @@
 #ifndef QUICC_STATEGENERATORFACTORY_HPP
 #define QUICC_STATEGENERATORFACTORY_HPP
 
-// First include
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
