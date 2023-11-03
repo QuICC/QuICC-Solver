@@ -7,6 +7,7 @@
 
 // System includes
 //
+#include <cstdint>
 #include <stdexcept>
 #include <type_traits>
 #include <variant>
