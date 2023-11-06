@@ -34,6 +34,7 @@ IncludeCategories:
     Priority:        -1
     SortPriority:    -1
 IndentWidth: 3
+InsertBraces: true
 MaxEmptyLinesToKeep: 2
 NamespaceIndentation: None
 FixNamespaceComments: true
