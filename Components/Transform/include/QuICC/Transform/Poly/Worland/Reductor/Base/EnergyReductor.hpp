@@ -37,7 +37,8 @@ namespace Reductor {
    /**
     * @brief Interface for a Worland based energy operator
     */
-   template <typename T> class EnergyReductor: public T
+   template <typename T>
+   class EnergyReductor: public T
    {
       public:
          /**

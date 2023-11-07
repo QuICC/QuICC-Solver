@@ -29,7 +29,7 @@ if(TARGET QuICC::Cuda)
     )
 endif()
 
-if(QUICC_USE_KOKKOS_CUDA)
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
     list(APPEND _tests_templated
         Poly::P:<kokkos_t>:projector
         Poly::D1:<kokkos_t>:projector
@@ -63,7 +63,7 @@ if(TARGET QuICC::Cuda)
     )
 endif()
 
-if(QUICC_USE_KOKKOS_CUDA)
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
     list(APPEND _tests_templated
         Poly::DivS1:<kokkos_t>:projector
         Poly::DivS1Dp:<kokkos_t>:projector
@@ -96,7 +96,7 @@ if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
     )
 endif()
 
-if(QUICC_USE_KOKKOS_CUDA)
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
     list(APPEND _tests_templated
         Poly::P:<kokkos_t>:projector
     )

@@ -53,7 +53,7 @@ private:
     /// we need to be able to propagate igrid/iweights to view ctor
     /// @param igrid
     /// @param iweights
-    void initOperators(const OpArray& igrid, const OpArray& iweights) const final;
+    void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const final;
 
 
     /// @brief Make operator
@@ -62,12 +62,12 @@ private:
     /// @param igrid
     /// @param iweights
     /// @param i
-    void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const final;
+    void makeOperator(QuICC::Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const final;
 
     /// @brief
     /// @param rOut
     /// @param in
-    void applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const final;
+    void applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in) const final;
 
     /// @brief Apply ith operator
     /// this is not used in the view implementations

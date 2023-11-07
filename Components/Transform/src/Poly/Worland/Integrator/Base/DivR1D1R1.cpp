@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Integrator/DivR1D1R1.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Integrator/DivR1D1R1.hpp"
 #include "QuICC/Polynomial/Worland/r_1drWnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/InnerProduct.hpp"
@@ -37,10 +31,6 @@ namespace Integrator {
    DivR1D1R1::DivR1D1R1()
    {
       this->setProfileTag();
-   }
-
-   DivR1D1R1::~DivR1D1R1()
-   {
    }
 
    void DivR1D1R1::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const

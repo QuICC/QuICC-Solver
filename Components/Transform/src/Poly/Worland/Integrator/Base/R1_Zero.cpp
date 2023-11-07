@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland R1_Zero integrator
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

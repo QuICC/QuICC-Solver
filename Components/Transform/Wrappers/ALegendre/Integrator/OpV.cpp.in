@@ -27,7 +27,7 @@ namespace ALegendre {
 namespace @Kind@ {
 
 
-void @Op@<@Tag@>::initOperators(const OpArray& igrid, const OpArray& iweights) const
+void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
 {
     Profiler::RegionFixture<3> fix("@Op@<@Tag@>::initOperators");
 
@@ -61,7 +61,7 @@ void @Op@<@Tag@>::initOperators(const OpArray& igrid, const OpArray& iweights) c
     mOp = std::make_unique<derived_t>(dimensions, layers, mem);
     derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
     auto opView = derivedOp.getOp();
-    builder<op_t, Polynomial::ALegendre::@PolyBuilder@, OpArray::Scalar, @Diff@>(opView, igrid, iweights);
+    builder<op_t, Polynomial::ALegendre::@PolyBuilder@, Internal::Array::Scalar, @Diff@>(opView, igrid, iweights);
 
     ///\todo move view setups to init
 
@@ -117,7 +117,7 @@ void @Op@<@Tag@>::initOperators(const OpArray& igrid, const OpArray& iweights) c
     @SetDataViews@
 }
 
-void @Op@<@Tag@>::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
+void @Op@<@Tag@>::applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in) const
 {
     Profiler::RegionFixture<2> fix("@Op@<@Tag@>::applyOperators");
 
@@ -198,7 +198,7 @@ void @Op@<@Tag@>::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
     }
 }
 
-void @Op@<@Tag@>::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
+void @Op@<@Tag@>::makeOperator(QuICC::Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
 {
     throw std::logic_error("view AL operator should never call this");
 }

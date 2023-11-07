@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland 1/R1 D R1 integrator but 0 mode is I4 P integrator
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

@@ -22,7 +22,7 @@ namespace ALegendre {
 namespace Projector {
 
 
-   void DivS1D1S1<base_t>::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
+   void DivS1D1S1<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       throw std::logic_error("Operator is not implemented!");
    }

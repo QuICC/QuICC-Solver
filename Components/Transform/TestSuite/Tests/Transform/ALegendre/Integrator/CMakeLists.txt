@@ -47,7 +47,7 @@ if(TARGET QuICC::Cuda)
     )
 endif()
 
-if(QUICC_USE_KOKKOS_CUDA)
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
     list(APPEND _tests_templated
         Poly::DivLl:<kokkos_t>:integrator
         Poly::DivS1Dp:<kokkos_t>:integrator
@@ -76,7 +76,7 @@ set(_tests_templated
     Poly::Ll2:<base_t>:integrator
 )
 
-if(QUICC_USE_KOKKOS_CUDA)
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
     list(APPEND _tests_templated
         Poly::Ll2:<kokkos_t>:integrator
     )
@@ -108,12 +108,13 @@ if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
     )
 endif()
 
-if(QUICC_USE_KOKKOS_CUDA)
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
     list(APPEND _tests_templated
         Poly::P:<kokkos_t>:integrator
     )
 endif()
 
+# Special integrator tests
 foreach(_test ${_tests_templated})
     quicc_add_test(${_test}
         COMMAND ${TestExe}

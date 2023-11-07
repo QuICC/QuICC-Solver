@@ -32,10 +32,6 @@ namespace Worland {
 
 namespace Integrator {
 
-   I4DivR1D1R1_I2<base_t>::I4DivR1D1R1_I2()
-   {
-   }
-
    void I4DivR1D1R1_I2<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);

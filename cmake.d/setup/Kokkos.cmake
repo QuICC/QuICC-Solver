@@ -12,9 +12,10 @@
 #
 
 option(QUICC_USE_KOKKOS "Enable Kokkos" OFF)
-
 include(CMakeDependentOption)
 cmake_dependent_option(QUICC_USE_KOKKOS_CUDA "Enable CUDA backend for Kokkos" OFF
+    "QUICC_USE_KOKKOS" OFF)
+cmake_dependent_option(QUICC_USE_KOKKOS_HIP "Enable HIP backend for Kokkos" OFF
     "QUICC_USE_KOKKOS" OFF)
 cmake_dependent_option(QUICC_USE_KOKKOS_CUDAUVM "Kokkos use as default memory space CUDAUVM" OFF
     "QUICC_USE_KOKKOS;QUICC_USE_KOKKOS_CUDA" OFF)
@@ -100,7 +101,6 @@ if(QUICC_USE_KOKKOS)
             )
         endif()
         message(VERBOSE "Kokkos CUDA Enabled = ${Kokkos_ENABLE_CUDA}")
-
         kokkos_check(OPTIONS CUDA_LAMBDA)
 
         # get cuda flags from the wrapper
@@ -122,6 +122,7 @@ if(QUICC_USE_KOKKOS)
         include(StripTarget)
         strip_target(${_KK_TARGET} LANGUAGE CUDA)
 
+
     else()
         string(FIND "${CMAKE_CXX_FLAGS}" "${_openmp}" _pos)
         if(_pos EQUAL -1)
@@ -130,10 +131,12 @@ if(QUICC_USE_KOKKOS)
 
         # strip target
         include(StripTarget)
-        strip_target(${_KK_TARGET} LANGUAGE CXX)
-
+        if(QUICC_USE_KOKKOS_HIP)
+            strip_target(${_KK_TARGET} LANGUAGE HIP)
+        else()
+            strip_target(${_KK_TARGET} LANGUAGE CXX)
+        endif()
     endif()
-
 
     get_target_property(Kokkos_INTERFACE_LINK_LIBRARIES ${_KK_TARGET} INTERFACE_LINK_LIBRARIES)
     message(DEBUG "Kokkos_INTERFACE_LINK_LIBRARIES: ${Kokkos_INTERFACE_LINK_LIBRARIES}")
@@ -154,7 +157,9 @@ if(QUICC_USE_KOKKOS)
     if(QUICC_USE_KOKKOS_CUDA)
         target_compile_definitions(QuICC::Kokkos INTERFACE QUICC_USE_KOKKOS_CUDA)
     endif()
-
+    if(QUICC_USE_KOKKOS_HIP)
+        target_compile_definitions(QuICC::Kokkos INTERFACE QUICC_USE_KOKKOS_HIP)
+    endif()
 
     list(POP_BACK CMAKE_MESSAGE_INDENT)
 

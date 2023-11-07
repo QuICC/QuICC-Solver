@@ -14,8 +14,6 @@
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "Profiler/Interface.hpp"
 
-#include "QuICC/Transform/Poly/KokkosUtils.hpp"
-
 namespace QuICC {
 
 namespace Transform {
@@ -38,7 +36,7 @@ namespace Projector {
       return this->mspSetup->blockSize();
    }
 
-   void KokkosIALegendreProjector::initOperators(const OpArray& igrid, const OpArray& iweights) const
+   void KokkosIALegendreProjector::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       // Initit specialized data for operators
       this->initSpecial();
@@ -65,6 +63,7 @@ namespace Projector {
          // Build operator
          Matrix op;
          this->makeOperator(op, igrid, iweights, i);
+         auto transpose = op.transpose();
          add_contribution_to_view_right(vmOpsHost, scan[i], op);
       }
 
@@ -72,7 +71,7 @@ namespace Projector {
    }
 
    void KokkosIALegendreProjector::applyOperators(
-      OpMatrixZ &rOut, const OpMatrixZ &in) const
+      MatrixZ &rOut, const MatrixZ &in) const
    {
       Profiler::RegionFixture<3> fix("KokkosIALegendreProjector::applyOperators");
 

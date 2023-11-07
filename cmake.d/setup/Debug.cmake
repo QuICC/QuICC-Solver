@@ -25,7 +25,6 @@ else(QUICC_DEBUG)
    add_compile_definitions("QUICC_NO_DEBUG")
 endif(QUICC_DEBUG)
 
-
 ###################################################
 #--------------- STORAGE PROFILING ---------------#
 ###################################################

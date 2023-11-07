@@ -34,7 +34,7 @@ namespace Projector {
    {
    }
 
-   void IALegendreProjector::initOperators(const OpArray& igrid, const OpArray& iweights) const
+   void IALegendreProjector::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       // Initit specialized data for operators
       this->initSpecial();
@@ -53,7 +53,7 @@ namespace Projector {
       }
    }
 
-   void IALegendreProjector::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
+   void IALegendreProjector::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreProjector::applyOperators");
 

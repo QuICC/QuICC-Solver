@@ -45,4 +45,9 @@ add_subdirectory(Integrator)
 add_subdirectory(Reductor)
 add_subdirectory(BFLoop)
 
+if(QUICC_USE_KOKKOS)
+  target_link_libraries(${TestExe} QuICC::Kokkos)
+  quicc_fix_target_sources_kokkos(${TestExe})
+endif()
+
 list(POP_BACK CMAKE_MESSAGE_INDENT)

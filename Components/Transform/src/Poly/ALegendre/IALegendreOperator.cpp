@@ -32,7 +32,7 @@ namespace ALegendre {
    {
    }
 
-   void IALegendreOperator::init(SharedTransformSetup spSetup, const OpArray& igrid, const OpArray& iweights) const
+   void IALegendreOperator::init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       // Store the shared pointer to setup object
       this->mspSetup = std::dynamic_pointer_cast<IALegendreOperator::SetupType>(spSetup);
@@ -49,21 +49,21 @@ namespace ALegendre {
       throw std::logic_error("Unused interface");
    }
 
-   void IALegendreOperator::transform(OpMatrixZ& rOut, const OpMatrixZ& in) const
+   void IALegendreOperator::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreOperator::transformZ");
       assert(this->isInitialized());
       this->applyOperators(rOut, in);
    }
 
-   void IALegendreOperator::transform(OpMatrix& rOut, const OpMatrixZ& in) const
+   void IALegendreOperator::transform(Matrix& rOut, const MatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreOperator::transform");
       assert(this->isInitialized());
       throw std::logic_error("Data is not compatible with ALegendre operator");
    }
 
-   void IALegendreOperator::applyOperators(OpMatrixZ&, const OpMatrixZ&) const
+   void IALegendreOperator::applyOperators(MatrixZ&, const MatrixZ&) const
    {
       throw std::logic_error("Data is not compatible with ALegendre operator");
    }

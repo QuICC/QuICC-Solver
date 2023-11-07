@@ -10,6 +10,12 @@ set(_tests
   Poly::P:<base_t>:projector
   Poly::P:<viewCpu_t>:projector
 )
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests
+        Poly::P:<kokkos_t>:projector
+    )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 8 94 55 60
   MPULP 1 1 2 1
@@ -22,6 +28,7 @@ foreach(_test ${_tests})
     IDS 0 1 2 3
   )
 endforeach()
+
 
 # triangular truncation
 set(_tests
@@ -41,6 +48,7 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+
 # \todo DivR1 test missing
 
 set(_tests
@@ -57,6 +65,17 @@ set(_tests
   Poly::DivR1D1R1_Zero:<viewCpu_t>:projector
   Poly::SphLapl:<viewCpu_t>:projector
 )
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+list(APPEND _tests
+  Poly::D1:<kokkos_t>:projector
+  Poly::D1R1:<kokkos_t>:projector
+  Poly::DivR1_Zero:<kokkos_t>:projector
+  Poly::DivR1D1R1:<kokkos_t>:projector
+  Poly::DivR1D1R1_Zero:<kokkos_t>:projector
+  Poly::SphLapl:<kokkos_t>:projector
+)
+endif()
+
 quicc_set_ulp(_ulp
   ULP 9 60 49 51
   MPULP 1 1 2 2
@@ -128,6 +147,31 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    set(_tests
+      Poly::CylLaplh:<kokkos_t>:projector
+      Poly::CylLaplh_DivR1D1R1:<kokkos_t>:projector
+      Poly::D1CylLaplh:<kokkos_t>:projector
+      Poly::D1_P:<kokkos_t>:projector
+      Poly::D1CylLaplh_D1DivR1D1R1:<kokkos_t>:projector
+      Poly::DivR1CylLaplh_Zero:<kokkos_t>:projector
+    )
+quicc_set_ulp(_ulp
+  ULP 1 1 1 1
+  MPULP 1 1 1 1
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:Template:type
+    ULPS ${_ulp}
+    IDS 0 1 2 3
+    DISABLED ON
+  )
+endforeach()
+endif()
+
+
 ######################
 # FFT based algorithm
 ######################
@@ -194,12 +238,18 @@ endforeach()
 
 # Split projector tests
 
-set(_split_tests_templated
+set(_split_tests
   Poly::P:<base_t>:projector
   Poly::P:<viewCpu_t>:projector
 )
 
-foreach(_test ${_split_tests_templated})
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _split_tests
+        Poly::P:<kokkos_t>:projector
+        )
+endif()
+
+foreach(_test ${_split_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type

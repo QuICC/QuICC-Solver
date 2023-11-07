@@ -11,7 +11,6 @@
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/DivLl.hpp"
 #include "QuICC/Polynomial/ALegendre/Plm.hpp"
 
-#include "QuICC/Transform/Poly/KokkosUtils.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 /* #include <type_traits> */
 
@@ -25,8 +24,8 @@ namespace ALegendre {
 
 namespace Integrator {
 
-   void DivLl<kokkos_t>::makeOperator(OpMatrix &op,
-      const OpArray &igrid, const OpArray &iweights, const int i) const {
+   void DivLl<kokkos_t>::makeOperator(Matrix &op,
+      const Internal::Array &igrid, const Internal::Array &iweights, const int i) const {
        P<kokkos_t>::makeOperator(op, igrid, iweights, i);
        op = op * this->mDivLl.bottomRows(op.cols()).asDiagonal();
    }

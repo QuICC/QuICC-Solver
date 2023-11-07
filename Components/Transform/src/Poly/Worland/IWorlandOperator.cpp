@@ -5,22 +5,13 @@
 
 // System includes
 //
-#include <cassert>
 #include <stdexcept>
-
-// Debug includes
-//
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
 
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 

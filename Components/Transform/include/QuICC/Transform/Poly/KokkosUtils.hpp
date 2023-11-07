@@ -6,15 +6,14 @@
 #ifndef QUICC_KOKKOS_UTILS_HPP
 #define QUICC_KOKKOS_UTILS_HPP
 
-// Configuration includes
+// System includes
 //
 
-// System includes
+// Project includes
 //
 
 #include "KokkosTypedefs.hpp"
 #include<KokkosBlas3_gemm.hpp>
-#include "QuICC/Transform/Poly/ALegendre/KokkosIALegendreOperatorTypes.hpp"
 
 namespace QuICC {
 
@@ -72,6 +71,30 @@ KOKKOS_INLINE_FUNCTION Integer binary_search(
 
    return -1;
 }
+
+template <typename V> void colwiseSum(const V& view, const V& out)
+{
+   auto rows = view.extent(0);
+   auto cols = view.extent(1);
+
+   using team_policy = Kokkos::TeamPolicy<>;
+   using team_member = typename team_policy::member_type;
+
+   Kokkos::parallel_for(
+      "colwiseSum", team_policy(cols, Kokkos::AUTO),
+      KOKKOS_LAMBDA(const team_member& teamMember) {
+          int col = teamMember.league_rank();
+          double colSum = 0;
+          Kokkos::parallel_reduce(
+             Kokkos::TeamThreadRange(teamMember, rows),
+             [=](int row, double& innerUpdate)
+             { innerUpdate += view(row, col); },
+             colSum);
+
+          out(col, 0) = colSum;
+      });
+}
+
 
 template <typename V, typename E>
 void DeepCopyEigen(const V &view, const Eigen::DenseBase<E> &matrix) {
@@ -140,8 +163,7 @@ void DeepCopyEigen(
          auto block = local_col / col_size;
          auto col = local_col % col_size;
          auto row = vrows * block + local_row;
-         complex_copy(local_row, local_col).real(hostView(row, col).real());
-         complex_copy(local_row, local_col).imag(hostView(row, col).imag());
+         complex_copy(local_row, local_col) = hostView(row, col);
       });
 }
 

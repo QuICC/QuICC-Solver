@@ -3,8 +3,8 @@
  * @brief Implementation of the associated Legendre based PP Projector
  */
 
-#ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_PP_HPP
-#define QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_PP_HPP
+#ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_KOKKOS_P_HPP
+#define QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_KOKKOS_P_HPP
 
 // System includes
 //
@@ -55,7 +55,7 @@ namespace Projector {
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const;
+         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const;
 
    };
 

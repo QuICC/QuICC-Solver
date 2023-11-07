@@ -1,0 +1,24 @@
+# Quicc Spack Environment file.
+#
+spack:
+  specs:
+  # - quicc@develop +rocm~openmp amdgpu_targe^t=gfx90a build_type=Release
+  - kokkos+rocm std=17 amdgpu_target=gfx90a ^hip@5.2.3
+  - kokkos-kernels
+  - mpi
+  - fftw
+  - hdf5
+  - openblas
+  - boost
+  - python@3.10
+  - py-numpy
+  develop:
+    quicc:
+      path: /users/daganell/projects/QuICC
+      spec: quicc@develop
+  view: /project/project_465000105/gandanie/view/quicc
+  packages:
+    all:
+      variants: std=17 amdgpu_target=gfx90a amdgpu_target_sram_ecc=gfx90a
+  concretizer:
+    unify: true

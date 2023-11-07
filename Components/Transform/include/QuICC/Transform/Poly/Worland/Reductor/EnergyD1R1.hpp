@@ -12,5 +12,8 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Reductor/Base/EnergyD1R1.hpp"
+#if defined(QUICC_USE_KOKKOS_CUDA) || defined(QUICC_USE_KOKKOS_HIP)
+#include "QuICC/Transform/Poly/Worland/Reductor/Kokkos/EnergyD1R1.hpp"
+#endif
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_ENERGYD1R1_HPP

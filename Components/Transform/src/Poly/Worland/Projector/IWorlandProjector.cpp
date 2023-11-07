@@ -103,7 +103,7 @@ namespace Projector {
       return mem;
    }
 
-   void IWorlandProjector::defaultApplyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
+   void IWorlandProjector::defaultApplyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const
    {
       rOut = this->mOps.at(i).transpose()*in;
    }

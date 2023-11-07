@@ -9,7 +9,7 @@
 
 // External includes
 //
-
+#include "Kokkos.hpp"
 // Class include
 //
 #include "QuICC/Transform/Poly/Setup.hpp"
@@ -26,6 +26,8 @@ namespace Poly {
    Setup::Setup(const int size, const int specSize, const GridPurpose::Id purpose)
       : TransformSetup(size, specSize, purpose)
    {
+       // Initialize fixtures
+       ExternalLibrary::Kokkos::getInstance();
    }
 
    Setup::~Setup()

@@ -91,7 +91,7 @@ namespace Transform {
    {
       using namespace Poly::ALegendre;
       // Reserve storage for the projectors, 1/sin projectors and derivative
-#ifdef QUICC_USE_KOKKOS_CUDA
+#if defined(QUICC_USE_KOKKOS_CUDA) || defined(QUICC_USE_KOKKOS_HIP)
       this->mImpl.addOperator<Poly::ALegendre::Projector::P<kokkos_t>>(Backward::P::id());
       using backend_t = kokkos_t;
 #elif QUICC_USE_KOKKOS
@@ -111,7 +111,7 @@ namespace Transform {
    this->mImpl.addOperator<Poly::ALegendre::Projector::LlDivS1Dp<backend_t>>(Backward::OversinLaplhDphi::id());
 
       // Reserve storage for the weighted projectors, 1/sin projectors and derivative
-#ifdef QUICC_USE_KOKKOS_CUDA
+#if defined(QUICC_USE_KOKKOS_CUDA) || defined(QUICC_USE_KOKKOS_HIP)
       this->mImpl.addOperator<Poly::ALegendre::Integrator::P<kokkos_t>>(Forward::P::id());
       using backend_t = kokkos_t;
 #elif QUICC_USE_KOKKOS

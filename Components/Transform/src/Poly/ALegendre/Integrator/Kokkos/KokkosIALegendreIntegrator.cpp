@@ -12,8 +12,6 @@
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 
-#include "QuICC/Transform/Poly/KokkosUtils.hpp"
-
 namespace QuICC {
 
 namespace Transform {
@@ -36,7 +34,7 @@ namespace Integrator {
       return this->mspSetup->blockSize();
    }
 
-   void KokkosIALegendreIntegrator::initOperators(const OpArray& igrid, const OpArray& iweights) const
+   void KokkosIALegendreIntegrator::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       // Initit specialized data for operators
       this->initSpecial();
@@ -56,7 +54,7 @@ namespace Integrator {
       auto vmOpsHost= Kokkos::create_mirror_view(this->vmOps);
 
       // Loop over harmonic orders
-      for(int i = 0; i < this->mspSetup->slowSize(); i++)
+      for(int i = 0; i < slowSize; i++)
       {
          // Build operator
          Matrix op;
@@ -68,7 +66,7 @@ namespace Integrator {
       Kokkos::deep_copy(vmOps, vmOpsHost);
    }
 
-   void KokkosIALegendreIntegrator::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
+   void KokkosIALegendreIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
       // assert right sizes for input matrix
       assert(in.rows() == this->mspSetup->fwdSize());

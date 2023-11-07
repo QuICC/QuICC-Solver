@@ -10,6 +10,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Transform.hpp"
+#include "Types/Internal/Math.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 
 namespace QuICC {

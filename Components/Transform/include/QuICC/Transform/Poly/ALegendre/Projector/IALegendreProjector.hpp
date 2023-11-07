@@ -71,28 +71,27 @@ namespace Projector {
          /**
           * @brief Storage for the operators
           */
-         mutable std::vector<OpMatrix>  mOps;
-
+         mutable std::vector<Matrix>  mOps;
         /**
          * @brief Storage for the quadrature grid
          */
-        mutable OpArray mGrid;
+        mutable Internal::Array mGrid;
 
         /**
          * @brief Storage for the quadrature weights
          */
-        mutable OpArray mWeights;
+        mutable Internal::Array mWeights;
 
       private:
          /**
           * @brief Initialise the operators
           */
-         virtual void initOperators(const OpArray& igrid, const OpArray& iweights) const override;
+         virtual void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const override;
 
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const = 0;
+         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const = 0;
 
          /**
           * @brief Compute projection
@@ -100,7 +99,7 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const override;
+         virtual void applyOperators(MatrixZ& rOut, const MatrixZ& in) const override;
 
          /**
           * @brief Apply ith operator

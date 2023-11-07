@@ -20,10 +20,19 @@ set(_tests_templated
   Poly::P_Zero:<viewCpu_t>:integrator
   Poly::R1_Zero:<viewCpu_t>:integrator
 )
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests_templated
+        Poly::P:<kokkos_t>:integrator
+        Poly::P_Zero:<kokkos_t>:integrator
+        Poly::R1_Zero:<kokkos_t>:integrator
+        )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 16 7 115 80 78
   MPULP 3 2 2 2 2
   )
+
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -46,6 +55,7 @@ quicc_set_ulp(_ulp
   ULP 16 10 115 80 78
   MPULP 3 2 2 2 2
   )
+
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -60,6 +70,13 @@ set(_tests_templated
   Poly::DivR1_Zero:<base_t>:integrator
   Poly::DivR1_Zero:<viewCpu_t>:integrator
 )
+
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests_templated
+        Poly::DivR1_Zero:<kokkos_t>:integrator
+    )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 32 51 226 172 191 32 42 148 75 73
   MPULP 2 2 2 2 2 3 3 3 3 3
@@ -79,6 +96,14 @@ set(_tests_templated
   Poly::I2:<viewCpu_t>:integrator
   Poly::I2_Zero:<viewCpu_t>:integrator
 )
+
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests_templated
+        Poly::I2:<kokkos_t>:integrator
+        Poly::I2_Zero:<kokkos_t>:integrator
+    )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 13 20 170 59 36
   MPULP 1 4 8 4 3
@@ -113,11 +138,17 @@ foreach(_test ${_tests_templated})
 endforeach()
 
 
-
 set(_tests_templated
   Poly::I2DivR1_Zero:<base_t>:integrator
   Poly::I2DivR1_Zero:<viewCpu_t>:integrator
 )
+
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests_templated
+        Poly::I2DivR1_Zero:<kokkos_t>:integrator
+    )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 40 47 145 73 86 41 206 191 41 51
   MPULP 2 3 14 4 3 1 10 11 2 3
@@ -135,6 +166,13 @@ set(_tests_templated
   Poly::I4DivR1_Zero:<base_t>:integrator
   Poly::I4DivR1_Zero:<viewCpu_t>:integrator
 )
+
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests_templated
+        Poly::I4DivR1_Zero:<kokkos_t>:integrator
+    )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 77 127 666 55 91 74 615 453 48 70
   MPULP 2 11 121 9 4 2 127 93 4 6
@@ -152,6 +190,13 @@ set(_tests_templated
   Poly::I6DivR1_Zero:<base_t>:integrator
   Poly::I6DivR1_Zero:<viewCpu_t>:integrator
 )
+
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests_templated
+        Poly::I6DivR1_Zero:<kokkos_t>:integrator
+    )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 53 160 1578 76 51 48 846 1258 66 104
   MPULP 2 11 147 6 8 2 165 92 2 10
@@ -169,6 +214,13 @@ set(_tests_templated
   Poly::DivR1D1R1_Zero:<base_t>:integrator
   Poly::DivR1D1R1_Zero:<viewCpu_t>:integrator
 )
+
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests_templated
+        Poly::DivR1D1R1_Zero:<kokkos_t>:integrator
+    )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 435 94 87 88 91 605 97 88 99 95
   MPULP 6 2 1 1 1 9 2 1 2 1
@@ -186,6 +238,13 @@ set(_tests_templated
   Poly::I2DivR1D1R1_Zero:<base_t>:integrator
   Poly::I2DivR1D1R1_Zero:<viewCpu_t>:integrator
 )
+
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests_templated
+        Poly::I2DivR1D1R1_Zero:<kokkos_t>:integrator
+    )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 30 383 1340 1104 1196 32 214 1017 374 925
   MPULP 2 17 64 42 40 2 10 44 31 24
@@ -203,6 +262,13 @@ set(_tests_templated
   Poly::I4DivR1D1R1_Zero:<base_t>:integrator
   Poly::I4DivR1D1R1_Zero:<viewCpu_t>:integrator
 )
+
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests_templated
+        Poly::I4DivR1D1R1_Zero:<kokkos_t>:integrator
+    )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 73 1262 10831 2375 2005 73 699 6655 1747 2191
   MPULP 2 79 464 121 55 2 58 328 49 51
@@ -224,6 +290,12 @@ set(_tests_templated
   Poly::P:<base_t>:integrator
   Poly::P:<viewCpu_t>:integrator
 )
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _tests_templated
+        Poly::P:<kokkos_t>:integrator
+    )
+endif()
+
 quicc_set_ulp(_ulp
   ULP 111 346 1331 2240 12000
   MPULP 8 20 12 18 20
@@ -433,6 +505,12 @@ set(_split_tests_templated
   Poly::P:<base_t>:integrator
   Poly::P:<viewCpu_t>:integrator
 )
+
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _split_tests_templated
+        Poly::P:<kokkos_t>:integrator
+        )
+endif()
 
 foreach(_test ${_split_tests_templated})
   quicc_add_test(${_test}

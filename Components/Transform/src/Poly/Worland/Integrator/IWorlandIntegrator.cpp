@@ -6,9 +6,6 @@
 // System includes
 //
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/Transform/Poly/Worland/Integrator/IWorlandIntegrator.hpp"
@@ -28,12 +25,12 @@ namespace Worland {
 
 namespace Integrator {
 
-   IWorlandIntegrator::IWorlandIntegrator()
-      : IWorlandOperator(),
+IWorlandIntegrator::IWorlandIntegrator() :
+    IWorlandOperator(),
 #ifdef QUICC_TRANSFORM_WORLAND_TRUNCATE_QI
-        mcTruncQI(true)
+    mcTruncQI(true)
 #else
-        mcTruncQI(false)
+    mcTruncQI(false)
 #endif // QUICC_TRANSFORM_WORLAND_TRUNCATE_QI
    {
       this->mProfileTag += "-Integrator";
@@ -106,7 +103,7 @@ namespace Integrator {
       return mem;
    }
 
-   void IWorlandIntegrator::defaultApplyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
+   void IWorlandIntegrator::defaultApplyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const
    {
       rOut = this->mOps.at(i).transpose()*in;
    }
@@ -120,7 +117,6 @@ namespace Integrator {
    {
       return this->mspSetup->blockSize();
    }
-
 }
 }
 }

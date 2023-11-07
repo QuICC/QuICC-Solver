@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Reductor/IWorlandReductor.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Reductor/IWorlandReductor.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
 namespace QuICC {
@@ -57,7 +51,6 @@ namespace Reductor {
 
       return mem;
    }
-
 }
 }
 }

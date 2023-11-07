@@ -15,12 +15,16 @@ options are: Debug Release RelWithDebInfo RelWithAssert RelForValgrind MinSizeRe
 set_property(CACHE CMAKE_BUILD_TYPE
   PROPERTY STRINGS "Debug;Release;RelWithDebInfo;RelWithAssert;RelForValgrind;MinSizeRel")
 
-# set CUDA debug 
+# set CUDA debug
 set(CMAKE_CUDA_FLAGS_DEBUG_INIT "-G --source-in-ptx")
 set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO_INIT "--generate-line-info --source-in-ptx")
 
 if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   set(CMAKE_CUDA_ARCHITECTURES 60)
+endif()
+
+if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
+    set(GPU_TARGETS "gfx90a" CACHE STRING "GPU targets to compile for")
 endif()
 
 project(QuICC CXX C)
@@ -37,6 +41,13 @@ else()
   message(STATUS "No CUDA support detected")
 endif()
 
+include(CheckLanguage)
+check_language(HIP)
+if(CMAKE_HIP_COMPILER)
+  enable_language(HIP)
+else()
+    message(STATUS "No HIP support detected")
+endif()
 
 include(MacroOutOfSourceBuild)
 MACRO_ENSURE_OUT_OF_SOURCE_BUILD(
@@ -50,6 +61,10 @@ set(CMAKE_CXX_EXTENSIONS OFF) # Use standard C++
 # Set CUDA C++ standard
 set(CMAKE_CUDA_STANDARD 17)
 set(CMAKE_CUDA_STANDARD_REQUIRED TRUE)
+# Set HIP C++ standard
+set(CMAKE_HIP_STANDARD 17)
+set(CMAKE_HIP_STANDARD_REQUIRED TRUE)
+
 
 
 # Set default install path

@@ -6,15 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Reductor/IWorlandPower.hpp"
 
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Reductor/IWorlandPower.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandSphEnergyRule.hpp"

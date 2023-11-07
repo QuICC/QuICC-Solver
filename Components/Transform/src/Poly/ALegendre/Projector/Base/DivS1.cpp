@@ -23,7 +23,7 @@ namespace ALegendre {
 
 namespace Projector {
 
-   void DivS1<base_t>::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
+   void DivS1<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int m = this->mspSetup->slow(i);
       int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;
@@ -32,7 +32,7 @@ namespace Projector {
       op.resize(igrid.size(), nPoly);
       namespace ev = Polynomial::ALegendre::Evaluator;
       Polynomial::ALegendre::sin_1Plm plm;
-      plm.compute<MHDFloat>(op, nPoly, m, igrid, OpArray(), ev::Set());
+      plm.compute<MHDFloat>(op, nPoly, m, igrid, Internal::Array(), ev::Set());
    }
 
    void DivS1<base_t>::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const

@@ -37,7 +37,7 @@ namespace Integrator {
          /**
           * @brief Constructor
           */
-         I4DivR1D1R1_I2();
+         I4DivR1D1R1_I2() = default;
 
          /**
           * @brief Destructor
