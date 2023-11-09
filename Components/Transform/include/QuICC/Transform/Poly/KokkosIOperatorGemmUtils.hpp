@@ -34,13 +34,15 @@ namespace Poly {
 // On GPUs it is more important to not jump around in global memory, i.e. have
 // coallesced loads
 template <class ExecSpace, class LayoutA, class LayoutAScratch>
-struct impl_gemm_choose_copy_layout {
+struct impl_gemm_choose_copy_layout
+{
    using type = LayoutAScratch;
 };
 
 #ifdef KOKKOS_ENABLE_CUDA
 template <class LayoutA, class LayoutAScratch>
-struct impl_gemm_choose_copy_layout<Kokkos::Cuda, LayoutA, LayoutAScratch> {
+struct impl_gemm_choose_copy_layout<Kokkos::Cuda, LayoutA, LayoutAScratch>
+{
    using type = LayoutA;
 };
 #endif
@@ -48,7 +50,8 @@ struct impl_gemm_choose_copy_layout<Kokkos::Cuda, LayoutA, LayoutAScratch> {
 #ifdef KOKKOS_ENABLE_HIP
 template <class LayoutA, class LayoutAScratch>
 struct impl_gemm_choose_copy_layout<Kokkos::Experimental::HIP, LayoutA,
-   LayoutAScratch> {
+   LayoutAScratch>
+{
    using type = LayoutA;
 };
 #endif
@@ -61,24 +64,28 @@ struct impl_deep_copy_matrix_block;
 template <class TeamHandle, class ViewTypeScratch, class ViewType, class Layout,
    int blockDim_i, int blockDim_j>
 struct impl_deep_copy_matrix_block<TeamHandle, ViewTypeScratch, ViewType,
-   Layout, blockDim_i, blockDim_j, 0> {
+   Layout, blockDim_i, blockDim_j, 0>
+{
    typedef typename ViewType::non_const_value_type value_type;
    typedef Kokkos::Details::ArithTraits<value_type> ATV;
 
    KOKKOS_INLINE_FUNCTION
-   static void copy(const TeamHandle &team, const ViewTypeScratch &A_scr_real,
-      const ViewTypeScratch &A_scr_imag, const ViewType &A, const int &offset_i,
-      const int &offset_j, const int row_block_end, const int col_block_end) {
-      if(offset_i + blockDim_i <= row_block_end &&
-         offset_j + blockDim_j <= col_block_end)
+   static void copy(const TeamHandle& team, const ViewTypeScratch& A_scr_real,
+      const ViewTypeScratch& A_scr_imag, const ViewType& A, const int& offset_i,
+      const int& offset_j, const int row_block_end, const int col_block_end)
+   {
+      if (offset_i + blockDim_i <= row_block_end &&
+          offset_j + blockDim_j <= col_block_end)
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_j), [&](const int j) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_j),
+            [&](const int j)
+            {
 #ifndef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                const int idx_j = offset_j + j;
 #endif
                Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockDim_i),
-                  [&](const int i) {
+                  [&](const int i)
+                  {
 #ifdef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                      const int idx_j = offset_j + j;
 #endif
@@ -88,15 +95,18 @@ struct impl_deep_copy_matrix_block<TeamHandle, ViewTypeScratch, ViewType,
                      A_scr_imag(i, j) = complex_value.imag();
                   });
             });
-      } else
+      }
+      else
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_j), [&](const int j) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_j),
+            [&](const int j)
+            {
 #ifndef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                int idx_j = offset_j + j;
 #endif
                Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockDim_i),
-                  [&](const int i) {
+                  [&](const int i)
+                  {
 #ifdef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                      int idx_j = offset_j + j;
 #endif
@@ -113,19 +123,22 @@ struct impl_deep_copy_matrix_block<TeamHandle, ViewTypeScratch, ViewType,
    }
 
    KOKKOS_INLINE_FUNCTION
-   static void copy(const TeamHandle &team, const ViewTypeScratch &A_scr,
-      const ViewType &A, const int &offset_i, const int &offset_j,
-      const int row_block_end, const int col_block_end) {
-      if(offset_i + blockDim_i <= row_block_end &&
-         offset_j + blockDim_j <= col_block_end)
+   static void copy(const TeamHandle& team, const ViewTypeScratch& A_scr,
+      const ViewType& A, const int& offset_i, const int& offset_j,
+      const int row_block_end, const int col_block_end)
+   {
+      if (offset_i + blockDim_i <= row_block_end &&
+          offset_j + blockDim_j <= col_block_end)
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_j), [&](const int j) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_j),
+            [&](const int j)
+            {
 #ifndef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                const int idx_j = offset_j + j;
 #endif
                Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockDim_i),
-                  [&](const int i) {
+                  [&](const int i)
+                  {
 #ifdef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                      const int idx_j = offset_j + j;
 #endif
@@ -133,15 +146,18 @@ struct impl_deep_copy_matrix_block<TeamHandle, ViewTypeScratch, ViewType,
                      A_scr(i, j) = A(idx_i, idx_j);
                   });
             });
-      } else
+      }
+      else
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_j), [&](const int j) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_j),
+            [&](const int j)
+            {
 #ifndef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                int idx_j = offset_j + j;
 #endif
                Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockDim_i),
-                  [&](const int i) {
+                  [&](const int i)
+                  {
 #ifdef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                      int idx_j = offset_j + j;
 #endif
@@ -159,35 +175,42 @@ struct impl_deep_copy_matrix_block<TeamHandle, ViewTypeScratch, ViewType,
 template <class TeamHandle, class ViewTypeScratch, class ViewType,
    int blockDim_i, int blockDim_j>
 struct impl_deep_copy_matrix_block<TeamHandle, ViewTypeScratch, ViewType,
-   Kokkos::LayoutRight, blockDim_i, blockDim_j, 0> {
+   Kokkos::LayoutRight, blockDim_i, blockDim_j, 0>
+{
    typedef typename ViewType::non_const_value_type value_type;
    typedef Kokkos::Details::ArithTraits<value_type> ATV;
 
    KOKKOS_INLINE_FUNCTION
-   static void copy(const TeamHandle &team, const ViewTypeScratch &A_scr,
-      const ViewType &A, const int &offset_i, const int &offset_j,
-      const int row_block_end, const int col_block_end) {
-      if(offset_i + blockDim_i <= row_block_end &&
-         offset_j + blockDim_j <= col_block_end)
+   static void copy(const TeamHandle& team, const ViewTypeScratch& A_scr,
+      const ViewType& A, const int& offset_i, const int& offset_j,
+      const int row_block_end, const int col_block_end)
+   {
+      if (offset_i + blockDim_i <= row_block_end &&
+          offset_j + blockDim_j <= col_block_end)
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_i), [&](const int i) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_i),
+            [&](const int i)
+            {
                const int idx_i = offset_i + i;
                Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockDim_j),
-                  [&](const int j) {
+                  [&](const int j)
+                  {
                      const int idx_j = offset_j + j;
                      A_scr(i, j) = A(idx_i, idx_j);
                   });
             });
-      } else
+      }
+      else
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_i), [&](const int i) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_i),
+            [&](const int i)
+            {
 #ifndef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                int idx_i = offset_i + i;
 #endif
                Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockDim_j),
-                  [&](const int j) {
+                  [&](const int j)
+                  {
 #ifdef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                      int idx_i = offset_i + i;
 #endif
@@ -202,32 +225,38 @@ struct impl_deep_copy_matrix_block<TeamHandle, ViewTypeScratch, ViewType,
    }
 
    KOKKOS_INLINE_FUNCTION
-   static void copy(const TeamHandle &team, const ViewTypeScratch &A_scr_real,
-      const ViewTypeScratch &A_scr_imag, const ViewType &A, const int &offset_i,
-      const int &offset_j, const int row_block_end, const int col_block_end) {
-      if(offset_i + blockDim_i <= row_block_end &&
-         offset_j + blockDim_j <= col_block_end)
+   static void copy(const TeamHandle& team, const ViewTypeScratch& A_scr_real,
+      const ViewTypeScratch& A_scr_imag, const ViewType& A, const int& offset_i,
+      const int& offset_j, const int row_block_end, const int col_block_end)
+   {
+      if (offset_i + blockDim_i <= row_block_end &&
+          offset_j + blockDim_j <= col_block_end)
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_i), [&](const int i) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_i),
+            [&](const int i)
+            {
                const int idx_i = offset_i + i;
                Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockDim_j),
-                  [&](const int j) {
+                  [&](const int j)
+                  {
                      const int idx_j = offset_j + j;
                      auto complex_value = A(idx_i, idx_j);
                      A_scr_real(i, j) = complex_value.real();
                      A_scr_imag(i, j) = complex_value.imag();
                   });
             });
-      } else
+      }
+      else
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_i), [&](const int i) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_i),
+            [&](const int i)
+            {
 #ifndef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                int idx_i = offset_i + i;
 #endif
                Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockDim_j),
-                  [&](const int j) {
+                  [&](const int j)
+                  {
 #ifdef KOKKOS_IMPL_BATCHED_GEMM_GCC_CXX14_WORKAROUND
                      int idx_i = offset_i + i;
 #endif
@@ -247,36 +276,42 @@ struct impl_deep_copy_matrix_block<TeamHandle, ViewTypeScratch, ViewType,
 
 template <class TeamHandle, class ViewType, class ViewTypeScratch, class Layout,
    int blockDim_i, int blockDim_j>
-struct impl_update_matrix_block {
+struct impl_update_matrix_block
+{
    typedef typename ViewType::non_const_value_type value_type;
    typedef Kokkos::Details::ArithTraits<value_type> ATV;
 
    KOKKOS_INLINE_FUNCTION
-   static void update(const TeamHandle &team, const value_type &beta,
-      const ViewType &A, const value_type &alpha,
-      const ViewTypeScratch &A_scr_real, const ViewTypeScratch &A_scr_imag,
-      const int &offset_i, const int &offset_j, const int row_block_end,
-      const int col_block_end) {
-      if(offset_i + blockDim_i <= row_block_end &&
-         offset_j + blockDim_j <= col_block_end)
+   static void update(const TeamHandle& team, const value_type& beta,
+      const ViewType& A, const value_type& alpha,
+      const ViewTypeScratch& A_scr_real, const ViewTypeScratch& A_scr_imag,
+      const int& offset_i, const int& offset_j, const int row_block_end,
+      const int col_block_end)
+   {
+      if (offset_i + blockDim_i <= row_block_end &&
+          offset_j + blockDim_j <= col_block_end)
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_j), [&](const int j) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_j),
+            [&](const int j)
+            {
                const int idx_j = offset_j + j;
-               if(beta == ATV::zero())
+               if (beta == ATV::zero())
                {
                   Kokkos::parallel_for(
                      Kokkos::ThreadVectorRange(team, blockDim_i),
-                     [&](const int i) {
+                     [&](const int i)
+                     {
                         const int idx_i = offset_i + i;
                         A(idx_i, idx_j) =
                            value_type(A_scr_real(i, j), A_scr_imag(i, j));
                      });
-               } else
+               }
+               else
                {
                   Kokkos::parallel_for(
                      Kokkos::ThreadVectorRange(team, blockDim_i),
-                     [&](const int i) {
+                     [&](const int i)
+                     {
                         const int idx_i = offset_i + i;
                         A(idx_i, idx_j) =
                            A(idx_i, idx_j) +
@@ -284,7 +319,8 @@ struct impl_update_matrix_block {
                      });
                }
             });
-      } else
+      }
+      else
       {
          const int range_i = offset_i + blockDim_i <= row_block_end
                                 ? blockDim_i
@@ -292,21 +328,25 @@ struct impl_update_matrix_block {
          const int range_j = offset_j + blockDim_j <= col_block_end
                                 ? blockDim_j
                                 : col_block_end - offset_j;
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, range_j), [&](const int j) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, range_j),
+            [&](const int j)
+            {
                const int idx_j = offset_j + j;
-               if(beta == ATV::zero())
+               if (beta == ATV::zero())
                {
                   Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, range_i),
-                     [&](const int i) {
+                     [&](const int i)
+                     {
                         const int idx_i = offset_i + i;
                         A(idx_i, idx_j) =
                            value_type(A_scr_real(i, j), A_scr_imag(i, j));
                      });
-               } else
+               }
+               else
                {
                   Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, range_i),
-                     [&](const int i) {
+                     [&](const int i)
+                     {
                         const int idx_i = offset_i + i;
                         A(idx_i, idx_j) =
                            A(idx_i, idx_j) +
@@ -317,36 +357,41 @@ struct impl_update_matrix_block {
       }
    }
    KOKKOS_INLINE_FUNCTION
-   static void update(const TeamHandle &team, const value_type &beta,
-      const ViewType &A, const value_type &alpha, const ViewTypeScratch &A_scr,
-      const int &offset_i, const int &offset_j, const int row_block_end,
-      const int col_block_end) {
-      if(offset_i + blockDim_i <= row_block_end &&
-         offset_j + blockDim_j <= col_block_end)
+   static void update(const TeamHandle& team, const value_type& beta,
+      const ViewType& A, const value_type& alpha, const ViewTypeScratch& A_scr,
+      const int& offset_i, const int& offset_j, const int row_block_end,
+      const int col_block_end)
+   {
+      if (offset_i + blockDim_i <= row_block_end &&
+          offset_j + blockDim_j <= col_block_end)
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_j), [&](const int j) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_j),
+            [&](const int j)
+            {
                const int idx_j = offset_j + j;
-               if(beta == ATV::zero())
+               if (beta == ATV::zero())
                {
                   Kokkos::parallel_for(
                      Kokkos::ThreadVectorRange(team, blockDim_i),
-                     [&](const int i) {
+                     [&](const int i)
+                     {
                         const int idx_i = offset_i + i;
                         A(idx_i, idx_j) = A_scr(i, j);
                      });
-               } else
+               }
+               else
                {
                   Kokkos::parallel_for(
                      Kokkos::ThreadVectorRange(team, blockDim_i),
-                     [&](const int i) {
+                     [&](const int i)
+                     {
                         const int idx_i = offset_i + i;
-                        A(idx_i, idx_j) =
-                           A(idx_i, idx_j) + A_scr(i, j);
+                        A(idx_i, idx_j) = A(idx_i, idx_j) + A_scr(i, j);
                      });
                }
             });
-      } else
+      }
+      else
       {
          const int range_i = offset_i + blockDim_i <= row_block_end
                                 ? blockDim_i
@@ -354,23 +399,26 @@ struct impl_update_matrix_block {
          const int range_j = offset_j + blockDim_j <= col_block_end
                                 ? blockDim_j
                                 : col_block_end - offset_j;
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, range_j), [&](const int j) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, range_j),
+            [&](const int j)
+            {
                const int idx_j = offset_j + j;
-               if(beta == ATV::zero())
+               if (beta == ATV::zero())
                {
                   Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, range_i),
-                     [&](const int i) {
+                     [&](const int i)
+                     {
                         const int idx_i = offset_i + i;
                         A(idx_i, idx_j) = A_scr(i, j);
                      });
-               } else
+               }
+               else
                {
                   Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, range_i),
-                     [&](const int i) {
+                     [&](const int i)
+                     {
                         const int idx_i = offset_i + i;
-                        A(idx_i, idx_j) =
-                           A(idx_i, idx_j) + A_scr(i, j);
+                        A(idx_i, idx_j) = A(idx_i, idx_j) + A_scr(i, j);
                      });
                }
             });
@@ -381,43 +429,51 @@ struct impl_update_matrix_block {
 template <class TeamHandle, class ViewType, class ViewTypeScratch,
    int blockDim_i, int blockDim_j>
 struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
-   Kokkos::LayoutRight, blockDim_i, blockDim_j> {
+   Kokkos::LayoutRight, blockDim_i, blockDim_j>
+{
    typedef typename ViewType::non_const_value_type value_type;
    typedef Kokkos::Details::ArithTraits<value_type> ATV;
 
    KOKKOS_INLINE_FUNCTION
-   static void update(const TeamHandle &team, const value_type &beta,
-      const ViewType &A, const value_type &alpha,
-      const ViewTypeScratch &A_scr_real, const ViewTypeScratch &A_scr_imag,
-      const int &offset_i, const int &offset_j, const int row_block_end,
-      const int col_block_end) {
-      if(offset_i + blockDim_i <= row_block_end &&
-         offset_j + blockDim_j <= col_block_end)
+   static void update(const TeamHandle& team, const value_type& beta,
+      const ViewType& A, const value_type& alpha,
+      const ViewTypeScratch& A_scr_real, const ViewTypeScratch& A_scr_imag,
+      const int& offset_i, const int& offset_j, const int row_block_end,
+      const int col_block_end)
+   {
+      if (offset_i + blockDim_i <= row_block_end &&
+          offset_j + blockDim_j <= col_block_end)
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_i), [&](const int i) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_i),
+            [&](const int i)
+            {
                const int idx_i = offset_i + i;
-               if(beta == ATV::zero())
+               if (beta == ATV::zero())
                {
                   Kokkos::parallel_for(
                      Kokkos::ThreadVectorRange(team, blockDim_j),
-                     [&](const int j) {
+                     [&](const int j)
+                     {
                         const int idx_j = offset_j + j;
                         A(idx_i, idx_j) =
                            value_type(A_scr_real(i, j), A_scr_imag(i, j));
                      });
-               } else
+               }
+               else
                {
                   Kokkos::parallel_for(
                      Kokkos::ThreadVectorRange(team, blockDim_j),
-                     [&](const int j) {
+                     [&](const int j)
+                     {
                         const int idx_j = offset_j + j;
                         A(idx_i, idx_j) =
-                           A(idx_i, idx_j) + value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                           A(idx_i, idx_j) +
+                           value_type(A_scr_real(i, j), A_scr_imag(i, j));
                      });
                }
             });
-      } else
+      }
+      else
       {
          const int range_i = offset_i + blockDim_i <= row_block_end
                                 ? blockDim_i
@@ -425,20 +481,25 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
          const int range_j = offset_j + blockDim_j <= col_block_end
                                 ? blockDim_j
                                 : col_block_end - offset_j;
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, range_i), [&](const int i) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, range_i),
+            [&](const int i)
+            {
                const int idx_i = offset_i + i;
-               if(beta == ATV::zero())
+               if (beta == ATV::zero())
                {
                   Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, range_j),
-                     [&](const int j) {
+                     [&](const int j)
+                     {
                         const int idx_j = offset_j + j;
-                        A(idx_i, idx_j) = value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        A(idx_i, idx_j) =
+                           value_type(A_scr_real(i, j), A_scr_imag(i, j));
                      });
-               } else
+               }
+               else
                {
                   Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, range_j),
-                     [&](const int j) {
+                     [&](const int j)
+                     {
                         const int idx_j = offset_j + j;
                         A(idx_i, idx_j) =
                            A(idx_i, idx_j) +
@@ -450,36 +511,41 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
    }
 
    KOKKOS_INLINE_FUNCTION
-   static void update(const TeamHandle &team, const value_type &beta,
-      const ViewType &A, const value_type &alpha, const ViewTypeScratch &A_scr,
-      const int &offset_i, const int &offset_j, const int row_block_end,
-      const int col_block_end) {
-      if(offset_i + blockDim_i <= row_block_end &&
-         offset_j + blockDim_j <= col_block_end)
+   static void update(const TeamHandle& team, const value_type& beta,
+      const ViewType& A, const value_type& alpha, const ViewTypeScratch& A_scr,
+      const int& offset_i, const int& offset_j, const int row_block_end,
+      const int col_block_end)
+   {
+      if (offset_i + blockDim_i <= row_block_end &&
+          offset_j + blockDim_j <= col_block_end)
       {
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, blockDim_i), [&](const int i) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockDim_i),
+            [&](const int i)
+            {
                const int idx_i = offset_i + i;
-               if(beta == ATV::zero())
+               if (beta == ATV::zero())
                {
                   Kokkos::parallel_for(
                      Kokkos::ThreadVectorRange(team, blockDim_j),
-                     [&](const int j) {
+                     [&](const int j)
+                     {
                         const int idx_j = offset_j + j;
                         A(idx_i, idx_j) = A_scr(i, j);
                      });
-               } else
+               }
+               else
                {
                   Kokkos::parallel_for(
                      Kokkos::ThreadVectorRange(team, blockDim_j),
-                     [&](const int j) {
+                     [&](const int j)
+                     {
                         const int idx_j = offset_j + j;
-                        A(idx_i, idx_j) =
-                           A(idx_i, idx_j) + A_scr(i, j);
+                        A(idx_i, idx_j) = A(idx_i, idx_j) + A_scr(i, j);
                      });
                }
             });
-      } else
+      }
+      else
       {
          const int range_i = offset_i + blockDim_i <= row_block_end
                                 ? blockDim_i
@@ -487,20 +553,24 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
          const int range_j = offset_j + blockDim_j <= col_block_end
                                 ? blockDim_j
                                 : col_block_end - offset_j;
-         Kokkos::parallel_for(
-            Kokkos::TeamThreadRange(team, range_i), [&](const int i) {
+         Kokkos::parallel_for(Kokkos::TeamThreadRange(team, range_i),
+            [&](const int i)
+            {
                const int idx_i = offset_i + i;
-               if(beta == ATV::zero())
+               if (beta == ATV::zero())
                {
                   Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, range_j),
-                     [&](const int j) {
+                     [&](const int j)
+                     {
                         const int idx_j = offset_j + j;
                         A(idx_i, idx_j) = A_scr(i, j);
                      });
-               } else
+               }
+               else
                {
                   Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, range_j),
-                     [&](const int j) {
+                     [&](const int j)
+                     {
                         const int idx_j = offset_j + j;
                         A(idx_i, idx_j) = A(idx_i, idx_j) + A_scr(i, j);
                      });
@@ -513,9 +583,10 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
 // Compute a single A block 8 B block, also do an in-place no-additional
 // blocking team GEMM
 template <class TeamHandle, class ViewTypeA, class ViewTypeB, class ViewTypeC>
-KOKKOS_INLINE_FUNCTION void impl_team_gemm_block_complex(const TeamHandle &team,
-   const ViewTypeC &C, const ViewTypeA &A, const ViewTypeB &BR,
-   const ViewTypeB &BI) {
+KOKKOS_INLINE_FUNCTION void impl_team_gemm_block_complex(const TeamHandle& team,
+   const ViewTypeC& C, const ViewTypeA& A, const ViewTypeB& BR,
+   const ViewTypeB& BI)
+{
    typedef typename ViewTypeA::non_const_value_type Scalar;
    typedef typename ViewTypeC::non_const_value_type ScalarC;
 // GNU COMPILER BUG WORKAROUND
@@ -529,11 +600,13 @@ KOKKOS_INLINE_FUNCTION void impl_team_gemm_block_complex(const TeamHandle &team,
    const int blockA1 = A.extent_int(1);
    const int blockB1 = BR.extent_int(1);
 #endif
-   Kokkos::parallel_for(
-      Kokkos::TeamThreadRange(team, blockA0), [&](const int i) {
+   Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockA0),
+      [&](const int i)
+      {
 #ifndef KOKKOSKERNELS_ENABLE_OMP_SIMD
-         Kokkos::parallel_for(
-            Kokkos::ThreadVectorRange(team, blockB1 / 4), [&](const int B_j) {
+         Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockB1 / 4),
+            [&](const int B_j)
+            {
 #else
 #pragma omp simd
     for(int B_j=0; B_j<blockB1/4; B_j++) {
@@ -542,7 +615,7 @@ KOKKOS_INLINE_FUNCTION void impl_team_gemm_block_complex(const TeamHandle &team,
                ScalarC C_ij1 = 0;
                ScalarC C_ij2 = 0;
                ScalarC C_ij3 = 0;
-               for(int j = 0; j < blockA1; j++)
+               for (int j = 0; j < blockA1; j++)
                {
                   Scalar A_ij = A(i, j);
                   C_ij0 += A_ij * ScalarC(BR(j, B_j), BI(j, B_j));
@@ -568,8 +641,9 @@ KOKKOS_INLINE_FUNCTION void impl_team_gemm_block_complex(const TeamHandle &team,
 // Compute a single A block 8 B block, also do an in-place no-additional
 // blocking team GEMM
 template <class TeamHandle, class ViewTypeA, class ViewTypeB, class ViewTypeC>
-KOKKOS_INLINE_FUNCTION void impl_team_gemm_block(const TeamHandle &team,
-   const ViewTypeC &C, const ViewTypeA &A, const ViewTypeB &B) {
+KOKKOS_INLINE_FUNCTION void impl_team_gemm_block(const TeamHandle& team,
+   const ViewTypeC& C, const ViewTypeA& A, const ViewTypeB& B)
+{
    typedef typename ViewTypeC::non_const_value_type ScalarC;
 // GNU COMPILER BUG WORKAROUND
 #if defined(KOKKOS_COMPILER_GNU) &&                                            \
@@ -582,11 +656,13 @@ KOKKOS_INLINE_FUNCTION void impl_team_gemm_block(const TeamHandle &team,
    const int blockA1 = A.extent_int(1);
    const int blockB1 = B.extent_int(1);
 #endif
-   Kokkos::parallel_for(
-      Kokkos::TeamThreadRange(team, blockA0), [&](const int i) {
+   Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockA0),
+      [&](const int i)
+      {
 #ifndef KOKKOSKERNELS_ENABLE_OMP_SIMD
-         Kokkos::parallel_for(
-            Kokkos::ThreadVectorRange(team, blockB1 / 4), [&](const int B_j) {
+         Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockB1 / 4),
+            [&](const int B_j)
+            {
 #else
 #pragma omp simd
     for(int B_j=0; B_j<blockB1/4; B_j++) {
@@ -595,7 +671,7 @@ KOKKOS_INLINE_FUNCTION void impl_team_gemm_block(const TeamHandle &team,
                ScalarC C_ij1 = 0;
                ScalarC C_ij2 = 0;
                ScalarC C_ij3 = 0;
-               for(int j = 0; j < blockA1; j++)
+               for (int j = 0; j < blockA1; j++)
                {
                   ScalarC A_ij = A(i, j);
                   C_ij0 += A_ij * B(j, B_j);
@@ -617,14 +693,16 @@ KOKKOS_INLINE_FUNCTION void impl_team_gemm_block(const TeamHandle &team,
 
 template <int TransposeA, int TransposeB> struct impl_gemm_label;
 
-template <> struct impl_gemm_label<0, 0> {
-   static constexpr const char *label = "KokkosBlas::gemm[NN]";
+template <> struct impl_gemm_label<0, 0>
+{
+   static constexpr const char* label = "KokkosBlas::gemm[NN]";
 };
 
 template <class ExecSpace, class ViewTypeA, class ViewTypeB, class ViewTypeC,
    class ViewS, int blockA0, int blockA1, int blockB1, int TransposeA,
    int TransposeB>
-struct GEMMImpl {
+struct GEMMImpl
+{
    ViewTypeA A;
    ViewTypeB B;
    ViewTypeC C;
@@ -657,36 +735,47 @@ struct GEMMImpl {
 
    typedef Kokkos::View<
 #if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
-       ScalarC[blockA0][blockB1], Kokkos::LayoutRight,
+      ScalarC[blockA0][blockB1], Kokkos::LayoutRight,
 #else
-       ScalarA[blockA0][blockB1 + 1], Kokkos::LayoutRight,
+      ScalarA[blockA0][blockB1 + 1], Kokkos::LayoutRight,
 #endif
       typename ExecSpace::scratch_memory_space>
       ViewTypeCScratch;
 
-   GEMMImpl(const ViewTypeA &A_, const ViewTypeB &B_, const ViewTypeC &C_,
-      const ViewS &AS_, const ViewS &S_, const ViewS &XG_, const ViewS &YG_,
-      const int nb_)
-       : A(A_), B(B_), C(C_), allScan(AS_), scan(S_), xGrid(XG_), yGrid(YG_),
-         /* num_blocks_0((C.extent_int(0) + blockA0 - 1) / blockA0), */
-         num_blocks(nb_) {
+   GEMMImpl(const ViewTypeA& A_, const ViewTypeB& B_, const ViewTypeC& C_,
+      const ViewS& AS_, const ViewS& S_, const ViewS& XG_, const ViewS& YG_,
+      const int nb_) :
+       A(A_),
+       B(B_),
+       C(C_),
+       allScan(AS_),
+       scan(S_),
+       xGrid(XG_),
+       yGrid(YG_),
+       /* num_blocks_0((C.extent_int(0) + blockA0 - 1) / blockA0), */
+       num_blocks(nb_)
+   {
       scratch_level = 0;
       alpha = 1;
       beta = 1;
    }
 
-   GEMMImpl(const ScalarA &alpha_, const ViewTypeA &A_, const ViewTypeB &B_,
-      const ScalarC &beta_, const ViewTypeC &C_, const int nb_)
-       : A(A_), B(B_), C(C_),
-         /* num_blocks_0((C.extent_int(0) + blockA0 - 1) / blockA0), */
-         num_blocks(nb_) {
+   GEMMImpl(const ScalarA& alpha_, const ViewTypeA& A_, const ViewTypeB& B_,
+      const ScalarC& beta_, const ViewTypeC& C_, const int nb_) :
+       A(A_),
+       B(B_),
+       C(C_),
+       /* num_blocks_0((C.extent_int(0) + blockA0 - 1) / blockA0), */
+       num_blocks(nb_)
+   {
       scratch_level = 0;
       alpha = alpha_;
       beta = beta_;
    }
 
-   void run(
-      const ExecSpace &space, int team_size, int vector_length, int scr_level) {
+   void run(const ExecSpace& space, int team_size, int vector_length,
+      int scr_level)
+   {
       scratch_level = scr_level;
       int scratch_memory_size = ViewTypeAScratch::shmem_size() +
                                 2 * ViewTypeBScratch::shmem_size() +
@@ -704,26 +793,23 @@ struct GEMMImpl {
       // are allocated... Switching to LaunchBounds<384,2> fixes
       // that problem but I'm not sure if that it a good perf
       // parameter or why it is set to 2 for Cuda?
-      Kokkos::TeamPolicy<ExecSpace, Kokkos::LaunchBounds<384, 0>> policy(
-         space, num_blocks, team_size, vector_length);
+      Kokkos::TeamPolicy<ExecSpace, Kokkos::LaunchBounds<384, 0>> policy(space,
+         num_blocks, team_size, vector_length);
 #else
-      Kokkos::TeamPolicy<ExecSpace, Kokkos::LaunchBounds<256, 2>> policy(
-         space, num_blocks, team_size, vector_length);
+      Kokkos::TeamPolicy<ExecSpace, Kokkos::LaunchBounds<256, 2>> policy(space,
+         num_blocks, team_size, vector_length);
 #endif
 
-      Kokkos::Timer timer_gen;
       Kokkos::parallel_for(impl_gemm_label<TransposeA, TransposeB>::label,
-         policy.set_scratch_size(
-            scratch_level, Kokkos::PerTeam(scratch_memory_size)),
+         policy.set_scratch_size(scratch_level,
+            Kokkos::PerTeam(scratch_memory_size)),
          *this);
-      double time_gen = timer_gen.seconds();
-      std::cout << "KOKKOS operator teampolicy took: " << time_gen << " seconds."
-                << std::endl;
    }
 
    KOKKOS_INLINE_FUNCTION
    void operator()(
-      const typename Kokkos::TeamPolicy<ExecSpace>::member_type &team) const {
+      const typename Kokkos::TeamPolicy<ExecSpace>::member_type& team) const
+   {
       // This team is responsible for computing a single block of C
       const int blockId = team.league_rank();
 
@@ -752,10 +838,12 @@ struct GEMMImpl {
       ViewTypeCScratch C_scr_real(team.team_scratch(scratch_level));
       ViewTypeCScratch C_scr_imag(team.team_scratch(scratch_level));
 #endif
-      Kokkos::parallel_for(
-         Kokkos::TeamThreadRange(team, blockA0), [&](const int i) {
-            Kokkos::parallel_for(
-               Kokkos::ThreadVectorRange(team, blockB1), [&](const int j) {
+      Kokkos::parallel_for(Kokkos::TeamThreadRange(team, blockA0),
+         [&](const int i)
+         {
+            Kokkos::parallel_for(Kokkos::ThreadVectorRange(team, blockB1),
+               [&](const int j)
+               {
 #if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
                   C_scr(i, j) = 0;
 #else
@@ -769,7 +857,7 @@ struct GEMMImpl {
 
       // Move along the inner dimension in blocks
       const int length = TransposeA > 0 ? A.extent_int(0) : A.extent_int(1);
-      for(int A_j = 0; A_j < length; A_j += blockA1)
+      for (int A_j = 0; A_j < length; A_j += blockA1)
       {
          // Load A block into scratch
 
@@ -799,8 +887,8 @@ struct GEMMImpl {
          // Add contribution from multiplying the A and B block to the C block
 #if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
          /* impl_team_gemm_block(team, C_scr, A_scr, B_scr); */
-         impl_team_gemm_block_complex(
-            team, C_scr, A_scr, B_scr_real, B_scr_imag);
+         impl_team_gemm_block_complex(team, C_scr, A_scr, B_scr_real,
+            B_scr_imag);
 #else
          impl_team_gemm_block(team, C_scr_real, A_scr, B_scr_real);
          impl_team_gemm_block(team, C_scr_imag, A_scr, B_scr_imag);
@@ -824,27 +912,23 @@ struct GEMMImpl {
    }
 };
 
-template <typename ExecSpace> inline int get_max_vector_size() {
+template <typename ExecSpace> inline int get_max_vector_size()
+{
    return Kokkos::TeamPolicy<ExecSpace>::vector_length_max();
 }
 
-template <class AV, class BV, class CV, class V>
-struct GEMM {
-   static void gemm(const typename CV::execution_space &space, const AV &A,
-      const BV &B, const CV &C, const V &allScan, const V &scan, const V &xGrid,
-      const V &yGrid, const int num_blocks) {
-      static_assert(
-         Kokkos::is_view<AV>::value, "AV must be a Kokkos::View.");
-      static_assert(
-         Kokkos::is_view<BV>::value, "BV must be a Kokkos::View.");
-      static_assert(
-         Kokkos::is_view<CV>::value, "CV must be a Kokkos::View.");
-      static_assert(
-         static_cast<int>(AV::rank) == 2, "AV must have rank 2.");
-      static_assert(
-         static_cast<int>(BV::rank) == 2, "BV must have rank 2.");
-      static_assert(
-         static_cast<int>(CV::rank) == 2, "CV must have rank 2.");
+template <class AV, class BV, class CV, class V> struct GEMM
+{
+   static void gemm(const typename CV::execution_space& space, const AV& A,
+      const BV& B, const CV& C, const V& allScan, const V& scan, const V& xGrid,
+      const V& yGrid, const int num_blocks)
+   {
+      static_assert(Kokkos::is_view<AV>::value, "AV must be a Kokkos::View.");
+      static_assert(Kokkos::is_view<BV>::value, "BV must be a Kokkos::View.");
+      static_assert(Kokkos::is_view<CV>::value, "CV must be a Kokkos::View.");
+      static_assert(static_cast<int>(AV::rank) == 2, "AV must have rank 2.");
+      static_assert(static_cast<int>(BV::rank) == 2, "BV must have rank 2.");
+      static_assert(static_cast<int>(CV::rank) == 2, "CV must have rank 2.");
 
       // Figure out Scalar Types
       typedef typename AV::non_const_value_type ScalarA;
@@ -872,8 +956,10 @@ struct GEMM {
       int vector_length = blockB1 / 4;
       int max_vector_length =
          get_max_vector_size<typename CV::execution_space>();
-      if(vector_length > max_vector_length)
+      if (vector_length > max_vector_length)
+      {
          vector_length = max_vector_length;
+      }
 
       // Compute scratch space size
       typedef GEMMImpl<typename CV::execution_space, AV, BV, CV, V, blockA0,
@@ -892,22 +978,30 @@ struct GEMM {
       // Figure out Team Sizes
       int team_size = 1;
 #if defined(KOKKOS_ENABLE_CUDA)
-      if(std::is_same<typename CV::execution_space, Kokkos::Cuda>::value)
+      if (std::is_same<typename CV::execution_space, Kokkos::Cuda>::value)
+      {
          team_size = blockA0;
+      }
 #endif
 #if defined(KOKKOS_ENABLE_HIP)
-      if(std::is_same<typename CV::execution_space,
-            Kokkos::Experimental::HIP>::value)
+      if (std::is_same<typename CV::execution_space,
+             Kokkos::Experimental::HIP>::value)
+      {
          team_size = blockA0;
+      }
 #endif
 #if defined(KOKKOS_ENABLE_ROCM)
-      if(std::is_same<typename CV::execution_space, Kokkos::ROCm>::value)
+      if (std::is_same<typename CV::execution_space, Kokkos::ROCm>::value)
+      {
          team_size = blockA0;
+      }
 #endif
 #if defined(KOKKOS_ENABLE_SYCL)
-      if(std::is_same<typename CV::execution_space,
-            Kokkos::Experimental::SYCL>::value)
+      if (std::is_same<typename CV::execution_space,
+             Kokkos::Experimental::SYCL>::value)
+      {
          team_size = blockA0;
+      }
 #endif
 
       GEMMImpl<typename CV::execution_space, AV, BV, CV, V, blockA0, blockA1,
@@ -919,27 +1013,30 @@ struct GEMM {
 
 
 template <class AViewType, class BViewType, class CViewType, class V>
-void blockGemm(const AViewType &A, const BViewType &B, const CViewType &C,
-   const V &allScan, const V &scan, const V &xGrid, const V &yGrid,
-   const int allTotal) {
+void blockGemm(const AViewType& A, const BViewType& B, const CViewType& C,
+   const V& allScan, const V& scan, const V& xGrid, const V& yGrid,
+   const int allTotal)
+{
    const typename CViewType::execution_space space =
       typename CViewType::execution_space();
    // Return if C matrix is degenerated
-   if((C.extent(0) == 0) || (C.extent(1) == 0))
-   { return; }
+   if ((C.extent(0) == 0) || (C.extent(1) == 0))
+   {
+      return;
+   }
 
    // Minimize the number of Impl::GEMM instantiations, by
    // standardizing on particular View specializations for its template
    // parameters.
-   typedef Kokkos::View<typename AViewType::const_value_type **,
+   typedef Kokkos::View<typename AViewType::const_value_type**,
       typename AViewType::array_layout, typename AViewType::device_type,
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>
       AVT;
-   typedef Kokkos::View<typename BViewType::const_value_type **,
+   typedef Kokkos::View<typename BViewType::const_value_type**,
       typename BViewType::array_layout, typename BViewType::device_type,
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>
       BVT;
-   typedef Kokkos::View<typename CViewType::non_const_value_type **,
+   typedef Kokkos::View<typename CViewType::non_const_value_type**,
       typename CViewType::array_layout, typename CViewType::device_type,
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>
       CVT;
@@ -949,8 +1046,9 @@ void blockGemm(const AViewType &A, const BViewType &B, const CViewType &C,
 
 template <Integer S = 0, typename T, typename MS, typename MZ, typename MZL,
    typename V>
-void applyKokkosBlockOperator(const T mspSetup, const MS &vmOps, const MZ &rOutView,
-   const MZL &inView, const V &scan, const int total) {
+void applyKokkosBlockOperator(const T mspSetup, const MS& vmOps,
+   const MZ& rOutView, const MZL& inView, const V& scan, const int total)
+{
 
    auto slowSize = mspSetup->slowSize();
    auto outRows = mspSetup->fwdSize();
@@ -965,9 +1063,9 @@ void applyKokkosBlockOperator(const T mspSetup, const MS &vmOps, const MZ &rOutV
    static constexpr int blockA0 = ROW_BLOCK_SIZE;
    static constexpr int blockB1 = COL_BLOCK_SIZE;
    // build row and cols scan for each matrix using the block sizes.
-   for(int i = 0; i < slowSize; i++)
+   for (int i = 0; i < slowSize; i++)
    {
-      if constexpr(S != 1)
+      if constexpr (S != 1)
       {
          outRows = mspSetup->fastSize(i);
       }
@@ -978,11 +1076,15 @@ void applyKokkosBlockOperator(const T mspSetup, const MS &vmOps, const MZ &rOutV
       auto rc = col_size % blockB1;
       auto colBlocks = col_size / blockB1;
 
-      if(ro > 0)
+      if (ro > 0)
+      {
          ++rowBlocks;
+      }
 
-      if(rc > 0)
+      if (rc > 0)
+      {
          ++colBlocks;
+      }
 
       hostRowScan(i + 1) = hostRowScan(i) + rowBlocks;
       hostColScan(i + 1) = hostColScan(i) + colBlocks;
@@ -1004,13 +1106,7 @@ void applyKokkosBlockOperator(const T mspSetup, const MS &vmOps, const MZ &rOutV
    generate_block_cluster(xGrid, yGrid, hostRowScan, hostColScan, hostAllScan);
 
    // call the
-   Kokkos::Timer timer_gen;
    blockGemm(vmOps, inView, rOutView, allScan, scan, xGrid, yGrid, allTotal);
-   /* iKokkosBlockGemm<S>(vmOps, inView, rOutView, rowScan, colScan, scan, xGrid, yGrid,
-      allScan, allTotal); */
-   double time_gen = timer_gen.seconds();
-   std::cout << "Kokkos ApplyBlockOp took: " << time_gen << " seconds."
-             << std::endl;
 }
 
 #endif

@@ -7,6 +7,7 @@
 //
 
 // Project includes
+#include "Profiler/Interface.hpp"
 #include "QuICC/Transform/Poly/Worland/Integrator/Kokkos/KokkosIWorlandIntegrator.hpp"
 
 namespace QuICC {
@@ -54,6 +55,7 @@ void KokkosIWorlandIntegrator::initOperators(const Internal::Array& igrid,
 void KokkosIWorlandIntegrator::applyOperators(MatrixZ& rOut,
    const MatrixZ& in) const
 {
+   Profiler::RegionFixture<3> fix("KokkosIWorlandIntegrator::applyOperators");
 
    // assert right sizes for input matrix
    assert(in.rows() == this->mspSetup->fwdSize());
@@ -65,11 +67,15 @@ void KokkosIWorlandIntegrator::applyOperators(MatrixZ& rOut,
    OpVectorI scan("outRows Scan", slowSize + 1);
    auto hostScan = Kokkos::create_mirror_view(scan);
 
+   Profiler::RegionStart<4>("KokkosIWorlandIntegrator::hostScan");
+
    for (int i = 0; i < this->mspSetup->slowSize(); i++)
    {
       int cols = this->mspSetup->mult(i);
       hostScan[i + 1] = hostScan[i] + cols;
    }
+
+   Profiler::RegionStop<4>("KokkosIWorlandIntegrator::hostScan");
 
    Kokkos::deep_copy(scan, hostScan);
 
@@ -80,13 +86,11 @@ void KokkosIWorlandIntegrator::applyOperators(MatrixZ& rOut,
 
    OpMatrixLZ rOutView("rOutView", rOut.rows(), rOut.cols());
 
-   Kokkos::Timer timer;
+   Profiler::RegionStart<4>("KokkosIWorlandIntegrator::applyUnitOperator");
 
    this->applyUnitOperator(rOutView, inView, scan, total);
 
-   double time = timer.seconds();
-   std::cout << "Kokkos Integrator Operator Took: " << time << " Seconds."
-             << std::endl;
+   Profiler::RegionStop<4>("KokkosIWorlandIntegrator::applyUnitOperator");
 
    DeepCopyEigen(rOut, rOutView);
 }

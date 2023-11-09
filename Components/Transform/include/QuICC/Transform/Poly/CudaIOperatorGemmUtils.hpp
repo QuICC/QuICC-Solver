@@ -34,14 +34,16 @@ namespace Poly {
 // Get a matrix element, layout left
 template <Integer Layout, typename M>
 __device__ std::enable_if_t<Layout == 0, typename M::Scalar> GetElement(
-   const M A, int row, int col) {
+   const M A, int row, int col)
+{
    return A.elements[col * A.stride + row];
 }
 
 // Get a matrix element, layout right
 template <Integer Layout, typename M>
 __device__ std::enable_if_t<Layout == 1, typename M::Scalar> GetElement(
-   const M A, int row, int col) {
+   const M A, int row, int col)
+{
    return A.elements[row * A.stride + col];
 }
 
@@ -54,19 +56,23 @@ __device__ void SetElement(M A, int row, int col, cuDoubleComplex value) {
 
 // Set a matrix element
 template <Integer Layout, typename M>
-__device__ std::enable_if_t<Layout == 0, void> SetElement(
-   M A, int row, int col, typename M::Scalar value) {
+__device__ std::enable_if_t<Layout == 0, void> SetElement(M A, int row, int col,
+   typename M::Scalar value)
+{
    A.elements[col * A.stride + row] = value;
 }
 
 // Set a matrix element
 template <Integer Layout, typename M>
-__device__ std::enable_if_t<Layout == 1, void> SetElement(
-   M A, int row, int col, typename M::Scalar value) {
+__device__ std::enable_if_t<Layout == 1, void> SetElement(M A, int row, int col,
+   typename M::Scalar value)
+{
    A.elements[row * A.stride + col] = value;
 }
 
-template <typename M> __device__ M GetStartMatrix(M A, int offset, int stride, int width) {
+template <typename M>
+__device__ M GetStartMatrix(M A, int offset, int stride, int width)
+{
    M Asub;
    Asub.width = width;
    Asub.height = stride;
@@ -76,7 +82,8 @@ template <typename M> __device__ M GetStartMatrix(M A, int offset, int stride, i
    return Asub;
 }
 
-template <typename M> __device__ M GetStartMatrix(M A, int offset, int stride) {
+template <typename M> __device__ M GetStartMatrix(M A, int offset, int stride)
+{
    M Asub;
    Asub.height = stride;
    Asub.block_stride = stride;
@@ -89,8 +96,8 @@ template <typename M> __device__ M GetStartMatrix(M A, int offset, int stride) {
 // located col sub-matrices to the right and row sub-matrices down
 // from the upper-left corner of A
 template <Integer Layout, typename M>
-__device__ std::enable_if_t<Layout == 0, M> GetSubMatrix(
-   M A, int row, int col) {
+__device__ std::enable_if_t<Layout == 0, M> GetSubMatrix(M A, int row, int col)
+{
    M Asub;
    Asub.width = BLOCK_SIZE;
    Asub.height = BLOCK_SIZE;
@@ -103,8 +110,8 @@ __device__ std::enable_if_t<Layout == 0, M> GetSubMatrix(
 // located col sub-matrices to the right and row sub-matrices down
 // from the upper-left corner of A
 template <Integer Layout, typename M>
-__device__ std::enable_if_t<Layout == 1, M> GetSubMatrix(
-   M A, int row, int col) {
+__device__ std::enable_if_t<Layout == 1, M> GetSubMatrix(M A, int row, int col)
+{
    M Asub;
    Asub.width = BLOCK_SIZE;
    Asub.height = BLOCK_SIZE;
@@ -113,16 +120,18 @@ __device__ std::enable_if_t<Layout == 1, M> GetSubMatrix(
    return Asub;
 }
 
-struct Abs2Complex {
-   template<typename C>
-    __device__ auto operator()(C v) const {
-        return (v.real() * v.real()) + (v.imag() * v.imag());
-    }
+struct Abs2Complex
+{
+   template <typename C> __device__ auto operator()(C v) const
+   {
+      return (v.real() * v.real()) + (v.imag() * v.imag());
+   }
 };
 
 
 template <typename V, typename M, typename L, typename T, Integer Layout = 0>
-__global__ void MatMulKernel(M A, L B, T C) {
+__global__ void MatMulKernel(M A, L B, T C)
+{
    // Block row and column
    int blockRow = blockIdx.y;
    int blockCol = blockIdx.x;
@@ -142,7 +151,7 @@ __global__ void MatMulKernel(M A, L B, T C) {
    // required to compute Csub
    // Multiply each pair of sub-matrices together
    // and accumulate the results
-   for(int m = 0; m < (A.width / BLOCK_SIZE); ++m)
+   for (int m = 0; m < (A.width / BLOCK_SIZE); ++m)
    {
 
       // Get sub-matrix Asub of A
@@ -164,8 +173,10 @@ __global__ void MatMulKernel(M A, L B, T C) {
       // before starting the computation
       __syncthreads();
       // Multiply Asub and Bsub together
-      for(int e = 0; e < BLOCK_SIZE; ++e)
+      for (int e = 0; e < BLOCK_SIZE; ++e)
+      {
          Cvalue += As[row][e] * Bs[e][col];
+      }
 
       // Synchronize to make sure that the preceding
       // computation is done before loading two new
@@ -181,7 +192,8 @@ __global__ void MatMulKernel(M A, L B, T C) {
 // Matrix multiplication - Host code
 // Matrix dimensions are assumed to be multiples of BLOCK_SIZE
 template <typename V, typename M, typename L, typename T, Integer Layout = 0>
-void MatMul(const M A, const L B, T C) {
+void MatMul(const M A, const L B, T C)
+{
    // Load A and B to device memory
    using OpMatrixC = typename CudaIOperatorTypes::OpMatrixC;
 
@@ -210,15 +222,15 @@ void MatMul(const M A, const L B, T C) {
    MatMulKernel<V><<<dimGrid, dimBlock>>>(d_A, d_B, d_C);
 }
 
-//BLOCK GEMM KERNELS
+// BLOCK GEMM KERNELS
 //
 
 // irregular block gemm kernel, default Layout left (L = 0)
 template <typename M, typename L, typename V, typename T, typename S,
-    Integer Layout = 0, typename F = nullptr_t>
+   Integer Layout = 0, typename F = nullptr_t>
 __device__ void iBlockGemmDevice(const F& f, M Astart, L Bstart, V Cstart,
-    const S rowScan, const S colScan, const T* xGrid, const T* yGrid,
-    const Integer matrix_block_id)
+   const S rowScan, const S colScan, const T* xGrid, const T* yGrid,
+   const Integer matrix_block_id)
 {
 
    int blockid = blockIdx.x;
@@ -239,8 +251,10 @@ __device__ void iBlockGemmDevice(const F& f, M Astart, L Bstart, V Cstart,
    auto rs = Bstart.height % BLOCK_SIZE;
    auto subMatrixSize = Bstart.height / BLOCK_SIZE;
 
-   if(rs > 0)
+   if (rs > 0)
+   {
       ++subMatrixSize;
+   }
 
    // Thread row and column within Csub
    int row = threadIdx.x;
@@ -256,21 +270,27 @@ __device__ void iBlockGemmDevice(const F& f, M Astart, L Bstart, V Cstart,
 
    /* auto col_size = Cstart.width; */
    // handle the last row block which can be less than block size.
-   if(lastBlockRow == blockRow)
+   if (lastBlockRow == blockRow)
+   {
       Axblock = Cstart.height - BLOCK_SIZE * lastBlockRow;
+   }
 
    // handle the last col block which can be less than block size.
-   if(lastBlockCol == blockCol)
+   if (lastBlockCol == blockCol)
+   {
       Ayblock = Cstart.width - BLOCK_SIZE * lastBlockCol;
+   }
 
    // Loop over all the sub-matrices of A and B that are rquired to compute Csub
    // Multiply each pair of sub-matrices together and accumulate the results
-   for(int m = 0; m < subMatrixSize; ++m)
+   for (int m = 0; m < subMatrixSize; ++m)
    {
       auto ABxyBlock = BLOCK_SIZE;
       /* handle the last col block which can be less than block size. */
-      if(m == subMatrixSize - 1 && rs > 0)
+      if (m == subMatrixSize - 1 && rs > 0)
+      {
          ABxyBlock = Bstart.block_stride - BLOCK_SIZE * m;
+      }
 
       using AScalar = typename M::Scalar;
       using BScalar = typename L::Scalar;
@@ -292,11 +312,13 @@ __device__ void iBlockGemmDevice(const F& f, M Astart, L Bstart, V Cstart,
           Each thread loads one element of each sub-matrix */
 
       // Handle the last row block
-      if(col < ABxyBlock && row < Axblock)
-      { As[row][col] = GetElement<Layout>(Asub, row, col); }
+      if (col < ABxyBlock && row < Axblock)
+      {
+         As[row][col] = GetElement<Layout>(Asub, row, col);
+      }
 
       // Handle the last col block
-      if(row < ABxyBlock && col < Ayblock)
+      if (row < ABxyBlock && col < Ayblock)
       {
          auto bsub = GetElement<Layout>(Bsub, row, col);
          Bs1[row][col] = bsub.real();
@@ -308,10 +330,12 @@ __device__ void iBlockGemmDevice(const F& f, M Astart, L Bstart, V Cstart,
       __syncthreads();
       /* Multiply Asub and Bsub together */
       // handle the last col and last row block
-      if(row < Axblock && col < Ayblock)
+      if (row < Axblock && col < Ayblock)
       {
-         for(int e = 0; e < ABxyBlock; ++e)
-         { Cvalue += As[row][e] * CScalar(Bs1[e][col], Bs2[e][col]); }
+         for (int e = 0; e < ABxyBlock; ++e)
+         {
+            Cvalue += As[row][e] * CScalar(Bs1[e][col], Bs2[e][col]);
+         }
       }
 
       /* Synchronize to make sure that the preceding computation is done
@@ -320,16 +344,18 @@ __device__ void iBlockGemmDevice(const F& f, M Astart, L Bstart, V Cstart,
    }
 
    // handle the last col and last row block
-   if(row < Axblock && col < Ayblock)
+   if (row < Axblock && col < Ayblock)
    {
-       RScalar result = 0;
-       if constexpr (!std::is_same_v<F, nullptr_t>)
-           result = f(Cvalue);
-       else
-       {
-           static_assert(std::is_same_v<V, L>);
-           result = Cvalue;
-       }
+      RScalar result = 0;
+      if constexpr (!std::is_same_v<F, nullptr_t>)
+      {
+         result = f(Cvalue);
+      }
+      else
+      {
+         static_assert(std::is_same_v<V, L>);
+         result = Cvalue;
+      }
       // Write Csub to device memory
       // Each thread writes one element
       SetElement<Layout>(Csub, row, col, result);
@@ -342,14 +368,16 @@ __device__ void iBlockGemmDevice(const F& f, M Astart, L Bstart, V Cstart,
 
 
 // irregular block gemm kernel, default Layout left (L = 0), horizontal IN
-template <typename M, typename L, typename V, typename T, typename S, Integer Layout = 0, typename F = nullptr_t>
+template <typename M, typename L, typename V, typename T, typename S,
+   Integer Layout = 0, typename F = nullptr_t>
 __global__ void iBlockGemmKernelWorlandProjector(M A, L B, V C, const S rowScan,
-   const S colScan, const S scan, const S allscan, const T *xGrid,
-   const T *yGrid, const F& f) {
+   const S colScan, const S scan, const S allscan, const T* xGrid,
+   const T* yGrid, const F& f)
+{
    int blockid = blockIdx.x;
    // The id of the matrix block within the large matrix
    auto matrix_block_id = binary_search_range(allscan, blockid);
-      // The start address of the vertical C and A matrices
+   // The start address of the vertical C and A matrices
    auto matrix_block_col_start = scan(matrix_block_id);
    // The size of the block matrix with matrix block id.
    auto matrixColSize = scan(matrix_block_id + 1) - matrix_block_col_start;
@@ -360,18 +388,21 @@ __global__ void iBlockGemmKernelWorlandProjector(M A, L B, V C, const S rowScan,
    // This is a horizontal matrix. Calc. differ from the A matrix.
    L Bstart = GetStartMatrix(B, matrix_block_col_start * B.height, B.height);
    // matrix starts at scan(i) with size scan(i+1) - scan(i)
-   V Cstart = GetStartMatrix(C, matrix_block_col_start * C.height, C.height, matrixColSize);
+   V Cstart = GetStartMatrix(C, matrix_block_col_start * C.height, C.height,
+      matrixColSize);
 
    iBlockGemmDevice(f, Astart, Bstart, Cstart, rowScan, colScan, xGrid, yGrid,
-       matrix_block_id);
+      matrix_block_id);
 }
 
 // irregular block gemm kernel, default Layout left (L = 0), horizontal mops
 // matrix
-template <typename M, typename L, typename V, typename T, typename S, Integer Layout = 0, typename F = nullptr_t>
+template <typename M, typename L, typename V, typename T, typename S,
+   Integer Layout = 0, typename F = nullptr_t>
 __global__ void iBlockGemmKernelProjector(M A, L B, V C, const S rowScan,
-   const S colScan, const S scan, const S allscan, const T *xGrid,
-   const T *yGrid, const F& f) {
+   const S colScan, const S scan, const S allscan, const T* xGrid,
+   const T* yGrid, const F& f)
+{
    int blockid = blockIdx.x;
 
    // The id of the matrix block within the large matrix
@@ -390,18 +421,20 @@ __global__ void iBlockGemmKernelProjector(M A, L B, V C, const S rowScan,
    V Cstart = GetStartMatrix(C, CRowSize * matrix_block_id, CRowSize, C.width);
 
    iBlockGemmDevice(f, Astart, Bstart, Cstart, rowScan, colScan, xGrid, yGrid,
-       matrix_block_id);
+      matrix_block_id);
 }
 
 // irregular block gemm kernel, default Layout left (L = 0), horizontal IN
-template <typename M, typename L, typename V, typename T, typename S, Integer Layout = 0, typename F = nullptr_t>
+template <typename M, typename L, typename V, typename T, typename S,
+   Integer Layout = 0, typename F = nullptr_t>
 __global__ void iBlockGemmKernelReductor(M A, L B, V C, const S rowScan,
-   const S colScan, const S scan, const S allscan, const T *xGrid,
-   const T *yGrid, const F& f) {
+   const S colScan, const S scan, const S allscan, const T* xGrid,
+   const T* yGrid, const F& f)
+{
    int blockid = blockIdx.x;
    // The id of the matrix block within the large matrix
    auto matrix_block_id = binary_search_range(allscan, blockid);
-      // The start address of the vertical C and A matrices
+   // The start address of the vertical C and A matrices
    auto matrix_block_row_start = scan(matrix_block_id);
    // The size of the block matrix with matrix block id.
    auto matrixRowSize = scan(matrix_block_id + 1) - matrix_block_row_start;
@@ -415,19 +448,21 @@ __global__ void iBlockGemmKernelReductor(M A, L B, V C, const S rowScan,
    V Cstart = GetStartMatrix(C, matrix_block_row_start, matrixRowSize, C.width);
 
    iBlockGemmDevice(f, Astart, Bstart, Cstart, rowScan, colScan, xGrid, yGrid,
-       matrix_block_id);
+      matrix_block_id);
 }
 
 
 // irregular block gemm kernel, default Layout left (L = 0), horizontal IN
-template <typename M, typename L, typename V, typename T, typename S, Integer Layout = 0, typename F = nullptr_t>
-__global__ void iBlockGemmKernelWorlandIntegrator(M A, L B, V C, const S rowScan,
-   const S colScan, const S scan, const S allscan, const T *xGrid,
-   const T *yGrid, const F& f) {
+template <typename M, typename L, typename V, typename T, typename S,
+   Integer Layout = 0, typename F = nullptr_t>
+__global__ void iBlockGemmKernelWorlandIntegrator(M A, L B, V C,
+   const S rowScan, const S colScan, const S scan, const S allscan,
+   const T* xGrid, const T* yGrid, const F& f)
+{
    int blockid = blockIdx.x;
    // The id of the matrix block within the large matrix
    auto matrix_block_id = binary_search_range(allscan, blockid);
-      // The start address of the vertical C and A matrices
+   // The start address of the vertical C and A matrices
    auto matrix_block_col_start = scan(matrix_block_id);
    // The size of the block matrix with matrix block id.
    auto matrixColSize = scan(matrix_block_id + 1) - matrix_block_col_start;
@@ -438,22 +473,25 @@ __global__ void iBlockGemmKernelWorlandIntegrator(M A, L B, V C, const S rowScan
    // This is a horizontal matrix. Calc. differ from the A matrix.
    L Bstart = GetStartMatrix(B, matrix_block_col_start * B.height, B.height);
    // matrix starts at scan(i) with size scan(i+1) - scan(i)
-   V Cstart = GetStartMatrix(C, matrix_block_col_start * C.height, C.height, matrixColSize);
+   V Cstart = GetStartMatrix(C, matrix_block_col_start * C.height, C.height,
+      matrixColSize);
 
    iBlockGemmDevice(f, Astart, Bstart, Cstart, rowScan, colScan, xGrid, yGrid,
-       matrix_block_id);
+      matrix_block_id);
 }
 
 
 // irregular block gemm kernel, default Layout left (L = 0), horizontal IN
-template <typename M, typename L, typename V, typename T, typename S, Integer Layout = 0, typename F = nullptr_t>
+template <typename M, typename L, typename V, typename T, typename S,
+   Integer Layout = 0, typename F = nullptr_t>
 __global__ void iBlockGemmKernelIntegrator(M A, L B, V C, const S rowScan,
-   const S colScan, const S scan, const S allscan, const T *xGrid,
-   const T *yGrid, const F& f) {
+   const S colScan, const S scan, const S allscan, const T* xGrid,
+   const T* yGrid, const F& f)
+{
    int blockid = blockIdx.x;
    // The id of the matrix block within the large matrix
    auto matrix_block_id = binary_search_range(allscan, blockid);
-      // The start address of the vertical C and A matrices
+   // The start address of the vertical C and A matrices
    auto matrix_block_row_start = scan(matrix_block_id);
    // The size of the block matrix with matrix block id.
    auto matrixRowSize = scan(matrix_block_id + 1) - matrix_block_row_start;
@@ -467,16 +505,16 @@ __global__ void iBlockGemmKernelIntegrator(M A, L B, V C, const S rowScan,
    V Cstart = GetStartMatrix(C, matrix_block_row_start, matrixRowSize, C.width);
 
    iBlockGemmDevice(f, Astart, Bstart, Cstart, rowScan, colScan, xGrid, yGrid,
-       matrix_block_id);
+      matrix_block_id);
 }
 
 // Block Matrix multiplication - Host code - Using layout left (column major)
 // matrices
 template <Integer S = 0, typename M, typename L, typename Z, typename V,
-    typename F = nullptr_t>
+   typename F = nullptr_t>
 void iBlockGemm(const M& d_A, const L& d_B, const Z& d_C, const V& rowScan,
-    const V& colScan, const V& scan, const V& xGrid, const V& yGrid,
-    const V& allScan, const int allTotal, const F& f)
+   const V& colScan, const V& scan, const V& xGrid, const V& yGrid,
+   const V& allScan, const int allTotal, const F& f)
 {
 
    dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
@@ -484,27 +522,27 @@ void iBlockGemm(const M& d_A, const L& d_B, const Z& d_C, const V& rowScan,
    if constexpr (S == 0)
    {
       iBlockGemmKernelIntegrator<<<allTotal, dimBlock>>>(d_A, d_B, d_C, rowScan,
-          colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
+         colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
    }
    else if (S == 1)
    {
       iBlockGemmKernelProjector<<<allTotal, dimBlock>>>(d_A, d_B, d_C, rowScan,
-          colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
+         colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
    }
    else if (S == 2)
    {
       iBlockGemmKernelReductor<<<allTotal, dimBlock>>>(d_A, d_B, d_C, rowScan,
-          colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
+         colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
    }
    else if (S == 3)
    {
       iBlockGemmKernelWorlandIntegrator<<<allTotal, dimBlock>>>(d_A, d_B, d_C,
-          rowScan, colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
+         rowScan, colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
    }
    else if (S == 4)
    {
       iBlockGemmKernelWorlandProjector<<<allTotal, dimBlock>>>(d_A, d_B, d_C,
-          rowScan, colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
+         rowScan, colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
    }
 
 
@@ -512,9 +550,11 @@ void iBlockGemm(const M& d_A, const L& d_B, const Z& d_C, const V& rowScan,
    cudaErrChk(cudaDeviceSynchronize());
 }
 
-template <Integer S = 0, typename T, typename MS, typename MV, typename MZ, typename V, typename F = nullptr_t>
-void applyBlockOperator(const T mspSetup, const MS &vmOps, const MV &rOutView,
-   const MZ &inView, const V &scan, const int total, const F& f = F()) {
+template <Integer S = 0, typename T, typename MS, typename MV, typename MZ,
+   typename V, typename F = nullptr_t>
+void applyBlockOperator(const T mspSetup, const MS& vmOps, const MV& rOutView,
+   const MZ& inView, const V& scan, const int total, const F& f = F())
+{
 
    auto slowSize = mspSetup->slowSize();
    auto outRows = mspSetup->fwdSize();
@@ -527,7 +567,7 @@ void applyBlockOperator(const T mspSetup, const MS &vmOps, const MV &rOutView,
    auto hostAllScan = Kokkos::create_mirror_view(allScan);
 
    // build row and cols scan for each matrix using the block sizes.
-   for(int i = 0; i < slowSize; i++)
+   for (int i = 0; i < slowSize; i++)
    {
       if constexpr (S != 1 && S != 4)
       {
@@ -540,11 +580,15 @@ void applyBlockOperator(const T mspSetup, const MS &vmOps, const MV &rOutView,
       auto rc = col_size % BLOCK_SIZE;
       auto colBlocks = col_size / BLOCK_SIZE;
 
-      if(ro > 0)
+      if (ro > 0)
+      {
          ++rowBlocks;
+      }
 
-      if(rc > 0)
+      if (rc > 0)
+      {
          ++colBlocks;
+      }
 
       hostRowScan(i + 1) = hostRowScan(i) + rowBlocks;
       hostColScan(i + 1) = hostColScan(i) + colBlocks;
@@ -565,13 +609,9 @@ void applyBlockOperator(const T mspSetup, const MS &vmOps, const MV &rOutView,
 
    generate_block_cluster(xGrid, yGrid, hostRowScan, hostColScan, hostAllScan);
 
-   /* if(std::is_same<KokkosSpace, Kokkos::CudaSpace>::value)
-      std::cout << "KOKKOS_HAVE_CUDA\n" << std::endl; */
-
    // use cuda poly data types
    using OpMatrixA = typename CudaIOperatorTypes::OpMatrixC;
    using OpMatrixB = typename CudaIOperatorTypes::OpMatrixZC;
-
 
 
    // build cuda matrix types from Kokkos views
@@ -587,46 +627,37 @@ void applyBlockOperator(const T mspSetup, const MS &vmOps, const MV &rOutView,
    d_B.stride = d_B.height;
    d_B.elements = inView.data();
 
-if constexpr (!std::is_same_v<F, nullptr_t>)
+   if constexpr (!std::is_same_v<F, nullptr_t>)
    {
-       using OpMatrixCC = typename CudaIOperatorTypes::OpMatrixC;
+      using OpMatrixCC = typename CudaIOperatorTypes::OpMatrixC;
 
-   OpMatrixCC d_C;
-   d_C.width = rOutView.extent(1);
-   d_C.height = rOutView.extent(0);
-   d_C.stride = d_C.height;
-   d_C.elements = rOutView.data();
-   // call the
-   Kokkos::Timer timer_gen;
-   iBlockGemm<S>(
-      d_A, d_B, d_C, rowScan, colScan, scan, xGrid, yGrid, allScan, allTotal, f);
-   double time_gen = timer_gen.seconds();
-   std::cout << "Cuda ApplyBlockOp took: " << time_gen << " seconds."
-             << std::endl;
-
-   }else {
-
-       using OpMatrixCC = typename CudaIOperatorTypes::OpMatrixZC;
-   OpMatrixCC d_C;
-   d_C.width = rOutView.extent(1);
-   d_C.height = rOutView.extent(0);
-   d_C.stride = d_C.height;
-   d_C.elements = rOutView.data();
-   // call the
-   Kokkos::Timer timer_gen;
-   iBlockGemm<S>(
-      d_A, d_B, d_C, rowScan, colScan, scan, xGrid, yGrid, allScan, allTotal, f);
-   double time_gen = timer_gen.seconds();
-   std::cout << "Cuda ApplyBlockOp took: " << time_gen << " seconds."
-             << std::endl;
-
+      OpMatrixCC d_C;
+      d_C.width = rOutView.extent(1);
+      d_C.height = rOutView.extent(0);
+      d_C.stride = d_C.height;
+      d_C.elements = rOutView.data();
+      // call the
+      iBlockGemm<S>(d_A, d_B, d_C, rowScan, colScan, scan, xGrid, yGrid,
+         allScan, allTotal, f);
    }
+   else
+   {
 
-
+      using OpMatrixCC = typename CudaIOperatorTypes::OpMatrixZC;
+      OpMatrixCC d_C;
+      d_C.width = rOutView.extent(1);
+      d_C.height = rOutView.extent(0);
+      d_C.stride = d_C.height;
+      d_C.elements = rOutView.data();
+      // call the
+      iBlockGemm<S>(d_A, d_B, d_C, rowScan, colScan, scan, xGrid, yGrid,
+         allScan, allTotal, f);
+   }
 }
 
 template <typename T, typename M>
-void constantMultiplyMatrix(const T constant, const M &matrix){
+void constantMultiplyMatrix(const T constant, const M& matrix)
+{
 
    auto rows = matrix.extent(0);
    auto cols = matrix.extent(1);
@@ -640,7 +671,8 @@ void constantMultiplyMatrix(const T constant, const M &matrix){
 }
 
 template <Integer S = 0, typename T, typename V, typename M>
-void constantMultiplyMatrix(const T mspSetup, const V &scan, const M &matrix){
+void constantMultiplyMatrix(const T mspSetup, const V& scan, const M& matrix)
+{
 
    using DataType = CudaIOperatorTypes::DataType;
    auto slowSize = mspSetup->slowSize();
@@ -649,11 +681,12 @@ void constantMultiplyMatrix(const T mspSetup, const V &scan, const M &matrix){
    auto hostConstants = Kokkos::create_mirror_view(constants);
 
    auto sign = -1.0;
-   if constexpr(S == 1){
-       sign = 1.0;
+   if constexpr (S == 1)
+   {
+      sign = 1.0;
    }
 
-   for(int i = 0; i < slowSize; i++)
+   for (int i = 0; i < slowSize; i++)
    {
       hostConstants(i) =
          DataType(0.0, sign * static_cast<MHDFloat>(mspSetup->slow(i)));
@@ -678,8 +711,9 @@ namespace Experimental {
 
 template <typename M, typename L, typename T, typename S, Integer Layout = 0>
 __global__ void iBlockGemmExpKernel(M A, L B, L C, const S rowScan,
-   const S colScan, const S scan, const S allscan, const T *xGrid,
-   const T *yGrid) {
+   const S colScan, const S scan, const S allscan, const T* xGrid,
+   const T* yGrid)
+{
 
    auto col_size = C.width;
 
@@ -709,25 +743,27 @@ __global__ void iBlockGemmExpKernel(M A, L B, L C, const S rowScan,
    // Each thread computes one element of Csub
    // by accumulating results into Cvalue
    CScalar Cvalue = 0;
-   /* cuDoubleComplex czero = make_cuDoubleComplex(0, 0);
-   cuDoubleComplex CCvalue = czero; */
 
    auto rs = A.width % BLOCK_SIZE;
    auto subMatrixSize = A.width / BLOCK_SIZE;
 
-   if(rs > 0)
+   if (rs > 0)
+   {
       ++subMatrixSize;
+   }
 
    // Loop over all the sub-matrices of A and B that are
    // required to compute Csub
    // Multiply each pair of sub-matrices together
    // and accumulate the results
-   for(int m = 0; m < subMatrixSize; ++m)
+   for (int m = 0; m < subMatrixSize; ++m)
    {
       auto ABxyBlock = BLOCK_SIZE;
       /* handle the last col block which can be less than block size. */
-      if(m == subMatrixSize - 1 && rs > 0)
+      if (m == subMatrixSize - 1 && rs > 0)
+      {
          ABxyBlock = B.height - BLOCK_SIZE * m;
+      }
 
       using AScalar = typename M::Scalar;
       using BScalar = typename L::Scalar;
@@ -753,12 +789,14 @@ __global__ void iBlockGemmExpKernel(M A, L B, L C, const S rowScan,
 
       // Handle the last row block
       /* if(col < ABxyBlock && row < Axblock) */
-      if(col < ABxyBlock && grow < C.height)
-      { As[row][col] = GetElement<Layout>(Asub, row, col); }
+      if (col < ABxyBlock && grow < C.height)
+      {
+         As[row][col] = GetElement<Layout>(Asub, row, col);
+      }
 
       // Handle the last col block
       /* if(row < ABxyBlock && col < Ayblock) */
-      if(row < ABxyBlock && gcol < C.width)
+      if (row < ABxyBlock && gcol < C.width)
       {
          auto bsub = GetElement<Layout>(Bsub, row, col);
          // transpose
@@ -775,10 +813,9 @@ __global__ void iBlockGemmExpKernel(M A, L B, L C, const S rowScan,
       /* Multiply Asub and Bsub together */
 
       // handle the last col and last row block
-      /* if(row < Axblock && col < Ayblock) */
-      if(grow < C.height && gcol < C.width)
+      if (grow < C.height && gcol < C.width)
       {
-         for(int e = 0; e < ABxyBlock; ++e)
+         for (int e = 0; e < ABxyBlock; ++e)
          {
             Cvalue += As[row][e] * CScalar(Bs1[e][col], Bs2[e][col]);
             /* Cvalue += As[row][e] * CScalar(Bs1[col][e], Bs2[col][e]); */
@@ -792,13 +829,9 @@ __global__ void iBlockGemmExpKernel(M A, L B, L C, const S rowScan,
 
    // TODO: Get the block id of the row and block id of the col and if equal
    // store. Meaning do only comp. into your own block.
-   if(grow < C.height && gcol < C.width)
+   if (grow < C.height && gcol < C.width)
    {
-      /* auto val = GetElement<Layout>(Csub1, row, col); */
       SetElement<Layout>(Csub, row, col, Cvalue);
-
-      /* auto a = GetElement<Layout>(Csub, row, col); */
-      /* C.elements[grow + C.stride * gcol] = a; */
    }
 }
 
@@ -806,12 +839,10 @@ __global__ void iBlockGemmExpKernel(M A, L B, L C, const S rowScan,
 // matrices calling the iblockGemmExpKernel which works on the new cuda version
 // of the iblockgemm.
 template <typename M, typename L, typename V>
-void iBlockGemmExperimental(const M &d_A, const L &d_B, const L &d_C,
-   const V &rowScan, const V &colScan, const V &scan, const V &xGrid,
-   const V &yGrid, const V &allScan, const int allTotal) {
-   /* cudaEvent_t start, stop;
-   cudaEventCreate(&start);
-   cudaEventCreate(&stop); */
+void iBlockGemmExperimental(const M& d_A, const L& d_B, const L& d_C,
+   const V& rowScan, const V& colScan, const V& scan, const V& xGrid,
+   const V& yGrid, const V& allScan, const int allTotal)
+{
 
    dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
 
@@ -820,30 +851,21 @@ void iBlockGemmExperimental(const M &d_A, const L &d_B, const L &d_C,
    auto rc = d_C.width % BLOCK_SIZE;
    auto colBlocks = d_C.width / BLOCK_SIZE;
 
-   if(ro > 0)
+   if (ro > 0)
+   {
       ++rowBlocks;
+   }
 
-   if(rc > 0)
+   if (rc > 0)
+   {
       ++colBlocks;
+   }
 
    dim3 dimGrid(rowBlocks, colBlocks);
 
    // Invoke kernel
-   /* cudaEventRecord(start); */
-
-   /* iBlockCopyKernel<<<allTotal, dimBlock>>>(d_A, d_B, d_C, d_C, rowScan,
-      colScan, scan, allScan, xGrid.data(), yGrid.data()); */
-
-   iBlockGemmExpKernel<<<dimGrid, dimBlock>>>(d_A, d_B, d_C, rowScan,
-      colScan, scan, allScan, xGrid.data(), yGrid.data());
-
-   /* cudaEventRecord(stop);
-
-   cudaEventSynchronize(stop);
-   float milliseconds = 0;
-   cudaEventElapsedTime(&milliseconds, start, stop); */
-   /* std::cout << "Cuda iBlockGemmKernel Exp took: " << milliseconds
-             << " milliseconds." << std::endl; */
+   iBlockGemmExpKernel<<<dimGrid, dimBlock>>>(d_A, d_B, d_C, rowScan, colScan,
+      scan, allScan, xGrid.data(), yGrid.data());
 }
 } // namespace Experimental
 #endif

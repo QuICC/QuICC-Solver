@@ -9,9 +9,9 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Poly/Worland/Projector/Kokkos/KokkosIWorlandProjector.hpp"
-#include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "Profiler/Interface.hpp"
+#include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "QuICC/Transform/Poly/Worland/Projector/Kokkos/KokkosIWorlandProjector.hpp"
 
 namespace QuICC {
 
@@ -58,7 +58,7 @@ void KokkosIWorlandProjector::initOperators(const Internal::Array& igrid,
 void KokkosIWorlandProjector::applyOperators(MatrixZ& rOut,
    const MatrixZ& in) const
 {
-   Profiler::RegionFixture<3> fix("PIWorlandProjector::applyOperators");
+   Profiler::RegionFixture<3> fix("KokkosIWorlandProjector::applyOperators");
 
    // assert right sizes for input  matrix
    assert(in.cols() == this->mspSetup->blockSize());
@@ -70,7 +70,7 @@ void KokkosIWorlandProjector::applyOperators(MatrixZ& rOut,
    OpVectorI scan("outRows Scan", slowSize + 1);
    auto hostScan = Kokkos::create_mirror_view(scan);
 
-   Profiler::RegionStart<4>("PIWorlandProjector::hostScan");
+   Profiler::RegionStart<4>("KokkosIWorlandProjector::hostScan");
 
    for (int i = 0; i < this->mspSetup->slowSize(); i++)
    {
@@ -78,7 +78,7 @@ void KokkosIWorlandProjector::applyOperators(MatrixZ& rOut,
       hostScan[i + 1] = hostScan[i] + cols;
    }
 
-   Profiler::RegionStop<4>("PIWorlandProjector::hostScan");
+   Profiler::RegionStop<4>("KokkosIWorlandProjector::hostScan");
 
    Kokkos::deep_copy(scan, hostScan);
 
@@ -89,11 +89,11 @@ void KokkosIWorlandProjector::applyOperators(MatrixZ& rOut,
 
    OpMatrixLZ rOutView("rOutView", rOut.rows(), rOut.cols());
 
-   Profiler::RegionStart<4>("PIWorlandProjector::applyUnitOperator");
+   Profiler::RegionStart<4>("KokkosIWorlandProjector::applyUnitOperator");
 
    this->applyUnitOperator(rOutView, inView, scan, total);
 
-   Profiler::RegionStop<4>("PIWorlandProjector::applyUnitOperator");
+   Profiler::RegionStop<4>("KokkosIWorlandProjector::applyUnitOperator");
 
    DeepCopyEigen(rOut, rOutView);
 }
