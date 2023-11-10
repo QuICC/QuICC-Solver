@@ -27,7 +27,7 @@ test-quicc-lib:
   - .cpu
   image: $CSCS_REGISTRY_PATH/quicc_mp:$CI_COMMIT_SHA
 ci-cache-cleanup:
-  extends: .container-runner-daint-gpu
+  extends: .container-runner-daint
   stage: cleanup
   image: $CSCS_REGISTRY_PATH/quicc_mp:$CI_COMMIT_SHA
   script:
