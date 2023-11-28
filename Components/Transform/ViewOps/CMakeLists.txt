@@ -5,6 +5,8 @@ message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_
 
 # components
 add_subdirectory(ViewOps/Blas)
+add_subdirectory(ViewOps/Pointwise)
+add_subdirectory(ViewOps/Reduction)
 add_subdirectory(ViewOps/Fourier)
 add_subdirectory(ViewOps/ALegendre)
 add_subdirectory(ViewOps/Worland)

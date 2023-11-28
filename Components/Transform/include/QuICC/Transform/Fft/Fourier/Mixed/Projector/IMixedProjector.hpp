@@ -81,20 +81,6 @@ namespace Projector {
           */
          Backend::MixedProjector mBackend;
 
-      private:
-         /**
-          * @brief Initialise FFT backend
-          */
-         virtual void initBackend() const override;
-
-         /**
-          * @brief Apply pre FFT operator
-          *
-          * @param out  Copied or scaled input
-          * @param in   Input values
-          */
-         virtual void applyPreOperator(MatrixZ& out, const MatrixZ& in) const = 0;
-
          /**
           * @brief Compute transform C2C or R2R componentwise (disabled)
           *
@@ -118,6 +104,20 @@ namespace Projector {
           * @param in   Input values
           */
          virtual void transform(Matrix& rOut, const Matrix& in) const override;
+
+      private:
+         /**
+          * @brief Initialise FFT backend
+          */
+         virtual void initBackend() const override;
+
+         /**
+          * @brief Apply pre FFT operator
+          *
+          * @param out  Copied or scaled input
+          * @param in   Input values
+          */
+         virtual void applyPreOperator(MatrixZ& out, const MatrixZ& in) const = 0;
    };
 
 }

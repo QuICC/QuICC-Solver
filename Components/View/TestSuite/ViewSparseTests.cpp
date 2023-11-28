@@ -123,11 +123,10 @@ TEST_CASE("View Two Dimensional CSC", "[ViewTwoDimCSC]")
     constexpr size_t S = 3;
     std::array<double, S> data = {1,2,3};
 
-    using CSC = DimLevelType<compressed_t, sparse_t>;
     std::array<std::uint32_t, 2> dimensions {M, N};
     std::array<std::vector<std::uint32_t>, 2> pointers = {{ {0,2,2,2,3}, {}}};
     std::array<std::vector<std::uint32_t>, 2> indices = {{ {0,2,0}, {}}};
-    View<double, Attributes<CSC>> someView (data, dimensions, pointers, indices);
+    View<double, CSC> someView (data, dimensions, pointers, indices);
 
     CHECK(someView.rank() == 2);
     CHECK(someView.dims()[0] == M);

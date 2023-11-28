@@ -156,3 +156,45 @@ add_test(
     WORKING_DIRECTORY
     "${QUICC_WORK_DIR}"
 )
+
+#
+# View Pointwise  Tests
+#
+
+add_executable(ViewPointwiseTest
+    ViewPointwiseTests.cpp
+)
+
+target_link_libraries(ViewPointwiseTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Pointwise
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewPointwiseTest
+    COMMAND ViewPointwiseTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+#
+# View Reduction  Tests
+#
+
+add_executable(ViewReductionTest
+    ViewReductionTests.cpp
+)
+
+target_link_libraries(ViewReductionTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Reduction
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewReductionTest
+    COMMAND ViewReductionTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)

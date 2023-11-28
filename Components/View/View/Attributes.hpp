@@ -424,6 +424,11 @@ namespace Memory {
    using dense2DRM = Attributes<DimLevelType<dense_t, dense_t>, LoopOrderType<j_t, i_t>>;
 
    /**
+    * @brief 2D CSC column major matrix (M,N)
+    */
+   using CSC = Attributes<DimLevelType<compressed_t, sparse_t>>;
+
+   /**
     * @brief 2D CSC column major matrix (N,K) which elements are 1D dense vectors,
     * i.e a 3D tensor (M,N,K) with fully populated columns
     *
@@ -527,6 +532,33 @@ namespace Memory {
     */
    using S2CLCSC3DJIK = Attributes<DimLevelType<step2K_t, compressed_t, sparse_t>,
       LoopOrderType<j_t, i_t, k_t>>;
+
+   /**
+    * @brief AL projector operator type on cpu
+    *  Compressed step 2 row layer
+    */
+   using CS2RL3DJIK = Attributes<DimLevelType<dense_t, step2K_t, compressed_t>,
+      LoopOrderType<j_t, i_t, k_t>>;
+
+   /**
+    * @brief AL projector operator type on gpu
+    *  Compressed step 2 row layer
+    */
+   using CS2RL3D = Attributes<DimLevelType<dense_t, step2K_t, compressed_t>>;
+
+   /**
+    * @brief JW projector input type on cpu
+    * Step 2 column layer, with (N,K) plane a 2D CSC column major matrix
+    */
+   using S2CLCSC3D = Attributes<DimLevelType<step2K_t, compressed_t, sparse_t>>;
+
+   /**
+    * @brief JW projector input type on gpu
+    * Step 2 column layer, with (N,K) plane a 2D CSC column major matrix
+    */
+   using S2CLCSC3DJIK = Attributes<DimLevelType<step2K_t, compressed_t, sparse_t>,
+      LoopOrderType<j_t, i_t, k_t>>;
+
 
 
 

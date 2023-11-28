@@ -89,19 +89,6 @@ namespace Integrator {
           */
          Backend::MixedIntegrator mBackend;
 
-      private:
-         /**
-          * @brief Initialise FFT backend
-          */
-         virtual void initBackend() const override;
-
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         virtual void applyPostOperator(MatrixZ& rOut) const = 0;
-
          /**
           * @brief Compute transform C2C or R2R componentwise (disabled)
           *
@@ -125,6 +112,19 @@ namespace Integrator {
           * @param in   Input values
           */
          virtual void transform(Matrix& rOut, const Matrix& in) const override;
+
+      private:
+         /**
+          * @brief Initialise FFT backend
+          */
+         virtual void initBackend() const override;
+
+         /**
+          * @brief Apply post FFT operator
+          *
+          * @param rOut Output values
+          */
+         virtual void applyPostOperator(MatrixZ& rOut) const = 0;
    };
 
 }
