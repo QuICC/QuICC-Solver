@@ -42,11 +42,25 @@
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
-    - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_cpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local --exec-policy=serial --keep-stage-files
+    - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_cpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files
+
+.time-lib-sweep-cpu:
+  script:
+    - pwd
+    - export QUICC_ROOT=/QuICC.src
+    - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
+    - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_cpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files --parameterize=testId=108,109 --parameterize=splitting=96,288,576,1152,2304,4608,9216
 
 .time-lib-gpu:
   script:
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
-    - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_gpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local --exec-policy=serial --keep-stage-files
+    - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_gpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files
+
+.time-lib-sweep-gpu:
+  script:
+    - pwd
+    - export QUICC_ROOT=/QuICC.src
+    - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
+    - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_gpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files --parameterize=testId=108,109 --parameterize=splitting=8,16,32,64,96,128,256

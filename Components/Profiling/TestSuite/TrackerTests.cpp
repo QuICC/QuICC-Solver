@@ -4,6 +4,8 @@
 #include <chrono>
 #include <thread>
 
+#include "Tracker/GetVM.hpp"
+
 // save
 #if defined QUICC_PROFILE_LEVEL
     #define GLOBAL_QUICC_PROFILE_LEVEL QUICC_PROFILE_LEVEL
@@ -43,8 +45,8 @@ TEST_CASE("Start Stop region with String", "[StartStopString]")
     using namespace QuICC::Profiler;
     using namespace std::chrono_literals;
     Initialize();
-    std::string region = "Five hundred millisec";
-    std::size_t count = 5;
+    std::string region = "Count times hundred millisec";
+    std::size_t count = 10;
     for (std::size_t i = 0; i < count; ++i)
     {
         RegionStart(region);
@@ -60,7 +62,8 @@ TEST_CASE("Start Stop region with String", "[StartStopString]")
     {
         timeTot += std::get<Tracker::tracking::time>(Tracker::get(region))[i];
     }
-    REQUIRE(std::abs(timeTot - 0.5) < 0.01);
+    double timeRef = 0.1*count;
+    REQUIRE(std::abs(timeTot - timeRef) < timeRef/10);
 
     Finalize();
 }
@@ -70,8 +73,10 @@ TEST_CASE("Nested Levels: on, on, off", "[Levels]")
 {
     using namespace QuICC::Profiler;
     using namespace std::chrono_literals;
+    std::size_t maxVM = 0;
     Initialize();
     {
+        auto vm0 = GetVM();
         RegionFixture<0> mainFix("Main");
         std::this_thread::sleep_for(100ms);
         std::vector<double> page(1e7);
@@ -83,6 +88,8 @@ TEST_CASE("Nested Levels: on, on, off", "[Levels]")
                 std::this_thread::sleep_for(100ms);
             }
         }
+        auto vm1 = GetVM();
+        maxVM =  std::max(maxVM, vm1 - vm0);
     }
     REQUIRE(std::get<Tracker::tracking::count>(Tracker::get("Main")) == 1);
     REQUIRE(std::get<Tracker::tracking::count>(Tracker::get("Nested")) == 1);
@@ -92,7 +99,9 @@ TEST_CASE("Nested Levels: on, on, off", "[Levels]")
     REQUIRE(std::abs(std::get<Tracker::tracking::time>(Tracker::get("Main"))[0] - 0.3) < 0.1);
     REQUIRE(std::abs(std::get<Tracker::tracking::time>(Tracker::get("Nested"))[0] - 0.2) < 0.1);
     //
-    REQUIRE(std::abs(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Main")) - 80) < 5);
+    auto maxVMMB = maxVM * 1.0e-6;
+    REQUIRE(std::abs(maxVMMB - 80.0) < 0.01);
+    REQUIRE(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Main")) <= maxVMMB * 1.01);
     REQUIRE(std::abs(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Nested")) - 0.0) < 0.01);
 
     // high watermark is hard to estimate a priori

@@ -259,3 +259,59 @@ foreach(_test ${_split_tests})
     SPLITS 4:0 8:0 8:0 96:0 288:0 256:0 3072:0 9216:0
   )
 endforeach()
+
+# Perf tests
+
+set(_perf_tests
+  Poly::P:<base_t>:projector
+  Poly::P:<viewCpu_t>:projector
+  Fft::P:<base_t>:projector
+)
+
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+    list(APPEND _perf_tests
+        Poly::P:<kokkos_t>:projector
+        )
+endif()
+
+foreach(_perf_id 108 109)
+  if(${_perf_id} EQUAL 109)
+    set(_perf_step_slow 10)
+    set(_perf_step_fast 50)
+  else()
+    set(_perf_step_slow 500)
+    set(_perf_step_fast 1000)
+  endif()
+
+  set(_perf_splits_slow 8:0 16:0 32:0 64:0 96:0 128:0 192:0 256:0 288:0 384:0)
+  set(_perf_splits_fast 576:0 768:0 1152:0 1536:0 2304:0 3072:0 4608:0 9216:0)
+
+  set(_perf_ids )
+  set(_perf_ulps )
+  set(_perf_steps )
+  set(_perf_splits )
+  foreach(_s ${_perf_splits_slow})
+    list(APPEND _perf_ids ${_perf_id})
+    list(APPEND _perf_ulps 15000)
+    list(APPEND _perf_splits ${_s})
+    list(APPEND _perf_steps ${_perf_step_slow})
+  endforeach()
+  foreach(_s ${_perf_splits_fast})
+    list(APPEND _perf_ids ${_perf_id})
+    list(APPEND _perf_ulps 15000)
+    list(APPEND _perf_splits ${_s})
+    list(APPEND _perf_steps ${_perf_step_fast})
+  endforeach()
+
+  foreach(_test ${_perf_tests})
+    quicc_add_test(${_test}
+      COMMAND ${TestExe}
+      KEYWORD Algorithm::Operator:Template:type
+      IDS  ${_perf_ids}
+      ULPS ${_perf_ulps}
+      SPLITS ${_perf_splits}
+      STEPS ${_perf_steps}
+      PERFONLY
+      )
+  endforeach()
+endforeach()

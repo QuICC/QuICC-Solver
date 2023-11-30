@@ -37,3 +37,12 @@ reframe -c $QUICC_ROOT/ci/reframe/quicc.py -r -S quicc_root=$QUICC_ROOT
 export QUICC_ROOT=</path/to/QuICC>
 reframe -c $QUICC_ROOT/ci/reframe/quicc_library_[cpu|gpu].py -r -S quicc_root=$QUICC_ROOT --performance-report --force-local --exec-policy=serial
 ```
+
+# Extracting timings from performance report and update references
+- Download report from CI as text file, say quicc_time_cpu.txt for arch=broadwell
+```sh
+export QUICC_ROOT=</path/to/QuICC>
+export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
+python -c "import quicc.reframe.utils as utils;d = utils.extract_timings('quicc_time_cpu.txt', 'broadwell');utils.write_timings('new_daint_mc_cpu.json', d)"
+python -c "import quicc.reframe.utils as utils;d = utils.update_timings('new_daint_mc_cpu.json', 'daint_mc_cpu.json')"
+```

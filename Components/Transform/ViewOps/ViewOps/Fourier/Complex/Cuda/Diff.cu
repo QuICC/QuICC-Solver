@@ -156,7 +156,7 @@ DiffOp<Tout, Tin, Order, Direction, Treatment>::DiffOp(ScaleType scale) : mScale
 template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
 void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
-    Profiler::RegionFixture<4> fix("DiffOp::applyImpl");
+    Profiler::RegionFixture<5> fix("DiffOp::applyImpl");
 
     assert(out.size() == in.size());
     assert(out.dims()[0] == in.dims()[0]);

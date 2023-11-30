@@ -9,7 +9,7 @@ if(QUICC_PROFILE_BACKEND STREQUAL "native")
   add_subdirectory(Tracker)
 endif()
 
-# Inteface target for all components
+# Interface target for all components
 add_library("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE)
 target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
   INTERFACE

@@ -19,6 +19,9 @@
 
 #include "PeakRss.hpp"
 #include "Framework/gitHash.hpp"
+#if defined QUICC_HAS_CUDA_BACKEND
+#include <cuda_runtime_api.h>
+#endif
 
 namespace QuICC {
 namespace Profiler {
@@ -49,7 +52,15 @@ void Tracker::start(const std::string& regionName)
         // retry
         start(regionName);
     }
-    else {
+    else 
+    {
+        #if defined QUICC_HAS_CUDA_BACKEND
+        // sync cuda kernel
+        // WARNING
+        // this does not allow for kernel overlap
+        // to be substituted with cudaEventCreate/Record/Sync/Elapsed
+        cudaDeviceSynchronize();
+        #endif
         // start memory and time tracker (time second!)
         std::get<tracking::memTracker>(reg->second).start();
         std::get<tracking::timTracker>(reg->second).start();
@@ -60,18 +71,18 @@ void Tracker::stop(const std::string& regionName)
 {
     // stop time and mem tracker (time first!)
     auto reg = mRegions.find(regionName);
-    std::get<tracking::timTracker>(reg->second).stop();
-    std::get<tracking::memTracker>(reg->second).stop();
-
-    auto count = std::get<tracking::count>(reg->second);
-    // time
-    #if defined __NVCC__
+    #if defined QUICC_HAS_CUDA_BACKEND
     // sync cuda kernel
     // WARNING
     // this does not allow for kernel overlap
     // to be substituted with cudaEventCreate/Record/Sync/Elapsed
     cudaDeviceSynchronize();
     #endif
+    std::get<tracking::timTracker>(reg->second).stop();
+    std::get<tracking::memTracker>(reg->second).stop();
+
+    auto count = std::get<tracking::count>(reg->second);
+    // time
     auto id = count % collectSize;
     std::get<tracking::time>(reg->second)[id] =
         std::get<tracking::timTracker>(reg->second).time();

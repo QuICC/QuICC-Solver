@@ -1,0 +1,2250 @@
+{
+  "TransformWorlandTests_Poly_P_base_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00162,
+          "applyOperatorsMin": 0.00158,
+          "applyOperatorsMax": 0.00171
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00241,
+          "applyOperatorsMin": 0.00238,
+          "applyOperatorsMax": 0.0025
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00472,
+          "applyOperatorsMin": 0.00466,
+          "applyOperatorsMax": 0.00477
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00664,
+          "applyOperatorsMin": 0.00657,
+          "applyOperatorsMax": 0.0068
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0137,
+          "applyOperatorsMin": 0.0134,
+          "applyOperatorsMax": 0.0148
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0228,
+          "applyOperatorsMin": 0.0224,
+          "applyOperatorsMax": 0.0235
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0552,
+          "applyOperatorsMin": 0.054,
+          "applyOperatorsMax": 0.0567
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000144,
+          "applyOperatorsMin": 0.00014,
+          "applyOperatorsMax": 0.000215
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000199,
+          "applyOperatorsMin": 0.000194,
+          "applyOperatorsMax": 0.000249
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00044,
+          "applyOperatorsMin": 0.000431,
+          "applyOperatorsMax": 0.000512
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00064,
+          "applyOperatorsMin": 0.000611,
+          "applyOperatorsMax": 0.000788
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00129,
+          "applyOperatorsMin": 0.00125,
+          "applyOperatorsMax": 0.00146
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00179,
+          "applyOperatorsMin": 0.00174,
+          "applyOperatorsMax": 0.00205
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0038,
+          "applyOperatorsMin": 0.00372,
+          "applyOperatorsMax": 0.00409
+        }
+      }
+    }
+  },
+  "TransformWorlandTests_Poly_P_viewCpu_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00174,
+          "applyOperatorsMin": 0.00165,
+          "applyOperatorsMax": 0.0019
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0028,
+          "applyOperatorsMin": 0.00271,
+          "applyOperatorsMax": 0.00289
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00496,
+          "applyOperatorsMin": 0.00485,
+          "applyOperatorsMax": 0.00512
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00779,
+          "applyOperatorsMin": 0.00746,
+          "applyOperatorsMax": 0.00831
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0147,
+          "applyOperatorsMin": 0.0143,
+          "applyOperatorsMax": 0.0158
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0255,
+          "applyOperatorsMin": 0.0251,
+          "applyOperatorsMax": 0.0265
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.061,
+          "applyOperatorsMin": 0.0579,
+          "applyOperatorsMax": 0.0626
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000154,
+          "applyOperatorsMin": 0.000149,
+          "applyOperatorsMax": 0.000204
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000205,
+          "applyOperatorsMin": 0.000198,
+          "applyOperatorsMax": 0.000262
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000453,
+          "applyOperatorsMin": 0.00044,
+          "applyOperatorsMax": 0.000542
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000674,
+          "applyOperatorsMin": 0.000632,
+          "applyOperatorsMax": 0.000831
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00145,
+          "applyOperatorsMin": 0.00142,
+          "applyOperatorsMax": 0.0016
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00188,
+          "applyOperatorsMin": 0.00183,
+          "applyOperatorsMax": 0.00216
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00401,
+          "applyOperatorsMin": 0.00394,
+          "applyOperatorsMax": 0.00448
+        }
+      }
+    }
+  },
+  "TransformWorlandTests_Poly_P_base_t_integrator": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00223,
+          "applyOperatorsMin": 0.00219,
+          "applyOperatorsMax": 0.00231
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00344,
+          "applyOperatorsMin": 0.00337,
+          "applyOperatorsMax": 0.00358
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0068,
+          "applyOperatorsMin": 0.00669,
+          "applyOperatorsMax": 0.0069
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0102,
+          "applyOperatorsMin": 0.0101,
+          "applyOperatorsMax": 0.0103
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0186,
+          "applyOperatorsMin": 0.0184,
+          "applyOperatorsMax": 0.019
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0325,
+          "applyOperatorsMin": 0.0322,
+          "applyOperatorsMax": 0.0332
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0859,
+          "applyOperatorsMin": 0.085,
+          "applyOperatorsMax": 0.0875
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000197,
+          "applyOperatorsMin": 0.000192,
+          "applyOperatorsMax": 0.000309
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000254,
+          "applyOperatorsMin": 0.000245,
+          "applyOperatorsMax": 0.000316
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000587,
+          "applyOperatorsMin": 0.000574,
+          "applyOperatorsMax": 0.000682
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000841,
+          "applyOperatorsMin": 0.000821,
+          "applyOperatorsMax": 0.000998
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00175,
+          "applyOperatorsMin": 0.0017,
+          "applyOperatorsMax": 0.00208
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00271,
+          "applyOperatorsMin": 0.00266,
+          "applyOperatorsMax": 0.00286
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00612,
+          "applyOperatorsMin": 0.00601,
+          "applyOperatorsMax": 0.00656
+        }
+      }
+    }
+  },
+  "TransformWorlandTests_Poly_P_viewCpu_t_integrator": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00224,
+          "applyOperatorsMin": 0.00221,
+          "applyOperatorsMax": 0.00231
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00329,
+          "applyOperatorsMin": 0.00325,
+          "applyOperatorsMax": 0.00332
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00653,
+          "applyOperatorsMin": 0.00639,
+          "applyOperatorsMax": 0.00669
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00951,
+          "applyOperatorsMin": 0.00944,
+          "applyOperatorsMax": 0.00963
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.019,
+          "applyOperatorsMin": 0.0185,
+          "applyOperatorsMax": 0.0198
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0336,
+          "applyOperatorsMin": 0.0332,
+          "applyOperatorsMax": 0.0349
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0879,
+          "applyOperatorsMin": 0.0871,
+          "applyOperatorsMax": 0.0888
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000198,
+          "applyOperatorsMin": 0.000196,
+          "applyOperatorsMax": 0.000234
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000274,
+          "applyOperatorsMin": 0.000265,
+          "applyOperatorsMax": 0.000387
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000569,
+          "applyOperatorsMin": 0.000557,
+          "applyOperatorsMax": 0.000687
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000867,
+          "applyOperatorsMin": 0.000837,
+          "applyOperatorsMax": 0.000992
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00176,
+          "applyOperatorsMin": 0.00173,
+          "applyOperatorsMax": 0.00192
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00269,
+          "applyOperatorsMin": 0.00264,
+          "applyOperatorsMax": 0.0029
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00637,
+          "applyOperatorsMin": 0.00625,
+          "applyOperatorsMax": 0.00679
+        }
+      }
+    }
+  },
+  "TransformWorlandTests_Fft_P_base_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.00306,
+          "transformMin": 0.00299,
+          "transformMax": 0.00311
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.00535,
+          "transformMin": 0.00525,
+          "transformMax": 0.00551
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.0108,
+          "transformMin": 0.0107,
+          "transformMax": 0.011
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.0231,
+          "transformMin": 0.0229,
+          "transformMax": 0.0232
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.0568,
+          "transformMin": 0.0565,
+          "transformMax": 0.0574
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.12,
+          "transformMin": 0.119,
+          "transformMax": 0.121
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.451,
+          "transformMin": 0.449,
+          "transformMax": 0.453
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.000502,
+          "transformMin": 0.000486,
+          "transformMax": 0.000625
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000807,
+          "transformMin": 0.000778,
+          "transformMax": 0.000997
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.00138,
+          "transformMin": 0.00132,
+          "transformMax": 0.00163
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00253,
+          "transformMin": 0.00245,
+          "transformMax": 0.00283
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.00508,
+          "transformMin": 0.00494,
+          "transformMax": 0.00544
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0102,
+          "transformMin": 0.00997,
+          "transformMax": 0.0107
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.0348,
+          "transformMin": 0.0345,
+          "transformMax": 0.0355
+        }
+      }
+    }
+  },
+  "TransformWorlandTests_Fft_P_base_t_integrator": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.00355,
+          "transformMin": 0.00348,
+          "transformMax": 0.00376
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.0061,
+          "transformMin": 0.00605,
+          "transformMax": 0.00617
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.0113,
+          "transformMin": 0.0112,
+          "transformMax": 0.0116
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.0259,
+          "transformMin": 0.0257,
+          "transformMax": 0.0263
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.0605,
+          "transformMin": 0.0601,
+          "transformMax": 0.0609
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.123,
+          "transformMin": 0.122,
+          "transformMax": 0.123
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.468,
+          "transformMin": 0.466,
+          "transformMax": 0.472
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.000481,
+          "transformMin": 0.000474,
+          "transformMax": 0.000561
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000826,
+          "transformMin": 0.000804,
+          "transformMax": 0.000957
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.00149,
+          "transformMin": 0.00147,
+          "transformMax": 0.00167
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00273,
+          "transformMin": 0.00269,
+          "transformMax": 0.00289
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.00529,
+          "transformMin": 0.00516,
+          "transformMax": 0.00564
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0106,
+          "transformMin": 0.0105,
+          "transformMax": 0.0109
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.0365,
+          "transformMin": 0.0361,
+          "transformMax": 0.0375
+        }
+      }
+    }
+  },
+  "TransformALegendreTests_Poly_P_base_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00267,
+          "applyOperatorsMin": 0.00257,
+          "applyOperatorsMax": 0.003
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00533,
+          "applyOperatorsMin": 0.00519,
+          "applyOperatorsMax": 0.00596
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00749,
+          "applyOperatorsMin": 0.00735,
+          "applyOperatorsMax": 0.00827
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0147,
+          "applyOperatorsMin": 0.0145,
+          "applyOperatorsMax": 0.0156
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0264,
+          "applyOperatorsMin": 0.0249,
+          "applyOperatorsMax": 0.0277
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0484,
+          "applyOperatorsMin": 0.0481,
+          "applyOperatorsMax": 0.0498
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.143,
+          "applyOperatorsMin": 0.142,
+          "applyOperatorsMax": 0.148
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000253,
+          "applyOperatorsMin": 0.000246,
+          "applyOperatorsMax": 0.00031
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000501,
+          "applyOperatorsMin": 0.000482,
+          "applyOperatorsMax": 0.000579
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000649,
+          "applyOperatorsMin": 0.000634,
+          "applyOperatorsMax": 0.000787
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00135,
+          "applyOperatorsMin": 0.00129,
+          "applyOperatorsMax": 0.00163
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00193,
+          "applyOperatorsMin": 0.00186,
+          "applyOperatorsMax": 0.00222
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00369,
+          "applyOperatorsMin": 0.00362,
+          "applyOperatorsMax": 0.00403
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00972,
+          "applyOperatorsMin": 0.00955,
+          "applyOperatorsMax": 0.0107
+        }
+      }
+    }
+  },
+  "TransformALegendreTests_Poly_P_viewCpu_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00288,
+          "applyOperatorsMin": 0.00283,
+          "applyOperatorsMax": 0.00302
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00541,
+          "applyOperatorsMin": 0.00534,
+          "applyOperatorsMax": 0.00552
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00732,
+          "applyOperatorsMin": 0.00721,
+          "applyOperatorsMax": 0.00774
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0157,
+          "applyOperatorsMin": 0.0154,
+          "applyOperatorsMax": 0.0171
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0276,
+          "applyOperatorsMin": 0.0272,
+          "applyOperatorsMax": 0.0283
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0545,
+          "applyOperatorsMin": 0.0518,
+          "applyOperatorsMax": 0.0564
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.157,
+          "applyOperatorsMin": 0.156,
+          "applyOperatorsMax": 0.158
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000269,
+          "applyOperatorsMin": 0.000259,
+          "applyOperatorsMax": 0.000332
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000525,
+          "applyOperatorsMin": 0.000507,
+          "applyOperatorsMax": 0.000645
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000736,
+          "applyOperatorsMin": 0.000712,
+          "applyOperatorsMax": 0.000866
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00148,
+          "applyOperatorsMin": 0.00145,
+          "applyOperatorsMax": 0.00168
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00206,
+          "applyOperatorsMin": 0.00199,
+          "applyOperatorsMax": 0.00229
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00408,
+          "applyOperatorsMin": 0.00399,
+          "applyOperatorsMax": 0.00435
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0105,
+          "applyOperatorsMin": 0.0104,
+          "applyOperatorsMax": 0.0116
+        }
+      }
+    }
+  },
+  "TransformALegendreTests_Poly_LlDivS1Dp_base_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00287,
+          "applyOperatorsMin": 0.00278,
+          "applyOperatorsMax": 0.00314
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00544,
+          "applyOperatorsMin": 0.00527,
+          "applyOperatorsMax": 0.00606
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00772,
+          "applyOperatorsMin": 0.00752,
+          "applyOperatorsMax": 0.00855
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0152,
+          "applyOperatorsMin": 0.0147,
+          "applyOperatorsMax": 0.0163
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0259,
+          "applyOperatorsMin": 0.0253,
+          "applyOperatorsMax": 0.0281
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.049,
+          "applyOperatorsMin": 0.0475,
+          "applyOperatorsMax": 0.052
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.143,
+          "applyOperatorsMin": 0.142,
+          "applyOperatorsMax": 0.146
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000261,
+          "applyOperatorsMin": 0.000252,
+          "applyOperatorsMax": 0.000311
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000501,
+          "applyOperatorsMin": 0.000489,
+          "applyOperatorsMax": 0.000586
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000714,
+          "applyOperatorsMin": 0.000685,
+          "applyOperatorsMax": 0.000846
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0014,
+          "applyOperatorsMin": 0.00137,
+          "applyOperatorsMax": 0.00161
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00191,
+          "applyOperatorsMin": 0.00187,
+          "applyOperatorsMax": 0.00225
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00388,
+          "applyOperatorsMin": 0.00381,
+          "applyOperatorsMax": 0.00435
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00976,
+          "applyOperatorsMin": 0.00964,
+          "applyOperatorsMax": 0.011
+        }
+      }
+    }
+  },
+  "TransformALegendreTests_Poly_LlDivS1Dp_viewCpu_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00282,
+          "applyOperatorsMin": 0.00273,
+          "applyOperatorsMax": 0.00292
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00565,
+          "applyOperatorsMin": 0.00555,
+          "applyOperatorsMax": 0.00589
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00772,
+          "applyOperatorsMin": 0.00767,
+          "applyOperatorsMax": 0.00806
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0164,
+          "applyOperatorsMin": 0.0162,
+          "applyOperatorsMax": 0.0172
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0294,
+          "applyOperatorsMin": 0.0291,
+          "applyOperatorsMax": 0.0303
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0525,
+          "applyOperatorsMin": 0.0523,
+          "applyOperatorsMax": 0.0534
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.164,
+          "applyOperatorsMin": 0.163,
+          "applyOperatorsMax": 0.164
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000265,
+          "applyOperatorsMin": 0.000254,
+          "applyOperatorsMax": 0.000385
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000527,
+          "applyOperatorsMin": 0.000511,
+          "applyOperatorsMax": 0.000679
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000753,
+          "applyOperatorsMin": 0.000721,
+          "applyOperatorsMax": 0.000924
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00146,
+          "applyOperatorsMin": 0.00143,
+          "applyOperatorsMax": 0.00165
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00202,
+          "applyOperatorsMin": 0.00199,
+          "applyOperatorsMax": 0.0023
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00418,
+          "applyOperatorsMin": 0.00407,
+          "applyOperatorsMax": 0.00442
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0109,
+          "applyOperatorsMin": 0.0107,
+          "applyOperatorsMax": 0.0121
+        }
+      }
+    }
+  },
+  "TransformALegendreTests_Poly_P_base_t_integrator": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00311,
+          "applyOperatorsMin": 0.00297,
+          "applyOperatorsMax": 0.00355
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00627,
+          "applyOperatorsMin": 0.00608,
+          "applyOperatorsMax": 0.00687
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00918,
+          "applyOperatorsMin": 0.00904,
+          "applyOperatorsMax": 0.00967
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0187,
+          "applyOperatorsMin": 0.0184,
+          "applyOperatorsMax": 0.0195
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0334,
+          "applyOperatorsMin": 0.0329,
+          "applyOperatorsMax": 0.0342
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0629,
+          "applyOperatorsMin": 0.0624,
+          "applyOperatorsMax": 0.0647
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.201,
+          "applyOperatorsMin": 0.2,
+          "applyOperatorsMax": 0.205
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000264,
+          "applyOperatorsMin": 0.000255,
+          "applyOperatorsMax": 0.000377
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000548,
+          "applyOperatorsMin": 0.000531,
+          "applyOperatorsMax": 0.000767
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000788,
+          "applyOperatorsMin": 0.00077,
+          "applyOperatorsMax": 0.000975
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00154,
+          "applyOperatorsMin": 0.0015,
+          "applyOperatorsMax": 0.00185
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00218,
+          "applyOperatorsMin": 0.00213,
+          "applyOperatorsMax": 0.00253
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00437,
+          "applyOperatorsMin": 0.00427,
+          "applyOperatorsMax": 0.00474
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0117,
+          "applyOperatorsMin": 0.0115,
+          "applyOperatorsMax": 0.0127
+        }
+      }
+    }
+  },
+  "TransformALegendreTests_Poly_P_viewCpu_t_integrator": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00316,
+          "applyOperatorsMin": 0.00306,
+          "applyOperatorsMax": 0.00323
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00657,
+          "applyOperatorsMin": 0.00647,
+          "applyOperatorsMax": 0.00667
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0091,
+          "applyOperatorsMin": 0.00899,
+          "applyOperatorsMax": 0.00924
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0197,
+          "applyOperatorsMin": 0.0194,
+          "applyOperatorsMax": 0.0205
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.035,
+          "applyOperatorsMin": 0.0346,
+          "applyOperatorsMax": 0.0358
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0668,
+          "applyOperatorsMin": 0.0665,
+          "applyOperatorsMax": 0.0675
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.211,
+          "applyOperatorsMin": 0.211,
+          "applyOperatorsMax": 0.212
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000252,
+          "applyOperatorsMin": 0.000244,
+          "applyOperatorsMax": 0.00033
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000577,
+          "applyOperatorsMin": 0.000568,
+          "applyOperatorsMax": 0.000663
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.000777,
+          "applyOperatorsMin": 0.000758,
+          "applyOperatorsMax": 0.000938
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00163,
+          "applyOperatorsMin": 0.00159,
+          "applyOperatorsMax": 0.00183
+        }
+      },
+      "576": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00231,
+          "applyOperatorsMin": 0.00227,
+          "applyOperatorsMax": 0.00263
+        }
+      },
+      "288": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.00467,
+          "applyOperatorsMin": 0.00456,
+          "applyOperatorsMax": 0.00536
+        }
+      },
+      "96": {
+        "broadwell": {
+          "applyOperatorsAvg": 0.0121,
+          "applyOperatorsMin": 0.0119,
+          "applyOperatorsMax": 0.0126
+        }
+      }
+    }
+  },
+  "TransformFourierTests_Mixed_P_base_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.000502,
+          "transformMin": 0.000438,
+          "transformMax": 0.000735
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.00104,
+          "transformMin": 0.000869,
+          "transformMax": 0.00157
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.00208,
+          "transformMin": 0.00174,
+          "transformMax": 0.00331
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00419,
+          "transformMin": 0.00348,
+          "transformMax": 0.0067
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.00913,
+          "transformMin": 0.00791,
+          "transformMax": 0.0137
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0215,
+          "transformMin": 0.0192,
+          "transformMax": 0.03
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.094,
+          "transformMin": 0.0933,
+          "transformMax": 0.0965
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 5.38e-05,
+          "transformMin": 5.19e-05,
+          "transformMax": 0.000107
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000113,
+          "transformMin": 0.000109,
+          "transformMax": 0.000231
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.000204,
+          "transformMin": 0.0002,
+          "transformMax": 0.000262
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.000406,
+          "transformMin": 0.000395,
+          "transformMax": 0.00048
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.000781,
+          "transformMin": 0.000766,
+          "transformMax": 0.000883
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0016,
+          "transformMin": 0.00155,
+          "transformMax": 0.00312
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.00483,
+          "transformMin": 0.0047,
+          "transformMax": 0.00958
+        }
+      }
+    }
+  },
+  "TransformFourierTests_Mixed_P_viewCpu_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.000572,
+          "transformMin": 0.000438,
+          "transformMax": 0.00676,
+          "applyImplAvg": 0.000517,
+          "applyImplMin": 0.000384,
+          "applyImplMax": 0.0067
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.00104,
+          "transformMin": 0.000852,
+          "transformMax": 0.00823,
+          "applyImplAvg": 0.000923,
+          "applyImplMin": 0.00075,
+          "applyImplMax": 0.00812
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.00199,
+          "transformMin": 0.00174,
+          "transformMax": 0.0121,
+          "applyImplAvg": 0.00178,
+          "applyImplMin": 0.00153,
+          "applyImplMax": 0.0119
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00394,
+          "transformMin": 0.00349,
+          "transformMax": 0.0186,
+          "applyImplAvg": 0.00354,
+          "applyImplMin": 0.00308,
+          "applyImplMax": 0.0182
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.00866,
+          "transformMin": 0.00781,
+          "transformMax": 0.0339,
+          "applyImplAvg": 0.00768,
+          "applyImplMin": 0.00689,
+          "applyImplMax": 0.0331
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0259,
+          "transformMin": 0.0192,
+          "transformMax": 0.0639,
+          "applyImplAvg": 0.0229,
+          "applyImplMin": 0.0161,
+          "applyImplMax": 0.0616
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.103,
+          "transformMin": 0.0926,
+          "transformMax": 0.187,
+          "applyImplAvg": 0.0919,
+          "applyImplMin": 0.0821,
+          "applyImplMax": 0.176
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 5.49e-05,
+          "transformMin": 5.25e-05,
+          "transformMax": 9.71e-05,
+          "applyImplAvg": 4.5e-05,
+          "applyImplMin": 4.31e-05,
+          "applyImplMax": 8.46e-05
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000115,
+          "transformMin": 0.00011,
+          "transformMax": 0.000157,
+          "applyImplAvg": 9.4e-05,
+          "applyImplMin": 8.96e-05,
+          "applyImplMax": 0.000138
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.000206,
+          "transformMin": 0.000199,
+          "transformMax": 0.000263,
+          "applyImplAvg": 0.000174,
+          "applyImplMin": 0.000168,
+          "applyImplMax": 0.00023
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.000407,
+          "transformMin": 0.000389,
+          "transformMax": 0.000536,
+          "applyImplAvg": 0.00035,
+          "applyImplMin": 0.000334,
+          "applyImplMax": 0.000478
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.000785,
+          "transformMin": 0.000768,
+          "transformMax": 0.000905,
+          "applyImplAvg": 0.000679,
+          "applyImplMin": 0.000662,
+          "applyImplMax": 0.000798
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.00161,
+          "transformMin": 0.00154,
+          "transformMax": 0.011,
+          "applyImplAvg": 0.0014,
+          "applyImplMin": 0.00133,
+          "applyImplMax": 0.0108
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.00492,
+          "transformMin": 0.00475,
+          "transformMax": 0.0243,
+          "applyImplAvg": 0.0043,
+          "applyImplMin": 0.00415,
+          "applyImplMax": 0.0237
+        }
+      }
+    }
+  },
+  "TransformFourierTests_Mixed_D1_base_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.00135,
+          "transformMin": 0.00127,
+          "transformMax": 0.00156
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.00268,
+          "transformMin": 0.00253,
+          "transformMax": 0.00317
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.00535,
+          "transformMin": 0.00501,
+          "transformMax": 0.00658
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.0106,
+          "transformMin": 0.00986,
+          "transformMax": 0.0131
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.0219,
+          "transformMin": 0.0206,
+          "transformMax": 0.0264
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0463,
+          "transformMin": 0.0435,
+          "transformMax": 0.0547
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.163,
+          "transformMin": 0.162,
+          "transformMax": 0.163
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.000175,
+          "transformMin": 0.000169,
+          "transformMax": 0.000263
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000347,
+          "transformMin": 0.000336,
+          "transformMax": 0.000444
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.000625,
+          "transformMin": 0.000608,
+          "transformMax": 0.000867
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00125,
+          "transformMin": 0.00122,
+          "transformMax": 0.0017
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.00248,
+          "transformMin": 0.00241,
+          "transformMax": 0.00329
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.00482,
+          "transformMin": 0.00473,
+          "transformMax": 0.00631
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.0144,
+          "transformMin": 0.0142,
+          "transformMax": 0.0193
+        }
+      }
+    }
+  },
+  "TransformFourierTests_Mixed_D1_viewCpu_t_projector": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.00061,
+          "transformMin": 0.000477,
+          "transformMax": 0.00703,
+          "applyImplAvg": 0.00056,
+          "applyImplMin": 0.000427,
+          "applyImplMax": 0.00697
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.00116,
+          "transformMin": 0.000976,
+          "transformMax": 0.00844,
+          "applyImplAvg": 0.00106,
+          "applyImplMin": 0.000874,
+          "applyImplMax": 0.00834
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.0022,
+          "transformMin": 0.00198,
+          "transformMax": 0.0122,
+          "applyImplAvg": 0.00199,
+          "applyImplMin": 0.00178,
+          "applyImplMax": 0.012
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00443,
+          "transformMin": 0.00393,
+          "transformMax": 0.0196,
+          "applyImplAvg": 0.00401,
+          "applyImplMin": 0.00351,
+          "applyImplMax": 0.0192
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.00958,
+          "transformMin": 0.00869,
+          "transformMax": 0.0346,
+          "applyImplAvg": 0.00865,
+          "applyImplMin": 0.00777,
+          "applyImplMax": 0.0338
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0279,
+          "transformMin": 0.021,
+          "transformMax": 0.0673,
+          "applyImplAvg": 0.0249,
+          "applyImplMin": 0.018,
+          "applyImplMax": 0.065
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.112,
+          "transformMin": 0.0991,
+          "transformMax": 0.193,
+          "applyImplAvg": 0.102,
+          "applyImplMin": 0.0891,
+          "applyImplMax": 0.183
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 6.28e-05,
+          "transformMin": 6.01e-05,
+          "transformMax": 0.000108,
+          "applyImplAvg": 5.36e-05,
+          "applyImplMin": 5.13e-05,
+          "applyImplMax": 9.74e-05
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000133,
+          "transformMin": 0.000128,
+          "transformMax": 0.000185,
+          "applyImplAvg": 0.000114,
+          "applyImplMin": 0.00011,
+          "applyImplMax": 0.000166
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.000244,
+          "transformMin": 0.000237,
+          "transformMax": 0.00031,
+          "applyImplAvg": 0.000213,
+          "applyImplMin": 0.000206,
+          "applyImplMax": 0.000268
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.000451,
+          "transformMin": 0.000449,
+          "transformMax": 0.000492,
+          "applyImplAvg": 0.000399,
+          "applyImplMin": 0.000397,
+          "applyImplMax": 0.00044
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.000921,
+          "transformMin": 0.000904,
+          "transformMax": 0.00109,
+          "applyImplAvg": 0.000814,
+          "applyImplMin": 0.000799,
+          "applyImplMax": 0.000907
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.00192,
+          "transformMin": 0.00179,
+          "transformMax": 0.0115,
+          "applyImplAvg": 0.00171,
+          "applyImplMin": 0.00158,
+          "applyImplMax": 0.0113
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.00564,
+          "transformMin": 0.00545,
+          "transformMax": 0.0251,
+          "applyImplAvg": 0.00503,
+          "applyImplMin": 0.00484,
+          "applyImplMax": 0.0245
+        }
+      }
+    }
+  },
+  "TransformFourierTests_Mixed_P_base_t_integrator": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.000363,
+          "transformMin": 0.000339,
+          "transformMax": 0.000741
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000817,
+          "transformMin": 0.000671,
+          "transformMax": 0.00131
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.00162,
+          "transformMin": 0.00135,
+          "transformMax": 0.00266
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00352,
+          "transformMin": 0.00285,
+          "transformMax": 0.0063
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.00735,
+          "transformMin": 0.00598,
+          "transformMax": 0.0128
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0167,
+          "transformMin": 0.0136,
+          "transformMax": 0.0266
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.0822,
+          "transformMin": 0.0812,
+          "transformMax": 0.0831
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 4.4e-05,
+          "transformMin": 4.1e-05,
+          "transformMax": 9.11e-05
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 9.04e-05,
+          "transformMin": 8.63e-05,
+          "transformMax": 0.000167
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.000163,
+          "transformMin": 0.000156,
+          "transformMax": 0.000316
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.000314,
+          "transformMin": 0.000307,
+          "transformMax": 0.000368
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.000595,
+          "transformMin": 0.000584,
+          "transformMax": 0.000684
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.00127,
+          "transformMin": 0.00123,
+          "transformMax": 0.00289
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.00365,
+          "transformMin": 0.00354,
+          "transformMax": 0.00883
+        }
+      }
+    }
+  },
+  "TransformFourierTests_Mixed_P_viewCpu_t_integrator": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.000492,
+          "transformMin": 0.000362,
+          "transformMax": 0.00637,
+          "applyImplAvg": 0.000488,
+          "applyImplMin": 0.000359,
+          "applyImplMax": 0.00636
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000884,
+          "transformMin": 0.000721,
+          "transformMax": 0.00771,
+          "applyImplAvg": 0.00088,
+          "applyImplMin": 0.000718,
+          "applyImplMax": 0.0077
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.00169,
+          "transformMin": 0.00146,
+          "transformMax": 0.0114,
+          "applyImplAvg": 0.00169,
+          "applyImplMin": 0.00145,
+          "applyImplMax": 0.0113
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00317,
+          "transformMin": 0.00274,
+          "transformMax": 0.0174,
+          "applyImplAvg": 0.00317,
+          "applyImplMin": 0.00274,
+          "applyImplMax": 0.0174
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.00645,
+          "transformMin": 0.00562,
+          "transformMax": 0.0317,
+          "applyImplAvg": 0.00644,
+          "applyImplMin": 0.00561,
+          "applyImplMax": 0.0317
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0213,
+          "transformMin": 0.0145,
+          "transformMax": 0.06,
+          "applyImplAvg": 0.0213,
+          "applyImplMin": 0.0145,
+          "applyImplMax": 0.06
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.0884,
+          "transformMin": 0.0788,
+          "transformMax": 0.171,
+          "applyImplAvg": 0.0884,
+          "applyImplMin": 0.0788,
+          "applyImplMax": 0.171
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 4.59e-05,
+          "transformMin": 4.45e-05,
+          "transformMax": 8.74e-05,
+          "applyImplAvg": 4.28e-05,
+          "applyImplMin": 4.15e-05,
+          "applyImplMax": 8.4e-05
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 8.78e-05,
+          "transformMin": 8.5e-05,
+          "transformMax": 0.000169,
+          "applyImplAvg": 8.45e-05,
+          "applyImplMin": 8.17e-05,
+          "applyImplMax": 0.000165
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.000168,
+          "transformMin": 0.000162,
+          "transformMax": 0.000244,
+          "applyImplAvg": 0.000164,
+          "applyImplMin": 0.000158,
+          "applyImplMax": 0.00024
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00033,
+          "transformMin": 0.000324,
+          "transformMax": 0.000385,
+          "applyImplAvg": 0.000326,
+          "applyImplMin": 0.000321,
+          "applyImplMax": 0.000381
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.000648,
+          "transformMin": 0.00063,
+          "transformMax": 0.000748,
+          "applyImplAvg": 0.000644,
+          "applyImplMin": 0.000626,
+          "applyImplMax": 0.000744
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.00124,
+          "transformMin": 0.00119,
+          "transformMax": 0.0104,
+          "applyImplAvg": 0.00124,
+          "applyImplMin": 0.00118,
+          "applyImplMax": 0.0103
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.00368,
+          "transformMin": 0.00352,
+          "transformMax": 0.023,
+          "applyImplAvg": 0.00367,
+          "applyImplMin": 0.00352,
+          "applyImplMax": 0.023
+        }
+      }
+    }
+  },
+  "TransformFourierTests_Mixed_D1_base_t_integrator": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.00125,
+          "transformMin": 0.00116,
+          "transformMax": 0.00155
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.00251,
+          "transformMin": 0.00229,
+          "transformMax": 0.00315
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.00489,
+          "transformMin": 0.00457,
+          "transformMax": 0.00594
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00965,
+          "transformMin": 0.00894,
+          "transformMax": 0.0125
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.0197,
+          "transformMin": 0.0181,
+          "transformMax": 0.0249
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0406,
+          "transformMin": 0.0377,
+          "transformMax": 0.0506
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.15,
+          "transformMin": 0.149,
+          "transformMax": 0.152
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.00016,
+          "transformMin": 0.000157,
+          "transformMax": 0.000248
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000321,
+          "transformMin": 0.000311,
+          "transformMax": 0.00041
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.000579,
+          "transformMin": 0.000557,
+          "transformMax": 0.00071
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00115,
+          "transformMin": 0.00113,
+          "transformMax": 0.00155
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.00227,
+          "transformMin": 0.0022,
+          "transformMax": 0.00302
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0044,
+          "transformMin": 0.00431,
+          "transformMax": 0.00605
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.013,
+          "transformMin": 0.0129,
+          "transformMax": 0.0181
+        }
+      }
+    }
+  },
+  "TransformFourierTests_Mixed_D1_viewCpu_t_integrator": {
+    "109": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 0.000523,
+          "transformMin": 0.000386,
+          "transformMax": 0.00633,
+          "applyImplAvg": 0.000519,
+          "applyImplMin": 0.000382,
+          "applyImplMax": 0.00633
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000931,
+          "transformMin": 0.000763,
+          "transformMax": 0.00767,
+          "applyImplAvg": 0.000927,
+          "applyImplMin": 0.000759,
+          "applyImplMax": 0.00767
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.00176,
+          "transformMin": 0.00154,
+          "transformMax": 0.0112,
+          "applyImplAvg": 0.00176,
+          "applyImplMin": 0.00153,
+          "applyImplMax": 0.0112
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.00376,
+          "transformMin": 0.00314,
+          "transformMax": 0.0186,
+          "applyImplAvg": 0.00376,
+          "applyImplMin": 0.00314,
+          "applyImplMax": 0.0186
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.00983,
+          "transformMin": 0.00627,
+          "transformMax": 0.0313,
+          "applyImplAvg": 0.00983,
+          "applyImplMin": 0.00627,
+          "applyImplMax": 0.0313
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.0215,
+          "transformMin": 0.0144,
+          "transformMax": 0.0605,
+          "applyImplAvg": 0.0215,
+          "applyImplMin": 0.0144,
+          "applyImplMax": 0.0605
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.0899,
+          "transformMin": 0.0806,
+          "transformMax": 0.171,
+          "applyImplAvg": 0.0899,
+          "applyImplMin": 0.0806,
+          "applyImplMax": 0.171
+        }
+      }
+    },
+    "108": {
+      "9216": {
+        "broadwell": {
+          "transformAvg": 5.53e-05,
+          "transformMin": 5.23e-05,
+          "transformMax": 9.78e-05,
+          "applyImplAvg": 5.21e-05,
+          "applyImplMin": 4.93e-05,
+          "applyImplMax": 9.43e-05
+        }
+      },
+      "4608": {
+        "broadwell": {
+          "transformAvg": 0.000108,
+          "transformMin": 9.8e-05,
+          "transformMax": 0.000168,
+          "applyImplAvg": 0.000105,
+          "applyImplMin": 9.47e-05,
+          "applyImplMax": 0.000164
+        }
+      },
+      "2304": {
+        "broadwell": {
+          "transformAvg": 0.000191,
+          "transformMin": 0.000186,
+          "transformMax": 0.000246,
+          "applyImplAvg": 0.000188,
+          "applyImplMin": 0.000182,
+          "applyImplMax": 0.000242
+        }
+      },
+      "1152": {
+        "broadwell": {
+          "transformAvg": 0.000382,
+          "transformMin": 0.000364,
+          "transformMax": 0.000473,
+          "applyImplAvg": 0.000379,
+          "applyImplMin": 0.000361,
+          "applyImplMax": 0.000469
+        }
+      },
+      "576": {
+        "broadwell": {
+          "transformAvg": 0.000736,
+          "transformMin": 0.000714,
+          "transformMax": 0.000872,
+          "applyImplAvg": 0.000732,
+          "applyImplMin": 0.00071,
+          "applyImplMax": 0.000868
+        }
+      },
+      "288": {
+        "broadwell": {
+          "transformAvg": 0.00149,
+          "transformMin": 0.00136,
+          "transformMax": 0.0106,
+          "applyImplAvg": 0.00148,
+          "applyImplMin": 0.00135,
+          "applyImplMax": 0.0106
+        }
+      },
+      "96": {
+        "broadwell": {
+          "transformAvg": 0.00421,
+          "transformMin": 0.00403,
+          "transformMax": 0.0236,
+          "applyImplAvg": 0.0042,
+          "applyImplMin": 0.00402,
+          "applyImplMax": 0.0236
+        }
+      }
+    }
+  }
+}

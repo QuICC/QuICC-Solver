@@ -9,6 +9,7 @@
 // Project includes
 #include "Profiler/Interface.hpp"
 #include "QuICC/Transform/Poly/Worland/Integrator/Kokkos/KokkosIWorlandIntegrator.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 

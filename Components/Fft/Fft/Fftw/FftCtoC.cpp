@@ -71,7 +71,7 @@ void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>
 {
     if(_plan == nullptr)
     {
-        Profiler::RegionFixture<4> fix("Fftw::FftOp::initFft-CtoC");
+        Profiler::RegionFixture<5> fix("Fftw::FftOp::initFft-CtoC");
         int columns = 0;
         if constexpr(std::is_same_v<AttIn, dense2D>)
         {
@@ -91,7 +91,7 @@ void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>
         }
         _plan = details::setPlanCtoC(phys.dims()[0], columns);
     }
-    Profiler::RegionFixture<4> fix("Fftw::FftOp::applyFft-CtoC");
+    Profiler::RegionFixture<5> fix("Fftw::FftOp::applyFft-CtoC");
     fftw_execute_dft(static_cast<fftw_plan>(_plan),
         reinterpret_cast<fftw_complex* >(
         const_cast<std::complex<double>* >(mods.data())),

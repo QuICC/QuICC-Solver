@@ -11,6 +11,7 @@
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/KokkosIALegendreIntegrator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -68,6 +69,8 @@ namespace Integrator {
 
    void KokkosIALegendreIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<3> fix("KokkosIALegendreIntegrator::applyOperators");
+
       // assert right sizes for input matrix
       assert(in.rows() == this->mspSetup->fwdSize());
       assert(in.cols() == this->mspSetup->blockSize());
@@ -78,12 +81,16 @@ namespace Integrator {
       OpVectorI scan("outRows Scan", slowSize + 1);
       auto hostScan = Kokkos::create_mirror_view(scan);
 
+      Profiler::RegionStart<4>("KokkosIALegendreIntegrator::hostScan");
+
       for(int i = 0; i < this->mspSetup->slowSize(); i++)
       {
          int m = this->mspSetup->slow(i);
          int outRows = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1;
          hostScan[i + 1] = hostScan[i] + outRows;
       }
+
+      Profiler::RegionStop<4>("KokkosIALegendreIntegrator::hostScan");
 
       Kokkos::deep_copy(scan, hostScan);
 
@@ -101,7 +108,11 @@ namespace Integrator {
       auto col_size = this->mspSetup->mult(0);
       OpMatrixLZ rOutView("rOutView", total, col_size);
 
+      Profiler::RegionStart<4>("KokkosIALegendreIntegrator::applyUnitOperator");
+
       this->applyUnitOperator(rOutView, inView, scan, total);
+
+      Profiler::RegionStop<4>("KokkosIALegendreIntegrator::applyUnitOperator");
 
       DeepCopyEigen(rOut, rOutView, hostScan, col_size);
    }

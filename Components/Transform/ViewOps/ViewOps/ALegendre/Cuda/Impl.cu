@@ -11,7 +11,6 @@
 #include "ViewOps/ALegendre/Types.hpp"
 #include "ViewOps/ALegendre/TypeTraits.hpp"
 #include "Cuda/CudaUtil.hpp"
-#include "Profiler/Interface.hpp"
 
 // #define QUICC_USE_NAIVE_CUDA_BATCHED_MATMUL
 // #define QUICC_USE_BLOCKED_CUDA_BATCHED_MATMUL
@@ -96,8 +95,6 @@ ImplOp<Tout, Tin, Top, Treatment>::ImplOp(std::shared_ptr<QuICC::Memory::memory_
 template<class Tout, class Tin, class Top, std::uint16_t Treatment>
 void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, const Top& op)
 {
-    Profiler::RegionFixture<4> fix("ImplOp::applyImpl");
-
     assert(QuICC::Cuda::isDeviceMemory(out.data()));
     assert(QuICC::Cuda::isDeviceMemory(in.data()));
 

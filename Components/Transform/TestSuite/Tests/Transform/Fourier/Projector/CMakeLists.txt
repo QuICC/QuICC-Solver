@@ -1,5 +1,7 @@
 message(VERBOSE "Projectors:")
 
+# Mixed Fourier tests
+
 # Create projector tests targets
 include(ConfigureTests)
 set(_tests
@@ -48,21 +50,6 @@ foreach(_test ${_tests})
   )
 endforeach()
 
-# Perf test
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Space::Operator:Template:type
-    IDS  108 108 108 108 108 108
-    ULPS 7420 7420 7420 7420 7420 7420
-    # node:rank, node*12:rank, node*36:rank
-    SPLITS 8:0 96:0 288:0 256:0 3072:0 9216:0
-    STEPS   100   500   500   500    500   1000
-    PERFONLY
-  )
-endforeach()
-
-
 set(_tests
   Mixed::D4:projector
   )
@@ -74,6 +61,71 @@ foreach(_test ${_tests})
     ULPS 70 70 250 250 1000
   )
 endforeach()
+
+# Perf test
+set(_perf_tests
+  Mixed::P:<base_t>:projector
+  Mixed::P:<viewCpu_t>:projector
+  Mixed::D1:<base_t>:projector
+  Mixed::D1:<viewCpu_t>:projector
+)
+
+if(QUICC_USE_CUFFT)
+  list(APPEND _perf_tests
+    Mixed::P:<viewGpu_t>:projector
+    Mixed::D1:<viewGpu_t>:projector
+  )
+endif()
+if(QUICC_USE_VKFFT)
+  list(APPEND _perf_tests
+    Mixed::P:<viewGpuVkFFT_t>:projector
+    Mixed::D1:<viewGpuVkFFT_t>:projector
+  )
+endif()
+
+foreach(_perf_id 108 109)
+  if(${_perf_id} EQUAL 109)
+    set(_perf_step_slow 10)
+    set(_perf_step_fast 50)
+  else()
+    set(_perf_step_slow 500)
+    set(_perf_step_fast 1000)
+  endif()
+
+  set(_perf_splits_slow 8:0 16:0 32:0 64:0 96:0 128:0 192:0 256:0 288:0 384:0)
+  set(_perf_splits_fast 576:0 768:0 1152:0 1536:0 2304:0 3072:0 4608:0 9216:0)
+
+  set(_perf_ids )
+  set(_perf_ulps )
+  set(_perf_steps )
+  set(_perf_splits )
+  foreach(_s ${_perf_splits_slow})
+    list(APPEND _perf_ids ${_perf_id})
+    list(APPEND _perf_ulps 7420)
+    list(APPEND _perf_splits ${_s})
+    list(APPEND _perf_steps ${_perf_step_slow})
+  endforeach()
+  foreach(_s ${_perf_splits_fast})
+    list(APPEND _perf_ids ${_perf_id})
+    list(APPEND _perf_ulps 7420)
+    list(APPEND _perf_splits ${_s})
+    list(APPEND _perf_steps ${_perf_step_fast})
+  endforeach()
+
+  foreach(_test ${_perf_tests})
+    quicc_add_test(${_test}
+      COMMAND ${TestExe}
+      KEYWORD Space::Operator:Template:type
+      IDS ${_perf_ids}
+      ULPS ${_perf_ulps}
+      SPLITS ${_perf_splits}
+      STEPS ${_perf_steps}
+      PERFONLY
+      )
+  endforeach()
+endforeach()
+
+# Complex Fourier tests
 
 set(_tests
   Complex::P:<base_t>:projector
@@ -157,7 +209,7 @@ if(QUICC_USE_VKFFT)
     Complex::Df1Lapl2D:<viewGpuVkFFT_t>:projector
     Complex::Ds1Lapl2D:<viewGpuVkFFT_t>:projector
   )
-endif() 
+endif()
 
 foreach(_test ${_tests})
   quicc_add_test(${_test}

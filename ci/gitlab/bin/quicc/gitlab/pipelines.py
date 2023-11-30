@@ -122,7 +122,7 @@ class libtest_pipeline(base_pipeline):
                 'image': self.path_image,
             }
 
-"""Add library timing to the base pipeline"""
+"""Add library timing to the libtest pipeline"""
 class libtime_pipeline(libtest_pipeline):
     def __init__(self, cnf):
         super(libtime_pipeline, self).__init__(cnf)
@@ -137,6 +137,36 @@ class libtime_pipeline(libtest_pipeline):
                     ],
                 'image': self.path_image,
             }
+
+"""Add library sweep timing to the base pipeline and changes default name of the yml file"""
+class libtime_sweep_pipeline(base_pipeline):
+    def __init__(self, cnf):
+        super(libtime_sweep_pipeline, self).__init__(cnf)
+        self.actions.extend([self.timelib_yaml])
+
+    def set_file_name(self):
+        self.file_name = '.quicc_'+self.tag+'_'+self.backend+'_perf'
+
+    def timelib_yaml(self):
+        self.config['include'].extend(
+                [
+                    '/ci/gitlab/.quicc_tests.yml',
+                ],
+            )
+        self.config['stages'].extend(
+                [
+                    'test',
+                ],
+            )
+        self.config['time-quicc-lib'] = {
+                'extends':
+                    [
+                        '.time-lib-sweep-'+self.backend,
+                        '.'+self.backend
+                    ],
+                'image': self.path_image,
+            }
+
 
 """Add model testing to the libtime pipeline"""
 class model_pipeline(libtime_pipeline):
@@ -216,13 +246,13 @@ class model_pipeline_notiming(libtest_pipeline):
 
 
 """Add model timing to the base pipeline and changes default name of the yml file"""
-class perf_pipeline(base_pipeline):
+class model_perf_pipeline(base_pipeline):
     def __init__(self, cnf):
-        super(perf_pipeline, self).__init__(cnf)
+        super(model_perf_pipeline, self).__init__(cnf)
         self.actions.extend([self.model_yaml])
 
     def set_file_name(self):
-        self.file_name = '.quicc_'+self.tag+'_'+self.backend+'_perf'
+        self.file_name = '.quicc_'+self.tag+'_'+self.backend+'_models_perf'
 
     def model_yaml(self):
         self.config['include'].extend(

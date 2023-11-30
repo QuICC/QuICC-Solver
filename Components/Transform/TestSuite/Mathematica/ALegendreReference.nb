@@ -10,19 +10,52 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     68863,       1671]
-NotebookOptionsPosition[     67342,       1645]
-NotebookOutlinePosition[     67737,       1661]
-CellTagsIndexPosition[     67694,       1658]
+NotebookDataLength[     70469,       1714]
+NotebookOptionsPosition[     68949,       1688]
+NotebookOutlinePosition[     69343,       1704]
+CellTagsIndexPosition[     69300,       1701]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
 Notebook[{
 Cell[BoxData[{
  RowBox[{
-  RowBox[{
-  "quiccroot", "=", 
-   "\"\</home/phmarti/Documents/QuICC/build/QuICC_aquad/serial\>\""}], 
+  RowBox[{"nbPath", "=", 
+   RowBox[{"NotebookDirectory", "[", "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"nbDepth", "=", 
+   RowBox[{"FileNameDepth", "[", "nbPath", "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"quiccroot", "=", 
+   RowBox[{"FileNameJoin", "[", 
+    RowBox[{
+     RowBox[{"FileNameSplit", "[", "nbPath", "]"}], "[", 
+     RowBox[{"[", 
+      RowBox[{"1", ";;", 
+       RowBox[{"nbDepth", "-", "4"}]}], "]"}], "]"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"dataroot", "=", 
+   RowBox[{"FileNameJoin", "[", 
+    RowBox[{"Flatten", "[", 
+     RowBox[{"{", 
+      RowBox[{
+      "quiccroot", ",", "\"\<build\>\"", ",", "\"\<Components\>\"", ",", 
+       "\"\<Transform\>\"", ",", "\"\<TestSuite\>\""}], "}"}], "]"}], "]"}]}],
+   ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"If", "[", 
+   RowBox[{
+    RowBox[{"!", 
+     RowBox[{"DirectoryQ", "[", "dataroot", "]"}]}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"Message", "[", 
+      RowBox[{
+       RowBox[{"dataroot", "::", "wrongpath"}], ",", "dataroot"}], "]"}], ";",
+      "\[IndentingNewLine]", 
+     RowBox[{"Abort", "[", "]"}], ";"}]}], "\[IndentingNewLine]", "]"}], 
   ";"}], "\[IndentingNewLine]", 
  RowBox[{"Needs", "[", "\"\<NumericalDifferentialEquationAnalysis`\>\"", 
   "]"}], "\[IndentingNewLine]", 
@@ -318,15 +351,6 @@ Cell[BoxData[{
       RowBox[{"1", "-", "\[ImaginaryI]"}], ")"}], ",", "0"}], "]"}]}], 
   ";"}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"dataroot", "=", 
-   RowBox[{"FileNameJoin", "[", 
-    RowBox[{"Flatten", "[", 
-     RowBox[{"{", 
-      RowBox[{
-      "quiccroot", ",", "\"\<Components\>\"", ",", "\"\<Transform\>\"", ",", 
-       "\"\<TestSuite\>\""}], "}"}], "]"}], "]"}]}], 
-  ";"}], "\[IndentingNewLine]", 
- RowBox[{
   RowBox[{"datadir", "=", 
    RowBox[{"{", 
     RowBox[{
@@ -395,7 +419,9 @@ Cell[BoxData[{
    3.850991689865411*^9}, {3.851052880795401*^9, 3.851052882126112*^9}, {
    3.8983951891026487`*^9, 3.8983951914817657`*^9}, {3.898395921688764*^9, 
    3.898395924013887*^9}, {3.898396237608138*^9, 3.898396238173674*^9}, 
-   3.8983963874805517`*^9},
+   3.8983963874805517`*^9, {3.909107107277359*^9, 3.90910719188612*^9}, {
+   3.909107373563562*^9, 3.909107393119272*^9}, {3.909107817300446*^9, 
+   3.9091078198168163`*^9}},
  CellLabel->"In[1]:=",ExpressionUUID->"716da434-014e-437e-81f5-b28f156e2497"],
 
 Cell[BoxData[
@@ -592,7 +618,7 @@ Cell[BoxData[
    3.8487102477166147`*^9}, {3.850959631508787*^9, 3.850959675193553*^9}, 
    3.8509597260373774`*^9, {3.898395241528104*^9, 3.898395306851406*^9}, {
    3.8983953659168262`*^9, 3.898395490795874*^9}},
- CellLabel->"In[37]:=",ExpressionUUID->"0a7bae86-0645-434d-b125-ea7fb65f3527"],
+ CellLabel->"In[40]:=",ExpressionUUID->"0a7bae86-0645-434d-b125-ea7fb65f3527"],
 
 Cell[BoxData[{
  RowBox[{
@@ -700,63 +726,78 @@ Cell[BoxData[{
     RowBox[{
      RowBox[{"{", "subdir", "}"}], ",", "\[IndentingNewLine]", 
      RowBox[{
-      RowBox[{"configureGenerator", "[", "]"}], ";", "\[IndentingNewLine]", 
+      RowBox[{"configureGenerator", "[", 
+       RowBox[{"True", ",", "False"}], "]"}], ";", "\[IndentingNewLine]", 
       RowBox[{"subdir", "=", "\"\<Projector/\>\""}], ";", 
       "\[IndentingNewLine]", 
-      RowBox[{"testProjector", "[", 
-       RowBox[{"meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "Plm", ",", 
-        RowBox[{"subdir", "<>", "\"\<P\>\""}]}], "]"}], ";"}]}], 
-    "\[IndentingNewLine]", 
-    RowBox[{"(*", "\[IndentingNewLine]", 
-     RowBox[{
-      RowBox[{"testProjector", "[", 
+      RowBox[{"(*", 
        RowBox[{
-       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "divsinPlm", ",", 
-        RowBox[{"subdir", "<>", "\"\<DivS1\>\""}]}], "]"}], ";", 
+        RowBox[{"testProjector", "[", 
+         RowBox[{
+         "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "Plm", ",", 
+          RowBox[{"subdir", "<>", "\"\<P\>\""}]}], "]"}], ";"}], "*)"}], 
       "\[IndentingNewLine]", 
-      RowBox[{"testProjector", "[", 
+      RowBox[{"(*", 
        RowBox[{
-       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "dPlm", ",", 
-        RowBox[{"subdir", "<>", "\"\<D1\>\""}]}], "]"}], ";", 
+        RowBox[{"testProjector", "[", 
+         RowBox[{
+         "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "divsinPlm", ",", 
+          RowBox[{"subdir", "<>", "\"\<DivS1\>\""}]}], "]"}], ";"}], "*)"}], 
       "\[IndentingNewLine]", 
-      RowBox[{"testProjector", "[", 
+      RowBox[{"(*", 
        RowBox[{
-       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "divsindpPlm", ",", 
-        RowBox[{"subdir", "<>", "\"\<DivS1Dp\>\""}]}], "]"}], ";", 
+        RowBox[{"testProjector", "[", 
+         RowBox[{
+         "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "dPlm", ",", 
+          RowBox[{"subdir", "<>", "\"\<D1\>\""}]}], "]"}], ";"}], "*)"}], 
       "\[IndentingNewLine]", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"testProjector", "[", 
+         RowBox[{
+         "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "divsindpPlm", 
+          ",", 
+          RowBox[{"subdir", "<>", "\"\<DivS1Dp\>\""}]}], "]"}], ";"}], "*)"}],
+       "\[IndentingNewLine]", 
       RowBox[{"testProjector", "[", 
        RowBox[{
        "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "llPlm", ",", 
         RowBox[{"subdir", "<>", "\"\<Ll\>\""}]}], "]"}], ";", 
       "\[IndentingNewLine]", 
-      RowBox[{"testProjector", "[", 
+      RowBox[{"(*", 
        RowBox[{
-       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "lldivsinPlm", ",", 
-        RowBox[{"subdir", "<>", "\"\<LlDivS1\>\""}]}], "]"}], ";", 
-      "\[IndentingNewLine]", 
-      RowBox[{"testProjector", "[", 
+        RowBox[{"testProjector", "[", 
+         RowBox[{
+         "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "lldivsinPlm", 
+          ",", 
+          RowBox[{"subdir", "<>", "\"\<LlDivS1\>\""}]}], "]"}], ";"}], "*)"}],
+       "\[IndentingNewLine]", 
+      RowBox[{"(*", 
        RowBox[{
-       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "lldPlm", ",", 
-        RowBox[{"subdir", "<>", "\"\<LlD1\>\""}]}], "]"}], ";", 
+        RowBox[{"testProjector", "[", 
+         RowBox[{
+         "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "lldPlm", ",", 
+          RowBox[{"subdir", "<>", "\"\<LlD1\>\""}]}], "]"}], ";"}], "*)"}], 
       "\[IndentingNewLine]", 
       RowBox[{"testProjector", "[", 
        RowBox[{
        "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "lldivsindpPlm", 
         ",", 
-        RowBox[{"subdir", "<>", "\"\<LlDivS1Dp\>\""}]}], "]"}], ";", 
-      "\[IndentingNewLine]", 
+        RowBox[{"subdir", "<>", "\"\<LlDivS1Dp\>\""}]}], "]"}], ";"}]}], 
+    "\[IndentingNewLine]", 
+    RowBox[{"(*", 
+     RowBox[{
       RowBox[{"testProjector", "[", 
        RowBox[{
        "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "divsindsinPlm", 
         ",", 
-        RowBox[{"subdir", "<>", "\"\<DivS1D1S1\>\""}]}], "]"}], ";"}], 
-     "\[IndentingNewLine]", "*)"}], "\[IndentingNewLine]", "]"}]}], 
-  ";"}], "\[IndentingNewLine]", 
+        RowBox[{"subdir", "<>", "\"\<DivS1D1S1\>\""}]}], "]"}], ";"}], "*)"}],
+     "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"For", "[", " ", 
    RowBox[{
-    RowBox[{"p", " ", "=", " ", "4"}], ",", 
-    RowBox[{"p", "<", "9"}], ",", 
+    RowBox[{"p", " ", "=", " ", "9"}], ",", 
+    RowBox[{"p", "<", "10"}], ",", 
     RowBox[{"p", "++"}], ",", "\[IndentingNewLine]", 
     RowBox[{
      RowBox[{"nM", "=", 
@@ -795,15 +836,17 @@ Cell[BoxData[{
    3.851472692180838*^9}, {3.8514728016012917`*^9, 3.851472819126686*^9}, {
    3.898395525069697*^9, 3.8983955268134003`*^9}, {3.898397001873953*^9, 
    3.898397039247439*^9}, {3.898399071032651*^9, 3.898399085203718*^9}, {
-   3.8983991458322763`*^9, 
-   3.898399146187419*^9}},ExpressionUUID->"703b0358-5bac-4735-8505-\
-86741e230f4e"],
+   3.8983991458322763`*^9, 3.898399146187419*^9}, {3.909107215252717*^9, 
+   3.909107218475091*^9}, {3.909107270404088*^9, 3.909107313246419*^9}, {
+   3.9091075659061623`*^9, 3.909107585603158*^9}, {3.9091078056722107`*^9, 
+   3.909107805830324*^9}, {3.90910788803162*^9, 3.90910788853474*^9}},
+ CellLabel->"In[43]:=",ExpressionUUID->"703b0358-5bac-4735-8505-86741e230f4e"],
 
 Cell[BoxData[{
  RowBox[{
   RowBox[{"For", "[", " ", 
    RowBox[{
-    RowBox[{"p", " ", "=", " ", "4"}], ",", 
+    RowBox[{"p", " ", "=", " ", "9"}], ",", 
     RowBox[{"p", "<", "13"}], ",", 
     RowBox[{"p", "++"}], ",", "\[IndentingNewLine]", 
     RowBox[{
@@ -842,8 +885,8 @@ Cell[BoxData[{
    3.8514725931829863`*^9, 3.8514726322586317`*^9}, {3.8514726878911963`*^9, 
    3.851472692180838*^9}, {3.8514728016012917`*^9, 3.851472819126686*^9}, {
    3.898395525069697*^9, 3.8983955268134003`*^9}, {3.898397001873953*^9, 
-   3.898397039247439*^9}},
- CellLabel->"In[77]:=",ExpressionUUID->"96cfd35a-cedf-45ee-9609-35b5c69f61be"],
+   3.898397039247439*^9}, {3.909107869454987*^9, 3.90910786957593*^9}},
+ CellLabel->"In[46]:=",ExpressionUUID->"96cfd35a-cedf-45ee-9609-35b5c69f61be"],
 
 Cell[BoxData[
  RowBox[{
@@ -1645,7 +1688,7 @@ Cell[BoxData[
 },
 WindowSize->{720., 756.75},
 WindowMargins->{{8.25, Automatic}, {0, Automatic}},
-FrontEndVersion->"12.3 for Linux x86 (64-bit) (June 30, 2021)",
+FrontEndVersion->"13.3 for Linux x86 (64-bit) (June 3, 2023)",
 StyleDefinitions->"Default.nb",
 ExpressionUUID->"2e5ef3de-7aa6-4d4f-9426-9fc19aba969a"
 ]
@@ -1660,19 +1703,19 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 13499, 378, 1152, "Input",ExpressionUUID->"716da434-014e-437e-81f5-b28f156e2497"],
-Cell[14060, 400, 8518, 194, 711, "Input",ExpressionUUID->"0a7bae86-0645-434d-b125-ea7fb65f3527"],
-Cell[22581, 596, 4045, 94, 463, "Input",ExpressionUUID->"c396a047-3e90-4f27-9f87-902ac358ba7b"],
-Cell[26629, 692, 4841, 107, 555, "Input",ExpressionUUID->"703b0358-5bac-4735-8505-86741e230f4e"],
-Cell[31473, 801, 2153, 44, 246, "Input",ExpressionUUID->"96cfd35a-cedf-45ee-9609-35b5c69f61be"],
-Cell[33629, 847, 10014, 226, 793, "Input",ExpressionUUID->"46b000bb-6f8c-4f78-a5b4-37226056d6b6"],
-Cell[43646, 1075, 5501, 129, 731, "Input",ExpressionUUID->"cb15dbad-a946-4def-8fcb-4e56887331e4"],
-Cell[49150, 1206, 6620, 157, 914, "Input",ExpressionUUID->"bde0936f-b449-4b8a-9e62-905966e4cbe5"],
-Cell[55773, 1365, 9186, 216, 782, "Input",ExpressionUUID->"d4c67adc-ff80-4971-a67d-03425a2ba516"],
-Cell[64962, 1583, 899, 21, 92, "Input",ExpressionUUID->"283a5286-a4bc-46b8-aede-886586b4d86a"],
-Cell[65864, 1606, 489, 11, 29, "Input",ExpressionUUID->"c0c275b0-4a1c-46e9-925e-410080cade67"],
-Cell[66356, 1619, 486, 11, 29, "Input",ExpressionUUID->"b366a8f5-dca3-4c7c-bae8-aab15afc3e33"],
-Cell[66845, 1632, 493, 11, 29, "Input",ExpressionUUID->"dbc9bc24-dc68-4187-bfd9-f6a91889240f"]
+Cell[558, 20, 14448, 404, 1310, "Input",ExpressionUUID->"716da434-014e-437e-81f5-b28f156e2497"],
+Cell[15009, 426, 8518, 194, 709, "Input",ExpressionUUID->"0a7bae86-0645-434d-b125-ea7fb65f3527"],
+Cell[23530, 622, 4045, 94, 450, "Input",ExpressionUUID->"c396a047-3e90-4f27-9f87-902ac358ba7b"],
+Cell[27578, 718, 5454, 124, 501, "Input",ExpressionUUID->"703b0358-5bac-4735-8505-86741e230f4e"],
+Cell[33035, 844, 2198, 44, 241, "Input",ExpressionUUID->"96cfd35a-cedf-45ee-9609-35b5c69f61be"],
+Cell[35236, 890, 10014, 226, 798, "Input",ExpressionUUID->"46b000bb-6f8c-4f78-a5b4-37226056d6b6"],
+Cell[45253, 1118, 5501, 129, 691, "Input",ExpressionUUID->"cb15dbad-a946-4def-8fcb-4e56887331e4"],
+Cell[50757, 1249, 6620, 157, 852, "Input",ExpressionUUID->"bde0936f-b449-4b8a-9e62-905966e4cbe5"],
+Cell[57380, 1408, 9186, 216, 776, "Input",ExpressionUUID->"d4c67adc-ff80-4971-a67d-03425a2ba516"],
+Cell[66569, 1626, 899, 21, 92, "Input",ExpressionUUID->"283a5286-a4bc-46b8-aede-886586b4d86a"],
+Cell[67471, 1649, 489, 11, 29, "Input",ExpressionUUID->"c0c275b0-4a1c-46e9-925e-410080cade67"],
+Cell[67963, 1662, 486, 11, 29, "Input",ExpressionUUID->"b366a8f5-dca3-4c7c-bae8-aab15afc3e33"],
+Cell[68452, 1675, 493, 11, 29, "Input",ExpressionUUID->"dbc9bc24-dc68-4187-bfd9-f6a91889240f"]
 }
 ]
 *)
