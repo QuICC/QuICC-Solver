@@ -4,7 +4,7 @@
  * operator with different treatment for the mean (l=0)
  */
 
-#ifndef QUICC_DENSESMWWORLAND_OPERATORWITHMEAN_HPP
+#ifndef QUICC_DENSESM_WORLAND_OPERATORWITHMEAN_HPP
 #define QUICC_DENSESM_WORLAND_OPERATORWITHMEAN_HPP
 
 // System includes
@@ -29,6 +29,10 @@ template <class TPolyBuilder, class TZeroBuilder = void>
 class OperatorWithMean : IDenseSMOperator
 {
 public:
+   /// @brief Pass-by-value polynomial builder ctor
+   /// @param polyBuilder to be stored and used
+   OperatorWithMean(TPolyBuilder polyBuilder) : mPolyBuilder(polyBuilder){};
+
    /// @brief ctor
    OperatorWithMean() = default;
 
@@ -42,6 +46,9 @@ public:
    /// @param l
    void compute(Eigen::Ref<Matrix> op, const Internal::Array& grid,
       const Internal::Array& weights, const std::uint32_t l) final;
+
+private:
+   TPolyBuilder mPolyBuilder;
 };
 
 template <class TPolyBuilder, class TZeroBuilder>
@@ -67,8 +74,7 @@ void OperatorWithMean<TPolyBuilder, TZeroBuilder>::compute(
    }
    else
    {
-      TPolyBuilder polyBuilder;
-      polyBuilder.compute(op, op.cols(), static_cast<int>(l), grid, weights,
+      mPolyBuilder.compute(op, op.cols(), static_cast<int>(l), grid, weights,
          ev::Set());
    }
 }

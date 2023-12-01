@@ -13,9 +13,9 @@
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
-#include "ViewOps/ALegendre/Op.hpp"
-#include "ViewOps/ALegendre/Impl.hpp"
-#include "ViewOps/ALegendre/Tags.hpp"
+#include "ViewOps/Quadrature/Op.hpp"
+#include "ViewOps/Quadrature/Impl.hpp"
+#include "ViewOps/Quadrature/Tags.hpp"
 #include "ViewOps/ALegendre/Builder.hpp"
 #include "Profiler/Interface.hpp"
 @CppHeaders@
@@ -46,9 +46,10 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
     std::array<std::uint32_t, rank> dimensions {M, K, P};
 
     // Make view operator
+    using namespace QuICC::Transform::Quadrature;
     using namespace QuICC::Transform::ALegendre;
     using backend_t = @BackendNamespace@::ImplOp<phys_t, mods_t, op_t,
-        QuICC::Transform::ALegendre::@Treatment@>;
+        QuICC::Transform::Quadrature::@Treatment@>;
     using derived_t = Op<phys_t, mods_t, op_t, backend_t>;
     auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
 

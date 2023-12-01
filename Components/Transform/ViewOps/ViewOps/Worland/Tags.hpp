@@ -31,15 +31,6 @@ struct bwd_t
 {
 };
 
-/// @brief mask for special treatment.
-/// none
-constexpr std::uint16_t none_m = 0;
-
-/// @brief mask for special treatment.
-/// diff phi
-constexpr std::uint16_t diffPhi_m = 1;
-
-
 } // namespace Worland
 } // namespace Transform
 } // namespace QuICC

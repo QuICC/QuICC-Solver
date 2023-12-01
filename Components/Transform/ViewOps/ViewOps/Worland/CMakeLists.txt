@@ -1,17 +1,15 @@
 # Create component library
 set(QUICC_CURRENT_SUBCOMPONENT_LIB Worland)
-add_library(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} STATIC "")
+add_library(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} INTERFACE "")
 
 target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
-  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../..)
-
-target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} PRIVATE
-  Op.cpp
+  INTERFACE
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
 # Add public header
 set(PHS
-  Op.hpp
   Builder.hpp
 )
 
@@ -20,20 +18,16 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
     PUBLIC_HEADER "${PHS}"
 )
 
-add_subdirectory(Cpu)
-# if(TARGET QuICC::Cuda)
-#   add_subdirectory(Cuda)
-# endif()
-
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
-  PUBLIC
+  INTERFACE
     QuICC::Std
     QuICC::View
-    QuICC::Operator
     QuICC::Profiling
     QuICC::Memory
-    QuICC::ViewOps::Blas
     QuICC::DenseSM
+    QuICC::ViewOps::Quadrature
+    QuICC::ViewOps::Pointwise
+    QuICC::ViewOps::Reduction
 )
 
 

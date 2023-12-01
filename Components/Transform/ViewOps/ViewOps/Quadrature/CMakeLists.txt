@@ -1,16 +1,28 @@
 # Create component library
-set(QUICC_CURRENT_SUBCOMPONENT_LIB ALegendre)
-add_library(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} INTERFACE "")
+set(QUICC_CURRENT_SUBCOMPONENT_LIB Quadrature)
+
+# if cuda backend is present we compile as static lib
+# to not propagate the dependency, otherwise header only lib
+if(TARGET QuICC::Cuda)
+  set(LIBTYPE "STATIC")
+  set(INTTYPE "PUBLIC")
+else()
+  set(LIBTYPE "INTERFACE")
+  set(INTTYPE "INTERFACE")
+endif()
+
+add_library(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} "${LIBTYPE}" "")
 
 target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
-  INTERFACE
+  "${INTTYPE}"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
 # Add public header
 set(PHS
-  Builder.hpp
+  Op.hpp
+  Tags.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
@@ -18,14 +30,23 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
     PUBLIC_HEADER "${PHS}"
 )
 
+add_subdirectory(Cpu)
+if(TARGET QuICC::Cuda)
+  add_subdirectory(Cuda)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+    "${INTTYPE}"
+      QuICC::Cuda
+  )
+endif()
+
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
-  INTERFACE
+  "${INTTYPE}"
     QuICC::Std
     QuICC::View
     QuICC::Operator
     QuICC::Profiling
     QuICC::Memory
-    QuICC::ViewOps::Quadrature
+    QuICC::ViewOps::Blas
 )
 
 

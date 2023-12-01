@@ -18,23 +18,18 @@ set(ProjectorOpInOut "phys_t, mods_t")
 
 set(PPolyBuilder "Plm")
 set(PDiff "0")
-set(PTreatment "none_m")
 
 set(D1PolyBuilder "dPlm")
 set(D1Diff "0")
-set(D1Treatment "${PTreatment}")
 
 set(LlPolyBuilder "Plm")
 set(LlDiff "1")
-set(LlTreatment "${PTreatment}")
 
 set(LlD1PolyBuilder "${D1PolyBuilder}")
 set(LlD1Diff "1")
-set(LlD1Treatment "${PTreatment}")
 
 set(DivS1PolyBuilder "sin_1Plm")
 set(DivS1Diff "0")
-set(DivS1Treatment "${PTreatment}")
 
 set(DivS1DpPolyBuilder "${DivS1PolyBuilder}")
 set(DivS1DpDiff "0")
@@ -42,7 +37,6 @@ set(DivS1DpTreatment "diffPhi_m")
 
 set(LlDivS1PolyBuilder "${DivS1PolyBuilder}")
 set(LlDivS1Diff "1")
-set(LlDivS1Treatment "${PTreatment}")
 
 set(LlDivS1DpPolyBuilder "${DivS1PolyBuilder}")
 set(LlDivS1DpDiff "1")
@@ -50,19 +44,15 @@ set(LlDivS1DpTreatment "diffPhi_m")
 
 set(Ll2PolyBuilder "Plm")
 set(Ll2Diff "2")
-set(Ll2Treatment "${PTreatment}")
 
 set(DivLlPolyBuilder "Plm")
 set(DivLlDiff "-1")
-set(DivLlTreatment "${PTreatment}")
 
 set(DivLlD1PolyBuilder "dPlm")
 set(DivLlD1Diff "-1")
-set(DivLlD1Treatment "${PTreatment}")
 
 set(DivLlDivS1PolyBuilder "sin_1Plm")
 set(DivLlDivS1Diff "-1")
-set(DivLlDivS1Treatment "${PTreatment}")
 
 set(DivLlDivS1DpPolyBuilder "sin_1Plm")
 set(DivLlDivS1DpDiff "-1")
@@ -181,6 +171,15 @@ foreach(Backend IN LISTS Backends)
             set(Diff "${${Op}Diff}")
             set(PolyBuilderScale "${${Op}PolyBuilderScale}")
             set(Treatment "${${Op}Treatment}")
+            if(NOT Treatment)
+                set(Treatment "none_m")
+            else()
+                if("${Kind}" STREQUAL "Projector")
+                    set(Treatment "diffPhiPrj_m")
+                else()
+                set(Treatment "diffPhiInt_m")
+                endif()
+            endif()
 
             configure_file(
                 "OpV.hpp.in"

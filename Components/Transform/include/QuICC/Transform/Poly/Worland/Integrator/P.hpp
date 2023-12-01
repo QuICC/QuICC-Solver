@@ -16,5 +16,8 @@
 #include "QuICC/Transform/Poly/Worland/Integrator/Kokkos/P.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/Worland/Integrator/PviewCpu_t.hpp.inc"
+#ifdef QUICC_HAS_CUDA_BACKEND
+#include "QuICC/Transform/Wrappers/Worland/Integrator/PviewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_P_HPP

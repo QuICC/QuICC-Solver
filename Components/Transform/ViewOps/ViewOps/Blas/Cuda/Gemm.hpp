@@ -134,7 +134,7 @@ inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::
 
 } // namespace Blocked
 
-/// @brief namespace for join tiling and register backend
+/// @brief namespace for joint tiling and register backend
 namespace Vad
 {
 

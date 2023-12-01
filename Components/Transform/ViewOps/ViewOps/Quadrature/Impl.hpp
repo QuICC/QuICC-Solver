@@ -9,8 +9,7 @@
 
 // Project includes
 //
-#include "ViewOps/ALegendre/Cpu/Impl.hpp"
+#include "ViewOps/Quadrature/Cpu/Impl.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
-#include "ViewOps/ALegendre/Cuda/Impl.hpp"
+#include "ViewOps/Quadrature/Cuda/Impl.hpp"
 #endif
-// #include "ViewOps/ALegendre/Tags.hpp"

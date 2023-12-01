@@ -28,7 +28,11 @@ namespace Worland {
 template <class TPolyBuilder> class Operator : IDenseSMOperator
 {
 public:
-   /// @brief ctor
+   /// @brief Pass-by-value polynomial builder ctor
+   /// @param polyBuilder to be stored and used
+   Operator(TPolyBuilder polyBuilder) : mPolyBuilder(polyBuilder){};
+
+   /// @brief default ctor
    Operator() = default;
 
    /// @brief dtor
@@ -41,6 +45,9 @@ public:
    /// @param l
    void compute(Eigen::Ref<Matrix> op, const Internal::Array& grid,
       const Internal::Array& weights, const std::uint32_t l) final;
+
+private:
+   TPolyBuilder mPolyBuilder;
 };
 
 template <class TPolyBuilder>
@@ -51,8 +58,7 @@ void Operator<TPolyBuilder>::compute(Eigen::Ref<Matrix> op,
    assert(op.rows() == grid.size());
 
    namespace ev = Polynomial::Worland::Evaluator;
-   TPolyBuilder polyBuilder;
-   polyBuilder.compute(op, op.cols(), static_cast<int>(l), grid, weights,
+   mPolyBuilder.compute(op, op.cols(), static_cast<int>(l), grid, weights,
       ev::Set());
 }
 

@@ -10,6 +10,11 @@ set(_tests
   Poly::P:<base_t>:projector
   Poly::P:<viewCpu_t>:projector
 )
+if(TARGET QuICC::Cuda)
+  list(APPEND _tests
+    Poly::P:<viewGpu_t>:projector
+  )
+endif()
 if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
     list(APPEND _tests
         Poly::P:<kokkos_t>:projector
@@ -65,6 +70,16 @@ set(_tests
   Poly::DivR1D1R1_Zero:<viewCpu_t>:projector
   Poly::SphLapl:<viewCpu_t>:projector
 )
+if(TARGET QuICC::Cuda)
+  list(APPEND _tests
+    Poly::D1:<viewGpu_t>:projector
+    Poly::D1R1:<viewGpu_t>:projector
+    Poly::DivR1_Zero:<viewGpu_t>:projector
+    Poly::DivR1D1R1:<viewGpu_t>:projector
+    Poly::DivR1D1R1_Zero:<viewGpu_t>:projector
+    Poly::SphLapl:<viewGpu_t>:projector
+  )
+endif()
 if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
 list(APPEND _tests
   Poly::D1:<kokkos_t>:projector
@@ -133,20 +148,17 @@ set(_tests
   Poly::DivR1:<viewCpu_t>:projector
   Poly::DivR1CylLaplh_Zero:<viewCpu_t>:projector
 )
-quicc_set_ulp(_ulp
-  ULP 1 1 1 1 1 1 1 1
-  MPULP 1 1 1 1 1 1 1 1
+if(TARGET QuICC::Cuda)
+  list(APPEND _tests
+    Poly::CylLaplh:<viewGpu_t>:projector
+    Poly::CylLaplh_DivR1D1R1:<viewGpu_t>:projector
+    Poly::D1_P:<viewGpu_t>:projector
+    Poly::D1CylLaplh:<viewGpu_t>:projector
+    Poly::D1CylLaplh_D1DivR1D1R1:<viewGpu_t>:projector
+    Poly::DivR1:<viewGpu_t>:projector
+    Poly::DivR1CylLaplh_Zero:<viewGpu_t>:projector
   )
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Algorithm::Operator:Template:type
-    ULPS ${_ulp}
-    IDS 0 1 2 3 1000 1001 1002 1003
-    DISABLED ON
-  )
-endforeach()
-
+endif()
 if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
     set(_tests
       Poly::CylLaplh:<kokkos_t>:projector
@@ -170,6 +182,37 @@ foreach(_test ${_tests})
   )
 endforeach()
 endif()
+
+# triangular truncation
+set(_tests
+  Poly::CylLaplh:<base_t>:projector
+  Poly::CylLaplh_DivR1D1R1:<base_t>:projector
+  Poly::D1_P:<base_t>:projector
+  Poly::D1CylLaplh:<base_t>:projector
+  Poly::D1CylLaplh_D1DivR1D1R1:<base_t>:projector
+  Poly::DivR1:<base_t>:projector
+  Poly::DivR1CylLaplh_Zero:<base_t>:projector
+  # Poly::CylLaplh:<viewCpu_t>:projector
+  # Poly::CylLaplh_DivR1D1R1:<viewCpu_t>:projector
+  # Poly::D1_P:<viewCpu_t>:projector
+  # Poly::D1CylLaplh:<viewCpu_t>:projector
+  # Poly::D1CylLaplh_D1DivR1D1R1:<viewCpu_t>:projector
+  # Poly::DivR1:<viewCpu_t>:projector
+  # Poly::DivR1CylLaplh_Zero:<viewCpu_t>:projector
+)
+quicc_set_ulp(_ulp
+  ULP 1 1 1 1
+  MPULP  1 1 1 1
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:Template:type
+    ULPS ${_ulp}
+    IDS 1000 1001 1002 1003
+    DISABLED ON
+  )
+endforeach()
 
 
 ######################
@@ -242,11 +285,15 @@ set(_split_tests
   Poly::P:<base_t>:projector
   Poly::P:<viewCpu_t>:projector
 )
-
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(TARGET QuICC::Cuda)
     list(APPEND _split_tests
-        Poly::P:<kokkos_t>:projector
-        )
+        Poly::P:<viewGpu_t>:projector
+    )
+endif()
+if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+  list(APPEND _split_tests
+      Poly::P:<kokkos_t>:projector
+  )
 endif()
 
 foreach(_test ${_split_tests})
@@ -267,7 +314,11 @@ set(_perf_tests
   Poly::P:<viewCpu_t>:projector
   Fft::P:<base_t>:projector
 )
-
+if(TARGET QuICC::Cuda)
+    list(APPEND _perf_tests
+        Poly::P:<viewGpu_t>:projector
+    )
+endif()
 if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
     list(APPEND _perf_tests
         Poly::P:<kokkos_t>:projector

@@ -10,8 +10,8 @@
 
 namespace QuICC {
 namespace Transform {
+/// @brief namespace for Worland operators
 namespace Worland {
-
 /// @brief namespace for uniform truncation
 namespace Uniform {
 

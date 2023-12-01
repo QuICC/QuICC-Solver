@@ -16,5 +16,8 @@
 #include "QuICC/Transform/Poly/Worland/Projector/Kokkos/DivR1.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/Worland/Projector/DivR1viewCpu_t.hpp.inc"
+#ifdef QUICC_HAS_CUDA_BACKEND
+#include "QuICC/Transform/Wrappers/Worland/Projector/DivR1viewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_PROJECTOR_DIVR1_HPP

@@ -1,6 +1,6 @@
 /**
  * @file @Op@@Tag@.cpp
- * @brief Wrapper of the Worland @Op@ @Kind@
+ * @brief Wrapper of the Worland @Op@ Reductor
  */
 
 // System includes
@@ -8,7 +8,7 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Wrappers/Worland/@Kind@/@Op@@Tag@.hpp.inc"
+#include "QuICC/Transform/Wrappers/Worland/Reductor/@Op@@Tag@.hpp.inc"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/rWnl.hpp"
 #include "QuICC/Polynomial/Worland/dWnl.hpp"
@@ -25,6 +25,9 @@
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
+#include "ViewOps/Pointwise/Cpu/Pointwise.hpp"
+#include "ViewOps/Pointwise/Functors.hpp"
+#include "ViewOps/Reduction/Cpu/Reduction.hpp"
 #include "ViewOps/Quadrature/Op.hpp"
 #include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/Worland/Tags.hpp"
@@ -36,12 +39,21 @@ namespace QuICC {
 namespace Transform {
 namespace Poly {
 namespace Worland {
-namespace @Kind@ {
+namespace Reductor {
+
+@Op@<@Tag@>::@Op@() : IWorlandPower(1)
+{
+    this->setProfileTag();
+}
 
 
-void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
+void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal::Array& icompweights) const
 {
     Profiler::RegionFixture<3> fix("@Op@<@Tag@>::initOperators");
+
+    // Energy calculation requires a different quadrature
+    Internal::Array igrid, iweights;
+    @Grid@
 
     std::uint32_t M = igrid.size();
     std::uint32_t K = static_cast<std::uint32_t>(this->mspSetup->fastSize(0));
@@ -51,31 +63,37 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
     ///\todo this should be the full matrix size
     std::uint32_t P = static_cast<std::uint32_t>(this->mspSetup->slow(nLayers-1)) + 1;
 
-    constexpr size_t rank = 3;
-    // dim 0 - Nr - radial points
-    // dim 1 - R  - radial modes
-    // dim 2 - L  - harmonic degree
-    std::array<std::uint32_t, rank> dimensions {M, K, P};
-
-    // Make view operator
-    using namespace QuICC::Transform::Quadrature;
-    using namespace QuICC::Transform::Worland;
-    using backend_t = @BackendNamespace@::ImplOp<phys_t, mods_t, op_t>;
-    using derived_t = Op<phys_t, mods_t, op_t, backend_t>;
-    auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
-
     std::vector<std::uint32_t> layers(nLayers);
     for(std::uint32_t p = 0; p < nLayers; ++p)
     {
         layers[p] = this->mspSetup->slow(p);
     }
 
-    mOp = std::make_unique<derived_t>(dimensions, layers, mem);
-    derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
-    auto opView = derivedOp.getOp();
+    constexpr size_t rank = 3;
+    // dim 0 - Nr - radial points
+    // dim 1 - R  - radial modes
+    // dim 2 - L  - harmonic degree
+    std::array<std::uint32_t, rank> dimensionsPrj {M, K, P};
+
+    // Make projector view operator
+    using namespace QuICC::Transform::Quadrature;
+    using namespace QuICC::Transform::Worland;
+    using backendPrj_t = @BackendNamespace@::ImplOp<phys_t, mods_t, op_t>;
+    using derivedPrj_t = Op<phys_t, mods_t, op_t, backendPrj_t>;
+
+    auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
+    mPrj = std::make_unique<derivedPrj_t>(dimensionsPrj, layers, mem);
+    derivedPrj_t& derivedPrjOp = dynamic_cast<derivedPrj_t&>(*mPrj);
+    auto prjView = derivedPrjOp.getOp();
+
     using namespace QuICC::Polynomial::Worland;
-    Builder<op_t, QuICC::DenseSM::Worland::@OpBuilder@, bwd_t> tBuilder;
-    tBuilder.compute(opView, igrid, Internal::Array());
+    Builder<op_t, QuICC::DenseSM::Worland::@OpBuilderBwd@, bwd_t> tBuilderBwd;
+    tBuilderBwd.compute(prjView, igrid, Internal::Array());
+
+    @SetIntOp@
+
+    // setup pointwise operator
+    mPnt = std::make_unique<QuICC::Pointwise::@BackendNamespace@::Op<@RedType@Abs_t, @RedType@_t, QuICC::Pointwise::Abs2Functor<double>>>(QuICC::Pointwise::Abs2Functor<double>());
 
     ///\todo move view setups to init
 
@@ -119,6 +137,7 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
     // dim 2 - L  - harmonic degree
     std::array<std::uint32_t, rank> modsDims = {K, N, P};
     mModsFlat.resize(inFlatSize);
+    mModsAbsFlat.resize(inFlatSize);
 
     // dim 0 - Nr - radial points
     // dim 1 - M  - harmonic order
@@ -127,16 +146,17 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
     mPhysFlat.resize(M * nCols);
 
     @SetDataViews@
+    @SetPowerView@
+    @SetReductorView@
+    @SetRadialView@
 }
 
-void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in) const
 {
     Profiler::RegionFixture<2> fix("@Op@<@Tag@>::applyOperators");
 
     assert(static_cast<std::size_t>(in.rows()) == mModsView.dims()[0]);
     assert(static_cast<std::size_t>(in.cols()) == mModsView.indices()[1].size());
-    assert(static_cast<std::size_t>(rOut.rows()) == mPhysView.dims()[0]);
-    assert(static_cast<std::size_t>(rOut.cols()) == mPhysView.indices()[1].size());
 
     std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
 
@@ -169,59 +189,30 @@ void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
 
     @HostToDevice@
 
-    /// apply
-    mOp->apply(mPhysView, mModsView);
-
-    /// copy back
+    /// project to physical space
+    mPrj->apply(mPhysView, mModsView);
+    @CompTree@
 
     @DeviceToHost@
-
-    start = 0;
-    offSet = 0;
-    int outRows = this->mspSetup->fwdSize();
-    for(std::uint32_t p = 0; p < nLayers; p++)
-    {
-        int cols = this->mspSetup->mult(p);
-
-        Eigen::Ref<MatrixZ> outB = rOut.block(0, start, outRows, cols);
-
-        #ifdef QUICC_JW_ROW_MAJOR
-        for (std::int64_t j = 0; j < outB.cols(); ++j)
-        {
-            for (std::int64_t i = 0; i < outB.rows(); ++i)
-            {
-                // copy padded to flattened column and transpose
-                outB.data()[i+j*rOut.rows()]= mPhysFlat[offSet + i*outB.cols()+j];
-            }
-        }
-        #else
-        for (std::int64_t i = 0; i < outB.size(); ++i)
-        {
-            outB.data()[i] = mPhysFlat[offSet + i];
-        }
-        #endif
-
-        offSet += outB.size();
-        start += cols;
-    }
+    @ViewToEigen@
 }
 
-void @Op@<@Tag@>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
+void @Op@<@Tag@>::makeOperator(Matrix& op, Matrix& eop, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
 {
     throw std::logic_error("view Worland operator should never call this");
 }
 
-void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in) const
+void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
 {
     throw std::logic_error("view Worland operator should never call this");
 }
 
-void @Op@<@Tag@>::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
+void @Op@<@Tag@>::applyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
 {
     throw std::logic_error("view Worland operator should never call this");
 }
 
-} // namespace @Kind@
+} // namespace Reductor
 } // namespace Worland
 } // namespace Poly
 } // namespace Transform

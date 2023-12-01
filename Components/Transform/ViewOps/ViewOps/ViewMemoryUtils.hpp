@@ -1,3 +1,8 @@
+/**
+ * @file ViewMemoryUtils.hpp
+ * @brief Utilities to temporarily transfer memory from the device to host
+ * for setup operations that are supported only on the host side
+ */
 #pragma once
 
 // External includes

@@ -27,8 +27,8 @@
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
-#include "ViewOps/Worland/Op.hpp"
-#include "ViewOps/Worland/Impl.hpp"
+#include "ViewOps/Quadrature/Op.hpp"
+#include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/Worland/Tags.hpp"
 #include "ViewOps/Worland/Builder.hpp"
 #include "Profiler/Interface.hpp"
@@ -60,6 +60,7 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
     std::array<std::uint32_t, rank> dimensions {K, M, P};
 
     // Make view operator
+    using namespace QuICC::Transform::Quadrature;
     using namespace QuICC::Transform::Worland;
     using backend_t = @BackendNamespace@::ImplOp<mods_t, phys_t, op_t>;
     using derived_t = Op<mods_t, phys_t, op_t, backend_t>;
@@ -74,9 +75,9 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
     mOp = std::make_unique<derived_t>(dimensions, layers, mem);
     derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
     auto opView = derivedOp.getOp();
-    using compute_t = Internal::Array::Scalar;
     using namespace QuICC::Polynomial::Worland;
-    builder<op_t, QuICC::DenseSM::Worland::@OpBuilder@, compute_t, fwd_t>(opView, igrid, iweights);
+    Builder<op_t, QuICC::DenseSM::Worland::@OpBuilder@, fwd_t> tBuilder;
+    tBuilder.compute(opView, igrid, iweights);
 
 
     ///\todo move view setups to init
@@ -186,25 +187,19 @@ void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
 
         Eigen::Ref<MatrixZ> outB = rOut.block(0, start, outRows, cols);
 
-        #ifdef QUICC_JW_ROW_MAJOR
         for (std::int64_t j = 0; j < outB.cols(); ++j)
         {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
             {
+                #ifdef QUICC_JW_ROW_MAJOR
                 // copy to padded from flattened column and transpose
                 outB.data()[i+j*rOut.rows()]= mModsFlat[offSet + i*outB.cols()+j];
-            }
-        }
-        #else
-        for (std::int64_t j = 0; j < outB.cols(); ++j)
-        {
-            for (std::int64_t i = 0; i < outB.rows(); ++i)
-            {
+                #else
                 // copy to padded from flattened column
                 outB.data()[i+j*rOut.rows()]= mModsFlat[offSet + i+j*outB.rows()];
+                #endif
             }
         }
-        #endif
 
         offSet += outB.size();
         start += cols;
@@ -212,6 +207,11 @@ void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
 }
 
 void @Op@<@Tag@>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
+{
+    throw std::logic_error("view Worland operator should never call this");
+}
+
+void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in) const
 {
     throw std::logic_error("view Worland operator should never call this");
 }

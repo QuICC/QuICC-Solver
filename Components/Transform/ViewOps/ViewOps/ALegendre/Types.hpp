@@ -10,6 +10,7 @@
 
 namespace QuICC {
 namespace Transform {
+/// @brief namespace for Associated Legendre operators
 namespace ALegendre {
 
 using namespace Memory;
@@ -26,9 +27,9 @@ using physRM_t = View<std::complex<double>, DCCSC3DJIK>;
 using proj_t = View<double, CS1RL3D>;
 /// @brief projector view with row major layout (in a layer)
 using projRM_t = View<double, CS1RL3DJIK>;
-/// @brief projector view with column major layout (in a layer)
+/// @brief integrator view with column major layout (in a layer)
 using int_t = View<double, S1CLCSC3D>;
-/// @brief projector view with row major layout (in a layer)
+/// @brief integrator view with row major layout (in a layer)
 using intRM_t = View<double, S1CLCSC3DJIK>;
 
 } // namespace ALegendre

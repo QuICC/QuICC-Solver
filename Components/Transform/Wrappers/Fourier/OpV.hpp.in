@@ -48,6 +48,7 @@ public:
     void initBackend() const final;
 
 protected:
+    using I@Space@@Kind@::transform;
 
 private:
     @PreOp@

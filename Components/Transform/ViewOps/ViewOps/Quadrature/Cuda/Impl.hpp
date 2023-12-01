@@ -17,10 +17,9 @@
 
 namespace QuICC {
 namespace Transform {
-namespace ALegendre {
+namespace Quadrature {
 /// @brief Cuda backend namespace
 namespace Cuda {
-
 
 using namespace QuICC::Operator;
 using namespace QuICC::Memory;
@@ -57,11 +56,11 @@ private:
     std::shared_ptr<memory_resource> _mem;
     /// @brief index typedef
     using IndexType = typename Tin::IndexType;
-    /// @brief harmonic order cache
-    MemBlock<IndexType> _harmOrd;
-    /// @brief number of columns cache
-    MemBlock<IndexType> _cols;
-    /// @brief max slice width
+    /// @brief layer index cache
+    MemBlock<IndexType> _layerIndex;
+    /// @brief layer width cache
+    MemBlock<IndexType> _layerWidth;
+    /// @brief max layer width cache
     std::uint32_t _N;
     /// @brief A (operator) matrix offset cache
     MemBlock<IndexType> _offSetA;
@@ -72,6 +71,6 @@ private:
 };
 
 } // namespace Cuda
-} // namespace ALegendre
+} // namespace Quadrature
 } // namespace Transform
 } // namespace QuICC

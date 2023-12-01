@@ -15,5 +15,8 @@
 #include "QuICC/Transform/Poly/Worland/Projector/Kokkos/DivR1CylLaplh_Zero.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/Worland/Projector/DivR1CylLaplh_ZeroviewCpu_t.hpp.inc"
+#ifdef QUICC_HAS_CUDA_BACKEND
+#include "QuICC/Transform/Wrappers/Worland/Projector/DivR1CylLaplh_ZeroviewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_PROJECTOR_DIVR1CYLLAPLH_ZERO_HPP

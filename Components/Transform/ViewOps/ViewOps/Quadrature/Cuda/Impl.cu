@@ -6,10 +6,11 @@
 #include "Impl.hpp"
 #include "View/View.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
+#include "ViewOps/Quadrature/ViewBatchedMatmulUtils.hpp"
 #include "ViewOps/Blas/Cuda/Gemm.hpp"
-#include "ViewOps/ALegendre/Tags.hpp"
+#include "ViewOps/Quadrature/Tags.hpp"
 #include "ViewOps/ALegendre/Types.hpp"
-#include "ViewOps/ALegendre/TypeTraits.hpp"
+#include "ViewOps/Worland/Types.hpp"
 #include "Cuda/CudaUtil.hpp"
 
 // #define QUICC_USE_NAIVE_CUDA_BATCHED_MATMUL
@@ -18,17 +19,17 @@
 
 namespace QuICC {
 namespace Transform {
-namespace ALegendre {
+namespace Quadrature {
 namespace Cuda {
 
 namespace details
 {
-    using namespace QuICC::Transform::ALegendre::Cuda;
+    using namespace QuICC::Transform::Quadrature::Cuda;
 
     /// cuda kernel of batched matmul with varying sizes
     template<class Tout, class Tin, class Top, std::uint16_t Treatment = 0>
     __global__ void batchedMatmulKernel(Tout out, const Tin in, const Top op,
-        const ViewBase<std::uint32_t> harmOrd, const ViewBase<std::uint32_t> cols,
+        const ViewBase<std::uint32_t> layerIndex, const ViewBase<std::uint32_t> layerWidth,
         const ViewBase<std::uint32_t> offSetA, const ViewBase<std::uint32_t> offSetB,
         const ViewBase<std::uint32_t> offSetC)
     {
@@ -36,25 +37,11 @@ namespace details
 
         const std::size_t l = blockIdx.z;
 
-        IndexType M, N, K;
-
         // get dimensions
-        if constexpr (is_projector_v<Top>)
-        {
-            M = out.dims()[0]; // longitudinal points
-            K = in.dims()[0] - harmOrd[l]; // current harmonic order
-            N = cols[l]; // number of columns
-        }
-        else if constexpr (is_integrator_v<Top>)
-        {
-            M = out.dims()[0] - harmOrd[l]; // current harmonic order
-            K = in.dims()[0]; // longitudinal points
-            N = cols[l]; // number of columns
-        }
-        else
-        {
-            assert(false && "batched kernel for these types is not implemented.");
-        }
+        auto dims = getMatmulDims(out, in, op, layerWidth[l], layerIndex[l]);
+        auto M = dims.M;
+        auto K = dims.K;
+        auto N = dims.N;
 
         // mats pointers
         auto* c = reinterpret_cast<cuda::std::complex<double>*>(&(out[offSetC[l]]));
@@ -62,14 +49,14 @@ namespace details
         double* a = &(op[offSetA[l]]);
 
         // compute
-        using alpha_t = typename std::conditional<Treatment == diffPhi_m,
+        using alpha_t = typename std::conditional<Treatment != none_m,
             cuda::std::complex<double>, double>::type;
         alpha_t alpha = 1.0;
 
-        if constexpr (Treatment == diffPhi_m)
+        if constexpr (Treatment != none_m)
         {
-            alpha = cuda::std::complex<double>{0.0, static_cast<double>(harmOrd[l])};
-            if constexpr (is_integrator_v<Top>)
+            alpha = cuda::std::complex<double>{0.0, static_cast<double>(layerIndex[l])};
+            if constexpr (Treatment == diffPhiInt_m)
             {
                 alpha = -alpha;
             }
@@ -97,34 +84,24 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
 {
     assert(QuICC::Cuda::isDeviceMemory(out.data()));
     assert(QuICC::Cuda::isDeviceMemory(in.data()));
+    assert(QuICC::Cuda::isDeviceMemory(op.data()));
+
+    // batched matmul out = op*in
+    assert(op.dims()[0] == out.dims()[0]);
+    assert(op.dims()[1] == in.dims()[0]);
+    assert(op.dims()[2] == in.dims()[2]);
+    assert(op.dims()[2] == out.dims()[2]);
 
     using IndexType = typename Tin::IndexType;
+    using namespace QuICC::Memory;
 
     // setup offsets
-    if (_harmOrd.data() == nullptr)
+    if (_layerIndex.data() == nullptr)
     {
         /// \todo move setup to gpu
-
-        IndexType L; // harmonic order
-
-        ViewBase<IndexType> modsPointers;
-        if constexpr (is_projector_v<Top>)
-        {
-            modsPointers = in.pointers()[1];
-            L = in.dims()[0];
-        }
-        else if constexpr (is_integrator_v<Top>)
-        {
-            modsPointers = out.pointers()[1];
-            L = out.dims()[0];
-        }
-        else
-        {
-            assert(false && "backend for these types is not implemented.");
-        }
+        auto modsPointers = getModsPointers(out, in, op);
 
         // copy back to cpu for preprocessing
-        using namespace QuICC::Memory;
         tempOnHostMemorySpace converterP(modsPointers, TransferMode::read | TransferMode::block);
 
         _N = 0;
@@ -141,16 +118,16 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
         }
 
         // alloc device mem
-        _harmOrd = std::move(QuICC::Memory::MemBlock<IndexType>(nLayers, _mem.get()));
-        _cols = std::move(QuICC::Memory::MemBlock<IndexType>(nLayers, _mem.get()));
+        _layerIndex = std::move(QuICC::Memory::MemBlock<IndexType>(nLayers, _mem.get()));
+        _layerWidth = std::move(QuICC::Memory::MemBlock<IndexType>(nLayers, _mem.get()));
 
         // setup view
-        ViewBase<IndexType> vHarmOrd(_harmOrd.data(), _harmOrd.size());
-        ViewBase<IndexType> vCols(_cols.data(), _cols.size());
+        ViewBase<IndexType> vLayerIndex(_layerIndex.data(), _layerIndex.size());
+        ViewBase<IndexType> vLayerWidth(_layerWidth.data(), _layerWidth.size());
 
         // setup converters
-        tempOnHostMemorySpace converterHO(vHarmOrd, TransferMode::write | TransferMode::block);
-        tempOnHostMemorySpace converterC(vCols, TransferMode::write);
+        tempOnHostMemorySpace converterLI(vLayerIndex, TransferMode::write | TransferMode::block);
+        tempOnHostMemorySpace converterLW(vLayerWidth, TransferMode::write);
 
         IndexType layCtr = 0;
         for (IndexType k = 0; k < modsPointers.size()-1 ; ++k)
@@ -159,8 +136,8 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
             // check if layer is populated
             if (nCols > 0)
             {
-                vHarmOrd[layCtr] = k;
-                vCols[layCtr] = nCols;
+                vLayerIndex[layCtr] = k;
+                vLayerWidth[layCtr] = nCols;
                 ++layCtr;
             }
         }
@@ -188,22 +165,10 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
         for (IndexType h = 0; h < nLayers-1 ; ++h)
         {
             // get dimensions
-            if constexpr (is_projector_v<Top>)
-            {
-                M = out.dims()[0]; // longitudinal points
-                K = L - vHarmOrd[h]; // current harmonic order
-                N = vCols[h]; // number of columns
-            }
-            else if constexpr (is_integrator_v<Top>)
-            {
-                M = L - vHarmOrd[h]; // current harmonic order
-                K = in.dims()[0]; // longitudinal points
-                N = vCols[h]; // number of columns
-            }
-            else
-            {
-                assert(false && "backend for these types is not implemented.");
-            }
+            auto dims = getMatmulDims(out, in, op, vLayerWidth[h], vLayerIndex[h]);
+            auto M = dims.M;
+            auto K = dims.K;
+            auto N = dims.N;
 
             vOffSetA[h+1] = vOffSetA[h] + M*K;
             vOffSetB[h+1] = vOffSetB[h] + K*N;
@@ -214,26 +179,36 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
 
     /// \todo more balanced load distribution
     IndexType M;
-    if constexpr (is_projector_v<Top>)
+    using opLevelType = typename Top::LevelType;
+    // if constexpr (ALegendre::is_projector_v<Top>)
+    if constexpr (std::is_same_v<opLevelType, CS1RL3D::level> ||
+                  std::is_same_v<opLevelType, CS1RL3DJIK::level>)
     {
         M = out.dims()[0]; // longitudinal points
     }
-    else if constexpr (is_integrator_v<Top>)
+    // else if constexpr (ALegendre::is_integrator_v<Top>)
+    else if constexpr (std::is_same_v<opLevelType, S1CLCSC3D::level> ||
+                       std::is_same_v<opLevelType, S1CLCSC3DJIK::level>)
     {
         /// \todo store actual max
         M = out.dims()[0] ; // max harmonic order
     }
+    // else if constexpr (Worland::Uniform::is_integrator_v<Top>)
+    else if constexpr (std::is_same_v<opLevelType, CSL3D::level> ||
+                       std::is_same_v<opLevelType, CSL3DJIK::level>)
+        M = op.dims()[0]; // radial points/modes
     else
     {
-        assert(false && "backend for these types is not implemented.");
+        static_assert(std::is_same_v<opLevelType, void>,
+            "backend for these types is not implemented.");
     }
 
     const IndexType N = _N;
-    const IndexType activeLayers = _harmOrd.size();
+    const IndexType activeLayers = _layerIndex.size();
 
     // offsets views
-    ViewBase<IndexType> harmOrd(_harmOrd.data(), _harmOrd.size());
-    ViewBase<IndexType> cols(_cols.data(), _cols.size());
+    ViewBase<IndexType> layerIndex(_layerIndex.data(), _layerIndex.size());
+    ViewBase<IndexType> layerWidth(_layerWidth.data(), _layerWidth.size());
     ViewBase<IndexType> offSetA(_offSetA.data(), _offSetA.size());
     ViewBase<IndexType> offSetB(_offSetB.data(), _offSetB.size());
     ViewBase<IndexType> offSetC(_offSetC.data(), _offSetC.size());
@@ -261,23 +236,27 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
     #endif
 
     details::batchedMatmulKernel<Tout, Tin, Top, Treatment>
-        <<<numBlocks, blockSize>>>(out, in, op, harmOrd, cols, offSetA, offSetB, offSetC);
+        <<<numBlocks, blockSize>>>(out, in, op, layerIndex, layerWidth, offSetA, offSetB, offSetC);
 
 }
 
-// Explicit instantations
-using namespace QuICC::Memory;
+// Explicit instantations for AL
 
 // Projectors with row major data
-template class ImplOp<physRM_t, modsRM_t, proj_t>;
-template class ImplOp<physRM_t, modsRM_t, proj_t, diffPhi_m>;
+template class ImplOp<ALegendre::physRM_t, ALegendre::modsRM_t, ALegendre::proj_t>;
+template class ImplOp<ALegendre::physRM_t, ALegendre::modsRM_t, ALegendre::proj_t, diffPhiPrj_m>;
 
 // Integrators with row major data
-template class ImplOp<modsRM_t, physRM_t, int_t>;
-template class ImplOp<modsRM_t, physRM_t, int_t, diffPhi_m>;
+template class ImplOp<ALegendre::modsRM_t, ALegendre::physRM_t, ALegendre::int_t>;
+template class ImplOp<ALegendre::modsRM_t, ALegendre::physRM_t, ALegendre::int_t, diffPhiInt_m>;
+
+// Explicit instantations for JW
+
+// Integrators with row major data
+template class ImplOp<Worland::Uniform::modsRM_t, Worland::Uniform::physRM_t, Worland::Uniform::int_t>;
 
 
 } // namespace Cuda
-} // namespace ALegendre
+} // namespace Quadrature
 } // namespace Transform
 } // namespace QuICC

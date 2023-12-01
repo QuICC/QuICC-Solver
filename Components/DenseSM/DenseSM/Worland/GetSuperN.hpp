@@ -20,6 +20,9 @@ namespace QuICC {
 namespace DenseSM {
 namespace Worland {
 
+/// @brief Get number of super diagonals based on builder type
+/// @tparam TINBuilder
+/// @return number of super diagonals
 template <class TINBuilder> constexpr std::uint32_t getSuperN()
 {
 #ifdef QUICC_TRANSFORM_WORLAND_TRUNCATE_QI
@@ -27,19 +30,19 @@ template <class TINBuilder> constexpr std::uint32_t getSuperN()
 #else
    if constexpr (std::is_same_v<TINBuilder, ::QuICC::SparseSM::Worland::I2>)
    {
-      // I2 has 3 superdiagonals
+      // I2 has 3 super diagonals
       return 3;
    }
    else if constexpr (std::is_same_v<TINBuilder,
                          ::QuICC::SparseSM::Worland::I4>)
    {
-      // I4 has 6 superdiagonals
+      // I4 has 6 super diagonals
       return 6;
    }
    else if constexpr (std::is_same_v<TINBuilder,
                          ::QuICC::SparseSM::Worland::I6>)
    {
-      // I6 has 9 superdiagonals
+      // I6 has 9 super diagonals
       return 9;
    }
    else

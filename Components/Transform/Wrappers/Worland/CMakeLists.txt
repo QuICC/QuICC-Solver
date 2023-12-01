@@ -1,8 +1,8 @@
 set(Backends "Cpu")
 
-# if(TARGET QuICC::Cuda)
-#     list(APPEND Backends "Gpu")
-# endif()
+if(TARGET QuICC::Cuda)
+    list(APPEND Backends "Gpu")
+endif()
 
 set(Kinds "Projector;Integrator")
 

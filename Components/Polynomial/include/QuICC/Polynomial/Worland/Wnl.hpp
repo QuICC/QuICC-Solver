@@ -44,7 +44,7 @@ namespace Worland {
          /**
           * @brief Constructor for specific alpha,beta pair
           */
-         Wnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta);
+         Wnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta, const int lShift = 0);
 
          /**
           * @brief Compute worland polynomial
@@ -52,11 +52,14 @@ namespace Worland {
           * @tparam TEvaluator The evaluator allows to change behavior from computing Matric operator, to On-the-fly transforms, etc
           */
          template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
-
+      private:
+         int mLShift = 0;
    };
 
-   template <typename T, typename TEval> inline void Wnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEval evaluator)
+   template <typename T, typename TEval> inline void Wnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int lIn, const Internal::Array& igrid, const Internal::Array& scale, TEval evaluator)
    {
+      const auto l = lIn + this->mLShift;
+
       int gN = igrid.rows();
 
       if(l < 0)

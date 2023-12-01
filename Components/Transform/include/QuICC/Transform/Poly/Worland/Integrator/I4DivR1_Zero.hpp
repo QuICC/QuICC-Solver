@@ -16,5 +16,9 @@
 #include "QuICC/Transform/Poly/Worland/Integrator/Kokkos/I4DivR1_Zero.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/Worland/Integrator/I4DivR1_ZeroviewCpu_t.hpp.inc"
+#ifdef QUICC_HAS_CUDA_BACKEND
+#include "QuICC/Transform/Wrappers/Worland/Integrator/I4DivR1_ZeroviewGpu_t.hpp.inc"
+#endif
+
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I4DIVR1_ZERO_HPP

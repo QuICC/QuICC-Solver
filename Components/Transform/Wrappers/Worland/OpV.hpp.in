@@ -68,6 +68,11 @@ private:
     /// @param in
     void applyOperators(MatrixZ& rOut, const MatrixZ& in) const final;
 
+    /// @brief
+    /// @param rOut
+    /// @param in
+    void applyOperators(Matrix& rOut, const MatrixZ& in) const final;
+
     /// @brief Apply ith operator
     /// this is not used in the view implementations
     /// @param rOut
@@ -76,7 +81,7 @@ private:
     void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const final;
 
     // Uniform truncation
-    #ifdef QUICC_AL_ROW_MAJOR
+    #ifdef QUICC_JW_ROW_MAJOR
     using mods_t = View<std::complex<double>, DCCSC3DJIK>;
     using phys_t = View<std::complex<double>, DCCSC3DJIK>;
     using op_t = View<double, @OpAttribute@>;
