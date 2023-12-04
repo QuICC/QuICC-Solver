@@ -86,7 +86,7 @@ def torspec(phys, l, n):
 def torphys2D(spec, m, nr):
     """Transform 2D R spectral coefficients to 2D R physical values"""
 
-    phys = np.zeros((2*nrgrid(nr), spec.shape[1]))
+    phys = np.zeros((nrgrid(nr), spec.shape[1]))
     for j in range(spec.shape[1]):
         phys[:,j:j+1] = torphys(spec[:,j:j+1], m+j, nr)
 
