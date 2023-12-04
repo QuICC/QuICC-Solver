@@ -17,8 +17,6 @@ namespace Blas {
 /// @brief namespace for Cuda backends
 namespace Cuda {
 
-using namespace QuICC::Memory;
-
 /// @brief namespace for naive backend
 namespace Naive {
 
@@ -135,11 +133,12 @@ inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::
 } // namespace Blocked
 
 /// @brief namespace for joint tiling and register backend
-namespace Vad
+namespace VadRegA
 {
 
 /// @brief Cuda kernel vad matmul
 /// joint tiling register / shared memory implementation (Volkov and Demmel)
+/// tile a in registers
 /// @tparam T
 /// @tparam Talpha
 /// @param c complex, row major
@@ -186,8 +185,8 @@ inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::
     for (std::uint32_t k = 0; k < K; k+=KK)
     {
         // copy b to local memory (SM)
-        auto kk = threadIdx.x % KK;
-        auto nn = threadIdx.x / KK;
+        auto kk = threadIdx.x / NN;
+        auto nn = threadIdx.x % NN;
         // row major
         auto kknn = kk*NN + nn;
         if (k + kk < K && n + nn < N) {
@@ -237,7 +236,114 @@ inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::
     }
 }
 
-} // namespace Vad
+} // namespace VadRegA
+
+/// @brief namespace for joint tiling and register backend
+namespace VadRegB
+{
+
+/// @brief Cuda kernel vad matmul
+/// joint tiling register / shared memory implementation (Volkov and Demmel)
+/// tile b in registers
+/// @tparam T
+/// @tparam Talpha
+/// @param c complex, row major
+/// @param a real, col major
+/// @param b complex, row major
+/// @param M
+/// @param K
+/// @param N
+/// @param alpha
+template <class T, class Talpha, unsigned int Nthreads, unsigned int CoarseFactor>
+inline __device__ void matmul(cuda::std::complex<T>* c, const T* a, const cuda::std::complex<T>* b,
+    const std::size_t M, const std::size_t K, const std::size_t N,
+    const Talpha alpha)
+{
+    // tile size
+    constexpr unsigned int ntrd = Nthreads;       // number of threads, min one warp ~64
+    constexpr unsigned int MM = CoarseFactor;     // coarsening factor,
+    constexpr unsigned int NN = ntrd;
+    // number of reuse of reg values, adjust register pressure ~16
+    constexpr unsigned int KK = NN / MM;  // steps of outer product, chosen so that tile b_sm is loaded by all threads
+
+    assert(blockDim.x == NN);
+    assert(blockDim.y == 1);
+    assert(blockDim.z == 1);
+
+    // local memory
+    __shared__ T a_sm[MM*KK];
+
+    // registers
+    cuda::std::complex<T> b_reg[KK];
+    cuda::std::complex<T> c_reg[MM];
+
+    const auto m = blockIdx.x*MM;
+    const auto n = blockIdx.y*NN;
+
+    // set tile c to zero
+    #pragma unroll
+    for (std::uint32_t mm = 0; mm < MM; ++mm) {
+        c_reg[mm] = cuda::std::complex<T>{0.0};
+    }
+
+    auto nn = threadIdx.x;
+
+    for (std::uint32_t k = 0; k < K; k+=KK)
+    {
+        // copy a to local memory (SM)
+        auto mm = threadIdx.x % MM;
+        auto kk = threadIdx.x / MM;
+        // col major
+        auto mmkk = mm + kk*MM;
+        if (k + kk < K && m + mm < M) {
+            a_sm[mmkk] = a[m + mm + (k + kk)*M]; // col major
+        }
+        else {
+            a_sm[mmkk] = 0.0;
+        }
+
+        // copy b to registers
+        #pragma unroll
+        for (std::uint32_t kk = 0; kk < KK; ++kk) {
+            // row major
+            auto kknn = (k + kk)*N + n + nn;
+            if (k + kk < K && n + nn < N) {
+                b_reg[kk] = b[kknn];
+            }
+            else {
+                b_reg[kk] = 0.0;
+            }
+        }
+
+        __syncthreads();
+
+        // tile c
+        #pragma unroll
+        for (std::uint32_t mm = 0; mm < MM; ++mm) {
+            #pragma unroll
+            // KK steps of tile c
+            for (std::uint32_t kk = 0; kk < KK; ++kk) {
+                // col major
+                auto mmkk = mm + kk*MM;
+                c_reg[mm] += a_sm[mmkk]*b_reg[kk];
+            }
+        }
+
+        __syncthreads();
+    }
+
+    // copy back c_reg
+    #pragma unroll
+    for (std::uint32_t mm = 0; mm < MM; ++mm) {
+        if (m + mm < M && n + nn < N) {
+            // row major
+            c[(mm + m)*N + nn + n] = alpha * c_reg[mm];
+        }
+    }
+}
+
+} // namespace VadRegB
+
 
 } // namespace Cuda
 } // namespace Blas

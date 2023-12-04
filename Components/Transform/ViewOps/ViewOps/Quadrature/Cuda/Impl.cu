@@ -15,7 +15,8 @@
 
 // #define QUICC_USE_NAIVE_CUDA_BATCHED_MATMUL
 // #define QUICC_USE_BLOCKED_CUDA_BATCHED_MATMUL
-#define QUICC_USE_VAD_CUDA_BATCHED_MATMUL
+#define QUICC_USE_VAD_CUDA_BATCHED_MATMUL_REGA
+// #define QUICC_USE_VAD_CUDA_BATCHED_MATMUL_REGB
 
 namespace QuICC {
 namespace Transform {
@@ -67,9 +68,13 @@ namespace details
         #ifdef QUICC_USE_BLOCKED_CUDA_BATCHED_MATMUL
         QuICC::Blas::Cuda::Blocked::matmul<double, alpha_t, 16>(c, a, b, M, K, N, alpha);
         #endif
-        #ifdef QUICC_USE_VAD_CUDA_BATCHED_MATMUL
-        QuICC::Blas::Cuda::Vad::matmul<double, alpha_t, 64, 16>(c, a, b, M, K, N, alpha);
+        #ifdef QUICC_USE_VAD_CUDA_BATCHED_MATMUL_REGA
+        QuICC::Blas::Cuda::VadRegA::matmul<double, alpha_t, 64, 16>(c, a, b, M, K, N, alpha);
         #endif
+        #ifdef QUICC_USE_VAD_CUDA_BATCHED_MATMUL_REGB
+        QuICC::Blas::Cuda::VadRegB::matmul<double, alpha_t, 64, 8>(c, a, b, M, K, N, alpha);
+        #endif
+
     }
 } // namespace details
 
@@ -224,14 +229,24 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
     numBlocks.y = (N + blockSize.y - 1) / blockSize.y;
     numBlocks.z = activeLayers;
     #endif
-    #ifdef QUICC_USE_VAD_CUDA_BATCHED_MATMUL
+    #ifdef QUICC_USE_VAD_CUDA_BATCHED_MATMUL_REGA
     constexpr unsigned int numThreads = 64;
     constexpr unsigned int tileSizeN = 16; // coarsening factor
     blockSize.x = numThreads;
     blockSize.y = 1;
     blockSize.z = 1;
-    numBlocks.x = (M + blockSize.x - 1) / blockSize.x;
+    numBlocks.x = (M + numThreads - 1) / numThreads;
     numBlocks.y = (N + tileSizeN - 1) / tileSizeN;
+    numBlocks.z = activeLayers;
+    #endif
+    #ifdef QUICC_USE_VAD_CUDA_BATCHED_MATMUL_REGB
+    constexpr unsigned int numThreads = 64;
+    constexpr unsigned int tileSizeM = 8; // coarsening factor
+    blockSize.x = numThreads;
+    blockSize.y = 1;
+    blockSize.z = 1;
+    numBlocks.y = (M + tileSizeM - 1) / tileSizeM;
+    numBlocks.x = (N + numThreads - 1) / numThreads;
     numBlocks.z = activeLayers;
     #endif
 

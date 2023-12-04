@@ -198,3 +198,25 @@ add_test(
     WORKING_DIRECTORY
     "${QUICC_WORK_DIR}"
 )
+
+#
+# View Blas Tests
+#
+if(TARGET QuICC::Cuda)
+    add_executable(ViewBlasTest
+        ViewBlasTests.cu
+    )
+
+    target_link_libraries(ViewBlasTest
+        ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Blas
+        Catch2::Catch2
+        QuICC::Memory
+    )
+
+    add_test(
+        NAME ViewBlasTest
+        COMMAND ViewBlasTest
+        WORKING_DIRECTORY
+        "${QUICC_WORK_DIR}"
+    )
+endif()
