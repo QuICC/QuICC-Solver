@@ -19,6 +19,7 @@
 #include "QuICC/Transform/Poly/Worland/Tags.hpp"
 #include "View/View.hpp"
 #include "Operator/Unary.hpp"
+#include "Operator/Nary.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -122,7 +123,7 @@ private:
     mutable std::unique_ptr<QuICC::Operator::UnaryOp<mods_t, phys_t>> mInt;
 
     /// @brief Pointwise backend class pointer
-    mutable std::unique_ptr<QuICC::Operator::UnaryOp<@RedType@Abs_t, @RedType@_t>> mPnt;
+    mutable std::unique_ptr<QuICC::Operator::NaryOp<@RedType@Abs_t, @RedType@_t>> mPnt;
 
     /// @brief Reduction backend class pointer
     mutable std::unique_ptr<QuICC::Operator::UnaryOp<modsRed_t, modsAbs_t>> mRed;

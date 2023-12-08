@@ -21,6 +21,17 @@ namespace QuICC {
 /// @brief namespace for Pointwise type operations
 namespace Pointwise {
 
+/// @brief scalar add operation
+/// @tparam T scalar
+template <class T = double> struct AddFunctor
+{
+   QUICC_CUDA_HOSTDEV T operator()(T a, T b)
+   {
+      return a + b;
+   }
+};
+
+
 /// @brief scalar square operation
 /// @tparam T scalar
 template <class T = double> struct SquareFunctor

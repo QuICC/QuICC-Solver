@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "Operator/Unary.hpp"
+#include "Operator/Nary.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -25,21 +25,21 @@ namespace Cuda {
 using namespace QuICC::Operator;
 
 /// @brief Pointwise operator
-/// @tparam Tout View
-/// @tparam Tin View
-/// @tparam Functor unary scalar functor
-template <class Tout, class Tin, class Functor>
-class Op : public UnaryBaseOp<Op<Tout, Tin, Functor>, Tout, Tin>
+/// @tparam Functor Nary scalar functor
+/// @tparam Tout output View
+/// @tparam ...Targs input Views
+template <class Functor, class Tout, class... Targs>
+class Op : public NaryBaseOp<Op<Functor, Tout, Targs...>, Tout, Targs...>
 {
 private:
    /// @brief stored functor, i.e. struct with method
-   /// Tout::ScalarType operator()(Tin::ScalarType var)
+   /// Tout::ScalarType operator()(Targs::ScalarType var, ...)
    Functor _f;
 
 public:
    /// @brief capture functor by value
    /// @param f functor, i.e. struct with method
-   /// Tout::ScalarType operator()(Tin::ScalarType var)
+   /// Tout::ScalarType operator()(Targs::ScalarType var, ...)
    Op(Functor f) : _f(f){};
    /// @brief default constructor
    Op() = delete;
@@ -47,16 +47,12 @@ public:
    ~Op() = default;
 
 private:
-   /// @brief action implementation that does not overwrite the input
-   /// @param out differentiatied physical space coefficient
-   /// @param in input modes
-   void applyImpl(Tout& out, const Tin& in);
-   /// @brief action implementation that might modify the input
-   /// @param out differentiatied physical space coefficient
-   /// @param in input modes
-   // void applyImpl(Tout& out, Tin& in);
+   /// @brief action implementation
+   /// @param out output View
+   /// @param ...args input Views
+   void applyImpl(Tout& out, const Targs&... args);
    /// @brief give access to base class
-   friend UnaryBaseOp<Op<Tout, Tin, Functor>, Tout, Tin>;
+   friend NaryBaseOp<Op<Functor, Tout, Targs...>, Tout, Targs...>;
 };
 
 } // namespace Cuda

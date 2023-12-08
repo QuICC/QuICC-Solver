@@ -93,7 +93,7 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
     @SetIntOp@
 
     // setup pointwise operator
-    mPnt = std::make_unique<QuICC::Pointwise::@BackendNamespace@::Op<@RedType@Abs_t, @RedType@_t, QuICC::Pointwise::Abs2Functor<double>>>(QuICC::Pointwise::Abs2Functor<double>());
+    mPnt = std::make_unique<QuICC::Pointwise::@BackendNamespace@::Op<QuICC::Pointwise::Abs2Functor<double>, @RedType@Abs_t, @RedType@_t>>(QuICC::Pointwise::Abs2Functor<double>());
 
     ///\todo move view setups to init
 

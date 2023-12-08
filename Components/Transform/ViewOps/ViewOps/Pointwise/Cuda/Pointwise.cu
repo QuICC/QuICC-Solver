@@ -11,34 +11,34 @@ namespace Cuda {
 
 namespace details {
 // naive implementation
-template <class Tout, class Tin, class Functor>
-__global__ void pointwiseKernel(Tout out, const Tin in, Functor f)
+template <class Functor, class Tout, class ...Targs>
+__global__ void pointwiseKernel(Functor f, Tout out, Targs... args)
 {
    const auto M = out.size();
    const std::size_t m = blockIdx.x * blockDim.x + threadIdx.x;
    if (m < M)
    {
-      out[m] = f(in[m]);
+      out[m] = f(args[m]...);
    }
 }
 
 } // namespace details
 
 
-template <class Tout, class Tin, class Functor>
-void Op<Tout, Tin, Functor>::applyImpl(Tout& out, const Tin& in)
+template <class Functor, class Tout, class ...Targs>
+void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
 {
    Profiler::RegionFixture<4> fix("Pointwise::Cuda::applyImpl");
 
    assert(QuICC::Cuda::isDeviceMemory(out.data()));
-   assert(QuICC::Cuda::isDeviceMemory(in.data()));
+   assert(((QuICC::Cuda::isDeviceMemory(args.data())) && ...));
 
-   // check Tout and Tin match Functor op
-   using res_t = std::invoke_result_t<Functor, typename Tin::ScalarType>;
+   // check Tout and Targs.. match Functor op
+   using res_t = std::invoke_result_t<Functor, typename Targs::ScalarType...>;
    static_assert(std::is_same_v<typename Tout::ScalarType, res_t>,
       "Mismatch in functor or arguments");
    // check same size
-   assert(out.size() == in.size());
+   assert(((out.size() == args.size()) && ... ));
 
    const auto M = out.size();
    dim3 blockSize;
@@ -46,20 +46,19 @@ void Op<Tout, Tin, Functor>::applyImpl(Tout& out, const Tin& in)
    blockSize.x = 64;
    numBlocks.x = (M + blockSize.x - 1) / blockSize.x;
 
-   details::pointwiseKernel<Tout, Tin, Functor>
-      <<<numBlocks, blockSize>>>(out, in, _f);
+   details::pointwiseKernel<Functor, Tout, Targs...>
+      <<<numBlocks, blockSize>>>(_f, out, args...);
 }
 
 using namespace QuICC::Memory;
 
 // Explicit instantiations
 // tests
-template class Op<ViewBase<double>, ViewBase<double>, SquareFunctor<double>>;
-template class Op<ViewBase<double>, ViewBase<std::complex<double>>,
-   Abs2Functor<double>>;
+template class Op<SquareFunctor<double>, ViewBase<double>, ViewBase<double>>;
+template class Op<Abs2Functor<double>, ViewBase<double>, ViewBase<std::complex<double>>>;
 // JW
-template class Op<View<double, DCCSC3DJIK>,
-   View<std::complex<double>, DCCSC3DJIK>, Abs2Functor<double>>;
+template class Op<Abs2Functor<double>, View<double, DCCSC3DJIK>,
+   View<std::complex<double>, DCCSC3DJIK>>;
 
 } // namespace Cuda
 } // namespace Pointwise
