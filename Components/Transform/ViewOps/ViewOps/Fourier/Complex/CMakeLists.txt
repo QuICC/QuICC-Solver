@@ -1,16 +1,16 @@
-target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} PRIVATE
-  Projector/D.cpp
-  Integrator/D.cpp
-  Cpu/Diff.cpp
-  Cpu/Diff2D.cpp
-  Cpu/Mean.cpp
+target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+  PRIVATE
+    Cpu/Diff.cpp
+    Cpu/Diff2D.cpp
+    Cpu/Mean.cpp
 )
 
 if((TARGET QuICC::Fft::CuFft AND QUICC_USE_CUFFT) OR (TARGET QuICC::Fft::VkFft AND QUICC_USE_VKFFT))
-  target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} PRIVATE
-    Cuda/Diff.cu
-    Cuda/Diff2D.cu
-    Cuda/Mean.cu
+  target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+    PRIVATE
+      Cuda/Diff.cu
+      Cuda/Diff2D.cu
+      Cuda/Mean.cu
 
   )
 endif()

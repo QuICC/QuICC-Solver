@@ -16,6 +16,12 @@ if(QUICC_USE_VKFFT)
     list(APPEND Tags "viewGpuVkFFT_t")
 endif()
 
+# Memres
+set(viewCpu_tMemRes "Cpu::NewDelete")
+set(viewGpu_tMemRes "Cuda::Malloc")
+set(viewGpuVkFFT_tMemRes "Cuda::Malloc")
+set(ProjectorMem "mem")
+
 # Old interface output type
 set(ProjectorMixedOutMatrixType "Matrix")
 set(ProjectorMixedInMatrixType "MatrixZ")
@@ -83,7 +89,7 @@ Cpu::DiffOp<mods_t, mods_t, 0, bwd_t>>")
 if(QUICC_USE_VKFFT)
 set(ProjectorPviewGpuVkFFT_tPtrParam "DOp<phys_t, mods_t,
         QuICC::Fft::VkFft::FftOp<phys_t, mods_t>,
-            Cuda::DiffOp<mods_t, mods_t, 0, bwd_t>>")        
+            Cuda::DiffOp<mods_t, mods_t, 0, bwd_t>>")
 endif()
 if(QUICC_USE_CUFFT)
 set(ProjectorPviewGpu_tPtrParam "DOp<phys_t, mods_t,
@@ -554,6 +560,7 @@ foreach(Space IN LISTS Spaces)
     set(ViewAttribute "${${Space}ViewAttribute}")
     foreach(Kind IN LISTS Kinds)
         set(Ops "${${Kind}${Space}Ops}")
+        set(Mem "${${Kind}Mem}")
         set(OutMatrixType "${${Kind}${Space}OutMatrixType}")
         set(InMatrixType "${${Kind}${Space}InMatrixType}")
 
@@ -584,6 +591,7 @@ foreach(Space IN LISTS Spaces)
         set(viewGpuVkFFT_tMemBlock "${viewGpu_tMemBlock}")
 
         set(viewGpu_tCuHeader "#include <cuda_runtime_api.h>
+    #include \"Memory/Cuda/Malloc.hpp\"
     #include \"Cuda/CudaUtil.hpp\""
         )
         set(viewGpuVkFFT_tCuHeader "${viewGpu_tCuHeader}")
@@ -606,6 +614,7 @@ foreach(Space IN LISTS Spaces)
                 set(CopyPad "${${Tag}${Kind}${Space}CopyPad}")
                 set(CuhHeader "${${Tag}CuhHeader}")
                 set(MemBlock "${${Tag}MemBlock}")
+                set(MemRes "${${Tag}MemRes}")
                 set(IndicesPointers "${${Space}IndicesPointers}")
                 configure_file(
                     "OpV.hpp.in"

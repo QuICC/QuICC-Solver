@@ -13,15 +13,15 @@ namespace Operator {
  *  Its purpose is to allow the usage of a common pointer to akin operators
  *  (i.e. operator with same input/output types) and to keep a consistent API.
  *  @tparam Tout output type, in pratice always a View
- *  @tparam Tin input type, in pratice always a View
- *  @tparam Top operator type, in pratice always a View
+ *  @tparam ...Targs input type, in pratice always Views
  */
 template <class Tout, class... Targs> class NaryOp
 {
 public:
    /// @brief apply action of the Nary operator
-   /// @param out result of the operation
-   virtual void apply(Tout&, const Targs&...) = 0;
+   /// @param out result of the operator
+   /// @param ...args inputs of the operator
+   virtual void apply(Tout& out, const Targs&... args) = 0;
 
    /// @brief dtor
    virtual ~NaryOp() = default;
