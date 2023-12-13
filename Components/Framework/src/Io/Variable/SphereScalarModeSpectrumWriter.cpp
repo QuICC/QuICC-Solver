@@ -1,7 +1,7 @@
 /**
- * @file SphereTorPolModeSpectrumWriter.cpp
- * @brief Source of the implementation of the ASCII spherical harmonics energy
- * calculation for toroidal/poloidal field in a sphere
+ * @file SphereScalarModeSpectrumWriter.cpp
+ * @brief Source of the implementation of the ASCII spherical harmonics mode
+ * energy spectrum calculation for scalar field in a sphere
  */
 
 // System includes
@@ -12,7 +12,7 @@
 //
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Io/Variable/SphereTorPolModeSpectrumWriter.hpp"
+#include "QuICC/Io/Variable/SphereScalarModeSpectrumWriter.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 
@@ -22,20 +22,20 @@ namespace Io {
 
 namespace Variable {
 
-SphereTorPolModeSpectrumWriter::SphereTorPolModeSpectrumWriter(
+SphereScalarModeSpectrumWriter::SphereScalarModeSpectrumWriter(
    const std::string& prefix, const std::string& type) :
-    ISphericalTorPolModeSpectrumWriter(prefix, type)
+    ISphericalScalarModeSpectrumWriter(prefix, type)
 {}
 
-void SphereTorPolModeSpectrumWriter::init()
+void SphereScalarModeSpectrumWriter::init()
 {
-   // Sphere volume: 4/3*pi*r_o^3
+   // Sphere volume (r_o = 1): 4/3*pi*r_o^3
    this->mVolume = (4.0 / 3.0) * Math::PI;
 
    this->mHasMOrdering = this->res().sim().ss().has(
       SpatialScheme::Feature::TransformSpectralOrdering123);
 
-   ISphericalTorPolModeSpectrumWriter::init();
+   ISphericalScalarModeSpectrumWriter::init();
 }
 
 } // namespace Variable

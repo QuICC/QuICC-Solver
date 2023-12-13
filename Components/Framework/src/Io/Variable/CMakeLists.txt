@@ -10,6 +10,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ISphericalScalarEnergyWriter.cpp
   ISphericalScalarLSpectrumWriter.cpp
   ISphericalScalarMSpectrumWriter.cpp
+  ISphericalScalarModeSpectrumWriter.cpp
   ISphericalScalarNSpectrumWriter.cpp
   ISphericalScalarRSpectrumWriter.cpp
   ISphericalScalarPowerBaseWriter.cpp
@@ -43,6 +44,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   SphereScalarEnergyWriter.cpp
   SphereScalarLSpectrumWriter.cpp
   SphereScalarMSpectrumWriter.cpp
+  SphereScalarModeSpectrumWriter.cpp
   SphereScalarNSpectrumWriter.cpp
   SphereScalarRSpectrumWriter.cpp
   SphereTorPolEnergyWriter.cpp
