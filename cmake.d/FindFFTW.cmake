@@ -54,7 +54,7 @@
 #   FFTW::mpi
 #
 
-message(VERBOSE "Looking for FTTW")
+message(VERBOSE "Looking for FFTW")
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
 # We haven't found FFTW yet. Clear its state in case it is set in the parent

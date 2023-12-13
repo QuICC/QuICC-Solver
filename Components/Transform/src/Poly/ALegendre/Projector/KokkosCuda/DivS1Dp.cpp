@@ -12,7 +12,6 @@
 #include "Types/Math.hpp"
 #include "QuICC/Polynomial/ALegendre/sin_1Plm.hpp"
 
-#include "QuICC/Transform/Poly/KokkosUtils.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 
 namespace QuICC {

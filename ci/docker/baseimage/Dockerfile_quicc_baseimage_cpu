@@ -1,18 +1,20 @@
 # Depend on CSCS official spack base container helpers
-FROM docker.io/finkandreas/spack:0.18.1-ubuntu22.04 as builder
+FROM docker.io/finkandreas/spack:0.20.2-ubuntu22.04 as builder
 
 ARG NUM_PROCS=16
 ARG TARGET=broadwell
 
-RUN spack-install-helper daint-mc \
+# Performance tests require at least reframe@4.3.0
+RUN spack-install-helper \
+    daint-mc \
     fftw \
     hdf5 \
     cmake \
     openblas \
     "boost@1.78.0" \
     py-scipy \
-    reframe \
-    kokkos-kernels
+    kokkos-kernels \
+    "reframe@develop"
 
 
 # Bare OS image to run the installed executables

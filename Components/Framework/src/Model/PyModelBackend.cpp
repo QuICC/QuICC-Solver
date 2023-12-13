@@ -3,26 +3,14 @@
  * @brief Source of the interface for Python model backend
  */
 
-// First includes
-//
-#include "QuICC/PyQuICC/SystemHeader.hpp"
-
-// Configuration includes
-//
-
 // System includes
 //
+#include "QuICC/PyQuICC/SystemHeader.hpp"
 #include <stdexcept>
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Model/PyModelBackend.hpp"
 
 // Project includes
 //
+#include "QuICC/Model/PyModelBackend.hpp"
 #include "QuICC/ModelOperator/Stencil.hpp"
 #include "QuICC/ModelOperatorBoundary/FieldToRhs.hpp"
 #include "QuICC/ModelOperatorBoundary/Stencil.hpp"

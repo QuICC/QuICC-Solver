@@ -18,7 +18,8 @@
 //
 #include "QuICC/Enums/SplittingTools.hpp"
 #include "QuICC/Timestep/Id/Coordinator.hpp"
-#include "QuICC/Timestep/Id/registerAll.hpp"
+#include "QuICC/Timestep/Id/registerAllPc.hpp"
+#include "QuICC/Timestep/Id/registerAllRkcb.hpp"
 #include "QuICC/Transform/Setup/registerAll.hpp"
 #include "QuICC/Bc/Scheme/Coordinator.hpp"
 #include "QuICC/Bc/Scheme/registerAll.hpp"
@@ -332,7 +333,8 @@ namespace QuICC {
       std::transform(s.cbegin(), s.cend(), tag.begin(), [](unsigned char c) { return std::tolower(c); });
 
       // Register all timestepper IDs
-      Timestep::Id::registerAll();
+      Timestep::Id::registerAllPc();
+      Timestep::Id::registerAllRkcb();
 
       std::size_t id = 0;
       for(auto&& e: Timestep::Id::Coordinator::map())

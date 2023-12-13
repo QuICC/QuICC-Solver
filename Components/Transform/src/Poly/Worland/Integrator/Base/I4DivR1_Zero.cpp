@@ -56,37 +56,14 @@ namespace Integrator {
          this->checkGridSize(nN, l, igrid.size());
 
          Internal::Matrix tOp(igrid.size(), nN);
+
 #if defined QUICC_AVOID_EXPLICIT_RADIAL_FACTOR
-         // **************************************************
-         // Formulation without explicit grid:
-         // Operates on polynomials with l = l-1
-         int l_in = std::abs(l-1);
-         int n_in = nN + 1;
-         this->checkGridSize(n_in, l_in, igrid.size());
-
-         Internal::Matrix opA(igrid.size(), n_in);
-         wnl.compute<Internal::MHDFloat>(opA, n_in, l_in, igrid, iweights, ev::Set());
-
-         Internal::Matrix opB(igrid.size(), n_in);
-         Polynomial::Worland::r_1Wnl r_1Wnl;
-         r_1Wnl.compute<Internal::MHDFloat>(opB, n_in, l_in, igrid, Internal::Array(), ev::Set());
-
-         Internal::Matrix opC(igrid.size(), nN);
-         Polynomial::Worland::Wnl wnlB;
-         wnlB.compute<Internal::MHDFloat>(opC, nN, l, igrid, iweights, ev::Set());
-
-         tOp = (opC.transpose()*opB*opA.transpose()).transpose();
+         using poly_t = QuICC::Polynomial::Worland::implicit_t;
 #else
-
-         // **************************************************
-         // Alternative formulation of operators:
-         // This version uses explicit radial factors to work on l polynomials
-
-         Internal::Matrix opA(igrid.size(), nN);
-         wnl.compute<Internal::MHDFloat>(opA, nN, l, igrid, iweights, ev::Set());
-
-         tOp = (opA.transpose()*igrid.array().pow(-1).matrix().asDiagonal()).transpose();
+         using poly_t = QuICC::Polynomial::Worland::explicit_t;
 #endif
+         Polynomial::Worland::r_1Wnl<poly_t> r_1Wnl;
+         r_1Wnl.compute<Internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
          // Multiply by Quasi-inverse
          auto a = wnl.alpha(l);

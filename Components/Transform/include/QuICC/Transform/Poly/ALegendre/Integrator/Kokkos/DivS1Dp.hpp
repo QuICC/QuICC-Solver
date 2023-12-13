@@ -41,7 +41,7 @@ namespace Integrator {
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const;
+         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const;
    };
 
 }

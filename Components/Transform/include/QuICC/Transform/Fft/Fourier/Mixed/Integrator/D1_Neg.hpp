@@ -16,5 +16,8 @@
 #ifdef QUICC_USE_CUFFT
 #include "QuICC/Transform/Wrappers/Fourier/Mixed/Integrator/D1_NegviewGpu_t.hpp.inc"
 #endif
+#ifdef QUICC_USE_VKFFT
+#include "QuICC/Transform/Wrappers/Fourier/Mixed/Integrator/D1_NegviewGpuVkFFT_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_FFT_FOURIER_MIXED_INTEGRATOR_D1_NEG_HPP

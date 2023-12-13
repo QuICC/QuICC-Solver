@@ -22,8 +22,8 @@ namespace Polynomial {
 
 namespace Worland {
 
-   Wnl::Wnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta)
-      : WorlandBase(alpha, dBeta)
+   Wnl::Wnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta, const int lShift)
+      : WorlandBase(alpha, dBeta), mLShift(lShift)
    {
    }
 

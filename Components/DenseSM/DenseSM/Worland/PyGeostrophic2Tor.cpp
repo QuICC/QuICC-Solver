@@ -23,7 +23,7 @@ namespace DenseSM {
 namespace Worland {
 
    PyGeostrophic2Tor::PyGeostrophic2Tor(const int nN, const int maxnl, const int nR, const int maxNug, const ArrayI& nli, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugDBeta, const Scalar_t alpha, const Scalar_t dBeta, const int q)
-      : IWorlandOperator(maxnl*nN, maxNug+1, alpha, dBeta), mNn(nN), mMaxnl(maxnl), mNr(nR), mMaxNug(maxNug), mNlist(nli), mNidx(nIdx)
+      : IEmbeddedOperator(maxnl*nN, maxNug+1, alpha, dBeta), mNn(nN), mMaxnl(maxnl), mNr(nR), mMaxNug(maxNug), mNlist(nli), mNidx(nIdx)
    {
       PyQuICC::CoreWrapper::init();
       PyQuICC::CoreWrapper::import("quicc_solver.model.boussinesq.sphere.modifiedtaylor.linear.helper");

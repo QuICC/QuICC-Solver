@@ -29,7 +29,7 @@ namespace ALegendre {
 
 namespace Integrator {
 
-   void D1<base_t>::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
+   void D1<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int m = this->mspSetup->slow(i);
       int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;

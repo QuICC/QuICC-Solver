@@ -35,6 +35,8 @@ namespace Memory {
    public:
       /// @brief typedef for pointed data type
       using ScalarType = Scalar;
+      /// @brief typedef for aggregated attributes
+      using AttributesType = Attributes<Args...>;
       /// @brief typedef for indeces and pointers data type
       using IndexType = typename Attributes<Args...>::index;
       /// @brief typedef for aggregated compression level types, i.e. a std::varint of dense_t, compressed_t, etc
@@ -393,7 +395,7 @@ namespace Memory {
       assert(j < _dimensions[1]);
       assert(k < _dimensions[2]);
 
-      if constexpr (std::is_same_v<LevelType, DimLevelType<dense_t,dense_t,compressed_t>>)
+      if constexpr (std::is_same_v<LevelType, DimLevelType<dense_t, dense_t, compressed_t>>)
       {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
@@ -402,9 +404,24 @@ namespace Memory {
             {
                if (_indices[2][idx] == k)
                {
-                  auto kmn = idx*_dimensions[0]*_dimensions[1];
-                  assert(i+j*_dimensions[0]+kmn < this->_size);
-                  return this->_data[i+j*_dimensions[0]+kmn];
+                  const auto kmn = idx*_dimensions[0]*_dimensions[1];
+                  const auto index = i+j*_dimensions[0]+kmn;
+                  assert(index < this->_size);
+                  return this->_data[index];
+               }
+            }
+         }
+         else if constexpr (std::is_same_v<OrderType, LoopOrderType<j_t, i_t, k_t>>)
+         {
+            // row major slice
+            for (IndexType idx = _pointers[2][0]; idx < _pointers[2][1]; ++idx)
+            {
+               if (_indices[2][idx] == k)
+               {
+                  const auto kmn = idx*_dimensions[0]*_dimensions[1];
+                  const auto index = i*_dimensions[1]+j+kmn;
+                  assert(index < this->_size);
+                  return this->_data[index];
                }
             }
          }
@@ -473,7 +490,7 @@ namespace Memory {
          }
          throw std::logic_error("Trying to refer to an implicit zero.");
       }
-      else if constexpr (std::is_same_v<LevelType, DimLevelType<triK_t, dense_t, dense_t>>)
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<step1K_t, dense_t, dense_t>>)
       {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
@@ -499,7 +516,7 @@ namespace Memory {
          }
          throw std::logic_error("Trying to refer to an implicit zero.");
       }
-      else if constexpr (std::is_same_v<LevelType, DimLevelType<triK_t, dense_t, compressed_t>>)
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<step1K_t, dense_t, compressed_t>>)
       {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
@@ -546,7 +563,7 @@ namespace Memory {
          }
          throw std::logic_error("Trying to refer to an implicit zero.");
       }
-      else if constexpr (std::is_same_v<LevelType, DimLevelType<dense_t, triK_t, compressed_t>>)
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<dense_t, step1K_t, compressed_t>>)
       {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
@@ -593,7 +610,7 @@ namespace Memory {
          }
          throw std::logic_error("Trying to refer to an implicit zero.");
       }
-      else if constexpr (std::is_same_v<LevelType, DimLevelType<triK_t, compressed_t, sparse_t>>)
+      else if constexpr (std::is_same_v<LevelType, DimLevelType<step1K_t, compressed_t, sparse_t>>)
       {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {

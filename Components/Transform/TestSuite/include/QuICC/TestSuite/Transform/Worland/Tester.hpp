@@ -359,9 +359,13 @@ namespace Worland {
          Internal::Array igrid;
          this->initOperator(op, igrid, spSetup);
 
-         Matrix outData = Matrix::Zero(op.outRows(), op.outCols());
+         Matrix outData;
 
-         op.transform(outData, inData);
+         for (unsigned int i = 0; i < this->mIter; ++i)
+         {
+            outData = Matrix::Zero(op.outRows(), op.outCols());
+            op.transform(outData, inData);
+         }
 
          return outData;
       }

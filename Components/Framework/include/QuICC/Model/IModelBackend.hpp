@@ -6,9 +6,6 @@
 #ifndef QUICC_MODEL_IMODELBACKEND_HPP
 #define QUICC_MODEL_IMODELBACKEND_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <string>
@@ -16,9 +13,6 @@
 #include <set>
 #include <map>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -174,7 +168,7 @@ namespace Model {
          bool mUseLinearized;
    };
 
-}
-}
+} // namespace Model
+} // namespace QuICC
 
 #endif // QUICC_MODEL_IMODELBACKEND_HPP

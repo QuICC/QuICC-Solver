@@ -39,6 +39,8 @@ namespace Memory {
    public:
       /// @brief typedef for pointed data type
       using ScalarType = Scalar;
+      /// @brief typedef for aggregated attributes
+      using AttributesType = Attributes<Args...>;
       /// @brief typedef for indeces and pointers data type
       using IndexType = typename Attributes<Args...>::index;
       /// @brief typedef for aggregated compression level types, i.e. a std::variant of dense_t, compressed_t, etc

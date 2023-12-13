@@ -43,16 +43,16 @@ namespace Pseudospectral {
       public:
          /// Typedef for a IScalarEquation
          typedef Equations::IScalarEquation IScalarEquation;
-         
+
          /// Typedef for a IVectorEquation
          typedef Equations::IVectorEquation IVectorEquation;
 
          /// Typedef for a IScalarEquation
          typedef std::shared_ptr<IScalarEquation> SharedIScalarEquation;
-         
+
          /// Typedef for a IVectorEquation
          typedef std::shared_ptr<IVectorEquation> SharedIVectorEquation;
-         
+
          /// Typedef for a shared scalar equation iterator
          typedef std::vector<SharedIScalarEquation>::iterator   ScalarEquation_iterator;
 
@@ -141,6 +141,18 @@ namespace Pseudospectral {
           * @brief Evolve pseudospectral equations
           */
          virtual void evolve();
+
+         /**
+          * @brief Evolve pseudospectral equations
+          *
+          * @param it Current iteration
+          */
+         virtual void evolveUntilPrognostic(const bool finishedStep);
+
+         /**
+          * @brief Evolve pseudospectral equations
+          */
+         virtual void evolveAfterPrognostic(const bool finishedStep);
 
          /**
           * @brief Add scalar equation to solver
@@ -335,11 +347,18 @@ namespace Pseudospectral {
          void preSolveEquations();
 
          /**
-          * @brief Solve all equations
+          * @brief Solve equations before prognostic equations
           *
           * @param it   Iteration index
           */
-         void solveEquations(const int it);
+         void solveEquationsBefore(const int it);
+
+         /**
+          * @brief Solve equations after prognostic equations
+          *
+          * @param it   Iteration index
+          */
+         void solveEquationsAfter(const int it);
 
          /**
           * @brief Update equations
@@ -444,6 +463,20 @@ namespace Pseudospectral {
           * @brief Initialise the imposed components of the simulation
           */
          void initImposed();
+
+         /**
+          * @brief Evolve pseudospectral equations
+          *
+          * @param it Current iteration
+          */
+         void evolveBefore(const int it);
+
+         /**
+          * @brief Evolve pseudospectral equations
+          *
+          * @param it Current iteration
+          */
+         void evolveEndIteration(const int it);
 
          /**
           * @brief Iteration indexes
@@ -572,6 +605,11 @@ namespace Pseudospectral {
          bool atLeastOne(ScalarEquation_range s, VectorEquation_range v) const;
 
          /**
+          * @brief Iteration has prognostic equation
+          */
+         bool hasPrognostic(const int it) const;
+
+         /**
           * @brief Add equation range to equation map
           */
          void addToMap(const std::size_t eqId, const int it, const ScalarEquation_range& r);
@@ -621,7 +659,7 @@ namespace Pseudospectral {
    {
       return this->mImposedVectorVariables;
    }
-   
+
    inline Transform::TransformCoordinatorType& Coordinator::transformCoordinator()
    {
       return this->mTransformCoordinator;

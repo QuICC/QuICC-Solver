@@ -20,5 +20,4 @@
 #include "QuICC/Transform/Wrappers/ALegendre/Projector/PviewGpu_t.hpp.inc"
 #endif
 
-
 #endif // QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_P_HPP

@@ -11,7 +11,6 @@
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/DivLlDivS1.hpp"
 #include "QuICC/Polynomial/ALegendre/sin_1Plm.hpp"
 
-#include "QuICC/Transform/Poly/KokkosUtils.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 
 namespace QuICC {
@@ -24,8 +23,8 @@ namespace ALegendre {
 
 namespace Integrator {
 
-   void DivLlDivS1<kokkos_t>::makeOperator(OpMatrix &op,
-      const OpArray &igrid, const OpArray &iweights, const int i) const {
+   void DivLlDivS1<kokkos_t>::makeOperator(Matrix &op,
+      const Internal::Array &igrid, const Internal::Array &iweights, const int i) const {
        DivS1<kokkos_t>::makeOperator(op, igrid, iweights, i);
        op = op * this->mDivLl.bottomRows(op.cols()).asDiagonal();
    }

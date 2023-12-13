@@ -13,7 +13,6 @@
 #include "QuICC/Polynomial/ALegendre/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/ALegendre/Evaluator/InnerProduct.hpp"
 
-#include "QuICC/Transform/Poly/KokkosUtils.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 
 namespace QuICC {
@@ -26,8 +25,8 @@ namespace ALegendre {
 
 namespace Integrator {
 
-   void D1<kokkos_t>::makeOperator(OpMatrix &op,
-      const OpArray &igrid, const OpArray &iweights, const int i) const {
+   void D1<kokkos_t>::makeOperator(Matrix &op,
+      const Internal::Array &igrid, const Internal::Array &iweights, const int i) const {
       int m = this->mspSetup->slow(i);
       int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;
 

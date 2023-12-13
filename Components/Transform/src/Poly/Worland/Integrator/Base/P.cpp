@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland P integrator
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

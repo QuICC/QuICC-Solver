@@ -55,7 +55,7 @@ void builder(Tview opView, const Evector<Tdata>& grid,
     }
     else
     {
-        static_assert("builder for this type is not implemented.");
+        throw std::logic_error("builder for this type is not implemented.");
     }
 
     ViewBase<IndexType>& pointers = const_cast<ViewBase<IndexType>*>(opView.pointers())[metaIdx];
@@ -173,7 +173,7 @@ void builder(Tview opView,
     }
     else
     {
-        static_assert("builder for this type is not implemented.");
+        throw std::logic_error("builder for this type is not implemented.");
     }
 
     using ScalarType = typename Tview::ScalarType;

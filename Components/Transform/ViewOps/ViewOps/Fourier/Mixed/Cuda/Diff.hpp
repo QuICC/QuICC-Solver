@@ -30,6 +30,10 @@ using namespace QuICC::Operator;
 template<class Tout, class Tin, std::size_t Order, class Direction,  std::uint16_t Treatment = 0>
 class DiffOp : public BinaryBaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin, typename Tout::ScalarType::value_type> {
 public:
+    /// @brief Type of treatment mask
+    static constexpr std::uint16_t TreatmentValue = Treatment;
+    /// @brief Order of differentiation
+    static constexpr std::size_t OrderValue = Order;
     /// @brief Type of scale parameter, i.e. float 32/64 bits
     using ScaleType = typename Tout::ScalarType::value_type;
     /// @brief Constructor with user defined scaling factor

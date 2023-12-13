@@ -12,10 +12,11 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/ALegendre/Projector/IALegendreProjector.hpp"
-#include "QuICC/Transform/Poly/ALegendre/KokkosIALegendreOperatorTypes.hpp"
+#include "QuICC/Transform/Poly/KokkosIOperatorTypes.hpp"
+#include "QuICC/Transform/Poly/KokkosIOperatorGemmUtils.hpp"
 #ifdef QUICC_USE_KOKKOS_CUDA
-#include "QuICC/Transform/Poly/ALegendre/CudaIALegendreOperatorTypes.hpp"
-#include "QuICC/Transform/Poly/ALegendre/CudaIALegendreOperatorGemmUtils.hpp"
+#include "QuICC/Transform/Poly/CudaIOperatorTypes.hpp"
+#include "QuICC/Transform/Poly/CudaIOperatorGemmUtils.hpp"
 #endif
 namespace QuICC {
 
@@ -33,12 +34,12 @@ namespace Projector {
    class KokkosIALegendreProjector: public IALegendreProjector
    {
       public:
-         using DataType = typename KokkosIALegendreOperatorTypes::DataType;
+         using DataType = typename KokkosIOperatorTypes::DataType;
 
-         using OpVectorI = typename KokkosIALegendreOperatorTypes::OpVectorI;
-         using OpMatrixI = typename KokkosIALegendreOperatorTypes::OpMatrixI;
-         using OpMatrixLZ = typename KokkosIALegendreOperatorTypes::OpMatrixLZ;
-         using OpMatrixL = typename KokkosIALegendreOperatorTypes::OpMatrixL;
+         using OpVectorI = typename KokkosIOperatorTypes::OpVectorI;
+         using OpMatrixI = typename KokkosIOperatorTypes::OpMatrixI;
+         using OpMatrixLZ = typename KokkosIOperatorTypes::OpMatrixLZ;
+         using OpMatrixL = typename KokkosIOperatorTypes::OpMatrixL;
 
          /**
           * @brief Constructor
@@ -74,14 +75,14 @@ namespace Projector {
          /**
           * @brief Storage for the quadrature grid
           */
-         mutable OpArray  mGrid;
+         mutable Internal::Array  mGrid;
 
          /**
           * @brief Storage for the quadrature weights
           */
-         mutable OpArray  mWeights;
+         mutable Internal::Array  mWeights;
 
-         //Apply operator using the entire OpMatrix in parallel instead  of block by block
+         //Apply operator using the entire Matrix in parallel instead  of block by block
 
          virtual void applyUnitOperator(const OpMatrixLZ &rOut,
             const OpMatrixLZ &in, const OpVectorI &scan,
@@ -91,12 +92,12 @@ namespace Projector {
          /**
           * @brief Initialise the operators
           */
-         virtual void initOperators(const OpArray& igrid, const OpArray& iweights) const;
+         virtual void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const;
 
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const = 0;
+         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const = 0;
 
          /**
           * @brief Compute projection
@@ -104,7 +105,7 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         void applyOperators(OpMatrixZ &rOut, const OpMatrixZ &in) const;
+         void applyOperators(MatrixZ &rOut, const MatrixZ &in) const;
 
          /**
           * @brief Apply ith operator

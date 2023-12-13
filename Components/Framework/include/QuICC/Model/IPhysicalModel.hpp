@@ -6,18 +6,12 @@
 #ifndef QUICC_MODEL_IPHYSICALMODEL_HPP
 #define QUICC_MODEL_IPHYSICALMODEL_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <string>
 #include <vector>
 #include <set>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //

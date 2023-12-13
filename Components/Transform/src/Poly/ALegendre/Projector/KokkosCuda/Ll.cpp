@@ -11,7 +11,6 @@
 #include "QuICC/Transform/Poly/ALegendre/Projector/Kokkos/Ll.hpp"
 #include "QuICC/Polynomial/ALegendre/Plm.hpp"
 
-#include "QuICC/Transform/Poly/KokkosUtils.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 
 namespace QuICC {
@@ -24,8 +23,8 @@ namespace ALegendre {
 
 namespace Projector {
 
-   void Ll<kokkos_t>::makeOperator(OpMatrix &op,
-      const OpArray &igrid, const OpArray &iweights, const int i) const {
+   void Ll<kokkos_t>::makeOperator(Matrix &op,
+      const Internal::Array &igrid, const Internal::Array &iweights, const int i) const {
        P<kokkos_t>::makeOperator(op, igrid, iweights, i);
        op = op * this->mLl.bottomRows(op.cols()).asDiagonal();
    }

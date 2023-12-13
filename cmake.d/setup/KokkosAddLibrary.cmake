@@ -46,6 +46,11 @@ function(quicc_add_library_kokkos libname)
   if(Kokkos_ENABLE_CUDA)
     set_source_files_properties(${ARGN} PROPERTIES LANGUAGE CUDA)
   endif()
+
+  if(Kokkos_ENABLE_HIP)
+      set_source_files_properties(${ARGN} PROPERTIES LANGUAGE HIP)
+  endif()
+
   add_library(${libname} STATIC ${ARGN})
   target_link_libraries(${libname} PRIVATE QuICC::Kokkos)
 
@@ -69,6 +74,10 @@ function(quicc_target_sources_kokkos libname)
   message(DEBUG "Kokkos_ENABLE_CUDA: ${Kokkos_ENABLE_CUDA}")
   if(Kokkos_ENABLE_CUDA)
     set_source_files_properties(${ARGN} PROPERTIES LANGUAGE CUDA)
+  endif()
+
+  if(Kokkos_ENABLE_HIP)
+      set_source_files_properties(${ARGN} PROPERTIES LANGUAGE HIP)
   endif()
 
   target_sources(${libname} PRIVATE ${ARGN})
@@ -100,5 +109,8 @@ function(quicc_fix_target_sources_kokkos libname)
     set_source_files_properties(${_src} PROPERTIES LANGUAGE CUDA)
   endif()
 
+  if(Kokkos_ENABLE_HIP)
+      set_source_files_properties(${ARGN} PROPERTIES LANGUAGE HIP)
+  endif()
   list(POP_BACK CMAKE_MESSAGE_INDENT)
 endfunction(quicc_fix_target_sources_kokkos)

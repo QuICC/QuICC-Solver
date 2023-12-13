@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Integrator/Base/P_Zero.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Integrator/Base/P_Zero.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/InnerProduct.hpp"

@@ -28,7 +28,7 @@ namespace ALegendre {
 
 namespace Integrator {
 
-   void IALegendreIntegrator::initOperators(const OpArray& igrid, const OpArray& iweights) const
+   void IALegendreIntegrator::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       // Initit specialized data for operators
       this->initSpecial();
@@ -45,7 +45,7 @@ namespace Integrator {
       }
    }
 
-   void IALegendreIntegrator::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
+   void IALegendreIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
       Profiler::RegionFixture<3> fix("IALegendreIntegrator::applyOperators");
 

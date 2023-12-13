@@ -4,7 +4,7 @@ add_executable(ViewOpsTest "")
 
 set(Tags "Cpu")
 
-if(TARGET CUDA::cufft AND QUICC_USE_CUFFT)
+if((TARGET QuICC::Fft::CuFft AND QUICC_USE_CUFFT) OR (TARGET QuICC::Fft::VkFft AND QUICC_USE_VKFFT))
     list(APPEND Tags "Cuda")
 endif()
 
@@ -156,3 +156,67 @@ add_test(
     WORKING_DIRECTORY
     "${QUICC_WORK_DIR}"
 )
+
+#
+# View Pointwise  Tests
+#
+
+add_executable(ViewPointwiseTest
+    ViewPointwiseTests.cpp
+)
+
+target_link_libraries(ViewPointwiseTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Pointwise
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewPointwiseTest
+    COMMAND ViewPointwiseTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+#
+# View Reduction  Tests
+#
+
+add_executable(ViewReductionTest
+    ViewReductionTests.cpp
+)
+
+target_link_libraries(ViewReductionTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Reduction
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewReductionTest
+    COMMAND ViewReductionTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+#
+# View Blas Tests
+#
+if(TARGET QuICC::Cuda)
+    add_executable(ViewBlasTest
+        ViewBlasTests.cu
+    )
+
+    target_link_libraries(ViewBlasTest
+        ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Blas
+        Catch2::Catch2
+        QuICC::Memory
+    )
+
+    add_test(
+        NAME ViewBlasTest
+        COMMAND ViewBlasTest
+        WORKING_DIRECTORY
+        "${QUICC_WORK_DIR}"
+    )
+endif()

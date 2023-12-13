@@ -56,7 +56,7 @@ namespace Projector {
 
    void IWorlandProjector::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
-      Profiler::RegionFixture<3> fix(this->mProfileTag);
+      Profiler::RegionFixture<3> fix(this->mProfileTag + "::applyOperators");
 
       // assert right sizes for input  matrix
       assert(in.cols() == this->mspSetup->blockSize());
@@ -103,7 +103,7 @@ namespace Projector {
       return mem;
    }
 
-   void IWorlandProjector::defaultApplyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
+   void IWorlandProjector::defaultApplyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const
    {
       rOut = this->mOps.at(i).transpose()*in;
    }

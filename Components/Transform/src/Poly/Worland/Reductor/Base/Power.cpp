@@ -40,7 +40,7 @@ namespace Reductor {
       // Build operator
       op.resize(igrid.size(), nPoly);
       namespace ev = Polynomial::Worland::Evaluator;
-      Polynomial::Worland::r_1Wnl bwnl;
+      Polynomial::Worland::r_1Wnl<QuICC::Polynomial::Worland::recurrence_t> bwnl;
       bwnl.compute<MHDFloat>(op, nPoly, l, igrid, Internal::Array(), ev::Set());
 
       eop.resize(igrid.size(), nPoly);

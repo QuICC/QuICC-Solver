@@ -44,10 +44,6 @@ namespace ALegendre {
          /// Typedef for the configuration class as a shared pointer
          typedef SharedSetup SharedSetupType;
 
-         using OpArray = Internal::Array;
-         using OpMatrix = QuICC::Matrix;
-         using OpMatrixZ = QuICC::MatrixZ;
-
          /**
           * @brief Constructor
           */
@@ -63,7 +59,7 @@ namespace ALegendre {
           *
           * @param spSetup   Shared setup object for the transform
           */
-         virtual void init(SharedTransformSetup spSetup, const OpArray& igrid, const OpArray& iweights) const override;
+         virtual void init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const override;
 
          void init(SharedTransformSetup spSetup) const override;
 
@@ -73,7 +69,7 @@ namespace ALegendre {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(OpMatrixZ& rOut, const OpMatrixZ& in) const override;
+         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
 
          /**
           * @brief Compute polynomial transform
@@ -81,7 +77,7 @@ namespace ALegendre {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(OpMatrix& rOut, const OpMatrixZ& in) const;
+         void transform(Matrix& rOut, const MatrixZ& in) const;
 
          /**
           * @brief Rows of output data
@@ -108,7 +104,7 @@ namespace ALegendre {
          /**
           * @brief Initialise the operators
           */
-         virtual void initOperators(const OpArray& igrid, const OpArray& iweights) const = 0;
+         virtual void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const = 0;
 
          /**
           * @brief Apply operators
@@ -116,7 +112,7 @@ namespace ALegendre {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const;
+         virtual void applyOperators(MatrixZ& rOut, const MatrixZ& in) const;
    };
 
 }

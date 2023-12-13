@@ -29,7 +29,7 @@ namespace DenseSM {
 namespace Worland {
 
    ProjFitEnergyPol::ProjFitEnergyPol(const int outRows, const std::size_t bcId, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
-      : IWorlandOperator(rows, cols, alpha, dBeta), mOutRows(outRows), mL(l), mBcId(bcId)
+      : IEmbeddedOperator(rows, cols, alpha, dBeta), mOutRows(outRows), mL(l), mBcId(bcId)
    {
    }
 

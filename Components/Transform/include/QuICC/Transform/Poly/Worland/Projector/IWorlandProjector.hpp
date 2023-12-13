@@ -39,6 +39,10 @@ namespace Projector {
    class IWorlandProjector: public IWorlandOperator
    {
       public:
+
+         using OpMatrixR = Eigen::Ref<MatrixZ>;;
+         using OpMatrixCR = Eigen::Ref<const MatrixZ>;
+
          /**
           * @brief Constructor
           */
@@ -68,7 +72,7 @@ namespace Projector {
          /**
           * @brief Default implementation to apply ith operator
           */
-         void defaultApplyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
+         void defaultApplyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const;
 
          /**
           * @brief Storage for the operators
@@ -115,7 +119,7 @@ namespace Projector {
          /**
           * @brief Apply ith operator
           */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const = 0;
+         virtual void applyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const = 0;
    };
 
 }

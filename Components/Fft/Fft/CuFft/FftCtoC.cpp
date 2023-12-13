@@ -60,7 +60,7 @@ void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>
 {
     if(_plan == nullptr)
     {
-        Profiler::RegionFixture<4> fix("FftOp::initFft");
+        Profiler::RegionFixture<5> fix("FftOp::initFft");
         int columns = 0;
         if constexpr(std::is_same_v<AttIn, dense2D>)
         {
@@ -80,7 +80,7 @@ void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>
         }
         _plan = details::setPlanCtoC(phys.dims()[0], columns);
     }
-    Profiler::RegionFixture<4> fix("FftOp::applyFft");
+    Profiler::RegionFixture<5> fix("FftOp::applyFft");
     auto err = cufftExecZ2Z(*static_cast<cufftHandle*>(_plan),
         reinterpret_cast<cufftDoubleComplex*>(mods.data()),
         reinterpret_cast<cufftDoubleComplex*>(phys.data()), CUFFT_INVERSE);

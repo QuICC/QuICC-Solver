@@ -108,6 +108,45 @@ namespace Polynomial {
       infile.close();
    }
 
+   void readList(Array& inData, const std::string& path)
+   {
+      std::ifstream infile;
+      infile.open(path, std::ios::in | std::ios::binary);
+      if(! infile.is_open())
+      {
+         std::cerr << "*****************************************************************" << std::endl;
+         std::cerr << "*****************************************************************" << std::endl;
+         std::cerr << "  Couldn't open real input file: " + path << std::endl;
+         std::cerr << "*****************************************************************" << std::endl;
+         std::cerr << "*****************************************************************" << std::endl;
+         inData.setConstant(std::numeric_limits<MHDFloat>::max());
+      } else
+      {
+         // Ignore header
+         int s = infile.peek();
+         while(s == '#')
+         {
+            infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            s = infile.peek();
+         }
+
+         // Get size from first value
+         if(inData.size() == 0)
+         {
+            MHDFloat s;
+            infile >> s;
+            inData.resize(static_cast<int>(s));
+         }
+
+         // Loop over data
+         for(int i = 0; i < inData.size(); ++i)
+         {
+            infile >> inData(i);
+         }
+         infile.close();
+      }
+   }
+
 }
 }
 }

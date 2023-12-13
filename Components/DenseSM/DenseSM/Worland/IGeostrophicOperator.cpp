@@ -21,7 +21,7 @@ namespace DenseSM {
 namespace Worland {
 
    IGeostrophicOperator::IGeostrophicOperator(const Scalar_t ugAlpha, const Scalar_t ugDBeta, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int q)
-      : IWorlandOperator(rows, cols, alpha, dBeta), mcUgAlpha(ugAlpha), mcUgDBeta(ugDBeta)
+      : IEmbeddedOperator(rows, cols, alpha, dBeta), mcUgAlpha(ugAlpha), mcUgDBeta(ugDBeta)
    {
    }
 

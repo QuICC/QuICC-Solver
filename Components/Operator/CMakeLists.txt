@@ -12,6 +12,8 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 
 set(PHS
   "Operator/Unary.hpp"
+  "Operator/Binary.hpp"
+  "Operator/Nary.hpp"
 )
 
 # Add public header

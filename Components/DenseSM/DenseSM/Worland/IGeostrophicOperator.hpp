@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "Types/Internal/Typedefs.hpp"
-#include "DenseSM/IWorlandOperator.hpp"
+#include "DenseSM/Worland/IEmbeddedOperator.hpp"
 
 namespace QuICC {
 
@@ -23,7 +23,7 @@ namespace Worland {
    /**
     * @brief Implementation of the base for geostrophic basis operator
     */
-   class IGeostrophicOperator: public IWorlandOperator
+   class IGeostrophicOperator: public IEmbeddedOperator
    {
       public:
          /**

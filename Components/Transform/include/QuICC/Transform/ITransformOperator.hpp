@@ -34,7 +34,7 @@ namespace Transform {
          /**
           * @brief Destructor
           */
-         virtual ~ITransformOperator();
+         virtual ~ITransformOperator() = default;
 
          /**
           * @brief Initialise the polynomial transform

@@ -6,36 +6,14 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Timestep/Coordinator.hpp"
-
 // Project includes
 //
+#include "QuICC/Timestep/Coordinator.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
-#include "QuICC/Timestep/InterfaceRKCB.hpp"
-#include "QuICC/Timestep/Id/ImexRkCb2.hpp"
-#include "QuICC/Timestep/ImExRKCB2.hpp"
-#include "QuICC/Timestep/Id/ImexRkCb3b.hpp"
-#include "QuICC/Timestep/ImExRKCB3b.hpp"
-#include "QuICC/Timestep/Id/ImexRkCb3c.hpp"
-#include "QuICC/Timestep/ImExRKCB3c.hpp"
-#include "QuICC/Timestep/Id/ImexRkCb3d.hpp"
-#include "QuICC/Timestep/ImExRKCB3d.hpp"
-#include "QuICC/Timestep/Id/ImexRkCb3e.hpp"
-#include "QuICC/Timestep/ImExRKCB3e.hpp"
-#include "QuICC/Timestep/Id/ImexRkCb3f.hpp"
-#include "QuICC/Timestep/ImExRKCB3f.hpp"
-#include "QuICC/Timestep/Id/ImexRkCb4.hpp"
-#include "QuICC/Timestep/ImExRKCB4.hpp"
-#include "QuICC/Timestep/InterfacePC.hpp"
-#include "QuICC/Timestep/Id/ImexPc2.hpp"
-#include "QuICC/Timestep/ImExPC2.hpp"
+#include "Timestep/RungeKuttaCB/Factory.hpp"
+#include "Timestep/PredictorCorrector/Factory.hpp"
 
 namespace QuICC {
 
@@ -51,6 +29,7 @@ namespace Timestep {
    }
 
    MHDFloat Coordinator::timestep() const
+
    {
       return mpImpl->timestep();
    }
@@ -90,41 +69,22 @@ namespace Timestep {
       this->mpImpl->stepForward(scalEq, vectEq, scalVar, vectVar);
    }
 
-   void Coordinator::init(const std::size_t schemeId, const MHDFloat time, const Matrix& cfl, const MHDFloat maxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
+   void Coordinator::init(const std::size_t schemeId, const MHDFloat time, const Matrix& cfl, const MHDFloat maxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, Pseudospectral::Coordinator& pseudo)
    {
-      if(schemeId == Id::ImexRkCb2::id())
+      // Try Runge-Kutta CB schemes
+      if(!this->mpImpl)
       {
-         this->mpImpl = std::make_shared<InterfaceRKCB<ImExRKCB2> >(time, cfl, maxError, scalEq, vectEq);
+         this->mpImpl = RungeKuttaCB::makeInterface(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);
       }
-      else if(schemeId == Id::ImexRkCb3b::id())
+
+      // Try Predictor-Corrector schemes
+      if(!this->mpImpl)
       {
-         this->mpImpl = std::make_shared<InterfaceRKCB<ImExRKCB3b> >(time, cfl, maxError, scalEq, vectEq);
+         this->mpImpl = PredictorCorrector::makeInterface(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);
       }
-      else if(schemeId == Id::ImexRkCb3c::id())
-      {
-         this->mpImpl = std::make_shared<InterfaceRKCB<ImExRKCB3c> >(time, cfl, maxError, scalEq, vectEq);
-      }
-      else if(schemeId == Id::ImexRkCb3d::id())
-      {
-         this->mpImpl = std::make_shared<InterfaceRKCB<ImExRKCB3d> >(time, cfl, maxError, scalEq, vectEq);
-      }
-      else if(schemeId == Id::ImexRkCb3e::id())
-      {
-         this->mpImpl = std::make_shared<InterfaceRKCB<ImExRKCB3e> >(time, cfl, maxError, scalEq, vectEq);
-      }
-      else if(schemeId == Id::ImexRkCb3f::id())
-      {
-         this->mpImpl = std::make_shared<InterfaceRKCB<ImExRKCB3f> >(time, cfl, maxError, scalEq, vectEq);
-      }
-      else if(schemeId == Id::ImexRkCb4::id())
-      {
-         this->mpImpl = std::make_shared<InterfaceRKCB<ImExRKCB4> >(time, cfl, maxError, scalEq, vectEq);
-      }
-      else if(schemeId == Id::ImexPc2::id())
-      {
-         this->mpImpl = std::make_shared<InterfacePC<ImExPC2> >(time, cfl, maxError, scalEq, vectEq);
-      }
-      else
+
+      // No interface was created
+      if(!this->mpImpl)
       {
          throw std::logic_error("Unknown timestepping scheme requested");
       }

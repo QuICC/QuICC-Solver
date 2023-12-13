@@ -4,6 +4,14 @@ import reframe as rfm
 import reframe.utility.sanity as sn
 import reframe.core.runtime as rt
 import contextlib
+import quicc.reframe.utils as quicc_utils
+from collections import defaultdict
+
+def nested_dict(n, type):
+    if n == 1:
+        return defaultdict(type)
+    else:
+        return defaultdict(lambda: nested_dict(n-1, type))
 
 class testBase(rfm.RunOnlyRegressionTest):
     """QuICC transform performance test
@@ -12,9 +20,8 @@ class testBase(rfm.RunOnlyRegressionTest):
     exe_path = ''
     target_executable = variable(str, value='ctest')
     test = ''
-    region = ''
+    region = []
     csv_rpt = variable(str, value='rpt.csv')
-    steps = 100
     cscs_systems = ['daint:mc', 'manali:mc', 'dom:gpu', 'dom:mc']
     local_systems = ['generic', 'g-X1', 'ph-fangorn']
     valid_systems = cscs_systems + local_systems
@@ -104,9 +111,6 @@ class testBase(rfm.RunOnlyRegressionTest):
             sn.assert_found(regex1, self.stdout),
         ]
 
-        regexSteps = str(self.steps)+r' times'
-        sanity_list.append(sn.assert_found(regexSteps, self.stdout))
-
         return sn.all(sanity_list)
 
     def report_time(self, region, group):
@@ -131,21 +135,58 @@ class testBase(rfm.RunOnlyRegressionTest):
     def report_time_max(self, region):
         return self.report_time(region, 2)
 
+    @run_before('performance')
+    def set_perf_variables(self):
+        """Build the dictionary with all the performance variables."""
+
+        for r in self.region:
+            self.perf_variables[r+'Avg'] = sn.make_performance_function(self.report_time_avg(r), 's')
+            self.perf_variables[r+'Min'] = sn.make_performance_function(self.report_time_min(r), 's')
+            self.perf_variables[r+'Max'] = sn.make_performance_function(self.report_time_max(r), 's')
+
 class testTransform(testBase):
     """QuICC transform performance test
     """
 
-    @performance_function('s')
-    def applyOperatorsAvg(self):
-        return self.report_time_avg(self.region)
+class splitTestTransform(testTransform):
+    """QuICC transform performance split test
+    """
 
-    @performance_function('s')
-    def applyOperatorsMin(self):
-        return self.report_time_min(self.region)
+    splitting = variable(int, value=8*12)
+    testId = variable(int, value=108)
 
-    @performance_function('s')
-    def applyOperatorsMax(self):
-        return self.report_time_max(self.region)
+    def __init__(self):
+        self.refs_db = nested_dict(3,dict)
+        self.init_references()
+
+    def init_references(self):
+        pass
+
+    def add_reference(self, tId, split, arch, region, timings):
+        """ Add new timing reference
+        """
+
+        self.refs_db[tId][split][arch][region] = timings
+
+    def read_references(self, db_file, test, filter = 'Avg'):
+        """ Read references from JSON file
+        """
+
+        db = quicc_utils.read_timings(db_file)
+
+        # Extract test data from DB if available
+        if test in db:
+            for id,l1 in db[test].items():
+                for split,l2 in l1.items():
+                    for arch,l3 in l2.items():
+                        for region,time in l3.items():
+                            if filter is None or region[-3:] == filter:
+                                self.add_reference(int(id), int(split), arch, region, (float(time), -0.25, 0.1, 's'))
+
+    @run_before('compile')
+    def setupTest(self):
+        self.test = f'prof_{self.__class__.__name__}_id{self.testId}_ulp.*_split{self.splitting}_0'
+        self.refs = self.refs_db[self.testId][self.splitting]
 
 class testStateFile(testBase):
     """QuICC transform performance test

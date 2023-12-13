@@ -20,10 +20,10 @@
 
 // Project includes
 //
-#include "Types/Typedefs.hpp"
 #include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Transform/Poly/Setup.hpp"
 #include "QuICC/Transform/ITransformOperator.hpp"
+
 
 namespace QuICC {
 
@@ -61,7 +61,6 @@ namespace Worland {
           * @param spSetup   Shared setup object for the transform
           */
          void init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const override;
-
          /**
           * @brief Initialise the polynomial transform
           *

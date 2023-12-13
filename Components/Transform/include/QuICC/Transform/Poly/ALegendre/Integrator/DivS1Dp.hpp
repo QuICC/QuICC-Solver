@@ -19,5 +19,4 @@
 #include "QuICC/Transform/Wrappers/ALegendre/Integrator/DivS1DpviewGpu_t.hpp.inc"
 #endif
 
-
 #endif // QUICC_TRANSFORM_POLY_ALEGENDRE_INTEGRATOR_DIVS1DP_HPP

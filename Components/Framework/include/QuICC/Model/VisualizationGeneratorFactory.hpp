@@ -6,16 +6,7 @@
 #ifndef QUICC_VISUALIZATIONGENERATORFACTORY_HPP
 #define QUICC_VISUALIZATIONGENERATORFACTORY_HPP
 
-// First include
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes

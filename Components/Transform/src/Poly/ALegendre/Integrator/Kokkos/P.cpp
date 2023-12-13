@@ -1,5 +1,5 @@
 /**
- * @file PP.cpp
+ * @file P.cpp
  * @brief Source of the implementation of the associated Legendre P parallel integrator
  */
 
@@ -13,9 +13,7 @@
 #include "QuICC/Polynomial/ALegendre/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/ALegendre/Evaluator/InnerProduct.hpp"
 
-#include "QuICC/Transform/Poly/KokkosUtils.hpp"
-#include "QuICC/Debug/DebuggerMacro.h"
-/* #include <type_traits> */
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -27,7 +25,7 @@ namespace ALegendre {
 
 namespace Integrator {
 
-   void P<kokkos_t>::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
+   void P<kokkos_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int m = this->mspSetup->slow(i);
       int nPoly = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1 ;
@@ -40,12 +38,18 @@ namespace Integrator {
    }
 
    //Operator working on horizontal rout layout
-   /* template<typename R, typename T, typename V>
-   struct ApplyOperator {
+   template<typename R, typename T, typename V>
+   struct ApplyOperatorHorizontalLayout {
 
-      ApplyOperator(R rv, R iv, T vo, V s, int tl, int ir, int cs)
-          : rOutView(rv), inView(iv), Ops(vo), scan(s), total(tl), inRows(ir),
-            col_size(cs) {}
+      ApplyOperatorHorizontalLayout(R rv, R iv, T vo, V s, int tl, int ir, int cs) :
+          rOutView(rv),
+          inView(iv),
+          Ops(vo),
+          scan(s),
+          total(tl),
+          inRows(ir),
+          col_size(cs)
+      {}
 
       KOKKOS_INLINE_FUNCTION
       void operator()(const int thid) const {
@@ -67,7 +71,7 @@ namespace Integrator {
       int total;
       int inRows;
       int col_size;
-   }; */
+   };
 
    //Requires rOut to be a vertical matrix instead of horizontal.
    //Better coalescing achieved with very good occupancy.
@@ -97,18 +101,19 @@ namespace Integrator {
    };
 
 
-   void P<kokkos_t>::applyUnitOperator(const OpMatrixLZ &rOutView,
-      const OpMatrixLZ &inView, const OpVectorI &scan, const int total) const {
+   void P<kokkos_t>::applyUnitOperator(const OpMatrixLZ& rOutView,
+      const OpMatrixLZ& inView, const OpVectorI& scan, const int total) const
+   {
       auto inRows = this->mspSetup->fwdSize();
       auto col_size = this->mspSetup->mult(0);
+      Profiler::RegionFixture<3> fix("Kokkos::P::applyUnitOperators");
 
-      Kokkos::parallel_for("Apply Kokkos Operator",
-         Kokkos::MDRangePolicy<Kokkos::Rank<2>>(
-            {0, 0}, {rOutView.extent(0), rOutView.extent(1)}),
-         ApplyUnitOperator(
-            rOutView, inView, this->vmOps, scan, inRows, col_size));
+
+      Profiler::RegionStart<4>("Kokkos::P::applyUnitOperator");
+      applyKokkosBlockOperator(this->mspSetup, this->vmOps, rOutView, inView,
+         scan, total);
+      Profiler::RegionStop<4>("Kokkos::P::applyUnitOperator");
    }
-
 }
 }
 }

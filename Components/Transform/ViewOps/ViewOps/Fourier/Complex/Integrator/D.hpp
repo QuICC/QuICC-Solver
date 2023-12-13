@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "Operator/Unary.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -44,10 +45,6 @@ private:
     /// @param out differentiatied modes
     /// @param in input physical space coefficient
     void applyImpl(Tout& out, const Tin& in);
-    /// @brief action implementation that might modify the input
-    /// @param out differentiatied modes
-    /// @param in input physical space coefficient
-    void applyImpl(Tout& out, Tin& in);
     /// @brief pointer to FFT operator
     std::unique_ptr<UnaryOp<Tout, Tin>> mFft;
     /// @brief pointer to differentiation operator
@@ -57,6 +54,45 @@ private:
     /// @brief Give access to base class
     friend UnaryBaseOp<DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>, Tout, Tin>;
 };
+
+template<class Tout, class Tin, class FftBackend, class DiffBackend, class DiffBackend2>
+DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>::DOp(ScaleType scale) : mFft(std::make_unique<FftBackend>()),
+    mDiff(std::make_unique<DiffBackend>(scale))
+{
+    if constexpr(!std::is_same_v<DiffBackend2, void>)
+    {
+        mDiff2 = std::make_unique<DiffBackend2>(scale);
+    }
+}
+
+template<class Tout, class Tin, class FftBackend, class DiffBackend, class DiffBackend2>
+DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>::DOp() : mFft(std::make_unique<FftBackend>()),
+    mDiff(std::make_unique<DiffBackend>())
+{
+    if constexpr(!std::is_same_v<DiffBackend2, void>)
+    {
+        mDiff2 = std::make_unique<DiffBackend2>();
+    }
+}
+
+
+template<class Tout, class Tin, class FftBackend, class DiffBackend, class DiffBackend2>
+void DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>::applyImpl(Tout& out, const Tin& in)
+{
+    Profiler::RegionFixture<4> fix("DOp::applyImpl");
+
+    // FFT
+    mFft->apply(out, in);
+
+    // differentiate in place
+    mDiff->apply(out, out);
+
+    // second optional stage needed for Df1InvLapl2D
+    if constexpr(!std::is_same_v<DiffBackend2, void>)
+    {
+        mDiff2->apply(out, out);
+    }
+}
 
 } // namespace Integrator
 } // namespace Complex

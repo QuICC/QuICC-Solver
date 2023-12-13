@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "DenseSM/IWorlandOperator.hpp"
+#include "DenseSM/Worland/IEmbeddedOperator.hpp"
 
 namespace QuICC {
 
@@ -23,7 +23,7 @@ namespace Worland {
    /**
     * @brief Implementation of the projection operator from the geostrophic basis to Worland in Python
     */
-   class PyGeostrophic2Tor: public IWorlandOperator
+   class PyGeostrophic2Tor: public IEmbeddedOperator
    {
       public:
          /**

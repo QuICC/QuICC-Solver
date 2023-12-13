@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Timestep/Interface.hpp"
-
 // Project includes
 //
+#include "QuICC/Timestep/Interface.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
@@ -24,8 +18,8 @@ namespace QuICC {
 
 namespace Timestep {
 
-   Interface::Interface(const MHDFloat time, const Matrix& cfl, const MHDFloat maxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
-      : mcMinCnst(2), mcMaxJump(MAX_STEPSIZE_JUMP), mcUpWindow(FIVE_PC_WINDOW), mcMinDt(LIMIT_MINSTEP), mcMaxDt(LIMIT_MAXSTEP), mMaxError(-1.0), mOldDt(this->mcMinDt), mDt(2,1), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0)
+   Interface::Interface(const MHDFloat time, const Matrix& cfl, const MHDFloat maxError, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, Pseudospectral::Coordinator& pseudo)
+      : mcMinCnst(2), mcMaxJump(MAX_STEPSIZE_JUMP), mcUpWindow(FIVE_PC_WINDOW), mcMinDt(LIMIT_MINSTEP), mcMaxDt(LIMIT_MAXSTEP), mMaxError(-1.0), mOldDt(this->mcMinDt), mDt(2,1), mTime(0.0), mRefTime(0.0), mCnstSteps(0.0), mStepTime(0.0), mpPseudo(&pseudo)
    {
       this->mDt(0,0) = this->mcMinDt;
       this->mDt(1,0) = FIXEDSTEP_LOCATION;

@@ -37,7 +37,8 @@ namespace Reductor {
    /**
     * @brief Interface for a Worland based energy operator
     */
-   template <typename T> class EnergyReductor: public T
+   template <typename T>
+   class EnergyReductor: public T
    {
       public:
          /**
@@ -87,7 +88,7 @@ namespace Reductor {
 
    template <typename T> void EnergyReductor<T>::applyOperators(Matrix& rOut, const MatrixZ& in) const
    {
-      Profiler::RegionFixture<3> fix(this->mProfileTag);
+      Profiler::RegionFixture<3> fix(this->mProfileTag+"::applyOperators");
 
       // assert right sizes for input  matrix
       assert(in.cols() == this->mspSetup->blockSize());

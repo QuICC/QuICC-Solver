@@ -11,8 +11,7 @@
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/KokkosIALegendreIntegrator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
-
-#include "QuICC/Transform/Poly/KokkosUtils.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -36,7 +35,7 @@ namespace Integrator {
       return this->mspSetup->blockSize();
    }
 
-   void KokkosIALegendreIntegrator::initOperators(const OpArray& igrid, const OpArray& iweights) const
+   void KokkosIALegendreIntegrator::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       // Initit specialized data for operators
       this->initSpecial();
@@ -56,7 +55,7 @@ namespace Integrator {
       auto vmOpsHost= Kokkos::create_mirror_view(this->vmOps);
 
       // Loop over harmonic orders
-      for(int i = 0; i < this->mspSetup->slowSize(); i++)
+      for(int i = 0; i < slowSize; i++)
       {
          // Build operator
          Matrix op;
@@ -68,8 +67,10 @@ namespace Integrator {
       Kokkos::deep_copy(vmOps, vmOpsHost);
    }
 
-   void KokkosIALegendreIntegrator::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
+   void KokkosIALegendreIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<3> fix("KokkosIALegendreIntegrator::applyOperators");
+
       // assert right sizes for input matrix
       assert(in.rows() == this->mspSetup->fwdSize());
       assert(in.cols() == this->mspSetup->blockSize());
@@ -80,12 +81,16 @@ namespace Integrator {
       OpVectorI scan("outRows Scan", slowSize + 1);
       auto hostScan = Kokkos::create_mirror_view(scan);
 
+      Profiler::RegionStart<4>("KokkosIALegendreIntegrator::hostScan");
+
       for(int i = 0; i < this->mspSetup->slowSize(); i++)
       {
          int m = this->mspSetup->slow(i);
          int outRows = this->mspSetup->fast(this->mspSetup->fastSize(i)-1,i) - m + 1;
          hostScan[i + 1] = hostScan[i] + outRows;
       }
+
+      Profiler::RegionStop<4>("KokkosIALegendreIntegrator::hostScan");
 
       Kokkos::deep_copy(scan, hostScan);
 
@@ -103,7 +108,11 @@ namespace Integrator {
       auto col_size = this->mspSetup->mult(0);
       OpMatrixLZ rOutView("rOutView", total, col_size);
 
+      Profiler::RegionStart<4>("KokkosIALegendreIntegrator::applyUnitOperator");
+
       this->applyUnitOperator(rOutView, inView, scan, total);
+
+      Profiler::RegionStop<4>("KokkosIALegendreIntegrator::applyUnitOperator");
 
       DeepCopyEigen(rOut, rOutView, hostScan, col_size);
    }

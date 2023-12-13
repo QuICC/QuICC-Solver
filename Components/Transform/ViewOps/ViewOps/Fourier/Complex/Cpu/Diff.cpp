@@ -9,9 +9,10 @@
 #include "View/View.hpp"
 #include "ViewOps/Fourier/Util.hpp"
 #include "ViewOps/Fourier/Tags.hpp"
+#include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Profiler/Interface.hpp"
 
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #endif
 
@@ -21,24 +22,22 @@ namespace Fourier {
 namespace Complex {
 namespace Cpu {
 
-using namespace QuICC::Memory;
-
 template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
 DiffOp<Tout, Tin, Order, Direction, Treatment>::DiffOp(ScaleType scale) : mScale(scale){};
 
 template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
 void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
-    Profiler::RegionFixture<4> fix("DiffOp::applyImpl");
+    Profiler::RegionFixture<5> fix("DiffOp::applyImpl");
 
     assert(out.size() == in.size());
     assert(out.dims()[0] == in.dims()[0]);
     assert(out.dims()[1] == in.dims()[1]);
     assert(out.dims()[2] == in.dims()[2]);
 
-    #ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
     assert(!QuICC::Cuda::isDeviceMemory(out.data()));
-    #endif
+#endif
 
     if constexpr (std::is_same_v<Direction, bwd_t> &&
         Treatment == none_m && Order == 0)
@@ -214,7 +213,6 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
 }
 
 // explicit instantations
-using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
 template class DiffOp<mods_t, mods_t, 0, fwd_t>;
 template class DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_m>;
 template class DiffOp<mods_t, mods_t, 1, fwd_t>;

@@ -6,9 +6,10 @@
 #include "View/View.hpp"
 #include "ViewOps/Fourier/Util.hpp"
 #include "ViewOps/Fourier/Tags.hpp"
+#include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Profiler/Interface.hpp"
 
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #endif
 
@@ -17,8 +18,6 @@ namespace Transform {
 namespace Fourier {
 namespace Complex {
 namespace Cpu {
-
-using namespace QuICC::Memory;
 
 template<class Tout, class Tin, class Direction>
 MeanOp<Tout, Tin, Direction>::MeanOp(ScaleType scale) : mScale(scale){};
@@ -31,7 +30,7 @@ void MeanOp<Tout, Tin, Direction>::applyImpl(Tout& out, const Tin& in)
 
     Profiler::RegionFixture<4> fix("MeanOp::applyImpl");
 
-    #ifdef QUICC_USE_CUFFT
+    #ifdef QUICC_HAS_CUDA_BACKEND
     assert(!QuICC::Cuda::isDeviceMemory(out.data()));
     #endif
 
@@ -99,7 +98,6 @@ void MeanOp<Tout, Tin, Direction>::applyImpl(Tout& out, const Tin& in)
 }
 
 // explicit instantations
-using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
 template class MeanOp<mods_t, mods_t, fwd_t>;
 template class MeanOp<mods_t, mods_t, bwd_t>;
 

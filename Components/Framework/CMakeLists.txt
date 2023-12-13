@@ -10,7 +10,6 @@ include(cmake.d/setup/RegisterTransformBackward.cmake)
 include(cmake.d/setup/RegisterTransformReductor.cmake)
 include(cmake.d/setup/RegisterTransformPath.cmake)
 include(cmake.d/setup/RegisterTransformSetup.cmake)
-include(cmake.d/setup/RegisterTimestepId.cmake)
 include(cmake.d/setup/RegisterTimestepRegister.cmake)
 include(cmake.d/setup/RegisterTagOperator.cmake)
 include(cmake.d/setup/RegisterBcScheme.cmake)
@@ -34,13 +33,15 @@ target_compile_options(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
 include(cmake.d/setup/SetHdf5Typedef.cmake)
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  ${QUICC_POLYNOMIAL_COMPONENT_LIB}
+  QuICC::Polynomial
   ${QUICC_PYQUICC_COMPONENT_LIB}
   QuICC::DenseSM
   QuICC::Io
   QuICC::Common
   QuICC::Framework::GitHash
   QuICC::Profiling
+  QuICC::TimestepPc
+  QuICC::TimestepRkcb
   )
 
 # Add debug option for operator output

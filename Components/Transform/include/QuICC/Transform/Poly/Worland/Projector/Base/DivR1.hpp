@@ -42,7 +42,7 @@ namespace Projector {
          /**
           * @brief Destructor
           */
-         virtual ~DivR1();
+         ~DivR1() = default;
 
       protected:
 
@@ -50,12 +50,12 @@ namespace Projector {
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const;
+         void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const final;
 
          /**
           * @brief Apply ith operator
           */
-         virtual void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
+         void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const final;
    };
 
 }

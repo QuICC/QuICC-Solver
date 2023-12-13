@@ -12,7 +12,6 @@
 #include "Types/Math.hpp"
 #include "QuICC/Polynomial/ALegendre/sin_1Plm.hpp"
 
-#include "QuICC/Transform/Poly/KokkosUtils.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 
 namespace QuICC {
@@ -25,8 +24,8 @@ namespace ALegendre {
 
 namespace Projector {
 
-   void LlDivS1Dp<kokkos_t>::makeOperator(OpMatrix &op,
-      const OpArray &igrid, const OpArray &iweights, const int i) const {
+   void LlDivS1Dp<kokkos_t>::makeOperator(Matrix &op,
+      const Internal::Array &igrid, const Internal::Array &iweights, const int i) const {
        DivS1<kokkos_t>::makeOperator(op, igrid, iweights, i);
        op = op * (static_cast<MHDFloat>(this->mspSetup->slow(i)) * this->mLl.bottomRows(op.cols())).asDiagonal();
    }

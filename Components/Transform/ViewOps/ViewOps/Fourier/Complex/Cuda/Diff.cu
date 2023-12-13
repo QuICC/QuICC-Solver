@@ -10,6 +10,7 @@
 #include "View/View.hpp"
 #include "ViewOps/Fourier/Util.hpp"
 #include "ViewOps/Fourier/Tags.hpp"
+#include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Cuda/CudaUtil.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -18,10 +19,6 @@ namespace Transform {
 namespace Fourier {
 namespace Complex {
 namespace Cuda {
-
-using namespace QuICC::Memory;
-
-using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
 
 /// @brief thread coarsening factor
 constexpr std::size_t tCF = 8;
@@ -159,7 +156,7 @@ DiffOp<Tout, Tin, Order, Direction, Treatment>::DiffOp(ScaleType scale) : mScale
 template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
 void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
-    Profiler::RegionFixture<4> fix("DiffOp::applyImpl");
+    Profiler::RegionFixture<5> fix("DiffOp::applyImpl");
 
     assert(out.size() == in.size());
     assert(out.dims()[0] == in.dims()[0]);
