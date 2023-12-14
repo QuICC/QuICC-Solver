@@ -106,13 +106,6 @@ function(quicc_add_benchmark target)
     set(_toolsdir "${PROJECT_SOURCE_DIR}/${QUICC_MODEL_PATH}/TestSuite")
 
     set(_args )
-    foreach(_file IN LISTS QAB_STARTFILES)
-      list(APPEND _args "COMMAND" ${CMAKE_COMMAND} -E copy
-        "${_refdir}/${_file}"
-        "${_rundir}/${_file}"
-        )
-    endforeach()
-
     foreach(_file IN LISTS QAB_TOOLS)
       list(APPEND _args "COMMAND" ${CMAKE_COMMAND} -E create_symlink
         "${_toolsdir}/${_file}"
@@ -129,18 +122,34 @@ function(quicc_add_benchmark target)
       )
     add_dependencies(${_bench} ${_exe})
 
+    set(_cp_start )
+    foreach(_file IN LISTS QAB_STARTFILES)
+      list(APPEND _cp_start "COMMAND" ${CMAKE_COMMAND} -E copy
+        "${_refdir}/${_file}"
+        "${_rundir}/${_file}"
+        )
+    endforeach()
+
     # Modify parameters.cfg for variants
+    set(_mod_cfg )
     foreach(_variant IN ITEMS ${QAB_VARIANTS})
       string(REGEX REPLACE ":" ";" _vlist "${_variant}")
       list(GET _vlist 0 _path)
       list(GET _vlist 1 _value)
-      add_custom_command(TARGET ${_bench} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E remove *.dat state0*.hdf5 *.gxl *.vtp
-        COMMAND ${CMAKE_COMMAND} -E rename parameters.cfg parameters_orig.cfg
-        COMMAND ${Python_EXECUTABLE} ${_toolsdir}/modify_xml.py -i parameters_orig.cfg -p ${_path} -v ${_value} -o parameters.cfg
-        WORKING_DIRECTORY ${_rundir}
-        )
+      list(APPEND _mod_cfg "COMMAND" ${CMAKE_COMMAND} -E rename parameters.cfg parameters_tmp.cfg)
+      list(APPEND _mod_cfg "COMMAND" "${Python_EXECUTABLE}"
+        "${_toolsdir}/modify_xml.py" "-i" "parameters_tmp.cfg" "-p" "${_path}" "-v" "${_value}" "-o" "parameters.cfg")
+      list(APPEND _mod_cfg "COMMAND" ${CMAKE_COMMAND} -E remove parameters_tmp.cfg)
     endforeach()
+
+    # Prepare startup files
+    add_custom_command(TARGET ${_bench} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E remove *.dat *.hdf5 *.gxl *.vtp
+      ${_cp_start}
+      COMMAND ${CMAKE_COMMAND} -E copy parameters.cfg parameters_orig.cfg
+      ${_mod_cfg}
+      WORKING_DIRECTORY ${_rundir}
+    )
 
     # Fetch reference data
     include(FetchBenchmarkReference)
