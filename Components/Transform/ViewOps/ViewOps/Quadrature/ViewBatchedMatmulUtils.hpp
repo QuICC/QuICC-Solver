@@ -17,8 +17,6 @@ namespace QuICC {
 namespace Transform {
 namespace Quadrature {
 
-using namespace QuICC::Memory;
-
 /// @brief POD to return op metadata as a single object
 /// @tparam T
 template <class T> struct opMeta
@@ -38,6 +36,7 @@ QUICC_CUDA_HOSTDEV inline opMeta<typename Top::IndexType> getOpMeta(
    span<const typename Top::IndexType> dimensions,
    span<const typename Top::IndexType> layers)
 {
+   using namespace QuICC::View;
    auto nLayers = layers.size();
    using IndexType = typename Top::IndexType;
    opMeta<IndexType> meta;
@@ -109,11 +108,12 @@ QUICC_CUDA_HOSTDEV inline opMeta<typename Top::IndexType> getOpMeta(
 
 template <class Top>
 QUICC_CUDA_HOSTDEV inline void setIndicesAndPointers(
-   ViewBase<typename Top::IndexType> pointers[],
-   ViewBase<typename Top::IndexType> indices[],
+   View::ViewBase<typename Top::IndexType> pointers[],
+   View::ViewBase<typename Top::IndexType> indices[],
    span<const typename Top::IndexType> dimensions,
    span<const typename Top::IndexType> layers)
 {
+   using namespace QuICC::View;
    using IndexType = typename Top::IndexType;
    using opLevelType = typename Top::LevelType;
    auto nLayers = layers.size();
@@ -197,9 +197,10 @@ QUICC_CUDA_HOSTDEV inline void setIndicesAndPointers(
 /// @param op
 /// @return mods pointers
 template <class Tout, class Tin, class Top>
-QUICC_CUDA_HOSTDEV inline ViewBase<typename Tin::IndexType> getModsPointers(
+QUICC_CUDA_HOSTDEV inline View::ViewBase<typename Tin::IndexType> getModsPointers(
    const Tout& out, const Tin& in, const Top& op)
 {
+   using namespace QuICC::View;
    using IndexType = typename Tin::IndexType;
    ViewBase<IndexType> modsPointers;
    using opLevelType = typename Top::LevelType;
@@ -252,6 +253,7 @@ QUICC_CUDA_HOSTDEV inline matmulDims<typename Tin::IndexType> getMatmulDims(
    const Tout& out, const Tin& in, const Top& op,
    const typename Tin::IndexType col, const typename Tin::IndexType layerIndex)
 {
+   using namespace QuICC::View;
    using IndexType = typename Tin::IndexType;
    using opLevelType = typename Top::LevelType;
 

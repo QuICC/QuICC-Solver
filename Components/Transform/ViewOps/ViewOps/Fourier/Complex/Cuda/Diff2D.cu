@@ -177,6 +177,7 @@ template<class Tout, class Tin, std::size_t Ofi, std::size_t Ofj,
     std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment>
 void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
+    using namespace QuICC::View;
     static_assert(std::is_same_v<typename Tin::LevelType, DCCSC3D::level>,
         "implementation assumes dense, compressed, sparse");
 

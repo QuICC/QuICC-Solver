@@ -13,14 +13,12 @@ namespace Transform {
 namespace Fourier {
 namespace Complex {
 
-using namespace Memory;
-
 /// @brief mode coefficients view with column major layout (in a layer)
 /// with in-order mapping
-using mods_t = View<std::complex<double>, DCCSC3DInOrder>;
+using mods_t = View::View<std::complex<double>, View::DCCSC3DInOrder>;
 /// @brief physical coefficients view with column major layout (in a layer)
 /// with in-order mapping
-using phys_t = View<std::complex<double>, DCCSC3DInOrder>;
+using phys_t = View::View<std::complex<double>, View::DCCSC3DInOrder>;
 
 } // namespace Complex
 } // namespace Fourier

@@ -164,6 +164,8 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     assert(out.dims()[2] == in.dims()[2]);
     assert(QuICC::Cuda::isDeviceMemory(out.data()));
 
+    using namespace QuICC::View;
+
     if constexpr (std::is_same_v<Direction, bwd_t> &&
         Treatment == none_m && Order == 0)
     {

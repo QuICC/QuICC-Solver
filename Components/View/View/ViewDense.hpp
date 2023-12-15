@@ -19,7 +19,7 @@
 #include "Std/Cuda/Utility.hpp"
 
 namespace QuICC {
-namespace Memory {
+namespace View {
 
    /// @brief Generic template for a dense (structured) view
    /// @tparam Scalar element type
@@ -488,5 +488,5 @@ namespace Memory {
       return const_cast<Scalar &>(cuda::std::as_const(*this).operator()(i, j, k));
    }
 
-} // namespace Memory
+} // namespace View
 } // namespace QuICC

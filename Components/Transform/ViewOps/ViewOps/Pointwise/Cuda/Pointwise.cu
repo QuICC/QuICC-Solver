@@ -50,15 +50,14 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       <<<numBlocks, blockSize>>>(_f, out, args...);
 }
 
-using namespace QuICC::Memory;
 
 // Explicit instantiations
 // tests
-template class Op<SquareFunctor<double>, ViewBase<double>, ViewBase<double>>;
-template class Op<Abs2Functor<double>, ViewBase<double>, ViewBase<std::complex<double>>>;
+template class Op<SquareFunctor<double>, View::ViewBase<double>, View::ViewBase<double>>;
+template class Op<Abs2Functor<double>, View::ViewBase<double>, View::ViewBase<std::complex<double>>>;
 // JW
-template class Op<Abs2Functor<double>, View<double, DCCSC3DJIK>,
-   View<std::complex<double>, DCCSC3DJIK>>;
+template class Op<Abs2Functor<double>, View::View<double, View::DCCSC3DJIK>,
+   View::View<std::complex<double>, View::DCCSC3DJIK>>;
 
 } // namespace Cuda
 } // namespace Pointwise

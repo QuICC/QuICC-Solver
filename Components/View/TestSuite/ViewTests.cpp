@@ -4,7 +4,7 @@
 
 #include "View/View.hpp"
 
-using namespace QuICC::Memory;
+using namespace QuICC::View;
 
 TEST_CASE("Level", "[Level]")
 {

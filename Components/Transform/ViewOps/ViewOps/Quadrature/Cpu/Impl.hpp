@@ -24,10 +24,6 @@ namespace Quadrature {
 /// @brief Cpu backend namespace
 namespace Cpu {
 
-
-using namespace QuICC::Operator;
-using namespace QuICC::Memory;
-
 /// @brief Derived classes implement Associated Legendre operators.
 /// In practice it boils down to a batched matmul with each batch having
 /// different sizes.
@@ -37,7 +33,7 @@ using namespace QuICC::Memory;
 /// @tparam Treatment tag to include scaling due to derivative
 template <class Tout, class Tin, class Top, std::uint16_t Treatment = 0>
 class ImplOp
-    : public BinaryBaseOp<ImplOp<Tout, Tin, Top, Treatment>, Tout, Tin, Top>
+    : public Operator::BinaryBaseOp<ImplOp<Tout, Tin, Top, Treatment>, Tout, Tin, Top>
 {
 public:
    /// @brief Default constructor
@@ -52,7 +48,7 @@ private:
    /// @param op operator
    void applyImpl(Tout& out, const Tin& in, const Top& op);
    /// @brief Give access to base class
-   friend BinaryBaseOp<ImplOp<Tout, Tin, Top, Treatment>, Tout, Tin, Top>;
+   friend Operator::BinaryBaseOp<ImplOp<Tout, Tin, Top, Treatment>, Tout, Tin, Top>;
    /// @brief index typedef
    using IndexType = typename Tin::IndexType;
    /// @brief layer index cache
@@ -98,11 +94,11 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in,
    {
       // select correct type to extract slice
       constexpr bool isSliceOpRowMaj =
-         std::is_same_v<typename Top::OrderType, LoopOrderType<j_t, i_t, k_t>>;
+         std::is_same_v<typename Top::OrderType, View::LoopOrderType<View::j_t, View::i_t, View::k_t>>;
       using opSliceAtt_t =
-         std::conditional_t<isSliceOpRowMaj, dense2DRM, dense2D>;
+         std::conditional_t<isSliceOpRowMaj, View::dense2DRM, View::dense2D>;
       using dataSliceAtt_t =
-         std::conditional_t<isSliceOpRowMaj, dense2D, dense2DRM>;
+         std::conditional_t<isSliceOpRowMaj, View::dense2D, View::dense2DRM>;
 
       // get dimensions
       auto dims = getMatmulDims(out, in, op, _layerWidth[h], _layerIndex[h]);
@@ -116,11 +112,11 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in,
       assert(offSetC + M * N <= out.size());
 
       // set dense views
-      View<typename Top::ScalarType, opSliceAtt_t> A(
+      View::View<typename Top::ScalarType, opSliceAtt_t> A(
          {op.data() + offSetA, M * K}, {M, K});
-      View<typename Tin::ScalarType, dataSliceAtt_t> B(
+      View::View<typename Tin::ScalarType, dataSliceAtt_t> B(
          {in.data() + offSetB, K * N}, {K, N});
-      View<typename Tout::ScalarType, dataSliceAtt_t> C(
+      View::View<typename Tout::ScalarType, dataSliceAtt_t> C(
          {out.data() + offSetC, M * N}, {M, N});
 
       // compute

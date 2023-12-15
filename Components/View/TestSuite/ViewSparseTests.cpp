@@ -2,11 +2,10 @@
 
 #include "View/ViewSparse.hpp"
 
+using namespace QuICC::View;
 
 TEST_CASE("ViewOneDimSparse", "[ViewOneDimSparse]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t SF = 10;
     std::array<double, SF> fullData = {0,0,3,4,5,0,7,0,0,10};
     constexpr size_t S = 5;
@@ -40,8 +39,6 @@ TEST_CASE("ViewOneDimSparse", "[ViewOneDimSparse]")
 
 TEST_CASE("ViewCopy", "[ViewCopy]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t SF = 10;
     std::array<double, SF> fullData = {0,0,3,4,5,0,7,0,0,10};
     constexpr size_t S = 5;
@@ -78,8 +75,6 @@ TEST_CASE("ViewCopy", "[ViewCopy]")
 
 TEST_CASE("View Two Diminsional CSR", "[ViewTwoDimCSR]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 3;
     constexpr size_t N = 4;
     std::array<double, M*N> fullData = {1,0,0,3,
@@ -113,8 +108,6 @@ TEST_CASE("View Two Diminsional CSR", "[ViewTwoDimCSR]")
 
 TEST_CASE("View Two Dimensional CSC", "[ViewTwoDimCSC]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 3;
     constexpr size_t N = 4;
     std::array<double, M*N> fullData = {1,0,0,3,
@@ -148,8 +141,6 @@ TEST_CASE("View Two Dimensional CSC", "[ViewTwoDimCSC]")
 
 TEST_CASE("ViewThreeDimDtrClColMaj", "[ViewThreeDimDtrClColMaj]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 3;
     constexpr size_t N = 2;
     constexpr size_t K = 3;
@@ -199,8 +190,6 @@ TEST_CASE("ViewThreeDimDtrClColMaj", "[ViewThreeDimDtrClColMaj]")
 
 TEST_CASE("ViewThreeDim Compressed step 1 Column Layer ColMaj", "[ViewThreeDimCtrClColMaj]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 4;
     constexpr size_t N = 2;
     constexpr size_t K = 4;
@@ -250,8 +239,6 @@ TEST_CASE("ViewThreeDim Compressed step 1 Column Layer ColMaj", "[ViewThreeDimCt
 TEST_CASE("ViewThreeDim Compressed step 1 Column Layer, Row Column Layer layout",
     "[ViewThreeDimCtrClJIK]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 4;
     constexpr size_t N = 2;
     constexpr size_t K = 4;
@@ -311,8 +298,6 @@ TEST_CASE("ViewThreeDim Compressed step 1 Column Layer, Row Column Layer layout"
 
 TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer ColMaj ", "[ViewThreeDimCtrRlColMaj]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 2;
     constexpr size_t N = 4;
     constexpr size_t K = 4;
@@ -370,8 +355,6 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer ColMaj ", "[Vi
 TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column Layer layout ",
     "[ViewThreeDimCtrRlJIK]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 2;
     constexpr size_t N = 4;
     constexpr size_t K = 4;
@@ -422,8 +405,6 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column La
 TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column Layer layout #2",
     "[ViewThreeDimCtrRlJIK2]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 2;
     constexpr size_t N = 4;
     constexpr size_t K = 4;
@@ -474,8 +455,6 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column La
 
 TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer ColMaj", "[ViewThreeDimDCCSCColMaj]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 4;
     constexpr size_t N = 2;
     constexpr size_t K = 4;
@@ -525,8 +504,6 @@ TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer ColMaj", "[ViewThreeDimDCCSCC
 
 TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer ColMaj Padded", "[ViewThreeDimDCCSCColMajPadded]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 4;
     constexpr size_t N = 2;
     constexpr size_t K = 4;
@@ -577,8 +554,6 @@ TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer ColMaj Padded", "[ViewThreeDi
 
 TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer JIK", "[ViewThreeDimDCCSCJIK]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 4;
     constexpr size_t N = 2;
     constexpr size_t K = 4;
@@ -643,8 +618,6 @@ TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer JIK", "[ViewThreeDimDCCSCJIK]
 
 TEST_CASE("ViewThreeDim Dense Column/Row compressed layer ColMaj", "[ViewThreeDimCsl3DColMaj]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 4;
     constexpr size_t N = 2;
     constexpr size_t K = 4;
@@ -693,8 +666,6 @@ TEST_CASE("ViewThreeDim Dense Column/Row compressed layer ColMaj", "[ViewThreeDi
 
 TEST_CASE("ViewThreeDim Dense Column/Row compressed layer Row Major", "[ViewThreeDimCsl3DRowMaj]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 4;
     constexpr size_t N = 2;
     constexpr size_t K = 4;
@@ -748,8 +719,6 @@ TEST_CASE("ViewThreeDim Dense Column/Row compressed layer Row Major", "[ViewThre
 
 TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane ColMaj", "[ViewThreeDimTrClCSCS3DColMaj]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 4;
     constexpr size_t N = 3;
     constexpr size_t K = 4;
@@ -801,8 +770,6 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane ColMaj", "[ViewT
 
 TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane JIK", "[ViewThreeDimTrClCSCS3DJIK]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 4;
     constexpr size_t N = 3;
     constexpr size_t K = 4;

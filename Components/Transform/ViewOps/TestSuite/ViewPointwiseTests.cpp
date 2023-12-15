@@ -9,6 +9,8 @@
 #include "ViewOps/Pointwise/Functors.hpp"
 
 using namespace QuICC::Memory;
+using namespace QuICC::View;
+
 TEST_CASE("Square Cpu Lambda", "SquareCpuLambda")
 {
    // host mem block

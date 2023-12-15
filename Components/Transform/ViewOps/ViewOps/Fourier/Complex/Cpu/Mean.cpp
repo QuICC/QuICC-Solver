@@ -25,6 +25,7 @@ MeanOp<Tout, Tin, Direction>::MeanOp(ScaleType scale) : mScale(scale){};
 template<class Tout, class Tin, class Direction>
 void MeanOp<Tout, Tin, Direction>::applyImpl(Tout& out, const Tin& in)
 {
+    using namespace QuICC::View;
     static_assert(std::is_same_v<typename Tin::LevelType, DCCSC3D::level>,
         "implementation assumes dense, compressed, sparse");
 

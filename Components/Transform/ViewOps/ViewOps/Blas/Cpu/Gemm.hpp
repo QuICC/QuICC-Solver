@@ -18,8 +18,6 @@ namespace Blas {
 /// @brief namespace for cpu backends
 namespace Cpu {
 
-using namespace QuICC::Memory;
-
 /// @brief namespace for Naive implementations
 namespace Naive {
 
@@ -33,9 +31,9 @@ namespace Naive {
 /// @param B
 /// @param alpha
 template <class TA, class TB, class TC, class Talpha>
-inline void matmul(View<TC, dense2D>& C,
-    const View<TA, dense2DRM>& A,
-    const View<TB, dense2D>& B,
+inline void matmul(View::View<TC, View::dense2D>& C,
+    const View::View<TA, View::dense2DRM>& A,
+    const View::View<TB, View::dense2D>& B,
     const Talpha alpha)
 {
     assert(C.dims()[0] == A.dims()[0]);
@@ -72,9 +70,9 @@ inline void matmul(View<TC, dense2D>& C,
 /// @param B
 /// @param alpha
 template <class TA, class TB, class TC, class Talpha>
-inline void matmul(View<TC, dense2DRM>& C,
-    const View<TA, dense2D>& A,
-    const View<TB, dense2DRM>& B,
+inline void matmul(View::View<TC, View::dense2DRM>& C,
+    const View::View<TA, View::dense2D>& A,
+    const View::View<TB, View::dense2DRM>& B,
     const Talpha alpha)
 {
     assert(C.dims()[0] == A.dims()[0]);
@@ -116,9 +114,9 @@ namespace Eigen {
 /// @param B
 /// @param alpha
 template <class TA, class TB, class TC, class Talpha>
-inline void matmul(View<TC, dense2D>& C,
-    const View<TA, dense2DRM>& A,
-    const View<TB, dense2D>& B,
+inline void matmul(View::View<TC, View::dense2D>& C,
+    const View::View<TA, View::dense2DRM>& A,
+    const View::View<TB, View::dense2D>& B,
     const Talpha alpha)
 {
     assert(C.dims()[0] == A.dims()[0]);
@@ -151,9 +149,9 @@ inline void matmul(View<TC, dense2D>& C,
 /// @param B
 /// @param alpha
 template <class TA, class TB, class TC, class Talpha>
-inline void matmul(View<TC, dense2DRM>& C,
-    const View<TA, dense2D>& A,
-    const View<TB, dense2DRM>& B,
+inline void matmul(View::View<TC, View::dense2DRM>& C,
+    const View::View<TA, View::dense2D>& A,
+    const View::View<TB, View::dense2DRM>& B,
     const Talpha alpha)
 {
     assert(C.dims()[0] == A.dims()[0]);

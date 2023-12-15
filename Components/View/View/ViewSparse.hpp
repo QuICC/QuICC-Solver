@@ -21,7 +21,7 @@
 #include "Std/Cuda/Utility.hpp"
 
 namespace QuICC {
-namespace Memory {
+namespace View {
 
    /// @brief Specialized template for sparse view with attributes
    /// @tparam Scalar element type
@@ -692,5 +692,5 @@ namespace Memory {
       return const_cast<Scalar &>(cuda::std::as_const(*this).operator()(i, j, k));
    }
 
-} // namespace Memory
+} // namespace View
 } // namespace QuICC

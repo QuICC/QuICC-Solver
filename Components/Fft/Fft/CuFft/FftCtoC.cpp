@@ -19,7 +19,7 @@ namespace Fft {
 namespace CuFft {
 
 template<class AttIn, class AttOut>
-FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>::~FftOp()
+FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>::~FftOp()
 {
     // Destroy plan
     if(_plan != nullptr)
@@ -56,8 +56,9 @@ namespace details
 }
 
 template<class AttIn, class AttOut>
-void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>::applyImpl(View<std::complex<double>, AttOut>& phys, const View<std::complex<double>, AttIn>& mods)
+void FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>::applyImpl(View::View<std::complex<double>, AttOut>& phys, const View::View<std::complex<double>, AttIn>& mods)
 {
+    using namespace QuICC::View;
     if(_plan == nullptr)
     {
         Profiler::RegionFixture<5> fix("FftOp::initFft");

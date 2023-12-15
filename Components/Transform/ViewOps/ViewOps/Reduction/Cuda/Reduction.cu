@@ -10,6 +10,7 @@ namespace QuICC {
 namespace Reduction {
 namespace Cuda {
 
+using namespace QuICC::View;
 
 namespace details {
 // naive implementation of mat reduction
@@ -214,9 +215,8 @@ void Op<Tout, Tin, Dir>::applyImpl(Tout& out, const Tin& in)
    }
 }
 
-using namespace QuICC::Memory;
 // Explicit instantiations
-template class Op<View<double, CSC>, View<double, DCCSC3DJIK>, 0u>;
+template class Op<View::View<double, CSC>, View::View<double, DCCSC3DJIK>, 0u>;
 
 
 } // namespace Cuda
