@@ -58,6 +58,8 @@ void builder(Tview opView, const Evector<Tdata>& grid,
         throw std::logic_error("builder for this type is not implemented.");
     }
 
+    using namespace QuICC::View;
+
     ViewBase<IndexType>& pointers = const_cast<ViewBase<IndexType>*>(opView.pointers())[metaIdx];
     ViewBase<IndexType>& indices = const_cast<ViewBase<IndexType>*>(opView.indices())[metaIdx];
 
@@ -65,6 +67,7 @@ void builder(Tview opView, const Evector<Tdata>& grid,
     ViewBase<ScalarType> viewData(opView.data(), opView.size());
 
     // Setup converters
+    using namespace QuICC::Memory;
     tempOnHostMemorySpace converterP(pointers, TransferMode::read);
     tempOnHostMemorySpace converterI(indices, TransferMode::read | TransferMode::block);
     tempOnHostMemorySpace converterD(viewData, TransferMode::write);

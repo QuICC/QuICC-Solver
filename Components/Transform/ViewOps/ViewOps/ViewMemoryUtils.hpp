@@ -59,12 +59,12 @@ public:
 private:
     #ifdef QUICC_HAS_CUDA_BACKEND
     /// @brief temp data storage
-    MemBlock<ScalarType> _dataHost;
+    Memory::MemBlock<ScalarType> _dataHost;
     /// @brief store original view data
-    ViewBase<ScalarType> _dataDevice;
+    View::ViewBase<ScalarType> _dataDevice;
     #endif
     /// @brief store ref to view
-    ViewBase<ScalarType>& _viewRef{};
+    View::ViewBase<ScalarType>& _viewRef{};
 
     const std::uint16_t _mode;
 };
@@ -73,6 +73,7 @@ private:
 template <class Tview>
 tempOnHostMemorySpace<Tview>::tempOnHostMemorySpace(Tview& view, std::uint16_t mode) : _viewRef(view), _mode(mode)
 {
+    using namespace QuICC::View;
     #ifdef QUICC_HAS_CUDA_BACKEND
     if(QuICC::Cuda::isDeviceMemory(view.data()))
     {

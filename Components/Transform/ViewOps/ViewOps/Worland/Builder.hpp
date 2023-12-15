@@ -66,6 +66,7 @@ void Builder<TView, TDenseSMBuilder, TDirection>::compute(TView opView,
    }
 
    using namespace QuICC::Memory;
+   using namespace QuICC::View;
 
    ViewBase<IndexType>& pointers =
       const_cast<ViewBase<IndexType>*>(opView.pointers())[metaIdx];

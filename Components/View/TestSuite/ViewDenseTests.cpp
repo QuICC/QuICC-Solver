@@ -2,10 +2,10 @@
 
 #include "View/ViewDense.hpp"
 
+using namespace QuICC::View;
+
 TEST_CASE("ViewOneDimDense", "[ViewOneDimDense]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t S = 5;
     std::array<double, S> data = {1,2,3,4,5};
 
@@ -27,8 +27,6 @@ TEST_CASE("ViewOneDimDense", "[ViewOneDimDense]")
 
 TEST_CASE("ViewTwoDimDenseColMaj", "[ViewTwoDimDenseColMaj]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t S = 3*2;
     std::array<double, S> data = {1,2,3,4,5,6};
 
@@ -53,8 +51,6 @@ TEST_CASE("ViewTwoDimDenseColMaj", "[ViewTwoDimDenseColMaj]")
 
 TEST_CASE("ViewTwoDimDenseColMaj pointer constructor", "[ViewTwoDimDenseColMajPtr]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t S = 3*2;
     std::array<double, S> data = {1,2,3,4,5,6};
 
@@ -80,8 +76,6 @@ TEST_CASE("ViewTwoDimDenseColMaj pointer constructor", "[ViewTwoDimDenseColMajPt
 
 TEST_CASE("View Two Dimensional Dense Column Major Padded", "[ViewTwoDimDenseColMajPadded]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t rank = 2;
     constexpr size_t dim0 = 3;
     constexpr size_t dim1 = 2;
@@ -114,8 +108,6 @@ TEST_CASE("View Two Dimensional Dense Column Major Padded", "[ViewTwoDimDenseCol
 
 TEST_CASE("View Two Dimensional Dense Column Major Padded pointer constructor", "[ViewTwoDimDenseColMajPaddedPtr]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t rank = 2;
     constexpr size_t dim0 = 3;
     constexpr size_t dim1 = 2;
@@ -148,8 +140,6 @@ TEST_CASE("View Two Dimensional Dense Column Major Padded pointer constructor", 
 
 TEST_CASE("ViewTwoDimDenseRowMaj", "[ViewTwoDimDenseRowMaj]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t S = 3*2;
     std::array<double, S> data = {1,2,3,4,5,6};
 
@@ -174,8 +164,6 @@ TEST_CASE("ViewTwoDimDenseRowMaj", "[ViewTwoDimDenseRowMaj]")
 
 TEST_CASE("ViewThreeDimDenseLayMaj", "[ViewThreeDimDenseLayMaj]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 3;
     constexpr size_t N = 2;
     constexpr size_t K = 2;
@@ -214,8 +202,6 @@ TEST_CASE("ViewThreeDimDenseLayMaj", "[ViewThreeDimDenseLayMaj]")
 
 TEST_CASE("View Three Diminsional Dense Column Major Padded", "[ViewThreeDimDenseColMajPadded]")
 {
-    using namespace QuICC::Memory;
-
     constexpr size_t M = 3;
     constexpr size_t N = 2;
     constexpr size_t K = 2;

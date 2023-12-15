@@ -19,7 +19,7 @@ using QuICC::Patch::std::span;
 
 namespace QuICC {
 /// @brief This namespace provides all the View related code
-namespace Memory {
+namespace View {
 
    /// @brief Generic template for a View
    /// @tparam Scalar element type
@@ -81,5 +81,5 @@ namespace Memory {
       QUICC_CUDA_HOSTDEV constexpr Scalar* data() const {return _data;}
    };
 
-} // namespace Memory
+} // namespace View
 } // namespace QuICC

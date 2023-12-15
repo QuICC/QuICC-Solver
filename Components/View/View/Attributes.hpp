@@ -16,7 +16,7 @@
 //
 
 namespace QuICC {
-namespace Memory {
+namespace View {
 
    //
    // Level types tags
@@ -560,7 +560,5 @@ namespace Memory {
       LoopOrderType<j_t, i_t, k_t>>;
 
 
-
-
-} // namespace Memory
+} // namespace View
 } // namespave QuICC

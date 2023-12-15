@@ -27,7 +27,6 @@ namespace Poly {
 namespace Worland {
 namespace Reductor {
 
-using namespace QuICC::Memory;
 template <class Impl>
 class @Op@;
 
@@ -101,19 +100,19 @@ private:
 
     // Uniform truncation
     #ifdef QUICC_JW_ROW_MAJOR
-    using mods_t = View<std::complex<double>, DCCSC3DJIK>;
-    using phys_t = View<std::complex<double>, DCCSC3DJIK>;
-    using physAbs_t = View<double, DCCSC3DJIK>;
-    using modsAbs_t = View<double, DCCSC3DJIK>;
-    using modsRed_t = View<double, CSC>;
-    using op_t = View<double, @OpAttribute@>;
+    using mods_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using physAbs_t = View::View<double, View::DCCSC3DJIK>;
+    using modsAbs_t = View::View<double, View::DCCSC3DJIK>;
+    using modsRed_t = View::View<double, View::CSC>;
+    using op_t = View::View<double, View::@OpAttribute@>;
     #else
-    using mods_t = View<std::complex<double>, DCCSC3D>;
-    using phys_t = View<std::complex<double>, DCCSC3D>;
-    using physAbs_t = View<double, DCCSC3D>;
-    using modsAbs_t = View<double, DCCSC3D>;
-    using modsRed_t = View<double, CSC>;
-    using op_t = View<double, @OpAttribute@JIK>;
+    using mods_t = View::View<std::complex<double>, View::DCCSC3D>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3D>;
+    using physAbs_t = View::View<double, View::DCCSC3D>;
+    using modsAbs_t = View::View<double, View::DCCSC3D>;
+    using modsRed_t = View::View<double, View::CSC>;
+    using op_t = View::View<double, View::@OpAttribute@JIK>;
     #endif
 
     /// @brief Projector backend class pointer

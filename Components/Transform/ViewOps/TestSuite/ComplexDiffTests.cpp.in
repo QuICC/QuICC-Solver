@@ -6,7 +6,7 @@
 #include "ViewOps/Fourier/Complex/Diff.hpp"
 @Header@
 
-using namespace QuICC::Memory;
+using namespace QuICC::View;
 using namespace QuICC::Transform::Fourier;
 
 using mods_t = View<std::complex<double>, DCCSC3DInOrder>;

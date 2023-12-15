@@ -26,6 +26,7 @@ namespace Cuda {
 namespace details
 {
     using namespace QuICC::Transform::Quadrature::Cuda;
+    using namespace QuICC::View;
 
     /// cuda kernel of batched matmul with varying sizes
     template<class Tout, class Tin, class Top, std::uint16_t Treatment = 0>
@@ -99,6 +100,7 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in, cons
 
     using IndexType = typename Tin::IndexType;
     using namespace QuICC::Memory;
+    using namespace QuICC::View;
 
     // setup offsets
     if (_layerIndex.data() == nullptr)

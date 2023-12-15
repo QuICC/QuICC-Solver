@@ -145,6 +145,8 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
     std::array<std::uint32_t, rank> physDims = {M, N, P};
     mPhysFlat.resize(M * nCols);
 
+    using namespace QuICC::View;
+
     @SetDataViews@
     @SetPowerView@
     @SetReductorView@

@@ -21,15 +21,12 @@ namespace Reduction {
 /// @brief namespace for cpu backends
 namespace Cpu {
 
-using namespace QuICC::Operator;
-
-
 /// @brief Reduction operator
 /// @tparam Tout n dimensional view
 /// @tparam Tin  n-1 dimensional view
 /// @tparam Dir axis to perform reduction on
 template <class Tout, class Tin, std::uint32_t Dir>
-class Op : public UnaryBaseOp<Op<Tout, Tin, Dir>, Tout, Tin>
+class Op : public Operator::UnaryBaseOp<Op<Tout, Tin, Dir>, Tout, Tin>
 {
 public:
    /// @brief default constructor
@@ -47,7 +44,7 @@ private:
    /// @param in input modes
    // void applyImpl(Tout& out, Tin& in);
    /// @brief give access to base class
-   friend UnaryBaseOp<Op<Tout, Tin, Dir>, Tout, Tin>;
+   friend Operator::UnaryBaseOp<Op<Tout, Tin, Dir>, Tout, Tin>;
 };
 
 template <class Tout, class Tin, std::uint32_t Dir>
@@ -55,7 +52,7 @@ void Op<Tout, Tin, Dir>::applyImpl(Tout& out, const Tin& in)
 {
    Profiler::RegionFixture<4> fix("Reduction::Cpu::applyImpl");
 
-   using namespace QuICC::Memory;
+   using namespace QuICC::View;
 
    // check types consistency
    static_assert(out.rank() == in.rank() - 1, "input/output rank mismatch");

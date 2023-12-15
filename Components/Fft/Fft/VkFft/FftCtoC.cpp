@@ -18,7 +18,7 @@ namespace Fft {
 namespace VkFft {
 
 template<class AttIn, class AttOut>
-FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>::~FftOp()
+FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>::~FftOp()
 {
     // Destroy plan
     if(_plan != nullptr)
@@ -36,10 +36,10 @@ namespace details
     {
         // Create the complex to complex plan
         VkFFTApplication* plan = new VkFFTApplication();
-        
+
         VkFFTConfiguration configuration = VKFFT_ZERO_INIT;
         configuration.FFTdim = 1;
-        
+
         FILE* kernelCache;
         uint64_t str_len;
         char fname[500];
@@ -79,22 +79,22 @@ namespace details
 
         CUresult err = CUDA_SUCCESS;
         err = cuInit(0);
-        if (err != CUDA_SUCCESS) 
+        if (err != CUDA_SUCCESS)
         {
             throw  std::logic_error("CUDA failed! error code: "+std::to_string(err) );
         }
         configuration.device = (CUdevice*) calloc(1, sizeof(CUdevice));
         err = cuDeviceGet (configuration.device, 0); //need to fix id for multi-GPU/node systems
-        if (err != CUDA_SUCCESS) 
+        if (err != CUDA_SUCCESS)
         {
             throw  std::logic_error("CUDA failed! error code: "+std::to_string(err) );
         }
-	
+
         VkFFTResult resFFT = initializeVkFFT(plan, configuration);
-        
+
         if (configuration.loadApplicationFromString)
 		    free(configuration.loadApplicationString);
-        
+
         if (configuration.saveApplicationToString) {
             kernelCache = fopen(fname, "wb");
             fwrite(plan->saveApplicationString, plan->applicationStringSize, 1, kernelCache);
@@ -111,8 +111,9 @@ namespace details
 }
 
 template<class AttIn, class AttOut>
-void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>::applyImpl(View<std::complex<double>, AttOut>& phys, const View<std::complex<double>, AttIn>& mods)
+void FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>::applyImpl(View::View<std::complex<double>, AttOut>& phys, const View::View<std::complex<double>, AttIn>& mods)
 {
+    using namespace QuICC::View;
     if(_plan == nullptr)
     {
         Profiler::RegionFixture<5> fix("FftOp::initFft");
@@ -136,13 +137,13 @@ void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>
         _plan = details::setPlanCtoC(phys.dims()[0], columns);
     }
     Profiler::RegionFixture<5> fix("FftOp::applyFft");
-    
+
     VkFFTLaunchParams launchParams = VKFFT_ZERO_INIT;
     void* inputData = mods.data();
     void* outputData = phys.data();
     launchParams.inputBuffer = &inputData;
     launchParams.buffer = &outputData;
-    VkFFTResult resFFT = VkFFTAppend((VkFFTApplication*)_plan, 1, &launchParams);  
+    VkFFTResult resFFT = VkFFTAppend((VkFFTApplication*)_plan, 1, &launchParams);
     if(resFFT != VKFFT_SUCCESS)
     {
         std::string str(getVkFFTErrorString(resFFT));

@@ -16,7 +16,7 @@
 #include "View/View.hpp"
 
 namespace QuICC {
-namespace Memory {
+namespace View {
 
 /// @brief compute storage requirements of view
 /// @tparam ViewType, either dense or compressed
@@ -101,5 +101,5 @@ std::array<std::size_t, 4> memBlockOffsets(ViewType v)
    return offsets;
 }
 
-} // namespace Memory
+} // namespace View
 } // namespace QuICC

@@ -20,6 +20,8 @@ namespace Fourier {
 namespace @Space@ {
 namespace @Kind@ {
 
+using namespace QuICC::View;
+
 void @Op@<@Tag@>::initBackend() const
 {
     auto bwdSize = mspSetup->bwdSize();

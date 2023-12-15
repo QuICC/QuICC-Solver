@@ -15,48 +15,44 @@ namespace Worland {
 /// @brief namespace for uniform truncation
 namespace Uniform {
 
-using namespace Memory;
-
 /// @brief mode coefficients view with column major layout (in a layer)
-using mods_t = View<std::complex<double>, DCCSC3D>;
+using mods_t = View::View<std::complex<double>, View::DCCSC3D>;
 /// @brief mode coefficients view with row major layout (in a layer)
-using modsRM_t = View<std::complex<double>, DCCSC3DJIK>;
+using modsRM_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
 /// @brief physical coefficients view with column major layout (in a layer)
-using phys_t = View<std::complex<double>, DCCSC3D>;
+using phys_t = View::View<std::complex<double>, View::DCCSC3D>;
 /// @brief physical coefficients view with row major layout (in a layer)
-using physRM_t = View<std::complex<double>, DCCSC3DJIK>;
+using physRM_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
 /// @brief projector view with column major layout (in a layer)
-using proj_t = View<double, CSL3D>;
+using proj_t = View::View<double, View::CSL3D>;
 /// @brief projector view with row major layout (in a layer)
-using projRM_t = View<double, CSL3DJIK>;
+using projRM_t = View::View<double, View::CSL3DJIK>;
 /// @brief projector view with column major layout (in a layer)
-using int_t = View<double, CSL3D>;
+using int_t = View::View<double, View::CSL3D>;
 /// @brief projector view with row major layout (in a layer)
-using intRM_t = View<double, CSL3DJIK>;
+using intRM_t = View::View<double, View::CSL3DJIK>;
 
 } // namespace Uniform
 
 /// @brief namespace for triangular/trapezoidal truncation
 namespace Triangular {
 
-using namespace Memory;
-
 /// @brief mode coefficients view with column major layout (in a layer)
-using mods_t = View<std::complex<double>, S2CLCSC3D>;
+using mods_t = View::View<std::complex<double>, View::S2CLCSC3D>;
 /// @brief mode coefficients view with row major layout (in a layer)
-using modsRM_t = View<std::complex<double>, S2CLCSC3DJIK>;
+using modsRM_t = View::View<std::complex<double>, View::S2CLCSC3DJIK>;
 /// @brief physical coefficients view with column major layout (in a layer)
-using phys_t = View<std::complex<double>, DCCSC3D>;
+using phys_t = View::View<std::complex<double>, View::DCCSC3D>;
 /// @brief physical coefficients view with row major layout (in a layer)
-using physRM_t = View<std::complex<double>, DCCSC3DJIK>;
+using physRM_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
 /// @brief projector view with column major layout (in a layer)
-using proj_t = View<double, CS2RL3D>;
+using proj_t = View::View<double, View::CS2RL3D>;
 /// @brief projector view with row major layout (in a layer)
-using projRM_t = View<double, CS2RL3DJIK>;
+using projRM_t = View::View<double, View::CS2RL3DJIK>;
 /// @brief projector view with column major layout (in a layer)
-using int_t = View<double, S2CLCSC3D>;
+using int_t = View::View<double, View::S2CLCSC3D>;
 /// @brief projector view with row major layout (in a layer)
-using intRM_t = View<double, S2CLCSC3DJIK>;
+using intRM_t = View::View<double, View::S2CLCSC3DJIK>;
 
 } // namespace Triangular
 

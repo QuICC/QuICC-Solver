@@ -18,7 +18,7 @@
 
 
 namespace QuICC {
-namespace Memory {
+namespace View {
 
 /// @brief Map in-order index (complex DFT) [-N...N] -> [0...N,-N...-1]
 /// with padding
@@ -49,5 +49,5 @@ inline QUICC_CUDA_HOST IndexType mapInOrderIndex(const IndexType i,
    return mapInOrderIndex(i, N, N);
 }
 
-} // namespace Memory
+} // namespace View
 } // namespace QuICC
