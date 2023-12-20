@@ -3,21 +3,12 @@
  * @brief Source of the CFL constraint wrapper in a spherical geometry
  */
 
-// Debug includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Diagnostics/ISphericalCflWrapper.hpp"
-
 // Project includes
 //
+#include "QuICC/Diagnostics/ISphericalCflWrapper.hpp"
 #include "QuICC/NonDimensional/CflTorsional.hpp"
 #include "QuICC/NonDimensional/CflInertial.hpp"
 #include "QuICC/NonDimensional/CflAlfvenDamping.hpp"
@@ -75,10 +66,6 @@ namespace Diagnostics {
          this->mGlobalCfl(iCfl) = params.find(NonDimensional::CflTorsional::id())->second->value();
          iCfl++;
       }
-   }
-
-   ISphericalCflWrapper::~ISphericalCflWrapper()
-   {
    }
 
    void ISphericalCflWrapper::init(const std::vector<Array>& mesh)

@@ -554,10 +554,18 @@ namespace Solver {
          {
             if(fIt.second == FieldComponents::Spectral::SCALAR)
             {
-               std::visit([&](auto&& p){Equations::addExplicitTerm(*spEq, opId, id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), fIt, p->dom(0).perturbation(), i);}, scalVar.find(fIt.first)->second);
+               std::visit(
+                     [&](auto&& p)
+                     {
+                        Equations::addExplicitTerm(*spEq, opId, id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), fIt, p->dom(0).perturbation(), i);
+                     }, scalVar.find(fIt.first)->second);
             } else
             {
-               std::visit([&](auto&& p){Equations::addExplicitTerm(*spEq, opId, id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), fIt, p->dom(0).perturbation().comp(fIt.second), i);}, vectVar.find(fIt.first)->second);
+               std::visit(
+                     [&](auto&& p)
+                     {
+                        Equations::addExplicitTerm(*spEq, opId, id.second, (*solveIt)->rRHSData(i), (*solveIt)->startRow(id,i), fIt, p->dom(0).perturbation().comp(fIt.second), i);
+                     }, vectVar.find(fIt.first)->second);
             }
          }
       }

@@ -3,21 +3,12 @@
  * @brief Source of the CFL constraint wrapper in a full sphere
  */
 
-// Debug includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Diagnostics/SphereCflWrapper.hpp"
-
 // Project includes
 //
+#include "QuICC/Diagnostics/SphereCflWrapper.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 
 namespace QuICC {
@@ -31,10 +22,6 @@ namespace Diagnostics {
 
    SphereCflWrapper::SphereCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic, const std::map<std::size_t,NonDimensional::SharedINumber>& params)
       : ISphericalCflWrapper(spVelocity, spMagnetic, params)
-   {
-   }
-
-   SphereCflWrapper::~SphereCflWrapper()
    {
    }
 

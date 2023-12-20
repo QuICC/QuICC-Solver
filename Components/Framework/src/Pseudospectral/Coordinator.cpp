@@ -317,6 +317,8 @@ namespace Pseudospectral {
 
    void Coordinator::updateSpectral(const bool isTrivial, const bool isDiagnostic, const bool isPrognostic, const bool isWrapper, const int it)
    {
+      /// \todo This needs to be checked as it currently doesn't do anything
+
       std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel> kernels;
 
       // Get kernels from trivial equations
@@ -811,7 +813,9 @@ namespace Pseudospectral {
 
    void Coordinator::preSolveEquations()
    {
-#warning "THIS NEEDS TO BE CHECK"
+      /// \todo No models are currently requiring a preSolve stage (only some cartesian models did).
+      /// Implementation needs to be checked
+
       StageTimer stage;
       stage.start("initializing fields");
 
