@@ -14,7 +14,7 @@ class TransformWorlandTests_Poly_P_kokkos_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__)
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformWorlandTests_Poly_P_kokkos_t_integrator(splitTestTransform):
@@ -25,7 +25,7 @@ class TransformWorlandTests_Poly_P_kokkos_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__)
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformWorlandTests_Poly_P_viewGpu_t_projector(splitTestTransform):
@@ -36,7 +36,7 @@ class TransformWorlandTests_Poly_P_viewGpu_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__)
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformWorlandTests_Poly_P_viewGpu_t_integrator(splitTestTransform):
@@ -47,7 +47,7 @@ class TransformWorlandTests_Poly_P_viewGpu_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__)
+        self.read_references("gpu.json", self.__class__.__name__)
 
 #
 # Associated Legendre with cpu <-> gpu copy
@@ -62,7 +62,7 @@ class TransformALegendreTests_Poly_P_kokkos_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__)
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformALegendreTests_Poly_P_viewGpu_t_projector(splitTestTransform):
@@ -73,7 +73,7 @@ class TransformALegendreTests_Poly_P_viewGpu_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__)
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformALegendreTests_Poly_LlDivS1Dp_kokkos_t_projector(splitTestTransform):
@@ -84,7 +84,7 @@ class TransformALegendreTests_Poly_LlDivS1Dp_kokkos_t_projector(splitTestTransfo
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__)
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformALegendreTests_Poly_LlDivS1Dp_viewGpu_t_projector(splitTestTransform):
@@ -95,7 +95,7 @@ class TransformALegendreTests_Poly_LlDivS1Dp_viewGpu_t_projector(splitTestTransf
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__)
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformALegendreTests_Poly_P_kokkos_t_integrator(splitTestTransform):
@@ -106,7 +106,7 @@ class TransformALegendreTests_Poly_P_kokkos_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__)
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformALegendreTests_Poly_P_viewGpu_t_integrator(splitTestTransform):
@@ -117,7 +117,7 @@ class TransformALegendreTests_Poly_P_viewGpu_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__)
+        self.read_references("gpu.json", self.__class__.__name__)
 
 #
 # Fourier with cpu <-> gpu copy
@@ -132,7 +132,7 @@ class TransformFourierTests_Mixed_P_viewGpu_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_P_viewGpuVkFFT_t_projector(splitTestTransform):
@@ -143,7 +143,7 @@ class TransformFourierTests_Mixed_P_viewGpuVkFFT_t_projector(splitTestTransform)
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_D1_viewGpu_t_projector(splitTestTransform):
@@ -154,7 +154,7 @@ class TransformFourierTests_Mixed_D1_viewGpu_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_D1_viewGpuVkFFT_t_projector(splitTestTransform):
@@ -165,7 +165,7 @@ class TransformFourierTests_Mixed_D1_viewGpuVkFFT_t_projector(splitTestTransform
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_P_viewGpu_t_integrator(splitTestTransform):
@@ -176,7 +176,7 @@ class TransformFourierTests_Mixed_P_viewGpu_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_P_viewGpuVkFFT_t_integrator(splitTestTransform):
@@ -187,7 +187,7 @@ class TransformFourierTests_Mixed_P_viewGpuVkFFT_t_integrator(splitTestTransform
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_D1_viewGpu_t_integrator(splitTestTransform):
@@ -198,7 +198,7 @@ class TransformFourierTests_Mixed_D1_viewGpu_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_D1_viewGpuVkFFT_t_integrator(splitTestTransform):
@@ -209,5 +209,5 @@ class TransformFourierTests_Mixed_D1_viewGpuVkFFT_t_integrator(splitTestTransfor
         """ Initiallize references
         """
 
-        self.read_references("daint_hybrid_gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
 

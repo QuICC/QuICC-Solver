@@ -6,6 +6,11 @@
           "applyOperatorsAvg": 0.00162,
           "applyOperatorsMin": 0.00158,
           "applyOperatorsMax": 0.00171
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00174299,
+          "applyOperatorsMin": 0.00170722,
+          "applyOperatorsMax": 0.00182526
         }
       },
       "4608": {
@@ -13,6 +18,11 @@
           "applyOperatorsAvg": 0.00241,
           "applyOperatorsMin": 0.00238,
           "applyOperatorsMax": 0.0025
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00308665,
+          "applyOperatorsMin": 0.0030012,
+          "applyOperatorsMax": 0.00319267
         }
       },
       "2304": {
@@ -20,6 +30,11 @@
           "applyOperatorsAvg": 0.00472,
           "applyOperatorsMin": 0.00466,
           "applyOperatorsMax": 0.00477
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00612499,
+          "applyOperatorsMin": 0.00603103,
+          "applyOperatorsMax": 0.00632364
         }
       },
       "1152": {
@@ -27,6 +42,11 @@
           "applyOperatorsAvg": 0.00664,
           "applyOperatorsMin": 0.00657,
           "applyOperatorsMax": 0.0068
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.010115,
+          "applyOperatorsMin": 0.00997464,
+          "applyOperatorsMax": 0.0103887
         }
       },
       "576": {
@@ -34,6 +54,11 @@
           "applyOperatorsAvg": 0.0137,
           "applyOperatorsMin": 0.0134,
           "applyOperatorsMax": 0.0148
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0203137,
+          "applyOperatorsMin": 0.0201777,
+          "applyOperatorsMax": 0.0209841
         }
       },
       "288": {
@@ -41,6 +66,11 @@
           "applyOperatorsAvg": 0.0228,
           "applyOperatorsMin": 0.0224,
           "applyOperatorsMax": 0.0235
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0357103,
+          "applyOperatorsMin": 0.0355946,
+          "applyOperatorsMax": 0.0361617
         }
       },
       "96": {
@@ -57,6 +87,11 @@
           "applyOperatorsAvg": 0.000144,
           "applyOperatorsMin": 0.00014,
           "applyOperatorsMax": 0.000215
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000148979,
+          "applyOperatorsMin": 0.000146324,
+          "applyOperatorsMax": 0.000173459
         }
       },
       "4608": {
@@ -64,6 +99,11 @@
           "applyOperatorsAvg": 0.000199,
           "applyOperatorsMin": 0.000194,
           "applyOperatorsMax": 0.000249
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000224359,
+          "applyOperatorsMin": 0.000220191,
+          "applyOperatorsMax": 0.000260725
         }
       },
       "2304": {
@@ -71,6 +111,11 @@
           "applyOperatorsAvg": 0.00044,
           "applyOperatorsMin": 0.000431,
           "applyOperatorsMax": 0.000512
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000481456,
+          "applyOperatorsMin": 0.000469895,
+          "applyOperatorsMax": 0.000560651
         }
       },
       "1152": {
@@ -78,6 +123,11 @@
           "applyOperatorsAvg": 0.00064,
           "applyOperatorsMin": 0.000611,
           "applyOperatorsMax": 0.000788
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000776056,
+          "applyOperatorsMin": 0.000764138,
+          "applyOperatorsMax": 0.000841469
         }
       },
       "576": {
@@ -85,6 +135,11 @@
           "applyOperatorsAvg": 0.00129,
           "applyOperatorsMin": 0.00125,
           "applyOperatorsMax": 0.00146
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00150253,
+          "applyOperatorsMin": 0.0014799,
+          "applyOperatorsMax": 0.00156324
         }
       },
       "288": {
@@ -92,6 +147,11 @@
           "applyOperatorsAvg": 0.00179,
           "applyOperatorsMin": 0.00174,
           "applyOperatorsMax": 0.00205
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00254714,
+          "applyOperatorsMin": 0.0025009,
+          "applyOperatorsMax": 0.00261005
         }
       },
       "96": {
@@ -110,6 +170,11 @@
           "applyOperatorsAvg": 0.00174,
           "applyOperatorsMin": 0.00165,
           "applyOperatorsMax": 0.0019
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00236169,
+          "applyOperatorsMin": 0.00195878,
+          "applyOperatorsMax": 0.00318914
         }
       },
       "4608": {
@@ -117,6 +182,11 @@
           "applyOperatorsAvg": 0.0028,
           "applyOperatorsMin": 0.00271,
           "applyOperatorsMax": 0.00289
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00326522,
+          "applyOperatorsMin": 0.0032081,
+          "applyOperatorsMax": 0.00342486
         }
       },
       "2304": {
@@ -124,6 +194,11 @@
           "applyOperatorsAvg": 0.00496,
           "applyOperatorsMin": 0.00485,
           "applyOperatorsMax": 0.00512
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00678442,
+          "applyOperatorsMin": 0.00670846,
+          "applyOperatorsMax": 0.00703787
         }
       },
       "1152": {
@@ -131,6 +206,11 @@
           "applyOperatorsAvg": 0.00779,
           "applyOperatorsMin": 0.00746,
           "applyOperatorsMax": 0.00831
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0106157,
+          "applyOperatorsMin": 0.0105011,
+          "applyOperatorsMax": 0.0109414
         }
       },
       "576": {
@@ -138,6 +218,11 @@
           "applyOperatorsAvg": 0.0147,
           "applyOperatorsMin": 0.0143,
           "applyOperatorsMax": 0.0158
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0211004,
+          "applyOperatorsMin": 0.0210135,
+          "applyOperatorsMax": 0.0216396
         }
       },
       "288": {
@@ -145,6 +230,11 @@
           "applyOperatorsAvg": 0.0255,
           "applyOperatorsMin": 0.0251,
           "applyOperatorsMax": 0.0265
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0374581,
+          "applyOperatorsMin": 0.0373023,
+          "applyOperatorsMax": 0.0378615
         }
       },
       "96": {
@@ -161,6 +251,11 @@
           "applyOperatorsAvg": 0.000154,
           "applyOperatorsMin": 0.000149,
           "applyOperatorsMax": 0.000204
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000170238,
+          "applyOperatorsMin": 0.000166828,
+          "applyOperatorsMax": 0.000200008
         }
       },
       "4608": {
@@ -168,6 +263,11 @@
           "applyOperatorsAvg": 0.000205,
           "applyOperatorsMin": 0.000198,
           "applyOperatorsMax": 0.000262
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000232774,
+          "applyOperatorsMin": 0.000228012,
+          "applyOperatorsMax": 0.000280293
         }
       },
       "2304": {
@@ -175,6 +275,11 @@
           "applyOperatorsAvg": 0.000453,
           "applyOperatorsMin": 0.00044,
           "applyOperatorsMax": 0.000542
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00050514,
+          "applyOperatorsMin": 0.000496441,
+          "applyOperatorsMax": 0.000567633
         }
       },
       "1152": {
@@ -182,6 +287,11 @@
           "applyOperatorsAvg": 0.000674,
           "applyOperatorsMin": 0.000632,
           "applyOperatorsMax": 0.000831
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000822952,
+          "applyOperatorsMin": 0.000807024,
+          "applyOperatorsMax": 0.000900205
         }
       },
       "576": {
@@ -189,6 +299,11 @@
           "applyOperatorsAvg": 0.00145,
           "applyOperatorsMin": 0.00142,
           "applyOperatorsMax": 0.0016
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00163983,
+          "applyOperatorsMin": 0.00161466,
+          "applyOperatorsMax": 0.00169757
         }
       },
       "288": {
@@ -196,6 +311,11 @@
           "applyOperatorsAvg": 0.00188,
           "applyOperatorsMin": 0.00183,
           "applyOperatorsMax": 0.00216
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00267127,
+          "applyOperatorsMin": 0.00262973,
+          "applyOperatorsMax": 0.00293372
         }
       },
       "96": {
@@ -214,6 +334,11 @@
           "applyOperatorsAvg": 0.00223,
           "applyOperatorsMin": 0.00219,
           "applyOperatorsMax": 0.00231
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00238333,
+          "applyOperatorsMin": 0.00234463,
+          "applyOperatorsMax": 0.00244225
         }
       },
       "4608": {
@@ -221,6 +346,11 @@
           "applyOperatorsAvg": 0.00344,
           "applyOperatorsMin": 0.00337,
           "applyOperatorsMax": 0.00358
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00432049,
+          "applyOperatorsMin": 0.00427146,
+          "applyOperatorsMax": 0.00439748
         }
       },
       "2304": {
@@ -228,6 +358,11 @@
           "applyOperatorsAvg": 0.0068,
           "applyOperatorsMin": 0.00669,
           "applyOperatorsMax": 0.0069
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00848401,
+          "applyOperatorsMin": 0.00840526,
+          "applyOperatorsMax": 0.00864726
         }
       },
       "1152": {
@@ -235,6 +370,11 @@
           "applyOperatorsAvg": 0.0102,
           "applyOperatorsMin": 0.0101,
           "applyOperatorsMax": 0.0103
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0136226,
+          "applyOperatorsMin": 0.0135054,
+          "applyOperatorsMax": 0.0138194
         }
       },
       "576": {
@@ -242,6 +382,11 @@
           "applyOperatorsAvg": 0.0186,
           "applyOperatorsMin": 0.0184,
           "applyOperatorsMax": 0.019
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0270977,
+          "applyOperatorsMin": 0.0267156,
+          "applyOperatorsMax": 0.0274506
         }
       },
       "288": {
@@ -249,6 +394,11 @@
           "applyOperatorsAvg": 0.0325,
           "applyOperatorsMin": 0.0322,
           "applyOperatorsMax": 0.0332
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0503401,
+          "applyOperatorsMin": 0.0500075,
+          "applyOperatorsMax": 0.0508742
         }
       },
       "96": {
@@ -265,6 +415,11 @@
           "applyOperatorsAvg": 0.000197,
           "applyOperatorsMin": 0.000192,
           "applyOperatorsMax": 0.000309
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000186985,
+          "applyOperatorsMin": 0.000183471,
+          "applyOperatorsMax": 0.000224449
         }
       },
       "4608": {
@@ -272,6 +427,11 @@
           "applyOperatorsAvg": 0.000254,
           "applyOperatorsMin": 0.000245,
           "applyOperatorsMax": 0.000316
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000278929,
+          "applyOperatorsMin": 0.000277207,
+          "applyOperatorsMax": 0.000316916
         }
       },
       "2304": {
@@ -279,6 +439,11 @@
           "applyOperatorsAvg": 0.000587,
           "applyOperatorsMin": 0.000574,
           "applyOperatorsMax": 0.000682
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000577838,
+          "applyOperatorsMin": 0.000569124,
+          "applyOperatorsMax": 0.000631326
         }
       },
       "1152": {
@@ -286,6 +451,11 @@
           "applyOperatorsAvg": 0.000841,
           "applyOperatorsMin": 0.000821,
           "applyOperatorsMax": 0.000998
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00096874,
+          "applyOperatorsMin": 0.000954792,
+          "applyOperatorsMax": 0.00104165
         }
       },
       "576": {
@@ -293,6 +463,11 @@
           "applyOperatorsAvg": 0.00175,
           "applyOperatorsMin": 0.0017,
           "applyOperatorsMax": 0.00208
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00195376,
+          "applyOperatorsMin": 0.00191595,
+          "applyOperatorsMax": 0.00213908
         }
       },
       "288": {
@@ -300,6 +475,11 @@
           "applyOperatorsAvg": 0.00271,
           "applyOperatorsMin": 0.00266,
           "applyOperatorsMax": 0.00286
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00337565,
+          "applyOperatorsMin": 0.00332055,
+          "applyOperatorsMax": 0.00361666
         }
       },
       "96": {
@@ -318,6 +498,11 @@
           "applyOperatorsAvg": 0.00224,
           "applyOperatorsMin": 0.00221,
           "applyOperatorsMax": 0.00231
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00234263,
+          "applyOperatorsMin": 0.00230275,
+          "applyOperatorsMax": 0.00237448
         }
       },
       "4608": {
@@ -325,6 +510,11 @@
           "applyOperatorsAvg": 0.00329,
           "applyOperatorsMin": 0.00325,
           "applyOperatorsMax": 0.00332
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00402318,
+          "applyOperatorsMin": 0.00400707,
+          "applyOperatorsMax": 0.00407596
         }
       },
       "2304": {
@@ -332,6 +522,11 @@
           "applyOperatorsAvg": 0.00653,
           "applyOperatorsMin": 0.00639,
           "applyOperatorsMax": 0.00669
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00836813,
+          "applyOperatorsMin": 0.00811575,
+          "applyOperatorsMax": 0.00858052
         }
       },
       "1152": {
@@ -339,6 +534,11 @@
           "applyOperatorsAvg": 0.00951,
           "applyOperatorsMin": 0.00944,
           "applyOperatorsMax": 0.00963
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0139812,
+          "applyOperatorsMin": 0.0138704,
+          "applyOperatorsMax": 0.0141775
         }
       },
       "576": {
@@ -346,6 +546,11 @@
           "applyOperatorsAvg": 0.019,
           "applyOperatorsMin": 0.0185,
           "applyOperatorsMax": 0.0198
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0286046,
+          "applyOperatorsMin": 0.028246,
+          "applyOperatorsMax": 0.0297091
         }
       },
       "288": {
@@ -353,6 +558,11 @@
           "applyOperatorsAvg": 0.0336,
           "applyOperatorsMin": 0.0332,
           "applyOperatorsMax": 0.0349
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0521962,
+          "applyOperatorsMin": 0.0520088,
+          "applyOperatorsMax": 0.0527255
         }
       },
       "96": {
@@ -369,6 +579,11 @@
           "applyOperatorsAvg": 0.000198,
           "applyOperatorsMin": 0.000196,
           "applyOperatorsMax": 0.000234
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000195615,
+          "applyOperatorsMin": 0.000192481,
+          "applyOperatorsMax": 0.000236071
         }
       },
       "4608": {
@@ -376,6 +591,11 @@
           "applyOperatorsAvg": 0.000274,
           "applyOperatorsMin": 0.000265,
           "applyOperatorsMax": 0.000387
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000290909,
+          "applyOperatorsMin": 0.000285889,
+          "applyOperatorsMax": 0.000367521
         }
       },
       "2304": {
@@ -383,6 +603,11 @@
           "applyOperatorsAvg": 0.000569,
           "applyOperatorsMin": 0.000557,
           "applyOperatorsMax": 0.000687
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000604506,
+          "applyOperatorsMin": 0.000595446,
+          "applyOperatorsMax": 0.000691125
         }
       },
       "1152": {
@@ -390,6 +615,11 @@
           "applyOperatorsAvg": 0.000867,
           "applyOperatorsMin": 0.000837,
           "applyOperatorsMax": 0.000992
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00101217,
+          "applyOperatorsMin": 0.000997913,
+          "applyOperatorsMax": 0.00107257
         }
       },
       "576": {
@@ -397,6 +627,11 @@
           "applyOperatorsAvg": 0.00176,
           "applyOperatorsMin": 0.00173,
           "applyOperatorsMax": 0.00192
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00204251,
+          "applyOperatorsMin": 0.00200923,
+          "applyOperatorsMax": 0.00215606
         }
       },
       "288": {
@@ -404,6 +639,11 @@
           "applyOperatorsAvg": 0.00269,
           "applyOperatorsMin": 0.00264,
           "applyOperatorsMax": 0.0029
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0035032,
+          "applyOperatorsMin": 0.00344443,
+          "applyOperatorsMax": 0.00379468
         }
       },
       "96": {
@@ -422,6 +662,11 @@
           "transformAvg": 0.00306,
           "transformMin": 0.00299,
           "transformMax": 0.00311
+        },
+        "haswell": {
+          "transformAvg": 0.00337022,
+          "transformMin": 0.00331431,
+          "transformMax": 0.0035196
         }
       },
       "4608": {
@@ -429,6 +674,11 @@
           "transformAvg": 0.00535,
           "transformMin": 0.00525,
           "transformMax": 0.00551
+        },
+        "haswell": {
+          "transformAvg": 0.00611133,
+          "transformMin": 0.0060635,
+          "transformMax": 0.00622146
         }
       },
       "2304": {
@@ -436,6 +686,11 @@
           "transformAvg": 0.0108,
           "transformMin": 0.0107,
           "transformMax": 0.011
+        },
+        "haswell": {
+          "transformAvg": 0.0120601,
+          "transformMin": 0.0119692,
+          "transformMax": 0.0121313
         }
       },
       "1152": {
@@ -443,6 +698,11 @@
           "transformAvg": 0.0231,
           "transformMin": 0.0229,
           "transformMax": 0.0232
+        },
+        "haswell": {
+          "transformAvg": 0.0266983,
+          "transformMin": 0.026551,
+          "transformMax": 0.0273992
         }
       },
       "576": {
@@ -450,6 +710,11 @@
           "transformAvg": 0.0568,
           "transformMin": 0.0565,
           "transformMax": 0.0574
+        },
+        "haswell": {
+          "transformAvg": 0.0615647,
+          "transformMin": 0.0610726,
+          "transformMax": 0.0647882
         }
       },
       "288": {
@@ -457,6 +722,11 @@
           "transformAvg": 0.12,
           "transformMin": 0.119,
           "transformMax": 0.121
+        },
+        "haswell": {
+          "transformAvg": 0.131109,
+          "transformMin": 0.130466,
+          "transformMax": 0.134802
         }
       },
       "96": {
@@ -473,6 +743,11 @@
           "transformAvg": 0.000502,
           "transformMin": 0.000486,
           "transformMax": 0.000625
+        },
+        "haswell": {
+          "transformAvg": 0.000512203,
+          "transformMin": 0.000506161,
+          "transformMax": 0.000554003
         }
       },
       "4608": {
@@ -480,6 +755,11 @@
           "transformAvg": 0.000807,
           "transformMin": 0.000778,
           "transformMax": 0.000997
+        },
+        "haswell": {
+          "transformAvg": 0.000783046,
+          "transformMin": 0.000772995,
+          "transformMax": 0.000823354
         }
       },
       "2304": {
@@ -487,6 +767,11 @@
           "transformAvg": 0.00138,
           "transformMin": 0.00132,
           "transformMax": 0.00163
+        },
+        "haswell": {
+          "transformAvg": 0.00134328,
+          "transformMin": 0.00132742,
+          "transformMax": 0.00137707
         }
       },
       "1152": {
@@ -494,6 +779,11 @@
           "transformAvg": 0.00253,
           "transformMin": 0.00245,
           "transformMax": 0.00283
+        },
+        "haswell": {
+          "transformAvg": 0.00248936,
+          "transformMin": 0.00245952,
+          "transformMax": 0.00254567
         }
       },
       "576": {
@@ -501,6 +791,11 @@
           "transformAvg": 0.00508,
           "transformMin": 0.00494,
           "transformMax": 0.00544
+        },
+        "haswell": {
+          "transformAvg": 0.00503282,
+          "transformMin": 0.00498827,
+          "transformMax": 0.00513574
         }
       },
       "288": {
@@ -508,6 +803,11 @@
           "transformAvg": 0.0102,
           "transformMin": 0.00997,
           "transformMax": 0.0107
+        },
+        "haswell": {
+          "transformAvg": 0.0101592,
+          "transformMin": 0.0100385,
+          "transformMax": 0.0144686
         }
       },
       "96": {
@@ -526,6 +826,11 @@
           "transformAvg": 0.00355,
           "transformMin": 0.00348,
           "transformMax": 0.00376
+        },
+        "haswell": {
+          "transformAvg": 0.00430703,
+          "transformMin": 0.00428997,
+          "transformMax": 0.00437744
         }
       },
       "4608": {
@@ -533,6 +838,11 @@
           "transformAvg": 0.0061,
           "transformMin": 0.00605,
           "transformMax": 0.00617
+        },
+        "haswell": {
+          "transformAvg": 0.00736479,
+          "transformMin": 0.00734341,
+          "transformMax": 0.00743179
         }
       },
       "2304": {
@@ -540,6 +850,11 @@
           "transformAvg": 0.0113,
           "transformMin": 0.0112,
           "transformMax": 0.0116
+        },
+        "haswell": {
+          "transformAvg": 0.0135667,
+          "transformMin": 0.0134941,
+          "transformMax": 0.0136253
         }
       },
       "1152": {
@@ -547,6 +862,11 @@
           "transformAvg": 0.0259,
           "transformMin": 0.0257,
           "transformMax": 0.0263
+        },
+        "haswell": {
+          "transformAvg": 0.0324577,
+          "transformMin": 0.0321877,
+          "transformMax": 0.0333925
         }
       },
       "576": {
@@ -554,6 +874,11 @@
           "transformAvg": 0.0605,
           "transformMin": 0.0601,
           "transformMax": 0.0609
+        },
+        "haswell": {
+          "transformAvg": 0.0699134,
+          "transformMin": 0.0695392,
+          "transformMax": 0.0721834
         }
       },
       "288": {
@@ -561,6 +886,11 @@
           "transformAvg": 0.123,
           "transformMin": 0.122,
           "transformMax": 0.123
+        },
+        "haswell": {
+          "transformAvg": 0.136122,
+          "transformMin": 0.135591,
+          "transformMax": 0.138822
         }
       },
       "96": {
@@ -577,6 +907,11 @@
           "transformAvg": 0.000481,
           "transformMin": 0.000474,
           "transformMax": 0.000561
+        },
+        "haswell": {
+          "transformAvg": 0.000518265,
+          "transformMin": 0.000511439,
+          "transformMax": 0.00055874
         }
       },
       "4608": {
@@ -584,6 +919,11 @@
           "transformAvg": 0.000826,
           "transformMin": 0.000804,
           "transformMax": 0.000957
+        },
+        "haswell": {
+          "transformAvg": 0.000863831,
+          "transformMin": 0.000853251,
+          "transformMax": 0.00090096
         }
       },
       "2304": {
@@ -591,6 +931,11 @@
           "transformAvg": 0.00149,
           "transformMin": 0.00147,
           "transformMax": 0.00167
+        },
+        "haswell": {
+          "transformAvg": 0.0015627,
+          "transformMin": 0.00154465,
+          "transformMax": 0.00159384
         }
       },
       "1152": {
@@ -598,6 +943,11 @@
           "transformAvg": 0.00273,
           "transformMin": 0.00269,
           "transformMax": 0.00289
+        },
+        "haswell": {
+          "transformAvg": 0.00280651,
+          "transformMin": 0.00277373,
+          "transformMax": 0.00287488
         }
       },
       "576": {
@@ -605,6 +955,11 @@
           "transformAvg": 0.00529,
           "transformMin": 0.00516,
           "transformMax": 0.00564
+        },
+        "haswell": {
+          "transformAvg": 0.00542024,
+          "transformMin": 0.00539234,
+          "transformMax": 0.00546293
         }
       },
       "288": {
@@ -612,6 +967,11 @@
           "transformAvg": 0.0106,
           "transformMin": 0.0105,
           "transformMax": 0.0109
+        },
+        "haswell": {
+          "transformAvg": 0.010802,
+          "transformMin": 0.0107553,
+          "transformMax": 0.0109001
         }
       },
       "96": {
@@ -630,6 +990,11 @@
           "applyOperatorsAvg": 0.00267,
           "applyOperatorsMin": 0.00257,
           "applyOperatorsMax": 0.003
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00368904,
+          "applyOperatorsMin": 0.00361103,
+          "applyOperatorsMax": 0.00390316
         }
       },
       "4608": {
@@ -637,6 +1002,11 @@
           "applyOperatorsAvg": 0.00533,
           "applyOperatorsMin": 0.00519,
           "applyOperatorsMax": 0.00596
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00752348,
+          "applyOperatorsMin": 0.00740782,
+          "applyOperatorsMax": 0.00804773
         }
       },
       "2304": {
@@ -644,6 +1014,11 @@
           "applyOperatorsAvg": 0.00749,
           "applyOperatorsMin": 0.00735,
           "applyOperatorsMax": 0.00827
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0123979,
+          "applyOperatorsMin": 0.0122836,
+          "applyOperatorsMax": 0.0129429
         }
       },
       "1152": {
@@ -651,6 +1026,11 @@
           "applyOperatorsAvg": 0.0147,
           "applyOperatorsMin": 0.0145,
           "applyOperatorsMax": 0.0156
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0258301,
+          "applyOperatorsMin": 0.0255028,
+          "applyOperatorsMax": 0.0263466
         }
       },
       "576": {
@@ -658,6 +1038,11 @@
           "applyOperatorsAvg": 0.0264,
           "applyOperatorsMin": 0.0249,
           "applyOperatorsMax": 0.0277
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0491295,
+          "applyOperatorsMin": 0.0488817,
+          "applyOperatorsMax": 0.0499847
         }
       },
       "288": {
@@ -665,6 +1050,11 @@
           "applyOperatorsAvg": 0.0484,
           "applyOperatorsMin": 0.0481,
           "applyOperatorsMax": 0.0498
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0943653,
+          "applyOperatorsMin": 0.0939098,
+          "applyOperatorsMax": 0.0948658
         }
       },
       "96": {
@@ -681,6 +1071,11 @@
           "applyOperatorsAvg": 0.000253,
           "applyOperatorsMin": 0.000246,
           "applyOperatorsMax": 0.00031
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000276311,
+          "applyOperatorsMin": 0.000271402,
+          "applyOperatorsMax": 0.000328564
         }
       },
       "4608": {
@@ -688,6 +1083,11 @@
           "applyOperatorsAvg": 0.000501,
           "applyOperatorsMin": 0.000482,
           "applyOperatorsMax": 0.000579
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000565882,
+          "applyOperatorsMin": 0.000554691,
+          "applyOperatorsMax": 0.000639874
         }
       },
       "2304": {
@@ -695,6 +1095,11 @@
           "applyOperatorsAvg": 0.000649,
           "applyOperatorsMin": 0.000634,
           "applyOperatorsMax": 0.000787
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000935107,
+          "applyOperatorsMin": 0.000918334,
+          "applyOperatorsMax": 0.00110093
         }
       },
       "1152": {
@@ -702,6 +1107,11 @@
           "applyOperatorsAvg": 0.00135,
           "applyOperatorsMin": 0.00129,
           "applyOperatorsMax": 0.00163
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00186487,
+          "applyOperatorsMin": 0.00183595,
+          "applyOperatorsMax": 0.0019259
         }
       },
       "576": {
@@ -709,6 +1119,11 @@
           "applyOperatorsAvg": 0.00193,
           "applyOperatorsMin": 0.00186,
           "applyOperatorsMax": 0.00222
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00321546,
+          "applyOperatorsMin": 0.00316568,
+          "applyOperatorsMax": 0.00328109
         }
       },
       "288": {
@@ -716,6 +1131,11 @@
           "applyOperatorsAvg": 0.00369,
           "applyOperatorsMin": 0.00362,
           "applyOperatorsMax": 0.00403
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0064216,
+          "applyOperatorsMin": 0.00636873,
+          "applyOperatorsMax": 0.00647429
         }
       },
       "96": {
@@ -734,6 +1154,11 @@
           "applyOperatorsAvg": 0.00288,
           "applyOperatorsMin": 0.00283,
           "applyOperatorsMax": 0.00302
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00384963,
+          "applyOperatorsMin": 0.00383242,
+          "applyOperatorsMax": 0.00391407
         }
       },
       "4608": {
@@ -741,6 +1166,11 @@
           "applyOperatorsAvg": 0.00541,
           "applyOperatorsMin": 0.00534,
           "applyOperatorsMax": 0.00552
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00779916,
+          "applyOperatorsMin": 0.00773864,
+          "applyOperatorsMax": 0.00791411
         }
       },
       "2304": {
@@ -748,6 +1178,11 @@
           "applyOperatorsAvg": 0.00732,
           "applyOperatorsMin": 0.00721,
           "applyOperatorsMax": 0.00774
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0131098,
+          "applyOperatorsMin": 0.0130225,
+          "applyOperatorsMax": 0.013363
         }
       },
       "1152": {
@@ -755,6 +1190,11 @@
           "applyOperatorsAvg": 0.0157,
           "applyOperatorsMin": 0.0154,
           "applyOperatorsMax": 0.0171
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0271902,
+          "applyOperatorsMin": 0.0269481,
+          "applyOperatorsMax": 0.0279333
         }
       },
       "576": {
@@ -762,6 +1202,11 @@
           "applyOperatorsAvg": 0.0276,
           "applyOperatorsMin": 0.0272,
           "applyOperatorsMax": 0.0283
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.051483,
+          "applyOperatorsMin": 0.0513127,
+          "applyOperatorsMax": 0.0516023
         }
       },
       "288": {
@@ -769,6 +1214,11 @@
           "applyOperatorsAvg": 0.0545,
           "applyOperatorsMin": 0.0518,
           "applyOperatorsMax": 0.0564
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0984095,
+          "applyOperatorsMin": 0.0980743,
+          "applyOperatorsMax": 0.0991054
         }
       },
       "96": {
@@ -785,6 +1235,11 @@
           "applyOperatorsAvg": 0.000269,
           "applyOperatorsMin": 0.000259,
           "applyOperatorsMax": 0.000332
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000307935,
+          "applyOperatorsMin": 0.000302403,
+          "applyOperatorsMax": 0.000390208
         }
       },
       "4608": {
@@ -792,6 +1247,11 @@
           "applyOperatorsAvg": 0.000525,
           "applyOperatorsMin": 0.000507,
           "applyOperatorsMax": 0.000645
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00060676,
+          "applyOperatorsMin": 0.000596448,
+          "applyOperatorsMax": 0.000667838
         }
       },
       "2304": {
@@ -799,6 +1259,11 @@
           "applyOperatorsAvg": 0.000736,
           "applyOperatorsMin": 0.000712,
           "applyOperatorsMax": 0.000866
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000992313,
+          "applyOperatorsMin": 0.000977546,
+          "applyOperatorsMax": 0.00105821
         }
       },
       "1152": {
@@ -806,6 +1271,11 @@
           "applyOperatorsAvg": 0.00148,
           "applyOperatorsMin": 0.00145,
           "applyOperatorsMax": 0.00168
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00198745,
+          "applyOperatorsMin": 0.00195593,
+          "applyOperatorsMax": 0.00206706
         }
       },
       "576": {
@@ -813,6 +1283,11 @@
           "applyOperatorsAvg": 0.00206,
           "applyOperatorsMin": 0.00199,
           "applyOperatorsMax": 0.00229
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00336219,
+          "applyOperatorsMin": 0.00331313,
+          "applyOperatorsMax": 0.00360834
         }
       },
       "288": {
@@ -820,6 +1295,11 @@
           "applyOperatorsAvg": 0.00408,
           "applyOperatorsMin": 0.00399,
           "applyOperatorsMax": 0.00435
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00673967,
+          "applyOperatorsMin": 0.00668098,
+          "applyOperatorsMax": 0.0069115
         }
       },
       "96": {
@@ -889,6 +1369,11 @@
           "applyOperatorsAvg": 0.000261,
           "applyOperatorsMin": 0.000252,
           "applyOperatorsMax": 0.000311
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000290393,
+          "applyOperatorsMin": 0.000285299,
+          "applyOperatorsMax": 0.000348451
         }
       },
       "4608": {
@@ -896,6 +1381,11 @@
           "applyOperatorsAvg": 0.000501,
           "applyOperatorsMin": 0.000489,
           "applyOperatorsMax": 0.000586
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000575135,
+          "applyOperatorsMin": 0.000565249,
+          "applyOperatorsMax": 0.000637915
         }
       },
       "2304": {
@@ -903,6 +1393,11 @@
           "applyOperatorsAvg": 0.000714,
           "applyOperatorsMin": 0.000685,
           "applyOperatorsMax": 0.000846
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000948608,
+          "applyOperatorsMin": 0.000932752,
+          "applyOperatorsMax": 0.00101283
         }
       },
       "1152": {
@@ -910,6 +1405,11 @@
           "applyOperatorsAvg": 0.0014,
           "applyOperatorsMin": 0.00137,
           "applyOperatorsMax": 0.00161
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00190493,
+          "applyOperatorsMin": 0.00187049,
+          "applyOperatorsMax": 0.00214185
         }
       },
       "576": {
@@ -917,6 +1417,11 @@
           "applyOperatorsAvg": 0.00191,
           "applyOperatorsMin": 0.00187,
           "applyOperatorsMax": 0.00225
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00325418,
+          "applyOperatorsMin": 0.00320534,
+          "applyOperatorsMax": 0.00331298
         }
       },
       "288": {
@@ -924,6 +1429,11 @@
           "applyOperatorsAvg": 0.00388,
           "applyOperatorsMin": 0.00381,
           "applyOperatorsMax": 0.00435
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.006529,
+          "applyOperatorsMin": 0.00647602,
+          "applyOperatorsMax": 0.00661298
         }
       },
       "96": {
@@ -993,6 +1503,11 @@
           "applyOperatorsAvg": 0.000265,
           "applyOperatorsMin": 0.000254,
           "applyOperatorsMax": 0.000385
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000306575,
+          "applyOperatorsMin": 0.000302249,
+          "applyOperatorsMax": 0.000351087
         }
       },
       "4608": {
@@ -1000,6 +1515,11 @@
           "applyOperatorsAvg": 0.000527,
           "applyOperatorsMin": 0.000511,
           "applyOperatorsMax": 0.000679
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000609543,
+          "applyOperatorsMin": 0.000599728,
+          "applyOperatorsMax": 0.000672052
         }
       },
       "2304": {
@@ -1007,6 +1527,11 @@
           "applyOperatorsAvg": 0.000753,
           "applyOperatorsMin": 0.000721,
           "applyOperatorsMax": 0.000924
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000999967,
+          "applyOperatorsMin": 0.000983973,
+          "applyOperatorsMax": 0.00106105
         }
       },
       "1152": {
@@ -1014,6 +1539,11 @@
           "applyOperatorsAvg": 0.00146,
           "applyOperatorsMin": 0.00143,
           "applyOperatorsMax": 0.00165
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00199958,
+          "applyOperatorsMin": 0.00196889,
+          "applyOperatorsMax": 0.00207683
         }
       },
       "576": {
@@ -1021,6 +1551,11 @@
           "applyOperatorsAvg": 0.00202,
           "applyOperatorsMin": 0.00199,
           "applyOperatorsMax": 0.0023
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00337345,
+          "applyOperatorsMin": 0.00331944,
+          "applyOperatorsMax": 0.00342771
         }
       },
       "288": {
@@ -1028,6 +1563,11 @@
           "applyOperatorsAvg": 0.00418,
           "applyOperatorsMin": 0.00407,
           "applyOperatorsMax": 0.00442
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00677077,
+          "applyOperatorsMin": 0.00672579,
+          "applyOperatorsMax": 0.00700149
         }
       },
       "96": {
@@ -1046,6 +1586,11 @@
           "applyOperatorsAvg": 0.00311,
           "applyOperatorsMin": 0.00297,
           "applyOperatorsMax": 0.00355
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00497879,
+          "applyOperatorsMin": 0.00489945,
+          "applyOperatorsMax": 0.00547963
         }
       },
       "4608": {
@@ -1053,6 +1598,11 @@
           "applyOperatorsAvg": 0.00627,
           "applyOperatorsMin": 0.00608,
           "applyOperatorsMax": 0.00687
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00999237,
+          "applyOperatorsMin": 0.00988115,
+          "applyOperatorsMax": 0.0105049
         }
       },
       "2304": {
@@ -1060,6 +1610,11 @@
           "applyOperatorsAvg": 0.00918,
           "applyOperatorsMin": 0.00904,
           "applyOperatorsMax": 0.00967
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0174969,
+          "applyOperatorsMin": 0.0173778,
+          "applyOperatorsMax": 0.0180583
         }
       },
       "1152": {
@@ -1067,6 +1622,11 @@
           "applyOperatorsAvg": 0.0187,
           "applyOperatorsMin": 0.0184,
           "applyOperatorsMax": 0.0195
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0362784,
+          "applyOperatorsMin": 0.0356501,
+          "applyOperatorsMax": 0.0375969
         }
       },
       "576": {
@@ -1074,6 +1634,11 @@
           "applyOperatorsAvg": 0.0334,
           "applyOperatorsMin": 0.0329,
           "applyOperatorsMax": 0.0342
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0682207,
+          "applyOperatorsMin": 0.0679736,
+          "applyOperatorsMax": 0.0689357
         }
       },
       "288": {
@@ -1081,6 +1646,11 @@
           "applyOperatorsAvg": 0.0629,
           "applyOperatorsMin": 0.0624,
           "applyOperatorsMax": 0.0647
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.138188,
+          "applyOperatorsMin": 0.136566,
+          "applyOperatorsMax": 0.147437
         }
       },
       "96": {
@@ -1097,6 +1667,11 @@
           "applyOperatorsAvg": 0.000264,
           "applyOperatorsMin": 0.000255,
           "applyOperatorsMax": 0.000377
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000282769,
+          "applyOperatorsMin": 0.000277122,
+          "applyOperatorsMax": 0.000341766
         }
       },
       "4608": {
@@ -1104,6 +1679,11 @@
           "applyOperatorsAvg": 0.000548,
           "applyOperatorsMin": 0.000531,
           "applyOperatorsMax": 0.000767
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00062889,
+          "applyOperatorsMin": 0.00061771,
+          "applyOperatorsMax": 0.000697319
         }
       },
       "2304": {
@@ -1111,6 +1691,11 @@
           "applyOperatorsAvg": 0.000788,
           "applyOperatorsMin": 0.00077,
           "applyOperatorsMax": 0.000975
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00112298,
+          "applyOperatorsMin": 0.00104829,
+          "applyOperatorsMax": 0.00187611
         }
       },
       "1152": {
@@ -1118,6 +1703,11 @@
           "applyOperatorsAvg": 0.00154,
           "applyOperatorsMin": 0.0015,
           "applyOperatorsMax": 0.00185
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00221883,
+          "applyOperatorsMin": 0.00213268,
+          "applyOperatorsMax": 0.00364002
         }
       },
       "576": {
@@ -1125,6 +1715,11 @@
           "applyOperatorsAvg": 0.00218,
           "applyOperatorsMin": 0.00213,
           "applyOperatorsMax": 0.00253
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00375201,
+          "applyOperatorsMin": 0.0037143,
+          "applyOperatorsMax": 0.00379702
         }
       },
       "288": {
@@ -1132,6 +1727,11 @@
           "applyOperatorsAvg": 0.00437,
           "applyOperatorsMin": 0.00427,
           "applyOperatorsMax": 0.00474
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00762495,
+          "applyOperatorsMin": 0.00755815,
+          "applyOperatorsMax": 0.0079749
         }
       },
       "96": {
@@ -1150,6 +1750,11 @@
           "applyOperatorsAvg": 0.00316,
           "applyOperatorsMin": 0.00306,
           "applyOperatorsMax": 0.00323
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00484403,
+          "applyOperatorsMin": 0.00482968,
+          "applyOperatorsMax": 0.00489245
         }
       },
       "4608": {
@@ -1157,6 +1762,11 @@
           "applyOperatorsAvg": 0.00657,
           "applyOperatorsMin": 0.00647,
           "applyOperatorsMax": 0.00667
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0102662,
+          "applyOperatorsMin": 0.0101653,
+          "applyOperatorsMax": 0.0103818
         }
       },
       "2304": {
@@ -1164,6 +1774,11 @@
           "applyOperatorsAvg": 0.0091,
           "applyOperatorsMin": 0.00899,
           "applyOperatorsMax": 0.00924
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0177819,
+          "applyOperatorsMin": 0.0176818,
+          "applyOperatorsMax": 0.0179521
         }
       },
       "1152": {
@@ -1171,6 +1786,11 @@
           "applyOperatorsAvg": 0.0197,
           "applyOperatorsMin": 0.0194,
           "applyOperatorsMax": 0.0205
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0370398,
+          "applyOperatorsMin": 0.0368611,
+          "applyOperatorsMax": 0.0377575
         }
       },
       "576": {
@@ -1178,6 +1798,11 @@
           "applyOperatorsAvg": 0.035,
           "applyOperatorsMin": 0.0346,
           "applyOperatorsMax": 0.0358
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.0707002,
+          "applyOperatorsMin": 0.0705414,
+          "applyOperatorsMax": 0.0712506
         }
       },
       "288": {
@@ -1185,6 +1810,11 @@
           "applyOperatorsAvg": 0.0668,
           "applyOperatorsMin": 0.0665,
           "applyOperatorsMax": 0.0675
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.141324,
+          "applyOperatorsMin": 0.140992,
+          "applyOperatorsMax": 0.142583
         }
       },
       "96": {
@@ -1201,6 +1831,11 @@
           "applyOperatorsAvg": 0.000252,
           "applyOperatorsMin": 0.000244,
           "applyOperatorsMax": 0.00033
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000300881,
+          "applyOperatorsMin": 0.000296252,
+          "applyOperatorsMax": 0.000364083
         }
       },
       "4608": {
@@ -1208,6 +1843,11 @@
           "applyOperatorsAvg": 0.000577,
           "applyOperatorsMin": 0.000568,
           "applyOperatorsMax": 0.000663
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.000667433,
+          "applyOperatorsMin": 0.000654581,
+          "applyOperatorsMax": 0.000735433
         }
       },
       "2304": {
@@ -1215,6 +1855,11 @@
           "applyOperatorsAvg": 0.000777,
           "applyOperatorsMin": 0.000758,
           "applyOperatorsMax": 0.000938
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00112501,
+          "applyOperatorsMin": 0.00110821,
+          "applyOperatorsMax": 0.00119111
         }
       },
       "1152": {
@@ -1222,6 +1867,11 @@
           "applyOperatorsAvg": 0.00163,
           "applyOperatorsMin": 0.00159,
           "applyOperatorsMax": 0.00183
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00227445,
+          "applyOperatorsMin": 0.00224172,
+          "applyOperatorsMax": 0.00233638
         }
       },
       "576": {
@@ -1229,6 +1879,11 @@
           "applyOperatorsAvg": 0.00231,
           "applyOperatorsMin": 0.00227,
           "applyOperatorsMax": 0.00263
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00391394,
+          "applyOperatorsMin": 0.00387718,
+          "applyOperatorsMax": 0.00400745
         }
       },
       "288": {
@@ -1236,6 +1891,11 @@
           "applyOperatorsAvg": 0.00467,
           "applyOperatorsMin": 0.00456,
           "applyOperatorsMax": 0.00536
+        },
+        "haswell": {
+          "applyOperatorsAvg": 0.00790157,
+          "applyOperatorsMin": 0.00776309,
+          "applyOperatorsMax": 0.0130109
         }
       },
       "96": {
@@ -1254,6 +1914,11 @@
           "transformAvg": 0.000502,
           "transformMin": 0.000438,
           "transformMax": 0.000735
+        },
+        "haswell": {
+          "transformAvg": 0.000487458,
+          "transformMin": 0.000430112,
+          "transformMax": 0.000799144
         }
       },
       "4608": {
@@ -1261,6 +1926,11 @@
           "transformAvg": 0.00104,
           "transformMin": 0.000869,
           "transformMax": 0.00157
+        },
+        "haswell": {
+          "transformAvg": 0.000985602,
+          "transformMin": 0.000858866,
+          "transformMax": 0.00153058
         }
       },
       "2304": {
@@ -1268,6 +1938,11 @@
           "transformAvg": 0.00208,
           "transformMin": 0.00174,
           "transformMax": 0.00331
+        },
+        "haswell": {
+          "transformAvg": 0.0019603,
+          "transformMin": 0.0017025,
+          "transformMax": 0.00302023
         }
       },
       "1152": {
@@ -1275,6 +1950,11 @@
           "transformAvg": 0.00419,
           "transformMin": 0.00348,
           "transformMax": 0.0067
+        },
+        "haswell": {
+          "transformAvg": 0.00401186,
+          "transformMin": 0.00350764,
+          "transformMax": 0.00607451
         }
       },
       "576": {
@@ -1282,6 +1962,11 @@
           "transformAvg": 0.00913,
           "transformMin": 0.00791,
           "transformMax": 0.0137
+        },
+        "haswell": {
+          "transformAvg": 0.00868249,
+          "transformMin": 0.00776644,
+          "transformMax": 0.0124615
         }
       },
       "288": {
@@ -1289,6 +1974,11 @@
           "transformAvg": 0.0215,
           "transformMin": 0.0192,
           "transformMax": 0.03
+        },
+        "haswell": {
+          "transformAvg": 0.01975,
+          "transformMin": 0.0179948,
+          "transformMax": 0.0265096
         }
       },
       "96": {
@@ -1305,6 +1995,11 @@
           "transformAvg": 5.38e-05,
           "transformMin": 5.19e-05,
           "transformMax": 0.000107
+        },
+        "haswell": {
+          "transformAvg": "5.73059e-05",
+          "transformMin": "5.6503e-05",
+          "transformMax": "7.3495e-05"
         }
       },
       "4608": {
@@ -1312,6 +2007,11 @@
           "transformAvg": 0.000113,
           "transformMin": 0.000109,
           "transformMax": 0.000231
+        },
+        "haswell": {
+          "transformAvg": 0.00011184,
+          "transformMin": 0.000110539,
+          "transformMax": 0.000132112
         }
       },
       "2304": {
@@ -1319,6 +2019,11 @@
           "transformAvg": 0.000204,
           "transformMin": 0.0002,
           "transformMax": 0.000262
+        },
+        "haswell": {
+          "transformAvg": 0.000198232,
+          "transformMin": 0.000194931,
+          "transformMax": 0.00022198
         }
       },
       "1152": {
@@ -1326,6 +2031,11 @@
           "transformAvg": 0.000406,
           "transformMin": 0.000395,
           "transformMax": 0.00048
+        },
+        "haswell": {
+          "transformAvg": 0.000386094,
+          "transformMin": 0.000380771,
+          "transformMax": 0.000426819
         }
       },
       "576": {
@@ -1333,6 +2043,11 @@
           "transformAvg": 0.000781,
           "transformMin": 0.000766,
           "transformMax": 0.000883
+        },
+        "haswell": {
+          "transformAvg": 0.000766654,
+          "transformMin": 0.000756123,
+          "transformMax": 0.000802809
         }
       },
       "288": {
@@ -1340,6 +2055,11 @@
           "transformAvg": 0.0016,
           "transformMin": 0.00155,
           "transformMax": 0.00312
+        },
+        "haswell": {
+          "transformAvg": 0.00154487,
+          "transformMin": 0.00152296,
+          "transformMax": 0.00162569
         }
       },
       "96": {
@@ -1361,6 +2081,14 @@
           "applyImplAvg": 0.000517,
           "applyImplMin": 0.000384,
           "applyImplMax": 0.0067
+        },
+        "haswell": {
+          "transformAvg": 0.00103159,
+          "transformMin": 0.000426203,
+          "transformMax": 0.00643432,
+          "applyImplAvg": 0.000960164,
+          "applyImplMin": 0.000359114,
+          "applyImplMax": 0.00632882
         }
       },
       "4608": {
@@ -1371,6 +2099,14 @@
           "applyImplAvg": 0.000923,
           "applyImplMin": 0.00075,
           "applyImplMax": 0.00812
+        },
+        "haswell": {
+          "transformAvg": 0.00156342,
+          "transformMin": 0.000854486,
+          "transformMax": 0.00784092,
+          "applyImplAvg": 0.00142897,
+          "applyImplMin": 0.00072767,
+          "applyImplMax": 0.00765257
         }
       },
       "2304": {
@@ -1381,6 +2117,14 @@
           "applyImplAvg": 0.00178,
           "applyImplMin": 0.00153,
           "applyImplMax": 0.0119
+        },
+        "haswell": {
+          "transformAvg": 0.00259893,
+          "transformMin": 0.00169637,
+          "transformMax": 0.0105087,
+          "applyImplAvg": 0.00233439,
+          "applyImplMin": 0.00144681,
+          "applyImplMax": 0.0101544
         }
       },
       "1152": {
@@ -1391,6 +2135,14 @@
           "applyImplAvg": 0.00354,
           "applyImplMin": 0.00308,
           "applyImplMax": 0.0182
+        },
+        "haswell": {
+          "transformAvg": 0.00529749,
+          "transformMin": 0.00350519,
+          "transformMax": 0.0166442,
+          "applyImplAvg": 0.00476868,
+          "applyImplMin": 0.00301085,
+          "applyImplMax": 0.0159636
         }
       },
       "576": {
@@ -1401,6 +2153,14 @@
           "applyImplAvg": 0.00768,
           "applyImplMin": 0.00689,
           "applyImplMax": 0.0331
+        },
+        "haswell": {
+          "transformAvg": 0.0107445,
+          "transformMin": 0.00774032,
+          "transformMax": 0.0288452,
+          "applyImplAvg": 0.00953688,
+          "applyImplMin": 0.00656775,
+          "applyImplMax": 0.0275011
         }
       },
       "288": {
@@ -1411,6 +2171,14 @@
           "applyImplAvg": 0.0229,
           "applyImplMin": 0.0161,
           "applyImplMax": 0.0616
+        },
+        "haswell": {
+          "transformAvg": 0.0232182,
+          "transformMin": 0.0181104,
+          "transformMax": 0.0527803,
+          "applyImplAvg": 0.020471,
+          "applyImplMin": 0.0153478,
+          "applyImplMax": 0.0500908
         }
       },
       "96": {
@@ -1433,6 +2201,14 @@
           "applyImplAvg": 4.5e-05,
           "applyImplMin": 4.31e-05,
           "applyImplMax": 8.46e-05
+        },
+        "haswell": {
+          "transformAvg": "5.74761e-05",
+          "transformMin": "5.6444e-05",
+          "transformMax": "7.3501e-05",
+          "applyImplAvg": "4.40458e-05",
+          "applyImplMin": "4.3043e-05",
+          "applyImplMax": "6.0047e-05"
         }
       },
       "4608": {
@@ -1443,6 +2219,14 @@
           "applyImplAvg": 9.4e-05,
           "applyImplMin": 8.96e-05,
           "applyImplMax": 0.000138
+        },
+        "haswell": {
+          "transformAvg": 0.000111115,
+          "transformMin": 0.000109401,
+          "transformMax": 0.000130788,
+          "applyImplAvg": "8.77377e-05",
+          "applyImplMin": "8.653e-05",
+          "applyImplMax": 0.000103809
         }
       },
       "2304": {
@@ -1453,6 +2237,14 @@
           "applyImplAvg": 0.000174,
           "applyImplMin": 0.000168,
           "applyImplMax": 0.00023
+        },
+        "haswell": {
+          "transformAvg": 0.000198558,
+          "transformMin": 0.000194221,
+          "transformMax": 0.000218299,
+          "applyImplAvg": 0.00016132,
+          "applyImplMin": 0.000157556,
+          "applyImplMax": 0.0001799
         }
       },
       "1152": {
@@ -1463,6 +2255,14 @@
           "applyImplAvg": 0.00035,
           "applyImplMin": 0.000334,
           "applyImplMax": 0.000478
+        },
+        "haswell": {
+          "transformAvg": 0.000386582,
+          "transformMin": 0.000380925,
+          "transformMax": 0.000425171,
+          "applyImplAvg": 0.000320109,
+          "applyImplMin": 0.000315096,
+          "applyImplMax": 0.000359249
         }
       },
       "576": {
@@ -1473,6 +2273,14 @@
           "applyImplAvg": 0.000679,
           "applyImplMin": 0.000662,
           "applyImplMax": 0.000798
+        },
+        "haswell": {
+          "transformAvg": 0.000769846,
+          "transformMin": 0.000758637,
+          "transformMax": 0.000809202,
+          "applyImplAvg": 0.000641846,
+          "applyImplMin": 0.000631937,
+          "applyImplMax": 0.000680883
         }
       },
       "288": {
@@ -1483,6 +2291,14 @@
           "applyImplAvg": 0.0014,
           "applyImplMin": 0.00133,
           "applyImplMax": 0.0108
+        },
+        "haswell": {
+          "transformAvg": 0.00153715,
+          "transformMin": 0.00151848,
+          "transformMax": 0.00156828,
+          "applyImplAvg": 0.00128321,
+          "applyImplMin": 0.00126787,
+          "applyImplMax": 0.00131715
         }
       },
       "96": {
@@ -1504,6 +2320,11 @@
           "transformAvg": 0.00135,
           "transformMin": 0.00127,
           "transformMax": 0.00156
+        },
+        "haswell": {
+          "transformAvg": 0.0013783,
+          "transformMin": 0.00132287,
+          "transformMax": 0.00154235
         }
       },
       "4608": {
@@ -1511,6 +2332,11 @@
           "transformAvg": 0.00268,
           "transformMin": 0.00253,
           "transformMax": 0.00317
+        },
+        "haswell": {
+          "transformAvg": 0.0027233,
+          "transformMin": 0.00259158,
+          "transformMax": 0.00313034
         }
       },
       "2304": {
@@ -1518,6 +2344,11 @@
           "transformAvg": 0.00535,
           "transformMin": 0.00501,
           "transformMax": 0.00658
+        },
+        "haswell": {
+          "transformAvg": 0.00533274,
+          "transformMin": 0.00510527,
+          "transformMax": 0.00619815
         }
       },
       "1152": {
@@ -1525,6 +2356,11 @@
           "transformAvg": 0.0106,
           "transformMin": 0.00986,
           "transformMax": 0.0131
+        },
+        "haswell": {
+          "transformAvg": 0.0106471,
+          "transformMin": 0.0101487,
+          "transformMax": 0.012434
         }
       },
       "576": {
@@ -1532,6 +2368,11 @@
           "transformAvg": 0.0219,
           "transformMin": 0.0206,
           "transformMax": 0.0264
+        },
+        "haswell": {
+          "transformAvg": 0.0217203,
+          "transformMin": 0.0208122,
+          "transformMax": 0.0251987
         }
       },
       "288": {
@@ -1539,6 +2380,11 @@
           "transformAvg": 0.0463,
           "transformMin": 0.0435,
           "transformMax": 0.0547
+        },
+        "haswell": {
+          "transformAvg": 0.0453181,
+          "transformMin": 0.0436116,
+          "transformMax": 0.0519771
         }
       },
       "96": {
@@ -1555,6 +2401,11 @@
           "transformAvg": 0.000175,
           "transformMin": 0.000169,
           "transformMax": 0.000263
+        },
+        "haswell": {
+          "transformAvg": 0.000179974,
+          "transformMin": 0.000177527,
+          "transformMax": 0.000203098
         }
       },
       "4608": {
@@ -1562,6 +2413,11 @@
           "transformAvg": 0.000347,
           "transformMin": 0.000336,
           "transformMax": 0.000444
+        },
+        "haswell": {
+          "transformAvg": 0.000356536,
+          "transformMin": 0.000351949,
+          "transformMax": 0.000396245
         }
       },
       "2304": {
@@ -1569,6 +2425,11 @@
           "transformAvg": 0.000625,
           "transformMin": 0.000608,
           "transformMax": 0.000867
+        },
+        "haswell": {
+          "transformAvg": 0.000646998,
+          "transformMin": 0.000639335,
+          "transformMax": 0.000687569
         }
       },
       "1152": {
@@ -1576,6 +2437,11 @@
           "transformAvg": 0.00125,
           "transformMin": 0.00122,
           "transformMax": 0.0017
+        },
+        "haswell": {
+          "transformAvg": 0.00129101,
+          "transformMin": 0.00127567,
+          "transformMax": 0.00132262
         }
       },
       "576": {
@@ -1583,6 +2449,11 @@
           "transformAvg": 0.00248,
           "transformMin": 0.00241,
           "transformMax": 0.00329
+        },
+        "haswell": {
+          "transformAvg": 0.00252955,
+          "transformMin": 0.00249378,
+          "transformMax": 0.00257344
         }
       },
       "288": {
@@ -1590,6 +2461,11 @@
           "transformAvg": 0.00482,
           "transformMin": 0.00473,
           "transformMax": 0.00631
+        },
+        "haswell": {
+          "transformAvg": 0.00495286,
+          "transformMin": 0.00492585,
+          "transformMax": 0.00505955
         }
       },
       "96": {
@@ -1611,6 +2487,14 @@
           "applyImplAvg": 0.00056,
           "applyImplMin": 0.000427,
           "applyImplMax": 0.00697
+        },
+        "haswell": {
+          "transformAvg": 0.00113131,
+          "transformMin": 0.000507238,
+          "transformMax": 0.00669616,
+          "applyImplAvg": 0.00105973,
+          "applyImplMin": 0.000439796,
+          "applyImplMax": 0.00658884
         }
       },
       "4608": {
@@ -1621,6 +2505,14 @@
           "applyImplAvg": 0.00106,
           "applyImplMin": 0.000874,
           "applyImplMax": 0.00834
+        },
+        "haswell": {
+          "transformAvg": 0.00171907,
+          "transformMin": 0.00101047,
+          "transformMax": 0.00799561,
+          "applyImplAvg": 0.00158025,
+          "applyImplMin": 0.000878474,
+          "applyImplMax": 0.00780048
         }
       },
       "2304": {
@@ -1631,6 +2523,14 @@
           "applyImplAvg": 0.00199,
           "applyImplMin": 0.00178,
           "applyImplMax": 0.012
+        },
+        "haswell": {
+          "transformAvg": 0.00293035,
+          "transformMin": 0.00201521,
+          "transformMax": 0.0109363,
+          "applyImplAvg": 0.00266494,
+          "applyImplMin": 0.00176217,
+          "applyImplMax": 0.0105762
         }
       },
       "1152": {
@@ -1641,6 +2541,14 @@
           "applyImplAvg": 0.00401,
           "applyImplMin": 0.00351,
           "applyImplMax": 0.0192
+        },
+        "haswell": {
+          "transformAvg": 0.00583558,
+          "transformMin": 0.00406232,
+          "transformMax": 0.0170401,
+          "applyImplAvg": 0.00531509,
+          "applyImplMin": 0.00356865,
+          "applyImplMax": 0.0163637
         }
       },
       "576": {
@@ -1651,6 +2559,14 @@
           "applyImplAvg": 0.00865,
           "applyImplMin": 0.00777,
           "applyImplMax": 0.0338
+        },
+        "haswell": {
+          "transformAvg": 0.0117667,
+          "transformMin": 0.00875319,
+          "transformMax": 0.029779,
+          "applyImplAvg": 0.0105449,
+          "applyImplMin": 0.00757701,
+          "applyImplMax": 0.0284387
         }
       },
       "288": {
@@ -1661,6 +2577,14 @@
           "applyImplAvg": 0.0249,
           "applyImplMin": 0.018,
           "applyImplMax": 0.065
+        },
+        "haswell": {
+          "transformAvg": 0.0252376,
+          "transformMin": 0.0201189,
+          "transformMax": 0.0548032,
+          "applyImplAvg": 0.0224691,
+          "applyImplMin": 0.0173535,
+          "applyImplMax": 0.0520293
         }
       },
       "96": {
@@ -1683,6 +2607,14 @@
           "applyImplAvg": 5.36e-05,
           "applyImplMin": 5.13e-05,
           "applyImplMax": 9.74e-05
+        },
+        "haswell": {
+          "transformAvg": "6.77416e-05",
+          "transformMin": "6.6559e-05",
+          "transformMax": "8.3589e-05",
+          "applyImplAvg": "5.443e-05",
+          "applyImplMin": "5.3492e-05",
+          "applyImplMax": "7.0355e-05"
         }
       },
       "4608": {
@@ -1693,6 +2625,14 @@
           "applyImplAvg": 0.000114,
           "applyImplMin": 0.00011,
           "applyImplMax": 0.000166
+        },
+        "haswell": {
+          "transformAvg": 0.000133114,
+          "transformMin": 0.000130904,
+          "transformMax": 0.00015423,
+          "applyImplAvg": 0.000109981,
+          "applyImplMin": 0.000107986,
+          "applyImplMax": 0.000131141
         }
       },
       "2304": {
@@ -1703,6 +2643,14 @@
           "applyImplAvg": 0.000213,
           "applyImplMin": 0.000206,
           "applyImplMax": 0.000268
+        },
+        "haswell": {
+          "transformAvg": 0.00023827,
+          "transformMin": 0.000235158,
+          "transformMax": 0.000262101,
+          "applyImplAvg": 0.000201548,
+          "applyImplMin": 0.000198649,
+          "applyImplMax": 0.000225284
         }
       },
       "1152": {
@@ -1713,6 +2661,14 @@
           "applyImplAvg": 0.000399,
           "applyImplMin": 0.000397,
           "applyImplMax": 0.00044
+        },
+        "haswell": {
+          "transformAvg": 0.000466139,
+          "transformMin": 0.000460504,
+          "transformMax": 0.000507156,
+          "applyImplAvg": 0.00039838,
+          "applyImplMin": 0.00039368,
+          "applyImplMax": 0.000440321
         }
       },
       "576": {
@@ -1723,6 +2679,14 @@
           "applyImplAvg": 0.000814,
           "applyImplMin": 0.000799,
           "applyImplMax": 0.000907
+        },
+        "haswell": {
+          "transformAvg": 0.000925778,
+          "transformMin": 0.000914038,
+          "transformMax": 0.00096218,
+          "applyImplAvg": 0.000796635,
+          "applyImplMin": 0.000786251,
+          "applyImplMax": 0.000834244
         }
       },
       "288": {
@@ -1733,6 +2697,14 @@
           "applyImplAvg": 0.00171,
           "applyImplMin": 0.00158,
           "applyImplMax": 0.0113
+        },
+        "haswell": {
+          "transformAvg": 0.00185029,
+          "transformMin": 0.00182107,
+          "transformMax": 0.00193863,
+          "applyImplAvg": 0.00159862,
+          "applyImplMin": 0.00157236,
+          "applyImplMax": 0.00167603
         }
       },
       "96": {
@@ -1754,6 +2726,11 @@
           "transformAvg": 0.000363,
           "transformMin": 0.000339,
           "transformMax": 0.000741
+        },
+        "haswell": {
+          "transformAvg": 0.000407176,
+          "transformMin": 0.000351499,
+          "transformMax": 0.000712798
         }
       },
       "4608": {
@@ -1761,6 +2738,11 @@
           "transformAvg": 0.000817,
           "transformMin": 0.000671,
           "transformMax": 0.00131
+        },
+        "haswell": {
+          "transformAvg": 0.000821686,
+          "transformMin": 0.000690405,
+          "transformMax": 0.00142256
         }
       },
       "2304": {
@@ -1768,6 +2750,11 @@
           "transformAvg": 0.00162,
           "transformMin": 0.00135,
           "transformMax": 0.00266
+        },
+        "haswell": {
+          "transformAvg": 0.00166877,
+          "transformMin": 0.00139242,
+          "transformMax": 0.00282661
         }
       },
       "1152": {
@@ -1775,6 +2762,11 @@
           "transformAvg": 0.00352,
           "transformMin": 0.00285,
           "transformMax": 0.0063
+        },
+        "haswell": {
+          "transformAvg": 0.00334809,
+          "transformMin": 0.00277187,
+          "transformMax": 0.00571077
         }
       },
       "576": {
@@ -1782,6 +2774,11 @@
           "transformAvg": 0.00735,
           "transformMin": 0.00598,
           "transformMax": 0.0128
+        },
+        "haswell": {
+          "transformAvg": 0.00739836,
+          "transformMin": 0.00631687,
+          "transformMax": 0.0116216
         }
       },
       "288": {
@@ -1789,6 +2786,11 @@
           "transformAvg": 0.0167,
           "transformMin": 0.0136,
           "transformMax": 0.0266
+        },
+        "haswell": {
+          "transformAvg": 0.0161041,
+          "transformMin": 0.0141248,
+          "transformMax": 0.0239642
         }
       },
       "96": {
@@ -1805,6 +2807,11 @@
           "transformAvg": 4.4e-05,
           "transformMin": 4.1e-05,
           "transformMax": 9.11e-05
+        },
+        "haswell": {
+          "transformAvg": "4.71856e-05",
+          "transformMin": "4.6259e-05",
+          "transformMax": "6.2947e-05"
         }
       },
       "4608": {
@@ -1812,6 +2819,11 @@
           "transformAvg": 9.04e-05,
           "transformMin": 8.63e-05,
           "transformMax": 0.000167
+        },
+        "haswell": {
+          "transformAvg": "8.96668e-05",
+          "transformMin": "8.7921e-05",
+          "transformMax": 0.000108198
         }
       },
       "2304": {
@@ -1819,6 +2831,11 @@
           "transformAvg": 0.000163,
           "transformMin": 0.000156,
           "transformMax": 0.000316
+        },
+        "haswell": {
+          "transformAvg": 0.000158355,
+          "transformMin": 0.000155741,
+          "transformMax": 0.000177905
         }
       },
       "1152": {
@@ -1826,6 +2843,11 @@
           "transformAvg": 0.000314,
           "transformMin": 0.000307,
           "transformMax": 0.000368
+        },
+        "haswell": {
+          "transformAvg": 0.000308868,
+          "transformMin": 0.000304341,
+          "transformMax": 0.000346837
         }
       },
       "576": {
@@ -1833,6 +2855,11 @@
           "transformAvg": 0.000595,
           "transformMin": 0.000584,
           "transformMax": 0.000684
+        },
+        "haswell": {
+          "transformAvg": 0.000612346,
+          "transformMin": 0.000601795,
+          "transformMax": 0.000666088
         }
       },
       "288": {
@@ -1840,6 +2867,11 @@
           "transformAvg": 0.00127,
           "transformMin": 0.00123,
           "transformMax": 0.00289
+        },
+        "haswell": {
+          "transformAvg": 0.0012132,
+          "transformMin": 0.00119837,
+          "transformMax": 0.00125
         }
       },
       "96": {
@@ -1861,6 +2893,14 @@
           "applyImplAvg": 0.000488,
           "applyImplMin": 0.000359,
           "applyImplMax": 0.00636
+        },
+        "haswell": {
+          "transformAvg": 0.000915836,
+          "transformMin": 0.000344644,
+          "transformMax": 0.0060044,
+          "applyImplAvg": 0.000909639,
+          "applyImplMin": 0.000340107,
+          "applyImplMax": 0.00598455
         }
       },
       "4608": {
@@ -1871,6 +2911,14 @@
           "applyImplAvg": 0.00088,
           "applyImplMin": 0.000718,
           "applyImplMax": 0.0077
+        },
+        "haswell": {
+          "transformAvg": 0.00136646,
+          "transformMin": 0.000685423,
+          "transformMax": 0.00738547,
+          "applyImplAvg": 0.00135779,
+          "applyImplMin": 0.000680053,
+          "applyImplMax": 0.00734761
         }
       },
       "2304": {
@@ -1881,6 +2929,14 @@
           "applyImplAvg": 0.00169,
           "applyImplMin": 0.00145,
           "applyImplMax": 0.0113
+        },
+        "haswell": {
+          "transformAvg": 0.00224509,
+          "transformMin": 0.00135543,
+          "transformMax": 0.0100899,
+          "applyImplAvg": 0.0022373,
+          "applyImplMin": 0.00134932,
+          "applyImplMax": 0.0100681
         }
       },
       "1152": {
@@ -1891,6 +2947,14 @@
           "applyImplAvg": 0.00317,
           "applyImplMin": 0.00274,
           "applyImplMax": 0.0174
+        },
+        "haswell": {
+          "transformAvg": 0.00454208,
+          "transformMin": 0.00270914,
+          "transformMax": 0.0156222,
+          "applyImplAvg": 0.00453377,
+          "applyImplMin": 0.00270276,
+          "applyImplMax": 0.0155991
         }
       },
       "576": {
@@ -1901,6 +2965,14 @@
           "applyImplAvg": 0.00644,
           "applyImplMin": 0.00561,
           "applyImplMax": 0.0317
+        },
+        "haswell": {
+          "transformAvg": 0.00935762,
+          "transformMin": 0.00624344,
+          "transformMax": 0.0267047,
+          "applyImplAvg": 0.00934706,
+          "applyImplMin": 0.0062357,
+          "applyImplMax": 0.0266804
         }
       },
       "288": {
@@ -1911,6 +2983,14 @@
           "applyImplAvg": 0.0213,
           "applyImplMin": 0.0145,
           "applyImplMax": 0.06
+        },
+        "haswell": {
+          "transformAvg": 0.0191129,
+          "transformMin": 0.0136483,
+          "transformMax": 0.0489107,
+          "applyImplAvg": 0.019101,
+          "applyImplMin": 0.0136383,
+          "applyImplMax": 0.0488825
         }
       },
       "96": {
@@ -1933,6 +3013,14 @@
           "applyImplAvg": 4.28e-05,
           "applyImplMin": 4.15e-05,
           "applyImplMax": 8.4e-05
+        },
+        "haswell": {
+          "transformAvg": "4.58551e-05",
+          "transformMin": "4.4868e-05",
+          "transformMax": "6.5833e-05",
+          "applyImplAvg": "4.14139e-05",
+          "applyImplMin": "4.0597e-05",
+          "applyImplMax": "6.02e-05"
         }
       },
       "4608": {
@@ -1943,6 +3031,14 @@
           "applyImplAvg": 8.45e-05,
           "applyImplMin": 8.17e-05,
           "applyImplMax": 0.000165
+        },
+        "haswell": {
+          "transformAvg": "8.7321e-05",
+          "transformMin": "8.5947e-05",
+          "transformMax": 0.000112424,
+          "applyImplAvg": "8.2808e-05",
+          "applyImplMin": "8.1465e-05",
+          "applyImplMax": 0.000107629
         }
       },
       "2304": {
@@ -1953,6 +3049,14 @@
           "applyImplAvg": 0.000164,
           "applyImplMin": 0.000158,
           "applyImplMax": 0.00024
+        },
+        "haswell": {
+          "transformAvg": 0.000155218,
+          "transformMin": 0.000152427,
+          "transformMax": 0.000185591,
+          "applyImplAvg": 0.000150583,
+          "applyImplMin": 0.000147818,
+          "applyImplMax": 0.000180756
         }
       },
       "1152": {
@@ -1963,6 +3067,14 @@
           "applyImplAvg": 0.000326,
           "applyImplMin": 0.000321,
           "applyImplMax": 0.000381
+        },
+        "haswell": {
+          "transformAvg": 0.000301952,
+          "transformMin": 0.00029657,
+          "transformMax": 0.000351317,
+          "applyImplAvg": 0.000297068,
+          "applyImplMin": 0.000291896,
+          "applyImplMax": 0.00034617
         }
       },
       "576": {
@@ -1973,6 +3085,14 @@
           "applyImplAvg": 0.000644,
           "applyImplMin": 0.000626,
           "applyImplMax": 0.000744
+        },
+        "haswell": {
+          "transformAvg": 0.000597988,
+          "transformMin": 0.00058982,
+          "transformMax": 0.000642647,
+          "applyImplAvg": 0.000592544,
+          "applyImplMin": 0.000584494,
+          "applyImplMax": 0.000637011
         }
       },
       "288": {
@@ -1983,6 +3103,14 @@
           "applyImplAvg": 0.00124,
           "applyImplMin": 0.00118,
           "applyImplMax": 0.0103
+        },
+        "haswell": {
+          "transformAvg": 0.0011977,
+          "transformMin": 0.00117728,
+          "transformMax": 0.00131138,
+          "applyImplAvg": 0.00119148,
+          "applyImplMin": 0.00117103,
+          "applyImplMax": 0.00130479
         }
       },
       "96": {
@@ -2004,6 +3132,11 @@
           "transformAvg": 0.00125,
           "transformMin": 0.00116,
           "transformMax": 0.00155
+        },
+        "haswell": {
+          "transformAvg": 0.0013125,
+          "transformMin": 0.00124543,
+          "transformMax": 0.00161598
         }
       },
       "4608": {
@@ -2011,6 +3144,11 @@
           "transformAvg": 0.00251,
           "transformMin": 0.00229,
           "transformMax": 0.00315
+        },
+        "haswell": {
+          "transformAvg": 0.00259251,
+          "transformMin": 0.00242951,
+          "transformMax": 0.0031697
         }
       },
       "2304": {
@@ -2018,6 +3156,11 @@
           "transformAvg": 0.00489,
           "transformMin": 0.00457,
           "transformMax": 0.00594
+        },
+        "haswell": {
+          "transformAvg": 0.00506719,
+          "transformMin": 0.00479138,
+          "transformMax": 0.00625495
         }
       },
       "1152": {
@@ -2025,6 +3168,11 @@
           "transformAvg": 0.00965,
           "transformMin": 0.00894,
           "transformMax": 0.0125
+        },
+        "haswell": {
+          "transformAvg": 0.0100651,
+          "transformMin": 0.0094812,
+          "transformMax": 0.0124445
         }
       },
       "576": {
@@ -2032,6 +3180,11 @@
           "transformAvg": 0.0197,
           "transformMin": 0.0181,
           "transformMax": 0.0249
+        },
+        "haswell": {
+          "transformAvg": 0.0206273,
+          "transformMin": 0.0194971,
+          "transformMax": 0.024804
         }
       },
       "288": {
@@ -2039,6 +3192,11 @@
           "transformAvg": 0.0406,
           "transformMin": 0.0377,
           "transformMax": 0.0506
+        },
+        "haswell": {
+          "transformAvg": 0.0419424,
+          "transformMin": 0.0399303,
+          "transformMax": 0.0495587
         }
       },
       "96": {
@@ -2055,6 +3213,11 @@
           "transformAvg": 0.00016,
           "transformMin": 0.000157,
           "transformMax": 0.000248
+        },
+        "haswell": {
+          "transformAvg": 0.000173031,
+          "transformMin": 0.000169689,
+          "transformMax": 0.00019882
         }
       },
       "4608": {
@@ -2062,6 +3225,11 @@
           "transformAvg": 0.000321,
           "transformMin": 0.000311,
           "transformMax": 0.00041
+        },
+        "haswell": {
+          "transformAvg": 0.0003358,
+          "transformMin": 0.000331705,
+          "transformMax": 0.000376307
         }
       },
       "2304": {
@@ -2069,6 +3237,11 @@
           "transformAvg": 0.000579,
           "transformMin": 0.000557,
           "transformMax": 0.00071
+        },
+        "haswell": {
+          "transformAvg": 0.000612166,
+          "transformMin": 0.000602631,
+          "transformMax": 0.000665682
         }
       },
       "1152": {
@@ -2076,6 +3249,11 @@
           "transformAvg": 0.00115,
           "transformMin": 0.00113,
           "transformMax": 0.00155
+        },
+        "haswell": {
+          "transformAvg": 0.00123773,
+          "transformMin": 0.00119662,
+          "transformMax": 0.00136166
         }
       },
       "576": {
@@ -2083,6 +3261,11 @@
           "transformAvg": 0.00227,
           "transformMin": 0.0022,
           "transformMax": 0.00302
+        },
+        "haswell": {
+          "transformAvg": 0.0023715,
+          "transformMin": 0.00233474,
+          "transformMax": 0.00242669
         }
       },
       "288": {
@@ -2090,6 +3273,11 @@
           "transformAvg": 0.0044,
           "transformMin": 0.00431,
           "transformMax": 0.00605
+        },
+        "haswell": {
+          "transformAvg": 0.00461002,
+          "transformMin": 0.00458824,
+          "transformMax": 0.00466863
         }
       },
       "96": {
@@ -2111,6 +3299,14 @@
           "applyImplAvg": 0.000519,
           "applyImplMin": 0.000382,
           "applyImplMax": 0.00633
+        },
+        "haswell": {
+          "transformAvg": 0.000970598,
+          "transformMin": 0.000398857,
+          "transformMax": 0.00606563,
+          "applyImplAvg": 0.000964329,
+          "applyImplMin": 0.00039422,
+          "applyImplMax": 0.00604585
         }
       },
       "4608": {
@@ -2121,6 +3317,14 @@
           "applyImplAvg": 0.000927,
           "applyImplMin": 0.000759,
           "applyImplMax": 0.00767
+        },
+        "haswell": {
+          "transformAvg": 0.00146311,
+          "transformMin": 0.000787307,
+          "transformMax": 0.00747481,
+          "applyImplAvg": 0.00145627,
+          "applyImplMin": 0.000782132,
+          "applyImplMax": 0.00745497
         }
       },
       "2304": {
@@ -2131,6 +3335,14 @@
           "applyImplAvg": 0.00176,
           "applyImplMin": 0.00153,
           "applyImplMax": 0.0112
+        },
+        "haswell": {
+          "transformAvg": 0.00245818,
+          "transformMin": 0.00157203,
+          "transformMax": 0.0102856,
+          "applyImplAvg": 0.00245045,
+          "applyImplMin": 0.00156584,
+          "applyImplMax": 0.0102644
         }
       },
       "1152": {
@@ -2141,6 +3353,14 @@
           "applyImplAvg": 0.00376,
           "applyImplMin": 0.00314,
           "applyImplMax": 0.0186
+        },
+        "haswell": {
+          "transformAvg": 0.00498618,
+          "transformMin": 0.00316036,
+          "transformMax": 0.0160301,
+          "applyImplAvg": 0.00497817,
+          "applyImplMin": 0.00315413,
+          "applyImplMax": 0.0160065
         }
       },
       "576": {
@@ -2151,6 +3371,14 @@
           "applyImplAvg": 0.00983,
           "applyImplMin": 0.00627,
           "applyImplMax": 0.0313
+        },
+        "haswell": {
+          "transformAvg": 0.0100844,
+          "transformMin": 0.0070149,
+          "transformMax": 0.0274174,
+          "applyImplAvg": 0.0100755,
+          "applyImplMin": 0.00700795,
+          "applyImplMax": 0.0273941
         }
       },
       "288": {
@@ -2161,6 +3389,14 @@
           "applyImplAvg": 0.0215,
           "applyImplMin": 0.0144,
           "applyImplMax": 0.0605
+        },
+        "haswell": {
+          "transformAvg": 0.0202429,
+          "transformMin": 0.014779,
+          "transformMax": 0.0499158,
+          "applyImplAvg": 0.0202296,
+          "applyImplMin": 0.014769,
+          "applyImplMax": 0.0498883
         }
       },
       "96": {
@@ -2183,6 +3419,14 @@
           "applyImplAvg": 5.21e-05,
           "applyImplMin": 4.93e-05,
           "applyImplMax": 9.43e-05
+        },
+        "haswell": {
+          "transformAvg": "5.41421e-05",
+          "transformMin": "5.333e-05",
+          "transformMax": "7.1307e-05",
+          "applyImplAvg": "4.99003e-05",
+          "applyImplMin": "4.9101e-05",
+          "applyImplMax": "6.6867e-05"
         }
       },
       "4608": {
@@ -2193,6 +3437,14 @@
           "applyImplAvg": 0.000105,
           "applyImplMin": 9.47e-05,
           "applyImplMax": 0.000164
+        },
+        "haswell": {
+          "transformAvg": 0.000102487,
+          "transformMin": 0.00010064,
+          "transformMax": 0.000121453,
+          "applyImplAvg": "9.79842e-05",
+          "applyImplMin": "9.6163e-05",
+          "applyImplMax": 0.000116749
         }
       },
       "2304": {
@@ -2203,6 +3455,14 @@
           "applyImplAvg": 0.000188,
           "applyImplMin": 0.000182,
           "applyImplMax": 0.000242
+        },
+        "haswell": {
+          "transformAvg": 0.000182718,
+          "transformMin": 0.00018009,
+          "transformMax": 0.000205748,
+          "applyImplAvg": 0.000178178,
+          "applyImplMin": 0.00017556,
+          "applyImplMax": 0.000201023
         }
       },
       "1152": {
@@ -2213,6 +3473,14 @@
           "applyImplAvg": 0.000379,
           "applyImplMin": 0.000361,
           "applyImplMax": 0.000469
+        },
+        "haswell": {
+          "transformAvg": 0.000359847,
+          "transformMin": 0.000353541,
+          "transformMax": 0.000419272,
+          "applyImplAvg": 0.000355207,
+          "applyImplMin": 0.000348985,
+          "applyImplMax": 0.000413732
         }
       },
       "576": {
@@ -2223,6 +3491,14 @@
           "applyImplAvg": 0.000732,
           "applyImplMin": 0.00071,
           "applyImplMax": 0.000868
+        },
+        "haswell": {
+          "transformAvg": 0.000705867,
+          "transformMin": 0.000696649,
+          "transformMax": 0.000745311,
+          "applyImplAvg": 0.000700632,
+          "applyImplMin": 0.000691605,
+          "applyImplMax": 0.000739801
         }
       },
       "288": {
@@ -2233,6 +3509,14 @@
           "applyImplAvg": 0.00148,
           "applyImplMin": 0.00135,
           "applyImplMax": 0.0106
+        },
+        "haswell": {
+          "transformAvg": 0.00140408,
+          "transformMin": 0.00138743,
+          "transformMax": 0.00143544,
+          "applyImplAvg": 0.00139803,
+          "applyImplMin": 0.00138137,
+          "applyImplMax": 0.00142973
         }
       },
       "96": {

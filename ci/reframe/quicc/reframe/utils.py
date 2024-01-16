@@ -2,7 +2,7 @@
 
 import json
 import re
-import importlib.resources as imlib_res
+import pathlib as pl
 from collections import defaultdict
 import numpy as np
 
@@ -78,15 +78,14 @@ def write_timings(out_file, db):
     with open(out_file, 'w') as file:
         json.dump(db, file, indent=2)
 
-def read_timings(db_file):
-    """Read timings and build dictionary
+def read_reference_timings(db_file):
+    """Read reference timings and build dictionary
     """
-
     # Read JSON database
-    with imlib_res.files(__package__).joinpath(f'timings/{db_file}').open() as file:
-        db = json.loads(file.read())
-
+    with pl.Path(__file__).parent.joinpath(f'timings/{db_file}') as file:
+        db = json.loads(file.read_text())
     return db
+
 
 def update_timings(new_file, old_file):
     """Update timings if large changes
@@ -96,8 +95,9 @@ def update_timings(new_file, old_file):
     with open(new_file,'r') as file:
         new_db = json.loads(file.read())
 
-    # Read new JSON database
-    old_db = read_timings(old_file)
+    # Read old JSON database
+    with open(old_file,'r') as file:
+        old_db = json.loads(file.read())
 
     u_margin = 1.0 + 0.1
     l_margin = 1.0 - 0.25

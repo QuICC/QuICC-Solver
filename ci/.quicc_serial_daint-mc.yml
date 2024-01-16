@@ -1,7 +1,7 @@
 # This file is generated, do not modify!
 include:
 - remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
-- /ci/gitlab/.daint_runner.yml
+- /ci/gitlab/.cscs_runners.yml
 - /ci/gitlab/.quicc_tests.yml
 - /ci/gitlab/.quicc_models.yml
 stages:
@@ -14,25 +14,25 @@ build-quicc-base:
   extends: .container-builder
   stage: build_base
   variables:
-    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_cpu
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:fd59159aa7de9b4fe923aa22f9656e0d
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-mc
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:65306c0c0a122b63338fea40ca9bad60
 build-quicc:
   extends: .container-builder
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_serial
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:fd59159aa7de9b4fe923aa22f9656e0d"]'
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:65306c0c0a122b63338fea40ca9bad60"]'
 test-quicc-lib:
   extends:
   - .test-lib
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
 BoussinesqSphereDynamoExplicit_serial:
   extends:
   - .BoussinesqSphereDynamoExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -42,8 +42,8 @@ BoussinesqSphereDynamoExplicit_serial:
 BoussinesqSphereDynamoImplicit_serial:
   extends:
   - .BoussinesqSphereDynamoImplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -53,8 +53,8 @@ BoussinesqSphereDynamoImplicit_serial:
 BoussinesqShellDynamoExplicit_serial:
   extends:
   - .BoussinesqShellDynamoExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -64,8 +64,8 @@ BoussinesqShellDynamoExplicit_serial:
 BoussinesqShellDynamoImplicit_serial:
   extends:
   - .BoussinesqShellDynamoImplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -75,8 +75,8 @@ BoussinesqShellDynamoImplicit_serial:
 BoussinesqSphereRTCExplicit_serial:
   extends:
   - .BoussinesqSphereRTCExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -86,8 +86,8 @@ BoussinesqSphereRTCExplicit_serial:
 BoussinesqSphereRTCImplicit_serial:
   extends:
   - .BoussinesqSphereRTCImplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -97,8 +97,8 @@ BoussinesqSphereRTCImplicit_serial:
 BoussinesqShellRTCExplicit_serial:
   extends:
   - .BoussinesqShellRTCExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -108,8 +108,8 @@ BoussinesqShellRTCExplicit_serial:
 BoussinesqShellRTCImplicit_serial:
   extends:
   - .BoussinesqShellRTCImplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -119,8 +119,8 @@ BoussinesqShellRTCImplicit_serial:
 BoussinesqSphereTCExplicit_serial:
   extends:
   - .BoussinesqSphereTCExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -130,8 +130,8 @@ BoussinesqSphereTCExplicit_serial:
 BoussinesqShellTCExplicit_serial:
   extends:
   - .BoussinesqShellTCExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -141,8 +141,8 @@ BoussinesqShellTCExplicit_serial:
 BoussinesqPlaneRBCExplicit_serial:
   extends:
   - .BoussinesqPlaneRBCExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
@@ -152,6 +152,6 @@ BoussinesqPlaneRBCExplicit_serial:
 ci-cache-cleanup:
   extends: .container-runner-daint
   stage: cleanup
-  image: $CSCS_REGISTRY_PATH/quicc_serial:$CI_COMMIT_SHA
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   script:
   - rm -Rf $CI_CACHE_FOLDER/*

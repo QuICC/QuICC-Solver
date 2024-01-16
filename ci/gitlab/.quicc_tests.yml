@@ -37,30 +37,36 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "PyQuICCTests"
 
-.time-lib-cpu:
+.time-lib-daint-mc:
   script:
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
     - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_cpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files
 
-.time-lib-sweep-cpu:
+.time-lib-sweep-daint-mc:
   script:
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
     - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_cpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files --parameterize=testId=108,109 --parameterize=splitting=96,288,576,1152,2304,4608,9216
 
-.time-lib-gpu:
+.time-lib-daint-gpu:
   script:
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
     - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_gpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files
 
-.time-lib-sweep-gpu:
+.time-lib-sweep-daint-gpu:
   script:
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
     - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_gpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files --parameterize=testId=108,109 --parameterize=splitting=8,16,32,64,96,128,256
+
+.time-lib-alps-a100:
+  extends: .time-lib-daint-gpu
+
+.time-lib-sweep-alps-a100:
+  extends: .time-lib-sweep-daint-gpu

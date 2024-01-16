@@ -88,16 +88,21 @@ class testBase(rfm.RunOnlyRegressionTest):
     @run_before('run')
     def set_perf_reference(self):
         proc = self.current_partition.processor
+        device = self.current_partition.devices
         pname = self.current_partition.fullname
         arch = proc.arch
 
         # fix for gpu systems
         if pname in ('daint:gpu', 'dom:gpu'):
             arch = 'p100'
+        elif pname in ('alps:a100'):
+            arch = 'a100'
         # fix for CI
         elif pname == 'generic:default':
             if(arch == 'haswell'):
                 arch = 'p100'
+            elif(arch == 'zen3'):
+                arch = 'a100'
 
         with contextlib.suppress(KeyError):
             self.reference = {
@@ -172,7 +177,7 @@ class splitTestTransform(testTransform):
         """ Read references from JSON file
         """
 
-        db = quicc_utils.read_timings(db_file)
+        db = quicc_utils.read_reference_timings(db_file)
 
         # Extract test data from DB if available
         if test in db:

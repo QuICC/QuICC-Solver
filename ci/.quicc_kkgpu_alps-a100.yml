@@ -1,0 +1,151 @@
+# This file is generated, do not modify!
+include:
+- remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
+- /ci/gitlab/.cscs_runners.yml
+- /ci/gitlab/.quicc_tests.yml
+- /ci/gitlab/.quicc_models.yml
+stages:
+- build_base
+- build
+- test
+- model-build-and-test
+- cleanup
+build-quicc-base:
+  extends: .container-builder
+  stage: build_base
+  variables:
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-a100
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:f6c51a53d55aebc29e0951564f79ec54
+build-quicc:
+  extends: .container-builder
+  stage: build
+  variables:
+    DOCKERFILE: ci/docker/Dockerfile_kkgpu
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:f6c51a53d55aebc29e0951564f79ec54"]'
+test-quicc-lib:
+  extends:
+  - .test-lib
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+time-quicc-lib:
+  extends:
+  - .time-lib-alps-a100
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+BoussinesqSphereDynamoExplicit_serial:
+  extends:
+  - .BoussinesqSphereDynamoExplicit_serial
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '64'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqSphereDynamoImplicit_serial:
+  extends:
+  - .BoussinesqSphereDynamoImplicit_serial
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '64'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqShellDynamoExplicit_serial:
+  extends:
+  - .BoussinesqShellDynamoExplicit_serial
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '64'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqShellDynamoImplicit_serial:
+  extends:
+  - .BoussinesqShellDynamoImplicit_serial
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '64'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqSphereRTCExplicit_serial:
+  extends:
+  - .BoussinesqSphereRTCExplicit_serial
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '64'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqSphereRTCImplicit_serial:
+  extends:
+  - .BoussinesqSphereRTCImplicit_serial
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '64'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqShellRTCExplicit_serial:
+  extends:
+  - .BoussinesqShellRTCExplicit_serial
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '64'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqShellRTCImplicit_serial:
+  extends:
+  - .BoussinesqShellRTCImplicit_serial
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '64'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqSphereTCExplicit_serial:
+  extends:
+  - .BoussinesqSphereTCExplicit_serial
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '64'
+    QUICC_VERSION_TAG: kkgpu
+BoussinesqShellTCExplicit_serial:
+  extends:
+  - .BoussinesqShellTCExplicit_serial
+  - .alps-a100
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '64'
+    QUICC_VERSION_TAG: kkgpu
+ci-cache-cleanup:
+  extends: .container-runner-daint
+  stage: cleanup
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  script:
+  - rm -Rf $CI_CACHE_FOLDER/*
