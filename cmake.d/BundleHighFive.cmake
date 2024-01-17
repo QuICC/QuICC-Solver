@@ -4,7 +4,7 @@
 message(DEBUG "HighFive")
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
-set(QUICC_HIGHFIVE_VERSION "2.4.1")
+set(QUICC_HIGHFIVE_VERSION "2.8.0")
 
 option(QUICC_USE_SYSTEM_HIGHFIVE "Use system installed HighFive." OFF)
 
