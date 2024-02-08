@@ -6,25 +6,28 @@ from typing import NamedTuple
 from quicc.gitlab.models import default_configs
 from quicc.gitlab.yaml import base_yaml
 
+"""Config struct to generate a pipeline"""
 class config(NamedTuple):
     tag: str
     backend: str
+
+backend2nodeSize = {
+    "daint-mc": 72,
+    "daint-gpu": 24,
+    "alps-a100": 64
+}
 
 """Base class, defines a pipeline that build the docker image, test and time the library and cleans up the runner"""
 class base_pipeline(base_yaml):
     def __init__(self, cnf):
         image_location = '$CSCS_REGISTRY_PATH'
         self.cs_base_yml = 'https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml'
-        self.base_docker = 'ci/docker/baseimage/Dockerfile_quicc_baseimage_cpu'
-        self.cpus_full_node = 72
-        if (cnf.backend == 'gpu'):
-            self.base_docker = 'ci/docker/baseimage/Dockerfile_quicc_baseimage_gpu'
-            self.cpus_full_node = 24
-        base_md5sum = hashlib.md5(open(self.base_docker[3:], 'rb').read()).hexdigest()
         self.backend = cnf.backend
+        self.base_docker = 'ci/docker/baseimage/Dockerfile_quicc_baseimage_'+self.backend
+        self.cpus_full_node = backend2nodeSize[self.backend]
+        base_md5sum = hashlib.md5(open(self.base_docker[3:], 'rb').read()).hexdigest()
         self.tag = cnf.tag
-
-        image = 'quicc_'+cnf.tag+':$CI_COMMIT_SHA'
+        image = 'quicc_'+cnf.tag+'_'+cnf.backend+':$CI_COMMIT_SHA'
         self.path_image = image_location+'/'+image
         self.base_path_image = f'{image_location}/baseimage/quicc_baseimage_{cnf.backend}:{base_md5sum}'
         self.docker = 'ci/docker/Dockerfile_'+cnf.tag
@@ -46,7 +49,7 @@ class base_pipeline(base_yaml):
             'include':
                 [
                     {'remote': self.cs_base_yml},
-                    '/ci/gitlab/.daint_runner.yml',
+                    '/ci/gitlab/.cscs_runners.yml',
                 ],
             'stages':
                 [

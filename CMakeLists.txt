@@ -19,10 +19,6 @@ set_property(CACHE CMAKE_BUILD_TYPE
 set(CMAKE_CUDA_FLAGS_DEBUG_INIT "-G --source-in-ptx")
 set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO_INIT "--generate-line-info --source-in-ptx")
 
-if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
-  set(CMAKE_CUDA_ARCHITECTURES 60)
-endif()
-
 if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
     set(GPU_TARGETS "gfx90a" CACHE STRING "GPU targets to compile for")
 endif()

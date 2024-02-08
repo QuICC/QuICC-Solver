@@ -1,7 +1,7 @@
 # This file is generated, do not modify!
 include:
 - remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
-- /ci/gitlab/.daint_runner.yml
+- /ci/gitlab/.cscs_runners.yml
 - /ci/gitlab/.quicc_models_perf.yml
 stages:
 - build_base
@@ -12,20 +12,20 @@ build-quicc-base:
   extends: .container-builder
   stage: build_base
   variables:
-    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_cpu
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:fd59159aa7de9b4fe923aa22f9656e0d
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-mc
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:65306c0c0a122b63338fea40ca9bad60
 build-quicc:
   extends: .container-builder
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_mpi
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:fd59159aa7de9b4fe923aa22f9656e0d"]'
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:65306c0c0a122b63338fea40ca9bad60"]'
 BoussinesqSphereDynamoExplicit:
   extends:
   - .BoussinesqSphereDynamoExplicit
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -34,8 +34,8 @@ BoussinesqSphereDynamoExplicit:
 BoussinesqSphereDynamoImplicit:
   extends:
   - .BoussinesqSphereDynamoImplicit
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -44,8 +44,8 @@ BoussinesqSphereDynamoImplicit:
 BoussinesqShellDynamoExplicit:
   extends:
   - .BoussinesqShellDynamoExplicit
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -54,8 +54,8 @@ BoussinesqShellDynamoExplicit:
 BoussinesqSphereRTCExplicit:
   extends:
   - .BoussinesqSphereRTCExplicit
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -64,8 +64,8 @@ BoussinesqSphereRTCExplicit:
 BoussinesqSphereRTCImplicit:
   extends:
   - .BoussinesqSphereRTCImplicit
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -74,8 +74,8 @@ BoussinesqSphereRTCImplicit:
 BoussinesqShellRTCExplicit:
   extends:
   - .BoussinesqShellRTCExplicit
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -84,8 +84,8 @@ BoussinesqShellRTCExplicit:
 BoussinesqSphereTCExplicit:
   extends:
   - .BoussinesqSphereTCExplicit
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
@@ -94,16 +94,16 @@ BoussinesqSphereTCExplicit:
 BoussinesqShellTCExplicit:
   extends:
   - .BoussinesqShellTCExplicit
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '36'
     SLURM_NTASKS_PER_NODE: '36'
     SLURM_CPUS_PER_TASK: '2'
     QUICC_VERSION_TAG: mpi
 ci-cache-cleanup:
-  extends: .container-runner-daint-gpu
+  extends: .container-runner-daint
   stage: cleanup
-  image: $CSCS_REGISTRY_PATH/quicc_mpi:$CI_COMMIT_SHA
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   script:
   - rm -Rf $CI_CACHE_FOLDER/*

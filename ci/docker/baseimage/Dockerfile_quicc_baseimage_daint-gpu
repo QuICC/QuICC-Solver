@@ -42,3 +42,6 @@ RUN ( test -L /opt/view/bin/nvcc_wrapper && \
              $(find /opt/software -name nvcc_wrapper) \
     ) \
   || ( echo "/opt/view/bin/nvcc_wrapper must be a symbolic link" && exit 1 )
+
+# set env var to init CMAKE_CUDA_ARCHITECTURES
+ENV CUDAARCHS 60

@@ -1,7 +1,7 @@
 # This file is generated, do not modify!
 include:
 - remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
-- /ci/gitlab/.daint_runner.yml
+- /ci/gitlab/.cscs_runners.yml
 - /ci/gitlab/.quicc_tests.yml
 - /ci/gitlab/.quicc_models.yml
 stages:
@@ -14,138 +14,138 @@ build-quicc-base:
   extends: .container-builder
   stage: build_base
   variables:
-    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_cpu
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:fd59159aa7de9b4fe923aa22f9656e0d
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-gpu
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:7a12f03f6ce481be832ae6175a76f745
 build-quicc:
   extends: .container-builder
   stage: build
   variables:
-    DOCKERFILE: ci/docker/Dockerfile_kk
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_cpu:fd59159aa7de9b4fe923aa22f9656e0d"]'
+    DOCKERFILE: ci/docker/Dockerfile_kkgpu
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:7a12f03f6ce481be832ae6175a76f745"]'
 test-quicc-lib:
   extends:
   - .test-lib
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
 time-quicc-lib:
   extends:
-  - .time-lib-cpu
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .time-lib-daint-gpu
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
 BoussinesqSphereDynamoExplicit_serial:
   extends:
   - .BoussinesqSphereDynamoExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '72'
-    QUICC_VERSION_TAG: kk
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
 BoussinesqSphereDynamoImplicit_serial:
   extends:
   - .BoussinesqSphereDynamoImplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '72'
-    QUICC_VERSION_TAG: kk
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
 BoussinesqShellDynamoExplicit_serial:
   extends:
   - .BoussinesqShellDynamoExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '72'
-    QUICC_VERSION_TAG: kk
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
 BoussinesqShellDynamoImplicit_serial:
   extends:
   - .BoussinesqShellDynamoImplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '72'
-    QUICC_VERSION_TAG: kk
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
 BoussinesqSphereRTCExplicit_serial:
   extends:
   - .BoussinesqSphereRTCExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '72'
-    QUICC_VERSION_TAG: kk
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
 BoussinesqSphereRTCImplicit_serial:
   extends:
   - .BoussinesqSphereRTCImplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '72'
-    QUICC_VERSION_TAG: kk
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
 BoussinesqShellRTCExplicit_serial:
   extends:
   - .BoussinesqShellRTCExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '72'
-    QUICC_VERSION_TAG: kk
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
 BoussinesqShellRTCImplicit_serial:
   extends:
   - .BoussinesqShellRTCImplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '72'
-    QUICC_VERSION_TAG: kk
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
 BoussinesqSphereTCExplicit_serial:
   extends:
   - .BoussinesqSphereTCExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '72'
-    QUICC_VERSION_TAG: kk
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
 BoussinesqShellTCExplicit_serial:
   extends:
   - .BoussinesqShellTCExplicit_serial
-  - .cpu
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  - .daint-gpu
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '72'
-    QUICC_VERSION_TAG: kk
+    SLURM_CPUS_PER_TASK: '24'
+    QUICC_VERSION_TAG: kkgpu
 ci-cache-cleanup:
   extends: .container-runner-daint
   stage: cleanup
-  image: $CSCS_REGISTRY_PATH/quicc_kk:$CI_COMMIT_SHA
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   script:
   - rm -Rf $CI_CACHE_FOLDER/*

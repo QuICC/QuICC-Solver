@@ -16,7 +16,7 @@ class TransformWorlandTests_Poly_P_base_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformWorlandTests_Poly_P_viewCpu_t_projector(splitTestTransform):
@@ -27,7 +27,7 @@ class TransformWorlandTests_Poly_P_viewCpu_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformWorlandTests_Poly_P_base_t_integrator(splitTestTransform):
@@ -38,7 +38,7 @@ class TransformWorlandTests_Poly_P_base_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformWorlandTests_Poly_P_viewCpu_t_integrator(splitTestTransform):
@@ -49,7 +49,7 @@ class TransformWorlandTests_Poly_P_viewCpu_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
 # FFT algorithm
 
@@ -62,7 +62,7 @@ class TransformWorlandTests_Fft_P_base_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformWorlandTests_Fft_P_base_t_integrator(splitTestTransform):
@@ -73,7 +73,7 @@ class TransformWorlandTests_Fft_P_base_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
 #
 # Associated Legendre
@@ -87,7 +87,7 @@ class TransformALegendreTests_Poly_P_base_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
         # Test id = 108, splitting = 8*12
         self.add_reference(108, 8*12, 'icelake',   'applyOperatorsAvg', (0.00610543, -0.25, 0.1, 's'))
@@ -112,7 +112,7 @@ class TransformALegendreTests_Poly_P_viewCpu_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
         # Test id = 108, splitting = 8*12
         self.add_reference(108, 8*12, 'icelake',   'applyOperatorsAvg', (0.00657657, -0.25, 0.1, 's'))
@@ -126,7 +126,7 @@ class TransformALegendreTests_Poly_LlDivS1Dp_base_t_projector(splitTestTransform
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
         # Test id = 108, splitting = 8*12
         self.add_reference(108, 8*12, 'icelake',   'applyOperatorsAvg', (0.00613202, -0.25, 0.1, 's'))
@@ -140,7 +140,7 @@ class TransformALegendreTests_Poly_LlDivS1Dp_viewCpu_t_projector(splitTestTransf
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
         # Test id = 108, splitting = 8*12
         self.add_reference(108, 8*12, 'icelake',   'applyOperatorsAvg', (0.00677547, -0.25, 0.1, 's'))
@@ -155,7 +155,7 @@ class TransformALegendreTests_Poly_P_base_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
         # Test id = 108, splitting = 8*12
         self.add_reference(108, 8*12, 'icelake',   'applyOperatorsAvg', (0.00625215, -0.25, 0.1, 's'))
@@ -169,7 +169,7 @@ class TransformALegendreTests_Poly_P_viewCpu_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
         # Test id = 108, splitting = 8*12
         self.add_reference(108, 8*12, 'icelake',   'applyOperatorsAvg', (0.00680607, -0.25, 0.1, 's'))
@@ -187,7 +187,7 @@ class TransformFourierTests_Mixed_P_base_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
         # Test id = 108, splitting = 8*12
         self.add_reference(108, 8*12, 'icelake',   'transformAvg', (0.00607775, -0.25, 0.05, 's'))
@@ -201,7 +201,7 @@ class TransformFourierTests_Mixed_P_viewCpu_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
         # Test id = 108, splitting = 8*12
         self.add_reference(108, 8*12, 'icelake',   'transformAvg', (0.00629394, -0.25, 0.05, 's'))
@@ -215,7 +215,7 @@ class TransformFourierTests_Mixed_D1_base_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
         # Test id = 108, splitting = 8*12
         self.add_reference(108, 8*12, 'icelake',   'transformAvg', (0.0114277, -0.25, 0.05, 's'))
@@ -229,7 +229,7 @@ class TransformFourierTests_Mixed_D1_viewCpu_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
         # Test id = 108, splitting = 8*12
         self.add_reference(108, 8*12, 'icelake',   'transformAvg', (0.00684981, -0.25, 0.05, 's'))
@@ -244,7 +244,7 @@ class TransformFourierTests_Mixed_P_base_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_P_viewCpu_t_integrator(splitTestTransform):
@@ -255,7 +255,7 @@ class TransformFourierTests_Mixed_P_viewCpu_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_D1_base_t_integrator(splitTestTransform):
@@ -266,7 +266,7 @@ class TransformFourierTests_Mixed_D1_base_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_D1_viewCpu_t_integrator(splitTestTransform):
@@ -277,7 +277,7 @@ class TransformFourierTests_Mixed_D1_viewCpu_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("daint_mc_cpu.json", self.__class__.__name__)
+        self.read_references("cpu.json", self.__class__.__name__)
 
 #
 # HDF5 IO tests

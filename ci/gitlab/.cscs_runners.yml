@@ -9,15 +9,22 @@
     SLURM_NTASKS_PER_NODE: 1
     SLURM_TIMELIMIT: '01:20:00'
 
-.cpu:
+.daint-mc:
   extends: .daint_runner
   variables:
     SLURM_CONSTRAINT: 'mc'
     SLURM_CPUS_PER_TASK: 72
 
-.gpu:
+.daint-gpu:
   extends: .daint_runner
   variables:
     SLURM_CONSTRAINT: 'gpu'
-    SLURM_TIMELIMIT: '01:20:00'
     SLURM_CPUS_PER_TASK: 24
+
+.alps-a100:
+  extends: .container-runner-clariden-a100
+  variables:
+    PULL_ON_HOST_MACHINE: 'NO'
+    CSCS_REGISTRY_LOGIN: 'YES'
+    USE_MPI: 'YES'
+    SLURM_TIMELIMIT: '01:20:00'
