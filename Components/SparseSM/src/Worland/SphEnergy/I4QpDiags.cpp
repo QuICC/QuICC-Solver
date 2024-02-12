@@ -5,12 +5,11 @@
 
 // System includes
 //
-#include <cassert>
 #include <stdexcept>
 
 // Project includes
 //
-#include "QuICC/SparseSM/Worland/Chebyshev/I4QpDiags.hpp"
+#include "QuICC/SparseSM/Worland/SphEnergy/I4QpDiags.hpp"
 
 namespace QuICC {
 
@@ -18,10 +17,10 @@ namespace SparseSM {
 
 namespace Worland {
 
-namespace Chebyshev {
+namespace SphEnergy {
 
    I4QpDiags::I4QpDiags(const Scalar_t alpha, const int l, const int q)
-      : QuICC::SparseSM::Worland::I4QpDiags(alpha, MHD_MP(-0.5), l, q), mI4(alpha, l, 0)
+      : QuICC::SparseSM::Worland::I4QpDiags(alpha, MHD_MP(0.5), l, q), mI4(alpha, l, 0)
    {
       if(q > 2)
       {
@@ -34,7 +33,7 @@ namespace Chebyshev {
       auto l1 = this->l();
       ACoeff_t val;
 
-     val = 16.0*(l1+ n - 3.0)*(l1+ n - 2.0)*(l1+ n - 1.0)*(2.0*l1+ 2.0*n - 5.0)/((l1+ 2.0*n - 7.0)*(l1+ 2.0*n - 6.0)*(l1+ 2.0*n - 5.0)*(l1+ 2.0*n - 4.0)*(l1+ 2.0*n - 3.0)*(l1+ 2.0*n - 2.0)*(l1+ 2.0*n - 1.0));
+      val = 256.0*(2.0*l1 + 2.0*n - 5.0)*(2.0*l1 + 2.0*n - 3.0)*(2.0*l1 + 2.0*n - 1.0)*(2.0*l1 + 2.0*n + 1.0)/((2.0*l1 + 4.0*n - 11.0)*(2.0*l1 + 4.0*n - 9.0)*(2.0*l1 + 4.0*n - 7.0)*(2.0*l1 + 4.0*n - 5.0)*(2.0*l1 + 4.0*n - 3.0)*(2.0*l1 + 4.0*n - 1.0)*(2.0*l1 + 4.0*n + 1.0));
 
       return this->normalizeDiag(n,-4,1)*val;
    }
@@ -45,7 +44,7 @@ namespace Chebyshev {
       const auto l2 = l1*l1;
       ACoeff_t val;
 
-     val = -8.0*(l1+ n - 2.0)*(l1+ n - 1.0)*(12.0*l2 + 8.0*l1*n - 16.0*l1- 4.0*n.pow(2) + 12.0*n + 7.0)/((l1+ 2.0*n - 6.0)*(l1+ 2.0*n - 5.0)*(l1+ 2.0*n - 4.0)*(l1+ 2.0*n - 3.0)*(l1+ 2.0*n - 2.0)*(l1+ 2.0*n - 1.0)*(l1+ 2.0*n + 1.0));
+      val = -256.0*(2.0*l1 + 2.0*n - 3.0)*(2.0*l1 + 2.0*n - 1.0)*(2.0*l1 + 2.0*n + 1.0)*(6.0*l1 - 2.0*n + 1.0)/((2.0*l1 + 4.0*n - 9.0)*(2.0*l1 + 4.0*n - 7.0)*(2.0*l1 + 4.0*n - 5.0)*(2.0*l1 + 4.0*n - 3.0)*(2.0*l1 + 4.0*n - 1.0)*(2.0*l1 + 4.0*n + 1.0)*(2.0*l1 + 4.0*n + 5.0));
 
       // Correct if q == 2
       this->correctQ2(val, n, -3);
@@ -60,7 +59,7 @@ namespace Chebyshev {
       const auto l3 = l2*l1;
       ACoeff_t val;
 
-     val = 12.0*(l1+ n - 1.0)*(8.0*l3 - 8.0*l2*n + 4.0*l2 - 24.0*l1*n.pow(2) + 40.0*l1*n + 26.0*l1- 8.0*n.pow(3) + 20.0*n.pow(2) + 2.0*n - 5.0)/((l1+ 2.0*n - 5.0)*(l1+ 2.0*n - 4.0)*(l1+ 2.0*n - 3.0)*(l1+ 2.0*n - 2.0)*(l1+ 2.0*n - 1.0)*(l1+ 2.0*n + 1.0)*(l1+ 2.0*n + 2.0));
+      val = 768.0*(2.0*l1 + 2.0*n - 1.0)*(2.0*l1 + 2.0*n + 1.0)*(4.0*l2 - 8.0*l1*n - 4.0*n.pow(2) + 7.0)/((2.0*l1 + 4.0*n - 7.0)*(2.0*l1 + 4.0*n - 5.0)*(2.0*l1 + 4.0*n - 3.0)*(2.0*l1 + 4.0*n - 1.0)*(2.0*l1 + 4.0*n + 1.0)*(2.0*l1 + 4.0*n + 5.0)*(2.0*l1 + 4.0*n + 7.0));
 
       // Correct if q == 2
       this->correctQ2(val, n, -2);
@@ -76,7 +75,7 @@ namespace Chebyshev {
       const auto l4 = l2*l2;
       ACoeff_t val;
 
-      val = -2.0*(16.0*l4 - 128.0*l3*n + 32.0*l3 - 192.0*l2*n.pow(2) + 96.0*l2*n + 272.0*l2 + 32.0*l1*n + 112.0*l1+ 48.0*n.pow(4) - 48.0*n.pow(3) - 144.0*n.pow(2) + 108.0*n + 81.0)/((l1+ 2.0*n - 4.0)*(l1+ 2.0*n - 3.0)*(l1+ 2.0*n - 2.0)*(l1+ 2.0*n - 1.0)*(l1+ 2.0*n + 1.0)*(l1+ 2.0*n + 2.0)*(l1+ 2.0*n + 3.0));
+      val = -256.0*(2.0*l1 + 2.0*n + 1.0)*(8.0*l3 - 72.0*l2*n - 36.0*l2 - 24.0*l1*n.pow(2) - 24.0*l1*n + 46.0*l1 + 24.0*n.pow(3) + 36.0*n.pow(2) - 18.0*n - 15.0)/((2.0*l1 + 4.0*n - 5.0)*(2.0*l1 + 4.0*n - 3.0)*(2.0*l1 + 4.0*n - 1.0)*(2.0*l1 + 4.0*n + 1.0)*(2.0*l1 + 4.0*n + 5.0)*(2.0*l1 + 4.0*n + 7.0)*(2.0*l1 + 4.0*n + 9.0));
 
       // Correct if q == 2
       this->correctQ2(val, n, -1);
@@ -91,7 +90,7 @@ namespace Chebyshev {
       const auto l3 = l2*l1;
       ACoeff_t val;
 
-      val = -(2.0*l1+ 2.0*n + 1.0)*(64.0*l3*n + 16.0*l3 - 96.0*l2*n.pow(2) - 48.0*l2*n - 96.0*l2 - 192.0*l1*n.pow(3) - 144.0*l1*n.pow(2) + 320.0*l1*n - 4.0*l1- 48.0*n.pow(4) - 48.0*n.pow(3) + 144.0*n.pow(2) + 108.0*n - 81.0)/((l1+ n)*(l1+ 2.0*n - 3.0)*(l1+ 2.0*n - 2.0)*(l1+ 2.0*n - 1.0)*(l1+ 2.0*n + 1.0)*(l1+ 2.0*n + 2.0)*(l1+ 2.0*n + 3.0)*(l1+ 2.0*n + 4.0));
+      val = -2048.0*(n + 1.0)*(8.0*l3 - 12.0*l2*n - 12.0*l2 - 24.0*l1*n.pow(2) - 48.0*l1*n - 2.0*l1 - 6.0*n.pow(3) - 18.0*n.pow(2) - 9.0*n + 3.0)/((2.0*l1 + 4.0*n - 3.0)*(2.0*l1 + 4.0*n - 1.0)*(2.0*l1 + 4.0*n + 1.0)*(2.0*l1 + 4.0*n + 5.0)*(2.0*l1 + 4.0*n + 7.0)*(2.0*l1 + 4.0*n + 9.0)*(2.0*l1 + 4.0*n + 11.0));
 
       // Correct if q == 2
       this->correctQ2(val, n, 0);
@@ -105,7 +104,7 @@ namespace Chebyshev {
       const auto l2 = l1*l1;
       ACoeff_t val;
 
-      val = -3.0*(2.0*n + 1.0)*(2.0*l1+ 2.0*n + 1.0)*(2.0*l1+ 2.0*n + 3.0)*(16.0*l2*n + 16.0*l2 - 24.0*l1- 8.0*n.pow(3) - 20.0*n.pow(2) + 2.0*n + 5.0)/(2.0*(l1+ n)*(l1+ n + 1.0)*(l1+ 2.0*n - 2.0)*(l1+ 2.0*n - 1.0)*(l1+ 2.0*n + 1.0)*(l1+ 2.0*n + 2.0)*(l1+ 2.0*n + 3.0)*(l1+ 2.0*n + 4.0)*(l1+ 2.0*n + 5.0));
+      val = -6144.0*(n + 1.0)*(n + 2.0)*(4.0*l2 - 2.0*n.pow(2) - 6.0*n - 1.0)/((2.0*l1 + 4.0*n - 1.0)*(2.0*l1 + 4.0*n + 1.0)*(2.0*l1 + 4.0*n + 5.0)*(2.0*l1 + 4.0*n + 7.0)*(2.0*l1 + 4.0*n + 9.0)*(2.0*l1 + 4.0*n + 11.0)*(2.0*l1 + 4.0*n + 13.0));
 
       // Correct if q == 2
       this->correctQ2(val, n, 1);
@@ -118,7 +117,7 @@ namespace Chebyshev {
       auto l1 = this->l();
       ACoeff_t val;
 
-      val = -(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*l1+ 2.0*n + 1.0)*(2.0*l1+ 2.0*n + 3.0)*(2.0*l1+ 2.0*n + 5.0)*(16.0*l1*n + 28.0*l1+ 4.0*n.pow(2) + 12.0*n - 7.0)/(4.0*(l1+ n)*(l1+ n + 1.0)*(l1+ n + 2.0)*(l1+ 2.0*n - 1.0)*(l1+ 2.0*n + 1.0)*(l1+ 2.0*n + 2.0)*(l1+ 2.0*n + 3.0)*(l1+ 2.0*n + 4.0)*(l1+ 2.0*n + 5.0)*(l1+ 2.0*n + 6.0));
+      val = -4096.0*(n + 1.0)*(n + 2.0)*(n + 3.0)*(4.0*l1 + n + 2.0)/((2.0*l1 + 4.0*n + 1.0)*(2.0*l1 + 4.0*n + 5.0)*(2.0*l1 + 4.0*n + 7.0)*(2.0*l1 + 4.0*n + 9.0)*(2.0*l1 + 4.0*n + 11.0)*(2.0*l1 + 4.0*n + 13.0)*(2.0*l1 + 4.0*n + 15.0));
 
       // Correct if q == 2
       this->correctQ2(val, n, 2);
@@ -131,7 +130,7 @@ namespace Chebyshev {
       auto l1 = this->l();
       ACoeff_t val;
 
-      val =  -(2.0*n + 1.0)*(2.0*n + 3.0)*(2.0*n + 5.0).pow(2)*(2.0*l1+ 2.0*n + 1.0)*(2.0*l1+ 2.0*n + 3.0)*(2.0*l1+ 2.0*n + 5.0)*(2.0*l1+ 2.0*n + 7.0)/(8.0*(l1+ n)*(l1+ n + 1.0)*(l1+ n + 2.0)*(l1+ n + 3.0)*(l1+ 2.0*n + 1.0)*(l1+ 2.0*n + 2.0)*(l1+ 2.0*n + 3.0)*(l1+ 2.0*n + 4.0)*(l1+ 2.0*n + 5.0)*(l1+ 2.0*n + 6.0)*(l1+ 2.0*n + 7.0));
+      val = -4096.0*(n + 1.0)*(n + 2.0)*(n + 3.0)*(n + 4.0)/((2.0*l1 + 4.0*n + 5.0)*(2.0*l1 + 4.0*n + 7.0)*(2.0*l1 + 4.0*n + 9.0)*(2.0*l1 + 4.0*n + 11.0)*(2.0*l1 + 4.0*n + 13.0)*(2.0*l1 + 4.0*n + 15.0)*(2.0*l1 + 4.0*n + 17.0));
 
       // Correct if q == 2
       this->correctQ2(val, n, 3);
@@ -170,19 +169,20 @@ namespace Chebyshev {
          // Truncation requires 3 coefficients from tau operator T: 
          // a = T[-2,-2], b = T[-1,-1], c = T[-2,-1]
          ACoeff_t m = n.bottomRows(1)-1;
-         ACoeff_t f = (2.0*l1 + 2.0*m - 1.0)*(l1 + 2.0*m - 4.0)/(l1 + m - 2.0);
+         ACoeff_t f = (2.0*l1 + 4.0*m - 5.0);
          ACoeff_t ncA = (this->normalizeDiag(m, -2, 1)/this->normalizeDiag(m, -2))*f;
 
          m = n.bottomRows(1);
-         f = (2.0*l1 + 2.0*m - 1.0)*(l1 + 2.0*m - 4.0)/(l1 + m - 2.0);
+         f = (2.0*l1 + 4.0*m - 5.0);
          ACoeff_t ncB = (this->normalizeDiag(m, -2, 1)/this->normalizeDiag(m, -2))*f;
 
+         // compute T[-2,-1] term, and simplify common factors
          m = n.bottomRows(1)-1;
-         ACoeff_t num = -2.0*(4.0*l2 + 4.0*l1 - 4.0*m.pow(2) + 4.0*m + 3.0)/((l1 + 2.0*m + 1.0));
+         ACoeff_t num = -(2.0*l1 - 2.0*m - 1.0)/((2.0*l1 + 4.0*m + 5.0));
          num *= this->normalizeDiag(m, -1, 1);
-         ACoeff_t prod = -8.0*l1*(l1 + m - 1.0)/((l1 + 2.0*m - 3.0)*(l1 + 2.0*m + 1.0));
+         ACoeff_t prod = -2.0*(2.0*l1 + 1.0)/((2.0*l1 + 4.0*m - 3.0)*(2.0*l1 + 4.0*m + 5.0));
          prod *= this->normalizeDiag(m, -1);
-         ACoeff_t den = 4.0*(l1 + m - 2.0)*(l1 + m - 1.0)/((l1 + 2.0*m - 4.0)*(l1 + 2.0*m - 3.0));
+         ACoeff_t den = (2.0*l1 + 2.0*m - 1.0)/((2.0*l1 + 4.0*m - 5.0)*(2.0*l1 + 4.0*m - 3.0));
          den *=  this->normalizeDiag(m, -2);
 
          ACoeff_t ncC = (num - ncB*prod)/den;;
@@ -255,7 +255,7 @@ namespace Chebyshev {
       }
    }
 
-} // Chebyshev
+} // SphEnergy
 } // Worland
 } // SparseSM
 } // QuICC

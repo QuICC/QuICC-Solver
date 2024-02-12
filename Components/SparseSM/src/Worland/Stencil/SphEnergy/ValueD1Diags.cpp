@@ -1,4 +1,4 @@
-/**
+/** 
  * @file ValueD1Diags.cpp
  * @brief Source of the implementation of the full sphere Worland ValueD1Diags sparse operator
  */
@@ -8,7 +8,7 @@
 
 // Project includes
 //
-#include "QuICC/SparseSM/Worland/Stencil/Chebyshev/ValueD1Diags.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/SphEnergy/ValueD1Diags.hpp"
 
 namespace QuICC {
 
@@ -18,10 +18,10 @@ namespace Worland {
 
 namespace Stencil {
 
-namespace Chebyshev {
+namespace SphEnergy {
 
    ValueD1Diags::ValueD1Diags(const Scalar_t alpha, const int l)
-      : QuICC::SparseSM::Worland::Stencil::ValueD1Diags(alpha, MHD_MP(-0.5), l)
+      : QuICC::SparseSM::Worland::Stencil::ValueD1Diags(alpha, MHD_MP(0.5), l)
    {
    }
 
@@ -29,8 +29,8 @@ namespace Chebyshev {
    {
       auto l1 = this->l();
 
-      ACoeff_t num = 4.0*n*(n - 1.0)*(-3.0 + l1 + 2.0*n);
-      ACoeff_t den = (-1.0 + l1 + 2.0*n)*(3.0 + 4.0*(n - 2.0)*n);
+      ACoeff_t num = (2.0*l1 + 4.0*n - 3.0);
+      ACoeff_t den = (2.0*l1 + 4.0*n + 1.0);
 
       return this->normalizeDiag(n,-2)*(num/den);
    }
@@ -39,8 +39,8 @@ namespace Chebyshev {
    {
       auto l1 = this->l();
 
-      ACoeff_t num = -4.0*n*(l1 + 2.0*n);
-      ACoeff_t den = (-1.0 + 2.0*n)*(1.0 + l1 + 2.0*n);
+      ACoeff_t num = -2.0*(2.0*l1 + 4.0*n + 3.0);
+      ACoeff_t den = (2.0*l1 + 4.0*n + 5.0);
 
       return this->normalizeDiag(n,-1)*(num/den);
    }
@@ -52,7 +52,7 @@ namespace Chebyshev {
       return this->normalizeDiag(n,0)*val;
    }
 
-} // Chebyshev
+} // SphEnergy
 } // Stencil
 } // Worland
 } // SparseSM

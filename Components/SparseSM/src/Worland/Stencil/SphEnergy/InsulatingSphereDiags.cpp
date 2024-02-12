@@ -5,12 +5,10 @@
 
 // System includes
 //
-#include <cassert>
-#include <stdexcept>
 
 // Project includes
 //
-#include "QuICC/SparseSM/Worland/Stencil/Chebyshev/InsulatingSphereDiags.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/SphEnergy/InsulatingSphereDiags.hpp"
 
 namespace QuICC {
 
@@ -20,10 +18,10 @@ namespace Worland {
 
 namespace Stencil {
 
-namespace Chebyshev {
+namespace SphEnergy {
 
    InsulatingSphereDiags::InsulatingSphereDiags(const Scalar_t alpha, const int l)
-      : QuICC::SparseSM::Worland::Stencil::InsulatingSphereDiags(alpha, MHD_MP(-0.5), l)
+      : QuICC::SparseSM::Worland::Stencil::InsulatingSphereDiags(alpha, MHD_MP(0.5), l)
    {
    }
 
@@ -31,8 +29,8 @@ namespace Chebyshev {
    {
       auto l1 = this->l();
 
-      ACoeff_t num = -2.0*n*(4.0*(-1.0 + n)*(-1.0 + n) + l1*(-2.0 + 4.0*n) + 1.0);
-      ACoeff_t den = (-1.0 + 2.0*n)*(2.0*l1 + 1.0 + 4.0*l1*n + 4.0*n*n);
+      ACoeff_t num = -n*(2.0*l1 + 2.0*n - 1.0);
+      ACoeff_t den = (n + 1.0)*(2.0*l1 + 2.0*n + 1.0);
 
       ACoeff_t val = num/den;
 
@@ -46,7 +44,7 @@ namespace Chebyshev {
       return this->normalizeDiag(n,0)*val;
    }
 
-} // Chebyshev
+} // SphEnergy
 } // Stencil
 } // Worland
 } // SparseSM

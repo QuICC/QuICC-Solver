@@ -16,7 +16,7 @@
 
 namespace currentts = ::QuICC::TestSuite::SparseSM::Worland;
 
-TEST_CASE( "Error for @Operator@ operator", "[@Operator@:@type@]" )
+TEST_CASE( "Error for @Operator@ operator of @WType@ type", "[@Operator@:@WType@:@type@]" )
 {
 
    // Set default arguments if required
@@ -35,7 +35,7 @@ TEST_CASE( "Error for @Operator@ operator", "[@Operator@:@type@]" )
    typedef ::QuICC::SparseSM::Worland::@Operator@ Operator;
    typedef typename currentts::Tester<Operator> Tester;
 
-   Tester tester("@Operator@.dat", currentts::args().dumpData);
+   Tester tester("@Operator@.dat", "@WType@", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
 
    Tester::ParameterType params = {-1};
