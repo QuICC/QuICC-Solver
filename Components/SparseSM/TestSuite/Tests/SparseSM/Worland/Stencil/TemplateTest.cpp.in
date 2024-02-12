@@ -9,6 +9,8 @@
 
 // Project includes
 //
+#include "Types/Internal/Typedefs.hpp"
+#include "Types/Internal/Literals.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/Operator.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/D1.hpp"
@@ -21,9 +23,9 @@
 #include "QuICC/SparseSM/Worland/Stencil/InsulatingSphere.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/ValueD1.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/ValueD2.hpp"
-#include "Types/BasicTypes.hpp"
 #include "QuICC/TestSuite/SparseSM/TestUtils.hpp"
 #include "QuICC/TestSuite/SparseSM/Worland/TestArgs.hpp"
+#include "QuICC/TestSuite/SparseSM/Worland/TestHelper.hpp"
 
 namespace currentts = ::QuICC::TestSuite::SparseSM::Worland;
 
@@ -38,30 +40,7 @@ TEST_CASE( "Error for @Type@ stencils", "[@Type@]" )
    ::QuICC::Internal::MHDFloat dBeta;
 
    std::string type = "@Type@";
-   if(type == std::string("Chebyshev"))
-   {
-      alpha = -MHD_MP(0.5);
-      dBeta = -MHD_MP(0.5);
-   }
-   else if(type == std::string("Legendre"))
-   {
-      alpha = MHD_MP(0);
-      dBeta = -MHD_MP(0.5);
-   }
-   else if(type == std::string("CylEnergy"))
-   {
-      alpha = MHD_MP(0);
-      dBeta = MHD_MP(0);
-   }
-   else if(type == std::string("SphEnergy"))
-   {
-      alpha = MHD_MP(0);
-      dBeta = MHD_MP(0.5);
-   }
-   else
-   {
-      throw std::logic_error("Unknown Worland type");
-   }
+   currentts::setJacobiParameters(alpha, dBeta, type);
 
    const auto maxUlp = currentts::args().ulp;
 
