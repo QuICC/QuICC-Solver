@@ -28,7 +28,7 @@ struct worland_chebyshev_t
 {
    /// Typedef for quadrature rule
    typedef Polynomial::Quadrature::WorlandChebyshevRule Rule;
-   
+
    /// Jacobi alpha parameter
    static const Internal::MHDFloat ALPHA;
    /// Jacobi beta = l + dBeta parameter
@@ -40,7 +40,7 @@ struct worland_legendre_t
 {
    /// Typedef for quadrature rule
    typedef Polynomial::Quadrature::WorlandLegendreRule Rule;
-   
+
    /// Jacobi alpha parameter
    static const Internal::MHDFloat ALPHA;
    /// Jacobi beta = l + dBeta parameter
@@ -52,7 +52,7 @@ struct worland_cylenergy_t
 {
    /// Typedef for quadrature rule
    typedef Polynomial::Quadrature::WorlandCylEnergyRule Rule;
-   
+
    /// Jacobi alpha parameter
    static const Internal::MHDFloat ALPHA;
    /// Jacobi beta = l + dBeta parameter
@@ -64,7 +64,7 @@ struct worland_sphenergy_t
 {
    /// Typedef for quadrature rule
    typedef Polynomial::Quadrature::WorlandSphEnergyRule Rule;
-   
+
    /// Jacobi alpha parameter
    static const Internal::MHDFloat ALPHA;
    /// Jacobi beta = l + dBeta parameter
