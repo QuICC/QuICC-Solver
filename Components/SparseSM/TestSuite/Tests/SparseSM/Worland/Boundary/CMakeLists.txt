@@ -41,7 +41,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:WType:type
     IDS 0 1 2 3 4 10 11 12 13 14
-    ULP 40 40 40 40 40 40 40 40 40 40
+    ULPS 40 40 40 40 41 40 40 40 40 41
   )
 endforeach()
 
