@@ -6,16 +6,7 @@
 #ifndef QUICC_POLYNOMIAL_WORLAND_DWNL_HPP
 #define QUICC_POLYNOMIAL_WORLAND_DWNL_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -36,6 +27,16 @@ namespace Worland {
    class dWnl: public WorlandBase
    {
       public:
+         /**
+          * @brief Default constructor
+          */
+         dWnl() = default;
+
+         /**
+          * @brief Constructor for specific alpha,beta pair
+          */
+         dWnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta): WorlandBase(alpha, dBeta){};
+
          /**
           * @brief Compute worland polynomial
           *

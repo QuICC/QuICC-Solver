@@ -51,26 +51,6 @@ namespace Worland {
           */
          Internal::MHDFloat dBeta();
 
-         /// Alpha parameter for Chebyshev type
-         static const Internal::MHDFloat ALPHA_CHEBYSHEV;
-         /// dBeta parameter for Chebyshev type
-         static const Internal::MHDFloat DBETA_CHEBYSHEV;
-
-         /// Alpha parameter for Legendre type
-         static const Internal::MHDFloat ALPHA_LEGENDRE;
-         /// dBeta parameter for Legendre type
-         static const Internal::MHDFloat DBETA_LEGENDRE;
-
-         /// Alpha parameter for CylEnergy type
-         static const Internal::MHDFloat ALPHA_CYLENERGY;
-         /// dBeta parameter for CylEnergy type
-         static const Internal::MHDFloat DBETA_CYLENERGY;
-
-         /// Alpha parameter for SphEnergy type
-         static const Internal::MHDFloat ALPHA_SPHENERGY;
-         /// dBeta parameter for SphEnergy type
-         static const Internal::MHDFloat DBETA_SPHENERGY;
-
       protected:
          /**
           * @brief Get beta parameter of Jacobi polynomial
