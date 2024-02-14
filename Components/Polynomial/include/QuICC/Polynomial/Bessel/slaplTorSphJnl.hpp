@@ -49,6 +49,11 @@ namespace Bessel {
          {
             rOut(i,j) = slaplJnl(k, lIn, igrid(i));
          }
+
+         if(scale.size() > 0)
+         {
+            rOut.col(j).array() *= scale.array();
+         }
       }
    }
 
