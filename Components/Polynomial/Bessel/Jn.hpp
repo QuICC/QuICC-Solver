@@ -94,4 +94,4 @@ T besselJ(const T nu, const T x)
 } // namespace Polynomial
 } // namespace QuICC
 
-#endif // QUICC_POLYNOMIAL_BESSEL_BESSEL_HPP
+#endif // QUICC_POLYNOMIAL_BESSEL_JN_HPP
