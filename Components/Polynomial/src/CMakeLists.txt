@@ -3,6 +3,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
 )
 
 add_subdirectory(ALegendre)
+add_subdirectory(Bessel)
 add_subdirectory(Jacobi)
 add_subdirectory(Legendre)
 add_subdirectory(Quadrature)

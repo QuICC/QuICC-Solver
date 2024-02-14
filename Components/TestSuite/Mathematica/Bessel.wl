@@ -71,8 +71,6 @@ divrJnl[k_,l_,t_]=Simplify[1/t Jnl[k,l,t]];
 drJnl[k_,l_,t_]=Simplify[D[t Jnl[k,l,t],t]];
 (*divrdrJnl*)
 divrdrJnl[k_,l_,t_]=Simplify[1/t D[t Jnl[k,l,t],t]];
-(*rddivrJnl*)
-rddivrJnl[k_,l_,t_]=Simplify[t D[1/t Jnl[k,l,t],{t,1}]];
 
 
 (* Operators to work on grid*)
@@ -90,8 +88,6 @@ drTorSphJnl[n_,l_,r_]:=drJnl[torZero[n,l],l,r]
 drPolSphJnl[n_,l_,r_]:=drJnl[polZero[n,l],l,r]
 divrdrTorSphJnl[n_,l_,r_]:=divrdrJnl[torZero[n,l],l,r]
 divrdrPolSphJnl[n_,l_,r_]:=divrdrJnl[polZero[n,l],l,r]
-rddivrTorSphJnl[n_,l_,r_]:=rddivrJnl[torZero[n,l],l,r]
-rddivrPolSphJnl[n_,l_,r_]:=rddivrJnl[polZero[n,l],l,r]
 
 
 End[];

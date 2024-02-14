@@ -8,12 +8,11 @@
 
 // System includes
 //
-#include <boost/math/special_functions/bessel.hpp>
 
 // Project includes
 //
 #include "Types/Internal/Typedefs.hpp"
-#include "Types/Internal/Literals.hpp"
+#include "QuICC/Polynomial/Bessel/Operators.hpp"
 
 namespace QuICC {
 
@@ -40,17 +39,15 @@ namespace Bessel {
 
    template <typename T> inline void TorSphJnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int lIn, const Internal::Array& igrid, const Internal::Array& scale)
    {
-      using namespace Internal::Literals;
       std::vector<Internal::MHDFloat> roots;
-      Internal::MHDFloat nu = static_cast<Internal::MHDFloat>(lIn) + 0.5_mp;
-      boost::math::cyl_bessel_j_zero(nu, 1, nPoly, std::back_inserter(roots));
+      getTorRoots(roots, lIn, nPoly);
 
       for(int j = 0; j < nPoly; j++)
       {
          auto k = roots.at(j);
          for(int i = 0; i < igrid.size(); i++)
          {
-            rOut(i,j) = boost::math::sph_bessel(lIn, k*igrid(i));
+            rOut(i,j) = Jnl(k, lIn, igrid(i));
          }
       }
    }

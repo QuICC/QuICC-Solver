@@ -1,10 +1,10 @@
 /**
- * @file rTorSphJnl.hpp
+ * @file dPolSphJnl.hpp
  * @brief Implementation of the spherical Bessel basis for magnetic toroidal boundary conditions
  */
 
-#ifndef QUICC_POLYNOMIAL_BESSEL_RTORSPHJNL_HPP
-#define QUICC_POLYNOMIAL_BESSEL_RTORSPHJNL_HPP
+#ifndef QUICC_POLYNOMIAL_BESSEL_DPOLSPHJNL_HPP
+#define QUICC_POLYNOMIAL_BESSEL_DPOLSPHJNL_HPP
 
 // System includes
 //
@@ -23,13 +23,13 @@ namespace Bessel {
    /**
     * @brief Implementation of the spherical Bessel basis for magnetic toroidal boundary conditions
     */
-   class rTorSphJnl
+   class dPolSphJnl
    {
       public:
          /**
           * @brief Default constructor
           */
-         rTorSphJnl() = default;
+         dPolSphJnl() = default;
 
          /**
           * @brief Compute spherical bessel basis for magnetic toroidal boundary condition
@@ -37,17 +37,18 @@ namespace Bessel {
          template <typename T> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale);
    };
 
-   template <typename T> inline void rTorSphJnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int lIn, const Internal::Array& igrid, const Internal::Array& scale)
+   template <typename T> inline void dPolSphJnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int lIn, const Internal::Array& igrid, const Internal::Array& scale)
    {
       std::vector<Internal::MHDFloat> roots;
-      getTorRoots(roots, lIn, nPoly);
+      getPolRoots(roots, lIn, nPoly);
 
+      auto dl = static_cast<Internal::MHDFloat>(lIn);
       for(int j = 0; j < nPoly; j++)
       {
          auto k = roots.at(j);
          for(int i = 0; i < igrid.size(); i++)
          {
-            rOut(i,j) = rJnl(k, lIn, igrid(i));
+            rOut(i,j) = dJnl(k, lIn, igrid(i));
          }
       }
    }
@@ -56,4 +57,4 @@ namespace Bessel {
 }
 }
 
-#endif // QUICC_POLYNOMIAL_BESSEL_RTORSPHJNL_HPP
+#endif // QUICC_POLYNOMIAL_BESSEL_DPOLSPHJNL_HPP
