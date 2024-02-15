@@ -56,14 +56,19 @@ namespace Bessel {
       for(int j = 0; j < nPoly; j++)
       {
          auto k = roots.at(j);
+         Internal::Array col(igrid.size());
          for(int i = 0; i < igrid.size(); i++)
          {
-            rOut(i,j) = details::r_1drSphJnl(k, l, igrid(i));
+            col(i) = details::r_1drSphJnl(k, l, igrid(i));
          }
 
          if(scale.size() > 0)
          {
-            rOut.col(j).array() *= scale.array();
+            rOut.col(j).array() = (col.array()*scale.array()).cast<T>();
+         }
+         else
+         {
+            rOut.col(j).array() = col.cast<T>();
          }
       }
    }

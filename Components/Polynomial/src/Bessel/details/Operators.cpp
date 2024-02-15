@@ -5,6 +5,7 @@
 
 // System include
 //
+#include "Types/Internal/Typedefs.hpp"
 #include <boost/math/special_functions/bessel.hpp>
 
 // Project includes
