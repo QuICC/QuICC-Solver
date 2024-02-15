@@ -21,29 +21,65 @@ set_target_properties(
 # Create Bessel tests targets
 include(ConfigureTests)
 set(BesselTests
-  TorSphJnl
-  PolSphJnl
-  rTorSphJnl
-  rPolSphJnl
-  r_1TorSphJnl
-  r_1PolSphJnl
-  dTorSphJnl
-  dPolSphJnl
-  drTorSphJnl
-  drPolSphJnl
-  slaplTorSphJnl
-  slaplPolSphJnl
+  Tor:SphJnl
+  Pol:SphJnl
+  Tor:rSphJnl
+  Pol:rSphJnl
+  Tor:r_1SphJnl
+  Pol:r_1SphJnl
+  Tor:dSphJnl
+  Pol:dSphJnl
+  Tor:drSphJnl
+  Pol:drSphJnl
+  Tor:slaplSphJnl
+  Pol:slaplSphJnl
 )
 include(SetUlp)
 quicc_set_ulp(_ulp
-  ULP 16000
+  ULP 600
   MPULP 11
 )
 foreach(_test ${BesselTests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Operator
+    KEYWORD Field:Operator
     TYPES matrix weighted
+    ULP ${_ulp}
+  )
+endforeach()
+
+set(BesselTestsTemplated
+  Tor:r_1drSphJnl:recurrence_t
+  Pol:r_1drSphJnl:recurrence_t
+)
+quicc_set_ulp(_ulp
+  ULP 600
+  MPULP 11
+)
+foreach(_test ${BesselTestsTemplated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Field:Operator:Template
+    TYPES matrix
+    ULP ${_ulp}
+  )
+endforeach()
+
+set(BesselTestsTemplated
+  Tor:r_1drSphJnl:explicit_t
+  Pol:r_1drSphJnl:explicit_t
+  Tor:r_1drSphJnl:implicit_t
+  Pol:r_1drSphJnl:implicit_t
+)
+quicc_set_ulp(_ulp
+  ULP 600
+  MPULP 11
+)
+foreach(_test ${BesselTestsTemplated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Field:Operator:Template
+    TYPES weighted
     ULP ${_ulp}
   )
 endforeach()
@@ -53,10 +89,10 @@ set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
 
 # Fetch reference data
 include(FetchTestReference)
-#quicc_fetch_test_reference(
-#  ${TestExe}
-#  COMPONENT Polynomial
-#  FILENAME "Bessel.tar.gz"
-#  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
-#  DATADIR ${QUICC_WORK_DIR}
-#)
+quicc_fetch_test_reference(
+  ${TestExe}
+  COMPONENT Polynomial
+  FILENAME "Bessel.tar.gz"
+  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+  DATADIR ${QUICC_WORK_DIR}
+)

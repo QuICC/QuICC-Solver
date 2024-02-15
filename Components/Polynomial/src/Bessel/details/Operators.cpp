@@ -9,7 +9,7 @@
 
 // Project includes
 //
-#include "QuICC/Polynomial/Bessel/Operators.hpp"
+#include "QuICC/Polynomial/Bessel/details/Operators.hpp"
 #include "Types/Internal/Literals.hpp"
 
 namespace QuICC {
@@ -18,7 +18,9 @@ namespace Polynomial {
 
 namespace Bessel {
 
-   Internal::MHDFloat Jnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
+namespace details {
+
+   Internal::MHDFloat SphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
    {
       Internal::MHDFloat val;
       val = boost::math::sph_bessel(l, k*r);
@@ -26,7 +28,7 @@ namespace Bessel {
       return val;
    }
 
-   Internal::MHDFloat rJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
+   Internal::MHDFloat rSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
    {
       Internal::MHDFloat val;
       val = r*boost::math::sph_bessel(l, k*r);
@@ -34,7 +36,7 @@ namespace Bessel {
       return val;
    }
 
-   Internal::MHDFloat r_1Jnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
+   Internal::MHDFloat r_1SphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
    {
       Internal::MHDFloat val;
       val = boost::math::sph_bessel(l, k*r)/r;
@@ -42,7 +44,7 @@ namespace Bessel {
       return val;
    }
 
-   Internal::MHDFloat dJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
+   Internal::MHDFloat dSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
    {
       auto dl = static_cast<Internal::MHDFloat>(l);
       Internal::MHDFloat val;
@@ -51,7 +53,7 @@ namespace Bessel {
       return val;
    }
 
-   Internal::MHDFloat drJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
+   Internal::MHDFloat drSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
    {
       auto dl1 = static_cast<Internal::MHDFloat>(l+1);
       Internal::MHDFloat val;
@@ -60,7 +62,16 @@ namespace Bessel {
       return val;
    }
 
-   Internal::MHDFloat slaplJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
+   Internal::MHDFloat r_1drSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
+   {
+      auto dl1 = static_cast<Internal::MHDFloat>(l+1);
+      Internal::MHDFloat val;
+      val = dl1 * boost::math::sph_bessel(l, k * r)/r - k * boost::math::sph_bessel(l + 1, k * r);
+
+      return val;
+   }
+
+   Internal::MHDFloat slaplSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r)
    {
       Internal::MHDFloat val;
       val = -k*k*boost::math::sph_bessel(l, k*r);
@@ -82,6 +93,7 @@ namespace Bessel {
       boost::math::cyl_bessel_j_zero(nu, 1, nRoots, std::back_inserter(roots));
    }
 
+}
 }
 }
 }

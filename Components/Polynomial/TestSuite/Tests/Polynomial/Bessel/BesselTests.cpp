@@ -36,8 +36,8 @@ int main( int argc, char* argv[] )
       | Opt( test::args().ulp, "ulp" )        // Add max ulp option
          ["--ulp"]
          ("Maximum acceptable ulp")
-      | Opt( test::args().params, "harmonicL" )  // Add harmonic degree option
-         ["--harmonicL"]
+      | Opt( test::args().params, "l" )      // Add harmonic degree option
+         ["--l"]
          ("Harmonic degree L")
       | Opt( test::args().ids, "test metadata ID" ) // Add test ID
          ["--id"]
@@ -65,13 +65,14 @@ int main( int argc, char* argv[] )
 
    if(test::args().params.size() > 0)
    {
-      if((test::args().specN > 0 && test::args().physN > 0) || test::args().ids.size() > 0)
+      if((test::args().specN > 0 && test::args().physN > 0))
       {
          test::args().useDefault = false;
+         test::args().ids.clear();
       }
       else
       {
-         std::cerr << "You need to specify --specN and --physN or provide metadata ID with --id" << std::endl;
+         std::cerr << "You need to specify --l, --specN and --physN or provide metadata ID with --id" << std::endl;
          return 1;
       }
    }

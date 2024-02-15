@@ -18,21 +18,24 @@ polZeros::usage="polZeros[n,l]";
 
 (* Operators to work on grid*)
 TorSphJnl::usage="TorSphJnl[n,l,r]";
-PolSphJnl::usage="TorSphJnl[n,l,r]";
+PolSphJnl::usage="PolSphJnl[n,l,r]";
 rTorSphJnl::usage="rTorSphJnl[n,l,r]";
-rPolSphJnl::usage="rTorSphJnl[n,l,r]";
+rPolSphJnl::usage="rPolSphJnl[n,l,r]";
 dTorSphJnl::usage="dTorSphJnl[n,l,r]";
-dPolSphJnl::usage="dTorSphJnl[n,l,r]";
+dPolSphJnl::usage="dPolSphJnl[n,l,r]";
 slaplTorSphJnl::usage="slaplTorSphJnl[n,l,r]";
-slaplPolSphJnl::usage="slaplTorSphJnl[n,l,r]";
+slaplPolSphJnl::usage="slaplPolSphJnl[n,l,r]";
 divrTorSphJnl::usage="divrTorSphJnl[n,l,r]";
-divrPolSphJnl::usage="divrTorSphJnl[n,l,r]";
+divrPolSphJnl::usage="divrPolSphJnl[n,l,r]";
 drTorSphJnl::usage="drTorSphJnl[n,l,r]";
-drPolSphJnl::usage="drTorSphJnl[n,l,r]";
+drPolSphJnl::usage="drPolSphJnl[n,l,r]";
+(*divrdrJnl operators*)
 divrdrTorSphJnl::usage="divrdrTorSphJnl[n,l,r]";
-divrdrPolSphJnl::usage="divrdrTorSphJnl[n,l,r]";
-rddivrTorSphJnl::usage="rddivrTorSphJnl[n,l,r]";
-rddivrPolSphJnl::usage="rddivrTorSphJnl[n,l,r]";
+divrdrTorSphJnlExplicit::usage="divrdrTorSphJnlExplicit[n,l,r]";
+divrdrTorSphJnlImplicit::usage="divrdrTorSphJnlImplicit[n,l,r]";
+divrdrPolSphJnl::usage="divrdrPolSphJnl[n,l,r]";
+divrdrPolSphJnlExplicit::usage="divrdrPolSphJnlExplicit[n,l,r]";
+divrdrPolSphJnlImplicit::usage="divrdrPolSphJnlImplicit[n,l,r]";
 
 
 Begin["`Private`"];
@@ -73,6 +76,27 @@ drJnl[k_,l_,t_]=Simplify[D[t Jnl[k,l,t],t]];
 divrdrJnl[k_,l_,t_]=Simplify[1/t D[t Jnl[k,l,t],t]];
 
 
+(*divrdrJnl operators*)
+divrdrJnlExplicit[ks_,l_,r_,w_]:=Module[{opA,opB,opC,op},
+opA=Table[Jnl[k,l,r],{k,ks}];
+opB=Table[dJnl[k,l,r],{k,ks}];
+opC=Table[Jnl[k,l,r],{k,ks[[;;-2]]}];
+op=(opC . DiagonalMatrix[w]) . DiagonalMatrix[1/r] . Transpose[opB] . (opA . DiagonalMatrix[w]) . DiagonalMatrix[r];
+Transpose[op]
+]
+divrdrJnlImplicit[ks_,ksm1_,l_,r_,w_]:=Module[{opA,opB,opC,op},
+If[l==0,
+op =divrdrJnlExplicit[ks,l,r,w];
+,
+opA=Table[Jnl[k,l-1,r],{k,ksm1}];
+opB=Table[divrdrJnl[k,l-1,r],{k,ksm1}];
+opC=Table[Jnl[k,l,r],{k,ks[[;;-2]]}];
+op=Transpose[((opC . DiagonalMatrix[w]) . Transpose[opB] . (opA . DiagonalMatrix[w]))];
+];
+op
+]
+
+
 (* Operators to work on grid*)
 TorSphJnl[n_,l_,r_]:=Jnl[torZero[n,l],l,r]
 PolSphJnl[n_,l_,r_]:=Jnl[polZero[n,l],l,r]
@@ -88,6 +112,24 @@ drTorSphJnl[n_,l_,r_]:=drJnl[torZero[n,l],l,r]
 drPolSphJnl[n_,l_,r_]:=drJnl[polZero[n,l],l,r]
 divrdrTorSphJnl[n_,l_,r_]:=divrdrJnl[torZero[n,l],l,r]
 divrdrPolSphJnl[n_,l_,r_]:=divrdrJnl[polZero[n,l],l,r]
+divrdrTorSphJnlExplicit[maxN_,l_,r_,w_]:=Module[{ks},
+	ks = Table[torZero[n,l],{n,0,maxN+1}];
+	divrdrJnlExplicit[ks,l,r,w]
+	]
+divrdrTorSphJnlImplicit[maxN_,l_,r_,w_]:=Module[{ks,ksm1},
+	ks = Table[torZero[n,l],{n,0,maxN+1}];
+	ksm1 = Table[torZero[n,l-1],{n,0,maxN+1}];
+	divrdrJnlImplicit[ks,ksm1,l,r,w]
+	]
+divrdrPolSphJnlExplicit[maxN_,l_,r_,w_]:=Module[{ks},
+	ks = Table[polZero[n,l],{n,0,maxN+1}];
+	divrdrJnlExplicit[ks,l,r,w]
+	]
+divrdrPolSphJnlImplicit[maxN_,l_,r_,w_]:=Module[{ks,ksm1},
+	ks = Table[polZero[n,l],{n,0,maxN+1}];
+	ksm1 = Table[polZero[n,l-1],{n,0,maxN+1}];
+	divrdrJnlImplicit[ks,ksm1,l,r,w]
+	]
 
 
 End[];
