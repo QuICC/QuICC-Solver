@@ -8,7 +8,7 @@ $mpprec::usage="Precision for Worland computations, default is 100";
 
 bgrid::usage="wgrid[n] computes the Worland quadrature grid";
 bweights::usage="wweights[n] computes the Worland quadrature weights";
-norm::usage="norm[k,\[Alpha],\[Beta]] norm of Worland polynomial k";
+norm::usage="norm[k,l] norm of Bessel k";
 
 (* Zeros *)
 torZero::usage="torZero[n,l]";
@@ -60,10 +60,13 @@ torZeros[n_,l_]:=Table[torZero[i,l],{i,0,n}];
 polZeros[n_,l_]:=Table[polZero[i,l] ,{i,0,n}];
 
 
+norm[k_,l_]:=Abs[SphericalBesselJ[l,k]/Sqrt[2]];
+
+
 (*Jnl*)
-Jnl[k_,l_,t_]:=SphericalBesselJ[l, k t]
+Jnl[k_,l_,t_]:=SphericalBesselJ[l, k t]/norm[k,l]
 (*rJnl*)
-rJnl[k_,l_,t_]=Simplify[t SphericalBesselJ[l, k t]];
+rJnl[k_,l_,t_]=Simplify[t Jnl[k,l,t]];
 (*dJnl*)
 dJnl[k_,l_,t_]=FullSimplify[D[Jnl[k,l,t],{t,1}]];
 (*slaplJnl*)
