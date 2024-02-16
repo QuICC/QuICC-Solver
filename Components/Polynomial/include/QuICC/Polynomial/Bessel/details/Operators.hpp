@@ -22,6 +22,14 @@ namespace Bessel {
 namespace details {
 
    /**
+    * @brief Norm of spherical Bessel basis Jnl(k, l, r)
+    *
+    * @param k Basis specific constant k
+    * @param l Harmonic degree
+    */
+   Internal::MHDFloat norm(const Internal::MHDFloat k, const int l);
+
+   /**
     * @brief Spherical Bessel basis Jnl(k, l, r)
     *
     * @param k Basis specific constant k
@@ -85,14 +93,14 @@ namespace details {
    Internal::MHDFloat slaplSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r);
 
    /**
-    * @brief Compute Bessel roots for Toroidal magnetic scalar
+    * @brief Compute Bessel roots for zero value boundary condition
     */
-   void getTorRoots(std::vector<Internal::MHDFloat>& roots, const int l, const int nRoots);
+   void getValueRoots(std::vector<Internal::MHDFloat>& roots, const int l, const int nRoots);
 
    /**
-    * @brief Compute Bessel roots for Poloidal magnetic scalar
+    * @brief Compute Bessel roots for insulating boundary condition
     */
-   void getPolRoots(std::vector<Internal::MHDFloat>& roots, const int l, const int nRoots);
+   void getInsulatingRoots(std::vector<Internal::MHDFloat>& roots, const int l, const int nRoots);
 
 }
 }

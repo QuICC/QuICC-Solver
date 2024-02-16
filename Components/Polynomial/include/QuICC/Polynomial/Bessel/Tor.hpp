@@ -40,7 +40,7 @@ namespace Bessel {
    template <typename TOp> template <typename T> inline void Tor<TOp>::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale)
    {
       std::vector<Internal::MHDFloat> roots;
-      details::getTorRoots(roots, l, nPoly + TOp::EXTRA_POLY);
+      details::getValueRoots(roots, l, nPoly + TOp::EXTRA_POLY);
 
       if constexpr(TOp::EXTRA_L == 0)
       {
@@ -49,7 +49,7 @@ namespace Bessel {
       else
       {
          std::vector<Internal::MHDFloat> roots_extra;
-         details::getTorRoots(roots_extra, l + TOp::EXTRA_L, nPoly + TOp::EXTRA_POLY);
+         details::getValueRoots(roots_extra, l + TOp::EXTRA_L, nPoly + TOp::EXTRA_POLY);
 
          TOp::compute(rOut, roots, roots_extra, l, igrid, scale);
       }
