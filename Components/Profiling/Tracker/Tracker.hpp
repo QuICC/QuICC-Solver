@@ -84,6 +84,10 @@ public:
      */
     static void stop(const std::string& name);
     /**
+     * @brief reset profiling of all regions
+     */
+    static void resetAll();
+    /**
      * @brief stop profiling a region
      * @param name name of the region to profile
      * @return tuple containing the data for a region

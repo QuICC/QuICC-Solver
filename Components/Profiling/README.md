@@ -46,7 +46,10 @@ RegionEnd<2>("myRegion");
 ...
 ```
 so that different granularities can be achieved.
-
+The counter of collected values for all regions can be reset:
+```bash
+RegionResetAll();
+``` 
 ## Existing backends
 
 ### native
@@ -78,6 +81,7 @@ namespace details {
     inline static void Finalize(){...}
     inline static void RegionStart(const std::string& name){...}
     inline static void RegionEnd(const std::string& name){...}
+    inline static void RegionResetAll(){...}
 }
 ...
 ```
