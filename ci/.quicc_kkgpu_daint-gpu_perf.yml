@@ -9,13 +9,13 @@ stages:
 - test
 - cleanup
 build-quicc-base:
-  extends: .container-builder
+  extends: .container-builder-cscs-zen2
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-gpu
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:7a12f03f6ce481be832ae6175a76f745
 build-quicc:
-  extends: .container-builder
+  extends: .container-builder-cscs-zen2
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_kkgpu

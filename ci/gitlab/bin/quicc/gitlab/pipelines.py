@@ -58,7 +58,7 @@ class base_pipeline(base_yaml):
                 ],
             'build-quicc-base':
                 {
-                    'extends': '.container-builder',
+                    'extends': '.container-builder-cscs-zen2',
                     'stage': 'build_base',
                     'variables':
                         {
@@ -68,7 +68,7 @@ class base_pipeline(base_yaml):
                 },
             'build-quicc':
                 {
-                    'extends': '.container-builder',
+                    'extends': '.container-builder-cscs-zen2',
                     'stage': 'build',
                     'variables':
                         {
