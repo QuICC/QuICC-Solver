@@ -38,7 +38,8 @@ namespace details {
    {
       using namespace Internal::Literals;
       Internal::MHDFloat val;
-      Internal::MHDFloat nu;
+      unsigned int nu;
+      assert(l >= 0);
       if(dNu == Value_dNu())
       {
          nu = l+1;
