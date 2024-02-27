@@ -153,8 +153,17 @@ namespace DenseSM {
          std::cerr << "*****************************************************************" << std::endl;
          std::cerr << "*****************************************************************" << std::endl;
          inData.setConstant(std::numeric_limits<MHDFloat>::max());
-      } else
+      }
+      else
       {
+         // Ignore header
+         int s = infile.peek();
+         while(s == '#')
+         {
+            infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            s = infile.peek();
+         }
+
          // Get size from first value
          if(inData.size() == 0)
          {

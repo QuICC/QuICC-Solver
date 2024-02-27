@@ -26,6 +26,8 @@
 #include "DenseSM/Worland/GeostrophicAngularMomentum.hpp"
 #include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
+#include "QuICC/Bc/Name/FixedTemperature.hpp"
+#include "QuICC/Bc/Name/FixedFlux.hpp"
 #include "QuICC/Bc/Name/Insulating.hpp"
 
 namespace dsm = ::QuICC::DenseSM::Worland;
@@ -192,19 +194,26 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size(7));
+         assert(meta.size(6));
 
          int outRows = meta(0) + 1;
          int bc = static_cast<int>(meta(1));
          std::size_t bcId;
-         int rows = meta(2)+1;
-         int cols = meta(3)+1;
-         auto a = static_cast<QuICC::Internal::MHDFloat>(meta(4));
-         auto b = static_cast<QuICC::Internal::MHDFloat>(meta(5));
-         auto l = static_cast<int>(meta(6));
+         int nN = meta(2) + 1;
+         auto a = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         auto b = static_cast<QuICC::Internal::MHDFloat>(meta(4));
+         auto l = static_cast<int>(meta(5));
 
          // Identify boundary condition
          if(bc == 0)
+         {
+            bcId = Bc::Name::FixedTemperature::id();
+         }
+         else if(bc == 1)
+         {
+            bcId = Bc::Name::FixedFlux::id();
+         }
+         else if(bc == 2)
          {
             bcId = Bc::Name::Insulating::id();
          }
@@ -213,7 +222,7 @@ namespace Worland {
             throw std::logic_error("Unknown boundary condition");
          }
 
-         TOp op(outRows, bcId, rows, cols, a, b, l);
+         TOp op(outRows, bcId, nN, nN, a, b, l);
 
          outData = op.mat();
       }

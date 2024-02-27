@@ -23,13 +23,13 @@ set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
 
 # Fetch reference data
 include(FetchTestReference)
-#quicc_fetch_test_reference(
-#  ${TestExe}
-#  COMPONENT DenseSM
-#  FILENAME "Worland.tar.gz"
-#  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
-#  DATADIR ${QUICC_WORK_DIR}
-#)
+quicc_fetch_test_reference(
+  ${TestExe}
+  COMPONENT DenseSM
+  FILENAME "Worland.tar.gz"
+  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+  DATADIR ${QUICC_WORK_DIR}
+)
 
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
@@ -90,22 +90,74 @@ foreach(_test ${_tests})
   )
 endforeach()
 
-# Create tests for ProjFitEnergy
+# Create tests for ProjFitEnergyR2 with Chebyshev type basis
 set(_tests
-  ProjFitEnergyPol:dense
   ProjFitEnergyR2:dense
   I2ProjFitEnergyR2:dense
-  I2ProjFitEnergyPol:dense
   )
 quicc_set_ulp(_ulp
-  ULP 11 11 11 11 11
-  MPULP 11 11 11 11 11
+  ULP 5000 2200 3800 1600 4500 1700 5900 4300 3200 2700 3000 1400
+  MPULP 11 11 11 11 11 11 11 11 11 11 11 11
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 0 1 2 3 4
+    IDS 0 1 2 3 4 5 6 7 8 9 10 11
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create tests for ProjFitEnergyR2 with SphEnergy type basis
+set(_tests
+  ProjFitEnergyR2:dense
+  I2ProjFitEnergyR2:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 5000 2200 3800 1600 4500 1700 5900 4300 3200 2700 3000 1400
+  MPULP 11 11 11 11 11 11 11 11 11 11 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 100 101 102 103 104 105 106 107 108 109 110 111
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create tests for ProjFitEnergyPol with Chebyshev type basis
+set(_tests
+  ProjFitEnergyPol:dense
+  I2ProjFitEnergyPol:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 9400 9800 6100 4500 3400 3600
+  MPULP 11 11 11 11 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1 2 3 4 5
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create tests for ProjFitEnergyPol with SphEnergy type basis
+set(_tests
+  ProjFitEnergyPol:dense
+  I2ProjFitEnergyPol:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 9400 9800 6100 4500 3400 3600
+  MPULP 11 11 11 11 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 100 101 102 103 104 105
     ULPS ${_ulp}
   )
 endforeach()
