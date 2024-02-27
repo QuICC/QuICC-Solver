@@ -22,12 +22,23 @@ namespace Bessel {
 namespace details {
 
    /**
+    * @brief Zero boundary value Bessel function nu = l + dNu
+    */
+   Internal::MHDFloat Value_dNu();
+
+   /**
+    * @brief Insulating boundary Bessel function nu = l + dNu
+    */
+   Internal::MHDFloat Insulating_dNu();
+
+   /**
     * @brief Norm of spherical Bessel basis Jnl(k, l, r)
     *
     * @param k Basis specific constant k
     * @param l Harmonic degree
+    * @param dNu  Bessel nu = l + dNu
     */
-   Internal::MHDFloat norm(const Internal::MHDFloat k, const int l);
+   Internal::MHDFloat norm(const Internal::MHDFloat k, const int l, const Internal::MHDFloat dNu);
 
    /**
     * @brief Spherical Bessel basis Jnl(k, l, r)
@@ -36,7 +47,7 @@ namespace details {
     * @param l Harmonic degree
     * @param r Radius r
     */
-   Internal::MHDFloat SphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r);
+   Internal::MHDFloat SphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r, const Internal::MHDFloat dNu);
 
    /**
     * @brief r of Spherical Bessel basis Jnl(k, l, r)
@@ -45,7 +56,7 @@ namespace details {
     * @param l Harmonic degree
     * @param r Radius r
     */
-   Internal::MHDFloat rSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r);
+   Internal::MHDFloat rSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r, const Internal::MHDFloat dNu);
 
    /**
     * @brief 1/r of Spherical Bessel basis Jnl(k, l, r)
@@ -54,7 +65,7 @@ namespace details {
     * @param l Harmonic degree
     * @param r Radius r
     */
-   Internal::MHDFloat r_1SphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r);
+   Internal::MHDFloat r_1SphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r, const Internal::MHDFloat dNu);
 
    /**
     * @brief D of Spherical Bessel basis Jnl(k, l, r)
@@ -63,7 +74,7 @@ namespace details {
     * @param l Harmonic degree
     * @param r Radius r
     */
-   Internal::MHDFloat dSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r);
+   Internal::MHDFloat dSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r, const Internal::MHDFloat dNu);
 
    /**
     * @brief D r of Spherical Bessel basis Jnl(k, l, r)
@@ -72,7 +83,7 @@ namespace details {
     * @param l Harmonic degree
     * @param r Radius r
     */
-   Internal::MHDFloat drSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r);
+   Internal::MHDFloat drSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r, const Internal::MHDFloat dNu);
 
    /**
     * @brief 1/r D r of Spherical Bessel basis Jnl(k, l, r)
@@ -81,7 +92,7 @@ namespace details {
     * @param l Harmonic degree
     * @param r Radius r
     */
-   Internal::MHDFloat r_1drSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r);
+   Internal::MHDFloat r_1drSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r, const Internal::MHDFloat dNu);
 
    /**
     * @brief Spherical laplacian of Spherical Bessel basis Jnl(k, l, r)
@@ -90,17 +101,12 @@ namespace details {
     * @param l Harmonic degree
     * @param r Radius r
     */
-   Internal::MHDFloat slaplSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r);
+   Internal::MHDFloat slaplSphJnl(const Internal::MHDFloat k, const int l, const Internal::MHDFloat r, const Internal::MHDFloat dNu);
 
    /**
-    * @brief Compute Bessel roots for zero value boundary condition
+    * @brief Compute Bessel roots
     */
-   void getValueRoots(std::vector<Internal::MHDFloat>& roots, const int l, const int nRoots);
-
-   /**
-    * @brief Compute Bessel roots for insulating boundary condition
-    */
-   void getInsulatingRoots(std::vector<Internal::MHDFloat>& roots, const int l, const int nRoots);
+   void getRoots(std::vector<Internal::MHDFloat>& roots, const int l, const int nRoots,  const Internal::MHDFloat dNu);
 
 }
 }

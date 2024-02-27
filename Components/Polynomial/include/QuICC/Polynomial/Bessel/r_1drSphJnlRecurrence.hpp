@@ -46,10 +46,10 @@ namespace Bessel {
          /**
           * @brief Compute spherical bessel basis
           */
-         template <typename T> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const int l, const Internal::Array& igrid, const Internal::Array& scale);
+         template <typename T> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const int l, const Internal::Array& igrid, const Internal::Array& scale, const Internal::MHDFloat dNu);
    };
 
-   template <typename T> inline void r_1drSphJnl<recurrence_t>::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const int l, const Internal::Array& igrid, const Internal::Array& scale)
+   template <typename T> inline void r_1drSphJnl<recurrence_t>::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const int l, const Internal::Array& igrid, const Internal::Array& scale, const Internal::MHDFloat dNu)
    {
       const int nPoly = roots.size();
 
@@ -59,7 +59,7 @@ namespace Bessel {
          Internal::Array col(igrid.size());
          for(int i = 0; i < igrid.size(); i++)
          {
-            col(i) = details::r_1drSphJnl(k, l, igrid(i));
+            col(i) = details::r_1drSphJnl(k, l, igrid(i), dNu);
          }
 
          if(scale.size() > 0)

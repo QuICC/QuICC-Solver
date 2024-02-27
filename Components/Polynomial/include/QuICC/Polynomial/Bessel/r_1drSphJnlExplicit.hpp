@@ -44,10 +44,10 @@ namespace Bessel {
           */
          static const int EXTRA_L = 0;
 
-         template <typename T> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const int l, const Internal::Array& igrid, const Internal::Array& scale);
+         template <typename T> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const int l, const Internal::Array& igrid, const Internal::Array& scale, const Internal::MHDFloat dNu);
    };
 
-   template <typename T> inline void r_1drSphJnl<explicit_t>::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const int l, const Internal::Array& igrid, const Internal::Array& scale)
+   template <typename T> inline void r_1drSphJnl<explicit_t>::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const int l, const Internal::Array& igrid, const Internal::Array& scale, const Internal::MHDFloat dNu)
    {
       if (scale.size() == 0)
       {
@@ -66,15 +66,15 @@ namespace Bessel {
       // Extend intermediate truncation by one due to multiplication by r
       Internal::Matrix opA(igrid.size(), nPoly+1);
       Polynomial::Bessel::SphJnl jnl;
-      jnl.compute<Internal::MHDFloat>(opA, roots, l, igrid, scale.array()*igrid.array());
+      jnl.compute<Internal::MHDFloat>(opA, roots, l, igrid, scale.array()*igrid.array(), dNu);
 
       Internal::Matrix opB(igrid.size(), nPoly+1);
       Polynomial::Bessel::dSphJnl dJnl;
-      dJnl.compute<Internal::MHDFloat>(opB, roots, l, igrid, Internal::Array());
+      dJnl.compute<Internal::MHDFloat>(opB, roots, l, igrid, Internal::Array(), dNu);
 
       Internal::Matrix opC(igrid.size(), nPoly);
       std::vector<Internal::MHDFloat> ks(roots.begin(), std::prev(roots.end()));
-      jnl.compute<Internal::MHDFloat>(opC, ks, l, igrid, scale.array()*igrid.array().pow(-1));
+      jnl.compute<Internal::MHDFloat>(opC, ks, l, igrid, scale.array()*igrid.array().pow(-1), dNu);
 
       tOp = (opC.transpose()*opB*opA.transpose()).transpose();
 

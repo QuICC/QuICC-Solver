@@ -21,18 +21,18 @@ set_target_properties(
 # Create Bessel tests targets
 include(ConfigureTests)
 set(BesselTests
-  Tor:SphJnl
-  Pol:SphJnl
-  Tor:rSphJnl
-  Pol:rSphJnl
-  Tor:r_1SphJnl
-  Pol:r_1SphJnl
-  Tor:dSphJnl
-  Pol:dSphJnl
-  Tor:drSphJnl
-  Pol:drSphJnl
-  Tor:slaplSphJnl
-  Pol:slaplSphJnl
+  Value:SphJnl
+  Insulating:SphJnl
+  Value:rSphJnl
+  Insulating:rSphJnl
+  Value:r_1SphJnl
+  Insulating:r_1SphJnl
+  Value:dSphJnl
+  Insulating:dSphJnl
+  Value:drSphJnl
+  Insulating:drSphJnl
+  Value:slaplSphJnl
+  Insulating:slaplSphJnl
 )
 include(SetUlp)
 quicc_set_ulp(_ulp
@@ -49,8 +49,8 @@ foreach(_test ${BesselTests})
 endforeach()
 
 set(BesselTestsTemplated
-  Tor:r_1drSphJnl:recurrence_t
-  Pol:r_1drSphJnl:recurrence_t
+  Value:r_1drSphJnl:recurrence_t
+  Insulating:r_1drSphJnl:recurrence_t
 )
 quicc_set_ulp(_ulp
   ULP 600
@@ -66,10 +66,10 @@ foreach(_test ${BesselTestsTemplated})
 endforeach()
 
 set(BesselTestsTemplated
-  Tor:r_1drSphJnl:explicit_t
-  Pol:r_1drSphJnl:explicit_t
-  Tor:r_1drSphJnl:implicit_t
-  Pol:r_1drSphJnl:implicit_t
+  Value:r_1drSphJnl:explicit_t
+  Insulating:r_1drSphJnl:explicit_t
+  Value:r_1drSphJnl:implicit_t
+  Insulating:r_1drSphJnl:implicit_t
 )
 quicc_set_ulp(_ulp
   ULP 600

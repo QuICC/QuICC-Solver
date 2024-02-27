@@ -44,10 +44,10 @@ namespace Bessel {
           */
          static const int EXTRA_L = -1;
 
-         template <typename T> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const std::vector<Internal::MHDFloat>& roots_l1, const int l, const Internal::Array& igrid, const Internal::Array& scale);
+         template <typename T> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const std::vector<Internal::MHDFloat>& roots_l1, const int l, const Internal::Array& igrid, const Internal::Array& scale, const Internal::MHDFloat dNu);
    };
 
-   template <typename T> inline void r_1drSphJnl<implicit_t>::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const std::vector<Internal::MHDFloat>& roots_l1, const int l, const Internal::Array& igrid, const Internal::Array& scale)
+   template <typename T> inline void r_1drSphJnl<implicit_t>::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const std::vector<Internal::MHDFloat>& roots_l1, const int l, const Internal::Array& igrid, const Internal::Array& scale, const Internal::MHDFloat dNu)
    {
       Polynomial::Bessel::r_1drSphJnl<recurrence_t> r_1drSphJnl;
 
@@ -55,7 +55,7 @@ namespace Bessel {
       {
          // fallback on explicit implementation
          Polynomial::Bessel::r_1drSphJnl<explicit_t> r_1drSphJnlExplicit;
-         r_1drSphJnlExplicit.compute<T>(rOut, roots, l, igrid, scale);
+         r_1drSphJnlExplicit.compute<T>(rOut, roots, l, igrid, scale, dNu);
       }
       else
       {
@@ -79,15 +79,15 @@ namespace Bessel {
 
          Internal::Matrix opA(igrid.size(), n_in);
          Polynomial::Bessel::SphJnl jnl;
-         jnl.compute<Internal::MHDFloat>(opA, roots_l1, lm, igrid, scale);
+         jnl.compute<Internal::MHDFloat>(opA, roots_l1, lm, igrid, scale, dNu);
 
          Internal::Matrix opB(igrid.size(), n_in);
-         r_1drSphJnl.compute<Internal::MHDFloat>(opB, roots_l1, lm, igrid, Internal::Array());
+         r_1drSphJnl.compute<Internal::MHDFloat>(opB, roots_l1, lm, igrid, Internal::Array(), dNu);
 
          Internal::Matrix opC(igrid.size(), nPoly);
          Polynomial::Bessel::SphJnl jnlB;
          std::vector<Internal::MHDFloat> ks(roots.begin(), std::prev(roots.end()));
-         jnlB.compute<Internal::MHDFloat>(opC, ks, l, igrid, scale);
+         jnlB.compute<Internal::MHDFloat>(opC, ks, l, igrid, scale, dNu);
 
          rOut = ((opC.transpose()*opB*opA.transpose()).transpose()).cast<T>();
       }

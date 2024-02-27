@@ -15,8 +15,8 @@
 //
 #include "QuICC/TestSuite/Polynomial/Bessel/TestArgs.hpp"
 #include "QuICC/TestSuite/Polynomial/Bessel/Tester.hpp"
-#include "QuICC/Polynomial/Bessel/Tor.hpp"
-#include "QuICC/Polynomial/Bessel/Pol.hpp"
+#include "QuICC/Polynomial/Bessel/Value.hpp"
+#include "QuICC/Polynomial/Bessel/Insulating.hpp"
 #include "QuICC/Polynomial/Bessel/@Operator@.hpp"
 
 #cmakedefine01 Template
