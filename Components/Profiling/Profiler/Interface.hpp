@@ -4,7 +4,7 @@
  *
  * Implementation of profiler wrappers. A backend is selected by a macro
  * QUICC_PROFILE_BACKEND_<name>.
- * A new backend needs to implement 4 methods (Initialize, Finalize, RegionStart, RegionStop)
+ * A new backend needs to implement 4 methods (Initialize, Finalize, RegionStart, RegionStop, RegionResetAll)
  * in the namespace QuICC::Profiler::details.
  * A region is profiler only if the macro QUICC_PROFILE_LEVEL is equal
  * or higher than the template parameter L that is used for the region.
@@ -60,7 +60,12 @@ namespace details {
      * Every backend needs to implement this method.
      */
     inline static void RegionStop(const std::string& name);
-
+    /**
+     * @brief Internal interface to reset the profiler for all regions
+     *
+     * Every backend needs to implement this method.
+     */
+    inline static void RegionResetAll();
 
     /**
      * @brief Class to check wether mpi is already initialized
@@ -191,6 +196,14 @@ inline static void RegionStop(const std::string& name)
 }
 
 /**
+ * @brief Public interface to reset the profiler counter for all regions
+ */
+inline static void RegionResetAll()
+{
+    details::RegionResetAll();
+}
+
+/**
  * @brief Provide RAII functionality for a region to be profiled
  * @tparam L profiling level
  */
@@ -243,6 +256,10 @@ namespace details {
     {
         std::cout << "stop: "+name << std::endl;
     }
+    inline static void RegionResetAll()
+    {
+        std::cout << "reset all regions " << std::endl;
+    }
 }
 
 #elif defined QUICC_PROFILE_BACKEND_NATIVE
@@ -267,6 +284,10 @@ namespace details {
     {
         Tracker::stop(name);
     }
+    inline static void RegionResetAll()
+    {
+        Tracker::resetAll();
+    }
 }
 
 #elif defined QUICC_PROFILE_BACKEND_LIKWID
@@ -290,6 +311,10 @@ namespace details {
     {
         likwid_markerStopRegion(name.c_str());
     }
+    inline static void RegionResetAll()
+    {            
+        // we need to call likwid_markerResetRegion(reg->second) on all the regions - how to get the list of them? 
+    }
 }
 
 #else // do nothing
@@ -299,6 +324,7 @@ namespace details {
     inline static void Finalize(){}
     inline static void RegionStart(const std::string& name){}
     inline static void RegionStop(const std::string& name){}
+    inline static void RegionResetAll(){}
 }
 
 #endif

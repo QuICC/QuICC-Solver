@@ -11,13 +11,13 @@ stages:
 - model-build-and-test
 - cleanup
 build-quicc-base:
-  extends: .container-builder
+  extends: .container-builder-cscs-zen2
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-a100
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:f6c51a53d55aebc29e0951564f79ec54
 build-quicc:
-  extends: .container-builder
+  extends: .container-builder-cscs-zen2
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_kkgpu
