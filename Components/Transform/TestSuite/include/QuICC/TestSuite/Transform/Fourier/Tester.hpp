@@ -19,6 +19,7 @@
 
 // Project includes
 //
+#include "Profiler/Interface.hpp"
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/TestSuite/Transform/TesterBase.hpp"
@@ -241,6 +242,10 @@ namespace Fourier {
 
          FwdType outData;
 
+         outData = FwdType(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+         Profiler::RegionResetAll();
+
          for (unsigned int i = 0; i < this->mIter; ++i)
          {
             outData = FwdType(op.outRows(), op.outCols());
@@ -285,6 +290,10 @@ namespace Fourier {
          this->initOperator(op, spSetup);
 
          BwdType outData;
+
+         outData = BwdType(spSetup->bwdSize(), op.outCols());
+         op.transform(outData, inData);
+         Profiler::RegionResetAll();
 
          for (unsigned int i = 0; i < this->mIter; ++i)
          {

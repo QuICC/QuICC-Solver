@@ -16,6 +16,7 @@
 
 // Project includes
 //
+#include "Profiler/Interface.hpp"
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/TestSuite/Transform/TesterBase.hpp"
@@ -300,6 +301,10 @@ namespace Worland {
 
       MatrixZ outData;
 
+      outData = MatrixZ::Zero(op.outRows(), op.outCols());
+      op.transform(outData, inData);
+      Profiler::RegionResetAll();
+
       for (unsigned int i = 0; i < this->mIter; ++i)
       {
          outData = MatrixZ::Zero(op.outRows(), op.outCols());
@@ -342,6 +347,10 @@ namespace Worland {
          this->reverseData(inData);
       }
 
+      outData = MatrixZ::Zero(op.outRows(), op.outCols());
+      op.transform(outData, inData);
+      Profiler::RegionResetAll();
+
       for (unsigned int i = 0; i < this->mIter; ++i)
       {
          outData = MatrixZ::Zero(op.outRows(), op.outCols());
@@ -383,6 +392,10 @@ namespace Worland {
          this->initOperator(op, igrid, spSetup);
 
          Matrix outData;
+
+         outData = Matrix::Zero(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+         Profiler::RegionResetAll();
 
          for (unsigned int i = 0; i < this->mIter; ++i)
          {

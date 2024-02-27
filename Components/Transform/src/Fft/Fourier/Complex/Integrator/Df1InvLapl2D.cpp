@@ -31,10 +31,10 @@ namespace Integrator {
       orders = { {1,0} };
       int dfId = this->mBackend.computeDiff2D(orders, this->mspSetup->boxScale(), this->mspSetup->idBlocks());
       int opId = this->mBackend.multDiff2D(invId, dfId);
-      this->mBackend.destroyDiff2D(invId);
-      this->mBackend.destroyDiff2D(dfId);
       this->mBackend.applyDiff2D(rOut, opId);
       this->mBackend.destroyDiff2D(opId);
+      this->mBackend.destroyDiff2D(dfId);
+      this->mBackend.destroyDiff2D(invId);
    }
 
 } // namespace Integrator

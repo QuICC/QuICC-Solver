@@ -98,6 +98,16 @@ void Tracker::stop(const std::string& regionName)
 
 }
 
+void Tracker::resetAll()
+{
+    // reset all regions tracker 
+    for(auto &reg: mRegions)
+    {
+        // set count to 0
+        std::get<tracking::count>(reg.second) = 0;
+    }
+}
+
 Tracker::tracking_t Tracker::get(const std::string& regionName)
 {
     auto reg = mRegions.find(regionName);
