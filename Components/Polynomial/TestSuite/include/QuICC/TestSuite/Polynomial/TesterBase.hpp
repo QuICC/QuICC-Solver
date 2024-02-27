@@ -191,7 +191,7 @@ namespace Polynomial {
       ParameterType runParam;
       runParam.push_back(meta(2));
 
-      this->validate(specN, physN, param, type);
+      this->validate(specN, physN, runParam, type);
    }
 
    template <typename TOp> void TesterBase<TOp>::validate(const int specN, const int physN, const ParameterType& param, const TestType type) const
