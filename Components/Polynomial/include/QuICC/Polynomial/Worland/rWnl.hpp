@@ -35,7 +35,7 @@ namespace Worland {
          /**
           * @brief Constructor for specific alpha,beta pair
           */
-         rWnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta);
+         rWnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta): WorlandBase(alpha, dBeta){};
 
          /**
           * @brief Compute worland polynomial

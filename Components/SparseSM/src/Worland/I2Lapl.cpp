@@ -5,7 +5,6 @@
 
 // System includes
 //
-#include <cassert>
 #include <stdexcept>
 
 // Project includes
@@ -14,7 +13,7 @@
 #include "QuICC/SparseSM/Worland/Chebyshev/I2LaplDiags.hpp"
 //#include "QuICC/SparseSM/Worland/Legendre/I2LaplDiags.hpp"
 //#include "QuICC/SparseSM/Worland/CylEnergy/I2LaplDiags.hpp"
-//#include "QuICC/SparseSM/Worland/SphEnergy/I2LaplDiags.hpp"
+#include "QuICC/SparseSM/Worland/SphEnergy/I2LaplDiags.hpp"
 
 namespace QuICC {
 
@@ -39,8 +38,7 @@ namespace Worland {
             throw std::logic_error("Not yet implemented");
             break;
          case WorlandKind::SPHENERGY:
-            //this->mpImpl = std::make_shared<SphEnergy::I2LaplDiags>(alpha, l);
-            throw std::logic_error("Not yet implemented");
+            this->mpImpl = std::make_shared<SphEnergy::I2LaplDiags>(alpha, l, q);
             break;
       }
    }

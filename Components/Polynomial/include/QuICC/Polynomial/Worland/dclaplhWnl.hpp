@@ -6,16 +6,7 @@
 #ifndef QUICC_POLYNOMIAL_WORLAND_DCLAPLHWNL_HPP
 #define QUICC_POLYNOMIAL_WORLAND_DCLAPLHWNL_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -36,6 +27,16 @@ namespace Worland {
    class dclaplhWnl: public WorlandBase
    {
       public:
+         /**
+          * @brief Default constructor
+          */
+         dclaplhWnl() = default;
+
+         /**
+          * @brief Constructor for specific alpha,beta pair
+          */
+         dclaplhWnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta): WorlandBase(alpha, dBeta){};
+
          template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 

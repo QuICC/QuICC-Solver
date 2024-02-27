@@ -6,16 +6,7 @@
 #ifndef QUICC_POLYNOMIAL_WORLAND_WNL_HPP
 #define QUICC_POLYNOMIAL_WORLAND_WNL_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -37,14 +28,14 @@ namespace Worland {
    {
       public:
          /**
-          * @brief Default constructorx
+          * @brief Default constructor
           */
          Wnl() = default;
 
          /**
           * @brief Constructor for specific alpha,beta pair
           */
-         Wnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta, const int lShift = 0);
+         Wnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta, const int lShift = 0): WorlandBase(alpha, dBeta), mLShift(lShift){};
 
          /**
           * @brief Compute worland polynomial
@@ -52,7 +43,11 @@ namespace Worland {
           * @tparam TEvaluator The evaluator allows to change behavior from computing Matric operator, to On-the-fly transforms, etc
           */
          template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
+
       private:
+         /**
+          * @brief Shift of the harmonic degree when computing the polyniomial
+          */
          int mLShift = 0;
    };
 

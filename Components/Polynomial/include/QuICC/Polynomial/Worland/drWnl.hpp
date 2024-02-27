@@ -6,16 +6,7 @@
 #ifndef QUICC_POLYNOMIAL_WORLAND_DRWNL_HPP
 #define QUICC_POLYNOMIAL_WORLAND_DRWNL_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -36,6 +27,19 @@ namespace Worland {
    class drWnl: public WorlandBase
    {
       public:
+         /**
+          * @brief Default constructor
+          */
+         drWnl() = default;
+
+         /**
+          * @brief Constructor for specific alpha,beta pair
+          */
+         drWnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta): WorlandBase(alpha, dBeta){};
+
+         /**
+          * @brief Compute D r Worland polynomial
+          */
          template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 

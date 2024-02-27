@@ -18,7 +18,7 @@
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
-#include "QuICC/Polynomial/Worland/WorlandBase.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/D2.hpp"
@@ -45,8 +45,8 @@ void initQuasiInverse(Test& test, SparseMatrix& qi)
    {
       if (test.equationId == Test::EquationId::DIFFUSION)
       {
-         const auto& w_a = Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
-         const auto& w_db = Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
+         const auto& w_a = Polynomial::Worland::worland_chebyshev_t::ALPHA;
+         const auto& w_db = Polynomial::Worland::worland_chebyshev_t::DBETA;
 
          const auto& l = test.l;
          SparseSM::Worland::I2 i2(nN, nN, w_a, w_db, l);
@@ -55,8 +55,8 @@ void initQuasiInverse(Test& test, SparseMatrix& qi)
       }
       else if (test.equationId == Test::EquationId::BIDIFFUSION)
       {
-         const auto& w_a = Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
-         const auto& w_db = Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
+         const auto& w_a = Polynomial::Worland::worland_chebyshev_t::ALPHA;
+         const auto& w_db = Polynomial::Worland::worland_chebyshev_t::DBETA;
 
          const auto& l = test.l;
          SparseSM::Worland::I4 i4(nN, nN, w_a, w_db, l);
@@ -115,8 +115,8 @@ void createOperators(Test& test, std::map<std::size_t, DecoupledZSparse>& ops)
       if (test.equationId == Test::EquationId::DIFFUSION)
       {
          const auto& l = test.l;
-         const auto& w_a = Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
-         const auto& w_db = Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
+         const auto& w_a = Polynomial::Worland::worland_chebyshev_t::ALPHA;
+         const auto& w_db = Polynomial::Worland::worland_chebyshev_t::DBETA;
          // Compute model's linear operator (without Tau lines)
          ops.insert(std::make_pair(ModelOperator::ImplicitLinear::id(),
             DecoupledZSparse()));
@@ -147,8 +147,8 @@ void createOperators(Test& test, std::map<std::size_t, DecoupledZSparse>& ops)
       else if (test.equationId == Test::EquationId::BIDIFFUSION)
       {
          const auto& l = test.l;
-         const auto& w_a = Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
-         const auto& w_db = Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
+         const auto& w_a = Polynomial::Worland::worland_chebyshev_t::ALPHA;
+         const auto& w_db = Polynomial::Worland::worland_chebyshev_t::DBETA;
          // Compute model's linear operator (without Tau lines)
          ops.insert(std::make_pair(ModelOperator::ImplicitLinear::id(),
             DecoupledZSparse()));

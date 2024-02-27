@@ -170,11 +170,11 @@ namespace Chebyshev {
          // Truncation requires 3 coefficients from tau operator T: 
          // a = T[-2,-2], b = T[-1,-1], c = T[-2,-1]
          ACoeff_t m = n.bottomRows(1)-1;
-         ACoeff_t f = (2.0*l1 + 2.0*m - 1.0)*(l1 + 2.0*m - 4.0)/((l1 + m - 2.0));
+         ACoeff_t f = (2.0*l1 + 2.0*m - 1.0)*(l1 + 2.0*m - 4.0)/(l1 + m - 2.0);
          ACoeff_t ncA = (this->normalizeDiag(m, -2, 1)/this->normalizeDiag(m, -2))*f;
 
          m = n.bottomRows(1);
-         f = (2.0*l1 + 2.0*m - 1.0)*(l1 + 2.0*m - 4.0)/((l1 + m - 2.0));
+         f = (2.0*l1 + 2.0*m - 1.0)*(l1 + 2.0*m - 4.0)/(l1 + m - 2.0);
          ACoeff_t ncB = (this->normalizeDiag(m, -2, 1)/this->normalizeDiag(m, -2))*f;
 
          m = n.bottomRows(1)-1;

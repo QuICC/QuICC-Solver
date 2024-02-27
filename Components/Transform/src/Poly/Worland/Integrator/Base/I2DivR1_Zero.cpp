@@ -10,11 +10,8 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Integrator/Base/I2DivR1_Zero.hpp"
-#include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
-#include "QuICC/Polynomial/Worland/Evaluator/InnerProduct.hpp"
-#include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
 #include "QuICC/SparseSM/Worland/I2.hpp"
 
 // It is not clear yet which implementation is more accurate
@@ -48,7 +45,6 @@ namespace Integrator {
       } else
       {
          namespace ev = Polynomial::Worland::Evaluator;
-         Polynomial::Worland::Wnl wnl;
 
          // Internal computation uses dealiased modes
          const int extraN = 3*(!this->mcTruncQI); // I2 has 3 superdiagonals
@@ -66,8 +62,8 @@ namespace Integrator {
          r_1Wnl.compute<Internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
          // Multiply by Quasi-inverse
-         auto a = wnl.alpha(l);
-         auto b = wnl.dBeta();
+         auto a = r_1Wnl.alpha(l);
+         auto b = r_1Wnl.dBeta();
          ::QuICC::SparseSM::Worland::I2 spasm(nN, nN, a, b, l, 1*this->mcTruncQI);
          tOp = (spasm.mat()*tOp.transpose()).transpose();
          op = tOp.cast<MHDFloat>().leftCols(nPoly);

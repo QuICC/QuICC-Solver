@@ -34,6 +34,16 @@ namespace Worland {
    class r_1Wnl<recurrence_t>: public WorlandBase
    {
       public:
+         /**
+          * @brief Default constructor
+          */
+         r_1Wnl() = default;
+
+         /**
+          * @brief Constructor for specific alpha,beta pair
+          */
+         r_1Wnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta): WorlandBase(alpha, dBeta){};
+
          template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 

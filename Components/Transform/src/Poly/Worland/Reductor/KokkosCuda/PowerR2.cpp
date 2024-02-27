@@ -13,6 +13,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Reductor/Kokkos/PowerR2.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
@@ -47,8 +48,8 @@ void PowerR2<kokkos_t>::makeOperator(Matrix& op, Matrix& eop,
    Polynomial::Worland::Wnl bwnl;
    bwnl.compute<MHDFloat>(op, nPoly, l, igrid, Internal::Array(), ev::Set());
 
-   Polynomial::Worland::Wnl fwnl(Polynomial::Worland::Wnl::ALPHA_SPHENERGY,
-      Polynomial::Worland::Wnl::DBETA_SPHENERGY);
+   Polynomial::Worland::Wnl fwnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
+      Polynomial::Worland::worland_sphenergy_t::DBETA);
 
    eop.resize(igrid.size(), nPoly);
    fwnl.compute<MHDFloat>(eop, nPoly, l, igrid, iweights, ev::Set());
