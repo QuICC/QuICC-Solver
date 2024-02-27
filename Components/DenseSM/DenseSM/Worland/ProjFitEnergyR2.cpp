@@ -15,10 +15,9 @@
 #include "QuICC/Polynomial/Quadrature/WorlandLegendreRule.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
-#include "QuICC/Polynomial/Worland/WorlandBase.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/Value.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/D1.hpp"
-#include "QuICC/SparseSM/Worland/I2.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
 #include "QuICC/Bc/Name/FixedFlux.hpp"
 #include "QuICC/Bc/Name/Insulating.hpp"
@@ -36,42 +35,61 @@ namespace Worland {
 
    void ProjFitEnergyR2::buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const
    {
+      Scalar_t alpha, dBeta;
+      auto define_worland = [&](auto& w)
+      {
+         alpha = w.ALPHA;
+         dBeta = w.DBETA;
+      };
+
       switch(this->type())
       {
          case WorlandKind::CHEBYSHEV:
-            this->buildChebyshevOp(mat, rows, cols);
-            break;
+            {
+               ::QuICC::Polynomial::Worland::worland_chebyshev_t wt;
+               define_worland(wt);
+               break;
+            }
          case WorlandKind::LEGENDRE:
-            throw std::logic_error("Legendre basis operator not implemented");
-            break;
+            {
+               ::QuICC::Polynomial::Worland::worland_legendre_t wt;
+               define_worland(wt);
+               break;
+            }
          case WorlandKind::CYLENERGY:
-            throw std::logic_error("Cylindrical energy basis operator not implemented");
-            break;
+            {
+               ::QuICC::Polynomial::Worland::worland_cylenergy_t wt;
+               define_worland(wt);
+               break;
+            }
          case WorlandKind::SPHENERGY:
-            throw std::logic_error("Spherical energy basis operator not implemented");
-            break;
+            {
+               ::QuICC::Polynomial::Worland::worland_sphenergy_t wt;
+               define_worland(wt);
+               break;
+            }
       }
+      this->buildGenericOp(mat, rows, cols, alpha, dBeta);
    }
 
-   void ProjFitEnergyR2::buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const
+   void ProjFitEnergyR2::buildGenericOp(Internal::Matrix& mat, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta) const
    {
       const auto& nbar = this->mOutRows;
 
       if(nbar > 1)
       {
-         const auto a = Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
-         const auto db = Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
          const auto& l = this->mL;
-         Polynomial::Quadrature::WorlandLegendreRule wquad;
 
+         // Compute Legendre quadrature to integrate r polynomial
          int rp = 2*rows + l;
          int pts = rp + 2 + (rp + 2)%2;
          Internal::Array igrid;
          Internal::Array iweights;
+         Polynomial::Quadrature::WorlandLegendreRule wquad;
          wquad.computeQuadrature(igrid, iweights, pts);
 
          namespace ev = Polynomial::Worland::Evaluator;
-         Polynomial::Worland::Wnl wnl;
+         Polynomial::Worland::Wnl wnl(alpha, dBeta);
          Internal::Matrix tmpBwd(igrid.size(), rows);
          wnl.compute<Internal::MHDFloat>(tmpBwd, rows, l, igrid, Internal::Array(), ev::Set());
          Internal::Matrix tmpFwd(igrid.size(), rows);
@@ -81,12 +99,12 @@ namespace Worland {
          SparseMatrix matS;
          if(this->mBcId == Bc::Name::FixedTemperature::id() || this->mBcId == Bc::Name::Insulating::id())
          {
-            SparseSM::Worland::Stencil::Value S(nbar, nbar-1, a, db, l);
+            SparseSM::Worland::Stencil::Value S(nbar, nbar-1, alpha, dBeta, l);
             matS = S.mat();
          }
          else if(this->mBcId == Bc::Name::FixedFlux::id())
          {
-            SparseSM::Worland::Stencil::D1 S(nbar, nbar-1, a, db, l);
+            SparseSM::Worland::Stencil::D1 S(nbar, nbar-1, alpha, dBeta, l);
             matS = S.mat();
          }
          else

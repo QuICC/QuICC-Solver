@@ -59,9 +59,15 @@ namespace Worland {
 
       private:
          /**
-          * @brief Build Chebyshev type operator
+          * @brief Build generic operator
+          *
+          * @param mat     Input/Output matrix
+          * @param rows    Number of row
+          * @param cols    Number of cols
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
           */
-         void buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const;
+         void buildGenericOp(Internal::Matrix& mat, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta) const;
 
          /**
           * @brief Output truncation

@@ -84,10 +84,6 @@ namespace Worland {
          std::vector<int> mNidx;
 
       private:
-         /**
-          * @brief Build Chebyshev type operator
-          */
-         void buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const;
    };
 
 } // Worland

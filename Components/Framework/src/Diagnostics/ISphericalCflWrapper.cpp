@@ -13,7 +13,7 @@
 #include "QuICC/NonDimensional/CflInertial.hpp"
 #include "QuICC/NonDimensional/CflAlfvenDamping.hpp"
 #include "QuICC/NonDimensional/CflAlfvenScale.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 
 namespace QuICC {
 
@@ -96,7 +96,7 @@ namespace Diagnostics {
       // Compute magnetic grid
       int nB = 3*this->mspVelocity->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL)/4 + 1;
       Internal::Array igrid, iweights;
-      Polynomial::Quadrature::WorlandChebyshevRule wquad;
+      Polynomial::Quadrature::WorlandRule wquad;
       wquad.computeQuadrature(igrid, iweights, nB);
       Array rB = igrid.cast<MHDFloat>();
       Array drB = Array(rB.size());

@@ -23,13 +23,13 @@ set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
 
 # Fetch reference data
 include(FetchTestReference)
-quicc_fetch_test_reference(
-  ${TestExe}
-  COMPONENT DenseSM
-  FILENAME "Worland.tar.gz"
-  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
-  DATADIR ${QUICC_WORK_DIR}
-)
+#quicc_fetch_test_reference(
+#  ${TestExe}
+#  COMPONENT DenseSM
+#  FILENAME "Worland.tar.gz"
+#  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+#  DATADIR ${QUICC_WORK_DIR}
+#)
 
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
@@ -76,6 +76,26 @@ endforeach()
 # Create tests for GeostrophicAngular
 set(_tests
   GeostrophicAngularMomentum:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 11 11 11 11 11
+  MPULP 11 11 11 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1 2 3 4
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create tests for ProjFitEnergy
+set(_tests
+  ProjFitEnergyPol:dense
+  ProjFitEnergyR2:dense
+  I2ProjFitEnergyR2:dense
+  I2ProjFitEnergyPol:dense
   )
 quicc_set_ulp(_ulp
   ULP 11 11 11 11 11

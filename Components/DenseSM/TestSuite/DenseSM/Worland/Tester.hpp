@@ -15,6 +15,7 @@
 
 // Project includes
 //
+#include "DenseSM/Worland/IEmbeddedOperator.hpp"
 #include "Types/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "QuICC/QuICCEnv.hpp"
@@ -23,8 +24,9 @@
 #include "DenseSM/Worland/Geostrophic2Tor.hpp"
 #include "DenseSM/Worland/PyGeostrophic2Tor.hpp"
 #include "DenseSM/Worland/GeostrophicAngularMomentum.hpp"
-#include "QuICC/Polynomial/Worland/WorlandBase.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
+#include "QuICC/Bc/Name/Insulating.hpp"
 
 namespace dsm = ::QuICC::DenseSM::Worland;
 
@@ -115,17 +117,17 @@ namespace Worland {
 
       if constexpr(std::is_same_v<TOp, dsm::Geostrophic2Tor> || std::is_same_v<TOp, dsm::PyGeostrophic2Tor>)
       {
-         auto a = ::QuICC::Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
-         auto b = ::QuICC::Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
-
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
+         assert(meta.size() == 6);
 
          int nN = meta(0) + 1;
          int maxnl = meta(1) + 1;
          QuICC::Internal::MHDFloat ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
          QuICC::Internal::MHDFloat ugDBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         auto a = static_cast<QuICC::Internal::MHDFloat>(meta(4));
+         auto b = static_cast<QuICC::Internal::MHDFloat>(meta(5));
 
          int nR = int(((maxnl + 1) - (maxnl + 1) % 2) / 2 + 2) + 1;
          int maxNug = int(((maxnl - 2) - (maxnl - 2) % 2) / 2);
@@ -167,21 +169,51 @@ namespace Worland {
       }
       else if constexpr(std::is_same_v<TOp, dsm::GeostrophicAngularMomentum>)
       {
-         auto a = ::QuICC::Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
-         auto b = ::QuICC::Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
-
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
+         assert(meta.size(6));
 
          int nN = meta(0) + 1;
          int maxnl = meta(1) + 1;
          QuICC::Internal::MHDFloat ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
          QuICC::Internal::MHDFloat ugDBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         auto a = static_cast<QuICC::Internal::MHDFloat>(meta(4));
+         auto b = static_cast<QuICC::Internal::MHDFloat>(meta(5));
 
          int nr = (maxnl - 3)/2 + 1;
 
          TOp op(ugAlpha, ugDBeta, nr, a, b, 0);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_base_of_v<dsm::IEmbeddedOperator, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         assert(meta.size(7));
+
+         int outRows = meta(0) + 1;
+         int bc = static_cast<int>(meta(1));
+         std::size_t bcId;
+         int rows = meta(2)+1;
+         int cols = meta(3)+1;
+         auto a = static_cast<QuICC::Internal::MHDFloat>(meta(4));
+         auto b = static_cast<QuICC::Internal::MHDFloat>(meta(5));
+         auto l = static_cast<int>(meta(6));
+
+         // Identify boundary condition
+         if(bc == 0)
+         {
+            bcId = Bc::Name::Insulating::id();
+         }
+         else
+         {
+            throw std::logic_error("Unknown boundary condition");
+         }
+
+         TOp op(outRows, bcId, rows, cols, a, b, l);
 
          outData = op.mat();
       }

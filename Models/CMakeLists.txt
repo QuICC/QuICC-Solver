@@ -40,7 +40,7 @@ set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "worland_types")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.10.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "v1.1.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereModifiedTaylor
-  "v1.5.0")
+  "bessel_ie")
 
 # Cache value, may be overwritten manually
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo

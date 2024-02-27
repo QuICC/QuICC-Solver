@@ -15,6 +15,10 @@
 #include "Types/Internal/Math.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandLegendreRule.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandCylEnergyRule.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandSphEnergyRule.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/ALegendre/dPlm.hpp"
@@ -33,25 +37,6 @@ namespace Worland {
 
    void Geostrophic2Tor::buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const
    {
-      switch(this->type())
-      {
-         case WorlandKind::CHEBYSHEV:
-            this->buildChebyshevOp(mat, rows, cols);
-            break;
-         case WorlandKind::LEGENDRE:
-            throw std::logic_error("Legendre basis operator not implemented");
-            break;
-         case WorlandKind::CYLENERGY:
-            throw std::logic_error("Cylindrical energy basis operator not implemented");
-            break;
-         case WorlandKind::SPHENERGY:
-            throw std::logic_error("Spherical energy basis operator not implemented");
-            break;
-      }
-   }
-
-   void Geostrophic2Tor::buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const
-   {
       const auto& nN = this->mNn;
       const auto& maxnl = this->mMaxnl;
       const auto& nR = this->mNr;
@@ -61,10 +46,48 @@ namespace Worland {
       const auto& a = this->mcUgAlpha;
       const auto& b = this->mcUgDBeta;
 
+      // Select Worland type and create quadrature grid and weights
+      Scalar_t alpha, dBeta;
       Internal::Array igrid, iweights;
-      Polynomial::Quadrature::WorlandChebyshevRule wquad;
-      wquad.computeQuadrature(igrid, iweights, nR);
 
+      auto define_worland = [&](auto& w)
+      {
+         alpha = w.ALPHA;
+         dBeta = w.DBETA;
+         typename std::remove_reference<decltype(w)>::type::Rule quad;
+         quad.computeQuadrature(igrid, iweights, nR);
+      };
+
+      switch(this->type())
+      {
+         case WorlandKind::CHEBYSHEV:
+            {
+               ::QuICC::Polynomial::Worland::worland_chebyshev_t wt;
+               define_worland(wt);
+               break;
+            }
+         case WorlandKind::LEGENDRE:
+            {
+               ::QuICC::Polynomial::Worland::worland_legendre_t wt;
+               define_worland(wt);
+               break;
+            }
+         case WorlandKind::CYLENERGY:
+            {
+               ::QuICC::Polynomial::Worland::worland_cylenergy_t wt;
+               define_worland(wt);
+               break;
+            }
+         case WorlandKind::SPHENERGY:
+            {
+               ::QuICC::Polynomial::Worland::worland_sphenergy_t wt;
+               define_worland(wt);
+               break;
+            }
+      }
+
+      //
+      // Build operator
       mat = Internal::Matrix::Zero(maxnl*nN, maxNug+1);
 
       std::map<int,Internal::Matrix> matP;
@@ -74,7 +97,7 @@ namespace Worland {
          {
             int nN_ = std::min(nli(l), nN-1);
             Internal::Matrix ipoly(igrid.size(), nN_ + 1);
-            Polynomial::Worland::Wnl wnl;
+            Polynomial::Worland::Wnl wnl(alpha, dBeta);
             wnl.compute<Internal::MHDFloat>(ipoly, nN_ + 1, l, igrid, iweights, Polynomial::Worland::Evaluator::Set());
             matP.try_emplace(l,ipoly);
          }
