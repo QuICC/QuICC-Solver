@@ -1,7 +1,7 @@
 /**
- * @file DivLlDivS1.cpp
+ * @file DivLlDivS1Dp.cpp
  * @brief Source of the implementation of the associated Legendre 1/l(l+1) 1/Sin
- * parallel integrator
+ * D_phi parallel integrator
  */
 
 // System includes
@@ -9,8 +9,10 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/DivLlDivS1.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/DivLlDivS1Dp.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Polynomial/ALegendre/sin_1Plm.hpp"
+#include "Types/Math.hpp"
 
 namespace QuICC {
 
@@ -22,7 +24,7 @@ namespace ALegendre {
 
 namespace Integrator {
 
-void DivLlDivS1<kokkos_t>::makeOperator(Matrix& op,
+void DivLlDivS1Dp<kokkos_t>::makeOperator(Matrix& op,
    const Internal::Array& igrid, const Internal::Array& iweights,
    const int i) const
 {
@@ -30,13 +32,14 @@ void DivLlDivS1<kokkos_t>::makeOperator(Matrix& op,
    op = op * this->mDivLl.bottomRows(op.cols()).asDiagonal();
 }
 
-void DivLlDivS1<kokkos_t>::applyUnitOperator(const OpMatrixLZ& rOutView,
+void DivLlDivS1Dp<kokkos_t>::applyUnitOperator(const OpMatrixLZ& rOutView,
    const OpMatrixLZ& inView, const OpVectorI& scan, const int total) const
 {
    DivS1<kokkos_t>::applyUnitOperator(rOutView, inView, scan, total);
+   constantMultiplyMatrix(this->mspSetup, scan, rOutView);
 }
 
-void DivLlDivS1<kokkos_t>::initSpecial() const
+void DivLlDivS1Dp<kokkos_t>::initSpecial() const
 {
    // Initialise storage for l(l+1) factor
    this->mDivLl = Array::LinSpaced(this->mspSetup->specSize(), 0,

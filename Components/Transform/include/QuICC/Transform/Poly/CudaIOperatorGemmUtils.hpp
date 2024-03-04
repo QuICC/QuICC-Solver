@@ -655,58 +655,6 @@ void applyBlockOperator(const T mspSetup, const MS& vmOps, const MV& rOutView,
    }
 }
 
-template <typename T, typename M>
-void constantMultiplyMatrix(const T constant, const M& matrix)
-{
-
-   auto rows = matrix.extent(0);
-   auto cols = matrix.extent(1);
-   Kokkos::parallel_for(
-      "constantMultiplyMatrix",
-      Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {rows, cols}),
-      KOKKOS_LAMBDA(int i, int j) {
-         auto result = matrix(i, j) * constant;
-         matrix(i, j) = result;
-      });
-}
-
-template <Integer S = 0, typename T, typename V, typename M>
-void constantMultiplyMatrix(const T mspSetup, const V& scan, const M& matrix)
-{
-
-   using DataType = CudaIOperatorTypes::DataType;
-   auto slowSize = mspSetup->slowSize();
-
-   ViewVectorType<DataType> constants("Constant vector", slowSize);
-   auto hostConstants = Kokkos::create_mirror_view(constants);
-
-   auto sign = -1.0;
-   if constexpr (S == 1)
-   {
-      sign = 1.0;
-   }
-
-   for (int i = 0; i < slowSize; i++)
-   {
-      hostConstants(i) =
-         DataType(0.0, sign * static_cast<MHDFloat>(mspSetup->slow(i)));
-   }
-
-   Kokkos::deep_copy(constants, hostConstants);
-
-   auto rows = matrix.extent(0);
-   auto cols = matrix.extent(1);
-
-   Kokkos::parallel_for(
-      "constantMultiplyMatrix using a scan",
-      Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {rows, cols}),
-      KOKKOS_LAMBDA(int i, int j) {
-         auto index = binary_search_range(scan, i);
-         auto result = matrix(i, j) * constants(index);
-         matrix(i, j) = result;
-      });
-}
-
 namespace Experimental {
 
 template <typename M, typename L, typename T, typename S, Integer Layout = 0>

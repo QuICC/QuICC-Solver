@@ -29,13 +29,13 @@ class KokkosIOperatorTypes {
 
    using DataType = Kokkos::complex<double>;
 
-   using OpMatrixLZ = ViewMatrixTypeLeft<DataType>;
-   using OpMatrixLZL = ViewMatrixTypeLeft<DataType>;
-   using OpMatrixL = ViewMatrixTypeLeft<ScalarType>;
-   using OpMatrixLZH = ViewMatrixTypeLeftHost<MatrixZ::Scalar>;
+   using OpMatrixLZ = ViewMatrixType<DataType>;
+   using OpMatrixLZL = ViewMatrixType<DataType>;
+   using OpMatrixL = ViewMatrixType<ScalarType>;
+   using OpMatrixLZH = ViewMatrixTypeHost<MatrixZ::Scalar>;
 
    using OpVectorI = ViewVectorType<int>;
-   using OpMatrixI = ViewMatrixTypeLeft<int>;
+   using OpMatrixI = ViewMatrixType<int>;
 
 };
 

@@ -37,13 +37,13 @@ namespace Integrator {
       public:
         virtual void applyUnitOperator(const OpMatrixLZ &rOut,
            const OpMatrixLZ &in, const OpVectorI &scan,
-           const int totalOpsCols) const;
+           const int totalOpsCols) const override;
 
       protected:
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const;
+         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const override;
 
    };
 

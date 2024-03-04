@@ -1,7 +1,6 @@
 /**
  * @file D1.cpp
- * @brief Source of the implementation of the associated Legendre D parallel
- * Projector
+ * @brief Source of the implementation of the associated Legendre D integrator
  */
 
 // System includes
@@ -9,10 +8,10 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Poly/ALegendre/Projector/Kokkos/D1.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/D1.hpp"
 #include "QuICC/Polynomial/ALegendre/dPlm.hpp"
 #include "QuICC/Polynomial/ALegendre/Evaluator/Set.hpp"
-#include "QuICC/Polynomial/ALegendre/Evaluator/OuterProduct.hpp"
+#include "QuICC/Polynomial/ALegendre/Evaluator/InnerProduct.hpp"
 
 namespace QuICC {
 
@@ -22,7 +21,7 @@ namespace Poly {
 
 namespace ALegendre {
 
-namespace Projector {
+namespace Integrator {
 
 void D1<kokkos_t>::makeOperator(Matrix& op, const Internal::Array& igrid,
    const Internal::Array& iweights, const int i) const
@@ -34,17 +33,16 @@ void D1<kokkos_t>::makeOperator(Matrix& op, const Internal::Array& igrid,
    op.resize(igrid.size(), nPoly);
    namespace ev = Polynomial::ALegendre::Evaluator;
    Polynomial::ALegendre::dPlm dplm;
-   dplm.compute<MHDFloat>(op, nPoly, m, igrid, Internal::Array(), ev::Set());
+   dplm.compute<MHDFloat>(op, nPoly, m, igrid, iweights, ev::Set());
 }
 
 void D1<kokkos_t>::applyUnitOperator(const OpMatrixLZ& rOutView,
    const OpMatrixLZ& inView, const OpVectorI& scan, const int total) const
 {
-   applyBlockOperator<1>(this->mspSetup, this->vmOps, rOutView, inView, scan,
-      total);
+   applyKokkosBlockOperator(this->mspSetup, this->vmOps, rOutView, inView,
+      scan);
 }
-
-} // namespace Projector
+} // namespace Integrator
 } // namespace ALegendre
 } // namespace Poly
 } // namespace Transform

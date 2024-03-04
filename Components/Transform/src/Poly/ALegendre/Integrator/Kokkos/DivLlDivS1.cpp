@@ -10,6 +10,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/DivLlDivS1.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Polynomial/ALegendre/sin_1Plm.hpp"
 
 namespace QuICC {
