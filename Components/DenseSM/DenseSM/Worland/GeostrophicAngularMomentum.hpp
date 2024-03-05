@@ -55,9 +55,9 @@ namespace Worland {
 
       private:
          /**
-          * @brief Build Chebyshev type operator
+          * @brief Build Worland type independent operator
           */
-         void buildChebyshevOp(Internal::Matrix& mat, const int rows) const;
+         void buildGenericOp(Internal::Matrix& mat, const int rows) const;
    };
 
 } // Worland

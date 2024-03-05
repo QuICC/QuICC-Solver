@@ -94,6 +94,15 @@ namespace Equations {
       this->defineCoupling(FieldComponents::Spectral::SCALAR, CouplingInformation::TRIVIAL, 0, features);
    }
 
+   void SphereExactScalarState::initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh)
+   {
+      for(auto it = this->mConstraintKernel.begin(); it != this->mConstraintKernel.end(); ++it)
+      {
+         it->second->setField(this->name(), this->spUnknown());
+         it->second->setResolution(this->spRes());
+      }
+   }
+
    void SphereExactScalarState::initNLKernel(const bool force)
    {
       // Initialize if empty or forced
@@ -102,7 +111,8 @@ namespace Equations {
          if(this->mspPhysKernel)
          {
             this->mspNLKernel = this->mspPhysKernel;
-         } else if(this->mSrcKernel.size() > 0)
+         }
+         else if(this->mSrcKernel.size() > 0 || this->mConstraintKernel.size() > 0)
          {
             // Pure spectral state is used
             auto spNLKernel = std::make_shared<Physical::Kernel::DoNothing>();

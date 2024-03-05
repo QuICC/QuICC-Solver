@@ -89,6 +89,9 @@ namespace QuICC {
       // Initialise the simulation
       spGen->init(spBcs);
 
+      // Set initial state
+      model.setGeneratorState(spGen);
+
       return spGen;
    }
 

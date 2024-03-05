@@ -28,24 +28,10 @@ namespace Worland {
    void GeostrophicAngularMomentum::buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const
    {
       assert(cols == 1);
-      switch(this->type())
-      {
-         case WorlandKind::CHEBYSHEV:
-            this->buildChebyshevOp(mat, rows);
-            break;
-         case WorlandKind::LEGENDRE:
-            throw std::logic_error("Legendre basis operator not implemented");
-            break;
-         case WorlandKind::CYLENERGY:
-            throw std::logic_error("Cylindrical energy basis operator not implemented");
-            break;
-         case WorlandKind::SPHENERGY:
-            throw std::logic_error("Spherical energy basis operator not implemented");
-            break;
-      }
+      this->buildGenericOp(mat, rows);
    }
 
-   void GeostrophicAngularMomentum::buildChebyshevOp(Internal::Matrix& mat, const int rows) const
+   void GeostrophicAngularMomentum::buildGenericOp(Internal::Matrix& mat, const int rows) const
    {
       mat = Internal::Matrix::Zero(rows, 1);
 

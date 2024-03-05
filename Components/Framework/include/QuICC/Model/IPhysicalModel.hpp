@@ -100,6 +100,13 @@ namespace Model {
          virtual void addStates(std::shared_ptr<TState> spGen) = 0;
 
          /**
+          * @brief Set the state generator initial state
+          *
+          * @param spGen   Shared generator object
+          */
+         virtual void setGeneratorState(std::shared_ptr<TState> spGen);
+
+         /**
           * @brief Add the visualization generation equations
           *
           * @param spGen   Shared visualization generator
@@ -109,7 +116,7 @@ namespace Model {
          /**
           * @brief Set the visualization initial state
           *
-          * @param spSim   Shared visualization generator
+          * @param spVis   Shared visualization generator
           */
          virtual void setVisualizationState(std::shared_ptr<TVis> spVis);
 
@@ -157,6 +164,13 @@ namespace Model {
          template <typename T> void enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim);
 
       protected:
+         /**
+          * @brief Set default generator initial state
+          *
+          * @param spGen   Shared generator object
+          */
+         void setDefaultGeneratorState(std::shared_ptr<TState> spGen);
+
          /**
           * @brief Register Named IDs needed for simulation
           */
@@ -216,6 +230,36 @@ namespace Model {
 
       // Propagate split 4th order equations flag
       this->mpBackend->enableSplitEquation(f.count(SpatialScheme::Feature::SplitFourthOrder));
+   }
+
+   template <typename TSim, typename TState, typename TVis> void IPhysicalModel<TSim,TState,TVis>::setGeneratorState(std::shared_ptr<TState> spGen)
+   {
+   }
+
+   template <typename TSim, typename TState, typename TVis> void IPhysicalModel<TSim,TState,TVis>::setDefaultGeneratorState(std::shared_ptr<TState> spGen)
+   {
+      // Field IDs iterator
+      std::vector<std::size_t> ids = this->backend().fieldIds();
+
+      // Create and add initial state file to IO
+      auto spIn = std::make_shared<Io::Variable::StateFileReader>("_initial", spGen->ss().tag(), spGen->ss().has(SpatialScheme::Feature::RegularSpectrum));
+
+      // Set expected field names
+      for(auto it = ids.cbegin(); it != ids.cend(); ++it)
+      {
+         spIn->expect(*it);
+      }
+
+      // Add extra field names
+      ids.clear();
+      ids = this->extraFieldIds();
+      for(auto it = ids.cbegin(); it != ids.cend(); ++it)
+      {
+         spIn->expect(*it);
+      }
+
+      // Set simulation state
+      spGen->setInitialState(spIn);
    }
 
    template <typename TSim, typename TState, typename TVis> void IPhysicalModel<TSim,TState,TVis>::setVisualizationState(std::shared_ptr<TVis> spVis)

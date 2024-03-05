@@ -91,6 +91,13 @@ namespace Equations {
           */
          void setSpectralModes(const Spectral::Kernel::Complex3DMapType& modes);
 
+         /**
+          * @brief Initialize constraint kernels
+          *
+          * @param spMesh  Physical mesh
+          */
+         virtual void initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh);
+
       protected:
          /**
           * @brief Set variable requirements

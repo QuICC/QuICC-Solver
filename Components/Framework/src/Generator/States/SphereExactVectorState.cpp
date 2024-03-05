@@ -114,6 +114,15 @@ namespace Equations {
       }
    }
 
+   void SphereExactVectorState::initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh)
+   {
+      for(auto it = this->mConstraintKernel.begin(); it != this->mConstraintKernel.end(); ++it)
+      {
+         it->second->setField(this->name(), this->spUnknown());
+         it->second->setResolution(this->spRes());
+      }
+   }
+
    void SphereExactVectorState::initNLKernel(const bool force)
    {
       // Initialize if empty or forced
@@ -123,7 +132,8 @@ namespace Equations {
          {
             this->mspNLKernel = this->mspPhysKernel;
 
-         } else if(this->mSrcKernel.size() > 0)
+         }
+         else if(this->mSrcKernel.size() > 0 || this->mConstraintKernel.size() > 0)
          {
             // Pur spectral state is used
             auto spNLKernel = std::make_shared<Physical::Kernel::DoNothing>();
