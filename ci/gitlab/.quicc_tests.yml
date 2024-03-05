@@ -27,6 +27,7 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_projector_ulp"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_projector_id"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_bfloop_ulp"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMBesselTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapBoundaryTests_
