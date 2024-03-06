@@ -15,14 +15,15 @@ namespace SparseSM {
 
 namespace Bessel {
 
-   /// Different kinds of Bessel basis
-   enum class BesselKind {
-      VALUE,
-      INSULATING,
-   };
+/// Different kinds of Bessel basis
+enum class BesselKind
+{
+   VALUE,
+   INSULATING,
+};
 
-}
-}
-}
+} // namespace Bessel
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_BESSEL_BESSELKIND_HPP

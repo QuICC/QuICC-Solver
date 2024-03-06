@@ -21,11 +21,11 @@ namespace Polynomial {
 
 namespace Bessel {
 
-   Polynomial::TestArgs& args();
+Polynomial::TestArgs& args();
 
 }
-}
-}
-}
+} // namespace Polynomial
+} // namespace TestSuite
+} // namespace QuICC
 
-#endif //QUICC_TESTSUITE_POLYNOMIAL_BESSEL_TESTARGS_HPP
+#endif // QUICC_TESTSUITE_POLYNOMIAL_BESSEL_TESTARGS_HPP

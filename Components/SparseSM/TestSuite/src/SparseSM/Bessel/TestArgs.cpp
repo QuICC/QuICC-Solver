@@ -18,14 +18,14 @@ namespace SparseSM {
 
 namespace Bessel {
 
-   SparseSM::TestArgs& args()
-   {
-      static SparseSM::TestArgs a;
+SparseSM::TestArgs& args()
+{
+   static SparseSM::TestArgs a;
 
-      return a;
-   }
+   return a;
+}
 
-}
-}
-}
-}
+} // namespace Bessel
+} // namespace SparseSM
+} // namespace TestSuite
+} // namespace QuICC

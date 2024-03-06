@@ -11,8 +11,8 @@
 
 // Project includes
 //
-#include "Types/Internal/Typedefs.hpp"
 #include "QuICC/SparseSM/Bessel/BesselKind.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -20,56 +20,56 @@ namespace SparseSM {
 
 namespace Bessel {
 
+/**
+ * @brief Interface to Bessel sparse operator diagonals
+ */
+class IDiags
+{
+public:
+   /// Typedef for scalar
+   typedef Internal::MHDFloat Scalar_t;
+
+   /// Typedef for coefficient array
+   typedef Internal::ACoeff ACoeff_t;
+
    /**
-    * @brief Interface to Bessel sparse operator diagonals
+    * @brief Constructor
+    *
+    * @param type Type of Bessel basis
+    * @param l    Harmonic degree l
     */
-   class IDiags
-   {
-      public:
-         /// Typedef for scalar
-         typedef Internal::MHDFloat Scalar_t;
+   IDiags(const BesselKind type, const int l);
 
-         /// Typedef for coefficient array
-         typedef Internal::ACoeff ACoeff_t;
+   /**
+    * @brief Destructor
+    */
+   virtual ~IDiags() = default;
 
-         /**
-          * @brief Constructor
-          *
-          * @param type Type of Bessel basis
-          * @param l    Harmonic degree l
-          */
-         IDiags(const BesselKind type, const int l);
+protected:
+   /**
+    * @brief Get l
+    */
+   Scalar_t l() const;
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~IDiags() = default;
+   /**
+    * @brief Type of Bessel implementation
+    */
+   Bessel::BesselKind type() const;
 
-      protected:
-         /**
-          * @brief Get l
-          */
-         Scalar_t l() const;
+private:
+   /**
+    * @brief Type of Bessel basis
+    */
+   BesselKind mType;
 
-         /**
-          * @brief Type of Bessel implementation
-          */
-         Bessel::BesselKind type() const;
+   /**
+    * @brief l
+    */
+   Scalar_t mL;
+};
 
-      private:
-         /**
-          * @brief Type of Bessel basis
-          */
-         BesselKind mType;
-
-         /**
-          * @brief l
-          */
-         Scalar_t mL;
-   };
-
-}
-}
-}
+} // namespace Bessel
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_BESSEL_IDIAGS_HPP

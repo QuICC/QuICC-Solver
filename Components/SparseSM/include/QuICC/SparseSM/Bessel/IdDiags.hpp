@@ -1,6 +1,7 @@
 /**
  * @file IdDiags.hpp
- * @brief Interface to I2 diagonals for full sphere Bessel (restricted) identity sparse operator
+ * @brief Interface to I2 diagonals for full sphere Bessel (restricted) identity
+ * sparse operator
  */
 
 #ifndef QUICC_SPARSESM_BESSEL_IDDIAGS_HPP
@@ -11,8 +12,8 @@
 
 // Project includes
 //
-#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Bessel/IDiags.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -20,39 +21,39 @@ namespace SparseSM {
 
 namespace Bessel {
 
+/**
+ * @brief Implementation of the full sphere Bessel (restricted) identity sparse
+ * operator
+ */
+class IdDiags : public IDiags
+{
+public:
    /**
-    * @brief Implementation of the full sphere Bessel (restricted) identity sparse operator
+    * @brief Constructor
+    *
+    * @param type Type of Bessel basis
+    * @param l    Harmonic degree l
     */
-   class IdDiags: public IDiags
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param type Type of Bessel basis
-          * @param l    Harmonic degree l
-          */
-         IdDiags(const BesselKind type, const int l);
+   IdDiags(const BesselKind type, const int l);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~IdDiags() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~IdDiags() = default;
 
-         /**
-          * @brief Main diagonal
-          *
-          * @param n Array of n indexes
-          */
-         virtual ACoeff_t d0(const ACoeff_t& n) const;
+   /**
+    * @brief Main diagonal
+    *
+    * @param n Array of n indexes
+    */
+   virtual ACoeff_t d0(const ACoeff_t& n) const;
 
-      protected:
+protected:
+private:
+};
 
-      private:
-   };
-
-}
-}
-}
+} // namespace Bessel
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_BESSEL_IDDIAGS_HPP

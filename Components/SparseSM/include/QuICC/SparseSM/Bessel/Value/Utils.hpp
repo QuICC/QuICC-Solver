@@ -21,15 +21,16 @@ namespace Bessel {
 
 namespace Value {
 
-   /**
-    * @brief Compute Bessel roots for zero value boundary condition
-    */
-   void getRoots(std::vector<Internal::MHDFloat>& roots, const int l, const int nRoots);
+/**
+ * @brief Compute Bessel roots for zero value boundary condition
+ */
+void getRoots(std::vector<Internal::MHDFloat>& roots, const int l,
+   const int nRoots);
 
 
-}
-}
-}
-}
+} // namespace Value
+} // namespace Bessel
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_BESSEL_VALUE_UTILS_HPP

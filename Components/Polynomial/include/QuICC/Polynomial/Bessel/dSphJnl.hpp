@@ -11,8 +11,8 @@
 
 // Project includes
 //
-#include "Types/Internal/Typedefs.hpp"
 #include "QuICC/Polynomial/Bessel/details/Operators.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -20,60 +20,70 @@ namespace Polynomial {
 
 namespace Bessel {
 
+/**
+ * @brief Implementation of the spherical Bessel basis
+ */
+class dSphJnl
+{
+public:
    /**
-    * @brief Implementation of the spherical Bessel basis
+    * @brief Needed additional modes for computation
     */
-   class dSphJnl
+   static const int EXTRA_POLY = 0;
+
+   /**
+    * @brief Additional roots with different harmonic degree
+    */
+   static const int EXTRA_L = 0;
+
+   /**
+    * @brief Default constructor
+    */
+   dSphJnl() = default;
+
+   /**
+    * @brief Compute spherical bessel basis
+    */
+   template <typename T>
+   void compute(
+      Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>> rOut,
+      const std::vector<Internal::MHDFloat>& roots, const int l,
+      const Internal::Array& igrid, const Internal::Array& scale,
+      const Internal::MHDFloat dNu);
+};
+
+template <typename T>
+inline void dSphJnl::compute(
+   Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>> rOut,
+   const std::vector<Internal::MHDFloat>& roots, const int l,
+   const Internal::Array& igrid, const Internal::Array& scale,
+   const Internal::MHDFloat dNu)
+{
+   const int nPoly = roots.size();
+
+   auto dl = static_cast<Internal::MHDFloat>(l);
+   for (int j = 0; j < nPoly; j++)
    {
-      public:
-         /**
-          * @brief Needed additional modes for computation
-          */
-         static const int EXTRA_POLY = 0;
-
-         /**
-          * @brief Additional roots with different harmonic degree
-          */
-         static const int EXTRA_L = 0;
-
-         /**
-          * @brief Default constructor
-          */
-         dSphJnl() = default;
-
-         /**
-          * @brief Compute spherical bessel basis
-          */
-         template <typename T> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const int l, const Internal::Array& igrid, const Internal::Array& scale, const Internal::MHDFloat dNu);
-   };
-
-   template <typename T> inline void dSphJnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const std::vector<Internal::MHDFloat>& roots, const int l, const Internal::Array& igrid, const Internal::Array& scale, const Internal::MHDFloat dNu)
-   {
-      const int nPoly = roots.size();
-
-      auto dl = static_cast<Internal::MHDFloat>(l);
-      for(int j = 0; j < nPoly; j++)
+      auto k = roots.at(j);
+      Internal::Array col(igrid.size());
+      for (int i = 0; i < igrid.size(); i++)
       {
-         auto k = roots.at(j);
-         Internal::Array col(igrid.size());
-         for(int i = 0; i < igrid.size(); i++)
-         {
-            col(i) = details::dSphJnl(k, l, igrid(i), dNu);
-         }
+         col(i) = details::dSphJnl(k, l, igrid(i), dNu);
+      }
 
-         if(scale.size() > 0)
-         {
-            rOut.col(j).array() = (col.array()*scale.array()).cast<T>();
-         }
-         else
-         {
-            rOut.col(j).array() = col.cast<T>();
-         }
+      if (scale.size() > 0)
+      {
+         rOut.col(j).array() = (col.array() * scale.array()).cast<T>();
+      }
+      else
+      {
+         rOut.col(j).array() = col.cast<T>();
       }
    }
+}
 
-}
-}
-}
+} // namespace Bessel
+} // namespace Polynomial
+} // namespace QuICC
 
 #endif // QUICC_POLYNOMIAL_BESSEL_DSPHJNL_HPP

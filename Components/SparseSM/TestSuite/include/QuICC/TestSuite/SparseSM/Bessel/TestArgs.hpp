@@ -21,11 +21,11 @@ namespace SparseSM {
 
 namespace Bessel {
 
-   SparseSM::TestArgs& args();
+SparseSM::TestArgs& args();
 
 }
-}
-}
-}
+} // namespace SparseSM
+} // namespace TestSuite
+} // namespace QuICC
 
-#endif //QUICC_TESTSUITE_SPARSESM_BESSEL_TESTARGS_HPP
+#endif // QUICC_TESTSUITE_SPARSESM_BESSEL_TESTARGS_HPP

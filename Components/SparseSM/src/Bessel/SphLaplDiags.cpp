@@ -1,6 +1,7 @@
-/** 
+/**
  * @file SphLaplDiags.cpp
- * @brief Source of the implementation of the full sphere Bessel SphLapl sparse operator
+ * @brief Source of the implementation of the full sphere Bessel SphLapl sparse
+ * operator
  */
 
 // System includes
@@ -16,11 +17,9 @@ namespace SparseSM {
 
 namespace Bessel {
 
-   SphLaplDiags::SphLaplDiags(const BesselKind type, const int l)
-      : IDiags(type, l)
-   {
-   }
+SphLaplDiags::SphLaplDiags(const BesselKind type, const int l) : IDiags(type, l)
+{}
 
-}
-}
-}
+} // namespace Bessel
+} // namespace SparseSM
+} // namespace QuICC
