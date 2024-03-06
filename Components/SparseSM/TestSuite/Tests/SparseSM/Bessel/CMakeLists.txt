@@ -29,6 +29,7 @@ quicc_fetch_test_reference(
   FILENAME "Bessel.tar.gz"
   ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
   DATADIR ${QUICC_WORK_DIR}
+)
 
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
