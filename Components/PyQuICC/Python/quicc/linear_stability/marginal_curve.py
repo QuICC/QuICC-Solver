@@ -76,14 +76,16 @@ class MarginalCurve:
 
         # Get bounds for minimum
         imin = np.argmin(Ras)
-        a = ks[imin-1]
-        b = ks[imin]
-        c = ks[imin+1]
-        self.guess = Ras[imin]
         if imin == 0 or imin == len(Ras)-1:
-            Print("Minimum is not in provided range")
+            Print("Minimum found for k = ", int(ks[imin]))
+            Print("Minimum might not in provided range. Try extend the range of search.")
+            Print("")
             return (None, None, None)
         else:
+            a = ks[imin-1]
+            b = ks[imin]
+            c = ks[imin+1]
+            self.guess = Ras[imin]
             if only_int:
                 self.point(b, guess = Ras[imin])
                 min_kc = b
