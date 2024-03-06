@@ -37,6 +37,9 @@ public:
 
    /**
     * @brief Constructor
+    *
+    * @param fname      file name
+    * @param keepData   Dump data?
     */
    Tester(const std::string& fname, const bool keepData);
 
@@ -48,18 +51,29 @@ public:
 protected:
    /**
     * @brief Build filename extension with resolution information
+    *
+    * @param specN   Number of spectral modes
+    * @param physN   Number of physical grid points
+    * @param param   Parameters of run
     */
    virtual std::string resname(const int specN, const int physN,
       const ParameterType& param) const override;
 
    /**
     * @brief Test matrix operator
+    *
+    * @param specN   Number of spectral modes
+    * @param physN   Number of physical grid points
+    * @param param   Parameters of run
+    * @param type    Type of test
     */
    virtual Matrix buildOperator(const int specN, const int physN,
       const ParameterType& param, const TestType type) const override;
 
    /**
     * @brief Format the parameters
+    *
+    * @param param   Parameters of run
     */
    virtual std::string formatParameter(
       const ParameterType& param) const override;
@@ -72,24 +86,41 @@ private:
 
    /**
     * @brief Test quadrature matrix operator
+    *
+    * @param specN      Number of spectral modes
+    * @param physN      Number of physical grid points
+    * @param param      Parameters of run
+    * @param isWeighted Are quadrature weights included?
     */
    Matrix buildMatrix(const int specN, const int physN,
       const ParameterType& param, const bool isWeighted) const;
 
    /**
     * @brief Test on-the-fly inner product
+    *
+    * @param specN      Number of spectral modes
+    * @param physN      Number of physical grid points
+    * @param param      Parameters of run
     */
    Matrix buildInner(const int specN, const int physN,
       const ParameterType& param) const;
 
    /**
     * @brief Test on-the-fly outer product
+    *
+    * @param specN      Number of spectral modes
+    * @param physN      Number of physical grid points
+    * @param param      Parameters of run
     */
    Matrix buildOuter(const int specN, const int physN,
       const ParameterType& param) const;
 
    /**
     * @brief Test on-the-fly reduction
+    *
+    * @param specN      Number of spectral modes
+    * @param physN      Number of physical grid points
+    * @param param      Parameters of run
     */
    Matrix buildReduce(const int specN, const int physN,
       const ParameterType& param) const;

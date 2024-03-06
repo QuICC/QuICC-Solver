@@ -5,9 +5,10 @@
 
 // System include
 //
-#include <boost/math/special_functions/bessel.hpp>
-
+// clang-format off
 #include "Types/Internal/Typedefs.hpp"
+#include <boost/math/special_functions/bessel.hpp>
+// clang-format on
 
 // Project includes
 //

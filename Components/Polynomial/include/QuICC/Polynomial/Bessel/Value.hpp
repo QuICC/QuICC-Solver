@@ -36,6 +36,11 @@ public:
    /**
     * @brief Compute spherical bessel basis for magnetic toroidal boundary
     * condition
+    *
+    * @param rOut    Output matrix
+    * @param nPoly   Number of polynomials
+    * @param l       Harmonic degree l
+    * @param igrid   Physical grid points
     */
    template <typename T>
    void compute(

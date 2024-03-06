@@ -10,7 +10,6 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/LlD1.hpp"
-#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Polynomial/ALegendre/dPlm.hpp"
 
 namespace QuICC {

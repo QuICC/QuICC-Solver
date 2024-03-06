@@ -23,6 +23,10 @@ namespace Worland {
 
 /**
  * @Brief Compute ULP
+ *
+ * @param alpha   Jacobi alpha
+ * @param dBeta   Jacobi dBeta: beta = l + dBeta
+ * @param wtype   Type of Worland polynomials: Chebyshev, Legendre, SphEnergy, CylEnergy
  */
 void setJacobiParameters(Internal::MHDFloat& alpha, Internal::MHDFloat& dBeta,
    const std::string& wtype);

@@ -56,11 +56,17 @@ protected:
 
    /**
     * @brief Build filename extension with resolution information
+    *
+    * @param param Run parameters
     */
    virtual std::string resname(const ParameterType& param) const override;
 
    /**
     * @brief Test operator
+    *
+    * @param mat     Sparse matrix output
+    * @param param   Run parameters
+    * @param type    Type of test
     */
    virtual void buildOperator(SparseMatrix& mat, const ParameterType& param,
       const TestType type) const override;
@@ -73,6 +79,8 @@ protected:
 
    /**
     * @brief Format the parameters
+    *
+    * @param param   Run parameters
     */
    virtual std::string formatParameter(
       const ParameterType& param) const override;
@@ -80,11 +88,16 @@ protected:
 private:
    /**
     * @brief Append specific path
+    *
+    * @param subdir Sub-directory to append
     */
    void appendPath(const std::string& subdir);
 
    /**
     * @brief Read meta data
+    *
+    * @param param   Run parameters
+    * @param type    Type of test
     */
    Array readMeta(const ParameterType& param, const TestType type) const;
 };

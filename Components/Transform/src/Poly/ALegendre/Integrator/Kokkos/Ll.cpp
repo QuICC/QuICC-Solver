@@ -1,5 +1,5 @@
 /**
- * @file LlD1.cpp
+ * @file Ll.cpp
  * @brief Source of the implementation of the associated Legendre P parallel
  * integrator
  */
@@ -9,9 +9,8 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/LlD1.hpp"
-#include "QuICC/Debug/DebuggerMacro.h"
-#include "QuICC/Polynomial/ALegendre/dPlm.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Integrator/Kokkos/Ll.hpp"
+#include "QuICC/Polynomial/ALegendre/Plm.hpp"
 
 namespace QuICC {
 
@@ -23,27 +22,26 @@ namespace ALegendre {
 
 namespace Integrator {
 
-void LlD1<kokkos_t>::makeOperator(Matrix& op, const Internal::Array& igrid,
+void Ll<kokkos_t>::makeOperator(Matrix& op, const Internal::Array& igrid,
    const Internal::Array& iweights, const int i) const
 {
-   D1<kokkos_t>::makeOperator(op, igrid, iweights, i);
+   P<kokkos_t>::makeOperator(op, igrid, iweights, i);
    op = op * this->mLl.bottomRows(op.cols()).asDiagonal();
 }
 
-void LlD1<kokkos_t>::applyUnitOperator(const OpMatrixLZ& rOutView,
+void Ll<kokkos_t>::applyUnitOperator(const OpMatrixLZ& rOutView,
    const OpMatrixLZ& inView, const OpVectorI& scan, const int total) const
 {
-   D1<kokkos_t>::applyUnitOperator(rOutView, inView, scan, total);
+   P<kokkos_t>::applyUnitOperator(rOutView, inView, scan, total);
 }
 
-void LlD1<kokkos_t>::initSpecial() const
+void Ll<kokkos_t>::initSpecial() const
 {
    // Initialise storage for l(l+1) factor
    this->mLl = Array::LinSpaced(this->mspSetup->specSize(), 0,
       this->mspSetup->specSize() - 1);
    this->mLl = (this->mLl.array() * (this->mLl.array() + 1.0));
 }
-
 } // namespace Integrator
 } // namespace ALegendre
 } // namespace Poly

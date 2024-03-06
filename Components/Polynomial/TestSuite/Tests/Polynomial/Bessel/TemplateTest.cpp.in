@@ -13,11 +13,11 @@
 
 // Project includes
 //
+#include "QuICC/Polynomial/Bessel/@Operator@.hpp"
+#include "QuICC/Polynomial/Bessel/Insulating.hpp"
+#include "QuICC/Polynomial/Bessel/Value.hpp"
 #include "QuICC/TestSuite/Polynomial/Bessel/TestArgs.hpp"
 #include "QuICC/TestSuite/Polynomial/Bessel/Tester.hpp"
-#include "QuICC/Polynomial/Bessel/Value.hpp"
-#include "QuICC/Polynomial/Bessel/Insulating.hpp"
-#include "QuICC/Polynomial/Bessel/@Operator@.hpp"
 
 #cmakedefine01 Template
 #if Template == 1
@@ -31,21 +31,23 @@
 
 namespace currentts = ::QuICC::TestSuite::Polynomial::Bessel;
 
-TEST_CASE( "Error for @Field@_@Operator@_@Template@ operator", "[@CatchTestName@]" ){
+TEST_CASE("Error for @Field@_@Operator@_@Template@ operator",
+   "[@CatchTestName@]")
+{
    // Set default arguments if required
-   if(currentts::args().useDefault)
+   if (currentts::args().useDefault)
    {
       currentts::args().params.clear();
-      currentts::args().ids = {0,1,2,3,4,5};
+      currentts::args().ids = {0, 1, 2, 3, 4, 5};
    }
 
    Catch::StringMaker<double>::precision = 15;
 
-   if(currentts::args().ids.size() == 0)
+   if (currentts::args().ids.size() == 0)
    {
-      REQUIRE( currentts::args().specN > 0 );
-      REQUIRE( currentts::args().physN > 0 );
-      REQUIRE( currentts::args().params.size() > 0 );
+      REQUIRE(currentts::args().specN > 0);
+      REQUIRE(currentts::args().physN > 0);
+      REQUIRE(currentts::args().params.size() > 0);
    }
 
    // Typedef for used operator
@@ -58,17 +60,18 @@ TEST_CASE( "Error for @Field@_@Operator@_@Template@ operator", "[@CatchTestName@
 
    Tester::ParameterType params = {-1};
 
-   if(currentts::args().params.size() > 0)
+   if (currentts::args().params.size() > 0)
    {
-      for(int l: currentts::args().params)
+      for (int l: currentts::args().params)
       {
          params.at(0) = l;
-         tester.validate(currentts::args().specN, currentts::args().physN, params, currentts::args().type);
+         tester.validate(currentts::args().specN, currentts::args().physN,
+            params, currentts::args().type);
       }
    }
    else
    {
-      for(int i: currentts::args().ids)
+      for (int i: currentts::args().ids)
       {
          params.at(0) = i;
          tester.validate(params, currentts::args().type);

@@ -34,7 +34,8 @@ SphLapl2Diags::ACoeff_t SphLapl2Diags::d0(const ACoeff_t& n) const
    for (int i = 0; i < roots.size(); i++)
    {
       const auto& k = roots.at(i);
-      val(i) = -k * k;
+      const auto k2 = k * k;
+      val(i) = k2 * k2;
    }
 
    return val;

@@ -11,8 +11,8 @@
 
 // Project includes
 //
+#include "QuICC/Polynomial/Bessel/r_1drSphJnlRecurrence.hpp"
 #include "QuICC/Polynomial/Bessel/r_1drSphJnlExplicit.hpp"
 #include "QuICC/Polynomial/Bessel/r_1drSphJnlImplicit.hpp"
-#include "QuICC/Polynomial/Bessel/r_1drSphJnlRecurrence.hpp"
 
 #endif // QUICC_POLYNOMIAL_BESSEL_R_1DRSPHJNL_HPP

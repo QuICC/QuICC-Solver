@@ -23,6 +23,10 @@ namespace Insulating {
 
 /**
  * @brief Compute Bessel roots for zero value boundary condition
+ *
+ * @param roots   Output vector of computed roots
+ * @param l       Harmonic degree l
+ * @param nRoots  Number of roots to compute
  */
 void getRoots(std::vector<Internal::MHDFloat>& roots, const int l,
    const int nRoots);

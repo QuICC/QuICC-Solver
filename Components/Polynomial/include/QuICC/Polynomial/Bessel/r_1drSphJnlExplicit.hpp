@@ -43,6 +43,16 @@ public:
     */
    static const int EXTRA_L = 0;
 
+   /**
+    * @brief Compute spherical bessel basis
+    *
+    * @param rOut    Output matrix
+    * @param roots   Vector of Bessel roots k: j(l, k_n r)
+    * @param l       Harmonic degree l
+    * @param igrid   Physical grid points
+    * @param scale   Scaling array, ie. weights
+    * @param dNu     nu shift used in bessel function J(l + dnu, x)
+    */
    template <typename T>
    void compute(
       Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>> rOut,

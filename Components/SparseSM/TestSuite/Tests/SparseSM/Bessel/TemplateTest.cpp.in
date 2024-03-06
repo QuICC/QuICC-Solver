@@ -9,19 +9,20 @@
 
 // Project includes
 //
+#include "QuICC/SparseSM/Bessel/@Operator@.hpp"
 #include "QuICC/TestSuite/SparseSM/Bessel/TestArgs.hpp"
 #include "QuICC/TestSuite/SparseSM/Bessel/Tester.hpp"
-#include "QuICC/SparseSM/Bessel/@Operator@.hpp"
 
 namespace currentts = ::QuICC::TestSuite::SparseSM::Bessel;
 
-TEST_CASE( "Error for @Operator@ operator of @BType@ type", "[@Operator@:@BType@:@type@]" )
+TEST_CASE("Error for @Operator@ operator of @BType@ type",
+   "[@Operator@:@BType@:@type@]")
 {
 
    // Set default arguments if required
-   if(currentts::args().useDefault)
+   if (currentts::args().useDefault)
    {
-      currentts::args().params = {0,1,2,3,4,10,11,12,13,14};
+      currentts::args().params = {0, 1, 2, 3, 4, 10, 11, 12, 13, 14};
    }
 
    Catch::StringMaker<double>::precision = 15;
@@ -29,7 +30,7 @@ TEST_CASE( "Error for @Operator@ operator of @BType@ type", "[@Operator@:@BType@
    // Set type
    currentts::args().setType("@type@");
 
-   REQUIRE( currentts::args().params.size() > 0 );
+   REQUIRE(currentts::args().params.size() > 0);
 
    typedef ::QuICC::SparseSM::Bessel::@Operator@ Operator;
    typedef typename currentts::Tester<Operator> Tester;
@@ -39,7 +40,7 @@ TEST_CASE( "Error for @Operator@ operator of @BType@ type", "[@Operator@:@BType@
 
    Tester::ParameterType params = {-1};
 
-   for(auto id: currentts::args().params)
+   for (auto id: currentts::args().params)
    {
       params.at(0) = id;
       tester.validate(params, currentts::args().type);

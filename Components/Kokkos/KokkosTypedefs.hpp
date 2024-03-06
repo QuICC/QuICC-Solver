@@ -71,6 +71,9 @@ template <typename T>
     using ViewMatrixTypeLeft = Kokkos::View<T**, Kokkos::LayoutLeft, KokkosSpace>;
 
     template <typename T>
+    using ViewMatrixTypeHost = Kokkos::View<T**, KokkosLayout, KokkosHostSpace>;
+
+    template <typename T>
     using ViewMatrixTypeLeftHost = Kokkos::View<T**, Kokkos::LayoutLeft, KokkosHostSpace>;
 
     template <typename T>

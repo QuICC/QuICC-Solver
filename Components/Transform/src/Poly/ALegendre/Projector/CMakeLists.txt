@@ -20,6 +20,13 @@ endif()
 if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
   quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB_KK} ${QUICC_CMAKE_SRC_VISIBILITY}
     Kokkos/P.cpp
+    Kokkos/D1.cpp
+    Kokkos/DivS1.cpp
+    Kokkos/DivS1Dp.cpp
+    Kokkos/Ll.cpp
+    Kokkos/LlD1.cpp
+    Kokkos/LlDivS1.cpp
+    Kokkos/LlDivS1Dp.cpp
   )
 endif()
 
