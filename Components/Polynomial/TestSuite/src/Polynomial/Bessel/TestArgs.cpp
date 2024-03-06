@@ -18,14 +18,14 @@ namespace Polynomial {
 
 namespace Bessel {
 
-   Polynomial::TestArgs& args()
-   {
-      static Polynomial::TestArgs a;
+Polynomial::TestArgs& args()
+{
+   static Polynomial::TestArgs a;
 
-      return a;
-   }
+   return a;
+}
 
-}
-}
-}
-}
+} // namespace Bessel
+} // namespace Polynomial
+} // namespace TestSuite
+} // namespace QuICC
