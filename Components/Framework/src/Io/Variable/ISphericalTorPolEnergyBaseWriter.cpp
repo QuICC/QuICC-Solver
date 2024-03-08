@@ -16,6 +16,9 @@
 #include "QuICC/Transform/Reductor/Energy.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
 #include "QuICC/Transform/Reductor/EnergyD1R1.hpp"
+#include "QuICC/Transform/Reductor/TorEnergyR2.hpp"
+#include "QuICC/Transform/Reductor/PolEnergy.hpp"
+#include "QuICC/Transform/Reductor/PolEnergyD1R1.hpp"
 #include "QuICC/Io/Variable/Tags/Energy.hpp"
 
 namespace QuICC {
@@ -24,13 +27,18 @@ namespace Io {
 
 namespace Variable {
    ISphericalTorPolEnergyBaseWriter::ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
+      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false), mUseBessel(false)
    {
    }
 
    void ISphericalTorPolEnergyBaseWriter::showParity()
    {
       this->mShowParity = true;
+   }
+
+   void ISphericalTorPolEnergyBaseWriter::useBessel()
+   {
+      this->mUseBessel = true;
    }
 
    void ISphericalTorPolEnergyBaseWriter::prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord)
@@ -62,6 +70,16 @@ namespace Variable {
 
    void ISphericalTorPolEnergyBaseWriter::compute(Transform::TransformCoordinatorType& coord)
    {
+      std::size_t torEnergyR2Id = Transform::Reductor::EnergyR2::id();
+      std::size_t polEnergyId = Transform::Reductor::Energy::id();
+      std::size_t polEnergyD1R1Id = Transform::Reductor::EnergyD1R1::id();
+      if(this->mUseBessel)
+      {
+         torEnergyR2Id = Transform::Reductor::TorEnergyR2::id();
+         polEnergyId = Transform::Reductor::PolEnergy::id();
+         polEnergyD1R1Id = Transform::Reductor::PolEnergyD1R1::id();
+      }
+
       constexpr auto TId = Dimensions::Transform::TRA1D;
       Matrix spectrum;
 
@@ -77,7 +95,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyR2::id());
+               coord.transform1D().reduce(spectrum, p->data(), torEnergyR2Id);
             },
             pInVarTor);
 
@@ -153,7 +171,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Energy::id());
+               coord.transform1D().reduce(spectrum, p->data(), polEnergyId);
             },
             pInVarPolQ);
 
@@ -223,7 +241,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyD1R1::id());
+               coord.transform1D().reduce(spectrum, p->data(), polEnergyD1R1Id);
             },
             pInVarPolS);
 

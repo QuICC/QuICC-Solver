@@ -52,6 +52,11 @@ namespace Variable {
          void showParity();
 
          /**
+          * @brief Field is expanded as spherical Bessel
+          */
+         void useBessel();
+
+         /**
           * @brief Compute energy
           */
          void compute(Transform::TransformCoordinatorType& coord);
@@ -81,6 +86,11 @@ namespace Variable {
           * @brief Flag to show parity split in energy
           */
          bool mShowParity;
+
+         /**
+          * @brief Flag to use Bessel expansion
+          */
+         bool mUseBessel;
 
       private:
          /**

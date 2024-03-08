@@ -161,7 +161,7 @@ namespace Model {
          /**
           * @brief Interface to adding ASCII output file
           */
-         template <typename T> void enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim);
+         template <typename T> std::shared_ptr<T> enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim);
 
       protected:
          /**
@@ -351,7 +351,7 @@ namespace Model {
       return this->mpBackend;
    }
 
-   template <typename TSim, typename TState, typename TVis> template <typename T> void IPhysicalModel<TSim,TState,TVis>::enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim)
+   template <typename TSim, typename TState, typename TVis> template <typename T> std::shared_ptr<T> IPhysicalModel<TSim,TState,TVis>::enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim)
    {
       if(spSim->config().model(tag).at("enable"))
       {
@@ -366,6 +366,12 @@ namespace Model {
             spFile->onlyEvery(spSim->config().model(tag).at("only_every"));
          }
          spSim->addAsciiOutputFile(spFile);
+
+         return spFile;
+      }
+      else
+      {
+         return nullptr;
       }
    }
 
