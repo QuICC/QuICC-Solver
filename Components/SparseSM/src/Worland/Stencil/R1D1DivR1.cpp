@@ -5,16 +5,15 @@
 
 // System includes
 //
-#include <cassert>
 #include <stdexcept>
 
 // Project includes
 //
 #include "QuICC/SparseSM/Worland/Stencil/R1D1DivR1.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/Chebyshev/R1D1DivR1Diags.hpp"
-//#include "QuICC/SparseSM/Worland/Legendre/R1D1DivR1Diags.hpp"
-//#include "QuICC/SparseSM/Worland/CylEnergy/R1D1DivR1Diags.hpp"
-//#include "QuICC/SparseSM/Worland/SphEnergy/R1D1DivR1Diags.hpp"
+//#include "QuICC/SparseSM/Worland/Stencil/Legendre/R1D1DivR1Diags.hpp"
+//#include "QuICC/SparseSM/Worland/Stencil/CylEnergy/R1D1DivR1Diags.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/SphEnergy/R1D1DivR1Diags.hpp"
 
 namespace QuICC {
 
@@ -41,8 +40,7 @@ namespace Stencil {
             throw std::logic_error("Not yet implemented");
             break;
          case WorlandKind::SPHENERGY:
-            //this->mpImpl = std::make_shared<SphEnergy::R1D1DivR1Diags>(alpha, l);
-            throw std::logic_error("Not yet implemented");
+            this->mpImpl = std::make_shared<SphEnergy::R1D1DivR1Diags>(alpha, l);
             break;
       }
    }

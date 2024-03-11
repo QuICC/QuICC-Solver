@@ -36,7 +36,6 @@ namespace Chebyshev {
 
       ACoeff_t val = num/den;
 
-
       return this->normalizeDiag(n,-1)*val;
    }
 

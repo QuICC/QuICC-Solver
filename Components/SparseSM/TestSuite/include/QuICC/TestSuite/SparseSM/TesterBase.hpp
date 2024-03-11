@@ -433,6 +433,10 @@ namespace SparseSM {
    {
       MHDFloat globalUlp = 0;
 
+      // Check for sparsity
+      INFO( "nnz: " << outData.nonZeros() );
+      CHECK( outData.nonZeros() == refData.nonZeros() );
+
       // Compute error
       //
       for(int j = 0; j < refData.outerSize(); ++j)

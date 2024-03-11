@@ -35,6 +35,19 @@ namespace Worland {
    class r_1drWnl<explicit_t>: public WorlandBase
    {
       public:
+         /**
+          * @brief Default constructor
+          */
+         r_1drWnl() = default;
+
+         /**
+          * @brief Constructor for specific alpha,beta pair
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
+          */
+         r_1drWnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta): WorlandBase(alpha, dBeta){};
+
          template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 
@@ -55,11 +68,11 @@ namespace Worland {
 
       // Extend intermediate truncation by one due to multiplication by r
       Internal::Matrix opA(igrid.size(), nPoly+1);
-      Polynomial::Worland::Wnl wnl;
+      Polynomial::Worland::Wnl wnl(this->alpha(l), this->dBeta());
       wnl.compute<Internal::MHDFloat>(opA, nPoly+1, l, igrid, scale.array()*igrid.array(), evaluator);
 
       Internal::Matrix opB(igrid.size(), nPoly+1);
-      Polynomial::Worland::dWnl dWnl;
+      Polynomial::Worland::dWnl dWnl(this->alpha(l), this->dBeta());
       dWnl.compute<Internal::MHDFloat>(opB, nPoly+1, l, igrid, Internal::Array(), evaluator);
 
       Internal::Matrix opC(igrid.size(), nPoly);

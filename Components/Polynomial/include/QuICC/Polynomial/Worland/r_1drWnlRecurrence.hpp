@@ -12,6 +12,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
+#include "Types/Internal/Literals.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 #include "QuICC/Polynomial/Worland/Tags.hpp"
@@ -34,11 +35,25 @@ namespace Worland {
    class r_1drWnl<recurrence_t>: public WorlandBase
    {
       public:
+         /**
+          * @brief Default constructor
+          */
+         r_1drWnl() = default;
+
+         /**
+          * @brief Constructor for specific alpha,beta pair
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
+          */
+         r_1drWnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta): WorlandBase(alpha, dBeta){};
+
          template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 
    template <typename T, typename TEvaluator> void r_1drWnl<recurrence_t>::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
+      using namespace Internal::Literals;
       int gN = igrid.rows();
 
       if(l < 0)
@@ -58,12 +73,12 @@ namespace Worland {
 
       Internal::MHDFloat a = this->alpha(l);
       Internal::MHDFloat b = this->beta(l);
-      Internal::MHDFloat a1 = this->alpha(l) + MHD_MP(1.0);
-      Internal::MHDFloat b1 = this->beta(l) + MHD_MP(1.0);
+      Internal::MHDFloat a1 = this->alpha(l) + 1.0_mp;
+      Internal::MHDFloat b1 = this->beta(l) + 1.0_mp;
       Internal::MHDFloat dl1 = Internal::MHDFloat(l+1);
 
       // Make X grid in [-1, 1]
-      Internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+      Internal::Array ixgrid = 2.0_mp*igrid.array()*igrid.array() - 1.0_mp;
 
       // Storage for P_n^{(alpha,beta)} and dP_n{(alpha,beta)}
       Internal::Matrix ipnab(gN,2);

@@ -41,8 +41,6 @@ namespace Integrator {
       }
       else
       {
-         Polynomial::Worland::Wnl wnl;
-
          // Internal computation uses dealiased modes
          const int extraN = 9; // I6 has 9 superdiagonals
          int nN = nPoly + extraN;
@@ -55,8 +53,8 @@ namespace Integrator {
          r_1Wnl.compute<Internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
          // Multiply by Quasi-inverse
-         auto a = wnl.alpha(l);
-         auto b = wnl.dBeta();
+         auto a = r_1Wnl.alpha(l);
+         auto b = r_1Wnl.dBeta();
          ::QuICC::SparseSM::Worland::I6 spasm(nN, nN, a, b, l);
          tOp = (spasm.mat()*tOp.transpose()).transpose();
          op = tOp.cast<MHDFloat>().leftCols(nPoly);

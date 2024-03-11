@@ -10,6 +10,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Reductor/Base/Power.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
@@ -44,7 +45,7 @@ namespace Reductor {
       bwnl.compute<MHDFloat>(op, nPoly, l, igrid, Internal::Array(), ev::Set());
 
       eop.resize(igrid.size(), nPoly);
-      Polynomial::Worland::Wnl fwnl(Polynomial::Worland::Wnl::ALPHA_SPHENERGY,Polynomial::Worland::Wnl::DBETA_SPHENERGY);
+      Polynomial::Worland::Wnl fwnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,Polynomial::Worland::worland_sphenergy_t::DBETA);
       if(l == 0)
       {
          eop.setZero();

@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y3.hpp"
+#include "Types/Internal/Literals.hpp"
 #include "Types/Internal/Math.hpp"
 
 namespace QuICC {
@@ -28,82 +29,95 @@ namespace LinearMap {
 
    I2Y3::ACoeff_t I2Y3::d_5(const ACoeff_t& n) const
    {
-      const auto c = Internal::Math::pow(this->a()/2.0,5);
-      return c/(n*(n - 1.0));
+      using namespace Internal::Literals;
+      const auto c = Internal::Math::pow(this->a()/2_mp,5);
+      return c/(n*(n - 1_mp));
    }
 
    I2Y3::ACoeff_t I2Y3::d_4(const ACoeff_t& n) const
    {
+      using namespace Internal::Literals;
       const auto& b1 = this->b();
-      const auto c = Internal::Math::pow(this->a()/2.0,4);
-      return c*3.0*b1/(n*(n - 1.0));
+      const auto c = Internal::Math::pow(this->a()/2_mp,4);
+      return c*3_mp*b1/(n*(n - 1_mp));
    }
 
    I2Y3::ACoeff_t I2Y3::d_3(const ACoeff_t& n) const
    {
+      using namespace Internal::Literals;
       const auto a2 = this->a()*this->a();
       const auto b2 = this->b()*this->b();
-      const auto c = Internal::Math::pow(this->a()/2.0,3);
-      return c*(a2*(n + 3.0) + 12.0*b2*(n + 1.0))/(4.0*n*(n - 1.0)*(n + 1.0));
+      const auto c = Internal::Math::pow(this->a()/2_mp,3);
+      return c*(a2*(n + 3_mp) + 12_mp*b2*(n + 1_mp))/(4_mp*n*(n - 1_mp)*(n + 1_mp));
    }
 
    I2Y3::ACoeff_t I2Y3::d_2(const ACoeff_t& n) const
    {
+      using namespace Internal::Literals;
       const auto& b1 = this->b();
       const auto a2 = this->a()*this->a();
       const auto b2 = this->b()*this->b();
-      const auto c = Internal::Math::pow(this->a()/2.0, 2);
-      return c*b1*(3.0*a2 + 2.0*b2*(n + 1.0))/(2.0*n*(n - 1.0)*(n + 1.0));
+      const auto c = Internal::Math::pow(this->a()/2_mp, 2);
+      return c*b1*(3_mp*a2 + 2_mp*b2*(n + 1_mp))/(2_mp*n*(n - 1_mp)*(n + 1_mp));
    }
 
    I2Y3::ACoeff_t I2Y3::d_1(const ACoeff_t& n) const
    {
-      const auto a2 = this->a()*this->a();
-      const auto a3 = this->a()*a2;
-      const auto b2 = this->b()*this->b();
-      return -a3*(a2 + 6.0*b2)/(16.0*n*(n + 1.0));
+      using namespace Internal::Literals;
+      const auto a_2 = this->a()/2_mp;
+      const auto a2 = a_2*a_2;
+      const auto a3 = a_2*a2;
+      const auto b_2 = this->b()/2_mp;
+      const auto b2 = b_2*b_2;
+      return -2_mp*a3*(a2 + 6_mp*b2)/(n*(n + 1_mp));
    }
 
    I2Y3::ACoeff_t I2Y3::d0(const ACoeff_t& n) const
    {
+      using namespace Internal::Literals;
       const auto& b1 = this->b();
       const auto a2 = this->a()*this->a();
       const auto b2 = this->b()*this->b();
-      return -a2*b1*(3.0*a2 + 4.0*b2)/(8.0*(n - 1.0)*(n + 1.0));
+      return -a2*b1*(3_mp*a2 + 4_mp*b2)/(8_mp*(n - 1_mp)*(n + 1_mp));
    }
 
    I2Y3::ACoeff_t I2Y3::d1(const ACoeff_t& n) const
    {
-      return this->d_1(n - 1.0);
+      using namespace Internal::Literals;
+      return this->d_1(n - 1_mp);
    }
 
    I2Y3::ACoeff_t I2Y3::d2(const ACoeff_t& n) const
    {
+      using namespace Internal::Literals;
       const auto& b1 = this->b();
       const auto a2 = this->a()*this->a();
       const auto b2 = this->b()*this->b();
-      return -a2*b1*(3.0*a2 - 2.0*b2*(n - 1.0))/(8.0*n*(n - 1.0)*(n + 1.0));
+      return -a2*b1*(3_mp*a2 - 2_mp*b2*(n - 1_mp))/(8_mp*n*(n - 1_mp)*(n + 1_mp));
    }
 
    I2Y3::ACoeff_t I2Y3::d3(const ACoeff_t& n) const
    {
+      using namespace Internal::Literals;
       const auto a2 = this->a()*this->a();
       const auto b2 = this->b()*this->b();
-      const auto c = Internal::Math::pow(this->a()/2.0,3);
-      return c*(a2*(n - 3.0) + 12.0*b2*(n - 1.0))/(4.0*n*(n - 1.0)*(n + 1.0));
+      const auto c = Internal::Math::pow(this->a()/2_mp,3);
+      return c*(a2*(n - 3_mp) + 12_mp*b2*(n - 1_mp))/(4_mp*n*(n - 1_mp)*(n + 1_mp));
    }
 
    I2Y3::ACoeff_t I2Y3::d4(const ACoeff_t& n) const
    {
+      using namespace Internal::Literals;
       const auto& b1 = this->b();
-      const auto c = Internal::Math::pow(this->a()/2.0,4);
-      return c*3.0*b1/(n*(n + 1.0));
+      const auto c = Internal::Math::pow(this->a()/2_mp,4);
+      return c*3_mp*b1/(n*(n + 1_mp));
    }
 
    I2Y3::ACoeff_t I2Y3::d5(const ACoeff_t& n) const
    {
-      const auto c = Internal::Math::pow(this->a()/2.0,5);
-      return c/(n*(n + 1.0));
+      using namespace Internal::Literals;
+      const auto c = Internal::Math::pow(this->a()/2_mp,5);
+      return c/(n*(n + 1_mp));
    }
 
    void I2Y3::buildTriplets(TripletList_t& list) const

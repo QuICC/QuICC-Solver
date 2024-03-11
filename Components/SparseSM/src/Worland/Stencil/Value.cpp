@@ -12,9 +12,9 @@
 //
 #include "QuICC/SparseSM/Worland/Stencil/Value.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/Chebyshev/ValueDiags.hpp"
-//#include "QuICC/SparseSM/Worland/Legendre/ValueDiags.hpp"
-//#include "QuICC/SparseSM/Worland/CylEnergy/ValueDiags.hpp"
-//#include "QuICC/SparseSM/Worland/SphEnergy/ValueDiags.hpp"
+//#include "QuICC/SparseSM/Worland/Stencil/Legendre/ValueDiags.hpp"
+//#include "QuICC/SparseSM/Worland/Stencil/CylEnergy/ValueDiags.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/SphEnergy/ValueDiags.hpp"
 
 namespace QuICC {
 
@@ -41,8 +41,7 @@ namespace Stencil {
             throw std::logic_error("Not yet implemented");
             break;
          case WorlandKind::SPHENERGY:
-            //this->mpImpl = std::make_shared<SphEnergy::ValueDiags>(alpha, l);
-            throw std::logic_error("Not yet implemented");
+            this->mpImpl = std::make_shared<SphEnergy::ValueDiags>(alpha, l);
             break;
       }
    }

@@ -88,8 +88,8 @@ set(IntOp
     derivedInt_t& derivedOp = dynamic_cast<derivedInt_t&>(*mInt);
     auto intView = derivedOp.getOp();
 
-    Wnl fWnl(Polynomial::Worland::Wnl::ALPHA_SPHENERGY,
-        Polynomial::Worland::Wnl::DBETA_SPHENERGY, @lShift@);
+    Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
+        Polynomial::Worland::worland_sphenergy_t::DBETA, @lShift@);
     QuICC::DenseSM::Worland::@OpBuilderFwd@ denseBuilder(fWnl);
     Builder<op_t, QuICC::DenseSM::Worland::@OpBuilderFwd@, fwd_t> tBuilderFwd(denseBuilder);
     tBuilderFwd.compute(intView, igrid, iweights);

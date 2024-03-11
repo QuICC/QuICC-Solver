@@ -114,6 +114,7 @@ namespace LinearMap {
 
          TOp op(rows, cols, lower, upper, l);
          mat = op.mat();
+         mat.prune(0.0);
       }
       else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::LinearMap::IPlaneOperator, TOp>)
       {
@@ -127,6 +128,7 @@ namespace LinearMap {
 
          TOp op(rows, cols, lower, upper, k1, k2);
          mat = op.mat();
+         mat.prune(0.0);
       }
       else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::ILinearMapOperator, TOp>)
       {
@@ -138,6 +140,7 @@ namespace LinearMap {
 
          TOp op(rows, cols, lower, upper);
          mat = op.mat();
+         mat.prune(0.0);
       }
       else
       {

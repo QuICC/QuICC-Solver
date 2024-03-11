@@ -21,6 +21,7 @@
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/TestSuite/Transform/TesterBase.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Transform/Fft/Worland/Setup.hpp"
 #include "QuICC/Transform/Fft/Worland/Tools.hpp"
 #include "QuICC/Transform/Poly/Setup.hpp"
@@ -155,7 +156,29 @@ namespace Worland {
 
    template <typename TOp, typename TOp2> void Tester<TOp,TOp2>::appendPath()
    {
-      this->mPath += "Worland/";
+      Polynomial::Worland::worland_default_t def_w;
+
+      auto isSame = [](const auto& d, const auto w)
+      {
+         return (d.ALPHA == w.ALPHA && d.DBETA == w.DBETA);
+      };
+
+      if(isSame(def_w, Polynomial::Worland::worland_chebyshev_t()))
+      {
+         this->mPath += "Worland/Chebyshev/";
+      }
+      else if(isSame(def_w, Polynomial::Worland::worland_legendre_t()))
+      {
+         this->mPath += "Worland/Legendre/";
+      }
+      else if(isSame(def_w, Polynomial::Worland::worland_cylenergy_t()))
+      {
+         this->mPath += "Worland/CylEnergy/";
+      }
+      else if(isSame(def_w, Polynomial::Worland::worland_sphenergy_t()))
+      {
+         this->mPath += "Worland/SphEnergy/";
+      }
    }
 
    template <typename TOp, typename TOp2> void Tester<TOp,TOp2>::readFile(Matrix& data, const ParameterType& param, const TestType type, const ContentType ctype) const

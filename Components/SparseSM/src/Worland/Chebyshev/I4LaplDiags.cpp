@@ -12,7 +12,6 @@
 //
 #include "QuICC/SparseSM/Worland/Chebyshev/I4LaplDiags.hpp"
 
-#include <iostream>
 namespace QuICC {
 
 namespace SparseSM {

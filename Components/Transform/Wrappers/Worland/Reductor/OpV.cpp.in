@@ -9,6 +9,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Wrappers/Worland/Reductor/@Op@@Tag@.hpp.inc"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/rWnl.hpp"
 #include "QuICC/Polynomial/Worland/dWnl.hpp"

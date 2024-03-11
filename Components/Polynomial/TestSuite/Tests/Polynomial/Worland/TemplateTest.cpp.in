@@ -30,7 +30,7 @@
 
 namespace currentts = ::QuICC::TestSuite::Polynomial::Worland;
 
-TEST_CASE( "Error for @Operator@_@Template@ operator", "[@CatchTestName@]" ){
+TEST_CASE( "Error for @Operator@_@Template@ operator of @WType@ type", "[@CatchTestName@]" ){
    // Set default arguments if required
    if(currentts::args().useDefault)
    {
@@ -52,7 +52,7 @@ TEST_CASE( "Error for @Operator@_@Template@ operator", "[@CatchTestName@]" ){
    typedef OPERATOR Operator;
    typedef typename currentts::Tester<Operator> Tester;
 
-   Tester tester(FNAME, currentts::args().dumpData);
+   Tester tester(FNAME, "@WType@", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
 
    Tester::ParameterType params = {-1};

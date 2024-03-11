@@ -13,7 +13,6 @@
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/SparseSM/Worland/I2.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
-#include "QuICC/Polynomial/Worland/Evaluator/InnerProduct.hpp"
 
 namespace QuICC {
 

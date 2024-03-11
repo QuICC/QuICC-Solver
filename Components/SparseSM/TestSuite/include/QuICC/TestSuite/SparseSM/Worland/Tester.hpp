@@ -38,8 +38,12 @@ namespace Worland {
 
          /**
           * @brief Constructor
+          *
+          * @param fname      Filename
+          * @param wtype      Worland type
+          * @param keepData   Write computed data
           */
-         Tester(const std::string& fname, const bool keepData);
+         Tester(const std::string& fname, const std::string& wtype, const bool keepData);
 
          /*
           * @brief Destructor
@@ -74,7 +78,7 @@ namespace Worland {
          /**
           * @brief Append specific path
           */
-         void appendPath();
+         void appendPath(const std::string& subdir);
 
          /**
           * @brief Read meta data
@@ -83,15 +87,15 @@ namespace Worland {
 
    };
 
-   template <typename TOp> Tester<TOp>::Tester(const std::string& fname, const bool keepData)
+   template <typename TOp> Tester<TOp>::Tester(const std::string& fname, const std::string& wtype, const bool keepData)
       : SparseSM::TesterBase<TOp>(fname, keepData)
    {
-      this->appendPath();
+      this->appendPath(wtype);
    }
 
-   template <typename TOp> void Tester<TOp>::appendPath()
+   template <typename TOp> void Tester<TOp>::appendPath(const std::string& subdir)
    {
-      this->mPath += "Worland/";
+      this->mPath += "Worland/" + subdir + "/";
    }
 
    template <typename TOp> void Tester<TOp>::buildOperator(SparseMatrix& mat, const ParameterType& param, const TestType type) const

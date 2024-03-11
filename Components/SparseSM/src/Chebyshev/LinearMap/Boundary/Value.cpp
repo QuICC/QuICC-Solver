@@ -10,7 +10,6 @@
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/Value.hpp"
 
-#include <iostream>
 namespace QuICC {
 
 namespace SparseSM {
