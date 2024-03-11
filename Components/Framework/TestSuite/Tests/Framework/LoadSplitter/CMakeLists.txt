@@ -184,7 +184,18 @@ foreach(_test ${_tests})
   endforeach()
 endforeach()
 
+#
 # Spatial scheme list for triangular truncation
+#
+
+set(_dis False)
+if(TARGET QuICC::Cuda)
+  set(_dis True)
+endif()
+if(QUICC_USE_KOKKOS)
+  set(_dis True)
+endif()
+
 set(_tests
   WLFl
   WLFm
@@ -200,6 +211,7 @@ foreach(_test ${_tests})
         COMMAND ${TestExe}
         KEYWORD Scheme
         OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} truncation:triangular
+        DISABLED ${_dis}
       )
     endforeach()
   endforeach()
@@ -215,6 +227,7 @@ foreach(_test "WLFm")
         COMMAND ${TestExe}
         KEYWORD Scheme
         OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} truncation:triangular checkRanks
+        DISABLED ${_dis}
       )
     endforeach()
   endforeach()
@@ -230,6 +243,7 @@ foreach(_test ${_tests})
         COMMAND ${TestExe}
         KEYWORD Scheme
         OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} truncation:triangular checkRanks
+        DISABLED ${_dis}
       )
     endforeach()
   endforeach()
@@ -245,6 +259,7 @@ foreach(_test ${_tests})
         COMMAND ${TestExe}
         KEYWORD Scheme
         OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} truncation:triangular checkRanks
+        DISABLED ${_dis}
       )
     endforeach()
   endforeach()
@@ -260,6 +275,7 @@ foreach(_test ${_tests})
         COMMAND ${TestExe}
         KEYWORD Scheme
         OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} truncation:triangular checkRanks
+        DISABLED ${_dis}
       )
     endforeach()
   endforeach()
@@ -275,6 +291,7 @@ foreach(_test ${_tests})
       COMMAND ${TestExe}
       KEYWORD Scheme
       OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} id:${_np} truncation:triangular
+      DISABLED ${_dis}
     )
   endforeach()
 endforeach()
@@ -289,6 +306,7 @@ foreach(_test ${_tests})
       COMMAND ${TestExe}
       KEYWORD Scheme
       OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} id:${_np} truncation:triangular
+      DISABLED ${_dis}
     )
   endforeach()
 endforeach()
@@ -303,6 +321,7 @@ foreach(_test ${_tests})
       COMMAND ${TestExe}
       KEYWORD Scheme
       OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} id:${_np} truncation:triangular
+      DISABLED ${_dis}
     )
   endforeach()
 endforeach()

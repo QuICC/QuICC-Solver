@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IBuilder.cpp
  * @brief Source of the base for the scheme builder implementations
  */
@@ -7,11 +7,13 @@
 //
 #include <set>
 #include <vector>
+#include <stdexcept>
 
 // Project includes
 //
 #include "QuICC/SpatialScheme/IBuilder.hpp"
 #include "QuICC/QuICCEnv.hpp"
+#include "QuICC/Transform/Setup/Triangular.hpp"
 #include "QuICC/Resolutions/Tools/RegularIndexCounter.hpp"
 
 namespace QuICC {
@@ -38,6 +40,14 @@ namespace SpatialScheme {
             this->mOptions.emplace(i, std::vector<std::size_t>());
          }
       }
+#if defined(QUICC_USE_KOKKOS) || defined(QUICC_HAS_CUDA_BACKEND)
+      /// \todo add support for triangular truncation
+      const auto& opt = options.at(0);
+      if(std::find(opt.begin(), opt.end(), Transform::Setup::Triangular::id()) != opt.end())
+      {
+         throw std::logic_error("Triangular truncation not supported by the Kokkos and GPU backends.");
+      }
+#endif
    }
 
    bool IBuilder::sameSpectralOrdering() const
@@ -66,7 +76,7 @@ namespace SpatialScheme {
       }
 
       // Initialise the domain's dimensions
-      this->setDimensions(); 
+      this->setDimensions();
 
       // Set the transform costs
       this->setCosts();

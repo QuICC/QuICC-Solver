@@ -144,9 +144,9 @@
       },
       "288": {
         "broadwell": {
-          "applyOperatorsAvg": 0.00179,
+          "applyOperatorsAvg": 0.00200,
           "applyOperatorsMin": 0.00174,
-          "applyOperatorsMax": 0.00205
+          "applyOperatorsMax": 0.00222
         },
         "haswell": {
           "applyOperatorsAvg": 0.00254714,
