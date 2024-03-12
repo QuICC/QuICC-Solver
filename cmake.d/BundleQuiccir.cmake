@@ -10,13 +10,13 @@ option(QUICC_USE_SYSTEM_QUICCIR "Use system installed Quiccir." OFF)
 
 if(QUICC_USE_SYSTEM_QUICCIR)
     find_package(Quiccir ${QUICC_QUICCIR_VERSION} REQUIRED)
-    # find_package(Quiccir ${QUICC_QUICCIR_VERSION} REQUIRED)
     if(NOT Quiccir_FOUND)
         message(SEND_ERROR "To use bundled Quiccir add: -DQUICC_USE_SYSTEM_QUICCIR=OFF or set Quiccir_DIR.")
     endif()
 else()
     if(NOT TARGET Quiccir)
-        set(QUICC_MESSAGE_QUIET ON)
+        message(STATUS "----> here")
+        # set(QUICC_MESSAGE_QUIET ON)
 
         include(FetchContent)
             FetchContent_Declare(
@@ -28,12 +28,6 @@ else()
             )
 
         # set some vars
-        # if(QUICC_MPI)
-        #     set(Quiccir_PARALLEL_HDF5 ON CACHE BOOL "")
-        # endif()
-        # # requires system and serialization which are not header only
-        # set(Quiccir_USE_BOOST OFF CACHE BOOL "")
-
         # set(Quiccir_UNIT_TESTS OFF CACHE BOOL "")
         # set(Quiccir_EXAMPLES OFF CACHE BOOL "")
         # set(Quiccir_BUILD_DOCS OFF CACHE BOOL "")
@@ -44,7 +38,11 @@ else()
         include(MarkAsAdvancedAll)
         mark_as_advanced_all(LLVM)
 
-        unset(QUICC_MESSAGE_QUIET)
+        add_library(Quiccir INTERFACE)
+        target_link_libraries(Quiccir INTERFACE MLIRQuiccirDialect)
+        target_include_directories(Quiccir INTERFACE "${FETCHCONTENT_BASE_DIR}/quiccir-src/include")
+
+        # unset(QUICC_MESSAGE_QUIET)
     endif()
 endif()
 
