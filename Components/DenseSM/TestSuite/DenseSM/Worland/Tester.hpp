@@ -15,6 +15,7 @@
 
 // Project includes
 //
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "Types/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "QuICC/QuICCEnv.hpp"
@@ -115,8 +116,9 @@ namespace Worland {
 
       if constexpr(std::is_same_v<TOp, dsm::Geostrophic2Tor> || std::is_same_v<TOp, dsm::PyGeostrophic2Tor>)
       {
-         auto a = ::QuICC::Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
-         auto b = ::QuICC::Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
+         const ::QuICC::Polynomial::Worland::worland_chebyshev_t wt;
+         auto a = wt.ALPHA;
+         auto b = wt.DBETA;
 
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
@@ -167,8 +169,9 @@ namespace Worland {
       }
       else if constexpr(std::is_same_v<TOp, dsm::GeostrophicAngularMomentum>)
       {
-         auto a = ::QuICC::Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
-         auto b = ::QuICC::Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
+         const ::QuICC::Polynomial::Worland::worland_chebyshev_t wt;
+         auto a = wt.ALPHA;
+         auto b = wt.DBETA;
 
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);

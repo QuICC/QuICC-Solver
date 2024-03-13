@@ -13,10 +13,10 @@
 //
 #include "ProjFitEnergyPol.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandLegendreRule.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/drWnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
-#include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 #include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/InsulatingSphere.hpp"
 #include "QuICC/SparseSM/Worland/I2.hpp"
@@ -58,8 +58,9 @@ namespace Worland {
 
       if(nbar > 1)
       {
-         const auto a = Polynomial::Worland::WorlandBase::ALPHA_CHEBYSHEV;
-         const auto db = Polynomial::Worland::WorlandBase::DBETA_CHEBYSHEV;
+         const Polynomial::Worland::worland_chebyshev_t wt;
+         const auto a = wt.ALPHA;
+         const auto db =wt.DBETA;
          const auto& l = this->mL;
          const auto& dl = static_cast<Internal::MHDFloat>(this->mL);
          const auto ll1 = dl*(dl+MHD_MP(1.0));
