@@ -6,11 +6,16 @@
 
 #include <Quiccir/IR/QuiccirDialect.h>
 #include <Quiccir/Transforms/QuiccirPasses.h>
+#include <Quiccir/Pipelines/Passes.h>
 
 #include <mlir/InitAllDialects.h>
 #include <mlir/Dialect/Func/Extensions/AllExtensions.h>
 #include <mlir/IR/MLIRContext.h>
 #include <mlir/Parser/Parser.h>
+
+#include <mlir/Pass/PassManager.h>
+
+#include <llvm/Support/CommandLine.h>
 
 // #include "Memory/Cpu\NewDelete.hpp"
 // #include "Memory/Cuda/Malloc.hpp"
@@ -20,17 +25,24 @@
 // #include "ViewOps/ViewMemoryUtils.hpp"
 #include "Profiler/Interface.hpp"
 
-int main()
+int main(int argc, char **argv)
 {
-   QuICC::Profiler::Initialize();
+  // Register any command line options.
+  // mlir::registerAsmPrinterCLOptions();
+  // mlir::registerMLIRContextCLOptions();
+  // mlir::registerPassManagerCLOptions();
 
-   Catch::Session session; // There must be exactly one instance
+  // llvm::cl::ParseCommandLineOptions(argc, argv, "quiccir jitter\n");
 
-   auto returnCode = session.run();
+  QuICC::Profiler::Initialize();
 
-   QuICC::Profiler::Finalize();
+  Catch::Session session; // There must be exactly one instance
 
-   return returnCode;
+  auto returnCode = session.run();
+
+  QuICC::Profiler::Finalize();
+
+  return returnCode;
 }
 
 TEST_CASE("Simple Tree", "[SimpleTree]")
@@ -63,7 +75,19 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   mlir::OwningOpRef<mlir::ModuleOp> module;
   module = mlir::parseSourceString<mlir::ModuleOp>(modStr, &ctx);
 
-  // Echo
+  // Dump
+  module->dump();
+
+  // Top level (module) pass manager
+  mlir::PassManager pm(&ctx);
+  mlir::quiccir::quiccLibCallPipelineBuilder(pm);
+
+  // Lower
+  if (mlir::failed(pm.run(*module))) {
+    CHECK(false);
+  }
+
+  // Dump
   module->dump();
 
 
