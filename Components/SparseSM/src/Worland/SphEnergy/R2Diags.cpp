@@ -13,6 +13,7 @@
 //
 #include "QuICC/SparseSM/Worland/SphEnergy/R2Diags.hpp"
 #include "Types/Internal/Math.hpp"
+#include "Types/Internal/Literals.hpp"
 
 namespace QuICC {
 
@@ -22,8 +23,10 @@ namespace Worland {
 
 namespace SphEnergy {
 
+   using namespace Internal::Literals;
+
 R2Diags::R2Diags(const Scalar_t alpha, const int l, const int q) :
-    QuICC::SparseSM::Worland::R2Diags(alpha, MHD_MP(0.5), l, q)
+    QuICC::SparseSM::Worland::R2Diags(alpha, 0.5_mp, l, q)
 {
    if (q > 0)
    {

@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Worland/SphEnergy/I2LaplDiags.hpp"
+#include "Types/Internal/Literals.hpp"
 
 namespace QuICC {
 
@@ -20,8 +21,10 @@ namespace Worland {
 
 namespace SphEnergy {
 
+   using namespace Internal::Literals;
+
 I2LaplDiags::I2LaplDiags(const Scalar_t alpha, const int l, const int q) :
-    QuICC::SparseSM::Worland::I2LaplDiags(alpha, MHD_MP(0.5), l, q)
+    QuICC::SparseSM::Worland::I2LaplDiags(alpha, 0.5_mp, l, q)
 {
    // q <= 1 is equivalent to no truncation (already zero rows)
 

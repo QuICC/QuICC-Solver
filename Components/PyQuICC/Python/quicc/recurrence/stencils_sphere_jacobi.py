@@ -16,10 +16,16 @@ w_beta_minhalf = l - sy.Rational(1,2)
 w_beta_zero = l
 w_beta_plushalf = l + sy.Rational(1,2)
 
-#w_a = w_alpha_chebyshev
-#w_b = w_beta_minhalf
-w_a = w_alpha_legendre
-w_b = w_beta_plushalf
+w_type  = "SphEnergy"
+
+# Setup for Chebyshev type
+if w_type == "Chebyshev":
+    w_a = w_alpha_chebyshev
+    w_b = w_beta_minhalf
+# Setup for SphEnergy type
+elif w_type == "SphEnergy":
+    w_a = w_alpha_legendre
+    w_b = w_beta_plushalf
 
 def w(n, l, a, b):
     expr = sy.gamma(n + a + 1)/(sy.gamma(n + 1)*sy.gamma(a + 1))

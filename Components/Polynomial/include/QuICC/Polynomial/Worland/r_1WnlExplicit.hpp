@@ -41,6 +41,9 @@ namespace Worland {
 
          /**
           * @brief Constructor for specific alpha,beta pair
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
           */
          r_1Wnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta): WorlandBase(alpha, dBeta){};
 

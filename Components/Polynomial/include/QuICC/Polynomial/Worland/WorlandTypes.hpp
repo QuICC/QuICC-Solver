@@ -9,11 +9,12 @@
 
 // Project includes
 //
-#include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandCylEnergyRule.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandLegendreRule.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandSphEnergyRule.hpp"
 #include "Types/Internal/Typedefs.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandLegendreRule.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandCylEnergyRule.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandSphEnergyRule.hpp"
 
 namespace QuICC {
 namespace Polynomial {
@@ -74,6 +75,9 @@ struct worland_sphenergy_t
 /// @brief Default type selected at CMake setup
 struct worland_default_t
 {
+   /// Typedef for quadrature rule
+   typedef Polynomial::Quadrature::WorlandRule Rule;
+
    /// Jacobi alpha parameter
    static const Internal::MHDFloat ALPHA;
    /// Jacobi beta = l + dBeta parameter

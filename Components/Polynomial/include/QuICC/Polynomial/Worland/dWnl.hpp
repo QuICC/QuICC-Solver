@@ -12,6 +12,7 @@
 // Project includes
 //
 #include "Types/Internal/BasicTypes.hpp"
+#include "Types/Internal/Literals.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 
@@ -34,13 +35,16 @@ namespace Worland {
 
          /**
           * @brief Constructor for specific alpha,beta pair
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
           */
          dWnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta): WorlandBase(alpha, dBeta){};
 
          /**
           * @brief Compute worland polynomial
           *
-          * @tparam TEValuator The evaluator allows to change behavior from computing Matric operator, to On-the-fly transforms, etc
+          * @tparam TEvaluator The evaluator allows to change behavior from computing Matric operator, to On-the-fly transforms, etc
           */
          template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
 
@@ -56,6 +60,7 @@ namespace Worland {
 
    template <typename T, typename TEvaluator> void dWnl::computedWn0(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
+      using namespace Internal::Literals;
       int gN = igrid.rows();
 
       if (nPoly < 1)
@@ -70,11 +75,11 @@ namespace Worland {
 
       Internal::Matrix idiff(gN,2);
 
-      Internal::MHDFloat a1 = this->alpha(0) + MHD_MP(1.0);
-      Internal::MHDFloat b1 = this->beta(0) + MHD_MP(1.0);
+      Internal::MHDFloat a1 = this->alpha(0) + 1.0_mp;
+      Internal::MHDFloat b1 = this->beta(0) + 1.0_mp;
 
       // Make X grid in [-1, 1]
-      Internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+      Internal::Array ixgrid = 2.0_mp*igrid.array()*igrid.array() - 1.0_mp;
 
       idiff.col(0).setZero();
       evaluator(rOut, idiff.col(0), 0);
@@ -106,6 +111,7 @@ namespace Worland {
 
    template <typename T, typename TEvaluator> void dWnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
+      using namespace Internal::Literals;
       if(l < 0)
       {
          throw std::logic_error("Tried to compute Worland derivative with l < 0");
@@ -130,12 +136,12 @@ namespace Worland {
 
          Internal::MHDFloat a = this->alpha(l);
          Internal::MHDFloat b = this->beta(l);
-         Internal::MHDFloat a1 = this->alpha(l) + MHD_MP(1.0);
-         Internal::MHDFloat b1 = this->beta(l) + MHD_MP(1.0);
+         Internal::MHDFloat a1 = this->alpha(l) + 1.0_mp;
+         Internal::MHDFloat b1 = this->beta(l) + 1.0_mp;
          Internal::MHDFloat dl = Internal::MHDFloat(l);
 
          // Make X grid in [-1, 1]
-         Internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+         Internal::Array ixgrid = 2.0_mp*igrid.array()*igrid.array() - 1.0_mp;
 
          // Storage for P_n^{(alpha,beta)} and dP_n{(alpha,beta)}
          Internal::Matrix ipnab(gN,2);

@@ -63,47 +63,81 @@ namespace Worland {
       protected:
          /**
           * @brief Build filename extension with resolution information
+          *
+          * @param specN   Number of spectral modes
+          * @param physN   Number of physical grid points
+          * @param param   Run parameters
           */
          virtual std::string resname(const int specN, const int physN, const ParameterType& param) const override;
 
          /**
           * @brief Test matrix operator
+          *
+          * @param specN   Number of spectral modes
+          * @param physN   Number of physical grid points
+          * @param param   Run parameters
+          * @param type    Type of test
           */
          virtual Matrix buildOperator(const int specN, const int physN, const ParameterType& param, const TestType type) const override;
 
          /**
           * @brief Format the parameters
+          *
+          * @param param   Run parameters
           */
          virtual std::string formatParameter(const ParameterType& param) const override;
 
       private:
          /**
           * @brief Append specific path
+          *
+          * @param subdir  Sub-directory to append to path
           */
          void appendPath(const std::string& subdir);
 
          /**
           * @brief Test quadrature matrix operator
+          *
+          * @param specN      Number of spectral modes
+          * @param physN      Number of physical grid points
+          * @param param      Run parameters
+          * @param isWeight   Quadrature weights included in matrix?
           */
          Matrix buildMatrix(const int specN, const int physN, const ParameterType& param, const bool isWeighted) const;
 
          /**
           * @brief Test on-the-fly inner product
+          *
+          * @param specN   Number of spectral modes
+          * @param physN   Number of physical grid points
+          * @param param   Run parameters
           */
          Matrix buildInner(const int specN, const int physN, const ParameterType& param) const;
 
          /**
           * @brief Test on-the-fly outer product
+          *
+          * @param specN   Number of spectral modes
+          * @param physN   Number of physical grid points
+          * @param param   Run parameters
           */
          Matrix buildOuter(const int specN, const int physN, const ParameterType& param) const;
 
          /**
           * @brief Test on-the-fly reduction
+          *
+          * @param specN   Number of spectral modes
+          * @param physN   Number of physical grid points
+          * @param param   Run parameters
           */
          Matrix buildReduce(const int specN, const int physN, const ParameterType& param) const;
 
          /**
           * @brief Make operator and compute grid and weights
+          *
+          * @param igrid      Array of grid points
+          * @param iweights   Array of weights
+          * @param physN      Number of physical grid points
           */
          std::shared_ptr<TOp> makeOp(Internal::Array& igrid, Internal::Array& iweights, const int physN) const;
 
