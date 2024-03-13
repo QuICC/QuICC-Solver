@@ -9,11 +9,11 @@
 
 // Project includes
 //
-#include "Types/Internal/Typedefs.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandLegendreRule.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandCylEnergyRule.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandLegendreRule.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandSphEnergyRule.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 namespace Polynomial {
