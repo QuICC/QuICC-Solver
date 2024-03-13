@@ -738,6 +738,7 @@ endif()
 # Split reductor tests
 
 set(_split_tests
+  Fft::EnergyR2:<base_t>:reductor
   Poly::EnergyR2:<base_t>:reductor
   Poly::EnergyR2:<viewCpu_t>:reductor
 )

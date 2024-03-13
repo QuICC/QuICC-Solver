@@ -117,6 +117,14 @@ if(QUICC_USE_VKFFT)
 endif()
 
 ###################################################
+#------------ PFSOLVE JWT IMPLEMENTATION -----------#
+###################################################
+option(QUICC_USE_PFSOLVE "Enable PfSolve backend for JWT" OFF)
+
+if(QUICC_USE_PFSOLVE)
+  include(BundlePfSolve)
+endif()
+###################################################
 #----- SPARSE LINEAR ALGEBRA IMPLEMENTATION ------#
 ###################################################
 

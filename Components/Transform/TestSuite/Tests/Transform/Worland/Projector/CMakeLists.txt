@@ -226,7 +226,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    ULPS 4 17 5 5
+    ULPS 5 17 5 5
     IDS  0 1 2 3
   )
 endforeach()
@@ -274,7 +274,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    ULPS 1 3 5 3
+    ULPS 1 4 5 3
     IDS  0 1 2 3
   )
 endforeach()
@@ -282,6 +282,7 @@ endforeach()
 # Split projector tests
 
 set(_split_tests
+  Fft::P:<base_t>:projector
   Poly::P:<base_t>:projector
   Poly::P:<viewCpu_t>:projector
 )

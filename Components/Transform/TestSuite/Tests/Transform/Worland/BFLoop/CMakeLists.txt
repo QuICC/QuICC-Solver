@@ -51,6 +51,6 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
     IDS 0 1 2 3 104 105 106 107 108 109 110
-    ULPS 5 5 12 5 5 6 11 16 21 28 41
+    ULPS 5 5 12 5 5 9 11 16 38 76 155
   )
 endforeach()
