@@ -83,7 +83,11 @@ namespace Transform {
 
    void DefaultSphereWorlandMap::operator()(MapType& m) const
    {
+#ifdef QUICC_HAS_CUDA_BACKEND
+      using backend_t = Poly::Worland::viewGpu_t;
+#else
       using backend_t = Poly::Worland::base_t;
+#endif
 
       // Create projectors
       this->addOperator<Poly::Worland::Projector::P<backend_t>>(m, Backward::P::id());

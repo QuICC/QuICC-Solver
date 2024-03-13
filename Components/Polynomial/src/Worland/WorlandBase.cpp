@@ -29,10 +29,6 @@ namespace Worland {
    {
    }
 
-   WorlandBase::~WorlandBase()
-   {
-   }
-
    Internal::MHDFloat WorlandBase::alpha(const int)
    {
       return this->mAlpha;

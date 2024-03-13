@@ -12,6 +12,7 @@
 // Project includes
 //
 #include "Types/Internal/BasicTypes.hpp"
+#include "Types/Internal/Literals.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 
@@ -34,6 +35,10 @@ namespace Worland {
 
          /**
           * @brief Constructor for specific alpha,beta pair
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
+          * @param lShift  Shift in harmonic degree
           */
          Wnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta, const int lShift = 0): WorlandBase(alpha, dBeta), mLShift(lShift){};
 
@@ -53,6 +58,7 @@ namespace Worland {
 
    template <typename T, typename TEval> inline void Wnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int lIn, const Internal::Array& igrid, const Internal::Array& scale, TEval evaluator)
    {
+      using namespace Internal::Literals;
       const auto l = lIn + this->mLShift;
 
       int gN = igrid.rows();
@@ -85,7 +91,7 @@ namespace Worland {
       evaluator(rOut, ipoly.col(0), 0);
 
       // Make X grid in [-1, 1]
-      Internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+      Internal::Array ixgrid = 2.0_mp*igrid.array()*igrid.array() - 1.0_mp;
 
       if(nPoly > 1)
       {

@@ -19,18 +19,20 @@ namespace TestSuite {
 
 namespace SparseSM {
 
-   /**
-    * @Brief Compute ULP
-    */
-   std::pair<bool, MHDFloat> computeUlp(const MHDFloat data, const MHDFloat ref, const MHDFloat refMod, const MHDFloat maxUlp, const MHDFloat epsilon);
+/**
+ * @Brief Compute ULP
+ */
+std::pair<bool, MHDFloat> computeUlp(const MHDFloat data, const MHDFloat ref,
+   const MHDFloat refMod, const MHDFloat maxUlp, const MHDFloat epsilon);
 
-   /**
-    * @brief Check stencils by computing boundary values
-    */
-   void checkStencil(const Matrix& bc, const Matrix& stencil, const MHDFloat maxUlp);
+/**
+ * @brief Check stencils by computing boundary values
+ */
+void checkStencil(const Matrix& bc, const Matrix& stencil,
+   const MHDFloat maxUlp);
 
-}
-}
-}
+} // namespace SparseSM
+} // namespace TestSuite
+} // namespace QuICC
 
-#endif //QUICC_TESTSUITE_SPARSESM_TESTUTILS_HPP
+#endif // QUICC_TESTSUITE_SPARSESM_TESTUTILS_HPP

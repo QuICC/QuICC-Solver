@@ -33,16 +33,21 @@ namespace Worland {
 
          /**
           * @brief Constructor
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
           */
          WorlandBase(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta);
 
          /**
           * @brief Destructor
           */
-         virtual ~WorlandBase();
+         virtual ~WorlandBase() = default;
 
          /**
           * @brief Get alpha parameter of Jacobi polynomial
+          *
+          * @param l Harmonic degree l
           */
          Internal::MHDFloat alpha(const int l);
 
@@ -54,6 +59,8 @@ namespace Worland {
       protected:
          /**
           * @brief Get beta parameter of Jacobi polynomial
+          *
+          * @param l Harmonic degree l
           */
          Internal::MHDFloat beta(const int l);
 

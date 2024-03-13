@@ -19,36 +19,37 @@ namespace SparseSM {
 
 namespace Worland {
 
-   void setJacobiParameters(Internal::MHDFloat& alpha, Internal::MHDFloat& dBeta, const std::string& type)
+void setJacobiParameters(Internal::MHDFloat& alpha, Internal::MHDFloat& dBeta,
+   const std::string& type)
+{
+   using namespace QuICC::Internal::Literals;
+   if (type == std::string("Chebyshev"))
    {
-      using namespace QuICC::Internal::Literals;
-      if(type == std::string("Chebyshev"))
-      {
-         alpha = -0.5_mp;
-         dBeta = -0.5_mp;
-      }
-      else if(type == std::string("Legendre"))
-      {
-         alpha = 0_mp;
-         dBeta = -0.5_mp;
-      }
-      else if(type == std::string("CylEnergy"))
-      {
-         alpha = 0_mp;
-         dBeta = 0_mp;
-      }
-      else if(type == std::string("SphEnergy"))
-      {
-         alpha = 0_mp;
-         dBeta = 0.5_mp;
-      }
-      else
-      {
-         throw std::logic_error("Unknown Worland type");
-      }
+      alpha = -0.5_mp;
+      dBeta = -0.5_mp;
    }
+   else if (type == std::string("Legendre"))
+   {
+      alpha = 0_mp;
+      dBeta = -0.5_mp;
+   }
+   else if (type == std::string("CylEnergy"))
+   {
+      alpha = 0_mp;
+      dBeta = 0_mp;
+   }
+   else if (type == std::string("SphEnergy"))
+   {
+      alpha = 0_mp;
+      dBeta = 0.5_mp;
+   }
+   else
+   {
+      throw std::logic_error("Unknown Worland type");
+   }
+}
 
-}
-}
-}
-}
+} // namespace Worland
+} // namespace SparseSM
+} // namespace TestSuite
+} // namespace QuICC
