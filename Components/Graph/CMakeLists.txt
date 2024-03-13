@@ -25,8 +25,9 @@ add_subdirectory(Graph)
 
 # Dependencies
 include(BundleQuiccir)
-target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" PRIVATE
-    Quiccir
+target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" PUBLIC
+  MLIRQuiccirDialect
+  QuiccirCAPITestLib
 )
 
 # Alias

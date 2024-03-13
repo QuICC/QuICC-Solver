@@ -72,6 +72,8 @@ if(QUICC_USE_VKFFT)
     CACHE BOOL "This is set by the framework" FORCE)
 endif()
 
+# Quiccir
+
 # Setup
 include(setup/global)
 

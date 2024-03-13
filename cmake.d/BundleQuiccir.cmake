@@ -15,7 +15,6 @@ if(QUICC_USE_SYSTEM_QUICCIR)
     endif()
 else()
     if(NOT TARGET Quiccir)
-        message(STATUS "----> here")
         # set(QUICC_MESSAGE_QUIET ON)
 
         include(FetchContent)
@@ -38,9 +37,7 @@ else()
         include(MarkAsAdvancedAll)
         mark_as_advanced_all(LLVM)
 
-        add_library(Quiccir INTERFACE)
-        target_link_libraries(Quiccir INTERFACE MLIRQuiccirDialect)
-        target_include_directories(Quiccir INTERFACE "${FETCHCONTENT_BASE_DIR}/quiccir-src/include")
+        # target_include_directories(MLIRQuiccirDialect INTERFACE "${FETCHCONTENT_BASE_DIR}/quiccir-src/include")
 
         # unset(QUICC_MESSAGE_QUIET)
     endif()

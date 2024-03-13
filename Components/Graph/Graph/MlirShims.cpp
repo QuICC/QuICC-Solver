@@ -1,5 +1,5 @@
 #include <iostream>
-#include <Quiccir-c/Utils.hpp>
+#include <Quiccir-c/Utils.h>
 
 /// @brief C Interface to MLIR for a jw prj operator
 /// @param op
