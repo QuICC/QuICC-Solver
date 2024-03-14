@@ -79,7 +79,7 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   module = mlir::parseSourceString<mlir::ModuleOp>(modStr, &ctx);
 
   // Dump
-  module->dump();
+  // module->dump();
 
   // Top level (module) pass manager
   mlir::PassManager pm(&ctx);
@@ -91,7 +91,7 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   }
 
   // Dump
-  module->dump();
+  // module->dump();
 
   // JIT
 
