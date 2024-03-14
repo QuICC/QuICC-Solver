@@ -4,9 +4,11 @@
 #include <catch2/catch.hpp>
 #include <memory>
 
+// Passes
 #include <Quiccir/IR/QuiccirDialect.h>
 #include <Quiccir/Transforms/QuiccirPasses.h>
 #include <Quiccir/Pipelines/Passes.h>
+#include <Quiccir-c/Utils.h>
 
 #include <mlir/InitAllDialects.h>
 #include <mlir/Dialect/Func/Extensions/AllExtensions.h>
@@ -14,15 +16,16 @@
 #include <mlir/Parser/Parser.h>
 
 #include <mlir/Pass/PassManager.h>
+// #include <llvm/Support/CommandLine.h>
 
-#include <llvm/Support/CommandLine.h>
+// JIT
+#include <mlir/ExecutionEngine/ExecutionEngine.h>
+#include <mlir/ExecutionEngine/OptUtils.h>
+#include <llvm/Support/SourceMgr.h>
+#include <llvm/Support/TargetSelect.h>
+#include <mlir/Target/LLVMIR/Dialect/Builtin/BuiltinToLLVMIRTranslation.h>
+#include <mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h>
 
-// #include "Memory/Cpu\NewDelete.hpp"
-// #include "Memory/Cuda/Malloc.hpp"
-// #include "Memory/Memory.hpp"
-// #include "ViewOps/Pointwise/Cpu/Pointwise.hpp"
-// #include "Visitor/Transform/Visitor.hpp"
-// #include "ViewOps/ViewMemoryUtils.hpp"
 #include "Profiler/Interface.hpp"
 
 int main(int argc, char **argv)
@@ -90,6 +93,43 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   // Dump
   module->dump();
 
+  // JIT
 
+  // Initialize LLVM targets.
+  llvm::InitializeNativeTarget();
+  llvm::InitializeNativeTargetAsmPrinter();
+
+  // Register the translation from MLIR to LLVM IR, which must happen before we
+  // can JIT-compile.
+  mlir::registerBuiltinDialectTranslation(*module->getContext());
+  mlir::registerLLVMDialectTranslation(*module->getContext());
+
+  // An optimization pipeline to use within the execution engine.
+  auto optPipeline = mlir::makeOptimizingTransformer(
+      /*optLevel=*/0, /*sizeLevel=*/0,
+      /*targetMachine=*/nullptr);
+
+  // Create an MLIR execution engine. The execution engine eagerly JIT-compiles
+  // the module.
+  mlir::ExecutionEngineOptions engineOptions;
+  engineOptions.transformer = optPipeline;
+  // engineOptions.sharedLibPaths = executionEngineLibs;
+  auto maybeEngine = mlir::ExecutionEngine::create(*module, engineOptions);
+  assert(maybeEngine && "failed to construct an execution engine");
+  auto &engine = maybeEngine.get();
+
+  // Invoke the JIT-compiled function.
+  std::string symbol = "entry";
+  auto funSym = engine->lookup(symbol);
+  if (auto E = funSym.takeError()) {
+    assert(false && "JIT invocation failed");
+  }
+
+  // Fake call
+  view3_t viewRef_in;
+  view3_t viewRef_out;
+   std::array<void*, 2> thisArr;
+  auto fun = (void (*)(void*, view3_t*, view3_t*))funSym.get();
+  fun(thisArr.data(), &viewRef_out, &viewRef_in);
 
 }
