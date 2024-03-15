@@ -4,7 +4,7 @@
 message(DEBUG "Quiccir")
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
-set(QUICC_QUICCIR_VERSION "integrate")
+set(QUICC_QUICCIR_VERSION "graph")
 
 option(QUICC_USE_SYSTEM_QUICCIR "Use system installed Quiccir." OFF)
 
@@ -16,7 +16,7 @@ if(QUICC_USE_SYSTEM_QUICCIR)
     endif()
 else()
     if(NOT TARGET quiccir)
-        # set(QUICC_MESSAGE_QUIET ON)
+        set(QUICC_MESSAGE_QUIET ON)
 
         include(FetchContent)
             FetchContent_Declare(
@@ -28,19 +28,18 @@ else()
             )
 
         # set some vars
-        # set(Quiccir_UNIT_TESTS OFF CACHE BOOL "")
-        # set(Quiccir_EXAMPLES OFF CACHE BOOL "")
-        # set(Quiccir_BUILD_DOCS OFF CACHE BOOL "")
+        set(QUICCIR_BUILD_TEST OFF CACHE BOOL "")
+        set(QUICCIR_BUILD_OPT OFF CACHE BOOL "")
+        set(QUICCIR_BUILD_MINIAPP OFF CACHE BOOL "")
 
         FetchContent_MakeAvailable(quiccir)
 
-        # hide LLVM vars
+        # Hide LLVM vars
         include(MarkAsAdvancedAll)
         mark_as_advanced_all(LLVM)
+        mark_as_advanced_all(MLIR)
 
-        # target_include_directories(MLIRQuiccirDialect INTERFACE "${FETCHCONTENT_BASE_DIR}/quiccir-src/include")
-
-        # unset(QUICC_MESSAGE_QUIET)
+        unset(QUICC_MESSAGE_QUIET)
     endif()
 endif()
 

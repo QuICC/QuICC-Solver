@@ -26,6 +26,11 @@
 #include <mlir/Target/LLVMIR/Dialect/Builtin/BuiltinToLLVMIRTranslation.h>
 #include <mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h>
 
+// QuICC
+#include "Memory/Cpu/NewDelete.hpp"
+#include "Memory/Cuda/Malloc.hpp"
+#include "Memory/Memory.hpp"
+#include "ViewOps/ViewMemoryUtils.hpp"
 #include "Profiler/Interface.hpp"
 
 int main(int argc, char **argv)
@@ -68,8 +73,8 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
     "!type_tuval = tensor<1x3x3xf64, \"layoutUval\">\n"
     "func.func @entry(%thisArr: !llvm.ptr<array<2 x ptr>> {llvm.noalias}, %uout: !type_umod, %umod: !type_umod) {\n"
     "  %tumod = builtin.unrealized_conversion_cast %umod : !type_umod to !type_tumod\n"
-    "  %tuval = quiccir.jw.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}\n"
-    "  %ret = quiccir.jw.int %tuval : !type_tuval -> !type_tumod attributes{implptr = 1 :i64}\n"
+    "  %tuval = quiccir.fr.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}\n"
+    "  %ret = quiccir.fr.int %tuval : !type_tuval -> !type_tumod attributes{implptr = 1 :i64}\n"
     "  quiccir.materialize %ret in %uout : (!type_tumod, !type_umod)\n"
     "  return\n"
     "}\n";
@@ -125,11 +130,49 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
     assert(false && "JIT invocation failed");
   }
 
-  // Fake call
-  view3_t viewRef_in;
-  view3_t viewRef_out;
-   std::array<void*, 2> thisArr;
-  auto fun = (void (*)(void*, view3_t*, view3_t*))funSym.get();
+
+  // setup metadata
+  constexpr std::size_t modsM = 6;
+  constexpr std::size_t N = 3;
+  constexpr std::size_t K = 5;
+  std::array<std::uint32_t, 3> modsDimensions {modsM, N, K};
+
+  std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+  std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+
+  // host mem block
+  QuICC::Memory::Cpu::NewDelete mem;
+  std::size_t modsS = modsM*indices[1].size();
+  QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsS, &mem);
+  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, &mem);
+
+  // host view
+  using namespace QuICC;
+  using C_DCCSC3D_t = View::View<std::complex<double>, View::DCCSC3D>;
+  C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, modsDimensions, pointers, indices);
+  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, modsDimensions, pointers, indices);
+
+  // set input modes
+  std::complex<double> val = {1.0, 0.0};
+  for(std::size_t m = 0; m < modsInView.size(); ++m)
+  {
+    modsInView[m] = val;
+  }
+
+  // Apply graph
+  using view3_cd_t = ViewDescriptor<std::complex<double>, std::uint32_t, 3>;
+  view3_cd_t viewRef_in{{K, modsM, N}, pointers[1].data(), pointers[1].size(), indices[1].data(),
+    indices[1].size(), modsIn.data(), modsIn.size()};
+  view3_cd_t viewRef_out{{K, modsM, N}, pointers[1].data(), pointers[1].size(), indices[1].data(),
+    indices[1].size(), modsOut.data(), modsOut.size()};
+  std::array<void*, 2> thisArr;
+  auto fun = (void (*)(void*, view3_cd_t*, view3_cd_t*))funSym.get();
   fun(thisArr.data(), &viewRef_out, &viewRef_in);
+
+  // check
+  for(std::size_t m = 0; m < modsOutView.size(); ++m)
+  {
+    CHECK(modsOutView[m] == val);
+  }
 
 }
