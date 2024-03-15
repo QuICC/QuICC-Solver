@@ -174,9 +174,8 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size(6));
+         assert(meta.size() == 6);
 
-         int nN = meta(0) + 1;
          int maxnl = meta(1) + 1;
          QuICC::Internal::MHDFloat ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
          QuICC::Internal::MHDFloat ugDBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
@@ -194,7 +193,7 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size(6));
+         assert(meta.size() == 6);
 
          int outRows = meta(0) + 1;
          int bc = static_cast<int>(meta(1));

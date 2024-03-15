@@ -117,7 +117,7 @@ namespace Bessel {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size(4));
+         assert(meta.size() == 4);
 
          int outRows = meta(0) + 1;
          int bc = static_cast<int>(meta(1));
