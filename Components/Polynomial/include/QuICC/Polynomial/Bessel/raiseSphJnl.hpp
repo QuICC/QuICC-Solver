@@ -1,10 +1,10 @@
 /**
- * @file dSphJnl.hpp
+ * @file raiseSphJnl.hpp
  * @brief Implementation of the spherical Bessel basis
  */
 
-#ifndef QUICC_POLYNOMIAL_BESSEL_DSPHJNL_HPP
-#define QUICC_POLYNOMIAL_BESSEL_DSPHJNL_HPP
+#ifndef QUICC_POLYNOMIAL_BESSEL_RAISESPHJNL_HPP
+#define QUICC_POLYNOMIAL_BESSEL_RAISESPHJNL_HPP
 
 // System includes
 //
@@ -23,7 +23,7 @@ namespace Bessel {
 /**
  * @brief Implementation of the spherical Bessel basis
  */
-class dSphJnl
+class raiseSphJnl
 {
 public:
    /**
@@ -39,7 +39,7 @@ public:
    /**
     * @brief Default constructor
     */
-   dSphJnl() = default;
+   raiseSphJnl() = default;
 
    /**
     * @brief Compute spherical bessel basis
@@ -60,7 +60,7 @@ public:
 };
 
 template <typename T>
-inline void dSphJnl::compute(
+inline void raiseSphJnl::compute(
    Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>> rOut,
    const std::vector<Internal::MHDFloat>& roots, const int l,
    const Internal::Array& igrid, const Internal::Array& scale,
@@ -74,7 +74,7 @@ inline void dSphJnl::compute(
       Internal::Array col(igrid.size());
       for (int i = 0; i < igrid.size(); i++)
       {
-         col(i) = details::dSphJnl(k, l, igrid(i), dNu);
+         col(i) = details::raiseSphJnl(k, l, igrid(i), dNu);
       }
 
       if (scale.size() > 0)
@@ -92,4 +92,4 @@ inline void dSphJnl::compute(
 } // namespace Polynomial
 } // namespace QuICC
 
-#endif // QUICC_POLYNOMIAL_BESSEL_DSPHJNL_HPP
+#endif // QUICC_POLYNOMIAL_BESSEL_RAISESPHJNL_HPP
