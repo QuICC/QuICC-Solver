@@ -48,7 +48,6 @@ I2QpDiags::ACoeff_t I2QpDiags::d_2(const ACoeff_t& n) const
 I2QpDiags::ACoeff_t I2QpDiags::d_1(const ACoeff_t& n) const
 {
    const auto l1 = this->l();
-   const auto l2 = l1 * l1;
    ACoeff_t val;
 
    val = -16.0 * (2.0 * l1 - 2.0 * n - 1.0) * (2.0 * l1 + 2.0 * n + 1.0) /
