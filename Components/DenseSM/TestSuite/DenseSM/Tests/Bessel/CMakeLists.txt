@@ -23,13 +23,13 @@ set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
 
 # Fetch reference data
 include(FetchTestReference)
-#quicc_fetch_test_reference(
-#  ${TestExe}
-#  COMPONENT DenseSM
-#  FILENAME "Bessel.tar.gz"
-#  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
-#  DATADIR ${QUICC_WORK_DIR}
-#)
+quicc_fetch_test_reference(
+  ${TestExe}
+  COMPONENT DenseSM
+  FILENAME "Bessel.tar.gz"
+  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+  DATADIR ${QUICC_WORK_DIR}
+)
 
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
@@ -66,6 +66,40 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:type
     IDS 0 1 2 3 4 5
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create tests for Coriolis
+set(_tests
+  CoriolisQm:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 25 25 25 25 25 25 25 25 25 25 35
+  MPULP 11 11 11 11 11 11 11 11 11 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 1000 1001 1002 1003 1004 1005 1006 1007 1008 1009 1010
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create tests for Coriolis
+set(_tests
+  CoriolisQp:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 1600 25 600 25 250 25 450 25 320 25 110
+  MPULP 11 11 11 11 11 11 11 11 11 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 1000 1001 1002 1003 1004 1005 1006 1007 1008 1009 1010
     ULPS ${_ulp}
   )
 endforeach()

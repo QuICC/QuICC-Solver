@@ -56,7 +56,6 @@ namespace Worland {
 
    void PyGeostrophic2Tor::buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const
    {
-      const bool isTriangular = true;
       const auto& nN = this->mNn;
       const auto& maxnl = this->mMaxnl;
       const auto& maxNug = this->mMaxNug;

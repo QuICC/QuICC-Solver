@@ -16,11 +16,14 @@
 // Project includes
 //
 #include "Types/BasicTypes.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
 #include "DenseSM/IEmbeddedSMOperator.hpp"
+#include "DenseSM/Bessel/CoriolisQm.hpp"
+#include "DenseSM/Bessel/CoriolisQp.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
 #include "QuICC/Bc/Name/FixedFlux.hpp"
 #include "QuICC/Bc/Name/Insulating.hpp"
@@ -112,7 +115,23 @@ namespace Bessel {
    {
       Matrix outData;
 
-      if constexpr(std::is_base_of_v<dsm::IEmbeddedSMOperator, TOp>)
+      if constexpr(std::is_same_v<dsm::Bessel::CoriolisQm, TOp> || std::is_same_v<dsm::Bessel::CoriolisQp, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         assert(meta.size() == 4);
+
+         Internal::MHDFloat outDNu = meta(0);
+         Internal::MHDFloat inDNu = meta(1);
+         int nN = meta(2) + 1;
+         auto l = static_cast<int>(meta(3));
+
+         TOp op(outDNu, inDNu, nN, nN, l);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_base_of_v<dsm::IEmbeddedSMOperator, TOp>)
       {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);

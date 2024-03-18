@@ -14,12 +14,16 @@ $valueD\[Nu]::usage="nu = l + d\[Nu] for value boundary condition";
 $insulatingD\[Nu]::usage="nu = l + d\[Nu] for insulating boundary condition";
 
 (* Zeros *)
+getZero::usage="getZero[n,l,d\[Nu]]"
 valueZero::usage="valueZero[n,l]";
 insulatingZero::usage="insulatingZero[n,l]";
 valueZeros::usage="valueZeros[n,l]";
 insulatingZeros::usage="insulatingZeros[n,l]";
 
 (* Operators to work on grid*)
+Jnl::usage="Jnl[k,l,t,d\[Nu]]";
+lowerJnl::usage="lowerJnl[k,l,t,d\[Nu]]
+raiseJnl::usage="raiseJnl[k,l,t,d\[Nu]]
 ValueSphJnl::usage="ValueSphJnl[n,l,r]";
 InsulatingSphJnl::usage="InsulatingSphJnl[n,l,r]";
 ValueRSphJnl::usage="ValueRSphJnl[n,l,r]";

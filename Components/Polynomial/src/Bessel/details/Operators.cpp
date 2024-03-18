@@ -54,7 +54,7 @@ Internal::MHDFloat norm(const Internal::MHDFloat k, const int l,
    }
    else
    {
-      throw std::logic_error("Unknown Bessel d_nu");
+      throw std::logic_error("Unknown Bessel d_nu: " + std::to_string(dNu));
    }
    val = boost::math::sph_bessel(nu, k) / Internal::Math::sqrt(2.0_mp);
 

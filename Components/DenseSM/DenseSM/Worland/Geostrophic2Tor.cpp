@@ -43,8 +43,6 @@ namespace Worland {
       const auto& maxNug = this->mMaxNug;
       const auto& nli = this->mNlist;
       const auto& nIdx = this->mNidx;
-      const auto& a = this->mcUgAlpha;
-      const auto& b = this->mcUgDBeta;
 
       // Select Worland type and create quadrature grid and weights
       Scalar_t alpha, dBeta;
