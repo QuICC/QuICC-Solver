@@ -14,6 +14,7 @@
 #include "Memory/MemoryResource.hpp"
 #include "Operator/Unary.hpp"
 #include "Operator/Binary.hpp"
+#include "ViewOps/Fourier/Tags.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -80,7 +81,7 @@ void DOp<Tout, Tin, FftBackend, DiffBackend>::applyImpl(Tout& out, const Tin& in
     {
         // special treatment for the pure projector is not necessary
         // but it avoids an allocation and copy
-        if constexpr (DiffBackend::TreatmentValue == none_m && DiffBackend::OrderValue == 0)
+        if constexpr (DiffBackend::TreatmentValue == QuICC::Transform::Fourier::none_m && DiffBackend::OrderValue == 0)
         {
             _tmpView = in;
         }

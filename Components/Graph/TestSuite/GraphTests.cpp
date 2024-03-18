@@ -27,10 +27,13 @@
 #include <mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h>
 
 // QuICC
+#include "Graph/MlirShims.hpp"
+#include "Graph/BackendsMap.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
 #include "Memory/Cuda/Malloc.hpp"
 #include "Memory/Memory.hpp"
-#include "ViewOps/ViewMemoryUtils.hpp"
+
+
 #include "Profiler/Interface.hpp"
 
 int main(int argc, char **argv)
@@ -67,10 +70,10 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   ctx.loadDialect<mlir::quiccir::QuiccirDialect>();
 
   std::string modStr =
-    "!type_umod = !quiccir.view<1x2x3xf64, \"layoutUmod\">\n"
-    "!type_uval = !quiccir.view<1x3x3xf64, \"layoutUval\">\n"
-    "!type_tumod = tensor<1x2x3xf64, \"layoutUmod\">\n"
-    "!type_tuval = tensor<1x3x3xf64, \"layoutUval\">\n"
+    "!type_umod = !quiccir.view<5x6x3xf64, \"C_DCCSC3D_t\">\n"
+    "!type_uval = !quiccir.view<5x11x3xf64, \"R_DCCSC3D_t\">\n"
+    "!type_tumod = tensor<5x6x3xf64, \"C_DCCSC3D_t\">\n"
+    "!type_tuval = tensor<5x11x3xf64, \"R_DCCSC3D_t\">\n"
     "func.func @entry(%thisArr: !llvm.ptr<array<2 x ptr>> {llvm.noalias}, %uout: !type_umod, %umod: !type_umod) {\n"
     "  %tumod = builtin.unrealized_conversion_cast %umod : !type_umod to !type_tumod\n"
     "  %tuval = quiccir.fr.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}\n"
@@ -141,14 +144,13 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
 
   // host mem block
-  QuICC::Memory::Cpu::NewDelete mem;
+  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   std::size_t modsS = modsM*indices[1].size();
-  QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsS, &mem);
-  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, &mem);
+  QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsS, mem.get());
+  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, mem.get());
 
   // host view
-  using namespace QuICC;
-  using C_DCCSC3D_t = View::View<std::complex<double>, View::DCCSC3D>;
+  using namespace QuICC::Graph;
   C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, modsDimensions, pointers, indices);
   C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, modsDimensions, pointers, indices);
 
@@ -159,13 +161,29 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
     modsInView[m] = val;
   }
 
-  // Apply graph
+  // map views
   using view3_cd_t = ViewDescriptor<std::complex<double>, std::uint32_t, 3>;
-  view3_cd_t viewRef_in{{K, modsM, N}, pointers[1].data(), pointers[1].size(), indices[1].data(),
+  view3_cd_t viewRef_in{{modsM, N, K}, pointers[1].data(), pointers[1].size(), indices[1].data(),
     indices[1].size(), modsIn.data(), modsIn.size()};
-  view3_cd_t viewRef_out{{K, modsM, N}, pointers[1].data(), pointers[1].size(), indices[1].data(),
+  view3_cd_t viewRef_out{{modsM, N, K}, pointers[1].data(), pointers[1].size(), indices[1].data(),
     indices[1].size(), modsOut.data(), modsOut.size()};
+
+  // get operators and map
   std::array<void*, 2> thisArr;
+  using namespace QuICC::Transform::Fourier;
+  using backend_t = QuICC::Graph::viewCpu_t;
+  using Tin = C_DCCSC3D_t;
+  using Tout = R_DCCSC3D_t;
+  using backendFft_t = Fft_t<backend_t, Tout, Tin>;
+  using backendDiff_t = MixedDiff_t<backend_t, Tin, 0, bwd_t,
+    QuICC::Transform::Fourier::none_m>;
+  using op_t = Mixed::Projector::DOp<Tout, Tin, backendFft_t,
+  backendDiff_t>;
+
+  op_t prjOp(mem);
+  thisArr[0] = (void*)&prjOp;
+
+  // Apply graph
   auto fun = (void (*)(void*, view3_cd_t*, view3_cd_t*))funSym.get();
   fun(thisArr.data(), &viewRef_out, &viewRef_in);
 
