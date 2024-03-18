@@ -169,19 +169,27 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
     indices[1].size(), modsOut.data(), modsOut.size()};
 
   // get operators and map
+  // this needs to happen programmatically
   std::array<void*, 2> thisArr;
   using namespace QuICC::Transform::Fourier;
   using backend_t = QuICC::Graph::viewCpu_t;
   using Tin = C_DCCSC3D_t;
   using Tout = R_DCCSC3D_t;
-  using backendFft_t = Fft_t<backend_t, Tout, Tin>;
-  using backendDiff_t = MixedDiff_t<backend_t, Tin, 0, bwd_t,
+  using backendFftPrj_t = Fft_t<backend_t, Tout, Tin>;
+  using backendDiffPrj_t = MixedDiff_t<backend_t, Tin, 0, bwd_t,
     QuICC::Transform::Fourier::none_m>;
-  using op_t = Mixed::Projector::DOp<Tout, Tin, backendFft_t,
-  backendDiff_t>;
+  using opPrj_t = Mixed::Projector::DOp<Tout, Tin, backendFftPrj_t,
+  backendDiffPrj_t>;
+  using backendFftInt_t = Fft_t<backend_t, Tin, Tout>;
+  using backendDiffInt_t = MixedDiff_t<backend_t, Tin, 0, fwd_t,
+    QuICC::Transform::Fourier::none_m>;
+  using opInt_t = Mixed::Integrator::DOp<Tin, Tout, backendFftInt_t,
+  backendDiffInt_t>;
 
-  op_t prjOp(mem);
-  thisArr[0] = (void*)&prjOp;
+  opPrj_t opPrj(mem);
+  opInt_t opInt;
+  thisArr[0] = (void*)&opPrj;
+  thisArr[1] = (void*)&opInt;
 
   // Apply graph
   auto fun = (void (*)(void*, view3_cd_t*, view3_cd_t*))funSym.get();
