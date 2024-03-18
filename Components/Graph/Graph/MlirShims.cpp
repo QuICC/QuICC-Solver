@@ -66,7 +66,6 @@ extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(void* obj, view3_
     cl->apply(viewMod, viewVal);
 };
 
-
 /// @brief C Interface to MLIR for an allocator
 /// The name fully describes how the buffer needs to be allocated
 /// since it includes the producer op and buffer.
@@ -88,6 +87,9 @@ extern "C" void _ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(view3_t* pN
     pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
     std::size_t sizeByte = sizeof(double) * pNewBuffer->dataSize;
     pNewBuffer->data = reinterpret_cast<double*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(double))));
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
 };
 
 /// @brief C Interface to MLIR for a  deallocator
@@ -100,7 +102,11 @@ extern "C" void _ciface_quiccir_dealloc_R_DCCSC3D_t(view3_t* pBuffer)
     pBuffer->pos = nullptr;
     pBuffer->posSize = 0;
     // dealloc
+    assert(pBuffer->data != nullptr);
     std::size_t sizeByte = sizeof(double) * pBuffer->dataSize;
     ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(double)));
     pBuffer->dataSize = 0;
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_dealloc_R_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
 };
