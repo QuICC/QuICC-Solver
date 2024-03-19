@@ -29,6 +29,7 @@
 // QuICC
 #include "Graph/MlirShims.hpp"
 #include "Graph/BackendsMap.hpp"
+#include "Graph/OpsMap.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
 #include "Memory/Cuda/Malloc.hpp"
 #include "Memory/Memory.hpp"
@@ -89,6 +90,10 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   // Dump
   // module->dump();
 
+  // setup ops map and store
+  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+  QuICC::Graph::MapOps storeOp(*module, mem);
+
   // Top level (module) pass manager
   mlir::PassManager pm(&ctx);
   mlir::quiccir::quiccLibCallPipelineBuilder(pm);
@@ -144,7 +149,6 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
 
   // host mem block
-  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   std::size_t modsS = modsM*indices[1].size();
   QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsS, mem.get());
   QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, mem.get());
@@ -161,35 +165,19 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
     modsInView[m] = val;
   }
 
-  // map views
+  // map input/output views
   using view3_cd_t = ViewDescriptor<std::complex<double>, std::uint32_t, 3>;
-  view3_cd_t viewRef_in{{modsM, N, K}, pointers[1].data(), pointers[1].size(), indices[1].data(),
-    indices[1].size(), modsIn.data(), modsIn.size()};
-  view3_cd_t viewRef_out{{modsM, N, K}, pointers[1].data(), pointers[1].size(), indices[1].data(),
-    indices[1].size(), modsOut.data(), modsOut.size()};
+  view3_cd_t viewRef_in{{modsM, N, K},
+    pointers[1].data(), (std::uint32_t)pointers[1].size(),
+    indices[1].data(), (std::uint32_t)indices[1].size(),
+    modsIn.data(), (std::uint32_t)modsIn.size()};
+  view3_cd_t viewRef_out{{modsM, N, K},
+    pointers[1].data(), (std::uint32_t)pointers[1].size(),
+    indices[1].data(), (std::uint32_t)indices[1].size(),
+    modsOut.data(), (std::uint32_t)modsOut.size()};
 
   // get operators and map
-  // this needs to happen programmatically
-  std::array<void*, 2> thisArr;
-  using namespace QuICC::Transform::Fourier;
-  using backend_t = QuICC::Graph::viewCpu_t;
-  using Tin = C_DCCSC3D_t;
-  using Tout = R_DCCSC3D_t;
-  using backendFftPrj_t = Fft_t<backend_t, Tout, Tin>;
-  using backendDiffPrj_t = MixedDiff_t<backend_t, Tin, 0, bwd_t,
-    QuICC::Transform::Fourier::none_m>;
-  using opPrj_t = Mixed::Projector::DOp<Tout, Tin, backendFftPrj_t,
-  backendDiffPrj_t>;
-  using backendFftInt_t = Fft_t<backend_t, Tin, Tout>;
-  using backendDiffInt_t = MixedDiff_t<backend_t, Tin, 0, fwd_t,
-    QuICC::Transform::Fourier::none_m>;
-  using opInt_t = Mixed::Integrator::DOp<Tin, Tout, backendFftInt_t,
-  backendDiffInt_t>;
-
-  opPrj_t opPrj(mem);
-  opInt_t opInt;
-  thisArr[0] = (void*)&opPrj;
-  thisArr[1] = (void*)&opInt;
+  auto thisArr = storeOp.getThisArr();
 
   // Apply graph
   auto fun = (void (*)(void*, view3_cd_t*, view3_cd_t*))funSym.get();
