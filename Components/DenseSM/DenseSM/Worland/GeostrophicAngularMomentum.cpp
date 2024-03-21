@@ -12,6 +12,7 @@
 // Project includes
 //
 #include "GeostrophicAngularMomentum.hpp"
+#include "DenseSM/Worland/details/GeostrophicTools.hpp"
 #include "Types/Internal/Math.hpp"
 
 namespace QuICC {
@@ -49,7 +50,7 @@ namespace Worland {
             for(int j = 0; j < n+1; j++)
             {
                Internal::MHDFloat dj = static_cast<Internal::MHDFloat>(j);
-               t += piFactor*this->Bjnab(j, n, a, b)*Internal::Math::exp(Internal::Math::lgamma(dj+MHD_MP(2))-Internal::Math::lgamma(dj+MHD_MP(3.5)));
+               t += piFactor*details::GeostrophicTools::Bjnab(j, n, a, b)*Internal::Math::exp(Internal::Math::lgamma(dj+MHD_MP(2))-Internal::Math::lgamma(dj+MHD_MP(3.5)));
             }
             angMom(n) = t;
          }

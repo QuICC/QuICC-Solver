@@ -12,6 +12,7 @@
 // Project includes
 //
 #include "Geostrophic2Tor.hpp"
+#include "DenseSM/Worland/details/GeostrophicTools.hpp"
 #include "Types/Internal/Math.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
@@ -140,7 +141,7 @@ namespace Worland {
       for(int n_: nIdx)
       {
          // Normalization (includes 2\pi from Fourier)
-         Internal::MHDFloat scale = this->Cn(n_)*(MHD_MP(2)*Internal::Math::PI)/this->Cnab(n_, ugA, ugB);
+         Internal::MHDFloat scale = details::GeostrophicTools::Cn(n_)*(MHD_MP(2)*Internal::Math::PI)/details::GeostrophicTools::Cnab(n_, ugA, ugB);
 
          // Convert geostrophic flow into 2D spherical flow (r, l)
          // (spectral theta, ignore phi direction)
