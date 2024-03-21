@@ -27,3 +27,5 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
   PROPERTIES
     PUBLIC_HEADER "${PHS}"
 )
+
+add_subdirectory(details)
