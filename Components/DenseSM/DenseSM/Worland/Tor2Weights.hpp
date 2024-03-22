@@ -1,11 +1,11 @@
 /**
- * @file Tor2Geostrophic.hpp
+ * @file Tor2Weights.hpp
  * @brief Implementation of the projection operator from the toroidal scalar to
  * the geostrophic basis
  */
 
-#ifndef QUICC_DENSESM_WORLAND_TOR2GEOSTROPHIC_HPP
-#define QUICC_DENSESM_WORLAND_TOR2GEOSTROPHIC_HPP
+#ifndef QUICC_DENSESM_WORLAND_TOR2WEIGHTS_HPP
+#define QUICC_DENSESM_WORLAND_TOR2WEIGHTS_HPP
 
 // System includes
 //
@@ -26,7 +26,7 @@ namespace Worland {
  * @brief Implementation of the projection operator from the toroidal scalar to
  * the geostrophic basis
  */
-class Tor2Geostrophic : public IMatrixSMOperator
+class Tor2Weights : public IMatrixSMOperator
 {
 public:
    /**
@@ -34,18 +34,17 @@ public:
     *
     * @param nN      Number of radial modes
     * @param nL      Number of harmonic degrees
-    * @param nCpu    Number of CPU in MPI version
-    * @param alpha   Geostrophic basis Jacobi alpha
-    * @param beta    Geostrophic basis Jacobi beta
-    * @param isGenericBasis   Is generic Worland basis (ie. Li et al)
+    * @param alpha   Jacobi alpha
+    * @param beta    Jacobi beta
+    * @param isTriangular  Uses triangular truncation?
     */
-   Tor2Geostrophic(const int nN, const int nL, const int nCpu, const Scalar_t alpha,
-      const Scalar_t beta, const bool isGenericBasis, const bool isTriangular);
+   Tor2Weights(const int nN, const int nL, const Scalar_t alpha,
+      const Scalar_t beta, const bool isTriangular);
 
    /**
     * @brief Destructor
     */
-   virtual ~Tor2Geostrophic() = default;
+   virtual ~Tor2Weights() = default;
 
 protected:
    /**
@@ -69,22 +68,18 @@ protected:
    const int mNl;
 
    /**
-    * @brief Number of CPU
+    * @brief Jacobi alpha
     */
-   const int mNcpu;
+   Scalar_t mAlpha;
 
    /**
-    * @brief Geostrophic basis alpha
+    * @brief Jacobi beta
     */
-   Scalar_t mUgAlpha;
+   Scalar_t mBeta;
 
    /**
-    * @brief Geostrophic basis beta
+    * @brief Uses triangular truncation?
     */
-   Scalar_t mUgBeta;
-
-   const bool mIsGenericBasis;
-
    bool mIsTriangular;
 
 private:
@@ -94,4 +89,4 @@ private:
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_WORLAND_TOR2GEOSTROPHIC_HPP
+#endif // QUICC_DENSESM_WORLAND_TOR2WEIGHTS_HPP

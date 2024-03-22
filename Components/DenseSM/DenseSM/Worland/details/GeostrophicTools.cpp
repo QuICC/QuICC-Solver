@@ -240,6 +240,101 @@ void GeostrophicTools::integrateZ(int l, int n, Internal::Matrix& iintgz,
    }
 }
 
+int GeostrophicTools::cylTruncNug(const int nL, const bool isTriangular)
+{
+   int nN;
+   if (isTriangular)
+   {
+      nN = int(((nL - 2) - (nL - 2) % 2) / 2);
+   }
+   else
+   {
+      nN = int(((nL - 2) - (nL - 2) % 2) / 2);
+   }
+
+   return nN;
+}
+
+int GeostrophicTools::cylTruncNugC(const int nr, const int nL)
+{
+   int nN = int(((nL - 2) - (nL - 2) % 2) / 2) + nr;
+
+   return nN;
+}
+
+int GeostrophicTools::cylTruncNs(const int nr, const int nL,
+   const bool isTriangular)
+{
+   int nN;
+   if (isTriangular)
+   {
+      nN = int(((nL + 2) - (nL + 2) % 2) / 2 + 3) + 1;
+   }
+   else
+   {
+      nN = int(((nL - 1) - (nL - 1) % 2) / 2 + nr + 1) + 1;
+   }
+
+   return nN;
+}
+
+int GeostrophicTools::cylTruncNz(const int nr, const int nL,
+   const bool isTriangular)
+{
+   int nN;
+   if (isTriangular)
+   {
+      nN = int(((nL - 1) - (nL - 1) % 2) / 2 + 2) + 1;
+   }
+   else
+   {
+      nN = int(((nL - 1) - (nL - 1) % 2) / 2 + nr + 1) + 1;
+   }
+
+   return nN;
+}
+
+int GeostrophicTools::cylTruncNr(const int nL, const bool isTriangular)
+{
+   int nN;
+   if (isTriangular)
+   {
+      nN = int(((nL + 1) - (nL + 1) % 2) / 2 + 2) + 1;
+   }
+   else
+   {
+      nN = int(nL + 1 + 2);
+   }
+
+   return nN;
+}
+
+ArrayI GeostrophicTools::nlist(const int maxNug, const int maxnl)
+{
+   if (2 * maxNug + 1 > maxnl - 1)
+   {
+      throw std::logic_error("L truncation is not enough to capture all "
+                             "geostrophic modes required");
+   }
+
+   ArrayI nli = ArrayI::Constant(maxnl, 0);
+
+   for (int l = 0; l < maxnl; l++)
+   {
+      if (l % 2 == 0)
+      {
+         nli[l] = -1;
+      }
+   }
+
+   for (int k = 0; k <= maxNug; k++)
+   {
+      nli(2 * k + 1) = maxNug - k;
+   }
+
+   return nli;
+}
+
 } // namespace details
 } // namespace Worland
 } // namespace DenseSM

@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "DenseSM/Worland/IEmbeddedOperator.hpp"
+#include "DenseSM/IMatrixSMOperator.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "Types/Typedefs.hpp"
 
@@ -26,7 +26,7 @@ namespace Worland {
  * @brief Implementation of the projection operator from the toroidal scalar to
  * the geostrophic basis
  */
-class Tor2GridS : public IEmbeddedOperator
+class Tor2GridS : public IMatrixSMOperator
 {
 public:
    /**
@@ -34,19 +34,14 @@ public:
     *
     * @param nN      Number of radial modes
     * @param nL      Number of harmonic degrees
-    * @param nS      Number of cylindrical s modes
-    * @param nZ      Number of z grid points
-    * @param maxNug  Maximum truncation for geostrophic flow
-    * @param nli     Radial truncation nN(l)
     * @param nCpu    Number of CPU in MPI version
     * @param alpha   Jacobi alpha
     * @param beta    Jacobi beta
-    * @param isGenericBasis   Is special geostrophic basis (ie. Li et al)
+    * @param isGenericBasis   Is generic Worland basis (ie. Li et al)
     * @param alphaB  Jacobi alpha
     * @param betaB   Jacobi beta
     */
-   Tor2GridS(const int nN, const int nL, const int nS, const int nZ,
-      const int maxNug, const ArrayI& nli, const int nCpu, const Scalar_t alpha,
+   Tor2GridS(const int nN, const int nL, const int nCpu, const Scalar_t alpha,
       const Scalar_t beta, const bool isGenericBasis, const Scalar_t alphaB,
       const Scalar_t betaB, const bool isTriangular);
 
@@ -77,26 +72,6 @@ protected:
    const int mNl;
 
    /**
-    * @brief Number of cylindrical modes
-    */
-   const int mNs;
-
-   /**
-    * @brief Number of z grid points
-    */
-   const int mNz;
-
-   /**
-    * @brief Number of geostrophic modes
-    */
-   const int mNnug;
-
-   /**
-    * @brief List of radial truncations
-    */
-   ArrayI mNlist;
-
-   /**
     * @brief Number of CPU
     */
    const int mNcpu;
@@ -123,6 +98,9 @@ protected:
     */
    Scalar_t mBetaB;
 
+   /**
+    * @brief Uses triangular truncation?
+    */
    bool mIsTriangular;
 
 private:

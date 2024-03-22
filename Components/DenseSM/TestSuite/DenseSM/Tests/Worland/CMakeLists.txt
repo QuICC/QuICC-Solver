@@ -90,6 +90,74 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+# Create Tor2Geostrophic
+set(_tests
+  Tor2Geostrophic:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 11 11
+  MPULP 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Tor2EGeostrophic
+set(_tests
+  Tor2EGeostrophic:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 11 11
+  MPULP 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Tor2GridS
+set(_tests
+  Tor2GridS:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 11 11
+  MPULP 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Tor2Weights
+set(_tests
+  Tor2Weights:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 11 11
+  MPULP 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1
+    ULPS ${_ulp}
+  )
+endforeach()
+
 # Create tests for ProjFitEnergyR2 with Chebyshev type basis
 set(_tests
   ProjFitEnergyR2:dense

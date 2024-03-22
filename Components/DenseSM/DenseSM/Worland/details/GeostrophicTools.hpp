@@ -68,6 +68,54 @@ public:
    static void integrateZ(int l, int n, Internal::Matrix& iintgz,
       Internal::Array& igrids, Internal::Array& igridz,
       Internal::Array& iweightz);
+
+   /**
+    * @brief Cylindrical truncation nUg
+    *
+    * @param nL            Number of harmonic degrees
+    * @param isTriangular  Use triangular truncation
+    */
+   static int cylTruncNug(const int nL, const bool isTriangular);
+
+   /**
+    * @brief Cylindrical uniform truncation nUg
+    *
+    * @param nN            Number of radial modes
+    * @param nL            Number of harmonic degrees
+    */
+   static int cylTruncNugC(const int nN, const int nL);
+
+   /**
+    * @brief Cylindrical truncation nS
+    *
+    * @param nr            Number of radial modes
+    * @param nL            Number of harmonic degrees
+    * @param isTriangular  Use triangular truncation
+    */
+   static int cylTruncNs(const int nr, const int nL, const bool isTriangular);
+
+   /**
+    * @brief Cylindrical truncation nZ
+    *
+    * @param nr            Number of radial modes
+    * @param nL            Number of harmonic degrees
+    * @param isTriangular  Use triangular truncation
+    */
+   static int cylTruncNz(const int nr, const int nL, const bool isTriangular);
+
+   /**
+    * @brief Cylindrical truncation nR
+    *
+    * @param nL            Number of harmonic degrees
+    * @param isTriangular  Use triangular truncation
+    */
+   static int cylTruncNr(const int nL, const bool isTriangular);
+
+   /**
+    * @brief list of maximum relevant radial basis for projection conversion
+    * between geostrophic and toroidal modes
+    */
+   static ArrayI nlist(const int nug, const int maxnl);
 };
 
 } // namespace details

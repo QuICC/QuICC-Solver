@@ -24,6 +24,10 @@
 #include "DenseSM/Worland/Geostrophic2Tor.hpp"
 #include "DenseSM/Worland/PyGeostrophic2Tor.hpp"
 #include "DenseSM/Worland/GeostrophicAngularMomentum.hpp"
+#include "DenseSM/Worland/Tor2Geostrophic.hpp"
+#include "DenseSM/Worland/Tor2EGeostrophic.hpp"
+#include "DenseSM/Worland/Tor2GridS.hpp"
+#include "DenseSM/Worland/Tor2Weights.hpp"
 #include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
@@ -185,6 +189,84 @@ namespace Worland {
          int nr = (maxnl - 3)/2 + 1;
 
          TOp op(ugAlpha, ugDBeta, nr, a, b, 0);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_same_v<dsm::Tor2Geostrophic, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         assert(meta.size() == 6);
+
+         int nN = meta(0) + 1;
+         int nL = meta(1) + 1;
+         auto ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         bool isGenericBasis = static_cast<bool>(meta(4));
+         bool isTriangular = static_cast<bool>(meta(5));
+
+         int nCpu = QuICCEnv().size();
+         TOp op(nN, nL, nCpu, ugAlpha, ugBeta, isGenericBasis, isTriangular);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_same_v<dsm::Tor2EGeostrophic, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         assert(meta.size() == 8);
+
+         int nN = meta(0) + 1;
+         int nL = meta(1) + 1;
+         auto ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         bool isGenericBasis = static_cast<bool>(meta(4));
+         auto alphaB = static_cast<QuICC::Internal::MHDFloat>(meta(5));
+         auto betaB = static_cast<QuICC::Internal::MHDFloat>(meta(6));
+         bool isTriangular = static_cast<bool>(meta(7));
+
+         int nCpu = QuICCEnv().size();
+         TOp op(nN, nL, nCpu, ugAlpha, ugBeta, isGenericBasis, alphaB, betaB, isTriangular);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_same_v<dsm::Tor2GridS, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         assert(meta.size() == 8);
+
+         int nN = meta(0) + 1;
+         int nL = meta(1) + 1;
+         auto ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         bool isGenericBasis = static_cast<bool>(meta(4));
+         auto alphaB = static_cast<QuICC::Internal::MHDFloat>(meta(5));
+         auto betaB = static_cast<QuICC::Internal::MHDFloat>(meta(6));
+         bool isTriangular = static_cast<bool>(meta(7));
+
+         int nCpu = QuICCEnv().size();
+         TOp op(nN, nL, nCpu, ugAlpha, ugBeta, isGenericBasis, alphaB, betaB, isTriangular);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_same_v<dsm::Tor2Weights, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         assert(meta.size() == 5);
+
+         int nN = meta(0) + 1;
+         int nL = meta(1) + 1;
+         auto alpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto beta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         bool isTriangular = static_cast<bool>(meta(4));
+
+         TOp op(nN, nL, alpha, beta, isTriangular);
 
          outData = op.mat();
       }

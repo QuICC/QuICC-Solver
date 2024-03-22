@@ -14,11 +14,9 @@
 // Project includes
 //
 #include "DenseSM/Worland/details/GeostrophicTools.hpp"
-#include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Polynomial/Quadrature/JacobiRule.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
-#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "Tor2EGeostrophic.hpp"
 #include "Types/Internal/Literals.hpp"
@@ -30,17 +28,12 @@ namespace DenseSM {
 
 namespace Worland {
 
-Tor2EGeostrophic::Tor2EGeostrophic(const int nN, const int nL, const int nS,
-   const int nZ, const int nNug, const ArrayI& nli, const int nCpu,
+Tor2EGeostrophic::Tor2EGeostrophic(const int nN, const int nL, const int nCpu,
    const Scalar_t alpha, const Scalar_t beta, const bool isGenericBasis,
    const Scalar_t alphaB, const Scalar_t betaB, const bool isTriangular) :
-    IEmbeddedOperator(nL * nN, nNug, -0.5, -0.5),
+    IMatrixSMOperator(nN, nL * nN),
     mNn(nN),
     mNl(nL),
-    mNs(nS),
-    mNz(nZ),
-    mNnug(nNug),
-    mNlist(nli),
     mNcpu(nCpu),
     mUgAlpha(alpha),
     mUgBeta(beta),
@@ -56,10 +49,18 @@ void Tor2EGeostrophic::buildOpImpl(Internal::Matrix& mat, const int rows,
    using namespace Internal::Literals;
    const auto& nN = this->mNn;
    const auto& nL = this->mNl;
-   const auto& nli = this->mNlist;
-   const auto& nS = this->mNs;
-   const auto& nZ = this->mNz;
-   const auto& nNug = this->mNnug;
+   const auto nS = details::GeostrophicTools::cylTruncNs(nN, nL, this->mIsTriangular);
+   const auto nZ = details::GeostrophicTools::cylTruncNz(nN, nL, this->mIsTriangular);
+   int nNug;
+   if(this->mIsTriangular)
+   {
+      nNug = details::GeostrophicTools::cylTruncNug(nL, this->mIsTriangular) + 1;
+   }
+   else
+   {
+      nNug = details::GeostrophicTools::cylTruncNugC(nN, nL);
+   }
+   const auto nli = details::GeostrophicTools::nlist(nNug-1, nL);
    const auto& nCpu = this->mNcpu;
    const auto& alpha = this->mUgAlpha;
    const auto& beta = this->mUgBeta;
@@ -68,12 +69,6 @@ void Tor2EGeostrophic::buildOpImpl(Internal::Matrix& mat, const int rows,
 
    Internal::Array igridz;
    Internal::Array iweightz;
-   if (QuICCEnv().id() == 0)
-   {
-      DebuggerMacro_showValue("nz is ", 1, nZ);
-      DebuggerMacro_showValue("ns is ", 1, nS);
-      DebuggerMacro_showValue("nug is ", 1, nNug);
-   }
    details::GeostrophicTools::computeQuadratureZ(igridz, iweightz, nZ);
 
    // compute Gauss-Jacobi quadrature in x
