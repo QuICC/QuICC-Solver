@@ -11,6 +11,7 @@
 
 // Project includes
 //
+#include "QuICC/QuICCEnv.hpp"
 #include "Geostrophic2Tor.hpp"
 #include "DenseSM/Worland/details/GeostrophicTools.hpp"
 #include "Types/Internal/Math.hpp"
@@ -28,13 +29,13 @@ namespace DenseSM {
 
 namespace Worland {
 
-   Geostrophic2Tor::Geostrophic2Tor(const int nN, const int nL, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool isTriangular)
-      : IGeostrophicOperator(ugAlpha, ugBeta, isGenericBasis, nL*nN, nN), mNn(nN), mNl(nL), mNidx(nIdx), mIsTriangular(isTriangular)
+   Geostrophic2Tor::Geostrophic2Tor(const int nN, const int nL, const int nCpu, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool isTriangular)
+      : IGeostrophicOperator(ugAlpha, ugBeta, isGenericBasis, nL*nN, nN), mNn(nN), mNl(nL), mNcpu(nCpu), mIsTriangular(isTriangular)
    {
    }
 
-   Geostrophic2Tor::Geostrophic2Tor(const int nN, const int nL, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool isTriangular, const Scalar_t alpha, const Scalar_t dBeta)
-      : IGeostrophicOperator(ugAlpha, ugBeta, isGenericBasis, nL*nN, nN, alpha, dBeta), mNn(nN), mNl(nL), mNidx(nIdx), mIsTriangular(isTriangular)
+   Geostrophic2Tor::Geostrophic2Tor(const int nN, const int nL, const int nCpu, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool isTriangular, const Scalar_t alpha, const Scalar_t dBeta)
+      : IGeostrophicOperator(ugAlpha, ugBeta, isGenericBasis, nL*nN, nN, alpha, dBeta), mNn(nN), mNl(nL), mNcpu(nCpu), mIsTriangular(isTriangular)
    {
    }
 
@@ -52,8 +53,19 @@ namespace Worland {
       {
          nNug = details::GeostrophicTools::cylTruncNugC(nN, nL);
       }
+
+      // Create truncation list
       const auto nli = details::GeostrophicTools::nlist(nNug - 1, nL);
-      const auto& nIdx = this->mNidx;
+
+      // Create index list
+      std::vector<int> nIdx;
+      for (int n = 0; n < nNug; n++)
+      {
+         if (QuICCEnv().id() == n % this->mNcpu)
+         {
+            nIdx.push_back(n);
+         }
+      }
 
       // Select Worland type and create quadrature grid and weights
       Scalar_t alpha, dBeta;
@@ -170,6 +182,11 @@ namespace Worland {
             }
          }
       }
+
+#if defined QUICC_MPI
+      MPI_Allreduce(MPI_IN_PLACE, this->mGeo2Tor.data(), this->mGeo2Tor.size(),
+         MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+#endif
    }
 
 } // Worland

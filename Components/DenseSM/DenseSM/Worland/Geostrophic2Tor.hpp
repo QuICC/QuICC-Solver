@@ -30,22 +30,28 @@ namespace Worland {
          /**
           * @brief Constructor with default Worland basis
           *
+          * @param nN      Number of radial modes
+          * @param nL      Number of harmonic degrees
+          * @param nCpu    Number of CPU in MPI version
           * @param ugAlph  Geostrophic basis Jacobi alpha
           * @param ugBeta  Geostrophic basis Jacobi beta
           * @param isGenericBasis   Use generic Worland basis a geostrophic basis?
           */
-         Geostrophic2Tor(const int nN, const int nL, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool mIsTriangular);
+         Geostrophic2Tor(const int nN, const int nL, const int nCpu, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool mIsTriangular);
 
          /**
           * @brief Constructor
           *
+          * @param nN      Number of radial modes
+          * @param nL      Number of harmonic degrees
+          * @param nCpu    Number of CPU in MPI version
           * @param ugAlpha Geostrophic basis Jacobi alpha
           * @param ugBeta  Geostrophic basis Jacobi beta
           * @param isGenericBasis   Use generic Worland basis a geostrophic basis?
           * @param alpha   Jacobi alpha
           * @param dBeta   Jacobi beta = l + dBeta
           */
-         Geostrophic2Tor(const int nN, const int nL, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool isTriangular, const Scalar_t alpha, const Scalar_t dBeta);
+         Geostrophic2Tor(const int nN, const int nL, const int nCpu, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool isTriangular, const Scalar_t alpha, const Scalar_t dBeta);
 
          /**
           * @brief Destructor
@@ -73,9 +79,9 @@ namespace Worland {
          const int mNl;
 
          /**
-          * @brief radial indexes
+          * @brief Number of CPU
           */
-         std::vector<int> mNidx;
+         const int mNcpu;
 
          /**
           * @brief Uses triangular truncation?
