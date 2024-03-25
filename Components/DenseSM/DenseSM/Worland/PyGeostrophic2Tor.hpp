@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "DenseSM/Worland/IEmbeddedOperator.hpp"
+#include "DenseSM/Worland/IWorlandOperator.hpp"
 
 namespace QuICC {
 
@@ -23,19 +23,19 @@ namespace Worland {
    /**
     * @brief Implementation of the projection operator from the geostrophic basis to Worland in Python
     */
-   class PyGeostrophic2Tor: public IEmbeddedOperator
+   class PyGeostrophic2Tor: public IWorlandOperator
    {
       public:
          /**
           * @brief Constructor
           *
-          * @param ugAlph  Geostrophic basis Jacobi alpha
-          * @param ugDBeta Geostrophic basis Jacobi beta = l + dBeta
+          * @param ugAlpha Geostrophic basis Jacobi alpha
+          * @param ugBeta  Geostrophic basis Jacobi beta
+          * @param isGenericBasis   Use generic Worland basis a geostrophic basis?
           * @param alpha   Jacobi alpha
           * @param dBeta   Jacobi beta = l + dBeta
-          * @param q       Truncation q (only consider rows - q equations)
           */
-         PyGeostrophic2Tor(const int nN, const int maxnl, const int nR, const int maxNug, const ArrayI& nli, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugDBeta, const Scalar_t alpha, const Scalar_t dBeta, const int q = 0);
+         PyGeostrophic2Tor(const int nN, const int nL, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const Scalar_t alpha, const Scalar_t dBeta, const bool isTriangular);
 
          /**
           * @brief Destructor
@@ -60,27 +60,17 @@ namespace Worland {
          /**
           * @brief Max harmonics
           */
-         const int mMaxnl;
-
-         /**
-          * @brief radial grid size
-          */
-         const int mNr;
-
-         /**
-          * @brief Max geostrophic truncation
-          */
-         const int mMaxNug;
-
-         /**
-          * @brief List of radial truncations
-          */
-         ArrayI mNlist;
+         const int mNl;
 
          /**
           * @brief radial indexes
           */
          std::vector<int> mNidx;
+
+         /**
+          * @brief Uses triangular truncation?
+          */
+         const bool mIsTriangular;
 
       private:
          /**

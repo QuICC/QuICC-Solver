@@ -51,7 +51,7 @@ void Tor2GridS::buildOpImpl(Internal::Matrix& mat, const int rows,
    int nNug;
    if(this->mIsTriangular)
    {
-      nNug = details::GeostrophicTools::cylTruncNug(nL, this->mIsTriangular) + 1;
+      nNug = details::GeostrophicTools::cylTruncNug(nL, this->mIsTriangular);
    }
    else
    {

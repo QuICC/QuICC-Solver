@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "Types/Internal/Typedefs.hpp"
-#include "DenseSM/Worland/IEmbeddedOperator.hpp"
+#include "DenseSM/Worland/IWorlandOperator.hpp"
 
 namespace QuICC {
 
@@ -23,21 +23,32 @@ namespace Worland {
    /**
     * @brief Implementation of the base for geostrophic basis operator
     */
-   class IGeostrophicOperator: public IEmbeddedOperator
+   class IGeostrophicOperator: public IWorlandOperator
    {
       public:
+         /**
+          * @brief Constructor with default Worland basis
+          *
+          * @param ugAlph  Geostrophic basis Jacobi alpha
+          * @param ugBeta  Geostrophic basis Jacobi beta
+          * @param isGenericBasis   Use generic Worland as geostrophic basis
+          * @param rows    Number of row
+          * @param cols    Number of cols
+          */
+         IGeostrophicOperator(const Scalar_t ugAlpha, const Scalar_t ugBeta, bool isGenericBasis, const int rows, const int cols);
+
          /**
           * @brief Constructor
           *
           * @param ugAlph  Geostrophic basis Jacobi alpha
-          * @param ugDBeta Geostrophic basis Jacobi beta = l + dBeta
+          * @param ugBeta  Geostrophic basis Jacobi beta
+          * @param isGenericBasis   Use generic Worland as geostrophic basis
           * @param rows    Number of row
           * @param cols    Number of cols
-          * @param alpha   Jacobi alpha
-          * @param dBeta   Jacobi beta = l + dBeta
-          * @param q       Truncation q (only consider rows - q equations)
+          * @param alpha   Worland Jacobi alpha
+          * @param dBeta   Worland Jacobi beta = l + dBeta
           */
-         IGeostrophicOperator(const Scalar_t ugAlpha, const Scalar_t ugDBeta, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int q = 0);
+         IGeostrophicOperator(const Scalar_t ugAlpha, const Scalar_t ugBeta, bool isGenericBasis, const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta);
 
          /**
           * @brief Destructor
@@ -46,24 +57,19 @@ namespace Worland {
 
       protected:
          /**
-          * @brief Is Ug basis?
-          */
-         bool isUgBasis() const;
-
-         /**
-          * @brief alpha and beta parameter of Ug basis?
-          */
-         bool isUgBasis(const Scalar_t a, const Scalar_t b) const;
-
-         /**
           * @brief Geostrophic alpha
           */
-         Scalar_t mcUgAlpha;
+         const Scalar_t mcUgAlpha;
 
          /**
-          * @brief Geostrophic dBeta: beta = l + dbeta
+          * @brief Geostrophic beta
           */
-         Scalar_t mcUgDBeta;
+         const Scalar_t mcUgBeta;
+
+         /**
+          * @brief Use generic Worland basis for Geostrophic basis?
+          */
+         const bool mcIsGenericBasis;
 
       private:
    };

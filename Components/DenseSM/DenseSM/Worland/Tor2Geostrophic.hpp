@@ -83,6 +83,9 @@ protected:
     */
    Scalar_t mUgBeta;
 
+   /**
+    * @brief Use generic Worland basis as Geostrophic basis?
+    */
    const bool mIsGenericBasis;
 
    bool mIsTriangular;

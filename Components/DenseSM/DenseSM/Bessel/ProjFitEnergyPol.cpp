@@ -24,7 +24,7 @@ namespace DenseSM {
 namespace Bessel {
 
    ProjFitEnergyPol::ProjFitEnergyPol(const int outRows, const std::size_t bcId, const int rows, const int cols, const int l)
-      : IEmbeddedSMOperator(rows, cols), mOutRows(outRows), mL(l), mBcId(bcId)
+      : IMatrixSMOperator(rows, cols), mOutRows(outRows), mL(l), mBcId(bcId)
    {
    }
 

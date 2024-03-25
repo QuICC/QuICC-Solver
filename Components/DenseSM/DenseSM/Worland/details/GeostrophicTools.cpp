@@ -146,7 +146,9 @@ Internal::MHDFloat GeostrophicTools::Cnab(const int n,
 
    Internal::MHDFloat dn = static_cast<Internal::MHDFloat>(n);
    Internal::MHDFloat ret =
-      Internal::Math::sqrt((2_mp * (2_mp * dn + a + b + 1_mp))) *
+      Internal::Math::sqrt(
+            (2_mp * (2_mp * dn + a + b + 1_mp))
+            ) *
       Internal::Math::exp(0.5_mp * (Internal::Math::lgamma(dn + a + b + 1_mp) +
                                       Internal::Math::lgamma(dn + 1_mp) -
                                       Internal::Math::lgamma(dn + a + 1_mp) -
@@ -245,11 +247,11 @@ int GeostrophicTools::cylTruncNug(const int nL, const bool isTriangular)
    int nN;
    if (isTriangular)
    {
-      nN = int(((nL - 2) - (nL - 2) % 2) / 2);
+      nN = int(((nL - 2) - (nL - 2) % 2) / 2) + 1;
    }
    else
    {
-      nN = int(((nL - 2) - (nL - 2) % 2) / 2);
+      nN = int(((nL - 2) - (nL - 2) % 2) / 2) + 1;
    }
 
    return nN;

@@ -13,7 +13,7 @@
 //
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Typedefs.hpp"
-#include "DenseSM/IEmbeddedSMOperator.hpp"
+#include "DenseSM/IMatrixSMOperator.hpp"
 
 namespace QuICC {
 
@@ -24,7 +24,7 @@ namespace Bessel {
    /**
     * @brief Implementation of the full sphere Bessel Coriolis cross term acting on l+1
     */
-   class CoriolisQp: public IEmbeddedSMOperator
+   class CoriolisQp: public IMatrixSMOperator
    {
       public:
          /**

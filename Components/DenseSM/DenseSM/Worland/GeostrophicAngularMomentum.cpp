@@ -21,8 +21,13 @@ namespace DenseSM {
 
 namespace Worland {
 
-   GeostrophicAngularMomentum::GeostrophicAngularMomentum(const Scalar_t ugAlpha, const Scalar_t ugDBeta, const int nR, const Scalar_t alpha, const Scalar_t dBeta, const int q)
-      : IGeostrophicOperator(ugAlpha, ugDBeta, nR, 1, alpha, dBeta, q)
+   GeostrophicAngularMomentum::GeostrophicAngularMomentum(const Scalar_t ugAlpha, const Scalar_t ugDBeta, const bool isGenericBasis, const int nR)
+      : IGeostrophicOperator(ugAlpha, ugDBeta, isGenericBasis, nR, 1)
+   {
+   }
+
+   GeostrophicAngularMomentum::GeostrophicAngularMomentum(const Scalar_t ugAlpha, const Scalar_t ugDBeta, const bool isGenericBasis, const int nR, const Scalar_t alpha, const Scalar_t dBeta)
+      : IGeostrophicOperator(ugAlpha, ugDBeta, isGenericBasis, nR, 1, alpha, dBeta)
    {
    }
 
@@ -36,10 +41,10 @@ namespace Worland {
    {
       mat = Internal::Matrix::Zero(rows, 1);
 
-      if(this->isUgBasis(this->mcUgAlpha, this->mcUgDBeta))
+      if(this->mcIsGenericBasis)
       {
-         const auto a = this->mcUgAlpha;
-         const auto b = this->mcUgDBeta + MHD_MP(1);
+         const auto& a = this->mcUgAlpha;
+         const auto& b = this->mcUgBeta;
          const int nr = rows + 1;
          Internal::Array angMom = Internal::Array::Zero(nr);
 

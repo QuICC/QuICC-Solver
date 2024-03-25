@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "DenseSM/IEmbeddedSMOperator.hpp"
+#include "DenseSM/IMatrixSMOperator.hpp"
 
 namespace QuICC {
 
@@ -23,7 +23,7 @@ namespace Bessel {
    /**
     * @brief Implementation of the full sphere Bessel projection operator onto best energy fit for poloidal scalar
     */
-   class ProjFitEnergyPol: public IEmbeddedSMOperator
+   class ProjFitEnergyPol: public IMatrixSMOperator
    {
       public:
          /**

@@ -15,7 +15,7 @@
 
 // Project includes
 //
-#include "DenseSM/Worland/IEmbeddedOperator.hpp"
+#include "DenseSM/Worland/IWorlandOperator.hpp"
 #include "Types/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "QuICC/QuICCEnv.hpp"
@@ -28,6 +28,7 @@
 #include "DenseSM/Worland/Tor2EGeostrophic.hpp"
 #include "DenseSM/Worland/Tor2GridS.hpp"
 #include "DenseSM/Worland/Tor2Weights.hpp"
+#include "DenseSM/Worland/details/GeostrophicTools.hpp"
 #include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
@@ -126,46 +127,39 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size() == 6);
+         if(meta.size() != 8)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
 
          int nN = meta(0) + 1;
-         int maxnl = meta(1) + 1;
+         int nL = meta(1) + 1;
          QuICC::Internal::MHDFloat ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
-         QuICC::Internal::MHDFloat ugDBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
-         auto a = static_cast<QuICC::Internal::MHDFloat>(meta(4));
-         auto b = static_cast<QuICC::Internal::MHDFloat>(meta(5));
+         QuICC::Internal::MHDFloat ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         bool isGeneric = static_cast<bool>(meta(4));
+         auto a = static_cast<QuICC::Internal::MHDFloat>(meta(5));
+         auto b = static_cast<QuICC::Internal::MHDFloat>(meta(6));
+         bool isTriangular = static_cast<bool>(meta(7));
 
-         int nR = int(((maxnl + 1) - (maxnl + 1) % 2) / 2 + 2) + 1;
-         int maxNug = int(((maxnl - 2) - (maxnl - 2) % 2) / 2);
-         int& nug = maxNug;
-         QuICC::ArrayI nli;
-         if (2 * nug + 1 > maxnl - 1)
+         int nNug;
+         if (isTriangular)
          {
-            throw std::logic_error("L truncation is not enough to capture all geostrophic modes required");
+            nNug = QuICC::DenseSM::Worland::details::GeostrophicTools::cylTruncNug(nL, isTriangular);
          }
-
-         nli.resize(maxnl);
-         nli.setConstant(0);
-
-         for(int l = 0; l < maxnl; l++)
+         else
          {
-            if(l % 2 == 0) nli(l) = -1;
-         }
-
-         for(int k = 0; k <= nug; k++)
-         {
-            nli(2*k+1) = nug - k;
+            nNug = QuICC::DenseSM::Worland::details::GeostrophicTools::cylTruncNugC(nL, isTriangular);
          }
 
          std::vector<int> nIdx;
-         for(int n = 0; n < maxNug+1; n++)
+         for(int n = 0; n < nNug+1; n++)
          {
             if(QuICC::QuICCEnv().id() == n%QuICCEnv().size())
             {
                nIdx.push_back(n);
             }
          }
-         TOp op(nN, maxnl, nR, maxNug, nli, nIdx, ugAlpha, ugDBeta, a, b, 0);
+         TOp op(nN, nL, nIdx, ugAlpha, ugBeta, isGeneric, a, b, isTriangular);
 
          outData = op.mat();
 
@@ -178,7 +172,10 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size() == 6);
+         if(meta.size() != 6)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
 
          int maxnl = meta(1) + 1;
          QuICC::Internal::MHDFloat ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
@@ -197,7 +194,10 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size() == 6);
+         if(meta.size() != 6)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
 
          int nN = meta(0) + 1;
          int nL = meta(1) + 1;
@@ -216,7 +216,10 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size() == 8);
+         if(meta.size() != 8)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
 
          int nN = meta(0) + 1;
          int nL = meta(1) + 1;
@@ -237,7 +240,10 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size() == 8);
+         if(meta.size() != 8)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
 
          int nN = meta(0) + 1;
          int nL = meta(1) + 1;
@@ -258,7 +264,10 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size() == 5);
+         if(meta.size() != 5)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
 
          int nN = meta(0) + 1;
          int nL = meta(1) + 1;
@@ -270,12 +279,15 @@ namespace Worland {
 
          outData = op.mat();
       }
-      else if constexpr(std::is_base_of_v<dsm::IEmbeddedOperator, TOp>)
+      else if constexpr(std::is_base_of_v<dsm::IWorlandOperator, TOp>)
       {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         assert(meta.size() == 6);
+         if(meta.size() != 6)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
 
          int outRows = meta(0) + 1;
          int bc = static_cast<int>(meta(1));

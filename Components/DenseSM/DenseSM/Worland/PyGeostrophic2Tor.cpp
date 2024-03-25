@@ -12,6 +12,7 @@
 // Project includes
 //
 #include "PyGeostrophic2Tor.hpp"
+#include "DenseSM/Worland/details/GeostrophicTools.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/PyQuICC/CoreWrapper.hpp"
 #include "QuICC/PyQuICC/Tools.hpp"
@@ -22,8 +23,8 @@ namespace DenseSM {
 
 namespace Worland {
 
-   PyGeostrophic2Tor::PyGeostrophic2Tor(const int nN, const int maxnl, const int nR, const int maxNug, const ArrayI& nli, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugDBeta, const Scalar_t alpha, const Scalar_t dBeta, const int q)
-      : IEmbeddedOperator(maxnl*nN, maxNug+1, alpha, dBeta), mNn(nN), mMaxnl(maxnl), mNr(nR), mMaxNug(maxNug), mNlist(nli), mNidx(nIdx)
+   PyGeostrophic2Tor::PyGeostrophic2Tor(const int nN, const int nL, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const Scalar_t alpha, const Scalar_t dBeta, const bool isTriangular)
+      : IWorlandOperator(nL*nN, nN, alpha, dBeta), mNn(nN), mNl(nL), mNidx(nIdx), mIsTriangular(isTriangular)
    {
       PyQuICC::CoreWrapper::init();
       PyQuICC::CoreWrapper::import("quicc_solver.model.boussinesq.sphere.modifiedtaylor.linear.helper");
@@ -57,16 +58,26 @@ namespace Worland {
    void PyGeostrophic2Tor::buildChebyshevOp(Internal::Matrix& mat, const int rows, const int cols) const
    {
       const auto& nN = this->mNn;
-      const auto& maxnl = this->mMaxnl;
-      const auto& maxNug = this->mMaxNug;
+      const auto& nL = this->mNl;
+      const auto& nR = DenseSM::Worland::details::GeostrophicTools::cylTruncNr(nL, this->mIsTriangular);
+      int nNug;
+      if(this->mIsTriangular)
+      {
+         nNug = details::GeostrophicTools::cylTruncNug(nL, this->mIsTriangular);
+      }
+      else
+      {
+         nNug = details::GeostrophicTools::cylTruncNugC(nN, nL);
+      }
+      const auto nli = details::GeostrophicTools::nlist(nNug - 1, nL);
       const auto& nIdx = this->mNidx;
 
       // Get simulation spectral resolution array
       ArrayI simRes(3);
-      simRes << nN, maxnl, maxnl;
+      simRes << nN, nL, nL;
 
-      Matrix pyMat = Matrix::Zero(nN*maxnl, maxNug+1);
-      Matrix tmp(nN*maxnl, maxNug+1);
+      Matrix pyMat = Matrix::Zero(nN*nL, nNug);
+      Matrix tmp(nN*nL, nNug);
       for(int n: nIdx)
       {
          // Prepare Python call arguments

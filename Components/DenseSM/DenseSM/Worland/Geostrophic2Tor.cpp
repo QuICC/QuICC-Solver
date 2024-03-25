@@ -14,11 +14,8 @@
 #include "Geostrophic2Tor.hpp"
 #include "DenseSM/Worland/details/GeostrophicTools.hpp"
 #include "Types/Internal/Math.hpp"
+#include "Types/Internal/Literals.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandChebyshevRule.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandLegendreRule.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandCylEnergyRule.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandSphEnergyRule.hpp"
 #include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
@@ -31,18 +28,31 @@ namespace DenseSM {
 
 namespace Worland {
 
-   Geostrophic2Tor::Geostrophic2Tor(const int nN, const int maxnl, const int nR, const int maxNug, const ArrayI& nli, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugDBeta, const Scalar_t alpha, const Scalar_t dBeta, const int q)
-      : IGeostrophicOperator(ugAlpha, ugDBeta, maxnl*nN, maxNug+1, alpha, dBeta, q), mNn(nN), mMaxnl(maxnl), mNr(nR), mMaxNug(maxNug), mNlist(nli), mNidx(nIdx)
+   Geostrophic2Tor::Geostrophic2Tor(const int nN, const int nL, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool isTriangular)
+      : IGeostrophicOperator(ugAlpha, ugBeta, isGenericBasis, nL*nN, nN), mNn(nN), mNl(nL), mNidx(nIdx), mIsTriangular(isTriangular)
+   {
+   }
+
+   Geostrophic2Tor::Geostrophic2Tor(const int nN, const int nL, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool isTriangular, const Scalar_t alpha, const Scalar_t dBeta)
+      : IGeostrophicOperator(ugAlpha, ugBeta, isGenericBasis, nL*nN, nN, alpha, dBeta), mNn(nN), mNl(nL), mNidx(nIdx), mIsTriangular(isTriangular)
    {
    }
 
    void Geostrophic2Tor::buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const
    {
       const auto& nN = this->mNn;
-      const auto& maxnl = this->mMaxnl;
-      const auto& nR = this->mNr;
-      const auto& maxNug = this->mMaxNug;
-      const auto& nli = this->mNlist;
+      const auto& nL = this->mNl;
+      const auto& nR = DenseSM::Worland::details::GeostrophicTools::cylTruncNr(nL, this->mIsTriangular);
+      int nNug;
+      if(this->mIsTriangular)
+      {
+         nNug = details::GeostrophicTools::cylTruncNug(nL, this->mIsTriangular);
+      }
+      else
+      {
+         nNug = details::GeostrophicTools::cylTruncNugC(nN, nL);
+      }
+      const auto nli = details::GeostrophicTools::nlist(nNug - 1, nL);
       const auto& nIdx = this->mNidx;
 
       // Select Worland type and create quadrature grid and weights
@@ -87,10 +97,10 @@ namespace Worland {
 
       //
       // Build operator
-      mat = Internal::Matrix::Zero(maxnl*nN, maxNug+1);
+      mat = Internal::Matrix::Zero(nL*nN, nNug);
 
       std::map<int,Internal::Matrix> matP;
-      for(int l = 0; l < maxnl; l++)
+      for(int l = 0; l < nL; l++)
       {
          if(l % 2 == 1)
          {
@@ -103,7 +113,7 @@ namespace Worland {
       }
 
       // Create Legendre grid and weights
-      int nAlPoly = maxnl;
+      int nAlPoly = nL;
       int nTh = 3*(nAlPoly+1)/2;
       Internal::Array ialgrid, ialweights;
       Polynomial::Quadrature::LegendreRule lquad;
@@ -118,30 +128,22 @@ namespace Worland {
       invLaplh = (invLaplh.array()*(invLaplh.array() + 1.0)).pow(-1);
       invLaplh(0) = 0.0;
 
+      using namespace Internal::Literals;
       // Create basis for geostrophic flow (used with l = 1)
-      Internal::MHDFloat ugA;
-      Internal::MHDFloat ugDB;
-      if(this->isUgBasis(this->mcUgAlpha, this->mcUgDBeta))
+      const auto& ugA = this->mcUgAlpha;
+      const auto& ugB = this->mcUgBeta;
+      const auto ugDB = ugB - 1_mp;
+      if(this->mcIsGenericBasis)
       {
-         // Using \tilde{\Lambda}(s) basis
-         ugA = this->mcUgAlpha;
-         ugDB = this->mcUgDBeta;
          throw std::logic_error("General geostrophic basis is not implemented");
       }
-      else
-      {
-         // Using \Lambda(s) basis
-         ugA = MHD_MP(0.5);
-         ugDB = MHD_MP(0);
-      }
-      Internal::MHDFloat ugB = ugDB + MHD_MP(1);
       Polynomial::Worland::Wnl ugWnl(ugA, ugDB);
 
       Internal::Array iugGrid(ialgrid.size());
       for(int n_: nIdx)
       {
          // Normalization (includes 2\pi from Fourier)
-         Internal::MHDFloat scale = details::GeostrophicTools::Cn(n_)*(MHD_MP(2)*Internal::Math::PI)/details::GeostrophicTools::Cnab(n_, ugA, ugB);
+         Internal::MHDFloat scale = details::GeostrophicTools::Cn(n_)*(2_mp*Internal::Math::PI)/details::GeostrophicTools::Cnab(n_, ugA, ugB);
 
          // Convert geostrophic flow into 2D spherical flow (r, l)
          // (spectral theta, ignore phi direction)
@@ -157,7 +159,7 @@ namespace Worland {
 
             tPoly.row(tk) = -(invLaplh.asDiagonal()*(alOp.transpose()*(scale*ipoly.rightCols(1)))).transpose();
          }
-         for(int l = 0; l < std::min(2*n_+2, maxnl); l++)
+         for(int l = 0; l < std::min(2*n_+2, nL); l++)
          {
             if(l%2 == 1)
             {

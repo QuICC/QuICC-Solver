@@ -21,7 +21,7 @@
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
-#include "DenseSM/IEmbeddedSMOperator.hpp"
+#include "DenseSM/IMatrixSMOperator.hpp"
 #include "DenseSM/Bessel/CoriolisQm.hpp"
 #include "DenseSM/Bessel/CoriolisQp.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
@@ -131,7 +131,7 @@ namespace Bessel {
 
          outData = op.mat();
       }
-      else if constexpr(std::is_base_of_v<dsm::IEmbeddedSMOperator, TOp>)
+      else if constexpr(std::is_base_of_v<dsm::IMatrixSMOperator, TOp>)
       {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);

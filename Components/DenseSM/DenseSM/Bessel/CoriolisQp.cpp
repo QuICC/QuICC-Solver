@@ -23,7 +23,7 @@ namespace DenseSM {
 namespace Bessel {
 
    CoriolisQp::CoriolisQp(const Internal::MHDFloat outDNu, const Internal::MHDFloat inDNu, const int rows, const int cols, const int l)
-      : IEmbeddedSMOperator(rows, cols), mOutDNu(outDNu), mInDNu(inDNu), mL(l)
+      : IMatrixSMOperator(rows, cols), mOutDNu(outDNu), mInDNu(inDNu), mL(l)
    {
    }
 

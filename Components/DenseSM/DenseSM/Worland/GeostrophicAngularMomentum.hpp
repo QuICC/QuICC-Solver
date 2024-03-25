@@ -30,13 +30,19 @@ namespace Worland {
           * @brief Constructor
           *
           * @param ugAlph  Geostrophic basis Jacobi alpha
-          * @param ugDBeta Geostrophic basis Jacobi beta = l + dBeta
-          * @param rows    Number of row
+          * @param ugBeta Geostrophic basis Jacobi beta = l + dBeta
+          */
+         GeostrophicAngularMomentum(const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const int nR);
+
+         /**
+          * @brief Constructor
+          *
+          * @param ugAlph  Geostrophic basis Jacobi alpha
+          * @param ugBeta Geostrophic basis Jacobi beta = l + dBeta
           * @param alpha   Jacobi alpha
           * @param dBeta   Jacobi beta = l + dBeta
-          * @param q       Truncation q (only consider rows - q equations)
           */
-         GeostrophicAngularMomentum(const Scalar_t ugAlpha, const Scalar_t ugDBeta, const int nR, const Scalar_t alpha, const Scalar_t dBeta, const int q = 0);
+         GeostrophicAngularMomentum(const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const int nR, const Scalar_t alpha, const Scalar_t dBeta);
 
          /**
           * @brief Destructor

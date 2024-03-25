@@ -28,15 +28,24 @@ namespace Worland {
    {
       public:
          /**
-          * @brief Constructor
+          * @brief Constructor with default Worland basis
           *
           * @param ugAlph  Geostrophic basis Jacobi alpha
-          * @param ugDBeta Geostrophic basis Jacobi beta = l + dBeta
+          * @param ugBeta  Geostrophic basis Jacobi beta
+          * @param isGenericBasis   Use generic Worland basis a geostrophic basis?
+          */
+         Geostrophic2Tor(const int nN, const int nL, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool mIsTriangular);
+
+         /**
+          * @brief Constructor
+          *
+          * @param ugAlpha Geostrophic basis Jacobi alpha
+          * @param ugBeta  Geostrophic basis Jacobi beta
+          * @param isGenericBasis   Use generic Worland basis a geostrophic basis?
           * @param alpha   Jacobi alpha
           * @param dBeta   Jacobi beta = l + dBeta
-          * @param q       Truncation q (only consider rows - q equations)
           */
-         Geostrophic2Tor(const int nN, const int maxnl, const int nR, const int maxNug, const ArrayI& nli, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugDBeta, const Scalar_t alpha, const Scalar_t dBeta, const int q = 0);
+         Geostrophic2Tor(const int nN, const int nL, const std::vector<int>& nIdx, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool isTriangular, const Scalar_t alpha, const Scalar_t dBeta);
 
          /**
           * @brief Destructor
@@ -59,29 +68,19 @@ namespace Worland {
          const int mNn;
 
          /**
-          * @brief Max harmonics
+          * @brief Number of harmonic degrees
           */
-         const int mMaxnl;
-
-         /**
-          * @brief radial grid size
-          */
-         const int mNr;
-
-         /**
-          * @brief Max geostrophic truncation
-          */
-         const int mMaxNug;
-
-         /**
-          * @brief List of radial truncations
-          */
-         ArrayI mNlist;
+         const int mNl;
 
          /**
           * @brief radial indexes
           */
          std::vector<int> mNidx;
+
+         /**
+          * @brief Uses triangular truncation?
+          */
+         const bool mIsTriangular;
 
       private:
    };

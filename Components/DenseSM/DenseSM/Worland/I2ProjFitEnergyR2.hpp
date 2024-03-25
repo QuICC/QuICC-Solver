@@ -13,7 +13,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "DenseSM/Worland/IEmbeddedOperator.hpp"
+#include "DenseSM/Worland/IWorlandOperator.hpp"
 #include "DenseSM/Worland/ProjFitEnergyR2.hpp"
 
 namespace QuICC {
@@ -25,7 +25,7 @@ namespace Worland {
    /**
     * @brief Implementation of the full sphere Worland projection operator onto best energy fit with I2 quasi-inverse
     */
-   class I2ProjFitEnergyR2: public IEmbeddedOperator
+   class I2ProjFitEnergyR2: public IWorlandOperator
    {
       public:
          /**
