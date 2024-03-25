@@ -152,7 +152,7 @@ namespace Worland {
          }
 
          std::vector<int> nIdx;
-         for(int n = 0; n < nNug+1; n++)
+         for(int n = 0; n < nNug; n++)
          {
             if(QuICC::QuICCEnv().id() == n%QuICCEnv().size())
             {
