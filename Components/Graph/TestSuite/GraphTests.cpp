@@ -14,6 +14,7 @@
 #include <mlir/Dialect/Func/Extensions/AllExtensions.h>
 #include <mlir/IR/MLIRContext.h>
 #include <mlir/Parser/Parser.h>
+#include <mlir/Transforms/Passes.h>
 
 #include <mlir/Pass/PassManager.h>
 // #include <llvm/Support/CommandLine.h>
@@ -57,7 +58,7 @@ int main(int argc, char **argv)
   return returnCode;
 }
 
-TEST_CASE("Simple Tree", "[SimpleTree]")
+TEST_CASE("One Dimensional Loop", "[OneDimLoop]")
 {
   mlir::DialectRegistry registry;
   mlir::func::registerAllExtensions(registry);
@@ -138,7 +139,6 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
     assert(false && "JIT invocation failed");
   }
 
-
   // setup metadata
   constexpr std::size_t modsM = 6;
   constexpr std::size_t N = 3;
@@ -176,7 +176,7 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
     indices[1].data(), (std::uint32_t)indices[1].size(),
     modsOut.data(), (std::uint32_t)modsOut.size()};
 
-  // get operators and map
+  // get operators map
   auto thisArr = storeOp.getThisArr();
 
   // Apply graph
@@ -188,5 +188,149 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   {
     CHECK(modsOutView[m] == val);
   }
+
+}
+
+TEST_CASE("Simple Tree", "[SimpleTree]")
+{
+  mlir::DialectRegistry registry;
+  mlir::func::registerAllExtensions(registry);
+  // Add the following to include *all* MLIR Core dialects, or selectively
+  // include what you need like above. You only need to register dialects that
+  // will be *parsed* by the tool, not the one generated
+  registerAllDialects(registry);
+
+  mlir::MLIRContext ctx(registry);
+  // Load our Dialect in this MLIR Context.
+  ctx.loadDialect<mlir::quiccir::QuiccirDialect>();
+
+  // Load
+  mlir::OwningOpRef<mlir::ModuleOp> module;
+  std::string inputFilename = "./simple-tree.mlir";
+  // Otherwise, the input is '.mlir'.
+  llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
+      llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
+  if (std::error_code EC = fileOrErr.getError()) {
+    llvm::errs() << "Could not open input file: " << EC.message() << "\n";
+    CHECK(false);
+  }
+
+  // Parse the input mlir.
+  llvm::SourceMgr sourceMgr;
+  sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
+  module = mlir::parseSourceFile<mlir::ModuleOp>(sourceMgr, &ctx);
+
+  // Dump
+  module->dump();
+
+  // Inline and set view attributes
+  mlir::PassManager pmPre(&ctx);
+  pmPre.addPass(mlir::createInlinerPass());
+  std::array<std::array<std::string, 2>, 3> layOpt;
+  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
+  mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
+  nestedFuncPmPre.addPass(mlir::quiccir::createSetViewLayoutPass(layOpt));
+
+  if (mlir::failed(pmPre.run(*module))) {
+    CHECK(false);
+  }
+
+  // // setup ops map and store
+  // auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+  // QuICC::Graph::MapOps storeOp(*module, mem);
+
+  // // Top level (module) pass manager
+  // mlir::PassManager pm(&ctx);
+  // mlir::quiccir::quiccLibCallPipelineBuilder(pm);
+
+  // // Lower
+  // if (mlir::failed(pm.run(*module))) {
+  //   CHECK(false);
+  // }
+
+  // Dump
+  module->dump();
+
+  // // JIT
+
+  // // Initialize LLVM targets.
+  // llvm::InitializeNativeTarget();
+  // llvm::InitializeNativeTargetAsmPrinter();
+
+  // // Register the translation from MLIR to LLVM IR, which must happen before we
+  // // can JIT-compile.
+  // mlir::registerBuiltinDialectTranslation(*module->getContext());
+  // mlir::registerLLVMDialectTranslation(*module->getContext());
+
+  // // An optimization pipeline to use within the execution engine.
+  // auto optPipeline = mlir::makeOptimizingTransformer(
+  //     /*optLevel=*/0, /*sizeLevel=*/0,
+  //     /*targetMachine=*/nullptr);
+
+  // // Create an MLIR execution engine. The execution engine eagerly JIT-compiles
+  // // the module.
+  // mlir::ExecutionEngineOptions engineOptions;
+  // engineOptions.transformer = optPipeline;
+  // // engineOptions.sharedLibPaths = executionEngineLibs;
+  // auto maybeEngine = mlir::ExecutionEngine::create(*module, engineOptions);
+  // assert(maybeEngine && "failed to construct an execution engine");
+  // auto &engine = maybeEngine.get();
+
+  // // Invoke the JIT-compiled function.
+  // std::string symbol = "entry";
+  // auto funSym = engine->lookup(symbol);
+  // if (auto E = funSym.takeError()) {
+  //   assert(false && "JIT invocation failed");
+  // }
+
+  // // setup metadata
+  // constexpr std::size_t modsM = 6;
+  // constexpr std::size_t N = 3;
+  // constexpr std::size_t K = 5;
+  // std::array<std::uint32_t, 3> modsDimensions {modsM, N, K};
+
+  // std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+  // std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+
+  // // host mem block
+  // std::size_t modsS = modsM*indices[1].size();
+  // QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsS, mem.get());
+  // QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, mem.get());
+
+  // // host view
+  // using namespace QuICC::Graph;
+  // C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, modsDimensions, pointers, indices);
+  // C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, modsDimensions, pointers, indices);
+
+  // // set input modes
+  // std::complex<double> val = {1.0, 0.0};
+  // for(std::size_t m = 0; m < modsInView.size(); ++m)
+  // {
+  //   modsInView[m] = val;
+  // }
+
+  // // map input/output views
+  // using view3_cd_t = ViewDescriptor<std::complex<double>, std::uint32_t, 3>;
+  // view3_cd_t viewRef_in{{modsM, N, K},
+  //   pointers[1].data(), (std::uint32_t)pointers[1].size(),
+  //   indices[1].data(), (std::uint32_t)indices[1].size(),
+  //   modsIn.data(), (std::uint32_t)modsIn.size()};
+  // view3_cd_t viewRef_out{{modsM, N, K},
+  //   pointers[1].data(), (std::uint32_t)pointers[1].size(),
+  //   indices[1].data(), (std::uint32_t)indices[1].size(),
+  //   modsOut.data(), (std::uint32_t)modsOut.size()};
+
+  // // get operators map
+  // auto thisArr = storeOp.getThisArr();
+
+  // // Apply graph
+  // auto fun = (void (*)(void*, view3_cd_t*, view3_cd_t*))funSym.get();
+  // fun(thisArr.data(), &viewRef_out, &viewRef_in);
+
+  // // check
+  // for(std::size_t m = 0; m < modsOutView.size(); ++m)
+  // {
+  //   CHECK(modsOutView[m] == val);
+  // }
 
 }

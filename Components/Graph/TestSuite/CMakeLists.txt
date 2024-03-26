@@ -19,5 +19,5 @@ add_test(
     NAME GraphTest
     COMMAND GraphTest
     WORKING_DIRECTORY
-    "${QUICC_WORK_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}"
   )
