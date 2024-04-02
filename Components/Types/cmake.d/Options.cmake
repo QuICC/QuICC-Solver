@@ -12,7 +12,11 @@ if(QUICC_MULTPRECISION)
     message(FATAL_ERROR "find gmp/mpfr/quad library needs to be implemented")
   endif()
 
-  find_package(Boost REQUIRED)
+  include(QuICCFindBoostRequired)
+  quicc_find_boost_required()
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+    INTERFACE
+      Boost::headers)
 
   target_compile_definitions(${QUICC_CURRENT_COMPONENT_LIB}
     INTERFACE "-DQUICC_MULTPRECISION")
