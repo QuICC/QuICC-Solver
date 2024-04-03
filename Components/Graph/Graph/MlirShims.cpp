@@ -1,6 +1,7 @@
 #include <iostream>
-#include <Quiccir-c/Utils.h>
 #include <complex>
+#include <cassert>
+#include <Quiccir-c/Utils.h>
 
 #include "Graph/MlirShims.hpp"
 #include "Graph/BackendsMap.hpp"
@@ -14,6 +15,9 @@ using namespace QuICC::Graph;
 /// @param umod
 extern "C" void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_t* pUval, view3_cd_t* pUmod)
 {
+    assert(obj != nullptr);
+    assert(pUval != nullptr);
+    assert(pUmod != nullptr);
     // op
     using namespace QuICC::Transform::Fourier;
     using backend_t = QuICC::Graph::viewCpu_t;
@@ -43,6 +47,9 @@ extern "C" void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
 /// @param uval
 extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(void* obj, view3_cd_t* pUmod, view3_t* pUval)
 {
+    assert(obj != nullptr);
+    assert(pUval != nullptr);
+    assert(pUmod != nullptr);
     // op
     using namespace QuICC::Transform::Fourier;
     using backend_t = QuICC::Graph::viewCpu_t;
@@ -72,6 +79,9 @@ extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(void* obj, view3_
 /// @param umod
 extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
 {
+    assert(obj != nullptr);
+    assert(pUval != nullptr);
+    assert(pUmod != nullptr);
     // op
     using namespace QuICC::Transform::Quadrature;
     using Tin = C_S1CLCSC3D_t;
@@ -99,6 +109,9 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view
 /// @param umod
 extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
 {
+    assert(obj != nullptr);
+    assert(pUval != nullptr);
+    assert(pUmod != nullptr);
     // op
     using namespace QuICC::Transform::Quadrature;
     using Tin = C_DCCSC3D_t;
@@ -127,6 +140,10 @@ extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
 extern "C" void _ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
     view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
 {
+    assert(obj != nullptr);
+    assert(pRet != nullptr);
+    assert(pLhs != nullptr);
+    assert(pRhs != nullptr);
     // op
     using namespace QuICC::Pointwise::Cpu;
     using namespace QuICC::Pointwise;
@@ -154,6 +171,10 @@ extern "C" void _ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* ob
 extern "C" void _ciface_quiccir_sub_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
     view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
 {
+    assert(obj != nullptr);
+    assert(pRet != nullptr);
+    assert(pLhs != nullptr);
+    assert(pRhs != nullptr);
     // op
     using namespace QuICC::Pointwise::Cpu;
     using namespace QuICC::Pointwise;

@@ -29,6 +29,7 @@ using varOp_t = std::variant<
     // std::shared_ptr<NaryOp<R_VB_t, R_VB_t>>,
     std::shared_ptr<NaryOp<C_DCCSC3D_t, C_DCCSC3D_t>>,
     std::shared_ptr<NaryOp<R_DCCSC3D_t, R_DCCSC3D_t>>,
+    std::shared_ptr<NaryOp<C_DCCSC3D_t, C_S1CLCSC3D_t>>,
     // std::shared_ptr<NaryOp<R_VB_t, R_VB_t, R_VB_t>>,
     std::shared_ptr<NaryOp<C_DCCSC3D_t, C_DCCSC3D_t, C_DCCSC3D_t>>,
     std::shared_ptr<NaryOp<R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t>>,
@@ -63,9 +64,11 @@ MapOps::MapOps(mlir::ModuleOp module,
     using namespace mlir;
     Dialect *quiccirDialect = module->getContext()->getLoadedDialect("quiccir");
     mlir::WalkResult result = module->walk([&](mlir::Operation* op) {
+#ifndef NDEBUG
       if (op->getDialect() == quiccirDialect) {
-        llvm::outs() << op->getName() << '\n';
+        llvm::outs() << "visiting: " << op->getName() << '\n';
       }
+#endif
       if (auto frPrj = dyn_cast<mlir::quiccir::FrPOp>(op)) {
         using namespace QuICC::Transform::Fourier;
         using backend_t = QuICC::Graph::viewCpu_t;
@@ -82,7 +85,7 @@ MapOps::MapOps(mlir::ModuleOp module,
         if (index >= _thisArr.size()) {
           _thisArr.resize(index+1);
         }
-        auto* ptr = std::get<std::shared_ptr<UnaryOp<R_DCCSC3D_t, C_DCCSC3D_t>>>(_ops.back()).get();
+        auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
         assert(ptr != nullptr);
         _thisArr[index] = ptr;
 
@@ -103,7 +106,25 @@ MapOps::MapOps(mlir::ModuleOp module,
         if (index >= _thisArr.size()) {
           _thisArr.resize(index+1);
         }
-        auto* ptr = std::get<std::shared_ptr<UnaryOp<C_DCCSC3D_t, R_DCCSC3D_t>>>(_ops.back()).get();
+        auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+        assert(ptr != nullptr);
+        _thisArr[index] = ptr;
+
+      }
+      else if (auto alInt = dyn_cast<mlir::quiccir::AlIOp>(op)) {
+        using namespace QuICC::Transform::Quadrature;
+        using Tin = C_S1CLCSC3D_t;
+        using Tout = C_DCCSC3D_t;
+        using Top = QuICC::View::View<double, QuICC::View::CSL3DJIK>;
+        using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
+        using op_t = Op<Tout, Tin, Top, backend_t>;
+        _ops.push_back(std::make_unique<op_t>());
+        // get index from MLIR source
+        std::uint64_t index = alInt.getImplptr().value();
+        if (index >= _thisArr.size()) {
+          _thisArr.resize(index+1);
+        }
+        auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
         assert(ptr != nullptr);
         _thisArr[index] = ptr;
 
