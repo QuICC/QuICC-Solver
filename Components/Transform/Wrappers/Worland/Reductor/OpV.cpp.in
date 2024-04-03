@@ -83,8 +83,9 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
     using derivedPrj_t = Op<phys_t, mods_t, op_t, backendPrj_t>;
 
     auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
-    mPrj = std::make_unique<derivedPrj_t>(dimensionsPrj, layers, mem);
+    mPrj = std::make_unique<derivedPrj_t>(mem);
     derivedPrj_t& derivedPrjOp = dynamic_cast<derivedPrj_t&>(*mPrj);
+    derivedPrjOp.allocOp(dimensionsPrj, layers);
     auto prjView = derivedPrjOp.getOp();
 
     using namespace QuICC::Polynomial::Worland;

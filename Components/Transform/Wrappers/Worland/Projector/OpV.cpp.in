@@ -70,8 +70,9 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
         layers[p] = this->mspSetup->slow(p);
     }
 
-    mOp = std::make_unique<derived_t>(dimensions, layers, mem);
+    mOp = std::make_unique<derived_t>(mem);
     derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
+    derivedOp.allocOp(dimensions, layers);
     auto opView = derivedOp.getOp();
     using namespace QuICC::Polynomial::Worland;
     Builder<op_t, QuICC::DenseSM::Worland::@OpBuilder@, bwd_t> tBuilder;

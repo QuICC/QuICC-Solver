@@ -84,8 +84,9 @@ set(IntOp
     using backendInt_t = @BackendNamespace@::ImplOp<mods_t, phys_t, op_t>;
     using derivedInt_t = Op<mods_t, phys_t, op_t, backendInt_t>;
 
-    mInt = std::make_unique<derivedInt_t>(dimensionsInt, layers, mem);
+    mInt = std::make_unique<derivedInt_t>(mem);
     derivedInt_t& derivedOp = dynamic_cast<derivedInt_t&>(*mInt);
+    derivedOp.allocOp(dimensionsInt, layers);
     auto intView = derivedOp.getOp();
 
     Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
