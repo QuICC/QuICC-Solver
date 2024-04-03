@@ -13,6 +13,8 @@
 #include "Operator/Unary.hpp"
 #include "Graph/MlirShims.hpp"
 
+#include "ViewOps/Pointwise/Cpu/Pointwise.hpp"
+
 namespace QuICC
 {
 namespace Graph
@@ -105,6 +107,21 @@ MapOps::MapOps(mlir::ModuleOp module,
         assert(ptr != nullptr);
         _thisArr[index] = ptr;
 
+      }
+      else if (auto add = dyn_cast<mlir::quiccir::AddOp>(op)) {
+        using namespace QuICC::Pointwise::Cpu;
+        using namespace QuICC::Pointwise;
+        using T = C_DCCSC3D_t;
+        using op_t = Op<AddFunctor<std::complex<double>>, T, T, T>;
+        _ops.push_back(std::make_unique<op_t>(AddFunctor<std::complex<double>>()));
+        // get index from MLIR source
+        std::uint64_t index = add.getImplptr().value();
+        if (index >= _thisArr.size()) {
+          _thisArr.resize(index+1);
+        }
+        auto* ptr = std::get<std::shared_ptr<NaryOp<C_DCCSC3D_t, C_DCCSC3D_t, C_DCCSC3D_t>>>(_ops.back()).get();
+        assert(ptr != nullptr);
+        _thisArr[index] = ptr;
       }
       // return deallocateBuffers(op);
     //   if (failed(deallocateBuffers(op)))

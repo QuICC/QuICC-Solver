@@ -66,6 +66,130 @@ extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(void* obj, view3_
     cl->apply(viewMod, viewVal);
 };
 
+/// @brief C Interface to MLIR for a al int operator
+/// @param op
+/// @param uval
+/// @param umod
+extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
+{
+    // op
+    using namespace QuICC::Transform::Quadrature;
+    using Tin = C_S1CLCSC3D_t;
+    using Tout = C_DCCSC3D_t;
+    using Top = QuICC::View::View<double, QuICC::View::CSL3DJIK>;
+    using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
+    using op_t = Op<Tout, Tin, Top, backend_t>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
+    Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
+    Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    // call
+    auto cl = reinterpret_cast<op_t*>(obj);
+    cl->apply(viewVal, viewMod);
+};
+
+/// @brief C Interface to MLIR for a jw int operator
+/// @param op
+/// @param uval
+/// @param umod
+extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
+{
+    // op
+    using namespace QuICC::Transform::Quadrature;
+    using Tin = C_DCCSC3D_t;
+    using Tout = C_DCCSC3D_t;
+    using Top = QuICC::View::View<double, QuICC::View::CSL3DJIK>;
+    using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
+    using op_t = Op<Tout, Tin, Top, backend_t>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
+    Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
+    Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    // call
+    auto cl = reinterpret_cast<op_t*>(obj);
+    cl->apply(viewVal, viewMod);
+};
+
+/// @brief C Interface to MLIR for a binary add operator
+/// @param op
+/// @param uval
+/// @param umod
+extern "C" void _ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
+    view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
+{
+    // op
+    using namespace QuICC::Pointwise::Cpu;
+    using namespace QuICC::Pointwise;
+    using T = C_DCCSC3D_t;
+    using op_t = Op<AddFunctor<std::complex<double>>, T, T, T>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pLhs->pos, pLhs->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pLhs->coo, pLhs->cooSize);
+    T viewLhs(pLhs->data, pLhs->dataSize, pLhs->dims, pointers, indices);
+    T viewRhs(pRhs->data, pRhs->dataSize, pRhs->dims, pointers, indices);
+    T viewRet(pRet->data, pRet->dataSize, pRet->dims, pointers, indices);
+    // call
+    auto cl = reinterpret_cast<op_t*>(obj);
+    cl->apply(viewRet, viewLhs, viewRhs);
+};
+
+/// @brief C Interface to MLIR for a binary sub operator
+/// @param op
+/// @param uval
+/// @param umod
+extern "C" void _ciface_quiccir_sub_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
+    view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
+{
+    // op
+    using namespace QuICC::Pointwise::Cpu;
+    using namespace QuICC::Pointwise;
+    using T = C_DCCSC3D_t;
+    using op_t = Op<SubFunctor<std::complex<double>>, T, T, T>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pLhs->pos, pLhs->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pLhs->coo, pLhs->cooSize);
+    T viewLhs(pLhs->data, pLhs->dataSize, pLhs->dims, pointers, indices);
+    T viewRhs(pRhs->data, pRhs->dataSize, pRhs->dims, pointers, indices);
+    T viewRet(pRet->data, pRet->dataSize, pRet->dims, pointers, indices);
+    // call
+    auto cl = reinterpret_cast<op_t*>(obj);
+    cl->apply(viewRet, viewLhs, viewRhs);
+};
+
+
+
+/// @brief C Interface to MLIR for a transpose operator
+/// @param op
+/// @param umod
+/// @param uval
+extern "C" void _ciface_quiccir_transpose_C_DCCSC3D_t_C_S1CLCSC3D_t(void* obj, view3_cd_t*, view3_cd_t*)
+{
+   std::cout << "missing transpose op\n";
+};
+
+extern "C" void _ciface_quiccir_transpose_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t*, view3_cd_t*)
+{
+   std::cout << "missing transpose op\n";
+};
+
 /// @brief C Interface to MLIR for an allocator
 /// The name fully describes how the buffer needs to be allocated
 /// since it includes the producer op and buffer.
@@ -92,8 +216,54 @@ extern "C" void _ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(view3_t* pN
     #endif
 };
 
-/// @brief C Interface to MLIR for a  deallocator
-/// @param umod
+extern "C" void _ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_t* pProdBuffer)
+{
+    // Slice (phys = mods*2-1)
+    assert(pNewBuffer->dims[0] == std::floor(pProdBuffer->dims[0]/2)+1);
+    assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
+    // Layers
+    assert(pNewBuffer->dims[2] == pProdBuffer->dims[2]);
+    // reuse meta
+    pNewBuffer->pos = pProdBuffer->pos;
+    pNewBuffer->posSize = pProdBuffer->posSize;
+    pNewBuffer->coo = pProdBuffer->coo;
+    pNewBuffer->cooSize = pProdBuffer->cooSize;
+    // alloc buffer
+    pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
+    std::size_t sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
+    pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(double))));
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
+};
+
+extern "C" void _ciface_quiccir_alloc_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+{
+    std::cout << "missing alloc operator\n";
+};
+
+extern "C" void _ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+{
+    std::cout << "missing alloc operator\n";
+};
+
+extern "C" void _ciface_quiccir_alloc_sub_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+{
+    std::cout << "missing alloc operator\n";
+};
+
+extern "C" void _ciface_quiccir_alloc_transpose_C_DCCSC3D_t_C_S1CLCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+{
+    std::cout << "missing alloc operator\n";
+};
+
+extern "C" void _ciface_quiccir_alloc_transpose_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+{
+    std::cout << "missing alloc operator\n";
+};
+
+/// @brief C Interface to MLIR for a deallocator
+/// @param pBuffer
 extern "C" void _ciface_quiccir_dealloc_R_DCCSC3D_t(view3_t* pBuffer)
 {
     // meta
@@ -108,5 +278,43 @@ extern "C" void _ciface_quiccir_dealloc_R_DCCSC3D_t(view3_t* pBuffer)
     pBuffer->dataSize = 0;
     #ifndef NDEBUG
     std::cout << "_ciface_quiccir_dealloc_R_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
+};
+
+/// @brief C Interface to MLIR for a deallocator
+/// @param pBuffer
+extern "C" void _ciface_quiccir_dealloc_C_DCCSC3D_t(view3_t* pBuffer)
+{
+    // meta
+    pBuffer->coo = nullptr;
+    pBuffer->cooSize = 0;
+    pBuffer->pos = nullptr;
+    pBuffer->posSize = 0;
+    // dealloc
+    assert(pBuffer->data != nullptr);
+    std::size_t sizeByte = sizeof(double) * pBuffer->dataSize;
+    ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(double)));
+    pBuffer->dataSize = 0;
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_dealloc_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
+};
+
+/// @brief C Interface to MLIR for a deallocator
+/// @param pBuffer
+extern "C" void _ciface_quiccir_dealloc_C_S1CLCSC3D_t(view3_t* pBuffer)
+{
+    // meta
+    pBuffer->coo = nullptr;
+    pBuffer->cooSize = 0;
+    pBuffer->pos = nullptr;
+    pBuffer->posSize = 0;
+    // dealloc
+    assert(pBuffer->data != nullptr);
+    std::size_t sizeByte = sizeof(double) * pBuffer->dataSize;
+    ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(double)));
+    pBuffer->dataSize = 0;
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_dealloc_C_S1CLCSC3D_t, bytes: " << sizeByte << '\n';
     #endif
 };

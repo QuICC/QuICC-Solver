@@ -7,7 +7,6 @@ add_executable(GraphTest
 target_link_libraries(GraphTest
     ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}
     Catch2::Catch2
-    QuICC::ViewOps
     QuICC::Graph
 )
 

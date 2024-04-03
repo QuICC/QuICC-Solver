@@ -14,8 +14,11 @@
 #include "ViewOps/Fourier/Mixed/Projector/D.hpp"
 #include "ViewOps/Fourier/Mixed/Integrator/D.hpp"
 #include "ViewOps/Fourier/Mixed/Diff.hpp"
-// #include "ViewOps/Pointwise/Pointwise.hpp"
-// #include "ViewOps/Pointwise/Functors.hpp"
+#include "ViewOps/Worland/Tags.hpp"
+#include "ViewOps/Quadrature/Impl.hpp"
+#include "ViewOps/Quadrature/Op.hpp"
+#include "ViewOps/Pointwise/Cpu/Pointwise.hpp"
+#include "ViewOps/Pointwise/Functors.hpp"
 #include "Fft/Fft.hpp"
 #include "ViewOps/Fourier/Mixed/Diff.hpp"
 

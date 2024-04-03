@@ -221,13 +221,15 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   module = mlir::parseSourceFile<mlir::ModuleOp>(sourceMgr, &ctx);
 
   // Dump
-  module->dump();
+  // module->dump();
 
   // Inline and set view attributes
   mlir::PassManager pmPre(&ctx);
   pmPre.addPass(mlir::createInlinerPass());
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
+  layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
+  layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
   mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
   nestedFuncPmPre.addPass(mlir::quiccir::createSetViewLayoutPass(layOpt));
 
@@ -235,99 +237,114 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
     CHECK(false);
   }
 
-  // // setup ops map and store
-  // auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  // QuICC::Graph::MapOps storeOp(*module, mem);
+  // Dump
+  // module->dump();
 
-  // // Top level (module) pass manager
-  // mlir::PassManager pm(&ctx);
-  // mlir::quiccir::quiccLibCallPipelineBuilder(pm);
+  // setup ops map and store
+  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+  QuICC::Graph::MapOps storeOp(*module, mem);
 
-  // // Lower
-  // if (mlir::failed(pm.run(*module))) {
-  //   CHECK(false);
-  // }
+  // Lower to library call
+  mlir::PassManager pm(&ctx);
+  mlir::quiccir::quiccLibCallPipelineBuilder(pm);
+
+  // Lower
+  if (mlir::failed(pm.run(*module))) {
+    CHECK(false);
+  }
 
   // Dump
-  module->dump();
+  // module->dump();
 
-  // // JIT
+  // JIT
 
-  // // Initialize LLVM targets.
-  // llvm::InitializeNativeTarget();
-  // llvm::InitializeNativeTargetAsmPrinter();
+  // Initialize LLVM targets.
+  llvm::InitializeNativeTarget();
+  llvm::InitializeNativeTargetAsmPrinter();
 
-  // // Register the translation from MLIR to LLVM IR, which must happen before we
-  // // can JIT-compile.
-  // mlir::registerBuiltinDialectTranslation(*module->getContext());
-  // mlir::registerLLVMDialectTranslation(*module->getContext());
+  // Register the translation from MLIR to LLVM IR, which must happen before we
+  // can JIT-compile.
+  mlir::registerBuiltinDialectTranslation(*module->getContext());
+  mlir::registerLLVMDialectTranslation(*module->getContext());
 
-  // // An optimization pipeline to use within the execution engine.
-  // auto optPipeline = mlir::makeOptimizingTransformer(
-  //     /*optLevel=*/0, /*sizeLevel=*/0,
-  //     /*targetMachine=*/nullptr);
+  // An optimization pipeline to use within the execution engine.
+  auto optPipeline = mlir::makeOptimizingTransformer(
+      /*optLevel=*/0, /*sizeLevel=*/0,
+      /*targetMachine=*/nullptr);
 
-  // // Create an MLIR execution engine. The execution engine eagerly JIT-compiles
-  // // the module.
-  // mlir::ExecutionEngineOptions engineOptions;
-  // engineOptions.transformer = optPipeline;
-  // // engineOptions.sharedLibPaths = executionEngineLibs;
-  // auto maybeEngine = mlir::ExecutionEngine::create(*module, engineOptions);
-  // assert(maybeEngine && "failed to construct an execution engine");
-  // auto &engine = maybeEngine.get();
+  // Create an MLIR execution engine. The execution engine eagerly JIT-compiles
+  // the module.
+  mlir::ExecutionEngineOptions engineOptions;
+  engineOptions.transformer = optPipeline;
+  // engineOptions.sharedLibPaths = executionEngineLibs;
+  auto maybeEngine = mlir::ExecutionEngine::create(*module, engineOptions);
+  assert(maybeEngine && "failed to construct an execution engine");
+  auto &engine = maybeEngine.get();
 
-  // // Invoke the JIT-compiled function.
-  // std::string symbol = "entry";
-  // auto funSym = engine->lookup(symbol);
-  // if (auto E = funSym.takeError()) {
-  //   assert(false && "JIT invocation failed");
-  // }
+  // Invoke the JIT-compiled function.
+  std::string symbol = "entry";
+  auto funSym = engine->lookup(symbol);
+  if (auto E = funSym.takeError()) {
+    assert(false && "JIT invocation failed");
+  }
 
-  // // setup metadata
-  // constexpr std::size_t modsM = 6;
-  // constexpr std::size_t N = 3;
-  // constexpr std::size_t K = 5;
-  // std::array<std::uint32_t, 3> modsDimensions {modsM, N, K};
+  // setup metadata
+  constexpr std::size_t M = 10;
+  constexpr std::size_t N = 6;
+  constexpr std::size_t K = 4;
+  constexpr std::size_t modsM = 6;
+  std::array<std::uint32_t, 3> physDimensions {M, N, K};
+  std::array<std::uint32_t, 3> modsDimensions {modsM, N, K};
 
-  // std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
-  // std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+  std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
+  std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
 
-  // // host mem block
-  // std::size_t modsS = modsM*indices[1].size();
-  // QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsS, mem.get());
-  // QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, mem.get());
+  // host mem block
+  std::size_t modsS = modsM*indices[1].size();
+  QuICC::Memory::MemBlock<double> R(modsS, mem.get());
+  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, mem.get());
 
-  // // host view
-  // using namespace QuICC::Graph;
-  // C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, modsDimensions, pointers, indices);
-  // C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, modsDimensions, pointers, indices);
+  // host view
+  using namespace QuICC::Graph;
+  R_DCCSC3D_t RView({R.data(), R.size()}, physDimensions, pointers, indices);
+  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, modsDimensions, pointers, indices);
 
-  // // set input modes
-  // std::complex<double> val = {1.0, 0.0};
-  // for(std::size_t m = 0; m < modsInView.size(); ++m)
-  // {
-  //   modsInView[m] = val;
-  // }
+  // set input modes
+  double val = 1.0;
+  for(std::size_t m = 0; m < RView.size(); ++m)
+  {
+    RView[m] = val;
+  }
 
-  // // map input/output views
-  // using view3_cd_t = ViewDescriptor<std::complex<double>, std::uint32_t, 3>;
-  // view3_cd_t viewRef_in{{modsM, N, K},
-  //   pointers[1].data(), (std::uint32_t)pointers[1].size(),
-  //   indices[1].data(), (std::uint32_t)indices[1].size(),
-  //   modsIn.data(), (std::uint32_t)modsIn.size()};
-  // view3_cd_t viewRef_out{{modsM, N, K},
-  //   pointers[1].data(), (std::uint32_t)pointers[1].size(),
-  //   indices[1].data(), (std::uint32_t)indices[1].size(),
-  //   modsOut.data(), (std::uint32_t)modsOut.size()};
+  // map input/output views
+  using view3_rd_t = ViewDescriptor<double, std::uint32_t, 3>;
+  using view3_cd_t = ViewDescriptor<std::complex<double>, std::uint32_t, 3>;
 
-  // // get operators map
-  // auto thisArr = storeOp.getThisArr();
+  view3_rd_t RviewDes{{M, N, K},
+    pointers[1].data(), (std::uint32_t)pointers[1].size(),
+    indices[1].data(), (std::uint32_t)indices[1].size(),
+    R.data(), (std::uint32_t)R.size()};
+  view3_rd_t PhiviewDes{{M, N, K},
+    pointers[1].data(), (std::uint32_t)pointers[1].size(),
+    indices[1].data(), (std::uint32_t)indices[1].size(),
+    R.data(), (std::uint32_t)R.size()};
+  view3_rd_t ThetaviewDes{{M, N, K},
+    pointers[1].data(), (std::uint32_t)pointers[1].size(),
+    indices[1].data(), (std::uint32_t)indices[1].size(),
+    R.data(), (std::uint32_t)R.size()};
+  view3_cd_t viewRef_out{{modsM, N, K},
+    pointers[1].data(), (std::uint32_t)pointers[1].size(),
+    indices[1].data(), (std::uint32_t)indices[1].size(),
+    modsOut.data(), (std::uint32_t)modsOut.size()};
 
-  // // Apply graph
-  // auto fun = (void (*)(void*, view3_cd_t*, view3_cd_t*))funSym.get();
-  // fun(thisArr.data(), &viewRef_out, &viewRef_in);
+  // get operators map
+  auto thisArr = storeOp.getThisArr();
 
-  // // check
+  // Apply graph
+  auto fun = (void (*)(void*, view3_cd_t*, view3_rd_t*, view3_rd_t*, view3_rd_t*))funSym.get();
+  fun(thisArr.data(), &viewRef_out, &RviewDes, &PhiviewDes, &ThetaviewDes);
+
+  // check
   // for(std::size_t m = 0; m < modsOutView.size(); ++m)
   // {
   //   CHECK(modsOutView[m] == val);

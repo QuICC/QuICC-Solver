@@ -31,6 +31,15 @@ template <class T = double> struct AddFunctor
    }
 };
 
+/// @brief scalar sub operation
+/// @tparam T scalar
+template <class T = double> struct SubFunctor
+{
+   QUICC_CUDA_HOSTDEV T operator()(T a, T b)
+   {
+      return a - b;
+   }
+};
 
 /// @brief scalar square operation
 /// @tparam T scalar
