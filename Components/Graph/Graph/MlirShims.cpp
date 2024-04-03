@@ -224,6 +224,8 @@ extern "C" void _ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(view3_t* pN
     // Layers
     assert(pNewBuffer->dims[2] == pProdBuffer->dims[2]);
     // reuse meta
+    assert(pProdBuffer->pos != nullptr);
+    assert(pProdBuffer->coo != nullptr);
     pNewBuffer->pos = pProdBuffer->pos;
     pNewBuffer->posSize = pProdBuffer->posSize;
     pNewBuffer->coo = pProdBuffer->coo;
@@ -240,16 +242,19 @@ extern "C" void _ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(view3_t* pN
 extern "C" void _ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_t* pProdBuffer)
 {
     // Slice (phys = mods*2-1)
+    // Integrator, NewBuffer is in modal space
     assert(pNewBuffer->dims[0] == std::floor(pProdBuffer->dims[0]/2)+1);
     assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
     // Layers
     assert(pNewBuffer->dims[2] == pProdBuffer->dims[2]);
-    // reuse meta
+    // Reuse meta
+    assert(pProdBuffer->pos != nullptr);
+    assert(pProdBuffer->coo != nullptr);
     pNewBuffer->pos = pProdBuffer->pos;
     pNewBuffer->posSize = pProdBuffer->posSize;
     pNewBuffer->coo = pProdBuffer->coo;
     pNewBuffer->cooSize = pProdBuffer->cooSize;
-    // alloc buffer
+    // Alloc buffer
     pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
     std::size_t sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
     pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(double))));
@@ -260,27 +265,67 @@ extern "C" void _ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(view3_cd_t*
 
 extern "C" void _ciface_quiccir_alloc_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
-    std::cout << "missing alloc operator\n";
+    // Check slice dimensions
+    // Integrator, NewBuffer is in modal space
+    assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
+    // Layers
+    assert(pNewBuffer->dims[2] == pProdBuffer->dims[2]);
+    // Reuse meta
+    assert(pProdBuffer->pos != nullptr);
+    assert(pProdBuffer->coo != nullptr);
+    pNewBuffer->pos = pProdBuffer->pos;
+    pNewBuffer->posSize = pProdBuffer->posSize;
+    pNewBuffer->coo = pProdBuffer->coo;
+    pNewBuffer->cooSize = pProdBuffer->cooSize;
+    // Alloc buffer
+    std::size_t cumSliceSize = 0;
+    for (std::size_t i = 0; i < pNewBuffer->posSize - 1; ++i) {
+        auto width = pNewBuffer->pos[i+1] - pNewBuffer->pos[i];
+        auto height = pNewBuffer->dims[0] - i;
+        cumSliceSize += height * width;
+    }
+    pNewBuffer->dataSize = cumSliceSize;
+    std::size_t sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
+    pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(double))));
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
 };
 
 extern "C" void _ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
-    std::cout << "missing alloc operator\n";
+    std::cout << "missing alloc operator: _ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    pNewBuffer->pos = nullptr;
+    pNewBuffer->posSize = 0;
+    pNewBuffer->coo = nullptr;
+    pNewBuffer->cooSize = 0;
 };
 
 extern "C" void _ciface_quiccir_alloc_sub_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
-    std::cout << "missing alloc operator\n";
+    std::cout << "missing alloc operator: _ciface_quiccir_alloc_sub_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    pNewBuffer->pos = nullptr;
+    pNewBuffer->posSize = 0;
+    pNewBuffer->coo = nullptr;
+    pNewBuffer->cooSize = 0;
 };
 
 extern "C" void _ciface_quiccir_alloc_transpose_C_DCCSC3D_t_C_S1CLCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
-    std::cout << "missing alloc operator\n";
+    std::cout << "missing alloc operator: _ciface_quiccir_alloc_transpose_C_DCCSC3D_t_C_S1CLCSC3D_t\n";
+    pNewBuffer->pos = nullptr;
+    pNewBuffer->posSize = 0;
+    pNewBuffer->coo = nullptr;
+    pNewBuffer->cooSize = 0;
 };
 
 extern "C" void _ciface_quiccir_alloc_transpose_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
-    std::cout << "missing alloc operator\n";
+    std::cout << "missing alloc operator: _ciface_quiccir_alloc_transpose_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    pNewBuffer->pos = nullptr;
+    pNewBuffer->posSize = 0;
+    pNewBuffer->coo = nullptr;
+    pNewBuffer->cooSize = 0;
 };
 
 /// @brief C Interface to MLIR for a deallocator

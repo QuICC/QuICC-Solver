@@ -29,14 +29,14 @@ using varOp_t = std::variant<
     // std::shared_ptr<NaryOp<R_VB_t, R_VB_t>>,
     std::shared_ptr<NaryOp<C_DCCSC3D_t, C_DCCSC3D_t>>,
     std::shared_ptr<NaryOp<R_DCCSC3D_t, R_DCCSC3D_t>>,
-    std::shared_ptr<NaryOp<C_DCCSC3D_t, C_S1CLCSC3D_t>>,
     // std::shared_ptr<NaryOp<R_VB_t, R_VB_t, R_VB_t>>,
     std::shared_ptr<NaryOp<C_DCCSC3D_t, C_DCCSC3D_t, C_DCCSC3D_t>>,
     std::shared_ptr<NaryOp<R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t>>,
     std::shared_ptr<UnaryOp<C_DCCSC3D_t, C_DCCSC3D_t>>,
     std::shared_ptr<UnaryOp<R_DCCSC3D_t, C_DCCSC3D_t>>,
     std::shared_ptr<UnaryOp<C_DCCSC3D_t, R_DCCSC3D_t>>,
-    std::shared_ptr<UnaryOp<R_DCCSC3D_t, R_DCCSC3D_t>>
+    std::shared_ptr<UnaryOp<R_DCCSC3D_t, R_DCCSC3D_t>>,
+    std::shared_ptr<UnaryOp<C_DCCSC3D_t, C_S1CLCSC3D_t>>
 >;
 
 
@@ -118,7 +118,7 @@ MapOps::MapOps(mlir::ModuleOp module,
         using Top = QuICC::View::View<double, QuICC::View::CSL3DJIK>;
         using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
         using op_t = Op<Tout, Tin, Top, backend_t>;
-        _ops.push_back(std::make_unique<op_t>());
+        _ops.push_back(std::make_unique<op_t>(mem));
         // get index from MLIR source
         std::uint64_t index = alInt.getImplptr().value();
         if (index >= _thisArr.size()) {
