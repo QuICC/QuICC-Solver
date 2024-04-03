@@ -158,7 +158,7 @@ add_test(
 )
 
 #
-# View Pointwise  Tests
+# View Pointwise Tests
 #
 
 add_executable(ViewPointwiseTest
@@ -179,7 +179,7 @@ add_test(
 )
 
 #
-# View Reduction  Tests
+# View Reduction Tests
 #
 
 add_executable(ViewReductionTest
@@ -195,6 +195,27 @@ target_link_libraries(ViewReductionTest
 add_test(
     NAME ViewReductionTest
     COMMAND ViewReductionTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+#
+# View Transpose Tests
+#
+
+add_executable(ViewTransposeTest
+    ViewTransposeTests.cpp
+)
+
+target_link_libraries(ViewTransposeTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewTransposeTest
+    COMMAND ViewTransposeTest
     WORKING_DIRECTORY
     "${QUICC_WORK_DIR}"
 )

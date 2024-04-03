@@ -11,6 +11,7 @@ add_subdirectory(ViewOps/Fourier)
 add_subdirectory(ViewOps/Quadrature)
 add_subdirectory(ViewOps/ALegendre)
 add_subdirectory(ViewOps/Worland)
+add_subdirectory(ViewOps/Transpose)
 
 add_library(${QUICC_CURRENT_COMPONENT_LIB} INTERFACE)
 
