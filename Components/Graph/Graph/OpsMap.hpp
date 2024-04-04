@@ -144,6 +144,23 @@ MapOps::MapOps(mlir::ModuleOp module,
         assert(ptr != nullptr);
         _thisArr[index] = ptr;
       }
+      else if (auto tran = dyn_cast<mlir::quiccir::TransposeOp>(op)) {
+        using namespace QuICC::Transpose::Cpu;
+        using namespace QuICC::Transpose;
+        using Tin = C_DCCSC3D_t;
+        using Tout = C_DCCSC3D_t;
+        using op_t = Op<Tout, Tin, p021_t>;
+        _ops.push_back(std::make_unique<op_t>());
+        // get index from MLIR source
+        std::uint64_t index = tran.getImplptr().value();
+        if (index >= _thisArr.size()) {
+          _thisArr.resize(index+1);
+        }
+        auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+        assert(ptr != nullptr);
+        _thisArr[index] = ptr;
+
+      }
       // return deallocateBuffers(op);
     //   if (failed(deallocateBuffers(op)))
     //     return WalkResult::interrupt();

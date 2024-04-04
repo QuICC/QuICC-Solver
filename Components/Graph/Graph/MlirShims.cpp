@@ -229,6 +229,10 @@ extern "C" void _ciface_quiccir_transpose_021_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_transpose_021_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    #endif
 };
 
 /// @brief C Interface to MLIR for an allocator
@@ -279,7 +283,7 @@ extern "C" void _ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(view3_cd_t*
     std::size_t sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
     pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>))));
     #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    std::cout << "_ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t, bytes: " << sizeByte << '\n';
     #endif
 };
 
@@ -409,8 +413,8 @@ extern "C" void _ciface_quiccir_dealloc_C_DCCSC3D_t(view3_t* pBuffer)
     pBuffer->posSize = 0;
     // dealloc
     assert(pBuffer->data != nullptr);
-    std::size_t sizeByte = sizeof(double) * pBuffer->dataSize;
-    ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(double)));
+    std::size_t sizeByte = sizeof(std::complex<double>) * pBuffer->dataSize;
+    ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>)));
     pBuffer->dataSize = 0;
     #ifndef NDEBUG
     std::cout << "_ciface_quiccir_dealloc_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
@@ -428,8 +432,8 @@ extern "C" void _ciface_quiccir_dealloc_C_S1CLCSC3D_t(view3_t* pBuffer)
     pBuffer->posSize = 0;
     // dealloc
     assert(pBuffer->data != nullptr);
-    std::size_t sizeByte = sizeof(double) * pBuffer->dataSize;
-    ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(double)));
+    std::size_t sizeByte = sizeof(std::complex<double>) * pBuffer->dataSize;
+    ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>)));
     pBuffer->dataSize = 0;
     #ifndef NDEBUG
     std::cout << "_ciface_quiccir_dealloc_C_S1CLCSC3D_t, bytes: " << sizeByte << '\n';

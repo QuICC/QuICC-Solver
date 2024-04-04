@@ -296,8 +296,19 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   std::array<std::uint32_t, 3> physDimensions {M, N, K};
   std::array<std::uint32_t, 3> modsDimensions {modsM, N, K};
 
-  std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
-  std::array<std::vector<std::uint32_t>, 3> indices {{{},{0, 1, 0, 0},{}}};
+  // Populate meta for fully populated tensor
+  std::vector<std::uint32_t> ptr(K+1);
+  std::vector<std::uint32_t> idx(K*N);
+  ptr[0] = 0;
+  for (std::size_t i = 1; i < ptr.size(); ++i) {
+      ptr[i] = ptr[i-1]+N;
+  }
+  for (std::size_t i = 0; i < idx.size(); ++i) {
+      idx[i] = i % N;
+  }
+
+  std::array<std::vector<std::uint32_t>, 3> pointers {{{}, ptr, {}}};
+  std::array<std::vector<std::uint32_t>, 3> indices {{{}, idx, {}}};
 
   // host mem block
   std::size_t modsS = modsM*indices[1].size();
