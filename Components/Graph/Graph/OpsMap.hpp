@@ -138,9 +138,9 @@ MapOps::MapOps(mlir::ModuleOp module,
         auto alIntOp = dynamic_cast<op_t*>(ptr);
         constexpr size_t rank = 3;
         /// dim 0 - L  - harmonic degree
-        /// dim 1 - Nl - longitudinal points
+        /// dim 1 - Ntheta - colatitudinal points
         /// dim 2 - M  - harmonic order
-        std::array<std::uint32_t, rank> dims {modsDims[1], physDims[1], physDims[2]};
+        std::array<std::uint32_t, rank> dims {modsDims[1], physDims[1], modsDims[0]};
         std::vector<std::uint32_t> layers;
         // Dense operator \todo generalize for distributed op
         for (std::size_t i = 0; i < dims[2]; ++i) {

@@ -275,11 +275,9 @@ extern "C" void _ciface_quiccir_alloc_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(view3_cd_
     pNewBuffer->cooSize = pProdBuffer->cooSize;
     // Alloc buffer
     std::size_t cumSliceSize = 0;
-    std::cout << "alloc al int\n";
     for (std::size_t i = 0; i < pNewBuffer->posSize - 1; ++i) {
         auto width = pNewBuffer->pos[i+1] - pNewBuffer->pos[i];
         auto height = pNewBuffer->dims[0] - i;
-        std::cout << height << ' ' << width << '\n';
         cumSliceSize += height * width;
     }
     pNewBuffer->dataSize = cumSliceSize;

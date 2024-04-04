@@ -1,11 +1,11 @@
-// mod -> phys
+// phys -> mod
 // Nr x Nphi x Ntheta
 !type_uval = !quiccir.view<3x10x6xf64, "R_DCCSC3D_t">
 // L x N x M  ( ..., radial, ...)
-!type_umod = !quiccir.view<4x2x6xf64, "C_DCCSC3D_t">
+!type_umod = !quiccir.view<6x2x6xf64, "C_DCCSC3D_t">
 
 !type_tuval = tensor<3x10x6xf64, "R_DCCSC3D_t">
-!type_tumod = tensor<4x2x6xf64, "C_DCCSC3D_t">
+!type_tumod = tensor<6x2x6xf64, "C_DCCSC3D_t">
 
 // func.func private @simpleTree(%R: tensor<?x?x?xf64>, %Theta: tensor<?x?x?xf64>, %Phi: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
 //   // R
