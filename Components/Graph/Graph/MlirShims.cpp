@@ -104,22 +104,7 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
-    if (cl->getOp().data() == nullptr) {
-        // set up operator
-        constexpr size_t rank = 3;
-        /// dim 0 - L  - harmonic degree
-        /// dim 1 - Nl - longitudinal points
-        /// dim 2 - M  - harmonic order
-        std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUval->dims[2]};
-        std::vector<std::uint32_t> layers;
-        // check for populated layers
-        for (std::size_t i = 0; i < pUmod->posSize-1; ++i) {
-            if (pUmod->pos[i+1] - pUmod->pos[i] > 0) {
-                layers.push_back(i);
-            }
-        }
-        cl->allocOp(dims, layers);
-    }
+    assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewVal, viewMod);
 };

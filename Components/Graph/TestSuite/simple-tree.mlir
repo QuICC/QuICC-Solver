@@ -1,8 +1,8 @@
 // mod -> phys
-!type_uval = !quiccir.view<4x10x6xf64, "R_DCCSC3D_t">
+!type_uval = !quiccir.view<3x10x6xf64, "R_DCCSC3D_t">
 !type_umod = !quiccir.view<6x2x3xf64, "C_DCCSC3D_t">
 
-!type_tuval = tensor<4x10x6xf64, "R_DCCSC3D_t">
+!type_tuval = tensor<3x10x6xf64, "R_DCCSC3D_t">
 !type_tumod = tensor<6x2x3xf64, "C_DCCSC3D_t">
 
 // func.func private @simpleTree(%R: tensor<?x?x?xf64>, %Theta: tensor<?x?x?xf64>, %Phi: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {

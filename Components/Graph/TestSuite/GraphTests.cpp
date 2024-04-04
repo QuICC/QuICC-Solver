@@ -93,7 +93,8 @@ TEST_CASE("One Dimensional Loop", "[OneDimLoop]")
 
   // setup ops map and store
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::MapOps storeOp(*module, mem);
+  QuICC::Graph::MapOps storeOp(*module, mem, /*physDims=*/{11, 3, 5},
+    /*modsDims=*/{6, 3, 5});
 
   // Top level (module) pass manager
   mlir::PassManager pm(&ctx);
@@ -240,9 +241,14 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   // Dump
   // module->dump();
 
+  // Grid dimensions
+  constexpr std::uint32_t rank = 3;
+  std::array<std::uint32_t, rank> physDims{10, 6, 3};
+  std::array<std::uint32_t, rank> modsDims{6, 3, 2};
+
   // setup ops map and store
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::MapOps storeOp(*module, mem);
+  QuICC::Graph::MapOps storeOp(*module, mem, physDims, modsDims);
 
   // Lower to library call
   mlir::PassManager pm(&ctx);
@@ -289,12 +295,14 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   }
 
   // setup metadata
-  constexpr std::size_t M = 10;
-  constexpr std::size_t N = 6;
-  constexpr std::size_t K = 4;
-  constexpr std::size_t modsM = 6;
+  auto M = physDims[0];
+  auto N = physDims[1];
+  auto K = physDims[2];
+  auto modsM = modsDims[0];
+  auto modsN = modsDims[1];
+  auto modsK = modsDims[2];
   std::array<std::uint32_t, 3> physDimensions {M, N, K};
-  std::array<std::uint32_t, 3> modsDimensions {modsM, N, K};
+  std::array<std::uint32_t, 3> modsDimensions {modsM, modsN, modsK};
 
   // Populate meta for fully populated tensor
   std::vector<std::uint32_t> ptr(K+1);
@@ -317,8 +325,8 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
 
   // host view
   using namespace QuICC::Graph;
-  R_DCCSC3D_t RView({R.data(), R.size()}, physDimensions, pointers, indices);
-  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, modsDimensions, pointers, indices);
+  R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointers, indices);
+  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, modsDims, pointers, indices);
 
   // set input modes
   double val = 1.0;

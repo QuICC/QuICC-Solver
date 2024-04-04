@@ -13,6 +13,11 @@
 #include "Operator/Unary.hpp"
 #include "Graph/MlirShims.hpp"
 
+// al ops
+#include "QuICC/Polynomial/ALegendre/Plm.hpp"
+#include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
+#include "ViewOps/ALegendre/Builder.hpp"
+
 #include "ViewOps/Pointwise/Cpu/Pointwise.hpp"
 
 namespace QuICC
@@ -51,7 +56,9 @@ class MapOps
     const std::shared_ptr<Memory::memory_resource> _mem;
   public:
     MapOps(mlir::ModuleOp module,
-      const std::shared_ptr<Memory::memory_resource> mem);
+      const std::shared_ptr<Memory::memory_resource> mem,
+      const std::array<std::uint32_t, 3> physDims,
+      const std::array<std::uint32_t, 3> modsDims);
 
     /// @brief return void pointers to ops
     std::vector<void*> getThisArr(){return _thisArr;}
@@ -60,7 +67,9 @@ class MapOps
 
 
 MapOps::MapOps(mlir::ModuleOp module,
-      const std::shared_ptr<Memory::memory_resource> mem) : _mem(mem) {
+      const std::shared_ptr<Memory::memory_resource> mem,
+      const std::array<std::uint32_t, 3> physDims,
+      const std::array<std::uint32_t, 3> modsDims) : _mem(mem) {
     using namespace mlir;
     Dialect *quiccirDialect = module->getContext()->getLoadedDialect("quiccir");
     mlir::WalkResult result = module->walk([&](mlir::Operation* op) {
@@ -119,12 +128,35 @@ MapOps::MapOps(mlir::ModuleOp module,
         using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
         using op_t = Op<Tout, Tin, Top, backend_t>;
         _ops.push_back(std::make_unique<op_t>(mem));
-        // get index from MLIR source
+        // Get index from MLIR source
         std::uint64_t index = alInt.getImplptr().value();
         if (index >= _thisArr.size()) {
           _thisArr.resize(index+1);
         }
         auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+        // Setup operator
+        auto alIntOp = dynamic_cast<op_t*>(ptr);
+        constexpr size_t rank = 3;
+        /// dim 0 - L  - harmonic degree
+        /// dim 1 - Nl - longitudinal points
+        /// dim 2 - M  - harmonic order
+        std::array<std::uint32_t, rank> dims {modsDims[1], physDims[1], physDims[2]};
+        std::vector<std::uint32_t> layers;
+        // Dense operator \todo generalize for distributed op
+        for (std::size_t i = 0; i < dims[2]; ++i) {
+          layers.push_back(i);
+        }
+        alIntOp->allocOp(dims, layers);
+        // Set grid \todo set once per operator kind
+        Internal::Array igrid;
+        Internal::Array iweights;
+        ::QuICC::Polynomial::Quadrature::LegendreRule quad;
+        quad.computeQuadrature(igrid, iweights, physDims[1]);
+        // Populate op
+        auto opView = alIntOp->getOp();
+        using namespace QuICC::Transform::ALegendre;
+        builder<Top, Polynomial::ALegendre::Plm, Internal::Array::Scalar, 0>(opView, igrid, iweights);
+        // Add to thisArr
         assert(ptr != nullptr);
         _thisArr[index] = ptr;
 
