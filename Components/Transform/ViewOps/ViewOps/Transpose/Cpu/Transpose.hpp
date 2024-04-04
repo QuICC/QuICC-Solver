@@ -47,23 +47,23 @@ template <class Tout, class Tin, class Perm>
 void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 {
     Profiler::RegionFixture<4> fix("Transpose::Cpu::applyImpl");
-    if (std::is_same_v<Perm, p021_t> &&
+    if (std::is_same_v<Perm, p201_t> &&
         std::is_same_v<typename Tin::AttributesType, View::DCCSC3D> &&
         std::is_same_v<typename Tout::AttributesType, View::DCCSC3D>) {
-        // dense transpose, slice by slice
+        // dense transpose
         assert(out.size() == in.size());
         assert(out.size() == out.dims()[0]*out.dims()[1]*out.dims()[2]);
         auto I = in.dims()[0];
         auto J = in.dims()[1];
         auto K = in.dims()[2];
         for (std::size_t k = 0; k < K; ++k) {
-            auto IJ = I*J;
             for (std::size_t j = 0; j < J; ++j) {
                 for (std::size_t i = 0; i < I; ++i) {
-                    // col maj
-                    std::size_t ijk = i + j*I + k*IJ;
-                    std::size_t ikj = i*J + j + k*IJ;
-                    out[ikj] = in[ijk];
+                    std::size_t ijk = i + j*I + k*I*J;
+                    std::size_t jki = j + k*J + i*J*K;
+                    assert(ijk < in.size());
+                    assert(jki < out.size());
+                    out[jki] = in[ijk];
                 }
             }
         }

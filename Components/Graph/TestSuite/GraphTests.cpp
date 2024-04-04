@@ -244,7 +244,7 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   // Grid dimensions
   constexpr std::uint32_t rank = 3;
   std::array<std::uint32_t, rank> physDims{10, 6, 3};
-  std::array<std::uint32_t, rank> modsDims{6, 3, 2};
+  std::array<std::uint32_t, rank> modsDims{6, 6, 2};
 
   // setup ops map and store
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
@@ -301,8 +301,6 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   auto modsM = modsDims[0];
   auto modsN = modsDims[1];
   auto modsK = modsDims[2];
-  std::array<std::uint32_t, 3> physDimensions {M, N, K};
-  std::array<std::uint32_t, 3> modsDimensions {modsM, modsN, modsK};
 
   // Populate meta for fully populated tensor
   std::vector<std::uint32_t> ptr(K+1);

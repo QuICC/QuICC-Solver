@@ -17,9 +17,8 @@ namespace Transpose {
 // Tags
 //
 
-/// @brief tag type for transpose permuation order.
-struct p021_t {};
-
+/// @brief tag type for transpose permutation order.
+struct p201_t {};
 
 
 } // namespace Transpose

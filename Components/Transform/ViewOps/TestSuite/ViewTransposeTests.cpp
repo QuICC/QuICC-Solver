@@ -39,7 +39,7 @@ TEST_CASE("Serial DCCSC3D", "SerialDCCSC3D")
     using namespace QuICC::Transpose::Cpu;
     using namespace QuICC::Transpose;
     auto transposeOp =
-      std::make_unique<Op<View<double, DCCSC3D>, View<double, DCCSC3D>, p021_t>>();
+      std::make_unique<Op<View<double, DCCSC3D>, View<double, DCCSC3D>, p201_t>>();
 
     transposeOp->apply(viewOut, viewIn);
 
@@ -51,8 +51,8 @@ TEST_CASE("Serial DCCSC3D", "SerialDCCSC3D")
             for (std::uint64_t m = 0; m < M; ++m)
             {
                 auto mnk = m + n*M + k*M*N;
-                auto nmk = m*N + n + k*M*N;
-                CHECK(viewIn[mnk] == viewOut[nmk]);
+                auto nkm = n + k*N + m*K*N;
+                CHECK(viewIn[mnk] == viewOut[nkm]);
             }
         }
     }

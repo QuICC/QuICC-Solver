@@ -181,7 +181,12 @@ MapOps::MapOps(mlir::ModuleOp module,
         using namespace QuICC::Transpose;
         using Tin = C_DCCSC3D_t;
         using Tout = C_DCCSC3D_t;
-        using op_t = Op<Tout, Tin, p021_t>;
+        // check perm attribute
+        auto perm = tran.getPermutation();
+        assert(perm[0] == 2);
+        assert(perm[1] == 0);
+        assert(perm[2] == 1);
+        using op_t = Op<Tout, Tin, p201_t>;
         _ops.push_back(std::make_unique<op_t>());
         // get index from MLIR source
         std::uint64_t index = tran.getImplptr().value();
