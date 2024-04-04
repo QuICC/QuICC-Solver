@@ -79,6 +79,10 @@ extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(void* obj, view3_
 /// @param umod
 extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
 {
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t\n";
+    #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
@@ -98,8 +102,25 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
     Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
-    // call
+    // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
+    if (cl->getOp().data() == nullptr) {
+        // set up operator
+        constexpr size_t rank = 3;
+        /// dim 0 - L  - harmonic degree
+        /// dim 1 - Nl - longitudinal points
+        /// dim 2 - M  - harmonic order
+        std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUval->dims[2]};
+        std::vector<std::uint32_t> layers;
+        // check for populated layers
+        for (std::size_t i = 1; i < pUmod->posSize; ++i) {
+            if (pUmod->pos[i] - pUmod->pos[i-1] > 0) {
+                layers.push_back(i);
+            }
+        }
+        cl->allocOp(dims, layers);
+    }
+    // call
     cl->apply(viewVal, viewMod);
 };
 
