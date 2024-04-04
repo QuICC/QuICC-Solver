@@ -36,7 +36,7 @@ using varOp_t = std::variant<
     std::shared_ptr<UnaryOp<R_DCCSC3D_t, C_DCCSC3D_t>>,
     std::shared_ptr<UnaryOp<C_DCCSC3D_t, R_DCCSC3D_t>>,
     std::shared_ptr<UnaryOp<R_DCCSC3D_t, R_DCCSC3D_t>>,
-    std::shared_ptr<UnaryOp<C_DCCSC3D_t, C_S1CLCSC3D_t>>
+    std::shared_ptr<UnaryOp<C_S1CLCSC3D_t, C_DCCSC3D_t>>
 >;
 
 
@@ -113,9 +113,9 @@ MapOps::MapOps(mlir::ModuleOp module,
       }
       else if (auto alInt = dyn_cast<mlir::quiccir::AlIOp>(op)) {
         using namespace QuICC::Transform::Quadrature;
-        using Tin = C_S1CLCSC3D_t;
-        using Tout = C_DCCSC3D_t;
-        using Top = QuICC::View::View<double, QuICC::View::CSL3DJIK>;
+        using Tin = C_DCCSC3D_t;
+        using Tout = C_S1CLCSC3D_t;
+        using Top = QuICC::View::View<double, QuICC::View::S1CLCSC3DJIK>;
         using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
         using op_t = Op<Tout, Tin, Top, backend_t>;
         _ops.push_back(std::make_unique<op_t>(mem));

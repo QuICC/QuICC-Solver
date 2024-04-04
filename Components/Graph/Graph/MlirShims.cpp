@@ -88,9 +88,9 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view
     assert(pUmod != nullptr);
     // op
     using namespace QuICC::Transform::Quadrature;
-    using Tin = C_S1CLCSC3D_t;
-    using Tout = C_DCCSC3D_t;
-    using Top = QuICC::View::View<double, QuICC::View::CSL3DJIK>;
+    using Tin = C_DCCSC3D_t;
+    using Tout = C_S1CLCSC3D_t;
+    using Top = QuICC::View::View<double, QuICC::View::S1CLCSC3DJIK>;
     using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
     using op_t = Op<Tout, Tin, Top, backend_t>;
     // views
@@ -113,8 +113,8 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view
         std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUval->dims[2]};
         std::vector<std::uint32_t> layers;
         // check for populated layers
-        for (std::size_t i = 1; i < pUmod->posSize; ++i) {
-            if (pUmod->pos[i] - pUmod->pos[i-1] > 0) {
+        for (std::size_t i = 0; i < pUmod->posSize-1; ++i) {
+            if (pUmod->pos[i+1] - pUmod->pos[i] > 0) {
                 layers.push_back(i);
             }
         }
@@ -130,6 +130,10 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view
 /// @param umod
 extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
 {
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
@@ -149,8 +153,10 @@ extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
     Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
-    // call
+    // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
+    assert(cl->getOp().data() == nullptr);
+    // call
     cl->apply(viewVal, viewMod);
 };
 
