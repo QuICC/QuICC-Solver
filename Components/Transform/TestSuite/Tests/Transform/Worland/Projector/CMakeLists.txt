@@ -15,7 +15,7 @@ if(TARGET QuICC::Cuda)
     Poly::P:<viewGpu_t>:projector
   )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _tests
         Poly::P:<kokkos_t>:projector
     )
@@ -80,7 +80,7 @@ if(TARGET QuICC::Cuda)
     Poly::SphLapl:<viewGpu_t>:projector
   )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
 list(APPEND _tests
   Poly::D1:<kokkos_t>:projector
   Poly::D1R1:<kokkos_t>:projector
@@ -159,7 +159,7 @@ if(TARGET QuICC::Cuda)
     Poly::DivR1CylLaplh_Zero:<viewGpu_t>:projector
   )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     set(_tests
       Poly::CylLaplh:<kokkos_t>:projector
       Poly::CylLaplh_DivR1D1R1:<kokkos_t>:projector
@@ -291,7 +291,7 @@ if(TARGET QuICC::Cuda)
         Poly::P:<viewGpu_t>:projector
     )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
   list(APPEND _split_tests
       Poly::P:<kokkos_t>:projector
   )
@@ -320,7 +320,7 @@ if(TARGET QuICC::Cuda)
         Poly::P:<viewGpu_t>:projector
     )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _perf_tests
         Poly::P:<kokkos_t>:projector
         )

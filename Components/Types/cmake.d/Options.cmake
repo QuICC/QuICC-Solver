@@ -18,6 +18,10 @@ if(QUICC_MULTPRECISION)
     INTERFACE
       Boost::headers)
 
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+    INTERFACE
+      Boost::headers)
+
   target_compile_definitions(${QUICC_CURRENT_COMPONENT_LIB}
     INTERFACE "-DQUICC_MULTPRECISION")
   quicc_target_add_definition(${QUICC_CURRENT_COMPONENT_LIB}

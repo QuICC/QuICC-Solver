@@ -13,6 +13,5 @@ if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
     I4DivR1D1R1_I2.cpp
     I4DivR1D1R1_Zero.cpp
     I6DivR1_Zero.cpp
-
   )
 endif()
