@@ -47,6 +47,10 @@ extern "C" void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
 /// @param uval
 extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(void* obj, view3_cd_t* pUmod, view3_t* pUval)
 {
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t\n";
+    #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
@@ -152,6 +156,10 @@ extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
 extern "C" void _ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
     view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
 {
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    #endif
     assert(obj != nullptr);
     assert(pRet != nullptr);
     assert(pLhs != nullptr);
@@ -183,6 +191,10 @@ extern "C" void _ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* ob
 extern "C" void _ciface_quiccir_sub_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
     view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
 {
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_sub_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    #endif
     assert(obj != nullptr);
     assert(pRet != nullptr);
     assert(pLhs != nullptr);

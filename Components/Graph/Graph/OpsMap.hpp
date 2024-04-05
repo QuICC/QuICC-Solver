@@ -179,6 +179,7 @@ MapOps::MapOps(mlir::ModuleOp module,
       else if (auto tran = dyn_cast<mlir::quiccir::TransposeOp>(op)) {
         using namespace QuICC::Transpose::Cpu;
         using namespace QuICC::Transpose;
+        // check type attribute
         using Tin = C_DCCSC3D_t;
         using Tout = C_DCCSC3D_t;
         // check perm attribute

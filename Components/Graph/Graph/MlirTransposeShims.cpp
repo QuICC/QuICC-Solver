@@ -27,8 +27,8 @@ extern "C" void _ciface_quiccir_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(void* ob
     // Op
     using namespace QuICC::Transpose::Cpu;
     using namespace QuICC::Transpose;
-    using Tin = C_DCCSC3D_t;
-    using Tout = C_S1CLCSC3D_t;
+    using Tin = C_S1CLCSC3D_t;
+    using Tout = C_DCCSC3D_t;
     using op_t = Op<Tout, Tin, p201_t>;
     // views
     using namespace QuICC::View;

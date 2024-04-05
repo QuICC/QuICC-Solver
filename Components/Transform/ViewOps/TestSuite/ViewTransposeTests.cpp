@@ -63,19 +63,23 @@ TEST_CASE("Serial S1CLCSC3D to DCCSC3D", "SerialS1CLCSC3DtoDCCSC3D")
     // Full data and type
     constexpr size_t M = 4;
     constexpr size_t N = 2;
-    constexpr size_t K = 2;
+    constexpr size_t K = 3;
 
-    constexpr size_t S = M * N * K;
+    constexpr size_t S = (M + (M-1) + (M-2)) * N ;
     std::array<double, S> dataIn = {/*k0*/ 1, 2, 3, 4,
         /*k0*/ 5, 6, 7, 8,
         /*k1*/ 9, 10, 11,
-        /*k1*/ 12, 13, 14};
+        /*k1*/ 12, 13, 14,
+        /*k2*/ 15, 16,
+        /*k2*/ 17, 18};
 
     // N K M
     std::array<double, S> dataRef = {/*m0*/ 1, 5,
         /*m0*/ 9,  12,
+        /*m0*/ 15, 17,
         /*m1*/ 2,  6,
         /*m1*/ 10, 13,
+        /*m1*/ 16, 18,
         /*m2*/ 3,  7,
         /*m2*/ 11, 14,
         /*m3*/ 4,
