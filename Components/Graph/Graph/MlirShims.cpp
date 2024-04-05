@@ -113,42 +113,6 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view
     cl->apply(viewVal, viewMod);
 };
 
-/// @brief C Interface to MLIR for a jw int operator
-/// @param op
-/// @param uval
-/// @param umod
-extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
-{
-    #ifndef NDEBUG
-    std::cout <<
-        "_ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t\n";
-    #endif
-    assert(obj != nullptr);
-    assert(pUval != nullptr);
-    assert(pUmod != nullptr);
-    // op
-    using namespace QuICC::Transform::Quadrature;
-    using Tin = C_DCCSC3D_t;
-    using Tout = C_DCCSC3D_t;
-    using Top = QuICC::View::View<double, QuICC::View::CSL3DJIK>;
-    using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
-    using op_t = Op<Tout, Tin, Top, backend_t>;
-    // views
-    using namespace QuICC::View;
-    constexpr std::uint32_t rank = 3;
-    ViewBase<std::uint32_t> pointers[rank];
-    pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
-    ViewBase<std::uint32_t> indices[rank];
-    indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
-    Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
-    Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
-    // Check that op was set up
-    auto cl = reinterpret_cast<op_t*>(obj);
-    assert(cl->getOp().data() == nullptr);
-    // call
-    cl->apply(viewVal, viewMod);
-};
-
 /// @brief C Interface to MLIR for a binary add operator
 /// @param op
 /// @param uval
@@ -298,15 +262,6 @@ extern "C" void _ciface_quiccir_alloc_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(view3_cd_
     #ifndef NDEBUG
     std::cout << "_ciface_quiccir_alloc_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
     #endif
-};
-
-extern "C" void _ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
-{
-    std::cout << "missing alloc operator shim: _ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t\n";
-    pNewBuffer->pos = nullptr;
-    pNewBuffer->posSize = 0;
-    pNewBuffer->coo = nullptr;
-    pNewBuffer->cooSize = 0;
 };
 
 extern "C" void _ciface_quiccir_alloc_sub_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
