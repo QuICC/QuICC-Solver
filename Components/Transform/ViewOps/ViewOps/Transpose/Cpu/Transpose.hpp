@@ -68,8 +68,16 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
             }
         }
     }
+    elseif (std::is_same_v<Perm, p201_t> &&
+        std::is_same_v<typename Tin::AttributesType, View::S1CLCSC3D> &&
+        std::is_same_v<typename Tout::AttributesType, View::DCCSC3D>) {
+        // dense transpose
+
+    }
     else {
-        throw std::logic_error("transpose not implemented");
+        // throw std::logic_error("transpose not implemented");
+        std::cerr << "transpose op not implemented\n";
+        assert(false);
     }
 }
 

@@ -24,25 +24,24 @@ extern "C" void _ciface_quiccir_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(void* ob
     assert(pIn != nullptr);
     assert(pOut != nullptr);
     assert(pIn->dataSize == pOut->dataSize);
-    std::cout << "missing op!\n";
-    // // Op
-    // using namespace QuICC::Transpose::Cpu;
-    // using namespace QuICC::Transpose;
-    // using Tin = C_DCCSC3D_t;
-    // using Tout = C_S1CLCSC3D_t;
-    // using op_t = Op<Tout, Tin, p201_t>;
-    // // views
-    // using namespace QuICC::View;
-    // constexpr std::uint32_t rank = 3;
-    // // not used, not setting up
-    // ViewBase<std::uint32_t> pointers[rank];
-    // // not used, not setting up
-    // ViewBase<std::uint32_t> indices[rank];
-    // Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
-    // Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
-    // // call
-    // auto cl = reinterpret_cast<op_t*>(obj);
-    // cl->apply(viewOut, viewIn);
+    // Op
+    using namespace QuICC::Transpose::Cpu;
+    using namespace QuICC::Transpose;
+    using Tin = C_DCCSC3D_t;
+    using Tout = C_S1CLCSC3D_t;
+    using op_t = Op<Tout, Tin, p201_t>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    // not used for dense transpose, not setting up
+    ViewBase<std::uint32_t> pointers[rank];
+    // not used for dense transpose, not setting up
+    ViewBase<std::uint32_t> indices[rank];
+    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    // call
+    auto cl = reinterpret_cast<op_t*>(obj);
+    cl->apply(viewOut, viewIn);
 };
 
 extern "C" void _ciface_quiccir_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pOut, const view3_cd_t* pIn)
