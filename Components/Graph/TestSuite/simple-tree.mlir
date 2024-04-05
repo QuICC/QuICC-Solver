@@ -69,5 +69,4 @@ func.func @entry(%thisArr: !llvm.ptr<array<7 x ptr>> {llvm.noalias}, %Polv: !typ
   return
 }
 
-
-// ./bin/quiccir-opt ../examples/simple-tree.mlir --inline --set-quiccir-view-lay --convert-quiccir-to-call --quiccir-view-deallocation --lower-quiccir-alloc --canonicalize --finalize-quiccir-view --convert-func-to-llvm --canonicalize
+// /home/gcastigl/codes/quiccir/build-17/bin/quiccir-opt ../Components/Graph/TestSuite/simple-tree.mlir --inline --set-quiccir-view-lay='lay-ppp2mpp=R_DCCSC3D_t,C_DCCSC3D_t lay-pmp2mmp=C_DCCSC3D_t,C_S1CLCSC3D_t lay-pmm2mmm=C_DCCSC3D_t,C_DCCSC3D_t' --convert-quiccir-to-call --quiccir-view-deallocation --lower-quiccir-alloc --canonicalize --finalize-quiccir-view --convert-func-to-llvm --canonicalize
