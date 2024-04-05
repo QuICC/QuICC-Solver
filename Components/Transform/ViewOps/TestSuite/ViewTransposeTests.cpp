@@ -79,11 +79,9 @@ TEST_CASE("Serial S1CLCSC3D to DCCSC3D", "SerialS1CLCSC3DtoDCCSC3D")
         /*m2*/ 3,  7,
         /*m2*/ 11, 14,
         /*m3*/ 4,
-        /*m3*/ 8, };
+        /*m3*/ 8};
 
     std::array<double, S> dataOut;
-
-
 
     // view
     constexpr std::uint32_t rank = 3;
@@ -107,17 +105,9 @@ TEST_CASE("Serial S1CLCSC3D to DCCSC3D", "SerialS1CLCSC3DtoDCCSC3D")
     transposeOp->apply(viewOut, viewIn);
 
     // check
-    for (std::uint64_t k = 0; k < K; ++k)
+    for (std::uint64_t s = 0; s < S; ++s)
     {
-        for (std::uint64_t n = 0; n < N; ++n)
-        {
-            for (std::uint64_t m = 0; m < M; ++m)
-            {
-                auto mnk = m + n*M + k*M*N;
-                auto nkm = n + k*N + m*K*N;
-                CHECK(viewIn[mnk] == viewOut[nkm]);
-            }
-        }
+        CHECK(dataRef[s] == viewOut[s]);
     }
 }
 
