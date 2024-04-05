@@ -43,24 +43,6 @@ private:
    friend UnaryBaseOp<Op<Tout, Tin, Perm>, Tout, Tin>;
 };
 
-/// @brief Generate inclusive scan, prefix sum of
-/// virtual vector {0, 1, 2, ..., K-1}
-/// Naive implementation O(K)
-/// @tparam T
-/// @param K
-/// @return
-template <class T>
-std::vector<T> pSum(T K){
-    static_assert(std::is_integral_v<T>, "T must be of integral type");
-    assert(K > 0);
-    std::vector<T> ret(K);
-    ret[0] = 0;
-    for (std::size_t i = 1; i < K; ++i) {
-        ret[i] = ret[i-1] + i;
-    }
-    return ret;
-}
-
 /// @brief inclusive scan
 /// @tparam T
 /// @param K
@@ -108,10 +90,16 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
         auto K = in.dims()[2];
         // access S1CLCSC3D
         // cumulative column height is (with ijk) I*k - sum(i)_0^k
-        auto iSum = pSum(I);
+        // iSum shifted by 1
+        std::vector<std::uint32_t> iSum(I, 0);
+        for (std::size_t i = 2; i < K; ++i) {
+            iSum[i] = iSum[i-1] + 1;
+        }
+        pSum(iSum);
         // cumulative row width (with jki)
+        // kSum shifted by 1
         std::vector<std::uint32_t> kSum(I);
-        kSum[I-1] = K-1;
+        kSum[I-1] = K-2;
         for (std::size_t i = I-1; i > 0; --i) {
             if (kSum[i] > 0) {
                 kSum[i-1] = kSum[i] - 1;
@@ -126,17 +114,14 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
             std::size_t Iloc = I - k;
             for (std::size_t j = 0; j < J; ++j) {
                 for (std::size_t i = 0; i < Iloc; ++i) {
-                    std::size_t ijk = i + j*Iloc + (k*I-iSum[k-1])*J;
-                    std::size_t jki = j + k*J + (i*K-kSum[i-1])*J;
+                    std::size_t ijk = i + j*Iloc + (k*I-iSum[k])*J;
+                    std::size_t jki = j + k*J + (i*K-kSum[i])*J;
                     assert(ijk < in.size());
                     assert(jki < out.size());
                     out[jki] = in[ijk];
                 }
             }
         }
-
-
-
     }
     else {
         // throw std::logic_error("transpose not implemented");
