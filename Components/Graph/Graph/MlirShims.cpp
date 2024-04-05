@@ -79,11 +79,46 @@ extern "C" void _ciface_quiccir_sub_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* ob
     cl->apply(viewRet, viewLhs, viewRhs);
 };
 
+extern "C" void _ciface_quiccir_alloc_add_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+{
+    // NewBuffer is identical to producer
+    assert(pNewBuffer->dims[0] == pProdBuffer->dims[0]);
+    assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
+    assert(pNewBuffer->dims[2] == pProdBuffer->dims[2]);
+    // Reuse meta
+    assert(pProdBuffer->pos != nullptr);
+    assert(pProdBuffer->coo != nullptr);
+    pNewBuffer->pos = pProdBuffer->pos;
+    pNewBuffer->posSize = pProdBuffer->posSize;
+    pNewBuffer->coo = pProdBuffer->coo;
+    pNewBuffer->cooSize = pProdBuffer->cooSize;
+    // Alloc buffer
+    pNewBuffer->dataSize = pProdBuffer->dataSize;
+    std::size_t sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
+    pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>))));
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_add_C_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
+};
+
 extern "C" void _ciface_quiccir_alloc_sub_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
-    std::cout << "missing alloc operator shim: _ciface_quiccir_alloc_sub_C_DCCSC3D_t_C_DCCSC3D_t\n";
-    pNewBuffer->pos = nullptr;
-    pNewBuffer->posSize = 0;
-    pNewBuffer->coo = nullptr;
-    pNewBuffer->cooSize = 0;
+    // NewBuffer is identical to producer
+    assert(pNewBuffer->dims[0] == pProdBuffer->dims[0]);
+    assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
+    assert(pNewBuffer->dims[2] == pProdBuffer->dims[2]);
+    // Reuse meta
+    assert(pProdBuffer->pos != nullptr);
+    assert(pProdBuffer->coo != nullptr);
+    pNewBuffer->pos = pProdBuffer->pos;
+    pNewBuffer->posSize = pProdBuffer->posSize;
+    pNewBuffer->coo = pProdBuffer->coo;
+    pNewBuffer->cooSize = pProdBuffer->cooSize;
+    // Alloc buffer
+    pNewBuffer->dataSize = pProdBuffer->dataSize;
+    std::size_t sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
+    pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>))));
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_sub_C_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
 };
