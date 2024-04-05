@@ -107,7 +107,9 @@ MapOps::MapOps(mlir::ModuleOp module,
           _thisArr[index] = ptr;
         }
         else {
+          #ifndef NDEBUG
           std::cout << "operator already allocated\n";
+          #endif
         }
       }
       else if (auto frInt = dyn_cast<mlir::quiccir::FrIOp>(op)) {
@@ -132,7 +134,9 @@ MapOps::MapOps(mlir::ModuleOp module,
           _thisArr[index] = ptr;
         }
         else {
+          #ifndef NDEBUG
           std::cout << "operator already allocated\n";
+          #endif
         }
       }
       else if (auto alInt = dyn_cast<mlir::quiccir::AlIOp>(op)) {
@@ -177,7 +181,9 @@ MapOps::MapOps(mlir::ModuleOp module,
           _thisArr[index] = ptr;
         }
         else {
+          #ifndef NDEBUG
           std::cout << "operator already allocated\n";
+          #endif
         }
       }
       else if (auto jwInt = dyn_cast<mlir::quiccir::JWIOp>(op)) {
@@ -224,7 +230,9 @@ MapOps::MapOps(mlir::ModuleOp module,
           _thisArr[index] = ptr;
         }
         else {
+          #ifndef NDEBUG
           std::cout << "operator already allocated\n";
+          #endif
         }
       }
       else if (auto add = dyn_cast<mlir::quiccir::AddOp>(op)) {
@@ -244,7 +252,31 @@ MapOps::MapOps(mlir::ModuleOp module,
           _thisArr[index] = ptr;
         }
         else {
+          #ifndef NDEBUG
           std::cout << "operator already allocated\n";
+          #endif
+        }
+      }
+      else if (auto sub = dyn_cast<mlir::quiccir::SubOp>(op)) {
+        // Get index from MLIR source
+        std::uint64_t index = sub.getImplptr().value();
+        if (index >= _thisArr.size()) {
+          _thisArr.resize(index+1, nullptr);
+        }
+        if (_thisArr[index] == nullptr) {
+          using namespace QuICC::Pointwise::Cpu;
+          using namespace QuICC::Pointwise;
+          using T = C_DCCSC3D_t;
+          using op_t = Op<SubFunctor<std::complex<double>>, T, T, T>;
+          _ops.push_back(std::make_unique<op_t>(SubFunctor<std::complex<double>>()));
+          auto* ptr = std::get<std::shared_ptr<NaryOp<C_DCCSC3D_t, C_DCCSC3D_t, C_DCCSC3D_t>>>(_ops.back()).get();
+          assert(ptr != nullptr);
+          _thisArr[index] = ptr;
+        }
+        else {
+          #ifndef NDEBUG
+          std::cout << "operator already allocated\n";
+          #endif
         }
       }
       else if (auto tran = dyn_cast<mlir::quiccir::TransposeOp>(op)) {
@@ -271,7 +303,9 @@ MapOps::MapOps(mlir::ModuleOp module,
           _thisArr[index] = ptr;
         }
         else {
+          #ifndef NDEBUG
           std::cout << "operator already allocated\n";
+          #endif
         }
       }
       // return deallocateBuffers(op);

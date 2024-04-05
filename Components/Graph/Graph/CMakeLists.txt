@@ -11,6 +11,8 @@
 target_sources(${QUICC_CURRENT_COMPONENT_LIB}
   PRIVATE
     MlirShims.cpp
+    MlirFourierShims.cpp
+    MlirALegendreShims.cpp
     MlirWorlandShims.cpp
     MlirTransposeShims.cpp
     MlirDeallocShims.cpp
