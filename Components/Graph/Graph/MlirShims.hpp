@@ -38,7 +38,7 @@ namespace Graph
     }
 
     /// @brief compute pointers and index meta data for fully populated
-    /// tensor as ouput of a Transpose operation
+    /// tensor as ouput of a Transpose operation between AL and JW
     /// @tparam C_DCCSC3D_t
     /// @tparam C_S1CLCSC3D_t
     /// @param dims output dimensions
@@ -51,7 +51,7 @@ namespace Graph
         std::uint32_t K = dims[1];
         std::uint32_t I = dims[2];
 
-        // row width (with jki)
+        // row width (with jki) K - ...
         std::vector<std::uint32_t> kLess(I);
         kLess[I-1] = K-1;
         for (std::size_t i = I-1; i > 0; --i)

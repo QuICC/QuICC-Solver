@@ -88,7 +88,7 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(vi
 
     // Alloc meta for fully populated tensor
     // we will need to add a hashmap with counter
-    // to know when we this was already allocated
+    // to know when this was already allocated
     // and when we can deallocate the meta data
     auto meta = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>(
         {pNewBuffer->dims[0], pNewBuffer->dims[1], pNewBuffer->dims[2]});
@@ -101,7 +101,7 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(vi
     pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
 
     // Populate meta for fully populated tensor
-    for (std::size_t i = 1; i < pNewBuffer->posSize; ++i) {
+    for (std::size_t i = 0; i < pNewBuffer->posSize; ++i) {
         pNewBuffer->pos[i] = meta.ptr[i];
     }
     for (std::size_t i = 0; i < pNewBuffer->cooSize; ++i) {

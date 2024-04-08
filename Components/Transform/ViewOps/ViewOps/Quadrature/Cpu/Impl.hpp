@@ -76,6 +76,7 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in,
       for (IndexType k = 0; k < modsPointers.size() - 1; ++k)
       {
          IndexType nCols = modsPointers[k + 1] - modsPointers[k];
+         assert(nCols <= in.dims()[1]);
          // check if layer is populated
          if (nCols > 0)
          {

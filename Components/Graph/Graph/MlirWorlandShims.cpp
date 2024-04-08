@@ -13,7 +13,7 @@ using namespace QuICC::Graph;
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
+extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUmod, view3_cd_t* pUval)
 {
     #ifndef NDEBUG
     std::cout <<
@@ -36,13 +36,15 @@ extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
     pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
     ViewBase<std::uint32_t> indices[rank];
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
-    Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
-    Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    assert(pUmod->pos == pUval->pos);
+    assert(pUmod->coo == pUval->coo);
+    Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
     assert(cl->getOp().data() != nullptr);
     // call
-    cl->apply(viewVal, viewMod);
+    cl->apply(viewMod, viewVal);
 };
 
 extern "C" void _ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
