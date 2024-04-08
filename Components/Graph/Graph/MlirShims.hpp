@@ -3,6 +3,7 @@
 
 #include <Quiccir-c/Utils.h>
 #include <complex>
+#include <unordered_map>
 
 #include "ViewOps/ViewMemoryUtils.hpp"
 

@@ -9,6 +9,32 @@
 
 using namespace QuICC::Graph;
 
+namespace details
+{
+    /// @brief map meta producer pointer to meta pointer
+    std::unordered_map<void*, void*> metaStore;
+
+    /// @brief map meta pointer to size for deallocation
+    std::unordered_map<void*, std::uint32_t> metaSize;
+
+    void cleanupMeta()
+    {
+        for (auto& m : metaSize)
+        {
+            if (m.second > 0)
+            {
+                ::operator delete(m.first, m.second,
+                    static_cast<std::align_val_t>(sizeof(std::uint32_t)));
+                #ifndef NDEBUG
+                std::cout << "_ciface_quiccir_dealloc_meta, bytes: " << m.second << '\n';
+                #endif
+                m.second = 0;
+            }
+        }
+
+    }
+
+} // namespace details
 
 /// @brief C Interface to MLIR for a transpose operator
 /// @param op
@@ -86,6 +112,7 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(vi
     assert(pNewBuffer->dims[0] == pProdBuffer->dims[1]);
     assert(pNewBuffer->dims[1] == pProdBuffer->dims[2]);
 
+
     // Alloc meta for fully populated tensor
     // we will need to add a hashmap with counter
     // to know when this was already allocated
@@ -95,23 +122,56 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(vi
 
     pNewBuffer->posSize = meta.ptr.size();
     std::size_t sizeByte = sizeof(std::uint32_t) * pNewBuffer->posSize;
-    pNewBuffer->pos = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
-    #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t, bytes: " << sizeByte << '\n';
-    #endif
+
+    // Check if this metadata was already allocated;
+    assert(pProdBuffer->pos != nullptr);
+    if (details::metaStore[pProdBuffer->pos])
+    {
+        #ifndef NDEBUG
+        std::cout << "meta pos buffer already allocated\n";
+        #endif
+        pNewBuffer->pos = reinterpret_cast<std::uint32_t*>(details::metaStore[pProdBuffer->pos]);
+    }
+    else
+    {
+        pNewBuffer->pos = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
+        #ifndef NDEBUG
+        std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t, bytes: " << sizeByte << '\n';
+        #endif
+        // Store meta
+        details::metaStore[pProdBuffer->pos] = pNewBuffer->pos;
+        // Register metaSize for dealloc
+        details::metaSize[pNewBuffer->pos] = sizeByte;
+        std::atexit(details::cleanupMeta);
+        // Populate meta for fully populated tensor
+        for (std::size_t i = 0; i < pNewBuffer->posSize; ++i) {
+            pNewBuffer->pos[i] = meta.ptr[i];
+        }
+    }
     pNewBuffer->cooSize = meta.idx.size();
     sizeByte = sizeof(std::uint32_t) * pNewBuffer->cooSize;
-    pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
-    #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t, bytes: " << sizeByte << '\n';
-    #endif
-
-    // Populate meta for fully populated tensor
-    for (std::size_t i = 0; i < pNewBuffer->posSize; ++i) {
-        pNewBuffer->pos[i] = meta.ptr[i];
+    assert(pProdBuffer->coo != nullptr);
+    if (details::metaStore[pProdBuffer->coo])
+    {
+        #ifndef NDEBUG
+        std::cout << "meta coo buffer already allocated\n";
+        #endif
+        pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(details::metaStore[pProdBuffer->coo]);
     }
-    for (std::size_t i = 0; i < pNewBuffer->cooSize; ++i) {
-        pNewBuffer->coo[i] = meta.idx[i];
+    else
+    {
+        pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
+        #ifndef NDEBUG
+        std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t, bytes: " << sizeByte << '\n';
+        #endif
+        // Store meta
+        details::metaStore[pProdBuffer->coo] = pNewBuffer->coo;
+        // Register meta for dealloc
+        details::metaSize[pNewBuffer->coo] = sizeByte;
+        // Populate meta for fully populated tensor
+        for (std::size_t i = 0; i < pNewBuffer->cooSize; ++i) {
+            pNewBuffer->coo[i] = meta.idx[i];
+        }
     }
 
     // Alloc buffer
@@ -141,24 +201,56 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t(view
     // to know when we can deallocate the meta data
     pNewBuffer->posSize = pNewBuffer->dims[2]+1;
     std::size_t sizeByte = sizeof(std::uint32_t) * pNewBuffer->posSize;
-    pNewBuffer->pos = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
-    #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
-    #endif
+    // Check if this metadata was already allocated;
+    assert(pProdBuffer->pos != nullptr);
+    if (details::metaStore[pProdBuffer->pos])
+    {
+        #ifndef NDEBUG
+        std::cout << "meta pos buffer already allocated\n";
+        #endif
+        pNewBuffer->pos = reinterpret_cast<std::uint32_t*>(details::metaStore[pProdBuffer->pos]);
+    }
+    else
+    {
+        pNewBuffer->pos = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
+        #ifndef NDEBUG
+        std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+        #endif
+        // Store meta
+        details::metaStore[pProdBuffer->pos] = pNewBuffer->pos;
+        // Register meta for dealloc
+        details::metaSize[pNewBuffer->pos] = sizeByte;
+        std::atexit(details::cleanupMeta);
+        // Populate meta for fully populated tensor
+        pNewBuffer->pos[0] = 0;
+        for (std::size_t i = 1; i < pNewBuffer->posSize; ++i) {
+            pNewBuffer->pos[i] = pNewBuffer->pos[i-1]+pNewBuffer->dims[1];
+        }
+    }
     pNewBuffer->cooSize = pNewBuffer->dims[1]*pNewBuffer->dims[2];
     sizeByte = sizeof(std::uint32_t) * pNewBuffer->cooSize;
-    pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
-    #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
-    #endif
-
-    // Populate meta for fully populated tensor
-    pNewBuffer->pos[0] = 0;
-    for (std::size_t i = 1; i < pNewBuffer->posSize; ++i) {
-        pNewBuffer->pos[i] = pNewBuffer->pos[i-1]+pNewBuffer->dims[1];
+    assert(pProdBuffer->coo != nullptr);
+    if (details::metaStore[pProdBuffer->coo])
+    {
+        #ifndef NDEBUG
+        std::cout << "meta coo buffer already allocated\n";
+        #endif
+        pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(details::metaStore[pProdBuffer->coo]);
     }
-    for (std::size_t i = 0; i < pNewBuffer->cooSize; ++i) {
-        pNewBuffer->coo[i] = i % pNewBuffer->dims[1];
+    else
+    {
+        pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
+        #ifndef NDEBUG
+        std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+        #endif
+        // Store meta
+        details::metaStore[pProdBuffer->coo] = pNewBuffer->coo;
+        // Register meta for dealloc
+        details::metaSize[pNewBuffer->coo] = sizeByte;
+        // Populate meta for fully populated tensor
+        for (std::size_t i = 0; i < pNewBuffer->cooSize; ++i) {
+            pNewBuffer->coo[i] = i % pNewBuffer->dims[1];
+        }
     }
 
     // Alloc buffer
