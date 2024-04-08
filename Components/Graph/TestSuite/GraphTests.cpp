@@ -303,28 +303,38 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   auto modsK = modsDims[2];
 
   // Populate meta for fully populated tensor
-  std::vector<std::uint32_t> ptr(K+1);
-  std::vector<std::uint32_t> idx(K*N);
-  ptr[0] = 0;
-  for (std::size_t i = 1; i < ptr.size(); ++i) {
-      ptr[i] = ptr[i-1]+N;
+  // Physical space
+  std::vector<std::uint32_t> ptrPhys(K+1);
+  std::vector<std::uint32_t> idxPhys(K*N);
+  ptrPhys[0] = 0;
+  for (std::size_t i = 1; i < ptrPhys.size(); ++i) {
+      ptrPhys[i] = ptrPhys[i-1]+N;
   }
-  for (std::size_t i = 0; i < idx.size(); ++i) {
-      idx[i] = i % N;
+  for (std::size_t i = 0; i < idxPhys.size(); ++i) {
+      idxPhys[i] = i % N;
   }
+  std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, ptrPhys, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
 
-  std::array<std::vector<std::uint32_t>, 3> pointers {{{}, ptr, {}}};
-  std::array<std::vector<std::uint32_t>, 3> indices {{{}, idx, {}}};
+  // Populate meta for fully populated tensor
+  // Modal space
+  using namespace QuICC::Graph;
+  auto metaMods = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});
+  std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaMods.ptr, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaMods.idx, {}}};
 
   // host mem block
-  std::size_t modsS = modsM*indices[1].size();
+  std::size_t modsS = modsM*indicesPhys[1].size();
   QuICC::Memory::MemBlock<double> R(modsS, mem.get());
-  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, mem.get());
+  QuICC::Memory::MemBlock<double> Phi(modsS, mem.get());
+  QuICC::Memory::MemBlock<double> Theta(modsS, mem.get());
+  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsK*metaMods.idx.size(), mem.get());
 
   // host view
-  using namespace QuICC::Graph;
-  R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointers, indices);
-  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, modsDims, pointers, indices);
+  R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
+  R_DCCSC3D_t PhiView({Phi.data(), Phi.size()}, physDims, pointersPhys, indicesPhys);
+  R_DCCSC3D_t ThetaView({Theta.data(), Theta.size()}, physDims, pointersPhys, indicesPhys);
+  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
 
   // set input modes
   double val = 1.0;
@@ -338,20 +348,20 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   using view3_cd_t = ViewDescriptor<std::complex<double>, std::uint32_t, 3>;
 
   view3_rd_t RviewDes{{M, N, K},
-    pointers[1].data(), (std::uint32_t)pointers[1].size(),
-    indices[1].data(), (std::uint32_t)indices[1].size(),
+    pointersPhys[1].data(), (std::uint32_t)pointersPhys[1].size(),
+    indicesPhys[1].data(), (std::uint32_t)indicesPhys[1].size(),
     R.data(), (std::uint32_t)R.size()};
   view3_rd_t PhiviewDes{{M, N, K},
-    pointers[1].data(), (std::uint32_t)pointers[1].size(),
-    indices[1].data(), (std::uint32_t)indices[1].size(),
-    R.data(), (std::uint32_t)R.size()};
+    pointersPhys[1].data(), (std::uint32_t)pointersPhys[1].size(),
+    indicesPhys[1].data(), (std::uint32_t)indicesPhys[1].size(),
+    Phi.data(), (std::uint32_t)Phi.size()};
   view3_rd_t ThetaviewDes{{M, N, K},
-    pointers[1].data(), (std::uint32_t)pointers[1].size(),
-    indices[1].data(), (std::uint32_t)indices[1].size(),
-    R.data(), (std::uint32_t)R.size()};
-  view3_cd_t viewRef_out{{modsM, N, K},
-    pointers[1].data(), (std::uint32_t)pointers[1].size(),
-    indices[1].data(), (std::uint32_t)indices[1].size(),
+    pointersPhys[1].data(), (std::uint32_t)pointersPhys[1].size(),
+    indicesPhys[1].data(), (std::uint32_t)indicesPhys[1].size(),
+    Theta.data(), (std::uint32_t)Theta.size()};
+  view3_cd_t viewRef_out{{modsK, modsM, modsN},
+    pointersMods[1].data(), (std::uint32_t)pointersMods[1].size(),
+    indicesMods[1].data(), (std::uint32_t)indicesMods[1].size(),
     modsOut.data(), (std::uint32_t)modsOut.size()};
 
   // get operators map

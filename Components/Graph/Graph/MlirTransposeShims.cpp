@@ -88,36 +88,28 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(vi
 
     // Alloc meta for fully populated tensor
     // we will need to add a hashmap with counter
-    // to know when we can deallocate the meta data
-    pNewBuffer->posSize = pNewBuffer->dims[2]+1;
+    // to know when we this was already allocated
+    // and when we can deallocate the meta data
+    auto meta = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>(
+        {pNewBuffer->dims[0], pNewBuffer->dims[1], pNewBuffer->dims[2]});
+
+    pNewBuffer->posSize = meta.ptr.size();
     std::size_t sizeByte = sizeof(std::uint32_t) * pNewBuffer->posSize;
     pNewBuffer->pos = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
-
-    pNewBuffer->cooSize = pNewBuffer->dims[1]*pNewBuffer->dims[2];
-    sizeByte = sizeof(std::uint32_t) * pNewBuffer->posSize;
+    pNewBuffer->cooSize = meta.idx.size();
+    sizeByte = sizeof(std::uint32_t) * pNewBuffer->cooSize;
     pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
+
     // Populate meta for fully populated tensor
-    pNewBuffer->pos[0] = 0;
     for (std::size_t i = 1; i < pNewBuffer->posSize; ++i) {
-        pNewBuffer->pos[i] = pNewBuffer->pos[i-1] + (pNewBuffer->dims[1] - (i-1));
+        pNewBuffer->pos[i] = meta.ptr[i];
     }
-    std::size_t layerIdx = 0;
-    for (std::size_t l = 0; l < pNewBuffer->posSize - 1; ++l) {
-        auto layerSize = pNewBuffer->pos[l+1] - pNewBuffer->pos[l];
-        for (std::size_t i = 0; i < layerSize; ++i) {
-            pNewBuffer->coo[layerIdx+i] = i;
-        }
-        layerIdx += layerSize;
+    for (std::size_t i = 0; i < pNewBuffer->cooSize; ++i) {
+        pNewBuffer->coo[i] = meta.idx[i];
     }
 
     // Alloc buffer
-    std::size_t cumSliceSize = 0;
-    for (std::size_t i = 0; i < pNewBuffer->posSize - 1; ++i) {
-        auto width = pNewBuffer->pos[i+1] - pNewBuffer->pos[i];
-        auto height = pNewBuffer->dims[0];
-        cumSliceSize += height * width;
-    }
-    pNewBuffer->dataSize = cumSliceSize;
+    pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
     sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
     pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>))));
     #ifndef NDEBUG
