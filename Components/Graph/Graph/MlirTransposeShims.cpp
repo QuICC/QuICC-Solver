@@ -96,9 +96,15 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(vi
     pNewBuffer->posSize = meta.ptr.size();
     std::size_t sizeByte = sizeof(std::uint32_t) * pNewBuffer->posSize;
     pNewBuffer->pos = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
     pNewBuffer->cooSize = meta.idx.size();
     sizeByte = sizeof(std::uint32_t) * pNewBuffer->cooSize;
     pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
 
     // Populate meta for fully populated tensor
     for (std::size_t i = 0; i < pNewBuffer->posSize; ++i) {
@@ -136,9 +142,15 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t(view
     pNewBuffer->posSize = pNewBuffer->dims[2]+1;
     std::size_t sizeByte = sizeof(std::uint32_t) * pNewBuffer->posSize;
     pNewBuffer->pos = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
     pNewBuffer->cooSize = pNewBuffer->dims[1]*pNewBuffer->dims[2];
     sizeByte = sizeof(std::uint32_t) * pNewBuffer->cooSize;
     pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
+    #endif
 
     // Populate meta for fully populated tensor
     pNewBuffer->pos[0] = 0;
