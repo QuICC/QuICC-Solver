@@ -15,6 +15,10 @@ using namespace QuICC::Graph;
 /// @param umod
 extern "C" void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_t* pUval, view3_cd_t* pUmod)
 {
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t\n";
+    #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
@@ -101,6 +105,7 @@ extern "C" void _ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(view3_t* pN
     pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
     std::size_t sizeByte = sizeof(double) * pNewBuffer->dataSize;
     pNewBuffer->data = reinterpret_cast<double*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(double))));
+    // std::size_t sizeByte = 0;
     #ifndef NDEBUG
     std::cout << "_ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
     #endif
@@ -125,6 +130,7 @@ extern "C" void _ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(view3_cd_t*
     pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
     std::size_t sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
     pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>))));
+    // std::size_t sizeByte = 0;
     #ifndef NDEBUG
     std::cout << "_ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t, bytes: " << sizeByte << '\n';
     #endif

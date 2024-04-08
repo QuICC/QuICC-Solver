@@ -20,28 +20,28 @@ extern "C" void _ciface_quiccir_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(void* ob
     std::cout <<
         "_ciface_quiccir_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t\n";
     #endif
-    assert(obj != nullptr);
-    assert(pIn != nullptr);
-    assert(pOut != nullptr);
-    assert(pIn->dataSize == pOut->dataSize);
-    // Op
-    using namespace QuICC::Transpose::Cpu;
-    using namespace QuICC::Transpose;
-    using Tin = C_S1CLCSC3D_t;
-    using Tout = C_DCCSC3D_t;
-    using op_t = Op<Tout, Tin, p201_t>;
-    // views
-    using namespace QuICC::View;
-    constexpr std::uint32_t rank = 3;
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> pointers[rank];
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> indices[rank];
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
-    // call
-    auto cl = reinterpret_cast<op_t*>(obj);
-    cl->apply(viewOut, viewIn);
+    // assert(obj != nullptr);
+    // assert(pIn != nullptr);
+    // assert(pOut != nullptr);
+    // assert(pIn->dataSize == pOut->dataSize);
+    // // Op
+    // using namespace QuICC::Transpose::Cpu;
+    // using namespace QuICC::Transpose;
+    // using Tin = C_S1CLCSC3D_t;
+    // using Tout = C_DCCSC3D_t;
+    // using op_t = Op<Tout, Tin, p201_t>;
+    // // views
+    // using namespace QuICC::View;
+    // constexpr std::uint32_t rank = 3;
+    // // not used for dense transpose, not setting up
+    // ViewBase<std::uint32_t> pointers[rank];
+    // // not used for dense transpose, not setting up
+    // ViewBase<std::uint32_t> indices[rank];
+    // Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
+    // Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    // // call
+    // auto cl = reinterpret_cast<op_t*>(obj);
+    // cl->apply(viewOut, viewIn);
 };
 
 extern "C" void _ciface_quiccir_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pOut, const view3_cd_t* pIn)
@@ -50,28 +50,28 @@ extern "C" void _ciface_quiccir_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
     std::cout <<
         "_ciface_quiccir_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t\n";
     #endif
-    assert(obj != nullptr);
-    assert(pIn != nullptr);
-    assert(pOut != nullptr);
-    assert(pIn->dataSize == pOut->dataSize);
-    // op
-    using namespace QuICC::Transpose::Cpu;
-    using namespace QuICC::Transpose;
-    using Tin = C_DCCSC3D_t;
-    using Tout = C_DCCSC3D_t;
-    using op_t = Op<Tout, Tin, p201_t>;
-    // views
-    using namespace QuICC::View;
-    constexpr std::uint32_t rank = 3;
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> pointers[rank];
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> indices[rank];
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
-    // call
-    auto cl = reinterpret_cast<op_t*>(obj);
-    cl->apply(viewOut, viewIn);
+    // assert(obj != nullptr);
+    // assert(pIn != nullptr);
+    // assert(pOut != nullptr);
+    // assert(pIn->dataSize == pOut->dataSize);
+    // // op
+    // using namespace QuICC::Transpose::Cpu;
+    // using namespace QuICC::Transpose;
+    // using Tin = C_DCCSC3D_t;
+    // using Tout = C_DCCSC3D_t;
+    // using op_t = Op<Tout, Tin, p201_t>;
+    // // views
+    // using namespace QuICC::View;
+    // constexpr std::uint32_t rank = 3;
+    // // not used for dense transpose, not setting up
+    // ViewBase<std::uint32_t> pointers[rank];
+    // // not used for dense transpose, not setting up
+    // ViewBase<std::uint32_t> indices[rank];
+    // Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
+    // Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    // // call
+    // auto cl = reinterpret_cast<op_t*>(obj);
+    // cl->apply(viewOut, viewIn);
 };
 
 extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(view3_cd_t* pNewBuffer, const view3_cd_t* pProdBuffer)
@@ -136,10 +136,10 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t(view
     pNewBuffer->posSize = pNewBuffer->dims[2]+1;
     std::size_t sizeByte = sizeof(std::uint32_t) * pNewBuffer->posSize;
     pNewBuffer->pos = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
-
     pNewBuffer->cooSize = pNewBuffer->dims[1]*pNewBuffer->dims[2];
-    sizeByte = sizeof(std::uint32_t) * pNewBuffer->posSize;
+    sizeByte = sizeof(std::uint32_t) * pNewBuffer->cooSize;
     pNewBuffer->coo = reinterpret_cast<std::uint32_t*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::uint32_t))));
+
     // Populate meta for fully populated tensor
     pNewBuffer->pos[0] = 0;
     for (std::size_t i = 1; i < pNewBuffer->posSize; ++i) {
