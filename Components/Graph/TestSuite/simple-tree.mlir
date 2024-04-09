@@ -21,8 +21,8 @@
 //   %Phi2 = quiccir.al.int %Phi1 : tensor<?x?x?xf64> -> tensor<?x?x?xf64>
 //   %Phi3 = quiccir.jw.int %Phi2 : tensor<?x?x?xf64> -> tensor<?x?x?xf64>
 //   // Pol
-//   %tmp = quiccir.sub %Th2, %R2 : tensor<?x?x?xf64>, tensor<?x?x?xf64> -> tensor<?x?x?xf64>
-//   %Pol = quiccir.add %tmp, %Phi2 : tensor<?x?x?xf64>, tensor<?x?x?xf64> -> tensor<?x?x?xf64>
+//   %tmp = quiccir.sub %Th3, %R3 : tensor<?x?x?xf64>, tensor<?x?x?xf64> -> tensor<?x?x?xf64>
+//   %Pol = quiccir.add %tmp, %Phi3 : tensor<?x?x?xf64>, tensor<?x?x?xf64> -> tensor<?x?x?xf64>
 //   return %Pol : tensor<?x?x?xf64>
 // }
 
@@ -45,13 +45,9 @@ func.func private @simpleTree(%R: tensor<?x?x?xf64>, %Theta: tensor<?x?x?xf64>, 
   %Phi2 = quiccir.al.int %Phi1T : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 2 :i64}
   %Phi2T = quiccir.transpose %Phi2 permutation = [2, 0, 1] : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 3 :i64}
   %Phi3 = quiccir.jw.int %Phi2T : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 4 :i64}
-
   // Pol
   %tmp = quiccir.sub %Th3, %R3 : tensor<?x?x?xf64>, tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 5 :i64}
   %Pol = quiccir.add %tmp, %Phi3 : tensor<?x?x?xf64>, tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 6 :i64}
-  // %0 = tensor.empty() : tensor<?x?x?xf64>
-  // %Pol = linalg.add ins(%tmp, %Phi3 : tensor<?x?x?xf64>, tensor<?x?x?xf64>) outs(%0): tensor<?x?x?xf64>) -> tensor<?x?x?xf64>
-
   return %Pol : tensor<?x?x?xf64>
 }
 

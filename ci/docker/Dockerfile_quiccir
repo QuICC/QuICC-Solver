@@ -10,6 +10,7 @@ RUN mkdir -p /QuICC.src/build \
     -DQUICC_MPI_CI=ON \
     -DQUICC_USE_MPI=ON \
     -DCMAKE_CXX_FLAGS="-march=broadwell" \
+    -DMLIR_DIR=/lib/llvm-17/lib/cmake/mlir \
     -DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
     -DQUICC_PROFILE_LEVEL=4 \
     -DQUICC_PROFILE_BACKEND=native \
