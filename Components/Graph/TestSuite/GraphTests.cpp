@@ -324,10 +324,10 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaMods.idx, {}}};
 
   // host mem block
-  std::size_t modsS = modsM*indicesPhys[1].size();
-  QuICC::Memory::MemBlock<double> R(modsS, mem.get());
-  QuICC::Memory::MemBlock<double> Phi(modsS, mem.get());
-  QuICC::Memory::MemBlock<double> Theta(modsS, mem.get());
+  std::size_t physS = M*indicesPhys[1].size();
+  QuICC::Memory::MemBlock<double> R(physS, mem.get());
+  QuICC::Memory::MemBlock<double> Phi(physS, mem.get());
+  QuICC::Memory::MemBlock<double> Theta(physS, mem.get());
   QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsK*metaMods.idx.size(), mem.get());
 
   // host view
@@ -341,6 +341,8 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   for(std::size_t m = 0; m < RView.size(); ++m)
   {
     RView[m] = val;
+    PhiView[m] = val;
+    ThetaView[m] = val;
   }
 
   // map input/output views
@@ -364,17 +366,17 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
     indicesMods[1].data(), (std::uint32_t)indicesMods[1].size(),
     modsOut.data(), (std::uint32_t)modsOut.size()};
 
-  // get operators map
+  // Get operators map
   auto thisArr = storeOp.getThisArr();
 
   // Apply graph
   auto fun = (void (*)(void*, view3_cd_t*, view3_rd_t*, view3_rd_t*, view3_rd_t*))funSym.get();
   fun(thisArr.data(), &viewRef_out, &RviewDes, &PhiviewDes, &ThetaviewDes);
 
-  // check
-  // for(std::size_t m = 0; m < modsOutView.size(); ++m)
-  // {
-  //   CHECK(modsOutView[m] == val);
-  // }
+  // Check
+  for(std::size_t m = 0; m < modsOutView.size(); ++m)
+  {
+    CHECK(modsOutView[m] == val);
+  }
 
 }
