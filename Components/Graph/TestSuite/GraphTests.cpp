@@ -130,8 +130,10 @@ TEST_CASE("One Dimensional Loop", "[OneDimLoop]")
   engineOptions.transformer = optPipeline;
   // engineOptions.sharedLibPaths = executionEngineLibs;
   auto maybeEngine = mlir::ExecutionEngine::create(*module, engineOptions);
-  assert(maybeEngine && "failed to construct an execution engine");
-  auto &engine = maybeEngine.get();
+  if (!maybeEngine) {
+    assert(false && "failed to construct an execution engine");
+  }
+  auto& engine = maybeEngine.get();
 
   // Invoke the JIT-compiled function.
   std::string symbol = "entry";
@@ -284,8 +286,10 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   engineOptions.transformer = optPipeline;
   // engineOptions.sharedLibPaths = executionEngineLibs;
   auto maybeEngine = mlir::ExecutionEngine::create(*module, engineOptions);
-  assert(maybeEngine && "failed to construct an execution engine");
-  auto &engine = maybeEngine.get();
+  if (!maybeEngine) {
+    assert(false && "failed to construct an execution engine");
+  }
+  auto& engine = maybeEngine.get();
 
   // Invoke the JIT-compiled function.
   std::string symbol = "entry";

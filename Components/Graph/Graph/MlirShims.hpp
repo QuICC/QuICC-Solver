@@ -26,18 +26,6 @@ namespace Graph
     template <class TagTo, class TagFrom>
     ptrAndIdx denseTransposePtrAndIdx(const std::array<std::uint32_t, 3> dims);
 
-    /// @brief inclusive scan
-    /// @tparam T
-    /// @param K
-    template <class T>
-    void pSum(std::vector<T>& vec){
-        static_assert(std::is_integral_v<T>, "T must be of integral type");
-        assert(vec.size() > 0);
-        for (std::size_t i = 1; i < vec.size(); ++i) {
-            vec[i] = vec[i-1] + vec[i];
-        }
-    }
-
     /// @brief compute pointers and index meta data for fully populated
     /// tensor as ouput of a Transpose operation between AL and JW
     /// @tparam C_DCCSC3D_t
