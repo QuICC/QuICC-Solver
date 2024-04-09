@@ -15,14 +15,14 @@ build-quicc-base:
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-gpu
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:7a12f03f6ce481be832ae6175a76f745
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:4ece824bade4a50431065e053d80ba1e
 build-quicc:
   extends: .container-builder-cscs-zen2
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_kkgpu
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:7a12f03f6ce481be832ae6175a76f745"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:4ece824bade4a50431065e053d80ba1e"]'
 test-quicc-lib:
   extends:
   - .test-lib

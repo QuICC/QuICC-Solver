@@ -15,14 +15,14 @@ build-quicc-base:
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-a100
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:f6c51a53d55aebc29e0951564f79ec54
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:cff1c778f72218e84b72687d90efc75d
 build-quicc:
   extends: .container-builder-cscs-zen2
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_kkgpu
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:f6c51a53d55aebc29e0951564f79ec54"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:cff1c778f72218e84b72687d90efc75d"]'
 test-quicc-lib:
   extends:
   - .test-lib
