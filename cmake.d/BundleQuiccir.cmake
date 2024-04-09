@@ -4,7 +4,7 @@
 message(DEBUG "Quiccir")
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
-set(QUICC_QUICCIR_VERSION "graph")
+set(QUICC_QUICCIR_VERSION "shape-inference")
 
 option(QUICC_USE_SYSTEM_QUICCIR "Use system installed Quiccir." OFF)
 

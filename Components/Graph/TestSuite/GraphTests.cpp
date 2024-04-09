@@ -374,9 +374,12 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   fun(thisArr.data(), &viewRef_out, &RviewDes, &PhiviewDes, &ThetaviewDes);
 
   // Check
-  for(std::size_t m = 0; m < modsOutView.size(); ++m)
+  double eps = 1e-15;
+  CHECK(std::abs(modsOutView[0].real() - sqrt(2.0)/2.0) <= eps);
+  CHECK(std::abs(modsOutView[0].imag()) <= eps);
+  for(std::size_t m = 1; m < modsOutView.size(); ++m)
   {
-    CHECK(modsOutView[m] == val);
+    CHECK(std::abs(modsOutView[m]) <= eps);
   }
 
 }
