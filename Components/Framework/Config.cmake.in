@@ -84,14 +84,16 @@ if(QUICC_USE_PFSOLVE)
     CACHE BOOL "This is set by the framework" FORCE)
 endif()
 
-# quiccir
+# quiccir (required), already part of the framework
 set(QUICC_USE_SYSTEM_QUICCIR ON
   CACHE BOOL "This is set by the framework" FORCE)
 if("@QUICC_USE_SYSTEM_QUICCIR@")
-  set(Quiccir_DIR "@Quiccir_DIR@")
+  set(quiccir_DIR "@Quiccir_DIR@")
 else()
-  set(Quiccir_DIR "${QUICC_LIBRARY_ROOT}/share/quiccir/CMake")
+  set(quiccir_DIR "${QUICC_LIBRARY_ROOT}/share/quiccir/cmake")
 endif()
+include(CMakeFindDependencyMacro)
+find_dependency(quiccir)
 
 # Setup
 include(setup/global)
