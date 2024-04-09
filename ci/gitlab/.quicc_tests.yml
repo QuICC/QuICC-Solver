@@ -39,6 +39,7 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^FrameworkStateFileTests_.*serial"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "PyQuICCTests"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^GraphTest
 
 .time-lib-daint-mc:
   script:
