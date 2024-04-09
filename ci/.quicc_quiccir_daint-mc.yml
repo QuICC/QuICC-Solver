@@ -18,17 +18,17 @@ build-quicc:
   extends: .container-builder-cscs-zen2
   stage: build
   variables:
-    DOCKERFILE: ci/docker/Dockerfile_mp
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mp_daint-mc:$CI_COMMIT_SHA
+    DOCKERFILE: ci/docker/Dockerfile_quiccir
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_quiccir_daint-mc:$CI_COMMIT_SHA
     DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:50eab408957473137cb58ea4b2354d00"]'
 test-quicc-lib:
   extends:
   - .test-lib
   - .daint-mc
-  image: $CSCS_REGISTRY_PATH/quicc_mp_daint-mc:$CI_COMMIT_SHA
+  image: $CSCS_REGISTRY_PATH/quicc_quiccir_daint-mc:$CI_COMMIT_SHA
 ci-cache-cleanup:
   extends: .container-runner-daint
   stage: cleanup
-  image: $CSCS_REGISTRY_PATH/quicc_mp_daint-mc:$CI_COMMIT_SHA
+  image: $CSCS_REGISTRY_PATH/quicc_quiccir_daint-mc:$CI_COMMIT_SHA
   script:
   - rm -Rf $CI_CACHE_FOLDER/*
