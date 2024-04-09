@@ -13,6 +13,7 @@ RUN mkdir -p /QuICC.src/build \
     -DQUICC_USE_CUFFT=ON \
     -DQUICC_USE_KOKKOS=ON \
     -DQUICC_USE_KOKKOS_CUDA=ON \
+    -DMLIR_DIR=/lib/llvm-17/lib/cmake/mlir \
     -DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
     -DQUICC_PROFILE_LEVEL=4 \
     -DQUICC_PROFILE_BACKEND=native \
@@ -26,5 +27,6 @@ RUN mkdir -p /QuICC.src/build \
     -DQUICC_TESTSUITE_TRANSFORM=ON \
     -DQUICC_TESTSUITE_PROFILING=ON \
     -DQUICC_TESTSUITE_FRAMEWORK=ON \
+    -DQUICC_TESTSUITE_GRAPH=ON \
     -DQUICC_TESTSUITE_PYQUICC=ON \
   && make -j $(grep processor /proc/cpuinfo | wc -l)

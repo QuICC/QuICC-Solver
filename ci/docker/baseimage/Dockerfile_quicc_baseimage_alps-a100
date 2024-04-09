@@ -31,8 +31,18 @@ COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_s
 RUN fix_spack_install
 
 RUN apt-get -yqq update && apt-get -yqq upgrade \
- && apt-get -yqq install build-essential git gcc g++ gfortran vim less \
- && rm -rf /var/lib/apt/lists/*
+ && apt-get -yqq install build-essential git gcc g++ gfortran vim less
+ #  \
+#  && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get -yqq install lsb-release wget \
+software-properties-common gnupg
+
+RUN wget https://apt.llvm.org/llvm.sh \
+&& chmod +x llvm.sh \
+&& ./llvm.sh 17
+
+RUN apt-get -yqq install libmlir-17-dev mlir-17-tools
 
 # sanity check that nvcc_wrapper is a symbolic link in the view and set default nvcc_wrapper compile options
 RUN ( test -L /opt/view/bin/nvcc_wrapper && \
