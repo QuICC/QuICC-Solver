@@ -10,8 +10,7 @@ from quicc.gitlab.pipelines import config, libtest_pipeline, \
 if __name__ == '__main__':
     # Base pipelines
     base_confs = [
-        config('mp', 'daint-mc'),
-        config('quiccir', 'daint-mc'),
+        config('mp', 'daint-mc')
         ]
     for c in base_confs:
         pipe = libtest_pipeline(c)
