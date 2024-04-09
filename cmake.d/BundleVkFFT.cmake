@@ -4,7 +4,7 @@
 message(DEBUG "VkFFT")
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
-set(QUICC_VKFFT_VERSION "v1.3.2")
+set(QUICC_VKFFT_VERSION "v1.3.4")
 
 option(QUICC_USE_SYSTEM_VKFFT "Use system installed VkFFT." OFF)
 option(QUICC_USE_DOUBLEDOUBLE_VKFFT "Use double-double version of VkFFT." OFF)
@@ -31,7 +31,7 @@ if(QUICC_USE_SYSTEM_VKFFT)
         set(VKFFT_SOURCE_DIR "${VKFFT_DIR}")
     endif()
     if(NOT VKFFT_KERNELS_DIR)
-        set(VKFFT_KERNELS_DIR="${VKFFT_SOURCE_DIR}")
+        set(VKFFT_KERNELS_DIR "${VKFFT_SOURCE_DIR}")
     endif()
     add_definitions(-DVKFFT_KERNELS_DIR="${VKFFT_KERNELS_DIR}")
 else()
@@ -46,7 +46,7 @@ else()
     )
     FetchContent_Populate(VkFFT)
     set(VKFFT_SOURCE_DIR "${FETCHCONTENT_BASE_DIR}/vkfft-src/vkFFT")
-    set(VKFFT_KERNELS_DIR="${FETCHCONTENT_BASE_DIR}/vkfft-build")
+    set(VKFFT_KERNELS_DIR "${FETCHCONTENT_BASE_DIR}/vkfft-build")
     add_definitions(-DVKFFT_KERNELS_DIR="${VKFFT_KERNELS_DIR}")
 endif()
     
@@ -81,9 +81,9 @@ if(QUICC_USE_DOUBLEDOUBLE_VKFFT)
     quadmath
     )
 endif()
+
 if((${VKFFT_BACKEND} EQUAL 1) OR (${VKFFT_BACKEND} EQUAL 2))
     target_include_directories(VkFFT INTERFACE "${VKFFT_SOURCE_DIR}")
-    #target_include_directories(VkFFT INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/QuICC/Math/PfSolve>")
 endif()
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)

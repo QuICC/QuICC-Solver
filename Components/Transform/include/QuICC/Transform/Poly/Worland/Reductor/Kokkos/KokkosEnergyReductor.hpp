@@ -132,12 +132,18 @@ void KokkosEnergyReductor<T>::defaultApplyUnitOperator(
    const OpMatrixL& rOutView, const OpMatrixLZ& inView, const OpVectorI& scan,
    const int total) const
 {
-   OpMatrixLZ temp("Temp View", this->vmOps.extent(0), inView.extent(1));
+   OpMatrixLZ temp("Temp View", this->vmEOps.extent(1), inView.extent(1));
+   OpMatrixL tempRout("rOut Temp View", inView.extent(0), inView.extent(1));
+#if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
    applyBlockOperator<4>(this->mspSetup, this->vmOps, temp, inView, scan,
       total);
-   OpMatrixL tempRout("rOut Temp View", inView.extent(0), inView.extent(1));
    applyBlockOperator<3>(this->mspSetup, this->vmEOps, tempRout, temp, scan,
       total, Abs2Complex());
+#else
+   applyKokkosBlockOperator<4>(this->mspSetup, this->vmOps, temp, inView, scan);
+   applyKokkosBlockOperator<3>(this->mspSetup, this->vmEOps, tempRout, temp,
+      scan, Abs2Complex());
+#endif
    colwiseSum(tempRout, rOutView);
 }
 

@@ -50,7 +50,7 @@ void KokkosIWorlandPower::initOperators(const Internal::Array& icompgrid,
    total = scan[slowSize];
    // reserve storage on the device for horizontal layout left
    // It will not affect the cuda limit on the horizontal block dim.
-   this->vmOps = OpMatrixL("vmOps", igrid.size(), total);
+   this->vmOps = OpMatrixL("vmOps", igrid.size() * slowSize, this->mspSetup->fastSize(0));
    this->vmEOps = OpMatrixL("vmEOps", total, igrid.size());
    // Create host view
    auto vmOpsHost = Kokkos::create_mirror_view(this->vmOps);
@@ -63,7 +63,7 @@ void KokkosIWorlandPower::initOperators(const Internal::Array& icompgrid,
       Matrix op, eop;
       this->makeOperator(op, eop, igrid, iweights, i);
       auto transpose = eop.transpose();
-      add_contribution_to_view_right(vmOpsHost, scan[i], op);
+      add_contribution_to_view_left(vmOpsHost, i * igrid.size(), op);
       add_contribution_to_view_left(vmEOpsHost, scan[i], transpose);
    }
 
@@ -126,12 +126,16 @@ void KokkosIWorlandPower::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
 void KokkosIWorlandPower::defaultApplyUnitOperator(const OpMatrixL& rOutView,
    const OpMatrixLZ& inView, const OpVectorI& scan, const int total) const
 {
+   OpMatrixLZ temp("Temp View", this->vmEOps.extent(1), inView.extent(1));
 #if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
-   OpMatrixLZ temp("Temp View", this->vmOps.extent(0), inView.extent(1));
    applyBlockOperator<4>(this->mspSetup, this->vmOps, temp, inView, scan,
       total);
    applyBlockOperator<3>(this->mspSetup, this->vmEOps, rOutView, temp, scan,
       total, Abs2Complex());
+#else
+   applyKokkosBlockOperator<4>(this->mspSetup, this->vmOps, temp, inView, scan);
+   applyKokkosBlockOperator<3>(this->mspSetup, this->vmEOps, rOutView, temp,
+      scan, Abs2Complex());
 #endif
 }
 

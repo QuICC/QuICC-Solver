@@ -1,6 +1,7 @@
 include(BundleCatch2)
 
-find_package(Boost REQUIRED)
+include(QuICCFindBoostRequired)
+quicc_find_boost_required()
 
 add_executable(BesselTest BesselTests.cpp)
 target_link_libraries(BesselTest Polynomial::Bessel Catch2::Catch2 Boost::headers)

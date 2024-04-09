@@ -60,6 +60,16 @@ struct impl_gemm_choose_copy_layout<Kokkos::Experimental::HIP, LayoutA,
 };
 #endif
 
+#if !defined(KOKKOS_ENABLE_CUDA) && !defined(KOKKOS_ENABLE_HIP)
+struct Abs2Complex
+{
+   template <typename C> auto operator()(C re, C imag) const
+   {
+      return (re * re) + (imag * imag);
+   }
+};
+#endif
+
 // DeepCopy matrix block into scratch
 template <class TeamHandle, class ViewTypeScratch, class ViewType, class Layout,
    int blockDim_i, int blockDim_j, int Transpose>
@@ -284,10 +294,11 @@ struct impl_deep_copy_matrix_block<TeamHandle, ViewTypeScratch, ViewType,
 
 
 template <class TeamHandle, class ViewType, class ViewTypeScratch, class Layout,
-   int blockDim_i, int blockDim_j>
+   int blockDim_i, int blockDim_j, typename F>
 struct impl_update_matrix_block
 {
-   typedef typename ViewType::non_const_value_type value_type;
+   typedef typename ViewTypeScratch::non_const_value_type value_type;
+   typedef typename ViewType::non_const_value_type view_value_type;
    typedef Kokkos::Details::ArithTraits<value_type> ATV;
 
    KOKKOS_INLINE_FUNCTION
@@ -295,7 +306,7 @@ struct impl_update_matrix_block
       const ViewType& A, const value_type& alpha,
       const ViewTypeScratch& A_scr_real, const ViewTypeScratch& A_scr_imag,
       const int& offset_i, const int& offset_j, const int row_block_end,
-      const int col_block_end)
+      const int col_block_end, const F& f)
    {
 
       if (offset_i + blockDim_i <= row_block_end &&
@@ -312,8 +323,16 @@ struct impl_update_matrix_block
                      [&](const int i)
                      {
                         const int idx_i = offset_i + i;
-                        A(idx_i, idx_j) =
+                        auto res =
                            value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = res;
+                        }
                      });
                }
                else
@@ -323,9 +342,16 @@ struct impl_update_matrix_block
                      [&](const int i)
                      {
                         const int idx_i = offset_i + i;
-                        A(idx_i, idx_j) =
-                           A(idx_i, idx_j) +
+                        auto res =
                            value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + res;
+                        }
                      });
                }
             });
@@ -348,8 +374,16 @@ struct impl_update_matrix_block
                      [&](const int i)
                      {
                         const int idx_i = offset_i + i;
-                        A(idx_i, idx_j) =
+                        auto res =
                            value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = res;
+                        }
                      });
                }
                else
@@ -358,19 +392,27 @@ struct impl_update_matrix_block
                      [&](const int i)
                      {
                         const int idx_i = offset_i + i;
-                        A(idx_i, idx_j) =
-                           A(idx_i, idx_j) +
+                        auto res =
                            value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + res;
+                        }
                      });
                }
             });
       }
    }
+
    KOKKOS_INLINE_FUNCTION
    static void update(const TeamHandle& team, const value_type& beta,
       const ViewType& A, const value_type& alpha, const ViewTypeScratch& A_scr,
       const int& offset_i, const int& offset_j, const int row_block_end,
-      const int col_block_end)
+      const int col_block_end, const F& f)
    {
       if (offset_i + blockDim_i <= row_block_end &&
           offset_j + blockDim_j <= col_block_end)
@@ -386,7 +428,15 @@ struct impl_update_matrix_block
                      [&](const int i)
                      {
                         const int idx_i = offset_i + i;
-                        A(idx_i, idx_j) = A_scr(i, j);
+                        auto res = A_scr(i, j);
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = res;
+                        }
                      });
                }
                else
@@ -396,7 +446,15 @@ struct impl_update_matrix_block
                      [&](const int i)
                      {
                         const int idx_i = offset_i + i;
-                        A(idx_i, idx_j) = A(idx_i, idx_j) + A_scr(i, j);
+                        auto res = A_scr(i, j);
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + res;
+                        }
                      });
                }
             });
@@ -419,7 +477,15 @@ struct impl_update_matrix_block
                      [&](const int i)
                      {
                         const int idx_i = offset_i + i;
-                        A(idx_i, idx_j) = A_scr(i, j);
+                        auto res = A_scr(i, j);
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = res;
+                        }
                      });
                }
                else
@@ -428,7 +494,15 @@ struct impl_update_matrix_block
                      [&](const int i)
                      {
                         const int idx_i = offset_i + i;
-                        A(idx_i, idx_j) = A(idx_i, idx_j) + A_scr(i, j);
+                        auto res = A_scr(i, j);
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + res;
+                        }
                      });
                }
             });
@@ -437,9 +511,9 @@ struct impl_update_matrix_block
 };
 
 template <class TeamHandle, class ViewType, class ViewTypeScratch,
-   int blockDim_i, int blockDim_j>
+   int blockDim_i, int blockDim_j, typename F>
 struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
-   Kokkos::LayoutRight, blockDim_i, blockDim_j>
+   Kokkos::LayoutRight, blockDim_i, blockDim_j, F>
 {
    typedef typename ViewType::non_const_value_type value_type;
    typedef Kokkos::Details::ArithTraits<value_type> ATV;
@@ -449,7 +523,7 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
       const ViewType& A, const value_type& alpha,
       const ViewTypeScratch& A_scr_real, const ViewTypeScratch& A_scr_imag,
       const int& offset_i, const int& offset_j, const int row_block_end,
-      const int col_block_end)
+      const int col_block_end, const F& f)
    {
 
       if (offset_i + blockDim_i <= row_block_end &&
@@ -466,8 +540,16 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
                      [&](const int j)
                      {
                         const int idx_j = offset_j + j;
-                        A(idx_i, idx_j) =
-                           value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) =
+                              f(A_scr_real(i, j), A_scr_imag(i, j));
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) =
+                              value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        }
                      });
                }
                else
@@ -477,9 +559,18 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
                      [&](const int j)
                      {
                         const int idx_j = offset_j + j;
-                        A(idx_i, idx_j) =
-                           A(idx_i, idx_j) +
-                           value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) =
+                              A(idx_i, idx_j) +
+                              f(A_scr_real(i, j), A_scr_imag(i, j));
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) =
+                              A(idx_i, idx_j) +
+                              value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        }
                      });
                }
             });
@@ -502,8 +593,16 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
                      [&](const int j)
                      {
                         const int idx_j = offset_j + j;
-                        A(idx_i, idx_j) =
-                           value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) =
+                              f(A_scr_real(i, j), A_scr_imag(i, j));
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) =
+                              value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        }
                      });
                }
                else
@@ -512,9 +611,18 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
                      [&](const int j)
                      {
                         const int idx_j = offset_j + j;
-                        A(idx_i, idx_j) =
-                           A(idx_i, idx_j) +
-                           value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) =
+                              A(idx_i, idx_j) +
+                              f(A_scr_real(i, j), A_scr_imag(i, j));
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) =
+                              A(idx_i, idx_j) +
+                              value_type(A_scr_real(i, j), A_scr_imag(i, j));
+                        }
                      });
                }
             });
@@ -525,7 +633,7 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
    static void update(const TeamHandle& team, const value_type& beta,
       const ViewType& A, const value_type& alpha, const ViewTypeScratch& A_scr,
       const int& offset_i, const int& offset_j, const int row_block_end,
-      const int col_block_end)
+      const int col_block_end, const F& f)
    {
 
       if (offset_i + blockDim_i <= row_block_end &&
@@ -542,7 +650,15 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
                      [&](const int j)
                      {
                         const int idx_j = offset_j + j;
-                        A(idx_i, idx_j) = A_scr(i, j);
+                        auto res = A_scr(i, j);
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = res;
+                        }
                      });
                }
                else
@@ -552,7 +668,15 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
                      [&](const int j)
                      {
                         const int idx_j = offset_j + j;
-                        A(idx_i, idx_j) = A(idx_i, idx_j) + A_scr(i, j);
+                        auto res = A_scr(i, j);
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + res;
+                        }
                      });
                }
             });
@@ -575,7 +699,15 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
                      [&](const int j)
                      {
                         const int idx_j = offset_j + j;
-                        A(idx_i, idx_j) = A_scr(i, j);
+                        auto res = A_scr(i, j);
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = res;
+                        }
                      });
                }
                else
@@ -584,7 +716,15 @@ struct impl_update_matrix_block<TeamHandle, ViewType, ViewTypeScratch,
                      [&](const int j)
                      {
                         const int idx_j = offset_j + j;
-                        A(idx_i, idx_j) = A(idx_i, idx_j) + A_scr(i, j);
+                        auto res = A_scr(i, j);
+                        if constexpr (!std::is_same<F, nullptr_t>::value)
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + f(res);
+                        }
+                        else
+                        {
+                           A(idx_i, idx_j) = A(idx_i, idx_j) + res;
+                        }
                      });
                }
             });
@@ -730,7 +870,7 @@ struct matrixSpan
 
 template <class ExecSpace, class ViewTypeA, class ViewTypeB, class ViewTypeC,
    class ViewS, int blockA0, int blockA1, int blockB1, int TransposeA,
-   int TransposeB, int S>
+   int TransposeB, int S, typename F = nullptr_t>
 struct GEMMImpl
 {
    ViewTypeA A;
@@ -740,6 +880,7 @@ struct GEMMImpl
    ViewS scan;
    ViewS xGrid;
    ViewS yGrid;
+   F f;
 
    typedef typename ViewTypeA::non_const_value_type ScalarA;
    typedef typename ViewTypeB::non_const_value_type ScalarB;
@@ -754,6 +895,7 @@ struct GEMMImpl
       typename ExecSpace::scratch_memory_space>
       ViewTypeAScratch;
 
+   //B is always split into real and imaginary parts so we need two scratch of type A.
    typedef Kokkos::View<
 #if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
       ScalarA[blockA1][blockB1], Kokkos::LayoutRight,
@@ -763,9 +905,10 @@ struct GEMMImpl
       typename ExecSpace::scratch_memory_space>
       ViewTypeBScratch;
 
+   //B is always a complex type. We need to store real and imaginary parts for the C matrix on scratch if Cuda.
    typedef Kokkos::View<
 #if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
-      ScalarC[blockA0][blockB1], Kokkos::LayoutRight,
+      ScalarB[blockA0][blockB1], Kokkos::LayoutRight,
 #else
       ScalarA[blockA0][blockB1 + 1], Kokkos::LayoutRight,
 #endif
@@ -774,7 +917,7 @@ struct GEMMImpl
 
    GEMMImpl(const ViewTypeA& A_, const ViewTypeB& B_, const ViewTypeC& C_,
       const ViewS& AS_, const ViewS& S_, const ViewS& XG_, const ViewS& YG_,
-      const int nb_) :
+      const int nb_, const F& f_) :
        A(A_),
        B(B_),
        C(C_),
@@ -782,7 +925,8 @@ struct GEMMImpl
        scan(S_),
        xGrid(XG_),
        yGrid(YG_),
-       num_blocks(nb_)
+       num_blocks(nb_),
+       f(f_)
    {
       scratch_level = 0;
       alpha = 1;
@@ -869,7 +1013,7 @@ struct GEMMImpl
          span.matrix_block_row_end =
             (matrix_block_id + 1) * span.matrix_row_end;
       }
-      else if (S == 3) // Worland integrator
+      else if (S == 3 || S == 4) // Worland integrator
       {
          span.matrix_row_start =
             matrix_block_id * C.extent(0) + blockRow * blockA0;
@@ -907,7 +1051,6 @@ struct GEMMImpl
 
       ViewTypeAScratch A_scr(team.team_scratch(scratch_level));
 #if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
-      /* ViewTypeBScratch B_scr(team.team_scratch(scratch_level)); */
       ViewTypeBScratch B_scr_imag(team.team_scratch(scratch_level));
       ViewTypeBScratch B_scr_real(team.team_scratch(scratch_level));
       ViewTypeCScratch C_scr(team.team_scratch(scratch_level));
@@ -978,22 +1121,23 @@ struct GEMMImpl
          team.team_barrier();
       }
       // Write back the C block from scratch to main memory
-      int col_start = (S == 3)
+      int col_start = (S == 3 || S == 4)
                          ? span.matrix_block_col_start + span.matrix_col_start
                          : span.matrix_block_col_start;
-      int col_end = (S == 3) ? span.matrix_block_col_end : C.extent(1);
+      int col_end =
+         (S == 3 || S == 4) ? span.matrix_block_col_end : C.extent(1);
 
       impl_update_matrix_block<
          typename Kokkos::TeamPolicy<ExecSpace>::member_type, ViewTypeC,
          ViewTypeCScratch, typename ViewTypeC::array_layout, blockA0,
-         blockB1>::update(team, beta, C, alpha,
+         blockB1, F>::update(team, beta, C, alpha,
 #if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
          C_scr,
 #else
          C_scr_real, C_scr_imag,
 #endif
          span.matrix_block_row_start, col_start, span.matrix_block_row_end,
-         col_end);
+         col_end, f);
    }
 };
 
@@ -1002,11 +1146,13 @@ template <typename ExecSpace> inline int get_max_vector_size()
    return Kokkos::TeamPolicy<ExecSpace>::vector_length_max();
 }
 
-template <Integer S, class AV, class BV, class CV, class V> struct GEMM
+template <Integer S, class AV, class BV, class CV, class V,
+   typename F = nullptr_t>
+struct GEMM
 {
    static void gemm(const typename CV::execution_space& space, const AV& A,
       const BV& B, const CV& C, const V& allScan, const V& scan, const V& xGrid,
-      const V& yGrid, const int num_blocks)
+      const V& yGrid, const int num_blocks, const F& f)
    {
       static_assert(Kokkos::is_view<AV>::value, "AV must be a Kokkos::View.");
       static_assert(Kokkos::is_view<BV>::value, "BV must be a Kokkos::View.");
@@ -1048,7 +1194,7 @@ template <Integer S, class AV, class BV, class CV, class V> struct GEMM
 
       // Compute scratch space size
       typedef GEMMImpl<typename CV::execution_space, AV, BV, CV, V, blockA0,
-         blockA1, blockB1, 0, 0, S>
+         blockA1, blockB1, 0, 0, S, F>
          gemm_dummy_type;
       const int scratch_memory_size =
          gemm_dummy_type::ViewTypeAScratch::required_allocation_size() +
@@ -1090,18 +1236,18 @@ template <Integer S, class AV, class BV, class CV, class V> struct GEMM
 #endif
 
       GEMMImpl<typename CV::execution_space, AV, BV, CV, V, blockA0, blockA1,
-         blockB1, 0, 0, S>
-         gemm(A, B, C, allScan, scan, xGrid, yGrid, num_blocks);
+         blockB1, 0, 0, S, F>
+         gemm(A, B, C, allScan, scan, xGrid, yGrid, num_blocks, f);
       gemm.run(space, team_size, vector_length, scratch_level);
    }
 };
 
 
 template <Integer S = 0, class AViewType, class BViewType, class CViewType,
-   class V>
+   class V, typename F = nullptr_t>
 void blockGemm(const AViewType& A, const BViewType& B, const CViewType& C,
    const V& allScan, const V& scan, const V& xGrid, const V& yGrid,
-   const int allTotal)
+   const int allTotal, const F& f)
 {
    const typename CViewType::execution_space space =
       typename CViewType::execution_space();
@@ -1126,14 +1272,14 @@ void blockGemm(const AViewType& A, const BViewType& B, const CViewType& C,
       typename CViewType::array_layout, typename CViewType::device_type,
       Kokkos::MemoryTraits<Kokkos::Unmanaged>>
       CVT;
-   typedef GEMM<S, AVT, BVT, CVT, V> impl_type;
-   impl_type::gemm(space, A, B, C, allScan, scan, xGrid, yGrid, allTotal);
+   typedef GEMM<S, AVT, BVT, CVT, V, F> impl_type;
+   impl_type::gemm(space, A, B, C, allScan, scan, xGrid, yGrid, allTotal, f);
 }
 
 template <Integer S = 0, typename T, typename MS, typename MZ, typename MZL,
-   typename V>
+   typename V, typename F = nullptr_t>
 void applyKokkosBlockOperator(const T mspSetup, const MS& vmOps,
-   const MZ& rOutView, const MZL& inView, const V& scan)
+   const MZ& rOutView, const MZL& inView, const V& scan, const F& f = F())
 {
    auto slowSize = mspSetup->slowSize();
    auto outRows = mspSetup->fwdSize();
@@ -1150,7 +1296,7 @@ void applyKokkosBlockOperator(const T mspSetup, const MS& vmOps,
    // build row and cols scan for each matrix using the block sizes.
    for (int i = 0; i < slowSize; i++)
    {
-      if constexpr (S != 1 && S!=4)
+     if constexpr (S != 1 && S!=4)
       {
          outRows = mspSetup->fastSize(i);
       }
@@ -1191,7 +1337,7 @@ void applyKokkosBlockOperator(const T mspSetup, const MS& vmOps,
    generate_block_cluster(xGrid, yGrid, hostRowScan, hostColScan, hostAllScan);
 
    // call the
-   blockGemm<S>(vmOps, inView, rOutView, allScan, scan, xGrid, yGrid, allTotal);
+   blockGemm<S>(vmOps, inView, rOutView, allScan, scan, xGrid, yGrid, allTotal, f);
 }
 
 

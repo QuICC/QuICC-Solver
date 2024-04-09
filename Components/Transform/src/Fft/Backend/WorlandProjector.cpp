@@ -23,6 +23,9 @@
 #elif defined QUICC_FFT_WORLAND_CUFFT
    #include "QuICC/Transform/Fft/Backend/CuFft/WorlandProjector.hpp"
    #define BACKENDIMPL CuFft
+#elif defined QUICC_FFT_WORLAND_PFSOLVE
+   #include "QuICC/Transform/Fft/Backend/PfSolve/WorlandProjector.hpp"
+   #define BACKENDIMPL PfSolve
 #endif
 
 namespace QuICC {

@@ -23,6 +23,8 @@ set(QUICC_USE_KOKKOS_KERNELS @QUICC_USE_KOKKOS_KERNELS@
   CACHE BOOL "This is set by the framework" FORCE)
 set(QUICC_USE_VKFFT @QUICC_USE_VKFFT@
   CACHE BOOL "This is set by the framework" FORCE)
+set(QUICC_USE_PFSOLVE @QUICC_USE_PFSOLVE@
+  CACHE BOOL "This is set by the framework" FORCE)
 
 # Hide them since they should not be changed
 mark_as_advanced(FORCE
@@ -72,7 +74,15 @@ if(QUICC_USE_VKFFT)
     CACHE BOOL "This is set by the framework" FORCE)
 endif()
 
-# Quiccir
+# PfSolve
+if(QUICC_USE_PFSOLVE)
+  set(QUICC_USE_SYSTEM_PFSOLVE ON
+    CACHE BOOL "This is set by the framework" FORCE)
+  set(PFSOLVE_SOURCE_DIR @PFSOLVE_SOURCE_DIR@
+    CACHE BOOL "This is set by the framework" FORCE)
+  set(PFSOLVE_KERNELS_DIR @PFSOLVE_KERNELS_DIR@
+    CACHE BOOL "This is set by the framework" FORCE)
+endif()
 
 # Setup
 include(setup/global)

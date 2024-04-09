@@ -11,7 +11,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Integrator/Base/R1_Zero.hpp"
-#if defined(QUICC_USE_KOKKOS_CUDA) || defined(QUICC_USE_KOKKOS_HIP)
+#ifdef QUICC_USE_KOKKOS
 #include "QuICC/Transform/Poly/Worland/Integrator/Kokkos/R1_Zero.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/Worland/Integrator/R1_ZeroviewCpu_t.hpp.inc"
