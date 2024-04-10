@@ -31,7 +31,7 @@ SphLapl2Diags::ACoeff_t SphLapl2Diags::d0(const ACoeff_t& n) const
    getRoots(roots, static_cast<int>(this->l()), n.size());
 
    ACoeff_t val = ACoeff_t::Ones(n.size());
-   for (int i = 0; i < roots.size(); i++)
+   for (std::size_t i = 0; i < roots.size(); i++)
    {
       const auto& k = roots.at(i);
       const auto k2 = k * k;

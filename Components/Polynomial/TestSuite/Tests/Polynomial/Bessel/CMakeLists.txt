@@ -33,6 +33,10 @@ set(BesselTests
   Insulating:drSphJnl
   Value:slaplSphJnl
   Insulating:slaplSphJnl
+  Value:lowerSphJnl
+  Insulating:lowerSphJnl
+  Value:raiseSphJnl
+  Insulating:raiseSphJnl
 )
 include(SetUlp)
 quicc_set_ulp(_ulp
