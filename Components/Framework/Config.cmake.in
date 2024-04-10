@@ -87,8 +87,9 @@ endif()
 # quiccir (required), already part of the framework
 set(QUICC_USE_SYSTEM_QUICCIR ON
   CACHE BOOL "This is set by the framework" FORCE)
+set(MLIR_DIR "@MLIR_DIR@")
 if("@QUICC_USE_SYSTEM_QUICCIR@")
-  set(quiccir_DIR "@Quiccir_DIR@")
+  set(quiccir_DIR "@quiccir_DIR@")
 else()
   set(quiccir_DIR "${QUICC_LIBRARY_ROOT}/share/quiccir/cmake")
 endif()
