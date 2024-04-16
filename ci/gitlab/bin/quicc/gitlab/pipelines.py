@@ -17,7 +17,7 @@ backend2nodeSize = {
     "alps-a100": 64
 }
 
-"""Base class, defines a pipeline that build the docker image, test and time the library and cleans up the runner"""
+"""Base class, defines a pipeline that build the docker image, the library and cleans up the runner"""
 class base_pipeline(base_yaml):
     def __init__(self, cnf):
         image_location = '$CSCS_REGISTRY_PATH'
