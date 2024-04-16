@@ -13,8 +13,8 @@ build-quicc-base:
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-mc
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:50eab408957473137cb58ea4b2354d00
-    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_daint-mc:50eab408957473137cb58ea4b2354d00
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:fbef04579fc61fc18598ba2e9feaca74
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_daint-mc:fbef04579fc61fc18598ba2e9feaca74
     SECONDARY_IMAGE_USERNAME: quicc
     SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
@@ -23,7 +23,7 @@ build-quicc:
   variables:
     DOCKERFILE: ci/docker/Dockerfile_mpi
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:50eab408957473137cb58ea4b2354d00"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:fbef04579fc61fc18598ba2e9feaca74"]'
 BoussinesqSphereDynamoExplicit:
   extends:
   - .BoussinesqSphereDynamoExplicit

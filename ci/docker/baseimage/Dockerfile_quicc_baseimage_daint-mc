@@ -15,7 +15,6 @@ RUN spack-install-helper \
     kokkos-kernels \
     "reframe@develop"
 
-
 # Bare OS image to run the installed executables
 FROM docker.io/finkandreas/spack:base-ubuntu22.04
 
