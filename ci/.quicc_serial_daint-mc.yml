@@ -16,6 +16,9 @@ build-quicc-base:
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-mc
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:50eab408957473137cb58ea4b2354d00
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_daint-mc:50eab408957473137cb58ea4b2354d00
+    SECONDARY_IMAGE_USERNAME: quicc
+    SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
   extends: .container-builder-cscs-zen2
   stage: build

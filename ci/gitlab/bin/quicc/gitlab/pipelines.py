@@ -30,6 +30,7 @@ class base_pipeline(base_yaml):
         image = 'quicc_'+cnf.tag+'_'+cnf.backend+':$CI_COMMIT_SHA'
         self.path_image = image_location+'/'+image
         self.base_path_image = f'{image_location}/baseimage/quicc_baseimage_{cnf.backend}:{base_md5sum}'
+        self.dockerhub_base_image = f'docker.io/quicc/quicc_baseimage_{cnf.backend}:{base_md5sum}'
         self.docker = 'ci/docker/Dockerfile_'+cnf.tag
 
         # pipeline actions
@@ -64,6 +65,9 @@ class base_pipeline(base_yaml):
                         {
                             'DOCKERFILE': self.base_docker,
                             'PERSIST_IMAGE_NAME': self.base_path_image,
+                            'SECONDARY_IMAGE_NAME': self.dockerhub_base_image,
+                            'SECONDARY_IMAGE_USERNAME': 'quicc',
+                            'SECONDARY_IMAGE_PASSWORD': '$DOCKERHUB_ACCESS_TOKEN'
                         },
                 },
             'build-quicc':
