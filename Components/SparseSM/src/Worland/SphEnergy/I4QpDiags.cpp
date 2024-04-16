@@ -51,7 +51,6 @@ I4QpDiags::ACoeff_t I4QpDiags::d_4(const ACoeff_t& n) const
 I4QpDiags::ACoeff_t I4QpDiags::d_3(const ACoeff_t& n) const
 {
    const auto l1 = this->l();
-   const auto l2 = l1 * l1;
    ACoeff_t val;
 
    val = -256.0 * (2.0 * l1 + 2.0 * n - 3.0) * (2.0 * l1 + 2.0 * n - 1.0) *
@@ -71,7 +70,6 @@ I4QpDiags::ACoeff_t I4QpDiags::d_2(const ACoeff_t& n) const
 {
    const auto l1 = this->l();
    const auto l2 = l1 * l1;
-   const auto l3 = l2 * l1;
    ACoeff_t val;
 
    val = 768.0 * (2.0 * l1 + 2.0 * n - 1.0) * (2.0 * l1 + 2.0 * n + 1.0) *
@@ -92,7 +90,6 @@ I4QpDiags::ACoeff_t I4QpDiags::d_1(const ACoeff_t& n) const
    const auto l1 = this->l();
    const auto l2 = l1 * l1;
    const auto l3 = l2 * l1;
-   const auto l4 = l2 * l2;
    ACoeff_t val;
 
    val = -256.0 * (2.0 * l1 + 2.0 * n + 1.0) *
@@ -211,7 +208,6 @@ void I4QpDiags::correctQ2(ACoeff_t& val, const ACoeff_t& n, const int k) const
    if (this->mQ == 2)
    {
       auto l1 = this->l();
-      const auto l2 = l1 * l1;
 
       // Truncation requires 3 coefficients from tau operator T:
       // a = T[-2,-2], b = T[-1,-1], c = T[-2,-1]

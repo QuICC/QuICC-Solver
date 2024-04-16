@@ -27,7 +27,7 @@ $w\[Alpha]::usage="\[Alpha] parameter of Jacobi polynomial";
 $wd\[Beta]::usage="\[Beta] = l + $wd\[Beta] parameter of Jacobi polynomial";
 wgrid::usage="wgrid[n] computes the Worland quadrature grid";
 wweights::usage="wweights[n] computes the Worland quadrature weights";
-norm::usage="norm[k,\[Alpha],\[Beta]] norm of Worland polynomial k";
+wnorm::usage="wnorm[k,\[Alpha],\[Beta]] norm of Worland polynomial k";
 
 (* Operators to work on grid*)
 Wnl::usage="Wnl[n,l,r]";
@@ -100,7 +100,7 @@ wweights[n_]:=wsphweights[n];
 ];
 
 
-norm[k_,\[Alpha]_,\[Beta]_]:=If[k==0,Sqrt[1/2 (Gamma[\[Alpha]+1]Gamma[\[Beta]+1])/Gamma[\[Alpha]+\[Beta]+2]],Sqrt[1/(2(2k+\[Alpha]+\[Beta]+1)) (Gamma[k+\[Alpha]+1]Gamma[k+\[Beta]+1])/(Gamma[k+\[Alpha]+\[Beta]+1]Gamma[k+1])]];
+wnorm[k_,\[Alpha]_,\[Beta]_]:=If[k==0,Sqrt[1/2 (Gamma[\[Alpha]+1]Gamma[\[Beta]+1])/Gamma[\[Alpha]+\[Beta]+2]],Sqrt[1/(2(2k+\[Alpha]+\[Beta]+1)) (Gamma[k+\[Alpha]+1]Gamma[k+\[Beta]+1])/(Gamma[k+\[Alpha]+\[Beta]+1]Gamma[k+1])]];
 
 
 (*dWorland*)
@@ -146,21 +146,21 @@ ddivrdrWorland[n_,l_,t_]=Simplify[D[1/t D[t^(l+1) JacobiP[n,$w\[Alpha],l+$wd\[Be
 
 
 (* Operators to work on grid*)
-Wnl[n_,l_,r_]:=r^l JacobiP[n,$w\[Alpha],l+$wd\[Beta],2r^2-1]/norm[n,$w\[Alpha],l+$wd\[Beta]]
-rWnl[n_,l_,r_]:=r^(l+1) JacobiP[n,$w\[Alpha],l+$wd\[Beta],2r^2-1]/norm[n,$w\[Alpha],l+$wd\[Beta]]
-dWnl[n_,l_,r_]:=If[n>0,dWorland[n,l,r],dWorland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
-d2Wnl[n_,l_,r_]:=If[n>0,If[n>1,d2Worland[n,l,r],d2Worland1[l,r]],d2Worland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
-slaplWnl[n_,l_,r_]:=If[n>0,If[n>1,slaplWorland[n,l,r],slaplWorland1[l,r]],slaplWorland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
-divrWnl[n_,l_,r_]:=r^(l-1) JacobiP[n,$w\[Alpha],l+$wd\[Beta],2r^2-1]/norm[n,$w\[Alpha],l+$wd\[Beta]];
-drWnl[n_,l_,r_]:=If[n>0,drWorland[n,l,r],drWorland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
-divrdrWnl[n_,l_,r_]:=If[n>0,divrdrWorland[n,l,r],divrdrWorland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
-rddivrWnl[n_,l_,r_]:=If[n>0,rddivrWorland[n,l,r],rddivrWorland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
-insulatingWnl[n_,l_,r_]:=If[n>0,insulatingWorland[n,l,r],insulatingWorland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
+Wnl[n_,l_,r_]:=r^l JacobiP[n,$w\[Alpha],l+$wd\[Beta],2r^2-1]/wnorm[n,$w\[Alpha],l+$wd\[Beta]]
+rWnl[n_,l_,r_]:=r^(l+1) JacobiP[n,$w\[Alpha],l+$wd\[Beta],2r^2-1]/wnorm[n,$w\[Alpha],l+$wd\[Beta]]
+dWnl[n_,l_,r_]:=If[n>0,dWorland[n,l,r],dWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+d2Wnl[n_,l_,r_]:=If[n>0,If[n>1,d2Worland[n,l,r],d2Worland1[l,r]],d2Worland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+slaplWnl[n_,l_,r_]:=If[n>0,If[n>1,slaplWorland[n,l,r],slaplWorland1[l,r]],slaplWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+divrWnl[n_,l_,r_]:=r^(l-1) JacobiP[n,$w\[Alpha],l+$wd\[Beta],2r^2-1]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+drWnl[n_,l_,r_]:=If[n>0,drWorland[n,l,r],drWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+divrdrWnl[n_,l_,r_]:=If[n>0,divrdrWorland[n,l,r],divrdrWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+rddivrWnl[n_,l_,r_]:=If[n>0,rddivrWorland[n,l,r],rddivrWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+insulatingWnl[n_,l_,r_]:=If[n>0,insulatingWorland[n,l,r],insulatingWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
 
-ddivrdrWnl[n_,l_,r_]:=If[n>0,If[n>1,ddivrdrWorland[n,l,r],ddivrdrWorland1[l,r]],ddivrdrWorland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
-claplhWnl[n_,l_,r_]:=If[n>0,If[n>1,claplhWorland[n,l,r],claplhWorland1[l,r]],claplhWorland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
-dclaplhWnl[n_,l_,r_]:=If[n>0,If[n>1,If[n>2,dclaplhWorland[n,l,r],dclaplhWorland2[l,r]],dclaplhWorland1[l,r]],dclaplhWorland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
-divrclaplhWnl[n_,l_,r_]:=If[n>0,If[n>1,divrclaplhWorland[n,l,r],divrclaplhWorland1[l,r]],divrclaplhWorland0[l,r]]/norm[n,$w\[Alpha],l+$wd\[Beta]];
+ddivrdrWnl[n_,l_,r_]:=If[n>0,If[n>1,ddivrdrWorland[n,l,r],ddivrdrWorland1[l,r]],ddivrdrWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+claplhWnl[n_,l_,r_]:=If[n>0,If[n>1,claplhWorland[n,l,r],claplhWorland1[l,r]],claplhWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+dclaplhWnl[n_,l_,r_]:=If[n>0,If[n>1,If[n>2,dclaplhWorland[n,l,r],dclaplhWorland2[l,r]],dclaplhWorland1[l,r]],dclaplhWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
+divrclaplhWnl[n_,l_,r_]:=If[n>0,If[n>1,divrclaplhWorland[n,l,r],divrclaplhWorland1[l,r]],divrclaplhWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];
 
 
 (* More complex operators *)

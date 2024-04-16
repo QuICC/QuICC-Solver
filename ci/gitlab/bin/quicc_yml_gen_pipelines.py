@@ -3,18 +3,27 @@
 #
 import os
 from typing import NamedTuple
-from quicc.gitlab.pipelines import config, libtest_pipeline, \
-    model_pipeline, model_pipeline_notiming, model_perf_pipeline, \
-    libtime_sweep_pipeline
+from quicc.gitlab.pipelines import config, base_pipeline, \
+    libtest_pipeline, model_pipeline, model_pipeline_notiming, \
+    model_perf_pipeline, libtime_sweep_pipeline
 
 if __name__ == '__main__':
-    # Base pipelines
-    base_confs = [
+    # Build only pipelines
+    build_only_confs = [
+        config('mpi-debug', 'daint-mc')
+        ]
+    for c in build_only_confs:
+        pipe = base_pipeline(c)
+        pipe.write()
+
+    # Lib test pipelines
+    libtest_confs = [
         config('mp', 'daint-mc')
         ]
-    for c in base_confs:
+    for c in libtest_confs:
         pipe = libtest_pipeline(c)
         pipe.write()
+
 
     # Model without timing pipelines
     model_notiming_confs = [
