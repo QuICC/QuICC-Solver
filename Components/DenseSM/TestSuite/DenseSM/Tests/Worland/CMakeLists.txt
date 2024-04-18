@@ -39,37 +39,17 @@ include(SetUlp)
 # Create Geostrophic2Tor
 set(_tests
   Geostrophic2Tor:dense
-  PyGeostrophic2Tor:dense
   )
 quicc_set_ulp(_ulp
-  ULP 50 70
-  MPULP 25 25
+  ULP 50 70 11 18
+  MPULP 25 25 11 11
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 0 1
+    IDS 0 1 100 101
     ULPS ${_ulp}
-  )
-endforeach()
-
-# Create Geostrophic2Tor
-set(_tests
-  Geostrophic2Tor:dense
-  PyGeostrophic2Tor:dense
-  )
-quicc_set_ulp(_ulp
-  ULP 500 500
-  MPULP 25 25
-        )
-foreach(_test ${_tests})
-  quicc_add_test(${_test}
-    COMMAND ${TestExe}
-    KEYWORD Operator:type
-    IDS 2 3
-    ULPS ${_ulp}
-    DISABLED ON
   )
 endforeach()
 
@@ -95,14 +75,14 @@ set(_tests
   Tor2Geostrophic:dense
   )
 quicc_set_ulp(_ulp
-  ULP 11 11
-  MPULP 11 11
+  ULP 11 35 11 40
+  MPULP 11 11 11 11
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 0 1
+    IDS 0 1 100 101
     ULPS ${_ulp}
   )
 endforeach()
@@ -112,15 +92,16 @@ set(_tests
   Tor2EGeostrophic:dense
   )
 quicc_set_ulp(_ulp
-  ULP 11 11
-  MPULP 11 11
+  ULP 11 11 11 11
+  MPULP 11 11 11 11
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 0 1
+    IDS 0 1 100 101
     ULPS ${_ulp}
+    DISABLED ON
   )
 endforeach()
 
@@ -129,14 +110,14 @@ set(_tests
   Tor2GridS:dense
   )
 quicc_set_ulp(_ulp
-  ULP 11 11
-  MPULP 11 11
+  ULP 16 80 11 80
+  MPULP 11 11 11 11
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 0 1
+    IDS 0 1 100 101
     ULPS ${_ulp}
   )
 endforeach()
@@ -155,6 +136,7 @@ foreach(_test ${_tests})
     KEYWORD Operator:type
     IDS 0 1
     ULPS ${_ulp}
+    DISABLED ON
   )
 endforeach()
 

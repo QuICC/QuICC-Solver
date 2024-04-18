@@ -38,6 +38,22 @@ public:
     * @param alpha   Geostrophic basis Jacobi alpha
     * @param beta    Geostrophic basis Jacobi beta
     * @param isGenericBasis   Is generic Worland basis (ie. Li et al)
+    * @param wAlpha  Worland Jacobi alpha
+    * @param wDBeta  Worland Jacobi beta = l + dBeta
+    */
+   Tor2Geostrophic(const int nN, const int nL, const int nCpu, const Scalar_t alpha,
+      const Scalar_t beta, const bool isGenericBasis, const bool isTriangular,
+      const Scalar_t wAlpha, const Scalar_t wDBeta);
+
+   /**
+    * @brief Constructor
+    *
+    * @param nN      Number of radial modes
+    * @param nL      Number of harmonic degrees
+    * @param nCpu    Number of CPU in MPI version
+    * @param alpha   Geostrophic basis Jacobi alpha
+    * @param beta    Geostrophic basis Jacobi beta
+    * @param isGenericBasis   Is generic Worland basis (ie. Li et al)
     */
    Tor2Geostrophic(const int nN, const int nL, const int nCpu, const Scalar_t alpha,
       const Scalar_t beta, const bool isGenericBasis, const bool isTriangular);
@@ -78,7 +94,7 @@ protected:
     */
    Scalar_t mUgAlpha;
 
-   /**
+    /**
     * @brief Geostrophic basis beta
     */
    Scalar_t mUgBeta;
@@ -89,6 +105,16 @@ protected:
    const bool mIsGenericBasis;
 
    bool mIsTriangular;
+
+   /**
+    * @brief Worland Jacobi alpha
+    */
+   Scalar_t mAlpha;
+
+   /**
+    * @brief Worland Jacobi beta = l + dBeta
+    */
+   Scalar_t mDBeta;
 
 private:
 };

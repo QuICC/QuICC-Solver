@@ -4,8 +4,8 @@
  * the geostrophic basis
  */
 
-#ifndef QUICC_DENSESM_WORLAND_TOR2GRIDS_HPP
-#define QUICC_DENSESM_WORLAND_TOR2GRIDS_HPP
+#ifndef QUICC_DENSESM_BESSEL_TOR2GRIDS_HPP
+#define QUICC_DENSESM_BESSEL_TOR2GRIDS_HPP
 
 // System includes
 //
@@ -20,7 +20,7 @@ namespace QuICC {
 
 namespace DenseSM {
 
-namespace Worland {
+namespace Bessel {
 
 /**
  * @brief Implementation of the projection operator from the toroidal scalar to
@@ -35,28 +35,10 @@ public:
     * @param nN      Number of radial modes
     * @param nL      Number of harmonic degrees
     * @param nCpu    Number of CPU in MPI version
-    * @param alpha   S grid Jacobi alpha
-    * @param beta    S grid Jacobi beta
-    * @param isTriangular  Uses triangular truncation?
-    * @param wAlpha  Worland Jacobi alpha
-    * @param wDBeta  Worland Jacobi beta = l + dBeta
+    * @paramd sDNu   Bessel dNu of S basis
+    * @paramd torDNu Bessel dNu of toroidal basis
     */
-   Tor2GridS(const int nN, const int nL, const int nCpu, const Scalar_t alpha,
-      const Scalar_t beta, const bool isTriangular, const Scalar_t wAlpha,
-      const Scalar_t wDBeta);
-
-   /**
-    * @brief Constructor
-    *
-    * @param nN      Number of radial modes
-    * @param nL      Number of harmonic degrees
-    * @param nCpu    Number of CPU in MPI version
-    * @param alpha   S grid Jacobi alpha
-    * @param beta    S grid Jacobi beta
-    * @param isTriangular  Uses triangular truncation?
-    */
-   Tor2GridS(const int nN, const int nL, const int nCpu, const Scalar_t alpha,
-      const Scalar_t beta, const bool isTriangular);
+   Tor2GridS(const int nN, const int nL, const int nCpu, const Internal::MHDFloat sDNu, const Internal::MHDFloat torDNu);
 
    /**
     * @brief Destructor
@@ -97,35 +79,20 @@ protected:
    const int mNcpu;
 
    /**
-    * @brief Geostrophic basis alpha
+    * @brief Bessel parameter nu = l + dnu for S grid
     */
-   Scalar_t mUgAlpha;
+   Internal::MHDFloat mSDNu;
 
    /**
-    * @brief Geostrophic basis beta
+    * @brief Bessel parameter nu = l + dnu for toroidal basis
     */
-   Scalar_t mUgBeta;
-
-   /**
-    * @brief Uses triangular truncation?
-    */
-   bool mIsTriangular;
-
-   /**
-    * @brief Worland basis alpha
-    */
-   Scalar_t mAlpha;
-
-   /**
-    * @brief Worland basis dBeta
-    */
-   Scalar_t mDBeta;
+   Internal::MHDFloat mTorDNu;
 
 private:
 };
 
-} // namespace Worland
+} // namespace Bessel
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_WORLAND_TOR2GRIDS_HPP
+#endif // QUICC_DENSESM_BESSEL_TOR2GRIDS_HPP

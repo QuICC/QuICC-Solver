@@ -24,6 +24,9 @@
 #include "DenseSM/IMatrixSMOperator.hpp"
 #include "DenseSM/Bessel/CoriolisQm.hpp"
 #include "DenseSM/Bessel/CoriolisQp.hpp"
+#include "DenseSM/Bessel/Geostrophic2Tor.hpp"
+#include "DenseSM/Bessel/Tor2GridS.hpp"
+#include "DenseSM/Bessel/Tor2Geostrophic.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
 #include "QuICC/Bc/Name/FixedFlux.hpp"
 #include "QuICC/Bc/Name/Insulating.hpp"
@@ -128,6 +131,70 @@ namespace Bessel {
          auto l = static_cast<int>(meta(3));
 
          TOp op(outDNu, inDNu, nN, nN, l);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_same_v<TOp, dsm::Bessel::Geostrophic2Tor>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         if(meta.size() != 4)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+
+         int nN = meta(0) + 1;
+         int nL = meta(1) + 1;
+         auto torDNu = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto sDNu = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+
+         int nCpu = QuICCEnv().size();
+         TOp op(nN, nL, nCpu, sDNu, torDNu);
+
+         outData = op.mat();
+
+         #if defined QUICC_MPI
+            MPI_Allreduce(MPI_IN_PLACE, outData.data(), outData.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+         #endif
+      }
+      else if constexpr(std::is_same_v<dsm::Bessel::Tor2Geostrophic, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         if(meta.size() != 4)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+
+         int nN = meta(0) + 1;
+         int nL = meta(1) + 1;
+         auto torDNu = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto sDNu = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+
+         int nCpu = QuICCEnv().size();
+         TOp op(nN, nL, nCpu, sDNu, torDNu);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_same_v<dsm::Bessel::Tor2GridS, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         if(meta.size() != 4)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+
+         int nN = meta(0) + 1;
+         int nL = meta(1) + 1;
+         auto torDNu = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto sDNu = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+
+         int nCpu = QuICCEnv().size();
+         TOp op(nN, nL, nCpu, sDNu, torDNu);
 
          outData = op.mat();
       }

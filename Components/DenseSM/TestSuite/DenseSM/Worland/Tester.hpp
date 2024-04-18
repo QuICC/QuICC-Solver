@@ -122,7 +122,7 @@ namespace Worland {
    {
       Matrix outData;
 
-      if constexpr(std::is_same_v<TOp, dsm::Geostrophic2Tor> || std::is_same_v<TOp, dsm::PyGeostrophic2Tor>)
+      if constexpr(std::is_same_v<TOp, dsm::Geostrophic2Tor>)
       {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
@@ -134,32 +134,15 @@ namespace Worland {
 
          int nN = meta(0) + 1;
          int nL = meta(1) + 1;
-         QuICC::Internal::MHDFloat ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
-         QuICC::Internal::MHDFloat ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
-         bool isGeneric = static_cast<bool>(meta(4));
-         auto a = static_cast<QuICC::Internal::MHDFloat>(meta(5));
-         auto b = static_cast<QuICC::Internal::MHDFloat>(meta(6));
+         auto alpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto dBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         auto ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(4));
+         auto ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(5));
+         bool isGenericBasis = static_cast<bool>(meta(6));
          bool isTriangular = static_cast<bool>(meta(7));
 
-         int nNug;
-         if (isTriangular)
-         {
-            nNug = QuICC::DenseSM::Worland::details::GeostrophicTools::cylTruncNug(nL, isTriangular);
-         }
-         else
-         {
-            nNug = QuICC::DenseSM::Worland::details::GeostrophicTools::cylTruncNugC(nL, isTriangular);
-         }
-
-         std::vector<int> nIdx;
-         for(int n = 0; n < nNug; n++)
-         {
-            if(QuICC::QuICCEnv().id() == n%QuICCEnv().size())
-            {
-               nIdx.push_back(n);
-            }
-         }
-         TOp op(nN, nL, nIdx, ugAlpha, ugBeta, isGeneric, a, b, isTriangular);
+         int nCpu = QuICCEnv().size();
+         TOp op(nN, nL, nCpu, ugAlpha, ugBeta, isGenericBasis, isTriangular, alpha, dBeta);
 
          outData = op.mat();
 
@@ -194,20 +177,22 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         if(meta.size() != 6)
+         if(meta.size() != 8)
          {
             throw std::logic_error("Test meta data is wrong");
          }
 
          int nN = meta(0) + 1;
          int nL = meta(1) + 1;
-         auto ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
-         auto ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
-         bool isGenericBasis = static_cast<bool>(meta(4));
-         bool isTriangular = static_cast<bool>(meta(5));
+         auto alpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto dBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         auto ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(4));
+         auto ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(5));
+         bool isGenericBasis = static_cast<bool>(meta(6));
+         bool isTriangular = static_cast<bool>(meta(7));
 
          int nCpu = QuICCEnv().size();
-         TOp op(nN, nL, nCpu, ugAlpha, ugBeta, isGenericBasis, isTriangular);
+         TOp op(nN, nL, nCpu, ugAlpha, ugBeta, isGenericBasis, isTriangular, alpha, dBeta);
 
          outData = op.mat();
       }
@@ -216,22 +201,24 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         if(meta.size() != 8)
+         if(meta.size() != 10)
          {
             throw std::logic_error("Test meta data is wrong");
          }
 
          int nN = meta(0) + 1;
          int nL = meta(1) + 1;
-         auto ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
-         auto ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
-         bool isGenericBasis = static_cast<bool>(meta(4));
-         auto alphaB = static_cast<QuICC::Internal::MHDFloat>(meta(5));
-         auto betaB = static_cast<QuICC::Internal::MHDFloat>(meta(6));
-         bool isTriangular = static_cast<bool>(meta(7));
+         auto alpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto dBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         auto ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(4));
+         auto ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(5));
+         bool isGenericBasis = static_cast<bool>(meta(6));
+         auto alphaB = static_cast<QuICC::Internal::MHDFloat>(meta(7));
+         auto betaB = static_cast<QuICC::Internal::MHDFloat>(meta(8));
+         bool isTriangular = static_cast<bool>(meta(9));
 
          int nCpu = QuICCEnv().size();
-         TOp op(nN, nL, nCpu, ugAlpha, ugBeta, isGenericBasis, alphaB, betaB, isTriangular);
+         TOp op(nN, nL, nCpu, ugAlpha, ugBeta, isGenericBasis, alphaB, betaB, isTriangular, alpha, dBeta);
 
          outData = op.mat();
       }
@@ -240,22 +227,21 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         if(meta.size() != 8)
+         if(meta.size() != 7)
          {
             throw std::logic_error("Test meta data is wrong");
          }
 
          int nN = meta(0) + 1;
          int nL = meta(1) + 1;
-         auto ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
-         auto ugBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
-         bool isGenericBasis = static_cast<bool>(meta(4));
-         auto alphaB = static_cast<QuICC::Internal::MHDFloat>(meta(5));
-         auto betaB = static_cast<QuICC::Internal::MHDFloat>(meta(6));
-         bool isTriangular = static_cast<bool>(meta(7));
+         auto alpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         auto dBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
+         auto sAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(4));
+         auto sBeta = static_cast<QuICC::Internal::MHDFloat>(meta(5));
+         bool isTriangular = static_cast<bool>(meta(6));
 
          int nCpu = QuICCEnv().size();
-         TOp op(nN, nL, nCpu, ugAlpha, ugBeta, isGenericBasis, alphaB, betaB, isTriangular);
+         TOp op(nN, nL, nCpu, sAlpha, sBeta, isTriangular, alpha, dBeta);
 
          outData = op.mat();
       }

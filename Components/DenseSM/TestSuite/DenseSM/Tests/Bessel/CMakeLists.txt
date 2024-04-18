@@ -104,4 +104,55 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+# Create Geostrophic2Tor
+set(_tests
+  Geostrophic2Tor:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 20 60
+  MPULP 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Tor2GridS
+set(_tests
+  Tor2GridS:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 25 400
+  MPULP 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Tor2Geostrophic
+set(_tests
+  Tor2Geostrophic:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 20 37
+  MPULP 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1
+    ULPS ${_ulp}
+  )
+endforeach()
+
 list(POP_BACK CMAKE_MESSAGE_INDENT)

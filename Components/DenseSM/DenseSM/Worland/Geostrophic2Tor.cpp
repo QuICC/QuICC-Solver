@@ -134,7 +134,7 @@ namespace Worland {
       // Compute Legendre operator
       Polynomial::ALegendre::dPlm dplm;
       namespace evAL = Polynomial::ALegendre::Evaluator;
-      Internal::Matrix alOp(ialgrid.size(), nAlPoly);;
+      Internal::Matrix alOp(ialgrid.size(), nAlPoly);
       dplm.compute<Internal::MHDFloat>(alOp, nAlPoly, 0, ialgrid, ialweights, evAL::Set());
       Internal::Array invLaplh = Internal::Array::LinSpaced(nAlPoly, 0, nAlPoly-1);
       invLaplh = (invLaplh.array()*(invLaplh.array() + 1.0)).pow(-1);

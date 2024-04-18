@@ -3,8 +3,8 @@
  * @brief Implementation of the base for geostrophic basis operator
  */
 
-#ifndef QUICC_DENSESM_WORLAND_DETAILS_GEOSTROPHICTOOLS_HPP
-#define QUICC_DENSESM_WORLAND_DETAILS_GEOSTROPHICTOOLS_HPP
+#ifndef QUICC_DENSESM_BESSEL_DETAILS_GEOSTROPHICTOOLS_HPP
+#define QUICC_DENSESM_BESSEL_DETAILS_GEOSTROPHICTOOLS_HPP
 
 // System includes
 //
@@ -17,7 +17,7 @@ namespace QuICC {
 
 namespace DenseSM {
 
-namespace Worland {
+namespace Bessel {
 
 namespace details {
 
@@ -60,7 +60,7 @@ public:
     * @brief Compute cylindrical S grid
     */
    static void computeGridS(Internal::Array& igridS, Internal::Array& iweightS,
-      const int nS, const Internal::MHDFloat alpha, const Internal::MHDFloat beta);
+      const int nS, const Internal::MHDFloat dNu);
 
    /**
     * @brief Compute quadrature points and weights for z integral
@@ -77,65 +77,48 @@ public:
     * @param igridS S grid
     * @param igridZ Z grid
     * @param iweightZ Z weights
-    * @param alpha   Worland Jacobi alpha
-    * @param dBeta   Worland Jacobi beta = l + dBeta
+    * @param dNu Bessel dNU
     */
    static void integrateZ(int l, int n, Internal::Matrix& iintgz,
       const Internal::Array& igridS, const Internal::Array& igridZ,
-      const Internal::Array& iweightZ, const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta);
+      const Internal::Array& iweightZ, const Internal::MHDFloat dNu);
 
    /**
     * @brief Cylindrical truncation nUg
     *
-    * @param nL            Number of harmonic degrees
-    * @param isTriangular  Use triangular truncation
-    */
-   static int cylTruncNug(const int nL, const bool isTriangular);
-
-   /**
-    * @brief Cylindrical uniform truncation nUg
-    *
     * @param nN            Number of radial modes
     * @param nL            Number of harmonic degrees
     */
-   static int cylTruncNugC(const int nN, const int nL);
+   static int cylTruncNug(const int nN, const int nL);
 
    /**
     * @brief Cylindrical truncation nS
     *
     * @param nr            Number of radial modes
     * @param nL            Number of harmonic degrees
-    * @param isTriangular  Use triangular truncation
     */
-   static int cylTruncNs(const int nr, const int nL, const bool isTriangular);
+   static int cylTruncNs(const int nr, const int nL);
 
    /**
     * @brief Cylindrical truncation nZ
     *
     * @param nr            Number of radial modes
     * @param nL            Number of harmonic degrees
-    * @param isTriangular  Use triangular truncation
     */
-   static int cylTruncNz(const int nr, const int nL, const bool isTriangular);
+   static int cylTruncNz(const int nr, const int nL);
 
    /**
     * @brief Cylindrical truncation nR
     *
+    * @param nR            Number of radial modes
     * @param nL            Number of harmonic degrees
-    * @param isTriangular  Use triangular truncation
     */
-   static int cylTruncNr(const int nL, const bool isTriangular);
-
-   /**
-    * @brief list of maximum relevant radial basis for projection conversion
-    * between geostrophic and toroidal modes
-    */
-   static ArrayI nlist(const int nug, const int maxnl);
+   static int cylTruncNr(const int nR, const int nL);
 };
 
 } // namespace details
-} // namespace Worland
+} // namespace Bessel
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_WORLAND_DETAILS_GEOSTROPHICTOOLS_HPP
+#endif // QUICC_DENSESM_BESSEL_DETAILS_GEOSTROPHICTOOLS_HPP

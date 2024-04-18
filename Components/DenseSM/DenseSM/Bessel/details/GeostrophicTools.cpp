@@ -17,9 +17,9 @@
 #include "QuICC/Polynomial/ALegendre/Plm.hpp"
 #include "QuICC/Polynomial/ALegendre/dPlm.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
-#include "QuICC/Polynomial/Quadrature/JacobiRule.hpp"
-#include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
-#include "QuICC/Polynomial/Worland/Wnl.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandSphEnergyRule.hpp"
+#include "QuICC/Polynomial/Bessel/Generic.hpp"
+#include "QuICC/Polynomial/Bessel/SphJnl.hpp"
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Literals.hpp"
 #include "Types/Internal/Math.hpp"
@@ -28,7 +28,7 @@ namespace QuICC {
 
 namespace DenseSM {
 
-namespace Worland {
+namespace Bessel {
 
 namespace details {
 
@@ -169,23 +169,13 @@ Internal::MHDFloat GeostrophicTools::Cn(const int n)
 }
 
 void GeostrophicTools::computeGridS(Internal::Array& igridS, Internal::Array& iweightS,
-   const int nS, const Internal::MHDFloat alpha, const Internal::MHDFloat beta)
+   const int nS, const Internal::MHDFloat dNu)
 {
    using namespace Internal::Literals;
 
-   if (alpha != 0.5_mp || beta != 1.0_mp)
-   {
-      throw std::logic_error("Generic (alpha,beta) pair is not implemented!");
-   }
-
-   // compute Gauss-Jacobi quadrature in x
-   Internal::Array igridX;
-   Polynomial::Quadrature::JacobiRule jRuleA(alpha, beta - 1);
-   jRuleA.computeQuadrature(igridX, iweightS, nS);
-
-   // grid in s
-   igridS =
-      ((igridX.array() + 1.0_mp) / 2.0_mp).sqrt().matrix();
+   // compute weighted Gauss-Legendre quadrature in x
+   Polynomial::Quadrature::WorlandSphEnergyRule wquad;
+   wquad.computeQuadrature(igridS, iweightS, nS);
 }
 
 void GeostrophicTools::computeQuadratureZ(Internal::Array& igridZ,
@@ -200,7 +190,7 @@ void GeostrophicTools::computeQuadratureZ(Internal::Array& igridZ,
 }
 
 void GeostrophicTools::integrateZ(int l, int n, Internal::Matrix& iintgz,
-   const Internal::Array& igrids, const Internal::Array& igridz, const Internal::Array& iweightz, const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta)
+   const Internal::Array& igrids, const Internal::Array& igridz, const Internal::Array& iweightz, const Internal::MHDFloat dNu)
 {
    using namespace Internal::Literals;
 
@@ -235,9 +225,8 @@ void GeostrophicTools::integrateZ(int l, int n, Internal::Matrix& iintgz,
          // compute worland values on cylinder
          Internal::Matrix ipoly;
          ipoly.resize(nz, n + 1);
-         Polynomial::Worland::Wnl wnl(alpha, dBeta);
-         wnl.compute<Internal::MHDFloat>(ipoly, n + 1, l, r, Internal::Array(),
-            Polynomial::Worland::Evaluator::Set());
+         Polynomial::Bessel::Generic<Polynomial::Bessel::SphJnl> jnl(dNu);
+         jnl.compute<Internal::MHDFloat>(ipoly, n+1, l, r, Internal::Array());
 
          // compute derivative of legendre poly on cylinder
          Internal::Matrix ipolyP;
@@ -263,99 +252,32 @@ void GeostrophicTools::integrateZ(int l, int n, Internal::Matrix& iintgz,
    }
 }
 
-int GeostrophicTools::cylTruncNug(const int nL, const bool isTriangular)
+int GeostrophicTools::cylTruncNug(const int nR, const int nL)
 {
-   int nN;
-   if (isTriangular)
-   {
-      nN = int(((nL - 2) - (nL - 2) % 2) / 2) + 1;
-   }
-   else
-   {
-      nN = int(((nL - 2) - (nL - 2) % 2) / 2) + 1;
-   }
+   int nN = int(((nL - 2) - (nL - 2) % 2) / 2) + nR;
 
    return nN;
 }
 
-int GeostrophicTools::cylTruncNugC(const int nr, const int nL)
+int GeostrophicTools::cylTruncNs(const int nR, const int nL)
 {
-   int nN = int(((nL - 2) - (nL - 2) % 2) / 2) + nr;
+   int nN = int(((nL - 1) - (nL - 1) % 2) / 2 + nR + 1) + 1;
 
    return nN;
 }
 
-int GeostrophicTools::cylTruncNs(const int nr, const int nL,
-   const bool isTriangular)
+int GeostrophicTools::cylTruncNz(const int nR, const int nL)
 {
-   int nN;
-   if (isTriangular)
-   {
-      nN = int(((nL + 2) - (nL + 2) % 2) / 2 + 3) + 1;
-   }
-   else
-   {
-      nN = int(((nL - 1) - (nL - 1) % 2) / 2 + nr + 1) + 1;
-   }
+   int nN = int(((nL - 1) - (nL - 1) % 2) / 2 + nR + 1) + 1;
 
    return nN;
 }
 
-int GeostrophicTools::cylTruncNz(const int nr, const int nL,
-   const bool isTriangular)
+int GeostrophicTools::cylTruncNr(const int nR, const int nL)
 {
-   int nN;
-   if (isTriangular)
-   {
-      nN = int(((nL - 1) - (nL - 1) % 2) / 2 + 2) + 1;
-   }
-   else
-   {
-      nN = int(((nL - 1) - (nL - 1) % 2) / 2 + nr + 1) + 1;
-   }
+   int nN = int(nL + 1 + 2);
 
    return nN;
-}
-
-int GeostrophicTools::cylTruncNr(const int nL, const bool isTriangular)
-{
-   int nN;
-   if (isTriangular)
-   {
-      nN = int(((nL + 1) - (nL + 1) % 2) / 2 + 2) + 1;
-   }
-   else
-   {
-      nN = int(nL + 1 + 2);
-   }
-
-   return nN;
-}
-
-ArrayI GeostrophicTools::nlist(const int maxNug, const int maxnl)
-{
-   if (2 * maxNug + 1 > maxnl - 1)
-   {
-      throw std::logic_error("L truncation is not enough to capture all "
-                             "geostrophic modes required");
-   }
-
-   ArrayI nli = ArrayI::Constant(maxnl, 0);
-
-   for (int l = 0; l < maxnl; l++)
-   {
-      if (l % 2 == 0)
-      {
-         nli[l] = -1;
-      }
-   }
-
-   for (int k = 0; k <= maxNug; k++)
-   {
-      nli(2 * k + 1) = maxNug - k;
-   }
-
-   return nli;
 }
 
 } // namespace details
