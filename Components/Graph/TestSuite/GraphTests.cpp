@@ -71,18 +71,19 @@ TEST_CASE("One Dimensional Loop", "[OneDimLoop]")
   // Load our Dialect in this MLIR Context.
   ctx.loadDialect<mlir::quiccir::QuiccirDialect>();
 
-  std::string modStr =
-    "!type_umod = !quiccir.view<5x6x3xf64, \"C_DCCSC3D_t\">\n"
-    "!type_uval = !quiccir.view<5x11x3xf64, \"R_DCCSC3D_t\">\n"
-    "!type_tumod = tensor<5x6x3xf64, \"C_DCCSC3D_t\">\n"
-    "!type_tuval = tensor<5x11x3xf64, \"R_DCCSC3D_t\">\n"
-    "func.func @entry(%thisArr: !llvm.ptr<array<2 x ptr>> {llvm.noalias}, %uout: !type_umod, %umod: !type_umod) {\n"
-    "  %tumod = builtin.unrealized_conversion_cast %umod : !type_umod to !type_tumod\n"
-    "  %tuval = quiccir.fr.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}\n"
-    "  %ret = quiccir.fr.int %tuval : !type_tuval -> !type_tumod attributes{implptr = 1 :i64}\n"
-    "  quiccir.materialize %ret in %uout : (!type_tumod, !type_umod)\n"
-    "  return\n"
-    "}\n";
+  std::string modStr = R"mlir(
+    !type_umod = !quiccir.view<5x6x3xf64, "C_DCCSC3D_t">
+    !type_uval = !quiccir.view<5x11x3xf64, "R_DCCSC3D_t">
+    !type_tumod = tensor<5x6x3xf64, "C_DCCSC3D_t">
+    !type_tuval = tensor<5x11x3xf64, "R_DCCSC3D_t">
+    func.func @entry(%thisArr: !llvm.ptr<array<2 x ptr>> {llvm.noalias}, %uout: !type_umod, %umod: !type_umod) {
+      %tumod = builtin.unrealized_conversion_cast %umod : !type_umod to !type_tumod
+      %tuval = quiccir.fr.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}
+      %ret = quiccir.fr.int %tuval : !type_tuval -> !type_tumod attributes{implptr = 1 :i64}
+      quiccir.materialize %ret in %uout : (!type_tumod, !type_umod)
+      return
+    }
+    )mlir";
 
   // Load
   mlir::OwningOpRef<mlir::ModuleOp> module;
