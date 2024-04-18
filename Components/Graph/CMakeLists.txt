@@ -3,7 +3,7 @@ set(QUICC_CURRENT_COMPONENT_LIB Graph)
 set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")
 message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}" )
 
-add_library(${QUICC_CURRENT_COMPONENT_LIB} SHARED)
+add_library(${QUICC_CURRENT_COMPONENT_LIB} STATIC)
 
 target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
@@ -25,9 +25,11 @@ add_subdirectory(Graph)
 
 # Dependencies
 include(BundleQuiccir)
-target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" PUBLIC
-  QuICC::ViewOps
-  QuiccirJITLib
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+    QuICC::Graph::Shims
+    QuICC::ViewOps
+    QuiccirJITLib
 )
 
 # Alias

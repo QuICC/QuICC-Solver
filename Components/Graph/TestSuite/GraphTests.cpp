@@ -8,7 +8,7 @@
 #include <Quiccir/IR/QuiccirDialect.h>
 #include <Quiccir/Transforms/QuiccirPasses.h>
 #include <Quiccir/Pipelines/Passes.h>
-#include <Quiccir-c/Utils.h>
+// #include <Quiccir-c/Utils.h>
 
 #include <mlir/InitAllDialects.h>
 #include <mlir/Dialect/Func/Extensions/AllExtensions.h>

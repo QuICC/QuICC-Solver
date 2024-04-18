@@ -1,7 +1,6 @@
 #include <iostream>
 #include <complex>
 #include <cassert>
-#include <Quiccir-c/Utils.h>
 
 #include "Graph/MlirShims.hpp"
 #include "Graph/BackendsMap.hpp"

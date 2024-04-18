@@ -1,7 +1,6 @@
 #pragma once
 
 
-#include <Quiccir-c/Utils.h>
 #include <complex>
 #include <unordered_map>
 
@@ -11,9 +10,22 @@ namespace QuICC
 {
 namespace Graph
 {
+    template<typename Tdata, typename Tmeta, std::size_t N>
+    struct ViewDescriptor {
+    Tmeta dims[N];
+    Tmeta *pos;
+    Tmeta posSize;
+    Tmeta *coo;
+    Tmeta cooSize;
+    Tdata *data;
+    Tmeta dataSize;
+    };
+
     using R_DCCSC3D_t = View::View<double, View::DCCSC3D>;
     using C_DCCSC3D_t = QuICC::View::View<std::complex<double>, View::DCCSC3D>;
     using C_S1CLCSC3D_t = QuICC::View::View<std::complex<double>, View::S1CLCSC3D>;
+
+    using view3_t = ViewDescriptor<double, std::uint32_t, 3>;
     using view3_cd_t = ViewDescriptor<std::complex<double>, std::uint32_t, 3>;
 
 
