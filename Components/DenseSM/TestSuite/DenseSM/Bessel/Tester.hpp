@@ -25,6 +25,8 @@
 #include "DenseSM/Bessel/CoriolisQm.hpp"
 #include "DenseSM/Bessel/CoriolisQp.hpp"
 #include "DenseSM/Bessel/Geostrophic2Tor.hpp"
+#include "DenseSM/Bessel/GeostrophicAngularMomentum.hpp"
+#include "DenseSM/Bessel/GeostrophicEnergy.hpp"
 #include "DenseSM/Bessel/Tor2GridS.hpp"
 #include "DenseSM/Bessel/Tor2Geostrophic.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
@@ -157,6 +159,41 @@ namespace Bessel {
          #if defined QUICC_MPI
             MPI_Allreduce(MPI_IN_PLACE, outData.data(), outData.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          #endif
+      }
+      else if constexpr(std::is_same_v<TOp, dsm::Bessel::GeostrophicAngularMomentum>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         if(meta.size() != 2)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+
+         int nN = meta(0) + 1;
+         auto sDNu = static_cast<QuICC::Internal::MHDFloat>(meta(1));
+
+         TOp op(nN, sDNu);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_same_v<TOp, dsm::Bessel::GeostrophicEnergy>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         if(meta.size() != 3)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+
+         int nN = meta(0) + 1;
+         int nL = meta(1) + 1;
+         auto sDNu = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+
+         TOp op(nN, nL, sDNu);
+
+         outData = op.mat();
       }
       else if constexpr(std::is_same_v<dsm::Bessel::Tor2Geostrophic, TOp>)
       {

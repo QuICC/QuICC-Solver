@@ -57,7 +57,6 @@ void Tor2GridS::buildOpImpl(Internal::Matrix& mat, const int rows,
    mat.setConstant(0.0);
 
    // compute integration matrices
-   int nNug = details::GeostrophicTools::cylTruncNug(nN, nL);
    const auto& nCpu = this->mNcpu;
    int pid = 0;
    for (int l = 1; l < nL; l += 2)

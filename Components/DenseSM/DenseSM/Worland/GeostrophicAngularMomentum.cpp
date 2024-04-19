@@ -12,8 +12,11 @@
 // Project includes
 //
 #include "GeostrophicAngularMomentum.hpp"
-#include "DenseSM/Worland/details/GeostrophicTools.hpp"
 #include "Types/Internal/Math.hpp"
+#include "Types/Internal/Literals.hpp"
+#include "QuICC/Polynomial/Quadrature/JacobiRule.hpp"
+#include "QuICC/Polynomial/Worland/Wnl.hpp"
+#include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 
 namespace QuICC {
 
@@ -21,13 +24,8 @@ namespace DenseSM {
 
 namespace Worland {
 
-   GeostrophicAngularMomentum::GeostrophicAngularMomentum(const Scalar_t ugAlpha, const Scalar_t ugDBeta, const bool isGenericBasis, const int nR)
-      : IGeostrophicOperator(ugAlpha, ugDBeta, isGenericBasis, nR, 1)
-   {
-   }
-
-   GeostrophicAngularMomentum::GeostrophicAngularMomentum(const Scalar_t ugAlpha, const Scalar_t ugDBeta, const bool isGenericBasis, const int nR, const Scalar_t alpha, const Scalar_t dBeta)
-      : IGeostrophicOperator(ugAlpha, ugDBeta, isGenericBasis, nR, 1, alpha, dBeta)
+   GeostrophicAngularMomentum::GeostrophicAngularMomentum(const int nN, const Scalar_t ugAlpha, const Scalar_t ugDBeta, const bool isGenericBasis)
+      : IGeostrophicOperator(ugAlpha, ugDBeta, isGenericBasis, nN, 1)
    {
    }
 
@@ -45,22 +43,20 @@ namespace Worland {
       {
          const auto& a = this->mcUgAlpha;
          const auto& b = this->mcUgBeta;
-         const int nr = rows + 1;
-         Internal::Array angMom = Internal::Array::Zero(nr);
 
-         Internal::MHDFloat piFactor = Internal::Math::pow(Internal::Math::PI,MHD_MP(1.5));
-         for(int n = 0; n < nr; n++)
-         {
-            Internal::MHDFloat t = 0;
-            for(int j = 0; j < n+1; j++)
-            {
-               Internal::MHDFloat dj = static_cast<Internal::MHDFloat>(j);
-               t += piFactor*details::GeostrophicTools::Bjnab(j, n, a, b)*Internal::Math::exp(Internal::Math::lgamma(dj+MHD_MP(2))-Internal::Math::lgamma(dj+MHD_MP(3.5)));
-            }
-            angMom(n) = t;
-         }
+         using namespace Internal::Literals;
+         Internal::Array isg, isw;
+         Polynomial::Quadrature::JacobiRule rule(0.5_mp, 0_mp);
+         rule.computeQuadrature(isg, isw, 2*rows);
+         isg = ((1_mp + isg.array())/2_mp).sqrt().matrix();
+         isw.array() *= (Internal::Math::PI/Internal::Math::sqrt(2_mp)); // 4 pi / sqrt(32)
+                                                                         //
+         Internal::Matrix ipoly;
+         ipoly.resize(isg.size(), rows);
+         Polynomial::Worland::Wnl wnl(a, b-1_mp);
+         wnl.compute<Internal::MHDFloat>(ipoly, rows, 1, isg, isw, Polynomial::Worland::Evaluator::Set());
 
-         mat = angMom.topRows(rows);
+         mat.col(0) = (isg.transpose()*ipoly).transpose();
       }
       else
       {

@@ -118,7 +118,7 @@ namespace Bessel {
          {
             if(l%2 == 1)
             {
-               // Compute Worland expansion
+               // Compute spectral expansion
                Internal::Matrix tmp = matP.at(l).transpose()*(tPoly.col(l));
 
                mat.block(l*nN, n_, tmp.rows(), 1) = tmp;

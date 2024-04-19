@@ -24,6 +24,7 @@
 #include "DenseSM/Worland/Geostrophic2Tor.hpp"
 #include "DenseSM/Worland/PyGeostrophic2Tor.hpp"
 #include "DenseSM/Worland/GeostrophicAngularMomentum.hpp"
+#include "DenseSM/Worland/GeostrophicEnergy.hpp"
 #include "DenseSM/Worland/Tor2Geostrophic.hpp"
 #include "DenseSM/Worland/Tor2EGeostrophic.hpp"
 #include "DenseSM/Worland/Tor2GridS.hpp"
@@ -155,20 +156,38 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
+         if(meta.size() != 4)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+
+         int nN = meta(0) + 1;
+         QuICC::Internal::MHDFloat ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(1));
+         QuICC::Internal::MHDFloat ugDBeta = static_cast<QuICC::Internal::MHDFloat>(meta(2));
+         bool isGenericBasis = static_cast<bool>(meta(3));
+
+         TOp op(nN, ugAlpha, ugDBeta, isGenericBasis);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_same_v<TOp, dsm::GeostrophicEnergy>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
          if(meta.size() != 6)
          {
             throw std::logic_error("Test meta data is wrong");
          }
 
-         int maxnl = meta(1) + 1;
+         int nN = meta(0) + 1;
+         int nL = meta(1) + 1;
          QuICC::Internal::MHDFloat ugAlpha = static_cast<QuICC::Internal::MHDFloat>(meta(2));
          QuICC::Internal::MHDFloat ugDBeta = static_cast<QuICC::Internal::MHDFloat>(meta(3));
-         auto a = static_cast<QuICC::Internal::MHDFloat>(meta(4));
-         auto b = static_cast<QuICC::Internal::MHDFloat>(meta(5));
+         bool isGenericBasis = static_cast<bool>(meta(4));
+         bool isTriangular = static_cast<bool>(meta(5));
 
-         int nr = (maxnl - 3)/2 + 1;
-
-         TOp op(ugAlpha, ugDBeta, nr, a, b, 0);
+         TOp op(nN, nL, ugAlpha, ugDBeta, isGenericBasis, isTriangular);
 
          outData = op.mat();
       }

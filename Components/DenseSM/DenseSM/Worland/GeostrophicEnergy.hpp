@@ -1,10 +1,10 @@
 /**
- * @file Geostrophic2Tor.hpp
+ * @file GeostrophicEnergy.hpp
  * @brief Implementation of the projection operator from the geostrophic basis to Worland
  */
 
-#ifndef QUICC_DENSESM_WORLAND_GEOSTROPHIC2TOR_HPP
-#define QUICC_DENSESM_WORLAND_GEOSTROPHIC2TOR_HPP
+#ifndef QUICC_DENSESM_WORLAND_GEOSTROPHICENERGY_HPP
+#define QUICC_DENSESM_WORLAND_GEOSTROPHICENERGY_HPP
 
 // System includes
 //
@@ -24,7 +24,7 @@ namespace Worland {
    /**
     * @brief Implementation of the projection operator from the geostrophic basis to Worland
     */
-   class Geostrophic2Tor: public IGeostrophicOperator
+   class GeostrophicEnergy: public IGeostrophicOperator
    {
       public:
          /**
@@ -32,31 +32,16 @@ namespace Worland {
           *
           * @param nN      Number of radial modes
           * @param nL      Number of harmonic degrees
-          * @param nCpu    Number of CPU in MPI version
           * @param ugAlpha Geostrophic basis Jacobi alpha
           * @param ugBeta  Geostrophic basis Jacobi beta
           * @param isGenericBasis   Use generic Worland basis a geostrophic basis?
           */
-         Geostrophic2Tor(const int nN, const int nL, const int nCpu, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool mIsTriangular);
-
-         /**
-          * @brief Constructor
-          *
-          * @param nN      Number of radial modes
-          * @param nL      Number of harmonic degrees
-          * @param nCpu    Number of CPU in MPI version
-          * @param ugAlpha Geostrophic basis Jacobi alpha
-          * @param ugBeta  Geostrophic basis Jacobi beta
-          * @param isGenericBasis   Use generic Worland basis a geostrophic basis?
-          * @param alpha   Jacobi alpha
-          * @param dBeta   Jacobi beta = l + dBeta
-          */
-         Geostrophic2Tor(const int nN, const int nL, const int nCpu, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool isTriangular, const Scalar_t alpha, const Scalar_t dBeta);
+         GeostrophicEnergy(const int nN, const int nL, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis, const bool mIsTriangular);
 
          /**
           * @brief Destructor
           */
-         virtual ~Geostrophic2Tor() = default;
+         virtual ~GeostrophicEnergy() = default;
 
       protected:
          /**
@@ -79,11 +64,6 @@ namespace Worland {
          const int mNl;
 
          /**
-          * @brief Number of CPU
-          */
-         const int mNcpu;
-
-         /**
           * @brief Uses triangular truncation?
           */
          const bool mIsTriangular;
@@ -95,4 +75,4 @@ namespace Worland {
 } // DenseSM
 } // QuICC
 
-#endif // QUICC_DENSESM_WORLAND_GEOSTROPHIC2TOR_HPP
+#endif // QUICC_DENSESM_WORLAND_GEOSTROPHICENERGY_HPP

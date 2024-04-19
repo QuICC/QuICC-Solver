@@ -121,6 +121,40 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+# Create GeostrophicAngularMomentum
+set(_tests
+  GeostrophicAngularMomentum:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 1500 11 30
+  MPULP 11 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1 2
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create GeostrophicEnergy
+set(_tests
+  GeostrophicEnergy:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 15 630
+  MPULP 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1
+    ULPS ${_ulp}
+  )
+endforeach()
+
 # Create Tor2GridS
 set(_tests
   Tor2GridS:dense

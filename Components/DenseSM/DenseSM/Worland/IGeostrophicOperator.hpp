@@ -29,7 +29,7 @@ namespace Worland {
          /**
           * @brief Constructor with default Worland basis
           *
-          * @param ugAlph  Geostrophic basis Jacobi alpha
+          * @param ugAlpha Geostrophic basis Jacobi alpha
           * @param ugBeta  Geostrophic basis Jacobi beta
           * @param isGenericBasis   Use generic Worland as geostrophic basis
           * @param rows    Number of row
@@ -40,7 +40,7 @@ namespace Worland {
          /**
           * @brief Constructor
           *
-          * @param ugAlph  Geostrophic basis Jacobi alpha
+          * @param ugAlpha Geostrophic basis Jacobi alpha
           * @param ugBeta  Geostrophic basis Jacobi beta
           * @param isGenericBasis   Use generic Worland as geostrophic basis
           * @param rows    Number of row

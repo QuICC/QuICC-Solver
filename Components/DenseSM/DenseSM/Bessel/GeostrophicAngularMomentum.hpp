@@ -3,8 +3,8 @@
  * @brief Implementation of the angular momentum operator for the geostrophic basis
  */
 
-#ifndef QUICC_DENSESM_WORLAND_GEOSTROPHICANGULARMOMENTUM_HPP
-#define QUICC_DENSESM_WORLAND_GEOSTROPHICANGULARMOMENTUM_HPP
+#ifndef QUICC_DENSESM_BESSEL_GEOSTROPHICANGULARMOMENTUM_HPP
+#define QUICC_DENSESM_BESSEL_GEOSTROPHICANGULARMOMENTUM_HPP
 
 // System includes
 //
@@ -12,29 +12,27 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "DenseSM/Worland/IGeostrophicOperator.hpp"
+#include "DenseSM/IMatrixSMOperator.hpp"
 
 namespace QuICC {
 
 namespace DenseSM {
 
-namespace Worland {
+namespace Bessel {
 
    /**
     * @brief Implementation of the angula momentum operator for the geostrophic basis
     */
-   class GeostrophicAngularMomentum: public IGeostrophicOperator
+   class GeostrophicAngularMomentum: public IMatrixSMOperator
    {
       public:
          /**
           * @brief Constructor
           *
           * @param nN      Number of radial modes
-          * @param ugAlpha Geostrophic basis Jacobi alpha
-          * @param ugBeta  Geostrophic basis Jacobi beta = l + dBeta
-          * @param isGenericBasis   Use generic Worland basis a geostrophic basis?
+          * @param sDNu    Bessel dNu of S basis
           */
-         GeostrophicAngularMomentum(const int nN, const Scalar_t ugAlpha, const Scalar_t ugBeta, const bool isGenericBasis);
+         GeostrophicAngularMomentum(const int nN, const Scalar_t sDNu);
 
          /**
           * @brief Destructor
@@ -51,15 +49,25 @@ namespace Worland {
           */
          void buildOpImpl(Internal::Matrix& mat, const int rows, const int cols) const final;
 
+         /**
+          * @brief Max radial truncation
+          */
+         const int mNn;
+
+         /**
+          * @brief Bessel parameter nu = l + dnu for S grid
+          */
+         Internal::MHDFloat mSDNu;
+
       private:
          /**
-          * @brief Build Worland type independent operator
+          * @brief Build independent operator
           */
          void buildGenericOp(Internal::Matrix& mat, const int rows) const;
    };
 
-} // Worland
+} // Bessel
 } // DenseSM
 } // QuICC
 
-#endif // QUICC_DENSESM_WORLAND_GEOSTROPHICANGULARMOMENTUM_HPP
+#endif // QUICC_DENSESM_BESSEL_GEOSTROPHICANGULARMOMENTUM_HPP

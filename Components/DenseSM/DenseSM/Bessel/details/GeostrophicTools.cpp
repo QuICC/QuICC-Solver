@@ -222,7 +222,7 @@ void GeostrophicTools::integrateZ(int l, int n, Internal::Matrix& iintgz,
                   r.array().inverse())
                     .matrix();
 
-         // compute worland values on cylinder
+         // compute spherical bessel values on cylinder
          Internal::Matrix ipoly;
          ipoly.resize(nz, n + 1);
          Polynomial::Bessel::Generic<Polynomial::Bessel::SphJnl> jnl(dNu);
@@ -281,6 +281,6 @@ int GeostrophicTools::cylTruncNr(const int nR, const int nL)
 }
 
 } // namespace details
-} // namespace Worland
+} // namespace Bessel
 } // namespace DenseSM
 } // namespace QuICC
