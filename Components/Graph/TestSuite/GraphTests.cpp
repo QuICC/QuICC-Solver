@@ -31,6 +31,7 @@
 #include "Graph/MlirShims.hpp"
 #include "Graph/BackendsMap.hpp"
 #include "Graph/OpsMap.hpp"
+#include "Graph/Jit.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
 #include "Memory/Cuda/Malloc.hpp"
 #include "Memory/Memory.hpp"
@@ -60,17 +61,7 @@ int main(int argc, char **argv)
 
 TEST_CASE("One Dimensional Loop", "[OneDimLoop]")
 {
-  mlir::DialectRegistry registry;
-  mlir::func::registerAllExtensions(registry);
-  // Add the following to include *all* MLIR Core dialects, or selectively
-  // include what you need like above. You only need to register dialects that
-  // will be *parsed* by the tool, not the one generated
-  registerAllDialects(registry);
-
-  mlir::MLIRContext ctx(registry);
-  // Load our Dialect in this MLIR Context.
-  ctx.loadDialect<mlir::quiccir::QuiccirDialect>();
-
+  // Test Graph
   std::string modStr = R"mlir(
     !type_umod = !quiccir.view<5x6x3xf64, "C_DCCSC3D_t">
     !type_uval = !quiccir.view<5x11x3xf64, "R_DCCSC3D_t">
@@ -83,70 +74,20 @@ TEST_CASE("One Dimensional Loop", "[OneDimLoop]")
       quiccir.materialize %ret in %uout : (!type_tumod, !type_umod)
       return
     }
-    )mlir";
+  )mlir";
 
-  // Load
-  mlir::OwningOpRef<mlir::ModuleOp> module;
-  module = mlir::parseSourceString<mlir::ModuleOp>(modStr, &ctx);
+  // Grid dimensions
+  constexpr std::uint32_t rank = 3u;
+  std::array<std::uint32_t, rank> physDims{11, 3, 5};
+  std::array<std::uint32_t, rank> modsDims{6, 3, 5};
 
-  // Dump
-  // module->dump();
-
-  // setup ops map and store
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::MapOps storeOp(*module, mem, /*physDims=*/{11, 3, 5},
-    /*modsDims=*/{6, 3, 5});
-
-  // Top level (module) pass manager
-  mlir::PassManager pm(&ctx);
-  mlir::quiccir::quiccLibCallPipelineBuilder(pm);
-
-  // Lower
-  if (mlir::failed(pm.run(*module))) {
-    CHECK(false);
-  }
-
-  // Dump
-  // module->dump();
-
-  // JIT
-
-  // Initialize LLVM targets.
-  llvm::InitializeNativeTarget();
-  llvm::InitializeNativeTargetAsmPrinter();
-
-  // Register the translation from MLIR to LLVM IR, which must happen before we
-  // can JIT-compile.
-  mlir::registerBuiltinDialectTranslation(*module->getContext());
-  mlir::registerLLVMDialectTranslation(*module->getContext());
-
-  // An optimization pipeline to use within the execution engine.
-  auto optPipeline = mlir::makeOptimizingTransformer(
-      /*optLevel=*/0, /*sizeLevel=*/0,
-      /*targetMachine=*/nullptr);
-
-  // Create an MLIR execution engine. The execution engine eagerly JIT-compiles
-  // the module.
-  mlir::ExecutionEngineOptions engineOptions;
-  engineOptions.transformer = optPipeline;
-  // engineOptions.sharedLibPaths = executionEngineLibs;
-  auto maybeEngine = mlir::ExecutionEngine::create(*module, engineOptions);
-  if (!maybeEngine) {
-    assert(false && "failed to construct an execution engine");
-  }
-  auto& engine = maybeEngine.get();
-
-  // Invoke the JIT-compiled function.
-  std::string symbol = "entry";
-  auto funSym = engine->lookup(symbol);
-  if (auto E = funSym.takeError()) {
-    assert(false && "JIT invocation failed");
-  }
+  QuICC::Graph::Jit<rank> Jitter(modStr, physDims, modsDims);
 
   // setup metadata
-  constexpr std::size_t modsM = 6;
-  constexpr std::size_t N = 3;
-  constexpr std::size_t K = 5;
+  auto modsM = modsDims[0];
+  auto N = physDims[1];
+  auto K = physDims[2];
   std::array<std::uint32_t, 3> modsDimensions {modsM, N, K};
 
   std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
@@ -169,49 +110,19 @@ TEST_CASE("One Dimensional Loop", "[OneDimLoop]")
     modsInView[m] = val;
   }
 
-  // map input/output views
-  using view3_cd_t = ViewDescriptor<std::complex<double>, std::uint32_t, 3>;
-  view3_cd_t viewRef_in{{modsM, N, K},
-    pointers[1].data(), (std::uint32_t)pointers[1].size(),
-    indices[1].data(), (std::uint32_t)indices[1].size(),
-    modsIn.data(), (std::uint32_t)modsIn.size()};
-  view3_cd_t viewRef_out{{modsM, N, K},
-    pointers[1].data(), (std::uint32_t)pointers[1].size(),
-    indices[1].data(), (std::uint32_t)indices[1].size(),
-    modsOut.data(), (std::uint32_t)modsOut.size()};
-
-  // get operators map
-  auto thisArr = storeOp.getThisArr();
-
   // Apply graph
-  auto fun = (void (*)(void*, view3_cd_t*, view3_cd_t*))funSym.get();
-  fun(thisArr.data(), &viewRef_out, &viewRef_in);
+  Jitter.apply(modsOutView, modsInView);
 
-  // check
+  // Check
   for(std::size_t m = 0; m < modsOutView.size(); ++m)
   {
     CHECK(modsOutView[m] == val);
   }
-
 }
 
 TEST_CASE("Simple Tree", "[SimpleTree]")
 {
-  mlir::DialectRegistry registry;
-  mlir::func::registerAllExtensions(registry);
-  // Add the following to include *all* MLIR Core dialects, or selectively
-  // include what you need like above. You only need to register dialects that
-  // will be *parsed* by the tool, not the one generated
-  registerAllDialects(registry);
-
-  mlir::MLIRContext ctx(registry);
-  // Load our Dialect in this MLIR Context.
-  ctx.loadDialect<mlir::quiccir::QuiccirDialect>();
-
-  // Load
-  mlir::OwningOpRef<mlir::ModuleOp> module;
   std::string inputFilename = "./simple-tree.mlir";
-  // Otherwise, the input is '.mlir'.
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
       llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
   if (std::error_code EC = fileOrErr.getError()) {
@@ -222,82 +133,19 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
   // Parse the input mlir.
   llvm::SourceMgr sourceMgr;
   sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
-  module = mlir::parseSourceFile<mlir::ModuleOp>(sourceMgr, &ctx);
-
-  // Dump
-  // module->dump();
-
-  // Inline and set view attributes
-  mlir::PassManager pmPre(&ctx);
-  pmPre.addPass(mlir::createInlinerPass());
-  std::array<std::array<std::string, 2>, 3> layOpt;
-  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
-  layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
-  layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
-  mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
-  nestedFuncPmPre.addPass(mlir::quiccir::createSetViewLayoutPass(layOpt));
-
-  if (mlir::failed(pmPre.run(*module))) {
-    CHECK(false);
-  }
-
-  // Dump
-  // module->dump();
 
   // Grid dimensions
   constexpr std::uint32_t rank = 3;
   std::array<std::uint32_t, rank> physDims{10, 6, 3};
   std::array<std::uint32_t, rank> modsDims{6, 6, 2};
 
-  // setup ops map and store
+  std::array<std::array<std::string, 2>, 3> layOpt;
+  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
+  layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
+  layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::MapOps storeOp(*module, mem, physDims, modsDims);
-
-  // Lower to library call
-  mlir::PassManager pm(&ctx);
-  mlir::quiccir::quiccLibCallPipelineBuilder(pm);
-
-  // Lower
-  if (mlir::failed(pm.run(*module))) {
-    CHECK(false);
-  }
-
-  // Dump
-  // module->dump();
-
-  // JIT
-
-  // Initialize LLVM targets.
-  llvm::InitializeNativeTarget();
-  llvm::InitializeNativeTargetAsmPrinter();
-
-  // Register the translation from MLIR to LLVM IR, which must happen before we
-  // can JIT-compile.
-  mlir::registerBuiltinDialectTranslation(*module->getContext());
-  mlir::registerLLVMDialectTranslation(*module->getContext());
-
-  // An optimization pipeline to use within the execution engine.
-  auto optPipeline = mlir::makeOptimizingTransformer(
-      /*optLevel=*/0, /*sizeLevel=*/0,
-      /*targetMachine=*/nullptr);
-
-  // Create an MLIR execution engine. The execution engine eagerly JIT-compiles
-  // the module.
-  mlir::ExecutionEngineOptions engineOptions;
-  engineOptions.transformer = optPipeline;
-  // engineOptions.sharedLibPaths = executionEngineLibs;
-  auto maybeEngine = mlir::ExecutionEngine::create(*module, engineOptions);
-  if (!maybeEngine) {
-    assert(false && "failed to construct an execution engine");
-  }
-  auto& engine = maybeEngine.get();
-
-  // Invoke the JIT-compiled function.
-  std::string symbol = "entry";
-  auto funSym = engine->lookup(symbol);
-  if (auto E = funSym.takeError()) {
-    assert(false && "JIT invocation failed");
-  }
+  QuICC::Graph::Jit<rank> Jitter(std::move(sourceMgr), physDims, modsDims, layOpt);
 
   // setup metadata
   auto M = physDims[0];
@@ -350,33 +198,8 @@ TEST_CASE("Simple Tree", "[SimpleTree]")
     ThetaView[m] = val;
   }
 
-  // map input/output views
-  using view3_rd_t = ViewDescriptor<double, std::uint32_t, 3>;
-  using view3_cd_t = ViewDescriptor<std::complex<double>, std::uint32_t, 3>;
-
-  view3_rd_t RviewDes{{M, N, K},
-    pointersPhys[1].data(), (std::uint32_t)pointersPhys[1].size(),
-    indicesPhys[1].data(), (std::uint32_t)indicesPhys[1].size(),
-    R.data(), (std::uint32_t)R.size()};
-  view3_rd_t PhiviewDes{{M, N, K},
-    pointersPhys[1].data(), (std::uint32_t)pointersPhys[1].size(),
-    indicesPhys[1].data(), (std::uint32_t)indicesPhys[1].size(),
-    Phi.data(), (std::uint32_t)Phi.size()};
-  view3_rd_t ThetaviewDes{{M, N, K},
-    pointersPhys[1].data(), (std::uint32_t)pointersPhys[1].size(),
-    indicesPhys[1].data(), (std::uint32_t)indicesPhys[1].size(),
-    Theta.data(), (std::uint32_t)Theta.size()};
-  view3_cd_t viewRef_out{{modsK, modsM, modsN},
-    pointersMods[1].data(), (std::uint32_t)pointersMods[1].size(),
-    indicesMods[1].data(), (std::uint32_t)indicesMods[1].size(),
-    modsOut.data(), (std::uint32_t)modsOut.size()};
-
-  // Get operators map
-  auto thisArr = storeOp.getThisArr();
-
   // Apply graph
-  auto fun = (void (*)(void*, view3_cd_t*, view3_rd_t*, view3_rd_t*, view3_rd_t*))funSym.get();
-  fun(thisArr.data(), &viewRef_out, &RviewDes, &PhiviewDes, &ThetaviewDes);
+  Jitter.apply(modsOutView, RView, PhiView, ThetaView);
 
   // Check
   double eps = 1e-15;

@@ -60,8 +60,9 @@ class MapOps
     /// @brief store for RAII
     std::vector<varOp_t> _ops;
     /// @brief memory resource for internal op allocation
-    const std::shared_ptr<Memory::memory_resource> _mem;
+    std::shared_ptr<Memory::memory_resource> _mem;
   public:
+    MapOps() = default;
     MapOps(mlir::ModuleOp module,
       const std::shared_ptr<Memory::memory_resource> mem,
       const std::array<std::uint32_t, 3> physDims,
