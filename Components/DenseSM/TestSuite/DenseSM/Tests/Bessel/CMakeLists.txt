@@ -143,7 +143,7 @@ set(_tests
   GeostrophicEnergy:dense
   )
 quicc_set_ulp(_ulp
-  ULP 15 630
+  ULP 15 50
   MPULP 11 11
         )
 foreach(_test ${_tests})
