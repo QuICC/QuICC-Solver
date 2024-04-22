@@ -91,7 +91,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
         // access S1CLCSC3D
         // cumulative column height is (with ijk) I*k - sum(i)_0^k
         // iSum shifted by 1
-        std::vector<std::uint32_t> iSum(I, 0);
+        std::vector<std::uint32_t> iSum(K, 0);
         for (std::size_t i = 2; i < K; ++i) {
             iSum[i] = iSum[i-1] + 1;
         }
