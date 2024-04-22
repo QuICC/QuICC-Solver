@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-#include "ViewOps/Transpose/Cpu/Transpose.hpp"
+#include "ViewOps/Transpose/Transpose.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 
 using namespace QuICC::Memory;
@@ -146,16 +146,40 @@ TEST_CASE("Serial DCCSC3D to DCCSC3DJIK", "SerialDCCSC3DtoDCCSC3DJIK")
         {{}, {}, {}}};
     std::array<std::vector<std::uint32_t>, rank> indices = {
         {{}, {}, {}}};
-    View<double, DCCSC3D> viewIn(dataIn, dimensionsIn, pointers, indices);
-    View<double, DCCSC3D> viewOut(dataOut, dimensionsOut, pointers, indices);
+    using Tin = DCCSC3D;
+    using Tout = DCCSC3DJIK;
+    View<double, Tin> viewIn(dataIn, dimensionsIn, pointers, indices);
+    View<double, Tout> viewOut(dataOut, dimensionsOut, pointers, indices);
+
+    // device mem
+    auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
+    QuICC::Memory::MemBlock<double> memBlockIn(S, memDev.get());
+    QuICC::Memory::MemBlock<double> memBlockOut(S, memDev.get());
+
+    // set device pointers and indices
+   ViewBase<std::uint32_t> pointersDev[rank];
+   ViewBase<std::uint32_t> indicesDev[rank];
+
+    // set device views
+    View<double, Tin> viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(), pointersDev, indicesDev);
+    View<double, Tout> viewOutDev(memBlockOut.data(), memBlockOut.size(), dimensionsOut.data(), pointersDev, indicesDev);
+
+    // cpu -> gpu
+    cudaErrChk(cudaMemcpy(viewInDev.data(), viewIn.data(),
+        S * sizeof(double), cudaMemcpyHostToDevice));
 
     // Transpose op
-    using namespace QuICC::Transpose::Cpu;
+    using namespace QuICC::Transpose::Cuda;
     using namespace QuICC::Transpose;
     auto transposeOp =
-      std::make_unique<Op<View<double, DCCSC3D>, View<double, DCCSC3D>, p201_t>>();
+      std::make_unique<Op<View<double, Tout>, View<double, Tin>, p201_t>>();
 
-    transposeOp->apply(viewOut, viewIn);
+    transposeOp->apply(viewOutDev, viewInDev);
+
+    // gpu -> cpu
+    cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(),
+      viewOut.size() * sizeof(double),
+      cudaMemcpyDeviceToHost));
 
     // check
     for (std::uint64_t k = 0; k < K; ++k)
@@ -165,7 +189,8 @@ TEST_CASE("Serial DCCSC3D to DCCSC3DJIK", "SerialDCCSC3DtoDCCSC3DJIK")
             for (std::uint64_t m = 0; m < M; ++m)
             {
                 auto mnk = m + n*M + k*M*N;
-                auto nkm = n + k*N + m*K*N;
+                // plane is row major
+                auto nkm = n*K + k + m*K*N;
                 CHECK(viewIn[mnk] == viewOut[nkm]);
             }
         }

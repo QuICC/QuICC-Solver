@@ -124,9 +124,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
         }
     }
     else {
-        // throw std::logic_error("transpose not implemented");
-        std::cerr << "transpose op not implemented\n";
-        assert(false);
+        throw std::logic_error("transpose not implemented");
     }
 }
 
