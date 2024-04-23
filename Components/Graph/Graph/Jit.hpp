@@ -57,6 +57,8 @@ private:
     std::unique_ptr<mlir::ExecutionEngine> _engine;
 
     QuICC::Graph::MapOps _storeOp;
+    /// @brief memory resource for internal op allocation
+    std::shared_ptr<Memory::memory_resource> _mem;
 
 
     void setDialects()
@@ -88,8 +90,7 @@ private:
         const std::array<std::uint32_t, RANK> modsDims)
     {
         // setup ops map and store
-        auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-        _storeOp = std::move(QuICC::Graph::MapOps(*_module, mem, physDims, modsDims));
+        _storeOp = std::move(QuICC::Graph::MapOps(*_module, _mem, physDims, modsDims));
     }
 
     void lower()
@@ -148,9 +149,10 @@ public:
     /// @param modsDims
     /// @param layOpt
     Jit(const std::string modStr,
+        const std::shared_ptr<Memory::memory_resource> mem,
         const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
-        const std::array<std::array<std::string, 2>, RANK> layOpt = {{}})
+        const std::array<std::array<std::string, 2>, RANK> layOpt = {{}}) : _mem(mem)
     {
         setDialects();
 
@@ -173,9 +175,10 @@ public:
     /// @param modsDims
     /// @param layOpt
     Jit(const llvm::SourceMgr sourceMgr,
+        const std::shared_ptr<Memory::memory_resource> mem,
         const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
-        const std::array<std::array<std::string, 2>, RANK> layOpt = {{}})
+        const std::array<std::array<std::string, 2>, RANK> layOpt = {{}}) : _mem(mem)
     {
         setDialects();
 

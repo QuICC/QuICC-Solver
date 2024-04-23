@@ -20,7 +20,21 @@ extern "C" void _ciface_quiccir_dealloc_R_DCCSC3D_t(view3_t* pBuffer)
     // Dealloc
     assert(pBuffer->data != nullptr);
     std::size_t sizeByte = sizeof(double) * pBuffer->dataSize;
-    ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(double)));
+    // Check memory space
+    bool isCpuMem = true;
+    #ifdef QUICC_HAS_CUDA_BACKEND
+    isCpuMem = !QuICC::Cuda::isDeviceMemory(pBuffer->data);
+    #endif
+    if (isCpuMem)
+    {
+        ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(double)));
+    }
+    #ifdef QUICC_HAS_CUDA_BACKEND
+    else
+    {
+        cudaErrChk(cudaFree(pBuffer->data));
+    }
+    #endif
     pBuffer->dataSize = 0;
     pBuffer->data = nullptr;
     #ifndef NDEBUG

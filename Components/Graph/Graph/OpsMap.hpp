@@ -61,6 +61,9 @@ class MapOps
     std::vector<varOp_t> _ops;
     /// @brief memory resource for internal op allocation
     std::shared_ptr<Memory::memory_resource> _mem;
+    /// @brief is the memory space cpu or gpu
+    /// to be replaced by a per-operator-attribute
+    bool _isCpu = true;
   public:
     MapOps() = default;
     MapOps(mlir::ModuleOp module,
@@ -78,6 +81,14 @@ MapOps::MapOps(mlir::ModuleOp module,
       const std::shared_ptr<Memory::memory_resource> mem,
       const std::array<std::uint32_t, 3> physDims,
       const std::array<std::uint32_t, 3> modsDims) : _mem(mem) {
+    #ifdef QUICC_HAS_CUDA_BACKEND
+    // Check memory space
+    {
+      QuICC::Memory::MemBlock<std::size_t> test(1, _mem.get());
+      _isCpu = !QuICC::Cuda::isDeviceMemory(test.data());
+    }
+    #endif
+
     using namespace mlir;
     Dialect *quiccirDialect = module->getContext()->getLoadedDialect("quiccir");
     mlir::WalkResult result = module->walk([&](mlir::Operation* op) {
@@ -93,19 +104,38 @@ MapOps::MapOps(mlir::ModuleOp module,
           _thisArr.resize(index+1, nullptr);
         }
         if (_thisArr[index] == nullptr) {
-          using namespace QuICC::Transform::Fourier;
-          using backend_t = QuICC::Graph::viewCpu_t;
-          using Tin = C_DCCSC3D_t;
-          using Tout = R_DCCSC3D_t;
-          using backendFft_t = Fft_t<backend_t, Tout, Tin>;
-          using backendDiff_t = MixedDiff_t<backend_t, Tin, 0, bwd_t,
-            QuICC::Transform::Fourier::none_m>;
-          using op_t = Mixed::Projector::DOp<Tout, Tin, backendFft_t,
-          backendDiff_t>;
-          _ops.push_back(std::make_unique<op_t>(mem));
-          auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
-          assert(ptr != nullptr);
-          _thisArr[index] = ptr;
+          if (_isCpu)
+          {
+            using namespace QuICC::Transform::Fourier;
+            using backend_t = QuICC::Graph::viewCpu_t;
+            using Tin = C_DCCSC3D_t;
+            using Tout = R_DCCSC3D_t;
+            using backendFft_t = Fft_t<backend_t, Tout, Tin>;
+            using backendDiff_t = MixedDiff_t<backend_t, Tin, 0, bwd_t,
+              QuICC::Transform::Fourier::none_m>;
+            using op_t = Mixed::Projector::DOp<Tout, Tin, backendFft_t,
+            backendDiff_t>;
+            _ops.push_back(std::make_unique<op_t>(mem));
+            auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+            assert(ptr != nullptr);
+            _thisArr[index] = ptr;
+          }
+          else
+          {
+            using namespace QuICC::Transform::Fourier;
+            using backend_t = QuICC::Graph::viewGpu_t;
+            using Tin = C_DCCSC3D_t;
+            using Tout = R_DCCSC3D_t;
+            using backendFft_t = Fft_t<backend_t, Tout, Tin>;
+            using backendDiff_t = MixedDiff_t<backend_t, Tin, 0, bwd_t,
+              QuICC::Transform::Fourier::none_m>;
+            using op_t = Mixed::Projector::DOp<Tout, Tin, backendFft_t,
+            backendDiff_t>;
+            _ops.push_back(std::make_unique<op_t>(mem));
+            auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+            assert(ptr != nullptr);
+            _thisArr[index] = ptr;
+          }
         }
         else {
           #ifndef NDEBUG
@@ -120,19 +150,38 @@ MapOps::MapOps(mlir::ModuleOp module,
           _thisArr.resize(index+1, nullptr);
         }
         if (_thisArr[index] == nullptr) {
-          using namespace QuICC::Transform::Fourier;
-          using backend_t = QuICC::Graph::viewCpu_t;
-          using Tin = R_DCCSC3D_t;
-          using Tout = C_DCCSC3D_t;
-          using backendFft_t = Fft_t<backend_t, Tout, Tin>;
-          using backendDiff_t = MixedDiff_t<backend_t, Tout, 0, fwd_t,
-            QuICC::Transform::Fourier::none_m>;
-          using op_t = Mixed::Integrator::DOp<Tout, Tin, backendFft_t,
-          backendDiff_t>;
-          _ops.push_back(std::make_unique<op_t>());
-          auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
-          assert(ptr != nullptr);
-          _thisArr[index] = ptr;
+          if (_isCpu)
+          {
+            using namespace QuICC::Transform::Fourier;
+            using backend_t = QuICC::Graph::viewCpu_t;
+            using Tin = R_DCCSC3D_t;
+            using Tout = C_DCCSC3D_t;
+            using backendFft_t = Fft_t<backend_t, Tout, Tin>;
+            using backendDiff_t = MixedDiff_t<backend_t, Tout, 0, fwd_t,
+              QuICC::Transform::Fourier::none_m>;
+            using op_t = Mixed::Integrator::DOp<Tout, Tin, backendFft_t,
+            backendDiff_t>;
+            _ops.push_back(std::make_unique<op_t>());
+            auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+            assert(ptr != nullptr);
+            _thisArr[index] = ptr;
+          }
+          else
+          {
+            using namespace QuICC::Transform::Fourier;
+            using backend_t = QuICC::Graph::viewGpu_t;
+            using Tin = R_DCCSC3D_t;
+            using Tout = C_DCCSC3D_t;
+            using backendFft_t = Fft_t<backend_t, Tout, Tin>;
+            using backendDiff_t = MixedDiff_t<backend_t, Tout, 0, fwd_t,
+              QuICC::Transform::Fourier::none_m>;
+            using op_t = Mixed::Integrator::DOp<Tout, Tin, backendFft_t,
+            backendDiff_t>;
+            _ops.push_back(std::make_unique<op_t>());
+            auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+            assert(ptr != nullptr);
+            _thisArr[index] = ptr;
+          }
         }
         else {
           #ifndef NDEBUG
