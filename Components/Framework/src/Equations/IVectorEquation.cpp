@@ -13,6 +13,8 @@
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
 
 namespace QuICC {
 
@@ -132,7 +134,21 @@ namespace Equations {
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, this->spUnknown()))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).phys().enabled());}, this->spUnknown());
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  std::map<FieldComponents::Physical::Id,std::size_t> m;
+                  for(auto&& c: p->dom(0).phys().enabled())
+                  {
+                     std::size_t id = Transform::Path::Empty::id();
+                     if(c.second)
+                     {
+                        id = Transform::Path::TorPol::id();
+                     }
+                     m.try_emplace(c.first,id);
+                  }
+                  return m;
+               }, this->spUnknown());
          if(disabledPhys)
          {
             for(auto&& c: compsMap)
@@ -149,7 +165,21 @@ namespace Equations {
          auto range = this->spectralRange();
          for(auto it = range.first; it != range.second; ++it)
          {
-            auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).grad(*it).enabled());}, this->spUnknown());
+            auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  std::map<FieldComponents::Physical::Id,std::size_t> m;
+                  for(auto&& c: p->dom(0).grad(*it).enabled())
+                  {
+                     std::size_t id = Transform::Path::Empty::id();
+                     if(c.second)
+                     {
+                        id = Transform::Path::TorPol::id();
+                     }
+                     m.try_emplace(c.first,id);
+                  }
+                  return m;
+               }, this->spUnknown());
             if(disabledGrad)
             {
                for(auto&& c: compsMap)
@@ -176,7 +206,21 @@ namespace Equations {
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasCurl());}, this->spUnknown()))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).curl().enabled());}, this->spUnknown());
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  std::map<FieldComponents::Physical::Id,std::size_t> m;
+                  for(auto&& c: p->dom(0).curl().enabled())
+                  {
+                     std::size_t id = Transform::Path::Empty::id();
+                     if(c.second)
+                     {
+                        id = Transform::Path::TorPol::id();
+                     }
+                     m.try_emplace(c.first,id);
+                  }
+                  return m;
+               }, this->spUnknown());
          if(disabledCurl)
          {
             for(auto&& c: compsMap)

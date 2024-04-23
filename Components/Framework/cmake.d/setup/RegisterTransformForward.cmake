@@ -1,4 +1,4 @@
-set(tags 
+set(tags
   D1
   D1ZP0
   D2
@@ -50,4 +50,36 @@ quicc_register_tags(
   COMMON_DIR "../Common"
   TAGS ${tags}
   PREFIX "fwd_"
+  )
+
+set(value_tags
+  P
+  Pol
+  Q
+  S
+  T
+  )
+
+quicc_register_tags(
+  NAMESPACE "Transform/Forward/Value"
+  BASECLASS "IOperator"
+  COMMON_DIR "../Common"
+  TAGS ${value_tags}
+  PREFIX "fwd_value_"
+  )
+
+set(insulating_tags
+  P
+  Pol
+  Q
+  S
+  T
+  )
+
+quicc_register_tags(
+  NAMESPACE "Transform/Forward/Insulating"
+  BASECLASS "IOperator"
+  COMMON_DIR "../Common"
+  TAGS ${insulating_tags}
+  PREFIX "fwd_insulating_"
   )

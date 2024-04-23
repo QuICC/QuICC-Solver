@@ -1,4 +1,4 @@
-set(tags 
+set(tags
   NegCurlCurlNl
   CurlCurlNl
   CurlNl
@@ -20,4 +20,43 @@ quicc_register_tags(
   COMMON_DIR "../Common"
   TAGS ${tags}
   PREFIX "path_"
+  )
+
+set(value_tags
+  Scalar
+  ScalarNl
+  TorPol
+  Tor
+  Pol
+  CurlNl
+  CurlCurlNl
+  NegCurlCurlNl
+  )
+
+quicc_register_tags(
+  NAMESPACE "Transform/Path/Value"
+  BASECLASS "IOperator"
+  COMMON_DIR "../Common"
+  TAGS ${value_tags}
+  PREFIX "path_value_"
+  )
+
+set(insulating_tags
+  Scalar
+  ScalarNl
+  TorPol
+  Tor
+  Pol
+  CurlNl
+  CurlCurlNl
+  NegCurlCurlNl
+  )
+
+include(RegisterTags)
+quicc_register_tags(
+  NAMESPACE "Transform/Path/Insulating"
+  BASECLASS "IOperator"
+  COMMON_DIR "../Common"
+  TAGS ${insulating_tags}
+  PREFIX "path_insulatin_"
   )

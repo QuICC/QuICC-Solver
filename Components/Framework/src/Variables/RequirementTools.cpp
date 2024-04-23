@@ -9,6 +9,9 @@
 // Project includes
 //
 #include "QuICC/Variables/RequirementTools.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
+#include "QuICC/Transform/Path/Scalar.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
 
 namespace QuICC {
 
@@ -371,22 +374,50 @@ namespace QuICC {
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, spScalar))
       {
-         std::map<FieldComponents::Physical::Id,bool> compsMap;
-         compsMap.insert(std::make_pair(FieldComponents::Physical::SCALAR, true));
+         std::map<FieldComponents::Physical::Id,std::size_t> compsMap;
+         compsMap.insert(std::make_pair(FieldComponents::Physical::SCALAR, Transform::Path::Scalar::id()));
          auto b = spSteps->backwardScalar(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad());}, spScalar))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).grad().enabled());}, spScalar);
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  std::map<FieldComponents::Physical::Id,std::size_t> m;
+                  for(auto&& c: p->dom(0).grad().enabled())
+                  {
+                     std::size_t id = Transform::Path::Empty::id();
+                     if(c.second)
+                     {
+                        id = Transform::Path::Scalar::id();
+                     }
+                     m.try_emplace(c.first,id);
+                  }
+                  return m;
+               }, spScalar);
          auto b = spSteps->backwardGradient(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad2());}, spScalar))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>{return (p->dom(0).grad2().enabled());}, spScalar);
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,std::size_t> m;
+                  for(auto&& c: p->dom(0).grad2().enabled())
+                  {
+                     std::size_t id = Transform::Path::Empty::id();
+                     if(c.second)
+                     {
+                        id = Transform::Path::Scalar::id();
+                     }
+                     m.try_emplace(c.first,id);
+                  }
+                  return m;
+               }, spScalar);
          auto b = spSteps->backwardGradient2(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
@@ -404,7 +435,21 @@ namespace QuICC {
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, spVector))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).phys().enabled());}, spVector);
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  std::map<FieldComponents::Physical::Id,std::size_t> m;
+                  for(auto&& c: p->dom(0).phys().enabled())
+                  {
+                     std::size_t id = Transform::Path::Empty::id();
+                     if(c.second)
+                     {
+                        id = Transform::Path::TorPol::id();
+                     }
+                     m.try_emplace(c.first,id);
+                  }
+                  return m;
+               }, spVector);
          auto branches = spSteps->backwardVector(compsMap);
          paths.insert(paths.end(), branches.begin(), branches.end());
       }
@@ -416,7 +461,21 @@ namespace QuICC {
          {
             if(it->second)
             {
-               auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).grad(it->first).enabled());}, spVector);
+               auto compsMap = std::visit(
+                  [&](auto&& p)
+                  {
+                     std::map<FieldComponents::Physical::Id,std::size_t> m;
+                     for(auto&& c: p->dom(0).grad(it->first).enabled())
+                     {
+                        std::size_t id = Transform::Path::Empty::id();
+                        if(c.second)
+                        {
+                           id = Transform::Path::TorPol::id();
+                        }
+                        m.try_emplace(c.first,id);
+                     }
+                     return m;
+                  }, spVector);
                auto b = spSteps->backwardVGradient(it->first, compsMap);
                paths.insert(paths.end(), b.begin(), b.end());
             }
@@ -437,7 +496,21 @@ namespace QuICC {
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasCurl());}, spVector))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).curl().enabled());}, spVector);
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  std::map<FieldComponents::Physical::Id,std::size_t> m;
+                  for(auto&& c: p->dom(0).curl().enabled())
+                  {
+                     std::size_t id = Transform::Path::Empty::id();
+                     if(c.second)
+                     {
+                        id = Transform::Path::TorPol::id();
+                     }
+                     m.try_emplace(c.first,id);
+                  }
+                  return m;
+               }, spVector);
          auto b = spSteps->backwardCurl(compsMap);
          paths.insert(paths.end(),b.begin(), b.end());
       }

@@ -13,6 +13,7 @@
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
 #include "QuICC/Transform/Path/I2ScalarNl.hpp"
 
@@ -131,13 +132,13 @@ namespace Equations {
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, this->spUnknown()))
       {
-         std::map<FieldComponents::Physical::Id,bool> compsMap;
-         compsMap.insert(std::make_pair(FieldComponents::Physical::SCALAR, true));
+         std::map<FieldComponents::Physical::Id,std::size_t> compsMap;
+         compsMap.insert(std::make_pair(FieldComponents::Physical::SCALAR, Transform::Path::Scalar::id()));
          if(disabledPhys)
          {
             for(auto&& c: compsMap)
             {
-               c.second = false;
+               c.second = Transform::Path::Empty::id();
             }
          }
          auto b = spSteps->backwardScalar(compsMap);
@@ -146,12 +147,26 @@ namespace Equations {
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad());}, this->spUnknown()))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).grad().enabled());}, this->spUnknown());
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  std::map<FieldComponents::Physical::Id,std::size_t> m;
+                  for(auto&& c: p->dom(0).grad().enabled())
+                  {
+                     std::size_t id = Transform::Path::Empty::id();
+                     if(c.second)
+                     {
+                        id = Transform::Path::Scalar::id();
+                     }
+                     m.try_emplace(c.first,id);
+                  }
+                  return m;
+               }, this->spUnknown());
          if(disabledGrad)
          {
             for(auto&& c: compsMap)
             {
-               c.second = false;
+               c.second = Transform::Path::Empty::id();
             }
          }
          auto b = spSteps->backwardGradient(compsMap);
@@ -160,12 +175,26 @@ namespace Equations {
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad2());}, this->spUnknown()))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>{return (p->dom(0).grad2().enabled());}, this->spUnknown());
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,std::size_t> m;
+                  for(auto&& c: p->dom(0).grad2().enabled())
+                  {
+                     std::size_t id = Transform::Path::Empty::id();
+                     if(c.second)
+                     {
+                        id = Transform::Path::Scalar::id();
+                     }
+                     m.try_emplace(c.first,id);
+                  }
+                  return m;
+               }, this->spUnknown());
          if(disabledGrad2)
          {
             for(auto&& c: compsMap)
             {
-               c.second = false;
+               c.second = Transform::Path::Empty::id();
             }
          }
          auto b = spSteps->backwardGradient2(compsMap);

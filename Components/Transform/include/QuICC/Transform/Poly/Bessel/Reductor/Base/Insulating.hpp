@@ -1,0 +1,65 @@
+/**
+ * @file Insulating.hpp
+ * @brief Implementation of the Bessel with Insulating BC operator
+ */
+
+#ifndef QUICC_TRANSFORM_POLY_BESSEL_REDUCTOR_BASE_INSULATING_HPP
+#define QUICC_TRANSFORM_POLY_BESSEL_REDUCTOR_BASE_INSULATING_HPP
+
+// External includes
+//
+
+// Project includes
+//
+#include "Types/Typedefs.hpp"
+#include "Types/Internal/Typedefs.hpp"
+#include "QuICC/Polynomial/Bessel/Insulating.hpp"
+
+namespace QuICC {
+
+namespace Transform {
+
+namespace Poly {
+
+namespace Bessel {
+
+namespace Reductor {
+
+   /**
+    * @brief Implementation of the Bessel with Insulating BC operator
+    */
+   template <typename TOp>
+   class Insulating: public TOp
+   {
+      public:
+         /**
+          * @brief Constructor
+          */
+         Insulating() = default;
+
+         /**
+          * @brief Destructor
+          */
+         virtual ~Insulating() = default;
+
+      protected:
+
+      private:
+         /**
+          * @brief Make operator
+          */
+         virtual void makeOperator(Matrix& op, Matrix& eop, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const override;
+   };
+
+   template <typename TOp> void Insulating<TOp>::makeOperator(Matrix& op, Matrix& eop, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
+   {
+      this->template makeOperatorImpl<Polynomial::Bessel::Insulating>(op, eop, igrid, iweights, i);
+   }
+
+}
+}
+}
+}
+}
+
+#endif // QUICC_TRANSFORM_POLY_BESSEL_REDUCTOR_BASE_INSULATING_HPP

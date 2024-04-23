@@ -4,4 +4,5 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB_KK} ${QUICC_CMAKE_SRC_VISIBIL
 )
 
 add_subdirectory(ALegendre)
+add_subdirectory(Bessel)
 add_subdirectory(Worland)

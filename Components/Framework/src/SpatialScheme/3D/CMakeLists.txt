@@ -3,6 +3,11 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   IRegular3DBuilder.cpp
   IRegularSHlBuilder.cpp
   IRegularSHmlBuilder.cpp
+  JLFMesher.cpp
+  JLFl.cpp
+  JLFlBuilder.cpp
+  JLFm.cpp
+  JLFmBuilder.cpp
   TTT.cpp
   TTTBuilder.cpp
   TTTMesher.cpp
