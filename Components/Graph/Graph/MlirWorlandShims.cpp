@@ -48,6 +48,9 @@ extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
 
 extern "C" void _ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    #endif
     // Integrator, NewBuffer is in modal space
     assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
     // Layers
@@ -61,9 +64,5 @@ extern "C" void _ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t*
     pNewBuffer->cooSize = pProdBuffer->cooSize;
     // Alloc buffer
     pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
-    std::size_t sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
-    pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>))));
-    #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
-    #endif
+    details::alloc_ptr(&pNewBuffer->data, pNewBuffer->dataSize, pProdBuffer->data);
 };

@@ -91,6 +91,74 @@ namespace Graph
         return ret;
     }
 
+namespace details
+{
+
+/// @brief generic view descriptor allocator
+/// @tparam T view descriptor type
+/// @param pBuffer
+template<class Tnew, class Tprod>
+void alloc_ptr(Tnew** newPtr, const size_t size, const Tprod* prodPtr)
+{
+    std::size_t sizeByte = sizeof(Tnew) * size;
+    // Check memory space
+    bool isCpuMem = true;
+    #ifdef QUICC_HAS_CUDA_BACKEND
+    isCpuMem = !QuICC::Cuda::isDeviceMemory(prodPtr);
+    #endif
+    if (isCpuMem)
+    {
+        *newPtr = reinterpret_cast<Tnew*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(Tnew))));
+    }
+    #ifdef QUICC_HAS_CUDA_BACKEND
+    else
+    {
+        cudaErrChk(cudaMalloc(reinterpret_cast<void**>(newPtr), sizeByte));
+    }
+    #endif
+    #ifndef NDEBUG
+    std::cout << "alloc, bytes: " << sizeByte << '\t' << isCpuMem <<'\n';
+    #endif
+}
+
+
+/// @brief generic view descriptor deallocator
+/// @tparam T view descriptor type
+/// @param pBuffer
+template<class T>
+void dealloc_viewDescriptor(T* pBuffer)
+{
+    // Reset Meta
+    pBuffer->coo = nullptr;
+    pBuffer->cooSize = 0;
+    pBuffer->pos = nullptr;
+    pBuffer->posSize = 0;
+    // Dealloc
+    assert(pBuffer->data != nullptr);
+    std::size_t sizeByte = sizeof(decltype(*pBuffer->data)) * pBuffer->dataSize;
+    // Check memory space
+    bool isCpuMem = true;
+    #ifdef QUICC_HAS_CUDA_BACKEND
+    isCpuMem = !QuICC::Cuda::isDeviceMemory(pBuffer->data);
+    #endif
+    if (isCpuMem)
+    {
+        ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(double)));
+    }
+    #ifdef QUICC_HAS_CUDA_BACKEND
+    else
+    {
+        cudaErrChk(cudaFree(pBuffer->data));
+    }
+    #endif
+    pBuffer->dataSize = 0;
+    pBuffer->data = nullptr;
+    #ifndef NDEBUG
+    std::cout << "dealloc, bytes: " << sizeByte << '\t' << isCpuMem <<'\n';
+    #endif
+}
+
+} // namespace details
 } // namespace Graph
 } // namespace QuICC
 

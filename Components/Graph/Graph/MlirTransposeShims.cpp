@@ -8,7 +8,7 @@
 
 using namespace QuICC::Graph;
 
-namespace details
+namespace QuICC::Graph::details
 {
     /// @brief map meta producer pointer to meta pointer
     std::unordered_map<void*, void*> metaStore;
@@ -101,6 +101,9 @@ extern "C" void _ciface_quiccir_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
 
 extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(view3_cd_t* pNewBuffer, const view3_cd_t* pProdBuffer)
 {
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t\n";
+    #endif
     // This operation allocates for the serial transpose operator
     // therefore it assumes dense 3D tensors
 
@@ -175,16 +178,15 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t(vi
 
     // Alloc buffer
     pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
-    sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
-    pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>))));
-    #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_S1CLCSC3D_t, bytes: " << sizeByte << '\n';
-    #endif
+    details::alloc_ptr(&pNewBuffer->data, pNewBuffer->dataSize, pProdBuffer->data);
 };
 
 
 extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, const view3_cd_t* pProdBuffer)
 {
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    #endif
     // This operation allocates for the serial transpose operator
     // therefore it assumes dense 3D tensors
 
@@ -254,9 +256,5 @@ extern "C" void _ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t(view
 
     // Alloc buffer
     pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
-    sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
-    pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>))));
-    #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_transpose_201_C_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\n';
-    #endif
+    details::alloc_ptr(&pNewBuffer->data, pNewBuffer->dataSize, pProdBuffer->data);
 };

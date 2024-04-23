@@ -210,6 +210,9 @@ extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(void* obj, view3_
 /// @param pProdBuffer producer buffer
 extern "C" void _ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(view3_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t\n";
+    #endif
     // Slice (phys = mods*2-1)
     assert(pNewBuffer->dims[0] == pProdBuffer->dims[0]*2-1);
     assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
@@ -224,29 +227,14 @@ extern "C" void _ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(view3_t* pN
     pNewBuffer->cooSize = pProdBuffer->cooSize;
     // Alloc buffer
     pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
-    std::size_t sizeByte = sizeof(double) * pNewBuffer->dataSize;
-    // Check memory space
-    bool isCpuMem = true;
-    #ifdef QUICC_HAS_CUDA_BACKEND
-    isCpuMem = !QuICC::Cuda::isDeviceMemory(pProdBuffer->data);
-    #endif
-    if (isCpuMem)
-    {
-        pNewBuffer->data = reinterpret_cast<double*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(double))));
-    }
-    #ifdef QUICC_HAS_CUDA_BACKEND
-    else
-    {
-        cudaErrChk(cudaMalloc(reinterpret_cast<void**>(&pNewBuffer->data), sizeByte));
-    }
-    #endif
-    #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t, bytes: " << sizeByte << '\t' << isCpuMem <<'\n';
-    #endif
+    details::alloc_ptr(&pNewBuffer->data, pNewBuffer->dataSize, pProdBuffer->data);
 };
 
 extern "C" void _ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_t* pProdBuffer)
 {
+    #ifndef NDEBUG
+    std::cout << "_ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t\n";
+    #endif
     // Slice (phys = mods*2-1)
     // Integrator, NewBuffer is in modal space
     assert(pNewBuffer->dims[0] == std::floor(pProdBuffer->dims[0]/2)+1);
@@ -262,10 +250,5 @@ extern "C" void _ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(view3_cd_t*
     pNewBuffer->cooSize = pProdBuffer->cooSize;
     // Alloc buffer
     pNewBuffer->dataSize = pNewBuffer->dims[0] * pNewBuffer->cooSize;
-    std::size_t sizeByte = sizeof(std::complex<double>) * pNewBuffer->dataSize;
-    pNewBuffer->data = reinterpret_cast<std::complex<double>*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(std::complex<double>))));
-    // std::size_t sizeByte = 0;
-    #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t, bytes: " << sizeByte << '\n';
-    #endif
+    details::alloc_ptr(&pNewBuffer->data, pNewBuffer->dataSize, pProdBuffer->data);
 };
