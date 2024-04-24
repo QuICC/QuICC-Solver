@@ -17,6 +17,8 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}
     FourierMap.cpp
     ALegendreMap.cpp
     WorlandMap.cpp
+    PointwiseMap.cpp
+    TransposeMap.cpp
 )
 
 add_subdirectory(Shims)

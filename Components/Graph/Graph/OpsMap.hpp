@@ -18,7 +18,6 @@
 #include "Graph/Types.hpp"
 #include "Memory/Memory.hpp"
 
-#include "ViewOps/Pointwise/Cpu/Pointwise.hpp"
 
 namespace QuICC
 {
@@ -77,6 +76,15 @@ class MapOps
     /// @brief map Worland integrators
     /// @param op
     void setWorlandInt(mlir::quiccir::JWIOp op);
+    /// @brief map pointwise addition
+    /// @param op
+    void setAdd(mlir::quiccir::AddOp op);
+    /// @brief map pointwise subtraction
+    /// @param op
+    void setSub(mlir::quiccir::SubOp op);
+    /// @brief map transpose
+    /// @param op
+    void setTranspose(mlir::quiccir::TransposeOp op);
 };
 
 } // namespace Graph

@@ -12,7 +12,7 @@ MapOps::MapOps(mlir::ModuleOp module,
       const std::shared_ptr<Memory::memory_resource> mem,
       const std::array<std::uint32_t, 3> physDims,
       const std::array<std::uint32_t, 3> modsDims) :
-      _mem(mem), _physDims(physDims), _modsDims(modsDims) {
+      _physDims(physDims), _modsDims(modsDims), _mem(mem) {
     #ifdef QUICC_HAS_CUDA_BACKEND
     // Check memory space
     {
@@ -40,6 +40,15 @@ MapOps::MapOps(mlir::ModuleOp module,
       }
       else if (auto jwInt = dyn_cast<mlir::quiccir::JWIOp>(op)) {
         setWorlandInt(jwInt);
+      }
+      else if (auto add = dyn_cast<mlir::quiccir::AddOp>(op)) {
+        setAdd(add);
+      }
+      else if (auto sub = dyn_cast<mlir::quiccir::SubOp>(op)) {
+        setSub(sub);
+      }
+      else if (auto tran = dyn_cast<mlir::quiccir::TransposeOp>(op)) {
+        setTranspose(tran);
       }
       // return deallocateBuffers(op);
     //   if (failed(deallocateBuffers(op)))

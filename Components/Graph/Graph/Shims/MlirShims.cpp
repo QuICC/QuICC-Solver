@@ -9,9 +9,10 @@
 using namespace QuICC::Graph;
 
 /// @brief C Interface to MLIR for a binary add operator
-/// @param op
-/// @param uval
-/// @param umod
+/// @param obj
+/// @param pRet
+/// @param pLhs
+/// @param pRhs
 extern "C" void _ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
     view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
 {
@@ -44,9 +45,10 @@ extern "C" void _ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* ob
 };
 
 /// @brief C Interface to MLIR for a binary sub operator
-/// @param op
-/// @param uval
-/// @param umod
+/// @param obj
+/// @param pRet
+/// @param pLhs
+/// @param pRhs
 extern "C" void _ciface_quiccir_sub_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
     view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
 {
@@ -78,6 +80,9 @@ extern "C" void _ciface_quiccir_sub_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* ob
     cl->apply(viewRet, viewLhs, viewRhs);
 };
 
+/// @brief C Interface to MLIR for an allocator
+/// @param pNewBuffer
+/// @param pProdBuffer
 extern "C" void _ciface_quiccir_alloc_add_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     // NewBuffer is identical to producer
@@ -100,6 +105,9 @@ extern "C" void _ciface_quiccir_alloc_add_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pN
     #endif
 };
 
+/// @brief C Interface to MLIR for an allocator
+/// @param pNewBuffer
+/// @param pProdBuffer
 extern "C" void _ciface_quiccir_alloc_sub_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     // NewBuffer is identical to producer
