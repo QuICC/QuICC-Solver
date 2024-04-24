@@ -1,29 +1,22 @@
+/**
+ * @file OPsMap.hpp
+ * @brief map mlir operators to QuICC
+ */
 #pragma once
 
+// External includes
+//
 #include <vector>
-#include <cassert>
-#include <iostream>
 #include <Quiccir/IR/QuiccirDialect.h>
 #include <Quiccir/IR/QuiccirOps.h>
 #include <Quiccir/Pipelines/Passes.h>
 #include <mlir/IR/BuiltinDialect.h>
 #include <mlir/IR/Operation.h>
 
-#include "Graph/BackendsMap.hpp"
-#include "Graph/Shims/MlirShims.hpp"
+// Project includes
+//
 #include "Graph/Types.hpp"
-
-// al ops
-#include "QuICC/Polynomial/ALegendre/Plm.hpp"
-#include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
-#include "ViewOps/ALegendre/Builder.hpp"
-
-// jw ops
-#include "QuICC/Polynomial/Worland/Wnl.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
-#include "ViewOps/Worland/Tags.hpp"
-#include "ViewOps/Worland/Builder.hpp"
-#include "DenseSM/Worland/Operator.hpp"
+#include "Memory/Memory.hpp"
 
 #include "ViewOps/Pointwise/Cpu/Pointwise.hpp"
 
@@ -36,6 +29,10 @@ namespace Graph
 class MapOps
 {
   private:
+    /// @brief physical dimensions
+    std::array<std::uint32_t, 3> _physDims;
+    /// @brief spectral sapce dimensions
+    std::array<std::uint32_t, 3> _modsDims;
     /// @brief store pointers for passing into MLIR
     std::vector<void*> _thisArr;
     /// @brief store for RAII
@@ -68,7 +65,18 @@ class MapOps
     /// @brief map Fourier integrators
     /// @param op
     void setFourierInt(mlir::quiccir::FrIOp op);
-
+    /// @brief map ALegendre projectors
+    /// @param op
+    void setALegendrePrj(mlir::quiccir::AlPOp op);
+    /// @brief map ALegendre integrators
+    /// @param op
+    void setALegendreInt(mlir::quiccir::AlIOp op);
+    /// @brief map ALegendre projectors
+    /// @param op
+    void setWorlandPrj(mlir::quiccir::JWPOp op);
+    /// @brief map Worland integrators
+    /// @param op
+    void setWorlandInt(mlir::quiccir::JWIOp op);
 };
 
 } // namespace Graph

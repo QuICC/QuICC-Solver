@@ -15,6 +15,8 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}
   PRIVATE
     OpsMap.cpp
     FourierMap.cpp
+    ALegendreMap.cpp
+    WorlandMap.cpp
 )
 
 add_subdirectory(Shims)

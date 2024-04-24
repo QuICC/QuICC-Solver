@@ -39,7 +39,7 @@ TEST_CASE("One Dimensional Loop", "[OneDimLoop]")
     !type_tuval = tensor<5x11x3xf64, "R_DCCSC3D_t">
     func.func @entry(%thisArr: !llvm.ptr<array<2 x ptr>> {llvm.noalias}, %uout: !type_umod, %umod: !type_umod) {
       %tumod = builtin.unrealized_conversion_cast %umod : !type_umod to !type_tumod
-      %tuval = quiccir.fr.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64, backend = "cpu"}
+      %tuval = quiccir.fr.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}
       %ret = quiccir.fr.int %tuval : !type_tuval -> !type_tumod attributes{implptr = 1 :i64}
       quiccir.materialize %ret in %uout : (!type_tumod, !type_umod)
       return
