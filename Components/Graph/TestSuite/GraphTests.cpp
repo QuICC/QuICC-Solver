@@ -5,7 +5,7 @@
 #include <memory>
 
 // QuICC
-#include "Graph/MlirShims.hpp"
+#include "Graph/Shims/MlirShims.hpp"
 #include "Graph/BackendsMap.hpp"
 #include "Graph/OpsMap.hpp"
 #include "Graph/Jit.hpp"

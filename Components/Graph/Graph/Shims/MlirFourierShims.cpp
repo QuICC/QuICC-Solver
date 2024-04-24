@@ -2,9 +2,9 @@
 #include <complex>
 #include <cassert>
 
-#include "Graph/MlirShims.hpp"
 #include "Graph/BackendsMap.hpp"
-#include "View/View.hpp"
+#include "Graph/Shims/MlirShims.hpp"
+#include "Graph/Types.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #endif

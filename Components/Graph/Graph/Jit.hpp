@@ -32,7 +32,7 @@
 
 // Project includes
 //
-#include "Graph/MlirShims.hpp"
+#include "Graph/Shims/MlirShims.hpp"
 
 namespace QuICC {
 namespace Graph {

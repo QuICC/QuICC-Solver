@@ -2,9 +2,9 @@
 #include <complex>
 #include <cassert>
 
-#include "Graph/MlirShims.hpp"
 #include "Graph/BackendsMap.hpp"
-#include "View/View.hpp"
+#include "Graph/Types.hpp"
+#include "Graph/Shims/MlirShims.hpp"
 
 using namespace QuICC::Graph;
 
