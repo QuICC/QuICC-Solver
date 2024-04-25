@@ -73,9 +73,26 @@ private:
         _ctx.loadDialect<mlir::quiccir::QuiccirDialect>();
     }
 
+    void setDimensions(const std::array<std::uint32_t, RANK> physDims,
+        const std::array<std::uint32_t, RANK> modsDims)
+    {
+        // Inline and set dimensions
+        mlir::PassManager pmPre(&_ctx);
+        pmPre.addPass(mlir::createInlinerPass());
+        mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
+        // Reorder dimensions based on mlir convention
+        std::array<std::int64_t, RANK> phys{physDims[2], physDims[0], physDims[1]};
+        std::array<std::int64_t, RANK> mods{modsDims[2], modsDims[0], modsDims[1]};
+        nestedFuncPmPre.addPass(mlir::quiccir::createSetDimensionsPass(phys, mods));
+
+        if (mlir::failed(pmPre.run(*_module))) {
+            throw std::runtime_error("Failed to set dimensions.");
+        }
+    }
+
     void setLayout(const std::array<std::array<std::string, 2>, 3> layOpt)
     {
-        // Inline and set view attributes
+        // Inline and set layout attributes
         mlir::PassManager pmPre(&_ctx);
         pmPre.addPass(mlir::createInlinerPass());
         mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
@@ -159,6 +176,8 @@ public:
         // Load module
         _module = mlir::parseSourceString<mlir::ModuleOp>(modStr, &_ctx);
 
+        setDimensions(physDims, modsDims);
+
         if (layOpt[0][0].size() > 0)
         {
             setLayout(layOpt);
@@ -184,6 +203,8 @@ public:
 
         // Load module
         _module = mlir::parseSourceFile<mlir::ModuleOp>(sourceMgr, &_ctx);
+
+        setDimensions(physDims, modsDims);
 
         if (layOpt[0][0].size() > 0)
         {
