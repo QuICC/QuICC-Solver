@@ -12,6 +12,7 @@
 
 // Project includes
 //
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 /// @brief namespace for generic dense spectral operator builders
