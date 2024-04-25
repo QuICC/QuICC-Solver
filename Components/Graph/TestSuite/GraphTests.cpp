@@ -182,94 +182,84 @@ TEST_CASE("Serial 3D Bwd", "[Serial3DBwd]")
 
 }
 
-// TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
-// {
-//   std::string inputFilename = "./simple-3d-loop.mlir";
-//   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
-//       llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
-//   if (std::error_code EC = fileOrErr.getError()) {
-//     llvm::errs() << "Could not open input file: " << EC.message() << "\n";
-//     CHECK(false);
-//   }
+TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
+{
+  std::string inputFilename = "./simple-3d-loop.mlir";
+  llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
+      llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
+  if (std::error_code EC = fileOrErr.getError()) {
+    llvm::errs() << "Could not open input file: " << EC.message() << "\n";
+    CHECK(false);
+  }
 
-//   // Parse the input mlir.
-//   llvm::SourceMgr sourceMgr;
-//   sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
+  // Parse the input mlir.
+  llvm::SourceMgr sourceMgr;
+  sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
 
-//   // Grid dimensions
-//   constexpr std::uint32_t rank = 3;
-//   std::array<std::uint32_t, rank> physDims{10, 6, 3};
-//   std::array<std::uint32_t, rank> modsDims{6, 6, 2};
+  // Grid dimensions
+  constexpr std::uint32_t rank = 3;
+  std::array<std::uint32_t, rank> physDims{10, 6, 3};
+  std::array<std::uint32_t, rank> modsDims{6, 6, 2};
 
-//   std::array<std::array<std::string, 2>, 3> layOpt;
-//   layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
-//   layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
-//   layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+  std::array<std::array<std::string, 2>, 3> layOpt;
+  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
+  layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
+  layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
 
-//   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-//   QuICC::Graph::Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt);
+  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+  QuICC::Graph::Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt);
 
-//   // setup metadata
-//   auto M = physDims[0];
-//   auto N = physDims[1];
-//   auto K = physDims[2];
-//   auto modsM = modsDims[0];
-//   auto modsN = modsDims[1];
-//   auto modsK = modsDims[2];
+  // setup metadata
+  // auto M = physDims[0];
+  // auto N = physDims[1];
+  // auto K = physDims[2];
+  auto modsM = modsDims[0];
+  auto modsN = modsDims[1];
+  auto modsK = modsDims[2];
 
-//   // Populate meta for fully populated tensor
-//   // Physical space
-//   std::vector<std::uint32_t> ptrPhys(K+1);
-//   std::vector<std::uint32_t> idxPhys(K*N);
-//   ptrPhys[0] = 0;
-//   for (std::size_t i = 1; i < ptrPhys.size(); ++i) {
-//       ptrPhys[i] = ptrPhys[i-1]+N;
-//   }
-//   for (std::size_t i = 0; i < idxPhys.size(); ++i) {
-//       idxPhys[i] = i % N;
-//   }
-//   std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, ptrPhys, {}}};
-//   std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
+  // Populate meta for fully populated tensor
+  // // Physical space
+  // std::vector<std::uint32_t> ptrPhys(K+1);
+  // std::vector<std::uint32_t> idxPhys(K*N);
+  // ptrPhys[0] = 0;
+  // for (std::size_t i = 1; i < ptrPhys.size(); ++i) {
+  //     ptrPhys[i] = ptrPhys[i-1]+N;
+  // }
+  // for (std::size_t i = 0; i < idxPhys.size(); ++i) {
+  //     idxPhys[i] = i % N;
+  // }
+  // std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, ptrPhys, {}}};
+  // std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
 
-//   // Populate meta for fully populated tensor
-//   // Modal space
-//   using namespace QuICC::Graph;
-//   auto metaMods = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});
-//   std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaMods.ptr, {}}};
-//   std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaMods.idx, {}}};
+  // Populate meta for fully populated tensor
+  // Modal space
+  using namespace QuICC::Graph;
+  auto metaMods = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});
+  std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaMods.ptr, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaMods.idx, {}}};
 
-//   // host mem block
-//   std::size_t physS = M*indicesPhys[1].size();
-//   QuICC::Memory::MemBlock<double> R(physS, mem.get());
-//   QuICC::Memory::MemBlock<double> Phi(physS, mem.get());
-//   QuICC::Memory::MemBlock<double> Theta(physS, mem.get());
-//   QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsK*metaMods.idx.size(), mem.get());
+  // host mem block
+  QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsK*metaMods.idx.size(), mem.get());
+  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsK*metaMods.idx.size(), mem.get());
 
-//   // host view
-//   R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
-//   R_DCCSC3D_t PhiView({Phi.data(), Phi.size()}, physDims, pointersPhys, indicesPhys);
-//   R_DCCSC3D_t ThetaView({Theta.data(), Theta.size()}, physDims, pointersPhys, indicesPhys);
-//   C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
+  // host view
+  C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
+  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
 
-//   // set input modes
-//   double val = 1.0;
-//   for(std::size_t m = 0; m < RView.size(); ++m)
-//   {
-//     RView[m] = val;
-//     PhiView[m] = val;
-//     ThetaView[m] = val;
-//   }
+  // set input modes
+  std::complex<double> val = {1.0, 0.0};
+  for(std::size_t m = 0; m < modsInView.size(); ++m)
+  {
+    modsInView[m] = val;
+  }
 
-//   // Apply graph
-//   Jitter.apply(modsOutView, RView, PhiView, ThetaView);
+  // Apply graph
+  Jitter.apply(modsOutView, modsInView);
 
-//   // Check
-//   double eps = 1e-15;
-//   CHECK(std::abs(modsOutView[0].real() - sqrt(2.0)/2.0) <= eps);
-//   CHECK(std::abs(modsOutView[0].imag()) <= eps);
-//   for(std::size_t m = 1; m < modsOutView.size(); ++m)
-//   {
-//     CHECK(std::abs(modsOutView[m]) <= eps);
-//   }
+  // Check
+  for(std::size_t m = 0; m < modsOutView.size(); ++m)
+  {
+    CHECK(modsOutView[m] == val);
+  }
 
-// }
+}
