@@ -11,6 +11,8 @@ target_link_libraries(GraphTest
 )
 
 if(TARGET QuICC::Cuda)
+    target_source(GraphTest
+        GraphTests.cu)
     target_link_libraries(GraphTest QuICC::Cuda)
 endif()
 

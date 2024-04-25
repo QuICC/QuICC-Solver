@@ -7,7 +7,7 @@
 !type_tuval = tensor<3x10x6xf64, "R_DCCSC3D_t">
 !type_tumod = tensor<6x2x6xf64, "C_DCCSC3D_t">
 
-// func.func private @simpleTree(%R: tensor<?x?x?xf64>, %Theta: tensor<?x?x?xf64>, %Phi: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
+// func.func private @simpleBwd(%R: tensor<?x?x?xf64>, %Theta: tensor<?x?x?xf64>, %Phi: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
 //   // R
 //   %R1 = quiccir.fr.int %R : tensor<?x?x?xf64> -> tensor<?x?x?xf64>
 //   %R2 = quiccir.al.int %R1 : tensor<?x?x?xf64> -> tensor<?x?x?xf64>
@@ -26,7 +26,7 @@
 //   return %Pol : tensor<?x?x?xf64>
 // }
 
-func.func private @simpleTree(%R: tensor<?x?x?xf64>, %Theta: tensor<?x?x?xf64>, %Phi: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
+func.func private @simpleBwd(%R: tensor<?x?x?xf64>, %Theta: tensor<?x?x?xf64>, %Phi: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
   // R
   %R1 = quiccir.fr.int %R : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64}
   %R1T = quiccir.transpose %R1 permutation = [2, 0, 1] : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 1 :i64}
@@ -58,11 +58,11 @@ func.func @entry(%thisArr: !llvm.ptr<array<7 x ptr>> {llvm.noalias}, %Polv: !typ
   %RR = tensor.cast %R : !type_tuval to tensor<?x?x?xf64>
   %TTheta = tensor.cast %Theta : !type_tuval to tensor<?x?x?xf64>
   %PPhi = tensor.cast %Phi : !type_tuval to tensor<?x?x?xf64>
-  %Polt = call @simpleTree(%RR, %TTheta, %PPhi) : (tensor<?x?x?xf64>, tensor<?x?x?xf64>, tensor<?x?x?xf64>) -> tensor<?x?x?xf64>
+  %Polt = call @simpleBwd(%RR, %TTheta, %PPhi) : (tensor<?x?x?xf64>, tensor<?x?x?xf64>, tensor<?x?x?xf64>) -> tensor<?x?x?xf64>
   %Pol = tensor.cast %Polt : tensor<?x?x?xf64> to !type_tumod
   /// if this is the only consumer write to existing buffer
   quiccir.materialize %Pol in %Polv : (!type_tumod, !type_umod)
   return
 }
 
-// /home/gcastigl/codes/quiccir/build-17/bin/quiccir-opt ../Components/Graph/TestSuite/simple-tree.mlir --inline --set-quiccir-view-lay='lay-ppp2mpp=R_DCCSC3D_t,C_DCCSC3D_t lay-pmp2mmp=C_DCCSC3D_t,C_S1CLCSC3D_t lay-pmm2mmm=C_DCCSC3D_t,C_DCCSC3D_t' --convert-quiccir-to-call --quiccir-view-deallocation --lower-quiccir-alloc --canonicalize --finalize-quiccir-view --convert-func-to-llvm --canonicalize
+// /home/gcastigl/codes/quiccir/build-17/bin/quiccir-opt ../Components/Graph/TestSuite/simple-3d-bwd.mlir --inline --set-quiccir-view-lay='lay-ppp2mpp=R_DCCSC3D_t,C_DCCSC3D_t lay-pmp2mmp=C_DCCSC3D_t,C_S1CLCSC3D_t lay-pmm2mmm=C_DCCSC3D_t,C_DCCSC3D_t' --convert-quiccir-to-call --quiccir-view-deallocation --lower-quiccir-alloc --canonicalize --finalize-quiccir-view --convert-func-to-llvm --canonicalize
