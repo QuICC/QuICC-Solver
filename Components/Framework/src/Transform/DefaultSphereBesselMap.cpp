@@ -39,32 +39,47 @@
 #include "QuICC/Transform/Poly/Bessel/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Poly/Bessel/Reductor/Power.hpp"
 
-#include "QuICC/Transform/Backward/P.hpp"
-#include "QuICC/Transform/Backward/Overr1.hpp"
-#include "QuICC/Transform/Backward/D1.hpp"
-#include "QuICC/Transform/Backward/Overr1D1R1.hpp"
-#include "QuICC/Transform/Backward/Slapl.hpp"
+#include "QuICC/Transform/Backward/ValueP.hpp"
+#include "QuICC/Transform/Backward/InsulatingP.hpp"
+#include "QuICC/Transform/Backward/ValueOverr1.hpp"
+#include "QuICC/Transform/Backward/InsulatingOverr1.hpp"
+#include "QuICC/Transform/Backward/ValueD1.hpp"
+#include "QuICC/Transform/Backward/InsulatingD1.hpp"
+#include "QuICC/Transform/Backward/ValueOverr1D1R1.hpp"
+#include "QuICC/Transform/Backward/InsulatingOverr1D1R1.hpp"
+#include "QuICC/Transform/Backward/ValueSlapl.hpp"
+#include "QuICC/Transform/Backward/InsulatingSlapl.hpp"
 
-#include "QuICC/Transform/Forward/P.hpp"
-#include "QuICC/Transform/Forward/R1.hpp"
-#include "QuICC/Transform/Forward/Pol.hpp"
-#include "QuICC/Transform/Forward/Q.hpp"
-#include "QuICC/Transform/Forward/S.hpp"
-#include "QuICC/Transform/Forward/T.hpp"
+#include "QuICC/Transform/Forward/ValueP.hpp"
+#include "QuICC/Transform/Forward/InsulatingP.hpp"
+#include "QuICC/Transform/Forward/ValuePol.hpp"
+#include "QuICC/Transform/Forward/InsulatingPol.hpp"
+#include "QuICC/Transform/Forward/ValueQ.hpp"
+#include "QuICC/Transform/Forward/InsulatingQ.hpp"
+#include "QuICC/Transform/Forward/ValueBc1Q.hpp"
+#include "QuICC/Transform/Forward/ValueS.hpp"
+#include "QuICC/Transform/Forward/InsulatingS.hpp"
+#include "QuICC/Transform/Forward/ValueBc1S.hpp"
+#include "QuICC/Transform/Forward/ValueT.hpp"
+#include "QuICC/Transform/Forward/InsulatingT.hpp"
 
-#include "QuICC/Transform/Reductor/Energy.hpp"
-#include "QuICC/Transform/Reductor/EnergyR2.hpp"
-#include "QuICC/Transform/Reductor/EnergyD1R1.hpp"
-#include "QuICC/Transform/Reductor/EnergySlaplR2.hpp"
+#include "QuICC/Transform/Reductor/ValueEnergy.hpp"
+#include "QuICC/Transform/Reductor/InsulatingEnergy.hpp"
+#include "QuICC/Transform/Reductor/ValueEnergyR2.hpp"
+#include "QuICC/Transform/Reductor/InsulatingEnergyR2.hpp"
+#include "QuICC/Transform/Reductor/ValueEnergyD1R1.hpp"
+#include "QuICC/Transform/Reductor/InsulatingEnergyD1R1.hpp"
+#include "QuICC/Transform/Reductor/ValueEnergySlaplR2.hpp"
+#include "QuICC/Transform/Reductor/InsulatingEnergySlaplR2.hpp"
 
-#include "QuICC/Transform/Reductor/Power.hpp"
-#include "QuICC/Transform/Reductor/PowerR2.hpp"
-#include "QuICC/Transform/Reductor/PowerD1R1.hpp"
-#include "QuICC/Transform/Reductor/PowerSlaplR2.hpp"
-
-#include "QuICC/Transform/Reductor/RadialPower.hpp"
-#include "QuICC/Transform/Reductor/RadialPowerOverr1.hpp"
-#include "QuICC/Transform/Reductor/RadialPowerOverr1D1R1.hpp"
+#include "QuICC/Transform/Reductor/ValuePower.hpp"
+#include "QuICC/Transform/Reductor/ValuePowerR2.hpp"
+#include "QuICC/Transform/Reductor/ValuePowerD1R1.hpp"
+#include "QuICC/Transform/Reductor/ValuePowerSlaplR2.hpp"
+#include "QuICC/Transform/Reductor/InsulatingPower.hpp"
+#include "QuICC/Transform/Reductor/InsulatingPowerR2.hpp"
+#include "QuICC/Transform/Reductor/InsulatingPowerD1R1.hpp"
+#include "QuICC/Transform/Reductor/InsulatingPowerSlaplR2.hpp"
 
 namespace QuICC {
 
@@ -80,30 +95,50 @@ namespace Transform {
 
       // Create projectors
       namespace proj_ns = Poly::Bessel::Projector; 
-      this->addOperator<proj_ns::Value<proj_ns::P<backend_t>>>(m, Backward::P::id());
-      this->addOperator<proj_ns::Value<proj_ns::DivR1_Zero<backend_t>>>(m, Backward::Overr1::id());
-      this->addOperator<proj_ns::Value<proj_ns::D1<backend_t>>>(m, Backward::D1::id());
-      this->addOperator<proj_ns::Value<proj_ns::DivR1D1R1_Zero<backend_t>>>(m, Backward::Overr1D1R1::id());
-      this->addOperator<proj_ns::Value<proj_ns::SphLapl<backend_t>>>(m, Backward::Slapl::id());
+      this->addOperator<proj_ns::Value<proj_ns::P<backend_t>>>(m, Backward::ValueP::id());
+      this->addOperator<proj_ns::Value<proj_ns::DivR1_Zero<backend_t>>>(m, Backward::ValueOverr1::id());
+      this->addOperator<proj_ns::Value<proj_ns::D1<backend_t>>>(m, Backward::ValueD1::id());
+      this->addOperator<proj_ns::Value<proj_ns::DivR1D1R1_Zero<backend_t>>>(m, Backward::ValueOverr1D1R1::id());
+      this->addOperator<proj_ns::Value<proj_ns::SphLapl<backend_t>>>(m, Backward::ValueSlapl::id());
+      this->addOperator<proj_ns::Insulating<proj_ns::P<backend_t>>>(m, Backward::InsulatingP::id());
+      this->addOperator<proj_ns::Insulating<proj_ns::DivR1_Zero<backend_t>>>(m, Backward::InsulatingOverr1::id());
+      this->addOperator<proj_ns::Insulating<proj_ns::D1<backend_t>>>(m, Backward::InsulatingD1::id());
+      this->addOperator<proj_ns::Insulating<proj_ns::DivR1D1R1_Zero<backend_t>>>(m, Backward::InsulatingOverr1D1R1::id());
+      this->addOperator<proj_ns::Insulating<proj_ns::SphLapl<backend_t>>>(m, Backward::InsulatingSlapl::id());
 
       // Create integrators
       namespace intg_ns = Poly::Bessel::Integrator; 
-      this->addOperator<intg_ns::Value<intg_ns::P<backend_t>>>(m, Forward::P::id());
-      this->addOperator<intg_ns::Value<intg_ns::R1_Zero<backend_t>>>(m, Forward::Pol::id());
-      this->addOperator<intg_ns::Value<intg_ns::DivR1_Zero<backend_t>>>(m, Forward::Q::id());
-      this->addOperator<intg_ns::Value<intg_ns::DivR1D1R1_Zero<backend_t>>>(m, Forward::S::id());
-      this->addOperator<intg_ns::Value<intg_ns::P_Zero<backend_t>>>(m, Forward::T::id());
+      this->addOperator<intg_ns::Value<intg_ns::P<backend_t>>>(m, Forward::ValueP::id());
+      this->addOperator<intg_ns::Value<intg_ns::R1_Zero<backend_t>>>(m, Forward::ValuePol::id());
+      this->addOperator<intg_ns::Value<intg_ns::DivR1_Zero<backend_t>>>(m, Forward::ValueQ::id());
+      this->addOperator<intg_ns::Value<intg_ns::DivR1_Zero<backend_t>,1>>(m, Forward::ValueBc1Q::id());
+      this->addOperator<intg_ns::Value<intg_ns::DivR1D1R1_Zero<backend_t>>>(m, Forward::ValueS::id());
+      this->addOperator<intg_ns::Value<intg_ns::DivR1D1R1_Zero<backend_t>,1>>(m, Forward::ValueBc1S::id());
+      this->addOperator<intg_ns::Value<intg_ns::P_Zero<backend_t>>>(m, Forward::ValueT::id());
+      this->addOperator<intg_ns::Insulating<intg_ns::P<backend_t>>>(m, Forward::InsulatingP::id());
+      this->addOperator<intg_ns::Insulating<intg_ns::R1_Zero<backend_t>>>(m, Forward::InsulatingPol::id());
+      this->addOperator<intg_ns::Insulating<intg_ns::DivR1_Zero<backend_t>>>(m, Forward::InsulatingQ::id());
+      this->addOperator<intg_ns::Insulating<intg_ns::DivR1D1R1_Zero<backend_t>>>(m, Forward::InsulatingS::id());
+      this->addOperator<intg_ns::Insulating<intg_ns::P_Zero<backend_t>>>(m, Forward::InsulatingT::id());
 
       // Create reductors
       namespace red_ns = Poly::Bessel::Reductor; 
-      this->addOperator<red_ns::Value<red_ns::EnergySLaplR2<backend_t>>>(m, Reductor::EnergySlaplR2::id());
-      this->addOperator<red_ns::Value<red_ns::EnergyD1R1<backend_t>>>(m, Reductor::EnergyD1R1::id());
-      this->addOperator<red_ns::Value<red_ns::EnergyR2<backend_t>>>(m, Reductor::EnergyR2::id());
-      this->addOperator<red_ns::Value<red_ns::Energy<backend_t>>>(m, Reductor::Energy::id());
-      this->addOperator<red_ns::Value<red_ns::PowerSLaplR2<backend_t>>>(m, Reductor::PowerSlaplR2::id());
-      this->addOperator<red_ns::Value<red_ns::PowerD1R1<backend_t>>>(m, Reductor::PowerD1R1::id());
-      this->addOperator<red_ns::Value<red_ns::PowerR2<backend_t>>>(m, Reductor::PowerR2::id());
-      this->addOperator<red_ns::Value<red_ns::Power<backend_t>>>(m, Reductor::Power::id());
+      this->addOperator<red_ns::Value<red_ns::EnergySLaplR2<backend_t>>>(m, Reductor::ValueEnergySlaplR2::id());
+      this->addOperator<red_ns::Value<red_ns::EnergyD1R1<backend_t>>>(m, Reductor::ValueEnergyD1R1::id());
+      this->addOperator<red_ns::Value<red_ns::EnergyR2<backend_t>>>(m, Reductor::ValueEnergyR2::id());
+      this->addOperator<red_ns::Value<red_ns::Energy<backend_t>>>(m, Reductor::ValueEnergy::id());
+      this->addOperator<red_ns::Insulating<red_ns::EnergySLaplR2<backend_t>>>(m, Reductor::InsulatingEnergySlaplR2::id());
+      this->addOperator<red_ns::Insulating<red_ns::EnergyD1R1<backend_t>>>(m, Reductor::InsulatingEnergyD1R1::id());
+      this->addOperator<red_ns::Insulating<red_ns::EnergyR2<backend_t>>>(m, Reductor::InsulatingEnergyR2::id());
+      this->addOperator<red_ns::Insulating<red_ns::Energy<backend_t>>>(m, Reductor::InsulatingEnergy::id());
+      this->addOperator<red_ns::Value<red_ns::PowerSLaplR2<backend_t>>>(m, Reductor::ValuePowerSlaplR2::id());
+      this->addOperator<red_ns::Value<red_ns::PowerD1R1<backend_t>>>(m, Reductor::ValuePowerD1R1::id());
+      this->addOperator<red_ns::Value<red_ns::PowerR2<backend_t>>>(m, Reductor::ValuePowerR2::id());
+      this->addOperator<red_ns::Value<red_ns::Power<backend_t>>>(m, Reductor::ValuePower::id());
+      this->addOperator<red_ns::Insulating<red_ns::PowerSLaplR2<backend_t>>>(m, Reductor::InsulatingPowerSlaplR2::id());
+      this->addOperator<red_ns::Insulating<red_ns::PowerD1R1<backend_t>>>(m, Reductor::InsulatingPowerD1R1::id());
+      this->addOperator<red_ns::Insulating<red_ns::PowerR2<backend_t>>>(m, Reductor::InsulatingPowerR2::id());
+      this->addOperator<red_ns::Insulating<red_ns::Power<backend_t>>>(m, Reductor::InsulatingPower::id());
    }
 
 }

@@ -49,11 +49,25 @@ namespace Equations {
          virtual ~SphereExactScalarState() = default;
 
          /**
+          * @brief Set backward path ID
+          *
+          * @param pathId Path ID
+          */
+         void setBackwardPath(const std::size_t id);
+
+         /**
+          * @brief Set forward path ID
+          *
+          * @param pathId Path ID
+          */
+         void setForwardPath(const std::size_t id);
+
+         /**
           * @brief Initialize nonlinear interaction kernel
           *
           * @param force   Force initialization
           */
-         virtual void initNLKernel(const bool force = false);
+         virtual void initNLKernel(const bool force = false) override;
 
          /**
           * @brief Set the unknown name and requirements
@@ -96,18 +110,38 @@ namespace Equations {
           *
           * @param spMesh  Physical mesh
           */
-         virtual void initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh);
+         virtual void initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh) override;
+
+         /**
+          * @brief Get backward transform paths
+          */
+         virtual std::vector<Transform::TransformPath> backwardPaths() override;
 
       protected:
          /**
+          * @brief Set the nonlinear integration components
+          */
+         virtual void setNLComponents() override;
+
+         /**
           * @brief Set variable requirements
           */
-         virtual void setRequirements();
+         virtual void setRequirements() override;
 
          /**
           * @brief Set coupling information
           */
-         virtual void setCoupling();
+         virtual void setCoupling() override;
+
+         /**
+          * @brief Backward path ID
+          */
+         std::size_t mBwdPathId;
+
+         /**
+          * @brief Forward path ID
+          */
+         std::size_t mFwdPathId;
 
       private:
          /**

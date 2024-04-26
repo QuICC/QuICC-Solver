@@ -33,8 +33,18 @@ namespace QuICC {
 namespace Equations {
 
    SphereExactVectorState::SphereExactVectorState(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend)
-      : IVectorEquation(spEqParams,spScheme,spBackend), mPathTag(0)
+      : IVectorEquation(spEqParams,spScheme,spBackend), mBwdPathId(Transform::Path::TorPol::id()), mFwdPathId(0)
    {
+   }
+
+   void SphereExactVectorState::setBackwardPath(const std::size_t pathId)
+   {
+      this->mBwdPathId = pathId;
+   }
+
+   void SphereExactVectorState::setForwardPath(const std::size_t pathId)
+   {
+      this->mFwdPathId = pathId;
    }
 
    void SphereExactVectorState::setIdentity(const std::size_t name)
@@ -50,7 +60,7 @@ namespace Equations {
    {
       // Use transform path for nonlinear computations
       this->setForwardPathsType(FWD_IS_NONLINEAR);
-      this->mPathTag = tag;
+      this->mFwdPathId = tag;
    }
 
    void SphereExactVectorState::setPhysicalKernel(Physical::Kernel::SharedIPhysicalKernel spKernel)
@@ -157,11 +167,11 @@ namespace Equations {
       this->setForwardPathsType(FWD_IS_FIELD);
       if(this->ss().formulation() == VectorFormulation::TORPOL)
       {
-         this->mPathTag = Transform::Path::TorPol::id();
+         this->mFwdPathId = Transform::Path::TorPol::id();
       }
       else
       {
-         this->mPathTag = 0;
+         this->mFwdPathId = 0;
       }
 
       // Get reference to spatial scheme
@@ -177,18 +187,23 @@ namespace Equations {
    {
       if(this->ss().spectral().ONE() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().ONE(), this->mPathTag);
+         this->addNLComponent(this->ss().spectral().ONE(), this->mFwdPathId);
       }
 
       if(this->ss().spectral().TWO() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().TWO(), this->mPathTag);
+         this->addNLComponent(this->ss().spectral().TWO(), this->mFwdPathId);
       }
 
       if(this->ss().spectral().THREE() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().THREE(), this->mPathTag);
+         this->addNLComponent(this->ss().spectral().THREE(), this->mFwdPathId);
       }
+   }
+
+   std::vector<Transform::TransformPath> SphereExactVectorState::backwardPaths()
+   {
+      return this->defaultBackwardPaths(this->mBwdPathId);
    }
 
 }

@@ -14,7 +14,10 @@
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
+#include "QuICC/Transform/Path/Scalar.hpp"
+#include "QuICC/Transform/Path/ValueScalar.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
+#include "QuICC/Transform/Reductor/ValueEnergyR2.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
 #include "QuICC/Io/Variable/Tags/Energy.hpp"
 
@@ -25,8 +28,13 @@ namespace Io {
 namespace Variable {
 
    ISphericalScalarEnergyBaseWriter::ISphericalScalarEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IVariableAsciiWriter(name, ext ,header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
+      : IVariableAsciiWriter(name, ext ,header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mPathId(Transform::Path::Scalar::id()), mShowParity(false)
    {
+   }
+
+   void ISphericalScalarEnergyBaseWriter::setTransformPath(const std::size_t pathId)
+   {
+      this->mPathId = pathId;
    }
 
    void ISphericalScalarEnergyBaseWriter::showParity()
@@ -64,6 +72,21 @@ namespace Variable {
 
       constexpr auto TId = Dimensions::Transform::TRA1D;
 
+      std::size_t energyR2Id;
+
+      if(this->mPathId == Transform::Path::Scalar::id())
+      {
+         energyR2Id = Transform::Reductor::EnergyR2::id();
+      }
+      else if(this->mPathId == Transform::Path::ValueScalar::id())
+      {
+         energyR2Id = Transform::Reductor::ValueEnergyR2::id();
+      }
+      else
+      {
+         throw std::logic_error("Unknown transform path requested");
+      }
+
       // Prepare spectral data for transform
       this->prepareInput(coord);
 
@@ -76,7 +99,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyR2::id());
+               coord.transform1D().reduce(spectrum, p->data(), energyR2Id);
             },
             pInVar);
 

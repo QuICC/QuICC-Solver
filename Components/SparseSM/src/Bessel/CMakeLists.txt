@@ -8,5 +8,6 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   SphLapl2Diags.cpp
 )
 
+add_subdirectory(Boundary)
 add_subdirectory(Value)
 add_subdirectory(Insulating)

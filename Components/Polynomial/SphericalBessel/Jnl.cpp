@@ -1,6 +1,6 @@
 /**
- * @file Operators.cpp
- * @brief Source of the Bessel operators
+ * @file Jnl.cpp
+ * @brief Source of the spherical Bessel operators
  */
 
 // System include
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Polynomial/Bessel/details/Operators.hpp"
+#include "Polynomial/SphericalBessel/Jnl.hpp"
 #include "Types/Internal/Literals.hpp"
 #include "Types/Internal/Math.hpp"
 
@@ -21,9 +21,7 @@ namespace QuICC {
 
 namespace Polynomial {
 
-namespace Bessel {
-
-namespace details {
+namespace SphericalBessel {
 
 Internal::MHDFloat Value_dNu()
 {
@@ -124,6 +122,33 @@ Internal::MHDFloat dSphJnl(const Internal::MHDFloat k, const int l,
    return val / scale;
 }
 
+Internal::MHDFloat d2SphJnl(const Internal::MHDFloat k, const int l,
+   const Internal::MHDFloat r, const Internal::MHDFloat dNu)
+{
+   using namespace Internal::Literals;
+   auto dl = static_cast<Internal::MHDFloat>(l);
+   Internal::MHDFloat val;
+   if (l == 0)
+   {
+      val = (dl / r) * boost::math::sph_bessel(l, k * r) -
+            k * boost::math::sph_bessel(l + 1, k * r);
+   }
+   else
+   {
+      Internal::MHDFloat dl = static_cast<Internal::MHDFloat>(l);
+      const Internal::MHDFloat c =
+         k*k / ((2_mp*dl - 1_mp)*(2_mp*dl + 1_mp)*(2_mp*dl + 3_mp));
+      val = c*(
+            (dl - 1_mp)*dl*(2_mp*dl + 3_mp)*boost::math::sph_bessel(l - 2, k * r) -
+            (2_mp*dl*dl + 2_mp*dl - 1_mp)*(2_mp*dl + 1_mp)*boost::math::sph_bessel(l, k * r) +
+            (dl+1_mp)*(dl+2_mp)*(2_mp*dl-1_mp)*boost::math::sph_bessel(l + 2, k * r)
+            );
+   }
+
+   const auto scale = norm(k, l, dNu);
+   return val / scale;
+}
+
 Internal::MHDFloat drSphJnl(const Internal::MHDFloat k, const int l,
    const Internal::MHDFloat r, const Internal::MHDFloat dNu)
 {
@@ -206,7 +231,6 @@ void getRoots(std::vector<Internal::MHDFloat>& roots, const int l,
    boost::math::cyl_bessel_j_zero(nu, 1, nRoots, std::back_inserter(roots));
 }
 
-} // namespace details
-} // namespace Bessel
+} // namespace SphericalBessel
 } // namespace Polynomial
 } // namespace QuICC

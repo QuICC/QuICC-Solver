@@ -23,9 +23,17 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
+#include "QuICC/Transform/Path/NoSlipTorPol.hpp"
+#include "QuICC/Transform/Path/InsulatingTorPol.hpp"
 #include "QuICC/Transform/Reductor/Power.hpp"
 #include "QuICC/Transform/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Reductor/PowerD1R1.hpp"
+#include "QuICC/Transform/Reductor/ValuePower.hpp"
+#include "QuICC/Transform/Reductor/ValuePowerR2.hpp"
+#include "QuICC/Transform/Reductor/ValuePowerD1R1.hpp"
+#include "QuICC/Transform/Reductor/InsulatingPower.hpp"
+#include "QuICC/Transform/Reductor/InsulatingPowerD1R1.hpp"
 #include "QuICC/Io/Variable/Tags/Power.hpp"
 
 namespace QuICC {
@@ -34,12 +42,17 @@ namespace Io {
 
 namespace Variable {
    ISphericalTorPolPowerBaseWriter::ISphericalTorPolPowerBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
+      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mPathId(Transform::Path::TorPol::id()), mShowParity(false)
    {
    }
 
    ISphericalTorPolPowerBaseWriter::~ISphericalTorPolPowerBaseWriter()
    {
+   }
+
+   void ISphericalTorPolPowerBaseWriter::setTransformPath(const std::size_t pathId)
+   {
+      this->mPathId = pathId;
    }
 
    void ISphericalTorPolPowerBaseWriter::showParity()
@@ -79,6 +92,33 @@ namespace Variable {
       constexpr auto TId = Dimensions::Transform::TRA1D;
       Matrix spectrum;
 
+      std::size_t torPowerR2Id;
+      std::size_t polPowerId;
+      std::size_t polPowerD1R1Id;
+
+      if(this->mPathId == Transform::Path::TorPol::id())
+      {
+         torPowerR2Id = Transform::Reductor::PowerR2::id();
+         polPowerId = Transform::Reductor::Power::id();
+         polPowerD1R1Id = Transform::Reductor::PowerD1R1::id();
+      }
+      else if(this->mPathId == Transform::Path::InsulatingTorPol::id())
+      {
+         torPowerR2Id = Transform::Reductor::ValuePowerR2::id();
+         polPowerId = Transform::Reductor::InsulatingPower::id();
+         polPowerD1R1Id = Transform::Reductor::InsulatingPowerD1R1::id();
+      }
+      else if(this->mPathId == Transform::Path::NoSlipTorPol::id())
+      {
+         torPowerR2Id = Transform::Reductor::ValuePowerR2::id();
+         polPowerId = Transform::Reductor::ValuePower::id();
+         polPowerD1R1Id = Transform::Reductor::ValuePowerD1R1::id();
+      }
+      else
+      {
+         throw std::logic_error("Unknown path ID requested");
+      }
+
       // Prepare spectral data for transform
       this->prepareInput(FieldComponents::Spectral::TOR, coord);
 
@@ -112,7 +152,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::PowerR2::id());
+               coord.transform1D().reduce(spectrum, p->data(), torPowerR2Id);
             },
             pInVarTor);
 
@@ -192,7 +232,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Power::id());
+               coord.transform1D().reduce(spectrum, p->data(), polPowerId);
             },
             pInVarPolQ);
 
@@ -268,7 +308,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::PowerD1R1::id());
+               coord.transform1D().reduce(spectrum, p->data(), polPowerD1R1Id);
             },
             pInVarPolS);
 

@@ -425,7 +425,6 @@ namespace QuICC {
       return paths;
    }
 
-
    std::vector<Transform::TransformPath> RequirementTools::backwardPaths(Framework::Selector::VariantSharedVectorVariable spVector)
    {
       std::vector<Transform::TransformPath> paths;

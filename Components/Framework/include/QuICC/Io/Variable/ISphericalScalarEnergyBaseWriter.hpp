@@ -47,6 +47,13 @@ namespace Variable {
          virtual ~ISphericalScalarEnergyBaseWriter() = default;
 
          /**
+          * @brief Set transform path ID
+          *
+          * @param pathID  ID of transform path
+          */
+         void setTransformPath(const std::size_t pathId);
+
+         /**
           * @brief Activate output of parity splitting in energy output
           */
          void showParity();
@@ -76,6 +83,11 @@ namespace Variable {
           * @brief Spherical volume to normalize energy to energy density
           */
          MHDFloat mVolume;
+
+         /**
+          * @brief Transform path ID
+          */
+         std::size_t mPathId;
 
          /**
           * @brief Flag to show parity split in energy

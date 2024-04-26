@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the equation to generate an exact scalar solution in a sphere
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Generator/States/SphereExactScalarState.hpp"
-
 // Project includes
 //
+#include "QuICC/Generator/States/SphereExactScalarState.hpp"
 #include "QuICC/PhysicalKernels/IPhysicalKernel.hpp"
 #include "Types/Typedefs.hpp"
 #include "Types/Math.hpp"
@@ -27,14 +18,25 @@
 #include "QuICC/PhysicalKernels/MakeRandom.hpp"
 #include "QuICC/SpectralKernels/Set3DModes.hpp"
 #include "QuICC/Generator/States/Kernels/Sphere/ScalarHarmonic.hpp"
+#include "QuICC/Transform/Path/Scalar.hpp"
 
 namespace QuICC {
 
 namespace Equations {
 
    SphereExactScalarState::SphereExactScalarState(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend)
-      : IScalarEquation(spEqParams,spScheme,spBackend)
+      : IScalarEquation(spEqParams,spScheme,spBackend), mBwdPathId(Transform::Path::Scalar::id()), mFwdPathId(Transform::Path::Scalar::id())
    {
+   }
+
+   void SphereExactScalarState::setBackwardPath(const std::size_t pathId)
+   {
+      this->mBwdPathId = pathId;
+   }
+
+   void SphereExactScalarState::setForwardPath(const std::size_t pathId)
+   {
+      this->mFwdPathId = pathId;
    }
 
    void SphereExactScalarState::setIdentity(const std::size_t name)
@@ -142,6 +144,16 @@ namespace Equations {
       auto& req = this->mRequirements.addField(this->name(), FieldRequirement(true, ss.spectral(), ss.physical()));
       req.enableSpectral();
       req.enablePhysical();
+   }
+
+   std::vector<Transform::TransformPath> SphereExactScalarState::backwardPaths()
+   {
+      return this->defaultBackwardPaths(this->mBwdPathId);
+   }
+
+   void SphereExactScalarState::setNLComponents()
+   {
+      this->addNLComponent(FieldComponents::Spectral::SCALAR, this->mFwdPathId);
    }
 
 }

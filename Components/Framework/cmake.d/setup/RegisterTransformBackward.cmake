@@ -24,6 +24,19 @@ set(tags
   OversinDphi
   OversinLaplh
   OversinLaplhDphi
+  ValueP
+  ValueOverr1
+  ValueD1
+  ValueOverr1D1R1
+  ValueSlapl
+  InsulatingP
+  InsulatingOverr1
+  InsulatingD1
+  InsulatingOverr1D1R1
+  InsulatingSlapl
+  StressFreeP
+  StressFreeOverr1
+  StressFreeOverr1D1R1
   )
 
 include(RegisterTags)
@@ -33,36 +46,4 @@ quicc_register_tags(
   COMMON_DIR "../Common"
   TAGS ${tags}
   PREFIX "bwd_"
-  )
-
-set(value_tags
-  P
-  Overr1
-  D1
-  Overr1D1R1
-  Slapl
-  )
-
-quicc_register_tags(
-  NAMESPACE "Transform/Backward/Value"
-  BASECLASS "IOperator"
-  COMMON_DIR "../Common"
-  TAGS ${value_tags}
-  PREFIX "bwd_value_"
-  )
-
-set(insulating_tags
-  P
-  Overr1
-  D1
-  Overr1D1R1
-  Slapl
-  )
-
-quicc_register_tags(
-  NAMESPACE "Transform/Backward/Insulating"
-  BASECLASS "IOperator"
-  COMMON_DIR "../Common"
-  TAGS ${insulating_tags}
-  PREFIX "bwd_insulating_"
   )

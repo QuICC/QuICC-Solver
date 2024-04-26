@@ -6,16 +6,10 @@
 #ifndef QUICC_EQUATIONS_SPHEREEXACTVECTORSTATE_HPP
 #define QUICC_EQUATIONS_SPHEREEXACTVECTORSTATE_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <tuple>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -49,11 +43,25 @@ namespace Equations {
          virtual ~SphereExactVectorState() = default;
 
          /**
+          * @brief Set backward path ID
+          *
+          * @param pathId Path ID
+          */
+         void setBackwardPath(const std::size_t id);
+
+         /**
+          * @brief Set forward path ID
+          *
+          * @param pathId Path ID
+          */
+         void setForwardPath(const std::size_t id);
+
+         /**
           * @brief Initialize nonlinear interaction kernel
           *
           * @param force   Force initialization
           */
-         virtual void initNLKernel(const bool force = false);
+         virtual void initNLKernel(const bool force = false) override;
 
          /**
           * @brief Set the unknown name and requirements
@@ -103,28 +111,38 @@ namespace Equations {
           *
           * @param spMesh  Physical mesh
           */
-         virtual void initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh);
+         virtual void initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh) override;
+
+         /**
+          * @brief Get backward transform paths
+          */
+         virtual std::vector<Transform::TransformPath> backwardPaths() override;
 
       protected:
          /**
           * @brief Set variable requirements
           */
-         virtual void setRequirements();
+         virtual void setRequirements() override;
 
          /**
           * @brief Set coupling information
           */
-         virtual void setCoupling();
+         virtual void setCoupling() override;
 
          /**
           * @brief Set the nonliner integration components
           */
-         virtual void setNLComponents();
+         virtual void setNLComponents() override;
 
          /**
-          * @brief Transform path tag
+          * @brief Backward Transform path ID
           */
-         std::size_t mPathTag;
+         std::size_t mBwdPathId;
+
+         /**
+          * @brief Forward Transform path ID
+          */
+         std::size_t mFwdPathId;
 
       private:
          /**

@@ -218,7 +218,7 @@ namespace SpatialScheme {
    Transform::SharedTransformSetup JLFmBuilder::spSetup1D(SharedResolution spRes) const
    {
       const auto& opt = this->mOptions.at(0);
-      assert(opt.size() == 1 && std::find(opt.begin(), opt.end(), Transform::Setup::GaussianQuadrature::id()) != opt.end());
+      assert(opt.size() == 2 && std::find(opt.begin(), opt.end(), Transform::Setup::GaussianQuadrature::id()) != opt.end());
 
       const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA1D);
 

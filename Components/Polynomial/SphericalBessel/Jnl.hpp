@@ -1,11 +1,11 @@
 /**
- * @file Operators.hpp
- * @brief Implementation of the spherical Bessel basis for magnetic toroidal
+ * @file Jnl.hpp
+ * @brief Implementation of the spherical Bessel
  * boundary conditions
  */
 
-#ifndef QUICC_POLYNOMIAL_BESSEL_DETAILS_OPERATORS_HPP
-#define QUICC_POLYNOMIAL_BESSEL_DETAILS_OPERATORS_HPP
+#ifndef QUICC_POLYNOMIAL_SPHERICALBESSEL_JNL_HPP
+#define QUICC_POLYNOMIAL_SPHERICALBESSEL_JNL_HPP
 
 // System includes
 //
@@ -18,9 +18,7 @@ namespace QuICC {
 
 namespace Polynomial {
 
-namespace Bessel {
-
-namespace details {
+namespace SphericalBessel {
 
 /**
  * @brief Zero boundary value Bessel function nu = l + dNu
@@ -83,6 +81,16 @@ Internal::MHDFloat dSphJnl(const Internal::MHDFloat k, const int l,
    const Internal::MHDFloat r, const Internal::MHDFloat dNu);
 
 /**
+ * @brief D^2 of Spherical Bessel basis Jnl(k, l, r)
+ *
+ * @param k Basis specific constant k
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat d2SphJnl(const Internal::MHDFloat k, const int l,
+   const Internal::MHDFloat r, const Internal::MHDFloat dNu);
+
+/**
  * @brief D r of Spherical Bessel basis Jnl(k, l, r)
  *
  * @param k Basis specific constant k
@@ -140,9 +148,8 @@ Internal::MHDFloat lowerSphJnl(const Internal::MHDFloat k, const int l,
 void getRoots(std::vector<Internal::MHDFloat>& roots, const int l,
    const int nRoots, const Internal::MHDFloat dNu);
 
-} // namespace details
-} // namespace Bessel
+} // namespace SphericalBessel
 } // namespace Polynomial
 } // namespace QuICC
 
-#endif // QUICC_POLYNOMIAL_BESSEL_DETAILS_OPERATORS_HPP
+#endif // QUICC_POLYNOMIAL_SPHERICALBESSEL_JNL_HPP

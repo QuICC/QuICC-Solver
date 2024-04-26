@@ -184,7 +184,7 @@ namespace Worland {
       }
 
 #if defined QUICC_MPI
-      MPI_Allreduce(MPI_IN_PLACE, this->mGeo2Tor.data(), this->mGeo2Tor.size(),
+      MPI_Allreduce(MPI_IN_PLACE, mat.data(), mat.size(),
          MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 #endif
    }

@@ -28,7 +28,7 @@ namespace Integrator {
    /**
     * @brief Implementation of the Bessel with Value BC operator
     */
-   template <typename TOp>
+   template <typename TOp, unsigned int N = 0>
    class Value: public TOp
    {
       public:
@@ -51,9 +51,14 @@ namespace Integrator {
          virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const override;
    };
 
-   template <typename TOp> void Value<TOp>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
+   template <typename TOp,unsigned int N> void Value<TOp,N>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       this->template makeOperatorImpl<Polynomial::Bessel::Value>(op, igrid, iweights, i);
+
+      if constexpr(N > 0)
+      {
+         op.bottomRows(N).setZero();
+      }
    }
 
 }

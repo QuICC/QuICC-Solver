@@ -13,12 +13,18 @@
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
+#include "QuICC/Transform/Path/InsulatingTorPol.hpp"
+#include "QuICC/Transform/Path/NoSlipTorPol.hpp"
+#include "QuICC/Transform/Path/StressFreeTorPol.hpp"
 #include "QuICC/Transform/Reductor/Energy.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
 #include "QuICC/Transform/Reductor/EnergyD1R1.hpp"
-#include "QuICC/Transform/Reductor/TorEnergyR2.hpp"
-#include "QuICC/Transform/Reductor/PolEnergy.hpp"
-#include "QuICC/Transform/Reductor/PolEnergyD1R1.hpp"
+#include "QuICC/Transform/Reductor/ValueEnergy.hpp"
+#include "QuICC/Transform/Reductor/ValueEnergyR2.hpp"
+#include "QuICC/Transform/Reductor/ValueEnergyD1R1.hpp"
+#include "QuICC/Transform/Reductor/InsulatingEnergy.hpp"
+#include "QuICC/Transform/Reductor/InsulatingEnergyD1R1.hpp"
 #include "QuICC/Io/Variable/Tags/Energy.hpp"
 
 namespace QuICC {
@@ -27,18 +33,18 @@ namespace Io {
 
 namespace Variable {
    ISphericalTorPolEnergyBaseWriter::ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false), mUseBessel(false)
+      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mPathId(Transform::Path::TorPol::id()), mShowParity(false)
    {
+   }
+
+   void ISphericalTorPolEnergyBaseWriter::setTransformPath(const std::size_t pathId)
+   {
+      this->mPathId = pathId;
    }
 
    void ISphericalTorPolEnergyBaseWriter::showParity()
    {
       this->mShowParity = true;
-   }
-
-   void ISphericalTorPolEnergyBaseWriter::useBessel()
-   {
-      this->mUseBessel = true;
    }
 
    void ISphericalTorPolEnergyBaseWriter::prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord)
@@ -70,14 +76,31 @@ namespace Variable {
 
    void ISphericalTorPolEnergyBaseWriter::compute(Transform::TransformCoordinatorType& coord)
    {
-      std::size_t torEnergyR2Id = Transform::Reductor::EnergyR2::id();
-      std::size_t polEnergyId = Transform::Reductor::Energy::id();
-      std::size_t polEnergyD1R1Id = Transform::Reductor::EnergyD1R1::id();
-      if(this->mUseBessel)
+      std::size_t torEnergyR2Id;
+      std::size_t polEnergyId;
+      std::size_t polEnergyD1R1Id;
+
+      if(this->mPathId == Transform::Path::TorPol::id())
       {
-         torEnergyR2Id = Transform::Reductor::TorEnergyR2::id();
-         polEnergyId = Transform::Reductor::PolEnergy::id();
-         polEnergyD1R1Id = Transform::Reductor::PolEnergyD1R1::id();
+         torEnergyR2Id = Transform::Reductor::EnergyR2::id();
+         polEnergyId = Transform::Reductor::Energy::id();
+         polEnergyD1R1Id = Transform::Reductor::EnergyD1R1::id();
+      }
+      else if(this->mPathId == Transform::Path::InsulatingTorPol::id())
+      {
+         torEnergyR2Id = Transform::Reductor::ValueEnergyR2::id();
+         polEnergyId = Transform::Reductor::InsulatingEnergy::id();
+         polEnergyD1R1Id = Transform::Reductor::InsulatingEnergyD1R1::id();
+      }
+      else if(this->mPathId == Transform::Path::NoSlipTorPol::id())
+      {
+         torEnergyR2Id = Transform::Reductor::ValueEnergyR2::id();
+         polEnergyId = Transform::Reductor::ValueEnergy::id();
+         polEnergyD1R1Id = Transform::Reductor::ValueEnergyD1R1::id();
+      }
+      else
+      {
+         throw std::logic_error("Unknown path ID requested");
       }
 
       constexpr auto TId = Dimensions::Transform::TRA1D;

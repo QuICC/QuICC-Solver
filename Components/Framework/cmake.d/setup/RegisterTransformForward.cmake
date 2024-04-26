@@ -41,6 +41,20 @@ set(tags
   Oversin
   OversinDphi
   T
+  ValueP
+  ValuePol
+  ValueQ
+  ValueS
+  ValueT
+  ValueBc1Q
+  ValueBc1S
+  InsulatingP
+  InsulatingPol
+  InsulatingQ
+  InsulatingS
+  InsulatingT
+  StressFreeP
+  StressFreeT
   )
 
 include(RegisterTags)
@@ -50,36 +64,4 @@ quicc_register_tags(
   COMMON_DIR "../Common"
   TAGS ${tags}
   PREFIX "fwd_"
-  )
-
-set(value_tags
-  P
-  Pol
-  Q
-  S
-  T
-  )
-
-quicc_register_tags(
-  NAMESPACE "Transform/Forward/Value"
-  BASECLASS "IOperator"
-  COMMON_DIR "../Common"
-  TAGS ${value_tags}
-  PREFIX "fwd_value_"
-  )
-
-set(insulating_tags
-  P
-  Pol
-  Q
-  S
-  T
-  )
-
-quicc_register_tags(
-  NAMESPACE "Transform/Forward/Insulating"
-  BASECLASS "IOperator"
-  COMMON_DIR "../Common"
-  TAGS ${insulating_tags}
-  PREFIX "fwd_insulating_"
   )

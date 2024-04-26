@@ -27,6 +27,7 @@
 #include "QuICC/RuntimeStatus/registerAll.hpp"
 #include "QuICC/SolveTiming/registerAll.hpp"
 #include "QuICC/PseudospectralTag/registerAll.hpp"
+#include "QuICC/Transform/Reductor/registerAll.hpp"
 
 namespace QuICC {
 
@@ -207,6 +208,7 @@ namespace Model {
       SolveTiming::registerAll();
       // PseudospectralTag names
       PseudospectralTag::registerAll();
+      Transform::Reductor::registerAll();
    }
 
    template <typename TSim, typename TState, typename TVis> std::vector<std::size_t> IPhysicalModel<TSim,TState,TVis>::extraFieldIds() const

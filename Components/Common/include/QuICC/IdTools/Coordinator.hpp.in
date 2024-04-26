@@ -11,6 +11,7 @@
 #include <string>
 #include <memory>
 #include <map>
+#include <cassert>
 
 // External includes
 //
@@ -61,6 +62,7 @@ namespace QuICC {
 
    inline std::string Coordinator::tag(const std::size_t id)
    {
+      assert(Coordinator::map().count(id) > 0);
       return Coordinator::map().find(id)->second->create(@_idNAN@)->tag();
    }
 

@@ -118,7 +118,7 @@ namespace Equations {
       return disabled;
    }
 
-   std::vector<Transform::TransformPath> IScalarEquation::backwardPaths()
+   std::vector<Transform::TransformPath> IScalarEquation::defaultBackwardPaths(const std::size_t pathId) const
    {
       // Disable some paths
       auto disabled = this->disabledBackwardPaths();
@@ -129,18 +129,27 @@ namespace Equations {
       std::vector<Transform::TransformPath> paths;
 
       auto spSteps = this->transformSteps();
+      std::size_t disabledPathId = Transform::Path::Empty::id();
+
+      auto makeMap = [&](auto&& enabled, const bool disabled)
+      {
+         std::map<typename std::remove_reference<decltype(enabled)>::type::key_type,std::size_t> m;
+         for(auto&& c: enabled)
+         {
+            std::size_t id = disabledPathId;
+            if(c.second && !disabled)
+            {
+               id = pathId;
+            }
+            m.try_emplace(c.first,id);
+         }
+         return m;
+      };
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, this->spUnknown()))
       {
-         std::map<FieldComponents::Physical::Id,std::size_t> compsMap;
-         compsMap.insert(std::make_pair(FieldComponents::Physical::SCALAR, Transform::Path::Scalar::id()));
-         if(disabledPhys)
-         {
-            for(auto&& c: compsMap)
-            {
-               c.second = Transform::Path::Empty::id();
-            }
-         }
+         std::map<FieldComponents::Physical::Id, bool> e = {{FieldComponents::Physical::SCALAR, true}};
+         auto compsMap = makeMap(e, disabledPhys);
          auto b = spSteps->backwardScalar(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
@@ -150,25 +159,8 @@ namespace Equations {
          auto compsMap = std::visit(
                [&](auto&& p)
                {
-                  std::map<FieldComponents::Physical::Id,std::size_t> m;
-                  for(auto&& c: p->dom(0).grad().enabled())
-                  {
-                     std::size_t id = Transform::Path::Empty::id();
-                     if(c.second)
-                     {
-                        id = Transform::Path::Scalar::id();
-                     }
-                     m.try_emplace(c.first,id);
-                  }
-                  return m;
+                  return makeMap(p->dom(0).grad().enabled(), disabledGrad);
                }, this->spUnknown());
-         if(disabledGrad)
-         {
-            for(auto&& c: compsMap)
-            {
-               c.second = Transform::Path::Empty::id();
-            }
-         }
          auto b = spSteps->backwardGradient(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
@@ -178,30 +170,18 @@ namespace Equations {
          auto compsMap = std::visit(
                [&](auto&& p)
                {
-                  std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,std::size_t> m;
-                  for(auto&& c: p->dom(0).grad2().enabled())
-                  {
-                     std::size_t id = Transform::Path::Empty::id();
-                     if(c.second)
-                     {
-                        id = Transform::Path::Scalar::id();
-                     }
-                     m.try_emplace(c.first,id);
-                  }
-                  return m;
+                  return makeMap(p->dom(0).grad2().enabled(), disabledGrad2);
                }, this->spUnknown());
-         if(disabledGrad2)
-         {
-            for(auto&& c: compsMap)
-            {
-               c.second = Transform::Path::Empty::id();
-            }
-         }
          auto b = spSteps->backwardGradient2(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
 
       return paths;
+   }
+
+   std::vector<Transform::TransformPath> IScalarEquation::backwardPaths()
+   {
+      return this->defaultBackwardPaths(Transform::Path::Scalar::id());
    }
 
    void IScalarEquation::setConstraintKernel(Spectral::Kernel::SharedISpectralKernel spKernel)

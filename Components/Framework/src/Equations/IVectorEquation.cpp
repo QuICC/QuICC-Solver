@@ -120,7 +120,7 @@ namespace Equations {
       return disabled;
    }
 
-   std::vector<Transform::TransformPath> IVectorEquation::backwardPaths()
+   std::vector<Transform::TransformPath> IVectorEquation::defaultBackwardPaths(const std::size_t pathId) const
    {
       // Disable some paths
       auto disabled = this->disabledBackwardPaths();
@@ -131,31 +131,30 @@ namespace Equations {
       std::vector<Transform::TransformPath> paths;
 
       auto spSteps = this->transformSteps();
+      const std::size_t disabledPathId = Transform::Path::Empty::id();
+
+      auto makeMap = [&](auto&& enabled, const bool disabled)
+      {
+         std::map<FieldComponents::Physical::Id,std::size_t> m;
+         for(auto&& c: enabled)
+         {
+            std::size_t id = disabledPathId;
+            if(c.second && !disabled)
+            {
+               id = pathId;
+            }
+            m.try_emplace(c.first,id);
+         }
+         return m;
+      };
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, this->spUnknown()))
       {
          auto compsMap = std::visit(
                [&](auto&& p)
                {
-                  std::map<FieldComponents::Physical::Id,std::size_t> m;
-                  for(auto&& c: p->dom(0).phys().enabled())
-                  {
-                     std::size_t id = Transform::Path::Empty::id();
-                     if(c.second)
-                     {
-                        id = Transform::Path::TorPol::id();
-                     }
-                     m.try_emplace(c.first,id);
-                  }
-                  return m;
+                  return makeMap(p->dom(0).phys().enabled(), disabledPhys);
                }, this->spUnknown());
-         if(disabledPhys)
-         {
-            for(auto&& c: compsMap)
-            {
-               c.second = false;
-            }
-         }
          auto branches = spSteps->backwardVector(compsMap);
          paths.insert(paths.end(), branches.begin(), branches.end());
       }
@@ -168,40 +167,16 @@ namespace Equations {
             auto compsMap = std::visit(
                [&](auto&& p)
                {
-                  std::map<FieldComponents::Physical::Id,std::size_t> m;
-                  for(auto&& c: p->dom(0).grad(*it).enabled())
-                  {
-                     std::size_t id = Transform::Path::Empty::id();
-                     if(c.second)
-                     {
-                        id = Transform::Path::TorPol::id();
-                     }
-                     m.try_emplace(c.first,id);
-                  }
-                  return m;
+                  return makeMap(p->dom(0).grad(*it).enabled(), disabledGrad);
                }, this->spUnknown());
-            if(disabledGrad)
-            {
-               for(auto&& c: compsMap)
-               {
-                  c.second = false;
-               }
-            }
             auto b = spSteps->backwardVGradient(*it, compsMap);
             paths.insert(paths.end(), b.begin(), b.end());
          }
       }
 
-// Not yet implemented
 //      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad2());}, this->spUnknown()))
 //      {
-//         auto range = this->spectralRange();
-//         for(auto it = range.first; it != range.second; ++it)
-//         {
-//            auto compsMap = std::visit([&](auto&& p)->std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>{return (p->dom(0).grad2(*it).enabled());}, this->spUnknown());
-//            auto b = spSteps->backwardVGradient2(*it, compsMap);
-//            paths.insert(paths.end(),b.begin(), b.end());
-//         }
+//          Grad2 is not yet implemented yet implemented
 //      }
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasCurl());}, this->spUnknown()))
@@ -209,30 +184,18 @@ namespace Equations {
          auto compsMap = std::visit(
                [&](auto&& p)
                {
-                  std::map<FieldComponents::Physical::Id,std::size_t> m;
-                  for(auto&& c: p->dom(0).curl().enabled())
-                  {
-                     std::size_t id = Transform::Path::Empty::id();
-                     if(c.second)
-                     {
-                        id = Transform::Path::TorPol::id();
-                     }
-                     m.try_emplace(c.first,id);
-                  }
-                  return m;
+                  return makeMap(p->dom(0).curl().enabled(), disabledCurl);
                }, this->spUnknown());
-         if(disabledCurl)
-         {
-            for(auto&& c: compsMap)
-            {
-               c.second = false;
-            }
-         }
          auto b = spSteps->backwardCurl(compsMap);
          paths.insert(paths.end(),b.begin(), b.end());
       }
 
       return paths;
+   }
+
+   std::vector<Transform::TransformPath> IVectorEquation::backwardPaths()
+   {
+      return this->defaultBackwardPaths(Transform::Path::TorPol::id());
    }
 
 } // Equations

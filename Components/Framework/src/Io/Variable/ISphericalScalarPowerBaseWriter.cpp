@@ -24,7 +24,10 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
+#include "QuICC/Transform/Path/Scalar.hpp"
+#include "QuICC/Transform/Path/ValueScalar.hpp"
 #include "QuICC/Transform/Reductor/PowerR2.hpp"
+#include "QuICC/Transform/Reductor/ValuePowerR2.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
 #include "QuICC/Io/Variable/Tags/Power.hpp"
 
@@ -35,12 +38,17 @@ namespace Io {
 namespace Variable {
 
    ISphericalScalarPowerBaseWriter::ISphericalScalarPowerBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IVariableAsciiWriter(name, ext ,header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
+      : IVariableAsciiWriter(name, ext ,header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mPathId(Transform::Path::Scalar::id()), mShowParity(false)
    {
    }
 
    ISphericalScalarPowerBaseWriter::~ISphericalScalarPowerBaseWriter()
    {
+   }
+
+   void ISphericalScalarPowerBaseWriter::setTransformPath(const std::size_t pathId)
+   {
+      this->mPathId = pathId;
    }
 
    void ISphericalScalarPowerBaseWriter::showParity()
@@ -83,6 +91,20 @@ namespace Variable {
       auto pInVar = coord.ss().bwdPtr(TId);
       coord.communicator().receiveBackward(TId, pInVar);
 
+      std::size_t powerR2Id;
+      if(this->mPathId == Transform::Path::Scalar::id())
+      {
+         powerR2Id = Transform::Reductor::PowerR2::id();
+      }
+      else if(this->mPathId == Transform::Path::ValueScalar::id())
+      {
+         powerR2Id = Transform::Reductor::ValuePowerR2::id();
+      }
+      else
+      {
+         throw std::logic_error("Unknown path was requested");
+      }
+
       const auto& tRes = *this->res().cpu()->dim(TId);
 
       // Size of spectrum
@@ -109,7 +131,7 @@ namespace Variable {
       std::visit(
             [&](auto&& p)
             {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::PowerR2::id());
+               coord.transform1D().reduce(spectrum, p->data(), powerR2Id);
             },
             pInVar);
 
