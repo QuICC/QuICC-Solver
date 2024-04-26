@@ -1,5 +1,6 @@
 #include <cassert>
 #include <complex>
+#include <cuda/std/complex>
 
 #include "Cuda/CudaUtil.hpp"
 #include "Pointwise.hpp"
@@ -58,6 +59,17 @@ template class Op<Abs2Functor<double>, View::ViewBase<double>, View::ViewBase<st
 // JW
 template class Op<Abs2Functor<double>, View::View<double, View::DCCSC3DJIK>,
    View::View<std::complex<double>, View::DCCSC3DJIK>>;
+// Add Mods
+template class Op<AddFunctor<cuda::std::complex<double>>,
+   View::ViewBase<cuda::std::complex<double>>,
+   View::ViewBase<cuda::std::complex<double>>,
+   View::ViewBase<cuda::std::complex<double>>>;
+// Sub Mods
+template class Op<SubFunctor<cuda::std::complex<double>>,
+   View::ViewBase<cuda::std::complex<double>>,
+   View::ViewBase<cuda::std::complex<double>>,
+   View::ViewBase<cuda::std::complex<double>>>;
+
 
 } // namespace Cuda
 } // namespace Pointwise
