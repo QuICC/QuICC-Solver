@@ -1,5 +1,6 @@
 // External includes
 //
+#include <iostream>
 
 // Project includes
 //
@@ -70,7 +71,7 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
           if (inTyStr == "C_DCCSC3D_t")
           {
             using Tin = C_DCCSC3D_t;
-            using Tout = C_DCCSC3D_t;
+            using Tout = C_DCCSC3DJIK_t;
             using op_t = Op<Tout, Tin, p201_t>;
             _ops.push_back(std::make_unique<op_t>());
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();

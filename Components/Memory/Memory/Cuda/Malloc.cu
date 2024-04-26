@@ -3,7 +3,6 @@
  * @brief
  */
 
-
 // External includes
 //
 #ifndef NDEBUG

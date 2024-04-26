@@ -1,5 +1,6 @@
 // External includes
 //
+#include <iostream>
 
 // Project includes
 //

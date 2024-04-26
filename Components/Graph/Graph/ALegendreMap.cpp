@@ -1,5 +1,6 @@
 // External includes
 //
+#include <iostream>
 
 // Project includes
 //
@@ -73,7 +74,8 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             using Tin = C_DCCSC3DJIK_t;
             using Tout = C_S1CLCSC3DJIK_t;
             using Top = QuICC::View::View<double, QuICC::View::S1CLCSC3D>;
-            using backend_t = Cuda::ImplOp<Tout, Tin, Top>;
+            using QuICC::Transform::Quadrature::Cuda::ImplOp;
+            using backend_t = ImplOp<Tout, Tin, Top>;
             using op_t = Op<Tout, Tin, Top, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();

@@ -1,5 +1,6 @@
 // External includes
 //
+#include <iostream>
 
 // Project includes
 //
@@ -36,7 +37,7 @@ void MapOps::setAdd(mlir::quiccir::AddOp op)
         {
             using namespace QuICC::Pointwise::Cuda;
             using namespace QuICC::Pointwise;
-            using T = C_DCCSC3DJIT_t;
+            using T = C_DCCSC3DJIK_t;
             using op_t = Op<AddFunctor<std::complex<double>>, T, T, T>;
             _ops.push_back(std::make_unique<op_t>(AddFunctor<std::complex<double>>()));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T>>>(_ops.back()).get();
