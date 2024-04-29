@@ -22,8 +22,8 @@ insulatingZeros::usage="insulatingZeros[n,l]";
 
 (* Operators to work on grid*)
 Jnl::usage="Jnl[k,l,t,d\[Nu]]";
-lowerJnl::usage="lowerJnl[k,l,t,d\[Nu]]"
-raiseJnl::usage="raiseJnl[k,l,t,d\[Nu]]"
+lowerJnl::usage="lowerJnl[k,l,t,d\[Nu]]";
+raiseJnl::usage="raiseJnl[k,l,t,d\[Nu]]";
 ValueSphJnl::usage="ValueSphJnl[n,l,r]";
 InsulatingSphJnl::usage="InsulatingSphJnl[n,l,r]";
 ValueRSphJnl::usage="ValueRSphJnl[n,l,r]";

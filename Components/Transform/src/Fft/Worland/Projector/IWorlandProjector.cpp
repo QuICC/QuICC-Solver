@@ -86,11 +86,14 @@ namespace Projector {
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == rOut.rows());
       assert(in.cols() <= rOut.cols());
-
+#ifdef QUICC_USE_PFSOLVE
+      this->transformBlock(rOut, in, true, true);
+#else
       this->transformBlock(rOut, in, true, true);
       this->transformBlock(rOut, in, true, false);
       this->transformBlock(rOut, in, false, true);
       this->transformBlock(rOut, in, false, false);
+#endif
    }
 
    void IWorlandProjector::transform(Matrix& rOut, const Matrix& in) const

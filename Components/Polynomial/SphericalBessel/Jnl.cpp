@@ -52,7 +52,7 @@ Internal::MHDFloat norm(const Internal::MHDFloat k, const int l,
    }
    else
    {
-      throw std::logic_error("Unknown Bessel d_nu: " + std::to_string(dNu));
+      throw std::logic_error("Unknown Bessel d_nu: " + std::to_string(static_cast<double>(dNu)));
    }
    val = boost::math::sph_bessel(nu, k) / Internal::Math::sqrt(2.0_mp);
 
@@ -211,9 +211,9 @@ Internal::MHDFloat lowerSphJnl(const Internal::MHDFloat k, const int l,
    using namespace Internal::Literals;
    Internal::MHDFloat val;
 
-   if(l > 0)
+   if (l > 0)
    {
-      val = k * boost::math::sph_bessel(l-1, k * r);
+      val = k * boost::math::sph_bessel(l - 1, k * r);
    }
    else
    {

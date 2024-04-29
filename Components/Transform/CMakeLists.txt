@@ -70,6 +70,16 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB_KK}
     QuICC::KokkosWrapper
 )
 
+# VkFFT
+if(TARGET VkFFT AND QUICC_USE_VKFFT)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE VkFFT)
+endif()
+
+# PfSolve
+if(TARGET PfSolve AND QUICC_USE_PFSOLVE)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE PfSolve)
+endif()
+
 # View Operator wrappers
 add_subdirectory(Wrappers)
 

@@ -367,34 +367,6 @@ __device__ void iBlockGemmDevice(const F& f, M Astart, L Bstart, V Cstart,
 //
 
 
-// irregular block gemm kernel, default Layout left (L = 0), horizontal IN
-template <typename M, typename L, typename V, typename T, typename S,
-   Integer Layout = 0, typename F = nullptr_t>
-__global__ void iBlockGemmKernelWorlandProjector(M A, L B, V C, const S rowScan,
-   const S colScan, const S scan, const S allscan, const T* xGrid,
-   const T* yGrid, const F& f)
-{
-   int blockid = blockIdx.x;
-   // The id of the matrix block within the large matrix
-   auto matrix_block_id = binary_search_range(allscan, blockid);
-   // The start address of the vertical C and A matrices
-   auto matrix_block_col_start = scan(matrix_block_id);
-   // The size of the block matrix with matrix block id.
-   auto matrixColSize = scan(matrix_block_id + 1) - matrix_block_col_start;
-   // The start address of the horizontal B matrix
-   auto matrix_block_row_start = matrix_block_id * C.height * B.height;
-
-   M Astart = GetStartMatrix(A, matrix_block_row_start, C.height);
-   // This is a horizontal matrix. Calc. differ from the A matrix.
-   L Bstart = GetStartMatrix(B, matrix_block_col_start * B.height, B.height);
-   // matrix starts at scan(i) with size scan(i+1) - scan(i)
-   V Cstart = GetStartMatrix(C, matrix_block_col_start * C.height, C.height,
-      matrixColSize);
-
-   iBlockGemmDevice(f, Astart, Bstart, Cstart, rowScan, colScan, xGrid, yGrid,
-      matrix_block_id);
-}
-
 // irregular block gemm kernel, default Layout left (L = 0), horizontal mops
 // matrix
 template <typename M, typename L, typename V, typename T, typename S,
@@ -480,6 +452,35 @@ __global__ void iBlockGemmKernelWorlandIntegrator(M A, L B, V C,
       matrix_block_id);
 }
 
+// irregular block gemm kernel, default Layout left (L = 0), horizontal IN
+template <typename M, typename L, typename V, typename T, typename S,
+   Integer Layout = 0, typename F = nullptr_t>
+__global__ void iBlockGemmKernelWorlandProjector(M A, L B, V C, const S rowScan,
+   const S colScan, const S scan, const S allscan, const T* xGrid,
+   const T* yGrid, const F& f)
+{
+   int blockid = blockIdx.x;
+   // The id of the matrix block within the large matrix
+   auto matrix_block_id = binary_search_range(allscan, blockid);
+   // The start address of the vertical C and A matrices
+   auto matrix_block_col_start = scan(matrix_block_id);
+   // The size of the block matrix with matrix block id.
+   auto matrixColSize = scan(matrix_block_id + 1) - matrix_block_col_start;
+   // The start address of the horizontal B matrix
+   auto matrix_block_row_start = matrix_block_id * C.height * B.height;
+
+   M Astart = GetStartMatrix(A, matrix_block_row_start, C.height);
+   // This is a horizontal matrix. Calc. differ from the A matrix.
+   L Bstart = GetStartMatrix(B, matrix_block_col_start * B.height, B.height);
+   // matrix starts at scan(i) with size scan(i+1) - scan(i)
+   V Cstart = GetStartMatrix(C, matrix_block_col_start * C.height, C.height,
+      matrixColSize);
+
+   iBlockGemmDevice(f, Astart, Bstart, Cstart, rowScan, colScan, xGrid, yGrid,
+      matrix_block_id);
+}
+
+
 
 // irregular block gemm kernel, default Layout left (L = 0), horizontal IN
 template <typename M, typename L, typename V, typename T, typename S,
@@ -534,17 +535,16 @@ void iBlockGemm(const M& d_A, const L& d_B, const Z& d_C, const V& rowScan,
       iBlockGemmKernelReductor<<<allTotal, dimBlock>>>(d_A, d_B, d_C, rowScan,
          colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
    }
-   else if (S == 3)
+   else if (S == 3 || S == 4)
    {
       iBlockGemmKernelWorlandIntegrator<<<allTotal, dimBlock>>>(d_A, d_B, d_C,
          rowScan, colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
    }
-   else if (S == 4)
+   else if (S == 5)
    {
       iBlockGemmKernelWorlandProjector<<<allTotal, dimBlock>>>(d_A, d_B, d_C,
          rowScan, colScan, scan, allScan, xGrid.data(), yGrid.data(), f);
    }
-
 
    cudaErrChk(cudaGetLastError());
    cudaErrChk(cudaDeviceSynchronize());

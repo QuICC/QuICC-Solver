@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Integrator/Base/I2DivR1_Zero.hpp"
-#if defined(QUICC_USE_KOKKOS_CUDA) || defined(QUICC_USE_KOKKOS_HIP)
+#ifdef QUICC_USE_KOKKOS
 #include "QuICC/Transform/Poly/Worland/Integrator/Kokkos/I2DivR1_Zero.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/Worland/Integrator/I2DivR1_ZeroviewCpu_t.hpp.inc"

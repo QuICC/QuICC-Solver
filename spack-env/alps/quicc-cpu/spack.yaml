@@ -1,0 +1,25 @@
+spack:
+  specs:
+  - kokkos
+  - kokkos-kernels
+  - mpi
+  - fftw
+  - hdf5
+  - python@3.10
+  - py-numpy
+  - openblas
+  - boost
+  - cmake
+  packages:
+    all:
+      providers:
+        mpi: [cray-mpich]
+      variants: +openmp +mpi build_type=Release
+  concretizer:
+    unify: true
+    targets:
+      host_compatible: false
+  config:
+    install_tree:
+      root: $SCRATCH/views/quicc_cpu_software
+  view: $SCRATCH/views/view_cpu_quicc

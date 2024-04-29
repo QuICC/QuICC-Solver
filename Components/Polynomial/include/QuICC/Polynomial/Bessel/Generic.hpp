@@ -1,7 +1,6 @@
 /**
  * @file Generic.hpp
- * @brief Implementation of the spherical Bessel basis for insulating boundary
- * conditions
+ * @brief Implementation of the spherical Bessel basis for genericl roots
  */
 
 #ifndef QUICC_POLYNOMIAL_BESSEL_GENERIC_HPP
@@ -23,14 +22,17 @@ namespace Polynomial {
 namespace Bessel {
 
 /**
- * @brief Implementation of the spherical Bessel basis for insulating boundary
- * conditions
+ * @brief Implementation of the spherical Bessel basis for generic roots
+ *
+ * @tparam TOp Spherical bessel operator
  */
 template <typename TOp> class Generic : private TOp
 {
 public:
    /**
     * @brief Default constructor
+    *
+    * @param dNu Bessel parameter: nu = l + dNu
     */
    Generic(const Internal::MHDFloat dNu);
 

@@ -59,16 +59,8 @@ void RadialPowerDivR1<kokkos_t>::makeOperator(Matrix& op,
 void RadialPowerDivR1<kokkos_t>::applyUnitOperator(const OpMatrixL& rOutView,
    const OpMatrixLZ& inView, const OpVectorI& scan, const int total) const
 {
-   // Changing col size or row size? If change then it behaves as a worland
-   // projector
-   auto change = this->mspSetup->mult(this->mspSetup->slowSize() - 1) -
-                 this->mspSetup->mult(0);
-   if (change)
-      applyBlockOperator<4>(this->mspSetup, this->vmOps, rOutView, inView, scan,
-         total, Abs2Complex());
-   else
-      applyBlockOperator<1>(this->mspSetup, this->vmOps, rOutView, inView, scan,
-         total, Abs2Complex());
+   applyBlockOperator<4>(this->mspSetup, this->vmOps, rOutView, inView, scan,
+      total, Abs2Complex());
 }
 
 } // namespace Reductor

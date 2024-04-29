@@ -47,23 +47,6 @@ endif()
 if(_BLAS_MKL)
     target_compile_definitions(${_BLAS_TARGET} INTERFACE "QUICC_USING_MKL_BLAS")
 endif()
-#
-# Boost
-#
-if(NOT BOOST_ROOT)
-  message(VERBOSE "setting BOOST_ROOT")
-  list(APPEND _ALL_PATHS $ENV{CPATH} $ENV{C_INCLUDE_PATH} $ENV{CPLUS_INCLUDE_PATH})
-  if(NOT "${_ALL_PATHS}" STREQUAL "")
-    string(REPLACE ":" ";" _ALL_PATHS "${_ALL_PATHS}")
-    include(ListFindRegex)
-    quicc_list(FIND_REGEX _ALL_PATHS "boost" BOOST_ROOT)
-    message(VERBOSE "BOOST_ROOT: ${BOOST_ROOT}")
-  endif()
-endif()
-find_package(Boost 1.78)
-if(NOT Boost_FOUND)
-  message(FATAL_ERROR "Could not find Boost, required >= 1.78, try to specify path: -DBOOST_ROOT=</path/to/boost>")
-endif()
 
 #
 # Eigen
@@ -116,6 +99,14 @@ if(QUICC_USE_VKFFT)
   include(BundleVkFFT)
 endif()
 
+###################################################
+#------------ PFSOLVE JWT IMPLEMENTATION -----------#
+###################################################
+option(QUICC_USE_PFSOLVE "Enable PfSolve backend for JWT" OFF)
+
+if(QUICC_USE_PFSOLVE)
+  include(BundlePfSolve)
+endif()
 ###################################################
 #----- SPARSE LINEAR ALGEBRA IMPLEMENTATION ------#
 ###################################################

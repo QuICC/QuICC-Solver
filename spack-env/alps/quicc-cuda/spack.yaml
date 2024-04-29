@@ -12,39 +12,14 @@ spack:
   - cmake
   packages:
     all:
-      target: [zen3]
       providers:
         mpi: [cray-mpich]
-      variants: +cuda +openmp +mpi cuda_arch=80 build_type=Release
-    python:
-      buildable: false
-      externals:
-      - spec: python@3.9.13.1
-        prefix: /opt/cray/pe/python/3.9.13.1
+      variants: +cuda +openmp +mpi cuda_arch=90 build_type=Release
   concretizer:
     unify: true
     targets:
       host_compatible: false
   config:
     install_tree:
-      root: $SCRATCH/apps/cuda_software
-  view: $SCRATCH/apps/view_cudaquicc
-  modules:
-    default:
-      lmod:
-        core_compilers:
-        - gcc@11.3.0
-  compilers:
-  - compiler:
-      spec: gcc@7.5.0
-      paths:
-        cc: /usr/bin/gcc
-        cxx: /usr/bin/g++
-        f77: /usr/bin/gfortran
-        fc: /usr/bin/gfortran
-      flags: {}
-      operating_system: sles15
-      target: x86_64
-      modules: []
-      environment: {}
-      extra_rpaths: []
+      root: $SCRATCH/views/quicc_software
+  view: $SCRATCH/views/view_quicc
