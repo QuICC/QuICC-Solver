@@ -113,6 +113,28 @@ Internal::MHDFloat slaplSphJnl(const Internal::MHDFloat k, const int l,
    const Internal::MHDFloat r, const Internal::MHDFloat dNu);
 
 /**
+ * @brief Raise l by 1 on Spherical Bessel basis Jnl(k, l-1, r)
+ *        [-D + l/r] f_l(z)
+ *
+ * @param k Basis specific constant k
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat raiseSphJnl(const Internal::MHDFloat k, const int l,
+   const Internal::MHDFloat r, const Internal::MHDFloat dNu);
+
+/**
+ * @brief Lower l by 1 on Spherical Bessel basis Jnl(k, l+1, r)
+ *        [D + (l+1)/r] f_l(z)
+ *
+ * @param k Basis specific constant k
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat lowerSphJnl(const Internal::MHDFloat k, const int l,
+   const Internal::MHDFloat r, const Internal::MHDFloat dNu);
+
+/**
  * @brief Compute Bessel roots
  */
 void getRoots(std::vector<Internal::MHDFloat>& roots, const int l,

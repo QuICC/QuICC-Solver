@@ -86,11 +86,14 @@ namespace Integrator {
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == in.rows());
       assert(in.cols() <= rOut.cols());
-
+#ifdef QUICC_USE_PFSOLVE
+      this->transformBlock(rOut, in, true, true);
+#else
       this->transformBlock(rOut, in, true, true);
       this->transformBlock(rOut, in, true, false);
       this->transformBlock(rOut, in, false, true);
       this->transformBlock(rOut, in, false, false);
+#endif
    }
 
    void IWorlandIntegrator::transform(Matrix& rOut, const Matrix& in) const

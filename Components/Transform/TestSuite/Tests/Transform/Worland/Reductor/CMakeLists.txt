@@ -493,7 +493,7 @@ endforeach()
 
 # Kokkos reductor tests
 
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
 set(_tests
     Poly::EnergyR2:<kokkos_t>:reductor
     Poly::Energy:<kokkos_t>:reductor
@@ -738,6 +738,7 @@ endif()
 # Split reductor tests
 
 set(_split_tests
+  Fft::EnergyR2:<base_t>:reductor
   Poly::EnergyR2:<base_t>:reductor
   Poly::EnergyR2:<viewCpu_t>:reductor
 )
@@ -746,7 +747,7 @@ if(TARGET QuICC::Cuda)
     Poly::EnergyR2:<viewGpu_t>:reductor
   )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _split_tests
         Poly::EnergyR2:<kokkos_t>:reductor
         )
@@ -795,7 +796,7 @@ if(TARGET QuICC::Cuda)
   )
 endif()
 
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _split_tests
         Poly::PowerR2:<kokkos_t>:reductor
         )
@@ -825,7 +826,7 @@ if(TARGET QuICC::Cuda)
     Poly::RadialPower:<viewGpu_t>:reductor
   )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _split_tests
         Poly::RadialPower:<kokkos_t>:reductor
         )

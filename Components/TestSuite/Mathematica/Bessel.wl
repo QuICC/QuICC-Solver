@@ -8,18 +8,22 @@ $mpprec::usage="Precision for Worland computations, default is 100";
 
 bgrid::usage="wgrid[n] computes the Worland quadrature grid";
 bweights::usage="wweights[n] computes the Worland quadrature weights";
-norm::usage="norm[k,l,dv] norm of Bessel k";
+bnorm::usage="bnorm[k,l,dv] norm of Bessel k";
 
 $valueD\[Nu]::usage="nu = l + d\[Nu] for value boundary condition";
 $insulatingD\[Nu]::usage="nu = l + d\[Nu] for insulating boundary condition";
 
 (* Zeros *)
+getZero::usage="getZero[n,l,d\[Nu]]"
 valueZero::usage="valueZero[n,l]";
 insulatingZero::usage="insulatingZero[n,l]";
 valueZeros::usage="valueZeros[n,l]";
 insulatingZeros::usage="insulatingZeros[n,l]";
 
 (* Operators to work on grid*)
+Jnl::usage="Jnl[k,l,t,d\[Nu]]";
+lowerJnl::usage="lowerJnl[k,l,t,d\[Nu]]
+raiseJnl::usage="raiseJnl[k,l,t,d\[Nu]]
 ValueSphJnl::usage="ValueSphJnl[n,l,r]";
 InsulatingSphJnl::usage="InsulatingSphJnl[n,l,r]";
 ValueRSphJnl::usage="ValueRSphJnl[n,l,r]";
@@ -32,6 +36,10 @@ ValueDivrSphJnl::usage="ValueDivrSphJnl[n,l,r]";
 InsulatingDivrSphJnl::usage="InsulatingDivrSphJnl[n,l,r]";
 ValueDrSphJnl::usage="ValueDrSphJnl[n,l,r]";
 InsulatingDrSphJnl::usage="InsulatingDrSphJnl[n,l,r]";
+ValueRaiseSphJnl::usage="ValueRaiseSphJnl[n,l,r]";
+InsulatingRaiseSphJnl::usage="InsulatingRaiseSphJnl[n,l,r]";
+ValueLowerSphJnl::usage="ValueLowerSphJnl[n,l,r]";
+InsulatingLowerSphJnl::usage="InsulatingLowerSphJnl[n,l,r]";
 (*divrdrJnl operators*)
 ValueDivrdrSphJnl::usage="ValueDivrdrSphJnl[n,l,r]";
 ValueDivrdrSphJnlExplicit::usage="ValueDivrdrSphJnlExplicit[n,l,r]";
@@ -66,7 +74,7 @@ valueZeros[n_,l_]:=Table[valueZero[i,l],{i,0,n}];
 insulatingZeros[n_,l_]:=Table[insulatingZero[i,l] ,{i,0,n}];
 
 
-norm[k_,l_,d\[Nu]_]:=Module[{},
+bnorm[k_,l_,d\[Nu]_]:=Module[{},
 	If[d\[Nu]==$valueD\[Nu],
 		Abs[SphericalBesselJ[l+1,k]/Sqrt[2]],
 		If[d\[Nu]==$insulatingD\[Nu],
@@ -78,7 +86,7 @@ norm[k_,l_,d\[Nu]_]:=Module[{},
 
 
 (*Jnl*)
-Jnl[k_,l_,t_,d\[Nu]_]:=SphericalBesselJ[l, k t]/norm[k,l,d\[Nu]]
+Jnl[k_,l_,t_,d\[Nu]_]:=SphericalBesselJ[l, k t]/bnorm[k,l,d\[Nu]]
 (*rJnl*)
 rJnl[k_,l_,t_,d\[Nu]_]=Simplify[t Jnl[k,l,t,d\[Nu]]];
 (*dJnl*)
@@ -91,6 +99,10 @@ divrJnl[k_,l_,t_,d\[Nu]_]=Simplify[1/t Jnl[k,l,t,d\[Nu]]];
 drJnl[k_,l_,t_,d\[Nu]_]=Simplify[D[t Jnl[k,l,t,d\[Nu]],t]];
 (*divrdrJnl*)
 divrdrJnl[k_,l_,t_,d\[Nu]_]=Simplify[1/t D[t Jnl[k,l,t,d\[Nu]],t]];
+(*raiseJnl*)
+raiseJnl[k_,l_,t_,d\[Nu]_]:=Simplify[k SphericalBesselJ[l+1, k t]/bnorm[k,l,d\[Nu]]];
+(*lowerJnl*)
+lowerJnl[k_,l_,t_,d\[Nu]_]:=Simplify[k SphericalBesselJ[l-1, k t]/bnorm[k,l,d\[Nu]]];
 
 
 (*divrdrJnl operators*)
@@ -129,6 +141,10 @@ ValueDrSphJnl[n_,l_,r_]:=drJnl[valueZero[n,l],l,r,$valueD\[Nu]]
 InsulatingDrSphJnl[n_,l_,r_]:=drJnl[insulatingZero[n,l],l,r,$insulatingD\[Nu]]
 ValueDivrdrSphJnl[n_,l_,r_]:=divrdrJnl[valueZero[n,l],l,r,$valueD\[Nu]]
 InsulatingDivrdrSphJnl[n_,l_,r_]:=divrdrJnl[insulatingZero[n,l],l,r,$insulatingD\[Nu]]
+ValueRaiseSphJnl[n_,l_,r_]:=raiseJnl[valueZero[n,l],l,r,$valueD\[Nu]]
+InsulatingRaiseSphJnl[n_,l_,r_]:=raiseJnl[insulatingZero[n,l],l,r,$insulatingD\[Nu]]
+ValueLowerSphJnl[n_,l_,r_]:=lowerJnl[valueZero[n,l],l,r,$valueD\[Nu]]
+InsulatingLowerSphJnl[n_,l_,r_]:=lowerJnl[insulatingZero[n,l],l,r,$insulatingD\[Nu]]
 ValueDivrdrSphJnlExplicit[maxN_,l_,r_,w_]:=Module[{ks},
 	ks = Table[valueZero[n,l],{n,0,maxN+1}];
 	divrdrJnlExplicit[ks,l,r,$valueD\[Nu],w]

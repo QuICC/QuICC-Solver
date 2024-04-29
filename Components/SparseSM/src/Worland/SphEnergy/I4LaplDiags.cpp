@@ -50,7 +50,6 @@ I4LaplDiags::ACoeff_t I4LaplDiags::d_3(const ACoeff_t& n) const
 I4LaplDiags::ACoeff_t I4LaplDiags::d_2(const ACoeff_t& n) const
 {
    auto l1 = this->l();
-   auto l2 = l1 * l1;
    ACoeff_t val;
 
    val = -512.0 * (2.0 * l1 - 2.0 * n - 1.0) * (2.0 * l1 + 2.0 * n - 3.0) *
@@ -69,7 +68,6 @@ I4LaplDiags::ACoeff_t I4LaplDiags::d_1(const ACoeff_t& n) const
 {
    auto l1 = this->l();
    auto l2 = l1 * l1;
-   auto l3 = l2 * l1;
    ACoeff_t val;
 
    val =
@@ -89,7 +87,6 @@ I4LaplDiags::ACoeff_t I4LaplDiags::d0(const ACoeff_t& n) const
 {
    auto l1 = this->l();
    auto l2 = l1 * l1;
-   auto l3 = l2 * l1;
    ACoeff_t val;
 
    val = 2048.0 * (n + 1.0) * (2.0 * l1 + 2.0 * n + 1.0) *

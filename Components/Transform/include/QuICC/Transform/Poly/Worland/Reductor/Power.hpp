@@ -13,7 +13,7 @@
 //
 #include "QuICC/Transform/Poly/Worland/Reductor/Base/Power.hpp"
 #include "QuICC/Transform/Wrappers/Worland/Reductor/PowerviewCpu_t.hpp.inc"
-#if defined(QUICC_USE_KOKKOS_CUDA) || defined(QUICC_USE_KOKKOS_HIP)
+#ifdef QUICC_USE_KOKKOS
 #include "QuICC/Transform/Poly/Worland/Reductor/Kokkos/Power.hpp"
 #endif
 #ifdef QUICC_HAS_CUDA_BACKEND

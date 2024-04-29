@@ -6,6 +6,7 @@
 // System include
 //
 // clang-format off
+#include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include <boost/math/special_functions/bessel.hpp>
 // clang-format on
@@ -53,7 +54,7 @@ Internal::MHDFloat norm(const Internal::MHDFloat k, const int l,
    }
    else
    {
-      throw std::logic_error("Unknown Bessel d_nu");
+      throw std::logic_error("Unknown Bessel d_nu: " + std::to_string(static_cast<double>(dNu)));
    }
    val = boost::math::sph_bessel(nu, k) / Internal::Math::sqrt(2.0_mp);
 
@@ -83,8 +84,19 @@ Internal::MHDFloat rSphJnl(const Internal::MHDFloat k, const int l,
 Internal::MHDFloat r_1SphJnl(const Internal::MHDFloat k, const int l,
    const Internal::MHDFloat r, const Internal::MHDFloat dNu)
 {
+   using namespace Internal::Literals;
    Internal::MHDFloat val;
-   val = boost::math::sph_bessel(l, k * r) / r;
+   if (l == 0)
+   {
+      val = boost::math::sph_bessel(l, k * r) / r;
+   }
+   else
+   {
+      const Internal::MHDFloat c =
+         k / static_cast<Internal::MHDFloat>(2 * l + 1);
+      val = c * (boost::math::sph_bessel(l - 1, k * r) +
+                   boost::math::sph_bessel(l + 1, k * r));
+   }
 
    const auto scale = norm(k, l, dNu);
    return val / scale;
@@ -95,8 +107,18 @@ Internal::MHDFloat dSphJnl(const Internal::MHDFloat k, const int l,
 {
    auto dl = static_cast<Internal::MHDFloat>(l);
    Internal::MHDFloat val;
-   val = (dl / r) * boost::math::sph_bessel(l, k * r) -
-         k * boost::math::sph_bessel(l + 1, k * r);
+   if (l == 0)
+   {
+      val = (dl / r) * boost::math::sph_bessel(l, k * r) -
+            k * boost::math::sph_bessel(l + 1, k * r);
+   }
+   else
+   {
+      const Internal::MHDFloat c =
+         k / static_cast<Internal::MHDFloat>(2 * l + 1);
+      val = (c * dl) * boost::math::sph_bessel(l - 1, k * r) +
+            (c * dl - k) * boost::math::sph_bessel(l + 1, k * r);
+   }
 
    const auto scale = norm(k, l, dNu);
    return val / scale;
@@ -119,8 +141,18 @@ Internal::MHDFloat r_1drSphJnl(const Internal::MHDFloat k, const int l,
 {
    auto dl1 = static_cast<Internal::MHDFloat>(l + 1);
    Internal::MHDFloat val;
-   val = dl1 * boost::math::sph_bessel(l, k * r) / r -
-         k * boost::math::sph_bessel(l + 1, k * r);
+   if (l == 0)
+   {
+      val = dl1 * boost::math::sph_bessel(l, k * r) / r -
+            k * boost::math::sph_bessel(l + 1, k * r);
+   }
+   else
+   {
+      const Internal::MHDFloat c =
+         k / static_cast<Internal::MHDFloat>(2 * l + 1);
+      val = dl1 * c * boost::math::sph_bessel(l - 1, k * r) +
+            (dl1 * c - k) * boost::math::sph_bessel(l + 1, k * r);
+   }
 
    const auto scale = norm(k, l, dNu);
    return val / scale;
@@ -131,6 +163,37 @@ Internal::MHDFloat slaplSphJnl(const Internal::MHDFloat k, const int l,
 {
    Internal::MHDFloat val;
    val = -k * k * boost::math::sph_bessel(l, k * r);
+
+   const auto scale = norm(k, l, dNu);
+   return val / scale;
+}
+
+Internal::MHDFloat raiseSphJnl(const Internal::MHDFloat k, const int l,
+   const Internal::MHDFloat r, const Internal::MHDFloat dNu)
+{
+   using namespace Internal::Literals;
+   Internal::MHDFloat val;
+
+   val = k * boost::math::sph_bessel(l + 1, k * r);
+
+   const auto scale = norm(k, l, dNu);
+   return val / scale;
+}
+
+Internal::MHDFloat lowerSphJnl(const Internal::MHDFloat k, const int l,
+   const Internal::MHDFloat r, const Internal::MHDFloat dNu)
+{
+   using namespace Internal::Literals;
+   Internal::MHDFloat val;
+
+   if (l > 0)
+   {
+      val = k * boost::math::sph_bessel(l - 1, k * r);
+   }
+   else
+   {
+      throw std::logic_error("Negative Bessel parameter is not defined");
+   }
 
    const auto scale = norm(k, l, dNu);
    return val / scale;

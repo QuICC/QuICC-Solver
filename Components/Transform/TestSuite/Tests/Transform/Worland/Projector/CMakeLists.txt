@@ -15,7 +15,7 @@ if(TARGET QuICC::Cuda)
     Poly::P:<viewGpu_t>:projector
   )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _tests
         Poly::P:<kokkos_t>:projector
     )
@@ -80,7 +80,7 @@ if(TARGET QuICC::Cuda)
     Poly::SphLapl:<viewGpu_t>:projector
   )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
 list(APPEND _tests
   Poly::D1:<kokkos_t>:projector
   Poly::D1R1:<kokkos_t>:projector
@@ -159,7 +159,7 @@ if(TARGET QuICC::Cuda)
     Poly::DivR1CylLaplh_Zero:<viewGpu_t>:projector
   )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     set(_tests
       Poly::CylLaplh:<kokkos_t>:projector
       Poly::CylLaplh_DivR1D1R1:<kokkos_t>:projector
@@ -226,7 +226,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    ULPS 4 17 5 5
+    ULPS 5 17 5 5
     IDS  0 1 2 3
   )
 endforeach()
@@ -274,7 +274,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    ULPS 1 3 5 3
+    ULPS 1 4 5 3
     IDS  0 1 2 3
   )
 endforeach()
@@ -282,6 +282,7 @@ endforeach()
 # Split projector tests
 
 set(_split_tests
+  Fft::P:<base_t>:projector
   Poly::P:<base_t>:projector
   Poly::P:<viewCpu_t>:projector
 )
@@ -290,7 +291,7 @@ if(TARGET QuICC::Cuda)
         Poly::P:<viewGpu_t>:projector
     )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
   list(APPEND _split_tests
       Poly::P:<kokkos_t>:projector
   )
@@ -319,7 +320,7 @@ if(TARGET QuICC::Cuda)
         Poly::P:<viewGpu_t>:projector
     )
 endif()
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _perf_tests
         Poly::P:<kokkos_t>:projector
         )

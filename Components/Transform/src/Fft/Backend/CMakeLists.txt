@@ -44,4 +44,5 @@ quicc_target_cuda_sources(_useCUDA ${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_
 )
 
 add_subdirectory(Fftw)
+add_subdirectory(PfSolve)
 add_subdirectory(CuFft)

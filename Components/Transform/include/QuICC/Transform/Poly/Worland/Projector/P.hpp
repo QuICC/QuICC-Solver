@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Projector/Base/P.hpp"
-#if defined(QUICC_USE_KOKKOS_CUDA) || defined(QUICC_USE_KOKKOS_HIP)
+#ifdef QUICC_USE_KOKKOS
 #include "QuICC/Transform/Poly/Worland/Projector/Kokkos/P.hpp"
 #endif
 #include "QuICC/Transform/Wrappers/Worland/Projector/PviewCpu_t.hpp.inc"

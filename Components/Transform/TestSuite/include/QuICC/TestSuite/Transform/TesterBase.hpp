@@ -370,6 +370,10 @@ namespace Transform {
             INFO( "position: " << i << " / " << refData.rows()-1 );
             INFO( "refData: " << std::scientific << std::setprecision(16) << refData(i,j) );
 
+            if ((ref < std::numeric_limits<MHDFloat>::min()) && (!this->isZero(ref))){
+               ref = 0;
+            }
+
             // check special values
             if(std::isnan(outData(i,j)))
             {

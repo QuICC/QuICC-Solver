@@ -35,12 +35,12 @@ void KokkosIWorlandRadialPower::initOperators(const Internal::Array& igrid,
 
    for (int i = 0; i < slowSize; i++)
    {
-      scan[i + 1] = scan[i] + this->mspSetup->fastSize(i);
+      scan[i + 1] = scan[i] + igrid.size();
    }
    total = scan[slowSize];
    // reserve storage on the device for horizontal layout left
    // It will not affect the cuda limit on the horizontal block dim.
-   this->vmOps = OpMatrixL("vmops", igrid.size(), total);
+   this->vmOps = OpMatrixL("vmops", total, this->mspSetup->fastSize(0));
    // Create host view
    auto vmOpsHost = Kokkos::create_mirror_view(this->vmOps);
 
@@ -50,7 +50,7 @@ void KokkosIWorlandRadialPower::initOperators(const Internal::Array& igrid,
       // Build operator
       Matrix op;
       this->makeOperator(op, igrid, iweights, i);
-      add_contribution_to_view_right(vmOpsHost, scan[i], op);
+      add_contribution_to_view_left(vmOpsHost, scan[i], op);
    }
 
    Kokkos::deep_copy(this->vmOps, vmOpsHost);
@@ -73,18 +73,10 @@ void KokkosIWorlandRadialPower::applyOperators(Matrix& rOut,
 
    Profiler::RegionStart<4>("KokkosIWorlandProjector::hostScan");
 
-   // Changing col size or row size? If change then it behaves as a worland
-   // projector
-   int change = this->mspSetup->mult(slowSize - 1) - this->mspSetup->mult(0);
    for (int i = 0; i < this->mspSetup->slowSize(); i++)
    {
-      int val = 0;
-      if (change)
-         val = this->mspSetup->mult(i);
-      else
-         val = this->mspSetup->fastSize(i);
-
-      hostScan[i + 1] = hostScan[i] + val;
+      int cols = this->mspSetup->mult(i);
+      hostScan[i + 1] = hostScan[i] + cols;
    }
 
    Profiler::RegionStop<4>("KokkosIWorlandProjector::hostScan");
@@ -93,32 +85,15 @@ void KokkosIWorlandRadialPower::applyOperators(Matrix& rOut,
 
    auto total = hostScan(slowSize);
 
-   if (change)
-   {
-      OpMatrixLZL inView("inView", in.rows(), in.cols());
-      DeepCopyEigen(inView, in);
-      OpMatrixL rOutView("rOutView", rOut.rows(), rOut.cols());
+   OpMatrixLZL inView("inView", in.rows(), in.cols());
+   DeepCopyEigen(inView, in);
+   OpMatrixL rOutView("rOutView", rOut.rows(), rOut.cols());
 
-      Profiler::RegionStart<4>("KokkosIWorlandProjector::applyUnitOperator");
-      this->applyUnitOperator(rOutView, inView, scan, total);
-      Profiler::RegionStop<4>("KokkosIWorlandProjector::applyUnitOperator");
+   Profiler::RegionStart<4>("KokkosIWorlandProjector::applyUnitOperator");
+   this->applyUnitOperator(rOutView, inView, scan, total);
+   Profiler::RegionStop<4>("KokkosIWorlandProjector::applyUnitOperator");
 
-      DeepCopyEigen(rOut, rOutView);
-   }
-   else
-   {
-      auto col_size = this->mspSetup->mult(0);
-
-      OpMatrixLZ inView("inView", total, col_size);
-      DeepCopyEigen(inView, in, hostScan, col_size);
-      OpMatrixL rOutView("rOutView", rOut.rows() * slowSize, col_size);
-
-      Profiler::RegionStart<4>("KokkosIWorlandProjector::applyUnitOperator");
-      this->applyUnitOperator(rOutView, inView, scan, total);
-      Profiler::RegionStop<4>("KokkosIWorlandProjector::applyUnitOperator");
-
-      DeepCopyEigen(rOut, rOutView, col_size);
-   }
+   DeepCopyEigen(rOut, rOutView);
 }
 
 void KokkosIWorlandRadialPower::applyOperators(MatrixZ& rOut,

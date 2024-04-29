@@ -34,22 +34,22 @@ void KokkosIWorlandProjector::initOperators(const Internal::Array& igrid,
 
    for (int i = 0; i < slowSize; i++)
    {
-      scan[i + 1] = scan[i] + this->mspSetup->fastSize(i);
+      scan[i + 1] = scan[i] + igrid.size();
    }
    total = scan[slowSize];
    // reserve storage on the device for horizontal layout left
    // It will not affect the cuda limit on the horizontal block dim.
-   this->vmOps = OpMatrixL("vmops", igrid.size(), total);
+   this->vmOps = OpMatrixL("vmops", total, this->mspSetup->fastSize(0));
    // Create host view
    auto vmOpsHost = Kokkos::create_mirror_view(this->vmOps);
 
    // Loop over harmonic orders
-   for (int i = 0; i < this->mspSetup->slowSize(); i++)
+   for (int i = 0; i < slowSize; i++)
    {
       // Build operator
       Matrix op;
       this->makeOperator(op, igrid, iweights, i);
-      add_contribution_to_view_right(vmOpsHost, scan[i], op);
+      add_contribution_to_view_left(vmOpsHost, scan[i], op);
    }
 
    Kokkos::deep_copy(this->vmOps, vmOpsHost);
@@ -96,12 +96,6 @@ void KokkosIWorlandProjector::applyOperators(MatrixZ& rOut,
    Profiler::RegionStop<4>("KokkosIWorlandProjector::applyUnitOperator");
 
    DeepCopyEigen(rOut, rOutView);
-}
-
-void KokkosIWorlandProjector::defaultApplyOperator(OpMatrixR rOut, const int i,
-   const OpMatrixCR& in) const
-{
-   rOut = this->mOps.at(i).transpose() * in;
 }
 
 int KokkosIWorlandProjector::outRows() const

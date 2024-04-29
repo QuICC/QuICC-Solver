@@ -68,7 +68,6 @@ inline void dSphJnl::compute(
 {
    const int nPoly = roots.size();
 
-   auto dl = static_cast<Internal::MHDFloat>(l);
    for (int j = 0; j < nPoly; j++)
    {
       auto k = roots.at(j);
