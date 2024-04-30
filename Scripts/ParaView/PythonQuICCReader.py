@@ -68,7 +68,7 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         self._scheme = self._current_file['/'].attrs['type']
 
         # Spherical schemes
-        if self._scheme in [b'SLFl', b'SLFm', b'WLFl', b'WLFm']:
+        if self._scheme in [b'SLFl', b'SLFm', b'WLFl', b'WLFm', b'JLFl', b'JLFm']:
             self._components = ['r', 'theta', 'phi']
             self._make_mesh_coordinates = self._spherical_mesh
             self._vcomp = dict({'x':self._spherical_x_vcomp, 'y':self._spherical_y_vcomp, 'z':self._spherical_z_vcomp})
