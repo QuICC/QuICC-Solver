@@ -73,11 +73,11 @@ namespace Integrator {
       {
          using poly_t = QuICC::Polynomial::Bessel::implicit_t;
 
+         Internal::Matrix top(igrid.size(), nPoly);
          TBc<Polynomial::Bessel::r_1drSphJnl<poly_t>> r_1drJnl;
-         r_1drJnl.template compute<Internal::MHDFloat>(op, nPoly, l, igrid, iweights);
+         r_1drJnl.template compute<Internal::MHDFloat>(top, nPoly, l, igrid, iweights);
 
-         assert(op.rows() == igrid.size());
-         assert(op.cols() == nPoly);
+         op = top.cast<MHDFloat>();
       }
    }
 

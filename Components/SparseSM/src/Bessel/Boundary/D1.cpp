@@ -47,11 +47,12 @@ namespace Boundary {
       }
 
       std::vector<Internal::MHDFloat> roots;
-      Polynomial::SphericalBessel::getRoots(roots, this->l(), maxN+1, dNu);
+      int il = static_cast<int>(this->l());
+      Polynomial::SphericalBessel::getRoots(roots, il, maxN+1, dNu);
       for(int i = 0; i < val.size(); i++)
       {
          const auto& k = roots.at(i);
-         val(i) = Polynomial::SphericalBessel::dSphJnl(k, this->l(), 1_mp, dNu);
+         val(i) = Polynomial::SphericalBessel::dSphJnl(k, il, 1_mp, dNu);
       }
 
       return val;

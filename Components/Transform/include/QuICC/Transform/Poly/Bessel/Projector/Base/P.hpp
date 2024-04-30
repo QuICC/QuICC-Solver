@@ -61,9 +61,11 @@ namespace Projector {
 
       // Build operator
       int nPoly = this->mspSetup->fastSize(i);
-      op.resize(igrid.size(), nPoly);
+      Internal::Matrix top(igrid.size(), nPoly);
       TBc<Polynomial::Bessel::SphJnl> jnl;
-      jnl.template compute<MHDFloat>(op, nPoly, l, igrid, Internal::Array());
+      jnl.template compute<Internal::MHDFloat>(top, nPoly, l, igrid, Internal::Array());
+
+      op = top.cast<MHDFloat>();
    }
 
 }

@@ -71,8 +71,11 @@ namespace Projector {
       }
       else
       {
+         Internal::Matrix top(igrid.size(), nPoly);
          TBc<Polynomial::Bessel::r_1SphJnl> jnl;
-         jnl.template compute<MHDFloat>(op, nPoly, l, igrid, Internal::Array());
+         jnl.template compute<Internal::MHDFloat>(top, nPoly, l, igrid, Internal::Array());
+
+         op = top.cast<MHDFloat>();
       }
    }
 

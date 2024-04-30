@@ -64,9 +64,10 @@ namespace Integrator {
 
       // Build operator
       int nPoly = this->mspSetup->fastSize(i);
-      op.resize(igrid.size(), nPoly);
+      Internal::Matrix top(igrid.size(), nPoly);
       TBc<Polynomial::Bessel::SphJnl> jnl;
-      jnl.template compute<Internal::MHDFloat>(op, nPoly, l, igrid, iweights);
+      jnl.template compute<Internal::MHDFloat>(top, nPoly, l, igrid, iweights);
+      op = top.cast<MHDFloat>();
    }
 
 }

@@ -71,8 +71,11 @@ namespace Integrator {
       }
       else
       {
+         Internal::Matrix top(igrid.size(), nPoly);
          TBc<Polynomial::Bessel::rSphJnl> jnl;
-         jnl.template compute<Internal::MHDFloat>(op, nPoly, l, igrid, iweights);
+         jnl.template compute<Internal::MHDFloat>(top, nPoly, l, igrid, iweights);
+
+         op = top.cast<MHDFloat>();
       }
    }
 
