@@ -23,9 +23,6 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
     if (_thisArr[index] == nullptr) {
         // check perm attribute
         auto perm = op.getPermutation();
-        assert(perm[0] == 2);
-        assert(perm[1] == 0);
-        assert(perm[2] == 1);
         if (_isCpu)
         {
           using namespace QuICC::Transpose::Cpu;
@@ -36,7 +33,7 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
           auto tensor = inTy.cast<RankedTensorType>();
           std::string inTyStr = tensor.getEncoding().cast<StringAttr>().str();
           /// \todo check output attribute
-          if (inTyStr == "C_DCCSC3D_t")
+          if (inTyStr == "C_DCCSC3D_t" && perm[0] == 2 && perm[1] == 0)
           {
             using Tin = C_DCCSC3D_t;
             using Tout = C_DCCSC3D_t;
@@ -46,11 +43,31 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (inTyStr == "C_S1CLCSC3D_t")
+          else if (inTyStr == "C_DCCSC3D_t" && perm[0] == 1 && perm[1] == 2)
+          {
+            using Tin = C_DCCSC3D_t;
+            using Tout = C_DCCSC3D_t;
+            using op_t = Op<Tout, Tin, p120_t>;
+            _ops.push_back(std::make_unique<op_t>());
+            auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+            assert(ptr != nullptr);
+            _thisArr[index] = ptr;
+          }
+          else if (inTyStr == "C_S1CLCSC3D_t" && perm[0] == 2 && perm[1] == 0)
           {
             using Tin = C_S1CLCSC3D_t;
             using Tout = C_DCCSC3D_t;
             using op_t = Op<Tout, Tin, p201_t>;
+            _ops.push_back(std::make_unique<op_t>());
+            auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+            assert(ptr != nullptr);
+            _thisArr[index] = ptr;
+          }
+          else if (inTyStr == "C_S1CLCSC3D_t" && perm[0] == 1 && perm[1] == 2)
+          {
+            using Tin = C_S1CLCSC3D_t;
+            using Tout = C_DCCSC3D_t;
+            using op_t = Op<Tout, Tin, p120_t>;
             _ops.push_back(std::make_unique<op_t>());
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
@@ -68,7 +85,7 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
           auto tensor = inTy.cast<RankedTensorType>();
           std::string inTyStr = tensor.getEncoding().cast<StringAttr>().str();
           /// \todo check output attribute
-          if (inTyStr == "C_DCCSC3D_t")
+          if (inTyStr == "C_DCCSC3D_t" && perm[0] == 2 && perm[1] == 0)
           {
             using Tin = C_DCCSC3D_t;
             using Tout = C_DCCSC3DJIK_t;
@@ -78,7 +95,7 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (inTyStr == "C_S1CLCSC3DJIK_t")
+          else if (inTyStr == "C_S1CLCSC3DJIK_t" && perm[0] == 2 && perm[1] == 0)
           {
             using Tin = C_S1CLCSC3DJIK_t;
             using Tout = C_DCCSC3DJIK_t;
