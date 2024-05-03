@@ -59,12 +59,16 @@ template <class Tout, class Tin, class Perm>
 void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 {
     Profiler::RegionFixture<4> fix("Transpose::Cpu::applyImpl");
-    if (std::is_same_v<Perm, p201_t> &&
+    if constexpr (std::is_same_v<Perm, p201_t> &&
         std::is_same_v<typename Tin::AttributesType, View::DCCSC3D> &&
         std::is_same_v<typename Tout::AttributesType, View::DCCSC3D>) {
         // dense transpose
         assert(out.size() == in.size());
         assert(out.size() == out.dims()[0]*out.dims()[1]*out.dims()[2]);
+        // perm = [2, 0, 1]
+        assert(in.dims()[0] == out.dims()[2]);
+        assert(in.dims()[1] == out.dims()[0]);
+        assert(in.dims()[2] == out.dims()[1]);
         auto I = in.dims()[0];
         auto J = in.dims()[1];
         auto K = in.dims()[2];
@@ -80,11 +84,40 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
             }
         }
     }
-    else if (std::is_same_v<Perm, p201_t> &&
+    else if constexpr (std::is_same_v<Perm, p120_t> &&
+        std::is_same_v<typename Tin::AttributesType, View::DCCSC3D> &&
+        std::is_same_v<typename Tout::AttributesType, View::DCCSC3D>) {
+        // dense transpose
+        assert(out.size() == in.size());
+        assert(out.size() == out.dims()[0]*out.dims()[1]*out.dims()[2]);
+        // perm = [1, 2, 0]
+        assert(in.dims()[0] == out.dims()[1]);
+        assert(in.dims()[1] == out.dims()[2]);
+        assert(in.dims()[2] == out.dims()[0]);
+        auto I = out.dims()[0];
+        auto J = out.dims()[1];
+        auto K = out.dims()[2];
+        for (std::size_t k = 0; k < K; ++k) {
+            for (std::size_t j = 0; j < J; ++j) {
+                for (std::size_t i = 0; i < I; ++i) {
+                    std::size_t ijk = i + j*I + k*I*J;
+                    std::size_t jki = j + k*J + i*J*K;
+                    assert(jki < in.size());
+                    assert(ijk < out.size());
+                    out[ijk] = in[jki];
+                }
+            }
+        }
+    }
+    else if constexpr (std::is_same_v<Perm, p201_t> &&
         std::is_same_v<typename Tin::AttributesType, View::S1CLCSC3D> &&
         std::is_same_v<typename Tout::AttributesType, View::DCCSC3D>) {
         // dense transpose
         assert(out.size() == in.size());
+        // perm = [2, 0, 1]
+        assert(in.dims()[0] == out.dims()[2]);
+        assert(in.dims()[1] == out.dims()[0]);
+        assert(in.dims()[2] == out.dims()[1]);
         auto I = in.dims()[0];
         auto J = in.dims()[1];
         auto K = in.dims()[2];
@@ -119,6 +152,53 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
                     assert(ijk < in.size());
                     assert(jki < out.size());
                     out[jki] = in[ijk];
+                }
+            }
+        }
+    }
+    else if constexpr (std::is_same_v<Perm, p120_t> &&
+        std::is_same_v<typename Tout::AttributesType, View::S1CLCSC3D> &&
+        std::is_same_v<typename Tin::AttributesType, View::DCCSC3D>) {
+        // dense transpose
+        assert(out.size() == in.size());
+        // perm = [1, 2, 0]
+        assert(in.dims()[0] == out.dims()[1]);
+        assert(in.dims()[1] == out.dims()[2]);
+        assert(in.dims()[2] == out.dims()[0]);
+        auto I = out.dims()[0];
+        auto J = out.dims()[1];
+        auto K = out.dims()[2];
+        // access S1CLCSC3D
+        // cumulative column height is (with ijk) I*k - sum(i)_0^k
+        // iSum shifted by 1
+        std::vector<std::uint32_t> iSum(K, 0);
+        for (std::size_t i = 2; i < K; ++i) {
+            iSum[i] = iSum[i-1] + 1;
+        }
+        pSum(iSum);
+        // cumulative row width (with jki)
+        // kSum shifted by 1
+        std::vector<std::uint32_t> kSum(I);
+        kSum[I-1] = K-2;
+        for (std::size_t i = I-1; i > 0; --i) {
+            if (kSum[i] > 0) {
+                kSum[i-1] = kSum[i] - 1;
+            }
+            else {
+                kSum[i-1] = 0;
+            }
+        }
+        pSum(kSum);
+
+        for (std::size_t k = 0; k < K; ++k) {
+            std::size_t Iloc = I - k;
+            for (std::size_t j = 0; j < J; ++j) {
+                for (std::size_t i = 0; i < Iloc; ++i) {
+                    std::size_t ijk = i + j*Iloc + (k*I-iSum[k])*J;
+                    std::size_t jki = j + k*J + (i*K-kSum[i])*J;
+                    assert(jki < in.size());
+                    assert(ijk < out.size());
+                    out[ijk] = in[jki];
                 }
             }
         }

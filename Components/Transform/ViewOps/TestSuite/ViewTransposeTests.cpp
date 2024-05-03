@@ -7,7 +7,7 @@
 using namespace QuICC::Memory;
 using namespace QuICC::View;
 
-TEST_CASE("Serial DCCSC3D to DCCSC3D", "SerialDCCSC3DtoDCCSC3D")
+TEST_CASE("Serial DCCSC3D to DCCSC3D 210", "SerialDCCSC3DtoDCCSC3D210")
 {
     // FFT out -> AL in
     // Full data and type
@@ -21,26 +21,29 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D", "SerialDCCSC3DtoDCCSC3D")
         /*k1*/ 9, 10, 11, 12,
         /*k1*/ 13, 14, 15, 16};
 
+    // perm = [2 0 1] -> N K M
     std::array<double, S> dataOut;
 
     // view
     constexpr std::uint32_t rank = 3;
     std::array<std::uint32_t, rank> dimensionsIn{M, N, K};
-    std::array<std::uint32_t, rank> dimensionsOut{N, M, K};
+    std::array<std::uint32_t, rank> dimensionsOut{N, K, M};
     // skip setting up pointers and indices
     // they are not used in the serial aka dense tranpose
     std::array<std::vector<std::uint32_t>, rank> pointers = {
         {{}, {}, {}}};
     std::array<std::vector<std::uint32_t>, rank> indices = {
         {{}, {}, {}}};
-    View<double, DCCSC3D> viewIn(dataIn, dimensionsIn, pointers, indices);
-    View<double, DCCSC3D> viewOut(dataOut, dimensionsOut, pointers, indices);
+    using inTy = DCCSC3D;
+    using outTy = DCCSC3D;
+    View<double, inTy> viewIn(dataIn, dimensionsIn, pointers, indices);
+    View<double, outTy> viewOut(dataOut, dimensionsOut, pointers, indices);
 
     // Transpose op
     using namespace QuICC::Transpose::Cpu;
     using namespace QuICC::Transpose;
     auto transposeOp =
-      std::make_unique<Op<View<double, DCCSC3D>, View<double, DCCSC3D>, p201_t>>();
+      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>();
 
     transposeOp->apply(viewOut, viewIn);
 
@@ -59,7 +62,62 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D", "SerialDCCSC3DtoDCCSC3D")
     }
 }
 
-TEST_CASE("Serial S1CLCSC3D to DCCSC3D", "SerialS1CLCSC3DtoDCCSC3D")
+TEST_CASE("Serial DCCSC3D to DCCSC3D 120", "SerialDCCSC3DtoDCCSC3D120")
+{
+    // FFT out -> AL in
+    // Full data and type
+    constexpr size_t M = 4;
+    constexpr size_t N = 2;
+    constexpr size_t K = 2;
+
+    constexpr size_t S = M * N * K;
+    std::array<double, S> dataIn = {/*k0*/ 1, 2, 3, 4,
+        /*k0*/ 5, 6, 7, 8,
+        /*k1*/ 9, 10, 11, 12,
+        /*k1*/ 13, 14, 15, 16};
+
+    // perm = [1 2 0] -> K M N
+    std::array<double, S> dataOut;
+
+    // view
+    constexpr std::uint32_t rank = 3;
+    std::array<std::uint32_t, rank> dimensionsIn{M, N, K};
+    std::array<std::uint32_t, rank> dimensionsOut{K, M, N};
+    // skip setting up pointers and indices
+    // they are not used in the serial aka dense tranpose
+    std::array<std::vector<std::uint32_t>, rank> pointers = {
+        {{}, {}, {}}};
+    std::array<std::vector<std::uint32_t>, rank> indices = {
+        {{}, {}, {}}};
+    using inTy = DCCSC3D;
+    using outTy = DCCSC3D;
+    View<double, inTy> viewIn(dataIn, dimensionsIn, pointers, indices);
+    View<double, outTy> viewOut(dataOut, dimensionsOut, pointers, indices);
+
+    // Transpose op
+    using namespace QuICC::Transpose::Cpu;
+    using namespace QuICC::Transpose;
+    auto transposeOp =
+      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p120_t>>();
+
+    transposeOp->apply(viewOut, viewIn);
+
+    // check
+    for (std::uint64_t k = 0; k < K; ++k)
+    {
+        for (std::uint64_t n = 0; n < N; ++n)
+        {
+            for (std::uint64_t m = 0; m < M; ++m)
+            {
+                auto mnk = m + n*M + k*M*N;
+                auto kmn = k + m*K + n*K*M;
+                CHECK(viewIn[mnk] == viewOut[kmn]);
+            }
+        }
+    }
+}
+
+TEST_CASE("Serial S1CLCSC3D to DCCSC3D 210", "SerialS1CLCSC3DtoDCCSC3D210")
 {
     // AL out -> JW in
     // Full data and type
@@ -119,7 +177,7 @@ TEST_CASE("Serial S1CLCSC3D to DCCSC3D", "SerialS1CLCSC3DtoDCCSC3D")
     }
 }
 
-TEST_CASE("Serial DCCSC3D to S1CLCSC3D", "SerialDCCSC3DtoS1CLCSC3D")
+TEST_CASE("Serial DCCSC3D to S1CLCSC3D 120", "SerialDCCSC3DtoS1CLCSC3D120")
 {
     // JW out -> AL in
     // Full data and type
@@ -152,7 +210,7 @@ TEST_CASE("Serial DCCSC3D to S1CLCSC3D", "SerialDCCSC3DtoS1CLCSC3D")
 
     // view
     constexpr std::uint32_t rank = 3;
-    std::array<std::uint32_t, rank> dimensionsIn{N, M, K};
+    std::array<std::uint32_t, rank> dimensionsIn{N, K, M};
     std::array<std::uint32_t, rank> dimensionsOut{M, N, K};
     // skip setting up pointers and indices
     // they are not used in the serial aka dense tranpose
