@@ -214,6 +214,13 @@ add_executable(ViewTransposeTest
     ViewTransposeTests.cpp
 )
 
+if(TARGET QuICC::Cuda)
+    target_sources(ViewTransposeTest
+        PRIVATE
+            ViewTransposeTests.cu
+    )
+endif()
+
 target_link_libraries(ViewTransposeTest
     ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
     Catch2::Catch2
