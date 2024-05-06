@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the equation to generate an exact vector solution in a sphere
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Generator/States/SphereExactVectorState.hpp"
-
 // Project includes
 //
+#include "QuICC/Generator/States/SphereExactVectorState.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
 #include "Types/Typedefs.hpp"
 #include "Types/Math.hpp"

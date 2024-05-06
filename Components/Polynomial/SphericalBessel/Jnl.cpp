@@ -164,6 +164,7 @@ Internal::MHDFloat drSphJnl(const Internal::MHDFloat k, const int l,
 Internal::MHDFloat r_1drSphJnl(const Internal::MHDFloat k, const int l,
    const Internal::MHDFloat r, const Internal::MHDFloat dNu)
 {
+   auto dl = static_cast<Internal::MHDFloat>(l);
    auto dl1 = static_cast<Internal::MHDFloat>(l + 1);
    Internal::MHDFloat val;
    if (l == 0)
@@ -175,8 +176,9 @@ Internal::MHDFloat r_1drSphJnl(const Internal::MHDFloat k, const int l,
    {
       const Internal::MHDFloat c =
          k / static_cast<Internal::MHDFloat>(2 * l + 1);
-      val = dl1 * c * boost::math::sph_bessel(l - 1, k * r) +
-            (dl1 * c - k) * boost::math::sph_bessel(l + 1, k * r);
+
+      val = c*(dl1 * boost::math::sph_bessel(l - 1, k * r) -
+            dl * boost::math::sph_bessel(l + 1, k * r));
    }
 
    const auto scale = norm(k, l, dNu);

@@ -6,16 +6,10 @@
 #ifndef QUICC_EQUATIONS_SPHEREEXACTSCALARSTATE_HPP
 #define QUICC_EQUATIONS_SPHEREEXACTSCALARSTATE_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <map>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //

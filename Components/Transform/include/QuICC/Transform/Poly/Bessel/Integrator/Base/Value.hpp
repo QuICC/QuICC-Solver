@@ -57,7 +57,7 @@ namespace Integrator {
 
       if constexpr(N > 0)
       {
-         op.bottomRows(N).setZero();
+         op.rightCols(N).setZero();
       }
    }
 

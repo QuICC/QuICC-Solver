@@ -98,26 +98,26 @@ namespace Transform {
       FieldComponents::Spectral::Id scalId = components.at(0).first;
       auto flag = components.at(0).second;
 
+      std::size_t rId;
       // Value BC
       if(flag == Path::ValueScalar::id())
       {
-         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
-         transform.back().addEdge(Forward::P::id());
-         transform.back().addEdge(Forward::P::id());
-         transform.back().addEdge(Forward::ValueP::id(), scalId, Arithmetics::Add::id());
+         rId = Forward::ValueP::id();
       }
       // Insulating BC
       else if(flag == Path::InsulatingScalar::id())
       {
-         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
-         transform.back().addEdge(Forward::P::id());
-         transform.back().addEdge(Forward::P::id());
-         transform.back().addEdge(Forward::InsulatingP::id(), scalId, Arithmetics::Add::id());
+         rId = Forward::InsulatingP::id();
       }
       else
       {
-         throw std::logic_error("Requested an unknown scalar forward transform (ID = " + std::to_string(flag) + ")");
+         throw std::logic_error("Unknown backward scalar transform path");
       }
+
+      transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+      transform.back().addEdge(Forward::P::id());
+      transform.back().addEdge(Forward::P::id());
+      transform.back().addEdge(rId, scalId, Arithmetics::Add::id());
 
       return transform;
    }
@@ -130,28 +130,28 @@ namespace Transform {
       FieldComponents::Spectral::Id scalId = components.at(0).first;
       auto flag = components.at(0).second;
 
-      DebuggerMacro_msg("Using SphereBesselTransformSteps for forwardNLScalar", 1);
-
+      std::size_t rId;
       // Value BC
       if(flag == Path::ValueScalarNl::id())
       {
-         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
-         transform.back().addEdge(Forward::P::id());
-         transform.back().addEdge(Forward::P::id());
-         transform.back().addEdge(Forward::ValueP::id(), scalId, Arithmetics::Add::id());
+         rId = Forward::ValueP::id();
       }
       // Insulating BC
       else if(flag == Path::InsulatingScalarNl::id())
       {
-         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
-         transform.back().addEdge(Forward::P::id());
-         transform.back().addEdge(Forward::P::id());
-         transform.back().addEdge(Forward::InsulatingP::id(), scalId, Arithmetics::Add::id());
+         rId = Forward::InsulatingP::id();
       }
       else
       {
          throw std::logic_error("Requested an unknown nonlinear scalar forward transform (ID = " + std::to_string(flag) + ")");
       }
+
+      DebuggerMacro_msg("Using SphereBesselTransformSteps for forwardNLScalar", 1);
+
+      transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+      transform.back().addEdge(Forward::P::id());
+      transform.back().addEdge(Forward::P::id());
+      transform.back().addEdge(rId, scalId, Arithmetics::Add::id());
 
       return transform;
    }
@@ -384,7 +384,7 @@ namespace Transform {
       }
       else
       {
-         throw std::logic_error("Unknown path transform path");
+         throw std::logic_error("Unknown backward scalar transform path");
       }
 
       transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::SCALAR));
