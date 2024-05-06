@@ -35,8 +35,9 @@ extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
     pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
     ViewBase<std::uint32_t> indices[rank];
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
-    assert(pUmod->pos == pUval->pos);
-    assert(pUmod->coo == pUval->coo);
+    /// \todo stronger check?
+    assert(pUmod->posSize == pUval->posSize);
+    assert(pUmod->cooSize == pUval->cooSize);
     Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     // Check that op was set up

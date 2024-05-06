@@ -218,20 +218,6 @@ TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
   auto modsK = modsDims[2];
 
   // Populate meta for fully populated tensor
-  // // Physical space
-  // std::vector<std::uint32_t> ptrPhys(K+1);
-  // std::vector<std::uint32_t> idxPhys(K*N);
-  // ptrPhys[0] = 0;
-  // for (std::size_t i = 1; i < ptrPhys.size(); ++i) {
-  //     ptrPhys[i] = ptrPhys[i-1]+N;
-  // }
-  // for (std::size_t i = 0; i < idxPhys.size(); ++i) {
-  //     idxPhys[i] = i % N;
-  // }
-  // std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, ptrPhys, {}}};
-  // std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
-
-  // Populate meta for fully populated tensor
   // Modal space
   using namespace QuICC::Graph;
   auto metaMods = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});

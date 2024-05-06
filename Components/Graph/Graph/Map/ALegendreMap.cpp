@@ -31,7 +31,7 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             using namespace QuICC::Transform::Quadrature;
             using Tin = C_S1CLCSC3D_t;
             using Tout = C_DCCSC3D_t;
-            using Top = QuICC::View::View<double, QuICC::View::S1CLCSC3DJIK>;
+            using Top = QuICC::View::View<double, QuICC::View::CS1RL3DJIK>;
             using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
             using op_t = Op<Tout, Tin, Top, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
@@ -68,7 +68,7 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             using namespace QuICC::Transform::Quadrature;
             using Tin = C_S1CLCSC3DJIK_t;
             using Tout = C_DCCSC3DJIK_t;
-            using Top = QuICC::View::View<double, QuICC::View::S1CLCSC3D>;
+            using Top = QuICC::View::View<double, QuICC::View::CS1RL3D>;
             using QuICC::Transform::Quadrature::Cuda::ImplOp;
             using backend_t = ImplOp<Tout, Tin, Top>;
             using op_t = Op<Tout, Tin, Top, backend_t>;

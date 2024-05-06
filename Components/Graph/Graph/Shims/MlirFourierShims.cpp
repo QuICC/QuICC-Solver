@@ -214,7 +214,8 @@ extern "C" void _ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(view3_t* pN
     std::cout << "_ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t\n";
     #endif
     // Slice (phys = mods*2-1)
-    assert(pNewBuffer->dims[0] == pProdBuffer->dims[0]*2-1);
+    // Projector, NewBuffer is in physical space
+    assert(pProdBuffer->dims[0] == std::floor(pNewBuffer->dims[0]/2)+1);
     assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
     // Layers
     assert(pNewBuffer->dims[2] == pProdBuffer->dims[2]);

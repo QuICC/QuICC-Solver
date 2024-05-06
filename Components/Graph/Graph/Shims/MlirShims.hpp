@@ -40,6 +40,8 @@ namespace Graph
         std::vector<std::uint32_t> idx;
     };
 
+    /// @brief compute pointers and index meta data for fully populated
+    /// tensor as output of a Transpose operation
     template <class TagTo, class TagFrom>
     ptrAndIdx denseTransposePtrAndIdx(const std::array<std::uint32_t, 3> dims)
     {
@@ -57,7 +59,7 @@ namespace Graph
     ptrAndIdx denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>(const std::array<std::uint32_t, 3> dims);
 
     /// @brief compute pointers and index meta data for fully populated
-    /// tensor as ouput of a Transpose operation between AL and JW
+    /// tensor as ouput of a Transpose operation between JW and AL
     /// @tparam C_S1CLCSC3D_t new buffer type
     /// @tparam C_DCCSC3D_t producer type
     /// @param dims output dimensions
