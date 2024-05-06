@@ -35,8 +35,14 @@ MapOps::MapOps(mlir::ModuleOp module,
       else if (auto frInt = dyn_cast<mlir::quiccir::FrIOp>(op)) {
         setFourierInt(frInt);
       }
+      else if (auto alPrj = dyn_cast<mlir::quiccir::AlPOp>(op)) {
+        setALegendrePrj(alPrj);
+      }
       else if (auto alInt = dyn_cast<mlir::quiccir::AlIOp>(op)) {
         setALegendreInt(alInt);
+      }
+      else if (auto jwPrj = dyn_cast<mlir::quiccir::JWPOp>(op)) {
+        setWorlandPrj(jwPrj);
       }
       else if (auto jwInt = dyn_cast<mlir::quiccir::JWIOp>(op)) {
         setWorlandInt(jwInt);

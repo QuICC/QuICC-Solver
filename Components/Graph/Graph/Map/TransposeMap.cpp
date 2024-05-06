@@ -27,13 +27,18 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
         {
           using namespace QuICC::Transpose::Cpu;
           using namespace QuICC::Transpose;
-          // check type attribute
+          // check type attributes
           using namespace mlir;
           Type inTy = op.getInput().getType();
-          auto tensor = inTy.cast<RankedTensorType>();
-          std::string inTyStr = tensor.getEncoding().cast<StringAttr>().str();
+          auto inTensor = inTy.cast<RankedTensorType>();
+          std::string inTyStr = inTensor.getEncoding().cast<StringAttr>().str();
+          Type outTy = op.getOutput().getType();
+          auto outTensor = outTy.cast<RankedTensorType>();
+          std::string outTyStr = outTensor.getEncoding().cast<StringAttr>().str();
           /// \todo check output attribute
-          if (inTyStr == "C_DCCSC3D_t" && perm[0] == 2 && perm[1] == 0)
+          if (outTyStr == "C_DCCSC3D_t" &&
+            inTyStr == "C_DCCSC3D_t" &&
+            perm[0] == 2 && perm[1] == 0)
           {
             using Tin = C_DCCSC3D_t;
             using Tout = C_DCCSC3D_t;
@@ -43,7 +48,9 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (inTyStr == "C_DCCSC3D_t" && perm[0] == 1 && perm[1] == 2)
+          else if (outTyStr == "C_DCCSC3D_t" &&
+            inTyStr == "C_DCCSC3D_t" &&
+            perm[0] == 1 && perm[1] == 2)
           {
             using Tin = C_DCCSC3D_t;
             using Tout = C_DCCSC3D_t;
@@ -53,7 +60,9 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (inTyStr == "C_S1CLCSC3D_t" && perm[0] == 2 && perm[1] == 0)
+          else if (outTyStr == "C_DCCSC3D_t" &&
+            inTyStr == "C_S1CLCSC3D_t" &&
+            perm[0] == 2 && perm[1] == 0)
           {
             using Tin = C_S1CLCSC3D_t;
             using Tout = C_DCCSC3D_t;
@@ -63,7 +72,9 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (inTyStr == "C_S1CLCSC3D_t" && perm[0] == 1 && perm[1] == 2)
+          else if (outTyStr == "C_S1CLCSC3D_t" &&
+            inTyStr == "C_DCCSC3D_t" &&
+            perm[0] == 1 && perm[1] == 2)
           {
             using Tin = C_S1CLCSC3D_t;
             using Tout = C_DCCSC3D_t;

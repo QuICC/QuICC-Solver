@@ -7,6 +7,7 @@
 // External includes
 //
 #include <variant>
+#include <memory>
 
 // Project includes
 //
