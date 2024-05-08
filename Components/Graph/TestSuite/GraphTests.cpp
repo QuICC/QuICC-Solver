@@ -93,11 +93,12 @@ TEST_CASE("One Dimensional Loop Fourier", "[OneDimLoopFourier]")
 TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
 {
   // Test Graph
+  // Same setup as transform loop
   std::string modStr = R"mlir(
-    !type_umod = !quiccir.view<2x10x1xf64, "C_S1CLCSC3D_t">
-    !type_uval = !quiccir.view<2x20x1xf64, "C_DCCSC3D_t">
-    !type_tumod = tensor<2x10x1xf64, "C_S1CLCSC3D_t">
-    !type_tuval = tensor<2x20x1xf64, "C_DCCSC3D_t">
+    !type_umod = !quiccir.view<4x10x1xf64, "C_S1CLCSC3D_t">
+    !type_uval = !quiccir.view<4x20x1xf64, "C_DCCSC3D_t">
+    !type_tumod = tensor<4x10x1xf64, "C_S1CLCSC3D_t">
+    !type_tuval = tensor<4x20x1xf64, "C_DCCSC3D_t">
     func.func @entry(%thisArr: !llvm.ptr<array<2 x ptr>> {llvm.noalias}, %uout: !type_umod, %umod: !type_umod) {
       %tumod = builtin.unrealized_conversion_cast %umod : !type_umod to !type_tumod
       %tuval = quiccir.al.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}
@@ -109,13 +110,13 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
 
   // Grid dimensions
   constexpr std::uint32_t rank = 3u;
-  std::array<std::uint32_t, rank> physDims{2, 20, 1};
-  std::array<std::uint32_t, rank> modsDims{2, 10, 1};
+  std::array<std::uint32_t, rank> physDims{4, 20, 1};
+  std::array<std::uint32_t, rank> modsDims{4, 10, 1};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   QuICC::Graph::Jit<rank> Jitter(modStr, mem, physDims, modsDims);
 
-    // setup metadata
+  // setup metadata
   auto M = physDims[0];
   // auto N = physDims[1];
   auto K = physDims[2];
@@ -136,23 +137,34 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   }
   std::array<std::vector<std::uint32_t>, rank> pointers {{{}, ptr, {}}};
   std::array<std::vector<std::uint32_t>, rank> indices {{{}, idx, {}}};
+  // std::array<std::vector<std::uint32_t>, rank> pointers {{{}, {0,0,1,2,3}, {}}};
+  // std::array<std::vector<std::uint32_t>, rank> indices {{{}, {0,0,0}, {}}};
 
   // host mem block
-  std::size_t modsS = modsN + modsN-1;
+  std::size_t modsS = modsN + modsN-1 + modsN-2 + modsN-3;
+  // std::size_t modsS = modsN-1 + modsN-2 + modsN-3;
   QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsS, mem.get());
   QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, mem.get());
 
   // host view
   using namespace QuICC::Graph;
-  C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {modsN, K, modsM}, pointers, indices);
+  C_S1CLCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {modsN, K, modsM}, pointers, indices);
   C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsN, K, modsM}, pointers, indices);
 
   // set input modes
-  std::complex<double> val = {1.0, 0.0};
+  std::complex<double> val = {1.0, -1.0};
+  // for(std::size_t m = 0; m < modsInView.size(); ++m)
+  // {
+  //   modsInView[m] = val;
+  // }
   for(std::size_t m = 0; m < modsInView.size(); ++m)
   {
-    modsInView[m] = val;
+    modsInView[m] = {0.0, 0.0};
   }
+  modsInView(0, 0, 0) = val;
+  modsInView(0, 0, 1) = val;
+  modsInView(0, 0, 2) = val;
+  modsInView(0, 0, 3) = val;
 
   // Apply graph
   Jitter.apply(modsOutView, modsInView);
@@ -160,7 +172,8 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   // Check
   for(std::size_t m = 0; m < modsOutView.size(); ++m)
   {
-    CHECK(modsOutView[m] == val);
+    CHECK(std::abs((modsOutView[m] - modsOutView[m]).real()) == 0.0);
+    CHECK(std::abs((modsOutView[m] - modsOutView[m]).imag()) == 0.0);
   }
 }
 

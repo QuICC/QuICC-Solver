@@ -4,6 +4,7 @@ message(VERBOSE "BFLoop:")
 include(ConfigureTests)
 set(_tests
   Poly::P:<base_t>:bfloop
+  Poly::P:<viewCpu_t>:bfloop
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
