@@ -9,6 +9,7 @@
 #include "QuICC/Polynomial/ALegendre/Plm.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "ViewOps/ALegendre/Builder.hpp"
+#include "Types/Internal/Math.hpp"
 
 
 namespace QuICC
@@ -148,6 +149,8 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::LegendreRule quad;
             quad.computeQuadrature(igrid, iweights, _physDims[1]);
+            // scale for spherical harmonics
+            iweights.array() *= 2.0*Internal::Math::PI;
             // Populate op
             auto opView = alIntOp->getOp();
             using namespace QuICC::Transform::ALegendre;
@@ -186,6 +189,8 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::LegendreRule quad;
             quad.computeQuadrature(igrid, iweights, _physDims[1]);
+            // scale for spherical harmonics
+            iweights.array() *= 2.0*Internal::Math::PI;
             // Populate op
             auto opView = alIntOp->getOp();
             using namespace QuICC::Transform::ALegendre;
