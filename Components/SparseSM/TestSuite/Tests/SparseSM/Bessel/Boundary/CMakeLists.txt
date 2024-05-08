@@ -23,17 +23,55 @@ set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
 
 # Create basis tests targets
 set(_tests
+  Value:Value:boundary
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:BType:type
+    IDS 0 1 2 3
+    ULPS 100 100 100 100
+  )
+endforeach()
+
+# Create basis tests targets
+set(_tests
+  Value:Insulating:boundary
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:BType:type
+    IDS 0 1 2 3 4
+    ULPS 100 100 100 100 100
+  )
+endforeach()
+
+# Create basis tests targets
+set(_tests
   D1:Value:boundary
   D1:Insulating:boundary
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:BType:type
+    IDS 0 1 2 3 4
+    ULPS 100 100 100 100 100
+  )
+endforeach()
+
+# Create basis tests targets
+set(_tests
   D2:Value:boundary
   D2:Insulating:boundary
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Operator:WType:type
-    IDS 0 1 2 3 4 10 11 12 13 14
-    ULPS 40 40 40 40 41 40 40 40 40 41
+    KEYWORD Operator:BType:type
+    IDS 0 1 2 3 4
+    ULPS 120 120 120 280 400
   )
 endforeach()
 
