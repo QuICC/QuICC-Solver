@@ -30,6 +30,8 @@ ValueRSphJnl::usage="ValueRSphJnl[n,l,r]";
 InsulatingRSphJnl::usage="InsulatingRSphJnl[n,l,r]";
 ValueDSphJnl::usage="ValueDSphJnl[n,l,r]";
 InsulatingDSphJnl::usage="InsulatingDSphJnl[n,l,r]";
+ValueD2SphJnl::usage="ValueD2SphJnl[n,l,r]";
+InsulatingD2SphJnl::usage="InsulatingD2SphJnl[n,l,r]";
 ValueSlaplSphJnl::usage="ValueSlaplSphJnl[n,l,r]";
 InsulatingSlaplSphJnl::usage="InsulatingSlaplSphJnl[n,l,r]";
 ValueDivrSphJnl::usage="ValueDivrSphJnl[n,l,r]";
@@ -91,6 +93,8 @@ Jnl[k_,l_,t_,d\[Nu]_]:=SphericalBesselJ[l, k t]/bnorm[k,l,d\[Nu]]
 rJnl[k_,l_,t_,d\[Nu]_]=Simplify[t Jnl[k,l,t,d\[Nu]]];
 (*dJnl*)
 dJnl[k_,l_,t_,d\[Nu]_]=FullSimplify[D[Jnl[k,l,t,d\[Nu]],{t,1}]];
+(*d2Jnl*)
+d2Jnl[k_,l_,t_,d\[Nu]_]=FullSimplify[D[Jnl[k,l,t,d\[Nu]],{t,2}]];
 (*slaplJnl*)
 slaplJnl[k_,l_,t_,d\[Nu]_]=Simplify[1/t^2 D[t^2 D[Jnl[k,l,t,d\[Nu]],t],t]-(l(l+1))/t^2 Jnl[k,l,t,d\[Nu]]];
 (*divrJnl*)
@@ -133,6 +137,8 @@ ValueRSphJnl[n_,l_,r_]:=rJnl[valueZero[n,l],l,r,$valueD\[Nu]]
 InsulatingRSphJnl[n_,l_,r_]:=rJnl[insulatingZero[n,l],l,r,$insulatingD\[Nu]]
 ValueDSphJnl[n_,l_,r_]:=dJnl[valueZero[n,l],l,r,$valueD\[Nu]]
 InsulatingDSphJnl[n_,l_,r_]:=dJnl[insulatingZero[n,l],l,r,$insulatingD\[Nu]]
+ValueD2SphJnl[n_,l_,r_]:=d2Jnl[valueZero[n,l],l,r,$valueD\[Nu]]
+InsulatingD2SphJnl[n_,l_,r_]:=d2Jnl[insulatingZero[n,l],l,r,$insulatingD\[Nu]]
 ValueSlaplSphJnl[n_,l_,r_]:=slaplJnl[valueZero[n,l],l,r,$valueD\[Nu]]
 InsulatingSlaplSphJnl[n_,l_,r_]:=slaplJnl[insulatingZero[n,l],l,r,$insulatingD\[Nu]]
 ValueDivrSphJnl[n_,l_,r_]:=divrJnl[valueZero[n,l],l,r,$valueD\[Nu]]

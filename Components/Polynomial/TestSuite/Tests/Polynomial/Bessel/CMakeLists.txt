@@ -29,6 +29,8 @@ set(BesselTests
   Insulating:r_1SphJnl
   Value:dSphJnl
   Insulating:dSphJnl
+  Value:d2SphJnl
+  Insulating:d2SphJnl
   Value:drSphJnl
   Insulating:drSphJnl
   Value:slaplSphJnl

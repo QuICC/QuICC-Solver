@@ -9,7 +9,10 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Bessel/Boundary/D2.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "Types/Typedefs.hpp"
+#include "Polynomial/SphericalBessel/Jnl.hpp"
+#include "Types/Internal/Literals.hpp"
 
 namespace QuICC {
 
@@ -26,7 +29,32 @@ namespace Boundary {
 
    D2::ACoeff_t D2::compute(const int maxN)
    {
+      using namespace Internal::Literals;
+
       ACoeff_t val = ACoeff_t::Ones(maxN+1);
+      Internal::MHDFloat dNu;
+      if(this->type() == BesselKind::VALUE)
+      {
+         dNu = Polynomial::SphericalBessel::Value_dNu();
+      }
+      else if(this->type() == BesselKind::INSULATING)
+      {
+         dNu = Polynomial::SphericalBessel::Insulating_dNu();
+      }
+      else
+      {
+         throw std::logic_error("Unknown Bessel Kind");
+      }
+
+      std::vector<Internal::MHDFloat> roots;
+      int il = static_cast<int>(this->l());
+      Polynomial::SphericalBessel::getRoots(roots, il, maxN+1, dNu);
+      for(int i = 0; i < val.size(); i++)
+      {
+         const auto& k = roots.at(i);
+         val(i) = Polynomial::SphericalBessel::d2SphJnl(k, il, 1_mp, dNu);
+      }
+
       return val;
    }
 

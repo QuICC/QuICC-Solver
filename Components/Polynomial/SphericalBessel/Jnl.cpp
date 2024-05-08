@@ -107,8 +107,7 @@ Internal::MHDFloat dSphJnl(const Internal::MHDFloat k, const int l,
    Internal::MHDFloat val;
    if (l == 0)
    {
-      val = (dl / r) * boost::math::sph_bessel(l, k * r) -
-            k * boost::math::sph_bessel(l + 1, k * r);
+      val = - k * boost::math::sph_bessel(1, k * r);
    }
    else
    {
@@ -130,8 +129,15 @@ Internal::MHDFloat d2SphJnl(const Internal::MHDFloat k, const int l,
    Internal::MHDFloat val;
    if (l == 0)
    {
-      val = (dl / r) * boost::math::sph_bessel(l, k * r) -
-            k * boost::math::sph_bessel(l + 1, k * r);
+      auto c = - k * k / 3_mp;
+      val = c * (boost::math::sph_bessel(0, k * r) -
+            2_mp*boost::math::sph_bessel(2, k * r));
+   }
+   else if (l == 1)
+   {
+      auto c = k * k / 5_mp;
+      val = c * (- 3_mp * boost::math::sph_bessel(1, k * r) +
+            2_mp*boost::math::sph_bessel(3, k * r));
    }
    else
    {
