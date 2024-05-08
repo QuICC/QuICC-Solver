@@ -53,11 +53,11 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::LegendreRule quad;
-            quad.computeQuadrature(igrid, iweights, dims[1]);
+            quad.computeQuadrature(igrid, iweights, _physDims[1]);
             // Populate op
             auto opView = alPrjOp->getOp();
             using namespace QuICC::Transform::ALegendre;
-            builder<Top, Polynomial::ALegendre::Plm, Internal::Array::Scalar, 0>(opView, igrid, iweights);
+            builder<Top, Polynomial::ALegendre::Plm, Internal::Array::Scalar, 0>(opView, igrid, Internal::Array());
             // Add to thisArr
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -91,11 +91,11 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::LegendreRule quad;
-            quad.computeQuadrature(igrid, iweights, dims[1]);
+            quad.computeQuadrature(igrid, iweights, _physDims[1]);
             // Populate op
             auto opView = alPrjOp->getOp();
             using namespace QuICC::Transform::ALegendre;
-            builder<Top, Polynomial::ALegendre::Plm, Internal::Array::Scalar, 0>(opView, igrid, iweights);
+            builder<Top, Polynomial::ALegendre::Plm, Internal::Array::Scalar, 0>(opView, igrid, Internal::Array());
             // Add to thisArr
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -147,7 +147,7 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::LegendreRule quad;
-            quad.computeQuadrature(igrid, iweights, dims[1]);
+            quad.computeQuadrature(igrid, iweights, _physDims[1]);
             // Populate op
             auto opView = alIntOp->getOp();
             using namespace QuICC::Transform::ALegendre;
@@ -185,7 +185,7 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::LegendreRule quad;
-            quad.computeQuadrature(igrid, iweights, dims[1]);
+            quad.computeQuadrature(igrid, iweights, _physDims[1]);
             // Populate op
             auto opView = alIntOp->getOp();
             using namespace QuICC::Transform::ALegendre;

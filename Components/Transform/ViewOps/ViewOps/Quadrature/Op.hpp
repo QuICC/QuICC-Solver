@@ -137,7 +137,7 @@ void Op<Tout, Tin, Top, Backend>::allocOp(span<const typename Top::IndexType> di
 template <class Tout, class Tin, class Top, class Backend>
 void Op<Tout, Tin, Top, Backend>::applyImpl(Tout& out, const Tin& in)
 {
-   Profiler::RegionFixture<4> fix("Quadrature::Projector::Op::applyImpl");
+   Profiler::RegionFixture<4> fix("Quadrature::Op::applyImpl");
 
    // Apply backend
    mImpl->apply(out, in, _opView);

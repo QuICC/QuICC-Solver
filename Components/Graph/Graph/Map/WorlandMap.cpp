@@ -55,13 +55,13 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, dims[1]);
+            quad.computeQuadrature(igrid, iweights, _physDims[2]);
             // Populate op
             auto opView = jwPrjOp->getOp();
             using namespace QuICC::Polynomial::Worland;
             using namespace QuICC::Transform::Worland;
             Builder<Top, QuICC::DenseSM::Worland::Operator<Wnl>, bwd_t> tBuilder;
-            tBuilder.compute(opView, igrid, iweights);
+            tBuilder.compute(opView, igrid, Internal::Array());
             // Add to thisArr
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -94,13 +94,13 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, dims[1]);
+            quad.computeQuadrature(igrid, iweights, _physDims[2]);
             // Populate op
             auto opView = jwPrjOp->getOp();
             using namespace QuICC::Polynomial::Worland;
             using namespace QuICC::Transform::Worland;
             Builder<Top, QuICC::DenseSM::Worland::Operator<Wnl>, bwd_t> tBuilder;
-            tBuilder.compute(opView, igrid, iweights);
+            tBuilder.compute(opView, igrid, Internal::Array());
             // Add to thisArr
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -152,7 +152,7 @@ void MapOps::setWorlandInt(mlir::quiccir::JWIOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, dims[1]);
+            quad.computeQuadrature(igrid, iweights, _physDims[2]);
             // Populate op
             auto opView = jwIntOp->getOp();
             using namespace QuICC::Polynomial::Worland;
@@ -191,7 +191,7 @@ void MapOps::setWorlandInt(mlir::quiccir::JWIOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, dims[1]);
+            quad.computeQuadrature(igrid, iweights, _physDims[2]);
             // Populate op
             auto opView = jwIntOp->getOp();
             using namespace QuICC::Polynomial::Worland;

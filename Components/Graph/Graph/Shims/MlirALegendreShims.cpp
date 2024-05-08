@@ -46,7 +46,7 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(void* obj, view
     cl->apply(viewMod, viewVal);
 };
 
-extern "C" void _ciface_quiccir_al_prj_C_DCCSC3D_t_C_S1CLCSC3D_t(void* obj, view3_cd_t* pUmod, view3_cd_t* pUval)
+extern "C" void _ciface_quiccir_al_prj_C_DCCSC3D_t_C_S1CLCSC3D_t(void* obj,  view3_cd_t* pUval, view3_cd_t* pUmod)
 {
     #ifndef NDEBUG
     std::cout <<
@@ -59,7 +59,7 @@ extern "C" void _ciface_quiccir_al_prj_C_DCCSC3D_t_C_S1CLCSC3D_t(void* obj, view
     using namespace QuICC::Transform::Quadrature;
     using Tin = C_S1CLCSC3D_t;
     using Tout = C_DCCSC3D_t;
-    using Top = QuICC::View::View<double, QuICC::View::CS1RL3D>;
+    using Top = QuICC::View::View<double, QuICC::View::CS1RL3DJIK>;
     using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
     using op_t = Op<Tout, Tin, Top, backend_t>;
     // views
@@ -71,13 +71,13 @@ extern "C" void _ciface_quiccir_al_prj_C_DCCSC3D_t_C_S1CLCSC3D_t(void* obj, view
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
     assert(pUmod->pos == pUval->pos);
     assert(pUmod->coo == pUval->coo);
-    Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
-    Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
+    Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
+    Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
     assert(cl->getOp().data() != nullptr);
     // call
-    cl->apply(viewMod, viewVal);
+    cl->apply(viewVal, viewMod);
 };
 
 extern "C" void _ciface_quiccir_alloc_al_int_C_S1CLCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
