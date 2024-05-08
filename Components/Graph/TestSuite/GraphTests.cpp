@@ -149,7 +149,7 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   // host view
   using namespace QuICC::Graph;
   C_S1CLCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {modsN, K, modsM}, pointers, indices);
-  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsN, K, modsM}, pointers, indices);
+  C_S1CLCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsN, K, modsM}, pointers, indices);
 
   // set input modes
   std::complex<double> val = {1.0, -1.0};
@@ -157,6 +157,85 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   // {
   //   modsInView[m] = val;
   // }
+  for(std::size_t m = 0; m < modsInView.size(); ++m)
+  {
+    modsInView[m] = {0.0, 0.0};
+  }
+  modsInView(0, 0, 0) = val;
+  modsInView(0, 0, 1) = val;
+  modsInView(0, 0, 2) = val;
+  modsInView(0, 0, 3) = val;
+
+  // Apply graph
+  Jitter.apply(modsOutView, modsInView);
+
+  // Check
+  for(std::size_t m = 0; m < modsOutView.size(); ++m)
+  {
+    CHECK(std::abs((modsOutView[m] - modsOutView[m]).real()) == 0.0);
+    CHECK(std::abs((modsOutView[m] - modsOutView[m]).imag()) == 0.0);
+  }
+}
+
+TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
+{
+  // Test Graph
+  // Same setup as transform loop
+  std::string modStr = R"mlir(
+    !type_umod = !quiccir.view<4x10x1xf64, "C_DCCSC3D_t">
+    !type_uval = !quiccir.view<4x20x1xf64, "C_DCCSC3D_t">
+    !type_tumod = tensor<4x10x1xf64, "C_DCCSC3D_t">
+    !type_tuval = tensor<4x20x1xf64, "C_DCCSC3D_t">
+    func.func @entry(%thisArr: !llvm.ptr<array<2 x ptr>> {llvm.noalias}, %uout: !type_umod, %umod: !type_umod) {
+      %tumod = builtin.unrealized_conversion_cast %umod : !type_umod to !type_tumod
+      %tuval = quiccir.jw.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}
+      %ret = quiccir.jw.int %tuval : !type_tuval -> !type_tumod attributes{implptr = 1 :i64}
+      quiccir.materialize %ret in %uout : (!type_tumod, !type_umod)
+      return
+    }
+  )mlir";
+
+  // Grid dimensions
+  constexpr std::uint32_t rank = 3u;
+  std::array<std::uint32_t, rank> physDims{1, 4, 20};
+  std::array<std::uint32_t, rank> modsDims{1, 4, 10};
+
+  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+  QuICC::Graph::Jit<rank> Jitter(modStr, mem, physDims, modsDims);
+
+  // setup metadata
+  auto M = physDims[0];
+  auto N = physDims[1];
+  // auto K = physDims[2];
+  auto modsM = modsDims[0];
+  auto modsN = modsDims[1];
+  auto modsK = modsDims[2];
+
+  // Populate meta for fully populated tensor
+  std::vector<std::uint32_t> ptr(N+1);
+  std::vector<std::uint32_t> idx(N*M);
+  ptr[0] = 0;
+  for (std::size_t i = 1; i < ptr.size(); ++i) {
+      ptr[i] = ptr[i-1]+M;
+  }
+  for (std::size_t i = 0; i < idx.size(); ++i) {
+      idx[i] = i % M;
+  }
+  std::array<std::vector<std::uint32_t>, rank> pointers {{{}, ptr, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indices {{{}, idx, {}}};
+
+  // host mem block
+  std::size_t modsS = modsK * idx.size();
+  QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsS, mem.get());
+  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, mem.get());
+
+  // host view
+  using namespace QuICC::Graph;
+  C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {modsK, modsM, modsN}, pointers, indices);
+  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsK, modsM, modsN}, pointers, indices);
+
+  // set input modes
+  std::complex<double> val = {1.0, 0.0};
   for(std::size_t m = 0; m < modsInView.size(); ++m)
   {
     modsInView[m] = {0.0, 0.0};
@@ -285,8 +364,8 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
 
 //   // Grid dimensions
 //   constexpr std::uint32_t rank = 3;
-//   std::array<std::uint32_t, rank> physDims{10, 20, 3};
-//   std::array<std::uint32_t, rank> modsDims{6, 10, 2};
+//   std::array<std::uint32_t, rank> physDims{10, 4, 3};
+//   std::array<std::uint32_t, rank> modsDims{6, 14 2};
 
 //   std::array<std::array<std::string, 2>, 3> layOpt;
 //   layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
