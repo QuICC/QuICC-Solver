@@ -64,11 +64,19 @@ template class Op<AddFunctor<cuda::std::complex<double>>,
    View::ViewBase<cuda::std::complex<double>>,
    View::ViewBase<cuda::std::complex<double>>,
    View::ViewBase<cuda::std::complex<double>>>;
+template class Op<AddFunctor<cuda::std::complex<double>>,
+   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>,
+   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>,
+   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>>;
 // Sub Mods
 template class Op<SubFunctor<cuda::std::complex<double>>,
    View::ViewBase<cuda::std::complex<double>>,
    View::ViewBase<cuda::std::complex<double>>,
    View::ViewBase<cuda::std::complex<double>>>;
+template class Op<SubFunctor<cuda::std::complex<double>>,
+   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>,
+   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>,
+   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>>;
 
 
 } // namespace Cuda

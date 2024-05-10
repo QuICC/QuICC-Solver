@@ -31,15 +31,40 @@ template <class T = double> struct AddFunctor
    }
 };
 
+/// @brief scalar add operation
+/// specialization for complex double
+#ifdef QUICC_HAS_CUDA_BACKEND
+template <> struct AddFunctor<cuda::std::complex<double>>
+{
+   QUICC_CUDA_HOSTDEV cuda::std::complex<double> operator()(cuda::std::complex<double> a, cuda::std::complex<double> b)
+   {
+      return a + b;
+   }
+};
+#endif
+
 /// @brief scalar sub operation
 /// @tparam T scalar
 template <class T = double> struct SubFunctor
 {
-   QUICC_CUDA_HOSTDEV T operator()(T a, T b)
+  QUICC_CUDA_HOSTDEV T operator()(T a, T b)
    {
       return a - b;
    }
 };
+
+/// @brief scalar add operation
+/// specialization for complex double
+#ifdef QUICC_HAS_CUDA_BACKEND
+template <> struct SubFunctor<cuda::std::complex<double>>
+{
+   QUICC_CUDA_HOSTDEV cuda::std::complex<double> operator()(cuda::std::complex<double> a, cuda::std::complex<double> b)
+   {
+      return a - b;
+   }
+};
+#endif
+
 
 /// @brief scalar square operation
 /// @tparam T scalar

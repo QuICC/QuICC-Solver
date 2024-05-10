@@ -35,11 +35,12 @@ void MapOps::setAdd(mlir::quiccir::AddOp op)
         #ifdef QUICC_HAS_CUDA_BACKEND
         else
         {
+            using ptTy = cuda::std::complex<double>;
             using namespace QuICC::Pointwise::Cuda;
             using namespace QuICC::Pointwise;
-            using T = C_DCCSC3DJIK_t;
-            using op_t = Op<AddFunctor<std::complex<double>>, T, T, T>;
-            _ops.push_back(std::make_unique<op_t>(AddFunctor<std::complex<double>>()));
+            using T = Ccuda_DCCSC3DJIK_t;
+            using op_t = Op<AddFunctor<ptTy>, T, T, T>;
+            _ops.push_back(std::make_unique<op_t>(AddFunctor<ptTy>()));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -75,11 +76,12 @@ void MapOps::setSub(mlir::quiccir::SubOp op)
         #ifdef QUICC_HAS_CUDA_BACKEND
         else
         {
+            using ptTy = cuda::std::complex<double>;
             using namespace QuICC::Pointwise::Cuda;
             using namespace QuICC::Pointwise;
-            using T = C_DCCSC3DJIK_t;
-            using op_t = Op<SubFunctor<std::complex<double>>, T, T, T>;
-            _ops.push_back(std::make_unique<op_t>(SubFunctor<std::complex<double>>()));
+            using T = Ccuda_DCCSC3DJIK_t;
+            using op_t = Op<SubFunctor<ptTy>, T, T, T>;
+            _ops.push_back(std::make_unique<op_t>(SubFunctor<ptTy>()));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
