@@ -172,8 +172,6 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
     assert(QuICC::Cuda::isDeviceMemory(out.data()));
     assert(QuICC::Cuda::isDeviceMemory(in.data()));
 
-    std::is_same_v<typename Tin::AttributesType, View::DCCSC3D> &&
-    std::is_same_v<typename Tout::AttributesType, View::DCCSC3DJIK>) {
     // dense transpose
     assert(out.size() == in.size());
 
@@ -192,7 +190,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
     numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
     numBlocks.z = 1;
 
-    details::perm<typename Tout::ScalarType, typename Tin::ScalarType, p201_t><<<numBlocks, blockSize>>>(out, in);
+    details::perm<typename Tout::ScalarType, typename Tin::ScalarType, Perm><<<numBlocks, blockSize>>>(out, in);
 
 }
 
@@ -200,6 +198,10 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 // FT -> AL
 template class Op<View::View<double, View::DCCSC3DJIK>, View::View<double, View::DCCSC3D>, p201_t>;
 template class Op<View::View<std::complex<double>, View::DCCSC3DJIK>, View::View<std::complex<double>, View::DCCSC3D>, p201_t>;
+// AL -> FT
+template class Op<View::View<double, View::DCCSC3D>, View::View<double, View::DCCSC3DJIK>, p120_t>;
+template class Op<View::View<std::complex<double>, View::DCCSC3D>, View::View<std::complex<double>, View::DCCSC3DJIK>, p120_t>;
+
 // AL -> JW
 template class Op<View::View<double, View::DCCSC3DJIK>, View::View<double, View::S1CLCSC3DJIK>, p201_t>;
 template class Op<View::View<std::complex<double>, View::DCCSC3DJIK>, View::View<std::complex<double>, View::S1CLCSC3DJIK>, p201_t>;
