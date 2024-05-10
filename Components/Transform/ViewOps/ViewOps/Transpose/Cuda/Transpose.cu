@@ -53,6 +53,32 @@ __global__ void perm(View::View<Tout, View::DCCSC3DJIK> out,
     }
 }
 
+template <class Tout, class Tin, class Perm>
+__global__ void perm(View::View<Tout, View::DCCSC3D> out,
+    const View::View<Tin, View::DCCSC3DJIK> in)
+{
+    static_assert(std::is_same_v<Perm, p120_t>,
+      "Not implemented for other types");
+
+    const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
+
+    const auto I = in.dims()[0];
+    const auto J = in.dims()[1];
+    const auto K = in.dims()[2];
+
+    if(i < I && j < J) {
+        for (std::size_t k = 0; k < K; ++k) {
+            // plane is row major
+            std::size_t ijk = i*J + j + k*I*J;
+            std::size_t kij = k + i*K + j*K*I;
+            assert(ijk < in.size());
+            assert(kij < out.size());
+            out[kij] = in[ijk];
+        }
+    }
+}
+
 /// @brief inclusive scan
 /// @tparam T
 /// @param K
@@ -146,57 +172,27 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
     assert(QuICC::Cuda::isDeviceMemory(out.data()));
     assert(QuICC::Cuda::isDeviceMemory(in.data()));
 
-    if constexpr(std::is_same_v<Perm, p201_t> &&
-        std::is_same_v<typename Tin::AttributesType, View::DCCSC3D> &&
-        std::is_same_v<typename Tout::AttributesType, View::DCCSC3DJIK>) {
-        // dense transpose
-        assert(out.size() == in.size());
-        assert(out.size() == out.dims()[0]*out.dims()[1]*out.dims()[2]);
+    std::is_same_v<typename Tin::AttributesType, View::DCCSC3D> &&
+    std::is_same_v<typename Tout::AttributesType, View::DCCSC3DJIK>) {
+    // dense transpose
+    assert(out.size() == in.size());
 
-        auto I = in.dims()[0];
-        auto J = in.dims()[1];
-        auto K = in.dims()[2];
+    auto I = in.dims()[0];
+    auto J = in.dims()[1];
+    auto K = in.dims()[2];
 
-        // setup grid
-        dim3 blockSize;
-        dim3 numBlocks;
+    // setup grid
+    dim3 blockSize;
+    dim3 numBlocks;
 
-        blockSize.x = 32;
-        blockSize.y = 32;
-        blockSize.z = 1;
-        numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
-        numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
-        numBlocks.z = 1;
+    blockSize.x = 32;
+    blockSize.y = 32;
+    blockSize.z = 1;
+    numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
+    numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
+    numBlocks.z = 1;
 
-        details::perm<typename Tout::ScalarType, typename Tin::ScalarType, p201_t><<<numBlocks, blockSize>>>(out, in);
-
-    }
-    else if constexpr (std::is_same_v<Perm, p201_t> &&
-        std::is_same_v<typename Tin::AttributesType, View::S1CLCSC3DJIK> &&
-        std::is_same_v<typename Tout::AttributesType, View::DCCSC3DJIK>) {
-        // dense transpose
-        assert(out.size() == in.size());
-        auto I = in.dims()[0];
-        auto J = in.dims()[1];
-        auto K = in.dims()[2];
-
-        // setup grid
-        dim3 blockSize;
-        dim3 numBlocks;
-
-        blockSize.x = 32;
-        blockSize.y = 32;
-        blockSize.z = 1;
-        numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
-        numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
-        numBlocks.z = 1;
-
-        details::perm<typename Tout::ScalarType, typename Tin::ScalarType, p201_t><<<numBlocks, blockSize, sizeof(std::uint32_t)*(2*I+K)>>>(out, in);
-
-    }
-    else {
-        throw std::logic_error("transpose not implemented");
-    }
+    details::perm<typename Tout::ScalarType, typename Tin::ScalarType, p201_t><<<numBlocks, blockSize>>>(out, in);
 
 }
 
