@@ -160,6 +160,74 @@ __global__ void perm(View::View<Tout, View::DCCSC3DJIK> out,
     }
 }
 
+template <class Tout, class Tin, class Perm>
+__global__ void perm(View::View<Tout, View::S1CLCSC3DJIK> out,
+    const View::View<Tin, View::DCCSC3DJIK> in)
+{
+    static_assert(std::is_same_v<Perm, p120_t>,
+      "Not implemented for other types");
+
+
+    const auto I = out.dims()[0];
+    const auto J = out.dims()[1];
+    const auto K = out.dims()[2];
+
+    // iSum and kSum in shared mem
+    extern __shared__ std::uint32_t shared_mem[];
+    std::uint32_t *iSum = &shared_mem[0];
+    std::uint32_t *kSum = &shared_mem[K];
+    std::uint32_t *kLoc = &shared_mem[K+I];
+
+    // access S1CLCSC3D
+    // cumulative column height is (with ijk) I*k - sum(i)_0^k
+
+    /// \todo vvv serial chunk to be optimized vvv
+    if (threadIdx.x == 0 && threadIdx.y == 0)
+    {
+        // iSum shifted by 1
+        for (std::size_t i = 1; i < K; ++i) {
+            iSum[i] = 0;
+        }
+        for (std::size_t i = 2; i < K; ++i) {
+            iSum[i] = iSum[i-1] + 1;
+        }
+        pSum(iSum, K);
+        // cumulative row width (with jki)
+        // kSum shifted by 1
+        kSum[I-1] = K-2;
+        kLoc[I-1] = K-1;
+        for (std::size_t i = I-1; i > 0; --i) {
+            if (kSum[i] > 0) {
+                kSum[i-1] = kSum[i] - 1;
+                kLoc[i-1] = kLoc[i] - 1;
+            }
+            else {
+                kSum[i-1] = 0;
+                kLoc[i-1] = 0;
+            }
+        }
+        pSum(kSum, I);
+
+    }
+
+    __syncthreads();
+
+    /// \todo ^^^ serial chunk to be optimized ^^^
+
+    const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
+
+    for (std::size_t k = 0; k < K; ++k) {
+        std::size_t Iloc = I - k;
+        if(i < Iloc && j < J) {
+            std::size_t ijk = i*J + j + (k*I-iSum[k])*J;
+            std::size_t jki = j*(K-kLoc[i]) + k + (i*K-kSum[i])*J;
+            assert(jki < in.size());
+            assert(ijk < out.size());
+            out[ijk] = in[jki];
+        }
+    }
+}
 
 } // namespace details
 
@@ -205,6 +273,9 @@ template class Op<View::View<std::complex<double>, View::DCCSC3D>, View::View<st
 // AL -> JW
 template class Op<View::View<double, View::DCCSC3DJIK>, View::View<double, View::S1CLCSC3DJIK>, p201_t>;
 template class Op<View::View<std::complex<double>, View::DCCSC3DJIK>, View::View<std::complex<double>, View::S1CLCSC3DJIK>, p201_t>;
+// JW -> AL
+template class Op<View::View<double, View::S1CLCSC3DJIK>, View::View<double, View::DCCSC3DJIK>, p120_t>;
+template class Op<View::View<std::complex<double>, View::S1CLCSC3DJIK>, View::View<std::complex<double>, View::DCCSC3DJIK>, p120_t>;
 
 } // namespace Cuda
 } // namespace Transpose
