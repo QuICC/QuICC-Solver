@@ -52,8 +52,8 @@ namespace Boundary {
       for(int i = 0; i < val.size(); i++)
       {
          const auto& k = roots.at(i);
-         val(i) = Polynomial::SphericalBessel::SphJnl(k, il, 1_mp, dNu) - 
-            Polynomial::SphericalBessel::dSphJnl(k, il, 1_mp, dNu);
+         val(i) = Polynomial::SphericalBessel::dSphJnl(k, il, 1_mp, dNu) -
+            Polynomial::SphericalBessel::SphJnl(k, il, 1_mp, dNu);
       }
 
       return val;
