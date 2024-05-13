@@ -49,6 +49,11 @@ ValueDivrdrSphJnlImplicit::usage="ValueDivrdrSphJnlImplicit[n,l,r]";
 InsulatingDivrdrSphJnl::usage="InsulatingDivrdrSphJnl[n,l,r]";
 InsulatingDivrdrSphJnlExplicit::usage="InsulatingDivrdrSphJnlExplicit[n,l,r]";
 InsulatingDivrdrSphJnlImplicit::usage="InsulatingDivrdrSphJnlImplicit[n,l,r]";
+(*Boundary operators*)
+ValueRDDivrSphJnl::usage="ValueRDDivrSphJnl[n,l,r]";
+InsulatingRDDivrSphJnl::usage="ValueRDDivrSphJnl[n,l,r]";
+ValueInsulatingSphereSphJnl::usage="ValueInsulatinSphereSphJnl[n,l,r]";
+InsulatingInsulatingSphereSphJnl::usage="ValueInsulatingSphereSphJnl[n,l,r]";
 
 
 Begin["`Private`"];
@@ -169,6 +174,13 @@ InsulatingDivrdrSphJnlImplicit[maxN_,l_,r_,w_]:=Module[{ks,ksm1},
 	ksm1 = Table[insulatingZero[n,l-1],{n,0,maxN+1}];
 	divrdrJnlImplicit[ks,ksm1,l,r,$insulatingD\[Nu],w]
 	]
+
+
+ValueInsulatingSphereSphJnl[n_,l_,r_]:=ValueDSphJnl[n,l,r]+(l+1)/r ValueSphJnl[n,l,r]
+InsulatingInsulatingSphereSphJnl[n_,l_,r_]:=InsulatingDSphJnl[n,l,r]+(l+1)/r InsulatingSphJnl[n,l,r]
+ValueRDDivrSphJnl[n_,l_,r_]:=ValueDSphJnl[n,l,r]-1/r ValueSphJnl[n,l,r]
+InsulatingRDDivrSphJnl[n_,l_,r_]:=InsulatingDSphJnl[n,l,r]-1/r InsulatingSphJnl[n,l,r]
+
 
 
 End[];
