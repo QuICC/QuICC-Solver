@@ -13,8 +13,8 @@ build-quicc-base:
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-gpu
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:4ece824bade4a50431065e053d80ba1e
-    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_daint-gpu:4ece824bade4a50431065e053d80ba1e
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:0a337fffd2eeb068c3f19c8a7a7f53dd
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_daint-gpu:0a337fffd2eeb068c3f19c8a7a7f53dd
     SECONDARY_IMAGE_USERNAME: quicc
     SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
@@ -23,7 +23,7 @@ build-quicc:
   variables:
     DOCKERFILE: ci/docker/Dockerfile_kkgpu
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:4ece824bade4a50431065e053d80ba1e"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:0a337fffd2eeb068c3f19c8a7a7f53dd"]'
 time-quicc-lib:
   extends:
   - .time-lib-sweep-daint-gpu
