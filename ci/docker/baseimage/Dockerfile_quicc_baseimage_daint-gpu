@@ -55,3 +55,4 @@ RUN ( test -L /opt/view/bin/nvcc_wrapper && \
 
 # set env var to init CMAKE_CUDA_ARCHITECTURES
 ENV CUDAARCHS 60
+
