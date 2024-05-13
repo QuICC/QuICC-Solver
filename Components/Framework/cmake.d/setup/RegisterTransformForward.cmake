@@ -48,6 +48,8 @@ set(tags
   ValueT
   ValueBc1Q
   ValueBc1S
+  InsulatingBc2Q
+  InsulatingBc2S
   InsulatingP
   InsulatingPol
   InsulatingQ

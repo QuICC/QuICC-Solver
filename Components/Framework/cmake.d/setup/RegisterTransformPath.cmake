@@ -18,6 +18,7 @@ set(tags
   ValueCurlCurlNl
   ValueNegCurlCurlNl
   ValueBc1NegCurlCurlNl
+  InsulatingBc2NegCurlCurlNl
   ValueLaplhCurlNl
   ValueLaplhCurlCurlNl
   InsulatingScalar
