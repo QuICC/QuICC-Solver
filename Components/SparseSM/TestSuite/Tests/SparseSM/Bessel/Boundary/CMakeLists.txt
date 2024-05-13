@@ -65,6 +65,10 @@ endforeach()
 set(_tests
   D2:Value:boundary
   D2:Insulating:boundary
+  R1D1DivR1:Value:boundary
+  R1D1DivR1:Insulating:boundary
+  Value:Value:boundary
+  Value:Insulating:boundary
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}

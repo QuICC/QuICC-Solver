@@ -1,10 +1,10 @@
 /**
- * @file Value.hpp
- * @brief Implementation of the boundary value for Bessel polynomials
+ * @file R1D1DivR1.hpp
+ * @brief Implementation of the boundary value for toroidal stress-free for Bessel polynomials
  */
 
-#ifndef QUICC_SPARSESM_BESSEL_BOUNDARY_VALUE_HPP
-#define QUICC_SPARSESM_BESSEL_BOUNDARY_VALUE_HPP
+#ifndef QUICC_SPARSESM_BESSEL_BOUNDARY_R1D1DIVR1_HPP
+#define QUICC_SPARSESM_BESSEL_BOUNDARY_R1D1DIVR1_HPP
 
 // System includes
 //
@@ -24,9 +24,9 @@ namespace Bessel {
 namespace Boundary {
 
    /**
-    * @brief Implementation of the boundary value for Bessel polynomial
+    * @brief Implementation of the boundary value for toroidal stress-free for Bessel polynomial
     */
-   class Value: public ICondition
+   class R1D1DivR1: public ICondition
    {
       public:
          /**
@@ -34,12 +34,12 @@ namespace Boundary {
           *
           * @param l       Harmonic degree l
           */
-         Value(const BesselKind type, const int l);
+         R1D1DivR1(const BesselKind type, const int l);
 
          /**
           * @brief Destructor
           */
-         ~Value() = default;
+         ~R1D1DivR1() = default;
 
          /**
           * @brief Compute list of boundary values
@@ -56,4 +56,4 @@ namespace Boundary {
 } // SparseSM
 } // QuICC
 
-#endif // QUICC_SPARSESM_BESSEL_BOUNDARY_VALUE_HPP
+#endif // QUICC_SPARSESM_BESSEL_BOUNDARY_R1D1DIVR1_HPP

@@ -1,10 +1,10 @@
 /**
- * @file Value.hpp
- * @brief Implementation of the boundary value for Bessel polynomials
+ * @file InsulatingSphere.hpp
+ * @brief Implementation of the boundary value for an insulating outer sphere for Bessel polynomials
  */
 
-#ifndef QUICC_SPARSESM_BESSEL_BOUNDARY_VALUE_HPP
-#define QUICC_SPARSESM_BESSEL_BOUNDARY_VALUE_HPP
+#ifndef QUICC_SPARSESM_BESSEL_BOUNDARY_INSULATINGSPHERE_HPP
+#define QUICC_SPARSESM_BESSEL_BOUNDARY_INSULATINGSPHERE_HPP
 
 // System includes
 //
@@ -24,9 +24,9 @@ namespace Bessel {
 namespace Boundary {
 
    /**
-    * @brief Implementation of the boundary value for Bessel polynomial
+    * @brief Implementation of the boundary value for an insulating outer sphere for Bessel polynomial
     */
-   class Value: public ICondition
+   class InsulatingSphere: public ICondition
    {
       public:
          /**
@@ -34,12 +34,12 @@ namespace Boundary {
           *
           * @param l       Harmonic degree l
           */
-         Value(const BesselKind type, const int l);
+         InsulatingSphere(const BesselKind type, const int l);
 
          /**
           * @brief Destructor
           */
-         ~Value() = default;
+         ~InsulatingSphere() = default;
 
          /**
           * @brief Compute list of boundary values
@@ -56,4 +56,4 @@ namespace Boundary {
 } // SparseSM
 } // QuICC
 
-#endif // QUICC_SPARSESM_BESSEL_BOUNDARY_VALUE_HPP
+#endif // QUICC_SPARSESM_BESSEL_BOUNDARY_INSULATINGSPHERE_HPP
