@@ -44,6 +44,7 @@ RUN wget https://apt.llvm.org/llvm.sh \
 
 RUN apt-get -yqq install libmlir-17-dev mlir-17-tools
 
+
 # sanity check that nvcc_wrapper is a symbolic link in the view and set default nvcc_wrapper compile options
 RUN ( test -L /opt/view/bin/nvcc_wrapper && \
       sed -i -e 's/default_arch="sm_35"/default_arch="sm_60"/' \
