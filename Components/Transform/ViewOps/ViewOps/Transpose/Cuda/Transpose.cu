@@ -262,6 +262,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 
 }
 
+
 // Explicit instantiations
 // FT -> AL
 template class Op<View::View<double, View::DCCSC3DJIK>, View::View<double, View::DCCSC3D>, p201_t>;

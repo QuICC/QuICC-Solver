@@ -33,16 +33,10 @@ TEST_CASE("One Dimensional Loop Fourier", "[OneDimLoopFourier]")
 {
   // Test Graph
   std::string modStr = R"mlir(
-    !type_umod = !quiccir.view<5x6x3xf64, "C_DCCSC3D_t">
-    !type_uval = !quiccir.view<5x11x3xf64, "R_DCCSC3D_t">
-    !type_tumod = tensor<5x6x3xf64, "C_DCCSC3D_t">
-    !type_tuval = tensor<5x11x3xf64, "R_DCCSC3D_t">
-    func.func @entry(%thisArr: !llvm.ptr<array<2 x ptr>> {llvm.noalias}, %uout: !type_umod, %umod: !type_umod) {
-      %tumod = builtin.unrealized_conversion_cast %umod : !type_umod to !type_tumod
-      %tuval = quiccir.fr.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}
-      %ret = quiccir.fr.int %tuval : !type_tuval -> !type_tumod attributes{implptr = 1 :i64}
-      quiccir.materialize %ret in %uout : (!type_tumod, !type_umod)
-      return
+    func.func @entry(%tumod: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
+      %tuval = quiccir.fr.prj %tumod : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64}
+      %ret = quiccir.fr.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 1 :i64}
+      return %ret : tensor<?x?x?xf64>
     }
   )mlir";
 
@@ -51,8 +45,15 @@ TEST_CASE("One Dimensional Loop Fourier", "[OneDimLoopFourier]")
   std::array<std::uint32_t, rank> physDims{11, 3, 5};
   std::array<std::uint32_t, rank> modsDims{6, 3, 5};
 
+  // View Types
+  std::array<std::array<std::string, 2>, 3> layOpt;
+  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
+  // layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
+  // layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::Jit<rank> Jitter(modStr, mem, physDims, modsDims);
+  using namespace QuICC::Graph;
+  Jit<rank> Jitter(modStr, mem, physDims, modsDims, layOpt, Stage::MPP, Stage::MPP);
 
   // setup metadata
   auto modsM = modsDims[0];
@@ -95,16 +96,10 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   // Test Graph
   // Same setup as transform loop
   std::string modStr = R"mlir(
-    !type_umod = !quiccir.view<4x10x1xf64, "C_S1CLCSC3D_t">
-    !type_uval = !quiccir.view<4x20x1xf64, "C_DCCSC3D_t">
-    !type_tumod = tensor<4x10x1xf64, "C_S1CLCSC3D_t">
-    !type_tuval = tensor<4x20x1xf64, "C_DCCSC3D_t">
-    func.func @entry(%thisArr: !llvm.ptr<array<2 x ptr>> {llvm.noalias}, %uout: !type_umod, %umod: !type_umod) {
-      %tumod = builtin.unrealized_conversion_cast %umod : !type_umod to !type_tumod
-      %tuval = quiccir.al.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}
-      %ret = quiccir.al.int %tuval : !type_tuval -> !type_tumod attributes{implptr = 1 :i64}
-      quiccir.materialize %ret in %uout : (!type_tumod, !type_umod)
-      return
+    func.func @entry(%tumod: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
+      %tuval = quiccir.al.prj %tumod : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64}
+      %ret = quiccir.al.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 1 :i64}
+      return %ret : tensor<?x?x?xf64>
     }
   )mlir";
 
@@ -113,8 +108,15 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   std::array<std::uint32_t, rank> physDims{4, 20, 1};
   std::array<std::uint32_t, rank> modsDims{4, 10, 1};
 
+  // View Types
+  std::array<std::array<std::string, 2>, 3> layOpt;
+  // layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
+  layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
+  // layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::Jit<rank> Jitter(modStr, mem, physDims, modsDims);
+  using namespace QuICC::Graph;
+  Jit<rank> Jitter(modStr, mem, physDims, modsDims, layOpt, Stage::MPM, Stage::MPM);
 
   // setup metadata
   auto M = physDims[0];
@@ -176,16 +178,10 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
   // Test Graph
   // Same setup as transform loop
   std::string modStr = R"mlir(
-    !type_umod = !quiccir.view<4x2x1xf64, "C_DCCSC3D_t">
-    !type_uval = !quiccir.view<4x3x1xf64, "C_DCCSC3D_t">
-    !type_tumod = tensor<4x2x1xf64, "C_DCCSC3D_t">
-    !type_tuval = tensor<4x3x1xf64, "C_DCCSC3D_t">
-    func.func @entry(%thisArr: !llvm.ptr<array<2 x ptr>> {llvm.noalias}, %uout: !type_umod, %umod: !type_umod) {
-      %tumod = builtin.unrealized_conversion_cast %umod : !type_umod to !type_tumod
-      %tuval = quiccir.jw.prj %tumod : !type_tumod -> !type_tuval attributes{implptr = 0 :i64}
-      %ret = quiccir.jw.int %tuval : !type_tuval -> !type_tumod attributes{implptr = 1 :i64}
-      quiccir.materialize %ret in %uout : (!type_tumod, !type_umod)
-      return
+    func.func @entry(%tumod: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
+      %tuval = quiccir.jw.prj %tumod : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64}
+      %ret = quiccir.jw.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 1 :i64}
+      return %ret : tensor<?x?x?xf64>
     }
   )mlir";
 
@@ -194,8 +190,15 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
   std::array<std::uint32_t, rank> physDims{1, 4, 3};
   std::array<std::uint32_t, rank> modsDims{1, 4, 2};
 
+  // View Types
+  std::array<std::array<std::string, 2>, 3> layOpt;
+  // layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
+  // layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
+  layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::Jit<rank> Jitter(modStr, mem, physDims, modsDims);
+  using namespace QuICC::Graph;
+  Jit<rank> Jitter(modStr, mem, physDims, modsDims, layOpt, Stage::MMM, Stage::MMM);
 
   // setup metadata
   auto M = physDims[0];
@@ -276,7 +279,8 @@ TEST_CASE("Serial 3D Fwd", "[Serial3DFwd]")
   layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt);
+  using namespace QuICC::Graph;
+  Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::PPP);
 
   // setup metadata
   auto M = physDims[0];
@@ -362,7 +366,8 @@ TEST_CASE("Serial 3D Bwd", "[Serial3DBwd]")
   layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt);
+  using namespace QuICC::Graph;
+  Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::PPP, Stage::MMM);
 
   // setup metadata
   auto M = physDims[0];
@@ -449,7 +454,8 @@ TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
   layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt);
+  using namespace QuICC::Graph;
+  Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::MMM);
 
   // setup metadata
   auto modsM = modsDims[0];
@@ -518,7 +524,8 @@ TEST_CASE("Serial Multi Var 3D Fwd", "[SerialMultiVar3DFwd]")
   layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  QuICC::Graph::Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt);
+  using namespace QuICC::Graph;
+  Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::PPP);
 
   // setup metadata
   auto M = physDims[0];

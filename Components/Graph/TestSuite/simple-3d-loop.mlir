@@ -1,12 +1,10 @@
 // mod -> phys
 // phys -> mod
 // Nr x Nphi x Ntheta
-!type_uval = !quiccir.view<6x10x10xf64, "R_DCCSC3D_t">
+// !type_uval = !quiccir.view<6x10x10xf64, "R_DCCSC3D_t">
 // L x N x M  ( ..., radial, ...)
-!type_umod = !quiccir.view<7x3x6xf64, "C_DCCSC3D_t">
+// !type_umod = !quiccir.view<7x3x6xf64, "C_DCCSC3D_t">
 
-!type_tuval = tensor<6x10x10xf64, "R_DCCSC3D_t">
-!type_tumod = tensor<7x3x6xf64, "C_DCCSC3D_t">
 
 func.func private @bwd(%Pol: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
   // Pol
@@ -28,15 +26,10 @@ func.func private @fwd(%R: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
   return %R3 : tensor<?x?x?xf64>
 }
 
-func.func @entry(%thisArr: !llvm.ptr<array<15 x ptr>> {llvm.noalias}, %PolNewv: !type_umod, %Polv: !type_umod) {
-  %Pol = builtin.unrealized_conversion_cast %Polv : !type_umod to !type_tumod
-  %Polur = tensor.cast %Pol : !type_tumod to tensor<?x?x?xf64>
+func.func @entry(%Polur: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
   %tmp = call @bwd(%Polur) : (tensor<?x?x?xf64>) -> tensor<?x?x?xf64>
   %PolNewur = call @fwd(%tmp) : (tensor<?x?x?xf64>) -> tensor<?x?x?xf64>
-  %PolNew = tensor.cast %PolNewur : tensor<?x?x?xf64> to !type_tumod
-  /// if this is the only consumer write to existing buffer
-  quiccir.materialize %PolNew in %PolNewv : (!type_tumod, !type_umod)
-  return
+  return %PolNewur : tensor<?x?x?xf64>
 }
 
-// /home/gcastigl/codes/quiccir/build-17/bin/quiccir-opt ../Components/Graph/TestSuite/simple-3d-loop.mlir --inline  --set-quiccir-dims='phys=3,10,6 mods=2,6,6' --set-quiccir-view-lay='lay-ppp2mpp=R_DCCSC3D_t,C_DCCSC3D_t lay-pmp2mmp=C_DCCSC3D_t,C_S1CLCSC3D_t lay-pmm2mmm=C_DCCSC3D_t,C_DCCSC3D_t' --convert-quiccir-to-call --quiccir-view-deallocation --lower-quiccir-alloc --canonicalize --finalize-quiccir-view --convert-func-to-llvm --canonicalize
+// ./bin/quiccir-opt ../examples/simple-3d-loop.mlir --inline --quiccir-view-wrapper='dim-rets=7,3,6 dim-args=7,3,6 lay-args=C_DCCSC3D_t lay-rets=C_DCCSC3D_t' --inline --set-quiccir-dims='phys=6,10,10 mods=3,6,7' --set-quiccir-view-lay='lay-ppp2mpp=R_DCCSC3D_t,C_DCCSC3D_t lay-pmp2mmp=C_DCCSC3D_t,C_S1CLCSC3D_t lay-pmm2mmm=C_DCCSC3D_t,C_DCCSC3D_t' --convert-quiccir-to-call --quiccir-view-deallocation --lower-quiccir-alloc --canonicalize --finalize-quiccir-view --convert-func-to-llvm --canonicalize

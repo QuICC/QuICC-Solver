@@ -37,6 +37,17 @@
 namespace QuICC {
 namespace Graph {
 
+enum class Stage
+{
+    PPP, // physical space, stage 0
+    MPP, // modal space, stage 0
+    PPM, // physical space, stage 1
+    MPM, // modal space, stage 1
+    PMM, // physical space, stage 2
+    MMM  // modal space, stage 2
+};
+
+
 template<class T, class ATT>
 ViewDescriptor<T, std::uint32_t, 3> getViewDescriptor(View::View<T, ATT> view)
 {
@@ -49,115 +60,52 @@ ViewDescriptor<T, std::uint32_t, 3> getViewDescriptor(View::View<T, ATT> view)
 template <std::uint32_t RANK = 3u>
 class Jit {
 private:
-    /// @brief data
-    mlir::DialectRegistry _registry;
-    mlir::MLIRContext _ctx;
-    mlir::OwningOpRef<mlir::ModuleOp> _module;
-    void* _funSym;
-    std::unique_ptr<mlir::ExecutionEngine> _engine;
 
+    /// @brief do we need to add a wrapper
+    bool needViewWrapper = false;
+    /// @brief storage for MLIR registry
+    mlir::DialectRegistry _registry;
+    /// @brief storage for MLIR context
+    mlir::MLIRContext _ctx;
+    /// @brief storage for MLIR module to be JITted
+    mlir::OwningOpRef<mlir::ModuleOp> _module;
+    /// @brief storage for MLIR execution engine
+    std::unique_ptr<mlir::ExecutionEngine> _engine;
+    /// @brief  storage for JITted graph function
+    void* _funSym;
+    /// @brief mat to QuICC operators
     QuICC::Graph::MapOps _storeOp;
     /// @brief memory resource for internal op allocation
     std::shared_ptr<Memory::memory_resource> _mem;
 
-
-    void setDialects()
-    {
-        mlir::func::registerAllExtensions(_registry);
-        // Add the following to include *all* MLIR Core dialects, or selectively
-        // include what you need like above. You only need to register dialects that
-        // will be *parsed* by the tool, not the one generated
-        registerAllDialects(_registry);
-        _ctx.appendDialectRegistry(_registry);
-        // Load our Dialect in this MLIR Context.
-        _ctx.loadDialect<mlir::quiccir::QuiccirDialect>();
-    }
-
+    /// @brief register needed MLIR dialects
+    void setDialects();
+    /// @brief set grid and spectral dimensions
+    /// @param physDims
+    /// @param modsDims
+    /// @param outStage
+    /// @param inStage
+    void insertWrapper(const std::array<std::uint32_t, RANK> physDims,
+        const std::array<std::uint32_t, RANK> modsDims,
+        const std::array<std::array<std::string, 2>, RANK> layOpt,
+        const Stage outStage, const Stage inStage);
+    /// @brief set grid and spectral dimensions
+    /// @param physDims
+    /// @param modsDims
     void setDimensions(const std::array<std::uint32_t, RANK> physDims,
-        const std::array<std::uint32_t, RANK> modsDims)
-    {
-        // Inline and set dimensions
-        mlir::PassManager pmPre(&_ctx);
-        pmPre.addPass(mlir::createInlinerPass());
-        mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
-        // Reorder dimensions based on mlir convention
-        std::array<std::int64_t, RANK> phys{physDims[2], physDims[0], physDims[1]};
-        std::array<std::int64_t, RANK> mods{modsDims[2], modsDims[0], modsDims[1]};
-        nestedFuncPmPre.addPass(mlir::quiccir::createSetDimensionsPass(phys, mods));
-
-        if (mlir::failed(pmPre.run(*_module))) {
-            throw std::runtime_error("Failed to set dimensions.");
-        }
-    }
-
-    void setLayout(const std::array<std::array<std::string, 2>, 3> layOpt)
-    {
-        // Inline and set layout attributes
-        mlir::PassManager pmPre(&_ctx);
-        pmPre.addPass(mlir::createInlinerPass());
-        mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
-        nestedFuncPmPre.addPass(mlir::quiccir::createSetViewLayoutPass(layOpt));
-
-        if (mlir::failed(pmPre.run(*_module))) {
-            throw std::runtime_error("Failed to set layout.");
-        }
-    }
-
+        const std::array<std::uint32_t, RANK> modsDims);
+    /// @brief set layout for each stage
+    /// @param layOpt
+    void setLayout(const std::array<std::array<std::string, 2>, 3> layOpt);
+    /// @brief map operators
+    /// @param physDims
+    /// @param modsDims
     void setMap(const std::array<std::uint32_t, RANK> physDims,
-        const std::array<std::uint32_t, RANK> modsDims)
-    {
-        // setup ops map and store
-        _storeOp = std::move(QuICC::Graph::MapOps(*_module, _mem, physDims, modsDims));
-    }
-
-    void lower()
-    {
-        // Top level (module) pass manager
-        mlir::PassManager pm(&_ctx);
-        mlir::quiccir::quiccLibCallPipelineBuilder(pm);
-
-        // Lower
-        if (mlir::failed(pm.run(*_module))) {
-            throw std::runtime_error("Failed to lower module.");
-        }
-    }
-
-    void setEngineAndJit()
-    {
-        // Initialize LLVM targets.
-        llvm::InitializeNativeTarget();
-        llvm::InitializeNativeTargetAsmPrinter();
-
-        // Register the translation from MLIR to LLVM IR, which must happen before we
-        // can JIT-compile.
-        mlir::registerBuiltinDialectTranslation(*_module->getContext());
-        mlir::registerLLVMDialectTranslation(*_module->getContext());
-
-        // An optimization pipeline to use within the execution engine.
-        auto optPipeline = mlir::makeOptimizingTransformer(
-            /*optLevel=*/0, /*sizeLevel=*/0,
-            /*targetMachine=*/nullptr);
-
-        // Create an MLIR execution engine. The execution engine eagerly JIT-compiles
-        // the module.
-        mlir::ExecutionEngineOptions engineOptions;
-        engineOptions.transformer = optPipeline;
-        // engineOptions.sharedLibPaths = executionEngineLibs;
-        auto maybeEngine = mlir::ExecutionEngine::create(*_module, engineOptions);
-        if (!maybeEngine) {
-            throw std::runtime_error("failed to construct an execution engine");
-        }
-        auto& engine = maybeEngine.get();
-        _engine = std::move(engine);
-
-        // Invoke the JIT-compiled function.
-        std::string symbol = "entry";
-        auto funSym = _engine->lookup(symbol);
-        if (auto E = funSym.takeError()) {
-           throw std::runtime_error("JIT invocation failed");
-        }
-        _funSym = funSym.get();
-    }
+        const std::array<std::uint32_t, RANK> modsDims);
+    /// @brief lower graph to LLVM IR
+    void lower();
+    /// @brief JIT and store graph function
+    void setEngineAndJit();
 
 public:
     /// @brief Setup Graph from string
@@ -169,20 +117,16 @@ public:
         const std::shared_ptr<Memory::memory_resource> mem,
         const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
-        const std::array<std::array<std::string, 2>, RANK> layOpt = {{}}) : _mem(mem)
+        const std::array<std::array<std::string, 2>, RANK> layOpt,
+        const Stage outStage, const Stage inStage) : _mem(mem)
     {
         setDialects();
 
         // Load module
         _module = mlir::parseSourceString<mlir::ModuleOp>(modStr, &_ctx);
-
+        insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
         setDimensions(physDims, modsDims);
-
-        if (layOpt[0][0].size() > 0)
-        {
-            setLayout(layOpt);
-        }
-
+        setLayout(layOpt);
         setMap(physDims, modsDims);
         lower();
         setEngineAndJit();
@@ -197,20 +141,16 @@ public:
         const std::shared_ptr<Memory::memory_resource> mem,
         const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
-        const std::array<std::array<std::string, 2>, RANK> layOpt = {{}}) : _mem(mem)
+        const std::array<std::array<std::string, 2>, RANK> layOpt,
+        const Stage outStage, const Stage inStage) : _mem(mem)
     {
         setDialects();
 
         // Load module
         _module = mlir::parseSourceFile<mlir::ModuleOp>(sourceMgr, &_ctx);
-
+        insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
         setDimensions(physDims, modsDims);
-
-        if (layOpt[0][0].size() > 0)
-        {
-            setLayout(layOpt);
-        }
-
+        setLayout(layOpt);
         setMap(physDims, modsDims);
         lower();
         setEngineAndJit();
@@ -254,6 +194,188 @@ public:
 
 
 };
+
+template <std::uint32_t RANK>
+void Jit<RANK>::setDialects()
+{
+    mlir::func::registerAllExtensions(_registry);
+    // Add the following to include *all* MLIR Core dialects, or selectively
+    // include what you need like above. You only need to register dialects that
+    // will be *parsed* by the tool, not the one generated
+    registerAllDialects(_registry);
+    _ctx.appendDialectRegistry(_registry);
+    // Load our Dialect in this MLIR Context.
+    _ctx.loadDialect<mlir::quiccir::QuiccirDialect>();
+}
+
+namespace details
+{
+template <std::uint32_t RANK>
+void setOpt(const std::array<std::uint32_t, RANK> physDims,
+    const std::array<std::uint32_t, RANK> modsDims,
+    const std::array<std::array<std::string, 2>, RANK> layout,
+    const Stage stage, std::array<std::int64_t, RANK>& dim, std::string& lay)
+{
+
+    switch(stage)
+    {
+        /// MLIR convention has layer first!
+        case Stage::PPP :
+            dim[1] = physDims[0];
+            dim[2] = physDims[1];
+            dim[0] = physDims[2];
+            lay = layout[0][0];
+            break;;
+        case Stage::MPP :
+            dim[1] = modsDims[0];
+            dim[2] = physDims[1];
+            dim[0] = physDims[2];
+            lay = layout[0][1];
+            break;
+        case Stage::PPM :
+            dim[1] = physDims[1];
+            dim[2] = physDims[2];
+            dim[0] = modsDims[0];
+            lay = layout[1][0];
+            break;
+        case Stage::MPM :
+            dim[1] = modsDims[1];
+            dim[2] = physDims[2];
+            dim[0] = modsDims[0];
+            lay = layout[1][1];
+            break;
+        case Stage::PMM :
+            dim[1] = physDims[2];
+            dim[2] = modsDims[0];
+            dim[0] = modsDims[1];
+            lay = layout[2][0];
+            break;
+        case Stage::MMM :
+            dim[1] = modsDims[2];
+            dim[2] = modsDims[0];
+            dim[0] = modsDims[1];
+            lay = layout[2][1];
+            break;
+    }
+}
+}
+
+template <std::uint32_t RANK>
+void Jit<RANK>::insertWrapper(const std::array<std::uint32_t, RANK> physDims,
+    const std::array<std::uint32_t, RANK> modsDims,
+    const std::array<std::array<std::string, 2>, RANK> lay,
+    const Stage outStage, const Stage inStage)
+{
+    // Inline and insert wrapper
+    mlir::PassManager pmPre(&_ctx);
+    pmPre.addPass(mlir::createInlinerPass());
+    mlir::quiccir::QuiccirViewWrapperOptions opt;
+
+    std::array<std::int64_t, RANK> dimArgs;
+    details::setOpt<RANK>(physDims, modsDims, lay, inStage, dimArgs, opt.layArgs);
+    opt.dimArgs = dimArgs;
+    std::array<std::int64_t, RANK> dimRets;
+    details::setOpt<RANK>(physDims, modsDims, lay, outStage, dimRets, opt.layRets);
+    opt.dimRets = dimRets;
+
+    pmPre.addPass(mlir::quiccir::createViewWrapperPass(opt));
+
+    if (mlir::failed(pmPre.run(*_module))) {
+        throw std::runtime_error("Failed to insert wrapper.");
+    }
+}
+
+
+template <std::uint32_t RANK>
+void Jit<RANK>::setDimensions(const std::array<std::uint32_t, RANK> physDims,
+    const std::array<std::uint32_t, RANK> modsDims)
+{
+    // Inline and set dimensions
+    mlir::PassManager pmPre(&_ctx);
+    pmPre.addPass(mlir::createInlinerPass());
+    mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
+    // Reorder dimensions based on mlir convention
+    std::array<std::int64_t, RANK> phys{physDims[2], physDims[0], physDims[1]};
+    std::array<std::int64_t, RANK> mods{modsDims[2], modsDims[0], modsDims[1]};
+    nestedFuncPmPre.addPass(mlir::quiccir::createSetDimensionsPass(phys, mods));
+
+    if (mlir::failed(pmPre.run(*_module))) {
+        throw std::runtime_error("Failed to set dimensions.");
+    }
+}
+
+template <std::uint32_t RANK>
+void Jit<RANK>::setLayout(const std::array<std::array<std::string, 2>, 3> layOpt)
+{
+    // Inline and set layout attributes
+    mlir::PassManager pmPre(&_ctx);
+    mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
+    nestedFuncPmPre.addPass(mlir::quiccir::createSetViewLayoutPass(layOpt));
+    pmPre.addPass(mlir::createCanonicalizerPass());
+
+    if (mlir::failed(pmPre.run(*_module))) {
+        throw std::runtime_error("Failed to set layout.");
+    }
+}
+
+template <std::uint32_t RANK>
+void Jit<RANK>::setMap(const std::array<std::uint32_t, RANK> physDims,
+    const std::array<std::uint32_t, RANK> modsDims)
+{
+    // setup ops map and store
+    _storeOp = std::move(QuICC::Graph::MapOps(*_module, _mem, physDims, modsDims));
+}
+
+template <std::uint32_t RANK>
+void Jit<RANK>::lower()
+{
+    // Top level (module) pass manager
+    mlir::PassManager pm(&_ctx);
+    mlir::quiccir::quiccLibCallPipelineBuilder(pm);
+
+    // Lower
+    if (mlir::failed(pm.run(*_module))) {
+        throw std::runtime_error("Failed to lower module.");
+    }
+}
+
+template <std::uint32_t RANK>
+void Jit<RANK>::setEngineAndJit()
+{
+    // Initialize LLVM targets.
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+
+    // Register the translation from MLIR to LLVM IR, which must happen before we
+    // can JIT-compile.
+    mlir::registerBuiltinDialectTranslation(*_module->getContext());
+    mlir::registerLLVMDialectTranslation(*_module->getContext());
+
+    // An optimization pipeline to use within the execution engine.
+    auto optPipeline = mlir::makeOptimizingTransformer(
+        /*optLevel=*/0, /*sizeLevel=*/0,
+        /*targetMachine=*/nullptr);
+
+    // Create an MLIR execution engine. The execution engine eagerly JIT-compiles
+    // the module.
+    mlir::ExecutionEngineOptions engineOptions;
+    engineOptions.transformer = optPipeline;
+    // engineOptions.sharedLibPaths = executionEngineLibs;
+    auto maybeEngine = mlir::ExecutionEngine::create(*_module, engineOptions);
+    if (!maybeEngine) {
+        throw std::runtime_error("failed to construct an execution engine");
+    }
+    auto& engine = maybeEngine.get();
+    _engine = std::move(engine);
+
+    // Invoke the JIT-compiled function.
+    std::string symbol = "_view_entry";
+    auto funSym = _engine->lookup(symbol);
+    if (auto E = funSym.takeError()) {
+        throw std::runtime_error("JIT invocation failed");
+    }
+    _funSym = funSym.get();
+}
 
 
 } // namespace Graph
