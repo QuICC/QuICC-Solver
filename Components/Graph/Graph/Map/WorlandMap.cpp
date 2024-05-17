@@ -70,10 +70,10 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
         else
         {
             using namespace QuICC::Transform::Quadrature;
-            using Tin = C_DCCSC3D_t;
-            using Tout = C_DCCSC3D_t;
+            using Tin = C_DCCSC3DJIK_t;
+            using Tout = C_DCCSC3DJIK_t;
             using Top = QuICC::View::View<double, QuICC::View::CSL3D>;
-            using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
+            using backend_t = QuICC::Transform::Quadrature::Cuda::ImplOp<Tout, Tin, Top>;
             using op_t = Op<Tout, Tin, Top, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
@@ -167,10 +167,10 @@ void MapOps::setWorlandInt(mlir::quiccir::JWIOp op)
         else
         {
             using namespace QuICC::Transform::Quadrature;
-            using Tin = C_DCCSC3D_t;
-            using Tout = C_DCCSC3D_t;
+            using Tin = C_DCCSC3DJIK_t;
+            using Tout = C_DCCSC3DJIK_t;
             using Top = QuICC::View::View<double, QuICC::View::CSL3D>;
-            using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
+            using backend_t = QuICC::Transform::Quadrature::Cuda::ImplOp<Tout, Tin, Top>;
             using op_t = Op<Tout, Tin, Top, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();

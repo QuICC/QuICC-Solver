@@ -9,7 +9,7 @@
 using namespace QuICC::Graph;
 
 /// @brief C Interface to MLIR for a al int operator
-/// column major, cpu operators
+/// column major data, cpu operators
 /// @param op
 /// @param uval
 /// @param umod
