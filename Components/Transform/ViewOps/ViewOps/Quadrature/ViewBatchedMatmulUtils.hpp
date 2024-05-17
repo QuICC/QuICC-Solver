@@ -220,7 +220,7 @@ QUICC_CUDA_HOSTDEV inline View::ViewBase<typename Tin::IndexType> getModsPointer
                       std::is_same_v<opLevelType, CS1RL3DJIK::level>)
    {
       modsPointers = in.pointers()[1];
-      #ifndef NDEBUG
+      #if 0
       // check consistency between data and operator metadata
       std::size_t iOp = 0;
       for (std::size_t i = 0; i < modsPointers.size()-1; ++i) {

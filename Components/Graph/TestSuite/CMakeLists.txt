@@ -1,6 +1,7 @@
 include(BundleCatch2)
 
 add_executable(GraphTest
+    GraphTestsMain.cpp
     GraphTests.cpp
 )
 
