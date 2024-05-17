@@ -1,9 +1,8 @@
 # Add public header
 set(PHS
-  ../Graph/FourierMap.hpp
-  ../Graph/OpsMap.hpp
-  ../Graph/Tags.hpp
-  ../Graph/Types.hpp
+  ./Graph/OpsMap.hpp
+  ./Graph/Tags.hpp
+  ./Graph/Types.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
