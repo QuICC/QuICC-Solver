@@ -39,8 +39,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             inTyStr == "C_DCCSC3D_t" &&
             perm[0] == 2 && perm[1] == 0)
           {
-            using Tin = C_DCCSC3D_t;
             using Tout = C_DCCSC3D_t;
+            using Tin = C_DCCSC3D_t;
             using op_t = Op<Tout, Tin, p201_t>;
             _ops.push_back(std::make_unique<op_t>());
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
@@ -51,8 +51,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             inTyStr == "C_DCCSC3D_t" &&
             perm[0] == 1 && perm[1] == 2)
           {
-            using Tin = C_DCCSC3D_t;
             using Tout = C_DCCSC3D_t;
+            using Tin = C_DCCSC3D_t;
             using op_t = Op<Tout, Tin, p120_t>;
             _ops.push_back(std::make_unique<op_t>());
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
@@ -63,8 +63,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             inTyStr == "C_S1CLCSC3D_t" &&
             perm[0] == 2 && perm[1] == 0)
           {
-            using Tin = C_S1CLCSC3D_t;
             using Tout = C_DCCSC3D_t;
+            using Tin = C_S1CLCSC3D_t;
             using op_t = Op<Tout, Tin, p201_t>;
             _ops.push_back(std::make_unique<op_t>());
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
@@ -75,8 +75,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             inTyStr == "C_DCCSC3D_t" &&
             perm[0] == 1 && perm[1] == 2)
           {
-            using Tin = C_S1CLCSC3D_t;
-            using Tout = C_DCCSC3D_t;
+            using Tout = C_S1CLCSC3D_t;
+            using Tin = C_DCCSC3D_t;
             using op_t = Op<Tout, Tin, p120_t>;
             _ops.push_back(std::make_unique<op_t>());
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
@@ -109,6 +109,18 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
+          else if (outTyStr == "C_DCCSC3D_t" &&
+            inTyStr == "C_DCCSC3DJIK_t" &&
+            perm[0] == 1 && perm[2] == 0)
+          {
+            using Tout = C_DCCSC3D_t;
+            using Tin = C_DCCSC3DJIK_t;
+            using op_t = Op<Tout, Tin, p120_t>;
+            _ops.push_back(std::make_unique<op_t>());
+            auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+            assert(ptr != nullptr);
+            _thisArr[index] = ptr;
+          }
           else if (outTyStr == "C_DCCSC3DJIK_t" &&
             inTyStr == "C_S1CLCSC3DJIK_t" &&
             perm[0] == 2 && perm[1] == 0)
@@ -116,6 +128,18 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tout = C_DCCSC3DJIK_t;
             using Tin = C_S1CLCSC3DJIK_t;
             using op_t = Op<Tout, Tin, p201_t>;
+            _ops.push_back(std::make_unique<op_t>());
+            auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
+            assert(ptr != nullptr);
+            _thisArr[index] = ptr;
+          }
+          else if (outTyStr == "C_S1CLCSC3DJIK_t" &&
+            inTyStr == "C_DCCSC3DJIK_t" &&
+            perm[0] == 1 && perm[1] == 2)
+          {
+            using Tout = C_S1CLCSC3DJIK_t;
+            using Tin = C_DCCSC3DJIK_t;
+            using op_t = Op<Tout, Tin, p120_t>;
             _ops.push_back(std::make_unique<op_t>());
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);

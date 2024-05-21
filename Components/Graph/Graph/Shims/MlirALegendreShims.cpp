@@ -213,10 +213,14 @@ extern "C" void _ciface_quiccir_alloc_al_int_C_S1CLCSC3DJIK_t_C_DCCSC3DJIK_t(vie
     pNewBuffer->posSize = pProdBuffer->posSize;
     pNewBuffer->coo = pProdBuffer->coo;
     pNewBuffer->cooSize = pProdBuffer->cooSize;
+    // Temporary auto move to host if needed
+    QuICC::View::ViewBase<std::uint32_t> viewPos(pNewBuffer->pos, pNewBuffer->posSize);
+    using namespace QuICC::Memory;
+    tempOnHostMemorySpace converter(viewPos, TransferMode::read | TransferMode::block);
     // Alloc buffer
     std::size_t cumSliceSize = 0;
     for (std::size_t i = 0; i < pNewBuffer->posSize - 1; ++i) {
-        auto width = pNewBuffer->pos[i+1] - pNewBuffer->pos[i];
+        auto width = viewPos[i+1] - viewPos[i];
         auto height = pNewBuffer->dims[0] - i;
         cumSliceSize += height * width;
     }
