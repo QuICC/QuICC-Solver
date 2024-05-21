@@ -61,6 +61,12 @@ extern "C" inline void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t_gpu(void* 
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->coo));
     // op
     using namespace QuICC::Transform::Fourier;
     using backend_t = QuICC::Graph::viewGpu_t;
@@ -157,6 +163,12 @@ extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t_gpu(void* obj, vi
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->coo));
     // op
     using namespace QuICC::Transform::Fourier;
     using backend_t = QuICC::Graph::viewGpu_t;

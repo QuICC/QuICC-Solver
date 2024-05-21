@@ -63,6 +63,12 @@ extern "C" void _ciface_quiccir_jw_int_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj, 
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->coo));
     // op
     using namespace QuICC::Transform::Quadrature;
     using Tin = C_DCCSC3DJIK_t;
@@ -144,6 +150,12 @@ extern "C" void _ciface_quiccir_jw_prj_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj, 
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->coo));
     // op
     using namespace QuICC::Transform::Quadrature;
     using Tin = C_DCCSC3DJIK_t;

@@ -99,6 +99,12 @@ extern "C" void _ciface_quiccir_transpose_201_C_DCCSC3DJIK_t_C_DCCSC3D_t(void* o
     assert(pIn != nullptr);
     assert(pOut != nullptr);
     assert(pIn->dataSize == pOut->dataSize);
+    assert(QuICC::Cuda::isDeviceMemory(pOut->data));
+    assert(QuICC::Cuda::isDeviceMemory(pOut->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pOut->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->data));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->coo));
     // op
     using namespace QuICC::Transpose::Cuda;
     using namespace QuICC::Transpose;
@@ -170,6 +176,12 @@ extern "C" void _ciface_quiccir_transpose_120_C_DCCSC3D_t_C_DCCSC3DJIK_t(void* o
     assert(pIn != nullptr);
     assert(pOut != nullptr);
     assert(pIn->dataSize == pOut->dataSize);
+    assert(QuICC::Cuda::isDeviceMemory(pOut->data));
+    assert(QuICC::Cuda::isDeviceMemory(pOut->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pOut->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->data));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->coo));
     // op
     using namespace QuICC::Transpose::Cuda;
     using namespace QuICC::Transpose;
@@ -241,6 +253,12 @@ extern "C" void _ciface_quiccir_transpose_201_C_DCCSC3DJIK_t_C_S1CLCSC3DJIK_t(vo
     assert(pIn != nullptr);
     assert(pOut != nullptr);
     assert(pIn->dataSize == pOut->dataSize);
+    assert(QuICC::Cuda::isDeviceMemory(pOut->data));
+    assert(QuICC::Cuda::isDeviceMemory(pOut->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pOut->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->data));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->coo));
     // Op
     using namespace QuICC::Transpose::Cuda;
     using namespace QuICC::Transpose;
@@ -312,6 +330,12 @@ extern "C" void _ciface_quiccir_transpose_120_C_S1CLCSC3DJIK_t_C_DCCSC3DJIK_t(vo
     assert(pIn != nullptr);
     assert(pOut != nullptr);
     assert(pIn->dataSize == pOut->dataSize);
+    assert(QuICC::Cuda::isDeviceMemory(pOut->data));
+    assert(QuICC::Cuda::isDeviceMemory(pOut->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pOut->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->data));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pIn->coo));
     // Op
     using namespace QuICC::Transpose::Cuda;
     using namespace QuICC::Transpose;

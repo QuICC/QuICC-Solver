@@ -62,6 +62,12 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->coo));
     // op
     using namespace QuICC::Transform::Quadrature;
     using Tin = C_DCCSC3DJIK_t;
@@ -129,7 +135,7 @@ extern "C" void _ciface_quiccir_al_prj_C_DCCSC3D_t_C_S1CLCSC3D_t(void* obj,  vie
 
 #ifdef QUICC_HAS_CUDA_BACKEND
 /// @brief C Interface to MLIR for a al int operator
-/// row major, cpu operators
+/// row major, gpu operators
 /// @param op
 /// @param umod
 /// @param uval
@@ -142,12 +148,18 @@ extern "C" void _ciface_quiccir_al_prj_C_DCCSC3DJIK_t_C_S1CLCSC3DJIK_t(void* obj
     assert(obj != nullptr);
     assert(pUval != nullptr);
     assert(pUmod != nullptr);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->coo));
     // op
     using namespace QuICC::Transform::Quadrature;
     using Tin = C_S1CLCSC3DJIK_t;
     using Tout = C_DCCSC3DJIK_t;
     using Top = QuICC::View::View<double, QuICC::View::CS1RL3D>;
-    using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
+    using backend_t = Cuda::ImplOp<Tout, Tin, Top>;
     using op_t = Op<Tout, Tin, Top, backend_t>;
     // views
     using namespace QuICC::View;
