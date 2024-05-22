@@ -66,8 +66,8 @@ extern "C" void _ciface_quiccir_add_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t
     // op
     using namespace QuICC::Pointwise::Cuda;
     using namespace QuICC::Pointwise;
-    using T = C_DCCSC3DJIK_t;
-    using op_t = Op<AddFunctor<std::complex<double>>, T, T, T>;
+    using T = Ccuda_DCCSC3DJIK_t;
+    using op_t = Op<AddFunctor<typename T::ScalarType>, T, T, T>;
     // views
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
@@ -141,8 +141,8 @@ extern "C" void _ciface_quiccir_sub_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t
     // op
     using namespace QuICC::Pointwise::Cuda;
     using namespace QuICC::Pointwise;
-    using T = C_DCCSC3DJIK_t;
-    using op_t = Op<SubFunctor<std::complex<double>>, T, T, T>;
+    using T = Ccuda_DCCSC3DJIK_t;
+    using op_t = Op<SubFunctor<typename T::ScalarType>, T, T, T>;
     // views
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
