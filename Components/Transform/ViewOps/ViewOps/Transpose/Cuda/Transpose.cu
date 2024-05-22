@@ -116,7 +116,7 @@ __global__ void perm(View::View<Tout, View::DCCSC3DJIK> out,
     if (threadIdx.x == 0 && threadIdx.y == 0)
     {
         // iSum shifted by 1
-        for (std::size_t i = 1; i < K; ++i) {
+        for (std::size_t i = 0; i < K; ++i) {
             iSum[i] = 0;
         }
         for (std::size_t i = 2; i < K; ++i) {
@@ -185,7 +185,7 @@ __global__ void perm(View::View<Tout, View::S1CLCSC3DJIK> out,
     if (threadIdx.x == 0 && threadIdx.y == 0)
     {
         // iSum shifted by 1
-        for (std::size_t i = 1; i < K; ++i) {
+        for (std::size_t i = 0; i < K; ++i) {
             iSum[i] = 0;
         }
         for (std::size_t i = 2; i < K; ++i) {
