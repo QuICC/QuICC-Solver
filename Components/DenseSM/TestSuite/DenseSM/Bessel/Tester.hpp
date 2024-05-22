@@ -26,6 +26,7 @@
 #include "DenseSM/Bessel/CoriolisQp.hpp"
 #include "DenseSM/Bessel/Geostrophic2Tor.hpp"
 #include "DenseSM/Bessel/GeostrophicAngularMomentum.hpp"
+#include "DenseSM/Bessel/GeostrophicSolidBody.hpp"
 #include "DenseSM/Bessel/GeostrophicEnergy.hpp"
 #include "DenseSM/Bessel/Tor2GridS.hpp"
 #include "DenseSM/Bessel/Tor2Geostrophic.hpp"
@@ -160,7 +161,7 @@ namespace Bessel {
             MPI_Allreduce(MPI_IN_PLACE, outData.data(), outData.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          #endif
       }
-      else if constexpr(std::is_same_v<TOp, dsm::Bessel::GeostrophicAngularMomentum>)
+      else if constexpr(std::is_same_v<TOp, dsm::Bessel::GeostrophicAngularMomentum> || std::is_same_v<TOp, dsm::Bessel::GeostrophicSolidBody>)
       {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);

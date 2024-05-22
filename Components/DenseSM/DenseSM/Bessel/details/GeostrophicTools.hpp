@@ -114,6 +114,15 @@ public:
     * @param nL            Number of harmonic degrees
     */
    static int cylTruncNr(const int nR, const int nL);
+
+   /**
+    * @brief Cancel angular momentum
+    *
+    * @param spec       Field spectrum
+    * @param momWeights Angular momentum weights per mode
+    * @param solidBody  Solid body decomposition with unit angular momentum
+    */
+   static void cancelAngularMomentum(Array& spec, const Array& momWeights, const Array& solidBody);
 };
 
 } // namespace details

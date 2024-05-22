@@ -12,6 +12,7 @@
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Hasher.hpp"
 #include "QuICC/NonDimensional/Coordinator.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
 
 namespace QuICC {
 
@@ -20,13 +21,18 @@ namespace Io {
 namespace Variable {
 
    IVariableAsciiWriter::IVariableAsciiWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IAsciiWriter(name, ext, header, type, version, mode), mTime(-1.0), mTimestep(-1.0), mSpaceId(id)
+      : IAsciiWriter(name, ext, header, type, version, mode), mPathId(Transform::Path::Empty::id()), mTime(-1.0), mTimestep(-1.0), mSpaceId(id)
    {
    }
 
    Dimensions::Space::Id IVariableAsciiWriter::space() const
    {
       return this->mSpaceId;
+   }
+
+   void IVariableAsciiWriter::setTransformPath(const std::size_t pathId)
+   {
+      this->mPathId = pathId;
    }
 
    void IVariableAsciiWriter::setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,std::size_t>& boundary)

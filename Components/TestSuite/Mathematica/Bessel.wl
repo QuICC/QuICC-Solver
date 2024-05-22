@@ -19,6 +19,8 @@ valueZero::usage="valueZero[n,l]";
 insulatingZero::usage="insulatingZero[n,l]";
 valueZeros::usage="valueZeros[n,l]";
 insulatingZeros::usage="insulatingZeros[n,l]";
+sfZero::usage="sfZero[n,l]";
+sfZeros::usage="sfZeros[n,l]";
 
 (* Operators to work on grid*)
 Jnl::usage="Jnl[k,l,t,d\[Nu]]";
@@ -26,6 +28,7 @@ lowerJnl::usage="lowerJnl[k,l,t,d\[Nu]]";
 raiseJnl::usage="raiseJnl[k,l,t,d\[Nu]]";
 ValueSphJnl::usage="ValueSphJnl[n,l,r]";
 InsulatingSphJnl::usage="InsulatingSphJnl[n,l,r]";
+StressFreeSphJnl::usage="StressFreeSphJnl[n,l,r]";
 ValueRSphJnl::usage="ValueRSphJnl[n,l,r]";
 InsulatingRSphJnl::usage="InsulatingRSphJnl[n,l,r]";
 ValueDSphJnl::usage="ValueDSphJnl[n,l,r]";
@@ -54,6 +57,7 @@ ValueRDDivrSphJnl::usage="ValueRDDivrSphJnl[n,l,r]";
 InsulatingRDDivrSphJnl::usage="ValueRDDivrSphJnl[n,l,r]";
 ValueInsulatingSphereSphJnl::usage="ValueInsulatinSphereSphJnl[n,l,r]";
 InsulatingInsulatingSphereSphJnl::usage="ValueInsulatingSphereSphJnl[n,l,r]";
+rddivrJnl::usage="rddivrJnl[k,l,t,d\[Nu]]";
 
 
 Begin["`Private`"];
@@ -79,6 +83,36 @@ valueZero[n_,l_]:=getZero[n,l,$valueD\[Nu]];
 insulatingZero[n_,l_]:=getZero[n,l,$insulatingD\[Nu]];
 valueZeros[n_,l_]:=Table[valueZero[i,l],{i,0,n}];
 insulatingZeros[n_,l_]:=Table[insulatingZero[i,l] ,{i,0,n}];
+(* Stress-free Roots *)
+scanRoot[l_,z0_,iN_,dk_,zf_]:=Module[{k0,k1,y0,y1,i,z=-1},
+For[i=0,i<iN,i++,
+k0=z0+dk/iN i;
+y0=zf[l,k0];
+k1=z0+dk/iN (i+1);
+y1=zf[l,k1];
+If[y0 y1 <0,z=k1;Break[];]
+];
+z
+]
+sfZeros[n_,l_]:=Module[{dk,iN,z1,z2,zs,zf,fp=32,wp=100},
+zf[p_,k_]=(D[SphericalBesselJ[p,k r],r]-1/r SphericalBesselJ[p,k])/.{r->1};
+(* Scan for starting roots *)
+dk=Max[2l,10];
+iN=2dk;
+z1=scanRoot[l,2,iN,dk,zf];
+If[z1>0,
+z2=scanRoot[l,z1,iN,dk,zf];
+If[z2>0,
+zs={k/.FindRoot[zf[l,k],{k,z1},WorkingPrecision->wp,PrecisionGoal->fp],k/.FindRoot[zf[l,k],{k,z2},WorkingPrecision->wp,PrecisionGoal->fp]};
+For[i=0,i<n-2,i++,
+dz=zs[[-1]]-zs[[-2]];
+zn=k/.FindRoot[zf[l,k],{k,zs[[-1]]+dz},WorkingPrecision->wp,PrecisionGoal->fp];
+AppendTo[zs,zn];
+];
+,Abort[];];
+,Abort[];];
+zs];
+sfZero[n_,l_]:=sfZeros[n+1,l][[n+1]];
 
 
 bnorm[k_,l_,d\[Nu]_]:=Module[{},
@@ -86,7 +120,7 @@ bnorm[k_,l_,d\[Nu]_]:=Module[{},
 		Abs[SphericalBesselJ[l+1,k]/Sqrt[2]],
 		If[d\[Nu]==$insulatingD\[Nu],
 			Abs[SphericalBesselJ[l,k]/Sqrt[2]],
-			Abs[SphericalBesselJ[l,k]/Sqrt[2]]
+			1
 			]
 		]
 ]
@@ -112,6 +146,8 @@ divrdrJnl[k_,l_,t_,d\[Nu]_]=Simplify[1/t D[t Jnl[k,l,t,d\[Nu]],t]];
 raiseJnl[k_,l_,t_,d\[Nu]_]:=Simplify[k SphericalBesselJ[l+1, k t]/bnorm[k,l,d\[Nu]]];
 (*lowerJnl*)
 lowerJnl[k_,l_,t_,d\[Nu]_]:=Simplify[k SphericalBesselJ[l-1, k t]/bnorm[k,l,d\[Nu]]];
+(* Stres-free toroidal *)
+rddivrJnl[k_,l_,t_,d\[Nu]_]:=dJnl[k,l,t,d\[Nu]]- 1/t Jnl[k,l,t,d\[Nu]]
 
 
 (*divrdrJnl operators*)
@@ -138,6 +174,7 @@ op
 (* Operators to work on grid*)
 ValueSphJnl[n_,l_,r_]:=Jnl[valueZero[n,l],l,r,$valueD\[Nu]]
 InsulatingSphJnl[n_,l_,r_]:=Jnl[insulatingZero[n,l],l,r,$insulatingD\[Nu]]
+StressFreeSphJnl[n_,l_,r_]:=Jnl[sfZero[n,l],l,r,-42]
 ValueRSphJnl[n_,l_,r_]:=rJnl[valueZero[n,l],l,r,$valueD\[Nu]]
 InsulatingRSphJnl[n_,l_,r_]:=rJnl[insulatingZero[n,l],l,r,$insulatingD\[Nu]]
 ValueDSphJnl[n_,l_,r_]:=dJnl[valueZero[n,l],l,r,$valueD\[Nu]]
@@ -180,7 +217,6 @@ ValueInsulatingSphereSphJnl[n_,l_,r_]:=ValueDSphJnl[n,l,r]+(l+1)/r ValueSphJnl[n
 InsulatingInsulatingSphereSphJnl[n_,l_,r_]:=InsulatingDSphJnl[n,l,r]+(l+1)/r InsulatingSphJnl[n,l,r]
 ValueRDDivrSphJnl[n_,l_,r_]:=ValueDSphJnl[n,l,r]-1/r ValueSphJnl[n,l,r]
 InsulatingRDDivrSphJnl[n_,l_,r_]:=InsulatingDSphJnl[n,l,r]-1/r InsulatingSphJnl[n,l,r]
-
 
 
 End[];

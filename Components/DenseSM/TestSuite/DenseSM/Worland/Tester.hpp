@@ -24,6 +24,7 @@
 #include "DenseSM/Worland/Geostrophic2Tor.hpp"
 #include "DenseSM/Worland/PyGeostrophic2Tor.hpp"
 #include "DenseSM/Worland/GeostrophicAngularMomentum.hpp"
+#include "DenseSM/Worland/GeostrophicSolidBody.hpp"
 #include "DenseSM/Worland/GeostrophicEnergy.hpp"
 #include "DenseSM/Worland/Tor2Geostrophic.hpp"
 #include "DenseSM/Worland/Tor2EGeostrophic.hpp"
@@ -151,7 +152,7 @@ namespace Worland {
             MPI_Allreduce(MPI_IN_PLACE, outData.data(), outData.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          #endif
       }
-      else if constexpr(std::is_same_v<TOp, dsm::GeostrophicAngularMomentum>)
+      else if constexpr(std::is_same_v<TOp, dsm::GeostrophicAngularMomentum> || std::is_same_v<TOp, dsm::GeostrophicSolidBody>)
       {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);

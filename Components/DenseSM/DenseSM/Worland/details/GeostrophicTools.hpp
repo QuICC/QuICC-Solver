@@ -132,6 +132,15 @@ public:
     * between geostrophic and toroidal modes
     */
    static ArrayI nlist(const int nug, const int maxnl);
+
+   /**
+    * @brief Cancel angular momentum
+    *
+    * @param spec       Field spectrum
+    * @param momWeights Angular momentum weights per mode
+    * @param solidBody  Solid body decomposition with unit angular momentum
+    */
+   static void cancelAngularMomentum(Array& spec, const Array& momWeights, const Array& solidBody);
 };
 
 } // namespace details

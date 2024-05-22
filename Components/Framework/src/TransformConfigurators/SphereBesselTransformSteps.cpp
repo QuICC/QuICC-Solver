@@ -20,20 +20,30 @@
 #include "QuICC/Transform/Path/InsulatingTorPol.hpp"
 #include "QuICC/Transform/Path/NoSlipTorPol.hpp"
 #include "QuICC/Transform/Path/StressFreeTorPol.hpp"
+#include "QuICC/Transform/Path/NoPenetrationTorPol.hpp"
 #include "QuICC/Transform/Path/ValueScalarNl.hpp"
 #include "QuICC/Transform/Path/InsulatingScalarNl.hpp"
 #include "QuICC/Transform/Path/ValueCurlNl.hpp"
 #include "QuICC/Transform/Path/InsulatingCurlNl.hpp"
+#include "QuICC/Transform/Path/InsulatingLaplhCurlNl.hpp"
 #include "QuICC/Transform/Path/StressFreeCurlNl.hpp"
 #include "QuICC/Transform/Path/ValueCurlCurlNl.hpp"
+#include "QuICC/Transform/Path/ValueLaplhCurlCurlNl.hpp"
+#include "QuICC/Transform/Path/ValueWithL0CurlNl.hpp"
+#include "QuICC/Transform/Path/InsulatingWithL0CurlNl.hpp"
 #include "QuICC/Transform/Path/InsulatingCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/ValueNegCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/ValueBc1NegCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/InsulatingBc2NegCurlCurlNl.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
+#include "QuICC/Transform/Forward/Laplh.hpp"
 #include "QuICC/Transform/Forward/ValueP.hpp"
 #include "QuICC/Transform/Forward/InsulatingP.hpp"
 #include "QuICC/Transform/Forward/StressFreeP.hpp"
+#include "QuICC/Transform/Forward/D1.hpp"
+#include "QuICC/Transform/Forward/OversinDphi.hpp"
 #include "QuICC/Transform/Forward/Overlaplh.hpp"
 #include "QuICC/Transform/Forward/OverlaplhD1.hpp"
 #include "QuICC/Transform/Forward/OverlaplhOversinDphi.hpp"
@@ -65,6 +75,7 @@
 #include "QuICC/Transform/Backward/StressFreeOverr1D1R1.hpp"
 #include "QuICC/Transform/Backward/OversinDphi.hpp"
 #include "QuICC/Transform/Backward/ValueSlapl.hpp"
+#include "QuICC/Transform/Backward/InsulatingSlapl.hpp"
 #include "QuICC/Transform/Backward/OversinD1Sin.hpp"
 #include "QuICC/Transform/Backward/Laplh.hpp"
 
@@ -113,7 +124,7 @@ namespace Transform {
       }
       else
       {
-         throw std::logic_error("Unknown backward scalar transform path");
+         throw std::logic_error("Requested an unknown scalar forward transform (ID = " + std::to_string(flag) + ")");
       }
 
       transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
@@ -132,28 +143,31 @@ namespace Transform {
       FieldComponents::Spectral::Id scalId = components.at(0).first;
       auto flag = components.at(0).second;
 
-      std::size_t rId;
-      // Value BC
-      if(flag == Path::ValueScalarNl::id())
+      if(flag != Path::Empty::id())
       {
-         rId = Forward::ValueP::id();
-      }
-      // Insulating BC
-      else if(flag == Path::InsulatingScalarNl::id())
-      {
-         rId = Forward::InsulatingP::id();
-      }
-      else
-      {
-         throw std::logic_error("Requested an unknown nonlinear scalar forward transform (ID = " + std::to_string(flag) + ")");
-      }
+         std::size_t rId;
+         // Value BC
+         if(flag == Path::ValueScalarNl::id())
+         {
+            rId = Forward::ValueP::id();
+         }
+         // Insulating BC
+         else if(flag == Path::InsulatingScalarNl::id())
+         {
+            rId = Forward::InsulatingP::id();
+         }
+         else
+         {
+            throw std::logic_error("Requested an unknown nonlinear scalar forward transform (ID = " + std::to_string(flag) + ")");
+         }
 
-      DebuggerMacro_msg("Using SphereBesselTransformSteps for forwardNLScalar", 1);
+         DebuggerMacro_msg("Using SphereBesselTransformSteps for forwardNLScalar", 1);
 
-      transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
-      transform.back().addEdge(Forward::P::id());
-      transform.back().addEdge(Forward::P::id());
-      transform.back().addEdge(rId, scalId, Arithmetics::Add::id());
+         transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
+         transform.back().addEdge(Forward::P::id());
+         transform.back().addEdge(Forward::P::id());
+         transform.back().addEdge(rId, scalId, Arithmetics::Add::id());
+      }
 
       return transform;
    }
@@ -170,59 +184,62 @@ namespace Transform {
          FieldComponents::Spectral::Id curlcurlId = components.at(1).first;
          auto curlcurlFlag = components.at(1).second;
 
-         // Value BC for toroidal and Value BC for poloidal
-         if(((curlFlag == Path::ValueTorPol::id()) ||
-             (curlFlag == Path::NoSlipTorPol::id()) ||
-             (curlFlag == Path::InsulatingTorPol::id()))
-               && (curlcurlFlag == curlFlag))
+         if(!(curlFlag == Path::Empty::id() && curlcurlFlag == Path::Empty::id()))
          {
-            std::size_t tId;
-            std::size_t pId;
-            // Value BC for Tor and Pol
-            if(curlFlag == Path::ValueTorPol::id())
+            // Value BC for toroidal and Value BC for poloidal
+            if(((curlFlag == Path::ValueTorPol::id()) ||
+                (curlFlag == Path::NoSlipTorPol::id()) ||
+                (curlFlag == Path::InsulatingTorPol::id()))
+                  && (curlcurlFlag == curlFlag))
             {
-               tId = Forward::ValueP::id();
-               pId = Forward::ValuePol::id();
-            }
-            // No-slip BC: Value for Tor, Value and D on Pol
-            if(curlFlag == Path::NoSlipTorPol::id())
-            {
-               tId = Forward::ValueP::id();
-               pId = Forward::ValuePol::id();
-               throw std::logic_error("No-Slip basis not implemented");
-            }
-            // Stress-free BC
-            else if(curlFlag == Path::StressFreeTorPol::id())
-            {
-               tId = Forward::StressFreeP::id();
-               pId = Forward::ValuePol::id();
-            }
-            // Insulating BC
-            else if(curlFlag == Path::InsulatingTorPol::id())
-            {
-               tId = Forward::ValueP::id();
-               pId = Forward::InsulatingPol::id();
-            }
-            // Compute Toroidal component
-            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
-            transform.back().addEdge(tId, curlId, Arithmetics::Add::id());
+               std::size_t tId;
+               std::size_t pId;
+               // Value BC for Tor and Pol
+               if(curlFlag == Path::ValueTorPol::id())
+               {
+                  tId = Forward::ValueP::id();
+                  pId = Forward::ValuePol::id();
+               }
+               // No-slip BC: Value for Tor, Value and D on Pol
+               if(curlFlag == Path::NoSlipTorPol::id())
+               {
+                  tId = Forward::ValueP::id();
+                  pId = Forward::ValuePol::id();
+                  throw std::logic_error("No-Slip basis not implemented");
+               }
+               // Stress-free BC
+               else if(curlFlag == Path::StressFreeTorPol::id())
+               {
+                  tId = Forward::StressFreeP::id();
+                  pId = Forward::ValuePol::id();
+               }
+               // Insulating BC
+               else if(curlFlag == Path::InsulatingTorPol::id())
+               {
+                  tId = Forward::ValueP::id();
+                  pId = Forward::InsulatingPol::id();
+               }
+               // Compute Toroidal component
+               transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
+               transform.back().addEdge(tId, curlId, Arithmetics::Add::id());
 
-            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::OverlaplhD1::id());
-            transform.back().addEdge(tId, curlId, Arithmetics::Sub::id());
+               transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(Forward::OverlaplhD1::id());
+               transform.back().addEdge(tId, curlId, Arithmetics::Sub::id());
 
-            // Compute Poloidal component
-            transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::Overlaplh::id());
-            transform.back().addEdge(pId, curlcurlId, Arithmetics::Add::id());
-         }
-         else
-         {
-            throw std::logic_error("Requested an unknown vector forward transform (ID = " + std::to_string(curlFlag) + ")");
+               // Compute Poloidal component
+               transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(Forward::Overlaplh::id());
+               transform.back().addEdge(pId, curlcurlId, Arithmetics::Add::id());
+            }
+            else
+            {
+               throw std::logic_error("Requested an unknown vector forward transform (ID = " + std::to_string(curlFlag) + ")");
+            }
          }
       } else
       {
@@ -246,129 +263,168 @@ namespace Transform {
          FieldComponents::Spectral::Id curlcurlId = components.at(1).first;
          auto curlcurlFlag = components.at(1).second;
 
-         // CurlNl BC
-         if(curlFlag == Path::ValueCurlNl::id() ||
-               curlFlag == Path::StressFreeCurlNl::id() ||
-               curlFlag == Path::InsulatingCurlNl::id())
+         if(curlFlag != Path::Empty::id())
          {
-            std::size_t tId;
-            // Value BC
-            if(curlFlag == Path::ValueCurlNl::id())
+            // CurlNl BC
+            if(curlFlag == Path::ValueCurlNl::id() ||
+                  curlFlag == Path::StressFreeCurlNl::id() ||
+                  curlFlag == Path::InsulatingCurlNl::id() || 
+                  curlFlag == Path::ValueWithL0CurlNl::id() ||
+                  curlFlag == Path::InsulatingWithL0CurlNl::id() ||
+                  curlFlag == Transform::Path::InsulatingLaplhCurlNl::id())
             {
-               tId = Forward::ValueT::id();
-            }
-            // Insulating BC
-            else if(curlFlag == Path::InsulatingCurlNl::id())
-            {
-               tId = Forward::InsulatingT::id();
-            }
-            // Stress-Free BC
-            else if(curlFlag == Path::StressFreeCurlNl::id())
-            {
-               tId = Forward::StressFreeT::id();
+               std::size_t tId;
+               // Value BC
+               if(curlFlag == Path::ValueCurlNl::id())
+               {
+                  tId = Forward::ValueT::id();
+               }
+               // Insulating BC
+               else if(curlFlag == Path::InsulatingCurlNl::id() || curlFlag == Transform::Path::InsulatingLaplhCurlNl::id())
+               {
+                  tId = Forward::InsulatingT::id();
+               }
+               // Stress-Free BC
+               else if(curlFlag == Path::StressFreeCurlNl::id())
+               {
+                  tId = Forward::StressFreeT::id();
+               }
+               // Value BC with l = 0
+               else if(curlFlag == Path::ValueWithL0CurlNl::id())
+               {
+                  tId = Forward::ValueP::id();
+               }
+               // Insulating BC with l = 0
+               else if(curlFlag == Path::InsulatingWithL0CurlNl::id())
+               {
+                  tId = Forward::InsulatingP::id();
+               }
+               else
+               {
+                  throw std::logic_error("Unknown path requested");
+               }
+
+               auto alThetaId = Forward::OverlaplhOversinDphi::id();
+               auto alPhiId = Forward::OverlaplhD1::id();
+               if(curlFlag == Transform::Path::InsulatingLaplhCurlNl::id())
+               {
+                  alThetaId = Forward::OversinDphi::id();
+                  alPhiId = Forward::D1::id();
+               }
+
+               // Compute curl component
+               transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(alThetaId);
+               transform.back().addEdge(tId, curlId, Arithmetics::Add::id());
+
+               transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(alPhiId);
+               transform.back().addEdge(tId, curlId, Arithmetics::Sub::id());
             }
             else
             {
-               throw std::logic_error("Unknown path requested");
+               throw std::logic_error("Requested an unknown curl nonlinear vector forward transform (ID = " + std::to_string(curlFlag) + ")");
             }
-            // Compute curl component
-            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
-            transform.back().addEdge(tId, curlId, Arithmetics::Add::id());
-
-            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::OverlaplhD1::id());
-            transform.back().addEdge(tId, curlId, Arithmetics::Sub::id());
          }
-         else
+
+         if(curlcurlFlag != Path::Empty::id())
          {
-            throw std::logic_error("Requested an unknown curl nonlinear vector forward transform (ID = " + std::to_string(curlFlag) + ")");
+            // CurlCurlNl BC
+            if(curlcurlFlag == Path::ValueCurlCurlNl::id() ||
+                  curlcurlFlag == Path::InsulatingCurlCurlNl::id() ||
+                  curlcurlFlag == Transform::Path::ValueLaplhCurlCurlNl::id())
+            {
+               std::size_t qId;
+               std::size_t sId;
+               // Value BC
+               if(curlcurlFlag == Path::ValueCurlCurlNl::id() || curlcurlFlag == Transform::Path::ValueLaplhCurlCurlNl::id())
+               {
+                  qId = Forward::ValueQ::id();
+                  sId = Forward::ValueS::id();
+               }
+               // Insulating BC
+               else if(curlcurlFlag == Path::InsulatingCurlCurlNl::id())
+               {
+                  qId = Forward::InsulatingQ::id();
+                  sId = Forward::InsulatingS::id();
+               }
+
+               auto alRId = Forward::P::id();
+               auto alThetaId = Forward::OverlaplhD1::id();
+               auto alPhiId = Forward::OverlaplhOversinDphi::id();
+               if(curlcurlFlag == Transform::Path::ValueLaplhCurlCurlNl::id())
+               {
+                  alRId = Forward::Laplh::id();
+                  alThetaId = Forward::D1::id();
+                  alPhiId = Forward::OversinDphi::id();
+               }
+
+               // Compute curlcurl Q component
+               transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(alRId);
+               transform.back().addEdge(qId, curlcurlId, Arithmetics::Add::id());
+
+               // Compute curlcurl S component
+               transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(alThetaId);
+               transform.back().addEdge(sId, curlcurlId, Arithmetics::Sub::id());
+
+               transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(alPhiId);
+               transform.back().addEdge(sId, curlcurlId, Arithmetics::Sub::id());
+            }
+            // Negative CurlCurlNl
+            else if(curlcurlFlag == Path::ValueNegCurlCurlNl::id() ||
+                  curlcurlFlag == Path::ValueBc1NegCurlCurlNl::id() ||
+                  curlcurlFlag == Path::InsulatingBc2NegCurlCurlNl::id())
+            {
+               std::size_t qId;
+               std::size_t sId;
+               // Value BC
+               if(curlcurlFlag == Path::ValueNegCurlCurlNl::id())
+               {
+                  qId = Forward::ValueQ::id();
+                  sId = Forward::ValueS::id();
+               }
+               // Value BC with 1 additional BC
+               else if(curlcurlFlag == Path::ValueBc1NegCurlCurlNl::id())
+               {
+                  qId = Forward::ValueBc1Q::id();
+                  sId = Forward::ValueBc1S::id();
+               }
+               // Insulating BC with 2 additional BC
+               else if(curlcurlFlag == Path::InsulatingBc2NegCurlCurlNl::id())
+               {
+                  qId = Forward::InsulatingBc2Q::id();
+                  sId = Forward::InsulatingBc2S::id();
+               }
+               // Compute curlcurl Q component
+               transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(qId, curlcurlId, Arithmetics::Sub::id());
+
+               // Compute curlcurl S component
+               transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(Forward::OverlaplhD1::id());
+               transform.back().addEdge(sId, curlcurlId, Arithmetics::Add::id());
+
+               transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+               transform.back().addEdge(Forward::P::id());
+               transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
+               transform.back().addEdge(sId, curlcurlId, Arithmetics::Add::id());
+            }
+            else
+            {
+               throw std::logic_error("Requested an unknown curlcurl vector forward transform (ID = " + std::to_string(curlcurlFlag) + ")");
+            }
          }
-
-         // CurlCurlNl BC
-         if(curlcurlFlag == Path::ValueCurlCurlNl::id() ||
-               curlcurlFlag == Path::InsulatingCurlCurlNl::id())
-         {
-            std::size_t qId;
-            std::size_t sId;
-            // Value BC
-            if(curlcurlFlag == Path::ValueCurlCurlNl::id())
-            {
-               qId = Forward::ValueQ::id();
-               sId = Forward::ValueS::id();
-            }
-            // Insulating BC
-            else if(curlcurlFlag == Path::InsulatingCurlCurlNl::id())
-            {
-               qId = Forward::InsulatingQ::id();
-               sId = Forward::InsulatingS::id();
-            }
-            // Compute curlcurl Q component
-            transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(qId, curlcurlId, Arithmetics::Add::id());
-
-            // Compute curlcurl S component
-            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::OverlaplhD1::id());
-            transform.back().addEdge(sId, curlcurlId, Arithmetics::Sub::id());
-
-            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
-            transform.back().addEdge(sId, curlcurlId, Arithmetics::Sub::id());
-         }
-         // Negative CurlCurlNl
-         else if(curlcurlFlag == Path::ValueNegCurlCurlNl::id() ||
-               curlcurlFlag == Path::ValueBc1NegCurlCurlNl::id() ||
-               curlcurlFlag == Path::InsulatingBc2NegCurlCurlNl::id())
-         {
-            std::size_t qId;
-            std::size_t sId;
-            // Value BC
-            if(curlcurlFlag == Path::ValueNegCurlCurlNl::id())
-            {
-               qId = Forward::ValueQ::id();
-               sId = Forward::ValueS::id();
-            }
-            // Value BC with 1 additional BC
-            else if(curlcurlFlag == Path::ValueBc1NegCurlCurlNl::id())
-            {
-               qId = Forward::ValueBc1Q::id();
-               sId = Forward::ValueBc1S::id();
-            }
-            // Insulating BC with 2 additional BC
-            else if(curlcurlFlag == Path::InsulatingBc2NegCurlCurlNl::id())
-            {
-               qId = Forward::InsulatingBc2Q::id();
-               sId = Forward::InsulatingBc2S::id();
-            }
-            // Compute curlcurl Q component
-            transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(qId, curlcurlId, Arithmetics::Sub::id());
-
-            // Compute curlcurl S component
-            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::OverlaplhD1::id());
-            transform.back().addEdge(sId, curlcurlId, Arithmetics::Add::id());
-
-            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
-            transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
-            transform.back().addEdge(sId, curlcurlId, Arithmetics::Add::id());
-         }
-         else
-         {
-            throw std::logic_error("Requested an unknown curlcurl vector forward transform (ID = " + std::to_string(curlcurlFlag) + ")");
-         }
-
       }
       // The following assumes the physical values are obtained from a primitive formulation
       else
@@ -386,12 +442,13 @@ namespace Transform {
       std::size_t rId;
 
       // Value BC
-      if(req.find(FieldComponents::Physical::SCALAR)->second == Path::ValueScalar::id())
+      auto cS = req.find(FieldComponents::Physical::SCALAR)->second;
+      if(cS == Path::ValueScalar::id())
       {
          rId = Backward::ValueP::id();
       }
       // Insulating BC
-      else if(req.find(FieldComponents::Physical::SCALAR)->second == Path::InsulatingScalar::id())
+      else if(cS == Path::InsulatingScalar::id())
       {
          rId = Backward::InsulatingP::id();
       }
@@ -413,62 +470,74 @@ namespace Transform {
       std::vector<TransformPath> transform;
       std::size_t rId;
 
-      // Value BC
-      if(req.find(FieldComponents::Physical::R)->second == Path::ValueScalar::id())
+      auto cR = req.find(FieldComponents::Physical::R)->second;
+      if(cR != Path::Empty::id())
       {
-         rId = Backward::ValueD1::id();
+         // Value BC
+         if(cR == Path::ValueScalar::id())
+         {
+            rId = Backward::ValueD1::id();
+         }
+         // Insulating BC
+         else if(cR == Path::InsulatingScalar::id())
+         {
+            rId = Backward::InsulatingD1::id();
+         }
+         else
+         {
+            throw std::logic_error("Unknown transform path for backward gradient");
+         }
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
+         transform.back().addEdge(rId);
+         transform.back().addEdge(Backward::P::id());
+         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
       }
-      // Insulating BC
-      else if(req.find(FieldComponents::Physical::R)->second == Path::InsulatingScalar::id())
-      {
-         rId = Backward::InsulatingD1::id();
-      }
-      else
-      {
-         throw std::logic_error("Unknown path transform path");
-      }
-      transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
-      transform.back().addEdge(rId);
-      transform.back().addEdge(Backward::P::id());
-      transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
 
-      // Value BC
-      if(req.find(FieldComponents::Physical::THETA)->second == Path::ValueScalar::id())
+      auto cT = req.find(FieldComponents::Physical::THETA)->second;
+      if(cT != Path::Empty::id())
       {
-         rId = Backward::ValueOverr1::id();
+         // Value BC
+         if(cT == Path::ValueScalar::id())
+         {
+            rId = Backward::ValueOverr1::id();
+         }
+         // Insulating BC
+         else if(cT == Path::InsulatingScalar::id())
+         {
+            rId = Backward::InsulatingOverr1::id();
+         }
+         else
+         {
+            throw std::logic_error("Unknown transform path for backward gradient");
+         }
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
+         transform.back().addEdge(rId);
+         transform.back().addEdge(Backward::D1::id());
+         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
       }
-      // Insulating BC
-      else if(req.find(FieldComponents::Physical::THETA)->second == Path::InsulatingScalar::id())
-      {
-         rId = Backward::InsulatingOverr1::id();
-      }
-      else
-      {
-         throw std::logic_error("Unknown path transform path");
-      }
-      transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
-      transform.back().addEdge(rId);
-      transform.back().addEdge(Backward::D1::id());
-      transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
 
-      // Value BC
-      if(req.find(FieldComponents::Physical::PHI)->second == Path::ValueScalar::id())
+      auto cP = req.find(FieldComponents::Physical::PHI)->second;
+      if(cP != Path::Empty::id())
       {
-         rId = Backward::ValueOverr1::id();
+         // Value BC
+         if(cP == Path::ValueScalar::id())
+         {
+            rId = Backward::ValueOverr1::id();
+         }
+         // Insulating BC
+         else if(cP == Path::InsulatingScalar::id())
+         {
+            rId = Backward::InsulatingOverr1::id();
+         }
+         else
+         {
+            throw std::logic_error("Unknown transform path for backward gradient");
+         }
+         transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
+         transform.back().addEdge(rId);
+         transform.back().addEdge(Backward::OversinDphi::id());
+         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Add::id());
       }
-      // Insulating BC
-      else if(req.find(FieldComponents::Physical::PHI)->second == Path::InsulatingScalar::id())
-      {
-         rId = Backward::InsulatingOverr1::id();
-      }
-      else
-      {
-         throw std::logic_error("Unknown path transform path");
-      }
-      transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
-      transform.back().addEdge(rId);
-      transform.back().addEdge(Backward::OversinDphi::id());
-      transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Add::id());
 
       return transform;
    }
@@ -493,82 +562,101 @@ namespace Transform {
          std::size_t rPolId;
 
          auto cR = req.find(FieldComponents::Physical::R)->second;
-         if(cR == Path::ValueTorPol::id() || cR == Path::NoSlipTorPol::id() || cR == Path::StressFreeTorPol::id())
+         if(cR != Path::Empty::id())
          {
-            rPolId = Backward::ValueOverr1::id();
+            if(cR == Path::ValueTorPol::id() || cR == Path::NoSlipTorPol::id() || cR == Path::StressFreeTorPol::id() || cR == Path::NoPenetrationTorPol::id())
+            {
+               rPolId = Backward::ValueOverr1::id();
+            }
+            else if(cR == Path::InsulatingTorPol::id())
+            {
+               rPolId = Backward::InsulatingOverr1::id();
+            }
+            else
+            {
+               throw std::logic_error("Unknown transform path for backward vector");
+            }
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
+            transform.back().addEdge(rPolId);
+            transform.back().addEdge(Backward::Laplh::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
          }
-         else if(cR == Path::InsulatingTorPol::id())
-         {
-            rPolId = Backward::InsulatingOverr1::id();
-         }
-         else
-         {
-            throw std::logic_error("Unknown path transform path");
-         }
-         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
-         transform.back().addEdge(rPolId);
-         transform.back().addEdge(Backward::Laplh::id());
-         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
 
          auto cT = req.find(FieldComponents::Physical::THETA)->second;
-         if(cT == Path::ValueTorPol::id() || cT == Path::NoSlipTorPol::id())
+         if(cT != Path::Empty::id())
          {
-            rTorId = Backward::ValueP::id();
-            rPolId = Backward::ValueOverr1D1R1::id();
-         }
-         else if(cT == Path::StressFreeTorPol::id())
-         {
-            rTorId = Backward::StressFreeP::id();
-            rPolId = Backward::ValueOverr1D1R1::id();
-         }
-         else if(cT == Path::InsulatingTorPol::id())
-         {
-            rTorId = Backward::ValueP::id();
-            rPolId = Backward::InsulatingOverr1D1R1::id();
-         }
-         else
-         {
-            throw std::logic_error("Unknown path transform path");
-         }
-         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
-         transform.back().addEdge(rTorId);
-         transform.back().addEdge(Backward::OversinDphi::id());
-         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
+            if(cT == Path::ValueTorPol::id() || cT == Path::NoSlipTorPol::id())
+            {
+               rTorId = Backward::ValueP::id();
+               rPolId = Backward::ValueOverr1D1R1::id();
+            }
+            else if(cT == Path::StressFreeTorPol::id())
+            {
+               rTorId = Backward::StressFreeP::id();
+               rPolId = Backward::ValueOverr1D1R1::id();
+            }
+            else if(cT == Path::NoPenetrationTorPol::id())
+            {
+               rTorId = Backward::InsulatingP::id();
+               rPolId = Backward::ValueOverr1D1R1::id();
+            }
+            else if(cT == Path::InsulatingTorPol::id())
+            {
+               rTorId = Backward::ValueP::id();
+               rPolId = Backward::InsulatingOverr1D1R1::id();
+            }
+            else
+            {
+               throw std::logic_error("Unknown transform path for backward vector");
+            }
+            transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
+            transform.back().addEdge(rTorId);
+            transform.back().addEdge(Backward::OversinDphi::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
 
-         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
-         transform.back().addEdge(rPolId);
-         transform.back().addEdge(Backward::D1::id());
-         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
+            transform.back().addEdge(rPolId);
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
+         }
 
          auto cP = req.find(FieldComponents::Physical::PHI)->second;
-         if(cP == Path::ValueTorPol::id() || cP == Path::NoSlipTorPol::id())
+         if(cP != Path::Empty::id())
          {
-            rTorId = Backward::ValueP::id();
-            rPolId = Backward::ValueOverr1D1R1::id();
-         }
-         else if(cP == Path::StressFreeTorPol::id())
-         {
-            rTorId = Backward::StressFreeP::id();
-            rPolId = Backward::ValueOverr1D1R1::id();
-         }
-         else if(cP == Path::InsulatingTorPol::id())
-         {
-            rTorId = Backward::ValueP::id();
-            rPolId = Backward::InsulatingOverr1D1R1::id();
-         }
-         else
-         {
-            throw std::logic_error("Unknown path transform path");
-         }
-         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
-         transform.back().addEdge(rTorId);
-         transform.back().addEdge(Backward::D1::id());
-         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Sub::id());
+            if(cP == Path::ValueTorPol::id() || cP == Path::NoSlipTorPol::id())
+            {
+               rTorId = Backward::ValueP::id();
+               rPolId = Backward::ValueOverr1D1R1::id();
+            }
+            else if(cP == Path::StressFreeTorPol::id())
+            {
+               rTorId = Backward::StressFreeP::id();
+               rPolId = Backward::ValueOverr1D1R1::id();
+            }
+            else if(cP == Path::NoPenetrationTorPol::id())
+            {
+               rTorId = Backward::InsulatingP::id();
+               rPolId = Backward::ValueOverr1D1R1::id();
+            }
+            else if(cP == Path::InsulatingTorPol::id())
+            {
+               rTorId = Backward::ValueP::id();
+               rPolId = Backward::InsulatingOverr1D1R1::id();
+            }
+            else
+            {
+               throw std::logic_error("Unknown transform path for backward vector");
+            }
+            transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
+            transform.back().addEdge(rTorId);
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Sub::id());
 
-         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
-         transform.back().addEdge(rPolId);
-         transform.back().addEdge(Backward::OversinDphi::id());
-         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Add::id());
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
+            transform.back().addEdge(rPolId);
+            transform.back().addEdge(Backward::OversinDphi::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Add::id());
+         }
       }
       else
       {
@@ -603,90 +691,109 @@ namespace Transform {
          std::size_t rPolId;
 
          auto cR = req.find(FieldComponents::Physical::R)->second;
-         if(cR == Path::ValueTorPol::id() || cR == Path::NoSlipTorPol::id())
+         if(cR != Path::Empty::id())
          {
-            rTorId = Backward::ValueOverr1::id();
+            if(cR == Path::ValueTorPol::id() || cR == Path::NoSlipTorPol::id() || cR == Path::InsulatingTorPol::id())
+            {
+               rTorId = Backward::ValueOverr1::id();
+            }
+            else if(cR == Path::StressFreeTorPol::id())
+            {
+               rTorId = Backward::StressFreeOverr1::id();
+            }
+            else if(cR == Path::NoPenetrationTorPol::id())
+            {
+               rTorId = Backward::InsulatingOverr1::id();
+            }
+            else
+            {
+               throw std::logic_error("Unknown transform path for backward curl");
+            }
+            transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
+            transform.back().addEdge(rTorId);
+            transform.back().addEdge(Backward::Laplh::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
          }
-         else if(cR == Path::StressFreeTorPol::id())
-         {
-            rTorId = Backward::StressFreeOverr1::id();
-         }
-         else if(cR == Path::InsulatingTorPol::id())
-         {
-            rTorId = Backward::InsulatingOverr1::id();
-         }
-         else
-         {
-            throw std::logic_error("Unknown path transform path");
-         }
-         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
-         transform.back().addEdge(rTorId);
-         transform.back().addEdge(Backward::Laplh::id());
-         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
 
          auto cT = req.find(FieldComponents::Physical::THETA)->second;
-         if(cT == Path::ValueTorPol::id() || cT == Path::NoSlipTorPol::id())
+         if(cT != Path::Empty::id())
          {
-            rTorId = Backward::ValueOverr1D1R1::id();
-            rPolId = Backward::ValueSlapl::id();
-         }
-         else if(cT == Path::StressFreeTorPol::id())
-         {
-            rTorId = Backward::StressFreeOverr1D1R1::id();
-            rPolId = Backward::ValueSlapl::id();
-         }
-         else if(cT == Path::InsulatingTorPol::id())
-         {
-            rTorId = Backward::InsulatingOverr1D1R1::id();
-            rPolId = Backward::ValueSlapl::id();
-         }
-         else
-         {
-            throw std::logic_error("Unknown path transform path");
-         }
-         // Toroidal part
-         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
-         transform.back().addEdge(rTorId);
-         transform.back().addEdge(Backward::D1::id());
-         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
+            if(cT == Path::ValueTorPol::id() || cT == Path::NoSlipTorPol::id())
+            {
+               rTorId = Backward::ValueOverr1D1R1::id();
+               rPolId = Backward::ValueSlapl::id();
+            }
+            else if(cT == Path::StressFreeTorPol::id())
+            {
+               rTorId = Backward::StressFreeOverr1D1R1::id();
+               rPolId = Backward::ValueSlapl::id();
+            }
+            else if(cT == Path::NoPenetrationTorPol::id())
+            {
+               rTorId = Backward::InsulatingOverr1D1R1::id();
+               rPolId = Backward::ValueSlapl::id();
+            }
+            else if(cT == Path::InsulatingTorPol::id())
+            {
+               rTorId = Backward::ValueOverr1D1R1::id();
+               rPolId = Backward::InsulatingSlapl::id();
+            }
+            else
+            {
+               throw std::logic_error("Unknown transform path for backward curl");
+            }
+            // Toroidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
+            transform.back().addEdge(rTorId);
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
 
-         // Poloidal part
-         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
-         transform.back().addEdge(rPolId);
-         transform.back().addEdge(Backward::OversinDphi::id());
-         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Sub::id());
+            // Poloidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
+            transform.back().addEdge(rPolId);
+            transform.back().addEdge(Backward::OversinDphi::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Sub::id());
+         }
 
          auto cP = req.find(FieldComponents::Physical::PHI)->second;
-         if(cP == Path::ValueTorPol::id() || cP == Path::NoSlipTorPol::id())
+         if(cP != Path::Empty::id())
          {
-            rTorId = Backward::ValueOverr1D1R1::id();
-            rPolId = Backward::ValueSlapl::id();
-         }
-         else if(cP == Path::StressFreeTorPol::id())
-         {
-            rTorId = Backward::StressFreeOverr1D1R1::id();
-            rPolId = Backward::ValueSlapl::id();
-         }
-         else if(cP == Path::InsulatingTorPol::id())
-         {
-            rTorId = Backward::InsulatingOverr1D1R1::id();
-            rPolId = Backward::ValueSlapl::id();
-         }
-         else
-         {
-            throw std::logic_error("Unknown path transform path");
-         }
-         // Toroidal part
-         transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
-         transform.back().addEdge(rTorId);
-         transform.back().addEdge(Backward::OversinDphi::id());
-         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Add::id());
+            if(cP == Path::ValueTorPol::id() || cP == Path::NoSlipTorPol::id())
+            {
+               rTorId = Backward::ValueOverr1D1R1::id();
+               rPolId = Backward::ValueSlapl::id();
+            }
+            else if(cP == Path::StressFreeTorPol::id())
+            {
+               rTorId = Backward::StressFreeOverr1D1R1::id();
+               rPolId = Backward::ValueSlapl::id();
+            }
+            else if(cP == Path::NoPenetrationTorPol::id())
+            {
+               rTorId = Backward::InsulatingOverr1D1R1::id();
+               rPolId = Backward::ValueSlapl::id();
+            }
+            else if(cP == Path::InsulatingTorPol::id())
+            {
+               rTorId = Backward::ValueOverr1D1R1::id();
+               rPolId = Backward::InsulatingSlapl::id();
+            }
+            else
+            {
+               throw std::logic_error("Unknown transform path for backward curl");
+            }
+            // Toroidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
+            transform.back().addEdge(rTorId);
+            transform.back().addEdge(Backward::OversinDphi::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Add::id());
 
-         // Poloidal part
-         transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
-         transform.back().addEdge(rPolId);
-         transform.back().addEdge(Backward::D1::id());
-         transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Add::id());
+            // Poloidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::CURL));
+            transform.back().addEdge(rPolId);
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Add::id());
+         }
       }
       else
       {

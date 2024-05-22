@@ -23,7 +23,9 @@
 #include "QuICC/Transform/Path/NegCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/I2ScalarNl.hpp"
 #include "QuICC/Transform/Path/I2CurlNl.hpp"
+#include "QuICC/Transform/Path/I2LaplhCurlNl.hpp"
 #include "QuICC/Transform/Path/I2CurlCurlNl.hpp"
+#include "QuICC/Transform/Path/I2LaplhCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/NegI2CurlCurlNl.hpp"
 #include "QuICC/Transform/Path/NegI4CurlCurlNl.hpp"
 #include "QuICC/Transform/Path/NegCurlCurlNl.hpp"
@@ -31,6 +33,8 @@
 #include "QuICC/Transform/Forward/I2P.hpp"
 #include "QuICC/Transform/Forward/Overlaplh.hpp"
 #include "QuICC/Transform/Forward/R1.hpp"
+#include "QuICC/Transform/Forward/D1.hpp"
+#include "QuICC/Transform/Forward/OversinDphi.hpp"
 #include "QuICC/Transform/Forward/OverlaplhD1.hpp"
 #include "QuICC/Transform/Forward/OverlaplhOversinDphi.hpp"
 #include "QuICC/Transform/Forward/Pol.hpp"
@@ -195,17 +199,30 @@ namespace Transform {
          auto curlcurlFlag = components.at(1).second;
 
          // Integrate standard second order equation
-         if(curlFlag == Path::I2CurlNl::id())
+         if(curlFlag == Path::I2CurlNl::id() || curlFlag == Path::I2LaplhCurlNl::id())
          {
+            std::size_t alThetaId;
+            std::size_t alPhiId;
+            if(curlFlag == Path::I2CurlNl::id())
+            {
+               alThetaId = Forward::OverlaplhOversinDphi::id();
+               alPhiId = Forward::OverlaplhD1::id();
+            }
+            else if(curlFlag == Path::I2LaplhCurlNl::id())
+            {
+               alThetaId = Forward::OversinDphi::id();
+               alPhiId = Forward::D1::id();
+            }
+
             // Compute curl component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
+            transform.back().addEdge(alThetaId);
             transform.back().addEdge(Forward::I2T::id(), curlId, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
-            transform.back().addEdge(Forward::OverlaplhD1::id());
+            transform.back().addEdge(alPhiId);
             transform.back().addEdge(Forward::I2T::id(), curlId, Arithmetics::Sub::id());
          }
          // Standard second order equation without quasi-inverse

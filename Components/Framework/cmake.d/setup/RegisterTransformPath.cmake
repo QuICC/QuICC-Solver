@@ -32,6 +32,7 @@ set(tags
   StressFreeTorPol
   StressFreeCurlNl
   NoSlipTorPol
+  NoPenetrationTorPol
   )
 
 include(RegisterTags)

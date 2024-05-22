@@ -9,6 +9,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   GeostrophicEnergy.cpp
   PyGeostrophic2Tor.cpp
   GeostrophicAngularMomentum.cpp
+  GeostrophicSolidBody.cpp
   Tools.cpp
   Tor2Geostrophic.cpp
   Tor2EGeostrophic.cpp

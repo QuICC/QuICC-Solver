@@ -18,6 +18,8 @@
 #include "QuICC/Polynomial/ALegendre/dPlm.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/Quadrature/JacobiRule.hpp"
+#include "QuICC/Polynomial/Quadrature/ChebyshevRule.hpp"
+#include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "Types/Internal/BasicTypes.hpp"
@@ -173,15 +175,26 @@ void GeostrophicTools::computeGridS(Internal::Array& igridS, Internal::Array& iw
 {
    using namespace Internal::Literals;
 
-   if (alpha != 0.5_mp || beta != 1.0_mp)
+   if (!((alpha == 0.5_mp && beta == 1.0_mp) || (alpha == -0.5_mp && beta == 0.5_mp)))
    {
       throw std::logic_error("Generic (alpha,beta) pair is not implemented!");
    }
 
    // compute Gauss-Jacobi quadrature in x
    Internal::Array igridX;
-   Polynomial::Quadrature::JacobiRule jRuleA(alpha, beta - 1);
-   jRuleA.computeQuadrature(igridX, iweightS, nS);
+   // Chebyshev rule
+   if(alpha == -0.5_mp && beta == 0.5_mp)
+   {
+      Polynomial::Quadrature::ChebyshevRule rule;
+      rule.computeQuadrature(igridX, iweightS, nS);
+      igridX = igridX.reverse().eval();
+   }
+   // Generic Jacobi rule
+   else
+   {
+      Polynomial::Quadrature::JacobiRule jRuleA(alpha, beta - 1);
+      jRuleA.computeQuadrature(igridX, iweightS, nS);
+   }
 
    // grid in s
    igridS =
@@ -261,6 +274,13 @@ void GeostrophicTools::integrateZ(int l, int n, Internal::Matrix& iintgz,
    {
       iintgz.setConstant(0.0_mp);
    }
+}
+
+void GeostrophicTools::cancelAngularMomentum(Array& spec, const Array& momWeights, const Array& solidBody)
+{
+   auto angMom = (spec.transpose() * momWeights).value();
+
+   spec.topRows(solidBody.size()) -= angMom*solidBody;
 }
 
 int GeostrophicTools::cylTruncNug(const int nL, const bool isTriangular)

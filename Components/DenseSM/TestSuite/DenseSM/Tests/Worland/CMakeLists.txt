@@ -70,6 +70,23 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+# Create tests for GeostrophicSolidBody
+set(_tests
+  GeostrophicSolidBody:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 1 1 11 11 11 11
+  MPULP 1 1 11 11 11 11
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1 2 3 4 5
+    ULPS ${_ulp}
+  )
+endforeach()
+
 # Create tests for GeostrophicEnergy
 set(_tests
   GeostrophicEnergy:dense

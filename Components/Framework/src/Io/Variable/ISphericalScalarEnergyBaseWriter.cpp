@@ -28,13 +28,10 @@ namespace Io {
 namespace Variable {
 
    ISphericalScalarEnergyBaseWriter::ISphericalScalarEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IVariableAsciiWriter(name, ext ,header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mPathId(Transform::Path::Scalar::id()), mShowParity(false)
+      : IVariableAsciiWriter(name, ext ,header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
    {
-   }
-
-   void ISphericalScalarEnergyBaseWriter::setTransformPath(const std::size_t pathId)
-   {
-      this->mPathId = pathId;
+      // Set default path
+      this->setTransformPath(Transform::Path::Scalar::id());
    }
 
    void ISphericalScalarEnergyBaseWriter::showParity()
@@ -84,7 +81,7 @@ namespace Variable {
       }
       else
       {
-         throw std::logic_error("Unknown transform path requested");
+         throw std::logic_error("Unknown energy transform reductor path (" + std::to_string(this->mPathId) + ") requested for scalar");
       }
 
       // Prepare spectral data for transform

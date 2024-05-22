@@ -280,6 +280,13 @@ int GeostrophicTools::cylTruncNr(const int nR, const int nL)
    return nN;
 }
 
+void GeostrophicTools::cancelAngularMomentum(Array& spec, const Array& momWeights, const Array& solidBody)
+{
+   auto angMom = (spec.transpose() * momWeights).value();
+
+   spec.topRows(solidBody.size()) -= angMom*solidBody;
+}
+
 } // namespace details
 } // namespace Bessel
 } // namespace DenseSM

@@ -26,6 +26,7 @@
 #include "QuICC/Transform/Path/TorPol.hpp"
 #include "QuICC/Transform/Path/NoSlipTorPol.hpp"
 #include "QuICC/Transform/Path/InsulatingTorPol.hpp"
+#include "QuICC/Transform/Path/NoPenetrationTorPol.hpp"
 #include "QuICC/Transform/Reductor/Power.hpp"
 #include "QuICC/Transform/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Reductor/PowerD1R1.hpp"
@@ -34,6 +35,7 @@
 #include "QuICC/Transform/Reductor/ValuePowerD1R1.hpp"
 #include "QuICC/Transform/Reductor/InsulatingPower.hpp"
 #include "QuICC/Transform/Reductor/InsulatingPowerD1R1.hpp"
+#include "QuICC/Transform/Reductor/InsulatingPowerR2.hpp"
 #include "QuICC/Io/Variable/Tags/Power.hpp"
 
 namespace QuICC {
@@ -42,17 +44,14 @@ namespace Io {
 
 namespace Variable {
    ISphericalTorPolPowerBaseWriter::ISphericalTorPolPowerBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mPathId(Transform::Path::TorPol::id()), mShowParity(false)
+      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
    {
+      // Set default path
+      this->setTransformPath(Transform::Path::TorPol::id());
    }
 
    ISphericalTorPolPowerBaseWriter::~ISphericalTorPolPowerBaseWriter()
    {
-   }
-
-   void ISphericalTorPolPowerBaseWriter::setTransformPath(const std::size_t pathId)
-   {
-      this->mPathId = pathId;
    }
 
    void ISphericalTorPolPowerBaseWriter::showParity()
@@ -114,9 +113,15 @@ namespace Variable {
          polPowerId = Transform::Reductor::ValuePower::id();
          polPowerD1R1Id = Transform::Reductor::ValuePowerD1R1::id();
       }
+      else if(this->mPathId == Transform::Path::NoPenetrationTorPol::id())
+      {
+         torPowerR2Id = Transform::Reductor::InsulatingPowerR2::id();
+         polPowerId = Transform::Reductor::ValuePower::id();
+         polPowerD1R1Id = Transform::Reductor::ValuePowerD1R1::id();
+      }
       else
       {
-         throw std::logic_error("Unknown path ID requested");
+         throw std::logic_error("Unknown power transform reductor path (" + std::to_string(this->mPathId) + ") requested for Toroidal/Poloidal");
       }
 
       // Prepare spectral data for transform

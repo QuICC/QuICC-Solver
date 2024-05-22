@@ -55,6 +55,13 @@ namespace Variable {
          virtual ~IVariableAsciiWriter() = default;
 
          /**
+          * @brief Set transform path ID
+          *
+          * @param pathID  ID of transform path
+          */
+         void setTransformPath(const std::size_t pathId);
+
+         /**
           * @brief Add name of expected variable to be added
           *
           * @param id ID of field
@@ -145,6 +152,11 @@ namespace Variable {
           * @brief Get iterator range to vectors
           */
          vector_iterator_range   vectorRange();
+
+         /**
+          * @brief Transform path ID
+          */
+         std::size_t mPathId;
 
          /**
           * @brief Physical parameters of the simulation

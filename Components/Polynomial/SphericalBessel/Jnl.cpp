@@ -125,7 +125,6 @@ Internal::MHDFloat d2SphJnl(const Internal::MHDFloat k, const int l,
    const Internal::MHDFloat r, const Internal::MHDFloat dNu)
 {
    using namespace Internal::Literals;
-   auto dl = static_cast<Internal::MHDFloat>(l);
    Internal::MHDFloat val;
    if (l == 0)
    {
@@ -141,7 +140,7 @@ Internal::MHDFloat d2SphJnl(const Internal::MHDFloat k, const int l,
    }
    else
    {
-      Internal::MHDFloat dl = static_cast<Internal::MHDFloat>(l);
+      auto dl = static_cast<Internal::MHDFloat>(l);
       const Internal::MHDFloat c =
          k*k / ((2_mp*dl - 1_mp)*(2_mp*dl + 1_mp)*(2_mp*dl + 3_mp));
       val = c*(

@@ -3,6 +3,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   CoriolisQp.cpp
   Geostrophic2Tor.cpp
   GeostrophicAngularMomentum.cpp
+  GeostrophicSolidBody.cpp
   GeostrophicEnergy.cpp
   ProjFitEnergyR2.cpp
   ProjFitEnergyPol.cpp
