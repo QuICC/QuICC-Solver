@@ -573,5 +573,4 @@ TEST_CASE("Serial Multi Var 3D Fwd", "[SerialMultiVar3DFwd]")
   {
     CHECK(std::abs(modsOutView[m]) <= eps);
   }
-
 }

@@ -401,7 +401,7 @@ TEST_CASE("Serial 3D Loop Gpu", "[Serial3DLoopGpu]")
   // Populate meta for fully populated tensor
   // Modal space
   using namespace QuICC::Graph;
-  auto metaMods = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});
+  auto metaMods = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>(dimensions);
   std::array<std::vector<std::uint32_t>, rank> pointers {{{}, metaMods.ptr, {}}};
   std::array<std::vector<std::uint32_t>, rank> indices {{{}, metaMods.idx, {}}};
 
@@ -474,4 +474,159 @@ TEST_CASE("Serial 3D Loop Gpu", "[Serial3DLoopGpu]")
     CHECK(std::abs(modsOutView[m] - modsInView[m]) <= eps);
   }
 
+}
+
+TEST_CASE("Serial Multi Var 3D Fwd Gpu", "[SerialMultiVar3DFwdGpu]")
+{
+  std::string inputFilename = "./complex-3d-fwd.mlir";
+  llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
+      llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
+  if (std::error_code EC = fileOrErr.getError()) {
+    llvm::errs() << "Could not open input file: " << EC.message() << "\n";
+    CHECK(false);
+  }
+
+  // Parse the input mlir.
+  llvm::SourceMgr sourceMgr;
+  sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
+
+  // Grid dimensions
+  constexpr std::uint32_t rank = 3;
+  std::array<std::uint32_t, rank> physDims{10, 6, 3};
+  std::array<std::uint32_t, rank> modsDims{6, 6, 2};
+
+  std::array<std::array<std::string, 2>, 3> layOpt;
+  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
+  layOpt[1] = {"C_DCCSC3DJIK_t", "C_S1CLCSC3DJIK_t"};
+  layOpt[2] = {"C_DCCSC3DJIK_t", "C_DCCSC3DJIK_t"};
+
+  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+  auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
+  using namespace QuICC::Graph;
+  Jit<rank> Jitter(std::move(sourceMgr), memDev, physDims, modsDims, layOpt, Stage::MMM, Stage::PPP);
+
+  // setup metadata
+  auto M = physDims[0];
+  auto N = physDims[1];
+  auto K = physDims[2];
+  auto modsM = modsDims[0];
+  auto modsN = modsDims[1];
+  auto modsK = modsDims[2];
+  std::array<std::uint32_t, 3> outDims {modsK, modsM, modsN};
+
+  // Populate meta for fully populated tensor
+  // Physical space
+  std::vector<std::uint32_t> ptrPhys(K+1);
+  std::vector<std::uint32_t> idxPhys(K*N);
+  ptrPhys[0] = 0;
+  for (std::size_t i = 1; i < ptrPhys.size(); ++i) {
+      ptrPhys[i] = ptrPhys[i-1]+N;
+  }
+  for (std::size_t i = 0; i < idxPhys.size(); ++i) {
+      idxPhys[i] = i % N;
+  }
+  std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, ptrPhys, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
+
+  // Populate meta for fully populated tensor
+  // Modal space
+  using namespace QuICC::Graph;
+  auto metaMods = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>(outDims);
+  std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaMods.ptr, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaMods.idx, {}}};
+
+  // host mem block
+  std::size_t physS = M*indicesPhys[1].size();
+  std::size_t modsS = modsK*metaMods.idx.size()
+  QuICC::Memory::MemBlock<double> R(physS, mem.get());
+  QuICC::Memory::MemBlock<double> Phi(physS, mem.get());
+  QuICC::Memory::MemBlock<double> Theta(physS, mem.get());
+  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, mem.get());
+
+  // host view
+  R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
+  R_DCCSC3D_t PhiView({Phi.data(), Phi.size()}, physDims, pointersPhys, indicesPhys);
+  R_DCCSC3D_t ThetaView({Theta.data(), Theta.size()}, physDims, pointersPhys, indicesPhys);
+  C_DCCSC3DJIK_t modsOutView({modsOut.data(), modsOut.size()}, outDims, pointersMods, indicesMods);
+
+  // device block
+  QuICC::Memory::MemBlock<double> RDev(physS, memDev.get());
+  QuICC::Memory::MemBlock<double> PhiDev(physS, memDev.get());
+  QuICC::Memory::MemBlock<double> ThetaDev(physS, memDev.get());
+  QuICC::Memory::MemBlock<std::complex<double>> modsOutDev(modsS, memDev.get());
+
+  QuICC::Memory::MemBlock<std::uint32_t> memBlockPointersPhysDev(
+    pointersPhys[1].size(), memDev.get());
+  QuICC::Memory::MemBlock<std::uint32_t> memBlockIndicesPhysDev(
+    indicesPhys[1].size(), memDev.get());
+  QuICC::Memory::MemBlock<std::uint32_t> memBlockPointersModsDev(
+    pointersMods[1].size(), memDev.get());
+  QuICC::Memory::MemBlock<std::uint32_t> memBlockIndicesModsDev(
+    indicesMods[1].size(), memDev.get());
+
+  // set device pointers and indice
+  using namespace QuICC::View;
+  ViewBase<std::uint32_t> pointersPhysDev[rank];
+  pointersPhysDev[1] = ViewBase<std::uint32_t>(memBlockPointersPhysDev.data(),
+    memBlockPointersPhysDev.size());
+  ViewBase<std::uint32_t> indicesPhysDev[rank];
+  indicesPhysDev[1] = ViewBase<std::uint32_t>(memBlockIndicesPhysDev.data(),
+    memBlockIndicesPhysDev.size());
+  ViewBase<std::uint32_t> pointersModsDev[rank];
+  pointersModsDev[1] = ViewBase<std::uint32_t>(memBlockPointersModsDev.data(),
+    memBlockPointersModsDev.size());
+  ViewBase<std::uint32_t> indicesModsDev[rank];
+  indicesModsDev[1] = ViewBase<std::uint32_t>(memBlockIndicesModsDev.data(),
+    memBlockIndicesModsDev.size());
+
+  // device view
+  R_DCCSC3D_t RViewDev({RDev.data(), RDev.size()}, physDims, pointersPhysDev, indicesPhysDev);
+  R_DCCSC3D_t PhiViewDev({PhiDev.data(), PhiDev.size()}, physDims, pointersPhysDev, indicesPhysDev);
+  R_DCCSC3D_t ThetaViewDev({ThetaDev.data(), ThetaDev.size()}, physDims, pointersPhysDev, indicesPhysDev);
+  C_DCCSC3DJIK_t modsOutViewDev({modsOutDev.data(), modsOutDev.size()}, outDims, pointersModsDev, indicesModsDev);
+
+  // cpu -> gpu index/pointers
+  cudaErrChk(cudaMemcpy(memBlockPointersPhysDev.data(), pointersPhys[1].data(),
+    pointersPhys[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+  cudaErrChk(cudaMemcpy(memBlockIndicesPhysDev.data(), indicesPhys[1].data(),
+    indicesPhys[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+  cudaErrChk(cudaMemcpy(memBlockPointersPhysDev.data(), pointersMods[1].data(),
+    pointersMods[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+  cudaErrChk(cudaMemcpy(memBlockIndicesModsDev.data(), indicesMods[1].data(),
+    indicesMods[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+
+  // set input phys
+  double val = 1.0;
+  for(std::size_t m = 0; m < RView.size(); ++m)
+  {
+    RView[m] = val;
+    PhiView[m] = val;
+    ThetaView[m] = val;
+  }
+
+  // cpu -> gpu data
+  cudaErrChk(cudaMemcpy(RDev.data(), R.data(),
+    physS * sizeof(double), cudaMemcpyHostToDevice));
+  cudaErrChk(cudaMemcpy(PhiDev.data(), Phi.data(),
+    physS * sizeof(double), cudaMemcpyHostToDevice));
+  cudaErrChk(cudaMemcpy(ThetaDev.data(), Theta.data(),
+    physS * sizeof(double), cudaMemcpyHostToDevice));
+
+  // Apply graph
+  Jitter.apply(modsOutViewDev, RViewDev, PhiViewDev, ThetaViewDev);
+
+  // gpu -> cpu
+  cudaErrChk(cudaDeviceSynchronize());
+  cudaErrChk(cudaMemcpy(modsOut.data(), modsOutDev.data(),
+    modsS * sizeof(std::complex<double>),
+    cudaMemcpyDeviceToHost));
+
+  // Check
+  double eps = 1e-15;
+  CHECK(std::abs(modsOutView[0].real() - sqrt(2.0)*QuICC::Math::PI) <= eps);
+  CHECK(std::abs(modsOutView[0].imag()) <= eps);
+  for(std::size_t m = 1; m < modsOutView.size(); ++m)
+  {
+    CHECK(std::abs(modsOutView[m]) <= eps);
+  }
 }
