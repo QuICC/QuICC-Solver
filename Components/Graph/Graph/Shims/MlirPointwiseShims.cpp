@@ -75,9 +75,9 @@ extern "C" void _ciface_quiccir_add_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t
     pointers[1] = ViewBase<std::uint32_t>(pLhs->pos, pLhs->posSize);
     ViewBase<std::uint32_t> indices[rank];
     indices[1] = ViewBase<std::uint32_t>(pLhs->coo, pLhs->cooSize);
-    T viewLhs(pLhs->data, pLhs->dataSize, pLhs->dims, pointers, indices);
-    T viewRhs(pRhs->data, pRhs->dataSize, pRhs->dims, pointers, indices);
-    T viewRet(pRet->data, pRet->dataSize, pRet->dims, pointers, indices);
+    T viewLhs(reinterpret_cast<cuda::std::complex<double>*>(pLhs->data), pLhs->dataSize, pLhs->dims, pointers, indices);
+    T viewRhs(reinterpret_cast<cuda::std::complex<double>*>(pRhs->data), pRhs->dataSize, pRhs->dims, pointers, indices);
+    T viewRet(reinterpret_cast<cuda::std::complex<double>*>(pRet->data), pRet->dataSize, pRet->dims, pointers, indices);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewRet, viewLhs, viewRhs);
@@ -150,9 +150,9 @@ extern "C" void _ciface_quiccir_sub_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t
     pointers[1] = ViewBase<std::uint32_t>(pLhs->pos, pLhs->posSize);
     ViewBase<std::uint32_t> indices[rank];
     indices[1] = ViewBase<std::uint32_t>(pLhs->coo, pLhs->cooSize);
-    T viewLhs(pLhs->data, pLhs->dataSize, pLhs->dims, pointers, indices);
-    T viewRhs(pRhs->data, pRhs->dataSize, pRhs->dims, pointers, indices);
-    T viewRet(pRet->data, pRet->dataSize, pRet->dims, pointers, indices);
+    T viewLhs(reinterpret_cast<cuda::std::complex<double>*>(pLhs->data), pLhs->dataSize, pLhs->dims, pointers, indices);
+    T viewRhs(reinterpret_cast<cuda::std::complex<double>*>(pRhs->data), pRhs->dataSize, pRhs->dims, pointers, indices);
+    T viewRet(reinterpret_cast<cuda::std::complex<double>*>(pRet->data), pRet->dataSize, pRet->dims, pointers, indices);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewRet, viewLhs, viewRhs);

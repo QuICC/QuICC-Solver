@@ -240,7 +240,7 @@ TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 210", "SerialS1CLCSC3DJIKtoDCCSC3DJ
 
     // gpu -> cpu
     cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(),
-      viewOut.size() * sizeof(double),
+      S * sizeof(double),
       cudaMemcpyDeviceToHost));
 
     // check

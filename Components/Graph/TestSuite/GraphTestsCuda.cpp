@@ -9,7 +9,7 @@
 #include "Memory/Cpu/NewDelete.hpp"
 #include "Memory/Cuda/Malloc.hpp"
 #include "Memory/Memory.hpp"
-
+#include "Types/Math.hpp"
 
 TEST_CASE("One Dimensional Loop Fourier Gpu", "[OneDimLoopFourierGpu]")
 {
@@ -537,7 +537,7 @@ TEST_CASE("Serial Multi Var 3D Fwd Gpu", "[SerialMultiVar3DFwdGpu]")
 
   // host mem block
   std::size_t physS = M*indicesPhys[1].size();
-  std::size_t modsS = modsK*metaMods.idx.size()
+  std::size_t modsS = modsK*metaMods.idx.size();
   QuICC::Memory::MemBlock<double> R(physS, mem.get());
   QuICC::Memory::MemBlock<double> Phi(physS, mem.get());
   QuICC::Memory::MemBlock<double> Theta(physS, mem.get());
@@ -580,17 +580,17 @@ TEST_CASE("Serial Multi Var 3D Fwd Gpu", "[SerialMultiVar3DFwdGpu]")
     memBlockIndicesModsDev.size());
 
   // device view
-  R_DCCSC3D_t RViewDev({RDev.data(), RDev.size()}, physDims, pointersPhysDev, indicesPhysDev);
-  R_DCCSC3D_t PhiViewDev({PhiDev.data(), PhiDev.size()}, physDims, pointersPhysDev, indicesPhysDev);
-  R_DCCSC3D_t ThetaViewDev({ThetaDev.data(), ThetaDev.size()}, physDims, pointersPhysDev, indicesPhysDev);
-  C_DCCSC3DJIK_t modsOutViewDev({modsOutDev.data(), modsOutDev.size()}, outDims, pointersModsDev, indicesModsDev);
+  R_DCCSC3D_t RViewDev(RDev.data(), RDev.size(), physDims.data(), pointersPhysDev, indicesPhysDev);
+  R_DCCSC3D_t PhiViewDev(PhiDev.data(), PhiDev.size(), physDims.data(), pointersPhysDev, indicesPhysDev);
+  R_DCCSC3D_t ThetaViewDev(ThetaDev.data(), ThetaDev.size(), physDims.data(), pointersPhysDev, indicesPhysDev);
+  C_DCCSC3DJIK_t modsOutViewDev(modsOutDev.data(), modsOutDev.size(), outDims.data(), pointersModsDev, indicesModsDev);
 
   // cpu -> gpu index/pointers
   cudaErrChk(cudaMemcpy(memBlockPointersPhysDev.data(), pointersPhys[1].data(),
     pointersPhys[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
   cudaErrChk(cudaMemcpy(memBlockIndicesPhysDev.data(), indicesPhys[1].data(),
     indicesPhys[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
-  cudaErrChk(cudaMemcpy(memBlockPointersPhysDev.data(), pointersMods[1].data(),
+  cudaErrChk(cudaMemcpy(memBlockPointersModsDev.data(), pointersMods[1].data(),
     pointersMods[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
   cudaErrChk(cudaMemcpy(memBlockIndicesModsDev.data(), indicesMods[1].data(),
     indicesMods[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
