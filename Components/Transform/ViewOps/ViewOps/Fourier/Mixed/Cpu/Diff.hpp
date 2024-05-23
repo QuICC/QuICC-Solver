@@ -15,7 +15,9 @@
 
 namespace QuICC {
 namespace Transform {
+/// @brief namespace for Fourier based operators
 namespace Fourier {
+/// @brief namespace for Mixed Fourier operators (i.e. real to complex and complex to real)
 namespace Mixed {
 /// @brief Cpu backend namespace
 namespace Cpu {

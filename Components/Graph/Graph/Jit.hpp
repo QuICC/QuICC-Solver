@@ -35,16 +35,24 @@
 #include "Graph/Shims/MlirShims.hpp"
 
 namespace QuICC {
+/// @brief This namespace groups the code needed to connect QuICC and quiccir, a MLIR dialect
 namespace Graph {
 
+/// @brief Transform data states, from fully physical (PPP) to fully spectral/modal (MMM)
 enum class Stage
 {
-    PPP, // physical space, stage 0
-    MPP, // modal space, stage 0
-    PPM, // physical space, stage 1
-    MPM, // modal space, stage 1
-    PMM, // physical space, stage 2
-    MMM  // modal space, stage 2
+    /// physical space, stage 0
+    PPP,
+    /// modal space, stage 0
+    MPP,
+    /// physical space, stage 1
+    PPM,
+    /// modal space, stage 1
+    MPM,
+    /// physical space, stage 2
+    PMM,
+    /// modal space, stage 2
+    MMM
 };
 
 
@@ -57,6 +65,8 @@ ViewDescriptor<T, std::uint32_t, 3> getViewDescriptor(View::View<T, ATT> view)
     view.data(), (std::uint32_t)view.size()};
 }
 
+/// @brief classe to setup and JIT the mlir graph
+/// @tparam RANK spatial dimensions
 template <std::uint32_t RANK = 3u>
 class Jit {
 private:

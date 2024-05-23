@@ -20,6 +20,7 @@
 
 namespace QuICC {
 namespace Transform {
+/// @brief namespace for quadrature based operators
 namespace Quadrature {
 /// @brief Cpu backend namespace
 namespace Cpu {
