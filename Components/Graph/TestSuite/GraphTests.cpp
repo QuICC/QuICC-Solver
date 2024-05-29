@@ -17,10 +17,10 @@ TEST_CASE("One Dimensional Loop Fourier", "[OneDimLoopFourier]")
 {
   // Test Graph
   std::string modStr = R"mlir(
-    func.func @entry(%tumod: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
-      %tuval = quiccir.fr.prj %tumod : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64}
-      %ret = quiccir.fr.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 1 :i64}
-      return %ret : tensor<?x?x?xf64>
+    func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
+      %tuval = quiccir.fr.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64}
+      %ret = quiccir.fr.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64}
+      return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";
 
@@ -31,9 +31,9 @@ TEST_CASE("One Dimensional Loop Fourier", "[OneDimLoopFourier]")
 
   // View Types
   std::array<std::array<std::string, 2>, 3> layOpt;
-  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
-  // layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
-  // layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+  layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+  // layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+  // layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
@@ -80,10 +80,10 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   // Test Graph
   // Same setup as transform loop
   std::string modStr = R"mlir(
-    func.func @entry(%tumod: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
-      %tuval = quiccir.al.prj %tumod : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64}
-      %ret = quiccir.al.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 1 :i64}
-      return %ret : tensor<?x?x?xf64>
+    func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
+      %tuval = quiccir.al.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 0 :i64}
+      %ret = quiccir.al.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64}
+      return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";
 
@@ -94,9 +94,9 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
 
   // View Types
   std::array<std::array<std::string, 2>, 3> layOpt;
-  // layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
-  layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
-  // layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+  // layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+  layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+  // layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
@@ -162,10 +162,10 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
   // Test Graph
   // Same setup as transform loop
   std::string modStr = R"mlir(
-    func.func @entry(%tumod: tensor<?x?x?xf64>) -> (tensor<?x?x?xf64>) {
-      %tuval = quiccir.jw.prj %tumod : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64}
-      %ret = quiccir.jw.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xf64> attributes{implptr = 1 :i64}
-      return %ret : tensor<?x?x?xf64>
+    func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
+      %tuval = quiccir.jw.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 0 :i64}
+      %ret = quiccir.jw.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64}
+      return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";
 
@@ -176,9 +176,9 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
 
   // View Types
   std::array<std::array<std::string, 2>, 3> layOpt;
-  // layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
-  // layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
-  layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+  // layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+  // layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+  layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
@@ -258,9 +258,9 @@ TEST_CASE("Serial 3D Fwd", "[Serial3DFwd]")
   std::array<std::uint32_t, rank> modsDims{6, 6, 2};
 
   std::array<std::array<std::string, 2>, 3> layOpt;
-  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
-  layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
-  layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+  layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+  layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+  layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
@@ -345,9 +345,9 @@ TEST_CASE("Serial 3D Bwd", "[Serial3DBwd]")
   std::array<std::uint32_t, rank> modsDims{6, 6, 2};
 
   std::array<std::array<std::string, 2>, 3> layOpt;
-  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
-  layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
-  layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+  layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+  layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+  layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
@@ -433,9 +433,9 @@ TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
   std::array<std::uint32_t, rank> modsDims{6, 7, 3};
 
   std::array<std::array<std::string, 2>, 3> layOpt;
-  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
-  layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
-  layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+  layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+  layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+  layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
@@ -503,9 +503,9 @@ TEST_CASE("Serial Multi Var 3D Fwd", "[SerialMultiVar3DFwd]")
   std::array<std::uint32_t, rank> modsDims{6, 6, 2};
 
   std::array<std::array<std::string, 2>, 3> layOpt;
-  layOpt[0] = {"R_DCCSC3D_t", "C_DCCSC3D_t"};
-  layOpt[1] = {"C_DCCSC3D_t", "C_S1CLCSC3D_t"};
-  layOpt[2] = {"C_DCCSC3D_t", "C_DCCSC3D_t"};
+  layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+  layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+  layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;

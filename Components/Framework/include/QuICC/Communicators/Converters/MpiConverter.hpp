@@ -239,9 +239,11 @@ namespace Parallel {
 
          // Create TBwd datatypes
          #if defined QUICC_MPIPACK_MANUAL
+            // storing list of indexes
             this->mBTypes.push_back(MpiConverterTools::CoordinateVector());
             MpiConverterTools::buildDatatype<TBwd,Dimensions::Data::DATF1D>(this->mBTypes.back(), localBwdMap, spRes, this->mTraId, this->mTraId, bTmp, id);
          #else
+            // Buffer index to local index or reverse depending on direction
             MPI_Datatype type = MpiConverterTools::buildDatatype<TBwd,Dimensions::Data::DATF1D>(localBwdMap, spRes, this->mTraId, this->mTraId, bTmp, id);
             this->mBTypes.push_back(type);
          #endif //defined QUICC_MPIPACK_MANUAL

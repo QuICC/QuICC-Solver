@@ -379,6 +379,7 @@ namespace Parallel {
       // Loop over slow data dimension
       for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
       {
+         // Global index
          // Extract "physical" index of slow data dimension
          k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
 

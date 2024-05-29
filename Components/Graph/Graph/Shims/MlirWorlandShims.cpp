@@ -13,11 +13,11 @@ using namespace QuICC::Graph;
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUmod, view3_cd_t* pUval)
+extern "C" void _ciface_quiccir_jw_int_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj, view3_cd_t* pUmod, view3_cd_t* pUval)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t\n";
+        "_ciface_quiccir_jw_int_complexf64_DCCSC3D_complexf64_DCCSC3D\n";
     #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
@@ -54,11 +54,11 @@ extern "C" void _ciface_quiccir_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" void _ciface_quiccir_jw_int_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj, view3_cd_t* pUmod, view3_cd_t* pUval)
+extern "C" void _ciface_quiccir_jw_int_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK(void* obj, view3_cd_t* pUmod, view3_cd_t* pUval)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_jw_int_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t\n";
+        "_ciface_quiccir_jw_int_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK\n";
     #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
@@ -101,11 +101,11 @@ extern "C" void _ciface_quiccir_jw_int_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj, 
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" void _ciface_quiccir_jw_prj_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
+extern "C" void _ciface_quiccir_jw_prj_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_jw_prj_C_DCCSC3D_t_C_DCCSC3D_t\n";
+        "_ciface_quiccir_jw_prj_complexf64_DCCSC3D_complexf64_DCCSC3D\n";
     #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
@@ -141,11 +141,11 @@ extern "C" void _ciface_quiccir_jw_prj_C_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" void _ciface_quiccir_jw_prj_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
+extern "C" void _ciface_quiccir_jw_prj_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_jw_prj_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t\n";
+        "_ciface_quiccir_jw_prj_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK\n";
     #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
@@ -182,10 +182,10 @@ extern "C" void _ciface_quiccir_jw_prj_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj, 
 };
 #endif
 
-extern "C" void _ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+extern "C" void _ciface_quiccir_alloc_jw_int_complexf64_DCCSC3D_complexf64_DCCSC3D(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    std::cout << "_ciface_quiccir_alloc_jw_int_complexf64_DCCSC3D_complexf64_DCCSC3D\n";
     #endif
     // Integrator, NewBuffer is in modal space
     assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
@@ -203,10 +203,10 @@ extern "C" void _ciface_quiccir_alloc_jw_int_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t*
     details::alloc_ptr(&pNewBuffer->data, pNewBuffer->dataSize, pProdBuffer->data);
 };
 
-extern "C" void _ciface_quiccir_alloc_jw_int_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+extern "C" void _ciface_quiccir_alloc_jw_int_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_jw_int_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t\n";
+    std::cout << "_ciface_quiccir_alloc_jw_int_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK\n";
     #endif
     // Integrator, NewBuffer is in modal space
     assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
@@ -224,10 +224,10 @@ extern "C" void _ciface_quiccir_alloc_jw_int_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(view3
     details::alloc_ptr(&pNewBuffer->data, pNewBuffer->dataSize, pProdBuffer->data);
 };
 
-extern "C" void _ciface_quiccir_alloc_jw_prj_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+extern "C" void _ciface_quiccir_alloc_jw_prj_complexf64_DCCSC3D_complexf64_DCCSC3D(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_jw_prj_C_DCCSC3D_t_C_DCCSC3D_t\n";
+    std::cout << "_ciface_quiccir_alloc_jw_prj_complexf64_DCCSC3D_complexf64_DCCSC3D\n";
     #endif
     // Projector, NewBuffer is in physical space
     assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);
@@ -245,10 +245,10 @@ extern "C" void _ciface_quiccir_alloc_jw_prj_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t*
     details::alloc_ptr(&pNewBuffer->data, pNewBuffer->dataSize, pProdBuffer->data);
 };
 
-extern "C" void _ciface_quiccir_alloc_jw_prj_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+extern "C" void _ciface_quiccir_alloc_jw_prj_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_jw_prj_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t\n";
+    std::cout << "_ciface_quiccir_alloc_jw_prj_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK\n";
     #endif
     // Projector, NewBuffer is in physical space
     assert(pNewBuffer->dims[1] == pProdBuffer->dims[1]);

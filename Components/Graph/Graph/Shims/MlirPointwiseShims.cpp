@@ -14,12 +14,12 @@ using namespace QuICC::Graph;
 /// @param pRet
 /// @param pLhs
 /// @param pRhs
-extern "C" void _ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
+extern "C" void _ciface_quiccir_add_complexf64_DCCSC3D_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj,
     view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t\n";
+        "_ciface_quiccir_add_complexf64_DCCSC3D_complexf64_DCCSC3D_complexf64_DCCSC3D\n";
     #endif
     assert(obj != nullptr);
     assert(pRet != nullptr);
@@ -52,12 +52,12 @@ extern "C" void _ciface_quiccir_add_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* ob
 /// @param pRet
 /// @param pLhs
 /// @param pRhs
-extern "C" void _ciface_quiccir_add_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj,
+extern "C" void _ciface_quiccir_add_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK(void* obj,
     view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_add_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t\n";
+        "_ciface_quiccir_add_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK\n";
     #endif
     assert(obj != nullptr);
     assert(pRet != nullptr);
@@ -89,12 +89,12 @@ extern "C" void _ciface_quiccir_add_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t
 /// @param pRet
 /// @param pLhs
 /// @param pRhs
-extern "C" void _ciface_quiccir_sub_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* obj,
+extern "C" void _ciface_quiccir_sub_complexf64_DCCSC3D_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj,
     view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_sub_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t\n";
+        "_ciface_quiccir_sub_complexf64_DCCSC3D_complexf64_DCCSC3D_complexf64_DCCSC3D\n";
     #endif
     assert(obj != nullptr);
     assert(pRet != nullptr);
@@ -127,12 +127,12 @@ extern "C" void _ciface_quiccir_sub_C_DCCSC3D_t_C_DCCSC3D_t_C_DCCSC3D_t(void* ob
 /// @param pRet
 /// @param pLhs
 /// @param pRhs
-extern "C" void _ciface_quiccir_sub_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj,
+extern "C" void _ciface_quiccir_sub_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK(void* obj,
     view3_cd_t* pRet, view3_cd_t* pLhs, view3_cd_t* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_sub_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t\n";
+        "_ciface_quiccir_sub_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK\n";
     #endif
     assert(obj != nullptr);
     assert(pRet != nullptr);
@@ -183,7 +183,7 @@ namespace QuICC::Graph::details
 /// @brief C Interface to MLIR for an allocator
 /// @param pNewBuffer
 /// @param pProdBuffer
-extern "C" void _ciface_quiccir_alloc_add_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+extern "C" void _ciface_quiccir_alloc_add_complexf64_DCCSC3D_complexf64_DCCSC3D(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     details::alloc_pointwise(pNewBuffer, pProdBuffer);
 };
@@ -191,7 +191,7 @@ extern "C" void _ciface_quiccir_alloc_add_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pN
 /// @brief C Interface to MLIR for an allocator
 /// @param pNewBuffer
 /// @param pProdBuffer
-extern "C" void _ciface_quiccir_alloc_add_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+extern "C" void _ciface_quiccir_alloc_add_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     details::alloc_pointwise(pNewBuffer, pProdBuffer);
 };
@@ -199,7 +199,7 @@ extern "C" void _ciface_quiccir_alloc_add_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(view3_cd
 /// @brief C Interface to MLIR for an allocator
 /// @param pNewBuffer
 /// @param pProdBuffer
-extern "C" void _ciface_quiccir_alloc_sub_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+extern "C" void _ciface_quiccir_alloc_sub_complexf64_DCCSC3D_complexf64_DCCSC3D(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     details::alloc_pointwise(pNewBuffer, pProdBuffer);
 };
@@ -207,7 +207,7 @@ extern "C" void _ciface_quiccir_alloc_sub_C_DCCSC3D_t_C_DCCSC3D_t(view3_cd_t* pN
 /// @brief C Interface to MLIR for an allocator
 /// @param pNewBuffer
 /// @param pProdBuffer
-extern "C" void _ciface_quiccir_alloc_sub_C_DCCSC3DJIK_t_C_DCCSC3DJIK_t(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
+extern "C" void _ciface_quiccir_alloc_sub_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK(view3_cd_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     details::alloc_pointwise(pNewBuffer, pProdBuffer);
 };

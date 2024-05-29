@@ -38,24 +38,6 @@ namespace QuICC {
 /// @brief This namespace groups the code needed to connect QuICC and quiccir, a MLIR dialect
 namespace Graph {
 
-/// @brief Transform data states, from fully physical (PPP) to fully spectral/modal (MMM)
-enum class Stage
-{
-    /// physical space, stage 0
-    PPP,
-    /// modal space, stage 0
-    MPP,
-    /// physical space, stage 1
-    PPM,
-    /// modal space, stage 1
-    MPM,
-    /// physical space, stage 2
-    PMM,
-    /// modal space, stage 2
-    MMM
-};
-
-
 template<class T, class ATT>
 ViewDescriptor<T, std::uint32_t, 3> getViewDescriptor(View::View<T, ATT> view)
 {
@@ -85,8 +67,6 @@ private:
     void* _funSym;
     /// @brief mat to QuICC operators
     QuICC::Graph::MapOps _storeOp;
-    /// @brief memory resource for internal op allocation
-    std::shared_ptr<Memory::memory_resource> _mem;
 
     /// @brief register needed MLIR dialects
     void setDialects();
@@ -111,7 +91,8 @@ private:
     /// @param physDims
     /// @param modsDims
     void setMap(const std::array<std::uint32_t, RANK> physDims,
-        const std::array<std::uint32_t, RANK> modsDims);
+        const std::array<std::uint32_t, RANK> modsDims,
+        const std::shared_ptr<Memory::memory_resource> mem);
     /// @brief lower graph to LLVM IR
     void lower();
     /// @brief JIT and store graph function
@@ -128,7 +109,7 @@ public:
         const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
         const std::array<std::array<std::string, 2>, RANK> layOpt,
-        const Stage outStage, const Stage inStage) : _mem(mem)
+        const Stage outStage, const Stage inStage)
     {
         setDialects();
 
@@ -137,7 +118,7 @@ public:
         insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
         setDimensions(physDims, modsDims);
         setLayout(layOpt);
-        setMap(physDims, modsDims);
+        setMap(physDims, modsDims, mem);
         lower();
         setEngineAndJit();
     }
@@ -152,7 +133,7 @@ public:
         const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
         const std::array<std::array<std::string, 2>, RANK> layOpt,
-        const Stage outStage, const Stage inStage) : _mem(mem)
+        const Stage outStage, const Stage inStage)
     {
         setDialects();
 
@@ -161,7 +142,7 @@ public:
         insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
         setDimensions(physDims, modsDims);
         setLayout(layOpt);
-        setMap(physDims, modsDims);
+        setMap(physDims, modsDims, mem);
         lower();
         setEngineAndJit();
     }
@@ -201,8 +182,6 @@ public:
             ))_funSym;
         fun(thisArr.data(), &ret0, &arg0, &arg1, &arg2);
     }
-
-
 };
 
 template <std::uint32_t RANK>
@@ -330,10 +309,11 @@ void Jit<RANK>::setLayout(const std::array<std::array<std::string, 2>, 3> layOpt
 
 template <std::uint32_t RANK>
 void Jit<RANK>::setMap(const std::array<std::uint32_t, RANK> physDims,
-    const std::array<std::uint32_t, RANK> modsDims)
+    const std::array<std::uint32_t, RANK> modsDims,
+    const std::shared_ptr<Memory::memory_resource> mem)
 {
     // setup ops map and store
-    _storeOp = std::move(QuICC::Graph::MapOps(*_module, _mem, physDims, modsDims));
+    _storeOp = std::move(QuICC::Graph::MapOps(*_module, mem, physDims, modsDims));
 }
 
 template <std::uint32_t RANK>

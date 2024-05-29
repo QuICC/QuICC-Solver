@@ -15,11 +15,11 @@ using namespace QuICC::Graph;
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" inline void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t_cpu(void* obj, view3_t* pUval, view3_cd_t* pUmod)
+extern "C" inline void _ciface_quiccir_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D_cpu(void* obj, view3_t* pUval, view3_cd_t* pUmod)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t_cpu\n";
+        "_ciface_quiccir_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D_cpu\n";
     #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
@@ -52,11 +52,11 @@ extern "C" inline void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t_cpu(void* 
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" inline void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t_gpu(void* obj, view3_t* pUval, view3_cd_t* pUmod)
+extern "C" inline void _ciface_quiccir_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D_gpu(void* obj, view3_t* pUval, view3_cd_t* pUmod)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t_gpu\n";
+        "_ciface_quiccir_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D_gpu\n";
     #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
@@ -95,21 +95,21 @@ extern "C" inline void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t_gpu(void* 
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_t* pUval, view3_cd_t* pUmod)
+extern "C" void _ciface_quiccir_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D(void* obj, view3_t* pUval, view3_cd_t* pUmod)
 {
     #ifdef QUICC_HAS_CUDA_BACKEND
     assert(pUval != nullptr);
     if (!QuICC::Cuda::isDeviceMemory(pUval->data))
     {
         assert(!QuICC::Cuda::isDeviceMemory(pUmod->data));
-        _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t_cpu(obj, pUval, pUmod);
+        _ciface_quiccir_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D_cpu(obj, pUval, pUmod);
     }
     else
     {
-        _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t_gpu(obj, pUval, pUmod);
+        _ciface_quiccir_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D_gpu(obj, pUval, pUmod);
     }
     #else
-    _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t_cpu(obj, pUval, pUmod);
+    _ciface_quiccir_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D_cpu(obj, pUval, pUmod);
     #endif
 }
 
@@ -117,11 +117,11 @@ extern "C" void _ciface_quiccir_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(void* obj, view3_
 /// @param op
 /// @param umod
 /// @param uval
-extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t_cpu(void* obj, view3_cd_t* pUmod, view3_t* pUval)
+extern "C" void _ciface_quiccir_fr_int_complexf64_DCCSC3D_f64_DCCSC3D_cpu(void* obj, view3_cd_t* pUmod, view3_t* pUval)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t_cpu\n";
+        "_ciface_quiccir_fr_int_complexf64_DCCSC3D_f64_DCCSC3D_cpu\n";
     #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
@@ -154,11 +154,11 @@ extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t_cpu(void* obj, vi
 /// @param op
 /// @param umod
 /// @param uval
-extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t_gpu(void* obj, view3_cd_t* pUmod, view3_t* pUval)
+extern "C" void _ciface_quiccir_fr_int_complexf64_DCCSC3D_f64_DCCSC3D_gpu(void* obj, view3_cd_t* pUmod, view3_t* pUval)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t_gpu\n";
+        "_ciface_quiccir_fr_int_complexf64_DCCSC3D_f64_DCCSC3D_gpu\n";
     #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);
@@ -197,21 +197,21 @@ extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t_gpu(void* obj, vi
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(void* obj, view3_cd_t* pUmod, view3_t* pUval)
+extern "C" void _ciface_quiccir_fr_int_complexf64_DCCSC3D_f64_DCCSC3D(void* obj, view3_cd_t* pUmod, view3_t* pUval)
 {
     #ifdef QUICC_HAS_CUDA_BACKEND
     assert(pUval != nullptr);
     if (!QuICC::Cuda::isDeviceMemory(pUval->data))
     {
         assert(!QuICC::Cuda::isDeviceMemory(pUmod->data));
-        _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t_cpu(obj, pUmod, pUval);
+        _ciface_quiccir_fr_int_complexf64_DCCSC3D_f64_DCCSC3D_cpu(obj, pUmod, pUval);
     }
     else
     {
-        _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t_gpu(obj, pUmod, pUval);
+        _ciface_quiccir_fr_int_complexf64_DCCSC3D_f64_DCCSC3D_gpu(obj, pUmod, pUval);
     }
     #else
-    _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t_cpu(obj, pUmod, pUval);
+    _ciface_quiccir_fr_int_complexf64_DCCSC3D_f64_DCCSC3D_cpu(obj, pUmod, pUval);
     #endif
 }
 
@@ -220,10 +220,10 @@ extern "C" void _ciface_quiccir_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(void* obj, view3_
 /// since it includes the producer op and buffer.
 /// @param pNewBuffer buffer to be allocated
 /// @param pProdBuffer producer buffer
-extern "C" void _ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(view3_t* pNewBuffer, view3_cd_t* pProdBuffer)
+extern "C" void _ciface_quiccir_alloc_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D(view3_t* pNewBuffer, view3_cd_t* pProdBuffer)
 {
     #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t\n";
+    std::cout << "_ciface_quiccir_alloc_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D\n";
     #endif
     // Slice (phys = mods*2-1)
     // Projector, NewBuffer is in physical space
@@ -243,10 +243,10 @@ extern "C" void _ciface_quiccir_alloc_fr_prj_R_DCCSC3D_t_C_DCCSC3D_t(view3_t* pN
     details::alloc_ptr(&pNewBuffer->data, pNewBuffer->dataSize, pProdBuffer->data);
 };
 
-extern "C" void _ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t(view3_cd_t* pNewBuffer, view3_t* pProdBuffer)
+extern "C" void _ciface_quiccir_alloc_fr_int_complexf64_DCCSC3D_f64_DCCSC3D(view3_cd_t* pNewBuffer, view3_t* pProdBuffer)
 {
     #ifndef NDEBUG
-    std::cout << "_ciface_quiccir_alloc_fr_int_C_DCCSC3D_t_R_DCCSC3D_t\n";
+    std::cout << "_ciface_quiccir_alloc_fr_int_complexf64_DCCSC3D_f64_DCCSC3D\n";
     #endif
     // Slice (phys = mods*2-1)
     // Integrator, NewBuffer is in modal space

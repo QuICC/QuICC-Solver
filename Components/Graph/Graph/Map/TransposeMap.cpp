@@ -35,8 +35,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
           Type outTy = op.getOutput().getType();
           auto outTensor = outTy.cast<RankedTensorType>();
           std::string outTyStr = outTensor.getEncoding().cast<StringAttr>().str();
-          if (outTyStr == "C_DCCSC3D_t" &&
-            inTyStr == "C_DCCSC3D_t" &&
+          if (outTyStr == "DCCSC3D" &&
+            inTyStr == "DCCSC3D" &&
             perm[0] == 2 && perm[1] == 0)
           {
             using Tout = C_DCCSC3D_t;
@@ -47,8 +47,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (outTyStr == "C_DCCSC3D_t" &&
-            inTyStr == "C_DCCSC3D_t" &&
+          else if (outTyStr == "DCCSC3D" &&
+            inTyStr == "DCCSC3D" &&
             perm[0] == 1 && perm[1] == 2)
           {
             using Tout = C_DCCSC3D_t;
@@ -59,8 +59,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (outTyStr == "C_DCCSC3D_t" &&
-            inTyStr == "C_S1CLCSC3D_t" &&
+          else if (outTyStr == "DCCSC3D" &&
+            inTyStr == "S1CLCSC3D" &&
             perm[0] == 2 && perm[1] == 0)
           {
             using Tout = C_DCCSC3D_t;
@@ -71,8 +71,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (outTyStr == "C_S1CLCSC3D_t" &&
-            inTyStr == "C_DCCSC3D_t" &&
+          else if (outTyStr == "S1CLCSC3D" &&
+            inTyStr == "DCCSC3D" &&
             perm[0] == 1 && perm[1] == 2)
           {
             using Tout = C_S1CLCSC3D_t;
@@ -97,8 +97,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
           Type outTy = op.getOutput().getType();
           auto outTensor = outTy.cast<RankedTensorType>();
           std::string outTyStr = outTensor.getEncoding().cast<StringAttr>().str();
-          if (outTyStr == "C_DCCSC3DJIK_t" &&
-            inTyStr == "C_DCCSC3D_t" &&
+          if (outTyStr == "DCCSC3DJIK" &&
+            inTyStr == "DCCSC3D" &&
             perm[0] == 2 && perm[1] == 0)
           {
             using Tout = C_DCCSC3DJIK_t;
@@ -109,8 +109,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (outTyStr == "C_DCCSC3D_t" &&
-            inTyStr == "C_DCCSC3DJIK_t" &&
+          else if (outTyStr == "DCCSC3D" &&
+            inTyStr == "DCCSC3DJIK" &&
             perm[0] == 1 && perm[2] == 0)
           {
             using Tout = C_DCCSC3D_t;
@@ -121,8 +121,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (outTyStr == "C_DCCSC3DJIK_t" &&
-            inTyStr == "C_S1CLCSC3DJIK_t" &&
+          else if (outTyStr == "DCCSC3DJIK" &&
+            inTyStr == "S1CLCSC3DJIK" &&
             perm[0] == 2 && perm[1] == 0)
           {
             using Tout = C_DCCSC3DJIK_t;
@@ -133,8 +133,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
-          else if (outTyStr == "C_S1CLCSC3DJIK_t" &&
-            inTyStr == "C_DCCSC3DJIK_t" &&
+          else if (outTyStr == "S1CLCSC3DJIK" &&
+            inTyStr == "DCCSC3DJIK" &&
             perm[0] == 1 && perm[1] == 2)
           {
             using Tout = C_S1CLCSC3DJIK_t;

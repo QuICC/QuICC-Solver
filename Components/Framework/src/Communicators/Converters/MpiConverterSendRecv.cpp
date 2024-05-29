@@ -339,6 +339,7 @@ namespace Parallel {
       int ierr;
 
       // Storage for the number of packs
+      // (number of vars)
       int packs;
 
       // Initialise forward transform requests
