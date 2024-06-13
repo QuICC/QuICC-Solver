@@ -332,6 +332,8 @@ void Jit<RANK>::lower()
 template <std::uint32_t RANK>
 void Jit<RANK>::setEngineAndJit()
 {
+    _module->dump();
+
     // Initialize LLVM targets.
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();

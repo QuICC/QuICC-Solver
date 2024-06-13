@@ -61,5 +61,14 @@ using varOp_t = std::variant<
 >;
 
 
+template<typename T, std::size_t N>
+struct MemRefDescriptor {
+  T *allocated;
+  T *aligned;
+  intptr_t offset;
+  intptr_t sizes[N];
+  intptr_t strides[N];
+};
+
 } // namespace Graph
 } // namespace QuICC
