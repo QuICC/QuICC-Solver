@@ -332,7 +332,7 @@ void Jit<RANK>::lower()
 template <std::uint32_t RANK>
 void Jit<RANK>::setEngineAndJit()
 {
-    _module->dump();
+    // _module->dump();
 
     // Initialize LLVM targets.
     llvm::InitializeNativeTarget();
