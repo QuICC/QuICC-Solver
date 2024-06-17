@@ -13,7 +13,6 @@
 #include "Types/Math.hpp"
 #include "Profiler/Interface.hpp"
 
-#if 0
 TEST_CASE("One Dimensional Loop Fourier", "[OneDimLoopFourier]")
 {
   // Test Graph
@@ -241,7 +240,6 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
     CHECK(std::abs((modsOutView[m] - modsInView[m]).imag()) <= eps);
   }
 }
-#else
 
 TEST_CASE("Serial 3D Fwd", "[Serial3DFwd]")
 {
@@ -344,7 +342,6 @@ TEST_CASE("Serial 3D Fwd", "[Serial3DFwd]")
   }
 
 }
-#endif
 
 TEST_CASE("Serial 3D Bwd", "[Serial3DBwd]")
 {
@@ -446,77 +443,109 @@ TEST_CASE("Serial 3D Bwd", "[Serial3DBwd]")
 
 }
 
-// TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
-// {
-//   std::string inputFilename = "./simple-3d-loop.mlir";
-//   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
-//       llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
-//   if (std::error_code EC = fileOrErr.getError()) {
-//     llvm::errs() << "Could not open input file: " << EC.message() << "\n";
-//     CHECK(false);
-//   }
+TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
+{
+  std::string inputFilename = "./simple-3d-loop.mlir";
+  llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
+      llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
+  if (std::error_code EC = fileOrErr.getError()) {
+    llvm::errs() << "Could not open input file: " << EC.message() << "\n";
+    CHECK(false);
+  }
 
-//   // Parse the input mlir.
-//   llvm::SourceMgr sourceMgr;
-//   sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
+  // Parse the input mlir.
+  llvm::SourceMgr sourceMgr;
+  sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
 
-//   // Grid dimensions
-//   constexpr std::uint32_t rank = 3;
-//   //
-//   std::array<std::uint32_t, rank> physDims{10, 10, 6};
-//   // M L N
-//   std::array<std::uint32_t, rank> modsDims{6, 7, 3};
+  // Grid dimensions
+  constexpr std::uint32_t rank = 3;
+  //
+  std::array<std::uint32_t, rank> physDims{10, 10, 6};
+  // M L N
+  std::array<std::uint32_t, rank> modsDims{6, 7, 3};
 
-//   std::array<std::array<std::string, 2>, 3> layOpt;
-//   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
-//   layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
-//   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
+  std::array<std::array<std::string, 2>, 3> layOpt;
+  layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+  layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+  layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
-//   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-//   using namespace QuICC::Graph;
-//   Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::MMM);
+  // setup metadata
+  auto M = physDims[0];
+  auto N = physDims[1];
+  auto K = physDims[2];
+  auto modsM = modsDims[0];
+  auto modsN = modsDims[1];
+  auto modsK = modsDims[2];
 
-//   // setup metadata
-//   auto modsM = modsDims[0];
-//   auto modsN = modsDims[1];
-//   auto modsK = modsDims[2];
+  // Populate meta for fully populated tensor
+  // Physical space
+  std::vector<std::uint32_t> ptrPhys(K+1);
+  std::vector<std::uint32_t> idxPhys(K*N);
+  ptrPhys[0] = 0;
+  for (std::size_t i = 1; i < ptrPhys.size(); ++i) {
+      ptrPhys[i] = ptrPhys[i-1]+N;
+  }
+  for (std::size_t i = 0; i < idxPhys.size(); ++i) {
+      idxPhys[i] = i % N;
+  }
+  std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, ptrPhys, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
 
-//   // Populate meta for fully populated tensor
-//   // Modal space
-//   using namespace QuICC::Graph;
-//   auto metaMods = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});
-//   std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaMods.ptr, {}}};
-//   std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaMods.idx, {}}};
+  // Populate meta for fully populated tensor
+  // AL space (Stage::PPM and Stage::MPM
+  using namespace QuICC::Graph;
+  auto metaAL = denseTransposePtrAndIdx<C_S1CLCSC3D_t, C_DCCSC3D_t>({modsN, K, modsM});
 
-//   // host mem block
-//   QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsK*metaMods.idx.size(), mem.get());
-//   QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsK*metaMods.idx.size(), mem.get());
+  // Populate meta for fully populated tensor
+  // Modal space
+  using namespace QuICC::Graph;
+  auto metaJW = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});
+  std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaJW.ptr, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaJW.idx, {}}};
 
-//   // host view
-//   C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
-//   C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
+  // Store meta stages to pass to Jitter
+  std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
+  meta.push_back({ptrPhys.data(), ptrPhys.size()});
+  meta.push_back({idxPhys.data(), idxPhys.size()});
+  meta.push_back({metaAL.ptr.data(), metaAL.ptr.size()});
+  meta.push_back({metaAL.idx.data(), metaAL.idx.size()});
+  meta.push_back({metaJW.ptr.data(), metaJW.ptr.size()});
+  meta.push_back({metaJW.idx.data(), metaJW.idx.size()});
 
-//   // set input modes
-//   std::complex<double> val = {1.0, 0.0};
+  // Setup Jitter
+  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+  using namespace QuICC::Graph;
+  Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::MMM, meta);
 
-//   for(std::size_t m = 0; m < modsInView.size(); ++m)
-//   {
-//     modsInView[m] = {0.0, 0.0};
-//   }
-//   modsInView(0,0,0) = val;
-//   modsInView(1,0,0) = val;
+  // host mem block
+  QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsK*metaJW.idx.size(), mem.get());
+  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsK*metaJW.idx.size(), mem.get());
 
-//   // Apply graph
-//   Jitter.apply(modsOutView, modsInView);
+  // host view
+  C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
+  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
 
-//   // Check
-//   double eps = 1e-15;
-//   for(std::size_t m = 0; m < modsOutView.size(); ++m)
-//   {
-//     CHECK(std::abs(modsOutView[m] - modsInView[m]) <= eps);
-//   }
+  // set input modes
+  std::complex<double> val = {1.0, 0.0};
 
-// }
+  for(std::size_t m = 0; m < modsInView.size(); ++m)
+  {
+    modsInView[m] = {0.0, 0.0};
+  }
+  modsInView(0,0,0) = val;
+  modsInView(1,0,0) = val;
+
+  // Apply graph
+  Jitter.apply(modsOutView, modsInView);
+
+  // Check
+  double eps = 1e-15;
+  for(std::size_t m = 0; m < modsOutView.size(); ++m)
+  {
+    CHECK(std::abs(modsOutView[m] - modsInView[m]) <= eps);
+  }
+
+}
 
 // TEST_CASE("Serial Multi Var 3D Fwd", "[SerialMultiVar3DFwd]")
 // {
