@@ -339,20 +339,29 @@ void Jit<RANK>::setMeta(const std::vector<View::ViewBase<std::uint32_t>>& meta)
     {
         _metaMap[i] = nullptr;
     }
-    //  std::array<MemRefDescriptor<std::uint32_t, 1>, 6> _metaMap;
-    // ptr, ptr, offset, {size}, {stride}
-    // idx AL
-    _metaStore[2] = {meta[2].data(), meta[2].data(), 0, {meta[2].size()}, {1}};
-    _metaMap[2] = &_metaStore[2];
-    // ptr AL
-    _metaStore[3] = {meta[3].data(), meta[3].data(), 0, {meta[3].size()}, {1}};
-    _metaMap[3] = &_metaStore[3];
-    // idx JW
-    _metaStore[4] = {meta[4].data(), meta[4].data(), 0, {meta[4].size()}, {1}};
-    _metaMap[4] = &_metaStore[4];
-    // ptr JW
-    _metaStore[5] = {meta[5].data(), meta[5].data(), 0, {meta[5].size()}, {1}};
-    _metaMap[5] = &_metaStore[5];
+    if (meta.size() > 0)
+    {
+        //  std::array<MemRefDescriptor<std::uint32_t, 1>*, 6> _metaMap;
+        // ptr, ptr, offset, {size}, {stride}
+        // idx Fr
+        _metaStore[0] = {meta[0].data(), meta[0].data(), 0, {meta[0].size()}, {1}};
+        _metaMap[0] = &_metaStore[0];
+        // ptr Fr
+        _metaStore[1] = {meta[1].data(), meta[1].data(), 0, {meta[1].size()}, {1}};
+        _metaMap[1] = &_metaStore[1];
+        // idx AL
+        _metaStore[2] = {meta[2].data(), meta[2].data(), 0, {meta[2].size()}, {1}};
+        _metaMap[2] = &_metaStore[2];
+        // ptr AL
+        _metaStore[3] = {meta[3].data(), meta[3].data(), 0, {meta[3].size()}, {1}};
+        _metaMap[3] = &_metaStore[3];
+        // idx JW
+        _metaStore[4] = {meta[4].data(), meta[4].data(), 0, {meta[4].size()}, {1}};
+        _metaMap[4] = &_metaStore[4];
+        // ptr JW
+        _metaStore[5] = {meta[5].data(), meta[5].data(), 0, {meta[5].size()}, {1}};
+        _metaMap[5] = &_metaStore[5];
+    }
 }
 
 template <std::uint32_t RANK>
