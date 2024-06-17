@@ -200,7 +200,7 @@ public:
         auto thisArr = _storeOp.getThisArr();
 
         // Apply graph
-        auto fun = (void (*)(void*, decltype(ret0)*,
+        auto fun = (void (*)(void*, void*, decltype(ret0)*,
             decltype(arg0)*,
             decltype(arg1)*,
             decltype(arg2)*
