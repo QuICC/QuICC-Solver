@@ -68,6 +68,14 @@ private:
     /// @brief mat to QuICC operators
     QuICC::Graph::MapOps _storeOp;
 
+    /// @brief storage for intermediate stages
+    /// metadata idx/ptr pairs
+    /// (0, 1) -> stage 0
+    /// (2, 3) -> stage 1
+    /// (4, 5) -> stage 2
+    std::array<MemRefDescriptor<std::uint32_t, 1>*, 6> _metaMap;
+    std::array<MemRefDescriptor<std::uint32_t, 1>, 6> _metaStore;
+
     /// @brief register needed MLIR dialects
     void setDialects();
     /// @brief set grid and spectral dimensions
@@ -79,26 +87,39 @@ private:
         const std::array<std::uint32_t, RANK> modsDims,
         const std::array<std::array<std::string, 2>, RANK> layOpt,
         const Stage outStage, const Stage inStage);
+
     /// @brief set grid and spectral dimensions
     /// @param physDims
     /// @param modsDims
     void setDimensions(const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims);
+
     /// @brief set layout for each stage
     /// @param layOpt
     void setLayout(const std::array<std::array<std::string, 2>, 3> layOpt);
+
+    /// @brief set meta data for intermediate stages
+    void setMeta(const std::vector<View::ViewBase<std::uint32_t>>& meta);
+
     /// @brief map operators
     /// @param physDims
     /// @param modsDims
     void setMap(const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
         const std::shared_ptr<Memory::memory_resource> mem);
+
     /// @brief lower graph to LLVM IR
     void lower();
+
     /// @brief JIT and store graph function
     void setEngineAndJit();
 
 public:
+    ~Jit()
+    {
+        /// \todo clerup meta
+    }
+
     /// @brief Setup Graph from string
     /// @param modStr
     /// @param physDims
@@ -109,7 +130,8 @@ public:
         const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
         const std::array<std::array<std::string, 2>, RANK> layOpt,
-        const Stage outStage, const Stage inStage)
+        const Stage outStage, const Stage inStage,
+        const std::vector<View::ViewBase<std::uint32_t>>& meta)
     {
         setDialects();
 
@@ -119,6 +141,7 @@ public:
         setDimensions(physDims, modsDims);
         setLayout(layOpt);
         setMap(physDims, modsDims, mem);
+        setMeta(meta);
         lower();
         setEngineAndJit();
     }
@@ -133,7 +156,8 @@ public:
         const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
         const std::array<std::array<std::string, 2>, RANK> layOpt,
-        const Stage outStage, const Stage inStage)
+        const Stage outStage, const Stage inStage,
+        const std::vector<View::ViewBase<std::uint32_t>>& meta)
     {
         setDialects();
 
@@ -143,6 +167,7 @@ public:
         setDimensions(physDims, modsDims);
         setLayout(layOpt);
         setMap(physDims, modsDims, mem);
+        setMeta(meta);
         lower();
         setEngineAndJit();
     }
@@ -158,8 +183,8 @@ public:
         auto thisArr = _storeOp.getThisArr();
 
         // Apply graph
-        auto fun = (void (*)(void*, decltype(ret0)*, decltype(arg0)*))_funSym;
-        fun(thisArr.data(), &ret0, &arg0);
+        auto fun = (void (*)(void*, void*, decltype(ret0)*, decltype(arg0)*))_funSym;
+        fun(_metaMap.data(), thisArr.data(), &ret0, &arg0);
     }
 
     template <class Trets, class Targs>
@@ -180,7 +205,7 @@ public:
             decltype(arg1)*,
             decltype(arg2)*
             ))_funSym;
-        fun(thisArr.data(), &ret0, &arg0, &arg1, &arg2);
+        fun(_metaMap.data(), thisArr.data(), &ret0, &arg0, &arg1, &arg2);
     }
 };
 
@@ -308,6 +333,29 @@ void Jit<RANK>::setLayout(const std::array<std::array<std::string, 2>, 3> layOpt
 }
 
 template <std::uint32_t RANK>
+void Jit<RANK>::setMeta(const std::vector<View::ViewBase<std::uint32_t>>& meta)
+{
+    for (std::size_t i = 0; i < _metaMap.size(); ++i)
+    {
+        _metaMap[i] = nullptr;
+    }
+    //  std::array<MemRefDescriptor<std::uint32_t, 1>, 6> _metaMap;
+    // ptr, ptr, offset, {size}, {stride}
+    // idx AL
+    _metaStore[2] = {meta[2].data(), meta[2].data(), 0, {meta[2].size()}, {1}};
+    _metaMap[2] = &_metaStore[2];
+    // ptr AL
+    _metaStore[3] = {meta[3].data(), meta[3].data(), 0, {meta[3].size()}, {1}};
+    _metaMap[3] = &_metaStore[3];
+    // idx JW
+    _metaStore[4] = {meta[4].data(), meta[4].data(), 0, {meta[4].size()}, {1}};
+    _metaMap[4] = &_metaStore[4];
+    // ptr JW
+    _metaStore[5] = {meta[5].data(), meta[5].data(), 0, {meta[5].size()}, {1}};
+    _metaMap[5] = &_metaStore[5];
+}
+
+template <std::uint32_t RANK>
 void Jit<RANK>::setMap(const std::array<std::uint32_t, RANK> physDims,
     const std::array<std::uint32_t, RANK> modsDims,
     const std::shared_ptr<Memory::memory_resource> mem)
@@ -332,7 +380,7 @@ void Jit<RANK>::lower()
 template <std::uint32_t RANK>
 void Jit<RANK>::setEngineAndJit()
 {
-    // _module->dump();
+    _module->dump();
 
     // Initialize LLVM targets.
     llvm::InitializeNativeTarget();
