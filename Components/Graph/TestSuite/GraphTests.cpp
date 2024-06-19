@@ -265,8 +265,6 @@ TEST_CASE("Serial 3D Fwd", "[Serial3DFwd]")
   layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
-  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-
   // setup metadata
   auto M = physDims[0];
   auto N = physDims[1];
@@ -290,7 +288,7 @@ TEST_CASE("Serial 3D Fwd", "[Serial3DFwd]")
   std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
 
   // Populate meta for fully populated tensor
-  //
+  // AL space (Stage::PPM and Stage::MPM)
   using namespace QuICC::Graph;
   auto metaAL = denseTransposePtrAndIdx<C_S1CLCSC3D_t, C_DCCSC3D_t>({modsN, K, modsM});
 
@@ -310,7 +308,7 @@ TEST_CASE("Serial 3D Fwd", "[Serial3DFwd]")
   meta.push_back({metaJW.idx.data(), metaJW.idx.size()});
 
   // Setup Jitter
-  using namespace QuICC::Graph;
+  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::PPP, meta);
 
   // host mem block
@@ -390,7 +388,7 @@ TEST_CASE("Serial 3D Bwd", "[Serial3DBwd]")
   std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
 
   // Populate meta for fully populated tensor
-  //
+  // AL space (Stage::PPM and Stage::MPM)
   using namespace QuICC::Graph;
   auto metaAL = denseTransposePtrAndIdx<C_S1CLCSC3D_t, C_DCCSC3D_t>({modsN, K, modsM});
 
@@ -492,7 +490,7 @@ TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
   std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
 
   // Populate meta for fully populated tensor
-  //
+  // AL space (Stage::PPM and Stage::MPM)
   using namespace QuICC::Graph;
   auto metaAL = denseTransposePtrAndIdx<C_S1CLCSC3D_t, C_DCCSC3D_t>({modsN, K, modsM});
 
