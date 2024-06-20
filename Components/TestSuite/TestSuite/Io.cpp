@@ -205,5 +205,53 @@ void readList(Array& inData, const std::string& path)
    }
 }
 
+void readList(std::vector<MHDFloat>& inData, const std::string& path)
+{
+   std::ifstream infile;
+   infile.open(path, std::ios::in | std::ios::binary);
+   if (!infile.is_open())
+   {
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr << "  Couldn't open real input file: " + path << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      inData = std::vector<MHDFloat>(inData.size(), std::numeric_limits<MHDFloat>::max());
+   }
+   else
+   {
+      // Ignore header
+      int s = infile.peek();
+      while (s == '#')
+      {
+         infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+         s = infile.peek();
+      }
+
+      // Get size from first value
+      if (inData.size() == 0)
+      {
+         MHDFloat s;
+         infile >> s;
+         inData.resize(static_cast<size_t>(s));
+      }
+
+      // Loop over data
+      for (std::size_t i = 0; i < inData.size(); ++i)
+      {
+         infile >> inData[i];
+      }
+      infile.close();
+   }
+}
+
 } // namespace TestSuite
 } // namespace QuICC

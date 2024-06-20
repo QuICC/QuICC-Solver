@@ -237,7 +237,7 @@ namespace Parallel {
       this->addConverter(TId, spConv);
    }
 
-#if 1
+#ifdef QUICC_MPI
       template <Dimensions::Transform::Id TId>
          void Communicator::createMpiConverter(SharedResolution spRes, const ArrayI& packsFwd, const ArrayI& packsBwd)
    {

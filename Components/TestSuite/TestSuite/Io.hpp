@@ -42,6 +42,11 @@ void writeData(const std::string& path, const SparseMatrix& outData);
 /// @param path
 void readList(Array& inData, const std::string& path);
 
+/// @brief
+/// @param inData
+/// @param path
+void readList(std::vector<MHDFloat>& inData, const std::string& path);
+
 /// @brief Read real data from file
 /// @param inData dense real matrix
 /// @param path
