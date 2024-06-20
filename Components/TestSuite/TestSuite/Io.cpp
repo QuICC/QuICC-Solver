@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unsupported/Eigen/SparseExtra>
 
 // Project includes
 //
@@ -43,6 +44,11 @@ void writeData(const std::string& path, const MatrixZ& outData)
    outfile << std::setprecision(15) << outData.real() << std::endl;
    outfile << std::setprecision(15) << outData.imag() << std::endl;
    outfile.close();
+}
+
+void writeData(const std::string& path, const SparseMatrix& outData)
+{
+   Eigen::saveMarket(outData, path);
 }
 
 void readData(Matrix& inData, const std::string& path)
@@ -137,6 +143,20 @@ void readData(MatrixZ& inData, const std::string& path)
    }
 }
 
+void readData(SparseMatrix& inData, const std::string& path)
+{
+   // Check if file exists
+   std::ifstream infile;
+   infile.open(path, std::ios::in | std::ios::binary);
+   if (!infile.is_open())
+   {
+      throw std::logic_error("Couldn't open input file: " + path);
+   }
+   infile.close();
+
+   Eigen::loadMarket(inData, path);
+}
+
 void readList(Array& inData, const std::string& path)
 {
    std::ifstream infile;
@@ -160,6 +180,14 @@ void readList(Array& inData, const std::string& path)
    }
    else
    {
+      // Ignore header
+      int s = infile.peek();
+      while (s == '#')
+      {
+         infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+         s = infile.peek();
+      }
+
       // Get size from first value
       if (inData.size() == 0)
       {
