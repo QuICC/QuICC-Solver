@@ -25,7 +25,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "Types/Typedefs.hpp"
 #include "QuICC/MpiTypes.hpp"
 #include "QuICC/Enums/Dimensions.hpp"

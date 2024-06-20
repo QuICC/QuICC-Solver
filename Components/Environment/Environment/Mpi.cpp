@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Mpi.cpp
  * @brief Source of the implementation of an MPI environment
  */
@@ -23,8 +23,7 @@ extern "C"
 
 // Class include
 //
-#include "QuICC/Debug/DebuggerMacro.h"
-#include "QuICC/Environment/Mpi.hpp"
+#include "Environment/Mpi.hpp"
 
 namespace QuICC {
 
@@ -233,8 +232,6 @@ namespace Environment {
 
    void Mpi::checkCommunicator(const std::size_t id) const
    {
-      DebuggerMacro_msg("Checking MPI sub-communicator for ID = " + std::to_string(id), 1);
-
       for(int i = 0; i < this->size(id); ++i)
       {
          int rank = -1;

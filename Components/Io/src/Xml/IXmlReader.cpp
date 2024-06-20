@@ -1,5 +1,5 @@
-/** 
- * @file IXmlReader.cpp 
+/**
+ * @file IXmlReader.cpp
  * @brief Source of the interface to the XML reader
  */
 
@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 
 namespace QuICC {
 
@@ -76,7 +76,7 @@ namespace Xml {
          std::string tmp;
          std::string tmpAll;
 
-         // Read file, line by line until EOF 
+         // Read file, line by line until EOF
          while(this->mFile.good())
          {
             getline(this->mFile, tmp);

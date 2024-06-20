@@ -10,7 +10,7 @@
 
 // Project includes
 //
-#include "QuICC/Environment/Serial.hpp"
+#include "Environment/Serial.hpp"
 
 namespace QuICC {
 

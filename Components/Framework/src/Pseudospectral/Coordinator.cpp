@@ -14,7 +14,7 @@
 #include "QuICC/Pseudospectral/Coordinator.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/QuICCTimer.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"

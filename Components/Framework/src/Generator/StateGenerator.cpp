@@ -11,7 +11,7 @@
 #include "QuICC/Generator/StateGenerator.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/SolveTiming/Before.hpp"
 #include "QuICC/Tools/Formatter.hpp"

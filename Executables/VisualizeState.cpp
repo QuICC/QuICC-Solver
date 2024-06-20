@@ -1,6 +1,6 @@
 /**
  * @file VisualizeState.cpp
- * @brief Simple general executable to visualize a state file for a model 
+ * @brief Simple general executable to visualize a state file for a model
  */
 
 /// Set the path to the simulation implementation
@@ -22,7 +22,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Generator/VisualizationGenerator.hpp"
 #include "QuICC/Model/VisualizationGeneratorFactory.hpp"

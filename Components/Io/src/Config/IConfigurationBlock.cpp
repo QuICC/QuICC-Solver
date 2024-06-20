@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IConfigurationBlock.cpp
  * @brief Source of the implementation of the base of the configuration file block
  */
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 

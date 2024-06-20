@@ -1,4 +1,4 @@
-/** 
+/**
  * @file DirectBinaryWriter.cpp
  * @brief Source of the direct access binary writer
  */
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 
 namespace QuICC {
 

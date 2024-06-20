@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/Environment/IEnvironment.hpp"
+#include "Environment/IEnvironment.hpp"
 
 namespace QuICC {
 

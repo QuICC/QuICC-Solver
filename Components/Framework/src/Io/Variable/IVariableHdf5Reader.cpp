@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 #include "QuICC/Io/Variable/Tags/VariableHdf5.hpp"
 #include "QuICC/Tools/Formatter.hpp"

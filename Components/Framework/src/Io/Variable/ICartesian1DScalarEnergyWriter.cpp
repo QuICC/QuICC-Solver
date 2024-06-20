@@ -1,6 +1,6 @@
 /**
  * @file ICartesian1DScalarEnergyWriter.cpp
- * @brief Source of the implementation of the ASCII Chebyshev energy calculation for scalar field in a plane layer 
+ * @brief Source of the implementation of the ASCII Chebyshev energy calculation for scalar field in a plane layer
  */
 
 // System includes
@@ -11,7 +11,7 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/ICartesian1DScalarEnergyWriter.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Tools/Formatter.hpp"

@@ -13,7 +13,7 @@
 // Project includes
 //
 #include "QuICC/LoadSplitter/Algorithms/SplittingTools.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingDescription.hpp"
 #include "QuICC/Enums/VectorFormulation.hpp"
@@ -229,5 +229,5 @@ namespace StateFile {
 } // Framework
 } // TestSuite
 } // QuICC
- 
+
 #endif //QUICC_TESTSUITE_FRAMEWORK_STATEFILE_TESTHELPER_HPP

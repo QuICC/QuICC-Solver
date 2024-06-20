@@ -1,4 +1,4 @@
-/** 
+/**
  * @file TTTBuilder.cpp
  * @brief Source of the Chebyshev(FFT) + Chebyshev(FFT) + Chebyshev(FFT) scheme implementation
  */
@@ -12,7 +12,7 @@
 //
 #include "QuICC/SpatialScheme/3D/TTTBuilder.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Tools/RegularIndexCounter.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
 #include "QuICC/SpatialScheme/3D/TTTMesher.hpp"

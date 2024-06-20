@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"

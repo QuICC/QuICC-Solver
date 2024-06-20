@@ -19,7 +19,7 @@
 // Project includes
 //
 #include "QuICC/Communicators/Converters/PassthroughIndexConv.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 
 namespace QuICC {
 

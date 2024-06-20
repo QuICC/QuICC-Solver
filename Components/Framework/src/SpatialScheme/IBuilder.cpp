@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/SpatialScheme/IBuilder.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Transform/Setup/Triangular.hpp"
 #include "QuICC/Resolutions/Tools/RegularIndexCounter.hpp"
 

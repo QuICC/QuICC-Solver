@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "Types/Typedefs.hpp"
 #include "QuICC/Io/Hdf5/Hdf5Types.hpp"
 #include "QuICC/Io/Hdf5/Hdf5File.hpp"
