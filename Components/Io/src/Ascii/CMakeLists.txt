@@ -1,7 +1,7 @@
 include(ConfigureLibrary)
 quicc_add_library(ascii
   PARENT ${QUICC_CURRENT_COMPONENT_LIB}
-  LINK PUBLIC QuICC::Common
+  LINK PUBLIC QuICC::Common QuICC::Environment
   INCLUDE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../include
   SRC
     AsciiFile.cpp

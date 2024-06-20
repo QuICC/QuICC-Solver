@@ -1,4 +1,4 @@
-/** 
+/**
  * @file WFTBuilder.cpp
  * @brief Source of the cylindrical Worland(poly) + Fourier + Chebyshev(FFT) scheme implementation
  */
@@ -10,7 +10,7 @@
 // Project includes
 //
 #include "QuICC/SpatialScheme/3D/WFTBuilder.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Transform/Poly/Tools.hpp"
 #include "QuICC/Transform/Fft/Tools.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
@@ -23,7 +23,7 @@ namespace SpatialScheme {
    void WFTBuilder::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
    {
       this->tuneMpiResolution(descr);
-      
+
       // Create spectral space sub communicators
       #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
          // MPI error code
@@ -64,7 +64,7 @@ namespace SpatialScheme {
          // Loop over all cpus
          int commId;
          int globalCpu = QuICCEnv().id();
-         ierr = MPI_Comm_rank(comm, &commId); 
+         ierr = MPI_Comm_rank(comm, &commId);
          QuICCEnv().check(ierr, 814);
          ArrayI tmp;
          for(int commCpu = 0; commCpu < MpiFramework::transformCpus(0).size(); ++commCpu)
@@ -78,7 +78,7 @@ namespace SpatialScheme {
                QuICCEnv().check(ierr, 815);
                MPI_Barrier(comm);
 
-               // Send global CPU rank 
+               // Send global CPU rank
                globalCpu = QuICCEnv().id();
                ierr = MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
                QuICCEnv().check(ierr, 816);
@@ -95,7 +95,7 @@ namespace SpatialScheme {
                QuICCEnv().check(ierr, 818);
                MPI_Barrier(comm);
 
-               // Get global CPU rank 
+               // Get global CPU rank
                ierr = MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
                QuICCEnv().check(ierr, 819);
                MPI_Barrier(comm);
@@ -185,7 +185,7 @@ namespace SpatialScheme {
                i_++;
             }
          }
-         
+
          // Free communicator
          ierr = MPI_Comm_free(&comm);
          QuICCEnv().check(ierr, 825);

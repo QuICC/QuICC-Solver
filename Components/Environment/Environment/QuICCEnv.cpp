@@ -1,4 +1,4 @@
-/** 
+/**
  * @file QuICCEnv.cpp
  * @brief Source of static environment
  */
@@ -14,15 +14,15 @@
 
 // Class include
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 
 // Project includes
 //
 #ifdef QUICC_MPI
-#include "QuICC/Environment/Mpi.hpp"
+#include "Environment/Mpi.hpp"
 #define QUICC_ENVIMPL Environment::Mpi
 #else
-#include "QuICC/Environment/Serial.hpp"
+#include "Environment/Serial.hpp"
 #define QUICC_ENVIMPL Environment::Serial
 #endif // QUICC_MPI
 

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file LoadSplitter.cpp
  * @brief Source of the workload splitter
  */
@@ -11,7 +11,7 @@
 // Project includes
 //
 #include "QuICC/LoadSplitter/LoadSplitter.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Xml/GxlWriter.hpp"

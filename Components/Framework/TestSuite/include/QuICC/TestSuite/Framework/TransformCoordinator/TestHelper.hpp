@@ -14,7 +14,7 @@
 //
 #include "QuICC/Communicators/Communicator.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingTools.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingDescription.hpp"
 #include "QuICC/Enums/VectorFormulation.hpp"

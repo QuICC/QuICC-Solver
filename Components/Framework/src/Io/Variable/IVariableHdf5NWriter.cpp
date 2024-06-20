@@ -9,7 +9,7 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/IVariableHdf5NWriter.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Hasher.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 #include "QuICC/NonDimensional/Coordinator.hpp"

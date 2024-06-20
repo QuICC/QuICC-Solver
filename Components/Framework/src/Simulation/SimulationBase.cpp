@@ -11,7 +11,7 @@
 // Project includes
 //
 #include "QuICC/Simulation/SimulationBase.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/QuICCTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Simulation/SimulationIoTools.hpp"

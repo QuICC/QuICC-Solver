@@ -16,7 +16,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 
 namespace QuICC {

@@ -12,7 +12,7 @@
 //
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/Splitting.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/LoadSplitter/LoadSplitter.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/3D/@Scheme@.hpp"

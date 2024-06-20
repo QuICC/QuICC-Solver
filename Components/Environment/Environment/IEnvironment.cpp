@@ -3,23 +3,14 @@
  * @brief Source of generic environment
  */
 
-// Configuration includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Environment/IEnvironment.hpp"
 
 // Project includes
 //
+#include "Environment/IEnvironment.hpp"
 
 namespace QuICC {
 

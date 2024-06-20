@@ -13,7 +13,7 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Io/Variable/SphereTorPolModeSpectrumWriter.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {

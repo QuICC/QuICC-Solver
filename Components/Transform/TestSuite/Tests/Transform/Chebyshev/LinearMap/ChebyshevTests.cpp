@@ -14,7 +14,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/TestSuite/Transform/Chebyshev/LinearMap/TestArgs.hpp"
 #include "Profiler/Interface.hpp"
 

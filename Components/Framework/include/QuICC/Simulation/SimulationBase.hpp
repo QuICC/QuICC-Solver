@@ -13,7 +13,7 @@
 // Project includes
 //
 #include "QuICC/Equations/EquationOptions.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Timers/ExecutionTimer.hpp"
 #include "QuICC/SpatialScheme/IBuilder.hpp"

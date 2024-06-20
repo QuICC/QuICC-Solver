@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ControlInterface.cpp
  * @brief Source of the external control interface implementation
  */
@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/RuntimeStatus/GoOn.hpp"
 #include "QuICC/RuntimeStatus/Stop.hpp"
@@ -162,7 +162,7 @@ namespace Control {
          // Check if the framework allows IO to be performed
          if(this->mAllowedIo)
          {
-            // Produce a nice looking output to std output 
+            // Produce a nice looking output to std output
             Tools::Formatter::printLine(std::cout, '#');
             Tools::Formatter::printCentered(std::cout, "User requested abort!", '#');
             Tools::Formatter::printLine(std::cout, '#');

@@ -8,7 +8,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Enums/SplittingTools.hpp"
