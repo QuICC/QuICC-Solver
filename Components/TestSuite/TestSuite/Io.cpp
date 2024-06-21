@@ -247,7 +247,9 @@ void readList(std::vector<MHDFloat>& inData, const std::string& path)
       // Loop over data
       for (std::size_t i = 0; i < inData.size(); ++i)
       {
-         infile >> inData[i];
+         MHDFloat tmp;
+         infile >> tmp;
+         inData[i] = tmp;
       }
       infile.close();
    }

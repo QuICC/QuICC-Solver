@@ -33,6 +33,46 @@ int main(int argc, char **argv)
   return returnCode;
 }
 
+QuICC::Graph::ptrAndIdx unPackMeta(const std::vector<QuICC::MHDFloat>& db, std::uint32_t maxLayers)
+{
+  // Unpack metadata
+  std::uint32_t nLayers = db[2];
+  // Pointers
+  // note that index order is reversed
+  std::vector<std::uint32_t> ptr(maxLayers+1);
+  ptr[0] = 0;
+  for (std::size_t i = 1; i < ptr.size(); ++i)
+  {
+    ptr[i] += ptr[i-1];
+    for (std::uint32_t l = 1; l <= nLayers; ++l)
+    {
+      if (db[3 + (nLayers-l)*2] == maxLayers - i)
+      {
+        auto nCols = db[4 + (nLayers-l)*2];
+        ptr[i] += nCols;
+        for (std::uint32_t c = 0; c < nCols; ++c) {
+
+        }
+        continue;
+      }
+    }
+  }
+  // Indices
+  auto totCols = ptr[maxLayers];
+  std::vector<std::uint32_t> idx(totCols);
+  for (std::size_t i = 0; i < ptr.size()-1; ++i)
+  {
+    auto nCols = ptr[i+1] - ptr[i];
+    for (std::size_t c = 0; c < nCols; ++c)
+    {
+      idx[c+ptr[i]] = db[5 + (nLayers-1)*2 + (totCols-1)*2 - (nCols-1-c)*2];
+    }
+    totCols -= nCols;
+  }
+  return {ptr, idx};
+}
+
+
 
 TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 {
@@ -48,27 +88,59 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   llvm::SourceMgr sourceMgr;
   sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
 
+  // Load size meta info
+  #if 1
+  std::string dist = "Serial";
+  int ranks = 1;
+  #else
+  std::string dist = "Tubular";
+  int ranks = 4;
+  #endif
+  std::string fileName = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_data/Framework/LoadSplitter/WLFl/"+dist
+  +"/P_id103_np"+std::to_string(ranks)+"_r0_stage0_meta.dat";
+  std::vector<double> dbJW;
+  QuICC::TestSuite::readList(dbJW, fileName);
+  std::uint32_t modsK = dbJW[0];
+  std::uint32_t K = dbJW[1];
+
+  fileName = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_data/Framework/LoadSplitter/WLFl/"+dist
+  +"/P_id103_np"+std::to_string(ranks)+"_r0_stage1_meta.dat";
+   std::vector<double> dbAL;
+  QuICC::TestSuite::readList(dbAL, fileName);
+  std::uint32_t modsN = dbAL[0];
+  std::uint32_t N = dbAL[1];
+
+  fileName = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_data/Framework/LoadSplitter/WLFl/"+dist
+  +"/P_id103_np"+std::to_string(ranks)+"_r0_stage2_meta.dat";
+   std::vector<double> dbFr;
+  QuICC::TestSuite::readList(dbFr, fileName);
+  std::uint32_t modsM = dbFr[0];
+  std::uint32_t M = dbFr[1];
+
   // Grid dimensions
   constexpr std::uint32_t rank = 3;
-  std::array<std::uint32_t, rank> physDims{24, 12, 21};
-  std::array<std::uint32_t, rank> modsDims{8, 8, 4};
+  std::array<std::uint32_t, rank> physDims{M, N, K};
+  std::array<std::uint32_t, rank> modsDims{modsM, modsN, modsK};
+
+  // Unpack metadata AL stage
+  // auto metaALnew = unPackMeta(dbAL, modsM);
+
+  // Unpack metadata JW stage
+  auto metaJW = unPackMeta(dbJW, modsN);
+
 
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
   layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
-  // setup metadata
-  auto M = physDims[0];
-  auto N = physDims[1];
-  auto K = physDims[2];
-  auto modsM = modsDims[0];
-  auto modsN = modsDims[1];
-  auto modsK = modsDims[2];
-
-  std::vector<double> db;
-  std::string fileName = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_data/Framework/LoadSplitter/WLFl/Tubular/P_id103_np4_r0_stage0_meta.dat";
-  QuICC::TestSuite::readList(db, fileName);
+  // Setup metadata
+  // auto M = physDims[0];
+  // auto N = physDims[1];
+  // auto K = physDims[2];
+  // auto modsM = modsDims[0];
+  // auto modsN = modsDims[1];
+  // auto modsK = modsDims[2];
 
   // Populate meta by rank
   // Physical space (Stage::PPP and Stage::MPP)
@@ -91,7 +163,7 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 
   // Populate meta by rank
   // Modal space  (QuICC Stage0)
-  auto metaJW = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});
+  // auto metaJW = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});
   std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaJW.ptr, {}}};
   std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaJW.idx, {}}};
 
