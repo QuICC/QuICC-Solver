@@ -63,19 +63,20 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
         std::is_same_v<typename Tin::AttributesType, View::DCCSC3D> &&
         std::is_same_v<typename Tout::AttributesType, View::DCCSC3D>) {
         // dense transpose
-        assert(out.size() == in.size());
+        assert(out.size() <= in.size()); // input might be padded
         assert(out.size() == out.dims()[0]*out.dims()[1]*out.dims()[2]);
         // perm = [2, 0, 1]
         assert(in.dims()[0] == out.dims()[2]);
         assert(in.dims()[1] == out.dims()[0]);
         assert(in.dims()[2] == out.dims()[1]);
+        auto Ipad = in.lds();
         auto I = in.dims()[0];
         auto J = in.dims()[1];
         auto K = in.dims()[2];
         for (std::size_t k = 0; k < K; ++k) {
             for (std::size_t j = 0; j < J; ++j) {
                 for (std::size_t i = 0; i < I; ++i) {
-                    std::size_t ijk = i + j*I + k*I*J;
+                    std::size_t ijk = i + j*Ipad + k*Ipad*J;
                     std::size_t jki = j + k*J + i*J*K;
                     assert(ijk < in.size());
                     assert(jki < out.size());

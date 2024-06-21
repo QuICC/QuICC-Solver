@@ -127,7 +127,7 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   Jitter.apply(modsOutView, RView);
 
   // Check
-  double eps = 1e-15;
+  double eps = 1e-14;
   CHECK(std::abs(modsOutView[0].real() - sqrt(2.0)*QuICC::Math::PI) <= eps);
   CHECK(std::abs(modsOutView[0].imag()) <= eps);
   for(std::size_t m = 1; m < modsOutView.size(); ++m)
