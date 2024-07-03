@@ -44,15 +44,50 @@ QuICC::Graph::ptrAndIdx unPackMeta(const std::vector<QuICC::MHDFloat>& db, std::
   for (std::size_t i = 1; i < ptr.size(); ++i)
   {
     ptr[i] += ptr[i-1];
+    for (std::uint32_t l = 0; l < nLayers; ++l)
+    {
+      if (db[3 + l*2] == i - 1)
+      {
+        auto nCols = db[4 + l*2];
+        ptr[i] += nCols;
+        continue;
+      }
+    }
+  }
+  // Indices
+  auto totCols = ptr[maxLayers];
+  std::vector<std::uint32_t> idx(totCols);
+  std::uint32_t currCols = 0;
+  for (std::size_t i = 0; i < ptr.size()-1; ++i)
+  {
+    auto nCols = ptr[i+1] - ptr[i];
+    for (std::size_t c = 0; c < nCols; ++c)
+    {
+      idx[c+ptr[i]] = db[5 + (nLayers-1)*2 + (currCols)*2 +c*2];
+    }
+    currCols += nCols;
+  }
+  return {ptr, idx};
+}
+
+
+QuICC::Graph::ptrAndIdx unPackMetaJW(const std::vector<QuICC::MHDFloat>& db, std::uint32_t maxLayers)
+{
+  // Unpack metadata
+  std::uint32_t nLayers = db[2];
+  // Pointers
+  // note that index order is reversed
+  std::vector<std::uint32_t> ptr(maxLayers+1);
+  ptr[0] = 0;
+  for (std::size_t i = 1; i < ptr.size(); ++i)
+  {
+    ptr[i] += ptr[i-1];
     for (std::uint32_t l = 1; l <= nLayers; ++l)
     {
       if (db[3 + (nLayers-l)*2] == maxLayers - i)
       {
         auto nCols = db[4 + (nLayers-l)*2];
         ptr[i] += nCols;
-        for (std::uint32_t c = 0; c < nCols; ++c) {
-
-        }
         continue;
       }
     }
@@ -122,61 +157,39 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   std::array<std::uint32_t, rank> physDims{M, N, K};
   std::array<std::uint32_t, rank> modsDims{modsM, modsN, modsK};
 
+  // Unpack metadata Fourier stage
+  auto metaFr = unPackMeta(dbFr, K);
+
   // Unpack metadata AL stage
-  // auto metaALnew = unPackMeta(dbAL, modsM);
+  auto metaAL = unPackMeta(dbAL, modsM);
 
   // Unpack metadata JW stage
-  auto metaJW = unPackMeta(dbJW, modsN);
-
+  auto metaJW = unPackMetaJW(dbJW, modsN);
 
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
   layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
-  // Setup metadata
-  // auto M = physDims[0];
-  // auto N = physDims[1];
-  // auto K = physDims[2];
-  // auto modsM = modsDims[0];
-  // auto modsN = modsDims[1];
-  // auto modsK = modsDims[2];
-
-  // Populate meta by rank
   // Physical space (Stage::PPP and Stage::MPP)
-  std::vector<std::uint32_t> ptrPhys(K+1);
-  std::vector<std::uint32_t> idxPhys(K*N);
-  ptrPhys[0] = 0;
-  for (std::size_t i = 1; i < ptrPhys.size(); ++i) {
-      ptrPhys[i] = ptrPhys[i-1]+N;
-  }
-  for (std::size_t i = 0; i < idxPhys.size(); ++i) {
-      idxPhys[i] = i % N;
-  }
-  std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, ptrPhys, {}}};
-  std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
+  std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, metaFr.ptr, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, metaFr.idx, {}}};
 
-  // Populate meta by rank
-  // AL space (Stage::PPM and Stage::MPM)
-  using namespace QuICC::Graph;
-  auto metaAL = denseTransposePtrAndIdx<C_S1CLCSC3D_t, C_DCCSC3D_t>({modsN, K, modsM});
-
-  // Populate meta by rank
-  // Modal space  (QuICC Stage0)
-  // auto metaJW = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});
+  // Modal space (aka JW space, Stage::PMM and Stage::MMM, QuICC Stage0)
   std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaJW.ptr, {}}};
   std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaJW.idx, {}}};
 
   // Store meta stages to pass to Jitter
   std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
-  meta.push_back({nullptr, 0});
-  meta.push_back({nullptr, 0});
+  meta.push_back({metaFr.ptr.data(), metaFr.ptr.size()});
+  meta.push_back({metaFr.idx.data(), metaFr.idx.size()});
   meta.push_back({metaAL.ptr.data(), metaAL.ptr.size()});
   meta.push_back({metaAL.idx.data(), metaAL.idx.size()});
   meta.push_back({metaJW.ptr.data(), metaJW.ptr.size()});
   meta.push_back({metaJW.idx.data(), metaJW.idx.size()});
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+  using namespace QuICC::Graph;
   Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::PPP, meta);
 
   // host mem block
