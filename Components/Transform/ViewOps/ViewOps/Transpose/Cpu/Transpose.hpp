@@ -89,23 +89,30 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
         std::is_same_v<typename Tin::AttributesType, View::DCCSC3D> &&
         std::is_same_v<typename Tout::AttributesType, View::DCCSC3D>) {
         // dense transpose
-        assert(out.size() == in.size());
-        assert(out.size() == out.dims()[0]*out.dims()[1]*out.dims()[2]);
+        assert(out.size() >= in.size()); // output might be padded
+        assert(out.size() == out.lds()*out.dims()[1]*out.dims()[2]);
         // perm = [1, 2, 0]
         assert(in.dims()[0] == out.dims()[1]);
         assert(in.dims()[1] == out.dims()[2]);
         assert(in.dims()[2] == out.dims()[0]);
+        auto Ipad = out.lds();
         auto I = out.dims()[0];
         auto J = out.dims()[1];
         auto K = out.dims()[2];
         for (std::size_t k = 0; k < K; ++k) {
             for (std::size_t j = 0; j < J; ++j) {
-                for (std::size_t i = 0; i < I; ++i) {
-                    std::size_t ijk = i + j*I + k*I*J;
+                std::size_t i = 0;
+                for (; i < I; ++i) {
+                    std::size_t ijk = i + j*Ipad + k*Ipad*J;
                     std::size_t jki = j + k*J + i*J*K;
                     assert(jki < in.size());
                     assert(ijk < out.size());
                     out[ijk] = in[jki];
+                }
+                for (; i < Ipad; ++i) {
+                    std::size_t ijk = i + j*Ipad + k*Ipad*J;
+                    assert(ijk < out.size());
+                    out[ijk] = 0.0;
                 }
             }
         }

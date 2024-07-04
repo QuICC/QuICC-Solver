@@ -100,7 +100,7 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_DCCS
     assert(obj != nullptr);
     assert(pIn != nullptr);
     assert(pOut != nullptr);
-    assert(pIn->dataSize == pOut->dataSize);
+    assert(pIn->dataSize <= pOut->dataSize); // there could be padding for FFT
     // op
     using namespace QuICC::Transpose::Cpu;
     using namespace QuICC::Transpose;
@@ -115,7 +115,8 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_DCCS
     // not used for dense transpose, not setting up
     ViewBase<std::uint32_t> indices[rank];
     Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    std::uint32_t lds = pOut->dataSize / pOut->cooSize;
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices, lds);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
