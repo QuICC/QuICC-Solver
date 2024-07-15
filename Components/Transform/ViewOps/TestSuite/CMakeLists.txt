@@ -234,6 +234,26 @@ add_test(
     "${QUICC_WORK_DIR}"
 )
 
+# Mpi
+
+add_executable(ViewTransposeTestMpi
+    ViewTransposeTestsMpi.cpp
+)
+
+
+target_link_libraries(ViewTransposeTestMpi
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewTransposeTestMpi
+    COMMAND ViewTransposeTestMpi
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
 #
 # View Blas Tests
 #

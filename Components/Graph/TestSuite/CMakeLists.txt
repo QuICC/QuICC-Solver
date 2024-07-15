@@ -37,6 +37,7 @@ if(QUICC_USE_MPI)
     target_link_libraries(GraphTestsMpi
         ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}
         QuICC::Graph
+        QuICC::Environment
         QuICC::TestSuite
         Catch2::Catch2
     )

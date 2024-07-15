@@ -122,6 +122,11 @@ namespace Environment {
 
          /**
           * @brief setup gdb hook
+          * By setting the enviroment variable `QUICC_GDB_HOOK` to
+          * a non-negative integer value, that process will print
+          * its PID, wait here.
+          * To exit the waiting loop one needs to set the local var
+          * wait = false.
           */
          void gdbHook();
 

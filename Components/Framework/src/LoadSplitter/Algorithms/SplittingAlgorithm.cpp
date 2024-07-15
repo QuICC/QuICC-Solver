@@ -396,7 +396,8 @@ namespace Parallel {
    void SplittingAlgorithm::buildCommunicationStructure(const int localId, SharedResolution spRes, std::map<Dimensions::Transform::Id,std::multimap<int,int> >& commStructure)
    {
       // Clear the communication structure
-      std::map<Dimensions::Transform::Id,std::multimap<int,int> >().swap(commStructure);
+      // std::map<Dimensions::Transform::Id,std::multimap<int,int> >().swap(commStructure); ???
+      commStructure.clear();
 
       Dimensions::Transform::Id dimId;
       int i_;
