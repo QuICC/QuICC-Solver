@@ -98,37 +98,6 @@ TEST_CASE("Send/recv displacements", "[SendRecvDispls]")
             CHECK(recvDispls[r][i] == recvDisplsRef[r][i]);
         }
     }
-
-    // std::cout << "rank: " << rank << " sendDispls size ";
-    // for (int r = 0; r < ranks; ++r ) {
-    //     std::cout << sendDispls[r].size() << ' ';
-    // }
-    // std::cout << '\n';
-
-    // Reduced communicators
-
-
-
-    // // Build types
-    // for (int r = 0; r < ranks; ++r ) {
-    //     MPI_Type_create_indexed_block(sendDispls[r].size(), 1, sendDispls[r].data(), MPI_INT, &sendType[r]);
-    //     MPI_Type_commit(&sendType[r]);
-    //     MPI_Type_create_indexed_block(recvDispls[r].size(), 1, recvDispls[r].data(), MPI_INT, &recvType[r]);
-    //     MPI_Type_commit(&recvType[r]);
-    // }
-
-    // // Comm
-    // MPI_Alltoallw(sendBuf.data(), sendCounts.data(), sDispls.data(), sendType.data(),
-    //               recvBuf.data(), recvCounts.data(), rDispls.data(), recvType.data(),
-    //               MPI_COMM_WORLD);
-
-    // // Check
-
-    // // Release types
-    // for (int r = 0; r < ranks; ++r ) {
-    //     MPI_Type_free(&sendType[r]);
-    //     MPI_Type_free(&recvType[r]);
-    // }
 }
 
 TEST_CASE("Reduce displacements", "[ReduceDispls]")
@@ -193,9 +162,107 @@ TEST_CASE("Reduce displacements", "[ReduceDispls]")
     }
 }
 
-TEST_CASE("Reduce communicators", "[ReduceComm]")
+
+TEST_CASE("SubComm and Types", "[SubComm]")
 {
+    int rank, ranks;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+
+    assert(ranks >= 2);
+
+    // this should be store in a class
+    std::vector<int> sendBuf;
+    std::vector<int> recvBuf;
+    std::vector<int> recvBufRef;
+    std::vector<int> sendCounts(ranks, 1);
+    std::vector<int> recvCounts(ranks, 1);
+    std::vector<int> sDispls(ranks, 0);
+    std::vector<int> rDispls(ranks, 0);
+    std::vector<std::vector<int>> sendDisplsRef(ranks);
+    std::vector<std::vector<int>> recvDisplsRef(ranks);
+
+    // needed to build sendRankMap recvRankMap
+    std::vector<point_t> absCooOld;
+    std::vector<point_t> absCooNew;
+
+    //
+    // transpose distributed trapezoidal matrix
+
+    // r0   0  1  *  *    r1   *  *  2  3
+    //      4  5  *  *         *  *  6  7
+    //      8  9  *            *  * 10
+
+    //             vvv to vvv
+
+    // r0   0  4  *        r1  *  *  8
+    //      1  5  *            *  *  9
+    //      2  6  *            *  * 10
+    //      3  7
+
+    if (rank == 0) {
+        absCooOld = {{0,0,0}, {0,1,0}, {0,2,0}, {1,0,0}, {1,1,0}, {1,2,0}};
+        absCooNew = {{0,0,0}, {1,0,0}, {2,0,0}, {3,0,0}, {0,1,0}, {1,1,0}, {2,1,0}, {3,1,0}};
+        sendBuf = {0, 4, 8, 1, 5, 9}; // col maj
+        recvBuf = std::vector<int>(8, -1);
+        recvBufRef = {0, 1, 2, 3, 4, 5, 6, 7};
+    }
+    if (rank == 1) {
+        absCooOld = {{2,0,0}, {2,1,0}, {2,2,0}, {3,0,0}, {3,1,0}};
+        absCooNew = {{0,2,0}, {1,2,0}, {2,2,0}};
+        sendBuf = {2, 6, 10, 3, 7}; // col maj
+        recvBuf = std::vector<int>(3, -1);
+        recvBufRef = {8, 9, 10};
+    }
+
+    auto sendDispls = getDispls(absCooNew, absCooOld);
+    auto recvDispls = getDispls(absCooOld, absCooNew);
+    auto redSet = getReducedRanksSet(sendDispls, recvDispls);
+    redDisplsFromSet(sendDispls, recvDispls, redSet);
+    auto subComm = getSubComm(redSet);
+
+    if (rank == 0 || rank == 1) {
+        CHECK(subComm != MPI_COMM_NULL);
+    }
+    else {
+        CHECK(subComm == MPI_COMM_NULL);
+    }
+
+    // Communicate with partecipants only
+    if (subComm != MPI_COMM_NULL) {
+
+        int subRanks;
+        MPI_Comm_size(subComm, &subRanks);
+
+        std::vector<MPI_Datatype> sendType(subRanks);
+        std::vector<MPI_Datatype> recvType(subRanks);
+
+        // Build types
+        for (int r = 0; r < subRanks; ++r ) {
+            MPI_Type_create_indexed_block(sendDispls[r].size(), 1, sendDispls[r].data(), MPI_INT, &sendType[r]);
+            MPI_Type_commit(&sendType[r]);
+            MPI_Type_create_indexed_block(recvDispls[r].size(), 1, recvDispls[r].data(), MPI_INT, &recvType[r]);
+            MPI_Type_commit(&recvType[r]);
+        }
+
+        // Comm
+        MPI_Alltoallw(sendBuf.data(), sendCounts.data(), sDispls.data(), sendType.data(),
+                    recvBuf.data(), recvCounts.data(), rDispls.data(), recvType.data(),
+                    subComm);
+
+        // Check
+        for (std::size_t i = 0; i < recvBufRef.size(); ++i) {
+            CHECK(recvBuf[i] == recvBufRef[i]);
+        }
+
+        // Release types
+        for (int r = 0; r < subRanks; ++r ) {
+            MPI_Type_free(&sendType[r]);
+            MPI_Type_free(&recvType[r]);
+        }
+    }
 }
+
 
 
 // Test one sided comm

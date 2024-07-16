@@ -102,10 +102,10 @@ std::vector<int> getReducedRanksSet(const std::vector<std::vector<int>>& sendDis
         }
     }
     // Copy to vector
-    std::vector<int> res;
-    res.reserve(redSet.size());
+    std::vector<int> res(redSet.size());
+    std::size_t i = 0;
     for (auto it = redSet.begin(); it != redSet.end(); ++it) {
-        res.push_back(*it);
+        res[i++] = *it;
     }
     return res;
 }
@@ -128,6 +128,24 @@ void redDisplsFromSet(std::vector<std::vector<int>>& sendDispls,
 
     sendDispls = std::move(sendDisplsRed);
     recvDispls = std::move(recvDisplsRed);
+}
+
+/// @brief Get sub communicator from the reduced set
+/// @param redSet
+/// @param comm
+/// @return
+MPI_Comm getSubComm(const std::vector<int>& redSet, const MPI_Comm comm = MPI_COMM_WORLD)
+{
+    // Original group
+    MPI_Group   worldGroup;
+    MPI_Comm_group(comm, &worldGroup);
+    // Sub group
+    MPI_Group subGroup;
+    MPI_Group_incl(worldGroup, redSet.size(), redSet.data(), &subGroup);
+    // Sub communicator
+    MPI_Comm subComm;
+    MPI_Comm_create(comm, subGroup, &subComm);
+    return subComm;
 }
 
 
