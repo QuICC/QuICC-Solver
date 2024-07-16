@@ -21,13 +21,13 @@ int main(int argc, char **argv)
 }
 
 
-TEST_CASE("3D", "[3D]")
+TEST_CASE("Send/recv displacements", "[SendRecvDispls]")
 {
     int rank, ranks;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &ranks);
 
-    // assert(ranks == 2);
+    assert(ranks >= 2);
 
     // this should be store in a class
     std::vector<int> sendBuf;
@@ -99,11 +99,11 @@ TEST_CASE("3D", "[3D]")
         }
     }
 
-    std::cout << "rank: " << rank << " sendDispls size ";
-    for (int r = 0; r < ranks; ++r ) {
-        std::cout << sendDispls[r].size() << ' ';
-    }
-    std::cout << '\n';
+    // std::cout << "rank: " << rank << " sendDispls size ";
+    // for (int r = 0; r < ranks; ++r ) {
+    //     std::cout << sendDispls[r].size() << ' ';
+    // }
+    // std::cout << '\n';
 
     // Reduced communicators
 
@@ -130,3 +130,72 @@ TEST_CASE("3D", "[3D]")
     //     MPI_Type_free(&recvType[r]);
     // }
 }
+
+TEST_CASE("Reduce displacements", "[ReduceDispls]")
+{
+    int rank, ranks;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+
+    std::vector<std::vector<int>> sendDispls(ranks);
+    std::vector<std::vector<int>> recvDispls(ranks);
+    std::vector<std::vector<int>> sendDisplsRef(ranks);
+    std::vector<std::vector<int>> recvDisplsRef(ranks);
+
+    if (rank == 0) {
+        sendDispls[0] = {0, 1, 3, 4};
+        recvDispls[0] = {0, 4, 1, 5};
+        sendDispls[1] = {2, 5};
+        recvDispls[1] = {2, 6, 3, 7};
+        sendDisplsRef[0] = {0, 1, 3, 4};
+        recvDisplsRef[0] = {0, 4, 1, 5};
+        sendDisplsRef[1] = {2, 5};
+        recvDisplsRef[1] = {2, 6, 3, 7};
+    }
+    if (rank == 1) {
+        sendDispls[0] = {0, 1, 3, 4};
+        recvDispls[0] = {0, 1};
+        sendDispls[1] = {2};
+        recvDispls[1] = {2};
+        sendDisplsRef[0] = {0, 1, 3, 4};
+        recvDisplsRef[0] = {0, 1};
+        sendDisplsRef[1] = {2};
+        recvDisplsRef[1] = {2};
+    }
+
+    auto redSet = getReducedRanksSet(sendDispls, recvDispls);
+
+    if (rank == 0 || rank == 1) {
+        CHECK(redSet.size() == 2);
+    }
+    else {
+        CHECK(redSet.size() == 0);
+    }
+
+    redDisplsFromSet(sendDispls, recvDispls, redSet);
+
+    if (rank == 0 || rank == 1) {
+        CHECK(sendDispls.size() == 2);
+        CHECK(recvDispls.size() == 2);
+    }
+    else {
+        CHECK(sendDispls.size() == 0);
+        CHECK(recvDispls.size() == 0);
+    }
+
+    for (std::size_t r = 0; r < redSet.size(); ++r ) {
+        for (std::size_t i = 0; i < sendDispls[r].size(); ++i) {
+            CHECK(sendDispls[r][i] == sendDisplsRef[redSet[r]][i]);
+        }
+        for (std::size_t i = 0; i < recvDispls[r].size(); ++i) {
+            CHECK(recvDispls[r][i] == recvDisplsRef[redSet[r]][i]);
+        }
+    }
+}
+
+TEST_CASE("Reduce communicators", "[ReduceComm]")
+{
+}
+
+
+// Test one sided comm

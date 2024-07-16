@@ -19,7 +19,13 @@ constexpr int dimSize = 3;
 
 using point_t = std::array<int, dimSize>;
 
-std::vector<std::vector<int>> getDispls(std::vector<point_t>& absCooNew, const std::vector<point_t>& absCooOld, const MPI_Comm comm = MPI_COMM_WORLD) {
+/// @brief Build send or recv displacement
+/// @param absCooNew ending coordinates
+/// @param absCooOld starting coordinates
+/// @param comm mpi communicator spanning all involved ranks
+/// @return send/recv displacement
+std::vector<std::vector<int>> getDispls(std::vector<point_t>& absCooNew,
+    const std::vector<point_t>& absCooOld, const MPI_Comm comm = MPI_COMM_WORLD) {
 
     int rank, ranks;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -61,19 +67,67 @@ std::vector<std::vector<int>> getDispls(std::vector<point_t>& absCooNew, const s
         for (auto itLCoo = locOldIdx.begin(); itLCoo != locOldIdx.end();) {
             auto lCoo = (*itLCoo).first;
             if (auto itRCoo = remNewIdx.find(lCoo); itRCoo != remNewIdx.end()) {
-                std::cout << "rank " << r << ": "
-                    << lCoo[0] << ',' << lCoo[1] << " found " << r << '\n';
+                // std::cout << "rank " << r << ": "
+                //     << lCoo[0] << ',' << lCoo[1] << " found " << r << '\n';
                 sendDispls[r].push_back((*itLCoo).second);
                 itLCoo = locOldIdx.erase(itLCoo);
                 remNewIdx.erase(itRCoo);
             }
             else {
                 ++itLCoo;
-                std::cout << "not found\n";
+                // std::cout << "not found\n";
             }
         }
     }
     return sendDispls;
+}
+
+/// @brief Build set of communicating ranks from displacements
+/// This is part of the alltoallw setup
+/// @param sendDispls sending displacements
+/// @param recvDispls receiving displacements
+/// @return set of communicating ranks
+std::vector<int> getReducedRanksSet(const std::vector<std::vector<int>>& sendDispls,
+    const std::vector<std::vector<int>>& recvDispls) {
+    std::set<int> redSet;
+    // Save non-empty exchanges
+    for (std::size_t i = 0; i < sendDispls.size(); ++i) {
+        if (sendDispls[i].size() > 0) {
+            redSet.insert(i);
+        }
+    }
+    for (std::size_t i = 0; i < recvDispls.size(); ++i) {
+        if (recvDispls[i].size() > 0) {
+            redSet.insert(i);
+        }
+    }
+    // Copy to vector
+    std::vector<int> res;
+    res.reserve(redSet.size());
+    for (auto it = redSet.begin(); it != redSet.end(); ++it) {
+        res.push_back(*it);
+    }
+    return res;
+}
+
+/// @brief Reduce diplacements to the to the reduced set
+/// @param sendDispls
+/// @param recvDispls
+/// @param redSet
+void redDisplsFromSet(std::vector<std::vector<int>>& sendDispls,
+    std::vector<std::vector<int>>& recvDispls, std::vector<int>& redSet)
+{
+    auto redSize = redSet.size();
+    std::vector<std::vector<int>> sendDisplsRed(redSize);
+    std::vector<std::vector<int>> recvDisplsRed(redSize);
+
+    for (std::size_t r = 0; r < redSize; ++r) {
+        sendDisplsRed[r] = std::move(sendDispls[redSet[r]]);
+        recvDisplsRed[r] = std::move(recvDispls[redSet[r]]);
+    }
+
+    sendDispls = std::move(sendDisplsRed);
+    recvDispls = std::move(recvDisplsRed);
 }
 
 
