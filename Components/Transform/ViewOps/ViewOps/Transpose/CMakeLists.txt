@@ -3,7 +3,7 @@ set(QUICC_CURRENT_SUBCOMPONENT_LIB Transpose)
 
 # if cuda backend is present we compile as static lib
 # to not propagate the dependency, otherwise header only lib
-if(TARGET QuICC::Cuda)
+if(TARGET QuICC::Cuda OR QUICC_USE_MPI)
   set(LIBTYPE "STATIC")
   set(INTTYPE "PUBLIC")
 else()
@@ -26,6 +26,13 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOM
 # set(PHS
 #   Functors.hpp
 # )
+
+if(QUICC_USE_MPI)
+  target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+    PRIVATE
+      MpiUtils.cpp
+  )
+endif()
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PROPERTIES

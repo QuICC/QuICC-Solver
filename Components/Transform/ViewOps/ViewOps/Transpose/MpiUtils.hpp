@@ -7,17 +7,63 @@
 // External includes
 //
 #include <array>
-#include <vector>
 #include <mpi.h>
+#include <vector>
 
 // Project includes
 //
+
 namespace QuICC {
 namespace Transpose {
 
+/// @brief point coordinate dimensions
 constexpr int dimSize = 3;
 
+/// @brief point coordinate type
 using point_t = std::array<int, dimSize>;
+
+/// @brief Container for Mpi communicator and types
+/// @tparam TAG
+template<class TAG>
+class Comm
+{
+public:
+    Comm(MPI_Comm comm = MPI_COMM_WORLD):_comm(comm){};
+
+    /// @brief release resources
+    /// like Types and Displacements
+    ~Comm();
+
+    void setComm(std::vector<point_t>& cooNew, const std::vector<point_t>& cooOld);
+
+    std::vector<std::vector<int>>& getRecvDispls()
+    {
+        return _recvDispls;
+    }
+
+    std::vector<std::vector<int>>& getSendDispls()
+    {
+        return _sendDispls;
+    }
+
+    std::vector<MPI_Datatype>& getRecvType()
+    {
+        return _recvType;
+    }
+
+    std::vector<MPI_Datatype>& getSendType()
+    {
+        return _sendType;
+    }
+
+private:
+    MPI_Comm _comm;
+    MPI_Comm _subComm;
+    std::vector<std::vector<int>> _sendDispls;
+    std::vector<std::vector<int>> _recvDispls;
+    std::vector<MPI_Datatype> _sendType();
+    std::vector<MPI_Datatype> _recvType();
+};
 
 /// @brief Build send or recv displacement
 /// @param absCooNew ending coordinates
@@ -25,132 +71,38 @@ using point_t = std::array<int, dimSize>;
 /// @param comm mpi communicator spanning all involved ranks
 /// @return send/recv displacement
 std::vector<std::vector<int>> getDispls(std::vector<point_t>& absCooNew,
-    const std::vector<point_t>& absCooOld, const MPI_Comm comm = MPI_COMM_WORLD) {
+   const std::vector<point_t>& absCooOld, const MPI_Comm comm = MPI_COMM_WORLD);
 
-    int rank, ranks;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &ranks);
-
-    std::vector<std::vector<int>> sendDispls(ranks);
-
-    std::map<point_t, int> locOldIdx;
-    for (std::size_t i = 0; i < absCooOld.size(); ++i) {
-        auto&& p = absCooOld[i];
-        locOldIdx[p] = i;
-    }
-    for (int r = 0; r < ranks; ++r) {
-        // get new coo from other rank and check if it is here
-        std::map<point_t, int> remNewIdx;
-        // comm remote coo size
-        int remAbsCooNewSize = absCooNew.size();
-        MPI_Bcast(&remAbsCooNewSize, 1, MPI_INT, r, comm);
-        if (r == rank) {
-            MPI_Bcast(absCooNew.data(), absCooNew.size()*dimSize, MPI_INT, r, comm);
-            // setup remote map
-            for (std::size_t i = 0; i < absCooNew.size(); ++i) {
-                auto&& p = absCooNew[i];
-                remNewIdx[p] = i;
-            }
-        }
-        else {
-            // comm remote coordinates
-            std::vector<point_t> remAbsCooNew(remAbsCooNewSize);
-            MPI_Bcast(remAbsCooNew.data(), remAbsCooNew.size()*dimSize, MPI_INT, r, comm);
-            // setup remote map
-            for (std::size_t i = 0; i < remAbsCooNew.size(); ++i) {
-                auto&& p = remAbsCooNew[i];
-                remNewIdx[p] = i;
-            }
-        }
-
-        // loop over loc coo to find match
-        for (auto itLCoo = locOldIdx.begin(); itLCoo != locOldIdx.end();) {
-            auto lCoo = (*itLCoo).first;
-            if (auto itRCoo = remNewIdx.find(lCoo); itRCoo != remNewIdx.end()) {
-                // std::cout << "rank " << r << ": "
-                //     << lCoo[0] << ',' << lCoo[1] << " found " << r << '\n';
-                sendDispls[r].push_back((*itLCoo).second);
-                itLCoo = locOldIdx.erase(itLCoo);
-                remNewIdx.erase(itRCoo);
-            }
-            else {
-                ++itLCoo;
-                // std::cout << "not found\n";
-            }
-        }
-    }
-    return sendDispls;
-}
 
 /// @brief Build set of communicating ranks from displacements
 /// This is part of the alltoallw setup
 /// @param sendDispls sending displacements
 /// @param recvDispls receiving displacements
 /// @return set of communicating ranks
-std::vector<int> getReducedRanksSet(const std::vector<std::vector<int>>& sendDispls,
-    const std::vector<std::vector<int>>& recvDispls) {
-    std::set<int> redSet;
-    // Save non-empty exchanges
-    for (std::size_t i = 0; i < sendDispls.size(); ++i) {
-        if (sendDispls[i].size() > 0) {
-            redSet.insert(i);
-        }
-    }
-    for (std::size_t i = 0; i < recvDispls.size(); ++i) {
-        if (recvDispls[i].size() > 0) {
-            redSet.insert(i);
-        }
-    }
-    // Copy to vector
-    std::vector<int> res(redSet.size());
-    std::size_t i = 0;
-    for (auto it = redSet.begin(); it != redSet.end(); ++it) {
-        res[i++] = *it;
-    }
-    return res;
-}
+std::vector<int> getReducedRanksSet(
+   const std::vector<std::vector<int>>& sendDispls,
+   const std::vector<std::vector<int>>& recvDispls,
+   const MPI_Comm comm = MPI_COMM_WORLD);
 
 /// @brief Reduce diplacements to the to the reduced set
 /// @param sendDispls
 /// @param recvDispls
 /// @param redSet
 void redDisplsFromSet(std::vector<std::vector<int>>& sendDispls,
-    std::vector<std::vector<int>>& recvDispls, std::vector<int>& redSet)
-{
-    auto redSize = redSet.size();
-    std::vector<std::vector<int>> sendDisplsRed(redSize);
-    std::vector<std::vector<int>> recvDisplsRed(redSize);
-
-    for (std::size_t r = 0; r < redSize; ++r) {
-        sendDisplsRed[r] = std::move(sendDispls[redSet[r]]);
-        recvDisplsRed[r] = std::move(recvDispls[redSet[r]]);
-    }
-
-    sendDispls = std::move(sendDisplsRed);
-    recvDispls = std::move(recvDisplsRed);
-}
+   std::vector<std::vector<int>>& recvDispls, std::vector<int>& redSet);
 
 /// @brief Get sub communicator from the reduced set
 /// @param redSet
 /// @param comm
 /// @return
-MPI_Comm getSubComm(const std::vector<int>& redSet, const MPI_Comm comm = MPI_COMM_WORLD)
-{
-    // Original group
-    MPI_Group   worldGroup;
-    MPI_Comm_group(comm, &worldGroup);
-    // Sub group
-    MPI_Group subGroup;
-    MPI_Group_incl(worldGroup, redSet.size(), redSet.data(), &subGroup);
-    // Sub communicator
-    MPI_Comm subComm;
-    MPI_Comm_create(comm, subGroup, &subComm);
-    return subComm;
-}
+MPI_Comm getSubComm(const std::vector<int>& redSet,
+   const MPI_Comm comm = MPI_COMM_WORLD);
+
+/// @brief Get count vector based on displacements
+/// @param displs
+/// @return
+std::vector<int> getCount(const std::vector<std::vector<int>>& displs);
 
 
-}
-}
-
-
-
+} // namespace Transpose
+} // namespace QuICC
