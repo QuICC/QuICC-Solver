@@ -6,7 +6,7 @@
 #include <regex>
 #include <thread>
 
-#include "ViewOps/Transpose/MpiUtils.hpp"
+#include "ViewOps/Transpose/Mpi/Comm.hpp"
 extern "C" {
 #include <unistd.h>
 }

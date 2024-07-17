@@ -1,5 +1,5 @@
 /**
- * @file MpiUtils.cpp
+ * @file Comm.cpp
  * @brief Methods for mpi enabled transform
  */
 
@@ -10,7 +10,7 @@
 
 // Project includes
 //
-#include "ViewOps/Transpose/MpiUtils.hpp"
+#include "ViewOps/Transpose/Mpi/Comm.hpp"
 
 namespace QuICC {
 namespace Transpose {

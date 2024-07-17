@@ -1,5 +1,5 @@
 /**
- * @file MpiUtils.hpp
+ * @file Comm.hpp
  * @brief Methods for mpi enabled transform
  */
 #pragma once
@@ -73,10 +73,10 @@ public:
    /// like Types and Displacements
    ~Comm()
    {
-      for (int r = 0; r < sendType.size(); ++r)
+      for (int r = 0; r < _sendType.size(); ++r)
       {
-         MPI_Type_free(&sendType[r]);
-         MPI_Type_free(&recvType[r]);
+         MPI_Type_free(&_sendType[r]);
+         MPI_Type_free(&_recvType[r]);
       }
    }
 

@@ -27,13 +27,6 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOM
 #   Functors.hpp
 # )
 
-if(QUICC_USE_MPI)
-  target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
-    PRIVATE
-      MpiUtils.cpp
-  )
-endif()
-
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PROPERTIES
     PUBLIC_HEADER "${PHS}"
@@ -42,6 +35,9 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
 add_subdirectory(Cpu)
 if(TARGET QuICC::Cuda)
   add_subdirectory(Cuda)
+endif()
+if(QUICC_USE_MPI)
+  add_subdirectory(Mpi)
 endif()
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
