@@ -14,6 +14,8 @@
 
 namespace QuICC {
 namespace Transpose {
+namespace Mpi {
+
 
 std::vector<std::vector<int>> getDispls(const std::vector<point_t>& absCooNew,
    const std::vector<point_t>& absCooOld, const MPI_Comm comm)
@@ -189,6 +191,6 @@ std::vector<int> getCount(const std::vector<std::vector<int>>& displs)
    return count;
 }
 
-
+} // namespace Mpi
 } // namespace Transpose
 } // namespace QuICC

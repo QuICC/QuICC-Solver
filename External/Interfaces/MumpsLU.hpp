@@ -1,6 +1,6 @@
 /**
  * @file MumpsLU.hpp
- * @brief Eigen wrapper to use the Mumps solver 
+ * @brief Eigen wrapper to use the Mumps solver
  * @author Philippe Marti \<philippe.marti@colorado.edu\>
  */
 
@@ -19,7 +19,7 @@
 #include <dmumps_c.h>
 #include <zmumps_c.h>
 
-#include "QuICC/MpiTypes.hpp"
+#include "Environment/MpiTypes.hpp"
 #include "QuICC/Profiler/ProfilerMacro.h"
 
 namespace Eigen {
@@ -85,8 +85,8 @@ namespace Eigen {
 
       public:
 
-         MumpsLU(MPI_Comm comm) 
-         { 
+         MumpsLU(MPI_Comm comm)
+         {
             m_comm = comm;
             init();
          }
@@ -159,7 +159,7 @@ namespace Eigen {
             return m_info;
          }
 
-         /** Computes the sparse LU decomposition of \a matrix 
+         /** Computes the sparse LU decomposition of \a matrix
           *  Note that the matrix should be column-major, and in compressed format for best performance.
           *  \sa SparseMatrix::makeCompressed().
           */
@@ -416,7 +416,7 @@ namespace Eigen {
             {
                DetailedProfilerMacro_start(QuICC::ProfilerMacro::TSTEPMPI);
                mTmp.resize(m_id.lrhs, m_id.nrhs);
-               MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, QuICC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm); 
+               MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, QuICC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm);
                pRhs = mTmp.data();
                DetailedProfilerMacro_stop(QuICC::ProfilerMacro::TSTEPMPI);
             } else

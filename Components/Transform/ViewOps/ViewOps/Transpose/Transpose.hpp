@@ -13,3 +13,7 @@
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "ViewOps/Transpose/Cuda/Transpose.hpp"
 #endif
+#ifdef QUICC_MPI
+#include "ViewOps/Transpose/Mpi/Transpose.hpp"
+#endif
+

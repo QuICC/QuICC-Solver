@@ -18,6 +18,10 @@ namespace Transpose {
 //
 
 /// @brief tag type for transpose permutation order.
+/// perm = [0, 1, 2]
+struct p012_t {};
+
+/// @brief tag type for transpose permutation order.
 /// perm = [2, 0, 1]
 struct p201_t {};
 

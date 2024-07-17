@@ -6,8 +6,8 @@
 // Only define in MPI case
 #ifdef QUICC_MPI
 
-#ifndef QUICC_PARALLEL_MPITYPES_HPP
-#define QUICC_PARALLEL_MPITYPES_HPP
+#ifndef QUICC_ENVIRONMENT_MPITYPES_HPP
+#define QUICC_ENVIRONMENT_MPITYPES_HPP
 
 // System includes
 //
@@ -22,7 +22,7 @@
 
 namespace QuICC {
 
-namespace Parallel {
+namespace Environment {
 
    /**
     * @brief This class implements a few type conversion routines for the MPI library
@@ -94,7 +94,7 @@ namespace Parallel {
 }
 }
 
-#endif // QUICC_PARALLEL_MPITYPES_HPP
+#endif // QUICC_ENVIRONMENT_MPITYPES_HPP
 
 // Only define in MPI case
 #endif //QUICC_MPI

@@ -27,7 +27,7 @@
 //
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Typedefs.hpp"
-#include "QuICC/MpiTypes.hpp"
+#include "Environment/MpiTypes.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/DimensionTools.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"

@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/MpiTypes.hpp"
+#include "Environment/MpiTypes.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/VelocityZ.hpp"

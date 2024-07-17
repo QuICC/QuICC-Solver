@@ -14,8 +14,8 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
     PUBLIC_HEADER "${PHS}"
 )
 
-# target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
-#   PRIVATE
-#     QuICC::Cuda
-#     QuICC::Memory
-# )
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+  PUBLIC
+    QuICC::Environment
+    QuICC::View
+)

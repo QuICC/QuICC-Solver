@@ -11,8 +11,11 @@
 //
 #include "Operator/Unary.hpp"
 #include "Profiler/Interface.hpp"
-#include "ViewOps/Transpose/Tags.hpp"
 #include "View/View.hpp"
+#include "ViewOps/Transpose/Mpi/Comm.hpp"
+#include "ViewOps/Transpose/Mpi/Coordinates.hpp"
+#include "ViewOps/Transpose/Tags.hpp"
+
 
 namespace QuICC {
 /// @brief namespace for Transpose type operations
@@ -30,7 +33,8 @@ class Op : public UnaryBaseOp<Op<Tout, Tin, Perm>, Tout, Tin>
 {
 public:
    /// @brief default constructor
-   Op() = default;
+   Op(std::shared_ptr<Comm<typename Tin::ScalarType>> comm) :_comm(comm){};
+   Op() = delete;
    /// @brief dtor
    ~Op() = default;
 
@@ -41,170 +45,38 @@ private:
    void applyImpl(Tout& out, const Tin& in);
    /// @brief give access to base class
    friend UnaryBaseOp<Op<Tout, Tin, Perm>, Tout, Tin>;
-
-
+   /// @brief communicator object
+   std::shared_ptr<Comm<typename Tin::ScalarType>> _comm;
 };
 
 
 template <class Tout, class Tin, class Perm>
 void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 {
-    Profiler::RegionFixture<4> fix("Transpose::Mpi::applyImpl");
-    if constexpr (std::is_same_v<Perm, p201_t> &&
-        std::is_same_v<typename Tin::AttributesType, View::DCCSC3D> &&
-        std::is_same_v<typename Tout::AttributesType, View::DCCSC3D>) {
-        // dense transpose
-        assert(out.size() <= in.size()); // input might be padded
-        assert(out.size() == out.dims()[0]*out.dims()[1]*out.dims()[2]);
-        // perm = [2, 0, 1]
-        assert(in.dims()[0] == out.dims()[2]);
-        assert(in.dims()[1] == out.dims()[0]);
-        assert(in.dims()[2] == out.dims()[1]);
-        auto Ipad = in.lds();
-        auto I = in.dims()[0];
-        auto J = in.dims()[1];
-        auto K = in.dims()[2];
-        for (std::size_t k = 0; k < K; ++k) {
-            for (std::size_t j = 0; j < J; ++j) {
-                for (std::size_t i = 0; i < I; ++i) {
-                    std::size_t ijk = i + j*Ipad + k*Ipad*J;
-                    std::size_t jki = j + k*J + i*J*K;
-                    assert(ijk < in.size());
-                    assert(jki < out.size());
-                    out[jki] = in[ijk];
-                }
-            }
-        }
-    }
-    else if constexpr (std::is_same_v<Perm, p120_t> &&
-        std::is_same_v<typename Tin::AttributesType, View::DCCSC3D> &&
-        std::is_same_v<typename Tout::AttributesType, View::DCCSC3D>) {
-        // dense transpose
-        assert(out.size() >= in.size()); // output might be padded
-        assert(out.size() == out.lds()*out.dims()[1]*out.dims()[2]);
-        // perm = [1, 2, 0]
-        assert(in.dims()[0] == out.dims()[1]);
-        assert(in.dims()[1] == out.dims()[2]);
-        assert(in.dims()[2] == out.dims()[0]);
-        auto Ipad = out.lds();
-        auto I = out.dims()[0];
-        auto J = out.dims()[1];
-        auto K = out.dims()[2];
-        for (std::size_t k = 0; k < K; ++k) {
-            for (std::size_t j = 0; j < J; ++j) {
-                std::size_t i = 0;
-                for (; i < I; ++i) {
-                    std::size_t ijk = i + j*Ipad + k*Ipad*J;
-                    std::size_t jki = j + k*J + i*J*K;
-                    assert(jki < in.size());
-                    assert(ijk < out.size());
-                    out[ijk] = in[jki];
-                }
-                for (; i < Ipad; ++i) {
-                    std::size_t ijk = i + j*Ipad + k*Ipad*J;
-                    assert(ijk < out.size());
-                    out[ijk] = 0.0;
-                }
-            }
-        }
-    }
-    else if constexpr (std::is_same_v<Perm, p201_t> &&
-        std::is_same_v<typename Tin::AttributesType, View::S1CLCSC3D> &&
-        std::is_same_v<typename Tout::AttributesType, View::DCCSC3D>) {
-        // dense transpose
-        assert(out.size() == in.size());
-        // perm = [2, 0, 1]
-        assert(in.dims()[0] == out.dims()[2]);
-        assert(in.dims()[1] == out.dims()[0]);
-        assert(in.dims()[2] == out.dims()[1]);
-        auto I = in.dims()[0];
-        auto J = in.dims()[1];
-        auto K = in.dims()[2];
-        // access S1CLCSC3D
-        // cumulative column height is (with ijk) I*k - sum(i)_0^k
-        // iSum shifted by 1
-        std::vector<std::uint32_t> iSum(K, 0);
-        for (std::size_t i = 2; i < K; ++i) {
-            iSum[i] = iSum[i-1] + 1;
-        }
-        pSum(iSum);
-        // cumulative row width (with jki)
-        // kSum shifted by 1
-        std::vector<std::uint32_t> kSum(I);
-        kSum[I-1] = K-2;
-        for (std::size_t i = I-1; i > 0; --i) {
-            if (kSum[i] > 0) {
-                kSum[i-1] = kSum[i] - 1;
-            }
-            else {
-                kSum[i-1] = 0;
-            }
-        }
-        pSum(kSum);
+   Profiler::RegionFixture<4> fix("Transpose::Mpi::applyImpl");
 
-        for (std::size_t k = 0; k < K; ++k) {
-            std::size_t Iloc = I - k;
-            for (std::size_t j = 0; j < J; ++j) {
-                for (std::size_t i = 0; i < Iloc; ++i) {
-                    std::size_t ijk = i + j*Iloc + (k*I-iSum[k])*J;
-                    std::size_t jki = j + k*J + (i*K-kSum[i])*J;
-                    assert(ijk < in.size());
-                    assert(jki < out.size());
-                    out[jki] = in[ijk];
-                }
-            }
-        }
-    }
-    else if constexpr (std::is_same_v<Perm, p120_t> &&
-        std::is_same_v<typename Tout::AttributesType, View::S1CLCSC3D> &&
-        std::is_same_v<typename Tin::AttributesType, View::DCCSC3D>) {
-        // dense transpose
-        assert(out.size() == in.size());
-        // perm = [1, 2, 0]
-        assert(in.dims()[0] == out.dims()[1]);
-        assert(in.dims()[1] == out.dims()[2]);
-        assert(in.dims()[2] == out.dims()[0]);
-        auto I = out.dims()[0];
-        auto J = out.dims()[1];
-        auto K = out.dims()[2];
-        // access S1CLCSC3D
-        // cumulative column height is (with ijk) I*k - sum(i)_0^k
-        // iSum shifted by 1
-        std::vector<std::uint32_t> iSum(K, 0);
-        for (std::size_t i = 2; i < K; ++i) {
-            iSum[i] = iSum[i-1] + 1;
-        }
-        pSum(iSum);
-        // cumulative row width (with jki)
-        // kSum shifted by 1
-        std::vector<std::uint32_t> kSum(I);
-        kSum[I-1] = K-2;
-        for (std::size_t i = I-1; i > 0; --i) {
-            if (kSum[i] > 0) {
-                kSum[i-1] = kSum[i] - 1;
-            }
-            else {
-                kSum[i-1] = 0;
-            }
-        }
-        pSum(kSum);
+   auto comm = _comm.get();
+   assert(comm != nullptr);
 
-        for (std::size_t k = 0; k < K; ++k) {
-            std::size_t Iloc = I - k;
-            for (std::size_t j = 0; j < J; ++j) {
-                for (std::size_t i = 0; i < Iloc; ++i) {
-                    std::size_t ijk = i + j*Iloc + (k*I-iSum[k])*J;
-                    std::size_t jki = j + k*J + (i*K-kSum[i])*J;
-                    assert(jki < in.size());
-                    assert(ijk < out.size());
-                    out[ijk] = in[jki];
-                }
-            }
-        }
-    }
-    else {
-        throw std::logic_error("transpose not implemented");
-    }
+   if (!comm->isSetup())
+   {
+      // Get Coo
+      std::vector<point_t> cooOld = View::getCoo<Tin, p012_t>(in);
+      std::vector<point_t> cooNew = View::getCoo<Tout, Perm>(out);
+      assert(cooOld.size() == in.size());
+      assert(cooNew.size() == out.size());
+      // Setup
+      comm->setComm(cooNew, cooOld);
+   }
+
+   if (comm->getSubComm() != MPI_COMM_NULL)
+   {
+      MPI_Alltoallw(in.data(), comm->getSendCounts().data(),
+         comm->getSDispls().data(), comm->getSendType().data(),
+         out.data(), comm->getRecvCounts().data(),
+         comm->getRDispls().data(), comm->getRecvType().data(),
+         comm->getSubComm());
+   }
 }
 
 } // namespace Mpi

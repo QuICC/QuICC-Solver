@@ -21,7 +21,7 @@
 //
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Typedefs.hpp"
-#include "QuICC/MpiTypes.hpp"
+#include "Environment/MpiTypes.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Config/IConfigurationNode.hpp"
 #include "QuICC/Io/Config/Framework/Block.hpp"

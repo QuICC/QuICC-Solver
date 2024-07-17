@@ -25,7 +25,7 @@
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/RuntimeStatus/GoOn.hpp"
 #include "QuICC/RuntimeStatus/Stop.hpp"
-#include "QuICC/MpiTypes.hpp"
+#include "Environment/MpiTypes.hpp"
 
 namespace QuICC {
 
