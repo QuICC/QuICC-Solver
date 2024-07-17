@@ -15,7 +15,7 @@
 namespace QuICC {
 namespace Transpose {
 
-std::vector<std::vector<int>> getDispls(std::vector<point_t>& absCooNew,
+std::vector<std::vector<int>> getDispls(const std::vector<point_t>& absCooNew,
    const std::vector<point_t>& absCooOld, const MPI_Comm comm)
 {
 
@@ -42,8 +42,8 @@ std::vector<std::vector<int>> getDispls(std::vector<point_t>& absCooNew,
       MPI_Bcast(&remAbsCooNewSize, 1, MPI_INT, r, comm);
       if (r == rank)
       {
-         MPI_Bcast(absCooNew.data(), absCooNew.size() * dimSize, MPI_INT, r,
-            comm);
+         MPI_Bcast(const_cast<point_t*>(absCooNew.data()),
+            absCooNew.size() * dimSize, MPI_INT, r, comm);
          // setup remote map
          for (std::size_t i = 0; i < absCooNew.size(); ++i)
          {
@@ -89,8 +89,7 @@ std::vector<std::vector<int>> getDispls(std::vector<point_t>& absCooNew,
 
 std::vector<int> getReducedRanksSet(
    const std::vector<std::vector<int>>& sendDispls,
-   const std::vector<std::vector<int>>& recvDispls,
-   const MPI_Comm comm)
+   const std::vector<std::vector<int>>& recvDispls, const MPI_Comm comm)
 {
    std::set<int> redSet;
    // Save non-empty exchanges
@@ -143,7 +142,7 @@ std::vector<int> getReducedRanksSet(
 }
 
 void redDisplsFromSet(std::vector<std::vector<int>>& sendDispls,
-   std::vector<std::vector<int>>& recvDispls, std::vector<int>& redSet)
+   std::vector<std::vector<int>>& recvDispls, const std::vector<int>& redSet)
 {
    auto redSize = redSet.size();
    std::vector<std::vector<int>> sendDisplsRed(redSize);
@@ -159,8 +158,7 @@ void redDisplsFromSet(std::vector<std::vector<int>>& sendDispls,
    recvDispls = std::move(recvDisplsRed);
 }
 
-MPI_Comm getSubComm(const std::vector<int>& redSet,
-   const MPI_Comm comm)
+MPI_Comm getSubComm(const std::vector<int>& redSet, const MPI_Comm comm)
 {
    // Original group
    MPI_Group worldGroup;
