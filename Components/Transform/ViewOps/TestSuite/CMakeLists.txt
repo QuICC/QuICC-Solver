@@ -236,19 +236,36 @@ add_test(
 
 # Mpi
 if(QUICC_USE_MPI)
-    add_executable(ViewTransposeTestMpi
-        ViewTransposeTestsMpi.cpp
+    add_executable(ViewTransposeMpiTest
+        ViewTransposeMpiTests.cpp
     )
 
-    target_link_libraries(ViewTransposeTestMpi
+    target_link_libraries(ViewTransposeMpiTest
         ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
         Catch2::Catch2
         QuICC::Memory
     )
 
     add_test(
-        NAME ViewTransposeTestMpi
-        COMMAND ViewTransposeTestMpi
+        NAME ViewTransposeMpiTest
+        COMMAND ViewTransposeMpiTest
+        WORKING_DIRECTORY
+        "${QUICC_WORK_DIR}"
+    )
+
+    add_executable(ViewTransposeMpiCommTest
+        ViewTransposeMpiCommTests.cpp
+    )
+
+    target_link_libraries(ViewTransposeMpiCommTest
+        ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
+        Catch2::Catch2
+        QuICC::Memory
+    )
+
+    add_test(
+        NAME ViewTransposeMpiCommTest
+        COMMAND ViewTransposeMpiCommTest
         WORKING_DIRECTORY
         "${QUICC_WORK_DIR}"
     )

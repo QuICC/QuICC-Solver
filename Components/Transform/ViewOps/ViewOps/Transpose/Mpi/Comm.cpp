@@ -5,6 +5,7 @@
 
 // External includes
 //
+#include <algorithm>
 #include <map>
 #include <set>
 
@@ -20,15 +21,11 @@ namespace Mpi {
 std::vector<std::vector<int>> getDispls(const std::vector<point_t>& absCooNew,
    const std::vector<point_t>& absCooOld, const MPI_Comm comm)
 {
-
    int rank, ranks;
    MPI_Comm_rank(comm, &rank);
    MPI_Comm_size(comm, &ranks);
 
-   // MPI_Barrier(MPI_COMM_WORLD);
-
    std::vector<std::vector<int>> sendDispls(ranks);
-
    std::map<point_t, int> locOldIdx;
    for (std::size_t i = 0; i < absCooOld.size(); ++i)
    {
@@ -138,6 +135,11 @@ std::vector<int> getReducedRanksSet(
       if (setLoc.size() == 0)
       {
          return setLoc;
+      }
+      // Check set intersection
+      for (auto l : setLoc)
+      {
+         assert(std::find(setGlo.begin(), setGlo.end(), l) != setGlo.end());
       }
       return setGlo;
    }
