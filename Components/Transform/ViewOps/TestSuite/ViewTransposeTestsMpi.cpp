@@ -13,6 +13,7 @@ extern "C" {
 
 #include "ViewOps/Transpose/Transpose.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
+#include "ViewOps/ViewIndexUtils.hpp"
 
 
 using namespace QuICC::Transpose::Mpi;
@@ -434,40 +435,41 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 210", "SerialDCCSC3DtoDCCSC3D210")
         /*k1*/ 9, 10, 11, 12,
         /*k1*/ 13, 14, 15, 16};
 
+
+    // constexpr size_t M = 4;
+    // constexpr size_t N = 3;
+    // constexpr size_t K = 1;
+
+    // constexpr size_t S = M * N * K;
+    // std::array<double, S> dataIn = {/*k0*/ 1, 2, 3, 4,
+    //     /*k0*/ 5, 6, 7, 8,
+    //     /*k0*/ 9, 10, 11, 12};
+
     // perm = [2 0 1] -> N K M
     std::array<double, S> dataOut;
 
     // view
     constexpr std::uint32_t rank = 3;
     std::array<std::uint32_t, rank> dimensionsIn{M, N, K};
-    std::array<std::uint32_t, rank> dimensionsOut{N, K, M};
+    std::array<std::uint32_t, rank> dimensionsOut{N, K, M}; // 2 0 1
 
    // Populate meta for fully populated tensor
    // Physical space (Stage::PPP and Stage::MPP)
-   std::vector<std::uint32_t> ptrPhys(K+1);
-   std::vector<std::uint32_t> idxPhys(K*N);
-   ptrPhys[0] = 0;
-   for (std::size_t i = 1; i < ptrPhys.size(); ++i) {
-         ptrPhys[i] = ptrPhys[i-1]+N;
-   }
-   for (std::size_t i = 0; i < idxPhys.size(); ++i) {
-         idxPhys[i] = i % N;
-   }
+   auto metaIn = Index::densePtrAndIdx<DCCSC3D> (dimensionsIn);
+    std::array<std::vector<std::uint32_t>, rank> pointersIn = {{{}, metaIn.ptr, {}}};
+    std::array<std::vector<std::uint32_t>, rank> indicesIn = {{{}, metaIn.idx, {}}};
 
-    std::array<std::vector<std::uint32_t>, rank> pointers = {{{}, ptrPhys, {}}};
-    std::array<std::vector<std::uint32_t>, rank> indices = {{{}, idxPhys, {}}};
-
-   // // Populate meta for fully populated tensor
-   // // AL space (Stage::PPM and Stage::MPM)
-   // using namespace QuICC::Graph;
-   // auto metaAL = denseTransposePtrAndIdx<C_S1CLCSC3D_t, C_DCCSC3D_t>({modsN, K, modsM});
-
+    // Populate meta for fully populated tensor
+    // AL space (Stage::PPM and Stage::MPM)
+    auto metaOut = Index::densePtrAndIdx<DCCSC3D> (dimensionsOut);
+    std::array<std::vector<std::uint32_t>, rank> pointersOut = {{{}, metaOut.ptr, {}}};
+    std::array<std::vector<std::uint32_t>, rank> indicesOut = {{{}, metaOut.idx, {}}};
 
 
     using inTy = DCCSC3D;
     using outTy = DCCSC3D;
-    View<double, inTy> viewIn(dataIn, dimensionsIn, pointers, indices);
-    View<double, outTy> viewOut(dataOut, dimensionsOut, pointers, indices);
+    View<double, inTy> viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
+    View<double, outTy> viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
 
     // Transpose op
     using namespace QuICC::Transpose::Mpi;
