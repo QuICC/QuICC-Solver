@@ -64,31 +64,68 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 210", "MpiDCCSC3DtoDCCSC3D210")
    constexpr size_t N = 2;
    constexpr size_t K = 2;
 
-   constexpr size_t S = M * N * K;
-   std::array<double, S> dataIn = {/*k0*/ 1, 2, 3, 4,
-      /*k0*/ 5, 6, 7, 8,
-      /*k1*/ 9, 10, 11, 12,
-      /*k1*/ 13, 14, 15, 16};
-
-   // perm = [2 0 1] -> N K M
-   std::array<double, S> dataOut;
-
    // view
    constexpr std::uint32_t vRank = 3;
    std::array<std::uint32_t, vRank> dimensionsIn{M, N, K};
    std::array<std::uint32_t, vRank> dimensionsOut{N, K, M}; // 2 0 1
 
-   // Populate meta for fully populated tensor
-   // Physical space (Stage::PPP and Stage::MPP)
-   auto metaIn = Index::densePtrAndIdx<DCCSC3D>(dimensionsIn);
+   std::vector<double> dataIn;
+   std::vector<double> dataOut;
+   std::vector<double> dataOutRef;
+   Index::ptrAndIdx metaIn;
+   Index::ptrAndIdx metaOut;
+   if (rank == 0 && ranks == 1)
+   {
+      constexpr size_t S = M * N * K;
+      dataIn = {/*k0*/ 1, 2, 3, 4,
+         /*k0*/ 5, 6, 7, 8,
+         /*k1*/ 9, 10, 11, 12,
+         /*k1*/ 13, 14, 15, 16};
+
+      // perm = [2 0 1] -> N K M
+      dataOut.resize(S);
+
+      // Populate meta for fully populated tensor
+      // Physical space (Stage::PPP and Stage::MPP)
+      metaIn = Index::densePtrAndIdx<DCCSC3D>(dimensionsIn);
+      // Populate meta for fully populated tensor
+      // AL space (Stage::PPM and Stage::MPM)
+      metaOut = Index::densePtrAndIdx<DCCSC3D>(dimensionsOut);
+   }
+   else if (rank == 0 && ranks == 2)
+   {
+      dataIn = {/*k0*/ 1, 2, 3, 4,
+         /*k0*/ 5, 6, 7, 8};
+
+      metaIn.ptr = {0, 2, 2};
+      metaIn.idx = {0, 1};
+
+      // perm = [2 0 1] -> N K M
+      dataOut.resize(N * K  * M/2);
+      dataOutRef = {1, 5, 9, 13, 2, 6, 10, 14};
+      metaOut.ptr = {0, 2, 4, 4, 4};
+      metaOut.idx = {0, 1, 0, 1, 0, 1, 0, 1};
+   }
+   else if (rank == 1 && ranks == 2)
+   {
+      dataIn = {/*k1*/ 9, 10, 11, 12,
+         /*k1*/ 13, 14, 15, 16};
+
+      metaIn.ptr = {0, 0, 2};
+      metaIn.idx = {0, 1};
+
+      // perm = [2 0 1] -> N K M
+      dataOut.resize(N * K  * M/2);
+      dataOutRef = {3, 7, 11, 15, 4, 8, 12, 16};
+      metaOut.ptr = {0, 0, 0, 2, 4};
+      metaOut.idx = {0, 1, 0, 1, 0, 1, 0, 1};
+   }
+
+   // Set meta
    std::array<std::vector<std::uint32_t>, vRank> pointersIn = {
       {{}, metaIn.ptr, {}}};
    std::array<std::vector<std::uint32_t>, vRank> indicesIn = {
       {{}, metaIn.idx, {}}};
-
-   // Populate meta for fully populated tensor
-   // AL space (Stage::PPM and Stage::MPM)
-   auto metaOut = Index::densePtrAndIdx<DCCSC3D>(dimensionsOut);
    std::array<std::vector<std::uint32_t>, vRank> pointersOut = {
       {{}, metaOut.ptr, {}}};
    std::array<std::vector<std::uint32_t>, vRank> indicesOut = {
@@ -111,16 +148,33 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 210", "MpiDCCSC3DtoDCCSC3D210")
    transposeOp->apply(viewOut, viewIn);
 
    // check
-   for (std::uint64_t k = 0; k < K; ++k)
+   if (rank == 0 && ranks == 1)
    {
-      for (std::uint64_t n = 0; n < N; ++n)
+      for (std::uint64_t k = 0; k < K; ++k)
       {
-         for (std::uint64_t m = 0; m < M; ++m)
+         for (std::uint64_t n = 0; n < N; ++n)
          {
-            auto mnk = m + n * M + k * M * N;
-            auto nkm = n + k * N + m * K * N;
-            CHECK(viewIn[mnk] == viewOut[nkm]);
+            for (std::uint64_t m = 0; m < M; ++m)
+            {
+               auto mnk = m + n * M + k * M * N;
+               auto nkm = n + k * N + m * K * N;
+               CHECK(viewIn[mnk] == viewOut[nkm]);
+            }
          }
+      }
+   }
+   else if (rank == 0 && ranks == 2)
+   {
+      for (std::size_t i = 0; i < dataOutRef.size(); ++i)
+      {
+         CHECK(dataOut[i] == dataOutRef[i]);
+      }
+   }
+   else if (rank == 1 && ranks == 2)
+   {
+      for (std::size_t i = 0; i < dataOutRef.size(); ++i)
+      {
+         CHECK(dataOut[i] == dataOutRef[i]);
       }
    }
 }
