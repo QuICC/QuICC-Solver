@@ -290,7 +290,7 @@ namespace Parallel {
       // Create MPI datatype
       MPI_Datatype type;
       //ierr = MPI_Type_create_hindexed(nElements, blocks, displ, MpiTypes::type<TData>(), &type);
-      ierr = MPI_Type_create_hindexed_block(nElements, 1, displ, MpiTypes::type<TData>(), &type);
+      ierr = MPI_Type_create_hindexed_block(nElements, 1, displ, Environment::MpiTypes::type<TData>(), &type);
       QuICCEnv().check(ierr, 971);
 
       // Commit MPI datatype

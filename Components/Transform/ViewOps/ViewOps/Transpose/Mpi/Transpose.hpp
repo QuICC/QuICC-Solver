@@ -60,7 +60,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 
    if (!comm->isSetup())
    {
-      // Get Coo
+      // Get absolute coordinates
       std::vector<point_t> cooOld = View::getCoo<Tin, p012_t>(in);
       std::vector<point_t> cooNew = View::getCoo<Tout, Perm>(out);
       assert(cooOld.size() == in.size());
@@ -69,6 +69,8 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       comm->setComm(cooNew, cooOld);
    }
 
+   assert(in.data() != nullptr);
+   assert(out.data() != nullptr);
    comm->exchange(out.data(), in.data());
 }
 

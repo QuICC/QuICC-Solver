@@ -79,7 +79,7 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   std::uint32_t N = dbAL[1];
 
   fileName = path+dist+"/P_id103_np"+std::to_string(ranks)+"_r"+std::to_string(rank)+"_stage2_meta.dat";
-   std::vector<double> dbFr;
+  std::vector<double> dbFr;
   QuICC::TestSuite::readList(dbFr, fileName);
   std::uint32_t modsM = dbFr[0];
   std::uint32_t M = dbFr[1];
