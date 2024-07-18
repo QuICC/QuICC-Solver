@@ -33,7 +33,7 @@ class Op : public UnaryBaseOp<Op<Tout, Tin, Perm>, Tout, Tin>
 {
 public:
    /// @brief default constructor
-   Op(std::shared_ptr<Comm<typename Tin::ScalarType>> comm) :_comm(comm){};
+   Op(std::shared_ptr<Comm<typename Tin::ScalarType>> comm) : _comm(comm){};
    Op() = delete;
    /// @brief dtor
    ~Op() = default;

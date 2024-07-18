@@ -86,8 +86,7 @@ public:
       if (_subComm != MPI_COMM_NULL)
       {
          MPI_Alltoallw(in, _sendCounts.data(), _sDispls.data(),
-            _sendType.data(), out,
-            _recvCounts.data(), _rDispls.data(),
+            _sendType.data(), out, _recvCounts.data(), _rDispls.data(),
             _recvType.data(), _subComm);
       }
    }
@@ -110,10 +109,12 @@ public:
          for (std::size_t r = 0; r < subRanks; ++r)
          {
             MPI_Type_create_indexed_block(_sendDispls[r].size(), 1,
-               _sendDispls[r].data(), Environment::MpiTypes::type<TDATA>(), &_sendType[r]);
+               _sendDispls[r].data(), Environment::MpiTypes::type<TDATA>(),
+               &_sendType[r]);
             MPI_Type_commit(&_sendType[r]);
             MPI_Type_create_indexed_block(_recvDispls[r].size(), 1,
-               _recvDispls[r].data(), Environment::MpiTypes::type<TDATA>(), &_recvType[r]);
+               _recvDispls[r].data(), Environment::MpiTypes::type<TDATA>(),
+               &_recvType[r]);
             MPI_Type_commit(&_recvType[r]);
          }
       }
@@ -124,7 +125,7 @@ public:
       _isSetup = true;
    }
 
-   bool isSetup()
+   bool isSetup() const
    {
       return _isSetup;
    }

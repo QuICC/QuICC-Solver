@@ -137,7 +137,7 @@ std::vector<int> getReducedRanksSet(
          return setLoc;
       }
       // Check set intersection
-      for (auto l : setLoc)
+      for (auto l: setLoc)
       {
          assert(std::find(setGlo.begin(), setGlo.end(), l) != setGlo.end());
       }
