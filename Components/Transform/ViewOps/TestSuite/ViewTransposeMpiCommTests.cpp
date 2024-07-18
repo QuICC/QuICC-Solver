@@ -393,18 +393,10 @@ TEST_CASE("Comm", "[Comm]")
    }
 
    Comm<int> comm;
-
    comm.setComm(absCooNew, absCooOld);
 
    // Comm
-   if (comm.getSubComm() != MPI_COMM_NULL)
-   {
-      MPI_Alltoallw(sendBuf.data(), comm.getSendCounts().data(),
-      comm.getSDispls().data(),
-         comm.getSendType().data(), recvBuf.data(),
-         comm.getRecvCounts().data(), comm.getRDispls().data(),
-         comm.getRecvType().data(), comm.getSubComm());
-   }
+   comm.exchange(recvBuf.data(), sendBuf.data());
 
    // Check
    for (std::size_t i = 0; i < recvBufRef.size(); ++i)

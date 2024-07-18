@@ -69,14 +69,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       comm->setComm(cooNew, cooOld);
    }
 
-   if (comm->getSubComm() != MPI_COMM_NULL)
-   {
-      MPI_Alltoallw(in.data(), comm->getSendCounts().data(),
-         comm->getSDispls().data(), comm->getSendType().data(),
-         out.data(), comm->getRecvCounts().data(),
-         comm->getRDispls().data(), comm->getRecvType().data(),
-         comm->getSubComm());
-   }
+   comm->exchange(out.data(), in.data());
 }
 
 } // namespace Mpi

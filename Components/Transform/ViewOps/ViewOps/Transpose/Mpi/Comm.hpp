@@ -71,8 +71,7 @@ template <class TDATA, class TAG = void> class Comm
 public:
    Comm(MPI_Comm comm = MPI_COMM_WORLD) : _comm(comm){};
 
-   /// @brief release resources
-   /// like Types and Displacements
+   /// @brief release Mpi resources
    ~Comm()
    {
       for (std::size_t r = 0; r < _sendType.size(); ++r)
@@ -82,9 +81,15 @@ public:
       }
    }
 
-   void exchange()
+   void exchange(TDATA* out, const TDATA* in) const
    {
-
+      if (_subComm != MPI_COMM_NULL)
+      {
+         MPI_Alltoallw(in, _sendCounts.data(), _sDispls.data(),
+            _sendType.data(), out,
+            _recvCounts.data(), _rDispls.data(),
+            _recvType.data(), _subComm);
+      }
    }
 
    void setComm(const std::vector<point_t>& cooNew,
@@ -117,59 +122,6 @@ public:
       _sDispls = std::vector<int>(subRanks, 0);
       _rDispls = std::vector<int>(subRanks, 0);
       _isSetup = true;
-   }
-
-   std::vector<std::vector<int>>& getRecvDispls()
-   {
-      assert(_recvDispls.size() > 0);
-      return _recvDispls;
-   }
-
-   std::vector<std::vector<int>>& getSendDispls()
-   {
-      assert(_sendDispls.size() > 0);
-      return _sendDispls;
-   }
-
-   std::vector<MPI_Datatype>& getRecvType()
-   {
-      assert(_recvType.size() > 0);
-      return _recvType;
-   }
-
-   std::vector<MPI_Datatype>& getSendType()
-   {
-      assert(_sendType.size() > 0);
-      return _sendType;
-   }
-
-   std::vector<int>& getSendCounts()
-   {
-      assert(_sendCounts.size() > 0);
-      return _sendCounts;
-   }
-
-   std::vector<int>& getRecvCounts()
-   {
-      assert(_recvCounts.size() > 0);
-      return _recvCounts;
-   }
-
-   std::vector<int>& getRDispls()
-   {
-      assert(_rDispls.size() > 0);
-      return _rDispls;
-   }
-
-   std::vector<int>& getSDispls()
-   {
-      assert(_sDispls.size() > 0);
-      return _sDispls;
-   }
-
-   MPI_Comm& getSubComm()
-   {
-      return _subComm;
    }
 
    bool isSetup()
