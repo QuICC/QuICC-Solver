@@ -83,7 +83,7 @@ namespace Control {
       // Share the status over all MPI processes
       #ifdef QUICC_MPI
          std::size_t flag = this->mStatus;
-         int ierr = MPI_Bcast(&flag, 1, Parallel::MpiTypes::type<std::size_t>(), QuICCEnv().ioRank(), MPI_COMM_WORLD);
+         int ierr = MPI_Bcast(&flag, 1, Environment::MpiTypes::type<std::size_t>(), QuICCEnv().ioRank(), MPI_COMM_WORLD);
          QuICCEnv().check(ierr, 555);
          this->mStatus = flag;
 

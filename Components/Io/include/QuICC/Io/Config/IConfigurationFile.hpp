@@ -289,7 +289,7 @@ namespace Config {
       MPI_Get_address(&fData[0], &element);
       displ[1] = element;
       blocks[1] = fData.size();
-      types[1] = Parallel::MpiTypes::type<MHDFloat>();
+      types[1] = Environment::MpiTypes::type<MHDFloat>();
 
       // Create string data part
       for(std::size_t i = 0; i < sData.size();i++)

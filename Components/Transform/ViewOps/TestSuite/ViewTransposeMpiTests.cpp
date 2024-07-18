@@ -74,6 +74,7 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 210", "MpiDCCSC3DtoDCCSC3D210")
    std::vector<double> dataOutRef;
    Index::ptrAndIdx metaIn;
    Index::ptrAndIdx metaOut;
+
    if (rank == 0 && ranks == 1)
    {
       constexpr size_t S = M * N * K;

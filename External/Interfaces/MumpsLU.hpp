@@ -416,7 +416,7 @@ namespace Eigen {
             {
                DetailedProfilerMacro_start(QuICC::ProfilerMacro::TSTEPMPI);
                mTmp.resize(m_id.lrhs, m_id.nrhs);
-               MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, QuICC::Parallel::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm);
+               MPI_Reduce(const_cast<Scalar*>(pData), mTmp.data(), m_id.nrhs*m_id.lrhs, QuICC::Environment::MpiTypes::type<Scalar>(), MPI_SUM, 0, m_comm);
                pRhs = mTmp.data();
                DetailedProfilerMacro_stop(QuICC::ProfilerMacro::TSTEPMPI);
             } else
@@ -465,7 +465,7 @@ namespace Eigen {
             if(m_isParallel)
             {
                DetailedProfilerMacro_start(QuICC::ProfilerMacro::TSTEPMPI);
-               MPI_Bcast(pData, nK, QuICC::Parallel::MpiTypes::type<Scalar>(), 0, m_comm);
+               MPI_Bcast(pData, nK, QuICC::Environment::MpiTypes::type<Scalar>(), 0, m_comm);
                DetailedProfilerMacro_stop(QuICC::ProfilerMacro::TSTEPMPI);
             }
             #endif //QUICC_MPI
