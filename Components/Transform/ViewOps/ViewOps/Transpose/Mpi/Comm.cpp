@@ -128,46 +128,42 @@ std::vector<int> getReducedRanksSet(
 
    // Recv remote set size
    std::vector<MPI_Request> req(sendSet.size()+recvSet.size());
-   int recvCount = 0;
+   int count = 0;
    std::vector<int> remSetSize(sendSet.size(), 0);
    for (auto it = sendSet.begin(); it != sendSet.end(); ++it)
    {
       int sr = *it;
-      // recv size of remote set
-      MPI_Irecv(&remSetSize[recvCount], 1, MPI_INT, sr, 0, comm, &req[recvCount]);
-      recvCount++;
+      MPI_Irecv(&remSetSize[count], 1, MPI_INT, sr, 0, comm, &req[count]);
+      count++;
    }
    // Send size of remote set
-   int sendCount = 0;
    int size = setLoc.size();
    for (auto it = recvSet.begin(); it != recvSet.end(); ++it)
    {
       int rr = *it;
-      MPI_Isend(&size, 1, MPI_INT, rr, 0, comm, &req[recvCount+sendCount]);
-      sendCount++;
+      MPI_Isend(&size, 1, MPI_INT, rr, 0, comm, &req[count]);
+      count++;
    }
    // Wait for comm to be done
    std::vector<MPI_Status> stat(req.size());
    MPI_Waitall(req.size(), req.data(), stat.data());
 
    // Receive sets
-   recvCount = 0;
+   count = 0;
    std::vector<std::vector<int>> remSet(remSetSize.size());
    for (auto it = sendSet.begin(); it != sendSet.end(); ++it)
    {
       int sr = *it;
-      remSet[recvCount].resize(remSetSize[recvCount]);
-      MPI_Irecv(remSet[recvCount].data(), remSet[recvCount].size(), MPI_INT, sr, 1, comm, &req[recvCount]);
-      recvCount++;
+      remSet[count].resize(remSetSize[count]);
+      MPI_Irecv(remSet[count].data(), remSet[count].size(), MPI_INT, sr, 1, comm, &req[count]);
+      count++;
    }
-   // Send sets
-   sendCount = 0;
+   // Send local set
    for (auto it = recvSet.begin(); it != recvSet.end(); ++it)
    {
       int rr = *it;
-      // send local set
-      MPI_Isend(setLoc.data(), setLoc.size(), MPI_INT, rr, 1, comm, &req[recvCount+sendCount]);
-      sendCount++;
+      MPI_Isend(setLoc.data(), setLoc.size(), MPI_INT, rr, 1, comm, &req[count]);
+      count++;
    }
    // Wait for comm to be done
    MPI_Waitall(req.size(), req.data(), stat.data());
