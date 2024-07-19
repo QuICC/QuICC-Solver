@@ -404,5 +404,3 @@ TEST_CASE("Comm", "[Comm]")
       CHECK(recvBuf[i] == recvBufRef[i]);
    }
 }
-
-

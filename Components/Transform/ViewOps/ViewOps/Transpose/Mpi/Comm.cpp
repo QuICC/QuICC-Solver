@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <map>
 #include <set>
-#include <iostream>
 
 // Project includes
 //
@@ -119,49 +118,67 @@ std::vector<int> getReducedRanksSet(
       setLoc[i++] = *it;
    }
 
-   // Check asymmetric exchanges
-   if (sendSet.size() > recvSet.size())
-   {
-      // need to recv from extra senders the bigger set
-      // find missing set
-      for (auto it = recvSet.begin(); it != recvSet.end(); ++it)
-      {
-         sendSet.erase(*it);
-      }
-      for (auto it = sendSet.begin(); it != sendSet.end(); ++it)
-      {
-         // recv size of remote set
-         // recv remote set
-         int size;
-         MPI_Status status;
-         MPI_Recv(&size, 1, MPI_INT, *it, 0, comm, &status);
-         std::cout << size << ' ' << setLoc.size() << '\n';
-         std::vector<int> setRem(size);
-         MPI_Recv(setRem.data(), size, MPI_INT, *it, 1, comm, &status);
-         if (setRem.size() > setLoc.size())
-         {
-            setLoc = std::move(setRem);
-         }
-      }
-   }
-   if (sendSet.size() < recvSet.size())
-   {
-      // need to send to missing recv the bigger set
-      // find missing set
-      for (auto it = sendSet.begin(); it != sendSet.end(); ++it)
-      {
-         recvSet.erase(*it);
-      }
-      for (auto it = recvSet.begin(); it != recvSet.end(); ++it)
-      {
-         // send size of remote set
-         // send remote set
-         int size = setLoc.size();
-         MPI_Send(&size, 1, MPI_INT, *it, 0, comm);
-         MPI_Send(setLoc.data(), size, MPI_INT, *it, 1, comm);
-      }
-   }
+   int rank, ranks;
+   MPI_Comm_rank(comm, &rank);
+   MPI_Comm_size(comm, &ranks);
 
+   //
+   // Check exchanges
+   //
+
+   // Recv remote set size
+   std::vector<MPI_Request> req(sendSet.size()+recvSet.size());
+   int recvCount = 0;
+   std::vector<int> remSetSize(sendSet.size(), 0);
+   for (auto it = sendSet.begin(); it != sendSet.end(); ++it)
+   {
+      int sr = *it;
+      // recv size of remote set
+      MPI_Irecv(&remSetSize[recvCount], 1, MPI_INT, sr, 0, comm, &req[recvCount]);
+      recvCount++;
+   }
+   // Send size of remote set
+   int sendCount = 0;
+   int size = setLoc.size();
+   for (auto it = recvSet.begin(); it != recvSet.end(); ++it)
+   {
+      int rr = *it;
+      MPI_Isend(&size, 1, MPI_INT, rr, 0, comm, &req[recvCount+sendCount]);
+      sendCount++;
+   }
+   // Wait for comm to be done
+   std::vector<MPI_Status> stat(req.size());
+   MPI_Waitall(req.size(), req.data(), stat.data());
+
+   // Receive sets
+   recvCount = 0;
+   std::vector<std::vector<int>> remSet(remSetSize.size());
+   for (auto it = sendSet.begin(); it != sendSet.end(); ++it)
+   {
+      int sr = *it;
+      remSet[recvCount].resize(remSetSize[recvCount]);
+      MPI_Irecv(remSet[recvCount].data(), remSet[recvCount].size(), MPI_INT, sr, 1, comm, &req[recvCount]);
+      recvCount++;
+   }
+   // Send sets
+   sendCount = 0;
+   for (auto it = recvSet.begin(); it != recvSet.end(); ++it)
+   {
+      int rr = *it;
+      // send local set
+      MPI_Isend(setLoc.data(), setLoc.size(), MPI_INT, rr, 1, comm, &req[recvCount+sendCount]);
+      sendCount++;
+   }
+   // Wait for comm to be done
+   MPI_Waitall(req.size(), req.data(), stat.data());
+
+   // Update local set
+   for (auto& s : remSet)
+   {
+      if (s.size() > setLoc.size()) {
+         setLoc = std::move(s);
+      }
+   }
 
    return setLoc;
 }
