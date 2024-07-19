@@ -16,7 +16,7 @@
 #include "Types/Math.hpp"
 #include "Profiler/Interface.hpp"
 #include "TestSuite/Io.hpp"
-#include "Utils.hpp"
+#include "TestSuite/ViewMeta.hpp"
 
 int main(int argc, char **argv)
 {
@@ -65,44 +65,16 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
   assert(ranks == 4);
   #endif
+
   std::string path = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_refdata/Framework/LoadSplitter/WLFl/";
-  std::string fileName = path+dist+"/P_id103_np"+std::to_string(ranks)+"_r"+std::to_string(rank)+"_stage0_meta.dat";
-  std::vector<double> dbJW;
-  QuICC::TestSuite::readList(dbJW, fileName);
-  std::uint32_t modsK = dbJW[0];
-  std::uint32_t K = dbJW[1];
-
-  fileName = path+dist+"/P_id103_np"+std::to_string(ranks)+"_r"+std::to_string(rank)+"_stage1_meta.dat";
-   std::vector<double> dbAL;
-  QuICC::TestSuite::readList(dbAL, fileName);
-  std::uint32_t modsN = dbAL[0];
-  std::uint32_t N = dbAL[1];
-
-  fileName = path+dist+"/P_id103_np"+std::to_string(ranks)+"_r"+std::to_string(rank)+"_stage2_meta.dat";
-  std::vector<double> dbFr;
-  QuICC::TestSuite::readList(dbFr, fileName);
-  std::uint32_t modsM = dbFr[0];
-  std::uint32_t M = dbFr[1];
+  std::string id = "103";
+  using namespace QuICC::TestSuite;
+  auto setup = readDimsAndMeta(path, dist, id);
 
   // Grid dimensions
   constexpr std::uint32_t dim = 3;
-  std::array<std::uint32_t, dim> physDims{M, N, K};
-  std::array<std::uint32_t, dim> modsDims{modsM, modsN, modsK};
-
-  // Unpack metadata Fourier stage
-  using namespace QuICC::Graph;
-  auto metaFr = unPackMeta(dbFr, K);
-  if (rank==0) {
-    for (std::size_t i = 0; i < metaFr.ptr.size();++i) {
-      std::cout << metaFr.ptr[i] << '\n';
-    }
-  }
-
-  // Unpack metadata AL stage
-  auto metaAL = unPackMeta(dbAL, modsM);
-
-  // Unpack metadata JW stage
-  auto metaJW = unPackMetaJW(dbJW, modsN);
+  std::array<std::uint32_t, dim> physDims{setup.physDims[2], setup.physDims[1], setup.physDims[0]};
+  std::array<std::uint32_t, dim> modsDims{setup.modsDims[2], setup.modsDims[1], setup.modsDims[0]};
 
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
@@ -110,21 +82,21 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   // Physical space (Stage::PPP and Stage::MPP)
-  std::array<std::vector<std::uint32_t>, dim> pointersPhys {{{}, metaFr.ptr, {}}};
-  std::array<std::vector<std::uint32_t>, dim> indicesPhys {{{}, metaFr.idx, {}}};
+  std::array<std::vector<std::uint32_t>, dim> pointersPhys {{{}, setup.metaFT.ptr, {}}};
+  std::array<std::vector<std::uint32_t>, dim> indicesPhys {{{}, setup.metaFT.idx, {}}};
 
   // Modal space (aka JW space, Stage::PMM and Stage::MMM, QuICC Stage0)
-  std::array<std::vector<std::uint32_t>, dim> pointersMods {{{}, metaJW.ptr, {}}};
-  std::array<std::vector<std::uint32_t>, dim> indicesMods {{{}, metaJW.idx, {}}};
+  std::array<std::vector<std::uint32_t>, dim> pointersMods {{{}, setup.metaJW.ptr, {}}};
+  std::array<std::vector<std::uint32_t>, dim> indicesMods {{{}, setup.metaJW.idx, {}}};
 
   // Store meta stages to pass to Jitter
   std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
-  meta.push_back({metaFr.ptr.data(), metaFr.ptr.size()});
-  meta.push_back({metaFr.idx.data(), metaFr.idx.size()});
-  meta.push_back({metaAL.ptr.data(), metaAL.ptr.size()});
-  meta.push_back({metaAL.idx.data(), metaAL.idx.size()});
-  meta.push_back({metaJW.ptr.data(), metaJW.ptr.size()});
-  meta.push_back({metaJW.idx.data(), metaJW.idx.size()});
+  meta.push_back({setup.metaFT.ptr.data(), setup.metaFT.ptr.size()});
+  meta.push_back({setup.metaFT.idx.data(), setup.metaFT.idx.size()});
+  meta.push_back({setup.metaAL.ptr.data(), setup.metaAL.ptr.size()});
+  meta.push_back({setup.metaAL.idx.data(), setup.metaAL.idx.size()});
+  meta.push_back({setup.metaJW.ptr.data(), setup.metaJW.ptr.size()});
+  meta.push_back({setup.metaJW.idx.data(), setup.metaJW.idx.size()});
 
 
   QuICC::QuICCEnv().synchronize();
@@ -133,13 +105,13 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   Jit<dim> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::PPP, meta);
 
   // host mem block
-  std::size_t physS = M*indicesPhys[1].size();
+  std::size_t physS = setup.physDims[2]*indicesPhys[1].size();
   QuICC::Memory::MemBlock<double> R(physS, mem.get());
-  QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsK*metaJW.idx.size(), mem.get());
+  QuICC::Memory::MemBlock<std::complex<double>> modsOut(setup.modsDims[0]*indicesMods[1].size(), mem.get());
 
   // host view
   R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
-  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
+  C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {setup.modsDims[0], setup.modsDims[2], setup.modsDims[1]}, pointersMods, indicesMods);
 
   // set input phys
   double val = 1.0;
@@ -210,7 +182,7 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 
 //   // Unpack metadata Fourier stage
 //   using namespace QuICC::Graph;
-//   auto metaFr = unPackMeta(dbFr, K);
+//   auto metaFT = unPackMeta(dbFr, K);
 
 //   // Unpack metadata AL stage
 //   auto metaAL = unPackMeta(dbAL, modsM);
@@ -224,8 +196,8 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 //   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
 //   // Physical space
-//   std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, metaFr.ptr, {}}};
-//   std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, metaFr.idx, {}}};
+//   std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, metaFT.ptr, {}}};
+//   std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, metaFT.idx, {}}};
 
 //   // Modal space
 //   std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaJW.ptr, {}}};
@@ -233,8 +205,8 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 
 //   // Store meta stages to pass to Jitter
 //   std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
-//   meta.push_back({metaFr.ptr.data(), metaFr.ptr.size()});
-//   meta.push_back({metaFr.idx.data(), metaFr.idx.size()});
+//   meta.push_back({metaFT.ptr.data(), metaFT.ptr.size()});
+//   meta.push_back({metaFT.idx.data(), metaFT.idx.size()});
 //   meta.push_back({metaAL.ptr.data(), metaAL.ptr.size()});
 //   meta.push_back({metaAL.idx.data(), metaAL.idx.size()});
 //   meta.push_back({metaJW.ptr.data(), metaJW.ptr.size()});
@@ -321,7 +293,7 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 
 //   // Unpack metadata Fourier stage
 //   using namespace QuICC::Graph;
-//   auto metaFr = unPackMeta(dbFr, K);
+//   auto metaFT = unPackMeta(dbFr, K);
 
 //   // Unpack metadata AL stage
 //   auto metaAL = unPackMeta(dbAL, modsM);
@@ -335,8 +307,8 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 //   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
 //   // Physical space
-//   std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, metaFr.ptr, {}}};
-//   std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, metaFr.idx, {}}};
+//   std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, metaFT.ptr, {}}};
+//   std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, metaFT.idx, {}}};
 
 //   // Modal space
 //   std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaJW.ptr, {}}};
@@ -344,8 +316,8 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 
 //   // Store meta stages to pass to Jitter
 //   std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
-//   meta.push_back({metaFr.ptr.data(), metaFr.ptr.size()});
-//   meta.push_back({metaFr.idx.data(), metaFr.idx.size()});
+//   meta.push_back({metaFT.ptr.data(), metaFT.ptr.size()});
+//   meta.push_back({metaFT.idx.data(), metaFT.idx.size()});
 //   meta.push_back({metaAL.ptr.data(), metaAL.ptr.size()});
 //   meta.push_back({metaAL.idx.data(), metaAL.idx.size()});
 //   meta.push_back({metaJW.ptr.data(), metaJW.ptr.size()});
