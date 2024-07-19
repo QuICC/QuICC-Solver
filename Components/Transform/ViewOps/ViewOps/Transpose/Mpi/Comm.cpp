@@ -175,13 +175,15 @@ std::vector<int> getReducedRanksSet(
       {
          if (std::find(commSet.begin(), commSet.end(), r) == commSet.end())
          {
+            // Remote set contained a rank missing form local set, add it
             commSet.insert(r);
          }
       }
    }
+
+   // If local set was modified, update
    if (commSet.size() > setLoc.size())
    {
-      // update set
       setLoc.resize(commSet.size());
       std::size_t i = 0;
       for (auto it = commSet.begin(); it != commSet.end(); ++it)
