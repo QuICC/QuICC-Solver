@@ -15,6 +15,7 @@ extern "C" {
 #include "ViewOps/ViewIndexUtils.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 #include "TestSuite/ViewMeta.hpp"
+#include "Environment/QuICCEnv.hpp"
 
 
 using namespace QuICC::Transpose::Mpi;
@@ -22,30 +23,11 @@ using namespace QuICC::Transpose::Mpi;
 
 int main(int argc, char** argv)
 {
-   MPI_Init(NULL, NULL);
-
-   int rank, ranks;
-   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
-
-   // if(rank == 0)
-   // {
-   //     using namespace std::chrono_literals;
-   //     volatile bool wait = true;
-   //     char hostname[HOST_NAME_MAX];
-   //     gethostname(hostname, HOST_NAME_MAX);
-   //     std::cerr << "PID " << getpid() << " on " << hostname
-   //         << " ready to attach" << std::endl;
-   //     while (wait == true)
-   //     std::this_thread::sleep_for(1s);
-   // }
-   // MPI_Barrier(MPI_COMM_WORLD);
+   QuICC::QuICCEnv();
 
    Catch::Session session; // There must be exactly one instance
 
    auto returnCode = session.run();
-
-   MPI_Finalize();
 
    return returnCode;
 }

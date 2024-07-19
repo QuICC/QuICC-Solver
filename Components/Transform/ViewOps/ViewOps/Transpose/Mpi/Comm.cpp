@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <map>
 #include <set>
+#include <iostream>
 
 // Project includes
 //
@@ -116,33 +117,46 @@ std::vector<int> getReducedRanksSet(
    // Get max set size and location
    int rank;
    MPI_Comm_rank(comm, &rank);
-   std::array<int, 2> sizeLoc = {static_cast<int>(setLoc.size()), rank};
-   std::array<int, 2> sizeLocGlo;
-   MPI_Allreduce(sizeLoc.data(), sizeLocGlo.data(), 1, MPI_2INT, MPI_MAXLOC,
-      comm);
-   // Get global set
-   std::vector<int> setGlo(sizeLocGlo[0]);
-   int rankMax = sizeLocGlo[1];
-   if (rank == rankMax)
+   bool localSetIsSubset = false;
+   while (!localSetIsSubset)
    {
-      MPI_Bcast(setLoc.data(), setLoc.size(), MPI_INT, rankMax, comm);
-      return setLoc;
-   }
-   else
-   {
-      MPI_Bcast(setGlo.data(), setGlo.size(), MPI_INT, rankMax, comm);
-      // This rank is not in the set
-      if (setLoc.size() == 0)
+      localSetIsSubset = true;
+      std::array<int, 2> sizeLoc = {static_cast<int>(setLoc.size()), rank};
+      std::array<int, 2> sizeLocGlo;
+      MPI_Allreduce(sizeLoc.data(), sizeLocGlo.data(), 1, MPI_2INT, MPI_MAXLOC,
+         comm);
+      // Get global set
+      std::vector<int> setGlo(sizeLocGlo[0]);
+      int rankMax = sizeLocGlo[1];
+      if (rank == rankMax)
       {
-         return setLoc;
+         MPI_Bcast(setLoc.data(), setLoc.size(), MPI_INT, rankMax, comm);
       }
-      // Check set intersection
-      for (auto l: setLoc)
+      else
       {
-         assert(std::find(setGlo.begin(), setGlo.end(), l) != setGlo.end());
+         MPI_Bcast(setGlo.data(), setGlo.size(), MPI_INT, rankMax, comm);
+         // This rank is not in the set
+         if (setLoc.size() > 0)
+         {
+            // Check set intersection
+            for (auto l: setLoc)
+            {
+               if (std::find(setGlo.begin(), setGlo.end(), l) == setGlo.end())
+               {
+                  localSetIsSubset = false;
+                  // add rank to global subset
+                  setGlo.push_back(l);
+               }
+            }
+            if (!localSetIsSubset) {
+               // we added ranks, should sort
+               std::sort(setGlo.begin(), setGlo.end());
+            }
+            setLoc = std::move(setGlo);
+         }
       }
-      return setGlo;
    }
+   return setLoc;
 }
 
 void redDisplsFromSet(std::vector<std::vector<int>>& sendDispls,
