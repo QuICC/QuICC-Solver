@@ -171,8 +171,22 @@ std::vector<int> getReducedRanksSet(
    // Update local set
    for (auto& s : remSet)
    {
-      if (s.size() > setLoc.size()) {
-         setLoc = std::move(s);
+      for (auto r : s)
+      {
+         if (std::find(commSet.begin(), commSet.end(), r) == commSet.end())
+         {
+            commSet.insert(r);
+         }
+      }
+   }
+   if (commSet.size() > setLoc.size())
+   {
+      // update set
+      setLoc.resize(commSet.size());
+      std::size_t i = 0;
+      for (auto it = commSet.begin(); it != commSet.end(); ++it)
+      {
+         setLoc[i++] = *it;
       }
    }
 

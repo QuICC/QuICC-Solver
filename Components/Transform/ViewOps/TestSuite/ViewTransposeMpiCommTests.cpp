@@ -404,3 +404,84 @@ TEST_CASE("Comm", "[Comm]")
       CHECK(recvBuf[i] == recvBufRef[i]);
    }
 }
+
+TEST_CASE("Check disjoint sets", "[DisSet]")
+{
+   int rank, ranks;
+   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+
+   assert(ranks >= 4);
+
+   std::vector<int> sendBuf;
+   std::vector<int> recvBuf;
+   std::vector<int> recvBufRef;
+
+   // needed to build sendRankMap recvRankMap
+   std::vector<point_t> absCooOld;
+   std::vector<point_t> absCooNew;
+
+   //
+   // transpose distributed matrix
+   // with disjoint sets
+
+   // r0  0  1  *  *    r1  *  *  2  3   r2  *  *  *  *  r3 *  *  *  *
+   //     *  *  *  *        *  *  6  7       *  *  *  *     4  5  *  *
+   //     *  *  *  *        *  *  *  *       8  9  *  *     *  * 10 11
+   //     *  * 14 15        *  *  *  *      12 13  *  *     *  *  *  *
+
+   //                               to
+
+   // r0  0  4  *  *     r1  *  *  8 12   r2  *  *  *  *  r3 *  *  *  *
+   //     *  *  *  *         *  *  9 13       *  *  *  *     1  5  *  *
+   //     *  *  *  *         *  *  *  *       2  6  *  *     *  * 10 14
+   //     *  * 11 15         *  *  *  *       3  7  *  *     *  *  *  *
+
+
+   if (rank == 0)
+   {
+      absCooOld = {{0, 0, 0}, {0, 1, 0}, {3, 2, 0}, {3, 3, 0}};
+      absCooNew = {{0, 0, 0}, {1, 0, 0}, {2, 3, 0}, {3, 3, 0}};
+      sendBuf = {0, 1, 14, 15}; // col maj
+      recvBuf = std::vector<int>(4, -1);
+      recvBufRef = {0, 4, 11, 15};
+   }
+   if (rank == 1)
+   {
+      absCooOld = {{0, 2, 0}, {1, 2, 0}, {0, 3, 0}, {1, 3, 0}};
+      absCooNew = {{2, 0, 0}, {2, 1, 0}, {3, 0, 0}, {3, 1, 0}};
+      sendBuf = {2, 6, 3, 7}; // col maj
+      recvBuf = std::vector<int>(4, -1);
+      recvBufRef = {8, 9, 12, 13};
+   }
+   if (rank == 2)
+   {
+      absCooOld = {{2, 0, 0}, {3, 0, 0}, {2, 1, 0}, {3, 1, 0}};
+      absCooNew = {{0, 2, 0}, {0, 3, 0}, {1, 2, 0}, {1, 3, 0}};
+      sendBuf = {8, 12, 9, 13}; // col maj
+      recvBuf = std::vector<int>(4, -1);
+      recvBufRef = {2, 3, 6, 7};
+   }
+   if (rank == 3)
+   {
+      absCooOld = {{1, 0, 0}, {1, 1, 0}, {2, 2, 0}, {2, 3, 0}};
+      absCooNew = {{0, 1, 0}, {1, 1, 0}, {2, 2, 0}, {3, 2, 0}};
+      sendBuf = {4, 5, 10, 11}; // col maj
+      recvBuf = std::vector<int>(4, -1);
+      recvBufRef = {1, 5, 10, 14};
+   }
+
+   auto sendDispls = getDispls(absCooNew, absCooOld);
+   auto recvDispls = getDispls(absCooOld, absCooNew);
+   auto redSet = getReducedRanksSet(sendDispls, recvDispls);
+
+   // Check
+   if (rank < 4)
+   {
+      CHECK(redSet.size() == 2);
+   }
+   else
+   {
+      CHECK(redSet.size() == 0);
+   }
+}
