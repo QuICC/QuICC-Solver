@@ -91,71 +91,78 @@ std::vector<int> getReducedRanksSet(
    const std::vector<std::vector<int>>& sendDispls,
    const std::vector<std::vector<int>>& recvDispls, const MPI_Comm comm)
 {
-   std::set<int> redSet;
+   std::set<int> commSet;
+   std::set<int> sendSet;
+   std::set<int> recvSet;
    // Save non-empty exchanges
    for (std::size_t i = 0; i < sendDispls.size(); ++i)
    {
       if (sendDispls[i].size() > 0)
       {
-         redSet.insert(i);
+         commSet.insert(i);
+         sendSet.insert(i);
       }
    }
    for (std::size_t i = 0; i < recvDispls.size(); ++i)
    {
       if (recvDispls[i].size() > 0)
       {
-         redSet.insert(i);
+         commSet.insert(i);
+         recvSet.insert(i);
       }
    }
    // Copy to vector
-   std::vector<int> setLoc(redSet.size());
+   std::vector<int> setLoc(commSet.size());
    std::size_t i = 0;
-   for (auto it = redSet.begin(); it != redSet.end(); ++it)
+   for (auto it = commSet.begin(); it != commSet.end(); ++it)
    {
       setLoc[i++] = *it;
    }
-   // Get max set size and location
-   int rank;
-   MPI_Comm_rank(comm, &rank);
-   bool localSetIsSubset = false;
-   while (!localSetIsSubset)
+
+   // Check asymmetric exchanges
+   if (sendSet.size() > recvSet.size())
    {
-      localSetIsSubset = true;
-      std::array<int, 2> sizeLoc = {static_cast<int>(setLoc.size()), rank};
-      std::array<int, 2> sizeLocGlo;
-      MPI_Allreduce(sizeLoc.data(), sizeLocGlo.data(), 1, MPI_2INT, MPI_MAXLOC,
-         comm);
-      // Get global set
-      std::vector<int> setGlo(sizeLocGlo[0]);
-      int rankMax = sizeLocGlo[1];
-      if (rank == rankMax)
+      // need to recv from extra senders the bigger set
+      // find missing set
+      for (auto it = recvSet.begin(); it != recvSet.end(); ++it)
       {
-         MPI_Bcast(setLoc.data(), setLoc.size(), MPI_INT, rankMax, comm);
+         sendSet.erase(*it);
       }
-      else
+      for (auto it = sendSet.begin(); it != sendSet.end(); ++it)
       {
-         MPI_Bcast(setGlo.data(), setGlo.size(), MPI_INT, rankMax, comm);
-         // This rank is not in the set
-         if (setLoc.size() > 0)
+         // recv size of remote set
+         // recv remote set
+         int size;
+         MPI_Status status;
+         MPI_Recv(&size, 1, MPI_INT, *it, 0, comm, &status);
+         std::cout << size << ' ' << setLoc.size() << '\n';
+         std::vector<int> setRem(size);
+         MPI_Recv(setRem.data(), size, MPI_INT, *it, 1, comm, &status);
+         if (setRem.size() > setLoc.size())
          {
-            // Check set intersection
-            for (auto l: setLoc)
-            {
-               if (std::find(setGlo.begin(), setGlo.end(), l) == setGlo.end())
-               {
-                  localSetIsSubset = false;
-                  // add rank to global subset
-                  setGlo.push_back(l);
-               }
-            }
-            if (!localSetIsSubset) {
-               // we added ranks, should sort
-               std::sort(setGlo.begin(), setGlo.end());
-            }
-            setLoc = std::move(setGlo);
+            setLoc = std::move(setRem);
          }
       }
    }
+   if (sendSet.size() < recvSet.size())
+   {
+      // need to send to missing recv the bigger set
+      // find missing set
+      for (auto it = sendSet.begin(); it != sendSet.end(); ++it)
+      {
+         recvSet.erase(*it);
+      }
+      for (auto it = recvSet.begin(); it != recvSet.end(); ++it)
+      {
+         // send size of remote set
+         // send remote set
+         int size = setLoc.size();
+         MPI_Send(&size, 1, MPI_INT, *it, 0, comm);
+         MPI_Send(setLoc.data(), size, MPI_INT, *it, 1, comm);
+      }
+   }
+
+
    return setLoc;
 }
 
