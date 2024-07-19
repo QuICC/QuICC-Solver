@@ -14,6 +14,7 @@ extern "C" {
 #include "ViewOps/Transpose/Transpose.hpp"
 #include "ViewOps/ViewIndexUtils.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
+#include "TestSuite/ViewMeta.hpp"
 
 
 using namespace QuICC::Transpose::Mpi;
@@ -51,6 +52,7 @@ int main(int argc, char** argv)
 
 using namespace QuICC::Memory;
 using namespace QuICC::View;
+using namespace QuICC::TestSuite;
 
 TEST_CASE("Mpi DCCSC3D to DCCSC3D 210", "MpiDCCSC3DtoDCCSC3D210")
 {
@@ -72,8 +74,8 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 210", "MpiDCCSC3DtoDCCSC3D210")
    std::vector<double> dataIn;
    std::vector<double> dataOut;
    std::vector<double> dataOutRef;
-   Index::ptrAndIdx metaIn;
-   Index::ptrAndIdx metaOut;
+   ptrAndIdx metaIn;
+   ptrAndIdx metaOut;
 
    if (rank == 0 && ranks == 1)
    {
@@ -114,6 +116,25 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 210", "MpiDCCSC3DtoDCCSC3D210")
       metaOut.idx = {0, 1, 0, 1};
       dataOut.resize(metaOut.idx.size()*N);
       dataOutRef.resize(metaOut.idx.size()*N);
+   }
+   else if (ranks == 4)
+   {
+      std::string path = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_refdata/Framework/LoadSplitter/WLFl/";
+      std::string dist = "Tubular";
+      std::string id = "103";
+      auto setup = readDimsAndMeta(path, dist, id);
+
+      dimensionsIn = {setup.modsDims[2], setup.physDims[1], setup.physDims[0]};
+      dimensionsOut = {setup.physDims[1], setup.physDims[0], setup.physDims[2]};
+
+      metaIn.ptr = setup.metaFT.ptr;
+      metaIn.idx = setup.metaFT.idx;
+      dataIn.resize(metaIn.idx.size()*dimensionsIn[0]);
+      // perm = [2 0 1] MLN -> LNM
+      metaOut.ptr = setup.metaAL.ptr;
+      metaOut.idx = setup.metaAL.idx;
+      dataOut.resize(metaOut.idx.size()*dimensionsOut[0]);
+      dataOutRef.resize(metaOut.idx.size()*dimensionsOut[0]);
    }
 
    // Set meta

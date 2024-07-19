@@ -18,6 +18,13 @@
 namespace QuICC {
 namespace View {
 
+/// @brief Convienience struct to pass metadata
+struct ptrAndIdx
+{
+   std::vector<std::uint32_t> ptr;
+   std::vector<std::uint32_t> idx;
+};
+
 /// @brief compute storage requirements of view
 /// @tparam ViewType, either dense or compressed
 /// @param v View

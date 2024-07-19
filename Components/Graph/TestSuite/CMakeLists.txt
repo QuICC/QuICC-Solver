@@ -3,7 +3,6 @@ include(BundleCatch2)
 add_executable(GraphTests
     GraphTestsMain.cpp
     GraphTests.cpp
-    Utils.cpp
 )
 
 target_link_libraries(GraphTests
@@ -31,7 +30,6 @@ add_test(
 if(QUICC_USE_MPI)
     add_executable(GraphTestsMpi
         GraphTestsMpi.cpp
-        Utils.cpp
     )
 
     target_link_libraries(GraphTestsMpi

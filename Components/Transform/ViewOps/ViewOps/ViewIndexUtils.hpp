@@ -15,6 +15,7 @@
 // Project includes
 //
 #include "View/Attributes.hpp"
+#include "View/ViewUtils.hpp"
 
 namespace QuICC {
 namespace View {
@@ -53,13 +54,6 @@ namespace Index {
         PhiThetaR = 3,
         YXZ = 3,
     };
-
-    struct ptrAndIdx
-    {
-        std::vector<std::uint32_t> ptr;
-        std::vector<std::uint32_t> idx;
-    };
-
 
     /// @brief Reorder logical dimensions based on order
     /// @param logDims logical dimensions, dimOrder::v012

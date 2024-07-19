@@ -244,6 +244,7 @@ if(QUICC_USE_MPI)
         ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
         Catch2::Catch2
         QuICC::Memory
+        QuICC::TestSuite
     )
 
     add_test(
