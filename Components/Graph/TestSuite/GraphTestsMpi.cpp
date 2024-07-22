@@ -36,6 +36,13 @@ int main(int argc, char **argv)
 
 TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 {
+  int rank = 0;
+  int ranks = 1;
+  #ifdef QUICC_MPI
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+  #endif
+
   std::string inputFilename = "./simple-3d-fwd.mlir";
   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
       llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
@@ -49,25 +56,19 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
 
   // Load size meta info
-  #if 1
   std::string dist = "Serial";
-  int rank = 0;
-  int ranks = 1;
-  #ifdef QUICC_MPI
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &ranks);
-  #endif
-  assert(rank == 0);
-  assert(ranks == 1);
-  #else
-  std::string dist = "Tubular";
-  int rank = 0;
-  int ranks = 4;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &ranks);
-  assert(ranks == 4);
-  #endif
-
+  if (rank == 0 && ranks == 1)
+  {
+    dist = "Serial";
+  }
+  else if (ranks == 4)
+  {
+    dist = "Tubular";
+  }
+  else
+  {
+    assert(false && "missing setup");
+  }
   std::string path = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_refdata/Framework/LoadSplitter/WLFl/";
   std::string id = "103";
   using namespace QuICC::TestSuite;
