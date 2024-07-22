@@ -37,7 +37,7 @@ std::vector<point_t> getCoo(const Tv& view)
         {
             for (std::size_t idx = pointers[ptr]; idx < pointers[ptr+1]; ++idx)
             {
-                for (std::size_t i = 0; i < view.dims()[0]; ++i)
+                for (std::size_t i = 0; i < view.lds(); ++i)
                 {
                     coo[itCoo++] = {
                         static_cast<int>(i),
@@ -59,7 +59,7 @@ std::vector<point_t> getCoo(const Tv& view)
         {
             for (std::size_t idx = pointers[ptr]; idx < pointers[ptr+1]; ++idx)
             {
-                for (std::size_t i = 0; i < view.dims()[0]; ++i)
+                for (std::size_t i = 0; i < view.lds(); ++i)
                 {
                     // 2 0 1 -> k i j
                     coo[itCoo++] = {

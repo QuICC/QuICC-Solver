@@ -53,8 +53,10 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   std::string dist = "Serial";
   int rank = 0;
   int ranks = 1;
+  #ifdef QUICC_MPI
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+  #endif
   assert(rank == 0);
   assert(ranks == 1);
   #else
@@ -97,7 +99,6 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   meta.push_back({setup.metaAL.idx.data(), setup.metaAL.idx.size()});
   meta.push_back({setup.metaJW.ptr.data(), setup.metaJW.ptr.size()});
   meta.push_back({setup.metaJW.idx.data(), setup.metaJW.idx.size()});
-
 
   QuICC::QuICCEnv().synchronize();
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();

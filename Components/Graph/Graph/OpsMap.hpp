@@ -17,7 +17,9 @@
 //
 #include "Graph/Types.hpp"
 #include "Memory/Memory.hpp"
+#ifdef QUICC_MPI
 #include "ViewOps/Transpose/Mpi/Comm.hpp"
+#endif
 
 namespace QuICC
 {
@@ -42,8 +44,10 @@ class MapOps
     /// to be replaced by a per-operator-attribute
     bool _isCpu = true;
     /// comm
+    #ifdef QUICC_MPI
     std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commFTAL;
     std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commALJW;
+    #endif
   public:
     /// @brief empty constructor
     MapOps() = default;

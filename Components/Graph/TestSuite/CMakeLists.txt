@@ -27,7 +27,7 @@ add_test(
     "${CMAKE_CURRENT_SOURCE_DIR}"
   )
 
-if(QUICC_USE_MPI)
+# if(QUICC_USE_MPI)
     add_executable(GraphTestsMpi
         GraphTestsMpi.cpp
     )
@@ -46,4 +46,4 @@ if(QUICC_USE_MPI)
         WORKING_DIRECTORY
         "${CMAKE_CURRENT_SOURCE_DIR}"
     )
-endif()
+# endif()
