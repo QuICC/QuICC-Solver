@@ -7,12 +7,15 @@ namespace TestSuite {
 dimsAndMeta readDimsAndMeta(const std::string path, const std::string dist,
    const std::string id)
 {
-   int rank, ranks;
+   int rank = 0;
+   int ranks = 1;
+
+   # ifdef QUICC_MPI
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
    MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+   #endif
 
    dimsAndMeta ret;
-
    std::string base = path + dist + "/P_id" + id + "_np" +
                       std::to_string(ranks) + "_r" + std::to_string(rank);
    std::string fileName = base + "_stage0_meta.dat";
