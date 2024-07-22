@@ -56,7 +56,7 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
 
   // Load size meta info
-  std::string dist = "Serial";
+  std::string dist;
   if (rank == 0 && ranks == 1)
   {
     dist = "Serial";
@@ -127,9 +127,14 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 
   // Check
   double eps = 1e-14;
-  CHECK(std::abs(modsOutView[0].real() - sqrt(2.0)*QuICC::Math::PI) <= eps);
-  CHECK(std::abs(modsOutView[0].imag()) <= eps);
-  for(std::size_t m = 1; m < modsOutView.size(); ++m)
+  std::size_t m = 0;
+  if (rank == 0)
+  {
+    CHECK(std::abs(modsOutView[m].real() - sqrt(2.0)*QuICC::Math::PI) <= eps);
+    CHECK(std::abs(modsOutView[m].imag()) <= eps);
+    ++m;
+  }
+  for(; m < modsOutView.size(); ++m)
   {
     CHECK(std::abs(modsOutView[m]) <= eps);
   }
