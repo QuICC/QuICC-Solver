@@ -112,6 +112,72 @@ namespace Index {
         return ret;
     }
 
+    /// @brief compute pointers and index meta data for fully populated
+    /// tensor at different stages based on view attributes
+    /// @tparam TagViewAttributes
+    /// @param logDims logical dimensions, dimOrder::v012
+    /// @param order order for which the metadata is created
+    /// @return pointer and indices in a struct
+    template <class TagViewAttributes>
+    ptrAndIdx densePtrAndIdxStep1(const std::array<std::uint32_t, 3> logDims, const dimOrder order = dimOrder::v012)
+    {
+        assert(false && "not implemented");
+        return ptrAndIdx{};
+    }
+
+
+    /// @brief compute pointers and index meta data for fully populated
+    /// tensor at different stages based on view attributes
+    /// @param logDims logical dimensions, dimOrder::v012
+    /// @param order order for which the metadata is created
+    /// @return pointer and indices in a struct
+    template<>
+    ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(const std::array<std::uint32_t, 3> logDims, const dimOrder order)
+    {
+        std::array<std::uint32_t, 3> dims = getDims(logDims, order);
+        auto K = dims[1];
+        auto I = dims[2];
+
+        // Populate meta for fully populated tensor
+        ptrAndIdx ret;
+        // row width (with jki) K - ...
+        std::vector<std::uint32_t> kLess(I);
+        kLess[I-1] = K-1;
+        for (std::size_t i = I-1; i > 0; --i)
+        {
+            if (kLess[i] > 0)
+            {
+                kLess[i-1] = kLess[i] - 1;
+            }
+            else
+            {
+                kLess[i-1] = 0;
+            }
+        }
+
+        std::size_t layWidthCum = 0;
+        ret.ptr.resize(I+1);
+        ret.ptr[0] = 0;
+        for (std::size_t i = 1; i < I+1; ++i)
+        {
+            std::uint32_t width = K-kLess[i-1];
+            ret.ptr[i] = ret.ptr[i-1] + width;
+            layWidthCum += width;
+        }
+
+        std::size_t layerIdx = 0;
+        ret.idx.resize(layWidthCum);
+        for (std::size_t l = 0; l < ret.ptr.size() - 1; ++l)
+        {
+            auto layerSize = ret.ptr[l+1] - ret.ptr[l];
+            for (std::size_t i = 0; i < layerSize; ++i)
+            {
+                ret.idx[layerIdx+i] = i;
+            }
+            layerIdx += layerSize;
+        }
+        return ret;
+    }
 
 
 

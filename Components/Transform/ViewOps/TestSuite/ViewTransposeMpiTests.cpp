@@ -185,11 +185,34 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 210", "MpiDCCSC3DtoDCCSC3D210")
 
 TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 210", "MpiS1CLCSC3DtoDCCSC3D210")
 {
-    // AL out -> JW in
-    // Full data and type
-    constexpr size_t M = 4;
-    constexpr size_t N = 2;
-    constexpr size_t K = 3;
+   int rank, ranks;
+   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+
+   // AL out -> JW in
+   // Full data and type
+   constexpr size_t M = 4;
+   constexpr size_t N = 2;
+   constexpr size_t K = 3;
+
+   // view
+   constexpr std::uint32_t vRank = 3;
+   std::array<std::uint32_t, vRank> dimensionsIn{M, N, K};
+   std::array<std::uint32_t, vRank> dimensionsOut{N, K, M};
+
+   ptrAndIdx metaIn;
+   ptrAndIdx metaOut;
+
+   if (rank == 0 && ranks == 1)
+   {
+      // Populate meta for fully populated tensor
+      // AL space (Stage::PPM and Stage::MPM)
+      metaIn = Index::densePtrAndIdx<DCCSC3D>(dimensionsIn);
+      // Populate meta for fully populated tensor
+      // Spectral(JW) space (Stage::PMM and Stage::MMM)
+      metaOut = Index::densePtrAndIdxStep1<DCCSC3D>(dimensionsOut);
+
+   }
 
     constexpr size_t S = (M + (M-1) + (M-2)) * N ;
     std::array<double, S> dataIn = {/*k0*/ 1, 2, 3, 4,
@@ -213,20 +236,20 @@ TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 210", "MpiS1CLCSC3DtoDCCSC3D210")
 
     std::array<double, S> dataOut;
 
-    // view
-    constexpr std::uint32_t rank = 3;
-    std::array<std::uint32_t, rank> dimensionsIn{M, N, K};
-    std::array<std::uint32_t, rank> dimensionsOut{N, K, M};
     // skip setting up pointers and indices
     // they are not used in the serial aka dense tranpose
-    std::array<std::vector<std::uint32_t>, rank> pointers = {
-        {{}, {}, {}}};
-    std::array<std::vector<std::uint32_t>, rank> indices = {
-        {{}, {}, {}}};
+   std::array<std::vector<std::uint32_t>, vRank> pointersIn = {
+      {{}, metaIn.ptr, {}}};
+   std::array<std::vector<std::uint32_t>, vRank> indicesIn = {
+      {{}, metaIn.idx, {}}};
+   std::array<std::vector<std::uint32_t>, vRank> pointersOut = {
+      {{}, metaOut.ptr, {}}};
+   std::array<std::vector<std::uint32_t>, vRank> indicesOut = {
+      {{}, metaOut.idx, {}}};
     using inTy = S1CLCSC3D;
     using outTy = DCCSC3D;
-    View<double, inTy> viewIn(dataIn, dimensionsIn, pointers, indices);
-    View<double, outTy> viewOut(dataOut, dimensionsOut, pointers, indices);
+    View<double, inTy> viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
+    View<double, outTy> viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
 
     // Transpose op
     using namespace QuICC::Transpose::Mpi;
