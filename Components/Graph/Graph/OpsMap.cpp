@@ -21,7 +21,8 @@ MapOps::MapOps(mlir::ModuleOp module,
     }
     #endif
 
-    _comm201 = std::make_shared<Transpose::Mpi::Comm<std::complex<double>>>();
+    _commFTAL = std::make_shared<Transpose::Mpi::Comm<std::complex<double>>>();
+    _commALJW = std::make_shared<Transpose::Mpi::Comm<std::complex<double>>>();
 
     using namespace mlir;
     Dialect *quiccirDialect = module->getContext()->getLoadedDialect("quiccir");

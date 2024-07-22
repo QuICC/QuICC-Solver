@@ -41,8 +41,9 @@ class MapOps
     /// @brief is the memory space cpu or gpu
     /// to be replaced by a per-operator-attribute
     bool _isCpu = true;
-    /// 201 comm
-    std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _comm201;
+    /// comm
+    std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commFTAL;
+    std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commALJW;
   public:
     /// @brief empty constructor
     MapOps() = default;

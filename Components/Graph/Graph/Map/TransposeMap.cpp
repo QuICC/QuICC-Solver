@@ -47,7 +47,7 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = C_DCCSC3D_t;
             using op_t = Op<Tout, Tin, p201_t>;
             #ifdef QUICC_MPI
-            _ops.push_back(std::make_unique<op_t>(_comm201));
+            _ops.push_back(std::make_unique<op_t>(_commFTAL));
             #else
             _ops.push_back(std::make_unique<op_t>());
             #endif
@@ -63,7 +63,7 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = C_DCCSC3D_t;
             using op_t = Op<Tout, Tin, p120_t>;
             #ifdef QUICC_MPI
-            _ops.push_back(std::make_unique<op_t>(_comm201));
+            _ops.push_back(std::make_unique<op_t>(_commFTAL));
             #else
             _ops.push_back(std::make_unique<op_t>());
             #endif
@@ -79,7 +79,7 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = C_S1CLCSC3D_t;
             using op_t = Op<Tout, Tin, p201_t>;
             #ifdef QUICC_MPI
-            _ops.push_back(std::make_unique<op_t>(_comm201));
+            _ops.push_back(std::make_unique<op_t>(_commALJW));
             #else
             _ops.push_back(std::make_unique<op_t>());
             #endif
@@ -95,7 +95,7 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = C_DCCSC3D_t;
             using op_t = Op<Tout, Tin, p120_t>;
             #ifdef QUICC_MPI
-            _ops.push_back(std::make_unique<op_t>(_comm201));
+            _ops.push_back(std::make_unique<op_t>(_commALJW));
             #else
             _ops.push_back(std::make_unique<op_t>());
             #endif

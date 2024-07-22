@@ -181,3 +181,66 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 210", "MpiDCCSC3DtoDCCSC3D210")
       CHECK(dataOut[i] == dataOutRef[i]);
    }
 }
+
+
+TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 210", "MpiS1CLCSC3DtoDCCSC3D210")
+{
+    // AL out -> JW in
+    // Full data and type
+    constexpr size_t M = 4;
+    constexpr size_t N = 2;
+    constexpr size_t K = 3;
+
+    constexpr size_t S = (M + (M-1) + (M-2)) * N ;
+    std::array<double, S> dataIn = {/*k0*/ 1, 2, 3, 4,
+        /*k0*/ 5, 6, 7, 8,
+        /*k1*/ 9, 10, 11,
+        /*k1*/ 12, 13, 14,
+        /*k2*/ 15, 16,
+        /*k2*/ 17, 18};
+
+    // perm = [2 0 1] -> N K M
+    std::array<double, S> dataRef = {/*m0*/ 1, 5,
+        /*m0*/ 9,  12,
+        /*m0*/ 15, 17,
+        /*m1*/ 2,  6,
+        /*m1*/ 10, 13,
+        /*m1*/ 16, 18,
+        /*m2*/ 3,  7,
+        /*m2*/ 11, 14,
+        /*m3*/ 4,
+        /*m3*/ 8};
+
+    std::array<double, S> dataOut;
+
+    // view
+    constexpr std::uint32_t rank = 3;
+    std::array<std::uint32_t, rank> dimensionsIn{M, N, K};
+    std::array<std::uint32_t, rank> dimensionsOut{N, K, M};
+    // skip setting up pointers and indices
+    // they are not used in the serial aka dense tranpose
+    std::array<std::vector<std::uint32_t>, rank> pointers = {
+        {{}, {}, {}}};
+    std::array<std::vector<std::uint32_t>, rank> indices = {
+        {{}, {}, {}}};
+    using inTy = S1CLCSC3D;
+    using outTy = DCCSC3D;
+    View<double, inTy> viewIn(dataIn, dimensionsIn, pointers, indices);
+    View<double, outTy> viewOut(dataOut, dimensionsOut, pointers, indices);
+
+    // Transpose op
+    using namespace QuICC::Transpose::Mpi;
+    using namespace QuICC::Transpose;
+
+    auto comm = std::make_shared<Comm<double>>();
+    auto transposeOp =
+      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>(comm);
+
+    transposeOp->apply(viewOut, viewIn);
+
+    // check
+    for (std::uint64_t s = 0; s < S; ++s)
+    {
+        CHECK(dataRef[s] == viewOut[s]);
+    }
+}
