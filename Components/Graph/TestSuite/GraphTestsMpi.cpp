@@ -49,13 +49,13 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
 
   // Load size meta info
-  #if 0
+  #if 1
   std::string dist = "Serial";
   int rank = 0;
   int ranks = 1;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  assert(rank == 0);
   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+  assert(rank == 0);
   assert(ranks == 1);
   #else
   std::string dist = "Tubular";

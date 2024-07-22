@@ -17,7 +17,7 @@
 //
 #include "Graph/Types.hpp"
 #include "Memory/Memory.hpp"
-
+#include "ViewOps/Transpose/Mpi/Comm.hpp"
 
 namespace QuICC
 {
@@ -41,6 +41,8 @@ class MapOps
     /// @brief is the memory space cpu or gpu
     /// to be replaced by a per-operator-attribute
     bool _isCpu = true;
+    /// 201 comm
+    std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _comm201;
   public:
     /// @brief empty constructor
     MapOps() = default;

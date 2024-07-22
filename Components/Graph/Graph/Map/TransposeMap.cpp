@@ -25,7 +25,11 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
         auto perm = op.getPermutation();
         if (_isCpu)
         {
+          #ifdef QUICC_MPI
+          using namespace QuICC::Transpose::Mpi;
+          #else
           using namespace QuICC::Transpose::Cpu;
+          #endif
           using namespace QuICC::Transpose;
           // check type attributes
           using namespace mlir;
@@ -42,7 +46,11 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tout = C_DCCSC3D_t;
             using Tin = C_DCCSC3D_t;
             using op_t = Op<Tout, Tin, p201_t>;
+            #ifdef QUICC_MPI
+            _ops.push_back(std::make_unique<op_t>(_comm201));
+            #else
             _ops.push_back(std::make_unique<op_t>());
+            #endif
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -54,7 +62,11 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tout = C_DCCSC3D_t;
             using Tin = C_DCCSC3D_t;
             using op_t = Op<Tout, Tin, p120_t>;
+            #ifdef QUICC_MPI
+            _ops.push_back(std::make_unique<op_t>(_comm201));
+            #else
             _ops.push_back(std::make_unique<op_t>());
+            #endif
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -66,7 +78,11 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tout = C_DCCSC3D_t;
             using Tin = C_S1CLCSC3D_t;
             using op_t = Op<Tout, Tin, p201_t>;
+            #ifdef QUICC_MPI
+            _ops.push_back(std::make_unique<op_t>(_comm201));
+            #else
             _ops.push_back(std::make_unique<op_t>());
+            #endif
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -78,7 +94,11 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tout = C_S1CLCSC3D_t;
             using Tin = C_DCCSC3D_t;
             using op_t = Op<Tout, Tin, p120_t>;
+            #ifdef QUICC_MPI
+            _ops.push_back(std::make_unique<op_t>(_comm201));
+            #else
             _ops.push_back(std::make_unique<op_t>());
+            #endif
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;

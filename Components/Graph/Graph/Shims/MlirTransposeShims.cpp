@@ -24,7 +24,11 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_DCCS
     assert(pOut != nullptr);
     assert(pIn->dataSize >= pOut->dataSize); // Input might be padded
     // op
+    #ifdef QUICC_MPI
+    using namespace QuICC::Transpose::Mpi;
+    #else
     using namespace QuICC::Transpose::Cpu;
+    #endif
     using namespace QuICC::Transpose;
     using Tin = C_DCCSC3D_t;
     using Tout = C_DCCSC3D_t;
@@ -32,13 +36,17 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_DCCS
     // views
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> pointers[rank];
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> indices[rank];
+    ViewBase<std::uint32_t> pointersIn[rank];
+    pointersIn[1] = ViewBase<std::uint32_t>(pIn->pos, pIn->posSize);
+    ViewBase<std::uint32_t> indicesIn[rank];
+    indicesIn[1] = ViewBase<std::uint32_t>(pIn->coo, pIn->cooSize);
+    ViewBase<std::uint32_t> pointersOut[rank];
+    pointersOut[1] = ViewBase<std::uint32_t>(pOut->pos, pOut->posSize);
+    ViewBase<std::uint32_t> indicesOut[rank];
+    indicesOut[1] = ViewBase<std::uint32_t>(pOut->coo, pOut->cooSize);
     std::uint32_t lds = pIn->dataSize / pIn->cooSize;
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices, lds);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn, lds);
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
@@ -59,7 +67,6 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_complexf64_D
     assert(obj != nullptr);
     assert(pIn != nullptr);
     assert(pOut != nullptr);
-    assert(pIn->dataSize == pOut->dataSize);
     assert(QuICC::Cuda::isDeviceMemory(pOut->data));
     assert(QuICC::Cuda::isDeviceMemory(pOut->pos));
     assert(QuICC::Cuda::isDeviceMemory(pOut->coo));
@@ -75,12 +82,16 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_complexf64_D
     // views
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> pointers[rank];
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> indices[rank];
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    ViewBase<std::uint32_t> pointersIn[rank];
+    pointersIn[1] = ViewBase<std::uint32_t>(pIn->pos, pIn->posSize);
+    ViewBase<std::uint32_t> indicesIn[rank];
+    indicesIn[1] = ViewBase<std::uint32_t>(pIn->coo, pIn->cooSize);
+    ViewBase<std::uint32_t> pointersOut[rank];
+    pointersOut[1] = ViewBase<std::uint32_t>(pOut->pos, pOut->posSize);
+    ViewBase<std::uint32_t> indicesOut[rank];
+    indicesOut[1] = ViewBase<std::uint32_t>(pOut->coo, pOut->cooSize);
+    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn);
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
@@ -102,7 +113,11 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_DCCS
     assert(pOut != nullptr);
     assert(pIn->dataSize <= pOut->dataSize); // there could be padding for FFT
     // op
+    #ifdef QUICC_MPI
+    using namespace QuICC::Transpose::Mpi;
+    #else
     using namespace QuICC::Transpose::Cpu;
+    #endif
     using namespace QuICC::Transpose;
     using Tin = C_DCCSC3D_t;
     using Tout = C_DCCSC3D_t;
@@ -110,13 +125,17 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_DCCS
     // views
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> pointers[rank];
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> indices[rank];
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
+    ViewBase<std::uint32_t> pointersIn[rank];
+    pointersIn[1] = ViewBase<std::uint32_t>(pIn->pos, pIn->posSize);
+    ViewBase<std::uint32_t> indicesIn[rank];
+    indicesIn[1] = ViewBase<std::uint32_t>(pIn->coo, pIn->cooSize);
+    ViewBase<std::uint32_t> pointersOut[rank];
+    pointersOut[1] = ViewBase<std::uint32_t>(pOut->pos, pOut->posSize);
+    ViewBase<std::uint32_t> indicesOut[rank];
+    indicesOut[1] = ViewBase<std::uint32_t>(pOut->coo, pOut->cooSize);
+    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn);
     std::uint32_t lds = pOut->dataSize / pOut->cooSize;
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices, lds);
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut, lds);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
@@ -137,7 +156,6 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_DCCS
     assert(obj != nullptr);
     assert(pIn != nullptr);
     assert(pOut != nullptr);
-    assert(pIn->dataSize == pOut->dataSize);
     assert(QuICC::Cuda::isDeviceMemory(pOut->data));
     assert(QuICC::Cuda::isDeviceMemory(pOut->pos));
     assert(QuICC::Cuda::isDeviceMemory(pOut->coo));
@@ -153,12 +171,16 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_DCCS
     // views
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> pointers[rank];
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> indices[rank];
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    ViewBase<std::uint32_t> pointersIn[rank];
+    pointersIn[1] = ViewBase<std::uint32_t>(pIn->pos, pIn->posSize);
+    ViewBase<std::uint32_t> indicesIn[rank];
+    indicesIn[1] = ViewBase<std::uint32_t>(pIn->coo, pIn->cooSize);
+    ViewBase<std::uint32_t> pointersOut[rank];
+    pointersOut[1] = ViewBase<std::uint32_t>(pOut->pos, pOut->posSize);
+    ViewBase<std::uint32_t> indicesOut[rank];
+    indicesOut[1] = ViewBase<std::uint32_t>(pOut->coo, pOut->cooSize);
+    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn);
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
@@ -178,9 +200,12 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_S1CL
     assert(obj != nullptr);
     assert(pIn != nullptr);
     assert(pOut != nullptr);
-    assert(pIn->dataSize == pOut->dataSize);
     // Op
+    #ifdef QUICC_MPI
+    using namespace QuICC::Transpose::Mpi;
+    #else
     using namespace QuICC::Transpose::Cpu;
+    #endif
     using namespace QuICC::Transpose;
     using Tin = C_S1CLCSC3D_t;
     using Tout = C_DCCSC3D_t;
@@ -188,12 +213,16 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_S1CL
     // views
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> pointers[rank];
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> indices[rank];
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    ViewBase<std::uint32_t> pointersIn[rank];
+    pointersIn[1] = ViewBase<std::uint32_t>(pIn->pos, pIn->posSize);
+    ViewBase<std::uint32_t> indicesIn[rank];
+    indicesIn[1] = ViewBase<std::uint32_t>(pIn->coo, pIn->cooSize);
+    ViewBase<std::uint32_t> pointersOut[rank];
+    pointersOut[1] = ViewBase<std::uint32_t>(pOut->pos, pOut->posSize);
+    ViewBase<std::uint32_t> indicesOut[rank];
+    indicesOut[1] = ViewBase<std::uint32_t>(pOut->coo, pOut->cooSize);
+    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn);
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
@@ -214,7 +243,6 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_complexf64_S
     assert(obj != nullptr);
     assert(pIn != nullptr);
     assert(pOut != nullptr);
-    assert(pIn->dataSize == pOut->dataSize);
     assert(QuICC::Cuda::isDeviceMemory(pOut->data));
     assert(QuICC::Cuda::isDeviceMemory(pOut->pos));
     assert(QuICC::Cuda::isDeviceMemory(pOut->coo));
@@ -230,12 +258,16 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_complexf64_S
     // views
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> pointers[rank];
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> indices[rank];
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    ViewBase<std::uint32_t> pointersIn[rank];
+    pointersIn[1] = ViewBase<std::uint32_t>(pIn->pos, pIn->posSize);
+    ViewBase<std::uint32_t> indicesIn[rank];
+    indicesIn[1] = ViewBase<std::uint32_t>(pIn->coo, pIn->cooSize);
+    ViewBase<std::uint32_t> pointersOut[rank];
+    pointersOut[1] = ViewBase<std::uint32_t>(pOut->pos, pOut->posSize);
+    ViewBase<std::uint32_t> indicesOut[rank];
+    indicesOut[1] = ViewBase<std::uint32_t>(pOut->coo, pOut->cooSize);
+    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn);
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
@@ -255,9 +287,12 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_S1CLCSC3D_complexf64_DC
     assert(obj != nullptr);
     assert(pIn != nullptr);
     assert(pOut != nullptr);
-    assert(pIn->dataSize == pOut->dataSize);
     // Op
+    #ifdef QUICC_MPI
+    using namespace QuICC::Transpose::Mpi;
+    #else
     using namespace QuICC::Transpose::Cpu;
+    #endif
     using namespace QuICC::Transpose;
     using Tin = C_DCCSC3D_t;
     using Tout = C_S1CLCSC3D_t;
@@ -265,12 +300,16 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_S1CLCSC3D_complexf64_DC
     // views
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> pointers[rank];
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> indices[rank];
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    ViewBase<std::uint32_t> pointersIn[rank];
+    pointersIn[1] = ViewBase<std::uint32_t>(pIn->pos, pIn->posSize);
+    ViewBase<std::uint32_t> indicesIn[rank];
+    indicesIn[1] = ViewBase<std::uint32_t>(pIn->coo, pIn->cooSize);
+    ViewBase<std::uint32_t> pointersOut[rank];
+    pointersOut[1] = ViewBase<std::uint32_t>(pOut->pos, pOut->posSize);
+    ViewBase<std::uint32_t> indicesOut[rank];
+    indicesOut[1] = ViewBase<std::uint32_t>(pOut->coo, pOut->cooSize);
+    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn);
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
@@ -291,7 +330,6 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_S1CLCSC3DJIK_complexf64
     assert(obj != nullptr);
     assert(pIn != nullptr);
     assert(pOut != nullptr);
-    assert(pIn->dataSize == pOut->dataSize);
     assert(QuICC::Cuda::isDeviceMemory(pOut->data));
     assert(QuICC::Cuda::isDeviceMemory(pOut->pos));
     assert(QuICC::Cuda::isDeviceMemory(pOut->coo));
@@ -307,12 +345,16 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_S1CLCSC3DJIK_complexf64
     // views
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> pointers[rank];
-    // not used for dense transpose, not setting up
-    ViewBase<std::uint32_t> indices[rank];
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointers, indices);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointers, indices);
+    ViewBase<std::uint32_t> pointersIn[rank];
+    pointersIn[1] = ViewBase<std::uint32_t>(pIn->pos, pIn->posSize);
+    ViewBase<std::uint32_t> indicesIn[rank];
+    indicesIn[1] = ViewBase<std::uint32_t>(pIn->coo, pIn->cooSize);
+    ViewBase<std::uint32_t> pointersOut[rank];
+    pointersOut[1] = ViewBase<std::uint32_t>(pOut->pos, pOut->posSize);
+    ViewBase<std::uint32_t> indicesOut[rank];
+    indicesOut[1] = ViewBase<std::uint32_t>(pOut->coo, pOut->cooSize);
+    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn);
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
