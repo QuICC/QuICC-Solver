@@ -23,7 +23,9 @@ MapOps::MapOps(mlir::ModuleOp module,
 
     #ifdef QUICC_MPI
     _commFTAL = std::make_shared<Transpose::Mpi::Comm<std::complex<double>>>();
+    _commALFT = std::make_shared<Transpose::Mpi::Comm<std::complex<double>>>();
     _commALJW = std::make_shared<Transpose::Mpi::Comm<std::complex<double>>>();
+    _commJWAL = std::make_shared<Transpose::Mpi::Comm<std::complex<double>>>();
     #endif
 
     using namespace mlir;

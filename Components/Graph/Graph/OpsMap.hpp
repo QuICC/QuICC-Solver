@@ -46,7 +46,9 @@ class MapOps
     /// comm
     #ifdef QUICC_MPI
     std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commFTAL;
+    std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commALFT;
     std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commALJW;
+    std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commJWAL;
     #endif
   public:
     /// @brief empty constructor
