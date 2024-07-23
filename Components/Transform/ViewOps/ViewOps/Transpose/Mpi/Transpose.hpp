@@ -53,11 +53,12 @@ private:
 template <class Tout, class Tin, class Perm>
 void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 {
+   assert(in.data() != nullptr);
+   assert(out.data() != nullptr);
    Profiler::RegionFixture<4> fix("Transpose::Mpi::applyImpl");
 
    auto comm = _comm.get();
    assert(comm != nullptr);
-
    if (!comm->isSetup())
    {
       // Get absolute coordinates
@@ -69,8 +70,6 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       comm->setComm(cooNew, cooOld);
    }
 
-   assert(in.data() != nullptr);
-   assert(out.data() != nullptr);
    comm->exchange(out.data(), in.data());
 }
 
