@@ -101,7 +101,7 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   meta.push_back({setup.metaJW.ptr.data(), setup.metaJW.ptr.size()});
   meta.push_back({setup.metaJW.idx.data(), setup.metaJW.idx.size()});
 
-  QuICC::QuICCEnv().synchronize();
+  // QuICC::QuICCEnv().synchronize();
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
   Jit<dim> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::PPP, meta);
@@ -141,116 +141,110 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
 
 }
 
-// TEST_CASE("Serial 3D Bwd", "[Serial3DBwd]")
-// {
-//   std::string inputFilename = "./simple-3d-bwd.mlir";
-//   llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
-//       llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
-//   if (std::error_code EC = fileOrErr.getError()) {
-//     llvm::errs() << "Could not open input file: " << EC.message() << "\n";
-//     CHECK(false);
-//   }
+TEST_CASE("Parallel 3D Bwd", "[Parallel3DBwd]")
+{
+  int rank = 0;
+  int ranks = 1;
+  #ifdef QUICC_MPI
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+  #endif
 
-//   // Parse the input mlir.
-//   llvm::SourceMgr sourceMgr;
-//   sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
+  std::string inputFilename = "./simple-3d-bwd.mlir";
+  llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> fileOrErr =
+      llvm::MemoryBuffer::getFileOrSTDIN(inputFilename);
+  if (std::error_code EC = fileOrErr.getError()) {
+    llvm::errs() << "Could not open input file: " << EC.message() << "\n";
+    CHECK(false);
+  }
 
-//   // Load size meta info
-//   #if 1
-//   std::string dist = "Serial";
-//   int ranks = 1;
-//   #else
-//   std::string dist = "Tubular";
-//   int ranks = 4;
-//   #endif
-//   std::string path = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_data/Framework/LoadSplitter/WLFl/";
-//   std::string fileName = path+dist+"/P_id103_np"+std::to_string(ranks)+"_r0_stage0_meta.dat";
-//   std::vector<double> dbJW;
-//   QuICC::TestSuite::readList(dbJW, fileName);
-//   std::uint32_t modsK = dbJW[0];
-//   std::uint32_t K = dbJW[1];
+  // Parse the input mlir.
+  llvm::SourceMgr sourceMgr;
+  sourceMgr.AddNewSourceBuffer(std::move(*fileOrErr), llvm::SMLoc());
 
-//   fileName = path+dist+"/P_id103_np"+std::to_string(ranks)+"_r0_stage1_meta.dat";
-//    std::vector<double> dbAL;
-//   QuICC::TestSuite::readList(dbAL, fileName);
-//   std::uint32_t modsN = dbAL[0];
-//   std::uint32_t N = dbAL[1];
+  // Load size meta info
+  std::string dist;
+  if (rank == 0 && ranks == 1)
+  {
+    dist = "Serial";
+  }
+  else if (ranks == 4)
+  {
+    dist = "Tubular";
+  }
+  else
+  {
+    assert(false && "missing setup");
+  }
+  std::string path = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_refdata/Framework/LoadSplitter/WLFl/";
+  std::string id = "103";
+  using namespace QuICC::TestSuite;
+  auto setup = readDimsAndMeta(path, dist, id);
 
-//   fileName = path+dist+"/P_id103_np"+std::to_string(ranks)+"_r0_stage2_meta.dat";
-//    std::vector<double> dbFr;
-//   QuICC::TestSuite::readList(dbFr, fileName);
-//   std::uint32_t modsM = dbFr[0];
-//   std::uint32_t M = dbFr[1];
+  // Grid dimensions
+  constexpr std::uint32_t dim = 3;
+  std::array<std::uint32_t, dim> physDims{setup.physDims[2], setup.physDims[1], setup.physDims[0]};
+  std::array<std::uint32_t, dim> modsDims{setup.modsDims[2], setup.modsDims[1], setup.modsDims[0]};
 
-//   // Grid dimensions
-//   constexpr std::uint32_t rank = 3;
-//   std::array<std::uint32_t, rank> physDims{M, N, K};
-//   std::array<std::uint32_t, rank> modsDims{modsM, modsN, modsK};
+  std::array<std::array<std::string, 2>, 3> layOpt;
+  layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+  layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+  layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
-//   // Unpack metadata Fourier stage
-//   using namespace QuICC::Graph;
-//   auto metaFT = unPackMeta(dbFr, K);
+  // Physical space (Stage::PPP and Stage::MPP)
+  std::array<std::vector<std::uint32_t>, dim> pointersPhys {{{}, setup.metaFT.ptr, {}}};
+  std::array<std::vector<std::uint32_t>, dim> indicesPhys {{{}, setup.metaFT.idx, {}}};
 
-//   // Unpack metadata AL stage
-//   auto metaAL = unPackMeta(dbAL, modsM);
+  // Modal space (aka JW space, Stage::PMM and Stage::MMM, QuICC Stage0)
+  std::array<std::vector<std::uint32_t>, dim> pointersMods {{{}, setup.metaJW.ptr, {}}};
+  std::array<std::vector<std::uint32_t>, dim> indicesMods {{{}, setup.metaJW.idx, {}}};
 
-//   // Unpack metadata JW stage
-//   auto metaJW = unPackMetaJW(dbJW, modsN);
+  // Store meta stages to pass to Jitter
+  std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
+  meta.push_back({setup.metaFT.ptr.data(), setup.metaFT.ptr.size()});
+  meta.push_back({setup.metaFT.idx.data(), setup.metaFT.idx.size()});
+  meta.push_back({setup.metaAL.ptr.data(), setup.metaAL.ptr.size()});
+  meta.push_back({setup.metaAL.idx.data(), setup.metaAL.idx.size()});
+  meta.push_back({setup.metaJW.ptr.data(), setup.metaJW.ptr.size()});
+  meta.push_back({setup.metaJW.idx.data(), setup.metaJW.idx.size()});
 
-//   std::array<std::array<std::string, 2>, 3> layOpt;
-//   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
-//   layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
-//   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
+  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+  using namespace QuICC::Graph;
+  Jit<dim> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::PPP, Stage::MMM, meta);
 
-//   // Physical space
-//   std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, metaFT.ptr, {}}};
-//   std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, metaFT.idx, {}}};
+  // host mem block
+  std::size_t physS = setup.physDims[2]*indicesPhys[1].size();
+  QuICC::Memory::MemBlock<double> R(physS, mem.get());
+  QuICC::Memory::MemBlock<std::complex<double>> modsIn(setup.modsDims[0]*indicesMods[1].size(), mem.get());
 
-//   // Modal space
-//   std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaJW.ptr, {}}};
-//   std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaJW.idx, {}}};
+  // host view
+  R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
+  C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {setup.modsDims[0], setup.modsDims[2], setup.modsDims[1]}, pointersMods, indicesMods);
 
-//   // Store meta stages to pass to Jitter
-//   std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
-//   meta.push_back({metaFT.ptr.data(), metaFT.ptr.size()});
-//   meta.push_back({metaFT.idx.data(), metaFT.idx.size()});
-//   meta.push_back({metaAL.ptr.data(), metaAL.ptr.size()});
-//   meta.push_back({metaAL.idx.data(), metaAL.idx.size()});
-//   meta.push_back({metaJW.ptr.data(), metaJW.ptr.size()});
-//   meta.push_back({metaJW.idx.data(), metaJW.idx.size()});
+  // set input modes
+  std::complex<double> val = {sqrt(2.0)/2.0, 0.0};
+  std::size_t m = 0;
+  if (rank == 0)
+  {
+    modsInView[m] = val;
+    ++m;
+  }
+  for(; m < modsInView.size(); ++m)
+  {
+    modsInView[m] = {0.0, 0.0};
+  }
 
-//   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-//   using namespace QuICC::Graph;
-//   Jit<rank> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::PPP, Stage::MMM, meta);
+  // Apply graph
+  Jitter.apply(RView, modsInView);
 
-//   // host mem block
-//   std::size_t physS = M*indicesPhys[1].size();
-//   QuICC::Memory::MemBlock<double> R(physS, mem.get());
-//   QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsK*indicesMods[1].size(), mem.get());
+  // Check
+  double eps = 1e-15;
+  for(std::size_t m = 0; m < RView.size(); ++m)
+  {
+    CHECK(std::abs(RView[m] - 0.5/QuICC::Math::PI) <= eps);
+  }
 
-//   // host view
-//   R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
-//   C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
-
-//   // set input modes
-//   std::complex<double> val = {sqrt(2.0)/2.0, 0.0};
-//   modsInView[0] = val;
-//   for(std::size_t m = 1; m < modsInView.size(); ++m)
-//   {
-//     modsInView[m] = {0.0, 0.0};
-//   }
-
-//   // Apply graph
-//   Jitter.apply(RView, modsInView);
-
-//   // Check
-//   double eps = 1e-15;
-//   for(std::size_t m = 0; m < RView.size(); ++m)
-//   {
-//     CHECK(std::abs(RView[m] - 0.5/QuICC::Math::PI) <= eps);
-//   }
-
-// }
+}
 
 // TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
 // {
