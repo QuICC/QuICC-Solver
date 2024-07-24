@@ -61,7 +61,6 @@ namespace details
 template<class AttIn, class AttOut>
 void FftOp<View::View<std::complex<double>, AttOut>, View::View<double, AttIn>>::applyImpl(View::View<std::complex<double>, AttOut>& mods, const View::View<double, AttIn>& phys)
 {
-    assert(std::floor(phys.dims()[0]/2) + 1 == mods.dims()[0]);
     using namespace QuICC::View;
     if(_plan == nullptr)
     {
@@ -69,11 +68,13 @@ void FftOp<View::View<std::complex<double>, AttOut>, View::View<double, AttIn>>:
         int columns = 0;
         if constexpr(std::is_same_v<AttIn, dense2D>)
         {
+            assert(std::floor(phys.dims()[0]/2) + 1 == mods.dims()[0]);
             assert(phys.dims()[1] == mods.dims()[1]);
             columns = phys.dims()[1];
         }
         else if constexpr(std::is_same_v<AttIn, DCCSC3D>)
         {
+            assert(std::floor(phys.dims()[0]/2) + 1 == mods.lds());
             assert(phys.indices()[1].size() == mods.indices()[1].size());
             columns = phys.indices()[1].size();
         }
