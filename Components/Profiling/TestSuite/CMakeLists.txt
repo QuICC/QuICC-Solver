@@ -48,12 +48,12 @@ if(TARGET LIKWID::LIKWID)
     "${QUICC_WORK_DIR}"
 
   )
-    if(QUICC_MPI)
+    if(QUICC_USE_MPI)
         set_tests_properties(LikwidTest PROPERTIES DISABLED True)
     endif()
 endif()
 
-# if(QUICC_MPI AND NOT QUICC_MPI_CI)
+# if(QUICC_USE_MPI AND NOT QUICC_MPI_CI)
 #     add_executable(ProfilerTestMpi ProfilerTestsMpi.cpp)
 #     target_link_libraries(ProfilerTestMpi
 #         ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}

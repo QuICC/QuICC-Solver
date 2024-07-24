@@ -12,6 +12,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
+include(cmake.d/Mpi.cmake)
 add_subdirectory(Environment)
 
 # Add MPI dependency

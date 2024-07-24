@@ -32,15 +32,17 @@ target_compile_options(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
 # Set HDF5 typedef depending on version
 include(cmake.d/setup/SetHdf5Typedef.cmake)
 
-target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  QuICC::Polynomial
-  ${QUICC_PYQUICC_COMPONENT_LIB}
-  QuICC::Io
-  QuICC::Common
-  QuICC::Framework::GitHash
-  QuICC::Profiling
-  QuICC::TimestepPc
-  QuICC::TimestepRkcb
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+    QuICC::Polynomial
+    ${QUICC_PYQUICC_COMPONENT_LIB}
+    QuICC::Io
+    QuICC::Common
+    QuICC::Framework::GitHash
+    QuICC::Profiling
+    QuICC::Environment
+    QuICC::TimestepPc
+    QuICC::TimestepRkcb
   )
 
 # Add debug option for operator output
