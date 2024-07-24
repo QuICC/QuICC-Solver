@@ -1,4 +1,4 @@
-/** 
+/**
  * @file StatisticCoordinator.cpp
  * @brief Source of the statistic coordinator
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/MpiTypes.hpp"
+#include "Environment/MpiTypes.hpp"
 
 namespace QuICC {
 

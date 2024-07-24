@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/MpiTypes.hpp"
+#include "Environment/MpiTypes.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/VelocityZ.hpp"
@@ -235,7 +235,7 @@ namespace Diagnostics {
 
          // Create MPI datatype
          MPI_Datatype ctype;
-         MPI_Type_contiguous(2, Parallel::MpiTypes::type<MHDFloat>(), &ctype);
+         MPI_Type_contiguous(2, Environment::MpiTypes::type<MHDFloat>(), &ctype);
          MPI_Type_commit(&ctype);
 
          // Reduce CFL on all CPUs to the global minimum

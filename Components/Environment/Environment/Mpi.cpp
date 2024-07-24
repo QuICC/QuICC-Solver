@@ -186,13 +186,13 @@ namespace Environment {
          if(Mpi::mId == gdbRank)
          {
             using namespace std::chrono_literals;
-            volatile int i = 0;
+            volatile bool wait = true;
             char hostname[HOST_NAME_MAX];
             gethostname(hostname, HOST_NAME_MAX);
             std::cerr << "PID " << getpid() << " on " << hostname
                << " with rank " << gdbRank
                << " ready to attach" << std::endl;
-            while (0 == i)
+            while (wait == true)
             std::this_thread::sleep_for(1s);
          }
       }

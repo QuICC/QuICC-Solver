@@ -1,6 +1,7 @@
 set(PHS
   Environment/QuICCEnv.hpp
   Environment/Typedefs.hpp
+  Environment/MpiTypes.hpp
 )
 
 # Add public header
