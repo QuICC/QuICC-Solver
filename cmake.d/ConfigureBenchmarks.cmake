@@ -50,7 +50,7 @@ function(quicc_add_benchmark target)
   message(DEBUG "QAB_TOOLS: ${QAB_TOOLS}")
 
   # default configs
-  if(QUICC_MPI)
+  if(QUICC_USE_MPI)
     set(_mpi_ranks ${QAB_MPIRANKS})
     set(_comm_algo "tubular")
   else()
@@ -163,7 +163,7 @@ function(quicc_add_benchmark target)
     )
 
     set(_run "Run${_bench}")
-    if(QUICC_MPI AND NOT QUICC_MPI_CI)
+    if(QUICC_USE_MPI AND NOT QUICC_MPI_CI)
       # check which command is available
       foreach(_mpiexe IN ITEMS srun mpirun)
         message(VERBOSE "_mpiexe: ${_mpiexe}")

@@ -27,7 +27,7 @@ else()
             )
 
         # set some vars
-        if(QUICC_MPI)
+        if(QUICC_USE_MPI)
             set(HIGHFIVE_PARALLEL_HDF5 ON CACHE BOOL "")
         endif()
         # requires system and serialization which are not header only
