@@ -31,8 +31,10 @@ class MapOps
 {
   private:
     /// @brief physical dimensions
+    /// order v012, RThetaPhi
     std::array<std::uint32_t, 3> _physDims;
     /// @brief spectral sapce dimensions
+    /// order v012, NLM
     std::array<std::uint32_t, 3> _modsDims;
     /// @brief store pointers for passing into MLIR
     std::vector<void*> _thisArr;

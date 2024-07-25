@@ -43,7 +43,7 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             /// dim 0 - Ntheta - colatitudinal points
             /// dim 1 - L  - harmonic degree
             /// dim 2 - M  - harmonic order
-            std::array<std::uint32_t, rank> dims {_physDims[1], _modsDims[1], _modsDims[0]};
+            std::array<std::uint32_t, rank> dims {_physDims[1], _modsDims[1], _modsDims[2]};
             std::vector<std::uint32_t> layers;
             /// Dense operator \todo generalize for distributed op
             for (std::size_t i = 0; i < dims[2]; ++i) {
@@ -81,7 +81,7 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             /// dim 0 - Ntheta - colatitudinal points
             /// dim 1 - L  - harmonic degree
             /// dim 2 - M  - harmonic order
-            std::array<std::uint32_t, rank> dims {_physDims[1], _modsDims[1], _modsDims[0]};
+            std::array<std::uint32_t, rank> dims {_physDims[1], _modsDims[1], _modsDims[2]};
             std::vector<std::uint32_t> layers;
             /// Dense operator \todo generalize for distributed op
             for (std::size_t i = 0; i < dims[2]; ++i) {
@@ -137,7 +137,7 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             /// dim 0 - L  - harmonic degree
             /// dim 1 - Ntheta - colatitudinal points
             /// dim 2 - M  - harmonic order
-            std::array<std::uint32_t, rank> dims {_modsDims[1], _physDims[1], _modsDims[0]};
+            std::array<std::uint32_t, rank> dims {_modsDims[1], _physDims[1], _modsDims[2]};
             std::vector<std::uint32_t> layers;
             /// Dense operator \todo generalize for distributed op
             for (std::size_t i = 0; i < dims[2]; ++i) {
@@ -177,7 +177,7 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             /// dim 0 - L  - harmonic degree
             /// dim 1 - Ntheta - colatitudinal points
             /// dim 2 - M  - harmonic order
-            std::array<std::uint32_t, rank> dims {_modsDims[1], _physDims[1], _modsDims[0]};
+            std::array<std::uint32_t, rank> dims {_modsDims[1], _physDims[1], _modsDims[2]};
             std::vector<std::uint32_t> layers;
             /// Dense operator \todo generalize for distributed op
             for (std::size_t i = 0; i < dims[2]; ++i) {

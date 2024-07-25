@@ -44,7 +44,7 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
             // dim 0 - Nr - radial points
             // dim 1 - N  - radial modes
             // dim 2 - L  - harmonic degree
-            std::array<std::uint32_t, rank> dims {_physDims[2], _modsDims[2], _modsDims[1]};
+            std::array<std::uint32_t, rank> dims {_physDims[0], _modsDims[0], _modsDims[1]};
             std::vector<std::uint32_t> layers;
             /// Dense operator \todo generalize for distributed op
             for (std::size_t i = 0; i < dims[2]; ++i) {
@@ -55,7 +55,7 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, _physDims[2]);
+            quad.computeQuadrature(igrid, iweights, _physDims[0]);
             // Populate op
             auto opView = jwPrjOp->getOp();
             using namespace QuICC::Polynomial::Worland;
@@ -83,7 +83,7 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
             // dim 0 - Nr - radial points
             // dim 1 - N  - radial modes
             // dim 2 - L  - harmonic degree
-            std::array<std::uint32_t, rank> dims {_physDims[2], _modsDims[2], _modsDims[1]};
+            std::array<std::uint32_t, rank> dims {_physDims[0], _modsDims[0], _modsDims[1]};
             std::vector<std::uint32_t> layers;
             /// Dense operator \todo generalize for distributed op
             for (std::size_t i = 0; i < dims[2]; ++i) {
@@ -94,7 +94,7 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, _physDims[2]);
+            quad.computeQuadrature(igrid, iweights, _physDims[0]);
             // Populate op
             auto opView = jwPrjOp->getOp();
             using namespace QuICC::Polynomial::Worland;
@@ -141,7 +141,7 @@ void MapOps::setWorlandInt(mlir::quiccir::JWIOp op)
             // dim 0 - N  - radial modes
             // dim 1 - Nr - radial points
             // dim 2 - L  - harmonic degree
-            std::array<std::uint32_t, rank> dims {_modsDims[2], _physDims[2], _modsDims[1]};
+            std::array<std::uint32_t, rank> dims {_modsDims[0], _physDims[0], _modsDims[1]};
             std::vector<std::uint32_t> layers;
             /// Dense operator \todo generalize for distributed op
             for (std::size_t i = 0; i < dims[2]; ++i) {
@@ -152,7 +152,7 @@ void MapOps::setWorlandInt(mlir::quiccir::JWIOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, _physDims[2]);
+            quad.computeQuadrature(igrid, iweights, _physDims[0]);
             // Populate op
             auto opView = jwIntOp->getOp();
             using namespace QuICC::Polynomial::Worland;
@@ -180,7 +180,7 @@ void MapOps::setWorlandInt(mlir::quiccir::JWIOp op)
             // dim 0 - N  - radial modes
             // dim 1 - Nr - radial points
             // dim 2 - L  - harmonic degree
-            std::array<std::uint32_t, rank> dims {_modsDims[2], _physDims[2], _modsDims[1]};
+            std::array<std::uint32_t, rank> dims {_modsDims[0], _physDims[0], _modsDims[1]};
             std::vector<std::uint32_t> layers;
             /// Dense operator \todo generalize for distributed op
             for (std::size_t i = 0; i < dims[2]; ++i) {
@@ -191,7 +191,7 @@ void MapOps::setWorlandInt(mlir::quiccir::JWIOp op)
             Internal::Array igrid;
             Internal::Array iweights;
             ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, _physDims[2]);
+            quad.computeQuadrature(igrid, iweights, _physDims[0]);
             // Populate op
             auto opView = jwIntOp->getOp();
             using namespace QuICC::Polynomial::Worland;

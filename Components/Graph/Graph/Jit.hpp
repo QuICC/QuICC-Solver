@@ -102,8 +102,10 @@ private:
     void setMeta(const std::vector<View::ViewBase<std::uint32_t>>& meta);
 
     /// @brief map operators
-    /// @param physDims
-    /// @param modsDims
+    /// @param physDims physical dimensions
+    /// order v012, RThetaPhi
+    /// @param modsDims spectral sapce dimensions
+    /// order v012, NLM
     void setMap(const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
         const std::shared_ptr<Memory::memory_resource> mem);
@@ -117,96 +119,62 @@ private:
 public:
     ~Jit()
     {
-        /// \todo clerup meta
+        /// \todo clearup meta
     }
 
     /// @brief Setup Graph from string
     /// @param modStr
+    /// @param mem memory resource
     /// @param physDims
     /// @param modsDims
     /// @param layOpt
+    /// @param outStage
+    /// @param inStage
+    /// @param meta
     Jit(const std::string modStr,
         const std::shared_ptr<Memory::memory_resource> mem,
         const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
         const std::array<std::array<std::string, 2>, RANK> layOpt,
         const Stage outStage, const Stage inStage,
-        const std::vector<View::ViewBase<std::uint32_t>>& meta)
-    {
-        setDialects();
-
-        // Load module
-        _module = mlir::parseSourceString<mlir::ModuleOp>(modStr, &_ctx);
-        insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
-        setDimensions(physDims, modsDims);
-        setLayout(layOpt);
-        setMap(physDims, modsDims, mem);
-        setMeta(meta);
-        lower();
-        setEngineAndJit();
-    }
+        const std::vector<View::ViewBase<std::uint32_t>>& meta);
 
     /// @brief Setup Graph from source file
     /// @param sourceMgr
+    /// @param mem memory resource
     /// @param physDims
     /// @param modsDims
     /// @param layOpt
+    /// @param outStage
+    /// @param inStage
+    /// @param meta
     Jit(const llvm::SourceMgr sourceMgr,
         const std::shared_ptr<Memory::memory_resource> mem,
         const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims,
         const std::array<std::array<std::string, 2>, RANK> layOpt,
         const Stage outStage, const Stage inStage,
-        const std::vector<View::ViewBase<std::uint32_t>>& meta)
-    {
-        setDialects();
+        const std::vector<View::ViewBase<std::uint32_t>>& meta);
 
-        // Load module
-        _module = mlir::parseSourceFile<mlir::ModuleOp>(sourceMgr, &_ctx);
-        insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
-        setDimensions(physDims, modsDims);
-        setLayout(layOpt);
-        setMap(physDims, modsDims, mem);
-        setMeta(meta);
-        lower();
-        setEngineAndJit();
-    }
-
+    /// @brief Apply graph
+    /// 1 input, 1 output
+    /// @tparam Trets
+    /// @tparam Targs
+    /// @param ret0V
+    /// @param arg0V
     template <class Trets, class Targs>
-    void apply(Trets ret0V, Targs arg0V)
-    {
-        // Map view to MLIR view descritor
-        auto arg0 = getViewDescriptor(arg0V);
-        auto ret0 = getViewDescriptor(ret0V);
+    void apply(Trets ret0V, Targs arg0V);
 
-        // Get operators map
-        auto thisArr = _storeOp.getThisArr();
-
-        // Apply graph
-        auto fun = (void (*)(void*, void*, decltype(ret0)*, decltype(arg0)*))_funSym;
-        fun(_metaMap.data(), thisArr.data(), &ret0, &arg0);
-    }
-
+    /// @brief Apply graph
+    /// 3 inputs, 1 output
+    /// @tparam Trets
+    /// @tparam Targs
+    /// @param ret0V
+    /// @param arg0V
+    /// @param arg1V
+    /// @param arg2V
     template <class Trets, class Targs>
-    void apply(Trets ret0V, Targs arg0V, Targs arg1V, Targs arg2V)
-    {
-        // Map view to MLIR view descritor
-        auto arg0 = getViewDescriptor(arg0V);
-        auto arg1 = getViewDescriptor(arg1V);
-        auto arg2 = getViewDescriptor(arg2V);
-        auto ret0 = getViewDescriptor(ret0V);
-
-        // Get operators map
-        auto thisArr = _storeOp.getThisArr();
-
-        // Apply graph
-        auto fun = (void (*)(void*, void*, decltype(ret0)*,
-            decltype(arg0)*,
-            decltype(arg1)*,
-            decltype(arg2)*
-            ))_funSym;
-        fun(_metaMap.data(), thisArr.data(), &ret0, &arg0, &arg1, &arg2);
-    }
+    void apply(Trets ret0V, Targs arg0V, Targs arg1V, Targs arg2V);
 };
 
 template <std::uint32_t RANK>
@@ -426,6 +394,91 @@ void Jit<RANK>::setEngineAndJit()
     _funSym = funSym.get();
 }
 
+template <std::uint32_t RANK>
+Jit<RANK>::Jit(const std::string modStr,
+    const std::shared_ptr<Memory::memory_resource> mem,
+    const std::array<std::uint32_t, RANK> physDims,
+    const std::array<std::uint32_t, RANK> modsDims,
+    const std::array<std::array<std::string, 2>, RANK> layOpt,
+    const Stage outStage, const Stage inStage,
+    const std::vector<View::ViewBase<std::uint32_t>>& meta)
+{
+    setDialects();
+
+    // Load module
+    _module = mlir::parseSourceString<mlir::ModuleOp>(modStr, &_ctx);
+    insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
+    setDimensions(physDims, modsDims);
+    setLayout(layOpt);
+    std::array<std::uint32_t, RANK> tmpPhysDims = {physDims[2], physDims[1], physDims[0]};
+    std::array<std::uint32_t, RANK> tmpModsDims = {modsDims[2], modsDims[1], modsDims[0]};
+    setMap(tmpPhysDims, tmpModsDims, mem);
+    setMeta(meta);
+    lower();
+    setEngineAndJit();
+}
+
+template <std::uint32_t RANK>
+Jit<RANK>::Jit(const llvm::SourceMgr sourceMgr,
+    const std::shared_ptr<Memory::memory_resource> mem,
+    const std::array<std::uint32_t, RANK> physDims,
+    const std::array<std::uint32_t, RANK> modsDims,
+    const std::array<std::array<std::string, 2>, RANK> layOpt,
+    const Stage outStage, const Stage inStage,
+    const std::vector<View::ViewBase<std::uint32_t>>& meta)
+{
+    setDialects();
+
+    // Load module
+    _module = mlir::parseSourceFile<mlir::ModuleOp>(sourceMgr, &_ctx);
+    insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
+    setDimensions(physDims, modsDims);
+    setLayout(layOpt);
+    std::array<std::uint32_t, RANK> tmpPhysDims = {physDims[2], physDims[1], physDims[0]};
+    std::array<std::uint32_t, RANK> tmpModsDims = {modsDims[2], modsDims[1], modsDims[0]};
+    setMap(tmpPhysDims, tmpModsDims, mem);
+    setMeta(meta);
+    lower();
+    setEngineAndJit();
+}
+
+template <std::uint32_t RANK>
+template <class Trets, class Targs>
+void Jit<RANK>::apply(Trets ret0V, Targs arg0V)
+{
+    // Map view to MLIR view descritor
+    auto arg0 = getViewDescriptor(arg0V);
+    auto ret0 = getViewDescriptor(ret0V);
+
+    // Get operators map
+    auto thisArr = _storeOp.getThisArr();
+
+    // Apply graph
+    auto fun = (void (*)(void*, void*, decltype(ret0)*, decltype(arg0)*))_funSym;
+    fun(_metaMap.data(), thisArr.data(), &ret0, &arg0);
+}
+
+template <std::uint32_t RANK>
+template <class Trets, class Targs>
+void Jit<RANK>::apply(Trets ret0V, Targs arg0V, Targs arg1V, Targs arg2V)
+{
+    // Map view to MLIR view descritor
+    auto arg0 = getViewDescriptor(arg0V);
+    auto arg1 = getViewDescriptor(arg1V);
+    auto arg2 = getViewDescriptor(arg2V);
+    auto ret0 = getViewDescriptor(ret0V);
+
+    // Get operators map
+    auto thisArr = _storeOp.getThisArr();
+
+    // Apply graph
+    auto fun = (void (*)(void*, void*, decltype(ret0)*,
+        decltype(arg0)*,
+        decltype(arg1)*,
+        decltype(arg2)*
+        ))_funSym;
+    fun(_metaMap.data(), thisArr.data(), &ret0, &arg0, &arg1, &arg2);
+}
 
 } // namespace Graph
 } // namespace QuICC
