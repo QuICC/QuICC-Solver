@@ -75,17 +75,14 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   using namespace QuICC::TestSuite;
   auto setup = readDimsAndMeta(path, dist, id);
 
-  // Grid dimensions
-  constexpr std::uint32_t dim = 3;
-  std::array<std::uint32_t, dim> physDims{setup.physDims[2], setup.physDims[1], setup.physDims[0]};
-  std::array<std::uint32_t, dim> modsDims{setup.modsDims[2], setup.modsDims[1], setup.modsDims[0]};
-
+  // Layouts
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
   layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   // Physical space (Stage::PPP and Stage::MPP)
+  constexpr std::uint32_t dim = 3;
   std::array<std::vector<std::uint32_t>, dim> pointersPhys {{{}, setup.metaFT.ptr, {}}};
   std::array<std::vector<std::uint32_t>, dim> indicesPhys {{{}, setup.metaFT.idx, {}}};
 
@@ -105,7 +102,7 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   // QuICC::QuICCEnv().synchronize();
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
-  Jit<dim> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::PPP, meta);
+  Jit<dim> Jitter(std::move(sourceMgr), mem, setup.physDims, setup.modsDims, layOpt, Stage::MMM, Stage::PPP, meta);
 
   // host mem block
   std::size_t physS = setup.physDims[2]*indicesPhys[1].size();
@@ -113,6 +110,7 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   QuICC::Memory::MemBlock<std::complex<double>> modsOut(setup.modsDims[0]*indicesMods[1].size(), mem.get());
 
   // host view
+  std::array<std::uint32_t, dim> physDims{setup.physDims[2], setup.physDims[1], setup.physDims[0]};
   R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
   C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {setup.modsDims[0], setup.modsDims[2], setup.modsDims[1]}, pointersMods, indicesMods);
 
@@ -182,17 +180,14 @@ TEST_CASE("Parallel 3D Bwd", "[Parallel3DBwd]")
   using namespace QuICC::TestSuite;
   auto setup = readDimsAndMeta(path, dist, id);
 
-  // Grid dimensions
-  constexpr std::uint32_t dim = 3;
-  std::array<std::uint32_t, dim> physDims{setup.physDims[2], setup.physDims[1], setup.physDims[0]};
-  std::array<std::uint32_t, dim> modsDims{setup.modsDims[2], setup.modsDims[1], setup.modsDims[0]};
-
+  // Layouts
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
   layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   // Physical space (Stage::PPP and Stage::MPP)
+  constexpr std::uint32_t dim = 3;
   std::array<std::vector<std::uint32_t>, dim> pointersPhys {{{}, setup.metaFT.ptr, {}}};
   std::array<std::vector<std::uint32_t>, dim> indicesPhys {{{}, setup.metaFT.idx, {}}};
 
@@ -211,7 +206,7 @@ TEST_CASE("Parallel 3D Bwd", "[Parallel3DBwd]")
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
-  Jit<dim> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::PPP, Stage::MMM, meta);
+  Jit<dim> Jitter(std::move(sourceMgr), mem, setup.physDims, setup.modsDims, layOpt, Stage::PPP, Stage::MMM, meta);
 
   // host mem block
   std::size_t physS = setup.physDims[2]*indicesPhys[1].size();
@@ -219,6 +214,7 @@ TEST_CASE("Parallel 3D Bwd", "[Parallel3DBwd]")
   QuICC::Memory::MemBlock<std::complex<double>> modsIn(setup.modsDims[0]*indicesMods[1].size(), mem.get());
 
   // host view
+  std::array<std::uint32_t, dim> physDims{setup.physDims[2], setup.physDims[1], setup.physDims[0]};
   R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
   C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {setup.modsDims[0], setup.modsDims[2], setup.modsDims[1]}, pointersMods, indicesMods);
 
@@ -287,17 +283,14 @@ TEST_CASE("Parallel 3D Loop", "[Parallel3DLoop]")
   using namespace QuICC::TestSuite;
   auto setup = readDimsAndMeta(path, dist, id);
 
-  // Grid dimensions
-  constexpr std::uint32_t dim = 3;
-  std::array<std::uint32_t, dim> physDims{setup.physDims[2], setup.physDims[1], setup.physDims[0]};
-  std::array<std::uint32_t, dim> modsDims{setup.modsDims[2], setup.modsDims[1], setup.modsDims[0]};
-
+  // Layouts
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
   layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   // Physical space (Stage::PPP and Stage::MPP)
+  constexpr std::uint32_t dim = 3;
   std::array<std::vector<std::uint32_t>, dim> pointersPhys {{{}, setup.metaFT.ptr, {}}};
   std::array<std::vector<std::uint32_t>, dim> indicesPhys {{{}, setup.metaFT.idx, {}}};
 
@@ -316,7 +309,7 @@ TEST_CASE("Parallel 3D Loop", "[Parallel3DLoop]")
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
-  Jit<dim> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::MMM, meta);
+  Jit<dim> Jitter(std::move(sourceMgr), mem, setup.physDims, setup.modsDims, layOpt, Stage::MMM, Stage::MMM, meta);
 
   // host mem block
   QuICC::Memory::MemBlock<std::complex<double>> modsIn(setup.modsDims[0]*indicesMods[1].size(), mem.get());
@@ -391,17 +384,14 @@ TEST_CASE("Parallel Multi Var 3D Fwd", "[ParallelMultiVar3DFwd]")
   using namespace QuICC::TestSuite;
   auto setup = readDimsAndMeta(path, dist, id);
 
-  // Grid dimensions
-  constexpr std::uint32_t dim = 3;
-  std::array<std::uint32_t, dim> physDims{setup.physDims[2], setup.physDims[1], setup.physDims[0]};
-  std::array<std::uint32_t, dim> modsDims{setup.modsDims[2], setup.modsDims[1], setup.modsDims[0]};
-
+  // Layouts
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
   layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   // Physical space (Stage::PPP and Stage::MPP)
+  constexpr std::uint32_t dim = 3;
   std::array<std::vector<std::uint32_t>, dim> pointersPhys {{{}, setup.metaFT.ptr, {}}};
   std::array<std::vector<std::uint32_t>, dim> indicesPhys {{{}, setup.metaFT.idx, {}}};
 
@@ -420,7 +410,7 @@ TEST_CASE("Parallel Multi Var 3D Fwd", "[ParallelMultiVar3DFwd]")
 
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   using namespace QuICC::Graph;
-  Jit<dim> Jitter(std::move(sourceMgr), mem, physDims, modsDims, layOpt, Stage::MMM, Stage::PPP, meta);
+  Jit<dim> Jitter(std::move(sourceMgr), mem, setup.physDims, setup.modsDims, layOpt, Stage::MMM, Stage::PPP, meta);
 
   // host mem block
   std::size_t physS = setup.physDims[2]*indicesPhys[1].size();
@@ -430,6 +420,7 @@ TEST_CASE("Parallel Multi Var 3D Fwd", "[ParallelMultiVar3DFwd]")
   QuICC::Memory::MemBlock<std::complex<double>> modsOut(setup.modsDims[0]*indicesMods[1].size(), mem.get());
 
   // host view
+  std::array<std::uint32_t, dim> physDims{setup.physDims[2], setup.physDims[1], setup.physDims[0]};
   R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
   R_DCCSC3D_t PhiView({Phi.data(), Phi.size()}, physDims, pointersPhys, indicesPhys);
   R_DCCSC3D_t ThetaView({Theta.data(), Theta.size()}, physDims, pointersPhys, indicesPhys);

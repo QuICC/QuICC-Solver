@@ -26,8 +26,10 @@ TEST_CASE("One Dimensional Loop Fourier", "[OneDimLoopFourier]")
 
   // Grid dimensions
   constexpr std::uint32_t rank = 3u;
-  std::array<std::uint32_t, rank> physDims{11, 3, 5};
-  std::array<std::uint32_t, rank> modsDims{6, 3, 5};
+  // v012
+  std::array<std::uint32_t, rank> physDims{5, 3, 11};
+  // v012
+  std::array<std::uint32_t, rank> modsDims{5, 3, 6};
 
   // View Types
   std::array<std::array<std::string, 2>, 3> layOpt;
@@ -41,9 +43,9 @@ TEST_CASE("One Dimensional Loop Fourier", "[OneDimLoopFourier]")
   Jit<rank> Jitter(modStr, mem, physDims, modsDims, layOpt, Stage::MPP, Stage::MPP, meta);
 
   // setup metadata
-  auto modsM = modsDims[0];
+  auto modsM = modsDims[2];
   auto N = physDims[1];
-  auto K = physDims[2];
+  auto K = physDims[0];
   std::array<std::uint32_t, 3> modsDimensions {modsM, N, K};
 
   std::array<std::vector<std::uint32_t>, 3> pointers {{{},{0, 2, 2, 2, 3, 4},{}}};
@@ -90,8 +92,10 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
 
   // Grid dimensions
   constexpr std::uint32_t rank = 3u;
-  std::array<std::uint32_t, rank> physDims{4, 20, 1};
-  std::array<std::uint32_t, rank> modsDims{4, 10, 1};
+  // v012
+  std::array<std::uint32_t, rank> physDims{1, 20, 4};
+  // v012
+  std::array<std::uint32_t, rank> modsDims{1, 10, 4};
 
   // View Types
   std::array<std::array<std::string, 2>, 3> layOpt;
@@ -105,10 +109,10 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   Jit<rank> Jitter(modStr, mem, physDims, modsDims, layOpt, Stage::MPM, Stage::MPM, meta);
 
   // setup metadata
-  auto M = physDims[0];
+  auto M = physDims[2];
   // auto N = physDims[1];
-  auto K = physDims[2];
-  auto modsM = modsDims[0];
+  auto K = physDims[0];
+  auto modsM = modsDims[2];
   auto modsN = modsDims[1];
   // auto modsK = modsDims[2];
 
@@ -173,8 +177,10 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
 
   // Grid dimensions
   constexpr std::uint32_t rank = 3u;
-  std::array<std::uint32_t, rank> physDims{1, 4, 3};
-  std::array<std::uint32_t, rank> modsDims{1, 4, 2};
+  // v012
+  std::array<std::uint32_t, rank> physDims{3, 4, 1};
+  // v012
+  std::array<std::uint32_t, rank> modsDims{2, 4, 1};
 
   // View Types
   std::array<std::array<std::string, 2>, 3> layOpt;
@@ -188,12 +194,12 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
   Jit<rank> Jitter(modStr, mem, physDims, modsDims, layOpt, Stage::MMM, Stage::MMM, meta);
 
   // setup metadata
-  auto M = physDims[0];
+  auto M = physDims[2];
   auto N = physDims[1];
-  // auto K = physDims[2];
-  auto modsM = modsDims[0];
+  // auto K = physDims[0];
+  auto modsM = modsDims[2];
   auto modsN = modsDims[1];
-  auto modsK = modsDims[2];
+  auto modsK = modsDims[0];
 
   // Populate meta for fully populated tensor
   std::vector<std::uint32_t> ptr(N+1);
@@ -257,8 +263,10 @@ TEST_CASE("Serial 3D Fwd", "[Serial3DFwd]")
 
   // Grid dimensions
   constexpr std::uint32_t rank = 3;
-  std::array<std::uint32_t, rank> physDims{10, 6, 3};
-  std::array<std::uint32_t, rank> modsDims{6, 6, 2};
+  // v012
+  std::array<std::uint32_t, rank> physDims{3, 6, 10};
+  // v012
+  std::array<std::uint32_t, rank> modsDims{2, 6, 6};
 
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
@@ -266,12 +274,12 @@ TEST_CASE("Serial 3D Fwd", "[Serial3DFwd]")
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   // setup metadata
-  auto M = physDims[0];
+  auto M = physDims[2];
   auto N = physDims[1];
-  auto K = physDims[2];
-  auto modsM = modsDims[0];
+  auto K = physDims[0];
+  auto modsM = modsDims[2];
   auto modsN = modsDims[1];
-  auto modsK = modsDims[2];
+  auto modsK = modsDims[0];
 
   // Populate meta for fully populated tensor
   // Physical space (Stage::PPP and Stage::MPP)
@@ -317,7 +325,7 @@ TEST_CASE("Serial 3D Fwd", "[Serial3DFwd]")
   QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsK*metaJW.idx.size(), mem.get());
 
   // host view
-  R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
+  R_DCCSC3D_t RView({R.data(), R.size()}, {M, N, K}, pointersPhys, indicesPhys);
   C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
 
   // set input phys
@@ -357,8 +365,9 @@ TEST_CASE("Serial 3D Bwd", "[Serial3DBwd]")
 
   // Grid dimensions
   constexpr std::uint32_t rank = 3;
-  std::array<std::uint32_t, rank> physDims{10, 6, 3};
-  std::array<std::uint32_t, rank> modsDims{6, 6, 2};
+  // v012
+  std::array<std::uint32_t, rank> physDims{3, 6, 10};
+  std::array<std::uint32_t, rank> modsDims{2, 6, 6};
 
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
@@ -366,12 +375,12 @@ TEST_CASE("Serial 3D Bwd", "[Serial3DBwd]")
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   // setup metadata
-  auto M = physDims[0];
+  auto M = physDims[2];
   auto N = physDims[1];
-  auto K = physDims[2];
-  auto modsM = modsDims[0];
+  auto K = physDims[0];
+  auto modsM = modsDims[2];
   auto modsN = modsDims[1];
-  auto modsK = modsDims[2];
+  auto modsK = modsDims[0];
 
   // Populate meta for fully populated tensor
   // Physical space
@@ -418,7 +427,7 @@ TEST_CASE("Serial 3D Bwd", "[Serial3DBwd]")
   QuICC::Memory::MemBlock<std::complex<double>> modsIn(modsK*metaJW.idx.size(), mem.get());
 
   // host view
-  R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
+  R_DCCSC3D_t RView({R.data(), R.size()}, {M, N, K}, pointersPhys, indicesPhys);
   C_DCCSC3D_t modsInView({modsIn.data(), modsIn.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
 
   // set input modes
@@ -457,10 +466,9 @@ TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
 
   // Grid dimensions
   constexpr std::uint32_t rank = 3;
-  //
-  std::array<std::uint32_t, rank> physDims{10, 10, 6};
-  // M L N
-  std::array<std::uint32_t, rank> modsDims{6, 7, 3};
+  // v012
+  std::array<std::uint32_t, rank> physDims{6, 10, 10};
+  std::array<std::uint32_t, rank> modsDims{3, 7, 6};
 
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
@@ -468,12 +476,12 @@ TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   // setup metadata
-  auto M = physDims[0];
+  auto M = physDims[2];
   auto N = physDims[1];
-  auto K = physDims[2];
-  auto modsM = modsDims[0];
+  auto K = physDims[0];
+  auto modsM = modsDims[2];
   auto modsN = modsDims[1];
-  auto modsK = modsDims[2];
+  auto modsK = modsDims[0];
 
   // Populate meta for fully populated tensor
   // Physical space
@@ -561,8 +569,9 @@ TEST_CASE("Serial Multi Var 3D Fwd", "[SerialMultiVar3DFwd]")
 
   // Grid dimensions
   constexpr std::uint32_t rank = 3;
-  std::array<std::uint32_t, rank> physDims{10, 6, 3};
-  std::array<std::uint32_t, rank> modsDims{6, 6, 2};
+  // v012
+  std::array<std::uint32_t, rank> physDims{3, 6, 10};
+  std::array<std::uint32_t, rank> modsDims{2, 6, 6};
 
   std::array<std::array<std::string, 2>, 3> layOpt;
   layOpt[0] = {"DCCSC3D", "DCCSC3D"};
@@ -570,12 +579,12 @@ TEST_CASE("Serial Multi Var 3D Fwd", "[SerialMultiVar3DFwd]")
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   // setup metadata
-  auto M = physDims[0];
+  auto M = physDims[2];
   auto N = physDims[1];
-  auto K = physDims[2];
-  auto modsM = modsDims[0];
+  auto K = physDims[0];
+  auto modsM = modsDims[2];
   auto modsN = modsDims[1];
-  auto modsK = modsDims[2];
+  auto modsK = modsDims[0];
 
   // Populate meta for fully populated tensor
   // Physical space
@@ -625,9 +634,9 @@ TEST_CASE("Serial Multi Var 3D Fwd", "[SerialMultiVar3DFwd]")
   QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsK*metaJW.idx.size(), mem.get());
 
   // host view
-  R_DCCSC3D_t RView({R.data(), R.size()}, physDims, pointersPhys, indicesPhys);
-  R_DCCSC3D_t PhiView({Phi.data(), Phi.size()}, physDims, pointersPhys, indicesPhys);
-  R_DCCSC3D_t ThetaView({Theta.data(), Theta.size()}, physDims, pointersPhys, indicesPhys);
+  R_DCCSC3D_t RView({R.data(), R.size()}, {M, N, K}, pointersPhys, indicesPhys);
+  R_DCCSC3D_t PhiView({Phi.data(), Phi.size()}, {M, N, K}, pointersPhys, indicesPhys);
+  R_DCCSC3D_t ThetaView({Theta.data(), Theta.size()}, {M, N, K}, pointersPhys, indicesPhys);
   C_DCCSC3D_t modsOutView({modsOut.data(), modsOut.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
 
   // set input phys

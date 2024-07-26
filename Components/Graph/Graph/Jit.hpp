@@ -38,6 +38,13 @@ namespace QuICC {
 /// @brief This namespace groups the code needed to connect QuICC and quiccir, a MLIR dialect
 namespace Graph {
 
+/// @brief Return a ViewDescritort struct
+/// (which is a 1:1 map to view type in quiccir)
+/// from a QuICC::View::View
+/// @tparam T scalar type
+/// @tparam ATT attribute encoding (not used at the moment)
+/// @param view
+/// @return
 template<class T, class ATT>
 ViewDescriptor<T, std::uint32_t, 3> getViewDescriptor(View::View<T, ATT> view)
 {
@@ -79,8 +86,10 @@ private:
     /// @brief register needed MLIR dialects
     void setDialects();
     /// @brief set grid and spectral dimensions
-    /// @param physDims
-    /// @param modsDims
+    /// @param physDims physical dimensions
+    /// order v012, RThetaPhi
+    /// @param modsDims spectral sapce dimensions
+    /// order v012, NLM
     /// @param outStage
     /// @param inStage
     void insertWrapper(const std::array<std::uint32_t, RANK> physDims,
@@ -122,8 +131,10 @@ public:
     /// @brief Setup Graph from string
     /// @param modStr
     /// @param mem memory resource
-    /// @param physDims
-    /// @param modsDims
+    /// @param physDims physical dimensions
+    /// order v012, RThetaPhi
+    /// @param modsDims spectral sapce dimensions
+    /// order v012, NLM
     /// @param layOpt
     /// @param outStage
     /// @param inStage
@@ -139,8 +150,10 @@ public:
     /// @brief Setup Graph from source file
     /// @param sourceMgr
     /// @param mem memory resource
-    /// @param physDims
-    /// @param modsDims
+    /// @param physDims physical dimensions
+    /// order v012, RThetaPhi
+    /// @param modsDims spectral sapce dimensions
+    /// order v012, NLM
     /// @param layOpt
     /// @param outStage
     /// @param inStage
@@ -189,6 +202,17 @@ void Jit<RANK>::setDialects()
 
 namespace details
 {
+
+/// @brief Set options for  ViewWrapperPass in mlir
+/// @tparam RANK
+/// @param physDims physical dimensions
+/// order v012, RThetaPhi
+/// @param modsDims spectral sapce dimensions
+/// order v012, NLM
+/// @param layout
+/// @param stage
+/// @param dim mlir uses v210 with layer in first position (v021)
+/// @param lay
 template <std::uint32_t RANK>
 void setOpt(const std::array<std::uint32_t, RANK> physDims,
     const std::array<std::uint32_t, RANK> modsDims,
@@ -200,38 +224,44 @@ void setOpt(const std::array<std::uint32_t, RANK> physDims,
     {
         /// MLIR convention has layer first!
         case Stage::PPP :
-            dim[1] = physDims[0];
+            // v210
+            dim[1] = physDims[2];
             dim[2] = physDims[1];
-            dim[0] = physDims[2];
+            dim[0] = physDims[0];
             lay = layout[0][0];
             break;;
         case Stage::MPP :
-            dim[1] = modsDims[0];
+            // v210
+            dim[1] = modsDims[2];
             dim[2] = physDims[1];
-            dim[0] = physDims[2];
+            dim[0] = physDims[0];
             lay = layout[0][1];
             break;
         case Stage::PPM :
+            // v102
             dim[1] = physDims[1];
-            dim[2] = physDims[2];
-            dim[0] = modsDims[0];
+            dim[2] = physDims[0];
+            dim[0] = modsDims[2];
             lay = layout[1][0];
             break;
         case Stage::MPM :
+            // v102
             dim[1] = modsDims[1];
-            dim[2] = physDims[2];
-            dim[0] = modsDims[0];
+            dim[2] = physDims[0];
+            dim[0] = modsDims[2];
             lay = layout[1][1];
             break;
         case Stage::PMM :
-            dim[1] = physDims[2];
-            dim[2] = modsDims[0];
+            // v021
+            dim[1] = physDims[0];
+            dim[2] = modsDims[2];
             dim[0] = modsDims[1];
             lay = layout[2][0];
             break;
         case Stage::MMM :
-            dim[1] = modsDims[2];
-            dim[2] = modsDims[0];
+            // v021
+            dim[1] = modsDims[0];
+            dim[2] = modsDims[2];
             dim[0] = modsDims[1];
             lay = layout[2][1];
             break;
@@ -403,10 +433,8 @@ Jit<RANK>::Jit(const std::string modStr,
 
     // Load module
     _module = mlir::parseSourceString<mlir::ModuleOp>(modStr, &_ctx);
-    std::array<std::uint32_t, RANK> tmpPhysDims = {physDims[2], physDims[1], physDims[0]};
-    std::array<std::uint32_t, RANK> tmpModsDims = {modsDims[2], modsDims[1], modsDims[0]};
     insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
-    setDimensions(tmpPhysDims, tmpModsDims);
+    setDimensions(physDims, modsDims);
     setLayout(layOpt);
     setMap(mem);
     setMeta(meta);
@@ -427,10 +455,8 @@ Jit<RANK>::Jit(const llvm::SourceMgr sourceMgr,
 
     // Load module
     _module = mlir::parseSourceFile<mlir::ModuleOp>(sourceMgr, &_ctx);
-    std::array<std::uint32_t, RANK> tmpPhysDims = {physDims[2], physDims[1], physDims[0]};
-    std::array<std::uint32_t, RANK> tmpModsDims = {modsDims[2], modsDims[1], modsDims[0]};
     insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
-    setDimensions(tmpPhysDims, tmpModsDims);
+    setDimensions(physDims, modsDims);
     setLayout(layOpt);
     setMap(mem);
     setMeta(meta);
