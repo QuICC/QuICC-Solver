@@ -17,6 +17,10 @@ include(setup/Worland)
 # Create component library
 add_library(${QUICC_CURRENT_COMPONENT_LIB} "")
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB} PROPERTIES LINKER_LANGUAGE CXX)
+
+set_property(TARGET ${QUICC_CURRENT_COMPONENT_LIB}
+  PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"

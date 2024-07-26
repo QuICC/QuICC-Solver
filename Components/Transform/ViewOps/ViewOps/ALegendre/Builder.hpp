@@ -103,6 +103,10 @@ void builder(Tview opView, const Evector<Tdata>& grid,
         }
         else if constexpr (is_projector_v<Tview>)
         {
+            if (layerCounter >= indices.size())
+            {
+                break;
+            }
             if (indices[layerCounter] != k)
             {
                 continue;

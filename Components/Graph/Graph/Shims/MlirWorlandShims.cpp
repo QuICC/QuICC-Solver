@@ -6,6 +6,12 @@
 #include "Graph/BackendsMap.hpp"
 #include "Graph/Types.hpp"
 
+#include "QuICC/Polynomial/Worland/Wnl.hpp"
+#include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
+#include "ViewOps/Worland/Tags.hpp"
+#include "ViewOps/Worland/Builder.hpp"
+#include "DenseSM/Worland/Operator.hpp"
+
 using namespace QuICC::Graph;
 
 /// @brief C Interface to MLIR for a jw int operator
@@ -130,6 +136,33 @@ extern "C" void _ciface_quiccir_jw_prj_complexf64_DCCSC3D_complexf64_DCCSC3D(voi
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
+    if (cl->getOp().data() == nullptr)
+    {
+        // dim 0 - Nr - radial points
+        // dim 1 - N  - radial modes
+        // dim 2 - L  - harmonic degree
+        std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
+        std::vector<std::uint32_t> layers;
+        /// Dense operator \todo generalize for distributed op
+        for (std::size_t i = 0; i < dims[2]; ++i) {
+            if (pUmod->pos[i+1]-pUmod->pos[i] > 0)
+            {
+                layers.push_back(i);
+            }
+        }
+        cl->allocOp(dims, layers);
+        /// Set grid \todo set once per operator kind
+        ::QuICC::Internal::Array igrid;
+        ::QuICC::Internal::Array iweights;
+        ::QuICC::Polynomial::Quadrature::WorlandRule quad;
+        quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
+        // Populate op
+        auto opView = cl->getOp();
+        using namespace QuICC::Polynomial::Worland;
+        using namespace QuICC::Transform::Worland;
+        Builder<Top, QuICC::DenseSM::Worland::Operator<Wnl>, bwd_t> tBuilder;
+        tBuilder.compute(opView, igrid, ::QuICC::Internal::Array());
+    }
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewVal, viewMod);

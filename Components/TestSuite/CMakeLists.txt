@@ -39,6 +39,8 @@ if(QUICC_USE_MPI)
     PRIVATE
       MPI::MPI_CXX
   )
+  target_compile_definitions(${QUICC_CURRENT_COMPONENT_LIB}
+    PRIVATE "QUICC_MPI")
 endif()
 
 # Alias
