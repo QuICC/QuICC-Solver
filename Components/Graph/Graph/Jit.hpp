@@ -89,8 +89,10 @@ private:
         const Stage outStage, const Stage inStage);
 
     /// @brief set grid and spectral dimensions
-    /// @param physDims
-    /// @param modsDims
+    /// @param physDims physical dimensions
+    /// order v012, RThetaPhi
+    /// @param modsDims spectral sapce dimensions
+    /// order v012, NLM
     void setDimensions(const std::array<std::uint32_t, RANK> physDims,
         const std::array<std::uint32_t, RANK> modsDims);
 
@@ -272,8 +274,9 @@ void Jit<RANK>::setDimensions(const std::array<std::uint32_t, RANK> physDims,
     pmPre.addPass(mlir::createInlinerPass());
     mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
     // Reorder dimensions based on mlir convention
-    std::array<std::int64_t, RANK> phys{physDims[2], physDims[0], physDims[1]};
-    std::array<std::int64_t, RANK> mods{modsDims[2], modsDims[0], modsDims[1]};
+    // mlir uses v210 with layer in first position (v021)
+    std::array<std::int64_t, RANK> phys{physDims[0], physDims[2], physDims[1]};
+    std::array<std::int64_t, RANK> mods{modsDims[0], modsDims[2], modsDims[1]};
     nestedFuncPmPre.addPass(mlir::quiccir::createSetDimensionsPass(phys, mods));
 
     if (mlir::failed(pmPre.run(*_module))) {
@@ -403,7 +406,7 @@ Jit<RANK>::Jit(const std::string modStr,
     std::array<std::uint32_t, RANK> tmpPhysDims = {physDims[2], physDims[1], physDims[0]};
     std::array<std::uint32_t, RANK> tmpModsDims = {modsDims[2], modsDims[1], modsDims[0]};
     insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
-    setDimensions(physDims, modsDims);
+    setDimensions(tmpPhysDims, tmpModsDims);
     setLayout(layOpt);
     setMap(mem);
     setMeta(meta);
@@ -427,7 +430,7 @@ Jit<RANK>::Jit(const llvm::SourceMgr sourceMgr,
     std::array<std::uint32_t, RANK> tmpPhysDims = {physDims[2], physDims[1], physDims[0]};
     std::array<std::uint32_t, RANK> tmpModsDims = {modsDims[2], modsDims[1], modsDims[0]};
     insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
-    setDimensions(physDims, modsDims);
+    setDimensions(tmpPhysDims, tmpModsDims);
     setLayout(layOpt);
     setMap(mem);
     setMeta(meta);
