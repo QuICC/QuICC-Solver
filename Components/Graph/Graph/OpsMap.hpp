@@ -30,12 +30,6 @@ namespace Graph
 class MapOps
 {
   private:
-    /// @brief physical dimensions
-    /// order v012, RThetaPhi
-    std::array<std::uint32_t, 3> _physDims;
-    /// @brief spectral sapce dimensions
-    /// order v012, NLM
-    std::array<std::uint32_t, 3> _modsDims;
     /// @brief store pointers for passing into MLIR
     std::vector<void*> _thisArr;
     /// @brief store for RAII
@@ -58,12 +52,8 @@ class MapOps
     /// @brief constructor from mlir module
     /// @param module mlir module
     /// @param mem memory resource to pass to operators
-    /// @param physDims physical dimensions of the problem
-    /// @param modsDims spectral dimensions of the problem
     MapOps(mlir::ModuleOp module,
-      const std::shared_ptr<Memory::memory_resource> mem,
-      const std::array<std::uint32_t, 3> physDims,
-      const std::array<std::uint32_t, 3> modsDims);
+      const std::shared_ptr<Memory::memory_resource> mem);
 
     /// @brief return void pointers to ops
     std::vector<void*> getThisArr(){return _thisArr;}

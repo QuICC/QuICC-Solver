@@ -6,12 +6,7 @@
 //
 #include "Graph/OpsMap.hpp"
 #include "Graph/BackendsMap.hpp"
-#include "QuICC/Polynomial/Worland/Wnl.hpp"
-#include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 #include "ViewOps/Worland/Tags.hpp"
-#include "ViewOps/Worland/Builder.hpp"
-#include "DenseSM/Worland/Operator.hpp"
-
 
 namespace QuICC
 {
@@ -38,30 +33,6 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
             using op_t = Op<Tout, Tin, Top, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
-            // Setup operator
-            // auto jwPrjOp = dynamic_cast<op_t*>(ptr);
-            // constexpr size_t rank = 3;
-            // // dim 0 - Nr - radial points
-            // // dim 1 - N  - radial modes
-            // // dim 2 - L  - harmonic degree
-            // std::array<std::uint32_t, rank> dims {_physDims[0], _modsDims[0], _modsDims[1]};
-            // std::vector<std::uint32_t> layers;
-            // /// Dense operator \todo generalize for distributed op
-            // for (std::size_t i = 0; i < dims[2]; ++i) {
-            //     layers.push_back(i);
-            // }
-            // jwPrjOp->allocOp(dims, layers);
-            // /// Set grid \todo set once per operator kind
-            // Internal::Array igrid;
-            // Internal::Array iweights;
-            // ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            // quad.computeQuadrature(igrid, iweights, _physDims[0]);
-            // // Populate op
-            // auto opView = jwPrjOp->getOp();
-            // using namespace QuICC::Polynomial::Worland;
-            // using namespace QuICC::Transform::Worland;
-            // Builder<Top, QuICC::DenseSM::Worland::Operator<Wnl>, bwd_t> tBuilder;
-            // tBuilder.compute(opView, igrid, Internal::Array());
             // Add to thisArr
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -77,30 +48,6 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
             using op_t = Op<Tout, Tin, Top, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
-            // Setup operator
-            auto jwPrjOp = dynamic_cast<op_t*>(ptr);
-            constexpr size_t rank = 3;
-            // dim 0 - Nr - radial points
-            // dim 1 - N  - radial modes
-            // dim 2 - L  - harmonic degree
-            std::array<std::uint32_t, rank> dims {_physDims[0], _modsDims[0], _modsDims[1]};
-            std::vector<std::uint32_t> layers;
-            /// Dense operator \todo generalize for distributed op
-            for (std::size_t i = 0; i < dims[2]; ++i) {
-                layers.push_back(i);
-            }
-            jwPrjOp->allocOp(dims, layers);
-            /// Set grid \todo set once per operator kind
-            Internal::Array igrid;
-            Internal::Array iweights;
-            ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, _physDims[0]);
-            // Populate op
-            auto opView = jwPrjOp->getOp();
-            using namespace QuICC::Polynomial::Worland;
-            using namespace QuICC::Transform::Worland;
-            Builder<Top, QuICC::DenseSM::Worland::Operator<Wnl>, bwd_t> tBuilder;
-            tBuilder.compute(opView, igrid, Internal::Array());
             // Add to thisArr
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -135,30 +82,6 @@ void MapOps::setWorlandInt(mlir::quiccir::JWIOp op)
             using op_t = Op<Tout, Tin, Top, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
-            // Setup operator
-            auto jwIntOp = dynamic_cast<op_t*>(ptr);
-            constexpr size_t rank = 3;
-            // dim 0 - N  - radial modes
-            // dim 1 - Nr - radial points
-            // dim 2 - L  - harmonic degree
-            std::array<std::uint32_t, rank> dims {_modsDims[0], _physDims[0], _modsDims[1]};
-            std::vector<std::uint32_t> layers;
-            /// Dense operator \todo generalize for distributed op
-            for (std::size_t i = 0; i < dims[2]; ++i) {
-            layers.push_back(i);
-            }
-            jwIntOp->allocOp(dims, layers);
-            /// Set grid \todo set once per operator kind
-            Internal::Array igrid;
-            Internal::Array iweights;
-            ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, _physDims[0]);
-            // Populate op
-            auto opView = jwIntOp->getOp();
-            using namespace QuICC::Polynomial::Worland;
-            using namespace QuICC::Transform::Worland;
-            Builder<Top, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilder;
-            tBuilder.compute(opView, igrid, iweights);
             // Add to thisArr
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -174,30 +97,6 @@ void MapOps::setWorlandInt(mlir::quiccir::JWIOp op)
             using op_t = Op<Tout, Tin, Top, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
-            // Setup operator
-            auto jwIntOp = dynamic_cast<op_t*>(ptr);
-            constexpr size_t rank = 3;
-            // dim 0 - N  - radial modes
-            // dim 1 - Nr - radial points
-            // dim 2 - L  - harmonic degree
-            std::array<std::uint32_t, rank> dims {_modsDims[0], _physDims[0], _modsDims[1]};
-            std::vector<std::uint32_t> layers;
-            /// Dense operator \todo generalize for distributed op
-            for (std::size_t i = 0; i < dims[2]; ++i) {
-            layers.push_back(i);
-            }
-            jwIntOp->allocOp(dims, layers);
-            /// Set grid \todo set once per operator kind
-            Internal::Array igrid;
-            Internal::Array iweights;
-            ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-            quad.computeQuadrature(igrid, iweights, _physDims[0]);
-            // Populate op
-            auto opView = jwIntOp->getOp();
-            using namespace QuICC::Polynomial::Worland;
-            using namespace QuICC::Transform::Worland;
-            Builder<Top, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilder;
-            tBuilder.compute(opView, igrid, iweights);
             // Add to thisArr
             assert(ptr != nullptr);
             _thisArr[index] = ptr;

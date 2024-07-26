@@ -49,6 +49,29 @@ extern "C" void _ciface_quiccir_jw_int_complexf64_DCCSC3D_complexf64_DCCSC3D(voi
     Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
+    if (cl->getOp().data() == nullptr)
+    {
+        // dim 0 - N  - radial modes
+        // dim 1 - Nr - radial points
+        // dim 2 - L  - harmonic degree
+        std::array<std::uint32_t, rank> dims {pUmod->dims[0], pUval->dims[0], pUmod->dims[2]};
+        std::vector<std::uint32_t> layers;
+        for (std::size_t i = 0; i < dims[2]; ++i) {
+            layers.push_back(i);
+        }
+        cl->allocOp(dims, layers);
+        /// Set grid \todo set once per operator kind
+        ::QuICC::Internal::Array igrid;
+        ::QuICC::Internal::Array iweights;
+        ::QuICC::Polynomial::Quadrature::WorlandRule quad;
+        quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
+        // Populate op
+        auto opView = cl->getOp();
+        using namespace QuICC::Polynomial::Worland;
+        using namespace QuICC::Transform::Worland;
+        Builder<Top, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilder;
+        tBuilder.compute(opView, igrid, iweights);
+    }
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewMod, viewVal);
@@ -96,6 +119,29 @@ extern "C" void _ciface_quiccir_jw_int_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJ
     Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
+    if (cl->getOp().data() == nullptr)
+    {
+        // dim 0 - N  - radial modes
+        // dim 1 - Nr - radial points
+        // dim 2 - L  - harmonic degree
+        std::array<std::uint32_t, rank> dims {pUmod->dims[0], pUval->dims[0], pUmod->dims[2]};
+        std::vector<std::uint32_t> layers;
+        for (std::size_t i = 0; i < dims[2]; ++i) {
+            layers.push_back(i);
+        }
+        cl->allocOp(dims, layers);
+        /// Set grid \todo set once per operator kind
+        ::QuICC::Internal::Array igrid;
+        ::QuICC::Internal::Array iweights;
+        ::QuICC::Polynomial::Quadrature::WorlandRule quad;
+        quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
+        // Populate op
+        auto opView = cl->getOp();
+        using namespace QuICC::Polynomial::Worland;
+        using namespace QuICC::Transform::Worland;
+        Builder<Top, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilder;
+        tBuilder.compute(opView, igrid, iweights);
+    }
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewMod, viewVal);
@@ -143,7 +189,6 @@ extern "C" void _ciface_quiccir_jw_prj_complexf64_DCCSC3D_complexf64_DCCSC3D(voi
         // dim 2 - L  - harmonic degree
         std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
         std::vector<std::uint32_t> layers;
-        /// Dense operator \todo generalize for distributed op
         for (std::size_t i = 0; i < dims[2]; ++i) {
             if (pUmod->pos[i+1]-pUmod->pos[i] > 0)
             {
@@ -209,6 +254,29 @@ extern "C" void _ciface_quiccir_jw_prj_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJ
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
+    if (cl->getOp().data() == nullptr)
+    {
+        // dim 0 - Nr - radial points
+        // dim 1 - N  - radial modes
+        // dim 2 - L  - harmonic degree
+        std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
+        std::vector<std::uint32_t> layers;
+        for (std::size_t i = 0; i < dims[2]; ++i) {
+            layers.push_back(i);
+        }
+        cl->allocOp(dims, layers);
+        /// Set grid \todo set once per operator kind
+        ::QuICC::Internal::Array igrid;
+        ::QuICC::Internal::Array iweights;
+        ::QuICC::Polynomial::Quadrature::WorlandRule quad;
+        quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
+        // Populate op
+        auto opView = cl->getOp();
+        using namespace QuICC::Polynomial::Worland;
+        using namespace QuICC::Transform::Worland;
+        Builder<Top, QuICC::DenseSM::Worland::Operator<Wnl>, bwd_t> tBuilder;
+        tBuilder.compute(opView, igrid, ::QuICC::Internal::Array());
+    }
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewVal, viewMod);

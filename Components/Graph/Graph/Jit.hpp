@@ -102,13 +102,8 @@ private:
     void setMeta(const std::vector<View::ViewBase<std::uint32_t>>& meta);
 
     /// @brief map operators
-    /// @param physDims physical dimensions
-    /// order v012, RThetaPhi
-    /// @param modsDims spectral sapce dimensions
-    /// order v012, NLM
-    void setMap(const std::array<std::uint32_t, RANK> physDims,
-        const std::array<std::uint32_t, RANK> modsDims,
-        const std::shared_ptr<Memory::memory_resource> mem);
+    /// @param mem memory resource to be passed to operators
+    void setMap(const std::shared_ptr<Memory::memory_resource> mem);
 
     /// @brief lower graph to LLVM IR
     void lower();
@@ -333,12 +328,10 @@ void Jit<RANK>::setMeta(const std::vector<View::ViewBase<std::uint32_t>>& meta)
 }
 
 template <std::uint32_t RANK>
-void Jit<RANK>::setMap(const std::array<std::uint32_t, RANK> physDims,
-    const std::array<std::uint32_t, RANK> modsDims,
-    const std::shared_ptr<Memory::memory_resource> mem)
+void Jit<RANK>::setMap(const std::shared_ptr<Memory::memory_resource> mem)
 {
     // setup ops map and store
-    _storeOp = std::move(QuICC::Graph::MapOps(*_module, mem, physDims, modsDims));
+    _storeOp = std::move(QuICC::Graph::MapOps(*_module, mem));
 }
 
 template <std::uint32_t RANK>
@@ -407,12 +400,12 @@ Jit<RANK>::Jit(const std::string modStr,
 
     // Load module
     _module = mlir::parseSourceString<mlir::ModuleOp>(modStr, &_ctx);
+    std::array<std::uint32_t, RANK> tmpPhysDims = {physDims[2], physDims[1], physDims[0]};
+    std::array<std::uint32_t, RANK> tmpModsDims = {modsDims[2], modsDims[1], modsDims[0]};
     insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
     setDimensions(physDims, modsDims);
     setLayout(layOpt);
-    std::array<std::uint32_t, RANK> tmpPhysDims = {physDims[2], physDims[1], physDims[0]};
-    std::array<std::uint32_t, RANK> tmpModsDims = {modsDims[2], modsDims[1], modsDims[0]};
-    setMap(tmpPhysDims, tmpModsDims, mem);
+    setMap(mem);
     setMeta(meta);
     lower();
     setEngineAndJit();
@@ -431,12 +424,12 @@ Jit<RANK>::Jit(const llvm::SourceMgr sourceMgr,
 
     // Load module
     _module = mlir::parseSourceFile<mlir::ModuleOp>(sourceMgr, &_ctx);
+    std::array<std::uint32_t, RANK> tmpPhysDims = {physDims[2], physDims[1], physDims[0]};
+    std::array<std::uint32_t, RANK> tmpModsDims = {modsDims[2], modsDims[1], modsDims[0]};
     insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
     setDimensions(physDims, modsDims);
     setLayout(layOpt);
-    std::array<std::uint32_t, RANK> tmpPhysDims = {physDims[2], physDims[1], physDims[0]};
-    std::array<std::uint32_t, RANK> tmpModsDims = {modsDims[2], modsDims[1], modsDims[0]};
-    setMap(tmpPhysDims, tmpModsDims, mem);
+    setMap(mem);
     setMeta(meta);
     lower();
     setEngineAndJit();

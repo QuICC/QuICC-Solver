@@ -6,6 +6,12 @@
 #include "Graph/Types.hpp"
 #include "Graph/Shims/MlirShims.hpp"
 
+#include "QuICC/Polynomial/ALegendre/Plm.hpp"
+#include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
+#include "ViewOps/ALegendre/Builder.hpp"
+#include "Types/Internal/Math.hpp"
+
+
 using namespace QuICC::Graph;
 
 /// @brief C Interface to MLIR for a al int operator
@@ -42,6 +48,30 @@ extern "C" void _ciface_quiccir_al_int_complexf64_S1CLCSC3D_complexf64_DCCSC3D(v
     Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
+    if (cl->getOp().data() == nullptr)
+    {
+        /// dim 0 - L  - harmonic degree
+        /// dim 1 - Ntheta - colatitudinal points
+        /// dim 2 - M  - harmonic order
+        std::array<std::uint32_t, rank> dims {pUmod->dims[0], pUval->dims[0], pUmod->dims[2]};
+        std::vector<std::uint32_t> layers;
+        /// Dense operator \todo generalize for distributed op
+        for (std::size_t i = 0; i < dims[2]; ++i) {
+            layers.push_back(i);
+        }
+        cl->allocOp(dims, layers);
+        /// Set grid \todo set once per operator kind
+        ::QuICC::Internal::Array igrid;
+        ::QuICC::Internal::Array iweights;
+        ::QuICC::Polynomial::Quadrature::LegendreRule quad;
+        quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
+        // scale for spherical harmonics
+        iweights.array() *= 2.0*::QuICC::Internal::Math::PI;
+        // Populate op
+        auto opView = cl->getOp();
+        using namespace QuICC::Transform::ALegendre;
+        builder<Top, ::QuICC::Polynomial::ALegendre::Plm, ::QuICC::Internal::Array::Scalar, 0>(opView, igrid, iweights);
+    }
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewMod, viewVal);
@@ -88,6 +118,30 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj
     Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
+    if (cl->getOp().data() == nullptr)
+    {
+        /// dim 0 - L  - harmonic degree
+        /// dim 1 - Ntheta - colatitudinal points
+        /// dim 2 - M  - harmonic order
+        std::array<std::uint32_t, rank> dims {pUmod->dims[0], pUval->dims[0], pUmod->dims[2]};
+        std::vector<std::uint32_t> layers;
+        /// Dense operator \todo generalize for distributed op
+        for (std::size_t i = 0; i < dims[2]; ++i) {
+            layers.push_back(i);
+        }
+        alIntOp->allocOp(dims, layers);
+        /// Set grid \todo set once per operator kind
+        ::QuICC::Internal::Array igrid;
+        ::QuICC::Internal::Array iweights;
+        ::QuICC::Polynomial::Quadrature::LegendreRule quad;
+        quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
+        // scale for spherical harmonics
+        iweights.array() *= 2.0*::QuICC::Internal::Math::PI;
+        // Populate op
+        auto opView = alIntOp->getOp();
+        using namespace QuICC::Transform::ALegendre;
+        builder<Top, ::QuICC::Polynomial::ALegendre::Plm, ::QuICC::Internal::Array::Scalar, 0>(opView, igrid, iweights);
+    }
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewMod, viewVal);
@@ -128,6 +182,28 @@ extern "C" void _ciface_quiccir_al_prj_complexf64_DCCSC3D_complexf64_S1CLCSC3D(v
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
+    if (cl->getOp().data() == nullptr)
+    {
+        /// dim 0 - Ntheta - colatitudinal points
+        /// dim 1 - L  - harmonic degree
+        /// dim 2 - M  - harmonic order
+        std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
+        std::vector<std::uint32_t> layers;
+        /// Dense operator \todo generalize for distributed op
+        for (std::size_t i = 0; i < dims[2]; ++i) {
+            layers.push_back(i);
+        }
+        cl->allocOp(dims, layers);
+        /// Set grid \todo set once per operator kind
+        ::QuICC::Internal::Array igrid;
+        ::QuICC::Internal::Array iweights;
+        ::QuICC::Polynomial::Quadrature::LegendreRule quad;
+        quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
+        // Populate op
+        auto opView = cl->getOp();
+        using namespace QuICC::Transform::ALegendre;
+        builder<Top, ::QuICC::Polynomial::ALegendre::Plm, ::QuICC::Internal::Array::Scalar, 0>(opView, igrid, ::QuICC::Internal::Array());
+    }
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewVal, viewMod);
@@ -174,6 +250,28 @@ extern "C" void _ciface_quiccir_al_prj_complexf64_DCCSC3DJIK_complexf64_S1CLCSC3
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
+    if (cl->getOp().data() == nullptr)
+    {
+        /// dim 0 - Ntheta - colatitudinal points
+        /// dim 1 - L  - harmonic degree
+        /// dim 2 - M  - harmonic order
+        std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
+        std::vector<std::uint32_t> layers;
+        /// Dense operator \todo generalize for distributed op
+        for (std::size_t i = 0; i < dims[2]; ++i) {
+            layers.push_back(i);
+        }
+        cl->allocOp(dims, layers);
+        /// Set grid \todo set once per operator kind
+        ::QuICC::Internal::Array igrid;
+        ::QuICC::Internal::Array iweights;
+        ::QuICC::Polynomial::Quadrature::LegendreRule quad;
+        quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
+        // Populate op
+        auto opView = cl->getOp();
+        using namespace QuICC::Transform::ALegendre;
+        builder<Top, Polynomial::ALegendre::Plm, ::QuICC::Internal::Array::Scalar, 0>(opView, igrid, ::QuICC::Internal::Array());
+    }
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewVal, viewMod);

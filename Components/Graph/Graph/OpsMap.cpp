@@ -9,10 +9,8 @@ namespace Graph
 {
 
 MapOps::MapOps(mlir::ModuleOp module,
-      const std::shared_ptr<Memory::memory_resource> mem,
-      const std::array<std::uint32_t, 3> physDims,
-      const std::array<std::uint32_t, 3> modsDims) :
-      _physDims(physDims), _modsDims(modsDims), _mem(mem) {
+      const std::shared_ptr<Memory::memory_resource> mem) :
+        _mem(mem) {
     #ifdef QUICC_HAS_CUDA_BACKEND
     // Check memory space
     {
