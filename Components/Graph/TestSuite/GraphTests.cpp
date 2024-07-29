@@ -28,7 +28,6 @@ TEST_CASE("One Dimensional Loop Fourier", "[OneDimLoopFourier]")
   constexpr std::uint32_t rank = 3u;
   // v012
   std::array<std::uint32_t, rank> physDims{5, 3, 11};
-  // v012
   std::array<std::uint32_t, rank> modsDims{5, 3, 6};
 
   // View Types
@@ -94,7 +93,6 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   constexpr std::uint32_t rank = 3u;
   // v012
   std::array<std::uint32_t, rank> physDims{1, 20, 4};
-  // v012
   std::array<std::uint32_t, rank> modsDims{1, 10, 4};
 
   // View Types
@@ -179,7 +177,6 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
   constexpr std::uint32_t rank = 3u;
   // v012
   std::array<std::uint32_t, rank> physDims{3, 4, 1};
-  // v012
   std::array<std::uint32_t, rank> modsDims{2, 4, 1};
 
   // View Types
@@ -476,7 +473,7 @@ TEST_CASE("Serial 3D Loop", "[Serial3DLoop]")
   layOpt[2] = {"DCCSC3D", "DCCSC3D"};
 
   // setup metadata
-  auto M = physDims[2];
+  // auto M = physDims[2];
   auto N = physDims[1];
   auto K = physDims[0];
   auto modsM = modsDims[2];
