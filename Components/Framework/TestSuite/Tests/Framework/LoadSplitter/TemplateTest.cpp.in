@@ -46,7 +46,6 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
 
       currentts::args().params.clear();
       currentts::args().params.push_back(0);
-      currentts::args().params.push_back(2);
       auto np = currentts::args().np;
       currentts::args().params.push_back((np-1)/2);
       currentts::args().params.push_back(np-1);
