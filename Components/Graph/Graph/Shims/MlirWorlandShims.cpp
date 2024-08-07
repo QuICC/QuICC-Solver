@@ -213,6 +213,16 @@ extern "C" void _ciface_quiccir_jw_prj_complexf64_DCCSC3D_complexf64_DCCSC3D(voi
     cl->apply(viewVal, viewMod);
 };
 
+/// @brief C Interface to MLIR for a jw prj operator
+/// column major data, cpu operators
+/// @param op
+/// @param uval
+/// @param umod
+extern "C" void _ciface_quiccir_jw_prj_P_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
+{
+    _ciface_quiccir_jw_prj_complexf64_DCCSC3D_complexf64_DCCSC3D(obj, pUval, pUmod);
+}
+
 #ifdef QUICC_HAS_CUDA_BACKEND
 /// @brief C Interface to MLIR for a jw prj operator
 /// row major data, gpu operators

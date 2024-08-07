@@ -13,11 +13,7 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
 target_sources(${QUICC_CURRENT_COMPONENT_LIB}
   PRIVATE
     OpsMap.cpp
-    Map/FourierMap.cpp
-    Map/ALegendreMap.cpp
-    Map/WorlandMap.cpp
-    Map/PointwiseMap.cpp
-    Map/TransposeMap.cpp
 )
 
+add_subdirectory(Maps)
 add_subdirectory(Shims)
