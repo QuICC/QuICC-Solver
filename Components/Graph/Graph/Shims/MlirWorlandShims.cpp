@@ -213,16 +213,6 @@ extern "C" void _ciface_quiccir_jw_prj_complexf64_DCCSC3D_complexf64_DCCSC3D(voi
     cl->apply(viewVal, viewMod);
 };
 
-/// @brief C Interface to MLIR for a jw prj operator
-/// column major data, cpu operators
-/// @param op
-/// @param uval
-/// @param umod
-extern "C" void _ciface_quiccir_jw_prj_P_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
-{
-    _ciface_quiccir_jw_prj_complexf64_DCCSC3D_complexf64_DCCSC3D(obj, pUval, pUmod);
-}
-
 #ifdef QUICC_HAS_CUDA_BACKEND
 /// @brief C Interface to MLIR for a jw prj operator
 /// row major data, gpu operators
@@ -271,6 +261,7 @@ extern "C" void _ciface_quiccir_jw_prj_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJ
         // dim 2 - L  - harmonic degree
         std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
         std::vector<std::uint32_t> layers;
+        /// \todo getLayers
         for (std::size_t i = 0; i < dims[2]; ++i) {
             layers.push_back(i);
         }

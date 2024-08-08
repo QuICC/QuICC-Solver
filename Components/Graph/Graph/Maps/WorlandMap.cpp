@@ -53,6 +53,7 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
             _thisArr[index] = ptr;
         }
         #endif
+    }
     else
     {
         #ifndef NDEBUG
