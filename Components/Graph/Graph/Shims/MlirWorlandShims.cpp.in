@@ -6,11 +6,8 @@
 #include "Graph/BackendsMap.hpp"
 #include "Graph/Types.hpp"
 
-#include "QuICC/Polynomial/Worland/@PolyBuilder@.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
-#include "ViewOps/Worland/Tags.hpp"
-#include "ViewOps/Worland/Builder.hpp"
-#include "DenseSM/Worland/Operator.hpp"
+#include "ViewOps/Worland/OpsBuilder.hpp"
 
 using namespace QuICC::Graph;
 
@@ -69,9 +66,8 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
         quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
         // Populate op
         auto opView = cl->getOp();
-        using namespace QuICC::Polynomial::Worland;
         using namespace QuICC::Transform::Worland;
-        Builder<Top, QuICC::DenseSM::Worland::@OpBuilder@, @OpDirection@> tBuilder;
+        OpsBuilder<Top, @Kind@_t, @OpDirection@> tBuilder;
         tBuilder.compute(opView, igrid, ::QuICC::Internal::Array());
     }
     assert(cl->getOp().data() != nullptr);

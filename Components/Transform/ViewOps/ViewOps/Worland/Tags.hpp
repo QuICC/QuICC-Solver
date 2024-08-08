@@ -31,6 +31,22 @@ struct bwd_t
 {
 };
 
+/// @brief P op type tag
+struct P_t
+{
+};
+
+/// @brief D1 op type tag
+struct D1_t
+{
+};
+
+/// @brief D1R1 op type tag
+struct D1R1_t
+{
+};
+
+
 } // namespace Worland
 } // namespace Transform
 } // namespace QuICC
