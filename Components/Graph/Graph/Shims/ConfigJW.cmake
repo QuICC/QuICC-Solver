@@ -6,7 +6,7 @@
 # Ops: quiccir.jw.prj, quiccir.jw.int
 set(Ops "prj;int")
 # kinds: P, D1, ...
-set(prjKinds "P;D1;D1R1")
+set(prjKinds "P;D1;D1R1;D1_P;DivR1;DivR1_Zero;DivR1D1R1;DivR1D1R1_Zero;SphLapl;CylLaplh;CylLaplh_DivR1D1R1;D1CylLaplh;D1CylLaplh_D1DivR1D1R1;DivR1CylLaplh_Zero")
 
 # map op name to direction
 set(prjOpDirection "bwd_t")
