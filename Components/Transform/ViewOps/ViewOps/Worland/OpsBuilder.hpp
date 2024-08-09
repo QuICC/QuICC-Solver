@@ -13,6 +13,7 @@
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/dWnl.hpp"
 #include "QuICC/Polynomial/Worland/drWnl.hpp"
+#include "QuICC/Polynomial/Worland/rWnl.hpp"
 #include "QuICC/Polynomial/Worland/r_1drWnl.hpp"
 #include "QuICC/Polynomial/Worland/dr_1drWnl.hpp"
 #include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
@@ -22,6 +23,8 @@
 #include "QuICC/Polynomial/Worland/dclaplhWnl.hpp"
 #include "DenseSM/Worland/Operator.hpp"
 #include "DenseSM/Worland/OperatorWithMean.hpp"
+#include "DenseSM/Worland/OperatorIN.hpp"
+#include "DenseSM/Worland/OperatorINWithMean.hpp"
 #include "ViewOps/Worland/Tags.hpp"
 #include "ViewOps/Worland/Builder.hpp"
 
@@ -104,6 +107,14 @@ struct OpsBuilderMap<VOP, DivR1_Zero_t, bwd_t> {
     using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<r_1Wnl<recurrence_t>, void>, bwd_t>;
 };
 
+/// @brief DivR1_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, DivR1_Zero_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<r_1Wnl<implicit_t>, void>, fwd_t>;
+};
+
 /// @brief DivR1D1R1 Builder
 /// Projector only
 /// @tparam VOP operator view type
@@ -118,6 +129,14 @@ struct OpsBuilderMap<VOP, DivR1D1R1_t, bwd_t> {
 template <class VOP>
 struct OpsBuilderMap<VOP, DivR1D1R1_Zero_t, bwd_t> {
     using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<r_1drWnl<recurrence_t>, void>, bwd_t>;
+};
+
+/// @brief DivR1D1R1_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, DivR1D1R1_Zero_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<r_1drWnl<implicit_t>, void>, fwd_t>;
 };
 
 /// @brief SphLapl Builder
@@ -166,6 +185,77 @@ struct OpsBuilderMap<VOP, D1CylLaplh_D1DivR1D1R1_t, bwd_t> {
 template <class VOP>
 struct OpsBuilderMap<VOP, DivR1CylLaplh_Zero_t, bwd_t> {
     using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<r_1claplhWnl, void>, bwd_t>;
+};
+
+/// @brief P_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, P_Zero_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<Wnl, void>, fwd_t>;
+};
+
+/// @brief R1_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, R1_Zero_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<rWnl, void>, fwd_t>;
+};
+
+/// @brief I2 Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, I2_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorIN<Wnl, ::QuICC::SparseSM::Worland::I2>, fwd_t>;
+};
+/// @brief I2_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, I2_Zero_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorINWithMean<Wnl, ::QuICC::SparseSM::Worland::I2>, fwd_t>;
+};
+
+/// @brief I2DivR1_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, I2DivR1_Zero_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorINWithMean<r_1Wnl<implicit_t>, ::QuICC::SparseSM::Worland::I2>, fwd_t>;
+};
+
+/// @brief I4DivR1_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, I4DivR1_Zero_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorINWithMean<r_1Wnl<implicit_t>, ::QuICC::SparseSM::Worland::I4>, fwd_t>;
+};
+
+/// @brief I6DivR1_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, I6DivR1_Zero_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorINWithMean<r_1Wnl<implicit_t>, ::QuICC::SparseSM::Worland::I6>, fwd_t>;
+};
+
+/// @brief I2DivR1D1R1_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, I2DivR1D1R1_Zero_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorINWithMean<r_1drWnl<implicit_t>, ::QuICC::SparseSM::Worland::I2>, fwd_t>;
+};
+
+/// @brief I4DivR1D1R1_Zero Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, I4DivR1D1R1_Zero_t, fwd_t> {
+    using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorINWithMean<r_1drWnl<implicit_t>, ::QuICC::SparseSM::Worland::I4>, fwd_t>;
 };
 
 } // namespace details

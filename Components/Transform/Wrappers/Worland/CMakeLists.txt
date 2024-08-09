@@ -14,84 +14,6 @@ set(ProjectorOpAttribute "CSL3D")
 set(IntegratorOpInOut "mods_t, phys_t")
 set(ProjectorOpInOut "phys_t, mods_t")
 
-# Ops
-set(PPolyBuilder "Wnl")
-
-set(P_ZeroPolyBuilder "Wnl")
-set(P_ZeroMeanBuilder "void")
-
-set(R1_ZeroPolyBuilder "rWnl")
-set(R1_ZeroMeanBuilder "void")
-
-set(D1PolyBuilder "dWnl")
-
-set(D1_PPolyBuilder "dWnl")
-set(D1_PMeanBuilder "Wnl")
-
-set(D1R1PolyBuilder "drWnl")
-
-set(ProjectorDivR1PolyBuilder "r_1Wnl<recurrence_t>")
-set(IntegratorDivR1PolyBuilder "r_1Wnl<implicit_t>")
-
-set(ProjectorDivR1_ZeroPolyBuilder "r_1Wnl<recurrence_t>")
-set(IntegratorDivR1_ZeroPolyBuilder "r_1Wnl<implicit_t>")
-set(DivR1_ZeroMeanBuilder "void")
-
-set(ProjectorDivR1D1R1PolyBuilder "r_1drWnl<recurrence_t>")
-set(IntegratorDivR1D1R1PolyBuilder "r_1drWnl<implicit_t>")
-
-set(ProjectorDivR1D1R1_ZeroPolyBuilder "r_1drWnl<recurrence_t>")
-set(IntegratorDivR1D1R1_ZeroPolyBuilder "r_1drWnl<implicit_t>")
-set(DivR1D1R1_ZeroMeanBuilder "void")
-
-set(SphLaplPolyBuilder "slaplWnl")
-
-set(CylLaplhPolyBuilder "claplhWnl")
-
-set(CylLaplh_DivR1D1R1PolyBuilder "claplhWnl")
-set(CylLaplh_DivR1D1R1MeanBuilder "r_1drWnl<recurrence_t>")
-
-set(D1CylLaplhPolyBuilder "dclaplhWnl")
-
-set(D1CylLaplh_D1DivR1D1R1PolyBuilder "dclaplhWnl")
-set(D1CylLaplh_D1DivR1D1R1MeanBuilder "dr_1drWnl")
-
-set(DivR1CylLaplh_ZeroPolyBuilder "r_1claplhWnl")
-set(DivR1CylLaplh_ZeroMeanBuilder "void")
-
-set(I2PolyBuilder "Wnl")
-set(I2INBuilder "I2")
-
-set(I2_ZeroPolyBuilder "Wnl")
-set(I2_ZeroINBuilder "I2")
-set(I2_ZeroMeanBuilder "void")
-set(I2_ZeroMeanINBuilder "void")
-
-set(I2DivR1_ZeroPolyBuilder "r_1Wnl<implicit_t>")
-set(I2DivR1_ZeroINBuilder "I2")
-set(I2DivR1_ZeroMeanBuilder "void")
-set(I2DivR1_ZeroMeanINBuilder "void")
-
-set(I2DivR1D1R1_ZeroPolyBuilder "r_1drWnl<implicit_t>")
-set(I2DivR1D1R1_ZeroINBuilder "I2")
-set(I2DivR1D1R1_ZeroMeanBuilder "void")
-set(I2DivR1D1R1_ZeroMeanINBuilder "void")
-
-set(I4DivR1_ZeroPolyBuilder "r_1Wnl<implicit_t>")
-set(I4DivR1_ZeroINBuilder "I4")
-set(I4DivR1_ZeroMeanBuilder "void")
-set(I4DivR1_ZeroMeanINBuilder "void")
-
-set(I4DivR1D1R1_ZeroPolyBuilder "r_1drWnl<implicit_t>")
-set(I4DivR1D1R1_ZeroINBuilder "I4")
-set(I4DivR1D1R1_ZeroMeanBuilder "void")
-set(I4DivR1D1R1_ZeroMeanINBuilder "void")
-
-set(I6DivR1_ZeroPolyBuilder "r_1Wnl<implicit_t>")
-set(I6DivR1_ZeroINBuilder "I6")
-set(I6DivR1_ZeroMeanBuilder "void")
-set(I6DivR1_ZeroMeanINBuilder "void")
-
 # cpu/gpu
 set(CpuMemRes "Cpu::NewDelete")
 set(GpuMemRes "Cuda::Malloc")
@@ -201,31 +123,6 @@ foreach(Backend IN LISTS Backends)
         set(HostToDevice "${${Backend}${Kind}HostToDevice}")
         set(DeviceToHost "${${Backend}${Kind}DeviceToHost}")
         foreach(Op IN LISTS Ops)
-            set(PolyBuilder "${${Op}PolyBuilder}")
-            if (NOT PolyBuilder)
-                set(PolyBuilder "${${Kind}${Op}PolyBuilder}")
-            endif()
-
-            set(OpBuilder "Operator<${PolyBuilder}>")
-            set(MeanBuilder "${${Op}MeanBuilder}")
-            set(INBuilder "${${Op}INBuilder}")
-            if(MeanBuilder)
-                if (NOT (MeanBuilder STREQUAL "void"))
-                    set(MeanHeader "#include \"QuICC/Polynomial/Worland/${MeanBuilder}.hpp\"")
-                endif()
-                set(OpBuilder "OperatorWithMean<${PolyBuilder}, ${MeanBuilder}>")
-            endif()
-            if(INBuilder)
-                set(INHeader "#include \"QuICC/SparseSM/Worland/${INBuilder}.hpp\"")
-                set(OpBuilder "OperatorIN<${PolyBuilder}, ::QuICC::SparseSM::Worland::${INBuilder}>")
-            endif()
-            if(INBuilder AND MeanBuilder)
-                set(INHeader "#include \"QuICC/SparseSM/Worland/${INBuilder}.hpp\"")
-                set(OpBuilder "OperatorINWithMean<${PolyBuilder}, ::QuICC::SparseSM::Worland::${INBuilder}>")
-            endif()
-
-
-            set(PolyBuilderScale "${${Op}PolyBuilderScale}")
 
             configure_file(
                 "OpV.hpp.in"

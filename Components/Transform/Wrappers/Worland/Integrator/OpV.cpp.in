@@ -9,21 +9,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Wrappers/Worland/@Kind@/@Op@@Tag@.hpp.inc"
-#include "QuICC/Polynomial/Worland/Wnl.hpp"
-#include "QuICC/Polynomial/Worland/rWnl.hpp"
-#include "QuICC/Polynomial/Worland/dWnl.hpp"
-#include "QuICC/Polynomial/Worland/drWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1drWnl.hpp"
-#include "QuICC/Polynomial/Worland/dr_1drWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
-#include "QuICC/Polynomial/Worland/slaplWnl.hpp"
-#include "QuICC/Polynomial/Worland/claplhWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1claplhWnl.hpp"
-#include "QuICC/Polynomial/Worland/dclaplhWnl.hpp"
-#include "DenseSM/Worland/Operator.hpp"
-#include "DenseSM/Worland/OperatorWithMean.hpp"
-#include "DenseSM/Worland/OperatorIN.hpp"
-#include "DenseSM/Worland/OperatorINWithMean.hpp"
+#include "ViewOps/Worland/OpsBuilder.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
@@ -77,7 +63,7 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
     derivedOp.allocOp(dimensions, layers);
     auto opView = derivedOp.getOp();
     using namespace QuICC::Polynomial::Worland;
-    Builder<op_t, QuICC::DenseSM::Worland::@OpBuilder@, fwd_t> tBuilder;
+    OpsBuilder<op_t, @Op@_t, fwd_t> tBuilder;
     tBuilder.compute(opView, igrid, iweights);
 
 

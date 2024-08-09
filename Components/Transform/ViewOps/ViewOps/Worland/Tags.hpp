@@ -36,6 +36,11 @@ struct P_t
 {
 };
 
+/// @brief P_Zero op type tag
+struct P_Zero_t
+{
+};
+
 /// @brief D1 op type tag
 struct D1_t
 {
@@ -98,6 +103,46 @@ struct D1CylLaplh_D1DivR1D1R1_t
 
 /// @brief DivR1CylLaplh_Zero op type tag
 struct DivR1CylLaplh_Zero_t
+{
+};
+
+/// @brief R1_Zero op type tag
+struct R1_Zero_t
+{
+};
+
+/// @brief I2 op type tag
+struct I2_t
+{
+};
+
+/// @brief I2_Zero op type tag
+struct I2_Zero_t
+{
+};
+
+/// @brief I2DivR1_Zero op type tag
+struct I2DivR1_Zero_t
+{
+};
+
+/// @brief I4DivR1_Zero op type tag
+struct I4DivR1_Zero_t
+{
+};
+
+/// @brief I6DivR1_Zero op type tag
+struct I6DivR1_Zero_t
+{
+};
+
+/// @brief I2DivR1D1R1_Zero op type tag
+struct I2DivR1D1R1_Zero_t
+{
+};
+
+/// @brief I4DivR1D1R1_Zero op type tag
+struct I4DivR1D1R1_Zero_t
 {
 };
 
