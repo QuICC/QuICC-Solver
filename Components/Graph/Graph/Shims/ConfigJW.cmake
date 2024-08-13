@@ -19,7 +19,7 @@ foreach(Op IN LISTS Ops)
     foreach(Kind IN LISTS Kinds)
         set(OpDirection "${${Op}OpDirection}")
         configure_file(
-            "MlirWorlandShims.cpp.in"
+            "MlirWorland${Op}Shims.cpp.in"
             "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/Worland/MlirShims/${Op}/${Kind}${Backend}.cpp"
         )
         target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}

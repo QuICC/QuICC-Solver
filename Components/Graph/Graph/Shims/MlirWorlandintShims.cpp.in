@@ -6,8 +6,8 @@
 #include "Graph/BackendsMap.hpp"
 #include "Graph/Types.hpp"
 
-#include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 #include "ViewOps/Worland/OpsBuilder.hpp"
+#include "ViewOps/Worland/OpsQuadrature.hpp"
 
 using namespace QuICC::Graph;
 
@@ -16,7 +16,7 @@ using namespace QuICC::Graph;
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
+extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj, view3_cd_t* pUmod, view3_cd_t* pUval)
 {
     #ifndef NDEBUG
     std::cout <<
@@ -39,38 +39,36 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
     pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
     ViewBase<std::uint32_t> indices[rank];
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
-    assert(pUmod->pos == pUval->pos);
-    assert(pUmod->coo == pUval->coo);
-    Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
-    Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    /// \todo stronger check?
+    assert(pUmod->posSize == pUval->posSize);
+    assert(pUmod->cooSize == pUval->cooSize);
+    Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
     {
-        // dim 0 - Nr - radial points
-        // dim 1 - N  - radial modes
+        // dim 0 - N  - radial modes
+        // dim 1 - Nr - radial points
         // dim 2 - L  - harmonic degree
-        std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
+        std::array<std::uint32_t, rank> dims {pUmod->dims[0], pUval->dims[0], pUmod->dims[2]};
         std::vector<std::uint32_t> layers;
         for (std::size_t i = 0; i < dims[2]; ++i) {
-            if (pUmod->pos[i+1]-pUmod->pos[i] > 0)
-            {
-                layers.push_back(i);
-            }
+            layers.push_back(i);
         }
         cl->allocOp(dims, layers);
         /// Set grid \todo set once per operator kind
         ::QuICC::Internal::Array igrid;
         ::QuICC::Internal::Array iweights;
-        ::QuICC::Polynomial::Quadrature::WorlandRule quad;
+        using namespace QuICC::Transform::Worland;
+        OpsQuadrature<@Kind@_t> quad;
         quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
         // Populate op
         auto opView = cl->getOp();
-        using namespace QuICC::Transform::Worland;
         OpsBuilder<Top, @Kind@_t, @OpDirection@> tBuilder;
         tBuilder.compute(opView, igrid, ::QuICC::Internal::Array());
     }
     assert(cl->getOp().data() != nullptr);
     // call
-    cl->apply(viewVal, viewMod);
+    cl->apply(viewMod, viewVal);
 };

@@ -10,6 +10,7 @@
 
 // Project includes
 //
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/dWnl.hpp"
 #include "QuICC/Polynomial/Worland/drWnl.hpp"
@@ -257,6 +258,119 @@ template <class VOP>
 struct OpsBuilderMap<VOP, I4DivR1D1R1_Zero_t, fwd_t> {
     using type = typename Worland::Builder<VOP, QuICC::DenseSM::Worland::OperatorINWithMean<r_1drWnl<implicit_t>, ::QuICC::SparseSM::Worland::I4>, fwd_t>;
 };
+
+
+/// @brief Generic helper in order to avoid having to pass
+/// extra parameters to energy integrators
+template <class VOP, class OP>
+struct EnergyHelperMap;
+
+/// @brief Helper for Energy
+/// It is needed in order to avoid having to pass
+/// extra parameters to energy integrators
+/// @tparam VOP
+template <class VOP>
+struct EnergyHelperMap<VOP, Energy_t>
+{
+    void compute(VOP opView, const Internal::Array& grid,
+      const Internal::Array& weights)
+    {
+        Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
+            Polynomial::Worland::worland_sphenergy_t::DBETA, -1);
+        QuICC::DenseSM::Worland::OperatorWithMean<Wnl, void> denseBuilder(fWnl);
+        Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<Wnl, void>, fwd_t> tBuilderFwd(denseBuilder);
+        tBuilderFwd.compute(opView, grid, weights);
+    }
+};
+
+/// @brief Energy Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, Energy_t, fwd_t> {
+    using type = EnergyHelperMap<VOP, Energy_t>;
+};
+
+/// @brief Helper for EnergyD1R1
+/// It is needed in order to avoid having to pass
+/// extra parameters to energy integrators
+/// @tparam VOP
+template <class VOP>
+struct EnergyHelperMap<VOP, EnergyD1R1_t>
+{
+    void compute(VOP opView, const Internal::Array& grid,
+      const Internal::Array& weights)
+    {
+        Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
+            Polynomial::Worland::worland_sphenergy_t::DBETA, -1);
+        QuICC::DenseSM::Worland::OperatorWithMean<Wnl, void> denseBuilder(fWnl);
+        Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<Wnl, void>, fwd_t> tBuilderFwd(denseBuilder);
+        tBuilderFwd.compute(opView, grid, weights);
+    }
+};
+
+/// @brief EnergyD1R1 Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, EnergyD1R1_t, fwd_t> {
+    using type = EnergyHelperMap<VOP, EnergyD1R1_t>;
+};
+
+/// @brief Helper for EnergyR2
+/// It is needed in order to avoid having to pass
+/// extra parameters to energy integrators
+/// @tparam VOP
+template <class VOP>
+struct EnergyHelperMap<VOP, EnergyR2_t>
+{
+    void compute(VOP opView, const Internal::Array& grid,
+      const Internal::Array& weights)
+    {
+        Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
+            Polynomial::Worland::worland_sphenergy_t::DBETA, 0);
+        QuICC::DenseSM::Worland::Operator<Wnl> denseBuilder(fWnl);
+        Builder<VOP, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(denseBuilder);
+        tBuilderFwd.compute(opView, grid, weights);
+    }
+};
+
+/// @brief EnergyR2 Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, EnergyR2_t, fwd_t> {
+    using type = EnergyHelperMap<VOP, EnergyR2_t>;
+};
+
+
+/// @brief Helper for EnergySLaplR2
+/// It is needed in order to avoid having to pass
+/// extra parameters to energy integrators
+/// @tparam VOP
+template <class VOP>
+struct EnergyHelperMap<VOP, EnergySLaplR2_t>
+{
+    void compute(VOP opView, const Internal::Array& grid,
+      const Internal::Array& weights)
+    {
+        Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
+            Polynomial::Worland::worland_sphenergy_t::DBETA, 0);
+        QuICC::DenseSM::Worland::Operator<Wnl> denseBuilder(fWnl);
+        Builder<VOP, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(denseBuilder);
+        tBuilderFwd.compute(opView, grid, weights);
+    }
+};
+
+/// @brief EnergySLaplR2 Builder
+/// Integrator only
+/// @tparam VOP operator view type
+template <class VOP>
+struct OpsBuilderMap<VOP, EnergySLaplR2_t, fwd_t> {
+    using type = EnergyHelperMap<VOP, EnergySLaplR2_t>;
+};
+
+
 
 } // namespace details
 

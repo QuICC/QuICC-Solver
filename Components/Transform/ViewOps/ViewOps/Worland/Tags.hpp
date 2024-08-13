@@ -146,6 +146,28 @@ struct I4DivR1D1R1_Zero_t
 {
 };
 
+/// @brief Energy op type tag
+struct Energy_t
+{
+};
+
+/// @brief EnergyD1R1 op type tag
+struct EnergyD1R1_t
+{
+};
+
+/// @brief EnergyR2 op type tag
+struct EnergyR2_t
+{
+};
+
+/// @brief EnergySLaplR2 op type tag
+struct EnergySLaplR2_t
+{
+};
+
+
+
 } // namespace Worland
 } // namespace Transform
 } // namespace QuICC
