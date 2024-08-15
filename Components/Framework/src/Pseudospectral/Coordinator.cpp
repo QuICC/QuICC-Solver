@@ -683,6 +683,9 @@ namespace Pseudospectral {
 
       // compute nonlinear interaction and forward transform
       this->updateSpectral(it);
+
+
+      /// \todo map/copy to graph
    }
 
    void Coordinator::explicitTrivialEquations(const std::size_t opId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)

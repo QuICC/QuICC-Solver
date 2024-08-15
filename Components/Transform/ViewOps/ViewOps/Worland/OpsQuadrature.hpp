@@ -59,7 +59,18 @@ void computePowerQuadrature(Internal::Array& igrid, Internal::Array& iweights, c
 template <class OP>
 struct EnergyHelperQuadMap;
 
-/// @brief Generic helper in order to avoid having to pass
+/// @brief Energy helper in order to avoid having to pass
+/// extra parameters to energy integrators
+template <>
+struct EnergyHelperQuadMap<Energy_t>
+{
+    void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize)
+    {
+        computePowerQuadrature<1>(igrid, iweights, gSize);
+    }
+};
+
+/// @brief EnergyD1R1 helper in order to avoid having to pass
 /// extra parameters to energy integrators
 template <>
 struct EnergyHelperQuadMap<EnergyD1R1_t>
@@ -70,7 +81,7 @@ struct EnergyHelperQuadMap<EnergyD1R1_t>
     }
 };
 
-/// @brief Generic helper in order to avoid having to pass
+/// @brief EnergyR2 helper in order to avoid having to pass
 /// extra parameters to energy integrators
 template <>
 struct EnergyHelperQuadMap<EnergyR2_t>
@@ -79,6 +90,21 @@ struct EnergyHelperQuadMap<EnergyR2_t>
     {
         computePowerQuadrature<1>(igrid, iweights, gSize);
     }
+};
+
+template <>
+struct EnergyHelperQuadMap<EnergySLaplR2_t>
+{
+    void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize)
+    {
+        computePowerQuadrature<1>(igrid, iweights, gSize);
+    }
+};
+
+/// @brief Quadrature for Energy
+template <>
+struct OpsQuadratureMap<Energy_t> {
+    using type = EnergyHelperQuadMap<Energy_t>;
 };
 
 /// @brief Quadrature for EnergyD1R1
@@ -93,6 +119,11 @@ struct OpsQuadratureMap<EnergyR2_t> {
     using type = EnergyHelperQuadMap<EnergyR2_t>;
 };
 
+/// @brief Quadrature for EnergySLaplR2
+template <>
+struct OpsQuadratureMap<EnergySLaplR2_t> {
+    using type = EnergyHelperQuadMap<EnergySLaplR2_t>;
+};
 
 } // namespace details
 

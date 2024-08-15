@@ -166,6 +166,41 @@ struct EnergySLaplR2_t
 {
 };
 
+/// @brief Power op type tag
+struct Power_t
+{
+};
+
+/// @brief PowerD1R1 op type tag
+struct PowerD1R1_t
+{
+};
+
+/// @brief PowerR2 op type tag
+struct PowerR2_t
+{
+};
+
+/// @brief PowerSLaplR2 op type tag
+struct PowerSLaplR2_t
+{
+};
+
+/// @brief RadialPower op type tag
+struct RadialPower_t
+{
+};
+
+/// @brief RadialPowerDivR1 op type tag
+struct RadialPowerDivR1_t
+{
+};
+
+/// @brief RadialPowerDivR1D1R1 op type tag
+struct RadialPowerDivR1D1R1_t
+{
+};
+
 
 
 } // namespace Worland

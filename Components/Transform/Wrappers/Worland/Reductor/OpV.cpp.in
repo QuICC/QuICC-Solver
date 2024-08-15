@@ -9,20 +9,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Wrappers/Worland/Reductor/@Op@@Tag@.hpp.inc"
-#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
-#include "QuICC/Polynomial/Worland/Wnl.hpp"
-#include "QuICC/Polynomial/Worland/rWnl.hpp"
-#include "QuICC/Polynomial/Worland/dWnl.hpp"
-#include "QuICC/Polynomial/Worland/drWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1drWnl.hpp"
-#include "QuICC/Polynomial/Worland/dr_1drWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
-#include "QuICC/Polynomial/Worland/slaplWnl.hpp"
-#include "QuICC/Polynomial/Worland/claplhWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1claplhWnl.hpp"
-#include "QuICC/Polynomial/Worland/dclaplhWnl.hpp"
-#include "DenseSM/Worland/Operator.hpp"
-#include "DenseSM/Worland/OperatorWithMean.hpp"
+#include "ViewOps/Worland/OpsBuilder.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
@@ -89,7 +76,7 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
     auto prjView = derivedPrjOp.getOp();
 
     using namespace QuICC::Polynomial::Worland;
-    Builder<op_t, QuICC::DenseSM::Worland::@OpBuilderBwd@, bwd_t> tBuilderBwd;
+    OpsBuilder<op_t, @Op@_t, bwd_t> tBuilderBwd;
     tBuilderBwd.compute(prjView, igrid, Internal::Array());
 
     @SetIntOp@

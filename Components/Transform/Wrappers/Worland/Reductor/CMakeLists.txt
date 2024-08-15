@@ -29,49 +29,6 @@ set(EnergySizeCol "1;")
 set(RadialSizeRow "this->mspSetup->fwdSize();")
 set(RadialSizeCol "this->mspSetup->blockSize();")
 
-# Ops
-set(PowerPolyBuilderBwd "r_1Wnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(PowerPolyBuilderFwd "Wnl")
-set(PowerMeanBuilderFwd "void")
-set(PowerlShift "-1")
-
-set(PowerR2PolyBuilderBwd "Wnl")
-set(PowerR2PolyBuilderFwd "Wnl")
-
-set(PowerD1R1PolyBuilderBwd "r_1drWnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(PowerD1R1PolyBuilderFwd "Wnl")
-set(PowerD1R1MeanBuilderFwd "void")
-set(PowerD1R1lShift "-1")
-
-set(PowerSLaplR2PolyBuilderBwd "slaplWnl")
-set(PowerSLaplR2PolyBuilderFwd "Wnl")
-set(PowerSLaplR2Output "mModsAbsFlat")
-
-set(EnergyPolyBuilderBwd "r_1Wnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(EnergyPolyBuilderFwd "Wnl")
-set(EnergyMeanBuilderFwd "void")
-set(EnergylShift "-1")
-
-set(EnergyR2PolyBuilderBwd "Wnl")
-set(EnergyR2PolyBuilderFwd "Wnl")
-
-set(EnergyD1R1PolyBuilderBwd "r_1drWnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(EnergyD1R1PolyBuilderFwd "Wnl")
-set(EnergyD1R1MeanBuilderFwd "void")
-set(EnergyD1R1lShift "-1")
-
-set(EnergySLaplR2PolyBuilderBwd "slaplWnl")
-set(EnergySLaplR2PolyBuilderFwd "Wnl")
-set(EnergySLaplR2Output "mModsAbsFlat")
-
-set(RadialPowerPolyBuilderBwd "Wnl")
-
-set(RadialPowerDivR1PolyBuilderBwd "r_1Wnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(RadialPowerDivR1MeanBuilderBwd "void")
-
-set(RadialPowerDivR1D1R1PolyBuilderBwd "r_1drWnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(RadialPowerDivR1D1R1MeanBuilderBwd "void")
-
 # Integrator operator
 set(IntOp
 "
@@ -89,10 +46,7 @@ set(IntOp
     derivedOp.allocOp(dimensionsInt, layers);
     auto intView = derivedOp.getOp();
 
-    Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
-        Polynomial::Worland::worland_sphenergy_t::DBETA, @lShift@);
-    QuICC::DenseSM::Worland::@OpBuilderFwd@ denseBuilder(fWnl);
-    Builder<op_t, QuICC::DenseSM::Worland::@OpBuilderFwd@, fwd_t> tBuilderFwd(denseBuilder);
+    OpsBuilder<op_t, @Op@_t, fwd_t> tBuilderFwd;
     tBuilderFwd.compute(intView, igrid, iweights);
 ")
 
@@ -460,13 +414,14 @@ foreach(Backend IN LISTS Backends)
             endif()
 
 
-            if(PolyBuilderFwd)
+            # if(PolyBuilderFwd)
                 set(SetIntOp "${IntOp}")
                 # manual sub
-                string(REGEX REPLACE "@OpBuilderFwd@" "${OpBuilderFwd}" SetIntOp "${SetIntOp}")
-                string(REGEX REPLACE "@lShift@" "${lShift}" SetIntOp "${SetIntOp}")
+                string(REGEX REPLACE "@Op@" "${Op}" SetIntOp "${SetIntOp}")
+                # string(REGEX REPLACE "@OpBuilderFwd@" "${OpBuilderFwd}" SetIntOp "${SetIntOp}")
+                # string(REGEX REPLACE "@lShift@" "${lShift}" SetIntOp "${SetIntOp}")
                 string(REGEX REPLACE "@BackendNamespace@" "${BackendNamespace}" SetIntOp "${SetIntOp}")
-            endif()
+            # endif()
 
             set(PolyBuilderScale "${${Op}PolyBuilderScale}")
 
