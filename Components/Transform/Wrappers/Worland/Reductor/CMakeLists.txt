@@ -18,10 +18,6 @@ set(PowerRedType "mods")
 set(EnergyRedType "mods")
 set(RadialRedType "phys")
 
-set(PowerGrid "this->computePowerQuadrature(igrid, iweights, icompgrid.size());")
-set(EnergyGrid "this->computePowerQuadrature(igrid, iweights, icompgrid.size());")
-set(RadialGrid "igrid = icompgrid; iweights = icompweights;")
-
 set(PowerSizeRow "this->mspSetup->fastSize(0);")
 set(PowerSizeCol "this->mspSetup->blockSize();")
 set(EnergySizeRow "this->mspSetup->blockSize();")
@@ -386,44 +382,10 @@ foreach(Backend IN LISTS Backends)
 
         foreach(Op IN LISTS Ops)
 
-            set(PolyBuilderFwd "${${Op}PolyBuilderFwd}")
-            set(PolyBuilderBwd "${${Op}PolyBuilderBwd}")
-
-
-            set(OpBuilderFwd "Operator<${PolyBuilderFwd}>")
-            set(OpBuilderBwd "Operator<${PolyBuilderBwd}>")
-            set(lShift "${${Op}lShift}")
-            if(NOT lShift)
-                set(lShift "0")
-            endif()
-
-            set(MeanBuilderFwd "${${Op}MeanBuilderFwd}")
-            if(MeanBuilderFwd)
-                if (NOT (MeanBuilderFwd STREQUAL "void"))
-                    set(MeanHeader "#include \"QuICC/Polynomial/Worland/${MeanBuilderFwd}.hpp\"")
-                endif()
-                set(OpBuilderFwd "OperatorWithMean<${PolyBuilderFwd}, ${MeanBuilderFwd}>")
-            endif()
-
-            set(MeanBuilderBwd "${${Op}MeanBuilderBwd}")
-            if(MeanBuilderBwd)
-                if (NOT (MeanBuilderBwd STREQUAL "void"))
-                    set(MeanHeader "#include \"QuICC/Polynomial/Worland/${MeanBuilderBwd}.hpp\"")
-                endif()
-                set(OpBuilderBwd "OperatorWithMean<${PolyBuilderBwd}, ${MeanBuilderBwd}>")
-            endif()
-
-
-            # if(PolyBuilderFwd)
-                set(SetIntOp "${IntOp}")
-                # manual sub
-                string(REGEX REPLACE "@Op@" "${Op}" SetIntOp "${SetIntOp}")
-                # string(REGEX REPLACE "@OpBuilderFwd@" "${OpBuilderFwd}" SetIntOp "${SetIntOp}")
-                # string(REGEX REPLACE "@lShift@" "${lShift}" SetIntOp "${SetIntOp}")
-                string(REGEX REPLACE "@BackendNamespace@" "${BackendNamespace}" SetIntOp "${SetIntOp}")
-            # endif()
-
-            set(PolyBuilderScale "${${Op}PolyBuilderScale}")
+            set(SetIntOp "${IntOp}")
+            # manual sub
+            string(REGEX REPLACE "@Op@" "${Op}" SetIntOp "${SetIntOp}")
+            string(REGEX REPLACE "@BackendNamespace@" "${BackendNamespace}" SetIntOp "${SetIntOp}")
 
             configure_file(
                 "OpV.hpp.in"

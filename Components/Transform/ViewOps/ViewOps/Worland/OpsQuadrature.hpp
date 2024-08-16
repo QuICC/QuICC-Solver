@@ -125,6 +125,30 @@ struct OpsQuadratureMap<EnergySLaplR2_t> {
     using type = EnergyHelperQuadMap<EnergySLaplR2_t>;
 };
 
+/// @brief Quadrature for Power
+template <>
+struct OpsQuadratureMap<Power_t> {
+    using type = OpsQuadrature<Energy_t>;
+};
+
+/// @brief Quadrature for PowerD1R1
+template <>
+struct OpsQuadratureMap<PowerD1R1_t> {
+    using type = OpsQuadrature<EnergyD1R1_t>;
+};
+
+/// @brief Quadrature for PowerR2
+template <>
+struct OpsQuadratureMap<PowerR2_t> {
+    using type = OpsQuadrature<EnergyR2_t>;
+};
+
+/// @brief Quadrature for PowerSLaplR2
+template <>
+struct OpsQuadratureMap<PowerSLaplR2_t> {
+    using type = OpsQuadrature<EnergySLaplR2_t>;
+};
+
 } // namespace details
 
 } // namespace Worland

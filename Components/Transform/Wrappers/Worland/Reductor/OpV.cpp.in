@@ -10,6 +10,7 @@
 //
 #include "QuICC/Transform/Wrappers/Worland/Reductor/@Op@@Tag@.hpp.inc"
 #include "ViewOps/Worland/OpsBuilder.hpp"
+#include "ViewOps/Worland/OpsQuadrature.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
@@ -41,7 +42,9 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
 
     // Energy calculation requires a different quadrature
     Internal::Array igrid, iweights;
-    @Grid@
+    using namespace QuICC::Transform::Worland;
+    OpsQuadrature<@Op@_t> quad;
+    quad.computeQuadrature(igrid, iweights, icompgrid.size());
 
     std::uint32_t M = igrid.size();
     std::uint32_t K = static_cast<std::uint32_t>(this->mspSetup->fastSize(0));
@@ -65,7 +68,6 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
 
     // Make projector view operator
     using namespace QuICC::Transform::Quadrature;
-    using namespace QuICC::Transform::Worland;
     using backendPrj_t = @BackendNamespace@::ImplOp<phys_t, mods_t, op_t>;
     using derivedPrj_t = Op<phys_t, mods_t, op_t, backendPrj_t>;
 
