@@ -1,5 +1,5 @@
 /**
- * @file Impl.hpp
+ * @file Pointwise.hpp
  * @brief Wrapper for implementation backends
  */
 #pragma once
@@ -9,7 +9,7 @@
 
 // Project includes
 //
-#include "ViewOps/Quadrature/Cpu/Impl.hpp"
+#include "ViewOps/Pointwise/Cpu/Pointwise.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
-#include "ViewOps/Quadrature/Cuda/Impl.hpp"
+#include "ViewOps/Pointwise/Cuda/Pointwise.hpp"
 #endif

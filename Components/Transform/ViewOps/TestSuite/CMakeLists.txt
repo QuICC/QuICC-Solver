@@ -158,12 +158,19 @@ add_test(
 )
 
 #
-# View Pointwise  Tests
+# View Pointwise Tests
 #
 
 add_executable(ViewPointwiseTest
     ViewPointwiseTests.cpp
 )
+
+if(TARGET QuICC::Cuda)
+    target_sources(ViewPointwiseTest
+        PRIVATE
+            ViewPointwiseTests.cu
+    )
+endif()
 
 target_link_libraries(ViewPointwiseTest
     ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Pointwise
@@ -179,7 +186,7 @@ add_test(
 )
 
 #
-# View Reduction  Tests
+# View Reduction Tests
 #
 
 add_executable(ViewReductionTest
