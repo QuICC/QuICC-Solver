@@ -1,6 +1,7 @@
 set(PHS
   Environment/QuICCEnv.hpp
   Environment/Typedefs.hpp
+  Environment/MpiTypes.hpp
 )
 
 # Add public header
@@ -15,7 +16,7 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}
         IEnvironment.cpp
 )
 
-if(QUICC_MPI)
+if(QUICC_USE_MPI)
     target_sources(${QUICC_CURRENT_COMPONENT_LIB}
         PRIVATE
             Mpi.cpp
@@ -25,4 +26,4 @@ else()
         PRIVATE
             Serial.cpp
     )
-endif(QUICC_MPI)
+endif()

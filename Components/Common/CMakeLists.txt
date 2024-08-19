@@ -28,7 +28,6 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 
 target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
   QuICC::Types
-  QuICC::Environment
   QuICC::Profiling::Timers
 )
 
