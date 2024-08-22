@@ -28,6 +28,15 @@ test-quicc-lib:
   - .test-lib
   - .daint-mc
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+test-quicc-mpi-lib:
+  extends:
+  - .test-lib-mpi
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    SLURM_CPUS_PER_TASK: '18'
 time-quicc-lib:
   extends:
   - .time-lib-daint-mc

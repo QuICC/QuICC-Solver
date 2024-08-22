@@ -18,6 +18,15 @@
 namespace QuICC {
 namespace View {
 
+/// @brief Convienience struct to pass around metadata
+struct ptrAndIdx
+{
+   /// @brief pointers
+   std::vector<std::uint32_t> ptr;
+   /// @brief indices
+   std::vector<std::uint32_t> idx;
+};
+
 /// @brief compute storage requirements of view
 /// @tparam ViewType, either dense or compressed
 /// @param v View
@@ -48,8 +57,7 @@ QUICC_CUDA_HOST std::array<std::size_t, 4> memBlockOffsets(ViewType v);
 //
 
 // Storage requirements
-template <class ViewType>
-std::size_t memBlockSize(ViewType v)
+template <class ViewType> std::size_t memBlockSize(ViewType v)
 {
    // dense and compressed
    std::size_t size = sizeof(typename ViewType::ScalarType) * v.size();
@@ -59,31 +67,31 @@ std::size_t memBlockSize(ViewType v)
    {
       for (std::size_t i = 0; i < v.rank(); ++i)
       {
-            size += v.pointers()[i].size() * sizeof(typename ViewType::IndexType);
-            size += v.indices()[i].size() * sizeof(typename ViewType::IndexType);
+         size += v.pointers()[i].size() * sizeof(typename ViewType::IndexType);
+         size += v.indices()[i].size() * sizeof(typename ViewType::IndexType);
       }
    }
    return size;
 }
 
 // offsets
-template <class ViewType>
-std::array<std::size_t, 4> memOffsets(ViewType v)
+template <class ViewType> std::array<std::size_t, 4> memOffsets(ViewType v)
 {
    static_assert(!isDimLevelTypeDense_v<typename ViewType::LevelType>);
 
    std::array<std::size_t, 4> offsets;
    offsets[0] = 0;
-   offsets[1] = reinterpret_cast<std::size_t>(v.pointers()) - reinterpret_cast<std::size_t>(v.data());
-   offsets[2] = reinterpret_cast<std::size_t>(v.indices()) - reinterpret_cast<std::size_t>(v.data());
+   offsets[1] = reinterpret_cast<std::size_t>(v.pointers()) -
+                reinterpret_cast<std::size_t>(v.data());
+   offsets[2] = reinterpret_cast<std::size_t>(v.indices()) -
+                reinterpret_cast<std::size_t>(v.data());
 
    return offsets;
 }
 
 // memblock offsets
 // no alignement requirements are considered
-template <class ViewType>
-std::array<std::size_t, 4> memBlockOffsets(ViewType v)
+template <class ViewType> std::array<std::size_t, 4> memBlockOffsets(ViewType v)
 {
    static_assert(!isDimLevelTypeDense_v<typename ViewType::LevelType>);
 
@@ -94,7 +102,7 @@ std::array<std::size_t, 4> memBlockOffsets(ViewType v)
    std::size_t size = 0;
    for (std::size_t i = 0; i < v.rank(); ++i)
    {
-         size += v.pointers()[i].size() * sizeof(typename ViewType::IndexType);
+      size += v.pointers()[i].size() * sizeof(typename ViewType::IndexType);
    }
    offsets[2] = offsets[1] + size;
 

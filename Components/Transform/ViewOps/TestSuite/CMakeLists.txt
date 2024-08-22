@@ -207,6 +207,88 @@ add_test(
 )
 
 #
+# View Transpose Tests
+#
+
+add_executable(ViewTransposeTest
+    ViewTransposeTests.cpp
+)
+
+if(TARGET QuICC::Cuda)
+    target_sources(ViewTransposeTest
+        PRIVATE
+            ViewTransposeTests.cu
+    )
+endif()
+
+target_link_libraries(ViewTransposeTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewTransposeTest
+    COMMAND ViewTransposeTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+# Mpi
+if(QUICC_USE_MPI)
+    add_executable(ViewTransposeMpiTest
+        ViewTransposeMpiTests.cpp
+    )
+
+    target_link_libraries(ViewTransposeMpiTest
+        ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
+        Catch2::Catch2
+        QuICC::Memory
+        QuICC::TestSuite
+    )
+
+    # Reusing LoadSplitter data
+    set(QUICC_WORK_DIR "${CMAKE_BINARY_DIR}/Components/Framework/TestSuite")
+
+    # Base dir for reference data archive
+    set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
+
+    # Fetch reference data
+    include(FetchTestReference)
+    quicc_fetch_test_reference(
+        ViewTransposeMpiTest
+        COMPONENT Framework
+        FILENAME "LoadSplitter.tar.gz"
+        ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+        DATADIR ${QUICC_WORK_DIR}
+    )
+
+    add_test(
+        NAME ViewTransposeMpiTest
+        COMMAND ViewTransposeMpiTest
+        WORKING_DIRECTORY
+        "${QUICC_WORK_DIR}"
+    )
+
+    add_executable(ViewTransposeMpiCommTest
+        ViewTransposeMpiCommTests.cpp
+    )
+
+    target_link_libraries(ViewTransposeMpiCommTest
+        ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
+        Catch2::Catch2
+        QuICC::Memory
+    )
+
+    add_test(
+        NAME ViewTransposeMpiCommTest
+        COMMAND ViewTransposeMpiCommTest
+        WORKING_DIRECTORY
+        "${QUICC_WORK_DIR}"
+    )
+endif()
+
+#
 # View Blas Tests
 #
 if(TARGET QuICC::Cuda)
