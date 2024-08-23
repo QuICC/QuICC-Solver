@@ -224,7 +224,8 @@ void readList(std::vector<MHDFloat>& inData, const std::string& path)
       std::cerr
          << "*****************************************************************"
          << std::endl;
-      inData = std::vector<MHDFloat>(inData.size(), std::numeric_limits<MHDFloat>::max());
+      inData = std::vector<MHDFloat>(inData.size(),
+         std::numeric_limits<MHDFloat>::max());
    }
    else
    {

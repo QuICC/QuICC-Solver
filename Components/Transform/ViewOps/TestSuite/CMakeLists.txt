@@ -247,6 +247,22 @@ if(QUICC_USE_MPI)
         QuICC::TestSuite
     )
 
+    # Reusing LoadSplitter data
+    set(QUICC_WORK_DIR "${CMAKE_BINARY_DIR}/Components/Framework/TestSuite")
+
+    # Base dir for reference data archive
+    set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
+
+    # Fetch reference data
+    include(FetchTestReference)
+    quicc_fetch_test_reference(
+        ViewTransposeMpiTest
+        COMPONENT Framework
+        FILENAME "LoadSplitter.tar.gz"
+        ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+        DATADIR ${QUICC_WORK_DIR}
+    )
+
     add_test(
         NAME ViewTransposeMpiTest
         COMMAND ViewTransposeMpiTest

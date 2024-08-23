@@ -45,30 +45,33 @@ std::vector<int> getReducedRanksSet(
    const MPI_Comm comm = MPI_COMM_WORLD);
 
 /// @brief Reduce diplacements to the to the reduced set
-/// @param sendDispls
-/// @param recvDispls
-/// @param redSet
+/// @param sendDispls sending displacements
+/// @param recvDispls receiving displacements
+/// @param redSet reduced set of ranks
 void redDisplsFromSet(std::vector<std::vector<int>>& sendDispls,
    std::vector<std::vector<int>>& recvDispls, const std::vector<int>& redSet);
 
 /// @brief Get sub communicator from the reduced set
-/// @param redSet
-/// @param comm
-/// @return
+/// @param redSet reduced set of ranks
+/// @param comm all world communicator
+/// @return sub communicator
 MPI_Comm getSubComm(const std::vector<int>& redSet,
    const MPI_Comm comm = MPI_COMM_WORLD);
 
 /// @brief Get count vector based on displacements
-/// @param displs
-/// @return
+/// @param displs displacements
+/// @return count vector
 std::vector<int> getCount(const std::vector<std::vector<int>>& displs);
 
 
 /// @brief Container for Mpi communicator and types
-/// @tparam TAG
+/// to exchange data with MPI_Alltoallw.
+/// @tparam TAG free tag type to implement other
 template <class TDATA, class TAG = void> class Comm
 {
 public:
+   /// @brief Constructor
+   /// @param comm
    Comm(MPI_Comm comm = MPI_COMM_WORLD) : _comm(comm){};
 
    /// @brief release Mpi resources
@@ -81,6 +84,9 @@ public:
       }
    }
 
+   /// @brief Execute the data exchange (communication)
+   /// @param out
+   /// @param in
    void exchange(TDATA* out, const TDATA* in) const
    {
       if (_subComm != MPI_COMM_NULL)
@@ -91,6 +97,10 @@ public:
       }
    }
 
+   /// @brief Set the communicator
+   /// i.e. build the type for the MPI_Alltoallw exchange
+   /// @param cooNew destination coordinates
+   /// @param cooOld source coordinates
    void setComm(const std::vector<point_t>& cooNew,
       const std::vector<point_t>& cooOld)
    {
@@ -125,22 +135,38 @@ public:
       _isSetup = true;
    }
 
+   /// @brief check if the comm was setup
+   /// @return
    bool isSetup() const
    {
       return _isSetup;
    }
 
 private:
+   /// @brief Displacement used to create the send types.
    std::vector<std::vector<int>> _sendDispls;
+   /// @brief Displacement used to create the recv types.
    std::vector<std::vector<int>> _recvDispls;
+   /// @brief Entry i specifies the datatype to use when sending data to rank i.
    std::vector<MPI_Datatype> _sendType;
+   /// @brief Entry j specifies the datatype to use when receiving data from
+   /// rank j.
    std::vector<MPI_Datatype> _recvType;
+   /// @brief Entry i specifies the number of elements to send to rank i.
    std::vector<int> _sendCounts;
+   /// @brief Entry j specifies the number of elements to receive from rank j.
    std::vector<int> _recvCounts;
+   /// @brief Entry i specifies the displacement (in bytes, offset from sendbuf)
+   /// from which to send data to rank i.
    std::vector<int> _sDispls;
+   /// @brief Entry j specifies the displacement (in bytes, offset from recvbuf)
+   /// to which data from rank j should be written.
    std::vector<int> _rDispls;
+   /// @brief All world communicator
    MPI_Comm _comm;
+   /// @brief Communicator over which data is to be exchanged.
    MPI_Comm _subComm;
+   /// @brief Is comm setup?
    bool _isSetup = false;
 };
 

@@ -5,7 +5,7 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
 
 # Add public header
 set(PHS
-  Mpi/Transpose.hpp
+  Mpi/Op.hpp
   Mpi/Comm.hpp
 )
 

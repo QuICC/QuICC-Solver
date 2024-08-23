@@ -5,7 +5,7 @@
  */
 #pragma once
 
-// External includes
+// System includes
 //
 #include <complex>
 #ifdef QUICC_HAS_CUDA_BACKEND
@@ -36,7 +36,8 @@ template <class T = double> struct AddFunctor
 #ifdef QUICC_HAS_CUDA_BACKEND
 template <> struct AddFunctor<cuda::std::complex<double>>
 {
-   QUICC_CUDA_HOSTDEV cuda::std::complex<double> operator()(cuda::std::complex<double> a, cuda::std::complex<double> b)
+   QUICC_CUDA_HOSTDEV cuda::std::complex<double> operator()(
+      cuda::std::complex<double> a, cuda::std::complex<double> b)
    {
       return a + b;
    }
@@ -47,7 +48,7 @@ template <> struct AddFunctor<cuda::std::complex<double>>
 /// @tparam T scalar
 template <class T = double> struct SubFunctor
 {
-  QUICC_CUDA_HOSTDEV T operator()(T a, T b)
+   QUICC_CUDA_HOSTDEV T operator()(T a, T b)
    {
       return a - b;
    }
@@ -58,7 +59,8 @@ template <class T = double> struct SubFunctor
 #ifdef QUICC_HAS_CUDA_BACKEND
 template <> struct SubFunctor<cuda::std::complex<double>>
 {
-   QUICC_CUDA_HOSTDEV cuda::std::complex<double> operator()(cuda::std::complex<double> a, cuda::std::complex<double> b)
+   QUICC_CUDA_HOSTDEV cuda::std::complex<double> operator()(
+      cuda::std::complex<double> a, cuda::std::complex<double> b)
    {
       return a - b;
    }

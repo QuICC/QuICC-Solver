@@ -70,8 +70,6 @@ std::vector<std::vector<int>> getDispls(const std::vector<point_t>& absCooNew,
          auto lCoo = (*itLCoo).first;
          if (auto itRCoo = remNewIdx.find(lCoo); itRCoo != remNewIdx.end())
          {
-            // std::cout << "rank " << r << ": "
-            //     << lCoo[0] << ',' << lCoo[1] << " found " << r << '\n';
             sendDispls[r].push_back((*itLCoo).second);
             itLCoo = locOldIdx.erase(itLCoo);
             remNewIdx.erase(itRCoo);
@@ -79,7 +77,6 @@ std::vector<std::vector<int>> getDispls(const std::vector<point_t>& absCooNew,
          else
          {
             ++itLCoo;
-            // std::cout << "not found\n";
          }
       }
    }
@@ -127,7 +124,7 @@ std::vector<int> getReducedRanksSet(
    //
 
    // Recv remote set size
-   std::vector<MPI_Request> req(sendSet.size()+recvSet.size());
+   std::vector<MPI_Request> req(sendSet.size() + recvSet.size());
    int count = 0;
    std::vector<int> remSetSize(sendSet.size(), 0);
    for (auto it = sendSet.begin(); it != sendSet.end(); ++it)
@@ -155,23 +152,25 @@ std::vector<int> getReducedRanksSet(
    {
       int sr = *it;
       remSet[count].resize(remSetSize[count]);
-      MPI_Irecv(remSet[count].data(), remSet[count].size(), MPI_INT, sr, 1, comm, &req[count]);
+      MPI_Irecv(remSet[count].data(), remSet[count].size(), MPI_INT, sr, 1,
+         comm, &req[count]);
       count++;
    }
    // Send local set
    for (auto it = recvSet.begin(); it != recvSet.end(); ++it)
    {
       int rr = *it;
-      MPI_Isend(setLoc.data(), setLoc.size(), MPI_INT, rr, 1, comm, &req[count]);
+      MPI_Isend(setLoc.data(), setLoc.size(), MPI_INT, rr, 1, comm,
+         &req[count]);
       count++;
    }
    // Wait for comm to be done
    MPI_Waitall(req.size(), req.data(), stat.data());
 
    // Update local set
-   for (auto& s : remSet)
+   for (auto& s: remSet)
    {
-      for (auto r : s)
+      for (auto r: s)
       {
          if (std::find(commSet.begin(), commSet.end(), r) == commSet.end())
          {

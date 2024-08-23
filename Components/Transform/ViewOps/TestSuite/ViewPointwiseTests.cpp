@@ -2,8 +2,8 @@
 #include <catch2/catch.hpp>
 
 #include "ViewOps/Pointwise/Cpu/Pointwise.hpp"
-#include "ViewOps/ViewMemoryUtils.hpp"
 #include "ViewOps/Pointwise/Functors.hpp"
+#include "ViewOps/ViewMemoryUtils.hpp"
 
 using namespace QuICC::Memory;
 using namespace QuICC::View;
@@ -142,8 +142,9 @@ TEST_CASE("Add Cpu Functor", "AddCpuFunctor")
    // add
    using namespace QuICC::Pointwise::Cpu;
    using namespace QuICC::Pointwise;
-   auto addOp = std::make_unique<Op<AddFunctor<double>, viewOut_t, viewIn_t, viewIn_t>>(
-      AddFunctor<double>());
+   auto addOp =
+      std::make_unique<Op<AddFunctor<double>, viewOut_t, viewIn_t, viewIn_t>>(
+         AddFunctor<double>());
 
    addOp->apply(viewOut, viewIn0, viewIn1);
 

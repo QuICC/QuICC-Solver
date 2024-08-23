@@ -5,7 +5,7 @@
 
 #pragma once
 
-// External includes
+// System includes
 //
 #include <Eigen/Core>
 

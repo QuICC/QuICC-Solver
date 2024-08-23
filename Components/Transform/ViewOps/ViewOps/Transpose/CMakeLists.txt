@@ -23,9 +23,10 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOM
 )
 
 # Add public header
-# set(PHS
-#   Functors.hpp
-# )
+set(PHS
+  Transpose.hpp
+  Tags.hpp
+)
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PROPERTIES

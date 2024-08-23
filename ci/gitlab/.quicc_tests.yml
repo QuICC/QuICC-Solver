@@ -7,7 +7,7 @@
     - cd /QuICC.src/build
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Types
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Memory
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^View
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^View -E Mpi
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Polynomial
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Jacobi
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_integrator"
@@ -40,6 +40,13 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "PyQuICCTests"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^GraphTest
+
+.test-lib-mpi:
+  script:
+    - pwd
+    - cd /QuICC.src/build
+    - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiCommTest
+    - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiTest
 
 .time-lib-daint-mc:
   script:

@@ -10,10 +10,10 @@ dimsAndMeta readDimsAndMeta(const std::string path, const std::string dist,
    int rank = 0;
    int ranks = 1;
 
-   # ifdef QUICC_MPI
+#ifdef QUICC_MPI
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
    MPI_Comm_size(MPI_COMM_WORLD, &ranks);
-   #endif
+#endif
 
    dimsAndMeta ret;
    std::string base = path + dist + "/P_id" + id + "_np" +
