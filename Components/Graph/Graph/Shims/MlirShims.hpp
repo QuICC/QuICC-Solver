@@ -137,5 +137,3 @@ void dealloc_viewDescriptor(T* pBuffer)
 } // namespace details
 } // namespace Graph
 } // namespace QuICC
-
-
