@@ -19,7 +19,7 @@
 #include "ViewOps/Quadrature/Op.hpp"
 #include "ViewOps/Pointwise/Pointwise.hpp"
 #include "ViewOps/Pointwise/Functors.hpp"
-#include "ViewOps/Transpose/Transpose.hpp"
+#include "ViewOps/Transpose/Op.hpp"
 #include "Fft/Fft.hpp"
 #include "ViewOps/Fourier/Mixed/Diff.hpp"
 

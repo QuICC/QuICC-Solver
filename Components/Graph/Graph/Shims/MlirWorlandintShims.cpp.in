@@ -66,7 +66,7 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
         // Populate op
         auto opView = cl->getOp();
         OpsBuilder<Top, @Kind@_t, @OpDirection@> tBuilder;
-        tBuilder.compute(opView, igrid, ::QuICC::Internal::Array());
+        tBuilder.compute(opView, igrid, iweights);
     }
     assert(cl->getOp().data() != nullptr);
     // call
