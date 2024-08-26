@@ -270,7 +270,7 @@ extern "C" void _ciface_quiccir_al_prj_complexf64_DCCSC3DJIK_complexf64_S1CLCSC3
         // Populate op
         auto opView = cl->getOp();
         using namespace QuICC::Transform::ALegendre;
-        builder<Top, Polynomial::ALegendre::Plm, ::QuICC::Internal::Array::Scalar, 0>(opView, igrid, ::QuICC::Internal::Array());
+        builder<Top, ::QuICC::Polynomial::ALegendre::Plm, ::QuICC::Internal::Array::Scalar, 0>(opView, igrid, ::QuICC::Internal::Array());
     }
     assert(cl->getOp().data() != nullptr);
     // call
