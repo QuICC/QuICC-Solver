@@ -39,7 +39,7 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^FrameworkStateFileTests_.*serial"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "PyQuICCTests"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^GraphTest
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^GraphTests -E Mpi
 
 .test-lib-mpi:
   script:
@@ -47,6 +47,7 @@
     - cd /QuICC.src/build
     - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiCommTest
     - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiTest
+    - ctest --no-tests=error --output-on-failure -R GraphTestsMpi
 
 .time-lib-daint-mc:
   script:

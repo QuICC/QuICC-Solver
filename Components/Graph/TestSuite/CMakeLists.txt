@@ -40,10 +40,33 @@ if(QUICC_USE_MPI)
         Catch2::Catch2
     )
 
+    # Reusing LoadSplitter data
+    set(QUICC_WORK_DIR "${CMAKE_BINARY_DIR}/Components/Framework/TestSuite")
+
+    # Base dir for reference data archive
+    set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
+
+    # Fetch reference data
+    include(FetchTestReference)
+    quicc_fetch_test_reference(
+        ViewTransposeMpiTest
+        COMPONENT Framework
+        FILENAME "LoadSplitter.tar.gz"
+        ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+        DATADIR ${QUICC_WORK_DIR}
+    )
+
+    # Copy graph files
+    file(GLOB mlirInputs
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.mlir"
+    )
+    file(COPY ${mlirInputs}
+        DESTINATION "${QUICC_WORK_DIR}")
+
     add_test(
         NAME GraphTestsMpi
         COMMAND GraphTestsMpi
         WORKING_DIRECTORY
-        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${QUICC_WORK_DIR}"
     )
 endif()

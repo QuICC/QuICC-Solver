@@ -70,7 +70,7 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   {
     assert(false && "missing setup");
   }
-  std::string path = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_refdata/Framework/LoadSplitter/WLFl/";
+  std::string path = "_refdata/Framework/LoadSplitter/WLFl/";
   std::string id = "103";
   using namespace QuICC::TestSuite;
   auto setup = readDimsAndMeta(path, dist, id);
@@ -175,7 +175,7 @@ TEST_CASE("Parallel 3D Bwd", "[Parallel3DBwd]")
   {
     assert(false && "missing setup");
   }
-  std::string path = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_refdata/Framework/LoadSplitter/WLFl/";
+  std::string path = "_refdata/Framework/LoadSplitter/WLFl/";
   std::string id = "103";
   using namespace QuICC::TestSuite;
   auto setup = readDimsAndMeta(path, dist, id);
@@ -379,7 +379,7 @@ TEST_CASE("Parallel Multi Var 3D Fwd", "[ParallelMultiVar3DFwd]")
   {
     assert(false && "missing setup");
   }
-  std::string path = "/home/gcastigl/codes/QuICC/build/Components/Framework/TestSuite/_refdata/Framework/LoadSplitter/WLFl/";
+  std::string path = "_refdata/Framework/LoadSplitter/WLFl/";
   std::string id = "103";
   using namespace QuICC::TestSuite;
   auto setup = readDimsAndMeta(path, dist, id);
