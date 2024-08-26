@@ -129,7 +129,7 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj
         for (std::size_t i = 0; i < dims[2]; ++i) {
             layers.push_back(i);
         }
-        alIntOp->allocOp(dims, layers);
+        cl->allocOp(dims, layers);
         /// Set grid \todo set once per operator kind
         ::QuICC::Internal::Array igrid;
         ::QuICC::Internal::Array iweights;
@@ -138,7 +138,7 @@ extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj
         // scale for spherical harmonics
         iweights.array() *= 2.0*::QuICC::Internal::Math::PI;
         // Populate op
-        auto opView = alIntOp->getOp();
+        auto opView = cl->getOp();
         using namespace QuICC::Transform::ALegendre;
         builder<Top, ::QuICC::Polynomial::ALegendre::Plm, ::QuICC::Internal::Array::Scalar, 0>(opView, igrid, iweights);
     }

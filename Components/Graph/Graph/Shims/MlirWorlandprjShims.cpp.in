@@ -47,13 +47,8 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
     {
-        // Prj
         // dim 0 - Nr - radial points
         // dim 1 - N  - radial modes
-        // dim 2 - L  - harmonic degree
-        // Int
-        // dim 0 - N  - radial modes
-        // dim 1 - Nr - radial points
         // dim 2 - L  - harmonic degree
         std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
         std::vector<std::uint32_t> layers;

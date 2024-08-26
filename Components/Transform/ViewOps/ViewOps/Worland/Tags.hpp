@@ -6,7 +6,6 @@
 
 // System includes
 //
-#include <cstdint>
 
 // Project includes
 //
