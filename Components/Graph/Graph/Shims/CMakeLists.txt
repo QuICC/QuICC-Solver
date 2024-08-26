@@ -34,6 +34,13 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
     MlirDeallocShims.cpp
 )
 
+if(TARGET QuICC::Cuda)
+  target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+    PRIVATE
+      MlirAllocShims.cu
+  )
+endif()
+
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PUBLIC
     QuICC::ViewOps

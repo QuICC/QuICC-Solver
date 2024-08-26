@@ -83,11 +83,11 @@ extern "C" void _ciface_quiccir_al_int_complexf64_S1CLCSC3D_complexf64_DCCSC3D(v
 /// @param op
 /// @param uval
 /// @param umod
-extern "C" void _ciface_quiccir_al_int_C_S1CLCSC3DJIK_t_C_DCCSC3DJIK_t(void* obj, view3_cd_t* pUmod, view3_cd_t* pUval)
+extern "C" void _ciface_quiccir_al_int_complexf64_S1CLCSC3DJIK_complexf64_DCCSC3DJIK(void* obj, view3_cd_t* pUmod, view3_cd_t* pUval)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_al_int_C_S1CLCSC3DJIK_t_C_DCCSC3DJIK_t\n";
+        "_ciface_quiccir_al_int_complexf64_S1CLCSC3DJIK_complexf64_DCCSC3DJIK\n";
     #endif
     assert(obj != nullptr);
     assert(pUval != nullptr);

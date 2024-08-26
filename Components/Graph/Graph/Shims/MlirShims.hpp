@@ -67,6 +67,24 @@ namespace Graph
     template<>
     ptrAndIdx denseTransposePtrAndIdx<C_S1CLCSC3D_t, C_DCCSC3D_t>(const std::array<std::uint32_t, 3> dims);
 
+    /// @brief compute pointers and index meta data for fully populated
+    /// tensor as ouput of a Transpose operation between AL and JW
+    /// @tparam C_DCCSC3DJIK_t new buffer type
+    /// @tparam C_S1CLCSC3DJIK_t producer type
+    /// @param dims output dimensions
+    /// @return
+    template<>
+    ptrAndIdx denseTransposePtrAndIdx<C_DCCSC3DJIK_t, C_S1CLCSC3DJIK_t>(const std::array<std::uint32_t, 3> dims);
+
+    /// @brief compute pointers and index meta data for fully populated
+    /// tensor as ouput of a Transpose operation between JW and AL
+    /// @tparam C_S1CLCSC3DJIK_t new buffer type
+    /// @tparam C_DCCSC3DJIK_t producer type
+    /// @param dims output dimensions
+    /// @return
+    template<>
+    ptrAndIdx denseTransposePtrAndIdx<C_S1CLCSC3DJIK_t, C_DCCSC3DJIK_t>(const std::array<std::uint32_t, 3> dims);
+
 namespace details
 {
 
@@ -133,6 +151,10 @@ void dealloc_viewDescriptor(T* pBuffer)
     std::cout << "dealloc, bytes: " << sizeByte << '\t' << isCpuMem <<'\n';
     #endif
 }
+
+#ifdef QUICC_HAS_CUDA_BACKEND
+std::uint32_t getSizeS1CLCSC3DJIK(const std::uint32_t* ptr, const std::uint32_t size, const std::uint32_t lds);
+#endif
 
 } // namespace details
 } // namespace Graph
