@@ -36,7 +36,8 @@ TEST_CASE("One Dimensional Loop Fourier Gpu", "[OneDimLoopFourierGpu]")
 
   auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
   using namespace QuICC::Graph;
-  Jit<rank> Jitter(modStr, memDev, physDims, modsDims, layOpt, Stage::MPP, Stage::MPP);
+  std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
+  Jit<rank> Jitter(modStr, memDev, physDims, modsDims, layOpt, Stage::MPP, Stage::MPP, meta);
 
   // setup metadata
   auto modsM = modsDims[2];
@@ -142,7 +143,8 @@ TEST_CASE("One Dimensional Loop Associated Legendre Gpu", "[OneDimLoopALGpu]")
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
   using namespace QuICC::Graph;
-  Jit<rank> Jitter(modStr, memDev, physDims, modsDims, layOpt, Stage::MPM, Stage::MPM);
+  std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
+  Jit<rank> Jitter(modStr, memDev, physDims, modsDims, layOpt, Stage::MPM, Stage::MPM, meta);
 
   // setup metadata
   auto M = physDims[2];
@@ -267,7 +269,8 @@ TEST_CASE("One Dimensional Loop Worland Gpu", "[OneDimLoopJWGpu]")
   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
   auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
   using namespace QuICC::Graph;
-  Jit<rank> Jitter(modStr, memDev, physDims, modsDims, layOpt, Stage::MMM, Stage::MMM);
+  std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
+  Jit<rank> Jitter(modStr, memDev, physDims, modsDims, layOpt, Stage::MMM, Stage::MMM, meta);
 
   // setup metadata
   auto M = physDims[2];
@@ -389,23 +392,54 @@ TEST_CASE("Serial 3D Loop Gpu", "[Serial3DLoopGpu]")
   layOpt[1] = {"DCCSC3DJIK", "S1CLCSC3DJIK"};
   layOpt[2] = {"DCCSC3DJIK", "DCCSC3DJIK"};
 
-  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-  auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
-  using namespace QuICC::Graph;
-  Jit<rank> Jitter(std::move(sourceMgr), memDev, physDims, modsDims, layOpt, Stage::MMM, Stage::MMM);
-
   // setup metadata
+  auto N = physDims[1];
+  auto K = physDims[0];
   auto modsM = modsDims[2];
   auto modsN = modsDims[1];
   auto modsK = modsDims[0];
-  std::array<std::uint32_t, 3> dimensions {modsK, modsM, modsN};
+
+  // Populate meta for fully populated tensor
+  // Physical space
+  std::vector<std::uint32_t> ptrPhys(K+1);
+  std::vector<std::uint32_t> idxPhys(K*N);
+  ptrPhys[0] = 0;
+  for (std::size_t i = 1; i < ptrPhys.size(); ++i) {
+      ptrPhys[i] = ptrPhys[i-1]+N;
+  }
+  for (std::size_t i = 0; i < idxPhys.size(); ++i) {
+      idxPhys[i] = i % N;
+  }
+  std::array<std::vector<std::uint32_t>, rank> pointersPhys {{{}, ptrPhys, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indicesPhys {{{}, idxPhys, {}}};
+
+  // Populate meta for fully populated tensor
+  // AL space (Stage::PPM and Stage::MPM)
+  using namespace QuICC::Graph;
+  auto metaAL = denseTransposePtrAndIdx<C_S1CLCSC3D_t, C_DCCSC3D_t>({modsN, K, modsM});
 
   // Populate meta for fully populated tensor
   // Modal space
   using namespace QuICC::Graph;
-  auto metaMods = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>(dimensions);
-  std::array<std::vector<std::uint32_t>, rank> pointers {{{}, metaMods.ptr, {}}};
-  std::array<std::vector<std::uint32_t>, rank> indices {{{}, metaMods.idx, {}}};
+  auto metaJW = denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>({modsK, modsM, modsN});
+  std::array<std::vector<std::uint32_t>, rank> pointersMods {{{}, metaJW.ptr, {}}};
+  std::array<std::vector<std::uint32_t>, rank> indicesMods {{{}, metaJW.idx, {}}};
+
+  // Store meta stages to pass to Jitter
+  std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
+  meta.push_back({ptrPhys.data(), ptrPhys.size()});
+  meta.push_back({idxPhys.data(), idxPhys.size()});
+  meta.push_back({metaAL.ptr.data(), metaAL.ptr.size()});
+  meta.push_back({metaAL.idx.data(), metaAL.idx.size()});
+  meta.push_back({metaJW.ptr.data(), metaJW.ptr.size()});
+  meta.push_back({metaJW.idx.data(), metaJW.idx.size()});
+
+  // Setup Jitter
+  auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+  auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
+  using namespace QuICC::Graph;
+  Jit<rank> Jitter(std::move(sourceMgr), memDev, physDims, modsDims, layOpt, Stage::MMM, Stage::MMM, meta);
+
 
   // host mem block
   std::size_t modsS = modsK * metaMods.idx.size();
@@ -413,17 +447,17 @@ TEST_CASE("Serial 3D Loop Gpu", "[Serial3DLoopGpu]")
   QuICC::Memory::MemBlock<std::complex<double>> modsOut(modsS, mem.get());
 
   // host view
-  C_DCCSC3DJIK_t modsInView({modsIn.data(), modsIn.size()}, dimensions, pointers, indices);
-  C_DCCSC3DJIK_t modsOutView({modsOut.data(), modsOut.size()}, dimensions, pointers, indices);
+  C_DCCSC3DJIK_t modsInView({modsIn.data(), modsIn.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
+  C_DCCSC3DJIK_t modsOutView({modsOut.data(), modsOut.size()}, {modsK, modsM, modsN}, pointersMods, indicesMods);
 
   // device block
   QuICC::Memory::MemBlock<std::complex<double>> modsInDev(modsS, memDev.get());
   QuICC::Memory::MemBlock<std::complex<double>> modsOutDev(modsS, memDev.get());
 
   QuICC::Memory::MemBlock<std::uint32_t> memBlockPointersDev(
-    pointers[1].size(), memDev.get());
+    pointersMods[1].size(), memDev.get());
   QuICC::Memory::MemBlock<std::uint32_t> memBlockIndicesDev(
-    indices[1].size(), memDev.get());
+    indicesMods[1].size(), memDev.get());
 
   // set device pointers and indice
   using namespace QuICC::View;
@@ -439,10 +473,10 @@ TEST_CASE("Serial 3D Loop Gpu", "[Serial3DLoopGpu]")
   C_DCCSC3DJIK_t modsOutViewDev(modsOutDev.data(), modsOutDev.size(), dimensions.data(), pointersDev, indicesDev);
 
   // cpu -> gpu index/pointers
-  cudaErrChk(cudaMemcpy(memBlockPointersDev.data(), pointers[1].data(),
-    pointers[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
-  cudaErrChk(cudaMemcpy(memBlockIndicesDev.data(), indices[1].data(),
-    indices[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+  cudaErrChk(cudaMemcpy(memBlockPointersDev.data(), pointersMods[1].data(),
+    pointersMods[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+  cudaErrChk(cudaMemcpy(memBlockIndicesDev.data(), indicesMods[1].data(),
+    indicesMods[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
 
   // set input modes
   std::complex<double> val = {1.0, 0.0};
@@ -515,6 +549,7 @@ TEST_CASE("Serial Multi Var 3D Fwd Gpu", "[SerialMultiVar3DFwdGpu]")
   auto modsM = modsDims[2];
   auto modsN = modsDims[1];
   auto modsK = modsDims[0];
+
   std::array<std::uint32_t, 3> inDims {M, N, K};
   std::array<std::uint32_t, 3> outDims {modsK, modsM, modsN};
 
