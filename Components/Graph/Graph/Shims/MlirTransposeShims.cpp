@@ -74,7 +74,11 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_complexf64_D
     assert(QuICC::Cuda::isDeviceMemory(pIn->pos));
     assert(QuICC::Cuda::isDeviceMemory(pIn->coo));
     // op
+    #ifdef QUICC_MPI
+    using namespace QuICC::Transpose::Mpi;
+    #else
     using namespace QuICC::Transpose::Cuda;
+    #endif
     using namespace QuICC::Transpose;
     using Tin = C_DCCSC3D_t;
     using Tout = C_DCCSC3DJIK_t;
@@ -250,7 +254,11 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_complexf64_S
     assert(QuICC::Cuda::isDeviceMemory(pIn->pos));
     assert(QuICC::Cuda::isDeviceMemory(pIn->coo));
     // Op
+    #ifdef QUICC_MPI
+    using namespace QuICC::Transpose::Mpi;
+    #else
     using namespace QuICC::Transpose::Cuda;
+    #endif
     using namespace QuICC::Transpose;
     using Tin = C_S1CLCSC3DJIK_t;
     using Tout = C_DCCSC3DJIK_t;
@@ -337,7 +345,11 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_S1CLCSC3DJIK_complexf64
     assert(QuICC::Cuda::isDeviceMemory(pIn->pos));
     assert(QuICC::Cuda::isDeviceMemory(pIn->coo));
     // Op
+    #ifdef QUICC_MPI
+    using namespace QuICC::Transpose::Mpi;
+    #else
     using namespace QuICC::Transpose::Cuda;
+    #endif
     using namespace QuICC::Transpose;
     using Tin = C_DCCSC3DJIK_t;
     using Tout = C_S1CLCSC3DJIK_t;

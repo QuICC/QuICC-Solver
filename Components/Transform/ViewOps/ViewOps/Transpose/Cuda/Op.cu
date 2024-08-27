@@ -16,6 +16,8 @@
 #include "Profiler/Interface.hpp"
 #include "View/View.hpp"
 
+#define QUICC_MAX_TH_NAIVE 2048
+
 namespace QuICC {
 /// @brief namespace for Transpose type operations
 namespace Transpose {
@@ -96,7 +98,9 @@ template <class T> __device__ void pSum(T* vec, std::size_t size)
 }
 
 template <class Tout, class Tin, class Perm>
-__global__ void perm(View::View<Tout, View::DCCSC3DJIK> out,
+__global__ void
+__launch_bounds__(QUICC_MAX_TH_NAIVE)
+perm(View::View<Tout, View::DCCSC3DJIK> out,
    const View::View<Tin, View::S1CLCSC3DJIK> in)
 {
    static_assert(std::is_same_v<Perm, p201_t>,
@@ -171,7 +175,9 @@ __global__ void perm(View::View<Tout, View::DCCSC3DJIK> out,
 }
 
 template <class Tout, class Tin, class Perm>
-__global__ void perm(View::View<Tout, View::S1CLCSC3DJIK> out,
+__global__ void
+__launch_bounds__(QUICC_MAX_TH_NAIVE)
+perm(View::View<Tout, View::S1CLCSC3DJIK> out,
    const View::View<Tin, View::DCCSC3DJIK> in)
 {
    static_assert(std::is_same_v<Perm, p120_t>,
@@ -282,6 +288,8 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       details::perm<typename Tout::ScalarType, typename Tin::ScalarType, Perm>
          <<<numBlocks, blockSize, sizeof(std::uint32_t) * (2 * I + K)>>>(out,
             in);
+      cudaErrChk(cudaPeekAtLastError());
+      cudaErrChk(cudaDeviceSynchronize());
    }
    else if constexpr (std::is_same_v<Perm, p120_t> &&
                       std::is_same_v<typename Tin::AttributesType,
@@ -309,6 +317,8 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       details::perm<typename Tout::ScalarType, typename Tin::ScalarType, Perm>
          <<<numBlocks, blockSize, sizeof(std::uint32_t) * (2 * I + K)>>>(out,
             in);
+      cudaErrChk(cudaPeekAtLastError());
+      cudaErrChk(cudaDeviceSynchronize());
    }
    else if constexpr (std::is_same_v<Perm, p201_t> &&
                       std::is_same_v<typename Tin::AttributesType,
@@ -337,6 +347,8 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 
       details::perm<typename Tout::ScalarType, typename Tin::ScalarType, Perm>
          <<<numBlocks, blockSize>>>(out, in);
+      cudaErrChk(cudaPeekAtLastError());
+      cudaErrChk(cudaDeviceSynchronize());
    }
    else if constexpr (std::is_same_v<Perm, p120_t> &&
                       std::is_same_v<typename Tin::AttributesType,
@@ -365,6 +377,8 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 
       details::perm<typename Tout::ScalarType, typename Tin::ScalarType, Perm>
          <<<numBlocks, blockSize>>>(out, in);
+      cudaErrChk(cudaPeekAtLastError());
+      cudaErrChk(cudaDeviceSynchronize());
    }
    else
    {

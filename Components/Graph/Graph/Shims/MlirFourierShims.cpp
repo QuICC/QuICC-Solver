@@ -84,7 +84,8 @@ extern "C" inline void _ciface_quiccir_fr_prj_f64_DCCSC3D_complexf64_DCCSC3D_gpu
     pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
     ViewBase<std::uint32_t> indices[rank];
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
-    Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
+    std::uint32_t lds = pUmod->dataSize / pUmod->cooSize;
+    Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices, lds);
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
@@ -187,7 +188,8 @@ extern "C" void _ciface_quiccir_fr_int_complexf64_DCCSC3D_f64_DCCSC3D_gpu(void* 
     pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
     ViewBase<std::uint32_t> indices[rank];
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
-    Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
+    std::uint32_t lds = pUmod->dataSize / pUmod->cooSize;
+    Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices, lds);
     Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);

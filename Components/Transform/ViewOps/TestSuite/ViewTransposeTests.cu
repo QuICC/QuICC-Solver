@@ -196,7 +196,7 @@ TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 210",
    // view
    constexpr std::uint32_t rank = 3;
    std::array<std::uint32_t, rank> dimensionsIn{M, N, K};
-   std::array<std::uint32_t, rank> dimensionsOut{N, M, K};
+   std::array<std::uint32_t, rank> dimensionsOut{N, K, M};
    // skip setting up pointers and indices
    // they are not used in the serial aka dense tranpose
    std::array<std::vector<std::uint32_t>, rank> pointers = {{{}, {}, {}}};
