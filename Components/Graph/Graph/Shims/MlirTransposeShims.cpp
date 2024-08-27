@@ -94,7 +94,8 @@ extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_complexf64_D
     pointersOut[1] = ViewBase<std::uint32_t>(pOut->pos, pOut->posSize);
     ViewBase<std::uint32_t> indicesOut[rank];
     indicesOut[1] = ViewBase<std::uint32_t>(pOut->coo, pOut->cooSize);
-    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn);
+    std::uint32_t lds = pIn->dataSize / pIn->cooSize;
+    Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn, lds);
     Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
@@ -184,7 +185,8 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_DCCS
     ViewBase<std::uint32_t> indicesOut[rank];
     indicesOut[1] = ViewBase<std::uint32_t>(pOut->coo, pOut->cooSize);
     Tin viewIn(pIn->data, pIn->dataSize, pIn->dims, pointersIn, indicesIn);
-    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut);
+    std::uint32_t lds = pOut->dataSize / pOut->cooSize;
+    Tout viewOut(pOut->data, pOut->dataSize, pOut->dims, pointersOut, indicesOut, lds);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewOut, viewIn);
