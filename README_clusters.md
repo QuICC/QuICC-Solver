@@ -83,16 +83,23 @@ make
 # Euler
 
 ```bash
-env2lmod
-module load cmake/3.20.3 gcc/8.2.0 openmpi openblas fftw hdf5 boost python
+module load stack
+module load openmpi fftw hdf5 boost python openblas cmake
 
-cmake </path/to/QuICC> -DQUICC_USE_MPI=ON \
+cmake -DQUICC_USE_MPI=ON \
 -DQUICC_MULTPRECISION=ON \
--DQUICC_MODEL=<GreatSimulation>
-
-make
+-DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
+-DQUICC_MODEL=<GreatSimulation> \
+</path/to/QuICC>
 ```
-the default `h5py` is built with the incorrect hdf5 library, we need to install it ourselves
+
+Euler login nodes are slow, build on compute nodes
+```bash
+salloc --nodes=1 --cpus-per-task=64 --time=00:20:00
+srun make -j 64
+```
+
+In  case of problems with h5py, install into a Python venv
 
 ```bash
 python -m venv quicc_env
