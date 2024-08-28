@@ -1,3 +1,7 @@
+/**
+ * @file GraphTestsMpi.hpp
+ * @brief mpi/distributed graph test with cpu operators
+ */
 #define CATCH_CONFIG_RUNNER
 
 #include <catch2/catch.hpp>

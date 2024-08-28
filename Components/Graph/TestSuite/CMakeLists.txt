@@ -37,7 +37,6 @@ if(QUICC_USE_MPI)
         QuICC::Graph
         QuICC::Environment
         QuICC::TestSuite
-        QuICC::Profiling
         Catch2::Catch2
     )
 
