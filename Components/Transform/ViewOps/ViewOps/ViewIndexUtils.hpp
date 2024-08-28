@@ -141,10 +141,34 @@ ptrAndIdx densePtrAndIdx<DCCSC3D>(const std::array<std::uint32_t, 3> logDims,
 /// @param order order for which the metadata is created
 /// @return pointer and indices in a struct
 template <>
+ptrAndIdx densePtrAndIdx<DCCSC3DJIK>(const std::array<std::uint32_t, 3> logDims,
+   const dimOrder order)
+{
+   return densePtrAndIdx<DCCSC3D>(logDims, order);
+}
+
+/// @brief compute pointers and index meta data for fully populated
+/// tensor at different stages based on view attributes
+/// @param logDims logical dimensions, dimOrder::v012
+/// @param order order for which the metadata is created
+/// @return pointer and indices in a struct
+template <>
 ptrAndIdx densePtrAndIdx<S1CLCSC3D>(const std::array<std::uint32_t, 3> logDims,
    const dimOrder order)
 {
    return densePtrAndIdx<DCCSC3D>(logDims, order);
+}
+
+/// @brief compute pointers and index meta data for fully populated
+/// tensor at different stages based on view attributes
+/// @param logDims logical dimensions, dimOrder::v012
+/// @param order order for which the metadata is created
+/// @return pointer and indices in a struct
+template <>
+ptrAndIdx densePtrAndIdx<S1CLCSC3DJIK>(const std::array<std::uint32_t, 3> logDims,
+   const dimOrder order)
+{
+   return densePtrAndIdx<S1CLCSC3D>(logDims, order);
 }
 
 
@@ -217,6 +241,17 @@ ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
    return ret;
 }
 
+/// @brief compute pointers and index meta data for fully populated
+/// tensor at different stages based on view attributes
+/// @param logDims logical dimensions, dimOrder::v012
+/// @param order order for which the metadata is created
+/// @return pointer and indices in a struct
+template <>
+ptrAndIdx densePtrAndIdxStep1<DCCSC3DJIK>(const std::array<std::uint32_t, 3> logDims,
+   const dimOrder order)
+{
+   return densePtrAndIdxStep1<DCCSC3D>(logDims, order);
+}
 
 } // namespace Index
 } // namespace View
