@@ -129,6 +129,7 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in,
       else
       {
          std::complex<double> alpha{0.0, static_cast<double>(_layerIndex[h])};
+         // Check if integrator or projector
          if constexpr (Treatment == diffPhiInt_m)
          {
             alpha = -alpha;

@@ -52,6 +52,7 @@ target_link_options(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_
 )
 
 # Generate Shims
+include(ConfigAL.cmake)
 include(ConfigJW.cmake)
 
 # Alias
