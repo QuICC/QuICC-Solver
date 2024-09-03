@@ -72,18 +72,13 @@ struct P_t
 {
 };
 
+/// @brief P_Clean op type tag
+struct P_Clean_t
+{
+};
+
 /// @brief D1 op type tag
 struct D1_t
-{
-};
-
-/// @brief D2 op type tag
-struct D2_t
-{
-};
-
-/// @brief D3 op type tag
-struct D3_t
 {
 };
 
@@ -97,8 +92,48 @@ struct D1_Neg_t
 {
 };
 
+/// @brief D2 op type tag
+struct D2_t
+{
+};
+
+/// @brief D3 op type tag
+struct D3_t
+{
+};
+
+/// @brief D4 op type tag
+struct D4_t
+{
+};
+
+/// @brief Lapl2D_t op type tag
+struct Lapl2D_t
+{
+};
+
 /// @brief Df1Lapl2D_t op type tag
-struct Df1Lapl2D_t_t
+struct Df1Lapl2D_t
+{
+};
+
+/// @brief Ds1Lapl2D_t op type tag
+struct Ds1Lapl2D_t
+{
+};
+
+/// @brief InvLapl2D_t op type tag
+struct InvLapl2D_t
+{
+};
+
+/// @brief Df1InvLapl2D_t op type tag
+struct Df1InvLapl2D_t
+{
+};
+
+/// @brief Mean_t op type tag
+struct Mean_t
 {
 };
 

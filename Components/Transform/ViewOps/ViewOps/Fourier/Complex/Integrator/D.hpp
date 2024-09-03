@@ -28,6 +28,8 @@ using namespace QuICC::Operator;
 /// @tparam Tin input physical type
 /// @tparam FftBackend  type of FFT operator
 /// @tparam DiffBackend type of operator
+/// @tparam DiffBackend2 type of operator
+/// second optional stage needed for Df1InvLapl2D
 template<class Tout, class Tin, class FftBackend, class DiffBackend, class DiffBackend2 = void>
 class DOp : public UnaryBaseOp<DOp<Tout, Tin, FftBackend, DiffBackend, DiffBackend2>, Tout, Tin> {
 public:
