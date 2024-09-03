@@ -22,9 +22,9 @@ namespace details {
 
 /// @brief Default Jones-Worland quadrature
 /// @tparam TAG kind
-template <class TAG>
-struct OpsQuadratureMap {
-    using type = ::QuICC::Polynomial::Quadrature::WorlandRule;
+template <class TAG> struct OpsQuadratureMap
+{
+   using type = ::QuICC::Polynomial::Quadrature::WorlandRule;
 };
 
 } // namespace details
@@ -46,107 +46,107 @@ using namespace QuICC::Polynomial::Worland;
 /// @param iweights
 /// @param gSize
 /// @param shift
-template<int SHIFT>
-void computePowerQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize)
+template <int SHIFT>
+void computePowerQuadrature(Internal::Array& igrid, Internal::Array& iweights,
+   const int gSize)
 {
-    int nrgSize = gSize + 2*SHIFT;
-    Polynomial::Quadrature::WorlandSphEnergyRule wquad;
-    wquad.computeQuadrature(igrid, iweights, nrgSize);
+   int nrgSize = gSize + 2 * SHIFT;
+   Polynomial::Quadrature::WorlandSphEnergyRule wquad;
+   wquad.computeQuadrature(igrid, iweights, nrgSize);
 }
 
 /// @brief Generic helper in order to avoid having to pass
 /// extra parameters to energy integrators
-template <class OP>
-struct EnergyHelperQuadMap;
+template <class OP> struct EnergyHelperQuadMap;
 
 /// @brief Energy helper in order to avoid having to pass
 /// extra parameters to energy integrators
-template <>
-struct EnergyHelperQuadMap<Energy_t>
+template <> struct EnergyHelperQuadMap<Energy_t>
 {
-    void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize)
-    {
-        computePowerQuadrature<1>(igrid, iweights, gSize);
-    }
+   void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights,
+      const int gSize)
+   {
+      computePowerQuadrature<1>(igrid, iweights, gSize);
+   }
 };
 
 /// @brief EnergyD1R1 helper in order to avoid having to pass
 /// extra parameters to energy integrators
-template <>
-struct EnergyHelperQuadMap<EnergyD1R1_t>
+template <> struct EnergyHelperQuadMap<EnergyD1R1_t>
 {
-    void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize)
-    {
-        computePowerQuadrature<0>(igrid, iweights, gSize);
-    }
+   void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights,
+      const int gSize)
+   {
+      computePowerQuadrature<0>(igrid, iweights, gSize);
+   }
 };
 
 /// @brief EnergyR2 helper in order to avoid having to pass
 /// extra parameters to energy integrators
-template <>
-struct EnergyHelperQuadMap<EnergyR2_t>
+template <> struct EnergyHelperQuadMap<EnergyR2_t>
 {
-    void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize)
-    {
-        computePowerQuadrature<1>(igrid, iweights, gSize);
-    }
+   void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights,
+      const int gSize)
+   {
+      computePowerQuadrature<1>(igrid, iweights, gSize);
+   }
 };
 
-template <>
-struct EnergyHelperQuadMap<EnergySLaplR2_t>
+template <> struct EnergyHelperQuadMap<EnergySLaplR2_t>
 {
-    void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize)
-    {
-        computePowerQuadrature<1>(igrid, iweights, gSize);
-    }
+   void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights,
+      const int gSize)
+   {
+      computePowerQuadrature<1>(igrid, iweights, gSize);
+   }
 };
 
 /// @brief Quadrature for Energy
-template <>
-struct OpsQuadratureMap<Energy_t> {
-    using type = EnergyHelperQuadMap<Energy_t>;
+template <> struct OpsQuadratureMap<Energy_t>
+{
+   using type = EnergyHelperQuadMap<Energy_t>;
 };
 
 /// @brief Quadrature for EnergyD1R1
-template <>
-struct OpsQuadratureMap<EnergyD1R1_t> {
-    using type = EnergyHelperQuadMap<EnergyD1R1_t>;
+template <> struct OpsQuadratureMap<EnergyD1R1_t>
+{
+   using type = EnergyHelperQuadMap<EnergyD1R1_t>;
 };
 
 /// @brief Quadrature for EnergyR2
-template <>
-struct OpsQuadratureMap<EnergyR2_t> {
-    using type = EnergyHelperQuadMap<EnergyR2_t>;
+template <> struct OpsQuadratureMap<EnergyR2_t>
+{
+   using type = EnergyHelperQuadMap<EnergyR2_t>;
 };
 
 /// @brief Quadrature for EnergySLaplR2
-template <>
-struct OpsQuadratureMap<EnergySLaplR2_t> {
-    using type = EnergyHelperQuadMap<EnergySLaplR2_t>;
+template <> struct OpsQuadratureMap<EnergySLaplR2_t>
+{
+   using type = EnergyHelperQuadMap<EnergySLaplR2_t>;
 };
 
 /// @brief Quadrature for Power
-template <>
-struct OpsQuadratureMap<Power_t> {
-    using type = OpsQuadrature<Energy_t>;
+template <> struct OpsQuadratureMap<Power_t>
+{
+   using type = OpsQuadrature<Energy_t>;
 };
 
 /// @brief Quadrature for PowerD1R1
-template <>
-struct OpsQuadratureMap<PowerD1R1_t> {
-    using type = OpsQuadrature<EnergyD1R1_t>;
+template <> struct OpsQuadratureMap<PowerD1R1_t>
+{
+   using type = OpsQuadrature<EnergyD1R1_t>;
 };
 
 /// @brief Quadrature for PowerR2
-template <>
-struct OpsQuadratureMap<PowerR2_t> {
-    using type = OpsQuadrature<EnergyR2_t>;
+template <> struct OpsQuadratureMap<PowerR2_t>
+{
+   using type = OpsQuadrature<EnergyR2_t>;
 };
 
 /// @brief Quadrature for PowerSLaplR2
-template <>
-struct OpsQuadratureMap<PowerSLaplR2_t> {
-    using type = OpsQuadrature<EnergySLaplR2_t>;
+template <> struct OpsQuadratureMap<PowerSLaplR2_t>
+{
+   using type = OpsQuadrature<EnergySLaplR2_t>;
 };
 
 } // namespace details

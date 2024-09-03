@@ -11,8 +11,8 @@
 // Project includes
 //
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
-#include "ViewOps/ALegendre/Tags.hpp"
 #include "Types/Internal/Math.hpp"
+#include "ViewOps/ALegendre/Tags.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -24,15 +24,16 @@ namespace details {
 
 struct ALegendreRule
 {
-    void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize);
+   void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights,
+      const int gSize);
 };
 
 
 /// @brief Default ALegendre quadrature
 /// @tparam TAG kind
-template <class TAG>
-struct OpsQuadratureMap {
-    using type = ALegendreRule;
+template <class TAG> struct OpsQuadratureMap
+{
+   using type = ALegendreRule;
 };
 
 } // namespace details
