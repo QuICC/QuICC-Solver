@@ -45,6 +45,48 @@ extern "C" void _ciface_quiccir_fr_@Op@_@Kind@_complexf64_DCCSC3D_f64_DCCSC3D_cp
     cl->apply(viewMod, viewVal);
 };
 
+#ifdef QUICC_HAS_CUDA_BACKEND
+/// @brief C Interface to MLIR for a fr int operator
+/// @param op
+/// @param umod
+/// @param uval
+extern "C" void _ciface_quiccir_fr_@Op@_@Kind@_complexf64_DCCSC3D_f64_DCCSC3D_gpu(void* obj, view3_cd_t* pUmod, view3_t* pUval)
+{
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_fr_@Op@_@Kind@_complexf64_DCCSC3D_f64_DCCSC3D_gpu\n";
+    #endif
+    assert(obj != nullptr);
+    assert(pUval != nullptr);
+    assert(pUmod != nullptr);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->coo));
+    // op
+    using namespace QuICC::Transform::Fourier;
+    using backend_t = viewGpu_t;
+    using Tin = R_DCCSC3D_t;
+    using Tout = C_DCCSC3D_t;
+    using op_t = Mixed::OpsType<Tout, Tin, @Kind@_t, @OpDirection@, backend_t>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
+    std::uint32_t lds = pUmod->dataSize / pUmod->cooSize;
+    Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices, lds);
+    Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    // call
+    auto cl = reinterpret_cast<op_t*>(obj);
+    cl->apply(viewMod, viewVal);
+};
+#endif
+
 /// @brief C Interface to MLIR for a fr int operator
 /// @param op
 /// @param uval
