@@ -160,6 +160,14 @@ void readList(Array& inData, const std::string& path)
    }
    else
    {
+      // Ignore header
+      int s = infile.peek();
+      while(s == '#')
+      {
+         infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+         s = infile.peek();
+      }
+
       // Get size from first value
       if (inData.size() == 0)
       {

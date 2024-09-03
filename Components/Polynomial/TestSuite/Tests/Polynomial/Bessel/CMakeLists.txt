@@ -23,18 +23,25 @@ include(ConfigureTests)
 set(BesselTests
   Value:SphJnl
   Insulating:SphJnl
+  NoSlip:SphJnl
   Value:rSphJnl
   Insulating:rSphJnl
+  NoSlip:rSphJnl
   Value:r_1SphJnl
   Insulating:r_1SphJnl
+  NoSlip:r_1SphJnl
   Value:dSphJnl
   Insulating:dSphJnl
+  NoSlip:dSphJnl
   Value:d2SphJnl
   Insulating:d2SphJnl
+  NoSlip:d2SphJnl
   Value:drSphJnl
   Insulating:drSphJnl
+  NoSlip:drSphJnl
   Value:slaplSphJnl
   Insulating:slaplSphJnl
+  NoSlip:slaplSphJnl
   Value:lowerSphJnl
   Insulating:lowerSphJnl
   Value:raiseSphJnl
@@ -57,6 +64,7 @@ endforeach()
 set(BesselTestsTemplated
   Value:r_1drSphJnl:recurrence_t
   Insulating:r_1drSphJnl:recurrence_t
+  NoSlip:r_1drSphJnl:recurrence_t
 )
 quicc_set_ulp(_ulp
   ULP 600
@@ -74,8 +82,10 @@ endforeach()
 set(BesselTestsTemplated
   Value:r_1drSphJnl:explicit_t
   Insulating:r_1drSphJnl:explicit_t
+  NoSlip:r_1drSphJnl:explicit_t
   Value:r_1drSphJnl:implicit_t
   Insulating:r_1drSphJnl:implicit_t
+  NoSlip:r_1drSphJnl:implicit_t
 )
 quicc_set_ulp(_ulp
   ULP 600

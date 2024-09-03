@@ -31,8 +31,10 @@ namespace Boundary {
    {
       using namespace Internal::Literals;
 
-      ACoeff_t val = ACoeff_t::Ones(maxN+1);
+      int nRoot = maxN + 1;
+      ACoeff_t val = ACoeff_t::Ones(nRoot);
       Internal::MHDFloat dNu;
+      std::vector<Internal::MHDFloat> roots;
       if(this->type() == BesselKind::VALUE)
       {
          dNu = Polynomial::SphericalBessel::Value_dNu();
@@ -41,14 +43,19 @@ namespace Boundary {
       {
          dNu = Polynomial::SphericalBessel::Insulating_dNu();
       }
+      else if(this->type() == BesselKind::NOSLIP)
+      {
+         dNu = Polynomial::SphericalBessel::NoSlip_dNu();
+         roots.push_back(0);
+         nRoot--;
+      }
       else
       {
-         throw std::logic_error("Unknown Bessel Kind");
+         throw std::logic_error("Unknown Bessel Kind for D1 boundary");
       }
 
-      std::vector<Internal::MHDFloat> roots;
       int il = static_cast<int>(this->l());
-      Polynomial::SphericalBessel::getRoots(roots, il, maxN+1, dNu);
+      Polynomial::SphericalBessel::getRoots(roots, il, nRoot, dNu);
       for(int i = 0; i < val.size(); i++)
       {
          const auto& k = roots.at(i);

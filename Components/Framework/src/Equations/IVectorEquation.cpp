@@ -131,6 +131,7 @@ namespace Equations {
       std::vector<Transform::TransformPath> paths;
 
       auto spSteps = this->transformSteps();
+
       const std::size_t disabledPathId = Transform::Path::Empty::id();
 
       auto makeMap = [&](auto&& enabled, const bool disabled)

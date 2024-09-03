@@ -15,73 +15,80 @@
 #include "QuICC/Arithmetics/Sub.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Transform/Path/ValueScalar.hpp"
-#include "QuICC/Transform/Path/InsulatingScalar.hpp"
 #include "QuICC/Transform/Path/ValueTorPol.hpp"
-#include "QuICC/Transform/Path/InsulatingTorPol.hpp"
-#include "QuICC/Transform/Path/NoSlipTorPol.hpp"
-#include "QuICC/Transform/Path/StressFreeTorPol.hpp"
-#include "QuICC/Transform/Path/NoPenetrationTorPol.hpp"
 #include "QuICC/Transform/Path/ValueScalarNl.hpp"
-#include "QuICC/Transform/Path/InsulatingScalarNl.hpp"
 #include "QuICC/Transform/Path/ValueCurlNl.hpp"
-#include "QuICC/Transform/Path/InsulatingCurlNl.hpp"
-#include "QuICC/Transform/Path/InsulatingLaplhCurlNl.hpp"
-#include "QuICC/Transform/Path/StressFreeCurlNl.hpp"
 #include "QuICC/Transform/Path/ValueCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/ValueLaplhCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/ValueWithL0CurlNl.hpp"
-#include "QuICC/Transform/Path/InsulatingWithL0CurlNl.hpp"
-#include "QuICC/Transform/Path/InsulatingCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/ValueNegCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/ValueBc1NegCurlCurlNl.hpp"
+#include "QuICC/Transform/Path/InsulatingScalar.hpp"
+#include "QuICC/Transform/Path/InsulatingTorPol.hpp"
+#include "QuICC/Transform/Path/InsulatingScalarNl.hpp"
+#include "QuICC/Transform/Path/InsulatingCurlNl.hpp"
+#include "QuICC/Transform/Path/InsulatingLaplhCurlNl.hpp"
+#include "QuICC/Transform/Path/InsulatingWithL0CurlNl.hpp"
+#include "QuICC/Transform/Path/InsulatingCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/InsulatingBc2NegCurlCurlNl.hpp"
+#include "QuICC/Transform/Path/NoSlipTorPol.hpp"
+#include "QuICC/Transform/Path/NoSlipBc1NegCurlCurlNl.hpp"
+#include "QuICC/Transform/Path/NoPenetrationTorPol.hpp"
+#include "QuICC/Transform/Path/StressFreeTorPol.hpp"
+#include "QuICC/Transform/Path/StressFreeCurlNl.hpp"
 #include "QuICC/Transform/Path/TorPol.hpp"
 #include "QuICC/Transform/Path/Empty.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/Laplh.hpp"
-#include "QuICC/Transform/Forward/ValueP.hpp"
-#include "QuICC/Transform/Forward/InsulatingP.hpp"
-#include "QuICC/Transform/Forward/StressFreeP.hpp"
 #include "QuICC/Transform/Forward/D1.hpp"
 #include "QuICC/Transform/Forward/OversinDphi.hpp"
 #include "QuICC/Transform/Forward/Overlaplh.hpp"
 #include "QuICC/Transform/Forward/OverlaplhD1.hpp"
 #include "QuICC/Transform/Forward/OverlaplhOversinDphi.hpp"
+#include "QuICC/Transform/Forward/ValueP.hpp"
 #include "QuICC/Transform/Forward/ValuePol.hpp"
-#include "QuICC/Transform/Forward/InsulatingPol.hpp"
 #include "QuICC/Transform/Forward/ValueQ.hpp"
-#include "QuICC/Transform/Forward/InsulatingQ.hpp"
 #include "QuICC/Transform/Forward/ValueBc1Q.hpp"
-#include "QuICC/Transform/Forward/InsulatingBc2Q.hpp"
 #include "QuICC/Transform/Forward/ValueS.hpp"
-#include "QuICC/Transform/Forward/InsulatingS.hpp"
 #include "QuICC/Transform/Forward/ValueBc1S.hpp"
-#include "QuICC/Transform/Forward/InsulatingBc2S.hpp"
 #include "QuICC/Transform/Forward/ValueT.hpp"
+#include "QuICC/Transform/Forward/InsulatingP.hpp"
+#include "QuICC/Transform/Forward/InsulatingPol.hpp"
+#include "QuICC/Transform/Forward/InsulatingQ.hpp"
+#include "QuICC/Transform/Forward/InsulatingBc2Q.hpp"
+#include "QuICC/Transform/Forward/InsulatingS.hpp"
+#include "QuICC/Transform/Forward/InsulatingBc2S.hpp"
 #include "QuICC/Transform/Forward/InsulatingT.hpp"
+#include "QuICC/Transform/Forward/NoSlipPol.hpp"
+#include "QuICC/Transform/Forward/NoSlipBc1Q.hpp"
+#include "QuICC/Transform/Forward/NoSlipBc1S.hpp"
+#include "QuICC/Transform/Forward/StressFreeP.hpp"
 #include "QuICC/Transform/Forward/StressFreeT.hpp"
 #include "QuICC/Transform/Backward/P.hpp"
-#include "QuICC/Transform/Backward/ValueP.hpp"
-#include "QuICC/Transform/Backward/InsulatingP.hpp"
-#include "QuICC/Transform/Backward/StressFreeP.hpp"
-#include "QuICC/Transform/Backward/ValueOverr1.hpp"
-#include "QuICC/Transform/Backward/InsulatingOverr1.hpp"
-#include "QuICC/Transform/Backward/StressFreeOverr1.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
-#include "QuICC/Transform/Backward/ValueD1.hpp"
-#include "QuICC/Transform/Backward/InsulatingD1.hpp"
-#include "QuICC/Transform/Backward/ValueOverr1D1R1.hpp"
-#include "QuICC/Transform/Backward/InsulatingOverr1D1R1.hpp"
-#include "QuICC/Transform/Backward/StressFreeOverr1D1R1.hpp"
 #include "QuICC/Transform/Backward/OversinDphi.hpp"
-#include "QuICC/Transform/Backward/ValueSlapl.hpp"
-#include "QuICC/Transform/Backward/InsulatingSlapl.hpp"
 #include "QuICC/Transform/Backward/OversinD1Sin.hpp"
 #include "QuICC/Transform/Backward/Laplh.hpp"
+#include "QuICC/Transform/Backward/ValueP.hpp"
+#include "QuICC/Transform/Backward/ValueOverr1.hpp"
+#include "QuICC/Transform/Backward/ValueD1.hpp"
+#include "QuICC/Transform/Backward/ValueOverr1D1R1.hpp"
+#include "QuICC/Transform/Backward/ValueSlapl.hpp"
+#include "QuICC/Transform/Backward/InsulatingP.hpp"
+#include "QuICC/Transform/Backward/InsulatingOverr1.hpp"
+#include "QuICC/Transform/Backward/InsulatingD1.hpp"
+#include "QuICC/Transform/Backward/InsulatingOverr1D1R1.hpp"
+#include "QuICC/Transform/Backward/InsulatingSlapl.hpp"
+#include "QuICC/Transform/Backward/NoSlipOverr1.hpp"
+#include "QuICC/Transform/Backward/NoSlipOverr1D1R1.hpp"
+#include "QuICC/Transform/Backward/NoSlipSlapl.hpp"
+#include "QuICC/Transform/Backward/StressFreeP.hpp"
+#include "QuICC/Transform/Backward/StressFreeOverr1.hpp"
+#include "QuICC/Transform/Backward/StressFreeOverr1D1R1.hpp"
 
 // Value Torpol = Tor Value, Pol Value
-// No-slip Torpol = Tor Value, Pol Value
-// Stress-free Torpol = SF Value, Pol Value
+// No-slip Torpol = Tor Value, Pol NS
+// Stress-free Torpol = Tor SF, Pol Value
 // Insulating Torpol = Tor Value, Pol Insulating
 namespace QuICC {
 
@@ -186,10 +193,11 @@ namespace Transform {
 
          if(!(curlFlag == Path::Empty::id() && curlcurlFlag == Path::Empty::id()))
          {
-            // Value BC for toroidal and Value BC for poloidal
+            // Check for known flag for Toroidal and Poloidal
             if(((curlFlag == Path::ValueTorPol::id()) ||
                 (curlFlag == Path::NoSlipTorPol::id()) ||
-                (curlFlag == Path::InsulatingTorPol::id()))
+                (curlFlag == Path::InsulatingTorPol::id()) ||
+                (curlFlag == Path::NoPenetrationTorPol::id()))
                   && (curlcurlFlag == curlFlag))
             {
                std::size_t tId;
@@ -200,12 +208,11 @@ namespace Transform {
                   tId = Forward::ValueP::id();
                   pId = Forward::ValuePol::id();
                }
-               // No-slip BC: Value for Tor, Value and D on Pol
+               // No-slip BC: Value for Tor, NS on Pol
                if(curlFlag == Path::NoSlipTorPol::id())
                {
                   tId = Forward::ValueP::id();
-                  pId = Forward::ValuePol::id();
-                  throw std::logic_error("No-Slip basis not implemented");
+                  pId = Forward::NoSlipPol::id();
                }
                // Stress-free BC
                else if(curlFlag == Path::StressFreeTorPol::id())
@@ -218,6 +225,12 @@ namespace Transform {
                {
                   tId = Forward::ValueP::id();
                   pId = Forward::InsulatingPol::id();
+               }
+               // NoPenetration BC
+               else if(curlFlag == Path::NoPenetrationTorPol::id())
+               {
+                  tId = Forward::InsulatingP::id();
+                  pId = Forward::ValuePol::id();
                }
                // Compute Toroidal component
                transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
@@ -268,10 +281,10 @@ namespace Transform {
             // CurlNl BC
             if(curlFlag == Path::ValueCurlNl::id() ||
                   curlFlag == Path::StressFreeCurlNl::id() ||
-                  curlFlag == Path::InsulatingCurlNl::id() || 
+                  curlFlag == Path::InsulatingCurlNl::id() ||
                   curlFlag == Path::ValueWithL0CurlNl::id() ||
                   curlFlag == Path::InsulatingWithL0CurlNl::id() ||
-                  curlFlag == Transform::Path::InsulatingLaplhCurlNl::id())
+                  curlFlag == Path::InsulatingLaplhCurlNl::id())
             {
                std::size_t tId;
                // Value BC
@@ -334,7 +347,7 @@ namespace Transform {
             // CurlCurlNl BC
             if(curlcurlFlag == Path::ValueCurlCurlNl::id() ||
                   curlcurlFlag == Path::InsulatingCurlCurlNl::id() ||
-                  curlcurlFlag == Transform::Path::ValueLaplhCurlCurlNl::id())
+                  curlcurlFlag == Path::ValueLaplhCurlCurlNl::id())
             {
                std::size_t qId;
                std::size_t sId;
@@ -381,7 +394,8 @@ namespace Transform {
             // Negative CurlCurlNl
             else if(curlcurlFlag == Path::ValueNegCurlCurlNl::id() ||
                   curlcurlFlag == Path::ValueBc1NegCurlCurlNl::id() ||
-                  curlcurlFlag == Path::InsulatingBc2NegCurlCurlNl::id())
+                  curlcurlFlag == Path::InsulatingBc2NegCurlCurlNl::id() ||
+                  curlcurlFlag == Path::NoSlipBc1NegCurlCurlNl::id())
             {
                std::size_t qId;
                std::size_t sId;
@@ -396,6 +410,12 @@ namespace Transform {
                {
                   qId = Forward::ValueBc1Q::id();
                   sId = Forward::ValueBc1S::id();
+               }
+               // No-slip BC with 1 additional BC
+               else if(curlcurlFlag == Path::NoSlipBc1NegCurlCurlNl::id())
+               {
+                  qId = Forward::NoSlipBc1Q::id();
+                  sId = Forward::NoSlipBc1S::id();
                }
                // Insulating BC with 2 additional BC
                else if(curlcurlFlag == Path::InsulatingBc2NegCurlCurlNl::id())
@@ -564,9 +584,13 @@ namespace Transform {
          auto cR = req.find(FieldComponents::Physical::R)->second;
          if(cR != Path::Empty::id())
          {
-            if(cR == Path::ValueTorPol::id() || cR == Path::NoSlipTorPol::id() || cR == Path::StressFreeTorPol::id() || cR == Path::NoPenetrationTorPol::id())
+            if(cR == Path::ValueTorPol::id() || cR == Path::StressFreeTorPol::id() || cR == Path::NoPenetrationTorPol::id())
             {
                rPolId = Backward::ValueOverr1::id();
+            }
+            else if(cR == Path::NoSlipTorPol::id())
+            {
+               rPolId = Backward::NoSlipOverr1::id();
             }
             else if(cR == Path::InsulatingTorPol::id())
             {
@@ -585,10 +609,15 @@ namespace Transform {
          auto cT = req.find(FieldComponents::Physical::THETA)->second;
          if(cT != Path::Empty::id())
          {
-            if(cT == Path::ValueTorPol::id() || cT == Path::NoSlipTorPol::id())
+            if(cT == Path::ValueTorPol::id())
             {
                rTorId = Backward::ValueP::id();
                rPolId = Backward::ValueOverr1D1R1::id();
+            }
+            else if(cT == Path::NoSlipTorPol::id())
+            {
+               rTorId = Backward::ValueP::id();
+               rPolId = Backward::NoSlipOverr1D1R1::id();
             }
             else if(cT == Path::StressFreeTorPol::id())
             {
@@ -623,10 +652,15 @@ namespace Transform {
          auto cP = req.find(FieldComponents::Physical::PHI)->second;
          if(cP != Path::Empty::id())
          {
-            if(cP == Path::ValueTorPol::id() || cP == Path::NoSlipTorPol::id())
+            if(cP == Path::ValueTorPol::id())
             {
                rTorId = Backward::ValueP::id();
                rPolId = Backward::ValueOverr1D1R1::id();
+            }
+            else if(cP == Path::NoSlipTorPol::id())
+            {
+               rTorId = Backward::ValueP::id();
+               rPolId = Backward::NoSlipOverr1D1R1::id();
             }
             else if(cP == Path::StressFreeTorPol::id())
             {
@@ -718,10 +752,15 @@ namespace Transform {
          auto cT = req.find(FieldComponents::Physical::THETA)->second;
          if(cT != Path::Empty::id())
          {
-            if(cT == Path::ValueTorPol::id() || cT == Path::NoSlipTorPol::id())
+            if(cT == Path::ValueTorPol::id())
             {
                rTorId = Backward::ValueOverr1D1R1::id();
                rPolId = Backward::ValueSlapl::id();
+            }
+            else if(cT == Path::NoSlipTorPol::id())
+            {
+               rTorId = Backward::ValueOverr1D1R1::id();
+               rPolId = Backward::NoSlipSlapl::id();
             }
             else if(cT == Path::StressFreeTorPol::id())
             {
@@ -758,10 +797,15 @@ namespace Transform {
          auto cP = req.find(FieldComponents::Physical::PHI)->second;
          if(cP != Path::Empty::id())
          {
-            if(cP == Path::ValueTorPol::id() || cP == Path::NoSlipTorPol::id())
+            if(cP == Path::ValueTorPol::id())
             {
                rTorId = Backward::ValueOverr1D1R1::id();
                rPolId = Backward::ValueSlapl::id();
+            }
+            else if(cP == Path::NoSlipTorPol::id())
+            {
+               rTorId = Backward::ValueOverr1D1R1::id();
+               rPolId = Backward::NoSlipSlapl::id();
             }
             else if(cP == Path::StressFreeTorPol::id())
             {

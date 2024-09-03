@@ -32,6 +32,16 @@ set(tags
   InsulatingPowerD1R1
   InsulatingPowerR2
   InsulatingPowerSlaplR2
+  NoSlipEnergy
+  NoSlipEnergyD1
+  NoSlipEnergyD1R1
+  NoSlipEnergyR2
+  NoSlipEnergySlaplR2
+  NoSlipPower
+  NoSlipPowerD1
+  NoSlipPowerD1R1
+  NoSlipPowerR2
+  NoSlipPowerSlaplR2
   )
 
 include(RegisterTags)

@@ -55,6 +55,13 @@ set(tags
   InsulatingQ
   InsulatingS
   InsulatingT
+  NoSlipP
+  NoSlipPol
+  NoSlipQ
+  NoSlipS
+  NoSlipT
+  NoSlipBc1Q
+  NoSlipBc1S
   StressFreeP
   StressFreeT
   )

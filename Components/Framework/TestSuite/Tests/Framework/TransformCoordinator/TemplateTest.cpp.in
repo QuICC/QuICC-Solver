@@ -52,8 +52,6 @@ TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
 
    Catch::StringMaker<double>::precision = 15;
 
-   QuICC::ArrayI dim = currentts::processCmdLine();
-
    // convert factor vector to list
    std::list<int> factorList(currentts::args().factors.begin(), currentts::args().factors.end());
 
@@ -77,14 +75,20 @@ TEST_CASE( "Full transform loop for @Scheme@", "[@Scheme@]" ){
    {
       throw std::logic_error("Unknown 1D truncation scheme");
    }
-   auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D);
-   auto&& descr = best.second;
 
    for(auto id: currentts::args().params)
    {
       currentts::Test test;
+      test.configure(id, "@Scheme@");
+
+      QuICC::ArrayI dim = currentts::processCmdLine(test);
+
+      // Create LoadSplitter, SpatialScheme and generate resolution
+      auto best = currentts::initResolution<QuICC::SpatialScheme::@Scheme@>(dim, currentts::args().algorithm, currentts::args().grouper, factorList, opt1D);
+      auto&& descr = best.second;
+
       test.spRes = best.first;
-      test.configure(id);
+
       test.maxUlp = currentts::args().ulp;
 
       currentts::initVariables(test);

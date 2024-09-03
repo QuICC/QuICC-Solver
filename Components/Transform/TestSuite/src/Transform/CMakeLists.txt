@@ -4,6 +4,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_TEST_LIB} ${QUICC_CMAKE_SRC_VISIB
   Tools.cpp
 )
 
+add_subdirectory(Bessel)
 add_subdirectory(Chebyshev)
 add_subdirectory(ALegendre)
 add_subdirectory(Fourier)

@@ -5,7 +5,9 @@ set(tags
   Empty
   I2CurlCurlNl
   I2CurlNl
+  I2LaplhCurlNl
   I2ScalarNl
+  I2LaplhCurlCurlNl
   NegI2CurlCurlNl
   NegI4CurlCurlNl
   Scalar
@@ -18,9 +20,10 @@ set(tags
   ValueCurlCurlNl
   ValueNegCurlCurlNl
   ValueBc1NegCurlCurlNl
-  InsulatingBc2NegCurlCurlNl
   ValueLaplhCurlNl
   ValueLaplhCurlCurlNl
+  ValueWithL0CurlNl
+  InsulatingBc2NegCurlCurlNl
   InsulatingScalar
   InsulatingScalarNl
   InsulatingTorPol
@@ -29,9 +32,11 @@ set(tags
   InsulatingNegCurlCurlNl
   InsulatingLaplhCurlNl
   InsulatingLaplhCurlCurlNl
+  InsulatingWithL0CurlNl
   StressFreeTorPol
   StressFreeCurlNl
   NoSlipTorPol
+  NoSlipBc1NegCurlCurlNl
   NoPenetrationTorPol
   )
 

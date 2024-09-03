@@ -1,0 +1,61 @@
+/**
+ * @file @Operator@Test.cpp
+ * @brief Tests for the Bessel based @Operator@ transform loop
+ */
+
+// System includes
+//
+#include <catch2/catch.hpp>
+
+// Project includes
+//
+#include "QuICC/TestSuite/Transform/Bessel/TestArgs.hpp"
+#include "QuICC/TestSuite/Transform/Bessel/Tester.hpp"
+#include "QuICC/Transform/Poly/Bessel/Projector/Base/@Boundary@.hpp"
+#include "QuICC/Transform/Poly/Bessel/Projector/@Operator@.hpp"
+#include "QuICC/Transform/Poly/Bessel/Integrator/Base/@Boundary@.hpp"
+#include "QuICC/Transform/Poly/Bessel/Integrator/P.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Transform::Bessel;
+
+TEST_CASE( "Error for @Boundary@@Operator@@Template@ backward-forward loop", "[@CatchTestName@]" ){
+
+   // Set default arguments if required
+   if(currentts::args().useDefault)
+   {
+      currentts::args().params = {0,1,2};
+
+      //
+      // OVERRIDING DEFAULT ULP
+      // SHOULD BE REMOVED ONCE WE
+      // HAVE A CLEAR POLICY
+      //
+      currentts::args().ulp = 12;
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   // Set type
+   currentts::args().setType("@type@");
+
+   REQUIRE( (currentts::args().type == ::QuICC::TestSuite::Transform::TestType::BFLOOP && "Test type is bfloop") );
+   REQUIRE( currentts::args().params.size() > 0 );
+
+   // Typedef for used operator
+   using namespace ::QuICC::Transform::Poly::Bessel;
+   typedef Projector::@Boundary@<Projector::@Operator@@Template@> Projector;
+   typedef Integrator::@Boundary@<Integrator::P@Template@> Integrator;
+   typedef typename currentts::Tester<Projector,Integrator> Tester;
+
+   Tester tester("@Boundary@", "@Operator@.dat", currentts::args().dumpData);
+   tester.setUlp(currentts::args().ulp);
+
+   Tester::ParameterType params = {-1};
+
+   for(int id: currentts::args().params)
+   {
+      params.at(0) = id;
+      tester.validate(params, currentts::args().type, currentts::args().timeOnly);
+   }
+
+}

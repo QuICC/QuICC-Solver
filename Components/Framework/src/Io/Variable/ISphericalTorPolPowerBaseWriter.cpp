@@ -36,6 +36,8 @@
 #include "QuICC/Transform/Reductor/InsulatingPower.hpp"
 #include "QuICC/Transform/Reductor/InsulatingPowerD1R1.hpp"
 #include "QuICC/Transform/Reductor/InsulatingPowerR2.hpp"
+#include "QuICC/Transform/Reductor/NoSlipPower.hpp"
+#include "QuICC/Transform/Reductor/NoSlipPowerD1R1.hpp"
 #include "QuICC/Io/Variable/Tags/Power.hpp"
 
 namespace QuICC {
@@ -110,8 +112,8 @@ namespace Variable {
       else if(this->mPathId == Transform::Path::NoSlipTorPol::id())
       {
          torPowerR2Id = Transform::Reductor::ValuePowerR2::id();
-         polPowerId = Transform::Reductor::ValuePower::id();
-         polPowerD1R1Id = Transform::Reductor::ValuePowerD1R1::id();
+         polPowerId = Transform::Reductor::NoSlipPower::id();
+         polPowerD1R1Id = Transform::Reductor::NoSlipPowerD1R1::id();
       }
       else if(this->mPathId == Transform::Path::NoPenetrationTorPol::id())
       {

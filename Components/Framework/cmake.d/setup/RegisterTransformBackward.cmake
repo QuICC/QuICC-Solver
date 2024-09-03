@@ -34,6 +34,11 @@ set(tags
   InsulatingD1
   InsulatingOverr1D1R1
   InsulatingSlapl
+  NoSlipP
+  NoSlipOverr1
+  NoSlipD1
+  NoSlipOverr1D1R1
+  NoSlipSlapl
   StressFreeP
   StressFreeOverr1
   StressFreeOverr1D1R1

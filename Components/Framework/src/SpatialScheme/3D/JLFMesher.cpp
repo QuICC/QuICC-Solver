@@ -40,7 +40,7 @@ namespace SpatialScheme {
       // radial spectral resolution
       nN_ = N + 1;
       // radial grid resolution
-      int nR_ = N + L/2 + 8;
+      int nR_ = 15*(2*N + L + 1)/8;
       // Get dealiased Bessel transform size
       this->mNr = Transform::Poly::Tools::dealias(nR_);
 

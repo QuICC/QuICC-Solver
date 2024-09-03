@@ -4,8 +4,8 @@
  * conditions
  */
 
-#ifndef _VALUE_
-#define _VALUE_
+#ifndef QUICC_POLYNOMIAL_BESSEL_VALUE_HPP
+#define QUICC_POLYNOMIAL_BESSEL_VALUE_HPP
 
 // System includes
 //
@@ -70,7 +70,7 @@ inline void Value<TOp>::compute(
          SphericalBessel::Value_dNu());
 
       TOp::compute(rOut, roots, roots_extra, l, igrid, scale,
-         SphericalBessel::Value_dNu());
+         SphericalBessel::Value_dNu(), SphericalBessel::Value_dNu());
    }
 }
 
@@ -78,4 +78,4 @@ inline void Value<TOp>::compute(
 } // namespace Polynomial
 } // namespace QuICC
 
-#endif // _VALUE_
+#endif // QUICC_POLYNOMIAL_BESSEL_VALUE_HPP

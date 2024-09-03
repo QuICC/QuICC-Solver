@@ -11,3 +11,4 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
 add_subdirectory(Boundary)
 add_subdirectory(Value)
 add_subdirectory(Insulating)
+add_subdirectory(NoSlip)

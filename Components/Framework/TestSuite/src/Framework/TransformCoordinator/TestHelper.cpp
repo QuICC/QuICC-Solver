@@ -15,21 +15,40 @@
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
+#include "QuICC/SpatialScheme/ISpatialScheme.hpp"
+#include "QuICC/SpatialScheme/Tools/SpectralTriangularSH.hpp"
 #include "QuICC/TestSuite/Framework/TransformCoordinator/TestHelper.hpp"
 #include "QuICC/TransformCoordinators/TransformCoordinatorTools.hpp"
 #include "QuICC/TransformConfigurators/TransformTreeTools.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
+#include "QuICC/Transform/Path/ValueScalar.hpp"
+#include "QuICC/Transform/Path/InsulatingScalar.hpp"
 #include "QuICC/Transform/Path/TorPol.hpp"
+#include "QuICC/Transform/Path/ValueTorPol.hpp"
+#include "QuICC/Transform/Path/NoPenetrationTorPol.hpp"
+#include "QuICC/Transform/Path/InsulatingTorPol.hpp"
+#include "QuICC/Transform/Path/ScalarNl.hpp"
+#include "QuICC/Transform/Path/ValueScalarNl.hpp"
+#include "QuICC/Transform/Path/InsulatingScalarNl.hpp"
+#include "QuICC/Transform/Path/CurlNl.hpp"
+#include "QuICC/Transform/Path/CurlCurlNl.hpp"
+#include "QuICC/Transform/Path/ValueCurlNl.hpp"
+#include "QuICC/Transform/Path/ValueCurlCurlNl.hpp"
+#include "QuICC/Transform/Path/InsulatingCurlNl.hpp"
+#include "QuICC/Transform/Path/InsulatingCurlCurlNl.hpp"
 #include "QuICC/TypeSelectors/ParallelSelector.hpp"
 #include "QuICC/Variables/FieldRequirement.hpp"
 #include "QuICC/Variables/RequirementTools.hpp"
 #include "QuICC/PhysicalKernels/Passthrough.hpp"
 #include "QuICC/TestSuite/Framework/TransformCoordinator/TestArgs.hpp"
-#include "QuICC/SpatialScheme/Tools/SpectralTriangularSH.hpp"
-#include "QuICC/SpatialScheme/Tools/SpectralTrapezoidalSH.hpp"
+#include "QuICC/TestSuite/Framework/TransformCoordinator/CurlKernel.hpp"
+#include "QuICC/TestSuite/Framework/TransformCoordinator/InertiaKernel.hpp"
+#include "QuICC/TestSuite/Framework/TransformCoordinator/IReference.hpp"
+#include "TestSuite/Io.hpp"
 
 namespace QuICC {
 
@@ -39,59 +58,35 @@ namespace Framework {
 
 namespace TCoord {
 
-   Test::Test()
-      : epsilon(std::numeric_limits<MHDFloat>::epsilon()), maxUlp(11)
-   {
-   }
-
-   MHDFloat Test::tolerance() const
-   {
-      return this->maxUlp*this->epsilon;
-   }
-
-   void Test::configure(const int id)
-   {
-      switch(id)
-      {
-         case 0:
-            this->fieldId = FieldId::SCALAR;
-            this->kernelId = KernelId::PASSTHROUGH;
-            this->pathId = PathId::BFLOOP;
-            this->spectrumId = SpectrumId::UNIT;
-            break;
-         case 1:
-            this->fieldId = FieldId::TOR;
-            this->kernelId = KernelId::PASSTHROUGH;
-            this->pathId = PathId::BFLOOP;
-            this->spectrumId = SpectrumId::UNIT;
-            break;
-         case 2:
-            this->fieldId = FieldId::POL;
-            this->kernelId = KernelId::PASSTHROUGH;
-            this->pathId = PathId::BFLOOP;
-            this->spectrumId = SpectrumId::UNIT;
-            break;
-         case 3:
-            this->fieldId = FieldId::TORPOL;
-            this->kernelId = KernelId::PASSTHROUGH;
-            this->pathId = PathId::BFLOOP;
-            this->spectrumId = SpectrumId::UNIT;
-            break;
-         case 4:
-            this->fieldId = FieldId::SCALAR_AND_TORPOL;
-            this->kernelId = KernelId::PASSTHROUGH;
-            this->pathId = PathId::BFLOOP;
-            this->spectrumId = SpectrumId::UNIT;
-            break;
-         default:
-            throw std::logic_error("Undefined test case was requested");
-      }
-   }
-
-   ArrayI processCmdLine()
+   ArrayI processCmdLine(Test& test)
    {
       // Set default arguments if required
-      if(args().useDefault)
+      if(test.fbase != "")
+      {
+         Array meta;
+         std::string path = test.fbase + "_meta.dat";
+         readList(meta, path);
+
+         args().dim1D = static_cast<int>(meta(0));
+         args().dim2D = static_cast<int>(meta(1));
+         args().dim3D = static_cast<int>(meta(2));
+
+         if(args().algorithm == "")
+         {
+            args().algorithm = "tubular";
+         }
+
+         if(args().grouper == "")
+         {
+            args().grouper = "transform";
+         }
+
+         if(args().truncation == "")
+         {
+            args().truncation = "uniform";
+         }
+      }
+      else if(args().useDefault)
       {
          args().dim1D = 15;
          args().dim2D = 31;
@@ -159,7 +154,6 @@ namespace TCoord {
 
       if(args().params.size() == 0)
       {
-         std::cerr << "Setting zero" << std::endl;
          args().params.push_back(0);
       }
 
@@ -187,6 +181,11 @@ namespace TCoord {
          auto& velReq = info.addField(PhysicalNames::Velocity::id(), FieldRequirement(false, ss.spectral(), ss.physical()));
          velReq.enableSpectral();
          velReq.enablePhysical();
+
+         if(test.kernelId == Test::KernelId::INERTIA || test.kernelId == Test::KernelId::CURL)
+         {
+            velReq.enableCurl();
+         }
       }
 
       RequirementTools::initVariables(test.scalars, test.vectors, info, test.spRes);
@@ -212,6 +211,38 @@ namespace TCoord {
             test.kernels.emplace(f.first, spKernel);
          }
       }
+      else if(test.kernelId == Test::KernelId::INERTIA)
+      {
+         if(test.scalars.size() > 0)
+         {
+            throw std::logic_error("Inertial kernel not implemented for scalar");
+         }
+
+         // Use inertia kernel for vectors
+         for(auto&& f: test.vectors)
+         {
+            auto spKernel = std::make_shared<Physical::Kernel::InertiaKernel>();
+            spKernel->setVelocity(f.first, f.second);
+            spKernel->init(1.0);
+            test.kernels.emplace(f.first, spKernel);
+         }
+      }
+      else if(test.kernelId == Test::KernelId::CURL)
+      {
+         if(test.scalars.size() > 0)
+         {
+            throw std::logic_error("Curl kernel not implemented for scalar");
+         }
+
+         // Use inertia kernel for vectors
+         for(auto&& f: test.vectors)
+         {
+            auto spKernel = std::make_shared<Physical::Kernel::CurlKernel>();
+            spKernel->setVelocity(f.first, f.second);
+            spKernel->init(1.0);
+            test.kernels.emplace(f.first, spKernel);
+         }
+      }
    }
 
    void initTrees(Test& test)
@@ -219,34 +250,95 @@ namespace TCoord {
       std::map<size_t, std::vector<Transform::TransformPath> > mt;
 
       auto spSteps = Transform::createTransformSteps(test.spRes->sim().spSpatialScheme());
-
-      if(test.pathId == Test::PathId::BFLOOP)
+      
+      std::size_t sFwdPathId;
+      std::size_t sBwdPathId;
+      std::size_t torFwdPathId;
+      std::size_t polFwdPathId;
+      std::size_t vBwdPathId;
+      bool isNonlinearPath;
+      switch(test.pathId)
       {
-         for(auto&& f: test.scalars)
+         case Test::PathId::BFLOOP:
+            isNonlinearPath = false;
+            sFwdPathId = Transform::Path::Scalar::id();
+            sBwdPathId = Transform::Path::Scalar::id();
+            torFwdPathId = Transform::Path::TorPol::id();
+            polFwdPathId = Transform::Path::TorPol::id();
+            vBwdPathId = Transform::Path::TorPol::id();
+            break;
+         case Test::PathId::NLLOOP:
+            isNonlinearPath = true;
+            sFwdPathId = Transform::Path::ScalarNl::id();
+            sBwdPathId = Transform::Path::Scalar::id();
+            torFwdPathId = Transform::Path::CurlNl::id();
+            polFwdPathId = Transform::Path::CurlCurlNl::id();
+            vBwdPathId = Transform::Path::TorPol::id();
+            break;
+         case Test::PathId::BFLOOP_BESSEL_VALUE:
+            isNonlinearPath = false;
+            sFwdPathId = Transform::Path::ValueScalarNl::id();
+            sBwdPathId = Transform::Path::ValueScalar::id();
+            torFwdPathId = Transform::Path::ValueTorPol::id();
+            polFwdPathId = Transform::Path::ValueTorPol::id();
+            vBwdPathId = Transform::Path::ValueTorPol::id();
+            break;
+         case Test::PathId::BFLOOP_BESSEL_NOPENETRATION:
+            isNonlinearPath = false;
+            sFwdPathId = Transform::Path::Empty::id();
+            sBwdPathId = Transform::Path::Empty::id();
+            torFwdPathId = Transform::Path::NoPenetrationTorPol::id();
+            polFwdPathId = Transform::Path::NoPenetrationTorPol::id();
+            vBwdPathId = Transform::Path::NoPenetrationTorPol::id();
+            break;
+         case Test::PathId::BFLOOP_BESSEL_INSULATING:
+            isNonlinearPath = false;
+            sFwdPathId = Transform::Path::Empty::id();
+            sBwdPathId = Transform::Path::Empty::id();
+            torFwdPathId = Transform::Path::InsulatingTorPol::id();
+            polFwdPathId = Transform::Path::InsulatingTorPol::id();
+            vBwdPathId = Transform::Path::InsulatingTorPol::id();
+            break;
+         default:
+            throw std::logic_error("Test for this transform path id = " + std::to_string(static_cast<int>(test.pathId)) + " is not implemented");
+      }
+
+      for(auto&& f: test.scalars)
+      {
+         // Create forward scalar transform tree
+         std::vector<Transform::ITransformSteps::PathId> comps = {{FieldComponents::Spectral::SCALAR,sFwdPathId}};
+         if(isNonlinearPath)
          {
-            // Create forward scalar transform tree
-            std::vector<Transform::ITransformSteps::PathId> comps = {{FieldComponents::Spectral::SCALAR,Transform::Path::Scalar::id()}};
+            auto t = spSteps->forwardNLScalar(comps);
+            mt.insert(std::make_pair(f.first, t));
+         }
+         else
+         {
             auto t = spSteps->forwardScalar(comps);
             mt.insert(std::make_pair(f.first, t));
          }
+      }
 
-         for(auto&& f: test.vectors)
+      for(auto&& f: test.vectors)
+      {
+         // Create forward vector transform tree
+         std::vector<Transform::ITransformSteps::PathId> comps = {{FieldComponents::Spectral::TOR,torFwdPathId},{FieldComponents::Spectral::POL,polFwdPathId}};
+         if(isNonlinearPath)
          {
-            // Create forward vector transform tree
-            std::vector<Transform::ITransformSteps::PathId> comps = {{FieldComponents::Spectral::TOR,Transform::Path::TorPol::id()},{FieldComponents::Spectral::POL,Transform::Path::TorPol::id()}};
+            auto t = spSteps->forwardNLVector(comps);
+            mt.insert(std::make_pair(f.first, t));
+         }
+         else
+         {
             auto t = spSteps->forwardVector(comps);
             mt.insert(std::make_pair(f.first, t));
          }
-      }
-      else
-      {
-         throw std::logic_error("Test for this transform path is not implemented");
       }
 
       Transform::TransformTreeTools::generateTrees(test.fwdTree, mt, TransformDirection::FORWARD);
 
       // Create backward transform tree based on variables
-      RequirementTools::buildBackwardTree(test.bwdTree, test.scalars, test.vectors);
+      RequirementTools::buildBackwardTree(test.bwdTree, test.scalars, test.vectors, sBwdPathId, vBwdPathId);
    }
 
    void initCoordinator(Test& test, const Parallel::SplittingDescription& descr)
@@ -263,70 +355,8 @@ namespace TCoord {
       Transform::TransformCoordinatorTools::init(test.coord, test.spFwdGrouper, test.spBwdGrouper, packs, test.spRes, runOptions);
    }
 
-   MHDComplex unitReference(const Test& test, const int i, const int j, const int k)
-   {
-      auto&& ss = test.spRes->sim().ss();
-      if(ss.has(SpatialScheme::Feature::SphereGeometry) || ss.has(SpatialScheme::Feature::ShellGeometry))
-      {
-         if(ss.has(SpatialScheme::Feature::SpectralOrdering123))
-         {
-            return unitReferenceSH(i,j,k);
-         }
-         else
-         {
-            return unitReferenceSH(i,k,j);
-         }
-      }
-      else if(ss.has(SpatialScheme::Feature::CartesianGeometry) && ss.has(SpatialScheme::Feature::FourierIndex23))
-      {
-         return unitReferenceFF(i,j,k);
-      }
-      else
-      {
-         throw std::logic_error("Unit spectrum for this geometry has not been implemented");
-      }
-   }
-
-   MHDComplex unitReferenceSH(const int n, const int l, const int m)
-   {
-      MHDComplex ref(std::sqrt(2.0),-std::sqrt(2.0));
-
-      if(l == 0)
-      {
-         ref = 0.0;
-      }
-      else if(m == 0)
-      {
-         ref.imag(0.0);
-      }
-
-      return ref;
-   }
-
-   MHDComplex unitReferenceFF(const int n, const int k1, const int k2)
-   {
-      MHDComplex ref(std::sqrt(2.0),-std::sqrt(2.0));
-
-      if(k1 == 0 && k2 == 0)
-      {
-         ref.imag(0.0);
-      }
-
-      return ref;
-   }
-
    void setVariables(Test& test)
    {
-      MHDComplex (*refFct)(const Test& tet, int,int,int);
-      if(test.spectrumId == Test::SpectrumId::UNIT)
-      {
-         refFct = &unitReference;
-      }
-      else
-      {
-         throw std::logic_error("Reference type not implemented");
-      }
-
       // Set unit spectrum for scalar fields
       for(auto&& f: test.scalars)
       {
@@ -334,6 +364,7 @@ namespace TCoord {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
+                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
@@ -342,7 +373,7 @@ namespace TCoord {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                         for(int i = 0; i < tRes.dim<Dimensions::Data::DATB1D>(j,k); i++)
                         {
-                           auto val = (*refFct)(test, i, j_, k_);
+                           auto val = test.spRef->inScalar(test, i, j_, k_);
                            p->rDom(0).rPerturbation().setPoint(val, i,j,k);
                         }
                      }
@@ -358,6 +389,7 @@ namespace TCoord {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
+                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
@@ -366,18 +398,13 @@ namespace TCoord {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                         for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
                         {
-                           auto val = (*refFct)(test, i, j_, k_);
-
                            // Toroidal component
                            if(test.fieldId == Test::FieldId::TOR ||
                               test.fieldId == Test::FieldId::TORPOL ||
                               test.fieldId == Test::FieldId::SCALAR_AND_TORPOL)
                            {
+                              auto val = test.spRef->inTor(test, i, j_, k_);
                               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(val, i,j,k);
-                           }
-                           else
-                           {
-                              p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(MHDComplex(0.0), i,j,k);
                            }
 
                            // Poloidal component
@@ -385,15 +412,23 @@ namespace TCoord {
                               test.fieldId == Test::FieldId::TORPOL ||
                               test.fieldId == Test::FieldId::SCALAR_AND_TORPOL)
                            {
+                              auto val = test.spRef->inPol(test, i, j_, k_);
                               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(val, i,j,k);
-                           }
-                           else
-                           {
-                              p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(MHDComplex(0.0), i,j,k);
                            }
                         }
                      }
                   }
+                  std::cerr << sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL) << std::endl;
+                  std::cerr << sRes.dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL) << std::endl;
+                  std::cerr << sRes.dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL) << std::endl;
+                  std::cerr << sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::PHYSICAL) << std::endl;
+                  std::cerr << sRes.dim(Dimensions::Simulation::SIM2D, Dimensions::Space::PHYSICAL) << std::endl;
+                  std::cerr << sRes.dim(Dimensions::Simulation::SIM3D, Dimensions::Space::PHYSICAL) << std::endl;
+                  std::cerr << std::string(50, '&') << std::endl;
+                  std::cerr << p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).data() << std::endl;
+                  std::cerr << std::string(50, '@') << std::endl;
+                  std::cerr << p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).data() << std::endl;
+                  std::cerr << std::string(50, 'q') << std::endl;
                },
             f.second);
       }
@@ -409,14 +444,12 @@ namespace TCoord {
                {
                   MHDComplex val = std::numeric_limits<MHDFloat>::max()/2.0;
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
+                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
-                        // Get rows from profile data (partially unused for
-                        // non-uniform truncation
-                        const int sN = p->dom(0).perturbation().profile(j,k).rows();
-                        for(int i = 0; i < sN; i++)
+                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                         {
                            p->rDom(0).rPerturbation().setPoint(val, i,j,k);
                         }
@@ -434,14 +467,12 @@ namespace TCoord {
                {
                   MHDComplex val = std::numeric_limits<MHDFloat>::max()/2.0;
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
+                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
                      {
-                        // Get rows from profile data (partially unused for
-                        // non-uniform truncation
-                        const int sN = p->dom(0).perturbation().comp(FieldComponents::Spectral::TOR).profile(j,k).rows();
-                        for(int i = 0; i < sN; i++)
+                        for(int i = 0; i < sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL); i++)
                         {
                            p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(val, i,j,k);
                            p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(val, i,j,k);
@@ -455,16 +486,6 @@ namespace TCoord {
 
    void checkVariables(Test& test)
    {
-      MHDComplex (*refFct)(const Test& tet, int,int,int);
-      if(test.spectrumId == Test::SpectrumId::UNIT)
-      {
-         refFct = &unitReference;
-      }
-      else
-      {
-         throw std::logic_error("Reference type not implemented");
-      }
-
       // Set unit spectrum for scalar fields
       for(auto&& f: test.scalars)
       {
@@ -473,6 +494,7 @@ namespace TCoord {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
+                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
@@ -481,7 +503,7 @@ namespace TCoord {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                         for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
                         {
-                           auto ref = (*refFct)(test, i, j_, k_);
+                           auto ref = test.spRef->refScalar(test, i, j_, k_);
                            INFO( "Checking Scalar" );
                            auto data = p->dom(0).perturbation().point(i,j,k);
                            auto err = computeUlp(data, ref, std::abs(ref), test.tolerance(), test.epsilon);
@@ -508,7 +530,13 @@ namespace TCoord {
          std::visit(
                [&](auto&& p)
                {
+               std::cerr << std::string(80,'-') << std::endl;
+               std::cerr << p->dom(0).perturbation().comp(FieldComponents::Spectral::TOR).data() << std::endl;
+               std::cerr << std::string(80,'_') << std::endl;
+               std::cerr << p->dom(0).perturbation().comp(FieldComponents::Spectral::POL).data() << std::endl;
+               std::cerr << std::string(80,'=') << std::endl;
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
+                  const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
@@ -517,8 +545,6 @@ namespace TCoord {
                         auto j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                         for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
                         {
-                           auto ref = (*refFct)(test, i, j_, k_);
-
                            auto checkFct = [&](auto comp, auto ref, auto scale, auto& worstUlp, const std::string name)
                            {
                               auto data = p->dom(0).perturbation().comp(comp).point(i,j,k);
@@ -533,20 +559,18 @@ namespace TCoord {
                               CHECK( std::get<0>(err) );
                            };
 
-                           auto refTor = ref;
-                           auto scaleTor = ref;
-                           auto refPol = ref;
-                           auto scalePol = ref;
+                           auto refTor = test.spRef->refTor(test, i, j_, k_);
+                           auto scaleTor = refTor;
+                           auto refPol = test.spRef->refPol(test, i, j_, k_);
+                           auto scalePol = refPol;
 
-                           if(test.fieldId == Test::FieldId::TOR)
+                           if(refTor == 0.0)
                            {
-                              refPol = 0.0;
-                              scalePol = 1.0;
-                           }
-                           else if(test.fieldId == Test::FieldId::POL)
-                           {
-                              refTor = 0.0;
                               scaleTor = 1.0;
+                           }
+                           else if(refPol == 0.0)
+                           {
+                              scalePol = 1.0;
                            }
                            checkFct(FieldComponents::Spectral::TOR, refTor, scaleTor, worstUlpTor, "Toroidal");
                            checkFct(FieldComponents::Spectral::POL, refPol, scalePol, worstUlpPol, "Poloidal");

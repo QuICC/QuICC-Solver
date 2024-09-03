@@ -72,7 +72,7 @@ inline void Insulating<TOp>::compute(
          SphericalBessel::Insulating_dNu());
 
       TOp::compute(rOut, roots, roots_extra, l, igrid, scale,
-         SphericalBessel::Insulating_dNu());
+         SphericalBessel::Insulating_dNu(), SphericalBessel::Insulating_dNu());
    }
 }
 

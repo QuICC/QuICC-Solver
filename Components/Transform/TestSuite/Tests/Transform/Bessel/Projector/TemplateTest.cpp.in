@@ -1,0 +1,58 @@
+/**
+ * @file @Operator@Test.cpp
+ * @brief Tests for the Bessel based @Boundary@ @Operator@ projector
+ */
+
+// System includes
+//
+#include <catch2/catch.hpp>
+
+// Project includes
+//
+#include "QuICC/TestSuite/Transform/Bessel/TestArgs.hpp"
+#include "QuICC/TestSuite/Transform/Bessel/Tester.hpp"
+#include "QuICC/Transform/Poly/Bessel/Projector/Base/@Boundary@.hpp"
+#include "QuICC/Transform/Poly/Bessel/Projector/@Operator@.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Transform::Bessel;
+
+TEST_CASE( "Error for @Boundary@<@Operator@@Template@> projector", "[@CatchTestName@]" ){
+
+   // Set default arguments if required
+   if(currentts::args().useDefault)
+   {
+      currentts::args().params = {0,1,2};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   // Set type
+   currentts::args().setType("@type@");
+
+   REQUIRE( (currentts::args().type == ::QuICC::TestSuite::Transform::TestType::PROJECTOR && "Test type is projector") );
+   REQUIRE( currentts::args().params.size() > 0 );
+
+   // Typedef for used operator
+   using namespace ::QuICC::Transform::Poly::Bessel;
+   typedef Projector::@Boundary@<Projector::@Operator@@Template@> Projector;
+   typedef typename currentts::Tester<Projector> Tester;
+
+   Tester tester("@Boundary@", "@Operator@.dat", currentts::args().dumpData);
+   tester.setUlp(currentts::args().ulp);
+   tester.setIter(currentts::args().iter);
+
+   Tester::ParameterType params = {-1};
+
+   if(currentts::args().np > 0)
+   {
+      params.push_back(currentts::args().np);
+      params.push_back(currentts::args().rank);
+   }
+
+   for(auto id: currentts::args().params)
+   {
+      params.at(0) = id;
+      tester.validate(params, currentts::args().type, currentts::args().timeOnly);
+   }
+
+}

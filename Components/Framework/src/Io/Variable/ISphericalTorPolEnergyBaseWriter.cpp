@@ -27,6 +27,8 @@
 #include "QuICC/Transform/Reductor/InsulatingEnergy.hpp"
 #include "QuICC/Transform/Reductor/InsulatingEnergyD1R1.hpp"
 #include "QuICC/Transform/Reductor/InsulatingEnergyR2.hpp"
+#include "QuICC/Transform/Reductor/NoSlipEnergy.hpp"
+#include "QuICC/Transform/Reductor/NoSlipEnergyD1R1.hpp"
 #include "QuICC/Io/Variable/Tags/Energy.hpp"
 
 namespace QuICC {
@@ -96,8 +98,8 @@ namespace Variable {
       else if(this->mPathId == Transform::Path::NoSlipTorPol::id())
       {
          torEnergyR2Id = Transform::Reductor::ValueEnergyR2::id();
-         polEnergyId = Transform::Reductor::ValueEnergy::id();
-         polEnergyD1R1Id = Transform::Reductor::ValueEnergyD1R1::id();
+         polEnergyId = Transform::Reductor::NoSlipEnergy::id();
+         polEnergyD1R1Id = Transform::Reductor::NoSlipEnergyD1R1::id();
       }
       else if(this->mPathId == Transform::Path::NoPenetrationTorPol::id())
       {

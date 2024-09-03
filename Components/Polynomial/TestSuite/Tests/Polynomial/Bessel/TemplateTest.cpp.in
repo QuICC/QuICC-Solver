@@ -14,8 +14,7 @@
 // Project includes
 //
 #include "QuICC/Polynomial/Bessel/@Operator@.hpp"
-#include "QuICC/Polynomial/Bessel/Insulating.hpp"
-#include "QuICC/Polynomial/Bessel/Value.hpp"
+#include "QuICC/Polynomial/Bessel/@Field@.hpp"
 #include "QuICC/TestSuite/Polynomial/Bessel/TestArgs.hpp"
 #include "QuICC/TestSuite/Polynomial/Bessel/Tester.hpp"
 

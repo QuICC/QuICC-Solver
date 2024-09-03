@@ -128,7 +128,7 @@ namespace Bessel {
          this->transform(rOut, in, *(it->second));
       } else
       {
-         throw std::logic_error("Requested Bessel transform operator is not avaible");
+         throw std::logic_error("Requested Bessel transform operator is not available (id = " + std::to_string(id) + ")");
       }
    }
 
@@ -141,7 +141,7 @@ namespace Bessel {
          this->transform(rOut, in, *(it->second));
       } else
       {
-         throw std::logic_error("Requested Bessel transform operator is not avaible");
+         throw std::logic_error("Requested Bessel transform operator is not available (id = " + std::to_string(id) + ")");
       }
    }
 

@@ -12,8 +12,6 @@
 
 // Project includes
 //
-#include "QuICC/Communicators/Communicator.hpp"
-#include "QuICC/LoadSplitter/Algorithms/SplittingTools.hpp"
 #include "QuICC/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingDescription.hpp"
@@ -21,14 +19,8 @@
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Enums/SplittingTools.hpp"
 #include "QuICC/LoadSplitter/LoadSplitter.hpp"
-#include "QuICC/Communicators/Communicator.hpp"
-#include "QuICC/ScalarFields/ScalarField.hpp"
-#include "QuICC/TransformCoordinators/TransformCoordinator.hpp"
-#include "QuICC/TransformGroupers/IForwardGrouper.hpp"
-#include "QuICC/TransformGroupers/IBackwardGrouper.hpp"
-#include "QuICC/ScalarFields/ScalarField.hpp"
-#include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/Transform/Setup/Default.hpp"
+#include "QuICC/TestSuite/Framework/TransformCoordinator/Test.hpp"
 
 namespace QuICC {
 
@@ -40,131 +32,6 @@ namespace TCoord {
 
    // Typedef for storing result of error checks
    typedef std::tuple<bool,MHDFloat,MHDFloat> ErrorType;
-
-   /**
-    * @brief Small struct to collect the different objects needed
-    */
-   struct Test
-   {
-      enum class FieldId
-      {
-         SCALAR= 0,
-         TOR,
-         POL,
-         TORPOL,
-         SCALAR_AND_TORPOL,
-      };
-
-      enum class KernelId
-      {
-         PASSTHROUGH = 0,
-      };
-
-      enum class PathId
-      {
-         BFLOOP = 0,
-      };
-
-      enum class SpectrumId
-      {
-         UNIT = 0,
-      };
-
-      /**
-       * @brief construtor
-       */
-      Test();
-
-      /**
-       * @brief Translate ID to test configuration
-       */
-      void configure(const int id);
-
-      /**
-       * @brief Tolerance for error checks
-       */
-      MHDFloat tolerance() const;
-
-      /**
-       * @brief Shared resolution
-       */
-      SharedResolution spRes;
-
-      /**
-       * @brief TransformCoordinator
-       */
-      TransformCoordinator<Parallel::Communicator> coord;
-
-      /**
-       * @brief Communicator
-       */
-      Parallel::Communicator comm;
-
-      /**
-       * @brief Forward grouper
-       */
-      Transform::SharedIForwardGrouper spFwdGrouper;
-
-      /**
-       * @brief Backward grouper
-       */
-      Transform::SharedIBackwardGrouper spBwdGrouper;
-
-      /**
-       * @brief Backward transform tree
-       */
-      std::vector<Transform::TransformTree> bwdTree;
-
-      /**
-       * @brief Forward transform tree
-       */
-      std::vector<Transform::TransformTree> fwdTree;
-
-      /**
-       * @brief Scalar variables
-       */
-      std::map<std::size_t, ::QuICC::Framework::Selector::VariantSharedScalarVariable> scalars;
-
-      /**
-       * @brief Vector variables
-       */
-      std::map<std::size_t, ::QuICC::Framework::Selector::VariantSharedVectorVariable> vectors;
-
-      /**
-       * @brief Physical space computational kernels
-       */
-      std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel> kernels;
-
-      /**
-       * @brief Epsilon for error checks
-       */
-      MHDFloat epsilon;
-
-      /**
-       * @brief Max acceptable ULP for error checks
-       */
-      MHDFloat maxUlp;
-
-      /**
-       * @brief Test field ID
-       */
-      FieldId fieldId;
-
-      /**
-       * @brief Test kernel ID
-       */
-      KernelId kernelId;
-
-      /**
-       * @brief Test transform path ID
-       */
-      PathId pathId;
-
-      /**
-       * @brief Test input spectrum ID
-       */
-      SpectrumId spectrumId;
-   };
 
    /**
     * @brief Create distributed resolution object
@@ -180,7 +47,7 @@ namespace TCoord {
    /**
     * @brief Process command line and generate dimension array
     */
-   ArrayI processCmdLine();
+   ArrayI processCmdLine(Test& test);
 
    /**
     * @brief Init variables
@@ -201,21 +68,6 @@ namespace TCoord {
     * @brief Initialize the transform coordinator
     */
    void initCoordinator(Test& test, const Parallel::SplittingDescription& descr);
-
-   /**
-    * @brief Generate unit spectrum reference
-    */
-   MHDComplex unitReference(const Test& test, const int i, const int j, const int k);
-
-   /**
-    * @brief Generate unit spectrum reference for spherical harmonics
-    */
-   MHDComplex unitReferenceSH(const int n, const int l, const int m);
-
-   /**
-    * @brief Generate unit spectrum reference for double Fourier series
-    */
-   MHDComplex unitReferenceFF(const int n, const int k1, const int k2);
 
    /**
     * @brief Set variables

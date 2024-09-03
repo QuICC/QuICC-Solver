@@ -28,7 +28,7 @@ namespace Integrator {
    /**
     * @brief Implementation of the Bessel with Insulating BC operator
     */
-   template <typename TOp, unsigned int N = 0>
+   template <typename TOp, unsigned int Nbot = 0>
    class Insulating: public TOp
    {
       public:
@@ -51,13 +51,13 @@ namespace Integrator {
          virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const override;
    };
 
-   template <typename TOp, unsigned int N> void Insulating<TOp,N>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
+   template <typename TOp, unsigned int Nbot> void Insulating<TOp,Nbot>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       this->template makeOperatorImpl<Polynomial::Bessel::Insulating>(op, igrid, iweights, i);
 
-      if constexpr(N > 0)
+      if constexpr(Nbot > 0)
       {
-         op.rightCols(N).setZero();
+         op.rightCols(Nbot).setZero();
       }
    }
 
