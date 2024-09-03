@@ -73,6 +73,14 @@ struct Diff<viewGpu_t, Tmods, Order, Direction, Treatment>
 };
 #endif
 
+#ifdef QUICC_USE_VKFFT
+template <class Tmods, std::size_t Order, class Direction, std::uint16_t Treatment>
+struct Diff<viewGpuVkFFT_t, Tmods, Order, Direction, Treatment>
+{
+    using type = typename Cuda::DiffOp<Tmods, Tmods, Order, Direction, Treatment>;
+};
+#endif
+
 /// @brief Op P type map
 /// Integrator only
 /// @tparam Tout

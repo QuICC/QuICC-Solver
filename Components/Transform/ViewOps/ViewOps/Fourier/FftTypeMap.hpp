@@ -41,6 +41,14 @@ struct Fft<viewGpu_t, Tout, Tin>
 };
 #endif
 
+#ifdef QUICC_USE_VKFFT
+template <class Tout, class Tin>
+struct Fft<viewGpuVkFFT_t, Tout, Tin>
+{
+    using type = typename QuICC::Fft::VkFft::FftOp<Tout, Tin>;
+};
+#endif
+
 } // namespace details
 
 }

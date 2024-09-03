@@ -75,6 +75,14 @@ struct Diff<viewGpu_t, Tmods, Order, Direction, Treatment>
 };
 #endif
 
+#ifdef QUICC_USE_VKFFT
+template <class Tmods, std::size_t Order, class Direction, std::uint16_t Treatment>
+struct Diff<viewGpuVkFFT_t, Tmods, Order, Direction, Treatment>
+{
+    using type = typename Cuda::DiffOp<Tmods, Tmods, Order, Direction, Treatment>;
+};
+#endif
+
 template <class Backend, class Tmods, std::size_t Ofi, std::size_t Ofj,
     std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment>
 struct Diff2D;
@@ -99,6 +107,15 @@ struct Diff2D<viewGpu_t, Tmods, Ofi, Ofj, Osi, Osj, Direction, Treatment>
 };
 #endif
 
+#ifdef QUICC_USE_VKFFT
+template <class Tmods, std::size_t Ofi, std::size_t Ofj,
+    std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment>
+struct Diff2D<viewGpuVkFFT_t, Tmods, Ofi, Ofj, Osi, Osj, Direction, Treatment>
+{
+    using type = typename Cuda::Diff2DOp<Tmods, Tmods, Ofi, Ofj, Osi, Osj, Direction, Treatment>;
+};
+#endif
+
 template <class Backend, class Tmods, class Direction>
 struct Mean;
 
@@ -114,6 +131,14 @@ struct Mean<viewCpu_t, Tmods, Direction>
 #ifdef QUICC_HAS_CUDA_BACKEND
 template <class Tmods, class Direction>
 struct Mean<viewGpu_t, Tmods, Direction>
+{
+    using type = typename Cuda::MeanOp<Tmods, Tmods, Direction>;
+};
+#endif
+
+#ifdef QUICC_USE_VKFFT
+template <class Tmods, class Direction>
+struct Mean<viewGpuVkFFT_t, Tmods, Direction>
 {
     using type = typename Cuda::MeanOp<Tmods, Tmods, Direction>;
 };
