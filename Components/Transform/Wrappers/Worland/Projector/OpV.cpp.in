@@ -9,19 +9,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Wrappers/Worland/@Kind@/@Op@@Tag@.hpp.inc"
-#include "QuICC/Polynomial/Worland/Wnl.hpp"
-#include "QuICC/Polynomial/Worland/rWnl.hpp"
-#include "QuICC/Polynomial/Worland/dWnl.hpp"
-#include "QuICC/Polynomial/Worland/drWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1drWnl.hpp"
-#include "QuICC/Polynomial/Worland/dr_1drWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
-#include "QuICC/Polynomial/Worland/slaplWnl.hpp"
-#include "QuICC/Polynomial/Worland/claplhWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1claplhWnl.hpp"
-#include "QuICC/Polynomial/Worland/dclaplhWnl.hpp"
-#include "DenseSM/Worland/Operator.hpp"
-#include "DenseSM/Worland/OperatorWithMean.hpp"
+#include "ViewOps/Worland/OpsBuilder.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
@@ -70,11 +58,12 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
         layers[p] = this->mspSetup->slow(p);
     }
 
-    mOp = std::make_unique<derived_t>(dimensions, layers, mem);
+    mOp = std::make_unique<derived_t>(mem);
     derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
+    derivedOp.allocOp(dimensions, layers);
     auto opView = derivedOp.getOp();
     using namespace QuICC::Polynomial::Worland;
-    Builder<op_t, QuICC::DenseSM::Worland::@OpBuilder@, bwd_t> tBuilder;
+    OpsBuilder<op_t, @Op@_t, bwd_t> tBuilder;
     tBuilder.compute(opView, igrid, Internal::Array());
 
     ///\todo move view setups to init

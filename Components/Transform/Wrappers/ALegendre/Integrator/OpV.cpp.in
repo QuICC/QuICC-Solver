@@ -9,14 +9,13 @@
 // Project includes
 //
 #include "QuICC/Transform/Wrappers/ALegendre/@Kind@/@Op@@Tag@.hpp.inc"
-#include "QuICC/Polynomial/ALegendre/@PolyBuilder@.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
 #include "ViewOps/Quadrature/Op.hpp"
 #include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/Quadrature/Tags.hpp"
-#include "ViewOps/ALegendre/Builder.hpp"
+#include "ViewOps/ALegendre/OpsBuilder.hpp"
 #include "Profiler/Interface.hpp"
 @CppHeaders@
 
@@ -59,10 +58,12 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
         layers[p] = this->mspSetup->slow(p);
     }
 
-    mOp = std::make_unique<derived_t>(dimensions, layers, mem);
+    mOp = std::make_unique<derived_t>(mem);
     derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
+    derivedOp.allocOp(dimensions, layers);
     auto opView = derivedOp.getOp();
-    builder<op_t, Polynomial::ALegendre::@PolyBuilder@, Internal::Array::Scalar, @Diff@>(opView, igrid, iweights);
+    OpsBuilder<op_t, @Op@_t, @OpDirection@> tBuilder;
+        tBuilder.compute(opView, igrid, iweights);
 
     ///\todo move view setups to init
 

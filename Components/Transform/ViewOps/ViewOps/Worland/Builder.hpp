@@ -20,7 +20,7 @@ namespace QuICC {
 namespace Transform {
 namespace Worland {
 
-/// @brief Generic AL builder operator
+/// @brief Generic JW builder operator
 /// @tparam TView  type View of the operator
 /// @tparam TDenseSMBuilder Polynomial builder
 /// @tparam TDirection
@@ -109,6 +109,10 @@ void Builder<TView, TDenseSMBuilder, TDirection>::compute(TView opView,
       if constexpr (Uniform::is_projector_v<TView, TDirection> ||
                     Uniform::is_integrator_v<TView, TDirection>)
       {
+         if (layerCounter >= indices.size())
+         {
+            break;
+         }
          if (indices[layerCounter] != k)
          {
             continue;

@@ -15,47 +15,8 @@ set(IntegratorOpInOut "mods_t, phys_t")
 set(ProjectorOpInOut "phys_t, mods_t")
 
 # Ops
-
-set(PPolyBuilder "Plm")
-set(PDiff "0")
-
-set(D1PolyBuilder "dPlm")
-set(D1Diff "0")
-
-set(LlPolyBuilder "Plm")
-set(LlDiff "1")
-
-set(LlD1PolyBuilder "${D1PolyBuilder}")
-set(LlD1Diff "1")
-
-set(DivS1PolyBuilder "sin_1Plm")
-set(DivS1Diff "0")
-
-set(DivS1DpPolyBuilder "${DivS1PolyBuilder}")
-set(DivS1DpDiff "0")
 set(DivS1DpTreatment "diffPhi_m")
-
-set(LlDivS1PolyBuilder "${DivS1PolyBuilder}")
-set(LlDivS1Diff "1")
-
-set(LlDivS1DpPolyBuilder "${DivS1PolyBuilder}")
-set(LlDivS1DpDiff "1")
 set(LlDivS1DpTreatment "diffPhi_m")
-
-set(Ll2PolyBuilder "Plm")
-set(Ll2Diff "2")
-
-set(DivLlPolyBuilder "Plm")
-set(DivLlDiff "-1")
-
-set(DivLlD1PolyBuilder "dPlm")
-set(DivLlD1Diff "-1")
-
-set(DivLlDivS1PolyBuilder "sin_1Plm")
-set(DivLlDivS1Diff "-1")
-
-set(DivLlDivS1DpPolyBuilder "sin_1Plm")
-set(DivLlDivS1DpDiff "-1")
 set(DivLlDivS1DpTreatment "diffPhi_m")
 
 # cpu/gpu
@@ -166,6 +127,11 @@ foreach(Backend IN LISTS Backends)
         set(OpInOut "${${Kind}OpInOut}")
         set(HostToDevice "${${Backend}${Kind}HostToDevice}")
         set(DeviceToHost "${${Backend}${Kind}DeviceToHost}")
+        if("${Kind}" STREQUAL "Projector")
+            set(OpDirection "bwd_t")
+        else()
+            set(OpDirection "fwd_t")
+        endif()
         foreach(Op IN LISTS Ops)
             set(PolyBuilder "${${Op}PolyBuilder}")
             set(Diff "${${Op}Diff}")
@@ -177,7 +143,7 @@ foreach(Backend IN LISTS Backends)
                 if("${Kind}" STREQUAL "Projector")
                     set(Treatment "diffPhiPrj_m")
                 else()
-                set(Treatment "diffPhiInt_m")
+                    set(Treatment "diffPhiInt_m")
                 endif()
             endif()
 

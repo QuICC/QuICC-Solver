@@ -18,59 +18,12 @@ set(PowerRedType "mods")
 set(EnergyRedType "mods")
 set(RadialRedType "phys")
 
-set(PowerGrid "this->computePowerQuadrature(igrid, iweights, icompgrid.size());")
-set(EnergyGrid "this->computePowerQuadrature(igrid, iweights, icompgrid.size());")
-set(RadialGrid "igrid = icompgrid; iweights = icompweights;")
-
 set(PowerSizeRow "this->mspSetup->fastSize(0);")
 set(PowerSizeCol "this->mspSetup->blockSize();")
 set(EnergySizeRow "this->mspSetup->blockSize();")
 set(EnergySizeCol "1;")
 set(RadialSizeRow "this->mspSetup->fwdSize();")
 set(RadialSizeCol "this->mspSetup->blockSize();")
-
-# Ops
-set(PowerPolyBuilderBwd "r_1Wnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(PowerPolyBuilderFwd "Wnl")
-set(PowerMeanBuilderFwd "void")
-set(PowerlShift "-1")
-
-set(PowerR2PolyBuilderBwd "Wnl")
-set(PowerR2PolyBuilderFwd "Wnl")
-
-set(PowerD1R1PolyBuilderBwd "r_1drWnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(PowerD1R1PolyBuilderFwd "Wnl")
-set(PowerD1R1MeanBuilderFwd "void")
-set(PowerD1R1lShift "-1")
-
-set(PowerSLaplR2PolyBuilderBwd "slaplWnl")
-set(PowerSLaplR2PolyBuilderFwd "Wnl")
-set(PowerSLaplR2Output "mModsAbsFlat")
-
-set(EnergyPolyBuilderBwd "r_1Wnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(EnergyPolyBuilderFwd "Wnl")
-set(EnergyMeanBuilderFwd "void")
-set(EnergylShift "-1")
-
-set(EnergyR2PolyBuilderBwd "Wnl")
-set(EnergyR2PolyBuilderFwd "Wnl")
-
-set(EnergyD1R1PolyBuilderBwd "r_1drWnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(EnergyD1R1PolyBuilderFwd "Wnl")
-set(EnergyD1R1MeanBuilderFwd "void")
-set(EnergyD1R1lShift "-1")
-
-set(EnergySLaplR2PolyBuilderBwd "slaplWnl")
-set(EnergySLaplR2PolyBuilderFwd "Wnl")
-set(EnergySLaplR2Output "mModsAbsFlat")
-
-set(RadialPowerPolyBuilderBwd "Wnl")
-
-set(RadialPowerDivR1PolyBuilderBwd "r_1Wnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(RadialPowerDivR1MeanBuilderBwd "void")
-
-set(RadialPowerDivR1D1R1PolyBuilderBwd "r_1drWnl<QuICC::Polynomial::Worland::recurrence_t>")
-set(RadialPowerDivR1D1R1MeanBuilderBwd "void")
 
 # Integrator operator
 set(IntOp
@@ -84,14 +37,12 @@ set(IntOp
     using backendInt_t = @BackendNamespace@::ImplOp<mods_t, phys_t, op_t>;
     using derivedInt_t = Op<mods_t, phys_t, op_t, backendInt_t>;
 
-    mInt = std::make_unique<derivedInt_t>(dimensionsInt, layers, mem);
+    mInt = std::make_unique<derivedInt_t>(mem);
     derivedInt_t& derivedOp = dynamic_cast<derivedInt_t&>(*mInt);
+    derivedOp.allocOp(dimensionsInt, layers);
     auto intView = derivedOp.getOp();
 
-    Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
-        Polynomial::Worland::worland_sphenergy_t::DBETA, @lShift@);
-    QuICC::DenseSM::Worland::@OpBuilderFwd@ denseBuilder(fWnl);
-    Builder<op_t, QuICC::DenseSM::Worland::@OpBuilderFwd@, fwd_t> tBuilderFwd(denseBuilder);
+    OpsBuilder<op_t, @Op@_t, fwd_t> tBuilderFwd;
     tBuilderFwd.compute(intView, igrid, iweights);
 ")
 
@@ -431,43 +382,10 @@ foreach(Backend IN LISTS Backends)
 
         foreach(Op IN LISTS Ops)
 
-            set(PolyBuilderFwd "${${Op}PolyBuilderFwd}")
-            set(PolyBuilderBwd "${${Op}PolyBuilderBwd}")
-
-
-            set(OpBuilderFwd "Operator<${PolyBuilderFwd}>")
-            set(OpBuilderBwd "Operator<${PolyBuilderBwd}>")
-            set(lShift "${${Op}lShift}")
-            if(NOT lShift)
-                set(lShift "0")
-            endif()
-
-            set(MeanBuilderFwd "${${Op}MeanBuilderFwd}")
-            if(MeanBuilderFwd)
-                if (NOT (MeanBuilderFwd STREQUAL "void"))
-                    set(MeanHeader "#include \"QuICC/Polynomial/Worland/${MeanBuilderFwd}.hpp\"")
-                endif()
-                set(OpBuilderFwd "OperatorWithMean<${PolyBuilderFwd}, ${MeanBuilderFwd}>")
-            endif()
-
-            set(MeanBuilderBwd "${${Op}MeanBuilderBwd}")
-            if(MeanBuilderBwd)
-                if (NOT (MeanBuilderBwd STREQUAL "void"))
-                    set(MeanHeader "#include \"QuICC/Polynomial/Worland/${MeanBuilderBwd}.hpp\"")
-                endif()
-                set(OpBuilderBwd "OperatorWithMean<${PolyBuilderBwd}, ${MeanBuilderBwd}>")
-            endif()
-
-
-            if(PolyBuilderFwd)
-                set(SetIntOp "${IntOp}")
-                # manual sub
-                string(REGEX REPLACE "@OpBuilderFwd@" "${OpBuilderFwd}" SetIntOp "${SetIntOp}")
-                string(REGEX REPLACE "@lShift@" "${lShift}" SetIntOp "${SetIntOp}")
-                string(REGEX REPLACE "@BackendNamespace@" "${BackendNamespace}" SetIntOp "${SetIntOp}")
-            endif()
-
-            set(PolyBuilderScale "${${Op}PolyBuilderScale}")
+            set(SetIntOp "${IntOp}")
+            # manual sub
+            string(REGEX REPLACE "@Op@" "${Op}" SetIntOp "${SetIntOp}")
+            string(REGEX REPLACE "@BackendNamespace@" "${BackendNamespace}" SetIntOp "${SetIntOp}")
 
             configure_file(
                 "OpV.hpp.in"

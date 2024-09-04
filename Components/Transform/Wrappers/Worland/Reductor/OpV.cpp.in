@@ -9,20 +9,8 @@
 // Project includes
 //
 #include "QuICC/Transform/Wrappers/Worland/Reductor/@Op@@Tag@.hpp.inc"
-#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
-#include "QuICC/Polynomial/Worland/Wnl.hpp"
-#include "QuICC/Polynomial/Worland/rWnl.hpp"
-#include "QuICC/Polynomial/Worland/dWnl.hpp"
-#include "QuICC/Polynomial/Worland/drWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1drWnl.hpp"
-#include "QuICC/Polynomial/Worland/dr_1drWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1Wnl.hpp"
-#include "QuICC/Polynomial/Worland/slaplWnl.hpp"
-#include "QuICC/Polynomial/Worland/claplhWnl.hpp"
-#include "QuICC/Polynomial/Worland/r_1claplhWnl.hpp"
-#include "QuICC/Polynomial/Worland/dclaplhWnl.hpp"
-#include "DenseSM/Worland/Operator.hpp"
-#include "DenseSM/Worland/OperatorWithMean.hpp"
+#include "ViewOps/Worland/OpsBuilder.hpp"
+#include "ViewOps/Worland/OpsQuadrature.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
@@ -54,7 +42,9 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
 
     // Energy calculation requires a different quadrature
     Internal::Array igrid, iweights;
-    @Grid@
+    using namespace QuICC::Transform::Worland;
+    OpsQuadrature<@Op@_t> quad;
+    quad.computeQuadrature(igrid, iweights, icompgrid.size());
 
     std::uint32_t M = igrid.size();
     std::uint32_t K = static_cast<std::uint32_t>(this->mspSetup->fastSize(0));
@@ -78,17 +68,17 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
 
     // Make projector view operator
     using namespace QuICC::Transform::Quadrature;
-    using namespace QuICC::Transform::Worland;
     using backendPrj_t = @BackendNamespace@::ImplOp<phys_t, mods_t, op_t>;
     using derivedPrj_t = Op<phys_t, mods_t, op_t, backendPrj_t>;
 
     auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
-    mPrj = std::make_unique<derivedPrj_t>(dimensionsPrj, layers, mem);
+    mPrj = std::make_unique<derivedPrj_t>(mem);
     derivedPrj_t& derivedPrjOp = dynamic_cast<derivedPrj_t&>(*mPrj);
+    derivedPrjOp.allocOp(dimensionsPrj, layers);
     auto prjView = derivedPrjOp.getOp();
 
     using namespace QuICC::Polynomial::Worland;
-    Builder<op_t, QuICC::DenseSM::Worland::@OpBuilderBwd@, bwd_t> tBuilderBwd;
+    OpsBuilder<op_t, @Op@_t, bwd_t> tBuilderBwd;
     tBuilderBwd.compute(prjView, igrid, Internal::Array());
 
     @SetIntOp@
