@@ -26,9 +26,6 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PRIVATE
     MlirShims.cpp
     MlirPointwiseShims.cpp
-    MlirFourierShims.cpp
-    MlirALegendreShims.cpp
-    MlirWorlandShims.cpp
     MlirTransposeShims.cpp
     MlirAllocShims.cpp
     MlirDeallocShims.cpp

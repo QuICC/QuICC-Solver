@@ -5,7 +5,8 @@
 // Project includes
 //
 #include "Graph/OpsMap.hpp"
-#include "Graph/BackendsMap.hpp"
+#include "ViewOps/Pointwise/Pointwise.hpp"
+#include "ViewOps/Pointwise/Functors.hpp"
 
 
 namespace QuICC

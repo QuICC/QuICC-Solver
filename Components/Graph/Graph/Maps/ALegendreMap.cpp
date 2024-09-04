@@ -5,7 +5,8 @@
 // Project includes
 //
 #include "Graph/OpsMap.hpp"
-#include "Graph/BackendsMap.hpp"
+#include "ViewOps/Quadrature/Op.hpp"
+#include "ViewOps/Quadrature/Impl.hpp"
 
 namespace QuICC
 {

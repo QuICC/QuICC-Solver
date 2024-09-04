@@ -17,21 +17,6 @@ namespace Graph {
 // Tags
 //
 
-/// view cpu implementation tag
-struct viewCpu_t
-{
-};
-
-/// view gpu implementation tag
-struct viewGpu_t
-{
-};
-
-/// view gpu VkFFT implementation tag
-struct viewGpuVkFFT_t
-{
-};
-
 /// @brief Transform data states.
 /// From fully physical (PPP) space to fully spectral/modal (MMM) space
 /// \todo change stage order to match old nomenclature (i.e. MMM is stage 0)?

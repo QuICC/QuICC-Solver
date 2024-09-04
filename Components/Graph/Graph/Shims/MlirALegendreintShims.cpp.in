@@ -2,10 +2,11 @@
 #include <complex>
 #include <cassert>
 
-#include "Graph/BackendsMap.hpp"
 #include "Graph/Types.hpp"
 #include "Graph/Shims/MlirShims.hpp"
 
+#include "ViewOps/Quadrature/Op.hpp"
+#include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/ALegendre/OpsBuilder.hpp"
 #include "ViewOps/ALegendre/OpsQuadrature.hpp"
 

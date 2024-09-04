@@ -3,9 +3,10 @@
 #include <cassert>
 
 #include "Graph/Shims/MlirShims.hpp"
-#include "Graph/BackendsMap.hpp"
 #include "Graph/Types.hpp"
 
+#include "ViewOps/Quadrature/Op.hpp"
+#include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/Worland/OpsBuilder.hpp"
 #include "ViewOps/Worland/OpsQuadrature.hpp"
 

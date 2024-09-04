@@ -7,7 +7,6 @@
 #endif
 
 #include "Graph/Shims/MlirShims.hpp"
-#include "Graph/BackendsMap.hpp"
 #include "Graph/Types.hpp"
 #include "View/View.hpp"
 

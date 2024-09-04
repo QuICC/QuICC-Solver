@@ -5,8 +5,7 @@
 // Project includes
 //
 #include "Graph/OpsMap.hpp"
-#include "Graph/BackendsMap.hpp"
-
+#include "ViewOps/Fourier/Mixed/OpsType.hpp"
 
 namespace QuICC
 {
@@ -15,6 +14,7 @@ namespace Graph
 
 void MapOps::setFourierPrj(mlir::quiccir::FrPOp op)
 {
+    using namespace QuICC::Transform::Fourier;
     // Get index from MLIR source
     std::uint64_t index = op.getImplptr().value();
     if (index >= _thisArr.size()) {
@@ -23,15 +23,10 @@ void MapOps::setFourierPrj(mlir::quiccir::FrPOp op)
     if (_thisArr[index] == nullptr) {
         if (_isCpu)
         {
-            using namespace QuICC::Transform::Fourier;
-            using backend_t = QuICC::Graph::viewCpu_t;
+            using backend_t = viewCpu_t;
             using Tin = C_DCCSC3D_t;
             using Tout = R_DCCSC3D_t;
-            using backendFft_t = Fft_t<backend_t, Tout, Tin>;
-            using backendDiff_t = MixedDiff_t<backend_t, Tin, 0, bwd_t,
-                QuICC::Transform::Fourier::none_m>;
-            using op_t = Mixed::Projector::DOp<Tout, Tin, backendFft_t,
-            backendDiff_t>;
+            using op_t = Mixed::OpsType<Tout, Tin, P_t, bwd_t, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
@@ -40,15 +35,10 @@ void MapOps::setFourierPrj(mlir::quiccir::FrPOp op)
         #ifdef QUICC_HAS_CUDA_BACKEND
         else
         {
-            using namespace QuICC::Transform::Fourier;
-            using backend_t = QuICC::Graph::viewGpu_t;
+            using backend_t = viewGpu_t;
             using Tin = C_DCCSC3D_t;
             using Tout = R_DCCSC3D_t;
-            using backendFft_t = Fft_t<backend_t, Tout, Tin>;
-            using backendDiff_t = MixedDiff_t<backend_t, Tin, 0, bwd_t,
-                QuICC::Transform::Fourier::none_m>;
-            using op_t = Mixed::Projector::DOp<Tout, Tin, backendFft_t,
-            backendDiff_t>;
+            using op_t = Mixed::OpsType<Tout, Tin, P_t, bwd_t, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
@@ -65,6 +55,7 @@ void MapOps::setFourierPrj(mlir::quiccir::FrPOp op)
 
 void MapOps::setFourierInt(mlir::quiccir::FrIOp op)
 {
+    using namespace QuICC::Transform::Fourier;
     // Get index from MLIR source
     std::uint64_t index = op.getImplptr().value();
     if (index >= _thisArr.size()) {
@@ -73,15 +64,11 @@ void MapOps::setFourierInt(mlir::quiccir::FrIOp op)
     if (_thisArr[index] == nullptr) {
         if (_isCpu)
         {
-            using namespace QuICC::Transform::Fourier;
-            using backend_t = QuICC::Graph::viewCpu_t;
+            using backend_t = viewCpu_t;
             using Tin = R_DCCSC3D_t;
             using Tout = C_DCCSC3D_t;
-            using backendFft_t = Fft_t<backend_t, Tout, Tin>;
-            using backendDiff_t = MixedDiff_t<backend_t, Tout, 0, fwd_t,
-                QuICC::Transform::Fourier::none_m>;
-            using op_t = Mixed::Integrator::DOp<Tout, Tin, backendFft_t,
-            backendDiff_t>;
+            //// \todo map each operator or split FFT and diff
+            using op_t = Mixed::OpsType<Tout, Tin, P_t, fwd_t, backend_t>;
             _ops.push_back(std::make_unique<op_t>());
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
@@ -90,15 +77,10 @@ void MapOps::setFourierInt(mlir::quiccir::FrIOp op)
         #ifdef QUICC_HAS_CUDA_BACKEND
         else
         {
-            using namespace QuICC::Transform::Fourier;
-            using backend_t = QuICC::Graph::viewGpu_t;
+            using backend_t = viewGpu_t;
             using Tin = R_DCCSC3D_t;
             using Tout = C_DCCSC3D_t;
-            using backendFft_t = Fft_t<backend_t, Tout, Tin>;
-            using backendDiff_t = MixedDiff_t<backend_t, Tout, 0, fwd_t,
-                QuICC::Transform::Fourier::none_m>;
-            using op_t = Mixed::Integrator::DOp<Tout, Tin, backendFft_t,
-            backendDiff_t>;
+            using op_t = Mixed::OpsType<Tout, Tin, P_t, fwd_t, backend_t>;
             _ops.push_back(std::make_unique<op_t>());
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);

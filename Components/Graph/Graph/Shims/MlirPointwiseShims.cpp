@@ -3,7 +3,8 @@
 #include <cassert>
 
 #include "Graph/Shims/MlirShims.hpp"
-#include "Graph/BackendsMap.hpp"
+#include "ViewOps/Pointwise/Pointwise.hpp"
+#include "ViewOps/Pointwise/Functors.hpp"
 #include "Graph/Types.hpp"
 
 

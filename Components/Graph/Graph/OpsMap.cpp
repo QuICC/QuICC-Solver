@@ -1,6 +1,5 @@
 #include "Graph/OpsMap.hpp"
 
-#include "Graph/BackendsMap.hpp"
 #include "Graph/Shims/MlirShims.hpp"
 
 namespace QuICC

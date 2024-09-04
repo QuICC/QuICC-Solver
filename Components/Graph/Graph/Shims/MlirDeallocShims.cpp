@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include "Graph/Shims/MlirShims.hpp"
-#include "Graph/BackendsMap.hpp"
 #include "View/View.hpp"
 
 using namespace QuICC::Graph;
