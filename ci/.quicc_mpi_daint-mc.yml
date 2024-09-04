@@ -1,6 +1,7 @@
 # This file is generated, do not modify!
 include:
 - remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
+- /ci/gitlab/.cscs_builders.yml
 - /ci/gitlab/.cscs_runners.yml
 - /ci/gitlab/.quicc_tests.yml
 - /ci/gitlab/.quicc_models.yml
@@ -11,13 +12,13 @@ stages:
 - model-build-and-test
 - cleanup
 build-quicc-base:
-  extends: .container-builder-cscs-zen2
+  extends: .daint-mc_builder
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-mc
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:65306c0c0a122b63338fea40ca9bad60
 build-quicc:
-  extends: .container-builder-cscs-zen2
+  extends: .daint-mc_builder
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_mpi
@@ -26,12 +27,12 @@ build-quicc:
 test-quicc-lib:
   extends:
   - .test-lib
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
 test-quicc-mpi-lib:
   extends:
   - .test-lib-mpi
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     SLURM_NTASKS: '4'
@@ -40,12 +41,12 @@ test-quicc-mpi-lib:
 time-quicc-lib:
   extends:
   - .time-lib-daint-mc
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
 BoussinesqSphereDynamoExplicit_tubular:
   extends:
   - .BoussinesqSphereDynamoExplicit_tubular
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -56,7 +57,7 @@ BoussinesqSphereDynamoExplicit_tubular:
 BoussinesqSphereDynamoImplicit_single2d:
   extends:
   - .BoussinesqSphereDynamoImplicit_single2d
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -67,7 +68,7 @@ BoussinesqSphereDynamoImplicit_single2d:
 BoussinesqShellDynamoExplicit_tubular:
   extends:
   - .BoussinesqShellDynamoExplicit_tubular
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -78,7 +79,7 @@ BoussinesqShellDynamoExplicit_tubular:
 BoussinesqShellDynamoImplicit_single2d:
   extends:
   - .BoussinesqShellDynamoImplicit_single2d
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -89,7 +90,7 @@ BoussinesqShellDynamoImplicit_single2d:
 BoussinesqSphereRTCExplicit_single1d:
   extends:
   - .BoussinesqSphereRTCExplicit_single1d
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -100,7 +101,7 @@ BoussinesqSphereRTCExplicit_single1d:
 BoussinesqSphereRTCExplicit_single2d:
   extends:
   - .BoussinesqSphereRTCExplicit_single2d
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -111,7 +112,7 @@ BoussinesqSphereRTCExplicit_single2d:
 BoussinesqSphereRTCExplicit_tubular:
   extends:
   - .BoussinesqSphereRTCExplicit_tubular
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -122,7 +123,7 @@ BoussinesqSphereRTCExplicit_tubular:
 BoussinesqSphereRTCImplicit_single1d:
   extends:
   - .BoussinesqSphereRTCImplicit_single1d
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -133,7 +134,7 @@ BoussinesqSphereRTCImplicit_single1d:
 BoussinesqSphereRTCImplicit_single2d:
   extends:
   - .BoussinesqSphereRTCImplicit_single2d
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -144,7 +145,7 @@ BoussinesqSphereRTCImplicit_single2d:
 BoussinesqSphereRTCImplicit_tubular:
   extends:
   - .BoussinesqSphereRTCImplicit_tubular
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -155,7 +156,7 @@ BoussinesqSphereRTCImplicit_tubular:
 BoussinesqShellRTCExplicit_single1d:
   extends:
   - .BoussinesqShellRTCExplicit_single1d
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -166,7 +167,7 @@ BoussinesqShellRTCExplicit_single1d:
 BoussinesqShellRTCExplicit_single2d:
   extends:
   - .BoussinesqShellRTCExplicit_single2d
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -177,7 +178,7 @@ BoussinesqShellRTCExplicit_single2d:
 BoussinesqShellRTCExplicit_tubular:
   extends:
   - .BoussinesqShellRTCExplicit_tubular
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -188,7 +189,7 @@ BoussinesqShellRTCExplicit_tubular:
 BoussinesqShellRTCImplicit_single2d:
   extends:
   - .BoussinesqShellRTCImplicit_single2d
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -199,7 +200,7 @@ BoussinesqShellRTCImplicit_single2d:
 BoussinesqSphereTCExplicit_tubular:
   extends:
   - .BoussinesqSphereTCExplicit_tubular
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -210,7 +211,7 @@ BoussinesqSphereTCExplicit_tubular:
 BoussinesqShellTCExplicit_tubular:
   extends:
   - .BoussinesqShellTCExplicit_tubular
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'

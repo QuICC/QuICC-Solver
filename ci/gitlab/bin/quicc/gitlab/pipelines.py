@@ -49,6 +49,7 @@ class base_pipeline(base_yaml):
             'include':
                 [
                     {'remote': self.cs_base_yml},
+                    '/ci/gitlab/.cscs_builders.yml',
                     '/ci/gitlab/.cscs_runners.yml',
                 ],
             'stages':
@@ -58,7 +59,7 @@ class base_pipeline(base_yaml):
                 ],
             'build-quicc-base':
                 {
-                    'extends': '.container-builder-cscs-zen2',
+                    'extends': '.'+self.backend+'_builder',
                     'stage': 'build_base',
                     'variables':
                         {
@@ -68,7 +69,7 @@ class base_pipeline(base_yaml):
                 },
             'build-quicc':
                 {
-                    'extends': '.container-builder-cscs-zen2',
+                    'extends': '.'+self.backend+'_builder',
                     'stage': 'build',
                     'variables':
                         {
@@ -120,7 +121,7 @@ class libtest_pipeline(base_pipeline):
                 'extends':
                     [
                         '.test-lib',
-                        '.'+self.backend
+                        '.'+self.backend+'_runner'
                     ],
                 'image': self.path_image,
             }
@@ -130,7 +131,7 @@ class libtest_pipeline(base_pipeline):
                 'extends':
                     [
                         '.test-lib-mpi',
-                        '.'+self.backend
+                        '.'+self.backend+'_runner'
                     ],
                 'image': self.path_image,
                 'variables':
@@ -152,7 +153,7 @@ class libtime_pipeline(libtest_pipeline):
                 'extends':
                     [
                         '.time-lib-'+self.backend,
-                        '.'+self.backend
+                        '.'+self.backend+'_runner'
                     ],
                 'image': self.path_image,
             }
@@ -181,7 +182,7 @@ class libtime_sweep_pipeline(base_pipeline):
                 'extends':
                     [
                         '.time-lib-sweep-'+self.backend,
-                        '.'+self.backend
+                        '.'+self.backend+'_runner'
                     ],
                 'image': self.path_image,
             }
@@ -211,7 +212,7 @@ class model_pipeline(libtime_pipeline):
                     'extends':
                         [
                             '.'+model,
-                            '.'+self.backend
+                            '.'+self.backend+'_runner'
                         ],
                     'image': self.path_image,
                     'variables':
@@ -249,7 +250,7 @@ class model_pipeline_notiming(libtest_pipeline):
                     'extends':
                         [
                             '.'+model,
-                            '.'+self.backend
+                            '.'+self.backend+'_runner'
                         ],
                     'image': self.path_image,
                     'variables':
@@ -294,7 +295,7 @@ class model_perf_pipeline(base_pipeline):
                     'extends':
                         [
                             '.'+model,
-                            '.'+self.backend
+                            '.'+self.backend+'_runner'
                         ],
                     'image': self.path_image,
                     'variables':

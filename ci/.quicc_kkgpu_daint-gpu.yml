@@ -1,6 +1,7 @@
 # This file is generated, do not modify!
 include:
 - remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
+- /ci/gitlab/.cscs_builders.yml
 - /ci/gitlab/.cscs_runners.yml
 - /ci/gitlab/.quicc_tests.yml
 - /ci/gitlab/.quicc_models.yml
@@ -11,13 +12,13 @@ stages:
 - model-build-and-test
 - cleanup
 build-quicc-base:
-  extends: .container-builder-cscs-zen2
+  extends: .daint-gpu_builder
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-gpu
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:7a12f03f6ce481be832ae6175a76f745
 build-quicc:
-  extends: .container-builder-cscs-zen2
+  extends: .daint-gpu_builder
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_kkgpu
@@ -26,17 +27,17 @@ build-quicc:
 test-quicc-lib:
   extends:
   - .test-lib
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
 time-quicc-lib:
   extends:
   - .time-lib-daint-gpu
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
 BoussinesqSphereDynamoExplicit_serial:
   extends:
   - .BoussinesqSphereDynamoExplicit_serial
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -47,7 +48,7 @@ BoussinesqSphereDynamoExplicit_serial:
 BoussinesqSphereDynamoImplicit_serial:
   extends:
   - .BoussinesqSphereDynamoImplicit_serial
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -58,7 +59,7 @@ BoussinesqSphereDynamoImplicit_serial:
 BoussinesqShellDynamoExplicit_serial:
   extends:
   - .BoussinesqShellDynamoExplicit_serial
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -69,7 +70,7 @@ BoussinesqShellDynamoExplicit_serial:
 BoussinesqShellDynamoImplicit_serial:
   extends:
   - .BoussinesqShellDynamoImplicit_serial
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -80,7 +81,7 @@ BoussinesqShellDynamoImplicit_serial:
 BoussinesqSphereRTCExplicit_serial:
   extends:
   - .BoussinesqSphereRTCExplicit_serial
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -91,7 +92,7 @@ BoussinesqSphereRTCExplicit_serial:
 BoussinesqSphereRTCImplicit_serial:
   extends:
   - .BoussinesqSphereRTCImplicit_serial
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -102,7 +103,7 @@ BoussinesqSphereRTCImplicit_serial:
 BoussinesqShellRTCExplicit_serial:
   extends:
   - .BoussinesqShellRTCExplicit_serial
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -113,7 +114,7 @@ BoussinesqShellRTCExplicit_serial:
 BoussinesqShellRTCImplicit_serial:
   extends:
   - .BoussinesqShellRTCImplicit_serial
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -124,7 +125,7 @@ BoussinesqShellRTCImplicit_serial:
 BoussinesqSphereTCExplicit_serial:
   extends:
   - .BoussinesqSphereTCExplicit_serial
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -135,7 +136,7 @@ BoussinesqSphereTCExplicit_serial:
 BoussinesqShellTCExplicit_serial:
   extends:
   - .BoussinesqShellTCExplicit_serial
-  - .daint-gpu
+  - .daint-gpu_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
