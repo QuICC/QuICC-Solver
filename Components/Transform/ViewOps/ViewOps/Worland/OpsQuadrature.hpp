@@ -42,10 +42,10 @@ using namespace QuICC::Polynomial::Worland;
 
 /// @brief Compute quadrature for grid needed for power
 /// computations
+/// @tparam SHIFT
 /// @param igrid
 /// @param iweights
 /// @param gSize
-/// @param shift
 template <int SHIFT>
 void computePowerQuadrature(Internal::Array& igrid, Internal::Array& iweights,
    const int gSize)

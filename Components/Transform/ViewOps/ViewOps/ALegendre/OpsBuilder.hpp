@@ -48,8 +48,12 @@ namespace details {
 
 using namespace QuICC::Polynomial::ALegendre;
 
-/// convenience wrapper for builder function
+/// @brief Convenience wrapper for builder function
 /// \todo cleanup underlaying builder to match JW
+/// @tparam Tview operator view type
+/// @tparam TPolyBuilder
+/// @tparam Tdata
+/// @tparam LlDiff
 template <class Tview, class TPolyBuilder, class Tdata, std::int16_t LlDiff>
 struct HelperBuilder
 {

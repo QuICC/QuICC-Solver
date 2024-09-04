@@ -101,7 +101,8 @@ Op<Tout, Tin, Top, Backend>::Op(std::shared_ptr<Memory::memory_resource> mem) :
 }
 
 template <class Tout, class Tin, class Top, class Backend>
-void Op<Tout, Tin, Top, Backend>::allocOp(span<const typename Top::IndexType> dimensions,
+void Op<Tout, Tin, Top, Backend>::allocOp(
+   span<const typename Top::IndexType> dimensions,
    span<const typename Top::IndexType> layers)
 {
    ///\todo move here in details namespace

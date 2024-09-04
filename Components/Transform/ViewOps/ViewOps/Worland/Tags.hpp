@@ -201,7 +201,6 @@ struct RadialPowerDivR1D1R1_t
 };
 
 
-
 } // namespace Worland
 } // namespace Transform
 } // namespace QuICC
