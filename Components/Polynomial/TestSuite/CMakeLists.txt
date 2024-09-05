@@ -9,8 +9,9 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_TEST_LIB} PROPERTIES LINKER_LANG
 target_include_directories(${QUICC_CURRENT_COMPONENT_TEST_LIB} PUBLIC "include" "Tests")
 target_link_libraries(${QUICC_CURRENT_COMPONENT_TEST_LIB}
   ${QUICC_CURRENT_COMPONENT_LIB}
-  Catch2::Catch2
   QuICC::Profiling
+  QuICC::TestSuite
+  Catch2::Catch2
 )
 
 # Copy component TestSuite Python files

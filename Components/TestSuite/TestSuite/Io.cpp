@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unsupported/Eigen/SparseExtra>
 
 // Project includes
 //
@@ -43,6 +44,11 @@ void writeData(const std::string& path, const MatrixZ& outData)
    outfile << std::setprecision(15) << outData.real() << std::endl;
    outfile << std::setprecision(15) << outData.imag() << std::endl;
    outfile.close();
+}
+
+void writeData(const std::string& path, const SparseMatrix& outData)
+{
+   Eigen::saveMarket(outData, path);
 }
 
 void readData(Matrix& inData, const std::string& path)
@@ -137,6 +143,20 @@ void readData(MatrixZ& inData, const std::string& path)
    }
 }
 
+void readData(SparseMatrix& inData, const std::string& path)
+{
+   // Check if file exists
+   std::ifstream infile;
+   infile.open(path, std::ios::in | std::ios::binary);
+   if (!infile.is_open())
+   {
+      throw std::logic_error("Couldn't open input file: " + path);
+   }
+   infile.close();
+
+   Eigen::loadMarket(inData, path);
+}
+
 void readList(Array& inData, const std::string& path)
 {
    std::ifstream infile;
@@ -162,7 +182,7 @@ void readList(Array& inData, const std::string& path)
    {
       // Ignore header
       int s = infile.peek();
-      while(s == '#')
+      while (s == '#')
       {
          infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
          s = infile.peek();
@@ -180,6 +200,57 @@ void readList(Array& inData, const std::string& path)
       for (int i = 0; i < inData.size(); ++i)
       {
          infile >> inData(i);
+      }
+      infile.close();
+   }
+}
+
+void readList(std::vector<MHDFloat>& inData, const std::string& path)
+{
+   std::ifstream infile;
+   infile.open(path, std::ios::in | std::ios::binary);
+   if (!infile.is_open())
+   {
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr << "  Couldn't open real input file: " + path << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      inData = std::vector<MHDFloat>(inData.size(),
+         std::numeric_limits<MHDFloat>::max());
+   }
+   else
+   {
+      // Ignore header
+      int s = infile.peek();
+      while (s == '#')
+      {
+         infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+         s = infile.peek();
+      }
+
+      // Get size from first value
+      if (inData.size() == 0)
+      {
+         MHDFloat s;
+         infile >> s;
+         inData.resize(static_cast<size_t>(s));
+      }
+
+      // Loop over data
+      for (std::size_t i = 0; i < inData.size(); ++i)
+      {
+         MHDFloat tmp;
+         infile >> tmp;
+         inData[i] = tmp;
       }
       infile.close();
    }

@@ -124,6 +124,22 @@ class libtest_pipeline(base_pipeline):
                     ],
                 'image': self.path_image,
             }
+        if (self.tag == 'mpi'):
+            tasks = '4'
+            self.config['test-quicc-mpi-lib'] = {
+                'extends':
+                    [
+                        '.test-lib-mpi',
+                        '.'+self.backend
+                    ],
+                'image': self.path_image,
+                'variables':
+                    {
+                        'SLURM_NTASKS': tasks,
+                        'SLURM_NTASKS_PER_NODE': tasks,
+                        'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks))
+                    },
+            }
 
 """Add library timing to the libtest pipeline"""
 class libtime_pipeline(libtest_pipeline):

@@ -1,5 +1,5 @@
-/** 
- * @file CflWriter.cpp 
+/**
+ * @file CflWriter.cpp
  * @brief Source of the implementation of the CFL writer
  */
 
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Timestep/Constants.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Ascii/CflTags.hpp"

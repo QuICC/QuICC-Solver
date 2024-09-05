@@ -13,7 +13,7 @@
 // Project includes
 //
 #include "QuICC/LoadSplitter/Algorithms/SplittingDescription.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/SpatialScheme/IBuilder.hpp"
 #include "QuICC/Equations/EquationParameters.hpp"

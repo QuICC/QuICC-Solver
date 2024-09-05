@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "Timestep/PredictorCorrector/@Scheme@.hpp"
 #include "TestSuite/Timestep/PredictorCorrector/TestArgs.hpp"
 #include "TestSuite/Timestep/PredictorCorrector/TestHelper.hpp"

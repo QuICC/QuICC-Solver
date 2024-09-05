@@ -11,7 +11,7 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/ISphericalScalarEnergyBaseWriter.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
@@ -148,7 +148,7 @@ namespace Variable {
                {
                   factor = 2.0;
                }
-               
+
                this->storeEnergy(l_, m_, factor*spectrum(idx, 0));
                idx += 1;
             }

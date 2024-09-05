@@ -21,7 +21,7 @@
 #include "Types/Typedefs.hpp"
 #include "Timers/TimerMacro.h"
 #include "QuICC/TestSuite/SparseSM/TestType.hpp"
-#include "QuICC/TestSuite/SparseSM/Io.hpp"
+#include "TestSuite/Io.hpp"
 
 namespace QuICC {
 

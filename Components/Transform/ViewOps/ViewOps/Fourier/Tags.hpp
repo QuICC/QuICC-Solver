@@ -4,7 +4,7 @@
  */
 #pragma once
 
-// External includes
+// System includes
 //
 
 // Project includes
@@ -20,11 +20,15 @@ namespace Fourier {
 
 /// @brief tag type for differentiation direction.
 /// Forwards i.e. physical to modal
-struct fwd_t {};
+struct fwd_t
+{
+};
 
 /// @brief tag type for differentiation direction.
 /// Backwards i.e. modal to physical
-struct bwd_t {};
+struct bwd_t
+{
+};
 
 /// @brief mask for special treatment.
 /// none

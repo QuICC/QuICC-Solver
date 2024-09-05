@@ -27,7 +27,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/DimensionTools.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingTools.hpp"
@@ -520,7 +520,7 @@ namespace Parallel {
 
                   // Broadcast data
                   QuICCEnv().synchronize();
-                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD); 
+                  ierr = MPI_Bcast(matRemote.data(), matRemote.size(), MPI_INT, cpu, MPI_COMM_WORLD);
                   QuICCEnv().check(ierr, 712);
 
                // Remote CPU
