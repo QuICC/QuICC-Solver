@@ -31,11 +31,6 @@ target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
   QuICC::Profiling::Timers
 )
 
-# Add MPI dependency
-if(QUICC_MPI)
-  target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" MPI::MPI_CXX)
-endif(QUICC_MPI)
-
 # Eigen
 if(TARGET Eigen3::Eigen)
   target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" Eigen3::Eigen)

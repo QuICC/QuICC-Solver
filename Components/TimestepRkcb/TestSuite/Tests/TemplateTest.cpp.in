@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "Timestep/RungeKuttaCB/@Scheme@.hpp"
 #include "TestSuite/Timestep/RungeKuttaCB/TestArgs.hpp"
 #include "TestSuite/Timestep/RungeKuttaCB/TestHelper.hpp"

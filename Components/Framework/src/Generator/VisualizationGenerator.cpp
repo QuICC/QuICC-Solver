@@ -14,7 +14,7 @@
 // Project includes
 //
 #include "QuICC/Generator/VisualizationGenerator.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/Tools/Formatter.hpp"

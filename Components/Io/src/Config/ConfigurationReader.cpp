@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ConfigurationReader.cpp
  * @brief Source of the implementation of the XML parameters file reader
  */
@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 
 namespace QuICC {
 

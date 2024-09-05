@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/DimensionTools.hpp"
 
 namespace QuICC {

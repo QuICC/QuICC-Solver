@@ -13,7 +13,7 @@
 #include <catch2/catch.hpp>
 
 // Project includes
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/TestSuite/Transform/ALegendre/TestArgs.hpp"
 #include "Profiler/Interface.hpp"
 
