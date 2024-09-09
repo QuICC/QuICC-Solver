@@ -32,6 +32,7 @@
 
 // Project includes
 //
+#include "Graph/Tags.hpp"
 #include "Graph/Shims/MlirShims.hpp"
 
 namespace QuICC {
