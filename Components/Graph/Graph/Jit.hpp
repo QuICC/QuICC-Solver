@@ -32,6 +32,7 @@
 
 // Project includes
 //
+#include "Graph/OpsMap.hpp"
 #include "Graph/Tags.hpp"
 #include "Graph/Shims/MlirShims.hpp"
 
@@ -61,8 +62,6 @@ template <std::uint32_t RANK = 3u>
 class Jit {
 private:
 
-    /// @brief do we need to add a wrapper
-    bool needViewWrapper = false;
     /// @brief storage for MLIR registry
     mlir::DialectRegistry _registry;
     /// @brief storage for MLIR context
@@ -122,6 +121,23 @@ private:
 
     /// @brief JIT and store graph function
     void setEngineAndJit();
+
+    /// @brief Passes to set the wrappers and dimensions
+    /// @param mem memory resource
+    /// @param physDims physical dimensions
+    /// order v012, RThetaPhi
+    /// @param modsDims spectral sapce dimensions
+    /// order v012, NLM
+    /// @param layOpt
+    /// @param outStage
+    /// @param inStage
+    /// @param meta
+    void setWrappers(const std::shared_ptr<Memory::memory_resource> mem,
+        const std::array<std::uint32_t, RANK> physDims,
+        const std::array<std::uint32_t, RANK> modsDims,
+        const std::array<std::array<std::string, 2>, RANK> layOpt,
+        const Stage outStage, const Stage inStage,
+        const std::vector<View::ViewBase<std::uint32_t>>& meta);
 
 public:
     ~Jit()
@@ -431,15 +447,12 @@ Jit<RANK>::Jit(const std::string modStr,
     const std::vector<View::ViewBase<std::uint32_t>>& meta)
 {
     setDialects();
-
     // Load module
     _module = mlir::parseSourceString<mlir::ModuleOp>(modStr, &_ctx);
-    insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
-    setDimensions(physDims, modsDims);
-    setLayout(layOpt);
-    setMap(mem);
-    setMeta(meta);
+    // Passes
+    setWrappers(mem, physDims, modsDims, layOpt, outStage, inStage, meta);
     lower();
+    // Jit
     setEngineAndJit();
 }
 
@@ -453,16 +466,28 @@ Jit<RANK>::Jit(const llvm::SourceMgr sourceMgr,
     const std::vector<View::ViewBase<std::uint32_t>>& meta)
 {
     setDialects();
-
     // Load module
     _module = mlir::parseSourceFile<mlir::ModuleOp>(sourceMgr, &_ctx);
+    // Passes
+    setWrappers(mem, physDims, modsDims, layOpt, outStage, inStage, meta);
+    lower();
+    // Jit;
+    setEngineAndJit();
+}
+
+template <std::uint32_t RANK>
+void Jit<RANK>::setWrappers(const std::shared_ptr<Memory::memory_resource> mem,
+    const std::array<std::uint32_t, RANK> physDims,
+    const std::array<std::uint32_t, RANK> modsDims,
+    const std::array<std::array<std::string, 2>, RANK> layOpt,
+    const Stage outStage, const Stage inStage,
+    const std::vector<View::ViewBase<std::uint32_t>>& meta)
+{
     insertWrapper(physDims, modsDims, layOpt, outStage, inStage);
     setDimensions(physDims, modsDims);
     setLayout(layOpt);
     setMap(mem);
     setMeta(meta);
-    lower();
-    setEngineAndJit();
 }
 
 template <std::uint32_t RANK>

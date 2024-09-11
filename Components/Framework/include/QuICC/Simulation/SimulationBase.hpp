@@ -123,6 +123,11 @@ namespace QuICC {
          template <typename TEquation, typename TOptions> std::shared_ptr<TEquation> addEquation(std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<TOptions> spOptions);
 
          /**
+          * @brief Add graph description to solver
+          */
+         void addGraph(const std::string& graphStr);
+
+         /**
           * @brief Set the base simulation configuration file and parameters
           *
           * @param bcNames Vector of names for the boundary conditions

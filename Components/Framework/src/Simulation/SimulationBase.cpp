@@ -368,4 +368,9 @@ namespace QuICC {
    {
       // Empty to simplify implementations but can't be called from derived class
    }
+
+   void  SimulationBase::addGraph(const std::string& graphStr)
+   {
+      mPseudospectral.addGraph(graphStr);
+   };
 }

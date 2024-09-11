@@ -30,6 +30,7 @@
 #include "QuICC/TransformGroupers/IBackwardGrouper.hpp"
 #include "QuICC/Timestep/Coordinator.hpp"
 #include "QuICC/Diagnostics/Coordinator.hpp"
+#include "Graph/Jit.hpp"
 
 namespace QuICC {
 
@@ -187,6 +188,11 @@ namespace Pseudospectral {
           * @param it         Iteration index
           */
          void addEquation(Equations::SharedIVectorEquation spEq, const std::size_t eqId, const int it);
+
+         /**
+          * @brief Add graph description to solver
+          */
+         void addGraph(const std::string& graphStr);
 
          /**
           * @brief Initialise the transforms
@@ -597,6 +603,10 @@ namespace Pseudospectral {
           * @brief Storage for a shared backward transform grouper for imposed fields
           */
          Transform::SharedIBackwardGrouper   mspImposedBwdGrouper;
+
+
+         std::unique_ptr<Graph::Jit<3>> mJitter;
+         std::string mModStr;
 
       private:
          /**

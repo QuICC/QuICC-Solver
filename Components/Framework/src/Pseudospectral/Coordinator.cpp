@@ -32,6 +32,7 @@
 #include "QuICC/PseudospectralTag/Uninitialized.hpp"
 #include "QuICC/PseudospectralTag/Wrapper.hpp"
 #include "QuICC/PhysicalNames/Coordinator.hpp"
+#include "QuICC/PhysicalNames/registerAll.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {
@@ -133,6 +134,12 @@ namespace Pseudospectral {
       this->mVectorEqMap.at(key).push_back(spEq);
       DebuggerMacro_msg("... done", 1);
    }
+
+
+   void Coordinator::addGraph(const std::string& graphStr)
+   {
+      mModStr = graphStr;
+   };
 
    Coordinator::ScalarEquation_range Coordinator::scalarRange(const std::size_t eqId, const int it)
    {
@@ -684,8 +691,38 @@ namespace Pseudospectral {
       // compute nonlinear interaction and forward transform
       this->updateSpectral(it);
 
+      if (mJitter == nullptr)
+      {
+         /// Setup
+         // get info from mspRes
+         /// jw : look at BenchmarkMagC2.cpp:65
+         /// LoadSplitter test?
+         /// Transform::SharedTransformSetup WLFlBuilder::spSetup3D
+         // mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
 
-      /// \todo map/copy to graph
+         /// \todo map/copy to graph
+         auto temp = mVectorVariables[PhysicalNames::Temperature::id()];
+         std::visit(
+               [&](auto&& p)
+               {
+                  auto ptrTemp = p->rDom(0).perturbation().comp(FieldComponents::Spectral::SCALAR);
+               }, temp);
+
+         auto vec = mVectorVariables[PhysicalNames::Velocity::id()];
+         std::visit(
+               [&](auto&& p)
+               {
+                  auto ptrTor = p->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR);
+                  auto ptrPol = p->rDom(0).perturbation().comp(FieldComponents::Spectral::POL);
+               }, vec);
+
+      }
+      else
+      {
+         /// copy ptrTor.data().data()?
+         /// call graph
+         /// copy back
+      }
    }
 
    void Coordinator::explicitTrivialEquations(const std::size_t opId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
