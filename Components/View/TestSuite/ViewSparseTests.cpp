@@ -259,10 +259,10 @@ TEST_CASE("ViewThreeDim Compressed step 1 Column Layer, Row Column Layer layout"
                                            0,0,
                                            0,0,
                                            0,0,
-                                             9,10,
                                              0,0,
                                              0,0,
-                                             0,0};
+                                             0,0,
+                                             9,10};
 
     constexpr size_t S = M*N+M;
     std::array<double, S> data = {1,5,
@@ -292,12 +292,13 @@ TEST_CASE("ViewThreeDim Compressed step 1 Column Layer, Row Column Layer layout"
         CHECK(data[l] == someView.data()[l]);
     }
 
-    CHECK(fullData[0] == someView(0, 0, 0));
-    CHECK(fullData[2*N] == someView(2, 0, 0));
-    CHECK(fullData[1*N+1] == someView(1, 1, 0));
-    CHECK(fullData[0*N+1+M*N*3] == someView(0, 1, 3));
+    CHECK(fullData[0*N+0+M*N*0] == someView(0, 0, 0));
+    CHECK(fullData[2*N+0+M*N*0] == someView(2, 0, 0));
+    CHECK(fullData[1*N+1+M*N*0] == someView(1, 1, 0));
+    CHECK(fullData[3*N+1+M*N*3] == someView(3, 1, 3));
 
     CHECK_THROWS(fullData[2*N+1+M*N*1] == someView(2, 1, 1));
+    CHECK_THROWS(fullData[0*N+1+M*N*3] == someView(0, 1, 3));
 }
 
 TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer ColMaj ", "[ViewThreeDimCtrRlColMaj]")

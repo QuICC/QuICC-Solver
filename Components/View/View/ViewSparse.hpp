@@ -530,7 +530,7 @@ namespace View {
             {
                auto m = _dimensions[0]-k; // column height
                auto p = _indices[2][idx];
-               if ( p == k && i >= k && i < _dimensions[0])
+               if (p == k && i >= k && i < _dimensions[0])
                {
                   kmn *= n;
                   assert(i-k + j*m + kmn < this->_size);
@@ -547,13 +547,13 @@ namespace View {
             const auto n = _dimensions[1];
             for (IndexType idx = _pointers[2][0]; idx < _pointers[2][1]; ++idx)
             {
-               auto m = _dimensions[0]-k;
+               // auto m = _dimensions[0]-k; // column height
                auto p = _indices[2][idx];
-               if ( p == k && i < m)
+               if (p == k && i >= k && i < _dimensions[0])
                {
                   kmn *= n;
-                  assert(j + i*n + kmn < this->_size);
-                  return this->_data[j + i*n + kmn];
+                  assert(j + (i-k)*n + kmn < this->_size);
+                  return this->_data[j + (i-k)*n + kmn];
                }
                // comulative m
                kmn += _dimensions[0]-p;
