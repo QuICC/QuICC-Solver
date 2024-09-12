@@ -741,7 +741,7 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane ColMaj", "[ViewT
                                            0,0,0,0,
                                            0,0,0,0,
                                            0,0,0,0,
-                                             9,0,0,0,
+                                             0,0,0,9,
                                              0,0,0,0,
                                              0,0,0,0};
 
@@ -768,10 +768,11 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane ColMaj", "[ViewT
         CHECK(data[l] == someView.data()[l]);
     }
 
-    CHECK(fullData[2] == someView(2, 0, 0));
-    CHECK(fullData[3+M*2] == someView(3, 2, 0));
-    CHECK(fullData[0+M*N*3] == someView(0, 0, 3));
+    CHECK(fullData[2+M*0+M*N*0] == someView(2, 0, 0));
+    CHECK(fullData[3+M*2+M*N*0] == someView(3, 2, 0));
+    CHECK(fullData[3+M*0+M*N*3] == someView(3, 0, 3));
 
+    CHECK_THROWS(fullData[0+M*1+M*N*1] == someView(0, 1, 0));
     CHECK_THROWS(fullData[0+M*1+M*N*1] == someView(0, 1, 1));
     CHECK_THROWS(fullData[0+M*1+M*N*1] == someView(1, 0, 3));
 }
@@ -795,10 +796,10 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane JIK", "[ViewThre
                                            0,0,0,
                                            0,0,0,
                                            0,0,0,
-                                             9,0,0,
                                              0,0,0,
                                              0,0,0,
-                                             0,0,0};
+                                             0,0,0,
+                                             9,0,0};
 
     constexpr size_t S = M*2+1;
     std::array<double, S> data = {1,5,
@@ -825,10 +826,12 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane JIK", "[ViewThre
         CHECK(data[l] == someView.data()[l]);
     }
 
-    CHECK(fullData[2*N] == someView(2, 0, 0));
-    CHECK(fullData[3*N+2] == someView(3, 2, 0));
-    CHECK(fullData[M*N*3] == someView(0, 0, 3));
+    CHECK(fullData[2*N+0+M*N*0] == someView(2, 0, 0));
+    CHECK(fullData[3*N+2+M*N*0] == someView(3, 2, 0));
+    CHECK(fullData[3*N+0+M*N*3] == someView(3, 0, 3));
 
-    CHECK_THROWS(fullData[0+M*1+M*N*1] == someView(0, 1, 1));
-    CHECK_THROWS(fullData[0+M*1+M*N*1] == someView(1, 0, 3));
+    CHECK_THROWS(fullData[0*N+1+M*N*1] == someView(0, 1, 0));
+    CHECK_THROWS(fullData[0*N+1+M*N*1] == someView(0, 1, 1));
+    CHECK_THROWS(fullData[1*N+0+M*N*3] == someView(1, 0, 3));
+    CHECK_THROWS(fullData[0*N+0+M*N*3] == someView(0, 0, 3));
 }

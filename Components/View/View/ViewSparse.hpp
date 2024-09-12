@@ -618,7 +618,8 @@ namespace View {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
             // column major
-            // use the knowledge that the column always start from zero and its size depends on the layer
+            // use the knowledge that the column always starts
+            // from k and its size depends on the layer
 
             const auto M = _dimensions[0];
             const auto K = _dimensions[2];
@@ -628,7 +629,7 @@ namespace View {
             for (IndexType idx = _pointers[1][k]; idx < _pointers[1][k+1]; ++idx)
             {
                IndexType currColSize = M - k;
-               if (j == _indices[1][idx] && i < currColSize)
+               if (j == _indices[1][idx] && i >= k && i < M)
                {
                   // compute column shift
                   for (IndexType kk = 0; kk < k; ++kk)
@@ -636,8 +637,8 @@ namespace View {
                      IndexType colSize = M - kk;
                      kmn += colSize* (_pointers[1][kk+1] - _pointers[1][kk]);
                   }
-                  assert(i + kmn < this->_size);
-                  return this->_data[i + kmn];
+                  assert(i-k + kmn < this->_size);
+                  return this->_data[i-k + kmn];
                }
                kmn += currColSize;
             }
@@ -645,7 +646,8 @@ namespace View {
          else if constexpr (std::is_same_v<OrderType, LoopOrderType<j_t, i_t, k_t>>)
          {
             // JIK
-            // use the knowledge that the column always start from zero and its size depends on the layer
+            // use the knowledge that the column always starts
+            // from k and its size depends on the layer
 
             const auto M = _dimensions[0];
             const auto K = _dimensions[2];
@@ -655,9 +657,9 @@ namespace View {
             IndexType jj = 0;
             for (IndexType idx = _pointers[1][k]; idx < _pointers[1][k+1]; ++idx)
             {
-               IndexType currColSize = M - k;
+               // IndexType currColSize = M - k;
                IndexType currRowSize = _pointers[1][k+1] - _pointers[1][k];
-               if (j == _indices[1][idx] && i < currColSize)
+               if (j == _indices[1][idx] && i >= k && i < M)
                {
 
                   // compute layer shift
@@ -668,8 +670,8 @@ namespace View {
                      kmn += colSize* (_pointers[1][kk+1] - _pointers[1][kk]);
                   }
 
-                  assert(i*currRowSize + jj + kmn < this->_size);
-                  return this->_data[i*currRowSize + jj + kmn];
+                  assert((i-k)*currRowSize + jj + kmn < this->_size);
+                  return this->_data[(i-k)*currRowSize + jj + kmn];
                }
                ++jj;
             }
