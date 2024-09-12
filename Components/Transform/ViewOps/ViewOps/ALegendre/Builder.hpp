@@ -145,7 +145,8 @@ void builder(Tview opView, const Evector<Tdata>& grid,
       {
          for (int i = 0; i < opT.rows(); ++i)
          {
-            opView(i, j, k) = opT(i, j);
+            // note, l goes from m to l_max
+            opView(i, j+k, k) = opT(i, j);
          }
       }
 
