@@ -319,10 +319,10 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer ColMaj ", "[Vi
                                            0,0,
                                            0,0,
                                            0,0,
-                                             9,10,
                                              0,0,
                                              0,0,
-                                             0,0};
+                                             0,0,
+                                             9,10};
 
     constexpr size_t S = M*N+M;
     std::array<double, S> data = {1,2,
@@ -348,13 +348,14 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer ColMaj ", "[Vi
         CHECK(data[l] == someView.data()[l]);
     }
 
-    CHECK(fullData[0] == someView(0, 0, 0));
-    CHECK(fullData[0+M*1+0] == someView(0, 1, 0));
-    CHECK(fullData[1+M*1+0] == someView(1, 1, 0));
-    CHECK(fullData[1+M*N*3] == someView(1, 0, 3));
+    CHECK(fullData[0+M*0+M*N*0] == someView(0, 0, 0));
+    CHECK(fullData[0+M*1+M*N*0] == someView(0, 1, 0));
+    CHECK(fullData[1+M*1+M*N*0] == someView(1, 1, 0));
+    CHECK(fullData[1+M*3+M*N*3] == someView(1, 3, 3));
 
     CHECK_THROWS(fullData[0+M*1+M*N*3] == someView(0, 1, 3));
-    CHECK_THROWS(fullData[2+M*1+M*N*1] == someView(1, 1, 1));
+    CHECK_THROWS(fullData[1+M*1+M*N*1] == someView(1, 1, 1));
+    CHECK_THROWS(fullData[1+M*1+M*N*2] == someView(1, 1, 2));
 }
 
 TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column Layer layout ",
@@ -370,8 +371,8 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column La
                                          0,0,0,0,
                                            0,0,0,0,
                                            0,0,0,0,
-                                             9,0,0,0,
-                                             10,0,0,0};
+                                             0,0,0,9,
+                                             0,0,0,10};
 
     constexpr size_t S = M*N+M;
     std::array<double, S> data = {1,3,5,7,
@@ -398,12 +399,13 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column La
         CHECK(data[l] == someView.data()[l]);
     }
 
-    CHECK(fullData[0] == someView(0, 0, 0));
-    CHECK(fullData[1+0+0] == someView(0, 1, 0));
-    CHECK(fullData[1*N+1+0] == someView(1, 1, 0));
-    CHECK(fullData[1*N+M*N*3] == someView(1, 0, 3));
+    CHECK(fullData[0*N+0+M*N*0] == someView(0, 0, 0));
+    CHECK(fullData[0*N+1+M*N*0] == someView(0, 1, 0));
+    CHECK(fullData[1*N+1+M*N*0] == someView(1, 1, 0));
+    CHECK(fullData[1*N+3+M*N*3] == someView(1, 3, 3));
 
-    CHECK_THROWS(fullData[0+1+M*N*3] == someView(0, 1, 3));
+    CHECK_THROWS(fullData[1*N+0+M*N*3] == someView(1, 0, 3));
+    CHECK_THROWS(fullData[0*N+1+M*N*2] == someView(0, 1, 2));
     CHECK_THROWS(fullData[1*N+1+M*N*1] == someView(1, 1, 1));
 }
 
@@ -416,12 +418,12 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column La
     constexpr size_t SF = M*N*K;
     std::array<double, SF> fullData = {0,0,0,0,
                                        0,0,0,0,
-                                         1,3,5,0,
-                                         2,4,6,0,
+                                         0,1,3,5,
+                                         0,2,4,6,
                                            0,0,0,0,
                                            0,0,0,0,
-                                             7,0,0,0,
-                                             8,0,0,0};
+                                             0,0,0,7,
+                                             0,0,0,8};
 
     constexpr size_t S = M*(N-1)+M;
     std::array<double, S> data = {1,3,5,
@@ -448,13 +450,15 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column La
         CHECK(data[l] == someView.data()[l]);
     }
 
-    CHECK(fullData[0+M*N] == someView(0, 0, 1));
-    CHECK(fullData[1+0+M*N] == someView(0, 1, 1));
-    CHECK(fullData[1*N+1+M*N] == someView(1, 1, 1));
-    CHECK(fullData[1*N+M*N*3] == someView(1, 0, 3));
+    CHECK(fullData[0*N+2+M*N*1] == someView(0, 2, 1));
+    CHECK(fullData[0*N+1+M*N*1] == someView(0, 1, 1));
+    CHECK(fullData[1*N+1+M*N*1] == someView(1, 1, 1));
+    CHECK(fullData[1*N+2+M*N*1] == someView(1, 2, 1));
+    CHECK(fullData[1*N+3+M*N*3] == someView(1, 3, 3));
 
-    CHECK_THROWS(fullData[0+1+M*N*3] == someView(0, 1, 3));
-    CHECK_THROWS(fullData[1*N+1+M*N*1] == someView(1, 1, 0));
+    CHECK_THROWS(fullData[0*N+1+M*N*1] == someView(1, 0, 1));
+    CHECK_THROWS(fullData[0*N+1+M*N*3] == someView(0, 1, 3));
+    CHECK_THROWS(fullData[1*N+1+M*N*0] == someView(1, 1, 0));
 }
 
 

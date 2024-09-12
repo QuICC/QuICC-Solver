@@ -570,18 +570,19 @@ namespace View {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
             // column major
-            // use the knowledge that the row always start from zero and its size depends on the layer
+            // use the knowledge that the row always starts
+            // from k and its size depends on the layer
             std::size_t kmn = 0;
             const auto m = _dimensions[0];
             for (IndexType idx = _pointers[2][0]; idx < _pointers[2][1]; ++idx)
             {
-               auto n = _dimensions[1]-k;
+               // auto n = _dimensions[1]-k; // row width
                auto p = _indices[2][idx];
-               if ( p == k && j < n)
+               if ( p == k && j >= k && j < _dimensions[1])
                {
                   kmn *= m;
-                  assert(i + j*m + kmn < this->_size);
-                  return this->_data[i + j*m + kmn];
+                  assert(i + (j-k)*m + kmn < this->_size);
+                  return this->_data[i + (j-k)*m + kmn];
                }
                // comulative n
                kmn += _dimensions[1]-p;
@@ -594,13 +595,13 @@ namespace View {
             const auto m = _dimensions[0];
             for (IndexType idx = _pointers[2][0]; idx < _pointers[2][1]; ++idx)
             {
-               auto n = _dimensions[1]-k;
+               auto n = _dimensions[1]-k; // row width
                auto p = _indices[2][idx];
-               if ( p == k && j < n)
+               if ( p == k && j >= k && j < _dimensions[1])
                {
                   kmn *= m;
-                  assert(j + i*n + kmn < this->_size);
-                  return this->_data[j + i*n + kmn];
+                  assert(j-k + i*n + kmn < this->_size);
+                  return this->_data[j-k + i*n + kmn];
                }
                // comulative n
                kmn += _dimensions[1]-p;
