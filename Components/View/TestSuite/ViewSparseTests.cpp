@@ -147,10 +147,10 @@ TEST_CASE("ViewThreeDimDtrClColMaj", "[ViewThreeDimDtrClColMaj]")
     constexpr size_t SF = M*N*K;
     std::array<double, SF> fullData = {1,2,3,
                                        4,5,6,
-                                            7,8,0,
-                                            10,11,0,
-                                                   13,0,0,
-                                                   16,0,0};
+                                            0,7,8,
+                                            0,10,11,
+                                                   0,0,13,
+                                                   0,0,16};
 
     constexpr size_t S = M*2+2*2+2;
     std::array<double, S> data = {1,2,3,
@@ -183,9 +183,11 @@ TEST_CASE("ViewThreeDimDtrClColMaj", "[ViewThreeDimDtrClColMaj]")
     CHECK(fullData[2] == someView(2, 0, 0));
     CHECK(fullData[1+M*1] == someView(1, 1, 0));
     CHECK(fullData[1+M*1+M*N*1] == someView(1, 1, 1));
-    CHECK(fullData[0+M*1+M*N*2] == someView(0, 1, 2));
+    CHECK(fullData[2+M*1+M*N*2] == someView(2, 1, 2));
 
-    CHECK_THROWS(fullData[2+M*1+M*N*1] == someView(2, 1, 1));
+    CHECK_THROWS(fullData[2+M*1+M*N*1] == someView(0, 1, 1));
+    CHECK_THROWS(fullData[0+M*1+M*N*2] == someView(0, 1, 2));
+    CHECK_THROWS(fullData[0+M*1+M*N*2] == someView(1, 1, 2));
 }
 
 TEST_CASE("ViewThreeDim Compressed step 1 Column Layer ColMaj", "[ViewThreeDimCtrClColMaj]")
@@ -200,8 +202,8 @@ TEST_CASE("ViewThreeDim Compressed step 1 Column Layer ColMaj", "[ViewThreeDimCt
                                          0,0,0,0,
                                            0,0,0,0,
                                            0,0,0,0,
-                                             9,0,0,0,
-                                             10,0,0,0};
+                                             0,0,0,9,
+                                             0,0,0,10};
 
     constexpr size_t S = M*N+N;
     std::array<double, S> data = {1,2,3,4,
@@ -228,12 +230,14 @@ TEST_CASE("ViewThreeDim Compressed step 1 Column Layer ColMaj", "[ViewThreeDimCt
         CHECK(data[l] == someView.data()[l]);
     }
 
-    CHECK(fullData[0] == someView(0, 0, 0));
-    CHECK(fullData[2] == someView(2, 0, 0));
-    CHECK(fullData[1+M*1] == someView(1, 1, 0));
-    CHECK(fullData[0+M*1+M*N*3] == someView(0, 1, 3));
+    CHECK(fullData[0+M*0+M*N*0] == someView(0, 0, 0));
+    CHECK(fullData[2+M*0+M*N*0] == someView(2, 0, 0));
+    CHECK(fullData[1+M*1+M*N*0] == someView(1, 1, 0));
+    CHECK(fullData[3+M*1+M*N*3] == someView(3, 1, 3));
 
     CHECK_THROWS(fullData[2+M*1+M*N*1] == someView(2, 1, 1));
+    CHECK_THROWS(fullData[1+M*1+M*N*1] == someView(1, 1, 1));
+    CHECK_THROWS(fullData[0+M*1+M*N*3] == someView(0, 1, 3));
 }
 
 TEST_CASE("ViewThreeDim Compressed step 1 Column Layer, Row Column Layer layout",

@@ -38,13 +38,15 @@ namespace View {
    /// this tag needs always be associated with a compressed_t tag
    struct sparse_t {};
 
-   /// @brief tag type for dense level with implicit start from zero
-   /// and the length is implicity equal to the full dimension minus K (3rd index)
+   /// @brief tag type for dense level with implicit starts from k
+   /// to the full dimension, so that the length is implicity equal
+   /// to the full dimension minus K (k being the 3rd index)
    /// \todo template on tag index and coeff?
    struct step1K_t {};
 
-   /// @brief tag type for dense level with implicit start from zero
-   /// and the length is implicity equal to the full dimension minus 2*K (3rd index)
+   /// @brief tag type for dense level with implicit start starts from 2*k
+   /// to the full dimension, so that the length is implicity equal
+   /// to the full dimension minus 2*K (k being the 3rd index)
    /// \todo template on tag index and coeff?
    struct step2K_t {};
 

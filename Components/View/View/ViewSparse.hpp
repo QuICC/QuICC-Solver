@@ -495,18 +495,19 @@ namespace View {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
             // column major
-            // use the knowledge that the column always start from zero and its size depends on the layer
-            auto m = _dimensions[0]-k;
-            if (i < m)
+            // use the knowledge that the column always starts
+            // from k and its size depends on the layer
+            auto m = _dimensions[0]-k; // column height
+            if (i >= k && i < _dimensions[0])
             {
                std::size_t kmn = 0;
                for(std::size_t ii = 0; ii < k; ++ii)
                {
-                  kmn += _dimensions[0]-ii;
+                  kmn += _dimensions[0]-ii; // comulative column height
                }
                kmn *= _dimensions[1];
-               assert(i + j*m + kmn < this->_size);
-               return this->_data[i + j*m + kmn];
+               assert(i-k + j*m + kmn < this->_size);
+               return this->_data[i-k + j*m + kmn];
             }
 
          }
@@ -521,20 +522,21 @@ namespace View {
          if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
          {
             // column major
-            // use the knowledge that the column always start from zero and its size depends on the layer
+            // use the knowledge that the column always starts
+            // from k and its size depends on the layer
             std::size_t kmn = 0;
             const auto n = _dimensions[1];
             for (IndexType idx = _pointers[2][0]; idx < _pointers[2][1]; ++idx)
             {
-               auto m = _dimensions[0]-k;
+               auto m = _dimensions[0]-k; // column height
                auto p = _indices[2][idx];
-               if ( p == k && i < m)
+               if ( p == k && i >= k && i < _dimensions[0])
                {
                   kmn *= n;
-                  assert(i + j*m + kmn < this->_size);
-                  return this->_data[i + j*m + kmn];
+                  assert(i-k + j*m + kmn < this->_size);
+                  return this->_data[i-k + j*m + kmn];
                }
-               // comulative m
+               // comulative m (column height)
                kmn += _dimensions[0]-p;
             }
          }
