@@ -7,7 +7,7 @@
 using namespace QuICC::Memory;
 using namespace QuICC::View;
 
-TEST_CASE("Serial DCCSC3D to DCCSC3D 210", "SerialDCCSC3DtoDCCSC3D210")
+TEST_CASE("Serial DCCSC3D to DCCSC3D 201", "SerialDCCSC3DtoDCCSC3D201")
 {
    // FFT out -> AL in
    // Full data and type
@@ -128,7 +128,8 @@ TEST_CASE("Serial S1CLCSC3D to DCCSC3D 201", "SerialS1CLCSC3DtoDCCSC3D201")
       /*k1*/ 9, 10, 11,
       /*k1*/ 12, 13, 14,
       /*k2*/ 15, 16,
-      /*k2*/ 17, 18};
+      /*k2*/ 17, 18
+   };
 
    // perm = [2 0 1] -> N K M
    std::array<double, S> dataRef = {
@@ -141,7 +142,7 @@ TEST_CASE("Serial S1CLCSC3D to DCCSC3D 201", "SerialS1CLCSC3DtoDCCSC3D201")
       /*m3*/ 4, 8,
       /*m3*/ 11, 14,
       /*m3*/ 16, 18
-      };
+   };
 
    std::array<double, S> dataOut;
 
@@ -193,7 +194,7 @@ TEST_CASE("Serial DCCSC3D to S1CLCSC3D 120", "SerialDCCSC3DtoS1CLCSC3D120")
       /*m3*/ 4, 8,
       /*m3*/ 11, 14,
       /*m3*/ 16, 18
-      };
+   };
 
    // perm = [1 2 0] -> M N K
    std::array<double, S> dataRef = {
@@ -202,7 +203,8 @@ TEST_CASE("Serial DCCSC3D to S1CLCSC3D 120", "SerialDCCSC3DtoS1CLCSC3D120")
       /*k1*/ 9, 10, 11,
       /*k1*/ 12, 13, 14,
       /*k2*/ 15, 16,
-      /*k2*/ 17, 18};
+      /*k2*/ 17, 18
+   };
 
    std::array<double, S> dataOut;
 

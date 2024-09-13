@@ -203,18 +203,11 @@ ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
    // Populate meta for fully populated tensor
    ptrAndIdx ret;
    // row width (with jki) K - ...
-   std::vector<std::uint32_t> kLess(I);
-   kLess[I - 1] = K - 1;
-   for (std::size_t i = I - 1; i > 0; --i)
+   std::vector<std::uint32_t> kLoc(I);
+   kLoc[0] = 1;
+   for (std::size_t i = 1; i < I; ++i)
    {
-      if (kLess[i] > 0)
-      {
-         kLess[i - 1] = kLess[i] - 1;
-      }
-      else
-      {
-         kLess[i - 1] = 0;
-      }
+      kLoc[i] = std::min(kLoc[i-1] + 1, K);
    }
 
    std::size_t layWidthCum = 0;
@@ -222,7 +215,7 @@ ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
    ret.ptr[0] = 0;
    for (std::size_t i = 1; i < I + 1; ++i)
    {
-      std::uint32_t width = K - kLess[i - 1];
+      std::uint32_t width = kLoc[i-1];
       ret.ptr[i] = ret.ptr[i - 1] + width;
       layWidthCum += width;
    }

@@ -37,7 +37,7 @@ using namespace QuICC::Memory;
 using namespace QuICC::View;
 using namespace QuICC::TestSuite;
 
-TEST_CASE("Mpi DCCSC3D to DCCSC3D 210", "MpiDCCSC3DtoDCCSC3D210")
+TEST_CASE("Mpi DCCSC3D to DCCSC3D 201", "MpiDCCSC3DtoDCCSC3D201")
 {
    int rank, ranks;
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -192,7 +192,7 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 210", "MpiDCCSC3DtoDCCSC3D210")
    }
 }
 
-TEST_CASE("Mpi DCCSC3D to DCCSC3DJIK 210", "MpiDCCSC3DtoDCCSC3DJIK210")
+TEST_CASE("Mpi DCCSC3D to DCCSC3DJIK 201", "MpiDCCSC3DtoDCCSC3DJIK201")
 {
    int rank, ranks;
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -624,7 +624,7 @@ TEST_CASE("Mpi DCCSC3DJIK to DCCSC3D 120", "MpiDCCSC3DJIKtoDCCSC3D120")
    }
 }
 
-TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 210", "MpiS1CLCSC3DtoDCCSC3D210")
+TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 201", "MpiS1CLCSC3DtoDCCSC3D201")
 {
    int rank, ranks;
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -654,24 +654,27 @@ TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 210", "MpiS1CLCSC3DtoDCCSC3D210")
 
    if (rank == 0 && ranks == 1)
    {
-      dataIn = {/*k0*/ 1, 2, 3, 4,
+      dataIn = {
+         /*k0*/ 1, 2, 3, 4,
          /*k0*/ 5, 6, 7, 8,
          /*k1*/ 9, 10, 11,
          /*k1*/ 12, 13, 14,
          /*k2*/ 15, 16,
-         /*k2*/ 17, 18};
+         /*k2*/ 17, 18
+      };
 
       // perm = [2 0 1] -> N K M
-      dataOutRef = {/*m0*/ 1, 5,
-         /*m0*/ 9, 12,
-         /*m0*/ 15, 17,
+      dataOutRef = {
+         /*m0*/ 1, 5,
          /*m1*/ 2, 6,
-         /*m1*/ 10, 13,
-         /*m1*/ 16, 18,
+         /*m1*/ 9, 12,
          /*m2*/ 3, 7,
-         /*m2*/ 11, 14,
-         /*m3*/ 4,
-         /*m3*/ 8};
+         /*m2*/ 10, 13,
+         /*m2*/ 15, 17,
+         /*m3*/ 4, 8,
+         /*m3*/ 11, 14,
+         /*m3*/ 16, 18
+      };
 
       // Populate meta for fully populated tensor
       // AL space (Stage::PPM and Stage::MPM)
@@ -750,7 +753,7 @@ TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 210", "MpiS1CLCSC3DtoDCCSC3D210")
    }
 }
 
-TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 210", "MpiS1CLCSC3DJIKtoDCCSC3D210JIK")
+TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201", "MpiS1CLCSC3DJIKtoDCCSC3D201JIK")
 {
    int rank, ranks;
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -789,17 +792,20 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 210", "MpiS1CLCSC3DJIKtoDCCSC3D210JIK"
          /*k1*/ 10, 13,
          /*k1*/ 11, 14,
          /*k2*/ 15, 17,
-         /*k2*/ 16, 18};
+         /*k2*/ 16, 18
+      };
 
       // perm = [2 0 1] -> N K M
       dataOutRef = {
-         /*m0*/ 1, 9, 15,
-         /*m0*/ 5, 12, 17,
-         /*m1*/ 2, 10, 16,
-         /*m1*/ 6, 13, 18,
-         /*m2*/ 3, 11,
-         /*m2*/ 7, 14,
-         /*m3*/ 4, 8};
+         /*m0*/ 1,
+         /*m0*/ 5,
+         /*m1*/ 2, 9,
+         /*m1*/ 6, 12,
+         /*m2*/ 3, 10, 15,
+         /*m2*/ 7, 13, 17,
+         /*m3*/ 4, 11, 16,
+         /*m3*/ 8, 14, 18
+      };
 
       // Populate meta for fully populated tensor
       // AL space (Stage::PPM and Stage::MPM)
@@ -903,32 +909,33 @@ TEST_CASE("Mpi DCCSC3D to S1CLCSC3D 120", "MpiDCCSC3DtoS1CLCSC3D120")
    ptrAndIdx metaIn;
    ptrAndIdx metaOut;
 
-   using inTy = DCCSC3DJIK;
-   using outTy = S1CLCSC3DJIK;
+   using inTy = DCCSC3D;
+   using outTy = S1CLCSC3D;
 
    if (rank == 0 && ranks == 1)
    {
       // N K M
       dataIn = {
-         /*m0*/ 1, 9, 15,
-         /*m0*/ 5, 12, 17,
-         /*m1*/ 2, 10, 16,
-         /*m1*/ 6, 13, 18,
-         /*m2*/ 3, 11,
-         /*m2*/ 7, 14,
-         /*m3*/ 4, 8};
+         /*m0*/ 1, 5,
+         /*m1*/ 2, 6,
+         /*m1*/ 9, 12,
+         /*m2*/ 3, 7,
+         /*m2*/ 10, 13,
+         /*m2*/ 15, 17,
+         /*m3*/ 4, 8,
+         /*m3*/ 11, 14,
+         /*m3*/ 16, 18
+      };
 
       // perm = [1 2 0] -> M N K
       dataOutRef = {
-         /*k0*/ 1, 5,
-         /*k0*/ 2, 6,
-         /*k0*/ 3, 7,
-         /*k0*/ 4, 8,
-         /*k1*/ 9, 12,
-         /*k1*/ 10, 13,
-         /*k1*/ 11, 14,
-         /*k2*/ 15, 17,
-         /*k2*/ 16, 18};
+         /*k0*/ 1, 2, 3, 4,
+         /*k0*/ 5, 6, 7, 8,
+         /*k1*/ 9, 10, 11,
+         /*k1*/ 12, 13, 14,
+         /*k2*/ 15, 16,
+         /*k2*/ 17, 18
+      };
 
       // Populate meta for fully populated tensor
       // Spectral(JW) space (Stage::PMM and Stage::MMM)
@@ -1019,30 +1026,35 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120", "MpiDCCSC3DJIKtoS1CLCSC3DJIK120"
    ptrAndIdx metaIn;
    ptrAndIdx metaOut;
 
-   using inTy = DCCSC3D;
-   using outTy = S1CLCSC3D;
+   using inTy = DCCSC3DJIK;
+   using outTy = S1CLCSC3DJIK;
 
    if (rank == 0 && ranks == 1)
    {
       // N K M
-      dataIn = {/*m0*/ 1, 5,
-         /*m0*/ 9, 12,
-         /*m0*/ 15, 17,
-         /*m1*/ 2, 6,
-         /*m1*/ 10, 13,
-         /*m1*/ 16, 18,
-         /*m2*/ 3, 7,
-         /*m2*/ 11, 14,
-         /*m3*/ 4,
-         /*m3*/ 8};
+      dataIn = {
+         /*m0*/ 1,
+         /*m0*/ 5,
+         /*m1*/ 2, 9,
+         /*m1*/ 6, 12,
+         /*m2*/ 3, 10, 15,
+         /*m2*/ 7, 13, 17,
+         /*m3*/ 4, 11, 16,
+         /*m3*/ 8, 14, 18
+      };
 
       // perm = [1 2 0] -> M N K
-      dataOutRef = {/*k0*/ 1, 2, 3, 4,
-         /*k0*/ 5, 6, 7, 8,
-         /*k1*/ 9, 10, 11,
-         /*k1*/ 12, 13, 14,
-         /*k2*/ 15, 16,
-         /*k2*/ 17, 18};
+      dataOutRef = {
+         /*k0*/ 1, 5,
+         /*k0*/ 2, 6,
+         /*k0*/ 3, 7,
+         /*k0*/ 4, 8,
+         /*k1*/ 9, 12,
+         /*k1*/ 10, 13,
+         /*k1*/ 11, 14,
+         /*k2*/ 15, 17,
+         /*k2*/ 16, 18
+      };
 
       // Populate meta for fully populated tensor
       // Spectral(JW) space (Stage::PMM and Stage::MMM)

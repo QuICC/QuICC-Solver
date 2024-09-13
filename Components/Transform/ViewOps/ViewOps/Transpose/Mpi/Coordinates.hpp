@@ -150,12 +150,13 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
                       std::is_same_v<Perm, p012_t>)
    {
       std::size_t itCoo = 0;
+      auto I = view.dims()[0];
       for (std::size_t ptr = 0; ptr < pointers.size() - 1; ++ptr)
       {
-         std::size_t heightCol = view.dims()[0] - ptr;
+         // std::size_t heightCol = view.dims()[0] - ptr;
          for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
          {
-            for (std::size_t i = 0; i < heightCol; ++i)
+            for (std::size_t i = ptr; i < I; ++i)
             {
                // 0 1 2 -> i j k
                coo[itCoo++] = {
@@ -172,10 +173,11 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
                       std::is_same_v<Perm, p012_t>)
    {
       std::size_t itCoo = 0;
+      auto I = view.dims()[0];
       for (std::size_t ptr = 0; ptr < pointers.size() - 1; ++ptr)
       {
-         std::size_t heightCol = view.dims()[0] - ptr;
-         for (std::size_t i = 0; i < heightCol; ++i)
+         // std::size_t heightCol = view.dims()[0] - ptr;
+         for (std::size_t i = ptr; i < I; ++i)
          {
             for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
             {
@@ -194,12 +196,13 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
                       std::is_same_v<Perm, p120_t>)
    {
       std::size_t itCoo = 0;
+      auto I = view.dims()[0];
       for (std::size_t ptr = 0; ptr < pointers.size() - 1; ++ptr)
       {
-         std::size_t heightCol = view.dims()[0] - ptr;
+         // std::size_t heightCol = view.dims()[0] - ptr;
          for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
          {
-            for (std::size_t i = 0; i < heightCol; ++i)
+            for (std::size_t i = ptr; i < I; ++i)
             {
                // 1 2 0 -> j k i
                coo[itCoo++] = {
@@ -216,10 +219,11 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
                       std::is_same_v<Perm, p120_t>)
    {
       std::size_t itCoo = 0;
+      auto I = view.dims()[0];
       for (std::size_t ptr = 0; ptr < pointers.size() - 1; ++ptr)
       {
-         std::size_t heightCol = view.dims()[0] - ptr;
-         for (std::size_t i = 0; i < heightCol; ++i)
+         // std::size_t heightCol = view.dims()[0] - ptr;
+         for (std::size_t i = ptr; i < I; ++i)
          {
             for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
             {
