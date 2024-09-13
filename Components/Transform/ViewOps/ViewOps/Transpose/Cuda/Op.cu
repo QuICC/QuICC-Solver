@@ -140,8 +140,8 @@ perm(View::View<Tout, View::DCCSC3DJIK> out,
       kLoc[0] = 1;
       for (std::size_t i = 1; i < I; ++i)
       {
-         kSum[i] = std::min(kSum[i-1] + 1, K);
-         kLoc[i] = std::min(kLoc[i-1] + 1, K);
+         kSum[i] = min(kSum[i-1] + 1, K);
+         kLoc[i] = min(kLoc[i-1] + 1, K);
       }
       pSum(kSum, I);
    }
@@ -158,8 +158,8 @@ perm(View::View<Tout, View::DCCSC3DJIK> out,
       // std::size_t Iloc = I - k; // Local column height
       if (i >= k && i < I && j < J)
       {
-         std::size_t ijk = i-k * J + j + (k * I - iSum[k]) * J;
-         std::size_t jki = j * kLoc[i] + k + i * kSum[i] * J;
+         std::size_t ijk = (i-k) * J + j + (k * I - iSum[k]) * J;
+         std::size_t jki = j * kLoc[i] + k + kSum[i] * J;
          assert(ijk < in.size());
          assert(jki < out.size());
          out[jki] = in[ijk];
@@ -210,8 +210,8 @@ perm(View::View<Tout, View::S1CLCSC3DJIK> out,
       kLoc[0] = 1;
       for (std::size_t i = 1; i < I; ++i)
       {
-         kSum[i] = std::min(kSum[i-1] + 1, K);
-         kLoc[i] = std::min(kLoc[i-1] + 1, K);
+         kSum[i] = min(kSum[i-1] + 1, K);
+         kLoc[i] = min(kLoc[i-1] + 1, K);
       }
       pSum(kSum, I);
    }
@@ -228,8 +228,8 @@ perm(View::View<Tout, View::S1CLCSC3DJIK> out,
       // std::size_t Iloc = I - k;  // Local column height
       if (i >= k && i < I && j < J)
       {
-         std::size_t ijk = i * J + j + (k * I - iSum[k]) * J;
-         std::size_t jki = j * kLoc[i] + k + i * kSum[i] * J;
+         std::size_t ijk = (i-k) * J + j + (k * I - iSum[k]) * J;
+         std::size_t jki = j * kLoc[i] + k + kSum[i] * J;
          assert(jki < in.size());
          assert(ijk < out.size());
          out[ijk] = in[jki];

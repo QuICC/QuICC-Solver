@@ -10,6 +10,7 @@
 #include "Memory/Cuda/Malloc.hpp"
 #include "Memory/Memory.hpp"
 #include "Types/Math.hpp"
+#include "Profiler/Interface.hpp"
 
 TEST_CASE("One Dimensional Loop Fourier Gpu", "[OneDimLoopFourierGpu]")
 {
