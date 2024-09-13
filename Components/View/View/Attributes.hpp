@@ -498,12 +498,14 @@ namespace View {
 
    /**
     * @brief AL projector input type on cpu
+    * AL integrator op
     * Step 1 column layer, with (N,K) plane a 2D CSC column major matrix
     */
    using S1CLCSC3D = Attributes<DimLevelType<step1K_t, compressed_t, sparse_t>>;
 
    /**
     * @brief AL projector input type on gpu
+    * AL integrator op
     * Step 1 column layer, with (N,K) plane a 2D CSC column major matrix
     */
    using S1CLCSC3DJIK = Attributes<DimLevelType<step1K_t, compressed_t, sparse_t>,
