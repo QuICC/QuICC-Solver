@@ -33,7 +33,9 @@
 #include "QuICC/PseudospectralTag/Wrapper.hpp"
 #include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/PhysicalNames/registerAll.hpp"
+#include "View/ViewUtils.hpp"
 #include "Profiler/Interface.hpp"
+
 
 namespace QuICC {
 
@@ -136,9 +138,104 @@ namespace Pseudospectral {
    }
 
 
+   namespace details {
+
+   View::ptrAndIdx getMeta(const TransformResolution& res, const std::uint32_t maxLayers)
+   {
+      std::vector<std::uint32_t> ptr;
+      std::vector<std::uint32_t> idx;
+
+      std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
+      // ptr
+      std::uint32_t cumLayerSize = 0;
+      std::uint32_t layerCounter = 0;
+      for(std::uint32_t l = 0; l < maxLayers; ++l)
+      {
+         auto layerIndex = static_cast<std::uint32_t>(res.idx<QuICC::Dimensions::Data::DAT3D>(layerCounter));
+         std::uint32_t layerSize = 0;
+         if (l == layerIndex)
+         {
+            layerSize = res.dim<QuICC::Dimensions::Data::DAT2D>(layerCounter);
+            ++layerCounter;
+         }
+         ptr[l+1] = ptr[l] + layerSize;
+         cumLayerSize += layerSize;
+      }
+      // idx
+      idx.resize(cumLayerSize);
+      std::uint32_t l = 0;
+      for(std::uint32_t k = 0; k < nLayers; ++k)
+      {
+         for(int j = 0; j < res.dim<QuICC::Dimensions::Data::DAT2D>(k); ++j)
+         {
+            // auto layerIndex = res.idx<QuICC::Dimensions::Data::DAT3D>(k);
+            auto columnIndex = res.idx<QuICC::Dimensions::Data::DAT2D>(j, k);
+            // auto columnHeight = res.dim<QuICC::Dimensions::Data::DATB1D>(j, k);
+            idx[l] = columnIndex;
+            ++l;
+         }
+      }
+      return {ptr, idx};
+   }
+
+   } // namespace details
+
+
+
    void Coordinator::addGraph(const std::string& graphStr)
    {
-      mModStr = graphStr;
+      /// Setup, get info from mspRes
+      /// jw : look at BenchmarkMagC2.cpp:65
+      /// LoadSplitter test?
+      /// Transform::SharedTransformSetup WLFlBuilder::spSetup3D
+      // mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
+
+      // get Dims from mspRes
+      // std::uint32_t Nr = jwRes.dim<Dimensions::Data::DATF1D>();
+      std::uint32_t Nr = mspRes->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::PHYSICAL);
+      std::uint32_t N = mspRes->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      // std::uint32_t Ntheta = alRes.dim<Dimensions::Data::DATF1D>();
+      std::uint32_t Ntheta = mspRes->sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::PHYSICAL);
+      std::uint32_t L = mspRes->sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
+      // std::uint32_t Nphi = ftRes.dim<Dimensions::Data::DATF1D>();
+      std::uint32_t Nphi = mspRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::PHYSICAL);
+      std::uint32_t M = mspRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+
+      // get meta from mspRes
+      const auto& jwRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA1D);
+      auto metaJW = details::getMeta(jwRes, L);
+      const auto& alRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA2D);
+      auto metaAL = details::getMeta(alRes, M);
+      const auto& ftRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA3D);
+      auto metaFT = details::getMeta(ftRes, Nr);
+
+      constexpr std::uint32_t dim = 3;
+      /// RThetaPhi - v012
+      std::array<std::uint32_t, dim> physDims{Nr, Ntheta, Nphi};
+      /// @brief Spectral dimensions
+      /// NLM - v012
+      std::array<std::uint32_t, dim> modsDims{N, L, M};
+
+      // Layouts, depends on backend
+      std::array<std::array<std::string, 2>, 3> layOpt;
+      layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+      layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
+      layOpt[2] = {"DCCSC3D", "DCCSC3D"};
+
+      // Store meta stages to pass to Jitter
+      std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
+      meta.push_back({metaFT.ptr.data(), metaFT.ptr.size()});
+      meta.push_back({metaFT.idx.data(), metaFT.idx.size()});
+      meta.push_back({metaAL.ptr.data(), metaAL.ptr.size()});
+      meta.push_back({metaAL.idx.data(), metaAL.idx.size()});
+      meta.push_back({metaJW.ptr.data(), metaJW.ptr.size()});
+      meta.push_back({metaJW.idx.data(), metaJW.idx.size()});
+
+      // Memory resource, depends on backend
+      mMemRsr = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+
+      mJitter = std::make_unique<QuICC::Graph::Jit<3>>(graphStr, mMemRsr, physDims, modsDims, layOpt, Graph::Stage::MMM, Graph::Stage::MMM, meta);
+
    };
 
    Coordinator::ScalarEquation_range Coordinator::scalarRange(const std::size_t eqId, const int it)
@@ -691,38 +788,29 @@ namespace Pseudospectral {
       // compute nonlinear interaction and forward transform
       this->updateSpectral(it);
 
-      if (mJitter == nullptr)
-      {
-         /// Setup
-         // get info from mspRes
-         /// jw : look at BenchmarkMagC2.cpp:65
-         /// LoadSplitter test?
-         /// Transform::SharedTransformSetup WLFlBuilder::spSetup3D
-         // mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
+      assert(mJitter != nullptr);
 
-         /// \todo map/copy to graph
-         auto temp = mVectorVariables[PhysicalNames::Temperature::id()];
-         std::visit(
-               [&](auto&& p)
-               {
-                  auto ptrTemp = p->rDom(0).perturbation().comp(FieldComponents::Spectral::SCALAR);
-               }, temp);
+      /// \todo map/copy to graph
+      auto temp = mVectorVariables[PhysicalNames::Temperature::id()];
+      std::visit(
+            [&](auto&& p)
+            {
+               auto ptrTemp = p->rDom(0).perturbation().comp(FieldComponents::Spectral::SCALAR);
+            }, temp);
 
-         auto vec = mVectorVariables[PhysicalNames::Velocity::id()];
-         std::visit(
-               [&](auto&& p)
-               {
-                  auto ptrTor = p->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR);
-                  auto ptrPol = p->rDom(0).perturbation().comp(FieldComponents::Spectral::POL);
-               }, vec);
+      auto vec = mVectorVariables[PhysicalNames::Velocity::id()];
+      std::visit(
+            [&](auto&& p)
+            {
+               auto ptrTor = p->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR);
+               auto ptrPol = p->rDom(0).perturbation().comp(FieldComponents::Spectral::POL);
+            }, vec);
 
-      }
-      else
-      {
-         /// copy ptrTor.data().data()?
-         /// call graph
-         /// copy back
-      }
+      /// copy ptrTor.data().data()?
+      /// call graph
+      // mJitter->apply();
+      /// copy back
+
    }
 
    void Coordinator::explicitTrivialEquations(const std::size_t opId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)

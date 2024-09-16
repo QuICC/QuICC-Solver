@@ -606,7 +606,7 @@ namespace Pseudospectral {
 
 
          std::unique_ptr<Graph::Jit<3>> mJitter;
-         std::string mModStr;
+         std::shared_ptr<QuICC::Memory::memory_resource> mMemRsr;
 
       private:
          /**

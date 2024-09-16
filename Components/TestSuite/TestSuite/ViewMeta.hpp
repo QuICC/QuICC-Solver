@@ -48,7 +48,7 @@ dimsAndMeta readDimsAndMeta(const std::string path, const std::string dist,
 /// @param db
 /// @param maxLayers
 /// @return
-View::ptrAndIdx unPackMeta(const std::vector<MHDFloat>& db,
+View::ptrAndIdx unPackMeta(const std::vector<MHDFloat>& db, const
    std::uint32_t maxLayers);
 
 } // namespace TestSuite
