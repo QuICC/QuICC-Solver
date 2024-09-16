@@ -52,6 +52,7 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
         // dim 1 - N  - radial modes
         // dim 2 - L  - harmonic degree
         std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
+        // Distributed operator, layer might not be populated
         std::vector<std::uint32_t> layers;
         for (std::size_t i = 0; i < dims[2]; ++i) {
             if (pUmod->pos[i+1]-pUmod->pos[i] > 0)
@@ -107,6 +108,10 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
     assert(pUmod->pos == pUval->pos);
     assert(pUmod->coo == pUval->coo);
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->pos));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->coo));
+    assert(QuICC::Cuda::isDeviceMemory(pUmod->data));
+    assert(QuICC::Cuda::isDeviceMemory(pUval->data));
     Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // Check that op was set up
@@ -117,9 +122,14 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
         // dim 1 - N  - radial modes
         // dim 2 - L  - harmonic degree
         std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
+        // Distributed operator, layer might not be populated
         std::vector<std::uint32_t> layers;
+        // Converter for metadata
+        auto pos = pointers[1];
+        using namespace QuICC::Memory;
+        tempOnHostMemorySpace converterP(pos, TransferMode::read | TransferMode::block);
         for (std::size_t i = 0; i < dims[2]; ++i) {
-            if (pUmod->pos[i+1]-pUmod->pos[i] > 0)
+            if (pos[i+1]-pos[i] > 0)
             {
                 layers.push_back(i);
             }
