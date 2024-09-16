@@ -46,7 +46,7 @@ dimsAndMeta readDimsAndMeta(const std::string path, const std::string dist,
    // Unpack metadata AL stage
    ret.metaAL = std::move(unPackMeta(dbAL, modsM));
    // Unpack metadata JW stage
-   ret.metaJW = std::move(unPackMeta(dbJW, modsM));
+   ret.metaJW = std::move(unPackMeta(dbJW, modsL));
 
    return ret;
 }

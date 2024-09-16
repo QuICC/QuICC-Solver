@@ -129,12 +129,20 @@ TEST_CASE("Parallel 3D Fwd", "[Parallel3DFwd]")
   // Check
   double eps = 1e-14;
   std::size_t m = 0;
-  if (rank == 0)
+  try
   {
+    // we don't know which rank has mode zero
+    modsOutView(0,0,0);
+    // if we didn't throw this rank has mode zero
     CHECK(std::abs(modsOutView[m].real() - sqrt(2.0)*QuICC::Math::PI) <= eps);
     CHECK(std::abs(modsOutView[m].imag()) <= eps);
     ++m;
   }
+  catch(std::logic_error& e)
+  {
+    // do nothing
+  }
+
   for(; m < modsOutView.size(); ++m)
   {
     CHECK(std::abs(modsOutView[m]) <= eps);
@@ -223,10 +231,17 @@ TEST_CASE("Parallel 3D Bwd", "[Parallel3DBwd]")
   // set input modes
   std::complex<double> val = {sqrt(2.0)/2.0, 0.0};
   std::size_t m = 0;
-  if (rank == 0)
+  try
   {
+    // we don't know which rank has mode zero
+    modsInView(0,0,0);
+    // if we didn't throw this rank has mode zero
     modsInView[m] = val;
     ++m;
+  }
+  catch(std::logic_error& e)
+  {
+    // do nothing
   }
   for(; m < modsInView.size(); ++m)
   {
@@ -328,10 +343,17 @@ TEST_CASE("Parallel 3D Loop", "[Parallel3DLoop]")
   {
     modsInView[m] = {0.0, 0.0};
   }
-  if (rank == 0)
+  try
   {
+    // we don't know which rank has mode zero and one
+    modsInView(0,0,0);
+    // if we didn't throw this rank has mode zero
     modsInView(0,0,0) = val;
     modsInView(1,0,0) = val;
+  }
+  catch(std::logic_error& e)
+  {
+    // do nothing
   }
 
   // Apply graph
@@ -443,12 +465,20 @@ TEST_CASE("Parallel Multi Var 3D Fwd", "[ParallelMultiVar3DFwd]")
   // Check
   double eps = 1e-14;
   std::size_t m = 0;
-  if (rank == 0)
+  try
   {
+    // we don't know which rank has mode zero
+    modsOutView(0,0,0);
+    // if we didn't throw this rank has mode zero
     CHECK(std::abs(modsOutView[m].real() - sqrt(2.0)*QuICC::Math::PI) <= eps);
     CHECK(std::abs(modsOutView[m].imag()) <= eps);
     ++m;
   }
+  catch(std::logic_error& e)
+  {
+    // do nothing
+  }
+
   for(; m < modsOutView.size(); ++m)
   {
     CHECK(std::abs(modsOutView[m]) <= eps);
