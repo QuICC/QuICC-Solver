@@ -180,8 +180,6 @@ namespace Pseudospectral {
 
    } // namespace details
 
-
-
    void Coordinator::addGraph(const std::string& graphStr)
    {
       /// Setup, get info from mspRes
@@ -808,7 +806,7 @@ namespace Pseudospectral {
 
       /// copy ptrTor.data().data()?
       /// call graph
-      // mJitter->apply();
+      // mJitter->apply(viewTNl, viewTorNl, viewPolNl, viewT, viewTor, viewPol);
       /// copy back
 
    }
