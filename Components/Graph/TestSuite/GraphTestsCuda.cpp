@@ -17,8 +17,8 @@ TEST_CASE("One Dimensional Loop Fourier Gpu", "[OneDimLoopFourierGpu]")
   // Test Graph
   std::string modStr = R"mlir(
     func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
-      %tuval = quiccir.fr.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64}
-      %ret = quiccir.fr.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64}
+      %tuval = quiccir.fr.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64, kind = "P"}
+      %ret = quiccir.fr.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64, kind = "P"}
       return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";
@@ -123,8 +123,8 @@ TEST_CASE("One Dimensional Loop Associated Legendre Gpu", "[OneDimLoopALGpu]")
   // Same setup as transform loop
   std::string modStr = R"mlir(
     func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
-      %tuval = quiccir.al.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 0 :i64}
-      %ret = quiccir.al.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64}
+      %tuval = quiccir.al.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 0 :i64, kind = "P"}
+      %ret = quiccir.al.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64, kind = "P"}
       return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";
@@ -214,9 +214,9 @@ TEST_CASE("One Dimensional Loop Associated Legendre Gpu", "[OneDimLoopALGpu]")
     modsInView[m] = {0.0, 0.0};
   }
   modsInView(0, 0, 0) = val;
-  modsInView(0, 0, 1) = val;
-  modsInView(0, 0, 2) = val;
-  modsInView(0, 0, 3) = val;
+  modsInView(1, 0, 1) = val;
+  modsInView(2, 0, 2) = val;
+  modsInView(3, 0, 3) = val;
 
   // cpu -> gpu data
   cudaErrChk(cudaMemcpy(modsInDev.data(), modsIn.data(),
@@ -249,8 +249,8 @@ TEST_CASE("One Dimensional Loop Worland Gpu", "[OneDimLoopJWGpu]")
   // Same setup as transform loop
   std::string modStr = R"mlir(
     func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
-      %tuval = quiccir.jw.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 0 :i64}
-      %ret = quiccir.jw.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64}
+      %tuval = quiccir.jw.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 0 :i64, kind = "P"}
+      %ret = quiccir.jw.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64, kind = "P"}
       return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";

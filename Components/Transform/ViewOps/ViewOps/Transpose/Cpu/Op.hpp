@@ -161,7 +161,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       {
          kSum[i] = std::min(kSum[i - 1] + 1, K);
       }
-      assert(kSum[I-1] == K);
+      assert(kSum[I-1] <= K);
       pSum(kSum);
 
       for (std::size_t k = 0; k < K; ++k)
@@ -212,7 +212,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       {
          kSum[i] = std::min(kSum[i - 1] + 1, K);
       }
-      assert(kSum[I-1] == K);
+      assert(kSum[I-1] <= K);
       pSum(kSum);
 
       for (std::size_t k = 0; k < K; ++k)

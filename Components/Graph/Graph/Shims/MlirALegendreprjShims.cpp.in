@@ -74,3 +74,68 @@ extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_S1C
     // call
     cl->apply(viewVal, viewMod);
 };
+
+#ifdef QUICC_HAS_CUDA_BACKEND
+/// @brief C Interface to MLIR for a al prj operator
+/// column major, gpu operators
+/// @param op
+/// @param umod
+/// @param uval
+extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_S1CLCSC3DJIK(void* obj,  view3_cd_t* pUval, view3_cd_t* pUmod)
+{
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_al_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_S1CLCSC3DJIK\n";
+    #endif
+    assert(obj != nullptr);
+    assert(pUval != nullptr);
+    assert(pUmod != nullptr);
+    // op
+    using namespace QuICC::Transform::Quadrature;
+    using Tin = C_S1CLCSC3DJIK_t;
+    using Tout = C_DCCSC3DJIK_t;
+    using Top = QuICC::View::View<double, QuICC::View::CS1RL3D>;
+    using backend_t = Cuda::ImplOp<Tout, Tin, Top,
+        QuICC::Transform::Quadrature::@Treatment@>;
+    using op_t = Op<Tout, Tin, Top, backend_t>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pUmod->pos, pUmod->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
+    assert(pUmod->pos == pUval->pos);
+    assert(pUmod->coo == pUval->coo);
+    Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
+    Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    // Check that op was set up
+    auto cl = reinterpret_cast<op_t*>(obj);
+    if (cl->getOp().data() == nullptr)
+    {
+        /// dim 0 - Ntheta - colatitudinal points
+        /// dim 1 - L  - harmonic degree
+        /// dim 2 - M  - harmonic order
+        std::array<std::uint32_t, rank> dims {pUval->dims[0], pUmod->dims[0], pUmod->dims[2]};
+        std::vector<std::uint32_t> layers;
+        /// Dense operator \todo generalize for distributed op
+        for (std::size_t i = 0; i < dims[2]; ++i) {
+            layers.push_back(i);
+        }
+        cl->allocOp(dims, layers);
+        /// Set grid \todo set once per operator kind
+        ::QuICC::Internal::Array igrid;
+        ::QuICC::Internal::Array iweights;
+        using namespace QuICC::Transform::ALegendre;
+        OpsQuadrature<@Kind@_t> quad;
+        quad.computeQuadrature(igrid, iweights, pUval->dims[0]);
+        // Populate op
+        auto opView = cl->getOp();
+        OpsBuilder<Top, @Kind@_t, @OpDirection@> tBuilder;
+        tBuilder.compute(opView, igrid, ::QuICC::Internal::Array());
+    }
+    assert(cl->getOp().data() != nullptr);
+    // call
+    cl->apply(viewVal, viewMod);
+};
+#endif

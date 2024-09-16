@@ -17,27 +17,14 @@ ptrAndIdx denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>(
     std::uint32_t K = dims[1];
     std::uint32_t I = dims[2];
 
-    // row width (with jki) K - ...
-    std::vector<std::uint32_t> kLess(I);
-    kLess[I-1] = K-1;
-    for (std::size_t i = I-1; i > 0; --i)
-    {
-        if (kLess[i] > 0)
-        {
-            kLess[i-1] = kLess[i] - 1;
-        }
-        else
-        {
-            kLess[i-1] = 0;
-        }
-    }
-
+    // row width (with jki)
+    std::uint32_t width = 0;
     std::size_t layWidthCum = 0;
     ret.ptr.resize(I+1);
     ret.ptr[0] = 0;
     for (std::size_t i = 1; i < I+1; ++i)
     {
-        std::uint32_t width = K-kLess[i-1];
+        width = std::min(width + 1, K);
         ret.ptr[i] = ret.ptr[i-1] + width;
         layWidthCum += width;
     }

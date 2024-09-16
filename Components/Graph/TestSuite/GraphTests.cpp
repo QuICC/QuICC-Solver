@@ -145,9 +145,9 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
     modsInView[m] = {0.0, 0.0};
   }
   modsInView(0, 0, 0) = val;
-  modsInView(0, 0, 1) = val;
-  modsInView(0, 0, 2) = val;
-  modsInView(0, 0, 3) = val;
+  modsInView(1, 0, 1) = val;
+  modsInView(2, 0, 2) = val;
+  modsInView(3, 0, 3) = val;
 
   // Apply graph
   Jitter.apply(modsOutView, modsInView);

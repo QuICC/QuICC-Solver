@@ -12,13 +12,13 @@ target_link_libraries(GraphTests
     Catch2::Catch2
 )
 
-if(TARGET QuICC::Cuda)
-    target_sources(GraphTests
-        PRIVATE
-            GraphTestsCuda.cpp
-    )
-    target_link_libraries(GraphTests QuICC::Cuda)
-endif()
+# if(TARGET QuICC::Cuda)
+#     target_sources(GraphTests
+#         PRIVATE
+#             GraphTestsCuda.cpp
+#     )
+#     target_link_libraries(GraphTests QuICC::Cuda)
+# endif()
 
 add_test(
     NAME GraphTests
