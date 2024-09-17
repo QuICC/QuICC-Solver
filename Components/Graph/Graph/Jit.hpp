@@ -202,6 +202,17 @@ public:
     /// @param arg2V
     template <class Trets, class Targs>
     void apply(Trets ret0V, Targs arg0V, Targs arg1V, Targs arg2V);
+
+    /// @brief Apply graph
+    /// 3 inputs, 3 outputs
+    /// @tparam Trets
+    /// @tparam Targs
+    /// @param ret0V
+    /// @param arg0V
+    /// @param arg1V
+    /// @param arg2V
+    template <class Trets, class Targs>
+    void apply(Trets ret0V, Trets ret1V, Trets ret2V, Targs arg0V, Targs arg1V, Targs arg2V);
 };
 
 template <std::uint32_t RANK>
@@ -527,6 +538,37 @@ void Jit<RANK>::apply(Trets ret0V, Targs arg0V, Targs arg1V, Targs arg2V)
         ))_funSym;
     fun(_metaMap.data(), thisArr.data(), &ret0, &arg0, &arg1, &arg2);
 }
+
+template <std::uint32_t RANK>
+template <class Trets, class Targs>
+void Jit<RANK>::apply(Trets ret0V, Trets ret1V, Trets ret2V, Targs arg0V, Targs arg1V, Targs arg2V)
+{
+    // Map view to MLIR view descritor
+    auto arg0 = getViewDescriptor(arg0V);
+    auto arg1 = getViewDescriptor(arg1V);
+    auto arg2 = getViewDescriptor(arg2V);
+    auto ret0 = getViewDescriptor(ret0V);
+    auto ret1 = getViewDescriptor(ret1V);
+    auto ret2 = getViewDescriptor(ret2V);
+
+    // Get operators map
+    auto thisArr = _storeOp.getThisArr();
+
+    // Apply graph
+    auto fun = (void (*)(void*, void*,
+        decltype(ret0)*,
+        decltype(ret1)*,
+        decltype(ret2)*,
+        decltype(arg0)*,
+        decltype(arg1)*,
+        decltype(arg2)*
+        ))_funSym;
+    fun(_metaMap.data(), thisArr.data(),
+        &ret0, &ret1, &ret2,
+        &arg0, &arg1, &arg2);
+
+}
+
 
 } // namespace Graph
 } // namespace QuICC

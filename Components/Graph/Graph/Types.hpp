@@ -37,8 +37,14 @@ using Ccuda_DCCSC3DJIK_t = QuICC::View::View<cuda::std::complex<double>, View::D
 using C_S1CLCSC3D_t = QuICC::View::View<std::complex<double>, View::S1CLCSC3D>;
 using C_S1CLCSC3DJIK_t = QuICC::View::View<std::complex<double>, View::S1CLCSC3DJIK>;
 
+/// @brief encode data types
+using varData_t = std::variant<
+  R_DCCSC3D_t,
+  C_DCCSC3D_t,
+  C_S1CLCSC3D_t
+>;
 
-/// @brief encode unary ops
+/// @brief encode shared pointers to op type
 using varOp_t = std::variant<
     std::shared_ptr<NaryOp<C_DCCSC3D_t, C_DCCSC3D_t>>,
     std::shared_ptr<NaryOp<R_DCCSC3D_t, R_DCCSC3D_t>>,
