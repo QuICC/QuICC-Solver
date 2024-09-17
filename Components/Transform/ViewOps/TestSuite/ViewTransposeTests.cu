@@ -92,10 +92,13 @@ TEST_CASE("Serial DCCSC3DJIK to DCCSC3D 120", "SerialDCCSC3DJIKtoDCCSC3D120")
    constexpr size_t K = 2;
 
    constexpr size_t S = M * N * K;
-   std::array<double, S> dataIn = {/*k0*/ 1, 2, 3, 4,
+   // clang-format off
+   std::array<double, S> dataIn = {
+      /*k0*/ 1, 2, 3, 4,
       /*k0*/ 5, 6, 7, 8,
       /*k1*/ 9, 10, 11, 12,
       /*k1*/ 13, 14, 15, 16};
+   // clang-format on
 
    // perm = [1 2 0] -> K M N
    std::array<double, S> dataOut;
@@ -161,8 +164,8 @@ TEST_CASE("Serial DCCSC3DJIK to DCCSC3D 120", "SerialDCCSC3DJIKtoDCCSC3D120")
 }
 
 
-TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 210",
-   "SerialS1CLCSC3DJIKtoDCCSC3DJIK210")
+TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 201",
+   "SerialS1CLCSC3DJIKtoDCCSC3DJIK201")
 {
    // AL out -> JW in, gpu backend
    // Full data and type
@@ -171,7 +174,10 @@ TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 210",
    constexpr size_t K = 3;
 
    constexpr size_t S = (M + (M - 1) + (M - 2)) * N;
-   std::array<double, S> dataIn = {/*k0*/ 1, 5,
+
+   // clang-format off
+   std::array<double, S> dataIn = {
+      /*k0*/ 1, 5,
       /*k0*/ 2, 6,
       /*k0*/ 3, 7,
       /*k0*/ 4, 8,
@@ -179,17 +185,21 @@ TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 210",
       /*k1*/ 10, 13,
       /*k1*/ 11, 14,
       /*k2*/ 15, 17,
-      /*k2*/ 16, 18};
+      /*k2*/ 16, 18
+   };
 
    // perm = [2 0 1] -> N K M
-   std::array<double, S> dataRef = {/*m0*/ 1, 9, 15,
-      /*m0*/ 5, 12, 17,
-      /*m1*/ 2, 10, 16,
-      /*m1*/ 6, 13, 18,
-      /*m2*/ 3, 11,
-      /*m2*/ 7, 14,
-      /*m3*/ 4,
-      /*m3*/ 8};
+   std::array<double, S> dataRef = {
+      /*m0*/ 1,
+      /*m0*/ 5,
+      /*m1*/ 2, 9,
+      /*m1*/ 6, 12,
+      /*m2*/ 3, 10, 15,
+      /*m2*/ 7, 13, 17,
+      /*m3*/ 4, 11, 16,
+      /*m3*/ 8, 14, 18
+   };
+   // clang-format on
 
    std::array<double, S> dataOut;
 
@@ -256,18 +266,23 @@ TEST_CASE("Serial DCCSC3DJIK to S1CLCSC3DJIK 120",
    constexpr size_t K = 3;
 
    constexpr size_t S = (M + (M - 1) + (M - 2)) * N;
+
+   // clang-format off
    // N K M
-   std::array<double, S> dataIn = {/*m0*/ 1, 9, 15,
-      /*m0*/ 5, 12, 17,
-      /*m1*/ 2, 10, 16,
-      /*m1*/ 6, 13, 18,
-      /*m2*/ 3, 11,
-      /*m2*/ 7, 14,
-      /*m3*/ 4,
-      /*m3*/ 8};
+   std::array<double, S> dataIn = {
+      /*m0*/ 1,
+      /*m0*/ 5,
+      /*m1*/ 2, 9,
+      /*m1*/ 6, 12,
+      /*m2*/ 3, 10, 15,
+      /*m2*/ 7, 13, 17,
+      /*m3*/ 4, 11, 16,
+      /*m3*/ 8, 14, 18
+   };
 
    // perm = [1 2 0] -> M N K
-   std::array<double, S> dataRef = {/*k0*/ 1, 5,
+   std::array<double, S> dataRef = {
+      /*k0*/ 1, 5,
       /*k0*/ 2, 6,
       /*k0*/ 3, 7,
       /*k0*/ 4, 8,
@@ -275,7 +290,9 @@ TEST_CASE("Serial DCCSC3DJIK to S1CLCSC3DJIK 120",
       /*k1*/ 10, 13,
       /*k1*/ 11, 14,
       /*k2*/ 15, 17,
-      /*k2*/ 16, 18};
+      /*k2*/ 16, 18
+   };
+   // clang-format on
 
    std::array<double, S> dataOut;
 
