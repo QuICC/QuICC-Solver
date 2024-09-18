@@ -7,6 +7,7 @@
 //
 #include <algorithm>
 #include <stdexcept>
+#include <type_traits>
 
 // Project includes
 //
@@ -235,30 +236,41 @@ namespace Pseudospectral {
 
       mJitter = std::make_unique<QuICC::Graph::Jit<3>>(graphStr, mMemRsr, physDims, modsDims, layOpt, Graph::Stage::MMM, Graph::Stage::MMM, meta);
 
-      // View for outputs/inputs
-      std::vector<size_t> fields = {FieldComponents::Spectral::SCALAR, FieldComponents::Spectral::TOR, FieldComponents::Spectral::POL};
-
       // Modal space (aka JW space, Stage::PMM and Stage::MMM, QuICC Stage0)
       std::array<std::vector<std::uint32_t>, dim> pointersMods {{{}, metaJW.ptr, {}}};
       std::array<std::vector<std::uint32_t>, dim> indicesMods {{{}, metaJW.idx, {}}};
 
-      for (size_t f = 0; f < fields.size(); ++f)
-      {
-         auto fId = fields[f];
+      // View for outputs/inputs
+      std::vector<size_t> fields = {FieldComponents::Spectral::SCALAR, FieldComponents::Spectral::TOR, FieldComponents::Spectral::POL};
 
-         // host mem block
-         QuICC::Memory::MemBlock<std::byte> block(modsDims[0]*metaJW.idx.size()*sizeof(std::complex<double>), mMemRsr.get());
+      // Add Views and Storage for each component
+      auto temp = mVectorVariables[PhysicalNames::Temperature::id()];
+      std::visit(
+         [&](auto&& p)
+         {
+            // Get field scalar type from temperature
+            auto eig = p->rDom(0).perturbation().comp(FieldComponents::Spectral::SCALAR).data();
+            using fld_t = typename decltype(eig)::Scalar;
 
-         // host view
-         Graph::C_DCCSC3D_t view({reinterpret_cast<std::complex<double>*>(block.data()), block.size()/sizeof(std::complex<double>)}, {modsDims[0], modsDims[2], modsDims[1]}, pointersMods, indicesMods);
+            for (size_t f = 0; f < fields.size(); ++f)
+            {
+               // Field Id
+               auto fId = fields[f];
 
-         // Store block
-         mBlocks.push_back(std::move(block));
+               // Host mem block
+               Memory::MemBlock<std::byte> block(modsDims[0]*metaJW.idx.size()*sizeof(fld_t), mMemRsr.get());
 
-         mId2View[fId] = view;
-      }
+               // Host view
+               // for now this work only for JW space
+               View::View<fld_t, View::DCCSC3D> view({reinterpret_cast<fld_t>*>(block.data()), block.size()/sizeof(fld_t>)}, {modsDims[0], modsDims[2], modsDims[1]}, pointersMods, indicesMods);
 
+               // Store block
+               mBlocks.push_back(std::move(block));
 
+               // Store view
+               mId2View[fId] = view;
+            }
+         }, temp);
    };
 
    Coordinator::ScalarEquation_range Coordinator::scalarRange(const std::size_t eqId, const int it)
@@ -803,7 +815,14 @@ namespace Pseudospectral {
 
 namespace details
 {
-   void copyEig2View(Graph::C_DCCSC3D_t view, const MatrixZ& eig, const TransformResolution& res)
+   template <class SCALAROUT, class SCALARIN>
+   void copyEig2View(QuICC::View::View<SCALAROUT, View::DCCSC3D> view, const Eigen::Matrix<SCALARIN, -1, -1>& eig, const TransformResolution& res)
+   {
+      throw std::logic_error("trying to copy different types");
+   }
+
+   template <class SCALAR>
+   void copyEig2View<SCALAR, SCALAR>(QuICC::View::View<SCALAR, View::DCCSC3D> view, const Eigen::Matrix<SCALAR, -1, -1>& eig, const TransformResolution& res)
    {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
@@ -813,11 +832,11 @@ namespace details
       for(std::uint32_t p = 0; p < nLayers; ++p)
       {
          // layer width
-         auto cols = res.dim<QuICC::Dimensions::Data::DAT2D>(p);
+         int cols = res.dim<QuICC::Dimensions::Data::DAT2D>(p);
          // layer height
-         auto inRows = res.dim<QuICC::Dimensions::Data::DATB1D>(0, p);
+         int inRows = res.dim<QuICC::Dimensions::Data::DATB1D>(0, p);
 
-         const Eigen::Ref<const MatrixZ> inB = eig.block(0, start, inRows, cols);
+         const Eigen::Ref<const Eigen::Matrix<SCALAR, -1, -1>> inB = eig.block(0, start, inRows, cols);
 
          for (std::int64_t j = 0; j < inB.cols(); ++j)
          {
@@ -837,8 +856,14 @@ namespace details
       }
    }
 
+   template <class SCALAROUT, class SCALARIN>
+   void copyView2Eig(Eigen::Matrix<SCALAROUT, -1, -1>& eig, const QuICC::View::View<SCALARIN, View::DCCSC3D> view, const TransformResolution& res)
+   {
+      throw std::logic_error("trying to copy different types");
+   }
+
    template <class SCALAR>
-   void copyView2Eig(Eigen::Matrix<SCALAR, -1, -1>& eig, const QuICC::View::View<SCALAR, View::DCCSC3D> view, const TransformResolution& res)
+   void copyView2Eig<SCALAR,SCALAR>(Eigen::Matrix<SCALAR, -1, -1>& eig, const QuICC::View::View<SCALAR, View::DCCSC3D> view, const TransformResolution& res)
    {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
@@ -847,9 +872,9 @@ namespace details
       for(std::uint32_t p = 0; p < nLayers; p++)
       {
          // layer width
-         auto cols = res.dim<QuICC::Dimensions::Data::DAT2D>(p);
+         int cols = res.dim<QuICC::Dimensions::Data::DAT2D>(p);
          // layer height
-         auto outRows = res.dim<QuICC::Dimensions::Data::DATB1D>(0, p);
+         int outRows = res.dim<QuICC::Dimensions::Data::DATB1D>(0, p);
 
          Eigen::Ref<Eigen::Matrix<SCALAR, -1, -1>> outB = eig.block(0, start, outRows, cols);
 
@@ -886,67 +911,53 @@ namespace details
       // compute nonlinear interaction and forward transform
       this->updateSpectral(it);
 
-      assert(mJitter != nullptr);
-
       // copy to view
       const auto& jwRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA1D);
       auto temp = mVectorVariables[PhysicalNames::Temperature::id()];
-      // std::visit(
-      //       [&](auto&& p)
-      //       {
-      //          auto ptrTemp = p->rDom(0).perturbation().comp(FieldComponents::Spectral::SCALAR);
-      //          auto& Tv = mId2View[FieldComponents::Spectral::SCALAR];
-      //          details::copyEig2View(Tv, ptrTemp.data(), jwRes);
-      //       }, temp);
+      auto tempVarv = mId2View[PhysicalNames::Temperature::id()];
+      std::visit(
+         [&](auto&& p, auto& Tv)
+         {
+            auto ptrTemp = p->rDom(0).perturbation().comp(FieldComponents::Spectral::SCALAR);
+            details::copyEig2View(Tv, ptrTemp.data(), jwRes);
+         }, temp, tempVarv);
 
-      // auto vec = mVectorVariables[PhysicalNames::Velocity::id()];
-      // std::visit(
-      //       [&](auto&& p)
-      //       {
-      //          auto ptrTor = p->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR);
-      //          auto& Torv = mId2View[FieldComponents::Spectral::TOR];
-      //          details::copyEig2View(Torv, ptrTor.data(), jwRes);
-      //          auto ptrPol = p->rDom(0).perturbation().comp(FieldComponents::Spectral::POL);
-      //          auto& Polv = mId2View[FieldComponents::Spectral::POL];
-      //          details::copyEig2View(Polv, ptrPol.data(), jwRes);
-      //       }, vec);
+      auto vec = mVectorVariables[PhysicalNames::Velocity::id()];
+      auto TorVarv = mId2View[FieldComponents::Spectral::TOR];
+      auto PolVarv = mId2View[FieldComponents::Spectral::POL];
+      std::visit(
+         [&](auto&& p, auto& Torv, auto& Polv)
+         {
+            auto ptrTor = p->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR);
+            details::copyEig2View(Torv, ptrTor.data(), jwRes);
+            auto ptrPol = p->rDom(0).perturbation().comp(FieldComponents::Spectral::POL);
+            details::copyEig2View(Polv, ptrPol.data(), jwRes);
+         }, vec, TorVarv, PolVarv);
 
       /// call graph
-      // std::visit(
-      // [&](auto& Tv, auto& Torv, auto& Polv)
-      // {
-      //    mJitter->apply(Tv, Torv, Polv, Tv, Torv, Polv);
-
-      // }, mId2View[FieldComponents::Spectral::SCALAR],
-      //    mId2View[FieldComponents::Spectral::TOR],
-      //    mId2View[FieldComponents::Spectral::POL]);
-
-      auto& Tv = mId2View[FieldComponents::Spectral::SCALAR];
-      auto& Torv = mId2View[FieldComponents::Spectral::TOR];
-      auto& Polv = mId2View[FieldComponents::Spectral::POL];
-
-      mJitter->apply(Tv, Torv, Polv, Tv, Torv, Polv);
+      std::visit(
+         [&](auto& Tv, auto& Torv, auto& Polv)
+         {
+            assert(mJitter != nullptr);
+            mJitter->apply(Tv, Torv, Polv, Tv, Torv, Polv);
+         }, tempVarv, TorVarv, PolVarv);
 
       // copy back
       std::visit(
-            [&](auto&& p)
-            {
-               auto ptrTemp = p->rDom(0).rPerturbation().comp(FieldComponents::Spectral::SCALAR);
-               auto& Tv = mId2View[FieldComponents::Spectral::SCALAR];
-               auto& Te = ptrTemp.rData();
-               details::copyView2Eig(Te, Tv, jwRes);
-            }, temp);
+         [&](auto&& p, auto& Tv)
+         {
+            auto ptrTemp = p->rDom(0).rPerturbation().comp(FieldComponents::Spectral::SCALAR);
+            details::copyView2Eig(ptrTemp.rData(), Tv, jwRes);
+         }, temp, tempVarv);
 
-      // std::visit(
-      //       [&](auto&& p)
-      //       {
-      //          auto ptrTor = p->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR);
-      //          auto& Torv = mId2View[FieldComponents::Spectral::TOR];
-      //          details::copyView2Eig(ptrTor.rData(), Torv, jwRes);
-      //          auto ptrPol = p->rDom(0).perturbation().comp(FieldComponents::Spectral::POL);
-      //          auto& Polv = mId2View[FieldComponents::Spectral::POL];
-      //          details::copyView2Eig(ptrPol.rData(), Polv, jwRes);
-      //       }, vec);
+      std::visit(
+         [&](auto&& p, auto& Torv, auto& Polv)
+         {
+            auto ptrTor = p->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR);
+            details::copyView2Eig(ptrTor.rData(), Torv, jwRes);
+            auto ptrPol = p->rDom(0).perturbation().comp(FieldComponents::Spectral::POL);
+            details::copyView2Eig(ptrPol.rData(), Polv, jwRes);
+         }, vec, TorVarv, PolVarv);
    }
 
    void Coordinator::explicitTrivialEquations(const std::size_t opId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)

@@ -607,8 +607,8 @@ namespace Pseudospectral {
 
          std::unique_ptr<Graph::Jit<3>> mJitter;
          std::shared_ptr<QuICC::Memory::memory_resource> mMemRsr;
-         // std::map<std::size_t, Graph::varData_t> mId2View;
-         std::map<std::size_t, Graph::C_DCCSC3D_t> mId2View;
+         std::map<std::size_t, Graph::varData_t> mId2View;
+         // std::map<std::size_t, Graph::C_DCCSC3D_t> mId2View;
          std::vector<QuICC::Memory::MemBlock<std::byte>> mBlocks;
 
       private:
