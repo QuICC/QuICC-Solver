@@ -261,8 +261,8 @@ namespace Pseudospectral {
                Memory::MemBlock<std::byte> block(modsDims[0]*metaJW.idx.size()*sizeof(fld_t), mMemRsr.get());
 
                // Host view
-               // for now this work only for JW space
-               View::View<fld_t, View::DCCSC3D> view({reinterpret_cast<fld_t>*>(block.data()), block.size()/sizeof(fld_t>)}, {modsDims[0], modsDims[2], modsDims[1]}, pointersMods, indicesMods);
+               // for now this works only for JW space
+               View::View<fld_t, View::DCCSC3D> view({reinterpret_cast<fld_t*>(block.data()), block.size()/sizeof(fld_t)}, {modsDims[0], modsDims[2], modsDims[1]}, pointersMods, indicesMods);
 
                // Store block
                mBlocks.push_back(std::move(block));
@@ -822,7 +822,7 @@ namespace details
    }
 
    template <class SCALAR>
-   void copyEig2View<SCALAR, SCALAR>(QuICC::View::View<SCALAR, View::DCCSC3D> view, const Eigen::Matrix<SCALAR, -1, -1>& eig, const TransformResolution& res)
+   void copyEig2View(QuICC::View::View<SCALAR, View::DCCSC3D> view, const Eigen::Matrix<SCALAR, -1, -1>& eig, const TransformResolution& res)
    {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
@@ -863,7 +863,7 @@ namespace details
    }
 
    template <class SCALAR>
-   void copyView2Eig<SCALAR,SCALAR>(Eigen::Matrix<SCALAR, -1, -1>& eig, const QuICC::View::View<SCALAR, View::DCCSC3D> view, const TransformResolution& res)
+   void copyView2Eig(Eigen::Matrix<SCALAR, -1, -1>& eig, const QuICC::View::View<SCALAR, View::DCCSC3D> view, const TransformResolution& res)
    {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 

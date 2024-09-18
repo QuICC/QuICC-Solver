@@ -604,11 +604,14 @@ namespace Pseudospectral {
           */
          Transform::SharedIBackwardGrouper   mspImposedBwdGrouper;
 
-
+         /// @brief storage for mlir graph JIT
          std::unique_ptr<Graph::Jit<3>> mJitter;
+         /// @brief memory resource
          std::shared_ptr<QuICC::Memory::memory_resource> mMemRsr;
+         /// @brief storage for view inputs/outputs
          std::map<std::size_t, Graph::varData_t> mId2View;
          // std::map<std::size_t, Graph::C_DCCSC3D_t> mId2View;
+         /// @brief storage for memory blocks of inputs/outputs
          std::vector<QuICC::Memory::MemBlock<std::byte>> mBlocks;
 
       private:

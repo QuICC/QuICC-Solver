@@ -184,6 +184,16 @@ public:
         const std::vector<View::ViewBase<std::uint32_t>>& meta);
 
     /// @brief Apply graph
+    /// Catch all, supposed to fail
+    /// @tparam Targs...
+    /// @param args
+    template <class... Targs>
+    void apply(Targs...)
+    {
+        throw std::logic_error("Graph::apply not implemented");
+    }
+
+    /// @brief Apply graph
     /// 1 input, 1 output
     /// @tparam Trets
     /// @tparam Targs
