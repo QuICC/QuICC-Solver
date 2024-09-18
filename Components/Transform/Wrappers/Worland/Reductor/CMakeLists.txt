@@ -50,7 +50,7 @@ set(IntOp
 set(CpuMemRes "Cpu::NewDelete")
 set(GpuMemRes "Cuda::Malloc")
 
-set(GpuLayout "#define QUICC_JW_ROW_MAJOR")
+set(GpuLayout "#define QUICC_JW_ALL_ROW_MAJOR")
 
 set(GpuHppHeaders
 "
@@ -260,7 +260,7 @@ set(PowerViewToEigen
         {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
             {
-                #ifdef QUICC_JW_ROW_MAJOR
+            #ifdef QUICC_JW_ALL_ROW_MAJOR
                 // copy to padded from flattened column and transpose
                 outB.data()[i+j*rOut.rows()]= mModsAbsFlat[offSet + i*outB.cols()+j];
                 #else
@@ -305,7 +305,7 @@ set(RadialViewToEigen
         {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
             {
-                #ifdef QUICC_JW_ROW_MAJOR
+            #ifdef QUICC_JW_ALL_ROW_MAJOR
                 // copy to padded from flattened column and transpose
                 outB.data()[i+j*rOut.rows()]= mPhysAbsFlat[offSet + i*outB.cols()+j];
                 #else

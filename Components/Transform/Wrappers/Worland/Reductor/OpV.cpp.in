@@ -167,13 +167,15 @@ void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in) const
         {
             for (std::int64_t i = 0; i < inB.rows(); ++i)
             {
-                #ifdef QUICC_JW_ROW_MAJOR
-                // copy padded to flattened and transpose
-                mModsFlat[offSet + i*inB.cols()+j] = inB.data()[i+j*in.rows()];
-                #else
-                // copy padded to flattened column
-                mModsFlat[offSet + i+j*inB.rows()] = inB.data()[i+j*in.rows()];
-                #endif
+#if defined QUICC_JW_ROW_MAJOR || defined QUICC_JW_ALL_ROW_MAJOR
+               // copy padded to flattened and transpose
+               mModsFlat[offSet + i * inB.cols() + j] =
+                  inB.data()[i + j * in.rows()];
+#else
+               // copy padded to flattened column
+               mModsFlat[offSet + i + j * inB.rows()] =
+                  inB.data()[i + j * in.rows()];
+#endif
             }
         }
         offSet += inB.size();

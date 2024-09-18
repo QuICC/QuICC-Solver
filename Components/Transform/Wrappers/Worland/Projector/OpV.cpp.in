@@ -145,13 +145,15 @@ void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
         {
             for (std::int64_t i = 0; i < inB.rows(); ++i)
             {
-                #ifdef QUICC_JW_ROW_MAJOR
-                // copy padded to flattened and transpose
-                mModsFlat[offSet + i*inB.cols()+j] = inB.data()[i+j*in.rows()];
-                #else
-                // copy padded to flattened column
-                mModsFlat[offSet + i+j*inB.rows()] = inB.data()[i+j*in.rows()];
-                #endif
+#if defined QUICC_JW_ROW_MAJOR || defined QUICC_JW_ALL_ROW_MAJOR
+               // copy padded to flattened and transpose
+               mModsFlat[offSet + i * inB.cols() + j] =
+                  inB.data()[i + j * in.rows()];
+#else
+               // copy padded to flattened column
+               mModsFlat[offSet + i + j * inB.rows()] =
+                  inB.data()[i + j * in.rows()];
+#endif
             }
         }
         offSet += inB.size();
@@ -176,7 +178,7 @@ void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
 
         Eigen::Ref<MatrixZ> outB = rOut.block(0, start, outRows, cols);
 
-        #ifdef QUICC_JW_ROW_MAJOR
+#if defined QUICC_JW_ROW_MAJOR || defined QUICC_JW_ALL_ROW_MAJOR
         for (std::int64_t j = 0; j < outB.cols(); ++j)
         {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
@@ -185,7 +187,7 @@ void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
                 outB.data()[i+j*rOut.rows()]= mPhysFlat[offSet + i*outB.cols()+j];
             }
         }
-        #else
+#else
         for (std::int64_t i = 0; i < outB.size(); ++i)
         {
             outB.data()[i] = mPhysFlat[offSet + i];

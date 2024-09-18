@@ -79,6 +79,10 @@ private:
     using mods_t = View::View<std::complex<double>, View::S1CLCSC3DJIK>;
     using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
     using op_t = View::View<double, View::@OpAttribute@>;
+    #elif defined QUICC_AL_ALL_ROW_MAJOR
+    using mods_t = View::View<std::complex<double>, View::S1CLCSC3DJIK>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using op_t = View::View<double, View::@OpAttribute@JIK>;
     #else
     using mods_t = View::View<std::complex<double>, View::S1CLCSC3D>;
     using phys_t = View::View<std::complex<double>, View::DCCSC3D>;

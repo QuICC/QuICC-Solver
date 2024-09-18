@@ -145,13 +145,15 @@ void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
         {
             for (std::int64_t i = 0; i < inB.rows(); ++i)
             {
-                #ifdef QUICC_JW_ROW_MAJOR
-                // copy from padded to flattened and transpose
-                mPhysFlat[offSet + i*inB.cols()+j] = inB.data()[i+j*in.rows()];
-                #else
-                // copy from padded to flattened column
-                mPhysFlat[offSet + i+j*inB.rows()] = inB.data()[i+j*in.rows()];
-                #endif
+#if defined QUICC_JW_ROW_MAJOR || defined QUICC_JW_ALL_ROW_MAJOR
+               // copy from padded to flattened and transpose
+               mPhysFlat[offSet + i * inB.cols() + j] =
+                  inB.data()[i + j * in.rows()];
+#else
+               // copy from padded to flattened column
+               mPhysFlat[offSet + i + j * inB.rows()] =
+                  inB.data()[i + j * in.rows()];
+#endif
             }
         }
         offSet += inB.size();
@@ -180,13 +182,15 @@ void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
         {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
             {
-                #ifdef QUICC_JW_ROW_MAJOR
-                // copy to padded from flattened column and transpose
-                outB.data()[i+j*rOut.rows()]= mModsFlat[offSet + i*outB.cols()+j];
-                #else
-                // copy to padded from flattened column
-                outB.data()[i+j*rOut.rows()]= mModsFlat[offSet + i+j*outB.rows()];
-                #endif
+#if defined QUICC_JW_ROW_MAJOR || defined QUICC_JW_ALL_ROW_MAJOR
+               // copy to padded from flattened column and transpose
+               outB.data()[i + j * rOut.rows()] =
+                  mModsFlat[offSet + i * outB.cols() + j];
+#else
+               // copy to padded from flattened column
+               outB.data()[i + j * rOut.rows()] =
+                  mModsFlat[offSet + i + j * outB.rows()];
+#endif
             }
         }
 

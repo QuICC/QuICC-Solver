@@ -23,7 +23,7 @@ set(DivLlDivS1DpTreatment "diffPhi_m")
 set(CpuMemRes "Cpu::NewDelete")
 set(GpuMemRes "Cuda::Malloc")
 
-set(GpuLayout "#define QUICC_AL_ROW_MAJOR")
+set(GpuLayout "#define QUICC_AL_ALL_ROW_MAJOR")
 
 set(GpuHppHeaders "#include <cuda/std/complex>
 #include \"Memory/Memory.hpp\""

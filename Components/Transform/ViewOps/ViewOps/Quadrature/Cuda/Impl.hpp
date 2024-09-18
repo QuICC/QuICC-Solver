@@ -65,6 +65,18 @@ private:
     Memory::MemBlock<IndexType> _offSetB;
     /// @brief C (output) matrix offset cache
     Memory::MemBlock<IndexType> _offSetC;
+    /// @brief row scan cache
+    Memory::MemBlock<IndexType> _rowScan;
+    /// @brief col scan cache
+    Memory::MemBlock<IndexType> _colScan;
+    /// @brief row scan cache
+    Memory::MemBlock<IndexType> _allScan;
+    /// @brief xgrid cache
+    Memory::MemBlock<IndexType> _xgrid;
+    /// @brief ygrid cache
+    Memory::MemBlock<IndexType> _ygrid;
+    /// @brief all scan inclusive sum cache
+    IndexType _allScanSum;
 };
 
 } // namespace Cuda
