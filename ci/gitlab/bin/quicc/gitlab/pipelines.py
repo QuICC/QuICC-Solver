@@ -17,7 +17,7 @@ backend2nodeSize = {
     "alps-a100": 64
 }
 
-"""Base class, defines a pipeline that build the docker image, test and time the library and cleans up the runner"""
+"""Base class, defines a pipeline that build the docker image, the library and cleans up the runner"""
 class base_pipeline(base_yaml):
     def __init__(self, cnf):
         image_location = '$CSCS_REGISTRY_PATH'
@@ -123,6 +123,22 @@ class libtest_pipeline(base_pipeline):
                         '.'+self.backend
                     ],
                 'image': self.path_image,
+            }
+        if (self.tag == 'mpi'):
+            tasks = '4'
+            self.config['test-quicc-mpi-lib'] = {
+                'extends':
+                    [
+                        '.test-lib-mpi',
+                        '.'+self.backend
+                    ],
+                'image': self.path_image,
+                'variables':
+                    {
+                        'SLURM_NTASKS': tasks,
+                        'SLURM_NTASKS_PER_NODE': tasks,
+                        'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks))
+                    },
             }
 
 """Add library timing to the libtest pipeline"""

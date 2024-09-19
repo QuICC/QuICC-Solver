@@ -1,5 +1,5 @@
-/** 
- * @file IXmlWriter.cpp 
+/**
+ * @file IXmlWriter.cpp
  * @brief Source of the implementation of the XML writer
  */
 
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 
 namespace QuICC {
 
@@ -56,21 +56,21 @@ namespace Xml {
       // ROOT node
       this->mpRoot = this->mXML.allocate_node(rapidxml::node_element, this->root().c_str());
       this->mXML.append_node(this->mpRoot);
-      
+
       // FILEMETA node
       node = this->mXML.allocate_node(rapidxml::node_element, this->fileTag().c_str());
       this->mpRoot->append_node(node);
-      
+
       // HEADER node
       child = this->mXML.allocate_node(rapidxml::node_element, this->headerTag().c_str());
       child->value(this->header().c_str());
       node->append_node(child);
-      
+
       // TYPE node
       child = this->mXML.allocate_node(rapidxml::node_element, this->typeTag().c_str());
       child->value(this->type().c_str());
       node->append_node(child);
-      
+
       // VERSION node
       child = this->mXML.allocate_node(rapidxml::node_element, this->versionTag().c_str());
       child->value(this->version().c_str());

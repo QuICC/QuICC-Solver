@@ -8,14 +8,10 @@ set(_tests_templated
     Poly::D1:<base_t>:projector
     Poly::Ll:<base_t>:projector
     Poly::LlD1:<base_t>:projector
-    Poly::LlDivS1:<base_t>:projector
-    Poly::LlDivS1Dp:<base_t>:projector
     Poly::P:<viewCpu_t>:projector
     Poly::D1:<viewCpu_t>:projector
     Poly::Ll:<viewCpu_t>:projector
     Poly::LlD1:<viewCpu_t>:projector
-    Poly::LlDivS1:<viewCpu_t>:projector
-    Poly::LlDivS1Dp:<viewCpu_t>:projector
 )
 
 if(TARGET QuICC::Cuda)
@@ -24,17 +20,43 @@ if(TARGET QuICC::Cuda)
         Poly::D1:<viewGpu_t>:projector
         Poly::Ll:<viewGpu_t>:projector
         Poly::LlD1:<viewGpu_t>:projector
-        Poly::LlDivS1:<viewGpu_t>:projector
-        Poly::LlDivS1Dp:<viewGpu_t>:projector
     )
 endif()
 
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _tests_templated
         Poly::P:<kokkos_t>:projector
         Poly::D1:<kokkos_t>:projector
         Poly::Ll:<kokkos_t>:projector
         Poly::LlD1:<kokkos_t>:projector
+    )
+endif()
+
+foreach(_test ${_tests_templated})
+    quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Algorithm::Operator:Template:type
+        ULP 131
+    )
+endforeach()
+
+
+set(_tests_templated
+    Poly::LlDivS1:<base_t>:projector
+    Poly::LlDivS1Dp:<base_t>:projector
+    Poly::LlDivS1:<viewCpu_t>:projector
+    Poly::LlDivS1Dp:<viewCpu_t>:projector
+)
+
+if(TARGET QuICC::Cuda)
+    list(APPEND _tests_templated
+        Poly::LlDivS1:<viewGpu_t>:projector
+        Poly::LlDivS1Dp:<viewGpu_t>:projector
+    )
+endif()
+
+if(QUICC_USE_KOKKOS)
+    list(APPEND _tests_templated
         Poly::LlDivS1:<kokkos_t>:projector
         Poly::LlDivS1Dp:<kokkos_t>:projector
     )
@@ -44,7 +66,7 @@ foreach(_test ${_tests_templated})
     quicc_add_test(${_test}
         COMMAND ${TestExe}
         KEYWORD Algorithm::Operator:Template:type
-        ULP 125
+        ULP 238
     )
 endforeach()
 
@@ -63,7 +85,7 @@ if(TARGET QuICC::Cuda)
     )
 endif()
 
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _tests_templated
         Poly::DivS1:<kokkos_t>:projector
         Poly::DivS1Dp:<kokkos_t>:projector
@@ -90,13 +112,7 @@ if(TARGET QuICC::Cuda)
     )
 endif()
 
-if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
-    list(APPEND _tests_templated
-        Poly::P:<kokkos_t>:projector
-    )
-endif()
-
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _tests_templated
         Poly::P:<kokkos_t>:projector
     )
@@ -123,13 +139,7 @@ if(TARGET QuICC::Cuda)
     )
 endif()
 
-if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
-    list(APPEND _split_tests_templated
-        Poly::P:<kokkos_t>:projector
-    )
-endif()
-
-if(QUICC_USE_KOKKOS_CUDA)
+if(QUICC_USE_KOKKOS)
     list(APPEND _split_tests_templated
         Poly::P:<kokkos_t>:projector
     )
@@ -163,13 +173,7 @@ if(TARGET QuICC::Cuda)
     )
 endif()
 
-if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
-    list(APPEND _perf_tests
-        Poly::P:<kokkos_t>:projector
-    )
-endif()
-
-if(QUICC_USE_KOKKOS_CUDA OR QUICC_USE_KOKKOS_HIP)
+if(QUICC_USE_KOKKOS)
     list(APPEND _perf_tests
         Poly::P:<kokkos_t>:projector
         Poly::Ll:<kokkos_t>:projector

@@ -27,9 +27,9 @@ using physRM_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
 using proj_t = View::View<double, View::CSL3D>;
 /// @brief projector view with row major layout (in a layer)
 using projRM_t = View::View<double, View::CSL3DJIK>;
-/// @brief projector view with column major layout (in a layer)
+/// @brief integrator view with column major layout (in a layer)
 using int_t = View::View<double, View::CSL3D>;
-/// @brief projector view with row major layout (in a layer)
+/// @brief integrator view with row major layout (in a layer)
 using intRM_t = View::View<double, View::CSL3DJIK>;
 
 } // namespace Uniform
@@ -49,9 +49,9 @@ using physRM_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
 using proj_t = View::View<double, View::CS2RL3D>;
 /// @brief projector view with row major layout (in a layer)
 using projRM_t = View::View<double, View::CS2RL3DJIK>;
-/// @brief projector view with column major layout (in a layer)
+/// @brief integrator view with column major layout (in a layer)
 using int_t = View::View<double, View::S2CLCSC3D>;
-/// @brief projector view with row major layout (in a layer)
+/// @brief integrator view with row major layout (in a layer)
 using intRM_t = View::View<double, View::S2CLCSC3DJIK>;
 
 } // namespace Triangular

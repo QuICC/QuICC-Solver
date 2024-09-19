@@ -1,5 +1,5 @@
 import scipy.io as io
-import quicc.geometry.spherical.shell_radius_boundary as bc
+import quicc.geometry.spherical.shell_radius as geo
 
 cases = dict()
 
@@ -53,31 +53,31 @@ for i in [0, 1, 10, 11]:
     # Value
     fbase = f'Value' + fid
     writeMeta(fbase, opts) 
-    S = bc.stencil_value(nN, ri, ro, 0, {'c':None})
+    S = geo.stencil(nN+2, ri, ro, {0:-20, 'rb':2}, False)
     writeMatrixMarket(fbase, S) 
 
     # Diff
     fbase = f'D1' + fid
     writeMeta(fbase, opts) 
-    S = bc.stencil_diff(nN, ri, ro, 0, {'c':None})
+    S = geo.stencil(nN+2, ri, ro, {0:-21, 'rb':2}, False)
     writeMatrixMarket(fbase, S) 
 
     # R1D1DivR1
     fbase = f'R1D1DivR1' + fid
     writeMeta(fbase, opts) 
-    S = bc.stencil_rdiffdivr(nN, ri, ro, 0, {'c':None})
+    S = geo.stencil(nN+2, ri, ro, {0:-22, 'rb':2}, False)
     writeMatrixMarket(fbase, S) 
 
     # ValueD1
     fbase = f'ValueD1' + fid
     writeMeta(fbase, opts) 
-    S = bc.stencil_value_diff(nN, ri, ro, 0, {'c':None})
+    S = geo.stencil(nN+4, ri, ro, {0:-40, 'rb':4}, False)
     writeMatrixMarket(fbase, S) 
 
     # ValueD2
     fbase = f'ValueD2' + fid
     writeMeta(fbase, opts) 
-    S = bc.stencil_value_diff2(nN, ri, ro, 0, {'c':None})
+    S = geo.stencil(nN+4, ri, ro, {0:-41, 'rb':4}, False)
     writeMatrixMarket(fbase, S) 
 
     # L dependent conditions
@@ -86,5 +86,5 @@ for i in [0, 1, 10, 11]:
     # InsulatingShell
     fbase = f'InsulatingShell' + fid
     writeMeta(fbase, opts) 
-    S = bc.stencil_insulating(nN, ri, ro, 0, {'c':None, 'l':l})
+    S = geo.stencil(nN+2, ri, ro, {0:-23, 'rb':2, 'c':{'l':l}}, False)
     writeMatrixMarket(fbase, S) 

@@ -15,12 +15,14 @@
 //
 #include <string>
 #include <set>
+#include <type_traits>
 
 // Project includes
 //
 #include "Types/Typedefs.hpp"
 #include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/InnerProduct.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
@@ -46,8 +48,12 @@ namespace Worland {
 
          /**
           * @brief Constructor
+          *
+          * @param fname      Filename
+          * @param wtype      Worland type
+          * @param keepData   Write computed data?
           */
-         Tester(const std::string& fname, const bool keepData);
+         Tester(const std::string& fname, const std::string& wtype, const bool keepData);
 
          /*
           * @brief Destructor
@@ -57,65 +63,141 @@ namespace Worland {
       protected:
          /**
           * @brief Build filename extension with resolution information
+          *
+          * @param specN   Number of spectral modes
+          * @param physN   Number of physical grid points
+          * @param param   Run parameters
           */
          virtual std::string resname(const int specN, const int physN, const ParameterType& param) const override;
 
          /**
           * @brief Test matrix operator
+          *
+          * @param specN   Number of spectral modes
+          * @param physN   Number of physical grid points
+          * @param param   Run parameters
+          * @param type    Type of test
           */
          virtual Matrix buildOperator(const int specN, const int physN, const ParameterType& param, const TestType type) const override;
 
          /**
           * @brief Format the parameters
+          *
+          * @param param   Run parameters
           */
          virtual std::string formatParameter(const ParameterType& param) const override;
 
       private:
          /**
           * @brief Append specific path
+          *
+          * @param subdir  Sub-directory to append to path
           */
-         void appendPath();
+         void appendPath(const std::string& subdir);
 
          /**
           * @brief Test quadrature matrix operator
+          *
+          * @param specN      Number of spectral modes
+          * @param physN      Number of physical grid points
+          * @param param      Run parameters
+          * @param isWeight   Quadrature weights included in matrix?
           */
          Matrix buildMatrix(const int specN, const int physN, const ParameterType& param, const bool isWeighted) const;
 
          /**
           * @brief Test on-the-fly inner product
+          *
+          * @param specN   Number of spectral modes
+          * @param physN   Number of physical grid points
+          * @param param   Run parameters
           */
          Matrix buildInner(const int specN, const int physN, const ParameterType& param) const;
 
          /**
           * @brief Test on-the-fly outer product
+          *
+          * @param specN   Number of spectral modes
+          * @param physN   Number of physical grid points
+          * @param param   Run parameters
           */
          Matrix buildOuter(const int specN, const int physN, const ParameterType& param) const;
 
          /**
           * @brief Test on-the-fly reduction
+          *
+          * @param specN   Number of spectral modes
+          * @param physN   Number of physical grid points
+          * @param param   Run parameters
           */
          Matrix buildReduce(const int specN, const int physN, const ParameterType& param) const;
+
+         /**
+          * @brief Make operator and compute grid and weights
+          *
+          * @param igrid      Array of grid points
+          * @param iweights   Array of weights
+          * @param physN      Number of physical grid points
+          */
+         std::shared_ptr<TOp> makeOp(Internal::Array& igrid, Internal::Array& iweights, const int physN) const;
+
+         /**
+          * @brief Worland type
+          */
+         std::string mWType;
    };
 
-   template <typename TOp> Tester<TOp>::Tester(const std::string& fname, const bool keepData)
-      : Polynomial::TesterBase<TOp>(fname, keepData)
+   template <typename TOp> Tester<TOp>::Tester(const std::string& fname, const std::string& wtype, const bool keepData)
+      : Polynomial::TesterBase<TOp>(fname, keepData), mWType(wtype)
    {
-      this->appendPath();
+
+      this->appendPath(this->mWType);
    }
 
-   template <typename TOp> void Tester<TOp>::appendPath()
+   template <typename TOp> void Tester<TOp>::appendPath(const std::string& subdir)
    {
-      #if defined QUICC_WORLAND_TYPE_CHEBYSHEV
-         this->mPath += "Worland/Chebyshev/";
-      #elif defined QUICC_WORLAND_TYPE_LEGENDRE
-         this->mPath += "Worland/Legendre/";
-      #elif defined QUICC_WORLAND_TYPE_CYLENERGY
-         this->mPath += "Worland/CylEnergy/";
-      #elif defined QUICC_WORLAND_TYPE_SPHENERGY
-         this->mPath += "Worland/SphEnergy/";
-      #else
-         this->mPath += "Worland/Unknown/";
-      #endif
+      this->mPath += "Worland/" + subdir + "/";
+   }
+
+   template <typename TOp> std::shared_ptr<TOp> Tester<TOp>::makeOp(Internal::Array& igrid, Internal::Array& iweights, const int physN) const
+   {
+      auto make = [&](auto& w)
+      {
+         typename std::remove_reference<decltype(w)>::type::Rule quad;
+         quad.computeQuadrature(igrid, iweights, physN);
+         auto pOp = std::make_shared<TOp>(w.ALPHA, w.DBETA);
+         return pOp;
+      };
+
+      std::shared_ptr<TOp> pOp;
+
+
+      if(this->mWType == "Chebyshev")
+      {
+         ::QuICC::Polynomial::Worland::worland_chebyshev_t wt;
+         pOp = make(wt);
+      }
+      else if(this->mWType == "Legendre")
+      {
+         ::QuICC::Polynomial::Worland::worland_legendre_t wt;
+         pOp = make(wt);
+      }
+      else if(this->mWType == "CylEnergy")
+      {
+         ::QuICC::Polynomial::Worland::worland_cylenergy_t wt;
+         pOp = make(wt);
+      }
+      else if(this->mWType == "SphEnergy")
+      {
+         ::QuICC::Polynomial::Worland::worland_sphenergy_t wt;
+         pOp = make(wt);
+      }
+      else
+      {
+         throw std::logic_error("Unknown Worland type");
+      }
+
+      return pOp;
    }
 
    template <typename TOp> Matrix Tester<TOp>::buildOperator(const int specN, const int physN, const ParameterType& param, const TestType type) const
@@ -142,21 +224,19 @@ namespace Worland {
       // Get harmonic degree from parameters
       int l = static_cast<int>(param.at(0));
 
-      // Create quadrature
+      // Compute quadrature and make operator
       Internal::Array igrid;
       Internal::Array iweights;
-      poly::Quadrature::WorlandRule quad;
-      quad.computeQuadrature(igrid, iweights, physN);
+      auto pOp = this->makeOp(igrid, iweights, physN);
 
-      TOp op;
       Matrix outData(physN, specN+1);
 
       if(isWeighted)
       {
-         op.template compute<MHDFloat>(outData, specN+1, l, igrid, iweights, current::Evaluator::Set());
+         pOp->template compute<MHDFloat>(outData, specN+1, l, igrid, iweights, current::Evaluator::Set());
       } else
       {
-         op.template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::Set());
+         pOp->template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::Set());
       }
 
       return outData;
@@ -170,14 +250,12 @@ namespace Worland {
       // Create quadrature
       Internal::Array igrid;
       Internal::Array iweights;
-      poly::Quadrature::WorlandRule quad;
-      quad.computeQuadrature(igrid, iweights, physN);
+      auto pOp = this->makeOp(igrid, iweights, physN);
 
-      TOp op;
       Matrix outData(physN, specN+1);
       Matrix inData = Matrix::Identity(specN+1, specN+1);
 
-      op.template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::OuterProduct<MHDFloat>(inData));
+      pOp->template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::OuterProduct<MHDFloat>(inData));
 
       return outData;
    }
@@ -190,15 +268,13 @@ namespace Worland {
       // Create quadrature
       Internal::Array igrid;
       Internal::Array iweights;
-      poly::Quadrature::WorlandRule quad;
-      quad.computeQuadrature(igrid, iweights, physN);
+      auto pOp = this->makeOp(igrid, iweights, physN);
 
-      TOp op;
       Matrix outData(specN+1, specN+1);
       Matrix inData = Matrix::Identity(physN, specN+1);
-      op.template compute<MHDFloat>(inData, specN+1, l, igrid, iweights, current::Evaluator::Set());
+      pOp->template compute<MHDFloat>(inData, specN+1, l, igrid, iweights, current::Evaluator::Set());
 
-      op.template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::InnerProduct<MHDFloat>(inData));
+      pOp->template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::InnerProduct<MHDFloat>(inData));
 
       Matrix outDataT = outData.transpose();
 
@@ -213,13 +289,11 @@ namespace Worland {
       // Create quadrature
       Internal::Array igrid;
       Internal::Array iweights;
-      poly::Quadrature::WorlandRule quad;
-      quad.computeQuadrature(igrid, iweights, physN);
+      auto pOp = this->makeOp(igrid, iweights, physN);
 
-      TOp op;
       Matrix outData(specN+1, 1);
 
-      op.template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::Reduce());
+      pOp->template compute<MHDFloat>(outData, specN+1, l, igrid, Internal::Array(), current::Evaluator::Reduce());
 
       return outData;
    }

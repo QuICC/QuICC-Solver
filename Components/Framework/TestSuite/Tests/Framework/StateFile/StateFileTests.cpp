@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/TestSuite/Framework/StateFile/TestArgs.hpp"
 #include "Profiler/Interface.hpp"
 

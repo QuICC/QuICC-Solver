@@ -16,7 +16,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Io/Variable/ISphericalTorPolModeSpectrumWriter.hpp"
 #include "QuICC/Io/Variable/Tags/Spectrum.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 
 namespace QuICC {

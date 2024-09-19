@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Resolution.cpp
  * @brief Source of the resolution object for several CPUs
  */
@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 
@@ -93,12 +93,12 @@ namespace QuICC {
    {
       this->mspSim->setBoxScale(boxScale);
 
-      // Set the boxscale on the 
+      // Set the boxscale on the
       for(auto it = this->mTSetups.begin(); it != this->mTSetups.end(); ++it)
       {
          it->second->setBoxScale(this->sim().boxScale(static_cast<Dimensions::Simulation::Id>(static_cast<int>(it->first))));
       }
-      
+
    }
 
    void Resolution::setSpatialScheme(SpatialScheme::SharedISpatialScheme spScheme)
@@ -158,7 +158,7 @@ namespace QuICC {
       // Check sizes
       assert(id >= 0);
       assert(static_cast<size_t>(id) < this->mCores.size());
-      
+
       return this->mCores.at(id);
    }
 

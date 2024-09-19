@@ -28,7 +28,8 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 include(setup/TruncateQI)
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  QuICC::Common
+  QuICC::Types
+  QuICC::Environment
   ${QUICC_SPARSESM_COMPONENT_LIB}
   QuICC::Polynomial
   QuICC::Profiling
@@ -69,6 +70,16 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB_KK}
     ${QUICC_CURRENT_COMPONENT_LIB}
     QuICC::KokkosWrapper
 )
+
+# VkFFT
+if(TARGET VkFFT AND QUICC_USE_VKFFT)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE VkFFT)
+endif()
+
+# PfSolve
+if(TARGET PfSolve AND QUICC_USE_PFSOLVE)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE PfSolve)
+endif()
 
 # View Operator wrappers
 add_subdirectory(Wrappers)

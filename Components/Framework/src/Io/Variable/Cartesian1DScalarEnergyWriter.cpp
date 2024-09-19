@@ -10,7 +10,7 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/Cartesian1DScalarEnergyWriter.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"

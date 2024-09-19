@@ -9,7 +9,7 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Hasher.hpp"
 #include "QuICC/NonDimensional/Coordinator.hpp"
 

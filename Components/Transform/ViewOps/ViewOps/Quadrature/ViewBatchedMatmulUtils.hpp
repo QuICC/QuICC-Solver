@@ -4,7 +4,7 @@
  */
 #pragma once
 
-// External includes
+// System includes
 //
 
 // Project includes
@@ -197,8 +197,8 @@ QUICC_CUDA_HOSTDEV inline void setIndicesAndPointers(
 /// @param op
 /// @return mods pointers
 template <class Tout, class Tin, class Top>
-QUICC_CUDA_HOSTDEV inline View::ViewBase<typename Tin::IndexType> getModsPointers(
-   const Tout& out, const Tin& in, const Top& op)
+QUICC_CUDA_HOSTDEV inline View::ViewBase<typename Tin::IndexType>
+getModsPointers(const Tout& out, const Tin& in, const Top& op)
 {
    using namespace QuICC::View;
    using IndexType = typename Tin::IndexType;

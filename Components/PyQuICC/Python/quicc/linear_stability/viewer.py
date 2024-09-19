@@ -160,7 +160,7 @@ def viewPhysical1D(specs, geometry, res, eigs, eq_params, transf, show = True, s
 
     elif geometry == 's1d':
         import quicc.geometry.spherical.shell_radius as geo
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['r_ratio'])
+        a, b = geo.linear_r2x(eq_params['upper1d'], eq_params['r_ratio'])
         viz_res = (res[0], a, b)
         prof_opt = ()
 
@@ -186,7 +186,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
 
     elif geometry == 'shell':
         import quicc.geometry.spherical.shell_radius as geo
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['r_ratio'])
+        a, b = geo.linear_r2x(eq_params['upper1d'], eq_params['r_ratio'])
         res_1d = (res[0], a, b)
         res_2d = (res[1]-1, int(eigs[0]))
 
@@ -196,7 +196,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
 
     elif geometry == 'annulus':
         import quicc.geometry.cylindrical.annulus_radius as geo
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['r_ratio'])
+        a, b = geo.linear_r2x(eq_params['upper1d'], eq_params['r_ratio'])
         res_1d = (res[0], a, b)
         res_2d = (res[-1],)
 

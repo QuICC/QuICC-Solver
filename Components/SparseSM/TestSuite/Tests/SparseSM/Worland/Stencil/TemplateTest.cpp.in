@@ -1,0 +1,140 @@
+/**
+ * @file @Operator@Test.cpp
+ * @brief Tests for the Worland @Operator@ SparseSM stencil operator
+ */
+
+// System includes
+//
+#include <catch2/catch.hpp>
+
+// Project includes
+//
+#include "QuICC/SparseSM/Worland/Boundary/D1.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/D2.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/InsulatingSphere.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/Operator.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/R1D1DivR1.hpp"
+#include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/D1.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/InsulatingSphere.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/R1D1DivR1.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/Value.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/ValueD1.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/ValueD2.hpp"
+#include "QuICC/TestSuite/SparseSM/TestUtils.hpp"
+#include "QuICC/TestSuite/SparseSM/Worland/TestArgs.hpp"
+#include "QuICC/TestSuite/SparseSM/Worland/TestHelper.hpp"
+#include "Types/Internal/Literals.hpp"
+#include "Types/Internal/Typedefs.hpp"
+
+namespace currentts = ::QuICC::TestSuite::SparseSM::Worland;
+
+#include <iostream>
+TEST_CASE("Error for @Type@ stencils", "[@Type@]")
+{
+   Catch::StringMaker<double>::precision = 15;
+
+   const int nN = 10;
+   const int l = 3;
+   ::QuICC::Internal::MHDFloat alpha;
+   ::QuICC::Internal::MHDFloat dBeta;
+
+   std::string type = "@Type@";
+   currentts::setJacobiParameters(alpha, dBeta, type);
+
+   const auto maxUlp = currentts::args().ulp;
+
+   INFO("Worland type: " << type);
+
+   {
+      INFO("Check Value stencil");
+
+      ::QuICC::SparseSM::Worland::Boundary::Operator bc(nN, nN, alpha, dBeta,
+         l);
+      bc.addRow<::QuICC::SparseSM::Worland::Boundary::Value>();
+      ::QuICC::SparseSM::Worland::Stencil::Value stencil(nN, nN - 1, alpha,
+         dBeta, l);
+
+      ::QuICC::Matrix bcMat = bc.mat().topRows(1);
+      ::QuICC::Matrix sMat = stencil.mat();
+
+      ::QuICC::TestSuite::SparseSM::checkStencil(bcMat, sMat, maxUlp);
+   }
+
+   {
+      INFO("Check D1 stencil");
+
+      ::QuICC::SparseSM::Worland::Boundary::Operator bc(nN, nN, alpha, dBeta,
+         l);
+      bc.addRow<::QuICC::SparseSM::Worland::Boundary::D1>();
+      ::QuICC::SparseSM::Worland::Stencil::D1 stencil(nN, nN - 1, alpha, dBeta,
+         l);
+
+      ::QuICC::Matrix bcMat = bc.mat().topRows(1);
+      ::QuICC::Matrix sMat = stencil.mat();
+
+      ::QuICC::TestSuite::SparseSM::checkStencil(bcMat, sMat, maxUlp);
+   }
+
+   {
+      INFO("Check R1D1DivR1 stencil");
+
+      ::QuICC::SparseSM::Worland::Boundary::Operator bc(nN, nN, alpha, dBeta,
+         l);
+      bc.addRow<::QuICC::SparseSM::Worland::Boundary::R1D1DivR1>();
+      ::QuICC::SparseSM::Worland::Stencil::R1D1DivR1 stencil(nN, nN - 1, alpha,
+         dBeta, l);
+
+      ::QuICC::Matrix bcMat = bc.mat().topRows(1);
+      ::QuICC::Matrix sMat = stencil.mat();
+
+      ::QuICC::TestSuite::SparseSM::checkStencil(bcMat, sMat, maxUlp);
+   }
+
+   {
+      INFO("Check InsulatingSphere stencil");
+
+      ::QuICC::SparseSM::Worland::Boundary::Operator bc(nN, nN, alpha, dBeta,
+         l);
+      bc.addRow<::QuICC::SparseSM::Worland::Boundary::InsulatingSphere>();
+      ::QuICC::SparseSM::Worland::Stencil::InsulatingSphere stencil(nN, nN - 1,
+         alpha, dBeta, l);
+
+      ::QuICC::Matrix bcMat = bc.mat().topRows(1);
+      ::QuICC::Matrix sMat = stencil.mat();
+
+      ::QuICC::TestSuite::SparseSM::checkStencil(bcMat, sMat, maxUlp);
+   }
+
+   {
+      INFO("Check ValueD1 stencil");
+
+      ::QuICC::SparseSM::Worland::Boundary::Operator bc(nN, nN, alpha, dBeta,
+         l);
+      bc.addRow<::QuICC::SparseSM::Worland::Boundary::Value>();
+      bc.addRow<::QuICC::SparseSM::Worland::Boundary::D1>();
+      ::QuICC::SparseSM::Worland::Stencil::ValueD1 stencil(nN, nN - 2, alpha,
+         dBeta, l);
+
+      ::QuICC::Matrix bcMat = bc.mat().topRows(2);
+      ::QuICC::Matrix sMat = stencil.mat();
+
+      ::QuICC::TestSuite::SparseSM::checkStencil(bcMat, sMat, maxUlp);
+   }
+
+   {
+      INFO("Check ValueD2 stencil");
+
+      ::QuICC::SparseSM::Worland::Boundary::Operator bc(nN, nN, alpha, dBeta,
+         l);
+      bc.addRow<::QuICC::SparseSM::Worland::Boundary::Value>();
+      bc.addRow<::QuICC::SparseSM::Worland::Boundary::D2>();
+      ::QuICC::SparseSM::Worland::Stencil::ValueD2 stencil(nN, nN - 2, alpha,
+         dBeta, l);
+
+      ::QuICC::Matrix bcMat = bc.mat().topRows(2);
+      ::QuICC::Matrix sMat = stencil.mat();
+
+      ::QuICC::TestSuite::SparseSM::checkStencil(bcMat, sMat, maxUlp);
+   }
+}

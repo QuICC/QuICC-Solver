@@ -22,7 +22,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "Types/Internal/Casts.hpp"
-#include "QuICC/TestSuite/Polynomial/Io.hpp"
+#include "TestSuite/Io.hpp"
 
 namespace QuICC {
 

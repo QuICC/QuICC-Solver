@@ -49,6 +49,28 @@ class TransformWorlandTests_Poly_P_viewGpu_t_integrator(splitTestTransform):
 
         self.read_references("gpu.json", self.__class__.__name__)
 
+@rfm.simple_test
+class TransformWorlandTests_Fft_P_base_t_projector(splitTestTransform):
+    splitting = 8
+    region = ['applyOperators', 'applyImpl']
+
+    def init_references(self):
+        """ Initiallize references
+        """
+
+        self.read_references("gpu.json", self.__class__.__name__)
+
+@rfm.simple_test
+class TransformWorlandTests_Fft_P_base_t_integrator(splitTestTransform):
+    splitting = 8
+    region = ['applyOperators', 'applyImpl']
+
+    def init_references(self):
+        """ Initiallize references
+        """
+
+        self.read_references("gpu.json", self.__class__.__name__)
+
 #
 # Associated Legendre with cpu <-> gpu copy
 #

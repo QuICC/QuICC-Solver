@@ -10,6 +10,7 @@
 // Project includes
 //
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "Types/Internal/Math.hpp"
 
 namespace QuICC {
@@ -18,43 +19,13 @@ namespace Polynomial {
 
 namespace Worland {
 
-   const Internal::MHDFloat WorlandBase::ALPHA_CHEBYSHEV = -MHD_MP(0.5);
-   const Internal::MHDFloat WorlandBase::DBETA_CHEBYSHEV = -MHD_MP(0.5);
-
-   const Internal::MHDFloat WorlandBase::ALPHA_LEGENDRE = MHD_MP(0.0);;
-   const Internal::MHDFloat WorlandBase::DBETA_LEGENDRE = -MHD_MP(0.5);
-
-   const Internal::MHDFloat WorlandBase::ALPHA_CYLENERGY = MHD_MP(0.0);
-   const Internal::MHDFloat WorlandBase::DBETA_CYLENERGY = MHD_MP(0.0);
-
-   const Internal::MHDFloat WorlandBase::ALPHA_SPHENERGY = MHD_MP(0.0);
-   const Internal::MHDFloat WorlandBase::DBETA_SPHENERGY = MHD_MP(0.5);
-
    WorlandBase::WorlandBase()
+      : mAlpha(worland_default_t::ALPHA), mDBeta(worland_default_t::DBETA)
    {
-      #if defined QUICC_WORLAND_TYPE_CHEBYSHEV
-         this->mAlpha = ALPHA_CHEBYSHEV;
-         this->mDBeta = DBETA_CHEBYSHEV;
-      #elif defined QUICC_WORLAND_TYPE_LEGENDRE
-         this->mAlpha = ALPHA_LEGENDRE;
-         this->mDBeta = DBETA_LEGENDRE;
-      #elif defined QUICC_WORLAND_TYPE_CYLENERGY
-         this->mAlpha = ALPHA_CYLENERGY;
-         this->mDBeta = DBETA_CYLENERGY;
-      #elif defined QUICC_WORLAND_TYPE_SPHENERGY
-         this->mAlpha = ALPHA_SPHENERGY;
-         this->mDBeta = DBETA_SPHENERGY;
-      #else
-         #error "QUICC_WORLAND_TYPE_? is not defined"
-      #endif //QUICC_WORLAND_TYPE_CHEBYSHEV
    }
 
    WorlandBase::WorlandBase(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta)
       : mAlpha(alpha), mDBeta(dBeta)
-   {
-   }
-
-   WorlandBase::~WorlandBase()
    {
    }
 

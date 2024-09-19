@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Simulation/SimulationRunControl.hpp"
 
 // Project includes

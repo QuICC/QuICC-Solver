@@ -33,16 +33,21 @@ namespace Worland {
 
          /**
           * @brief Constructor
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
           */
          WorlandBase(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta);
 
          /**
           * @brief Destructor
           */
-         virtual ~WorlandBase();
+         virtual ~WorlandBase() = default;
 
          /**
           * @brief Get alpha parameter of Jacobi polynomial
+          *
+          * @param l Harmonic degree l
           */
          Internal::MHDFloat alpha(const int l);
 
@@ -51,29 +56,11 @@ namespace Worland {
           */
          Internal::MHDFloat dBeta();
 
-         /// Alpha parameter for Chebyshev type
-         static const Internal::MHDFloat ALPHA_CHEBYSHEV;
-         /// dBeta parameter for Chebyshev type
-         static const Internal::MHDFloat DBETA_CHEBYSHEV;
-
-         /// Alpha parameter for Legendre type
-         static const Internal::MHDFloat ALPHA_LEGENDRE;
-         /// dBeta parameter for Legendre type
-         static const Internal::MHDFloat DBETA_LEGENDRE;
-
-         /// Alpha parameter for CylEnergy type
-         static const Internal::MHDFloat ALPHA_CYLENERGY;
-         /// dBeta parameter for CylEnergy type
-         static const Internal::MHDFloat DBETA_CYLENERGY;
-
-         /// Alpha parameter for SphEnergy type
-         static const Internal::MHDFloat ALPHA_SPHENERGY;
-         /// dBeta parameter for SphEnergy type
-         static const Internal::MHDFloat DBETA_SPHENERGY;
-
       protected:
          /**
           * @brief Get beta parameter of Jacobi polynomial
+          *
+          * @param l Harmonic degree l
           */
          Internal::MHDFloat beta(const int l);
 

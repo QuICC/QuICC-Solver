@@ -22,9 +22,6 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
     PUBLIC_HEADER "${PHS}"
 )
 
-# Boost
-target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE Boost::headers)
-
 # Alias
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS "${QUICC_CURRENT_COMPONENT_LIB}")
 

@@ -1,6 +1,6 @@
 /**
  * @file WriteConfig.cpp
- * @brief Simple executable to write a configuration file template for a model 
+ * @brief Simple executable to write a configuration file template for a model
  */
 
 /// Set the path to the simulation implementation
@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Io/Config/ConfigurationWriter.hpp"

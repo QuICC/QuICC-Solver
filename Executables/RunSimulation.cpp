@@ -1,6 +1,6 @@
 /**
  * @file RunSimulation.cpp
- * @brief General executable for the simulation implementations 
+ * @brief General executable for the simulation implementations
  */
 
 /// Set the path to the simulation implementation
@@ -22,7 +22,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Simulation/Simulation.hpp"
 #include "QuICC/Model/ModelFactory.hpp"

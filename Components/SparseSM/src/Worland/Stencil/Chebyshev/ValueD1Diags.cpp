@@ -1,12 +1,10 @@
-/** 
+/**
  * @file ValueD1Diags.cpp
  * @brief Source of the implementation of the full sphere Worland ValueD1Diags sparse operator
  */
 
 // System includes
 //
-#include <cassert>
-#include <stdexcept>
 
 // Project includes
 //
@@ -41,7 +39,7 @@ namespace Chebyshev {
    {
       auto l1 = this->l();
 
-      ACoeff_t num = 4.0*n*(l1 + 2.0*n);
+      ACoeff_t num = -4.0*n*(l1 + 2.0*n);
       ACoeff_t den = (-1.0 + 2.0*n)*(1.0 + l1 + 2.0*n);
 
       return this->normalizeDiag(n,-1)*(num/den);

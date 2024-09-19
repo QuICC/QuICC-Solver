@@ -10,7 +10,7 @@
 // Project includes
 //
 #include "QuICC/SpatialScheme/3D/WLFmBuilder.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/Setup.hpp"
 #include "QuICC/Transform/Fft/Worland/Setup.hpp"

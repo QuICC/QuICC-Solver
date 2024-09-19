@@ -12,9 +12,18 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"  )
-target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  QuICC::Common
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+    QuICC::Common
   )
+
+# Boost for Bessel
+include(QuICCFindBoostRequired)
+quicc_find_boost_required()
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+  PRIVATE
+    Boost::headers
+)
 
 # Add source directory
 add_subdirectory(src)
