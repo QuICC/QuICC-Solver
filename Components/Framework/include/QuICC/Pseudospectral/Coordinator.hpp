@@ -612,7 +612,8 @@ namespace Pseudospectral {
          std::map<std::size_t, Graph::varData_t> mId2View;
          // std::map<std::size_t, Graph::C_DCCSC3D_t> mId2View;
          /// @brief storage for memory blocks of inputs/outputs
-         std::vector<QuICC::Memory::MemBlock<std::byte>> mBlocks;
+         std::vector<QuICC::Memory::MemBlock<std::byte>> mBlocksData;
+         std::vector<QuICC::Memory::MemBlock<std::uint32_t>> mBlocksMeta;
 
       private:
          /**

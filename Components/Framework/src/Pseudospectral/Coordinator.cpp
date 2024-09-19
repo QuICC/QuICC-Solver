@@ -142,13 +142,20 @@ namespace Pseudospectral {
 
    namespace details {
 
-   View::ptrAndIdx getMeta(const TransformResolution& res, const std::uint32_t maxLayers)
+   struct ptrAndIdxBlock
    {
-      std::vector<std::uint32_t> ptr;
-      std::vector<std::uint32_t> idx;
+      Memory::MemBlock<std::uint32_t> ptr;
+      Memory::MemBlock<std::uint32_t> idx;
+   };
 
+   ptrAndIdxBlock getMeta(const TransformResolution& res, const std::uint32_t maxLayers, std::shared_ptr<Memory::memory_resource> mem)
+   {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
+
       // ptr
+      Memory::MemBlock<std::uint32_t> ptrBlock(nLayers+1, mem.get());
+      View::ViewBase<std::uint32_t> ptr(ptrBlock.data(), ptrBlock.size());
+
       std::uint32_t cumLayerSize = 0;
       std::uint32_t layerCounter = 0;
       for(std::uint32_t l = 0; l < maxLayers; ++l)
@@ -163,8 +170,10 @@ namespace Pseudospectral {
          ptr[l+1] = ptr[l] + layerSize;
          cumLayerSize += layerSize;
       }
+
       // idx
-      idx.resize(cumLayerSize);
+      Memory::MemBlock<std::uint32_t> idx(cumLayerSize, mem.get());
+      View::ViewBase<std::uint32_t> idx(idxBlock.data(), idxBlock.size());
       std::uint32_t l = 0;
       for(std::uint32_t k = 0; k < nLayers; ++k)
       {
@@ -177,7 +186,11 @@ namespace Pseudospectral {
             ++l;
          }
       }
-      return {ptr, idx};
+
+      ptrAndIdxBlock ret;
+      ret.ptr = std::move(ptrBlock);
+      ret.idx = std::move(idxBlock);
+      return ret;
    }
 
    } // namespace details
@@ -201,13 +214,16 @@ namespace Pseudospectral {
       std::uint32_t Nphi = mspRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::PHYSICAL);
       std::uint32_t M = mspRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
+      // Memory resource, depends on backend
+      mMemRsr = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+
       // get meta from mspRes
       const auto& jwRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA1D);
-      auto metaJW = details::getMeta(jwRes, L);
+      auto metaJW = details::getMeta(jwRes, L, mMemRsr);
       const auto& alRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA2D);
-      auto metaAL = details::getMeta(alRes, M);
+      auto metaAL = details::getMeta(alRes, M, mMemRsr);
       const auto& ftRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA3D);
-      auto metaFT = details::getMeta(ftRes, Nr);
+      auto metaFT = details::getMeta(ftRes, Nr, mMemRsr);
 
       constexpr std::uint32_t dim = 3;
       /// RThetaPhi - v012
@@ -231,26 +247,33 @@ namespace Pseudospectral {
       meta.push_back({metaJW.ptr.data(), metaJW.ptr.size()});
       meta.push_back({metaJW.idx.data(), metaJW.idx.size()});
 
-      // Memory resource, depends on backend
-      mMemRsr = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-
       mJitter = std::make_unique<QuICC::Graph::Jit<3>>(graphStr, mMemRsr, physDims, modsDims, layOpt, Graph::Stage::MMM, Graph::Stage::MMM, meta);
 
       // Modal space (aka JW space, Stage::PMM and Stage::MMM, QuICC Stage0)
-      std::array<std::vector<std::uint32_t>, dim> pointersMods {{{}, metaJW.ptr, {}}};
-      std::array<std::vector<std::uint32_t>, dim> indicesMods {{{}, metaJW.idx, {}}};
+      std::array<View::ViewBase<std::uint32_t>, dim> pointersMods;
+      pointersMods[1] = View::ViewBase<std::uint32_t>(metaJW.ptr.data(), metaJW.ptr.size());
+      std::array<View::ViewBase<std::uint32_t>, dim> indicesMods;
+      indicesMods[1] = View::ViewBase<std::uint32_t>(metaJW.idx.data(), metaJW.idx.size());
+
+      // Store meta blocks
+      mBlocksData.push_back(std::move(metaFT.ptr));
+      mBlocksData.push_back(std::move(metaFT.idx));
+      mBlocksData.push_back(std::move(metaAL.ptr));
+      mBlocksData.push_back(std::move(metaAL.idx));
+      mBlocksData.push_back(std::move(metaJW.ptr));
+      mBlocksData.push_back(std::move(metaJW.idx));
 
       // View for outputs/inputs
-      std::vector<size_t> fields = {FieldComponents::Spectral::SCALAR, FieldComponents::Spectral::TOR, FieldComponents::Spectral::POL};
+      std::vector<size_t> fields = {PhysicalNames::Temperature::id(), FieldComponents::Spectral::TOR, FieldComponents::Spectral::POL};
 
       // Add Views and Storage for each component
-      auto temp = mVectorVariables[PhysicalNames::Temperature::id()];
+      auto scalarVarPtr = mspRes->sim().ss().bwdPtr(Dimensions::Transform::SPECTRAL);
+
       std::visit(
          [&](auto&& p)
          {
-            // Get field scalar type from temperature
-            auto eig = p->rDom(0).perturbation().comp(FieldComponents::Spectral::SCALAR).data();
-            using fld_t = typename decltype(eig)::Scalar;
+            // Get field scalar type
+            using fld_t = typename std::remove_reference_t<decltype(p->data())>::Scalar;
 
             for (size_t f = 0; f < fields.size(); ++f)
             {
@@ -262,15 +285,15 @@ namespace Pseudospectral {
 
                // Host view
                // for now this works only for JW space
-               View::View<fld_t, View::DCCSC3D> view({reinterpret_cast<fld_t*>(block.data()), block.size()/sizeof(fld_t)}, {modsDims[0], modsDims[2], modsDims[1]}, pointersMods, indicesMods);
+               View::View<fld_t, View::DCCSC3D> view(reinterpret_cast<fld_t*>(block.data()), block.size()/sizeof(fld_t), {modsDims[0], modsDims[2], modsDims[1]}, pointersMods, indicesMods);
 
                // Store block
-               mBlocks.push_back(std::move(block));
+               mBlocksData.push_back(std::move(block));
 
                // Store view
                mId2View[fId] = view;
             }
-         }, temp);
+         }, scalarVarPtr);
    };
 
    Coordinator::ScalarEquation_range Coordinator::scalarRange(const std::size_t eqId, const int it)
@@ -911,14 +934,17 @@ namespace details
       // compute nonlinear interaction and forward transform
       this->updateSpectral(it);
 
-      // copy to view
+
+      assert(mJitter != nullptr);
+
+      // Copy to view
       const auto& jwRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA1D);
-      auto temp = mVectorVariables[PhysicalNames::Temperature::id()];
+      auto temp = mScalarVariables[PhysicalNames::Temperature::id()];
       auto tempVarv = mId2View[PhysicalNames::Temperature::id()];
       std::visit(
          [&](auto&& p, auto& Tv)
          {
-            auto ptrTemp = p->rDom(0).perturbation().comp(FieldComponents::Spectral::SCALAR);
+            auto ptrTemp = p->rDom(0).perturbation();
             details::copyEig2View(Tv, ptrTemp.data(), jwRes);
          }, temp, tempVarv);
 
@@ -934,7 +960,7 @@ namespace details
             details::copyEig2View(Polv, ptrPol.data(), jwRes);
          }, vec, TorVarv, PolVarv);
 
-      /// call graph
+      /// Call graph
       std::visit(
          [&](auto& Tv, auto& Torv, auto& Polv)
          {
@@ -942,11 +968,11 @@ namespace details
             mJitter->apply(Tv, Torv, Polv, Tv, Torv, Polv);
          }, tempVarv, TorVarv, PolVarv);
 
-      // copy back
+      // Copy back
       std::visit(
          [&](auto&& p, auto& Tv)
          {
-            auto ptrTemp = p->rDom(0).rPerturbation().comp(FieldComponents::Spectral::SCALAR);
+            auto ptrTemp = p->rDom(0).perturbation();
             details::copyView2Eig(ptrTemp.rData(), Tv, jwRes);
          }, temp, tempVarv);
 
