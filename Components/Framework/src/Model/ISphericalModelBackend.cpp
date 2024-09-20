@@ -43,6 +43,129 @@ void ISphericalModelBackend::blockInfo(int& tN, int& gN, ArrayI& shift,
    rhs = 1;
 }
 
+void ISphericalModelBackend::buildFixedBlock(DecoupledZSparse& decMat,
+   const int cols, const bool isComplexBlock,
+   const std::vector<details::BlockDescription>& descr,
+   const SpectralFieldId& rowId, const SpectralFieldId& colId,
+   const SpectralFieldIds& fields, const int matIdx, const std::size_t bcType,
+   const Resolution& res, const int l0, const int maxL, const BcMap& bcs,
+   const NonDimensional::NdMap& nds, const bool isSplitOperator,
+   const bool ignoreStart) const
+{
+   // Compute system size
+   const auto sysInfo = systemInfo(rowId, colId, fields, l0, maxL, res, bcs,
+      this->useGalerkin(), false);
+   const auto& sysN = sysInfo.systemSize;
+   auto baseRowShift = sysInfo.startRow;
+   auto baseColShift = sysInfo.startCol;
+   if (ignoreStart)
+   {
+      baseRowShift = 0;
+      baseColShift = 0;
+   }
+
+   // Resize matrices the first time
+   if (decMat.real().size() == 0)
+   {
+      decMat.real().resize(sysN, cols);
+      if (isComplexBlock)
+      {
+         decMat.imag().resize(sysN, cols);
+      }
+   }
+   assert(decMat.real().rows() == sysN);
+   assert(decMat.real().cols() == cols);
+   if (isComplexBlock)
+   {
+      assert(decMat.imag().rows() == sysN);
+      assert(decMat.imag().cols() == cols);
+   }
+
+   int tN, gN, rhs;
+   ArrayI shift(3);
+
+   bool needStencil = (this->useGalerkin());
+   bool needTau = (bcType == ModelOperatorBoundary::SolverHasBc::id() &&
+                   !this->useGalerkin());
+
+   for (auto&& d: descr)
+   {
+      assert(d.nRowShift == 0 || d.nColShift == 0);
+
+      // Shift starting row
+      int rowShift = baseRowShift;
+      for (int s = 0; s < d.nRowShift; s++)
+      {
+         this->blockInfo(tN, gN, shift, rhs, rowId, res, l0 + s, bcs);
+         rowShift += gN;
+      }
+
+      // Shift starting col
+      int colShift = baseColShift;
+      for (int s = 0; s < d.nColShift; s++)
+      {
+         this->blockInfo(tN, gN, shift, rhs, colId, res, l0 + s, bcs);
+         colShift += cols;
+      }
+
+      int lShift = -d.nRowShift + d.nColShift;
+
+      for (int l = l0 + d.nRowShift; l <= maxL - d.nColShift; l++)
+      {
+         auto nNr = res.counter().dimensions(Dimensions::Space::SPECTRAL, l)(0);
+         auto nNc = res.counter().dimensions(Dimensions::Space::SPECTRAL,
+            l + lShift)(0);
+
+         //
+         // Build real part of block
+         if (d.realOp)
+         {
+            auto bMat = d.realOp(nNr, nNc, l, d.opts, nds);
+            assert(bMat.cols() == cols);
+
+            if (needStencil)
+            {
+               this->applyGalerkinStencil(bMat, rowId, colId, l, l + lShift,
+                  res, bcs, nds);
+            }
+            else if (needTau)
+            {
+               this->applyTau(bMat, rowId, colId, l + lShift, res, bcs, nds,
+                  isSplitOperator);
+            }
+            this->addBlock(decMat.real(), bMat, rowShift, colShift);
+         }
+
+         //
+         // Build imaginary part of block
+         if (d.imagOp)
+         {
+            auto bMat = d.imagOp(nNr, nNc, l, d.opts, nds);
+            assert(bMat.cols() == cols);
+
+            if (needStencil)
+            {
+               this->applyGalerkinStencil(bMat, rowId, colId, l, l + lShift,
+                  res, bcs, nds);
+            }
+            else if (needTau)
+            {
+               this->applyTau(bMat, rowId, colId, l + lShift, res, bcs, nds,
+                  isSplitOperator);
+            }
+            this->addBlock(decMat.imag(), bMat, rowShift, colShift);
+         }
+
+         // Shift to next block
+         this->blockInfo(tN, gN, shift, rhs, rowId, res, l, bcs);
+         rowShift += gN;
+
+         this->blockInfo(tN, gN, shift, rhs, colId, res, l + lShift, bcs);
+         colShift += cols;
+      }
+   }
+}
+
 void ISphericalModelBackend::buildBlock(DecoupledZSparse& decMat,
    const std::vector<details::BlockDescription>& descr,
    const SpectralFieldId& rowId, const SpectralFieldId& colId,
@@ -89,6 +212,7 @@ void ISphericalModelBackend::buildBlock(DecoupledZSparse& decMat,
 
    for (auto&& d: descr)
    {
+      assert((d.imagOp && decMat.imag().size() > 0) || !d.imagOp);
       assert(d.nRowShift == 0 || d.nColShift == 0);
 
       // Shift starting row
