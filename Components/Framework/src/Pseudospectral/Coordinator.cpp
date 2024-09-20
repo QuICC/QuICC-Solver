@@ -172,7 +172,7 @@ namespace Pseudospectral {
       }
 
       // idx
-      Memory::MemBlock<std::uint32_t> idx(cumLayerSize, mem.get());
+      Memory::MemBlock<std::uint32_t> idxBlock(cumLayerSize, mem.get());
       View::ViewBase<std::uint32_t> idx(idxBlock.data(), idxBlock.size());
       std::uint32_t l = 0;
       for(std::uint32_t k = 0; k < nLayers; ++k)
@@ -255,14 +255,6 @@ namespace Pseudospectral {
       std::array<View::ViewBase<std::uint32_t>, dim> indicesMods;
       indicesMods[1] = View::ViewBase<std::uint32_t>(metaJW.idx.data(), metaJW.idx.size());
 
-      // Store meta blocks
-      mBlocksData.push_back(std::move(metaFT.ptr));
-      mBlocksData.push_back(std::move(metaFT.idx));
-      mBlocksData.push_back(std::move(metaAL.ptr));
-      mBlocksData.push_back(std::move(metaAL.idx));
-      mBlocksData.push_back(std::move(metaJW.ptr));
-      mBlocksData.push_back(std::move(metaJW.idx));
-
       // View for outputs/inputs
       std::vector<size_t> fields = {PhysicalNames::Temperature::id(), FieldComponents::Spectral::TOR, FieldComponents::Spectral::POL};
 
@@ -285,7 +277,8 @@ namespace Pseudospectral {
 
                // Host view
                // for now this works only for JW space
-               View::View<fld_t, View::DCCSC3D> view(reinterpret_cast<fld_t*>(block.data()), block.size()/sizeof(fld_t), {modsDims[0], modsDims[2], modsDims[1]}, pointersMods, indicesMods);
+               std::array<std::uint32_t, dim> dims {modsDims[0], modsDims[2], modsDims[1]};
+               View::View<fld_t, View::DCCSC3D> view(reinterpret_cast<fld_t*>(block.data()), block.size()/sizeof(fld_t), dims.data() , pointersMods.data(), indicesMods.data());
 
                // Store block
                mBlocksData.push_back(std::move(block));
@@ -294,6 +287,14 @@ namespace Pseudospectral {
                mId2View[fId] = view;
             }
          }, scalarVarPtr);
+
+      // Store meta blocks
+      mBlocksMeta.push_back(std::move(metaFT.ptr));
+      mBlocksMeta.push_back(std::move(metaFT.idx));
+      mBlocksMeta.push_back(std::move(metaAL.ptr));
+      mBlocksMeta.push_back(std::move(metaAL.idx));
+      mBlocksMeta.push_back(std::move(metaJW.ptr));
+      mBlocksMeta.push_back(std::move(metaJW.idx));
    };
 
    Coordinator::ScalarEquation_range Coordinator::scalarRange(const std::size_t eqId, const int it)
