@@ -11,7 +11,7 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/SphereDipolarityWriter.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/Dipolarity.hpp"
