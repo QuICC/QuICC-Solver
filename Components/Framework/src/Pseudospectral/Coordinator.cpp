@@ -153,7 +153,7 @@ namespace Pseudospectral {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
       // ptr
-      Memory::MemBlock<std::uint32_t> ptrBlock(nLayers+1, mem.get());
+      Memory::MemBlock<std::uint32_t> ptrBlock(maxLayers+1, mem.get());
       View::ViewBase<std::uint32_t> ptr(ptrBlock.data(), ptrBlock.size());
 
       std::uint32_t cumLayerSize = 0;
@@ -966,7 +966,6 @@ namespace details
          [&](auto& Tv, auto& Torv, auto& Polv)
          {
             mJitter->apply(Tv, Torv, Polv, Tv, Torv, Polv);
-            mJitter->apply(Tv, Tv);
          }, tempVarv, TorVarv, PolVarv);
 
       // Copy back
