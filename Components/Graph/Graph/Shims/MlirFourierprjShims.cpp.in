@@ -38,6 +38,7 @@ extern "C" inline void _ciface_quiccir_fr_@Op@_@Kind@_f64_DCCSC3D_complexf64_DCC
     ViewBase<std::uint32_t> indices[rank];
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
     std::uint32_t lds = pUmod->dataSize / pUmod->cooSize;
+    assert(lds >= pUmod->dims[0]);
     Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices, lds);
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // call
@@ -79,6 +80,7 @@ extern "C" inline void _ciface_quiccir_fr_@Op@_@Kind@_f64_DCCSC3D_complexf64_DCC
     ViewBase<std::uint32_t> indices[rank];
     indices[1] = ViewBase<std::uint32_t>(pUmod->coo, pUmod->cooSize);
     std::uint32_t lds = pUmod->dataSize / pUmod->cooSize;
+    assert(lds >= pUmod->dims[0]);
     Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices, lds);
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     // call

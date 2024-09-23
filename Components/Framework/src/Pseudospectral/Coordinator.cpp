@@ -274,12 +274,12 @@ namespace Pseudospectral {
                auto fId = fields[f];
 
                // Host mem block
-               Memory::MemBlock<std::byte> block(modsDims[0]*metaJW.idx.size()*sizeof(fld_t), mMemRsr.get());
+               Memory::MemBlock<fld_t> block(modsDims[0]*metaJW.idx.size(), mMemRsr.get());
 
                // Host view
                // for now this works only for JW space
                std::array<std::uint32_t, dim> dims {modsDims[0], modsDims[2], modsDims[1]};
-               View::View<fld_t, View::DCCSC3D> view(reinterpret_cast<fld_t*>(block.data()), block.size()/sizeof(fld_t), dims.data() , pointersMods.data(), indicesMods.data());
+               View::View<fld_t, View::DCCSC3D> view(block.data(), block.size(), dims.data(), pointersMods.data(), indicesMods.data());
 
                // Store block
                mBlocksData.push_back(std::move(block));
@@ -936,8 +936,7 @@ namespace details
       // compute nonlinear interaction and forward transform
       this->updateSpectral(it);
 
-
-      assert(mJitter != nullptr);
+      assert(mJitter.get() != nullptr);
 
       // Copy to view
       const auto& jwRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA1D);
@@ -966,8 +965,8 @@ namespace details
       std::visit(
          [&](auto& Tv, auto& Torv, auto& Polv)
          {
-            assert(mJitter != nullptr);
             mJitter->apply(Tv, Torv, Polv, Tv, Torv, Polv);
+            mJitter->apply(Tv, Tv);
          }, tempVarv, TorVarv, PolVarv);
 
       // Copy back

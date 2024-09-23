@@ -102,7 +102,8 @@ void alloc_ptr(Tnew** newPtr, const size_t size, const Tprod* prodPtr)
     #endif
     if (isCpuMem)
     {
-        *newPtr = reinterpret_cast<Tnew*>(::operator new(sizeByte, static_cast<std::align_val_t>(sizeof(Tnew))));
+        auto alignment = static_cast<std::align_val_t>(alignof(std::max_align_t));
+        *newPtr = reinterpret_cast<Tnew*>(::operator new(sizeByte, alignment));
     }
     #ifdef QUICC_HAS_CUDA_BACKEND
     else
@@ -111,16 +112,16 @@ void alloc_ptr(Tnew** newPtr, const size_t size, const Tprod* prodPtr)
     }
     #endif
     #ifndef NDEBUG
-    std::cout << "alloc, bytes: " << sizeByte << '\t' << isCpuMem <<'\n';
+    std::cout << "alloc, bytes: " << sizeByte << "\tis cpu: " << isCpuMem << "\tptr: " << *newPtr <<'\n';
     #endif
 }
 
 
 /// @brief generic view descriptor deallocator
-/// @tparam T view descriptor type
+/// @tparam Tdata scalar type of view descriptor
 /// @param pBuffer
-template<class T>
-void dealloc_viewDescriptor(T* pBuffer)
+template<class Tdata>
+void dealloc_viewDescriptor(ViewDescriptor<Tdata, std::uint32_t, 3>* pBuffer)
 {
     // Reset Meta
     pBuffer->coo = nullptr;
@@ -129,15 +130,19 @@ void dealloc_viewDescriptor(T* pBuffer)
     pBuffer->posSize = 0;
     // Dealloc
     assert(pBuffer->data != nullptr);
-    std::size_t sizeByte = sizeof(decltype(*pBuffer->data)) * pBuffer->dataSize;
+    std::size_t sizeByte = sizeof(Tdata) * pBuffer->dataSize;
     // Check memory space
     bool isCpuMem = true;
+    #ifndef NDEBUG
+    std::cout << "dealloc, bytes: " << sizeByte << "\tis cpu: " << isCpuMem << "\tptr: " << pBuffer->data <<'\n';
+    #endif
     #ifdef QUICC_HAS_CUDA_BACKEND
     isCpuMem = !QuICC::Cuda::isDeviceMemory(pBuffer->data);
     #endif
     if (isCpuMem)
     {
-        ::operator delete(pBuffer->data, sizeByte, static_cast<std::align_val_t>(sizeof(double)));
+        auto alignment = static_cast<std::align_val_t>(alignof(std::max_align_t));
+        ::operator delete(pBuffer->data, sizeByte, alignment);
     }
     #ifdef QUICC_HAS_CUDA_BACKEND
     else
@@ -147,9 +152,6 @@ void dealloc_viewDescriptor(T* pBuffer)
     #endif
     pBuffer->dataSize = 0;
     pBuffer->data = nullptr;
-    #ifndef NDEBUG
-    std::cout << "dealloc, bytes: " << sizeByte << '\t' << isCpuMem <<'\n';
-    #endif
 }
 
 #ifdef QUICC_HAS_CUDA_BACKEND

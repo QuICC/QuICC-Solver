@@ -30,6 +30,7 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     assert(out.dims()[0] == in.dims()[0]);
     assert(out.dims()[1] == in.dims()[1]);
     assert(out.dims()[2] == in.dims()[2]);
+    assert(out.lds() == in.lds());
 
     #ifdef QUICC_HAS_CUDA_BACKEND
     assert(!QuICC::Cuda::isDeviceMemory(out.data()));
@@ -81,24 +82,28 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
         std::size_t m = mStart;
         if constexpr (Treatment & zeroP_m)
         {
+            assert(nk+m < out.size());
             out.data()[nk+m] = in.data()[nk+m] * fftScaling;
             ++m;
         }
 
         if constexpr (Treatment & zeroMinusP_m)
         {
+            assert(nk+m < out.size());
             out.data()[nk+m] = -in.data()[nk+m] * fftScaling;
             ++m;
         }
 
         for (; m < nDealias; ++m)
         {
+            assert(nk+m < out.size());
             out.data()[nk+m] = in.data()[nk+m] * c * static_cast<float_t>(sgn) *
                 fast_pow<Order>(static_cast<float_t>(m)*mScale);
         }
 
         for (; m < M; ++m)
         {
+            assert(nk+m < out.size());
             out.data()[nk+m] = 0.0;
         }
 

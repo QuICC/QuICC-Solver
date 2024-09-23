@@ -97,6 +97,13 @@ void DOp<Tout, Tin, FftBackend, DiffBackend>::applyImpl(Tout& out, const Tin& in
 
     // FFT
     mFft->apply(out, _tmpView);
+
+    // for the pure projector we need to reset the temporary storage:
+    // next time the operator is called it might have a different input
+    if constexpr (DiffBackend::TreatmentValue == QuICC::Transform::Fourier::none_m && DiffBackend::OrderValue == 0)
+    {
+        _tmpView = Tin();
+    }
 }
 
 } // namespace Projector
