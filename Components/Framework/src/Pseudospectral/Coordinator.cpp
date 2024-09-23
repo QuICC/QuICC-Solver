@@ -161,12 +161,15 @@ namespace Pseudospectral {
       ptr[0] = 0;
       for(std::uint32_t l = 0; l < maxLayers; ++l)
       {
-         auto layerIndex = static_cast<std::uint32_t>(res.idx<QuICC::Dimensions::Data::DAT3D>(layerCounter));
          std::uint32_t layerSize = 0;
-         if (l == layerIndex)
+         if (layerCounter < nLayers)
          {
-            layerSize = res.dim<QuICC::Dimensions::Data::DAT2D>(layerCounter);
-            ++layerCounter;
+            auto layerIndex = static_cast<std::uint32_t>(res.idx<QuICC::Dimensions::Data::DAT3D>(layerCounter));
+            if (l == layerIndex)
+            {
+               layerSize = res.dim<QuICC::Dimensions::Data::DAT2D>(layerCounter);
+               ++layerCounter;
+            }
          }
          ptr[l+1] = ptr[l] + layerSize;
          cumLayerSize += layerSize;
