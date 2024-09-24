@@ -81,7 +81,7 @@ void DOp<Tout, Tin, FftBackend, DiffBackend>::applyImpl(Tout& out, const Tin& in
     {
         // special treatment for the pure projector is not necessary
         // but it avoids an allocation and copy
-        if constexpr (DiffBackend::TreatmentValue == QuICC::Transform::Fourier::none_m && DiffBackend::OrderValue == 0)
+        if constexpr (DiffBackend::TreatmentValue == Fourier::none_m && DiffBackend::OrderValue == 0)
         {
             _tmpView = in;
         }
@@ -100,7 +100,7 @@ void DOp<Tout, Tin, FftBackend, DiffBackend>::applyImpl(Tout& out, const Tin& in
 
     // for the pure projector we need to reset the temporary storage:
     // next time the operator is called it might have a different input
-    if constexpr (DiffBackend::TreatmentValue == QuICC::Transform::Fourier::none_m && DiffBackend::OrderValue == 0)
+    if constexpr (DiffBackend::TreatmentValue == Fourier::none_m && DiffBackend::OrderValue == 0)
     {
         _tmpView = Tin();
     }

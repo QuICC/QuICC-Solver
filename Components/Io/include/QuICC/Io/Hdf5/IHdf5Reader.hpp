@@ -562,7 +562,7 @@ namespace Hdf5 {
             memspace = H5Screate_simple(2, iDims, NULL);
 
             // Check block size
-            assert(this->mBlock.at(i).size() == this->mFileOffsets.at(i).size());
+            assert(blk.size() == this->mFileOffsets.at(i).size());
 
             // Select memory hyperslabs
             H5Sselect_none(memspace);
