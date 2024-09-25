@@ -17,7 +17,7 @@ namespace QuICC {
 /// @brief namespace for Slicewise type operations
 namespace Slicewise {
 
-/// @brief scalar add operation
+/// @brief heat transport equation kernel
 /// @tparam T scalar
 template <class T = double> struct SphericalHeatAdvection
 {
@@ -46,9 +46,7 @@ template <class T = double> struct SphericalHeatAdvection
    /// @param TdTheta temperature, Theta partial derivative
    /// @param TdPhi temperature, Phi partial derivative
    /// @return
-   QUICC_CUDA_HOSTDEV T operator()(const std::size_t l,
-      const T vR, const T vTheta, const T vPhi,
-      const T TdR, const T TdTheta, const T TdPhi)
+   QUICC_CUDA_HOSTDEV T operator()(std::uint32_t l, T vR, T vTheta, T vPhi, T TdR, T TdTheta, T TdPhi)
    {
       return _scaling * (vR*TdR + vTheta*TdTheta + vPhi*TdPhi - _grid[l]*vR);
    }

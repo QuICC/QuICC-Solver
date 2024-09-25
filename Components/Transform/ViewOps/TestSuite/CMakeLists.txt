@@ -186,6 +186,34 @@ add_test(
 )
 
 #
+# View Slicewise Tests
+#
+
+add_executable(ViewSlicewiseTest
+    ViewSlicewiseTests.cpp
+)
+
+# if(TARGET QuICC::Cuda)
+#     target_sources(ViewSlicewiseTest
+#         PRIVATE
+#             ViewSlicewiseTests.cu
+#     )
+# endif()
+
+target_link_libraries(ViewSlicewiseTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Slicewise
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewSlicewiseTest
+    COMMAND ViewSlicewiseTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+#
 # View Reduction Tests
 #
 

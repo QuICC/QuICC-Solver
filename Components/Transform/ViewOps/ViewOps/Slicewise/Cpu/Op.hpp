@@ -1,7 +1,7 @@
 /**
- * @file Pointwise.hpp
- * @brief Pointwise operations on Views
- * Allows for any user defined pointwise operation.
+ * @file Op.hpp
+ * @brief Slicewise operations on Views
+ * Allows for any user defined Slicewise operation.
  * The operation is defined via a functor object.
  * Value semantic lets a (good) compiler easily inline and
  * remove the indirect call.
@@ -16,17 +16,18 @@
 //
 #include "Operator/Nary.hpp"
 #include "Profiler/Interface.hpp"
+#include "View/View.hpp"
 #include "View/Attributes.hpp"
 
 namespace QuICC {
-/// @brief namespace for Pointwise type operations
-namespace Pointwise {
+/// @brief namespace for Slicewise type operations
+namespace Slicewise {
 /// @brief namespace for cpu backends
 namespace Cpu {
 
 using namespace QuICC::Operator;
 
-/// @brief Pointwise operator
+/// @brief Slicewise operator
 /// @tparam Functor Nary scalar functor
 /// @tparam Tout output View
 /// @tparam ...Targs input Views
@@ -66,20 +67,20 @@ private:
 template <class Functor, class Tout, class ...Targs>
 void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
 {
-   Profiler::RegionFixture<4> fix("Pointwise::Cpu::applyImpl");
+   Profiler::RegionFixture<4> fix("Slicewise::Cpu::applyImpl");
 
    // check Tout and Targs.. match Functor op
-   using res_t = std::invoke_result_t<Functor, typename Targs::ScalarType...>;
+   using res_t = std::invoke_result_t<Functor, IndexType, typename Targs::ScalarType...>;
    static_assert(std::is_same_v<typename Tout::ScalarType, res_t>,
       "Mismatch in functor or arguments");
    // check same size
    assert(((out.size() == args.size()) && ... ));
 
    // implemented only for physical space
-   static_assert(std::is_same_v<Tout::Attributes, View::DCCSC3D>());
+   static_assert(std::is_same_v<Tout, View::View<double, View::DCCSC3D>>);
 
    // cache populated layers
-   auto pointers = out.pointers();
+   auto pointers = out.pointers()[1];
    if (_layerIndex.size() < 1)
    {
       for (IndexType k = 0; k < pointers.size() - 1; ++k)
@@ -126,5 +127,5 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
 }
 
 } // namespace Cpu
-} // namespace Pointwise
+} // namespace Slicewise
 } // namespace QuICC
