@@ -48,7 +48,7 @@ struct SystemInfo
        blockRows(rows),
        blockCols(cols),
        startRow(row),
-       startCol(col){};
+       startCol(col) {};
 };
 
 /**
@@ -176,6 +176,33 @@ protected:
    void blockInfo(int& tN, int& gN, ArrayI& shift, int& rhs,
       const SpectralFieldId& fId, const Resolution& res, const MHDFloat l,
       const BcMap& bcs) const;
+
+   /**
+    * @brief Build matrix block with fixed width from description
+    *
+    * @param decMat  Ouput matrix
+    * @param cols    Number of columns
+    * @param isComplexBlock block is complex?
+    * @param descr   Block description
+    * @param rowId   Field ID of block matrix row
+    * @param colId   Field ID of block matrix column
+    * @param matIdx  Matrix ID
+    * @param bcType  Type of boundary condition
+    * @param res     Resolution object
+    * @param l0   Starting harmonic degree l0
+    * @param maxL Max harmonic degree L
+    * @param bcs     Boundary conditions for each field
+    * @param nds     Nondimension parameters
+    * @param isSplitOperator  Set operator of split system
+    * @param ignoreStart  Ignore start shift
+    */
+   void buildFixedBlock(DecoupledZSparse& decMat, const int cols,
+      const bool isComplex, const std::vector<details::BlockDescription>& descr,
+      const SpectralFieldId& rowId, const SpectralFieldId& colId,
+      const SpectralFieldIds& fields, const int matIdx,
+      const std::size_t bcType, const Resolution& res, const int l0,
+      const int maxL, const BcMap& bcs, const NonDimensional::NdMap& nds,
+      const bool isSplitOperator, const bool ignoreStart = false) const;
 
    /**
     * @brief Build matrix block from description

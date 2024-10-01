@@ -119,6 +119,17 @@ BoussinesqSphereRTCExplicit_tubular:
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '12'
     QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTCExplicit_tubular_split_equation:
+  extends:
+  - .BoussinesqSphereRTCExplicit_tubular_split_equation
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
 BoussinesqSphereRTCImplicit_single1d:
   extends:
   - .BoussinesqSphereRTCImplicit_single1d
@@ -177,6 +188,17 @@ BoussinesqShellRTCExplicit_single2d:
 BoussinesqShellRTCExplicit_tubular:
   extends:
   - .BoussinesqShellRTCExplicit_tubular
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellRTCExplicit_tubular_split_equation:
+  extends:
+  - .BoussinesqShellRTCExplicit_tubular_split_equation
   - .daint-mc
   image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
   variables:
