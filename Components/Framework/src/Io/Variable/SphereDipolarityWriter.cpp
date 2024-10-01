@@ -70,7 +70,7 @@ namespace Variable {
          auto a = wb.alpha(l);
          auto db = wb.dBeta();      
          SparseSM::Worland::Boundary::Value bc(a, db, l);
-         op = bc.compute(nN-1);
+         op = bc.compute(nN-1).cast<MHDFloat>();
       }
 
       IVariableAsciiWriter::init();
