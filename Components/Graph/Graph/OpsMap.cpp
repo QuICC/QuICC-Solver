@@ -57,6 +57,9 @@ MapOps::MapOps(mlir::ModuleOp module,
       else if (auto sub = dyn_cast<mlir::quiccir::SubOp>(op)) {
         setSub(sub);
       }
+      else if (auto cross = dyn_cast<mlir::quiccir::CrossOp>(op)) {
+        setCross(cross);
+      }
       else if (auto tran = dyn_cast<mlir::quiccir::TransposeOp>(op)) {
         setTranspose(tran);
       }

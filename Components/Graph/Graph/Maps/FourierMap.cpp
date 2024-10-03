@@ -21,6 +21,7 @@ void MapOps::setFourierPrj(mlir::quiccir::FrPOp op)
         _thisArr.resize(index+1, nullptr);
     }
     if (_thisArr[index] == nullptr) {
+        /// \todo check kind
         if (_isCpu)
         {
             using backend_t = viewCpu_t;

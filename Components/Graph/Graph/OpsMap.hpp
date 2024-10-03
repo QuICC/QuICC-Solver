@@ -83,6 +83,9 @@ class MapOps
     /// @brief map pointwise subtraction
     /// @param op
     void setSub(mlir::quiccir::SubOp op);
+    /// @brief map cross product
+    /// @param op
+    void setCross(mlir::quiccir::CrossOp op);
     /// @brief map transpose
     /// @param op
     void setTranspose(mlir::quiccir::TransposeOp op);

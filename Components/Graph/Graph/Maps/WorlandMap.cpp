@@ -23,6 +23,7 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
     }
     if (_thisArr[index] == nullptr)
     {
+        /// \todo check kind
         if (_isCpu)
         {
             using namespace QuICC::Transform::Quadrature;

@@ -4,5 +4,6 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}
     ALegendreMap.cpp
     WorlandMap.cpp
     PointwiseMap.cpp
+    CrossMap.cpp
     TransposeMap.cpp
 )

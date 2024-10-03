@@ -63,6 +63,7 @@ void MapOps::setSub(mlir::quiccir::SubOp op)
         _thisArr.resize(index+1, nullptr);
     }
     if (_thisArr[index] == nullptr) {
+        /// \todo check type
         if (_isCpu)
         {
             using namespace QuICC::Pointwise::Cpu;
