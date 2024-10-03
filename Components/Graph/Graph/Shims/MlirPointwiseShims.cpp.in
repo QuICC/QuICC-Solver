@@ -1,0 +1,86 @@
+#include <iostream>
+#include <complex>
+#include <cassert>
+
+#include "Graph/Shims/MlirShims.hpp"
+#include "ViewOps/Pointwise/Pointwise.hpp"
+#include "ViewOps/Pointwise/Functors.hpp"
+#include "Graph/Types.hpp"
+
+
+using namespace QuICC::Graph;
+
+/// @brief C Interface to MLIR for a binary @Op@ operator
+/// @param obj
+/// @param pRet
+/// @param pLhs
+/// @param pRhs
+extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D(void* obj,
+    ViewDescriptor<@Type@, std::uint32_t, 3>* pRet, ViewDescriptor<@Type@, std::uint32_t, 3>* pLhs, ViewDescriptor<@Type@, std::uint32_t, 3>* pRhs)
+{
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D\n";
+    #endif
+    assert(obj != nullptr);
+    assert(pRet != nullptr);
+    assert(pLhs != nullptr);
+    assert(pRhs != nullptr);
+    // op
+    using namespace QuICC::Pointwise::Cpu;
+    using namespace QuICC::Pointwise;
+    using T = QuICC::View::View<@Type@, QuICC::View::DCCSC3D>;
+    using op_t = Op<@OpCC@Functor<@Type@>, T, T, T>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pLhs->pos, pLhs->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pLhs->coo, pLhs->cooSize);
+    T viewLhs(pLhs->data, pLhs->dataSize, pLhs->dims, pointers, indices);
+    T viewRhs(pRhs->data, pRhs->dataSize, pRhs->dims, pointers, indices);
+    T viewRet(pRet->data, pRet->dataSize, pRet->dims, pointers, indices);
+    // call
+    auto cl = reinterpret_cast<op_t*>(obj);
+    cl->apply(viewRet, viewLhs, viewRhs);
+};
+
+#ifdef QUICC_HAS_CUDA_BACKEND
+/// @brief C Interface to MLIR for a binary @Op@ operator
+/// gpu backend
+/// @param obj
+/// @param pRet
+/// @param pLhs
+/// @param pRhs
+extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3DJIK_@MlirType@_DCCSC3DJIK_@MlirType@_DCCSC3DJIK(void* obj,
+    ViewDescriptor<@Type@, std::uint32_t, 3>* pRet, ViewDescriptor<@Type@, std::uint32_t, 3>* pLhs, ViewDescriptor<@Type@, std::uint32_t, 3>* pRhs)
+{
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_@Op@_@MlirType@_DCCSC3DJIK_@MlirType@_DCCSC3DJIK_@MlirType@_DCCSC3DJIK\n";
+    #endif
+    assert(obj != nullptr);
+    assert(pRet != nullptr);
+    assert(pLhs != nullptr);
+    assert(pRhs != nullptr);
+    // op
+    using namespace QuICC::Pointwise::Cuda;
+    using namespace QuICC::Pointwise;
+    using T = QuICC::View::View<cuda::@Type@, QuICC::View::DCCSC3DJIK>;
+    using op_t = Op<@OpCC@Functor<typename T::ScalarType>, T, T, T>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointers[rank];
+    pointers[1] = ViewBase<std::uint32_t>(pLhs->pos, pLhs->posSize);
+    ViewBase<std::uint32_t> indices[rank];
+    indices[1] = ViewBase<std::uint32_t>(pLhs->coo, pLhs->cooSize);
+    T viewLhs(reinterpret_cast<cuda::@Type@*>(pLhs->data), pLhs->dataSize, pLhs->dims, pointers, indices);
+    T viewRhs(reinterpret_cast<cuda::@Type@*>(pRhs->data), pRhs->dataSize, pRhs->dims, pointers, indices);
+    T viewRet(reinterpret_cast<cuda::@Type@*>(pRet->data), pRet->dataSize, pRet->dims, pointers, indices);
+    // call
+    auto cl = reinterpret_cast<op_t*>(obj);
+    cl->apply(viewRet, viewLhs, viewRhs);
+};
+#endif

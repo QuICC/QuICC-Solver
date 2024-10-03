@@ -25,7 +25,7 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
 target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PRIVATE
     MlirShims.cpp
-    MlirPointwiseShims.cpp
+    # MlirPointwiseShims.cpp
     MlirTransposeShims.cpp
     MlirAllocShims.cpp
     MlirDeallocShims.cpp
@@ -52,6 +52,7 @@ target_link_options(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_
 include(ConfigFT.cmake)
 include(ConfigAL.cmake)
 include(ConfigJW.cmake)
+include(ConfigPointwise.cmake)
 
 # Alias
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}${QUICC_CURRENT_SUBCOMPONENT_LIB}
