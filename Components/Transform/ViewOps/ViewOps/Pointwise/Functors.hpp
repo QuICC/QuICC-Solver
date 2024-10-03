@@ -94,5 +94,64 @@ template <class T = double> struct Abs2Functor
    }
 };
 
+/// @tparam T scalar
+template <class T = double> struct CrossCompFunctor
+{
+   /// @brief non dimensional scaling for transport term
+   T _scaling;
+
+   /// @brief ctor
+   /// @param scaling
+   CrossCompFunctor(T scaling) : _scaling(scaling){};
+
+   /// @brief deleted default constructor
+   CrossCompFunctor() = delete;
+
+   /// @brief dtor
+   ~CrossCompFunctor() = default;
+
+   /// @brief Cross product, component wise
+   /// @param uj
+   /// @param uk
+   /// @param vj
+   /// @param vk
+   /// @return i component of cross product
+   QUICC_CUDA_HOSTDEV T operator()(T uj, T uk, T vj, T vk)
+   {
+      return _scaling * (uj*vk - uk*vj);
+   }
+};
+
+/// @tparam T scalar
+template <class T = double> struct DotFunctor
+{
+   /// @brief non dimensional scaling for transport term
+   T _scaling;
+
+   /// @brief ctor
+   /// @param scaling
+   DotFunctor(T scaling) : _scaling(scaling){};
+
+   /// @brief deleted default constructor
+   DotFunctor() = delete;
+
+   /// @brief dtor
+   ~DotFunctor() = default;
+
+   /// @brief Dot product
+   /// @param ui
+   /// @param uj
+   /// @param uk
+   /// @param vi
+   /// @param vj
+   /// @param vk
+   /// @return
+   QUICC_CUDA_HOSTDEV T operator()(T ui, T uj, T uk, T vi, T vj, T vk)
+   {
+      return _scaling * (ui*vi + uj*vj + uk*vk);
+   }
+};
+
+
 } // namespace Pointwise
 } // namespace QuICC
