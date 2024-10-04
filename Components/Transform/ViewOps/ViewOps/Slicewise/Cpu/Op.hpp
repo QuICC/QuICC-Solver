@@ -14,10 +14,14 @@
 
 // Project includes
 //
+#include "Memory/Memory.hpp"
+#include "Memory/MemoryResource.hpp"
 #include "Operator/Nary.hpp"
 #include "Profiler/Interface.hpp"
 #include "View/View.hpp"
 #include "View/Attributes.hpp"
+
+#include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 
 namespace QuICC {
 /// @brief namespace for Slicewise type operations
@@ -43,7 +47,7 @@ public:
    /// @brief capture functor by value
    /// @param f functor, i.e. struct with method
    /// Tout::ScalarType operator()(Targs::ScalarType var, ...)
-   Op(Functor f) : _f(f){};
+   Op(std::shared_ptr<Memory::memory_resource> mem, Functor f) : _f(f), _mem(mem){};
    /// @brief default constructor
    Op() = delete;
    /// @brief dtor
@@ -62,6 +66,14 @@ private:
    std::vector<IndexType> _layerIndex;
    /// @brief layer width cache
    std::vector<IndexType> _layerWidth;
+   /// needs shared ptr for memory pools
+   /// note, this must call the dtor last
+   /// otherwise we cannot dealloc data
+   std::shared_ptr<Memory::memory_resource> _mem;
+   /// @brief Grid block
+   Memory::MemBlock<typename Tout::ScalarType> _gridData;
+   /// @brief Grid view
+   View::ViewBase<typename Tout::ScalarType> _grid;
 };
 
 template <class Functor, class Tout, class ...Targs>
@@ -96,6 +108,26 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       }
    }
 
+   // setup grid
+   if (_grid.data() == nullptr)
+   {
+      ::QuICC::Internal::Array igrid;
+      ::QuICC::Internal::Array iweights;
+      /// \todo template param
+      ::QuICC::Polynomial::Quadrature::WorlandRule quad;
+      quad.computeQuadrature(igrid, iweights, out.dims()[0]);
+
+      // setup view
+      _gridData = std::move(Memory::MemBlock<typename Tout::ScalarType>(igrid.size(), _mem.get()));
+      _grid = View::ViewBase(_gridData.data(), _gridData.size());
+
+      // copy
+      for (std::size_t i = 0; i < _grid.size(); ++i)
+      {
+         _grid[i] = igrid[i];
+      }
+   }
+
    // apply slicewise functor
    std::size_t offSet = 0;
    for (IndexType h = 0; h < _layerIndex.size(); ++h)
@@ -117,7 +149,7 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
          for (std::size_t m = 0; m < M; ++m)
          {
             auto mnk = offSet + m + n*M;
-            out[mnk] = _f(l, args[mnk]...);
+            out[mnk] = _f(_grid[l], args[mnk]...);
          }
       }
 

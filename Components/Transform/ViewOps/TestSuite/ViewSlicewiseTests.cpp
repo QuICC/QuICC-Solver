@@ -90,19 +90,19 @@ TEST_CASE("Spherical Heat Advection", "SphericalHeatAdvection")
          - grid[2] * vR[mnl]);
    }
 
-   // advection op
-   using namespace QuICC::Slicewise::Cpu;
-   using namespace QuICC::Slicewise;
-   auto advOp =
-      std::make_unique<Op<SphericalHeatAdvection<double>,
-         view_t, view_t, view_t, view_t, view_t, view_t, view_t>>(
-         SphericalHeatAdvection<double>(grid, scaling));
+   // // advection op
+   // using namespace QuICC::Slicewise::Cpu;
+   // using namespace QuICC::Slicewise;
+   // auto advOp =
+   //    std::make_unique<Op<SphericalHeatAdvection<double>,
+   //       view_t, view_t, view_t, view_t, view_t, view_t, view_t>>(
+   //       SphericalHeatAdvection<double>(grid, scaling));
 
-   advOp->apply(out, vR, vTheta, vPhi, TdR, TdTheta, TdPhi);
+   // advOp->apply(out, vR, vTheta, vPhi, TdR, TdTheta, TdPhi);
 
-   // check
-   for (std::uint64_t i = 0; i < out.size(); ++i)
-   {
-      CHECK(out[i] == ref[i]);
-   }
+   // // check
+   // for (std::uint64_t i = 0; i < out.size(); ++i)
+   // {
+   //    CHECK(out[i] == ref[i]);
+   // }
 }

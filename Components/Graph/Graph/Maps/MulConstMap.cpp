@@ -30,9 +30,7 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
             using T = R_DCCSC3D_t;
             using op_t = Op<MulRFunctor<double>, T, T>;
             double scaling = 1.0;
-            std::vector<double> _grid = {0.0, 1.0};
-            View::ViewBase<double> grid(_grid.data(), _grid.size());
-            _ops.push_back(std::make_unique<op_t>(MulRFunctor<double>(grid, scaling)));
+            _ops.push_back(std::make_unique<op_t>(_mem, MulRFunctor<double>(scaling)));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
