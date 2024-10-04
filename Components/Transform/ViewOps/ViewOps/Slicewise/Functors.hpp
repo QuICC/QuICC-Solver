@@ -65,7 +65,10 @@ template <class T = double> struct MulRFunctor
    /// @brief ctor
    /// @param grid
    /// @param scaling
-   MulRFunctor(View::ViewBase<T> grid, T scaling) : _grid(grid), _scaling(scaling){};
+   MulRFunctor(View::ViewBase<T> grid, T scaling) : _grid(grid), _scaling(scaling)
+   {
+      assert(_grid.data() != nullptr);
+   };
 
    /// @brief deleted default constructor
    MulRFunctor() = delete;

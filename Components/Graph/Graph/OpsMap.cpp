@@ -60,6 +60,12 @@ MapOps::MapOps(mlir::ModuleOp module,
       else if (auto cross = dyn_cast<mlir::quiccir::CrossOp>(op)) {
         setCross(cross);
       }
+      else if (auto dot = dyn_cast<mlir::quiccir::DotOp>(op)) {
+        setDot(dot);
+      }
+      else if (auto mulConst = dyn_cast<mlir::quiccir::MulConstOp>(op)) {
+        setMulConst(mulConst);
+      }
       else if (auto tran = dyn_cast<mlir::quiccir::TransposeOp>(op)) {
         setTranspose(tran);
       }

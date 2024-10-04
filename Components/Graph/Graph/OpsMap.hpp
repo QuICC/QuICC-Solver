@@ -86,6 +86,12 @@ class MapOps
     /// @brief map cross product
     /// @param op
     void setCross(mlir::quiccir::CrossOp op);
+    /// @brief map dot product
+    /// @param op
+    void setDot(mlir::quiccir::DotOp op);
+    /// @brief map multiplication by constant
+    /// @param op
+    void setMulConst(mlir::quiccir::MulConstOp op);
     /// @brief map transpose
     /// @param op
     void setTranspose(mlir::quiccir::TransposeOp op);
