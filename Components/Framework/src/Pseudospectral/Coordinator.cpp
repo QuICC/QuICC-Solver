@@ -933,12 +933,6 @@ namespace details
    {
       Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::computeNonlinear");
 
-      // Compute backward transform
-      this->updatePhysical(it);
-
-      // compute nonlinear interaction and forward transform
-      this->updateSpectral(it);
-
       assert(mJitter.get() != nullptr);
 
       // Copy to view
@@ -964,12 +958,23 @@ namespace details
             details::copyEig2View(Polv, ptrPol.data(), jwRes);
          }, vec, TorVarv, PolVarv);
 
-      /// Call graph
+
+      // Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
+      // // Compute backward transform
+      // this->updatePhysical(it);
+
+      // // compute nonlinear interaction and forward transform
+      // this->updateSpectral(it);
+      // Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
+
+      Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
+      // Call graph
       std::visit(
          [&](auto& Tv, auto& Torv, auto& Polv)
          {
             mJitter->apply(Tv, Torv, Polv, Tv, Torv, Polv);
          }, tempVarv, TorVarv, PolVarv);
+      Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlNew");
 
       // Copy back
       std::visit(

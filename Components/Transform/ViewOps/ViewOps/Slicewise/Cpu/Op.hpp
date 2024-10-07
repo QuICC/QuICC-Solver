@@ -115,7 +115,7 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       ::QuICC::Internal::Array iweights;
       /// \todo template param
       ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-      quad.computeQuadrature(igrid, iweights, out.dims()[0]);
+      quad.computeQuadrature(igrid, iweights, out.dims()[2]);
 
       // setup view
       _gridData = std::move(Memory::MemBlock<typename Tout::ScalarType>(igrid.size(), _mem.get()));
