@@ -25,11 +25,16 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
         /// \todo check kind
         if (_isCpu)
         {
+            double scaling = 1.0;
+            if (op.getKind() == "buoyancy")
+            {
+                /// \todo set by Jitter
+                scaling = 3122;
+            }
             using namespace QuICC::Slicewise::Cpu;
             using namespace QuICC::Slicewise;
             using T = R_DCCSC3D_t;
             using op_t = Op<MulRFunctor<double>, T, T>;
-            double scaling = 1.0;
             _ops.push_back(std::make_unique<op_t>(_mem, MulRFunctor<double>(scaling)));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
