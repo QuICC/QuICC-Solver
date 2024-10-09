@@ -22,7 +22,8 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
         _thisArr.resize(index+1, nullptr);
     }
     if (_thisArr[index] == nullptr) {
-        /// \todo check kind
+        /// \todo check all kinds
+        /// \todo check type
         if (_isCpu)
         {
             double scaling = 1.0;
