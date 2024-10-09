@@ -24,8 +24,8 @@ func.func @entry(%R: tensor<?x?x?xf64>, %Theta: tensor<?x?x?xf64>, %Phi: tensor<
   %Phi2T = quiccir.transpose %Phi2 permutation = [2, 0, 1] : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 3 :i64, kind = "P"}
   %Phi3 = quiccir.jw.int %Phi2T : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 4 :i64, kind = "P"}
   // Pol
-  %tmp = quiccir.sub %Th3, %R3 : tensor<?x?x?xcomplex<f64>>, tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 5 :i64, kind = "P"}
-  %Pol = quiccir.add %tmp, %Phi3 : tensor<?x?x?xcomplex<f64>>, tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 6 :i64, kind = "P"}
+  %tmp = quiccir.sub %Th3, %R3 : tensor<?x?x?xcomplex<f64>>, tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 5 :i64}
+  %Pol = quiccir.add %tmp, %Phi3 : tensor<?x?x?xcomplex<f64>>, tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 6 :i64}
   return %Pol : tensor<?x?x?xcomplex<f64>>
 }
 

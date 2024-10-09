@@ -211,3 +211,56 @@ TEST_CASE("Cross Cpu Functor", "CrossCpuFunctor")
       CHECK(viewC0[i] == scaling * (viewU1[i] * viewV2[i] - viewU2[i] * viewV1[i]));
    }
 }
+
+TEST_CASE("Dot Cpu Functor", "DotCpuFunctor")
+{
+   auto constexpr S = 5;
+   // host mem block
+   QuICC::Memory::Cpu::NewDelete mem;
+   QuICC::Memory::MemBlock<double> memBlockU0(S, &mem);
+   QuICC::Memory::MemBlock<double> memBlockU1(S, &mem);
+   QuICC::Memory::MemBlock<double> memBlockU2(S, &mem);
+   QuICC::Memory::MemBlock<double> memBlockV0(S, &mem);
+   QuICC::Memory::MemBlock<double> memBlockV1(S, &mem);
+   QuICC::Memory::MemBlock<double> memBlockV2(S, &mem);
+   QuICC::Memory::MemBlock<double> memBlockOut(S, &mem);
+
+   // view in
+   using view_t = ViewBase<double>;
+   view_t viewU0(memBlockU0.data(), memBlockU0.size());
+   view_t viewU1(memBlockU1.data(), memBlockU1.size());
+   view_t viewU2(memBlockU2.data(), memBlockU2.size());
+   view_t viewV0(memBlockV0.data(), memBlockV0.size());
+   view_t viewV1(memBlockV1.data(), memBlockV1.size());
+   view_t viewV2(memBlockV2.data(), memBlockV2.size());
+
+   // view Dot
+   view_t viewOut(memBlockOut.data(), memBlockOut.size());
+   // init
+   for (std::uint64_t i = 0; i < S; ++i)
+   {
+      viewU0[i] = 1.6;
+      viewU1[i] = 2.5;
+      viewU2[i] = 3.4;
+      viewV0[i] = 4.3;
+      viewV1[i] = 5.2;
+      viewV2[i] = 6.1;
+   }
+
+   // Dot
+   double scaling = 0.25;
+   using namespace QuICC::Pointwise::Cpu;
+   using namespace QuICC::Pointwise;
+   auto addOp =
+      std::make_unique<Op<DotFunctor<double>, view_t, view_t, view_t, view_t, view_t, view_t, view_t>>(
+         DotFunctor<double>(scaling));
+
+   addOp->apply(viewOut, viewU0, viewU1, viewU2, viewV0, viewV1, viewV2);
+
+   // check
+   for (std::uint64_t i = 0; i < S; ++i)
+   {
+      CHECK(viewOut[i] == scaling * (viewU0[i] * viewV0[i]
+      + viewU1[i] * viewV1[i] + viewU2[i] * viewV2[i]));
+   }
+}

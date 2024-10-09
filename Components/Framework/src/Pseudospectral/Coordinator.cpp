@@ -906,21 +906,19 @@ namespace details
 
          Eigen::Ref<Eigen::Matrix<SCALAR, -1, -1>> outB = eig.block(0, start, outRows, cols);
 
-         #ifdef QUICC_JW_ROW_MAJOR
          for (std::int64_t j = 0; j < outB.cols(); ++j)
          {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
             {
-               // copy padded to flattened column and transpose
-               outB.data()[i+j*eig.rows()]= view[offSet + i*outB.cols()+j];
-            }
+               #ifdef QUICC_JW_ROW_MAJOR
+               // copy padded from flattened column and transpose
+               outB.data()[i+j*eig.rows()] = view[offSet + i*outB.cols()+j];
+               #else
+               // copy padded from flattened column
+               outB.data()[i+j*eig.rows()] = view[offSet + i+j*outB.rows()];
+               #endif
+           }
          }
-         #else
-         for (std::int64_t i = 0; i < outB.size(); ++i)
-         {
-            outB.data()[i] = view[offSet + i];
-         }
-         #endif
 
          offSet += outB.size();
          start += cols;
@@ -959,13 +957,13 @@ namespace details
          }, vec, TorVarv, PolVarv);
 
 
-      // Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
-      // // Compute backward transform
-      // this->updatePhysical(it);
+      Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
+      // Compute backward transform
+      this->updatePhysical(it);
 
-      // // compute nonlinear interaction and forward transform
-      // this->updateSpectral(it);
-      // Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
+      // compute nonlinear interaction and forward transform
+      this->updateSpectral(it);
+      Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
 
       Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
       // Call graph
@@ -981,6 +979,7 @@ namespace details
          [&](auto&& p, auto& Tv)
          {
             auto ptrTemp = p->rDom(0).perturbation();
+            ptrTemp.rData().setZero();
             details::copyView2Eig(ptrTemp.rData(), Tv, jwRes);
          }, temp, tempVarv);
 
@@ -988,8 +987,10 @@ namespace details
          [&](auto&& p, auto& Torv, auto& Polv)
          {
             auto ptrTor = p->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR);
+            ptrTor.rData().setZero();
             details::copyView2Eig(ptrTor.rData(), Torv, jwRes);
             auto ptrPol = p->rDom(0).perturbation().comp(FieldComponents::Spectral::POL);
+            ptrPol.rData().setZero();
             details::copyView2Eig(ptrPol.rData(), Polv, jwRes);
          }, vec, TorVarv, PolVarv);
    }
