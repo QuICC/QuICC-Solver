@@ -203,10 +203,18 @@ void builder(Tview opView, const Evector<Tdata>& grid,
       scaling = Evector<ScalarType>::LinSpaced(L, 0, L - 1);
       scaling = scaling.array() * (scaling.array() + 1.0);
    }
-   else if constexpr (LlDiff != 0)
+   else if constexpr (LlDiff > 0)
    {
       auto L = opView.dims()[LIdx];
       scaling = Evector<ScalarType>::LinSpaced(L, 0, L - 1);
+      scaling = (scaling.array() * (scaling.array() + 1.0)).pow(LlDiff);
+   }
+   else if constexpr (LlDiff < 0)
+   {
+      auto L = opView.dims()[LIdx];
+      scaling = Evector<ScalarType>::LinSpaced(L, 0, L - 1);
+      // avoid division by zero
+      scaling[0] = L*std::numeric_limits<ScalarType>::epsilon();
       scaling = (scaling.array() * (scaling.array() + 1.0)).pow(LlDiff);
    }
 
