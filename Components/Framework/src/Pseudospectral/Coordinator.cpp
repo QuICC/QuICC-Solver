@@ -251,7 +251,8 @@ namespace Pseudospectral {
       meta.push_back({metaJW.ptr.data(), metaJW.ptr.size()});
       meta.push_back({metaJW.idx.data(), metaJW.idx.size()});
 
-      mJitter = std::make_unique<QuICC::Graph::Jit<3>>(graphStr, mMemRsr, physDims, modsDims, layOpt, Graph::Stage::MMM, Graph::Stage::MMM, meta);
+      // Wrapper pass options
+      std::vector<std::vector<std::int64_t>> dimRets;
 
       // Modal space (aka JW space, Stage::PMM and Stage::MMM, QuICC Stage0)
       std::array<View::ViewBase<std::uint32_t>, dim> pointersMods;
@@ -289,8 +290,51 @@ namespace Pseudospectral {
 
                // Store view
                mId2View[fId] = view;
+
+               // Return dimensions
+               // mlir has layer first
+               dimRets.push_back({dims[2], dims[0], dims[1]});
             }
          }, scalarVarPtr);
+
+      // Physical space (aka FT space, Stage::PPP and Stage::MPP, QuICC Stage2)
+      std::array<View::ViewBase<std::uint32_t>, dim> pointersPhys;
+      pointersPhys[1] = View::ViewBase<std::uint32_t>(metaFT.ptr.data(), metaFT.ptr.size());
+      std::array<View::ViewBase<std::uint32_t>, dim> indicesPhys;
+      indicesPhys[1] = View::ViewBase<std::uint32_t>(metaFT.idx.data(), metaFT.idx.size());
+
+      // Add Views for physical space
+      /// \todo move cfl computation into graph and
+      /// don't store physical space
+
+      std::vector<size_t> physFields = {FieldComponents::Physical::R,
+      FieldComponents::Physical::THETA, FieldComponents::Physical::PHI};
+
+      for (size_t f = 0; f < physFields.size(); ++f)
+      {
+         using fld_t = MHDFloat;
+
+         // Field Id
+         auto fId = physFields[f];
+
+         // Host mem block
+         Memory::MemBlock<fld_t> block(physDims[2]*indicesPhys[1].size(), mMemRsr.get());
+
+         // Host view
+         // for now this works only for FT space
+         std::array<std::uint32_t, dim> dims {physDims[2], physDims[1], physDims[0]};
+         View::View<fld_t, View::DCCSC3D> view(block.data(), block.size(), dims.data(), pointersPhys.data(), indicesPhys.data());
+
+         // Store block
+         mBlocksData.push_back(std::move(block));
+
+         // Store view
+         mId2View[fId] = view;
+
+         // Return dimensions
+         // mlir has layer first
+         dimRets.push_back({dims[2], dims[0], dims[1]});
+      }
 
       // Store meta blocks
       mBlocksMeta.push_back(std::move(metaFT.ptr));
@@ -299,6 +343,11 @@ namespace Pseudospectral {
       mBlocksMeta.push_back(std::move(metaAL.idx));
       mBlocksMeta.push_back(std::move(metaJW.ptr));
       mBlocksMeta.push_back(std::move(metaJW.idx));
+
+      // Jitter
+      Graph::PipelineOptions opt;
+      opt.wrap.dimRets = dimRets;
+      mJitter = std::make_unique<QuICC::Graph::Jit<3>>(graphStr, mMemRsr, physDims, modsDims, layOpt, Graph::Stage::MMM, Graph::Stage::MMM, meta, opt);
    };
 
    Coordinator::ScalarEquation_range Coordinator::scalarRange(const std::size_t eqId, const int it)
@@ -958,23 +1007,29 @@ namespace details
 
 
       Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
-      // Compute backward transform
-      this->updatePhysical(it);
+      // // Compute backward transform
+      // this->updatePhysical(it);
 
-      // compute nonlinear interaction and forward transform
-      this->updateSpectral(it);
+      // // compute nonlinear interaction and forward transform
+      // this->updateSpectral(it);
       Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
+
+      auto UrVarv = mId2View[FieldComponents::Physical::R];
+      auto UthetaVarv = mId2View[FieldComponents::Physical::THETA];
+      auto UphiVarv = mId2View[FieldComponents::Physical::PHI];
 
       Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
       // Call graph
       std::visit(
-         [&](auto& Tv, auto& Torv, auto& Polv)
+         [&](auto& Tv, auto& Torv, auto& Polv, auto& Urv, auto& Uthetav, auto& Uphiv)
          {
-            mJitter->apply(Tv, Torv, Polv, Tv, Torv, Polv);
-         }, tempVarv, TorVarv, PolVarv);
+            mJitter->apply(Tv, Torv, Polv,
+            Urv, Uthetav, Uphiv,
+            Tv, Torv, Polv);
+         }, tempVarv, TorVarv, PolVarv, UrVarv, UthetaVarv, UphiVarv);
       Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlNew");
 
-      // Copy back
+      // Copy back spectral coeff
       std::visit(
          [&](auto&& p, auto& Tv)
          {
@@ -993,6 +1048,20 @@ namespace details
             ptrPol.rData().setZero();
             details::copyView2Eig(ptrPol.rData(), Polv, jwRes);
          }, vec, TorVarv, PolVarv);
+
+      // Copy back physical vel for cfl computation
+      /// \todo move cfl comp in graph and remove
+      const auto& ftRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA3D);
+      std::visit(
+         [&](auto&& p, auto& Urv, auto& Uthetav, auto& Uphiv)
+         {
+            auto ptrUr = p->rDom(0).rPhys().comp(FieldComponents::Physical::R);
+            details::copyView2Eig(ptrUr.rData(), Urv, ftRes);
+            auto ptrUtheta = p->rDom(0).rPhys().comp(FieldComponents::Physical::THETA);
+            details::copyView2Eig(ptrUtheta.rData(), Uthetav, ftRes);
+            auto ptrUphi = p->rDom(0).rPhys().comp(FieldComponents::Physical::PHI);
+            details::copyView2Eig(ptrUphi.rData(), Uphiv, ftRes);
+         }, vec, UrVarv, UthetaVarv, UphiVarv);
    }
 
    void Coordinator::explicitTrivialEquations(const std::size_t opId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)

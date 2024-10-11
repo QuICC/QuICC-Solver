@@ -56,6 +56,13 @@ ViewDescriptor<T, std::uint32_t, 3> getViewDescriptor(View::View<T, ATT> view)
     view.data(), (std::uint32_t)view.size()};
 }
 
+/// @brief collection of pass options used in the
+/// lowering pipeline
+struct PipelineOptions {
+    /// @brief Wrapper pass options
+    mlir::quiccir::QuiccirViewWrapperOptions wrap;
+};
+
 /// @brief classe to setup and JIT the mlir graph
 /// @tparam RANK spatial dimensions
 template <std::uint32_t RANK = 3u>
@@ -82,6 +89,9 @@ private:
     /// (4, 5) -> stage 2
     std::array<MemRefDescriptor<std::uint32_t, 1>*, 6> _metaMap;
     std::array<MemRefDescriptor<std::uint32_t, 1>, 6> _metaStore;
+
+    /// @brief storage for pipeline pass options
+    PipelineOptions _opt;
 
     /// @brief register needed MLIR dialects
     void setDialects();
@@ -146,7 +156,7 @@ public:
     }
 
     /// @brief Setup Graph from string
-    /// @param modStr
+    /// @param modStr string describing mlir module
     /// @param mem memory resource
     /// @param physDims physical dimensions
     /// order v012, RThetaPhi
@@ -162,10 +172,11 @@ public:
         const std::array<std::uint32_t, RANK> modsDims,
         const std::array<std::array<std::string, 2>, RANK> layOpt,
         const Stage outStage, const Stage inStage,
-        const std::vector<View::ViewBase<std::uint32_t>>& meta);
+        const std::vector<View::ViewBase<std::uint32_t>>& meta,
+        const PipelineOptions options = PipelineOptions());
 
     /// @brief Setup Graph from source file
-    /// @param sourceMgr
+    /// @param sourceMgr source manager containing mlir module
     /// @param mem memory resource
     /// @param physDims physical dimensions
     /// order v012, RThetaPhi
@@ -181,17 +192,15 @@ public:
         const std::array<std::uint32_t, RANK> modsDims,
         const std::array<std::array<std::string, 2>, RANK> layOpt,
         const Stage outStage, const Stage inStage,
-        const std::vector<View::ViewBase<std::uint32_t>>& meta);
+        const std::vector<View::ViewBase<std::uint32_t>>& meta,
+        const PipelineOptions options = PipelineOptions());
 
     /// @brief Apply graph
     /// Catch all, supposed to fail
     /// @tparam Targs...
     /// @param args
     template <class... Targs>
-    void apply(Targs...)
-    {
-        throw std::logic_error("Graph::apply not implemented");
-    }
+    void apply(Targs...);
 
     /// @brief Apply graph
     /// 1 input, 1 output
@@ -218,11 +227,29 @@ public:
     /// @tparam Trets
     /// @tparam Targs
     /// @param ret0V
+    /// @param ret1V
+    /// @param ret2V
     /// @param arg0V
     /// @param arg1V
     /// @param arg2V
     template <class Trets, class Targs>
     void apply(Trets ret0V, Trets ret1V, Trets ret2V, Targs arg0V, Targs arg1V, Targs arg2V);
+
+    /// @brief Apply graph
+    /// 3 inputs, 3+3 outputs
+    /// @tparam Trets
+    /// @tparam Targs
+    /// @param retTyOne0V
+    /// @param retTyOne1V
+    /// @param retTyOne2V
+    /// @param arg0V
+    /// @param arg1V
+    /// @param arg2V
+    template <class TyOnerets, class TyTworets, class Targs>
+    void apply(
+        TyOnerets retTyOne0V, TyOnerets retTyOne1V, TyOnerets retTyOne2V,
+        TyTworets retTyTwo0V, TyTworets retTyTwo1V, TyTworets retTyTwo2V,
+        Targs arg0V, Targs arg1V, Targs arg2V);
 };
 
 template <std::uint32_t RANK>
@@ -255,9 +282,9 @@ template <std::uint32_t RANK>
 void setOpt(const std::array<std::uint32_t, RANK> physDims,
     const std::array<std::uint32_t, RANK> modsDims,
     const std::array<std::array<std::string, 2>, RANK> layout,
-    const Stage stage, std::array<std::int64_t, RANK>& dim, std::string& lay)
+    const Stage stage, std::vector<std::int64_t>& dim, std::string& lay)
 {
-
+    dim.resize(RANK);
     switch(stage)
     {
         /// MLIR convention has layer first!
@@ -316,16 +343,22 @@ void Jit<RANK>::insertWrapper(const std::array<std::uint32_t, RANK> physDims,
     // Inline and insert wrapper
     mlir::PassManager pmPre(&_ctx);
     pmPre.addPass(mlir::createInlinerPass());
-    mlir::quiccir::QuiccirViewWrapperOptions opt;
 
-    std::array<std::int64_t, RANK> dimArgs;
-    details::setOpt<RANK>(physDims, modsDims, lay, inStage, dimArgs, opt.layArgs);
-    opt.dimArgs = dimArgs;
-    std::array<std::int64_t, RANK> dimRets;
-    details::setOpt<RANK>(physDims, modsDims, lay, outStage, dimRets, opt.layRets);
-    opt.dimRets = dimRets;
+    std::vector<std::vector<std::int64_t>> dimArgs(1);
+    std::vector<std::string> layArgs(1);
+    details::setOpt<RANK>(physDims, modsDims, lay, inStage, dimArgs[0], layArgs[0]);
+    _opt.wrap.dimArgs = dimArgs;
+    _opt.wrap.layArgs = layArgs;
+    std::vector<std::vector<std::int64_t>> dimRets(1);
+    std::vector<std::string> layRets(1);
+    details::setOpt<RANK>(physDims, modsDims, lay, outStage, dimRets[0], layRets[0]);
+    if (_opt.wrap.dimRets.size() == 0)
+    {
+        _opt.wrap.dimRets = dimRets;
+    }
+    _opt.wrap.layRets = layRets;
 
-    pmPre.addPass(mlir::quiccir::createViewWrapperPass(opt));
+    pmPre.addPass(mlir::quiccir::createViewWrapperPass(_opt.wrap));
 
     if (mlir::failed(pmPre.run(*_module))) {
         throw std::runtime_error("Failed to insert wrapper.");
@@ -465,7 +498,8 @@ Jit<RANK>::Jit(const std::string modStr,
     const std::array<std::uint32_t, RANK> modsDims,
     const std::array<std::array<std::string, 2>, RANK> layOpt,
     const Stage outStage, const Stage inStage,
-    const std::vector<View::ViewBase<std::uint32_t>>& meta)
+    const std::vector<View::ViewBase<std::uint32_t>>& meta,
+    const PipelineOptions options) : _opt(options)
 {
     setDialects();
     // Load module
@@ -484,7 +518,8 @@ Jit<RANK>::Jit(const llvm::SourceMgr sourceMgr,
     const std::array<std::uint32_t, RANK> modsDims,
     const std::array<std::array<std::string, 2>, RANK> layOpt,
     const Stage outStage, const Stage inStage,
-    const std::vector<View::ViewBase<std::uint32_t>>& meta)
+    const std::vector<View::ViewBase<std::uint32_t>>& meta,
+    const PipelineOptions options) : _opt(options)
 {
     setDialects();
     // Load module
@@ -509,6 +544,13 @@ void Jit<RANK>::setWrappers(const std::shared_ptr<Memory::memory_resource> mem,
     setLayout(layOpt);
     setMap(mem);
     setMeta(meta);
+}
+
+template <std::uint32_t RANK>
+template <class... Targs>
+void Jit<RANK>::apply(Targs...)
+{
+    throw std::logic_error("Graph::apply not implemented");
 }
 
 template <std::uint32_t RANK>
@@ -575,6 +617,46 @@ void Jit<RANK>::apply(Trets ret0V, Trets ret1V, Trets ret2V, Targs arg0V, Targs 
         ))_funSym;
     fun(_metaMap.data(), thisArr.data(),
         &ret0, &ret1, &ret2,
+        &arg0, &arg1, &arg2);
+
+}
+
+template <std::uint32_t RANK>
+template <class TyOnerets, class TyTworets, class Targs>
+void Jit<RANK>::apply(
+    TyOnerets retTyOne0V, TyOnerets retTyOne1V, TyOnerets retTyOne2V,
+    TyTworets retTyTwo0V, TyTworets retTyTwo1V, TyTworets retTyTwo2V,
+    Targs arg0V, Targs arg1V, Targs arg2V)
+{
+    // Map view to MLIR view descritor
+    auto arg0 = getViewDescriptor(arg0V);
+    auto arg1 = getViewDescriptor(arg1V);
+    auto arg2 = getViewDescriptor(arg2V);
+    auto ret0 = getViewDescriptor(retTyOne0V);
+    auto ret1 = getViewDescriptor(retTyOne1V);
+    auto ret2 = getViewDescriptor(retTyOne2V);
+    auto ret3 = getViewDescriptor(retTyTwo0V);
+    auto ret4 = getViewDescriptor(retTyTwo1V);
+    auto ret5 = getViewDescriptor(retTyTwo2V);
+
+    // Get operators map
+    auto thisArr = _storeOp.getThisArr();
+
+    // Apply graph
+    auto fun = (void (*)(void*, void*,
+        decltype(ret0)*,
+        decltype(ret1)*,
+        decltype(ret2)*,
+        decltype(ret3)*,
+        decltype(ret4)*,
+        decltype(ret5)*,
+        decltype(arg0)*,
+        decltype(arg1)*,
+        decltype(arg2)*
+        ))_funSym;
+    fun(_metaMap.data(), thisArr.data(),
+        &ret0, &ret1, &ret2,
+        &ret3, &ret4, &ret5,
         &arg0, &arg1, &arg2);
 
 }

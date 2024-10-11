@@ -86,7 +86,7 @@ namespace Transform {
 #ifdef QUICC_HAS_CUDA_BACKEND
       using backend_t = Poly::Worland::viewGpu_t;
 #else
-      using backend_t = Poly::Worland::base_t;
+      using backend_t = Poly::Worland::viewCpu_t;
 #endif
 
       // Create projectors
@@ -110,18 +110,18 @@ namespace Transform {
       this->addOperator<Poly::Worland::Integrator::I4DivR1_Zero<backend_t>>(m, Forward::I4Q::id());
       this->addOperator<Poly::Worland::Integrator::I4DivR1D1R1_Zero<backend_t>>(m, Forward::I4S::id());
 
-      // Create reductors
-      this->addOperator<Poly::Worland::Reductor::EnergySLaplR2<backend_t>>(m, Reductor::EnergySlaplR2::id());
-      this->addOperator<Poly::Worland::Reductor::EnergyD1R1<backend_t>>(m, Reductor::EnergyD1R1::id());
-      this->addOperator<Poly::Worland::Reductor::EnergyR2<backend_t>>(m, Reductor::EnergyR2::id());
-      this->addOperator<Poly::Worland::Reductor::Energy<backend_t>>(m, Reductor::Energy::id());
-      this->addOperator<Poly::Worland::Reductor::PowerSLaplR2<backend_t>>(m, Reductor::PowerSlaplR2::id());
-      this->addOperator<Poly::Worland::Reductor::PowerD1R1<backend_t>>(m, Reductor::PowerD1R1::id());
-      this->addOperator<Poly::Worland::Reductor::PowerR2<backend_t>>(m, Reductor::PowerR2::id());
-      this->addOperator<Poly::Worland::Reductor::Power<backend_t>>(m, Reductor::Power::id());
-      this->addOperator<Poly::Worland::Reductor::RadialPower<backend_t>>(m, Reductor::RadialPower::id());
-      this->addOperator<Poly::Worland::Reductor::RadialPowerDivR1<backend_t>>(m, Reductor::RadialPowerOverr1::id());
-      this->addOperator<Poly::Worland::Reductor::RadialPowerDivR1D1R1<backend_t>>(m, Reductor::RadialPowerOverr1D1R1::id());
+      using backendRed_t = Poly::Worland::base_t;
+      this->addOperator<Poly::Worland::Reductor::EnergySLaplR2<backendRed_t>>(m, Reductor::EnergySlaplR2::id());
+      this->addOperator<Poly::Worland::Reductor::EnergyD1R1<backendRed_t>>(m, Reductor::EnergyD1R1::id());
+      this->addOperator<Poly::Worland::Reductor::EnergyR2<backendRed_t>>(m, Reductor::EnergyR2::id());
+      this->addOperator<Poly::Worland::Reductor::Energy<backendRed_t>>(m, Reductor::Energy::id());
+      this->addOperator<Poly::Worland::Reductor::PowerSLaplR2<backendRed_t>>(m, Reductor::PowerSlaplR2::id());
+      this->addOperator<Poly::Worland::Reductor::PowerD1R1<backendRed_t>>(m, Reductor::PowerD1R1::id());
+      this->addOperator<Poly::Worland::Reductor::PowerR2<backendRed_t>>(m, Reductor::PowerR2::id());
+      this->addOperator<Poly::Worland::Reductor::Power<backendRed_t>>(m, Reductor::Power::id());
+      this->addOperator<Poly::Worland::Reductor::RadialPower<backendRed_t>>(m, Reductor::RadialPower::id());
+      this->addOperator<Poly::Worland::Reductor::RadialPowerDivR1<backendRed_t>>(m, Reductor::RadialPowerOverr1::id());
+      this->addOperator<Poly::Worland::Reductor::RadialPowerDivR1D1R1<backendRed_t>>(m, Reductor::RadialPowerOverr1D1R1::id());
    }
 
 }
