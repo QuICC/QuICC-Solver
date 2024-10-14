@@ -11,14 +11,10 @@
 using namespace QuICC::Graph;
 
 /// @brief C Interface to MLIR for a mul const operator
-/// @param obj
-/// @param pRet
-/// @param pU0
-/// @param pU1
-/// @param pU2
-/// @param pV0
-/// @param pV1
-/// @param pV2
+/// cpu backend
+/// @param obj pointer to operator implementation
+/// @param pRet product
+/// @param pRhs non constant vector
 extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_cpu(void* obj,
     ViewDescriptor<double, std::uint32_t, 3>* pRet,
     ViewDescriptor<double, std::uint32_t, 3>* pRhs)
@@ -52,9 +48,9 @@ extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_cpu(v
 #ifdef QUICC_HAS_CUDA_BACKEND
 /// @brief C Interface to MLIR for a binary mul const operator
 /// gpu backend
-/// @param obj
-/// @param pRet
-/// @param pRhs
+/// @param obj pointer to operator implementation
+/// @param pRet product
+/// @param pRhs non constant vector
 extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_gpu(void* obj,
     ViewDescriptor<double, std::uint32_t, 3>* pRet,
     ViewDescriptor<double, std::uint32_t, 3>* pRhs)
@@ -67,8 +63,8 @@ extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_gpu(v
     assert(pRet != nullptr);
     assert(pRhs != nullptr);
     // op
-    using namespace QuICC::Pointwise::Cuda;
-    using namespace QuICC::Pointwise;
+    using namespace QuICC::Slicewise::Cuda;
+    using namespace QuICC::Slicewise;
     using T = QuICC::View::View<double, QuICC::View::DCCSC3D>;
     using op_t = Op<MulRFunctor<double>, T, T>;
     // views
@@ -87,36 +83,32 @@ extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_gpu(v
 #endif
 
 /// @brief C Interface to MLIR for a mul const operator
-/// @param op
-/// @param uval
-/// @param umod
-extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D(void* obj, view3_cd_t* pUmod, view3_t* pUval)
+/// @param obj pointer to operator implementation
+/// @param pRet product
+/// @param pRhs non constant vector
+extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D(void* obj, view3_cd_t* pRet, view3_t* pRhs)
 {
     #ifdef QUICC_HAS_CUDA_BACKEND
-    assert(pUval != nullptr);
-    if (!QuICC::Cuda::isDeviceMemory(pUval->data))
+    assert(pRhs != nullptr);
+    if (!QuICC::Cuda::isDeviceMemory(pRhs->data))
     {
-        assert(!QuICC::Cuda::isDeviceMemory(pUmod->data));
-        _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_cpu(obj, pUmod, pUval);
+        assert(!QuICC::Cuda::isDeviceMemory(pRet->data));
+        _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_cpu(obj, pRet, pRhs);
     }
     else
     {
-        _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_gpu(obj, pUmod, pUval);
+        _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_gpu(obj, pRet, pRhs);
     }
     #else
-    _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_cpu(obj, pUmod, pUval);
+    _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_cpu(obj, pRet, pRhs);
     #endif
 }
 
 /// @brief C Interface to MLIR for a mul const operator
-/// @param obj
-/// @param pRet
-/// @param pU0
-/// @param pU1
-/// @param pU2
-/// @param pV0
-/// @param pV1
-/// @param pV2
+/// cpu backend
+/// @param obj pointer to operator implementation
+/// @param pRet product
+/// @param pRhs non constant vector
 extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D(void* obj,
     ViewDescriptor<double, std::uint32_t, 3>* pRet,
     ViewDescriptor<double, std::uint32_t, 3>* pRhs)
@@ -148,11 +140,11 @@ extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D(void
 };
 
 #ifdef QUICC_HAS_CUDA_BACKEND
-/// @brief C Interface to MLIR for a binary mul const operator
+/// @brief C Interface to MLIR for a mul const operator
 /// gpu backend
-/// @param obj
-/// @param pRet
-/// @param pRhs
+/// @param obj pointer to operator implementation
+/// @param pRet product
+/// @param pRhs non constant vector
 extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_gpu(void* obj,
     ViewDescriptor<double, std::uint32_t, 3>* pRet,
     ViewDescriptor<double, std::uint32_t, 3>* pRhs)
@@ -165,8 +157,8 @@ extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_gpu(
     assert(pRet != nullptr);
     assert(pRhs != nullptr);
     // op
-    using namespace QuICC::Pointwise::Cuda;
-    using namespace QuICC::Pointwise;
+    using namespace QuICC::Slicewise::Cuda;
+    using namespace QuICC::Slicewise;
     using T = QuICC::View::View<double, QuICC::View::DCCSC3D>;
     using op_t = Op<MulRFunctor<double>, T, T>;
     // views
@@ -185,23 +177,23 @@ extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_gpu(
 #endif
 
 /// @brief C Interface to MLIR for a mul const operator
-/// @param op
-/// @param uval
-/// @param umod
-extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D(void* obj, view3_cd_t* pUmod, view3_t* pUval)
+/// @param obj pointer to operator implementation
+/// @param pRet product
+/// @param pRhs non constant vector
+extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D(void* obj, view3_t* pRet, view3_t* pRhs)
 {
     #ifdef QUICC_HAS_CUDA_BACKEND
-    assert(pUval != nullptr);
-    if (!QuICC::Cuda::isDeviceMemory(pUval->data))
+    assert(pRhs != nullptr);
+    if (!QuICC::Cuda::isDeviceMemory(pRhs->data))
     {
-        assert(!QuICC::Cuda::isDeviceMemory(pUmod->data));
-        _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_cpu(obj, pUmod, pUval);
+        assert(!QuICC::Cuda::isDeviceMemory(pRet->data));
+        _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_cpu(obj, pRet, pRhs);
     }
     else
     {
-        _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_gpu(obj, pUmod, pUval);
+        _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_gpu(obj, pRet, pRhs);
     }
     #else
-    _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_cpu(obj, pUmod, pUval);
+    _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_cpu(obj, pRet, pRhs);
     #endif
 }
