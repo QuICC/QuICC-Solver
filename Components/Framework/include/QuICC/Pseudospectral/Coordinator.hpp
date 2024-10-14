@@ -191,6 +191,7 @@ namespace Pseudospectral {
 
          /**
           * @brief Add graph description to solver
+          * @param graphStr graph description
           */
          void addGraph(const std::string& graphStr);
 
