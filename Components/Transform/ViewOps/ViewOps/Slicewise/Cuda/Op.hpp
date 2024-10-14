@@ -14,7 +14,8 @@
 // Project includes
 //
 #include "Operator/Nary.hpp"
-#include "Profiler/Interface.hpp"
+#include "Memory/MemoryResource.hpp"
+#include "Memory/Memory.hpp"
 
 namespace QuICC {
 /// @brief namespace for Pointwise type operations
@@ -40,7 +41,7 @@ public:
    /// @brief capture functor by value
    /// @param f functor, i.e. struct with method
    /// Tout::ScalarType operator()(Targs::ScalarType var, ...)
-   Op(Functor f) : _f(f){};
+   Op(Functor f, std::shared_ptr<Memory::memory_resource> mem) : _f(f), _mem(mem){};
    /// @brief default constructor
    Op() = delete;
    /// @brief dtor
@@ -53,6 +54,26 @@ private:
    void applyImpl(Tout& out, const Targs&... args);
    /// @brief give access to base class
    friend NaryBaseOp<Op<Functor, Tout, Targs...>, Tout, Targs...>;
+   /// @brief memory resource
+   /// needs shared ptr for memory pools
+   /// note, this must call the dtor last
+   /// otherwise we cannot dealloc data
+   /// \todo consider removing shared ptr and using singleton
+   std::shared_ptr<Memory::memory_resource> _mem;
+   /// @brief index typedef
+   using IndexType = typename Tout::IndexType;
+   /// @brief layer index cache
+   Memory::MemBlock<IndexType> _layerIndex;
+   /// @brief layer width cache
+   Memory::MemBlock<IndexType> _layerWidth;
+   /// @brief max layer width cache
+   std::uint32_t _N;
+   /// @brief matrix offset cache
+   Memory::MemBlock<IndexType> _offSet;
+   /// @brief Scalar typedef
+   using ScalarType = typename Tout::ScalarType;
+   /// @brief reduced grid (only populated layers)
+   Memory::MemBlock<ScalarType> _grid;
 };
 
 } // namespace Cuda
