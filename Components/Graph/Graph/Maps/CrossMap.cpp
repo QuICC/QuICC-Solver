@@ -22,14 +22,14 @@ void MapOps::setCross(mlir::quiccir::CrossOp op)
         _thisArr.resize(index+1, nullptr);
     }
     if (_thisArr[index] == nullptr) {
+        using namespace QuICC::Pointwise;
+        using T = R_DCCSC3D_t;
+        using op_t =  Op<CrossCompFunctor<double>, T, T, T, T, T>;
+        double scaling = 1.0;
         /// \todo check kind
         if (_isCpu)
         {
             using namespace QuICC::Pointwise::Cpu;
-            using namespace QuICC::Pointwise;
-            using T = R_DCCSC3D_t;
-            using op_t =  Op<CrossCompFunctor<double>, T, T, T, T, T>;
-            double scaling = 1.0;
             _ops.push_back(std::make_unique<op_t>(CrossCompFunctor<double>(scaling)));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T, T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
@@ -39,11 +39,8 @@ void MapOps::setCross(mlir::quiccir::CrossOp op)
         else
         {
             using namespace QuICC::Pointwise::Cuda;
-            using namespace QuICC::Pointwise;
-            using T = R_DCCSC3D_t;
-            using op_t = Op<CrossCompFunctor<double>, T, T, T, T, T>;
-            _ops.push_back(std::make_unique<op_t>(CrossCompFunctor<double>()));
-            auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T>>>(_ops.back()).get();
+            _ops.push_back(std::make_unique<op_t>(CrossCompFunctor<double>(scaling)));
+            auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T, T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
         }

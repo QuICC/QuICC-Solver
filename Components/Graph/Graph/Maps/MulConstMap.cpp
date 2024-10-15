@@ -22,20 +22,20 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
         _thisArr.resize(index+1, nullptr);
     }
     if (_thisArr[index] == nullptr) {
+        using T = R_DCCSC3D_t;
+        using namespace QuICC::Slicewise;
+        using op_t = Op<MulRFunctor<double>, T, T>;
+        double scaling = 1.0;
+        if (op.getKind() == "buoyancy")
+        {
+            /// \todo set by Jitter
+            scaling = 3122;
+        }
         /// \todo check all kinds
         /// \todo check type
         if (_isCpu)
         {
-            double scaling = 1.0;
-            if (op.getKind() == "buoyancy")
-            {
-                /// \todo set by Jitter
-                scaling = 3122;
-            }
             using namespace QuICC::Slicewise::Cpu;
-            using namespace QuICC::Slicewise;
-            using T = R_DCCSC3D_t;
-            using op_t = Op<MulRFunctor<double>, T, T>;
             _ops.push_back(std::make_unique<op_t>(_mem, MulRFunctor<double>(scaling)));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
@@ -45,11 +45,8 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
         else
         {
             using namespace QuICC::Slicewise::Cuda;
-            using namespace QuICC::Slicewise;
-            using T = R_DCCSC3D_t;
-            using op_t = Op<MulRFunctor<double>, T, T>;
-            _ops.push_back(std::make_unique<op_t>(MulConstCompFunctor<double>()));
-            auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T>>>(_ops.back()).get();
+            _ops.push_back(std::make_unique<op_t>(_mem, MulRFunctor<double>(scaling)));
+            auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
         }

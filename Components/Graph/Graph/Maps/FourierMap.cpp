@@ -21,12 +21,12 @@ void MapOps::setFourierPrj(mlir::quiccir::FrPOp op)
         _thisArr.resize(index+1, nullptr);
     }
     if (_thisArr[index] == nullptr) {
+        using Tin = C_DCCSC3D_t;
+        using Tout = R_DCCSC3D_t;
         /// \todo check kind
         if (_isCpu)
         {
             using backend_t = viewCpu_t;
-            using Tin = C_DCCSC3D_t;
-            using Tout = R_DCCSC3D_t;
             using op_t = Mixed::OpsType<Tout, Tin, P_t, bwd_t, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
@@ -37,8 +37,6 @@ void MapOps::setFourierPrj(mlir::quiccir::FrPOp op)
         else
         {
             using backend_t = viewGpu_t;
-            using Tin = C_DCCSC3D_t;
-            using Tout = R_DCCSC3D_t;
             using op_t = Mixed::OpsType<Tout, Tin, P_t, bwd_t, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
@@ -63,11 +61,11 @@ void MapOps::setFourierInt(mlir::quiccir::FrIOp op)
         _thisArr.resize(index+1, nullptr);
     }
     if (_thisArr[index] == nullptr) {
+        using Tin = R_DCCSC3D_t;
+        using Tout = C_DCCSC3D_t;
         if (_isCpu)
         {
             using backend_t = viewCpu_t;
-            using Tin = R_DCCSC3D_t;
-            using Tout = C_DCCSC3D_t;
             //// \todo map each operator or split FFT and diff
             using op_t = Mixed::OpsType<Tout, Tin, P_t, fwd_t, backend_t>;
             _ops.push_back(std::make_unique<op_t>());
@@ -79,8 +77,6 @@ void MapOps::setFourierInt(mlir::quiccir::FrIOp op)
         else
         {
             using backend_t = viewGpu_t;
-            using Tin = R_DCCSC3D_t;
-            using Tout = C_DCCSC3D_t;
             using op_t = Mixed::OpsType<Tout, Tin, P_t, fwd_t, backend_t>;
             _ops.push_back(std::make_unique<op_t>());
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();

@@ -123,12 +123,11 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       // alloc
       _grid = std::move(QuICC::Memory::MemBlock<ScalarType>(nLayers, _mem.get()));
 
-      // setup views
+      // setup view
       ViewBase<IndexType> vGrid(_grid.data(), _grid.size());
 
-      // setup converters
-      tempOnHostMemorySpace converterO(vGrid, TransferMode::write);
-
+      // setup converter
+      tempOnHostMemorySpace converterG(vGrid, TransferMode::write);
 
       ::QuICC::Internal::Array igrid;
       ::QuICC::Internal::Array iweights;
