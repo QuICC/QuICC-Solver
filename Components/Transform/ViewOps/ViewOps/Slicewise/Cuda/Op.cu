@@ -163,33 +163,8 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       <<<numBlocks, blockSize>>>(layerIndex, offset, grid, _f, out, args...);
 }
 
-
 // Explicit instantiations
-// tests
-template class Op<SquareFunctor<double>, View::ViewBase<double>, View::ViewBase<double>>;
-template class Op<Abs2Functor<double>, View::ViewBase<double>, View::ViewBase<std::complex<double>>>;
-// JW
-template class Op<Abs2Functor<double>, View::View<double, View::DCCSC3DJIK>,
-   View::View<std::complex<double>, View::DCCSC3DJIK>>;
-// Add Mods
-template class Op<AddFunctor<cuda::std::complex<double>>,
-   View::ViewBase<cuda::std::complex<double>>,
-   View::ViewBase<cuda::std::complex<double>>,
-   View::ViewBase<cuda::std::complex<double>>>;
-template class Op<AddFunctor<cuda::std::complex<double>>,
-   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>,
-   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>,
-   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>>;
-// Sub Mods
-template class Op<SubFunctor<cuda::std::complex<double>>,
-   View::ViewBase<cuda::std::complex<double>>,
-   View::ViewBase<cuda::std::complex<double>>,
-   View::ViewBase<cuda::std::complex<double>>>;
-template class Op<SubFunctor<cuda::std::complex<double>>,
-   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>,
-   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>,
-   View::View<cuda::std::complex<double>, View::DCCSC3DJIK>>;
-
+template class Op<MulRFunctor<double>, double, double>;
 
 } // namespace Cuda
 } // namespace Slicewise
