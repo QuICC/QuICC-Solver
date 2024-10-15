@@ -92,9 +92,9 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@Mlir
 /// @param pLhs lhs scalar
 /// @param pRhs rhs scalar
 extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D(void* obj,
-    ViewDescriptor<double, std::uint32_t, 3>* pRet,
-    ViewDescriptor<double, std::uint32_t, 3>* pLhs,
-    ViewDescriptor<double, std::uint32_t, 3>* pRhs
+    ViewDescriptor<@Type@, std::uint32_t, 3>* pRet,
+    ViewDescriptor<@Type@, std::uint32_t, 3>* pLhs,
+    ViewDescriptor<@Type@, std::uint32_t, 3>* pRhs
     )
 {
     #ifdef QUICC_HAS_CUDA_BACKEND
@@ -103,13 +103,13 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@Mlir
     {
         assert(!QuICC::Cuda::isDeviceMemory(pLhs->data));
         assert(!QuICC::Cuda::isDeviceMemory(pRhs->data));
-        _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_cpu(obj, pRet, pLhs);
+        _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_cpu(obj, pRet, pLhs, pRhs);
     }
     else
     {
-        _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_gpu(obj, pRet, pLhs);
+        _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_gpu(obj, pRet, pLhs, pRhs);
     }
     #else
-    _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_cpu(obj, pRet, pLhs);
+    _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_cpu(obj, pRet, pLhs, pRhs);
     #endif
 }

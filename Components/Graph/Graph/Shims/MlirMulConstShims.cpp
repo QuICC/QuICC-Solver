@@ -86,7 +86,7 @@ extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_gpu(v
 /// @param obj pointer to operator implementation
 /// @param pRet product
 /// @param pRhs non constant vector
-extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D(void* obj, view3_cd_t* pRet, view3_t* pRhs)
+extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D(void* obj, view3_t* pRet, view3_t* pRhs)
 {
     #ifdef QUICC_HAS_CUDA_BACKEND
     assert(pRhs != nullptr);
@@ -109,13 +109,13 @@ extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D(void*
 /// @param obj pointer to operator implementation
 /// @param pRet product
 /// @param pRhs non constant vector
-extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D(void* obj,
+extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_cpu(void* obj,
     ViewDescriptor<double, std::uint32_t, 3>* pRet,
     ViewDescriptor<double, std::uint32_t, 3>* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D\n";
+        "_ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_cpu\n";
     #endif
     assert(obj != nullptr);
     assert(pRet != nullptr);

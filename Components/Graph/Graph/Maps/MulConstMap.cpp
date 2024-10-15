@@ -24,7 +24,6 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
     if (_thisArr[index] == nullptr) {
         using T = R_DCCSC3D_t;
         using namespace QuICC::Slicewise;
-        using op_t = Op<MulRFunctor<double>, T, T>;
         double scaling = 1.0;
         if (op.getKind() == "buoyancy")
         {
@@ -36,6 +35,7 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
         if (_isCpu)
         {
             using namespace QuICC::Slicewise::Cpu;
+            using op_t = Op<MulRFunctor<double>, T, T>;
             _ops.push_back(std::make_unique<op_t>(_mem, MulRFunctor<double>(scaling)));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
@@ -45,6 +45,7 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
         else
         {
             using namespace QuICC::Slicewise::Cuda;
+            using op_t = Op<MulRFunctor<double>, T, T>;
             _ops.push_back(std::make_unique<op_t>(_mem, MulRFunctor<double>(scaling)));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);

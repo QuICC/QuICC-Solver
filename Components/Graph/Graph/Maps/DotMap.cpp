@@ -24,12 +24,12 @@ void MapOps::setDot(mlir::quiccir::DotOp op)
     if (_thisArr[index] == nullptr) {
         using namespace QuICC::Pointwise;
         using T = R_DCCSC3D_t;
-        using op_t =  Op<DotFunctor<double>, T, T, T, T, T, T, T>;
         double scaling = 1.0;
         /// \todo check kind
         if (_isCpu)
         {
             using namespace QuICC::Pointwise::Cpu;
+            using op_t =  Op<DotFunctor<double>, T, T, T, T, T, T, T>;
             _ops.push_back(std::make_unique<op_t>(DotFunctor<double>(scaling)));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T, T, T, T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
@@ -39,6 +39,7 @@ void MapOps::setDot(mlir::quiccir::DotOp op)
         else
         {
             using namespace QuICC::Pointwise::Cuda;
+            using op_t =  Op<DotFunctor<double>, T, T, T, T, T, T, T>;
             _ops.push_back(std::make_unique<op_t>(DotFunctor<double>(scaling)));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T, T, T, T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);

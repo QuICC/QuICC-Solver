@@ -36,6 +36,7 @@
 #include "QuICC/PhysicalNames/registerAll.hpp"
 #include "View/View.hpp"
 #include "View/ViewUtils.hpp"
+#include "ViewOps/ViewMemoryUtils.hpp"
 #include "Profiler/Interface.hpp"
 
 
@@ -156,6 +157,9 @@ namespace Pseudospectral {
       Memory::MemBlock<std::uint32_t> ptrBlock(maxLayers+1, mem.get());
       View::ViewBase<std::uint32_t> ptr(ptrBlock.data(), ptrBlock.size());
 
+      using namespace QuICC::Memory;
+      tempOnHostMemorySpace ConverterP(ptr, TransferMode::write | TransferMode::block);
+
       std::uint32_t cumLayerSize = 0;
       std::uint32_t layerCounter = 0;
       ptr[0] = 0;
@@ -178,6 +182,9 @@ namespace Pseudospectral {
       // idx
       Memory::MemBlock<std::uint32_t> idxBlock(cumLayerSize, mem.get());
       View::ViewBase<std::uint32_t> idx(idxBlock.data(), idxBlock.size());
+
+      tempOnHostMemorySpace ConverterI(idx, TransferMode::write);
+
       std::uint32_t l = 0;
       for(std::uint32_t k = 0; k < nLayers; ++k)
       {
@@ -219,7 +226,11 @@ namespace Pseudospectral {
       std::uint32_t M = mspRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
 
       // Memory resource, depends on backend
+      #ifdef QUICC_HAS_CUDA_BACKEND
+      mMemRsr = std::make_shared<QuICC::Memory::Cuda::Malloc>();
+      #else
       mMemRsr = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+      #endif
 
       // get meta from mspRes
       const auto& jwRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA1D);
@@ -277,10 +288,10 @@ namespace Pseudospectral {
                // Field Id
                auto fId = fields[f];
 
-               // Host mem block
+               // mem block
                Memory::MemBlock<fld_t> block(modsDims[0]*metaJW.idx.size(), mMemRsr.get());
 
-               // Host view
+               // view
                // for now this works only for JW space
                std::array<std::uint32_t, dim> dims {modsDims[0], modsDims[2], modsDims[1]};
                View::View<fld_t, View::DCCSC3D> view(block.data(), block.size(), dims.data(), pointersMods.data(), indicesMods.data());
@@ -317,10 +328,10 @@ namespace Pseudospectral {
          // Field Id
          auto fId = physFields[f];
 
-         // Host mem block
+         // mem block
          Memory::MemBlock<fld_t> block(physDims[2]*indicesPhys[1].size(), mMemRsr.get());
 
-         // Host view
+         // view
          // for now this works only for FT space
          std::array<std::uint32_t, dim> dims {physDims[2], physDims[1], physDims[0]};
          View::View<fld_t, View::DCCSC3D> view(block.data(), block.size(), dims.data(), pointersPhys.data(), indicesPhys.data());
@@ -903,6 +914,9 @@ namespace details
    {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
+      using namespace QuICC::Memory;
+      tempOnHostMemorySpace Converter(view, TransferMode::write | TransferMode::block);
+
       /// copy data to view
       int start = 0;
       std::int64_t offSet = 0;
@@ -943,6 +957,9 @@ namespace details
    void copyView2Eig(Eigen::Matrix<SCALAR, -1, -1>& eig, const QuICC::View::View<SCALAR, View::DCCSC3D> view, const TransformResolution& res)
    {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
+
+      using namespace QuICC::Memory;
+      tempOnHostMemorySpace Converter(view, TransferMode::read | TransferMode::block);
 
       int start = 0;
       std::uint64_t offSet = 0;
@@ -1007,11 +1024,11 @@ namespace details
 
 
       Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
-      // // Compute backward transform
-      // this->updatePhysical(it);
+      // Compute backward transform
+      this->updatePhysical(it);
 
-      // // compute nonlinear interaction and forward transform
-      // this->updateSpectral(it);
+      // compute nonlinear interaction and forward transform
+      this->updateSpectral(it);
       Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
 
       auto UrVarv = mId2View[FieldComponents::Physical::R];

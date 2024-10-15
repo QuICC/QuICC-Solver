@@ -51,7 +51,7 @@ public:
 
    /// @brief ctor referencing view to convert
    /// @param view
-   tempOnHostMemorySpace(Tview& view, std::uint16_t mode);
+   tempOnHostMemorySpace(const Tview& view, const std::uint16_t mode);
 
    /// @brief dtor
    ~tempOnHostMemorySpace();
@@ -71,9 +71,11 @@ private:
 
 
 template <class Tview>
-tempOnHostMemorySpace<Tview>::tempOnHostMemorySpace(Tview& view,
+tempOnHostMemorySpace<Tview>::tempOnHostMemorySpace(const Tview& view, const
    std::uint16_t mode) :
-    _viewRef(view), _mode(mode)
+   // This is done on purpose to modify read only views
+   // we restore the initial state of the view on exit
+   _viewRef(const_cast<Tview&>(view)), _mode(mode)
 {
    using namespace QuICC::View;
 #ifdef QUICC_HAS_CUDA_BACKEND

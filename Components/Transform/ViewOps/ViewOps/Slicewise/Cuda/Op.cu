@@ -142,7 +142,7 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       }
    }
 
-   // offsets views
+   // views
    ViewBase<IndexType> layerIndex(_layerIndex.data(), _layerIndex.size());
    ViewBase<IndexType> offSet(_offSet.data(), _offSet.size());
    ViewBase<ScalarType> grid(_grid.data(), _grid.size());
@@ -151,8 +151,8 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
    dim3 blockSize;
    dim3 numBlocks;
 
-   blockSize.x = 16;
-   blockSize.y = 16;
+   blockSize.x = 64;
+   blockSize.y = 4;
    blockSize.z = 1;
    numBlocks.x = (M + blockSize.x - 1) / blockSize.x;
    numBlocks.y = (_N + blockSize.y - 1) / blockSize.y;
