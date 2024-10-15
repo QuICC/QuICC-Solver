@@ -13,13 +13,23 @@ namespace Cuda {
 namespace details {
 // naive implementation
 template <class Functor, class Tout, class ...Targs>
-__global__ void SlicewiseKernel(Functor f, Tout out, Targs... args)
+__global__ void SlicewiseKernel(
+   const ViewBase<IndexType> layerWidth,
+   const ViewBase<IndexType> offSet,
+   const ViewBase<ScalarType> grid,
+   Functor f, Tout out, Targs... args)
 {
+   const std::size_t l = blockIdx.z;
    const auto M = out.size();
+   const auto N = layerWidth[l];
+
    const std::size_t m = blockIdx.x * blockDim.x + threadIdx.x;
-   if (m < M)
+   const std::size_t n = blockIdx.y * blockDim.y + threadIdx.y;
+
+   if (m < M && n < N)
    {
-      out[m] = f(args[m]...);
+      auto mnk = offSet[l] + m + n*M;
+      out[mnk] = f(grid[l], args[mnk]...);
    }
 }
 
@@ -133,14 +143,24 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       }
    }
 
+   // offsets views
+   ViewBase<IndexType> layerIndex(_layerIndex.data(), _layerIndex.size());
+   ViewBase<IndexType> offSet(_offSet.data(), _offSet.size());
+   ViewBase<ScalarType> grid(_grid.data(), _grid.size());
+
    const auto M = out.size();
    dim3 blockSize;
    dim3 numBlocks;
-   blockSize.x = 64;
+
+   blockSize.x = 16;
+   blockSize.y = 16;
+   blockSize.z = 1;
    numBlocks.x = (M + blockSize.x - 1) / blockSize.x;
+   numBlocks.y = (_N + blockSize.y - 1) / blockSize.y;
+   numBlocks.z = activeLayers;
 
    details::SlicewiseKernel<Functor, Tout, Targs...>
-      <<<numBlocks, blockSize>>>(_f, out, args...);
+      <<<numBlocks, blockSize>>>(layerIndex, offset, grid, _f, out, args...);
 }
 
 
