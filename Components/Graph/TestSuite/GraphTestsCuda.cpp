@@ -17,8 +17,8 @@ TEST_CASE("One Dimensional Loop Fourier Gpu", "[OneDimLoopFourierGpu]")
   // Test Graph
   std::string modStr = R"mlir(
     func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
-      %tuval = quiccir.fr.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64, kind = "P"}
-      %ret = quiccir.fr.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64, kind = "P"}
+      %tuval = quiccir.fr.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xf64> attributes{kind = "P"}
+      %ret = quiccir.fr.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xcomplex<f64>> attributes{kind = "P"}
       return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";
@@ -123,8 +123,8 @@ TEST_CASE("One Dimensional Loop Associated Legendre Gpu", "[OneDimLoopALGpu]")
   // Same setup as transform loop
   std::string modStr = R"mlir(
     func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
-      %tuval = quiccir.al.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 0 :i64, kind = "P"}
-      %ret = quiccir.al.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64, kind = "P"}
+      %tuval = quiccir.al.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{kind = "P"}
+      %ret = quiccir.al.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{kind = "P"}
       return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";
@@ -249,8 +249,8 @@ TEST_CASE("One Dimensional Loop Worland Gpu", "[OneDimLoopJWGpu]")
   // Same setup as transform loop
   std::string modStr = R"mlir(
     func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
-      %tuval = quiccir.jw.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 0 :i64, kind = "P"}
-      %ret = quiccir.jw.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64, kind = "P"}
+      %tuval = quiccir.jw.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{kind = "P"}
+      %ret = quiccir.jw.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{kind = "P"}
       return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";

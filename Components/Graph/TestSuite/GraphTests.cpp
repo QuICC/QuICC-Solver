@@ -18,8 +18,8 @@ TEST_CASE("One Dimensional Loop Fourier", "[OneDimLoopFourier]")
   // Test Graph
   std::string modStr = R"mlir(
     func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
-      %tuval = quiccir.fr.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xf64> attributes{implptr = 0 :i64, kind = "P"}
-      %ret = quiccir.fr.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64, kind = "P"}
+      %tuval = quiccir.fr.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xf64> attributes{kind = "P"}
+      %ret = quiccir.fr.int %tuval : tensor<?x?x?xf64> -> tensor<?x?x?xcomplex<f64>> attributes{kind = "P"}
       return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";
@@ -83,8 +83,8 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   // Same setup as transform loop
   std::string modStr = R"mlir(
     func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
-      %tuval = quiccir.al.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 0 :i64, kind = "P"}
-      %ret = quiccir.al.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64, kind = "P"}
+      %tuval = quiccir.al.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{kind = "P"}
+      %ret = quiccir.al.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{kind = "P"}
       return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";
@@ -167,8 +167,8 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
   // Same setup as transform loop
   std::string modStr = R"mlir(
     func.func @entry(%tumod: tensor<?x?x?xcomplex<f64>>) -> (tensor<?x?x?xcomplex<f64>>) {
-      %tuval = quiccir.jw.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 0 :i64, kind = "P"}
-      %ret = quiccir.jw.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{implptr = 1 :i64, kind = "P"}
+      %tuval = quiccir.jw.prj %tumod : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{kind = "P"}
+      %ret = quiccir.jw.int %tuval : tensor<?x?x?xcomplex<f64>> -> tensor<?x?x?xcomplex<f64>> attributes{kind = "P"}
       return %ret : tensor<?x?x?xcomplex<f64>>
     }
   )mlir";
@@ -177,7 +177,7 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
   constexpr std::uint32_t rank = 3u;
   // v012
   std::array<std::uint32_t, rank> physDims{3, 4, 1};
-  std::array<std::uint32_t, rank> modsDims{2, 4, 1};
+  std::array<std::uint32_t, rank> modsDims{2, 4, 1}; // NLM
 
   // View Types
   std::array<std::array<std::string, 2>, 3> layOpt;
@@ -194,9 +194,9 @@ TEST_CASE("One Dimensional Loop Worland", "[OneDimLoopJW]")
   auto M = physDims[2];
   auto N = physDims[1];
   // auto K = physDims[0];
-  auto modsM = modsDims[2];
-  auto modsN = modsDims[1];
-  auto modsK = modsDims[0];
+  auto modsM = modsDims[2]; // M
+  auto modsN = modsDims[1]; // L
+  auto modsK = modsDims[0]; // N
 
   // Populate meta for fully populated tensor
   std::vector<std::uint32_t> ptr(N+1);

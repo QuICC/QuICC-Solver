@@ -1073,10 +1073,13 @@ namespace details
          [&](auto&& p, auto& Urv, auto& Uthetav, auto& Uphiv)
          {
             auto ptrUr = p->rDom(0).rPhys().comp(FieldComponents::Physical::R);
+            ptrUr.rData().setZero();
             details::copyView2Eig(ptrUr.rData(), Urv, ftRes);
             auto ptrUtheta = p->rDom(0).rPhys().comp(FieldComponents::Physical::THETA);
+            ptrUtheta.rData().setZero();
             details::copyView2Eig(ptrUtheta.rData(), Uthetav, ftRes);
             auto ptrUphi = p->rDom(0).rPhys().comp(FieldComponents::Physical::PHI);
+            ptrUphi.rData().setZero();
             details::copyView2Eig(ptrUphi.rData(), Uphiv, ftRes);
          }, vec, UrVarv, UthetaVarv, UphiVarv);
    }

@@ -434,6 +434,15 @@ void Jit<RANK>::setMeta(const std::vector<View::ViewBase<std::uint32_t>>& meta)
 template <std::uint32_t RANK>
 void Jit<RANK>::setMap(const std::shared_ptr<Memory::memory_resource> mem)
 {
+    // Top level (module) pass manager
+    mlir::PassManager pm(&_ctx);
+    // Add implptr to mlir
+    pm.addPass(mlir::quiccir::createSetImplptrPass());
+    if (mlir::failed(pm.run(*_module))) {
+        throw std::runtime_error("Failed to add implementation pointer.");
+    }
+    _module->dump();
+
     // setup ops map and store
     _storeOp = std::move(QuICC::Graph::MapOps(*_module, mem));
 }
