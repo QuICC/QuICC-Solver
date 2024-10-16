@@ -6,6 +6,7 @@ message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_
 
 add_library(${QUICC_CURRENT_COMPONENT_LIB} STATIC
   Memory/Cpu/NewDelete.cpp
+  Memory/Cpu/Pool.cpp
   Memory/Cuda/Malloc.cu
 )
 
@@ -23,6 +24,7 @@ set(PHS
   Memory/MemoryResource.hpp
   Memory/Pensieve.hpp
   Memory/Cpu/NewDelete.hpp
+  Memory/Cpu/Pool.hpp
   Memory/Cuda/Malloc.hpp
 )
 

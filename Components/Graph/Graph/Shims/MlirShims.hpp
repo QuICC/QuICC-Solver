@@ -94,21 +94,29 @@ namespace details
 template<class Tnew, class Tprod>
 void alloc_ptr(Tnew** newPtr, const size_t size, const Tprod* prodPtr)
 {
+    // Cpu memory
+    using namespace QuICC::Memory;
+    auto& memCpu = Pensieve<Cpu::NewDelete>::getInstance().getMem();
+
     std::size_t sizeByte = sizeof(Tnew) * size;
     // Check memory space
     bool isCpuMem = true;
     #ifdef QUICC_HAS_CUDA_BACKEND
     isCpuMem = !QuICC::Cuda::isDeviceMemory(prodPtr);
+    auto& memGpu = Pensieve<Cuda::Malloc>::getInstance().getMem();
     #endif
     if (isCpuMem)
     {
-        auto alignment = static_cast<std::align_val_t>(alignof(std::max_align_t));
-        *newPtr = reinterpret_cast<Tnew*>(::operator new(sizeByte, alignment));
+        // auto alignment = static_cast<std::align_val_t>(alignof(std::max_align_t));
+        // *newPtr = reinterpret_cast<Tnew*>(::operator new(sizeByte, alignment));
+        auto alignment = alignof(std::max_align_t);
+        *newPtr = reinterpret_cast<Tnew*>(memCpu.allocate(sizeByte, alignment));
     }
     #ifdef QUICC_HAS_CUDA_BACKEND
     else
     {
-        cudaErrChk(cudaMalloc(reinterpret_cast<void**>(newPtr), sizeByte));
+        // cudaErrChk(cudaMalloc(reinterpret_cast<void**>(newPtr), sizeByte));
+        *newPtr = reinterpret_cast<Tnew*>(memGpu.allocate(sizeByte));
     }
     #endif
     #ifndef NDEBUG
@@ -128,6 +136,11 @@ void dealloc_viewDescriptor(ViewDescriptor<Tdata, std::uint32_t, 3>* pBuffer)
     pBuffer->cooSize = 0;
     pBuffer->pos = nullptr;
     pBuffer->posSize = 0;
+
+    // Cpu memory
+    using namespace QuICC::Memory;
+    auto& memCpu = Pensieve<Cpu::NewDelete>::getInstance().getMem();
+
     // Dealloc
     assert(pBuffer->data != nullptr);
     std::size_t sizeByte = sizeof(Tdata) * pBuffer->dataSize;
@@ -138,16 +151,21 @@ void dealloc_viewDescriptor(ViewDescriptor<Tdata, std::uint32_t, 3>* pBuffer)
     #endif
     #ifdef QUICC_HAS_CUDA_BACKEND
     isCpuMem = !QuICC::Cuda::isDeviceMemory(pBuffer->data);
+    auto& memGpu = Pensieve<Cuda::Malloc>::getInstance().getMem();
     #endif
     if (isCpuMem)
     {
-        auto alignment = static_cast<std::align_val_t>(alignof(std::max_align_t));
-        ::operator delete(pBuffer->data, sizeByte, alignment);
+        // auto alignment = static_cast<std::align_val_t>(alignof(std::max_align_t));
+        // ::operator delete(pBuffer->data, sizeByte, alignment);
+        auto alignment = alignof(std::max_align_t);
+        memCpu.deallocate(pBuffer->data, sizeByte, alignment);
+
     }
     #ifdef QUICC_HAS_CUDA_BACKEND
     else
     {
-        cudaErrChk(cudaFree(pBuffer->data));
+        // cudaErrChk(cudaFree(pBuffer->data));
+        memGpu.deallocate(pBuffer->data, sizeByte);
     }
     #endif
     pBuffer->dataSize = 0;
