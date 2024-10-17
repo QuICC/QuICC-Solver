@@ -249,9 +249,15 @@ namespace Pseudospectral {
 
       // Layouts, depends on backend
       std::array<std::array<std::string, 2>, 3> layOpt;
+      #ifdef QUICC_HAS_CUDA_BACKEND
+      layOpt[0] = {"DCCSC3D", "DCCSC3D"};
+      layOpt[1] = {"DCCSC3DJIK", "S1CLCSC3DJIK"};
+      layOpt[2] = {"DCCSC3DJIK", "DCCSC3DJIK"};
+      #else
       layOpt[0] = {"DCCSC3D", "DCCSC3D"};
       layOpt[1] = {"DCCSC3D", "S1CLCSC3D"};
       layOpt[2] = {"DCCSC3D", "DCCSC3D"};
+      #endif
 
       // Store meta stages to pass to Jitter
       std::vector<QuICC::View::ViewBase<std::uint32_t>> meta;
@@ -293,8 +299,13 @@ namespace Pseudospectral {
 
                // view
                // for now this works only for JW space
+               #ifdef QUICC_HAS_CUDA_BACKEND
+               using jwLay_t = View::DCCSC3DJIK;
+               #else
+               using jwLay_t = View::DCCSC3D;
+               #endif
                std::array<std::uint32_t, dim> dims {modsDims[0], modsDims[2], modsDims[1]};
-               View::View<fld_t, View::DCCSC3D> view(block.data(), block.size(), dims.data(), pointersMods.data(), indicesMods.data());
+               View::View<fld_t, jwLay_t> view(block.data(), block.size(), dims.data(), pointersMods.data(), indicesMods.data());
 
                // Store block
                mBlocksData.push_back(std::move(block));
@@ -903,14 +914,14 @@ namespace Pseudospectral {
 
 namespace details
 {
-   template <class SCALAROUT, class SCALARIN>
-   void copyEig2View(QuICC::View::View<SCALAROUT, View::DCCSC3D> view, const Eigen::Matrix<SCALARIN, -1, -1>& eig, const TransformResolution& res)
+   template <class SCALAROUT, class SCALARIN, class VIEWATT>
+   void copyEig2View(QuICC::View::View<SCALAROUT, VIEWATT> view, const Eigen::Matrix<SCALARIN, -1, -1>& eig, const TransformResolution& res)
    {
       throw std::logic_error("trying to copy different types");
    }
 
-   template <class SCALAR>
-   void copyEig2View(QuICC::View::View<SCALAR, View::DCCSC3D> view, const Eigen::Matrix<SCALAR, -1, -1>& eig, const TransformResolution& res)
+   template <class SCALAR, class VIEWATT>
+   void copyEig2View(QuICC::View::View<SCALAR, VIEWATT> view, const Eigen::Matrix<SCALAR, -1, -1>& eig, const TransformResolution& res)
    {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
@@ -933,13 +944,20 @@ namespace details
          {
             for (std::int64_t i = 0; i < inB.rows(); ++i)
             {
-               #ifdef QUICC_JW_ROW_MAJOR
-               // copy padded to flattened and transpose
-               view[offSet + i*inB.cols()+j] = inB.data()[i+j*eig.rows()];
-               #else
-               // copy padded to flattened column
-               view[offSet + i+j*inB.rows()] = inB.data()[i+j*eig.rows()];
-               #endif
+               if constexpr (std::is_same_v<VIEWATT, View::DCCSC3DJIK>)
+               {
+                  // copy padded to flattened and transpose
+                  view[offSet + i*inB.cols()+j] = inB.data()[i+j*eig.rows()];
+               }
+               else if constexpr (std::is_same_v<VIEWATT, View::DCCSC3D>)
+               {
+                  // copy padded to flattened column
+                  view[offSet + i+j*inB.rows()] = inB.data()[i+j*eig.rows()];
+               }
+               else
+               {
+                  throw std::logic_error("copy 2 view not implemented for this layout");
+               }
             }
          }
          offSet += inB.size();
@@ -947,14 +965,14 @@ namespace details
       }
    }
 
-   template <class SCALAROUT, class SCALARIN>
-   void copyView2Eig(Eigen::Matrix<SCALAROUT, -1, -1>& eig, const QuICC::View::View<SCALARIN, View::DCCSC3D> view, const TransformResolution& res)
+   template <class SCALAROUT, class SCALARIN, class VIEWATT>
+   void copyView2Eig(Eigen::Matrix<SCALAROUT, -1, -1>& eig, const QuICC::View::View<SCALARIN, VIEWATT> view, const TransformResolution& res)
    {
       throw std::logic_error("trying to copy different types");
    }
 
-   template <class SCALAR>
-   void copyView2Eig(Eigen::Matrix<SCALAR, -1, -1>& eig, const QuICC::View::View<SCALAR, View::DCCSC3D> view, const TransformResolution& res)
+   template <class SCALAR, class VIEWATT>
+   void copyView2Eig(Eigen::Matrix<SCALAR, -1, -1>& eig, const QuICC::View::View<SCALAR, VIEWATT> view, const TransformResolution& res)
    {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
@@ -976,13 +994,20 @@ namespace details
          {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
             {
-               #ifdef QUICC_JW_ROW_MAJOR
-               // copy padded from flattened column and transpose
-               outB.data()[i+j*eig.rows()] = view[offSet + i*outB.cols()+j];
-               #else
-               // copy padded from flattened column
-               outB.data()[i+j*eig.rows()] = view[offSet + i+j*outB.rows()];
-               #endif
+               if constexpr (std::is_same_v<VIEWATT, View::DCCSC3DJIK>)
+               {
+                  // copy padded from flattened column and transpose
+                  outB.data()[i+j*eig.rows()] = view[offSet + i*outB.cols()+j];
+               }
+               else if constexpr (std::is_same_v<VIEWATT, View::DCCSC3D>)
+               {
+                  // copy padded from flattened column
+                  outB.data()[i+j*eig.rows()] = view[offSet + i+j*outB.rows()];
+               }
+               else
+               {
+                  throw std::logic_error("copy from view not implemented for this layout");
+               }
            }
          }
 

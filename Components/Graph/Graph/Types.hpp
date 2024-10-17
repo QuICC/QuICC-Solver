@@ -40,7 +40,8 @@ using C_S1CLCSC3DJIK_t = QuICC::View::View<std::complex<double>, View::S1CLCSC3D
 /// @brief encode data types
 using varData_t = std::variant<
   R_DCCSC3D_t,
-  C_DCCSC3D_t
+  C_DCCSC3D_t,
+  C_DCCSC3DJIK_t
   // C_S1CLCSC3D_t
 >;
 
