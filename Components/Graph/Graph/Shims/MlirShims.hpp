@@ -88,6 +88,11 @@ namespace Graph
 namespace details
 {
 
+using cpuMem_t = Memory::Cpu::Pool;
+#ifdef QUICC_HAS_CUDA_BACKEND
+using cudaMem_t = Cuda::Malloc;
+#endif
+
 /// @brief generic view descriptor allocator
 /// @tparam T view descriptor type
 /// @param pBuffer
@@ -96,14 +101,14 @@ void alloc_ptr(Tnew** newPtr, const size_t size, const Tprod* prodPtr)
 {
     // Cpu memory
     using namespace QuICC::Memory;
-    auto& memCpu = Pensieve<Cpu::NewDelete>::getInstance().getMem();
+    auto& memCpu = Pensieve<cpuMem_t>::getInstance().getMem();
 
     std::size_t sizeByte = sizeof(Tnew) * size;
     // Check memory space
     bool isCpuMem = true;
     #ifdef QUICC_HAS_CUDA_BACKEND
     isCpuMem = !QuICC::Cuda::isDeviceMemory(prodPtr);
-    auto& memGpu = Pensieve<Cuda::Malloc>::getInstance().getMem();
+    auto& memGpu = Pensieve<cudaMem_t>::getInstance().getMem();
     #endif
     if (isCpuMem)
     {
@@ -139,7 +144,7 @@ void dealloc_viewDescriptor(ViewDescriptor<Tdata, std::uint32_t, 3>* pBuffer)
 
     // Cpu memory
     using namespace QuICC::Memory;
-    auto& memCpu = Pensieve<Cpu::NewDelete>::getInstance().getMem();
+    auto& memCpu = Pensieve<cpuMem_t>::getInstance().getMem();
 
     // Dealloc
     assert(pBuffer->data != nullptr);
@@ -151,7 +156,7 @@ void dealloc_viewDescriptor(ViewDescriptor<Tdata, std::uint32_t, 3>* pBuffer)
     #endif
     #ifdef QUICC_HAS_CUDA_BACKEND
     isCpuMem = !QuICC::Cuda::isDeviceMemory(pBuffer->data);
-    auto& memGpu = Pensieve<Cuda::Malloc>::getInstance().getMem();
+    auto& memGpu = Pensieve<cudaMem_t>::getInstance().getMem();
     #endif
     if (isCpuMem)
     {

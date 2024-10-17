@@ -131,6 +131,10 @@ inline void matmul(View::View<TC, View::dense2D>& C,
     using BMatrixZ = ::Eigen::Matrix<TB, ::Eigen::Dynamic, ::Eigen::Dynamic>;
     using CMatrixZ = ::Eigen::Matrix<TC, ::Eigen::Dynamic, ::Eigen::Dynamic>;
 
+    assert(A.size() == M*K);
+    assert(B.size() == K*N);
+    assert(C.size() == M*N);
+
     ::Eigen::Map<AMatrixRM> eA(A.data(), M, K);
     ::Eigen::Map<BMatrixZ> eB(B.data(), K, N);
     ::Eigen::Map<CMatrixZ> eC(C.data(), M, N);
@@ -165,6 +169,10 @@ inline void matmul(View::View<TC, View::dense2DRM>& C,
     using AMatrix = ::Eigen::Matrix<TA, ::Eigen::Dynamic, ::Eigen::Dynamic>;
     using BMatrixZRM = ::Eigen::Matrix<TB, ::Eigen::Dynamic, ::Eigen::Dynamic, ::Eigen::RowMajor>;
     using CMatrixZRM = ::Eigen::Matrix<TC, ::Eigen::Dynamic, ::Eigen::Dynamic, ::Eigen::RowMajor>;
+
+    assert(A.size() == M*K);
+    assert(B.size() == K*N);
+    assert(C.size() == M*N);
 
     ::Eigen::Map<AMatrix> eA(A.data(), M, K);
     ::Eigen::Map<BMatrixZRM> eB(B.data(), K, N);

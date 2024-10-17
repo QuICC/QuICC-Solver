@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "Memory/Cpu/NewDelete.hpp"
+#include "Memory/Cpu/Pool.hpp"
 #include "Memory/Memory.hpp"
 #include "Memory/Pensieve.hpp"
 #include "View/View.hpp"
