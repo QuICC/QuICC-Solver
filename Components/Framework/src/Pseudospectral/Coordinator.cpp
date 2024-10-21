@@ -1031,7 +1031,7 @@ namespace details
       std::visit(
          [&](auto&& p, auto& Tv)
          {
-            auto ptrTemp = p->rDom(0).perturbation();
+            auto& ptrTemp = p->rDom(0).rPerturbation();
             details::copyEig2View(Tv, ptrTemp.data(), jwRes);
          }, temp, tempVarv);
 
@@ -1041,19 +1041,19 @@ namespace details
       std::visit(
          [&](auto&& p, auto& Torv, auto& Polv)
          {
-            auto ptrTor = p->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR);
+            auto& ptrTor = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR);
             details::copyEig2View(Torv, ptrTor.data(), jwRes);
-            auto ptrPol = p->rDom(0).perturbation().comp(FieldComponents::Spectral::POL);
+            auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
             details::copyEig2View(Polv, ptrPol.data(), jwRes);
          }, vec, TorVarv, PolVarv);
 
 
       Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
       // Compute backward transform
-      this->updatePhysical(it);
+      // this->updatePhysical(it);
 
-      // compute nonlinear interaction and forward transform
-      this->updateSpectral(it);
+      // // compute nonlinear interaction and forward transform
+      // this->updateSpectral(it);
       Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
 
       auto UrVarv = mId2View[FieldComponents::Physical::R];
@@ -1075,19 +1075,19 @@ namespace details
       std::visit(
          [&](auto&& p, auto& Tv)
          {
-            auto ptrTemp = p->rDom(0).perturbation();
-            ptrTemp.rData().setZero();
+            auto& ptrTemp = p->rDom(0).rPerturbation();
+            p->rDom(0).rPerturbation().setZeros();
             details::copyView2Eig(ptrTemp.rData(), Tv, jwRes);
          }, temp, tempVarv);
 
       std::visit(
          [&](auto&& p, auto& Torv, auto& Polv)
          {
-            auto ptrTor = p->rDom(0).perturbation().comp(FieldComponents::Spectral::TOR);
-            ptrTor.rData().setZero();
+            auto& ptrTor = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR);
+            p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setZeros();
             details::copyView2Eig(ptrTor.rData(), Torv, jwRes);
-            auto ptrPol = p->rDom(0).perturbation().comp(FieldComponents::Spectral::POL);
-            ptrPol.rData().setZero();
+            auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
+            p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setZeros();
             details::copyView2Eig(ptrPol.rData(), Polv, jwRes);
          }, vec, TorVarv, PolVarv);
 
@@ -1097,14 +1097,14 @@ namespace details
       std::visit(
          [&](auto&& p, auto& Urv, auto& Uthetav, auto& Uphiv)
          {
-            auto ptrUr = p->rDom(0).rPhys().comp(FieldComponents::Physical::R);
-            ptrUr.rData().setZero();
+            auto& ptrUr = p->rDom(0).rPhys().rComp(FieldComponents::Physical::R);
+            p->rDom(0).rPhys().rComp(FieldComponents::Physical::R).setZeros();
             details::copyView2Eig(ptrUr.rData(), Urv, ftRes);
-            auto ptrUtheta = p->rDom(0).rPhys().comp(FieldComponents::Physical::THETA);
-            ptrUtheta.rData().setZero();
+            auto& ptrUtheta = p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA);
+            p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA).setZeros();
             details::copyView2Eig(ptrUtheta.rData(), Uthetav, ftRes);
-            auto ptrUphi = p->rDom(0).rPhys().comp(FieldComponents::Physical::PHI);
-            ptrUphi.rData().setZero();
+            auto& ptrUphi = p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI);
+            p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI).setZeros();
             details::copyView2Eig(ptrUphi.rData(), Uphiv, ftRes);
          }, vec, UrVarv, UthetaVarv, UphiVarv);
    }
