@@ -928,6 +928,8 @@ namespace details
       using namespace QuICC::Memory;
       tempOnHostMemorySpace Converter(view, TransferMode::write | TransferMode::block);
 
+      auto pointers = view.pointers()[1];
+
       /// copy data to view
       int start = 0;
       std::int64_t offSet = 0;
@@ -935,8 +937,23 @@ namespace details
       {
          // layer width
          int cols = res.dim<QuICC::Dimensions::Data::DAT2D>(p);
-         // layer height
-         int inRows = res.dim<QuICC::Dimensions::Data::DATB1D>(0, p);
+         auto widthView = pointers[p+1] - pointers[p];
+         assert(widthView == static_cast<std::uint32_t>(cols));
+         // layer height (DCCSC3D only)
+         /// \todo extend to other view types
+         int inRows;
+         if constexpr (std::is_same_v<SCALAR, double>)
+         {
+            // phys
+            inRows = res.dim<QuICC::Dimensions::Data::DATF1D>(0, p);
+         }
+         else
+         {
+            // mods
+            inRows = res.dim<QuICC::Dimensions::Data::DATB1D>(0, p);
+         }
+         auto highView = view.lds();
+         assert(highView == static_cast<std::uint32_t>(inRows));
 
          const Eigen::Ref<const Eigen::Matrix<SCALAR, -1, -1>> inB = eig.block(0, start, inRows, cols);
 
@@ -947,12 +964,12 @@ namespace details
                if constexpr (std::is_same_v<VIEWATT, View::DCCSC3DJIK>)
                {
                   // copy padded to flattened and transpose
-                  view[offSet + i*inB.cols()+j] = inB.data()[i+j*eig.rows()];
+                  view[offSet + i*widthView+j] = inB.data()[i+j*eig.rows()];
                }
                else if constexpr (std::is_same_v<VIEWATT, View::DCCSC3D>)
                {
                   // copy padded to flattened column
-                  view[offSet + i+j*inB.rows()] = inB.data()[i+j*eig.rows()];
+                  view[offSet + i+j*highView] = inB.data()[i+j*eig.rows()];
                }
                else
                {
@@ -979,14 +996,31 @@ namespace details
       using namespace QuICC::Memory;
       tempOnHostMemorySpace Converter(view, TransferMode::read | TransferMode::block);
 
+      auto pointers = view.pointers()[1];
+
       int start = 0;
       std::uint64_t offSet = 0;
       for(std::uint32_t p = 0; p < nLayers; p++)
       {
          // layer width
          int cols = res.dim<QuICC::Dimensions::Data::DAT2D>(p);
-         // layer height
-         int outRows = res.dim<QuICC::Dimensions::Data::DATB1D>(0, p);
+         auto widthView = pointers[p+1] - pointers[p];
+         assert(widthView == static_cast<std::uint32_t>(cols));
+         // layer height (DCCSC3D only)
+         /// \todo extend to other view types
+         int outRows;
+         if constexpr (std::is_same_v<SCALAR, double>)
+         {
+            // phys
+            outRows = res.dim<QuICC::Dimensions::Data::DATF1D>(0, p);
+         }
+         else
+         {
+            // mods
+            outRows = res.dim<QuICC::Dimensions::Data::DATB1D>(0, p);
+         }
+         auto highView = view.lds();
+         assert(highView == static_cast<std::uint32_t>(outRows));
 
          Eigen::Ref<Eigen::Matrix<SCALAR, -1, -1>> outB = eig.block(0, start, outRows, cols);
 
@@ -997,12 +1031,12 @@ namespace details
                if constexpr (std::is_same_v<VIEWATT, View::DCCSC3DJIK>)
                {
                   // copy padded from flattened column and transpose
-                  outB.data()[i+j*eig.rows()] = view[offSet + i*outB.cols()+j];
+                  outB.data()[i+j*eig.rows()] = view[offSet + i*widthView+j];
                }
                else if constexpr (std::is_same_v<VIEWATT, View::DCCSC3D>)
                {
                   // copy padded from flattened column
-                  outB.data()[i+j*eig.rows()] = view[offSet + i+j*outB.rows()];
+                  outB.data()[i+j*eig.rows()] = view[offSet + i+j*highView];
                }
                else
                {
@@ -1026,7 +1060,7 @@ namespace details
 
       // Copy to view
       const auto& jwRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA1D);
-      auto temp = mScalarVariables[PhysicalNames::Temperature::id()];
+      auto& temp = mScalarVariables[PhysicalNames::Temperature::id()];
       auto tempVarv = mId2View[PhysicalNames::Temperature::id()];
       std::visit(
          [&](auto&& p, auto& Tv)
@@ -1035,9 +1069,9 @@ namespace details
             details::copyEig2View(Tv, ptrTemp.data(), jwRes);
          }, temp, tempVarv);
 
-      auto vec = mVectorVariables[PhysicalNames::Velocity::id()];
-      auto TorVarv = mId2View[FieldComponents::Spectral::TOR];
-      auto PolVarv = mId2View[FieldComponents::Spectral::POL];
+      auto& vec = mVectorVariables[PhysicalNames::Velocity::id()];
+      auto& TorVarv = mId2View[FieldComponents::Spectral::TOR];
+      auto& PolVarv = mId2View[FieldComponents::Spectral::POL];
       std::visit(
          [&](auto&& p, auto& Torv, auto& Polv)
          {
@@ -1056,9 +1090,9 @@ namespace details
       // this->updateSpectral(it);
       Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
 
-      auto UrVarv = mId2View[FieldComponents::Physical::R];
-      auto UthetaVarv = mId2View[FieldComponents::Physical::THETA];
-      auto UphiVarv = mId2View[FieldComponents::Physical::PHI];
+      auto& UrVarv = mId2View[FieldComponents::Physical::R];
+      auto& UthetaVarv = mId2View[FieldComponents::Physical::THETA];
+      auto& UphiVarv = mId2View[FieldComponents::Physical::PHI];
 
       Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
       // Call graph

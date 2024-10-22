@@ -16,12 +16,12 @@ using namespace QuICC::Graph;
 /// @param pRet op result
 /// @param pLhs lhs scalar
 /// @param pRhs rhs scalar
-extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_cpu(void* obj,
+extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_cpu(void* obj,
     ViewDescriptor<@Type@, std::uint32_t, 3>* pRet, ViewDescriptor<@Type@, std::uint32_t, 3>* pLhs, ViewDescriptor<@Type@, std::uint32_t, 3>* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_cpu\n";
+        "_ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_cpu\n";
     #endif
     assert(obj != nullptr);
     assert(pRet != nullptr);
@@ -30,7 +30,7 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@Mlir
     // op
     using namespace QuICC::Pointwise::Cpu;
     using namespace QuICC::Pointwise;
-    using T = QuICC::View::View<@Type@, QuICC::View::DCCSC3D>;
+    using T = QuICC::View::View<@Type@, QuICC::View::@Layout@>;
     using op_t = Op<@OpCC@Functor<@Type@>, T, T, T>;
     // views
     using namespace QuICC::View;
@@ -54,12 +54,12 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@Mlir
 /// @param pRet op result
 /// @param pLhs lhs scalar
 /// @param pRhs rhs scalar
-extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_gpu(void* obj,
+extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_gpu(void* obj,
     ViewDescriptor<@Type@, std::uint32_t, 3>* pRet, ViewDescriptor<@Type@, std::uint32_t, 3>* pLhs, ViewDescriptor<@Type@, std::uint32_t, 3>* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
-        "_ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_gpu\n";
+        "_ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_gpu\n";
     #endif
     assert(obj != nullptr);
     assert(pRet != nullptr);
@@ -68,7 +68,7 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@Mlir
     // op
     using namespace QuICC::Pointwise::Cuda;
     using namespace QuICC::Pointwise;
-    using T = QuICC::View::View<cuda::@Type@, QuICC::View::DCCSC3D>;
+    using T = QuICC::View::View<cuda::@Type@, QuICC::View::@Layout@>;
     using op_t = Op<@OpCC@Functor<typename T::ScalarType>, T, T, T>;
     // views
     using namespace QuICC::View;
@@ -91,7 +91,7 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@Mlir
 /// @param pRet op result
 /// @param pLhs lhs scalar
 /// @param pRhs rhs scalar
-extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D(void* obj,
+extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@(void* obj,
     ViewDescriptor<@Type@, std::uint32_t, 3>* pRet,
     ViewDescriptor<@Type@, std::uint32_t, 3>* pLhs,
     ViewDescriptor<@Type@, std::uint32_t, 3>* pRhs
@@ -103,13 +103,13 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@Mlir
     {
         assert(!QuICC::Cuda::isDeviceMemory(pLhs->data));
         assert(!QuICC::Cuda::isDeviceMemory(pRhs->data));
-        _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_cpu(obj, pRet, pLhs, pRhs);
+        _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_cpu(obj, pRet, pLhs, pRhs);
     }
     else
     {
-        _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_gpu(obj, pRet, pLhs, pRhs);
+        _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_gpu(obj, pRet, pLhs, pRhs);
     }
     #else
-    _ciface_quiccir_@Op@_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_@MlirType@_DCCSC3D_cpu(obj, pRet, pLhs, pRhs);
+    _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_cpu(obj, pRet, pLhs, pRhs);
     #endif
 }

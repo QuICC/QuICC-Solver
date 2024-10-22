@@ -21,19 +21,22 @@ endfunction()
 
 set(Ops "add;sub")
 set(Types "double;std::complex<double>")
+set(Layouts "DCCSC3D;S1CLCSC3D")
 
 # Configure Shims
 foreach(Op IN LISTS Ops)
     camelCase(${Op} OpCC)
-    foreach(Type IN LISTS Types)
-        mapType2mlir(${Type} MlirType)
-        configure_file(
-            "MlirPointwiseShims.cpp.in"
-            "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/Pointwise/MlirShims/${Op}/${MlirType}${Backend}.cpp"
-        )
-        target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
-            PRIVATE
-                "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/Pointwise/MlirShims/${Op}/${MlirType}${Backend}.cpp"
-        )
+    foreach(Layout IN LISTS Layouts)
+        foreach(Type IN LISTS Types)
+            mapType2mlir(${Type} MlirType)
+            configure_file(
+                "MlirPointwiseShims.cpp.in"
+                "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/Pointwise/MlirShims/${Op}/${MlirType}${Layout}${Backend}.cpp"
+            )
+            target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+                PRIVATE
+                    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/Pointwise/MlirShims/${Op}/${MlirType}${Layout}${Backend}.cpp"
+            )
+        endforeach()
     endforeach()
 endforeach()
