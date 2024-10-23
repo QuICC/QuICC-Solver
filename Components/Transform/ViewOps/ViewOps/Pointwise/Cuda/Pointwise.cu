@@ -126,7 +126,6 @@ template class Op<CrossCompFunctor<double>,
    View::View<double, View::DCCSC3D>,
    View::View<double, View::DCCSC3D>>;
 
-
 } // namespace Cuda
 } // namespace Pointwise
 } // namespace QuICC
