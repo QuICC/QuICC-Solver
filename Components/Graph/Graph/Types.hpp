@@ -33,6 +33,7 @@ using C_DCCSC3D_t = QuICC::View::View<std::complex<double>, View::DCCSC3D>;
 using C_DCCSC3DJIK_t = QuICC::View::View<std::complex<double>, View::DCCSC3DJIK>;
 #ifdef QUICC_HAS_CUDA_BACKEND
 using Ccuda_DCCSC3DJIK_t = QuICC::View::View<cuda::std::complex<double>, View::DCCSC3DJIK>;
+using Ccuda_DCCSC3D_t = QuICC::View::View<cuda::std::complex<double>, View::DCCSC3D>;
 #endif
 /// @brief AL Mods
 using C_S1CLCSC3D_t = QuICC::View::View<std::complex<double>, View::S1CLCSC3D>;
@@ -54,6 +55,7 @@ using varOp_t = std::variant<
     std::shared_ptr<NaryOp<C_DCCSC3D_t, C_DCCSC3D_t, C_DCCSC3D_t>>,
     #ifdef QUICC_HAS_CUDA_BACKEND
     std::shared_ptr<NaryOp<Ccuda_DCCSC3DJIK_t, Ccuda_DCCSC3DJIK_t, Ccuda_DCCSC3DJIK_t>>,
+    std::shared_ptr<NaryOp<Ccuda_DCCSC3D_t, Ccuda_DCCSC3D_t, Ccuda_DCCSC3D_t>>,
     #endif
     std::shared_ptr<NaryOp<R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t>>,
     std::shared_ptr<NaryOp<R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t>>,

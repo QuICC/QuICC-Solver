@@ -39,6 +39,8 @@ target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
   QuICC::ViewOps::ALegendre
   QuICC::ViewOps::Worland
   QuICC::ViewOps::Transpose
+  QuICC::ViewOps::Pointwise
+  QuICC::ViewOps::Slicewise
 )
 
 # Alias

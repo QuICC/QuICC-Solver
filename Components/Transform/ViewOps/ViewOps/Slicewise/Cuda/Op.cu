@@ -66,7 +66,7 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
 
       // copy back to cpu for preprocessing
       using namespace QuICC::Memory;
-      tempOnHostMemorySpace converterP(pointers, TransferMode::read | TransferMode::block);
+      // tempOnHostMemorySpace converterP(pointers, TransferMode::read | TransferMode::block);
 
       // _N = 0;
       // IndexType nLayers = 0;

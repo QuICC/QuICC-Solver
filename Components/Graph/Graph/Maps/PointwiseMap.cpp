@@ -79,7 +79,7 @@ void MapOps::setAdd(mlir::quiccir::AddOp op)
                 llvm::isa<mlir::ComplexType>(eleRhsTy) &&
                 llvm::isa<mlir::Float64Type>(eleRhsTy.cast<mlir::ComplexType>().getElementType()))
             {
-                using ptTy = std::complex<double>;
+                using ptTy = cuda::std::complex<double>;
                 using T = View::View<ptTy, View::DCCSC3D>;
                 using op_t = Op<AddFunctor<ptTy>, T, T, T>;
                 _ops.push_back(std::make_unique<op_t>(AddFunctor<ptTy>()));
@@ -166,7 +166,7 @@ void MapOps::setSub(mlir::quiccir::SubOp op)
                 llvm::isa<mlir::ComplexType>(eleRhsTy) &&
                 llvm::isa<mlir::Float64Type>(eleRhsTy.cast<mlir::ComplexType>().getElementType()))
             {
-                using ptTy = std::complex<double>;
+                using ptTy = cuda::std::complex<double>;
                 using T = View::View<ptTy, View::DCCSC3D>;
                 using op_t = Op<SubFunctor<ptTy>, T, T, T>;
                 _ops.push_back(std::make_unique<op_t>(SubFunctor<ptTy>()));
