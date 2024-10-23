@@ -90,7 +90,7 @@ namespace details
 
 using cpuMem_t = Memory::Cpu::Pool;
 #ifdef QUICC_HAS_CUDA_BACKEND
-using cudaMem_t = Cuda::Malloc;
+using cudaMem_t = Memory::Cuda::Malloc;
 #endif
 
 /// @brief generic view descriptor allocator

@@ -68,7 +68,7 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@Ml
     // op
     using namespace QuICC::Pointwise::Cuda;
     using namespace QuICC::Pointwise;
-    using T = QuICC::View::View<cuda::@Type@, QuICC::View::@Layout@>;
+    using T = QuICC::View::View<@CudaType@, QuICC::View::@Layout@>;
     using op_t = Op<@OpCC@Functor<typename T::ScalarType>, T, T, T>;
     // views
     using namespace QuICC::View;
@@ -77,9 +77,9 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@Ml
     pointers[1] = ViewBase<std::uint32_t>(pLhs->pos, pLhs->posSize);
     ViewBase<std::uint32_t> indices[rank];
     indices[1] = ViewBase<std::uint32_t>(pLhs->coo, pLhs->cooSize);
-    T viewLhs(reinterpret_cast<cuda::@Type@*>(pLhs->data), pLhs->dataSize, pLhs->dims, pointers, indices);
-    T viewRhs(reinterpret_cast<cuda::@Type@*>(pRhs->data), pRhs->dataSize, pRhs->dims, pointers, indices);
-    T viewRet(reinterpret_cast<cuda::@Type@*>(pRet->data), pRet->dataSize, pRet->dims, pointers, indices);
+    T viewLhs(reinterpret_cast<@CudaType@*>(pLhs->data), pLhs->dataSize, pLhs->dims, pointers, indices);
+    T viewRhs(reinterpret_cast<@CudaType@*>(pRhs->data), pRhs->dataSize, pRhs->dims, pointers, indices);
+    T viewRet(reinterpret_cast<@CudaType@*>(pRet->data), pRet->dataSize, pRet->dims, pointers, indices);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewRet, viewLhs, viewRhs);

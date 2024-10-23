@@ -925,10 +925,11 @@ namespace details
    {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
-      using namespace QuICC::Memory;
-      tempOnHostMemorySpace Converter(view, TransferMode::write | TransferMode::block);
-
       auto pointers = view.pointers()[1];
+
+      using namespace QuICC::Memory;
+      // tempOnHostMemorySpace Converter(view, TransferMode::write | TransferMode::block);
+
 
       /// copy data to view
       int start = 0;
@@ -993,10 +994,11 @@ namespace details
    {
       std ::uint32_t nLayers = res.dim<QuICC::Dimensions::Data::DAT3D>();
 
-      using namespace QuICC::Memory;
-      tempOnHostMemorySpace Converter(view, TransferMode::read | TransferMode::block);
-
       auto pointers = view.pointers()[1];
+
+      using namespace QuICC::Memory;
+      // tempOnHostMemorySpace Converter(view, TransferMode::read | TransferMode::block);
+
 
       int start = 0;
       std::uint64_t offSet = 0;

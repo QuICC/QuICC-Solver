@@ -1,7 +1,7 @@
 /**
- * @file Pointwise.hpp
- * @brief Pointwise operations on Views
- * Allows for any user defined pointwise operation.
+ * @file Op.hpp
+ * @brief Slicewise operations on Views
+ * Allows for any user defined Slicewise operation.
  * The operation is defined via a functor object.
  * Value semantic lets a (good) compiler easily inline and
  * remove the indirect call.
@@ -10,6 +10,7 @@
 
 // External includes
 //
+#include <memory>
 
 // Project includes
 //
@@ -18,14 +19,14 @@
 #include "Memory/Memory.hpp"
 
 namespace QuICC {
-/// @brief namespace for Pointwise type operations
-namespace Pointwise {
+/// @brief namespace for Slicewise type operations
+namespace Slicewise {
 /// @brief namespace for Cuda backends
 namespace Cuda {
 
 using namespace QuICC::Operator;
 
-/// @brief Pointwise operator
+/// @brief Slicewise operator
 /// @tparam Functor Nary scalar functor
 /// @tparam Tout output View
 /// @tparam ...Targs input Views
@@ -77,5 +78,5 @@ private:
 };
 
 } // namespace Cuda
-} // namespace Pointwise
+} // namespace Slicewise
 } // namespace QuICC

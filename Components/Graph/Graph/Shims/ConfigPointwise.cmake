@@ -12,6 +12,16 @@ function(mapType2mlir TYPE MLIRTYPE)
     endif()
 endfunction()
 
+function(mapType2cuda TYPE CUDATYPE)
+    if(${TYPE} STREQUAL "double")
+        set(${CUDATYPE} "double" PARENT_SCOPE)
+    elseif(${TYPE} STREQUAL "std::complex<double>")
+        set(${CUDATYPE} "cuda::std::complex<double>" PARENT_SCOPE)
+    else()
+        message(SEND_ERROR "unknown type")
+    endif()
+endfunction()
+
 function(camelCase STRIN STROUT)
     string (TOUPPER "${STRIN}" U)
     string (SUBSTRING "${U}"   0  1 A)
@@ -29,6 +39,7 @@ foreach(Op IN LISTS Ops)
     foreach(Layout IN LISTS Layouts)
         foreach(Type IN LISTS Types)
             mapType2mlir(${Type} MlirType)
+            mapType2cuda(${Type} CudaType)
             configure_file(
                 "MlirPointwiseShims.cpp.in"
                 "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/Pointwise/MlirShims/${Op}/${MlirType}${Layout}${Backend}.cpp"

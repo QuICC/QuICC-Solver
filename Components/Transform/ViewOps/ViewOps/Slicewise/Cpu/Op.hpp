@@ -47,7 +47,7 @@ public:
    /// @brief capture functor by value
    /// @param f functor, i.e. struct with method
    /// Tout::ScalarType operator()(Targs::ScalarType var, ...)
-   Op(std::shared_ptr<Memory::memory_resource> mem, Functor f) : _f(f), _mem(mem){};
+   Op(Functor f, std::shared_ptr<Memory::memory_resource> mem) : _f(f), _mem(mem){};
    /// @brief default constructor
    Op() = delete;
    /// @brief dtor

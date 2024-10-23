@@ -3,8 +3,13 @@
 #include <cuda/std/complex>
 
 #include "Cuda/CudaUtil.hpp"
-#include "Slicewise.hpp"
+#include "Op.hpp"
 #include "ViewOps/Slicewise/Functors.hpp"
+#include "Profiler/Interface.hpp"
+#include "ViewOps/ViewMemoryUtils.hpp"
+#include "Types/Internal/Typedefs.hpp"
+
+#include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 
 namespace QuICC {
 namespace Slicewise {
@@ -14,9 +19,9 @@ namespace details {
 // naive implementation
 template <class Functor, class Tout, class ...Targs>
 __global__ void SlicewiseKernel(
-   const ViewBase<IndexType> layerWidth,
-   const ViewBase<IndexType> offSet,
-   const ViewBase<ScalarType> grid,
+   const View::ViewBase<typename Tout::IndexType> layerWidth,
+   const View::ViewBase<typename Tout::IndexType> offSet,
+   const View::ViewBase<typename Tout::ScalarType> grid,
    Functor f, Tout out, Targs... args)
 {
    const std::size_t l = blockIdx.z;
@@ -55,115 +60,123 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
    static_assert(std::is_same_v<Tout, View::View<double, View::DCCSC3D>>);
 
    // cache populated layers
-   auto pointers = out.pointers()[1];
+   View::ViewBase<IndexType> pointers = out.pointers()[1];
    if (_layerIndex.size() < 1)
    {
 
       // copy back to cpu for preprocessing
+      using namespace QuICC::Memory;
       tempOnHostMemorySpace converterP(pointers, TransferMode::read | TransferMode::block);
 
-      _N = 0;
-      IndexType nLayers = 0;
-      for (IndexType k = 0; k < pointers.size()-1 ; ++k)
-      {
-         IndexType nCols = pointers[k+1] - pointers[k];
-         // check if layer is populated
-         if (nCols > 0)
-         {
-            _N = std::max(_N, nCols);
-            ++nLayers;
-         }
-      }
+      // _N = 0;
+      // IndexType nLayers = 0;
+      // for (IndexType k = 0; k < pointers.size()-1 ; ++k)
+      // {
+      //    IndexType nCols = pointers[k+1] - pointers[k];
+      //    // check if layer is populated
+      //    if (nCols > 0)
+      //    {
+      //       _N = std::max(_N, nCols);
+      //       ++nLayers;
+      //    }
+      // }
 
-      // alloc device mem
-      _layerIndex = std::move(QuICC::Memory::MemBlock<IndexType>(nLayers, _mem.get()));
-      _layerWidth = std::move(QuICC::Memory::MemBlock<IndexType>(nLayers, _mem.get()));
+      // // alloc device mem
+      // _layerIndex = std::move(MemBlock<IndexType>(nLayers, _mem.get()));
+      // _layerWidth = std::move(MemBlock<IndexType>(nLayers, _mem.get()));
 
-      // setup view
-      ViewBase<IndexType> vLayerIndex(_layerIndex.data(), _layerIndex.size());
-      ViewBase<IndexType> vLayerWidth(_layerWidth.data(), _layerWidth.size());
+      // // setup view
+      // View::ViewBase<IndexType> vLayerIndex(_layerIndex.data(), _layerIndex.size());
+      // View::ViewBase<IndexType> vLayerWidth(_layerWidth.data(), _layerWidth.size());
 
-      // setup converters
-      tempOnHostMemorySpace converterLI(vLayerIndex, TransferMode::write | TransferMode::block);
-      tempOnHostMemorySpace converterLW(vLayerWidth, TransferMode::write);
+      // // setup converters
+      // tempOnHostMemorySpace converterLI(vLayerIndex, TransferMode::write | TransferMode::block);
+      // tempOnHostMemorySpace converterLW(vLayerWidth, TransferMode::write);
 
 
-      IndexType layCtr = 0;
-      for (IndexType k = 0; k < modsPointers.size()-1 ; ++k)
-      {
-         IndexType nCols = modsPointers[k+1] - modsPointers[k];
-         // check if layer is populated
-         if (nCols > 0)
-         {
-               vLayerIndex[layCtr] = k;
-               vLayerWidth[layCtr] = nCols;
-               ++layCtr;
-         }
-      }
+      // IndexType layCtr = 0;
+      // for (IndexType k = 0; k < pointers.size()-1 ; ++k)
+      // {
+      //    IndexType nCols = pointers[k+1] - pointers[k];
+      //    // check if layer is populated
+      //    if (nCols > 0)
+      //    {
+      //          vLayerIndex[layCtr] = k;
+      //          vLayerWidth[layCtr] = nCols;
+      //          ++layCtr;
+      //    }
+      // }
 
-      // alloc
-      _offSet = std::move(QuICC::Memory::MemBlock<IndexType>(nLayers, _mem.get()));
+      // // alloc
+      // _offSet = std::move(QuICC::Memory::MemBlock<IndexType>(nLayers, _mem.get()));
 
-      // setup views
-      ViewBase<IndexType> vOffSet(_offSet.data(), _offSet.size());
+      // // setup views
+      // View::ViewBase<IndexType> vOffSet(_offSet.data(), _offSet.size());
 
-      // setup converters
-      tempOnHostMemorySpace converterO(vOffSet, TransferMode::write);
+      // // setup converters
+      // tempOnHostMemorySpace converterO(vOffSet, TransferMode::write);
 
-      // exclusive scan offsets
-      vOffSet[0] = 0;
-      for (IndexType h = 0; h < nLayers-1 ; ++h)
-      {
-         vOffSet[h+1] = vOffSet[h] + out.lds()*vLayerWidth[h],;
-      }
+      // // exclusive scan offsets
+      // vOffSet[0] = 0;
+      // for (IndexType h = 0; h < nLayers-1 ; ++h)
+      // {
+      //    vOffSet[h+1] = vOffSet[h] + out.lds()*vLayerWidth[h];
+      // }
 
-      // setup grid
-      assert(_grid.data() == nullptr);
+      // // setup grid
+      // assert(_grid.data() == nullptr);
 
-      // alloc
-      _grid = std::move(QuICC::Memory::MemBlock<ScalarType>(nLayers, _mem.get()));
+      // // alloc
+      // _grid = std::move(QuICC::Memory::MemBlock<ScalarType>(nLayers, _mem.get()));
 
-      // setup view
-      ViewBase<IndexType> vGrid(_grid.data(), _grid.size());
+      // // setup views
+      // View::ViewBase<ScalarType> vGrid(_grid.data(), _grid.size());
 
-      // setup converter
-      tempOnHostMemorySpace converterG(vGrid, TransferMode::write);
+      // // setup converters
+      // tempOnHostMemorySpace converterG(vGrid, TransferMode::write);
 
-      ::QuICC::Internal::Array igrid;
-      ::QuICC::Internal::Array iweights;
-      /// \todo template param
-      ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-      quad.computeQuadrature(igrid, iweights, out.dims()[2]);
+      // ::QuICC::Internal::Array igrid;
+      // ::QuICC::Internal::Array iweights;
+      // /// \todo template param
+      // ::QuICC::Polynomial::Quadrature::WorlandRule quad;
+      // quad.computeQuadrature(igrid, iweights, out.dims()[2]);
 
-      // set grid
-      for (IndexType h = 0; h < nLayers-1 ; ++h)
-      {
-         _grid[h] = igrid[vLayerIndex[h]];
-      }
+      // // set grid
+      // for (IndexType h = 0; h < nLayers-1 ; ++h)
+      // {
+      //    vGrid[h] = igrid[vLayerIndex[h]];
+      // }
    }
 
-   // views
-   ViewBase<IndexType> layerIndex(_layerIndex.data(), _layerIndex.size());
-   ViewBase<IndexType> offSet(_offSet.data(), _offSet.size());
-   ViewBase<ScalarType> grid(_grid.data(), _grid.size());
+   // // views
+   // View::ViewBase<IndexType> layerIndex(_layerIndex.data(), _layerIndex.size());
+   // View::ViewBase<IndexType> offSet(_offSet.data(), _offSet.size());
+   // View::ViewBase<ScalarType> grid(_grid.data(), _grid.size());
 
-   const auto M = out.size();
-   dim3 blockSize;
-   dim3 numBlocks;
+   // const IndexType M = out.size();
+   // const IndexType N = _N;
+   // const IndexType activeLayers = _layerIndex.size();
 
-   blockSize.x = 64;
-   blockSize.y = 4;
-   blockSize.z = 1;
-   numBlocks.x = (M + blockSize.x - 1) / blockSize.x;
-   numBlocks.y = (_N + blockSize.y - 1) / blockSize.y;
-   numBlocks.z = activeLayers;
+   // dim3 blockSize;
+   // dim3 numBlocks;
 
-   details::SlicewiseKernel<Functor, Tout, Targs...>
-      <<<numBlocks, blockSize>>>(layerIndex, offset, grid, _f, out, args...);
+   // blockSize.x = 64;
+   // blockSize.y = 4;
+   // blockSize.z = 1;
+   // numBlocks.x = (M + blockSize.x - 1) / blockSize.x;
+   // numBlocks.y = (N + blockSize.y - 1) / blockSize.y;
+   // numBlocks.z = activeLayers;
+
+   // details::SlicewiseKernel<Functor, Tout, Targs...>
+   //    <<<numBlocks, blockSize>>>(layerIndex, offSet, grid, _f, out, args...);
 }
 
 // Explicit instantiations
-template class Op<MulRFunctor<double>, double, double>;
+// physical space
+template class Op<MulRFunctor<double>,
+   View::View<double, View::DCCSC3D>,
+   View::View<double, View::DCCSC3D>>;
+
 
 } // namespace Cuda
 } // namespace Slicewise

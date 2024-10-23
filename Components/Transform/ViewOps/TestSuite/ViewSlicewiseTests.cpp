@@ -66,8 +66,7 @@ TEST_CASE("Spherical Heat Advection", "SphericalHeatAdvection")
    using namespace QuICC::Slicewise;
    auto mulGridOp =
       std::make_unique<Op<MulRFunctor<double>,
-         view_t, view_t>>(mem,
-         MulRFunctor<double>(scaling));
+         view_t, view_t>>(MulRFunctor<double>(scaling), mem);
 
    mulGridOp->apply(out, in);
 

@@ -36,7 +36,7 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
         {
             using namespace QuICC::Slicewise::Cpu;
             using op_t = Op<MulRFunctor<double>, T, T>;
-            _ops.push_back(std::make_unique<op_t>(_mem, MulRFunctor<double>(scaling)));
+            _ops.push_back(std::make_unique<op_t>(MulRFunctor<double>(scaling), _mem));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
@@ -46,7 +46,7 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
         {
             using namespace QuICC::Slicewise::Cuda;
             using op_t = Op<MulRFunctor<double>, T, T>;
-            _ops.push_back(std::make_unique<op_t>(_mem, MulRFunctor<double>(scaling)));
+            _ops.push_back(std::make_unique<op_t>(MulRFunctor<double>(scaling), _mem));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;

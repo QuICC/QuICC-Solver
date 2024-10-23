@@ -92,7 +92,7 @@ tempOnHostMemorySpace<Tview>::tempOnHostMemorySpace(const Tview& view, const
       // store reference to device memory
       _dataDevice = ViewBase<ScalarType>(view.data(), view.size());
       // redirect view
-      view = Tview(_dataHost.data(), _dataHost.size());
+      const_cast<Tview&>(view) = Tview(_dataHost.data(), _dataHost.size());
       if (_mode & TransferMode::read)
       {
          // transfer data from gpu to temp

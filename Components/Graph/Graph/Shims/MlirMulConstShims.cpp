@@ -16,8 +16,8 @@ using namespace QuICC::Graph;
 /// @param pRet product
 /// @param pRhs non constant vector
 extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_cpu(void* obj,
-    ViewDescriptor<double, std::uint32_t, 3>* pRet,
-    ViewDescriptor<double, std::uint32_t, 3>* pRhs)
+    view3_t* pRet,
+    view3_t* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
@@ -52,8 +52,8 @@ extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_cpu(v
 /// @param pRet product
 /// @param pRhs non constant vector
 extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_gpu(void* obj,
-    ViewDescriptor<double, std::uint32_t, 3>* pRet,
-    ViewDescriptor<double, std::uint32_t, 3>* pRhs)
+    view3_t* pRet,
+    view3_t* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
@@ -71,11 +71,11 @@ extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D_gpu(v
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
     ViewBase<std::uint32_t> pointers[rank];
-    pointers[1] = ViewBase<std::uint32_t>(pLhs->pos, pLhs->posSize);
+    pointers[1] = ViewBase<std::uint32_t>(pRhs->pos, pRhs->posSize);
     ViewBase<std::uint32_t> indices[rank];
-    indices[1] = ViewBase<std::uint32_t>(pLhs->coo, pLhs->cooSize);
-    T viewRhs(reinterpret_cast<cuda::double*>(pRhs->data), pRhs->dataSize, pRhs->dims, pointers, indices);
-    T viewRet(reinterpret_cast<cuda::double*>(pRet->data), pRet->dataSize, pRet->dims, pointers, indices);
+    indices[1] = ViewBase<std::uint32_t>(pRhs->coo, pRhs->cooSize);
+    T viewRhs(pRhs->data, pRhs->dataSize, pRhs->dims, pointers, indices);
+    T viewRet(pRet->data, pRet->dataSize, pRet->dims, pointers, indices);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewRet, viewRhs);
@@ -110,8 +110,8 @@ extern "C" void _ciface_quiccir_mul_const_buoyancy_f64_DCCSC3D_f64_DCCSC3D(void*
 /// @param pRet product
 /// @param pRhs non constant vector
 extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_cpu(void* obj,
-    ViewDescriptor<double, std::uint32_t, 3>* pRet,
-    ViewDescriptor<double, std::uint32_t, 3>* pRhs)
+    view3_t* pRet,
+    view3_t* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
@@ -146,8 +146,8 @@ extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_cpu(
 /// @param pRet product
 /// @param pRhs non constant vector
 extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_gpu(void* obj,
-    ViewDescriptor<double, std::uint32_t, 3>* pRet,
-    ViewDescriptor<double, std::uint32_t, 3>* pRhs)
+    view3_t* pRet,
+    view3_t* pRhs)
 {
     #ifndef NDEBUG
     std::cout <<
@@ -165,11 +165,11 @@ extern "C" void _ciface_quiccir_mul_const_transport_f64_DCCSC3D_f64_DCCSC3D_gpu(
     using namespace QuICC::View;
     constexpr std::uint32_t rank = 3;
     ViewBase<std::uint32_t> pointers[rank];
-    pointers[1] = ViewBase<std::uint32_t>(pLhs->pos, pLhs->posSize);
+    pointers[1] = ViewBase<std::uint32_t>(pRhs->pos, pRhs->posSize);
     ViewBase<std::uint32_t> indices[rank];
-    indices[1] = ViewBase<std::uint32_t>(pLhs->coo, pLhs->cooSize);
-    T viewRhs(reinterpret_cast<cuda::double*>(pRhs->data), pRhs->dataSize, pRhs->dims, pointers, indices);
-    T viewRet(reinterpret_cast<cuda::double*>(pRet->data), pRet->dataSize, pRet->dims, pointers, indices);
+    indices[1] = ViewBase<std::uint32_t>(pRhs->coo, pRhs->cooSize);
+    T viewRhs(pRhs->data, pRhs->dataSize, pRhs->dims, pointers, indices);
+    T viewRet(pRet->data, pRet->dataSize, pRet->dims, pointers, indices);
     // call
     auto cl = reinterpret_cast<op_t*>(obj);
     cl->apply(viewRet, viewRhs);
