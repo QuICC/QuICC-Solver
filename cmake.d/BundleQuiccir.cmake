@@ -4,7 +4,7 @@
 message(DEBUG "BundleQuiccir")
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
-set(QUICC_QUICCIR_VERSION "nl-ops")
+set(QUICC_QUICCIR_VERSION "transform-contraction")
 
 option(QUICC_USE_SYSTEM_QUICCIR "Use system installed quiccir." OFF)
 
