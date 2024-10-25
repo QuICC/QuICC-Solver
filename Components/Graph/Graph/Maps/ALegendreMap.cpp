@@ -32,7 +32,7 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             if (op.getKind() == "DivS1Dp" ||
                 op.getKind() == "LlDivS1Dp")
             {
-                // special treatment operators
+                // Special treatment operators
                 // aka fused Phi diff
                 using backend_t = Cpu::ImplOp<Tout, Tin, Top, Transform::Quadrature::diffPhiPrj_m>;
                 using op_t = Op<Tout, Tin, Top, backend_t>;
@@ -44,7 +44,7 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             }
             else
             {
-                // regular AL ops
+                // Regular AL ops
                 using backend_t = Cpu::ImplOp<Tout, Tin, Top, Transform::Quadrature::none_m>;
                 using op_t = Op<Tout, Tin, Top, backend_t>;
                 _ops.push_back(std::make_unique<op_t>(_mem));
@@ -65,9 +65,9 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             if (op.getKind() == "DivS1Dp" ||
                 op.getKind() == "LlDivS1Dp")
             {
-                // special treatment operators
+                // Special treatment operators
                 // aka fused Phi diff
-                using backend_t = ImplOp<Tout, Tin, Top, Transform::Quadrature::none_m>;
+                using backend_t = ImplOp<Tout, Tin, Top, Transform::Quadrature::diffPhiPrj_m>;
                 using op_t = Op<Tout, Tin, Top, backend_t>;
                 _ops.push_back(std::make_unique<op_t>(_mem));
                 auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
@@ -77,7 +77,8 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             }
             else
             {
-                using backend_t = ImplOp<Tout, Tin, Top, Transform::Quadrature::diffPhiPrj_m>;
+                // Regular AL Ops
+                using backend_t = ImplOp<Tout, Tin, Top, Transform::Quadrature::none_m>;
                 using op_t = Op<Tout, Tin, Top, backend_t>;
                 _ops.push_back(std::make_unique<op_t>(_mem));
                 auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
@@ -116,7 +117,7 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
                 op.getKind() == "LlDivS1Dp"||
                 op.getKind() == "DivLlDivS1Dp")
             {
-                // special treatment operators
+                // Special treatment operators
                 // aka fused Phi diff
                 using backend_t = Cpu::ImplOp<Tout, Tin, Top, Transform::Quadrature::diffPhiInt_m>;
                 using op_t = Op<Tout, Tin, Top, backend_t>;
@@ -128,6 +129,7 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             }
             else
             {
+                // Regular AL Ops
                 using backend_t = Cpu::ImplOp<Tout, Tin, Top>;
                 using op_t = Op<Tout, Tin, Top, backend_t>;
                 _ops.push_back(std::make_unique<op_t>(_mem));
@@ -151,7 +153,7 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
                 op.getKind() == "LlDivS1Dp"||
                 op.getKind() == "DivLlDivS1Dp")
             {
-                // special treatment operators
+                // Special treatment operators
                 // aka fused Phi diff
                 using backend_t = ImplOp<Tout, Tin, Top, Transform::Quadrature::diffPhiInt_m>;
                 using op_t = Op<Tout, Tin, Top, backend_t>;
@@ -163,6 +165,7 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             }
             else
             {
+                // Regular AL Ops
                 using backend_t = ImplOp<Tout, Tin, Top>;
                 using op_t = Op<Tout, Tin, Top, backend_t>;
                 _ops.push_back(std::make_unique<op_t>(_mem));
