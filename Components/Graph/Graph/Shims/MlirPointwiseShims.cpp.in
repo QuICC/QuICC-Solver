@@ -27,6 +27,9 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@Ml
     assert(pRet != nullptr);
     assert(pLhs != nullptr);
     assert(pRhs != nullptr);
+    assert(pRet->data != nullptr);
+    assert(pLhs->data != nullptr);
+    assert(pRhs->data != nullptr);
     // op
     using namespace QuICC::Pointwise::Cpu;
     using namespace QuICC::Pointwise;
@@ -65,6 +68,9 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@Ml
     assert(pRet != nullptr);
     assert(pLhs != nullptr);
     assert(pRhs != nullptr);
+    assert(pRet->data != nullptr);
+    assert(pLhs->data != nullptr);
+    assert(pRhs->data != nullptr);
     // op
     using namespace QuICC::Pointwise::Cuda;
     using namespace QuICC::Pointwise;
@@ -107,6 +113,8 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@Ml
     }
     else
     {
+        assert(QuICC::Cuda::isDeviceMemory(pLhs->data));
+        assert(QuICC::Cuda::isDeviceMemory(pRhs->data));
         _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_gpu(obj, pRet, pLhs, pRhs);
     }
     #else

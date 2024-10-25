@@ -25,7 +25,7 @@ __global__ void SlicewiseKernel(
    Functor f, Tout out, Targs... args)
 {
    const std::size_t l = blockIdx.z;
-   const auto M = out.size();
+   const auto M = out.lds();
    const auto N = layerWidth[l];
 
    const std::size_t m = blockIdx.x * blockDim.x + threadIdx.x;
@@ -57,7 +57,8 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
    assert(((out.size() == args.size()) && ... ));
 
    // implemented only for physical space
-   static_assert(std::is_same_v<Tout, View::View<double, View::DCCSC3D>>);
+   static_assert(std::is_same_v<Tout, View::View<double, View::DCCSC3D>>,
+      "Implemented only for physical space and DCCSC3D layout");
 
    // cache populated layers
    View::ViewBase<IndexType> pointers = out.pointers()[1];
@@ -142,14 +143,14 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       quad.computeQuadrature(igrid, iweights, out.dims()[2]);
 
       // set grid
-      for (IndexType h = 0; h < nLayers-1 ; ++h)
+      for (IndexType h = 0; h < nLayers; ++h)
       {
          vGrid[h] = igrid[vLayerIndex[h]];
       }
    }
 
    // views
-   View::ViewBase<IndexType> layerIndex(_layerIndex.data(), _layerIndex.size());
+   View::ViewBase<IndexType> layerWidth(_layerWidth.data(), _layerWidth.size());
    View::ViewBase<IndexType> offSet(_offSet.data(), _offSet.size());
    View::ViewBase<ScalarType> grid(_grid.data(), _grid.size());
 
@@ -168,7 +169,7 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
    numBlocks.z = activeLayers;
 
    details::SlicewiseKernel<Functor, Tout, Targs...>
-      <<<numBlocks, blockSize>>>(layerIndex, offSet, grid, _f, out, args...);
+      <<<numBlocks, blockSize>>>(layerWidth, offSet, grid, _f, out, args...);
 }
 
 // Explicit instantiations

@@ -354,11 +354,15 @@ void Jit<RANK>::insertWrapper(const std::array<std::uint32_t, RANK> physDims,
     std::vector<std::vector<std::int64_t>> dimRets(1);
     std::vector<std::string> layRets(1);
     details::setOpt<RANK>(physDims, modsDims, lay, outStage, dimRets[0], layRets[0]);
+    // Set to defeault if not set
     if (_opt.wrap.dimRets.size() == 0)
     {
         _opt.wrap.dimRets = dimRets;
     }
-    _opt.wrap.layRets = layRets;
+    if (_opt.wrap.layRets.size() == 0)
+    {
+        _opt.wrap.layRets = layRets;
+    }
 
     pmPre.addPass(mlir::quiccir::createViewWrapperPass(_opt.wrap));
 

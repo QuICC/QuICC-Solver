@@ -1,14 +1,15 @@
-#define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
+#include "ViewOps/ViewMemoryUtils.hpp"
 #include "ViewOps/Slicewise/Op.hpp"
 #include "ViewOps/Slicewise/Functors.hpp"
-#include "ViewOps/ViewMemoryUtils.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 using namespace QuICC::Memory;
 using namespace QuICC::View;
 
-TEST_CASE("Radial Grid", "RadialGrid")
+
+TEST_CASE("Radial Grid Gpu", "RadialGridGpu")
 {
    // host mem block
    std::shared_ptr<memory_resource> mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
@@ -26,17 +27,32 @@ TEST_CASE("Radial Grid", "RadialGrid")
 
    std::uint32_t size = M*indices[1].size();
 
+   // host blocks
    // in
    MemBlock<double> memBlockIn(size, mem.get());
    // out and ref
    MemBlock<double> memBlockOut(size, mem.get());
    MemBlock<double> memBlockRef(size, mem.get());
 
-   // views
+   // host views
    view_t in({memBlockIn.data(), memBlockIn.size()}, dimensions, pointers, indices);
    // out and ref
    view_t out({memBlockOut.data(), memBlockOut.size()}, dimensions, pointers, indices);
    view_t ref({memBlockRef.data(), memBlockRef.size()}, dimensions, pointers, indices);
+
+   // device blocks
+   std::shared_ptr<memory_resource> memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
+
+   MemBlock<double> memBlockInDev(size, memDev.get());
+   // out and ref
+   MemBlock<double> memBlockOutDev(size, memDev.get());
+
+   // device views
+   view_t inDev({memBlockInDev.data(), memBlockInDev.size()}, dimensions, pointers, indices);
+   // out and ref
+   view_t outDev({memBlockOutDev.data(), memBlockOutDev.size()}, dimensions, pointers, indices);
+
+
 
    double scaling = 0.75;
 
@@ -61,14 +77,23 @@ TEST_CASE("Radial Grid", "RadialGrid")
       ref[mnl] = scaling * (in[mnl] * igrid[2]);
    }
 
+   // Copy to gpu
+   cudaErrChk(cudaMemcpy(inDev.data(), in.data(),
+      size * sizeof(typename view_t::ScalarType), cudaMemcpyHostToDevice));
+
+
    // const grid mul op
-   using namespace QuICC::Slicewise::Cpu;
+   using namespace QuICC::Slicewise::Cuda;
    using namespace QuICC::Slicewise;
    auto mulGridOp =
       std::make_unique<Op<MulRFunctor<double>,
-         view_t, view_t>>(MulRFunctor<double>(scaling), mem);
+         view_t, view_t>>(MulRFunctor<double>(scaling), memDev);
 
-   mulGridOp->apply(out, in);
+   mulGridOp->apply(outDev, inDev);
+
+   // Copy from gpu
+   cudaErrChk(cudaMemcpy(out.data(), outDev.data(),
+      size * sizeof(typename view_t::ScalarType), cudaMemcpyDeviceToHost));
 
    // check
    for (std::uint64_t i = 0; i < out.size(); ++i)

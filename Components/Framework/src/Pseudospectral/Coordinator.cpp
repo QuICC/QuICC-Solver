@@ -270,6 +270,7 @@ namespace Pseudospectral {
 
       // Wrapper pass options
       std::vector<std::vector<std::int64_t>> dimRets;
+      std::vector<std::string> layRets;
 
       // Modal space (aka JW space, Stage::PMM and Stage::MMM, QuICC Stage0)
       std::array<View::ViewBase<std::uint32_t>, dim> pointersMods;
@@ -316,6 +317,7 @@ namespace Pseudospectral {
                // Return dimensions
                // mlir has layer first
                dimRets.push_back({dims[2], dims[0], dims[1]});
+               layRets.push_back(layOpt[2][0]);
             }
          }, scalarVarPtr);
 
@@ -356,6 +358,7 @@ namespace Pseudospectral {
          // Return dimensions
          // mlir has layer first
          dimRets.push_back({dims[2], dims[0], dims[1]});
+         layRets.push_back(layOpt[0][0]);
       }
 
       // Store meta blocks
@@ -369,6 +372,7 @@ namespace Pseudospectral {
       // Jitter
       Graph::PipelineOptions opt;
       opt.wrap.dimRets = dimRets;
+      opt.wrap.layRets = layRets;
       mJitter = std::make_unique<QuICC::Graph::Jit<3>>(graphStr, mMemRsr, physDims, modsDims, layOpt, Graph::Stage::MMM, Graph::Stage::MMM, meta, opt);
    };
 
@@ -928,7 +932,13 @@ namespace details
       auto pointers = view.pointers()[1];
 
       using namespace QuICC::Memory;
-      // tempOnHostMemorySpace Converter(view, TransferMode::write | TransferMode::block);
+
+      /// \todo permanent host buffer
+      View::ViewBase viewb(view.data(), view.size());
+      tempOnHostMemorySpace Converter(viewb, TransferMode::write | TransferMode::block);
+
+      /// \todo permanent transfer / check width only in debug mode
+      tempOnHostMemorySpace ConverterP(pointers, TransferMode::read);
 
 
       /// copy data to view
@@ -953,8 +963,12 @@ namespace details
             // mods
             inRows = res.dim<QuICC::Dimensions::Data::DATB1D>(0, p);
          }
-         auto highView = view.lds();
-         assert(highView == static_cast<std::uint32_t>(inRows));
+
+         auto heightView = view.lds();
+         if constexpr (std::is_same_v<VIEWATT, View::DCCSC3D>)
+         {
+            assert(heightView == static_cast<std::uint32_t>(inRows));
+         }
 
          const Eigen::Ref<const Eigen::Matrix<SCALAR, -1, -1>> inB = eig.block(0, start, inRows, cols);
 
@@ -965,12 +979,12 @@ namespace details
                if constexpr (std::is_same_v<VIEWATT, View::DCCSC3DJIK>)
                {
                   // copy padded to flattened and transpose
-                  view[offSet + i*widthView+j] = inB.data()[i+j*eig.rows()];
+                  viewb[offSet + i*widthView+j] = inB.data()[i+j*eig.rows()];
                }
                else if constexpr (std::is_same_v<VIEWATT, View::DCCSC3D>)
                {
                   // copy padded to flattened column
-                  view[offSet + i+j*highView] = inB.data()[i+j*eig.rows()];
+                  viewb[offSet + i+j*heightView] = inB.data()[i+j*eig.rows()];
                }
                else
                {
@@ -997,7 +1011,12 @@ namespace details
       auto pointers = view.pointers()[1];
 
       using namespace QuICC::Memory;
-      // tempOnHostMemorySpace Converter(view, TransferMode::read | TransferMode::block);
+      /// \todo permanent host buffer
+      View::ViewBase viewb(view.data(), view.size());
+      tempOnHostMemorySpace Converter(viewb, TransferMode::read | TransferMode::block);
+
+      /// \todo permanent transfer / check width only in debug mode
+      tempOnHostMemorySpace ConverterP(pointers, TransferMode::read);
 
 
       int start = 0;
@@ -1021,8 +1040,12 @@ namespace details
             // mods
             outRows = res.dim<QuICC::Dimensions::Data::DATB1D>(0, p);
          }
-         auto highView = view.lds();
-         assert(highView == static_cast<std::uint32_t>(outRows));
+
+         auto heightView = view.lds();
+         if constexpr (std::is_same_v<VIEWATT, View::DCCSC3D>)
+         {
+            assert(heightView == static_cast<std::uint32_t>(outRows));
+         }
 
          Eigen::Ref<Eigen::Matrix<SCALAR, -1, -1>> outB = eig.block(0, start, outRows, cols);
 
@@ -1033,12 +1056,12 @@ namespace details
                if constexpr (std::is_same_v<VIEWATT, View::DCCSC3DJIK>)
                {
                   // copy padded from flattened column and transpose
-                  outB.data()[i+j*eig.rows()] = view[offSet + i*widthView+j];
+                  outB.data()[i+j*eig.rows()] = viewb[offSet + i*widthView+j];
                }
                else if constexpr (std::is_same_v<VIEWATT, View::DCCSC3D>)
                {
                   // copy padded from flattened column
-                  outB.data()[i+j*eig.rows()] = view[offSet + i+j*highView];
+                  outB.data()[i+j*eig.rows()] = viewb[offSet + i+j*heightView];
                }
                else
                {

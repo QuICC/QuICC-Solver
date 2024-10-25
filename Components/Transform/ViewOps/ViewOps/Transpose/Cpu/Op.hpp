@@ -103,10 +103,10 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       assert(in.dims()[0] == out.dims()[1]);
       assert(in.dims()[1] == out.dims()[2]);
       assert(in.dims()[2] == out.dims()[0]);
-      auto Ipad = out.lds();
-      auto I = out.dims()[0];
-      auto J = out.dims()[1];
-      auto K = out.dims()[2];
+      const auto Ipad = out.lds();
+      const auto I = out.dims()[0];
+      const auto J = out.dims()[1];
+      const auto K = out.dims()[2];
       for (std::size_t k = 0; k < K; ++k)
       {
          for (std::size_t j = 0; j < J; ++j)

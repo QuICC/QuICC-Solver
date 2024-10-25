@@ -193,12 +193,12 @@ add_executable(ViewSlicewiseTest
     ViewSlicewiseTests.cpp
 )
 
-# if(TARGET QuICC::Cuda)
-#     target_sources(ViewSlicewiseTest
-#         PRIVATE
-#             ViewSlicewiseTests.cu
-#     )
-# endif()
+if(TARGET QuICC::Cuda)
+    target_sources(ViewSlicewiseTest
+        PRIVATE
+            ViewSlicewiseTests.cu
+    )
+endif()
 
 target_link_libraries(ViewSlicewiseTest
     ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Slicewise

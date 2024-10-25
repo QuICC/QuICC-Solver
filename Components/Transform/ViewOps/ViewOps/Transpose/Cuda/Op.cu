@@ -66,6 +66,7 @@ __global__ void perm(View::View<Tout, View::DCCSC3D> out,
    const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
 
+   const auto Ipad = out.lds();
    const auto I = in.dims()[0];
    const auto J = in.dims()[1];
    const auto K = in.dims()[2];
@@ -76,7 +77,7 @@ __global__ void perm(View::View<Tout, View::DCCSC3D> out,
       {
          // plane is row major
          std::size_t ijk = i * J + j + k * I * J;
-         std::size_t kij = k + i * K + j * K * I;
+         std::size_t kij = k + i * K + j * K * Ipad;
          assert(ijk < in.size());
          assert(kij < out.size());
          out[kij] = in[ijk];
@@ -343,12 +344,15 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
                          View::DCCSC3D>)
    {
       // dense transpose
-      assert(out.size() == in.size());
-      assert(out.size() == out.dims()[0] * out.dims()[1] * out.dims()[2]);
-
-      auto I = in.dims()[0];
-      auto J = in.dims()[1];
-      auto K = in.dims()[2];
+      assert(out.size() >= in.size()); // output might be padded
+      assert(out.size() == out.lds() * out.dims()[1] * out.dims()[2]);
+      // perm = [1, 2, 0]
+      assert(in.dims()[0] == out.dims()[1]);
+      assert(in.dims()[1] == out.dims()[2]);
+      assert(in.dims()[2] == out.dims()[0]);
+      const auto I = in.dims()[0];
+      const auto J = in.dims()[1];
+      const auto K = in.dims()[2];
 
       // setup grid
       dim3 blockSize;

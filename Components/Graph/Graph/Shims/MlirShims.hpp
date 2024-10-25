@@ -151,12 +151,12 @@ void dealloc_viewDescriptor(ViewDescriptor<Tdata, std::uint32_t, 3>* pBuffer)
     std::size_t sizeByte = sizeof(Tdata) * pBuffer->dataSize;
     // Check memory space
     bool isCpuMem = true;
-    #ifndef NDEBUG
-    std::cout << "dealloc, bytes: " << sizeByte << "\tis cpu: " << isCpuMem << "\tptr: " << pBuffer->data <<'\n';
-    #endif
     #ifdef QUICC_HAS_CUDA_BACKEND
     isCpuMem = !QuICC::Cuda::isDeviceMemory(pBuffer->data);
     auto& memGpu = Pensieve<cudaMem_t>::getInstance().getMem();
+    #endif
+    #ifndef NDEBUG
+    std::cout << "dealloc, bytes: " << sizeByte << "\tis cpu: " << isCpuMem << "\tptr: " << pBuffer->data <<'\n';
     #endif
     if (isCpuMem)
     {

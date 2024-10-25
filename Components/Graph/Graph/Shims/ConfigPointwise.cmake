@@ -31,14 +31,18 @@ endfunction()
 
 set(Ops "add;sub")
 set(Types "double;std::complex<double>")
-set(Layouts "DCCSC3D;S1CLCSC3D")
+set(Layouts "DCCSC3D;DCCSC3DJIK;S1CLCSC3D;S1CLCSC3DJIK")
 
 # Configure Shims
 foreach(Op IN LISTS Ops)
     camelCase(${Op} OpCC)
     foreach(Layout IN LISTS Layouts)
         foreach(Type IN LISTS Types)
-            if (Type STREQUAL "double" AND Layout STREQUAL "S1CLCSC3D")
+            # These layouts appear only in spectral space
+            if (Type STREQUAL "double" AND
+                (Layout STREQUAL "S1CLCSC3D"
+                    OR Layout STREQUAL "S1CLCSC3DJIK"
+                    OR Layout STREQUAL "DCCSC3DJIK"))
                 continue()
             endif()
             mapType2mlir(${Type} MlirType)
