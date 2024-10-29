@@ -1,0 +1,69 @@
+/**
+ * @file DipolarityTest.cpp
+ * @brief Tests for the Framework IO
+ */
+
+// System includes
+//
+  #include <catch2/catch.hpp>
+
+// Project includes
+//
+#include "Environment/QuICCEnv.hpp"
+#include "QuICC/PhysicalNames/registerAll.hpp"
+#include "QuICC/Arithmetics/registerAll.hpp"
+#include "QuICC/TestSuite/Framework/Io/TestArgs.hpp"
+#include "QuICC/TestSuite/Framework/Io/TestModel.hpp"
+#include "QuICC/Generator/StateGenerator.hpp"
+#include "QuICC/Model/StateGeneratorFactory.hpp"
+#include "Profiler/Interface.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Framework::Io;
+
+static const auto badValueOut = std::numeric_limits<QuICC::MHDFloat>::max();
+
+TEST_CASE( "Check dipolarity writer", "[SphereDipolarity]" ){
+
+   // Register IDs
+   QuICC::PhysicalNames::registerAll();
+
+   Catch::StringMaker<double>::precision = 15;
+
+   int status = 0;
+
+   // Create simulation
+   QuICC::SharedStateGenerator   spGen;
+
+   // Exception handling during the initialisation part
+   try
+   {
+      // Create state generator
+      spGen = QuICC::StateGeneratorFactory<currentts::TestModel>::createGenerator();
+   }
+
+   // If exception is thrown, finalise (close files) and return
+   catch(std::logic_error& e)
+   {
+      try
+      {
+         QuICC::QuICCEnv().abort(e.what());
+      }
+      catch(std::logic_error& ee)
+      {
+         std::cerr << ee.what() << std::endl;
+      }
+
+      status = -1;
+   }
+
+   if(status == 0)
+   {
+      // Run the simulation
+      spGen->run();
+   }
+
+   // Cleanup and close file handles
+   spGen->finalize();
+
+   CHECK( status == 0);
+}

@@ -81,8 +81,6 @@ namespace QuICC {
 
    void StateGenerator::writeOutput()
    {
-      this->mSimIoCtrl.writeAscii(this->mPseudospectral.startTime(), this->mPseudospectral.startTimestep());
-
       // Write final state file (using stored time and timestep)
       this->mSimIoCtrl.writeHdf5(-1, -1);
 
