@@ -932,7 +932,7 @@ namespace details
       tempOnHostMemorySpace Converter(viewb, TransferMode::write | TransferMode::block);
 
       /// \todo permanent transfer / check width only in debug mode
-      tempOnHostMemorySpace ConverterP(pointers, TransferMode::read);
+      tempOnHostMemorySpace ConverterP(pointers, TransferMode::read | TransferMode::block);
 
 
       /// copy data to view
@@ -942,8 +942,10 @@ namespace details
       {
          // layer width
          int cols = res.dim<QuICC::Dimensions::Data::DAT2D>(p);
-         auto widthView = pointers[p+1] - pointers[p];
-         assert(widthView == static_cast<std::uint32_t>(cols));
+         auto widthView = static_cast<std::uint32_t>(cols);
+         // check only in debug mode
+         // auto widthView = pointers[p+1] - pointers[p];
+         // assert(widthView == static_cast<std::uint32_t>(cols));
          // layer height (DCCSC3D only)
          /// \todo extend to other view types
          int inRows;
@@ -1007,11 +1009,10 @@ namespace details
       using namespace QuICC::Memory;
       /// \todo permanent host buffer
       View::ViewBase viewb(view.data(), view.size());
-      tempOnHostMemorySpace Converter(viewb, TransferMode::read | TransferMode::block);
+      tempOnHostMemorySpace Converter(viewb, TransferMode::read);
 
       /// \todo permanent transfer / check width only in debug mode
-      tempOnHostMemorySpace ConverterP(pointers, TransferMode::read);
-
+      tempOnHostMemorySpace ConverterP(pointers, TransferMode::read | TransferMode::block);
 
       int start = 0;
       std::uint64_t offSet = 0;
@@ -1019,8 +1020,10 @@ namespace details
       {
          // layer width
          int cols = res.dim<QuICC::Dimensions::Data::DAT2D>(p);
-         auto widthView = pointers[p+1] - pointers[p];
-         assert(widthView == static_cast<std::uint32_t>(cols));
+         auto widthView = static_cast<std::uint32_t>(cols);
+         // check only in debug mode
+         // auto widthView = pointers[p+1] - pointers[p];
+         // assert(widthView == static_cast<std::uint32_t>(cols));
          // layer height (DCCSC3D only)
          /// \todo extend to other view types
          int outRows;

@@ -168,7 +168,11 @@ extern "C" void _ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_DCCS
     assert(QuICC::Cuda::isDeviceMemory(pIn->pos));
     assert(QuICC::Cuda::isDeviceMemory(pIn->coo));
     // op
+    #ifdef QUICC_MPI
+    using namespace QuICC::Transpose::Mpi;
+    #else
     using namespace QuICC::Transpose::Cuda;
+    #endif
     using namespace QuICC::Transpose;
     using Tout = C_DCCSC3D_t;
     using Tin = C_DCCSC3DJIK_t;
