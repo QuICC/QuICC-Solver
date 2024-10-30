@@ -208,12 +208,6 @@ namespace Pseudospectral {
 
    void Coordinator::addGraph(const std::string& graphStr)
    {
-      /// Setup, get info from mspRes
-      /// jw : look at BenchmarkMagC2.cpp:65
-      /// LoadSplitter test?
-      /// Transform::SharedTransformSetup WLFlBuilder::spSetup3D
-      // mspRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DATF1D>();
-
       // get Dims from mspRes
       // std::uint32_t Nr = jwRes.dim<Dimensions::Data::DATF1D>();
       std::uint32_t Nr = mspRes->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::PHYSICAL);
@@ -1108,7 +1102,7 @@ namespace details
 
 
       Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
-      // Compute backward transform
+      // // Compute backward transform
       // this->updatePhysical(it);
 
       // // compute nonlinear interaction and forward transform

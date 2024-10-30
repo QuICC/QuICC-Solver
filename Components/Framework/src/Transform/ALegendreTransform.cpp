@@ -94,7 +94,11 @@ namespace Transform {
 #if QUICC_USE_KOKKOS
       using backend_t = kokkos_t;
 #else
+   #ifdef QUICC_HAS_CUDA_BACKEND
+         using backend_t = viewGpu_t;
+   #else
       using backend_t = viewCpu_t;
+   #endif
 #endif
       this->mImpl.addOperator<Poly::ALegendre::Projector::P<backend_t>>(Backward::P::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::Ll<backend_t>>(Backward::Laplh::id());
@@ -106,7 +110,7 @@ namespace Transform {
       this->mImpl.addOperator<Poly::ALegendre::Projector::LlDivS1Dp<backend_t>>(Backward::OversinLaplhDphi::id());
       /// \todo not ported
       this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1D1S1<base_t>>(Backward::OversinD1Sin::id());
-       
+
       this->mImpl.addOperator<Poly::ALegendre::Integrator::P<backend_t>>(Forward::P::id());
       this->mImpl.addOperator<Poly::ALegendre::Integrator::DivLl<backend_t>>(Forward::Overlaplh::id());
       this->mImpl.addOperator<Poly::ALegendre::Integrator::Ll<backend_t>>(Forward::Laplh::id());

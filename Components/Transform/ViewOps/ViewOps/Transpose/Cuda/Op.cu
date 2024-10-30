@@ -47,7 +47,7 @@ __global__ void perm(View::View<Tout, View::DCCSC3DJIK> out,
    {
       for (std::size_t k = 0; k < K; ++k)
       {
-         std::size_t ijk = i + j * Ipad + k * I * J;
+         std::size_t ijk = i + j * Ipad + k * Ipad * J;
          // plane is row major
          std::size_t jki = j * K + k + i * J * K;
          assert(ijk < in.size());
@@ -67,7 +67,7 @@ __global__ void perm(View::View<Tout, View::DCCSC3D> out,
    const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
 
-   const auto Ipad = out.lds();
+   const auto Kpad = out.lds();
    const auto I = in.dims()[0];
    const auto J = in.dims()[1];
    const auto K = in.dims()[2];
@@ -78,7 +78,7 @@ __global__ void perm(View::View<Tout, View::DCCSC3D> out,
       {
          // plane is row major
          std::size_t ijk = i * J + j + k * I * J;
-         std::size_t kij = k + i * K + j * K * Ipad;
+         std::size_t kij = k + i * Kpad + j * Kpad * I;
          assert(ijk < in.size());
          assert(kij < out.size());
          out[kij] = in[ijk];

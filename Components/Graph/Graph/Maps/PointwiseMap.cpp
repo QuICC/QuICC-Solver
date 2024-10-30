@@ -67,7 +67,7 @@ void MapOps::setAdd(mlir::quiccir::AddOp op)
                 llvm::isa<mlir::Float64Type>(eleRhsTy))
             {
                 using ptTy = double;
-                using T = R_DCCSC3D_t;
+                using T = View::View<ptTy, View::DCCSC3D>;
                 using op_t = Op<AddFunctor<ptTy>, T, T, T>;
                 _ops.push_back(std::make_unique<op_t>(AddFunctor<ptTy>()));
                 auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T>>>(_ops.back()).get();
@@ -154,7 +154,7 @@ void MapOps::setSub(mlir::quiccir::SubOp op)
                 llvm::isa<mlir::Float64Type>(eleRhsTy))
             {
                 using ptTy = double;
-                using T = R_DCCSC3D_t;
+                using T = View::View<ptTy, View::DCCSC3D>;
                 using op_t = Op<SubFunctor<ptTy>, T, T, T>;
                 _ops.push_back(std::make_unique<op_t>(SubFunctor<ptTy>()));
                 auto* ptr = std::get<std::shared_ptr<NaryOp<T, T, T>>>(_ops.back()).get();
