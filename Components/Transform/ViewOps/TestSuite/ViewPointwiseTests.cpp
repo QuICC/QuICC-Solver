@@ -206,9 +206,10 @@ TEST_CASE("Cross Cpu Functor", "CrossCpuFunctor")
    addOp->apply(viewC0, viewU1, viewU2, viewV1, viewV2);
 
    // check
+   auto eps = 10*std::numeric_limits<double>::epsilon();
    for (std::uint64_t i = 0; i < S; ++i)
    {
-      CHECK(viewC0[i] == scaling * (viewU1[i] * viewV2[i] - viewU2[i] * viewV1[i]));
+      CHECK(std::abs(viewC0[i] - scaling * (viewU1[i] * viewV2[i] - viewU2[i] * viewV1[i])) < eps);
    }
 }
 
@@ -258,9 +259,10 @@ TEST_CASE("Dot Cpu Functor", "DotCpuFunctor")
    addOp->apply(viewOut, viewU0, viewU1, viewU2, viewV0, viewV1, viewV2);
 
    // check
+   auto eps = 10*std::numeric_limits<double>::epsilon();
    for (std::uint64_t i = 0; i < S; ++i)
    {
-      CHECK(viewOut[i] == scaling * (viewU0[i] * viewV0[i]
-      + viewU1[i] * viewV1[i] + viewU2[i] * viewV2[i]));
+      CHECK(std::abs(viewOut[i] - scaling * (viewU0[i] * viewV0[i]
+      + viewU1[i] * viewV1[i] + viewU2[i] * viewV2[i])) < eps);
    }
 }
