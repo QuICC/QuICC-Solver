@@ -50,7 +50,7 @@ TEST_CASE("Radial Grid", "RadialGrid")
    {
       auto mnl = m;
       in[mnl] = 1.0;
-      ref[mnl] = scaling * (in[mnl] * igrid[0]);
+      ref[mnl] = scaling * (in[mnl] * QuICC::Internal::cast(igrid[0]));
    }
 
    // init col 1, lay 2
@@ -58,7 +58,7 @@ TEST_CASE("Radial Grid", "RadialGrid")
    {
       auto mnl = m + M;
       in[mnl] = 1.0;
-      ref[mnl] = scaling * (in[mnl] * igrid[2]);
+      ref[mnl] = scaling * (in[mnl] * QuICC::Internal::cast(igrid[2]));
    }
 
    // const grid mul op

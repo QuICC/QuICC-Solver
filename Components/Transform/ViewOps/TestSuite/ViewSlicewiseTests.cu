@@ -4,6 +4,7 @@
 #include "ViewOps/Slicewise/Op.hpp"
 #include "ViewOps/Slicewise/Functors.hpp"
 #include "Types/Internal/Typedefs.hpp"
+#include "Types/Internal/Casts.hpp"
 
 using namespace QuICC::Memory;
 using namespace QuICC::View;
@@ -66,7 +67,7 @@ TEST_CASE("Radial Grid Gpu", "RadialGridGpu")
    {
       auto mnl = m;
       in[mnl] = 1.0;
-      ref[mnl] = scaling * (in[mnl] * igrid[0]);
+      ref[mnl] = scaling * (in[mnl] * QuICC::Internal::cast(igrid[0]));
    }
 
    // init col 1, lay 2
@@ -74,7 +75,7 @@ TEST_CASE("Radial Grid Gpu", "RadialGridGpu")
    {
       auto mnl = m + M;
       in[mnl] = 1.0;
-      ref[mnl] = scaling * (in[mnl] * igrid[2]);
+      ref[mnl] = scaling * (in[mnl] * QuICC::Internal::cast(igrid[2]));
    }
 
    // Copy to gpu
