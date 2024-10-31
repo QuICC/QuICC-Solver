@@ -20,6 +20,7 @@
 #include "Profiler/Interface.hpp"
 #include "View/View.hpp"
 #include "View/Attributes.hpp"
+#include "Types/Internal/Casts.hpp"
 
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 
