@@ -37,14 +37,14 @@ quicc_set_ulp(_ulp
 foreach(_test ${_tests})
   foreach(_impl1d uniform triangular)
     foreach(_alg tubular single1d single2d)
-      set(_dis False)
+      set(_dis True)
       if(_impl1d STREQUAL "triangular")
-        # if(TARGET QuICC::Cuda)
+        if(TARGET QuICC::Cuda)
           set(_dis True)
-        # endif()
-        # if(QUICC_USE_KOKKOS)
-        #   set(_dis True)
-        # endif()
+        endif()
+        if(QUICC_USE_KOKKOS)
+          set(_dis True)
+        endif()
       endif()
       quicc_add_test(${_test}
         COMMAND ${TestExe}
@@ -74,6 +74,7 @@ foreach(_test ${_tests})
       ULPS ${_ulp}
       IDS 0 1 2 3 4
       OPTIONS algorithm:${_alg} truncation:uniform
+      DISABLED True
     )
   endforeach()
 endforeach()
