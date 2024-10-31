@@ -8,6 +8,7 @@
 #include "Profiler/Interface.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 #include "Types/Internal/Typedefs.hpp"
+#include "Types/Internal/Casts.hpp"
 
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 
@@ -145,7 +146,7 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       // set grid
       for (IndexType h = 0; h < nLayers; ++h)
       {
-         vGrid[h] = igrid[vLayerIndex[h]];
+         vGrid[h] = Internal::cast(igrid[vLayerIndex[h]]);
       }
    }
 

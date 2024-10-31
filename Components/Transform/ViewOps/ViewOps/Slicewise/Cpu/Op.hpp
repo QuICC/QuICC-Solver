@@ -124,7 +124,7 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       // copy
       for (std::size_t i = 0; i < _grid.size(); ++i)
       {
-         _grid[i] = igrid[i];
+         _grid[i] = Internal::cast(igrid[i]);
       }
    }
 
