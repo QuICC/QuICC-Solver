@@ -268,6 +268,13 @@ if(QUICC_USE_MPI)
         ViewTransposeMpiTests.cpp
     )
 
+    if(TARGET QuICC::Cuda)
+        target_sources(ViewTransposeMpiTest
+            PRIVATE
+                ViewTransposeMpiTests.cu
+        )
+    endif()
+
     target_link_libraries(ViewTransposeMpiTest
         ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
         Catch2::Catch2
