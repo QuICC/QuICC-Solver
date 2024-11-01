@@ -13,9 +13,10 @@
 extern "C" {
 #include <unistd.h>
 }
-/// \to ompi guard?
 #include <mpi.h>
+#if defined(OPEN_MPI) && OPEN_MPI
 #include <mpi-ext.h>
+#endif
 
 // Project include
 //
@@ -202,7 +203,26 @@ void Mpi::gdbHook()
 
 void Mpi::checkCudaAwareness()
 {
-   if(MPIX_Query_cuda_support())
+
+   bool isCudaAware = false;
+
+   // OpenMPI check
+   #ifdef MPIX_CUDA_AWARE_SUPPORT
+   isCudaAware = MPIX_Query_cuda_support();
+   #endif
+
+   // MPICH check
+   auto mpichCheck = std::getenv("MPICH_GPU_SUPPORT_ENABLED");
+   if(mpichCheck != nullptr)
+   {
+      int mpich_gpu_support_enabled = std::stoi(mpichCheck);
+      if (mpich_gpu_support_enabled == 1)
+      {
+         isCudaAware = true;
+      }
+   }
+
+   if(isCudaAware)
    {
       std::cout << "Mpi is cuda aware!\n";
    }
