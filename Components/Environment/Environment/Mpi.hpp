@@ -131,6 +131,8 @@ private:
     */
    void gdbHook();
 
+   void checkCudaAwareness();
+
    /**
     * @brief size of the communicator
     */

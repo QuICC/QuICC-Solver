@@ -137,9 +137,6 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
    QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrOut(pointersOut[1].size(), memDev.get());
    QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxOut(indicesOut[1].size(), memDev.get());
 
-   std::cout << "blop\n";
-
-
    // set device pointers and indices
    constexpr std::uint32_t dims = 3;
    ViewBase<std::uint32_t> pointersInDev[dims];

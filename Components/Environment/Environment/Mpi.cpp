@@ -3,9 +3,6 @@
  * @brief Source of the implementation of an MPI environment
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <chrono>
@@ -16,11 +13,11 @@
 extern "C" {
 #include <unistd.h>
 }
+/// \to ompi guard?
+#include <mpi.h>
+#include <mpi-ext.h>
 
-// External includes
-//
-
-// Class include
+// Project include
 //
 #include "Environment/Mpi.hpp"
 
@@ -31,6 +28,9 @@ namespace Environment {
 Mpi::Mpi()
 {
    MPI_Init(nullptr, nullptr);
+
+   // Check if we have cuda awareness
+   checkCudaAwareness();
 
    // Set MPI rank of local CPU
    MPI_Comm_rank(MPI_COMM_WORLD, &Mpi::mId);
@@ -198,6 +198,21 @@ void Mpi::gdbHook()
    }
    // Wait for everyone
    this->synchronize();
+}
+
+void Mpi::checkCudaAwareness()
+{
+   if(MPIX_Query_cuda_support())
+   {
+      std::cout << "Mpi is cuda aware!\n";
+   }
+   else
+   {
+      std::cout << "Mpi is not cuda aware!\n";
+      #ifdef QUICC_HAS_CUDA_BACKEND
+      this->abort("Cuda aware is not supported, but needed for Cuda backend!");
+      #endif
+   }
 }
 
 void Mpi::addCommunicator(const std::size_t id, const std::vector<int>& ids)

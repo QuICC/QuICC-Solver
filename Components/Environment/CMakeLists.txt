@@ -26,6 +26,12 @@ if(QUICC_USE_MPI)
     PUBLIC
       QUICC_MPI
   )
+  if (TARGET QuICC::Cuda)
+    target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
+      PRIVATE
+        QuICC::Cuda
+    )
+  endif()
 endif()
 
 # Alias
