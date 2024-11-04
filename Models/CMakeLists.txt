@@ -32,13 +32,14 @@
 #
 
 # Default branch for known models
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.14.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.12.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.15.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.12.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.14.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.11.0")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "v1.1.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.15.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.13.1")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.17.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.13.1")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.15.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.12.1")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "v1.2.1")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRRBC "v1.0.0")
 
 # Cache value, may be overwritten manually
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo
@@ -55,6 +56,8 @@ set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC
     ${_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC} CACHE STRING "Model repository branch.")
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC
     ${_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC} CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRRBC
+    ${_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRRBC} CACHE STRING "Model repository branch.")
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.d")

@@ -1,5 +1,5 @@
 /**
- * @file ISphericalModelBackend.cpp
+ * @file IPlaneModelBackend.cpp
  * @brief Source of the interface for model backend
  */
 
@@ -9,7 +9,7 @@
 
 // Project includes
 //
-#include "QuICC/Model/ISphericalModelBackend.hpp"
+#include "QuICC/Model/IPlaneModelBackend.hpp"
 
 namespace QuICC {
 
