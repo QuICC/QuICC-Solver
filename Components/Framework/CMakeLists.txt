@@ -43,6 +43,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
     QuICC::Environment
     QuICC::TimestepPc
     QuICC::TimestepRkcb
+    QuICC::Graph
   )
 
 # Add debug option for operator output
