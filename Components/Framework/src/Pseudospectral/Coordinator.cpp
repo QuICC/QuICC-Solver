@@ -1078,91 +1078,99 @@ namespace details
    {
       Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::computeNonlinear");
 
-      assert(mJitter.get() != nullptr);
+      if (mJitter.get() == nullptr)
+      {
+         // Use old backward tree + non linear terms + forward tree
 
-      // Copy to view
-      const auto& jwRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA1D);
-      auto& temp = mScalarVariables[PhysicalNames::Temperature::id()];
-      auto tempVarv = mId2View[PhysicalNames::Temperature::id()];
-      std::visit(
-         [&](auto&& p, auto& Tv)
-         {
-            auto& ptrTemp = p->rDom(0).rPerturbation();
-            details::copyEig2View(Tv, ptrTemp.data(), jwRes);
-         }, temp, tempVarv);
+         Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
+         // Compute backward transform
+         this->updatePhysical(it);
 
-      auto& vec = mVectorVariables[PhysicalNames::Velocity::id()];
-      auto& TorVarv = mId2View[FieldComponents::Spectral::TOR];
-      auto& PolVarv = mId2View[FieldComponents::Spectral::POL];
-      std::visit(
-         [&](auto&& p, auto& Torv, auto& Polv)
-         {
-            auto& ptrTor = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR);
-            details::copyEig2View(Torv, ptrTor.data(), jwRes);
-            auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
-            details::copyEig2View(Polv, ptrPol.data(), jwRes);
-         }, vec, TorVarv, PolVarv);
+         // compute nonlinear interaction and forward transform
+         this->updateSpectral(it);
+         Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
 
+      }
+      else
+      {
+         // Use new graph
 
-      Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
-      // // Compute backward transform
-      // this->updatePhysical(it);
+         // Copy to view
+         const auto& jwRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA1D);
+         auto& temp = mScalarVariables[PhysicalNames::Temperature::id()];
+         auto tempVarv = mId2View[PhysicalNames::Temperature::id()];
+         std::visit(
+            [&](auto&& p, auto& Tv)
+            {
+               auto& ptrTemp = p->rDom(0).rPerturbation();
+               details::copyEig2View(Tv, ptrTemp.data(), jwRes);
+            }, temp, tempVarv);
 
-      // // compute nonlinear interaction and forward transform
-      // this->updateSpectral(it);
-      Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
+         auto& vec = mVectorVariables[PhysicalNames::Velocity::id()];
+         auto& TorVarv = mId2View[FieldComponents::Spectral::TOR];
+         auto& PolVarv = mId2View[FieldComponents::Spectral::POL];
+         std::visit(
+            [&](auto&& p, auto& Torv, auto& Polv)
+            {
+               auto& ptrTor = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR);
+               details::copyEig2View(Torv, ptrTor.data(), jwRes);
+               auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
+               details::copyEig2View(Polv, ptrPol.data(), jwRes);
+            }, vec, TorVarv, PolVarv);
 
-      auto& UrVarv = mId2View[FieldComponents::Physical::R];
-      auto& UthetaVarv = mId2View[FieldComponents::Physical::THETA];
-      auto& UphiVarv = mId2View[FieldComponents::Physical::PHI];
+         auto& UrVarv = mId2View[FieldComponents::Physical::R];
+         auto& UthetaVarv = mId2View[FieldComponents::Physical::THETA];
+         auto& UphiVarv = mId2View[FieldComponents::Physical::PHI];
 
-      Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
-      // Call graph
-      std::visit(
-         [&](auto& Tv, auto& Torv, auto& Polv, auto& Urv, auto& Uthetav, auto& Uphiv)
-         {
-            mJitter->apply(Tv, Torv, Polv,
-            Urv, Uthetav, Uphiv,
-            Tv, Torv, Polv);
-         }, tempVarv, TorVarv, PolVarv, UrVarv, UthetaVarv, UphiVarv);
-      Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlNew");
+         Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
+         // Call graph
+         std::visit(
+            [&](auto& Tv, auto& Torv, auto& Polv, auto& Urv, auto& Uthetav, auto& Uphiv)
+            {
+               mJitter->apply(Tv, Torv, Polv,
+               Urv, Uthetav, Uphiv,
+               Tv, Torv, Polv);
+            }, tempVarv, TorVarv, PolVarv, UrVarv, UthetaVarv, UphiVarv);
+         Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlNew");
 
-      // Copy back spectral coeff
-      std::visit(
-         [&](auto&& p, auto& Tv)
-         {
-            auto& ptrTemp = p->rDom(0).rPerturbation();
-            p->rDom(0).rPerturbation().setZeros();
-            details::copyView2Eig(ptrTemp.rData(), Tv, jwRes);
-         }, temp, tempVarv);
+         // Copy back spectral coeff
+         std::visit(
+            [&](auto&& p, auto& Tv)
+            {
+               auto& ptrTemp = p->rDom(0).rPerturbation();
+               p->rDom(0).rPerturbation().setZeros();
+               details::copyView2Eig(ptrTemp.rData(), Tv, jwRes);
+            }, temp, tempVarv);
 
-      std::visit(
-         [&](auto&& p, auto& Torv, auto& Polv)
-         {
-            auto& ptrTor = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR);
-            p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setZeros();
-            details::copyView2Eig(ptrTor.rData(), Torv, jwRes);
-            auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
-            p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setZeros();
-            details::copyView2Eig(ptrPol.rData(), Polv, jwRes);
-         }, vec, TorVarv, PolVarv);
+         std::visit(
+            [&](auto&& p, auto& Torv, auto& Polv)
+            {
+               auto& ptrTor = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR);
+               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setZeros();
+               details::copyView2Eig(ptrTor.rData(), Torv, jwRes);
+               auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
+               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setZeros();
+               details::copyView2Eig(ptrPol.rData(), Polv, jwRes);
+            }, vec, TorVarv, PolVarv);
 
-      // Copy back physical vel for cfl computation
-      /// \todo move cfl comp in graph and remove
-      const auto& ftRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA3D);
-      std::visit(
-         [&](auto&& p, auto& Urv, auto& Uthetav, auto& Uphiv)
-         {
-            auto& ptrUr = p->rDom(0).rPhys().rComp(FieldComponents::Physical::R);
-            p->rDom(0).rPhys().rComp(FieldComponents::Physical::R).setZeros();
-            details::copyView2Eig(ptrUr.rData(), Urv, ftRes);
-            auto& ptrUtheta = p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA);
-            p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA).setZeros();
-            details::copyView2Eig(ptrUtheta.rData(), Uthetav, ftRes);
-            auto& ptrUphi = p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI);
-            p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI).setZeros();
-            details::copyView2Eig(ptrUphi.rData(), Uphiv, ftRes);
-         }, vec, UrVarv, UthetaVarv, UphiVarv);
+         // Copy back physical vel for cfl computation
+         /// \todo move cfl comp in graph and remove
+         const auto& ftRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA3D);
+         std::visit(
+            [&](auto&& p, auto& Urv, auto& Uthetav, auto& Uphiv)
+            {
+               auto& ptrUr = p->rDom(0).rPhys().rComp(FieldComponents::Physical::R);
+               p->rDom(0).rPhys().rComp(FieldComponents::Physical::R).setZeros();
+               details::copyView2Eig(ptrUr.rData(), Urv, ftRes);
+               auto& ptrUtheta = p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA);
+               p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA).setZeros();
+               details::copyView2Eig(ptrUtheta.rData(), Uthetav, ftRes);
+               auto& ptrUphi = p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI);
+               p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI).setZeros();
+               details::copyView2Eig(ptrUphi.rData(), Uphiv, ftRes);
+            }, vec, UrVarv, UthetaVarv, UphiVarv);
+      }
+
    }
 
    void Coordinator::explicitTrivialEquations(const std::size_t opId, ScalarEquation_range scalarEq_range, VectorEquation_range vectorEq_range)
