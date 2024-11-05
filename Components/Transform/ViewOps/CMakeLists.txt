@@ -24,6 +24,9 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 
 # Add public headers
 set(PHS
+  ViewOps/ViewIndexUtils.hpp
+  ViewOps/ViewMemoryUtils.hpp
+  ViewOps/ViewSizeUtils.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
@@ -35,6 +38,7 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
 target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
   QuICC::View
   QuICC::Operator
+  QuICC::Memory
   QuICC::ViewOps::Fourier
   QuICC::ViewOps::ALegendre
   QuICC::ViewOps::Worland

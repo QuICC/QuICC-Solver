@@ -13,10 +13,10 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-set(PHS
-  Std/Span.hpp
-  Std/Cuda/Utility.hpp
-)
+# set(PHS
+#   Std/Span.hpp
+#   Std/Cuda/Utility.hpp
+# )
 
 # Add public header
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
@@ -41,5 +41,5 @@ add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS
 quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
   COMPONENT ${QUICC_CURRENT_COMPONENT_LIB}
   DIRECTORIES
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Std
     )

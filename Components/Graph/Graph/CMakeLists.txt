@@ -3,6 +3,7 @@ set(PHS
   ./Graph/OpsMap.hpp
   ./Graph/Tags.hpp
   ./Graph/Types.hpp
+  ./Graph/Jit.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}

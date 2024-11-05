@@ -15,6 +15,8 @@ set(PHS
   "View/View.hpp"
   "View/ViewBase.hpp"
   "View/ViewDense.hpp"
+  "View/ViewMacros.hpp"
+  "View/ViewMaps.hpp"
   "View/ViewSparse.hpp"
   "View/Attributes.hpp"
   "View/ViewUtils.hpp"

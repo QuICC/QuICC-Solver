@@ -19,14 +19,14 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-set(PHS
-  Memory/Memory.hpp
-  Memory/MemoryResource.hpp
-  Memory/Pensieve.hpp
-  Memory/Cpu/NewDelete.hpp
-  Memory/Cpu/Pool.hpp
-  Memory/Cuda/Malloc.hpp
-)
+# set(PHS
+#   Memory/Memory.hpp
+#   Memory/MemoryResource.hpp
+#   Memory/Pensieve.hpp
+#   Memory/Cpu/NewDelete.hpp
+#   Memory/Cpu/Pool.hpp
+#   Memory/Cuda/Malloc.hpp
+# )
 
 # Add public header
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
@@ -60,5 +60,5 @@ endif(QUICC_TESTSUITE_MEMORY)
 quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
   COMPONENT ${QUICC_CURRENT_COMPONENT_LIB}
   DIRECTORIES
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Memory
     )
