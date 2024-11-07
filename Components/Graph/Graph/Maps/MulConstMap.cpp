@@ -8,6 +8,8 @@
 #include "ViewOps/Slicewise/Op.hpp"
 #include "ViewOps/Slicewise/Functors.hpp"
 
+#include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
+#include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 
 namespace QuICC
 {
@@ -35,7 +37,7 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
         if (_isCpu)
         {
             using namespace QuICC::Slicewise::Cpu;
-            using op_t = Op<MulRFunctor<double>, T, T>;
+            using op_t = Op<2, QuICC::Polynomial::Quadrature::WorlandRule, MulRFunctor<double>, T, T>;
             _ops.push_back(std::make_unique<op_t>(MulRFunctor<double>(scaling), _mem));
             auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
             assert(ptr != nullptr);
