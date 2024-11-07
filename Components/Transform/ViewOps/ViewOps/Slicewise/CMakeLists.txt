@@ -39,8 +39,8 @@ endif()
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   "${INTTYPE}"
-    QuICC::Polynomial
     QuICC::View
+    QuICC::Types
     QuICC::Operator
     QuICC::Profiling
 )

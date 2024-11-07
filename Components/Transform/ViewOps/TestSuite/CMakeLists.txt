@@ -204,6 +204,7 @@ target_link_libraries(ViewSlicewiseTest
     ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Slicewise
     Catch2::Catch2
     QuICC::Memory
+    QuICC::Polynomial
 )
 
 add_test(

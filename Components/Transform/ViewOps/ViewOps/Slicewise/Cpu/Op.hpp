@@ -1,7 +1,7 @@
 /**
  * @file Op.hpp
  * @brief Slicewise operations on Views
- * Allows for any user defined Slicewise operation.
+ * Allows for any user defined Slicewise operation with grid dependence.
  * The operation is defined via a functor object.
  * Value semantic lets a (good) compiler easily inline and
  * remove the indirect call.
@@ -22,7 +22,6 @@
 #include "View/Attributes.hpp"
 #include "Types/Internal/Casts.hpp"
 
-#include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 
 namespace QuICC {
 /// @brief namespace for Slicewise type operations
@@ -36,8 +35,8 @@ using namespace QuICC::Operator;
 /// @tparam Functor Nary scalar functor
 /// @tparam Tout output View
 /// @tparam ...Targs input Views
-template <class Functor, class Tout, class... Targs>
-class Op : public NaryBaseOp<Op<Functor, Tout, Targs...>, Tout, Targs...>
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class... Targs>
+class Op : public NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout, Targs...>
 {
 private:
    /// @brief stored functor, i.e. struct with method
@@ -59,8 +58,10 @@ private:
    /// @param out output View
    /// @param ...args input Views
    void applyImpl(Tout& out, const Targs&... args);
-   /// @brief give access to base class
-   friend NaryBaseOp<Op<Functor, Tout, Targs...>, Tout, Targs...>;
+   /// @brief specialized implementation for Phi-Theta slice
+   void phiThetaImpl(Tout& out, const Targs&... args);
+    /// @brief specialized implementation for Phi-R slice
+   void phiRImpl(Tout& out, const Targs&... args);
    /// @brief index typedef
    using IndexType = typename Tout::IndexType;
    /// @brief layer index cache
@@ -75,10 +76,13 @@ private:
    Memory::MemBlock<typename Tout::ScalarType> _gridData;
    /// @brief Grid view
    View::ViewBase<typename Tout::ScalarType> _grid;
+   /// @brief give access to base class
+   friend NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout, Targs...>;
 };
 
-template <class Functor, class Tout, class ...Targs>
-void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
+
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class ...Targs>
+void Op<Dir, GridBuilder, Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
 {
    Profiler::RegionFixture<4> fix("Slicewise::Cpu::applyImpl");
 
@@ -91,6 +95,73 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
 
    // implemented only for physical space
    static_assert(std::is_same_v<Tout, View::View<double, View::DCCSC3D>>);
+
+   if constexpr(Dir == 1)
+   {
+      phiRImpl(out, args...);
+   }
+   else if constexpr(Dir == 2)
+   {
+      phiThetaImpl(out, args...);
+   }
+   else
+   {
+      throw std::logic_error("This slice direction is not implemented.");
+   }
+
+}
+
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class ...Targs>
+void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiRImpl(Tout& out, const Targs&... args)
+{
+   assert(Dir == 1);
+
+   // setup grid
+   if (_grid.data() == nullptr)
+   {
+      ::QuICC::Internal::Array igrid;
+      ::QuICC::Internal::Array iweights;
+      GridBuilder quad;
+      quad.computeQuadrature(igrid, iweights, out.dims()[Dir]);
+
+      // setup view
+      _gridData = std::move(Memory::MemBlock<typename Tout::ScalarType>(igrid.size(), _mem.get()));
+      _grid = View::ViewBase(_gridData.data(), _gridData.size());
+
+      // copy
+      for (std::size_t i = 0; i < _grid.size(); ++i)
+      {
+         _grid[i] = Internal::cast(igrid[i]);
+      }
+   }
+
+   // apply slicewise functor
+   auto indices = out.indices()[1];
+   // DCCSC3D
+   // column height
+   auto M = out.lds();
+   for (std::size_t col = 0; col < indices.size(); ++col)
+   {
+      // column Id index or Theta Idx
+      auto thetaIdx = indices[col];
+
+      // check mem bounds
+      assert((col+1)*M <= out.size());
+
+      // column major
+      for (std::size_t m = 0; m < M; ++m)
+      {
+         auto mnk = m + col*M;
+         out[mnk] = _f(_grid[thetaIdx], args[mnk]...);
+      }
+   }
+}
+
+
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class ...Targs>
+void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiThetaImpl(Tout& out, const Targs&... args)
+{
+   assert(Dir == 2);
 
    // cache populated layers
    auto pointers = out.pointers()[1];
@@ -114,9 +185,8 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
    {
       ::QuICC::Internal::Array igrid;
       ::QuICC::Internal::Array iweights;
-      /// \todo template param
-      ::QuICC::Polynomial::Quadrature::WorlandRule quad;
-      quad.computeQuadrature(igrid, iweights, out.dims()[2]);
+      GridBuilder quad;
+      quad.computeQuadrature(igrid, iweights, out.dims()[Dir]);
 
       // setup view
       _gridData = std::move(Memory::MemBlock<typename Tout::ScalarType>(igrid.size(), _mem.get()));
