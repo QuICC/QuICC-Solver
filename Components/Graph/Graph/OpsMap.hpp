@@ -41,11 +41,17 @@ class MapOps
     bool _isCpu = true;
     /// comm
     #ifdef QUICC_MPI
+    /// @brief Fourier space to Associated Legendre space comm
     std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commFTAL;
+    /// @brief Associated Legendre space to Fourier space comm
     std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commALFT;
+    /// @brief Associated Legendre space to Jones-Worland space comm
     std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commALJW;
+    /// @brief Jones-Worland space to Associated Legendre space comm
     std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commJWAL;
     #endif
+    /// @brief storage for scaling parameters
+    PhysicalParameters<double> _physParams;
   public:
     /// @brief empty constructor
     MapOps() = default;
@@ -53,6 +59,7 @@ class MapOps
     /// @param module mlir module
     /// @param mem memory resource to pass to operators
     MapOps(mlir::ModuleOp module,
+      const PhysicalParameters<double> physParams,
       const std::shared_ptr<Memory::memory_resource> mem);
 
     /// @brief return void pointers to ops

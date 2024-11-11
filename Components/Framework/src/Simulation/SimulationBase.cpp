@@ -355,6 +355,11 @@ namespace QuICC {
       return this->mSimIoCtrl.config();
    }
 
+   const Equations::SharedEquationParameters SimulationBase::eqParams() const
+   {
+      return this->mspEqParams;
+   }
+
    void SimulationBase::tuneOutput()
    {
    }
@@ -369,8 +374,9 @@ namespace QuICC {
       // Empty to simplify implementations but can't be called from derived class
    }
 
-   void  SimulationBase::addGraph(const std::string& graphStr)
+   void  SimulationBase::addGraph(const std::string& graphStr,
+      const Graph::PhysicalParameters<MHDFloat>& physParams)
    {
-      mPseudospectral.addGraph(graphStr);
+      mPseudospectral.addGraph(graphStr, physParams);
    };
 }

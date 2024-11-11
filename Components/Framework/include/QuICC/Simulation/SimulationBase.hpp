@@ -124,8 +124,11 @@ namespace QuICC {
 
          /**
           * @brief Add graph description to solver
+          * @param graphStr mlir module
+          * @param physParams scaling parameters
           */
-         void addGraph(const std::string& graphStr);
+         void addGraph(const std::string& graphStr,
+            const Graph::PhysicalParameters<MHDFloat>& physParams);
 
          /**
           * @brief Set the base simulation configuration file and parameters
@@ -176,6 +179,11 @@ namespace QuICC {
           * @brief Get configuration
           */
          const SimulationConfig& config() const;
+
+         /**
+          * @brief Get equation
+          */
+         const Equations::SharedEquationParameters eqParams() const;
 
       protected:
          /**

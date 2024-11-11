@@ -85,5 +85,15 @@ struct MemRefDescriptor {
   intptr_t strides[N];
 };
 
+/// @brief collection of non-dimensional scaling parameters
+template <class T = double>
+struct PhysicalParameters
+{
+  T inertia = 1.0;
+  T buoyancy = 1.0;
+  T transport = 1.0;
+  T coriolis = 1.0;
+};
+
 } // namespace Graph
 } // namespace QuICC

@@ -34,6 +34,7 @@
 //
 #include "Graph/OpsMap.hpp"
 #include "Graph/Tags.hpp"
+#include "Graph/Types.hpp"
 #include "Graph/Shims/MlirShims.hpp"
 
 namespace QuICC {
@@ -58,7 +59,8 @@ ViewDescriptor<T, std::uint32_t, 3> getViewDescriptor(View::View<T, ATT> view)
 
 /// @brief collection of pass options used in the
 /// lowering pipeline
-struct PipelineOptions {
+struct PipelineOptions
+{
     /// @brief Wrapper pass options
     mlir::quiccir::QuiccirViewWrapperOptions wrap;
 };
@@ -89,6 +91,9 @@ private:
     /// (4, 5) -> stage 2
     std::array<MemRefDescriptor<std::uint32_t, 1>*, 6> _metaMap;
     std::array<MemRefDescriptor<std::uint32_t, 1>, 6> _metaStore;
+
+    /// @brief storage for scaling parameters
+    PhysicalParameters<double> _physParams;
 
     /// @brief storage for pipeline pass options
     PipelineOptions _opt;
@@ -173,6 +178,7 @@ public:
         const std::array<std::array<std::string, 2>, RANK> layOpt,
         const Stage outStage, const Stage inStage,
         const std::vector<View::ViewBase<std::uint32_t>>& meta,
+        const PhysicalParameters<double> physParams = PhysicalParameters(),
         const PipelineOptions options = PipelineOptions());
 
     /// @brief Setup Graph from source file
@@ -193,6 +199,7 @@ public:
         const std::array<std::array<std::string, 2>, RANK> layOpt,
         const Stage outStage, const Stage inStage,
         const std::vector<View::ViewBase<std::uint32_t>>& meta,
+        const PhysicalParameters<double> physParams = PhysicalParameters(),
         const PipelineOptions options = PipelineOptions());
 
     /// @brief Apply graph
@@ -450,7 +457,7 @@ void Jit<RANK>::setMap(const std::shared_ptr<Memory::memory_resource> mem)
     _module->dump();
 
     // setup ops map and store
-    _storeOp = std::move(QuICC::Graph::MapOps(*_module, mem));
+    _storeOp = std::move(QuICC::Graph::MapOps(*_module, _physParams, mem));
 }
 
 template <std::uint32_t RANK>
@@ -514,7 +521,8 @@ Jit<RANK>::Jit(const std::string modStr,
     const std::array<std::array<std::string, 2>, RANK> layOpt,
     const Stage outStage, const Stage inStage,
     const std::vector<View::ViewBase<std::uint32_t>>& meta,
-    const PipelineOptions options) : _opt(options)
+    const PhysicalParameters<double> physParams,
+    const PipelineOptions options) : _physParams(physParams), _opt(options)
 {
     setDialects();
     // Load module
@@ -534,7 +542,8 @@ Jit<RANK>::Jit(const llvm::SourceMgr sourceMgr,
     const std::array<std::array<std::string, 2>, RANK> layOpt,
     const Stage outStage, const Stage inStage,
     const std::vector<View::ViewBase<std::uint32_t>>& meta,
-    const PipelineOptions options) : _opt(options)
+    const PhysicalParameters<double> physParams,
+    const PipelineOptions options) : _physParams(physParams), _opt(options)
 {
     setDialects();
     // Load module

@@ -192,8 +192,10 @@ namespace Pseudospectral {
          /**
           * @brief Add graph description to solver
           * @param graphStr graph description
+          * @param physParams scaling parameters
           */
-         void addGraph(const std::string& graphStr);
+         void addGraph(const std::string& graphStr,
+            const Graph::PhysicalParameters<MHDFloat>& physParams);
 
          /**
           * @brief Initialise the transforms

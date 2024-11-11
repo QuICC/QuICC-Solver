@@ -27,33 +27,97 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
         using T = R_DCCSC3D_t;
         using namespace QuICC::Slicewise;
         double scaling = 1.0;
-        if (op.getKind() == "buoyancy")
+        if (op.getKind() == "coriolis_cos")
         {
-            /// \todo set by Jitter
-            scaling = 3122;
+            scaling = _physParams.coriolis;
+            /// \todo check type
+            if (_isCpu)
+            {
+                using namespace QuICC::Slicewise::Cpu;
+                using op_t = Op<1, QuICC::Polynomial::Quadrature::LegendreRule, MulCosFunctor<double>, T, T>;
+                _ops.push_back(std::make_unique<op_t>(MulCosFunctor<double>(scaling), _mem));
+                auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
+                assert(ptr != nullptr);
+                _thisArr[index] = ptr;
+            }
+            #ifdef QUICC_HAS_CUDA_BACKEND
+            else
+            {
+                using namespace QuICC::Slicewise::Cuda;
+                using op_t = Op<1, QuICC::Polynomial::Quadrature::LegendreRule, MulCosFunctor<double>, T, T>;
+                _ops.push_back(std::make_unique<op_t>(MulCosFunctor<double>(scaling), _mem));
+                auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
+                assert(ptr != nullptr);
+                _thisArr[index] = ptr;
+            }
+            #endif
         }
-        /// \todo check all kinds
-        /// \todo check type
-        if (_isCpu)
+        else if (op.getKind() == "coriolis_sin")
         {
-            using namespace QuICC::Slicewise::Cpu;
-            using op_t = Op<2, QuICC::Polynomial::Quadrature::WorlandRule, MulRFunctor<double>, T, T>;
-            _ops.push_back(std::make_unique<op_t>(MulRFunctor<double>(scaling), _mem));
-            auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
-            assert(ptr != nullptr);
-            _thisArr[index] = ptr;
+            scaling = _physParams.coriolis;
+            /// \todo check type
+            if (_isCpu)
+            {
+                using namespace QuICC::Slicewise::Cpu;
+                using op_t = Op<1, QuICC::Polynomial::Quadrature::LegendreRule, MulSinFunctor<double>, T, T>;
+                _ops.push_back(std::make_unique<op_t>(MulSinFunctor<double>(scaling), _mem));
+                auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
+                assert(ptr != nullptr);
+                _thisArr[index] = ptr;
+            }
+            #ifdef QUICC_HAS_CUDA_BACKEND
+            else
+            {
+                using namespace QuICC::Slicewise::Cuda;
+                using op_t = Op<1, QuICC::Polynomial::Quadrature::LegendreRule, MulSinFunctor<double>, T, T>;
+                _ops.push_back(std::make_unique<op_t>(MulSinFunctor<double>(scaling), _mem));
+                auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
+                assert(ptr != nullptr);
+                _thisArr[index] = ptr;
+            }
+            #endif
         }
-        #ifdef QUICC_HAS_CUDA_BACKEND
         else
         {
-            using namespace QuICC::Slicewise::Cuda;
-            using op_t = Op<2, QuICC::Polynomial::Quadrature::WorlandRule, MulRFunctor<double>, T, T>;
-            _ops.push_back(std::make_unique<op_t>(MulRFunctor<double>(scaling), _mem));
-            auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
-            assert(ptr != nullptr);
-            _thisArr[index] = ptr;
+            /// \todo check all kinds
+            if (op.getKind() == "buoyancy")
+            {
+                /// \todo set by Jitter
+                scaling = _physParams.buoyancy;
+            }
+            else if (op.getKind() == "inertia")
+            {
+                /// \todo set by Jitter
+                scaling = _physParams.inertia;
+            }
+            else if (op.getKind() == "transport")
+            {
+                /// \todo set by Jitter
+                scaling = _physParams.transport;
+            }
+            /// \todo check all kinds
+            /// \todo check type
+            if (_isCpu)
+            {
+                using namespace QuICC::Slicewise::Cpu;
+                using op_t = Op<2, QuICC::Polynomial::Quadrature::WorlandRule, MulRFunctor<double>, T, T>;
+                _ops.push_back(std::make_unique<op_t>(MulRFunctor<double>(scaling), _mem));
+                auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
+                assert(ptr != nullptr);
+                _thisArr[index] = ptr;
+            }
+            #ifdef QUICC_HAS_CUDA_BACKEND
+            else
+            {
+                using namespace QuICC::Slicewise::Cuda;
+                using op_t = Op<2, QuICC::Polynomial::Quadrature::WorlandRule, MulRFunctor<double>, T, T>;
+                _ops.push_back(std::make_unique<op_t>(MulRFunctor<double>(scaling), _mem));
+                auto* ptr = std::get<std::shared_ptr<NaryOp<T, T>>>(_ops.back()).get();
+                assert(ptr != nullptr);
+                _thisArr[index] = ptr;
+            }
+            #endif
         }
-        #endif
     }
     else {
         #ifndef NDEBUG

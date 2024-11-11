@@ -206,7 +206,7 @@ namespace Pseudospectral {
 
    } // namespace details
 
-   void Coordinator::addGraph(const std::string& graphStr)
+   void Coordinator::addGraph(const std::string& graphStr, const Graph::PhysicalParameters<MHDFloat>& physParams)
    {
       // get Dims from mspRes
       // std::uint32_t Nr = jwRes.dim<Dimensions::Data::DATF1D>();
@@ -367,7 +367,7 @@ namespace Pseudospectral {
       Graph::PipelineOptions opt;
       opt.wrap.dimRets = dimRets;
       opt.wrap.layRets = layRets;
-      mJitter = std::make_unique<QuICC::Graph::Jit<3>>(graphStr, mMemRsr, physDims, modsDims, layOpt, Graph::Stage::MMM, Graph::Stage::MMM, meta, opt);
+      mJitter = std::make_unique<QuICC::Graph::Jit<3>>(graphStr, mMemRsr, physDims, modsDims, layOpt, Graph::Stage::MMM, Graph::Stage::MMM, meta, physParams, opt);
    };
 
    Coordinator::ScalarEquation_range Coordinator::scalarRange(const std::size_t eqId, const int it)
