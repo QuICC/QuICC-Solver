@@ -38,6 +38,12 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   BLAS::BLAS # banded/tridiag solve/mul TODO: remove dep
   )
 
+# Wrappers depends on kk part
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+  PRIVATE
+    ${QUICC_CURRENT_COMPONENT_LIB_KK}
+)
+
 if(QUICC_WORLAND_BACKEND STREQUAL "BLAS")
   if(NOT TARGET BLAS::BLAS)
     message(SEND_ERROR "${QUICC_CURRENT_COMPONENT_LIB} requires BLAS, but it was not found.")

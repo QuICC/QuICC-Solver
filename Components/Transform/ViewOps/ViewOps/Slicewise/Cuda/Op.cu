@@ -11,6 +11,7 @@
 #include "Types/Internal/Casts.hpp"
 
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
+#include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 
 namespace QuICC {
 namespace Slicewise {
@@ -42,8 +43,8 @@ __global__ void SlicewiseKernel(
 } // namespace details
 
 
-template <class Functor, class Tout, class ...Targs>
-void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class ...Targs>
+void Op<Dir, GridBuilder, Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
 {
    Profiler::RegionFixture<4> fix("Slicewise::Cuda::applyImpl");
 
@@ -140,7 +141,7 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
       ::QuICC::Internal::Array igrid;
       ::QuICC::Internal::Array iweights;
       /// \todo template param
-      ::QuICC::Polynomial::Quadrature::WorlandRule quad;
+      GridBuilder quad;
       quad.computeQuadrature(igrid, iweights, out.dims()[2]);
 
       // set grid
@@ -175,10 +176,17 @@ void Op<Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
 
 // Explicit instantiations
 // physical space
-template class Op<MulRFunctor<double>,
+template class Op<2, QuICC::Polynomial::Quadrature::WorlandRule, MulRFunctor<double>,
    View::View<double, View::DCCSC3D>,
    View::View<double, View::DCCSC3D>>;
 
+template class Op<1, QuICC::Polynomial::Quadrature::LegendreRule, MulCosFunctor<double>,
+   View::View<double, View::DCCSC3D>,
+   View::View<double, View::DCCSC3D>>;
+
+template class Op<1, QuICC::Polynomial::Quadrature::LegendreRule, MulSinFunctor<double>,
+   View::View<double, View::DCCSC3D>,
+   View::View<double, View::DCCSC3D>>;
 
 } // namespace Cuda
 } // namespace Slicewise

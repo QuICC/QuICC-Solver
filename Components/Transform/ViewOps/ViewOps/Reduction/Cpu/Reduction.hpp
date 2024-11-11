@@ -55,7 +55,8 @@ void Op<Tout, Tin, Dir>::applyImpl(Tout& out, const Tin& in)
    using namespace QuICC::View;
 
    // check types consistency
-   static_assert(out.rank() == in.rank() - 1, "input/output rank mismatch");
+   // Note, static_assert fail in clang
+   assert(out.rank() == in.rank() - 1 && "input/output rank mismatch");
    static_assert(
       std::is_same_v<typename Tin::ScalarType, typename Tout::ScalarType>,
       "input/output scalar type mismatch");

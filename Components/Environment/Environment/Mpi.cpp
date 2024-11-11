@@ -229,9 +229,9 @@ void Mpi::checkCudaAwareness()
    else
    {
       std::cout << "Mpi is not cuda aware!\n";
-      #ifdef QUICC_HAS_CUDA_BACKEND
-      this->abort("Cuda aware is not supported, but needed for Cuda backend!");
-      #endif
+      // #ifdef QUICC_HAS_CUDA_BACKEND
+      // this->abort("Cuda aware is not supported, but needed for Cuda backend!");
+      // #endif
    }
 }
 

@@ -30,8 +30,8 @@ using namespace QuICC::Operator;
 /// @tparam Functor Nary scalar functor
 /// @tparam Tout output View
 /// @tparam ...Targs input Views
-template <class Functor, class Tout, class... Targs>
-class Op : public NaryBaseOp<Op<Functor, Tout, Targs...>, Tout, Targs...>
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class... Targs>
+class Op : public NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout, Targs...>
 {
 private:
    /// @brief stored functor, i.e. struct with method
@@ -49,12 +49,12 @@ public:
    ~Op() = default;
 
 private:
+   /// @brief give access to base class
+   friend NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout, Targs...>;
    /// @brief action implementation
    /// @param out output View
    /// @param ...args input Views
    void applyImpl(Tout& out, const Targs&... args);
-   /// @brief give access to base class
-   friend NaryBaseOp<Op<Functor, Tout, Targs...>, Tout, Targs...>;
    /// @brief memory resource
    /// needs shared ptr for memory pools
    /// note, this must call the dtor last

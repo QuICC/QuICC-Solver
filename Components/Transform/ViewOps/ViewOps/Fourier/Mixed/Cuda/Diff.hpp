@@ -7,6 +7,7 @@
 // External includes
 //
 #include <memory>
+#include <cstdint>
 
 // Project includes
 //

@@ -54,6 +54,8 @@ public:
    ~Op() = default;
 
 private:
+   /// @brief give access to base class
+   friend NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout, Targs...>;
    /// @brief action implementation
    /// @param out output View
    /// @param ...args input Views
@@ -76,8 +78,6 @@ private:
    Memory::MemBlock<typename Tout::ScalarType> _gridData;
    /// @brief Grid view
    View::ViewBase<typename Tout::ScalarType> _grid;
-   /// @brief give access to base class
-   friend NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout, Targs...>;
 };
 
 
