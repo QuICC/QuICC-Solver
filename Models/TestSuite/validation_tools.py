@@ -7,6 +7,9 @@ import math
 import colorcodes as cc
 _c = cc.Colorcodes()
 
+success_str = 'All benchmark validation tests passed!'
+stability_success_str = 'All stability benchmark validation tests passed!'
+
 def compute_ulp(x):
     """Return the value of the least significant bit of a
     float x, such that the first float bigger than x is x+ulp(x).
@@ -119,7 +122,7 @@ def printSummary(results, rows, reftol = None):
 
     print("")
     if(fail == 0):
-        print(f'All benchmark validation tests passed!')
+        print(success_str)
     else:
         t = 'test'
         if fail > 1:
@@ -240,7 +243,7 @@ def check_setup(fname, ref_dir, data_dir, trigger, lines_to_check):
                 checked += 1
                 rlines.append(line)
 
-    print(f'Validating setup from {fname}')
+    print(f'Validating setup from {fname} for {trigger}')
     # Check lines were found
     cond = (len(dlines) == lines_to_check and len(rlines) == lines_to_check)
     printResult(cond, 'Checking setup is present')
@@ -248,5 +251,9 @@ def check_setup(fname, ref_dir, data_dir, trigger, lines_to_check):
     # Check lines match
     cond = True
     for d,r in zip(dlines,rlines):
-        cond = cond and (d == r)
+        cond = (cond and (d == r))
+        if not cond:
+            print((d,r))
     printResult(cond, 'Checking setup match: ')
+
+    return cond

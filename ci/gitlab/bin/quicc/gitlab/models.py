@@ -87,7 +87,8 @@ configurations = {  'BoussinesqSphereDynamo': {
                             'mpi' : [variant('single1d', 6), variant('single2d', 6), variant('tubular', 6) ],
                             'kk' : [variant()],
                             'kkgpu' : [variant()],
-                            'perf' : [variant()]
+                            'perf' : [variant()],
+                            'petsc-mpi' : [variant('tubular',1)]
                         }
                     },
                     'BoussinesqShellRTC': {
@@ -103,7 +104,8 @@ configurations = {  'BoussinesqSphereDynamo': {
                             'mpi' : [variant('single2d', 6)],
                             'kk' : [variant()],
                             'kkgpu' : [variant()],
-                            'perf' : [variant('none', -1)]
+                            'perf' : [variant('none', -1)],
+                            'petsc-mpi' : [variant('tubular',1)]
                         }
                     },
                     'BoussinesqSphereTC': {

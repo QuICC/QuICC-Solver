@@ -10,6 +10,7 @@ from quicc.gitlab.yaml import base_yaml
 class config(NamedTuple):
     tag: str
     backend: str
+    image: str = 'baseimage'
 
 backend2nodeSize = {
     "daint-mc": 72,
@@ -23,13 +24,13 @@ class base_pipeline(base_yaml):
         image_location = '$CSCS_REGISTRY_PATH'
         self.cs_base_yml = 'https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml'
         self.backend = cnf.backend
-        self.base_docker = 'ci/docker/baseimage/Dockerfile_quicc_baseimage_'+self.backend
+        self.base_docker = f'ci/docker/baseimage/Dockerfile_quicc_{cnf.image}_{self.backend}'
         self.cpus_full_node = backend2nodeSize[self.backend]
         base_md5sum = hashlib.md5(open(self.base_docker[3:], 'rb').read()).hexdigest()
         self.tag = cnf.tag
         image = 'quicc_'+cnf.tag+'_'+cnf.backend+':$CI_COMMIT_SHA'
         self.path_image = image_location+'/'+image
-        self.base_path_image = f'{image_location}/baseimage/quicc_baseimage_{cnf.backend}:{base_md5sum}'
+        self.base_path_image = f'{image_location}/baseimage/quicc_{cnf.image}_{cnf.backend}:{base_md5sum}'
         self.docker = 'ci/docker/Dockerfile_'+cnf.tag
 
         # pipeline actions
@@ -141,6 +142,48 @@ class libtest_pipeline(base_pipeline):
                     },
             }
 
+"""Add library PETSc testing to the base pipeline"""
+class libtest_petsc_pipeline(base_pipeline):
+    def __init__(self, cnf):
+        super(libtest_petsc_pipeline, self).__init__(cnf)
+        self.actions.extend([self.testlib_yaml])
+
+    def testlib_yaml(self):
+        self.config['include'].extend(
+                [
+                    '/ci/gitlab/.quicc_tests.yml',
+                ],
+            )
+        self.config['stages'].extend(
+                [
+                    'test', # test stage is running on PizDaint (on 1 node)
+                ],
+            )
+        self.config['test-quicc-petsc-lib'] = {
+                'extends':
+                    [
+                        '.test-petsc-lib',
+                        '.'+self.backend
+                    ],
+                'image': self.path_image,
+            }
+        if (self.tag == 'mpi'):
+            tasks = '4'
+            self.config['test-quicc-mpi-lib'] = {
+                'extends':
+                    [
+                        '.test-petsc-lib-mpi',
+                        '.'+self.backend
+                    ],
+                'image': self.path_image,
+                'variables':
+                    {
+                        'SLURM_NTASKS': tasks,
+                        'SLURM_NTASKS_PER_NODE': tasks,
+                        'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks))
+                    },
+            }
+
 """Add library timing to the libtest pipeline"""
 class libtime_pipeline(libtest_pipeline):
     def __init__(self, cnf):
@@ -235,6 +278,44 @@ class model_pipeline_notiming(libtest_pipeline):
         self.config['include'].extend(
                 [
                     '/ci/gitlab/.quicc_models.yml',
+                ],
+            )
+        self.config['stages'].extend(
+                [
+                    'model-build-and-test',
+                ],
+            )
+        for mode_config in default_configs(self.tag):
+            model = mode_config.fullname()
+            tasks = str(mode_config.tasks)
+            self.config[model] = {
+                    'extends':
+                        [
+                            '.'+model,
+                            '.'+self.backend
+                        ],
+                    'image': self.path_image,
+                    'variables':
+                    {
+                        # the image is pulled in the lib test stage
+                        'PULL_IMAGE': 'NO',
+                        'SLURM_NTASKS': tasks,
+                        'SLURM_NTASKS_PER_NODE': tasks,
+                        'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks)),
+                        'QUICC_VERSION_TAG': self.tag
+                    },
+                }
+
+"""Add model testing to the libtest petsc pipeline"""
+class model_stability_pipeline(libtest_petsc_pipeline):
+    def __init__(self, cnf):
+        super(model_stability_pipeline, self).__init__(cnf)
+        self.actions.extend([self.model_yaml])
+
+    def model_yaml(self):
+        self.config['include'].extend(
+                [
+                    '/ci/gitlab/.quicc_petsc_models.yml',
                 ],
             )
         self.config['stages'].extend(

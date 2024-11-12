@@ -223,5 +223,23 @@ endif(QUICC_OPTIMIZE_TREE)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development NumPy)
 
+###################################################
+#-------------------- SLEPc/PETSc ----------------#
+###################################################
+include(cmake.d/PkgConfigSLEPc.cmake)
+
+# Enable stability solver if SLEPc/PETSc are available
+if(QUICC_HAVE_SLEPC)
+  message(STATUS "SLEPc is present. Enabling stability solver.")
+
+  # Enable stability solver
+  set(QUICC_HAVE_STABILITY_SOLVER ON CACHE INTERNAL "Enable stability solver")
+
+# Disable stability solver if SLEPc/PETSc is not available
+else()
+  set(QUICC_HAVE_STABILITY_SOLVER OFF CACHE INTERNAL "Enable stability solver")
+
+  message(STATUS "SLEPc was not found. Stability solver will not be available.")
+endif()
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)

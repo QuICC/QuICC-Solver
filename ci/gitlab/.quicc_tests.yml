@@ -47,6 +47,18 @@
     - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiCommTest
     - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiTest
 
+.test-petsc-lib:
+  variables:
+    TEST_NCPU: 'grep processor /proc/cpuinfo | wc -l'
+  script:
+    - pwd
+    - cd /QuICC.src/build
+
+.test-petsc_lib-mpi:
+  script:
+    - pwd
+    - cd /QuICC.src/build
+
 .time-lib-daint-mc:
   script:
     - pwd
