@@ -21,10 +21,15 @@ void MapOps::setCross(mlir::quiccir::CrossOp op)
     if (index >= _thisArr.size()) {
         _thisArr.resize(index+1, nullptr);
     }
+    double scaling = 1.0;
+    /// \todo check all kinds
+    if (op.getKind() == "inertia")
+    {
+        scaling = _physParams.inertia;
+    }
     if (_thisArr[index] == nullptr) {
         using namespace QuICC::Pointwise;
         using T = R_DCCSC3D_t;
-        double scaling = 1.0;
         /// \todo check kind
         if (_isCpu)
         {

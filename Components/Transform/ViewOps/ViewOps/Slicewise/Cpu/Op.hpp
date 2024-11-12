@@ -124,14 +124,18 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiRImpl(Tout& out, const Ta
       GridBuilder quad;
       quad.computeQuadrature(igrid, iweights, out.dims()[Dir]);
 
+      // get theta
+      ::QuICC::Internal::Array itheta;
+      itheta = igrid.array().acos();
+
       // setup view
-      _gridData = std::move(Memory::MemBlock<typename Tout::ScalarType>(igrid.size(), _mem.get()));
+      _gridData = std::move(Memory::MemBlock<typename Tout::ScalarType>(itheta.size(), _mem.get()));
       _grid = View::ViewBase(_gridData.data(), _gridData.size());
 
       // copy
       for (std::size_t i = 0; i < _grid.size(); ++i)
       {
-         _grid[i] = Internal::cast(igrid[i]);
+         _grid[i] = Internal::cast(itheta[i]);
       }
    }
 

@@ -82,20 +82,16 @@ void MapOps::setMulConst(mlir::quiccir::MulConstOp op)
             /// \todo check all kinds
             if (op.getKind() == "buoyancy")
             {
-                /// \todo set by Jitter
                 scaling = _physParams.buoyancy;
             }
             else if (op.getKind() == "inertia")
             {
-                /// \todo set by Jitter
                 scaling = _physParams.inertia;
             }
             else if (op.getKind() == "transport")
             {
-                /// \todo set by Jitter
                 scaling = _physParams.transport;
             }
-            /// \todo check all kinds
             /// \todo check type
             if (_isCpu)
             {

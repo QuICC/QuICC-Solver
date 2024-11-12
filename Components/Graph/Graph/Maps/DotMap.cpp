@@ -25,7 +25,11 @@ void MapOps::setDot(mlir::quiccir::DotOp op)
         using namespace QuICC::Pointwise;
         using T = R_DCCSC3D_t;
         double scaling = 1.0;
-        /// \todo check kind
+        /// \todo check all kind
+        if (op.getKind() == "transport")
+        {
+            scaling = _physParams.transport;
+        }
         if (_isCpu)
         {
             using namespace QuICC::Pointwise::Cpu;
