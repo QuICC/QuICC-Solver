@@ -116,13 +116,14 @@ TEST_CASE("Longitudinal Grid", "LongitudinalGrid")
    ::QuICC::Internal::Array iweights;
    ::QuICC::Polynomial::Quadrature::LegendreRule quad;
    quad.computeQuadrature(igrid, iweights, out.dims()[1]);
+   ::QuICC::Internal::Array itheta = igrid.array().acos();
 
    // init col 0, lay 0
    for (std::size_t m = 0; m < M; ++m)
    {
       auto mnl = m;
       in[mnl] = 1.0;
-      ref[mnl] = scaling * (in[mnl] * std::sin(QuICC::Internal::cast(igrid[0])));
+      ref[mnl] = scaling * (in[mnl] * std::sin(QuICC::Internal::cast(itheta[0])));
    }
 
    // init col 1, lay 2
@@ -130,7 +131,7 @@ TEST_CASE("Longitudinal Grid", "LongitudinalGrid")
    {
       auto mnl = m + M;
       in[mnl] = 1.0;
-      ref[mnl] = scaling * (in[mnl] * std::sin(QuICC::Internal::cast(igrid[1])));
+      ref[mnl] = scaling * (in[mnl] * std::sin(QuICC::Internal::cast(itheta[1])));
    }
 
    // const grid mul op
