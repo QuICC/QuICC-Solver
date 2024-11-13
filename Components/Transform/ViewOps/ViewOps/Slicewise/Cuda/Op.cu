@@ -138,7 +138,7 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiRImpl(Tout& out, const Ta
    // views
    View::ViewBase<ScalarType> grid(_grid.data(), _grid.size());
 
-   const IndexType M = out.size();
+   const IndexType M = out.lds();
    const IndexType N = out.indices()[1].size();
 
    dim3 blockSize;
@@ -255,7 +255,7 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiThetaImpl(Tout& out, cons
    View::ViewBase<IndexType> offSet(_offSet.data(), _offSet.size());
    View::ViewBase<ScalarType> grid(_grid.data(), _grid.size());
 
-   const IndexType M = out.size();
+   const IndexType M = out.lds();
    const IndexType N = _N;
    const IndexType activeLayers = _layerIndex.size();
 

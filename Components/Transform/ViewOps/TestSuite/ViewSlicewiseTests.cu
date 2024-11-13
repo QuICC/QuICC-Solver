@@ -187,7 +187,7 @@ TEST_CASE("Longitudinal Grid Gpu", "LongitudinalGridGpu")
    {
       auto mnl = m;
       in[mnl] = 1.0;
-      ref[mnl] = scaling * (in[mnl] * QuICC::Internal::cast(itheta[0]));
+      ref[mnl] = scaling * (in[mnl] * std::sin(QuICC::Internal::cast(itheta[0])));
    }
 
    // init col 1, lay 2
@@ -195,7 +195,7 @@ TEST_CASE("Longitudinal Grid Gpu", "LongitudinalGridGpu")
    {
       auto mnl = m + M;
       in[mnl] = 1.0;
-      ref[mnl] = scaling * (in[mnl] * QuICC::Internal::cast(itheta[1]));
+      ref[mnl] = scaling * (in[mnl] * std::sin(QuICC::Internal::cast(itheta[1])));
    }
 
    // Copy to gpu
