@@ -20,7 +20,7 @@ namespace Cuda {
 namespace details {
 // naive implementation
 template <class Functor, class Tout, class ...Targs>
-__global__ void SlicewiseKernel(
+__global__ void SlicewisePhiThetaKernel(
    const View::ViewBase<typename Tout::IndexType> layerWidth,
    const View::ViewBase<typename Tout::IndexType> offSet,
    const View::ViewBase<typename Tout::ScalarType> grid,
@@ -37,6 +37,29 @@ __global__ void SlicewiseKernel(
    {
       auto mnk = offSet[l] + m + n*M;
       out[mnk] = f(grid[l], args[mnk]...);
+   }
+}
+
+// naive implementation
+template <class Functor, class Tout, class ...Targs>
+__global__ void SlicewisePhiRKernel(
+   const View::ViewBase<typename Tout::ScalarType> grid,
+   Functor f, Tout out, Targs... args)
+{
+   const auto M = out.lds();
+
+   const std::size_t m = blockIdx.x * blockDim.x + threadIdx.x;
+   const std::size_t col = blockIdx.y * blockDim.y + threadIdx.y;
+
+   // column Id index or Theta Idx
+   const auto indices = out.indices()[1];
+   const auto C = indices.size();
+
+   if (m < M && col < C)
+   {
+      auto thetaIdx = indices[col];
+      auto mnk = m + col*M;
+      out[mnk] = f(grid[thetaIdx], args[mnk]...);
    }
 }
 
@@ -61,6 +84,82 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::applyImpl(Tout& out, const T
    // implemented only for physical space
    static_assert(std::is_same_v<Tout, View::View<double, View::DCCSC3D>>,
       "Implemented only for physical space and DCCSC3D layout");
+
+   assert(QuICC::Cuda::isDeviceMemory(out.indices()[1].data()));
+
+   if constexpr(Dir == 1)
+   {
+      phiRImpl(out, args...);
+   }
+   else if constexpr(Dir == 2)
+   {
+      phiThetaImpl(out, args...);
+   }
+   else
+   {
+      throw std::logic_error("This slice direction is not implemented.");
+   }
+
+}
+
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class ...Targs>
+void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiRImpl(Tout& out, const Targs&... args)
+{
+   assert(Dir == 1);
+
+    // setup grid
+   if (_grid.data() == nullptr)
+   {
+      ::QuICC::Internal::Array igrid;
+      ::QuICC::Internal::Array iweights;
+      GridBuilder quad;
+      quad.computeQuadrature(igrid, iweights, out.dims()[Dir]);
+      // get theta
+      ::QuICC::Internal::Array itheta;
+      itheta = igrid.array().acos();
+
+      // alloc
+      _grid = std::move(QuICC::Memory::MemBlock<ScalarType>(itheta.size(), _mem.get()));
+
+      // setup views
+      View::ViewBase<ScalarType> vGrid(_grid.data(), _grid.size());
+
+      // setup converter
+      using namespace QuICC::Memory;
+      tempOnHostMemorySpace converterG(vGrid, TransferMode::write);
+
+      // copy
+      for (std::size_t i = 0; i < vGrid.size(); ++i)
+      {
+         vGrid[i] = Internal::cast(itheta[i]);
+      }
+   }
+
+   // views
+   View::ViewBase<ScalarType> grid(_grid.data(), _grid.size());
+
+   const IndexType M = out.size();
+   const IndexType N = out.indices()[1].size();
+
+   dim3 blockSize;
+   dim3 numBlocks;
+
+   blockSize.x = 64;
+   blockSize.y = 4;
+   blockSize.z = 1;
+   numBlocks.x = (M + blockSize.x - 1) / blockSize.x;
+   numBlocks.y = (N + blockSize.y - 1) / blockSize.y;
+   numBlocks.z = 1;
+
+   details::SlicewisePhiRKernel<Functor, Tout, Targs...>
+      <<<numBlocks, blockSize>>>(grid, _f, out, args...);
+
+}
+
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class ...Targs>
+void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiThetaImpl(Tout& out, const Targs&... args)
+{
+   assert(Dir == 2);
 
    // cache populated layers
    View::ViewBase<IndexType> pointers = out.pointers()[1];
@@ -142,7 +241,7 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::applyImpl(Tout& out, const T
       ::QuICC::Internal::Array iweights;
       /// \todo template param
       GridBuilder quad;
-      quad.computeQuadrature(igrid, iweights, out.dims()[2]);
+      quad.computeQuadrature(igrid, iweights, out.dims()[Dir]);
 
       // set grid
       for (IndexType h = 0; h < nLayers; ++h)
@@ -170,7 +269,7 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::applyImpl(Tout& out, const T
    numBlocks.y = (N + blockSize.y - 1) / blockSize.y;
    numBlocks.z = activeLayers;
 
-   details::SlicewiseKernel<Functor, Tout, Targs...>
+   details::SlicewisePhiThetaKernel<Functor, Tout, Targs...>
       <<<numBlocks, blockSize>>>(layerWidth, offSet, grid, _f, out, args...);
 }
 

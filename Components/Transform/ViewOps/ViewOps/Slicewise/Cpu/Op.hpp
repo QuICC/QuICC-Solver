@@ -123,7 +123,6 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiRImpl(Tout& out, const Ta
       ::QuICC::Internal::Array iweights;
       GridBuilder quad;
       quad.computeQuadrature(igrid, iweights, out.dims()[Dir]);
-
       // get theta
       ::QuICC::Internal::Array itheta;
       itheta = igrid.array().acos();

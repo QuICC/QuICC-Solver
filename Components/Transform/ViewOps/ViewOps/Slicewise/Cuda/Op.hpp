@@ -55,6 +55,10 @@ private:
    /// @param out output View
    /// @param ...args input Views
    void applyImpl(Tout& out, const Targs&... args);
+   /// @brief specialized implementation for Phi-Theta slice
+   void phiThetaImpl(Tout& out, const Targs&... args);
+    /// @brief specialized implementation for Phi-R slice
+   void phiRImpl(Tout& out, const Targs&... args);
    /// @brief memory resource
    /// needs shared ptr for memory pools
    /// note, this must call the dtor last
