@@ -202,19 +202,19 @@ namespace Transform {
       Profiler::RegionStart<3> (profRegion + "-transform");
 
       // Compute projection transform
-      #ifdef QUICC_DEBUG
-      auto opName = Backward::Coordinator::tag(edge.opId());
-      std::vector<std::string> outIds;
-      for (auto id : edge.outIds()) {
-         if (id != -1 ) {
-            outIds.push_back(Tools::IdToHuman::toString(static_cast<FieldComponents::Physical::Id>(id)));
-         }
-      }
-      auto id = edge.combinedOutId();
-      if (id != -1) {
-         outIds.push_back(Tools::IdToHuman::toString(static_cast<FieldComponents::Physical::Id>(id)));
-      }
-      #endif
+      // #ifdef QUICC_DEBUG
+      // auto opName = Backward::Coordinator::tag(edge.opId());
+      // std::vector<std::string> outIds;
+      // for (auto id : edge.outIds()) {
+      //    if (id != -1 ) {
+      //       outIds.push_back(Tools::IdToHuman::toString(static_cast<FieldComponents::Physical::Id>(id)));
+      //    }
+      // }
+      // auto id = edge.combinedOutId();
+      // if (id != -1) {
+      //    outIds.push_back(Tools::IdToHuman::toString(static_cast<FieldComponents::Physical::Id>(id)));
+      // }
+      // #endif
       std::visit([&](auto&& pOut, auto&& pIn){coord.transform(traId).backward(pOut->rData(), pIn->data(), edge.opId());}, pOutVar, pInVar);
 
       Profiler::RegionStop<3> (profRegion + "-transform");

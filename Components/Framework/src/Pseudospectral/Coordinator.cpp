@@ -1122,6 +1122,16 @@ namespace details
          auto& UthetaVarv = mId2View[FieldComponents::Physical::THETA];
          auto& UphiVarv = mId2View[FieldComponents::Physical::PHI];
 
+         #ifndef NDEBUG
+         Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
+         // Compute backward transform
+         this->updatePhysical(it);
+
+         // compute nonlinear interaction and forward transform
+         this->updateSpectral(it);
+         Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
+         #endif
+
          Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
          // Call graph
          std::visit(
