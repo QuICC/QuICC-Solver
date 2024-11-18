@@ -27,6 +27,7 @@
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I2Y2_Zero.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I2Y1_Zero.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I2Y1D1Y1_Zero.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I2Y2D1Y1_Zero.hpp"
 
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Energy.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/EnergyY2.hpp"
@@ -39,6 +40,8 @@
 #include "QuICC/Transform/Forward/I4S.hpp"
 #include "QuICC/Transform/Forward/I2Q.hpp"
 #include "QuICC/Transform/Forward/I2S.hpp"
+#include "QuICC/Transform/Forward/I2rQ.hpp"
+#include "QuICC/Transform/Forward/I2rS.hpp"
 #include "QuICC/Transform/Forward/I2T.hpp"
 
 #include "QuICC/Transform/Backward/P.hpp"
@@ -78,6 +81,9 @@ namespace Transform {
       this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y2_Zero>(m, Forward::I2T::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y1_Zero>(m, Forward::I2Q::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y1D1Y1_Zero>(m, Forward::I2S::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y2_Zero>(m, Forward::I2rQ::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y2D1Y1_Zero>(m, Forward::I2rS::id());
+      
 
       // Create reductors
       this->addOperator<Fft::Chebyshev::LinearMap::Reductor::Energy>(m, Reductor::Energy::id());

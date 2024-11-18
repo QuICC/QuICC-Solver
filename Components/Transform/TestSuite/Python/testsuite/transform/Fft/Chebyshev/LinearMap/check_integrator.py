@@ -63,6 +63,21 @@ def check_i2y1d1y1_zero(lower, upper):
             ref[:,i] = rad.i2r1d1r1(data.shape[0], lower, upper, {0:0})*ref[:,i]
     return utils.transform_error(data, ref)
 
+def check_i2y2d1y1_zero(lower, upper):
+    """Check I^2 Y^2 D Y integrator"""
+
+    print("\t" + "Checking I2Y2D1Y1...")
+    data = utils.read_complex(base_dir + "i2y2d1y1_zero.dat")
+    ref = 1j*np.zeros(data.shape)
+    for i in range(0,data.shape[1]):
+        t = 0.5*(1 + (i == 0))
+        ref[i,i] = (np.pi + i)*(1.0 - (i > 0)*3.0j)*t
+        if i == 0:
+            ref[:,i] = 0
+        else:
+            ref[:,i] = rad.i2r2d1r1(data.shape[0], lower, upper, {0:0})*ref[:,i]
+    return utils.transform_error(data, ref)
+
 def check_i2y1_zero(lower, upper):
     """Check I^2 Y^1  | Zero integrator"""
 

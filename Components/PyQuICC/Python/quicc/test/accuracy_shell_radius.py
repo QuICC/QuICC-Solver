@@ -417,6 +417,25 @@ def i2r1d1r1(nr, a, b, rg):
     ssol = sy.integrate(ssol,x,x)
     test_forward(A, sphys, ssol, rg, 2)
 
+def i2r2d1r1(nr, a, b, rg):
+    """Accuracy test for i2r2d1r1 operator"""
+
+    print("i2r2d1r1:")
+    print("\t Forward: (polynomial):")
+    x = sy.Symbol('x')
+    A = shell.i2r2d1r1(nr, a, b, shell.radbc.no_bc())
+    sphys = np.sum([np.random.ranf()*x**(i) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(x**2*sy.diff(sphys*x,x))
+    ssol = sy.integrate(ssol,x,x)
+    test_forward(A, sphys, ssol, rg, 2)
+
+    print("\t Forward: (full Chebyshev):")
+    A = shell.i2r2d1r1(nr, a, b, shell.radbc.no_bc())
+    sphys = np.sum([(-1.0)**np.round(np.random.ranf())*sy.chebyshevt(int(i),(x-b)/a) for i in np.arange(0,nr,1)])
+    ssol = sy.expand(x**2*sy.diff(sphys*x,x))
+    ssol = sy.integrate(ssol,x,x)
+    test_forward(A, sphys, ssol, rg, 2)
+
 def i2r2(nr, a, b, rg):
     """Accuracy test for i2r2 operator"""
 

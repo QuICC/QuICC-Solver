@@ -218,6 +218,11 @@ def i4r4(nr, ri, ro, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix
 
     return make_sh_operator(rad.i4r4, nr, ri, ro, maxnl, m, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
 
+def i4r1(nr, ri, ro, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
+    """Create a i4r1 radial operator kronecker with an identity"""
+
+    return make_sh_operator(rad.i4r1, nr, ri, ro, maxnl, m, bc, coeff, with_sh_coeff = with_sh_coeff, l_zero_fix = l_zero_fix, restriction = restriction)
+    
 def i4r4coriolis(nr, ri, ro, maxnl, m, bc, coeff = 1.0, with_sh_coeff = None, l_zero_fix = False, restriction = None):
     """Create a i4r4 radial operator kronecker with coriolis Q term"""
 
