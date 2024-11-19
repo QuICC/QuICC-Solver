@@ -1,5 +1,7 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   Coordinator.cpp
+  AddGraph.cpp
+  ComputeNonLinear.cpp
   Utils.cpp
 )
 
