@@ -1,5 +1,6 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   Coordinator.cpp
+  Utils.cpp
 )
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
