@@ -273,7 +273,18 @@ namespace Pseudospectral {
       indicesMods[1] = View::ViewBase<std::uint32_t>(metaJW.idx.data(), metaJW.idx.size());
 
       // View for outputs/inputs
-      std::vector<size_t> fields = {PhysicalNames::Temperature::id(), FieldComponents::Spectral::TOR, FieldComponents::Spectral::POL};
+      std::size_t hVelTor = llvm::hash_combine(PhysicalNames::Velocity::id(),        FieldComponents::Spectral::TOR);
+      std::size_t hVelPol = llvm::hash_combine(PhysicalNames::Velocity::id(),        FieldComponents::Spectral::POL);
+      std::vector<size_t> fields = {PhysicalNames::Temperature::id(), hVelTor, hVelPol};
+
+
+      if (mVectorEquations.at(/*it=*/0).size() == 2)
+      {
+         std::size_t hMagTor = llvm::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::TOR);
+         fields.push_back(hMagTor);
+         std::size_t hMagPol = llvm::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::POL);
+         fields.push_back(hMagPol);
+      }
 
       // Add Views and Storage for each component
       auto scalarVarPtr = mspRes->sim().ss().bwdPtr(Dimensions::Transform::SPECTRAL);
@@ -1096,6 +1107,7 @@ namespace details
          // Use new graph
 
          // Copy to view
+         // Temperature
          const auto& jwRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA1D);
          auto& temp = mScalarVariables[PhysicalNames::Temperature::id()];
          auto tempVarv = mId2View[PhysicalNames::Temperature::id()];
@@ -1106,9 +1118,12 @@ namespace details
                details::copyEig2View(Tv, ptrTemp.data(), jwRes);
             }, temp, tempVarv);
 
-         auto& vec = mVectorVariables[PhysicalNames::Velocity::id()];
-         auto& TorVarv = mId2View[FieldComponents::Spectral::TOR];
-         auto& PolVarv = mId2View[FieldComponents::Spectral::POL];
+         // Spectral Velocity
+         auto& vecVel = mVectorVariables[PhysicalNames::Velocity::id()];
+         std::size_t hVelTor = llvm::hash_combine(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR);
+         std::size_t hVelPol = llvm::hash_combine(PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL);
+         auto& TorVelVarv = mId2View[hVelTor];
+         auto& PolVelVarv = mId2View[hVelPol];
          std::visit(
             [&](auto&& p, auto& Torv, auto& Polv)
             {
@@ -1116,8 +1131,16 @@ namespace details
                details::copyEig2View(Torv, ptrTor.data(), jwRes);
                auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
                details::copyEig2View(Polv, ptrPol.data(), jwRes);
-            }, vec, TorVarv, PolVarv);
+            }, vecVel, TorVelVarv, PolVelVarv);
 
+         // Magnetic field
+         auto& vecMag = mVectorVariables[PhysicalNames::Magnetic::id()];
+         std::size_t hMagTor = llvm::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::TOR);
+         std::size_t hMagPol = llvm::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::POL);
+         auto& TorMagVarv = mId2View[hMagTor];
+         auto& PolMagVarv = mId2View[hMagPol];
+
+         // Physical velocity
          auto& UrVarv = mId2View[FieldComponents::Physical::R];
          auto& UthetaVarv = mId2View[FieldComponents::Physical::THETA];
          auto& UphiVarv = mId2View[FieldComponents::Physical::PHI];
@@ -1135,12 +1158,23 @@ namespace details
          Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
          // Call graph
          std::visit(
-            [&](auto& Tv, auto& Torv, auto& Polv, auto& Urv, auto& Uthetav, auto& Uphiv)
+            [&](auto& Tv, auto& TorVelv, auto& PolVelv, auto& TorMagv, auto& PolMagv,
+               auto& Urv, auto& Uthetav, auto& Uphiv)
             {
-               mJitter->apply(Tv, Torv, Polv,
-               Urv, Uthetav, Uphiv,
-               Tv, Torv, Polv);
-            }, tempVarv, TorVarv, PolVarv, UrVarv, UthetaVarv, UphiVarv);
+               if (PolMagv.data() == nullptr)
+               {
+                  mJitter->apply(Tv, TorVelv, PolVelv,
+                  Urv, Uthetav, Uphiv,
+                  Tv, TorVelv, PolVelv);
+               }
+               else
+               {
+                  mJitter->apply(Tv, TorVelv, PolVelv, TorMagv, PolMagv,
+                  Urv, Uthetav, Uphiv,
+                  Tv, TorVelv, PolVelv, TorMagv, PolMagv);
+               }
+            }, tempVarv, TorVelVarv, PolVelVarv, TorMagVarv, PolMagVarv,
+               UrVarv, UthetaVarv, UphiVarv);
          Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlNew");
 
          // Copy back spectral coeff
@@ -1161,7 +1195,7 @@ namespace details
                auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
                p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setZeros();
                details::copyView2Eig(ptrPol.rData(), Polv, jwRes);
-            }, vec, TorVarv, PolVarv);
+            }, vecVel, TorVelVarv, PolVelVarv);
 
          // Copy back physical vel for cfl computation
          /// \todo move cfl comp in graph and remove
@@ -1178,7 +1212,7 @@ namespace details
                auto& ptrUphi = p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI);
                p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI).setZeros();
                details::copyView2Eig(ptrUphi.rData(), Uphiv, ftRes);
-            }, vec, UrVarv, UthetaVarv, UphiVarv);
+            }, vecVel, UrVarv, UthetaVarv, UphiVarv);
       }
 
    }

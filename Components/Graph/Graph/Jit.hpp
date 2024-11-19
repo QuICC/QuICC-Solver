@@ -29,6 +29,7 @@
 #include <llvm/Support/TargetSelect.h>
 #include <mlir/Target/LLVMIR/Dialect/Builtin/BuiltinToLLVMIRTranslation.h>
 #include <mlir/Target/LLVMIR/Dialect/LLVMIR/LLVMToLLVMIRTranslation.h>
+#include <mlir/Debug/CLOptionsSetup.h>
 
 // Project includes
 //
@@ -75,6 +76,8 @@ private:
     mlir::DialectRegistry _registry;
     /// @brief storage for MLIR context
     mlir::MLIRContext _ctx;
+
+    // mlir::tracing::DebugConfig _debugConfig;
     /// @brief storage for MLIR module to be JITted
     mlir::OwningOpRef<mlir::ModuleOp> _module;
     /// @brief storage for MLIR execution engine
@@ -244,7 +247,9 @@ public:
 
     /// @brief Apply graph
     /// 3 inputs, 3+3 outputs
-    /// @tparam Trets
+    /// Pure hydro models returning also physical space velocity
+    /// @tparam TyOnerets
+    /// @tparam TyTworets
     /// @tparam Targs
     /// @param retTyOne0V
     /// @param retTyOne1V
@@ -257,6 +262,32 @@ public:
         TyOnerets retTyOne0V, TyOnerets retTyOne1V, TyOnerets retTyOne2V,
         TyTworets retTyTwo0V, TyTworets retTyTwo1V, TyTworets retTyTwo2V,
         Targs arg0V, Targs arg1V, Targs arg2V);
+
+    /// @brief Apply graph
+    /// 5 inputs, 5+3 outputs
+    /// Pure magneto-hydro models returning also physical space velocity
+    /// @tparam TyOnerets
+    /// @tparam TyTworets
+    /// @tparam Targs
+    /// @param retTyOne0V
+    /// @param retTyOne1V
+    /// @param retTyOne2V
+    /// @param retTyOne3V
+    /// @param retTyOne4V
+    /// @param retTyTwo0V
+    /// @param retTyTwo1V
+    /// @param retTyTwo2V
+    /// @param arg0V
+    /// @param arg1V
+    /// @param arg2V
+    /// @param arg3V
+    /// @param arg4V
+    template <class TyOnerets, class TyTworets, class Targs>
+    void apply(
+        TyOnerets retTyOne0V, TyOnerets retTyOne1V, TyOnerets retTyOne2V,
+        TyOnerets retTyOne3V, TyOnerets retTyOne4V,
+        TyTworets retTyTwo0V, TyTworets retTyTwo1V, TyTworets retTyTwo2V,
+        Targs arg0V, Targs arg1V, Targs arg2V, Targs arg3V, Targs arg4V);
 };
 
 template <std::uint32_t RANK>
@@ -270,6 +301,11 @@ void Jit<RANK>::setDialects()
     _ctx.appendDialectRegistry(_registry);
     // Load our Dialect in this MLIR Context.
     _ctx.loadDialect<mlir::quiccir::QuiccirDialect>();
+
+    // #ifndef NDEBUG
+    // mlir::tracing::InstallDebugHandler installDebugHandler(_ctx,
+    //                                                _debugConfig);
+    // #endif
 }
 
 namespace details
@@ -683,6 +719,57 @@ void Jit<RANK>::apply(
         &ret3, &ret4, &ret5,
         &arg0, &arg1, &arg2);
 
+}
+
+template <std::uint32_t RANK>
+template <class TyOnerets, class TyTworets, class Targs>
+void Jit<RANK>::apply(
+    TyOnerets retTyOne0V, TyOnerets retTyOne1V, TyOnerets retTyOne2V,
+    TyOnerets retTyOne3V, TyOnerets retTyOne4V,
+    TyTworets retTyTwo0V, TyTworets retTyTwo1V, TyTworets retTyTwo2V,
+    Targs arg0V, Targs arg1V, Targs arg2V,
+    Targs arg3V, Targs arg4V)
+{
+    // Map view to MLIR view descritor
+    auto arg0 = getViewDescriptor(arg0V);
+    auto arg1 = getViewDescriptor(arg1V);
+    auto arg2 = getViewDescriptor(arg2V);
+    auto arg3 = getViewDescriptor(arg3V);
+    auto arg4 = getViewDescriptor(arg4V);
+    auto ret0 = getViewDescriptor(retTyOne0V);
+    auto ret1 = getViewDescriptor(retTyOne1V);
+    auto ret2 = getViewDescriptor(retTyOne2V);
+    auto ret3 = getViewDescriptor(retTyOne3V);
+    auto ret4 = getViewDescriptor(retTyOne4V);
+    auto ret5 = getViewDescriptor(retTyTwo0V);
+    auto ret6 = getViewDescriptor(retTyTwo1V);
+    auto ret7 = getViewDescriptor(retTyTwo2V);
+
+    // Get operators map
+    auto thisArr = _storeOp.getThisArr();
+
+    // Apply graph
+    auto fun = (void (*)(void*, void*,
+        decltype(ret0)*,
+        decltype(ret1)*,
+        decltype(ret2)*,
+        decltype(ret3)*,
+        decltype(ret4)*,
+        decltype(ret5)*,
+        decltype(ret6)*,
+        decltype(ret7)*,
+        decltype(arg0)*,
+        decltype(arg1)*,
+        decltype(arg2)*,
+        decltype(arg3)*,
+        decltype(arg4)*
+        ))_funSym;
+    fun(_metaMap.data(), thisArr.data(),
+        &ret0, &ret1, &ret2,
+        &ret3, &ret4, &ret5,
+        &ret6, &ret7,
+        &arg0, &arg1, &arg2
+        &arg3, &arg4);
 }
 
 
