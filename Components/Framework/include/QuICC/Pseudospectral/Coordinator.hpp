@@ -621,6 +621,9 @@ namespace Pseudospectral {
          std::vector<varBlock_t> mBlocksData;
          std::vector<Memory::MemBlock<std::uint32_t>> mBlocksMeta;
 
+         /// @brief is the magnetic field equation present?
+         bool mIsMag = false;
+
       private:
          /**
           * @brief If at least one equation is present in range

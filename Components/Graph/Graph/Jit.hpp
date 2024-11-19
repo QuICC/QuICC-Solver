@@ -768,7 +768,7 @@ void Jit<RANK>::apply(
         &ret0, &ret1, &ret2,
         &ret3, &ret4, &ret5,
         &ret6, &ret7,
-        &arg0, &arg1, &arg2
+        &arg0, &arg1, &arg2,
         &arg3, &arg4);
 }
 

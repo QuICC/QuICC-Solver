@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include <type_traits>
+#include <boost/functional/hash.hpp>
 
 // Project includes
 //
@@ -43,6 +44,20 @@
 namespace QuICC {
 
 namespace Pseudospectral {
+
+
+   namespace details
+   {
+      std::size_t hash_combine(std::size_t a, std::size_t b)
+      {
+         std::size_t seed = 0;
+         boost::hash_combine(seed, a);
+         boost::hash_combine(seed, b);
+         return seed;
+      }
+
+   } // namespace details
+
 
    const std::set<int>& Coordinator::it() const
    {
@@ -273,16 +288,20 @@ namespace Pseudospectral {
       indicesMods[1] = View::ViewBase<std::uint32_t>(metaJW.idx.data(), metaJW.idx.size());
 
       // View for outputs/inputs
-      std::size_t hVelTor = llvm::hash_combine(PhysicalNames::Velocity::id(),        FieldComponents::Spectral::TOR);
-      std::size_t hVelPol = llvm::hash_combine(PhysicalNames::Velocity::id(),        FieldComponents::Spectral::POL);
+      std::size_t hVelTor = details::hash_combine(PhysicalNames::Velocity::id(),        FieldComponents::Spectral::TOR);
+      std::size_t hVelPol = details::hash_combine(PhysicalNames::Velocity::id(),        FieldComponents::Spectral::POL);
       std::vector<size_t> fields = {PhysicalNames::Temperature::id(), hVelTor, hVelPol};
-
 
       if (mVectorEquations.at(/*it=*/0).size() == 2)
       {
-         std::size_t hMagTor = llvm::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::TOR);
+         mIsMag = true;
+      }
+
+      if (mIsMag)
+      {
+         std::size_t hMagTor = details::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::TOR);
          fields.push_back(hMagTor);
-         std::size_t hMagPol = llvm::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::POL);
+         std::size_t hMagPol = details::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::POL);
          fields.push_back(hMagPol);
       }
 
@@ -1120,8 +1139,8 @@ namespace details
 
          // Spectral Velocity
          auto& vecVel = mVectorVariables[PhysicalNames::Velocity::id()];
-         std::size_t hVelTor = llvm::hash_combine(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR);
-         std::size_t hVelPol = llvm::hash_combine(PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL);
+         std::size_t hVelTor = details::hash_combine(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR);
+         std::size_t hVelPol = details::hash_combine(PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL);
          auto& TorVelVarv = mId2View[hVelTor];
          auto& PolVelVarv = mId2View[hVelPol];
          std::visit(
@@ -1134,11 +1153,25 @@ namespace details
             }, vecVel, TorVelVarv, PolVelVarv);
 
          // Magnetic field
-         auto& vecMag = mVectorVariables[PhysicalNames::Magnetic::id()];
-         std::size_t hMagTor = llvm::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::TOR);
-         std::size_t hMagPol = llvm::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::POL);
-         auto& TorMagVarv = mId2View[hMagTor];
-         auto& PolMagVarv = mId2View[hMagPol];
+         Graph::varData_t TorMagVarv;
+         Graph::varData_t PolMagVarv;
+         if (mIsMag)
+         {
+            auto& vecMag = mVectorVariables[PhysicalNames::Magnetic::id()];
+            std::size_t hMagTor = details::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::TOR);
+            std::size_t hMagPol = details::hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Spectral::POL);
+            TorMagVarv = mId2View[hMagTor];
+            PolMagVarv = mId2View[hMagPol];
+
+            std::visit(
+            [&](auto&& p, auto& Torv, auto& Polv)
+            {
+               auto& ptrTor = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR);
+               details::copyEig2View(Torv, ptrTor.data(), jwRes);
+               auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
+               details::copyEig2View(Polv, ptrPol.data(), jwRes);
+            }, vecMag, TorMagVarv, PolMagVarv);
+         }
 
          // Physical velocity
          auto& UrVarv = mId2View[FieldComponents::Physical::R];
@@ -1157,24 +1190,32 @@ namespace details
 
          Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
          // Call graph
-         std::visit(
-            [&](auto& Tv, auto& TorVelv, auto& PolVelv, auto& TorMagv, auto& PolMagv,
-               auto& Urv, auto& Uthetav, auto& Uphiv)
-            {
-               if (PolMagv.data() == nullptr)
-               {
-                  mJitter->apply(Tv, TorVelv, PolVelv,
-                  Urv, Uthetav, Uphiv,
-                  Tv, TorVelv, PolVelv);
-               }
-               else
+         if (mIsMag)
+         {
+            std::visit(
+               [&](auto& Tv, auto& TorVelv, auto& PolVelv, auto& TorMagv, auto& PolMagv,
+                  auto& Urv, auto& Uthetav, auto& Uphiv)
                {
                   mJitter->apply(Tv, TorVelv, PolVelv, TorMagv, PolMagv,
-                  Urv, Uthetav, Uphiv,
-                  Tv, TorVelv, PolVelv, TorMagv, PolMagv);
-               }
-            }, tempVarv, TorVelVarv, PolVelVarv, TorMagVarv, PolMagVarv,
-               UrVarv, UthetaVarv, UphiVarv);
+                     Urv, Uthetav, Uphiv,
+                     Tv, TorVelv, PolVelv, TorMagv, PolMagv);
+               }, tempVarv, TorVelVarv, PolVelVarv, TorMagVarv, PolMagVarv,
+                  UrVarv, UthetaVarv, UphiVarv);
+         }
+         else
+         {
+            std::visit(
+               [&](auto& Tv, auto& TorVelv, auto& PolVelv,
+                  auto& Urv, auto& Uthetav, auto& Uphiv)
+               {
+
+                  mJitter->apply(Tv, TorVelv, PolVelv,
+                     Urv, Uthetav, Uphiv,
+                     Tv, TorVelv, PolVelv);
+
+               }, tempVarv, TorVelVarv, PolVelVarv,
+                  UrVarv, UthetaVarv, UphiVarv);
+         }
          Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlNew");
 
          // Copy back spectral coeff
