@@ -207,8 +207,10 @@ namespace Pseudospectral {
 
          if (mIsMag)
          {
-            // Copy back physical magnetic field for cfl computation
             auto& vecMag = mVectorVariables[PhysicalNames::Magnetic::id()];
+            // Copy back spectral coeff
+            details::copyView2Vector(vecMag, TorMagVarv, PolMagVarv, jwRes);
+            // Copy back physical magnetic field for cfl computation
             details::copyView2Vector(vecMag, BrVarv, BthetaVarv, BphiVarv, ftRes);
          }
       }
