@@ -89,10 +89,12 @@ struct MemRefDescriptor {
 template <class T = double>
 struct PhysicalParameters
 {
+  T transport = 1.0;
   T inertia = 1.0;
   T buoyancy = 1.0;
-  T transport = 1.0;
   T coriolis = 1.0;
+  T lorenz = 1.0;
+  T induction = 1.0;
 };
 
 } // namespace Graph
