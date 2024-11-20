@@ -26,8 +26,6 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PRIVATE
     MlirShims.cpp
     MlirDotShims.cpp
-    # MlirCrossShims.cpp
-    # MlirMulConstShims.cpp
     MlirTransposeShims.cpp
     MlirAllocShims.cpp
     MlirDeallocShims.cpp
