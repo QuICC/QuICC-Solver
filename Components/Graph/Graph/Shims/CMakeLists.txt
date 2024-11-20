@@ -26,7 +26,7 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PRIVATE
     MlirShims.cpp
     MlirDotShims.cpp
-    MlirCrossShims.cpp
+    # MlirCrossShims.cpp
     # MlirMulConstShims.cpp
     MlirTransposeShims.cpp
     MlirAllocShims.cpp
@@ -56,6 +56,7 @@ include(ConfigAL.cmake)
 include(ConfigJW.cmake)
 include(ConfigPointwise.cmake)
 include(ConfigMulConst.cmake)
+include(ConfigCross.cmake)
 
 # Alias
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}${QUICC_CURRENT_SUBCOMPONENT_LIB}

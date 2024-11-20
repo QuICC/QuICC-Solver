@@ -27,6 +27,18 @@ void MapOps::setCross(mlir::quiccir::CrossOp op)
     {
         scaling = _physParams.inertia;
     }
+    else if (op.getKind() == "lorentz")
+    {
+        scaling = _physParams.lorentz;
+    }
+    else if (op.getKind() == "induction")
+    {
+        scaling = _physParams.induction;
+    }
+    else
+    {
+        throw std::logic_error("Unknown kind for Cross Op.");
+    }
     if (_thisArr[index] == nullptr) {
         using namespace QuICC::Pointwise;
         using T = R_DCCSC3D_t;

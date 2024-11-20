@@ -93,7 +93,7 @@ struct PhysicalParameters
   T inertia = 1.0;
   T buoyancy = 1.0;
   T coriolis = 1.0;
-  T lorenz = 1.0;
+  T lorentz = 1.0;
   T induction = 1.0;
 };
 
