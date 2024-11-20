@@ -159,8 +159,20 @@ void Coordinator::addGraph(const std::string& graphStr, const Graph::PhysicalPar
       /// \todo move cfl computation into graph and
       /// don't store physical space
 
-      std::vector<size_t> physFields = {FieldComponents::Physical::R,
-      FieldComponents::Physical::THETA, FieldComponents::Physical::PHI};
+      std::size_t hVelR = hash_combine(PhysicalNames::Velocity::id(), FieldComponents::Physical::R);
+      std::size_t hVelTheta = hash_combine(PhysicalNames::Velocity::id(), FieldComponents::Physical::THETA);
+      std::size_t hVelPhi = hash_combine(PhysicalNames::Velocity::id(), FieldComponents::Physical::PHI);
+      std::vector<size_t> physFields = {hVelR, hVelTheta, hVelPhi};
+
+      if (mIsMag)
+      {
+         std::size_t hMagR = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::R);
+         std::size_t hMagTheta = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::THETA);
+         std::size_t hMagPhi = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::PHI);
+         fields.push_back(hMagR);
+         fields.push_back(hMagTheta);
+         fields.push_back(hMagPhi);
+      }
 
       for (size_t f = 0; f < physFields.size(); ++f)
       {

@@ -264,7 +264,7 @@ public:
         Targs arg0V, Targs arg1V, Targs arg2V);
 
     /// @brief Apply graph
-    /// 5 inputs, 5+3 outputs
+    /// 5 inputs, 5+6 outputs
     /// Pure magneto-hydro models returning also physical space velocity
     /// @tparam TyOnerets
     /// @tparam TyTworets
@@ -277,6 +277,9 @@ public:
     /// @param retTyTwo0V
     /// @param retTyTwo1V
     /// @param retTyTwo2V
+    /// @param retTyTwo3V
+    /// @param retTyTwo4V
+    /// @param retTyTwo5V
     /// @param arg0V
     /// @param arg1V
     /// @param arg2V
@@ -287,6 +290,7 @@ public:
         TyOnerets retTyOne0V, TyOnerets retTyOne1V, TyOnerets retTyOne2V,
         TyOnerets retTyOne3V, TyOnerets retTyOne4V,
         TyTworets retTyTwo0V, TyTworets retTyTwo1V, TyTworets retTyTwo2V,
+        TyTworets retTyTwo3V, TyTworets retTyTwo4V, TyTworets retTyTwo5V,
         Targs arg0V, Targs arg1V, Targs arg2V, Targs arg3V, Targs arg4V);
 };
 
@@ -727,6 +731,7 @@ void Jit<RANK>::apply(
     TyOnerets retTyOne0V, TyOnerets retTyOne1V, TyOnerets retTyOne2V,
     TyOnerets retTyOne3V, TyOnerets retTyOne4V,
     TyTworets retTyTwo0V, TyTworets retTyTwo1V, TyTworets retTyTwo2V,
+    TyTworets retTyTwo3V, TyTworets retTyTwo4V, TyTworets retTyTwo5V,
     Targs arg0V, Targs arg1V, Targs arg2V,
     Targs arg3V, Targs arg4V)
 {
@@ -744,6 +749,9 @@ void Jit<RANK>::apply(
     auto ret5 = getViewDescriptor(retTyTwo0V);
     auto ret6 = getViewDescriptor(retTyTwo1V);
     auto ret7 = getViewDescriptor(retTyTwo2V);
+    auto ret8 = getViewDescriptor(retTyTwo3V);
+    auto ret9 = getViewDescriptor(retTyTwo4V);
+    auto ret10 = getViewDescriptor(retTyTwo5V);
 
     // Get operators map
     auto thisArr = _storeOp.getThisArr();
@@ -758,6 +766,9 @@ void Jit<RANK>::apply(
         decltype(ret5)*,
         decltype(ret6)*,
         decltype(ret7)*,
+        decltype(ret8)*,
+        decltype(ret9)*,
+        decltype(ret10)*,
         decltype(arg0)*,
         decltype(arg1)*,
         decltype(arg2)*,
@@ -766,8 +777,9 @@ void Jit<RANK>::apply(
         ))_funSym;
     fun(_metaMap.data(), thisArr.data(),
         &ret0, &ret1, &ret2,
-        &ret3, &ret4, &ret5,
-        &ret6, &ret7,
+        &ret3, &ret4,
+        &ret5, &ret6, &ret7,
+        &ret8, &ret9, &ret10,
         &arg0, &arg1, &arg2,
         &arg3, &arg4);
 }
