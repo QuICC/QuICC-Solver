@@ -169,9 +169,9 @@ void Coordinator::addGraph(const std::string& graphStr, const Graph::PhysicalPar
          std::size_t hMagR = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::R);
          std::size_t hMagTheta = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::THETA);
          std::size_t hMagPhi = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::PHI);
-         fields.push_back(hMagR);
-         fields.push_back(hMagTheta);
-         fields.push_back(hMagPhi);
+         physFields.push_back(hMagR);
+         physFields.push_back(hMagTheta);
+         physFields.push_back(hMagPhi);
       }
 
       for (size_t f = 0; f < physFields.size(); ++f)
