@@ -48,6 +48,7 @@ set(tags
   Roberts
   Rossby
   Sigma
+  StabilityMode
   Sort
   Tau
   Taylor

@@ -107,7 +107,14 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    Eigen::saveMarket(matT.real(), "A_re.mtx");
    Eigen::saveMarket(matT.imag(), "A_im.mtx");
 #endif //QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-   matA = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
+   if(eqInfo.isComplex)
+   {
+      matA = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
+   }
+   else
+   {
+      matA = matT.real().cast<MHDComplex>();
+   }
 
    // Build matrix B (mass matrix)
    opId = ModelOperator::Time::id();
@@ -118,7 +125,14 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    Eigen::saveMarket(matT.real(), "B_re.mtx");
    Eigen::saveMarket(matT.imag(), "B_im.mtx");
 #endif //QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-   matB = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
+   if(eqInfo.isComplex)
+   {
+      matB = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
+   }
+   else
+   {
+      matB = matT.real().cast<MHDComplex>();
+   }
 
    // Build boundary matrix if needed
    if (this->model().useGalerkin())
@@ -136,7 +150,14 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
       Eigen::saveMarket(matT.real(), "C_re.mtx");
       Eigen::saveMarket(matT.imag(), "C_im.mtx");
 #endif //QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-      matC = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
+      if(eqInfo.isComplex)
+      {
+         matC = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
+      }
+      else
+      {
+         matC = matT.real().cast<MHDComplex>();
+      }
    }
 
    // Set target
@@ -177,7 +198,7 @@ void LinearStability::eigenpairs(std::vector<MHDComplex>& evs, std::vector<std::
    auto dims = this->setupGEVP(Ra);
 
    std::vector<Vec> petscEfs;
-   if(efs.size() != static_cast<std::size_t>(nev))
+   if(efs.size() == static_cast<std::size_t>(nev))
    {
       for(int i = 0; i < nev; i++)
       {
@@ -186,9 +207,9 @@ void LinearStability::eigenpairs(std::vector<MHDComplex>& evs, std::vector<std::
          PetscCallVoid(MatCreateVecs(this->mA, &petscEfs.back(), nullptr));
       }
    }
-   else if(efs.size() > 0 || efs.size() != static_cast<std::size_t>(nev))
+   else if(efs.size() > 0 && efs.size() != static_cast<std::size_t>(nev))
    {
-      throw std::logic_error("Eigenvector storage initialized with wrong size");
+      throw std::logic_error("Eigenvector storage initialized with wrong size: " + std::to_string(efs.size()) + " vs " + std::to_string(nev));
    }
 
    // Solve GEVP

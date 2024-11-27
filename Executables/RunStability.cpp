@@ -39,7 +39,7 @@ int run()
    int status = 0;
 
    // Create simulation
-   QuICC::SharedMarginalCurve   spSolver;
+   std::shared_ptr<QuICC::MarginalCurve>   spSolver;
 
    // Exception handling during the initialisation part
    try
