@@ -57,12 +57,13 @@ public:
    MHDFloat operator()(const MHDFloat Ra, std::vector<MHDComplex>& evs);
 
    /**
-    * @brief Compute eigenvalues
+    * @brief Compute eigenpairs
     *
     * @param evs  Eigenvalues
+    * @param efs  Eigenfunctions
     * @param nev  Number of eigenvalues
     */
-   void eigenvalues(std::vector<MHDComplex>& evs, const int nev,
+   void eigenpairs(std::vector<MHDComplex>& evs, std::vector<std::vector<MHDComplex> >& efs, const int nev,
       const MHDFloat Ra);
 
 protected:
@@ -102,17 +103,17 @@ private:
     * @brief Solve Generalized eigenvalue problem (GEVP)
     *
     * @param evs  Eigenvalues
+    * @param efs  Eigenfunctions (not computed if empty)
     * @param nev  Number of eigenvalues
     */
-   void solveGEVP(std::vector<MHDComplex>& evs, const int nev);
+   void solveGEVP(std::vector<MHDComplex>& evs, std::vector<Vec>& efs, const int nev);
 
    /**
-    * @brief Solve Generalized eigenvalue problem (GEVP)
+    * @brief Setup Generalized eigenvalue problem (GEVP)
     *
-    * @param matA Linear operator
-    * @param matB Mass matrix
+    * @param Ra Rayleigh number
     */
-   void buildMatrix(const SparseMatrixZ& matA, const SparseMatrixZ& matB);
+   std::pair<int,int> setupGEVP(const MHDFloat Ra);
 
    /**
     * @brief Print solver details
@@ -170,6 +171,11 @@ private:
     * @brief SLEPc/PETSc EPS object
     */
    EPS mEps;
+
+   /**
+    * @brief Target for shift-invert
+    */
+   MHDComplex mTarget;
 };
 
 /// Typedef for a shared pointer of a Simulation
