@@ -50,6 +50,17 @@ BoussinesqShellRTCImplicit_tubular:
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '72'
     QUICC_VERSION_TAG: petsc-mpi
+BoussinesqPlaneRRBCExplicit_tubular:
+  extends:
+  - .BoussinesqPlaneRRBCExplicit_tubular
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_petsc-mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: petsc-mpi
 ci-cache-cleanup:
   extends: .container-runner-daint
   stage: cleanup
