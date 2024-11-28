@@ -177,9 +177,6 @@ private:
     */
    MHDComplex mTarget;
 };
-
-/// Typedef for a shared pointer of a Simulation
-typedef std::shared_ptr<LinearStability> SharedLinearStability;
 } // namespace QuICC
 
 #endif // QUICC_LINEARSTABILITY_HPP
