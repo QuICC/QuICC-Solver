@@ -28,13 +28,14 @@ public:
    /**
     * @brief Constructor
     *
+    * @param idc     ID of critical parameter
     * @param eigs    Indexes of matrix to solve (eg. m for rotating spherical setup)
     * @param spRes   Resolution
     * @param params  Nondimensional parameters
     * @param bcMap   Boundary conditions
     * @param spModel Model backend
     */
-   LinearStability(const std::vector<MHDFloat>& eigs, SharedResolution spRes,
+   LinearStability(const std::size_t idc, const std::vector<MHDFloat>& eigs, SharedResolution spRes,
       const Equations::EquationParameters::NDMapType& params,
       const std::map<std::size_t, std::size_t>& bcMap,
       std::shared_ptr<Model::IModelBackend> spModel);
@@ -45,16 +46,19 @@ public:
    virtual ~LinearStability();
 
    /**
-    * @brief Compute growth rate for given Rayleigh number
+    * @brief Compute growth rate for given critical parameter value
+    *
+    * @param vc Value of critical parameter
     */
-   MHDFloat operator()(const MHDFloat Ra);
+   MHDFloat operator()(const MHDFloat vc);
 
    /**
-    * @brief Compute growth rate for given Rayleigh number
+    * @brief Compute growth rate for given critical parameter value
     *
+    * @param vc   Value of critical parameter
     * @param evs  Storage for returning eigenvalues
     */
-   MHDFloat operator()(const MHDFloat Ra, std::vector<MHDComplex>& evs);
+   MHDFloat operator()(const MHDFloat vc, std::vector<MHDComplex>& evs);
 
    /**
     * @brief Compute eigenpairs
@@ -62,9 +66,10 @@ public:
     * @param evs  Eigenvalues
     * @param efs  Eigenfunctions
     * @param nev  Number of eigenvalues
+    * @param vc   Value of critical parameter
     */
    void eigenpairs(std::vector<MHDComplex>& evs, std::vector<std::vector<MHDComplex> >& efs, const int nev,
-      const MHDFloat Ra);
+      const MHDFloat vc);
 
 protected:
    /**
@@ -111,9 +116,9 @@ private:
    /**
     * @brief Setup Generalized eigenvalue problem (GEVP)
     *
-    * @param Ra Rayleigh number
+    * @param vc Value of critical parameter
     */
-   std::pair<int,int> setupGEVP(const MHDFloat Ra);
+   std::pair<int,int> setupGEVP(const MHDFloat vc);
 
    /**
     * @brief Print solver details
@@ -129,6 +134,11 @@ private:
     * @brief Need initialization?
     */
    bool mNeedInit;
+
+   /**
+    * @brief ID of critical parameter
+    */
+   std::size_t mIdc;
 
    /**
     * @brief Indexes for independent dimension(s)

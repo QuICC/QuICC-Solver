@@ -43,10 +43,11 @@ public:
    /**
     * @brief Constructor
     *
+    * @param name   Name to use in log
     * @param spStab Linear stability solver
     * @param spLog  Logging stream
     */
-   func(std::shared_ptr<LinearStability> spStab, std::shared_ptr<std::ofstream> spLog) : mspStab(spStab), mspLog(spLog) {};
+   func(const std::string& name, std::shared_ptr<LinearStability> spStab, std::shared_ptr<std::ofstream> spLog) : mcName(name), mspStab(spStab), mspLog(spLog) {};
 
    /**
     * @brief Destructor
@@ -56,19 +57,19 @@ public:
    /**
     * @brief Interface to call solver
     */
-   MHDFloat operator()(const MHDFloat Ra)
+   MHDFloat operator()(const MHDFloat vc)
    {
       if constexpr(TLevel == 0)
       {
-         return (*this->mspStab)(Ra);
+         return (*this->mspStab)(vc);
       }
       else if constexpr(TLevel == 1)
       {
          const unsigned int nev = 5;
          std::vector<MHDComplex> evs(nev);
-         auto ret = (*this->mspStab)(Ra, evs);
+         auto ret = (*this->mspStab)(vc, evs);
 
-         this->print(Ra, evs);
+         this->print(vc, evs);
 
          return ret;
       }
@@ -81,10 +82,10 @@ public:
    /**
     * @brief Logging computed eigenvalues
     */
-   void print(const MHDFloat Ra, const std::vector<MHDComplex>& evs) const
+   void print(const MHDFloat vc, const std::vector<MHDComplex>& evs) const
    {
       std::ofstream& log = *this->mspLog;
-      log << "Ra = " << Ra << std::endl;
+      log << this->mcName << " = " << vc << std::endl;
       for (unsigned int i = 0; i < evs.size(); i++)
       {
          log << " \t growth: " << evs.at(i) << std::endl;
@@ -92,6 +93,11 @@ public:
    }
 
 protected:
+   /**
+    * @brief Name for logging
+    */
+   const std::string mcName;
+
    /**
     * @brief Linear stability calculator
     */
@@ -283,7 +289,10 @@ void MarginalCurve::mainRun()
       throw std::logic_error("3D spectral matrix not setup");
    }
 
-   auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
+   auto idc = NonDimensional::Rayleigh::id();
+   auto name = NonDimensional::Coordinator::tag(idc);
+
+   auto spLinStab = std::make_shared<LinearStability>(idc, eigs, this->mspRes,
       this->mspEqParams->map(), this->createBoundary()->map(),
       this->mspBackend);
 
@@ -305,8 +314,8 @@ void MarginalCurve::mainRun()
    {
       std::vector<MHDComplex> evs(nev);
       std::vector<std::vector<MHDComplex> > efs(nev);
-      auto Ra = this->mspEqParams->nd(NonDimensional::Rayleigh::id());
-      spLinStab->eigenpairs(evs, efs, nev, Ra);
+      auto vc = this->mspEqParams->nd(idc);
+      spLinStab->eigenpairs(evs, efs, nev, vc);
 
       // Print eigenvalues
       for(auto&& e: evs)
@@ -327,10 +336,10 @@ void MarginalCurve::mainRun()
          }
       }
    }
-   // Find critical Rayleigh
+   // Find critical parameter
    else
    {
-      MHDFloat guess = this->mspEqParams->nd(NonDimensional::Rayleigh::id());
+      MHDFloat guess = this->mspEqParams->nd(idc);
       MHDFloat factor = 1.1; // To multiply
       int digits =
          std::numeric_limits<MHDFloat>::digits; // Maximum possible binary digits
@@ -350,14 +359,14 @@ void MarginalCurve::mainRun()
       auto spLog = std::make_shared<std::ofstream>("marginal.log");
 
       std::pair<MHDFloat, MHDFloat> r = boost::math::tools::bracket_and_solve_root(
-            func<1>(spLinStab, spLog), guess, factor, is_rising, tol, it);
+            func<1>(name, spLinStab, spLog), guess, factor, is_rising, tol, it);
 
       std::ofstream& logger = *spLog;
 
       unsigned int prec = (std::numeric_limits<MHDFloat>::digits10*3)/4 + 1;
       logger << std::string(50, '-') << std::endl 
-         << "Critical Rayleigh number converged to the bracket: " << std::endl
-         << std::setprecision(prec)  << r.first << " < Ra < " << r.second << std::endl;
+         << "Critical " + name + " number converged to the bracket: " << std::endl
+         << std::setprecision(prec)  << r.first << " < " << name << " < " << r.second << std::endl;
    }
 }
 

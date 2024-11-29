@@ -7,6 +7,7 @@
 //
 #include <algorithm>
 #include <limits>
+#include "QuICC/Equations/EquationParameters.hpp"
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
 #include <unsupported/Eigen/SparseExtra>
 #endif //QUICC_DEBUG_OUTPUT_MODEL_MATRIX
@@ -25,7 +26,6 @@
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverHasBc.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverNoTau.hpp"
-#include "QuICC/NonDimensional/Rayleigh.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
@@ -59,13 +59,14 @@ bool sortDecreasingRealIdx(std::pair<MHDComplex, int> a, std::pair<MHDComplex,in
 
 } // namespace internal
 
-LinearStability::LinearStability(const std::vector<MHDFloat>& eigs,
+LinearStability::LinearStability(const std::size_t idc, const std::vector<MHDFloat>& eigs,
    SharedResolution spRes,
    const Equations::EquationParameters::NDMapType& params,
    const std::map<std::size_t, std::size_t>& bcs,
    std::shared_ptr<Model::IModelBackend> spModel) :
     mcUseMumps(true),
     mNeedInit(true),
+    mIdc(idc),
     mEigs(eigs),
     mspRes(spRes),
     mParams(params),
@@ -167,11 +168,11 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    }
 }
 
-std::pair<int,int> LinearStability::setupGEVP(const MHDFloat Ra)
+std::pair<int,int> LinearStability::setupGEVP(const MHDFloat vc)
 {
-   // Update rayleigh number
-   this->mParams[NonDimensional::Rayleigh::id()] =
-      std::make_shared<NonDimensional::Rayleigh>(Ra);
+   // Update critical parameter
+   this->mParams[this->mIdc] =
+      std::make_shared<NonDimensional::INumber>(vc, this->mParams[this->mIdc]->tag());
 
    SparseMatrixZ matA;
    SparseMatrixZ matB;
@@ -193,9 +194,9 @@ std::pair<int,int> LinearStability::setupGEVP(const MHDFloat Ra)
 }
 
 void LinearStability::eigenpairs(std::vector<MHDComplex>& evs, std::vector<std::vector<MHDComplex> >& efs, const int nev,
-   const MHDFloat Ra)
+   const MHDFloat vc)
 {
-   auto dims = this->setupGEVP(Ra);
+   auto dims = this->setupGEVP(vc);
 
    std::vector<Vec> petscEfs;
    if(efs.size() == static_cast<std::size_t>(nev))
@@ -263,20 +264,20 @@ void LinearStability::eigenpairs(std::vector<MHDComplex>& evs, std::vector<std::
    }
 }
 
-MHDFloat LinearStability::operator()(const MHDFloat Ra)
+MHDFloat LinearStability::operator()(const MHDFloat vc)
 {
    const int nev = 5;
    std::vector<MHDComplex> evs(nev);
    std::vector<std::vector<MHDComplex>> efs;
-   this->eigenpairs(evs, efs, nev, Ra);
+   this->eigenpairs(evs, efs, nev, vc);
 
    return evs.at(0).real();
 }
 
-MHDFloat LinearStability::operator()(const MHDFloat Ra, std::vector<MHDComplex>& evs)
+MHDFloat LinearStability::operator()(const MHDFloat vc, std::vector<MHDComplex>& evs)
 {
    std::vector<std::vector<MHDComplex>> efs;
-   this->eigenpairs(evs, efs, evs.size(), Ra);
+   this->eigenpairs(evs, efs, evs.size(), vc);
 
    return evs.at(0).real();
 }
