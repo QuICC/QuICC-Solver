@@ -16,27 +16,27 @@
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Enums/Dimensions.hpp"
-#include "QuICC/NonDimensional/Rayleigh.hpp"
+#include "QuICC/Io/Variable/StateFileWriter.hpp"
 #include "QuICC/NonDimensional/Nev.hpp"
+#include "QuICC/NonDimensional/Rayleigh.hpp"
 #include "QuICC/NonDimensional/StabilityMode.hpp"
-#include "QuICC/QuICCTimer.hpp"
-#include "QuICC/SpatialScheme/Feature.hpp"
-#include "QuICC/Timers/StageTimer.hpp"
-#include "Stability/LinearStability.hpp"
-#include "Stability/MarginalCurve.hpp"
-#include "QuICC/ScalarFields/ScalarField.hpp"
-#include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
+#include "QuICC/PhysicalNames/Velocity.hpp"
+#include "QuICC/QuICCTimer.hpp"
+#include "QuICC/ScalarFields/ScalarField.hpp"
+#include "QuICC/SpatialScheme/Feature.hpp"
+#include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Variables/RequirementTools.hpp"
-#include "QuICC/Io/Variable/StateFileWriter.hpp"
+#include "Stability/LinearStability.hpp"
+#include "Stability/MarginalCurve.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {
 
 /**
-* @brief Functor to wrap calls for stability calculations
-*/
+ * @brief Functor to wrap calls for stability calculations
+ */
 template <unsigned int TLevel> class func
 {
 public:
@@ -47,7 +47,9 @@ public:
     * @param spStab Linear stability solver
     * @param spLog  Logging stream
     */
-   func(const std::string& name, std::shared_ptr<LinearStability> spStab, std::shared_ptr<std::ofstream> spLog) : mcName(name), mspStab(spStab), mspLog(spLog) {};
+   func(const std::string& name, std::shared_ptr<LinearStability> spStab,
+      std::shared_ptr<std::ofstream> spLog) :
+       mcName(name), mspStab(spStab), mspLog(spLog) {};
 
    /**
     * @brief Destructor
@@ -59,11 +61,11 @@ public:
     */
    MHDFloat operator()(const MHDFloat vc)
    {
-      if constexpr(TLevel == 0)
+      if constexpr (TLevel == 0)
       {
          return (*this->mspStab)(vc);
       }
-      else if constexpr(TLevel == 1)
+      else if constexpr (TLevel == 1)
       {
          const unsigned int nev = 5;
          std::vector<MHDComplex> evs(nev);
@@ -121,24 +123,26 @@ MarginalCurve::~MarginalCurve()
    PetscCallVoid(SlepcFinalize());
 }
 
-void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev, const std::vector<MHDComplex>& ef)
+void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
+   const std::vector<MHDComplex>& ef)
 {
    auto&& ss = this->mspRes->sim().ss();
-   if(!this->mpH5File)
+   if (!this->mpH5File)
    {
-      this->mpH5File = std::make_shared<Io::Variable::StateFileWriter>(ss.tag(), ss.has(SpatialScheme::Feature::RegularSpectrum));
+      this->mpH5File = std::make_shared<Io::Variable::StateFileWriter>(ss.tag(),
+         ss.has(SpatialScheme::Feature::RegularSpectrum));
 
       VariableRequirement varInfo;
-      for(auto fId: this->mspBackend->fieldIds())
+      for (auto fId: this->mspBackend->fieldIds())
       {
-         if(fId == PhysicalNames::Velocity::id() || fId == PhysicalNames::Magnetic::id())
+         if (fId == PhysicalNames::Velocity::id() ||
+             fId == PhysicalNames::Magnetic::id())
          {
             auto& req = varInfo.addField(fId,
                FieldRequirement(false, ss.spectral(), ss.physical()));
             req.enableSpectral();
-
          }
-         else if(fId == PhysicalNames::Temperature::id())
+         else if (fId == PhysicalNames::Temperature::id())
          {
             auto& req = varInfo.addField(fId,
                FieldRequirement(true, ss.spectral(), ss.physical()));
@@ -152,16 +156,17 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev, const st
       }
 
       // Initialize variables
-      RequirementTools::initVariables(this->mScalars, this->mVectors, varInfo, this->mspRes);
+      RequirementTools::initVariables(this->mScalars, this->mVectors, varInfo,
+         this->mspRes);
 
       // Add scalars
-      for(auto&& s: this->mScalars)
+      for (auto&& s: this->mScalars)
       {
          this->mpH5File->addScalar(s);
       }
 
       // Add vectors
-      for(auto&& v: this->mVectors)
+      for (auto&& v: this->mVectors)
       {
          this->mpH5File->addVector(v);
       }
@@ -170,7 +175,7 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev, const st
    // Fields
    auto pId = this->mspBackend->fieldIds().at(0);
    FieldComponents::Spectral::Id comp;
-   if(this->mVectors.count(pId) > 0)
+   if (this->mVectors.count(pId) > 0)
    {
       comp = FieldComponents::Spectral::TOR;
    }
@@ -188,62 +193,72 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev, const st
 
    std::size_t idx = 0;
    const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
-   for(auto it = imRange.first; it != imRange.second; ++it)
+   for (auto it = imRange.first; it != imRange.second; ++it)
    {
-      if(this->mScalars.count(it->first) > 0)
+      if (this->mScalars.count(it->first) > 0)
       {
          std::visit(
-               [&](auto& p)
-               {
-                  // Clear previous values
-                  p->rDom(0).rPerturbation().setZeros();
+            [&](auto& p)
+            {
+               // Clear previous values
+               p->rDom(0).rPerturbation().setZeros();
 
-                  for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
+               for (int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
+               {
+                  int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+                  if (k_ == m)
                   {
-                     int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
-                     if(k_ == m)
+                     for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k);
+                          j++)
                      {
-                        for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
+                        for (int i = 0;
+                             i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                         {
-                           for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
-                           {
-                              p->rDom(0).rPerturbation().setPoint(ef.at(idx), i, j, k);
-                              idx++;
-                           }
+                           p->rDom(0).rPerturbation().setPoint(ef.at(idx), i, j,
+                              k);
+                           idx++;
                         }
                      }
                   }
-               }, this->mScalars.at(it->first));
+               }
+            },
+            this->mScalars.at(it->first));
       }
 
-      if(this->mVectors.count(it->first) > 0)
+      if (this->mVectors.count(it->first) > 0)
       {
          std::visit(
-               [&](auto& p)
-               {
-                  // Clear previous values
-                  p->rDom(0).rPerturbation().rComp(it->second).setZeros();
+            [&](auto& p)
+            {
+               // Clear previous values
+               p->rDom(0).rPerturbation().rComp(it->second).setZeros();
 
-                  for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
+               for (int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
+               {
+                  int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+                  if (k_ == m)
                   {
-                     int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
-                     if(k_ == m)
+                     for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k);
+                          j++)
                      {
-                        for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
+                        for (int i = 0;
+                             i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                         {
-                           for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j,k); i++)
-                           {
-                              p->rDom(0).rPerturbation().rComp(it->second).setPoint(ef.at(idx), i, j, k);
-                              idx++;
-                           }
+                           p->rDom(0)
+                              .rPerturbation()
+                              .rComp(it->second)
+                              .setPoint(ef.at(idx), i, j, k);
+                           idx++;
                         }
                      }
                   }
-               }, this->mVectors.at(it->first));
+               }
+            },
+            this->mVectors.at(it->first));
       }
    }
 
-   if(idx != ef.size())
+   if (idx != ef.size())
    {
       throw std::logic_error("Wrong sizes");
    }
@@ -258,21 +273,23 @@ void MarginalCurve::mainRun()
    std::vector<MHDFloat> eigs;
    std::size_t max_nev;
 
-   if(this->mspRes->sim().ss().has(SpatialScheme::Feature::SpectralMatrix1D))
+   if (this->mspRes->sim().ss().has(SpatialScheme::Feature::SpectralMatrix1D))
    {
       eigs.clear();
-      eigs = {this->mspRes->sim().boxScale(Dimensions::Simulation::SIM2D),this->mspRes->sim().boxScale(Dimensions::Simulation::SIM3D)};
+      eigs = {this->mspRes->sim().boxScale(Dimensions::Simulation::SIM2D),
+         this->mspRes->sim().boxScale(Dimensions::Simulation::SIM3D)};
 
       int nF = this->mspBackend->fieldIds().size();
       int nN = this->mspRes->sim().dim(Dimensions::Simulation::SIM1D,
          Dimensions::Space::SPECTRAL);
-      max_nev = nF*nN;
+      max_nev = nF * nN;
    }
-   else if(this->mspRes->sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
+   else if (this->mspRes->sim().ss().has(
+               SpatialScheme::Feature::SpectralMatrix2D))
    {
       int m = this->mspRes->sim().dim(Dimensions::Simulation::SIM3D,
-            Dimensions::Space::SPECTRAL) -
-         1;
+                 Dimensions::Space::SPECTRAL) -
+              1;
       MHDFloat m_ = static_cast<MHDFloat>(m);
       eigs.clear();
       eigs = {m_};
@@ -281,8 +298,9 @@ void MarginalCurve::mainRun()
       int nN = this->mspRes->sim().dim(Dimensions::Simulation::SIM1D,
          Dimensions::Space::SPECTRAL);
       int nL = (this->mspRes->sim().dim(Dimensions::Simulation::SIM2D,
-         Dimensions::Space::SPECTRAL)-m);
-      max_nev = nF*nN*nL;
+                   Dimensions::Space::SPECTRAL) -
+                m);
+      max_nev = nF * nN * nL;
    }
    else
    {
@@ -298,7 +316,7 @@ void MarginalCurve::mainRun()
 
    auto nev_ = this->mspEqParams->nd(NonDimensional::Nev::id());
    unsigned int nev = 0;
-   if(nev_ <= 0)
+   if (nev_ <= 0)
    {
       nev = max_nev;
    }
@@ -310,22 +328,23 @@ void MarginalCurve::mainRun()
    int solver_mode = this->mspEqParams->nd(NonDimensional::StabilityMode::id());
 
    // Single mode calculation
-   if(solver_mode == 0)
+   if (solver_mode == 0)
    {
       std::vector<MHDComplex> evs(nev);
-      std::vector<std::vector<MHDComplex> > efs(nev);
+      std::vector<std::vector<MHDComplex>> efs(nev);
       auto vc = this->mspEqParams->nd(idc);
       spLinStab->eigenpairs(evs, efs, nev, vc);
 
       // Print eigenvalues
-      for(auto&& e: evs)
+      for (auto&& e: evs)
       {
          std::cerr << e << std::endl;
       }
 
-      for(std::size_t i = 0; i < efs.size(); i++)
+      for (std::size_t i = 0; i < efs.size(); i++)
       {
-         if(this->mspRes->sim().ss().has(SpatialScheme::Feature::SpectralMatrix2D))
+         if (this->mspRes->sim().ss().has(
+                SpatialScheme::Feature::SpectralMatrix2D))
          {
             int k_ = static_cast<int>(eigs.at(0));
             saveEigenfunction(k_, evs.at(i), efs.at(i));
@@ -342,31 +361,38 @@ void MarginalCurve::mainRun()
       MHDFloat guess = this->mspEqParams->nd(idc);
       MHDFloat factor = 1.1; // To multiply
       int digits =
-         std::numeric_limits<MHDFloat>::digits; // Maximum possible binary digits
-                                                // accuracy for type T.
-                                                // digits used to control how accurate to try to make the result.
-      int get_digits = (digits * 3) / 4; // Near maximum (3/4) possible accuracy.
+         std::numeric_limits<MHDFloat>::digits; // Maximum possible binary
+                                                // digits accuracy for type T.
+                                                // digits used to control how
+                                                // accurate to try to make the
+                                                // result.
+      int get_digits =
+         (digits * 3) / 4; // Near maximum (3/4) possible accuracy.
 
       const boost::uintmax_t maxit = 20;
       boost::uintmax_t it =
          maxit; // Initally our chosen max iterations, but updated with actual.
-                // We could also have used a maximum iterations provided by any policy:
-                // boost::uintmax_t max_it = policies::get_max_root_iterations<Policy>();
+                // We could also have used a maximum iterations provided by any
+                // policy: boost::uintmax_t max_it =
+                // policies::get_max_root_iterations<Policy>();
       bool is_rising =
          true; // So if result if guess^3 is too low, try increasing guess.
       boost::math::tools::eps_tolerance<double> tol(get_digits);
 
       auto spLog = std::make_shared<std::ofstream>("marginal.log");
 
-      std::pair<MHDFloat, MHDFloat> r = boost::math::tools::bracket_and_solve_root(
+      std::pair<MHDFloat, MHDFloat> r =
+         boost::math::tools::bracket_and_solve_root(
             func<1>(name, spLinStab, spLog), guess, factor, is_rising, tol, it);
 
       std::ofstream& logger = *spLog;
 
-      unsigned int prec = (std::numeric_limits<MHDFloat>::digits10*3)/4 + 1;
-      logger << std::string(50, '-') << std::endl 
-         << "Critical " + name + " number converged to the bracket: " << std::endl
-         << std::setprecision(prec)  << r.first << " < " << name << " < " << r.second << std::endl;
+      unsigned int prec = (std::numeric_limits<MHDFloat>::digits10 * 3) / 4 + 1;
+      logger << std::string(50, '-') << std::endl
+             << "Critical " + name + " number converged to the bracket: "
+             << std::endl
+             << std::setprecision(prec) << r.first << " < " << name << " < "
+             << r.second << std::endl;
    }
 }
 

@@ -53,22 +53,25 @@ private:
    /**
     * @brief Save eigenfunctions to statefile
     */
-   void saveEigenfunction(const int m, const MHDComplex ev, const std::vector<MHDComplex>& ef);
+   void saveEigenfunction(const int m, const MHDComplex ev,
+      const std::vector<MHDComplex>& ef);
 
    /**
     * @brief state file
     */
-   std::shared_ptr<Io::Variable::StateFileWriter>  mpH5File;
+   std::shared_ptr<Io::Variable::StateFileWriter> mpH5File;
 
    /**
     * @brief Scalar fields in eigenfunction
     */
-   std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>  mScalars;
+   std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>
+      mScalars;
 
    /**
     * @brief Vector fields in eigenfunction
     */
-   std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>  mVectors;
+   std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>
+      mVectors;
 };
 
 } // namespace QuICC

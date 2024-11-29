@@ -7,10 +7,11 @@
 //
 #include <algorithm>
 #include <limits>
+
 #include "QuICC/Equations/EquationParameters.hpp"
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
 #include <unsupported/Eigen/SparseExtra>
-#endif //QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
 
 // Project includes
 //
@@ -26,9 +27,9 @@
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverHasBc.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverNoTau.hpp"
-#include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
+#include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/QuICCTimer.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
@@ -48,7 +49,8 @@ bool sortDecreasingReal(MHDComplex a, MHDComplex b)
    return std::real(a) > std::real(b);
 }
 
-bool sortDecreasingRealIdx(std::pair<MHDComplex, int> a, std::pair<MHDComplex,int> b)
+bool sortDecreasingRealIdx(std::pair<MHDComplex, int> a,
+   std::pair<MHDComplex, int> b)
 {
    if (std::real(a.first) == std::real(b.first))
    {
@@ -59,8 +61,8 @@ bool sortDecreasingRealIdx(std::pair<MHDComplex, int> a, std::pair<MHDComplex,in
 
 } // namespace internal
 
-LinearStability::LinearStability(const std::size_t idc, const std::vector<MHDFloat>& eigs,
-   SharedResolution spRes,
+LinearStability::LinearStability(const std::size_t idc,
+   const std::vector<MHDFloat>& eigs, SharedResolution spRes,
    const Equations::EquationParameters::NDMapType& params,
    const std::map<std::size_t, std::size_t>& bcs,
    std::shared_ptr<Model::IModelBackend> spModel) :
@@ -107,8 +109,8 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    Eigen::saveMarket(matT.real(), "A_re.mtx");
    Eigen::saveMarket(matT.imag(), "A_im.mtx");
-#endif //QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-   if(eqInfo.isComplex)
+#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+   if (eqInfo.isComplex)
    {
       matA = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
    }
@@ -125,8 +127,8 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    Eigen::saveMarket(matT.real(), "B_re.mtx");
    Eigen::saveMarket(matT.imag(), "B_im.mtx");
-#endif //QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-   if(eqInfo.isComplex)
+#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+   if (eqInfo.isComplex)
    {
       matB = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
    }
@@ -150,8 +152,8 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
       Eigen::saveMarket(matT.real(), "C_re.mtx");
       Eigen::saveMarket(matT.imag(), "C_im.mtx");
-#endif //QUICC_DEBUG_OUTPUT_MODEL_MATRIX
-      if(eqInfo.isComplex)
+#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+      if (eqInfo.isComplex)
       {
          matC = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
       }
@@ -162,17 +164,18 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    }
 
    // Set target
-   if(nds.count(NonDimensional::Omega::id()) > 0)
+   if (nds.count(NonDimensional::Omega::id()) > 0)
    {
-      this->mTarget = MHDComplex(0, nds.at(NonDimensional::Omega::id())->value());
+      this->mTarget =
+         MHDComplex(0, nds.at(NonDimensional::Omega::id())->value());
    }
 }
 
-std::pair<int,int> LinearStability::setupGEVP(const MHDFloat vc)
+std::pair<int, int> LinearStability::setupGEVP(const MHDFloat vc)
 {
    // Update critical parameter
-   this->mParams[this->mIdc] =
-      std::make_shared<NonDimensional::INumber>(vc, this->mParams[this->mIdc]->tag());
+   this->mParams[this->mIdc] = std::make_shared<NonDimensional::INumber>(vc,
+      this->mParams[this->mIdc]->tag());
 
    SparseMatrixZ matA;
    SparseMatrixZ matB;
@@ -193,56 +196,58 @@ std::pair<int,int> LinearStability::setupGEVP(const MHDFloat vc)
    return dims;
 }
 
-void LinearStability::eigenpairs(std::vector<MHDComplex>& evs, std::vector<std::vector<MHDComplex> >& efs, const int nev,
-   const MHDFloat vc)
+void LinearStability::eigenpairs(std::vector<MHDComplex>& evs,
+   std::vector<std::vector<MHDComplex>>& efs, const int nev, const MHDFloat vc)
 {
    auto dims = this->setupGEVP(vc);
 
    std::vector<Vec> petscEfs;
-   if(efs.size() == static_cast<std::size_t>(nev))
+   if (efs.size() == static_cast<std::size_t>(nev))
    {
-      for(int i = 0; i < nev; i++)
+      for (int i = 0; i < nev; i++)
       {
          efs.at(i).resize(dims.first);
          petscEfs.push_back(Vec());
          PetscCallVoid(MatCreateVecs(this->mA, &petscEfs.back(), nullptr));
       }
    }
-   else if(efs.size() > 0 && efs.size() != static_cast<std::size_t>(nev))
+   else if (efs.size() > 0 && efs.size() != static_cast<std::size_t>(nev))
    {
-      throw std::logic_error("Eigenvector storage initialized with wrong size: " + std::to_string(efs.size()) + " vs " + std::to_string(nev));
+      throw std::logic_error(
+         "Eigenvector storage initialized with wrong size: " +
+         std::to_string(efs.size()) + " vs " + std::to_string(nev));
    }
 
    // Solve GEVP
    this->solveGEVP(evs, petscEfs, nev);
 
    // Setup sorting data
-   std::vector<std::pair<MHDComplex,int> > evs_idx;
-   for(std::size_t i = 0; i < evs.size(); i++)
+   std::vector<std::pair<MHDComplex, int>> evs_idx;
+   for (std::size_t i = 0; i < evs.size(); i++)
    {
       evs_idx.push_back(std::make_pair(evs.at(i), i));
    }
 
    // Sort eigenvalues
-   switch(static_cast<int>(this->mParams[NonDimensional::Sort::id()]->value()))
+   switch (static_cast<int>(this->mParams[NonDimensional::Sort::id()]->value()))
    {
-      case 1:
-         {
-            // Sort in decreasing real part order
-            std::sort(evs_idx.begin(), evs_idx.end(), internal::sortDecreasingRealIdx);
-         }
+   case 1: {
+      // Sort in decreasing real part order
+      std::sort(evs_idx.begin(), evs_idx.end(),
+         internal::sortDecreasingRealIdx);
+   }
    }
 
    // Extract sorted eigenpairs
-   for(std::size_t i = 0; i < evs_idx.size(); i++)
+   for (std::size_t i = 0; i < evs_idx.size(); i++)
    {
       const int& i_ = evs_idx.at(i).second;
       evs.at(i) = evs_idx.at(i).first;
-      if(efs.size() > 0)
+      if (efs.size() > 0)
       {
          const PetscScalar* val;
          PetscCallVoid(VecGetArrayRead(petscEfs.at(i_), &val));
-         for(std::size_t j = 0; j < efs.at(i).size(); j++)
+         for (std::size_t j = 0; j < efs.at(i).size(); j++)
          {
             efs.at(i).at(j) = val[j];
          }
@@ -258,7 +263,7 @@ void LinearStability::eigenpairs(std::vector<MHDComplex>& evs, std::vector<std::
 #endif
 
    // Destroy PETSc Vec
-   for(auto& ef: petscEfs)
+   for (auto& ef: petscEfs)
    {
       PetscCallVoid(VecDestroy(&ef));
    }
@@ -274,7 +279,8 @@ MHDFloat LinearStability::operator()(const MHDFloat vc)
    return evs.at(0).real();
 }
 
-MHDFloat LinearStability::operator()(const MHDFloat vc, std::vector<MHDComplex>& evs)
+MHDFloat LinearStability::operator()(const MHDFloat vc,
+   std::vector<MHDComplex>& evs)
 {
    std::vector<std::vector<MHDComplex>> efs;
    this->eigenpairs(evs, efs, evs.size(), vc);
@@ -347,7 +353,8 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
    PetscCallVoid(MatAssemblyEnd(this->mB, MAT_FINAL_ASSEMBLY));
 }
 
-void LinearStability::solveGEVP(std::vector<MHDComplex>& evs, std::vector<Vec>& efs, const int nev)
+void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
+   std::vector<Vec>& efs, const int nev)
 {
    ST st;
    PetscInt rows, cols;
@@ -374,7 +381,7 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs, std::vector<Vec>& 
    PetscCallVoid(EPSSetOperators(this->mEps, this->mA, this->mB));
    PetscCallVoid(EPSSetProblemType(this->mEps, EPS_GNHEP));
 
-   if(useShift)
+   if (useShift)
    {
       PetscCallVoid(EPSGetST(this->mEps, &st));
       PetscCallVoid(STSetType(st, STSINVERT));
@@ -389,28 +396,28 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs, std::vector<Vec>& 
          PetscCallVoid(KSPGetPC(ksp, &pc));
          PetscCallVoid(PCSetType(pc, PCLU));
          PetscCallVoid(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
-         // next line is required to force the creation of the ST operator and its
-         // passing to KSP */
+         // next line is required to force the creation of the ST operator and
+         // its passing to KSP */
          PetscCallVoid(STGetOperator(st, NULL));
          PetscCallVoid(PCFactorSetUpMatSolverType(pc));
          // Example to show how to pass additional options to Mumps solver:
-          Mat K;
-          PetscCallVoid(PCFactorGetMatrix(pc,&K));
-          PetscCallVoid(MatMumpsSetIcntl(K,14,50)); // Memory increase
+         Mat K;
+         PetscCallVoid(PCFactorGetMatrix(pc, &K));
+         PetscCallVoid(MatMumpsSetIcntl(K, 14, 50)); // Memory increase
          // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
       }
    }
 
    PetscCallVoid(
       EPSSetDimensions(this->mEps, nev, PETSC_DEFAULT, PETSC_DEFAULT));
-   if(useShift)
+   if (useShift)
    {
       PetscCallVoid(EPSSetTarget(this->mEps, this->mTarget));
-      if(this->mTarget.imag() == 0)
+      if (this->mTarget.imag() == 0)
       {
          PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_REAL));
       }
-      else if(this->mTarget.real() == 0)
+      else if (this->mTarget.real() == 0)
       {
          PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_IMAGINARY));
       }
@@ -427,18 +434,19 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs, std::vector<Vec>& 
    int nconv = static_cast<int>(t);
 
    evs.resize(nev);
-   if(efs.size() == 0)
+   if (efs.size() == 0)
    {
-      for (int i = 0; i < std::min(nconv,nev); i++)
+      for (int i = 0; i < std::min(nconv, nev); i++)
       {
          PetscCallVoid(EPSGetEigenvalue(this->mEps, i, &evs.at(i), nullptr));
       }
    }
    else
    {
-      for (int i = 0; i < std::min(nconv,nev); i++)
+      for (int i = 0; i < std::min(nconv, nev); i++)
       {
-         PetscCallVoid(EPSGetEigenpair(this->mEps, i, &evs.at(i), nullptr, efs.at(i), nullptr));
+         PetscCallVoid(EPSGetEigenpair(this->mEps, i, &evs.at(i), nullptr,
+            efs.at(i), nullptr));
       }
    }
 

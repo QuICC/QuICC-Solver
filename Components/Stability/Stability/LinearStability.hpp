@@ -29,13 +29,15 @@ public:
     * @brief Constructor
     *
     * @param idc     ID of critical parameter
-    * @param eigs    Indexes of matrix to solve (eg. m for rotating spherical setup)
+    * @param eigs    Indexes of matrix to solve (eg. m for rotating spherical
+    * setup)
     * @param spRes   Resolution
     * @param params  Nondimensional parameters
     * @param bcMap   Boundary conditions
     * @param spModel Model backend
     */
-   LinearStability(const std::size_t idc, const std::vector<MHDFloat>& eigs, SharedResolution spRes,
+   LinearStability(const std::size_t idc, const std::vector<MHDFloat>& eigs,
+      SharedResolution spRes,
       const Equations::EquationParameters::NDMapType& params,
       const std::map<std::size_t, std::size_t>& bcMap,
       std::shared_ptr<Model::IModelBackend> spModel);
@@ -68,7 +70,8 @@ public:
     * @param nev  Number of eigenvalues
     * @param vc   Value of critical parameter
     */
-   void eigenpairs(std::vector<MHDComplex>& evs, std::vector<std::vector<MHDComplex> >& efs, const int nev,
+   void eigenpairs(std::vector<MHDComplex>& evs,
+      std::vector<std::vector<MHDComplex>>& efs, const int nev,
       const MHDFloat vc);
 
 protected:
@@ -111,14 +114,15 @@ private:
     * @param efs  Eigenfunctions (not computed if empty)
     * @param nev  Number of eigenvalues
     */
-   void solveGEVP(std::vector<MHDComplex>& evs, std::vector<Vec>& efs, const int nev);
+   void solveGEVP(std::vector<MHDComplex>& evs, std::vector<Vec>& efs,
+      const int nev);
 
    /**
     * @brief Setup Generalized eigenvalue problem (GEVP)
     *
     * @param vc Value of critical parameter
     */
-   std::pair<int,int> setupGEVP(const MHDFloat vc);
+   std::pair<int, int> setupGEVP(const MHDFloat vc);
 
    /**
     * @brief Print solver details
