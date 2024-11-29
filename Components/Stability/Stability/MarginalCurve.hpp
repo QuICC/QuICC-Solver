@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Equations/EquationParameters.hpp"
+#include "QuICC/Io/Variable/StateFileWriter.hpp"
 #include "Stability/StabilityBase.hpp"
 
 namespace QuICC {
@@ -49,10 +49,31 @@ private:
     * @brief Do operations required just after finishing the main loop
     */
    virtual void postRun() override;
+
+   /**
+    * @brief Save eigenfunctions to statefile
+    */
+   void saveEigenfunction(const int m, const MHDComplex ev,
+      const std::vector<MHDComplex>& ef);
+
+   /**
+    * @brief state file
+    */
+   std::shared_ptr<Io::Variable::StateFileWriter> mpH5File;
+
+   /**
+    * @brief Scalar fields in eigenfunction
+    */
+   std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>
+      mScalars;
+
+   /**
+    * @brief Vector fields in eigenfunction
+    */
+   std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>
+      mVectors;
 };
 
-/// Typedef for a shared pointer of a MarginalCurve
-typedef std::shared_ptr<MarginalCurve> SharedMarginalCurve;
 } // namespace QuICC
 
 #endif // QUICC_MARGINALCURVE_HPP

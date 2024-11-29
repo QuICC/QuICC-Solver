@@ -13,6 +13,10 @@
 //
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Model/IPhysicalModel.hpp"
+#include "QuICC/NonDimensional/Nev.hpp"
+#include "QuICC/NonDimensional/Omega.hpp"
+#include "QuICC/NonDimensional/Sort.hpp"
+#include "QuICC/NonDimensional/StabilityMode.hpp"
 #include "Stability/MarginalCurve.hpp"
 
 namespace QuICC {
@@ -26,7 +30,7 @@ public:
    /**
     * @brief Create a shared simulation for the model
     */
-   static SharedMarginalCurve createSolver();
+   static std::shared_ptr<MarginalCurve> createSolver();
 
 protected:
 private:
@@ -42,7 +46,7 @@ private:
 };
 
 template <class TModel>
-SharedMarginalCurve LinearStabilityFactory<TModel>::createSolver()
+std::shared_ptr<MarginalCurve> LinearStabilityFactory<TModel>::createSolver()
 {
    // Create model
    TModel model;
@@ -60,6 +64,11 @@ SharedMarginalCurve LinearStabilityFactory<TModel>::createSolver()
 
    // Create list of nondimensional ID strings for physical parameters
    std::vector<std::string> ndNames = model.backend().paramNames();
+   // Add configuration parameters for Stability solver
+   ndNames.push_back(NonDimensional::Omega().tag());
+   ndNames.push_back(NonDimensional::Nev().tag());
+   ndNames.push_back(NonDimensional::Sort().tag());
+   ndNames.push_back(NonDimensional::StabilityMode().tag());
 
    // Get model configuration tags
    auto modelCfg = model.configTags();

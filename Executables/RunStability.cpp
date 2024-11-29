@@ -1,6 +1,6 @@
 /**
  * @file RunStability.cpp
- * @brief General executable for the stability implementations 
+ * @brief General executable for the stability implementations
  */
 
 /// Set the path to the simulation implementation
@@ -24,8 +24,8 @@
 //
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
-#include "Stability/MarginalCurve.hpp"
 #include "Stability/LinearStabilityFactory.hpp"
+#include "Stability/MarginalCurve.hpp"
 #include MODELHEADER
 #include "Profiler/Interface.hpp"
 
@@ -39,23 +39,24 @@ int run()
    int status = 0;
 
    // Create simulation
-   QuICC::SharedMarginalCurve   spSolver;
+   std::shared_ptr<QuICC::MarginalCurve> spSolver;
 
    // Exception handling during the initialisation part
    try
    {
       // Create simulation
-      spSolver = QuICC::LinearStabilityFactory<QuICC::Model::QUICC_RUNSIM_CPPMODEL::PhysicalModel>::createSolver();
+      spSolver = QuICC::LinearStabilityFactory<
+         QuICC::Model::QUICC_RUNSIM_CPPMODEL::PhysicalModel>::createSolver();
    }
 
    // If exception is thrown, finalise (close files) and return
-   catch(std::logic_error& e)
+   catch (std::logic_error& e)
    {
       try
       {
          QuICC::QuICCEnv().abort(e.what());
       }
-      catch(std::logic_error& ee)
+      catch (std::logic_error& ee)
       {
          std::cerr << ee.what() << std::endl;
       }
@@ -63,7 +64,7 @@ int run()
       status = -1;
    }
 
-   if(status == 0)
+   if (status == 0)
    {
       // Run the simulation
       spSolver->run();
