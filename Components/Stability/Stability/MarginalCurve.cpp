@@ -19,6 +19,7 @@
 #include "QuICC/Io/Variable/StateFileWriter.hpp"
 #include "QuICC/NonDimensional/Nev.hpp"
 #include "QuICC/NonDimensional/Rayleigh.hpp"
+#include "QuICC/NonDimensional/Lundquist.hpp"
 #include "QuICC/NonDimensional/StabilityMode.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
@@ -307,7 +308,8 @@ void MarginalCurve::mainRun()
       throw std::logic_error("3D spectral matrix not setup");
    }
 
-   auto idc = NonDimensional::Rayleigh::id();
+   //auto idc = NonDimensional::Rayleigh::id();
+   auto idc = NonDimensional::Lundquist::id();
    auto name = NonDimensional::Coordinator::tag(idc);
 
    auto spLinStab = std::make_shared<LinearStability>(idc, eigs, this->mspRes,
