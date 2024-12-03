@@ -224,7 +224,7 @@ def tableTest(fname, ref_dir, data_dir, tid, tol = 11, usecols = None, max_rows 
 
     return (1, int(not cond), f'{fname}{extra}', (tid, max_ulp))
 
-def check_setup(fname, ref_dir, data_dir, trigger, lines_to_check):
+def scan_setup(fname, ref_dir, data_dir, trigger, lines_to_check):
     checked = lines_to_check
     dlines = []
     with open(data_dir + fname) as f:
@@ -248,12 +248,24 @@ def check_setup(fname, ref_dir, data_dir, trigger, lines_to_check):
     cond = (len(dlines) == lines_to_check and len(rlines) == lines_to_check)
     printResult(cond, 'Checking setup is present')
 
-    # Check lines match
-    cond = True
-    for d,r in zip(dlines,rlines):
-        cond = (cond and (d == r))
-        if not cond:
-            print((d,r))
-    printResult(cond, 'Checking setup match: ')
+    # return lines for further validation
+    return (cond, dlines, rlines)
+
+def check_setup(fname, ref_dir, data_dir, trigger, lines_to_check, checker = None):
+
+    # Get lines
+    cond, dlines, rlines = scan_setup(fname, ref_dir, data_dir, trigger, lines_to_check)
+
+    if cond:
+        if checker is None:
+            # Check lines match
+            cond = True
+            for d,r in zip(dlines,rlines):
+                cond = (cond and (d == r))
+                if not cond:
+                    print((d,r))
+            printResult(cond, 'Checking setup match: ')
+        else:
+            cond = checker(dlines, rlines)
 
     return cond

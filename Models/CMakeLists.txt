@@ -36,12 +36,12 @@ set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo "v1.15.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo "v1.13.1")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellITO "dev")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereITO "dev")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "fix/stability")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "fixes/stability")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC "v1.19.0")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC "v1.15.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereTC "v1.15.0")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqShellTC "v1.12.1")
 set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRBC "v1.2.1")
-set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRRBC "fixes/stability")
+set(_QUICC_MODEL_GIT_BRANCH_BoussinesqPlaneRRBC "v1.1.0")
 
 # Cache value, may be overwritten manually
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo
