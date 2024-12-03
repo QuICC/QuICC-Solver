@@ -28,13 +28,16 @@ public:
    /**
     * @brief Constructor
     *
-    * @param eigs    Indexes of matrix to solve (eg. m for rotating spherical setup)
+    * @param idc     ID of critical parameter
+    * @param eigs    Indexes of matrix to solve (eg. m for rotating spherical
+    * setup)
     * @param spRes   Resolution
     * @param params  Nondimensional parameters
     * @param bcMap   Boundary conditions
     * @param spModel Model backend
     */
-   LinearStability(const std::vector<MHDFloat>& eigs, SharedResolution spRes,
+   LinearStability(const std::size_t idc, const std::vector<MHDFloat>& eigs,
+      SharedResolution spRes,
       const Equations::EquationParameters::NDMapType& params,
       const std::map<std::size_t, std::size_t>& bcMap,
       std::shared_ptr<Model::IModelBackend> spModel);
@@ -45,25 +48,31 @@ public:
    virtual ~LinearStability();
 
    /**
-    * @brief Compute growth rate for given Rayleigh number
+    * @brief Compute growth rate for given critical parameter value
+    *
+    * @param vc Value of critical parameter
     */
-   MHDFloat operator()(const MHDFloat Ra);
+   MHDFloat operator()(const MHDFloat vc);
 
    /**
-    * @brief Compute growth rate for given Rayleigh number
+    * @brief Compute growth rate for given critical parameter value
     *
+    * @param vc   Value of critical parameter
     * @param evs  Storage for returning eigenvalues
     */
-   MHDFloat operator()(const MHDFloat Ra, std::vector<MHDComplex>& evs);
+   MHDFloat operator()(const MHDFloat vc, std::vector<MHDComplex>& evs);
 
    /**
-    * @brief Compute eigenvalues
+    * @brief Compute eigenpairs
     *
     * @param evs  Eigenvalues
+    * @param efs  Eigenfunctions
     * @param nev  Number of eigenvalues
+    * @param vc   Value of critical parameter
     */
-   void eigenvalues(std::vector<MHDComplex>& evs, const int nev,
-      const MHDFloat Ra);
+   void eigenpairs(std::vector<MHDComplex>& evs,
+      std::vector<std::vector<MHDComplex>>& efs, const int nev,
+      const MHDFloat vc);
 
 protected:
    /**
@@ -102,17 +111,18 @@ private:
     * @brief Solve Generalized eigenvalue problem (GEVP)
     *
     * @param evs  Eigenvalues
+    * @param efs  Eigenfunctions (not computed if empty)
     * @param nev  Number of eigenvalues
     */
-   void solveGEVP(std::vector<MHDComplex>& evs, const int nev);
+   void solveGEVP(std::vector<MHDComplex>& evs, std::vector<Vec>& efs,
+      const int nev);
 
    /**
-    * @brief Solve Generalized eigenvalue problem (GEVP)
+    * @brief Setup Generalized eigenvalue problem (GEVP)
     *
-    * @param matA Linear operator
-    * @param matB Mass matrix
+    * @param vc Value of critical parameter
     */
-   void buildMatrix(const SparseMatrixZ& matA, const SparseMatrixZ& matB);
+   std::pair<int, int> setupGEVP(const MHDFloat vc);
 
    /**
     * @brief Print solver details
@@ -128,6 +138,11 @@ private:
     * @brief Need initialization?
     */
    bool mNeedInit;
+
+   /**
+    * @brief ID of critical parameter
+    */
+   std::size_t mIdc;
 
    /**
     * @brief Indexes for independent dimension(s)
@@ -170,10 +185,12 @@ private:
     * @brief SLEPc/PETSc EPS object
     */
    EPS mEps;
-};
 
-/// Typedef for a shared pointer of a Simulation
-typedef std::shared_ptr<LinearStability> SharedLinearStability;
+   /**
+    * @brief Target for shift-invert
+    */
+   MHDComplex mTarget;
+};
 } // namespace QuICC
 
 #endif // QUICC_LINEARSTABILITY_HPP

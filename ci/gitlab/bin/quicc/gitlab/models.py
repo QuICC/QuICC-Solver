@@ -130,6 +130,12 @@ configurations = {  'BoussinesqSphereDynamo': {
                         'Explicit' : {
                             'serial' : [variant('build_only', 1)]
                         }
+                    },
+                    'BoussinesqPlaneRRBC': {
+                        'Explicit' : {
+                            'serial' : [variant('build_only', 1)],
+                            'petsc-mpi' : [variant('tubular',1)]
+                        }
                     }
                 }
 
