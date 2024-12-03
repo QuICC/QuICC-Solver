@@ -24,7 +24,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
     QuICC::View
     QuICC::Profiling
     QuICC::Memory
-    QuICC::DenseSM
+    QuICC::DenseOp
     QuICC::ViewOps::Quadrature
     QuICC::ViewOps::Pointwise
     QuICC::ViewOps::Reduction

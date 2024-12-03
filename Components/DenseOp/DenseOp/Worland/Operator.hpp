@@ -4,8 +4,8 @@
  * operator
  */
 
-#ifndef QUICC_DENSESM_WORLAND_OPERATOR_HPP
-#define QUICC_DENSESM_WORLAND_OPERATOR_HPP
+#ifndef QUICC_DENSEOP_WORLAND_OPERATOR_HPP
+#define QUICC_DENSEOP_WORLAND_OPERATOR_HPP
 
 // System includes
 //
@@ -13,19 +13,19 @@
 
 // Project includes
 //
-#include "DenseSM/IDenseSMOperator.hpp"
+#include "DenseOp/IDenseOpOperator.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
-namespace DenseSM {
+namespace DenseOp {
 /// @brief namespace for generic dense spectral Worland operator builders
 namespace Worland {
 
 /// @brief Wrapper for generic Worland operator
 /// @tparam TPolyBuilder polynomial builder
-template <class TPolyBuilder> class Operator : IDenseSMOperator
+template <class TPolyBuilder> class Operator : IDenseOpOperator
 {
 public:
    /// @brief Pass-by-value polynomial builder ctor
@@ -64,7 +64,7 @@ void Operator<TPolyBuilder>::compute(Eigen::Ref<Matrix> op,
 
 
 } // namespace Worland
-} // namespace DenseSM
+} // namespace DenseOp
 } // namespace QuICC
 
-#endif // define QUICC_DENSESM_WORLAND_OPERATOR_HPP
+#endif // define QUICC_DENSEOP_WORLAND_OPERATOR_HPP

@@ -3,8 +3,8 @@
  * @brief Utility for Worland Builder
  */
 
-#ifndef QUICC_DENSESM_WORLAND_GETSUPERN_HPP
-#define QUICC_DENSESM_WORLAND_GETSUPERN_HPP
+#ifndef QUICC_DENSEOP_WORLAND_GETSUPERN_HPP
+#define QUICC_DENSEOP_WORLAND_GETSUPERN_HPP
 
 // System includes
 //
@@ -17,7 +17,7 @@
 #include "QuICC/SparseSM/Worland/I6.hpp"
 
 namespace QuICC {
-namespace DenseSM {
+namespace DenseOp {
 namespace Worland {
 
 /// @brief Get number of super diagonals based on builder type
@@ -53,7 +53,7 @@ template <class TINBuilder> constexpr std::uint32_t getSuperN()
 }
 
 } // namespace Worland
-} // namespace DenseSM
+} // namespace DenseOp
 } // namespace QuICC
 
-#endif // define QUICC_DENSESM_WORLAND_GETSUPERN_HPP
+#endif // define QUICC_DENSEOP_WORLAND_GETSUPERN_HPP

@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "DenseSM/Worland/Operator.hpp"
+#include "DenseOp/Worland/Operator.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 #include "ViewOps/Worland/TypeTraits.hpp"
@@ -22,14 +22,14 @@ namespace Worland {
 
 /// @brief Generic JW builder operator
 /// @tparam TView  type View of the operator
-/// @tparam TDenseSMBuilder Polynomial builder
+/// @tparam TDenseOpBuilder Polynomial builder
 /// @tparam TDirection
-template <class TView, class TDenseSMBuilder, class TDirection> class Builder
+template <class TView, class TDenseOpBuilder, class TDirection> class Builder
 {
 public:
    /// @brief Pass-by-value dense builder ctor
    /// @param denseBuilder to be stored and used
-   Builder(TDenseSMBuilder denseBuilder) : mDenseBuilder(denseBuilder){};
+   Builder(TDenseOpBuilder denseBuilder) : mDenseBuilder(denseBuilder){};
 
    /// @brief default ctor
    Builder() = default;
@@ -41,12 +41,12 @@ public:
       const Internal::Array& weights);
 
 private:
-   TDenseSMBuilder mDenseBuilder;
+   TDenseOpBuilder mDenseBuilder;
 };
 
 
-template <class TView, class TDenseSMBuilder, class TDirection>
-void Builder<TView, TDenseSMBuilder, TDirection>::compute(TView opView,
+template <class TView, class TDenseOpBuilder, class TDirection>
+void Builder<TView, TDenseOpBuilder, TDirection>::compute(TView opView,
    const Internal::Array& grid, const Internal::Array& weights)
 {
    using IndexType = typename TView::IndexType;
@@ -126,7 +126,7 @@ void Builder<TView, TDenseSMBuilder, TDirection>::compute(TView opView,
       // Build operator
       int nPoly = opView.dims()[LIdx];
       op.resize(grid.size(), nPoly);
-      // QuICC::DenseSM::Worland::Operator<ScalarType, TData, TPolyBuilder>
+      // QuICC::DenseOp::Worland::Operator<ScalarType, TData, TPolyBuilder>
       // help compiler to deduce type
       Eigen::Ref<slice_t> ref(op);
       mDenseBuilder.compute(ref, grid, weights, k);
