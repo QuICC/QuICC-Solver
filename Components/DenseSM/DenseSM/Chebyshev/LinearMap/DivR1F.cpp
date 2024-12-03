@@ -13,11 +13,12 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/DivR1F.hpp"
-#include "include/QuICC/Transform/"
-#include "include/QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY1.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
+#include <iostream>
 namespace QuICC {
 
 namespace DenseSM {
@@ -27,25 +28,40 @@ namespace Chebyshev {
 namespace LinearMap {
 
 DivR1F::DivR1F(const int nNr, const int nNc, const int lOut, const int lF, const int lIn,
-   std::shared_ptr<RadialTorPolFunction> pf, const Scalar_t lower, const Scalar_t upper) :
-    ILinearMapOperator(nNr, nNc, lower, upper),
-    mLout(lOut), mLf(lF), mLin(lIn), mpF(pf)
+   std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower, const Scalar_t upper) :
+    ITripleHarmonicOperator(nNr, nNc, lOut, lF, lIn, pF, lower, upper)
 {}
 
 void DivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   int size = 1;
-   int blocks = 1;
-   int specSize = 1;
-   Transform::Chebyshev::LinearMap::Projector::DivY1::SetupType s(size, blocks, specSize, GridPurpose::SIMULATION);
-   Transform::Chebyshev::LinearMap::Projector::DivY1 r_1Op;
-   r_1Op.init();
-   r_1Op.transform();
+   int size = 2*this->cols();
+   int blocks = this->cols();
+   int specSize = this->cols();
+   Internal::Array igrid, iweights;
+   this->computeQuadrature(igrid, iweights, size);
+   std::cerr << igrid.transpose() << std::endl;
+
+   auto pSetup = std::make_shared<Transform::Fft::Chebyshev::LinearMap::Projector::DivY1::SetupType>(size, blocks, specSize, GridPurpose::SIMULATION);
+   pSetup->setBounds(this->mcLower, this->mcUpper);
+   pSetup->lock();
+
+   Transform::Fft::Chebyshev::LinearMap::Projector::DivY1 r_1TBwd;
+   r_1TBwd.init(pSetup);
+   Transform::Fft::Chebyshev::LinearMap::Integrator::P TFwd;
+   TFwd.init(pSetup);
+
+   Matrix id = Matrix::Identity(size,this->cols());
+   Matrix tmp = Matrix::Zero(size,this->cols());
+   r_1TBwd.transform(tmp, id);
+   std::cerr << tmp << std::endl;
 
    auto f = this->mpF->evaluate(igrid, this->mLf);
 
-   mat = opFwd.transpose() * f.asDiagonal() * opBwd;
+   tmp = f.asDiagonal() * tmp;
+
+   TFwd.transform(id, tmp);
+
 }
 
 } // namespace LinearMap

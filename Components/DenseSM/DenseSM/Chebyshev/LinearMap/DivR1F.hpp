@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
+#include "DenseSM/Chebyshev/LinearMap/ITripleHarmonicOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "Types/Typedefs.hpp"
@@ -27,7 +27,7 @@ namespace LinearMap {
 /**
  * @brief Implementation of the spectral operator f/r
  */
-class DivR1F : public ILinearMapOperator
+class DivR1F : public ITripleHarmonicOperator
 {
 public:
    /**
@@ -59,26 +59,6 @@ protected:
     */
    void buildOpImpl(Internal::Matrix& mat, const int rows,
       const int cols) const final;
-
-   /**
-    * @brief Harmonic degree of output
-    */
-   int mLout;
-
-   /**
-    * @brief Harmonic degree of f
-    */
-   int mLf;
-
-   /**
-    * @brief Harmonic degree of input
-    */
-   int mLin;
-
-   /**
-    * @brief Functor for f
-    */
-   std::shared_ptr<RadialTorPolFunction> mpF;
 
 private:
 };

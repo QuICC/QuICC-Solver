@@ -2,6 +2,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ILinearMapOperator.cpp
   DipolarS1.cpp
   QuadrupolarS2.cpp
+  DivR1F.cpp
 )
 
 set(PHS

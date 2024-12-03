@@ -1,0 +1,50 @@
+/**
+ * @file @Operator@Test.cpp
+ * @brief Tests for the Chebyshev LinearMap @Operator@ DenseSM operator
+ */
+
+
+// System includes
+//
+#include <catch2/catch.hpp>
+#include <iostream>
+
+// Project includes
+//
+#include "TestSuite/DenseSM/Chebyshev/LinearMap/TestArgs.hpp"
+#include "DenseSM/Chebyshev/LinearMap/@Operator@.hpp"
+#include "TestSuite/DenseSM/Chebyshev/LinearMap/Tester.hpp"
+
+namespace currentts = ::QuICC::TestSuite::DenseSM::Chebyshev::LinearMap;
+
+TEST_CASE( "Error for @Operator@ operator", "[@Operator@:@type@]" )
+{
+
+   // Set default arguments if required
+   if(currentts::args().useDefault)
+   {
+      currentts::args().params = {0,1,2,3};
+   }
+
+   Catch::StringMaker<double>::precision = 15;
+
+   // Set type
+   currentts::args().setType("@type@");
+
+   REQUIRE( currentts::args().params.size() > 0 );
+
+   typedef ::QuICC::DenseSM::Chebyshev::LinearMap::@Operator@ Operator;
+   typedef typename currentts::Tester<Operator> Tester;
+
+   Tester tester("@Operator@.dat", currentts::args().dumpData);
+   tester.setUlp(currentts::args().ulp);
+
+   Tester::ParameterType params = {-1};
+
+   for(auto id: currentts::args().params)
+   {
+      params.at(0) = id;
+      tester.validate(params, currentts::args().type, currentts::args().timeOnly);
+   
+   }
+}

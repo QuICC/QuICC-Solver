@@ -21,7 +21,6 @@
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
-#include<iostream>
 namespace QuICC {
 
 namespace DenseSM {
@@ -36,12 +35,6 @@ DivR3D1R1FD1R1::DivR3D1R1FD1R1(const int nNr, const int nNc, const int lOut, con
 void DivR3D1R1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   std::cerr << "lOut : " << this->mLout << std::endl;
-   std::cerr << "lF : " << this->mLf << std::endl;
-   std::cerr << "lIn : " << this->mLin << std::endl;
-   std::cerr << "F nN : " << this->mpF->nN() << std::endl;
-   std::cerr << "nNr : " << this->rows() << std::endl;
-   std::cerr << "nNc : " << this->cols() << std::endl;
    namespace ev = Polynomial::Worland::Evaluator;
    const int nR = (3*(2*this->rows() + std::max(this->mLin, this->mLout)))/2;
    Internal::Array igrid, iweights;
