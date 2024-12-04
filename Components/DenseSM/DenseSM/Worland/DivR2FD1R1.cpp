@@ -27,9 +27,9 @@ namespace DenseSM {
 
 namespace Worland {
 
-DivR2FD1R1::DivR2FD1R1(const int nNr, const int nNc, const int lOut, const int lF, const int lIn,
+DivR2FD1R1::DivR2FD1R1(const int nNr, const int nNc, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn,
    std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t alpha, const Scalar_t dBeta) :
-    ITripleHarmonicOperator(nNr, nNc, lOut, lF, lIn, pF, alpha, dBeta)
+    ITripleHarmonicOperator(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, alpha, dBeta)
 {}
 
 void DivR2FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
@@ -55,7 +55,7 @@ void DivR2FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    Internal::Matrix opFwd(igrid.size(), this->rows());
    W.compute<Internal::MHDFloat>(opFwd, this->rows(), this->mLout, igrid, iweights, ev::Set());
 
-   Internal::Array f = opFBwd * opFFwd.transpose() * this->mpF->evaluate(igrid, this->mLf);
+   Internal::Array f = opFBwd * opFFwd.transpose() * this->mpF->evaluate(igrid, this->mLf, this->mMf);
 
    mat = opFwd.transpose() * f.asDiagonal() * opBwd;
 }

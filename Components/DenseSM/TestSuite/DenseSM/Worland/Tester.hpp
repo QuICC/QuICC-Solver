@@ -10,7 +10,6 @@
 //
 #include <catch2/catch.hpp>
 #include <string>
-#include <set>
 #include <sstream>
 
 // Project includes
@@ -18,13 +17,7 @@
 #include "DenseSM/Worland/DipolarS1.hpp"
 #include "DenseSM/Worland/IWorlandOperator.hpp"
 #include "DenseSM/Worland/RadialTorPolFunction.hpp"
-#include "Types/BasicTypes.hpp"
-#include "Types/Internal/Typedefs.hpp"
-#include "Environment/QuICCEnv.hpp"
-#include "QuICC/Enums/GridPurpose.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
-#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
-#include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
 #include "QuICC/Bc/Name/FixedFlux.hpp"
 #include "QuICC/Bc/Name/Insulating.hpp"
@@ -122,7 +115,7 @@ namespace Worland {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         if(meta.size() != 8)
+         if(meta.size() != 11)
          {
             throw std::logic_error("Test meta data is wrong");
          }
@@ -130,11 +123,14 @@ namespace Worland {
          int nNr = meta(0) + 1;
          int nNc = meta(1) + 1;
          int lOut = meta(2);
-         int lF = meta(3);
-         int lIn = meta(4);
-         int fId = meta(5);
-         auto alpha = static_cast<QuICC::Internal::MHDFloat>(meta(6));
-         auto dBeta = static_cast<QuICC::Internal::MHDFloat>(meta(7));
+         int mOut = meta(3);
+         int lF = meta(4);
+         int mF = meta(5);
+         int lIn = meta(6);
+         int mIn = meta(7);
+         int fId = meta(8);
+         auto alpha = static_cast<QuICC::Internal::MHDFloat>(meta(9));
+         auto dBeta = static_cast<QuICC::Internal::MHDFloat>(meta(10));
 
          std::shared_ptr<dsm::RadialTorPolFunction> pF;
          if (fId == 0)
@@ -142,13 +138,9 @@ namespace Worland {
             pF = std::make_shared<dsm::DipolarS1>();
          }
 
-         TOp op(nNr, nNc, lOut, lF, lIn, pF, alpha, dBeta);
+         TOp op(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, alpha, dBeta);
 
          outData = op.mat();
-
-         #if defined QUICC_MPI
-            MPI_Allreduce(MPI_IN_PLACE, outData.data(), outData.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-         #endif
       }
       else if constexpr(std::is_base_of_v<dsm::IWorlandOperator, TOp>)
       {

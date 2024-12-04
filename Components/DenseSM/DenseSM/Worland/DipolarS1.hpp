@@ -44,7 +44,7 @@ public:
    /**
     * @brief Evaluate on radial grid
     */
-   Internal::Array evaluate(const Internal::Array& r, const int l) const final;
+   Internal::Array evaluate(const Internal::Array& r, const int l, const int m) const final;
 
 protected:
 
