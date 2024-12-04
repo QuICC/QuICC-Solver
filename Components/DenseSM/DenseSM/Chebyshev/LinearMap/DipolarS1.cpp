@@ -25,7 +25,7 @@ int DipolarS1::nN() const
    return 3;
 }
 
-Internal::Array DipolarS1::evaluate(const Internal::Array& r, const int l) const
+Internal::Array DipolarS1::evaluate(const Internal::Array& r, const int l, const int m) const
 {
    using namespace Internal::Literals;
 

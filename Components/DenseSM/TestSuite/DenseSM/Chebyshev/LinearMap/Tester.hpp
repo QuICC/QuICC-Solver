@@ -10,7 +10,6 @@
 //
 #include <catch2/catch.hpp>
 #include <string>
-#include <set>
 #include <sstream>
 
 // Project includes
@@ -19,10 +18,6 @@
 #include "DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "DenseSM/Chebyshev/LinearMap/ITripleHarmonicOperator.hpp"
-#include "Types/BasicTypes.hpp"
-#include "Types/Internal/Typedefs.hpp"
-#include "Environment/QuICCEnv.hpp"
-#include "QuICC/Enums/GridPurpose.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
 #include "QuICC/Bc/Name/FixedFlux.hpp"
@@ -122,7 +117,7 @@ namespace LinearMap {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         if(meta.size() != 8)
+         if(meta.size() != 11)
          {
             throw std::logic_error("Test meta data is wrong");
          }
@@ -130,11 +125,14 @@ namespace LinearMap {
          int nNr = meta(0) + 1;
          int nNc = meta(1) + 1;
          int lOut = meta(2);
-         int lF = meta(3);
-         int lIn = meta(4);
-         int fId = meta(5);
-         auto lb = static_cast<QuICC::Internal::MHDFloat>(meta(6));
-         auto ub = static_cast<QuICC::Internal::MHDFloat>(meta(7));
+         int mOut = meta(3);
+         int lF = meta(4);
+         int mF = meta(5);
+         int lIn = meta(6);
+         int mIn = meta(7);
+         int fId = meta(8);
+         auto lb = static_cast<QuICC::Internal::MHDFloat>(meta(9));
+         auto ub = static_cast<QuICC::Internal::MHDFloat>(meta(10));
 
          std::shared_ptr<dsm::RadialTorPolFunction> pF;
          if (fId == 0)
@@ -142,7 +140,7 @@ namespace LinearMap {
             pF = std::make_shared<dsm::DipolarS1>();
          }
 
-         TOp op(nNr, nNc, lOut, lF, lIn, pF, lb, ub);
+         TOp op(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, lb, ub);
 
          outData = op.mat();
       }

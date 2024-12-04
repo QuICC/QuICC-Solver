@@ -25,9 +25,9 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-R2DivR1F::R2DivR1F(const int nNr, const int nNc, const int lOut, const int lF, const int lIn,
+R2DivR1F::R2DivR1F(const int nNr, const int nNc, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn,
    std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower, const Scalar_t upper) :
-    ITripleHarmonicOperator(nNr, nNc, lOut, lF, lIn, pF, lower, upper)
+    ITripleHarmonicOperator(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, lower, upper)
 {}
 
 void R2DivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
@@ -53,7 +53,7 @@ void R2DivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    Matrix tmpB = Matrix::Zero(rN, this->cols());
    TBwd.transform(tmpB, tmpA);
 
-   auto f = this->mpF->evaluate(igrid, this->mLf);
+   auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
    f = igrid.asDiagonal()*f;
 
    tmpB = f.asDiagonal() * tmpB;
