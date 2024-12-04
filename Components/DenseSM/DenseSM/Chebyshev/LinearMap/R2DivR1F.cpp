@@ -15,10 +15,8 @@
 #include "DenseSM/Chebyshev/LinearMap/R2DivR1F.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
-#include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
-#include <iostream>
 namespace QuICC {
 
 namespace DenseSM {
@@ -36,6 +34,7 @@ void R2DivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
    namespace cheb = Transform::Fft::Chebyshev::LinearMap;
+   typedef cheb::Integrator::P::SetupType SetupType;
 
    const auto pId = GridPurpose::SIMULATION;
    int rN = 2*this->cols();
@@ -44,33 +43,30 @@ void R2DivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, rN);
 
-   auto sBwd = std::make_shared<cheb::Projector::P::SetupType>(rN, this->cols(), this->cols(), pId);
+   auto sBwd = std::make_shared<SetupType>(rN, this->cols(), this->cols(), pId);
    sBwd->setBounds(this->mcLower, this->mcUpper);
    sBwd->lock();
-
    cheb::Projector::P TBwd;
    TBwd.init(sBwd);
 
-   auto sFwd = std::make_shared<cheb::Projector::P::SetupType>(rN, this->cols(), this->rows(), pId);
-   sFwd->setBounds(this->mcLower, this->mcUpper);
-   sFwd->lock();
-
-   cheb::Integrator::P TFwd;
-   TFwd.init(sFwd);
-
-   Matrix id = Matrix::Identity(this->cols(), this->cols());
-   Matrix tmp = Matrix::Zero(rN, this->cols());
-   TBwd.transform(tmp, id);
+   Matrix tmpA = Matrix::Identity(rN, this->cols());
+   Matrix tmpB = Matrix::Zero(rN, this->cols());
+   TBwd.transform(tmpB, tmpA);
 
    auto f = this->mpF->evaluate(igrid, this->mLf);
    f = igrid.asDiagonal()*f;
 
-   tmp = f.asDiagonal() * tmp;
+   tmpB = f.asDiagonal() * tmpB;
 
-   id.resize(rN,this->cols());
-   TFwd.transform(id, tmp);
+   auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
+   sFwd->setBounds(this->mcLower, this->mcUpper);
+   sFwd->lock();
+   cheb::Integrator::P TFwd;
+   TFwd.init(sFwd);
 
-   mat = id.topRows(this->rows());
+   TFwd.transform(tmpA, tmpB);
+
+   mat = tmpA.topRows(this->rows());
 }
 
 } // namespace LinearMap
