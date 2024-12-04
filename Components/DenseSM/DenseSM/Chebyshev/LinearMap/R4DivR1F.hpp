@@ -1,10 +1,10 @@
 /**
- * @file DivR1F.hpp
- * @brief Implementation of the spectral operator f/r
+ * @file R4DivR1F.hpp
+ * @brief Implementation of the spectral operator r^4 f/r
  */
 
-#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_DIVR1F_HPP
-#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_DIVR1F_HPP
+#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVR1F_HPP
+#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVR1F_HPP
 
 // System includes
 //
@@ -25,9 +25,9 @@ namespace Chebyshev {
 namespace LinearMap {
 
 /**
- * @brief Implementation of the spectral operator f/r
+ * @brief Implementation of the spectral operator r^4 f/r
  */
-class DivR1F : public ITripleHarmonicOperator
+class R4DivR1F : public ITripleHarmonicOperator
 {
 public:
    /**
@@ -41,13 +41,13 @@ public:
     * @param lower   Lower boundar
     * @param upper   Upper boundar
     */
-   DivR1F(const int rows, const int cols, const int lOut, const int lF, const int lIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
+   R4DivR1F(const int rows, const int cols, const int lOut, const int lF, const int lIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
       const Scalar_t upper);
 
    /**
     * @brief Destructor
     */
-   virtual ~DivR1F() = default;
+   virtual ~R4DivR1F() = default;
 
 protected:
    /**
@@ -68,4 +68,4 @@ private:
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_DIVR1F_HPP
+#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVR1F_HPP
