@@ -34,8 +34,11 @@ public:
     * @param rows    Number of rows
     * @param cols    Number of cols
     * @param lOut    Output harmonic degree
+    * @param mOut    Output harmonic order
     * @param lF      harmonic degree of f
+    * @param mF      harmonic order of f
     * @param lIn     Input harmonic degree
+    * @param mIn     Input harmonic order
     * @param alpha   Jacobi alpha parameter
     * @param dBeta   Jacobi dBeta parameter
     */

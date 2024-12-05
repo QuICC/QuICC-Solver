@@ -12,6 +12,14 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   R4DivR1D1DivR1FD1R1.cpp
   R4DivR1D1DivR1D1R1F.cpp
   R4DivR3D1R1FD1R1.cpp
+  ProjCurlTorCrossTor.cpp
+  ProjCurlTorCrossPol.cpp
+  ProjCurlPolCrossTor.cpp
+  ProjCurlPolCrossPol.cpp
+  ProjCurlCurlTorCrossTor.cpp
+  ProjCurlCurlTorCrossPol.cpp
+  ProjCurlCurlPolCrossTor.cpp
+  ProjCurlCurlPolCrossPol.cpp
 )
 
 set(PHS
