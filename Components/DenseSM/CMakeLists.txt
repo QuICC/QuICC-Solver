@@ -15,10 +15,16 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+    "/usr/local/install/wigxjpf/inc"
 )
 
 # Add source directory
 add_subdirectory(DenseSM)
+
+target_link_directories(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+  "/usr/local/install/wigxjpf/lib"
+)
 
 # Dependencies
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
