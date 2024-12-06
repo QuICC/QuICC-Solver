@@ -150,6 +150,7 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiRImpl(Tout& out, const Ta
 
       // check mem bounds
       assert((col+1)*M <= out.size());
+      assert(thetaIdx < _grid.size());
 
       // column major
       for (std::size_t m = 0; m < M; ++m)

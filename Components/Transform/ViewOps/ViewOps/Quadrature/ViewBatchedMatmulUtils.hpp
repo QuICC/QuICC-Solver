@@ -150,7 +150,7 @@ QUICC_CUDA_HOSTDEV inline void setIndicesAndPointers(
       for (IndexType i = 0; i < P; ++i)
       {
          IndexType blockWidth = 0;
-         if (static_cast<IndexType>(layers[layerCtr] == i))
+         if ((layerCtr < nLayers) && (layers[layerCtr] == i))
          {
             blockWidth = M;
             ++layerCtr;

@@ -18,6 +18,7 @@
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #include "Memory/Cuda/Malloc.hpp"
+#include "Memory/Cuda/Pool.hpp"
 #endif
 
 namespace QuICC {
