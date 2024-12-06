@@ -30,9 +30,6 @@ Mpi::Mpi()
 {
    MPI_Init(nullptr, nullptr);
 
-   // Check if we have cuda awareness
-   checkCudaAwareness();
-
    // Set MPI rank of local CPU
    MPI_Comm_rank(MPI_COMM_WORLD, &Mpi::mId);
 
@@ -41,6 +38,9 @@ Mpi::Mpi()
 
    // Set IO rank
    Mpi::mIoRank = 0;
+
+   // Check if we have cuda awareness
+   checkCudaAwareness();
 
    // Set gdb hook
    gdbHook();
@@ -222,16 +222,19 @@ void Mpi::checkCudaAwareness()
       }
    }
 
-   if(isCudaAware)
+   if (Mpi::mId == Mpi::mIoRank)
    {
-      std::cout << "Mpi is cuda aware!\n";
-   }
-   else
-   {
-      std::cout << "Mpi is not cuda aware!\n";
-      // #ifdef QUICC_HAS_CUDA_BACKEND
-      // this->abort("Cuda aware is not supported, but needed for Cuda backend!");
-      // #endif
+      if(isCudaAware)
+      {
+         std::cout << "Mpi is cuda aware!\n";
+      }
+      else
+      {
+         std::cout << "Mpi is not cuda aware!\n";
+         // #ifdef QUICC_HAS_CUDA_BACKEND
+         // this->abort("Cuda aware is not supported, but needed for Cuda backend!");
+         // #endif
+      }
    }
 }
 

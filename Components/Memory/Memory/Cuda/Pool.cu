@@ -9,16 +9,16 @@
 #ifndef NDEBUG
 #include <iostream>
 #endif
-#include <new>
 #include <cassert>
 
 // Project includes
 //
-#include "Memory/Cpu/Pool.hpp"
+#include "Memory/Cuda/Pool.hpp"
+#include "Cuda/CudaUtil.hpp"
 
 namespace QuICC {
 namespace Memory {
-namespace Cpu {
+namespace Cuda {
 
 Pool::~Pool()
 {
@@ -27,7 +27,8 @@ Pool::~Pool()
     {
         if(_blocks[i].ptr != nullptr)
         {
-            ::operator delete(_blocks[i].ptr, _blocks[i].blockSize, static_cast<std::align_val_t>(_alignment));
+            // ::operator delete(_blocks[i].ptr, _blocks[i].blockSize, static_cast<std::align_val_t>(_alignment));
+            cudaErrChk(cudaFree(_blocks[i].ptr));
 #ifndef NDEBUG
             std::cout << "deallocated: " << _blocks[i].blockSize << "\t@: " << _blocks[i].ptr << '\n';
 #endif
@@ -63,8 +64,10 @@ void* Pool::do_allocate(std::size_t bytes, std::size_t)
         if (bytes > _blocks[i].blockSize)
         {
             // realloc
-            ::operator delete(_blocks[i].ptr, _blocks[i].blockSize, static_cast<std::align_val_t>(_alignment));
-            _blocks[i].ptr = ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
+            // ::operator delete(_blocks[i].ptr, _blocks[i].blockSize, static_cast<std::align_val_t>(_alignment));
+            cudaErrChk(cudaFree(_blocks[i].ptr));
+            // _blocks[i].ptr = ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
+            cudaErrChk(cudaMalloc(reinterpret_cast<void**>(&_blocks[i].ptr), _maxBlockSize));
             _blocks[i].blockSize = _maxBlockSize;
 #ifndef NDEBUG
             std::cout << "realloc block: " << i << "\tof size: " << _blocks[i].blockSize << '\n';
@@ -81,7 +84,9 @@ void* Pool::do_allocate(std::size_t bytes, std::size_t)
     }
 
     // if not allocate
-    auto ptr = ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
+    // auto ptr = ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
+    void* ptr{nullptr};
+    cudaErrChk(cudaMalloc(reinterpret_cast<void**>(&ptr), _maxBlockSize));
     _blocks[i].blockSize = _maxBlockSize;
 #ifndef NDEBUG
     std::cout << "allocated: " << _blocks[i].blockSize  << "\t@: " << ptr << '\n';
@@ -119,7 +124,7 @@ bool Pool::do_is_equal(const QuICC::Memory::memory_resource& other) const noexce
     return op != nullptr;
 }
 
-} // namespace Cpu
+} // namespace Cuda
 } // namespace Memory
 } // namespace QuICC
 

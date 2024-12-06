@@ -8,6 +8,7 @@ add_library(${QUICC_CURRENT_COMPONENT_LIB} STATIC
   Memory/Cpu/NewDelete.cpp
   Memory/Cpu/Pool.cpp
   Memory/Cuda/Malloc.cu
+  Memory/Cuda/Pool.cu
 )
 
 set_property(TARGET ${QUICC_CURRENT_COMPONENT_LIB}

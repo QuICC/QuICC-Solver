@@ -39,7 +39,7 @@ namespace QuICC {
       this->initCfg();
 
       // Init StdOutPipe output file
-      // this->initStdOut();
+      this->initStdOut();
 
       // Print parameters file parameters
       this->mspCfgFile->printInfo();

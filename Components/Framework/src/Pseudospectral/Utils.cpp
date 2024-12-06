@@ -271,7 +271,7 @@ namespace details
          [&](auto&& p, auto& Tv)
          {
             auto& ptrTemp = p->rDom(0).rPerturbation();
-            p->rDom(0).rPerturbation().setZeros();
+            // p->rDom(0).rPerturbation().setZeros();
             details::copyView2Eig(ptrTemp.rData(), Tv, res);
          }, sVar, vVar);
    }
@@ -282,10 +282,10 @@ namespace details
          [&](auto&& p, auto& Torv, auto& Polv)
          {
             auto& ptrTor = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR);
-            p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setZeros();
+            // p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setZeros();
             details::copyView2Eig(ptrTor.rData(), Torv, res);
             auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
-            p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setZeros();
+            // p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setZeros();
             details::copyView2Eig(ptrPol.rData(), Polv, res);
          }, vecVar, vVar0, vVar1);
 
@@ -297,13 +297,13 @@ namespace details
             [&](auto&& p, auto& Urv, auto& Uthetav, auto& Uphiv)
             {
                auto& ptrUr = p->rDom(0).rPhys().rComp(FieldComponents::Physical::R);
-               p->rDom(0).rPhys().rComp(FieldComponents::Physical::R).setZeros();
+               // p->rDom(0).rPhys().rComp(FieldComponents::Physical::R).setZeros();
                details::copyView2Eig(ptrUr.rData(), Urv, res);
                auto& ptrUtheta = p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA);
-               p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA).setZeros();
+               // p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA).setZeros();
                details::copyView2Eig(ptrUtheta.rData(), Uthetav, res);
                auto& ptrUphi = p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI);
-               p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI).setZeros();
+               // p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI).setZeros();
                details::copyView2Eig(ptrUphi.rData(), Uphiv, res);
             }, vecVar, vVar0, vVar1, vVar2);
 

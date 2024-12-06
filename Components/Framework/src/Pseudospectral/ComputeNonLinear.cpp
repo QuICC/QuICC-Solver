@@ -14,26 +14,6 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
 #include "QuICC/Pseudospectral/Utils.hpp"
-// #include "QuICC/Debug/DebuggerMacro.h"
-// #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-// #include "Environment/QuICCEnv.hpp"
-// #include "QuICC/QuICCTimer.hpp"
-// #include "QuICC/ModelOperator/ExplicitLinear.hpp"
-// #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
-// #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
-// #include "QuICC/SolveTiming/After.hpp"
-// #include "QuICC/SolveTiming/Before.hpp"
-// #include "QuICC/SolveTiming/Prognostic.hpp"
-// #include "QuICC/Variables/RequirementTools.hpp"
-// #include "QuICC/TransformCoordinators/TransformCoordinatorTools.hpp"
-// #include "QuICC/Equations/Tools/EquationTools.hpp"
-// #include "QuICC/Simulation/SimulationIoTools.hpp"
-// #include "QuICC/PseudospectralTag/Diagnostic.hpp"
-// #include "QuICC/PseudospectralTag/Prognostic.hpp"
-// #include "QuICC/PseudospectralTag/Trivial.hpp"
-// #include "QuICC/PseudospectralTag/Uninitialized.hpp"
-// #include "QuICC/PseudospectralTag/Wrapper.hpp"
-// #include "QuICC/PhysicalNames/Coordinator.hpp"
 #include "QuICC/PhysicalNames/registerAll.hpp"
 #include "View/View.hpp"
 #include "View/ViewUtils.hpp"
@@ -111,15 +91,15 @@ namespace Pseudospectral {
          auto& BthetaVarv = mId2View[hMagTheta];
          auto& BphiVarv = mId2View[hMagPhi];
 
-         #ifndef NDEBUG
-         Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
-         // Compute backward transform
-         this->updatePhysical(it);
+         // #ifndef NDEBUG
+         // Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
+         // // Compute backward transform
+         // this->updatePhysical(it);
 
-         // compute nonlinear interaction and forward transform
-         this->updateSpectral(it);
-         Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
-         #endif
+         // // compute nonlinear interaction and forward transform
+         // this->updateSpectral(it);
+         // Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
+         // #endif
 
          Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
          // Call graph

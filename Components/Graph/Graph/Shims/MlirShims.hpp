@@ -90,7 +90,7 @@ namespace details
 
 using cpuMem_t = Memory::Cpu::Pool;
 #ifdef QUICC_HAS_CUDA_BACKEND
-using cudaMem_t = Memory::Cuda::Malloc;
+using cudaMem_t = Memory::Cuda::Pool;
 #endif
 
 /// @brief generic view descriptor allocator
@@ -112,15 +112,12 @@ void alloc_ptr(Tnew** newPtr, const size_t size, const Tprod* prodPtr)
     #endif
     if (isCpuMem)
     {
-        // auto alignment = static_cast<std::align_val_t>(alignof(std::max_align_t));
-        // *newPtr = reinterpret_cast<Tnew*>(::operator new(sizeByte, alignment));
         auto alignment = alignof(std::max_align_t);
         *newPtr = reinterpret_cast<Tnew*>(memCpu.allocate(sizeByte, alignment));
     }
     #ifdef QUICC_HAS_CUDA_BACKEND
     else
     {
-        // cudaErrChk(cudaMalloc(reinterpret_cast<void**>(newPtr), sizeByte));
         *newPtr = reinterpret_cast<Tnew*>(memGpu.allocate(sizeByte));
     }
     #endif

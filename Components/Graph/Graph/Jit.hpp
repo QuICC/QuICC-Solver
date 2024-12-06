@@ -494,7 +494,7 @@ void Jit<RANK>::setMap(const std::shared_ptr<Memory::memory_resource> mem)
     if (mlir::failed(pm.run(*_module))) {
         throw std::runtime_error("Failed to add implementation pointer.");
     }
-    _module->dump();
+    // _module->dump();
 
     // setup ops map and store
     _storeOp = std::move(QuICC::Graph::MapOps(*_module, _physParams, mem));
