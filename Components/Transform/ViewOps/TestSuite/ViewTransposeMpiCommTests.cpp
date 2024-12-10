@@ -323,7 +323,7 @@ TEST_CASE("SubComm and Types", "[SubComm]")
    }
 }
 
-TEST_CASE("Comm", "[Comm]")
+TEST_CASE("Comm mpi alltoallw", "[CommMpiAlltoallw]")
 {
    int rank, ranks;
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -379,7 +379,145 @@ TEST_CASE("Comm", "[Comm]")
       sendBuf = {4}; // col maj
    }
 
-   Comm<int> comm;
+   Comm<int, alltoallw_t> comm;
+   comm.setComm(absCooNew, absCooOld);
+
+   // Comm
+   comm.exchange(recvBuf.data(), sendBuf.data());
+
+   // Check
+   for (std::size_t i = 0; i < recvBufRef.size(); ++i)
+   {
+      CHECK(recvBuf[i] == recvBufRef[i]);
+   }
+}
+
+TEST_CASE("Comm mpi alltoallv", "[CommMpiAlltoallv]")
+{
+   int rank, ranks;
+   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+
+   assert(ranks >= 3);
+
+   std::vector<int> sendBuf;
+   std::vector<int> recvBuf;
+   std::vector<int> recvBufRef;
+
+   // needed to build sendRankMap recvRankMap
+   std::vector<point_t> absCooOld;
+   std::vector<point_t> absCooNew;
+
+   //
+   // transpose distributed trapezoidal matrix
+   // with one sided comm
+
+   // r0   0  1  *  *  *   r1   *  *  2  3   r2 * * * * 4
+   //      5  6  *  *           *  *  7  8      * * * *
+   //      9 10  *              *  * 11         * * *
+
+   //             vvv to vvv
+
+   // r0   0  5  *        r1  *  *  9        r2  * * *
+   //      1  6  *            *  * 10            * * *
+   //      2  7  *            *  * 11            * * *
+   //      3  8               *  *               * *
+   //      4                  *                  *
+
+   if (rank == 0)
+   {
+      absCooOld = {{0, 0, 0}, {0, 1, 0}, {0, 2, 0}, {1, 0, 0}, {1, 1, 0},
+         {1, 2, 0}};
+      absCooNew = {{0, 0, 0}, {1, 0, 0}, {2, 0, 0}, {3, 0, 0}, {4, 0, 0},
+         {0, 1, 0}, {1, 1, 0}, {2, 1, 0}, {3, 1, 0}};
+      sendBuf = {0, 5, 9, 1, 6, 10}; // col maj
+      recvBuf = std::vector<int>(9, -1);
+      recvBufRef = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+   }
+   if (rank == 1)
+   {
+      absCooOld = {{2, 0, 0}, {2, 1, 0}, {2, 2, 0}, {3, 0, 0}, {3, 1, 0}};
+      absCooNew = {{0, 2, 0}, {1, 2, 0}, {2, 2, 0}};
+      sendBuf = {2, 7, 11, 3, 8}; // col maj
+      recvBuf = std::vector<int>(3, -1);
+      recvBufRef = {9, 10, 11};
+   }
+   if (rank == 2)
+   {
+      absCooOld = {{4, 0, 0}};
+      sendBuf = {4}; // col maj
+   }
+
+   Comm<int, alltoallv_t> comm;
+   comm.setComm(absCooNew, absCooOld);
+
+   // Comm
+   comm.exchange(recvBuf.data(), sendBuf.data());
+
+   // Check
+   for (std::size_t i = 0; i < recvBufRef.size(); ++i)
+   {
+      CHECK(recvBuf[i] == recvBufRef[i]);
+   }
+}
+
+TEST_CASE("Comm mpi sendrecv", "[CommMpiSendrecv]")
+{
+   int rank, ranks;
+   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+
+   assert(ranks >= 3);
+
+   std::vector<int> sendBuf;
+   std::vector<int> recvBuf;
+   std::vector<int> recvBufRef;
+
+   // needed to build sendRankMap recvRankMap
+   std::vector<point_t> absCooOld;
+   std::vector<point_t> absCooNew;
+
+   //
+   // transpose distributed trapezoidal matrix
+   // with one sided comm
+
+   // r0   0  1  *  *  *   r1   *  *  2  3   r2 * * * * 4
+   //      5  6  *  *           *  *  7  8      * * * *
+   //      9 10  *              *  * 11         * * *
+
+   //             vvv to vvv
+
+   // r0   0  5  *        r1  *  *  9        r2  * * *
+   //      1  6  *            *  * 10            * * *
+   //      2  7  *            *  * 11            * * *
+   //      3  8               *  *               * *
+   //      4                  *                  *
+
+   if (rank == 0)
+   {
+      absCooOld = {{0, 0, 0}, {0, 1, 0}, {0, 2, 0}, {1, 0, 0}, {1, 1, 0},
+         {1, 2, 0}};
+      absCooNew = {{0, 0, 0}, {1, 0, 0}, {2, 0, 0}, {3, 0, 0}, {4, 0, 0},
+         {0, 1, 0}, {1, 1, 0}, {2, 1, 0}, {3, 1, 0}};
+      sendBuf = {0, 5, 9, 1, 6, 10}; // col maj
+      recvBuf = std::vector<int>(9, -1);
+      recvBufRef = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+   }
+   if (rank == 1)
+   {
+      absCooOld = {{2, 0, 0}, {2, 1, 0}, {2, 2, 0}, {3, 0, 0}, {3, 1, 0}};
+      absCooNew = {{0, 2, 0}, {1, 2, 0}, {2, 2, 0}};
+      sendBuf = {2, 7, 11, 3, 8}; // col maj
+      recvBuf = std::vector<int>(3, -1);
+      recvBufRef = {9, 10, 11};
+   }
+   if (rank == 2)
+   {
+      absCooOld = {{4, 0, 0}};
+      sendBuf = {4}; // col maj
+   }
+
+   Comm<int, sendrecv_t> comm;
    comm.setComm(absCooNew, absCooOld);
 
    // Comm

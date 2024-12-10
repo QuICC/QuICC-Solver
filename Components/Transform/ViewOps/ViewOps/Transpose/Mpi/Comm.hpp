@@ -92,7 +92,7 @@ std::vector<int> getCount(const std::vector<std::vector<int>>& displs)
 /// @brief Container for Mpi communicator and types
 /// to exchange data with MPI_Alltoallw.
 /// @tparam TAG free tag type to implement other
-template <class TDATA, class TAG = sendrecv_t> class Comm
+template <class TDATA, class TAG = alltoallv_t> class Comm
 {
 public:
    /// @brief Constructor
@@ -129,7 +129,7 @@ public:
             MPI_Comm_size(_subComm, &nSubComm);
             // Setup send/recv buffers
             /// \todo gpu buffers
-            if (_sendBuffers.size() == 0)
+            if (_sendBuffer.size() == 0)
             {
                // _sendBuffers.resize(nSubComm);
                // _recvBuffers.resize(nSubComm);
@@ -156,7 +156,7 @@ public:
             // Pack
             for (int i = 0; i < nSubComm; ++i)
             {
-               for (size_t s = 0; s < _sendBuffers[i].size(); ++s)
+               for (int s = 0; s < _sendCounts[i]; ++s)
                {
                   // _sendBuffers[i][s] = *(in + _sendDispls[i][s]);
                   _sendBuffer[_sendBufferDispls[i]+s] = *(in + _sendDispls[i][s]);
@@ -181,13 +181,13 @@ public:
                         Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm, &status);
                }
             }
-            // else if constexpr (std::is_same_v<TAG, alltoallv_t>)
-            // {
-            //    MPI_Alltoallv(const void *sendbuf, const int sendcounts[],
-            //       const int sdispls[], MPI_Datatype sendtype,
-            //       void *recvbuf, const int recvcounts[],
-            //       const int rdispls[], MPI_Datatype recvtype, _subComm);
-            // }
+            else if constexpr (std::is_same_v<TAG, alltoallv_t>)
+            {
+               MPI_Alltoallv(_sendBuffer.data(), _sendCounts.data(),
+                  _sendBufferDispls.data(), Environment::MpiTypes::type<TDATA>(),
+                  _recvBuffer.data(), _recvCounts.data(),
+                  _recvBufferDispls.data(), Environment::MpiTypes::type<TDATA>(), _subComm);
+            }
             else
             {
                throw std::logic_error("Comm not implemented");
@@ -196,7 +196,7 @@ public:
             // Unpack
             for (int i = 0; i < nSubComm; ++i)
             {
-               for (size_t s = 0; s < _recvBuffers[i].size(); ++s)
+               for (int s = 0; s < _recvCounts[i]; ++s)
                {
                   // *(out + _recvDispls[i][s]) = _recvBuffers[i][s];
                   *(out + _recvDispls[i][s]) = _recvBuffer[_recvBufferDispls[i]+s];
