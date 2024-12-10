@@ -10,12 +10,18 @@
 #include <cassert>
 #include <mpi.h>
 #include <vector>
+#include <memory>
 
 // Project includes
 //
 #include "ViewOps/Transpose/Mpi/Tags.hpp"
 #include "Environment/MpiTypes.hpp"
 #include "View/ViewBase.hpp"
+#include "Memory/Memory.hpp"
+#include "Memory/Cpu/NewDelete.hpp"
+#ifdef QUICC_HAS_CUDA_BACKEND
+#include "Memory/Cuda/Malloc.hpp"
+#endif
 
 namespace QuICC {
 namespace Transpose {
@@ -105,14 +111,14 @@ std::vector<int> getCount(const std::vector<std::vector<int>>& displs)
 
 
 /// @brief Container for Mpi communicator and types
-/// to exchange data with MPI_Alltoallw.
-/// @tparam TAG free tag type to implement other
+/// to exchange data with MPI_Alltoallw, MPI_Alltoallv or MPI_Send/MPI_Recv.
+/// @tparam TAG implementation tag
 template <class TDATA, class TAG = alltoallv_t> class Comm
 {
 public:
    /// @brief Constructor
    /// @param comm
-   Comm(MPI_Comm comm = MPI_COMM_WORLD) : _comm(comm){};
+   Comm(std::shared_ptr<Memory::memory_resource> mem, MPI_Comm comm = MPI_COMM_WORLD) : _mem(mem), _comm(comm){};
 
    /// @brief release Mpi resources
    ~Comm();
@@ -137,6 +143,8 @@ public:
    }
 
 private:
+   /// @brief Memory resource for buffers
+   std::shared_ptr<Memory::memory_resource> _mem;
    /// @brief Displacement used to create the send types.
    std::vector<std::vector<int>> _sendDispls;
    /// @brief Displacement used to create the recv types.
@@ -157,9 +165,13 @@ private:
    /// to which data from rank j should be written.
    std::vector<int> _rDispls;
    /// @brief Send buffer for packed comms
-   std::vector<TDATA> _sendBuffer;
+   Memory::MemBlock<TDATA> _sendBuffer;
+   /// @brief Send buffer view
+   View::ViewBase<TDATA> _sendBufferView;
    /// @brief Recv buffer for packed comms
-   std::vector<TDATA> _recvBuffer;
+   Memory::MemBlock<TDATA> _recvBuffer;
+   /// @brief Recv buffer view
+   View::ViewBase<TDATA> _recvBufferView;
    /// @brief Send buffer displacement for packed comms
    std::vector<int> _sendBufferDispls;
    /// @brief Recv buffer displacement for packed comms
@@ -172,6 +184,7 @@ private:
    int _nSubComm;
    /// @brief Is comm setup?
    bool _isSetup = false;
+
 };
 
 
@@ -225,7 +238,7 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
       }
       else
       {
-         // Setup send/recv buffers
+         // Setup send/recv buffers for alltoallv or send/recv
          /// \todo gpu buffers
          _sendBufferDispls.resize(_nSubComm+1);
          _recvBufferDispls.resize(_nSubComm+1);
@@ -236,8 +249,11 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
             _sendBufferDispls[i] = _sendBufferDispls[i-1] + _sendCounts[i-1];
             _recvBufferDispls[i] = _recvBufferDispls[i-1] + _recvCounts[i-1];
          }
-         _sendBuffer.resize(_sendBufferDispls[_nSubComm]);
-         _recvBuffer.resize(_recvBufferDispls[_nSubComm]);
+         _sendBuffer = std::move(Memory::MemBlock<TDATA>(_sendBufferDispls[_nSubComm], _mem.get()));
+         _recvBuffer = std::move(Memory::MemBlock<TDATA>(_recvBufferDispls[_nSubComm], _mem.get()));
+         // use view so that we have bound checks in debug mode
+         _sendBufferView = View::ViewBase<TDATA>(_sendBuffer.data(), _sendBuffer.size());
+         _recvBufferView = View::ViewBase<TDATA>(_recvBuffer.data(), _recvBuffer.size());
       }
    }
    _isSetup = true;
@@ -262,7 +278,7 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in)
             for (int s = 0; s < _sendCounts[i]; ++s)
             {
                // _sendBuffers[i][s] = *(in + _sendDispls[i][s]);
-               _sendBuffer[_sendBufferDispls[i]+s] = *(in + _sendDispls[i][s]);
+               _sendBufferView[_sendBufferDispls[i]+s] = *(in + _sendDispls[i][s]);
             }
          }
 
@@ -271,21 +287,21 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in)
          {
             for (int i = 0; i < _nSubComm; ++i)
             {
-               details::mpiAssert(MPI_Send(_sendBuffer.data()+_sendBufferDispls[i], _sendCounts[i],
+               details::mpiAssert(MPI_Send(_sendBufferView.data()+_sendBufferDispls[i], _sendCounts[i],
                      Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm));
             }
             MPI_Status status;
             for (int i = 0; i < _nSubComm; ++i)
             {
-               details::mpiAssert(MPI_Recv(_recvBuffer.data()+_recvBufferDispls[i], _recvCounts[i],
+               details::mpiAssert(MPI_Recv(_recvBufferView.data()+_recvBufferDispls[i], _recvCounts[i],
                      Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm, &status));
             }
          }
          else if constexpr (std::is_same_v<TAG, alltoallv_t>)
          {
-            details::mpiAssert(MPI_Alltoallv(_sendBuffer.data(), _sendCounts.data(),
+            details::mpiAssert(MPI_Alltoallv(_sendBufferView.data(), _sendCounts.data(),
                _sendBufferDispls.data(), Environment::MpiTypes::type<TDATA>(),
-               _recvBuffer.data(), _recvCounts.data(),
+               _recvBufferView.data(), _recvCounts.data(),
                _recvBufferDispls.data(), Environment::MpiTypes::type<TDATA>(), _subComm));
          }
          else
@@ -298,7 +314,7 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in)
          {
             for (int s = 0; s < _recvCounts[i]; ++s)
             {
-               *(out + _recvDispls[i][s]) = _recvBuffer[_recvBufferDispls[i]+s];
+               *(out + _recvDispls[i][s]) = _recvBufferView[_recvBufferDispls[i]+s];
             }
          }
       }

@@ -18,4 +18,5 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
   PUBLIC
     QuICC::Environment
     QuICC::View
+    QuICC::Memory
 )

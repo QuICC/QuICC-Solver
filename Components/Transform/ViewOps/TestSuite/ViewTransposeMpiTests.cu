@@ -171,7 +171,7 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
    using namespace QuICC::Transpose::Mpi;
    using namespace QuICC::Transpose;
 
-   auto comm = std::make_shared<Comm<double>>();
+   auto comm = std::make_shared<Comm<double>>(memDev);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p120_t>>(
          comm);

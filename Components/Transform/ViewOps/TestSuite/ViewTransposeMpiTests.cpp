@@ -160,7 +160,8 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 201", "MpiDCCSC3DtoDCCSC3D201")
    }
 
    // Transpose op
-   auto comm = std::make_shared<Comm<double>>();
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>(
          comm);
@@ -315,7 +316,8 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3DJIK 201", "MpiDCCSC3DtoDCCSC3DJIK201")
    }
 
    // Transpose op
-   auto comm = std::make_shared<Comm<double>>();
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>(
          comm);
@@ -452,7 +454,8 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 120", "MpiDCCSC3DtoDCCSC3D120")
    }
 
    // Transpose op
-   auto comm = std::make_shared<Comm<double>>();
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p120_t>>(
          comm);
@@ -592,7 +595,8 @@ TEST_CASE("Mpi DCCSC3DJIK to DCCSC3D 120", "MpiDCCSC3DJIKtoDCCSC3D120")
    }
 
    // Transpose op
-   auto comm = std::make_shared<Comm<double>>();
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p120_t>>(
          comm);
@@ -739,7 +743,8 @@ TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 201", "MpiS1CLCSC3DtoDCCSC3D201")
    }
 
    // Transpose op
-   auto comm = std::make_shared<Comm<double>>();
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>(
          comm);
@@ -870,7 +875,8 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201", "MpiS1CLCSC3DJIKtoDCCSC3D201JIK"
    }
 
    // Transpose op
-   auto comm = std::make_shared<Comm<double>>();
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>(
          comm);
@@ -987,7 +993,8 @@ TEST_CASE("Mpi DCCSC3D to S1CLCSC3D 120", "MpiDCCSC3DtoS1CLCSC3D120")
    using namespace QuICC::Transpose::Mpi;
    using namespace QuICC::Transpose;
 
-   auto comm = std::make_shared<Comm<double>>();
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p120_t>>(
          comm);
@@ -1106,7 +1113,8 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120", "MpiDCCSC3DJIKtoS1CLCSC3DJIK120"
    using namespace QuICC::Transpose::Mpi;
    using namespace QuICC::Transpose;
 
-   auto comm = std::make_shared<Comm<double>>();
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p120_t>>(
          comm);

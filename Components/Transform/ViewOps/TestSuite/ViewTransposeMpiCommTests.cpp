@@ -379,7 +379,8 @@ TEST_CASE("Comm mpi alltoallw", "[CommMpiAlltoallw]")
       sendBuf = {4}; // col maj
    }
 
-   Comm<int, alltoallw_t> comm;
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   Comm<int, alltoallw_t> comm(mem);
    comm.setComm(absCooNew, absCooOld);
 
    // Comm
@@ -448,7 +449,8 @@ TEST_CASE("Comm mpi alltoallv", "[CommMpiAlltoallv]")
       sendBuf = {4}; // col maj
    }
 
-   Comm<int, alltoallv_t> comm;
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   Comm<int, alltoallv_t> comm(mem);
    comm.setComm(absCooNew, absCooOld);
 
    // Comm
@@ -517,7 +519,8 @@ TEST_CASE("Comm mpi sendrecv", "[CommMpiSendrecv]")
       sendBuf = {4}; // col maj
    }
 
-   Comm<int, sendrecv_t> comm;
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   Comm<int, sendrecv_t> comm(mem);
    comm.setComm(absCooNew, absCooOld);
 
    // Comm
