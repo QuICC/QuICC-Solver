@@ -21,6 +21,21 @@ namespace QuICC {
 namespace Transpose {
 namespace Mpi {
 
+/// \todo move Mpi utils out of Enviroment and unify
+namespace details
+{
+   inline void mpiAssert(int ierr)
+   {
+      #ifndef NDEBUG
+      if (ierr != MPI_SUCCESS)
+      {
+         throw  std::runtime_error("Mpi failed.");
+      }
+      #endif
+   }
+} // namespace details
+
+
 /// @brief point coordinate dimensions
 constexpr int dimSize = 3;
 
@@ -167,8 +182,8 @@ Comm<TDATA, TAG>::~Comm()
    {
       for (std::size_t r = 0; r < _sendType.size(); ++r)
       {
-         MPI_Type_free(&_sendType[r]);
-         MPI_Type_free(&_recvType[r]);
+         details::mpiAssert(MPI_Type_free(&_sendType[r]));
+         details::mpiAssert(MPI_Type_free(&_recvType[r]));
       }
    }
 }
@@ -235,9 +250,9 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in)
    {
       if constexpr(std::is_same_v<TAG, alltoallw_t>)
       {
-         MPI_Alltoallw(in, _sendCounts.data(), _sDispls.data(),
+         details::mpiAssert(MPI_Alltoallw(in, _sendCounts.data(), _sDispls.data(),
             _sendType.data(), out, _recvCounts.data(), _rDispls.data(),
-            _recvType.data(), _subComm);
+            _recvType.data(), _subComm));
       }
       else
       {
@@ -256,26 +271,26 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in)
          {
             for (int i = 0; i < _nSubComm; ++i)
             {
-               MPI_Send(_sendBuffer.data()+_sendBufferDispls[i], _sendCounts[i],
-                     Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm);
+               details::mpiAssert(MPI_Send(_sendBuffer.data()+_sendBufferDispls[i], _sendCounts[i],
+                     Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm));
             }
             MPI_Status status;
             for (int i = 0; i < _nSubComm; ++i)
             {
-               MPI_Recv(_recvBuffer.data()+_recvBufferDispls[i], _recvCounts[i],
-                     Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm, &status);
+               details::mpiAssert(MPI_Recv(_recvBuffer.data()+_recvBufferDispls[i], _recvCounts[i],
+                     Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm, &status));
             }
          }
          else if constexpr (std::is_same_v<TAG, alltoallv_t>)
          {
-            MPI_Alltoallv(_sendBuffer.data(), _sendCounts.data(),
+            details::mpiAssert(MPI_Alltoallv(_sendBuffer.data(), _sendCounts.data(),
                _sendBufferDispls.data(), Environment::MpiTypes::type<TDATA>(),
                _recvBuffer.data(), _recvCounts.data(),
-               _recvBufferDispls.data(), Environment::MpiTypes::type<TDATA>(), _subComm);
+               _recvBufferDispls.data(), Environment::MpiTypes::type<TDATA>(), _subComm));
          }
          else
          {
-            throw std::logic_error("Comm not implemented");
+            throw std::logic_error("Comm type not implemented");
          }
 
          // Unpack
