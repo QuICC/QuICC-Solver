@@ -297,8 +297,8 @@ TEST_CASE("SubComm and Types", "[SubComm]")
          MPI_Type_commit(&recvType[r]);
       }
 
-      auto sendCounts = getCount(sendDispls);
-      auto recvCounts = getCount(recvDispls);
+      auto sendCounts = getCount<alltoallw_t>(sendDispls);
+      auto recvCounts = getCount<alltoallw_t>(recvDispls);
 
       std::vector<int> sDispls(subRanks, 0);
       std::vector<int> rDispls(subRanks, 0);

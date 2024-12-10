@@ -13,7 +13,9 @@
 
 // Project includes
 //
+#include "ViewOps/Transpose/Mpi/Tags.hpp"
 #include "Environment/MpiTypes.hpp"
+#include "View/ViewBase.hpp"
 
 namespace QuICC {
 namespace Transpose {
@@ -61,13 +63,36 @@ MPI_Comm getSubComm(const std::vector<int>& redSet,
 /// @brief Get count vector based on displacements
 /// @param displs displacements
 /// @return count vector
-std::vector<int> getCount(const std::vector<std::vector<int>>& displs);
+template <class TAG>
+std::vector<int> getCount(const std::vector<std::vector<int>>& displs)
+{
+   std::vector<int> count(displs.size());
+   for (std::size_t i = 0; i < displs.size(); ++i)
+   {
+      if constexpr(std::is_same_v<TAG, alltoallw_t>)
+      {
+         if (displs[i].size() > 0)
+         {
+            count[i] = 1;
+         }
+         else
+         {
+            count[i] = 0;
+         }
+      }
+      else
+      {
+         count[i] = displs[i].size();
+      }
+   }
+   return count;
+}
 
 
 /// @brief Container for Mpi communicator and types
 /// to exchange data with MPI_Alltoallw.
 /// @tparam TAG free tag type to implement other
-template <class TDATA, class TAG = void> class Comm
+template <class TDATA, class TAG = sendrecv_t> class Comm
 {
 public:
    /// @brief Constructor
@@ -87,13 +112,97 @@ public:
    /// @brief Execute the data exchange (communication)
    /// @param out
    /// @param in
-   void exchange(TDATA* out, const TDATA* in) const
+   void exchange(TDATA* out, const TDATA* in)
    {
       if (_subComm != MPI_COMM_NULL)
       {
-         MPI_Alltoallw(in, _sendCounts.data(), _sDispls.data(),
-            _sendType.data(), out, _recvCounts.data(), _rDispls.data(),
-            _recvType.data(), _subComm);
+         if constexpr(std::is_same_v<TAG, alltoallw_t>)
+         {
+            MPI_Alltoallw(in, _sendCounts.data(), _sDispls.data(),
+               _sendType.data(), out, _recvCounts.data(), _rDispls.data(),
+               _recvType.data(), _subComm);
+         }
+         else
+         {
+            int nSubComm;
+            MPI_Status status;
+            MPI_Comm_size(_subComm, &nSubComm);
+            // Setup send/recv buffers
+            /// \todo gpu buffers
+            if (_sendBuffers.size() == 0)
+            {
+               // _sendBuffers.resize(nSubComm);
+               // _recvBuffers.resize(nSubComm);
+               // for (int i = 0; i < nSubComm; ++i)
+               // {
+               //    _sendBuffers[i] = std::vector<TDATA>(_sendDispls[i].size());
+               //    _recvBuffers[i] = std::vector<TDATA>(_recvDispls[i].size());
+               // }
+
+               // Get buffers size
+               _sendBufferDispls.resize(nSubComm+1);
+               _recvBufferDispls.resize(nSubComm+1);
+               _sendBufferDispls[0] = 0;
+               _recvBufferDispls[0] = 0;
+               for (int i = 1; i <= nSubComm; ++i)
+               {
+                  _sendBufferDispls[i] = _sendBufferDispls[i-1] + _sendCounts[i-1];
+                  _recvBufferDispls[i] = _recvBufferDispls[i-1] + _recvCounts[i-1];
+               }
+               _sendBuffer.resize(_sendBufferDispls[nSubComm]);
+               _recvBuffer.resize(_recvBufferDispls[nSubComm]);
+            }
+
+            // Pack
+            for (int i = 0; i < nSubComm; ++i)
+            {
+               for (size_t s = 0; s < _sendBuffers[i].size(); ++s)
+               {
+                  // _sendBuffers[i][s] = *(in + _sendDispls[i][s]);
+                  _sendBuffer[_sendBufferDispls[i]+s] = *(in + _sendDispls[i][s]);
+               }
+            }
+
+            // Comm
+            if constexpr (std::is_same_v<TAG, sendrecv_t>)
+            {
+               for (int i = 0; i < nSubComm; ++i)
+               {
+                  // MPI_Send(_sendBuffers[i].data(), _sendBuffers[i].size(),
+                  //       Environment::MpiTypes::type<TDATA>(), i, /*tag*/0, _subComm);
+                  MPI_Send(_sendBuffer.data()+_sendBufferDispls[i], _sendCounts[i],
+                        Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm);
+               }
+               for (int i = 0; i < nSubComm; ++i)
+               {
+                  // MPI_Recv(_recvBuffers[i].data(), _recvBuffers[i].size(),
+                  //       Environment::MpiTypes::type<TDATA>(), i, /*tag*/0, _subComm, &status);
+                  MPI_Recv(_recvBuffer.data()+_recvBufferDispls[i], _recvCounts[i],
+                        Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm, &status);
+               }
+            }
+            // else if constexpr (std::is_same_v<TAG, alltoallv_t>)
+            // {
+            //    MPI_Alltoallv(const void *sendbuf, const int sendcounts[],
+            //       const int sdispls[], MPI_Datatype sendtype,
+            //       void *recvbuf, const int recvcounts[],
+            //       const int rdispls[], MPI_Datatype recvtype, _subComm);
+            // }
+            else
+            {
+               throw std::logic_error("Comm not implemented");
+            }
+
+            // Unpack
+            for (int i = 0; i < nSubComm; ++i)
+            {
+               for (size_t s = 0; s < _recvBuffers[i].size(); ++s)
+               {
+                  // *(out + _recvDispls[i][s]) = _recvBuffers[i][s];
+                  *(out + _recvDispls[i][s]) = _recvBuffer[_recvBufferDispls[i]+s];
+               }
+            }
+         }
       }
    }
 
@@ -128,8 +237,8 @@ public:
             MPI_Type_commit(&_recvType[r]);
          }
       }
-      _sendCounts = getCount(_sendDispls);
-      _recvCounts = getCount(_recvDispls);
+      _sendCounts = getCount<TAG>(_sendDispls);
+      _recvCounts = getCount<TAG>(_recvDispls);
       _sDispls = std::vector<int>(subRanks, 0);
       _rDispls = std::vector<int>(subRanks, 0);
       _isSetup = true;
@@ -162,6 +271,23 @@ private:
    /// @brief Entry j specifies the displacement (in bytes, offset from recvbuf)
    /// to which data from rank j should be written.
    std::vector<int> _rDispls;
+
+   // /// @brief Send buffer for packed comms
+   // std::vector<std::vector<TDATA>> _sendBuffers;
+   // /// @brief Recv buffer for packed comms
+   // std::vector<std::vector<TDATA>> _recvBuffers;
+
+
+   /// @brief Send buffer for packed comms
+   std::vector<TDATA> _sendBuffer;
+   /// @brief Recv buffer for packed comms
+   std::vector<TDATA> _recvBuffer;
+   /// @brief Send buffer displacement for packed comms
+   std::vector<int> _sendBufferDispls;
+   /// @brief Recv buffer displacement for packed comms
+   std::vector<int> _recvBufferDispls;
+
+
    /// @brief All world communicator
    MPI_Comm _comm;
    /// @brief Communicator over which data is to be exchanged.
