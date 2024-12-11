@@ -315,19 +315,19 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
          int recvCountsMax = 0;
          for (int i = 0; i < _nSubComm; ++i)
          {
-            sendCountsMax = std::max(sendCountsMax, _sendCounts[i].size());
-            recvCountsMax = std::max(recvCountsMax, _recvCounts[i].size());
+            sendCountsMax = std::max(sendCountsMax, _sendCounts[i]);
+            recvCountsMax = std::max(recvCountsMax, _recvCounts[i]);
          }
          std::vector<int> sendDisplsLin(_nSubComm*sendCountsMax, 0);
          std::vector<int> recvDisplsLin(_nSubComm*recvCountsMax, 0);
          // Linearize
          for (int i = 0; i < _nSubComm; ++i)
          {
-            for (int j = 0; j < _sendCounts[i].size(); ++j)
+            for (int j = 0; j < _sendCounts[i]; ++j)
             {
                sendDisplsLin[i*sendCountsMax+j] = _sendDispls[i][j];
             }
-            for (int j = 0; j < _recvCounts[i].size(); ++j)
+            for (int j = 0; j < _recvCounts[i]; ++j)
             {
                recvDisplsLin[i*recvCountsMax+j] = _recvDispls[i][j];
             }
@@ -337,9 +337,9 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
          _sendDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
          _recvDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
          std::array<std::uint32_t, 2> sendDim {_nSubComm, sendCountsMax};
-         _sendDisplsView =  View::View<int, View::dense2D>({_sendDisplsDevice.data(), _sendDisplsDevice.size()} sendDim);
+         _sendDisplsView =  View::View<int, View::dense2D>({_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
          std::array<std::uint32_t, 2> recvDim {_nSubComm, recvCountsMax};
-         _recvDisplsView =  View::View<int, View::dense2D>({_recvDisplsDevice.data(), _recvDisplsDevice.size()} recvDim);
+         _recvDisplsView =  View::View<int, View::dense2D>({_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
          cudaErrChk(cudaMemcpy(_sendDisplsDevice.data(), sendDisplsLin.data(),
             sendDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
          cudaErrChk(cudaMemcpy(_recvDisplsDevice.data(), recvDisplsLin.data(),
@@ -376,7 +376,7 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
       {
          // Pack
          #ifdef QUICC_HAS_CUDA_BACKEND
-         if(Cuda::isDeviceMemory(out))
+         if(QuICC::Cuda::isDeviceMemory(out))
          {
             Cuda::pack(_sendBufferView, in, _sendCountsView,
                _sendDisplsView, _sendBufferDisplsView);
@@ -418,7 +418,7 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
 
          // Unpack
          #ifdef QUICC_HAS_CUDA_BACKEND
-         if(Cuda::isDeviceMemory(out))
+         if(QuICC::Cuda::isDeviceMemory(out))
          {
             Cuda::unPack(out, _recvBufferView, _recvCountsView,
                _recvDisplsView, _recvBufferDisplsView);
@@ -438,7 +438,7 @@ template <class TDATA, class TAG>
 void Comm<TDATA, TAG>::pack(View::ViewBase<TDATA> buffer, const TDATA* in) const
 {
    #ifdef QUICC_HAS_CUDA_BACKEND
-   assert(Cuda::isDeviceMemory(in) == Cuda::isDeviceMemory(buffer.data()));
+   assert(QuICC::Cuda::isDeviceMemory(in) == QuICC::Cuda::isDeviceMemory(buffer.data()));
    #endif
    for (int i = 0; i < _nSubComm; ++i)
    {
@@ -453,7 +453,7 @@ template <class TDATA, class TAG>
 void Comm<TDATA, TAG>::unPack(TDATA* out, const View::ViewBase<TDATA> buffer) const
 {
    #ifdef QUICC_HAS_CUDA_BACKEND
-   assert(Cuda::isDeviceMemory(out) == Cuda::isDeviceMemory(buffer.data()));
+   assert(QuICC::Cuda::isDeviceMemory(out) == QuICC::Cuda::isDeviceMemory(buffer.data()));
    #endif
    for (int i = 0; i < _nSubComm; ++i)
    {

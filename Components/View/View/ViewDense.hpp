@@ -93,8 +93,8 @@ namespace View {
    class View<Scalar, Attributes<dense1D_t, Args...>> : public ViewDenseBase<Scalar, Attributes<dense1D_t, Args...>>
    {
    public:
-      /// @brief deleted ctor
-      View() = delete;
+      /// @brief default ctor for empty view
+      View() = default;
 
       /// @brief dtor
       ~View() = default;
@@ -137,8 +137,8 @@ namespace View {
    class View<Scalar, Attributes<dense2D_t, Args...>> : public ViewDenseBase<Scalar, Attributes<dense2D_t, Args...>>
    {
    public:
-      /// @brief deleted ctor
-      View() = delete;
+      /// @brief default ctor for empty view
+      View() = default;
       /// @brief dtor
       ~View() = default;
 
@@ -197,8 +197,8 @@ namespace View {
    class View<Scalar, Attributes<dense3D_t, Args...>> : public ViewDenseBase<Scalar, Attributes<dense3D_t, Args...>>
    {
    public:
-      /// @brief deleted ctor
-      View() = delete;
+      /// @brief default ctor for empty view
+      View() = default;
       /// @brief dtor
       ~View() = default;
 
