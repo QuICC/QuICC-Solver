@@ -49,6 +49,16 @@ public:
     */
    virtual ~IProjCrossOperator() = default;
 
+   /**
+    * @brief Operator is imaginary?
+    */
+   bool isImaginary() const;
+
+   /**
+    * @brief Operator is exactly zero?
+    */
+   bool isZero() const;
+
 protected:
    /**
     * @brief Compute Gaunt's integral
@@ -59,6 +69,16 @@ protected:
     * @brief Compute Elsasser's integral
     */
    MHDFloat  elsasser(const int lA, const int mA, const int lB, const int mB, const int lG, const int mG) const;
+
+   /**
+    * @brief Operator is exactly zero
+    */
+   bool mIsZero;
+
+   /**
+    * @brief Operator is imaginary
+    */
+   bool mIsImaginary;
 
    /**
     * @brief Harmonic degree of output

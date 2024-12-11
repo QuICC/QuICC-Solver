@@ -45,6 +45,8 @@ ProjCurlCurlPolCrossTor::ProjCurlCurlPolCrossTor(const int nNr, const int nNc, c
    {
       throw std::logic_error("One of the radial functions should be null");
    }
+
+   this->mIsZero = (this->gaunt(this->mLa, this->mMa, this->mLb, this->mMb, this->mLout, this->mMout) == 0);
 }
 
 void ProjCurlCurlPolCrossTor::buildOpImpl(Internal::Matrix& mat, const int rows,
@@ -60,7 +62,7 @@ void ProjCurlCurlPolCrossTor::buildOpImpl(Internal::Matrix& mat, const int rows,
 
    const MHDFloat Kabg = this->gaunt(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-   MHDFloat cA = -L2g*(L2b + L2b - L2g)/2.0*Kabg;
+   MHDFloat cA = -L2g*(L2a + L2b - L2g)/2.0*Kabg;
    MHDFloat cB = L2a*(L2a - L2b - L2g)/2.0*Kabg;
 
    mat = cA*this->mpOpA->mat() + cB*this->mpOpB->mat();

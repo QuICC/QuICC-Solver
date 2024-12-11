@@ -1,10 +1,10 @@
 /**
- * @file ProjCurlCurlPolCrossPol.hpp
- * @brief Implementation of the r Curl Curl(PolA ^ PolB) projection
+ * @file ProjCurlCPolCrossPol.hpp
+ * @brief Implementation of the r Curl(Curl PolA ^ PolB) projection
  */
 
-#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLCURLPOLCROSSPOL_HPP
-#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLCURLPOLCROSSPOL_HPP
+#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLCPOLCROSSPOL_HPP
+#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLCPOLCROSSPOL_HPP
 
 // System includes
 //
@@ -26,9 +26,9 @@ namespace Chebyshev {
 namespace LinearMap {
 
 /**
- * @brief Implementation of the r Curl Curl(PolA ^ PolB) projection
+ * @brief Implementation of the r Curl(TorA ^ PolB) projection
  */
-class ProjCurlCurlPolCrossPol : public IProjCrossOperator
+class ProjCurlCPolCrossPol : public IProjCrossOperator
 {
 public:
    /**
@@ -40,19 +40,19 @@ public:
     * @param mOut    Output harmonic order
     * @param lA      harmonic degree of A
     * @param mA      harmonic order of A
-    * @param lB      harmonic degreea of B
+    * @param lB      harmonic degree of B
     * @param mB      harmonic order of B
     * @param pPolA   Poloidal A radial function
     * @param pPolB   Poloidal B radial function
     * @param lower   Lower boundar
     * @param upper   Upper boundar
     */
-   ProjCurlCurlPolCrossPol(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower, const Scalar_t upper);
+   ProjCurlCPolCrossPol(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower, const Scalar_t upper);
 
    /**
     * @brief Destructor
     */
-   virtual ~ProjCurlCurlPolCrossPol() = default;
+   virtual ~ProjCurlCPolCrossPol() = default;
 
 protected:
    /**
@@ -66,19 +66,9 @@ protected:
       const int cols) const final;
 
    /**
-    * @brief Radial operator A
+    * @brief Radial operator
     */
-   std::shared_ptr<ITripleHarmonicOperator>  mpOpA;
-
-   /**
-    * @brief Radial operator B
-    */
-   std::shared_ptr<ITripleHarmonicOperator>  mpOpB;
-
-   /**
-    * @brief Radial operator C
-    */
-   std::shared_ptr<ITripleHarmonicOperator>  mpOpC;
+   std::shared_ptr<ITripleHarmonicOperator>  mpOp;
 
 private:
 };
@@ -88,4 +78,4 @@ private:
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLCURLPOLCROSSPOL_HPP
+#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLCPOLCROSSPOL_HPP

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ILinearMapOperator.cpp
  * @brief Source of the implementation of generic interface to a spherical shell linear map dense operator
  */

@@ -1,17 +1,16 @@
 /**
- * @file ProjCurlTorCrossTor.hpp
- * @brief Implementation of the r Curl(TorA ^ TorB) projection
+ * @file R4DivR2CFD1R1.hpp
+ * @brief Implementation of the spectral operator r^4 1/r (-lapl(f))/r D(r *)
  */
 
-#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLTORCROSSTOR_HPP
-#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLTORCROSSTOR_HPP
+#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVR2CFD1R1_HPP
+#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVR2CFD1R1_HPP
 
 // System includes
 //
 
 // Project includes
 //
-#include "DenseSM/Chebyshev/LinearMap/IProjCrossOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/ITripleHarmonicOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "Types/Internal/Typedefs.hpp"
@@ -26,9 +25,9 @@ namespace Chebyshev {
 namespace LinearMap {
 
 /**
- * @brief Implementation of the r Curl(TorA ^ TorB) projection
+ * @brief Implementation of the spectral operator r^4 1/r (-lapl(f))/r D(r *)
  */
-class ProjCurlTorCrossTor : public IProjCrossOperator
+class R4DivR2CFD1R1 : public ITripleHarmonicOperator
 {
 public:
    /**
@@ -38,21 +37,20 @@ public:
     * @param cols    Number of cols
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic order
-    * @param lA      harmonic degree of A
-    * @param mA      harmonic order of A
-    * @param lB      harmonic degree of B
-    * @param mB      harmonic order of B
-    * @param pTorA   Toroidal A radial function
-    * @param pTorB   Toroidal B radial function
+    * @param lF      harmonic degree of f
+    * @param mF      harmonic order of f
+    * @param lIn     Input harmonic degree
+    * @param mIn     Input harmonic order
     * @param lower   Lower boundar
     * @param upper   Upper boundar
     */
-   ProjCurlTorCrossTor(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pTorA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper);
+   R4DivR2CFD1R1(const int rows, const int cols, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
+      const Scalar_t upper);
 
    /**
     * @brief Destructor
     */
-   virtual ~ProjCurlTorCrossTor() = default;
+   virtual ~R4DivR2CFD1R1() = default;
 
 protected:
    /**
@@ -73,4 +71,4 @@ private:
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLTORCROSSTOR_HPP
+#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVR2CFD1R1_HPP

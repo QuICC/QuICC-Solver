@@ -1,6 +1,6 @@
 /**
  * @file ProjCurlPolCrossTor.hpp
- * @brief Implementation of the r Curl(PolA ^ TorB) projection 
+ * @brief Implementation of the r Curl(PolA ^ TorB) projection
  */
 
 #ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLPOLCROSSTOR_HPP
@@ -44,10 +44,11 @@ public:
     * @param mB      harmonic ordera of B
     * @param pPolA   Poloidal A radial function
     * @param pTorB   Toroidal B radial function
-    * @param lower   Lower boundar
-    * @param upper   Upper boundar
+    * @param lower   Lower boundary
+    * @param upper   Upper boundary
+    * @param useR4   Use r^4 prefactor?
     */
-   ProjCurlPolCrossTor(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper);
+   ProjCurlPolCrossTor(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper, const bool useR4);
 
    /**
     * @brief Destructor

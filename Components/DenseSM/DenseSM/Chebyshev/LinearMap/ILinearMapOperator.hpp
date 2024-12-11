@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ILinearMapOperator.hpp
  * @brief Implementation of the generic interface to the spherical shell with linear map dense operator
  */
@@ -25,7 +25,7 @@ namespace LinearMap {
 
    /**
     * @brief Implementation of the generic interface to the spherical shell with linear map dense operator
-    */ 
+    */
    class ILinearMapOperator: public IMatrixSMOperator
    {
       public:
@@ -43,7 +43,7 @@ namespace LinearMap {
           * @brief Destructor
           */
          virtual ~ILinearMapOperator() = default;
-         
+
       protected:
          /**
           * @brief Compute quadrature grid and weights

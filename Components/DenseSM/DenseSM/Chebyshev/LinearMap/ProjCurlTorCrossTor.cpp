@@ -40,6 +40,8 @@ ProjCurlTorCrossTor::ProjCurlTorCrossTor(const int nNr, const int nNc, const int
    {
       throw std::logic_error("One of the radial functions should be null");
    }
+
+   this->mIsZero = true;
 }
 
 void ProjCurlTorCrossTor::buildOpImpl(Internal::Matrix& mat, const int rows,

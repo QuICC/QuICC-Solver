@@ -1,6 +1,6 @@
 /**
  * @file ProjCurlCurlPolCrossTor.hpp
- * @brief Implementation of the r Curl Curl(PolA ^ TorB) projection 
+ * @brief Implementation of the r Curl Curl(PolA ^ TorB) projection
  */
 
 #ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_PROJCURLCURLPOLCROSSTOR_HPP

@@ -40,11 +40,17 @@ include(SetUlp)
 set(_tests
   R2DivR1F:dense
   R4DivR1F:dense
+  R4DivR1FC:dense
+  R4DivR1CF:dense
   R4DivR1D1F:dense
+  R4DivR1D1FC:dense
+  R4DivR1D1CF:dense
   R2DivR2D1R1F:dense
   R4DivR2D1R1F:dense
+  R4DivR2D1R1FC:dense
   R2DivR2FD1R1:dense
   R4DivR2FD1R1:dense
+  R4DivR2CFD1R1:dense
   R4DivR1D1DivR1FD1R1:dense
   R4DivR1D1DivR1D1R1F:dense
   R4DivR3D1R1FD1R1:dense

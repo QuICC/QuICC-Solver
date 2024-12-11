@@ -1,6 +1,6 @@
 /**
  * @file IProjCrossOperator.cpp
- * @brief Source of the implementation of the generic projection of cross product A ^ B 
+ * @brief Source of the implementation of the generic projection of cross product A ^ B
  */
 
 // System includes
@@ -25,8 +25,18 @@ namespace LinearMap {
 
 IProjCrossOperator::IProjCrossOperator(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, const Scalar_t lower,
    const Scalar_t upper)
-: ILinearMapOperator(rows, cols, lower, upper), mLout(lOut), mMout(mOut), mLa(lA), mMa(mA), mLb(lB), mMb(mB)
+: ILinearMapOperator(rows, cols, lower, upper), mIsZero(false), mIsImaginary(false), mLout(lOut), mMout(mOut), mLa(lA), mMa(mA), mLb(lB), mMb(mB)
 {}
+
+bool IProjCrossOperator::isZero() const
+{
+   return this->mIsZero;
+}
+
+bool IProjCrossOperator::isImaginary() const
+{
+   return this->mIsImaginary;
+}
 
 MHDFloat IProjCrossOperator::gaunt(const int lA, const int mA, const int lB, const int mB, const int lG, const int mG) const
 {
@@ -51,14 +61,21 @@ MHDFloat IProjCrossOperator::gaunt(const int lA, const int mA, const int lB, con
    wig_temp_free();
    wig_table_free();
 
-   MHDFloat Kabg = (std::sqrt(static_cast<MHDFloat>((2*lA + 1)*(2*lB + 1)*(2*lG + 1))))*val3jA*val3jB;
+   MHDFloat Kabg = 0;
+   if(val3jA != 0 && val3jB != 0)
+   {
+      MHDFloat ca = static_cast<MHDFloat>(2*lA + 1);
+      MHDFloat cb = static_cast<MHDFloat>(2*lB + 1);
+      MHDFloat cg = static_cast<MHDFloat>(2*lG + 1);
+      Kabg = std::sqrt(ca*cb*cg/(4.0*Math::PI))*val3jA*val3jB;
+   }
 
    return Kabg;
 }
 
 MHDFloat IProjCrossOperator::elsasser(const int lA, const int mA, const int lB, const int mB, const int lG, const int mG) const
 {
-   int lmax = std::max(std::max(lA, lB), lG);
+   int lmax = std::max(std::max(lA, lB + 1), lG);
 
    double val3jA;
    double val3jB;
@@ -79,7 +96,18 @@ MHDFloat IProjCrossOperator::elsasser(const int lA, const int mA, const int lB, 
    wig_temp_free();
    wig_table_free();
 
-   MHDFloat Labg = -(std::sqrt(static_cast<MHDFloat>((2*lA + 1)*(2*lB + 1)*(2*lG + 1)))/2.0)*val3jA*val3jB*std::sqrt(static_cast<MHDFloat>(lA + lB + lG + 2)*static_cast<MHDFloat>(lA + lB - lG + 1)*static_cast<MHDFloat>(lB + lG - lA + 1)*static_cast<MHDFloat>(lA + lG - lB));
+   MHDFloat Labg = 0;
+   if(val3jA != 0 && val3jB != 0)
+   {
+      MHDFloat ca = static_cast<MHDFloat>(2*lA + 1);
+      MHDFloat cb = static_cast<MHDFloat>(2*lB + 1);
+      MHDFloat cg = static_cast<MHDFloat>(2*lG + 1);
+      MHDFloat clabg2 = static_cast<MHDFloat>(lA + lB + lG + 2);
+      MHDFloat clab_g1 = static_cast<MHDFloat>(lA + lB - lG + 1);
+      MHDFloat clbg_a1 = static_cast<MHDFloat>(lB + lG - lA + 1);
+      MHDFloat clag_b = static_cast<MHDFloat>(lA + lG - lB);
+      Labg = -(std::sqrt(ca*cb*cg/(4.0*Math::PI))/2.0)*val3jA*val3jB*std::sqrt(clabg2*clab_g1*clbg_a1*clag_b);
+   }
 
    return Labg;
 }

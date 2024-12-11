@@ -340,7 +340,7 @@ void MarginalCurve::mainRun()
       // Print eigenvalues
       for (auto&& e: evs)
       {
-         std::cerr << e << std::endl;
+         std::cerr << std::setprecision(14) << e << std::endl;
       }
 
       for (std::size_t i = 0; i < efs.size(); i++)

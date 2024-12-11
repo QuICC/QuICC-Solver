@@ -40,6 +40,7 @@ function(quicc_add_model target)
     )
   target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
     QuICC::Framework
+    QuICC::DenseSM
     )
 
   # Create model implementations libraries

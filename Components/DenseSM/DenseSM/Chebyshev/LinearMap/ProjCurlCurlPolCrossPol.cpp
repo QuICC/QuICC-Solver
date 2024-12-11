@@ -47,6 +47,8 @@ ProjCurlCurlPolCrossPol::ProjCurlCurlPolCrossPol(const int nNr, const int nNc, c
    {
       throw std::logic_error("One of the radial functions should be null");
    }
+
+   this->mIsZero = (this->elsasser(this->mLa, this->mMa, this->mLb, this->mMb, this->mLout, this->mMout) == 0);
 }
 
 void ProjCurlCurlPolCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,

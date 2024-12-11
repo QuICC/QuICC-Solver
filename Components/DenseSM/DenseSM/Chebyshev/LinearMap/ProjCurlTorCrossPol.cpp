@@ -14,6 +14,7 @@
 //
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlTorCrossPol.hpp"
 #include "DenseSM/Chebyshev/LinearMap/R2DivR1F.hpp"
+#include "DenseSM/Chebyshev/LinearMap/R4DivR1F.hpp"
 
 namespace QuICC {
 
@@ -24,23 +25,39 @@ namespace Chebyshev {
 namespace LinearMap {
 
 ProjCurlTorCrossPol::ProjCurlTorCrossPol(const int nNr, const int nNc, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB,
-   std::shared_ptr<RadialTorPolFunction> pTorA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower, const Scalar_t upper) :
+   std::shared_ptr<RadialTorPolFunction> pTorA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower, const Scalar_t upper, const bool useR4) :
     IProjCrossOperator(nNr, nNc, lOut, mOut, lA, mA, lB, mB, lower, upper)
 {
    // Radial function A is given
    if(pTorA && pPolB == nullptr)
    {
-      this->mpOp = std::make_shared<R2DivR1F>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pTorA, lower, upper);
+      if(useR4)
+      {
+         this->mpOp = std::make_shared<R4DivR1F>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pTorA, lower, upper);
+      }
+      else
+      {
+         this->mpOp = std::make_shared<R2DivR1F>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pTorA, lower, upper);
+      }
    }
    // Radial function B is given
    else if(pPolB && pTorA == nullptr)
    {
-      this->mpOp = std::make_shared<R2DivR1F>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
+      if(useR4)
+      {
+         this->mpOp = std::make_shared<R4DivR1F>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
+      }
+      else
+      {
+         this->mpOp = std::make_shared<R2DivR1F>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
+      }
    }
    else
    {
       throw std::logic_error("One of the radial functions should be null");
    }
+
+   this->mIsZero = (this->elsasser(this->mLa, this->mMa, this->mLb, this->mMb, this->mLout, this->mMout) == 0);
 }
 
 void ProjCurlTorCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
@@ -54,7 +71,7 @@ void ProjCurlTorCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
 
    const MHDFloat Labg = this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-   MHDFloat c = std::pow(-1.0, lg  + la + lb - 1)*L2b*Labg;
+   MHDFloat c = std::pow(-1.0, la  + lb + lg - 1)*L2b*Labg;
 
    mat = c*this->mpOp->mat();
 }

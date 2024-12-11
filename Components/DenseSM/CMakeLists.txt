@@ -34,6 +34,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   QuICC::Transform
   ${QUICC_SPARSESM_COMPONENT_LIB}
   ${QUICC_PYQUICC_COMPONENT_LIB}
+  wigxjpf
 )
 
 # Alias
