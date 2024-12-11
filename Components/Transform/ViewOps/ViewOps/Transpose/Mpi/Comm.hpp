@@ -16,12 +16,13 @@
 //
 #include "ViewOps/Transpose/Mpi/Tags.hpp"
 #include "Environment/MpiTypes.hpp"
-#include "View/ViewBase.hpp"
+#include "View/View.hpp"
 #include "Memory/Memory.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Memory/Cuda/Malloc.hpp"
 #include "Cuda/CudaUtil.hpp"
+#include "ViewOps/Transpose/Cuda/Packing.hpp"
 #endif
 
 namespace QuICC {
@@ -177,6 +178,38 @@ private:
    std::vector<int> _sendBufferDispls;
    /// @brief Recv buffer displacement for packed comms
    std::vector<int> _recvBufferDispls;
+
+   #ifdef QUICC_HAS_CUDA_BACKEND
+   /// @brief Send buffer displacement for device side packing
+   Memory::MemBlock<int> _sendBufferDisplsDevice;
+   /// @brief Recv buffer displacement for device side packing
+   Memory::MemBlock<int> _recvBufferDisplsDevice;
+   /// @brief Send buffer View displacement for device side packing
+   View::ViewBase<int> _sendBufferDisplsView;
+   /// @brief Recv buffer View displacement for device side packing
+   View::ViewBase<int> _recvBufferDisplsView;
+   /// @brief Displacement for device side packing
+   Memory::MemBlock<int> _sendDisplsDevice;
+   /// @brief Displacement for device side packing
+   Memory::MemBlock<int> _recvDisplsDevice;
+   /// @brief Displacement for device side packing
+   View::View<int, View::Attributes<View::dense2D>> _sendDisplsView;
+   /// @brief Displacement for device side packing
+   View::View<int, View::Attributes<View::dense2D>> _recvDisplsView;
+   /// @brief Entry i specifies the number of elements to send to rank i.
+   /// Needed for device side packing
+   Memory::MemBlock<int> _sendCountsDevice;
+   /// @brief Entry j specifies the number of elements to receive from rank j.
+   /// Needed for device side packing
+   Memory::MemBlock<int> _recvCountsDevice;
+   /// @brief View of _sendCountsDevice
+   /// Needed for device side packing
+   View::ViewBase<int> _sendCountsView;
+   /// @brief View of _recvCountsDevice
+   /// Needed for device side packing
+   View::ViewBase<int> _recvCountsView;
+   #endif
+
    /// @brief All world communicator
    MPI_Comm _comm;
    /// @brief Communicator over which data is to be exchanged.
@@ -194,7 +227,7 @@ private:
    /// @brief Unpack buffer to output
    /// @param out
    /// @param buffer
-   void unPack(TDATA* out, const View::Base<TDATA> buffer) const;
+   void unPack(TDATA* out, const View::ViewBase<TDATA> buffer) const;
 
 };
 
@@ -250,7 +283,6 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
       else
       {
          // Setup send/recv buffers for alltoallv or send/recv
-         /// \todo gpu buffers
          _sendBufferDispls.resize(_nSubComm+1);
          _recvBufferDispls.resize(_nSubComm+1);
          _sendBufferDispls[0] = 0;
@@ -265,6 +297,65 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
          // use view so that we have bound checks in debug mode
          _sendBufferView = View::ViewBase<TDATA>(_sendBuffer.data(), _sendBuffer.size());
          _recvBufferView = View::ViewBase<TDATA>(_recvBuffer.data(), _recvBuffer.size());
+
+         #ifdef QUICC_HAS_CUDA_BACKEND
+         // Buffer offesets
+         _sendBufferDisplsDevice = std::move(Memory::MemBlock<int>(_sendBufferDispls.size(), _mem.get()));
+         _recvBufferDisplsDevice = std::move(Memory::MemBlock<int>(_recvBufferDispls.size(), _mem.get()));
+         _sendBufferDisplsView = View::ViewBase<int>(_sendBufferDisplsDevice.data(), _sendBufferDisplsDevice.size());
+         _recvBufferDisplsView = View::ViewBase<int>(_recvBufferDisplsDevice.data(), _recvBufferDisplsDevice.size());
+         // Copy to device
+         cudaErrChk(cudaMemcpy(_sendBufferDisplsDevice.data(), _sendBufferDispls.data(),
+            _sendBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
+         cudaErrChk(cudaMemcpy(_recvBufferDisplsDevice.data(), _recvBufferDispls.data(),
+            _recvBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
+
+         // Linearized and padded send/recv displacements
+         int sendCountsMax = 0;
+         int recvCountsMax = 0;
+         for (int i = 0; i < _nSubComm; ++i)
+         {
+            sendCountsMax = std::max(sendCountsMax, _sendCounts[i].size());
+            recvCountsMax = std::max(recvCountsMax, _recvCounts[i].size());
+         }
+         std::vector<int> sendDisplsLin(_nSubComm*sendCountsMax, 0);
+         std::vector<int> recvDisplsLin(_nSubComm*recvCountsMax, 0);
+         // Linearize
+         for (int i = 0; i < _nSubComm; ++i)
+         {
+            for (int j = 0; j < _sendCounts[i].size(); ++j)
+            {
+               sendDisplsLin[i*sendCountsMax+j] = _sendDispls[i][j];
+            }
+            for (int j = 0; j < _recvCounts[i].size(); ++j)
+            {
+               recvDisplsLin[i*recvCountsMax+j] = _recvDispls[i][j];
+            }
+         }
+
+         // Copy to device
+         _sendDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
+         _recvDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
+         std::array<std::uint32_t, 2> sendDim {_nSubComm, sendCountsMax};
+         _sendDisplsView =  View<int, Attributes<View::dense2D>>({_sendDisplsDevice.data(), _sendDisplsDevice.size()} sendDim);
+         std::array<std::uint32_t, 2> recvDim {_nSubComm, recvCountsMax};
+         _recvDisplsView =  View<int, Attributes<View::dense2D>>({_recvDisplsDevice.data(), _recvDisplsDevice.size()} recvDim);
+         cudaErrChk(cudaMemcpy(_sendDisplsDevice.data(), sendDisplsLin.data(),
+            sendDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
+         cudaErrChk(cudaMemcpy(_recvDisplsDevice.data(), recvDisplsLin.data(),
+            recvDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
+
+         // Send Counts
+         _sendCountsDevice = std::move(Memory::MemBlock<int>(_sendCounts.size(), _mem.get()));
+         _recvCountsDevice = std::move(Memory::MemBlock<int>(_recvCounts.size(), _mem.get()));
+         _sendCountsView = View::ViewBase<int>(_sendCountsDevice.data(), _sendCountsDevice.size());
+         _recvCountsView = View::ViewBase<int>(_recvCountsDevice.data(), _recvCountsDevice.size());
+         // Copy to device
+         cudaErrChk(cudaMemcpy(_sendCountsDevice.data(), _sendCounts.data(),
+            _sendCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
+         cudaErrChk(cudaMemcpy(_recvCountsDevice.data(), _recvCounts.data(),
+            _recvCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
+         #endif
       }
    }
    _isSetup = true;
@@ -284,7 +375,19 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
       else
       {
          // Pack
+         #ifdef QUICC_HAS_CUDA_BACKEND
+         if(Cuda::isDeviceMemory(out))
+         {
+            Cuda::pack(_sendBufferView, in, _sendCountsView,
+               _sendDisplsView, _sendBufferDisplsView);
+         }
+         else
+         {
+            pack(_sendBufferView, in);
+         }
+         #else
          pack(_sendBufferView, in);
+         #endif
 
          // Comm
          if constexpr (std::is_same_v<TAG, sendrecv_t>)
@@ -314,7 +417,19 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
          }
 
          // Unpack
+         #ifdef QUICC_HAS_CUDA_BACKEND
+         if(Cuda::isDeviceMemory(out))
+         {
+            Cuda::unPack(out, _recvBufferView, _recvCountsView,
+               _recvDisplsView, _recvBufferDisplsView);
+         }
+         else
+         {
+            unPack(out, _recvBufferView);
+         }
+         #else
          unPack(out, _recvBufferView);
+         #endif
       }
    }
 }
@@ -335,7 +450,7 @@ void Comm<TDATA, TAG>::pack(View::ViewBase<TDATA> buffer, const TDATA* in) const
 }
 
 template <class TDATA, class TAG>
-void Comm<TDATA, TAG>::unPack(TDATA* out, const View::Base<TDATA> buffer) const
+void Comm<TDATA, TAG>::unPack(TDATA* out, const View::ViewBase<TDATA> buffer) const
 {
    #ifdef QUICC_HAS_CUDA_BACKEND
    assert(Cuda::isDeviceMemory(out) == Cuda::isDeviceMemory(buffer.data()));
