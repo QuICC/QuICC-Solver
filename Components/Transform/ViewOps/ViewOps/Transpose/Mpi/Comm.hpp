@@ -193,9 +193,9 @@ private:
    /// @brief Displacement for device side packing
    Memory::MemBlock<int> _recvDisplsDevice;
    /// @brief Displacement for device side packing
-   View::View<int, View::Attributes<View::dense2D>> _sendDisplsView;
+   View::View<int, View::dense2D> _sendDisplsView;
    /// @brief Displacement for device side packing
-   View::View<int, View::Attributes<View::dense2D>> _recvDisplsView;
+   View::View<int, View::dense2D> _recvDisplsView;
    /// @brief Entry i specifies the number of elements to send to rank i.
    /// Needed for device side packing
    Memory::MemBlock<int> _sendCountsDevice;
@@ -337,9 +337,9 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
          _sendDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
          _recvDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
          std::array<std::uint32_t, 2> sendDim {_nSubComm, sendCountsMax};
-         _sendDisplsView =  View<int, Attributes<View::dense2D>>({_sendDisplsDevice.data(), _sendDisplsDevice.size()} sendDim);
+         _sendDisplsView =  View::View<int, View::dense2D>({_sendDisplsDevice.data(), _sendDisplsDevice.size()} sendDim);
          std::array<std::uint32_t, 2> recvDim {_nSubComm, recvCountsMax};
-         _recvDisplsView =  View<int, Attributes<View::dense2D>>({_recvDisplsDevice.data(), _recvDisplsDevice.size()} recvDim);
+         _recvDisplsView =  View::View<int, View::dense2D>({_recvDisplsDevice.data(), _recvDisplsDevice.size()} recvDim);
          cudaErrChk(cudaMemcpy(_sendDisplsDevice.data(), sendDisplsLin.data(),
             sendDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
          cudaErrChk(cudaMemcpy(_recvDisplsDevice.data(), recvDisplsLin.data(),
