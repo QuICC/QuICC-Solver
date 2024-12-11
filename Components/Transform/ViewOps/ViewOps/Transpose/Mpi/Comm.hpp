@@ -21,6 +21,7 @@
 #include "Memory/Cpu/NewDelete.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Memory/Cuda/Malloc.hpp"
+#include "Cuda/CudaUtil.hpp"
 #endif
 
 namespace QuICC {
@@ -133,7 +134,7 @@ public:
    /// @brief Execute the data exchange (communication)
    /// @param out
    /// @param in
-   void exchange(TDATA* out, const TDATA* in);
+   void exchange(TDATA* out, const TDATA* in) const;
 
    /// @brief check if the comm was setup
    /// @return
@@ -184,6 +185,16 @@ private:
    int _nSubComm;
    /// @brief Is comm setup?
    bool _isSetup = false;
+
+   /// @brief Pack input into buffer for alltoallv and send/recv
+   /// @param in
+   /// @param buffer
+   void pack(View::ViewBase<TDATA> buffer, const TDATA* in) const;
+
+   /// @brief Unpack buffer to output
+   /// @param out
+   /// @param buffer
+   void unPack(TDATA* out, const View::Base<TDATA> buffer) const;
 
 };
 
@@ -260,7 +271,7 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
 }
 
 template <class TDATA, class TAG>
-void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in)
+void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
 {
    if (_subComm != MPI_COMM_NULL)
    {
@@ -273,14 +284,7 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in)
       else
       {
          // Pack
-         for (int i = 0; i < _nSubComm; ++i)
-         {
-            for (int s = 0; s < _sendCounts[i]; ++s)
-            {
-               // _sendBuffers[i][s] = *(in + _sendDispls[i][s]);
-               _sendBufferView[_sendBufferDispls[i]+s] = *(in + _sendDispls[i][s]);
-            }
-         }
+         pack(_sendBufferView, in);
 
          // Comm
          if constexpr (std::is_same_v<TAG, sendrecv_t>)
@@ -310,17 +314,40 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in)
          }
 
          // Unpack
-         for (int i = 0; i < _nSubComm; ++i)
-         {
-            for (int s = 0; s < _recvCounts[i]; ++s)
-            {
-               *(out + _recvDispls[i][s]) = _recvBufferView[_recvBufferDispls[i]+s];
-            }
-         }
+         unPack(out, _recvBufferView);
       }
    }
 }
 
+template <class TDATA, class TAG>
+void Comm<TDATA, TAG>::pack(View::ViewBase<TDATA> buffer, const TDATA* in) const
+{
+   #ifdef QUICC_HAS_CUDA_BACKEND
+   assert(Cuda::isDeviceMemory(in) == Cuda::isDeviceMemory(buffer.data()));
+   #endif
+   for (int i = 0; i < _nSubComm; ++i)
+   {
+      for (int s = 0; s < _sendCounts[i]; ++s)
+      {
+         buffer[_sendBufferDispls[i]+s] = *(in + _sendDispls[i][s]);
+      }
+   }
+}
+
+template <class TDATA, class TAG>
+void Comm<TDATA, TAG>::unPack(TDATA* out, const View::Base<TDATA> buffer) const
+{
+   #ifdef QUICC_HAS_CUDA_BACKEND
+   assert(Cuda::isDeviceMemory(out) == Cuda::isDeviceMemory(buffer.data()));
+   #endif
+   for (int i = 0; i < _nSubComm; ++i)
+   {
+      for (int s = 0; s < _recvCounts[i]; ++s)
+      {
+         *(out + _recvDispls[i][s]) = buffer[_recvBufferDispls[i]+s];
+      }
+   }
+}
 
 } // namespace Mpi
 } // namespace Transpose
