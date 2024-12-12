@@ -299,62 +299,65 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
          _recvBufferView = View::ViewBase<TDATA>(_recvBuffer.data(), _recvBuffer.size());
 
          #ifdef QUICC_HAS_CUDA_BACKEND
-         // Buffer offesets
-         _sendBufferDisplsDevice = std::move(Memory::MemBlock<int>(_sendBufferDispls.size(), _mem.get()));
-         _recvBufferDisplsDevice = std::move(Memory::MemBlock<int>(_recvBufferDispls.size(), _mem.get()));
-         _sendBufferDisplsView = View::ViewBase<int>(_sendBufferDisplsDevice.data(), _sendBufferDisplsDevice.size());
-         _recvBufferDisplsView = View::ViewBase<int>(_recvBufferDisplsDevice.data(), _recvBufferDisplsDevice.size());
-         // Copy to device
-         cudaErrChk(cudaMemcpy(_sendBufferDisplsDevice.data(), _sendBufferDispls.data(),
-            _sendBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
-         cudaErrChk(cudaMemcpy(_recvBufferDisplsDevice.data(), _recvBufferDispls.data(),
-            _recvBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
-
-         // Linearized and padded send/recv displacements
-         int sendCountsMax = 0;
-         int recvCountsMax = 0;
-         for (int i = 0; i < _nSubComm; ++i)
+         if (QuICC::Cuda::isDeviceMemory(_sendBuffer.data()))
          {
-            sendCountsMax = std::max(sendCountsMax, _sendCounts[i]);
-            recvCountsMax = std::max(recvCountsMax, _recvCounts[i]);
-         }
-         std::vector<int> sendDisplsLin(_nSubComm*sendCountsMax, 0);
-         std::vector<int> recvDisplsLin(_nSubComm*recvCountsMax, 0);
-         // Linearize
-         for (int i = 0; i < _nSubComm; ++i)
-         {
-            for (int j = 0; j < _sendCounts[i]; ++j)
-            {
-               sendDisplsLin[i*sendCountsMax+j] = _sendDispls[i][j];
-            }
-            for (int j = 0; j < _recvCounts[i]; ++j)
-            {
-               recvDisplsLin[i*recvCountsMax+j] = _recvDispls[i][j];
-            }
-         }
+            // Buffer offsets
+            _sendBufferDisplsDevice = std::move(Memory::MemBlock<int>(_sendBufferDispls.size(), _mem.get()));
+            _recvBufferDisplsDevice = std::move(Memory::MemBlock<int>(_recvBufferDispls.size(), _mem.get()));
+            _sendBufferDisplsView = View::ViewBase<int>(_sendBufferDisplsDevice.data(), _sendBufferDisplsDevice.size());
+            _recvBufferDisplsView = View::ViewBase<int>(_recvBufferDisplsDevice.data(), _recvBufferDisplsDevice.size());
+            // Copy to device
+            cudaErrChk(cudaMemcpy(_sendBufferDisplsDevice.data(), _sendBufferDispls.data(),
+               _sendBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
+            cudaErrChk(cudaMemcpy(_recvBufferDisplsDevice.data(), _recvBufferDispls.data(),
+               _recvBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
 
-         // Copy to device
-         _sendDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
-         _recvDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
-         std::array<std::uint32_t, 2> sendDim {_nSubComm, sendCountsMax};
-         _sendDisplsView =  View::View<int, View::dense2D>({_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
-         std::array<std::uint32_t, 2> recvDim {_nSubComm, recvCountsMax};
-         _recvDisplsView =  View::View<int, View::dense2D>({_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
-         cudaErrChk(cudaMemcpy(_sendDisplsDevice.data(), sendDisplsLin.data(),
-            sendDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
-         cudaErrChk(cudaMemcpy(_recvDisplsDevice.data(), recvDisplsLin.data(),
-            recvDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
+            // Linearized and padded send/recv displacements
+            int sendCountsMax = 0;
+            int recvCountsMax = 0;
+            for (int i = 0; i < _nSubComm; ++i)
+            {
+               sendCountsMax = std::max(sendCountsMax, _sendCounts[i]);
+               recvCountsMax = std::max(recvCountsMax, _recvCounts[i]);
+            }
+            std::vector<int> sendDisplsLin(_nSubComm*sendCountsMax, 0);
+            std::vector<int> recvDisplsLin(_nSubComm*recvCountsMax, 0);
+            // Linearize
+            for (int i = 0; i < _nSubComm; ++i)
+            {
+               for (int j = 0; j < _sendCounts[i]; ++j)
+               {
+                  sendDisplsLin[i*sendCountsMax+j] = _sendDispls[i][j];
+               }
+               for (int j = 0; j < _recvCounts[i]; ++j)
+               {
+                  recvDisplsLin[i*recvCountsMax+j] = _recvDispls[i][j];
+               }
+            }
 
-         // Send Counts
-         _sendCountsDevice = std::move(Memory::MemBlock<int>(_sendCounts.size(), _mem.get()));
-         _recvCountsDevice = std::move(Memory::MemBlock<int>(_recvCounts.size(), _mem.get()));
-         _sendCountsView = View::ViewBase<int>(_sendCountsDevice.data(), _sendCountsDevice.size());
-         _recvCountsView = View::ViewBase<int>(_recvCountsDevice.data(), _recvCountsDevice.size());
-         // Copy to device
-         cudaErrChk(cudaMemcpy(_sendCountsDevice.data(), _sendCounts.data(),
-            _sendCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
-         cudaErrChk(cudaMemcpy(_recvCountsDevice.data(), _recvCounts.data(),
-            _recvCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
+            // Copy to device
+            _sendDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
+            _recvDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
+            std::array<std::uint32_t, 2> sendDim {_nSubComm, sendCountsMax};
+            _sendDisplsView =  View::View<int, View::dense2D>({_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
+            std::array<std::uint32_t, 2> recvDim {_nSubComm, recvCountsMax};
+            _recvDisplsView =  View::View<int, View::dense2D>({_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
+            cudaErrChk(cudaMemcpy(_sendDisplsDevice.data(), sendDisplsLin.data(),
+               sendDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
+            cudaErrChk(cudaMemcpy(_recvDisplsDevice.data(), recvDisplsLin.data(),
+               recvDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
+
+            // Send Counts
+            _sendCountsDevice = std::move(Memory::MemBlock<int>(_sendCounts.size(), _mem.get()));
+            _recvCountsDevice = std::move(Memory::MemBlock<int>(_recvCounts.size(), _mem.get()));
+            _sendCountsView = View::ViewBase<int>(_sendCountsDevice.data(), _sendCountsDevice.size());
+            _recvCountsView = View::ViewBase<int>(_recvCountsDevice.data(), _recvCountsDevice.size());
+            // Copy to device
+            cudaErrChk(cudaMemcpy(_sendCountsDevice.data(), _sendCounts.data(),
+               _sendCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
+            cudaErrChk(cudaMemcpy(_recvCountsDevice.data(), _recvCounts.data(),
+               _recvCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
+         }
          #endif
       }
    }
@@ -376,7 +379,7 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
       {
          // Pack
          #ifdef QUICC_HAS_CUDA_BACKEND
-         if(QuICC::Cuda::isDeviceMemory(out))
+         if(QuICC::Cuda::isDeviceMemory(in))
          {
             Cuda::pack(_sendBufferView, in, _sendCountsView,
                _sendDisplsView, _sendBufferDisplsView);
