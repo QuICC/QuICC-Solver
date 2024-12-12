@@ -245,7 +245,7 @@ perm(View::View<Tout, View::S1CLCSC3DJIK> out,
 template <class Tout, class Tin, class Perm>
 void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 {
-   Profiler::RegionFixture<4> fix("Reduction::Cuda::applyImpl");
+   Profiler::RegionFixture<4> fix("Transpose::Cuda::applyImpl");
 
    assert(QuICC::Cuda::isDeviceMemory(out.data()));
    assert(QuICC::Cuda::isDeviceMemory(in.data()));

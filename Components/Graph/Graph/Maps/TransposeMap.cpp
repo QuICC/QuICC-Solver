@@ -103,6 +103,10 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
           }
+          else
+          {
+            throw std::logic_error("missing transpose operator.");
+          }
         }
         #ifdef QUICC_HAS_CUDA_BACKEND
         else
@@ -184,6 +188,10 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             auto* ptr = std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
+          }
+          else
+          {
+            throw std::logic_error("missing transpose operator.");
           }
         }
         #endif
