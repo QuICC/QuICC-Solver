@@ -14,6 +14,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/IChebyshevOperator.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -49,9 +50,19 @@ namespace Chebyshev {
          Scalar_t a() const;
 
          /**
+          * @brief Templated power function a^p
+          */
+         template <int P> Scalar_t a() const;
+
+         /**
           * @brief Get mapping b coefficient from y = ax + b
           */
          Scalar_t b() const;
+
+         /**
+          * @brief Templated power function b^p
+          */
+         template <int P> Scalar_t b() const;
 
       private:
          /**
@@ -72,6 +83,38 @@ namespace Chebyshev {
           */
          Scalar_t mB;
    };
+
+   template <int P> ILinearMapOperator::Scalar_t ILinearMapOperator::a() const
+   {
+      if constexpr(P == 1)
+      {
+         return this->mA;
+      }
+      else if constexpr(P == 2)
+      {
+         return this->mA*this->mA;
+      }
+      else
+      {
+         return Internal::Math::pow(this->mA, P);
+      }
+   }
+
+   template <int P> ILinearMapOperator::Scalar_t ILinearMapOperator::b() const
+   {
+      if constexpr(P == 1)
+      {
+         return this->mB;
+      }
+      else if constexpr(P == 2)
+      {
+         return this->mB*this->mB;
+      }
+      else
+      {
+         return Internal::Math::pow(this->mB, P);
+      }
+   }
 
 }
 }

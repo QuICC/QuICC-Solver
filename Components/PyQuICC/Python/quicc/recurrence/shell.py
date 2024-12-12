@@ -283,6 +283,64 @@ def i3():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i3r3():
+    """Spherical shell 3rd integral of r^3 operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':3, 'p':3, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i3r4():
+    """Spherical shell 3rd integral of r^4 operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':3, 'p':4, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i3r4d1():
+    """Spherical shell 3rd integral of r^4 D operator"""
+
+    # Setup terms in recurrence
+    l = sympy.Symbol('l')
+    terms = [{'q':3, 'p':4, 'd':1, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
+def i3r4lapl():
+    """Spherical shell 3rd integral of r^4 laplacianoperator"""
+
+    # Setup terms in recurrence
+    l = sympy.Symbol('l')
+    terms = [{'q':3, 'p':4, 'd':2, 'c':1}, {'q':3, 'p':3, 'd':1, 'c':2}, {'q':3, 'p':2, 'd':0, 'c':-l*(l+1)}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+
 def i4():
     """Spherical shell 4th integral operator"""
 
