@@ -48,6 +48,8 @@ set(_tests
   I2D1:sparse
   I2Y1D1Y1:sparse
   I2Y2D1Y1:sparse
+  I2Y4:sparse
+  I2Y4D1:sparse
   I3:sparse
   I4:sparse
   I4D1:sparse
@@ -66,6 +68,7 @@ endforeach()
 set(_tests
   I2Y2SphLapl:sparse
   I2Y3SphLapl:sparse
+  I2Y4SphLapl:sparse
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
