@@ -330,17 +330,22 @@ void MarginalCurve::mainRun()
    int solver_mode = this->mspEqParams->nd(NonDimensional::StabilityMode::id());
 
    // Single mode calculation
-   if (solver_mode == 0)
+   if (solver_mode == 0 || solver_mode == 1)
    {
       std::vector<MHDComplex> evs(nev);
-      std::vector<std::vector<MHDComplex>> efs(nev);
+      std::vector<std::vector<MHDComplex>> efs;
+      if(solver_mode == 1)
+      {
+         efs.resize(nev);
+      }
       auto vc = this->mspEqParams->nd(idc);
       spLinStab->eigenpairs(evs, efs, nev, vc);
 
       // Print eigenvalues
+      std::ofstream logger("evs.log");
       for (auto&& e: evs)
       {
-         std::cerr << std::setprecision(14) << e << std::endl;
+         logger << std::setprecision(14) << e << std::endl;
       }
 
       for (std::size_t i = 0; i < efs.size(); i++)

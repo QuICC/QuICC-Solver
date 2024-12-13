@@ -293,15 +293,55 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
 {
    PetscFunctionBeginUser;
 
+   // Allocate PETSc matrix
+   auto allocatePetscMat = [](auto& petscMat, const auto& eigenMat)
+   {
+      PetscInt rows = eigenMat.rows();
+      PetscInt cols = eigenMat.cols();
+      PetscInt tnz = 0;
+      std::vector<PetscInt> nnz(rows, 0);
+      for (int k = 0; k < eigenMat.outerSize(); ++k)
+      {
+         for (SparseMatrixZ::InnerIterator it(eigenMat, k); it; ++it)
+         {
+            ++nnz.at(it.row());
+            ++tnz;
+         }
+      }
+      if(tnz != eigenMat.nonZeros())
+      {
+         throw std::logic_error("Counting NNZ per row failed");
+      }
+
+      PetscCallVoid(
+         MatCreateSeqAIJ(PETSC_COMM_WORLD, rows, cols, tnz, nnz.data(), &petscMat));
+   };
+
+   // Set PETSc matrix values
+   auto setPetscMat = [](auto& petscMat, const auto& eigenMat, const auto& mode)
+   {
+      for (int k = 0; k < eigenMat.outerSize(); ++k)
+      {
+         for (SparseMatrixZ::InnerIterator it(eigenMat, k); it; ++it)
+         {
+            PetscInt i = it.row();
+            PetscInt j = it.col();
+            if (it.value() == 0.0)
+            {
+               std::cerr << "WARNING: Matrix has explicit zero!" << std::endl;
+            }
+            PetscCallVoid(MatSetValues(petscMat, 1, &i, 1, &j, &it.value(), mode));
+         }
+      }
+      PetscCallVoid(MatAssemblyBegin(petscMat, MAT_FINAL_ASSEMBLY));
+      PetscCallVoid(MatAssemblyEnd(petscMat, MAT_FINAL_ASSEMBLY));
+   };
+
    InsertMode mode;
    // Build PETSc matrix A
    if (this->mNeedInit)
    {
-      PetscInt rows = matA.rows();
-      PetscInt cols = matA.cols();
-      PetscInt nnz = matA.nonZeros();
-      PetscCallVoid(
-         MatCreateSeqAIJ(PETSC_COMM_WORLD, rows, cols, nnz, NULL, &this->mA));
+      allocatePetscMat(this->mA, matA);
       mode = INSERT_VALUES;
    }
    else
@@ -309,48 +349,20 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
       PetscCallVoid(MatZeroEntries(this->mA));
       mode = ADD_VALUES;
    }
-   for (int k = 0; k < matA.outerSize(); ++k)
-   {
-      for (SparseMatrixZ::InnerIterator it(matA, k); it; ++it)
-      {
-         PetscInt i = it.row();
-         PetscInt j = it.col();
-         if (it.value() == 0.0)
-         {
-            std::cerr << "WARNING: Matrix has explicit zero!" << std::endl;
-         }
-         PetscCallVoid(MatSetValues(this->mA, 1, &i, 1, &j, &it.value(), mode));
-      }
-   }
-   PetscCallVoid(MatAssemblyBegin(this->mA, MAT_FINAL_ASSEMBLY));
-   PetscCallVoid(MatAssemblyEnd(this->mA, MAT_FINAL_ASSEMBLY));
+   setPetscMat(this->mA, matA, mode);
 
    // Build PETSc matrix B
    if (this->mNeedInit)
    {
-      PetscInt rows = matB.rows();
-      PetscInt cols = matB.cols();
-      PetscInt nnz = matB.nonZeros();
-      PetscCallVoid(
-         MatCreateSeqAIJ(PETSC_COMM_WORLD, rows, cols, nnz, NULL, &this->mB));
+      allocatePetscMat(this->mB, matB);
+      mode = INSERT_VALUES;
    }
    else
    {
       PetscCallVoid(MatZeroEntries(this->mB));
       mode = ADD_VALUES;
    }
-
-   for (int k = 0; k < matB.outerSize(); ++k)
-   {
-      for (SparseMatrixZ::InnerIterator it(matB, k); it; ++it)
-      {
-         PetscInt i = it.row();
-         PetscInt j = it.col();
-         PetscCallVoid(MatSetValues(this->mB, 1, &i, 1, &j, &it.value(), mode));
-      }
-   }
-   PetscCallVoid(MatAssemblyBegin(this->mB, MAT_FINAL_ASSEMBLY));
-   PetscCallVoid(MatAssemblyEnd(this->mB, MAT_FINAL_ASSEMBLY));
+   setPetscMat(this->mB, matB, mode);
 }
 
 void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
