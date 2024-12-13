@@ -43,6 +43,13 @@ Internal::Array QuadrupolarS2::evaluate(const Internal::Array& r, const int l, c
    return val;
 }
 
+std::vector<int> QuadrupolarS2::ls() const
+{
+   std::vector<int> l = {2};
+
+   return l;
+}
+
 } // namespace LinearMap
 } // namespace Chebyshev
 } // namespace DenseSM

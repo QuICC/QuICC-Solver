@@ -38,9 +38,14 @@ public:
    virtual ~RadialTorPolFunction() = default;
 
    /**
-    * @brief Spectral truncation
+    * @brief Required spectral truncation
     */
    virtual int nN() const = 0;
+
+   /**
+    * @brief Nonzero harmonic degrees
+    */
+   virtual std::vector<int> ls() const = 0;
 
    /**
     * @brief Spectral expansion
