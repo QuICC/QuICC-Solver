@@ -36,7 +36,7 @@ Internal::Array QuadrupolarS2::evaluate(const Internal::Array& r, const int l, c
    }
    else
    {
-      Internal::MHDFloat c2 = (1.0_mp/8.0_mp*Internal::Math::sqrt(587.0_mp));
+      Internal::MHDFloat c2 = (1.0_mp/(8.0_mp*Internal::Math::sqrt(587.0_mp)));
       val = c2*(35.0_mp - 200.0_mp*r.array() + 139.0_mp*r.array().pow(2));
    }
 
