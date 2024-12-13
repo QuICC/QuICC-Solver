@@ -19,10 +19,10 @@
 #include "View/View.hpp"
 #include "Memory/Memory.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
+#include "ViewOps/Transpose/Packing.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Memory/Cuda/Malloc.hpp"
 #include "Cuda/CudaUtil.hpp"
-#include "ViewOps/Transpose/Cuda/Packing.hpp"
 #endif
 
 namespace QuICC {
@@ -179,7 +179,7 @@ private:
    /// @brief Recv buffer displacement for packed comms
    std::vector<int> _recvBufferDispls;
 
-   #ifdef QUICC_HAS_CUDA_BACKEND
+   // #ifdef QUICC_HAS_CUDA_BACKEND
    /// @brief Send buffer displacement for device side packing
    Memory::MemBlock<int> _sendBufferDisplsDevice;
    /// @brief Recv buffer displacement for device side packing
@@ -193,9 +193,9 @@ private:
    /// @brief Displacement for device side packing
    Memory::MemBlock<int> _recvDisplsDevice;
    /// @brief Displacement for device side packing
-   View::View<int, View::dense2D> _sendDisplsView;
+   View::View<int, View::dense2DRM> _sendDisplsView;
    /// @brief Displacement for device side packing
-   View::View<int, View::dense2D> _recvDisplsView;
+   View::View<int, View::dense2DRM> _recvDisplsView;
    /// @brief Entry i specifies the number of elements to send to rank i.
    /// Needed for device side packing
    Memory::MemBlock<int> _sendCountsDevice;
@@ -208,7 +208,7 @@ private:
    /// @brief View of _recvCountsDevice
    /// Needed for device side packing
    View::ViewBase<int> _recvCountsView;
-   #endif
+   // #endif
 
    /// @brief All world communicator
    MPI_Comm _comm;
@@ -338,10 +338,10 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
             // Copy to device
             _sendDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
             _recvDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
-            std::array<std::uint32_t, 2> sendDim {_nSubComm, sendCountsMax};
-            _sendDisplsView =  View::View<int, View::dense2D>({_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
-            std::array<std::uint32_t, 2> recvDim {_nSubComm, recvCountsMax};
-            _recvDisplsView =  View::View<int, View::dense2D>({_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
+            std::array<std::uint32_t, 2> sendDim {static_cast<std::uint32_t>(_nSubComm), sendCountsMax};
+            _sendDisplsView =  View::View<int, View::dense2DRM>({_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
+            std::array<std::uint32_t, 2> recvDim {static_cast<std::uint32_t>(_nSubComm), recvCountsMax};
+            _recvDisplsView =  View::View<int, View::dense2DRM>({_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
             cudaErrChk(cudaMemcpy(_sendDisplsDevice.data(), sendDisplsLin.data(),
                sendDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
             cudaErrChk(cudaMemcpy(_recvDisplsDevice.data(), recvDisplsLin.data(),
@@ -358,7 +358,46 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
             cudaErrChk(cudaMemcpy(_recvCountsDevice.data(), _recvCounts.data(),
                _recvCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
          }
+         else
          #endif
+         {
+            // Buffer offsets
+            _sendBufferDisplsView = View::ViewBase<int>(_sendBufferDispls.data(), _sendBufferDispls.size());
+            _recvBufferDisplsView = View::ViewBase<int>(_recvBufferDispls.data(), _recvBufferDispls.size());
+
+            // Linearized and padded send/recv displacements
+            int sendCountsMax = 0;
+            int recvCountsMax = 0;
+            for (int i = 0; i < _nSubComm; ++i)
+            {
+               sendCountsMax = std::max(sendCountsMax, _sendCounts[i]);
+               recvCountsMax = std::max(recvCountsMax, _recvCounts[i]);
+            }
+            _sendDisplsDevice = std::move(Memory::MemBlock<int>(_nSubComm*sendCountsMax , _mem.get()));
+            _recvDisplsDevice = std::move(Memory::MemBlock<int>(_nSubComm*recvCountsMax, _mem.get()));
+
+            std::array<std::uint32_t, 2> sendDim {static_cast<std::uint32_t>(_nSubComm), sendCountsMax};
+            _sendDisplsView =  View::View<int, View::dense2DRM>({_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
+            std::array<std::uint32_t, 2> recvDim {static_cast<std::uint32_t>(_nSubComm), recvCountsMax};
+            _recvDisplsView =  View::View<int, View::dense2DRM>({_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
+
+            // Linearize
+            for (int i = 0; i < _nSubComm; ++i)
+            {
+               for (int j = 0; j < _sendCounts[i]; ++j)
+               {
+                  _sendDisplsView[i*sendCountsMax+j] = _sendDispls[i][j];
+               }
+               for (int j = 0; j < _recvCounts[i]; ++j)
+               {
+                  _recvDisplsView[i*recvCountsMax+j] = _recvDispls[i][j];
+               }
+            }
+
+            // Send/recv Counts
+            _sendCountsView = View::ViewBase<int>(_sendCounts.data(), _sendCounts.size());
+            _recvCountsView = View::ViewBase<int>(_recvCounts.data(), _recvCounts.size());
+         }
       }
    }
    _isSetup = true;
@@ -385,12 +424,14 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
                _sendDisplsView, _sendBufferDisplsView);
          }
          else
-         {
-            pack(_sendBufferView, in);
-         }
-         #else
-         pack(_sendBufferView, in);
          #endif
+         {
+            Cpu::pack(_sendBufferView, in, _sendCountsView,
+               _sendDisplsView, _sendBufferDisplsView);
+         }
+         // #else
+         // pack(_sendBufferView, in);
+         // #endif
 
          // Comm
          if constexpr (std::is_same_v<TAG, sendrecv_t>)
@@ -427,12 +468,14 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
                _recvDisplsView, _recvBufferDisplsView);
          }
          else
-         {
-            unPack(out, _recvBufferView);
-         }
-         #else
-         unPack(out, _recvBufferView);
          #endif
+         {
+            Cpu::unPack(out, _recvBufferView, _recvCountsView,
+               _recvDisplsView, _recvBufferDisplsView);
+         }
+         // #else
+         // unPack(out, _recvBufferView);
+         // #endif
       }
    }
 }

@@ -9,7 +9,7 @@
 
 // Project includes
 //
-// #include "ViewOps/Transpose/Cpu/Packing.hpp"
+#include "ViewOps/Transpose/Cpu/Packing.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "ViewOps/Transpose/Cuda/Packing.hpp"
 #endif

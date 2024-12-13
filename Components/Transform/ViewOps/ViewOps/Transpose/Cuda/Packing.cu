@@ -25,7 +25,7 @@ namespace details
 template<class TDATA>
 __global__ void pack(View::ViewBase<TDATA> buffer, const TDATA* in,
    const View::ViewBase<int> sendCountsView,
-   const View::View<int, View::dense2D> sendDisplsView,
+   const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView)
 {
 
@@ -47,7 +47,7 @@ __global__ void pack(View::ViewBase<TDATA> buffer, const TDATA* in,
 template <class TDATA>
 void pack(View::ViewBase<TDATA> buffer, const TDATA* in,
    const View::ViewBase<int> sendCountsView,
-   const View::View<int, View::dense2D> sendDisplsView,
+   const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView)
 {
 
@@ -76,7 +76,7 @@ namespace details
 template<class TDATA>
 __global__ void unPack(TDATA* out, const View::ViewBase<TDATA> buffer,
    const View::ViewBase<int> recvCountsView,
-   const View::View<int, View::dense2D> recvDisplsView,
+   const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView)
 {
 
@@ -98,7 +98,7 @@ __global__ void unPack(TDATA* out, const View::ViewBase<TDATA> buffer,
 template <class TDATA>
 void unPack(TDATA* out, const View::ViewBase<TDATA> buffer,
    const View::ViewBase<int> recvCountsView,
-   const View::View<int, View::dense2D> recvDisplsView,
+   const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView)
 {
 
@@ -126,37 +126,37 @@ void unPack(TDATA* out, const View::ViewBase<TDATA> buffer,
 template
 void pack(View::ViewBase<int> buffer, const int* in,
    const View::ViewBase<int> sendCountsView,
-   const View::View<int, View::dense2D> sendDisplsView,
+   const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView);
 
 template
 void pack(View::ViewBase<double> buffer, const double* in,
    const View::ViewBase<int> sendCountsView,
-   const View::View<int, View::dense2D> sendDisplsView,
+   const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView);
 
 template
 void pack(View::ViewBase<std::complex<double>> buffer, const std::complex<double>* in,
    const View::ViewBase<int> sendCountsView,
-   const View::View<int, View::dense2D> sendDisplsView,
+   const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView);
 
 template
 void unPack(int* out, const View::ViewBase<int> buffer,
    const View::ViewBase<int> recvCountsView,
-   const View::View<int, View::dense2D> recvDisplsView,
+   const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView);
 
 template
 void unPack(double* out, const View::ViewBase<double> buffer,
    const View::ViewBase<int> recvCountsView,
-   const View::View<int, View::dense2D> recvDisplsView,
+   const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView);
 
 template
 void unPack(std::complex<double>* out, const View::ViewBase<std::complex<double>> buffer,
    const View::ViewBase<int> recvCountsView,
-   const View::View<int, View::dense2D> recvDisplsView,
+   const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView);
 
 

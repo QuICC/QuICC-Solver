@@ -21,7 +21,7 @@ namespace Cuda {
 template <class TDATA>
 void pack(View::ViewBase<TDATA> buffer, const TDATA* in,
    const View::ViewBase<int> sendCountsView,
-   const View::View<int, View::dense2D> sendDisplsView,
+   const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView);
 
 
@@ -29,7 +29,7 @@ void pack(View::ViewBase<TDATA> buffer, const TDATA* in,
 template <class TDATA>
 void unPack(TDATA* out, const View::ViewBase<TDATA> buffer,
    const View::ViewBase<int> recvCountsView,
-   const View::View<int, View::dense2D> recvDisplsView,
+   const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView);
 
 } // namespace Cuda
