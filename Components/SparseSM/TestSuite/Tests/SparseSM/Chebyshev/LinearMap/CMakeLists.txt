@@ -66,6 +66,20 @@ foreach(_test ${_tests})
 endforeach()
 
 set(_tests
+  I3Y3:sparse
+  I3Y4:sparse
+  I3Y4D1:sparse
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1 10 11
+    ULP 25
+  )
+endforeach()
+
+set(_tests
   I2Y2SphLapl:sparse
   I2Y3SphLapl:sparse
   I2Y4SphLapl:sparse
@@ -76,6 +90,18 @@ foreach(_test ${_tests})
     KEYWORD Operator:type
     IDS 0 1
     ULP 11
+  )
+endforeach()
+
+set(_tests
+  I3Y4SphLapl:sparse
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1
+    ULP 25
   )
 endforeach()
 

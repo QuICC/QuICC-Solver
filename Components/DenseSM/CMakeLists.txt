@@ -7,6 +7,9 @@ message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_
 # Set library sources visibility
 set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
 
+# Setup wigxjpf library
+include(cmake.d/setup/ExternalWigxjpf.cmake)
+
 # Create component library
 add_library(${QUICC_CURRENT_COMPONENT_LIB} "")
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB} PROPERTIES LINKER_LANGUAGE CXX)
@@ -15,16 +18,10 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
-    "/usr/local/install/wigxjpf/inc"
 )
 
 # Add source directory
 add_subdirectory(DenseSM)
-
-target_link_directories(${QUICC_CURRENT_COMPONENT_LIB}
-  PUBLIC
-  "/usr/local/install/wigxjpf/lib"
-)
 
 # Dependencies
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
@@ -34,7 +31,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   QuICC::Transform
   ${QUICC_SPARSESM_COMPONENT_LIB}
   ${QUICC_PYQUICC_COMPONENT_LIB}
-  wigxjpf
+  QuICC::ThirdParty::Wigxjpf
 )
 
 # Alias

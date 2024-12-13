@@ -50,12 +50,33 @@ namespace LinearMap {
           */
          Scalar_t l() const;
 
+         /**
+          * @brief Templated power function l^p
+          */
+         template <int P> Scalar_t l() const;
+
       private:
          /**
           * @brief Harmonic degree l
           */
          Scalar_t mL;
    };
+
+   template <int P> ISphericalOperator::Scalar_t ISphericalOperator::l() const
+   {
+      if constexpr(P == 1)
+      {
+         return this->mL;
+      }
+      else if constexpr(P == 2)
+      {
+         return this->mL*this->mL;
+      }
+      else
+      {
+         return Internal::Math::pow(this->mL, P);
+      }
+   }
 
 } // LinearMap
 } // Chebyshev

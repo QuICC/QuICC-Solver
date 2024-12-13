@@ -1,10 +1,10 @@
 /**
- * @file I2Y4SphLapl.hpp
- * @brief Implementation of the I^2 Y^4 spherical laplacian sparse operator, with y = ax + b
+ * @file I3Y4SphLapl.hpp
+ * @brief Implementation of the I^3 Y^4 spherical laplacian sparse operator, with y = ax + b
  */
 
-#ifndef QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_I2Y4SPHLAPL_HPP
-#define QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_I2Y4SPHLAPL_HPP
+#ifndef QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_I3Y4SPHLAPL_HPP
+#define QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_I3Y4SPHLAPL_HPP
 
 // System includes
 //
@@ -23,9 +23,9 @@ namespace Chebyshev {
 namespace LinearMap {
 
    /**
-    * @brief Implementation of the I^2 Y^4 spherical laplacian sparse operator, with y = ax + b
+    * @brief Implementation of the I^3 Y^4 spherical laplacian sparse operator, with y = ax + b
     */
-   class I2Y4SphLapl: public ISphericalOperator
+   class I3Y4SphLapl: public ISphericalOperator
    {
       public:
          /**
@@ -37,16 +37,23 @@ namespace LinearMap {
           * @param upper   Upper bound
           * @param l       Harmonic degree l
           */
-         I2Y4SphLapl(const int rows, const int cols, const Scalar_t lower, const Scalar_t upper, const Scalar_t l);
+         I3Y4SphLapl(const int rows, const int cols, const Scalar_t lower, const Scalar_t upper, const Scalar_t l);
 
          /**
           * @brief Destructor
           */
-         virtual ~I2Y4SphLapl() = default;
+         virtual ~I3Y4SphLapl() = default;
 
       protected:
 
       private:
+         /**
+          * @brief 5th subdiagonal
+          *
+          * @param n mode indexes
+          */
+         ACoeff_t d_5(const ACoeff_t& n) const;
+
          /**
           * @brief 4th subdiagonal
           *
@@ -111,6 +118,13 @@ namespace LinearMap {
          ACoeff_t d4(const ACoeff_t& n) const;
 
          /**
+          * @brief 5th superdiagonal
+          *
+          * @param n mode indexes
+          */
+         ACoeff_t d5(const ACoeff_t& n) const;
+
+         /**
           * @brief Build triplet representation of matrix
           *
           * @param[out] list containing triplets
@@ -123,4 +137,4 @@ namespace LinearMap {
 } // SparseSM
 } // QuICC
 
-#endif // QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_I2Y4SPHLAPL_HPP
+#endif // QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_I3Y4SPHLAPL_HPP

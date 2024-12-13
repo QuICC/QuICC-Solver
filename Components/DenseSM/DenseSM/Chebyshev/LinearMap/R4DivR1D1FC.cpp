@@ -37,7 +37,7 @@ void R4DivR1D1FC::buildOpImpl(Internal::Matrix& mat, const int rows,
    typedef cheb::Integrator::P::SetupType SetupType;
 
    const auto pId = GridPurpose::SIMULATION;
-   int rN = 2*this->cols();
+   int rN = 2*(std::max(this->rows(), this->cols()) + this->mpF->nN() + 4 + 2);
 
    // Compute grid
    Internal::Array igrid, iweights;

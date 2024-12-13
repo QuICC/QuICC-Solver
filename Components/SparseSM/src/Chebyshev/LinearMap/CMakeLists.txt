@@ -18,6 +18,10 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I2Y4D1.cpp
   I2Y4SphLapl.cpp
   I3.cpp
+  I3Y3.cpp
+  I3Y4.cpp
+  I3Y4D1.cpp
+  I3Y4SphLapl.cpp
   I4.cpp
   I4D1.cpp
   I4Lapl.cpp
