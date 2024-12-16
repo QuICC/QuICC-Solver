@@ -25,6 +25,181 @@ using namespace QuICC::Memory;
 using namespace QuICC::View;
 using namespace QuICC::TestSuite;
 
+TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D201JIKCuda")
+{
+   int rank, ranks;
+   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
+
+   assert(ranks == 1 || ranks == 4);
+
+   // AL out -> JW in
+   // Full data and type
+   constexpr size_t M = 4;
+   constexpr size_t N = 2;
+   constexpr size_t K = 3;
+
+   // view
+   constexpr std::uint32_t vRank = 3;
+   std::array<std::uint32_t, vRank> dimensionsIn{M, N, K};
+   std::array<std::uint32_t, vRank> dimensionsOut{N, K, M};
+
+   std::vector<double> dataIn;
+   std::vector<double> dataOut;
+   std::vector<double> dataOutRef;
+   ptrAndIdx metaIn;
+   ptrAndIdx metaOut;
+
+   using inTy = S1CLCSC3DJIK;
+   using outTy = DCCSC3DJIK;
+
+   if (rank == 0 && ranks == 1)
+   {
+      dataIn = {
+         /*k0*/ 1, 5,
+         /*k0*/ 2, 6,
+         /*k0*/ 3, 7,
+         /*k0*/ 4, 8,
+         /*k1*/ 9, 12,
+         /*k1*/ 10, 13,
+         /*k1*/ 11, 14,
+         /*k2*/ 15, 17,
+         /*k2*/ 16, 18
+      };
+
+      // perm = [2 0 1] -> N K M
+      dataOutRef = {
+         /*m0*/ 1,
+         /*m0*/ 5,
+         /*m1*/ 2, 9,
+         /*m1*/ 6, 12,
+         /*m2*/ 3, 10, 15,
+         /*m2*/ 7, 13, 17,
+         /*m3*/ 4, 11, 16,
+         /*m3*/ 8, 14, 18
+      };
+
+      // Populate meta for fully populated tensor
+      // AL space (Stage::PPM and Stage::MPM)
+      metaIn = Index::densePtrAndIdx<inTy>(dimensionsIn);
+      // Populate meta for fully populated tensor
+      // Spectral(JW) space (Stage::PMM and Stage::MMM)
+      metaOut = Index::densePtrAndIdxStep1<outTy>(dimensionsOut);
+      dataOut.resize(dataOutRef.size());
+   }
+   else if (ranks == 4)
+   {
+      std::string path = "_refdata/Framework/LoadSplitter/WLFl/";
+      std::string dist = "Tubular";
+      std::string id = "103";
+      auto setup = readDimsAndMeta(path, dist, id);
+
+      dimensionsIn = {setup.modsDims[1], setup.physDims[0], setup.modsDims[2]};
+      dimensionsOut = {setup.physDims[0], setup.modsDims[2], setup.modsDims[1]};
+
+      metaIn.ptr = setup.metaAL.ptr;
+      metaIn.idx = setup.metaAL.idx;
+      auto sizeIn = getDataSize<inTy>(dimensionsIn, metaIn);
+      dataIn.resize(sizeIn);
+      // perm = [2 0 1] MLN -> LNM
+      metaOut.ptr = setup.metaJW.ptr;
+      metaOut.idx = setup.metaJW.idx;
+      auto sizeOut = getDataSize<outTy>(dimensionsOut, metaOut);
+      dataOut.resize(sizeOut);
+      dataOutRef.resize(sizeOut);
+   }
+
+   // Set meta
+   std::array<std::vector<std::uint32_t>, vRank> pointersIn = {
+      {{}, metaIn.ptr, {}}};
+   std::array<std::vector<std::uint32_t>, vRank> indicesIn = {
+      {{}, metaIn.idx, {}}};
+   std::array<std::vector<std::uint32_t>, vRank> pointersOut = {
+      {{}, metaOut.ptr, {}}};
+   std::array<std::vector<std::uint32_t>, vRank> indicesOut = {
+      {{}, metaOut.idx, {}}};
+
+   View<double, inTy> viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
+   View<double, outTy> viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
+
+   // Setup ref data and input data
+   using namespace QuICC::Transpose::Mpi;
+   using namespace QuICC::Transpose;
+
+   if (ranks > 1)
+   {
+      auto cooOld = ::QuICC::View::getCoo<View<double, inTy>, p012_t>(viewIn);
+      double shift = 2048;
+      for (std::size_t i = 0; i < cooOld.size(); ++i)
+      {
+         dataIn[i] = cooOld[i][0] + cooOld[i][1] * shift + cooOld[i][2] / shift;
+      }
+      auto cooNew = ::QuICC::View::getCoo<View<double, outTy>, p201_t>(viewOut);
+      for (std::size_t i = 0; i < cooNew.size(); ++i)
+      {
+         dataOutRef[i] =
+            cooNew[i][0] + cooNew[i][1] * shift + cooNew[i][2] / shift;
+      }
+   }
+
+   // device mem
+   auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
+   QuICC::Memory::MemBlock<double> memBlockIn(dataIn.size(), memDev.get());
+   QuICC::Memory::MemBlock<double> memBlockOut(dataOut.size(), memDev.get());
+
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrIn(pointersIn[1].size(), memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxIn(indicesIn[1].size(), memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrOut(pointersOut[1].size(), memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxOut(indicesOut[1].size(), memDev.get());
+
+   // set device pointers and indices
+   constexpr std::uint32_t dims = 3;
+   ViewBase<std::uint32_t> pointersInDev[dims];
+   ViewBase<std::uint32_t> indicesInDev[dims];
+   ViewBase<std::uint32_t> pointersOutDev[dims];
+   ViewBase<std::uint32_t> indicesOutDev[dims];
+
+   pointersInDev[1] = ViewBase<std::uint32_t>(memBlockPtrIn.data(), memBlockPtrIn.size());
+   indicesInDev[1] = ViewBase<std::uint32_t>(memBlockIdxIn.data(), memBlockIdxIn.size());
+   pointersOutDev[1] = ViewBase<std::uint32_t>(memBlockPtrOut.data(), memBlockPtrOut.size());
+   indicesOutDev[1] = ViewBase<std::uint32_t>(memBlockIdxOut.data(), memBlockIdxOut.size());
+
+   // set device views
+   View<double, inTy> viewInDev(memBlockIn.data(), memBlockIn.size(),
+      dimensionsIn.data(), pointersInDev, indicesInDev);
+   View<double, outTy> viewOutDev(memBlockOut.data(), memBlockOut.size(),
+      dimensionsOut.data(), pointersOutDev, indicesOutDev);
+
+   // cpu -> gpu
+   cudaErrChk(cudaMemcpy(viewInDev.data(), viewIn.data(), viewIn.size() * sizeof(double),
+      cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(pointersInDev[1].data(), pointersIn[1].data(), pointersIn[1].size() * sizeof(std::uint32_t),
+      cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(indicesInDev[1].data(), indicesIn[1].data(), indicesIn[1].size() * sizeof(std::uint32_t),
+      cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(pointersOutDev[1].data(), pointersOut[1].data(), pointersOut[1].size() * sizeof(std::uint32_t),
+      cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(indicesOutDev[1].data(), indicesOut[1].data(), indicesOut[1].size() * sizeof(std::uint32_t),
+      cudaMemcpyHostToDevice));
+
+   // Transpose op
+   auto comm = std::make_shared<Comm<double>>(memDev);
+   auto transposeOp =
+      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>(
+         comm);
+
+   transposeOp->apply(viewOutDev, viewInDev);
+
+    // gpu -> cpu
+   cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(),
+      viewOut.size() * sizeof(double), cudaMemcpyDeviceToHost));
+
+   // check
+   for (std::uint64_t s = 0; s < dataOutRef.size(); ++s)
+   {
+      CHECK(dataOut[s] == dataOutRef[s]);
+   }
+}
 
 TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJIK120Cuda")
 {
@@ -127,6 +302,26 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
    View<double, inTy> viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
    View<double, outTy> viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
 
+   // Setup ref data and input data
+   using namespace QuICC::Transpose::Mpi;
+   using namespace QuICC::Transpose;
+
+   if (ranks > 1)
+   {
+      auto cooOld = ::QuICC::View::getCoo<View<double, inTy>, p012_t>(viewIn);
+      double shift = 2048;
+      for (std::size_t i = 0; i < cooOld.size(); ++i)
+      {
+         dataIn[i] = cooOld[i][0] + cooOld[i][1] * shift + cooOld[i][2] / shift;
+      }
+      auto cooNew = ::QuICC::View::getCoo<View<double, outTy>, p120_t>(viewOut);
+      for (std::size_t i = 0; i < cooNew.size(); ++i)
+      {
+         dataOutRef[i] =
+            cooNew[i][0] + cooNew[i][1] * shift + cooNew[i][2] / shift;
+      }
+   }
+
    // device mem
    auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
    QuICC::Memory::MemBlock<double> memBlockIn(dataIn.size(), memDev.get());
@@ -168,8 +363,6 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
       cudaMemcpyHostToDevice));
 
    // Transpose op
-   using namespace QuICC::Transpose::Mpi;
-   using namespace QuICC::Transpose;
 
    auto comm = std::make_shared<Comm<double>>(memDev);
    auto transposeOp =
