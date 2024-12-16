@@ -343,9 +343,10 @@ void MarginalCurve::mainRun()
 
       // Print eigenvalues
       std::ofstream logger("evs.log");
+      unsigned int prec = (std::numeric_limits<MHDFloat>::digits10 * 3) / 4 + 1;
       for (auto&& e: evs)
       {
-         logger << std::setprecision(14) << e << std::endl;
+         logger << std::setprecision(prec) << e << std::endl;
       }
 
       for (std::size_t i = 0; i < efs.size(); i++)
