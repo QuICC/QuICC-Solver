@@ -989,10 +989,26 @@ TEST_CASE("Mpi DCCSC3D to S1CLCSC3D 120", "MpiDCCSC3DtoS1CLCSC3D120")
    View<double, inTy> viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
    View<double, outTy> viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
 
-   // Transpose op
+   // Setup ref data and input data
    using namespace QuICC::Transpose::Mpi;
    using namespace QuICC::Transpose;
+   if (ranks > 1)
+   {
+      auto cooOld = ::QuICC::View::getCoo<View<double, inTy>, p012_t>(viewIn);
+      double shift = 2048;
+      for (std::size_t i = 0; i < cooOld.size(); ++i)
+      {
+         dataIn[i] = cooOld[i][0] + cooOld[i][1] * shift + cooOld[i][2] / shift;
+      }
+      auto cooNew = ::QuICC::View::getCoo<View<double, outTy>, p120_t>(viewOut);
+      for (std::size_t i = 0; i < cooNew.size(); ++i)
+      {
+         dataOutRef[i] =
+            cooNew[i][0] + cooNew[i][1] * shift + cooNew[i][2] / shift;
+      }
+   }
 
+   // Transpose op
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
    auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
@@ -1109,10 +1125,27 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120", "MpiDCCSC3DJIKtoS1CLCSC3DJIK120"
    View<double, inTy> viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
    View<double, outTy> viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
 
-   // Transpose op
+
+   // Setup ref data and input data
    using namespace QuICC::Transpose::Mpi;
    using namespace QuICC::Transpose;
+   if (ranks > 1)
+   {
+      auto cooOld = ::QuICC::View::getCoo<View<double, inTy>, p012_t>(viewIn);
+      double shift = 2048;
+      for (std::size_t i = 0; i < cooOld.size(); ++i)
+      {
+         dataIn[i] = cooOld[i][0] + cooOld[i][1] * shift + cooOld[i][2] / shift;
+      }
+      auto cooNew = ::QuICC::View::getCoo<View<double, outTy>, p120_t>(viewOut);
+      for (std::size_t i = 0; i < cooNew.size(); ++i)
+      {
+         dataOutRef[i] =
+            cooNew[i][0] + cooNew[i][1] * shift + cooNew[i][2] / shift;
+      }
+   }
 
+   // Transpose op
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
    auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
