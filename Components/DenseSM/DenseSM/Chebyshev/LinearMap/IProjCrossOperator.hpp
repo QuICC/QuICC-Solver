@@ -38,8 +38,8 @@ public:
     * @param mA      harmonic degree of f
     * @param lB     Input harmonic degree
     * @param mB     Input harmonic degree
-    * @param lower   Lower boundar
-    * @param upper   Upper boundar
+    * @param lower   Lower boundary
+    * @param upper   Upper boundary
     */
    IProjCrossOperator(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, const Scalar_t lower,
       const Scalar_t upper);
