@@ -42,6 +42,11 @@ public:
    int nN() const final;
 
    /**
+    * @brief Nonzero harmonic degrees
+    */
+   std::vector<int> ls() const final;
+
+   /**
     * @brief Evaluate on radial grid
     */
    Internal::Array evaluate(const Internal::Array& r, const int l, const int m) const final;
