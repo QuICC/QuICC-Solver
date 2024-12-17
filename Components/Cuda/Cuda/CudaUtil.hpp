@@ -9,7 +9,7 @@
 //
 #include <stdexcept>
 #include <cuda_runtime_api.h>
-	
+
 
 // Project includes
 //
@@ -32,7 +32,7 @@ inline void cudaAssert(cudaError_t cErr, const char *file, int line)
 {
     if (cErr)
     {
-        constexpr unsigned int size = 140;
+        constexpr unsigned int size = 200;
         char msg [size];
         snprintf(msg, size,
           "cudaAssert: %s: %s:%d\n", cudaGetErrorString(cErr), file, line);

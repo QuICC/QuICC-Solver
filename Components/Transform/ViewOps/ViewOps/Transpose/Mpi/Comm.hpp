@@ -337,7 +337,7 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
 
             // Copy to device
             _sendDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
-            _recvDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
+            _recvDisplsDevice = std::move(Memory::MemBlock<int>(recvDisplsLin.size(), _mem.get()));
             std::array<std::uint32_t, 2> sendDim {static_cast<std::uint32_t>(_nSubComm), sendCountsMax};
             _sendDisplsView =  View::View<int, View::dense2DRM>({_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
             std::array<std::uint32_t, 2> recvDim {static_cast<std::uint32_t>(_nSubComm), recvCountsMax};
