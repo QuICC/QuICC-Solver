@@ -2,6 +2,7 @@
  * @file LinearStability.cpp
  * @brief Source of the high level simulation
  */
+#define QUICC_OUTPUT_STABILITY_MATRICES
 
 // System includes
 //
@@ -9,9 +10,9 @@
 #include <limits>
 
 #include "QuICC/Equations/EquationParameters.hpp"
-#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+#if defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
 #include <unsupported/Eigen/SparseExtra>
-#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+#endif // defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
 
 // Project includes
 //
@@ -106,10 +107,10 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    DecoupledZSparse matT;
    this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
-#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+#if defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
    Eigen::saveMarket(matT.real(), "A_re.mtx");
    Eigen::saveMarket(matT.imag(), "A_im.mtx");
-#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+#endif // defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
    if (eqInfo.isComplex)
    {
       matA = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
@@ -124,10 +125,10 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    matT.setZero();
    this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
-#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+#if defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
    Eigen::saveMarket(matT.real(), "B_re.mtx");
    Eigen::saveMarket(matT.imag(), "B_im.mtx");
-#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+#endif // defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
    if (eqInfo.isComplex)
    {
       matB = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
@@ -149,10 +150,10 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
       matT.setZero();
       this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
          this->mBcs, nds);
-#ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+#if defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
       Eigen::saveMarket(matT.real(), "C_re.mtx");
       Eigen::saveMarket(matT.imag(), "C_im.mtx");
-#endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
+#endif // defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
       if (eqInfo.isComplex)
       {
          matC = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
