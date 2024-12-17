@@ -41,5 +41,6 @@ In addition to the parameters for the nonlinear simulations, the following param
     - 0: no additional sorting
     - 1: decreasing real part
 - stability_mode: computation mode for the solver:
-    - 0: solve GEVP with provided parameters and save eigenfunction(s)
-    - 1: compute critical Rayleigh number starting from provided initial guess
+    - 0: solve GEVP with provided parameters
+    - 1: solve GEVP with provided parameters and save eigenfunction(s)
+    - 2: compute critical Rayleigh number starting from provided initial guess

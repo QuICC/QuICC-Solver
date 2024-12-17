@@ -1,8 +1,5 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   ILinearMapOperator.cpp
-  DipolarS1.cpp
-  QuadrupolarS2.cpp
-  Gravity.cpp
   R2DivR1F.cpp
   R4DivR1F.cpp
   R4DivR1FC.cpp

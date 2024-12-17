@@ -40,8 +40,8 @@ public:
     * @param lIn     Input harmonic degree
     * @param mIn     Input harmonic degree
     * @param pF      Radial function pointer
-    * @param lower   Lower boundar
-    * @param upper   Upper boundar
+    * @param lower   Lower boundary
+    * @param upper   Upper boundary
     */
    ITripleHarmonicOperator(const int rows, const int cols, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
       const Scalar_t upper) : ILinearMapOperator(rows, cols, lower, upper), mLout(lOut), mMout(mOut), mLf(lF), mMf(mF), mLin(lIn), mMin(mIn), mpF(pF){};

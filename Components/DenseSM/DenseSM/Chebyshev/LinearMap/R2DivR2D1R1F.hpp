@@ -41,8 +41,8 @@ public:
     * @param mF      harmonic order of f
     * @param lIn     Input harmonic degree
     * @param mIn     Input harmonic order
-    * @param lower   Lower boundar
-    * @param upper   Upper boundar
+    * @param lower   Lower boundary
+    * @param upper   Upper boundary
     */
    R2DivR2D1R1F(const int rows, const int cols, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
       const Scalar_t upper);

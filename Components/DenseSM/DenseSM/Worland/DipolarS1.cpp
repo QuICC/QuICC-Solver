@@ -41,6 +41,13 @@ Internal::Array DipolarS1::evaluate(const Internal::Array& r, const int l, const
    return val;
 }
 
+std::vector<int> DipolarS1::ls() const
+{
+   std::vector<int> l = {1};
+
+   return l;
+}
+
 } // namespace Worland
 } // namespace DenseSM
 } // namespace QuICC

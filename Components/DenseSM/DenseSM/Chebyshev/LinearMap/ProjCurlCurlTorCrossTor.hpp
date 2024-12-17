@@ -44,8 +44,8 @@ public:
     * @param mB      harmonic order of B
     * @param pTorA   Toroidal A radial function
     * @param pTorB   Toroidal B radial function
-    * @param lower   Lower boundar
-    * @param upper   Upper boundar
+    * @param lower   Lower boundary
+    * @param upper   Upper boundary
     */
    ProjCurlCurlTorCrossTor(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pTorA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper);
 
