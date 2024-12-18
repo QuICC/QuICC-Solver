@@ -28,7 +28,6 @@ public:
    /**
     * @brief Constructor
     *
-    * @param idc     ID of critical parameter
     * @param eigs    Indexes of matrix to solve (eg. m for rotating spherical
     * setup)
     * @param spRes   Resolution
@@ -36,7 +35,7 @@ public:
     * @param bcMap   Boundary conditions
     * @param spModel Model backend
     */
-   LinearStability(const std::size_t idc, const std::vector<MHDFloat>& eigs,
+   LinearStability(const std::vector<MHDFloat>& eigs,
       SharedResolution spRes,
       const Equations::EquationParameters::NDMapType& params,
       const std::map<std::size_t, std::size_t>& bcMap,
@@ -46,6 +45,11 @@ public:
     * @brief Simple empty destructor
     */
    virtual ~LinearStability();
+
+   /**
+    * @brief Set ID of critical parameter
+    */
+   void setCriticalId(const std::size_t);
 
    /**
     * @brief Compute growth rate for given critical parameter value

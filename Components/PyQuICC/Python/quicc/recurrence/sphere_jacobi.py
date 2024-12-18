@@ -184,6 +184,30 @@ def i2lapl():
     # Print recurrence relation per diagonals
     showDiags(r, w_layout, name = "I2Lapl")
 
+def i3():
+    """Sphere i3 (i1r1i1r1i1r1) operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':3, 'p':0, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+
+    # Print recurrence relation per diagonals
+    showDiags(r, w_layout, name = "I3")
+
+def i3lapl():
+    """Sphere i3lapl (i1r1i1r1i1r1 lapl) operator"""
+
+    # Setup terms in recurrence
+    terms = [
+            {'q':3, 'p':1, 'd':2, 'c':8},
+            {'q':3, 'p':0, 'd':2, 'c':8},
+            {'q':3, 'p':0, 'd':1, 'c':4*(2*l + 3)}
+            ]
+    r = symbolic.build_recurrence(terms, {0:1})
+
+    # Print recurrence relation per diagonals
+    showDiags(r, w_layout, name = "I4Lapl")
+
 def i4():
     """Sphere i4 (i1r1i1r1i1r1i1r1) operator"""
 
