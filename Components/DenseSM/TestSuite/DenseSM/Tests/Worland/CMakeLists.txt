@@ -53,14 +53,14 @@ set(_tests
   DivR3D1R1FD1R1:dense
   )
 quicc_set_ulp(_ulp
-  ULP 500
-  MPULP 25
+  ULP 500 500 500 500
+  MPULP 25 25 25 25
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 0
+    IDS 0 1 10 11
     ULPS ${_ulp}
   )
 endforeach()

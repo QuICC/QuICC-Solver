@@ -14,7 +14,8 @@
 
 // Project includes
 //
-#include "DenseSM/Worland/DipolarS1.hpp"
+#include "TestSuite/DenseSM/Worland/DipolarS1.hpp"
+#include "TestSuite/DenseSM/Worland/QuadrupolarS2.hpp"
 #include "DenseSM/Worland/IWorlandOperator.hpp"
 #include "DenseSM/Worland/RadialTorPolFunction.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
@@ -135,7 +136,15 @@ namespace Worland {
          std::shared_ptr<dsm::RadialTorPolFunction> pF;
          if (fId == 0)
          {
-            pF = std::make_shared<dsm::DipolarS1>();
+            pF = std::make_shared<DipolarS1>();
+         }
+         else if(fId == 1)
+         {
+            pF = std::make_shared<QuadrupolarS2>();
+         }
+         else
+         {
+            throw std::logic_error("Unknown forcing function");
          }
 
          TOp op(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, alpha, dBeta);

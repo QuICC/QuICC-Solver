@@ -42,7 +42,7 @@ void DivR1D1FC::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int lF = this->mpF->ls().at(0);
 
    namespace ev = Polynomial::Worland::Evaluator;
-   const int nR = (3*(2*this->rows() + std::max(this->mLin, this->mLout)))/2;
+   const int nR = (3*(2*this->rows() + std::max(this->mLin, this->mLout) + 2*this->mpF->nN() + this->mLf + 4))/2;
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, nR);
    

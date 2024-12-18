@@ -14,11 +14,12 @@
 
 // Project includes
 //
-#include "DenseSM/Chebyshev/LinearMap/DipolarS1.hpp"
 #include "DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "DenseSM/Chebyshev/LinearMap/ITripleHarmonicOperator.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
+#include "TestSuite/DenseSM/Chebyshev/LinearMap/DipolarS1.hpp"
+#include "TestSuite/DenseSM/Chebyshev/LinearMap/QuadrupolarS2.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
 #include "QuICC/Bc/Name/FixedFlux.hpp"
 #include "QuICC/Bc/Name/Insulating.hpp"
@@ -137,7 +138,15 @@ namespace LinearMap {
          std::shared_ptr<dsm::RadialTorPolFunction> pF;
          if (fId == 0)
          {
-            pF = std::make_shared<dsm::DipolarS1>();
+            pF = std::make_shared<DipolarS1>();
+         }
+         else if (fId == 1)
+         {
+            pF = std::make_shared<QuadrupolarS2>();
+         }
+         else
+         {
+            throw std::logic_error("Unknown forcing function ID");
          }
 
          TOp op(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, lb, ub);
