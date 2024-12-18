@@ -43,7 +43,7 @@ void R2DivR2FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    this->computeQuadrature(igrid, iweights, rN);
 
    auto sBwd = std::make_shared<SetupType>(rN, this->cols(), this->cols(), pId);
-   sBwd->setBounds(this->mcLower, this->mcUpper);
+   sBwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sBwd->lock();
    cheb::Projector::D1Y1 TBwd;
    TBwd.init(sBwd);
@@ -54,10 +54,10 @@ void R2DivR2FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
 
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
 
-   tmpB = f.asDiagonal() * tmpB;
+   tmpB = f.cast<MHDFloat>().asDiagonal() * tmpB;
 
    auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
-   sFwd->setBounds(this->mcLower, this->mcUpper);
+   sFwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sFwd->lock();
    cheb::Integrator::P TFwd;
    TFwd.init(sFwd);

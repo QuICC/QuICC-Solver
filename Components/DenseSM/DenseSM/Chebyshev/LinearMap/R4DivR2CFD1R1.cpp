@@ -44,7 +44,7 @@ void R4DivR2CFD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    this->computeQuadrature(igrid, iweights, rN);
 
    auto sBwd = std::make_shared<SetupType>(rN, this->cols(), this->cols(), pId);
-   sBwd->setBounds(this->mcLower, this->mcUpper);
+   sBwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sBwd->lock();
    cheb::Projector::P TBwd;
    TBwd.init(sBwd);
@@ -59,10 +59,10 @@ void R4DivR2CFD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    Matrix td1B = Matrix::Zero(rN,this->cols());
    TD1Bwd.transform(td1B, tA);
 
-   Matrix f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
+   Matrix f = this->mpF->evaluate(igrid, this->mLf, this->mMf).cast<MHDFloat>();
 
    auto sFFwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
-   sFFwd->setBounds(this->mcLower, this->mcUpper);
+   sFFwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sFFwd->lock();
    cheb::Integrator::P TFFwd;
    TFFwd.init(sFFwd);
@@ -71,7 +71,7 @@ void R4DivR2CFD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    TFFwd.transform(sf, f);
 
    auto sFBwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
-   sFBwd->setBounds(this->mcLower, this->mcUpper);
+   sFBwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sFBwd->lock();
    cheb::Projector::D<1> TFd1Bwd;
    TFd1Bwd.init(sFBwd);
@@ -88,10 +88,10 @@ void R4DivR2CFD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int l = this->mLf;
    const Internal::Array& r = igrid;
 
-   tA = -((-f.array()*l*(1+l)+r.array()*(2.0*d1f.array()+d2f.array()*r.array())).matrix().asDiagonal()*(tB+r.asDiagonal()*td1B));
+   tA = -((-f.array()*l*(1+l)+r.cast<MHDFloat>().array()*(2.0*d1f.array()+d2f.array()*r.cast<MHDFloat>().array())).matrix().asDiagonal()*(tB+r.cast<MHDFloat>().asDiagonal()*td1B));
 
    auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
-   sFwd->setBounds(this->mcLower, this->mcUpper);
+   sFwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sFwd->lock();
    cheb::Integrator::P TFwd;
    TFwd.init(sFwd);
