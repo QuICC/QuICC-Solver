@@ -40,6 +40,8 @@ set(_tests
   I2:Chebyshev:sparse
   I2Lapl:Chebyshev:sparse
   I2Qp:Chebyshev:sparse
+  I3:Chebyshev:sparse
+  I3Lapl:Chebyshev:sparse
   I4:Chebyshev:sparse
   I4Lapl:Chebyshev:sparse
   I4Lapl2:Chebyshev:sparse
@@ -49,11 +51,15 @@ set(_tests
   I2:SphEnergy:sparse
   I2Lapl:SphEnergy:sparse
   I2Qp:SphEnergy:sparse
+  I3:SphEnergy:sparse
+  I3Lapl:SphEnergy:sparse
   I4:SphEnergy:sparse
   I4Lapl:SphEnergy:sparse
   I4Lapl2:SphEnergy:sparse
   I4Qp:SphEnergy:sparse
   I6:SphEnergy:sparse
+  I3:Legendre:sparse
+  I3:CylEnergy:sparse
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
