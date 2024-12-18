@@ -32,8 +32,8 @@ namespace Quadrature {
       Internal::Array jweights(jsize);
       LegendreRule::computeQuadrature(jgrid, jweights, jsize);
 
-      igrid = (jgrid.array() + MHD_MP(1.0))/MHD_MP(2.0);
-      iweights.array() = jweights.array()*igrid.array()/MHD_MP(2.0);
+      igrid = ((jgrid.array() + MHD_MP(1.0))/MHD_MP(2.0)).sqrt();
+      iweights.array() = jweights.array()/MHD_MP(4.0);
    }
 
 }
