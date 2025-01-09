@@ -14,6 +14,7 @@ set(_tests
   DivY1:projector
   DivY2:projector
   D1Y1:projector
+  D2Y1:projector
   DivY1D1Y1:projector
   SphRadLapl:projector
   )
