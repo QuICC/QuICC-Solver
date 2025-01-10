@@ -8,15 +8,18 @@
 
 // Project includes
 //
-#include "DenseSM/Worland/DipolarS1.hpp"
+#include "TestSuite/DenseSM/Worland/DipolarS1.hpp"
 #include "Types/Internal/Math.hpp"
 #include "Types/Internal/Literals.hpp"
 
 namespace QuICC {
 
+namespace TestSuite {
+
 namespace DenseSM {
 
 namespace Worland {
+
 
 int DipolarS1::nN() const
 {
@@ -48,6 +51,7 @@ std::vector<int> DipolarS1::ls() const
    return l;
 }
 
-} // namespace Worland
-} // namespace DenseSM
+} // Worland
+} // DenseSM
+} // TestSuite
 } // namespace QuICC

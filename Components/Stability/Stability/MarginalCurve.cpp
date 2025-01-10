@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <boost/math/tools/roots.hpp>
 #include <iostream>
+#include <limits>
 
 // Project includes
 //
@@ -19,7 +20,6 @@
 #include "QuICC/Io/Variable/StateFileWriter.hpp"
 #include "QuICC/NonDimensional/Nev.hpp"
 #include "QuICC/NonDimensional/Rayleigh.hpp"
-#include "QuICC/NonDimensional/Lundquist.hpp"
 #include "QuICC/NonDimensional/StabilityMode.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
@@ -308,11 +308,7 @@ void MarginalCurve::mainRun()
       throw std::logic_error("3D spectral matrix not setup");
    }
 
-   //auto idc = NonDimensional::Rayleigh::id();
-   auto idc = NonDimensional::Lundquist::id();
-   auto name = NonDimensional::Coordinator::tag(idc);
-
-   auto spLinStab = std::make_shared<LinearStability>(idc, eigs, this->mspRes,
+   auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
       this->mspEqParams->map(), this->createBoundary()->map(),
       this->mspBackend);
 
@@ -338,8 +334,8 @@ void MarginalCurve::mainRun()
       {
          efs.resize(nev);
       }
-      auto vc = this->mspEqParams->nd(idc);
-      spLinStab->eigenpairs(evs, efs, nev, vc);
+      // Last argument is not used
+      spLinStab->eigenpairs(evs, efs, nev, std::numeric_limits<MHDFloat>::max());
 
       // Print eigenvalues
       std::ofstream logger("evs.log");
@@ -366,6 +362,10 @@ void MarginalCurve::mainRun()
    // Find critical parameter
    else
    {
+      auto idc = NonDimensional::Rayleigh::id();
+      auto name = NonDimensional::Coordinator::tag(idc);
+      spLinStab->setCriticalId(idc);
+
       MHDFloat guess = this->mspEqParams->nd(idc);
       MHDFloat factor = 1.1; // To multiply
       int digits =

@@ -3,27 +3,31 @@
  * @brief Implementation of the quadrupolar S2 field
  */
 
-#ifndef QUICC_DENSESM_WORLAND_QUADRUPOLARS2_HPP
-#define QUICC_DENSESM_WORLAND_QUADRUPOLARS2_HPP
+#ifndef QUICC_TESTSUITE_DENSESM_CHEBYSHEV_LINEARMAP_QUADRUPOLARS2_HPP
+#define QUICC_TESTSUITE_DENSESM_CHEBYSHEV_LINEARMAP_QUADRUPOLARS2_HPP
 
 // System includes
 //
 
 // Project includes
 //
-#include "DenseSM/Worland/RadialTorPolFunction.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
+namespace TestSuite {
+
 namespace DenseSM {
 
-namespace Worland {
+namespace Chebyshev {
+
+namespace LinearMap {
 
 /**
  * @brief Implementation of the quadrupolar S2 field
  */
-class QuadrupolarS2: public RadialTorPolFunction
+class QuadrupolarS2: public QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction
 {
 public:
    /**
@@ -56,8 +60,10 @@ protected:
 private:
 };
 
-} // namespace Worland
-} // namespace DenseSM
+}
+}
+}
+}
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_WORLAND_QUADRUPOLARS2_HPP
+#endif // QUICC_TESTSUITE_DENSESM_CHEBYSHEV_LINEARMAP_QUADRUPOLARS2_HPP

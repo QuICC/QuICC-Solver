@@ -53,7 +53,7 @@ MHDFloat IProjCrossOperator::gaunt(const int lA, const int mA, const int lB, con
     */
 
    val3jA = wig3jj(2* lA , 2* lB , 2* lG ,
-         2* mA, 2* mB , 2* mG);
+         2* mA, 2* mB , -2* mG);
 
    val3jB = wig3jj(2* lA , 2* lB , 2* lG ,
          0,  0, 0);
@@ -88,7 +88,7 @@ MHDFloat IProjCrossOperator::elsasser(const int lA, const int mA, const int lB, 
     */
 
    val3jA = wig3jj(2* lA , 2* lB , 2* lG ,
-         2* mA, 2* mB , 2* mG);
+         2* mA, 2* mB , -2* mG);
 
    val3jB = wig3jj(2* lA , 2* (lB + 1) , 2* lG ,
          0,  0, 0);

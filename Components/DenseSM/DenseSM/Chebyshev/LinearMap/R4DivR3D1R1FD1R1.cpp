@@ -44,7 +44,7 @@ void R4DivR3D1R1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    this->computeQuadrature(igrid, iweights, rN);
 
    auto sBwd = std::make_shared<SetupType>(rN, this->cols(), this->cols(), pId);
-   sBwd->setBounds(this->mcLower, this->mcUpper);
+   sBwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sBwd->lock();
    cheb::Projector::D1Y1 TBwd;
    TBwd.init(sBwd);
@@ -53,11 +53,11 @@ void R4DivR3D1R1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    Matrix tmpB = Matrix::Zero(rN, this->cols());
    TBwd.transform(tmpB, tmpA);
 
-   Matrix fA = this->mpF->evaluate(igrid, this->mLf, this->mMf);
+   Matrix fA = this->mpF->evaluate(igrid, this->mLf, this->mMf).cast<MHDFloat>();
    Matrix fB = Matrix::Zero(rN, 1);
 
    auto sFFwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
-   sFFwd->setBounds(this->mcLower, this->mcUpper);
+   sFFwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sFFwd->lock();
    cheb::Integrator::P TFFwd;
    TFFwd.init(sFFwd);
@@ -65,18 +65,18 @@ void R4DivR3D1R1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    TFFwd.transform(fB, fA);
 
    auto sFBwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
-   sFBwd->setBounds(this->mcLower, this->mcUpper);
+   sFBwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sFBwd->lock();
    cheb::Projector::D1Y1 TFBwd;
    TFBwd.init(sFBwd);
 
    TFBwd.transform(fA, fB);
-   fA = igrid.asDiagonal()*fA;
+   fA = igrid.cast<MHDFloat>().asDiagonal()*fA;
 
    tmpB = fA.asDiagonal() * tmpB;
 
    auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
-   sFwd->setBounds(this->mcLower, this->mcUpper);
+   sFwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sFwd->lock();
    cheb::Integrator::P TFwd;
    TFwd.init(sFwd);

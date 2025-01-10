@@ -48,6 +48,10 @@ set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo
     ${_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereDynamo} CACHE STRING "Model repository branch.")
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo
     ${_QUICC_MODEL_GIT_BRANCH_BoussinesqShellDynamo} CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereITO
+    ${_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereITO} CACHE STRING "Model repository branch.")
+set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellITO
+    ${_QUICC_MODEL_GIT_BRANCH_BoussinesqShellITO} CACHE STRING "Model repository branch.")
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC
     ${_QUICC_MODEL_GIT_BRANCH_BoussinesqSphereRTC} CACHE STRING "Model repository branch.")
 set(QUICC_MODEL_GIT_BRANCH_BoussinesqShellRTC

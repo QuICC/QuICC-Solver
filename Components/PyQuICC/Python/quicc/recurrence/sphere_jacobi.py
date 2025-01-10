@@ -184,6 +184,73 @@ def i2lapl():
     # Print recurrence relation per diagonals
     showDiags(r, w_layout, name = "I2Lapl")
 
+def i3():
+    """Sphere i3 (i1r1i1r1i1r1) operator"""
+
+    # Setup terms in recurrence
+    terms = [{'q':3, 'p':0, 'd':0, 'c':1}]
+    r = symbolic.build_recurrence(terms, {0:1})
+
+    # Print recurrence relation per diagonals
+    showDiags(r, w_layout, name = "I3")
+
+def i3lapl():
+    """Sphere i3lapl (i1r1i1r1i1r1 lapl) operator"""
+
+    # Setup terms in recurrence
+    terms = [
+            {'q':3, 'p':1, 'd':2, 'c':8},
+            {'q':3, 'p':0, 'd':2, 'c':8},
+            {'q':3, 'p':0, 'd':1, 'c':4*(2*l + 3)}
+            ]
+    r = symbolic.build_recurrence(terms, {0:1})
+
+    # Print recurrence relation per diagonals
+    showDiags(r, w_layout, name = "I4Lapl")
+
+def i3qm():
+    """Sphere i3qm (i1r1i1r1i1r1 coriolis Q(l-1)) operator"""
+
+    # Compute starting terms
+    fs = symbolic.spectral_increase({0:-4}, False)
+
+    # Setup terms in recurrence
+    terms = [
+            {'q':2, 'p':0, 'd':0, 'c':1},
+            ]
+    r = symbolic.build_recurrence(terms, fs)
+
+    # Print recurrence relation per diagonals
+    showDiags(r, w_layout, lshift = -1, name = "I3Qm")
+
+def i3qp():
+    """Sphere i3qp (i1r1i1r1i2r1 coriolis Q(l+1)) operator"""
+
+    above = mod.SymbolicJacobi(a = w_alpha, b = w_beta + 1)
+
+    # Setup terms in recurrence
+    terms = [
+            {'q':1, 'p':0, 'd':0, 'c':(2*l + 1)},
+            ]
+    tmp = above.build_recurrence(terms, {0:1}, False)
+    partA = symbolic.spectral_decrease(tmp, True)
+
+    # Compute starting terms
+    fs = symbolic.spectral_decrease({0:-(2*l-1)}, False)
+
+    # Setup terms in recurrence
+    terms = [
+            {'q':2, 'p':0, 'd':0, 'c':1},
+            ]
+    partB = symbolic.build_recurrence(terms, fs, True)
+    r = partA
+    for k,v in partB.items():
+        r[k] = r[k] + v
+        r[k] = r[k].simplify().factor()
+
+    # Print recurrence relation per diagonals
+    showDiags(r, w_layout, lshift = 1, name = "I2Qp")
+
 def i4():
     """Sphere i4 (i1r1i1r1i1r1i1r1) operator"""
 

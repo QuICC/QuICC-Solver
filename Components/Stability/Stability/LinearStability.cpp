@@ -62,14 +62,13 @@ bool sortDecreasingRealIdx(std::pair<MHDComplex, int> a,
 
 } // namespace internal
 
-LinearStability::LinearStability(const std::size_t idc,
-   const std::vector<MHDFloat>& eigs, SharedResolution spRes,
+LinearStability::LinearStability(const std::vector<MHDFloat>& eigs, SharedResolution spRes,
    const Equations::EquationParameters::NDMapType& params,
    const std::map<std::size_t, std::size_t>& bcs,
    std::shared_ptr<Model::IModelBackend> spModel) :
     mcUseMumps(true),
     mNeedInit(true),
-    mIdc(idc),
+    mIdc(0),
     mEigs(eigs),
     mspRes(spRes),
     mParams(params),
@@ -84,6 +83,11 @@ LinearStability::~LinearStability()
    PetscCallVoid(EPSDestroy(&this->mEps));
    PetscCallVoid(MatDestroy(&this->mA));
    PetscCallVoid(MatDestroy(&this->mB));
+}
+
+void LinearStability::setCriticalId(const std::size_t idc)
+{
+   this->mIdc = idc;
 }
 
 void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
@@ -174,9 +178,12 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
 
 std::pair<int, int> LinearStability::setupGEVP(const MHDFloat vc)
 {
-   // Update critical parameter
-   this->mParams[this->mIdc] = std::make_shared<NonDimensional::INumber>(vc,
-      this->mParams[this->mIdc]->tag());
+   if(this->mIdc != 0)
+   {
+      // Update critical parameter
+      this->mParams[this->mIdc] = std::make_shared<NonDimensional::INumber>(vc,
+         this->mParams[this->mIdc]->tag());
+   }
 
    SparseMatrixZ matA;
    SparseMatrixZ matB;

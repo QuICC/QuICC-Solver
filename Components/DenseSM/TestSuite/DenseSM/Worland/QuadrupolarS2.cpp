@@ -8,11 +8,13 @@
 
 // Project includes
 //
-#include "DenseSM/Worland/QuadrupolarS2.hpp"
+#include "TestSuite/DenseSM/Worland/QuadrupolarS2.hpp"
 #include "Types/Internal/Math.hpp"
 #include "Types/Internal/Literals.hpp"
 
 namespace QuICC {
+
+namespace TestSuite {
 
 namespace DenseSM {
 
@@ -48,6 +50,7 @@ std::vector<int> QuadrupolarS2::ls() const
    return l;
 }
 
-} // namespace Worland
-} // namespace DenseSM
+} // Worland
+} // DenseSM
+} // TestSuite
 } // namespace QuICC

@@ -1,10 +1,10 @@
 /**
- * @file DipolarS1.hpp
- * @brief Implementation of the dipolar S1 field
+ * @file QuadrupolarS2.hpp
+ * @brief Implementation of the quadrupolar S2 field
  */
 
-#ifndef QUICC_DENSESM_WORLAND_DIPOLARS1_HPP
-#define QUICC_DENSESM_WORLAND_DIPOLARS1_HPP
+#ifndef QUICC_TESTSUITE_DENSESM_WORLAND_QUADRUPOLARS2_HPP
+#define QUICC_TESTSUITE_DENSESM_WORLAND_QUADRUPOLARS2_HPP
 
 // System includes
 //
@@ -16,25 +16,27 @@
 
 namespace QuICC {
 
+namespace TestSuite {
+
 namespace DenseSM {
 
 namespace Worland {
 
 /**
- * @brief Implementation of the dipolar S1 field
+ * @brief Implementation of the quadrupolar S2 field
  */
-class DipolarS1: public RadialTorPolFunction
+class QuadrupolarS2: public QuICC::DenseSM::Worland::RadialTorPolFunction
 {
 public:
    /**
     * @brief Constructor
     */
-   DipolarS1() = default;
+   QuadrupolarS2() = default;
 
    /**
     * @brief Destructor
     */
-   virtual ~DipolarS1() = default;
+   virtual ~QuadrupolarS2() = default;
 
    /**
     * @brief Spectral truncation
@@ -56,8 +58,9 @@ protected:
 private:
 };
 
-} // namespace Worland
-} // namespace DenseSM
+} // Worland
+} // DenseSM
+} // TestSuite
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_WORLAND_DIPOLARS1_HPP
+#endif // QUICC_TESTSUITE_DENSESM_WORLAND_QUADRUPOLARS2_HPP

@@ -42,7 +42,7 @@ void DivR1D1CF::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int lF = this->mpF->ls().at(0);
 
    namespace ev = Polynomial::Worland::Evaluator;
-   const int nR = (3*(2*this->rows() + std::max(this->mLin, this->mLout)))/2;
+   const int nR = (3*(2*this->rows() + std::max(this->mLin, this->mLout) + 2*this->mpF->nN() + this->mLf + 4))/2;
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, nR);
    
@@ -66,7 +66,7 @@ void DivR1D1CF::buildOpImpl(Internal::Matrix& mat, const int rows,
    Polynomial::Worland::slaplWnl slaplW;
    Internal::Matrix opCBwd(igrid.size(), this->mpF->nN());
    slaplW.compute<Internal::MHDFloat>(opCBwd, opCBwd.cols(), lF, igrid, Internal::Array(), ev::Set());
-   Array cf = -(opCBwd * (opCFwd.transpose() * f));
+   Internal::Array cf = -(opCBwd * (opCFwd.transpose() * f));
 
    mat = opFwd.transpose() * opFBwd *  opFFwd.transpose() * (cf.asDiagonal() * opBwd);
 }
