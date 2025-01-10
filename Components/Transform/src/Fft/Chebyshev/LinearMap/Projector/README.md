@@ -23,17 +23,17 @@ $$
 w = \texttt{D2Y1} \cdot v.
 $$
 
-So, how de we add a new operator?
 
+# Adding a new operator
 The procedure to follow to define and test a new operator is:
 
 1. Implement new operator (for example copying an existing operator and modifying it)
 2. Add the operator to `Components/Transform/src/Fft/Chebyshev/LinearMap/Projector/CMakeList.txt`
-3. Text the operator
+3. Test the operator
 
 See below for some details.
 
-## Example: D2Y1 operator
+# Example: D2Y1 operator
 
 The ```D2Y1``` operator was created modifying the (slightly simpler) ```D1Y1```operator. See comments in `D2Y1.cpp` and `D2Y1.hpp`. The subtelty is that the $w$ coefficients are not obtained directly from the differential operators, but are obtained as follows:
 $$
@@ -64,9 +64,11 @@ The tests are performed as follows:
 
 See below for details on each step:
 
+
+
 ### Mathematica reference
 
-The easisest thing to do is to modify an existing reference. Some caveats/things to consider:
+The easiest thing to do is to modify an existing reference. Some caveats/things to consider:
 
 - Be sure that the reference is placed in the `build` directory. Some Mathematica ref files will not have a general path generation but it's hardcoded into the notebook and needs to be changed. 
 
@@ -75,6 +77,9 @@ The easisest thing to do is to modify an existing reference. Some caveats/things
 - It is expensive to generate tests for all operators implemented in the notebook. Unless that is what you want, you might want to comment out operators that are not to be tested (comment out these lines in the `generateProjectors` Module definition).
 
 - For the `D2Y1` operator, only run the `generateProjectors` function. Not the whole notebook. You don't need, for example, `generateIntegrators` for this example.
+
+
+
 
 ### Build and run the test
 
@@ -91,6 +96,9 @@ In the `build` directory (or wherever you put the tests):
 -       make -j 6 TransformChebyshevTests
 
 -       ctest -R D2Y1 --output-on-failure
+
+
+
 
 #### Some troubleshooting
 
@@ -127,3 +135,11 @@ In the `build` directory (or wherever you put the tests):
 
 
     You can set the ULP in `Components/Transform/TestSuite/Tests/Transform/Chebyshev/LinearMap/Projector/CMakeLists.txt` to a higher value. This obviously makes sense if the test generally passes, except for a few values (that do not fail by much).
+
+
+
+
+
+
+
+    # Mathematica reference: output and calculation
