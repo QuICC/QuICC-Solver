@@ -2,7 +2,7 @@
  * @file R1FD2R1.cpp
  * @brief Source of the implementation of the spectral operator r f D^2(r *)
  * 
- * Modified from R2DIVR2FD1R1.cpp, which is the spectral operator r^2 1/r^2 D(r f) *
+ * Modified from R2DIVR2FD1R1.cpp, which is the spectral operator r^2 1/r^2 f D(r *)
  * 
  * This operator should take a spectral field and:
  * - apply D^2(r *) and transform in physical space (D2Y1 projector)
@@ -19,8 +19,8 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/R1FD2R1.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1Y1.hpp" //I will need D2Y1
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp" // I think unused
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D2Y1.hpp" 
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
@@ -44,7 +44,9 @@ void R1FD2R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    typedef cheb::Integrator::P::SetupType SetupType;
 
    const auto pId = GridPurpose::SIMULATION;
-   int rN = 2*(std::max(this->rows(), this->cols()) + this->mpF->nN() + 2 + 2);
+   // The final polynomial has the same degree as in R2DIVR2FD1R1
+   // so the below is the same
+   int rN = 2*(std::max(this->rows(), this->cols()) + this->mpF->nN() + 2 + 2); 
 
    // Compute grid
    Internal::Array igrid, iweights;
@@ -53,7 +55,7 @@ void R1FD2R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    auto sBwd = std::make_shared<SetupType>(rN, this->cols(), this->cols(), pId);
    sBwd->setBounds(this->mcLower, this->mcUpper);
    sBwd->lock();
-   cheb::Projector::D1Y1 TBwd;
+   cheb::Projector::D2Y1 TBwd;
    TBwd.init(sBwd);
 
    Matrix tmpA = Matrix::Identity(rN, this->cols());
@@ -61,6 +63,8 @@ void R1FD2R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    TBwd.transform(tmpB, tmpA);
 
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
+   // compute f*r
+   f = igrid.asDiagonal()*f; 
 
    tmpB = f.asDiagonal() * tmpB;
 

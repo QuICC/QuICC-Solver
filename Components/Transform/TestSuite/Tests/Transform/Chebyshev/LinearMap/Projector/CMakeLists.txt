@@ -5,8 +5,8 @@ include(ConfigureTests)
 include(SetUlp)
 
 quicc_set_ulp(_ulps
-  ULP 40 40 40 250 250 625
-  MPULP 40 40 40 900 900 600
+  ULP 40 40 40 250 400 250 625
+  MPULP 40 40 40 900 900 900 600
   )
 
 set(_tests

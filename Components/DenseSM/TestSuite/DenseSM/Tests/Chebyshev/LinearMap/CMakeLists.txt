@@ -49,6 +49,7 @@ set(_tests
   R4DivR2D1R1F:dense
   R4DivR2D1R1FC:dense
   R2DivR2FD1R1:dense
+  R1FD2R1:dense
   R4DivR2FD1R1:dense
   R4DivR2CFD1R1:dense
   R4DivR1D1DivR1FD1R1:dense
