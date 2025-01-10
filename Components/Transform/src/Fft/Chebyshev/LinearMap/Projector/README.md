@@ -142,4 +142,19 @@ In the `build` directory (or wherever you put the tests):
 
 
 
-    # Mathematica reference: output and calculation
+# Mathematica reference: calculation and output
+
+The analytical forms of the operators involves the functions, e.g., `dyChebyshev` and similar. These are the mathematical forms of the operators, expressed with $x$ as the spatial variable. To convert, use:
+$$
+r = ax+b.
+$$
+From which:
+$$
+\partial_x = a \ \partial_r;\quad dr = a \ dx
+$$
+
+From which, for example, the form of `dyChebyshev` is derived:
+$$
+\partial_r (r T_n) = T_n +(ax+b) a^{-1} T_n'
+$$
+as in the Mathematica notebook.

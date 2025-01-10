@@ -78,6 +78,18 @@ The tests are performed as follows:
 See below for details on each step:
 
 
+### Mathematica reference
+
+The easiest thing to do is to modify an existing reference. Some caveats/things to consider:
+
+- Be sure that the reference is placed in the `build` directory. Some Mathematica ref files will not have a general path generation but it's hardcoded into the notebook and needs to be changed. 
+
+    This is not currently (January 2025) a problem for the notebook being discussed now
+
+- It is expensive to generate tests for all operators implemented in the notebook. Unless that is what you want, you might want to comment out operators that are not to be tested (comment out these lines in calls to `refTripleHarmonic`).
+
+
+
 ### Build and run the test
 
 In the `build` directory (or wherever you put the tests):
@@ -86,4 +98,27 @@ In the `build` directory (or wherever you put the tests):
 
 -       make -j 6 DenseSMChebyshevTests
 
--       ctest -R D2Y1 --output-on-failure
+-       ctest -R R1FD2R1 --output-on-failure
+
+
+# Mathematica reference: calculation and output
+
+The analytical forms of the operators are given in the functions, e.g., `r1Fd2r1Intg` and similar.
+
+The integrals defined in the Table are of the form
+$$
+I_1 = \frac{2}{\pi}\int_0^1 \frac{1}{\sqrt{1-x^2}} T_i(x) \Phi dr
+$$
+where $\Phi(r)$ is the mathematical form of our operator. For `R1FD2R1`:
+$$
+\Phi = r f \partial_r^2(r T_j(x) \tau_j)
+$$
+and $\tau_j$ accomodates the Chebyshev polynomials normalisation (1 for $T_0$, 2 otherwise). The above integral needs to be converted in a way that only $x$ appears as the spatial variable, not $r$. To do so, use the following:
+
+$$
+r = ax+b.
+$$
+From which:
+$$
+\partial_x = a \ \partial_r;\quad dr = a \ dx
+$$
