@@ -76,3 +76,14 @@ The tests are performed as follows:
 5. Run the test
 
 See below for details on each step:
+
+
+### Build and run the test
+
+In the `build` directory (or wherever you put the tests):
+
+-       cmake ..  -DQUICC_TESTSUITE_DENSESM=ON
+
+-       make -j 6 DenseSMChebyshevTests
+
+-       ctest -R D2Y1 --output-on-failure
