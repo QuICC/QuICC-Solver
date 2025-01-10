@@ -11,15 +11,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D2Y1.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D2Y1.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Y1.hpp"
 
@@ -35,30 +29,26 @@ namespace LinearMap {
 
 namespace Projector {
 
-   D2Y1::D2Y1()
-   {
-   }
-
-   D2Y1::~D2Y1()
-   {
-   }
-
    void D2Y1::initOperator() const
    {
-      // We want to find y from D2Y2 x = y
-      // To solve this: I2D2 (Y2 x) = I2 y, where I2D2=identity.
-      // Y2 x = I2 y can be inverted for y
+      // We want to find y from D2Y1 x = y
+      // To solve this: I2D2 (Y1 x) = I2 y, where I2D2=identity with 2 zero rows.
+      // Y1 x = I2 y can be inverted for y
       //
-      // In the argument of the specSize function,  specSize()+3 represents the bandwidth of the matrix
-      // For I2 it should be specSize()+2, but the Y1 makes it a specSize()+3
+      // The multiplication by Y1 increases the expansion by 1, we need the differntial 
+      // operator of size (N+1) x (N+1)
+      // I2 has two zero rows we need to compute I2 of size (N+3) x (N+3) in order to extra
+      // The bottom left sub matrix of size (N+1) x (N+1)
       ::QuICC::SparseSM::Chebyshev::LinearMap::I2 op(this->mspSetup->specSize()+3,this->mspSetup->specSize()+3, this->mspSetup->lower(), this->mspSetup->upper());
 
       // The last two args of setOperator are extraRows and extraColumns (see DifferentialSolver.cpp)
-      // Here they are set to 2 because of the order of I2.
-      this->mBackend.solver().setOperator(op.mat(), 2, 2);
+      // We extract the submatrix from bottom left corner of size N+1 x N+1
+      this->mBackend.solver().setOperator(op.mat(), 1, 1);
 
+      // Y1 increases the spectral expansion by 1 we need size (N+1) x N
+      // We dropped the first two rows in I2, so we need to shift Y1 by 2
       ::QuICC::SparseSM::Chebyshev::LinearMap::Y1 opY1(this->mspSetup->specSize()+1,this->mspSetup->specSize(), this->mspSetup->lower(), this->mspSetup->upper());
-      this->mBackend.solver().setSpectralOperator(opY1.mat(), 1);
+      this->mBackend.solver().setSpectralOperator(opY1.mat(), 2);
    }
 
    void D2Y1::initBackend() const
@@ -67,7 +57,7 @@ namespace Projector {
       IChebyshevProjector::initBackend();
 
       // Initialize the solver
-      this->mBackend.addSolver(1); // *** I think this is 1 (extra spectral degrees)
+      this->mBackend.addSolver(1); // I2 has size N+1
    }
 
    void D2Y1::applyPreOperator(Matrix& tmp, const Matrix& in) const
@@ -75,7 +65,8 @@ namespace Projector {
       this->mBackend.input(tmp, in);
       auto specOp = this->mBackend.solver().getSpectralOperator();
       tmp.topRows(specOp.rows()) = specOp * tmp.topRows(specOp.cols());
-      this->mBackend.getSolution(tmp, 1, 1); // **** Are these 2,2?
+      this->mBackend.getSolution(tmp, 2, 1); // Last 2 coefficients are zero (D^2)
+                                             // 1 extra modes
    }
 
    void D2Y1::applyPostOperator(Matrix&) const
@@ -87,7 +78,8 @@ namespace Projector {
       this->mBackend.input(tmp, in, useReal);
       auto specOp = this->mBackend.solver().getSpectralOperator();
       tmp.topRows(specOp.rows()) = specOp * tmp.topRows(specOp.cols());
-      this->mBackend.getSolution(tmp, 1, 1);
+      this->mBackend.getSolution(tmp, 2, 1); // Last 2 coefficients are zero (D^2)
+                                             // 1 extra mode
    }
 
    void D2Y1::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const

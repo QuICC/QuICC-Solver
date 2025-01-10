@@ -7,16 +7,7 @@
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_PROJECTOR_D2Y1_HPP
 #define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_PROJECTOR_D2Y1_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -45,12 +36,12 @@ namespace Projector {
          /**
           * @brief Constructor
           */
-         D2Y1();
+         D2Y1() = default;
 
          /**
           * @brief Destructor
           */
-         ~D2Y1();
+         ~D2Y1() = default;
 
       protected:
          /**
