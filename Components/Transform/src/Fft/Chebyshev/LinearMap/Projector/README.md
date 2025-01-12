@@ -40,9 +40,9 @@ $$
 w = \texttt{D2Y1} \cdot v \quad \Rightarrow \quad \texttt{I2} \cdot w = \texttt{Y1} \cdot v 
 $$
 and then solving for $w$. This is possible because $\texttt{I2}\cdot \texttt{D2}$ is an identity. Care must be taken in setting the correct sizes of the matrices, but it makes mathematical sense: we'd rather solve a linear system than calculate derivatives via recurrence relations such as:
-$$
-(1-x^2) T'_n = -n x T_n + n T_{n-1}
-$$
+$
+(1-x^2) T'_n = -n x T_n + n T_{n-1},;
+$
 because then we'd have to deal with a division by $1-x^2$ (which, numerically, you'd like to avoid).
 
 
@@ -134,7 +134,9 @@ In the `build` directory (or wherever you put the tests):
         Errors while running CTest
 
 
-    You can set the ULP in `Components/Transform/TestSuite/Tests/Transform/Chebyshev/LinearMap/Projector/CMakeLists.txt` to a higher value. This obviously makes sense if the test generally passes, except for a few values (that do not fail by much).
+    You can set the ULP in `Components/Transform/TestSuite/Tests/Transform/Chebyshev/LinearMap/Projector/CMakeLists.txt` to a higher value. This obviously makes sense if the test generally passes, except for a few values (that do not fail by much). 
+    
+    The rule is then to set the ULP to 10% higher than needed and round up to closest 5.
 
 
 
@@ -143,6 +145,14 @@ In the `build` directory (or wherever you put the tests):
 
 
 # Mathematica reference: calculation and output
+
+For these operators the tests:
+
+- take as input a given spectra $\hat{v}$ : a `minSpectrum` (only $T_1$ coefficient is nonzero), a `maxSpectrum` (only $T_n$ coefficients for the max $n$ is nonzero) and a `unitSpectrum` (each coefficient is $1-2\textrm{i}$). Each spectra is identified by the id of the output files.
+
+- gives in output the value of the projected $w$ in physical space, evaluated at the quadrature points.
+
+## Calculation
 
 The analytical forms of the operators involves the functions, e.g., `dyChebyshev` and similar. These are the mathematical forms of the operators, expressed with $x$ as the spatial variable. To convert, use:
 $$
@@ -158,3 +168,15 @@ $$
 \partial_r (r T_n) = T_n +(ax+b) a^{-1} T_n'
 $$
 as in the Mathematica notebook.
+
+## Output
+
+The output files are, for each operator:
+- `*_meta*`, which contains, in order, outprec, nN, Ng, (-a+b), (a+b), {ls}
+
+- `*_in*`, which contains the input spectral coefficients, with their real and imaginary part separated
+
+        inData = Join[Re[spec],Im[spec]]
+
+- `*_ref*`, the values of the output, in physical space, also ordered by their real and imaginary part. One column for each of the ls. Along each column we have the real parts on the grid points, and then the imaginary parts on the grid points.
+

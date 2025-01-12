@@ -39,6 +39,7 @@ include(SetUlp)
 # Create Geostrophic2Tor
 set(_tests
   R2DivR1F:dense
+  R2DivR2F:dense
   R4DivR1F:dense
   R4DivR1FC:dense
   R4DivR1CF:dense

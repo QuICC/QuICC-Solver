@@ -103,6 +103,18 @@ In the `build` directory (or wherever you put the tests):
 
 # Mathematica reference: calculation and output
 
+For each of these operators $O_d$ the tests:
+
+- take as input:
+    - a radial function $f$
+    - maximum degrees $nNr$ and $nNc$ (columns and rows).
+
+- gives in output spectral coefficients, organised in matrix form, resulting from the projection of $O_d(T_j); \ j=0,\dots,nNc -1$ onto a chebyshev basis $T_i; \ i=0,\dots,nNr -1$.
+
+    In other words, take an initial set of $T_j; \ j=0,\dots,nNc -1$, act on it with the dense operator $O_d$, project ont a basis $T_i; \ i=0,\dots,nNr -1$. 
+
+
+## Calculation
 The analytical forms of the operators are given in the functions, e.g., `r1Fd2r1Intg` and similar.
 
 The integrals defined in the Table are of the form
