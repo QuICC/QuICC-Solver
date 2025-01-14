@@ -233,7 +233,11 @@ def i3qp():
             {'q':1, 'p':0, 'd':0, 'c':(2*l + 1)},
             ]
     tmp = above.build_recurrence(terms, {0:1}, False)
-    partA = symbolic.spectral_decrease(tmp, True)
+    tmp2 = symbolic.spectral_decrease(tmp, False)
+    terms = [
+            {'q':1, 'p':0, 'd':0, 'c':1},
+            ]
+    partA = symbolic.build_recurrence(terms, tmp2, True)
 
     # Compute starting terms
     fs = symbolic.spectral_decrease({0:-(2*l-1)}, False)
@@ -249,7 +253,7 @@ def i3qp():
         r[k] = r[k].simplify().factor()
 
     # Print recurrence relation per diagonals
-    showDiags(r, w_layout, lshift = 1, name = "I2Qp")
+    showDiags(r, w_layout, lshift = 1, name = "I3Qp")
 
 def i4():
     """Sphere i4 (i1r1i1r1i1r1i1r1) operator"""
@@ -322,7 +326,7 @@ def i1qm():
     showDiags(r, w_layout, lshift = -1, name = "I1Qm")
 
 def i1qp():
-    """Sphere i2qp (i1r1 coriolis Q(l+1)) operator"""
+    """Sphere i1qp (i1r1 coriolis Q(l+1)) operator"""
 
     partA = symbolic.spectral_integral_decrease({0:(2*l+1)}, True)
     partB = symbolic.spectral_decrease({0:2}, True)
