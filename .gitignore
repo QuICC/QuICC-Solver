@@ -36,4 +36,4 @@ cmake-build-debug/
 
 # Build directory #
 ###################
-build
+build*
