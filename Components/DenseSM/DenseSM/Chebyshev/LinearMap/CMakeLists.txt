@@ -4,7 +4,6 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   R2DivR1F.cpp
   R4DivR1F.cpp
   R4DivR1FC.cpp
-  R4FC2.cpp
   R4DivR1CF.cpp
   R4DivR1D1F.cpp
   R4DivR1D1FC.cpp
