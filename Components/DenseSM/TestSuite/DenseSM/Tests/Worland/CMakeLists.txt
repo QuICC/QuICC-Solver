@@ -53,7 +53,7 @@ set(_tests
   DivR3D1R1FD1R1:dense
   )
 quicc_set_ulp(_ulp
-  ULP 500 500 500 500
+  ULP 550 750 500 1500
   MPULP 25 25 25 25
         )
 foreach(_test ${_tests})

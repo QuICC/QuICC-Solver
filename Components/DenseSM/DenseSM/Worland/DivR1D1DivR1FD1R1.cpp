@@ -48,9 +48,9 @@ void DivR1D1DivR1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    r_1drW.compute<Internal::MHDFloat>(opBwd, this->cols(), this->mLin, igrid, Internal::Array(), ev::Set());
 
    Internal::Matrix opFFwd(igrid.size(), this->cols() + this->mpF->nN());
-   W.compute<Internal::MHDFloat>(opFFwd, opFFwd.cols(), this->mLf + this->mLf - 1, igrid, iweights, ev::Set());
+   W.compute<Internal::MHDFloat>(opFFwd, opFFwd.cols(), this->mLin + this->mLf - 1, igrid, iweights, ev::Set());
    Internal::Matrix opFBwd(igrid.size(), this->cols() + this->mpF->nN());
-   r_1dW.compute<Internal::MHDFloat>(opFBwd, opFBwd.cols(), this->mLf + this->mLf - 1, igrid, Internal::Array(), ev::Set());
+   r_1dW.compute<Internal::MHDFloat>(opFBwd, opFBwd.cols(), this->mLin + this->mLf - 1, igrid, Internal::Array(), ev::Set());
 
    Internal::Matrix opFwd(igrid.size(), this->rows());
    W.compute<Internal::MHDFloat>(opFwd, this->rows(), this->mLout, igrid, iweights, ev::Set());

@@ -64,7 +64,7 @@ void ProjCurlCurlPolCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
 
    MHDFloat cA = -L2a*Labg;
    MHDFloat cB = -L2b*Labg;
-   MHDFloat cC = L2g;
+   MHDFloat cC = L2g*Labg;
 
    mat = cA*this->mpOpA->mat() + cB*this->mpOpB->mat() + cC*this->mpOpC->mat();
 }
