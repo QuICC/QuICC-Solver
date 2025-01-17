@@ -23,6 +23,7 @@
 #include "QuICC/Bc/Name/FixedFlux.hpp"
 #include "QuICC/Bc/Name/Insulating.hpp"
 #include "DenseSM/Worland/ITripleHarmonicOperator.hpp"
+#include "DenseSM/Worland/IProjCrossOperator.hpp"
 
 namespace dsm = ::QuICC::DenseSM::Worland;
 
@@ -148,6 +149,75 @@ namespace Worland {
          }
 
          TOp op(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, alpha, dBeta);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_base_of_v<dsm::IProjCrossOperator, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         if(meta.size() != 12)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+
+         int nNr = meta(0) + 1;
+         int nNc = meta(1) + 1;
+         int lOut = meta(2);
+         int mOut = meta(3);
+         int lF = meta(4);
+         int mF = meta(5);
+         int lIn = meta(6);
+         int mIn = meta(7);
+         int fAId = meta(8);
+         int fBId = meta(9);
+         auto alpha = static_cast<QuICC::Internal::MHDFloat>(meta(10));
+         auto dBeta = static_cast<QuICC::Internal::MHDFloat>(meta(11));
+
+         int lA, mA, lB, mB;
+         std::shared_ptr<dsm::RadialTorPolFunction> pFa = nullptr;
+         std::shared_ptr<dsm::RadialTorPolFunction> pFb = nullptr;
+         if (fAId >= 0)
+         {
+            if (fAId == 0)
+            {
+               pFa = std::make_shared<DipolarS1>();
+            }
+            else if(fAId == 1)
+            {
+               pFa = std::make_shared<QuadrupolarS2>();
+            }
+            else
+            {
+               throw std::logic_error("Unknown forcing function");
+            }
+            lA = lF;
+            mA = mF;
+            lB = lIn;
+            mB = mIn;
+         }
+         if (fBId >= 0)
+         {
+            if (fBId == 0)
+            {
+               pFb = std::make_shared<DipolarS1>();
+            }
+            else if(fBId == 1)
+            {
+               pFb = std::make_shared<QuadrupolarS2>();
+            }
+            else
+            {
+               throw std::logic_error("Unknown forcing function");
+            }
+            lA = lIn;
+            mA = mIn;
+            lB = lF;
+            mB = mF;
+         }
+
+         TOp op(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pFa, pFb, alpha, dBeta);
 
          outData = op.mat();
       }
