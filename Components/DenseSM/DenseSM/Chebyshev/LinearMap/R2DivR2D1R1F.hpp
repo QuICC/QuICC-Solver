@@ -1,6 +1,7 @@
 /**
  * @file R2DivR2D1R1F.hpp
  * @brief Implementation of the spectral operator r^2 1/r^2 D(r f) *
+ *        multiplied by gaunt and elsasser coefficient
  */
 
 #ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R2DIVR2D1R1F_HPP

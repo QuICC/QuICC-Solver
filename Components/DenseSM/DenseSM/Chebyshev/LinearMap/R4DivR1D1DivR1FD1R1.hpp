@@ -1,6 +1,7 @@
 /**
  * @file R4DivR1D1DivR1FD1R1.hpp
  * @brief Implementation of the spectral operator r^4 1/r D(1/r D(r f *))
+ *        multiplied by elsasser coefficient
  */
 
 #ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVR1D1DIVR1FD1R1_HPP

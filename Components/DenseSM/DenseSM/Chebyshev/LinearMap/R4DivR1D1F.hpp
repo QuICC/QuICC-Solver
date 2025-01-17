@@ -1,6 +1,7 @@
 /**
  * @file R4DivR1D1F.hpp
  * @brief Implementation of the spectral operator r^4 1/r D(f *)
+ *        multiplied by gaunt coefficient
  */
 
 #ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVR1D1F_HPP

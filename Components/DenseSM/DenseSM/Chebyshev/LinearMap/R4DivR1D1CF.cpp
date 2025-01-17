@@ -1,6 +1,7 @@
 /**
  * @file R4DivR1D1CF.cpp
  * @brief Source of the implementation of the spectral operator r^4 1/r D(-lapl(f) *)
+ *        multiplied by gaunt coefficient
  */
 
 // System includes
