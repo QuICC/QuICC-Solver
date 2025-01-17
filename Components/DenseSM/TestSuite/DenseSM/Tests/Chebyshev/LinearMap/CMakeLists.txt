@@ -36,12 +36,8 @@ list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 include(ConfigureTests)
 include(SetUlp)
 
-# Create Geostrophic2Tor
+# Create Gaunt coefficient, dipolar tests
 set(_tests
-  R2DivR1F:dense
-  R4DivR1F:dense
-  R4DivR1FC:dense
-  R4DivR1CF:dense
   R4DivR1D1F:dense
   R4DivR1D1FC:dense
   R4DivR1D1CF:dense
@@ -51,19 +47,91 @@ set(_tests
   R2DivR2FD1R1:dense
   R4DivR2FD1R1:dense
   R4DivR2CFD1R1:dense
-  R4DivR1D1DivR1FD1R1:dense
-  R4DivR1D1DivR1D1R1F:dense
-  R4DivR3D1R1FD1R1:dense
   )
 quicc_set_ulp(_ulp
-  ULP 500
-  MPULP 25
+  ULP 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 0
+    IDS 0 1 2 3 4 5 6
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Elsasser coefficient, dipolar tests
+set(_tests
+  R2DivR1F:dense
+  R4DivR1F:dense
+  R4DivR1FC:dense
+  R4DivR1CF:dense
+  R2DivR2D1R1F:dense
+  R2DivR2FD1R1:dense
+  R4DivR1D1DivR1FD1R1:dense
+  R4DivR1D1DivR1D1R1F:dense
+  R4DivR3D1R1FD1R1:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500
+  MPULP 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 100 101 102 103
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Gaunt coefficient, quadrupolar tests
+set(_tests
+  R4DivR1D1F:dense
+  R4DivR1D1FC:dense
+  R4DivR1D1CF:dense
+  R2DivR2D1R1F:dense
+  R4DivR2D1R1F:dense
+  R4DivR2D1R1FC:dense
+  R2DivR2FD1R1:dense
+  R4DivR2FD1R1:dense
+  R4DivR2CFD1R1:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 200 201 202 203 204 205 206 207 208 209
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Elsasser coefficient, quadrupolar tests
+set(_tests
+  R2DivR1F:dense
+  R4DivR1F:dense
+  R4DivR1FC:dense
+  R4DivR1CF:dense
+  R2DivR2D1R1F:dense
+  R2DivR2FD1R1:dense
+  R4DivR1D1DivR1FD1R1:dense
+  R4DivR1D1DivR1D1R1F:dense
+  R4DivR3D1R1FD1R1:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 300 301 302 303 304 305 306
     ULPS ${_ulp}
   )
 endforeach()
