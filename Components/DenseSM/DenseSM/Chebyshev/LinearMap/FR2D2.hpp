@@ -1,12 +1,12 @@
 /**
- * @file FR1D1.hpp
- * @brief Implementation of the spectral operator f r D(*)
+ * @file FR2D2.hpp
+ * @brief Implementation of the spectral operator f r^2 D2(*)
  * 
  * Modified from R4DivR1FC.cpp which does r^4 1/r f (-lapl(*))
  */
 
-#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_FR1D1_HPP
-#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_FR1D1_HPP
+#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_FR2D2_HPP
+#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_FR2D2_HPP
 
 // System includes
 //
@@ -27,9 +27,9 @@ namespace Chebyshev {
 namespace LinearMap {
 
 /**
- * @brief Implementation of the spectral operator f r D(*)
+ * @brief Implementation of the spectral operator f r^2 D2(*)
  */
-class FR1D1 : public ITripleHarmonicOperator
+class FR2D2 : public ITripleHarmonicOperator
 {
 public:
    /**
@@ -46,13 +46,13 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   FR1D1(const int rows, const int cols, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
+   FR2D2(const int rows, const int cols, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
       const Scalar_t upper);
 
    /**
     * @brief Destructor
     */
-   virtual ~FR1D1() = default;
+   virtual ~FR2D2() = default;
 
 protected:
    /**
@@ -73,4 +73,4 @@ private:
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_FR1D1_HPP
+#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_FR2D2_HPP
