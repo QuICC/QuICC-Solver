@@ -52,21 +52,28 @@ ProjCurlCurlPolCrossPol::ProjCurlCurlPolCrossPol(const int nNr, const int nNc, c
 void ProjCurlCurlPolCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   auto&& lg = this->mLout;
-   auto&& la = this->mLa;
-   auto&& lb = this->mLb;
+   if(this->mIsZero)
+   {
+      mat = Matrix::Zero(this->rows(), this->cols());
+   }
+   else
+   {
+      auto&& lg = this->mLout;
+      auto&& la = this->mLa;
+      auto&& lb = this->mLb;
 
-   const MHDFloat L2a = static_cast<MHDFloat>(la*(la + 1));
-   const MHDFloat L2b = static_cast<MHDFloat>(lb*(lb + 1));
-   const MHDFloat L2g = static_cast<MHDFloat>(lg*(lg + 1));
+      const MHDFloat L2a = static_cast<MHDFloat>(la*(la + 1));
+      const MHDFloat L2b = static_cast<MHDFloat>(lb*(lb + 1));
+      const MHDFloat L2g = static_cast<MHDFloat>(lg*(lg + 1));
 
-   const MHDFloat Labg = this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
+      const MHDFloat Labg = this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-   MHDFloat cA = -L2a*Labg;
-   MHDFloat cB = -L2b*Labg;
-   MHDFloat cC = L2g*Labg;
+      MHDFloat cA = -L2a*Labg;
+      MHDFloat cB = -L2b*Labg;
+      MHDFloat cC = L2g*Labg;
 
-   mat = cA*this->mpOpA->mat() + cB*this->mpOpB->mat() + cC*this->mpOpC->mat();
+      mat = cA*this->mpOpA->mat() + cB*this->mpOpB->mat() + cC*this->mpOpC->mat();
+   }
 }
 
 } // namespace Worland

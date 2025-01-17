@@ -46,17 +46,24 @@ ProjCurlTorCrossPol::ProjCurlTorCrossPol(const int nNr, const int nNc, const int
 void ProjCurlTorCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   auto&& lg = this->mLout;
-   auto&& la = this->mLa;
-   auto&& lb = this->mLb;
+   if(this->mIsZero)
+   {
+      mat = Matrix::Zero(this->rows(), this->cols());
+   }
+   else
+   {
+      auto&& lg = this->mLout;
+      auto&& la = this->mLa;
+      auto&& lb = this->mLb;
 
-   const MHDFloat L2b = static_cast<MHDFloat>(lb*(lb + 1));
+      const MHDFloat L2b = static_cast<MHDFloat>(lb*(lb + 1));
 
-   const MHDFloat Labg = this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
+      const MHDFloat Labg = this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-   MHDFloat c = std::pow(-1.0, la  + lb + lg - 1)*L2b*Labg;
+      MHDFloat c = std::pow(-1.0, la  + lb + lg - 1)*L2b*Labg;
 
-   mat = c*this->mpOp->mat();
+      mat = c*this->mpOp->mat();
+   }
 }
 
 } // namespace Worland

@@ -46,17 +46,24 @@ ProjCurlCurlTorCrossTor::ProjCurlCurlTorCrossTor(const int nNr, const int nNc, c
 void ProjCurlCurlTorCrossTor::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   auto&& la = this->mLa;
-   auto&& lb = this->mLb;
-   auto&& lg = this->mLout;
+   if(this->mIsZero)
+   {
+      mat = Matrix::Zero(this->rows(), this->cols());
+   }
+   else
+   {
+      auto&& la = this->mLa;
+      auto&& lb = this->mLb;
+      auto&& lg = this->mLout;
 
-   const MHDFloat L2g = static_cast<MHDFloat>(lg*(lg + 1));
+      const MHDFloat L2g = static_cast<MHDFloat>(lg*(lg + 1));
 
-   const MHDFloat Labg = this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
+      const MHDFloat Labg = this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-   MHDFloat c = L2g*Labg;
+      MHDFloat c = L2g*Labg;
 
-   mat = c*this->mpOp->mat();
+      mat = c*this->mpOp->mat();
+   }
 }
 
 } // namespace Worland

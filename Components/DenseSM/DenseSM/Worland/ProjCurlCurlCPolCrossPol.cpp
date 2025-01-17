@@ -33,6 +33,12 @@ ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
    {
       this->mpOpA = std::make_shared<DivR2CFD1R1>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, alpha, dBeta);
       this->mpOpB = std::make_shared<DivR1D1CF>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, alpha, dBeta);
+
+      // Special condition where both operators cancel each other
+      if(pPolA->ls().size() == 1 && pPolA->ls().at(0) == 1 && pPolA->nN() == 2)
+      {
+         this->mIsZero = true;
+      }
    }
    // Radial function B is given
    else if(pPolB && pPolA == nullptr)
