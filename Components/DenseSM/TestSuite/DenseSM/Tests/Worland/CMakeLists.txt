@@ -71,14 +71,14 @@ set(_tests
   DivR3D1R1FD1R1:dense
   )
 quicc_set_ulp(_ulp
-  ULP 550 750 500 1500
-  MPULP 25 25 25 25
+  ULP 550 750 500 1500 500 500 500
+  MPULP 25 25 25 25 25 25 25
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 100 101 102 103
+    IDS 100 101 102 103 104 105 106
     ULPS ${_ulp}
   )
 endforeach()
@@ -118,14 +118,14 @@ set(_tests
   DivR3D1R1FD1R1:dense
   )
 quicc_set_ulp(_ulp
-  ULP 550 750 500 1500
-  MPULP 25 25 25 25
+  ULP 550 750 500 1500 500 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25 25 25 25 25 25
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:type
-    IDS 300 301 302 303
+    IDS 300 301 302 303 304 305 306 307 308 309 310 311
     ULPS ${_ulp}
   )
 endforeach()
