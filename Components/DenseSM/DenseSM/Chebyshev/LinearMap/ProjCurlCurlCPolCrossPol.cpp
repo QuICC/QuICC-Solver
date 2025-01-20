@@ -26,21 +26,35 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB,
+ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc, const int p, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB,
    std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower, const Scalar_t upper) :
-    ProjCurlCurlTorCrossPol(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, pPolB, lower, upper)
+    ProjCurlCurlTorCrossPol(nNr, nNc, p, lOut, mOut, lA, mA, lB, mB, pPolA, pPolB, lower, upper)
 {
    // Radial function A is given
    if(pPolA && pPolB == nullptr)
    {
-      this->mpOpA = std::make_shared<R4DivR2CFD1R1>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
-      this->mpOpB = std::make_shared<R4DivR1D1CF>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
+      if(p == 4)
+      {
+         this->mpOpA = std::make_shared<R4DivR2CFD1R1>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
+         this->mpOpB = std::make_shared<R4DivR1D1CF>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
+      }
+      else
+      {
+         throw std::logic_error("Radial prefactor is not implemented!");
+      }
    }
    // Radial function B is given
    else if(pPolB && pPolA == nullptr)
    {
-      this->mpOpA = std::make_shared<R4DivR2D1R1FC>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
-      this->mpOpB = std::make_shared<R4DivR1D1FC>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
+      if(p == 4)
+      {
+         this->mpOpA = std::make_shared<R4DivR2D1R1FC>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
+         this->mpOpB = std::make_shared<R4DivR1D1FC>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
+      }
+      else
+      {
+         throw std::logic_error("Radial prefactor is not implemented!");
+      }
    }
    else
    {

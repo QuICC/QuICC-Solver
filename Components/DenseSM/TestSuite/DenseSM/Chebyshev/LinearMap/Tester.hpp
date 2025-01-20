@@ -17,6 +17,7 @@
 #include "DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "DenseSM/Chebyshev/LinearMap/ITripleHarmonicOperator.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IProjCrossOperator.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
 #include "TestSuite/DenseSM/Chebyshev/LinearMap/DipolarS1.hpp"
 #include "TestSuite/DenseSM/Chebyshev/LinearMap/QuadrupolarS2.hpp"
@@ -150,6 +151,76 @@ namespace LinearMap {
          }
 
          TOp op(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, lb, ub);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_base_of_v<dsm::IProjCrossOperator, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         if(meta.size() != 13)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+
+         int nNr = meta(0) + 1;
+         int nNc = meta(1) + 1;
+         int p = meta(2);
+         int lOut = meta(3);
+         int mOut = meta(4);
+         int lF = meta(5);
+         int mF = meta(6);
+         int lIn = meta(7);
+         int mIn = meta(8);
+         int fAId = meta(9);
+         int fBId = meta(10);
+         auto lb = static_cast<QuICC::Internal::MHDFloat>(meta(11));
+         auto ub = static_cast<QuICC::Internal::MHDFloat>(meta(12));
+
+         int lA, mA, lB, mB;
+         std::shared_ptr<dsm::RadialTorPolFunction> pFa = nullptr;
+         std::shared_ptr<dsm::RadialTorPolFunction> pFb = nullptr;
+         if (fAId >= 0)
+         {
+            if (fAId == 0)
+            {
+               pFa = std::make_shared<DipolarS1>();
+            }
+            else if(fAId == 1)
+            {
+               pFa = std::make_shared<QuadrupolarS2>();
+            }
+            else
+            {
+               throw std::logic_error("Unknown forcing function");
+            }
+            lA = lF;
+            mA = mF;
+            lB = lIn;
+            mB = mIn;
+         }
+         if (fBId >= 0)
+         {
+            if (fBId == 0)
+            {
+               pFb = std::make_shared<DipolarS1>();
+            }
+            else if(fBId == 1)
+            {
+               pFb = std::make_shared<QuadrupolarS2>();
+            }
+            else
+            {
+               throw std::logic_error("Unknown forcing function");
+            }
+            lA = lIn;
+            mA = mIn;
+            lB = lF;
+            mB = mF;
+         }
+
+         TOp op(nNr, nNc, p, lOut, mOut, lA, mA, lB, mB, pFa, pFb, lb, ub);
 
          outData = op.mat();
       }

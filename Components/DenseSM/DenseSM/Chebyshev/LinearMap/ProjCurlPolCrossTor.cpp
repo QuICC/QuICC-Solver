@@ -24,32 +24,40 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-ProjCurlPolCrossTor::ProjCurlPolCrossTor(const int nNr, const int nNc, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB,
-   std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper, const bool useR4) :
+ProjCurlPolCrossTor::ProjCurlPolCrossTor(const int nNr, const int nNc, const int p, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB,
+   std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper) :
     IProjCrossOperator(nNr, nNc, lOut, mOut, lA, mA, lB, mB, lower, upper)
 {
    // Radial function A is given
    if(pPolA && pTorB == nullptr)
    {
-      if(useR4)
+      if(p == 4)
       {
          this->mpOp = std::make_shared<R4DivR1F>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
       }
-      else
+      else if(p == 2)
       {
          this->mpOp = std::make_shared<R2DivR1F>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
+      }
+      else
+      {
+         throw std::logic_error("Radial prefactor is not implemented!");
       }
    }
    // Radial function B is given
    else if(pTorB && pPolA == nullptr)
    {
-      if(useR4)
+      if(p == 4)
       {
          this->mpOp = std::make_shared<R4DivR1F>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pTorB, lower, upper);
       }
-      else
+      else if(p == 2)
       {
          this->mpOp = std::make_shared<R2DivR1F>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pTorB, lower, upper);
+      }
+      else
+      {
+         throw std::logic_error("Radial prefactor is not implemented!");
       }
    }
    else

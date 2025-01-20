@@ -36,6 +36,7 @@ public:
     *
     * @param rows    Number of rows
     * @param cols    Number of cols
+    * @param p       Power of radial prefactor
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic order
     * @param lA      harmonic degree of A
@@ -46,9 +47,8 @@ public:
     * @param pTorB   Toroidal B radial function
     * @param lower   Lower boundary
     * @param upper   Upper boundary
-    * @param useR4   Use r^4 prefactor?
     */
-   ProjCurlPolCrossTor(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper, const bool useR4);
+   ProjCurlPolCrossTor(const int rows, const int cols, const int p, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper);
 
    /**
     * @brief Destructor
