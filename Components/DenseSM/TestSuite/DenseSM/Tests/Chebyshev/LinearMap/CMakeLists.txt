@@ -40,6 +40,8 @@ include(SetUlp)
 set(_tests
   FR1D1:dense
   FR2D2:dense
+  FR3D3:dense
+  FR4D4:dense
   R2DivR1F:dense
   R2DivR2F:dense
   R4DivR1F:dense

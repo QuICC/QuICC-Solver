@@ -2,6 +2,8 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ILinearMapOperator.cpp
   FR1D1.cpp
   FR2D2.cpp
+  FR3D3.cpp
+  FR4D4.cpp
   R2DivR2F.cpp
   R2DivR1F.cpp
   R4DivR1F.cpp

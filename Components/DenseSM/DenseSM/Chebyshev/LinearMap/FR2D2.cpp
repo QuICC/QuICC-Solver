@@ -1,6 +1,6 @@
 /**
  * @file FR2D2.cpp
- * @brief Source of the implementation of the spectral operator  f r D(*)
+ * @brief Source of the implementation of the spectral operator  f r^2 D2(*)
  * 
  * Modified from R4DivR1FC.cpp which does r^4 1/r f (-lapl(*))
  */
@@ -39,7 +39,7 @@ void FR2D2::buildOpImpl(Internal::Matrix& mat, const int rows,
    typedef cheb::Integrator::P::SetupType SetupType;
 
    const auto pId = GridPurpose::SIMULATION;
-   int rN = 2*(std::max(this->rows(), this->cols()) + this->mpF->nN() + 2 + 2 +(1-1) );
+   int rN = 2*(std::max(this->rows(), this->cols()) + this->mpF->nN() + 2 + 2 +(2-2) );
 
    // Compute grid
    Internal::Array igrid, iweights;
@@ -55,11 +55,11 @@ void FR2D2::buildOpImpl(Internal::Matrix& mat, const int rows,
    //Matrix tB = Matrix::Zero(rN,this->cols());
    //TBwd.transform(tB, tA);
 
-   cheb::Projector::D<1> TD1Bwd;
-   TD1Bwd.init(sBwd);
+   //cheb::Projector::D<1> TD1Bwd;
+   //TD1Bwd.init(sBwd);
 
-   Matrix td1B = Matrix::Zero(rN,this->cols());
-   TD1Bwd.transform(td1B, tA);
+   //Matrix td1B = Matrix::Zero(rN,this->cols());
+   //TD1Bwd.transform(td1B, tA);
 
    cheb::Projector::D<2> TD2Bwd;
    TD2Bwd.init(sBwd);
@@ -78,21 +78,20 @@ void FR2D2::buildOpImpl(Internal::Matrix& mat, const int rows,
    Matrix sf = Matrix::Zero(rN, 1);
    TFFwd.transform(sf, f);
 
-   auto sFBwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
-   sFBwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
-   sFBwd->lock();
-   cheb::Projector::D<1> TFd1Bwd;
-   TFd1Bwd.init(sFBwd);
+   //auto sFBwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
+   //sFBwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
+   //sFBwd->lock();
+   //cheb::Projector::D<1> TFd1Bwd;
+   //TFd1Bwd.init(sFBwd);
 
-   Matrix d1f = Matrix::Zero(rN, 1);
-   TFd1Bwd.transform(d1f, sf);
+   //Matrix d1f = Matrix::Zero(rN, 1);
+   //TFd1Bwd.transform(d1f, sf);
 
    const int l = this->mLin;
    const Internal::Array& r = igrid; 
 
-   //auto R = r.cast<MHDFloat>().asDiagonal();
-
-   tA = (f.array()*r.array()).cast<MHDFloat>().matrix().asDiagonal()*(r.cast<MHDFloat>().asDiagonal()*td2B);
+   tA = (f.array()*r.array()).cast<MHDFloat>().matrix().asDiagonal()
+         *(r.cast<MHDFloat>().asDiagonal()*td2B);
 
    auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
    sFwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
