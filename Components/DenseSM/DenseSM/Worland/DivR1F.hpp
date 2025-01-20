@@ -43,7 +43,9 @@ public:
     * @param alpha   Jacobi alpha parameter
     * @param dBeta   Jacobi dBeta parameter
     */
-   DivR1F(const int nNr, const int nNc, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t alpha,
+   DivR1F(const int nNr, const int nNc, const int lOut, const int mOut,
+      const int lF, const int mF, const int lIn, const int mIn,
+      std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t alpha,
       const Scalar_t dBeta);
 
    /**

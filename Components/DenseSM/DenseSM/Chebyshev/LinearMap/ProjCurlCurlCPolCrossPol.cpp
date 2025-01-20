@@ -1,6 +1,7 @@
 /**
  * @file ProjCurlCurlCPolCrossPol.cpp
- * @brief Source of the implementation of the projection r Curl Curl (CurlPolA ^ PolB)
+ * @brief Source of the implementation of the projection r Curl Curl (CurlPolA ^
+ * PolB)
  */
 
 // System includes
@@ -13,10 +14,10 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlCurlCPolCrossPol.hpp"
-#include "DenseSM/Chebyshev/LinearMap/R4DivR2CFD1R1.hpp"
 #include "DenseSM/Chebyshev/LinearMap/R4DivR1D1CF.hpp"
-#include "DenseSM/Chebyshev/LinearMap/R4DivR2D1R1FC.hpp"
 #include "DenseSM/Chebyshev/LinearMap/R4DivR1D1FC.hpp"
+#include "DenseSM/Chebyshev/LinearMap/R4DivR2CFD1R1.hpp"
+#include "DenseSM/Chebyshev/LinearMap/R4DivR2D1R1FC.hpp"
 
 namespace QuICC {
 
@@ -26,17 +27,23 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc, const int p, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB,
-   std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower, const Scalar_t upper) :
-    ProjCurlCurlTorCrossPol(nNr, nNc, p, lOut, mOut, lA, mA, lB, mB, pPolA, pPolB, lower, upper)
+ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
+   const int p, const int lOut, const int mOut, const int lA, const int mA,
+   const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
+   std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower,
+   const Scalar_t upper) :
+    ProjCurlCurlTorCrossPol(nNr, nNc, p, lOut, mOut, lA, mA, lB, mB, pPolA,
+       pPolB, lower, upper)
 {
    // Radial function A is given
-   if(pPolA && pPolB == nullptr)
+   if (pPolA && pPolB == nullptr)
    {
-      if(p == 4)
+      if (p == 4)
       {
-         this->mpOpA = std::make_shared<R4DivR2CFD1R1>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
-         this->mpOpB = std::make_shared<R4DivR1D1CF>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
+         this->mpOpA = std::make_shared<R4DivR2CFD1R1>(nNr, nNc, lOut, mOut, lA,
+            mA, lB, mB, pPolA, lower, upper);
+         this->mpOpB = std::make_shared<R4DivR1D1CF>(nNr, nNc, lOut, mOut, lA,
+            mA, lB, mB, pPolA, lower, upper);
       }
       else
       {
@@ -44,12 +51,14 @@ ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
       }
    }
    // Radial function B is given
-   else if(pPolB && pPolA == nullptr)
+   else if (pPolB && pPolA == nullptr)
    {
-      if(p == 4)
+      if (p == 4)
       {
-         this->mpOpA = std::make_shared<R4DivR2D1R1FC>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
-         this->mpOpB = std::make_shared<R4DivR1D1FC>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
+         this->mpOpA = std::make_shared<R4DivR2D1R1FC>(nNr, nNc, lOut, mOut, lB,
+            mB, lA, mA, pPolB, lower, upper);
+         this->mpOpB = std::make_shared<R4DivR1D1FC>(nNr, nNc, lOut, mOut, lB,
+            mB, lA, mA, pPolB, lower, upper);
       }
       else
       {

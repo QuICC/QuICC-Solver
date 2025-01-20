@@ -1,6 +1,7 @@
 /**
  * @file ProjCurlCurlCPolCrossTor.cpp
- * @brief Source of the implementation of the projection r Curl Curl (CurlPolA ^ TorB)
+ * @brief Source of the implementation of the projection r Curl Curl (CurlPolA ^
+ * TorB)
  */
 
 // System includes
@@ -24,16 +25,21 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-ProjCurlCurlCPolCrossTor::ProjCurlCurlCPolCrossTor(const int nNr, const int nNc, const int p, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB,
-   std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper) :
-    ProjCurlCurlTorCrossTor(nNr, nNc, p, lOut, mOut, lA, mA, lB, mB, pPolA, pTorB, lower, upper)
+ProjCurlCurlCPolCrossTor::ProjCurlCurlCPolCrossTor(const int nNr, const int nNc,
+   const int p, const int lOut, const int mOut, const int lA, const int mA,
+   const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
+   std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower,
+   const Scalar_t upper) :
+    ProjCurlCurlTorCrossTor(nNr, nNc, p, lOut, mOut, lA, mA, lB, mB, pPolA,
+       pTorB, lower, upper)
 {
    // Radial function A is given
-   if(pPolA && pTorB == nullptr)
+   if (pPolA && pTorB == nullptr)
    {
-      if(p == 4)
+      if (p == 4)
       {
-         this->mpOp = std::make_shared<R4DivR1CF>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
+         this->mpOp = std::make_shared<R4DivR1CF>(nNr, nNc, lOut, mOut, lA, mA,
+            lB, mB, pPolA, lower, upper);
       }
       else
       {
@@ -41,13 +47,14 @@ ProjCurlCurlCPolCrossTor::ProjCurlCurlCPolCrossTor(const int nNr, const int nNc,
       }
    }
    // Radial function B is given
-   else if(pTorB && pPolA == nullptr)
+   else if (pTorB && pPolA == nullptr)
    {
-      this->mpOp = std::make_shared<R4DivR1FC>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pTorB, lower, upper);
+      this->mpOp = std::make_shared<R4DivR1FC>(nNr, nNc, lOut, mOut, lB, mB, lA,
+         mA, pTorB, lower, upper);
    }
    else
    {
-      if(p == 4)
+      if (p == 4)
       {
          throw std::logic_error("One of the radial functions should be null");
       }

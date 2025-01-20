@@ -48,7 +48,11 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   ProjCurlTorCrossPol(const int rows, const int cols, const int p, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pTorA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower, const Scalar_t upper);
+   ProjCurlTorCrossPol(const int rows, const int cols, const int p,
+      const int lOut, const int mOut, const int lA, const int mA, const int lB,
+      const int mB, std::shared_ptr<RadialTorPolFunction> pTorA,
+      std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower,
+      const Scalar_t upper);
 
    /**
     * @brief Destructor
@@ -69,7 +73,7 @@ protected:
    /**
     * @brief Radial operator
     */
-   std::shared_ptr<ITripleHarmonicOperator>  mpOp;
+   std::shared_ptr<ITripleHarmonicOperator> mpOp;
 
 private:
 };

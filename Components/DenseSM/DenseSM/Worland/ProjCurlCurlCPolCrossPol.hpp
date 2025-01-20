@@ -45,7 +45,11 @@ public:
     * @param alpha   Jacobi alpha parameter
     * @param dBeta   Jacobi dBeta parameter
     */
-   ProjCurlCurlCPolCrossPol(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t alpha, const Scalar_t dBeta);
+   ProjCurlCurlCPolCrossPol(const int rows, const int cols, const int lOut,
+      const int mOut, const int lA, const int mA, const int lB, const int mB,
+      std::shared_ptr<RadialTorPolFunction> pPolA,
+      std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t alpha,
+      const Scalar_t dBeta);
 
    /**
     * @brief Destructor
@@ -53,7 +57,6 @@ public:
    virtual ~ProjCurlCurlCPolCrossPol() = default;
 
 protected:
-
 private:
 };
 

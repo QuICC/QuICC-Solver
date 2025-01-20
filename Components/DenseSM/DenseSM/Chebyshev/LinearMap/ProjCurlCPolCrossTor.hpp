@@ -12,8 +12,8 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/IProjCrossOperator.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlTorCrossTor.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -46,7 +46,11 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   ProjCurlCPolCrossTor(const int rows, const int cols, const int p, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper);
+   ProjCurlCPolCrossTor(const int rows, const int cols, const int p,
+      const int lOut, const int mOut, const int lA, const int mA, const int lB,
+      const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
+      std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower,
+      const Scalar_t upper);
 
    /**
     * @brief Destructor
@@ -54,7 +58,6 @@ public:
    virtual ~ProjCurlCPolCrossTor() = default;
 
 protected:
-
 private:
 };
 

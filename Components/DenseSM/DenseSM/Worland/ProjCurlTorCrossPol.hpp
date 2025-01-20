@@ -45,7 +45,11 @@ public:
     * @param alpha   Jacobi alpha parametery
     * @param dBeta   Jacobi dBeta parameter
     */
-   ProjCurlTorCrossPol(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pTorA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t alpha, const Scalar_t dBeta);
+   ProjCurlTorCrossPol(const int rows, const int cols, const int lOut,
+      const int mOut, const int lA, const int mA, const int lB, const int mB,
+      std::shared_ptr<RadialTorPolFunction> pTorA,
+      std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t alpha,
+      const Scalar_t dBeta);
 
    /**
     * @brief Destructor
@@ -66,7 +70,7 @@ protected:
    /**
     * @brief Radial operator
     */
-   std::shared_ptr<ITripleHarmonicOperator>  mpOp;
+   std::shared_ptr<ITripleHarmonicOperator> mpOp;
 
 private:
 };

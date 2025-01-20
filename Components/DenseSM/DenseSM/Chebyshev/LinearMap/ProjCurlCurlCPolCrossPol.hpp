@@ -48,7 +48,11 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   ProjCurlCurlCPolCrossPol(const int rows, const int cols, const int p, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower, const Scalar_t upper);
+   ProjCurlCurlCPolCrossPol(const int rows, const int cols, const int p,
+      const int lOut, const int mOut, const int lA, const int mA, const int lB,
+      const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
+      std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower,
+      const Scalar_t upper);
 
    /**
     * @brief Destructor
@@ -56,7 +60,6 @@ public:
    virtual ~ProjCurlCurlCPolCrossPol() = default;
 
 protected:
-
 private:
 };
 

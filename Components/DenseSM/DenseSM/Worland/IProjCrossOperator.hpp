@@ -39,8 +39,9 @@ public:
     * @param alpha   Jacobi alpha parameter
     * @param dBeta   Jacobi dBeta parameter
     */
-   IProjCrossOperator(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, const Scalar_t alpha,
-      const Scalar_t dBeta);
+   IProjCrossOperator(const int rows, const int cols, const int lOut,
+      const int mOut, const int lA, const int mA, const int lB, const int mB,
+      const Scalar_t alpha, const Scalar_t dBeta);
 
    /**
     * @brief Destructor
@@ -61,12 +62,14 @@ protected:
    /**
     * @brief Compute Gaunt's integral
     */
-   MHDFloat  gaunt(const int lA, const int mA, const int lB, const int mB, const int lG, const int mG) const;
+   MHDFloat gaunt(const int lA, const int mA, const int lB, const int mB,
+      const int lG, const int mG) const;
 
    /**
     * @brief Compute Elsasser's integral
     */
-   MHDFloat  elsasser(const int lA, const int mA, const int lB, const int mB, const int lG, const int mG) const;
+   MHDFloat elsasser(const int lA, const int mA, const int lB, const int mB,
+      const int lG, const int mG) const;
 
    /**
     * @brief Operator is exactly zero

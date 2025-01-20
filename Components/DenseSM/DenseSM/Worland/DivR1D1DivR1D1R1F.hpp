@@ -25,7 +25,7 @@ namespace Worland {
 /**
  * @brief Implementation of the spectral operator f/r
  */
-class DivR1D1DivR1D1R1F : public ITripleHarmonicOperator 
+class DivR1D1DivR1D1R1F : public ITripleHarmonicOperator
 {
 public:
    /**
@@ -42,7 +42,9 @@ public:
     * @param alpha   Jacobi alpha parameter
     * @param dBeta   Jacobi dBeta parameter
     */
-   DivR1D1DivR1D1R1F(const int rows, const int cols, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t alpha,
+   DivR1D1DivR1D1R1F(const int rows, const int cols, const int lOut,
+      const int mOut, const int lF, const int mF, const int lIn, const int mIn,
+      std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t alpha,
       const Scalar_t dBeta);
 
    /**

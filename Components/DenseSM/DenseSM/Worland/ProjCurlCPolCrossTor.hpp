@@ -12,8 +12,8 @@
 // Project includes
 //
 #include "DenseSM/Worland/IProjCrossOperator.hpp"
-#include "DenseSM/Worland/RadialTorPolFunction.hpp"
 #include "DenseSM/Worland/ProjCurlTorCrossTor.hpp"
+#include "DenseSM/Worland/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -43,7 +43,11 @@ public:
     * @param alpha   Jacobi alpha parameter
     * @param dBeta   Jacobi dBeta parameter
     */
-   ProjCurlCPolCrossTor(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t alpha, const Scalar_t dBeta);
+   ProjCurlCPolCrossTor(const int rows, const int cols, const int lOut,
+      const int mOut, const int lA, const int mA, const int lB, const int mB,
+      std::shared_ptr<RadialTorPolFunction> pPolA,
+      std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t alpha,
+      const Scalar_t dBeta);
 
    /**
     * @brief Destructor
@@ -51,7 +55,6 @@ public:
    virtual ~ProjCurlCPolCrossTor() = default;
 
 protected:
-
 private:
 };
 

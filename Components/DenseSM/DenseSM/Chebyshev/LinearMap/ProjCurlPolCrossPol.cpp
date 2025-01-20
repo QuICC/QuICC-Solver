@@ -13,10 +13,10 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlPolCrossPol.hpp"
-#include "DenseSM/Chebyshev/LinearMap/R2DivR2FD1R1.hpp"
 #include "DenseSM/Chebyshev/LinearMap/R2DivR2D1R1F.hpp"
-#include "DenseSM/Chebyshev/LinearMap/R4DivR2FD1R1.hpp"
+#include "DenseSM/Chebyshev/LinearMap/R2DivR2FD1R1.hpp"
 #include "DenseSM/Chebyshev/LinearMap/R4DivR2D1R1F.hpp"
+#include "DenseSM/Chebyshev/LinearMap/R4DivR2FD1R1.hpp"
 
 namespace QuICC {
 
@@ -26,22 +26,29 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-ProjCurlPolCrossPol::ProjCurlPolCrossPol(const int nNr, const int nNc, const int p, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB,
-   std::shared_ptr<RadialTorPolFunction> pPolA, std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower, const Scalar_t upper) :
+ProjCurlPolCrossPol::ProjCurlPolCrossPol(const int nNr, const int nNc,
+   const int p, const int lOut, const int mOut, const int lA, const int mA,
+   const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
+   std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower,
+   const Scalar_t upper) :
     IProjCrossOperator(nNr, nNc, lOut, mOut, lA, mA, lB, mB, lower, upper)
 {
    // Radial function A is given
-   if(pPolA && pPolB == nullptr)
+   if (pPolA && pPolB == nullptr)
    {
-      if(p == 4)
+      if (p == 4)
       {
-         this->mpOpA = std::make_shared<R4DivR2FD1R1>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
-         this->mpOpB = std::make_shared<R4DivR2D1R1F>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
+         this->mpOpA = std::make_shared<R4DivR2FD1R1>(nNr, nNc, lOut, mOut, lA,
+            mA, lB, mB, pPolA, lower, upper);
+         this->mpOpB = std::make_shared<R4DivR2D1R1F>(nNr, nNc, lOut, mOut, lA,
+            mA, lB, mB, pPolA, lower, upper);
       }
-      else if(p == 2)
+      else if (p == 2)
       {
-         this->mpOpA = std::make_shared<R2DivR2FD1R1>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
-         this->mpOpB = std::make_shared<R2DivR2D1R1F>(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, lower, upper);
+         this->mpOpA = std::make_shared<R2DivR2FD1R1>(nNr, nNc, lOut, mOut, lA,
+            mA, lB, mB, pPolA, lower, upper);
+         this->mpOpB = std::make_shared<R2DivR2D1R1F>(nNr, nNc, lOut, mOut, lA,
+            mA, lB, mB, pPolA, lower, upper);
       }
       else
       {
@@ -49,17 +56,21 @@ ProjCurlPolCrossPol::ProjCurlPolCrossPol(const int nNr, const int nNc, const int
       }
    }
    // Radial function B is given
-   else if(pPolB && pPolA == nullptr)
+   else if (pPolB && pPolA == nullptr)
    {
-      if(p == 4)
+      if (p == 4)
       {
-         this->mpOpA = std::make_shared<R4DivR2D1R1F>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
-         this->mpOpB = std::make_shared<R4DivR2FD1R1>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
+         this->mpOpA = std::make_shared<R4DivR2D1R1F>(nNr, nNc, lOut, mOut, lB,
+            mB, lA, mA, pPolB, lower, upper);
+         this->mpOpB = std::make_shared<R4DivR2FD1R1>(nNr, nNc, lOut, mOut, lB,
+            mB, lA, mA, pPolB, lower, upper);
       }
-      else if(p == 2)
+      else if (p == 2)
       {
-         this->mpOpA = std::make_shared<R2DivR2D1R1F>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
-         this->mpOpB = std::make_shared<R2DivR2FD1R1>(nNr, nNc, lOut, mOut, lB, mB, lA, mA, pPolB, lower, upper);
+         this->mpOpA = std::make_shared<R2DivR2D1R1F>(nNr, nNc, lOut, mOut, lB,
+            mB, lA, mA, pPolB, lower, upper);
+         this->mpOpB = std::make_shared<R2DivR2FD1R1>(nNr, nNc, lOut, mOut, lB,
+            mB, lA, mA, pPolB, lower, upper);
       }
       else
       {
@@ -71,7 +82,8 @@ ProjCurlPolCrossPol::ProjCurlPolCrossPol(const int nNr, const int nNc, const int
       throw std::logic_error("One of the radial functions should be null");
    }
 
-   this->mIsZero = (this->gaunt(this->mLa, this->mMa, this->mLb, this->mMb, this->mLout, this->mMout) == 0);
+   this->mIsZero = (this->gaunt(this->mLa, this->mMa, this->mLb, this->mMb,
+                       this->mLout, this->mMout) == 0);
 }
 
 void ProjCurlPolCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
@@ -81,16 +93,17 @@ void ProjCurlPolCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
    auto&& la = this->mLa;
    auto&& lb = this->mLb;
 
-   const MHDFloat L2a = static_cast<MHDFloat>(la*(la + 1));
-   const MHDFloat L2b = static_cast<MHDFloat>(lb*(lb + 1));
-   const MHDFloat L2g = static_cast<MHDFloat>(lg*(lg + 1));
+   const MHDFloat L2a = static_cast<MHDFloat>(la * (la + 1));
+   const MHDFloat L2b = static_cast<MHDFloat>(lb * (lb + 1));
+   const MHDFloat L2g = static_cast<MHDFloat>(lg * (lg + 1));
 
-   const MHDFloat Kabg = this->gaunt(la, this->mMa, lb, this->mMb, lg, this->mMout);
+   const MHDFloat Kabg =
+      this->gaunt(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-   MHDFloat cA = L2a*(L2a - L2b - L2g)/2.0*Kabg;
-   MHDFloat cB = L2b*(L2a - L2b + L2g)/2.0*Kabg;
+   MHDFloat cA = L2a * (L2a - L2b - L2g) / 2.0 * Kabg;
+   MHDFloat cB = L2b * (L2a - L2b + L2g) / 2.0 * Kabg;
 
-   mat = cA*this->mpOpA->mat() + cB*this->mpOpB->mat();
+   mat = cA * this->mpOpA->mat() + cB * this->mpOpB->mat();
 }
 
 } // namespace LinearMap

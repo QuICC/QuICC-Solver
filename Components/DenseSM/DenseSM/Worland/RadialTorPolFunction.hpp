@@ -48,10 +48,10 @@ public:
    /**
     * @brief Evaluate function on grid
     */
-   virtual Internal::Array evaluate(const Internal::Array& r, const int l, const int m) const = 0;
+   virtual Internal::Array evaluate(const Internal::Array& r, const int l,
+      const int m) const = 0;
 
 protected:
-
 private:
 };
 

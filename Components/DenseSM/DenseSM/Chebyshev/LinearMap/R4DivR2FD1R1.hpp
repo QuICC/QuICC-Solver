@@ -45,7 +45,9 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   R4DivR2FD1R1(const int rows, const int cols, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
+   R4DivR2FD1R1(const int rows, const int cols, const int lOut, const int mOut,
+      const int lF, const int mF, const int lIn, const int mIn,
+      std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
       const Scalar_t upper);
 
    /**
