@@ -1,0 +1,21 @@
+.cscs_x86_64_builder:
+  extends: .container-builder-cscs-zen2
+
+.cscs_aarch64_builder:
+  extends: .container-builder-cscs-gh200
+
+.daint-mc_builder:
+  extends: .cscs_x86_64_builder
+
+.daint-gpu_builder:
+  extends: .cscs_x86_64_builder
+
+.alps-a100_builder:
+  extends: .cscs_x86_64_builder
+
+.alps-gh200_builder:
+  extends: .cscs_aarch64_builder
+
+.alps-mc_builder:
+  extends: .cscs_x86_64_builder
+

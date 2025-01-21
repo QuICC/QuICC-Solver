@@ -17,7 +17,7 @@ if(QUICC_USE_MPI)
       MpiTimer.cpp
   )
   target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
-    PRIVATE
+    PUBLIC
       MPI::MPI_CXX
   )
   target_compile_definitions(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
