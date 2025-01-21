@@ -14,7 +14,6 @@
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1D1F.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
@@ -45,6 +44,7 @@ void RpDivR1D1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    typedef cheb::Integrator::P::SetupType SetupType;
 
    const auto pId = GridPurpose::SIMULATION;
+   int fN = this->mpF->nN();
    int rN =
       2 * (std::max(this->rows(), this->cols()) + this->mpF->nN() + 4 + 2);
 
@@ -52,33 +52,26 @@ void RpDivR1D1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, rN);
 
-   auto sBwd = std::make_shared<SetupType>(rN, this->cols(), this->cols(), pId);
-   sBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sBwd->lock();
-   cheb::Projector::P TBwd;
-   TBwd.init(sBwd);
-
-   Matrix tmpA = Matrix::Identity(rN, this->cols());
-   Matrix tmpB = Matrix::Zero(rN, this->cols());
-   TBwd.transform(tmpB, tmpA);
-
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
 
-   tmpB = f.cast<MHDFloat>().asDiagonal() * tmpB;
-
-   auto sFFwd = std::make_shared<SetupType>(rN, this->cols(),
-      this->cols() + this->mpF->nN(), pId);
-   sFFwd->setBounds(static_cast<MHDFloat>(this->mcLower),
+   auto sFwdF = std::make_shared<SetupType>(rN, 1, fN, pId);
+   sFwdF->setBounds(static_cast<MHDFloat>(this->mcLower),
       static_cast<MHDFloat>(this->mcUpper));
-   sFFwd->lock();
-   cheb::Integrator::P TFFwd;
-   TFFwd.init(sFFwd);
+   sFwdF->lock();
+   cheb::Integrator::P TFwdF;
+   TFwdF.init(sFwdF);
+   Matrix sF(rN,1);
+   Matrix gF(rN, 1);
+   gF = f.cast<MHDFloat>();
 
-   TFFwd.transform(tmpA, tmpB);
+   TFwdF.transform(sF, gF);
+   Matrix tmpA = Matrix::Zero(rN,cols);
+   expansionProduct(tmpA, cols+fN, cols, sF, fN);
+
+   Matrix tmpB = Matrix::Zero(rN, this->cols());
 
    auto sFBwd = std::make_shared<SetupType>(rN, this->cols(),
-      this->cols() + this->mpF->nN(), pId);
+      this->cols() + fN, pId);
    sFBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
       static_cast<MHDFloat>(this->mcUpper));
    sFBwd->lock();

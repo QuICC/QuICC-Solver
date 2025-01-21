@@ -46,25 +46,15 @@ void RpDivR2D1R1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    typedef cheb::Integrator::P::SetupType SetupType;
 
    const auto pId = GridPurpose::SIMULATION;
+   int fN = this->mpF->nN() + this->mP - 2;
    int rN =
-      2 * (std::max(this->rows(), this->cols()) + this->mpF->nN() + this->mP + 2);
+      2 * (fN + 2);
 
    // Compute grid
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, rN);
 
-   auto sBwd = std::make_shared<SetupType>(rN, this->cols(), this->cols(), pId);
-   sBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sBwd->lock();
-   cheb::Projector::P TBwd;
-   TBwd.init(sBwd);
-
-   Matrix tmpA = Matrix::Identity(rN, this->cols());
-   Matrix tmpB = Matrix::Zero(rN, this->cols());
-   TBwd.transform(tmpB, tmpA);
-
-   auto sFFwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
+   auto sFFwd = std::make_shared<SetupType>(rN, 1, fN, pId);
    sFFwd->setBounds(static_cast<MHDFloat>(this->mcLower),
       static_cast<MHDFloat>(this->mcUpper));
    sFFwd->lock();
@@ -88,18 +78,10 @@ void RpDivR2D1R1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    {
       fA = igrid.array().pow(this->mP-2).cast<MHDFloat>().matrix().asDiagonal() * fA;
    }
-   tmpB = fA.asDiagonal() * tmpB;
+   TFFwd.transform(fB,fA);
 
-   auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
-   sFwd->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sFwd->lock();
-   cheb::Integrator::P TFwd;
-   TFwd.init(sFwd);
-
-   TFwd.transform(tmpA, tmpB);
-
-   mat = tmpA.topRows(this->rows());
+   mat = Matrix::Zero(rows,cols);
+   expansionProduct(mat, rows, cols, fB, fN);
 }
 
 } // namespace LinearMap

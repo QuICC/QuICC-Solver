@@ -13,7 +13,6 @@
 //
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1F.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
@@ -44,39 +43,31 @@ void RpDivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    typedef cheb::Integrator::P::SetupType SetupType;
 
    const auto pId = GridPurpose::SIMULATION;
+   int fN = this->mpF->nN() + this->mP - 1;
    int rN =
-      2 * (std::max(this->rows(), this->cols()) + this->mpF->nN() + this->mP + 2);
+      2 * (fN + 2);
 
    // Compute grid
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, rN);
 
-   auto sBwd = std::make_shared<SetupType>(rN, this->cols(), this->cols(), pId);
-   sBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sBwd->lock();
-   cheb::Projector::P TBwd;
-   TBwd.init(sBwd);
-
-   Matrix tmpA = Matrix::Identity(rN, this->cols());
-   Matrix tmpB = Matrix::Zero(rN, this->cols());
-   TBwd.transform(tmpB, tmpA);
-
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
    f = igrid.array().pow(this->mP-1).matrix().asDiagonal() * f;
 
-   tmpB = f.cast<MHDFloat>().asDiagonal() * tmpB;
-
-   auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
-   sFwd->setBounds(static_cast<MHDFloat>(this->mcLower),
+   auto sFwdF = std::make_shared<SetupType>(rN, 1, fN, pId);
+   sFwdF->setBounds(static_cast<MHDFloat>(this->mcLower),
       static_cast<MHDFloat>(this->mcUpper));
-   sFwd->lock();
-   cheb::Integrator::P TFwd;
-   TFwd.init(sFwd);
+   sFwdF->lock();
+   cheb::Integrator::P TFwdF;
+   TFwdF.init(sFwdF);
+   Matrix sF(rN,1);
+   Matrix gF(rN, 1);
+   gF = f.cast<MHDFloat>();
 
-   TFwd.transform(tmpA, tmpB);
+   TFwdF.transform(sF, gF);
 
-   mat = tmpA.topRows(this->rows());
+   mat = Matrix::Zero(rows,cols);
+   expansionProduct(mat, rows, cols, sF, fN);
 }
 
 } // namespace LinearMap
