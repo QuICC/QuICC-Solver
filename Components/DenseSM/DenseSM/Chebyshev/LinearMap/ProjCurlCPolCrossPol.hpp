@@ -36,6 +36,7 @@ public:
     *
     * @param rows    Number of rows
     * @param cols    Number of cols
+    * @param q       Order of quasi-inverse
     * @param p       Power of radial prefactor
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic order
@@ -48,7 +49,7 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   ProjCurlCPolCrossPol(const int rows, const int cols, const int p,
+   ProjCurlCPolCrossPol(const int rows, const int cols, const int q, const int p,
       const int lOut, const int mOut, const int lA, const int mA, const int lB,
       const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
       std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower,

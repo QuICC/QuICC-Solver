@@ -1,11 +1,11 @@
 /**
- * @file R2DivR2FD1R1.hpp
- * @brief Implementation of the spectral operator r^2 1/r^2 f D(r *)
- *        multiplied by gaunt coefficient
+ * @file RpDivR1D1DivR1FD1R1.hpp
+ * @brief Implementation of the spectral operator r^p 1/r D(1/r D(r f *))
+ *        multiplied by elsasser coefficient
  */
 
-#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R2DIVR2FD1R1_HPP
-#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R2DIVR2FD1R1_HPP
+#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_RPDIVR1D1DIVR1FD1R1_HPP
+#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_RPDIVR1D1DIVR1FD1R1_HPP
 
 // System includes
 //
@@ -26,9 +26,9 @@ namespace Chebyshev {
 namespace LinearMap {
 
 /**
- * @brief Implementation of the spectral operator r^2 1/r^2 f D(r *)
+ * @brief Implementation of the spectral operator r^p 1/r D(1/r D(r f *))
  */
-class R2DivR2FD1R1 : public ITripleHarmonicOperator
+class RpDivR1D1DivR1FD1R1 : public ITripleHarmonicOperator
 {
 public:
    /**
@@ -36,6 +36,7 @@ public:
     *
     * @param rows    Number of rows
     * @param cols    Number of cols
+    * @param p       Power of radial prefactor
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic order
     * @param lF      harmonic degree of f
@@ -45,15 +46,15 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   R2DivR2FD1R1(const int rows, const int cols, const int lOut, const int mOut,
-      const int lF, const int mF, const int lIn, const int mIn,
+   RpDivR1D1DivR1FD1R1(const int rows, const int cols, const int p, const int lOut,
+      const int mOut, const int lF, const int mF, const int lIn, const int mIn,
       std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
       const Scalar_t upper);
 
    /**
     * @brief Destructor
     */
-   virtual ~R2DivR2FD1R1() = default;
+   virtual ~RpDivR1D1DivR1FD1R1() = default;
 
 protected:
    /**
@@ -74,4 +75,4 @@ private:
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R2DIVR2FD1R1_HPP
+#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_RPDIVR1D1DIVR1FD1R1_HPP

@@ -14,7 +14,12 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/IProjCrossOperator.hpp"
+#include "Types/Internal/Typedefs.hpp"
 #include "Types/Math.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I1.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I2.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I3.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I4.hpp"
 
 namespace QuICC {
 
@@ -25,11 +30,12 @@ namespace Chebyshev {
 namespace LinearMap {
 
 IProjCrossOperator::IProjCrossOperator(const int rows, const int cols,
-   const int lOut, const int mOut, const int lA, const int mA, const int lB,
+   const int q, const int p, const int lOut, const int mOut, const int lA, const int mA, const int lB,
    const int mB, const Scalar_t lower, const Scalar_t upper) :
     ILinearMapOperator(rows, cols, lower, upper),
     mIsZero(false),
     mIsImaginary(false),
+    mQ(q), mP(p),
     mLout(lOut),
     mMout(mOut),
     mLa(lA),
@@ -119,6 +125,41 @@ MHDFloat IProjCrossOperator::elsasser(const int lA, const int mA, const int lB,
    }
 
    return Labg;
+}
+
+void IProjCrossOperator::applyQI(Internal::Matrix& mat) const
+{
+   if(this->mQ > 0)
+   {
+      int nN = mat.rows();
+      Internal::SparseMatrix matI;
+      if(this->mQ == 1)
+      {
+         SparseSM::Chebyshev::LinearMap::I1 qi(nN, nN, this->mcLower, this->mcUpper);
+         matI = qi.mpmat();
+      }
+      else if(this->mQ == 2)
+      {
+         SparseSM::Chebyshev::LinearMap::I2 qi(nN, nN, this->mcLower, this->mcUpper);
+         matI = qi.mpmat();
+      }
+      else if(this->mQ == 3)
+      {
+         SparseSM::Chebyshev::LinearMap::I3 qi(nN, nN, this->mcLower, this->mcUpper);
+         matI = qi.mpmat();
+      }
+      else if(this->mQ == 4)
+      {
+         SparseSM::Chebyshev::LinearMap::I4 qi(nN, nN, this->mcLower, this->mcUpper);
+         matI = qi.mpmat();
+      }
+      else
+      {
+         throw std::logic_error("Quasi-inverse order not implemented");
+      }
+
+      mat = matI*mat;
+   }
 }
 
 } // namespace LinearMap

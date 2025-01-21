@@ -1,6 +1,6 @@
 /**
- * @file R4DivR1F.cpp
- * @brief Source of the implementation of the spectral operator r^4 f/r
+ * @file RpDivR1F.cpp
+ * @brief Source of the implementation of the spectral operator r^p f/r
  */
 
 // System includes
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "DenseSM/Chebyshev/LinearMap/R4DivR1F.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RpDivR1F.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
 #include "Types/Internal/Typedefs.hpp"
@@ -24,15 +24,20 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-R4DivR1F::R4DivR1F(const int nNr, const int nNc, const int lOut, const int mOut,
+RpDivR1F::RpDivR1F(const int nNr, const int nNc, const int p, const int lOut, const int mOut,
    const int lF, const int mF, const int lIn, const int mIn,
    std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
    const Scalar_t upper) :
-    ITripleHarmonicOperator(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, lower,
+    ITripleHarmonicOperator(nNr, nNc, p, lOut, mOut, lF, mF, lIn, mIn, pF, lower,
        upper)
-{}
+{
+   if(this->mP < 2)
+   {
+      throw std::logic_error("Radial prefactor should be at least r^p");
+   }
+}
 
-void R4DivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
+void RpDivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
    namespace cheb = Transform::Fft::Chebyshev::LinearMap;
@@ -40,7 +45,7 @@ void R4DivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
 
    const auto pId = GridPurpose::SIMULATION;
    int rN =
-      2 * (std::max(this->rows(), this->cols()) + this->mpF->nN() + 4 + 2);
+      2 * (std::max(this->rows(), this->cols()) + this->mpF->nN() + this->mP + 2);
 
    // Compute grid
    Internal::Array igrid, iweights;
@@ -58,7 +63,7 @@ void R4DivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    TBwd.transform(tmpB, tmpA);
 
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
-   f = igrid.array().pow(3).matrix().asDiagonal() * f;
+   f = igrid.array().pow(this->mP-1).matrix().asDiagonal() * f;
 
    tmpB = f.cast<MHDFloat>().asDiagonal() * tmpB;
 

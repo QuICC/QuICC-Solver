@@ -13,8 +13,7 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlTorCrossPol.hpp"
-#include "DenseSM/Chebyshev/LinearMap/R2DivR1F.hpp"
-#include "DenseSM/Chebyshev/LinearMap/R4DivR1F.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RpDivR1F.hpp"
 
 namespace QuICC {
 
@@ -25,23 +24,18 @@ namespace Chebyshev {
 namespace LinearMap {
 
 ProjCurlTorCrossPol::ProjCurlTorCrossPol(const int nNr, const int nNc,
-   const int p, const int lOut, const int mOut, const int lA, const int mA,
+   const int q, const int p, const int lOut, const int mOut, const int lA, const int mA,
    const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pTorA,
    std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t lower,
    const Scalar_t upper) :
-    IProjCrossOperator(nNr, nNc, lOut, mOut, lA, mA, lB, mB, lower, upper)
+    IProjCrossOperator(nNr, nNc, q, p, lOut, mOut, lA, mA, lB, mB, lower, upper)
 {
    // Radial function A is given
    if (pTorA && pPolB == nullptr)
    {
-      if (p == 4)
+      if (p > 1)
       {
-         this->mpOp = std::make_shared<R4DivR1F>(nNr, nNc, lOut, mOut, lA, mA,
-            lB, mB, pTorA, lower, upper);
-      }
-      else if (p == 2)
-      {
-         this->mpOp = std::make_shared<R2DivR1F>(nNr, nNc, lOut, mOut, lA, mA,
+         this->mpOp = std::make_shared<RpDivR1F>(nNr, nNc, p, lOut, mOut, lA, mA,
             lB, mB, pTorA, lower, upper);
       }
       else
@@ -52,14 +46,9 @@ ProjCurlTorCrossPol::ProjCurlTorCrossPol(const int nNr, const int nNc,
    // Radial function B is given
    else if (pPolB && pTorA == nullptr)
    {
-      if (p == 4)
+      if (p > 1)
       {
-         this->mpOp = std::make_shared<R4DivR1F>(nNr, nNc, lOut, mOut, lB, mB,
-            lA, mA, pPolB, lower, upper);
-      }
-      else if (p == 2)
-      {
-         this->mpOp = std::make_shared<R2DivR1F>(nNr, nNc, lOut, mOut, lB, mB,
+         this->mpOp = std::make_shared<RpDivR1F>(nNr, nNc, p, lOut, mOut, lB, mB,
             lA, mA, pPolB, lower, upper);
       }
       else
@@ -83,14 +72,19 @@ void ProjCurlTorCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
    auto&& la = this->mLa;
    auto&& lb = this->mLb;
 
-   const MHDFloat L2b = static_cast<MHDFloat>(lb * (lb + 1));
+   const Internal::MHDFloat L2b = static_cast<Internal::MHDFloat>(lb * (lb + 1));
 
    const MHDFloat Labg =
       this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-   MHDFloat c = std::pow(-1.0, la + lb + lg - 1) * L2b * Labg;
+   Internal::MHDFloat c = std::pow(-1, la + lb + lg - 1) * L2b;
 
-   mat = c * this->mpOp->mat();
+   mat = c * this->mpOp->mpmat();
+
+   // Apply quasi-inverse if necessary
+   this->applyQI(mat);
+
+   mat *= static_cast<Internal::MHDFloat>(Labg);
 }
 
 } // namespace LinearMap

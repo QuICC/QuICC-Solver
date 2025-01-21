@@ -1,10 +1,11 @@
 /**
- * @file R4DivR1D1CF.hpp
- * @brief Implementation of the spectral operator r^4 1/r D(-lapl(f) *)
+ * @file RpDivR1D1FC.hpp
+ * @brief Implementation of the spectral operator r^p 1/r D(f (-lapl(*)))
+ *        multiplied by gaunt coefficient
  */
 
-#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVRD1CF_HPP
-#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVRD1CF_HPP
+#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_RPDIVR1DFC_HPP
+#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_RPDIVR1DFC_HPP
 
 // System includes
 //
@@ -25,9 +26,9 @@ namespace Chebyshev {
 namespace LinearMap {
 
 /**
- * @brief Implementation of the spectral operator r^4 1/r D(-lapl(f) *)
+ * @brief Implementation of the spectral operator r^p 1/r D(f (-lapl(*)))
  */
-class R4DivR1D1CF : public ITripleHarmonicOperator
+class RpDivR1D1FC : public ITripleHarmonicOperator
 {
 public:
    /**
@@ -35,6 +36,7 @@ public:
     *
     * @param rows    Number of rows
     * @param cols    Number of cols
+    * @param p       Power of radial prefactor
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic order
     * @param lF      harmonic degree of f
@@ -44,7 +46,7 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   R4DivR1D1CF(const int rows, const int cols, const int lOut, const int mOut,
+   RpDivR1D1FC(const int rows, const int cols, const int p, const int lOut, const int mOut,
       const int lF, const int mF, const int lIn, const int mIn,
       std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
       const Scalar_t upper);
@@ -52,7 +54,7 @@ public:
    /**
     * @brief Destructor
     */
-   virtual ~R4DivR1D1CF() = default;
+   virtual ~RpDivR1D1FC() = default;
 
 protected:
    /**
@@ -73,4 +75,4 @@ private:
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_R4DIVRD1CF_HPP
+#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_RPDIVR1DFC_HPP

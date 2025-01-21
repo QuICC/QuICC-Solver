@@ -1,7 +1,7 @@
 /**
- * @file R4DivR2D1R1FC.cpp
- * @brief Source of the implementation of the spectral operator r^4 1/r D(r f)
- * (-lapl(*))/r
+ * @file RpDivR3D1R1FD1R1.cpp
+ * @brief Source of the implementation of the spectral operator r^p D(r f) D(r
+ * *)
  */
 
 // System includes
@@ -9,13 +9,13 @@
 #include <Eigen/Dense>
 #include <cassert>
 #include <cmath>
+#include <stdexcept>
 
 // Project includes
 //
-#include "DenseSM/Chebyshev/LinearMap/R4DivR2D1R1FC.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RpDivR3D1R1FD1R1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1Y1.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
@@ -26,15 +26,20 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-R4DivR2D1R1FC::R4DivR2D1R1FC(const int nNr, const int nNc, const int lOut,
+RpDivR3D1R1FD1R1::RpDivR3D1R1FD1R1(const int nNr, const int nNc, const int p, const int lOut,
    const int mOut, const int lF, const int mF, const int lIn, const int mIn,
    std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
    const Scalar_t upper) :
-    ITripleHarmonicOperator(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, lower,
+    ITripleHarmonicOperator(nNr, nNc, p, lOut, mOut, lF, mF, lIn, mIn, pF, lower,
        upper)
-{}
+{
+   if(this->mP != 4)
+   {
+      throw std::logic_error("Radial prefactor needs to be r^4");
+   }
+}
 
-void R4DivR2D1R1FC::buildOpImpl(Internal::Matrix& mat, const int rows,
+void RpDivR3D1R1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
    namespace cheb = Transform::Fft::Chebyshev::LinearMap;
@@ -52,26 +57,16 @@ void R4DivR2D1R1FC::buildOpImpl(Internal::Matrix& mat, const int rows,
    sBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
       static_cast<MHDFloat>(this->mcUpper));
    sBwd->lock();
-   cheb::Projector::P TBwd;
+   cheb::Projector::D1Y1 TBwd;
    TBwd.init(sBwd);
 
-   Matrix tA = Matrix::Identity(rN, this->cols());
-   Matrix tB = Matrix::Zero(rN, this->cols());
-   TBwd.transform(tB, tA);
+   Matrix tmpA = Matrix::Identity(rN, this->cols());
+   Matrix tmpB = Matrix::Zero(rN, this->cols());
+   TBwd.transform(tmpB, tmpA);
 
-   cheb::Projector::D<1> TD1Bwd;
-   TD1Bwd.init(sBwd);
-
-   Matrix td1B = Matrix::Zero(rN, this->cols());
-   TD1Bwd.transform(td1B, tA);
-
-   cheb::Projector::D<2> TD2Bwd;
-   TD2Bwd.init(sBwd);
-
-   Matrix td2B = Matrix::Zero(rN, this->cols());
-   TD2Bwd.transform(td2B, tA);
-
-   Matrix f = this->mpF->evaluate(igrid, this->mLf, this->mMf).cast<MHDFloat>();
+   Matrix fA =
+      this->mpF->evaluate(igrid, this->mLf, this->mMf).cast<MHDFloat>();
+   Matrix fB = Matrix::Zero(rN, 1);
 
    auto sFFwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
    sFFwd->setBounds(static_cast<MHDFloat>(this->mcLower),
@@ -80,29 +75,19 @@ void R4DivR2D1R1FC::buildOpImpl(Internal::Matrix& mat, const int rows,
    cheb::Integrator::P TFFwd;
    TFFwd.init(sFFwd);
 
-   Matrix sf = Matrix::Zero(rN, 1);
-   TFFwd.transform(sf, f);
+   TFFwd.transform(fB, fA);
 
    auto sFBwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
    sFBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
       static_cast<MHDFloat>(this->mcUpper));
    sFBwd->lock();
-   cheb::Projector::D<1> TFd1Bwd;
-   TFd1Bwd.init(sFBwd);
+   cheb::Projector::D1Y1 TFBwd;
+   TFBwd.init(sFBwd);
 
-   Matrix d1f = Matrix::Zero(rN, 1);
-   TFd1Bwd.transform(d1f, sf);
+   TFBwd.transform(fA, fB);
+   fA = igrid.cast<MHDFloat>().asDiagonal() * fA;
 
-   const int l = this->mLin;
-   const Internal::Array& r = igrid;
-
-
-   tA = -((f.array() + d1f.array() * r.cast<MHDFloat>().array())
-             .matrix()
-             .asDiagonal() *
-          (r.cast<MHDFloat>().asDiagonal() *
-                (2.0 * td1B + r.cast<MHDFloat>().asDiagonal() * td2B) -
-             l * (1.0 + l) * tB));
+   tmpB = fA.asDiagonal() * tmpB;
 
    auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
    sFwd->setBounds(static_cast<MHDFloat>(this->mcLower),
@@ -111,10 +96,9 @@ void R4DivR2D1R1FC::buildOpImpl(Internal::Matrix& mat, const int rows,
    cheb::Integrator::P TFwd;
    TFwd.init(sFwd);
 
-   Matrix tC = Matrix::Identity(rN, this->cols());
-   TFwd.transform(tC, tA);
+   TFwd.transform(tmpA, tmpB);
 
-   mat = tC.topRows(this->rows());
+   mat = tmpA.topRows(this->rows());
 }
 
 } // namespace LinearMap

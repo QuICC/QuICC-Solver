@@ -33,6 +33,7 @@ public:
     *
     * @param rows    Number of rows
     * @param cols    Number of cols
+    * @param p       Power of radial prefactor
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic degree
     * @param lF      harmonic degree of f
@@ -43,11 +44,12 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   ITripleHarmonicOperator(const int rows, const int cols, const int lOut,
+   ITripleHarmonicOperator(const int rows, const int cols, const int p, const int lOut,
       const int mOut, const int lF, const int mF, const int lIn, const int mIn,
       std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
       const Scalar_t upper) :
        ILinearMapOperator(rows, cols, lower, upper),
+       mP(p),
        mLout(lOut),
        mMout(mOut),
        mLf(lF),
@@ -62,6 +64,11 @@ public:
    virtual ~ITripleHarmonicOperator() = default;
 
 protected:
+   /**
+    * @brief Power of radial prefactor
+    */
+   const int mP;
+
    /**
     * @brief Harmonic degree of output
     */

@@ -14,8 +14,8 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlCurlCPolCrossTor.hpp"
-#include "DenseSM/Chebyshev/LinearMap/R4DivR1CF.hpp"
-#include "DenseSM/Chebyshev/LinearMap/R4DivR1FC.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RpDivR1CF.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RpDivR1FC.hpp"
 
 namespace QuICC {
 
@@ -26,11 +26,11 @@ namespace Chebyshev {
 namespace LinearMap {
 
 ProjCurlCurlCPolCrossTor::ProjCurlCurlCPolCrossTor(const int nNr, const int nNc,
-   const int p, const int lOut, const int mOut, const int lA, const int mA,
+   const int q , const int p, const int lOut, const int mOut, const int lA, const int mA,
    const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
    std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower,
    const Scalar_t upper) :
-    ProjCurlCurlTorCrossTor(nNr, nNc, p, lOut, mOut, lA, mA, lB, mB, pPolA,
+    ProjCurlCurlTorCrossTor(nNr, nNc, q, p, lOut, mOut, lA, mA, lB, mB, pPolA,
        pTorB, lower, upper)
 {
    // Radial function A is given
@@ -38,7 +38,7 @@ ProjCurlCurlCPolCrossTor::ProjCurlCurlCPolCrossTor(const int nNr, const int nNc,
    {
       if (p == 4)
       {
-         this->mpOp = std::make_shared<R4DivR1CF>(nNr, nNc, lOut, mOut, lA, mA,
+         this->mpOp = std::make_shared<RpDivR1CF>(nNr, nNc, p, lOut, mOut, lA, mA,
             lB, mB, pPolA, lower, upper);
       }
       else
@@ -49,7 +49,7 @@ ProjCurlCurlCPolCrossTor::ProjCurlCurlCPolCrossTor(const int nNr, const int nNc,
    // Radial function B is given
    else if (pTorB && pPolA == nullptr)
    {
-      this->mpOp = std::make_shared<R4DivR1FC>(nNr, nNc, lOut, mOut, lB, mB, lA,
+      this->mpOp = std::make_shared<RpDivR1FC>(nNr, nNc, p, lOut, mOut, lB, mB, lA,
          mA, pTorB, lower, upper);
    }
    else

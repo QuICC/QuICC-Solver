@@ -1,6 +1,6 @@
 /**
- * @file R4DivR1D1DivR1FD1R1.cpp
- * @brief Source of the implementation of the spectral operator r^4 1/r D(1/r
+ * @file RpDivR1D1DivR1D1R1F.cpp
+ * @brief Source of the implementation of the spectral operator r^p 1/r D(1/r
  * D(r f *))
  */
 
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "DenseSM/Chebyshev/LinearMap/R4DivR1D1DivR1FD1R1.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RpDivR1D1DivR1D1R1F.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1Y1.hpp"
@@ -27,15 +27,20 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-R4DivR1D1DivR1FD1R1::R4DivR1D1DivR1FD1R1(const int nNr, const int nNc,
+RpDivR1D1DivR1D1R1F::RpDivR1D1DivR1D1R1F(const int nNr, const int nNc, const int p,
    const int lOut, const int mOut, const int lF, const int mF, const int lIn,
    const int mIn, std::shared_ptr<RadialTorPolFunction> pF,
    const Scalar_t lower, const Scalar_t upper) :
-    ITripleHarmonicOperator(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, lower,
+    ITripleHarmonicOperator(nNr, nNc, p, lOut, mOut, lF, mF, lIn, mIn, pF, lower,
        upper)
-{}
+{
+   if(this->mP != 4)
+   {
+      throw std::logic_error("Radial prefactor needs to be r^4");
+   }
+}
 
-void R4DivR1D1DivR1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
+void RpDivR1D1DivR1D1R1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
    namespace cheb = Transform::Fft::Chebyshev::LinearMap;
@@ -53,37 +58,57 @@ void R4DivR1D1DivR1FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    sBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
       static_cast<MHDFloat>(this->mcUpper));
    sBwd->lock();
-   cheb::Projector::D1Y1 TBwd;
+   cheb::Projector::P TBwd;
    TBwd.init(sBwd);
 
    Matrix tmpA = Matrix::Identity(rN, this->cols());
    Matrix tmpB = Matrix::Zero(rN, this->cols());
    TBwd.transform(tmpB, tmpA);
 
-   auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
-
-   tmpB = f.cast<MHDFloat>().asDiagonal() * tmpB;
-
-   auto sFFwd = std::make_shared<SetupType>(rN, this->cols(),
-      this->cols() + this->mpF->nN() + 2, pId);
-   sFFwd->setBounds(static_cast<MHDFloat>(this->mcLower),
+   auto sFFwdA = std::make_shared<SetupType>(rN, 1, this->mpF->nN() + 2, pId);
+   sFFwdA->setBounds(static_cast<MHDFloat>(this->mcLower),
       static_cast<MHDFloat>(this->mcUpper));
-   sFFwd->lock();
-   cheb::Integrator::P TFFwd;
-   TFFwd.init(sFFwd);
+   sFFwdA->lock();
+   cheb::Integrator::P TFFwdA;
+   TFFwdA.init(sFFwdA);
 
-   TFFwd.transform(tmpA, tmpB);
+   Matrix fA =
+      this->mpF->evaluate(igrid, this->mLf, this->mMf).cast<MHDFloat>();
+   Matrix fB = Matrix::Zero(rN, 1);
 
-   auto sFBwd = std::make_shared<SetupType>(rN, this->cols(),
-      this->cols() + this->mpF->nN() + 2, pId);
-   sFBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
+   TFFwdA.transform(fB, fA);
+
+   auto sFBwdA = std::make_shared<SetupType>(rN, 1, this->mpF->nN() + 2, pId);
+   sFBwdA->setBounds(static_cast<MHDFloat>(this->mcLower),
       static_cast<MHDFloat>(this->mcUpper));
-   sFBwd->lock();
-   cheb::Projector::D<1> TFBwd;
-   TFBwd.init(sFBwd);
+   sFBwdA->lock();
+   cheb::Projector::D1Y1 TFBwdA;
+   TFBwdA.init(sFBwdA);
+
+   TFBwdA.transform(fA, fB);
+
+   tmpB = fA.asDiagonal() * tmpB;
+
+   auto sFFwdB = std::make_shared<SetupType>(rN, this->cols(),
+      this->cols() + this->mpF->nN() + 2, pId);
+   sFFwdB->setBounds(static_cast<MHDFloat>(this->mcLower),
+      static_cast<MHDFloat>(this->mcUpper));
+   sFFwdB->lock();
+   cheb::Integrator::P TFFwdB;
+   TFFwdB.init(sFFwdB);
+
+   TFFwdB.transform(tmpA, tmpB);
+
+   auto sFBwdB = std::make_shared<SetupType>(rN, this->cols(),
+      this->cols() + this->mpF->nN() + 2, pId);
+   sFBwdB->setBounds(static_cast<MHDFloat>(this->mcLower),
+      static_cast<MHDFloat>(this->mcUpper));
+   sFBwdB->lock();
+   cheb::Projector::D<1> TFBwdB;
+   TFBwdB.init(sFBwdB);
 
    Matrix tmpC = Matrix::Zero(rN, this->cols());
-   TFBwd.transform(tmpC, tmpA);
+   TFBwdB.transform(tmpC, tmpA);
 
    tmpA = igrid.array().pow(2).cast<MHDFloat>().matrix().asDiagonal() * tmpC -
           igrid.cast<MHDFloat>().asDiagonal() * tmpB;

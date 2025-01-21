@@ -1,21 +1,18 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   ILinearMapOperator.cpp
-  R2DivR1F.cpp
-  R4DivR1F.cpp
-  R4DivR1FC.cpp
-  R4DivR1CF.cpp
-  R4DivR1D1F.cpp
-  R4DivR1D1FC.cpp
-  R4DivR1D1CF.cpp
-  R2DivR2D1R1F.cpp
-  R4DivR2D1R1F.cpp
-  R4DivR2D1R1FC.cpp
-  R2DivR2FD1R1.cpp
-  R4DivR2FD1R1.cpp
-  R4DivR2CFD1R1.cpp
-  R4DivR1D1DivR1FD1R1.cpp
-  R4DivR1D1DivR1D1R1F.cpp
-  R4DivR3D1R1FD1R1.cpp
+  RpDivR1F.cpp
+  RpDivR1FC.cpp
+  RpDivR1CF.cpp
+  RpDivR1D1F.cpp
+  RpDivR1D1FC.cpp
+  RpDivR1D1CF.cpp
+  RpDivR2D1R1F.cpp
+  RpDivR2D1R1FC.cpp
+  RpDivR2FD1R1.cpp
+  RpDivR2CFD1R1.cpp
+  RpDivR1D1DivR1FD1R1.cpp
+  RpDivR1D1DivR1D1R1F.cpp
+  RpDivR3D1R1FD1R1.cpp
   IProjCrossOperator.cpp
   ProjCurlTorCrossTor.cpp
   ProjCurlTorCrossPol.cpp

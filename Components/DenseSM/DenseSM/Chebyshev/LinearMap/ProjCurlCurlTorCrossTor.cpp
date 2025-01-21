@@ -13,7 +13,7 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlCurlTorCrossTor.hpp"
-#include "DenseSM/Chebyshev/LinearMap/R4DivR1F.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RpDivR1F.hpp"
 
 namespace QuICC {
 
@@ -24,18 +24,18 @@ namespace Chebyshev {
 namespace LinearMap {
 
 ProjCurlCurlTorCrossTor::ProjCurlCurlTorCrossTor(const int nNr, const int nNc,
-   const int p, const int lOut, const int mOut, const int lA, const int mA,
+   const int q, const int p, const int lOut, const int mOut, const int lA, const int mA,
    const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pTorA,
    std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower,
    const Scalar_t upper) :
-    IProjCrossOperator(nNr, nNc, lOut, mOut, lA, mA, lB, mB, lower, upper)
+    IProjCrossOperator(nNr, nNc, q, p, lOut, mOut, lA, mA, lB, mB, lower, upper)
 {
    // Radial function A is given
    if (pTorA && pTorB == nullptr)
    {
-      if (p == 4)
+      if (p > 1)
       {
-         this->mpOp = std::make_shared<R4DivR1F>(nNr, nNc, lOut, mOut, lA, mA,
+         this->mpOp = std::make_shared<RpDivR1F>(nNr, nNc, p, lOut, mOut, lA, mA,
             lB, mB, pTorA, lower, upper);
       }
       else
@@ -46,9 +46,9 @@ ProjCurlCurlTorCrossTor::ProjCurlCurlTorCrossTor(const int nNr, const int nNc,
    // Radial function B is given
    else if (pTorB && pTorA == nullptr)
    {
-      if (p == 4)
+      if (p > 1)
       {
-         this->mpOp = std::make_shared<R4DivR1F>(nNr, nNc, lOut, mOut, lB, mB,
+         this->mpOp = std::make_shared<RpDivR1F>(nNr, nNc, p, lOut, mOut, lB, mB,
             lA, mA, pTorB, lower, upper);
       }
       else
@@ -72,14 +72,19 @@ void ProjCurlCurlTorCrossTor::buildOpImpl(Internal::Matrix& mat, const int rows,
    auto&& lb = this->mLb;
    auto&& lg = this->mLout;
 
-   const MHDFloat L2g = static_cast<MHDFloat>(lg * (lg + 1));
+   const Internal::MHDFloat L2g = static_cast<Internal::MHDFloat>(lg * (lg + 1));
 
    const MHDFloat Labg =
       this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-   MHDFloat c = L2g * Labg;
+   Internal::MHDFloat c = L2g;
 
-   mat = c * this->mpOp->mat();
+   mat = c * this->mpOp->mpmat();
+
+   // Apply quasi-inverse if necessary
+   this->applyQI(mat);
+
+   mat *= static_cast<Internal::MHDFloat>(Labg);
 }
 
 } // namespace LinearMap
