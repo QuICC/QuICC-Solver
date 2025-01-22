@@ -12,8 +12,7 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1D1F.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D.hpp"
+#include "DenseSM/Chebyshev/LinearMap/Utils/Operators.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
@@ -40,9 +39,6 @@ RpDivR1D1F::RpDivR1D1F(const int nNr, const int nNc, const int p, const int lOut
 void RpDivR1D1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   namespace cheb = Transform::Fft::Chebyshev::LinearMap;
-   typedef cheb::Integrator::P::SetupType SetupType;
-
    const auto pId = GridPurpose::SIMULATION;
    int fN = this->mpF->nN();
    int rN =
@@ -51,47 +47,21 @@ void RpDivR1D1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    // Compute grid
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, rN);
+   const Internal::MHDFloat& lb = this->mcLower;
+   const Internal::MHDFloat& ub = this->mcUpper;
 
-   auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
+   Matrix f = this->mpF->evaluate(igrid, this->mLf, this->mMf).cast<MHDFloat>();
+   Matrix sF = Utils::computeExpansion(f, fN, lb, ub);
 
-   auto sFwdF = std::make_shared<SetupType>(rN, 1, fN, pId);
-   sFwdF->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sFwdF->lock();
-   cheb::Integrator::P TFwdF;
-   TFwdF.init(sFwdF);
-   Matrix sF(rN,1);
-   Matrix gF(rN, 1);
-   gF = f.cast<MHDFloat>();
+   Matrix tA = Matrix::Zero(rN,cols);
+   Utils::expansionProduct(tA, cols+fN, cols, sF, fN);
 
-   TFwdF.transform(sF, gF);
-   Matrix tmpA = Matrix::Zero(rN,cols);
-   expansionProduct(tmpA, cols+fN, cols, sF, fN);
+   Matrix tB = Utils::evaluateD<1>(tA, this->cols() + fN, lb, ub);
 
-   Matrix tmpB = Matrix::Zero(rN, this->cols());
+   tB = igrid.array().pow(3).cast<MHDFloat>().matrix().asDiagonal() * tB;
 
-   auto sFBwd = std::make_shared<SetupType>(rN, this->cols(),
-      this->cols() + fN, pId);
-   sFBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sFBwd->lock();
-   cheb::Projector::D<1> TFBwd;
-   TFBwd.init(sFBwd);
-
-   TFBwd.transform(tmpB, tmpA);
-
-   tmpB = igrid.array().pow(3).cast<MHDFloat>().matrix().asDiagonal() * tmpB;
-
-   auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
-   sFwd->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sFwd->lock();
-   cheb::Integrator::P TFwd;
-   TFwd.init(sFwd);
-
-   TFwd.transform(tmpA, tmpB);
-
-   mat = tmpA.topRows(this->rows());
+   tA = Utils::computeExpansion(tB, this->rows(), lb, ub);
+   mat = tA.topRows(this->rows());
 }
 
 } // namespace LinearMap

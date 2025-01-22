@@ -13,6 +13,10 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   RpDivR1D1DivR1FD1R1.cpp
   RpDivR1D1DivR1D1R1F.cpp
   RpDivR3D1R1FD1R1.cpp
+  IqRpDivR1D1CF.cpp
+  IqRpDivR1D1FC.cpp
+  IqRpDivR2CFD1R1.cpp
+  IqRpDivR2D1R1FC.cpp
   IProjCrossOperator.cpp
   ProjCurlTorCrossTor.cpp
   ProjCurlTorCrossPol.cpp
@@ -26,6 +30,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ProjCurlCurlPolCrossPol.cpp
   ProjCurlCurlCPolCrossTor.cpp
   ProjCurlCurlCPolCrossPol.cpp
+  RadialTorPolFunction.cpp
 )
 
 set(PHS
@@ -44,3 +49,5 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
   PROPERTIES
     PUBLIC_HEADER "${PHS}"
 )
+
+add_subdirectory(Utils)

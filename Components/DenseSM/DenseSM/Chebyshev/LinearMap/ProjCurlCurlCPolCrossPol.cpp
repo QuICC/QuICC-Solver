@@ -18,6 +18,10 @@
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1D1FC.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR2CFD1R1.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR2D1R1FC.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR1D1CF.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR1D1FC.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR2CFD1R1.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR2D1R1FC.hpp"
 
 namespace QuICC {
 
@@ -40,10 +44,21 @@ ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
    {
       if (p == 4)
       {
-         this->mpOpA = std::make_shared<RpDivR2CFD1R1>(nNr, nNc, p, lOut, mOut, lA,
-            mA, lB, mB, pPolA, lower, upper);
-         this->mpOpB = std::make_shared<RpDivR1D1CF>(nNr, nNc, p, lOut, mOut, lA,
-            mA, lB, mB, pPolA, lower, upper);
+         if(q == 0)
+         {
+            this->mpOpA = std::make_shared<RpDivR2CFD1R1>(nNr, nNc, p, lOut, mOut, lA,
+               mA, lB, mB, pPolA, lower, upper);
+            this->mpOpB = std::make_shared<RpDivR1D1CF>(nNr, nNc, p, lOut, mOut, lA,
+               mA, lB, mB, pPolA, lower, upper);
+         }
+         else
+         {
+            this->mQ = 0;
+            this->mpOpA = std::make_shared<IqRpDivR2CFD1R1>(nNr, nNc, q, p, lOut, mOut, lA,
+               mA, lB, mB, pPolA, lower, upper);
+            this->mpOpB = std::make_shared<IqRpDivR1D1CF>(nNr, nNc, q, p, lOut, mOut, lA,
+               mA, lB, mB, pPolA, lower, upper);
+         }
       }
       else
       {
@@ -55,10 +70,21 @@ ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
    {
       if (p == 4)
       {
-         this->mpOpA = std::make_shared<RpDivR2D1R1FC>(nNr, nNc, p, lOut, mOut, lB,
-            mB, lA, mA, pPolB, lower, upper);
-         this->mpOpB = std::make_shared<RpDivR1D1FC>(nNr, nNc, p, lOut, mOut, lB,
-            mB, lA, mA, pPolB, lower, upper);
+         if(q == 0)
+         {
+            this->mpOpA = std::make_shared<RpDivR2D1R1FC>(nNr, nNc, p, lOut, mOut, lB,
+               mB, lA, mA, pPolB, lower, upper);
+            this->mpOpB = std::make_shared<RpDivR1D1FC>(nNr, nNc, p, lOut, mOut, lB,
+               mB, lA, mA, pPolB, lower, upper);
+         }
+         else
+         {
+            this->mQ = 0;
+            this->mpOpA = std::make_shared<IqRpDivR2D1R1FC>(nNr, nNc, q, p, lOut, mOut, lB,
+               mB, lA, mA, pPolB, lower, upper);
+            this->mpOpB = std::make_shared<IqRpDivR1D1FC>(nNr, nNc, q, p, lOut, mOut, lB,
+               mB, lA, mA, pPolB, lower, upper);
+         }
       }
       else
       {

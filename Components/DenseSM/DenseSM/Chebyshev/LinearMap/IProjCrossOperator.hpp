@@ -93,7 +93,7 @@ protected:
    /**
     * @brief Order of quasi-inverse
     */
-   const int mQ;
+   int mQ;
 
    /**
     * @brief Power of radial prefactor

@@ -11,6 +11,8 @@
 
 // Project includes
 //
+#include "Types/Internal/BasicTypes.hpp"
+#include "Types/Typedefs.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
@@ -52,6 +54,17 @@ public:
     */
    virtual Internal::Array evaluate(const Internal::Array& r, const int l,
       const int m) const = 0;
+
+   /**
+    * @brief Evaluate function derivative on grid
+    *
+    * @param p Derivative order
+    * @param r Radial grid
+    * @param l Harmonic degree
+    * @param m Harmonic order
+    */
+   virtual Array evaluateDiff(const int p, const Internal::Array& r, const int l,
+      const int m, const Internal::MHDFloat lb, const Internal::MHDFloat ub) const;
 
 protected:
 private:

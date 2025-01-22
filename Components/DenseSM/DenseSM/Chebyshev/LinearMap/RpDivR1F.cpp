@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1F.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
+#include "DenseSM/Chebyshev/LinearMap/Utils/Operators.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
@@ -39,9 +39,6 @@ RpDivR1F::RpDivR1F(const int nNr, const int nNc, const int p, const int lOut, co
 void RpDivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   namespace cheb = Transform::Fft::Chebyshev::LinearMap;
-   typedef cheb::Integrator::P::SetupType SetupType;
-
    const auto pId = GridPurpose::SIMULATION;
    int fN = this->mpF->nN() + this->mP - 1;
    int rN =
@@ -50,24 +47,17 @@ void RpDivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    // Compute grid
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, rN);
+   const Internal::MHDFloat& lb = this->mcLower;
+   const Internal::MHDFloat& ub = this->mcUpper;
 
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
    f = igrid.array().pow(this->mP-1).matrix().asDiagonal() * f;
+   Matrix gF = f.cast<MHDFloat>();
 
-   auto sFwdF = std::make_shared<SetupType>(rN, 1, fN, pId);
-   sFwdF->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sFwdF->lock();
-   cheb::Integrator::P TFwdF;
-   TFwdF.init(sFwdF);
-   Matrix sF(rN,1);
-   Matrix gF(rN, 1);
-   gF = f.cast<MHDFloat>();
-
-   TFwdF.transform(sF, gF);
+   Matrix sF = Utils::computeExpansion(gF, fN, lb, ub);
 
    mat = Matrix::Zero(rows,cols);
-   expansionProduct(mat, rows, cols, sF, fN);
+   Utils::expansionProduct(mat, rows, cols, sF, fN);
 }
 
 } // namespace LinearMap

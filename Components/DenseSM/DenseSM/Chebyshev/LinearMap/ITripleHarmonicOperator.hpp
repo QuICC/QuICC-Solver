@@ -107,42 +107,6 @@ protected:
 private:
 };
 
-   /**
-    * @brief Compute operator for product with spectral expansion
-    *
-    * @param mat   Matrix to store operator
-    * @param rows  Rows of operator
-    * @param cols  Cols of operator
-    * @param spec  Spectral expansion coefficients
-    * @param spec  Size of expansion
-    */
-template <typename TMat, typename TSpec> void expansionProduct(TMat& mat, const int rows, const int cols, const TSpec& spec, const int nN)
-{
-   assert(mat.rows() >= rows);
-   assert(mat.cols() >= cols);
-   assert(spec.rows() >= nN);
-   assert(spec.cols() >= 1);
-
-   for(int i = 0; i < rows; i++)
-   {
-      for(int j = 0; j < nN; j++)
-      {
-         if(i-j >= 0)
-         {
-            mat(i,i-j) += spec(j);
-         }
-         else if(j-i < nN)
-         {
-            mat(i,j-i) += spec(j);
-         }
-         if(j > 0 && i+j < cols)
-         {
-            mat(i,i+j) += spec(j);
-         }
-      }
-   }
-}
-
 } // namespace LinearMap
 } // namespace Chebyshev
 } // namespace DenseSM

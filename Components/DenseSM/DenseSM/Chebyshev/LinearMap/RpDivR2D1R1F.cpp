@@ -13,6 +13,7 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/RpDivR2D1R1F.hpp"
+#include "DenseSM/Chebyshev/LinearMap/Utils/Operators.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1Y1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
@@ -81,7 +82,7 @@ void RpDivR2D1R1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    TFFwd.transform(fB,fA);
 
    mat = Matrix::Zero(rows,cols);
-   expansionProduct(mat, rows, cols, fB, fN);
+   Utils::expansionProduct(mat, rows, cols, fB, fN);
 }
 
 } // namespace LinearMap

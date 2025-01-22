@@ -135,22 +135,22 @@ void IProjCrossOperator::applyQI(Internal::Matrix& mat) const
       Internal::SparseMatrix matI;
       if(this->mQ == 1)
       {
-         SparseSM::Chebyshev::LinearMap::I1 qi(nN, nN, this->mcLower, this->mcUpper);
+         SparseSM::Chebyshev::LinearMap::I1 qi(this->rows(), nN, this->mcLower, this->mcUpper);
          matI = qi.mpmat();
       }
       else if(this->mQ == 2)
       {
-         SparseSM::Chebyshev::LinearMap::I2 qi(nN, nN, this->mcLower, this->mcUpper);
+         SparseSM::Chebyshev::LinearMap::I2 qi(this->rows(), nN, this->mcLower, this->mcUpper);
          matI = qi.mpmat();
       }
       else if(this->mQ == 3)
       {
-         SparseSM::Chebyshev::LinearMap::I3 qi(nN, nN, this->mcLower, this->mcUpper);
+         SparseSM::Chebyshev::LinearMap::I3 qi(this->rows(), nN, this->mcLower, this->mcUpper);
          matI = qi.mpmat();
       }
       else if(this->mQ == 4)
       {
-         SparseSM::Chebyshev::LinearMap::I4 qi(nN, nN, this->mcLower, this->mcUpper);
+         SparseSM::Chebyshev::LinearMap::I4 qi(this->rows(), nN, this->mcLower, this->mcUpper);
          matI = qi.mpmat();
       }
       else
