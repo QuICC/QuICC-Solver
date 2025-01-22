@@ -8,6 +8,8 @@ set(tags
   I2Q
   I2S
   I2T
+  I2rQ
+  I2rS
   I2ZI2D1
   I4D1
   I4D1ZI2

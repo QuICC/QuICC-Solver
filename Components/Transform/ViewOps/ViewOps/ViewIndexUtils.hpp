@@ -141,10 +141,34 @@ ptrAndIdx densePtrAndIdx<DCCSC3D>(const std::array<std::uint32_t, 3> logDims,
 /// @param order order for which the metadata is created
 /// @return pointer and indices in a struct
 template <>
+ptrAndIdx densePtrAndIdx<DCCSC3DJIK>(const std::array<std::uint32_t, 3> logDims,
+   const dimOrder order)
+{
+   return densePtrAndIdx<DCCSC3D>(logDims, order);
+}
+
+/// @brief compute pointers and index meta data for fully populated
+/// tensor at different stages based on view attributes
+/// @param logDims logical dimensions, dimOrder::v012
+/// @param order order for which the metadata is created
+/// @return pointer and indices in a struct
+template <>
 ptrAndIdx densePtrAndIdx<S1CLCSC3D>(const std::array<std::uint32_t, 3> logDims,
    const dimOrder order)
 {
    return densePtrAndIdx<DCCSC3D>(logDims, order);
+}
+
+/// @brief compute pointers and index meta data for fully populated
+/// tensor at different stages based on view attributes
+/// @param logDims logical dimensions, dimOrder::v012
+/// @param order order for which the metadata is created
+/// @return pointer and indices in a struct
+template <>
+ptrAndIdx densePtrAndIdx<S1CLCSC3DJIK>(
+   const std::array<std::uint32_t, 3> logDims, const dimOrder order)
+{
+   return densePtrAndIdx<S1CLCSC3D>(logDims, order);
 }
 
 
@@ -179,18 +203,11 @@ ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
    // Populate meta for fully populated tensor
    ptrAndIdx ret;
    // row width (with jki) K - ...
-   std::vector<std::uint32_t> kLess(I);
-   kLess[I - 1] = K - 1;
-   for (std::size_t i = I - 1; i > 0; --i)
+   std::vector<std::uint32_t> kLoc(I);
+   kLoc[0] = 1;
+   for (std::size_t i = 1; i < I; ++i)
    {
-      if (kLess[i] > 0)
-      {
-         kLess[i - 1] = kLess[i] - 1;
-      }
-      else
-      {
-         kLess[i - 1] = 0;
-      }
+      kLoc[i] = std::min(kLoc[i - 1] + 1, K);
    }
 
    std::size_t layWidthCum = 0;
@@ -198,7 +215,7 @@ ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
    ret.ptr[0] = 0;
    for (std::size_t i = 1; i < I + 1; ++i)
    {
-      std::uint32_t width = K - kLess[i - 1];
+      std::uint32_t width = kLoc[i - 1];
       ret.ptr[i] = ret.ptr[i - 1] + width;
       layWidthCum += width;
    }
@@ -217,6 +234,17 @@ ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
    return ret;
 }
 
+/// @brief compute pointers and index meta data for fully populated
+/// tensor at different stages based on view attributes
+/// @param logDims logical dimensions, dimOrder::v012
+/// @param order order for which the metadata is created
+/// @return pointer and indices in a struct
+template <>
+ptrAndIdx densePtrAndIdxStep1<DCCSC3DJIK>(
+   const std::array<std::uint32_t, 3> logDims, const dimOrder order)
+{
+   return densePtrAndIdxStep1<DCCSC3D>(logDims, order);
+}
 
 } // namespace Index
 } // namespace View

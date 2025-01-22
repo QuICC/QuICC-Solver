@@ -51,6 +51,17 @@ foreach(_test ${_tests})
 endforeach()
 
 set(_tests
+  I2Y2D1Y1_Zero:integrator
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    ULP 700
+  )
+endforeach()
+
+set(_tests
   I4Y3_Zero:integrator
   )
 foreach(_test ${_tests})

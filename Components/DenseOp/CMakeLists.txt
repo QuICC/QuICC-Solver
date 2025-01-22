@@ -1,5 +1,5 @@
-# CMake setup for DenseSM
-set(QUICC_CURRENT_COMPONENT_LIB DenseSM)
+# CMake setup for DenseOp
+set(QUICC_CURRENT_COMPONENT_LIB DenseOp)
 set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")
 message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}" )
 
@@ -11,10 +11,10 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-add_subdirectory(DenseSM/Worland)
+add_subdirectory(DenseOp/Worland)
 
 set(PHS
-  DenseSM/IDenseSMOperator.hpp
+  DenseOp/IDenseOpOperator.hpp
 )
 
 # Add public header

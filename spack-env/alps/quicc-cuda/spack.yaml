@@ -5,7 +5,7 @@ spack:
   - mpi
   - fftw
   - hdf5
-  - python@3.10
+  - python
   - py-numpy
   - openblas
   - boost

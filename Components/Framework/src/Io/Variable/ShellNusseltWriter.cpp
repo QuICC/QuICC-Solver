@@ -25,6 +25,7 @@
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Heating.hpp"
+#include "QuICC/NonDimensional/Beta.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/Nusselt.hpp"
 
@@ -79,6 +80,26 @@ namespace Variable {
             auto c = ri*ro;
             this->mBackground(0) = -c*std::pow(ro,-2);
             this->mBackground(1) = -c*std::pow(ri,-2);
+         }
+         else if(flag == 2 || flag ==3)
+         {
+            // This needs to be looked at properly
+            auto beta = this->mPhysical.find(NonDimensional::Beta::id())->second->value();
+            auto chi = ri/ro;
+            auto bg1 = ri/ri;
+            if(flag == 2)
+            {
+               bg1 = 1.0;
+            }
+            else if(flag == 3)
+            {
+               bg1 = 1/(1-std::pow(chi,3));
+            }
+
+            auto den1 = 1;
+            this->mBackground(0) = - 1;
+            this->mBackground(1) = -(beta/bg1)*(ri/ro) - (1-beta/bg1)*(ro/ri)*(ro/ri);
+
          }
          else
          {

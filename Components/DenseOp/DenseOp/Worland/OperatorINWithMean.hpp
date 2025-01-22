@@ -4,8 +4,8 @@
  * operator builder with quasi-inverse and different treatment for the mean (l=0)
  */
 
-#ifndef QUICC_DENSESM_WORLAND_OPERATORINWITHMEAN_HPP
-#define QUICC_DENSESM_WORLAND_OPERATORINWITHMEAN_HPP
+#ifndef QUICC_DENSEOP_WORLAND_OPERATORINWITHMEAN_HPP
+#define QUICC_DENSEOP_WORLAND_OPERATORINWITHMEAN_HPP
 
 // System includes
 //
@@ -13,14 +13,14 @@
 
 // Project includes
 //
-#include "DenseSM/IDenseSMOperator.hpp"
-#include "DenseSM/Worland/GetSuperN.hpp"
+#include "DenseOp/IDenseOpOperator.hpp"
+#include "DenseOp/Worland/GetSuperN.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
-namespace DenseSM {
+namespace DenseOp {
 /// @brief namespace for generic dense spectral Worland operator builders
 namespace Worland {
 
@@ -31,7 +31,7 @@ namespace Worland {
 /// @tparam TZeroBuilder builder for l=0
 template <class TPolyBuilder, class TINBuilder, class TZeroBuilder = void,
    class TINZeroBuilder = void>
-class OperatorINWithMean : IDenseSMOperator
+class OperatorINWithMean : IDenseOpOperator
 {
 public:
    /// @brief ctor
@@ -111,7 +111,7 @@ void OperatorINWithMean<TPolyBuilder, TINBuilder, TZeroBuilder,
 }
 
 } // namespace Worland
-} // namespace DenseSM
+} // namespace DenseOp
 } // namespace QuICC
 
-#endif // define QUICC_DENSESM_WORLAND_OPERATORINWITHMEAN_HPP
+#endif // define QUICC_DENSEOP_WORLAND_OPERATORINWITHMEAN_HPP

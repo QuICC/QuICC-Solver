@@ -15,6 +15,22 @@
   - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build/Models/BoussinesqSphereDynamo/Executables/BoussinesqSphereDynamoExplicitModel
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereDynamoExplicitModel_serial$ && echo ${QUICC_VERSION_TAG}"
+.BoussinesqSphereDynamoExplicit_serial_split_equation:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereDynamoExplicit'"
+  - export PYTHONPATH=$QUICC_ROOT/build/lib/python:$PYTHONPATH
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build/Models/BoussinesqSphereDynamo/TestSuite/Benchmarks/_data/Explicit_serial_split_equation
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build/Models/BoussinesqSphereDynamo/Executables/BoussinesqSphereDynamoExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereDynamoExplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereDynamoExplicitModel_serial_split_equation$ && echo ${QUICC_VERSION_TAG}"
 .BoussinesqSphereDynamoImplicit_serial:
   stage: model-build-and-test
   script:
@@ -47,6 +63,22 @@
   - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoExplicit/build/Models/BoussinesqShellDynamo/Executables/BoussinesqShellDynamoExplicitModel
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoExplicit/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellDynamoExplicitModel_serial$ && echo ${QUICC_VERSION_TAG}"
+.BoussinesqShellDynamoExplicit_serial_split_equation:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoExplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellDynamo -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellDynamoExplicit'"
+  - export PYTHONPATH=$QUICC_ROOT/build/lib/python:$PYTHONPATH
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoExplicit/build/Models/BoussinesqShellDynamo/TestSuite/Benchmarks/_data/Explicit_serial_split_equation
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoExplicit/build/Models/BoussinesqShellDynamo/Executables/BoussinesqShellDynamoExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellDynamoExplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellDynamoExplicitModel_serial_split_equation$ && echo ${QUICC_VERSION_TAG}"
 .BoussinesqShellDynamoImplicit_serial:
   stage: model-build-and-test
   script:
@@ -79,6 +111,22 @@
   - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/Models/BoussinesqSphereRTC/Executables/BoussinesqSphereRTCExplicitModel
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereRTCExplicitModel_serial$ && echo ${QUICC_VERSION_TAG}"
+.BoussinesqSphereRTCExplicit_serial_split_equation:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCExplicit'"
+  - export PYTHONPATH=$QUICC_ROOT/build/lib/python:$PYTHONPATH
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Explicit_serial_split_equation
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/Models/BoussinesqSphereRTC/Executables/BoussinesqSphereRTCExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereRTCExplicitModel_serial_split_equation$ && echo ${QUICC_VERSION_TAG}"
 .BoussinesqSphereRTCImplicit_serial:
   stage: model-build-and-test
   script:
@@ -111,6 +159,22 @@
   - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/Executables/BoussinesqShellRTCExplicitModel
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellRTCExplicitModel_serial$ && echo ${QUICC_VERSION_TAG}"
+.BoussinesqShellRTCExplicit_serial_split_equation:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTCExplicit'"
+  - export PYTHONPATH=$QUICC_ROOT/build/lib/python:$PYTHONPATH
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/TestSuite/Benchmarks/_data/Explicit_serial_split_equation
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/Executables/BoussinesqShellRTCExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellRTCExplicitModel_serial_split_equation$ && echo ${QUICC_VERSION_TAG}"
 .BoussinesqShellRTCImplicit_serial:
   stage: model-build-and-test
   script:
@@ -143,6 +207,22 @@
   - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTCExplicit/build/Models/BoussinesqSphereTC/Executables/BoussinesqSphereTCExplicitModel
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTCExplicit/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereTCExplicitModel_serial$ && echo ${QUICC_VERSION_TAG}"
+.BoussinesqSphereTCExplicit_serial_split_equation:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTCExplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereTCExplicit'"
+  - export PYTHONPATH=$QUICC_ROOT/build/lib/python:$PYTHONPATH
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTCExplicit/build/Models/BoussinesqSphereTC/TestSuite/Benchmarks/_data/Explicit_serial_split_equation
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTCExplicit/build/Models/BoussinesqSphereTC/Executables/BoussinesqSphereTCExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereTCExplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereTCExplicitModel_serial_split_equation$ && echo ${QUICC_VERSION_TAG}"
 .BoussinesqShellTCExplicit_serial:
   stage: model-build-and-test
   script:
@@ -159,6 +239,22 @@
   - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTCExplicit/build/Models/BoussinesqShellTC/Executables/BoussinesqShellTCExplicitModel
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTCExplicit/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellTCExplicitModel_serial$ && echo ${QUICC_VERSION_TAG}"
+.BoussinesqShellTCExplicit_serial_split_equation:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTCExplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellTCExplicit'"
+  - export PYTHONPATH=$QUICC_ROOT/build/lib/python:$PYTHONPATH
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTCExplicit/build/Models/BoussinesqShellTC/TestSuite/Benchmarks/_data/Explicit_serial_split_equation
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTCExplicit/build/Models/BoussinesqShellTC/Executables/BoussinesqShellTCExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellTCExplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellTCExplicitModel_serial_split_equation$ && echo ${QUICC_VERSION_TAG}"
 .BoussinesqPlaneRBCExplicit_serial:
   stage: model-build-and-test
   script:
@@ -170,6 +266,17 @@
   - mkdir -p $QUICC_ROOT/build
   - cd $QUICC_ROOT/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqPlaneRBC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqPlaneRBCExplicit'"
+.BoussinesqPlaneRRBCExplicit_serial:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqPlaneRRBCExplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqPlaneRRBC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqPlaneRRBCExplicit'"
 .BoussinesqSphereDynamoExplicit_tubular:
   stage: model-build-and-test
   script:
@@ -282,6 +389,22 @@
   - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/Models/BoussinesqSphereRTC/Executables/BoussinesqSphereRTCExplicitModel
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereRTCExplicitModel_tubular$ && echo ${QUICC_VERSION_TAG}"
+.BoussinesqSphereRTCExplicit_tubular_split_equation:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCExplicit'"
+  - export PYTHONPATH=$QUICC_ROOT/build/lib/python:$PYTHONPATH
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/Models/BoussinesqSphereRTC/TestSuite/Benchmarks/_data/Explicit_tubular_split_equation
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build/Models/BoussinesqSphereRTC/Executables/BoussinesqSphereRTCExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCExplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqSphereRTCExplicitModel_tubular_split_equation$ && echo ${QUICC_VERSION_TAG}"
 .BoussinesqSphereRTCImplicit_single1d:
   stage: model-build-and-test
   script:
@@ -378,6 +501,22 @@
   - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/Executables/BoussinesqShellRTCExplicitModel
   - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellRTCExplicitModel_tubular$ && echo ${QUICC_VERSION_TAG}"
+.BoussinesqShellRTCExplicit_tubular_split_equation:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTCExplicit'"
+  - export PYTHONPATH=$QUICC_ROOT/build/lib/python:$PYTHONPATH
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/TestSuite/Benchmarks/_data/Explicit_tubular_split_equation
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build/Models/BoussinesqShellRTC/Executables/BoussinesqShellRTCExplicitModel
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCExplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateBenchmarkBoussinesqShellRTCExplicitModel_tubular_split_equation$ && echo ${QUICC_VERSION_TAG}"
 .BoussinesqShellRTCImplicit_single2d:
   stage: model-build-and-test
   script:

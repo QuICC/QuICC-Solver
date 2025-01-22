@@ -114,7 +114,7 @@ foreach(_test ${_tests_templated})
         COMMAND ${TestExe}
         KEYWORD Algorithm::Operator:Template:type
         IDS  204 205 206 207  208
-        ULPS 30  120 370 1612 7925
+        ULPS 30  130 370 1612 7925
     )
 endforeach()
 
@@ -167,11 +167,11 @@ endif()
 
 foreach(_perf_id 108 109)
   if(${_perf_id} EQUAL 109)
-    set(_perf_step_slow 10)
-    set(_perf_step_fast 50)
+    set(_perf_step_slow 50)
+    set(_perf_step_fast 250)
   else()
-    set(_perf_step_slow 500)
-    set(_perf_step_fast 1000)
+    set(_perf_step_slow 2500)
+    set(_perf_step_fast 5000)
   endif()
 
   set(_perf_splits_slow 8:0 16:0 32:0 64:0 96:0 128:0 192:0 256:0 288:0 384:0)

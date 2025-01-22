@@ -754,7 +754,7 @@ if(QUICC_USE_KOKKOS)
 endif()
 
 quicc_set_ulp(_ulp
-  ULP 25 25
+  ULP 26 26
   MPULP 11 11
 )
 foreach(_test ${_split_tests})

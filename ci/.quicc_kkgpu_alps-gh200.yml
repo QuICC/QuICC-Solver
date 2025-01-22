@@ -21,7 +21,7 @@ build-quicc:
   extends: .alps-gh200_builder
   stage: build
   variables:
-    DOCKERFILE: ci/docker/Dockerfile_kkgpu
+    DOCKERFILE: ci/docker/Dockerfile_kkgpu_alps-gh200
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
     DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:961e9a5316ac9d400431aec4521d370f"]'
 test-quicc-lib:

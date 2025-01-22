@@ -1,0 +1,46 @@
+# This file is generated, do not modify!
+.BoussinesqSphereRTCImplicit_tubular:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqSphereRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqSphereRTCImplicit'"
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build/Models/BoussinesqSphereRTC/TestSuite/Stability/_data/Implicit_tubular
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build/Models/BoussinesqSphereRTC/Executables/BoussinesqSphereRTCImplicitStability
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqSphereRTCImplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateStabilityBenchmarkBoussinesqSphereRTCImplicitStability_tubular$ && echo ${QUICC_VERSION_TAG}"
+.BoussinesqShellRTCImplicit_tubular:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqShellRTC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqShellRTCImplicit'"
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build/Models/BoussinesqShellRTC/TestSuite/Stability/_data/Implicit_tubular
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build/Models/BoussinesqShellRTC/Executables/BoussinesqShellRTCImplicitStability
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqShellRTCImplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateStabilityBenchmarkBoussinesqShellRTCImplicitStability_tubular$ && echo ${QUICC_VERSION_TAG}"
+.BoussinesqPlaneRRBCExplicit_tubular:
+  stage: model-build-and-test
+  script:
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
+  - cd /QuICC.src/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
+  - export QUICC_ROOT=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqPlaneRRBCExplicit
+  - echo $QUICC_ROOT
+  - mkdir -p $QUICC_ROOT/build
+  - cd $QUICC_ROOT/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL=BoussinesqPlaneRRBC -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}/share/quicc/cmake && bash -c 'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_BoussinesqPlaneRRBCExplicit'"
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqPlaneRRBCExplicit/build/Models/BoussinesqPlaneRRBC/TestSuite/Stability/_data/Explicit_tubular
+  - ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqPlaneRRBCExplicit/build/Models/BoussinesqPlaneRRBC/Executables/BoussinesqPlaneRRBCExplicitStability
+  - cd ${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG}-BoussinesqPlaneRRBCExplicit/build
+  - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "ctest --no-tests=error --verbose -R ValidateStabilityBenchmarkBoussinesqPlaneRRBCExplicitStability_tubular$ && echo ${QUICC_VERSION_TAG}"

@@ -100,6 +100,7 @@ function(quicc_add_model target)
     quicc_create_config_exe(${ModelId} "${modLib}")
     quicc_create_state_exe(${ModelId} "${modLib}")
     quicc_create_model_exe(${ModelId} "${modLib}")
+    quicc_create_stability_exe(${ModelId} "${modLib}")
     quicc_create_visu_exe(${ModelId} "${modLib}")
   endforeach()
 

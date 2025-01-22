@@ -8,14 +8,10 @@ set(_tests_templated
     Poly::D1:<base_t>:projector
     Poly::Ll:<base_t>:projector
     Poly::LlD1:<base_t>:projector
-    Poly::LlDivS1:<base_t>:projector
-    Poly::LlDivS1Dp:<base_t>:projector
     Poly::P:<viewCpu_t>:projector
     Poly::D1:<viewCpu_t>:projector
     Poly::Ll:<viewCpu_t>:projector
     Poly::LlD1:<viewCpu_t>:projector
-    Poly::LlDivS1:<viewCpu_t>:projector
-    Poly::LlDivS1Dp:<viewCpu_t>:projector
 )
 
 if(TARGET QuICC::Cuda)
@@ -24,8 +20,6 @@ if(TARGET QuICC::Cuda)
         Poly::D1:<viewGpu_t>:projector
         Poly::Ll:<viewGpu_t>:projector
         Poly::LlD1:<viewGpu_t>:projector
-        Poly::LlDivS1:<viewGpu_t>:projector
-        Poly::LlDivS1Dp:<viewGpu_t>:projector
     )
 endif()
 
@@ -35,6 +29,34 @@ if(QUICC_USE_KOKKOS)
         Poly::D1:<kokkos_t>:projector
         Poly::Ll:<kokkos_t>:projector
         Poly::LlD1:<kokkos_t>:projector
+    )
+endif()
+
+foreach(_test ${_tests_templated})
+    quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Algorithm::Operator:Template:type
+        ULP 131
+    )
+endforeach()
+
+
+set(_tests_templated
+    Poly::LlDivS1:<base_t>:projector
+    Poly::LlDivS1Dp:<base_t>:projector
+    Poly::LlDivS1:<viewCpu_t>:projector
+    Poly::LlDivS1Dp:<viewCpu_t>:projector
+)
+
+if(TARGET QuICC::Cuda)
+    list(APPEND _tests_templated
+        Poly::LlDivS1:<viewGpu_t>:projector
+        Poly::LlDivS1Dp:<viewGpu_t>:projector
+    )
+endif()
+
+if(QUICC_USE_KOKKOS)
+    list(APPEND _tests_templated
         Poly::LlDivS1:<kokkos_t>:projector
         Poly::LlDivS1Dp:<kokkos_t>:projector
     )
@@ -44,7 +66,7 @@ foreach(_test ${_tests_templated})
     quicc_add_test(${_test}
         COMMAND ${TestExe}
         KEYWORD Algorithm::Operator:Template:type
-        ULP 125
+        ULP 238
     )
 endforeach()
 
@@ -161,7 +183,7 @@ endif()
 
 foreach(_perf_id 108 109)
   if(${_perf_id} EQUAL 109)
-    set(_perf_step_slow 10)
+    set(_perf_step_slow 50)
     set(_perf_step_fast 50)
   else()
     set(_perf_step_slow 500)

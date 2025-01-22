@@ -39,15 +39,15 @@ namespace Equations {
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
 namespace debug {
    /// Create filename to write model operator to MatrixMarket file
-   void filenameWriteModelMatrix(const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx);
+   void filenameWriteModelMatrix(const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids);
 
    /// Write decoupled complex model operator to MatrixMarket file
-   void writeModelMatrix(const DecoupledZSparse& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx);
+   void writeModelMatrix(const DecoupledZSparse& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids);
 
    /// Write real model operator to MatrixMarket file
-   void writeModelMatrix(const SparseMatrix& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx);
+   void writeModelMatrix(const SparseMatrix& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids);
 
-   std::string filenameModelMatrix(const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx)
+   std::string filenameModelMatrix(const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids)
    {
       std::stringstream ss;
       ss << opName;
@@ -63,14 +63,17 @@ namespace debug {
             ss <<  "_pol";
          }
       }
-      ss << "_" << matIdx;
+      for(auto idx: ids)
+      {
+         ss << "_" << idx;
+      }
 
       return ss.str();
    }
 
-   void writeModelMatrix(const DecoupledZSparse& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx)
+   void writeModelMatrix(const DecoupledZSparse& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids)
    {
-      auto baseName = filenameModelMatrix(opName, tags, matIdx);
+      auto baseName = filenameModelMatrix(opName, tags, ids);
 
       std::string matName = baseName + "_re.mtx";
       Eigen::saveMarket(mat.real(), matName);
@@ -78,9 +81,9 @@ namespace debug {
       Eigen::saveMarket(mat.imag(), matName);
    }
 
-   void writeModelMatrix(const SparseMatrix& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const int matIdx)
+   void writeModelMatrix(const SparseMatrix& mat, const std::string& opName, const std::vector<SpectralFieldId>& tags, const std::vector<int>& ids)
    {
-      auto baseName = filenameModelMatrix(opName, tags, matIdx);
+      auto baseName = filenameModelMatrix(opName, tags, ids);
       std::string matName = baseName + ".mtx";
       Eigen::saveMarket(mat, matName);
    }
@@ -438,7 +441,20 @@ namespace debug {
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
       auto opName = ModelOperator::Coordinator::tag(opId);
       auto tags =  std::vector<SpectralFieldId>(imRange.first, imRange.second);
-      debug::writeModelMatrix(rModelMatrix, opName, tags, res.cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT3D>(matIdx));
+
+      std::vector<int> fileIdx;
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      if(eigs.size() == 1)
+      {
+         fileIdx.push_back(tRes.idx<Dimensions::Data::DAT3D>(matIdx));
+      }
+      else
+      {
+         ArrayI mode = tRes.mode(matIdx);
+         fileIdx.push_back(mode(0));
+         fileIdx.push_back(mode(1));
+      }
+      debug::writeModelMatrix(rModelMatrix, opName, tags, fileIdx);
 #endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    }
 
@@ -454,7 +470,20 @@ namespace debug {
          opName += "_sq";
       }
       std::vector<SpectralFieldId> tags = {fId};
-      debug::writeModelMatrix(mat, opName, tags, res.cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT3D>(matIdx));
+
+      std::vector<int> fileIdx;
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      if(eigs.size() == 1)
+      {
+         fileIdx.push_back(tRes.idx<Dimensions::Data::DAT3D>(matIdx));
+      }
+      else
+      {
+         ArrayI mode = tRes.mode(matIdx);
+         fileIdx.push_back(mode(0));
+         fileIdx.push_back(mode(1));
+      }
+      debug::writeModelMatrix(mat, opName, tags, fileIdx);
 #endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    }
 
@@ -466,7 +495,20 @@ namespace debug {
 #ifdef QUICC_DEBUG_OUTPUT_MODEL_MATRIX
       auto opName = ModelOperator::Coordinator::tag(opId);
       std::vector<SpectralFieldId> tags = {fId, fieldId};
-      debug::writeModelMatrix(mat, opName, tags, res.cpu()->dim(Dimensions::Transform::SPECTRAL)->idx<Dimensions::Data::DAT3D>(matIdx));
+
+      std::vector<int> fileIdx;
+      const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+      if(eigs.size() == 1)
+      {
+         fileIdx.push_back(tRes.idx<Dimensions::Data::DAT3D>(matIdx));
+      }
+      else
+      {
+         ArrayI mode = tRes.mode(matIdx);
+         fileIdx.push_back(mode(0));
+         fileIdx.push_back(mode(1));
+      }
+      debug::writeModelMatrix(mat, opName, tags, fileIdx);
 #endif // QUICC_DEBUG_OUTPUT_MODEL_MATRIX
    }
 

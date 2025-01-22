@@ -180,6 +180,21 @@ def i2r2d1():
         print("\t" + str(k) + ": \t" + str(rec))
     print("\n")
 
+def i2r2d1r1():
+    """Spherical shell 2nd integral of r D r operator"""
+
+    # Setup terms in recurrence
+    l = sympy.Symbol('l')
+    terms = [{'q':2, 'p':3, 'd':1, 'c':1}, {'q':2, 'p':2, 'd':0, 'c':1}]
+    terms = symbolic.change_variable(terms, 'linear_r2x')
+    r = symbolic.build_recurrence(terms, {0:1})
+    n = sympy.Symbol('n')
+
+    # Print recurrence relation per diagonals
+    for k,rec in sorted(r.items()):
+        print("\t" + str(k) + ": \t" + str(rec))
+    print("\n")
+    
 def i2r2lapl():
     """Spherical shell 2nd integral of r^2 laplacianoperator"""
 

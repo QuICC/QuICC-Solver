@@ -25,21 +25,27 @@ def extract_timings(in_file, arch, filter=None):
     """
 
     # Find start and end of report
-    regexp_start = re.compile("^PERFORMANCE REPORT*")
+    regexp_start = re.compile("[Reframe Setup]")
     regexp_end = re.compile("^Log file(s) saved*")
 
-    # Indentify test
-    regexp_test = re.compile("^\[(\w+) \%\$testId=(\w+) \%\$splitting=(\w+) .*")
+    # Identify test
+    regexp_test = re.compile(
+        r'\[\s*(?:.*?RUN.*?\])\s*(.*?)\s*%\.testId=(\d+)\s*%\.splitting=(\d+)'
+    )
 
     # Get timings
     if filter == 'Avg':
-        regexp_time = re.compile(" *- (\w+Avg): (.*) s \(.*$")
+        regexp_time = re.compile(r'\b(\w+Avg):\s*([\d\.]+)\s*s\s*\(.*$')
     elif filter == 'Min':
-        regexp_time = re.compile(" *- (\w+Min): (.*) s \(.*$")
+        regexp_time = re.compile(r'\b(\w+Min):\s*([\d\.]+)\s*s\s*\(.*$')
     elif filter == 'Max':
-        regexp_time = re.compile(" *- (\w+Max): (.*) s \(.*$")
+        regexp_time = re.compile(r'\b(\w+Max):\s*([\d\.]+)\s*s\s*\(.*$')
+    elif filter == 'Iter':
+        regexp_time = re.compile(r'\b(\w+Iter):\s*(\d+)\s*\(.*$')
     elif filter is None:
-        regexp_time = re.compile(" *- (\w+): (.*) s \(.*$")
+        regexp_time = re.compile(r'\b(\w+):\s*([\d\.]+)(?:\s*s)?\s*\(.*$')
+
+    exclusion_patterns = [r'AdjAvg$']
 
     db = nested_dict(4, dict)
     is_report = False
@@ -54,19 +60,24 @@ def extract_timings(in_file, arch, filter=None):
 
             # Process report
             if is_report:
-                r = re.search(regexp_test, line)
+                line = line.strip()
+                r = regexp_test.search(line)
                 # Get test parameters setup
                 if r:
-                    t = r.group(1)
+                    t = r.group(1).strip()
                     id = r.group(2)
                     split = r.group(3)
                 else:
                     # Get timings
-                    r = re.search(regexp_time, line)
+                    r = regexp_time.search(line)
                     if r:
                         region = r.group(1)
-                        time = float(r.group(2))
-                        db[t][id][split][arch][region] = round_time(time, 3)
+                         # Skip regions that match any exclusion pattern
+                        if any(re.search(pattern, region) for pattern in exclusion_patterns):
+                            continue
+                        raw_value = r.group(2)
+                        time = int(raw_value) if 'Iter' in region else round_time(float(raw_value), 3)
+                        db[t][id][split][arch][region] = time
 
     return db
 
@@ -90,18 +101,38 @@ def read_reference_timings(db_file):
 def update_timings(new_file, old_file):
     """Update timings if large changes
     """
+    from collections import OrderedDict
+
+    def get_region_order(region):
+        if 'Avg' in region:
+            return 0
+        elif 'Min' in region:
+            return 1
+        elif 'Max' in region:
+            return 2
+        elif 'Iter' in region:
+            return 3
+        else:
+            return 4
+
+    def sort_regions(items):
+        return sorted(items, key=lambda x: (
+            x[0].replace('Avg','').replace('Min','').replace('Max','').replace('Iter',''),
+            get_region_order(x[0])
+        ))
 
     # Read new JSON database
     with open(new_file,'r') as file:
-        new_db = json.loads(file.read())
+        new_db = json.loads(file.read(), object_pairs_hook=OrderedDict)
 
     # Read old JSON database
     with open(old_file,'r') as file:
-        old_db = json.loads(file.read())
+        old_db = json.loads(file.read(), object_pairs_hook=OrderedDict)
 
-    u_margin = 1.0 + 0.1
+    u_margin = 1.0 + 0.15
     l_margin = 1.0 - 0.25
-    # Update entries and add new
+ 
+        # Update entries and add new
     for test,l0 in new_db.items():
         if test not in old_db:
             old_db[test] = l0
@@ -115,22 +146,35 @@ def update_timings(new_file, old_file):
                             old_db[test][id][split] = l2
                         else:
                             for arch,l3 in l2.items():
-                                if arch not in old_db[test][id][split]:
-                                    old_db[test][id][split][arch] = l3
+                                # Check if we have any Iter regions
+                                has_iter = any('Iter' in region for region in l3)
+                                
+                                if has_iter:
+                                    # If we have Iter lines, create new sorted dict with all values
+                                    sorted_updates = OrderedDict()
+                                    for region,time in sort_regions(l3.items()):
+                                        sorted_updates[region] = time
+                                    old_db[test][id][split][arch] = sorted_updates
                                 else:
-                                    need_update = False
-                                    for region,time in l3.items():
-                                        if region not in old_db[test][id][split][arch]:
-                                            print((region, old_db[test][id][split][arch]))
-                                            old_db[test][id][split][arch][region] = time
-                                        else:
-                                            old_t = float(old_db[test][id][split][arch][region])
-                                            new_t = float(time)
-                                            if new_t > old_t*u_margin or new_t < old_t*l_margin:
-                                                need_update = True
-                                    if need_update:
+                                    # Original logic for Avg/Min/Max
+                                    if arch not in old_db[test][id][split]:
+                                        old_db[test][id][split][arch] = l3
+                                    else:
+                                        need_update = False
                                         for region,time in l3.items():
-                                            old_db[test][id][split][arch][region] = time
+                                            if region not in old_db[test][id][split][arch]:
+                                                old_db[test][id][split][arch][region] = time
+                                            else:
+                                                old_t = float(old_db[test][id][split][arch][region])
+                                                new_t = float(time)
+                                                if new_t > old_t*u_margin or new_t < old_t*l_margin:
+                                                    need_update = True
+    
+                                        if need_update:
+                                            sorted_updates = OrderedDict()
+                                            for region,time in sort_regions(l3.items()):
+                                                sorted_updates[region] = time
+                                            old_db[test][id][split][arch] = sorted_updates
     # Update old timings
     write_timings(old_file, old_db)
 

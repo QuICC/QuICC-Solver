@@ -78,7 +78,7 @@ endif()
 
 foreach(_perf_id 108 109)
   if(${_perf_id} EQUAL 109)
-    set(_perf_step_slow 10)
+    set(_perf_step_slow 50)
     set(_perf_step_fast 50)
   else()
     set(_perf_step_slow 500)

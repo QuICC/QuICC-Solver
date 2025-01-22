@@ -1,25 +1,18 @@
 # Depend on CSCS official spack base container helpers
-FROM docker.io/finkandreas/spack:0.20.2-cuda11.7.1-ubuntu22.04 as builder
+FROM jfrog.svc.cscs.ch/docker-ci-ext/base-containers/public/spack-build:spack0.21.0-ubuntu22.04-cuda12.4.1 as builder
 
-ARG NUM_PROCS=16
+# number of processes to use for building the spack software stack
+ARG NUM_PROCS
 
 # use spack-install-helper that has all the spack boilerplate
 # First argument is the target machine, the rest are spack specs
-# Performance tests require at least reframe@4.3.0
-RUN spack-install-helper \
-    alps-gh200 \
-    fftw \
-    hdf5 \
-    cmake \
-    openblas \
-    "boost@1.78.0" \
-    "kokkos +wrapper +cuda_lambda" \
-    py-scipy \
-    kokkos-kernels \
-    "reframe@develop"
+RUN spack-install-helper --target alps-gh200 \
+    "git" "cmake" "valgrind" "py-scipy" "py-filelock" "py-tabulate" "py-lxml" "vim +python +perl +lua" \
+    "fftw" "hdf5" "openblas" "boost@1.78.0" "kokkos +wrapper +cuda_lambda" "kokkos-kernels"
+
 
 # Bare OS image to run the installed executables
-FROM docker.io/finkandreas/spack:base-cuda11.7.1-ubuntu22.04
+FROM jfrog.svc.cscs.ch/docker-ci-ext/base-containers/public/spack-runtime:ubuntu22.04-cuda12.4.1
 
 # it is important to keep the paths, otherwise your installation is broken
 # all these paths are created with the above `spack-install-helper` invocation
@@ -28,20 +21,29 @@ COPY --from=builder /opt/software /opt/software
 COPY --from=builder /opt/._view /opt/._view
 COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
 
+# Some boilerplate to get all paths correctly - fix_spack_install is part of the base image
+# and makes sure that all important things are being correctly setup
 RUN fix_spack_install
 
+# Finally install software that is needed, e.g. compilers
+# It is also possible to build compilers via spack and let all dependencies be handled by spack
 RUN apt-get -yqq update && apt-get -yqq upgrade \
- && apt-get -yqq install build-essential git gcc g++ gfortran vim less \
+ && apt-get -yqq install build-essential gfortran gcc g++ \
  && rm -rf /var/lib/apt/lists/*
 
-# sanity check that nvcc_wrapper is a symbolic link in the view and set default nvcc_wrapper compile options
-RUN ( test -L /opt/view/bin/nvcc_wrapper && \
-      sed -i -e 's/default_arch="sm_35"/default_arch="sm_90"/' \
-             -e 's/DEFAULT_COMPILER:-"g++"/DEFAULT_COMPILER:-"mpic++"/' \
-             -e 's/^cuda_args=""$/cuda_args="--extended-lambda"/' \
-             $(find /opt/software -name nvcc_wrapper) \
-    ) \
-  || ( echo "/opt/view/bin/nvcc_wrapper must be a symbolic link" && exit 1 )
-
-# set env var to init CMAKE_CUDA_ARCHITECTURES
 ENV CUDAARCHS 90
+
+RUN cd /opt \
+ && rm -rf rfm_venv \
+ && python3 -m venv rfm_venv \
+ && source rfm_venv/bin/activate \
+ && rm -rf reframe \
+ && git clone https://github.com/reframe-hpc/reframe.git \
+ && (cd reframe; git checkout v4.7.1; ./bootstrap.sh) \
+ && export PATH=/opt/reframe/bin:$PATH \
+ && reframe --version
+
+
+RUN echo "source /opt/rfm_venv/bin/activate" >> /etc/profile.d/z99_reframe.sh \
+&& echo "export PATH=/opt/reframe/bin:$PATH" >> /etc/profile.d/z99_reframe.sh
+
