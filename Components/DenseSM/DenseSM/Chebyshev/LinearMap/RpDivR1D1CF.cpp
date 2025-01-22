@@ -79,9 +79,8 @@ void RpDivR1D1CF::buildOpImpl(Internal::Matrix& mat, const int rows,
                   .asDiagonal() *
                tB);
 
-   Matrix tC = Utils::computeExpansion(tA, this->rows(), lb, ub);
-
-   mat = tC.topRows(this->rows());
+   tB = Utils::computeExpansion(tA, this->rows(), lb, ub);
+   mat = tB.topRows(this->rows());
 }
 
 } // namespace LinearMap

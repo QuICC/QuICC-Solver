@@ -13,7 +13,7 @@
 // Project includes
 //
 #include "DenseSM/Chebyshev/LinearMap/RpDivR2FD1R1.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
+#include "DenseSM/Chebyshev/LinearMap/Utils/Operators.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1Y1.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
@@ -51,17 +51,11 @@ void RpDivR2FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
    // Compute grid
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, rN);
+   const Internal::MHDFloat& lb = this->mcLower;
+   const Internal::MHDFloat& ub = this->mcUpper;
 
-   auto sBwd = std::make_shared<SetupType>(rN, this->cols(), this->cols(), pId);
-   sBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sBwd->lock();
-   cheb::Projector::D1Y1 TBwd;
-   TBwd.init(sBwd);
-
-   Matrix tmpA = Matrix::Identity(rN, this->cols());
-   Matrix tmpB = Matrix::Zero(rN, this->cols());
-   TBwd.transform(tmpB, tmpA);
+   Matrix tA = Matrix::Identity(rN, this->cols());
+   Matrix tB = Utils::evaluateOp<cheb::Projector::D1Y1>(tA, this->cols(), lb, ub);
 
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
    if(this->mP-2 > 0)
@@ -69,18 +63,10 @@ void RpDivR2FD1R1::buildOpImpl(Internal::Matrix& mat, const int rows,
       f = igrid.array().pow(this->mP-2).matrix().asDiagonal() * f;
    }
 
-   tmpB = f.cast<MHDFloat>().asDiagonal() * tmpB;
+   tB = f.cast<MHDFloat>().asDiagonal() * tB;
 
-   auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
-   sFwd->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sFwd->lock();
-   cheb::Integrator::P TFwd;
-   TFwd.init(sFwd);
-
-   TFwd.transform(tmpA, tmpB);
-
-   mat = tmpA.topRows(this->rows());
+   tA = Utils::computeExpansion(tB, this->rows(), lb, ub);
+   mat = tA.topRows(this->rows());
 }
 
 } // namespace LinearMap

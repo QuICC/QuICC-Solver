@@ -14,9 +14,7 @@
 //
 #include "DenseSM/Chebyshev/LinearMap/RpDivR2D1R1F.hpp"
 #include "DenseSM/Chebyshev/LinearMap/Utils/Operators.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1Y1.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
@@ -54,32 +52,19 @@ void RpDivR2D1R1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    // Compute grid
    Internal::Array igrid, iweights;
    this->computeQuadrature(igrid, iweights, rN);
+   const Internal::MHDFloat& lb = this->mcLower;
+   const Internal::MHDFloat& ub = this->mcUpper;
 
-   auto sFFwd = std::make_shared<SetupType>(rN, 1, fN, pId);
-   sFFwd->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sFFwd->lock();
-   cheb::Integrator::P TFFwd;
-   TFFwd.init(sFFwd);
-
-   Matrix fB(rN, 1);
    Matrix fA =
       this->mpF->evaluate(igrid, this->mLf, this->mMf).cast<MHDFloat>();
-   TFFwd.transform(fB, fA);
+   Matrix fB = Utils::computeExpansion(fA, fN, lb, ub);
 
-   auto sFBwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
-   sFBwd->setBounds(static_cast<MHDFloat>(this->mcLower),
-      static_cast<MHDFloat>(this->mcUpper));
-   sFBwd->lock();
-   cheb::Projector::D1Y1 TFBwd;
-   TFBwd.init(sFBwd);
-
-   TFBwd.transform(fA, fB);
+   fA = Utils::evaluateOp<cheb::Projector::D1Y1>(fB, this->mpF->nN(), lb, ub);
    if(this->mP - 2 > 0)
    {
       fA = igrid.array().pow(this->mP-2).cast<MHDFloat>().matrix().asDiagonal() * fA;
    }
-   TFFwd.transform(fB,fA);
+   fB = Utils::computeExpansion(fA, fN, lb, ub);
 
    mat = Matrix::Zero(rows,cols);
    Utils::expansionProduct(mat, rows, cols, fB, fN);
