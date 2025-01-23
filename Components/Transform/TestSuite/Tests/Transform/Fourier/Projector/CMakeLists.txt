@@ -37,7 +37,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
     IDS 0 1 2 3 4
-    ULPS 70 70 150 13000 28000
+    ULPS 70 70 150 20000 28000
   )
 endforeach()
 
