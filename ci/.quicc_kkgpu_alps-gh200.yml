@@ -145,7 +145,7 @@ BoussinesqShellTCExplicit_serial:
     SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 ci-cache-cleanup:
-  extends: .container-runner-daint
+  extends: .container-runner-daint-gh200
   stage: cleanup
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   script:
