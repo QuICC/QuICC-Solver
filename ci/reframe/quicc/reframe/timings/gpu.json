@@ -385,13 +385,13 @@
           "applyUnitOperatorMax": 0.00078
         },
         "gh200": {
-          "applyOperatorsAvg": 0.00277,
-          "applyOperatorsMin": 0.00242,
-          "applyOperatorsMax": 0.0173,
+          "applyOperatorsAvg": 0.00274,
+          "applyOperatorsMin": 0.00247,
+          "applyOperatorsMax": 0.0131,
           "applyOperatorsIter": 500,
-          "applyUnitOperatorAvg": 0.000443,
-          "applyUnitOperatorMin": 0.000435,
-          "applyUnitOperatorMax": 0.00047,
+          "applyUnitOperatorAvg": 0.000432,
+          "applyUnitOperatorMin": 0.000422,
+          "applyUnitOperatorMax": 0.000453,
           "applyUnitOperatorIter": 500
         }
       }
@@ -783,12 +783,12 @@
           "applyUnitOperatorMax": 0.000518
         },
         "gh200": {
-          "applyOperatorsAvg": 0.00259,
-          "applyOperatorsMin": 0.00231,
-          "applyOperatorsMax": 0.011,
+          "applyOperatorsAvg": 0.00264,
+          "applyOperatorsMin": 0.00237,
+          "applyOperatorsMax": 0.0153,
           "applyOperatorsIter": 500,
-          "applyUnitOperatorAvg": 0.000371,
-          "applyUnitOperatorMin": 0.000363,
+          "applyUnitOperatorAvg": 0.000376,
+          "applyUnitOperatorMin": 0.000368,
           "applyUnitOperatorMax": 0.000393,
           "applyUnitOperatorIter": 500
         }
@@ -1181,13 +1181,13 @@
           "applyUnitOperatorMax": 0.00664
         },
         "gh200": {
-          "applyOperatorsAvg": 0.0125,
+          "applyOperatorsAvg": 0.0118,
           "applyOperatorsMin": 0.0108,
-          "applyOperatorsMax": 0.0218,
+          "applyOperatorsMax": 0.0249,
           "applyOperatorsIter": 500,
-          "applyUnitOperatorAvg": 0.000935,
-          "applyUnitOperatorMin": 0.000917,
-          "applyUnitOperatorMax": 0.00102,
+          "applyUnitOperatorAvg": 0.000952,
+          "applyUnitOperatorMin": 0.000925,
+          "applyUnitOperatorMax": 0.00142,
           "applyUnitOperatorIter": 500
         }
       }
@@ -1564,13 +1564,13 @@
           "applyImplMax": 0.000597
         },
         "gh200": {
-          "applyImplAvg": 0.000268,
-          "applyImplMin": 0.000261,
-          "applyImplMax": 0.000279,
+          "applyImplAvg": 0.000273,
+          "applyImplMin": 0.000267,
+          "applyImplMax": 0.000286,
           "applyImplIter": 500,
-          "applyOperatorsAvg": 0.0141,
-          "applyOperatorsMin": 0.0116,
-          "applyOperatorsMax": 0.015,
+          "applyOperatorsAvg": 0.015,
+          "applyOperatorsMin": 0.0135,
+          "applyOperatorsMax": 0.0172,
           "applyOperatorsIter": 500
         }
       }
@@ -1962,13 +1962,13 @@
           "applyUnitOperatorMax": 0.00308
         },
         "gh200": {
-          "applyOperatorsAvg": 0.0126,
-          "applyOperatorsMin": 0.0108,
-          "applyOperatorsMax": 0.0281,
+          "applyOperatorsAvg": 0.0116,
+          "applyOperatorsMin": 0.0104,
+          "applyOperatorsMax": 0.0221,
           "applyOperatorsIter": 500,
-          "applyUnitOperatorAvg": 0.00105,
-          "applyUnitOperatorMin": 0.00102,
-          "applyUnitOperatorMax": 0.00265,
+          "applyUnitOperatorAvg": 0.00108,
+          "applyUnitOperatorMin": 0.00105,
+          "applyUnitOperatorMax": 0.00111,
           "applyUnitOperatorIter": 500
         }
       }
@@ -2345,13 +2345,13 @@
           "applyImplMax": 0.00058
         },
         "gh200": {
-          "applyImplAvg": 0.00027,
+          "applyImplAvg": 0.000272,
           "applyImplMin": 0.000264,
-          "applyImplMax": 0.000278,
+          "applyImplMax": 0.000288,
           "applyImplIter": 500,
-          "applyOperatorsAvg": 0.0143,
-          "applyOperatorsMin": 0.0126,
-          "applyOperatorsMax": 0.015,
+          "applyOperatorsAvg": 0.015,
+          "applyOperatorsMin": 0.0134,
+          "applyOperatorsMax": 0.0172,
           "applyOperatorsIter": 500
         }
       }
@@ -2743,13 +2743,13 @@
           "applyUnitOperatorMax": 0.00105
         },
         "gh200": {
-          "applyOperatorsAvg": 0.01001,
-          "applyOperatorsMin": 0.00903,
-          "applyOperatorsMax": 0.0183,
+          "applyOperatorsAvg": 0.0104,
+          "applyOperatorsMin": 0.00938,
+          "applyOperatorsMax": 0.0244,
           "applyOperatorsIter": 2500,
-          "applyUnitOperatorAvg": 0.000812,
-          "applyUnitOperatorMin": 0.000761,
-          "applyUnitOperatorMax": 0.00957,
+          "applyUnitOperatorAvg": 0.000823,
+          "applyUnitOperatorMin": 0.000781,
+          "applyUnitOperatorMax": 0.00373,
           "applyUnitOperatorIter": 2500
         }
       }
@@ -3128,13 +3128,13 @@
           "applyImplMax": 0.00101
         },
         "gh200": {
-          "applyImplAvg": 0.000266,
+          "applyImplAvg": 0.000269,
           "applyImplMin": 0.000263,
-          "applyImplMax": 0.000275,
+          "applyImplMax": 0.000276,
           "applyImplIter": 2500,
-          "applyOperatorsAvg": 0.0124,
-          "applyOperatorsMin": 0.0123,
-          "applyOperatorsMax": 0.0128,
+          "applyOperatorsAvg": 0.013,
+          "applyOperatorsMin": 0.0129,
+          "applyOperatorsMax": 0.0131,
           "applyOperatorsIter": 2500
         }
       }
@@ -3405,9 +3405,9 @@
         },
         "gh200": {
           "applyImplIter": 500,
-          "transformAvg": 0.000443,
-          "transformMin": 0.000237,
-          "transformMax": 0.0322,
+          "transformAvg": 0.000439,
+          "transformMin": 0.000245,
+          "transformMax": 0.0317,
           "transformIter": 500
         }
       },
@@ -3771,9 +3771,9 @@
         },
         "gh200": {
           "applyImplIter": 500,
-          "transformAvg": 0.0003,
-          "transformMin": 0.000113,
-          "transformMax": 0.033,
+          "transformAvg": 0.000292,
+          "transformMin": 0.000115,
+          "transformMax": 0.0298,
           "transformIter": 500
         }
       },
@@ -4146,9 +4146,9 @@
         },
         "gh200": {
           "applyImplIter": 500,
-          "transformAvg": 0.000474,
-          "transformMin": 0.000263,
-          "transformMax": 0.0377,
+          "transformAvg": 0.000448,
+          "transformMin": 0.000252,
+          "transformMax": 0.0333,
           "transformIter": 500
         }
       },
@@ -4522,9 +4522,9 @@
         },
         "gh200": {
           "applyImplIter": 500,
-          "transformAvg": 0.000305,
-          "transformMin": 0.00012,
-          "transformMax": 0.0336,
+          "transformAvg": 0.000308,
+          "transformMin": 0.000121,
+          "transformMax": 0.0344,
           "transformIter": 500
         }
       },
@@ -4899,9 +4899,9 @@
         },
         "gh200": {
           "applyImplIter": 500,
-          "transformAvg": 0.000511,
-          "transformMin": 0.000259,
-          "transformMax": 0.031,
+          "transformAvg": 0.000521,
+          "transformMin": 0.000262,
+          "transformMax": 0.0313,
           "transformIter": 500
         }
       },
@@ -5276,9 +5276,9 @@
         },
         "gh200": {
           "applyImplIter": 500,
-          "transformAvg": 0.000322,
+          "transformAvg": 0.000371,
           "transformMin": 0.00013,
-          "transformMax": 0.0372,
+          "transformMax": 0.0319,
           "transformIter": 500
         }
       },
@@ -5654,9 +5654,9 @@
         },
         "gh200": {
           "applyImplIter": 500,
-          "transformAvg": 0.00052,
-          "transformMin": 0.000255,
-          "transformMax": 0.0322,
+          "transformAvg": 0.000457,
+          "transformMin": 0.000258,
+          "transformMax": 0.0369,
           "transformIter": 500
         }
       },
@@ -6031,9 +6031,9 @@
         },
         "gh200": {
           "applyImplIter": 500,
-          "transformAvg": 0.000376,
-          "transformMin": 0.000129,
-          "transformMax": 0.0355,
+          "transformAvg": 0.000312,
+          "transformMin": 0.00013,
+          "transformMax": 0.0321,
           "transformIter": 500
         }
       },
@@ -6510,11 +6510,11 @@
         "gh200": {
           "applyImplAvg": 0.000124,
           "applyImplMin": 0.000122,
-          "applyImplMax": 0.000129,
+          "applyImplMax": 0.00013,
           "applyImplIter": 500,
-          "applyOperatorsAvg": 0.00356,
-          "applyOperatorsMin": 0.00312,
-          "applyOperatorsMax": 0.0037,
+          "applyOperatorsAvg": 0.00368,
+          "applyOperatorsMin": 0.00327,
+          "applyOperatorsMax": 0.00382,
           "applyOperatorsIter": 500
         }
       }
@@ -6888,13 +6888,13 @@
           "applyImplMax": 0.000469
         },
         "gh200": {
-          "applyImplAvg": 0.000133,
-          "applyImplMin": 0.000128,
-          "applyImplMax": 0.000143,
+          "applyImplAvg": 0.000131,
+          "applyImplMin": 0.000127,
+          "applyImplMax": 0.000147,
           "applyImplIter": 500,
-          "applyOperatorsAvg": 0.00318,
-          "applyOperatorsMin": 0.00313,
-          "applyOperatorsMax": 0.00331,
+          "applyOperatorsAvg": 0.00324,
+          "applyOperatorsMin": 0.00318,
+          "applyOperatorsMax": 0.00335,
           "applyOperatorsIter": 500
         }
       }
@@ -7284,13 +7284,13 @@
           "applyImplMax": 0.00387
         },
         "gh200": {
-          "applyImplAvg": 0.000661,
-          "applyImplMin": 0.000645,
-          "applyImplMax": 0.000738,
+          "applyImplAvg": 0.000662,
+          "applyImplMin": 0.000643,
+          "applyImplMax": 0.000759,
           "applyImplIter": 500,
-          "applyOperatorsAvg": 0.0014,
-          "applyOperatorsMin": 0.00138,
-          "applyOperatorsMax": 0.00162,
+          "applyOperatorsAvg": 0.00141,
+          "applyOperatorsMin": 0.00139,
+          "applyOperatorsMax": 0.00165,
           "applyOperatorsIter": 500
         }
       }
@@ -7680,13 +7680,13 @@
           "applyImplMax": 0.00367
         },
         "gh200": {
-          "applyImplAvg": 0.000586,
-          "applyImplMin": 0.000575,
-          "applyImplMax": 0.000644,
+          "applyImplAvg": 0.000581,
+          "applyImplMin": 0.000571,
+          "applyImplMax": 0.000658,
           "applyImplIter": 500,
-          "applyOperatorsAvg": 0.00127,
-          "applyOperatorsMin": 0.00125,
-          "applyOperatorsMax": 0.00142,
+          "applyOperatorsAvg": 0.00124,
+          "applyOperatorsMin": 0.00123,
+          "applyOperatorsMax": 0.00144,
           "applyOperatorsIter": 500
         }
       }
