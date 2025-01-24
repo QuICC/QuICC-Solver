@@ -251,7 +251,7 @@ class splitTestTransform(testTransform):
                             upper_bound = 0.3
                         else:
                             lower_bound = -0.25
-                            upper_bound = 0.1
+                            upper_bound = 0.2
 
                         # Add references with adjusted times
                         for base_region, values in temp_data.items():

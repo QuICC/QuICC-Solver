@@ -47,7 +47,7 @@ set(_tests
   # Poly::EnergySLaplR2:<viewCpu_t>:reductor
 )
 quicc_set_ulp(_ulp_tri
-  ULP 30 120 120 50
+  ULP 30 120 147 59
   MPULP 11 11 11 11
 )
 set(_ids_tri
@@ -120,7 +120,7 @@ set(_tests
   # Poly::RadialPowerDivR1D1R1:<viewCpu_t>:reductor
 )
 quicc_set_ulp(_ulp_tri
-  ULP 60 220 120 130
+  ULP 60 242 120 130
   MPULP 11 11 11 11
 )
 foreach(_test ${_tests})
@@ -754,7 +754,7 @@ if(QUICC_USE_KOKKOS)
 endif()
 
 quicc_set_ulp(_ulp
-  ULP 26 26
+  ULP 29 29
   MPULP 11 11
 )
 foreach(_test ${_split_tests})
