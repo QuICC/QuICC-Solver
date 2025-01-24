@@ -35,6 +35,11 @@ IqRpDivR1F::IqRpDivR1F(const int nNr, const int nNc, const int q, const int p, c
    {
       throw std::logic_error("Radial prefactor should be at least I^q r^p");
    }
+
+   if(this->mQ < 1)
+   {
+      throw std::logic_error("Quasi-inverse need to be at least 1");
+   }
 }
 
 void IqRpDivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
