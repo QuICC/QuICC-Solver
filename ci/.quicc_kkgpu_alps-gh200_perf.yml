@@ -18,8 +18,8 @@ build-quicc-base:
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-gh200
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:$IMAGE_TAG
-    F7T_URL: https://api.cscs.ch/hpc/firecrest/v1
-    FIRECREST_SYSTEM: daint
+    F7T_URL: https://api.cscs.ch/cw/firecrest/v1
+    FIRECREST_SYSTEM: santis
 build-quicc:
   extends: .alps-gh200_builder
   stage: build
@@ -27,16 +27,16 @@ build-quicc:
     DOCKERFILE: ci/docker/Dockerfile_kkgpu_alps-gh200
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
     DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:$IMAGE_TAG"]'
-    F7T_URL: https://api.cscs.ch/hpc/firecrest/v1
-    FIRECREST_SYSTEM: daint
+    F7T_URL: https://api.cscs.ch/cw/firecrest/v1
+    FIRECREST_SYSTEM: santis
 time-quicc-lib:
   extends:
   - .time-lib-sweep-alps-gh200
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    F7T_URL: https://api.cscs.ch/hpc/firecrest/v1
-    FIRECREST_SYSTEM: daint
+    F7T_URL: https://api.cscs.ch/cw/firecrest/v1
+    FIRECREST_SYSTEM: santis
 ci-cache-cleanup:
   extends: .container-runner-daint-gh200
   stage: cleanup
