@@ -39,7 +39,6 @@ RpDivR1F::RpDivR1F(const int nNr, const int nNc, const int p, const int lOut, co
 void RpDivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   const auto pId = GridPurpose::SIMULATION;
    int fN = this->mpF->nN() + this->mP - 1;
    int rN =
       2 * (fN + 2);

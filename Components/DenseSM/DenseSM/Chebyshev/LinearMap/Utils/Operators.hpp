@@ -58,6 +58,18 @@ template<int N> Matrix evaluateD(const Matrix& sf, const int fN, const Internal:
  */
 template<typename TOp> Matrix evaluateOp(const Matrix& sf, const int fN, const Internal::MHDFloat lb, const Internal::MHDFloat ub);
 
+/**
+ * @brief Simple dispatch to select quasi-inverse order
+ */
+SparseMatrix selectIq(const int q, const int rows, const int cols, const Internal::MHDFloat lb, const Internal::MHDFloat ub);
+
+/**
+ * @brief Create quasi-inverse of order q-i, with q rows zeroed
+ */
+SparseMatrix matIq(const int q, const int i, const int rows, const int cols, const Internal::MHDFloat lb, const Internal::MHDFloat ub);
+
+
+
 template <typename TMat, typename TSpec> void expansionProduct(TMat& mat, const int rows, const int cols, const TSpec& spec, const int nN)
 {
    assert(mat.rows() >= rows);
@@ -70,11 +82,11 @@ template <typename TMat, typename TSpec> void expansionProduct(TMat& mat, const 
    {
       for(int j = 0; j < nN; j++)
       {
-         if(i-j >= 0)
+         if(i-j >= 0 && i-j < cols)
          {
             mat(i,i-j) += spec(j);
          }
-         else if(j-i < nN)
+         else if(j-i >= 0 && j-i < nN && j-i < cols)
          {
             mat(i,j-i) += spec(j);
          }
@@ -95,7 +107,7 @@ template<int N> Matrix evaluateD(const Matrix& sf, const int fN, const Internal:
    int rN = sf.rows();
    int cols = sf.cols();
 
-   assert(f.rows() == rN);
+   assert(sf.rows() == rN);
 
    // Setup differentiation projector
    auto sFBwd = std::make_shared<SetupType>(rN, cols, fN, pId);
@@ -120,7 +132,7 @@ template<typename TOp> Matrix evaluateOp(const Matrix& sf, const int fN, const I
    int rN = sf.rows();
    int cols = sf.cols();
 
-   assert(f.rows() == rN);
+   assert(sf.rows() == rN);
 
    // Setup differentiation projector
    auto sFBwd = std::make_shared<SetupType>(rN, cols, fN, pId);

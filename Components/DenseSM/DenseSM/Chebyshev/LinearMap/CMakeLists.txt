@@ -13,10 +13,19 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   RpDivR1D1DivR1FD1R1.cpp
   RpDivR1D1DivR1D1R1F.cpp
   RpDivR3D1R1FD1R1.cpp
-  IqRpDivR1D1CF.cpp
+  IqRpDivR1F.cpp
+  IqRpDivR1FC.cpp
+  IqRpDivR1CF.cpp
+  IqRpDivR1D1F.cpp
   IqRpDivR1D1FC.cpp
-  IqRpDivR2CFD1R1.cpp
+  IqRpDivR1D1CF.cpp
+  IqRpDivR2D1R1F.cpp
   IqRpDivR2D1R1FC.cpp
+  IqRpDivR2FD1R1.cpp
+  IqRpDivR2CFD1R1.cpp
+  IqRpDivR1D1DivR1FD1R1.cpp
+  IqRpDivR1D1DivR1D1R1F.cpp
+  IqRpDivR3D1R1FD1R1.cpp
   IProjCrossOperator.cpp
   ProjCurlTorCrossTor.cpp
   ProjCurlTorCrossPol.cpp

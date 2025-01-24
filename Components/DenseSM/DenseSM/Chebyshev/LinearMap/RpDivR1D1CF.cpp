@@ -40,7 +40,6 @@ RpDivR1D1CF::RpDivR1D1CF(const int nNr, const int nNc, const int p, const int lO
 void RpDivR1D1CF::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   const auto pId = GridPurpose::SIMULATION;
    int rN =
       2 * (std::max(this->rows(), this->cols()) + this->mpF->nN() + 4 + 2);
 

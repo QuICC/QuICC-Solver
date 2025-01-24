@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "DenseSM/Chebyshev/LinearMap/ITripleHarmonicOperator.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IIqTripleHarmonicOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "Types/Typedefs.hpp"
@@ -27,7 +27,7 @@ namespace LinearMap {
 /**
  * @brief Implementation of the spectral operator I^q r^p 1/r D(-lapl(f) *)
  */
-class IqRpDivR1D1CF : public ITripleHarmonicOperator
+class IqRpDivR1D1CF : public IIqTripleHarmonicOperator
 {
 public:
    /**
@@ -35,7 +35,7 @@ public:
     *
     * @param rows    Number of rows
     * @param cols    Number of cols
-    * @param p       Order of quasi-inverse
+    * @param q       Order of quasi-inverse
     * @param p       Power of radial prefactor
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic order

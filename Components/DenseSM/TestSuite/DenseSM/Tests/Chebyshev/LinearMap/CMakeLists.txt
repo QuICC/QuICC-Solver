@@ -196,6 +196,166 @@ foreach(_test ${_tests})
   )
 endforeach()
 
+# Create Quasi-inverse Gaunt coefficient, dipolar tests, r^2 prefactor
+set(_tests
+  IqRpDivR2D1R1F:dense
+  IqRpDivR2FD1R1:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 0 1 2 3 4 5 6
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Quasi-inverse Gaunt coefficient, dipolar tests, r^4 prefactor
+set(_tests
+  IqRpDivR1D1F:dense
+  IqRpDivR1D1FC:dense
+  IqRpDivR1D1CF:dense
+  IqRpDivR2D1R1F:dense
+  IqRpDivR2D1R1FC:dense
+  IqRpDivR2FD1R1:dense
+  IqRpDivR2CFD1R1:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 7 8 9 10 11 12 13
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Quasi-inverse Elsasser coefficient, dipolar tests, r^2 prefactor
+set(_tests
+  IqRpDivR1F:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 100 101 102 103 104 105 106
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Quasi-inverse Elsasser coefficient, dipolar tests, r^4 prefactor
+set(_tests
+  IqRpDivR1F:dense
+  IqRpDivR1FC:dense
+  IqRpDivR1CF:dense
+  IqRpDivR1D1DivR1FD1R1:dense
+  IqRpDivR1D1DivR1D1R1F:dense
+  IqRpDivR3D1R1FD1R1:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 107 108 109 110 111 112 113
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Quasi-inverse Gaunt coefficient, quadrupolar tests, r^2 prefactor
+set(_tests
+  IqRpDivR2D1R1F:dense
+  IqRpDivR2FD1R1:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 200 201 202 203 204 205 206 207 208 209
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Quasi-inverse Gaunt coefficient, quadrupolar tests, r^4 prefactor
+set(_tests
+  IqRpDivR1D1F:dense
+  IqRpDivR1D1FC:dense
+  IqRpDivR1D1CF:dense
+  IqRpDivR2D1R1F:dense
+  IqRpDivR2D1R1FC:dense
+  IqRpDivR2FD1R1:dense
+  IqRpDivR2CFD1R1:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 210 211 212 213 214 215 216 217 218 219
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Elsasser Quasi-inverse coefficient, quadrupolar tests, r^2 prefactor
+set(_tests
+  IqRpDivR1F:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500 500 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25 25 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 300 301 302 303 304 305 306 307 308 309 310 311
+    ULPS ${_ulp}
+  )
+endforeach()
+
+# Create Quasi-inverse Elsasser coefficient, quadrupolar tests, r^4 prefactor
+set(_tests
+  IqRpDivR1F:dense
+  IqRpDivR1FC:dense
+  IqRpDivR1CF:dense
+  IqRpDivR1D1DivR1FD1R1:dense
+  IqRpDivR1D1DivR1D1R1F:dense
+  IqRpDivR3D1R1FD1R1:dense
+  )
+quicc_set_ulp(_ulp
+  ULP 500 500 500 500 500 500 500 500 500 500 500 500
+  MPULP 25 25 25 25 25 25 25 25 25 25 25 25
+        )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:type
+    IDS 312 313 314 315 316 317 318 319 320 321 322 323
+    ULPS ${_ulp}
+  )
+endforeach()
+
 # Create Gaunt projection dipolar tests, r^2 prefactor
 set(_tests
   ProjCurlPolCrossPol:dense

@@ -1,11 +1,11 @@
 /**
- * @file IqRpDivR2D1R1FC.hpp
- * @brief Implementation of the spectral operator I^q r^p 1/r D(r f) (-lapl(*))/r
- *        multiplied by gaunt coefficient
+ * @file IqRpDivR1D1DivR1D1R1F.hpp
+ * @brief Implementation of the spectral operator I^q r^p 1/r D(f/r D(r *))
+ *        multiplied by elsasser coefficient
  */
 
-#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_IQRPDIVR2D1R1FC_HPP
-#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_IQRPDIVR2D1R1FC_HPP
+#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_IQRPDIVR1D1DIVR1D1R1F_HPP
+#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_IQRPDIVR1D1DIVR1D1R1F_HPP
 
 // System includes
 //
@@ -26,9 +26,9 @@ namespace Chebyshev {
 namespace LinearMap {
 
 /**
- * @brief Implementation of the spectral operator I^q r^p 1/r D(r f) (-lapl(*))/r
+ * @brief Implementation of the spectral operator I^q r^p 1/r D(f/r D(r *))
  */
-class IqRpDivR2D1R1FC : public IIqTripleHarmonicOperator
+class IqRpDivR1D1DivR1D1R1F : public IIqTripleHarmonicOperator
 {
 public:
    /**
@@ -47,15 +47,15 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   IqRpDivR2D1R1FC(const int rows, const int cols, const int q, const int p, const int lOut, const int mOut,
-      const int lF, const int mF, const int lIn, const int mIn,
+   IqRpDivR1D1DivR1D1R1F(const int rows, const int cols, const int q, const int p, const int lOut,
+      const int mOut, const int lF, const int mF, const int lIn, const int mIn,
       std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
       const Scalar_t upper);
 
    /**
     * @brief Destructor
     */
-   virtual ~IqRpDivR2D1R1FC() = default;
+   virtual ~IqRpDivR1D1DivR1D1R1F() = default;
 
 protected:
    /**
@@ -76,4 +76,4 @@ private:
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_IQRPDIVR2D1R1FC_HPP
+#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_IQRPDIVR1D1DIVR1D1R1F_HPP

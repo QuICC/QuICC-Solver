@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "DenseSM/Chebyshev/LinearMap/ITripleHarmonicOperator.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IIqTripleHarmonicOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "Types/Typedefs.hpp"
@@ -28,7 +28,7 @@ namespace LinearMap {
 /**
  * @brief Implementation of the spectral operator I^q r^p 1/r D(f (-lapl(*)))
  */
-class IqRpDivR1D1FC : public ITripleHarmonicOperator
+class IqRpDivR1D1FC : public IIqTripleHarmonicOperator
 {
 public:
    /**

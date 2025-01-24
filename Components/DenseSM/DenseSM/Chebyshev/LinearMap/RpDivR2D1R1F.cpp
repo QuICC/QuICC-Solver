@@ -42,9 +42,7 @@ void RpDivR2D1R1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
    namespace cheb = Transform::Fft::Chebyshev::LinearMap;
-   typedef cheb::Integrator::P::SetupType SetupType;
 
-   const auto pId = GridPurpose::SIMULATION;
    int fN = this->mpF->nN() + this->mP - 2;
    int rN =
       2 * (fN + 2);
