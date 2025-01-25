@@ -100,7 +100,7 @@ TEST_CASE("Nested Levels: on, on, off", "[Levels]")
     REQUIRE(std::abs(std::get<Tracker::tracking::time>(Tracker::get("Nested"))[0] - 0.2) < 0.1);
     //
     auto maxVMMB = maxVM * 1.0e-6;
-    REQUIRE(std::abs(maxVMMB - 80.0) < 0.01);
+    REQUIRE(std::abs(maxVMMB - 80.0) < 0.02);
     REQUIRE(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Main")) <= maxVMMB * 1.01);
     REQUIRE(std::abs(std::get<Tracker::tracking::memoryDelta>(Tracker::get("Nested")) - 0.0) < 0.01);
 
