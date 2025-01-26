@@ -39,7 +39,7 @@
     OMP_DISPLAY_ENV: verbose
     SLURM_CPUS_PER_TASK: 72
     SLURM_NTASKS: 1
-    SLURM_TIMELIMIT: '02:40:00'
+    SLURM_TIMELIMIT: '03:00:00'
 
 .alps-mc_runner:
   extends: .container-runner-eiger-zen2
