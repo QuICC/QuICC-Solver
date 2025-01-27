@@ -1,0 +1,55 @@
+# Depend on CSCS official spack base container helpers
+FROM jfrog.svc.cscs.ch/docker-ci-ext/base-containers/public/spack-build:spack0.21.0-ubuntu22.04 as builder
+
+# number of processes to use for building the spack software stack
+ARG NUM_PROCS=128
+
+# use spack-install-helper that has all the spack boilerplate
+# First argument is the target machine, the rest are spack specs
+RUN spack-install-helper --target alps-zen2 \
+    git \
+    cmake \
+    valgrind \
+    "vim +python +perl +lua" \
+    fftw \
+    hdf5 \
+    openblas \
+    "boost@1.78.0" \
+    py-scipy \
+    kokkos-kernels \
+
+
+# Bare OS image to run the installed executables
+FROM jfrog.svc.cscs.ch/docker-ci-ext/base-containers/public/spack-runtime:ubuntu22.04
+
+# it is important to keep the paths, otherwise your installation is broken
+# all these paths are created with the above `spack-install-helper` invocation
+COPY --from=builder /opt/spack-environment /opt/spack-environment
+COPY --from=builder /opt/software /opt/software
+COPY --from=builder /opt/._view /opt/._view
+COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
+
+# Some boilerplate to get all paths correctly - fix_spack_install is part of the base image
+# and makes sure that all important things are being correctly setup
+RUN fix_spack_install
+
+# Finally install software that is needed, e.g. compilers
+# It is also possible to build compilers via spack and let all dependencies be handled by spack
+RUN apt-get -yqq update && apt-get -yqq upgrade \
+ && apt-get -yqq install build-essential gfortran gcc g++ \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN cd /opt \
+ && rm -rf rfm_venv \
+ && python3 -m venv rfm_venv \
+ && source rfm_venv/bin/activate \
+ && rm -rf reframe \
+ && git clone https://github.com/reframe-hpc/reframe.git \
+ && (cd reframe; git checkout v4.7.1; ./bootstrap.sh) \
+ && export PATH=/opt/reframe/bin:$PATH \
+ && reframe --version
+
+
+RUN echo "source /opt/rfm_venv/bin/activate" >> /etc/profile.d/z99_reframe.sh \
+&& echo "export PATH=/opt/reframe/bin:$PATH" >> /etc/profile.d/z99_reframe.sh
+

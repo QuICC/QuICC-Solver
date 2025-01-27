@@ -10,7 +10,7 @@ from quicc.gitlab.pipelines import config, base_pipeline, \
 if __name__ == '__main__':
     # Build only pipelines
     build_only_confs = [
-        config('mpi-debug', 'daint-mc')
+        config('mpi-debug', 'alps-zen2')
         ]
     for c in build_only_confs:
         pipe = base_pipeline(c)
@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     # Lib test pipelines
     libtest_confs = [
-        config('mp', 'daint-mc')
+        config('mp', 'alps-zen2')
         ]
     for c in libtest_confs:
         pipe = libtest_pipeline(c)
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     # Model without timing pipelines
     model_notiming_confs = [
-        config('serial', 'daint-mc')
+        config('serial', 'alps-zen2')
         ]
     for c in model_notiming_confs:
         pipe = model_pipeline_notiming(c)
@@ -42,8 +42,8 @@ if __name__ == '__main__':
 
     # Model and Timing pipelines
     model_confs = [
-        config('mpi', 'daint-mc'),
-        config('kk', 'daint-mc'),
+        config('mpi', 'alps-zen2'),
+        config('kk', 'alps-zen2'),
         config('kkgpu', 'daint-gpu'),
         config('kkgpu', 'alps-a100'),
         config('kkgpu', 'alps-gh200')
@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
     # Model perf pipelines
     model_perf_confs = [
-        config('mpi', 'daint-mc'),
+        config('mpi', 'alps-zen2'),
     ]
     for c in model_perf_confs:
         pipe = model_perf_pipeline(c)

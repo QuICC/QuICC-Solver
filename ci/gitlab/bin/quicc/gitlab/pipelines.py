@@ -16,7 +16,8 @@ backend2nodeSize = {
     "daint-mc": 72,
     "daint-gpu": 24,
     "alps-a100": 64,
-    "alps-gh200": 288
+    "alps-gh200": 288,
+    "alps-zen2": 128
 }
 
 """Base class, defines a pipeline that build the docker image, the library and cleans up the runner"""
