@@ -242,7 +242,7 @@ BoussinesqShellTCExplicit_tubular:
     SLURM_CPUS_PER_TASK: '32'
     QUICC_VERSION_TAG: mpi
 ci-cache-cleanup:
-  extends: .alps-zen2_runnner
+  extends: .alps-zen2_runner
   stage: cleanup
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   script:

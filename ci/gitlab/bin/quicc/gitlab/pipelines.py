@@ -90,7 +90,7 @@ class base_pipeline(base_yaml):
                 ],
             )
         self.config['ci-cache-cleanup'] = {
-            'extends': '.'+self.backend+'_runnner',
+            'extends': '.'+self.backend+'_runner',
             'stage': 'cleanup',
             'image': self.path_image,
             'script':

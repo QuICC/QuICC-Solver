@@ -28,7 +28,7 @@ time-quicc-lib:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
 ci-cache-cleanup:
-  extends: .alps-gh200_runnner
+  extends: .alps-gh200_runner
   stage: cleanup
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   script:
