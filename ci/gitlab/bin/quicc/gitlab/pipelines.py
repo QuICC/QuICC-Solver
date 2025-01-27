@@ -89,12 +89,8 @@ class base_pipeline(base_yaml):
                     'cleanup',
                 ],
             )
-        if (self.backend == 'gpu'):
-            runner = '.container-runner-daint-gpu'
-        else:
-            runner = '.container-runner-daint'
         self.config['ci-cache-cleanup'] = {
-            'extends': runner,
+            'extends': '.'+self.backend+'_runnner',
             'stage': 'cleanup',
             'image': self.path_image,
             'script':

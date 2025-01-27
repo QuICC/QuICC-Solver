@@ -44,7 +44,6 @@ if __name__ == '__main__':
     model_confs = [
         config('mpi', 'alps-zen2'),
         config('kk', 'alps-zen2'),
-        config('kkgpu', 'daint-gpu'),
         config('kkgpu', 'alps-a100'),
         config('kkgpu', 'alps-gh200')
         ]
@@ -54,8 +53,7 @@ if __name__ == '__main__':
 
     # Library perf pipelines
     lib_perf_confs = [
-        config('mpi', 'daint-mc'),
-        config('kkgpu', 'daint-gpu'),
+        config('mpi', 'alps-zen2'),
         config('kkgpu', 'alps-a100'),
         config('kkgpu', 'alps-gh200')
     ]
