@@ -40,7 +40,7 @@ BoussinesqSphereDynamoExplicit_serial:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '288'
@@ -51,7 +51,7 @@ BoussinesqSphereDynamoImplicit_serial:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '288'
@@ -62,7 +62,7 @@ BoussinesqShellDynamoExplicit_serial:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '288'
@@ -73,7 +73,7 @@ BoussinesqShellDynamoImplicit_serial:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '288'
@@ -84,7 +84,7 @@ BoussinesqSphereRTCExplicit_serial:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '288'
@@ -95,7 +95,7 @@ BoussinesqSphereRTCImplicit_serial:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '288'
@@ -106,7 +106,7 @@ BoussinesqShellRTCExplicit_serial:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '288'
@@ -117,7 +117,7 @@ BoussinesqShellRTCImplicit_serial:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '288'
@@ -128,7 +128,7 @@ BoussinesqSphereTCExplicit_serial:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '288'
@@ -139,7 +139,7 @@ BoussinesqShellTCExplicit_serial:
   - .alps-gh200_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '288'
