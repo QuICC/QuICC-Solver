@@ -26,7 +26,7 @@ if __name__ == '__main__':
 
     # Model stability without timing pipelines
     model_stability_confs = [
-        config('petsc-mpi', 'daint-mc', 'petsc')
+        config('mpi-petsc', 'alps-zen2', 'baseimage_petsc')
         ]
     for c in model_stability_confs:
         pipe = model_stability_pipeline(c)
