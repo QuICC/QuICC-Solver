@@ -7,16 +7,16 @@ ARG NUM_PROCS=128
 # use spack-install-helper that has all the spack boilerplate
 # First argument is the target machine, the rest are spack specs
 RUN spack-install-helper --target alps-zen2 \
-    git \
-    cmake \
-    valgrind \
+    "git" \
+    "cmake" \
+    "valgrind" \
     "vim +python +perl +lua" \
-    fftw \
-    hdf5 \
-    openblas \
+    "fftw" \
+    "hdf5" \
+    "openblas" \
     "boost@1.78.0" \
-    py-scipy \
-    kokkos-kernels \
+    "py-scipy" \
+    "kokkos-kernels"
 
 
 # Bare OS image to run the installed executables
