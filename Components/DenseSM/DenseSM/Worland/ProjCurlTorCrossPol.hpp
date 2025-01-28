@@ -34,6 +34,7 @@ public:
     *
     * @param rows    Number of rows
     * @param cols    Number of cols
+    * @param q       Order of quasi-inverse
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic order
     * @param lA      harmonic degree of A
@@ -45,7 +46,7 @@ public:
     * @param alpha   Jacobi alpha parametery
     * @param dBeta   Jacobi dBeta parameter
     */
-   ProjCurlTorCrossPol(const int rows, const int cols, const int lOut,
+   ProjCurlTorCrossPol(const int rows, const int cols, const int q, const int lOut,
       const int mOut, const int lA, const int mA, const int lB, const int mB,
       std::shared_ptr<RadialTorPolFunction> pTorA,
       std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t alpha,

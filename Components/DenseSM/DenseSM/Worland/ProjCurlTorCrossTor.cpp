@@ -21,11 +21,11 @@ namespace DenseSM {
 namespace Worland {
 
 ProjCurlTorCrossTor::ProjCurlTorCrossTor(const int nNr, const int nNc,
-   const int lOut, const int mOut, const int lA, const int mA, const int lB,
+   const int q, const int lOut, const int mOut, const int lA, const int mA, const int lB,
    const int mB, std::shared_ptr<RadialTorPolFunction> pTorA,
    std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t alpha,
    const Scalar_t dBeta) :
-    IProjCrossOperator(nNr, nNc, lOut, mOut, lA, mA, lB, mB, alpha, dBeta)
+    IProjCrossOperator(nNr, nNc, q, lOut, mOut, lA, mA, lB, mB, alpha, dBeta)
 {
    // Radial function A is given
    if (pTorA && pTorB == nullptr)

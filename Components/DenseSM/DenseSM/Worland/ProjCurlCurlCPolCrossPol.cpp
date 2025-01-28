@@ -26,11 +26,11 @@ namespace DenseSM {
 namespace Worland {
 
 ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
-   const int lOut, const int mOut, const int lA, const int mA, const int lB,
+   const int q, const int lOut, const int mOut, const int lA, const int mA, const int lB,
    const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
    std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t alpha,
    const Scalar_t dBeta) :
-    ProjCurlCurlTorCrossPol(nNr, nNc, lOut, mOut, lA, mA, lB, mB, pPolA, pPolB,
+    ProjCurlCurlTorCrossPol(nNr, nNc, q, lOut, mOut, lA, mA, lB, mB, pPolA, pPolB,
        alpha, dBeta)
 {
    // Radial function A is given

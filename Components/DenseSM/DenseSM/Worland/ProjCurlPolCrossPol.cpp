@@ -15,6 +15,7 @@
 #include "DenseSM/Worland/DivR2D1R1F.hpp"
 #include "DenseSM/Worland/DivR2FD1R1.hpp"
 #include "DenseSM/Worland/ProjCurlPolCrossPol.hpp"
+#include "Types/Internal/Literals.hpp"
 
 namespace QuICC {
 
@@ -23,11 +24,11 @@ namespace DenseSM {
 namespace Worland {
 
 ProjCurlPolCrossPol::ProjCurlPolCrossPol(const int nNr, const int nNc,
-   const int lOut, const int mOut, const int lA, const int mA, const int lB,
+   const int q, const int lOut, const int mOut, const int lA, const int mA, const int lB,
    const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
    std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t alpha,
    const Scalar_t dBeta) :
-    IProjCrossOperator(nNr, nNc, lOut, mOut, lA, mA, lB, mB, alpha, dBeta)
+    IProjCrossOperator(nNr, nNc, q, lOut, mOut, lA, mA, lB, mB, alpha, dBeta)
 {
    // Radial function A is given
    if (pPolA && pPolB == nullptr)
@@ -63,21 +64,27 @@ void ProjCurlPolCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
    }
    else
    {
+      using namespace Internal::Literals;
       auto&& lg = this->mLout;
       auto&& la = this->mLa;
       auto&& lb = this->mLb;
 
-      const MHDFloat L2a = static_cast<MHDFloat>(la * (la + 1));
-      const MHDFloat L2b = static_cast<MHDFloat>(lb * (lb + 1));
-      const MHDFloat L2g = static_cast<MHDFloat>(lg * (lg + 1));
+      const Internal::MHDFloat L2a = static_cast<Internal::MHDFloat>(la * (la + 1));
+      const Internal::MHDFloat L2b = static_cast<Internal::MHDFloat>(lb * (lb + 1));
+      const Internal::MHDFloat L2g = static_cast<Internal::MHDFloat>(lg * (lg + 1));
 
       const MHDFloat Kabg =
          this->gaunt(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-      MHDFloat cA = L2a * (L2a - L2b - L2g) / 2.0 * Kabg;
-      MHDFloat cB = L2b * (L2a - L2b + L2g) / 2.0 * Kabg;
+      Internal::MHDFloat cA = L2a * (L2a - L2b - L2g) / 2.0_mp;
+      Internal::MHDFloat cB = L2b * (L2a - L2b + L2g) / 2.0_mp;
 
       mat = cA * this->mpOpA->mat() + cB * this->mpOpB->mat();
+
+      // Apply quasi-inverse if necessary
+      this->applyQI(mat, this->mLout);
+
+      mat *= static_cast<Internal::MHDFloat>(Kabg);
    }
 }
 

@@ -22,11 +22,11 @@ namespace DenseSM {
 namespace Worland {
 
 ProjCurlPolCrossTor::ProjCurlPolCrossTor(const int nNr, const int nNc,
-   const int lOut, const int mOut, const int lA, const int mA, const int lB,
+   const int q, const int lOut, const int mOut, const int lA, const int mA, const int lB,
    const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
    std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t alpha,
    const Scalar_t dBeta) :
-    IProjCrossOperator(nNr, nNc, lOut, mOut, lA, mA, lB, mB, alpha, dBeta)
+    IProjCrossOperator(nNr, nNc, q, lOut, mOut, lA, mA, lB, mB, alpha, dBeta)
 {
    // Radial function A is given
    if (pPolA && pTorB == nullptr)
@@ -62,14 +62,19 @@ void ProjCurlPolCrossTor::buildOpImpl(Internal::Matrix& mat, const int rows,
       auto&& lb = this->mLb;
       auto&& lg = this->mLout;
 
-      const MHDFloat L2a = static_cast<MHDFloat>(la * (la + 1));
+      const Internal::MHDFloat L2a = static_cast<Internal::MHDFloat>(la * (la + 1));
 
       const MHDFloat Labg =
          this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-      MHDFloat c = L2a * Labg;
+      Internal::MHDFloat c = L2a;
 
       mat = c * this->mpOp->mat();
+
+      // Apply quasi-inverse if necessary
+      this->applyQI(mat, this->mLout);
+
+      mat *= static_cast<Internal::MHDFloat>(Labg);
    }
 }
 

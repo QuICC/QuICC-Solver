@@ -30,6 +30,7 @@ public:
     *
     * @param rows    Number of rows
     * @param cols    Number of cols
+    * @param q       Order of quasi-inverse
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic degree
     * @param lA      harmonic degree of f
@@ -39,7 +40,7 @@ public:
     * @param alpha   Jacobi alpha parameter
     * @param dBeta   Jacobi dBeta parameter
     */
-   IProjCrossOperator(const int rows, const int cols, const int lOut,
+   IProjCrossOperator(const int rows, const int cols, const int q, const int lOut,
       const int mOut, const int lA, const int mA, const int lB, const int mB,
       const Scalar_t alpha, const Scalar_t dBeta);
 
@@ -72,6 +73,11 @@ protected:
       const int lG, const int mG) const;
 
    /**
+    * @brief Apply quasi-inverse
+    */
+   void applyQI(Internal::Matrix& mat, const int l) const;
+
+   /**
     * @brief Operator is exactly zero
     */
    bool mIsZero;
@@ -80,6 +86,11 @@ protected:
     * @brief Operator is imaginary
     */
    bool mIsImaginary;
+
+   /**
+    * @brief Order of quasi-inverse
+    */
+   int mQ;
 
    /**
     * @brief Harmonic degree of output

@@ -15,6 +15,8 @@
 #include "DenseSM/Worland/DivR1CF.hpp"
 #include "DenseSM/Worland/DivR1FC.hpp"
 #include "DenseSM/Worland/ProjCurlCPolCrossPol.hpp"
+#include "Types/Internal/BasicTypes.hpp"
+#include "Types/Internal/Casts.hpp"
 
 namespace QuICC {
 
@@ -23,11 +25,11 @@ namespace DenseSM {
 namespace Worland {
 
 ProjCurlCPolCrossPol::ProjCurlCPolCrossPol(const int nNr, const int nNc,
-   const int lOut, const int mOut, const int lA, const int mA, const int lB,
+   const int q, const int lOut, const int mOut, const int lA, const int mA, const int lB,
    const int mB, std::shared_ptr<RadialTorPolFunction> pPolA,
    std::shared_ptr<RadialTorPolFunction> pPolB, const Scalar_t alpha,
    const Scalar_t dBeta) :
-    IProjCrossOperator(nNr, nNc, lOut, mOut, lA, mA, lB, mB, alpha, dBeta)
+    IProjCrossOperator(nNr, nNc, q, lOut, mOut, lA, mA, lB, mB, alpha, dBeta)
 {
    // Radial function A is given
    if (pPolA && pPolB == nullptr)
@@ -63,14 +65,19 @@ void ProjCurlCPolCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
       auto&& la = this->mLa;
       auto&& lb = this->mLb;
 
-      const MHDFloat L2b = static_cast<MHDFloat>(lb * (lb + 1));
+      const Internal::MHDFloat L2b = static_cast<Internal::MHDFloat>(lb * (lb + 1));
 
       const MHDFloat Labg =
          this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-      MHDFloat c = std::pow(-1.0, lg + la + lb - 1) * L2b * Labg;
+      Internal::MHDFloat c = static_cast<Internal::MHDFloat>(std::pow(-1, lg + la + lb - 1)) * L2b;
 
       mat = c * this->mpOp->mat();
+
+      // Apply quasi-inverse if necessary
+      this->applyQI(mat, this->mLout);
+
+      mat *= static_cast<Internal::MHDFloat>(Labg);
    }
 }
 

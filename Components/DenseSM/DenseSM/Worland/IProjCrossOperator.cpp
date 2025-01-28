@@ -15,6 +15,9 @@
 //
 #include "DenseSM/Worland/IProjCrossOperator.hpp"
 #include "Types/Math.hpp"
+#include "QuICC/SparseSM/Worland/I2.hpp"
+#include "QuICC/SparseSM/Worland/I3.hpp"
+#include "QuICC/SparseSM/Worland/I4.hpp"
 
 namespace QuICC {
 
@@ -22,12 +25,13 @@ namespace DenseSM {
 
 namespace Worland {
 
-IProjCrossOperator::IProjCrossOperator(const int rows, const int cols,
+IProjCrossOperator::IProjCrossOperator(const int rows, const int cols, const int q,
    const int lOut, const int mOut, const int lA, const int mA, const int lB,
    const int mB, const Scalar_t alpha, const Scalar_t dBeta) :
     IWorlandOperator(rows, cols, alpha, dBeta),
     mIsZero(false),
     mIsImaginary(false),
+    mQ(q),
     mLout(lOut),
     mMout(mOut),
     mLa(lA),
@@ -117,6 +121,40 @@ MHDFloat IProjCrossOperator::elsasser(const int lA, const int mA, const int lB,
    }
 
    return Labg;
+}
+
+void IProjCrossOperator::applyQI(Internal::Matrix& mat, const int l) const
+{
+   if(this->mQ > 0)
+   {
+      int nN = mat.rows();
+      Internal::SparseMatrix matI;
+      if(this->mQ == 1)
+      {
+         throw std::logic_error("Quasi-inverse of order 1 is not implemented");
+      }
+      else if(this->mQ == 2)
+      {
+         SparseSM::Worland::I2 qi(this->rows(), nN, this->mcAlpha, this->mcDBeta, l);
+         matI = qi.mpmat();
+      }
+      else if(this->mQ == 3)
+      {
+         SparseSM::Worland::I3 qi(this->rows(), nN, this->mcAlpha, this->mcDBeta, l);
+         matI = qi.mpmat();
+      }
+      else if(this->mQ == 4)
+      {
+         SparseSM::Worland::I4 qi(this->rows(), nN, this->mcAlpha, this->mcDBeta, l);
+         matI = qi.mpmat();
+      }
+      else
+      {
+         throw std::logic_error("Quasi-inverse order not implemented");
+      }
+
+      mat = matI*mat;
+   }
 }
 
 } // namespace Worland
