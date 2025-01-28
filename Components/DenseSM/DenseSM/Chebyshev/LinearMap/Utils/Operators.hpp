@@ -96,8 +96,14 @@ template <typename TMat, typename TSpec> void expansionProduct(TMat& mat, const 
    {
       for(int j = 0; j < cols; j++)
       {
-         triplets.push_back(Eigen::Triplet<typename TMat::Scalar>(j+i, j, 0.5*c(i)*c(j)/c(j+i)*spec(i)));
-         triplets.push_back(Eigen::Triplet<typename TMat::Scalar>(std::abs(j-i), j, 0.5*c(i)*c(j)/c(j-i)*spec(i)));
+         if(i+j < rows)
+         {
+            triplets.push_back(Eigen::Triplet<typename TMat::Scalar>(j+i, j, 0.5*c(i)*c(j)/c(j+i)*spec(i)));
+         }
+         if(std::abs(j-i) < rows)
+         {
+            triplets.push_back(Eigen::Triplet<typename TMat::Scalar>(std::abs(j-i), j, 0.5*c(i)*c(j)/c(j-i)*spec(i)));
+         }
       }
    }
 
