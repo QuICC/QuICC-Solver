@@ -437,7 +437,7 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
       Mat K;
       PetscCallVoid(PCFactorGetMatrix(pc, &K));
       PetscCallVoid(MatMumpsSetIcntl(K, 14, 50)); // Memory increase
-                                                  // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
+      // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
    }
 
    PetscCallVoid(
