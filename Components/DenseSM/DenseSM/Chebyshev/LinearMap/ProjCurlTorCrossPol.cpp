@@ -100,7 +100,7 @@ void ProjCurlTorCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
    const MHDFloat Labg =
       this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
-   Internal::MHDFloat c = std::pow(-1, la + lb + lg - 1) * L2b;
+   Internal::MHDFloat c = static_cast<Internal::MHDFloat>(std::pow(-1, la + lb + lg - 1)) * L2b;
 
    mat = c * this->mpOp->mpmat();
 
