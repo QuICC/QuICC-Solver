@@ -44,7 +44,6 @@ void DivR1D1FC::buildOpImpl(Internal::Matrix& mat, const int rows,
       throw std::logic_error(
          "Operators are not implemented for forcing with multiple l");
    }
-   const int lF = this->mpF->ls().at(0);
 
    namespace ev = Polynomial::Worland::Evaluator;
    const int nR = (3 * (2 * this->rows() + std::max(this->mLin, this->mLout) +
