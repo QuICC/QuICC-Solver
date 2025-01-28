@@ -13,8 +13,11 @@
 //
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Model/IPhysicalModel.hpp"
+#include "QuICC/NonDimensional/Tolerance.hpp"
+#include "QuICC/NonDimensional/MaxIteration.hpp"
 #include "QuICC/NonDimensional/Nev.hpp"
 #include "QuICC/NonDimensional/Omega.hpp"
+#include "QuICC/NonDimensional/GrowthRate.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
 #include "QuICC/NonDimensional/StabilityMode.hpp"
 #include "Stability/MarginalCurve.hpp"
@@ -65,7 +68,10 @@ std::shared_ptr<MarginalCurve> LinearStabilityFactory<TModel>::createSolver()
    // Create list of nondimensional ID strings for physical parameters
    std::vector<std::string> ndNames = model.backend().paramNames();
    // Add configuration parameters for Stability solver
+   ndNames.push_back(NonDimensional::Tolerance().tag());
+   ndNames.push_back(NonDimensional::MaxIteration().tag());
    ndNames.push_back(NonDimensional::Omega().tag());
+   ndNames.push_back(NonDimensional::GrowthRate().tag());
    ndNames.push_back(NonDimensional::Nev().tag());
    ndNames.push_back(NonDimensional::Sort().tag());
    ndNames.push_back(NonDimensional::StabilityMode().tag());

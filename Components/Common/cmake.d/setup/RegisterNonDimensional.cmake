@@ -20,6 +20,7 @@ set(tags
   Eta
   FastMean
   Gamma
+  GrowthRate
   Heating
   Iota
   Kappa
@@ -32,6 +33,7 @@ set(tags
   MagneticEkman
   MagneticPrandtl
   MagneticReynolds
+  MaxIteration
   ModifiedElsasser
   Mu
   Nev
@@ -55,6 +57,7 @@ set(tags
   Tau
   Taylor
   Theta
+  Tolerance
   Upper1d
   Upper2d
   Upper3d

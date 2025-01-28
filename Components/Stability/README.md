@@ -36,6 +36,9 @@ The parameters for the physical model are read from the `parameters.cfg` file. T
 
 In addition to the parameters for the nonlinear simulations, the following parameters are added:
 - omega: the target frequency for the GEVP solver
+- growth_rate: the target growth rate for the GEVP solver
+- tolerance: tolerance for converged eigenvalues
+- max_iteration: max iterations for eigensolver
 - nev: the number of eigenvalues to compute
 - sort: sorting to apply to the eigenpairs. This is applied after the eigenvalues have been computed.
     - 0: no additional sorting

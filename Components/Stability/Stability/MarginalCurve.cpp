@@ -18,6 +18,8 @@
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Io/Variable/StateFileWriter.hpp"
+#include "QuICC/NonDimensional/Tolerance.hpp"
+#include "QuICC/NonDimensional/MaxIteration.hpp"
 #include "QuICC/NonDimensional/Nev.hpp"
 #include "QuICC/NonDimensional/Rayleigh.hpp"
 #include "QuICC/NonDimensional/StabilityMode.hpp"
@@ -274,13 +276,26 @@ void MarginalCurve::mainRun()
    std::vector<MHDFloat> eigs;
    std::size_t max_nev;
 
+   // Get number of fields in matrix
+   int nF = 0;
+   for(auto&& f: this->mspBackend->fieldIds())
+   {
+      for(auto&& c: {FieldComponents::Spectral::SCALAR, FieldComponents::Spectral::POL, FieldComponents::Spectral::POL})
+      {
+         auto fc = std::make_pair(f, c);
+         Model::EquationInfo info;
+         this->mspBackend->equationInfo(info, fc, *this->mspRes);
+         nF = std::max(nF, static_cast<int>(info.im.size()));
+      }
+   }
+
+   // Compute maximum number of eigenvalues
    if (this->mspRes->sim().ss().has(SpatialScheme::Feature::SpectralMatrix1D))
    {
       eigs.clear();
       eigs = {this->mspRes->sim().boxScale(Dimensions::Simulation::SIM2D),
          this->mspRes->sim().boxScale(Dimensions::Simulation::SIM3D)};
 
-      int nF = this->mspBackend->fieldIds().size();
       int nN = this->mspRes->sim().dim(Dimensions::Simulation::SIM1D,
          Dimensions::Space::SPECTRAL);
       max_nev = nF * nN;
@@ -295,7 +310,6 @@ void MarginalCurve::mainRun()
       eigs.clear();
       eigs = {m_};
 
-      int nF = this->mspBackend->fieldIds().size();
       int nN = this->mspRes->sim().dim(Dimensions::Simulation::SIM1D,
          Dimensions::Space::SPECTRAL);
       int nL = (this->mspRes->sim().dim(Dimensions::Simulation::SIM2D,
@@ -308,9 +322,21 @@ void MarginalCurve::mainRun()
       throw std::logic_error("3D spectral matrix not setup");
    }
 
+   LinearStability::Options opt;
+   if(this->mspEqParams->nd(NonDimensional::Tolerance::id()) > 0)
+   {
+      opt.tolerance = this->mspEqParams->nd(NonDimensional::Tolerance::id());
+   }
+   if(this->mspEqParams->nd(NonDimensional::MaxIteration::id()) > 0)
+   {
+      opt.maxIteration = this->mspEqParams->nd(NonDimensional::MaxIteration::id());
+   }
+   opt.writeMtx = true;
+   opt.verboseDiagnostics = true;
+
    auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
       this->mspEqParams->map(), this->createBoundary()->map(),
-      this->mspBackend);
+      this->mspBackend, opt);
 
    auto nev_ = this->mspEqParams->nd(NonDimensional::Nev::id());
    unsigned int nev = 0;
