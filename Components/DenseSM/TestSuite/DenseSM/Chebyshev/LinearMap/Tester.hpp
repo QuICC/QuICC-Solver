@@ -162,23 +162,24 @@ namespace LinearMap {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         if(meta.size() != 12)
+         if(meta.size() != 13)
          {
             throw std::logic_error("Test meta data is wrong");
          }
 
          int nNr = meta(0) + 1;
          int nNc = meta(1) + 1;
-         int p = meta(2);
-         int lOut = meta(3);
-         int mOut = meta(4);
-         int lF = meta(5);
-         int mF = meta(6);
-         int lIn = meta(7);
-         int mIn = meta(8);
-         int fId = meta(9);
-         auto lb = static_cast<QuICC::Internal::MHDFloat>(meta(10));
-         auto ub = static_cast<QuICC::Internal::MHDFloat>(meta(11));
+         assert(meta(2) == 0); // provided but not used
+         int p = meta(3);
+         int lOut = meta(4);
+         int mOut = meta(5);
+         int lF = meta(6);
+         int mF = meta(7);
+         int lIn = meta(8);
+         int mIn = meta(9);
+         int fId = meta(10);
+         auto lb = static_cast<QuICC::Internal::MHDFloat>(meta(11));
+         auto ub = static_cast<QuICC::Internal::MHDFloat>(meta(12));
 
          std::shared_ptr<dsm::RadialTorPolFunction> pF;
          if (fId == 0)
