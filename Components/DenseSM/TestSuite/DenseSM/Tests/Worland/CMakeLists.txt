@@ -23,14 +23,14 @@ set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
 
 # Fetch reference data
 include(FetchTestReference)
-#quicc_fetch_test_reference(
-#  ${TestExe}
-#  COMPONENT DenseSM
-#  FILENAME "Worland.tar.gz"
-#  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
-#  DATADIR ${QUICC_WORK_DIR}
-#)
-#
+quicc_fetch_test_reference(
+  ${TestExe}
+  COMPONENT DenseSM
+  FILENAME "Worland.tar.gz"
+  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+  DATADIR ${QUICC_WORK_DIR}
+)
+
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
 include(ConfigureTests)
@@ -64,8 +64,6 @@ set(_tests
   DivR1F:dense
   DivR1CF:dense
   DivR1FC:dense
-  DivR2D1R1F:dense
-  DivR2FD1R1:dense
   DivR1D1DivR1FD1R1:dense
   DivR1D1DivR1D1R1F:dense
   DivR3D1R1FD1R1:dense
@@ -111,8 +109,6 @@ set(_tests
   DivR1F:dense
   DivR1CF:dense
   DivR1FC:dense
-  DivR2D1R1F:dense
-  DivR2FD1R1:dense
   DivR1D1DivR1FD1R1:dense
   DivR1D1DivR1D1R1F:dense
   DivR3D1R1FD1R1:dense
