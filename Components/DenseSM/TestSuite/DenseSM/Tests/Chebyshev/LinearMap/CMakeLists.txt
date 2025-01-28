@@ -42,11 +42,11 @@ function(run_iqrp_tests tag)
   set(multiValueArgs TESTS IDS QIS MIN_QIS)
   cmake_parse_arguments(RIT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
   if(NOT RIT_ULP)
-    set(RIT_ULP 500)
-  endif())
+    set(RIT_ULP 200)
+  endif()
   if(NOT RIT_MPULP)
-    set(RIT_ULP 150)
-  endif())
+    set(RIT_MPULP 120)
+  endif()
   if(NOT RIT_MIN_QIS)
     foreach(_t ${RIT_TESTS})
       LIST(GET RIT_QIS 0 _min)
@@ -117,7 +117,7 @@ run_iqrp_tests("Gaunt, dipolar R^4" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_
 
 # Create Quasi-inverse Elsasser coefficient, dipolar tests, r^2 prefactor
 set(_tests
-  IqRpDivR1F:dense
+  DivR1F:dense
   )
 set(_ids 100 101 102 103 104 105 106)
 run_iqrp_tests("Elsasser, dipolar R^2" TESTS ${_tests} IDS ${_ids} QIS ${_qis})
@@ -159,7 +159,7 @@ run_iqrp_tests("Gaunt, quadrupolar R^4" TESTS ${_tests} IDS ${_ids} QIS ${_qis} 
 
 # Create Elsasser Quasi-inverse coefficient, quadrupolar tests, r^2 prefactor
 set(_tests
-  IqRpDivR1F:dense
+  DivR1F:dense
   )
 set(_ids 300 301 302 303 304 305 306 307 308 309 310 311)
 run_iqrp_tests("Elsasser, quadrupolar R^2" TESTS ${_tests} IDS ${_ids} QIS ${_qis})
