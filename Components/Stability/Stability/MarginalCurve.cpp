@@ -331,8 +331,8 @@ void MarginalCurve::mainRun()
    {
       opt.maxIteration = this->mspEqParams->nd(NonDimensional::MaxIteration::id());
    }
-   opt.writeMtx = true;
-   opt.verboseDiagnostics = true;
+   //opt.writeMtx = true;
+   //opt.verboseDiagnostics = true;
 
    auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
       this->mspEqParams->map(), this->createBoundary()->map(),
