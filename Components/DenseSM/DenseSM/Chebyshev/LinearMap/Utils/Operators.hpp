@@ -70,6 +70,7 @@ SparseMatrix matIq(const int q, const int i, const int rows, const int cols, con
 
 
 
+
 template <typename TMat, typename TSpec> void expansionProduct(TMat& mat, const int rows, const int cols, const TSpec& spec, const int nN)
 {
    assert(mat.rows() >= rows);
@@ -77,24 +78,40 @@ template <typename TMat, typename TSpec> void expansionProduct(TMat& mat, const 
    assert(spec.rows() >= nN);
    assert(spec.cols() >= 1);
 
-   mat.setZero();
-   for(int i = 0; i < rows; i++)
+   std::vector<Eigen::Triplet<typename TMat::Scalar>> triplets;
+
+   auto c = [](const int k)
    {
-      for(int j = 0; j < nN; j++)
+      if(k == 0)
       {
-         if(i-j >= 0 && i-j < cols)
-         {
-            mat(i,i-j) += spec(j);
-         }
-         else if(j-i >= 0 && j-i < nN && j-i < cols)
-         {
-            mat(i,j-i) += spec(j);
-         }
-         if(j > 0 && i+j < cols)
-         {
-            mat(i,i+j) += spec(j);
-         }
+         return 1.0;
       }
+      else
+      {
+         return 2.0;
+      }
+   };
+
+   for(int i = 0; i < nN; i++)
+   {
+      for(int j = 0; j < cols; j++)
+      {
+         triplets.push_back(Eigen::Triplet<typename TMat::Scalar>(j+i, j, 0.5*c(i)*c(j)/c(j+i)*spec(i)));
+         triplets.push_back(Eigen::Triplet<typename TMat::Scalar>(std::abs(j-i), j, 0.5*c(i)*c(j)/c(j-i)*spec(i)));
+      }
+   }
+
+   if constexpr(std::is_same_v<Eigen::SparseMatrix<typename TMat::Scalar>, TMat>)
+   {
+      mat.setFromTriplets(triplets.begin(), triplets.end());
+   }
+   else
+   {
+      Eigen::SparseMatrix<typename TMat::Scalar> spmat(rows, cols);
+      spmat.setFromTriplets(triplets.begin(), triplets.end());
+
+      mat.setZero();
+      mat.block(0, 0, rows, cols) = spmat.toDense();
    }
 }
 

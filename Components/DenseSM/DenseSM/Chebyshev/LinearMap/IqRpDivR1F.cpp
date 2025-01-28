@@ -15,7 +15,6 @@
 #include "DenseSM/Chebyshev/LinearMap/Utils/Operators.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
-#include <iostream>
 namespace QuICC {
 
 namespace DenseSM {
@@ -63,13 +62,9 @@ void IqRpDivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
       (f.array()*r.array().pow(this->mP-1))
          .cast<MHDFloat>();
    Matrix cf = Utils::computeExpansion(tf, fN, lb, ub);
-   std::cerr << "fN: " << fN << std::endl;
-   std::cerr << cf << std::endl;
 
    Matrix fOp = Matrix::Zero(rows + fN + 2*this->mQ,cols);
    Utils::expansionProduct(fOp, fOp.rows(), fOp.cols(), cf, fN);
-   std::cerr << fOp << std::endl;
-   std::cerr << Utils::matIq(this->mQ, 0, rows, fOp.rows(), lb, ub) << std::endl;
    mat = Utils::matIq(this->mQ, 0, rows, fOp.rows(), lb, ub) * fOp;
 }
 
