@@ -16,6 +16,9 @@
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1D1F.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR2D1R1F.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR2FD1R1.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR1D1F.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR2D1R1F.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR2FD1R1.hpp"
 #include "Types/Internal/Literals.hpp"
 
 namespace QuICC {
@@ -38,10 +41,23 @@ ProjCurlCurlPolCrossTor::ProjCurlCurlPolCrossTor(const int nNr, const int nNc,
    {
       if (p == 4)
       {
-         this->mpOpA = std::make_shared<RpDivR2D1R1F>(nNr, nNc, p, lOut, mOut, lA,
-            mA, lB, mB, pPolA, lower, upper);
-         this->mpOpB = std::make_shared<RpDivR1D1F>(nNr, nNc, p, lOut, mOut, lA,
-            mA, lB, mB, pPolA, lower, upper);
+         if(this->mQ == 0)
+         {
+            this->mpOpA = std::make_shared<RpDivR2D1R1F>(nNr, nNc, p, lOut, mOut, lA,
+                  mA, lB, mB, pPolA, lower, upper);
+            this->mpOpB = std::make_shared<RpDivR1D1F>(nNr, nNc, p, lOut, mOut, lA,
+                  mA, lB, mB, pPolA, lower, upper);
+         }
+         else
+         {
+            // Disable general quasi-inverse calculation
+            this->mQ = 0;
+
+            this->mpOpA = std::make_shared<IqRpDivR2D1R1F>(nNr, nNc, q, p, lOut, mOut, lA,
+                  mA, lB, mB, pPolA, lower, upper);
+            this->mpOpB = std::make_shared<IqRpDivR1D1F>(nNr, nNc, q, p, lOut, mOut, lA,
+                  mA, lB, mB, pPolA, lower, upper);
+         }
       }
       else
       {
@@ -53,10 +69,23 @@ ProjCurlCurlPolCrossTor::ProjCurlCurlPolCrossTor(const int nNr, const int nNc,
    {
       if (p == 4)
       {
-         this->mpOpA = std::make_shared<RpDivR2FD1R1>(nNr, nNc, p, lOut, mOut, lB,
-            mB, lA, mA, pTorB, lower, upper);
-         this->mpOpB = std::make_shared<RpDivR1D1F>(nNr, nNc, p, lOut, mOut, lB,
-            mB, lA, mA, pTorB, lower, upper);
+         if(this->mQ == 0)
+         {
+            this->mpOpA = std::make_shared<RpDivR2FD1R1>(nNr, nNc, p, lOut, mOut, lB,
+                  mB, lA, mA, pTorB, lower, upper);
+            this->mpOpB = std::make_shared<RpDivR1D1F>(nNr, nNc, p, lOut, mOut, lB,
+                  mB, lA, mA, pTorB, lower, upper);
+         }
+         else
+         {
+            // Disable general quasi-inverse calculation
+            this->mQ = 0;
+
+            this->mpOpA = std::make_shared<IqRpDivR2FD1R1>(nNr, nNc, q, p, lOut, mOut, lB,
+                  mB, lA, mA, pTorB, lower, upper);
+            this->mpOpB = std::make_shared<IqRpDivR1D1F>(nNr, nNc, q, p, lOut, mOut, lB,
+                  mB, lA, mA, pTorB, lower, upper);
+         }
       }
       else
       {

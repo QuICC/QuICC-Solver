@@ -16,6 +16,8 @@
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlCurlCPolCrossTor.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1CF.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1FC.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR1CF.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR1FC.hpp"
 
 namespace QuICC {
 
@@ -38,8 +40,19 @@ ProjCurlCurlCPolCrossTor::ProjCurlCurlCPolCrossTor(const int nNr, const int nNc,
    {
       if (p == 4)
       {
-         this->mpOp = std::make_shared<RpDivR1CF>(nNr, nNc, p, lOut, mOut, lA, mA,
-            lB, mB, pPolA, lower, upper);
+         if(this->mQ == 0)
+         {
+            this->mpOp = std::make_shared<RpDivR1CF>(nNr, nNc, p, lOut, mOut, lA, mA,
+               lB, mB, pPolA, lower, upper);
+         }
+         else
+         {
+            // Disable general quasi-inverse calculation
+            this->mQ = 0;
+
+            this->mpOp = std::make_shared<IqRpDivR1CF>(nNr, nNc, q, p, lOut, mOut, lA, mA,
+               lB, mB, pPolA, lower, upper);
+         }
       }
       else
       {
@@ -49,19 +62,23 @@ ProjCurlCurlCPolCrossTor::ProjCurlCurlCPolCrossTor(const int nNr, const int nNc,
    // Radial function B is given
    else if (pTorB && pPolA == nullptr)
    {
-      this->mpOp = std::make_shared<RpDivR1FC>(nNr, nNc, p, lOut, mOut, lB, mB, lA,
-         mA, pTorB, lower, upper);
-   }
-   else
-   {
-      if (p == 4)
+      if(this->mQ == 0)
       {
-         throw std::logic_error("One of the radial functions should be null");
+         this->mpOp = std::make_shared<RpDivR1FC>(nNr, nNc, p, lOut, mOut, lB, mB, lA,
+               mA, pTorB, lower, upper);
       }
       else
       {
-         throw std::logic_error("Radial prefactor is not implemented!");
+         // Disable general quasi-inverse calculation
+         this->mQ = 0;
+
+         this->mpOp = std::make_shared<IqRpDivR1FC>(nNr, nNc, q, p, lOut, mOut, lB, mB, lA,
+               mA, pTorB, lower, upper);
       }
+   }
+   else
+   {
+      throw std::logic_error("One of the radial functions should be null");
    }
 }
 

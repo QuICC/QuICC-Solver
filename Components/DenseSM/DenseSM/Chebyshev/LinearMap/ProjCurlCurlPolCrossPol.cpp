@@ -16,6 +16,9 @@
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1D1DivR1D1R1F.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1D1DivR1FD1R1.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR3D1R1FD1R1.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR1D1DivR1D1R1F.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR1D1DivR1FD1R1.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR3D1R1FD1R1.hpp"
 
 namespace QuICC {
 
@@ -37,12 +40,27 @@ ProjCurlCurlPolCrossPol::ProjCurlCurlPolCrossPol(const int nNr, const int nNc,
    {
       if (p == 4)
       {
-         this->mpOpA = std::make_shared<RpDivR1D1DivR1FD1R1>(nNr, nNc, p, lOut,
-            mOut, lA, mA, lB, mB, pPolA, lower, upper);
-         this->mpOpB = std::make_shared<RpDivR1D1DivR1D1R1F>(nNr, nNc, p, lOut,
-            mOut, lA, mA, lB, mB, pPolA, lower, upper);
-         this->mpOpC = std::make_shared<RpDivR3D1R1FD1R1>(nNr, nNc, p, lOut, mOut,
-            lA, mA, lB, mB, pPolA, lower, upper);
+         if(this->mQ == 0)
+         {
+            this->mpOpA = std::make_shared<RpDivR1D1DivR1FD1R1>(nNr, nNc, p, lOut,
+               mOut, lA, mA, lB, mB, pPolA, lower, upper);
+            this->mpOpB = std::make_shared<RpDivR1D1DivR1D1R1F>(nNr, nNc, p, lOut,
+               mOut, lA, mA, lB, mB, pPolA, lower, upper);
+            this->mpOpC = std::make_shared<RpDivR3D1R1FD1R1>(nNr, nNc, p, lOut, mOut,
+               lA, mA, lB, mB, pPolA, lower, upper);
+         }
+         else
+         {
+            // Disable general quasi-inverse calculation
+            this->mQ = 0;
+
+            this->mpOpA = std::make_shared<IqRpDivR1D1DivR1FD1R1>(nNr, nNc, q, p, lOut,
+               mOut, lA, mA, lB, mB, pPolA, lower, upper);
+            this->mpOpB = std::make_shared<IqRpDivR1D1DivR1D1R1F>(nNr, nNc, q, p, lOut,
+               mOut, lA, mA, lB, mB, pPolA, lower, upper);
+            this->mpOpC = std::make_shared<IqRpDivR3D1R1FD1R1>(nNr, nNc, q, p, lOut, mOut,
+               lA, mA, lB, mB, pPolA, lower, upper);
+         }
       }
       else
       {
@@ -54,12 +72,27 @@ ProjCurlCurlPolCrossPol::ProjCurlCurlPolCrossPol(const int nNr, const int nNc,
    {
       if (p == 4)
       {
-         this->mpOpA = std::make_shared<RpDivR1D1DivR1D1R1F>(nNr, nNc, p, lOut,
-            mOut, lB, mB, lA, mA, pPolB, lower, upper);
-         this->mpOpB = std::make_shared<RpDivR1D1DivR1FD1R1>(nNr, nNc, p, lOut,
-            mOut, lB, mB, lA, mA, pPolB, lower, upper);
-         this->mpOpC = std::make_shared<RpDivR3D1R1FD1R1>(nNr, nNc, p, lOut, mOut,
-            lB, mB, lA, mA, pPolB, lower, upper);
+         if(this->mQ == 0)
+         {
+            this->mpOpA = std::make_shared<RpDivR1D1DivR1D1R1F>(nNr, nNc, p, lOut,
+                  mOut, lB, mB, lA, mA, pPolB, lower, upper);
+            this->mpOpB = std::make_shared<RpDivR1D1DivR1FD1R1>(nNr, nNc, p, lOut,
+                  mOut, lB, mB, lA, mA, pPolB, lower, upper);
+            this->mpOpC = std::make_shared<RpDivR3D1R1FD1R1>(nNr, nNc, p, lOut, mOut,
+                  lB, mB, lA, mA, pPolB, lower, upper);
+         }
+         else
+         {
+            // Disable general quasi-inverse calculation
+            this->mQ = 0;
+
+            this->mpOpA = std::make_shared<IqRpDivR1D1DivR1D1R1F>(nNr, nNc, q, p, lOut,
+                  mOut, lB, mB, lA, mA, pPolB, lower, upper);
+            this->mpOpB = std::make_shared<IqRpDivR1D1DivR1FD1R1>(nNr, nNc, q, p, lOut,
+                  mOut, lB, mB, lA, mA, pPolB, lower, upper);
+            this->mpOpC = std::make_shared<IqRpDivR3D1R1FD1R1>(nNr, nNc, q, p, lOut, mOut,
+                  lB, mB, lA, mA, pPolB, lower, upper);
+         }
       }
       else
       {

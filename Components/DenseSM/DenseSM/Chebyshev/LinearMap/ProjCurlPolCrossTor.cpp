@@ -14,6 +14,7 @@
 //
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlPolCrossTor.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1F.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR1F.hpp"
 
 namespace QuICC {
 
@@ -35,8 +36,19 @@ ProjCurlPolCrossTor::ProjCurlPolCrossTor(const int nNr, const int nNc,
    {
       if (p > 1)
       {
-         this->mpOp = std::make_shared<RpDivR1F>(nNr, nNc, p, lOut, mOut, lA, mA,
-            lB, mB, pPolA, lower, upper);
+         if(this->mQ == 0)
+         {
+            this->mpOp = std::make_shared<RpDivR1F>(nNr, nNc, p, lOut, mOut, lA, mA,
+               lB, mB, pPolA, lower, upper);
+         }
+         else
+         {
+            // Disable general quasi-inverse calculation
+            this->mQ = 0;
+
+            this->mpOp = std::make_shared<IqRpDivR1F>(nNr, nNc, q, p, lOut, mOut, lA, mA,
+               lB, mB, pPolA, lower, upper);
+         }
       }
       else
       {
@@ -48,8 +60,19 @@ ProjCurlPolCrossTor::ProjCurlPolCrossTor(const int nNr, const int nNc,
    {
       if (p > 1)
       {
-         this->mpOp = std::make_shared<RpDivR1F>(nNr, nNc, p, lOut, mOut, lB, mB,
-            lA, mA, pTorB, lower, upper);
+         if(this->mQ == 0)
+         {
+            this->mpOp = std::make_shared<RpDivR1F>(nNr, nNc, p, lOut, mOut, lB, mB,
+               lA, mA, pTorB, lower, upper);
+         }
+         else
+         {
+            // Disable general quasi-inverse calculation
+            this->mQ = 0;
+
+            this->mpOp = std::make_shared<IqRpDivR1F>(nNr, nNc, q, p, lOut, mOut, lB, mB,
+               lA, mA, pTorB, lower, upper);
+         }
       }
       else
       {

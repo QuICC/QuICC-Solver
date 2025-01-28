@@ -53,7 +53,9 @@ ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
          }
          else
          {
+            // Disable general quasi-inverse calculation
             this->mQ = 0;
+
             this->mpOpA = std::make_shared<IqRpDivR2CFD1R1>(nNr, nNc, q, p, lOut, mOut, lA,
                mA, lB, mB, pPolA, lower, upper);
             this->mpOpB = std::make_shared<IqRpDivR1D1CF>(nNr, nNc, q, p, lOut, mOut, lA,
@@ -79,7 +81,9 @@ ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
          }
          else
          {
+            // Disable general quasi-inverse calculation
             this->mQ = 0;
+
             this->mpOpA = std::make_shared<IqRpDivR2D1R1FC>(nNr, nNc, q, p, lOut, mOut, lB,
                mB, lA, mA, pPolB, lower, upper);
             this->mpOpB = std::make_shared<IqRpDivR1D1FC>(nNr, nNc, q, p, lOut, mOut, lB,

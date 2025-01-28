@@ -15,6 +15,8 @@
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlCPolCrossPol.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1CF.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1FC.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR1CF.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IqRpDivR1FC.hpp"
 #include "Types/Internal/Math.hpp"
 #include "Types/Internal/Literals.hpp"
 
@@ -38,8 +40,19 @@ ProjCurlCPolCrossPol::ProjCurlCPolCrossPol(const int nNr, const int nNc,
    {
       if (p == 4)
       {
-         this->mpOp = std::make_shared<RpDivR1CF>(nNr, nNc, p, lOut, mOut, lA, mA,
-            lB, mB, pPolA, lower, upper);
+         if(this->mQ == 0)
+         {
+            this->mpOp = std::make_shared<RpDivR1CF>(nNr, nNc, p, lOut, mOut, lA, mA,
+               lB, mB, pPolA, lower, upper);
+         }
+         else
+         {
+            // Disable general quasi-inverse calculation
+            this->mQ = 0;
+
+            this->mpOp = std::make_shared<IqRpDivR1CF>(nNr, nNc, q, p, lOut, mOut, lA, mA,
+               lB, mB, pPolA, lower, upper);
+         }
       }
       else
       {
@@ -51,8 +64,19 @@ ProjCurlCPolCrossPol::ProjCurlCPolCrossPol(const int nNr, const int nNc,
    {
       if (p == 4)
       {
-         this->mpOp = std::make_shared<RpDivR1FC>(nNr, nNc, p, lOut, mOut, lB, mB,
-            lA, mA, pPolB, lower, upper);
+         if(this->mQ == 0)
+         {
+            this->mpOp = std::make_shared<RpDivR1FC>(nNr, nNc, p, lOut, mOut, lB, mB,
+               lA, mA, pPolB, lower, upper);
+         }
+         else
+         {
+            // Disable general quasi-inverse calculation
+            this->mQ = 0;
+
+            this->mpOp = std::make_shared<IqRpDivR1FC>(nNr, nNc, q, p, lOut, mOut, lB, mB,
+               lA, mA, pPolB, lower, upper);
+         }
       }
       else
       {
