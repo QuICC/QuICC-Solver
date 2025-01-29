@@ -259,7 +259,7 @@ class model_pipeline(libtime_pipeline):
                     'variables':
                     {
                         # the image is pulled in the lib test stage
-                        'PULL_IMAGE': 'NO',
+                        'PULL_IMAGE': 'YES',
                         'SLURM_NTASKS': tasks,
                         'SLURM_NTASKS_PER_NODE': tasks,
                         'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks)),

@@ -49,7 +49,7 @@ BoussinesqSphereDynamoExplicit_tubular:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '32'
@@ -60,7 +60,7 @@ BoussinesqSphereDynamoImplicit_single2d:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '32'
@@ -71,7 +71,7 @@ BoussinesqShellDynamoExplicit_tubular:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '32'
@@ -82,7 +82,7 @@ BoussinesqShellDynamoImplicit_single2d:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '32'
@@ -93,7 +93,7 @@ BoussinesqSphereRTCExplicit_single1d:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -104,7 +104,7 @@ BoussinesqSphereRTCExplicit_single2d:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -115,7 +115,7 @@ BoussinesqSphereRTCExplicit_tubular:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -126,7 +126,7 @@ BoussinesqSphereRTCExplicit_tubular_split_equation:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -137,7 +137,7 @@ BoussinesqSphereRTCImplicit_single1d:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -148,7 +148,7 @@ BoussinesqSphereRTCImplicit_single2d:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -159,7 +159,7 @@ BoussinesqSphereRTCImplicit_tubular:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -170,7 +170,7 @@ BoussinesqShellRTCExplicit_single1d:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -181,7 +181,7 @@ BoussinesqShellRTCExplicit_single2d:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -192,7 +192,7 @@ BoussinesqShellRTCExplicit_tubular:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -203,7 +203,7 @@ BoussinesqShellRTCExplicit_tubular_split_equation:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -214,7 +214,7 @@ BoussinesqShellRTCImplicit_single2d:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '6'
     SLURM_NTASKS_PER_NODE: '6'
     SLURM_CPUS_PER_TASK: '21'
@@ -225,7 +225,7 @@ BoussinesqSphereTCExplicit_tubular:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '32'
@@ -236,7 +236,7 @@ BoussinesqShellTCExplicit_tubular:
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '32'

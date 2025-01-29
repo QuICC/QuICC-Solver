@@ -40,7 +40,7 @@ BoussinesqSphereDynamoExplicit_serial:
   - .alps-a100_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '64'
@@ -51,7 +51,7 @@ BoussinesqSphereDynamoImplicit_serial:
   - .alps-a100_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '64'
@@ -62,7 +62,7 @@ BoussinesqShellDynamoExplicit_serial:
   - .alps-a100_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '64'
@@ -73,7 +73,7 @@ BoussinesqShellDynamoImplicit_serial:
   - .alps-a100_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '64'
@@ -84,7 +84,7 @@ BoussinesqSphereRTCExplicit_serial:
   - .alps-a100_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '64'
@@ -95,7 +95,7 @@ BoussinesqSphereRTCImplicit_serial:
   - .alps-a100_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '64'
@@ -106,7 +106,7 @@ BoussinesqShellRTCExplicit_serial:
   - .alps-a100_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '64'
@@ -117,7 +117,7 @@ BoussinesqShellRTCImplicit_serial:
   - .alps-a100_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '64'
@@ -128,7 +128,7 @@ BoussinesqSphereTCExplicit_serial:
   - .alps-a100_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '64'
@@ -139,7 +139,7 @@ BoussinesqShellTCExplicit_serial:
   - .alps-a100_runner
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
     SLURM_CPUS_PER_TASK: '64'
