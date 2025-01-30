@@ -37,7 +37,8 @@ IProjCrossOperator::IProjCrossOperator(const int rows, const int cols, const int
     mLa(lA),
     mMa(mA),
     mLb(lB),
-    mMb(mB)
+    mMb(mB),
+    mBand(rows,cols)
 {}
 
 bool IProjCrossOperator::isZero() const
@@ -127,24 +128,29 @@ void IProjCrossOperator::applyQI(Internal::Matrix& mat, const int l) const
 {
    if(this->mQ > 0)
    {
+      // Compute QI
       int nN = mat.rows();
       Internal::SparseMatrix matI;
+      std::pair<int,int> band;
       if(this->mQ == 1)
       {
          throw std::logic_error("Quasi-inverse of order 1 is not implemented");
       }
       else if(this->mQ == 2)
       {
+         band = std::make_pair(1,3);
          SparseSM::Worland::I2 qi(this->rows(), nN, this->mcAlpha, this->mcDBeta, l);
          matI = qi.mpmat();
       }
       else if(this->mQ == 3)
       {
+         band = std::make_pair(1,5);
          SparseSM::Worland::I3 qi(this->rows(), nN, this->mcAlpha, this->mcDBeta, l);
          matI = qi.mpmat();
       }
       else if(this->mQ == 4)
       {
+         band = std::make_pair(2,6);
          SparseSM::Worland::I4 qi(this->rows(), nN, this->mcAlpha, this->mcDBeta, l);
          matI = qi.mpmat();
       }
@@ -153,9 +159,50 @@ void IProjCrossOperator::applyQI(Internal::Matrix& mat, const int l) const
          throw std::logic_error("Quasi-inverse order not implemented");
       }
 
+      // Apply QI
       mat = matI*mat;
+
+      // Get bandwidth of product
+      band.first += this->mBand.first;
+      band.second += this->mBand.second;
+
+      // Set exact zeros
+      for(int i = 0; i < mat.rows(); i++)
+      {
+         // Set lower part to zero
+         for(int j = 0; j < i-band.first; j++)
+         {
+            mat(i,j) = 0;
+         }
+         // Set upper part to zero
+         for(int j = i + band.second + 1; j < mat.cols(); j++)
+         {
+            mat(i,j) = 0;
+         }
+      }
    }
 }
+
+void IProjCrossOperator::setBand(const int dL, int s)
+{
+   if(dL >= 0)
+   {
+      this->mBand.first = dL; 
+      this->mBand.second = 0; 
+      s -= 2*dL;
+   }
+   else
+   {
+      this->mBand.first = 0; 
+      this->mBand.second = -dL; 
+   }
+   if(s > 0)
+   {
+      this->mBand.first += s/2;
+      this->mBand.second += s/2;
+   }
+};
+
 
 } // namespace Worland
 } // namespace DenseSM

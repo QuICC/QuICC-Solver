@@ -33,12 +33,22 @@ ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
     ProjCurlCurlTorCrossPol(nNr, nNc, q, lOut, mOut, lA, mA, lB, mB, pPolA, pPolB,
        alpha, dBeta)
 {
+
+   auto prefactor = [](const int lIn, const int lOut, auto pF)
+   {
+      int dL = (lIn - lOut);
+      int s = dL + pF->ls().at(0) + 2*pF->nN() - 6;
+
+      auto p = std::make_pair(dL, s);
+      return p;
+   };
+
    // Radial function A is given
    if (pPolA && pPolB == nullptr)
    {
-      this->mpOpA = std::make_shared<DivR2CFD1R1>(nNr, nNc, lOut, mOut, lA, mA,
+      this->mpOpA = std::make_shared<DivR2CFD1R1>(nNr + 2*q, nNc, lOut, mOut, lA, mA,
          lB, mB, pPolA, alpha, dBeta);
-      this->mpOpB = std::make_shared<DivR1D1CF>(nNr, nNc, lOut, mOut, lA, mA,
+      this->mpOpB = std::make_shared<DivR1D1CF>(nNr + 2*q, nNc, lOut, mOut, lA, mA,
          lB, mB, pPolA, alpha, dBeta);
 
       // Special condition where both operators cancel each other
@@ -46,14 +56,20 @@ ProjCurlCurlCPolCrossPol::ProjCurlCurlCPolCrossPol(const int nNr, const int nNc,
       {
          this->mIsZero = true;
       }
+
+      auto bandInfo = prefactor(lB, lOut, pPolA);
+      this->setBand(bandInfo.first, bandInfo.second);
    }
    // Radial function B is given
    else if (pPolB && pPolA == nullptr)
    {
-      this->mpOpA = std::make_shared<DivR2D1R1FC>(nNr, nNc, lOut, mOut, lB, mB,
+      this->mpOpA = std::make_shared<DivR2D1R1FC>(nNr + 2*q, nNc, lOut, mOut, lB, mB,
          lA, mA, pPolB, alpha, dBeta);
-      this->mpOpB = std::make_shared<DivR1D1FC>(nNr, nNc, lOut, mOut, lB, mB,
+      this->mpOpB = std::make_shared<DivR1D1FC>(nNr + 2*q, nNc, lOut, mOut, lB, mB,
          lA, mA, pPolB, alpha, dBeta);
+
+      auto bandInfo = prefactor(lA, lOut, pPolB);
+      this->setBand(bandInfo.first, bandInfo.second);
    }
    else
    {

@@ -31,17 +31,32 @@ ProjCurlCPolCrossPol::ProjCurlCPolCrossPol(const int nNr, const int nNc,
    const Scalar_t dBeta) :
     IProjCrossOperator(nNr, nNc, q, lOut, mOut, lA, mA, lB, mB, alpha, dBeta)
 {
+   auto prefactor = [](const int lIn, const int lOut, auto pF)
+   {
+      int dL = (lIn - lOut);
+      int s = dL + pF->ls().at(0) + 2*pF->nN() - 5;
+
+      auto p = std::make_pair(dL, s);
+      return p;
+   };
+
    // Radial function A is given
    if (pPolA && pPolB == nullptr)
    {
-      this->mpOp = std::make_shared<DivR1CF>(nNr, nNc, lOut, mOut, lA, mA, lB,
+      this->mpOp = std::make_shared<DivR1CF>(nNr + 2*q, nNc, lOut, mOut, lA, mA, lB,
          mB, pPolA, alpha, dBeta);
+
+      auto bandInfo = prefactor(lB, lOut, pPolA);
+      this->setBand(bandInfo.first, bandInfo.second);
    }
    // Radial function B is given
    else if (pPolB && pPolA == nullptr)
    {
-      this->mpOp = std::make_shared<DivR1FC>(nNr, nNc, lOut, mOut, lB, mB, lA,
+      this->mpOp = std::make_shared<DivR1FC>(nNr + 2*q, nNc, lOut, mOut, lB, mB, lA,
          mA, pPolB, alpha, dBeta);
+
+      auto bandInfo = prefactor(lA, lOut, pPolB);
+      this->setBand(bandInfo.first, bandInfo.second);
    }
    else
    {

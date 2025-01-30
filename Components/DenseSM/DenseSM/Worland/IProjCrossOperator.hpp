@@ -74,8 +74,16 @@ protected:
 
    /**
     * @brief Apply quasi-inverse
+    *
+    * @param mat     Operator matrix to apply QI on
+    * @param l       harmonic degree
     */
    void applyQI(Internal::Matrix& mat, const int l) const;
+
+   /**
+    * @brief Set operator band
+    */
+   void setBand(const int dL, int s);
 
    /**
     * @brief Operator is exactly zero
@@ -121,6 +129,11 @@ protected:
     * @brief Harmonic order of B
     */
    int mMb;
+
+   /**
+    * @brief Bandwidth of operator
+    */
+   std::pair<int,int> mBand;
 
 private:
 };

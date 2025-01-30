@@ -36,6 +36,7 @@ list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 include(ConfigureTests)
 include(SetUlp)
 
+# Generate IqRp tests
 function(run_iqrp_tests tag)
   # parse inputs
   set(oneValueArgs ULP MPULP)
