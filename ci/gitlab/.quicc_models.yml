@@ -280,6 +280,7 @@
 .BoussinesqSphereDynamoExplicit_tubular:
   stage: model-build-and-test
   script:
+  - printenv
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh hostname
   - cd /QuICC.src/build
   - /QuICC.src/ci/gitlab/bin/mpi_lock.sh "cmake .. -DCMAKE_INSTALL_PREFIX=${CI_CACHE_FOLDER}/quicc-${QUICC_VERSION_TAG} -DQUICC_TESTSUITE_POLYNOMIAL=OFF -DQUICC_TESTSUITE_FRAMEWORK=OFF -DQUICC_TESTSUITE_TRANSFORM=OFF -DQUICC_TESTSUITE_PROFILING=OFF -DQUICC_TESTSUITE_SPARSESM=OFF && make install"
