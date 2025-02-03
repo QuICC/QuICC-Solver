@@ -18,4 +18,3 @@
 
 .alps-mc_builder:
   extends: .cscs_x86_64_builder
-

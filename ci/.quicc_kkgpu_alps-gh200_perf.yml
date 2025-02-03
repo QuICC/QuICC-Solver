@@ -38,7 +38,7 @@ time-quicc-lib:
     F7T_URL: https://api.cscs.ch/cw/firecrest/v1
     FIRECREST_SYSTEM: santis
 ci-cache-cleanup:
-  extends: .container-runner-daint
+  extends: .container-runner-daint-gh200
   stage: cleanup
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   script:

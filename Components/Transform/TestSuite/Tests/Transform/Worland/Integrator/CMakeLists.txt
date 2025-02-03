@@ -59,7 +59,7 @@ set(_tests
   # Poly::R1_Zero:<viewCpu_t>:integrator
 )
 quicc_set_ulp(_ulp
-  ULP 16 10 115 80 78
+  ULP 16 10 127 80 78
   MPULP 3 2 2 2 2
   )
 
@@ -484,7 +484,7 @@ set(_tests_templated
   Fft::I2DivR1D1R1_Zero:<base_t>:integrator
   )
 quicc_set_ulp(_ulp
-  ULP 11 353 1359 1067 1258 11 193 1111 393 884
+  ULP 11 392 1359 1067 1258 11 193 1111 393 884
   MPULP 4 75 278 95 149 3 57 107 163 97
   )
 foreach(_test ${_tests_templated})

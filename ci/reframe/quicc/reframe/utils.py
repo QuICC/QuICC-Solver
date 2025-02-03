@@ -20,17 +20,16 @@ def round_time(val, digits):
     rounded =  np.round(val + 10**-p, p)
     return rounded
 
-def extract_timings(in_file, arch, filter=None):
-    """Extract timings from performance report
-    """
+def extract_timings(in_file, arch, filter=None, default_id='108', default_split='8', keyword_split='fourier', keyword_split_value='96'):
+    """Extract timings from performance report"""
 
     # Find start and end of report
-    regexp_start = re.compile("[Reframe Setup]")
-    regexp_end = re.compile("^Log file(s) saved*")
+    regexp_start = re.compile(r"[Reframe Setup]")
+    regexp_end = re.compile(r"^Log file(s) saved*")
 
     # Identify test
     regexp_test = re.compile(
-        r'\[\s*(?:.*?RUN.*?\])\s*(.*?)\s*%\.testId=(\d+)\s*%\.splitting=(\d+)'
+        r'\[\s*(?:.*?RUN.*?\])\s*(.*?)\s*(?:%\.\w+=(\d+)\s*%\.\w+=(\d+)\s*)?/\w+\s*@\w+:\w+'
     )
 
     # Get timings
@@ -49,6 +48,7 @@ def extract_timings(in_file, arch, filter=None):
 
     db = nested_dict(4, dict)
     is_report = False
+    t, id, split = None, default_id, default_split  # Initialize variables with default values
     # Scan input file
     with open(in_file) as file:
         for line in file:
@@ -65,14 +65,20 @@ def extract_timings(in_file, arch, filter=None):
                 # Get test parameters setup
                 if r:
                     t = r.group(1).strip()
-                    id = r.group(2)
-                    split = r.group(3)
+                    id = r.group(2) if r.group(2) else default_id
+                    split = r.group(3) if r.group(3) else None
+                    # Determine the splitting value based on the keyword in the test name if not specified
+                    if split is None:
+                        if keyword_split.lower() in t.lower():
+                            split = keyword_split_value
+                        else:
+                            split = default_split
                 else:
                     # Get timings
                     r = regexp_time.search(line)
-                    if r:
+                    if r and t is not None:
                         region = r.group(1)
-                         # Skip regions that match any exclusion pattern
+                        # Skip regions that match any exclusion pattern
                         if any(re.search(pattern, region) for pattern in exclusion_patterns):
                             continue
                         raw_value = r.group(2)

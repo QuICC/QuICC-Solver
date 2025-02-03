@@ -15,7 +15,7 @@ class config(NamedTuple):
 backend2nodeSize = {
     "daint-mc": 72,
     "daint-gpu": 24,
-    "alps-a100": 64
+    "alps-a100": 64,
     "alps-gh200": 288
 }
 

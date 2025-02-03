@@ -45,7 +45,7 @@ if __name__ == '__main__':
         config('mpi', 'daint-mc'),
         config('kk', 'daint-mc'),
         config('kkgpu', 'daint-gpu'),
-        config('kkgpu', 'alps-a100')
+        config('kkgpu', 'alps-a100'),
         config('kkgpu', 'alps-gh200')
         ]
     for c in model_confs:
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     lib_perf_confs = [
         config('mpi', 'daint-mc'),
         config('kkgpu', 'daint-gpu'),
-        config('kkgpu', 'alps-a100')
+        config('kkgpu', 'alps-a100'),
         config('kkgpu', 'alps-gh200')
     ]
     for c in lib_perf_confs:
