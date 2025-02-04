@@ -29,11 +29,6 @@ COPY --from=builder /opt/software /opt/software
 COPY --from=builder /opt/._view /opt/._view
 COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
 
-# Try to prevent ldconfig from chacing the spack environment
-# This is a bit of a hack, but it prevents sarus from breaking curl
-# and git as a consequence
-RUN rm /etc/ld.so.conf.d/spack.conf
-
 # Some boilerplate to get all paths correctly - fix_spack_install is part of the base image
 # and makes sure that all important things are being correctly setup
 RUN fix_spack_install

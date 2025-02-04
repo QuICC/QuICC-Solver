@@ -4,26 +4,24 @@ include:
 - /ci/gitlab/.cscs_builders.yml
 - /ci/gitlab/.cscs_runners.yml
 - /ci/gitlab/.quicc_tests.yml
-- /ci/gitlab/.quicc_models.yml
 stages:
 - build_base
 - build
 - test
-- model-build-and-test
 - cleanup
 build-quicc-base:
   extends: .alps-zen2_builder
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-zen2
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:41b77f1e1e759a25d59782d0dc51abef
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:54a9d4ad1ddd658eefec4161d2ee62e5
 build-quicc:
   extends: .alps-zen2_builder
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_mpi
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:41b77f1e1e759a25d59782d0dc51abef"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:54a9d4ad1ddd658eefec4161d2ee62e5"]'
 test-quicc-lib:
   extends:
   - .test-lib
@@ -38,209 +36,6 @@ test-quicc-mpi-lib:
     SLURM_NTASKS: '4'
     SLURM_NTASKS_PER_NODE: '4'
     SLURM_CPUS_PER_TASK: '32'
-time-quicc-lib:
-  extends:
-  - .time-lib-alps-zen2
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-BoussinesqSphereDynamoExplicit_tubular:
-  extends:
-  - .BoussinesqSphereDynamoExplicit_tubular
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '4'
-    SLURM_NTASKS_PER_NODE: '4'
-    SLURM_CPUS_PER_TASK: '32'
-    QUICC_VERSION_TAG: mpi
-BoussinesqSphereDynamoImplicit_single2d:
-  extends:
-  - .BoussinesqSphereDynamoImplicit_single2d
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '4'
-    SLURM_NTASKS_PER_NODE: '4'
-    SLURM_CPUS_PER_TASK: '32'
-    QUICC_VERSION_TAG: mpi
-BoussinesqShellDynamoExplicit_tubular:
-  extends:
-  - .BoussinesqShellDynamoExplicit_tubular
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '4'
-    SLURM_NTASKS_PER_NODE: '4'
-    SLURM_CPUS_PER_TASK: '32'
-    QUICC_VERSION_TAG: mpi
-BoussinesqShellDynamoImplicit_single2d:
-  extends:
-  - .BoussinesqShellDynamoImplicit_single2d
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '4'
-    SLURM_NTASKS_PER_NODE: '4'
-    SLURM_CPUS_PER_TASK: '32'
-    QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCExplicit_single1d:
-  extends:
-  - .BoussinesqSphereRTCExplicit_single1d
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCExplicit_single2d:
-  extends:
-  - .BoussinesqSphereRTCExplicit_single2d
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCExplicit_tubular:
-  extends:
-  - .BoussinesqSphereRTCExplicit_tubular
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCExplicit_tubular_split_equation:
-  extends:
-  - .BoussinesqSphereRTCExplicit_tubular_split_equation
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCImplicit_single1d:
-  extends:
-  - .BoussinesqSphereRTCImplicit_single1d
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCImplicit_single2d:
-  extends:
-  - .BoussinesqSphereRTCImplicit_single2d
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqSphereRTCImplicit_tubular:
-  extends:
-  - .BoussinesqSphereRTCImplicit_tubular
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqShellRTCExplicit_single1d:
-  extends:
-  - .BoussinesqShellRTCExplicit_single1d
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqShellRTCExplicit_single2d:
-  extends:
-  - .BoussinesqShellRTCExplicit_single2d
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqShellRTCExplicit_tubular:
-  extends:
-  - .BoussinesqShellRTCExplicit_tubular
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqShellRTCExplicit_tubular_split_equation:
-  extends:
-  - .BoussinesqShellRTCExplicit_tubular_split_equation
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqShellRTCImplicit_single2d:
-  extends:
-  - .BoussinesqShellRTCImplicit_single2d
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '6'
-    SLURM_NTASKS_PER_NODE: '6'
-    SLURM_CPUS_PER_TASK: '21'
-    QUICC_VERSION_TAG: mpi
-BoussinesqSphereTCExplicit_tubular:
-  extends:
-  - .BoussinesqSphereTCExplicit_tubular
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '4'
-    SLURM_NTASKS_PER_NODE: '4'
-    SLURM_CPUS_PER_TASK: '32'
-    QUICC_VERSION_TAG: mpi
-BoussinesqShellTCExplicit_tubular:
-  extends:
-  - .BoussinesqShellTCExplicit_tubular
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    PULL_IMAGE: 'YES'
-    SLURM_NTASKS: '4'
-    SLURM_NTASKS_PER_NODE: '4'
-    SLURM_CPUS_PER_TASK: '32'
-    QUICC_VERSION_TAG: mpi
 ci-cache-cleanup:
   extends: .alps-zen2_runner
   stage: cleanup

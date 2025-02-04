@@ -18,7 +18,8 @@ if __name__ == '__main__':
 
     # Lib test pipelines
     libtest_confs = [
-        config('mp', 'alps-zen2')
+        config('mp', 'alps-zen2'),
+        config('mpi', 'alps-zen2')
         ]
     for c in libtest_confs:
         pipe = libtest_pipeline(c)
@@ -42,7 +43,7 @@ if __name__ == '__main__':
 
     # Model and Timing pipelines
     model_confs = [
-        config('mpi', 'alps-zen2'),
+        # config('mpi', 'alps-zen2'), # TODO: Enable when container hook is fixed
         config('kk', 'alps-zen2'),
         config('kkgpu', 'alps-a100'),
         config('kkgpu', 'alps-gh200')
