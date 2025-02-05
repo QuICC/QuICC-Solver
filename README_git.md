@@ -5,7 +5,7 @@
 ```
 git fetch
 git branch -v -a    # to visualise the branches
-git switch -c <remote_branch_name> origin/<remote_branch_name>
+git switch -c <local_branch_name> origin/<remote_branch_name>
 ```
 
 ### Merge branches

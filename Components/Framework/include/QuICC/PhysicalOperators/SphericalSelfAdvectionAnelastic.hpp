@@ -1,10 +1,10 @@
 /**
- * @file SphericalCoriolisAnelastic.hpp
+ * @file SphericalSelfAdvectionAnelastic.hpp
  * @brief Implementation of the spherical coriolis term
  */
 
-#ifndef QUICC_PHYSICAL_SPHERICALCORIOLISANELASTIC_HPP
-#define QUICC_PHYSICAL_SPHERICALCORIOLISANELASTIC_HPP
+#ifndef QUICC_PHYSICAL_SPHERICALSELFADVECTIONANELASTIC_HPP
+#define QUICC_PHYSICAL_SPHERICALSELFADVECTIONANELASTIC_HPP
 
 // Configuration includes
 //
@@ -33,7 +33,7 @@ namespace Physical {
    /**
     * @brief Implementation of the spherical coriolis term
     */
-   class SphericalCoriolisAnelastic
+   class SphericalSelfAdvectionAnelastic
    {
       public:
          /**
@@ -43,10 +43,10 @@ namespace Physical {
                          FieldComponents::Physical::Id compId, 
                          const Resolution& res, 
                          const Array& r, 
-                         const Array& cosTheta, 
-                         const Array& sinTheta, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                         const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
+                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
                          const MHDFloat c = 1.0);
 
          /**
@@ -56,10 +56,10 @@ namespace Physical {
                          FieldComponents::Physical::Id compId, 
                          const Resolution& res, 
                          const Array& r, 
-                         const Array& cosTheta, 
-                         const Array& sinTheta, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                         const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
+                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
                          const MHDFloat c = 1.0);
 
          /**
@@ -69,10 +69,10 @@ namespace Physical {
                          FieldComponents::Physical::Id compId, 
                          const Resolution& res, 
                          const Array& r, 
-                         const Array& cosTheta, 
-                         const Array& sinTheta, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                         const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
+                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
                          const MHDFloat c = 1.0);
 
       protected:
@@ -81,14 +81,14 @@ namespace Physical {
          /**
           * @brief Empty constructor
           */
-         SphericalCoriolisAnelastic() = default;
+         SphericalSelfAdvectionAnelastic() = default;
 
          /**
           * @brief Empty destructor
           */
-         ~SphericalCoriolisAnelastic() = default;
+         ~SphericalSelfAdvectionAnelastic() = default;
    };
 }
 }
 
-#endif // QUICC_PHYSICAL_SPHERICALCORIOLISANELASTIC_HPP
+#endif // QUICC_PHYSICAL_SPHERICALSELFADVECTIONANELASTIC_HPP

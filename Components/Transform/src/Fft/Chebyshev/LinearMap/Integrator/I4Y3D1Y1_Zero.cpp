@@ -6,7 +6,13 @@
 // System includes
 //
 #include <cassert>
-
+// ****************
+//Stuff that needs to be removed later
+#include <cstdio>
+#include <filesystem>
+#include <sstream>
+#include <iostream>
+// ****************
 // External includes
 //
 
@@ -42,12 +48,16 @@ namespace Integrator {
    {
       int size = this->mspSetup->specSize() + std::min(7, this->mspSetup->padSize());
       ::QuICC::SparseSM::Chebyshev::LinearMap::I4Y3D1Y1 op(size, size, this->mspSetup->lower(), this->mspSetup->upper());
-      this->mBackend.setSpectralOperator(op.mat().topRows(this->mspSetup->specSize()));
+      this->mBackend.setSpectralOperator(op.mat().topRows(this->mspSetup->specSize())); // setSpectralOperator expects a sparse operator *try call sparseview, as in the model
 
       if(this->mspSetup->slowSize() > 0)
       {
          this->mBackend.setMeanOperator(SparseMatrix(size, size).topRows(this->mspSetup->specSize()));
       }
+      // *** to print the operator *** // 
+      std::cerr << "in I4Y3D1Y1_Zero  " << " \n";
+      std::cerr << "I4Y3D1Y1 =  " << " \n";
+      std::cerr << op.mat() << " \n";
    }
 
    void I4Y3D1Y1_Zero::applyPostOperator(Matrix& rOut) const

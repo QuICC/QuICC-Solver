@@ -1,6 +1,6 @@
 /**
- * @file FR4D4.cpp
- * @brief Source of the implementation of the spectral operator  f r^4 D4(*)
+ * @file FR3D3.cpp
+ * @brief Source of the implementation of the spectral operator  f r^3 D3(*)
  * 
  * Modified from FR2D2.cpp
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "DenseSM/Chebyshev/LinearMap/FR4D4.hpp"
+#include "DenseSM/Chebyshev/LinearMap/FR3D3.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
@@ -27,12 +27,21 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-FR4D4::FR4D4(const int nNr, const int nNc, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn,
-   std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower, const Scalar_t upper) :
-    ITripleHarmonicOperator(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, lower, upper)
+FR3D3::FR3D3(const int nNr, 
+             const int nNc, 
+             const int lOut, 
+             const int mOut, 
+             const int lF, 
+             const int mF, 
+             const int lIn, 
+             const int mIn,
+             std::shared_ptr<RadialTorPolFunction> pF, 
+             const Scalar_t lower, 
+             const Scalar_t upper) :
+         ITripleHarmonicOperator(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, lower, upper)
 {}
 
-void FR4D4::buildOpImpl(Internal::Matrix& mat, const int rows,
+void FR3D3::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
    namespace cheb = Transform::Fft::Chebyshev::LinearMap;
@@ -61,11 +70,11 @@ void FR4D4::buildOpImpl(Internal::Matrix& mat, const int rows,
    //Matrix td1B = Matrix::Zero(rN,this->cols());
    //TD1Bwd.transform(td1B, tA);
 
-   cheb::Projector::D<4> TD4Bwd;
-   TD4Bwd.init(sBwd);
+   cheb::Projector::D<3> TD3Bwd;
+   TD3Bwd.init(sBwd);
 
-   Matrix td4B = Matrix::Zero(rN,this->cols());
-   TD4Bwd.transform(td4B, tA);
+   Matrix td3B = Matrix::Zero(rN,this->cols());
+   TD3Bwd.transform(td3B, tA);
 
    Matrix f = this->mpF->evaluate(igrid, this->mLf, this->mMf).cast<MHDFloat>();
 
@@ -90,12 +99,7 @@ void FR4D4::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int l = this->mLin;
    const Internal::Array& r = igrid; 
 
-   tA = (f.array()*r.array()).cast<MHDFloat>().matrix().asDiagonal()
-         *(r.cast<MHDFloat>().asDiagonal()
-           *(r.cast<MHDFloat>().asDiagonal()
-            *(r.cast<MHDFloat>().asDiagonal()*td4B)
-            )
-         );
+   tA = ( f.array() * r.array().pow(3) ).cast<MHDFloat>().matrix().asDiagonal()*td3B;
 
    auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
    sFwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));

@@ -90,8 +90,7 @@ void FR2D2::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int l = this->mLin;
    const Internal::Array& r = igrid; 
 
-   tA = (f.array()*r.array()).cast<MHDFloat>().matrix().asDiagonal()
-         *(r.cast<MHDFloat>().asDiagonal()*td2B);
+   tA = ( f.array() * r.array().pow(2) ).cast<MHDFloat>().matrix().asDiagonal()*td2B;
 
    auto sFwd = std::make_shared<SetupType>(rN, this->cols(), this->rows(), pId);
    sFwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));

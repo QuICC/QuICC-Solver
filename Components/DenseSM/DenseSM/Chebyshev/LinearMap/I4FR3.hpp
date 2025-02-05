@@ -1,12 +1,12 @@
 /**
- * @file FR4D4.hpp
- * @brief Implementation of the spectral operator f r^4 D4(*)
+ * @file I4FR3.hpp
+ * @brief Implementation of the spectral operator I4 F r^3
  * 
- * Modified from FR2D2.cpp
+ *  * copied from R2DivR1F
  */
 
-#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_FR4D4_HPP
-#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_FR4D4_HPP
+#ifndef QUICC_DENSESM_CHEBYSHEV_LINEARMAP_I4FR3_HPP
+#define QUICC_DENSESM_CHEBYSHEV_LINEARMAP_I4FR3_HPP
 
 // System includes
 //
@@ -27,9 +27,9 @@ namespace Chebyshev {
 namespace LinearMap {
 
 /**
- * @brief Implementation of the spectral operator f r^4 D4(*)
+ * @brief Implementation of the spectral operator I4 F r^3
  */
-class FR4D4 : public ITripleHarmonicOperator
+class I4FR3 : public ITripleHarmonicOperator
 {
 public:
    /**
@@ -47,7 +47,7 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   FR4D4(const int rows, 
+   I4FR3(const int rows, 
          const int cols, 
          const int lOut, 
          const int mOut, 
@@ -62,7 +62,7 @@ public:
    /**
     * @brief Destructor
     */
-   virtual ~FR4D4() = default;
+   virtual ~I4FR3() = default;
 
 protected:
    /**
@@ -83,4 +83,4 @@ private:
 } // namespace DenseSM
 } // namespace QuICC
 
-#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_FR4D4_HPP
+#endif // QUICC_DENSESM_CHEBYSHEV_LINEARMAP_I4FR3_HPP

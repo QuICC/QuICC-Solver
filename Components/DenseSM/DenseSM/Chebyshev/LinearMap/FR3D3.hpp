@@ -44,10 +44,20 @@ public:
     * @param lIn     Input harmonic degree
     * @param mIn     Input harmonic order
     * @param lower   Lower boundary
+    * @param pF      pointer to a given function
     * @param upper   Upper boundary
     */
-   FR3D3(const int rows, const int cols, const int lOut, const int mOut, const int lF, const int mF, const int lIn, const int mIn, std::shared_ptr<RadialTorPolFunction> pF, const Scalar_t lower,
-      const Scalar_t upper);
+   FR3D3(const int rows, 
+         const int cols, 
+         const int lOut, 
+         const int mOut, 
+         const int lF, 
+         const int mF, 
+         const int lIn, 
+         const int mIn, 
+         std::shared_ptr<RadialTorPolFunction> pF, 
+         const Scalar_t lower,
+         const Scalar_t upper);
 
    /**
     * @brief Destructor

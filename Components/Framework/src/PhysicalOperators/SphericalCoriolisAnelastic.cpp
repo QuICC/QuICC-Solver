@@ -32,7 +32,15 @@ namespace QuICC {
 
 namespace Physical {
 
-   void SphericalCoriolisAnelastic::set(Framework::Selector::PhysicalScalarField &rS, FieldComponents::Physical::Id compId, const Resolution& res, const Array& r, const Array& cosTheta, const Array& sinTheta, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, const MHDFloat c)
+   void SphericalCoriolisAnelastic::set(Framework::Selector::PhysicalScalarField &rS, 
+                                        FieldComponents::Physical::Id compId, 
+                                        const Resolution& res, 
+                                        const Array& r, 
+                                        const Array& cosTheta, 
+                                        const Array& sinTheta, 
+                                        const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
+                                        std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                                        const MHDFloat c)
    {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int nTh;
@@ -139,7 +147,15 @@ namespace Physical {
       }
    }
 
-   void SphericalCoriolisAnelastic::add(Framework::Selector::PhysicalScalarField &rS, FieldComponents::Physical::Id compId, const Resolution& res, const Array& r, const Array& cosTheta, const Array& sinTheta, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, const MHDFloat c)
+   void SphericalCoriolisAnelastic::add(Framework::Selector::PhysicalScalarField &rS, 
+                                        FieldComponents::Physical::Id compId, 
+                                        const Resolution& res, 
+                                        const Array& r, 
+                                        const Array& cosTheta, 
+                                        const Array& sinTheta, 
+                                        const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
+                                        std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                                        const MHDFloat c)
    {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int nTh;
@@ -240,6 +256,7 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
+               iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);
                nTh = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR); 
                
                for(int iTh = 0; iTh < nTh; ++iTh)
@@ -254,7 +271,15 @@ namespace Physical {
       }
    }
 
-   void SphericalCoriolisAnelastic::sub(Framework::Selector::PhysicalScalarField &rS, FieldComponents::Physical::Id compId, const Resolution& res, const Array& r, const Array& cosTheta, const Array& sinTheta, const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, const MHDFloat c)
+   void SphericalCoriolisAnelastic::sub(Framework::Selector::PhysicalScalarField &rS, 
+                                        FieldComponents::Physical::Id compId, 
+                                        const Resolution& res, 
+                                        const Array& r, 
+                                        const Array& cosTheta, 
+                                        const Array& sinTheta, 
+                                        const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
+                                        std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                                        const MHDFloat c)
    {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int nTh;
