@@ -47,54 +47,60 @@
     - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiCommTest
     - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiTest
 
-.test-petsc-lib:
+.test-lib-petsc:
   variables:
     TEST_NCPU: 'grep processor /proc/cpuinfo | wc -l'
   script:
     - pwd
     - cd /QuICC.src/build
 
-.test-petsc_lib-mpi:
+.test-lib-mpi-petsc:
   script:
     - pwd
     - cd /QuICC.src/build
 
-.time-lib-daint-mc:
+.time-lib-cpu:
   script:
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
     - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_cpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files
 
-.time-lib-sweep-daint-mc:
+.time-lib-sweep-cpu:
   script:
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
     - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_cpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files --parameterize=testId=108,109 --parameterize=splitting=96,288,576,1152,2304,4608,9216
 
-.time-lib-daint-gpu:
+.time-lib-gpu:
   script:
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
     - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_gpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files
 
-.time-lib-sweep-daint-gpu:
+.time-lib-sweep-gpu:
   script:
     - pwd
     - export QUICC_ROOT=/QuICC.src
     - export PYTHONPATH=$QUICC_ROOT/ci/reframe:$PYTHONPATH
     - reframe -c $QUICC_ROOT/ci/reframe/quicc_library_gpu.py -r -S quicc_root=$QUICC_ROOT --performance-report --exec-policy=serial --keep-stage-files --parameterize=testId=108,109 --parameterize=splitting=8,16,32,64,96,128,256
 
+.time-lib-alps-zen2:
+  extends: .time-lib-cpu
+
+.time-lib-sweep-alps-zen2:
+  extends: .time-lib-sweep-cpu
+
 .time-lib-alps-a100:
-  extends: .time-lib-daint-gpu
+  extends: .time-lib-gpu
 
 .time-lib-sweep-alps-a100:
-  extends: .time-lib-sweep-daint-gpu
+  extends: .time-lib-sweep-gpu
 
 .time-lib-alps-gh200:
-  extends: .time-lib-daint-gpu
+  extends: .time-lib-gpu
 
 .time-lib-sweep-alps-gh200:
-  extends: .time-lib-sweep-daint-gpu
+  extends: .time-lib-sweep-gpu

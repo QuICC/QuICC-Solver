@@ -16,14 +16,14 @@ build-quicc-base:
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-gh200
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:961e9a5316ac9d400431aec4521d370f
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:3cfa49dfa946aeb4b1dd1d40e87a3c12
 build-quicc:
   extends: .alps-gh200_builder
   stage: build
   variables:
-    DOCKERFILE: ci/docker/Dockerfile_kkgpu_alps-gh200
+    DOCKERFILE: ci/docker/Dockerfile_kkgpu
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:961e9a5316ac9d400431aec4521d370f"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:3cfa49dfa946aeb4b1dd1d40e87a3c12"]'
 test-quicc-lib:
   extends:
   - .test-lib
@@ -145,7 +145,7 @@ BoussinesqShellTCExplicit_serial:
     SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 ci-cache-cleanup:
-  extends: .container-runner-daint-gh200
+  extends: .alps-gh200_runner
   stage: cleanup
   image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   script:
