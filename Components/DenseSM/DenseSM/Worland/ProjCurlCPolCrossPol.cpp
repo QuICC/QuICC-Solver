@@ -12,6 +12,7 @@
 
 // Project includes
 //
+#include "DenseSM/Utils.hpp"
 #include "DenseSM/Worland/DivR1CF.hpp"
 #include "DenseSM/Worland/DivR1FC.hpp"
 #include "DenseSM/Worland/ProjCurlCPolCrossPol.hpp"
@@ -63,7 +64,7 @@ ProjCurlCPolCrossPol::ProjCurlCPolCrossPol(const int nNr, const int nNc,
       throw std::logic_error("One of the radial functions should be null");
    }
 
-   this->mIsZero = (this->elsasser(this->mLa, this->mMa, this->mLb, this->mMb,
+   this->mIsZero = (Utils::elsasser(this->mLa, this->mMa, this->mLb, this->mMb,
                        this->mLout, this->mMout) == 0);
 }
 
@@ -83,7 +84,7 @@ void ProjCurlCPolCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
       const Internal::MHDFloat L2b = static_cast<Internal::MHDFloat>(lb * (lb + 1));
 
       const MHDFloat Labg =
-         this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
+         Utils::elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
       Internal::MHDFloat c = static_cast<Internal::MHDFloat>(std::pow(-1, lg + la + lb - 1)) * L2b;
 

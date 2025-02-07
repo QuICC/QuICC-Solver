@@ -12,6 +12,7 @@
 
 // Project includes
 //
+#include "DenseSM/Utils.hpp"
 #include "DenseSM/Worland/DivR1D1F.hpp"
 #include "DenseSM/Worland/DivR2D1R1F.hpp"
 #include "DenseSM/Worland/DivR2FD1R1.hpp"
@@ -67,7 +68,7 @@ ProjCurlCurlTorCrossPol::ProjCurlCurlTorCrossPol(const int nNr, const int nNc,
       throw std::logic_error("One of the radial functions should be null");
    }
 
-   this->mIsZero = (this->gaunt(this->mLa, this->mMa, this->mLb, this->mMb,
+   this->mIsZero = (Utils::gaunt(this->mLa, this->mMa, this->mLb, this->mMb,
                        this->mLout, this->mMout) == 0);
 }
 
@@ -90,7 +91,7 @@ void ProjCurlCurlTorCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
       const Internal::MHDFloat L2g = static_cast<Internal::MHDFloat>(lg * (lg + 1));
 
       const MHDFloat Kabg =
-         this->gaunt(la, this->mMa, lb, this->mMb, lg, this->mMout);
+         Utils::gaunt(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
       Internal::MHDFloat cA = L2g * (L2a + L2b - L2g) / 2.0_mp;
       Internal::MHDFloat cB = -L2b * (L2b - L2a - L2g) / 2.0_mp;

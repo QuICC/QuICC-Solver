@@ -12,6 +12,7 @@
 
 // Project includes
 //
+#include "DenseSM/Utils.hpp"
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlPolCrossPol.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR2D1R1F.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR2FD1R1.hpp"
@@ -95,7 +96,7 @@ ProjCurlPolCrossPol::ProjCurlPolCrossPol(const int nNr, const int nNc,
       throw std::logic_error("One of the radial functions should be null");
    }
 
-   this->mIsZero = (this->gaunt(this->mLa, this->mMa, this->mLb, this->mMb,
+   this->mIsZero = (Utils::gaunt(this->mLa, this->mMa, this->mLb, this->mMb,
                        this->mLout, this->mMout) == 0);
 }
 
@@ -113,7 +114,7 @@ void ProjCurlPolCrossPol::buildOpImpl(Internal::Matrix& mat, const int rows,
    const Internal::MHDFloat L2g = static_cast<Internal::MHDFloat>(lg * (lg + 1));
 
    const MHDFloat Kabg =
-      this->gaunt(la, this->mMa, lb, this->mMb, lg, this->mMout);
+      Utils::gaunt(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
    Internal::MHDFloat cA = L2a * (L2a - L2b - L2g) / 2.0_mp;
    Internal::MHDFloat cB = L2b * (L2a - L2b + L2g) / 2.0_mp;
