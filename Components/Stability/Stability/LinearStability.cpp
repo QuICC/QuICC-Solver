@@ -7,6 +7,7 @@
 //
 #include <algorithm>
 #include <limits>
+#include <random>
 
 #include "QuICC/Equations/EquationParameters.hpp"
 #include <unsupported/Eigen/SparseExtra>
@@ -89,8 +90,8 @@ void LinearStability::setCriticalId(const std::size_t idc)
    this->mIdc = idc;
 }
 
-void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
-   SparseMatrixZ& matC, const std::vector<MHDFloat>& eigs,
+void LinearStability::buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& matB,
+   const std::vector<MHDFloat>& eigs,
    const Equations::EquationParameters::NDMapType& nds)
 {
    // Fields
@@ -107,67 +108,41 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    // Build matrix A (linear operator)
    auto opId = ModelOperator::ImplicitLinear::id();
    auto bcType = ModelOperatorBoundary::SolverNoTau::id();
-   DecoupledZSparse matT;
-   this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
+   this->model().modelMatrix(matA, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
    if(this->mOptions.writeMtx)
    {
-      Eigen::saveMarket(matT.real(), "A_re.mtx");
-      Eigen::saveMarket(matT.imag(), "A_im.mtx");
-   }
-   if (eqInfo.isComplex)
-   {
-      matA = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
-   }
-   else
-   {
-      matA = matT.real().cast<MHDComplex>();
+      Eigen::saveMarket(matA.real(), "A_re.mtx");
+      Eigen::saveMarket(matA.imag(), "A_im.mtx");
    }
 
    // Build matrix B (mass matrix)
    opId = ModelOperator::Time::id();
-   matT.setZero();
-   this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
+   this->model().modelMatrix(matB, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
    if(this->mOptions.writeMtx)
    {
-      Eigen::saveMarket(matT.real(), "B_re.mtx");
-      Eigen::saveMarket(matT.imag(), "B_im.mtx");
-   }
-   if (eqInfo.isComplex)
-   {
-      matB = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
-   }
-   else
-   {
-      matB = matT.real().cast<MHDComplex>();
+      Eigen::saveMarket(matB.real(), "B_re.mtx");
+      Eigen::saveMarket(matB.imag(), "B_im.mtx");
    }
 
    // Build boundary matrix if needed
-   if (this->model().useGalerkin())
+   if (!this->model().useGalerkin())
    {
-      matC.resize(0, 0);
-   }
-   else
-   {
+      DecoupledZSparse matC;
       opId = ModelOperator::Boundary::id();
       bcType = ModelOperatorBoundary::SolverHasBc::id();
-      matT.setZero();
-      this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
+      this->model().modelMatrix(matC, opId, imRange, matIdx, bcType, res, eigs,
          this->mBcs, nds);
       if(this->mOptions.writeMtx)
       {
-         Eigen::saveMarket(matT.real(), "C_re.mtx");
-         Eigen::saveMarket(matT.imag(), "C_im.mtx");
+         Eigen::saveMarket(matC.real(), "C_re.mtx");
+         Eigen::saveMarket(matC.imag(), "C_im.mtx");
       }
-      if (eqInfo.isComplex)
-      {
-         matC = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
-      }
-      else
-      {
-         matC = matT.real().cast<MHDComplex>();
-      }
+
+      // Add BC to matA}
+      matA.real() += matC.real();
+      matA.imag() += matC.imag();
    }
 
    // Set target
@@ -188,6 +163,27 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    }
 }
 
+void LinearStability::castMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB, const DecoupledZSparse& decA, const DecoupledZSparse& decB)
+{
+   if (decA.imag().size() > 0)
+   {
+      matA = decA.real().cast<MHDComplex>() + decA.imag() * Math::cI;
+   }
+   else
+   {
+      matA = decA.real().cast<MHDComplex>();
+   }
+
+   if (decB.imag().size() > 0)
+   {
+      matB = decB.real().cast<MHDComplex>() + decB.imag() * Math::cI;
+   }
+   else
+   {
+      matB = decB.real().cast<MHDComplex>();
+   }
+}
+
 std::pair<int, int> LinearStability::setupGEVP(const MHDFloat vc)
 {
    if(this->mIdc != 0)
@@ -197,21 +193,19 @@ std::pair<int, int> LinearStability::setupGEVP(const MHDFloat vc)
          this->mParams[this->mIdc]->tag());
    }
 
+   DecoupledZSparse decA;
+   DecoupledZSparse decB;
+   this->buildMatrices(decA, decB, this->mEigs, this->mParams);
    SparseMatrixZ matA;
    SparseMatrixZ matB;
-   SparseMatrixZ matC;
-   this->buildMatrices(matA, matB, matC, this->mEigs, this->mParams);
-
-   // Add tau lines if needed
-   if (matC.size() != 0)
-   {
-      matA += matC;
-   }
+   this->castMatrices(matA, matB, decA, decB);
 
    // Convert matrices for SLEPc/PETSC
    this->convertMatrices(matA, matB);
 
    auto dims = std::make_pair(matA.rows(), matA.cols());
+
+   std::cerr << "Finshed setting up matrices. Starting solver..." << std::endl;
 
    return dims;
 }
@@ -386,6 +380,75 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
    setPetscMat(this->mB, matB, mode);
 }
 
+void LinearStability::setCustomGuess()
+{
+   if(this->mOptions.guessType == 0)
+   {
+      std::vector<int> parity = {0, 1, 1, 0};
+      this->setParityGuess(parity);
+   }
+   else if(this->mOptions.guessType == 1)
+   {
+      std::vector<int> parity = {1, 0, 0, 1};
+      this->setParityGuess(parity);
+   }
+   else
+   {
+      throw std::logic_error("Unknown initial guess type");
+   }
+}
+
+void LinearStability::setParityGuess(const std::vector<int>& parity)
+{
+   const auto& res = *this->mspRes;
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+
+   Vec guess;
+   PetscCallVoid(MatCreateVecs(this->mA, &guess, nullptr));
+
+   std::random_device rd;
+   std::mt19937 gen(rd());
+   std::uniform_real_distribution<> dis(-1.0, 1.0);
+   std::size_t idx = 0;
+   int m = this->mspRes->sim().dim(Dimensions::Simulation::SIM3D,
+         Dimensions::Space::SPECTRAL) -
+      1;
+   int p;
+   PetscScalar val;
+   // Loop over fields
+   for(int c = 0; c < parity.size(); c++)
+   {
+      p = parity.at(c);
+      for (int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
+      {
+         int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+         if (k_ == m)
+         {
+            for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k);
+                  j++)
+            {
+               int j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
+               if(j_ != 0 && j % 2 == p)
+               {
+                  val = 1.0;
+               }
+               else
+               {
+                  val = 0.0;
+               }
+               for (int i = 0;
+                     i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
+               {
+                  PetscCallVoid(VecSetValue(guess,idx,val*dis(gen),INSERT_VALUES));
+                  idx++;
+               }
+            }
+         }
+      }
+   }
+   PetscCallVoid(EPSSetInitialSpace(this->mEps,1,&guess));
+}
+
 void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
    std::vector<Vec>& efs, const int nev)
 {
@@ -457,6 +520,12 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
       {
          PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_MAGNITUDE));
       }
+   }
+
+   // Use custom initial guess
+   if(this->mOptions.useCustomGuess)
+   {
+      this->setCustomGuess();
    }
 
    // Solve eigensystem

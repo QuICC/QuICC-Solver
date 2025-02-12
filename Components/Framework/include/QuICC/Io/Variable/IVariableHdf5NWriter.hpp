@@ -74,6 +74,13 @@ namespace Variable {
          void setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,std::size_t>& boundary);
 
          /**
+          * @brief Update the physical parameters of the simulation
+          *
+          * @param parameters Physical parameters
+          */
+         void updatePhysical(const std::map<std::string,MHDFloat>& parameters);
+
+         /**
           * @brief Set the mesh grid arrays
           *
           * @param mesh    Grid arrays of the mesh

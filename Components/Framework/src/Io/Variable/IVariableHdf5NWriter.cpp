@@ -46,6 +46,16 @@ namespace Variable {
       this->mBoundary = boundary;
    }
 
+   void IVariableHdf5NWriter::updatePhysical(const std::map<std::string,MHDFloat>& parameters)
+   {
+      // Convert parameters to NonDimensional numbers
+      for(auto it = parameters.cbegin(); it != parameters.cend(); ++it)
+      {
+         size_t nd = Hasher::makeId(it->first);
+         this->mPhysical[nd] = NonDimensional::Coordinator::map().find(nd)->second->create(it->second);
+      }
+   }
+
    const Resolution& IVariableHdf5NWriter::res() const
    {
       return *this->mspRes;

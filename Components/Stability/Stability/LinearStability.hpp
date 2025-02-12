@@ -41,6 +41,12 @@ public:
 
       /// Show verbose diagnostic
       bool verboseDiagnostics = false;
+
+      /// Use custom initial guess
+      bool useCustomGuess = false;
+
+      /// Custom initial guess type
+      int guessType = 0;
    };
 
    /**
@@ -113,13 +119,23 @@ private:
     *
     * @param matA Linear operator
     * @param matB Mass matrix
-    * @param matC Boundary condition matrix
     * @param eigs Indexes for matrix to solve
     * @param nds  Nondimensional parameters
     */
-   void buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
-      SparseMatrixZ& matC, const std::vector<MHDFloat>& eigs,
+   void buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& matB,
+      const std::vector<MHDFloat>& eigs,
       const Equations::EquationParameters::NDMapType& nds);
+
+   /**
+    * @brief cast matrices
+    *
+    * @param matA Linear operator
+    * @param matB Mass matrix
+    * @param decA Decoupled linear operator
+    * @param decB Decoupled Mass matrix
+    */
+   void castMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB, const DecoupledZSparse& decA,
+      const DecoupledZSparse& decB);
 
    /**
     * @brief Convert matrices to used with SLEPc/PETSc
@@ -128,6 +144,18 @@ private:
     * @param matB Mass matrix
     */
    void convertMatrices(const SparseMatrixZ& matA, const SparseMatrixZ& matB);
+
+   /**
+    * @brief Use custom initial guess
+    */
+   void setCustomGuess();
+
+   /**
+    * @brief Set random initial guess with given parity
+    *
+    * @param parity Parity in l for each field
+    */
+   void setParityGuess(const std::vector<int>& parity);
 
    /**
     * @brief Solve Generalized eigenvalue problem (GEVP)

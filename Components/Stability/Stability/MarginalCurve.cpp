@@ -23,6 +23,8 @@
 #include "QuICC/NonDimensional/Nev.hpp"
 #include "QuICC/NonDimensional/Rayleigh.hpp"
 #include "QuICC/NonDimensional/StabilityMode.hpp"
+#include "QuICC/NonDimensional/Omega.hpp"
+#include "QuICC/NonDimensional/GrowthRate.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
@@ -173,7 +175,16 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
       {
          this->mpH5File->addVector(v);
       }
+
+      // Set Physical parameters
+      std::map<std::string, MHDFloat> phys = this->config().physical();
+      this->mpH5File->setPhysical(phys, this->config().boundary());
    }
+
+   std::map<std::string,MHDFloat> evPhys;
+   evPhys.insert(std::make_pair(NonDimensional::Omega().tag(), ev.imag()));
+   evPhys.insert(std::make_pair(NonDimensional::GrowthRate().tag(), ev.real()));
+   this->mpH5File->updatePhysical(evPhys);
 
    // Fields
    auto pId = this->mspBackend->fieldIds().at(0);
@@ -331,8 +342,16 @@ void MarginalCurve::mainRun()
    {
       opt.maxIteration = this->mspEqParams->nd(NonDimensional::MaxIteration::id());
    }
-   //opt.writeMtx = true;
-   //opt.verboseDiagnostics = true;
+
+   // Write MatrixMarket files
+   opt.writeMtx = true;
+
+   // Output SLEPc diagnostics
+   opt.verboseDiagnostics = true;
+
+   // Use initial guess with parity
+   //opt.useCustomGuess = true;
+   //opt.guessType = 1;
 
    auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
       this->mspEqParams->map(), this->createBoundary()->map(),
