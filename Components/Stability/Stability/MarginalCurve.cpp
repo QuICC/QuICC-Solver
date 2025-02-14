@@ -35,6 +35,7 @@
 #include "QuICC/Variables/RequirementTools.hpp"
 #include "Stability/LinearStability.hpp"
 #include "Stability/MarginalCurve.hpp"
+#include "Stability/Options.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {
@@ -126,6 +127,52 @@ MarginalCurve::~MarginalCurve()
 {
    // Finalize SLEPc/PETSc
    PetscCallVoid(SlepcFinalize());
+}
+
+void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks, std::vector<MHDComplex>& evs,
+   std::vector<std::vector<MHDComplex>>& efs, const Stability::Options& opt)
+{
+   // Scaling options
+   if(opt.scalingType > 0)
+   {
+      for(auto& ef: efs)
+      {
+         MHDComplex s = std::numeric_limits<MHDComplex>::max();
+         for(auto c: ef)
+         {
+            if(std::abs(c) > 1e-6)
+            {
+               if(opt.scalingType == 1)
+               {
+                  s = std::abs(c)/c;
+               }
+               else if(opt.scalingType == 2)
+               {
+                  s = 1.0/c;
+               }
+               break;
+            }
+         }
+
+         for(auto& c: ef)
+         {
+            c *= s;
+         }
+      }
+   }
+
+   // Force m = 0 to be real
+   const int m = static_cast<int>(ks.at(0));
+   if(m == 0 && opt.makeM0Real)
+   {
+      for(auto& ef: efs)
+      {
+         for(auto& c: ef)
+         {
+            c.imag(0);
+         }
+      }
+   }
 }
 
 void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
@@ -228,8 +275,7 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
                         for (int i = 0;
                              i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                         {
-                           p->rDom(0).rPerturbation().setPoint(ef.at(idx), i, j,
-                              k);
+                           p->rDom(0).rPerturbation().setPoint(ef.at(idx), i, j, k);
                            idx++;
                         }
                      }
@@ -333,25 +379,31 @@ void MarginalCurve::mainRun()
       throw std::logic_error("3D spectral matrix not setup");
    }
 
-   LinearStability::Options opt;
+   auto opt = std::make_shared<Stability::Options>();
    if(this->mspEqParams->nd(NonDimensional::Tolerance::id()) > 0)
    {
-      opt.tolerance = this->mspEqParams->nd(NonDimensional::Tolerance::id());
+      opt->tolerance = this->mspEqParams->nd(NonDimensional::Tolerance::id());
    }
    if(this->mspEqParams->nd(NonDimensional::MaxIteration::id()) > 0)
    {
-      opt.maxIteration = this->mspEqParams->nd(NonDimensional::MaxIteration::id());
+      opt->maxIteration = this->mspEqParams->nd(NonDimensional::MaxIteration::id());
    }
 
    // Write MatrixMarket files
-   opt.writeMtx = true;
+   //opt->writeMtx = true;
 
    // Output SLEPc diagnostics
-   opt.verboseDiagnostics = true;
+   opt->verboseDiagnostics = true;
 
    // Use initial guess with parity
-   //opt.useCustomGuess = true;
-   //opt.guessType = 1;
+   //opt->useCustomGuess = true;
+   //opt->guessType = 1;
+
+   // Set imaginary part of m = 0 to zero
+   //opt->makeM0Real = true;
+
+   // Scale eigenfunctions to have first coefficient real and 1
+   //opt->scalingType = 1;
 
    auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
       this->mspEqParams->map(), this->createBoundary()->map(),
@@ -390,13 +442,15 @@ void MarginalCurve::mainRun()
          logger << std::setprecision(prec) << e << std::endl;
       }
 
+      this->processEigenpairs(eigs, evs, efs, *opt);
+
       for (std::size_t i = 0; i < efs.size(); i++)
       {
          if (this->mspRes->sim().ss().has(
                 SpatialScheme::Feature::SpectralMatrix2D))
          {
             int k_ = static_cast<int>(eigs.at(0));
-            saveEigenfunction(k_, evs.at(i), efs.at(i));
+            this->saveEigenfunction(k_, evs.at(i), efs.at(i));
          }
          else
          {

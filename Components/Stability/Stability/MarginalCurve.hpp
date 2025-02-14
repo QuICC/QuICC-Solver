@@ -14,6 +14,7 @@
 //
 #include "QuICC/Io/Variable/StateFileWriter.hpp"
 #include "Stability/StabilityBase.hpp"
+#include "Stability/Options.hpp"
 
 namespace QuICC {
 
@@ -51,9 +52,20 @@ private:
    virtual void postRun() override;
 
    /**
+    * @brief Process eigenpairs
+    *
+    * @param ks   Matrix modes
+    * @param evs  Eigenvalues
+    * @param efs  Eigenfunctions
+    * @param opt  Options
+    */
+   void processEigenpairs(const std::vector<MHDFloat> ks, std::vector<MHDComplex>& evs,
+      std::vector<std::vector<MHDComplex>>& ef, const Stability::Options& opt);
+
+   /**
     * @brief Save eigenfunctions to statefile
     */
-   void saveEigenfunction(const int m, const MHDComplex ev,
+   void saveEigenfunction(const int k, const MHDComplex ev,
       const std::vector<MHDComplex>& ef);
 
    /**

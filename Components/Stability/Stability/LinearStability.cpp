@@ -34,6 +34,7 @@
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "Stability/LinearStability.hpp"
+#include "Stability/Options.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {
@@ -64,7 +65,7 @@ bool sortDecreasingRealIdx(std::pair<MHDComplex, int> a,
 LinearStability::LinearStability(const std::vector<MHDFloat>& eigs, SharedResolution spRes,
    const Equations::EquationParameters::NDMapType& params,
    const std::map<std::size_t, std::size_t>& bcs,
-   std::shared_ptr<Model::IModelBackend> spModel, const Options& opt) :
+   std::shared_ptr<Model::IModelBackend> spModel, std::shared_ptr<const Stability::Options> opt) :
     mcUseMumps(true),
     mNeedInit(true),
     mIdc(0),
@@ -83,6 +84,11 @@ LinearStability::~LinearStability()
    PetscCallVoid(EPSDestroy(&this->mEps));
    PetscCallVoid(MatDestroy(&this->mA));
    PetscCallVoid(MatDestroy(&this->mB));
+}
+
+const Stability::Options& LinearStability::options() const
+{
+   return *this->mOptions;
 }
 
 void LinearStability::setCriticalId(const std::size_t idc)
@@ -110,7 +116,7 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& ma
    auto bcType = ModelOperatorBoundary::SolverNoTau::id();
    this->model().modelMatrix(matA, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
-   if(this->mOptions.writeMtx)
+   if(this->options().writeMtx)
    {
       Eigen::saveMarket(matA.real(), "A_re.mtx");
       Eigen::saveMarket(matA.imag(), "A_im.mtx");
@@ -120,7 +126,7 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& ma
    opId = ModelOperator::Time::id();
    this->model().modelMatrix(matB, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
-   if(this->mOptions.writeMtx)
+   if(this->options().writeMtx)
    {
       Eigen::saveMarket(matB.real(), "B_re.mtx");
       Eigen::saveMarket(matB.imag(), "B_im.mtx");
@@ -134,7 +140,7 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& ma
       bcType = ModelOperatorBoundary::SolverHasBc::id();
       this->model().modelMatrix(matC, opId, imRange, matIdx, bcType, res, eigs,
          this->mBcs, nds);
-      if(this->mOptions.writeMtx)
+      if(this->options().writeMtx)
       {
          Eigen::saveMarket(matC.real(), "C_re.mtx");
          Eigen::saveMarket(matC.imag(), "C_im.mtx");
@@ -271,7 +277,7 @@ void LinearStability::eigenpairs(std::vector<MHDComplex>& evs,
 
    this->mNeedInit = false;
 
-   if(this->mOptions.verboseDiagnostics)
+   if(this->options().verboseDiagnostics)
    {
       // print details results
       this->printDetails();
@@ -382,12 +388,12 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
 
 void LinearStability::setCustomGuess()
 {
-   if(this->mOptions.guessType == 0)
+   if(this->options().guessType == 0)
    {
       std::vector<int> parity = {0, 1, 1, 0};
       this->setParityGuess(parity);
    }
-   else if(this->mOptions.guessType == 1)
+   else if(this->options().guessType == 1)
    {
       std::vector<int> parity = {1, 0, 0, 1};
       this->setParityGuess(parity);
@@ -476,7 +482,7 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
       */
    PetscCallVoid(EPSSetOperators(this->mEps, this->mA, this->mB));
    PetscCallVoid(EPSSetProblemType(this->mEps, EPS_GNHEP));
-   PetscCallVoid(EPSSetTolerances(this->mEps, this->mOptions.tolerance, this->mOptions.maxIteration));
+   PetscCallVoid(EPSSetTolerances(this->mEps, this->options().tolerance, this->options().maxIteration));
    PetscCallVoid(EPSSetBalance(this->mEps,  EPS_BALANCE_TWOSIDE, PETSC_DETERMINE, PETSC_DETERMINE));
 
    PetscCallVoid(EPSGetST(this->mEps, &st));
@@ -523,7 +529,7 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
    }
 
    // Use custom initial guess
-   if(this->mOptions.useCustomGuess)
+   if(this->options().useCustomGuess)
    {
       this->setCustomGuess();
    }

@@ -16,6 +16,7 @@
 #include "QuICC/Equations/EquationParameters.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
+#include "Stability/Options.hpp"
 
 namespace QuICC {
 
@@ -25,30 +26,6 @@ namespace QuICC {
 class LinearStability
 {
 public:
-   /**
-    * @brief Options for setup
-    */
-   struct Options
-   {
-      /// Tolerance for EPS solver
-      MHDFloat tolerance = 1e-8;
-
-      /// Max iteration for EPS solver
-      int maxIteration = 2000;
-
-      /// Write matrices as MatrixMarket files
-      bool writeMtx = false;
-
-      /// Show verbose diagnostic
-      bool verboseDiagnostics = false;
-
-      /// Use custom initial guess
-      bool useCustomGuess = false;
-
-      /// Custom initial guess type
-      int guessType = 0;
-   };
-
    /**
     * @brief Constructor
     *
@@ -63,7 +40,7 @@ public:
       SharedResolution spRes,
       const Equations::EquationParameters::NDMapType& params,
       const std::map<std::size_t, std::size_t>& bcMap,
-      std::shared_ptr<Model::IModelBackend> spModel, const Options& opt);
+      std::shared_ptr<Model::IModelBackend> spModel, std::shared_ptr<const Stability::Options> opt);
 
    /**
     * @brief Simple empty destructor
@@ -101,6 +78,11 @@ public:
    void eigenpairs(std::vector<MHDComplex>& evs,
       std::vector<std::vector<MHDComplex>>& efs, const int nev,
       const MHDFloat vc);
+
+   /**
+    * @brief Get options
+    */
+   const Stability::Options& options() const;
 
 protected:
    /**
@@ -244,7 +226,7 @@ private:
    /**
     * @brief Options for EPS object
     */
-   const Options mOptions;
+   std::shared_ptr<const Stability::Options> mOptions;
 };
 } // namespace QuICC
 
