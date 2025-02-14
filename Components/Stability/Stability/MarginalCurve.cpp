@@ -136,23 +136,89 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
    // Scaling options
    if (opt.scalingType > 0)
    {
+   const int m = static_cast<int>(ks.at(0));
+      const auto& tRes = *this->mspRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
+
       for (auto& ef: efs)
       {
-         MHDComplex s = std::numeric_limits<MHDComplex>::max();
-         for (auto c: ef)
+
+         std::map<std::pair<std::size_t,FieldComponents::Spectral::Id>, std::pair<int, std::complex<MHDFloat>>> infoMax;
+         std::map<std::pair<std::size_t,FieldComponents::Spectral::Id>, std::pair<int, std::complex<MHDFloat>>> infoFirst;
+         std::size_t idx = 0;
+         for (auto fId: this->mspBackend->fieldIds())
          {
-            if (std::abs(c) > 1e-6)
+            std::vector<FieldComponents::Spectral::Id> comps;
+            if (fId == PhysicalNames::Velocity::id() ||
+                fId == PhysicalNames::Magnetic::id())
             {
-               if (opt.scalingType == 1)
-               {
-                  s = std::abs(c) / c;
-               }
-               else if (opt.scalingType == 2)
-               {
-                  s = 1.0 / c;
-               }
-               break;
+               comps = {FieldComponents::Spectral::TOR, FieldComponents::Spectral::POL};
             }
+            else if (fId == PhysicalNames::Temperature::id())
+            {
+               comps = {FieldComponents::Spectral::SCALAR};
+            }
+            else
+            {
+               throw std::logic_error("Unknown field for processing eigenfuction");
+            }
+            for (auto cId: comps)
+            {
+               std::pair<int, MHDComplex> iFirst = {-1, 0};
+               std::pair<int, MHDComplex> iMax = {-1, 0};
+               for (int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
+               {
+                  int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+                  if (k_ == m)
+                  {
+                     for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k);
+                           j++)
+                     {
+                        for (int i = 0;
+                              i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
+                        {
+                           auto val = ef.at(idx);
+                           auto norm = std::abs(val);
+                           if(iFirst.first == -1 && norm > 1e-6)
+                           {
+                              iFirst = {idx, val};
+                           }
+                           if(std::abs(iMax.second) < norm)
+                           {
+                              iMax = {idx, val};
+                           }
+                           idx++;
+                        }
+                     }
+                  }
+               }
+               infoMax.try_emplace(std::make_pair(fId, cId), iMax);
+               infoFirst.try_emplace(std::make_pair(fId, cId), iFirst);
+            }
+         }
+
+         MHDComplex s;
+         if(opt.scalingType == 1)
+         {
+            MHDComplex vTor = infoMax.at(std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR)).second;
+            MHDComplex vPol = infoMax.at(std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL)).second;
+            if(std::abs(vTor) > std::abs(vPol))
+            {
+               s = std::abs(vTor)/vTor;
+            }
+            else
+            {
+               s = std::abs(vPol)/vPol;
+            }
+         }
+         else if(opt.scalingType == 2)
+         {
+            MHDComplex vTor = infoFirst.at(std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR)).second;
+            s = std::abs(vTor)/vTor;
+         }
+         else if(opt.scalingType == 3)
+         {
+            MHDComplex vTor = infoFirst.at(std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR)).second;
+            s = 1.0/vTor;
          }
 
          for (auto& c: ef)
@@ -406,7 +472,7 @@ void MarginalCurve::mainRun()
    // Set imaginary part of m = 0 to zero
    // opt->makeM0Real = true;
 
-   // Scale eigenfunctions to have first coefficient real and 1
+   // Scale eigenfunctions to have first coefficient real and positive
    // opt->scalingType = 1;
 
    auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,

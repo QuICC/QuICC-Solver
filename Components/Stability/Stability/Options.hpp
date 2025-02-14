@@ -41,9 +41,10 @@ struct Options
 
    /// scaling type:
    /// 0: Nothing special
-   /// 1: Make first nonzero coefficient real and 1
-   /// 2: Make first nonzero coefficient real and normalized to 1
-   int scalingType = 0;
+   /// 1: Make largest velocity coefficient real and positive
+   /// 2: Make first nonzero coefficient > 1e-6 real and positive
+   /// 3: Make first nonzero coefficient > 1e-6 real and normalized to 1
+   int scalingType = 1;
 
    /// Force m=0 coefficients to be real
    bool makeM0Real = false;
