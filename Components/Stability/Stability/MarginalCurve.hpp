@@ -13,8 +13,8 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/StateFileWriter.hpp"
-#include "Stability/StabilityBase.hpp"
 #include "Stability/Options.hpp"
+#include "Stability/StabilityBase.hpp"
 
 namespace QuICC {
 
@@ -59,8 +59,9 @@ private:
     * @param efs  Eigenfunctions
     * @param opt  Options
     */
-   void processEigenpairs(const std::vector<MHDFloat> ks, std::vector<MHDComplex>& evs,
-      std::vector<std::vector<MHDComplex>>& ef, const Stability::Options& opt);
+   void processEigenpairs(const std::vector<MHDFloat> ks,
+      std::vector<MHDComplex>& evs, std::vector<std::vector<MHDComplex>>& ef,
+      const Stability::Options& opt);
 
    /**
     * @brief Save eigenfunctions to statefile

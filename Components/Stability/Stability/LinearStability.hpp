@@ -36,11 +36,11 @@ public:
     * @param bcMap   Boundary conditions
     * @param spModel Model backend
     */
-   LinearStability(const std::vector<MHDFloat>& eigs,
-      SharedResolution spRes,
+   LinearStability(const std::vector<MHDFloat>& eigs, SharedResolution spRes,
       const Equations::EquationParameters::NDMapType& params,
       const std::map<std::size_t, std::size_t>& bcMap,
-      std::shared_ptr<Model::IModelBackend> spModel, std::shared_ptr<const Stability::Options> opt);
+      std::shared_ptr<Model::IModelBackend> spModel,
+      std::shared_ptr<const Stability::Options> opt);
 
    /**
     * @brief Simple empty destructor
@@ -116,8 +116,8 @@ private:
     * @param decA Decoupled linear operator
     * @param decB Decoupled Mass matrix
     */
-   void castMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB, const DecoupledZSparse& decA,
-      const DecoupledZSparse& decB);
+   void castMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
+      const DecoupledZSparse& decA, const DecoupledZSparse& decB);
 
    /**
     * @brief Convert matrices to used with SLEPc/PETSc

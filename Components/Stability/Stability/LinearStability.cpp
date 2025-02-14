@@ -8,9 +8,9 @@
 #include <algorithm>
 #include <limits>
 #include <random>
+#include <unsupported/Eigen/SparseExtra>
 
 #include "QuICC/Equations/EquationParameters.hpp"
-#include <unsupported/Eigen/SparseExtra>
 
 // Project includes
 //
@@ -26,8 +26,8 @@
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverHasBc.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverNoTau.hpp"
-#include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/GrowthRate.hpp"
+#include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/QuICCTimer.hpp"
@@ -62,10 +62,12 @@ bool sortDecreasingRealIdx(std::pair<MHDComplex, int> a,
 
 } // namespace internal
 
-LinearStability::LinearStability(const std::vector<MHDFloat>& eigs, SharedResolution spRes,
+LinearStability::LinearStability(const std::vector<MHDFloat>& eigs,
+   SharedResolution spRes,
    const Equations::EquationParameters::NDMapType& params,
    const std::map<std::size_t, std::size_t>& bcs,
-   std::shared_ptr<Model::IModelBackend> spModel, std::shared_ptr<const Stability::Options> opt) :
+   std::shared_ptr<Model::IModelBackend> spModel,
+   std::shared_ptr<const Stability::Options> opt) :
     mcUseMumps(true),
     mNeedInit(true),
     mIdc(0),
@@ -96,8 +98,8 @@ void LinearStability::setCriticalId(const std::size_t idc)
    this->mIdc = idc;
 }
 
-void LinearStability::buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& matB,
-   const std::vector<MHDFloat>& eigs,
+void LinearStability::buildMatrices(DecoupledZSparse& matA,
+   DecoupledZSparse& matB, const std::vector<MHDFloat>& eigs,
    const Equations::EquationParameters::NDMapType& nds)
 {
    // Fields
@@ -116,7 +118,7 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& ma
    auto bcType = ModelOperatorBoundary::SolverNoTau::id();
    this->model().modelMatrix(matA, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
-   if(this->options().writeMtx)
+   if (this->options().writeMtx)
    {
       Eigen::saveMarket(matA.real(), "A_re.mtx");
       Eigen::saveMarket(matA.imag(), "A_im.mtx");
@@ -126,7 +128,7 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& ma
    opId = ModelOperator::Time::id();
    this->model().modelMatrix(matB, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
-   if(this->options().writeMtx)
+   if (this->options().writeMtx)
    {
       Eigen::saveMarket(matB.real(), "B_re.mtx");
       Eigen::saveMarket(matB.imag(), "B_im.mtx");
@@ -140,7 +142,7 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& ma
       bcType = ModelOperatorBoundary::SolverHasBc::id();
       this->model().modelMatrix(matC, opId, imRange, matIdx, bcType, res, eigs,
          this->mBcs, nds);
-      if(this->options().writeMtx)
+      if (this->options().writeMtx)
       {
          Eigen::saveMarket(matC.real(), "C_re.mtx");
          Eigen::saveMarket(matC.imag(), "C_im.mtx");
@@ -152,15 +154,16 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& ma
    }
 
    // Set target
-   if (nds.count(NonDimensional::Omega::id()) > 0 || nds.count(NonDimensional::GrowthRate::id()) > 0)
+   if (nds.count(NonDimensional::Omega::id()) > 0 ||
+       nds.count(NonDimensional::GrowthRate::id()) > 0)
    {
       MHDFloat re = 0.0;
-      if(nds.count(NonDimensional::GrowthRate::id()) > 0)
+      if (nds.count(NonDimensional::GrowthRate::id()) > 0)
       {
          re = nds.at(NonDimensional::GrowthRate::id())->value();
       }
       MHDFloat im = 0.0;
-      if(nds.count(NonDimensional::Omega::id()) > 0)
+      if (nds.count(NonDimensional::Omega::id()) > 0)
       {
          im = nds.at(NonDimensional::Omega::id())->value();
       }
@@ -169,7 +172,8 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& ma
    }
 }
 
-void LinearStability::castMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB, const DecoupledZSparse& decA, const DecoupledZSparse& decB)
+void LinearStability::castMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
+   const DecoupledZSparse& decA, const DecoupledZSparse& decB)
 {
    if (decA.imag().size() > 0)
    {
@@ -192,7 +196,7 @@ void LinearStability::castMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB, con
 
 std::pair<int, int> LinearStability::setupGEVP(const MHDFloat vc)
 {
-   if(this->mIdc != 0)
+   if (this->mIdc != 0)
    {
       // Update critical parameter
       this->mParams[this->mIdc] = std::make_shared<NonDimensional::INumber>(vc,
@@ -277,7 +281,7 @@ void LinearStability::eigenpairs(std::vector<MHDComplex>& evs,
 
    this->mNeedInit = false;
 
-   if(this->options().verboseDiagnostics)
+   if (this->options().verboseDiagnostics)
    {
       // print details results
       this->printDetails();
@@ -329,13 +333,13 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
             ++tnz;
          }
       }
-      if(tnz != eigenMat.nonZeros())
+      if (tnz != eigenMat.nonZeros())
       {
          throw std::logic_error("Counting NNZ per row failed");
       }
 
-      PetscCallVoid(
-         MatCreateSeqAIJ(PETSC_COMM_WORLD, rows, cols, tnz, nnz.data(), &petscMat));
+      PetscCallVoid(MatCreateSeqAIJ(PETSC_COMM_WORLD, rows, cols, tnz,
+         nnz.data(), &petscMat));
    };
 
    // Set PETSc matrix values
@@ -351,7 +355,8 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
             {
                std::cerr << "WARNING: Matrix has explicit zero!" << std::endl;
             }
-            PetscCallVoid(MatSetValues(petscMat, 1, &i, 1, &j, &it.value(), mode));
+            PetscCallVoid(
+               MatSetValues(petscMat, 1, &i, 1, &j, &it.value(), mode));
          }
       }
       PetscCallVoid(MatAssemblyBegin(petscMat, MAT_FINAL_ASSEMBLY));
@@ -388,12 +393,12 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
 
 void LinearStability::setCustomGuess()
 {
-   if(this->options().guessType == 0)
+   if (this->options().guessType == 0)
    {
       std::vector<int> parity = {0, 1, 1, 0};
       this->setParityGuess(parity);
    }
-   else if(this->options().guessType == 1)
+   else if (this->options().guessType == 1)
    {
       std::vector<int> parity = {1, 0, 0, 1};
       this->setParityGuess(parity);
@@ -417,12 +422,12 @@ void LinearStability::setParityGuess(const std::vector<int>& parity)
    std::uniform_real_distribution<> dis(-1.0, 1.0);
    std::size_t idx = 0;
    int m = this->mspRes->sim().dim(Dimensions::Simulation::SIM3D,
-         Dimensions::Space::SPECTRAL) -
-      1;
+              Dimensions::Space::SPECTRAL) -
+           1;
    int p;
    PetscScalar val;
    // Loop over fields
-   for(int c = 0; c < parity.size(); c++)
+   for (int c = 0; c < parity.size(); c++)
    {
       p = parity.at(c);
       for (int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
@@ -430,11 +435,10 @@ void LinearStability::setParityGuess(const std::vector<int>& parity)
          int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
          if (k_ == m)
          {
-            for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k);
-                  j++)
+            for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               int j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
-               if(j_ != 0 && j % 2 == p)
+               int j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
+               if (j_ != 0 && j % 2 == p)
                {
                   val = 1.0;
                }
@@ -442,17 +446,18 @@ void LinearStability::setParityGuess(const std::vector<int>& parity)
                {
                   val = 0.0;
                }
-               for (int i = 0;
-                     i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
+               for (int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k);
+                  i++)
                {
-                  PetscCallVoid(VecSetValue(guess,idx,val*dis(gen),INSERT_VALUES));
+                  PetscCallVoid(
+                     VecSetValue(guess, idx, val * dis(gen), INSERT_VALUES));
                   idx++;
                }
             }
          }
       }
    }
-   PetscCallVoid(EPSSetInitialSpace(this->mEps,1,&guess));
+   PetscCallVoid(EPSSetInitialSpace(this->mEps, 1, &guess));
 }
 
 void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
@@ -482,8 +487,10 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
       */
    PetscCallVoid(EPSSetOperators(this->mEps, this->mA, this->mB));
    PetscCallVoid(EPSSetProblemType(this->mEps, EPS_GNHEP));
-   PetscCallVoid(EPSSetTolerances(this->mEps, this->options().tolerance, this->options().maxIteration));
-   PetscCallVoid(EPSSetBalance(this->mEps,  EPS_BALANCE_TWOSIDE, PETSC_DETERMINE, PETSC_DETERMINE));
+   PetscCallVoid(EPSSetTolerances(this->mEps, this->options().tolerance,
+      this->options().maxIteration));
+   PetscCallVoid(EPSSetBalance(this->mEps, EPS_BALANCE_TWOSIDE, PETSC_DETERMINE,
+      PETSC_DETERMINE));
 
    PetscCallVoid(EPSGetST(this->mEps, &st));
    PetscCallVoid(STSetType(st, STSINVERT));
@@ -529,7 +536,7 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
    }
 
    // Use custom initial guess
-   if(this->options().useCustomGuess)
+   if (this->options().useCustomGuess)
    {
       this->setCustomGuess();
    }

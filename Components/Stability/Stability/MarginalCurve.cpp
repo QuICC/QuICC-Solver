@@ -18,13 +18,13 @@
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Io/Variable/StateFileWriter.hpp"
-#include "QuICC/NonDimensional/Tolerance.hpp"
+#include "QuICC/NonDimensional/GrowthRate.hpp"
 #include "QuICC/NonDimensional/MaxIteration.hpp"
 #include "QuICC/NonDimensional/Nev.hpp"
+#include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/Rayleigh.hpp"
 #include "QuICC/NonDimensional/StabilityMode.hpp"
-#include "QuICC/NonDimensional/Omega.hpp"
-#include "QuICC/NonDimensional/GrowthRate.hpp"
+#include "QuICC/NonDimensional/Tolerance.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
@@ -129,32 +129,33 @@ MarginalCurve::~MarginalCurve()
    PetscCallVoid(SlepcFinalize());
 }
 
-void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks, std::vector<MHDComplex>& evs,
-   std::vector<std::vector<MHDComplex>>& efs, const Stability::Options& opt)
+void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
+   std::vector<MHDComplex>& evs, std::vector<std::vector<MHDComplex>>& efs,
+   const Stability::Options& opt)
 {
    // Scaling options
-   if(opt.scalingType > 0)
+   if (opt.scalingType > 0)
    {
-      for(auto& ef: efs)
+      for (auto& ef: efs)
       {
          MHDComplex s = std::numeric_limits<MHDComplex>::max();
-         for(auto c: ef)
+         for (auto c: ef)
          {
-            if(std::abs(c) > 1e-6)
+            if (std::abs(c) > 1e-6)
             {
-               if(opt.scalingType == 1)
+               if (opt.scalingType == 1)
                {
-                  s = std::abs(c)/c;
+                  s = std::abs(c) / c;
                }
-               else if(opt.scalingType == 2)
+               else if (opt.scalingType == 2)
                {
-                  s = 1.0/c;
+                  s = 1.0 / c;
                }
                break;
             }
          }
 
-         for(auto& c: ef)
+         for (auto& c: ef)
          {
             c *= s;
          }
@@ -163,11 +164,11 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks, std::vecto
 
    // Force m = 0 to be real
    const int m = static_cast<int>(ks.at(0));
-   if(m == 0 && opt.makeM0Real)
+   if (m == 0 && opt.makeM0Real)
    {
-      for(auto& ef: efs)
+      for (auto& ef: efs)
       {
-         for(auto& c: ef)
+         for (auto& c: ef)
          {
             c.imag(0);
          }
@@ -228,7 +229,7 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
       this->mpH5File->setPhysical(phys, this->config().boundary());
    }
 
-   std::map<std::string,MHDFloat> evPhys;
+   std::map<std::string, MHDFloat> evPhys;
    evPhys.insert(std::make_pair(NonDimensional::Omega().tag(), ev.imag()));
    evPhys.insert(std::make_pair(NonDimensional::GrowthRate().tag(), ev.real()));
    this->mpH5File->updatePhysical(evPhys);
@@ -270,12 +271,13 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
                   if (k_ == m)
                   {
                      for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k);
-                          j++)
+                        j++)
                      {
                         for (int i = 0;
-                             i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
+                           i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                         {
-                           p->rDom(0).rPerturbation().setPoint(ef.at(idx), i, j, k);
+                           p->rDom(0).rPerturbation().setPoint(ef.at(idx), i, j,
+                              k);
                            idx++;
                         }
                      }
@@ -299,10 +301,10 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
                   if (k_ == m)
                   {
                      for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k);
-                          j++)
+                        j++)
                      {
                         for (int i = 0;
-                             i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
+                           i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                         {
                            p->rDom(0)
                               .rPerturbation()
@@ -335,9 +337,10 @@ void MarginalCurve::mainRun()
 
    // Get number of fields in matrix
    int nF = 0;
-   for(auto&& f: this->mspBackend->fieldIds())
+   for (auto&& f: this->mspBackend->fieldIds())
    {
-      for(auto&& c: {FieldComponents::Spectral::SCALAR, FieldComponents::Spectral::POL, FieldComponents::Spectral::POL})
+      for (auto&& c: {FieldComponents::Spectral::SCALAR,
+              FieldComponents::Spectral::POL, FieldComponents::Spectral::POL})
       {
          auto fc = std::make_pair(f, c);
          Model::EquationInfo info;
@@ -380,34 +383,35 @@ void MarginalCurve::mainRun()
    }
 
    auto opt = std::make_shared<Stability::Options>();
-   if(this->mspEqParams->nd(NonDimensional::Tolerance::id()) > 0)
+   if (this->mspEqParams->nd(NonDimensional::Tolerance::id()) > 0)
    {
       opt->tolerance = this->mspEqParams->nd(NonDimensional::Tolerance::id());
    }
-   if(this->mspEqParams->nd(NonDimensional::MaxIteration::id()) > 0)
+   if (this->mspEqParams->nd(NonDimensional::MaxIteration::id()) > 0)
    {
-      opt->maxIteration = this->mspEqParams->nd(NonDimensional::MaxIteration::id());
+      opt->maxIteration =
+         this->mspEqParams->nd(NonDimensional::MaxIteration::id());
    }
 
    // Write MatrixMarket files
-   //opt->writeMtx = true;
+   // opt->writeMtx = true;
 
    // Output SLEPc diagnostics
    opt->verboseDiagnostics = true;
 
    // Use initial guess with parity
-   //opt->useCustomGuess = true;
-   //opt->guessType = 1;
+   // opt->useCustomGuess = true;
+   // opt->guessType = 1;
 
    // Set imaginary part of m = 0 to zero
-   //opt->makeM0Real = true;
+   // opt->makeM0Real = true;
 
    // Scale eigenfunctions to have first coefficient real and 1
-   //opt->scalingType = 1;
+   // opt->scalingType = 1;
 
    auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
-      this->mspEqParams->map(), this->createBoundary()->map(),
-      this->mspBackend, opt);
+      this->mspEqParams->map(), this->createBoundary()->map(), this->mspBackend,
+      opt);
 
    auto nev_ = this->mspEqParams->nd(NonDimensional::Nev::id());
    unsigned int nev = 0;
@@ -427,12 +431,13 @@ void MarginalCurve::mainRun()
    {
       std::vector<MHDComplex> evs(nev);
       std::vector<std::vector<MHDComplex>> efs;
-      if(solver_mode == 1)
+      if (solver_mode == 1)
       {
          efs.resize(nev);
       }
       // Last argument is not used
-      spLinStab->eigenpairs(evs, efs, nev, std::numeric_limits<MHDFloat>::max());
+      spLinStab->eigenpairs(evs, efs, nev,
+         std::numeric_limits<MHDFloat>::max());
 
       // Print eigenvalues
       std::ofstream logger("evs.log");

@@ -49,7 +49,7 @@ struct Options
    bool makeM0Real = false;
 };
 
-} // namespace Options
+} // namespace Stability
 } // namespace QuICC
 
 #endif // QUICC_STABILITY_OPTIONS_HPP
