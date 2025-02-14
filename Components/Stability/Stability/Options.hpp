@@ -8,9 +8,11 @@
 
 // System includes
 //
+#include <vector>
 
 // Project includes
 //
+#include "QuICC/Enums/FieldIds.hpp"
 
 namespace QuICC {
 
@@ -41,10 +43,12 @@ struct Options
 
    /// scaling type:
    /// 0: Nothing special
-   /// 1: Make largest velocity coefficient real and positive
-   /// 2: Make first nonzero coefficient > 1e-6 real and positive
-   /// 3: Make first nonzero coefficient > 1e-6 real and normalized to 1
+   /// 1: Make coefficient with largest amplitude real positive
+   /// 2: Make coefficient with largest amplitude 1
    int scalingType = 1;
+
+   /// List of fields to get reference from
+   std::vector<std::pair<std::size_t,FieldComponents::Spectral::Id>> scalingRef;
 
    /// Force m=0 coefficients to be real
    bool makeM0Real = false;

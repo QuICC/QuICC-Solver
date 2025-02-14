@@ -196,29 +196,37 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
             }
          }
 
-         MHDComplex s;
+         MHDComplex s = 0;
          if(opt.scalingType == 1)
          {
-            MHDComplex vTor = infoMax.at(std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR)).second;
-            MHDComplex vPol = infoMax.at(std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL)).second;
-            if(std::abs(vTor) > std::abs(vPol))
+            MHDComplex vMax = 0;
+            for(auto&& f: opt.scalingRef)
             {
-               s = std::abs(vTor)/vTor;
+               auto v = infoMax.at(f).second;
+               if(std::abs(vMax) < std::abs(v))
+               {
+                  vMax = v;
+               }
             }
-            else
-            {
-               s = std::abs(vPol)/vPol;
-            }
+            s = std::abs(vMax)/vMax;
          }
          else if(opt.scalingType == 2)
          {
-            MHDComplex vTor = infoFirst.at(std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR)).second;
-            s = std::abs(vTor)/vTor;
+            MHDComplex vMax = 0;
+            for(auto&& f: opt.scalingRef)
+            {
+               auto v = infoMax.at(f).second;
+               if(std::abs(vMax) < std::abs(v))
+               {
+                  vMax = v;
+               }
+            }
+            s = 1.0/vMax;
          }
-         else if(opt.scalingType == 3)
+
+         if(s == 0)
          {
-            MHDComplex vTor = infoFirst.at(std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR)).second;
-            s = 1.0/vTor;
+            throw std::logic_error("Failed to find proper scaling coefficient");
          }
 
          for (auto& c: ef)
@@ -473,7 +481,11 @@ void MarginalCurve::mainRun()
    // opt->makeM0Real = true;
 
    // Scale eigenfunctions to have first coefficient real and positive
-   // opt->scalingType = 1;
+   opt->scalingType = 1;
+   opt->scalingRef = {
+      {PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR},
+      {PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL}
+   };
 
    auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
       this->mspEqParams->map(), this->createBoundary()->map(), this->mspBackend,
