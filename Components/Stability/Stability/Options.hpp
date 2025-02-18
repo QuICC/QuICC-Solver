@@ -35,8 +35,11 @@ struct Options
    /// Max iteration for EPS solver
    int maxIteration = 2000;
 
-   /// Write matrices as MatrixMarket files
+   /// Write original matrices as MatrixMarket files
    bool writeMtx = false;
+
+   /// Write PETSc matrices as binary Petsc files
+   bool writePetsc = false;
 
    /// Show verbose diagnostic
    bool verboseDiagnostics = false;

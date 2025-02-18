@@ -221,7 +221,11 @@ std::pair<int, int> LinearStability::setupGEVP(const MHDFloat vc)
 
    auto dims = std::make_pair(matA.rows(), matA.cols());
 
-   std::cerr << "Finshed setting up matrices. Starting solver..." << std::endl;
+   if(QuICCEnv().allowsIO())
+   {
+      std::cerr << "Finshed setting up matrices. Starting solver..." << std::endl;
+   }
+   QuICCEnv().synchronize();
 
    return dims;
 }
@@ -324,45 +328,92 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
 {
    PetscFunctionBeginUser;
 
-   // Allocate PETSc matrix
-   auto allocatePetscMat = [](auto& petscMat, const auto& eigenMat)
+   auto localSizes = [](PetscInt& locRows, PetscInt& locCols, std::pair<PetscInt,PetscInt>& bounds, const int rows, const int cols)
    {
+      assert(rows == cols);
+      bounds = {0, 0};
+      locRows = 0;
+      locCols = 0;
+      for(int i = 0; i <= QuICCEnv().id(); i++)
+      {
+         bounds.first += locRows;
+         // Distribute rows
+         locRows = rows/QuICCEnv().size();
+         if(rows % QuICCEnv().size() > i)
+         {
+            locRows++;
+         }
+      }
+      bounds.second += bounds.first + locRows;
+      locCols = locRows;
+   };
+
+   // Allocate PETSc matrix
+   auto allocatePetscMat = [localSizes](auto& petscMat, const auto& eigenMat)
+   {
+      assert(eigenMat.rows() == eigenMat.cols());
       PetscInt rows = eigenMat.rows();
       PetscInt cols = eigenMat.cols();
+      std::pair<PetscInt,PetscInt> locRBounds = {0,0};
+      PetscInt locRows;
+      PetscInt locCols;
+      localSizes(locRows, locCols, locRBounds, rows, cols);
+
       PetscInt tnz = 0;
-      std::vector<PetscInt> nnz(rows, 0);
+      std::vector<PetscInt> d_nnz(locRows, 0);
+      std::vector<PetscInt> o_nnz(locRows, 0);
       for (int k = 0; k < eigenMat.outerSize(); ++k)
       {
          for (SparseMatrixZ::InnerIterator it(eigenMat, k); it; ++it)
          {
-            ++nnz.at(it.row());
-            ++tnz;
+            // Local row
+            if(it.row() >= locRBounds.first && it.row() < locRBounds.second)
+            {
+               if(it.col() >= locRBounds.first && it.col() < locRBounds.second)
+               {
+                  ++d_nnz.at(it.row()-locRBounds.first);
+               }
+               else
+               {
+                  ++o_nnz.at(it.row()-locRBounds.first);
+               }
+               ++tnz;
+            }
          }
       }
-      if (tnz != eigenMat.nonZeros())
-      {
-         throw std::logic_error("Counting NNZ per row failed");
-      }
 
-      PetscCallVoid(MatCreateSeqAIJ(PETSC_COMM_WORLD, rows, cols, tnz,
-         nnz.data(), &petscMat));
+      PetscInt d_nz = 0;
+      PetscInt o_nz = 0;
+      PetscCallVoid(MatCreateAIJ(PETSC_COMM_WORLD, locRows, locCols, rows, cols, d_nz, d_nnz.data(), o_nz,
+         o_nnz.data(), &petscMat));
    };
 
    // Set PETSc matrix values
-   auto setPetscMat = [](auto& petscMat, const auto& eigenMat, const auto& mode)
+   auto setPetscMat = [localSizes](auto& petscMat, const auto& eigenMat, const auto& mode)
    {
+      PetscInt rows = eigenMat.rows();
+      PetscInt cols = eigenMat.cols();
+      std::pair<PetscInt,PetscInt> locRBounds = {0,0};
+      PetscInt locRows;
+      PetscInt locCols;
+      localSizes(locRows, locCols, locRBounds, rows, cols);
+
       for (int k = 0; k < eigenMat.outerSize(); ++k)
       {
          for (SparseMatrixZ::InnerIterator it(eigenMat, k); it; ++it)
          {
             PetscInt i = it.row();
-            PetscInt j = it.col();
-            if (it.value() == 0.0)
+            // Local row
+            if(i >= locRBounds.first && i < locRBounds.second)
             {
-               std::cerr << "WARNING: Matrix has explicit zero!" << std::endl;
+               PetscInt j = it.col();
+               if (it.value() == 0.0)
+               {
+                  std::cerr << "WARNING: Matrix has explicit zero!" << std::endl;
+               }
+               PetscCallVoid(
+                     MatSetValues(petscMat, 1, &i, 1, &j, &it.value(), mode));
             }
-            PetscCallVoid(
-               MatSetValues(petscMat, 1, &i, 1, &j, &it.value(), mode));
          }
       }
       PetscCallVoid(MatAssemblyBegin(petscMat, MAT_FINAL_ASSEMBLY));
@@ -383,6 +434,22 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
    }
    setPetscMat(this->mA, matA, mode);
 
+   // Check matrix A setup
+   MatInfo info;
+   PetscCallVoid(MatGetInfo(this->mA, MAT_GLOBAL_SUM, &info));
+   if (info.nz_used != matA.nonZeros())
+   {
+      throw std::logic_error("Counting NNZ for matrix A failed");
+   }
+
+   // Output matrix in binary PETSc format
+   if(this->options().writePetsc)
+   {
+      PetscViewer viewer;
+      PetscCallVoid(PetscViewerBinaryOpen(PETSC_COMM_WORLD, "A.petsc", FILE_MODE_WRITE, &viewer));
+      PetscCallVoid(MatView(this->mA, viewer));
+   }
+
    // Build PETSc matrix B
    if (this->mNeedInit)
    {
@@ -395,6 +462,21 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
       mode = ADD_VALUES;
    }
    setPetscMat(this->mB, matB, mode);
+
+   // Check matrix B setup
+   PetscCallVoid(MatGetInfo(this->mB, MAT_GLOBAL_SUM, &info));
+   if (info.nz_used != matB.nonZeros())
+   {
+      throw std::logic_error("Counting NNZ for matrix B failed");
+   }
+
+   // Output matrix in binary PETSc format
+   if(this->options().writePetsc)
+   {
+      PetscViewer viewer;
+      PetscCallVoid(PetscViewerBinaryOpen(PETSC_COMM_WORLD, "B.petsc", FILE_MODE_WRITE, &viewer));
+      PetscCallVoid(MatView(this->mB, viewer));
+   }
 }
 
 void LinearStability::setCustomGuess()

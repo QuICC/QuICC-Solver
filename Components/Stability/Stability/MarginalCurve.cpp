@@ -558,12 +558,16 @@ void MarginalCurve::computeSingleMode(
       std::numeric_limits<MHDFloat>::max());
 
    // Print eigenvalues
-   std::ofstream logger("evs.log");
-   unsigned int prec = (std::numeric_limits<MHDFloat>::digits10 * 3) / 4 + 1;
-   for (auto&& e: evs)
+   if(QuICCEnv().allowsIO())
    {
-      logger << std::setprecision(prec) << e << std::endl;
+      std::ofstream logger("evs.log");
+      unsigned int prec = (std::numeric_limits<MHDFloat>::digits10 * 3) / 4 + 1;
+      for (auto&& e: evs)
+      {
+         logger << std::setprecision(prec) << e << std::endl;
+      }
    }
+   QuICCEnv().synchronize();
 
    this->processEigenpairs(eigs, evs, efs, *opt);
 
