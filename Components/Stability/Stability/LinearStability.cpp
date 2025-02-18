@@ -30,8 +30,6 @@
 #include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
-#include "QuICC/QuICCTimer.hpp"
-#include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "Stability/LinearStability.hpp"
 #include "Stability/Options.hpp"
@@ -196,6 +194,8 @@ void LinearStability::castMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
 
 std::pair<int, int> LinearStability::setupGEVP(const MHDFloat vc)
 {
+   Profiler::RegionFixture<2> fix("LinearStability::setupGEVP");
+
    if (this->mIdc != 0)
    {
       // Update critical parameter
@@ -203,15 +203,21 @@ std::pair<int, int> LinearStability::setupGEVP(const MHDFloat vc)
          this->mParams[this->mIdc]->tag());
    }
 
+   Profiler::RegionStart<3>("LinearStability::setupGEVP-buildMatrices");
    DecoupledZSparse decA;
    DecoupledZSparse decB;
    this->buildMatrices(decA, decB, this->mEigs, this->mParams);
+   Profiler::RegionStop<3>("LinearStability::setupGEVP-buildMatrices");
+   Profiler::RegionStart<3>("LinearStability::setupGEVP-castMatrices");
    SparseMatrixZ matA;
    SparseMatrixZ matB;
    this->castMatrices(matA, matB, decA, decB);
+   Profiler::RegionStop<3>("LinearStability::setupGEVP-castMatrices");
 
    // Convert matrices for SLEPc/PETSC
+   Profiler::RegionStart<3>("LinearStability::setupGEVP-convertMatrices");
    this->convertMatrices(matA, matB);
+   Profiler::RegionStop<3>("LinearStability::setupGEVP-convertMatrices");
 
    auto dims = std::make_pair(matA.rows(), matA.cols());
 
@@ -446,7 +452,7 @@ void LinearStability::setParityGuess(const std::vector<int>& parity)
                {
                   val = 0.0;
                }
-               for (int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k);
+               for (int i = 0; i < tRes.dim<Dimensions::Data::DATB1D>(j, k);
                   i++)
                {
                   PetscCallVoid(
@@ -463,6 +469,8 @@ void LinearStability::setParityGuess(const std::vector<int>& parity)
 void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
    std::vector<Vec>& efs, const int nev)
 {
+   Profiler::RegionFixture<2> fix("LinearStability::solveGEVP");
+
    ST st;
    PetscInt rows, cols;
    PetscCallVoid(MatGetSize(this->mA, &rows, &cols));
@@ -489,9 +497,8 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
    PetscCallVoid(EPSSetProblemType(this->mEps, EPS_GNHEP));
    PetscCallVoid(EPSSetTolerances(this->mEps, this->options().tolerance,
       this->options().maxIteration));
-   PetscCallVoid(EPSSetBalance(this->mEps, EPS_BALANCE_TWOSIDE, PETSC_DETERMINE,
-      PETSC_DETERMINE));
 
+   PetscCallVoid(EPSSetType(this->mEps, EPSKRYLOVSCHUR));
    PetscCallVoid(EPSGetST(this->mEps, &st));
    PetscCallVoid(STSetType(st, STSINVERT));
 
@@ -516,6 +523,8 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
       // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
    }
 
+   PetscCallVoid(EPSSetBalance(this->mEps, EPS_BALANCE_TWOSIDE, PETSC_DETERMINE,
+      PETSC_DETERMINE));
    PetscCallVoid(
       EPSSetDimensions(this->mEps, nev, PETSC_DEFAULT, PETSC_DEFAULT));
    if (useShift)

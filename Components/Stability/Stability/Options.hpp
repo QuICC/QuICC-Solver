@@ -23,6 +23,12 @@ namespace Stability {
  */
 struct Options
 {
+   /// Solver mode
+   int solver_mode = 0;
+
+   /// Number of eigenvalues to compute
+   std::size_t nev = 3;
+
    /// Tolerance for EPS solver
    double tolerance = 1e-8;
 
@@ -48,7 +54,8 @@ struct Options
    int scalingType = 1;
 
    /// List of fields to get reference from
-   std::vector<std::pair<std::size_t,FieldComponents::Spectral::Id>> scalingRef;
+   std::vector<std::pair<std::size_t, FieldComponents::Spectral::Id>>
+      scalingRef;
 
    /// Force m=0 coefficients to be real
    bool makeM0Real = false;

@@ -70,6 +70,36 @@ private:
       const std::vector<MHDComplex>& ef);
 
    /**
+    * @brief Count number of fields
+    */
+   int countFields() const;
+
+   /**
+    * @brief Get size of matrix
+    */
+   std::size_t getMatrixSize() const;
+
+   /**
+    * @brief Set matrix mode
+    */
+   std::vector<MHDFloat> getMatrixMode() const;
+
+   /**
+    * @brief Set options
+    */
+   void setOptions(Stability::Options& opt);
+
+   /**
+    * @brief Compute single mode
+    */
+   void computeSingleMode(std::shared_ptr<const Stability::Options> opt);
+
+   /**
+    * @brief Compute critical parameter
+    */
+   void findCriticalParameter(std::shared_ptr<const Stability::Options> opt);
+
+   /**
     * @brief state file
     */
    std::shared_ptr<Io::Variable::StateFileWriter> mpH5File;
