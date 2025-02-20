@@ -493,6 +493,9 @@ std::vector<MHDFloat> MarginalCurve::getMatrixMode() const
 
 void MarginalCurve::setOptions(Stability::Options& opt)
 {
+   // Select eigensolver
+   //opt.eigensolver_type = 1;
+
    // Set options from parameter file
    if (this->mspEqParams->nd(NonDimensional::Tolerance::id()) > 0)
    {

@@ -580,56 +580,111 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
    PetscCallVoid(EPSSetTolerances(this->mEps, this->options().tolerance,
       this->options().maxIteration));
 
-   PetscCallVoid(EPSSetType(this->mEps, EPSKRYLOVSCHUR));
-   PetscCallVoid(EPSGetST(this->mEps, &st));
-   PetscCallVoid(STSetType(st, STSINVERT));
-
-   // Use MUMPS
-   if (this->mcUseMumps)
+   if(this->options().eigensolver_type == 0)
    {
-      KSP ksp;
-      PC pc;
-      PetscCallVoid(STGetKSP(st, &ksp));
-      PetscCallVoid(KSPSetType(ksp, KSPPREONLY));
-      PetscCallVoid(KSPGetPC(ksp, &pc));
-      PetscCallVoid(PCSetType(pc, PCLU));
-      PetscCallVoid(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
-      // next line is required to force the creation of the ST operator and
-      // its passing to KSP */
-      PetscCallVoid(STGetOperator(st, NULL));
-      PetscCallVoid(PCFactorSetUpMatSolverType(pc));
-      // Example to show how to pass additional options to Mumps solver:
-      Mat K;
-      PetscCallVoid(PCFactorGetMatrix(pc, &K));
-      PetscCallVoid(MatMumpsSetIcntl(K, 14, 50)); // Memory increase
-      // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
+      PetscCallVoid(EPSSetType(this->mEps, EPSKRYLOVSCHUR));
+      PetscCallVoid(EPSGetST(this->mEps, &st));
+      PetscCallVoid(STSetType(st, STSINVERT));
+
+      // Use MUMPS
+      if (this->mcUseMumps)
+      {
+         KSP ksp;
+         PC pc;
+         PetscCallVoid(STGetKSP(st, &ksp));
+         PetscCallVoid(KSPSetType(ksp, KSPPREONLY));
+         PetscCallVoid(KSPGetPC(ksp, &pc));
+         PetscCallVoid(PCSetType(pc, PCLU));
+         PetscCallVoid(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
+         // next line is required to force the creation of the ST operator and
+         // its passing to KSP */
+         PetscCallVoid(STGetOperator(st, NULL));
+         PetscCallVoid(PCFactorSetUpMatSolverType(pc));
+         // Example to show how to pass additional options to Mumps solver:
+         Mat K;
+         PetscCallVoid(PCFactorGetMatrix(pc, &K));
+         PetscCallVoid(MatMumpsSetIcntl(K, 14, 50)); // Memory increase
+         // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
+      }
+
+      PetscCallVoid(EPSSetBalance(this->mEps, EPS_BALANCE_TWOSIDE, PETSC_DETERMINE,
+         PETSC_DETERMINE));
+      PetscCallVoid(
+         EPSSetDimensions(this->mEps, nev, PETSC_DEFAULT, PETSC_DEFAULT));
+      if (useShift)
+      {
+         PetscCallVoid(EPSSetTarget(this->mEps, this->mTarget));
+         if (this->mTarget.imag() == 0)
+         {
+            PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_REAL));
+         }
+         else if (this->mTarget.real() == 0)
+         {
+            PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_IMAGINARY));
+         }
+         else
+         {
+            PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_MAGNITUDE));
+         }
+      }
+
+      // Use custom initial guess
+      if (this->options().useCustomGuess)
+      {
+         this->setCustomGuess();
+      }
    }
-
-   PetscCallVoid(EPSSetBalance(this->mEps, EPS_BALANCE_TWOSIDE, PETSC_DETERMINE,
-      PETSC_DETERMINE));
-   PetscCallVoid(
-      EPSSetDimensions(this->mEps, nev, PETSC_DEFAULT, PETSC_DEFAULT));
-   if (useShift)
+   else if(this->options().eigensolver_type == 1)
    {
-      PetscCallVoid(EPSSetTarget(this->mEps, this->mTarget));
-      if (this->mTarget.imag() == 0)
+      PetscCallVoid(EPSSetType(this->mEps, EPSCISS));
+      PetscCallVoid(EPSGetST(this->mEps, &st));
+      PetscCallVoid(STSetType(st, STSINVERT));
+
+      //PetscCallVoid(EPSCISSSetSizes(this->mEps, 128, PETSC_CURRENT, PETSC_CURRENT, PETSC_CURRENT, PETSC_CURRENT, PETSC_FALSE));
+
+      RG rg;
+      PetscCallVoid(EPSGetRG(this->mEps, &rg));
+      PetscCallVoid(RGSetType(rg, RGINTERVAL));
+
+      double cr = 0.01;
+      double ci = 0.01;
+      auto tgR = this->mTarget.real();
+      auto tgI = this->mTarget.real();
+      PetscReal rl = std::min((1. - cr)*tgR, (1. + cr)*tgR);
+      PetscReal rr = std::max((1. - cr)*tgR, (1. + cr)*tgR);
+      PetscReal il = std::min((1. - cr)*tgI, (1. + cr)*tgI);
+      PetscReal ir = std::max((1. - cr)*tgI, (1. + cr)*tgI);
+      PetscCallVoid(RGIntervalSetEndpoints(rg, rl, rr, il, ir));
+
+      // Use MUMPS
+      //if (this->mcUseMumps)
+      if (false)
       {
-         PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_REAL));
-      }
-      else if (this->mTarget.real() == 0)
-      {
-         PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_IMAGINARY));
-      }
-      else
-      {
-         PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_MAGNITUDE));
+         PetscInt nsolve;
+         KSP *ksp;
+         PetscCallVoid(EPSCISSGetKSPs(this->mEps, &nsolve, &ksp));
+         for(int i = 0; i < nsolve; i++)
+         {
+            PC pc;
+            PetscCallVoid(KSPSetType(ksp[i], KSPPREONLY));
+            PetscCallVoid(KSPGetPC(ksp[i], &pc));
+            PetscCallVoid(PCSetType(pc, PCLU));
+            PetscCallVoid(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
+            // next line is required to force the creation of the ST operator and
+            // its passing to KSP */
+            PetscCallVoid(STGetOperator(st, NULL));
+            PetscCallVoid(PCFactorSetUpMatSolverType(pc));
+            // Example to show how to pass additional options to Mumps solver:
+            //Mat K;
+            //PetscCallVoid(PCFactorGetMatrix(pc, &K));
+            //PetscCallVoid(MatMumpsSetIcntl(K, 14, 50)); // Memory increase
+            // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
+         }
       }
    }
-
-   // Use custom initial guess
-   if (this->options().useCustomGuess)
+   else
    {
-      this->setCustomGuess();
+      throw std::logic_error("Unknown eigensolver type");
    }
 
    // Solve eigensystem

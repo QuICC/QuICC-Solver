@@ -26,6 +26,11 @@ struct Options
    /// Solver mode
    int solver_mode = 0;
 
+   /// Eigen solver type
+   /// 0: Krylov-Schur
+   /// 1: CISS
+   int eigensolver_type = 0;
+
    /// Number of eigenvalues to compute
    std::size_t nev = 3;
 
