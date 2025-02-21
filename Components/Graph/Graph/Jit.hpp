@@ -391,7 +391,9 @@ void Jit<RANK>::insertWrapper(const std::array<std::uint32_t, RANK> physDims,
     mlir::PassManager pmPre(&_ctx);
     pmPre.addPass(mlir::createInlinerPass());
     mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
+    // Optimization passes
     nestedFuncPmPre.addPass(mlir::quiccir::createTransformContractionPass());
+    pmPre.addPass(mlir::createCSEPass());
 
     std::vector<std::vector<std::int64_t>> dimArgs(1);
     std::vector<std::string> layArgs(1);
