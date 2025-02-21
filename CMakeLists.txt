@@ -82,7 +82,7 @@ enable_testing()
 #
 # Include function library
 #
-include(ModelFunctions)
+include(FrameworkFunctions)
 include(ConfigureFunctions)
 include(MessageQuICC)
 
@@ -121,6 +121,9 @@ include(setup/automatic)
 
 # Components setup
 include(setup/Components)
+
+# Tools setup
+include(setup/Tools)
 
 # Models setup
 include(setup/Models)

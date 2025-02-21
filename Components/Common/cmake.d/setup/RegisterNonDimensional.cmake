@@ -32,7 +32,6 @@ set(tags
   MagneticReynolds
   ModifiedElsasser
   Mu
-  Nev
   Nu
   Omega
   Omicron
@@ -48,8 +47,6 @@ set(tags
   Roberts
   Rossby
   Sigma
-  StabilityMode
-  Sort
   Tau
   Taylor
   Theta
