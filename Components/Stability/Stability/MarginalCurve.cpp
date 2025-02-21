@@ -507,7 +507,7 @@ void MarginalCurve::setOptions(Stability::Options& opt)
          this->mspEqParams->nd(NonDimensional::MaxIteration::id());
    }
 
-   int solver_mode = this->mspEqParams->nd(NonDimensional::StabilityMode::id());
+   opt.solver_mode = this->mspEqParams->nd(NonDimensional::StabilityMode::id());
 
    auto nev_ = this->mspEqParams->nd(NonDimensional::Nev::id());
    if (nev_ <= 0)
