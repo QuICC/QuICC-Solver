@@ -82,6 +82,9 @@ namespace QuICC {
       // Add initial state generation equations
       model.addVisualizers(spVis);
 
+      // Add ASCII output files
+      model.addAsciiOutputFiles(spVis);
+
       // Set the boundary conditions
       SharedSimulationBoundary spBcs = spVis->createBoundary();
 
