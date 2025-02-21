@@ -36,8 +36,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.d")
 include(FetchRepository)
 
 # Default branch for known tools
-quicc_set_default_git_branch("Simulation" BRANCH "main" TYPE "Tool")
-quicc_set_default_git_branch("Stability" BRANCH "main" TYPE "Tool")
+quicc_set_default_git_branch("Simulation" BRANCH "dev" TYPE "Tool")
+quicc_set_default_git_branch("Stability" BRANCH "dev" TYPE "Tool")
 
 set(QUICC_TOOL CACHE STRING "List of Tools to build.")
 message(DEBUG "QUICC_TOOL: ${QUICC_TOOL}")
