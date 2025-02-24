@@ -17,6 +17,8 @@
 #include "DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "DenseSM/Chebyshev/LinearMap/ITripleHarmonicOperator.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IIqTripleHarmonicOperator.hpp"
+#include "DenseSM/Chebyshev/LinearMap/IProjCrossOperator.hpp"
 #include "TestSuite/DenseSM/TesterBase.hpp"
 #include "TestSuite/DenseSM/Chebyshev/LinearMap/DipolarS1.hpp"
 #include "TestSuite/DenseSM/Chebyshev/LinearMap/QuadrupolarS2.hpp"
@@ -113,27 +115,29 @@ namespace LinearMap {
    {
       Matrix outData;
 
-      if constexpr(std::is_base_of_v<dsm::ITripleHarmonicOperator, TOp>)
+      if constexpr(std::is_base_of_v<dsm::IIqTripleHarmonicOperator, TOp>)
       {
          Array meta(0);
          std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
          readList(meta, fullname);
-         if(meta.size() != 11)
+         if(meta.size() != 13)
          {
             throw std::logic_error("Test meta data is wrong");
          }
 
          int nNr = meta(0) + 1;
          int nNc = meta(1) + 1;
-         int lOut = meta(2);
-         int mOut = meta(3);
-         int lF = meta(4);
-         int mF = meta(5);
-         int lIn = meta(6);
-         int mIn = meta(7);
-         int fId = meta(8);
-         auto lb = static_cast<QuICC::Internal::MHDFloat>(meta(9));
-         auto ub = static_cast<QuICC::Internal::MHDFloat>(meta(10));
+         int q = meta(2);
+         int p = meta(3);
+         int lOut = meta(4);
+         int mOut = meta(5);
+         int lF = meta(6);
+         int mF = meta(7);
+         int lIn = meta(8);
+         int mIn = meta(9);
+         int fId = meta(10);
+         auto lb = static_cast<QuICC::Internal::MHDFloat>(meta(11));
+         auto ub = static_cast<QuICC::Internal::MHDFloat>(meta(12));
 
          std::shared_ptr<dsm::RadialTorPolFunction> pF;
          if (fId == 0)
@@ -149,7 +153,120 @@ namespace LinearMap {
             throw std::logic_error("Unknown forcing function ID");
          }
 
-         TOp op(nNr, nNc, lOut, mOut, lF, mF, lIn, mIn, pF, lb, ub);
+         TOp op(nNr, nNc, q, p, lOut, mOut, lF, mF, lIn, mIn, pF, lb, ub);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_base_of_v<dsm::ITripleHarmonicOperator, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         if(meta.size() != 13)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+
+         int nNr = meta(0) + 1;
+         int nNc = meta(1) + 1;
+         assert(meta(2) == 0); // provided but not used
+         int p = meta(3);
+         int lOut = meta(4);
+         int mOut = meta(5);
+         int lF = meta(6);
+         int mF = meta(7);
+         int lIn = meta(8);
+         int mIn = meta(9);
+         int fId = meta(10);
+         auto lb = static_cast<QuICC::Internal::MHDFloat>(meta(11));
+         auto ub = static_cast<QuICC::Internal::MHDFloat>(meta(12));
+
+         std::shared_ptr<dsm::RadialTorPolFunction> pF;
+         if (fId == 0)
+         {
+            pF = std::make_shared<DipolarS1>();
+         }
+         else if (fId == 1)
+         {
+            pF = std::make_shared<QuadrupolarS2>();
+         }
+         else
+         {
+            throw std::logic_error("Unknown forcing function ID");
+         }
+
+         TOp op(nNr, nNc, p, lOut, mOut, lF, mF, lIn, mIn, pF, lb, ub);
+
+         outData = op.mat();
+      }
+      else if constexpr(std::is_base_of_v<dsm::IProjCrossOperator, TOp>)
+      {
+         Array meta(0);
+         std::string fullname = this->makeFilename(param, this->refRoot(), type, ContentType::META);
+         readList(meta, fullname);
+         if(meta.size() != 14)
+         {
+            throw std::logic_error("Test meta data is wrong");
+         }
+
+         int nNr = meta(0) + 1;
+         int nNc = meta(1) + 1;
+         int q = meta(2);
+         int p = meta(3);
+         int lOut = meta(4);
+         int mOut = meta(5);
+         int lF = meta(6);
+         int mF = meta(7);
+         int lIn = meta(8);
+         int mIn = meta(9);
+         int fAId = meta(10);
+         int fBId = meta(11);
+         auto lb = static_cast<QuICC::Internal::MHDFloat>(meta(12));
+         auto ub = static_cast<QuICC::Internal::MHDFloat>(meta(13));
+
+         int lA, mA, lB, mB;
+         std::shared_ptr<dsm::RadialTorPolFunction> pFa = nullptr;
+         std::shared_ptr<dsm::RadialTorPolFunction> pFb = nullptr;
+         if (fAId >= 0)
+         {
+            if (fAId == 0)
+            {
+               pFa = std::make_shared<DipolarS1>();
+            }
+            else if(fAId == 1)
+            {
+               pFa = std::make_shared<QuadrupolarS2>();
+            }
+            else
+            {
+               throw std::logic_error("Unknown forcing function");
+            }
+            lA = lF;
+            mA = mF;
+            lB = lIn;
+            mB = mIn;
+         }
+         if (fBId >= 0)
+         {
+            if (fBId == 0)
+            {
+               pFb = std::make_shared<DipolarS1>();
+            }
+            else if(fBId == 1)
+            {
+               pFb = std::make_shared<QuadrupolarS2>();
+            }
+            else
+            {
+               throw std::logic_error("Unknown forcing function");
+            }
+            lA = lIn;
+            mA = mIn;
+            lB = lF;
+            mB = mF;
+         }
+
+         TOp op(nNr, nNc, q, p, lOut, mOut, lA, mA, lB, mB, pFa, pFb, lb, ub);
 
          outData = op.mat();
       }

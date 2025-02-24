@@ -41,6 +41,7 @@ set(_tests
   I2Lapl:Chebyshev:sparse
   I2Qp:Chebyshev:sparse
   I3:Chebyshev:sparse
+  I3Qp:Chebyshev:sparse
   I3Lapl:Chebyshev:sparse
   I4:Chebyshev:sparse
   I4Lapl:Chebyshev:sparse
@@ -71,6 +72,7 @@ foreach(_test ${_tests})
 endforeach()
 set(_tests
   I2Qm:Chebyshev:sparse
+  I3Qm:Chebyshev:sparse
   I4Qm:Chebyshev:sparse
   I2Qm:SphEnergy:sparse
   I4Qm:SphEnergy:sparse
@@ -116,7 +118,24 @@ endforeach()
 
 # Create Worland basis tests targets
 set(_tests
+  I3:Chebyshev:sparse
+  I3Lapl:Chebyshev:sparse
+  I3:SphEnergy:sparse
+  I3Lapl:SphEnergy:sparse
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:WType:type
+    IDS 10 11 12 13 14
+    ULP 85
+  )
+endforeach()
+
+# Create Worland basis tests targets
+set(_tests
   I2Qm:Chebyshev:sparse
+  I3Qm:Chebyshev:sparse
   I4Qm:Chebyshev:sparse
   I2Qm:SphEnergy:sparse
   I4Qm:SphEnergy:sparse
@@ -140,6 +159,12 @@ set(_tests
   I2Qm:SphEnergy:sparse
   I2Qp:SphEnergy:sparse
   I2Lapl:SphEnergy:sparse
+  I3:Chebyshev:sparse
+  I3Qm:Chebyshev:sparse
+  I3Qp:Chebyshev:sparse
+  I3Lapl:Chebyshev:sparse
+  I3:SphEnergy:sparse
+  I3Lapl:SphEnergy:sparse
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}

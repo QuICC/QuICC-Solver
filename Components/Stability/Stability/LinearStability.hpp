@@ -26,6 +26,24 @@ class LinearStability
 {
 public:
    /**
+    * @brief Options for setup
+    */
+   struct Options
+   {
+      /// Tolerance for EPS solver
+      MHDFloat tolerance = 1e-8;
+
+      /// Max iteration for EPS solver
+      int maxIteration = 2000;
+
+      /// Write matrices as MatrixMarket files
+      bool writeMtx = false;
+
+      /// Show verbose diagnostic
+      bool verboseDiagnostics = false;
+   };
+
+   /**
     * @brief Constructor
     *
     * @param eigs    Indexes of matrix to solve (eg. m for rotating spherical
@@ -39,7 +57,7 @@ public:
       SharedResolution spRes,
       const Equations::EquationParameters::NDMapType& params,
       const std::map<std::size_t, std::size_t>& bcMap,
-      std::shared_ptr<Model::IModelBackend> spModel);
+      std::shared_ptr<Model::IModelBackend> spModel, const Options& opt);
 
    /**
     * @brief Simple empty destructor
@@ -194,6 +212,11 @@ private:
     * @brief Target for shift-invert
     */
    MHDComplex mTarget;
+
+   /**
+    * @brief Options for EPS object
+    */
+   const Options mOptions;
 };
 } // namespace QuICC
 

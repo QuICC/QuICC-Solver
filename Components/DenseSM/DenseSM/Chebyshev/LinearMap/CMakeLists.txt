@@ -1,27 +1,36 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   ILinearMapOperator.cpp
-  FR1D1.cpp
-  FR2D2.cpp
-  FR3D3.cpp
-  FR4D4.cpp
-  R2DivR2F.cpp
-  R2DivR1F.cpp
-  R4DivR1F.cpp
-  R4DivR1FC.cpp
-  R4DivR1CF.cpp
-  R4DivR1D1F.cpp
-  R4DivR1D1FC.cpp
-  R4DivR1D1CF.cpp
-  R2DivR2D1R1F.cpp
-  R4DivR2D1R1F.cpp
-  R4DivR2D1R1FC.cpp
-  R2DivR2FD1R1.cpp
-  R1FD2R1.cpp
-  R4DivR2FD1R1.cpp
-  R4DivR2CFD1R1.cpp
-  R4DivR1D1DivR1FD1R1.cpp
-  R4DivR1D1DivR1D1R1F.cpp
-  R4DivR3D1R1FD1R1.cpp
+  RpDivR1F.cpp
+  R0F.cpp
+  RpFD1.cpp
+  RpFD2.cpp
+  RpFD3.cpp
+  RpFD4.cpp
+  RpDivR1FC.cpp
+  RpDivR1CF.cpp
+  RpDivR1D1F.cpp
+  RpDivR1D1FC.cpp
+  RpDivR1D1CF.cpp
+  RpDivR2D1R1F.cpp
+  RpDivR2D1R1FC.cpp
+  RpDivR2FD1R1.cpp
+  RpDivR2CFD1R1.cpp
+  RpDivR1D1DivR1FD1R1.cpp
+  RpDivR1D1DivR1D1R1F.cpp
+  RpDivR3D1R1FD1R1.cpp
+  IqRpDivR1F.cpp
+  IqRpDivR1FC.cpp
+  IqRpDivR1CF.cpp
+  IqRpDivR1D1F.cpp
+  IqRpDivR1D1FC.cpp
+  IqRpDivR1D1CF.cpp
+  IqRpDivR2D1R1F.cpp
+  IqRpDivR2D1R1FC.cpp
+  IqRpDivR2FD1R1.cpp
+  IqRpDivR2CFD1R1.cpp
+  IqRpDivR1D1DivR1FD1R1.cpp
+  IqRpDivR1D1DivR1D1R1F.cpp
+  IqRpDivR3D1R1FD1R1.cpp
   IProjCrossOperator.cpp
   ProjCurlTorCrossTor.cpp
   ProjCurlTorCrossPol.cpp
@@ -35,6 +44,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ProjCurlCurlPolCrossPol.cpp
   ProjCurlCurlCPolCrossTor.cpp
   ProjCurlCurlCPolCrossPol.cpp
+  RadialTorPolFunction.cpp
 )
 
 set(PHS
@@ -53,3 +63,5 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
   PROPERTIES
     PUBLIC_HEADER "${PHS}"
 )
+
+add_subdirectory(Utils)

@@ -98,7 +98,7 @@ In the `build` directory (or wherever you put the tests):
 
 -       make -j 6 DenseSMChebyshevTests
 
--       ctest -R R1FD2R1 --output-on-failure
+-       ctest -R _R1FD2R1 --output-on-failure
 
 
 # Mathematica reference: calculation and output

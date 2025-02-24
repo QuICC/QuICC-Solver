@@ -22,17 +22,20 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-ProjCurlTorCrossTor::ProjCurlTorCrossTor(const int nNr, const int nNc, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB,
-   std::shared_ptr<RadialTorPolFunction> pTorA, std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower, const Scalar_t upper) :
-    IProjCrossOperator(nNr, nNc, lOut, mOut, lA, mA, lB, mB, lower, upper)
+ProjCurlTorCrossTor::ProjCurlTorCrossTor(const int nNr, const int nNc,
+   const int q, const int p, const int lOut, const int mOut, const int lA, const int mA,
+   const int lB, const int mB, std::shared_ptr<RadialTorPolFunction> pTorA,
+   std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t lower,
+   const Scalar_t upper) :
+    IProjCrossOperator(nNr, nNc, q, p, lOut, mOut, lA, mA, lB, mB, lower, upper)
 {
    // Radial function A is given
-   if(pTorA && pTorB == nullptr)
+   if (pTorA && pTorB == nullptr)
    {
       // Nothing to do
    }
    // Radial function B is given
-   else if(pTorB && pTorA == nullptr)
+   else if (pTorB && pTorA == nullptr)
    {
       // Nothing to do
    }

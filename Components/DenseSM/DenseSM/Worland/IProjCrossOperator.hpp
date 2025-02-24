@@ -30,6 +30,7 @@ public:
     *
     * @param rows    Number of rows
     * @param cols    Number of cols
+    * @param q       Order of quasi-inverse
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic degree
     * @param lA      harmonic degree of f
@@ -39,8 +40,9 @@ public:
     * @param alpha   Jacobi alpha parameter
     * @param dBeta   Jacobi dBeta parameter
     */
-   IProjCrossOperator(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, const Scalar_t alpha,
-      const Scalar_t dBeta);
+   IProjCrossOperator(const int rows, const int cols, const int q, const int lOut,
+      const int mOut, const int lA, const int mA, const int lB, const int mB,
+      const Scalar_t alpha, const Scalar_t dBeta);
 
    /**
     * @brief Destructor
@@ -61,12 +63,27 @@ protected:
    /**
     * @brief Compute Gaunt's integral
     */
-   MHDFloat  gaunt(const int lA, const int mA, const int lB, const int mB, const int lG, const int mG) const;
+   MHDFloat gaunt(const int lA, const int mA, const int lB, const int mB,
+      const int lG, const int mG) const;
 
    /**
     * @brief Compute Elsasser's integral
     */
-   MHDFloat  elsasser(const int lA, const int mA, const int lB, const int mB, const int lG, const int mG) const;
+   MHDFloat elsasser(const int lA, const int mA, const int lB, const int mB,
+      const int lG, const int mG) const;
+
+   /**
+    * @brief Apply quasi-inverse
+    *
+    * @param mat     Operator matrix to apply QI on
+    * @param l       harmonic degree
+    */
+   void applyQI(Internal::Matrix& mat, const int l) const;
+
+   /**
+    * @brief Set operator band
+    */
+   void setBand(const int dL, int s);
 
    /**
     * @brief Operator is exactly zero
@@ -77,6 +94,11 @@ protected:
     * @brief Operator is imaginary
     */
    bool mIsImaginary;
+
+   /**
+    * @brief Order of quasi-inverse
+    */
+   int mQ;
 
    /**
     * @brief Harmonic degree of output
@@ -107,6 +129,11 @@ protected:
     * @brief Harmonic order of B
     */
    int mMb;
+
+   /**
+    * @brief Bandwidth of operator
+    */
+   std::pair<int,int> mBand;
 
 private:
 };

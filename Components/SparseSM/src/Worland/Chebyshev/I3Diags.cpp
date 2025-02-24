@@ -28,7 +28,6 @@ namespace Chebyshev {
    {
    }
 
-
    I3Diags::ACoeff_t I3Diags::d_3(const ACoeff_t& n) const
    {
       ACoeff_t val;

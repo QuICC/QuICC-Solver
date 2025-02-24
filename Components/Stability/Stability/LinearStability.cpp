@@ -2,7 +2,6 @@
  * @file LinearStability.cpp
  * @brief Source of the high level simulation
  */
-#define QUICC_OUTPUT_STABILITY_MATRICES
 
 // System includes
 //
@@ -10,9 +9,7 @@
 #include <limits>
 
 #include "QuICC/Equations/EquationParameters.hpp"
-#if defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
 #include <unsupported/Eigen/SparseExtra>
-#endif // defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
 
 // Project includes
 //
@@ -29,6 +26,7 @@
 #include "QuICC/ModelOperatorBoundary/SolverHasBc.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverNoTau.hpp"
 #include "QuICC/NonDimensional/Omega.hpp"
+#include "QuICC/NonDimensional/GrowthRate.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/QuICCTimer.hpp"
@@ -65,7 +63,7 @@ bool sortDecreasingRealIdx(std::pair<MHDComplex, int> a,
 LinearStability::LinearStability(const std::vector<MHDFloat>& eigs, SharedResolution spRes,
    const Equations::EquationParameters::NDMapType& params,
    const std::map<std::size_t, std::size_t>& bcs,
-   std::shared_ptr<Model::IModelBackend> spModel) :
+   std::shared_ptr<Model::IModelBackend> spModel, const Options& opt) :
     mcUseMumps(true),
     mNeedInit(true),
     mIdc(0),
@@ -74,7 +72,8 @@ LinearStability::LinearStability(const std::vector<MHDFloat>& eigs, SharedResolu
     mParams(params),
     mBcs(bcs),
     mspModel(spModel),
-    mTarget(0.0)
+    mTarget(0.0),
+    mOptions(opt)
 {}
 
 LinearStability::~LinearStability()
@@ -111,10 +110,11 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    DecoupledZSparse matT;
    this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
-#if defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
-   Eigen::saveMarket(matT.real(), "A_re.mtx");
-   Eigen::saveMarket(matT.imag(), "A_im.mtx");
-#endif // defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
+   if(this->mOptions.writeMtx)
+   {
+      Eigen::saveMarket(matT.real(), "A_re.mtx");
+      Eigen::saveMarket(matT.imag(), "A_im.mtx");
+   }
    if (eqInfo.isComplex)
    {
       matA = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
@@ -129,10 +129,11 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    matT.setZero();
    this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
-#if defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
-   Eigen::saveMarket(matT.real(), "B_re.mtx");
-   Eigen::saveMarket(matT.imag(), "B_im.mtx");
-#endif // defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
+   if(this->mOptions.writeMtx)
+   {
+      Eigen::saveMarket(matT.real(), "B_re.mtx");
+      Eigen::saveMarket(matT.imag(), "B_im.mtx");
+   }
    if (eqInfo.isComplex)
    {
       matB = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
@@ -154,10 +155,11 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
       matT.setZero();
       this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
          this->mBcs, nds);
-#if defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
-      Eigen::saveMarket(matT.real(), "C_re.mtx");
-      Eigen::saveMarket(matT.imag(), "C_im.mtx");
-#endif // defined(QUICC_DEBUG_OUTPUT_MODEL_MATRIX) || defined(QUICC_OUTPUT_STABILITY_MATRICES)
+      if(this->mOptions.writeMtx)
+      {
+         Eigen::saveMarket(matT.real(), "C_re.mtx");
+         Eigen::saveMarket(matT.imag(), "C_im.mtx");
+      }
       if (eqInfo.isComplex)
       {
          matC = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
@@ -169,10 +171,20 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    }
 
    // Set target
-   if (nds.count(NonDimensional::Omega::id()) > 0)
+   if (nds.count(NonDimensional::Omega::id()) > 0 || nds.count(NonDimensional::GrowthRate::id()) > 0)
    {
-      this->mTarget =
-         MHDComplex(0, nds.at(NonDimensional::Omega::id())->value());
+      MHDFloat re = 0.0;
+      if(nds.count(NonDimensional::GrowthRate::id()) > 0)
+      {
+         re = nds.at(NonDimensional::GrowthRate::id())->value();
+      }
+      MHDFloat im = 0.0;
+      if(nds.count(NonDimensional::Omega::id()) > 0)
+      {
+         im = nds.at(NonDimensional::Omega::id())->value();
+      }
+
+      this->mTarget = MHDComplex(re, im);
    }
 }
 
@@ -265,10 +277,11 @@ void LinearStability::eigenpairs(std::vector<MHDComplex>& evs,
 
    this->mNeedInit = false;
 
-#ifdef QUICC_STABILITY_VERBOSE
-   // print details results
-   this->printDetails();
-#endif
+   if(this->mOptions.verboseDiagnostics)
+   {
+      // print details results
+      this->printDetails();
+   }
 
    // Destroy PETSc Vec
    for (auto& ef: petscEfs)
@@ -400,32 +413,31 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
       */
    PetscCallVoid(EPSSetOperators(this->mEps, this->mA, this->mB));
    PetscCallVoid(EPSSetProblemType(this->mEps, EPS_GNHEP));
+   PetscCallVoid(EPSSetTolerances(this->mEps, this->mOptions.tolerance, this->mOptions.maxIteration));
+   PetscCallVoid(EPSSetBalance(this->mEps,  EPS_BALANCE_TWOSIDE, PETSC_DETERMINE, PETSC_DETERMINE));
 
-   if (useShift)
+   PetscCallVoid(EPSGetST(this->mEps, &st));
+   PetscCallVoid(STSetType(st, STSINVERT));
+
+   // Use MUMPS
+   if (this->mcUseMumps)
    {
-      PetscCallVoid(EPSGetST(this->mEps, &st));
-      PetscCallVoid(STSetType(st, STSINVERT));
-
-      // Use MUMPS
-      if (this->mcUseMumps)
-      {
-         KSP ksp;
-         PC pc;
-         PetscCallVoid(STGetKSP(st, &ksp));
-         PetscCallVoid(KSPSetType(ksp, KSPPREONLY));
-         PetscCallVoid(KSPGetPC(ksp, &pc));
-         PetscCallVoid(PCSetType(pc, PCLU));
-         PetscCallVoid(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
-         // next line is required to force the creation of the ST operator and
-         // its passing to KSP */
-         PetscCallVoid(STGetOperator(st, NULL));
-         PetscCallVoid(PCFactorSetUpMatSolverType(pc));
-         // Example to show how to pass additional options to Mumps solver:
-         Mat K;
-         PetscCallVoid(PCFactorGetMatrix(pc, &K));
-         PetscCallVoid(MatMumpsSetIcntl(K, 14, 50)); // Memory increase
-         // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
-      }
+      KSP ksp;
+      PC pc;
+      PetscCallVoid(STGetKSP(st, &ksp));
+      PetscCallVoid(KSPSetType(ksp, KSPPREONLY));
+      PetscCallVoid(KSPGetPC(ksp, &pc));
+      PetscCallVoid(PCSetType(pc, PCLU));
+      PetscCallVoid(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
+      // next line is required to force the creation of the ST operator and
+      // its passing to KSP */
+      PetscCallVoid(STGetOperator(st, NULL));
+      PetscCallVoid(PCFactorSetUpMatSolverType(pc));
+      // Example to show how to pass additional options to Mumps solver:
+      Mat K;
+      PetscCallVoid(PCFactorGetMatrix(pc, &K));
+      PetscCallVoid(MatMumpsSetIcntl(K, 14, 50)); // Memory increase
+      // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
    }
 
    PetscCallVoid(

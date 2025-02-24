@@ -32,6 +32,8 @@ public:
     *
     * @param rows    Number of rows
     * @param cols    Number of cols
+    * @param q       Order of quasi-inverse
+    * @param p       Power of radial prefactor
     * @param lOut    Output harmonic degree
     * @param mOut    Output harmonic degree
     * @param lA      harmonic degree of f
@@ -41,8 +43,9 @@ public:
     * @param lower   Lower boundary
     * @param upper   Upper boundary
     */
-   IProjCrossOperator(const int rows, const int cols, const int lOut, const int mOut, const int lA, const int mA, const int lB, const int mB, const Scalar_t lower,
-      const Scalar_t upper);
+   IProjCrossOperator(const int rows, const int cols, const int q, const int p, const int lOut,
+      const int mOut, const int lA, const int mA, const int lB, const int mB,
+      const Scalar_t lower, const Scalar_t upper);
 
    /**
     * @brief Destructor
@@ -63,12 +66,19 @@ protected:
    /**
     * @brief Compute Gaunt's integral
     */
-   MHDFloat  gaunt(const int lA, const int mA, const int lB, const int mB, const int lG, const int mG) const;
+   MHDFloat gaunt(const int lA, const int mA, const int lB, const int mB,
+      const int lG, const int mG) const;
 
    /**
     * @brief Compute Elsasser's integral
     */
-   MHDFloat  elsasser(const int lA, const int mA, const int lB, const int mB, const int lG, const int mG) const;
+   MHDFloat elsasser(const int lA, const int mA, const int lB, const int mB,
+      const int lG, const int mG) const;
+
+   /**
+    * @brief Apply quasi-inverse
+    */
+   void applyQI(Internal::Matrix& mat) const;
 
    /**
     * @brief Operator is exactly zero
@@ -79,6 +89,16 @@ protected:
     * @brief Operator is imaginary
     */
    bool mIsImaginary;
+
+   /**
+    * @brief Order of quasi-inverse
+    */
+   int mQ;
+
+   /**
+    * @brief Power of radial prefactor
+    */
+   const int mP;
 
    /**
     * @brief Harmonic degree of output

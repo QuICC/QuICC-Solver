@@ -52,6 +52,16 @@ public:
    Matrix mat() const;
 
    /**
+    * @brief Get full precision dense matrix if backend has MP
+    */
+   Internal::Matrix mpmat() const
+   {
+      Internal::Matrix mat;
+      this->buildOpImpl(mat, this->rows(), this->cols());
+      return mat;
+   }
+
+   /**
     * @brief Build matrix operator
     * @param output operator, might be banded or dense
     * @tparam T matrix type
