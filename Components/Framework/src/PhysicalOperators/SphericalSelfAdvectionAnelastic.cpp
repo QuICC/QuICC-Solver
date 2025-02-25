@@ -61,12 +61,14 @@ namespace Physical {
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // intended for derivative of log(Rho)
+                                             const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
       auto Rho       = pF->evaluate(r, 0, 0); 
+      //auto Rho       = pF->evaluate(r, 0, 0, eqParams); //overloaded version
       auto dLogRho   = pDF->evaluate(r, 0, 0);
 
       if(compId == FieldComponents::Physical::R)
@@ -222,6 +224,7 @@ namespace Physical {
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // intended for derivative of log(Rho)
+                                             const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
@@ -384,6 +387,7 @@ namespace Physical {
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // intended for derivative of log(Rho)
+                                             const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();

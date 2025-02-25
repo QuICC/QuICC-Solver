@@ -54,6 +54,9 @@ public:
     */
    virtual Internal::Array evaluate(const Internal::Array& r, const int l,
       const int m) const = 0;
+   // Overload: in case evaluate needs to read in other input parameters
+   
+   
 
    /**
     * @brief Evaluate function derivative on grid

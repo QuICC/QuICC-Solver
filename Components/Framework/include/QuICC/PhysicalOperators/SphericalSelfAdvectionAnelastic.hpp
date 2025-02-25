@@ -22,6 +22,8 @@
 #include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
+#include "QuICC/Equations/IVectorEquation.hpp"
+
 
 //#include "QuICC/DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
@@ -47,6 +49,7 @@ namespace Physical {
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
+                         const QuICC::Equations::EquationParameters &eqParam,
                          const MHDFloat c = 1.0);
 
          /**
@@ -60,6 +63,7 @@ namespace Physical {
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
+                         const QuICC::Equations::EquationParameters &eqParams,
                          const MHDFloat c = 1.0);
 
          /**
@@ -73,6 +77,7 @@ namespace Physical {
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
+                         const QuICC::Equations::EquationParameters &eqParams,
                          const MHDFloat c = 1.0);
 
       protected:

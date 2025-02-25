@@ -37,6 +37,7 @@ set(tags
   ModifiedElsasser
   Mu
   Nev
+  Nrho
   Nu
   Omega
   Omicron

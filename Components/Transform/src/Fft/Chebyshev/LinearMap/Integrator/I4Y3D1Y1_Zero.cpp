@@ -55,9 +55,9 @@ namespace Integrator {
          this->mBackend.setMeanOperator(SparseMatrix(size, size).topRows(this->mspSetup->specSize()));
       }
       // *** to print the operator *** // 
-      std::cerr << "in I4Y3D1Y1_Zero  " << " \n";
-      std::cerr << "I4Y3D1Y1 =  " << " \n";
-      std::cerr << op.mat() << " \n";
+      //std::cerr << "in I4Y3D1Y1_Zero  " << " \n";
+      //std::cerr << "I4Y3D1Y1 =  " << " \n";
+      //std::cerr << op.mat() << " \n";
    }
 
    void I4Y3D1Y1_Zero::applyPostOperator(Matrix& rOut) const

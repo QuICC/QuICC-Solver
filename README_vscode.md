@@ -50,6 +50,8 @@ We assume we are running in a container.
         mkdir build_NL_anelastic_debug
 
         cmake .. -DQUICC_MODEL=AnelasticShellRTC -DCMAKE_BUILD_TYPE=Debug
+
+        make -j 6
         
         # Create a folder where the debug is to be run
         # needs to be a place visible in the container
