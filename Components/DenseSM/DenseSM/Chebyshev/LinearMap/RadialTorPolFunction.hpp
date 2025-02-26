@@ -14,6 +14,7 @@
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Typedefs.hpp"
 #include "Types/Internal/Typedefs.hpp"
+#include "QuICC/Equations/EquationParameters.hpp"
 
 namespace QuICC {
 
@@ -53,10 +54,7 @@ public:
     * @brief Evaluate function on grid
     */
    virtual Internal::Array evaluate(const Internal::Array& r, const int l,
-      const int m) const = 0;
-   // Overload: in case evaluate needs to read in other input parameters
-   
-   
+      const int m) const = 0;   
 
    /**
     * @brief Evaluate function derivative on grid
@@ -68,6 +66,11 @@ public:
     */
    virtual Array evaluateDiff(const int p, const Internal::Array& r, const int l,
       const int m, const Internal::MHDFloat lb, const Internal::MHDFloat ub) const;
+   
+   /**
+    * @brief Set additional parameters to the TorPolFunction
+    */
+   virtual void initParams(const QuICC::Equations::EquationParameters& eqParams);
 
 protected:
 private:

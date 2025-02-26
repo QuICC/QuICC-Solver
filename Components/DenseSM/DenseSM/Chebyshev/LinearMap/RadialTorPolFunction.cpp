@@ -48,6 +48,11 @@ Array RadialTorPolFunction::evaluateDiff(const int p, const Internal::Array& r, 
    return f;
 }
 
+void RadialTorPolFunction::initParams(const QuICC::Equations::EquationParameters& eqParams)
+{
+   // nothing here
+}
+
 } // namespace LinearMap
 } // namespace Chebyshev
 } // namespace DenseSM
