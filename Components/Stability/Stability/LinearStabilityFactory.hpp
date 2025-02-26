@@ -13,13 +13,13 @@
 //
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Model/IPhysicalModel.hpp"
-#include "QuICC/NonDimensional/Tolerance.hpp"
+#include "QuICC/NonDimensional/GrowthRate.hpp"
 #include "QuICC/NonDimensional/MaxIteration.hpp"
 #include "QuICC/NonDimensional/Nev.hpp"
 #include "QuICC/NonDimensional/Omega.hpp"
-#include "QuICC/NonDimensional/GrowthRate.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
 #include "QuICC/NonDimensional/StabilityMode.hpp"
+#include "QuICC/NonDimensional/Tolerance.hpp"
 #include "Stability/MarginalCurve.hpp"
 
 namespace QuICC {

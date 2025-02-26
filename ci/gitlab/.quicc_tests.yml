@@ -92,3 +92,9 @@
 
 .time-lib-sweep-alps-a100:
   extends: .time-lib-sweep-daint-gpu
+
+.time-lib-alps-gh200:
+  extends: .time-lib-daint-gpu
+
+.time-lib-sweep-alps-gh200:
+  extends: .time-lib-sweep-daint-gpu

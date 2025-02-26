@@ -12,6 +12,7 @@
 
 // Project includes
 //
+#include "DenseSM/Utils.hpp"
 #include "DenseSM/Worland/DivR1F.hpp"
 #include "DenseSM/Worland/ProjCurlCurlTorCrossTor.hpp"
 
@@ -60,7 +61,7 @@ ProjCurlCurlTorCrossTor::ProjCurlCurlTorCrossTor(const int nNr, const int nNc,
       throw std::logic_error("One of the radial functions should be null");
    }
 
-   this->mIsZero = (this->elsasser(this->mLa, this->mMa, this->mLb, this->mMb,
+   this->mIsZero = (Utils::elsasser(this->mLa, this->mMa, this->mLb, this->mMb,
                        this->mLout, this->mMout) == 0);
 }
 
@@ -80,7 +81,7 @@ void ProjCurlCurlTorCrossTor::buildOpImpl(Internal::Matrix& mat, const int rows,
       const Internal::MHDFloat L2g = static_cast<Internal::MHDFloat>(lg * (lg + 1));
 
       const MHDFloat Labg =
-         this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
+         Utils::elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
       Internal::MHDFloat c = L2g;
 

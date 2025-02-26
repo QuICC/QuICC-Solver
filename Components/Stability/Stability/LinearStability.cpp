@@ -7,9 +7,10 @@
 //
 #include <algorithm>
 #include <limits>
+#include <random>
+#include <unsupported/Eigen/SparseExtra>
 
 #include "QuICC/Equations/EquationParameters.hpp"
-#include <unsupported/Eigen/SparseExtra>
 
 // Project includes
 //
@@ -25,14 +26,13 @@
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverHasBc.hpp"
 #include "QuICC/ModelOperatorBoundary/SolverNoTau.hpp"
-#include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/GrowthRate.hpp"
+#include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
-#include "QuICC/QuICCTimer.hpp"
-#include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "Stability/LinearStability.hpp"
+#include "Stability/Options.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {
@@ -60,10 +60,12 @@ bool sortDecreasingRealIdx(std::pair<MHDComplex, int> a,
 
 } // namespace internal
 
-LinearStability::LinearStability(const std::vector<MHDFloat>& eigs, SharedResolution spRes,
+LinearStability::LinearStability(const std::vector<MHDFloat>& eigs,
+   SharedResolution spRes,
    const Equations::EquationParameters::NDMapType& params,
    const std::map<std::size_t, std::size_t>& bcs,
-   std::shared_ptr<Model::IModelBackend> spModel, const Options& opt) :
+   std::shared_ptr<Model::IModelBackend> spModel,
+   std::shared_ptr<const Stability::Options> opt) :
     mcUseMumps(true),
     mNeedInit(true),
     mIdc(0),
@@ -84,13 +86,18 @@ LinearStability::~LinearStability()
    PetscCallVoid(MatDestroy(&this->mB));
 }
 
+const Stability::Options& LinearStability::options() const
+{
+   return *this->mOptions;
+}
+
 void LinearStability::setCriticalId(const std::size_t idc)
 {
    this->mIdc = idc;
 }
 
-void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
-   SparseMatrixZ& matC, const std::vector<MHDFloat>& eigs,
+void LinearStability::buildMatrices(DecoupledZSparse& matA,
+   DecoupledZSparse& matB, const std::vector<MHDFloat>& eigs,
    const Equations::EquationParameters::NDMapType& nds)
 {
    // Fields
@@ -107,79 +114,54 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    // Build matrix A (linear operator)
    auto opId = ModelOperator::ImplicitLinear::id();
    auto bcType = ModelOperatorBoundary::SolverNoTau::id();
-   DecoupledZSparse matT;
-   this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
+   this->model().modelMatrix(matA, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
-   if(this->mOptions.writeMtx)
+   if (this->options().writeMtx)
    {
-      Eigen::saveMarket(matT.real(), "A_re.mtx");
-      Eigen::saveMarket(matT.imag(), "A_im.mtx");
-   }
-   if (eqInfo.isComplex)
-   {
-      matA = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
-   }
-   else
-   {
-      matA = matT.real().cast<MHDComplex>();
+      Eigen::saveMarket(matA.real(), "A_re.mtx");
+      Eigen::saveMarket(matA.imag(), "A_im.mtx");
    }
 
    // Build matrix B (mass matrix)
    opId = ModelOperator::Time::id();
-   matT.setZero();
-   this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
+   this->model().modelMatrix(matB, opId, imRange, matIdx, bcType, res, eigs,
       this->mBcs, nds);
-   if(this->mOptions.writeMtx)
+   if (this->options().writeMtx)
    {
-      Eigen::saveMarket(matT.real(), "B_re.mtx");
-      Eigen::saveMarket(matT.imag(), "B_im.mtx");
-   }
-   if (eqInfo.isComplex)
-   {
-      matB = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
-   }
-   else
-   {
-      matB = matT.real().cast<MHDComplex>();
+      Eigen::saveMarket(matB.real(), "B_re.mtx");
+      Eigen::saveMarket(matB.imag(), "B_im.mtx");
    }
 
    // Build boundary matrix if needed
-   if (this->model().useGalerkin())
+   if (!this->model().useGalerkin())
    {
-      matC.resize(0, 0);
-   }
-   else
-   {
+      DecoupledZSparse matC;
       opId = ModelOperator::Boundary::id();
       bcType = ModelOperatorBoundary::SolverHasBc::id();
-      matT.setZero();
-      this->model().modelMatrix(matT, opId, imRange, matIdx, bcType, res, eigs,
+      this->model().modelMatrix(matC, opId, imRange, matIdx, bcType, res, eigs,
          this->mBcs, nds);
-      if(this->mOptions.writeMtx)
+      if (this->options().writeMtx)
       {
-         Eigen::saveMarket(matT.real(), "C_re.mtx");
-         Eigen::saveMarket(matT.imag(), "C_im.mtx");
+         Eigen::saveMarket(matC.real(), "C_re.mtx");
+         Eigen::saveMarket(matC.imag(), "C_im.mtx");
       }
-      if (eqInfo.isComplex)
-      {
-         matC = matT.real().cast<MHDComplex>() + matT.imag() * Math::cI;
-      }
-      else
-      {
-         matC = matT.real().cast<MHDComplex>();
-      }
+
+      // Add BC to matA}
+      matA.real() += matC.real();
+      matA.imag() += matC.imag();
    }
 
    // Set target
-   if (nds.count(NonDimensional::Omega::id()) > 0 || nds.count(NonDimensional::GrowthRate::id()) > 0)
+   if (nds.count(NonDimensional::Omega::id()) > 0 ||
+       nds.count(NonDimensional::GrowthRate::id()) > 0)
    {
       MHDFloat re = 0.0;
-      if(nds.count(NonDimensional::GrowthRate::id()) > 0)
+      if (nds.count(NonDimensional::GrowthRate::id()) > 0)
       {
          re = nds.at(NonDimensional::GrowthRate::id())->value();
       }
       MHDFloat im = 0.0;
-      if(nds.count(NonDimensional::Omega::id()) > 0)
+      if (nds.count(NonDimensional::Omega::id()) > 0)
       {
          im = nds.at(NonDimensional::Omega::id())->value();
       }
@@ -188,30 +170,62 @@ void LinearStability::buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
    }
 }
 
+void LinearStability::castMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
+   const DecoupledZSparse& decA, const DecoupledZSparse& decB)
+{
+   if (decA.imag().size() > 0)
+   {
+      matA = decA.real().cast<MHDComplex>() + decA.imag() * Math::cI;
+   }
+   else
+   {
+      matA = decA.real().cast<MHDComplex>();
+   }
+
+   if (decB.imag().size() > 0)
+   {
+      matB = decB.real().cast<MHDComplex>() + decB.imag() * Math::cI;
+   }
+   else
+   {
+      matB = decB.real().cast<MHDComplex>();
+   }
+}
+
 std::pair<int, int> LinearStability::setupGEVP(const MHDFloat vc)
 {
-   if(this->mIdc != 0)
+   Profiler::RegionFixture<2> fix("LinearStability::setupGEVP");
+
+   if (this->mIdc != 0)
    {
       // Update critical parameter
       this->mParams[this->mIdc] = std::make_shared<NonDimensional::INumber>(vc,
          this->mParams[this->mIdc]->tag());
    }
 
+   Profiler::RegionStart<3>("LinearStability::setupGEVP-buildMatrices");
+   DecoupledZSparse decA;
+   DecoupledZSparse decB;
+   this->buildMatrices(decA, decB, this->mEigs, this->mParams);
+   Profiler::RegionStop<3>("LinearStability::setupGEVP-buildMatrices");
+   Profiler::RegionStart<3>("LinearStability::setupGEVP-castMatrices");
    SparseMatrixZ matA;
    SparseMatrixZ matB;
-   SparseMatrixZ matC;
-   this->buildMatrices(matA, matB, matC, this->mEigs, this->mParams);
-
-   // Add tau lines if needed
-   if (matC.size() != 0)
-   {
-      matA += matC;
-   }
+   this->castMatrices(matA, matB, decA, decB);
+   Profiler::RegionStop<3>("LinearStability::setupGEVP-castMatrices");
 
    // Convert matrices for SLEPc/PETSC
+   Profiler::RegionStart<3>("LinearStability::setupGEVP-convertMatrices");
    this->convertMatrices(matA, matB);
+   Profiler::RegionStop<3>("LinearStability::setupGEVP-convertMatrices");
 
    auto dims = std::make_pair(matA.rows(), matA.cols());
+
+   if(QuICCEnv().allowsIO())
+   {
+      std::cerr << "Finshed setting up matrices. Starting solver..." << std::endl;
+   }
+   QuICCEnv().synchronize();
 
    return dims;
 }
@@ -277,7 +291,7 @@ void LinearStability::eigenpairs(std::vector<MHDComplex>& evs,
 
    this->mNeedInit = false;
 
-   if(this->mOptions.verboseDiagnostics)
+   if (this->options().verboseDiagnostics)
    {
       // print details results
       this->printDetails();
@@ -314,44 +328,92 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
 {
    PetscFunctionBeginUser;
 
-   // Allocate PETSc matrix
-   auto allocatePetscMat = [](auto& petscMat, const auto& eigenMat)
+   auto localSizes = [](PetscInt& locRows, PetscInt& locCols, std::pair<PetscInt,PetscInt>& bounds, const int rows, const int cols)
    {
+      assert(rows == cols);
+      bounds = {0, 0};
+      locRows = 0;
+      locCols = 0;
+      for(int i = 0; i <= QuICCEnv().id(); i++)
+      {
+         bounds.first += locRows;
+         // Distribute rows
+         locRows = rows/QuICCEnv().size();
+         if(rows % QuICCEnv().size() > i)
+         {
+            locRows++;
+         }
+      }
+      bounds.second += bounds.first + locRows;
+      locCols = locRows;
+   };
+
+   // Allocate PETSc matrix
+   auto allocatePetscMat = [localSizes](auto& petscMat, const auto& eigenMat)
+   {
+      assert(eigenMat.rows() == eigenMat.cols());
       PetscInt rows = eigenMat.rows();
       PetscInt cols = eigenMat.cols();
+      std::pair<PetscInt,PetscInt> locRBounds = {0,0};
+      PetscInt locRows;
+      PetscInt locCols;
+      localSizes(locRows, locCols, locRBounds, rows, cols);
+
       PetscInt tnz = 0;
-      std::vector<PetscInt> nnz(rows, 0);
+      std::vector<PetscInt> d_nnz(locRows, 0);
+      std::vector<PetscInt> o_nnz(locRows, 0);
       for (int k = 0; k < eigenMat.outerSize(); ++k)
       {
          for (SparseMatrixZ::InnerIterator it(eigenMat, k); it; ++it)
          {
-            ++nnz.at(it.row());
-            ++tnz;
+            // Local row
+            if(it.row() >= locRBounds.first && it.row() < locRBounds.second)
+            {
+               if(it.col() >= locRBounds.first && it.col() < locRBounds.second)
+               {
+                  ++d_nnz.at(it.row()-locRBounds.first);
+               }
+               else
+               {
+                  ++o_nnz.at(it.row()-locRBounds.first);
+               }
+               ++tnz;
+            }
          }
       }
-      if(tnz != eigenMat.nonZeros())
-      {
-         throw std::logic_error("Counting NNZ per row failed");
-      }
 
-      PetscCallVoid(
-         MatCreateSeqAIJ(PETSC_COMM_WORLD, rows, cols, tnz, nnz.data(), &petscMat));
+      PetscInt d_nz = 0;
+      PetscInt o_nz = 0;
+      PetscCallVoid(MatCreateAIJ(PETSC_COMM_WORLD, locRows, locCols, rows, cols, d_nz, d_nnz.data(), o_nz,
+         o_nnz.data(), &petscMat));
    };
 
    // Set PETSc matrix values
-   auto setPetscMat = [](auto& petscMat, const auto& eigenMat, const auto& mode)
+   auto setPetscMat = [localSizes](auto& petscMat, const auto& eigenMat, const auto& mode)
    {
+      PetscInt rows = eigenMat.rows();
+      PetscInt cols = eigenMat.cols();
+      std::pair<PetscInt,PetscInt> locRBounds = {0,0};
+      PetscInt locRows;
+      PetscInt locCols;
+      localSizes(locRows, locCols, locRBounds, rows, cols);
+
       for (int k = 0; k < eigenMat.outerSize(); ++k)
       {
          for (SparseMatrixZ::InnerIterator it(eigenMat, k); it; ++it)
          {
             PetscInt i = it.row();
-            PetscInt j = it.col();
-            if (it.value() == 0.0)
+            // Local row
+            if(i >= locRBounds.first && i < locRBounds.second)
             {
-               std::cerr << "WARNING: Matrix has explicit zero!" << std::endl;
+               PetscInt j = it.col();
+               if (it.value() == 0.0)
+               {
+                  std::cerr << "WARNING: Matrix has explicit zero!" << std::endl;
+               }
+               PetscCallVoid(
+                     MatSetValues(petscMat, 1, &i, 1, &j, &it.value(), mode));
             }
-            PetscCallVoid(MatSetValues(petscMat, 1, &i, 1, &j, &it.value(), mode));
          }
       }
       PetscCallVoid(MatAssemblyBegin(petscMat, MAT_FINAL_ASSEMBLY));
@@ -372,6 +434,22 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
    }
    setPetscMat(this->mA, matA, mode);
 
+   // Check matrix A setup
+   MatInfo info;
+   PetscCallVoid(MatGetInfo(this->mA, MAT_GLOBAL_SUM, &info));
+   if (info.nz_used != matA.nonZeros())
+   {
+      throw std::logic_error("Counting NNZ for matrix A failed");
+   }
+
+   // Output matrix in binary PETSc format
+   if(this->options().writePetsc)
+   {
+      PetscViewer viewer;
+      PetscCallVoid(PetscViewerBinaryOpen(PETSC_COMM_WORLD, "A.petsc", FILE_MODE_WRITE, &viewer));
+      PetscCallVoid(MatView(this->mA, viewer));
+   }
+
    // Build PETSc matrix B
    if (this->mNeedInit)
    {
@@ -384,11 +462,97 @@ void LinearStability::convertMatrices(const SparseMatrixZ& matA,
       mode = ADD_VALUES;
    }
    setPetscMat(this->mB, matB, mode);
+
+   // Check matrix B setup
+   PetscCallVoid(MatGetInfo(this->mB, MAT_GLOBAL_SUM, &info));
+   if (info.nz_used != matB.nonZeros())
+   {
+      throw std::logic_error("Counting NNZ for matrix B failed");
+   }
+
+   // Output matrix in binary PETSc format
+   if(this->options().writePetsc)
+   {
+      PetscViewer viewer;
+      PetscCallVoid(PetscViewerBinaryOpen(PETSC_COMM_WORLD, "B.petsc", FILE_MODE_WRITE, &viewer));
+      PetscCallVoid(MatView(this->mB, viewer));
+   }
+}
+
+void LinearStability::setCustomGuess()
+{
+   if (this->options().guessType == 0)
+   {
+      std::vector<int> parity = {0, 1, 1, 0};
+      this->setParityGuess(parity);
+   }
+   else if (this->options().guessType == 1)
+   {
+      std::vector<int> parity = {1, 0, 0, 1};
+      this->setParityGuess(parity);
+   }
+   else
+   {
+      throw std::logic_error("Unknown initial guess type");
+   }
+}
+
+void LinearStability::setParityGuess(const std::vector<int>& parity)
+{
+   const auto& res = *this->mspRes;
+   const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
+
+   Vec guess;
+   PetscCallVoid(MatCreateVecs(this->mA, &guess, nullptr));
+
+   std::random_device rd;
+   std::mt19937 gen(rd());
+   std::uniform_real_distribution<> dis(-1.0, 1.0);
+   std::size_t idx = 0;
+   int m = this->mspRes->sim().dim(Dimensions::Simulation::SIM3D,
+              Dimensions::Space::SPECTRAL) -
+           1;
+   int p;
+   PetscScalar val;
+   // Loop over fields
+   for (int c = 0; c < parity.size(); c++)
+   {
+      p = parity.at(c);
+      for (int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
+      {
+         int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+         if (k_ == m)
+         {
+            for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               int j_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
+               if (j_ != 0 && j % 2 == p)
+               {
+                  val = 1.0;
+               }
+               else
+               {
+                  val = 0.0;
+               }
+               for (int i = 0; i < tRes.dim<Dimensions::Data::DATB1D>(j, k);
+                  i++)
+               {
+                  PetscCallVoid(
+                     VecSetValue(guess, idx, val * dis(gen), INSERT_VALUES));
+                  idx++;
+               }
+            }
+         }
+      }
+   }
+   PetscCallVoid(EPSSetInitialSpace(this->mEps, 1, &guess));
 }
 
 void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
    std::vector<Vec>& efs, const int nev)
 {
+   Profiler::RegionFixture<2> fix("LinearStability::solveGEVP");
+
    ST st;
    PetscInt rows, cols;
    PetscCallVoid(MatGetSize(this->mA, &rows, &cols));
@@ -413,50 +577,114 @@ void LinearStability::solveGEVP(std::vector<MHDComplex>& evs,
       */
    PetscCallVoid(EPSSetOperators(this->mEps, this->mA, this->mB));
    PetscCallVoid(EPSSetProblemType(this->mEps, EPS_GNHEP));
-   PetscCallVoid(EPSSetTolerances(this->mEps, this->mOptions.tolerance, this->mOptions.maxIteration));
-   PetscCallVoid(EPSSetBalance(this->mEps,  EPS_BALANCE_TWOSIDE, PETSC_DETERMINE, PETSC_DETERMINE));
+   PetscCallVoid(EPSSetTolerances(this->mEps, this->options().tolerance,
+      this->options().maxIteration));
 
-   PetscCallVoid(EPSGetST(this->mEps, &st));
-   PetscCallVoid(STSetType(st, STSINVERT));
-
-   // Use MUMPS
-   if (this->mcUseMumps)
+   if(this->options().eigensolver_type == 0)
    {
-      KSP ksp;
-      PC pc;
-      PetscCallVoid(STGetKSP(st, &ksp));
-      PetscCallVoid(KSPSetType(ksp, KSPPREONLY));
-      PetscCallVoid(KSPGetPC(ksp, &pc));
-      PetscCallVoid(PCSetType(pc, PCLU));
-      PetscCallVoid(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
-      // next line is required to force the creation of the ST operator and
-      // its passing to KSP */
-      PetscCallVoid(STGetOperator(st, NULL));
-      PetscCallVoid(PCFactorSetUpMatSolverType(pc));
-      // Example to show how to pass additional options to Mumps solver:
-      Mat K;
-      PetscCallVoid(PCFactorGetMatrix(pc, &K));
-      PetscCallVoid(MatMumpsSetIcntl(K, 14, 50)); // Memory increase
-      // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
+      PetscCallVoid(EPSSetType(this->mEps, EPSKRYLOVSCHUR));
+      PetscCallVoid(EPSGetST(this->mEps, &st));
+      PetscCallVoid(STSetType(st, STSINVERT));
+
+      // Use MUMPS
+      if (this->mcUseMumps)
+      {
+         KSP ksp;
+         PC pc;
+         PetscCallVoid(STGetKSP(st, &ksp));
+         PetscCallVoid(KSPSetType(ksp, KSPPREONLY));
+         PetscCallVoid(KSPGetPC(ksp, &pc));
+         PetscCallVoid(PCSetType(pc, PCLU));
+         PetscCallVoid(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
+         // next line is required to force the creation of the ST operator and
+         // its passing to KSP */
+         PetscCallVoid(STGetOperator(st, NULL));
+         PetscCallVoid(PCFactorSetUpMatSolverType(pc));
+         // Example to show how to pass additional options to Mumps solver:
+         Mat K;
+         PetscCallVoid(PCFactorGetMatrix(pc, &K));
+         PetscCallVoid(MatMumpsSetIcntl(K, 14, 50)); // Memory increase
+         // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
+      }
+
+      PetscCallVoid(EPSSetBalance(this->mEps, EPS_BALANCE_TWOSIDE, PETSC_DETERMINE,
+         PETSC_DETERMINE));
+      PetscCallVoid(
+         EPSSetDimensions(this->mEps, nev, PETSC_DEFAULT, PETSC_DEFAULT));
+      if (useShift)
+      {
+         PetscCallVoid(EPSSetTarget(this->mEps, this->mTarget));
+         if (this->mTarget.imag() == 0)
+         {
+            PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_REAL));
+         }
+         else if (this->mTarget.real() == 0)
+         {
+            PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_IMAGINARY));
+         }
+         else
+         {
+            PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_MAGNITUDE));
+         }
+      }
+
+      // Use custom initial guess
+      if (this->options().useCustomGuess)
+      {
+         this->setCustomGuess();
+      }
    }
-
-   PetscCallVoid(
-      EPSSetDimensions(this->mEps, nev, PETSC_DEFAULT, PETSC_DEFAULT));
-   if (useShift)
+   else if(this->options().eigensolver_type == 1)
    {
-      PetscCallVoid(EPSSetTarget(this->mEps, this->mTarget));
-      if (this->mTarget.imag() == 0)
+      PetscCallVoid(EPSSetType(this->mEps, EPSCISS));
+      PetscCallVoid(EPSGetST(this->mEps, &st));
+      PetscCallVoid(STSetType(st, STSINVERT));
+
+      //PetscCallVoid(EPSCISSSetSizes(this->mEps, 128, PETSC_CURRENT, PETSC_CURRENT, PETSC_CURRENT, PETSC_CURRENT, PETSC_FALSE));
+
+      RG rg;
+      PetscCallVoid(EPSGetRG(this->mEps, &rg));
+      PetscCallVoid(RGSetType(rg, RGINTERVAL));
+
+      double cr = 0.01;
+      double ci = 0.01;
+      auto tgR = this->mTarget.real();
+      auto tgI = this->mTarget.real();
+      PetscReal rl = std::min((1. - cr)*tgR, (1. + cr)*tgR);
+      PetscReal rr = std::max((1. - cr)*tgR, (1. + cr)*tgR);
+      PetscReal il = std::min((1. - cr)*tgI, (1. + cr)*tgI);
+      PetscReal ir = std::max((1. - cr)*tgI, (1. + cr)*tgI);
+      PetscCallVoid(RGIntervalSetEndpoints(rg, rl, rr, il, ir));
+
+      // Use MUMPS
+      //if (this->mcUseMumps)
+      if (false)
       {
-         PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_REAL));
+         PetscInt nsolve;
+         KSP *ksp;
+         PetscCallVoid(EPSCISSGetKSPs(this->mEps, &nsolve, &ksp));
+         for(int i = 0; i < nsolve; i++)
+         {
+            PC pc;
+            PetscCallVoid(KSPSetType(ksp[i], KSPPREONLY));
+            PetscCallVoid(KSPGetPC(ksp[i], &pc));
+            PetscCallVoid(PCSetType(pc, PCLU));
+            PetscCallVoid(PCFactorSetMatSolverType(pc, MATSOLVERMUMPS));
+            // next line is required to force the creation of the ST operator and
+            // its passing to KSP */
+            PetscCallVoid(STGetOperator(st, NULL));
+            PetscCallVoid(PCFactorSetUpMatSolverType(pc));
+            // Example to show how to pass additional options to Mumps solver:
+            //Mat K;
+            //PetscCallVoid(PCFactorGetMatrix(pc, &K));
+            //PetscCallVoid(MatMumpsSetIcntl(K, 14, 50)); // Memory increase
+            // PetscCallVoid(MatMumpsSetCntl(K,3,1e-12)); // Zero pivot detection
+         }
       }
-      else if (this->mTarget.real() == 0)
-      {
-         PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_IMAGINARY));
-      }
-      else
-      {
-         PetscCallVoid(EPSSetWhichEigenpairs(this->mEps, EPS_TARGET_MAGNITUDE));
-      }
+   }
+   else
+   {
+      throw std::logic_error("Unknown eigensolver type");
    }
 
    // Solve eigensystem

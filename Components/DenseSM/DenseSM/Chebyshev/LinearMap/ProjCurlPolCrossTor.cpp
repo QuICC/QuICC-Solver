@@ -12,6 +12,7 @@
 
 // Project includes
 //
+#include "DenseSM/Utils.hpp"
 #include "DenseSM/Chebyshev/LinearMap/ProjCurlPolCrossTor.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RpDivR1F.hpp"
 #include "DenseSM/Chebyshev/LinearMap/IqRpDivR1F.hpp"
@@ -84,7 +85,7 @@ ProjCurlPolCrossTor::ProjCurlPolCrossTor(const int nNr, const int nNc,
       throw std::logic_error("One of the radial functions should be null");
    }
 
-   this->mIsZero = (this->elsasser(this->mLa, this->mMa, this->mLb, this->mMb,
+   this->mIsZero = (Utils::elsasser(this->mLa, this->mMa, this->mLb, this->mMb,
                        this->mLout, this->mMout) == 0);
 }
 
@@ -98,7 +99,7 @@ void ProjCurlPolCrossTor::buildOpImpl(Internal::Matrix& mat, const int rows,
    const Internal::MHDFloat L2a = static_cast<Internal::MHDFloat>(la * (la + 1));
 
    const MHDFloat Labg =
-      this->elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
+      Utils::elsasser(la, this->mMa, lb, this->mMb, lg, this->mMout);
 
    Internal::MHDFloat c = L2a;
 
