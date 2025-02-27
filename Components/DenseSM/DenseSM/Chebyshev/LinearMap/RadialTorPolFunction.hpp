@@ -14,7 +14,6 @@
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Typedefs.hpp"
 #include "Types/Internal/Typedefs.hpp"
-#include "QuICC/Equations/EquationParameters.hpp"
 
 namespace QuICC {
 
@@ -67,11 +66,6 @@ public:
    virtual Array evaluateDiff(const int p, const Internal::Array& r, const int l,
       const int m, const Internal::MHDFloat lb, const Internal::MHDFloat ub) const;
    
-   /**
-    * @brief Set additional parameters to the TorPolFunction
-    */
-   virtual void initParams(const QuICC::Equations::EquationParameters& eqParams);
-
 protected:
 private:
 };

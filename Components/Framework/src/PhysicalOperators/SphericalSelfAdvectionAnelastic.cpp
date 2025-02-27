@@ -67,9 +67,7 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
-      pF->initParams(eqParams);
       auto Rho       = pF->evaluate(r, 0, 0); 
-      //auto Rho       = pF->evaluate(r, 0, 0, eqParams); //overloaded version
       auto dLogRho   = pDF->evaluate(r, 0, 0);
 
       if(compId == FieldComponents::Physical::R)
