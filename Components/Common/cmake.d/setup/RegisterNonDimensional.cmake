@@ -16,6 +16,7 @@ set(tags
   Ekman
   Elevator
   Elsasser
+  EosType
   Epsilon
   Eta
   FastMean
@@ -37,6 +38,7 @@ set(tags
   ModifiedElsasser
   Mu
   Nev
+  Npoly
   Nrho
   Nu
   Omega
@@ -63,6 +65,7 @@ set(tags
   Upper2d
   Upper3d
   Upsilon
+  ViscType
   Xi
   Zeta
 )
