@@ -27,13 +27,13 @@ using namespace QuICC::Operator;
 /// @tparam Tout
 /// @tparam Tin
 template <class Tout, class Tin, class Perm>
-class Op : public UnaryBaseOp<Op<Tout, Tin, Perm>, Tout, Tin>
+class OpGrouped : public UnaryBaseOp<OpGrouped<Tout, Tin, Perm>, Tout, Tin>
 {
 public:
    /// @brief default constructor
-   Op() = default;
+   OpGrouped() = default;
    /// @brief dtor
-   ~Op() = default;
+   ~OpGrouped() = default;
 
 private:
    /// @brief action implementation
@@ -41,20 +41,27 @@ private:
    /// @param in input View
    void applyImpl(Tout& out, const Tin& in);
    /// @brief give access to base class
-   friend UnaryBaseOp<Op<Tout, Tin, Perm>, Tout, Tin>;
+   friend UnaryBaseOp<OpGrouped<Tout, Tin, Perm>, Tout, Tin>;
 };
 
 template <class Tout, class Tin, class Perm>
-void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
+void OpGrouped<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 {
+   assert(out.size() == in.size());
    Profiler::RegionFixture<4> fix("Transpose::Cpu::applyImpl");
    if constexpr (std::is_same_v<Perm, p201_t>)
    {
-      details::implPerm201(out, in);
+      for (std::size_t i = 0; i < in.size(); ++i)
+      {
+         details::implPerm201(out[i], in[i]);
+      }
    }
    else if constexpr (std::is_same_v<Perm, p120_t>)
    {
-      details::implPerm120(out, in);
+      for (std::size_t i = 0; i < in.size(); ++i)
+      {
+         details::implPerm120(out[i], in[i]);
+      }
    }
    else
    {

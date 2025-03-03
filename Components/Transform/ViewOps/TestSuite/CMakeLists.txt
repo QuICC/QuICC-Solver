@@ -263,6 +263,23 @@ add_test(
     "${QUICC_WORK_DIR}"
 )
 
+add_executable(ViewTransposeGroupedTest
+    ViewTransposeGroupedTests.cpp
+)
+
+target_link_libraries(ViewTransposeGroupedTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewTransposeGroupedTest
+    COMMAND ViewTransposeGroupedTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
 # Mpi
 if(QUICC_USE_MPI)
     add_executable(ViewTransposeMpiTest

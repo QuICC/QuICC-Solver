@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include "Graph/Shims/MlirShims.hpp"
+#include "ViewOps/Transpose/Op.hpp"
+#include "ViewOps/Transpose/Cpu/OpGrouped.hpp"
 #include "Graph/Types.hpp"
 #include "ViewOps/Transpose/Op.hpp"
 
@@ -54,6 +56,52 @@ _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj,
    auto cl = reinterpret_cast<op_t*>(obj);
    cl->apply(viewOut, viewIn);
 };
+
+extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_DCCSC3D_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj, view3_cd_t* pOut0, view3_cd_t* pOut1, const view3_cd_t* pIn0, const view3_cd_t* pIn1)
+{
+    #ifndef NDEBUG
+    std::cout <<
+        "_ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_DCCSC3D_complexf64_DCCSC3D_complexf64_DCCSC3D\n";
+    #endif
+    assert(obj != nullptr);
+    assert(pIn0 != nullptr);
+    assert(pIn1 != nullptr);
+    assert(pOut0 != nullptr);
+    assert(pOut1 != nullptr);
+    assert(pIn0->dataSize >= pOut0->dataSize); // Input might be padded
+    assert(pIn1->dataSize >= pOut1->dataSize); // Input might be padded
+    // op
+    #ifdef QUICC_MPI
+    using namespace QuICC::Transpose::Mpi;
+    #else
+    using namespace QuICC::Transpose::Cpu;
+    #endif
+    using namespace QuICC::Transpose;
+    using Tin = std::vector<C_DCCSC3D_t>;
+    using Tout = std::vector<C_DCCSC3D_t>;
+    using op_t = OpGrouped<Tout, Tin, p201_t>;
+    // views
+    using namespace QuICC::View;
+    constexpr std::uint32_t rank = 3;
+    ViewBase<std::uint32_t> pointersIn[rank];
+    pointersIn[1] = ViewBase<std::uint32_t>(pIn0->pos, pIn0->posSize);
+    ViewBase<std::uint32_t> indicesIn[rank];
+    indicesIn[1] = ViewBase<std::uint32_t>(pIn0->coo, pIn0->cooSize);
+    ViewBase<std::uint32_t> pointersOut[rank];
+    pointersOut[1] = ViewBase<std::uint32_t>(pOut0->pos, pOut0->posSize);
+    ViewBase<std::uint32_t> indicesOut[rank];
+    indicesOut[1] = ViewBase<std::uint32_t>(pOut0->coo, pOut0->cooSize);
+    std::uint32_t lds = pIn0->dataSize / pIn0->cooSize;
+    Tin::value_type viewIn0(pIn0->data, pIn0->dataSize, pIn0->dims, pointersIn, indicesIn, lds);
+    Tin::value_type viewIn1(pIn1->data, pIn1->dataSize, pIn1->dims, pointersIn, indicesIn, lds);
+    std::vector<C_DCCSC3D_t> viewIns = {viewIn0, viewIn1};
+    Tout::value_type viewOut0(pOut0->data, pOut0->dataSize, pOut0->dims, pointersOut, indicesOut);
+    Tout::value_type viewOut1(pOut1->data, pOut1->dataSize, pOut1->dims, pointersOut, indicesOut);
+    std::vector<C_DCCSC3D_t> viewOuts = {viewOut0, viewOut1};
+    // call
+    auto cl = reinterpret_cast<op_t*>(obj);
+    cl->apply(viewOuts, viewIns);
+}
 
 #ifdef QUICC_HAS_CUDA_BACKEND
 /// @brief C Interface to MLIR for a transpose operator
@@ -252,6 +300,10 @@ _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_S1CLCSC3D(void* obj,
    auto cl = reinterpret_cast<op_t*>(obj);
    cl->apply(viewOut, viewIn);
 };
+
+extern "C" void _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_DCCSC3D_complexf64_S1CLCSC3D_complexf64_S1CLCSC3D(void* obj, view3_cd_t* pOut0, view3_cd_t* pOut1, const view3_cd_t* pIn0, const view3_cd_t* pIn1) {
+
+}
 
 #ifdef QUICC_HAS_CUDA_BACKEND
 /// @brief C Interface to MLIR for a transpose operator
