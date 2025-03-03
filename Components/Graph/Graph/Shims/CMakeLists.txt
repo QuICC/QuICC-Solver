@@ -55,6 +55,7 @@ include(ConfigJW.cmake)
 include(ConfigPointwise.cmake)
 include(ConfigMulConst.cmake)
 include(ConfigCross.cmake)
+include(ConfigTranspose.cmake)
 
 # Alias
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}${QUICC_CURRENT_SUBCOMPONENT_LIB}
