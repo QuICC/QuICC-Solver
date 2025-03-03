@@ -37,7 +37,7 @@ include(FetchRepository)
 
 quicc_set_default_git_branch(BoussinesqSphereDynamo BRANCH "v1.15.1" TYPE Model)
 quicc_set_default_git_branch(BoussinesqShellDynamo BRANCH "v1.13.2" TYPE Model)
-quicc_set_default_git_branch(BoussinesqSphereRTC BRANCH "v1.19.1" TYPE Model)
+quicc_set_default_git_branch(BoussinesqSphereRTC BRANCH "split_tools" TYPE Model)
 quicc_set_default_git_branch(BoussinesqShellRTC BRANCH "v1.15.1" TYPE Model)
 quicc_set_default_git_branch(BoussinesqSphereTC BRANCH "v1.15.0" TYPE Model)
 quicc_set_default_git_branch(BoussinesqShellTC BRANCH "v1.12.1" TYPE Model)
