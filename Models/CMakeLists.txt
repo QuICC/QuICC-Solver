@@ -31,10 +31,9 @@
 #    Git repository branch to be used for a specific model (default: QUICC_MODEL_GIT_BRANCH)
 #
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.d")
-
 include(FetchRepository)
 
+# Default branch for main models
 quicc_set_default_git_branch(BoussinesqSphereDynamo BRANCH "v1.15.1" TYPE Model)
 quicc_set_default_git_branch(BoussinesqShellDynamo BRANCH "v1.13.2" TYPE Model)
 quicc_set_default_git_branch(BoussinesqSphereRTC BRANCH "split_tools" TYPE Model)

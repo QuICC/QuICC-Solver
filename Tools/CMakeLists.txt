@@ -31,11 +31,9 @@
 #    Git repository branch to be used for a specific tool (default: QUICC_TOOL_GIT_BRANCH)
 #
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake.d")
-
 include(FetchRepository)
 
-# Default branch for known tools
+# Default branch for main tools
 quicc_set_default_git_branch("Simulation" BRANCH "dev" TYPE "Tool")
 quicc_set_default_git_branch("Stability" BRANCH "dev" TYPE "Tool")
 
