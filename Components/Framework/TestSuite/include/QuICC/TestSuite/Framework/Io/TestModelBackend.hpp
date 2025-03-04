@@ -163,7 +163,8 @@ protected:
     * @param isSplitOperator  Is second operator of split 4th order system?
     */
    void applyTau(SparseMatrix& mat, const SpectralFieldId& rowId,
-      const SpectralFieldId& colId, const int l, const Resolution& res,
+      const SpectralFieldId& colId, const int l,
+      std::shared_ptr<QuICC::Model::details::BlockOptions> opts, const Resolution& res,
       const BcMap& bcs, const NonDimensional::NdMap& nds,
       const bool isSplitOperator) const override {};
 
@@ -181,8 +182,8 @@ protected:
     */
    void applyGalerkinStencil(SparseMatrix& decMat, const SpectralFieldId& rowId,
       const SpectralFieldId& colId, const int lr, const int lc,
-      const Resolution& res, const BcMap& bcs,
-      const NonDimensional::NdMap& nds) const override {};
+      std::shared_ptr<QuICC::Model::details::BlockOptions> opts, const Resolution& res,
+      const BcMap& bcs, const NonDimensional::NdMap& nds) const override {};
 
 private:
    /**
