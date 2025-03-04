@@ -1276,6 +1276,55 @@ def i2y1d1y1_diags(ny, lower, upper):
     diags, offsets = utils.build_diagonals(ns, nzrow, ds, offsets)
     return (diags, offsets)
 
+def i2y2d1y1_diags(ny, lower, upper):
+    """Create operator for I^2 y^2 D(y f(y)) dy"""
+
+    ns = np.arange(0, ny)
+    offsets = np.arange(-3,4)
+    nzrow = 1
+
+    a, b = linear_map(lower, upper)
+
+    # Generate 4rd subdiagonal
+    def d_4(n):
+        return a**4*(n - 3)/(16*n*(n - 1))
+
+    # Generate 3rd subdiagonal
+    def d_3(n):
+        return a**3*b*(3*n - 7)/(8*n*(n - 1))
+
+    # Generate 2nd subdiagonal
+    def d_2(n):
+        return a**2*(a**2*n**2 - 3*a**2 + 6*b**2*n**2 - 4*b**2*n - 10*b**2)/(8*n*(n - 1)*(n + 1))
+
+    # Generate 1st subdiagonal
+    def d_1(n):
+        return -a*b*(3*a**2*n - 7*a**2 + 4*b**2*n - 4*b**2)/(8*n*(n - 1))
+
+    # Generate main diagonal
+    def d0(n):
+        return a**2*(a**2 + 4*b**2)/(4*(n - 1)*(n + 1))
+
+    # Generate 1st superdiagonal
+    def d1(n):
+        return -a*b*(3*a**2*n - 7*a**2 + 4*b**2*n - 4*b**2)/(8*n*(n - 1))
+
+    # Generate 2nd superdiagonal
+    def d2(n):
+        return -a**2*(a**2*n**2 - 3*a**2 + 6*b**2*n**2 + 4*b**2*n - 10*b**2)/(8*n*(n - 1)*(n + 1))
+
+    # Generate 3rd superdiagonal
+    def d3(n):
+        return -a**3*b*(3*n + 7)/(8*n*(n + 1))
+    
+    # Generate 4rd superdiagonal
+    def d4(n):
+        return -a**4*(n + 3)/(16*n*(n + 1))
+
+    ds = [d_4, d_3, d_2, d_1, d0, d1, d2, d3, d4]
+    diags, offsets = utils.build_diagonals(ns, nzrow, ds, offsets)
+    return (diags, offsets)
+
 def i2y2d1_diags(ny, lower, upper):
     """Create operator for I^2 y^2 D f(y) dy"""
 

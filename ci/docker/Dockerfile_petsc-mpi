@@ -1,0 +1,19 @@
+ARG BASEIMAGE
+FROM $BASEIMAGE
+
+COPY . /QuICC.src
+
+RUN mkdir -p /QuICC.src/build \
+  && cd /QuICC.src/build \
+  && cmake .. -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE \
+    -DQUICC_MPI_CI=ON \
+    -DQUICC_USE_MPI=ON \
+    -DCMAKE_CXX_FLAGS="-march=broadwell" \
+    -DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
+    -DQUICC_PROFILE_LEVEL=4 \
+    -DQUICC_PROFILE_BACKEND=native \
+    -DQUICC_PROFILE_NATIVE_SAMPLE=500 \
+    -DPETSC_DIR=/opt/view \
+    -DSLEPC_DIR=/opt/view \
+  && make -j $(grep processor /proc/cpuinfo | wc -l)

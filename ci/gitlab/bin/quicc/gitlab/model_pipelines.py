@@ -83,6 +83,28 @@ class test_model(base_model):
                 ]
             )
 
+"""Extend base class to test the stability models"""
+class stability_model(base_model):
+    def __init__(self, cnf):
+        super(stability_model, self).__init__(cnf)
+        self.actions.extend([self.stability_test_yaml])
+
+    def set_file_name(self):
+        self.file_name = '.quicc_petsc_models'
+
+    def stability_test_yaml(self):
+        # check before actually adding the test
+        if self.test:
+            self.config['.'+self.pipe_line_name]['script'].extend(
+                [
+                    # cannot run the mpi model through ctest within a srun command
+                    'cd '+self.model_path+'/build/Models/'+self.model_name+'/TestSuite/Stability/_data/'+self.full_tag,
+                    self.model_path+'/build/Models/'+self.model_name+'/Executables/'+self.config_name+'Stability',
+                    'cd '+self.model_path+'/build',
+                    '/QuICC.src/ci/gitlab/bin/mpi_lock.sh \"ctest --no-tests=error --verbose -R ValidateStabilityBenchmark'+self.config_name+'Stability'+self.variant_extension+'$ && echo ${QUICC_VERSION_TAG}\"'
+                ]
+            )
+
 """Extend base class to time the models"""
 class perf_model(base_model):
     def __init__(self, cnf):

@@ -31,6 +31,7 @@
 #include "QuICC/Transform/Path/I2CurlNl.hpp"
 #include "QuICC/Transform/Path/I2CurlCurlNl.hpp"
 #include "QuICC/Transform/Path/NegI2CurlCurlNl.hpp"
+#include "QuICC/Transform/Path/NegI2rCurlCurlNl.hpp"
 #include "QuICC/Transform/Path/NegI4CurlCurlNl.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/Pol.hpp"
@@ -43,6 +44,8 @@
 #include "QuICC/Transform/Forward/I4S.hpp"
 #include "QuICC/Transform/Forward/I2Q.hpp"
 #include "QuICC/Transform/Forward/I2S.hpp"
+#include "QuICC/Transform/Forward/I2rQ.hpp"
+#include "QuICC/Transform/Forward/I2rS.hpp"
 #include "QuICC/Transform/Forward/I2T.hpp"
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/Overr1.hpp"
@@ -244,6 +247,26 @@ namespace Transform {
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
             transform.back().addEdge(Forward::I2S::id(), curlcurlId, Arithmetics::Add::id());
+         }
+         // Integrate for standard second order spherical equation with negative sign and an additional factor of r
+         else if(curlcurlFlag == Path::NegI2rCurlCurlNl::id())
+         {
+            // Compute curlcurl Q component
+            transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::I2rQ::id(), curlcurlId, Arithmetics::Sub::id());
+
+            // Compute curlcurl S component
+            transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::OverlaplhD1::id());
+            transform.back().addEdge(Forward::I2rS::id(), curlcurlId, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
+            transform.back().addEdge(Forward::P::id());
+            transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
+            transform.back().addEdge(Forward::I2rS::id(), curlcurlId, Arithmetics::Add::id());
          }
          // Integrate for second order spherical equation
          else if(curlcurlFlag == Path::I2CurlCurlNl::id())

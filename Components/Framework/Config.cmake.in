@@ -25,6 +25,10 @@ set(QUICC_USE_VKFFT @QUICC_USE_VKFFT@
   CACHE BOOL "This is set by the framework" FORCE)
 set(QUICC_USE_PFSOLVE @QUICC_USE_PFSOLVE@
   CACHE BOOL "This is set by the framework" FORCE)
+set(QUICC_HAVE_SLEPC @QUICC_HAVE_SLEPC@
+  CACHE BOOL "This is set by the framework" FORCE)
+set(QUICC_HAVE_STABILITY_SOLVER @QUICC_HAVE_STABILITY_SOLVER@
+  CACHE BOOL "This is set by the framework" FORCE)
 
 # Hide them since they should not be changed
 mark_as_advanced(FORCE
@@ -36,6 +40,8 @@ mark_as_advanced(FORCE
   QUICC_USE_KOKKOS
   QUICC_USE_KOKKOS_CUDA
   QUICC_USE_KOKKOS_KERNELS
+  QUICC_HAVE_SLEPC
+  QUICC_HAVE_STABILITY_SOLVER
 )
 
 # Find dependencies
