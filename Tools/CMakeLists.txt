@@ -12,7 +12,7 @@
 # The following variables affect the behaviour:
 #
 # QUICC_TOOL
-#    List of tools to be built (default: )
+#    List of tools to be built (default: Simulation)
 #    Note that the list is treated as case insensitive (due to GitHub limitation)
 #    The case-ness of the first tool registration is retained for the path
 #
@@ -37,7 +37,7 @@ include(FetchRepository)
 quicc_set_default_git_branch("Simulation" BRANCH "dev" TYPE "Tool")
 quicc_set_default_git_branch("Stability" BRANCH "dev" TYPE "Tool")
 
-set(QUICC_TOOL CACHE STRING "List of Tools to build.")
+set(QUICC_TOOL "Simulation" CACHE STRING "List of Tools to build.")
 message(DEBUG "QUICC_TOOL: ${QUICC_TOOL}")
 
 foreach(_tool ${QUICC_TOOL})
