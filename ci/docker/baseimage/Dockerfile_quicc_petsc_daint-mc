@@ -1,0 +1,35 @@
+# Depend on CSCS official spack base container helpers
+FROM docker.io/finkandreas/spack:0.20.2-ubuntu22.04 as builder
+
+ARG NUM_PROCS=16
+
+# Performance tests require at least reframe@4.3.0
+RUN spack-install-helper \
+    daint-mc \
+    fftw \
+    hdf5 \
+    cmake \
+    openblas \
+    "boost@1.78.0" \
+    py-scipy \
+    kokkos-kernels \
+    "reframe@develop" \
+    "petsc +complex +mumps" \
+    slepc
+
+
+# Bare OS image to run the installed executables
+FROM docker.io/finkandreas/spack:base-ubuntu22.04
+
+# it is important to keep the paths, otherwise your installation is broken
+# all these paths are created with the above `spack-install-helper` invocation
+COPY --from=builder /opt/spack-environment /opt/spack-environment
+COPY --from=builder /opt/software /opt/software
+COPY --from=builder /opt/._view /opt/._view
+COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
+
+RUN fix_spack_install
+
+RUN apt-get -yqq update && apt-get -yqq upgrade \
+ && apt-get -yqq install build-essential git gcc g++ gfortran vim less \
+ && rm -rf /var/lib/apt/lists/*

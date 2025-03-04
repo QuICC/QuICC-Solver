@@ -28,3 +28,4 @@ RUN mkdir -p /QuICC.src/build \
     -DQUICC_TESTSUITE_FRAMEWORK=ON \
     -DQUICC_TESTSUITE_PYQUICC=ON \
   && make -j $(grep processor /proc/cpuinfo | wc -l)
+

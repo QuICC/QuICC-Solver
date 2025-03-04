@@ -3,7 +3,6 @@
 
 #include "Types/BasicTypes.hpp"
 #include "Types/Math.hpp"
-#include "Types/MP/BasicTypes.hpp"
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Math.hpp"
 #include "Types/Internal/Literals.hpp"

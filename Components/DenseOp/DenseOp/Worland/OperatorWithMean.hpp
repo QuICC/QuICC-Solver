@@ -4,8 +4,8 @@
  * operator with different treatment for the mean (l=0)
  */
 
-#ifndef QUICC_DENSESM_WORLAND_OPERATORWITHMEAN_HPP
-#define QUICC_DENSESM_WORLAND_OPERATORWITHMEAN_HPP
+#ifndef QUICC_DENSEOP_WORLAND_OPERATORWITHMEAN_HPP
+#define QUICC_DENSEOP_WORLAND_OPERATORWITHMEAN_HPP
 
 // System includes
 //
@@ -13,20 +13,20 @@
 
 // Project includes
 //
-#include "DenseSM/IDenseSMOperator.hpp"
+#include "DenseOp/IDenseOpOperator.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
-namespace DenseSM {
+namespace DenseOp {
 namespace Worland {
 
 /// @brief Wrapper for generic Worland operator with different treatment for l=0
 /// @tparam TPolyBuilder builder for l!=0
 /// @tparam TZeroBuilder builder for l=0
 template <class TPolyBuilder, class TZeroBuilder = void>
-class OperatorWithMean : IDenseSMOperator
+class OperatorWithMean : IDenseOpOperator
 {
 public:
    /// @brief Pass-by-value polynomial builder ctor
@@ -81,7 +81,7 @@ void OperatorWithMean<TPolyBuilder, TZeroBuilder>::compute(
 
 
 } // namespace Worland
-} // namespace DenseSM
+} // namespace DenseOp
 } // namespace QuICC
 
-#endif // define QUICC_DENSESM_WORLAND_OPERATORWITHMEAN_HPP
+#endif // define QUICC_DENSEOP_WORLAND_OPERATORWITHMEAN_HPP

@@ -10,10 +10,10 @@
 
 // Project includes
 //
-#include "DenseSM/Worland/Operator.hpp"
-#include "DenseSM/Worland/OperatorIN.hpp"
-#include "DenseSM/Worland/OperatorINWithMean.hpp"
-#include "DenseSM/Worland/OperatorWithMean.hpp"
+#include "DenseOp/Worland/Operator.hpp"
+#include "DenseOp/Worland/OperatorIN.hpp"
+#include "DenseOp/Worland/OperatorINWithMean.hpp"
+#include "DenseOp/Worland/OperatorWithMean.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 #include "QuICC/Polynomial/Worland/claplhWnl.hpp"
@@ -66,7 +66,7 @@ using namespace QuICC::Polynomial::Worland;
 template <class VOP, class DIR> struct OpsBuilderMap<VOP, P_t, DIR>
 {
    using type =
-      Worland::Builder<VOP, QuICC::DenseSM::Worland::Operator<Wnl>, DIR>;
+      Worland::Builder<VOP, QuICC::DenseOp::Worland::Operator<Wnl>, DIR>;
 };
 
 /// @brief D1 Builder
@@ -75,7 +75,7 @@ template <class VOP, class DIR> struct OpsBuilderMap<VOP, P_t, DIR>
 template <class VOP, class DIR> struct OpsBuilderMap<VOP, D1_t, DIR>
 {
    using type =
-      Worland::Builder<VOP, QuICC::DenseSM::Worland::Operator<dWnl>, DIR>;
+      Worland::Builder<VOP, QuICC::DenseOp::Worland::Operator<dWnl>, DIR>;
 };
 
 /// @brief D1R1 Builder
@@ -84,7 +84,7 @@ template <class VOP, class DIR> struct OpsBuilderMap<VOP, D1_t, DIR>
 template <class VOP> struct OpsBuilderMap<VOP, D1R1_t, bwd_t>
 {
    using type =
-      Worland::Builder<VOP, QuICC::DenseSM::Worland::Operator<drWnl>, bwd_t>;
+      Worland::Builder<VOP, QuICC::DenseOp::Worland::Operator<drWnl>, bwd_t>;
 };
 
 /// @brief D1_P Builder
@@ -93,7 +93,7 @@ template <class VOP> struct OpsBuilderMap<VOP, D1R1_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, D1_P_t, bwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<dWnl, Wnl>, bwd_t>;
+      QuICC::DenseOp::Worland::OperatorWithMean<dWnl, Wnl>, bwd_t>;
 };
 
 /// @brief DivR1 Builder
@@ -102,7 +102,7 @@ template <class VOP> struct OpsBuilderMap<VOP, D1_P_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, DivR1_t, bwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::Operator<r_1Wnl<recurrence_t>>, bwd_t>;
+      QuICC::DenseOp::Worland::Operator<r_1Wnl<recurrence_t>>, bwd_t>;
 };
 
 /// @brief DivR1_Zero Builder
@@ -111,7 +111,7 @@ template <class VOP> struct OpsBuilderMap<VOP, DivR1_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, DivR1_Zero_t, bwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<r_1Wnl<recurrence_t>, void>,
+      QuICC::DenseOp::Worland::OperatorWithMean<r_1Wnl<recurrence_t>, void>,
       bwd_t>;
 };
 
@@ -121,7 +121,7 @@ template <class VOP> struct OpsBuilderMap<VOP, DivR1_Zero_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, DivR1_Zero_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<r_1Wnl<implicit_t>, void>,
+      QuICC::DenseOp::Worland::OperatorWithMean<r_1Wnl<implicit_t>, void>,
       fwd_t>;
 };
 
@@ -131,7 +131,7 @@ template <class VOP> struct OpsBuilderMap<VOP, DivR1_Zero_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, DivR1D1R1_t, bwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::Operator<r_1drWnl<recurrence_t>>, bwd_t>;
+      QuICC::DenseOp::Worland::Operator<r_1drWnl<recurrence_t>>, bwd_t>;
 };
 
 /// @brief DivR1D1R1_Zero Builder
@@ -140,7 +140,7 @@ template <class VOP> struct OpsBuilderMap<VOP, DivR1D1R1_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, DivR1D1R1_Zero_t, bwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<r_1drWnl<recurrence_t>, void>,
+      QuICC::DenseOp::Worland::OperatorWithMean<r_1drWnl<recurrence_t>, void>,
       bwd_t>;
 };
 
@@ -150,7 +150,7 @@ template <class VOP> struct OpsBuilderMap<VOP, DivR1D1R1_Zero_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, DivR1D1R1_Zero_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<r_1drWnl<implicit_t>, void>,
+      QuICC::DenseOp::Worland::OperatorWithMean<r_1drWnl<implicit_t>, void>,
       fwd_t>;
 };
 
@@ -160,7 +160,7 @@ template <class VOP> struct OpsBuilderMap<VOP, DivR1D1R1_Zero_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, SphLapl_t, bwd_t>
 {
    using type =
-      Worland::Builder<VOP, QuICC::DenseSM::Worland::Operator<slaplWnl>, bwd_t>;
+      Worland::Builder<VOP, QuICC::DenseOp::Worland::Operator<slaplWnl>, bwd_t>;
 };
 
 /// @brief CylLaplh Builder
@@ -169,7 +169,7 @@ template <class VOP> struct OpsBuilderMap<VOP, SphLapl_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, CylLaplh_t, bwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::Operator<claplhWnl>, bwd_t>;
+      QuICC::DenseOp::Worland::Operator<claplhWnl>, bwd_t>;
 };
 
 /// @brief CylLaplh_DivR1D1R1 Builder
@@ -178,7 +178,7 @@ template <class VOP> struct OpsBuilderMap<VOP, CylLaplh_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, CylLaplh_DivR1D1R1_t, bwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<claplhWnl,
+      QuICC::DenseOp::Worland::OperatorWithMean<claplhWnl,
          r_1drWnl<recurrence_t>>,
       bwd_t>;
 };
@@ -189,7 +189,7 @@ template <class VOP> struct OpsBuilderMap<VOP, CylLaplh_DivR1D1R1_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, D1CylLaplh_t, bwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::Operator<dclaplhWnl>, bwd_t>;
+      QuICC::DenseOp::Worland::Operator<dclaplhWnl>, bwd_t>;
 };
 
 /// @brief D1CylLaplh_D1DivR1D1R1 Builder
@@ -198,7 +198,7 @@ template <class VOP> struct OpsBuilderMap<VOP, D1CylLaplh_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, D1CylLaplh_D1DivR1D1R1_t, bwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<dclaplhWnl, dr_1drWnl>, bwd_t>;
+      QuICC::DenseOp::Worland::OperatorWithMean<dclaplhWnl, dr_1drWnl>, bwd_t>;
 };
 
 /// @brief DivR1CylLaplh_Zero Builder
@@ -207,7 +207,7 @@ template <class VOP> struct OpsBuilderMap<VOP, D1CylLaplh_D1DivR1D1R1_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, DivR1CylLaplh_Zero_t, bwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<r_1claplhWnl, void>, bwd_t>;
+      QuICC::DenseOp::Worland::OperatorWithMean<r_1claplhWnl, void>, bwd_t>;
 };
 
 /// @brief P_Zero Builder
@@ -216,7 +216,7 @@ template <class VOP> struct OpsBuilderMap<VOP, DivR1CylLaplh_Zero_t, bwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, P_Zero_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<Wnl, void>, fwd_t>;
+      QuICC::DenseOp::Worland::OperatorWithMean<Wnl, void>, fwd_t>;
 };
 
 /// @brief R1_Zero Builder
@@ -225,7 +225,7 @@ template <class VOP> struct OpsBuilderMap<VOP, P_Zero_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, R1_Zero_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<rWnl, void>, fwd_t>;
+      QuICC::DenseOp::Worland::OperatorWithMean<rWnl, void>, fwd_t>;
 };
 
 /// @brief I2 Builder
@@ -234,7 +234,7 @@ template <class VOP> struct OpsBuilderMap<VOP, R1_Zero_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, I2_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorIN<Wnl, ::QuICC::SparseSM::Worland::I2>,
+      QuICC::DenseOp::Worland::OperatorIN<Wnl, ::QuICC::SparseSM::Worland::I2>,
       fwd_t>;
 };
 /// @brief I2_Zero Builder
@@ -243,7 +243,7 @@ template <class VOP> struct OpsBuilderMap<VOP, I2_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, I2_Zero_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorINWithMean<Wnl,
+      QuICC::DenseOp::Worland::OperatorINWithMean<Wnl,
          ::QuICC::SparseSM::Worland::I2>,
       fwd_t>;
 };
@@ -254,7 +254,7 @@ template <class VOP> struct OpsBuilderMap<VOP, I2_Zero_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, I2DivR1_Zero_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorINWithMean<r_1Wnl<implicit_t>,
+      QuICC::DenseOp::Worland::OperatorINWithMean<r_1Wnl<implicit_t>,
          ::QuICC::SparseSM::Worland::I2>,
       fwd_t>;
 };
@@ -265,7 +265,7 @@ template <class VOP> struct OpsBuilderMap<VOP, I2DivR1_Zero_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, I4DivR1_Zero_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorINWithMean<r_1Wnl<implicit_t>,
+      QuICC::DenseOp::Worland::OperatorINWithMean<r_1Wnl<implicit_t>,
          ::QuICC::SparseSM::Worland::I4>,
       fwd_t>;
 };
@@ -276,7 +276,7 @@ template <class VOP> struct OpsBuilderMap<VOP, I4DivR1_Zero_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, I6DivR1_Zero_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorINWithMean<r_1Wnl<implicit_t>,
+      QuICC::DenseOp::Worland::OperatorINWithMean<r_1Wnl<implicit_t>,
          ::QuICC::SparseSM::Worland::I6>,
       fwd_t>;
 };
@@ -287,7 +287,7 @@ template <class VOP> struct OpsBuilderMap<VOP, I6DivR1_Zero_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, I2DivR1D1R1_Zero_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorINWithMean<r_1drWnl<implicit_t>,
+      QuICC::DenseOp::Worland::OperatorINWithMean<r_1drWnl<implicit_t>,
          ::QuICC::SparseSM::Worland::I2>,
       fwd_t>;
 };
@@ -298,7 +298,7 @@ template <class VOP> struct OpsBuilderMap<VOP, I2DivR1D1R1_Zero_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, I4DivR1D1R1_Zero_t, fwd_t>
 {
    using type = Worland::Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorINWithMean<r_1drWnl<implicit_t>,
+      QuICC::DenseOp::Worland::OperatorINWithMean<r_1drWnl<implicit_t>,
          ::QuICC::SparseSM::Worland::I4>,
       fwd_t>;
 };
@@ -319,8 +319,8 @@ template <class VOP> struct EnergyHelperMap<VOP, Energy_t>
    {
       Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
          Polynomial::Worland::worland_sphenergy_t::DBETA, -1);
-      QuICC::DenseSM::Worland::OperatorWithMean<Wnl, void> denseBuilder(fWnl);
-      Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<Wnl, void>, fwd_t>
+      QuICC::DenseOp::Worland::OperatorWithMean<Wnl, void> denseBuilder(fWnl);
+      Builder<VOP, QuICC::DenseOp::Worland::OperatorWithMean<Wnl, void>, fwd_t>
          tBuilderFwd(denseBuilder);
       tBuilderFwd.compute(opView, grid, weights);
    }
@@ -340,7 +340,7 @@ template <class VOP> struct OpsBuilderMap<VOP, Energy_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, Energy_t, bwd_t>
 {
    using type = Builder<VOP,
-      QuICC::DenseSM::Worland::Operator<
+      QuICC::DenseOp::Worland::Operator<
          r_1Wnl<QuICC::Polynomial::Worland::recurrence_t>>,
       bwd_t>;
 };
@@ -356,8 +356,8 @@ template <class VOP> struct EnergyHelperMap<VOP, EnergyD1R1_t>
    {
       Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
          Polynomial::Worland::worland_sphenergy_t::DBETA, -1);
-      QuICC::DenseSM::Worland::OperatorWithMean<Wnl, void> denseBuilder(fWnl);
-      Builder<VOP, QuICC::DenseSM::Worland::OperatorWithMean<Wnl, void>, fwd_t>
+      QuICC::DenseOp::Worland::OperatorWithMean<Wnl, void> denseBuilder(fWnl);
+      Builder<VOP, QuICC::DenseOp::Worland::OperatorWithMean<Wnl, void>, fwd_t>
          tBuilderFwd(denseBuilder);
       tBuilderFwd.compute(opView, grid, weights);
    }
@@ -377,7 +377,7 @@ template <class VOP> struct OpsBuilderMap<VOP, EnergyD1R1_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, EnergyD1R1_t, bwd_t>
 {
    using type = Builder<VOP,
-      QuICC::DenseSM::Worland::Operator<
+      QuICC::DenseOp::Worland::Operator<
          r_1drWnl<QuICC::Polynomial::Worland::recurrence_t>>,
       bwd_t>;
 };
@@ -393,8 +393,8 @@ template <class VOP> struct EnergyHelperMap<VOP, EnergyR2_t>
    {
       Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
          Polynomial::Worland::worland_sphenergy_t::DBETA, 0);
-      QuICC::DenseSM::Worland::Operator<Wnl> denseBuilder(fWnl);
-      Builder<VOP, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
+      QuICC::DenseOp::Worland::Operator<Wnl> denseBuilder(fWnl);
+      Builder<VOP, QuICC::DenseOp::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
          denseBuilder);
       tBuilderFwd.compute(opView, grid, weights);
    }
@@ -427,8 +427,8 @@ template <class VOP> struct EnergyHelperMap<VOP, EnergySLaplR2_t>
    {
       Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
          Polynomial::Worland::worland_sphenergy_t::DBETA, 0);
-      QuICC::DenseSM::Worland::Operator<Wnl> denseBuilder(fWnl);
-      Builder<VOP, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
+      QuICC::DenseOp::Worland::Operator<Wnl> denseBuilder(fWnl);
+      Builder<VOP, QuICC::DenseOp::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
          denseBuilder);
       tBuilderFwd.compute(opView, grid, weights);
    }
@@ -497,8 +497,8 @@ template <class VOP> struct EnergyHelperMap<VOP, RadialPower_t>
    {
       Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
          Polynomial::Worland::worland_sphenergy_t::DBETA, 0);
-      QuICC::DenseSM::Worland::Operator<Wnl> denseBuilder(fWnl);
-      Builder<VOP, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
+      QuICC::DenseOp::Worland::Operator<Wnl> denseBuilder(fWnl);
+      Builder<VOP, QuICC::DenseOp::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
          denseBuilder);
       tBuilderFwd.compute(opView, grid, weights);
    }
@@ -531,8 +531,8 @@ template <class VOP> struct EnergyHelperMap<VOP, RadialPowerDivR1_t>
    {
       Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
          Polynomial::Worland::worland_sphenergy_t::DBETA, 0);
-      QuICC::DenseSM::Worland::Operator<Wnl> denseBuilder(fWnl);
-      Builder<VOP, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
+      QuICC::DenseOp::Worland::Operator<Wnl> denseBuilder(fWnl);
+      Builder<VOP, QuICC::DenseOp::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
          denseBuilder);
       tBuilderFwd.compute(opView, grid, weights);
    }
@@ -565,8 +565,8 @@ template <class VOP> struct EnergyHelperMap<VOP, RadialPowerDivR1D1R1_t>
    {
       Wnl fWnl(Polynomial::Worland::worland_sphenergy_t::ALPHA,
          Polynomial::Worland::worland_sphenergy_t::DBETA, 0);
-      QuICC::DenseSM::Worland::Operator<Wnl> denseBuilder(fWnl);
-      Builder<VOP, QuICC::DenseSM::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
+      QuICC::DenseOp::Worland::Operator<Wnl> denseBuilder(fWnl);
+      Builder<VOP, QuICC::DenseOp::Worland::Operator<Wnl>, fwd_t> tBuilderFwd(
          denseBuilder);
       tBuilderFwd.compute(opView, grid, weights);
    }
@@ -586,7 +586,7 @@ template <class VOP> struct OpsBuilderMap<VOP, RadialPowerDivR1D1R1_t, fwd_t>
 template <class VOP> struct OpsBuilderMap<VOP, RadialPowerDivR1D1R1_t, bwd_t>
 {
    using type = Builder<VOP,
-      QuICC::DenseSM::Worland::OperatorWithMean<
+      QuICC::DenseOp::Worland::OperatorWithMean<
          r_1drWnl<QuICC::Polynomial::Worland::recurrence_t>, void>,
       bwd_t>;
 };
