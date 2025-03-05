@@ -63,7 +63,7 @@ struct PipelineOptions
     /// @brief Wrapper pass options
     mlir::quiccir::QuiccirViewWrapperOptions wrap;
     /// @brief Grouping pass options
-    mlir::quiccir::QuiccirTransposeGroupingOptions grouping{2};
+    mlir::quiccir::QuiccirTransposeGroupingOptions grouping{4};
 };
 
 /// @brief classe to setup and JIT the mlir graph

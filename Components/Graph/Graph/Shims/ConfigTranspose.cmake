@@ -12,7 +12,7 @@ set(Perms "201;120;201;120")
 # These 3 lists will be iterated over independently
 set(TypeIns "std::complex<double>")
 set(TypeOuts "std::complex<double>")
-set(GroupSizes "1;2")
+set(GroupSizes "1;2;3;4")
 
 # Configure Shims
 list(LENGTH Perms len)

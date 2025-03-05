@@ -173,9 +173,9 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
    _sendDisplsDevice = std::move(Memory::MemBlock<int>(_nSubComm*sendCountsMax , _mem.get()));
    _recvDisplsDevice = std::move(Memory::MemBlock<int>(_nSubComm*recvCountsMax, _mem.get()));
 
-   std::array<std::uint32_t, 2> sendDim {static_cast<std::uint32_t>(_nSubComm), sendCountsMax};
+   std::array<std::uint32_t, 2> sendDim {static_cast<std::uint32_t>(_nSubComm), static_cast<std::uint32_t>(sendCountsMax)};
    _sendDisplsView =  View::View<int, View::dense2DRM>({_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
-   std::array<std::uint32_t, 2> recvDim {static_cast<std::uint32_t>(_nSubComm), recvCountsMax};
+   std::array<std::uint32_t, 2> recvDim {static_cast<std::uint32_t>(_nSubComm), static_cast<std::uint32_t>(recvCountsMax)};
    _recvDisplsView =  View::View<int, View::dense2DRM>({_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
 
    // Linearize
