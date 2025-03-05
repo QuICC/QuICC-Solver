@@ -182,6 +182,14 @@ namespace QuICC {
       return id;
    }
 
+   int SimulationConfig::groupingSize() const
+   {
+      // Safety assert for non NULL pointer
+      assert(this->mspCfgFile);
+
+      return this->mspCfgFile->spFramework()->spNode(Io::Config::Framework::PARALLEL)->iTags().value("groupingsize");
+   }
+
    std::list<int>  SimulationConfig::cpuFactors() const
    {
       // Safety assert for non NULL pointer

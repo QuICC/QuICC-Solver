@@ -63,7 +63,7 @@ struct PipelineOptions
     /// @brief Wrapper pass options
     mlir::quiccir::QuiccirViewWrapperOptions wrap;
     /// @brief Grouping pass options
-    mlir::quiccir::QuiccirTransposeGroupingOptions grouping{4};
+    mlir::quiccir::QuiccirTransposeGroupingOptions grouping;
 };
 
 /// @brief classe to setup and JIT the mlir graph
@@ -384,7 +384,10 @@ void Jit<RANK>::insertWrapper(const std::array<std::uint32_t, RANK> physDims,
     // Optimization passes
     nestedFuncPmPre.addPass(mlir::quiccir::createTransformContractionPass());
     pmPre.addPass(mlir::createCSEPass());
-    pmPre.addPass(mlir::quiccir::createTransposeGroupingPass(_opt.grouping));
+    if (_opt.grouping.group != 1)
+    {
+        pmPre.addPass(mlir::quiccir::createTransposeGroupingPass(_opt.grouping));
+    }
 
    std::vector<std::vector<std::int64_t>> dimArgs(1);
    std::vector<std::string> layArgs(1);

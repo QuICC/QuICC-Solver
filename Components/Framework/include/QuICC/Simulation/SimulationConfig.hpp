@@ -66,6 +66,11 @@ namespace QuICC {
          Splitting::Groupers::Id grouper() const;
 
          /**
+          * @brief Get the size of the grouping factor for the quiccir grouping pass
+          */
+         int groupingSize() const;
+
+         /**
           * @brief List of CPU factorization to test for decomposition
           */
          std::list<int> cpuFactors() const;

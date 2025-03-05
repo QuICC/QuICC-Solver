@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Parallel.cpp
  * @brief Source of the implementation of the parallel node of the configuration
  */
@@ -31,6 +31,7 @@ namespace Framework {
       this->iTags().addTag("cpus", -1);
       this->sTags().addTag("algorithm", "serial");
       this->sTags().addTag("grouper", "transform");
+      this->iTags().addTag("groupingsize", 1);
       this->sTags().addTag("decomposition", "auto");
    }
 
