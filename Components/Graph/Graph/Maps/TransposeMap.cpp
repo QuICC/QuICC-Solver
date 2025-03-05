@@ -5,8 +5,8 @@
 // Project includes
 //
 #include "Graph/OpsMap.hpp"
-#include "ViewOps/Transpose/Op.hpp"
-#include "ViewOps/Transpose/Cpu/OpGrouped.hpp"
+// #include "ViewOps/Transpose/Op.hpp"
+#include "ViewOps/Transpose/OpGrouped.hpp"
 
 
 namespace QuICC {
@@ -14,42 +14,6 @@ namespace Graph {
 
 void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
 {
-<<<<<<< HEAD
-   // Get index from MLIR source
-   std::uint64_t index = op.getImplptr().value();
-   if (index >= _thisArr.size())
-   {
-      _thisArr.resize(index + 1, nullptr);
-   }
-   if (_thisArr[index] == nullptr)
-   {
-      // check perm attribute
-      auto perm = op.getPermutation();
-      // check type attributes
-      using namespace mlir;
-      Type inTy = op.getInput().getType()[0];
-      auto inTensor = inTy.cast<RankedTensorType>();
-      std::string inTyStr = inTensor.getEncoding().cast<StringAttr>().str();
-      Type outTy = op.getOutput().getType()[0];
-      auto outTensor = outTy.cast<RankedTensorType>();
-      std::string outTyStr = outTensor.getEncoding().cast<StringAttr>().str();
-      if (_isCpu)
-      {
-#ifdef QUICC_MPI
-         using namespace QuICC::Transpose::Mpi;
-#else
-         using namespace QuICC::Transpose::Cpu;
-#endif
-         using namespace QuICC::Transpose;
-
-         if (outTyStr == "DCCSC3D" && inTyStr == "DCCSC3D" && perm[0] == 2 &&
-             perm[1] == 0)
-         {
-            using Tout = C_DCCSC3D_t;
-            using Tin = C_DCCSC3D_t;
-            using op_t = Op<Tout, Tin, p201_t>;
-#ifdef QUICC_MPI
-=======
     // Get index from MLIR source
     std::uint64_t index = op.getImplptr().value();
     if (index >= _thisArr.size()) {
@@ -82,25 +46,15 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = std::vector<C_DCCSC3D_t>;
             using op_t = OpGrouped<Tout, Tin, p201_t>;
             #ifdef QUICC_MPI
->>>>>>> cc3ae591 (towards cpu)
-            _ops.push_back(std::make_unique<op_t>(_commFTAL));
-#else
+            _ops.push_back(std::make_unique<op_t>(_mem));
+            #else
+
             _ops.push_back(std::make_unique<op_t>());
-#endif
+         #endif
             auto* ptr =
                std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
-<<<<<<< HEAD
-         }
-         else if (outTyStr == "DCCSC3D" && inTyStr == "DCCSC3D" &&
-                  perm[0] == 1 && perm[1] == 2)
-         {
-            using Tout = C_DCCSC3D_t;
-            using Tin = C_DCCSC3D_t;
-            using op_t = Op<Tout, Tin, p120_t>;
-#ifdef QUICC_MPI
-=======
           }
           else if (outTyStr == "DCCSC3D" &&
             inTyStr == "DCCSC3D" &&
@@ -110,25 +64,14 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = std::vector<C_DCCSC3D_t>;
             using op_t = OpGrouped<Tout, Tin, p120_t>;
             #ifdef QUICC_MPI
->>>>>>> cc3ae591 (towards cpu)
-            _ops.push_back(std::make_unique<op_t>(_commALFT));
-#else
+            _ops.push_back(std::make_unique<op_t>(_mem));
+            #else
             _ops.push_back(std::make_unique<op_t>());
-#endif
+            #endif
             auto* ptr =
                std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
-<<<<<<< HEAD
-         }
-         else if (outTyStr == "DCCSC3D" && inTyStr == "S1CLCSC3D" &&
-                  perm[0] == 2 && perm[1] == 0)
-         {
-            using Tout = C_DCCSC3D_t;
-            using Tin = C_S1CLCSC3D_t;
-            using op_t = Op<Tout, Tin, p201_t>;
-#ifdef QUICC_MPI
-=======
           }
           else if (outTyStr == "DCCSC3D" &&
             inTyStr == "S1CLCSC3D" &&
@@ -138,25 +81,14 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = std::vector<C_S1CLCSC3D_t>;
             using op_t = OpGrouped<Tout, Tin, p201_t>;
             #ifdef QUICC_MPI
->>>>>>> cc3ae591 (towards cpu)
-            _ops.push_back(std::make_unique<op_t>(_commALJW));
-#else
+            _ops.push_back(std::make_unique<op_t>(_mem));
+            #else
             _ops.push_back(std::make_unique<op_t>());
-#endif
+         #endif
             auto* ptr =
                std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
             _thisArr[index] = ptr;
-<<<<<<< HEAD
-         }
-         else if (outTyStr == "S1CLCSC3D" && inTyStr == "DCCSC3D" &&
-                  perm[0] == 1 && perm[1] == 2)
-         {
-            using Tout = C_S1CLCSC3D_t;
-            using Tin = C_DCCSC3D_t;
-            using op_t = Op<Tout, Tin, p120_t>;
-#ifdef QUICC_MPI
-=======
           }
           else if (outTyStr == "S1CLCSC3D" &&
             inTyStr == "DCCSC3D" &&
@@ -166,11 +98,10 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = std::vector<C_DCCSC3D_t>;
             using op_t = OpGrouped<Tout, Tin, p120_t>;
             #ifdef QUICC_MPI
->>>>>>> cc3ae591 (towards cpu)
-            _ops.push_back(std::make_unique<op_t>(_commJWAL));
-#else
+            _ops.push_back(std::make_unique<op_t>(_mem));
+            #else
             _ops.push_back(std::make_unique<op_t>());
-#endif
+            #endif
             auto* ptr =
                std::get<std::shared_ptr<UnaryOp<Tout, Tin>>>(_ops.back()).get();
             assert(ptr != nullptr);
@@ -198,8 +129,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = C_DCCSC3D_t;
             using op_t = Op<std::vector<Tout>, std::vector<Tin>, p201_t>;
             #ifdef QUICC_MPI
-            _ops.push_back(std::make_unique<op_t>(_commFTAL));
-#else
+            _ops.push_back(std::make_unique<op_t>(_mem));
+            #else
             _ops.push_back(std::make_unique<op_t>());
 #endif
             auto* ptr =
@@ -214,8 +145,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = C_DCCSC3DJIK_t;
             using op_t = Op<std::vector<Tout>, std::vector<Tin>, p120_t>;
             #ifdef QUICC_MPI
-            _ops.push_back(std::make_unique<op_t>(_commALFT));
-#else
+            _ops.push_back(std::make_unique<op_t>(_mem));
+            #else
             _ops.push_back(std::make_unique<op_t>());
 #endif
             auto* ptr =
@@ -230,8 +161,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = C_S1CLCSC3DJIK_t;
             using op_t = Op<std::vector<Tout>, std::vector<Tin>, p201_t>;
             #ifdef QUICC_MPI
-            _ops.push_back(std::make_unique<op_t>(_commALJW));
-#else
+            _ops.push_back(std::make_unique<op_t>(_mem));
+            #else
             _ops.push_back(std::make_unique<op_t>());
 #endif
             auto* ptr =
@@ -246,8 +177,8 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
             using Tin = C_DCCSC3DJIK_t;
             using op_t = Op<std::vector<Tout>, std::vector<Tin>, p120_t>;
             #ifdef QUICC_MPI
-            _ops.push_back(std::make_unique<op_t>(_commJWAL));
-#else
+            _ops.push_back(std::make_unique<op_t>(_mem));
+            #else
             _ops.push_back(std::make_unique<op_t>());
 #endif
             auto* ptr =

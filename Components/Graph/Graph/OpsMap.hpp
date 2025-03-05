@@ -18,7 +18,7 @@
 #include "Graph/Types.hpp"
 #include "Memory/Memory.hpp"
 #ifdef QUICC_MPI
-#include "ViewOps/Transpose/Mpi/Comm.hpp"
+#include "ViewOps/Transpose/Mpi/CommGrouped.hpp"
 #endif
 
 namespace QuICC {
@@ -27,37 +27,26 @@ namespace Graph {
 /// @brief map mlir ops to QuICC operators
 class MapOps
 {
-private:
-   /// @brief store pointers for passing into MLIR
-   std::vector<void*> _thisArr;
-   /// @brief store for RAII
-   std::vector<varOp_t> _ops;
-   /// @brief memory resource for internal op allocation
-   std::shared_ptr<Memory::memory_resource> _mem;
-   /// @brief is the memory space cpu or gpu
-   /// to be replaced by a per-operator-attribute
-   bool _isCpu = true;
-/// comm
-#ifdef QUICC_MPI
-   /// @brief Fourier space to Associated Legendre space comm
-   std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commFTAL;
-   /// @brief Associated Legendre space to Fourier space comm
-   std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commALFT;
-   /// @brief Associated Legendre space to Jones-Worland space comm
-   std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commALJW;
-   /// @brief Jones-Worland space to Associated Legendre space comm
-   std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commJWAL;
-#endif
-   /// @brief storage for scaling parameters
-   PhysicalParameters<double> _physParams;
-
-public:
-   /// @brief empty constructor
-   MapOps() = default;
-   /// @brief constructor from mlir module
-   /// @param module mlir module
-   /// @param mem memory resource to pass to operators
-   MapOps(mlir::ModuleOp module, const PhysicalParameters<double> physParams,
+  private:
+    /// @brief store pointers for passing into MLIR
+    std::vector<void*> _thisArr;
+    /// @brief store for RAII
+    std::vector<varOp_t> _ops;
+    /// @brief memory resource for internal op allocation
+    std::shared_ptr<Memory::memory_resource> _mem;
+    /// @brief is the memory space cpu or gpu
+    /// to be replaced by a per-operator-attribute
+    bool _isCpu = true;
+    /// @brief storage for scaling parameters
+    PhysicalParameters<double> _physParams;
+  public:
+    /// @brief empty constructor
+    MapOps() = default;
+    /// @brief constructor from mlir module
+    /// @param module mlir module
+    /// @param mem memory resource to pass to operators
+    MapOps(mlir::ModuleOp module,
+      const PhysicalParameters<double> physParams,
       const std::shared_ptr<Memory::memory_resource> mem);
 
    /// @brief return void pointers to ops
