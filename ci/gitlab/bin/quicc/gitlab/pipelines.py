@@ -16,7 +16,8 @@ backend2nodeSize = {
     "daint-mc": 72,
     "daint-gpu": 24,
     "alps-a100": 64,
-    "alps-gh200": 288
+    "alps-gh200": 288,
+    "alps-zen2": 128
 }
 
 """Base class, defines a pipeline that build the docker image, the library and cleans up the runner"""
@@ -88,12 +89,8 @@ class base_pipeline(base_yaml):
                     'cleanup',
                 ],
             )
-        if (self.backend == 'gpu'):
-            runner = '.container-runner-daint-gpu'
-        else:
-            runner = '.container-runner-daint'
         self.config['ci-cache-cleanup'] = {
-            'extends': runner,
+            'extends': '.'+self.backend+'_runner',
             'stage': 'cleanup',
             'image': self.path_image,
             'script':
@@ -262,7 +259,7 @@ class model_pipeline(libtime_pipeline):
                     'variables':
                     {
                         # the image is pulled in the lib test stage
-                        'PULL_IMAGE': 'NO',
+                        'PULL_IMAGE': 'YES',
                         'SLURM_NTASKS': tasks,
                         'SLURM_NTASKS_PER_NODE': tasks,
                         'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks)),

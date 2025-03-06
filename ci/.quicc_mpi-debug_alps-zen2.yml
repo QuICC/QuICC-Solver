@@ -1,0 +1,28 @@
+# This file is generated, do not modify!
+include:
+- remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
+- /ci/gitlab/.cscs_builders.yml
+- /ci/gitlab/.cscs_runners.yml
+stages:
+- build_base
+- build
+- cleanup
+build-quicc-base:
+  extends: .alps-zen2_builder
+  stage: build_base
+  variables:
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-zen2
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:54a9d4ad1ddd658eefec4161d2ee62e5
+build-quicc:
+  extends: .alps-zen2_builder
+  stage: build
+  variables:
+    DOCKERFILE: ci/docker/Dockerfile_mpi-debug
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi-debug_alps-zen2:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:54a9d4ad1ddd658eefec4161d2ee62e5"]'
+ci-cache-cleanup:
+  extends: .alps-zen2_runner
+  stage: cleanup
+  image: $CSCS_REGISTRY_PATH/quicc_mpi-debug_alps-zen2:$CI_COMMIT_SHA
+  script:
+  - rm -Rf $CI_CACHE_FOLDER/*
