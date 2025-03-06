@@ -537,7 +537,7 @@ template <std::uint32_t RANK> void Jit<RANK>::setEngineAndJit()
 
    // An optimization pipeline to use within the execution engine.
    auto optPipeline = mlir::makeOptimizingTransformer(
-      /*optLevel=*/0, /*sizeLevel=*/0,
+      /*optLevel=*/3, /*sizeLevel=*/0,
       /*targetMachine=*/nullptr);
 
    // Create an MLIR execution engine. The execution engine eagerly JIT-compiles

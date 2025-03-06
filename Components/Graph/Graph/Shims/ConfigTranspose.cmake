@@ -12,7 +12,7 @@ set(Perms "201;120;201;120")
 # These 3 lists will be iterated over independently
 set(TypeIns "std::complex<double>")
 set(TypeOuts "std::complex<double>")
-set(GroupSizes "1;2;3;4")
+set(GroupSizes "1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16")
 
 # Configure Shims
 list(LENGTH Perms len)
@@ -30,6 +30,7 @@ foreach(ItP RANGE 0 ${lenM1})
             foreach(GroupSize IN LISTS GroupSizes)
                 math(EXPR GroupSizeM1 "${GroupSize}-1")
                 set(FunName "_ciface_quiccir_transpose_${Perm}")
+                set(FileName "${FunName}_${GroupSize}_${LayoutOut}_${LayoutIn}")
                 foreach(It RANGE 0 ${GroupSizeM1})
                     string(APPEND FunName "_${MlirTypeOut}_${LayoutOut}")
                 endforeach()
@@ -105,11 +106,11 @@ foreach(ItP RANGE 0 ${lenM1})
                 # Configure file
                 configure_file(
                     "MlirTransposeShims.cpp.in"
-                    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/Transpose/MlirShims/${FunName}.cpp"
+                    "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/Transpose/MlirShims/${FileName}.cpp"
                 )
                 target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
                     PRIVATE
-                        "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/Transpose/MlirShims/${FunName}.cpp"
+                        "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/Transpose/MlirShims/${FileName}.cpp"
                 )
             endforeach(GroupSize IN LISTS GroupSizes)
 
