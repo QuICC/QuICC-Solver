@@ -1,3 +1,5 @@
+include(ModelFunctions)
+
 #
 # Utility to add models
 #

@@ -82,7 +82,7 @@ enable_testing()
 #
 # Include function library
 #
-include(ModelFunctions)
+include(FrameworkFunctions)
 include(ConfigureFunctions)
 include(MessageQuICC)
 

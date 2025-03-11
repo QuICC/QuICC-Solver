@@ -25,10 +25,13 @@ namespace QuICC {
    template <class TModel> class ModelFactory
    {
       public:
+         /// Typedef of type of object created
+         typedef std::shared_ptr<Simulation> ReturnType;
+
          /**
           * @brief Create a shared simulation for the model
           */
-         static SharedSimulation createSimulation();
+         static ReturnType create();
 
       protected:
 
@@ -44,7 +47,7 @@ namespace QuICC {
          ~ModelFactory();
    };
 
-   template <class TModel> SharedSimulation ModelFactory<TModel>::createSimulation()
+   template <class TModel> typename ModelFactory<TModel>::ReturnType ModelFactory<TModel>::create()
    {
       Profiler::RegionFixture<1> simFix("createSimulation");
 

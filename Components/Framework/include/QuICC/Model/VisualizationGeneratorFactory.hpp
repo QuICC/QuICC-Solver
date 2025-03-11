@@ -22,10 +22,13 @@ namespace QuICC {
    template <class TModel> class VisualizationGeneratorFactory
    {
       public:
+         /// Typedef of type of object created
+         typedef std::shared_ptr<VisualizationGenerator> ReturnType;
+
          /**
           * @brief Create a shared state generator for the model
           */
-         static SharedVisualizationGenerator createVisualization();
+         static ReturnType create();
 
       protected:
 
@@ -41,7 +44,7 @@ namespace QuICC {
          ~VisualizationGeneratorFactory();
    };
 
-   template <class TModel> SharedVisualizationGenerator VisualizationGeneratorFactory<TModel>::createVisualization()
+   template <class TModel> typename VisualizationGeneratorFactory<TModel>::ReturnType VisualizationGeneratorFactory<TModel>::create()
    {
       // Create model
       TModel model;
