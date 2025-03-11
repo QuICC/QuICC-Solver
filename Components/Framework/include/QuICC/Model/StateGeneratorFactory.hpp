@@ -23,10 +23,13 @@ namespace QuICC {
    template <class TModel> class StateGeneratorFactory
    {
       public:
+         /// Typdef of type of oject created
+         typedef std::shared_ptr<StateGenerator> ReturnType;
+
          /**
           * @brief Create a shared state generator for the model
           */
-         static SharedStateGenerator createGenerator();
+         static ReturnType create();
 
       protected:
 
@@ -42,7 +45,7 @@ namespace QuICC {
          ~StateGeneratorFactory();
    };
 
-   template <class TModel> SharedStateGenerator StateGeneratorFactory<TModel>::createGenerator()
+   template <class TModel> typename StateGeneratorFactory<TModel>::ReturnType StateGeneratorFactory<TModel>::create()
    {
       // Create model
       TModel model;
