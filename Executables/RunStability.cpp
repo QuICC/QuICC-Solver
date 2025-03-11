@@ -12,66 +12,25 @@
 /// Create header include string for the required implementation
 #define MODELHEADER MAKE_STR( MODELPATH )
 
-// Configuration includes
-//
-
 // System includes
 //
-#include <iostream>
-#include <stdexcept>
 
 // Project includes
 //
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
-#include "Stability/LinearStabilityFactory.hpp"
-#include "Stability/MarginalCurve.hpp"
-#include MODELHEADER
 #include "Profiler/Interface.hpp"
+#include "QuICC/Model/RunApplication.hpp"
+#include "Stability/LinearStabilityFactory.hpp"
+#include MODELHEADER
 
 /**
  * @brief Setup and run the simulation
  */
 int run()
 {
-   QuICC::Profiler::RegionFixture runFix("run");
-
-   int status = 0;
-
-   // Create simulation
-   std::shared_ptr<QuICC::MarginalCurve> spSolver;
-
-   // Exception handling during the initialisation part
-   try
-   {
-      // Create simulation
-      spSolver = QuICC::LinearStabilityFactory<
-         QuICC::Model::QUICC_RUNSIM_CPPMODEL::PhysicalModel>::createSolver();
-   }
-
-   // If exception is thrown, finalise (close files) and return
-   catch (std::logic_error& e)
-   {
-      try
-      {
-         QuICC::QuICCEnv().abort(e.what());
-      }
-      catch (std::logic_error& ee)
-      {
-         std::cerr << ee.what() << std::endl;
-      }
-
-      status = -1;
-   }
-
-   if (status == 0)
-   {
-      // Run the simulation
-      spSolver->run();
-
-      // Cleanup and close file handles
-      spSolver->finalize();
-   }
+   typedef QuICC::Model::QUICC_RUNSIM_CPPMODEL::PhysicalModel Model;
+   int status = QuICC::run_application<QuICC::LinearStabilityFactory,Model>();
 
    return status;
 }
@@ -92,7 +51,9 @@ int main(int argc, char* argv[])
    QuICC::Profiler::Initialize();
 
    // Compute simulation
+   QuICC::Profiler::RegionStart<1>("Walltime");
    auto code = run();
+   QuICC::Profiler::RegionStop<1>("Walltime");
 
    // Finalise everything that can't be done inside a class
    QuICC::Profiler::Finalize();

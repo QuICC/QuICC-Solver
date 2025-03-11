@@ -27,10 +27,13 @@ namespace QuICC {
 template <class TModel> class LinearStabilityFactory
 {
 public:
+   /// Typedef of type of object created
+   typedef std::shared_ptr<MarginalCurve> ReturnType;
+
    /**
     * @brief Create a shared simulation for the model
     */
-   static std::shared_ptr<MarginalCurve> createSolver();
+   static ReturnType create();
 
 protected:
 private:
@@ -46,7 +49,7 @@ private:
 };
 
 template <class TModel>
-std::shared_ptr<MarginalCurve> LinearStabilityFactory<TModel>::createSolver()
+typename LinearStabilityFactory<TModel>::ReturnType LinearStabilityFactory<TModel>::create()
 {
    // Create model
    TModel model;
