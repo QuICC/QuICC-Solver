@@ -35,4 +35,7 @@ quicc_add_component(TimestepLegacy)
 quicc_add_component(TimestepPc)
 quicc_add_component(TimestepRkcb)
 quicc_add_component(Framework)
-quicc_add_component(Stability)
+
+include(FetchRepository)
+quicc_set_default_git_branch(Stability BRANCH "dev" TYPE Component)
+quicc_fetch_repository("Stability" TYPE Component)
