@@ -13,6 +13,7 @@
 //
 #include "Types/Internal/Typedefs.hpp"
 #include "QuICC/SparseSM/Worland/WorlandKind.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -70,6 +71,11 @@ namespace Worland {
           * @brief Get l
           */
          Scalar_t l() const;
+
+         /**
+          * @brief Templated power function l^p
+          */
+         template <int P> Scalar_t l() const;
 
          /**
           * @brief Natural log of norm
@@ -154,6 +160,22 @@ namespace Worland {
           */
          std::map<Scalar_t,ACoeff_t> mNorm;
    };
+
+   template <int P> IDiags::Scalar_t IDiags::l() const
+   {
+      if constexpr(P == 1)
+      {
+         return this->mL;
+      }
+      else if constexpr(P == 2)
+      {
+         return this->mL*this->mL;
+      }
+      else
+      {
+         return Internal::Math::pow(this->mL, P);
+      }
+   }
 
 }
 }

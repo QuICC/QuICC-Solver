@@ -61,6 +61,16 @@ namespace SparseSM {
          SparseMatrix mat() const;
 
          /**
+          * @brief Get full precision sparse matrix if backend has MP
+          */
+         Internal::SparseMatrix mpmat() const
+         {
+            Internal::SparseMatrix mat;
+            this->buildOpImpl(mat, this->rows(), this->cols());
+            return mat;
+         }
+
+         /**
           * @brief Get sparse matrix embedded in larger matrix
           */
          SparseMatrix embedded(const int rows, const int cols) const;
