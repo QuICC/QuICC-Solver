@@ -10,8 +10,14 @@
               "request": "launch",
               "name": "Launch(gdb)",
               //"program": "${fileBasenameNoExtension}",
-              "program": "/QuICC/QuICC_newDenseSM/build_NL_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCExplicitModel",
-              "cwd": "/QuICC/AnelasticShellRTC/debug/"
+              
+              // For the nonlinear model
+              //"program": "/QuICC/QuICC_newDenseSM/build_NL_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCExplicitModel",
+              //"cwd": "/QuICC/AnelasticShellRTC/debug/nonlinear/"
+              
+              // for the linear model
+              "program": "/QuICC/QuICC_newDenseSM/build_stability_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCImplicitStability",
+              "cwd": "/QuICC/AnelasticShellRTC/debug/stability/"
           }
       ]
   }

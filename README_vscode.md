@@ -49,9 +49,19 @@ We assume we are running in a container.
     
         mkdir build_NL_anelastic_debug
 
+        cd build_NL_anelastic_debug
+
+        # to compile the nonlinear version of the model
+
         cmake .. -DQUICC_MODEL=AnelasticShellRTC -DCMAKE_BUILD_TYPE=Debug
 
         make -j 6
+
+        # to compile the linear stability version
+
+        cmake .. -DQUICC_MODEL=AnelasticShellRTC -DCMAKE_BUILD_TYPE=Debug -DPETSC_DIR=/opt/view -DSLEPC_DIR=/opt/view
+
+        make -j 6 AnelasticShellRTCImplicitStability
         
         # Create a folder where the debug is to be run
         # needs to be a place visible in the container

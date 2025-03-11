@@ -12,6 +12,7 @@ set(tags
   Chandrasekhar
   Chi
   Delta
+  DensityType
   Eady
   Ekman
   Elevator
@@ -25,6 +26,7 @@ set(tags
   Heating
   Iota
   Kappa
+  KappaType
   Lambda
   Lehnert
   Lower1d
