@@ -6,7 +6,6 @@
 #include <regex>
 #include <thread>
 
-#include "ViewOps/Transpose/Mpi/Comm.hpp"
 extern "C" {
 #include <unistd.h>
 }
@@ -754,7 +753,8 @@ TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 201", "MpiS1CLCSC3DtoDCCSC3D201")
    }
 
    // Transpose op
-   auto comm = std::make_shared<Comm<double>>();
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>(
          comm);
@@ -1140,7 +1140,8 @@ TEST_CASE("Mpi DCCSC3D to S1CLCSC3D 120", "MpiDCCSC3DtoS1CLCSC3D120")
    using namespace QuICC::Transpose::Mpi;
    using namespace QuICC::Transpose;
 
-   auto comm = std::make_shared<Comm<double>>();
+   auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
       std::make_unique<Op<View<double, outTy>, View<double, inTy>, p120_t>>(
          comm);
