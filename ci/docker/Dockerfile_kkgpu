@@ -16,7 +16,6 @@ RUN mkdir -p /QuICC.src/build \
     -DMLIR_DIR=/lib/llvm-17/lib/cmake/mlir \
     -DCMAKE_CUDA_FLAGS_RELEASE="-expt-extended-lambda" \
     -DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
-    -DQUICC_EIGEN_ENABLE_CUDA=ON \
     -DQUICC_PROFILE_LEVEL=4 \
     -DQUICC_PROFILE_BACKEND=native \
     -DQUICC_PROFILE_NATIVE_SAMPLE=500 \
