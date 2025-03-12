@@ -27,7 +27,9 @@
 #include "QuICC/NonDimensional/Tolerance.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
+#include "QuICC/PhysicalNames/Entropy.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
+#include "QuICC/PhysicalNames/MassFlux.hpp"
 #include "QuICC/QuICCTimer.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
@@ -154,12 +156,14 @@ void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
          {
             std::vector<FieldComponents::Spectral::Id> comps;
             if (fId == PhysicalNames::Velocity::id() ||
-                fId == PhysicalNames::Magnetic::id())
+                fId == PhysicalNames::Magnetic::id() ||
+                fId == PhysicalNames::MassFlux::id())
             {
                comps = {FieldComponents::Spectral::TOR,
                   FieldComponents::Spectral::POL};
             }
-            else if (fId == PhysicalNames::Temperature::id())
+            else if (fId == PhysicalNames::Temperature::id() ||
+                     fId == PhysicalNames::Entropy::id())
             {
                comps = {FieldComponents::Spectral::SCALAR};
             }
@@ -270,13 +274,15 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
       for (auto fId: this->mspBackend->fieldIds())
       {
          if (fId == PhysicalNames::Velocity::id() ||
-             fId == PhysicalNames::Magnetic::id())
+             fId == PhysicalNames::Magnetic::id() ||
+             fId == PhysicalNames::MassFlux::id())
          {
             auto& req = varInfo.addField(fId,
                FieldRequirement(false, ss.spectral(), ss.physical()));
             req.enableSpectral();
          }
-         else if (fId == PhysicalNames::Temperature::id())
+         else if (fId == PhysicalNames::Temperature::id() ||
+                  fId == PhysicalNames::Entropy::id())
          {
             auto& req = varInfo.addField(fId,
                FieldRequirement(true, ss.spectral(), ss.physical()));
@@ -535,9 +541,31 @@ void MarginalCurve::setOptions(Stability::Options& opt)
 
    // Scale eigenfunctions to have first coefficient real and positive
    opt.scalingType = 1;
-   opt.scalingRef = {
-      {PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR},
-      {PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL}};
+
+   // need to scale by velocity (boussinesq) or mass_lux (anelastic)
+   auto fieldList = this->mspBackend->fieldIds();
+
+   bool isVel   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Velocity::id()) != fieldList.end();
+   bool isMassF = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::MassFlux::id()) != fieldList.end();
+   
+   if(isVel && !isMassF) 
+   {
+      //std::cerr<<"momentum variable is velocity";
+      opt.scalingRef = {
+         {PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR},
+         {PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL}};
+   } 
+   else if(!isVel && isMassF)
+   {
+      //std::cerr<<"momentum variable is mass flux";
+      opt.scalingRef = {
+         {PhysicalNames::MassFlux::id(), FieldComponents::Spectral::TOR},
+         {PhysicalNames::MassFlux::id(), FieldComponents::Spectral::POL}};
+   }
+   else
+   {
+      throw std::logic_error("Momentum variable not recognized");
+   }
 }
 
 void MarginalCurve::computeSingleMode(
