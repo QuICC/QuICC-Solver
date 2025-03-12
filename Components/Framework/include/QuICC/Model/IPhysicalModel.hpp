@@ -27,7 +27,6 @@
 #include "QuICC/RuntimeStatus/registerAll.hpp"
 #include "QuICC/SolveTiming/registerAll.hpp"
 #include "QuICC/PseudospectralTag/registerAll.hpp"
-#include "QuICC/Simulation/SimulationBase.hpp"
 
 namespace QuICC {
 
@@ -122,13 +121,6 @@ namespace Model {
          virtual void addAsciiOutputFiles(std::shared_ptr<TSim> spSim) = 0;
 
          /**
-          * @brief Add the required ASCII output files
-          *
-          * @param spVis   Shared visualization object
-          */
-         virtual void addAsciiOutputFiles(std::shared_ptr<TVis> spVis);
-
-         /**
           * @brief Add the required HDF5 output files
           *
           * @param spSim   Shared simulation object
@@ -162,7 +154,7 @@ namespace Model {
          /**
           * @brief Interface to adding ASCII output file
           */
-         template <typename T> void enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<SimulationBase> spSim);
+         template <typename T> void enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim);
 
       protected:
          /**
@@ -315,7 +307,7 @@ namespace Model {
       return this->mpBackend;
    }
 
-   template <typename TSim, typename TState, typename TVis> template <typename T> void IPhysicalModel<TSim,TState,TVis>::enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<SimulationBase> spSim)
+   template <typename TSim, typename TState, typename TVis> template <typename T> void IPhysicalModel<TSim,TState,TVis>::enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim)
    {
       if(spSim->config().model(tag).at("enable"))
       {
@@ -331,10 +323,6 @@ namespace Model {
          }
          spSim->addAsciiOutputFile(spFile);
       }
-   }
-
-   template <typename TSim, typename TState, typename TVis> void IPhysicalModel<TSim,TState,TVis>::addAsciiOutputFiles(std::shared_ptr<TVis> spVis)
-   {
    }
 
 }
