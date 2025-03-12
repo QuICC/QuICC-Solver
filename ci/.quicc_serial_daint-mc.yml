@@ -1,6 +1,7 @@
 # This file is generated, do not modify!
 include:
 - remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
+- /ci/gitlab/.cscs_builders.yml
 - /ci/gitlab/.cscs_runners.yml
 - /ci/gitlab/.quicc_tests.yml
 - /ci/gitlab/.quicc_models.yml
@@ -11,7 +12,7 @@ stages:
 - model-build-and-test
 - cleanup
 build-quicc-base:
-  extends: .container-builder-cscs-zen2
+  extends: .daint-mc_builder
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-mc
@@ -20,7 +21,7 @@ build-quicc-base:
     SECONDARY_IMAGE_USERNAME: quicc
     SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
-  extends: .container-builder-cscs-zen2
+  extends: .daint-mc_builder
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_serial
@@ -29,12 +30,23 @@ build-quicc:
 test-quicc-lib:
   extends:
   - .test-lib
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
 BoussinesqSphereDynamoExplicit_serial:
   extends:
   - .BoussinesqSphereDynamoExplicit_serial
-  - .daint-mc
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: serial
+BoussinesqSphereDynamoExplicit_serial_split_equation:
+  extends:
+  - .BoussinesqSphereDynamoExplicit_serial_split_equation
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -45,7 +57,7 @@ BoussinesqSphereDynamoExplicit_serial:
 BoussinesqSphereDynamoImplicit_serial:
   extends:
   - .BoussinesqSphereDynamoImplicit_serial
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -56,7 +68,18 @@ BoussinesqSphereDynamoImplicit_serial:
 BoussinesqShellDynamoExplicit_serial:
   extends:
   - .BoussinesqShellDynamoExplicit_serial
-  - .daint-mc
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: serial
+BoussinesqShellDynamoExplicit_serial_split_equation:
+  extends:
+  - .BoussinesqShellDynamoExplicit_serial_split_equation
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -67,7 +90,7 @@ BoussinesqShellDynamoExplicit_serial:
 BoussinesqShellDynamoImplicit_serial:
   extends:
   - .BoussinesqShellDynamoImplicit_serial
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -78,7 +101,18 @@ BoussinesqShellDynamoImplicit_serial:
 BoussinesqSphereRTCExplicit_serial:
   extends:
   - .BoussinesqSphereRTCExplicit_serial
-  - .daint-mc
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: serial
+BoussinesqSphereRTCExplicit_serial_split_equation:
+  extends:
+  - .BoussinesqSphereRTCExplicit_serial_split_equation
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -89,7 +123,7 @@ BoussinesqSphereRTCExplicit_serial:
 BoussinesqSphereRTCImplicit_serial:
   extends:
   - .BoussinesqSphereRTCImplicit_serial
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -100,7 +134,18 @@ BoussinesqSphereRTCImplicit_serial:
 BoussinesqShellRTCExplicit_serial:
   extends:
   - .BoussinesqShellRTCExplicit_serial
-  - .daint-mc
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: serial
+BoussinesqShellRTCExplicit_serial_split_equation:
+  extends:
+  - .BoussinesqShellRTCExplicit_serial_split_equation
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -111,7 +156,7 @@ BoussinesqShellRTCExplicit_serial:
 BoussinesqShellRTCImplicit_serial:
   extends:
   - .BoussinesqShellRTCImplicit_serial
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -122,7 +167,18 @@ BoussinesqShellRTCImplicit_serial:
 BoussinesqSphereTCExplicit_serial:
   extends:
   - .BoussinesqSphereTCExplicit_serial
-  - .daint-mc
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: serial
+BoussinesqSphereTCExplicit_serial_split_equation:
+  extends:
+  - .BoussinesqSphereTCExplicit_serial_split_equation
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -133,7 +189,18 @@ BoussinesqSphereTCExplicit_serial:
 BoussinesqShellTCExplicit_serial:
   extends:
   - .BoussinesqShellTCExplicit_serial
-  - .daint-mc
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: serial
+BoussinesqShellTCExplicit_serial_split_equation:
+  extends:
+  - .BoussinesqShellTCExplicit_serial_split_equation
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'NO'
@@ -144,6 +211,17 @@ BoussinesqShellTCExplicit_serial:
 BoussinesqPlaneRBCExplicit_serial:
   extends:
   - .BoussinesqPlaneRBCExplicit_serial
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: serial
+BoussinesqPlaneRRBCExplicit_serial:
+  extends:
+  - .BoussinesqPlaneRRBCExplicit_serial
   - .daint-mc
   image: $CSCS_REGISTRY_PATH/quicc_serial_daint-mc:$CI_COMMIT_SHA
   variables:

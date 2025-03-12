@@ -1,0 +1,69 @@
+# This file is generated, do not modify!
+include:
+- remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
+- /ci/gitlab/.cscs_runners.yml
+- /ci/gitlab/.quicc_tests.yml
+- /ci/gitlab/.quicc_petsc_models.yml
+stages:
+- build_base
+- build
+- test
+- model-build-and-test
+- cleanup
+build-quicc-base:
+  extends: .container-builder-cscs-zen2
+  stage: build_base
+  variables:
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_petsc_daint-mc
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_petsc_daint-mc:b18c00ef267cafc724eaae0664876044
+build-quicc:
+  extends: .container-builder-cscs-zen2
+  stage: build
+  variables:
+    DOCKERFILE: ci/docker/Dockerfile_petsc-mpi
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_petsc-mpi_daint-mc:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_petsc_daint-mc:b18c00ef267cafc724eaae0664876044"]'
+test-quicc-petsc-lib:
+  extends:
+  - .test-petsc-lib
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_petsc-mpi_daint-mc:$CI_COMMIT_SHA
+BoussinesqSphereRTCImplicit_tubular:
+  extends:
+  - .BoussinesqSphereRTCImplicit_tubular
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_petsc-mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: petsc-mpi
+BoussinesqShellRTCImplicit_tubular:
+  extends:
+  - .BoussinesqShellRTCImplicit_tubular
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_petsc-mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: petsc-mpi
+BoussinesqPlaneRRBCExplicit_tubular:
+  extends:
+  - .BoussinesqPlaneRRBCExplicit_tubular
+  - .daint-mc
+  image: $CSCS_REGISTRY_PATH/quicc_petsc-mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '1'
+    SLURM_NTASKS_PER_NODE: '1'
+    SLURM_CPUS_PER_TASK: '72'
+    QUICC_VERSION_TAG: petsc-mpi
+ci-cache-cleanup:
+  extends: .container-runner-daint
+  stage: cleanup
+  image: $CSCS_REGISTRY_PATH/quicc_petsc-mpi_daint-mc:$CI_COMMIT_SHA
+  script:
+  - rm -Rf $CI_CACHE_FOLDER/*

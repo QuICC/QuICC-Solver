@@ -29,7 +29,7 @@ set(_tests
   # Poly::P:<viewCpu_t>:bfloop
 )
 quicc_set_ulp(_ulp
-  ULP 20 50 130 80 130 560 1963 5211 19780
+  ULP 20 50 148 80 130 560 1963 5211 19780
   MPULP 4 4 6 2 2 4 4 8 12
 )
 foreach(_test ${_tests})

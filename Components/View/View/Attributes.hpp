@@ -565,4 +565,4 @@ namespace View {
 
 
 } // namespace View
-} // namespave QuICC
+} // namespace QuICC

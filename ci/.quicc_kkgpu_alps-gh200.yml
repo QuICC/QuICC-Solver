@@ -1,6 +1,7 @@
 # This file is generated, do not modify!
 include:
 - remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
+- /ci/gitlab/.cscs_builders.yml
 - /ci/gitlab/.cscs_runners.yml
 - /ci/gitlab/.quicc_tests.yml
 - /ci/gitlab/.quicc_models.yml
@@ -11,144 +12,144 @@ stages:
 - model-build-and-test
 - cleanup
 build-quicc-base:
-  extends: .container-builder-cscs-zen2
+  extends: .alps-gh200_builder
   stage: build_base
   variables:
-    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-gpu
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:0a337fffd2eeb068c3f19c8a7a7f53dd
-    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_daint-gpu:0a337fffd2eeb068c3f19c8a7a7f53dd
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-gh200
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:3cfa49dfa946aeb4b1dd1d40e87a3c12
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_alps-gh200:3cfa49dfa946aeb4b1dd1d40e87a3c12
     SECONDARY_IMAGE_USERNAME: quicc
     SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
-  extends: .container-builder-cscs-zen2
+  extends: .alps-gh200_builder
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_kkgpu
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-gpu:0a337fffd2eeb068c3f19c8a7a7f53dd"]'
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:3cfa49dfa946aeb4b1dd1d40e87a3c12"]'
 test-quicc-lib:
   extends:
   - .test-lib
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
 time-quicc-lib:
   extends:
-  - .time-lib-daint-gpu
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .time-lib-alps-gh200
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
 BoussinesqSphereDynamoExplicit_serial:
   extends:
   - .BoussinesqSphereDynamoExplicit_serial
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '24'
+    SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 BoussinesqSphereDynamoImplicit_serial:
   extends:
   - .BoussinesqSphereDynamoImplicit_serial
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '24'
+    SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 BoussinesqShellDynamoExplicit_serial:
   extends:
   - .BoussinesqShellDynamoExplicit_serial
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '24'
+    SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 BoussinesqShellDynamoImplicit_serial:
   extends:
   - .BoussinesqShellDynamoImplicit_serial
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '24'
+    SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 BoussinesqSphereRTCExplicit_serial:
   extends:
   - .BoussinesqSphereRTCExplicit_serial
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '24'
+    SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 BoussinesqSphereRTCImplicit_serial:
   extends:
   - .BoussinesqSphereRTCImplicit_serial
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '24'
+    SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 BoussinesqShellRTCExplicit_serial:
   extends:
   - .BoussinesqShellRTCExplicit_serial
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '24'
+    SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 BoussinesqShellRTCImplicit_serial:
   extends:
   - .BoussinesqShellRTCImplicit_serial
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '24'
+    SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 BoussinesqSphereTCExplicit_serial:
   extends:
   - .BoussinesqSphereTCExplicit_serial
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '24'
+    SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 BoussinesqShellTCExplicit_serial:
   extends:
   - .BoussinesqShellTCExplicit_serial
-  - .daint-gpu
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  - .alps-gh200_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   variables:
-    PULL_IMAGE: 'NO'
+    PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '24'
+    SLURM_CPUS_PER_TASK: '288'
     QUICC_VERSION_TAG: kkgpu
 ci-cache-cleanup:
-  extends: .container-runner-daint
+  extends: .alps-gh200_runner
   stage: cleanup
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_daint-gpu:$CI_COMMIT_SHA
+  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
   script:
   - rm -Rf $CI_CACHE_FOLDER/*

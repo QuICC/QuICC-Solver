@@ -155,13 +155,13 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       pSum(iSum);
       // cumulative row width (with jki)
       // kSum shifted by 1
-      std::vector<std::uint32_t> kSum(I,0);
+      std::vector<std::uint32_t> kSum(I, 0);
       kSum[1] = 1;
       for (std::size_t i = 2; i < I; ++i)
       {
          kSum[i] = std::min(kSum[i - 1] + 1, K);
       }
-      assert(kSum[I-1] <= K);
+      assert(kSum[I - 1] == K);
       pSum(kSum);
 
       for (std::size_t k = 0; k < K; ++k)
@@ -171,7 +171,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
          {
             for (std::size_t i = k; i < I; ++i)
             {
-               std::size_t ijk = i-k + j * Iloc + (k * I - iSum[k]) * J;
+               std::size_t ijk = i - k + j * Iloc + (k * I - iSum[k]) * J;
                std::size_t jki = j + k * J + kSum[i] * J;
                assert(ijk < in.size());
                assert(jki < out.size());
@@ -206,7 +206,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       pSum(iSum);
       // cumulative row width (with jki)
       // kSum shifted by 1
-      std::vector<std::uint32_t> kSum(I,0);
+      std::vector<std::uint32_t> kSum(I, 0);
       kSum[1] = 1;
       for (std::size_t i = 2; i < I; ++i)
       {
@@ -222,7 +222,7 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
          {
             for (std::size_t i = k; i < I; ++i)
             {
-               std::size_t ijk = i-k + j * Iloc + (k * I - iSum[k]) * J;
+               std::size_t ijk = i - k + j * Iloc + (k * I - iSum[k]) * J;
                std::size_t jki = j + k * J + kSum[i] * J;
                assert(jki < in.size());
                assert(ijk < out.size());

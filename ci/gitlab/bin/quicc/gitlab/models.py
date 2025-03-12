@@ -44,7 +44,7 @@ default_variants = {
 # [model][model_tag][pipe_tag] list(variants)
 configurations = {  'BoussinesqSphereDynamo': {
                         'Explicit' : {
-                            'serial' : [variant()],
+                            'serial' : [variant(), variant('serial_split_equation', 1)],
                             'mpi' : [variant()],
                             'kk' : [variant()],
                             'kkgpu' : [variant()],
@@ -60,7 +60,7 @@ configurations = {  'BoussinesqSphereDynamo': {
                     },
                     'BoussinesqShellDynamo': {
                         'Explicit' : {
-                            'serial' : [variant()],
+                            'serial' : [variant(), variant('serial_split_equation', 1)],
                             'mpi' : [variant()],
                             'kk' : [variant()],
                             'kkgpu' : [variant()],
@@ -76,8 +76,8 @@ configurations = {  'BoussinesqSphereDynamo': {
                     },
                     'BoussinesqSphereRTC': {
                         'Explicit' : {
-                            'serial' : [variant()],
-                            'mpi' : [variant('single1d', 6), variant('single2d', 6), variant('tubular', 6) ],
+                            'serial' : [variant(), variant('serial_split_equation', 1)],
+                            'mpi' : [variant('single1d', 6), variant('single2d', 6), variant('tubular', 6), variant('tubular_split_equation', 6)],
                             'kk' : [variant()],
                             'kkgpu' : [variant()],
                             'perf' : [variant()]
@@ -87,13 +87,14 @@ configurations = {  'BoussinesqSphereDynamo': {
                             'mpi' : [variant('single1d', 6), variant('single2d', 6), variant('tubular', 6) ],
                             'kk' : [variant()],
                             'kkgpu' : [variant()],
-                            'perf' : [variant()]
+                            'perf' : [variant()],
+                            'petsc-mpi' : [variant('tubular',1)]
                         }
                     },
                     'BoussinesqShellRTC': {
                         'Explicit' : {
-                            'serial' : [variant()],
-                            'mpi' : [variant('single1d', 6), variant('single2d', 6), variant('tubular', 6) ],
+                            'serial' : [variant(), variant('serial_split_equation', 1)],
+                            'mpi' : [variant('single1d', 6), variant('single2d', 6), variant('tubular', 6), variant('tubular_split_equation', 6)],
                             'kk' : [variant()],
                             'kkgpu' : [variant()],
                             'perf' : [variant()]
@@ -103,12 +104,13 @@ configurations = {  'BoussinesqSphereDynamo': {
                             'mpi' : [variant('single2d', 6)],
                             'kk' : [variant()],
                             'kkgpu' : [variant()],
-                            'perf' : [variant('none', -1)]
+                            'perf' : [variant('none', -1)],
+                            'petsc-mpi' : [variant('tubular',1)]
                         }
                     },
                     'BoussinesqSphereTC': {
                         'Explicit' : {
-                            'serial' : [variant()],
+                            'serial' : [variant(), variant('serial_split_equation', 1)],
                             'mpi' : [variant() ],
                             'kk' : [variant()],
                             'kkgpu' : [variant()],
@@ -117,7 +119,7 @@ configurations = {  'BoussinesqSphereDynamo': {
                     },
                     'BoussinesqShellTC': {
                         'Explicit' : {
-                            'serial' : [variant()],
+                            'serial' : [variant(), variant('serial_split_equation', 1)],
                             'mpi' : [variant()],
                             'kk' : [variant()],
                             'kkgpu' : [variant()],
@@ -127,6 +129,12 @@ configurations = {  'BoussinesqSphereDynamo': {
                     'BoussinesqPlaneRBC': {
                         'Explicit' : {
                             'serial' : [variant('build_only', 1)]
+                        }
+                    },
+                    'BoussinesqPlaneRRBC': {
+                        'Explicit' : {
+                            'serial' : [variant('build_only', 1)],
+                            'petsc-mpi' : [variant('tubular',1)]
                         }
                     }
                 }

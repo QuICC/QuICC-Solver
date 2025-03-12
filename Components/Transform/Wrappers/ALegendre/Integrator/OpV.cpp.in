@@ -145,13 +145,15 @@ void @Op@<@Tag@>::applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in)
         {
             for (std::int64_t i = 0; i < inB.rows(); ++i)
             {
-                #ifdef QUICC_AL_ROW_MAJOR
-                // copy from padded to flattened and transpose
-                mPhysFlat[offSet + i*inB.cols()+j] = inB.data()[i+j*in.rows()];
-                #else
-                // copy from padded to flattened column
-                mPhysFlat[offSet + i+j*inB.rows()] = inB.data()[i+j*in.rows()];
-                #endif
+#if defined QUICC_AL_ROW_MAJOR || defined QUICC_AL_ALL_ROW_MAJOR
+               // copy from padded to flattened and transpose
+               mPhysFlat[offSet + i * inB.cols() + j] =
+                  inB.data()[i + j * in.rows()];
+#else
+               // copy from padded to flattened column
+               mPhysFlat[offSet + i + j * inB.rows()] =
+                  inB.data()[i + j * in.rows()];
+#endif
             }
         }
         offSet += inB.size();
@@ -177,7 +179,7 @@ void @Op@<@Tag@>::applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in)
 
         OpMatrixR outB = rOut.block(0, start, outRows, cols);
 
-        #ifdef QUICC_AL_ROW_MAJOR
+#if defined QUICC_AL_ROW_MAJOR || defined QUICC_AL_ALL_ROW_MAJOR
         for (std::int64_t j = 0; j < outB.cols(); ++j)
         {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
@@ -186,7 +188,7 @@ void @Op@<@Tag@>::applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in)
                 outB.data()[i+j*rOut.rows()]= mModsFlat[offSet + i*outB.cols()+j];
             }
         }
-        #else
+#else
         for (std::int64_t j = 0; j < outB.cols(); ++j)
         {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
@@ -195,7 +197,7 @@ void @Op@<@Tag@>::applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in)
                 outB.data()[i+j*rOut.rows()]= mModsFlat[offSet + i+j*outB.rows()];
             }
         }
-        #endif
+#endif
 
         offSet += outB.size();
         start += cols;

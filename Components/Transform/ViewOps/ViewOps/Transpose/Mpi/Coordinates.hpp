@@ -38,7 +38,8 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
    // copy back to cpu
    using namespace QuICC::Memory;
    tempOnHostMemorySpace converterP(pointers, TransferMode::read);
-   tempOnHostMemorySpace converterI(indices, TransferMode::read | TransferMode::block);
+   tempOnHostMemorySpace converterI(indices,
+      TransferMode::read | TransferMode::block);
 
    using namespace QuICC::Transpose;
    if constexpr (std::is_same_v<typename Tv::AttributesType, DCCSC3D> &&
@@ -63,14 +64,15 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
       return coo;
    }
    else if constexpr (std::is_same_v<typename Tv::AttributesType, DCCSC3DJIK> &&
-                 std::is_same_v<Perm, p012_t>)
+                      std::is_same_v<Perm, p012_t>)
    {
       std::size_t itCoo = 0;
       for (std::size_t ptr = 0; ptr < pointers.size() - 1; ++ptr)
       {
          for (std::size_t i = 0; i < view.dims()[0]; ++i)
          {
-            for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
+            for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1];
+                 ++idx)
             {
                // 0 1 2 -> i j k && JIK
                coo[itCoo++] = {
@@ -95,10 +97,10 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
             {
                // 2 0 1 -> k i j
                coo[itCoo++] = {
-                  static_cast<int>(ptr),          // k
-                  static_cast<int>(i),            // i
-                  static_cast<int>(indices[idx])  // j
-                  };
+                  static_cast<int>(ptr),         // k
+                  static_cast<int>(i),           // i
+                  static_cast<int>(indices[idx]) // j
+               };
             }
          }
       }
@@ -112,13 +114,14 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
       {
          for (std::size_t i = 0; i < view.dims()[0]; ++i)
          {
-            for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
+            for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1];
+                 ++idx)
             {
                // 2 0 1 -> k i j && JIK
                coo[itCoo++] = {
-                  static_cast<int>(ptr),          // k
-                  static_cast<int>(i),            // i
-                  static_cast<int>(indices[idx])  // j
+                  static_cast<int>(ptr),         // k
+                  static_cast<int>(i),           // i
+                  static_cast<int>(indices[idx]) // j
                };
             }
          }
@@ -163,13 +166,14 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
                   static_cast<int>(i),            // i
                   static_cast<int>(indices[idx]), // j
                   static_cast<int>(ptr)           // k
-                  };
+               };
             }
          }
       }
       return coo;
    }
-   else if constexpr (std::is_same_v<typename Tv::AttributesType, S1CLCSC3DJIK> &&
+   else if constexpr (std::is_same_v<typename Tv::AttributesType,
+                         S1CLCSC3DJIK> &&
                       std::is_same_v<Perm, p012_t>)
    {
       std::size_t itCoo = 0;
@@ -179,7 +183,8 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
          // std::size_t heightCol = view.dims()[0] - ptr;
          for (std::size_t i = ptr; i < I; ++i)
          {
-            for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
+            for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1];
+                 ++idx)
             {
                // 0 1 2 -> i j k && JIK
                coo[itCoo++] = {
@@ -215,7 +220,8 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
       }
       return coo;
    }
-   else if constexpr (std::is_same_v<typename Tv::AttributesType, S1CLCSC3DJIK> &&
+   else if constexpr (std::is_same_v<typename Tv::AttributesType,
+                         S1CLCSC3DJIK> &&
                       std::is_same_v<Perm, p120_t>)
    {
       std::size_t itCoo = 0;
@@ -225,7 +231,8 @@ template <class Tv, class Perm> std::vector<point_t> getCoo(const Tv& view)
          // std::size_t heightCol = view.dims()[0] - ptr;
          for (std::size_t i = ptr; i < I; ++i)
          {
-            for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1]; ++idx)
+            for (std::size_t idx = pointers[ptr]; idx < pointers[ptr + 1];
+                 ++idx)
             {
                // 1 2 0 -> j k i && JIK
                coo[itCoo++] = {

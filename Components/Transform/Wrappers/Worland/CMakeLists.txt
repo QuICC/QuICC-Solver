@@ -18,7 +18,7 @@ set(ProjectorOpInOut "phys_t, mods_t")
 set(CpuMemRes "Cpu::NewDelete")
 set(GpuMemRes "Cuda::Malloc")
 
-set(GpuLayout "#define QUICC_JW_ROW_MAJOR")
+set(GpuLayout "#define QUICC_JW_ALL_ROW_MAJOR")
 
 set(GpuHppHeaders "#include <cuda/std/complex>
 #include \"Memory/Memory.hpp\""

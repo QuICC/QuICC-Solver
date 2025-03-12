@@ -1,4 +1,10 @@
-from quicc.reframe.library import splitTestTransform
+import os
+
+if os.getenv('CI') == 'true':
+    from quicc.reframe.library import splitTestTransform
+else:
+    from quicc.reframe.uenv.library import splitTestTransform
+
 import reframe as rfm
 
 #
@@ -154,7 +160,7 @@ class TransformFourierTests_Mixed_P_viewGpu_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_P_viewGpuVkFFT_t_projector(splitTestTransform):
@@ -165,7 +171,7 @@ class TransformFourierTests_Mixed_P_viewGpuVkFFT_t_projector(splitTestTransform)
         """ Initiallize references
         """
 
-        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_D1_viewGpu_t_projector(splitTestTransform):
@@ -176,7 +182,7 @@ class TransformFourierTests_Mixed_D1_viewGpu_t_projector(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_D1_viewGpuVkFFT_t_projector(splitTestTransform):
@@ -187,7 +193,7 @@ class TransformFourierTests_Mixed_D1_viewGpuVkFFT_t_projector(splitTestTransform
         """ Initiallize references
         """
 
-        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_P_viewGpu_t_integrator(splitTestTransform):
@@ -198,7 +204,7 @@ class TransformFourierTests_Mixed_P_viewGpu_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_P_viewGpuVkFFT_t_integrator(splitTestTransform):
@@ -209,7 +215,7 @@ class TransformFourierTests_Mixed_P_viewGpuVkFFT_t_integrator(splitTestTransform
         """ Initiallize references
         """
 
-        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_D1_viewGpu_t_integrator(splitTestTransform):
@@ -220,7 +226,7 @@ class TransformFourierTests_Mixed_D1_viewGpu_t_integrator(splitTestTransform):
         """ Initiallize references
         """
 
-        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__)
 
 @rfm.simple_test
 class TransformFourierTests_Mixed_D1_viewGpuVkFFT_t_integrator(splitTestTransform):
@@ -231,5 +237,5 @@ class TransformFourierTests_Mixed_D1_viewGpuVkFFT_t_integrator(splitTestTransfor
         """ Initiallize references
         """
 
-        self.read_references("gpu.json", self.__class__.__name__, filter='Min')
+        self.read_references("gpu.json", self.__class__.__name__)
 

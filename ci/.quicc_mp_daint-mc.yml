@@ -1,6 +1,7 @@
 # This file is generated, do not modify!
 include:
 - remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
+- /ci/gitlab/.cscs_builders.yml
 - /ci/gitlab/.cscs_runners.yml
 - /ci/gitlab/.quicc_tests.yml
 stages:
@@ -9,7 +10,7 @@ stages:
 - test
 - cleanup
 build-quicc-base:
-  extends: .container-builder-cscs-zen2
+  extends: .daint-mc_builder
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-mc
@@ -18,7 +19,7 @@ build-quicc-base:
     SECONDARY_IMAGE_USERNAME: quicc
     SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
-  extends: .container-builder-cscs-zen2
+  extends: .daint-mc_builder
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_mp
@@ -27,7 +28,7 @@ build-quicc:
 test-quicc-lib:
   extends:
   - .test-lib
-  - .daint-mc
+  - .daint-mc_runner
   image: $CSCS_REGISTRY_PATH/quicc_mp_daint-mc:$CI_COMMIT_SHA
 ci-cache-cleanup:
   extends: .container-runner-daint

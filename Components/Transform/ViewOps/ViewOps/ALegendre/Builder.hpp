@@ -152,11 +152,11 @@ void builder(Tview opView, const Evector<Tdata>& grid,
             // note, l goes from m to l_max
             if constexpr (is_integrator_v<Tview>)
             {
-               opView(i+k, j, k) = opT(i, j);
+               opView(i + k, j, k) = opT(i, j);
             }
             else
             {
-               opView(i, j+k, k) = opT(i, j);
+               opView(i, j + k, k) = opT(i, j);
             }
          }
       }

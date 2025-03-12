@@ -165,8 +165,8 @@ inline ptrAndIdx densePtrAndIdx<S1CLCSC3D>(const std::array<std::uint32_t, 3> lo
 /// @param order order for which the metadata is created
 /// @return pointer and indices in a struct
 template <>
-inline ptrAndIdx densePtrAndIdx<S1CLCSC3DJIK>(const std::array<std::uint32_t, 3> logDims,
-   const dimOrder order)
+inline ptrAndIdx densePtrAndIdx<S1CLCSC3DJIK>(
+   const std::array<std::uint32_t, 3> logDims, const dimOrder order)
 {
    return densePtrAndIdx<S1CLCSC3D>(logDims, order);
 }
@@ -207,7 +207,7 @@ inline ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
    kLoc[0] = 1;
    for (std::size_t i = 1; i < I; ++i)
    {
-      kLoc[i] = std::min(kLoc[i-1] + 1, K);
+      kLoc[i] = std::min(kLoc[i - 1] + 1, K);
    }
 
    std::size_t layWidthCum = 0;
@@ -215,7 +215,7 @@ inline ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
    ret.ptr[0] = 0;
    for (std::size_t i = 1; i < I + 1; ++i)
    {
-      std::uint32_t width = kLoc[i-1];
+      std::uint32_t width = kLoc[i - 1];
       ret.ptr[i] = ret.ptr[i - 1] + width;
       layWidthCum += width;
    }
@@ -240,8 +240,8 @@ inline ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
 /// @param order order for which the metadata is created
 /// @return pointer and indices in a struct
 template <>
-inline ptrAndIdx densePtrAndIdxStep1<DCCSC3DJIK>(const std::array<std::uint32_t, 3> logDims,
-   const dimOrder order)
+ptrAndIdx densePtrAndIdxStep1<DCCSC3DJIK>(
+   const std::array<std::uint32_t, 3> logDims, const dimOrder order)
 {
    return densePtrAndIdxStep1<DCCSC3D>(logDims, order);
 }

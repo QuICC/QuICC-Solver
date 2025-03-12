@@ -70,11 +70,14 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         # Spherical schemes
         if self._scheme in [b'SLFl', b'SLFm', b'WLFl', b'WLFm']:
             self._components = ['r', 'theta', 'phi']
+            self._ijk_components = ['phi', 'theta', 'r']
             self._make_mesh_coordinates = self._spherical_mesh
             self._vcomp = dict({'x':self._spherical_x_vcomp, 'y':self._spherical_y_vcomp, 'z':self._spherical_z_vcomp})
         # Plane layer
         elif self._scheme in [b'TFF']:
+            self._expand_phi = False
             self._components = ['z', 'x', 'y']
+            self._ijk_components = ['y', 'x', 'z']
             self._make_mesh_coordinates = self._planelayer_mesh
             self._vcomp = dict({'x':self._planelayer_x_vcomp, 'y':self._planelayer_y_vcomp, 'z':self._planelayer_z_vcomp})
         else:
@@ -102,6 +105,7 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         self._timesteps = list()
         self._scheme = None
         self._components = None
+        self._ijk_components = None
         self._make_mesh_coordinates = None
         self._vcomp = None
 
@@ -289,13 +293,13 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
 
         data_time = self._get_update_time(outInfoVec.GetInformationObject(0))
         raw_data = self._get_raw_data(data_time)
-        size_r = raw_data['mesh']['grid_r'].size
-        size_theta = raw_data['mesh']['grid_theta'].size
-        size_phi = raw_data['mesh']['grid_phi'].size
+        size_k = raw_data['mesh'][f'grid_{self._ijk_components[2]}'].size
+        size_j = raw_data['mesh'][f'grid_{self._ijk_components[1]}'].size
+        size_i = raw_data['mesh'][f'grid_{self._ijk_components[0]}'].size
         # Expand phi grid by one to close domain
         if self._expand_phi:
-            size_phi += 1
-        dims = [size_phi, size_theta, size_r]
+            size_i += 1
+        dims = [size_i, size_j, size_k]
         outInfo.Set(executive.WHOLE_EXTENT(), 0, dims[0]-1 , 0, dims[1]-1 , 0, dims[2]-1)
         outInfo.Set(self.CAN_PRODUCE_SUB_EXTENT(), 1)
 
@@ -307,12 +311,12 @@ class PythonQuICCReaderBase(VTKPythonAlgorithmBase):
         raw_data = self._get_raw_data(data_time)
         # Add 2pi to grid if extent contains last grid point
         if self._has_phi_boundary(exts, raw_data):
-            phi_grid = np.concatenate((raw_data['mesh'][f'grid_phi'][()][exts[0]:exts[1]], np.array([2*np.pi])))
+            i_grid = np.concatenate((raw_data['mesh'][f'grid_{self._ijk_components[0]}'][()][exts[0]:exts[1]], np.array([2*np.pi])))
         else:
-            phi_grid = raw_data['mesh'][f'grid_phi'][()][exts[0]:exts[1]+1]
-        grid = [raw_data['mesh'][f'grid_r'][()][exts[4]:exts[5]+1],
-                raw_data['mesh'][f'grid_theta'][()][exts[2]:exts[3]+1],
-                phi_grid]
+            i_grid = raw_data['mesh'][f'grid_{self._ijk_components[0]}'][()][exts[0]:exts[1]+1]
+        grid = [raw_data['mesh'][f'grid_{self._ijk_components[2]}'][()][exts[4]:exts[5]+1],
+                raw_data['mesh'][f'grid_{self._ijk_components[1]}'][()][exts[2]:exts[3]+1],
+                i_grid]
         mgrid = np.meshgrid(*grid, indexing="ij")
         X, Y, Z = self._make_mesh_coordinates(*mgrid)
 
