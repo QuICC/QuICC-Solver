@@ -429,9 +429,6 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
             Cpu::pack(_sendBufferView, in, _sendCountsView,
                _sendDisplsView, _sendBufferDisplsView);
          }
-         // #else
-         // pack(_sendBufferView, in);
-         // #endif
 
          // Comm
          if constexpr (std::is_same_v<TAG, sendrecv_t>)
@@ -473,42 +470,10 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
             Cpu::unPack(out, _recvBufferView, _recvCountsView,
                _recvDisplsView, _recvBufferDisplsView);
          }
-         // #else
-         // unPack(out, _recvBufferView);
-         // #endif
       }
    }
 }
 
-template <class TDATA, class TAG>
-void Comm<TDATA, TAG>::pack(View::ViewBase<TDATA> buffer, const TDATA* in) const
-{
-   #ifdef QUICC_HAS_CUDA_BACKEND
-   assert(QuICC::Cuda::isDeviceMemory(in) == QuICC::Cuda::isDeviceMemory(buffer.data()));
-   #endif
-   for (int i = 0; i < _nSubComm; ++i)
-   {
-      for (int s = 0; s < _sendCounts[i]; ++s)
-      {
-         buffer[_sendBufferDispls[i]+s] = *(in + _sendDispls[i][s]);
-      }
-   }
-}
-
-template <class TDATA, class TAG>
-void Comm<TDATA, TAG>::unPack(TDATA* out, const View::ViewBase<TDATA> buffer) const
-{
-   #ifdef QUICC_HAS_CUDA_BACKEND
-   assert(QuICC::Cuda::isDeviceMemory(out) == QuICC::Cuda::isDeviceMemory(buffer.data()));
-   #endif
-   for (int i = 0; i < _nSubComm; ++i)
-   {
-      for (int s = 0; s < _recvCounts[i]; ++s)
-      {
-         *(out + _recvDispls[i][s]) = buffer[_recvBufferDispls[i]+s];
-      }
-   }
-}
 
 } // namespace Mpi
 } // namespace Transpose
