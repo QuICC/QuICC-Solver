@@ -42,7 +42,6 @@ void MapOps::setCross(mlir::quiccir::CrossOp op)
     if (_thisArr[index] == nullptr) {
         using namespace QuICC::Pointwise;
         using T = R_DCCSC3D_t;
-        /// \todo check kind
         if (_isCpu)
         {
             using namespace QuICC::Pointwise::Cpu;

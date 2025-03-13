@@ -110,7 +110,6 @@ namespace Transform {
          transform.back().addEdge(Forward::P::id(), scalId, Arithmetics::Add::id());
       }
       // Apply second order quasi-inverse
-      // this
       else if(flag == Path::I2ScalarNl::id())
       {
          transform.push_back(TransformPath(FieldComponents::Physical::SCALAR, FieldType::SCALAR));
@@ -199,7 +198,6 @@ namespace Transform {
          auto curlcurlFlag = components.at(1).second;
 
          // Integrate standard second order equation
-         // this
          if(curlFlag == Path::I2CurlNl::id())
          {
             // Compute curl component
@@ -233,7 +231,6 @@ namespace Transform {
          }
 
          // Integrate fourth order spherical equation with negative sign
-         /// this
          if(curlcurlFlag == Path::NegI4CurlCurlNl::id())
          {
             // Compute curlcurl Q component
