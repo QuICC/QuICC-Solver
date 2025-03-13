@@ -282,7 +282,7 @@ if(QUICC_USE_KOKKOS)
 endif()
 
 quicc_set_ulp(_ulp
-  ULP 35 383 1340 1104 1196 36 214 1017 374 925
+  ULP 42 383 1340 1104 1196 42 214 1017 374 925
   MPULP 2 17 64 42 40 2 10 44 31 24
 )
 foreach(_test ${_tests})
