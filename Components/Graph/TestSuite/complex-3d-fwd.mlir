@@ -29,4 +29,4 @@ func.func @entry(%R: tensor<?x?x?xf64>, %Theta: tensor<?x?x?xf64>, %Phi: tensor<
   return %Pol : tensor<?x?x?xcomplex<f64>>
 }
 
-// /home/gcastigl/codes/quiccir/build-17/bin/quiccir-opt ./complex-3d-fwd.mlir --inline --quiccir-view-wrapper='dim-rets=7,3,6 dim-args=6,10,10 lay-args=DCCSC3D lay-rets=DCCSC3D' --inline --inline --set-quiccir-dims='phys=6,10,10 mods=3,6,7' --set-quiccir-view-lay='lay-ppp2mpp=DCCSC3D,DCCSC3D lay-pmp2mmp=DCCSC3D,S1CLCSC3D lay-pmm2mmm=DCCSC3D,DCCSC3D' --canonicalize --convert-quiccir-to-call --quiccir-view-deallocation --lower-quiccir-alloc --canonicalize --finalize-quiccir-view --cse --convert-func-to-llvm --canonicalize
+// quiccir-opt ./complex-3d-fwd.mlir --inline --quiccir-view-wrapper='dim-rets=7,3,6 dim-args=6,10,10 lay-args=DCCSC3D lay-rets=DCCSC3D' --inline --inline --set-quiccir-dims='phys=6,10,10 mods=3,6,7' --set-quiccir-view-lay='lay-ppp2mpp=DCCSC3D,DCCSC3D lay-pmp2mmp=DCCSC3D,S1CLCSC3D lay-pmm2mmm=DCCSC3D,DCCSC3D' --canonicalize --convert-quiccir-to-call --quiccir-view-deallocation --lower-quiccir-alloc --canonicalize --finalize-quiccir-view --cse --convert-func-to-llvm --canonicalize

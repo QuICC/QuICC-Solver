@@ -20,15 +20,6 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
-# set(PHS
-#   Memory/Memory.hpp
-#   Memory/MemoryResource.hpp
-#   Memory/Pensieve.hpp
-#   Memory/Cpu/NewDelete.hpp
-#   Memory/Cpu/Pool.hpp
-#   Memory/Cuda/Malloc.hpp
-# )
-
 # Add public header
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
   PROPERTIES

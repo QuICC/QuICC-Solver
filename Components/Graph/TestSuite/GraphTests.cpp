@@ -112,7 +112,7 @@ TEST_CASE("One Dimensional Loop Associated Legendre", "[OneDimLoopAL]")
   auto K = physDims[0];
   auto modsM = modsDims[2];
   auto modsN = modsDims[1];
-  // auto modsK = modsDims[2];
+  // auto modsK = modsDims[0];
 
   // Populate meta for fully populated tensor
 

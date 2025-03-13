@@ -27,7 +27,6 @@ Pool::~Pool()
     {
         if(_blocks[i].ptr != nullptr)
         {
-            // ::operator delete(_blocks[i].ptr, _blocks[i].blockSize, static_cast<std::align_val_t>(_alignment));
             cudaErrChk(cudaFree(_blocks[i].ptr));
 #ifndef NDEBUG
             std::cout << "deallocated: " << _blocks[i].blockSize << "\t@: " << _blocks[i].ptr << '\n';
@@ -64,9 +63,7 @@ void* Pool::do_allocate(std::size_t bytes, std::size_t)
         if (bytes > _blocks[i].blockSize)
         {
             // realloc
-            // ::operator delete(_blocks[i].ptr, _blocks[i].blockSize, static_cast<std::align_val_t>(_alignment));
             cudaErrChk(cudaFree(_blocks[i].ptr));
-            // _blocks[i].ptr = ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
             cudaErrChk(cudaMalloc(reinterpret_cast<void**>(&_blocks[i].ptr), _maxBlockSize));
             _blocks[i].blockSize = _maxBlockSize;
 #ifndef NDEBUG
@@ -84,7 +81,6 @@ void* Pool::do_allocate(std::size_t bytes, std::size_t)
     }
 
     // if not allocate
-    // auto ptr = ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
     void* ptr{nullptr};
     cudaErrChk(cudaMalloc(reinterpret_cast<void**>(&ptr), _maxBlockSize));
     _blocks[i].blockSize = _maxBlockSize;

@@ -245,11 +245,6 @@ namespace View {
 
       for (std::size_t i = 0; i < _rank; ++i)
       {
-         /// \todo check space consistency
-         // assert(QuICC::Cuda::isDeviceMemory(data) ==
-         //    QuICC::Cuda::isDeviceMemory(pointers[i]) ||
-         //    pointers[i] == nullptr);
-
          _dimensions[i] = dimensions[i];
          _pointers[i] = pointers[i];
          _indices[i] = indices[i];
