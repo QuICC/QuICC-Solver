@@ -7,13 +7,11 @@
 //
 #include <algorithm>
 #include <stdexcept>
-#include <type_traits>
 
 // Project includes
 //
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
-#include "QuICC/Pseudospectral/Utils.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "Environment/QuICCEnv.hpp"
@@ -34,14 +32,12 @@
 #include "QuICC/PseudospectralTag/Uninitialized.hpp"
 #include "QuICC/PseudospectralTag/Wrapper.hpp"
 #include "QuICC/PhysicalNames/Coordinator.hpp"
-#include "QuICC/PhysicalNames/registerAll.hpp"
 #include "Profiler/Interface.hpp"
 
 
 namespace QuICC {
 
 namespace Pseudospectral {
-
 
    const std::set<int>& Coordinator::it() const
    {
@@ -138,7 +134,6 @@ namespace Pseudospectral {
       this->mVectorEqMap.at(key).push_back(spEq);
       DebuggerMacro_msg("... done", 1);
    }
-
 
    Coordinator::ScalarEquation_range Coordinator::scalarRange(const std::size_t eqId, const int it)
    {

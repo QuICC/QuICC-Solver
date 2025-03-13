@@ -110,6 +110,7 @@ namespace Transform {
       this->addOperator<Poly::Worland::Integrator::I4DivR1_Zero<backend_t>>(m, Forward::I4Q::id());
       this->addOperator<Poly::Worland::Integrator::I4DivR1D1R1_Zero<backend_t>>(m, Forward::I4S::id());
 
+      // Create reductors
       this->addOperator<Poly::Worland::Reductor::EnergySLaplR2<backend_t>>(m, Reductor::EnergySlaplR2::id());
       this->addOperator<Poly::Worland::Reductor::EnergyD1R1<backend_t>>(m, Reductor::EnergyD1R1::id());
       this->addOperator<Poly::Worland::Reductor::EnergyR2<backend_t>>(m, Reductor::EnergyR2::id());

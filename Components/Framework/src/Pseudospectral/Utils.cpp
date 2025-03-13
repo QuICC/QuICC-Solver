@@ -69,9 +69,7 @@ namespace details
       {
          for(int j = 0; j < res.dim<QuICC::Dimensions::Data::DAT2D>(k); ++j)
          {
-            // auto layerIndex = res.idx<QuICC::Dimensions::Data::DAT3D>(k);
             auto columnIndex = res.idx<QuICC::Dimensions::Data::DAT2D>(j, k);
-            // auto columnHeight = res.dim<QuICC::Dimensions::Data::DATB1D>(j, k);
             idx[l] = columnIndex;
             ++l;
          }
@@ -114,10 +112,6 @@ namespace details
          // layer width
          int cols = res.dim<QuICC::Dimensions::Data::DAT2D>(p);
          auto widthView = static_cast<std::uint32_t>(cols);
-         // check only in debug mode
-         // auto widthView = pointers[p+1] - pointers[p];
-         // assert(widthView == static_cast<std::uint32_t>(cols));
-         // layer height (DCCSC3D only)
          /// \todo extend to other view types
          int inRows;
          if constexpr (std::is_same_v<SCALAR, double>)
@@ -192,10 +186,6 @@ namespace details
          // layer width
          int cols = res.dim<QuICC::Dimensions::Data::DAT2D>(p);
          auto widthView = static_cast<std::uint32_t>(cols);
-         // check only in debug mode
-         // auto widthView = pointers[p+1] - pointers[p];
-         // assert(widthView == static_cast<std::uint32_t>(cols));
-         // layer height (DCCSC3D only)
          /// \todo extend to other view types
          int outRows;
          if constexpr (std::is_same_v<SCALAR, double>)
@@ -271,7 +261,6 @@ namespace details
          [&](auto&& p, auto& Tv)
          {
             auto& ptrTemp = p->rDom(0).rPerturbation();
-            // p->rDom(0).rPerturbation().setZeros();
             details::copyView2Eig(ptrTemp.rData(), Tv, res);
          }, sVar, vVar);
    }
@@ -282,10 +271,8 @@ namespace details
          [&](auto&& p, auto& Torv, auto& Polv)
          {
             auto& ptrTor = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR);
-            // p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setZeros();
             details::copyView2Eig(ptrTor.rData(), Torv, res);
             auto& ptrPol = p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL);
-            // p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setZeros();
             details::copyView2Eig(ptrPol.rData(), Polv, res);
          }, vecVar, vVar0, vVar1);
 
@@ -297,13 +284,10 @@ namespace details
             [&](auto&& p, auto& Urv, auto& Uthetav, auto& Uphiv)
             {
                auto& ptrUr = p->rDom(0).rPhys().rComp(FieldComponents::Physical::R);
-               // p->rDom(0).rPhys().rComp(FieldComponents::Physical::R).setZeros();
                details::copyView2Eig(ptrUr.rData(), Urv, res);
                auto& ptrUtheta = p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA);
-               // p->rDom(0).rPhys().rComp(FieldComponents::Physical::THETA).setZeros();
                details::copyView2Eig(ptrUtheta.rData(), Uthetav, res);
                auto& ptrUphi = p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI);
-               // p->rDom(0).rPhys().rComp(FieldComponents::Physical::PHI).setZeros();
                details::copyView2Eig(ptrUphi.rData(), Uphiv, res);
             }, vecVar, vVar0, vVar1, vVar2);
 
