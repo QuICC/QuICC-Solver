@@ -11,7 +11,6 @@
 #include <Quiccir/IR/QuiccirDialect.h>
 #include <Quiccir/Transforms/QuiccirPasses.h>
 #include <Quiccir/Pipelines/Passes.h>
-// #include <Quiccir-c/Utils.h>
 
 #include <mlir/InitAllDialects.h>
 #include <mlir/Dialect/Func/Extensions/AllExtensions.h>
@@ -20,7 +19,6 @@
 #include <mlir/Transforms/Passes.h>
 
 #include <mlir/Pass/PassManager.h>
-// #include <llvm/Support/CommandLine.h>
 
 // JIT
 #include <mlir/ExecutionEngine/ExecutionEngine.h>
@@ -305,11 +303,6 @@ void Jit<RANK>::setDialects()
     _ctx.appendDialectRegistry(_registry);
     // Load our Dialect in this MLIR Context.
     _ctx.loadDialect<mlir::quiccir::QuiccirDialect>();
-
-    // #ifndef NDEBUG
-    // mlir::tracing::InstallDebugHandler installDebugHandler(_ctx,
-    //                                                _debugConfig);
-    // #endif
 }
 
 namespace details

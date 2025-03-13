@@ -55,7 +55,7 @@ void MapOps::setAdd(mlir::quiccir::AddOp op)
             }
             else
             {
-                throw std::logic_error("sub op not implemented.");
+                throw std::logic_error("add op not implemented.");
             }
         }
         #ifdef QUICC_HAS_CUDA_BACKEND
@@ -89,7 +89,7 @@ void MapOps::setAdd(mlir::quiccir::AddOp op)
             }
             else
             {
-                throw std::logic_error("sub op not implemented.");
+                throw std::logic_error("add op not implemented.");
             }
 
         }
