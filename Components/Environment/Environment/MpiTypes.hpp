@@ -14,8 +14,6 @@
 #include <complex>
 #include <mpi.h>
 
-// External includes
-//
 
 // Project includes
 //

@@ -11,6 +11,9 @@
 //
 #include <map>
 #include <mpi.h>
+#if defined(OPEN_MPI) && OPEN_MPI
+#include <mpi-ext.h>
+#endif
 #include <vector>
 
 // External includes

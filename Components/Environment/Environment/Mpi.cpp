@@ -13,10 +13,6 @@
 extern "C" {
 #include <unistd.h>
 }
-#include <mpi.h>
-#if defined(OPEN_MPI) && OPEN_MPI
-#include <mpi-ext.h>
-#endif
 
 // Project include
 //
@@ -231,9 +227,6 @@ void Mpi::checkCudaAwareness()
       else
       {
          std::cout << "Mpi is not cuda aware!\n";
-         // #ifdef QUICC_HAS_CUDA_BACKEND
-         // this->abort("Cuda aware is not supported, but needed for Cuda backend!");
-         // #endif
       }
    }
 }

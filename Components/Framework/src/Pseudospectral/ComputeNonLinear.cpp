@@ -46,6 +46,10 @@ namespace Pseudospectral {
       else
       {
          // Use new graph
+         if (it != 0)
+         {
+            throw std::logic_error("Graph Jitter is not supported yet");
+         }
 
          // Copy to view
          // Temperature
@@ -83,23 +87,20 @@ namespace Pseudospectral {
          auto& UrVarv = mId2View[hVelR];
          auto& UthetaVarv = mId2View[hVelTheta];
          auto& UphiVarv = mId2View[hVelPhi];
+
          // Physical magnetic field
-         std::size_t hMagR = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::R);
-         std::size_t hMagTheta = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::THETA);
-         std::size_t hMagPhi = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::PHI);
-         auto& BrVarv = mId2View[hMagR];
-         auto& BthetaVarv = mId2View[hMagTheta];
-         auto& BphiVarv = mId2View[hMagPhi];
-
-         // #ifndef NDEBUG
-         // Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
-         // // Compute backward transform
-         // this->updatePhysical(it);
-
-         // // compute nonlinear interaction and forward transform
-         // this->updateSpectral(it);
-         // Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
-         // #endif
+         Graph::varData_t BrVarv;
+         Graph::varData_t BthetaVarv;
+         Graph::varData_t BphiVarv;
+         if (mIsMag)
+         {
+            std::size_t hMagR = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::R);
+            std::size_t hMagTheta = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::THETA);
+            std::size_t hMagPhi = hash_combine(PhysicalNames::Magnetic::id(), FieldComponents::Physical::PHI);
+            BrVarv = mId2View[hMagR];
+            BthetaVarv = mId2View[hMagTheta];
+            BphiVarv = mId2View[hMagPhi];
+         }
 
          Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlNew");
          // Call graph
