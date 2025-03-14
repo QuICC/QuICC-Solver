@@ -1,6 +1,6 @@
 /**
  * @file ModelBackend.cpp
- * @brief Source of the interface for model backend
+ * @brief Source of the interface for test model backend
  */
 
 // System includes
@@ -9,7 +9,7 @@
 
 // Project includes
 //
-#include "QuICC/TestSuite/Framework/Io/TestModelBackend.hpp"
+#include "QuICC/TestSuite/Framework/Io/TestBackend.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
@@ -22,10 +22,10 @@ namespace Framework {
 
 namespace Io {
 
-TestModelBackend::TestModelBackend()
+TestBackend::TestBackend()
 {}
 
-std::vector<std::string> TestModelBackend::fieldNames() const
+std::vector<std::string> TestBackend::fieldNames() const
 {
    std::vector<std::string> names = {
       PhysicalNames::Velocity().tag(),
@@ -36,14 +36,14 @@ std::vector<std::string> TestModelBackend::fieldNames() const
    return names;
 }
 
-std::vector<std::string> TestModelBackend::paramNames() const
+std::vector<std::string> TestBackend::paramNames() const
 {
    std::vector<std::string> names;
 
    return names;
 }
 
-std::vector<bool> TestModelBackend::isPeriodicBox() const
+std::vector<bool> TestBackend::isPeriodicBox() const
 {
    std::vector<bool> periodic = {false, false, false};
 
@@ -51,7 +51,7 @@ std::vector<bool> TestModelBackend::isPeriodicBox() const
 }
 
 
-std::map<std::string, MHDFloat> TestModelBackend::automaticParameters(
+std::map<std::string, MHDFloat> TestBackend::automaticParameters(
    const std::map<std::string, MHDFloat>& cfg) const
 {
    std::map<std::string, MHDFloat> params;
@@ -59,7 +59,7 @@ std::map<std::string, MHDFloat> TestModelBackend::automaticParameters(
    return params;
 }
 
-void TestModelBackend::equationInfo(QuICC::Model::EquationInfo& info, const SpectralFieldId& fId,
+void TestBackend::equationInfo(QuICC::Model::EquationInfo& info, const SpectralFieldId& fId,
    const Resolution& res) const
 {
    // Operators are real
@@ -93,7 +93,7 @@ void TestModelBackend::equationInfo(QuICC::Model::EquationInfo& info, const Spec
       static_cast<int>(Equations::CouplingIndexType::SLOWEST_MULTI_RHS);
 }
 
-void TestModelBackend::operatorInfo(QuICC::Model::OperatorInfo& info, const SpectralFieldId& fId,
+void TestBackend::operatorInfo(QuICC::Model::OperatorInfo& info, const SpectralFieldId& fId,
    const Resolution& res, const Equations::Tools::ICoupling& coupling,
    const BcMap& bcs) const
 {
@@ -129,7 +129,7 @@ void TestModelBackend::operatorInfo(QuICC::Model::OperatorInfo& info, const Spec
    }
 }
 
-void TestModelBackend::modelMatrix(DecoupledZSparse& rModelMatrix,
+void TestBackend::modelMatrix(DecoupledZSparse& rModelMatrix,
    const std::size_t opId,
    const Equations::CouplingInformation::FieldId_range imRange,
    const int matIdx, const std::size_t bcType, const Resolution& res,
@@ -139,7 +139,7 @@ void TestModelBackend::modelMatrix(DecoupledZSparse& rModelMatrix,
    throw std::logic_error("modelMatrix: Should not be required");
 }
 
-void TestModelBackend::galerkinStencil(SparseMatrix& mat,
+void TestBackend::galerkinStencil(SparseMatrix& mat,
    const SpectralFieldId& fieldId, const int matIdx, const Resolution& res,
    const std::vector<MHDFloat>& eigs, const bool makeSquare, const BcMap& bcs,
    const NonDimensional::NdMap& nds) const
@@ -147,7 +147,7 @@ void TestModelBackend::galerkinStencil(SparseMatrix& mat,
    throw std::logic_error("galerkinStencil: Should not be required");
 }
 
-void TestModelBackend::explicitBlock(DecoupledZSparse& mat,
+void TestBackend::explicitBlock(DecoupledZSparse& mat,
    const SpectralFieldId& fId, const std::size_t opId,
    const SpectralFieldId fieldId, const int matIdx, const Resolution& res,
    const std::vector<MHDFloat>& eigs, const BcMap& bcs,
@@ -156,17 +156,17 @@ void TestModelBackend::explicitBlock(DecoupledZSparse& mat,
    throw std::logic_error("explicitBlock: Should not be required");
 }
 
-bool TestModelBackend::isComplex(const SpectralFieldId& fId) const
+bool TestBackend::isComplex(const SpectralFieldId& fId) const
 {
    return 0;
 }
 
-int TestModelBackend::nBc(const SpectralFieldId& fId) const
+int TestBackend::nBc(const SpectralFieldId& fId) const
 {
    return 0;
 }
 
-TestModelBackend::SpectralFieldIds TestModelBackend::implicitFields(
+TestBackend::SpectralFieldIds TestBackend::implicitFields(
    const SpectralFieldId& fId) const
 {
    SpectralFieldIds fields = {fId};

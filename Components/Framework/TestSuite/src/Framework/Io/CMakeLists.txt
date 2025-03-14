@@ -1,5 +1,5 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_TEST_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
   TestArgs.cpp
-  TestModel.cpp
-  TestModelBackend.cpp
+  TestUtils.cpp
+  TestBackend.cpp
 )

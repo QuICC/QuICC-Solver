@@ -1,10 +1,10 @@
 /**
- * @file TestModelBackend.hpp
- * @brief Model backend
+ * @file TestBackend.hpp
+ * @brief Test model backend
  */
 
-#ifndef QUICC_TESTSUITE_FRAMEWORK_IO_TESTMODELBACKEND_HPP
-#define QUICC_TESTSUITE_FRAMEWORK_IO_TESTMODELBACKEND_HPP
+#ifndef QUICC_TESTSUITE_FRAMEWORK_IO_TESTBACKEND_HPP
+#define QUICC_TESTSUITE_FRAMEWORK_IO_TESTBACKEND_HPP
 
 // System includes
 //
@@ -28,18 +28,18 @@ namespace Io {
 /**
  * @brief Interface for model backend
  */
-class TestModelBackend : public QuICC::Model::ISphericalModelBackend
+class TestBackend : public QuICC::Model::ISphericalModelBackend
 {
 public:
    /**
     * @brief Constructor
     */
-   TestModelBackend();
+   TestBackend();
 
    /**
     * @brief Destructor
     */
-   virtual ~TestModelBackend() = default;
+   virtual ~TestBackend() = default;
 
    /**
     * @brief Get vector of names for the physical fields
@@ -207,4 +207,4 @@ private:
 } // namespace TestSuite
 } // namespace QuICC
 
-#endif // QUICC_TESTSUITE_FRAMEWORK_IO_TESTMODELBACKEND_HPP
+#endif // QUICC_TESTSUITE_FRAMEWORK_IO_TESTBACKEND_HPP

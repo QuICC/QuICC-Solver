@@ -5,24 +5,23 @@
 
 // System includes
 //
-  #include <catch2/catch.hpp>
+#include <catch2/catch.hpp>
 
 // Project includes
 //
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/PhysicalNames/registerAll.hpp"
-#include "QuICC/Arithmetics/registerAll.hpp"
 #include "QuICC/TestSuite/Framework/Io/TestArgs.hpp"
-#include "QuICC/TestSuite/Framework/Io/TestModel.hpp"
-#include "QuICC/Generator/StateGenerator.hpp"
-#include "QuICC/Model/StateGeneratorFactory.hpp"
+#include "QuICC/TestSuite/Framework/Io/TestBackend.hpp"
+#include "QuICC/TestSuite/Framework/Io/TestUtils.hpp"
+#include "QuICC/SpatialScheme/3D/@Scheme@.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace currentts = ::QuICC::TestSuite::Framework::Io;
 
 static const auto badValueOut = std::numeric_limits<QuICC::MHDFloat>::max();
 
-TEST_CASE( "Check dipolarity writer", "[SphereDipolarity]" ){
+TEST_CASE( "Check ASCII writers for @Scheme@", "[@Scheme@]" ){
 
    // Register IDs
    QuICC::PhysicalNames::registerAll();
@@ -31,14 +30,19 @@ TEST_CASE( "Check dipolarity writer", "[SphereDipolarity]" ){
 
    int status = 0;
 
+   currentts::TestParameters test;
+   test.maxUlp = currentts::args().ulp;
+
+   auto spScheme = currentts::createScheme<QuICC::SpatialScheme::@Scheme@>();
+
    // Create simulation
-   QuICC::SharedStateGenerator   spGen;
+   decltype(currentts::createRunner(spScheme, test)) spRunner;
 
    // Exception handling during the initialisation part
    try
    {
       // Create state generator
-      spGen = QuICC::StateGeneratorFactory<currentts::TestModel>::createGenerator();
+      spRunner = currentts::createRunner(spScheme, test);
    }
 
    // If exception is thrown, finalise (close files) and return
@@ -59,11 +63,14 @@ TEST_CASE( "Check dipolarity writer", "[SphereDipolarity]" ){
    if(status == 0)
    {
       // Run the simulation
-      spGen->run();
+      spRunner->run();
    }
 
-   // Cleanup and close file handles
-   spGen->finalize();
+   CHECK( status == 0 );
 
-   CHECK( status == 0);
+   // Check output
+   currentts::checkFiles(spScheme, test);
+
+   // Cleanup and close file handles
+   spRunner->finalize();
 }

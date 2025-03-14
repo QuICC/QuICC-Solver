@@ -2,6 +2,10 @@ message(VERBOSE "Enabling Framework IO tests:")
 
 set(TestExe FrameworkIoTests)
 
+target_link_libraries(${QUICC_CURRENT_COMPONENT_TEST_LIB}
+  QuICC::TestSuite
+)
+
 # Add target for all tests
 add_executable(${TestExe} IoTests.cpp)
 
@@ -40,10 +44,18 @@ include(ConfigureTests)
 #  WORKING_DIRECTORY ${QUICC_WORK_DIR}
 #  )
 
-quicc_add_test(Dipolarity
-  COMMAND ${TestExe}
-  KEYWORD Type
-  ID 0
+set(_tests
+  WLFl
+  WLFm
+  SLFl
+  SLFm
 )
+foreach(_test IN LISTS _tests)
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Scheme
+    ID 0
+  )
+endforeach()
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)

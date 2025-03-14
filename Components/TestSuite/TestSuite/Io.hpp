@@ -52,6 +52,11 @@ void readList(std::vector<MHDFloat>& inData, const std::string& path);
 /// @param path
 void readData(Matrix& inData, const std::string& path);
 
+/// @brief Read real data separated in blocks from file
+/// @param inData dense real matrix
+/// @param path
+void readBlockData(std::vector<Matrix>& inData, const std::string& path);
+
 /// @brief Read complex data from file
 /// @param inData dense complex matrix
 /// @param path
@@ -61,7 +66,6 @@ void readData(MatrixZ& inData, const std::string& path);
 /// @param inData sparse real matrix
 /// @param path
 void readData(SparseMatrix& inData, const std::string& path);
-
 
 } // namespace TestSuite
 } // namespace QuICC

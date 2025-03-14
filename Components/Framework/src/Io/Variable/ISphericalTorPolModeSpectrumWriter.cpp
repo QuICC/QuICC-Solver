@@ -120,7 +120,7 @@ void ISphericalTorPolModeSpectrumWriter::writeContent()
       this->mFile << ioFW(ioPrec) << tT << "\t";
       this->mFile << ioFW(ioPrec) << tP << std::endl;
 
-      this->mFile << std::left << ioIW() << "l"
+      this->mFile << std::left << ioIW() << "# l"
                   << "\t"
                   << "m"
                   << "\t";
