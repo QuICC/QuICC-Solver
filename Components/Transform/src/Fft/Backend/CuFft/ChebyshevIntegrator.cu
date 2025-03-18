@@ -160,7 +160,15 @@ namespace CuFft {
 
    void ChebyshevIntegrator::output(Matrix& rOut) const
    {
-      rOut.topRows(this->mSpecSize) = this->mFftScaling*this->mOutMap.topRows(this->mSpecSize);
+      if(this->mMeanOp.size() > 0)
+      {
+         rOut.block(0, 0, this->mSpecSize, 1) = this->mFftScaling*this->mMeanOp*this->mOutMap.block(0,0,this->mMeanOp.cols(),1);
+         rOut.block(0, 1, this->mSpecSize, rOut.cols()-1) = this->mFftScaling*this->mOutMap.block(0,1,this->mSpecSize, rOut.cols()-1);
+      }
+      else
+      {
+         rOut.topRows(this->mSpecSize) = this->mFftScaling*this->mOutMap.topRows(this->mSpecSize);
+      }
    }
 
    void ChebyshevIntegrator::outputSpectral(Matrix& rOut) const
@@ -182,11 +190,11 @@ namespace CuFft {
          if(useReal)
          {
             rOut.block(0, 0, this->mSpecSize, 1).real() = this->mFftScaling*this->mMeanOp*this->mOutMap.block(0,0,this->mMeanOp.cols(),1);
-            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).real() = this->mFftScaling*this->mSpecOp*this->mOutMap.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
+            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).real() = this->mFftScaling*this->mOutMap.block(0,1,this->mSpecSize, rOut.cols()-1);
          } else
          {
             rOut.block(0, 0, this->mSpecSize, 1).imag() = this->mFftScaling*this->mMeanOp*this->mOutMap.block(0,0,this->mMeanOp.cols(),1);
-            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).imag() = this->mFftScaling*this->mSpecOp*this->mOutMap.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
+            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).imag() = this->mFftScaling*this->mOutMap.block(0,1,this->mSpecSize, rOut.cols()-1);
          }
       } else
       {
@@ -202,12 +210,27 @@ namespace CuFft {
 
    void ChebyshevIntegrator::outputSpectral(MatrixZ& rOut, const bool useReal) const
    {
-      if(useReal)
+      if(this->mMeanOp.size() > 0)
       {
-         rOut.topRows(this->mSpecSize).real() = this->mFftScaling*this->mSpecOp*this->mOutMap.topRows(this->mSpecOp.cols());
-      } else
+         if(useReal)
+         {
+            rOut.block(0, 0, this->mSpecSize, 1).real() = this->mFftScaling*this->mMeanOp*this->mOutMap.block(0,0,this->mMeanOp.cols(),1);
+            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).real() = this->mFftScaling*this->mSpecOp*this->mOutMap.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
+         } else
+         {
+            rOut.block(0, 0, this->mSpecSize, 1).imag() = this->mFftScaling*this->mMeanOp*this->mOutMap.block(0,0,this->mMeanOp.cols(),1);
+            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).imag() = this->mFftScaling*this->mSpecOp*this->mOutMap.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
+         }
+      }
+      else
       {
-         rOut.topRows(this->mSpecSize).imag() = this->mFftScaling*this->mSpecOp*this->mOutMap.topRows(this->mSpecOp.cols());
+         if(useReal)
+         {
+            rOut.topRows(this->mSpecSize).real() = this->mFftScaling*this->mSpecOp*this->mOutMap.topRows(this->mSpecOp.cols());
+         } else
+         {
+            rOut.topRows(this->mSpecSize).imag() = this->mFftScaling*this->mSpecOp*this->mOutMap.topRows(this->mSpecOp.cols());
+         }
       }
    }
 

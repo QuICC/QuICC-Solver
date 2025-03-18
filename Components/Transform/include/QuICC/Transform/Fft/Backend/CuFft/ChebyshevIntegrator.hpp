@@ -80,12 +80,12 @@ namespace CuFft {
          void output(MatrixZ& rOut, const bool useReal) const;
 
          /**
-          * @brief Set output multiplied aby spectral operator
+          * @brief Set output multiplied by spectral operator
           */
          void outputSpectral(Matrix& rOut) const;
 
          /**
-          * @brief Set output multiplied aby spectral operator
+          * @brief Set output multiplied by spectral operator
           */
          void outputSpectral(MatrixZ& rOut, const bool useReal) const;
 
