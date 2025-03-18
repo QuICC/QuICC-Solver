@@ -83,7 +83,15 @@ namespace Fftw {
 
    void ChebyshevIntegrator::output(Matrix& rOut) const
    {
-      rOut.topRows(this->mSpecSize) = this->mFftScaling*rOut.topRows(this->mSpecSize);
+      if(this->mMeanOp.size() > 0)
+      {
+         rOut.block(0, 0, this->mSpecSize, 1) = this->mFftScaling*this->mMeanOp*rOut.block(0,0,this->mMeanOp.cols(),1);
+         rOut.block(0, 1, this->mSpecSize, rOut.cols()-1) = this->mFftScaling*rOut.block(0,1,this->mSpecSize, rOut.cols()-1);
+      }
+      else
+      {
+         rOut.topRows(this->mSpecSize) = this->mFftScaling*rOut.topRows(this->mSpecSize);
+      }
    }
 
    void ChebyshevIntegrator::outputSpectral(Matrix& rOut) const
@@ -92,7 +100,8 @@ namespace Fftw {
       {
          rOut.block(0, 0, this->mSpecSize, 1) = this->mFftScaling*this->mMeanOp*rOut.block(0,0,this->mMeanOp.cols(),1);
          rOut.block(0, 1, this->mSpecSize, rOut.cols()-1) = this->mFftScaling*this->mSpecOp*rOut.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
-      } else
+      }
+      else
       {
          rOut.topRows(this->mSpecSize) = this->mFftScaling*this->mSpecOp*rOut.topRows(this->mSpecOp.cols());
       }
@@ -105,18 +114,21 @@ namespace Fftw {
          if(useReal)
          {
             rOut.block(0, 0, this->mSpecSize, 1).real() = this->mFftScaling*this->mMeanOp*tmp.block(0,0,this->mMeanOp.cols(),1);
-            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).real() = this->mFftScaling*this->mSpecOp*tmp.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
-         } else
+            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).real() = this->mFftScaling*tmp.block(0,1,this->mSpecSize, rOut.cols()-1);
+         }
+         else
          {
             rOut.block(0, 0, this->mSpecSize, 1).imag() = this->mFftScaling*this->mMeanOp*tmp.block(0,0,this->mMeanOp.cols(),1);
-            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).imag() = this->mFftScaling*this->mSpecOp*tmp.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
+            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).imag() = this->mFftScaling*tmp.block(0,1,this->mSpecSize, rOut.cols()-1);
          }
-      } else
+      }
+      else
       {
          if(useReal)
          {
             rOut.topRows(this->mSpecSize).real() = this->mFftScaling*tmp.topRows(this->mSpecSize);
-         } else
+         }
+         else
          {
             rOut.topRows(this->mSpecSize).imag() = this->mFftScaling*tmp.topRows(this->mSpecSize);
          }
@@ -125,12 +137,28 @@ namespace Fftw {
 
    void ChebyshevIntegrator::outputSpectral(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
-      if(useReal)
+      if(this->mMeanOp.size() > 0)
       {
-         rOut.topRows(this->mSpecSize).real() = this->mFftScaling*this->mSpecOp*tmp.topRows(this->mSpecOp.cols());
-      } else
+         if(useReal)
+         {
+            rOut.block(0, 0, this->mSpecSize, 1).real() = this->mFftScaling*this->mMeanOp*tmp.block(0,0,this->mMeanOp.cols(),1);
+            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).real() = this->mFftScaling*this->mSpecOp*tmp.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
+         }
+         else
+         {
+            rOut.block(0, 0, this->mSpecSize, 1).imag() = this->mFftScaling*this->mMeanOp*tmp.block(0,0,this->mMeanOp.cols(),1);
+            rOut.block(0, 1, this->mSpecSize, rOut.cols()-1).imag() = this->mFftScaling*this->mSpecOp*tmp.block(0,1,this->mSpecOp.cols(), rOut.cols()-1);
+         }
+      }
+      else
       {
-         rOut.topRows(this->mSpecSize).imag() = this->mFftScaling*this->mSpecOp*tmp.topRows(this->mSpecOp.cols());
+         if(useReal)
+         {
+            rOut.topRows(this->mSpecSize).real() = this->mFftScaling*this->mSpecOp*tmp.topRows(this->mSpecOp.cols());
+         } else
+         {
+            rOut.topRows(this->mSpecSize).imag() = this->mFftScaling*this->mSpecOp*tmp.topRows(this->mSpecOp.cols());
+         }
       }
    }
 

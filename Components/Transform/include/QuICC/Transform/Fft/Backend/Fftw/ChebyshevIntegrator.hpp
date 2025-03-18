@@ -56,12 +56,12 @@ namespace Fftw {
          void output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
-          * @brief Set output multiplied aby spectral operator
+          * @brief Set output multiplied by spectral operator
           */
          void outputSpectral(Matrix& rOut) const;
 
          /**
-          * @brief Set output multiplied aby spectral operator
+          * @brief Set output multiplied by spectral operator
           */
          void outputSpectral(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
 
