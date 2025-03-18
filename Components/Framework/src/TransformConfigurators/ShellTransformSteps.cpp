@@ -35,6 +35,7 @@
 #include "QuICC/Transform/Path/NegI4CurlCurlNl.hpp"
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/Pol.hpp"
+#include "QuICC/Transform/Forward/T.hpp"
 #include "QuICC/Transform/Forward/I2P.hpp"
 #include "QuICC/Transform/Forward/Overlaplh.hpp"
 #include "QuICC/Transform/Forward/R1.hpp"
@@ -138,12 +139,12 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
-            transform.back().addEdge(Forward::P::id(), curlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::T::id(), curlId, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::OverlaplhD1::id());
-            transform.back().addEdge(Forward::P::id(), curlId, Arithmetics::Sub::id());
+            transform.back().addEdge(Forward::T::id(), curlId, Arithmetics::Sub::id());
 
             // Compute Poloidal component
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));

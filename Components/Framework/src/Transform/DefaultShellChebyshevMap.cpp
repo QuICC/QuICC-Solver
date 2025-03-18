@@ -21,7 +21,9 @@
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
                                               
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P_Zero.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/Y1.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/Y1_Zero.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I4Y3_Zero.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I4Y3D1Y1_Zero.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/I2Y2_Zero.hpp"
@@ -36,6 +38,7 @@
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/R1.hpp"
 #include "QuICC/Transform/Forward/Pol.hpp"
+#include "QuICC/Transform/Forward/T.hpp"
 #include "QuICC/Transform/Forward/I4Q.hpp"
 #include "QuICC/Transform/Forward/I4S.hpp"
 #include "QuICC/Transform/Forward/I2Q.hpp"
@@ -75,7 +78,8 @@ namespace Transform {
 
       // Create integrators
       this->addOperator<Fft::Chebyshev::LinearMap::Integrator::P>(m, Forward::P::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::Y1>(m, Forward::Pol::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::Y1_Zero>(m, Forward::Pol::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::P_Zero>(m, Forward::T::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I4Y3_Zero>(m, Forward::I4Q::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I4Y3D1Y1_Zero>(m, Forward::I4S::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2Y2_Zero>(m, Forward::I2T::id());
