@@ -31,6 +31,9 @@ TEST_CASE( "Check ASCII writers for @Scheme@", "[@Scheme@]" ){
    int status = 0;
 
    currentts::TestParameters test;
+   test.refdir = "../../../../_refdata/Framework/Io/@Scheme@/";
+   test.datadir = "./";
+
    test.maxUlp = currentts::args().ulp;
 
    auto spScheme = currentts::createScheme<QuICC::SpatialScheme::@Scheme@>();

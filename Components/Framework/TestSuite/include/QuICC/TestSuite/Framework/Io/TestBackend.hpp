@@ -34,7 +34,7 @@ public:
    /**
     * @brief Constructor
     */
-   TestBackend();
+   TestBackend(const  std::string& scheme);
 
    /**
     * @brief Destructor
@@ -199,6 +199,11 @@ private:
     * @param fId  Field ID
     */
    SpectralFieldIds implicitFields(const SpectralFieldId& fId) const final;
+
+   /**
+    * @brief Scheme ID
+    */
+   std::string mScheme;
 
 };
 

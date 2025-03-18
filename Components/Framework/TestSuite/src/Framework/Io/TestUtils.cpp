@@ -52,6 +52,9 @@
 #include "QuICC/Io/Variable/ShellTorPolLSpectrumWriter.hpp"
 #include "QuICC/Io/Variable/ShellTorPolMSpectrumWriter.hpp"
 #include "QuICC/Io/Variable/ShellTorPolEnstrophyWriter.hpp"
+#include "QuICC/NonDimensional/RRatio.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
 #include "TestSuite/Io.hpp"
 
 namespace QuICC {
@@ -72,6 +75,10 @@ std::shared_ptr<StateGenerator> createRunner(std::shared_ptr<SpatialScheme::ISpa
 
    // Create list of nondimensional ID strings for physical parameters
    std::vector<std::string> ndNames = {};
+   if(spScheme->tag() == "SLFl")
+   {
+      ndNames.push_back(NonDimensional::RRatio().tag());
+   }
 
    // Get model configuration tags
    std::map<std::string, std::map<std::string, int>> modelCfg = {};
@@ -87,6 +94,15 @@ std::shared_ptr<StateGenerator> createRunner(std::shared_ptr<SpatialScheme::ISpa
    std::set<SpatialScheme::Feature> features;
    spRunner->getConfig(cfg, features, "IO test");
    spScheme->enable(features);
+
+   std::map<std::string, MHDFloat> extra;
+   if(cfg.count(NonDimensional::RRatio().tag()) > 0)
+   {
+      auto rratio = cfg.at(NonDimensional::RRatio().tag());
+      extra.emplace(NonDimensional::Lower1d().tag(), rratio / (1.0 - rratio));
+      extra.emplace(NonDimensional::Upper1d().tag(), 1.0 / (1.0 - rratio));
+   }
+   spRunner->updateConfig(extra);
 
    spRunner->initBase();
 
@@ -124,7 +140,7 @@ std::shared_ptr<StateGenerator> createRunner(std::shared_ptr<SpatialScheme::ISpa
 
 Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner)
 {
-   std::shared_ptr<Model::IModelBackend> spBackend = std::make_shared<TestBackend>();
+   std::shared_ptr<Model::IModelBackend> spBackend = std::make_shared<TestBackend>(spRunner->ss().tag());
 
    // Add state generation equations
    Equations::SharedSphereExactScalarState spScalar;
@@ -387,8 +403,8 @@ void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const T
 
 void checkSphereFiles(const TestParameters& test)
 {
-   std::string datadir = "./";
-   std::string refdir = "./";
+   const std::string& datadir = test.datadir;
+   const std::string& refdir = test.refdir;
 
    const auto& nN = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM1D, QuICC::Dimensions::Space::SPECTRAL);
    const auto& nL = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM2D, QuICC::Dimensions::Space::SPECTRAL);

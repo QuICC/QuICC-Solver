@@ -27,6 +27,8 @@ struct TestParameters
 {
    std::shared_ptr<Resolution> spRes;
    MHDFloat maxUlp;
+   std::string datadir;
+   std::string refdir;
 };
 
 // Typedef for storing result of error checks

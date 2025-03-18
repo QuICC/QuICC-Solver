@@ -22,7 +22,8 @@ namespace Framework {
 
 namespace Io {
 
-TestBackend::TestBackend()
+TestBackend::TestBackend(const std::string& scheme)
+   : mScheme(scheme)
 {}
 
 std::vector<std::string> TestBackend::fieldNames() const
@@ -89,8 +90,20 @@ void TestBackend::equationInfo(QuICC::Model::EquationInfo& info, const SpectralF
    info.exNS.clear();
 
    // Index mode
-   info.indexMode =
-      static_cast<int>(Equations::CouplingIndexType::SLOWEST_MULTI_RHS);
+   if(this->mScheme == "WLFl" || this->mScheme == "SLFl")
+   {
+      info.indexMode =
+         static_cast<int>(Equations::CouplingIndexType::SLOWEST_MULTI_RHS);
+   }
+   else if(this->mScheme == "WLFm" || this->mScheme == "SLFm")
+   {
+      info.indexMode =
+         static_cast<int>(Equations::CouplingIndexType::SLOWEST_SINGLE_RHS);
+   }
+   else
+   {
+      throw std::logic_error("Unknown scheme to set index mode");
+   }
 }
 
 void TestBackend::operatorInfo(QuICC::Model::OperatorInfo& info, const SpectralFieldId& fId,

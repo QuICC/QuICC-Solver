@@ -28,21 +28,15 @@ set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
 
 # Fetch reference data
 include(FetchTestReference)
-#quicc_fetch_test_reference(
-#  ${TestExe}
-#  COMPONENT Framework
-#  FILENAME "Io.tar.gz"
-#  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
-#  DATADIR ${QUICC_WORK_DIR}
-#)
+quicc_fetch_test_reference(
+  ${TestExe}
+  COMPONENT Framework
+  FILENAME "Io.tar.gz"
+  ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+  DATADIR ${QUICC_WORK_DIR}
+)
 
 include(ConfigureTests)
-
-#add_custom_command(TARGET ${TestExe} POST_BUILD
-#  COMMAND ${CMAKE_COMMAND} -E remove state*.hdf5
-#  COMMAND ${CMAKE_COMMAND} -E copy _refdata/Framework/StateFile/state*.hdf5 .
-#  WORKING_DIRECTORY ${QUICC_WORK_DIR}
-#  )
 
 set(_tests
   WLFl
@@ -50,11 +44,18 @@ set(_tests
   SLFl
   SLFm
 )
+
 foreach(_test IN LISTS _tests)
+  add_custom_command(TARGET ${TestExe} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove _data/Framework/Io/${_test}/*
+    COMMAND ${CMAKE_COMMAND} -E copy _refdata/Framework/Io/${_test}/parameters.cfg _data/Framework/Io/${_test}/
+    WORKING_DIRECTORY ${QUICC_WORK_DIR}
+    )
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Scheme
     ID 0
+    WORKDIR "${QUICC_WORK_DIR}/_data/Framework/Io/${_test}"
   )
 endforeach()
 
