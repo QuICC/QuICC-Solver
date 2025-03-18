@@ -44,7 +44,7 @@ namespace Integrator {
       ::QuICC::SparseSM::Chebyshev::LinearMap::I4Y3 op(size, size, this->mspSetup->lower(), this->mspSetup->upper());
       this->mBackend.setSpectralOperator(op.mat().topRows(this->mspSetup->specSize()));
 
-      if(this->mspSetup->slowSize() > 0)
+      if(this->mspSetup->slowSize() > 0 && this->mspSetup->slow(0) == 0)
       {
          this->mBackend.setMeanOperator(SparseMatrix(size, size).topRows(this->mspSetup->specSize()));
       }

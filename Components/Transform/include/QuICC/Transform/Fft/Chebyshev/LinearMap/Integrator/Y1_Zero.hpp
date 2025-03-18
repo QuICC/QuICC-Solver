@@ -1,10 +1,10 @@
 /**
- * @file Y1.hpp
+ * @file Y1_Zero.hpp
  * @brief Implementation of the Chebyshev based Y integrator, but 0 mode is zeroed, with linear map y = ax + b
  */
 
-#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_Y1_HPP
-#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_Y1_HPP
+#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_Y1_ZEROHPP
+#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_Y1_ZEROHPP
 
 // System includes
 //
@@ -29,18 +29,18 @@ namespace Integrator {
    /**
     * @brief Implementation of the Chebyshev based Y integrator, but 0 mode is zeroed, with linear map y = ax + b
     */
-   class Y1: public IChebyshevIntegrator
+   class Y1_Zero: public IChebyshevIntegrator
    {
       public:
          /**
           * @brief Constructor
           */
-         Y1() = default;
+         Y1_Zero() = default;
 
          /**
           * @brief Destructor
           */
-         ~Y1() = default;
+         ~Y1_Zero() = default;
 
       protected:
          /**
@@ -86,4 +86,4 @@ namespace Integrator {
 }
 }
 
-#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_Y1_HPP
+#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_Y1_ZEROHPP

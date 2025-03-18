@@ -1,10 +1,10 @@
 /**
- * @file Y1.hpp
- * @brief Implementation of the Chebyshev based Y integrator, but 0 mode is zeroed, with linear map y = ax + b
+ * @file P_Zero.hpp
+ * @brief Implementation of the Chebyshev based P integrator, with linear map y = ax + b
  */
 
-#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_Y1_HPP
-#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_Y1_HPP
+#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_P_ZERO_HPP
+#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_P_ZERO_HPP
 
 // System includes
 //
@@ -27,26 +27,22 @@ namespace LinearMap {
 namespace Integrator {
 
    /**
-    * @brief Implementation of the Chebyshev based Y integrator, but 0 mode is zeroed, with linear map y = ax + b
+    * @brief Implementation of the Chebyshev based P integrator, with linear map y = ax + b
     */
-   class Y1: public IChebyshevIntegrator
+   class P_Zero: public IChebyshevIntegrator
    {
       public:
          /**
           * @brief Constructor
           */
-         Y1() = default;
+         P_Zero() = default;
 
          /**
           * @brief Destructor
           */
-         ~Y1() = default;
+         ~P_Zero() = default;
 
       protected:
-         /**
-          * @brief Sparse matrix operator
-          */
-         mutable SparseMatrix mOp;
 
       private:
          /**
@@ -64,7 +60,6 @@ namespace Integrator {
          /**
           * @brief Apply pre FFT operator for component wise openerations
           *
-          * @param tmp Extracted Input real or imag values
           * @param in   Input values
           * @param useReal Real vs Imag flag
           */
@@ -86,4 +81,4 @@ namespace Integrator {
 }
 }
 
-#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_Y1_HPP
+#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_P_ZERO_HPP

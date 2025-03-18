@@ -45,7 +45,7 @@ namespace Integrator {
       ::QuICC::SparseSM::Chebyshev::LinearMap::I4D1 op(size, size, this->mspSetup->lower(), this->mspSetup->upper());
       this->mBackend.setSpectralOperator(op.mat().topRows(this->mspSetup->specSize()));
 
-      if(this->mspSetup->slowSize() > 0)
+      if(this->mspSetup->slowSize() > 0 && this->mspSetup->slow(0) == 0)
       {
          size = this->mspSetup->specSize() + std::min(2, this->mspSetup->padSize());
          ::QuICC::SparseSM::Chebyshev::LinearMap::I2 meanOp(size, size, this->mspSetup->lower(), this->mspSetup->upper());
