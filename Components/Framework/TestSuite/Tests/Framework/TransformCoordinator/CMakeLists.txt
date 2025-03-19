@@ -37,10 +37,10 @@ quicc_set_ulp(_ulp
 foreach(_test ${_tests})
   foreach(_impl1d uniform triangular)
     foreach(_alg tubular single1d single2d)
-      # The view operators are not implemented for the triangular truncation
-      # set(_dis False)
-      set (_dis True)
-      if(_impl1d STREQUAL "triangular")
+    set(_dis False)
+    if(_impl1d STREQUAL "triangular")
+        # The view operators are not implemented for the triangular truncation
+        set (_dis True)
         if(TARGET QuICC::Cuda)
           set(_dis True)
         endif()
