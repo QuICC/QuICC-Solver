@@ -1,8 +1,7 @@
 option(QUICC_USE_MLIR_GRAPH "Enable Graph component?" OFF)
+set(QUICC_USE_MLIR_GRAPH ${QUICC_USE_MLIR_GRAPH} PARENT_SCOPE)
 if(NOT QUICC_USE_MLIR_GRAPH)
   return()
-else()
-  add_compile_definitions(QUICC_USE_MLIR_GRAPH)
 endif()
 
 # CMake setup for Graph component
@@ -16,6 +15,11 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
+
+target_compile_definitions(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+    QUICC_USE_MLIR_GRAPH
 )
 
 set(PHS
