@@ -1,3 +1,10 @@
+option(QUICC_USE_MLIR_GRAPH "Enable Graph component?" OFF)
+if(NOT QUICC_USE_MLIR_GRAPH)
+  return()
+else()
+  add_compile_definitions(QUICC_USE_MLIR_GRAPH)
+endif()
+
 # CMake setup for Graph component
 set(QUICC_CURRENT_COMPONENT_LIB Graph)
 set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")

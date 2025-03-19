@@ -122,6 +122,7 @@ namespace QuICC {
           */
          template <typename TEquation, typename TOptions> std::shared_ptr<TEquation> addEquation(std::shared_ptr<Model::IModelBackend> spBackend, std::shared_ptr<TOptions> spOptions);
 
+         #ifdef QUICC_USE_MLIR_GRAPH
          /**
           * @brief Add graph description to solver
           * @param graphStr mlir module
@@ -129,6 +130,7 @@ namespace QuICC {
           */
          void addGraph(const std::string& graphStr,
             const Graph::PhysicalParameters<MHDFloat>& physParams);
+         #endif
 
          /**
           * @brief Set the base simulation configuration file and parameters

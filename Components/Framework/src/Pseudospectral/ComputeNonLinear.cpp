@@ -13,13 +13,14 @@
 //
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
-#include "QuICC/Pseudospectral/Utils.hpp"
 #include "QuICC/PhysicalNames/registerAll.hpp"
 #include "View/View.hpp"
 #include "View/ViewUtils.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 #include "Profiler/Interface.hpp"
-
+#ifdef QUICC_USE_MLIR_GRAPH
+#include "QuICC/Pseudospectral/Utils.hpp"
+#endif
 
 namespace QuICC {
 
@@ -30,10 +31,11 @@ namespace Pseudospectral {
    {
       Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::computeNonlinear");
 
+      #ifdef QUICC_USE_MLIR_GRAPH
       if (mJitter.get() == nullptr)
       {
+      #endif
          // Use old backward tree + non linear terms + forward tree
-
          Profiler::RegionStart<2>("Pseudospectral::Coordinator::nlOld");
          // Compute backward transform
          this->updatePhysical(it);
@@ -42,6 +44,7 @@ namespace Pseudospectral {
          this->updateSpectral(it);
          Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
 
+      #ifdef QUICC_USE_MLIR_GRAPH
       }
       else
       {
@@ -195,6 +198,7 @@ namespace Pseudospectral {
             details::copyView2Vector(vecMag, BrVarv, BthetaVarv, BphiVarv, ftRes);
          }
       }
+      #endif
    }
 
 } // Pseudospectral

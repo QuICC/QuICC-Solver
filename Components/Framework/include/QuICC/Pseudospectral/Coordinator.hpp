@@ -30,7 +30,9 @@
 #include "QuICC/TransformGroupers/IBackwardGrouper.hpp"
 #include "QuICC/Timestep/Coordinator.hpp"
 #include "QuICC/Diagnostics/Coordinator.hpp"
+#ifdef QUICC_USE_MLIR_GRAPH
 #include "Graph/Jit.hpp"
+#endif
 
 namespace QuICC {
 
@@ -189,6 +191,7 @@ namespace Pseudospectral {
           */
          void addEquation(Equations::SharedIVectorEquation spEq, const std::size_t eqId, const int it);
 
+         #ifdef QUICC_USE_MLIR_GRAPH
          /**
           * @brief Add graph description to solver
           * @param graphStr graph description
@@ -196,6 +199,7 @@ namespace Pseudospectral {
           */
          void addGraph(const std::string& graphStr,
             const Graph::PhysicalParameters<MHDFloat>& physParams);
+         #endif
 
          /**
           * @brief Initialise the transforms
@@ -607,6 +611,7 @@ namespace Pseudospectral {
           */
          Transform::SharedIBackwardGrouper   mspImposedBwdGrouper;
 
+         #ifdef QUICC_USE_MLIR_GRAPH
          /// @brief storage for mlir graph JIT
          std::unique_ptr<Graph::Jit<3>> mJitter;
          /// @brief memory resource
@@ -618,11 +623,13 @@ namespace Pseudospectral {
             Memory::MemBlock<double>,
             Memory::MemBlock<std::complex<double>>
          >;
+         /// @brief storage for memory blocks of data
          std::vector<varBlock_t> mBlocksData;
+         /// @brief storage for memory blocks of meta data
          std::vector<Memory::MemBlock<std::uint32_t>> mBlocksMeta;
-
          /// @brief is the magnetic field equation present?
          bool mIsMag = false;
+         #endif
 
       private:
          /**

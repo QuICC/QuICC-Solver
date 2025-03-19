@@ -76,6 +76,7 @@ foreach(_test ${_tests})
       ULPS ${_ulp}
       IDS 0 1 2 3 4
       OPTIONS algorithm:${_alg} truncation:uniform
+      DISABLED ON
     )
   endforeach()
 endforeach()

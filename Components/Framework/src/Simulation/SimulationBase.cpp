@@ -374,9 +374,11 @@ namespace QuICC {
       // Empty to simplify implementations but can't be called from derived class
    }
 
+   #ifdef QUICC_USE_MLIR_GRAPH
    void  SimulationBase::addGraph(const std::string& graphStr,
       const Graph::PhysicalParameters<MHDFloat>& physParams)
    {
       mPseudospectral.addGraph(graphStr, physParams);
    };
+   #endif
 }
