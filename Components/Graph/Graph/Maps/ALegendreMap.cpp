@@ -60,7 +60,8 @@ void MapOps::setALegendrePrj(mlir::quiccir::AlPOp op)
             using namespace QuICC::Transform::Quadrature;
             using Tin = C_S1CLCSC3DJIK_t;
             using Tout = C_DCCSC3DJIK_t;
-            using Top = QuICC::View::View<double, QuICC::View::CS1RL3D>;
+            // QUICC_USE_IBLOCKED_CUDA_MATMUL_WARP_TILE
+            using Top = QuICC::View::View<double, QuICC::View::CS1RL3DJIK>;
             using QuICC::Transform::Quadrature::Cuda::ImplOp;
             if (op.getKind() == "DivS1Dp" ||
                 op.getKind() == "LlDivS1Dp")
@@ -147,7 +148,8 @@ void MapOps::setALegendreInt(mlir::quiccir::AlIOp op)
             using namespace QuICC::Transform::Quadrature;
             using Tin = C_DCCSC3DJIK_t;
             using Tout = C_S1CLCSC3DJIK_t;
-            using Top = QuICC::View::View<double, QuICC::View::S1CLCSC3D>;
+            // QUICC_USE_IBLOCKED_CUDA_MATMUL_WARP_TILE
+            using Top = QuICC::View::View<double, QuICC::View::S1CLCSC3DJIK>;
             using QuICC::Transform::Quadrature::Cuda::ImplOp;
             if (op.getKind() == "DivS1Dp" ||
                 op.getKind() == "LlDivS1Dp"||

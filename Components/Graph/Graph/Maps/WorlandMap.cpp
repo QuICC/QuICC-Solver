@@ -44,7 +44,8 @@ void MapOps::setWorlandPrj(mlir::quiccir::JWPOp op)
             using namespace QuICC::Transform::Quadrature;
             using Tin = C_DCCSC3DJIK_t;
             using Tout = C_DCCSC3DJIK_t;
-            using Top = QuICC::View::View<double, QuICC::View::CSL3D>;
+            // QUICC_USE_IBLOCKED_CUDA_MATMUL_WARP_TILE
+            using Top = QuICC::View::View<double, QuICC::View::CSL3DJIK>;
             using backend_t = QuICC::Transform::Quadrature::Cuda::ImplOp<Tout, Tin, Top>;
             using op_t = Op<Tout, Tin, Top, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
@@ -93,7 +94,8 @@ void MapOps::setWorlandInt(mlir::quiccir::JWIOp op)
             using namespace QuICC::Transform::Quadrature;
             using Tin = C_DCCSC3DJIK_t;
             using Tout = C_DCCSC3DJIK_t;
-            using Top = QuICC::View::View<double, QuICC::View::CSL3D>;
+            // QUICC_USE_IBLOCKED_CUDA_MATMUL_WARP_TILE
+            using Top = QuICC::View::View<double, QuICC::View::CSL3DJIK>;
             using backend_t = QuICC::Transform::Quadrature::Cuda::ImplOp<Tout, Tin, Top>;
             using op_t = Op<Tout, Tin, Top, backend_t>;
             _ops.push_back(std::make_unique<op_t>(_mem));
