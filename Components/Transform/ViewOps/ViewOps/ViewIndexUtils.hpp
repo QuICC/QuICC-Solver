@@ -240,7 +240,7 @@ inline ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
 /// @param order order for which the metadata is created
 /// @return pointer and indices in a struct
 template <>
-ptrAndIdx densePtrAndIdxStep1<DCCSC3DJIK>(
+inline ptrAndIdx densePtrAndIdxStep1<DCCSC3DJIK>(
    const std::array<std::uint32_t, 3> logDims, const dimOrder order)
 {
    return densePtrAndIdxStep1<DCCSC3D>(logDims, order);
