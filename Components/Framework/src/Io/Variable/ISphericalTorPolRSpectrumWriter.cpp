@@ -415,7 +415,7 @@ namespace Variable {
          // Total spectrum
          for(int i = 0; i < this->mTorPower.rows(); i++)
          {
-            this->mFile << std::left << ioIW() << this->mGrid(i) << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::left << ioIW() << std::setprecision(ioPrec) << this->mGrid(i) << "\t";
             for(int j = 0; j < this->mTorPower.cols(); j++)
             {
                this->mFile << ioFW(ioPrec) << this->mTorPower(i,j) + this->mPolPower(i,j) << "\t";
