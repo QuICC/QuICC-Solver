@@ -16,42 +16,12 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Generator/States/SphereExactScalarState.hpp"
 #include "QuICC/Generator/States/SphereExactVectorState.hpp"
-#include "QuICC/Io/Variable/SphereDipolarityWriter.hpp"
 #include "QuICC/SpectralKernels/Typedefs.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
 #include "QuICC/Generator/StateGenerator.hpp"
-#include "QuICC/Io/Variable/SphereAngularMomentumWriter.hpp"
-#include "QuICC/Io/Variable/SphereDipolarityWriter.hpp"
-#include "QuICC/Io/Variable/SphereMaxAbsoluteFieldValueWriter.hpp"
-#include "QuICC/Io/Variable/SphereNusseltWriter.hpp"
-#include "QuICC/Io/Variable/SphereScalarEnergyWriter.hpp"
-#include "QuICC/Io/Variable/SphereScalarLSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereScalarMSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereScalarMeanWriter.hpp"
-#include "QuICC/Io/Variable/SphereScalarModeSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereScalarNSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereScalarRSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereTorPolEnergyWriter.hpp"
-#include "QuICC/Io/Variable/SphereTorPolLSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereTorPolMSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereTorPolNSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereTorPolRSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereTorPolModeSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereTorPolEnstrophyWriter.hpp"
-#include "QuICC/Io/Variable/SphereTorPolEnstrophyLSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/SphereTorPolEnstrophyMSpectrumWriter.hpp"
-
-#include "QuICC/Io/Variable/ShellNusseltWriter.hpp"
-#include "QuICC/Io/Variable/ShellScalarEnergyWriter.hpp"
-#include "QuICC/Io/Variable/ShellScalarLSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/ShellScalarMSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/ShellTorPolEnergyWriter.hpp"
-#include "QuICC/Io/Variable/ShellTorPolLSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/ShellTorPolMSpectrumWriter.hpp"
-#include "QuICC/Io/Variable/ShellTorPolEnstrophyWriter.hpp"
 #include "QuICC/NonDimensional/RRatio.hpp"
 #include "QuICC/NonDimensional/Heating.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
@@ -113,19 +83,11 @@ std::shared_ptr<StateGenerator> createRunner(std::shared_ptr<SpatialScheme::ISpa
    // Create the reference states
    auto spEq = createStates(spRunner);
 
-   // Add sphere ascii files
-   if(spScheme->tag() == "WLFl" || spScheme->tag() == "WLFm")
+
+   // Add ASCII output files
+   for(auto&& f: test.files)
    {
-      addSphereFiles(spRunner);
-   }
-   // Add shell ascii files
-   else if(spScheme->tag() == "SLFl" || spScheme->tag() == "SLFm")
-   {
-      addShellFiles(spRunner);
-   }
-   else
-   {
-      throw std::logic_error("No ASCII files have been setup for " + spScheme->tag() + " scheme");
+      spRunner->addAsciiOutputFile(f);
    }
 
    // Set the boundary conditions
@@ -141,11 +103,11 @@ std::shared_ptr<StateGenerator> createRunner(std::shared_ptr<SpatialScheme::ISpa
 
 Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner)
 {
-   int maxL = 3;
-   int maxM = 3;
-   int maxN = 3;
+   int maxN = 5;
+   int maxL = 5;
+   int maxM = 5;
 
-   auto setModes = [](auto& tSH, const int maxN, const int maxL, const int maxM, const int l0)
+   auto setScalarModes = [](auto& tSH, const int maxN, const int maxL, const int maxM, const int l0)
    {
       std::pair<Spectral::Kernel::Complex3DMapType::iterator, bool> ptSH;
       for(int m = 0; m <= maxM; m++)
@@ -156,7 +118,51 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
                std::make_pair(std::make_pair(l, m), std::map<int, MHDComplex>()));
             for(int n = 0; n <= maxN; n++)
             {
-               MHDComplex val(1.0/static_cast<MHDFloat>(n+1), 1.0/static_cast<MHDFloat>(n+1));
+               MHDComplex val(3.0/static_cast<MHDFloat>(n+1), 2.0/static_cast<MHDFloat>(n+1));
+               if(m == 0)
+               {
+                  val = std::real(val);
+               }
+               ptSH.first->second.insert(std::make_pair(n, val));
+            }
+         }
+      }
+   };
+
+   auto setTorModes = [](auto& tSH, const int maxN, const int maxL, const int maxM, const int l0)
+   {
+      std::pair<Spectral::Kernel::Complex3DMapType::iterator, bool> ptSH;
+      for(int m = 0; m <= maxM; m++)
+      {
+         for(int l = std::min(l0,m); l <= maxL; l++)
+         {
+            ptSH = tSH.insert(
+               std::make_pair(std::make_pair(l, m), std::map<int, MHDComplex>()));
+            for(int n = 0; n <= maxN; n++)
+            {
+               MHDComplex val(1.0/static_cast<MHDFloat>(n+1), 2.0/static_cast<MHDFloat>(n+1));
+               if(m == 0)
+               {
+                  val = std::real(val);
+               }
+               ptSH.first->second.insert(std::make_pair(n, val));
+            }
+         }
+      }
+   };
+
+   auto setPolModes = [](auto& tSH, const int maxN, const int maxL, const int maxM, const int l0)
+   {
+      std::pair<Spectral::Kernel::Complex3DMapType::iterator, bool> ptSH;
+      for(int m = 0; m <= maxM; m++)
+      {
+         for(int l = std::min(l0,m); l <= maxL; l++)
+         {
+            ptSH = tSH.insert(
+               std::make_pair(std::make_pair(l, m), std::map<int, MHDComplex>()));
+            for(int n = 0; n <= maxN; n++)
+            {
+               MHDComplex val(2.0/static_cast<MHDFloat>(n+1), -1.0/static_cast<MHDFloat>(n+1));
                if(m == 0)
                {
                   val = std::real(val);
@@ -179,7 +185,7 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
       spRunner->addEquation<Equations::SphereExactScalarState>(spBackend);
    spScalar->setIdentity(PhysicalNames::Temperature::id());
    tSH.clear();
-   setModes(tSH, maxN, maxL, maxM, 0);
+   setScalarModes(tSH, maxN, maxL, maxM, 0);
    spScalar->setSpectralModes(tSH);
 
    spVector =
@@ -187,11 +193,11 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
    spVector->setIdentity(PhysicalNames::Velocity::id());
    // Toroidal
    tSH.clear();
-   setModes(tSH, maxN, maxL, maxM, 1);
+   setTorModes(tSH, maxN, maxL, maxM, 1);
    spVector->setSpectralModes(FieldComponents::Spectral::TOR, tSH);
    // Poloidal
    tSH.clear();
-   setModes(tSH, maxN, maxL, maxM, 1);
+   setPolModes(tSH, maxN, maxL, maxM, 1);
    spVector->setSpectralModes(FieldComponents::Spectral::POL, tSH);
 
    spVector =
@@ -199,140 +205,17 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
    spVector->setIdentity(PhysicalNames::Magnetic::id());
    // Toroidal
    tSH.clear();
-   setModes(tSH, maxN, maxL, maxM, 1);
+   setTorModes(tSH, maxN, maxL, maxM, 1);
    spVector->setSpectralModes(FieldComponents::Spectral::TOR, tSH);
    // Poloidal
    tSH.clear();
-   setModes(tSH, maxN, maxL, maxM, 1);
+   setPolModes(tSH, maxN, maxL, maxM, 1);
    spVector->setSpectralModes(FieldComponents::Spectral::POL, tSH);
 
    return spVector;
 }
 
-void addSphereFiles(std::shared_ptr<StateGenerator> spRunner)
-{
-   // Add ASCII output files
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereAngularMomentumWriter>("", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereDipolarityWriter>("magnetic", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Magnetic::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereMaxAbsoluteFieldValueWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereNusseltWriter>("", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereScalarEnergyWriter>("temperature", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereScalarLSpectrumWriter>("temperature", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereScalarMSpectrumWriter>("temperature", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereScalarMeanWriter>("temperature", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereScalarModeSpectrumWriter>("temperature", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereScalarNSpectrumWriter>("temperature", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereScalarRSpectrumWriter>("temperature", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereTorPolEnergyWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereTorPolLSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereTorPolMSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereTorPolNSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereTorPolRSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereTorPolModeSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereTorPolEnstrophyWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereTorPolEnstrophyLSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::SphereTorPolEnstrophyMSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-}
-
+#if 0
 void addShellFiles(std::shared_ptr<StateGenerator> spRunner)
 {
    //
@@ -398,6 +281,7 @@ void addShellFiles(std::shared_ptr<StateGenerator> spRunner)
    }
 #endif
 }
+#endif
 
 void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const TestParameters& test)
 {
@@ -406,11 +290,11 @@ void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const T
 
    const auto& maxUlp = test.maxUlp;
 
-   MHDFloat eps = std::numeric_limits<MHDFloat>::epsilon();
-   MHDFloat tol = maxUlp*eps;
-
-   auto compareRef = [=](std::string fname, int rows, int cols, int blocks = 1)
+   auto compareRef = [](std::string fname, int rows, int cols, int blocks, const std::string& datadir, const std::string& refdir, const int maxUlp)
    {
+      MHDFloat eps = std::numeric_limits<MHDFloat>::epsilon();
+      MHDFloat tol = maxUlp*eps;
+
       std::vector<Matrix> data;
       std::vector<Matrix> ref;
       for(int i = 0; i < blocks; i++)
@@ -423,32 +307,44 @@ void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const T
 
       INFO( "Checking " + fname );
       CHECK( data.size() == ref.size() );
+      bool foundFiles = true;
       for(auto&& blk: data)
       {
          CHECK( blk.size() > 0 );
+         if(blk.size() == 0)
+         {
+            foundFiles = false;
+         }
       }
       for(auto&& blk: ref)
       {
          CHECK( blk.size() > 0 );
-      }
-      for(int k = 0; k < blocks; k++)
-      {
-         const auto& d = data.at(k);
-         const auto& r = data.at(k);
-         CHECK( d.rows() == r.rows() );
-         CHECK( d.cols() == r.cols() );
-
-         for(int i = 0; i < d.rows(); i++)
+         if(blk.size() == 0)
          {
-            for(int j = 0; j < d.cols(); j++)
+            foundFiles = false;
+         }
+      }
+      if(foundFiles)
+      {
+         for(int k = 0; k < blocks; k++)
+         {
+            const auto& d = data.at(k);
+            const auto& r = ref.at(k);
+            CHECK( d.rows() == r.rows() );
+            CHECK( d.cols() == r.cols() );
+
+            for(int i = 0; i < d.rows(); i++)
             {
-               auto err = computeUlp(d(i,j), r(i,j), std::abs(r(i,j)), tol, eps);
-               INFO( "i,j,k: " << i << "," << j << "," << k );
-               INFO( "data: " << std::scientific << std::setprecision(16) << d(i,j) );
-               INFO( "ref: " << std::scientific << std::setprecision(16) << r(i,j) );
-               INFO( "max ulp: " << maxUlp);
-               INFO( "measured ulp: " << std::get<1>(err) );
-               CHECK( std::get<0>(err) );
+               for(int j = 0; j < d.cols(); j++)
+               {
+                  auto err = computeUlp(d(i,j), r(i,j), std::abs(r(i,j)), tol, eps);
+                  INFO( "i,j,k: " << i << "," << j << "," << k );
+                  INFO( "data: " << std::scientific << std::setprecision(16) << d(i,j) );
+                  INFO( "ref: " << std::scientific << std::setprecision(16) << r(i,j) );
+                  INFO( "max ulp: " << maxUlp);
+                  INFO( "measured ulp: " << std::get<1>(err) );
+                  CHECK( std::get<0>(err) );
+               }
             }
          }
       }
@@ -478,7 +374,7 @@ void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const T
       int r = std::get<1>(f);
       int c = std::get<2>(f);
       int b = std::get<3>(f);
-      compareRef(fname, r, c, b);
+      compareRef(fname, r, c, b, datadir, refdir, maxUlp);
    }
 }
 
@@ -492,26 +388,95 @@ std::vector<std::tuple<std::string,int,int,int>> checkSphereFiles(const TestPara
 
    // List of files to check: fname, rows, cols, blocks
    std::vector<std::tuple<std::string,int,int,int>> fileList;
-   fileList.emplace_back("angular_momentum.dat", 1, 5, 1);
-   fileList.emplace_back("magnetic_dipolarity.dat", 1,  5, 1);
-   fileList.emplace_back("velocity_max.dat", 1, 2, 1);
-   fileList.emplace_back("nusselt.dat", 1, 2, 1);
-   fileList.emplace_back("temperature_energy.dat", 1, 2, 1);
-   fileList.emplace_back("temperature_l_spectrum.dat", nL, 2, 1);
-   fileList.emplace_back("temperature_m_spectrum.dat", nM, 2, 1);
-   fileList.emplace_back("temperature_mean.dat", 1, 2, 1);
-   fileList.emplace_back("temperature_mode_spectrum.dat", nH, 3, 1);
-   fileList.emplace_back("temperature_n_spectrum.dat", nN, nL + 1, 1);
-   fileList.emplace_back("temperature_r_spectrum.dat", nR, nL + 1, 1);
-   fileList.emplace_back("velocity_energy.dat", 1, 4, 1);
-   fileList.emplace_back("velocity_l_spectrum.dat", nL, 4, 1);
-   fileList.emplace_back("velocity_m_spectrum.dat", nM, 4, 1);
-   fileList.emplace_back("velocity_mode_spectrum.dat", nH, 5, 1);
-   fileList.emplace_back("velocity_n_spectrum.dat", nN, nL + 1, 3);
-   fileList.emplace_back("velocity_r_spectrum.dat", nR, nL + 1, 3);
-   fileList.emplace_back("velocity_enstrophy.dat", 1, 4, 1);
-   fileList.emplace_back("velocity_enstrophy_l_spectrum.dat", nL, 4, 1);
-   fileList.emplace_back("velocity_enstrophy_m_spectrum.dat", nM, 4, 1);
+   for(auto&& f: test.files)
+   {
+      std::string n = f->filename();
+
+      if(n == "velocityangular_momentum.dat")
+      {
+         fileList.emplace_back(n, 1, 5, 1);
+      }
+      else if(n == "magnetic_dipolarity.dat")
+      {
+         fileList.emplace_back(n, 1,  5, 1);
+      }
+      else if(n == "velocity_max.dat")
+      {
+         fileList.emplace_back(n, 1, 2, 1);
+      }
+      else if(n == "temperaturenusselt.dat")
+      {
+         fileList.emplace_back(n, 1, 2, 1);
+      }
+      else if(n == "temperature_energy.dat")
+      {
+         fileList.emplace_back(n, 1, 2, 1);
+      }
+      else if(n == "temperature_l_spectrum.dat")
+      {
+         fileList.emplace_back(n, nL, 2, 1);
+      }
+      else if(n == "temperature_m_spectrum.dat")
+      {
+         fileList.emplace_back(n, nM, 2, 1);
+      }
+      else if(n == "temperature_mean.dat")
+      {
+         fileList.emplace_back(n, 1, 2, 1);
+      }
+      else if(n == "temperature_mode_spectrum.dat")
+      {
+         fileList.emplace_back(n, nH, 3, 1);
+      }
+      else if(n == "temperature_n_spectrum.dat")
+      {
+         fileList.emplace_back(n, nN, nL + 1, 1);
+      }
+      else if(n == "temperature_r_spectrum.dat")
+      {
+         fileList.emplace_back(n, nR, nL + 1, 1);
+      }
+      else if(n == "velocity_energy.dat")
+      {
+         fileList.emplace_back(n, 1, 4, 1);
+      }
+      else if(n == "velocity_l_spectrum.dat")
+      {
+         fileList.emplace_back(n, nL, 4, 1);
+      }
+      else if(n == "velocity_m_spectrum.dat")
+      {
+         fileList.emplace_back(n, nM, 4, 1);
+      }
+      else if(n == "velocity_mode_spectrum.dat")
+      {
+         fileList.emplace_back(n, nH, 5, 1);
+      }
+      else if(n == "velocity_n_spectrum.dat")
+      {
+         fileList.emplace_back(n, nN, nL + 1, 3);
+      }
+      else if(n == "velocity_r_spectrum.dat")
+      {
+         fileList.emplace_back(n, nR, nL + 1, 3);
+      }
+      else if(n == "velocity_enstrophy.dat")
+      {
+         fileList.emplace_back(n, 1, 4, 1);
+      }
+      else if(n == "velocity_enstrophy_l_spectrum.dat")
+      {
+         fileList.emplace_back(n, nL, 4, 1);
+      }
+      else if(n == "velocity_enstrophy_m_spectrum.dat")
+      {
+         fileList.emplace_back(n, nM, 4, 1);
+      }
+      else
+      {
+         throw std::logic_error("Could not identify file " + n);
+      }
+   }
 
    return fileList;
 }

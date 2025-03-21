@@ -431,7 +431,7 @@ namespace Variable {
          // Toroidal spectrum
          for(int i = 0; i < this->mTorPower.rows(); i++)
          {
-            this->mFile << std::left << ioIW() << i << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::left << ioIW() << std::setprecision(ioPrec) << this->mGrid(i) << "\t";
             for(int j = 0; j < this->mTorPower.cols(); j++)
             {
                this->mFile << ioFW(ioPrec) << this->mTorPower(i,j) << "\t";
@@ -447,7 +447,7 @@ namespace Variable {
          // Poloidal spectrum
          for(int i = 0; i < this->mPolPower.rows(); i++)
          {
-            this->mFile << std::left << ioIW() << i << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::left << ioIW() << std::setprecision(ioPrec) << this->mGrid(i) << "\t";
             for(int j = 0; j < this->mPolPower.cols(); j++)
             {
                this->mFile << ioFW(ioPrec) << this->mPolPower(i,j) << "\t";

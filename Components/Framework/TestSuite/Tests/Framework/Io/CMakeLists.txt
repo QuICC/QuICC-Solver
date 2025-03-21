@@ -39,23 +39,62 @@ quicc_fetch_test_reference(
 include(ConfigureTests)
 
 set(_tests
-  WLFl
-  WLFm
-  SLFl
-  SLFm
+  WLFl:Temperature:SphereNusseltWriter
+  WLFl:Temperature:SphereScalarEnergyWriter
+  WLFl:Temperature:SphereScalarLSpectrumWriter
+  WLFl:Temperature:SphereScalarMSpectrumWriter
+  WLFl:Temperature:SphereScalarMeanWriter
+  WLFl:Temperature:SphereScalarModeSpectrumWriter
+  WLFl:Temperature:SphereScalarNSpectrumWriter
+  WLFl:Temperature:SphereScalarRSpectrumWriter
+  WLFl:Velocity:SphereAngularMomentumWriter
+  #WLFl:Velocity:SphereMaxAbsoluteFieldValueWriter
+  WLFl:Velocity:SphereTorPolEnergyWriter
+  WLFl:Velocity:SphereTorPolLSpectrumWriter
+  WLFl:Velocity:SphereTorPolMSpectrumWriter
+  WLFl:Velocity:SphereTorPolNSpectrumWriter
+  WLFl:Velocity:SphereTorPolRSpectrumWriter
+  WLFl:Velocity:SphereTorPolModeSpectrumWriter
+  WLFl:Velocity:SphereTorPolEnstrophyWriter
+  WLFl:Velocity:SphereTorPolEnstrophyLSpectrumWriter
+  WLFl:Velocity:SphereTorPolEnstrophyMSpectrumWriter
+  WLFl:Magnetic:SphereDipolarityWriter
+  WLFm:Temperature:SphereNusseltWriter
+  WLFm:Temperature:SphereScalarEnergyWriter
+  WLFm:Temperature:SphereScalarLSpectrumWriter
+  WLFm:Temperature:SphereScalarMSpectrumWriter
+  WLFm:Temperature:SphereScalarMeanWriter
+  WLFm:Temperature:SphereScalarModeSpectrumWriter
+  WLFm:Temperature:SphereScalarNSpectrumWriter
+  WLFm:Temperature:SphereScalarRSpectrumWriter
+  WLFm:Velocity:SphereAngularMomentumWriter
+  #WLFm:Velocity:SphereMaxAbsoluteFieldValueWriter
+  WLFm:Velocity:SphereTorPolEnergyWriter
+  WLFm:Velocity:SphereTorPolLSpectrumWriter
+  WLFm:Velocity:SphereTorPolMSpectrumWriter
+  WLFm:Velocity:SphereTorPolNSpectrumWriter
+  WLFm:Velocity:SphereTorPolRSpectrumWriter
+  WLFm:Velocity:SphereTorPolModeSpectrumWriter
+  WLFm:Velocity:SphereTorPolEnstrophyWriter
+  WLFm:Velocity:SphereTorPolEnstrophyLSpectrumWriter
+  WLFm:Velocity:SphereTorPolEnstrophyMSpectrumWriter
+  WLFm:Magnetic:SphereDipolarityWriter
 )
 
 foreach(_test IN LISTS _tests)
+  string(REPLACE ":" ";" _tags ${_test})
+  list(GET _tags 0 _scheme)
   add_custom_command(TARGET ${TestExe} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E remove _data/Framework/Io/${_test}/*
-    COMMAND ${CMAKE_COMMAND} -E copy _refdata/Framework/Io/${_test}/parameters.cfg _data/Framework/Io/${_test}/
+    COMMAND ${CMAKE_COMMAND} -E remove _data/Framework/Io/${_scheme}/*
+    COMMAND ${CMAKE_COMMAND} -E copy _refdata/Framework/Io/${_scheme}/parameters.cfg _data/Framework/Io/${_scheme}/
     WORKING_DIRECTORY ${QUICC_WORK_DIR}
     )
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Scheme
+    KEYWORD Scheme:Field:Writer
     ID 0
-    WORKDIR "${QUICC_WORK_DIR}/_data/Framework/Io/${_test}"
+    ULP 500
+    WORKDIR "${QUICC_WORK_DIR}/_data/Framework/Io/${_scheme}"
   )
 endforeach()
 

@@ -14,6 +14,8 @@
 //
 #include "QuICC/Generator/StateGenerator.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
+#include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
+#include "QuICC/PhysicalNames/registerAll.hpp"
 
 namespace QuICC {
 
@@ -29,7 +31,10 @@ struct TestParameters
    MHDFloat maxUlp;
    std::string datadir;
    std::string refdir;
+   std::vector<::QuICC::Io::Variable::SharedIVariableAsciiWriter> files;
 };
+
+template <typename TScheme> void testFile(TestParameters& test);
 
 // Typedef for storing result of error checks
 typedef std::tuple<bool,MHDFloat,MHDFloat> ErrorType;
@@ -42,12 +47,6 @@ std::shared_ptr<StateGenerator> createRunner(std::shared_ptr<SpatialScheme::ISpa
 
 /// Create reference states
 QuICC::Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner);
-
-/// Add ASCII files for sphere schemes
-void addSphereFiles(std::shared_ptr<StateGenerator> spRunner);
-
-/// Add ASCII files for shell schemes
-void addShellFiles(std::shared_ptr<StateGenerator> spRunner);
 
 /// Check files
 void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const TestParameters& test);
@@ -69,6 +68,53 @@ template <typename TScheme> std::shared_ptr<TScheme> createScheme()
    auto spScheme = std::make_shared<TScheme>(VectorFormulation::TORPOL, GridPurpose::SIMULATION);
 
    return spScheme;
+}
+
+template <typename TScheme> void testFile(TestParameters& test)
+{
+   // Register IDs
+   QuICC::PhysicalNames::registerAll();
+
+   int status = 0;
+
+   auto spScheme = createScheme<TScheme>();
+
+   // Create simulation
+   decltype(createRunner(spScheme, test)) spRunner;
+
+   // Exception handling during the initialisation part
+   try
+   {
+      // Create state generator
+      spRunner = createRunner(spScheme, test);
+   }
+
+   // If exception is thrown, finalise (close files) and return
+   catch(std::logic_error& e)
+   {
+      try
+      {
+         QuICC::QuICCEnv().abort(e.what());
+      }
+      catch(std::logic_error& ee)
+      {
+         std::cerr << ee.what() << std::endl;
+      }
+
+      status = -1;
+   }
+
+   if(status == 0)
+   {
+      // Run the simulation
+      spRunner->run();
+   }
+
+   // Check output
+   checkFiles(spScheme, test);
+
+   // Cleanup and close file handles
+   spRunner->finalize();
 }
 
 } // namespace Io
