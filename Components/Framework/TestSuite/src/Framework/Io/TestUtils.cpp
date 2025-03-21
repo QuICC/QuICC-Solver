@@ -53,6 +53,7 @@
 #include "QuICC/Io/Variable/ShellTorPolMSpectrumWriter.hpp"
 #include "QuICC/Io/Variable/ShellTorPolEnstrophyWriter.hpp"
 #include "QuICC/NonDimensional/RRatio.hpp"
+#include "QuICC/NonDimensional/Heating.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "TestSuite/Io.hpp"
@@ -75,10 +76,6 @@ std::shared_ptr<StateGenerator> createRunner(std::shared_ptr<SpatialScheme::ISpa
 
    // Create list of nondimensional ID strings for physical parameters
    std::vector<std::string> ndNames = {};
-   if(spScheme->tag() == "SLFl")
-   {
-      ndNames.push_back(NonDimensional::RRatio().tag());
-   }
 
    // Get model configuration tags
    std::map<std::string, std::map<std::string, int>> modelCfg = {};
@@ -96,9 +93,13 @@ std::shared_ptr<StateGenerator> createRunner(std::shared_ptr<SpatialScheme::ISpa
    spScheme->enable(features);
 
    std::map<std::string, MHDFloat> extra;
-   if(cfg.count(NonDimensional::RRatio().tag()) > 0)
+   if(spScheme->tag() == "SLFl" || spScheme->tag() == "SLFm")
    {
-      auto rratio = cfg.at(NonDimensional::RRatio().tag());
+      MHDFloat rratio = 0.35;
+      MHDFloat heating = 0;
+
+      extra.emplace(NonDimensional::RRatio().tag(), rratio);
+      extra.emplace(NonDimensional::Heating().tag(), heating);
       extra.emplace(NonDimensional::Lower1d().tag(), rratio / (1.0 - rratio));
       extra.emplace(NonDimensional::Upper1d().tag(), 1.0 / (1.0 - rratio));
    }
@@ -140,6 +141,32 @@ std::shared_ptr<StateGenerator> createRunner(std::shared_ptr<SpatialScheme::ISpa
 
 Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner)
 {
+   int maxL = 3;
+   int maxM = 3;
+   int maxN = 3;
+
+   auto setModes = [](auto& tSH, const int maxN, const int maxL, const int maxM, const int l0)
+   {
+      std::pair<Spectral::Kernel::Complex3DMapType::iterator, bool> ptSH;
+      for(int m = 0; m <= maxM; m++)
+      {
+         for(int l = std::min(l0,m); l <= maxL; l++)
+         {
+            ptSH = tSH.insert(
+               std::make_pair(std::make_pair(l, m), std::map<int, MHDComplex>()));
+            for(int n = 0; n <= maxN; n++)
+            {
+               MHDComplex val(1.0/static_cast<MHDFloat>(n+1), 1.0/static_cast<MHDFloat>(n+1));
+               if(m == 0)
+               {
+                  val = std::real(val);
+               }
+               ptSH.first->second.insert(std::make_pair(n, val));
+            }
+         }
+      }
+   };
+
    std::shared_ptr<Model::IModelBackend> spBackend = std::make_shared<TestBackend>(spRunner->ss().tag());
 
    // Add state generation equations
@@ -147,15 +174,12 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
    Equations::SharedSphereExactVectorState spVector;
 
    Spectral::Kernel::Complex3DMapType tSH;
-   std::pair<Spectral::Kernel::Complex3DMapType::iterator, bool> ptSH;
 
    spScalar =
       spRunner->addEquation<Equations::SphereExactScalarState>(spBackend);
    spScalar->setIdentity(PhysicalNames::Temperature::id());
    tSH.clear();
-   ptSH = tSH.insert(
-      std::make_pair(std::make_pair(3, 3), std::map<int, MHDComplex>()));
-   ptSH.first->second.insert(std::make_pair(7, MHDComplex(1.0, 2.0)));
+   setModes(tSH, maxN, maxL, maxM, 0);
    spScalar->setSpectralModes(tSH);
 
    spVector =
@@ -163,15 +187,11 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
    spVector->setIdentity(PhysicalNames::Velocity::id());
    // Toroidal
    tSH.clear();
-   ptSH = tSH.insert(
-         std::make_pair(std::make_pair(1, 1), std::map<int, MHDComplex>()));
-   ptSH.first->second.insert(std::make_pair(7, MHDComplex(1.0)));
+   setModes(tSH, maxN, maxL, maxM, 1);
    spVector->setSpectralModes(FieldComponents::Spectral::TOR, tSH);
    // Poloidal
    tSH.clear();
-   ptSH = tSH.insert(
-         std::make_pair(std::make_pair(2, 0), std::map<int, MHDComplex>()));
-   ptSH.first->second.insert(std::make_pair(7, MHDComplex(1.0)));
+   setModes(tSH, maxN, maxL, maxM, 1);
    spVector->setSpectralModes(FieldComponents::Spectral::POL, tSH);
 
    spVector =
@@ -179,15 +199,11 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
    spVector->setIdentity(PhysicalNames::Magnetic::id());
    // Toroidal
    tSH.clear();
-   ptSH = tSH.insert(
-         std::make_pair(std::make_pair(1, 1), std::map<int, MHDComplex>()));
-   ptSH.first->second.insert(std::make_pair(7, MHDComplex(1.0)));
+   setModes(tSH, maxN, maxL, maxM, 1);
    spVector->setSpectralModes(FieldComponents::Spectral::TOR, tSH);
    // Poloidal
    tSH.clear();
-   ptSH = tSH.insert(
-         std::make_pair(std::make_pair(2, 0), std::map<int, MHDComplex>()));
-   ptSH.first->second.insert(std::make_pair(7, MHDComplex(1.0)));
+   setModes(tSH, maxN, maxL, maxM, 1);
    spVector->setSpectralModes(FieldComponents::Spectral::POL, tSH);
 
    return spVector;
@@ -257,9 +273,9 @@ void addSphereFiles(std::shared_ptr<StateGenerator> spRunner)
    }
    //
    {
-   auto spFile = std::make_shared<QuICC::Io::Variable::SphereScalarRSpectrumWriter>("temperature", spRunner->ss().tag());
-   spFile->expect(PhysicalNames::Temperature::id());
-   spRunner->addAsciiOutputFile(spFile);
+      auto spFile = std::make_shared<QuICC::Io::Variable::SphereScalarRSpectrumWriter>("temperature", spRunner->ss().tag());
+      spFile->expect(PhysicalNames::Temperature::id());
+      spRunner->addAsciiOutputFile(spFile);
    }
    //
    {
@@ -361,13 +377,13 @@ void addShellFiles(std::shared_ptr<StateGenerator> spRunner)
       spFile->expect(PhysicalNames::Velocity::id());
       spRunner->addAsciiOutputFile(spFile);
    }
+#if 0
    //
    {
       auto spFile = std::make_shared<QuICC::Io::Variable::ShellTorPolEnstrophyWriter>("velocity", spRunner->ss().tag());
       spFile->expect(PhysicalNames::Velocity::id());
       spRunner->addAsciiOutputFile(spFile);
    }
-#if 0
    //
    {
       auto spFile = std::make_shared<QuICC::Io::Variable::ShellTorPolEnstrophyLSpectrumWriter>("velocity", spRunner->ss().tag());
@@ -385,377 +401,145 @@ void addShellFiles(std::shared_ptr<StateGenerator> spRunner)
 
 void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const TestParameters& test)
 {
+   const std::string& datadir = test.datadir;
+   const std::string& refdir = test.refdir;
+
+   const auto& maxUlp = test.maxUlp;
+
+   MHDFloat eps = std::numeric_limits<MHDFloat>::epsilon();
+   MHDFloat tol = maxUlp*eps;
+
+   auto compareRef = [=](std::string fname, int rows, int cols, int blocks = 1)
+   {
+      std::vector<Matrix> data;
+      std::vector<Matrix> ref;
+      for(int i = 0; i < blocks; i++)
+      {
+         data.emplace(data.end(), rows, cols);
+         ref.emplace(ref.end(), rows, cols);
+      }
+      QuICC::TestSuite::readBlockData(data, datadir + fname);
+      QuICC::TestSuite::readBlockData(ref, refdir + fname);
+
+      INFO( "Checking " + fname );
+      CHECK( data.size() == ref.size() );
+      for(auto&& blk: data)
+      {
+         CHECK( blk.size() > 0 );
+      }
+      for(auto&& blk: ref)
+      {
+         CHECK( blk.size() > 0 );
+      }
+      for(int k = 0; k < blocks; k++)
+      {
+         const auto& d = data.at(k);
+         const auto& r = data.at(k);
+         CHECK( d.rows() == r.rows() );
+         CHECK( d.cols() == r.cols() );
+
+         for(int i = 0; i < d.rows(); i++)
+         {
+            for(int j = 0; j < d.cols(); j++)
+            {
+               auto err = computeUlp(d(i,j), r(i,j), std::abs(r(i,j)), tol, eps);
+               INFO( "i,j,k: " << i << "," << j << "," << k );
+               INFO( "data: " << std::scientific << std::setprecision(16) << d(i,j) );
+               INFO( "ref: " << std::scientific << std::setprecision(16) << r(i,j) );
+               INFO( "max ulp: " << maxUlp);
+               INFO( "measured ulp: " << std::get<1>(err) );
+               CHECK( std::get<0>(err) );
+            }
+         }
+      }
+   };
+
+   std::vector<std::tuple<std::string,int,int,int>> fileList;
+
    // Add sphere ascii files
    if(spScheme->tag() == "WLFl" || spScheme->tag() == "WLFm")
    {
-      checkSphereFiles(test);
+      fileList = checkSphereFiles(test);
    }
    // Add shell ascii files
    else if(spScheme->tag() == "SLFl" || spScheme->tag() == "SLFm")
    {
-      checkShellFiles(test);
+      fileList = checkShellFiles(test);
    }
    else
    {
       throw std::logic_error("No ASCII files have been setup for " + spScheme->tag() + " scheme");
    }
+
+   // Check all files
+   for(auto&& f: fileList)
+   {
+      std::string fname = std::get<0>(f);
+      int r = std::get<1>(f);
+      int c = std::get<2>(f);
+      int b = std::get<3>(f);
+      compareRef(fname, r, c, b);
+   }
 }
 
-void checkSphereFiles(const TestParameters& test)
+std::vector<std::tuple<std::string,int,int,int>> checkSphereFiles(const TestParameters& test)
 {
-   const std::string& datadir = test.datadir;
-   const std::string& refdir = test.refdir;
-
    const auto& nN = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM1D, QuICC::Dimensions::Space::SPECTRAL);
    const auto& nL = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM2D, QuICC::Dimensions::Space::SPECTRAL);
    const auto& nM = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM3D, QuICC::Dimensions::Space::SPECTRAL);
    const auto& nR = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM1D, QuICC::Dimensions::Space::PHYSICAL);
    int nH = nL*(nL+1)/2;
-   const auto& maxUlp = test.maxUlp;
 
-   MHDFloat eps = std::numeric_limits<MHDFloat>::epsilon();
-   MHDFloat tol = maxUlp*eps;
+   // List of files to check: fname, rows, cols, blocks
+   std::vector<std::tuple<std::string,int,int,int>> fileList;
+   fileList.emplace_back("angular_momentum.dat", 1, 5, 1);
+   fileList.emplace_back("magnetic_dipolarity.dat", 1,  5, 1);
+   fileList.emplace_back("velocity_max.dat", 1, 2, 1);
+   fileList.emplace_back("nusselt.dat", 1, 2, 1);
+   fileList.emplace_back("temperature_energy.dat", 1, 2, 1);
+   fileList.emplace_back("temperature_l_spectrum.dat", nL, 2, 1);
+   fileList.emplace_back("temperature_m_spectrum.dat", nM, 2, 1);
+   fileList.emplace_back("temperature_mean.dat", 1, 2, 1);
+   fileList.emplace_back("temperature_mode_spectrum.dat", nH, 3, 1);
+   fileList.emplace_back("temperature_n_spectrum.dat", nN, nL + 1, 1);
+   fileList.emplace_back("temperature_r_spectrum.dat", nR, nL + 1, 1);
+   fileList.emplace_back("velocity_energy.dat", 1, 4, 1);
+   fileList.emplace_back("velocity_l_spectrum.dat", nL, 4, 1);
+   fileList.emplace_back("velocity_m_spectrum.dat", nM, 4, 1);
+   fileList.emplace_back("velocity_mode_spectrum.dat", nH, 5, 1);
+   fileList.emplace_back("velocity_n_spectrum.dat", nN, nL + 1, 3);
+   fileList.emplace_back("velocity_r_spectrum.dat", nR, nL + 1, 3);
+   fileList.emplace_back("velocity_enstrophy.dat", 1, 4, 1);
+   fileList.emplace_back("velocity_enstrophy_l_spectrum.dat", nL, 4, 1);
+   fileList.emplace_back("velocity_enstrophy_m_spectrum.dat", nM, 4, 1);
 
-   auto compareRef = [=](std::string fname, int rows, int cols, int blocks = 1)
-   {
-      std::vector<Matrix> data;
-      std::vector<Matrix> ref;
-      for(int i = 0; i < blocks; i++)
-      {
-         data.emplace(data.end(), rows, cols);
-         ref.emplace(ref.end(), rows, cols);
-      }
-      QuICC::TestSuite::readBlockData(data, datadir + fname);
-      QuICC::TestSuite::readBlockData(ref, refdir + fname);
-
-      INFO( "Checking " + fname );
-      CHECK( data.size() == ref.size() );
-      for(int k = 0; k < blocks; k++)
-      {
-         const auto& d = data.at(k);
-         const auto& r = data.at(k);
-         CHECK( d.rows() == r.rows() );
-         CHECK( d.cols() == r.cols() );
-
-         for(int i = 0; i < d.rows(); i++)
-         {
-            for(int j = 0; j < d.cols(); j++)
-            {
-               auto err = computeUlp(d(i,j), r(i,j), std::abs(r(i,j)), tol, eps);
-               INFO( "i,j,k: " << i << "," << j << "," << k );
-               INFO( "data: " << std::scientific << std::setprecision(16) << d(i,j) );
-               INFO( "ref: " << std::scientific << std::setprecision(16) << r(i,j) );
-               INFO( "max ulp: " << maxUlp);
-               INFO( "measured ulp: " << std::get<1>(err) );
-               CHECK( std::get<0>(err) );
-            }
-         }
-      }
-   };
-
-   //
-   {
-      std::string fname = "angular_momentum.dat";
-      int r = 1;
-      int c = 5;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "magnetic_dipolarity.dat";
-      int r = 1;
-      int c = 5;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_max.dat";
-      int r = 1;
-      int c = 2;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "nusselt.dat";
-      int r = 1;
-      int c = 2;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "temperature_energy.dat";
-      int r = 1;
-      int c = 2;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "temperature_l_spectrum.dat";
-      int r = nL;
-      int c = 2;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "temperature_m_spectrum.dat";
-      int r = nM;
-      int c = 2;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "temperature_mean.dat";
-      int r = 1;
-      int c = 2;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "temperature_mode_spectrum.dat";
-      int r = nH;
-      int c = 3;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "temperature_n_spectrum.dat";
-      int r = nN;
-      int c = nL + 1;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "temperature_r_spectrum.dat";
-      int r = nR;
-      int c = nL + 1;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_energy.dat";
-      int r = 1;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_l_spectrum.dat";
-      int r = nL;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_m_spectrum.dat";
-      int r = nM;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_mode_spectrum.dat";
-      int r = nH;
-      int c = 5;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_n_spectrum.dat";
-      int r = nN;
-      int c = nL + 1;
-      int b = 3;
-      compareRef(fname, r, c, b);
-   }
-
-   //
-   {
-      std::string fname = "velocity_r_spectrum.dat";
-      int r = nR;
-      int c = nL + 1;
-      int b = 3;
-      compareRef(fname, r, c, b);
-   }
-
-   //
-   {
-      std::string fname = "velocity_enstrophy.dat";
-      int r = 1;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_enstrophy_l_spectrum.dat";
-      int r = nL;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_enstrophy_m_spectrum.dat";
-      int r = nM;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
+   return fileList;
 }
 
-void checkShellFiles(const TestParameters& test)
+std::vector<std::tuple<std::string,int,int,int>> checkShellFiles(const TestParameters& test)
 {
-   std::string datadir = "./";
-   std::string refdir = "./";
-
    const auto& nN = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM1D, QuICC::Dimensions::Space::SPECTRAL);
    const auto& nL = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM2D, QuICC::Dimensions::Space::SPECTRAL);
    const auto& nM = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM3D, QuICC::Dimensions::Space::SPECTRAL);
    const auto& nR = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM1D, QuICC::Dimensions::Space::PHYSICAL);
    int nH = nL*(nL+1)/2;
-   const auto& maxUlp = test.maxUlp;
 
-   std::cerr << "PARAMS: " << std::endl;
-   std::cerr << " nN = " << nN << std::endl;
-   std::cerr << " nL = " << nL << std::endl;
-   std::cerr << " nM = " << nM << std::endl;
-   std::cerr << " nR = " << nR << std::endl;
-   std::cerr << " nR = " << maxUlp << std::endl;
-
-   MHDFloat eps = std::numeric_limits<MHDFloat>::epsilon();
-   MHDFloat tol = maxUlp*eps;
-
-   auto compareRef = [=](std::string fname, int rows, int cols, int blocks = 1)
-   {
-      std::vector<Matrix> data;
-      std::vector<Matrix> ref;
-      for(int i = 0; i < blocks; i++)
-      {
-         data.emplace(data.end(), rows, cols);
-         ref.emplace(ref.end(), rows, cols);
-      }
-      QuICC::TestSuite::readBlockData(data, datadir + fname);
-      QuICC::TestSuite::readBlockData(ref, refdir + fname);
-
-      INFO( "Checking " + fname );
-      CHECK( data.size() == ref.size() );
-      for(int k = 0; k < blocks; k++)
-      {
-         const auto& d = data.at(k);
-         const auto& r = data.at(k);
-         CHECK( d.rows() == r.rows() );
-         CHECK( d.cols() == r.cols() );
-
-         for(int i = 0; i < d.rows(); i++)
-         {
-            for(int j = 0; j < d.cols(); j++)
-            {
-               auto err = computeUlp(d(i,j), r(i,j), std::abs(r(i,j)), tol, eps);
-               INFO( "i,j,k: " << i << "," << j << "," << k );
-               INFO( "data: " << std::scientific << std::setprecision(16) << d(i,j) );
-               INFO( "ref: " << std::scientific << std::setprecision(16) << r(i,j) );
-               INFO( "max ulp: " << maxUlp);
-               INFO( "measured ulp: " << std::get<1>(err) );
-               CHECK( std::get<0>(err) );
-            }
-         }
-      }
-   };
-
-   //
-   {
-      std::string fname = "nusselt.dat";
-      int r = 1;
-      int c = 2;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "temperature_energy.dat";
-      int r = 1;
-      int c = 2;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "temperature_l_spectrum.dat";
-      int r = nL;
-      int c = 2;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "temperature_m_spectrum.dat";
-      int r = nM;
-      int c = 2;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_energy.dat";
-      int r = 1;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_l_spectrum.dat";
-      int r = nL;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_m_spectrum.dat";
-      int r = nM;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_enstrophy.dat";
-      int r = 1;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
-
+   // List of files to check: fname, rows, cols, blocks
+   std::vector<std::tuple<std::string,int,int,int>> fileList;
+   fileList.emplace_back("nusselt.dat", 1, 2, 1);
+   fileList.emplace_back("temperature_energy.dat", 1, 2, 1);
+   fileList.emplace_back("temperature_l_spectrum.dat", nL, 2, 1);
+   fileList.emplace_back("temperature_m_spectrum.dat", nM, 2, 1);
+   fileList.emplace_back("velocity_energy.dat", 1, 4, 1);
+   fileList.emplace_back("velocity_l_spectrum.dat", nL, 4, 1);
+   fileList.emplace_back("velocity_m_spectrum.dat", nM, 4, 1);
 #if 0
-   //
-   {
-      std::string fname = "velocity_enstrophy_l_spectrum.dat";
-      int r = nL;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
-
-   //
-   {
-      std::string fname = "velocity_enstrophy_m_spectrum.dat";
-      int r = nM;
-      int c = 4;
-      compareRef(fname, r, c);
-   }
+   fileList.emplace_back("velocity_enstrophy.dat", 1, 4, 1);
+   fileList.emplace_back("velocity_enstrophy_l_spectrum.dat", nL, 4, 1);
+   fileList.emplace_back("velocity_enstrophy_m_spectrum.dat", nM, 4, 1);
 #endif
+
+   return fileList;
 }
 
 

@@ -53,10 +53,10 @@ void addShellFiles(std::shared_ptr<StateGenerator> spRunner);
 void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const TestParameters& test);
 
 /// Check sphere files
-void checkSphereFiles(const TestParameters& test);
+std::vector<std::tuple<std::string,int,int,int>> checkSphereFiles(const TestParameters& test);
 
 /// Check sphere files
-void checkShellFiles(const TestParameters& test);
+std::vector<std::tuple<std::string,int,int,int>> checkShellFiles(const TestParameters& test);
 
 /**
  * @brief Compute ULP
