@@ -23,6 +23,14 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
     if (_thisArr[index] == nullptr) {
         // check perm attribute
         auto perm = op.getPermutation();
+        // check type attributes
+        using namespace mlir;
+        Type inTy = op.getInput().getType()[0];
+        auto inTensor = inTy.cast<RankedTensorType>();
+        std::string inTyStr = inTensor.getEncoding().cast<StringAttr>().str();
+        Type outTy = op.getOutput().getType()[0];
+        auto outTensor = outTy.cast<RankedTensorType>();
+        std::string outTyStr = outTensor.getEncoding().cast<StringAttr>().str();
         if (_isCpu)
         {
           #ifdef QUICC_MPI
@@ -31,14 +39,7 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
           using namespace QuICC::Transpose::Cpu;
           #endif
           using namespace QuICC::Transpose;
-          // check type attributes
-          using namespace mlir;
-          Type inTy = op.getInput().getType();
-          auto inTensor = inTy.cast<RankedTensorType>();
-          std::string inTyStr = inTensor.getEncoding().cast<StringAttr>().str();
-          Type outTy = op.getOutput().getType();
-          auto outTensor = outTy.cast<RankedTensorType>();
-          std::string outTyStr = outTensor.getEncoding().cast<StringAttr>().str();
+
           if (outTyStr == "DCCSC3D" &&
             inTyStr == "DCCSC3D" &&
             perm[0] == 2 && perm[1] == 0)
@@ -117,14 +118,7 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
           using namespace QuICC::Transpose::Cuda;
           #endif
           using namespace QuICC::Transpose;
-          // check type attribute
-          using namespace mlir;
-          Type inTy = op.getInput().getType();
-          auto inTensor = inTy.cast<RankedTensorType>();
-          std::string inTyStr = inTensor.getEncoding().cast<StringAttr>().str();
-          Type outTy = op.getOutput().getType();
-          auto outTensor = outTy.cast<RankedTensorType>();
-          std::string outTyStr = outTensor.getEncoding().cast<StringAttr>().str();
+
           if (outTyStr == "DCCSC3DJIK" &&
             inTyStr == "DCCSC3D" &&
             perm[0] == 2 && perm[1] == 0)
