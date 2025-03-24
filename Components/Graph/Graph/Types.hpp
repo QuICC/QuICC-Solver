@@ -63,23 +63,25 @@ using varOp_t = std::variant<std::shared_ptr<NaryOp<C_DCCSC3D_t, C_DCCSC3D_t>>,
       NaryOp<R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t>>,
    std::shared_ptr<NaryOp<R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t,
       R_DCCSC3D_t, R_DCCSC3D_t, R_DCCSC3D_t>>,
-    std::shared_ptr<UnaryOp<C_DCCSC3D_t, C_DCCSC3D_t>>,
-    std::shared_ptr<UnaryOp<C_DCCSC3D_t, C_DCCSC3DJIK_t>>,
-    std::shared_ptr<UnaryOp<C_DCCSC3DJIK_t, C_DCCSC3DJIK_t>>,
-    std::shared_ptr<UnaryOp<C_DCCSC3DJIK_t, C_DCCSC3D_t>>,
-    std::shared_ptr<UnaryOp<R_DCCSC3D_t, C_DCCSC3D_t>>,
-    std::shared_ptr<UnaryOp<C_DCCSC3D_t, R_DCCSC3D_t>>,
-    std::shared_ptr<UnaryOp<R_DCCSC3D_t, R_DCCSC3D_t>>,
-    std::shared_ptr<UnaryOp<C_S1CLCSC3D_t, C_DCCSC3D_t>>,
-    std::shared_ptr<UnaryOp<C_S1CLCSC3DJIK_t, C_DCCSC3DJIK_t>>,
-    std::shared_ptr<UnaryOp<C_DCCSC3D_t, C_S1CLCSC3D_t>>,
-    std::shared_ptr<UnaryOp<C_DCCSC3DJIK_t, C_S1CLCSC3DJIK_t>>,
+   std::shared_ptr<UnaryOp<C_DCCSC3D_t, C_DCCSC3D_t>>,
+   std::shared_ptr<UnaryOp<C_DCCSC3D_t, C_DCCSC3DJIK_t>>,
+   std::shared_ptr<UnaryOp<C_DCCSC3DJIK_t, C_DCCSC3DJIK_t>>,
+   std::shared_ptr<UnaryOp<C_DCCSC3DJIK_t, C_DCCSC3D_t>>,
+   std::shared_ptr<UnaryOp<R_DCCSC3D_t, C_DCCSC3D_t>>,
+   std::shared_ptr<UnaryOp<C_DCCSC3D_t, R_DCCSC3D_t>>,
+   std::shared_ptr<UnaryOp<R_DCCSC3D_t, R_DCCSC3D_t>>,
+   std::shared_ptr<UnaryOp<C_S1CLCSC3D_t, C_DCCSC3D_t>>,
+   std::shared_ptr<UnaryOp<C_S1CLCSC3DJIK_t, C_DCCSC3DJIK_t>>,
+   std::shared_ptr<UnaryOp<C_DCCSC3D_t, C_S1CLCSC3D_t>>,
+   std::shared_ptr<UnaryOp<C_DCCSC3DJIK_t, C_S1CLCSC3DJIK_t>>,
 
-    std::shared_ptr<UnaryOp<std::vector<C_DCCSC3D_t>, std::vector<C_DCCSC3D_t>>>,
-    std::shared_ptr<UnaryOp<std::vector<C_S1CLCSC3D_t>, std::vector<C_DCCSC3D_t>>>,
-    std::shared_ptr<UnaryOp<std::vector<C_DCCSC3D_t>, std::vector<C_S1CLCSC3D_t>>>
+   std::shared_ptr<UnaryOp<std::vector<C_DCCSC3D_t>, std::vector<C_DCCSC3D_t>>>,
+   std::shared_ptr<
+      UnaryOp<std::vector<C_S1CLCSC3D_t>, std::vector<C_DCCSC3D_t>>>,
+   std::shared_ptr<
+      UnaryOp<std::vector<C_DCCSC3D_t>, std::vector<C_S1CLCSC3D_t>>>
 
->;
+   >;
 
 
 template <typename T, std::size_t N> struct MemRefDescriptor

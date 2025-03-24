@@ -562,22 +562,27 @@ void Coordinator::cleanupForRun()
    // Loop over iterations
    for (auto j: this->it())
    {
-      Profiler::RegionFixture<1> fix("Pseudospectral::Coordinator::updateSpectral");
+      Profiler::RegionFixture<1> fix(
+         "Pseudospectral::Coordinator::updateSpectral");
 
       // Define transform trees
       this->mTransformCoordinator.defineFwdTransforms(this->mFwdTree.at(it));
 
-      this->mspFwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, this->mPhysicalKernels.at(it), this->mTransformCoordinator);
+      this->mspFwdGrouper->transform(this->mScalarVariables,
+         this->mVectorVariables, this->mPhysicalKernels.at(it),
+         this->mTransformCoordinator);
    }
 
-   void Coordinator::updateSpectral(const bool isTrivial, const bool isDiagnostic, const bool isPrognostic, const bool isWrapper, const int it)
+   void Coordinator::updateSpectral(const bool isTrivial,
+      const bool isDiagnostic, const bool isPrognostic, const bool isWrapper,
+      const int it)
    {
       /// \todo This needs to be checked as it currently doesn't do anything
 
       std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel> kernels;
 
       // Get kernels from trivial equations
-      if(isTrivial)
+      if (isTrivial)
       {
          auto sR = this->scalarRange(PseudospectralTag::Trivial::id(), it);
          Equations::Tools::getNonlinearKernels(kernels, sR.first, sR.second);
@@ -586,7 +591,7 @@ void Coordinator::cleanupForRun()
       }
 
       // Get kernels from diagnostic equations
-      if(isDiagnostic)
+      if (isDiagnostic)
       {
          auto sR = this->scalarRange(PseudospectralTag::Diagnostic::id(), it);
          Equations::Tools::getNonlinearKernels(kernels, sR.first, sR.second);
@@ -595,7 +600,7 @@ void Coordinator::cleanupForRun()
       }
 
       // Get kernels from prognostic equations
-      if(isPrognostic)
+      if (isPrognostic)
       {
          auto sR = this->scalarRange(PseudospectralTag::Prognostic::id(), it);
          Equations::Tools::getNonlinearKernels(kernels, sR.first, sR.second);
@@ -604,7 +609,7 @@ void Coordinator::cleanupForRun()
       }
 
       // Get kernels from wrapper equations
-      if(isWrapper)
+      if (isWrapper)
       {
          auto sR = this->scalarRange(PseudospectralTag::Wrapper::id(), it);
          Equations::Tools::getNonlinearKernels(kernels, sR.first, sR.second);
@@ -613,28 +618,33 @@ void Coordinator::cleanupForRun()
       }
 
       // Set mesh for kernels
-      Equations::Tools::setupPhysicalKernels(kernels, this->mTransformCoordinator.mesh());
+      Equations::Tools::setupPhysicalKernels(kernels,
+         this->mTransformCoordinator.mesh());
 
-      //this->mspFwdGrouper->transform(this->mScalarVariables, this->mVectorVariables, kernels, this->mTransformCoordinator);
+      // this->mspFwdGrouper->transform(this->mScalarVariables,
+      // this->mVectorVariables, kernels, this->mTransformCoordinator);
    }
 
-   void Coordinator::init(const Array& tstep, const SharedSimulationBoundary spBcs)
+   void Coordinator::init(const Array& tstep,
+      const SharedSimulationBoundary spBcs)
    {
       StageTimer stage;
 
       // Make sure types are initialized for both equation types
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
          // Create empty scalar vector for iteration
-         if(this->mScalarEquations.count(j) == 0)
+         if (this->mScalarEquations.count(j) == 0)
          {
-            this->mScalarEquations.insert(std::make_pair(j, std::vector<SharedIScalarEquation>()));
+            this->mScalarEquations.insert(
+               std::make_pair(j, std::vector<SharedIScalarEquation>()));
          }
 
          // Create empty vector vector for iteration
-         if(this->mVectorEquations.count(j) == 0)
+         if (this->mVectorEquations.count(j) == 0)
          {
-            this->mVectorEquations.insert(std::make_pair(j, std::vector<SharedIVectorEquation>()));
+            this->mVectorEquations.insert(
+               std::make_pair(j, std::vector<SharedIVectorEquation>()));
          }
       }
 
@@ -642,47 +652,61 @@ void Coordinator::cleanupForRun()
 
       // Initialise the variables and set general variable requirements
       VariableRequirement varInfo;
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
          assert(this->mScalarEquations.count(j) == 1);
          assert(this->mVectorEquations.count(j) == 1);
 
-         RequirementTools::mergeRequirements(varInfo, this->mScalarEquations.at(j), this->mVectorEquations.at(j));
+         RequirementTools::mergeRequirements(varInfo,
+            this->mScalarEquations.at(j), this->mVectorEquations.at(j));
       }
-      RequirementTools::initVariables(this->mScalarVariables, this->mVectorVariables, varInfo, this->mspRes);
+      RequirementTools::initVariables(this->mScalarVariables,
+         this->mVectorVariables, varInfo, this->mspRes);
 
       // Map variables to the equations and set nonlinear requirements
       std::vector<std::size_t> unmapped;
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
-         RequirementTools::mapEquationVariables(this->mScalarEquations.at(j), this->mVectorEquations.at(j), this->mScalarVariables, this->mVectorVariables, spBcs, unmapped);
+         RequirementTools::mapEquationVariables(this->mScalarEquations.at(j),
+            this->mVectorEquations.at(j), this->mScalarVariables,
+            this->mVectorVariables, spBcs, unmapped);
       }
 
-      if(unmapped.size() > 0)
+      if (unmapped.size() > 0)
       {
-         throw std::logic_error("Variables not mapped to equations are currently not implemented");
+         throw std::logic_error(
+            "Variables not mapped to equations are currently not implemented");
       }
 
       // Initialize Imposed fields
       this->initImposed();
 
       // Transform trees
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
          // Build backward tree
-         this->mBwdTree.insert(std::make_pair(j, std::vector<Transform::TransformTree>()));
-         RequirementTools::buildBackwardTree(this->mBwdTree.at(j), this->mScalarEquations.at(j), this->mVectorEquations.at(j));
+         this->mBwdTree.insert(
+            std::make_pair(j, std::vector<Transform::TransformTree>()));
+         RequirementTools::buildBackwardTree(this->mBwdTree.at(j),
+            this->mScalarEquations.at(j), this->mVectorEquations.at(j));
 
          // Build forward tree
-         this->mFwdTree.insert(std::make_pair(j, std::vector<Transform::TransformTree>()));
-         RequirementTools::buildForwardTree(this->mFwdTree.at(j), this->mScalarEquations.at(j), this->mVectorEquations.at(j));
+         this->mFwdTree.insert(
+            std::make_pair(j, std::vector<Transform::TransformTree>()));
+         RequirementTools::buildForwardTree(this->mFwdTree.at(j),
+            this->mScalarEquations.at(j), this->mVectorEquations.at(j));
 
          // Get nonlinear kernels
-         this->mPhysicalKernels.insert(std::make_pair(j, std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel>()));
+         this->mPhysicalKernels.insert(std::make_pair(j,
+            std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel>()));
          // ... for scalar equations
-         Equations::Tools::getNonlinearKernels(this->mPhysicalKernels.at(j), this->mScalarEquations.at(j).begin(), this->mScalarEquations.at(j).end());
+         Equations::Tools::getNonlinearKernels(this->mPhysicalKernels.at(j),
+            this->mScalarEquations.at(j).begin(),
+            this->mScalarEquations.at(j).end());
          // ... for vector equations
-         Equations::Tools::getNonlinearKernels(this->mPhysicalKernels.at(j), this->mVectorEquations.at(j).begin(), this->mVectorEquations.at(j).end());
+         Equations::Tools::getNonlinearKernels(this->mPhysicalKernels.at(j),
+            this->mVectorEquations.at(j).begin(),
+            this->mVectorEquations.at(j).end());
       }
 
       stage.done();
@@ -691,9 +715,10 @@ void Coordinator::cleanupForRun()
       this->initTransformCoordinator();
 
       // Setup nonlinear kernels
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
-         Equations::Tools::setupPhysicalKernels(this->mPhysicalKernels.at(j), this->mTransformCoordinator.mesh());
+         Equations::Tools::setupPhysicalKernels(this->mPhysicalKernels.at(j),
+            this->mTransformCoordinator.mesh());
       }
 
       stage.start("setup equations");
@@ -708,7 +733,9 @@ void Coordinator::cleanupForRun()
       stage.start("initializing diagnostics");
 
       // Initialise the diagnostics
-      this->mDiagnostics.init(this->transformCoordinator().mesh(), this->scalarVariables(), this->vectorVariables(), tstep, this->mspEqParams->map());
+      this->mDiagnostics.init(this->transformCoordinator().mesh(),
+         this->scalarVariables(), this->vectorVariables(), tstep,
+         this->mspEqParams->map());
       stage.done();
    }
 
@@ -727,7 +754,8 @@ void Coordinator::cleanupForRun()
       // Update equation time
       this->updateEquationTime(this->mDiagnostics.startTime(), false);
 
-      // Initialise all values (solve and nonlinear computations except timestep)
+      // Initialise all values (solve and nonlinear computations except
+      // timestep)
       this->preSolveEquations();
 
       // Update CFL condition
@@ -739,7 +767,7 @@ void Coordinator::cleanupForRun()
       // Init timestepper using clf/100 as starting timestep
       std::vector<SharedIScalarEquation> sEqs;
       std::vector<SharedIVectorEquation> vEqs;
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
          auto sP = this->scalarRange(PseudospectralTag::Prognostic::id(), j);
          sEqs.insert(sEqs.end(), sP.first, sP.second);
@@ -748,10 +776,13 @@ void Coordinator::cleanupForRun()
       }
       auto sP = std::make_pair(sEqs.begin(), sEqs.end());
       auto vP = std::make_pair(vEqs.begin(), vEqs.end());
-      this->mTimestepCoordinator.init(schemeId, this->mDiagnostics.startTime(), this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), sP, vP, *this);
+      this->mTimestepCoordinator.init(schemeId, this->mDiagnostics.startTime(),
+         this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), sP, vP,
+         *this);
 
       // Compute physical space values if required
-      this->mspImposedBwdGrouper->transform(this->mImposedScalarVariables, this->mImposedVectorVariables, *this->mspImposedTransformCoordinator);
+      this->mspImposedBwdGrouper->transform(this->mImposedScalarVariables,
+         this->mImposedVectorVariables, *this->mspImposedTransformCoordinator);
    }
 
    void Coordinator::cleanupForRun()
@@ -760,18 +791,20 @@ void Coordinator::cleanupForRun()
       stage.start("Cleanup equation backends");
 
       // Loop over iterations
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
          // Loop over all scalar equations
          auto sit = this->mScalarEquations.find(j);
-         for(auto scalEqIt = sit->second.begin(); scalEqIt < sit->second.end(); ++scalEqIt)
+         for (auto scalEqIt = sit->second.begin(); scalEqIt < sit->second.end();
+              ++scalEqIt)
          {
             (*scalEqIt)->cleanupBackend();
          }
 
          // Loop over all vector equations
          auto vit = this->mVectorEquations.find(j);
-         for(auto vectEqIt = vit->second.begin(); vectEqIt < vit->second.end(); ++vectEqIt)
+         for (auto vectEqIt = vit->second.begin(); vectEqIt < vit->second.end();
+              ++vectEqIt)
          {
             (*vectEqIt)->cleanupBackend();
          }
@@ -793,43 +826,55 @@ void Coordinator::cleanupForRun()
 
       // Initialise the variables and set general variable requirements
       VariableRequirement varInfo;
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
          assert(this->mScalarEquations.count(j) == 1);
          assert(this->mVectorEquations.count(j) == 1);
 
-         RequirementTools::mergeImposedRequirements(varInfo, this->mScalarEquations.at(j), this->mVectorEquations.at(j));
+         RequirementTools::mergeImposedRequirements(varInfo,
+            this->mScalarEquations.at(j), this->mVectorEquations.at(j));
       }
-      RequirementTools::initVariables(this->mImposedScalarVariables, this->mImposedVectorVariables, varInfo, this->mspRes);
+      RequirementTools::initVariables(this->mImposedScalarVariables,
+         this->mImposedVectorVariables, varInfo, this->mspRes);
 
       // Map variables to the equations and set nonlinear requirements
       std::vector<std::size_t> unmapped;
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
-         RequirementTools::mapImposedVariables(this->mScalarEquations.at(j), this->mVectorEquations.at(j), this->mImposedScalarVariables, this->mImposedVectorVariables, unmapped);
+         RequirementTools::mapImposedVariables(this->mScalarEquations.at(j),
+            this->mVectorEquations.at(j), this->mImposedScalarVariables,
+            this->mImposedVectorVariables, unmapped);
       }
 
-      if(unmapped.size() > 0)
+      if (unmapped.size() > 0)
       {
-         throw std::logic_error("Variables not mapped to equations are currently not implemented");
+         throw std::logic_error(
+            "Variables not mapped to equations are currently not implemented");
       }
 
       // Transform trees
       std::vector<Transform::TransformTree> forwardTree;
       std::vector<Transform::TransformTree> backwardTree;
-      RequirementTools::buildBackwardTree(backwardTree, this->mImposedScalarVariables, this->mImposedVectorVariables);
+      RequirementTools::buildBackwardTree(backwardTree,
+         this->mImposedScalarVariables, this->mImposedVectorVariables);
 
       stage.done();
 
       // Extract the run options for the equation parameters
-      std::map<std::size_t,NonDimensional::SharedINumber> runOptions(this->mspEqParams->map());
+      std::map<std::size_t, NonDimensional::SharedINumber> runOptions(
+         this->mspEqParams->map());
 
-      this->mspImposedTransformCoordinator = std::make_shared<Transform::TransformCoordinatorType>();
+      this->mspImposedTransformCoordinator =
+         std::make_shared<Transform::TransformCoordinatorType>();
 
       // Initialise the transform coordinator
       std::vector<ArrayI> packs;
-      Transform::TransformCoordinatorTools::computePacks(packs, this->mspImposedFwdGrouper, this->mspImposedBwdGrouper, {{0,forwardTree}}, {{0,backwardTree}}, {0}, this->mspRes);
-      Transform::TransformCoordinatorTools::init(*this->mspImposedTransformCoordinator, this->mspImposedFwdGrouper, this->mspImposedBwdGrouper, packs, this->mspRes, runOptions);
+      Transform::TransformCoordinatorTools::computePacks(packs,
+         this->mspImposedFwdGrouper, this->mspImposedBwdGrouper,
+         {{0, forwardTree}}, {{0, backwardTree}}, {0}, this->mspRes);
+      Transform::TransformCoordinatorTools::init(
+         *this->mspImposedTransformCoordinator, this->mspImposedFwdGrouper,
+         this->mspImposedBwdGrouper, packs, this->mspRes, runOptions);
    }
 
    void Coordinator::initSolvers()
@@ -840,7 +885,7 @@ void Coordinator::cleanupForRun()
       // Init trivial solver for trivial equations
       std::vector<SharedIScalarEquation> sEqs;
       std::vector<SharedIVectorEquation> vEqs;
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
          auto sT = this->scalarRange(PseudospectralTag::Trivial::id(), j);
          sEqs.insert(sEqs.end(), sT.first, sT.second);
@@ -857,7 +902,7 @@ void Coordinator::cleanupForRun()
       // Init linear solver for trivial equations
       sEqs.clear();
       vEqs.clear();
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
          auto sD = this->scalarRange(PseudospectralTag::Diagnostic::id(), j);
          sEqs.insert(sEqs.end(), sD.first, sD.second);
@@ -870,20 +915,23 @@ void Coordinator::cleanupForRun()
       stage.done();
    }
 
-   void Coordinator::updateEquationTime(const MHDFloat time, const bool finished)
+   void Coordinator::updateEquationTime(const MHDFloat time,
+      const bool finished)
    {
-      for(auto j: this->it())
+      for (auto j: this->it())
       {
          // Loop over all scalar equations
          assert(this->mScalarEquations.count(j) == 1);
-         for(auto scalEqIt = this->mScalarEquations.at(j).begin(); scalEqIt < this->mScalarEquations.at(j).end(); ++scalEqIt)
+         for (auto scalEqIt = this->mScalarEquations.at(j).begin();
+              scalEqIt < this->mScalarEquations.at(j).end(); ++scalEqIt)
          {
             (*scalEqIt)->setTime(time, finished);
          }
 
          // Loop over all vector equations
          assert(this->mVectorEquations.count(j) == 1);
-         for(auto vectEqIt = this->mVectorEquations.at(j).begin(); vectEqIt < this->mVectorEquations.at(j).end(); ++vectEqIt)
+         for (auto vectEqIt = this->mVectorEquations.at(j).begin();
+              vectEqIt < this->mVectorEquations.at(j).end(); ++vectEqIt)
          {
             (*vectEqIt)->setTime(time, finished);
          }
@@ -892,7 +940,8 @@ void Coordinator::cleanupForRun()
 
    void Coordinator::updateEquations(const int it, const bool isFinished) const
    {
-      const std::string profRegion = "Pseudospectral::Coordinator::updateEquations";
+      const std::string profRegion =
+         "Pseudospectral::Coordinator::updateEquations";
       Profiler::RegionFixture<1> fix(profRegion);
 
       // Loop over all scalar equations

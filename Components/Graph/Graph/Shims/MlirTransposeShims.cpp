@@ -3,9 +3,8 @@
 #include <iostream>
 
 #include "Graph/Shims/MlirShims.hpp"
-#include "ViewOps/Transpose/Op.hpp"
-#include "ViewOps/Transpose/Cpu/OpGrouped.hpp"
 #include "Graph/Types.hpp"
+#include "ViewOps/Transpose/Cpu/OpGrouped.hpp"
 #include "ViewOps/Transpose/Op.hpp"
 
 using namespace QuICC::Graph;

@@ -31,7 +31,8 @@ using namespace QuICC::Operator;
 template <class Tout, class Tin, class Perm>
 class OpGrouped : public UnaryBaseOp<OpGrouped<Tout, Tin, Perm>, Tout, Tin>
 {
-using ScalarType = typename Tin::value_type::ScalarType;
+   using ScalarType = typename Tin::value_type::ScalarType;
+
 public:
    /// @brief Constructor
    OpGrouped(std::shared_ptr<Memory::memory_resource> mem)
@@ -73,8 +74,10 @@ void OpGrouped<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       // Set group size
       _groupSize = in.size();
       // Get absolute coordinates
-      std::vector<point_t> cooOld = View::getCoo<typename Tin::value_type, p012_t>(in[0]);
-      std::vector<point_t> cooNew = View::getCoo<typename Tout::value_type, Perm>(out[0]);
+      std::vector<point_t> cooOld =
+         View::getCoo<typename Tin::value_type, p012_t>(in[0]);
+      std::vector<point_t> cooNew =
+         View::getCoo<typename Tout::value_type, Perm>(out[0]);
       assert(cooOld.size() == in[0].size());
       assert(cooNew.size() == out[0].size());
       // Setup

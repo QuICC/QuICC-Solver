@@ -14,12 +14,11 @@
 
 // Project includes
 //
-#include "ViewOps/Transpose/Mpi/Tags.hpp"
-#include "ViewOps/Transpose/Mpi/CommUtils.hpp"
 #include "Environment/MpiTypes.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
 #include "Memory/Memory.hpp"
 #include "View/View.hpp"
+#include "ViewOps/Transpose/Mpi/CommUtils.hpp"
 #include "ViewOps/Transpose/Mpi/Tags.hpp"
 #include "ViewOps/Transpose/Packing.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND

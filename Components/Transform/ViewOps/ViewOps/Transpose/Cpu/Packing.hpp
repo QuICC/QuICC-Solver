@@ -92,11 +92,11 @@ void pack(View::ViewBase<TDATA> buffer, const std::vector<TDATA*> in,
    {
       for (std::size_t i = 0; i < I; ++i)
       {
-         auto sendCount = sendCountsView[i]/groupSize;
+         auto sendCount = sendCountsView[i] / groupSize;
          for (int j = 0; j < sendCount; ++j)
          {
-            buffer[g*sendCount + sendBufferDisplsView[i]+j] =
-               *(in[g] + sendDisplsView[i*J+j]);
+            buffer[g * sendCount + sendBufferDisplsView[i] + j] =
+               *(in[g] + sendDisplsView[i * J + j]);
          }
       }
    }
@@ -124,11 +124,11 @@ void unPack(std::vector<TDATA*> out, const View::ViewBase<TDATA> buffer,
    {
       for (std::size_t i = 0; i < I; ++i)
       {
-         auto recvCount = recvCountsView[i]/groupSize;
+         auto recvCount = recvCountsView[i] / groupSize;
          for (int j = 0; j < recvCount; ++j)
          {
-            *(out[g] + recvDisplsView[i*J+j]) =
-               buffer[g*recvCount + recvBufferDisplsView[i]+j];
+            *(out[g] + recvDisplsView[i * J + j]) =
+               buffer[g * recvCount + recvBufferDisplsView[i] + j];
          }
       }
    }

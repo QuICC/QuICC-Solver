@@ -60,10 +60,10 @@ ViewDescriptor<T, std::uint32_t, 3> getViewDescriptor(View::View<T, ATT> view)
 /// lowering pipeline
 struct PipelineOptions
 {
-    /// @brief Wrapper pass options
-    mlir::quiccir::QuiccirViewWrapperOptions wrap;
-    /// @brief Grouping pass options
-    mlir::quiccir::QuiccirTransposeGroupingOptions grouping;
+   /// @brief Wrapper pass options
+   mlir::quiccir::QuiccirViewWrapperOptions wrap;
+   /// @brief Grouping pass options
+   mlir::quiccir::QuiccirTransposeGroupingOptions grouping;
 };
 
 /// @brief classe to setup and JIT the mlir graph
@@ -377,17 +377,17 @@ void Jit<RANK>::insertWrapper(const std::array<std::uint32_t, RANK> physDims,
    const std::array<std::array<std::string, 2>, RANK> lay, const Stage outStage,
    const Stage inStage)
 {
-    // Inline and insert wrapper
-    mlir::PassManager pmPre(&_ctx);
-    pmPre.addPass(mlir::createInlinerPass());
-    mlir::OpPassManager &nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
-    // Optimization passes
-    nestedFuncPmPre.addPass(mlir::quiccir::createTransformContractionPass());
-    pmPre.addPass(mlir::createCSEPass());
-    if (_opt.grouping.group != 1)
-    {
-        pmPre.addPass(mlir::quiccir::createTransposeGroupingPass(_opt.grouping));
-    }
+   // Inline and insert wrapper
+   mlir::PassManager pmPre(&_ctx);
+   pmPre.addPass(mlir::createInlinerPass());
+   mlir::OpPassManager& nestedFuncPmPre = pmPre.nest<mlir::func::FuncOp>();
+   // Optimization passes
+   nestedFuncPmPre.addPass(mlir::quiccir::createTransformContractionPass());
+   pmPre.addPass(mlir::createCSEPass());
+   if (_opt.grouping.group != 1)
+   {
+      pmPre.addPass(mlir::quiccir::createTransposeGroupingPass(_opt.grouping));
+   }
 
    std::vector<std::vector<std::int64_t>> dimArgs(1);
    std::vector<std::string> layArgs(1);

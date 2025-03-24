@@ -12,8 +12,8 @@
 #include "Operator/Unary.hpp"
 #include "Profiler/Interface.hpp"
 #include "View/View.hpp"
-#include "ViewOps/Transpose/Tags.hpp"
 #include "ViewOps/Transpose/Cpu/Impl.hpp"
+#include "ViewOps/Transpose/Tags.hpp"
 
 namespace QuICC {
 /// @brief namespace for Transpose type operations

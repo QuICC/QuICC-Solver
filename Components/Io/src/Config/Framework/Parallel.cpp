@@ -18,28 +18,25 @@ namespace Config {
 
 namespace Framework {
 
-   const std::string Parallel::PARENTTAG = "parallel";
+const std::string Parallel::PARENTTAG = "parallel";
 
-   Parallel::Parallel()
-      : IConfigurationNode(Parallel::PARENTTAG)
-   {
-      this->init();
-   }
+Parallel::Parallel() : IConfigurationNode(Parallel::PARENTTAG)
+{
+   this->init();
+}
 
-   void Parallel::init()
-   {
-      this->iTags().addTag("cpus", -1);
-      this->sTags().addTag("algorithm", "serial");
-      this->sTags().addTag("grouper", "transform");
-      this->iTags().addTag("groupingsize", 1);
-      this->sTags().addTag("decomposition", "auto");
-   }
+void Parallel::init()
+{
+   this->iTags().addTag("cpus", -1);
+   this->sTags().addTag("algorithm", "serial");
+   this->sTags().addTag("grouper", "transform");
+   this->iTags().addTag("groupingsize", 1);
+   this->sTags().addTag("decomposition", "auto");
+}
 
-   void Parallel::checkData()
-   {
-   }
+void Parallel::checkData() {}
 
-} // Framework
-} // Config
-} // Io
-} // QuICC
+} // namespace Framework
+} // namespace Config
+} // namespace Io
+} // namespace QuICC

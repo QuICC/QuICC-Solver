@@ -100,7 +100,8 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 201", "SerialDCCSC3DtoDCCSC3D201")
 //    using namespace QuICC::Transpose::Cpu;
 //    using namespace QuICC::Transpose;
 //    auto transposeOp =
-//       std::make_unique<OpGrouped<View<double, outTy>, View<double, inTy>, p120_t>>();
+//       std::make_unique<OpGrouped<View<double, outTy>, View<double, inTy>,
+//       p120_t>>();
 
 //    transposeOp->apply(viewOut, viewIn);
 
@@ -169,7 +170,8 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 201", "SerialDCCSC3DtoDCCSC3D201")
 //    using namespace QuICC::Transpose::Cpu;
 //    using namespace QuICC::Transpose;
 //    auto transposeOp =
-//       std::make_unique<OpGrouped<View<double, outTy>, View<double, inTy>, p201_t>>();
+//       std::make_unique<OpGrouped<View<double, outTy>, View<double, inTy>,
+//       p201_t>>();
 
 //    transposeOp->apply(viewOut, viewIn);
 
@@ -231,7 +233,8 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 201", "SerialDCCSC3DtoDCCSC3D201")
 //    using namespace QuICC::Transpose::Cpu;
 //    using namespace QuICC::Transpose;
 //    auto transposeOp =
-//       std::make_unique<OpGrouped<View<double, outTy>, View<double, inTy>, p120_t>>();
+//       std::make_unique<OpGrouped<View<double, outTy>, View<double, inTy>,
+//       p120_t>>();
 
 //    transposeOp->apply(viewOut, viewIn);
 

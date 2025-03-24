@@ -8,21 +8,21 @@
 //
 #include <array>
 #include <cassert>
+#include <memory>
 #include <mpi.h>
 #include <vector>
-#include <memory>
 
 // Project includes
 //
-#include "ViewOps/Transpose/Mpi/Tags.hpp"
 #include "Environment/MpiTypes.hpp"
-#include "View/View.hpp"
-#include "Memory/Memory.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
+#include "Memory/Memory.hpp"
+#include "View/View.hpp"
+#include "ViewOps/Transpose/Mpi/Tags.hpp"
 #include "ViewOps/Transpose/Packing.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
-#include "Memory/Cuda/Malloc.hpp"
 #include "Cuda/CudaUtil.hpp"
+#include "Memory/Cuda/Malloc.hpp"
 #endif
 
 namespace QuICC {
@@ -30,17 +30,16 @@ namespace Transpose {
 namespace Mpi {
 
 /// \todo move Mpi utils out of Enviroment and unify
-namespace details
+namespace details {
+inline void mpiAssert(int ierr)
 {
-    inline void mpiAssert(int ierr)
-    {
-       #ifndef NDEBUG
-       if (ierr != MPI_SUCCESS)
-       {
-          throw  std::runtime_error("Mpi failed.");
-       }
-       #endif
-    }
+#ifndef NDEBUG
+   if (ierr != MPI_SUCCESS)
+   {
+      throw std::runtime_error("Mpi failed.");
+   }
+#endif
+}
 } // namespace details
 
 
@@ -92,7 +91,7 @@ std::vector<int> getCount(const std::vector<std::vector<int>>& displs)
    std::vector<int> count(displs.size());
    for (std::size_t i = 0; i < displs.size(); ++i)
    {
-      if constexpr(std::is_same_v<TAG, alltoallw_t>)
+      if constexpr (std::is_same_v<TAG, alltoallw_t>)
       {
          if (displs[i].size() > 0)
          {
