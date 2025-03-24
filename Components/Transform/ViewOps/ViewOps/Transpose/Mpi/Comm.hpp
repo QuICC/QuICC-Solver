@@ -8,21 +8,21 @@
 //
 #include <array>
 #include <cassert>
+#include <memory>
 #include <mpi.h>
 #include <vector>
-#include <memory>
 
 // Project includes
 //
-#include "ViewOps/Transpose/Mpi/Tags.hpp"
 #include "Environment/MpiTypes.hpp"
-#include "View/View.hpp"
-#include "Memory/Memory.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
+#include "Memory/Memory.hpp"
+#include "View/View.hpp"
+#include "ViewOps/Transpose/Mpi/Tags.hpp"
 #include "ViewOps/Transpose/Packing.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
-#include "Memory/Cuda/Malloc.hpp"
 #include "Cuda/CudaUtil.hpp"
+#include "Memory/Cuda/Malloc.hpp"
 #endif
 
 namespace QuICC {
@@ -30,17 +30,16 @@ namespace Transpose {
 namespace Mpi {
 
 /// \todo move Mpi utils out of Enviroment and unify
-namespace details
+namespace details {
+inline void mpiAssert(int ierr)
 {
-   inline void mpiAssert(int ierr)
+#ifndef NDEBUG
+   if (ierr != MPI_SUCCESS)
    {
-      #ifndef NDEBUG
-      if (ierr != MPI_SUCCESS)
-      {
-         throw  std::runtime_error("Mpi failed.");
-      }
-      #endif
+      throw std::runtime_error("Mpi failed.");
    }
+#endif
+}
 } // namespace details
 
 
@@ -92,7 +91,7 @@ std::vector<int> getCount(const std::vector<std::vector<int>>& displs)
    std::vector<int> count(displs.size());
    for (std::size_t i = 0; i < displs.size(); ++i)
    {
-      if constexpr(std::is_same_v<TAG, alltoallw_t>)
+      if constexpr (std::is_same_v<TAG, alltoallw_t>)
       {
          if (displs[i].size() > 0)
          {
@@ -120,7 +119,9 @@ template <class TDATA, class TAG = alltoallv_t> class Comm
 public:
    /// @brief Constructor
    /// @param comm
-   Comm(std::shared_ptr<Memory::memory_resource> mem, MPI_Comm comm = MPI_COMM_WORLD) : _mem(mem), _comm(comm){};
+   Comm(std::shared_ptr<Memory::memory_resource> mem,
+      MPI_Comm comm = MPI_COMM_WORLD) :
+       _mem(mem), _comm(comm){};
 
    /// @brief release Mpi resources
    ~Comm();
@@ -228,14 +229,12 @@ private:
    /// @param out
    /// @param buffer
    void unPack(TDATA* out, const View::ViewBase<TDATA> buffer) const;
-
 };
 
 
-template <class TDATA, class TAG>
-Comm<TDATA, TAG>::~Comm()
+template <class TDATA, class TAG> Comm<TDATA, TAG>::~Comm()
 {
-   if constexpr(std::is_same_v<TAG, alltoallw_t>)
+   if constexpr (std::is_same_v<TAG, alltoallw_t>)
    {
       for (std::size_t r = 0; r < _sendType.size(); ++r)
       {
@@ -260,7 +259,7 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
    if (_subComm != MPI_COMM_NULL)
    {
       MPI_Comm_size(_subComm, &_nSubComm);
-      if constexpr(std::is_same_v<TAG, alltoallw_t>)
+      if constexpr (std::is_same_v<TAG, alltoallw_t>)
       {
          // Build types for alltoallw
          _sendType.resize(subRanks);
@@ -283,34 +282,46 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
       else
       {
          // Setup send/recv buffers for alltoallv or send/recv
-         _sendBufferDispls.resize(_nSubComm+1);
-         _recvBufferDispls.resize(_nSubComm+1);
+         _sendBufferDispls.resize(_nSubComm + 1);
+         _recvBufferDispls.resize(_nSubComm + 1);
          _sendBufferDispls[0] = 0;
          _recvBufferDispls[0] = 0;
          for (int i = 1; i <= _nSubComm; ++i)
          {
-            _sendBufferDispls[i] = _sendBufferDispls[i-1] + _sendCounts[i-1];
-            _recvBufferDispls[i] = _recvBufferDispls[i-1] + _recvCounts[i-1];
+            _sendBufferDispls[i] =
+               _sendBufferDispls[i - 1] + _sendCounts[i - 1];
+            _recvBufferDispls[i] =
+               _recvBufferDispls[i - 1] + _recvCounts[i - 1];
          }
-         _sendBuffer = std::move(Memory::MemBlock<TDATA>(_sendBufferDispls[_nSubComm], _mem.get()));
-         _recvBuffer = std::move(Memory::MemBlock<TDATA>(_recvBufferDispls[_nSubComm], _mem.get()));
+         _sendBuffer = std::move(
+            Memory::MemBlock<TDATA>(_sendBufferDispls[_nSubComm], _mem.get()));
+         _recvBuffer = std::move(
+            Memory::MemBlock<TDATA>(_recvBufferDispls[_nSubComm], _mem.get()));
          // use view so that we have bound checks in debug mode
-         _sendBufferView = View::ViewBase<TDATA>(_sendBuffer.data(), _sendBuffer.size());
-         _recvBufferView = View::ViewBase<TDATA>(_recvBuffer.data(), _recvBuffer.size());
+         _sendBufferView =
+            View::ViewBase<TDATA>(_sendBuffer.data(), _sendBuffer.size());
+         _recvBufferView =
+            View::ViewBase<TDATA>(_recvBuffer.data(), _recvBuffer.size());
 
-         #ifdef QUICC_HAS_CUDA_BACKEND
+#ifdef QUICC_HAS_CUDA_BACKEND
          if (QuICC::Cuda::isDeviceMemory(_sendBuffer.data()))
          {
             // Buffer offsets
-            _sendBufferDisplsDevice = std::move(Memory::MemBlock<int>(_sendBufferDispls.size(), _mem.get()));
-            _recvBufferDisplsDevice = std::move(Memory::MemBlock<int>(_recvBufferDispls.size(), _mem.get()));
-            _sendBufferDisplsView = View::ViewBase<int>(_sendBufferDisplsDevice.data(), _sendBufferDisplsDevice.size());
-            _recvBufferDisplsView = View::ViewBase<int>(_recvBufferDisplsDevice.data(), _recvBufferDisplsDevice.size());
+            _sendBufferDisplsDevice = std::move(
+               Memory::MemBlock<int>(_sendBufferDispls.size(), _mem.get()));
+            _recvBufferDisplsDevice = std::move(
+               Memory::MemBlock<int>(_recvBufferDispls.size(), _mem.get()));
+            _sendBufferDisplsView = View::ViewBase<int>(
+               _sendBufferDisplsDevice.data(), _sendBufferDisplsDevice.size());
+            _recvBufferDisplsView = View::ViewBase<int>(
+               _recvBufferDisplsDevice.data(), _recvBufferDisplsDevice.size());
             // Copy to device
-            cudaErrChk(cudaMemcpy(_sendBufferDisplsDevice.data(), _sendBufferDispls.data(),
-               _sendBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
-            cudaErrChk(cudaMemcpy(_recvBufferDisplsDevice.data(), _recvBufferDispls.data(),
-               _recvBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
+            cudaErrChk(cudaMemcpy(_sendBufferDisplsDevice.data(),
+               _sendBufferDispls.data(), _sendBufferDispls.size() * sizeof(int),
+               cudaMemcpyHostToDevice));
+            cudaErrChk(cudaMemcpy(_recvBufferDisplsDevice.data(),
+               _recvBufferDispls.data(), _recvBufferDispls.size() * sizeof(int),
+               cudaMemcpyHostToDevice));
 
             // Linearized and padded send/recv displacements
             int sendCountsMax = 0;
@@ -320,38 +331,52 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
                sendCountsMax = std::max(sendCountsMax, _sendCounts[i]);
                recvCountsMax = std::max(recvCountsMax, _recvCounts[i]);
             }
-            std::vector<int> sendDisplsLin(_nSubComm*sendCountsMax, 0);
-            std::vector<int> recvDisplsLin(_nSubComm*recvCountsMax, 0);
+            std::vector<int> sendDisplsLin(_nSubComm * sendCountsMax, 0);
+            std::vector<int> recvDisplsLin(_nSubComm * recvCountsMax, 0);
             // Linearize
             for (int i = 0; i < _nSubComm; ++i)
             {
                for (int j = 0; j < _sendCounts[i]; ++j)
                {
-                  sendDisplsLin[i*sendCountsMax+j] = _sendDispls[i][j];
+                  sendDisplsLin[i * sendCountsMax + j] = _sendDispls[i][j];
                }
                for (int j = 0; j < _recvCounts[i]; ++j)
                {
-                  recvDisplsLin[i*recvCountsMax+j] = _recvDispls[i][j];
+                  recvDisplsLin[i * recvCountsMax + j] = _recvDispls[i][j];
                }
             }
 
             // Copy to device
-            _sendDisplsDevice = std::move(Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
-            _recvDisplsDevice = std::move(Memory::MemBlock<int>(recvDisplsLin.size(), _mem.get()));
-            std::array<std::uint32_t, 2> sendDim {static_cast<std::uint32_t>(_nSubComm), static_cast<std::uint32_t>(sendCountsMax)};
-            _sendDisplsView =  View::View<int, View::dense2DRM>({_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
-            std::array<std::uint32_t, 2> recvDim {static_cast<std::uint32_t>(_nSubComm), static_cast<std::uint32_t>(recvCountsMax)};
-            _recvDisplsView =  View::View<int, View::dense2DRM>({_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
-            cudaErrChk(cudaMemcpy(_sendDisplsDevice.data(), sendDisplsLin.data(),
-               sendDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
-            cudaErrChk(cudaMemcpy(_recvDisplsDevice.data(), recvDisplsLin.data(),
-               recvDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
+            _sendDisplsDevice = std::move(
+               Memory::MemBlock<int>(sendDisplsLin.size(), _mem.get()));
+            _recvDisplsDevice = std::move(
+               Memory::MemBlock<int>(recvDisplsLin.size(), _mem.get()));
+            std::array<std::uint32_t, 2> sendDim{
+               static_cast<std::uint32_t>(_nSubComm),
+               static_cast<std::uint32_t>(sendCountsMax)};
+            _sendDisplsView = View::View<int, View::dense2DRM>(
+               {_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
+            std::array<std::uint32_t, 2> recvDim{
+               static_cast<std::uint32_t>(_nSubComm),
+               static_cast<std::uint32_t>(recvCountsMax)};
+            _recvDisplsView = View::View<int, View::dense2DRM>(
+               {_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
+            cudaErrChk(
+               cudaMemcpy(_sendDisplsDevice.data(), sendDisplsLin.data(),
+                  sendDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
+            cudaErrChk(
+               cudaMemcpy(_recvDisplsDevice.data(), recvDisplsLin.data(),
+                  recvDisplsLin.size() * sizeof(int), cudaMemcpyHostToDevice));
 
             // Send Counts
-            _sendCountsDevice = std::move(Memory::MemBlock<int>(_sendCounts.size(), _mem.get()));
-            _recvCountsDevice = std::move(Memory::MemBlock<int>(_recvCounts.size(), _mem.get()));
-            _sendCountsView = View::ViewBase<int>(_sendCountsDevice.data(), _sendCountsDevice.size());
-            _recvCountsView = View::ViewBase<int>(_recvCountsDevice.data(), _recvCountsDevice.size());
+            _sendCountsDevice =
+               std::move(Memory::MemBlock<int>(_sendCounts.size(), _mem.get()));
+            _recvCountsDevice =
+               std::move(Memory::MemBlock<int>(_recvCounts.size(), _mem.get()));
+            _sendCountsView = View::ViewBase<int>(_sendCountsDevice.data(),
+               _sendCountsDevice.size());
+            _recvCountsView = View::ViewBase<int>(_recvCountsDevice.data(),
+               _recvCountsDevice.size());
             // Copy to device
             cudaErrChk(cudaMemcpy(_sendCountsDevice.data(), _sendCounts.data(),
                _sendCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
@@ -359,11 +384,13 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
                _recvCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
          }
          else
-         #endif
+#endif
          {
             // Buffer offsets
-            _sendBufferDisplsView = View::ViewBase<int>(_sendBufferDispls.data(), _sendBufferDispls.size());
-            _recvBufferDisplsView = View::ViewBase<int>(_recvBufferDispls.data(), _recvBufferDispls.size());
+            _sendBufferDisplsView = View::ViewBase<int>(
+               _sendBufferDispls.data(), _sendBufferDispls.size());
+            _recvBufferDisplsView = View::ViewBase<int>(
+               _recvBufferDispls.data(), _recvBufferDispls.size());
 
             // Linearized and padded send/recv displacements
             int sendCountsMax = 0;
@@ -373,30 +400,40 @@ void Comm<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
                sendCountsMax = std::max(sendCountsMax, _sendCounts[i]);
                recvCountsMax = std::max(recvCountsMax, _recvCounts[i]);
             }
-            _sendDisplsDevice = std::move(Memory::MemBlock<int>(_nSubComm*sendCountsMax , _mem.get()));
-            _recvDisplsDevice = std::move(Memory::MemBlock<int>(_nSubComm*recvCountsMax, _mem.get()));
+            _sendDisplsDevice = std::move(
+               Memory::MemBlock<int>(_nSubComm * sendCountsMax, _mem.get()));
+            _recvDisplsDevice = std::move(
+               Memory::MemBlock<int>(_nSubComm * recvCountsMax, _mem.get()));
 
-            std::array<std::uint32_t, 2> sendDim {static_cast<std::uint32_t>(_nSubComm), static_cast<std::uint32_t>(sendCountsMax)};
-            _sendDisplsView =  View::View<int, View::dense2DRM>({_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
-            std::array<std::uint32_t, 2> recvDim {static_cast<std::uint32_t>(_nSubComm), static_cast<std::uint32_t>(recvCountsMax)};
-            _recvDisplsView =  View::View<int, View::dense2DRM>({_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
+            std::array<std::uint32_t, 2> sendDim{
+               static_cast<std::uint32_t>(_nSubComm),
+               static_cast<std::uint32_t>(sendCountsMax)};
+            _sendDisplsView = View::View<int, View::dense2DRM>(
+               {_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
+            std::array<std::uint32_t, 2> recvDim{
+               static_cast<std::uint32_t>(_nSubComm),
+               static_cast<std::uint32_t>(recvCountsMax)};
+            _recvDisplsView = View::View<int, View::dense2DRM>(
+               {_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
 
             // Linearize
             for (int i = 0; i < _nSubComm; ++i)
             {
                for (int j = 0; j < _sendCounts[i]; ++j)
                {
-                  _sendDisplsView[i*sendCountsMax+j] = _sendDispls[i][j];
+                  _sendDisplsView[i * sendCountsMax + j] = _sendDispls[i][j];
                }
                for (int j = 0; j < _recvCounts[i]; ++j)
                {
-                  _recvDisplsView[i*recvCountsMax+j] = _recvDispls[i][j];
+                  _recvDisplsView[i * recvCountsMax + j] = _recvDispls[i][j];
                }
             }
 
             // Send/recv Counts
-            _sendCountsView = View::ViewBase<int>(_sendCounts.data(), _sendCounts.size());
-            _recvCountsView = View::ViewBase<int>(_recvCounts.data(), _recvCounts.size());
+            _sendCountsView =
+               View::ViewBase<int>(_sendCounts.data(), _sendCounts.size());
+            _recvCountsView =
+               View::ViewBase<int>(_recvCounts.data(), _recvCounts.size());
          }
       }
    }
@@ -408,26 +445,26 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
 {
    if (_subComm != MPI_COMM_NULL)
    {
-      if constexpr(std::is_same_v<TAG, alltoallw_t>)
+      if constexpr (std::is_same_v<TAG, alltoallw_t>)
       {
-         details::mpiAssert(MPI_Alltoallw(in, _sendCounts.data(), _sDispls.data(),
-            _sendType.data(), out, _recvCounts.data(), _rDispls.data(),
-            _recvType.data(), _subComm));
+         details::mpiAssert(MPI_Alltoallw(in, _sendCounts.data(),
+            _sDispls.data(), _sendType.data(), out, _recvCounts.data(),
+            _rDispls.data(), _recvType.data(), _subComm));
       }
       else
       {
-         // Pack
-         #ifdef QUICC_HAS_CUDA_BACKEND
-         if(QuICC::Cuda::isDeviceMemory(in))
+// Pack
+#ifdef QUICC_HAS_CUDA_BACKEND
+         if (QuICC::Cuda::isDeviceMemory(in))
          {
-            Cuda::pack(_sendBufferView, in, _sendCountsView,
-               _sendDisplsView, _sendBufferDisplsView);
+            Cuda::pack(_sendBufferView, in, _sendCountsView, _sendDisplsView,
+               _sendBufferDisplsView);
          }
          else
-         #endif
+#endif
          {
-            Cpu::pack(_sendBufferView, in, _sendCountsView,
-               _sendDisplsView, _sendBufferDisplsView);
+            Cpu::pack(_sendBufferView, in, _sendCountsView, _sendDisplsView,
+               _sendBufferDisplsView);
          }
 
          // Comm
@@ -435,40 +472,45 @@ void Comm<TDATA, TAG>::exchange(TDATA* out, const TDATA* in) const
          {
             for (int i = 0; i < _nSubComm; ++i)
             {
-               details::mpiAssert(MPI_Send(_sendBufferView.data()+_sendBufferDispls[i], _sendCounts[i],
-                     Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm));
+               details::mpiAssert(
+                  MPI_Send(_sendBufferView.data() + _sendBufferDispls[i],
+                     _sendCounts[i], Environment::MpiTypes::type<TDATA>(), i,
+                     /*tag*/ 1, _subComm));
             }
             MPI_Status status;
             for (int i = 0; i < _nSubComm; ++i)
             {
-               details::mpiAssert(MPI_Recv(_recvBufferView.data()+_recvBufferDispls[i], _recvCounts[i],
-                     Environment::MpiTypes::type<TDATA>(), i, /*tag*/1, _subComm, &status));
+               details::mpiAssert(
+                  MPI_Recv(_recvBufferView.data() + _recvBufferDispls[i],
+                     _recvCounts[i], Environment::MpiTypes::type<TDATA>(), i,
+                     /*tag*/ 1, _subComm, &status));
             }
          }
          else if constexpr (std::is_same_v<TAG, alltoallv_t>)
          {
-            details::mpiAssert(MPI_Alltoallv(_sendBufferView.data(), _sendCounts.data(),
-               _sendBufferDispls.data(), Environment::MpiTypes::type<TDATA>(),
-               _recvBufferView.data(), _recvCounts.data(),
-               _recvBufferDispls.data(), Environment::MpiTypes::type<TDATA>(), _subComm));
+            details::mpiAssert(MPI_Alltoallv(_sendBufferView.data(),
+               _sendCounts.data(), _sendBufferDispls.data(),
+               Environment::MpiTypes::type<TDATA>(), _recvBufferView.data(),
+               _recvCounts.data(), _recvBufferDispls.data(),
+               Environment::MpiTypes::type<TDATA>(), _subComm));
          }
          else
          {
             throw std::logic_error("Comm type not implemented");
          }
 
-         // Unpack
-         #ifdef QUICC_HAS_CUDA_BACKEND
-         if(QuICC::Cuda::isDeviceMemory(out))
+// Unpack
+#ifdef QUICC_HAS_CUDA_BACKEND
+         if (QuICC::Cuda::isDeviceMemory(out))
          {
-            Cuda::unPack(out, _recvBufferView, _recvCountsView,
-               _recvDisplsView, _recvBufferDisplsView);
+            Cuda::unPack(out, _recvBufferView, _recvCountsView, _recvDisplsView,
+               _recvBufferDisplsView);
          }
          else
-         #endif
+#endif
          {
-            Cpu::unPack(out, _recvBufferView, _recvCountsView,
-               _recvDisplsView, _recvBufferDisplsView);
+            Cpu::unPack(out, _recvBufferView, _recvCountsView, _recvDisplsView,
+               _recvBufferDisplsView);
          }
       }
    }

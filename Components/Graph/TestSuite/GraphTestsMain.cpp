@@ -6,15 +6,15 @@
 
 #include "Profiler/Interface.hpp"
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-  QuICC::Profiler::Initialize();
+   QuICC::Profiler::Initialize();
 
-  Catch::Session session; // There must be exactly one instance
+   Catch::Session session; // There must be exactly one instance
 
-  auto returnCode = session.run();
+   auto returnCode = session.run();
 
-  QuICC::Profiler::Finalize();
+   QuICC::Profiler::Finalize();
 
-  return returnCode;
+   return returnCode;
 }

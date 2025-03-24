@@ -14,9 +14,9 @@
 
 // Project includes
 //
-#include "Operator/Nary.hpp"
-#include "Memory/MemoryResource.hpp"
 #include "Memory/Memory.hpp"
+#include "Memory/MemoryResource.hpp"
+#include "Operator/Nary.hpp"
 
 namespace QuICC {
 /// @brief namespace for Slicewise type operations
@@ -30,8 +30,10 @@ using namespace QuICC::Operator;
 /// @tparam Functor Nary scalar functor
 /// @tparam Tout output View
 /// @tparam ...Targs input Views
-template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class... Targs>
-class Op : public NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout, Targs...>
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout,
+   class... Targs>
+class Op : public NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>,
+              Tout, Targs...>
 {
 private:
    /// @brief stored functor, i.e. struct with method
@@ -42,7 +44,8 @@ public:
    /// @brief capture functor by value
    /// @param f functor, i.e. struct with method
    /// Tout::ScalarType operator()(Targs::ScalarType var, ...)
-   Op(Functor f, std::shared_ptr<Memory::memory_resource> mem) : _f(f), _mem(mem){};
+   Op(Functor f, std::shared_ptr<Memory::memory_resource> mem) :
+       _f(f), _mem(mem){};
    /// @brief default constructor
    Op() = delete;
    /// @brief dtor
@@ -50,14 +53,15 @@ public:
 
 private:
    /// @brief give access to base class
-   friend NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout, Targs...>;
+   friend NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout,
+      Targs...>;
    /// @brief action implementation
    /// @param out output View
    /// @param ...args input Views
    void applyImpl(Tout& out, const Targs&... args);
    /// @brief specialized implementation for Phi-Theta slice
    void phiThetaImpl(Tout& out, const Targs&... args);
-    /// @brief specialized implementation for Phi-R slice
+   /// @brief specialized implementation for Phi-R slice
    void phiRImpl(Tout& out, const Targs&... args);
    /// @brief memory resource
    /// needs shared ptr for memory pools

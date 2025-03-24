@@ -25,7 +25,6 @@ void pack(View::ViewBase<TDATA> buffer, const TDATA* in,
    const View::ViewBase<int> sendBufferDisplsView);
 
 
-
 template <class TDATA>
 void unPack(TDATA* out, const View::ViewBase<TDATA> buffer,
    const View::ViewBase<int> recvCountsView,

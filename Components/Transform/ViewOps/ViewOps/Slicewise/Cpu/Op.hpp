@@ -18,9 +18,9 @@
 #include "Memory/MemoryResource.hpp"
 #include "Operator/Nary.hpp"
 #include "Profiler/Interface.hpp"
-#include "View/View.hpp"
-#include "View/Attributes.hpp"
 #include "Types/Internal/Casts.hpp"
+#include "View/Attributes.hpp"
+#include "View/View.hpp"
 
 
 namespace QuICC {
@@ -35,8 +35,10 @@ using namespace QuICC::Operator;
 /// @tparam Functor Nary scalar functor
 /// @tparam Tout output View
 /// @tparam ...Targs input Views
-template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class... Targs>
-class Op : public NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout, Targs...>
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout,
+   class... Targs>
+class Op : public NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>,
+              Tout, Targs...>
 {
 private:
    /// @brief stored functor, i.e. struct with method
@@ -47,7 +49,8 @@ public:
    /// @brief capture functor by value
    /// @param f functor, i.e. struct with method
    /// Tout::ScalarType operator()(Targs::ScalarType var, ...)
-   Op(Functor f, std::shared_ptr<Memory::memory_resource> mem) : _f(f), _mem(mem){};
+   Op(Functor f, std::shared_ptr<Memory::memory_resource> mem) :
+       _f(f), _mem(mem){};
    /// @brief default constructor
    Op() = delete;
    /// @brief dtor
@@ -55,14 +58,15 @@ public:
 
 private:
    /// @brief give access to base class
-   friend NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout, Targs...>;
+   friend NaryBaseOp<Op<Dir, GridBuilder, Functor, Tout, Targs...>, Tout,
+      Targs...>;
    /// @brief action implementation
    /// @param out output View
    /// @param ...args input Views
    void applyImpl(Tout& out, const Targs&... args);
    /// @brief specialized implementation for Phi-Theta slice
    void phiThetaImpl(Tout& out, const Targs&... args);
-    /// @brief specialized implementation for Phi-R slice
+   /// @brief specialized implementation for Phi-R slice
    void phiRImpl(Tout& out, const Targs&... args);
    /// @brief index typedef
    using IndexType = typename Tout::IndexType;
@@ -81,26 +85,29 @@ private:
 };
 
 
-template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class ...Targs>
-void Op<Dir, GridBuilder, Functor, Tout, Targs...>::applyImpl(Tout& out, const Targs&... args)
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout,
+   class... Targs>
+void Op<Dir, GridBuilder, Functor, Tout, Targs...>::applyImpl(Tout& out,
+   const Targs&... args)
 {
    Profiler::RegionFixture<4> fix("Slicewise::Cpu::applyImpl");
 
    // check Tout and Targs.. match Functor op
-   using res_t = std::invoke_result_t<Functor, IndexType, typename Targs::ScalarType...>;
+   using res_t =
+      std::invoke_result_t<Functor, IndexType, typename Targs::ScalarType...>;
    static_assert(std::is_same_v<typename Tout::ScalarType, res_t>,
       "Mismatch in functor or arguments");
    // check same size
-   assert(((out.size() == args.size()) && ... ));
+   assert(((out.size() == args.size()) && ...));
 
    // implemented only for physical space
    static_assert(std::is_same_v<Tout, View::View<double, View::DCCSC3D>>);
 
-   if constexpr(Dir == 1)
+   if constexpr (Dir == 1)
    {
       phiRImpl(out, args...);
    }
-   else if constexpr(Dir == 2)
+   else if constexpr (Dir == 2)
    {
       phiThetaImpl(out, args...);
    }
@@ -108,11 +115,12 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::applyImpl(Tout& out, const T
    {
       throw std::logic_error("This slice direction is not implemented.");
    }
-
 }
 
-template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class ...Targs>
-void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiRImpl(Tout& out, const Targs&... args)
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout,
+   class... Targs>
+void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiRImpl(Tout& out,
+   const Targs&... args)
 {
    assert(Dir == 1);
 
@@ -128,7 +136,8 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiRImpl(Tout& out, const Ta
       itheta = igrid.array().acos();
 
       // setup view
-      _gridData = std::move(Memory::MemBlock<typename Tout::ScalarType>(itheta.size(), _mem.get()));
+      _gridData = std::move(Memory::MemBlock<typename Tout::ScalarType>(
+         itheta.size(), _mem.get()));
       _grid = View::ViewBase(_gridData.data(), _gridData.size());
 
       // copy
@@ -149,21 +158,23 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiRImpl(Tout& out, const Ta
       auto thetaIdx = indices[col];
 
       // check mem bounds
-      assert((col+1)*M <= out.size());
+      assert((col + 1) * M <= out.size());
       assert(thetaIdx < _grid.size());
 
       // column major
       for (std::size_t m = 0; m < M; ++m)
       {
-         auto mnk = m + col*M;
+         auto mnk = m + col * M;
          out[mnk] = _f(_grid[thetaIdx], args[mnk]...);
       }
    }
 }
 
 
-template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout, class ...Targs>
-void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiThetaImpl(Tout& out, const Targs&... args)
+template <std::uint8_t Dir, class GridBuilder, class Functor, class Tout,
+   class... Targs>
+void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiThetaImpl(Tout& out,
+   const Targs&... args)
 {
    assert(Dir == 2);
 
@@ -193,7 +204,8 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiThetaImpl(Tout& out, cons
       quad.computeQuadrature(igrid, iweights, out.dims()[Dir]);
 
       // setup view
-      _gridData = std::move(Memory::MemBlock<typename Tout::ScalarType>(igrid.size(), _mem.get()));
+      _gridData = std::move(
+         Memory::MemBlock<typename Tout::ScalarType>(igrid.size(), _mem.get()));
       _grid = View::ViewBase(_gridData.data(), _gridData.size());
 
       // copy
@@ -223,7 +235,7 @@ void Op<Dir, GridBuilder, Functor, Tout, Targs...>::phiThetaImpl(Tout& out, cons
       {
          for (std::size_t m = 0; m < M; ++m)
          {
-            auto mnk = offSet + m + n*M;
+            auto mnk = offSet + m + n * M;
             out[mnk] = _f(_grid[l], args[mnk]...);
          }
       }

@@ -28,7 +28,7 @@ template <class T = double> struct MulRFunctor
    /// @brief ctor
    /// @param grid
    /// @param scaling
-   MulRFunctor(T scaling) : _scaling(scaling) {};
+   MulRFunctor(T scaling) : _scaling(scaling){};
 
    /// @brief deleted default constructor
    MulRFunctor() = delete;
@@ -56,7 +56,7 @@ template <class T = double> struct MulSinFunctor
    /// @brief ctor
    /// @param grid
    /// @param scaling
-   MulSinFunctor(T scaling) : _scaling(scaling) {};
+   MulSinFunctor(T scaling) : _scaling(scaling){};
 
    /// @brief deleted default constructor
    MulSinFunctor() = delete;
@@ -84,7 +84,7 @@ template <class T = double> struct MulCosFunctor
    /// @brief ctor
    /// @param grid
    /// @param scaling
-   MulCosFunctor(T scaling) : _scaling(scaling) {};
+   MulCosFunctor(T scaling) : _scaling(scaling){};
 
    /// @brief deleted default constructor
    MulCosFunctor() = delete;
@@ -112,7 +112,7 @@ template <class T = double> struct MulSinPlusCosFunctor
    /// @brief ctor
    /// @param grid
    /// @param scaling
-   MulSinPlusCosFunctor(T scaling) : _scaling(scaling) {};
+   MulSinPlusCosFunctor(T scaling) : _scaling(scaling){};
 
    /// @brief deleted default constructor
    MulSinPlusCosFunctor() = delete;
@@ -129,8 +129,6 @@ template <class T = double> struct MulSinPlusCosFunctor
       return _scaling * (std::sin(grid) * Lhs + std::cos(grid) * Rhs);
    }
 };
-
-
 
 
 } // namespace Slicewise
