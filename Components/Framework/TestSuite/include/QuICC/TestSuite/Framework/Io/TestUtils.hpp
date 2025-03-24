@@ -51,11 +51,8 @@ QuICC::Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> s
 /// Check files
 void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const TestParameters& test);
 
-/// Check sphere files
-std::vector<std::tuple<std::string,int,int,int>> checkSphereFiles(const TestParameters& test);
-
-/// Check sphere files
-std::vector<std::tuple<std::string,int,int,int>> checkShellFiles(const TestParameters& test);
+/// Check spherical files
+std::vector<std::tuple<std::string,int,int,int>> checkSphericalFiles(const TestParameters& test);
 
 /**
  * @brief Compute ULP

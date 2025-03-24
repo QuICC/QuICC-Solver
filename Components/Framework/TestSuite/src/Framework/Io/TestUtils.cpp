@@ -215,74 +215,6 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
    return spVector;
 }
 
-#if 0
-void addShellFiles(std::shared_ptr<StateGenerator> spRunner)
-{
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::ShellNusseltWriter>("", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::ShellScalarEnergyWriter>("temperature", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::ShellScalarLSpectrumWriter>("temperature", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::ShellScalarMSpectrumWriter>("temperature", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Temperature::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::ShellTorPolEnergyWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::ShellTorPolLSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::ShellTorPolMSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-#if 0
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::ShellTorPolEnstrophyWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::ShellTorPolEnstrophyLSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-   //
-   {
-      auto spFile = std::make_shared<QuICC::Io::Variable::ShellTorPolEnstrophyMSpectrumWriter>("velocity", spRunner->ss().tag());
-      spFile->expect(PhysicalNames::Velocity::id());
-      spRunner->addAsciiOutputFile(spFile);
-   }
-#endif
-}
-#endif
-
 void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const TestParameters& test)
 {
    const std::string& datadir = test.datadir;
@@ -353,14 +285,9 @@ void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const T
    std::vector<std::tuple<std::string,int,int,int>> fileList;
 
    // Add sphere ascii files
-   if(spScheme->tag() == "WLFl" || spScheme->tag() == "WLFm")
+   if(spScheme->tag() == "WLFl" || spScheme->tag() == "WLFm" || spScheme->tag() == "SLFl" || spScheme->tag() == "SLFm")
    {
-      fileList = checkSphereFiles(test);
-   }
-   // Add shell ascii files
-   else if(spScheme->tag() == "SLFl" || spScheme->tag() == "SLFm")
-   {
-      fileList = checkShellFiles(test);
+      fileList = checkSphericalFiles(test);
    }
    else
    {
@@ -378,7 +305,7 @@ void checkFiles(std::shared_ptr<SpatialScheme::ISpatialScheme> spScheme, const T
    }
 }
 
-std::vector<std::tuple<std::string,int,int,int>> checkSphereFiles(const TestParameters& test)
+std::vector<std::tuple<std::string,int,int,int>> checkSphericalFiles(const TestParameters& test)
 {
    const auto& nN = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM1D, QuICC::Dimensions::Space::SPECTRAL);
    const auto& nL = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM2D, QuICC::Dimensions::Space::SPECTRAL);
@@ -480,33 +407,6 @@ std::vector<std::tuple<std::string,int,int,int>> checkSphereFiles(const TestPara
 
    return fileList;
 }
-
-std::vector<std::tuple<std::string,int,int,int>> checkShellFiles(const TestParameters& test)
-{
-   const auto& nN = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM1D, QuICC::Dimensions::Space::SPECTRAL);
-   const auto& nL = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM2D, QuICC::Dimensions::Space::SPECTRAL);
-   const auto& nM = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM3D, QuICC::Dimensions::Space::SPECTRAL);
-   const auto& nR = test.spRes->sim().dim(QuICC::Dimensions::Simulation::SIM1D, QuICC::Dimensions::Space::PHYSICAL);
-   int nH = nL*(nL+1)/2;
-
-   // List of files to check: fname, rows, cols, blocks
-   std::vector<std::tuple<std::string,int,int,int>> fileList;
-   fileList.emplace_back("nusselt.dat", 1, 2, 1);
-   fileList.emplace_back("temperature_energy.dat", 1, 2, 1);
-   fileList.emplace_back("temperature_l_spectrum.dat", nL, 2, 1);
-   fileList.emplace_back("temperature_m_spectrum.dat", nM, 2, 1);
-   fileList.emplace_back("velocity_energy.dat", 1, 4, 1);
-   fileList.emplace_back("velocity_l_spectrum.dat", nL, 4, 1);
-   fileList.emplace_back("velocity_m_spectrum.dat", nM, 4, 1);
-#if 0
-   fileList.emplace_back("velocity_enstrophy.dat", 1, 4, 1);
-   fileList.emplace_back("velocity_enstrophy_l_spectrum.dat", nL, 4, 1);
-   fileList.emplace_back("velocity_enstrophy_m_spectrum.dat", nM, 4, 1);
-#endif
-
-   return fileList;
-}
-
 
 ErrorType computeUlp(const MHDFloat data, const MHDFloat ref, MHDFloat refMod, const MHDFloat tol, const MHDFloat eps)
 {
