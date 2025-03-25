@@ -254,7 +254,6 @@ _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_S1CLCSC3D(void* obj,
    cl->apply(viewOut, viewIn);
 };
 
-
 #ifdef QUICC_HAS_CUDA_BACKEND
 /// @brief C Interface to MLIR for a transpose operator
 /// gpu backend

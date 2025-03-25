@@ -739,33 +739,6 @@ inline Transform::TransformCoordinatorType& Coordinator::transformCoordinator()
 /// Typedef for a shared pointer of a Coordinator
 typedef std::shared_ptr<Coordinator> SharedCoordinator;
 
-}
-
-inline const Coordinator::VectorVariable_map& Coordinator::vectorVariables()
-{
-   return this->mVectorVariables;
-}
-
-inline const Coordinator::ScalarVariable_map&
-Coordinator::imposedScalarVariables()
-{
-   return this->mImposedScalarVariables;
-}
-
-inline const Coordinator::VectorVariable_map&
-Coordinator::imposedVectorVariables()
-{
-   return this->mImposedVectorVariables;
-}
-
-inline Transform::TransformCoordinatorType& Coordinator::transformCoordinator()
-{
-   return this->mTransformCoordinator;
-}
-
-/// Typedef for a shared pointer of a Coordinator
-typedef std::shared_ptr<Coordinator> SharedCoordinator;
-
 } // namespace Pseudospectral
 } // namespace QuICC
 
