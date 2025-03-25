@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/IChebyshevProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/IChebyshevProjector.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
 namespace QuICC {
@@ -30,14 +24,6 @@ namespace Chebyshev {
 namespace LinearMap {
 
 namespace Projector {
-
-   IChebyshevProjector::IChebyshevProjector()
-   {
-   }
-
-   IChebyshevProjector::~IChebyshevProjector()
-   {
-   }
 
    void IChebyshevProjector::initBackend() const
    {

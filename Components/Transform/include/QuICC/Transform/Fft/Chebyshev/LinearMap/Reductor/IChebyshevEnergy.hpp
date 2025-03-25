@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVENERGY_HPP
 #define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVENERGY_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -45,12 +36,12 @@ namespace Reductor {
          /**
           * @brief Constructor
           */
-         IChebyshevEnergy();
+         IChebyshevEnergy() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IChebyshevEnergy();
+         virtual ~IChebyshevEnergy() = default;
 
          /**
           * @brief Compute reduction of complex data

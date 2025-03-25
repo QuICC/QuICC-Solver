@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVINTEGRATOR_HPP
 #define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVINTEGRATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -45,12 +36,12 @@ namespace Integrator {
          /**
           * @brief Constructor
           */
-         IChebyshevIntegrator();
+         IChebyshevIntegrator() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IChebyshevIntegrator();
+         virtual ~IChebyshevIntegrator() = default;
 
          /**
           * @brief Compute transform R2R componentwise

@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/IChebyshevIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/IChebyshevIntegrator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
 namespace QuICC {
@@ -30,14 +24,6 @@ namespace Chebyshev {
 namespace LinearMap {
 
 namespace Integrator {
-
-   IChebyshevIntegrator::IChebyshevIntegrator()
-   {
-   }
-
-   IChebyshevIntegrator::~IChebyshevIntegrator()
-   {
-   }
 
    void IChebyshevIntegrator::initBackend() const
    {

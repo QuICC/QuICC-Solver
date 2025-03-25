@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVPROJECTOR_HPP
 #define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -45,12 +36,12 @@ namespace Projector {
          /**
           * @brief Constructor
           */
-         IChebyshevProjector();
+         IChebyshevProjector() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IChebyshevProjector();
+         virtual ~IChebyshevProjector() = default;
 
          /**
           * @brief Compute transform R2R componentwise
