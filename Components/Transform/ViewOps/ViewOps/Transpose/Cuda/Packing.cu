@@ -123,7 +123,6 @@ void unPack(TDATA* out, const View::ViewBase<TDATA> buffer,
 }
 
 // Explicit instantiations
-
 template
 void pack(View::ViewBase<int> buffer, const int* in,
    const View::ViewBase<int> sendCountsView,
@@ -160,6 +159,44 @@ void unPack(std::complex<double>* out, const View::ViewBase<std::complex<double>
    const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView);
 
+template <class TDATA>
+void pack(View::ViewBase<TDATA> buffer, const View::ViewBase<TDATA*> in,
+   const View::ViewBase<int> sendCountsView,
+   const View::View<int, View::dense2DRM> sendDisplsView,
+   const View::ViewBase<int> sendBufferDisplsView)
+{
+
+
+
+}
+
+template <class TDATA>
+void unPack(View::ViewBase<TDATA*> out, const View::ViewBase<TDATA> buffer,
+   const View::ViewBase<int> recvCountsView,
+   const View::View<int, View::dense2DRM> recvDisplsView,
+   const View::ViewBase<int> recvBufferDisplsView)
+{
+
+   // const auto I = recvDisplsView.dims()[0];
+   // const auto J = recvDisplsView.dims()[1];
+   // const auto G = out.size();
+
+   // // setup grid
+   // dim3 blockSize;
+   // dim3 numBlocks;
+
+   // blockSize.x = 16;
+   // blockSize.y = 64;
+   // blockSize.z = 16;
+   // numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
+   // numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
+   // numBlocks.z = (G + blockSize.z - 1) / blockSize.z;
+
+   // details::unPack<TDATA>
+   //    <<<numBlocks, blockSize>>>(out, buffer, recvCountsView, recvDisplsView, recvBufferDisplsView);
+
+   // cudaErrChk(cudaDeviceSynchronize());
+}
 
 } // namespace Cuda
 } // namespace Transpose

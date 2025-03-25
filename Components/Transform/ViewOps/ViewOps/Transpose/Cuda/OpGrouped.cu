@@ -1,6 +1,6 @@
 /**
- * @file Op.cu
- * @brief Transpose operations on Views
+ * @file OpGrouped.cu
+ * @brief Grouped Transpose operations on Views
  */
 
 // External includes
@@ -11,12 +11,9 @@
 // Project includes
 //
 #include "Cuda/CudaUtil.hpp"
-#include "Op.hpp"
-#include "Impl.hpp"
+#include "OpGrouped.hpp"
 #include "Profiler/Interface.hpp"
 #include "View/View.hpp"
-
-#define QUICC_MAX_TH_NAIVE 2048
 
 namespace QuICC {
 /// @brief namespace for Transpose type operations
@@ -24,7 +21,6 @@ namespace Transpose {
 /// @brief namespace for Cuda backends
 namespace Cuda {
 
-using namespace QuICC::Operator;
 
 template <class Tout, class Tin, class Perm>
 void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)

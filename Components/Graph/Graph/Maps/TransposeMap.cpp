@@ -123,9 +123,9 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
          if (outTyStr == "DCCSC3DJIK" && inTyStr == "DCCSC3D" && perm[0] == 2 &&
              perm[1] == 0)
          {
-            using Tout = C_DCCSC3DJIK_t;
-            using Tin = C_DCCSC3D_t;
-            using op_t = Op<std::vector<Tout>, std::vector<Tin>, p201_t>;
+            using Tout = std::vector<C_DCCSC3DJIK_t>;
+            using Tin = std::vector<C_DCCSC3D_t>;
+            using op_t = OpGrouped<Tout, Tin, p201_t>;
 #ifdef QUICC_MPI
             _ops.push_back(std::make_unique<op_t>(_mem));
 #else
@@ -139,9 +139,9 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
          else if (outTyStr == "DCCSC3D" && inTyStr == "DCCSC3DJIK" &&
                   perm[0] == 1 && perm[2] == 0)
          {
-            using Tout = C_DCCSC3D_t;
-            using Tin = C_DCCSC3DJIK_t;
-            using op_t = Op<std::vector<Tout>, std::vector<Tin>, p120_t>;
+            using Tout = std::vector<C_DCCSC3D_t>;
+            using Tin = std::vector<C_DCCSC3DJIK_t>;
+            using op_t = OpGrouped<Tout, Tin, p120_t>;
 #ifdef QUICC_MPI
             _ops.push_back(std::make_unique<op_t>(_mem));
 #else
@@ -155,9 +155,9 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
          else if (outTyStr == "DCCSC3DJIK" && inTyStr == "S1CLCSC3DJIK" &&
                   perm[0] == 2 && perm[1] == 0)
          {
-            using Tout = C_DCCSC3DJIK_t;
-            using Tin = C_S1CLCSC3DJIK_t;
-            using op_t = Op<std::vector<Tout>, std::vector<Tin>, p201_t>;
+            using Tout = std::vector<C_DCCSC3DJIK_t>;
+            using Tin = std::vector<C_S1CLCSC3DJIK_t>;
+            using op_t = OpGrouped<Tout, Tin, p201_t>;
 #ifdef QUICC_MPI
             _ops.push_back(std::make_unique<op_t>(_mem));
 #else
@@ -171,9 +171,9 @@ void MapOps::setTranspose(mlir::quiccir::TransposeOp op)
          else if (outTyStr == "S1CLCSC3DJIK" && inTyStr == "DCCSC3DJIK" &&
                   perm[0] == 1 && perm[1] == 2)
          {
-            using Tout = C_S1CLCSC3DJIK_t;
-            using Tin = C_DCCSC3DJIK_t;
-            using op_t = Op<std::vector<Tout>, std::vector<Tin>, p120_t>;
+            using Tout = std::vector<C_S1CLCSC3DJIK_t>;
+            using Tin = std::vector<C_DCCSC3DJIK_t>;
+            using op_t = OpGrouped<Tout, Tin, p120_t>;
 #ifdef QUICC_MPI
             _ops.push_back(std::make_unique<op_t>(_mem));
 #else

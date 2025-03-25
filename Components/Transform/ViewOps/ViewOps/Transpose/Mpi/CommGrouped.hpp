@@ -21,6 +21,7 @@
 #include "ViewOps/Transpose/Mpi/CommUtils.hpp"
 #include "ViewOps/Transpose/Mpi/Tags.hpp"
 #include "ViewOps/Transpose/Packing.hpp"
+#include "ViewOps/Transpose/StructArray.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #include "Memory/Cuda/Malloc.hpp"
@@ -29,6 +30,7 @@
 namespace QuICC {
 namespace Transpose {
 namespace Mpi {
+
 
 /// @brief Container for Mpi communicator and types
 /// to exchange data with MPI_Alltoallv or MPI_Send/MPI_Recv.
@@ -55,7 +57,8 @@ public:
    /// @brief Execute the data exchange (communication)
    /// @param out
    /// @param in
-   void exchange(std::vector<TDATA*> out, const std::vector<TDATA*> in) const;
+   template <int SIZE>
+   void exchange(structArray<TDATA*, SIZE>& out, structArray<const TDATA*, SIZE>& in) const;
 
    /// @brief check if the comm was setup
    /// @return
@@ -130,16 +133,6 @@ private:
    int _nSubComm;
    /// @brief Is comm setup?
    bool _isSetup = false;
-
-   /// @brief Pack input into buffer for alltoallv and send/recv
-   /// @param in
-   /// @param buffer
-   void pack(View::ViewBase<TDATA> buffer, const TDATA* in) const;
-
-   /// @brief Unpack buffer to output
-   /// @param out
-   /// @param buffer
-   void unPack(TDATA* out, const View::ViewBase<TDATA> buffer) const;
 };
 
 
@@ -156,7 +149,6 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
    _subComm = QuICC::Transpose::Mpi::getSubComm(redSet);
    assert(_subComm != MPI_COMM_NULL);
 
-   auto subRanks = redSet.size();
    _sendCounts = getCount<TAG>(_sendDispls);
    _recvCounts = getCount<TAG>(_recvDispls);
 
@@ -203,7 +195,7 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
    //
 
    // scale counts by group size
-   for (std::size_t i = 0; i < _nSubComm; ++i)
+   for (int i = 0; i < _nSubComm; ++i)
    {
       _sendCounts[i] *= _maxGroupSize;
       _recvCounts[i] *= _maxGroupSize;
@@ -251,23 +243,23 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
 }
 
 template <class TDATA, class TAG>
-void CommGrouped<TDATA, TAG>::exchange(std::vector<TDATA*> out,
-   const std::vector<TDATA*> in) const
+template <int SIZE>
+void CommGrouped<TDATA, TAG>::exchange(structArray<TDATA*, SIZE>& out, structArray<const TDATA*, SIZE>& in) const
 {
    if (_subComm != MPI_COMM_NULL)
    {
-// Pack
+      // Pack
 #ifdef QUICC_HAS_CUDA_BACKEND
       if (QuICC::Cuda::isDeviceMemory(in[0]))
       {
          Cuda::pack(_sendBufferView, in, _sendCountsView, _sendDisplsView,
-            _sendBufferDisplsView);
+            _sendBufferDisplsView, _maxGroupSize);
       }
       else
 #endif
       {
          Cpu::pack(_sendBufferView, in, _sendCountsView, _sendDisplsView,
-            _sendBufferDisplsView);
+            _sendBufferDisplsView, _maxGroupSize);
       }
 
       // CommGrouped
@@ -303,16 +295,16 @@ void CommGrouped<TDATA, TAG>::exchange(std::vector<TDATA*> out,
 
 // Unpack
 #ifdef QUICC_HAS_CUDA_BACKEND
-      if (QuICC::Cuda::isDeviceMemory(out))
+      if (QuICC::Cuda::isDeviceMemory(out[0]))
       {
          Cuda::unPack(out, _recvBufferView, _recvCountsView, _recvDisplsView,
-            _recvBufferDisplsView);
+            _recvBufferDisplsView, _maxGroupSize);
       }
       else
 #endif
       {
          Cpu::unPack(out, _recvBufferView, _recvCountsView, _recvDisplsView,
-            _recvBufferDisplsView);
+            _recvBufferDisplsView, _maxGroupSize);
       }
    }
 }
