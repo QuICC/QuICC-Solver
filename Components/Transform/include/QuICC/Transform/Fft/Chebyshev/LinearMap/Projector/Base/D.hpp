@@ -142,19 +142,23 @@ namespace Projector {
    /**
     * @brief type alias for backward compatibility
     */
-   using D1 = D<1, base_t>;
+   template <typename Impl>
+   using D1 = D<1, Impl>;
    /**
     * @brief type alias for backward compatibility
     */
-   using D2 = D<2, base_t>;
+   template <typename Impl>
+   using D2 = D<2, Impl>;
    /**
     * @brief type alias for backward compatibility
     */
-   using D3 = D<3, base_t>;
+   template <typename Impl>
+   using D3 = D<3, Impl>;
    /**
     * @brief type alias for backward compatibility
     */
-   using D4 = D<4, base_t>;
+   template <typename Impl>
+   using D4 = D<4, Impl>;
 
 } // namespace Projector
 } // namespace LinearMap
