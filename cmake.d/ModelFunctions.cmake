@@ -74,7 +74,7 @@ function (quicc_add_exe ModelId)
   # Set special properties of target
   set_target_properties(${ExeName} PROPERTIES
     OUTPUT_NAME ${ExeName}
-    RUNTIME_OUTPUT_DIRECTORY "Executables/"
+    RUNTIME_OUTPUT_DIRECTORY "./"
     )
 
   # Install

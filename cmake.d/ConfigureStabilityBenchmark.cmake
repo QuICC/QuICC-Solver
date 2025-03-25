@@ -133,7 +133,7 @@ function(quicc_add_stability_benchmark target)
     message(VERBOSE "_rundir: ${_rundir}")
     set(_binsdir "${CMAKE_BINARY_DIR}/${_model_dir}/Executables")
     message(VERBOSE "_binsdir: ${_binsdir}")
-    set(_toolsdir "${QUICC_TOOLS_DIR}/Stability/TestSuite")
+    set(_toolsdir "${QUICC_COMPONENTS_DIR}/Stability/TestSuite")
 
     set(_args )
     foreach(_file IN LISTS QASB_TOOLS)
