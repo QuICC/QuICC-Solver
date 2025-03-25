@@ -90,6 +90,9 @@ void OpGrouped<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
    // Collect pointers to data
    constexpr std::size_t maxGroupSize = 16;
    assert(_groupSize <= maxGroupSize);
+   // We are using a stack array aka structArray to copy directly to 
+   // the GPU kernel the pointers, we are no using std::array because 
+   // of compatibility with CUDA
    structArray<ScalarType*, maxGroupSize> outData;
    structArray<const ScalarType*, maxGroupSize> inData;
    for (std::size_t i = 0; i < _groupSize; ++i)

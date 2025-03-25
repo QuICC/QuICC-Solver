@@ -75,10 +75,11 @@ void unPack(TDATA* out, const View::ViewBase<TDATA> buffer,
 /// @brief Pack data into buffer, grouped version
 /// @tparam TDATA
 /// @param buffer
-/// @param in
+/// @param in array of pointers to data (size is fixed and >= groupSize)
 /// @param sendCountsView count for groupSize variables
 /// @param sendDisplsView displacement for a single variable
 /// @param sendBufferDisplsView displacement for groupSize variables
+/// @param groupSize actual group size
 template <class TDATA, int SIZE>
 void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
    const View::ViewBase<int> sendCountsView,
@@ -104,11 +105,12 @@ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
 
 /// @brief Unpack data from buffer, grouped version
 /// @tparam TDATA
-/// @param out
+/// @param out array of pointers to data (size is fixed and >= groupSize)
 /// @param buffer
 /// @param recvCountsView count for groupSize variables
 /// @param recvDisplsView displacement for a single variable
 /// @param recvBufferDisplsView displacement for groupSize variables
+/// @param groupSize actual group size
 template <class TDATA, int SIZE>
 void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
    const View::ViewBase<int> recvCountsView,

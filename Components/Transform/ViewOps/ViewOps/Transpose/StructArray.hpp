@@ -1,6 +1,6 @@
 /**
- * @file Op.hpp
- * @brief Wrapper for transpose implementation backends
+ * @file StructArray.hpp
+ * @brief Simple fixed size array that is CUDA compatible
  */
 #pragma once
 
@@ -10,7 +10,6 @@
 // Project includes
 //
 #include "View/ViewMacros.hpp"
-
 
 namespace QuICC {
 namespace Transpose {
@@ -32,7 +31,6 @@ struct structArray
     /// @return reference to element
     QUICC_CUDA_HOSTDEV  const Scalar& operator[](std::size_t i) const
     {
-        assert(_data != nullptr);
         assert(i < SIZE);
         return _data[i];
     }
@@ -42,7 +40,6 @@ struct structArray
     /// @return reference to element
     QUICC_CUDA_HOSTDEV  Scalar& operator[](std::size_t i)
     {
-        assert(_data != nullptr);
         assert(i < SIZE);
         return _data[i];
     }
