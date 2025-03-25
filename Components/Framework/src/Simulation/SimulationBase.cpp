@@ -247,19 +247,12 @@ void SimulationBase::setInitialState(
    options.groupingSize = this->config().groupingSize();
    this->mPseudospectral.setGraphOptions(options);
 
-   // Initialise the workflow
-   QuICCEnv().setup(nCpu);
-
    // Forward state file time and timestep to diagnostic coordinator
    this->mPseudospectral.useStateTime(spInitFile->time(),
       spInitFile->timestep());
 
    // Finalise file
    spInitFile->finalize();
-
-
-   // Make sure nodes are synchronised after initialisation
-   QuICCEnv().synchronize();
 }
 
 void SimulationBase::tuneInitialState(
