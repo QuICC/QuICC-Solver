@@ -13,7 +13,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Tags.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/IChebyshevIntegrator.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/ILinearMapIntegrator.hpp"
 
 namespace QuICC {
 
@@ -33,7 +33,7 @@ namespace Integrator {
     * @brief Implementation of the Chebyshev based I^4 of D integrator, with y = ax + b
     */
    template <>
-   class I4D1<base_t> final : public IChebyshevIntegrator
+   class I4D1<base_t> final : public ILinearMapIntegrator
    {
       public:
          /**

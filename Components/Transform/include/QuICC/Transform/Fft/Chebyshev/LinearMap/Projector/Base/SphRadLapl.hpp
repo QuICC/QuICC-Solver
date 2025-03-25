@@ -13,7 +13,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Tags.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/IChebyshevProjector.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/ILinearMapProjector.hpp"
 
 namespace QuICC {
 
@@ -33,7 +33,7 @@ namespace Projector {
     * @brief Implementation of the Chebyshev based radial part of spherical Laplacian 1/Y^2 D Y^2 D projector, with linear map y = ax + b
     */
    template <>
-   class SphRadLapl<base_t>: public IChebyshevProjector
+   class SphRadLapl<base_t>: public ILinearMapProjector
    {
       public:
          /**

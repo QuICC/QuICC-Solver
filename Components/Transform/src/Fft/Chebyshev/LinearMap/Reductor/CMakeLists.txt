@@ -1,5 +1,5 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
-  IChebyshevEnergy.cpp
+  ILinearMapEnergy.cpp
 )
 
 add_subdirectory(Base)

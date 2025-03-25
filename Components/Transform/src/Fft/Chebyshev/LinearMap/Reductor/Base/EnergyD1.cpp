@@ -35,7 +35,7 @@ namespace Reductor {
    void EnergyD1<base_t>::initBackend() const
    {
       // Call parent initializer
-      IChebyshevEnergy::initBackend();
+      ILinearMapEnergy::initBackend();
 
       // Initialize the solver
       this->mBackend.addSolver();

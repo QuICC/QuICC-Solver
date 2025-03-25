@@ -1,5 +1,5 @@
 /**
- * @file IChebyshevEnergy.cpp
+ * @file ILinearMapEnergy.cpp
  * @brief Source of the interface for a generic FFT based Chebyshev energy reductor
  */
 
@@ -10,7 +10,7 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/IChebyshevEnergy.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/ILinearMapEnergy.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
 namespace QuICC {
@@ -25,12 +25,12 @@ namespace LinearMap {
 
 namespace Reductor {
 
-   void IChebyshevEnergy::initBackend() const
+   void ILinearMapEnergy::initBackend() const
    {
       this->mBackend.init(*this->mspSetup);
    }
 
-   void IChebyshevEnergy::transform(Matrix& rOut, const MatrixZ& in) const
+   void ILinearMapEnergy::transform(Matrix& rOut, const MatrixZ& in) const
    {
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
@@ -49,7 +49,7 @@ namespace Reductor {
       this->applyPostOperator(rOut, tmpOut);
    }
 
-   void IChebyshevEnergy::transform(Matrix& rOut, const Matrix& in) const
+   void ILinearMapEnergy::transform(Matrix& rOut, const Matrix& in) const
    {
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
@@ -65,17 +65,17 @@ namespace Reductor {
       this->applyPostOperator(rOut, tmpOut);
    }
 
-   void IChebyshevEnergy::transform(MatrixZ&, const MatrixZ&) const
+   void ILinearMapEnergy::transform(MatrixZ&, const MatrixZ&) const
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
    }
 
-   void IChebyshevEnergy::transform(MatrixZ&, const Matrix&) const
+   void ILinearMapEnergy::transform(MatrixZ&, const Matrix&) const
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
    }
 
-   MHDFloat IChebyshevEnergy::requiredStorage() const
+   MHDFloat ILinearMapEnergy::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 
@@ -86,12 +86,12 @@ namespace Reductor {
       return mem;
    }
 
-   int IChebyshevEnergy::outRows() const
+   int ILinearMapEnergy::outRows() const
    {
       return this->mspSetup->blockSize();
    }
 
-   int IChebyshevEnergy::outCols() const
+   int ILinearMapEnergy::outCols() const
    {
       return 1;
    }

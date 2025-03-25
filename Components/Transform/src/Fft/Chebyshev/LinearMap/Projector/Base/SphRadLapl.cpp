@@ -47,7 +47,7 @@ namespace Projector {
    void SphRadLapl<base_t>::initBackend() const
    {
       // Call parent initializer
-      IChebyshevProjector::initBackend();
+      ILinearMapProjector::initBackend();
 
       // Initialize the solver
       this->mBackend.addSolver(2);

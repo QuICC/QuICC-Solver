@@ -13,7 +13,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Tags.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/IChebyshevEnergy.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/ILinearMapEnergy.hpp"
 
 namespace QuICC {
 
@@ -33,7 +33,7 @@ namespace Reductor {
     * @brief Implementation of the Chebyshev based R^2 energy reductor, with linear map y = ax + b
     */
    template <>
-   class EnergyY2<base_t>: public IChebyshevEnergy
+   class EnergyY2<base_t>: public ILinearMapEnergy
    {
       public:
          /**

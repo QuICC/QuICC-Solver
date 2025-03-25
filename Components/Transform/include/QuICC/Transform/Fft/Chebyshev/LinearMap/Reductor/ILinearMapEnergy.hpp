@@ -1,10 +1,10 @@
 /**
- * @file IChebyshevProjector.hpp
- * @brief Interface for a generic Chebyshev FFT based projector
+ * @file ILinearMapEnergy.hpp
+ * @brief Interface for a generic Chebyshev FFT based energy reductor
  */
 
-#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVPROJECTOR_HPP
-#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVPROJECTOR_HPP
+#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPENERGY_HPP
+#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPENERGY_HPP
 
 // System includes
 //
@@ -13,7 +13,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/IChebyshevOperator.hpp"
-#include "QuICC/Transform/Fft/Backend/ChebyshevProjector.hpp"
+#include "QuICC/Transform/Fft/Backend/ChebyshevEnergy.hpp"
 
 namespace QuICC {
 
@@ -25,34 +25,34 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-namespace Projector {
+namespace Reductor {
 
    /**
-    * @brief Interface for a generic Chebyshev FFT based projector
+    * @brief Interface for a generic Chebyshev FFT based energy reductor
     */
-   class IChebyshevProjector: public IChebyshevOperator
+   class ILinearMapEnergy: public IChebyshevOperator
    {
       public:
          /**
           * @brief Constructor
           */
-         IChebyshevProjector() = default;
+         ILinearMapEnergy() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IChebyshevProjector() = default;
+         virtual ~ILinearMapEnergy() = default;
 
          /**
-          * @brief Compute transform R2R componentwise
+          * @brief Compute reduction of complex data
           *
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
+         virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
 
          /**
-          * @brief Compute transform R2R
+          * @brief Compute reduction of real data
           *
           * @param rOut Output values
           * @param in   Input values
@@ -83,13 +83,13 @@ namespace Projector {
          /**
           * @brief FFT backend
           */
-         Backend::ChebyshevProjector mBackend;
+         Backend::ChebyshevEnergy mBackend;
 
       private:
          /**
           * @brief Apply pre FFT operator
           *
-          * @param tmp  Temporary padded modal values
+          * @param rOut Output values
           * @param in   Input values
           */
          virtual void applyPreOperator(Matrix& tmp, const Matrix& in) const = 0;
@@ -99,23 +99,14 @@ namespace Projector {
           *
           * @param rOut Output values
           */
-         virtual void applyPostOperator(Matrix& rOut) const = 0;
+         virtual void applyPostOperator(Matrix& rOut, const Matrix& tmp) const = 0;
 
          /**
           * @brief Apply pre FFT operator for component wise operations
           *
-          * @param tmp Temporary padded modal values, either real or im part only
-          * @param in Input values
-          * @param useReal 1 -> extract real part, 0 -> extract im part
+          * @param in   Input values
           */
          virtual void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const = 0;
-
-         /**
-          * @brief Apply post FFT operator for component wise operations
-          *
-          * @param rOut Output values
-          */
-         virtual void applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const = 0;
 
          /**
           * @brief Compute transform R2C (disabled)
@@ -131,7 +122,7 @@ namespace Projector {
           * @param rOut Output values
           * @param in   Input values
           */
-         virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
+         virtual void transform(MatrixZ& rOut, const MatrixZ& in) const override;
    };
 
 }
@@ -141,4 +132,4 @@ namespace Projector {
 }
 }
 
-#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVPROJECTOR_HPP
+#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPENERGY_HPP

@@ -1,10 +1,10 @@
 /**
- * @file IChebyshevIntegrator.hpp
+ * @file ILinearMapIntegrator.hpp
  * @brief Interface for a generic Chebyshev FFT based integrator
  */
 
-#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVINTEGRATOR_HPP
-#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVINTEGRATOR_HPP
+#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPINTEGRATOR_HPP
+#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPINTEGRATOR_HPP
 
 // System includes
 //
@@ -30,18 +30,18 @@ namespace Integrator {
    /**
     * @brief Interface for a generic Chebyshev FFT based integrator
     */
-   class IChebyshevIntegrator: public IChebyshevOperator
+   class ILinearMapIntegrator: public IChebyshevOperator
    {
       public:
          /**
           * @brief Constructor
           */
-         IChebyshevIntegrator() = default;
+         ILinearMapIntegrator() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IChebyshevIntegrator() = default;
+         virtual ~ILinearMapIntegrator() = default;
 
          /**
           * @brief Compute transform R2R componentwise
@@ -131,4 +131,4 @@ namespace Integrator {
 }
 }
 
-#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVINTEGRATOR_HPP
+#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPINTEGRATOR_HPP

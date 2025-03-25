@@ -1,6 +1,6 @@
 /**
- * @file IChebyshevIntegrator.cpp
- * @brief Source of the interface for a generic FFT based Chebyshev integrator
+ * @file ILinearMapProjector.cpp
+ * @brief Source of the interface for a generic FFT based Chebyshev projector
  */
 
 // System includes
@@ -10,7 +10,7 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/IChebyshevIntegrator.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/ILinearMapProjector.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
 namespace QuICC {
@@ -23,19 +23,18 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-namespace Integrator {
+namespace Projector {
 
-   void IChebyshevIntegrator::initBackend() const
+   void ILinearMapProjector::initBackend() const
    {
       this->mBackend.init(*this->mspSetup);
    }
 
-   void IChebyshevIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
+   void ILinearMapProjector::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
       assert(this->isInitialized());
-      assert(this->mspSetup->fwdSize() == in.rows());
       assert(rOut.cols() == this->outCols());
-      assert(rOut.rows() >= this->outRows());
+      assert(rOut.rows() == this->outRows());
       assert(in.cols() <= rOut.cols());
 
       auto& tmpIn = this->mBackend.getStorage(StorageKind::in);
@@ -49,39 +48,40 @@ namespace Integrator {
       this->applyPostOperator(rOut, tmpOut, false);
    }
 
-   void IChebyshevIntegrator::transform(Matrix& rOut, const Matrix& in) const
+   void ILinearMapProjector::transform(Matrix& rOut, const Matrix& in) const
    {
       assert(this->isInitialized());
-      assert(this->mspSetup->fwdSize() == in.rows());
       assert(rOut.cols() == this->outCols());
-      assert(rOut.rows() >= this->outRows());
+      assert(rOut.rows() == this->outRows());
       assert(in.cols() <= rOut.cols());
 
-      this->mBackend.applyFft(rOut, in);
+      auto& tmp = this->mBackend.getStorage();
+      this->applyPreOperator(tmp, in);
+      this->mBackend.applyFft(rOut, tmp);
       this->applyPostOperator(rOut);
    }
 
-   void IChebyshevIntegrator::transform(Matrix&, const MatrixZ&) const
+   void ILinearMapProjector::transform(Matrix&, const MatrixZ&) const
    {
-      throw std::logic_error("Data is not compatible with Chebyshev FFT integrator");
+      throw std::logic_error("Data is not compatible with Chebyshev FFT projector");
    }
 
-   void IChebyshevIntegrator::transform(MatrixZ&, const Matrix&) const
+   void ILinearMapProjector::transform(MatrixZ&, const Matrix&) const
    {
-      throw std::logic_error("Data is not compatible with Chebyshev FFT integrator");
+      throw std::logic_error("Data is not compatible with Chebyshev FFT projector");
    }
 
-   int IChebyshevIntegrator::outRows() const
+   int ILinearMapProjector::outRows() const
    {
-      return this->mspSetup->specSize();
+      return this->mspSetup->fwdSize();
    }
 
-   int IChebyshevIntegrator::outCols() const
+   int ILinearMapProjector::outCols() const
    {
       return this->mspSetup->blockSize();
    }
 
-   MHDFloat IChebyshevIntegrator::requiredStorage() const
+   MHDFloat ILinearMapProjector::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 

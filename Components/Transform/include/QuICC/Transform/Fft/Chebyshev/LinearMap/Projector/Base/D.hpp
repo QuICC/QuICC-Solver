@@ -13,7 +13,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Tags.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/IChebyshevProjector.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/ILinearMapProjector.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I1.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I3.hpp"
@@ -39,7 +39,7 @@ namespace Projector {
     * @tparam DO Derivative order
     */
    template <int DO>
-   class D<DO, base_t>: public IChebyshevProjector
+   class D<DO, base_t>: public ILinearMapProjector
    {
       public:
          /**
@@ -59,7 +59,7 @@ namespace Projector {
          void initBackend() const final
          {
             // Call parent initializer
-            IChebyshevProjector::initBackend();
+            ILinearMapProjector::initBackend();
 
             // Initialize the solver
             this->mBackend.addSolver();

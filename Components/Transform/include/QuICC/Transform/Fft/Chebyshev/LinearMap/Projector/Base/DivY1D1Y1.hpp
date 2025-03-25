@@ -13,7 +13,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Tags.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/IChebyshevProjector.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/ILinearMapProjector.hpp"
 
 namespace QuICC {
 
@@ -33,7 +33,7 @@ namespace Projector {
     * @brief Implementation of the Chebyshev based 1/Y D Y projector, with linear map y = ax +  b
     */
    template <>
-   class DivY1D1Y1<base_t>: public IChebyshevProjector
+   class DivY1D1Y1<base_t>: public ILinearMapProjector
    {
       public:
          /**
