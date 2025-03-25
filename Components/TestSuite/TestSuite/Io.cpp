@@ -92,7 +92,7 @@ void readData(Matrix& inData, const std::string& path)
             infile >> inData(i, j);
             if(infile.fail())
             {
-               throw std::logic_error("Failed to read real data file at (i,j): (" + std::to_string(i) + "," + std::to_string(j) + ")");
+               throw std::logic_error(path + ": Failed to read real data file at (i,j): (" + std::to_string(i) + "," + std::to_string(j) + ")");
             }
          }
       }
