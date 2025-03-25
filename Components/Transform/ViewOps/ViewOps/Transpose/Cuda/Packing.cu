@@ -161,6 +161,33 @@ void unPack(std::complex<double>* out, const View::ViewBase<std::complex<double>
    const View::ViewBase<int> recvBufferDisplsView);
 // <<<<
 
+
+namespace details
+{
+template<class TDATA, int SIZE>
+__global__ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
+   const View::ViewBase<int> sendCountsView,
+   const View::View<int, View::dense2DRM> sendDisplsView,
+   const View::ViewBase<int> sendBufferDisplsView)
+{
+   const auto I = sendDisplsView.dims()[0];
+   const auto J = sendDisplsView.dims()[1];
+
+   const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+   const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
+   const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
+
+   if (g < groupSize && i < I && j < sendCountsView[i])
+   {
+      int sendCount = sendCountsView[i] / groupSize;
+      buffer[g * sendCount + sendBufferDisplsView[i] + j] =
+         *(in[g] + sendDisplsView[i * J + j]);
+   }
+
+}
+
+} // namespace details
+
 template <class TDATA, int SIZE>
 void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
    const View::ViewBase<int> sendCountsView,
@@ -168,9 +195,56 @@ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
    const View::ViewBase<int> sendBufferDisplsView, const std::int64_t groupSize)
 {
 
+   const auto I = sendDisplsView.dims()[0];
+   const auto J = sendDisplsView.dims()[1];
+   const auto G = in.size();
+
+   // setup grid
+   dim3 blockSize;
+   dim3 numBlocks;
+
+   blockSize.x = 16;
+   blockSize.y = 64;
+   blockSize.z = 16;
+   numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
+   numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
+   numBlocks.z = (G + blockSize.z - 1) / blockSize.z;
+
+   details::pack<TDATA>
+      <<<numBlocks, blockSize>>>(buffer, in, sendCountsView, sendDisplsView, sendBufferDisplsView, groupSize);
+
+   cudaErrChk(cudaDeviceSynchronize());
 
 
 }
+
+
+namespace details
+{
+template<class TDATA, int SIZE>
+__global__ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
+   const View::ViewBase<int> recvCountsView,
+   const View::View<int, View::dense2DRM> recvDisplsView,
+   const View::ViewBase<int> recvBufferDisplsView, 
+   const std::int64_t groupSize)
+{
+
+   const auto I = recvDisplsView.dims()[0];
+   const auto J = recvDisplsView.dims()[1];
+
+   const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
+   const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
+   const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
+
+   if (g < groupSize && i < I && j < recvCountsView[i])
+   {
+      int recvCount = recvCountsView[i] / groupSize;
+      *(out[g] + recvDisplsView[i * J + j]) =
+         buffer[g * recvCount + recvBufferDisplsView[i] + j];
+   }
+}
+
+} // namespace details
 
 template <class TDATA, int SIZE>
 void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
@@ -179,25 +253,25 @@ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
    const View::ViewBase<int> recvBufferDisplsView, const std::int64_t groupSize)
 {
 
-   // const auto I = recvDisplsView.dims()[0];
-   // const auto J = recvDisplsView.dims()[1];
-   // const auto G = out.size();
+   const auto I = recvDisplsView.dims()[0];
+   const auto J = recvDisplsView.dims()[1];
+   const auto G = out.size();
 
-   // // setup grid
-   // dim3 blockSize;
-   // dim3 numBlocks;
+   // setup grid
+   dim3 blockSize;
+   dim3 numBlocks;
 
-   // blockSize.x = 16;
-   // blockSize.y = 64;
-   // blockSize.z = 16;
-   // numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
-   // numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
-   // numBlocks.z = (G + blockSize.z - 1) / blockSize.z;
+   blockSize.x = 16;
+   blockSize.y = 64;
+   blockSize.z = 16;
+   numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
+   numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
+   numBlocks.z = (G + blockSize.z - 1) / blockSize.z;
 
-   // details::unPack<TDATA>
-   //    <<<numBlocks, blockSize>>>(out, buffer, recvCountsView, recvDisplsView, recvBufferDisplsView);
+   details::unPack<TDATA>
+      <<<numBlocks, blockSize>>>(out, buffer, recvCountsView, recvDisplsView, recvBufferDisplsView, groupSize);
 
-   // cudaErrChk(cudaDeviceSynchronize());
+   cudaErrChk(cudaDeviceSynchronize());
 }
 
 // Explicit instantiations
