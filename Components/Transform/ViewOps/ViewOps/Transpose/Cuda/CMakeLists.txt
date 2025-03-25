@@ -1,11 +1,7 @@
 target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PRIVATE
     Op.cu
-)
-
-# Add public header
-set(PHS
-  Cuda/Op.hpp
+    Packing.cu
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}

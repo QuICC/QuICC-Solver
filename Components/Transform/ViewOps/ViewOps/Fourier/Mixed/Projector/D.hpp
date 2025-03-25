@@ -12,9 +12,10 @@
 //
 #include "Memory/Memory.hpp"
 #include "Memory/MemoryResource.hpp"
-#include "Operator/Unary.hpp"
 #include "Operator/Binary.hpp"
+#include "Operator/Unary.hpp"
 #include "Profiler/Interface.hpp"
+#include "ViewOps/Fourier/Tags.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -28,31 +29,35 @@ namespace Projector {
 /// @tparam Tin input modes type
 /// @tparam FftBackend  type of FFT operator
 /// @tparam DiffBackend type of operator
-template<class Tout, class Tin, class FftBackend, class DiffBackend>
-class DOp : public Operator::UnaryBaseOp<DOp<Tout, Tin, FftBackend, DiffBackend>, Tout, Tin> {
+template <class Tout, class Tin, class FftBackend, class DiffBackend>
+class DOp
+    : public Operator::UnaryBaseOp<DOp<Tout, Tin, FftBackend, DiffBackend>,
+         Tout, Tin>
+{
 public:
-    /// @brief type of scale parameter, i.e. float 32/64 bits
-    using ScaleType = typename Tout::ScalarType;
-    /// @brief constructor with user defined scaling factor
-    /// @param mem
-    /// @param scale
-    DOp(std::shared_ptr<Memory::memory_resource> mem,
-      ScaleType scale = 1.0);
-    /// @brief default constructor
-    DOp() = delete;
-    /// @brief dtor
-    ~DOp() = default;
+   /// @brief type of scale parameter, i.e. float 32/64 bits
+   using ScaleType = typename Tout::ScalarType;
+   /// @brief constructor with user defined scaling factor
+   /// @param mem
+   /// @param scale
+   DOp(std::shared_ptr<Memory::memory_resource> mem, ScaleType scale = 1.0);
+   /// @brief default constructor
+   DOp() = delete;
+   /// @brief dtor
+   ~DOp() = default;
+
 private:
-    /// @brief action implementation that does not overwrite the input
-    /// @param out differentiatied physical space coefficient
-    /// @param in input modes
-    void applyImpl(Tout& out, const Tin& in);
-    /// @brief pointer to FFT operator
-    std::unique_ptr<Operator::UnaryOp<Tout, Tin>> mFft;
-    /// @brief pointer to differentiation operator
-    std::unique_ptr<Operator::BinaryOp<Tin, Tin, ScaleType>> mDiff;
-    /// @brief give access to base class
-    friend Operator::UnaryBaseOp<DOp<Tout, Tin, FftBackend, DiffBackend>, Tout, Tin>;
+   /// @brief action implementation that does not overwrite the input
+   /// @param out differentiatied physical space coefficient
+   /// @param in input modes
+   void applyImpl(Tout& out, const Tin& in);
+   /// @brief pointer to FFT operator
+   std::unique_ptr<Operator::UnaryOp<Tout, Tin>> mFft;
+   /// @brief pointer to differentiation operator
+   std::unique_ptr<Operator::BinaryOp<Tin, Tin, ScaleType>> mDiff;
+   /// @brief give access to base class
+   friend Operator::UnaryBaseOp<DOp<Tout, Tin, FftBackend, DiffBackend>, Tout,
+      Tin>;
    /// @brief memory resource
    /// needs shared ptr for memory pools
    /// note, this must call the dtor last
@@ -64,38 +69,52 @@ private:
    Tin _tmpView;
 };
 
-template<class Tout, class Tin, class FftBackend, class DiffBackend>
-DOp<Tout, Tin, FftBackend, DiffBackend>::DOp(std::shared_ptr<Memory::memory_resource> mem, ScaleType scale) : mFft(std::make_unique<FftBackend>()),
-    mDiff(std::make_unique<DiffBackend>(scale)), _mem(mem)
+template <class Tout, class Tin, class FftBackend, class DiffBackend>
+DOp<Tout, Tin, FftBackend, DiffBackend>::DOp(
+   std::shared_ptr<Memory::memory_resource> mem, ScaleType scale) :
+    mFft(std::make_unique<FftBackend>()),
+    mDiff(std::make_unique<DiffBackend>(scale)),
+    _mem(mem)
+{}
+
+template <class Tout, class Tin, class FftBackend, class DiffBackend>
+void DOp<Tout, Tin, FftBackend, DiffBackend>::applyImpl(Tout& out,
+   const Tin& in)
 {
-}
+   Profiler::RegionFixture<4> fix("Fourier::Mixed::Projector::DOp::applyImpl");
 
-template<class Tout, class Tin, class FftBackend, class DiffBackend>
-void DOp<Tout, Tin, FftBackend, DiffBackend>::applyImpl(Tout& out, const Tin& in)
-{
-    Profiler::RegionFixture<4> fix("Fourier::Mixed::Projector::DOp::applyImpl");
+   // setup tmp storage
+   if (_tmpView.data() == nullptr)
+   {
+      // special treatment for the pure projector is not necessary
+      // but it avoids an allocation and copy
+      if constexpr (DiffBackend::TreatmentValue == Fourier::none_m &&
+                    DiffBackend::OrderValue == 0)
+      {
+         _tmpView = in;
+      }
+      else
+      {
+         _tmpData = std::move(
+            Memory::MemBlock<typename Tin::ScalarType>(in.size(), _mem.get()));
+         _tmpView = Tin(_tmpData.data(), _tmpData.size(), in.dims(),
+            in.pointers(), in.indices(), in.lds());
+      }
+   }
 
-    // setup tmp storage
-    if (_tmpView.data() == nullptr)
-    {
-        // special treatment for the pure projector is not necessary
-        // but it avoids an allocation and copy
-        if constexpr (DiffBackend::TreatmentValue == none_m && DiffBackend::OrderValue == 0)
-        {
-            _tmpView = in;
-        }
-        else
-        {
-            _tmpData = std::move(Memory::MemBlock<typename Tin::ScalarType>(in.size(), _mem.get()));
-            _tmpView = Tin(_tmpData.data(), _tmpData.size(), in.dims(), in.pointers(), in.indices(), in.lds());
-        }
-    }
+   // differentiate
+   mDiff->apply(_tmpView, in, 1.0);
 
-    // differentiate
-    mDiff->apply(_tmpView, in, 1.0);
+   // FFT
+   mFft->apply(out, _tmpView);
 
-    // FFT
-    mFft->apply(out, _tmpView);
+   // for the pure projector we need to reset the temporary storage:
+   // next time the operator is called it might have a different input
+   if constexpr (DiffBackend::TreatmentValue == Fourier::none_m &&
+                 DiffBackend::OrderValue == 0)
+   {
+      _tmpView = Tin();
+   }
 }
 
 } // namespace Projector

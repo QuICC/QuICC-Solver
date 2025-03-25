@@ -3,9 +3,6 @@
  * @brief Source of the implementation of an MPI environment
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <chrono>
@@ -17,10 +14,7 @@ extern "C" {
 #include <unistd.h>
 }
 
-// External includes
-//
-
-// Class include
+// Project include
 //
 #include "Environment/Mpi.hpp"
 
@@ -40,6 +34,9 @@ Mpi::Mpi()
 
    // Set IO rank
    Mpi::mIoRank = 0;
+
+   // Check if we have cuda awareness
+   checkCudaAwareness();
 
    // Set gdb hook
    gdbHook();
@@ -198,6 +195,40 @@ void Mpi::gdbHook()
    }
    // Wait for everyone
    this->synchronize();
+}
+
+void Mpi::checkCudaAwareness()
+{
+
+   bool isCudaAware = false;
+
+// OpenMPI check
+#ifdef MPIX_CUDA_AWARE_SUPPORT
+   isCudaAware = MPIX_Query_cuda_support();
+#endif
+
+   // MPICH check
+   auto mpichCheck = std::getenv("MPICH_GPU_SUPPORT_ENABLED");
+   if (mpichCheck != nullptr)
+   {
+      int mpich_gpu_support_enabled = std::stoi(mpichCheck);
+      if (mpich_gpu_support_enabled == 1)
+      {
+         isCudaAware = true;
+      }
+   }
+
+   if (Mpi::mId == Mpi::mIoRank)
+   {
+      if (isCudaAware)
+      {
+         std::cout << "Mpi is cuda aware!\n";
+      }
+      else
+      {
+         std::cout << "Mpi is not cuda aware!\n";
+      }
+   }
 }
 
 void Mpi::addCommunicator(const std::size_t id, const std::vector<int>& ids)

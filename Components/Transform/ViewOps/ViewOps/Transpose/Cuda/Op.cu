@@ -16,6 +16,8 @@
 #include "Profiler/Interface.hpp"
 #include "View/View.hpp"
 
+#define QUICC_MAX_TH_NAIVE 2048
+
 namespace QuICC {
 /// @brief namespace for Transpose type operations
 namespace Transpose {
@@ -36,6 +38,7 @@ __global__ void perm(View::View<Tout, View::DCCSC3DJIK> out,
    const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
 
+   const auto Ipad = in.lds();
    const auto I = in.dims()[0];
    const auto J = in.dims()[1];
    const auto K = in.dims()[2];
@@ -44,7 +47,7 @@ __global__ void perm(View::View<Tout, View::DCCSC3DJIK> out,
    {
       for (std::size_t k = 0; k < K; ++k)
       {
-         std::size_t ijk = i + j * I + k * I * J;
+         std::size_t ijk = i + j * Ipad + k * Ipad * J;
          // plane is row major
          std::size_t jki = j * K + k + i * J * K;
          assert(ijk < in.size());
@@ -64,6 +67,7 @@ __global__ void perm(View::View<Tout, View::DCCSC3D> out,
    const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
 
+   const auto Kpad = out.lds();
    const auto I = in.dims()[0];
    const auto J = in.dims()[1];
    const auto K = in.dims()[2];
@@ -74,7 +78,7 @@ __global__ void perm(View::View<Tout, View::DCCSC3D> out,
       {
          // plane is row major
          std::size_t ijk = i * J + j + k * I * J;
-         std::size_t kij = k + i * K + j * K * I;
+         std::size_t kij = k + i * Kpad + j * Kpad * I;
          assert(ijk < in.size());
          assert(kij < out.size());
          out[kij] = in[ijk];
@@ -96,7 +100,9 @@ template <class T> __device__ void pSum(T* vec, std::size_t size)
 }
 
 template <class Tout, class Tin, class Perm>
-__global__ void perm(View::View<Tout, View::DCCSC3DJIK> out,
+__global__ void
+__launch_bounds__(QUICC_MAX_TH_NAIVE)
+perm(View::View<Tout, View::DCCSC3DJIK> out,
    const View::View<Tin, View::S1CLCSC3DJIK> in)
 {
    static_assert(std::is_same_v<Perm, p201_t>,
@@ -164,7 +170,9 @@ __global__ void perm(View::View<Tout, View::DCCSC3DJIK> out,
 }
 
 template <class Tout, class Tin, class Perm>
-__global__ void perm(View::View<Tout, View::S1CLCSC3DJIK> out,
+__global__ void
+__launch_bounds__(QUICC_MAX_TH_NAIVE)
+perm(View::View<Tout, View::S1CLCSC3DJIK> out,
    const View::View<Tin, View::DCCSC3DJIK> in)
 {
    static_assert(std::is_same_v<Perm, p120_t>,
@@ -237,7 +245,7 @@ __global__ void perm(View::View<Tout, View::S1CLCSC3DJIK> out,
 template <class Tout, class Tin, class Perm>
 void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 {
-   Profiler::RegionFixture<4> fix("Reduction::Cuda::applyImpl");
+   Profiler::RegionFixture<4> fix("Transpose::Cuda::applyImpl");
 
    assert(QuICC::Cuda::isDeviceMemory(out.data()));
    assert(QuICC::Cuda::isDeviceMemory(in.data()));
@@ -250,9 +258,9 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
    {
       // dense transpose
       assert(out.size() == in.size());
-      auto I = in.dims()[0];
-      auto J = in.dims()[1];
-      auto K = in.dims()[2];
+      const auto I = in.dims()[0];
+      const auto J = in.dims()[1];
+      const auto K = in.dims()[2];
 
       // setup grid
       dim3 blockSize;
@@ -268,6 +276,8 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       details::perm<typename Tout::ScalarType, typename Tin::ScalarType, Perm>
          <<<numBlocks, blockSize, sizeof(std::uint32_t) * (2 * I + K)>>>(out,
             in);
+      cudaErrChk(cudaPeekAtLastError());
+      cudaErrChk(cudaDeviceSynchronize());
    }
    else if constexpr (std::is_same_v<Perm, p120_t> &&
                       std::is_same_v<typename Tin::AttributesType,
@@ -277,9 +287,9 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
    {
       // dense transpose
       assert(out.size() == in.size());
-      auto I = out.dims()[0];
-      auto J = out.dims()[1];
-      auto K = out.dims()[2];
+      const auto I = out.dims()[0];
+      const auto J = out.dims()[1];
+      const auto K = out.dims()[2];
 
       // setup grid
       dim3 blockSize;
@@ -295,6 +305,8 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
       details::perm<typename Tout::ScalarType, typename Tin::ScalarType, Perm>
          <<<numBlocks, blockSize, sizeof(std::uint32_t) * (2 * I + K)>>>(out,
             in);
+      cudaErrChk(cudaPeekAtLastError());
+      cudaErrChk(cudaDeviceSynchronize());
    }
    else if constexpr (std::is_same_v<Perm, p201_t> &&
                       std::is_same_v<typename Tin::AttributesType,
@@ -303,12 +315,12 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
                          View::DCCSC3DJIK>)
    {
       // dense transpose
-      assert(out.size() == in.size());
+      assert(out.size() <= in.size()); // input might be padded
       assert(out.size() == out.dims()[0] * out.dims()[1] * out.dims()[2]);
 
-      auto I = in.dims()[0];
-      auto J = in.dims()[1];
-      auto K = in.dims()[2];
+      const auto I = in.dims()[0];
+      const auto J = in.dims()[1];
+      const auto K = in.dims()[2];
 
       // setup grid
       dim3 blockSize;
@@ -323,6 +335,8 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 
       details::perm<typename Tout::ScalarType, typename Tin::ScalarType, Perm>
          <<<numBlocks, blockSize>>>(out, in);
+      cudaErrChk(cudaPeekAtLastError());
+      cudaErrChk(cudaDeviceSynchronize());
    }
    else if constexpr (std::is_same_v<Perm, p120_t> &&
                       std::is_same_v<typename Tin::AttributesType,
@@ -331,12 +345,15 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
                          View::DCCSC3D>)
    {
       // dense transpose
-      assert(out.size() == in.size());
-      assert(out.size() == out.dims()[0] * out.dims()[1] * out.dims()[2]);
-
-      auto I = in.dims()[0];
-      auto J = in.dims()[1];
-      auto K = in.dims()[2];
+      assert(out.size() >= in.size()); // output might be padded
+      assert(out.size() == out.lds() * out.dims()[1] * out.dims()[2]);
+      // perm = [1, 2, 0]
+      assert(in.dims()[0] == out.dims()[1]);
+      assert(in.dims()[1] == out.dims()[2]);
+      assert(in.dims()[2] == out.dims()[0]);
+      const auto I = in.dims()[0];
+      const auto J = in.dims()[1];
+      const auto K = in.dims()[2];
 
       // setup grid
       dim3 blockSize;
@@ -351,6 +368,8 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 
       details::perm<typename Tout::ScalarType, typename Tin::ScalarType, Perm>
          <<<numBlocks, blockSize>>>(out, in);
+      cudaErrChk(cudaPeekAtLastError());
+      cudaErrChk(cudaDeviceSynchronize());
    }
    else
    {
