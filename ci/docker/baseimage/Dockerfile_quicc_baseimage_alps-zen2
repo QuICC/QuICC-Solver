@@ -36,9 +36,19 @@ RUN fix_spack_install
 # Finally install software that is needed, e.g. compilers
 # It is also possible to build compilers via spack and let all dependencies be handled by spack
 RUN apt-get -yqq update && apt-get -yqq upgrade \
- && apt-get -yqq install build-essential gfortran gcc g++ curl\
- && rm -rf /var/lib/apt/lists/*
+ && apt-get -yqq install build-essential gfortran gcc g++ curl
 
+# Install LLVM 17
+RUN apt-get -yqq install lsb-release wget \
+software-properties-common gnupg
+
+RUN wget https://apt.llvm.org/llvm.sh \
+&& chmod +x llvm.sh \
+&& ./llvm.sh 17
+
+RUN apt-get -yqq install libmlir-17-dev mlir-17-tools
+
+# Install Reframe
 RUN cd /opt \
  && rm -rf rfm_venv \
  && python3 -m venv rfm_venv \
