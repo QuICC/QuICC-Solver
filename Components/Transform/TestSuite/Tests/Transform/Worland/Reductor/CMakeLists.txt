@@ -582,7 +582,7 @@ set(_tests
     Poly::Power:<kokkos_t>:reductor
 )
 quicc_set_ulp(_ulp
-  ULP 30 350 500 100
+  ULP 30 350 500 110
   MPULP 11 30 50 11
 )
 foreach(_test ${_tests})

@@ -1,6 +1,6 @@
 /**
- * @file Transpose.hpp
- * @brief Wrapper for implementation backends
+ * @file Op.hpp
+ * @brief Wrapper for transpose implementation backends
  */
 #pragma once
 
