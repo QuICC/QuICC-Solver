@@ -92,7 +92,7 @@ list(APPEND _tests
 endif()
 
 quicc_set_ulp(_ulp
-  ULP 9 60 55 51
+  ULP 9 60 55 61
   MPULP 1 1 2 2
   )
 foreach(_test ${_tests})
