@@ -6,22 +6,18 @@ message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_
 
 add_library(${QUICC_CURRENT_COMPONENT_LIB} STATIC
   Memory/Cpu/NewDelete.cpp
+  Memory/Cpu/Pool.cpp
   Memory/Cuda/Malloc.cu
+  Memory/Cuda/Pool.cu
 )
+
+set_property(TARGET ${QUICC_CURRENT_COMPONENT_LIB}
+  PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
-)
-
-
-set(PHS
-  Memory/Memory.hpp
-  Memory/MemoryResource.hpp
-  Memory/Pensieve.hpp
-  Memory/Cpu/NewDelete.hpp
-  Memory/Cuda/Malloc.hpp
 )
 
 # Add public header
@@ -55,6 +51,5 @@ endif(QUICC_TESTSUITE_MEMORY)
 # Export info
 quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
   COMPONENT ${QUICC_CURRENT_COMPONENT_LIB}
-  DIRECTORIES
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    )
+  DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/Memory"
+)

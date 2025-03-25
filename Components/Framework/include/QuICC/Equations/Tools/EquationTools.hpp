@@ -18,6 +18,7 @@
 #include "QuICC/Equations/Tools/EquationSorters.hpp"
 #include "QuICC/Equations/CouplingInformation.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/IteratorRange.hpp"
 #ifdef QUICC_DEBUG
 #include "QuICC/PhysicalNames/Coordinator.hpp"
 #endif //QUICC_DEBUG

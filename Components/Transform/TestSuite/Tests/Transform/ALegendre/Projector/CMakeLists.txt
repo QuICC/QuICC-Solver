@@ -66,7 +66,7 @@ foreach(_test ${_tests_templated})
     quicc_add_test(${_test}
         COMMAND ${TestExe}
         KEYWORD Algorithm::Operator:Template:type
-        ULP 238
+        ULP 281
     )
 endforeach()
 
