@@ -9,8 +9,8 @@
 #ifndef NDEBUG
 #include <iostream>
 #endif
-#include <new>
 #include <cassert>
+#include <new>
 
 // Project includes
 //
@@ -22,104 +22,114 @@ namespace Cpu {
 
 Pool::~Pool()
 {
-    // deallocate all blocks
-    for(std::uint32_t i = 0; i < _blocks.size(); ++i)
-    {
-        if(_blocks[i].ptr != nullptr)
-        {
-            ::operator delete(_blocks[i].ptr, _blocks[i].blockSize, static_cast<std::align_val_t>(_alignment));
+   // deallocate all blocks
+   for (std::uint32_t i = 0; i < _blocks.size(); ++i)
+   {
+      if (_blocks[i].ptr != nullptr)
+      {
+         ::operator delete(_blocks[i].ptr, _blocks[i].blockSize,
+            static_cast<std::align_val_t>(_alignment));
 #ifndef NDEBUG
-            std::cout << "deallocated: " << _blocks[i].blockSize << "\t@: " << _blocks[i].ptr << '\n';
+         std::cout << "deallocated: " << _blocks[i].blockSize
+                   << "\t@: " << _blocks[i].ptr << '\n';
 #endif
-            _blocks[i].ptr = nullptr;
-        }
-    }
+         _blocks[i].ptr = nullptr;
+      }
+   }
 }
 
 void* Pool::do_allocate(std::size_t bytes, std::size_t)
 {
-    // update max block size
-    _maxBlockSize = std::max(bytes, _maxBlockSize);
+   // update max block size
+   _maxBlockSize = std::max(bytes, _maxBlockSize);
 
-    std::uint32_t i = _blocks.size();
-    // search for free block
-    if(!_freeBlocks.empty())
-    {
-        // there is at least a free block
-        i = _freeBlocks.top();
-        _freeBlocks.pop();
-    }
+   std::uint32_t i = _blocks.size();
+   // search for free block
+   if (!_freeBlocks.empty())
+   {
+      // there is at least a free block
+      i = _freeBlocks.top();
+      _freeBlocks.pop();
+   }
 
-    // check if we run out of blocks
-    if(i == _blocks.size())
-    {
-        _blocks.push_back(details::block{});
-    }
+   // check if we run out of blocks
+   if (i == _blocks.size())
+   {
+      _blocks.push_back(details::block{});
+   }
 
-    // check if it was allocated before
-    if(_blocks[i].ptr != nullptr)
-    {
-        // check if big enough
-        if (bytes > _blocks[i].blockSize)
-        {
-            // realloc
-            ::operator delete(_blocks[i].ptr, _blocks[i].blockSize, static_cast<std::align_val_t>(_alignment));
-            _blocks[i].ptr = ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
-            _blocks[i].blockSize = _maxBlockSize;
+   // check if it was allocated before
+   if (_blocks[i].ptr != nullptr)
+   {
+      // check if big enough
+      if (bytes > _blocks[i].blockSize)
+      {
+         // realloc
+         ::operator delete(_blocks[i].ptr, _blocks[i].blockSize,
+            static_cast<std::align_val_t>(_alignment));
+         _blocks[i].ptr = ::operator new(_maxBlockSize,
+            static_cast<std::align_val_t>(_alignment));
+         _blocks[i].blockSize = _maxBlockSize;
 #ifndef NDEBUG
-            std::cout << "realloc block: " << i << "\tof size: " << _blocks[i].blockSize << '\n';
+         std::cout << "realloc block: " << i
+                   << "\tof size: " << _blocks[i].blockSize << '\n';
 #endif
-        }
-        else
-        {
+      }
+      else
+      {
 #ifndef NDEBUG
-            std::cout << "reuse block: " << i << "\tof size: " << _blocks[i].blockSize << '\n';
+         std::cout << "reuse block: " << i
+                   << "\tof size: " << _blocks[i].blockSize << '\n';
 #endif
-        }
-        _blocks[i].isValid = true;
-        return _blocks[i].ptr;
-    }
+      }
+      _blocks[i].isValid = true;
+      return _blocks[i].ptr;
+   }
 
-    // if not allocate
-    auto ptr = ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
-    _blocks[i].blockSize = _maxBlockSize;
+   // if not allocate
+   auto ptr =
+      ::operator new(_maxBlockSize, static_cast<std::align_val_t>(_alignment));
+   _blocks[i].blockSize = _maxBlockSize;
 #ifndef NDEBUG
-    std::cout << "allocated: " << _blocks[i].blockSize  << "\t@: " << ptr << '\n';
+   std::cout << "allocated: " << _blocks[i].blockSize << "\t@: " << ptr << '\n';
 #endif
 
-    // store
-    _blocks[i].ptr = ptr;
-    _blocks[i].isValid = true;
-    return ptr;
+   // store
+   _blocks[i].ptr = ptr;
+   _blocks[i].isValid = true;
+   return ptr;
 }
 
 void Pool::do_deallocate(void* ptr, std::size_t bytes, std::size_t)
 {
-    assert(ptr != nullptr);
+   assert(ptr != nullptr);
 
-    for(std::uint32_t i = 0; i < _blocks.size(); ++i)
-    {
-        if(_blocks[i].ptr == ptr)
-        {
-            _blocks[i].isValid = false;
-            _freeBlocks.push(i);
+   for (std::uint32_t i = 0; i < _blocks.size(); ++i)
+   {
+      if (_blocks[i].ptr == ptr)
+      {
+         _blocks[i].isValid = false;
+         _freeBlocks.push(i);
 #ifndef NDEBUG
-            std::cout << "freed block: " << i << "\tof size: " << _blocks[i].blockSize <<'\n';
+         std::cout << "freed block: " << i
+                   << "\tof size: " << _blocks[i].blockSize << '\n';
 #endif
-            return;
-        }
-    }
-
+         return;
+      }
+   }
 }
 
-bool Pool::do_is_equal(const QuICC::Memory::memory_resource& other) const noexcept
+bool Pool::do_is_equal(
+   const QuICC::Memory::memory_resource& other) const noexcept
 {
-    if( this == &other ) return true;
-    const auto* const op = dynamic_cast<const Pool*>(&other);
-    return op != nullptr;
+   if (this == &other)
+   {
+      return true;
+   }
+   const auto* const op = dynamic_cast<const Pool*>(&other);
+   return op != nullptr;
 }
 
 } // namespace Cpu
 } // namespace Memory
 } // namespace QuICC
-

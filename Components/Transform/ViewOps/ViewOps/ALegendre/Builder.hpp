@@ -214,7 +214,7 @@ void builder(Tview opView, const Evector<Tdata>& grid,
       auto L = opView.dims()[LIdx];
       scaling = Evector<ScalarType>::LinSpaced(L, 0, L - 1);
       // avoid division by zero
-      scaling[0] = L*std::numeric_limits<ScalarType>::epsilon();
+      scaling[0] = L * std::numeric_limits<ScalarType>::epsilon();
       scaling = (scaling.array() * (scaling.array() + 1.0)).pow(LlDiff);
    }
 

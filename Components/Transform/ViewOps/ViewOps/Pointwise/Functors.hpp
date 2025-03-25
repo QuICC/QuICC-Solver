@@ -118,7 +118,7 @@ template <class T = double> struct CrossCompFunctor
    /// @return i component of cross product
    QUICC_CUDA_HOSTDEV T operator()(T uj, T uk, T vj, T vk)
    {
-      return _scaling * (uj*vk - uk*vj);
+      return _scaling * (uj * vk - uk * vj);
    }
 };
 
@@ -148,7 +148,7 @@ template <class T = double> struct DotFunctor
    /// @return
    QUICC_CUDA_HOSTDEV T operator()(T ui, T uj, T uk, T vi, T vj, T vk)
    {
-      return _scaling * (ui*vi + uj*vj + uk*vk);
+      return _scaling * (ui * vi + uj * vj + uk * vk);
    }
 };
 

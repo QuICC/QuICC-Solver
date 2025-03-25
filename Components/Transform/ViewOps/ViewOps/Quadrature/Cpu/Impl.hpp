@@ -33,8 +33,8 @@ namespace Cpu {
 /// @tparam Top operator type
 /// @tparam Treatment tag to include scaling due to derivative
 template <class Tout, class Tin, class Top, std::uint16_t Treatment = 0>
-class ImplOp
-    : public Operator::BinaryBaseOp<ImplOp<Tout, Tin, Top, Treatment>, Tout, Tin, Top>
+class ImplOp : public Operator::BinaryBaseOp<ImplOp<Tout, Tin, Top, Treatment>,
+                  Tout, Tin, Top>
 {
 public:
    /// @brief Default constructor
@@ -49,7 +49,8 @@ private:
    /// @param op operator
    void applyImpl(Tout& out, const Tin& in, const Top& op);
    /// @brief Give access to base class
-   friend Operator::BinaryBaseOp<ImplOp<Tout, Tin, Top, Treatment>, Tout, Tin, Top>;
+   friend Operator::BinaryBaseOp<ImplOp<Tout, Tin, Top, Treatment>, Tout, Tin,
+      Top>;
    /// @brief index typedef
    using IndexType = typename Tin::IndexType;
    /// @brief layer index cache
@@ -95,8 +96,8 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in,
    for (IndexType h = 0; h < _layerIndex.size(); ++h)
    {
       // select correct type to extract slice
-      constexpr bool isSliceOpRowMaj =
-         std::is_same_v<typename Top::OrderType, View::LoopOrderType<View::j_t, View::i_t, View::k_t>>;
+      constexpr bool isSliceOpRowMaj = std::is_same_v<typename Top::OrderType,
+         View::LoopOrderType<View::j_t, View::i_t, View::k_t>>;
       using opSliceAtt_t =
          std::conditional_t<isSliceOpRowMaj, View::dense2DRM, View::dense2D>;
       using dataSliceAtt_t =

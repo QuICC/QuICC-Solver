@@ -199,17 +199,18 @@ TEST_CASE("Cross Cpu Functor", "CrossCpuFunctor")
    double scaling = 0.25;
    using namespace QuICC::Pointwise::Cpu;
    using namespace QuICC::Pointwise;
-   auto addOp =
-      std::make_unique<Op<CrossCompFunctor<double>, view_t, view_t, view_t, view_t, view_t>>(
-         CrossCompFunctor<double>(scaling));
+   auto addOp = std::make_unique<
+      Op<CrossCompFunctor<double>, view_t, view_t, view_t, view_t, view_t>>(
+      CrossCompFunctor<double>(scaling));
 
    addOp->apply(viewC0, viewU1, viewU2, viewV1, viewV2);
 
    // check
-   auto eps = 10*std::numeric_limits<double>::epsilon();
+   auto eps = 10 * std::numeric_limits<double>::epsilon();
    for (std::uint64_t i = 0; i < S; ++i)
    {
-      CHECK(std::abs(viewC0[i] - scaling * (viewU1[i] * viewV2[i] - viewU2[i] * viewV1[i])) < eps);
+      CHECK(std::abs(viewC0[i] - scaling * (viewU1[i] * viewV2[i] -
+                                              viewU2[i] * viewV1[i])) < eps);
    }
 }
 
@@ -252,17 +253,17 @@ TEST_CASE("Dot Cpu Functor", "DotCpuFunctor")
    double scaling = 0.25;
    using namespace QuICC::Pointwise::Cpu;
    using namespace QuICC::Pointwise;
-   auto addOp =
-      std::make_unique<Op<DotFunctor<double>, view_t, view_t, view_t, view_t, view_t, view_t, view_t>>(
-         DotFunctor<double>(scaling));
+   auto addOp = std::make_unique<Op<DotFunctor<double>, view_t, view_t, view_t,
+      view_t, view_t, view_t, view_t>>(DotFunctor<double>(scaling));
 
    addOp->apply(viewOut, viewU0, viewU1, viewU2, viewV0, viewV1, viewV2);
 
    // check
-   auto eps = 10*std::numeric_limits<double>::epsilon();
+   auto eps = 10 * std::numeric_limits<double>::epsilon();
    for (std::uint64_t i = 0; i < S; ++i)
    {
-      CHECK(std::abs(viewOut[i] - scaling * (viewU0[i] * viewV0[i]
-      + viewU1[i] * viewV1[i] + viewU2[i] * viewV2[i])) < eps);
+      CHECK(std::abs(viewOut[i] -
+                     scaling * (viewU0[i] * viewV0[i] + viewU1[i] * viewV1[i] +
+                                  viewU2[i] * viewV2[i])) < eps);
    }
 }

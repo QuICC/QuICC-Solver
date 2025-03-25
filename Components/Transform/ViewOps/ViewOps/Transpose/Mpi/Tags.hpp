@@ -12,9 +12,7 @@
 
 namespace QuICC {
 namespace Transpose {
-namespace Mpi
-{
-
+namespace Mpi {
 
 
 //

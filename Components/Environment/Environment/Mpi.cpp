@@ -202,14 +202,14 @@ void Mpi::checkCudaAwareness()
 
    bool isCudaAware = false;
 
-   // OpenMPI check
-   #ifdef MPIX_CUDA_AWARE_SUPPORT
+// OpenMPI check
+#ifdef MPIX_CUDA_AWARE_SUPPORT
    isCudaAware = MPIX_Query_cuda_support();
-   #endif
+#endif
 
    // MPICH check
    auto mpichCheck = std::getenv("MPICH_GPU_SUPPORT_ENABLED");
-   if(mpichCheck != nullptr)
+   if (mpichCheck != nullptr)
    {
       int mpich_gpu_support_enabled = std::stoi(mpichCheck);
       if (mpich_gpu_support_enabled == 1)
@@ -220,7 +220,7 @@ void Mpi::checkCudaAwareness()
 
    if (Mpi::mId == Mpi::mIoRank)
    {
-      if(isCudaAware)
+      if (isCudaAware)
       {
          std::cout << "Mpi is cuda aware!\n";
       }

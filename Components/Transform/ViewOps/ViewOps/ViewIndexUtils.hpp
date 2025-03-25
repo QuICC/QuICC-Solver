@@ -113,8 +113,8 @@ ptrAndIdx densePtrAndIdx(const std::array<std::uint32_t, 3> logDims,
 /// @param order order for which the metadata is created
 /// @return pointer and indices in a struct
 template <>
-inline ptrAndIdx densePtrAndIdx<DCCSC3D>(const std::array<std::uint32_t, 3> logDims,
-   const dimOrder order)
+inline ptrAndIdx densePtrAndIdx<DCCSC3D>(
+   const std::array<std::uint32_t, 3> logDims, const dimOrder order)
 {
    std::array<std::uint32_t, 3> dims = getDims(logDims, order);
    auto N = dims[1];
@@ -141,8 +141,8 @@ inline ptrAndIdx densePtrAndIdx<DCCSC3D>(const std::array<std::uint32_t, 3> logD
 /// @param order order for which the metadata is created
 /// @return pointer and indices in a struct
 template <>
-inline ptrAndIdx densePtrAndIdx<DCCSC3DJIK>(const std::array<std::uint32_t, 3> logDims,
-   const dimOrder order)
+inline ptrAndIdx densePtrAndIdx<DCCSC3DJIK>(
+   const std::array<std::uint32_t, 3> logDims, const dimOrder order)
 {
    return densePtrAndIdx<DCCSC3D>(logDims, order);
 }
@@ -153,8 +153,8 @@ inline ptrAndIdx densePtrAndIdx<DCCSC3DJIK>(const std::array<std::uint32_t, 3> l
 /// @param order order for which the metadata is created
 /// @return pointer and indices in a struct
 template <>
-inline ptrAndIdx densePtrAndIdx<S1CLCSC3D>(const std::array<std::uint32_t, 3> logDims,
-   const dimOrder order)
+inline ptrAndIdx densePtrAndIdx<S1CLCSC3D>(
+   const std::array<std::uint32_t, 3> logDims, const dimOrder order)
 {
    return densePtrAndIdx<DCCSC3D>(logDims, order);
 }
@@ -240,7 +240,7 @@ inline ptrAndIdx densePtrAndIdxStep1<DCCSC3D>(
 /// @param order order for which the metadata is created
 /// @return pointer and indices in a struct
 template <>
-ptrAndIdx densePtrAndIdxStep1<DCCSC3DJIK>(
+inline ptrAndIdx densePtrAndIdxStep1<DCCSC3DJIK>(
    const std::array<std::uint32_t, 3> logDims, const dimOrder order)
 {
    return densePtrAndIdxStep1<DCCSC3D>(logDims, order);

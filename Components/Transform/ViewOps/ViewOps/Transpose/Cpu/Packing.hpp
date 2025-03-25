@@ -31,11 +31,11 @@ void pack(View::ViewBase<TDATA> buffer, const TDATA* in,
    {
       for (int j = 0; j < sendCountsView[i]; ++j)
       {
-         buffer[sendBufferDisplsView[i]+j] = *(in + sendDisplsView[i*J+j]);
+         buffer[sendBufferDisplsView[i] + j] =
+            *(in + sendDisplsView[i * J + j]);
       }
    }
 }
-
 
 
 template <class TDATA>
@@ -52,7 +52,8 @@ void unPack(TDATA* out, const View::ViewBase<TDATA> buffer,
    {
       for (int j = 0; j < recvCountsView[i]; ++j)
       {
-         *(out + recvDisplsView[i*J+j]) = buffer[recvBufferDisplsView[i]+j];
+         *(out + recvDisplsView[i * J + j]) =
+            buffer[recvBufferDisplsView[i] + j];
       }
    }
 }
