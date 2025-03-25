@@ -515,6 +515,11 @@ void Coordinator::init(const Array& tstep, const SharedSimulationBoundary spBcs)
    stage.done();
 }
 
+void Coordinator::setGraphOptions(const GraphOptions& options)
+{
+   mGraphOptions = options;
+}
+
 void Coordinator::useStateTime(const MHDFloat time, const MHDFloat timestep)
 {
    this->mDiagnostics.useStateTime(time, timestep);
