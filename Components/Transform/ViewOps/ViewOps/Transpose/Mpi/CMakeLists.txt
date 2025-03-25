@@ -4,10 +4,10 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
 )
 
 # Add public header
-set(PHS
-  Mpi/Op.hpp
-  Mpi/Comm.hpp
-)
+# set(PHS
+#   Mpi/Op.hpp
+#   Mpi/Comm.hpp
+# )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PROPERTIES
@@ -18,4 +18,5 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
   PUBLIC
     QuICC::Environment
     QuICC::View
+    QuICC::Memory
 )

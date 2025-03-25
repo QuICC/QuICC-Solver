@@ -77,12 +77,7 @@ TEST_CASE("View Two Diminsional CSR", "[ViewTwoDimCSR]")
 {
    constexpr size_t M = 3;
    constexpr size_t N = 4;
-   // clang-format off
-   std::array<double, M*N> fullData = {1,0,0,3,
-                                       0,0,0,0,
-                                       2,0,0,0};
-   // clang-format on
-
+   std::array<double, M * N> fullData = {1, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0};
    constexpr size_t S = 3;
    std::array<double, S> data = {1, 3, 2};
 
@@ -113,13 +108,7 @@ TEST_CASE("View Two Dimensional CSC", "[ViewTwoDimCSC]")
 {
    constexpr size_t M = 3;
    constexpr size_t N = 4;
-
-   // clang-format off
-   std::array<double, M*N> fullData = {1,0,0,3,
-                                       0,0,0,0,
-                                       2,0,0,0};
-   // clang-format on
-
+   std::array<double, M * N> fullData = {1, 0, 0, 3, 0, 0, 0, 0, 2, 0, 0, 0};
    constexpr size_t S = 3;
    std::array<double, S> data = {1, 2, 3};
 
@@ -152,23 +141,11 @@ TEST_CASE("ViewThreeDimDtrClColMaj", "[ViewThreeDimDtrClColMaj]")
    constexpr size_t N = 2;
    constexpr size_t K = 3;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 2, 3, 4, 5, 6, 0, 7, 8, 0, 10, 11, 0,
+      0, 13, 0, 0, 16};
 
-   // clang-format off
-   std::array<double, SF> fullData = {1,2,3,
-                                      4,5,6,
-                                          0,7,8,
-                                          0,10,11,
-                                             0,0,13,
-                                             0,0,16};
-
-   constexpr size_t S = M*2+2*2+2;
-   std::array<double, S> data = {1,2,3,
-                                 4,5,6,
-                                       7,8,
-                                       10,11,
-                                             13,
-                                             16};
-   // clang-format on
+   constexpr size_t S = M * 2 + 2 * 2 + 2;
+   std::array<double, S> data = {1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 13, 16};
 
 
    // Akin full AL op
@@ -207,23 +184,11 @@ TEST_CASE("ViewThreeDim Compressed step 1 Column Layer ColMaj",
    constexpr size_t N = 2;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 10};
 
-   // clang-format off
-   std::array<double, SF> fullData = {1,2,3,4,
-                                      5,6,7,8,
-                                          0,0,0,0,
-                                          0,0,0,0,
-                                             0,0,0,0,
-                                             0,0,0,0,
-                                                0,0,0,9,
-                                                0,0,0,10};
-
-   constexpr size_t S = M*N+N;
-   std::array<double, S> data = {1,2,3,4,
-                                 5,6,7,8,
-                                       9,
-                                       10};
-   // clang-format on
+   constexpr size_t S = M * N + N;
+   std::array<double, S> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
 
    // Akin distributed AL op
@@ -262,32 +227,11 @@ TEST_CASE(
    constexpr size_t N = 2;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 5, 2, 6, 3, 7, 4, 8, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 10};
 
-   // clang-format off
-   std::array<double, SF> fullData = {1,5,
-                                    2,6,
-                                    3,7,
-                                    4,8,
-                                       0,0,
-                                       0,0,
-                                       0,0,
-                                       0,0,
-                                          0,0,
-                                          0,0,
-                                          0,0,
-                                          0,0,
-                                             0,0,
-                                             0,0,
-                                             0,0,
-                                             9,10};
-
-   constexpr size_t S = M*N+M;
-   std::array<double, S> data = {1,5,
-                                 2,6,
-                                 3,7,
-                                 4,8,
-                                    9,10};
-   // clang-format on
+   constexpr size_t S = M * N + M;
+   std::array<double, S> data = {1, 5, 2, 6, 3, 7, 4, 8, 9, 10};
 
 
    // Akin distributed AL op
@@ -327,32 +271,11 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer ColMaj ",
    constexpr size_t N = 4;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 10};
 
-   // clang-format off
-   std::array<double, SF> fullData = {1,2,
-                                    3,4,
-                                    5,6,
-                                    7,8,
-                                       0,0,
-                                       0,0,
-                                       0,0,
-                                       0,0,
-                                          0,0,
-                                          0,0,
-                                          0,0,
-                                          0,0,
-                                             0,0,
-                                             0,0,
-                                             0,0,
-                                             9,10};
-
-   constexpr size_t S = M*N+M;
-   std::array<double, S> data = {1,2,
-                                 3,4,
-                                 5,6,
-                                 7,8,
-                                 9,10};
-   // clang-format on
+   constexpr size_t S = M * N + M;
+   std::array<double, S> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
    // Akin distributed AL op
    // Dense column, dense triangular row, compressed triangular layer
@@ -389,23 +312,11 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column "
    constexpr size_t N = 4;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 3, 5, 7, 2, 4, 6, 8, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 10};
 
-   // clang-format off
-   std::array<double, SF> fullData = {1,3,5,7,
-                                      2,4,6,8,
-                                          0,0,0,0,
-                                          0,0,0,0,
-                                             0,0,0,0,
-                                             0,0,0,0,
-                                                0,0,0,9,
-                                                0,0,0,10};
-
-   constexpr size_t S = M*N+M;
-   std::array<double, S> data = {1,3,5,7,
-                                 2,4,6,8,
-                                    9,
-                                    10};
-   // clang-format on
+   constexpr size_t S = M * N + M;
+   std::array<double, S> data = {1, 3, 5, 7, 2, 4, 6, 8, 9, 10};
 
 
    // Akin distributed AL op
@@ -444,23 +355,11 @@ TEST_CASE("ViewThreeDim Dense Column, Compressed step 1 row/layer, Row Column "
    constexpr size_t N = 4;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 5, 0, 2,
+      4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 8};
 
-   // clang-format off
-   std::array<double, SF> fullData = {0,0,0,0,
-                                      0,0,0,0,
-                                          0,1,3,5,
-                                          0,2,4,6,
-                                             0,0,0,0,
-                                             0,0,0,0,
-                                                0,0,0,7,
-                                                0,0,0,8};
-
-   constexpr size_t S = M*(N-1)+M;
-   std::array<double, S> data = {1,3,5,
-                                 2,4,6,
-                                    7,
-                                    8};
-   // clang-format on
+   constexpr size_t S = M * (N - 1) + M;
+   std::array<double, S> data = {1, 3, 5, 2, 4, 6, 7, 8};
 
 
    // Akin distributed AL op
@@ -500,23 +399,12 @@ TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer ColMaj",
    constexpr size_t N = 2;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 2, 3, 4, 0, 0, 0, 0, 5, 6, 7, 8, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 10, 11, 12, 13, 14, 15, 16};
 
-   // clang-format off
-   std::array<double, SF> fullData = {1,2,3,4,
-                                      0,0,0,0,
-                                          5,6,7,8,
-                                          0,0,0,0,
-                                             0,0,0,0,
-                                             0,0,0,0,
-                                                9,10,11,12,
-                                                13,14,15,16};
-
-   constexpr size_t S = M*N*2;
-   std::array<double, S> data = {1,2,3,4,
-                                 5,6,7,8,
-                                       9,10,11,12,
-                                       13,14,15,16};
-   // clang-format on
+   constexpr size_t S = M * N * 2;
+   std::array<double, S> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+      15, 16};
 
 
    // Akin distributed Fourier op
@@ -555,23 +443,12 @@ TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer ColMaj Padded",
    constexpr size_t K = 4;
    constexpr size_t lds = 6;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 2, 3, 4, 0, 0, 0, 0, 5, 6, 7, 8, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 10, 11, 12, 13, 14, 15, 16};
 
-   // clang-format off
-   std::array<double, SF> fullData = {1,2,3,4,
-                                      0,0,0,0,
-                                         5,6,7,8,
-                                         0,0,0,0,
-                                             0,0,0,0,
-                                             0,0,0,0,
-                                                9,10,11,12,
-                                                13,14,15,16};
-
-   constexpr size_t S = lds*N*2;
-   std::array<double, S> data = {1,2,3,4,0,0,
-                                 5,6,7,8,0,0,
-                                       9,10,11,12,0,0,
-                                       13,14,15,16,0,0};
-   // clang-format on
+   constexpr size_t S = lds * N * 2;
+   std::array<double, S> data = {1, 2, 3, 4, 0, 0, 5, 6, 7, 8, 0, 0, 9, 10, 11,
+      12, 0, 0, 13, 14, 15, 16, 0, 0};
 
 
    // Akin distributed Fourier op
@@ -609,40 +486,12 @@ TEST_CASE("ViewThreeDim Dense Column CSC Row/Layer JIK",
    constexpr size_t N = 2;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0,
+      8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 13, 10, 14, 11, 15, 12, 16};
 
-
-   // clang-format off
-   std::array<double, SF> fullData = {1,0,
-                                      2,0,
-                                      3,0,
-                                      4,0,
-                                         5,0,
-                                         6,0,
-                                         7,0,
-                                         8,0,
-                                             0,0,
-                                             0,0,
-                                             0,0,
-                                             0,0,
-                                                9,13,
-                                                10,14,
-                                                11,15,
-                                                12,16};
-
-   constexpr size_t S = M*N*2;
-   std::array<double, S> data = {1,
-                                 2,
-                                 3,
-                                 4,
-                                    5,
-                                    6,
-                                    7,
-                                    8,
-                                       9,13,
-                                       10,14,
-                                       11,15,
-                                       12,16};
-   // clang-format on
+   constexpr size_t S = M * N * 2;
+   std::array<double, S> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 10, 14, 11, 15,
+      12, 16};
 
 
    // Akin distributed Fourier op
@@ -679,23 +528,12 @@ TEST_CASE("ViewThreeDim Dense Column/Row compressed layer ColMaj",
    constexpr size_t N = 2;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 10, 11, 12, 13, 14, 15, 16};
 
-   // clang-format off
-   std::array<double, SF> fullData = {1,2,3,4,
-                                      5,6,7,8,
-                                          0,0,0,0,
-                                          0,0,0,0,
-                                             0,0,0,0,
-                                             0,0,0,0,
-                                              9,10,11,12,
-                                              13,14,15,16};
-
-   constexpr size_t S = M*N*2;
-   std::array<double, S> data = {1,2,3,4,
-                                 5,6,7,8,
-                                       9,10,11,12,
-                                       13,14,15,16};
-   // clang-format on
+   constexpr size_t S = M * N * 2;
+   std::array<double, S> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+      15, 16};
 
 
    // Akin distributed JW projector operator
@@ -731,28 +569,13 @@ TEST_CASE("ViewThreeDim Dense Column/Row compressed layer Row Major",
    constexpr size_t N = 2;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
-
-   // clang-format off
-    std::array<double, SF> fullData = {1,2,3,4,
-                                       5,6,7,8,
-                                          0,0,0,0,
-                                          0,0,0,0,
-                                             0,0,0,0,
-                                             0,0,0,0,
-                                                9,10,11,12,
-                                                13,14,15,16};
+   std::array<double, SF> fullData = {1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 10, 11, 12, 13, 14, 15, 16};
 
 
-    constexpr size_t S = M*N*2;
-    std::array<double, S> data = {1,5,
-                                  2,6,
-                                  3,7,
-                                  4,8,
-                                       9,13,
-                                       10,14,
-                                       11,15,
-                                       12,16};
-   // clang-format on
+   constexpr size_t S = M * N * 2;
+   std::array<double, S> data = {1, 5, 2, 6, 3, 7, 4, 8, 9, 13, 10, 14, 11, 15,
+      12, 16};
 
 
    // Akin distributed JW projector operator
@@ -788,26 +611,12 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane ColMaj",
    constexpr size_t N = 3;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 2, 3, 4, 0, 0, 0, 0, 5, 6, 7, 8, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      9, 0, 0, 0, 0, 0, 0, 0, 0};
 
-   // clang-format off
-   std::array<double, SF> fullData = {1,2,3,4,
-                                      0,0,0,0,
-                                      5,6,7,8,
-                                          0,0,0,0,
-                                          0,0,0,0,
-                                          0,0,0,0,
-                                             0,0,0,0,
-                                             0,0,0,0,
-                                             0,0,0,0,
-                                                0,0,0,9,
-                                                0,0,0,0,
-                                                0,0,0,0};
-
-   constexpr size_t S = M*2+1;
-   std::array<double, S> data = {1,2,3,4,
-                                 5,6,7,8,
-                                       9};
-   // clang-format on
+   constexpr size_t S = M * 2 + 1;
+   std::array<double, S> data = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
 
    // Akin distributed AL projector input on cpu
@@ -845,32 +654,12 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane JIK",
    constexpr size_t N = 3;
    constexpr size_t K = 4;
    constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = {1, 0, 5, 2, 0, 6, 3, 0, 7, 4, 0, 8, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 9, 0, 0};
 
-   // clang-format off
-   std::array<double, SF> fullData = {1,0,5,
-                                      2,0,6,
-                                      3,0,7,
-                                      4,0,8,
-                                          0,0,0,
-                                          0,0,0,
-                                          0,0,0,
-                                          0,0,0,
-                                             0,0,0,
-                                             0,0,0,
-                                             0,0,0,
-                                             0,0,0,
-                                                0,0,0,
-                                                0,0,0,
-                                                0,0,0,
-                                                9,0,0};
-
-   constexpr size_t S = M*2+1;
-   std::array<double, S> data = {1,5,
-                                 2,6,
-                                 3,7,
-                                 4,8,
-                                       9};
-   // clang-format on
+   constexpr size_t S = M * 2 + 1;
+   std::array<double, S> data = {1, 5, 2, 6, 3, 7, 4, 8, 9};
 
 
    // Akin distributed AL projector input on cpu

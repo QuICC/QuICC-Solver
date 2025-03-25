@@ -225,23 +225,6 @@ MPI_Comm getSubComm(const std::vector<int>& redSet, const MPI_Comm comm)
    return subComm;
 }
 
-std::vector<int> getCount(const std::vector<std::vector<int>>& displs)
-{
-   std::vector<int> count(displs.size());
-   for (std::size_t i = 0; i < displs.size(); ++i)
-   {
-      if (displs[i].size() > 0)
-      {
-         count[i] = 1;
-      }
-      else
-      {
-         count[i] = 0;
-      }
-   }
-   return count;
-}
-
 } // namespace Mpi
 } // namespace Transpose
 } // namespace QuICC

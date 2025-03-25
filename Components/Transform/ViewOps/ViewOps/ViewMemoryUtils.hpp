@@ -11,12 +11,14 @@
 // Project includes
 //
 #include "Memory/Cpu/NewDelete.hpp"
+#include "Memory/Cpu/Pool.hpp"
 #include "Memory/Memory.hpp"
 #include "Memory/Pensieve.hpp"
 #include "View/View.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #include "Memory/Cuda/Malloc.hpp"
+#include "Memory/Cuda/Pool.hpp"
 #endif
 
 namespace QuICC {
@@ -51,7 +53,7 @@ public:
 
    /// @brief ctor referencing view to convert
    /// @param view
-   tempOnHostMemorySpace(Tview& view, std::uint16_t mode);
+   tempOnHostMemorySpace(const Tview& view, const std::uint16_t mode);
 
    /// @brief dtor
    ~tempOnHostMemorySpace();
@@ -71,9 +73,11 @@ private:
 
 
 template <class Tview>
-tempOnHostMemorySpace<Tview>::tempOnHostMemorySpace(Tview& view,
-   std::uint16_t mode) :
-    _viewRef(view), _mode(mode)
+tempOnHostMemorySpace<Tview>::tempOnHostMemorySpace(const Tview& view,
+   const std::uint16_t mode) :
+    // This is done on purpose to modify read only views
+    // we restore the initial state of the view on exit
+    _viewRef(const_cast<Tview&>(view)), _mode(mode)
 {
    using namespace QuICC::View;
 #ifdef QUICC_HAS_CUDA_BACKEND
@@ -89,7 +93,7 @@ tempOnHostMemorySpace<Tview>::tempOnHostMemorySpace(Tview& view,
       // store reference to device memory
       _dataDevice = ViewBase<ScalarType>(view.data(), view.size());
       // redirect view
-      view = Tview(_dataHost.data(), _dataHost.size());
+      const_cast<Tview&>(view) = Tview(_dataHost.data(), _dataHost.size());
       if (_mode & TransferMode::read)
       {
          // transfer data from gpu to temp
