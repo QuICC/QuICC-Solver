@@ -25,13 +25,14 @@ if __name__ == '__main__':
         pipe = libtest_pipeline(c)
         pipe.write()
 
-    # Model stability without timing pipelines
-    model_stability_confs = [
-        config('mpi-petsc', 'alps-zen2', 'baseimage_petsc')
-        ]
-    for c in model_stability_confs:
-        pipe = model_stability_pipeline(c)
-        pipe.write()
+    #/// \todo this is broken
+    # # Model stability without timing pipelines
+    # model_stability_confs = [
+    #     config('mpi-petsc', 'alps-zen2', 'baseimage_petsc')
+    #     ]
+    # for c in model_stability_confs:
+    #     pipe = model_stability_pipeline(c)
+    #     pipe.write()
 
     # Model without timing pipelines
     model_notiming_confs = [

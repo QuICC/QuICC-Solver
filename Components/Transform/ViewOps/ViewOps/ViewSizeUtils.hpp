@@ -35,7 +35,7 @@ std::size_t getDataSize(const std::array<std::uint32_t, 3> dim,
 /// @param meta
 /// @return
 template <>
-std::size_t getDataSize<DCCSC3D>(const std::array<std::uint32_t, 3> dim,
+inline std::size_t getDataSize<DCCSC3D>(const std::array<std::uint32_t, 3> dim,
    const ptrAndIdx& meta)
 {
    std::size_t cumWidth = 0;
@@ -53,8 +53,8 @@ std::size_t getDataSize<DCCSC3D>(const std::array<std::uint32_t, 3> dim,
 /// @param meta
 /// @return
 template <>
-std::size_t getDataSize<DCCSC3DJIK>(const std::array<std::uint32_t, 3> dim,
-   const ptrAndIdx& meta)
+inline std::size_t getDataSize<DCCSC3DJIK>(
+   const std::array<std::uint32_t, 3> dim, const ptrAndIdx& meta)
 {
    return getDataSize<DCCSC3D>(dim, meta);
 }
@@ -65,8 +65,8 @@ std::size_t getDataSize<DCCSC3DJIK>(const std::array<std::uint32_t, 3> dim,
 /// @param meta
 /// @return
 template <>
-std::size_t getDataSize<S1CLCSC3D>(const std::array<std::uint32_t, 3> dim,
-   const ptrAndIdx& meta)
+inline std::size_t getDataSize<S1CLCSC3D>(
+   const std::array<std::uint32_t, 3> dim, const ptrAndIdx& meta)
 {
    std::size_t cumSize = 0;
    for (std::size_t ptr = 0; ptr < meta.ptr.size() - 1; ++ptr)
@@ -86,8 +86,8 @@ std::size_t getDataSize<S1CLCSC3D>(const std::array<std::uint32_t, 3> dim,
 /// @param meta
 /// @return
 template <>
-std::size_t getDataSize<S1CLCSC3DJIK>(const std::array<std::uint32_t, 3> dim,
-   const ptrAndIdx& meta)
+inline std::size_t getDataSize<S1CLCSC3DJIK>(
+   const std::array<std::uint32_t, 3> dim, const ptrAndIdx& meta)
 {
    return getDataSize<S1CLCSC3D>(dim, meta);
 }
