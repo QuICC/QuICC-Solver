@@ -135,7 +135,7 @@ namespace Xml {
 
       } else
       {
-         throw std::logic_error("XML tag not found " + tag + "!");
+         throw std::logic_error("Unknown XML tag " + tag + "!");
       }
    }
 
