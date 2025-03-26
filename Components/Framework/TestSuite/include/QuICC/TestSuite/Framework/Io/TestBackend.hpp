@@ -146,7 +146,7 @@ protected:
    /**
     * @brief Number of boundary conditions
     *
-    * @fId  Field ID
+    * @param fId  Field ID
     */
    int nBc(const SpectralFieldId& fId) const override;
 
