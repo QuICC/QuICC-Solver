@@ -22,6 +22,7 @@
 #include "ViewOps/Transpose/Mpi/Tags.hpp"
 #include "ViewOps/Transpose/Packing.hpp"
 #include "ViewOps/Transpose/StructArray.hpp"
+#include "ViewOps/ViewMemoryUtils.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #include "Memory/Cuda/Malloc.hpp"
@@ -175,16 +176,28 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
    _recvDisplsView = View::View<int, View::dense2DRM>(
       {_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
 
+   // Helper views to linearize cpu/gpu data
+   View::ViewBase<int> _sendDisplsViewLin(_sendDisplsDevice.data(),
+      _sendDisplsDevice.size());
+   View::ViewBase<int> _recvDisplsViewLin(_recvDisplsDevice.data(),
+      _recvDisplsDevice.size());
+
+   // Move temporarly to host
+   using namespace QuICC::Memory;
+   tempOnHostMemorySpace converterS(_sendDisplsViewLin, TransferMode::write | TransferMode::block);
+   tempOnHostMemorySpace converterR(_recvDisplsViewLin, TransferMode::write);
+
+
    // Linearize
    for (int i = 0; i < _nSubComm; ++i)
    {
       for (int j = 0; j < _sendCounts[i]; ++j)
       {
-         _sendDisplsView[i * sendCountsMax + j] = _sendDispls[i][j];
+         _sendDisplsViewLin[i * sendCountsMax + j] = _sendDispls[i][j];
       }
       for (int j = 0; j < _recvCounts[i]; ++j)
       {
-         _recvDisplsView[i * recvCountsMax + j] = _recvDispls[i][j];
+         _recvDisplsViewLin[i * recvCountsMax + j] = _recvDispls[i][j];
       }
    }
 
@@ -215,25 +228,56 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
       Memory::MemBlock<TDATA>(_sendBufferDispls[_nSubComm], _mem.get()));
    _recvBuffer = std::move(
       Memory::MemBlock<TDATA>(_recvBufferDispls[_nSubComm], _mem.get()));
-   // use view so that we have bound checks in debug mode
+
+   // Use view so that we have bound checks in debug mode
    _sendBufferView =
       View::ViewBase<TDATA>(_sendBuffer.data(), _sendBuffer.size());
    _recvBufferView =
       View::ViewBase<TDATA>(_recvBuffer.data(), _recvBuffer.size());
 
-
+   #ifndef QUICC_HAS_CUDA_BACKEND
    // Buffer offsets
    _sendBufferDisplsView =
       View::ViewBase<int>(_sendBufferDispls.data(), _sendBufferDispls.size());
    _recvBufferDisplsView =
       View::ViewBase<int>(_recvBufferDispls.data(), _recvBufferDispls.size());
 
-
    // Send/recv Counts
    _sendCountsView =
       View::ViewBase<int>(_sendCounts.data(), _sendCounts.size());
    _recvCountsView =
       View::ViewBase<int>(_recvCounts.data(), _recvCounts.size());
+   #else
+   // Buffer offsets
+   _sendBufferDisplsDevice = std::move(
+      Memory::MemBlock<int>(_sendBufferDispls.size(), _mem.get()));
+   _recvBufferDisplsDevice = std::move(
+      Memory::MemBlock<int>(_recvBufferDispls.size(), _mem.get()));
+   _sendBufferDisplsView =
+      View::ViewBase<int>(_sendBufferDisplsDevice.data(), _sendBufferDisplsDevice.size());
+   _recvBufferDisplsView =
+      View::ViewBase<int>(_recvBufferDisplsDevice.data(), _recvBufferDisplsDevice.size());
+   // Copy to device
+   cudaErrChk(cudaMemcpy(_sendBufferDisplsDevice.data(), _sendBufferDispls.data(),
+      _sendBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(_recvBufferDisplsDevice.data(), _recvBufferDispls.data(),
+      _recvBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
+
+   // Send/recv Counts
+   _sendCountsDevice =
+      std::move(Memory::MemBlock<int>(_sendCounts.size(), _mem.get()));
+   _recvCountsDevice =
+      std::move(Memory::MemBlock<int>(_recvCounts.size(), _mem.get()));
+   _sendCountsView =
+      View::ViewBase<int>(_sendCountsDevice.data(), _sendCountsDevice.size());
+   _recvCountsView =
+      View::ViewBase<int>(_recvCountsDevice.data(), _recvCountsDevice.size());
+   // Copy to device
+   cudaErrChk(cudaMemcpy(_sendCountsDevice.data(), _sendCounts.data(),
+      _sendCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(_recvCountsDevice.data(), _recvCounts.data(),
+      _recvCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
+   #endif
 
    //
    // End Buffers
