@@ -28,7 +28,7 @@ extern "C" void @FunSignature@
     #ifdef QUICC_MPI
     using namespace QuICC::Transpose::Mpi;
     #else
-    using namespace QuICC::Transpose::Cpu;
+    using namespace QuICC::Transpose::@Backend@;
     #endif
     using namespace QuICC::Transpose;
     using Tin = std::vector<QuICC::View::View<@TypeIn@, QuICC::View::@LayoutIn@>>;

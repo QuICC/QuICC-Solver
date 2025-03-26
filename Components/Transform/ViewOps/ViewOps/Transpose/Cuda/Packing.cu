@@ -168,7 +168,8 @@ template<class TDATA, int SIZE>
 __global__ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
    const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
-   const View::ViewBase<int> sendBufferDisplsView)
+   const View::ViewBase<int> sendBufferDisplsView,
+   const std::int64_t groupSize)
 {
    const auto I = sendDisplsView.dims()[0];
    const auto J = sendDisplsView.dims()[1];
@@ -225,7 +226,7 @@ template<class TDATA, int SIZE>
 __global__ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
    const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
-   const View::ViewBase<int> recvBufferDisplsView, 
+   const View::ViewBase<int> recvBufferDisplsView,
    const std::int64_t groupSize)
 {
 
@@ -277,51 +278,51 @@ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
 // Explicit instantiations
 // >>>>
 template
-void pack(View::ViewBase<int> buffer, 
+void pack(View::ViewBase<int> buffer,
    structArray<const int*, 16> in,
    const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
-   const View::ViewBase<int> sendBufferDisplsView, 
+   const View::ViewBase<int> sendBufferDisplsView,
    const std::int64_t groupSize);
 
 template
-void pack(View::ViewBase<double> buffer, 
+void pack(View::ViewBase<double> buffer,
    structArray<const double*, 16> in,
    const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
-   const View::ViewBase<int> sendBufferDisplsView, 
+   const View::ViewBase<int> sendBufferDisplsView,
    const std::int64_t groupSize);
 
 template
-void pack(View::ViewBase<std::complex<double>> buffer, 
+void pack(View::ViewBase<std::complex<double>> buffer,
    structArray<const std::complex<double>*, 16> in,
    const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
-   const View::ViewBase<int> sendBufferDisplsView, 
+   const View::ViewBase<int> sendBufferDisplsView,
    const std::int64_t groupSize);
 
 template
-void unPack(structArray<int*, 16> out, 
+void unPack(structArray<int*, 16> out,
    const View::ViewBase<int> buffer,
    const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
-   const View::ViewBase<int> recvBufferDisplsView, 
+   const View::ViewBase<int> recvBufferDisplsView,
    const std::int64_t groupSize);
 
 template
-void unPack(structArray<double*, 16> out, 
+void unPack(structArray<double*, 16> out,
    const View::ViewBase<double> buffer,
    const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
-   const View::ViewBase<int> recvBufferDisplsView, 
+   const View::ViewBase<int> recvBufferDisplsView,
    const std::int64_t groupSize);
 
 template
-void unPack(structArray<std::complex<double>*, 16> out, 
+void unPack(structArray<std::complex<double>*, 16> out,
    const View::ViewBase<std::complex<double>> buffer,
    const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
-   const View::ViewBase<int> recvBufferDisplsView, 
+   const View::ViewBase<int> recvBufferDisplsView,
    const std::int64_t groupSize);
 // <<<<
 
