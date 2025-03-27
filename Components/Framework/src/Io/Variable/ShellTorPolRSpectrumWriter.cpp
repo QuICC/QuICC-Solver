@@ -17,6 +17,8 @@
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "Types/Math.hpp"
+#include "Types/Internal/Typedefs.hpp"
+#include "QuICC/Polynomial/Quadrature/ChebyshevRule.hpp"
 
 namespace QuICC {
 
@@ -40,6 +42,17 @@ void ShellTorPolRSpectrumWriter::init()
 
    this->mHasMOrdering = this->res().sim().ss().has(
       SpatialScheme::Feature::TransformSpectralOrdering123);
+
+   // Set the radial grid to match computation
+   Internal::Array g,w;
+   Polynomial::Quadrature::ChebyshevRule quad;
+   int size = 2*this->res().sim().dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL);
+   quad.computeQuadrature(g, w, size, ri, ro);
+   this->mGrid.resize(size/2);
+   for(int i = 0; i < size/2; i++)
+   {
+      this->mGrid(i) = g(2*i);
+   }
 
    ISphericalTorPolRSpectrumWriter::init();
 }

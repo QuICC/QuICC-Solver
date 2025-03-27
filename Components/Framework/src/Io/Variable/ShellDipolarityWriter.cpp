@@ -1,6 +1,6 @@
 /**
- * @file SphereDipolarityWriter.cpp
- * @brief Source of the implementation of the ASCII dipolarity in a sphere
+ * @file ShellDipolarityWriter.cpp
+ * @brief Source of the implementation of the ASCII dipolarity in a shell
  */
 
 // System includes
@@ -10,13 +10,17 @@
 
 // Project includes
 //
-#include "QuICC/Io/Variable/SphereDipolarityWriter.hpp"
+#include "QuICC/Io/Variable/ShellDipolarityWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/Dipolarity.hpp"
-#include "QuICC/SparseSM/Worland/Boundary/Value.hpp"
-#include "QuICC/Polynomial/Worland/WorlandBase.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/ICondition.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/Value.hpp"
+#include "QuICC/NonDimensional/Lower1d.hpp"
+#include "QuICC/NonDimensional/Upper1d.hpp"
+#include "QuICC/Enums/Dimensions.hpp"
+#include "QuICC/Enums/FieldIds.hpp"
 
 namespace QuICC {
 
@@ -24,14 +28,14 @@ namespace Io {
 
 namespace Variable {
 
-   SphereDipolarityWriter::SphereDipolarityWriter(const std::string& prefix, const std::string& type)
+   ShellDipolarityWriter::ShellDipolarityWriter(const std::string& prefix, const std::string& type)
       : IVariableAsciiWriter(prefix + Tags::Dipolarity::BASENAME, Tags::Dipolarity::EXTENSION, prefix + Tags::Dipolarity::HEADER, type, Tags::Dipolarity::VERSION, Dimensions::Space::SPECTRAL, EXTEND), mHasMOrdering(false), mAxialDipole(0.0), mNonAxialDipole(0.0)
    {
    }
 
-   void SphereDipolarityWriter::init()
+   void ShellDipolarityWriter::init()
    {
-      this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::TransformSpectralOrdering123);
+      this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123);
       const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
 
       // Compute boundary operators
@@ -64,19 +68,21 @@ namespace Variable {
          }
       }
 
-      Polynomial::Worland::WorlandBase wb;
+      typedef SparseSM::Chebyshev::LinearMap::Boundary::ICondition::Position
+         Position;
+      MHDFloat ri = this->mPhysical.find(NonDimensional::Lower1d::id())->second->value();
+      MHDFloat ro = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
+
       for (auto& [l, op] : this->mValue)
       {
-         auto a = wb.alpha(l);
-         auto db = wb.dBeta();      
-         SparseSM::Worland::Boundary::Value bc(a, db, l);
+         SparseSM::Chebyshev::LinearMap::Boundary::Value bc(ri, ro, Position::TOP);
          op = bc.compute(nN-1).cast<MHDFloat>();
       }
 
       IVariableAsciiWriter::init();
    }
 
-   void SphereDipolarityWriter::prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord)
+   void ShellDipolarityWriter::prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord)
    {
       // get iterator to field
       vector_iterator vIt;
@@ -103,7 +109,7 @@ namespace Variable {
       coord.communicator().converter<TId>().initiateForwardSend();
    }
 
-   void SphereDipolarityWriter::compute(Transform::TransformCoordinatorType& coord)
+   void ShellDipolarityWriter::compute(Transform::TransformCoordinatorType& coord)
    {
       constexpr auto TId = Dimensions::Transform::TRA1D;
       MatrixZ spectrum;
@@ -221,7 +227,7 @@ namespace Variable {
       coord.communicator().storage<TId>().freeBwd(pInVarPolS);
    }
 
-   void SphereDipolarityWriter::writeContent()
+   void ShellDipolarityWriter::writeContent()
    {
       // Create file
       this->preWrite();
@@ -236,6 +242,11 @@ namespace Variable {
       using Tools::Formatter::ioFW;
       int ioPrec = 14;
 
+      MHDFloat ro = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
+      this->mCmbSpectrum = this->mCmbSpectrum/ro;
+      this->mAxialDipole = this->mAxialDipole/ro;
+      this->mNonAxialDipole = this->mNonAxialDipole/ro;
+
       // Compute dipolarity
       this->mDipolarity = std::sqrt(this->mCmbSpectrum(1) / this->mCmbSpectrum.topRows(13).sum());
 
@@ -244,6 +255,9 @@ namespace Variable {
       {
          this->mFile << std::scientific;
          this->mFile << std::setprecision(ioPrec) << ioFW(ioPrec) << this->mTime << "\t" << ioFW(ioPrec) << this->mDipolarity << "\t" << this->mAxialDipole << "\t" << this->mNonAxialDipole.real() << "\t" << this->mNonAxialDipole.imag();
+         for(int count = 0; count < this->mCmbSpectrum.size(); count ++){
+            this->mFile  << "\t" << this->mCmbSpectrum(count);
+         }
          this->mFile << std::endl;
       }
 
@@ -253,11 +267,11 @@ namespace Variable {
       // Abort if is NaN
       if(std::isnan(this->mCmbSpectrum.sum()))
       {
-         QuICCEnv().abort("Sphere dipolarity is NaN!");
+         QuICCEnv().abort("Shell dipolarity is NaN!");
       }
    }
 
-   void SphereDipolarityWriter::resetEnergy()
+   void ShellDipolarityWriter::resetEnergy()
    {
       this->mCmbSpectrum.setZero();
       this->mAxialDipole = 0.0;

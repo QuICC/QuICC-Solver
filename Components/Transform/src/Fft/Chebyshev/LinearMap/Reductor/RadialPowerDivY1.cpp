@@ -32,27 +32,25 @@ void RadialPowerDivY1::initOperator() const
 
       Internal::Array igrid, iweights;
       Polynomial::Quadrature::ChebyshevRule quad;
-      quad.computeQuadrature(igrid, iweights, this->mspSetup->fwdSize(), this->mspSetup->lower(), this->mspSetup->upper());
+      quad.computeQuadrature(igrid, iweights, 2*this->mspSetup->fwdSize(), this->mspSetup->lower(), this->mspSetup->upper());
       this->mBackend.setScaler(igrid.array().pow(-1).cast<MHDFloat>().matrix());
 }
 
 void RadialPowerDivY1::applyPreOperator(Matrix& tmp, const Matrix& in) const
 {
-   this->mBackend.input(tmp, in, 1);
-   this->mBackend.getSolution(tmp, 1, 1);
+   this->mBackend.input(tmp, in);
 }
 
 void RadialPowerDivY1::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
 {
    assert(rOut.cols() == 1);
-   this->mBackend.output(rOut, tmp);
+   this->mBackend.outputGrid(rOut, tmp);
 }
 
 void RadialPowerDivY1::applyPreOperator(Matrix& tmp, const MatrixZ& in,
    const bool useReal) const
 {
-   this->mBackend.input(tmp, in, 1, useReal);
-   this->mBackend.getSolution(tmp, 1, 1);
+   this->mBackend.input(tmp, in, useReal);
 }
 
 } // namespace Reductor

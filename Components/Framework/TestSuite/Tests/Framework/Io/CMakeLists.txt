@@ -91,6 +91,7 @@ set(_tests
   SLFl:Velocity:ShellTorPolEnstrophyWriter
   SLFl:Velocity:ShellTorPolEnstrophyLSpectrumWriter
   SLFl:Velocity:ShellTorPolEnstrophyMSpectrumWriter
+  SLFl:Magnetic:ShellDipolarityWriter
   SLFm:Temperature:ShellNusseltWriter
   SLFm:Temperature:ShellScalarEnergyWriter
   SLFm:Temperature:ShellScalarLSpectrumWriter
@@ -105,6 +106,7 @@ set(_tests
   SLFm:Velocity:ShellTorPolEnstrophyWriter
   SLFm:Velocity:ShellTorPolEnstrophyLSpectrumWriter
   SLFm:Velocity:ShellTorPolEnstrophyMSpectrumWriter
+  SLFm:Magnetic:ShellDipolarityWriter
 )
 
 foreach(_test IN LISTS _tests)
