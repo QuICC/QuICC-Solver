@@ -1,6 +1,6 @@
 .test-lib:
   variables:
-    TEST_NCPU: 'grep processor /proc/cpuinfo | wc -l'
+    TEST_NCPU: $(grep processor /proc/cpuinfo | wc -l)
   script:
     - pwd
     # the tests are not installed, so we need to run them from the build directory
