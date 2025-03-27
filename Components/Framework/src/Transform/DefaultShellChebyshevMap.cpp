@@ -32,6 +32,9 @@
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Energy.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/EnergyY2.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/EnergyD1Y1.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/RadialPower.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/RadialPowerDivY1.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/RadialPowerDivY1D1Y1.hpp"
 
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/R1.hpp"
@@ -56,6 +59,9 @@
 #include "QuICC/Transform/Reductor/Energy.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
 #include "QuICC/Transform/Reductor/EnergyD1R1.hpp"
+#include "QuICC/Transform/Reductor/RadialPower.hpp"
+#include "QuICC/Transform/Reductor/RadialPowerOverr1.hpp"
+#include "QuICC/Transform/Reductor/RadialPowerOverr1D1R1.hpp"
 
 namespace QuICC {
 
@@ -89,6 +95,12 @@ namespace Transform {
       this->addOperator<Fft::Chebyshev::LinearMap::Reductor::Energy>(m, Reductor::Energy::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Reductor::EnergyD1Y1>(m, Reductor::EnergyD1R1::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Reductor::EnergyY2>(m, Reductor::EnergyR2::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::RadialPower>(m,
+         Reductor::RadialPower::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::RadialPowerDivY1>(m,
+         Reductor::RadialPowerOverr1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::RadialPowerDivY1D1Y1>(
+         m, Reductor::RadialPowerOverr1D1R1::id());
    }
  
 } // Transform

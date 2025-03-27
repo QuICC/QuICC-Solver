@@ -62,6 +62,11 @@ namespace Backend {
          void init(const SetupType& setup) const;
 
          /**
+          * @brief Set Scaler array
+          */
+         void setScaler(const Array& scaler) const;
+
+         /**
           * @brief set spectral operator
           */
          void setSpectralOperator(const SparseMatrix& mat) const;
@@ -111,6 +116,11 @@ namespace Backend {
           * @brief Set output
           */
          void output(Matrix& rOut, const Matrix& tmp) const;
+
+         /**
+          * @brief Set output on grid
+          */
+         void outputGrid(Matrix& rOut, const Matrix& tmp) const;
 
          /**
           * @brief Set output mutliplied by scalar operator
