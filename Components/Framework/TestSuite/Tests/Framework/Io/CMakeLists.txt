@@ -48,7 +48,6 @@ set(_tests
   WLFl:Temperature:SphereScalarNSpectrumWriter
   WLFl:Temperature:SphereScalarRSpectrumWriter
   WLFl:Velocity:SphereAngularMomentumWriter
-  #WLFl:Velocity:SphereMaxAbsoluteFieldValueWriter
   WLFl:Velocity:SphereTorPolEnergyWriter
   WLFl:Velocity:SphereTorPolLSpectrumWriter
   WLFl:Velocity:SphereTorPolMSpectrumWriter
@@ -68,7 +67,6 @@ set(_tests
   WLFm:Temperature:SphereScalarNSpectrumWriter
   WLFm:Temperature:SphereScalarRSpectrumWriter
   WLFm:Velocity:SphereAngularMomentumWriter
-  #WLFm:Velocity:SphereMaxAbsoluteFieldValueWriter
   WLFm:Velocity:SphereTorPolEnergyWriter
   WLFm:Velocity:SphereTorPolLSpectrumWriter
   WLFm:Velocity:SphereTorPolMSpectrumWriter
@@ -84,29 +82,19 @@ set(_tests
   SLFl:Temperature:ShellScalarLSpectrumWriter
   SLFl:Temperature:ShellScalarMSpectrumWriter
   SLFl:Temperature:ShellScalarModeSpectrumWriter
-  #SLFl:Temperature:ShellScalarRSpectrumWriter
   SLFl:Velocity:ShellTorPolEnergyWriter
   SLFl:Velocity:ShellTorPolLSpectrumWriter
   SLFl:Velocity:ShellTorPolMSpectrumWriter
   SLFl:Velocity:ShellTorPolModeSpectrumWriter
-  #SLFl:Velocity:ShellTorPolRSpectrumWriter
-  #SLFl:Velocity:ShellTorPolEnstrophyWriter
-  #SLFl:Velocity:ShellTorPolEnstrophyLSpectrumWriter
-  #SLFl:Velocity:ShellTorPolEnstrophyMSpectrumWriter
   SLFm:Temperature:ShellNusseltWriter
   SLFm:Temperature:ShellScalarEnergyWriter
   SLFm:Temperature:ShellScalarLSpectrumWriter
   SLFm:Temperature:ShellScalarMSpectrumWriter
   SLFm:Temperature:ShellScalarModeSpectrumWriter
-  #SLFm:Temperature:ShellScalarRSpectrumWriter
   SLFm:Velocity:ShellTorPolEnergyWriter
   SLFm:Velocity:ShellTorPolLSpectrumWriter
   SLFm:Velocity:ShellTorPolMSpectrumWriter
   SLFm:Velocity:ShellTorPolModeSpectrumWriter
-  #SLFm:Velocity:ShellTorPolRSpectrumWriter
-  #SLFl:Velocity:ShellTorPolEnstrophyWriter
-  #SLFl:Velocity:ShellTorPolEnstrophyLSpectrumWriter
-  #SLFl:Velocity:ShellTorPolEnstrophyMSpectrumWriter
 )
 
 foreach(_test IN LISTS _tests)
@@ -123,6 +111,39 @@ foreach(_test IN LISTS _tests)
     ID 0
     ULP 500
     WORKDIR "${QUICC_WORK_DIR}/_data/Framework/Io/${_scheme}"
+  )
+endforeach()
+
+set(_tests
+  WLFl:Velocity:SphereMaxAbsoluteFieldValueWriter
+  WLFm:Velocity:SphereMaxAbsoluteFieldValueWriter
+  #SLFl:Temperature:ShellScalarRSpectrumWriter
+  #SLFl:Velocity:ShellTorPolRSpectrumWriter
+  #SLFl:Velocity:ShellTorPolEnstrophyWriter
+  #SLFl:Velocity:ShellTorPolEnstrophyLSpectrumWriter
+  #SLFl:Velocity:ShellTorPolEnstrophyMSpectrumWriter
+  #SLFm:Temperature:ShellScalarRSpectrumWriter
+  #SLFm:Velocity:ShellTorPolRSpectrumWriter
+  #SLFm:Velocity:ShellTorPolEnstrophyWriter
+  #SLFm:Velocity:ShellTorPolEnstrophyLSpectrumWriter
+  #SLFm:Velocity:ShellTorPolEnstrophyMSpectrumWriter
+)
+
+foreach(_test IN LISTS _tests)
+  string(REPLACE ":" ";" _tags ${_test})
+  list(GET _tags 0 _scheme)
+  add_custom_command(TARGET ${TestExe} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove _data/Framework/Io/${_scheme}/*
+    COMMAND ${CMAKE_COMMAND} -E copy _refdata/Framework/Io/${_scheme}/parameters.cfg _data/Framework/Io/${_scheme}/
+    WORKING_DIRECTORY ${QUICC_WORK_DIR}
+    )
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Scheme:Field:Writer
+    ID 0
+    ULP 500
+    WORKDIR "${QUICC_WORK_DIR}/_data/Framework/Io/${_scheme}"
+    DISABLED ON
   )
 endforeach()
 
