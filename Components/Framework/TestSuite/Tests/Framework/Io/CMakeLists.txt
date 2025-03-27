@@ -117,16 +117,6 @@ endforeach()
 set(_tests
   WLFl:Velocity:SphereMaxAbsoluteFieldValueWriter
   WLFm:Velocity:SphereMaxAbsoluteFieldValueWriter
-  #SLFl:Temperature:ShellScalarRSpectrumWriter
-  #SLFl:Velocity:ShellTorPolRSpectrumWriter
-  #SLFl:Velocity:ShellTorPolEnstrophyWriter
-  #SLFl:Velocity:ShellTorPolEnstrophyLSpectrumWriter
-  #SLFl:Velocity:ShellTorPolEnstrophyMSpectrumWriter
-  #SLFm:Temperature:ShellScalarRSpectrumWriter
-  #SLFm:Velocity:ShellTorPolRSpectrumWriter
-  #SLFm:Velocity:ShellTorPolEnstrophyWriter
-  #SLFm:Velocity:ShellTorPolEnstrophyLSpectrumWriter
-  #SLFm:Velocity:ShellTorPolEnstrophyMSpectrumWriter
 )
 
 foreach(_test IN LISTS _tests)
