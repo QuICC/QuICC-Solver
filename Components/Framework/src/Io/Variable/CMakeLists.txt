@@ -34,13 +34,15 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ShellScalarLSpectrumWriter.cpp
   ShellScalarMSpectrumWriter.cpp
   ShellScalarModeSpectrumWriter.cpp
+  ShellScalarRSpectrumWriter.cpp
   ShellTorPolEnergyWriter.cpp
   ShellTorPolLSpectrumWriter.cpp
   ShellTorPolMSpectrumWriter.cpp
   ShellTorPolModeSpectrumWriter.cpp
-  #ShellTorPolEnstrophyWriter.cpp
-  #ShellTorPolEnstrophyLSpectrumWriter.cpp
-  #ShellTorPolEnstrophyMSpectrumWriter.cpp
+  ShellTorPolRSpectrumWriter.cpp
+  ShellTorPolEnstrophyWriter.cpp
+  ShellTorPolEnstrophyLSpectrumWriter.cpp
+  ShellTorPolEnstrophyMSpectrumWriter.cpp
   SphereAngularMomentumWriter.cpp
   SphereDipolarityWriter.cpp
   SphereMaxAbsoluteFieldValueWriter.cpp

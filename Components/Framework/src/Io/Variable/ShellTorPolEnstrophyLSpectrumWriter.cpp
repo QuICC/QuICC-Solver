@@ -1,18 +1,17 @@
 /**
- * @file ShellTorPolEnstrophyWriter.cpp
+ * @file ShellTorPolEnstrophyLSpectrumWriter.cpp
  * @brief Source of the implementation of the ASCII spherical harmonics
- * enstrophy calculation for scalar field in a spherical shell
+ * enstrophy L spectrum calculation for toroidal/poloidal field in a sphere
  */
 
 // System includes
 //
-#include <iomanip>
 
 // Project includes
 //
+#include "QuICC/Io/Variable/ShellTorPolEnstrophyLSpectrumWriter.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Io/Variable/ShellTorPolEnstrophyWriter.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
@@ -24,12 +23,12 @@ namespace Io {
 
 namespace Variable {
 
-ShellTorPolEnstrophyWriter::ShellTorPolEnstrophyWriter(
+ShellTorPolEnstrophyLSpectrumWriter::ShellTorPolEnstrophyLSpectrumWriter(
    const std::string& prefix, const std::string& type) :
-    ISphericalTorPolEnstrophyWriter(prefix, type)
+    ISphericalTorPolEnstrophyLSpectrumWriter(prefix, type)
 {}
 
-void ShellTorPolEnstrophyWriter::init()
+void ShellTorPolEnstrophyLSpectrumWriter::init()
 {
    // Normalize by spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
    MHDFloat ri =
@@ -41,7 +40,7 @@ void ShellTorPolEnstrophyWriter::init()
    this->mHasMOrdering = this->res().sim().ss().has(
       SpatialScheme::Feature::TransformSpectralOrdering123);
 
-   ISphericalTorPolEnstrophyWriter::init();
+   ISphericalTorPolEnstrophyLSpectrumWriter::init();
 }
 
 } // namespace Variable

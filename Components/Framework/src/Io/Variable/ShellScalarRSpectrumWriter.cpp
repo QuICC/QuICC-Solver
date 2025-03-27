@@ -1,7 +1,7 @@
 /**
- * @file ShellTorPolEnstrophyWriter.cpp
- * @brief Source of the implementation of the ASCII spherical harmonics
- * enstrophy calculation for scalar field in a spherical shell
+ * @file ShellScalarRSpectrumWriter.cpp
+ * @brief Source of the implementation of the ASCII spherical harmonics radial
+ * power spectrum calculation for scalar field in a spherical shell
  */
 
 // System includes
@@ -10,9 +10,10 @@
 
 // Project includes
 //
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Io/Variable/ShellTorPolEnstrophyWriter.hpp"
+#include "QuICC/Io/Variable/ShellScalarRSpectrumWriter.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
@@ -24,12 +25,12 @@ namespace Io {
 
 namespace Variable {
 
-ShellTorPolEnstrophyWriter::ShellTorPolEnstrophyWriter(
+ShellScalarRSpectrumWriter::ShellScalarRSpectrumWriter(
    const std::string& prefix, const std::string& type) :
-    ISphericalTorPolEnstrophyWriter(prefix, type)
+    ISphericalScalarRSpectrumWriter(prefix, type)
 {}
 
-void ShellTorPolEnstrophyWriter::init()
+void ShellScalarRSpectrumWriter::init()
 {
    // Normalize by spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
    MHDFloat ri =
@@ -41,7 +42,7 @@ void ShellTorPolEnstrophyWriter::init()
    this->mHasMOrdering = this->res().sim().ss().has(
       SpatialScheme::Feature::TransformSpectralOrdering123);
 
-   ISphericalTorPolEnstrophyWriter::init();
+   ISphericalScalarRSpectrumWriter::init();
 }
 
 } // namespace Variable
