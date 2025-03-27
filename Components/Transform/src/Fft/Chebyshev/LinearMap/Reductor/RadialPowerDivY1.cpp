@@ -27,13 +27,13 @@ namespace Reductor {
 
 void RadialPowerDivY1::initOperator() const
 {
-      // Check for division by 0!
-      assert(this->mspSetup->lower() > 0.0 || this->mspSetup->upper() < 0.0);
+   // Check for division by 0!
+   assert(this->mspSetup->lower() > 0.0 || this->mspSetup->upper() < 0.0);
 
-      Internal::Array igrid, iweights;
-      Polynomial::Quadrature::ChebyshevRule quad;
-      quad.computeQuadrature(igrid, iweights, 2*this->mspSetup->fwdSize(), this->mspSetup->lower(), this->mspSetup->upper());
-      this->mBackend.setScaler(igrid.array().pow(-1).cast<MHDFloat>().matrix());
+   Internal::Array igrid, iweights;
+   Polynomial::Quadrature::ChebyshevRule quad;
+   quad.computeQuadrature(igrid, iweights, 2*this->mspSetup->fwdSize(), this->mspSetup->lower(), this->mspSetup->upper());
+   this->mBackend.setScaler(igrid.array().pow(-1).cast<MHDFloat>().matrix());
 }
 
 void RadialPowerDivY1::applyPreOperator(Matrix& tmp, const Matrix& in) const

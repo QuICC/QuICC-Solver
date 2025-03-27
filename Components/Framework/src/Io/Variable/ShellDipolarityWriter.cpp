@@ -35,7 +35,7 @@ namespace Variable {
 
    void ShellDipolarityWriter::init()
    {
-      this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123);
+      this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::TransformSpectralOrdering123);
       const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
 
       // Compute boundary operators

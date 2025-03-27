@@ -197,6 +197,15 @@ namespace SpatialScheme {
       }
 
       auto spSetup = std::make_shared<Transform::Fft::Chebyshev::Setup>(size, blockSize, specSize, this->purpose());
+
+      // Get number of transforms and list of indexes
+      for(int i = 0; i < spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT3D>(); i++)
+      {
+         auto l = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->idx<Dimensions::Data::DAT3D>(i);
+         auto ms = spRes->cpu()->dim(Dimensions::Transform::TRA1D)->dim<Dimensions::Data::DAT2D>(i);
+
+         spSetup->addIndex(l, ms);
+      }
       spSetup->lock();
 
       return spSetup;
