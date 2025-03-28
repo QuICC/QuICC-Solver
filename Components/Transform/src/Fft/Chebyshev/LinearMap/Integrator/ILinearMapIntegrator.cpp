@@ -67,12 +67,6 @@ void ILinearMapIntegrator::transform(Matrix&, const MatrixZ&) const
       "Data is not compatible with Chebyshev FFT integrator");
 }
 
-void ILinearMapIntegrator::transform(MatrixZ&, const Matrix&) const
-{
-   throw std::logic_error(
-      "Data is not compatible with Chebyshev FFT integrator");
-}
-
 int ILinearMapIntegrator::outRows() const
 {
    return this->mspSetup->specSize();

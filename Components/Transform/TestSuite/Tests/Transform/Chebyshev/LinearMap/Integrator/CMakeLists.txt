@@ -14,6 +14,7 @@ set(_tests
   I2_I2D1:<base_t>:integrator
   I4D1:<base_t>:integrator
   I4D1_I2:<base_t>:integrator
+  P:<viewCpu_t>:integrator
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}

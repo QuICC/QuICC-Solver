@@ -12,6 +12,7 @@
 //
 #include "Operator/Unary.hpp"
 #include "View/View.hpp"
+#include "Fft/FftTags.hpp"
 
 namespace QuICC {
 /// @brief This namespace provides base methods and classes for Fft backends
@@ -22,8 +23,8 @@ namespace Fftw {
 /// @brief this is the generic base class for Fftw backends
 /// @tparam Tout
 /// @tparam Tin
-template<class Tout, class Tin>
-class FftOp : public Operator::UnaryBaseOp<FftOp<Tout, Tin>, Tout, Tin>
+template<class Tout, class Tin, typename TType = void>
+class FftOp : public Operator::UnaryBaseOp<FftOp<Tout, Tin, TType>, Tout, Tin>
 {
 public:
     /// @brief action implementation, default to no implementation
@@ -36,8 +37,8 @@ public:
 /// @tparam AttIn attributes describing the input View
 /// @tparam AttOut attributes describing the output View
 template<class AttIn, class AttOut>
-class FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>> :
-    public Operator::UnaryBaseOp<FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>>,
+class FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>, void> :
+    public Operator::UnaryBaseOp<FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>, void>,
         View::View<double, AttOut>, View::View<std::complex<double>, AttIn>>
 {
 public:
@@ -58,8 +59,8 @@ private:
 /// @tparam AttIn attributes describing the input View
 /// @tparam AttOut attributes describing the output View
 template<class AttIn, class AttOut>
-class FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>> :
-    public Operator::UnaryBaseOp<FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>,
+class FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>, void> :
+    public Operator::UnaryBaseOp<FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>, void>,
         View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>
 {
 public:
@@ -80,8 +81,8 @@ private:
 /// @tparam AttIn attributes describing the input View
 /// @tparam AttOut attributes describing the output View
 template<class AttIn, class AttOut>
-class FftOp<View::View<std::complex<double>, AttOut>, View::View<double, AttIn>> :
-    public Operator::UnaryBaseOp<FftOp<View::View<std::complex<double>, AttOut>, View::View<double, AttIn>>,
+class FftOp<View::View<std::complex<double>, AttOut>, View::View<double, AttIn>, void> :
+    public Operator::UnaryBaseOp<FftOp<View::View<std::complex<double>, AttOut>, View::View<double, AttIn>, void>,
         View::View<std::complex<double>, AttOut>, View::View<double, AttIn>>
 {
 public:
@@ -93,6 +94,94 @@ public:
     /// @param out output View
     /// @param in input View
     void applyImpl(View::View<std::complex<double>, AttOut>& out, const View::View<double, AttIn>& in);
+private:
+    /// @brief pointer to store the fft plan
+    void* _plan{nullptr};
+};
+
+/// @brief Real to Real of Complex components batched Fft, DCT Type 1
+/// @tparam AttIn attributes describing the input View
+/// @tparam AttOut attributes describing the output View
+template<class AttIn, class AttOut>
+class FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>, dct_type1_t> :
+    public Operator::UnaryBaseOp<FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>, dct_type1_t>,
+        View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>
+{
+public:
+    /// @brief ctor
+    FftOp();
+    /// @brief dtor
+    ~FftOp();
+    /// @brief action implementation
+    /// @param out output View
+    /// @param in input View
+    void applyImpl(View::View<std::complex<double>, AttOut>& out, const View::View<std::complex<double>, AttIn>& in);
+private:
+    /// @brief pointer to store the fft plan
+    void* _plan{nullptr};
+};
+
+/// @brief Real to Real of Complex components batched Fft, DCT Type 2
+/// @tparam AttIn attributes describing the input View
+/// @tparam AttOut attributes describing the output View
+template<class AttIn, class AttOut>
+class FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>, dct_type2_t> :
+    public Operator::UnaryBaseOp<FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>, dct_type2_t>,
+        View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>
+{
+public:
+    /// @brief ctor
+    FftOp();
+    /// @brief dtor
+    ~FftOp();
+    /// @brief action implementation
+    /// @param out output View
+    /// @param in input View
+    void applyImpl(View::View<std::complex<double>, AttOut>& out, const View::View<std::complex<double>, AttIn>& in);
+private:
+    /// @brief pointer to store the fft plan
+    void* _plan{nullptr};
+};
+
+/// @brief Real to Real of Complex components batched Fft, DCT Type 3
+/// @tparam AttIn attributes describing the input View
+/// @tparam AttOut attributes describing the output View
+template<class AttIn, class AttOut>
+class FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>, dct_type3_t> :
+    public Operator::UnaryBaseOp<FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>, dct_type3_t>,
+        View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>
+{
+public:
+    /// @brief ctor
+    FftOp();
+    /// @brief dtor
+    ~FftOp();
+    /// @brief action implementation
+    /// @param out output View
+    /// @param in input View
+    void applyImpl(View::View<std::complex<double>, AttOut>& out, const View::View<std::complex<double>, AttIn>& in);
+private:
+    /// @brief pointer to store the fft plan
+    void* _plan{nullptr};
+};
+
+/// @brief Real to Real of Complex components batched Fft, DCT Type 4
+/// @tparam AttIn attributes describing the input View
+/// @tparam AttOut attributes describing the output View
+template<class AttIn, class AttOut>
+class FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>, dct_type4_t> :
+    public Operator::UnaryBaseOp<FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>, dct_type4_t>,
+        View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>
+{
+public:
+    /// @brief ctor
+    FftOp();
+    /// @brief dtor
+    ~FftOp();
+    /// @brief action implementation
+    /// @param out output View
+    /// @param in input View
+    void applyImpl(View::View<std::complex<double>, AttOut>& out, const View::View<std::complex<double>, AttIn>& in);
 private:
     /// @brief pointer to store the fft plan
     void* _plan{nullptr};

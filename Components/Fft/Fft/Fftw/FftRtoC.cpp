@@ -24,7 +24,7 @@ namespace Fftw {
 
 template <class AttIn, class AttOut>
 FftOp<View::View<std::complex<double>, AttOut>,
-   View::View<double, AttIn>>::FftOp()
+   View::View<double, AttIn>, void>::FftOp()
 {
    // FFTW Fixture
    Library::getInstance();
@@ -32,7 +32,7 @@ FftOp<View::View<std::complex<double>, AttOut>,
 
 template <class AttIn, class AttOut>
 FftOp<View::View<std::complex<double>, AttOut>,
-   View::View<double, AttIn>>::~FftOp()
+   View::View<double, AttIn>, void>::~FftOp()
 {
    // Destroy plan
    if (_plan != nullptr)
@@ -69,7 +69,7 @@ fftw_plan setPlanRtoC(const int fwdSize, const int blockSize)
 
 template <class AttIn, class AttOut>
 void FftOp<View::View<std::complex<double>, AttOut>,
-   View::View<double, AttIn>>::applyImpl(View::View<std::complex<double>,
+   View::View<double, AttIn>, void>::applyImpl(View::View<std::complex<double>,
                                             AttOut>& mods,
    const View::View<double, AttIn>& phys)
 {
@@ -103,8 +103,8 @@ void FftOp<View::View<std::complex<double>, AttOut>,
 }
 
 // Explicit instantiations
-template class FftOp<CmodsDense2D_t, RphysDense2D_t>;
-template class FftOp<CmodsDCCSC3D_t, RphysDCCSC3D_t>;
+template class FftOp<CmodsDense2D_t, RphysDense2D_t, void>;
+template class FftOp<CmodsDCCSC3D_t, RphysDCCSC3D_t, void>;
 
 
 } // namespace Fftw

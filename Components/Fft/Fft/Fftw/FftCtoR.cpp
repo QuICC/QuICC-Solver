@@ -23,14 +23,14 @@ namespace Fft {
 namespace Fftw {
 
 template<class AttIn, class AttOut>
-FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>>::FftOp()
+FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>, void>::FftOp()
 {
     // FFTW Fixture
     Library::getInstance();
 }
 
 template<class AttIn, class AttOut>
-FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>>::~FftOp()
+FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>, void>::~FftOp()
 {
     // Destroy plan
     if(_plan != nullptr)
@@ -67,7 +67,7 @@ namespace details
 
 
 template<class AttIn, class AttOut>
-void FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>>::applyImpl(View::View<double, AttOut>& phys, const View::View<std::complex<double>, AttIn>& mods)
+void FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>, void>::applyImpl(View::View<double, AttOut>& phys, const View::View<std::complex<double>, AttIn>& mods)
 {
     using namespace QuICC::View;
     if(_plan == nullptr)
@@ -99,8 +99,8 @@ void FftOp<View::View<double, AttOut>, View::View<std::complex<double>, AttIn>>:
 }
 
 // Explicit instantiations
-template class FftOp<RphysDense2D_t, CmodsDense2D_t>;
-template class FftOp<RphysDCCSC3D_t, CmodsDCCSC3D_t>;
+template class FftOp<RphysDense2D_t, CmodsDense2D_t, void>;
+template class FftOp<RphysDCCSC3D_t, CmodsDCCSC3D_t, void>;
 
 } // namespace Fftw
 } // namespace Fft

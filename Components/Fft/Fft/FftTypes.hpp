@@ -25,6 +25,8 @@ using CmodsDCCSC3D_t = View::View<std::complex<double>, View::DCCSC3D>;
 /// @brief Real compressed sparse layer 3D tensor, output phys view type
 using RphysDCCSC3D_t = View::View<double, View::DCCSC3D>;
 /// @brief Complex compressed sparse layer 3D tensor, output phys view type
+using CphysDCCSC3D_t = View::View<std::complex<double>, View::DCCSC3D>;
+/// @brief Complex compressed sparse layer 3D tensor, output phys view type
 using CphysDCCSC3DInOrder_t = View::View<std::complex<double>, View::DCCSC3DInOrder>;
 /// @brief Complex compressed sparse layer 3D tensor, input mods view type
 using CmodsDCCSC3DInOrder_t = View::View<std::complex<double>, View::DCCSC3DInOrder>;

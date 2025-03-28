@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Chebyshev/IChebyshevOperator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Chebyshev/IChebyshevOperator.hpp"
 
 namespace QuICC {
 
@@ -26,11 +20,7 @@ namespace Fft {
 
 namespace Chebyshev {
 
-   IChebyshevOperator::IChebyshevOperator()
-   {
-   }
-
-   IChebyshevOperator::~IChebyshevOperator()
+   void IChebyshevOperator::cleanup()
    {
    }
 
@@ -46,6 +36,33 @@ namespace Chebyshev {
    void IChebyshevOperator::init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       throw std::logic_error("Unused interface");
+   }
+
+   void IChebyshevOperator::initBase() const
+   {
+      // Initialize FFT backend
+      this->initBackend();
+
+      // Operator specific initialization
+      this->initOperator();
+
+      // Set initialization flag
+      this->mIsInitialized = true;
+   }
+
+   void IChebyshevOperator::initOperator() const
+   {
+   }
+
+   MHDFloat IChebyshevOperator::requiredStorage() const
+   {
+      MHDFloat mem = 0.0;
+
+#ifdef QUICC_STORAGEPROFILE
+      mem += static_cast<MHDFloat>(Debug::MemorySize<int>::BYTES);
+#endif // QUICC_STORAGEPROFILE
+
+      return mem;
    }
 
 }

@@ -1,0 +1,98 @@
+/**
+ * @file @Op@@Tag@.hpp.inc
+ * @brief Wrapper of the Chebyshev LinearMap @Op@ @Kind@
+ */
+#pragma once
+
+// System includes
+//
+
+// Project includes
+//
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/@Kind@/ILinearMap@Kind@.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Tags.hpp"
+#include "View/View.hpp"
+#include "Operator/Unary.hpp"
+@CuhHeader@
+
+namespace QuICC {
+namespace Transform {
+namespace Fft {
+namespace Chebyshev {
+namespace LinearMap {
+namespace @Kind@ {
+
+template<class Impl>
+class @Op@;
+
+/**
+ * @brief Implementation of wrapper to the View LinearMap @Op@ @Kind@ op
+ */
+template<>
+class @Op@<@Tag@>: public ILinearMap@Kind@
+{
+public:
+    /**
+     * @brief Constructor
+     */
+    @Op@() = default;
+
+    /**
+     * @brief Destructor
+     */
+    ~@Op@() = default;
+
+    /**
+     * @brief Compute Chebyshev componentwise transform
+     */
+    void transform(MatrixZ& rOut, const MatrixZ& in) const final;
+
+    /**
+     * @brief Compute Chebyshev transform
+     */
+    void transform(Matrix& rOut, const Matrix& in) const final;
+
+    /**
+     * @brief Initialise View Op
+     */
+    void initBackend() const final;
+
+protected:
+
+private:
+    @PreOp@
+    @PostOp@
+
+    using mods_t = View::View<std::complex<double>, View::DCCSC3D>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3D>;
+
+    /// @brief Operator base class pointer
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<@OpInOut@>> mOp;
+
+    /// @brief Output View
+    mutable mods_t mModsView;
+
+    /// @brief Input View
+    mutable phys_t mPhysView;
+
+    /// @brief Temporary storage for flattened output
+    mutable std::vector<std::complex<double>> mModsFlat;
+
+    /// @brief Temporary storage for flattened input
+    mutable std::vector<std::complex<double>> mPhysFlat;
+
+    /// @brief Data pointers
+    mutable std::vector<std::uint32_t> mDataPointers;
+
+    /// @brief Data indices
+    mutable std::vector<std::uint32_t> mDataIndices;
+
+    @Storage@
+};
+
+} // namespace @Kind@
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

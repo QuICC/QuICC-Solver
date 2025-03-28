@@ -66,11 +66,6 @@ namespace Projector {
       throw std::logic_error("Data is not compatible with Chebyshev FFT projector");
    }
 
-   void ILinearMapProjector::transform(MatrixZ&, const Matrix&) const
-   {
-      throw std::logic_error("Data is not compatible with Chebyshev FFT projector");
-   }
-
    int ILinearMapProjector::outRows() const
    {
       return this->mspSetup->fwdSize();

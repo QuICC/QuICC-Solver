@@ -16,6 +16,7 @@ set(_tests
   D1Y1:<base_t>:projector
   DivY1D1Y1:<base_t>:projector
   SphRadLapl:<base_t>:projector
+  P:<viewCpu_t>:projector
   )
 
 foreach(_test _ulp IN ZIP_LISTS _tests _ulps)

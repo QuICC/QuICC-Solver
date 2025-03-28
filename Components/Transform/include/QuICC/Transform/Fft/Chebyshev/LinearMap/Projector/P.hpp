@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/Base/P.hpp"
-//#include "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Projector/PviewCpu_t.hpp.inc"
+#include "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Projector/PviewCpu_t.hpp.inc"
 #ifdef QUICC_HAS_CUDA_BACKEND
 //#include "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Projector/PviewGpu_t.hpp.inc"
 #endif
