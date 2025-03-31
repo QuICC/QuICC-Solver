@@ -13,6 +13,7 @@
 #include "View/View.hpp"
 #include "Cuda/CudaUtil.hpp"
 
+# define QUICC_MAX_PACK_THREADS 512
 namespace QuICC {
 /// @brief namespace for Transpose type operations
 namespace Transpose {
@@ -178,9 +179,9 @@ __global__ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZ
    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
    // const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
 
-   for (int g = 0; g < groupSize; ++g)
+   if (i < I && j < sendCountsView[i])
    {
-      if (i < I && j < sendCountsView[i])
+      for (int g = 0; g < groupSize; ++g)
       {
          int sendCount = sendCountsView[i] / groupSize;
          buffer[g * sendCount + sendBufferDisplsView[i] + j] =
@@ -208,18 +209,19 @@ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
    dim3 numBlocks;
 
    blockSize.x = 16;
-   blockSize.y = 64;
+   blockSize.y = 32;
    blockSize.z = 1;
    numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
    numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
    numBlocks.z = 1;
 
+   assert(blockSize.x * blockSize.y <= QUICC_MAX_PACK_THREADS);
+   __launch_bounds__(QUICC_MAX_PACK_THREADS);
    details::pack<TDATA>
       <<<numBlocks, blockSize>>>(buffer, in, sendCountsView, sendDisplsView, sendBufferDisplsView, groupSize);
 
+   cudaErrChk(cudaGetLastError());
    cudaErrChk(cudaDeviceSynchronize());
-
-
 }
 
 
@@ -240,9 +242,9 @@ __global__ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA
    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
    // const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
 
-   for(int g = 0; g < groupSize; ++g)
+   if (i < I && j < recvCountsView[i])
    {
-      if (i < I && j < recvCountsView[i])
+      for(int g = 0; g < groupSize; ++g)
       {
          int recvCount = recvCountsView[i] / groupSize;
          *(out[g] + recvDisplsView[i * J + j]) =
@@ -269,15 +271,18 @@ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
    dim3 numBlocks;
 
    blockSize.x = 16;
-   blockSize.y = 64;
+   blockSize.y = 32;
    blockSize.z = 1;
    numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
    numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
    numBlocks.z = 1;
 
+   assert(blockSize.x * blockSize.y <= QUICC_MAX_PACK_THREADS);
+   __launch_bounds__(QUICC_MAX_PACK_THREADS);
    details::unPack<TDATA>
       <<<numBlocks, blockSize>>>(out, buffer, recvCountsView, recvDisplsView, recvBufferDisplsView, groupSize);
 
+   cudaErrChk(cudaGetLastError());
    cudaErrChk(cudaDeviceSynchronize());
 }
 

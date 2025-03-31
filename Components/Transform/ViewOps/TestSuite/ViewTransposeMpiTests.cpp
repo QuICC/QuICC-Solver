@@ -13,6 +13,7 @@ extern "C" {
 #include "Environment/QuICCEnv.hpp"
 #include "TestSuite/ViewMeta.hpp"
 #include "ViewOps/Transpose/Op.hpp"
+#include "ViewOps/Transpose/OpGrouped.hpp"
 #include "ViewOps/ViewIndexUtils.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 #include "ViewOps/ViewSizeUtils.hpp"
@@ -730,8 +731,11 @@ TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 201", "MpiS1CLCSC3DtoDCCSC3D201")
    std::array<std::vector<std::uint32_t>, vRank> indicesOut = {
       {{}, metaOut.idx, {}}};
 
-   View<double, inTy> viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
-   View<double, outTy> viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
+   // Create views
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
+   VoutTy viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
 
    // Setup ref data and input data
    using namespace QuICC::Transpose::Mpi;
@@ -754,12 +758,15 @@ TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 201", "MpiS1CLCSC3DtoDCCSC3D201")
 
    // Transpose op
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-   auto comm = std::make_shared<Comm<double>>(mem);
    auto transposeOp =
-      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>(
-         comm);
+      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(
+         mem);
 
-   transposeOp->apply(viewOut, viewIn);
+   // Pack views
+   std::vector<VoutTy> viewsOut = {viewOut};
+   std::vector<VinTy> viewsIn = {viewIn};
+
+   transposeOp->apply(viewsOut, viewsIn);
 
    // check
    for (std::uint64_t s = 0; s < dataOutRef.size(); ++s)
