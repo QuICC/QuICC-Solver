@@ -13,6 +13,7 @@ extern "C" {
 #include "Environment/QuICCEnv.hpp"
 #include "TestSuite/ViewMeta.hpp"
 #include "ViewOps/Transpose/Op.hpp"
+#include "ViewOps/Transpose/OpGrouped.hpp"
 #include "ViewOps/ViewIndexUtils.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 #include "ViewOps/ViewSizeUtils.hpp"
@@ -165,9 +166,11 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
    indicesOutDev[1] = ViewBase<std::uint32_t>(memBlockIdxOut.data(), memBlockIdxOut.size());
 
    // set device views
-   View<double, inTy> viewInDev(memBlockIn.data(), memBlockIn.size(),
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(),
       dimensionsIn.data(), pointersInDev, indicesInDev);
-   View<double, outTy> viewOutDev(memBlockOut.data(), memBlockOut.size(),
+   VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersOutDev, indicesOutDev);
 
    // cpu -> gpu
@@ -183,12 +186,15 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
       cudaMemcpyHostToDevice));
 
    // Transpose op
-   auto comm = std::make_shared<Comm<double>>(memDev);
    auto transposeOp =
-      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>(
-         comm);
+      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(
+         memDev);
 
-   transposeOp->apply(viewOutDev, viewInDev);
+   // Pack views
+   std::vector<VoutTy> viewsOut = {viewOutDev};
+   std::vector<VinTy> viewsIn = {viewInDev}; 
+
+   transposeOp->apply(viewsOut, viewsIn);
 
     // gpu -> cpu
    cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(),

@@ -23,7 +23,7 @@ namespace Cuda {
 
 
 template <class Tout, class Tin, class Perm>
-void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
+void OpGrouped<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 {
    Profiler::RegionFixture<4> fix("Transpose::Cuda::applyImpl");
 
@@ -160,25 +160,25 @@ void Op<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 
 // Explicit instantiations
 // FT -> AL
-template class Op<View::View<double, View::DCCSC3DJIK>,
+template class OpGrouped<View::View<double, View::DCCSC3DJIK>,
    View::View<double, View::DCCSC3D>, p201_t>;
-template class Op<View::View<std::complex<double>, View::DCCSC3DJIK>,
+template class OpGrouped<View::View<std::complex<double>, View::DCCSC3DJIK>,
    View::View<std::complex<double>, View::DCCSC3D>, p201_t>;
 // AL -> FT
-template class Op<View::View<double, View::DCCSC3D>,
+template class OpGrouped<View::View<double, View::DCCSC3D>,
    View::View<double, View::DCCSC3DJIK>, p120_t>;
-template class Op<View::View<std::complex<double>, View::DCCSC3D>,
+template class OpGrouped<View::View<std::complex<double>, View::DCCSC3D>,
    View::View<std::complex<double>, View::DCCSC3DJIK>, p120_t>;
 
 // AL -> JW
-template class Op<View::View<double, View::DCCSC3DJIK>,
+template class OpGrouped<View::View<double, View::DCCSC3DJIK>,
    View::View<double, View::S1CLCSC3DJIK>, p201_t>;
-template class Op<View::View<std::complex<double>, View::DCCSC3DJIK>,
+template class OpGrouped<View::View<std::complex<double>, View::DCCSC3DJIK>,
    View::View<std::complex<double>, View::S1CLCSC3DJIK>, p201_t>;
 // JW -> AL
-template class Op<View::View<double, View::S1CLCSC3DJIK>,
+template class OpGrouped<View::View<double, View::S1CLCSC3DJIK>,
    View::View<double, View::DCCSC3DJIK>, p120_t>;
-template class Op<View::View<std::complex<double>, View::S1CLCSC3DJIK>,
+template class OpGrouped<View::View<std::complex<double>, View::S1CLCSC3DJIK>,
    View::View<std::complex<double>, View::DCCSC3DJIK>, p120_t>;
 
 } // namespace Cuda

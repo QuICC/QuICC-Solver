@@ -176,13 +176,16 @@ __global__ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZ
 
    const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
-   const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
+   // const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
 
-   if (g < groupSize && i < I && j < sendCountsView[i])
+   for (int g = 0; g < groupSize; ++g)
    {
-      int sendCount = sendCountsView[i] / groupSize;
-      buffer[g * sendCount + sendBufferDisplsView[i] + j] =
-         *(in[g] + sendDisplsView[i * J + j]);
+      if (i < I && j < sendCountsView[i])
+      {
+         int sendCount = sendCountsView[i] / groupSize;
+         buffer[g * sendCount + sendBufferDisplsView[i] + j] =
+            *(in[g] + sendDisplsView[i * J + j]);
+      }
    }
 
 }
@@ -198,7 +201,7 @@ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
 
    const auto I = sendDisplsView.dims()[0];
    const auto J = sendDisplsView.dims()[1];
-   const auto G = in.size();
+   // const auto G = in.size();
 
    // setup grid
    dim3 blockSize;
@@ -206,10 +209,10 @@ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
 
    blockSize.x = 16;
    blockSize.y = 64;
-   blockSize.z = 16;
+   blockSize.z = 1;
    numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
    numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
-   numBlocks.z = (G + blockSize.z - 1) / blockSize.z;
+   numBlocks.z = 1;
 
    details::pack<TDATA>
       <<<numBlocks, blockSize>>>(buffer, in, sendCountsView, sendDisplsView, sendBufferDisplsView, groupSize);
@@ -235,13 +238,16 @@ __global__ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA
 
    const std::size_t i = blockIdx.x * blockDim.x + threadIdx.x;
    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
-   const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
+   // const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
 
-   if (g < groupSize && i < I && j < recvCountsView[i])
+   for(int g = 0; g < groupSize; ++g)
    {
-      int recvCount = recvCountsView[i] / groupSize;
-      *(out[g] + recvDisplsView[i * J + j]) =
-         buffer[g * recvCount + recvBufferDisplsView[i] + j];
+      if (i < I && j < recvCountsView[i])
+      {
+         int recvCount = recvCountsView[i] / groupSize;
+         *(out[g] + recvDisplsView[i * J + j]) =
+            buffer[g * recvCount + recvBufferDisplsView[i] + j];
+      }
    }
 }
 
@@ -256,7 +262,7 @@ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
 
    const auto I = recvDisplsView.dims()[0];
    const auto J = recvDisplsView.dims()[1];
-   const auto G = out.size();
+   // const auto G = out.size();
 
    // setup grid
    dim3 blockSize;
@@ -264,10 +270,10 @@ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
 
    blockSize.x = 16;
    blockSize.y = 64;
-   blockSize.z = 16;
+   blockSize.z = 1;
    numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
    numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
-   numBlocks.z = (G + blockSize.z - 1) / blockSize.z;
+   numBlocks.z = 1;
 
    details::unPack<TDATA>
       <<<numBlocks, blockSize>>>(out, buffer, recvCountsView, recvDisplsView, recvBufferDisplsView, groupSize);
