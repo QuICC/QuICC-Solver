@@ -6,8 +6,8 @@
 
 // System includes
 //
-#include <cstdint>
 #include <array>
+#include <cstdint>
 
 // Project includes
 //
@@ -36,57 +36,57 @@ struct bwd_t
 /// @brief tag type for identity spectral operation
 struct spec_id
 {
-   constexpr static std::array<std::size_t,1> p = {0};
-   constexpr static std::array<std::size_t,1> t = {0};
+   constexpr static std::array<std::size_t, 1> p = {0};
+   constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief tag type for spectral padding operation
 struct spec_y1
 {
-   constexpr static std::array<std::size_t,1> p = {0};
-   constexpr static std::array<std::size_t,1> t = {1};
+   constexpr static std::array<std::size_t, 1> p = {0};
+   constexpr static std::array<std::size_t, 1> t = {1};
 };
 
 /// @brief tag type for spectral padding operation
 struct spec_d1
 {
-   constexpr static std::array<std::size_t,1> p = {1};
-   constexpr static std::array<std::size_t,1> t = {0};
+   constexpr static std::array<std::size_t, 1> p = {1};
+   constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief tag type for spectral padding operation
 struct spec_d2
 {
-   constexpr static std::array<std::size_t,1> p = {2};
-   constexpr static std::array<std::size_t,1> t = {0};
+   constexpr static std::array<std::size_t, 1> p = {2};
+   constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief tag type for spectral padding operation
 struct spec_d3
 {
-   constexpr static std::array<std::size_t,1> p = {3};
-   constexpr static std::array<std::size_t,1> t = {0};
+   constexpr static std::array<std::size_t, 1> p = {3};
+   constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief tag type for spectral padding operation
 struct spec_d4
 {
-   constexpr static std::array<std::size_t,1> p = {4};
-   constexpr static std::array<std::size_t,1> t = {0};
+   constexpr static std::array<std::size_t, 1> p = {4};
+   constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief tag type for spectral padding operation
 struct spec_d1y1
 {
-   constexpr static std::array<std::size_t,1> p = {1};
-   constexpr static std::array<std::size_t,1> t = {1};
+   constexpr static std::array<std::size_t, 1> p = {1};
+   constexpr static std::array<std::size_t, 1> t = {1};
 };
 
 /// @brief tag type for spectral padding operation
 struct spec_d1y2d1
 {
-   constexpr static std::array<std::size_t,2> p = {1,1};
-   constexpr static std::array<std::size_t,2> t = {0,2};
+   constexpr static std::array<std::size_t, 2> p = {1, 1};
+   constexpr static std::array<std::size_t, 2> t = {0, 2};
 };
 
 /// @brief tag type for identity grid operation
@@ -104,7 +104,7 @@ struct grid_divy2
 {
 };
 
-///view cpu implementation tag
+/// view cpu implementation tag
 struct viewCpu_t
 {
 };

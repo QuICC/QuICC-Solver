@@ -31,11 +31,9 @@ using namespace QuICC::Operator;
 /// @tparam Tin input modes type
 /// @tparam Operation Type of grid operation
 /// @tparam Treatment special treatment mask, typically of mode zero
-template <class Tout, class Tin, class Operation,
-   std::uint16_t Treatment = 0>
-class GridOp
-    : public BinaryBaseOp<GridOp<Tout, Tin, Operation, Treatment>, Tout,
-         Tin, typename Tout::ScalarType::value_type>
+template <class Tout, class Tin, class Operation, std::uint16_t Treatment = 0>
+class GridOp : public BinaryBaseOp<GridOp<Tout, Tin, Operation, Treatment>,
+                  Tout, Tin, typename Tout::ScalarType::value_type>
 {
 public:
    /// @brief Type of treatment mask
@@ -61,8 +59,8 @@ private:
    /// @param fftScaling fft scaling (inverse number of grid points)
    void applyImpl(Tout& out, const Tin& in, const ScaleType fftScaling);
    /// @brif Give access to base class
-   friend BinaryBaseOp<GridOp<Tout, Tin, Operation, Treatment>, Tout,
-      Tin, ScaleType>;
+   friend BinaryBaseOp<GridOp<Tout, Tin, Operation, Treatment>, Tout, Tin,
+      ScaleType>;
    /// @brief Lower bound
    double mLower;
    /// @brief Upper bound

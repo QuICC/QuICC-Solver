@@ -6,8 +6,8 @@
 
 // System includes
 //
-#include <type_traits>
 #include <cstdint>
+#include <type_traits>
 
 // Project includes
 //
@@ -25,9 +25,7 @@ namespace Transform {
 namespace Chebyshev {
 namespace LinearMap {
 
-namespace dealias {
-
-} // namespace dealias
+namespace dealias {} // namespace dealias
 
 } // namespace LinearMap
 } // namespace Chebyshev
