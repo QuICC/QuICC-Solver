@@ -179,13 +179,17 @@ __global__ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZ
    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
    // const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
 
-   if (i < I && j < sendCountsView[i])
+   if (i < I) 
    {
-      for (int g = 0; g < groupSize; ++g)
+      int sendCount = sendCountsView[i] / groupSize;
+      if (j < sendCount)
       {
-         int sendCount = sendCountsView[i] / groupSize;
-         buffer[g * sendCount + sendBufferDisplsView[i] + j] =
-            *(in[g] + sendDisplsView[i * J + j]);
+         for (int g = 0; g < groupSize; ++g)
+         {
+            
+            buffer[g * sendCount + sendBufferDisplsView[i] + j] =
+               *(in[g] + sendDisplsView[i * J + j]);
+         }
       }
    }
 
@@ -242,13 +246,17 @@ __global__ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA
    const std::size_t j = blockIdx.y * blockDim.y + threadIdx.y;
    // const std::size_t g = blockIdx.z * blockDim.z + threadIdx.z;
 
-   if (i < I && j < recvCountsView[i])
+   if (i < I) 
    {
-      for(int g = 0; g < groupSize; ++g)
+      int recvCount = recvCountsView[i] / groupSize;
+      if (j < recvCount)
       {
-         int recvCount = recvCountsView[i] / groupSize;
-         *(out[g] + recvDisplsView[i * J + j]) =
-            buffer[g * recvCount + recvBufferDisplsView[i] + j];
+         for(int g = 0; g < groupSize; ++g)
+         {
+            int recvCount = recvCountsView[i] / groupSize;
+            *(out[g] + recvDisplsView[i * J + j]) =
+               buffer[g * recvCount + recvBufferDisplsView[i] + j];
+         }
       }
    }
 }

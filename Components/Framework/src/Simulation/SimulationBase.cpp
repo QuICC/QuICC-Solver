@@ -110,6 +110,11 @@ void SimulationBase::initBase()
    // Initialise the workflow
    QuICCEnv().setup(nCpu);
 
+   // Forward graph options
+   Pseudospectral::GraphOptions options;
+   options.groupingSize = this->config().groupingSize();
+   this->mPseudospectral.setGraphOptions(options);
+
    // Initialise additional things depending on implementation
    this->initAdditionalBase();
 
@@ -241,11 +246,6 @@ void SimulationBase::setInitialState(
 
    // Addition operations on initial state file
    this->tuneInitialState(spInitFile);
-
-   // Forward graph options
-   Pseudospectral::GraphOptions options;
-   options.groupingSize = this->config().groupingSize();
-   this->mPseudospectral.setGraphOptions(options);
 
    // Forward state file time and timestep to diagnostic coordinator
    this->mPseudospectral.useStateTime(spInitFile->time(),
