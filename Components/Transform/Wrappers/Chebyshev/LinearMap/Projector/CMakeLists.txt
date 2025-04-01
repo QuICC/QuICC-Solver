@@ -12,7 +12,7 @@ set(viewGpu_tMemRes "Cuda::Malloc")
 set(viewGpuVkFFT_tMemRes "Cuda::Malloc")
 set(ProjectorMem "mem")
 
-set(ProjectorOps "P")
+set(ProjectorOps "P" "DivY1" "DivY2" "D1" "D2" "D3" "D4" "D1Y1" "DivY1D1Y1" "SphRadLapl")
 set(ProjectorOpDirection "bwd_t")
 set(ProjectorOpInOut "phys_t, mods_t")
 

@@ -8,6 +8,7 @@
 //
 #include <cstdint>
 #include <memory>
+#include <vector>
 
 // Project includes
 //
@@ -41,11 +42,15 @@ public:
    static constexpr std::uint16_t TreatmentValue = Treatment;
    /// @brief Type of scale parameter, i.e. float 32/64 bits
    using ScaleType = double;
-   /// @brief Constructor with user defined scaling factor
+   /// @brief Constructor with bounds user defined scaling factor
+   /// @param lower  lower bound
+   /// @param upper  upper bound
    /// @param scale
-   GridOp(ScaleType scale);
-   /// @brief Default constructor
-   GridOp() = default;
+   GridOp(const double lower, const double upper, ScaleType scale);
+   /// @brief constructor with bounds
+   /// @param lower  lower bound
+   /// @param upper  upper bound
+   GridOp(const double lower, const double upper);
    /// @brief dtor
    ~GridOp() = default;
 
@@ -58,7 +63,13 @@ private:
    /// @brif Give access to base class
    friend BinaryBaseOp<GridOp<Tout, Tin, Operation, Treatment>, Tout,
       Tin, ScaleType>;
-   /// @brif Scaling factor, i.e. domain size
+   /// @brief Lower bound
+   double mLower;
+   /// @brief Upper bound
+   double mUpper;
+   /// @brief
+   std::vector<double> mGridScaler;
+   /// @brief Scaling factor, i.e. domain size
    ScaleType mScale{1.0};
 };
 

@@ -36,8 +36,10 @@ public:
     using ScaleType = double;
     /// @brief constructor with user defined scaling factor
     /// @param mem
+    /// @param lower lower bound
+    /// @param upper upper bound
     /// @param scale
-    GFSOp(std::shared_ptr<Memory::memory_resource> mem,
+    GFSOp(std::shared_ptr<Memory::memory_resource> mem, const double lower, const double upper,
       ScaleType scale = 1.0);
     /// @brief default constructor
     GFSOp() = delete;
@@ -63,16 +65,16 @@ private:
     std::shared_ptr<Memory::memory_resource> _mem;
     /// @brief temporary memory block
     Memory::MemBlock<typename Tin::ScalarType> _tmpData;
-    /// @brief View for the operator
+    /// @brief Input View for the operator
     Tin _tmpView;
 };
 
 template<class Tout, class Tin, class GridBackend, class FftBackend, class SpecBackend>
-GFSOp<Tout, Tin, GridBackend, FftBackend, SpecBackend>::GFSOp(std::shared_ptr<Memory::memory_resource> mem, ScaleType scale) 
-   : 
-      mGrid(std::make_unique<GridBackend>()), 
-      mFft(std::make_unique<FftBackend>()), 
-      mSpec(std::make_unique<SpecBackend>()), 
+GFSOp<Tout, Tin, GridBackend, FftBackend, SpecBackend>::GFSOp(std::shared_ptr<Memory::memory_resource> mem, const double lower, const double upper, ScaleType scale)
+   :
+      mGrid(std::make_unique<GridBackend>(lower, upper)),
+      mFft(std::make_unique<FftBackend>()),
+      mSpec(std::make_unique<SpecBackend>(lower, upper)),
       _mem(mem)
 {
 }
@@ -85,7 +87,7 @@ void GFSOp<Tout, Tin, GridBackend, FftBackend, SpecBackend>::applyImpl(Tout& out
     // setup tmp storage
     if (_tmpView.data() == nullptr)
     {
-//        // special treatment for the pure projector is not necessary
+//        // special treatment for the pure integrator is not necessary
 //        // but it avoids an allocation and copy
 //        if constexpr (DiffBackend::TreatmentValue == none_m && DiffBackend::OrderValue == 0)
 //        {
@@ -98,17 +100,18 @@ void GFSOp<Tout, Tin, GridBackend, FftBackend, SpecBackend>::applyImpl(Tout& out
         }
     }
 
-    // spectral operation
-    mSpec->apply(_tmpView, in, 1.0);
-
-    // FFT
-    mFft->apply(out, _tmpView);
-
     // grid operation
     mGrid->apply(_tmpView, in, 1.0);
+
+    // FFT
+    mFft->apply(_tmpView, _tmpView);
+
+    // spectral operation
+    ScaleType fftScaling = 1.0/static_cast<ScaleType>(2*_tmpView.dims()[0]);
+    mSpec->apply(out, _tmpView, fftScaling);
 }
 
-} // namespace Projector
+} // namespace Integrator
 } // namespace LinearMap
 } // namespace Chebyshev
 } // namespace Transform

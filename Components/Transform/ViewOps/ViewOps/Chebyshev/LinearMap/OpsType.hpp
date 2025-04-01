@@ -129,7 +129,7 @@ struct OpsTypeMap<Tout, Tin, P_t, fwd_t, BACKEND>
 {
    using backendGrid_t =
       Grid_t<BACKEND, Tin, grid_id, QuICC::Transform::Chebyshev::LinearMap::none_l>;
-   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
    using backendSpec_t =
       Spec_t<BACKEND, Tout, spec_id, QuICC::Transform::Chebyshev::LinearMap::none_l>;
    using type = Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
@@ -145,10 +145,163 @@ template <class Tout, class Tin, class BACKEND>
 struct OpsTypeMap<Tout, Tin, P_t, bwd_t, BACKEND>
 {
    using backendSpec_t =
-      Spec_t<BACKEND, Tin, spec_id, QuICC::Transform::Chebyshev::LinearMap::none_l>;
-   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
-   using backendGrid_t = 
+      Spec_t<BACKEND, Tin, spec_pad, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t =
       Grid_t<BACKEND, Tout, grid_id, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using type = Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op DivY1 type map
+/// Projector of 1/Y
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, DivY1_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_pad, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t =
+      Grid_t<BACKEND, Tout, grid_divy1, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using type = Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op DivY2 type map
+/// Projector of 1/Y^2
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, DivY2_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_pad, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t =
+      Grid_t<BACKEND, Tout, grid_divy2, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using type = Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op D1 type map
+/// Projector of D^1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, D1_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d1, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t =
+      Grid_t<BACKEND, Tout, grid_id, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using type = Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op D2 type map
+/// Projector of D^2
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, D2_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d2, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t =
+      Grid_t<BACKEND, Tout, grid_id, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using type = Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op D3 type map
+/// Projector of D^3
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, D3_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d3, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t =
+      Grid_t<BACKEND, Tout, grid_id, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using type = Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op D4 type map
+/// Projector of D^4
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, D4_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d4, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t =
+      Grid_t<BACKEND, Tout, grid_id, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using type = Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op D1Y1 type map
+/// Projector of D^1Y1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, D1Y1_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d1y1, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t =
+      Grid_t<BACKEND, Tout, grid_id, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using type = Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op DivY1D1Y1 type map
+/// Projector of 1/Y^1 D^1Y1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, DivY1D1Y1_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d1y1, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t =
+      Grid_t<BACKEND, Tout, grid_divy1, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using type = Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op SphRadLapl type map
+/// Projector of 1/Y^2 D^1Y2D^1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, SphRadLapl_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d1y2d1, QuICC::Transform::Chebyshev::LinearMap::none_l>;
+   using backendFft_t = Chebyshev::LinearMap::details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t =
+      Grid_t<BACKEND, Tout, grid_divy2, QuICC::Transform::Chebyshev::LinearMap::none_l>;
    using type = Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
    ;
 };

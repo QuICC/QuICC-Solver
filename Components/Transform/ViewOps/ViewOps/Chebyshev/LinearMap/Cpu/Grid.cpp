@@ -7,6 +7,10 @@
 #include "ViewOps/Chebyshev/LinearMap/Tags.hpp"
 #include "ViewOps/Chebyshev/LinearMap/Types.hpp"
 #include "Profiler/Interface.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Internal/Typedefs.hpp"
+#include "Types/Internal/Math.hpp"
+#include "QuICC/Polynomial/Quadrature/ChebyshevRule.hpp"
 
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
@@ -19,7 +23,10 @@ namespace LinearMap {
 namespace Cpu {
 
 template<class Tout, class Tin, class Operation, std::uint16_t Treatment>
-GridOp<Tout, Tin, Operation, Treatment>::GridOp(ScaleType scale) : mScale(scale){};
+GridOp<Tout, Tin, Operation, Treatment>::GridOp(const double lower, const double upper) : mLower(lower), mUpper(upper), mScale(1.0){};
+
+template<class Tout, class Tin, class Operation, std::uint16_t Treatment>
+GridOp<Tout, Tin, Operation, Treatment>::GridOp(const double lower, const double upper, ScaleType scale) : mLower(lower), mUpper(upper), mScale(scale){};
 
 template<class Tout, class Tin, class Operation, std::uint16_t Treatment>
 void GridOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out, const Tin& in, const ScaleType fftScaling)
@@ -45,8 +52,6 @@ void GridOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out, const Tin& in
         }
     }
 
-    float c = fftScaling;
-
     // Column major
     // Get total number of columns to loop over
     auto indices = in.indices()[1];
@@ -54,29 +59,64 @@ void GridOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out, const Tin& in
 
     const auto N = in.lds();
     const auto nDealias = in.dims()[0];
-    for (std::size_t col = 0; col < columns ; ++col)
+    if constexpr(std::is_same_v<Operation, grid_divy1> || std::is_same_v<Operation, grid_divy2>)
     {
-        // linear index (:,n,k)
-        std::size_t nk = N*col;
-        std::size_t n = 0;
+       // Initialize grid scaling
+       if(mGridScaler.size() == 0)
+       {
+          int p = 0;
+          if constexpr(std::is_same_v<Operation, grid_divy1>)
+          {
+             p = -1;
+          }
+          else if constexpr(std::is_same_v<Operation, grid_divy2>)
+          {
+             p = -2;
+          }
 
-        for (; n < nDealias; ++n)
-        {
-           out.data()[nk+n] = in.data()[nk+n];
-        }
+          Internal::Array igrid, iweights;
+          Polynomial::Quadrature::ChebyshevRule quad;
+          quad.computeQuadrature(igrid, iweights, nDealias, mLower, mUpper);
 
-        // Dealiasing modes
-        for (; n < N; ++n)
-        {
-            out.data()[nk+n] = 0.0;
-        }
+          mGridScaler.reserve(nDealias);
+          for(std::size_t i = 0; i < nDealias; i++)
+          {
+             mGridScaler.push_back(static_cast<double>(Internal::Math::pow(igrid(i),p)));
+          }
+       }
 
+       for (std::size_t col = 0; col < columns ; ++col)
+       {
+          // linear index (:,n,k)
+          std::size_t nk = N*col;
+          std::size_t n = 0;
+
+          for (; n < nDealias; ++n)
+          {
+             out.data()[nk+n] = in.data()[nk+n]*mGridScaler[n];
+          }
+       }
     }
+    else
+    {
+       for (std::size_t col = 0; col < columns ; ++col)
+       {
+          // linear index (:,n,k)
+          std::size_t nk = N*col;
+          std::size_t n = 0;
 
+          for (; n < nDealias; ++n)
+          {
+             out.data()[nk+n] = in.data()[nk+n];
+          }
+       }
+    }
 }
 
 // explicit instantations
-template class GridOp<mods_t, mods_t, grid_id>;
+template class GridOp<phys_t, phys_t, grid_id>;
+template class GridOp<phys_t, phys_t, grid_divy1>;
+template class GridOp<phys_t, phys_t, grid_divy2>;
 
 } // namespace Cpu
 } // namespace LinearMap

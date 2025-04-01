@@ -36,8 +36,10 @@ public:
     using ScaleType = double;
     /// @brief constructor with user defined scaling factor
     /// @param mem
+    /// @param lower Upper bound
+    /// @param upper lower bound
     /// @param scale
-    SFGOp(std::shared_ptr<Memory::memory_resource> mem,
+    SFGOp(std::shared_ptr<Memory::memory_resource> mem, const double lower, const double upper,
       ScaleType scale = 1.0);
     /// @brief default constructor
     SFGOp() = delete;
@@ -68,11 +70,11 @@ private:
 };
 
 template<class Tout, class Tin, class SpecBackend, class FftBackend, class GridBackend>
-SFGOp<Tout, Tin, SpecBackend, FftBackend, GridBackend>::SFGOp(std::shared_ptr<Memory::memory_resource> mem, ScaleType scale) 
+SFGOp<Tout, Tin, SpecBackend, FftBackend, GridBackend>::SFGOp(std::shared_ptr<Memory::memory_resource> mem, const double lower, const double upper, ScaleType scale) 
    : 
-      mSpec(std::make_unique<SpecBackend>()), 
+      mSpec(std::make_unique<SpecBackend>(lower, upper)), 
       mFft(std::make_unique<FftBackend>()), 
-      mGrid(std::make_unique<GridBackend>()), 
+      mGrid(std::make_unique<GridBackend>(lower, upper)), 
       _mem(mem)
 {
 }
@@ -93,8 +95,8 @@ void SFGOp<Tout, Tin, SpecBackend, FftBackend, GridBackend>::applyImpl(Tout& out
 //        }
 //        else
         {
-            _tmpData = std::move(Memory::MemBlock<typename Tin::ScalarType>(in.size(), _mem.get()));
-            _tmpView = Tin(_tmpData.data(), _tmpData.size(), in.dims(), in.pointers(), in.indices(), in.lds());
+            _tmpData = std::move(Memory::MemBlock<typename Tout::ScalarType>(out.size(), _mem.get()));
+            _tmpView = Tout(_tmpData.data(), _tmpData.size(), out.dims(), out.pointers(), out.indices(), out.lds());
         }
     }
 
@@ -102,10 +104,10 @@ void SFGOp<Tout, Tin, SpecBackend, FftBackend, GridBackend>::applyImpl(Tout& out
     mSpec->apply(_tmpView, in, 1.0);
 
     // FFT
-    mFft->apply(out, _tmpView);
+    mFft->apply(_tmpView, _tmpView);
 
     // grid operation
-    mGrid->apply(_tmpView, in, 1.0);
+    mGrid->apply(out, _tmpView, 1.0);
 }
 
 } // namespace Projector

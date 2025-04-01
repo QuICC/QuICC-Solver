@@ -41,11 +41,15 @@ public:
    static constexpr std::uint16_t TreatmentValue = Treatment;
    /// @brief Type of scale parameter, i.e. float 32/64 bits
    using ScaleType = double;
-   /// @brief Constructor with user defined scaling factor
+   /// @brief Constructor with bounds and user defined scaling factor
+   /// @param lower  lower bound
+   /// @param upper  upper bound
    /// @param scale
-   SpecOp(ScaleType scale);
-   /// @brief Default constructor
-   SpecOp() = default;
+   SpecOp(const double lower, const double upper, ScaleType scale);
+   /// @brief constructor with bounds
+   /// @param lower  lower bound
+   /// @param upper  upper bound
+   SpecOp(const double lower, const double upper);
    /// @brief dtor
    ~SpecOp() = default;
 
@@ -58,6 +62,10 @@ private:
    /// @brif Give access to base class
    friend BinaryBaseOp<SpecOp<Tout, Tin, Operation, Treatment>, Tout,
       Tin, ScaleType>;
+   /// @brif Lower bound
+   double mLower;
+   /// @brif Upper bound
+   double mUpper;
    /// @brif Scaling factor, i.e. domain size
    ScaleType mScale{1.0};
 };

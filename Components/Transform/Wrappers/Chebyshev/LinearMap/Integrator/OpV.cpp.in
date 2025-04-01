@@ -36,7 +36,7 @@ void @Op@<@Tag@>::initBackend() const
 
     auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
     using op_t = OpsType<@OpInOut@, @Op@_t, @OpDirection@, Transform::Chebyshev::LinearMap::@Tag@>;
-    mOp = std::make_unique<op_t>(@Mem@);
+    mOp = std::make_unique<op_t>(@Mem@, mspSetup->lower(), this->mspSetup->upper());
 
     constexpr size_t rank = 3;
     std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
