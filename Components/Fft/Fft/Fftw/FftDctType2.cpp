@@ -17,7 +17,6 @@
 #include "Library.hpp"
 #include "Profiler/Interface.hpp"
 
-
 namespace QuICC {
 namespace Fft {
 namespace Fftw {
@@ -55,10 +54,10 @@ fftw_plan setPlanDctType2(const int fwdSize, const int blockSize)
 
    const int* fftSize = &fwdSize;
 
-   // Create the real to real type III plan
+   // Create the real to real type II plan
    const fftw_r2r_kind fftKind[] = {FFTW_REDFT10};
    auto fftwPlan = fftw_plan_many_r2r(1, fftSize, blockSize, bwdTmp.data(),
-      NULL, 2, bwdSize, fwdTmp.data(), NULL, 2, fwdSize, fftKind, Library::planFlag());
+      NULL, 2, 2*bwdSize, fwdTmp.data(), NULL, 2, 2*fwdSize, fftKind, Library::planFlag());
    if (fftwPlan == NULL)
    {
       throw std::logic_error("FFTW plan failed!");
@@ -71,8 +70,8 @@ fftw_plan setPlanDctType2(const int fwdSize, const int blockSize)
 template <class AttIn, class AttOut>
 void FftOp<View::View<std::complex<double>, AttOut>,
    View::View<std::complex<double>, AttIn>, dct_type2_t>::applyImpl(View::View<std::complex<double>,
-                                            AttOut>& phys,
-   const View::View<std::complex<double>, AttIn>& mods)
+                                            AttOut>& mods,
+   const View::View<std::complex<double>, AttIn>& phys)
 {
    using namespace QuICC::View;
    if (_plan == nullptr)
@@ -99,16 +98,16 @@ void FftOp<View::View<std::complex<double>, AttOut>,
    }
    Profiler::RegionFixture<5> fix("Fftw::FftOp::applyFft-DctType2");
    fftw_execute_r2r(static_cast<fftw_plan>(_plan),
-      const_cast<double*>(reinterpret_cast<double*>(mods.data())),
-      reinterpret_cast<double*>(phys.data()));
+      const_cast<double*>(reinterpret_cast<double*>(phys.data())),
+      reinterpret_cast<double*>(mods.data()));
    fftw_execute_r2r(static_cast<fftw_plan>(_plan),
-      const_cast<double*>(reinterpret_cast<double*>(mods.data()))+1,
-      reinterpret_cast<double*>(phys.data())+1);
+      const_cast<double*>(reinterpret_cast<double*>(phys.data()))+1,
+      reinterpret_cast<double*>(mods.data())+1);
 }
 
 // Explicit instantiations
-template class FftOp<CmodsDense2D_t, CphysDense2D_t, dct_type2_t>;
-template class FftOp<CmodsDCCSC3D_t, CphysDCCSC3D_t, dct_type2_t>;
+template class FftOp<CphysDense2D_t, CmodsDense2D_t, dct_type2_t>;
+template class FftOp<CphysDCCSC3D_t, CmodsDCCSC3D_t, dct_type2_t>;
 
 
 } // namespace Fftw

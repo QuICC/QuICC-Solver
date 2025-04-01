@@ -55,10 +55,10 @@ fftw_plan setPlanDctType4(const int fwdSize, const int blockSize)
 
    const int* fftSize = &fwdSize;
 
-   // Create the real to real type III plan
-   const fftw_r2r_kind fftKind[] = {FFTW_REDFT01};
+   // Create the real to real type IV plan
+   const fftw_r2r_kind fftKind[] = {FFTW_REDFT11};
    auto fftwPlan = fftw_plan_many_r2r(1, fftSize, blockSize, bwdTmp.data(),
-      NULL, 2, bwdSize, fwdTmp.data(), NULL, 2, fwdSize, fftKind, Library::planFlag());
+      NULL, 2, 2*bwdSize, fwdTmp.data(), NULL, 2, 2*fwdSize, fftKind, Library::planFlag());
    if (fftwPlan == NULL)
    {
       throw std::logic_error("FFTW plan failed!");
