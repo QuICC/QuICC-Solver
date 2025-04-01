@@ -12,7 +12,7 @@ set(viewGpu_tMemRes "Cuda::Malloc")
 set(viewGpuVkFFT_tMemRes "Cuda::Malloc")
 set(IntegratorMem "mem")
 
-set(IntegratorOps "P")
+set(IntegratorOps "P" "Y1")
 set(IntegratorOpDirection "fwd_t")
 set(IntegratorOpInOut "mods_t, phys_t")
 

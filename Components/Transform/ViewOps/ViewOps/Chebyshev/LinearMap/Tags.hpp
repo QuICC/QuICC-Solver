@@ -41,10 +41,10 @@ struct spec_id
 };
 
 /// @brief tag type for spectral padding operation
-struct spec_pad
+struct spec_y1
 {
    constexpr static std::array<std::size_t,1> p = {0};
-   constexpr static std::array<std::size_t,1> t = {0};
+   constexpr static std::array<std::size_t,1> t = {1};
 };
 
 /// @brief tag type for spectral padding operation
@@ -120,7 +120,16 @@ struct viewGpuVkFFT_t
 };
 
 /// @brief no special treatment
-constexpr std::uint16_t none_l = 0;
+constexpr std::uint16_t none_t = 0;
+
+/// @brief no special treatment
+constexpr std::uint16_t ndealias_in = 1 << 1;
+
+/// @brief no special treatment
+constexpr std::uint16_t ndealias_out = 1 << 2;
+
+/// @brief no special treatment
+constexpr std::uint16_t zero_pad = 1 << 3;
 
 /// @brief P op type tag
 struct P_t
@@ -129,6 +138,11 @@ struct P_t
 
 /// @brief P_Zero op type tag
 struct P_Zero_t
+{
+};
+
+/// @brief P op type tag
+struct Y1_t
 {
 };
 

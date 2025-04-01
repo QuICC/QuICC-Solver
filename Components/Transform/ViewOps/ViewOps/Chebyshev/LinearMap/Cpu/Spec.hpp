@@ -29,9 +29,9 @@ using namespace QuICC::Operator;
 /// @tparam Tout output modes type
 /// @tparam Tin input modes type
 /// @tparam Operation type of spectral operation
-/// @tparam Treatment special treatment mask, typically of mode zero
+/// @tparam Treatment special treatment mask
 template <class Tout, class Tin, class Operation,
-   std::uint16_t Treatment = 0>
+   std::uint16_t Treatment>
 class SpecOp
     : public BinaryBaseOp<SpecOp<Tout, Tin, Operation, Treatment>, Tout,
          Tin, typename Tout::ScalarType::value_type>
