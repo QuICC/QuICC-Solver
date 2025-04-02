@@ -1,22 +1,17 @@
 /**
- * @file Y.cpp
- * @brief Source of the implementation of the  Chebyshev Y integrator, with linear map y = ax + b
+ * @file Y1.cpp
+ * @brief Source of the implementation of the  Chebyshev Y integrator, with
+ * linear map y = ax + b
  */
 
 // System includes
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/Y1.hpp"
-
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Y1.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/Y1.hpp"
 
 namespace QuICC {
 
@@ -30,39 +25,36 @@ namespace LinearMap {
 
 namespace Integrator {
 
-   Y1::Y1()
-   {
-   }
-
-   Y1::~Y1()
-   {
-   }
-
-   void Y1::initOperator() const
-   {
-      int size = this->mspSetup->specSize() + std::min(1, this->mspSetup->padSize());
-      ::QuICC::SparseSM::Chebyshev::LinearMap::Y1 op(size, size, this->mspSetup->lower(), this->mspSetup->upper());
-      this->mBackend.setSpectralOperator(op.mat().topRows(this->mspSetup->specSize()));
-   }
-
-   void Y1::applyPostOperator(Matrix& rOut) const
-   {
-      this->mBackend.outputSpectral(rOut);
-   }
-
-   void Y1::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
-   {
-      this->mBackend.input(tmp, in, useReal);
-   }
-
-   void Y1::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
-   {
-      this->mBackend.outputSpectral(rOut, tmp, useReal);
-   }
-
+void Y1::initOperator() const
+{
+   int size =
+      this->mspSetup->specSize() + std::min(1, this->mspSetup->padSize());
+   ::QuICC::SparseSM::Chebyshev::LinearMap::Y1 op(size, size,
+      this->mspSetup->lower(), this->mspSetup->upper());
+   this->mBackend.setSpectralOperator(
+      op.mat().topRows(this->mspSetup->specSize()));
 }
+
+void Y1::applyPostOperator(Matrix& rOut) const
+{
+   this->mBackend.outputSpectral(rOut);
 }
+
+void Y1::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+   const bool useReal) const
+{
+   this->mBackend.input(tmp, in, useReal);
 }
+
+void Y1::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+   const bool useReal) const
+{
+   this->mBackend.outputSpectral(rOut, tmp, useReal);
 }
-}
-}
+
+} // namespace Integrator
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

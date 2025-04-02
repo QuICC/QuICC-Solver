@@ -4,7 +4,9 @@ message(VERBOSE "Integrators:")
 include(ConfigureTests)
 set(_tests
   P:integrator
+  P_Zero:integrator
   Y1:integrator
+  Y1_Zero:integrator
   I2:integrator
   I2D1:integrator
   I2D1_I2:integrator
@@ -18,6 +20,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:type
     ULP 11
+    IDS 0 1 2 3 4 5
   )
 endforeach()
 
@@ -36,6 +39,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:type
     ULP ${_ulp}
+    IDS 0 1 2 3 4 5
   )
 endforeach()
 
@@ -47,6 +51,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:type
     ULP 100
+    IDS 0 1 2 3 4 5
   )
 endforeach()
 
@@ -58,6 +63,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:type
     ULP 700
+    IDS 0 1 2 3 4 5
   )
 endforeach()
 
@@ -69,6 +75,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:type
     ULP 150
+    IDS 0 1 2 3 4 5
   )
 endforeach()
 
@@ -80,5 +87,6 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:type
     ULP 175
+    IDS 0 1 2 3 4 5
   )
 endforeach()
