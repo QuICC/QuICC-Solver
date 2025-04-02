@@ -90,9 +90,11 @@ void readData(Matrix& inData, const std::string& path)
          for (int j = 0; j < inData.cols(); ++j)
          {
             infile >> inData(i, j);
-            if(infile.fail())
+            if (infile.fail())
             {
-               throw std::logic_error(path + ": Failed to read real data file at (i,j): (" + std::to_string(i) + "," + std::to_string(j) + ")");
+               throw std::logic_error(
+                  path + ": Failed to read real data file at (i,j): (" +
+                  std::to_string(i) + "," + std::to_string(j) + ")");
             }
          }
       }
@@ -131,9 +133,11 @@ void readData(MatrixZ& inData, const std::string& path)
          {
             infile >> val;
             inData(i, j) = val;
-            if(infile.fail())
+            if (infile.fail())
             {
-               throw std::logic_error("Failed to read real part of complex data file at (i,j): (" + std::to_string(i) + "," + std::to_string(j) + ")");
+               throw std::logic_error(
+                  "Failed to read real part of complex data file at (i,j): (" +
+                  std::to_string(i) + "," + std::to_string(j) + ")");
             }
          }
       }
@@ -145,9 +149,12 @@ void readData(MatrixZ& inData, const std::string& path)
          {
             infile >> val;
             inData(i, j) += val * Math::cI;
-            if(infile.fail())
+            if (infile.fail())
             {
-               throw std::logic_error("Failed to read  imaginary part of complex data file at (i,j): (" + std::to_string(i) + "," + std::to_string(j) + ")");
+               throw std::logic_error("Failed to read  imaginary part of "
+                                      "complex data file at (i,j): (" +
+                                      std::to_string(i) + "," +
+                                      std::to_string(j) + ")");
             }
          }
       }
@@ -212,9 +219,11 @@ void readList(Array& inData, const std::string& path)
       for (int i = 0; i < inData.size(); ++i)
       {
          infile >> inData(i);
-         if(infile.fail())
+         if (infile.fail())
          {
-            throw std::logic_error("Failed to read list from data file at (i): (" + std::to_string(i) + ")");
+            throw std::logic_error(
+               "Failed to read list from data file at (i): (" +
+               std::to_string(i) + ")");
          }
       }
       infile.close();
@@ -266,9 +275,11 @@ void readList(std::vector<MHDFloat>& inData, const std::string& path)
       {
          MHDFloat tmp;
          infile >> tmp;
-         if(infile.fail())
+         if (infile.fail())
          {
-            throw std::logic_error("Failed to read list from data file at (i): (" + std::to_string(i) + ")");
+            throw std::logic_error(
+               "Failed to read list from data file at (i): (" +
+               std::to_string(i) + ")");
          }
          inData[i] = tmp;
       }

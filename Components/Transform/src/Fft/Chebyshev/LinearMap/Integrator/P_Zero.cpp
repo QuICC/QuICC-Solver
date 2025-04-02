@@ -1,6 +1,7 @@
 /**
  * @file P_Zero.cpp
- * @brief Source of the implementation of the Chebyshev P integrator, with linear map y = ax + b
+ * @brief Source of the implementation of the Chebyshev P integrator, with
+ * linear map y = ax + b
  */
 
 // System includes
@@ -23,33 +24,37 @@ namespace LinearMap {
 
 namespace Integrator {
 
-   void P_Zero::initOperator() const
+void P_Zero::initOperator() const
+{
+   if (this->mspSetup->slowSize() > 0 && this->mspSetup->slow(0) == 0)
    {
-      if(this->mspSetup->slowSize() > 0 && this->mspSetup->slow(0) == 0)
-      {
-         int size = this->mspSetup->specSize() + std::min(0, this->mspSetup->padSize());
-         this->mBackend.setMeanOperator(SparseMatrix(size, size).topRows(this->mspSetup->specSize()));
-      }
+      int size =
+         this->mspSetup->specSize() + std::min(0, this->mspSetup->padSize());
+      this->mBackend.setMeanOperator(
+         SparseMatrix(size, size).topRows(this->mspSetup->specSize()));
    }
+}
 
-   void P_Zero::applyPostOperator(Matrix& rOut) const
-   {
-      this->mBackend.output(rOut);
-   }
+void P_Zero::applyPostOperator(Matrix& rOut) const
+{
+   this->mBackend.output(rOut);
+}
 
-   void P_Zero::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
-   {
-      this->mBackend.input(tmp, in, useReal);
-   }
+void P_Zero::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+   const bool useReal) const
+{
+   this->mBackend.input(tmp, in, useReal);
+}
 
-   void P_Zero::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
-   {
-      this->mBackend.output(rOut, tmp, useReal);
-   }
+void P_Zero::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+   const bool useReal) const
+{
+   this->mBackend.output(rOut, tmp, useReal);
+}
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

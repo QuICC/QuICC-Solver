@@ -1,6 +1,7 @@
 /**
  * @file P.cpp
- * @brief Source of the implementation of the Chebyshev P integrator, with linear map y = ax + b
+ * @brief Source of the implementation of the Chebyshev P integrator, with
+ * linear map y = ax + b
  */
 
 // System includes
@@ -29,32 +30,30 @@ namespace LinearMap {
 
 namespace Integrator {
 
-   P::P()
-   {
-   }
+P::P() {}
 
-   P::~P()
-   {
-   }
+P::~P() {}
 
-   void P::applyPostOperator(Matrix& rOut) const
-   {
-      this->mBackend.output(rOut);
-   }
+void P::applyPostOperator(Matrix& rOut) const
+{
+   this->mBackend.output(rOut);
+}
 
-   void P::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
-   {
-      this->mBackend.input(tmp, in, useReal);
-   }
+void P::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+   const bool useReal) const
+{
+   this->mBackend.input(tmp, in, useReal);
+}
 
-   void P::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
-   {
-      this->mBackend.output(rOut, tmp, useReal);
-   }
+void P::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+   const bool useReal) const
+{
+   this->mBackend.output(rOut, tmp, useReal);
+}
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC
