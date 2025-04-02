@@ -22,6 +22,7 @@
 #include "TestSuite/DenseSM/TesterBase.hpp"
 #include "TestSuite/DenseSM/Chebyshev/LinearMap/DipolarS1.hpp"
 #include "TestSuite/DenseSM/Chebyshev/LinearMap/QuadrupolarS2.hpp"
+#include "TestSuite/DenseSM/Chebyshev/LinearMap/Polytrope.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
 #include "QuICC/Bc/Name/FixedFlux.hpp"
 #include "QuICC/Bc/Name/Insulating.hpp"
@@ -148,6 +149,10 @@ namespace LinearMap {
          {
             pF = std::make_shared<QuadrupolarS2>();
          }
+         else if (fId == 2)
+         {
+            pF = std::make_shared<Polytrope>(0.35, 5, 3);
+         }
          else
          {
             throw std::logic_error("Unknown forcing function ID");
@@ -189,6 +194,10 @@ namespace LinearMap {
          else if (fId == 1)
          {
             pF = std::make_shared<QuadrupolarS2>();
+         }
+         else if (fId == 2)
+         {
+            pF = std::make_shared<Polytrope>(0.35, 5, 3);
          }
          else
          {
@@ -237,6 +246,10 @@ namespace LinearMap {
             {
                pFa = std::make_shared<QuadrupolarS2>();
             }
+            else if (fAId == 2)
+            {
+               pFa = std::make_shared<Polytrope>(0.35, 5, 3);
+            }
             else
             {
                throw std::logic_error("Unknown forcing function");
@@ -256,6 +269,11 @@ namespace LinearMap {
             {
                pFb = std::make_shared<QuadrupolarS2>();
             }
+            else if (fBId == 2)
+            {
+               pFb = std::make_shared<Polytrope>(0.35, 5, 3);
+            }
+            
             else
             {
                throw std::logic_error("Unknown forcing function");

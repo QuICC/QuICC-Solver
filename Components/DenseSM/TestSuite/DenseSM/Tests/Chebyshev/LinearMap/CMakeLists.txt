@@ -96,6 +96,34 @@ endfunction()
 
 
 ### Tests for the new operators written for the anelastic model
+# Create anelastic operators coefficients, polytropic profile, Nrho=5
+
+# r^1 prefactor:
+
+set(_tests
+  FD1:dense
+  FD2:dense
+  FD3:dense
+  FD4:dense
+  )
+set(_ids 400 401 402 403)
+set(_qis 0) # the Iq operators are not implemented yet
+run_iqrp_tests("Anelastic, polytropic, Nrho5" TESTS ${_tests} IDS ${_ids} QIS ${_qis})
+
+# r^4 prefactor:
+
+set(_tests
+  FD1:dense
+  FD2:dense
+  FD3:dense
+  FD4:dense
+  )
+set(_ids 404 405 406 407)
+set(_qis 0) # the Iq operators are not implemented yet
+run_iqrp_tests("Anelastic, polytropic, Nrho5" TESTS ${_tests} IDS ${_ids} QIS ${_qis})
+
+
+
 # Create anelastic operators coefficients, dipolar tests, r^2 prefactor
 
 set(_tests
