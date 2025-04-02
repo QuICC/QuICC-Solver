@@ -52,6 +52,15 @@ public:
    ~SpecOp() = default;
 
 private:
+   /// @brief Multiply by Y
+   std::size_t multiplyByY(typename Tout::ScalarType* const out,
+      typename Tout::ScalarType* in, const std::size_t Nout,
+      const std::size_t Nin, const double c, const std::size_t shiftIn = 0);
+
+   /// @brief Differentiate
+   void differentiate(typename Tout::ScalarType* const out,
+      const std::size_t Nout);
+
    /// @brief Action implementation
    /// @param out output modes
    /// @param in input modes

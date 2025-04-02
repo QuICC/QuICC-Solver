@@ -107,48 +107,15 @@ void SpecOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out,
          }
          else
          {
-            // 2*a, from y=ax + b
-            double a2 = (mUpper - mLower);
-            // off diagonal entries are a/2, from y = ax + b
-            double d1 = c * a2 / 4.0;
-            // diagonal coefficient is b, from y = ax + b
-            double d0 = 2.0 * (mUpper + mLower) / a2;
-
-            typename Tout::ScalarType* ptr = in.data() + nki;
-
-            std::size_t k = 0;
+            assert(Nin >= nDealias + 1);
+            n = nDealias + 1;
+            typename Tout::ScalarType* inPtr = in.data() + nki;
+            typename Tout::ScalarType* outPtr = out.data() + nko;
             for (std::size_t j = 1; j <= t; j++)
             {
-               k = 0;
-               typename Tout::ScalarType vPrev = *ptr;
-               typename Tout::ScalarType vCurr = *ptr;
-
-               out.data()[nko + k] = d1 * ((*ptr) * d0 + *(ptr + 1) * 2.0);
-               k++;
-               ptr++;
-
-               for (; k < nDealias; ++k, ++ptr)
-               {
-                  vCurr = *ptr;
-                  out.data()[nko + k] = d1 * (vPrev + vCurr * d0 + *(ptr + 1));
-                  vPrev = vCurr;
-               }
-               if (k < Nout)
-               {
-                  vCurr = *ptr;
-                  out.data()[nko + k] = d1 * (vPrev + vCurr * d0);
-                  vPrev = vCurr;
-                  k++;
-               }
-               if (k < Nout)
-               {
-                  out.data()[nko + k] = d1 * (vPrev);
-                  k++;
-               }
-
-               ptr = out.data() + nko;
+               n = this->multiplyByY(outPtr, inPtr, Nout, n, c);
+               inPtr = out.data() + nko;
             }
-            n = k;
          }
 
          if constexpr (Treatment & zero_pad)
@@ -165,28 +132,24 @@ void SpecOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out,
       const auto& ps = Operation::p;
       const auto& ts = Operation::t;
 
-      // 2*a, from y=ax + b
-      double a2 = (mUpper - mLower);
-      // off diagonal entries are a/2, from y = ax + b
-      double d1 = a2 / 4.0;
-      // diagonal coefficient is b, from y = ax + b
-      double d0 = 2.0 * (mUpper + mLower) / a2;
       for (std::size_t col = 0; col < columns; ++col)
       {
          // linear index (:,n,k)
          std::size_t nko = Nout * col;
          std::size_t nki = Nin * col;
 
+         typename Tout::ScalarType* inPtr = in.data() + nki;
+         typename Tout::ScalarType* outPtr = out.data() + nko;
+
          // Set aliasing modes to zero
          if constexpr (Treatment & zero_pad)
          {
             for (std::size_t n = nDealias; n < Nout; ++n)
             {
-               out.data()[nko + n] = 0;
+               outPtr[n] = 0;
             }
          }
 
-         typename Tout::ScalarType* ptr = in.data() + nki;
          for (std::size_t ip = 0; ip < ps.size(); ip++)
          {
             const std::size_t& p = ps[ip];
@@ -198,66 +161,106 @@ void SpecOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out,
                std::size_t k = 0;
                if (t == 0)
                {
-                  ptr++;
-                  for (; k < nDealias - 1; ++k, ++ptr)
+                  inPtr++;
+                  for (; k < nDealias - 1; ++k, ++inPtr)
                   {
-                     out.data()[nko + k] = *ptr;
+                     outPtr[k] = *inPtr;
                   }
-                  out.data()[nko + k] = 0;
+                  outPtr[k] = 0;
 
-                  ptr = out.data() + nko;
+                  inPtr = out.data() + nko;
                }
                // multiply by Y, shift and zero last
                else
                {
-                  std::size_t s;
+                  k = nDealias;
+                  std::size_t s = 0;
                   for (std::size_t j = 1; j <= t; j++)
                   {
-                     k = 0;
-                     typename Tout::ScalarType vPrev = *ptr;
-                     typename Tout::ScalarType vCurr = *ptr;
                      if (j == t)
                      {
                         s = 1;
-                        ptr++;
                      }
-                     else
-                     {
-                        s = 0;
-                        out.data()[nko + k] =
-                           d1 * ((*ptr) * d0 + *(ptr + 1) * 2.0);
-                        k++;
-                        ptr++;
-                     }
-
-                     for (; k < nDealias - 1 - s; ++k, ++ptr)
-                     {
-                        vCurr = *ptr;
-                        out.data()[nko + k] =
-                           d1 * (vPrev + vCurr * d0 + *(ptr + 1));
-                        vPrev = vCurr;
-                     }
-                     vCurr = *ptr;
-                     out.data()[nko + k] = d1 * (vPrev + vCurr * d0);
-                     vPrev = vCurr;
-                     k++;
-                     out.data()[nko + k] = d1 * (vPrev);
-                     k++;
-
-                     ptr = out.data() + nko;
+                     k = this->multiplyByY(outPtr, inPtr, Nout, k - s, c, s);
+                     inPtr = out.data() + nko;
                   }
                }
 
                // Compute derivative
-               for (; k > 0; --k)
-               {
-                  double scale = static_cast<double>(4 * k) * a2;
-                  out.data()[nko + k - 1] =
-                     out.data()[nko + k + 1] + scale * out.data()[nko + k - 1];
-               }
+               differentiate(outPtr, k + 1);
             }
          }
       }
+   }
+}
+
+template <class Tout, class Tin, class Operation, std::uint16_t Treatment>
+std::size_t SpecOp<Tout, Tin, Operation, Treatment>::multiplyByY(
+   typename Tout::ScalarType* const out, typename Tout::ScalarType* in,
+   const std::size_t Nout, const std::size_t Nin, const double c,
+   const std::size_t shiftIn)
+{
+   assert(Nout >= Nin - 2);
+
+   // 2*a, from y=ax + b
+   double a2 = (mUpper - mLower);
+   // off diagonal entries are a/2, from y = ax + b
+   double d1 = c * a2 / 4.0;
+   // diagonal coefficient is b, from y = ax + b
+   double d0 = 2.0 * (mUpper + mLower) / a2;
+
+   std::size_t k;
+   const std::size_t Nk = Nin - 1;
+   typename Tout::ScalarType vPrev = in[0];
+   typename Tout::ScalarType vCurr;
+
+   if (shiftIn > 0)
+   {
+      k = 0;
+      in += shiftIn;
+   }
+   else
+   {
+      out[0] = d1 * (in[0] * d0 + in[1] * 2.0);
+      k = 1;
+      in++;
+   }
+
+   for (; k < Nk; ++k, ++in)
+   {
+      vCurr = in[0];
+      out[k] = d1 * (vPrev + in[0] * d0 + in[1]);
+      vPrev = vCurr;
+   }
+   if (k < Nout)
+   {
+      vCurr = in[0];
+      out[k] = d1 * (vPrev + in[0] * d0);
+      vPrev = vCurr;
+      k++;
+   }
+   if (k < Nout)
+   {
+      out[k] = d1 * (vPrev);
+      k++;
+   }
+
+   return k;
+}
+
+template <class Tout, class Tin, class Operation, std::uint16_t Treatment>
+void SpecOp<Tout, Tin, Operation, Treatment>::differentiate(
+   typename Tout::ScalarType* const out, const std::size_t Nout)
+{
+   // 2*a, from y=ax + b
+   double a2 = (mUpper - mLower);
+
+   // Compute derivative
+   assert(out[Nout] == 0.0);
+   for (std::size_t k = Nout - 1; k > 0; --k)
+   {
+      double scale = static_cast<double>(4 * k) * a2;
+      out[k - 1] = out[k + 1] + scale * out[k - 1];
    }
 }
 
