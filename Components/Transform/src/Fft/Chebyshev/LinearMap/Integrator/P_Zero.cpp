@@ -1,5 +1,5 @@
 /**
- * @file P.cpp
+ * @file P_Zero.cpp
  * @brief Source of the implementation of the Chebyshev P integrator, with
  * linear map y = ax + b
  */
@@ -8,15 +8,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/P_Zero.hpp"
 
 namespace QuICC {
 
@@ -30,22 +24,29 @@ namespace LinearMap {
 
 namespace Integrator {
 
-P::P() {}
+void P_Zero::initOperator() const
+{
+   if (this->mspSetup->slowSize() > 0 && this->mspSetup->slow(0) == 0)
+   {
+      int size =
+         this->mspSetup->specSize() + std::min(0, this->mspSetup->padSize());
+      this->mBackend.setMeanOperator(
+         SparseMatrix(size, size).topRows(this->mspSetup->specSize()));
+   }
+}
 
-P::~P() {}
-
-void P::applyPostOperator(Matrix& rOut) const
+void P_Zero::applyPostOperator(Matrix& rOut) const
 {
    this->mBackend.output(rOut);
 }
 
-void P::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void P_Zero::applyPreOperator(Matrix& tmp, const MatrixZ& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);
 }
 
-void P::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+void P_Zero::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
    const bool useReal) const
 {
    this->mBackend.output(rOut, tmp, useReal);
