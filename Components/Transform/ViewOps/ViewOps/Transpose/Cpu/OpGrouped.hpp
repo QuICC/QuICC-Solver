@@ -48,7 +48,7 @@ template <class Tout, class Tin, class Perm>
 void OpGrouped<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 {
    assert(out.size() == in.size());
-   Profiler::RegionFixture<4> fix("Transpose::Cpu::applyImpl");
+   Profiler::RegionFixture<4> fix("Transpose::Cpu::OpGrouped::applyImpl");
    if constexpr (std::is_same_v<Perm, p201_t>)
    {
       for (std::size_t i = 0; i < in.size(); ++i)
