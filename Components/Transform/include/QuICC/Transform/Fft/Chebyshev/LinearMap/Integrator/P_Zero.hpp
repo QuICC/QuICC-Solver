@@ -1,22 +1,13 @@
 /**
- * @file I4D1_I2.hpp
- * @brief Implementation of the Chebyshev based I^4 of D integrator, but 0 mode
- * is I2 of P integrator, with linear map y = ax + b
+ * @file P_Zero.hpp
+ * @brief Implementation of the Chebyshev based P integrator, with linear map y
+ * = ax + b
  */
 
-#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_I4D1_I2_HPP
-#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_I4D1_I2_HPP
-
-// Debug includes
-//
-
-// Configuration includes
-//
+#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_P_ZERO_HPP
+#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_P_ZERO_HPP
 
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -37,33 +28,23 @@ namespace LinearMap {
 namespace Integrator {
 
 /**
- * @brief Implementation of the Chebyshev based I^4 of D integrator, but 0 mode
- * is I^2 of P integrator, with linear map y = ax + b
+ * @brief Implementation of the Chebyshev based P integrator, with linear map y
+ * = ax + b
  */
-class I4D1_I2 : public IChebyshevIntegrator
+class P_Zero : public IChebyshevIntegrator
 {
 public:
    /**
     * @brief Constructor
     */
-   I4D1_I2();
+   P_Zero() = default;
 
    /**
     * @brief Destructor
     */
-   ~I4D1_I2();
+   ~P_Zero() = default;
 
 protected:
-   /**
-    * @brief Sparse matrix operator
-    */
-   mutable SparseMatrix mOp;
-
-   /**
-    * @brief Sparse matrix operator for mean
-    */
-   mutable SparseMatrix mMeanOp;
-
 private:
    /**
     * @brief Initialize solver operators
@@ -103,4 +84,4 @@ private:
 } // namespace Transform
 } // namespace QuICC
 
-#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_I4D1_I2_HPP
+#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_P_ZERO_HPP

@@ -1,6 +1,7 @@
 /**
  * @file I2.cpp
- * @brief Source of the implementation of the Chebyshev I2 of P integrator, with linear map y = ax + b
+ * @brief Source of the implementation of the Chebyshev I2 of P integrator, with
+ * linear map y = ax + b
  */
 
 // System includes
@@ -30,39 +31,40 @@ namespace LinearMap {
 
 namespace Integrator {
 
-   I2::I2()
-   {
-   }
+I2::I2() {}
 
-   I2::~I2()
-   {
-   }
+I2::~I2() {}
 
-   void I2::initOperator() const
-   {
-      int size = this->mspSetup->specSize() + std::min(2, this->mspSetup->padSize());
-      ::QuICC::SparseSM::Chebyshev::LinearMap::I2 op(size, size, this->mspSetup->lower(), this->mspSetup->upper());
-      this->mBackend.setSpectralOperator(op.mat().topRows(this->mspSetup->specSize()));
-   }
+void I2::initOperator() const
+{
+   int size =
+      this->mspSetup->specSize() + std::min(2, this->mspSetup->padSize());
+   ::QuICC::SparseSM::Chebyshev::LinearMap::I2 op(size, size,
+      this->mspSetup->lower(), this->mspSetup->upper());
+   this->mBackend.setSpectralOperator(
+      op.mat().topRows(this->mspSetup->specSize()));
+}
 
-   void I2::applyPostOperator(Matrix& rOut) const
-   {
-      this->mBackend.outputSpectral(rOut);
-   }
+void I2::applyPostOperator(Matrix& rOut) const
+{
+   this->mBackend.outputSpectral(rOut);
+}
 
-   void I2::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
-   {
-      this->mBackend.input(tmp, in, useReal);
-   }
+void I2::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+   const bool useReal) const
+{
+   this->mBackend.input(tmp, in, useReal);
+}
 
-   void I2::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
-   {
-      this->mBackend.outputSpectral(rOut, tmp, useReal);
-   }
+void I2::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+   const bool useReal) const
+{
+   this->mBackend.outputSpectral(rOut, tmp, useReal);
+}
 
-}
-}
-}
-}
-}
-}
+} // namespace Integrator
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace Fft
+} // namespace Transform
+} // namespace QuICC

@@ -14,5 +14,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I4Y3D1Y1_Zero.cpp
   I4Y3_Zero.cpp
   P.cpp
+  P_Zero.cpp
   Y1.cpp
+  Y1_Zero.cpp
 )
