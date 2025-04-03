@@ -36,7 +36,7 @@ TEST_CASE( "Error for @Operator@@Impl@ projector", "[@CatchTestName@]" )
    typedef Projector::@Operator@@Impl@ Projector;
    typedef typename currentts::Tester<Projector> Tester;
 
-   Tester tester("@Operator@@Impl@.dat", currentts::args().dumpData);
+   Tester tester("@Operator@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
 
    Tester::ParameterType params = {-1};
