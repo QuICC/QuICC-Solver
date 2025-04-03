@@ -62,7 +62,8 @@ namespace Transform {
 void DefaultShellChebyshevMap::operator()(MapType& m) const
 {
 #ifdef QUICC_HAS_CUDA_BACKEND
-      using backend_t = Fft::Chebyshev::LinearMap::viewGpu_t;
+      //using backend_t = Fft::Chebyshev::LinearMap::viewGpu_t;
+      using backend_t = Fft::Chebyshev::LinearMap::base_t;
 #else
       //using backend_t = Fft::Chebyshev::LinearMap::viewCpu_t;
       using backend_t = Fft::Chebyshev::LinearMap::base_t;
