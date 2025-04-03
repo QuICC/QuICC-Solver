@@ -6,10 +6,6 @@
 #ifndef QUICC_TESTSUITE_TRANSFORM_CHEBYSHEV_LINEARMAP_TESTER_HPP
 #define QUICC_TESTSUITE_TRANSFORM_CHEBYSHEV_LINEARMAP_TESTER_HPP
 
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -85,9 +81,15 @@ protected:
    virtual void readFile(Matrix& data, const ParameterType& param,
       const TestType type, const ContentType ctype) const override;
 
+   /**
+    * @brief Read complex data from file
+    */
    virtual void readFile(MatrixZ& data, const ParameterType& param,
       const TestType type, const ContentType ctype) const override;
 
+   /**
+    * @brief Read data from database file
+    */
    template <typename TData>
    void dbReadFile(TData& data, const ParameterType& param, const TestType type,
       const ContentType ctype) const;
@@ -188,26 +190,57 @@ template <typename TData>
 void Tester<TOp, TOp2>::dbReadFile(TData& data, const ParameterType& param,
    const TestType type, const ContentType ctype) const
 {
-   // Create setup
-   auto spSetup = this->buildSetup(param, type);
+   // Read database file
+   ParameterType dbParam = {param.at(0)};
+   auto spDbSetup = this->buildSetup(dbParam, type);
+   int dbRows = data.rows();
+   int dbCols = spDbSetup->slowSize();
+   if (type == TestType::PROJECTOR && ctype == ContentType::INPUT)
+   {
+      dbRows = spDbSetup->fastSize(0);
+   }
 
    // Read database file
-   TData dbData = TData::Zero(data.rows(), spSetup->specSize());
-   ParameterType dbParam = {param.at(0)};
+   TData dbData = TData::Zero(dbRows, dbCols);
    std::string fullname =
       this->makeFilename(dbParam, this->refRoot(), type, ctype);
    readData(dbData, fullname);
 
-   // Loop over indexes
-   int col = 0;
+   // Create setup
+   auto spSetup = this->buildSetup(param, type);
+
+   // Count modes
+   int nModes = 0;
    for (int j = 0; j < spSetup->slowSize(); j++)
    {
-      int m = spSetup->slow(j);
+      nModes += spSetup->mult(j);
+   }
+
+   std::function<void(TData&, const TData&, const int, const int)> fillData =
+      [](TData& data, const TData& db, const int idx, const int j_)
+   {
+      const int dataRows = data.rows();
+      data.block(0, idx, dataRows, 1) = db.block(0, j_, dataRows, 1);
+   };
+
+   // Special case for energy reduction
+   if (type == TestType::REDUCTOR && ctype == ContentType::REFERENCE &&
+       data.rows() == nModes && data.cols() == 1)
+   {
+      fillData = [](TData& data, const TData& db, const int idx, const int j_)
+      { data(idx, 0) = db(0, j_); };
+   }
+
+   // Loop over indexes
+   int idx = 0;
+   for (int j = 0; j < spSetup->slowSize(); j++)
+   {
+      int j_ = spSetup->slow(j);
       // Loop over multiplier
       for (int i = 0; i < spSetup->mult(j); i++)
       {
-         data.col(col) = dbData.col(m);
-         col++;
+         fillData(data, dbData, idx, j_);
+         idx++;
       }
    }
 }
@@ -442,48 +475,82 @@ template <typename TOp, typename TOp2>
 std::shared_ptr<typename TOp::SetupType> Tester<TOp, TOp2>::buildSetup(
    const ParameterType& param, const TestType type) const
 {
-   // Read metadata
-   Array meta(0);
+   // Read DB metadata
+   ParameterType dbParam(param.begin(), param.begin() + 1);
+   Array dbMeta(0);
    std::string fullname =
+      this->makeFilename(dbParam, this->refRoot(), type, ContentType::META);
+   readList(dbMeta, fullname);
+
+   // Read (distributed) metadata
+   Array meta(0);
+   fullname =
       this->makeFilename(param, this->refRoot(), type, ContentType::META);
    readList(meta, fullname);
 
    // Create setup
-   int nMeta = 4;
+   int nMeta = 5;
+   if (dbMeta(0) != meta(0) || dbMeta(1) != meta(1) || dbMeta(3) != meta(3) ||
+       dbMeta(4) != meta(4))
+   {
+      throw std::logic_error("Distributed data doesn't match database");
+   }
    int specN = meta(0);
    int physN = meta(1);
    double lb = meta(2);
    double ub = meta(3);
-   auto spSetup = std::make_shared<typename TOp::SetupType>(physN,
-      meta.size() - nMeta, specN, GridPurpose::SIMULATION);
+   int nModes = meta(4);
+
+   // Gather indices
+   std::map<int, std::pair<int, int>> indices;
+   assert((meta.size() - nMeta - 2 * nModes) % 2 == 0);
+   int nModes2D = 0;
+   int h = nMeta;
+
+   // Create mode list
+   for (int i = 0; i < nModes; i++)
+   {
+      int k_ = static_cast<int>(meta(h));
+      int mult = static_cast<int>(meta(h + 1));
+      indices.insert(std::pair(k_, std::make_pair(mult, 0)));
+      h += 2;
+      nModes2D += mult;
+   }
+
+   auto spSetup = std::make_shared<typename TOp::SetupType>(physN, nModes2D,
+      specN, GridPurpose::SIMULATION);
    spSetup->setBoxScale(1.0);
    spSetup->setBounds(lb, ub);
 
-   // Gather indices
-   std::map<int, int> indices;
-   if (param.size() == 1)
+   // Check meta data size
+   if (meta.size() - nMeta - 2 * nModes - 2 * nModes2D != 0)
    {
-      for (int i = nMeta; i < meta.size(); i++)
-      {
-         int m = static_cast<int>(meta(i));
-         indices[m]++;
-      }
+      throw std::logic_error(
+         "Meta data format is not supported (file: " + fullname + ")");
    }
-   else
+
+   // Set truncation
+   for (auto& [k_, p]: indices)
    {
-      assert((meta.size() - nMeta) % 2 == 0);
-      for (int i = nMeta; i < meta.size(); i += 2)
+      // Get 1D truncation of first 2D mode
+      p.second = meta(h + 1);
+
+      // Check all 2D modes have same truncation
+      for (int j = 0; j < p.first; j++)
       {
-         int m = static_cast<int>(meta(i));
-         int mult = static_cast<int>(meta(i + 1));
-         indices.insert(std::pair(m, mult));
+         if (p.second != meta(h + 1))
+         {
+            throw std::logic_error(
+               "Meta data format is not supported (file: " + fullname + ")");
+         }
+         h += 2;
       }
    }
 
    // Add indices with multiplier
-   for (const auto& [m, mult]: indices)
+   for (const auto& [k_, p]: indices)
    {
-      spSetup->addIndex(m, mult);
+      spSetup->addIndex(k_, p.first);
    }
    spSetup->lock();
 
