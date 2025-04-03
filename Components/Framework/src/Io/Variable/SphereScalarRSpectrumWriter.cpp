@@ -10,6 +10,7 @@
 
 // Project includes
 //
+#include "QuICC/Io/Variable/SphereScalarRSpectrumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
