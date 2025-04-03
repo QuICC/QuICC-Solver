@@ -3,22 +3,13 @@
  * @brief Source of the implementation of the ASCII spherical harmonics radial power spectrum calculation for scalar field in a sphere
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/SphereScalarRSpectrumWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/SphereScalarRSpectrumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
