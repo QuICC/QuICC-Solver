@@ -3,10 +3,6 @@
  * @brief Tests for the linear map Chebyshev based @Operator@ projector
  */
 
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -19,7 +15,7 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::Chebyshev::LinearMap;
 
-TEST_CASE( "Error for @Operator@@Template@ projector", "[@CatchTestName@]" )
+TEST_CASE( "Error for @Operator@@Impl@ projector", "[@CatchTestName@]" )
 {
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -36,10 +32,11 @@ TEST_CASE( "Error for @Operator@@Template@ projector", "[@CatchTestName@]" )
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::Fft::Chebyshev::LinearMap::Projector::@Operator@@Template@ Projector;
+   using namespace ::QuICC::Transform::Fft::Chebyshev::LinearMap;
+   typedef Projector::@Operator@@Impl@ Projector;
    typedef typename currentts::Tester<Projector> Tester;
 
-   Tester tester("@Operator@@Template@.dat", currentts::args().dumpData);
+   Tester tester("@Operator@@Impl@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
 
    Tester::ParameterType params = {-1};
