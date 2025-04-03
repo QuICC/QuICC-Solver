@@ -12,7 +12,6 @@ extern "C" {
 
 #include "Environment/QuICCEnv.hpp"
 #include "TestSuite/ViewMeta.hpp"
-#include "ViewOps/Transpose/Op.hpp"
 #include "ViewOps/Transpose/OpGrouped.hpp"
 #include "ViewOps/ViewIndexUtils.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
@@ -120,8 +119,10 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
    std::array<std::vector<std::uint32_t>, vRank> indicesOut = {
       {{}, metaOut.idx, {}}};
 
-   View<double, inTy> viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
-   View<double, outTy> viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
+   VoutTy viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
 
    // Setup ref data and input data
    using namespace QuICC::Transpose::Mpi;
@@ -129,13 +130,13 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
 
    if (ranks > 1)
    {
-      auto cooOld = ::QuICC::View::getCoo<View<double, inTy>, p012_t>(viewIn);
+      auto cooOld = ::QuICC::View::getCoo<VinTy, p012_t>(viewIn);
       double shift = 2048;
       for (std::size_t i = 0; i < cooOld.size(); ++i)
       {
          dataIn[i] = cooOld[i][0] + cooOld[i][1] * shift + cooOld[i][2] / shift;
       }
-      auto cooNew = ::QuICC::View::getCoo<View<double, outTy>, p201_t>(viewOut);
+      auto cooNew = ::QuICC::View::getCoo<VoutTy, p201_t>(viewOut);
       for (std::size_t i = 0; i < cooNew.size(); ++i)
       {
          dataOutRef[i] =
@@ -166,8 +167,6 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
    indicesOutDev[1] = ViewBase<std::uint32_t>(memBlockIdxOut.data(), memBlockIdxOut.size());
 
    // set device views
-   using VinTy = View<double, inTy>;
-   using VoutTy = View<double, outTy>;
    VinTy viewInDev(memBlockIn.data(), memBlockIn.size(),
       dimensionsIn.data(), pointersInDev, indicesInDev);
    VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
@@ -189,11 +188,10 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
    auto transposeOp =
       std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(
          memDev);
-
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOutDev};
    std::vector<VinTy> viewsIn = {viewInDev}; 
-
+   // Apply transpose
    transposeOp->apply(viewsOut, viewsIn);
 
     // gpu -> cpu
@@ -305,22 +303,24 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
    std::array<std::vector<std::uint32_t>, vRank> indicesOut = {
       {{}, metaOut.idx, {}}};
 
-   View<double, inTy> viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
-   View<double, outTy> viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
-
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
+   VoutTy viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
+   
    // Setup ref data and input data
    using namespace QuICC::Transpose::Mpi;
    using namespace QuICC::Transpose;
 
    if (ranks > 1)
    {
-      auto cooOld = ::QuICC::View::getCoo<View<double, inTy>, p012_t>(viewIn);
+      auto cooOld = ::QuICC::View::getCoo<VinTy, p012_t>(viewIn);
       double shift = 2048;
       for (std::size_t i = 0; i < cooOld.size(); ++i)
       {
          dataIn[i] = cooOld[i][0] + cooOld[i][1] * shift + cooOld[i][2] / shift;
       }
-      auto cooNew = ::QuICC::View::getCoo<View<double, outTy>, p120_t>(viewOut);
+      auto cooNew = ::QuICC::View::getCoo<VoutTy, p120_t>(viewOut);
       for (std::size_t i = 0; i < cooNew.size(); ++i)
       {
          dataOutRef[i] =
@@ -351,9 +351,9 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
    indicesOutDev[1] = ViewBase<std::uint32_t>(memBlockIdxOut.data(), memBlockIdxOut.size());
 
    // set device views
-   View<double, inTy> viewInDev(memBlockIn.data(), memBlockIn.size(),
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(),
       dimensionsIn.data(), pointersInDev, indicesInDev);
-   View<double, outTy> viewOutDev(memBlockOut.data(), memBlockOut.size(),
+   VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersOutDev, indicesOutDev);
 
    // cpu -> gpu
@@ -369,14 +369,15 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
       cudaMemcpyHostToDevice));
 
    // Transpose op
-
-   auto comm = std::make_shared<Comm<double>>(memDev);
    auto transposeOp =
-      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p120_t>>(
-         comm);
-
-   transposeOp->apply(viewOutDev, viewInDev);
-
+      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(
+         memDev);
+   // Pack views
+   std::vector<VoutTy> viewsOut = {viewOutDev};
+   std::vector<VinTy> viewsIn = {viewInDev};
+   // Apply transpose
+   transposeOp->apply(viewsOut, viewsIn);
+   
    // gpu -> cpu
    cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(),
       viewOut.size() * sizeof(double), cudaMemcpyDeviceToHost));

@@ -12,7 +12,6 @@
 // Project includes
 //
 #include "Cuda/CudaUtil.hpp"
-#include "Op.hpp"
 #include "Profiler/Interface.hpp"
 #include "View/View.hpp"
 

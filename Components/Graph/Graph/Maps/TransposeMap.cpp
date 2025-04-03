@@ -5,9 +5,7 @@
 // Project includes
 //
 #include "Graph/OpsMap.hpp"
-// #include "ViewOps/Transpose/Op.hpp"
 #include "ViewOps/Transpose/OpGrouped.hpp"
-
 
 namespace QuICC {
 namespace Graph {

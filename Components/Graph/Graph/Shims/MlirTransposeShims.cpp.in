@@ -3,7 +3,6 @@
 #include <cassert>
 
 #include "Graph/Shims/MlirShims.hpp"
-#include "ViewOps/Transpose/Op.hpp"
 #include "ViewOps/Transpose/OpGrouped.hpp"
 #include "Graph/Types.hpp"
 

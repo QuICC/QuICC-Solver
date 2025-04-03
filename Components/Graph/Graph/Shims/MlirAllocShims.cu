@@ -11,7 +11,8 @@ namespace details
 {
 
 /// @brief Cache class
-/// Computing and copying from device to host is expensive.
+/// Computing the size on the device and copying to the host in oreder
+/// to allocate the temporary is expensive.
 /// We cache the size of the layers in a map based on the metadata pointer.
 /// @tparam T type of ptr to cache
 template <class T>
@@ -52,7 +53,12 @@ std::map<T*, std::size_t>& Cache<T>::getMap()
     return _ptr2size;
 }
 
-
+/// @brief kernel to get the size of the layers
+/// @param pCumSliceSize 
+/// @param ptr 
+/// @param size 
+/// @param lds 
+/// @return 
 __global__ void kernelGetSizeS1CLCSC3DJIK(std::uint32_t* pCumSliceSize, const std::uint32_t* ptr, const std::uint32_t size, const std::uint32_t lds)
 {
     /// naive single thread implementation

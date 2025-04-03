@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-#include "ViewOps/Transpose/Op.hpp"
+#include "ViewOps/Transpose/OpGrouped.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 
 using namespace QuICC::Memory;
@@ -38,17 +38,20 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 201", "SerialDCCSC3DtoDCCSC3D201")
    std::array<std::vector<std::uint32_t>, rank> indices = {{{}, {}, {}}};
    using inTy = DCCSC3D;
    using outTy = DCCSC3D;
-   View<double, inTy> viewIn(dataIn, dimensionsIn, pointers, indices);
-   View<double, outTy> viewOut(dataOut, dimensionsOut, pointers, indices);
-
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
+   VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
    // Transpose op
    using namespace QuICC::Transpose::Cpu;
    using namespace QuICC::Transpose;
    auto transposeOp =
-      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>();
-
-   transposeOp->apply(viewOut, viewIn);
-
+   std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>();
+   // Pack views
+   std::vector<VoutTy> viewsOut = {viewOut};
+   std::vector<VinTy> viewsIn = {viewIn};
+   // Apply transpose
+   transposeOp->apply(viewsOut, viewsIn);
    // check
    for (std::uint64_t k = 0; k < K; ++k)
    {
@@ -94,17 +97,20 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 120", "SerialDCCSC3DtoDCCSC3D120")
    std::array<std::vector<std::uint32_t>, rank> indices = {{{}, {}, {}}};
    using inTy = DCCSC3D;
    using outTy = DCCSC3D;
-   View<double, inTy> viewIn(dataIn, dimensionsIn, pointers, indices);
-   View<double, outTy> viewOut(dataOut, dimensionsOut, pointers, indices);
-
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
+   VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
    // Transpose op
    using namespace QuICC::Transpose::Cpu;
    using namespace QuICC::Transpose;
    auto transposeOp =
-      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p120_t>>();
-
-   transposeOp->apply(viewOut, viewIn);
-
+      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>();
+   // Pack views
+   std::vector<VoutTy> viewsOut = {viewOut};
+   std::vector<VinTy> viewsIn = {viewIn};
+   // Apply transpose
+   transposeOp->apply(viewsOut, viewsIn);
    // check
    for (std::uint64_t k = 0; k < K; ++k)
    {
@@ -165,17 +171,20 @@ TEST_CASE("Serial S1CLCSC3D to DCCSC3D 201", "SerialS1CLCSC3DtoDCCSC3D201")
    std::array<std::vector<std::uint32_t>, rank> indices = {{{}, {}, {}}};
    using inTy = S1CLCSC3D;
    using outTy = DCCSC3D;
-   View<double, inTy> viewIn(dataIn, dimensionsIn, pointers, indices);
-   View<double, outTy> viewOut(dataOut, dimensionsOut, pointers, indices);
-
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
+   VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
    // Transpose op
    using namespace QuICC::Transpose::Cpu;
    using namespace QuICC::Transpose;
    auto transposeOp =
-      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p201_t>>();
-
-   transposeOp->apply(viewOut, viewIn);
-
+      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>();
+   // Pack views
+   std::vector<VoutTy> viewsOut = {viewOut};
+   std::vector<VinTy> viewsIn = {viewIn};
+   // Apply transpose
+   transposeOp->apply(viewsOut, viewsIn);
    // check
    for (std::uint64_t s = 0; s < S; ++s)
    {
@@ -230,17 +239,20 @@ TEST_CASE("Serial DCCSC3D to S1CLCSC3D 120", "SerialDCCSC3DtoS1CLCSC3D120")
    std::array<std::vector<std::uint32_t>, rank> indices = {{{}, {}, {}}};
    using inTy = DCCSC3D;
    using outTy = S1CLCSC3D;
-   View<double, inTy> viewIn(dataIn, dimensionsIn, pointers, indices);
-   View<double, outTy> viewOut(dataOut, dimensionsOut, pointers, indices);
-
+   using VinTy = View<double, inTy>;
+   using VoutTy = View<double, outTy>;
+   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
+   VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
    // Transpose op
    using namespace QuICC::Transpose::Cpu;
    using namespace QuICC::Transpose;
    auto transposeOp =
-      std::make_unique<Op<View<double, outTy>, View<double, inTy>, p120_t>>();
-
-   transposeOp->apply(viewOut, viewIn);
-
+      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>();
+   // Pack views  
+   std::vector<VoutTy> viewsOut = {viewOut};
+   std::vector<VinTy> viewsIn = {viewIn};
+   // Apply transpose
+   transposeOp->apply(viewsOut, viewsIn);
    // check
    for (std::uint64_t s = 0; s < S; ++s)
    {

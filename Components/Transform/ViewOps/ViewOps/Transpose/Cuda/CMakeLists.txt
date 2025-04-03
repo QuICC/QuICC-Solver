@@ -1,6 +1,5 @@
 target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PRIVATE
-    Op.cu
     OpGrouped.cu
     Packing.cu
 )
