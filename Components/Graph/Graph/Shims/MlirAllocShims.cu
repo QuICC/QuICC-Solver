@@ -36,9 +36,9 @@ std::uint32_t getSizeS1CLCSC3DJIK(const std::uint32_t* ptr, const std::uint32_t 
 {
     // check if the size was cached
     auto& cache = CacheLayerSize<const std::uint32_t>::getInstance();
-    auto it = cache.getMap().find(ptr);
-    if (it != cache.getMap().end()) {
-        return it->second;
+    std::uint32_t cumSliceSize = cache.getCachedSizeOrZero(ptr);
+    if (cumSliceSize != 0) {
+        return cumSliceSize;
     }
 
     // otherwise, we need to calculate the size
@@ -54,7 +54,6 @@ std::uint32_t getSizeS1CLCSC3DJIK(const std::uint32_t* ptr, const std::uint32_t 
     numBlocks.y = 1;
     numBlocks.z = 1;
 
-    std::uint32_t cumSliceSize = 0;
     std::uint32_t* pCumSliceSize;
     cudaErrChk(cudaMalloc(reinterpret_cast<void**>(&pCumSliceSize), sizeof(std::uint32_t)));
     kernelGetSizeS1CLCSC3DJIK<<<numBlocks, blockSize>>>(pCumSliceSize, ptr, size, lds);
@@ -62,7 +61,7 @@ std::uint32_t getSizeS1CLCSC3DJIK(const std::uint32_t* ptr, const std::uint32_t 
     cudaErrChk(cudaFree(pCumSliceSize));
 
     // cache the size
-    cache.getMap().insert(std::make_pair(ptr, cumSliceSize));
+    cache.addToCache(ptr, cumSliceSize);
     return cumSliceSize;
 }
 
