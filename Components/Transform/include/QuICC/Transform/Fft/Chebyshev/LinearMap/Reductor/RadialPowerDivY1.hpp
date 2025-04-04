@@ -1,7 +1,7 @@
 /**
  * @file RadialPowerDivY1.hpp
- * @brief Implementation of the Chebyshev based 1/Y^1 radial power reductor, with
- * linear map y = ax + b
+ * @brief Implementation of the Chebyshev based RadialPowerDivY1 reductor, with linear
+ * map y = ax + b
  */
 
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_REDUCTOR_RADIALPOWERDIVY1_HPP
@@ -12,74 +12,13 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/ILinearMapRadialPower.hpp"
-#include "Types/Typedefs.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Base/RadialPowerDivY1.hpp"
+// #include
+// "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Reductor/RadialPowerDivY1viewCpu_t.hpp.inc"
+#ifdef QUICC_HAS_CUDA_BACKEND
+// #include
+// "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Reductor/RadialPowerDivY1viewGpu_t.hpp.inc"
+#endif
 
-namespace QuICC {
-
-namespace Transform {
-
-namespace Fft {
-
-namespace Chebyshev {
-
-namespace LinearMap {
-
-namespace Reductor {
-
-/**
- * @brief Implementation of the Chebyshev based 1/Y^1 radial power reductor, with
- * linear map y = ax + b
- */
-class RadialPowerDivY1 : public ILinearMapRadialPower
-{
-public:
-   /**
-    * @brief Constructor
-    */
-   RadialPowerDivY1() = default;
-
-   /**
-    * @brief Destructor
-    */
-   ~RadialPowerDivY1() = default;
-
-protected:
-   /**
-    * @brief Initialise operator
-    */
-   void initOperator() const final;
-
-private:
-   /**
-    * @brief Apply pre FFT operator
-    *
-    * @param in   Input values
-    */
-   void applyPreOperator(Matrix& tmp, const Matrix& in) const final;
-
-   /**
-    * @brief Apply post FFT operator
-    *
-    * @param rOut Output values
-    */
-   void applyPostOperator(Matrix& rOut, const Matrix& tmp) const final;
-
-   /**
-    * @brief Apply pre FFT operator for component wise openerations
-    *
-    * @param in   Input values
-    * @param useReal Real vs Imag flag
-    */
-   void applyPreOperator(Matrix& tmp, const MatrixZ& in,
-      const bool useReal) const final;
-};
-
-} // namespace Reductor
-} // namespace LinearMap
-} // namespace Chebyshev
-} // namespace Fft
-} // namespace Transform
-} // namespace QuICC
 
 #endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_REDUCTOR_RADIALPOWERDIVY1_HPP
