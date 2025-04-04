@@ -91,21 +91,7 @@ std::vector<int> getCount(const std::vector<std::vector<int>>& displs)
    std::vector<int> count(displs.size());
    for (std::size_t i = 0; i < displs.size(); ++i)
    {
-      if constexpr (std::is_same_v<TAG, alltoallw_t>)
-      {
-         if (displs[i].size() > 0)
-         {
-            count[i] = 1;
-         }
-         else
-         {
-            count[i] = 0;
-         }
-      }
-      else
-      {
-         count[i] = displs[i].size();
-      }
+      count[i] = displs[i].size();
    }
    return count;
 }

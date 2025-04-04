@@ -274,53 +274,6 @@ TEST_CASE("SubComm and Types", "[SubComm]")
    {
       CHECK(subComm == MPI_COMM_NULL);
    }
-
-   // Communicate with partecipants only
-   if (subComm != MPI_COMM_NULL)
-   {
-
-      // Setup comm
-      int subRanks;
-      MPI_Comm_size(subComm, &subRanks);
-
-      std::vector<MPI_Datatype> sendType(subRanks);
-      std::vector<MPI_Datatype> recvType(subRanks);
-
-      // Build types
-      for (int r = 0; r < subRanks; ++r)
-      {
-         MPI_Type_create_indexed_block(sendDispls[r].size(), 1,
-            sendDispls[r].data(), MPI_INT, &sendType[r]);
-         MPI_Type_commit(&sendType[r]);
-         MPI_Type_create_indexed_block(recvDispls[r].size(), 1,
-            recvDispls[r].data(), MPI_INT, &recvType[r]);
-         MPI_Type_commit(&recvType[r]);
-      }
-
-      auto sendCounts = getCount<alltoallw_t>(sendDispls);
-      auto recvCounts = getCount<alltoallw_t>(recvDispls);
-
-      std::vector<int> sDispls(subRanks, 0);
-      std::vector<int> rDispls(subRanks, 0);
-
-      // Comm
-      MPI_Alltoallw(sendBuf.data(), sendCounts.data(), sDispls.data(),
-         sendType.data(), recvBuf.data(), recvCounts.data(), rDispls.data(),
-         recvType.data(), subComm);
-
-      // Check
-      for (std::size_t i = 0; i < recvBufRef.size(); ++i)
-      {
-         CHECK(recvBuf[i] == recvBufRef[i]);
-      }
-
-      // Release types
-      for (int r = 0; r < subRanks; ++r)
-      {
-         MPI_Type_free(&sendType[r]);
-         MPI_Type_free(&recvType[r]);
-      }
-   }
 }
 
 TEST_CASE("Comm mpi alltoallv", "[CommMpiAlltoallv]")
