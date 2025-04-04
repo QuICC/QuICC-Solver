@@ -16,6 +16,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
     QuICC::Profiling
     QuICC::Types
     QuICC::Polynomial
+    QuICC::SparseSM
 )
 
 

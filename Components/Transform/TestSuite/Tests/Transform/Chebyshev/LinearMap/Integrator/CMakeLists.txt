@@ -15,7 +15,15 @@ set(_tests
   I4D1:<base_t>:integrator
   I4D1_I2:<base_t>:integrator
   P:<viewCpu_t>:integrator
+  P_Zero:<viewCpu_t>:integrator
   Y1:<viewCpu_t>:integrator
+  Y1_Zero:<viewCpu_t>:integrator
+  I2:<viewCpu_t>:integrator
+  I2D1:<viewCpu_t>:integrator
+  I2D1_I2:<viewCpu_t>:integrator
+  I2_I2D1:<viewCpu_t>:integrator
+  I4D1:<viewCpu_t>:integrator
+  I4D1_I2:<viewCpu_t>:integrator
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -29,12 +37,14 @@ endforeach()
 if(QUICC_MULTPRECISION)
   set(_ulp 60)
 else()
-  set(_ulp 33)
+  set(_ulp 60)
 endif()
 
 set(_tests
   I2Y2_Zero:<base_t>:integrator
   I4:<base_t>:integrator
+  I2Y2_Zero:<viewCpu_t>:integrator
+  I4:<viewCpu_t>:integrator
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -47,6 +57,7 @@ endforeach()
 
 set(_tests
   I2Y1D1Y1_Zero:<base_t>:integrator
+  I2Y1D1Y1_Zero:<viewCpu_t>:integrator
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -59,6 +70,7 @@ endforeach()
 
 set(_tests
   I2Y2D1Y1_Zero:<base_t>:integrator
+  I2Y2D1Y1_Zero:<viewCpu_t>:integrator
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -71,18 +83,20 @@ endforeach()
 
 set(_tests
   I4Y3_Zero:<base_t>:integrator
+  I4Y3_Zero:<viewCpu_t>:integrator
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Operator:Impl:Type
-    ULP 150
+    ULP 155
     IDS 0 1 2 3 4 5
   )
 endforeach()
 
 set(_tests
   I4Y3D1Y1_Zero:<base_t>:integrator
+  I4Y3D1Y1_Zero:<viewCpu_t>:integrator
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}

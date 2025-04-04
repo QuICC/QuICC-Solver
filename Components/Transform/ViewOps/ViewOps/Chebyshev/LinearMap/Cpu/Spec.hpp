@@ -11,6 +11,7 @@
 
 // Project includes
 //
+#include "Types/Typedefs.hpp"
 #include "Operator/Binary.hpp"
 
 namespace QuICC {
@@ -66,9 +67,13 @@ private:
    /// @param in input modes
    /// @param fftScaling fft scaling (inverse number of grid points)
    void applyImpl(Tout& out, const Tin& in, const ScaleType fftScaling);
-   /// @brif Give access to base class
+   /// @brief Give access to base class
    friend BinaryBaseOp<SpecOp<Tout, Tin, Operation, Treatment>, Tout, Tin,
       ScaleType>;
+   /// Sparse operator
+   std::unique_ptr<SparseMatrix> mSparseOp;
+   /// Sparse mean operator
+   std::unique_ptr<SparseMatrix> mSparseMeanOp;
    /// @brif Lower bound
    double mLower;
    /// @brif Upper bound

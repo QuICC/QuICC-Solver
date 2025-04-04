@@ -11,6 +11,16 @@
 
 // Project includes
 //
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I2.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I2D1.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y1D1Y1.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y1.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y2D1Y1.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y2.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I4.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I4D1.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y3D1Y1.hpp"
+#include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y3.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -33,60 +43,119 @@ struct bwd_t
 {
 };
 
+/// @brief No sparse operator op type tag
+struct spec_no_sparseop
+{
+   typedef void SparseOpType;
+};
+
 /// @brief tag type for identity spectral operation
-struct spec_id
+struct spec_id: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {0};
    constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief tag type for spectral padding operation
-struct spec_y1
+struct spec_y1: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {0};
    constexpr static std::array<std::size_t, 1> t = {1};
 };
 
 /// @brief tag type for spectral padding operation
-struct spec_d1
+struct spec_d1: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {1};
    constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief tag type for spectral padding operation
-struct spec_d2
+struct spec_d2: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {2};
    constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief tag type for spectral padding operation
-struct spec_d3
+struct spec_d3: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {3};
    constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief tag type for spectral padding operation
-struct spec_d4
+struct spec_d4: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {4};
    constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief tag type for spectral padding operation
-struct spec_d1y1
+struct spec_d1y1: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {1};
    constexpr static std::array<std::size_t, 1> t = {1};
 };
 
 /// @brief tag type for spectral padding operation
-struct spec_d1y2d1
+struct spec_d1y2d1: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 2> p = {1, 1};
    constexpr static std::array<std::size_t, 2> t = {0, 2};
+};
+
+/// @brief sparse operator op type tag
+template <typename Type>
+struct spec_sparseop
+{
+   typedef Type SparseOpType;
+
+   constexpr static std::array<std::size_t, 1> p = {0};
+   constexpr static std::array<std::size_t, 1> t = {0};
+};
+
+struct spec_i2: public spec_sparseop<::QuICC::SparseSM::Chebyshev::LinearMap::I2>
+{
+   typedef ::QuICC::SparseSM::Chebyshev::LinearMap::I2D1 SparseMeanOpType;
+};
+
+struct spec_i2d1: public spec_sparseop<::QuICC::SparseSM::Chebyshev::LinearMap::I2D1>
+{
+   typedef ::QuICC::SparseSM::Chebyshev::LinearMap::I2 SparseMeanOpType;
+};
+
+struct spec_i2y1d1y1: public spec_sparseop<::QuICC::SparseSM::Chebyshev::LinearMap::I2Y1D1Y1>
+{
+};
+
+struct spec_i2y1: public spec_sparseop<::QuICC::SparseSM::Chebyshev::LinearMap::I2Y1>
+{
+};
+
+struct spec_i2y2d1y1: public spec_sparseop<::QuICC::SparseSM::Chebyshev::LinearMap::I2Y2D1Y1>
+{
+};
+
+struct spec_i2y2: public spec_sparseop<::QuICC::SparseSM::Chebyshev::LinearMap::I2Y2>
+{
+};
+
+struct spec_i4: public spec_sparseop<::QuICC::SparseSM::Chebyshev::LinearMap::I4>
+{
+};
+
+struct spec_i4d1: public spec_sparseop<::QuICC::SparseSM::Chebyshev::LinearMap::I4D1>
+{
+   typedef ::QuICC::SparseSM::Chebyshev::LinearMap::I2 SparseMeanOpType;
+};
+
+struct spec_i4y3d1y1: public spec_sparseop<::QuICC::SparseSM::Chebyshev::LinearMap::I4Y3D1Y1>
+{
+};
+
+struct spec_i4y3: public spec_sparseop<::QuICC::SparseSM::Chebyshev::LinearMap::I4Y3>
+{
 };
 
 /// @brief tag type for identity grid operation
@@ -122,14 +191,20 @@ struct viewGpuVkFFT_t
 /// @brief no special treatment
 constexpr std::uint16_t none_t = 0;
 
-/// @brief no special treatment
+/// @brief dealias size from input
 constexpr std::uint16_t ndealias_in = 1 << 1;
 
-/// @brief no special treatment
+/// @brief dealias size from output
 constexpr std::uint16_t ndealias_out = 1 << 2;
 
-/// @brief no special treatment
+/// @brief zero pad
 constexpr std::uint16_t zero_pad = 1 << 3;
+
+/// @brief zero l = 0 modes
+constexpr std::uint16_t zero_l0 = 1 << 4;
+
+/// @brief special mean op modes
+constexpr std::uint16_t mean_op = 1 << 5;
 
 /// @brief P op type tag
 struct P_t
@@ -143,6 +218,11 @@ struct P_Zero_t
 
 /// @brief P op type tag
 struct Y1_t
+{
+};
+
+/// @brief Y1_Zero op type tag
+struct Y1_Zero_t
 {
 };
 
@@ -190,6 +270,72 @@ struct DivY1D1Y1_t
 struct SphRadLapl_t
 {
 };
+
+/// @brief I2 op type tag
+struct I2_t
+{
+};
+
+/// @brief I2D1 op type tag
+struct I2D1_t
+{
+};
+
+/// @brief I2D1_I2 op type tag
+struct I2D1_I2_t
+{
+};
+
+/// @brief I2Y1D1Y1_Zero op type tag
+struct I2Y1D1Y1_Zero_t
+{
+};
+
+/// @brief I2Y1_Zero op type tag
+struct I2Y1_Zero_t
+{
+};
+
+/// @brief I2Y2D1Y1_Zero op type tag
+struct I2Y2D1Y1_Zero_t
+{
+};
+
+/// @brief I2Y2_Zero op type tag
+struct I2Y2_Zero_t
+{
+};
+
+/// @brief I2_I2D1 op type tag
+struct I2_I2D1_t
+{
+};
+
+/// @brief I4 op type tag
+struct I4_t
+{
+};
+
+/// @brief I4D1 op type tag
+struct I4D1_t
+{
+};
+
+/// @brief I4D1_I2 op type tag
+struct I4D1_I2_t
+{
+};
+
+/// @brief I4Y3D1Y1_Zero op type tag
+struct I4Y3D1Y1_Zero_t
+{
+};
+
+/// @brief I4Y3_Zero op type tag
+struct I4Y3_Zero_t
+{
+};
+
 
 } // namespace LinearMap
 } // namespace Chebyshev

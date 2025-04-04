@@ -1,5 +1,6 @@
 #include <complex>
 #include <iostream>
+#include <memory>
 
 #include "Spec.hpp"
 #include "Profiler/Interface.hpp"
@@ -88,10 +89,30 @@ void SpecOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out,
    auto indices = in.indices()[1];
    auto columns = indices.size();
 
+   std::size_t col0 = 0;
+   std::size_t mean_cols = 0;
+   if constexpr (Treatment & (zero_l0 | mean_op))
+   {
+      mean_cols = out.pointers()[1][1] - out.pointers()[1][0];
+   }
+
+   if constexpr (Treatment & zero_l0)
+   {
+      for (std::size_t col = 0; col < mean_cols; ++col)
+      {
+         std::size_t nko = Nout * col;
+         for (std::size_t n = 0; n < nDealias; ++n)
+         {
+            out.data()[nko + n] = 0;
+         }
+      }
+      col0 = mean_cols;
+   }
+
    if constexpr (Operation::p.size() == 1 && Operation::p[0] == 0)
    {
       const std::size_t& t = Operation::t[0];
-      for (std::size_t col = 0; col < columns; ++col)
+      for (std::size_t col = col0; col < columns; ++col)
       {
          // linear index (:,n,k)
          std::size_t nko = Nout * col;
@@ -132,7 +153,7 @@ void SpecOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out,
       const auto& ps = Operation::p;
       const auto& ts = Operation::t;
 
-      for (std::size_t col = 0; col < columns; ++col)
+      for (std::size_t col = col0; col < columns; ++col)
       {
          // linear index (:,n,k)
          std::size_t nko = Nout * col;
@@ -191,6 +212,35 @@ void SpecOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out,
             }
          }
       }
+   }
+
+   if constexpr(Treatment & mean_op)
+   {
+      if(!std::is_same_v<typename Operation::SparseMeanOpType, void>)
+      {
+         if(!this->mSparseMeanOp)
+         {
+            typename Operation::SparseMeanOpType op(nDealias, nDealias, this->mLower, this->mUpper);
+            this->mSparseMeanOp = std::make_unique<SparseMatrix>(op.mat());
+         }
+
+         Eigen::Map<MatrixZ, Eigen::Unaligned, Eigen::Stride<::Eigen::Dynamic,1> > outMap(out.data(), nDealias, mean_cols, Eigen::Stride<::Eigen::Dynamic,1>(Nout, 1));
+
+         outMap = (*this->mSparseMeanOp) * outMap;
+      }
+   }
+
+   if constexpr(!std::is_same_v<typename Operation::SparseOpType, void>)
+   {
+      if(!this->mSparseOp)
+      {
+         typename Operation::SparseOpType op(nDealias, nDealias, this->mLower, this->mUpper);
+         this->mSparseOp = std::make_unique<SparseMatrix>(op.mat());
+      }
+
+      Eigen::Map<MatrixZ, Eigen::Unaligned, Eigen::Stride<::Eigen::Dynamic,1> > outMap(out.data() + Nout*mean_cols, nDealias, columns - mean_cols, Eigen::Stride<::Eigen::Dynamic,1>(Nout, 1));
+
+      outMap = (*this->mSparseOp) * outMap;
    }
 }
 
@@ -266,7 +316,22 @@ void SpecOp<Tout, Tin, Operation, Treatment>::differentiate(
 
 // explicit instantations
 template class SpecOp<mods_t, mods_t, spec_id, ndealias_out>;
+template class SpecOp<mods_t, mods_t, spec_id, ndealias_out | zero_l0>;
 template class SpecOp<mods_t, mods_t, spec_y1, ndealias_out>;
+template class SpecOp<mods_t, mods_t, spec_y1, ndealias_out | zero_l0>;
+template class SpecOp<mods_t, mods_t, spec_i2, ndealias_out>;
+template class SpecOp<mods_t, mods_t, spec_i2, ndealias_out | mean_op>;
+template class SpecOp<mods_t, mods_t, spec_i2d1, ndealias_out>;
+template class SpecOp<mods_t, mods_t, spec_i2d1, ndealias_out | mean_op>;
+template class SpecOp<mods_t, mods_t, spec_i2y1d1y1, ndealias_out | zero_l0>;
+template class SpecOp<mods_t, mods_t, spec_i2y1, ndealias_out | zero_l0>;
+template class SpecOp<mods_t, mods_t, spec_i2y2d1y1, ndealias_out | zero_l0>;
+template class SpecOp<mods_t, mods_t, spec_i2y2, ndealias_out | zero_l0>;
+template class SpecOp<mods_t, mods_t, spec_i4, ndealias_out>;
+template class SpecOp<mods_t, mods_t, spec_i4y3d1y1, ndealias_out | zero_l0>;
+template class SpecOp<mods_t, mods_t, spec_i4y3, ndealias_out | zero_l0>;
+template class SpecOp<mods_t, mods_t, spec_i4d1, ndealias_out>;
+template class SpecOp<mods_t, mods_t, spec_i4d1, ndealias_out | mean_op>;
 template class SpecOp<mods_t, mods_t, spec_id, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d1, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d2, ndealias_in | zero_pad>;

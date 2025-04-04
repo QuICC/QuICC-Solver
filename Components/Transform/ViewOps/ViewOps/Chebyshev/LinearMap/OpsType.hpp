@@ -130,6 +130,23 @@ struct OpsTypeMap<Tout, Tin, P_t, fwd_t, BACKEND>
    ;
 };
 
+/// @brief Op P_Zero type map
+/// Integrator only
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, P_Zero_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_id, ndealias_out | zero_l0>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
 /// @brief Op Y1 type map
 /// Integrator of Y^1
 /// @tparam Tout
@@ -142,6 +159,246 @@ struct OpsTypeMap<Tout, Tin, Y1_t, fwd_t, BACKEND>
    using backendFft_t =
       details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
    using backendSpec_t = Spec_t<BACKEND, Tout, spec_y1, ndealias_out>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op Y1_Zero type map
+/// Integrator of Y^1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, Y1_Zero_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_y1, ndealias_out | zero_l0> ;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I2 type map
+/// Integrator of I2
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I2_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i2, ndealias_out>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I2D1 type map
+/// Integrator of I2D1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I2D1_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i2d1, ndealias_out>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I2D1_I2 type map
+/// Integrator of I2D1_I2
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I2D1_I2_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i2d1, ndealias_out | mean_op>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I2Y1D1Y1_Zero type map
+/// Integrator of I2Y1D1Y1_Zero
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I2Y1D1Y1_Zero_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i2y1d1y1, ndealias_out | zero_l0>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I2Y1_Zero type map
+/// Integrator of I2Y1_Zero
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I2Y1_Zero_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i2y1, ndealias_out | zero_l0>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I2Y1D1Y1_Zero type map
+/// Integrator of I2Y2D1Y1_Zero
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I2Y2D1Y1_Zero_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i2y2d1y1, ndealias_out | zero_l0>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I2Y2_Zero type map
+/// Integrator of I2Y2_Zero
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I2Y2_Zero_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i2y2, ndealias_out | zero_l0>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I2_I2D1 type map
+/// Integrator of I2_I2D1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I2_I2D1_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i2, ndealias_out | mean_op>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I4 type map
+/// Integrator of I4
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I4_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i4, ndealias_out>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I4D1 type map
+/// Integrator of I4D1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I4D1_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i4d1, ndealias_out>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I4D1_I2 type map
+/// Integrator of I4D1_I2
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I4D1_I2_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i4d1, ndealias_out | mean_op>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I4Y3D1Y1_Zero type map
+/// Integrator of I4Y4D1Y1_Zero
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I4Y3D1Y1_Zero_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   typedef ::QuICC::SparseSM::Chebyshev::LinearMap::I4Y3D1Y1 SparseType;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i4y3d1y1, ndealias_out | zero_l0>;
+   using type =
+      Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
+   ;
+};
+
+/// @brief Op I4Y3_Zero type map
+/// Integrator of I4Y3_Zero
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, I4Y3_Zero_t, fwd_t, BACKEND>
+{
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type2_t>;
+   typedef ::QuICC::SparseSM::Chebyshev::LinearMap::I4Y3 SparseType;
+   using backendSpec_t = Spec_t<BACKEND, Tout, spec_i4y3, ndealias_out | zero_l0>;
    using type =
       Integrator::GFSOp<Tout, Tin, backendGrid_t, backendFft_t, backendSpec_t>;
    ;
