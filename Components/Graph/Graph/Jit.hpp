@@ -31,6 +31,7 @@
 //
 #include "Graph/OpsMap.hpp"
 #include "Graph/Shims/MlirShims.hpp"
+#include "Graph/Shims/CacheLayerSize.hpp"
 #include "Graph/Tags.hpp"
 #include "Graph/Types.hpp"
 
@@ -159,7 +160,11 @@ private:
 public:
    ~Jit()
    {
-      /// \todo clearup meta
+      /// \todo clear up meta
+
+      // Invalidate cache
+      auto& cache = details::CacheLayerSize<const std::uint32_t>::getInstance();
+      cache.invalidate();
    }
 
    /// @brief Setup Graph from string
