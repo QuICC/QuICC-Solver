@@ -95,7 +95,7 @@ private:
    /// @brief Max Number of variables to communicate
    std::int64_t _maxGroupSize;
 
-   // #ifdef QUICC_HAS_CUDA_BACKEND
+   #ifdef QUICC_HAS_CUDA_BACKEND
    /// @brief Send buffer displacement for device side packing
    Memory::MemBlock<int> _sendBufferDisplsDevice;
    /// @brief Recv buffer displacement for device side packing
@@ -124,7 +124,7 @@ private:
    /// @brief View of _recvCountsDevice
    /// Needed for device side packing
    View::ViewBase<int> _recvCountsView;
-   // #endif
+   #endif
 
    /// @brief All world communicator
    MPI_Comm _comm;
@@ -148,7 +148,11 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
    auto redSet = getReducedRanksSet(_sendDispls, _recvDispls);
    redDisplsFromSet(_sendDispls, _recvDispls, redSet);
    _subComm = QuICC::Transpose::Mpi::getSubComm(redSet);
-   assert(_subComm != MPI_COMM_NULL);
+   if (_subComm == MPI_COMM_NULL)
+   {
+      _isSetup = true;
+      return;
+   }
 
    _sendCounts = getCount<TAG>(_sendDispls);
    _recvCounts = getCount<TAG>(_recvDispls);

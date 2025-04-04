@@ -65,7 +65,6 @@ std::uint32_t getSizeS1CLCSC3DJIK(const std::uint32_t* ptr, const std::uint32_t 
     return cumSliceSize;
 }
 
-
 } // namespace details
 } // namespace Graph
 } // namespace QuICC
