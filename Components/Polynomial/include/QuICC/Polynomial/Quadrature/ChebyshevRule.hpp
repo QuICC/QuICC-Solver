@@ -11,6 +11,7 @@
 
 // Project includes
 //
+#include "Types/Internal/Typedefs.hpp"
 #include "Types/Internal/Math.hpp"
 #include "QuICC/Polynomial/Quadrature/traits.hpp"
 
