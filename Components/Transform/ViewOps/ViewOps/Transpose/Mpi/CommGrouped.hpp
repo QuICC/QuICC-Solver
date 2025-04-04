@@ -103,6 +103,10 @@ private:
    View::ViewBase<int> _sendCountsView;
    /// @brief View of _recvCountsDevice
    View::ViewBase<int> _recvCountsView;
+   /// @brief Buffer for linearized displacement for device/host side packing
+   Memory::MemBlock<int> _sendDisplsLin;
+   /// @brief Buffer for linearized displacement for device/host side packing
+   Memory::MemBlock<int> _recvDisplsLin;
 
    /// @brief Max Number of variables to communicate
    std::int64_t _maxGroupSize;
@@ -112,10 +116,6 @@ private:
    Memory::MemBlock<int> _sendBufferDisplsDevice;
    /// @brief Recv buffer displacement for device side packing
    Memory::MemBlock<int> _recvBufferDisplsDevice;
-   /// @brief Displacement for device side packing
-   Memory::MemBlock<int> _sendDisplsDevice;
-   /// @brief Displacement for device side packing
-   Memory::MemBlock<int> _recvDisplsDevice;
    /// @brief Entry i specifies the number of elements to send to rank i.
    /// Needed for device side packing
    Memory::MemBlock<int> _sendCountsDevice;
@@ -164,25 +164,25 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
       sendCountsMax = std::max(sendCountsMax, _sendCounts[i]);
       recvCountsMax = std::max(recvCountsMax, _recvCounts[i]);
    }
-   _sendDisplsDevice =
+   _sendDisplsLin =
       std::move(Memory::MemBlock<int>(_nSubComm * sendCountsMax, _mem.get()));
-   _recvDisplsDevice =
+   _recvDisplsLin =
       std::move(Memory::MemBlock<int>(_nSubComm * recvCountsMax, _mem.get()));
 
    std::array<std::uint32_t, 2> sendDim{static_cast<std::uint32_t>(_nSubComm),
       static_cast<std::uint32_t>(sendCountsMax)};
    _sendDisplsView = View::View<int, View::dense2DRM>(
-      {_sendDisplsDevice.data(), _sendDisplsDevice.size()}, sendDim);
+      {_sendDisplsLin.data(), _sendDisplsLin.size()}, sendDim);
    std::array<std::uint32_t, 2> recvDim{static_cast<std::uint32_t>(_nSubComm),
       static_cast<std::uint32_t>(recvCountsMax)};
    _recvDisplsView = View::View<int, View::dense2DRM>(
-      {_recvDisplsDevice.data(), _recvDisplsDevice.size()}, recvDim);
+      {_recvDisplsLin.data(), _recvDisplsLin.size()}, recvDim);
 
    // Helper views to linearize cpu/gpu data
-   View::ViewBase<int> _sendDisplsViewLin(_sendDisplsDevice.data(),
-      _sendDisplsDevice.size());
-   View::ViewBase<int> _recvDisplsViewLin(_recvDisplsDevice.data(),
-      _recvDisplsDevice.size());
+   View::ViewBase<int> _sendDisplsViewLin(_sendDisplsLin.data(),
+      _sendDisplsLin.size());
+   View::ViewBase<int> _recvDisplsViewLin(_recvDisplsLin.data(),
+      _recvDisplsLin.size());
 
    // Move temporarly to host
    using namespace QuICC::Memory;
