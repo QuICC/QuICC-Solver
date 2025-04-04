@@ -91,6 +91,18 @@ private:
    std::vector<int> _sendBufferDispls;
    /// @brief Recv buffer displacement for packed comms
    std::vector<int> _recvBufferDispls;
+   /// @brief Send buffer View displacement for device side packing
+   View::ViewBase<int> _sendBufferDisplsView;
+   /// @brief Recv buffer View displacement for device side packing
+   View::ViewBase<int> _recvBufferDisplsView;
+   /// @brief Displacement for device side packing
+   View::View<int, View::dense2DRM> _sendDisplsView;
+   /// @brief Displacement for device side packing
+   View::View<int, View::dense2DRM> _recvDisplsView;
+   /// @brief View of _sendCountsDevice
+   View::ViewBase<int> _sendCountsView;
+   /// @brief View of _recvCountsDevice
+   View::ViewBase<int> _recvCountsView;
 
    /// @brief Max Number of variables to communicate
    std::int64_t _maxGroupSize;
@@ -100,30 +112,16 @@ private:
    Memory::MemBlock<int> _sendBufferDisplsDevice;
    /// @brief Recv buffer displacement for device side packing
    Memory::MemBlock<int> _recvBufferDisplsDevice;
-   /// @brief Send buffer View displacement for device side packing
-   View::ViewBase<int> _sendBufferDisplsView;
-   /// @brief Recv buffer View displacement for device side packing
-   View::ViewBase<int> _recvBufferDisplsView;
    /// @brief Displacement for device side packing
    Memory::MemBlock<int> _sendDisplsDevice;
    /// @brief Displacement for device side packing
    Memory::MemBlock<int> _recvDisplsDevice;
-   /// @brief Displacement for device side packing
-   View::View<int, View::dense2DRM> _sendDisplsView;
-   /// @brief Displacement for device side packing
-   View::View<int, View::dense2DRM> _recvDisplsView;
    /// @brief Entry i specifies the number of elements to send to rank i.
    /// Needed for device side packing
    Memory::MemBlock<int> _sendCountsDevice;
    /// @brief Entry j specifies the number of elements to receive from rank j.
    /// Needed for device side packing
    Memory::MemBlock<int> _recvCountsDevice;
-   /// @brief View of _sendCountsDevice
-   /// Needed for device side packing
-   View::ViewBase<int> _sendCountsView;
-   /// @brief View of _recvCountsDevice
-   /// Needed for device side packing
-   View::ViewBase<int> _recvCountsView;
    #endif
 
    /// @brief All world communicator

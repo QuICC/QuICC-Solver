@@ -5,7 +5,6 @@
 #include <regex>
 #include <thread>
 
-#include "ViewOps/Transpose/Mpi/Comm.hpp"
 extern "C" {
 #include <unistd.h>
 }
@@ -190,7 +189,7 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
          memDev);
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOutDev};
-   std::vector<VinTy> viewsIn = {viewInDev}; 
+   std::vector<VinTy> viewsIn = {viewInDev};
    // Apply transpose
    transposeOp->apply(viewsOut, viewsIn);
 
@@ -307,7 +306,7 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
    using VoutTy = View<double, outTy>;
    VinTy viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
    VoutTy viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
-   
+
    // Setup ref data and input data
    using namespace QuICC::Transpose::Mpi;
    using namespace QuICC::Transpose;
@@ -377,7 +376,7 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
    std::vector<VinTy> viewsIn = {viewInDev};
    // Apply transpose
    transposeOp->apply(viewsOut, viewsIn);
-   
+
    // gpu -> cpu
    cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(),
       viewOut.size() * sizeof(double), cudaMemcpyDeviceToHost));
