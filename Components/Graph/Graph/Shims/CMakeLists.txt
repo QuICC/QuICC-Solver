@@ -10,6 +10,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOM
 
 set(PHS
   ../../Graph/Shims/MlirShims.hpp
+  ../../Graph/Shims/CacheLayerSize.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
