@@ -12,6 +12,7 @@
 //
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/ILinearMapIntegrator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -32,6 +33,8 @@ void ILinearMapIntegrator::initBackend() const
 
 void ILinearMapIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
 {
+   Profiler::RegionFixture<2> fix("ILinearIntegrator::transform");
+
    assert(this->isInitialized());
    assert(this->mspSetup->fwdSize() == in.rows());
    assert(rOut.cols() == this->outCols());
@@ -51,6 +54,8 @@ void ILinearMapIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
 
 void ILinearMapIntegrator::transform(Matrix& rOut, const Matrix& in) const
 {
+   Profiler::RegionFixture<2> fix("ILinearIntegrator::transform");
+
    assert(this->isInitialized());
    assert(this->mspSetup->fwdSize() == in.rows());
    assert(rOut.cols() == this->outCols());

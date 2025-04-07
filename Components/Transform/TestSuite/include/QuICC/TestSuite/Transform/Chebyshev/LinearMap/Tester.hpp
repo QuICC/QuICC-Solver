@@ -291,7 +291,11 @@ Matrix Tester<TOp, TOp2>::applyProjector(const ParameterType& param) const
 
       FwdType outData(op.outRows(), op.outCols());
 
-      op.transform(outData, inData);
+      for (unsigned int i = 0; i < this->mIter; ++i)
+      {
+         outData = FwdType::Zero(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+      }
 
       if constexpr (std::is_same_v<FwdType, MatrixZ>)
       {
@@ -334,7 +338,11 @@ Matrix Tester<TOp, TOp2>::applyIntegrator(const ParameterType& param) const
 
       BwdType outData(op.outRows(), op.outCols());
 
-      op.transform(outData, inData);
+      for (unsigned int i = 0; i < this->mIter; ++i)
+      {
+         outData = BwdType::Zero(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+      }
 
       Matrix out(2 * outData.rows(), outData.cols());
       out.topRows(outData.rows()) = outData.real();
@@ -370,7 +378,11 @@ Matrix Tester<TOp, TOp2>::applyReductor(const ParameterType& param) const
 //
 //      Matrix outData(op.outRows(), op.outCols());
 //
+//   for (unsigned int i = 0; i < this->mIter; ++i)
+//   {
+//      outData = Matrix::Zero(op.outRows(), op.outCols());
 //      op.transform(outData, inData);
+//   }
 //
 //      return outData;
 //   }

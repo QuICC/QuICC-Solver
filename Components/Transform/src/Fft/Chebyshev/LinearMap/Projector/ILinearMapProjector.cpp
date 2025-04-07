@@ -12,6 +12,7 @@
 //
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/ILinearMapProjector.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -32,6 +33,8 @@ namespace Projector {
 
    void ILinearMapProjector::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
+      Profiler::RegionFixture<2> fix("ILinearMapProjector::transform");
+
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
       assert(rOut.rows() == this->outRows());
@@ -50,6 +53,8 @@ namespace Projector {
 
    void ILinearMapProjector::transform(Matrix& rOut, const Matrix& in) const
    {
+      Profiler::RegionFixture<2> fix("ILinearMapProjector::transform");
+
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
       assert(rOut.rows() == this->outRows());

@@ -38,6 +38,7 @@ TEST_CASE( "Error for @Operator@@Impl@ projector", "[@CatchTestName@]" )
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
+   tester.setIter(currentts::args().iter);
 
    Tester::ParameterType params = {-1};
 
