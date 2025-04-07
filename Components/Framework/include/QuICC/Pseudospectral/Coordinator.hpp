@@ -229,10 +229,11 @@ public:
     */
    void init(const Array& tstep, const SharedSimulationBoundary spBcs);
 
-
+   #ifdef QUICC_USE_MLIR_GRAPH
    /// @brief store configuration wrapper
    /// @param GraphOptions
    void setGraphOptions(const GraphOptions& options);
+   #endif
 
    /**
     * @brief Use state file time and timestep for diagnostics

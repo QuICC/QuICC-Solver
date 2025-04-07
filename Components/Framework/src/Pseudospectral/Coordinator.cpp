@@ -515,10 +515,12 @@ void Coordinator::init(const Array& tstep, const SharedSimulationBoundary spBcs)
    stage.done();
 }
 
+#ifdef QUICC_USE_MLIR_GRAPH
 void Coordinator::setGraphOptions(const GraphOptions& options)
 {
    mGraphOptions = options;
 }
+#endif
 
 void Coordinator::useStateTime(const MHDFloat time, const MHDFloat timestep)
 {
