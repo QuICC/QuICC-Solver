@@ -35,17 +35,17 @@ public:
     */
    static ReturnType create();
 
-protected:
-private:
    /**
     * @brief Constructor
     */
-   LinearStabilityFactory() = default;
+   LinearStabilityFactory() = delete;
 
    /**
     * @brief Destructor
     */
-   ~LinearStabilityFactory() = default;
+   ~LinearStabilityFactory() = delete;
+protected:
+private:
 };
 
 template <class TModel>
