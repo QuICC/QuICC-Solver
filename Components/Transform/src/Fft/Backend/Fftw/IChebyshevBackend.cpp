@@ -78,7 +78,7 @@ namespace Fftw {
       {
          tmp.topRows(this->mSpecSize - shift) = in.imag().block(shift, 0, this->mSpecSize - shift, in.cols());
       }
-      tmp.bottomRows(this->mSpecSize - shift).setZero();
+      tmp.bottomRows(this->mPadSize + shift).setZero();
    }
 
    void IChebyshevBackend::applyPadding(Matrix& rData, const int extraRows) const
