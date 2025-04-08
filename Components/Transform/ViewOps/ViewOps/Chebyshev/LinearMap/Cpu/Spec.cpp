@@ -302,15 +302,32 @@ template <class Tout, class Tin, class Operation, std::uint16_t Treatment>
 void SpecOp<Tout, Tin, Operation, Treatment>::differentiate(
    typename Tout::ScalarType* const out, const std::size_t Nout)
 {
-   // 2*a, from y=ax + b
-   double a2 = (mUpper - mLower);
-
    // Compute derivative
    assert(out[Nout] == 0.0);
-   for (std::size_t k = Nout - 1; k > 0; --k)
+   if constexpr(std::is_same_v<std::complex<double>,typename Tout::ScalarType>)
    {
-      double scale = static_cast<double>(4 * k) * a2;
-      out[k - 1] = out[k + 1] + scale * out[k - 1];
+      // 2*a, from y=ax + b
+      //double c = 2.0*(mUpper - mLower);
+      double c = 2.0;
+
+      double* dout = reinterpret_cast<double *>(out);
+      for (std::size_t k = 2*(Nout - 1); k > 0; k -= 2)
+      {
+         double scale = static_cast<double>(k) * c;
+         dout[k - 2] = dout[k + 2] + scale * dout[k - 2];
+         dout[k - 1] = dout[k + 3] + scale * dout[k - 1];
+      }
+   }
+   else
+   {
+      // 2*a, from y=ax + b
+      double c = 4.0*(mUpper - mLower);
+
+      for (std::size_t k = Nout - 1; k > 0; --k)
+      {
+         double scale = static_cast<double>(k) * c;
+         out[k - 1] = out[k + 1] + scale * out[k - 1];
+      }
    }
 }
 

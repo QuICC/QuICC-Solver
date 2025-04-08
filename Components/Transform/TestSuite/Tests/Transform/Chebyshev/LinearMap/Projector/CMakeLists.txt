@@ -29,6 +29,7 @@ foreach(_test _ulp IN ZIP_LISTS _tests _ulps)
     COMMAND ${TestExe}
     KEYWORD Operator:Impl:Type
     ULP ${_ulp}
+    IDS 0 1 2
   )
 endforeach()
 
@@ -38,10 +39,10 @@ quicc_set_ulp(_ulps
   )
 
 set(_tests
-  D:<1,base_t>:projector
-  D:<2,base_t>:projector
-  D:<3,base_t>:projector
-  D:<4,base_t>:projector
+  D:<1,base_t>:projector:1
+  D:<2,base_t>:projector:2
+  D:<3,base_t>:projector:3
+  D:<4,base_t>:projector:4
   D1:<viewCpu_t>:projector
   D2:<viewCpu_t>:projector
   D3:<viewCpu_t>:projector
@@ -50,7 +51,61 @@ set(_tests
 foreach(_test _ulp IN ZIP_LISTS _tests _ulps)
   quicc_add_test(${_test}
     COMMAND ${TestExe}
+    KEYWORD Operator:Impl:Type:DataExt
+    ULP ${_ulp}
+    IDS 0 1 2
+  )
+endforeach()
+
+quicc_set_ulp(_ulps
+  ULP 40 40 40 250 250 625 40 40 40 250 250 625
+  MPULP 40 40 40 900 900 600 40 40 40 900 900 600
+  )
+
+set(_tests
+  P:<base_t>:projector
+  DivY1:<base_t>:projector
+  DivY2:<base_t>:projector
+  D1Y1:<base_t>:projector
+  DivY1D1Y1:<base_t>:projector
+  SphRadLapl:<base_t>:projector
+  P:<viewCpu_t>:projector
+  DivY1:<viewCpu_t>:projector
+  DivY2:<viewCpu_t>:projector
+  D1Y1:<viewCpu_t>:projector
+  DivY1D1Y1:<viewCpu_t>:projector
+  SphRadLapl:<viewCpu_t>:projector
+  )
+
+foreach(_test _ulp IN ZIP_LISTS _tests _ulps)
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
     KEYWORD Operator:Impl:Type
     ULP ${_ulp}
+    IDS 7
+  )
+endforeach()
+
+quicc_set_ulp(_ulps
+  ULP 150 375 425 116 60 375 475 150
+  MPULP 150 165 525 150 150 165 525 150
+  )
+
+set(_tests
+  D:<1,base_t>:projector:1
+  D:<2,base_t>:projector:2
+  D:<3,base_t>:projector:3
+  D:<4,base_t>:projector:4
+  D1:<viewCpu_t>:projector
+  D2:<viewCpu_t>:projector
+  D3:<viewCpu_t>:projector
+  D4:<viewCpu_t>:projector
+  )
+foreach(_test _ulp IN ZIP_LISTS _tests _ulps)
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:Impl:Type:DataExt
+    ULP ${_ulp}
+    IDS 6 7 8
   )
 endforeach()

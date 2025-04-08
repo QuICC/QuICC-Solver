@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[    161555,       3850]
-NotebookOptionsPosition[    157688,       3795]
-NotebookOutlinePosition[    158081,       3811]
-CellTagsIndexPosition[    158038,       3808]
+NotebookDataLength[    246677,       5699]
+NotebookOptionsPosition[    233593,       5535]
+NotebookOutlinePosition[    233986,       5551]
+CellTagsIndexPosition[    233943,       5548]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -78,7 +78,7 @@ Cell[BoxData[{
  RowBox[{
   RowBox[{"$MaxExtraPrecision", "=", "1000"}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
-  RowBox[{"mpprec", "=", "100"}], ";"}], "\[IndentingNewLine]", 
+  RowBox[{"mpprec", "=", "200"}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"chebgrid", "[", "n_", "]"}], ":=", 
   RowBox[{"N", "[", 
@@ -1623,7 +1623,9 @@ Cell[BoxData[{
    3.952677829718709*^9}, {3.9526785084507093`*^9, 3.952678516842821*^9}, {
    3.952678561748214*^9, 3.9526786016819267`*^9}, {3.95267865002055*^9, 
    3.9526786964193563`*^9}, {3.952678796008973*^9, 3.952678796265214*^9}, {
-   3.9526788446485147`*^9, 3.952678876189404*^9}, 3.9526789272496157`*^9},
+   3.9526788446485147`*^9, 3.952678876189404*^9}, 3.9526789272496157`*^9, {
+   3.9530940318470793`*^9, 3.95309403200605*^9}, {3.9531030497018957`*^9, 
+   3.9531030636598*^9}, {3.95310311205725*^9, 3.953103116910425*^9}},
  CellLabel->"In[8]:=",ExpressionUUID->"3bf21af0-91c3-4515-b8b9-f47c47b551a5"],
 
 Cell[BoxData[
@@ -1938,6 +1940,121 @@ Cell[BoxData[
 
 Cell[BoxData[{
  RowBox[{
+  RowBox[{"ab", " ", "=", " ", 
+   RowBox[{"abSphere", "[", 
+    FractionBox["7", "20"], "]"}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"nN", "=", 
+   SuperscriptBox["2", "6"]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"nR", "=", 
+   RowBox[{"dealiasGrid", "[", 
+    RowBox[{"nN", ",", "nN"}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"x", "=", 
+   RowBox[{"N", "[", 
+    RowBox[{
+     RowBox[{"chebgrid", "[", "nR", "]"}], ",", "$MachinePrecision"}], 
+    "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"w", "=", 
+   RowBox[{"chebweights", "[", "nR", "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"s", "=", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"i", "<", "nN"}], ",", 
+       RowBox[{"maxSpectrum", "[", 
+        RowBox[{"i", ",", 
+         RowBox[{"nN", "-", "1"}], ",", "1", ",", "1"}], "]"}], ",", "0"}], 
+      "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "0", ",", 
+       RowBox[{"nR", "-", "1"}]}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"t", "=", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"FourierDCT", "[", 
+      RowBox[{
+       RowBox[{"Re", "[", "s", "]"}], ",", "3"}], "]"}], "[", 
+     RowBox[{"[", "18", "]"}], "]"}], 
+    SqrtBox[
+     RowBox[{"Length", "@", "s"}]]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Length", "@", "s"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"f", "=", 
+   RowBox[{"Sum", "[", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"i", "==", "0"}], ",", "1", ",", "2"}], "]"}], 
+      RowBox[{"maxSpectrum", "[", 
+       RowBox[{"i", ",", 
+        RowBox[{"nN", "-", "1"}], ",", "1", ",", "1"}], "]"}], 
+      RowBox[{"Tnabl", "[", 
+       RowBox[{"i", ",", 
+        RowBox[{"ab", "[", 
+         RowBox[{"[", "1", "]"}], "]"}], ",", 
+        RowBox[{"ab", "[", 
+         RowBox[{"[", "2", "]"}], "]"}], ",", "1", ",", "x"}], "]"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "0", ",", 
+       RowBox[{"nN", "-", "1"}]}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"g", "=", 
+   RowBox[{"Table", "[", 
+    RowBox[{
+     RowBox[{"Dot", "[", 
+      RowBox[{
+       RowBox[{"w", " ", 
+        RowBox[{"Tnabl", "[", 
+         RowBox[{"i", ",", 
+          RowBox[{"ab", "[", 
+           RowBox[{"[", "1", "]"}], "]"}], ",", 
+          RowBox[{"ab", "[", 
+           RowBox[{"[", "2", "]"}], "]"}], ",", "1", ",", "x"}], "]"}]}], ",",
+        "f"}], "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"i", ",", "0", ",", 
+       RowBox[{"nN", "-", "1"}]}], "}"}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Re", "[", 
+  RowBox[{"f", "[", 
+   RowBox[{"[", "18", "]"}], "]"}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Re", "[", "g", "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Im", "[", "g", "]"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"Clear", "[", 
+  RowBox[{
+  "ab", ",", "nN", ",", "nR", ",", "x", ",", "w", ",", "f", ",", "g"}], 
+  "]"}]}], "Input",
+ Evaluatable->False,
+ CellChangeTimes->{{3.953092528640842*^9, 3.953092753750744*^9}, {
+   3.953093087280274*^9, 3.953093119491351*^9}, {3.953093221486766*^9, 
+   3.953093221813116*^9}, {3.953093898384356*^9, 3.953093900076212*^9}, {
+   3.953096943101215*^9, 3.9530969483685617`*^9}, 3.953100146619401*^9, {
+   3.953100479791106*^9, 3.953100493168118*^9}, {3.9531005715838137`*^9, 
+   3.953100577172347*^9}, {3.953100620807989*^9, 3.953100625600979*^9}, {
+   3.953100664401718*^9, 3.9531006654464817`*^9}, {3.953100696053803*^9, 
+   3.953100748386758*^9}, {3.953100948354027*^9, 3.953100956690836*^9}, {
+   3.9531010529587297`*^9, 3.953101192607272*^9}, {3.953102560258225*^9, 
+   3.953102644895249*^9}, 3.953102870607172*^9, {3.953103164528315*^9, 
+   3.9531031662505007`*^9}, {3.953103375382289*^9, 3.953103566138671*^9}, {
+   3.9531036684418573`*^9, 3.953103765558869*^9}, {3.953104206585623*^9, 
+   3.953104206647356*^9}, {3.953104284919709*^9, 3.953104290880433*^9}, {
+   3.953104349280882*^9, 3.953104352984255*^9}, 3.9531051513730917`*^9},
+ CellLabel->
+  "In[394]:=",ExpressionUUID->"a3ec0a39-6b51-4e19-b363-bf4cac6ec80e"],
+
+Cell[BoxData[{
+ RowBox[{
   RowBox[{
    RowBox[{"generateProjectors", "[", 
     RowBox[{"meta_", ",", "tId_", ",", "inOp_", ",", "gfunc_", ",", 
@@ -2022,22 +2139,15 @@ Cell[BoxData[{
    3.848725760799109*^9, 3.848725787205972*^9}, {3.848726818262965*^9, 
    3.848726824446135*^9}, {3.848726968992082*^9, 3.848726996487983*^9}, {
    3.848741855817755*^9, 3.8487418585486736`*^9}, {3.848744345351952*^9, 
-   3.848744349470261*^9}, {3.952679546489304*^9, 3.952679587830152*^9}},
- CellLabel->
-  "In[425]:=",ExpressionUUID->"5af23305-aef2-41e2-8726-851ccf5d1bc8"],
+   3.848744349470261*^9}, {3.952679546489304*^9, 3.952679587830152*^9}, {
+   3.953092775440214*^9, 3.953092783144006*^9}, 3.953100185369026*^9},
+ CellLabel->"In[79]:=",ExpressionUUID->"5af23305-aef2-41e2-8726-851ccf5d1bc8"],
 
-Cell[BoxData[
+Cell[BoxData[{
  RowBox[{
   RowBox[{"ab", " ", "=", " ", 
    RowBox[{"abSphere", "[", 
-    FractionBox["7", "20"], "]"}]}], ";"}]], "Input",
- CellChangeTimes->{{3.848631155813589*^9, 3.848631158288791*^9}, {
-  3.848631655605214*^9, 3.8486316643646917`*^9}, {3.848721511884447*^9, 
-  3.848721512851106*^9}, {3.848730749046012*^9, 3.848730775754123*^9}, {
-  3.848739920780733*^9, 3.848739943498784*^9}},
- CellLabel->"In[32]:=",ExpressionUUID->"de216113-265d-4668-a0f7-2560f47736a8"],
-
-Cell[BoxData[
+    FractionBox["7", "20"], "]"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"generateProjectors", "[", 
    RowBox[{
@@ -2047,17 +2157,21 @@ Cell[BoxData[
        RowBox[{"ab", ",", 
         RowBox[{"{", 
          RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "}"}]}], "}"}], ",", "0",
-     ",", "minSpectrum", ",", "chebgrid"}], "]"}], ";"}]], "Input",
+     ",", "minSpectrum", ",", "chebgrid"}], "]"}], ";"}]}], "Input",
  CellChangeTimes->{{3.848042079566894*^9, 3.848042115271824*^9}, {
   3.848630163252915*^9, 3.848630184842233*^9}, {3.84863043473332*^9, 
   3.848630435721219*^9}, {3.848630513610408*^9, 3.848630526096408*^9}, {
   3.84863060432757*^9, 3.848630625554902*^9}, {3.848631396540618*^9, 
   3.8486314142052393`*^9}, {3.848739960510014*^9, 3.8487399623250318`*^9}, {
-  3.848740251352149*^9, 3.848740252491442*^9}},
- CellLabel->
-  "In[427]:=",ExpressionUUID->"bf1cc371-48f4-48d4-b8f3-a1f7dd987e26"],
+  3.848740251352149*^9, 3.848740252491442*^9}, {3.953092801748835*^9, 
+  3.95309280251483*^9}},ExpressionUUID->"bf1cc371-48f4-48d4-b8f3-\
+a1f7dd987e26"],
 
-Cell[BoxData[
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ab", " ", "=", " ", 
+   RowBox[{"abSphere", "[", 
+    FractionBox["7", "20"], "]"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"generateProjectors", "[", 
    RowBox[{
@@ -2067,7 +2181,7 @@ Cell[BoxData[
        RowBox[{"ab", ",", 
         RowBox[{"{", 
          RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "}"}]}], "}"}], ",", "1",
-     ",", "maxSpectrum", ",", "chebgrid"}], "]"}], ";"}]], "Input",
+     ",", "maxSpectrum", ",", "chebgrid"}], "]"}], ";"}]}], "Input",
  CellChangeTimes->{{3.8480327959268436`*^9, 3.848032808156605*^9}, {
    3.848033040620837*^9, 3.848033041485807*^9}, {3.848033264123011*^9, 
    3.848033285315278*^9}, {3.848036250750192*^9, 3.8480363159171968`*^9}, {
@@ -2081,11 +2195,15 @@ Cell[BoxData[
    3.8486304372519484`*^9, 3.8486304388429613`*^9}, {3.848630539612248*^9, 
    3.8486305446679096`*^9}, {3.848630609381185*^9, 3.8486306216469736`*^9}, {
    3.848631399724424*^9, 3.848631399948221*^9}, {3.8486316840492883`*^9, 
-   3.848631684730764*^9}},
- CellLabel->
-  "In[428]:=",ExpressionUUID->"a50dbb99-5c52-40f2-b506-085158fef463"],
+   3.848631684730764*^9}, {3.9530928041164713`*^9, 
+   3.953092804561514*^9}},ExpressionUUID->"a50dbb99-5c52-40f2-b506-\
+085158fef463"],
 
-Cell[BoxData[
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ab", " ", "=", " ", 
+   RowBox[{"abSphere", "[", 
+    FractionBox["7", "20"], "]"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"generateProjectors", "[", 
    RowBox[{
@@ -2095,7 +2213,7 @@ Cell[BoxData[
        RowBox[{"ab", ",", 
         RowBox[{"{", 
          RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "}"}]}], "}"}], ",", "2",
-     ",", "unitSpectrum", ",", "chebgrid"}], "]"}], ";"}]], "Input",
+     ",", "unitSpectrum", ",", "chebgrid"}], "]"}], ";"}]}], "Input",
  CellChangeTimes->{{3.8480327959268436`*^9, 3.848032808156605*^9}, {
    3.848033040620837*^9, 3.848033041485807*^9}, {3.848033264123011*^9, 
    3.848033285315278*^9}, {3.848036250750192*^9, 3.8480363159171968`*^9}, {
@@ -2109,9 +2227,599 @@ Cell[BoxData[
    3.848042143290714*^9, 3.848042154091345*^9}, {3.848630440697487*^9, 
    3.84863044174303*^9}, {3.848630547770124*^9, 3.848630553367612*^9}, {
    3.848630614174631*^9, 3.848630616835202*^9}, {3.848631403006382*^9, 
-   3.848631403389942*^9}, {3.848631687111252*^9, 3.848631687672746*^9}},
+   3.848631403389942*^9}, {3.848631687111252*^9, 3.848631687672746*^9}, {
+   3.953078562253878*^9, 3.953078564731475*^9}, {3.9530928063162117`*^9, 
+   3.9530928069632063`*^9}},ExpressionUUID->"498e4b6a-9b70-461f-b217-\
+2bf3a80b441a"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ab", " ", "=", " ", 
+   RowBox[{"abSphere", "[", 
+    FractionBox["7", "20"], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"generateProjectors", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      SuperscriptBox["2", "4"], ",", 
+      RowBox[{"dealiasGrid", "[", 
+       RowBox[{
+        SuperscriptBox["2", "4"], ",", 
+        SuperscriptBox["2", "4"]}], "]"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"ab", ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "}"}]}], "}"}], ",", "6",
+     ",", "unitSpectrum", ",", "chebgrid", ",", 
+    RowBox[{"genIn", "->", "True"}], ",", 
+    RowBox[{"genRef", "->", "True"}]}], "]"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.953078533249535*^9, 3.953078540779696*^9}, {
+  3.953078584380097*^9, 3.9530786074776363`*^9}, {3.953079002880474*^9, 
+  3.953079023292302*^9}, {3.953079132877376*^9, 3.953079147799921*^9}, {
+  3.953082839943343*^9, 3.9530828774866734`*^9}, {3.953082927306089*^9, 
+  3.953082930166507*^9}, {3.953092808868449*^9, 3.953092809393409*^9}, {
+  3.953092865958457*^9, 3.953092901918496*^9}},
  CellLabel->
-  "In[429]:=",ExpressionUUID->"498e4b6a-9b70-461f-b217-2bf3a80b441a"],
+  "In[408]:=",ExpressionUUID->"c5d84ce3-40b2-41b7-bb3a-f9761c0f9ed1"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"{xi,xo} -> {0.538462, 1.53846}\"\>"], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.953105168955093*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"a8bc45c3-367c-45d7-9db9-50a840bd1cec"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/P Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:08)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.9531051692629843`*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"b083792d-dbb1-4004-a08e-16f48949fc1e"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:09)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.953105169575406*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"98d03501-7e43-42a9-8727-0285c9f4ee52"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1Y1 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:09)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.953105169621131*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"7b9702a6-f678-4e3e-9720-a43be75a5134"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1D1Y1 Chebyshev operator for N = 16, Ng = 24, a \
+= 0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:09)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.953105169715418*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"d78b978e-610e-4766-9441-458ebe1464a0"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D2 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:09)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.953105169812519*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"0c56c2fb-242a-46ae-b02e-1f28b19fcc9f"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D3 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:09)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.953105169936749*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"7a9bca9b-e117-4e56-84a8-e3b1c263a7f2"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D4 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:10)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.953105170056107*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"c02858ad-9d29-481a-ab88-27e09101674d"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:10)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.9531051701372633`*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"7afc952c-81fe-4ce1-a354-13694b76a030"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY2 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:10)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.953105170222499*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"5790a351-cda8-49d8-855d-66142c08c3c1"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/SphRadLapl Chebyshev operator for N = 16, Ng = 24, a \
+= 0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:10)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.9530929042657833`*^9, 
+  3.953094071040522*^9, 3.953100192219817*^9, 3.953105170374536*^9},
+ CellLabel->
+  "During evaluation of \
+In[408]:=",ExpressionUUID->"9a220293-5d3d-49a6-95f6-69364098ca48"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ab", " ", "=", " ", 
+   RowBox[{"abSphere", "[", 
+    FractionBox["7", "20"], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"generateProjectors", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      SuperscriptBox["2", "6"], ",", 
+      RowBox[{"dealiasGrid", "[", 
+       RowBox[{
+        SuperscriptBox["2", "6"], ",", 
+        SuperscriptBox["2", "6"]}], "]"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"ab", ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "}"}]}], "}"}], ",", "7",
+     ",", "unitSpectrum", ",", "chebgrid", ",", 
+    RowBox[{"genIn", "->", "True"}], ",", 
+    RowBox[{"genRef", "->", "True"}]}], "]"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.953078533249535*^9, 3.953078540779696*^9}, {
+  3.953078584380097*^9, 3.9530786074776363`*^9}, {3.953079002880474*^9, 
+  3.953079023292302*^9}, {3.953079132877376*^9, 3.953079147799921*^9}, {
+  3.953082839943343*^9, 3.9530828774866734`*^9}, {3.953082927306089*^9, 
+  3.953082930166507*^9}, {3.953092808868449*^9, 3.953092809393409*^9}, {
+  3.953092865958457*^9, 3.9530928695124407`*^9}, {3.953092911909236*^9, 
+  3.9530929198415747`*^9}, {3.953102384530157*^9, 3.953102384892805*^9}, {
+  3.953102927241518*^9, 3.9531029276173353`*^9}, {3.953105184379766*^9, 
+  3.953105185891562*^9}},
+ CellLabel->
+  "In[412]:=",ExpressionUUID->"f0a349d8-cd4c-4776-99e5-6398c26014a1"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"{xi,xo} -> {0.538462, 1.53846}\"\>"], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.953105190965473*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"fabaed81-b131-40f8-a714-5f56170095cc"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/P Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:31)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.9531051912521677`*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"2afaef24-a481-4ebf-a7f0-617744e2dd3e"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:31)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.953105191850875*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"34a2082c-f6de-45e9-92d3-7b6fa6f041c4"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1Y1 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:32)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.953105192231063*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"f477153d-f829-4d4a-b7b7-3986543fa976"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1D1Y1 Chebyshev operator for N = 64, Ng = 96, a \
+= 0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:32)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.9531051926220493`*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"b5f3234d-8d3a-4e73-81e1-006f96a35128"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D2 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:32)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.953105192988164*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"b7593d93-c83b-44c1-89d7-6ab08cde09a8"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D3 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:33)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.953105193440898*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"62514300-a4e5-4d56-838b-f1c17e975296"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D4 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:34)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.953105194669943*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"15a5404e-0d80-4c30-b7bf-e5965cc30952"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:34)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.953105194969859*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"cef055ea-162d-4930-9b40-eeb1fec0ffbd"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY2 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:35)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.953105195283029*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"ae4d4ea3-92f4-40a2-b910-06c07f0de6a2"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/SphRadLapl Chebyshev operator for N = 64, Ng = 96, a \
+= 0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:35)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{
+  3.95308293415311*^9, 3.9530929220861187`*^9, 3.953094079961327*^9, 
+   3.953100235671372*^9, 3.953102386660343*^9, 3.9531029281777277`*^9, 
+   3.9531030734586153`*^9, {3.9531031816607113`*^9, 3.95310320702178*^9}, 
+   3.9531032571513357`*^9, 3.953105195780856*^9},
+ CellLabel->
+  "During evaluation of \
+In[412]:=",ExpressionUUID->"f63e5c09-4cd0-425e-9b03-ba7ba8caab0d"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"ab", " ", "=", " ", 
+   RowBox[{"abSphere", "[", 
+    FractionBox["7", "20"], "]"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"generateProjectors", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      SuperscriptBox["2", "7"], ",", 
+      RowBox[{"dealiasGrid", "[", 
+       RowBox[{
+        SuperscriptBox["2", "7"], ",", 
+        SuperscriptBox["2", "7"]}], "]"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"ab", ",", 
+        RowBox[{"{", 
+         RowBox[{"1", ",", "2", ",", "3"}], "}"}]}], "}"}]}], "}"}], ",", "8",
+     ",", "unitSpectrum", ",", "chebgrid", ",", 
+    RowBox[{"genIn", "->", "True"}], ",", 
+    RowBox[{"genRef", "->", "True"}]}], "]"}], ";"}]}], "Input",
+ CellChangeTimes->{{3.953078533249535*^9, 3.953078540779696*^9}, {
+  3.953078584380097*^9, 3.9530786074776363`*^9}, {3.953079002880474*^9, 
+  3.953079023292302*^9}, {3.953079132877376*^9, 3.953079147799921*^9}, {
+  3.953082839943343*^9, 3.9530828774866734`*^9}, {3.953082927306089*^9, 
+  3.953082930166507*^9}, {3.953092808868449*^9, 3.953092809393409*^9}, {
+  3.953092865958457*^9, 3.953092892750843*^9}, {3.953105173964911*^9, 
+  3.953105176704487*^9}},
+ CellLabel->
+  "In[410]:=",ExpressionUUID->"a2381718-518f-4ca6-9441-254c09ddd3f3"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"{xi,xo} -> {0.538462, 1.53846}\"\>"], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.953105177966403*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"2dab5ac6-0b94-438e-aa11-744acfec299e"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/P Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:18)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.953105178397873*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"0edddb80-cb73-49b8-bfa1-69d9c33fa3ba"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:19)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.953105179202427*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"27ea9ebd-dce2-44c7-9fb3-d103e8e79fc3"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1Y1 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:20)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.953105180102313*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"47d4f28d-6307-4e59-ab19-44f8fd829f6e"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1D1Y1 Chebyshev operator for N = 128, Ng = 192, \
+a = 0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:20)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.953105180981495*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"b2ef70a5-1ccf-4555-85ab-e48e7802cb1a"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D2 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:21)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.95310518192282*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"43f53754-1c34-4941-aadc-ae43906ab646"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D3 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:23)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.953105183480989*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"410f0747-696e-4cc8-9de6-2e76972e7018"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D4 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:28)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.9531051885315847`*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"0d390cf1-a083-4c71-8024-c1cd7c9eb2bf"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:28)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.9531051889577093`*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"8906b6fb-b911-41a5-9ddb-28b5769f9e88"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY2 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:29)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.953105189551491*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"6bd482af-d71b-4fd8-b2bf-ce5663633562"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/SphRadLapl Chebyshev operator for N = 128, Ng = 192, \
+a = 0.50000, b = 1.0385, l = {1, 2, 3}...\"", 
+   StyleBox[
+   "\" Done(Tue 8 Apr 2025 14:46:30)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95308293415311*^9, 3.953092927484291*^9, 
+  3.953105190881177*^9},
+ CellLabel->
+  "During evaluation of \
+In[410]:=",ExpressionUUID->"50662a60-7b84-4d5d-afe0-3d98e9aa4a94"]
+}, Open  ]]
+}, Open  ]],
 
 Cell[BoxData[{
  RowBox[{
@@ -2130,10 +2838,61 @@ Cell[BoxData[{
       "\[IndentingNewLine]", 
       RowBox[{"subdir", "=", "\"\<Projector/\>\""}], ";", 
       "\[IndentingNewLine]", 
-      RowBox[{"testProjector", "[", 
+      RowBox[{"func", " ", "=", " ", "testProjector"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"(*", 
        RowBox[{
-       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "Tnabl", ",", 
-        RowBox[{"subdir", "<>", "\"\<P\>\""}]}], "]"}], ";"}]}], 
+        RowBox[{"func", "[", 
+         RowBox[{
+         "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "Tnabl", ",", 
+          RowBox[{"subdir", "<>", "\"\<P\>\""}]}], "]"}], ";"}], "*)"}], 
+      "\[IndentingNewLine]", 
+      RowBox[{"func", "[", 
+       RowBox[{
+       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "dTnabl", ",", 
+        RowBox[{"subdir", "<>", "\"\<D1\>\""}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"func", "[", 
+       RowBox[{
+       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "dyTnabl", ",", 
+        RowBox[{"subdir", "<>", "\"\<D1Y1\>\""}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"func", "[", 
+       RowBox[{
+       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "divydyTnabl", ",", 
+        RowBox[{"subdir", "<>", "\"\<DivY1D1Y1\>\""}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"func", "[", 
+       RowBox[{
+       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "d2Tnabl", ",", 
+        RowBox[{"subdir", "<>", "\"\<D2\>\""}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"func", "[", 
+       RowBox[{
+       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "d3Tnabl", ",", 
+        RowBox[{"subdir", "<>", "\"\<D3\>\""}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"func", "[", 
+       RowBox[{
+       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "d4Tnabl", ",", 
+        RowBox[{"subdir", "<>", "\"\<D4\>\""}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"func", "[", 
+       RowBox[{
+       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "divyTnabl", ",", 
+        RowBox[{"subdir", "<>", "\"\<DivY1\>\""}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"func", "[", 
+       RowBox[{
+       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "divy2Tnabl", ",", 
+        
+        RowBox[{"subdir", "<>", "\"\<DivY2\>\""}]}], "]"}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"func", "[", 
+       RowBox[{
+       "meta", ",", "tId", ",", "inOp", ",", "gfunc", ",", "slaplTnabl", ",", 
+        
+        RowBox[{"subdir", "<>", "\"\<SphRadLapl\>\""}]}], "]"}], ";"}]}], 
     "\[IndentingNewLine]", "]"}]}], ";"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
@@ -2158,8 +2917,11 @@ Cell[BoxData[{
    3.9049049166992292`*^9}, {3.9049050395653143`*^9, 3.904905051358252*^9}, {
    3.90490509088834*^9, 3.9049050917751083`*^9}, {3.90495959088622*^9, 
    3.904959652856584*^9}, {3.90495968888876*^9, 3.9049598419921417`*^9}, {
-   3.9526500061905003`*^9, 3.952650074876226*^9}},
- CellLabel->"In[79]:=",ExpressionUUID->"f526fe9d-5cc3-4270-89d2-2a442fb5b746"],
+   3.9526500061905003`*^9, 3.952650074876226*^9}, {3.953008130017976*^9, 
+   3.953008242646042*^9}},
+ CellLabel->"In[81]:=",ExpressionUUID->"f526fe9d-5cc3-4270-89d2-2a442fb5b746"],
+
+Cell[CellGroupData[{
 
 Cell[BoxData[{
  RowBox[{
@@ -2193,7 +2955,7 @@ Cell[BoxData[{
       "]"}], ";", "\[IndentingNewLine]", 
      RowBox[{"For", "[", " ", 
       RowBox[{
-       RowBox[{"p", " ", "=", " ", "6"}], ",", 
+       RowBox[{"p", " ", "=", " ", "4"}], ",", 
        RowBox[{"p", "<", "10"}], ",", 
        RowBox[{"p", "++"}], ",", "\[IndentingNewLine]", 
        RowBox[{
@@ -2279,8 +3041,986 @@ Cell[BoxData[{
    3.9526506298541613`*^9, 3.952650668131963*^9}, {3.9526508278666077`*^9, 
    3.952650829428862*^9}, {3.9526508675452433`*^9, 3.952650874558317*^9}, {
    3.952677939909815*^9, 3.9526779413104763`*^9}, {3.952736013091609*^9, 
-   3.9527360330338507`*^9}},
+   3.9527360330338507`*^9}, {3.953008231039605*^9, 3.95300823117876*^9}},
  CellLabel->"In[81]:=",ExpressionUUID->"1e85b8a7-47f9-40c8-a1dc-5a0561e87d23"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"{xi,xo} -> {0.538462, 1.53846}\"\>"], "Print",
+ CellChangeTimes->{3.953008250456831*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"0dd42bb0-5dbf-4701-90ca-29d5064622ea"],
+
+Cell[BoxData["\<\"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\"\>"], \
+"Print",
+ CellChangeTimes->{3.953008250462098*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"0fc4b318-3fc8-43fe-821d-2d5993b708fa"],
+
+Cell[BoxData["\<\"%%% Generating data with randSpectrum spectrum\"\>"], \
+"Print",
+ CellChangeTimes->{3.9530082504633512`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"54ca6227-1e12-4942-b0f1-9937a193779d"],
+
+Cell[BoxData["\<\"--- Generating data with id = 104\"\>"], "Print",
+ CellChangeTimes->{3.9530082504647493`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"74308ebf-22bd-45b6-b779-d985b094e2cf"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:50:59)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530082595873528`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"b3d07681-b2bd-4a38-b267-681bdbe27e69"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1Y1 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:50:59)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008259731452*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"1acfbb67-70dc-44a6-864f-07f9b546517e"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1D1Y1 Chebyshev operator for N = 16, Ng = 24, a \
+= 0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:50:59)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008259887641*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"c4c7e35b-3f1f-40f0-9f37-1047c3d79c26"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D2 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:00)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008260045237*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"b5d75457-e27b-48d3-8535-bc0d53cc055b"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D3 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:00)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530082602293463`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"45679d64-0b61-4eae-808e-1e635c79b0a6"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D4 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:00)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008260477818*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"9258e674-500e-49b0-827b-d8507341b56e"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:00)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008260623872*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"fba2f5a6-d6f5-46fc-b9a3-1cef53a6e5c6"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY2 Chebyshev operator for N = 16, Ng = 24, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:00)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008260771646*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"4da2e4af-5f13-40dd-ba43-7373740e2b85"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/SphRadLapl Chebyshev operator for N = 16, Ng = 24, a \
+= 0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:00)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008260963614*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"a59f21f9-0ce9-4ff2-8038-e742812cf654"],
+
+Cell[BoxData["\<\"--- Generating data with id = 105\"\>"], "Print",
+ CellChangeTimes->{3.953008260966702*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"7daabf39-a89e-41f4-ac01-1d96b15df626"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1 Chebyshev operator for N = 32, Ng = 48, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:01)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530082614966707`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"f5c895bf-3d6f-446d-94c0-83cac7069cc6"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1Y1 Chebyshev operator for N = 32, Ng = 48, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:02)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008262067917*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"b492e8a5-83b2-4f7e-bc94-de741a2cc29e"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1D1Y1 Chebyshev operator for N = 32, Ng = 48, a \
+= 0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:02)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008262646285*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"3fc19c1e-e033-4b30-87a6-73b28c621a40"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D2 Chebyshev operator for N = 32, Ng = 48, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:03)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008263256714*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"df58e85e-d7dc-4a3f-ae02-6a1084013840"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D3 Chebyshev operator for N = 32, Ng = 48, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:03)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530082639424*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"0ef48a4b-5f4c-421e-a7e7-439a7004d706"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D4 Chebyshev operator for N = 32, Ng = 48, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:05)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008265063389*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"d467a9e5-610f-4cbd-a04a-5345b52a32d3"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1 Chebyshev operator for N = 32, Ng = 48, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:05)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008265675753*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"6c79d6f1-0592-4e2b-8c15-8ed8c9a1fcbd"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY2 Chebyshev operator for N = 32, Ng = 48, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:06)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530082662103863`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"83053e3a-3d7d-4c85-96fc-f42b18a46a78"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/SphRadLapl Chebyshev operator for N = 32, Ng = 48, a \
+= 0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:06)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95300826685085*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"c388321c-db60-4d34-badf-d369709af0db"],
+
+Cell[BoxData["\<\"--- Generating data with id = 106\"\>"], "Print",
+ CellChangeTimes->{3.9530082668539333`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"585467fc-2f53-4aee-ac9b-a8bf65a3bc78"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:09)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95300826905798*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"526cf491-4d1a-4ac8-a532-57deea5ba182"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1Y1 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:11)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008271500251*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"341404aa-ced0-4423-8f08-7af14b8eb8d0"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1D1Y1 Chebyshev operator for N = 64, Ng = 96, a \
+= 0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:13)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008273963969*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"913f9b38-27d3-4287-bc39-bf1f2e1e72b6"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D2 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:16)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530082764959784`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"db3ad297-3d32-4599-91a9-79198e7fd210"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D3 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:19)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008279455167*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"08235e57-236c-4e4a-a93c-92e92ba3ca3f"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D4 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:26)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008286089575*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"08dda5f3-8688-4eeb-95ba-071a58057ec6"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:28)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008288177709*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"00a4ebc8-1a3a-44b7-9f9d-fa31fcefc076"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY2 Chebyshev operator for N = 64, Ng = 96, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:30)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008290241049*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"ef866cbd-f87e-4544-b9a0-a4330d594693"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/SphRadLapl Chebyshev operator for N = 64, Ng = 96, a \
+= 0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:33)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008293044724*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"b72ab067-97bd-4737-a63b-eb708f65621d"],
+
+Cell[BoxData["\<\"--- Generating data with id = 107\"\>"], "Print",
+ CellChangeTimes->{3.953008293048246*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"12d4aa43-d43e-48a1-9bd2-9dfdd6fd9212"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:42)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530083026348*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"ef26f0d9-2982-4f41-a32f-9b046897ccc2"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1Y1 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:51:55)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530083150737953`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"6ba7803b-af04-4c93-8f29-e60e5c4e7d51"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1D1Y1 Chebyshev operator for N = 128, Ng = 192, \
+a = 0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, \
+14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, \
+33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, \
+52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, \
+71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, \
+90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, \
+107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, \
+122, 123, 124, 125, 126, 127}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:52:07)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530083278111*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"a8780ab7-8ecd-4964-ba73-b7b813f54cd5"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D2 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:52:20)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530083406000443`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"f81d437e-b138-4a8b-a1eb-edc5fb61755c"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D3 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:52:36)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530083565788593`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"fa53edd4-110a-46c5-a300-a9fa72cd61db"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D4 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:53:28)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008408398176*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"7eed0d58-16e1-4e56-bd26-bbc4d22a98bb"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:53:38)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530084181466427`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"fb96cdab-c090-4c54-9859-27c3fc6ffcb4"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY2 Chebyshev operator for N = 128, Ng = 192, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:53:48)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530084285393467`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"ac4ab9fc-58d2-4916-b23a-da0375e3f463"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/SphRadLapl Chebyshev operator for N = 128, Ng = 192, \
+a = 0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, \
+14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, \
+33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, \
+52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, \
+71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, \
+90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, \
+107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, \
+122, 123, 124, 125, 126, 127}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:54:06)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008446889677*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"8784828c-aa2d-4f60-b92b-e25b669c0c08"],
+
+Cell[BoxData["\<\"--- Generating data with id = 108\"\>"], "Print",
+ CellChangeTimes->{3.9530084468943043`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"70f7c49e-a9af-4100-8a42-2081495ad985"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1 Chebyshev operator for N = 256, Ng = 384, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, \
+138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, \
+153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, \
+168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, \
+183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, \
+198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, \
+213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, \
+228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, \
+243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:55:09)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95300850970055*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"f3695e8c-9c40-4318-944b-816ecfd215be"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1Y1 Chebyshev operator for N = 256, Ng = 384, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, \
+138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, \
+153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, \
+168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, \
+183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, \
+198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, \
+213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, \
+228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, \
+243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:56:37)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008597422475*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"a18fff40-01e3-445c-b3f3-2aadf8c7b1a6"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1D1Y1 Chebyshev operator for N = 256, Ng = 384, \
+a = 0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, \
+14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, \
+33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, \
+52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, \
+71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, \
+90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, \
+107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, \
+122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, \
+137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, \
+152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, \
+167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, \
+182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, \
+197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, \
+212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, \
+227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, \
+242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:58:08)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008688821809*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"cf130d55-8f25-403a-9ba9-fc4cf2867858"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D2 Chebyshev operator for N = 256, Ng = 384, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, \
+138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, \
+153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, \
+168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, \
+183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, \
+198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, \
+213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, \
+228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, \
+243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 11:59:41)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.95300878187118*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"f9b31a96-5066-4a85-beef-98f15362d8c4"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D3 Chebyshev operator for N = 256, Ng = 384, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, \
+138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, \
+153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, \
+168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, \
+183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, \
+198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, \
+213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, \
+228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, \
+243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 12:01:52)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953008912961487*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"3472ee8e-1085-4aaf-91c3-b5dbd442702e"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D4 Chebyshev operator for N = 256, Ng = 384, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, \
+138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, \
+153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, \
+168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, \
+183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, \
+198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, \
+213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, \
+228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, \
+243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 12:10:04)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530094043570127`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"0a80c5c7-8215-48df-81bf-67c2c5381c26"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY1 Chebyshev operator for N = 256, Ng = 384, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, \
+138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, \
+153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, \
+168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, \
+183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, \
+198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, \
+213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, \
+228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, \
+243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 12:11:00)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953009460232789*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"30bae331-5a37-46b4-80ee-454034eaca8c"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/DivY2 Chebyshev operator for N = 256, Ng = 384, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, \
+138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, \
+153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, \
+168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, \
+183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, \
+198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, \
+213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, \
+228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, \
+243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 12:11:56)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530095167020283`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"d77c9e6b-7ca6-4382-bbc4-179679046e5a"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/SphRadLapl Chebyshev operator for N = 256, Ng = 384, \
+a = 0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, \
+14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, \
+33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, \
+52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, \
+71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, \
+90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, \
+107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, \
+122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, \
+137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, \
+152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, \
+167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, \
+182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, \
+197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, \
+212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, \
+227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, \
+242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 12:14:05)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953009645371369*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"53be40c7-11c8-40d2-a26e-628472b6a1f3"],
+
+Cell[BoxData["\<\"--- Generating data with id = 109\"\>"], "Print",
+ CellChangeTimes->{3.95300964537706*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"2d685039-197b-4e3c-bd27-12685e273903"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1 Chebyshev operator for N = 512, Ng = 768, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, \
+138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, \
+153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, \
+168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, \
+183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, \
+198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, \
+213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, \
+228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, \
+243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, \
+258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, \
+273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, \
+288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, \
+303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, \
+318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, \
+333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, \
+348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, \
+363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, \
+378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, \
+393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, \
+408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, \
+423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, \
+438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, \
+453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466, 467, \
+468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, \
+483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 494, 495, 496, 497, \
+498, 499, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 12:21:11)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.953010071323138*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"4c5a2b41-d21f-4c33-95f8-90d7e584e3cd"],
+
+Cell[BoxData[
+ TemplateBox[{
+  "\"Exporting Projector/D1Y1 Chebyshev operator for N = 512, Ng = 768, a = \
+0.50000, b = 1.0385, l = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, \
+15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, \
+34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, \
+53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, \
+72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, \
+91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, \
+108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, \
+123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, \
+138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, \
+153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, \
+168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, \
+183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, \
+198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, \
+213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, \
+228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, \
+243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, \
+258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 272, \
+273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, \
+288, 289, 290, 291, 292, 293, 294, 295, 296, 297, 298, 299, 300, 301, 302, \
+303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, \
+318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, \
+333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, \
+348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, \
+363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, \
+378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390, 391, 392, \
+393, 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, \
+408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, \
+423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, \
+438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449, 450, 451, 452, \
+453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466, 467, \
+468, 469, 470, 471, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, \
+483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 494, 495, 496, 497, \
+498, 499, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511}...\"", 
+   StyleBox[
+   "\" Done(Mon 7 Apr 2025 12:32:10)\"", FontColor -> RGBColor[0, 1, 0], 
+    StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9530107303301497`*^9},
+ CellLabel->
+  "During evaluation of \
+In[81]:=",ExpressionUUID->"e74764da-8cad-4b86-8874-cd46c418bbbb"]
+}, Open  ]]
+}, Open  ]],
 
 Cell[BoxData[
  RowBox[{
@@ -3810,48 +5550,157 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 1932, 54, 305, "Input",ExpressionUUID->"d658a15c-d0fa-4364-885d-b052f24ca2ad",
+Cell[558, 20, 1932, 54, 265, "Input",ExpressionUUID->"d658a15c-d0fa-4364-885d-b052f24ca2ad",
  InitializationCell->True],
-Cell[2493, 76, 57656, 1550, 6338, "Input",ExpressionUUID->"3bf21af0-91c3-4515-b8b9-f47c47b551a5",
+Cell[2493, 76, 57802, 1552, 5446, "Input",ExpressionUUID->"3bf21af0-91c3-4515-b8b9-f47c47b551a5",
  InitializationCell->True],
-Cell[60152, 1628, 4474, 105, 802, "Input",ExpressionUUID->"d9d681a6-4440-4faf-a1b9-35d72d693a6b",
+Cell[60298, 1630, 4474, 105, 782, "Input",ExpressionUUID->"d9d681a6-4440-4faf-a1b9-35d72d693a6b",
  InitializationCell->True],
-Cell[64629, 1735, 8600, 201, 876, "Input",ExpressionUUID->"39d33efb-4852-4237-9edf-8769cd493b08",
+Cell[64775, 1737, 8600, 201, 708, "Input",ExpressionUUID->"39d33efb-4852-4237-9edf-8769cd493b08",
  InitializationCell->True],
-Cell[73232, 1938, 3869, 88, 356, "Input",ExpressionUUID->"5af23305-aef2-41e2-8726-851ccf5d1bc8"],
-Cell[77104, 2028, 478, 9, 42, "Input",ExpressionUUID->"de216113-265d-4668-a0f7-2560f47736a8"],
-Cell[77585, 2039, 831, 18, 29, "Input",ExpressionUUID->"bf1cc371-48f4-48d4-b8f3-a1f7dd987e26"],
-Cell[78419, 2059, 1407, 26, 29, "Input",ExpressionUUID->"a50dbb99-5c52-40f2-b506-085158fef463"],
-Cell[79829, 2087, 1442, 26, 49, "Input",ExpressionUUID->"498e4b6a-9b70-461f-b217-2bf3a80b441a"],
-Cell[81274, 2115, 2426, 46, 149, "Input",ExpressionUUID->"f526fe9d-5cc3-4270-89d2-2a442fb5b746"],
-Cell[83703, 2163, 5787, 119, 400, "Input",ExpressionUUID->"1e85b8a7-47f9-40c8-a1dc-5a0561e87d23"],
-Cell[89493, 2284, 9569, 229, 789, "Input",ExpressionUUID->"600c2424-f368-468d-812a-b7e683b155a7",
+Cell[73378, 1940, 4207, 113, 309, "Input",ExpressionUUID->"a3ec0a39-6b51-4e19-b363-bf4cac6ec80e",
+ Evaluatable->False],
+Cell[77588, 2055, 3937, 88, 336, "Input",ExpressionUUID->"5af23305-aef2-41e2-8726-851ccf5d1bc8"],
+Cell[81528, 2145, 994, 22, 64, "Input",ExpressionUUID->"bf1cc371-48f4-48d4-b8f3-a1f7dd987e26"],
+Cell[82525, 2169, 1574, 30, 64, "Input",ExpressionUUID->"a50dbb99-5c52-40f2-b506-085158fef463"],
+Cell[84102, 2201, 1661, 31, 64, "Input",ExpressionUUID->"498e4b6a-9b70-461f-b217-2bf3a80b441a"],
+Cell[CellGroupData[{
+Cell[85788, 2236, 1218, 29, 88, "Input",ExpressionUUID->"c5d84ce3-40b2-41b7-bb3a-f9761c0f9ed1"],
+Cell[CellGroupData[{
+Cell[87031, 2269, 304, 5, 23, "Print",ExpressionUUID->"a8bc45c3-367c-45d7-9db9-50a840bd1cec"],
+Cell[87338, 2276, 529, 12, 41, "Print",ExpressionUUID->"b083792d-dbb1-4004-a08e-16f48949fc1e"],
+Cell[87870, 2290, 528, 12, 41, "Print",ExpressionUUID->"98d03501-7e43-42a9-8727-0285c9f4ee52"],
+Cell[88401, 2304, 530, 12, 41, "Print",ExpressionUUID->"7b9702a6-f678-4e3e-9720-a43be75a5134"],
+Cell[88934, 2318, 535, 12, 41, "Print",ExpressionUUID->"d78b978e-610e-4766-9441-458ebe1464a0"],
+Cell[89472, 2332, 528, 12, 41, "Print",ExpressionUUID->"0c56c2fb-242a-46ae-b02e-1f28b19fcc9f"],
+Cell[90003, 2346, 528, 12, 41, "Print",ExpressionUUID->"7a9bca9b-e117-4e56-84a8-e3b1c263a7f2"],
+Cell[90534, 2360, 528, 12, 41, "Print",ExpressionUUID->"c02858ad-9d29-481a-ab88-27e09101674d"],
+Cell[91065, 2374, 533, 12, 41, "Print",ExpressionUUID->"7afc952c-81fe-4ce1-a354-13694b76a030"],
+Cell[91601, 2388, 531, 12, 41, "Print",ExpressionUUID->"5790a351-cda8-49d8-855d-66142c08c3c1"],
+Cell[92135, 2402, 536, 12, 41, "Print",ExpressionUUID->"9a220293-5d3d-49a6-95f6-69364098ca48"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[92720, 2420, 1417, 32, 88, "Input",ExpressionUUID->"f0a349d8-cd4c-4776-99e5-6398c26014a1"],
+Cell[CellGroupData[{
+Cell[94162, 2456, 457, 8, 23, "Print",ExpressionUUID->"fabaed81-b131-40f8-a714-5f56170095cc"],
+Cell[94622, 2466, 682, 15, 41, "Print",ExpressionUUID->"2afaef24-a481-4ebf-a7f0-617744e2dd3e"],
+Cell[95307, 2483, 681, 15, 41, "Print",ExpressionUUID->"34a2082c-f6de-45e9-92d3-7b6fa6f041c4"],
+Cell[95991, 2500, 683, 15, 41, "Print",ExpressionUUID->"f477153d-f829-4d4a-b7b7-3986543fa976"],
+Cell[96677, 2517, 690, 15, 41, "Print",ExpressionUUID->"b5f3234d-8d3a-4e73-81e1-006f96a35128"],
+Cell[97370, 2534, 681, 15, 41, "Print",ExpressionUUID->"b7593d93-c83b-44c1-89d7-6ab08cde09a8"],
+Cell[98054, 2551, 681, 15, 41, "Print",ExpressionUUID->"62514300-a4e5-4d56-838b-f1c17e975296"],
+Cell[98738, 2568, 681, 15, 41, "Print",ExpressionUUID->"15a5404e-0d80-4c30-b7bf-e5965cc30952"],
+Cell[99422, 2585, 684, 15, 41, "Print",ExpressionUUID->"cef055ea-162d-4930-9b40-eeb1fec0ffbd"],
+Cell[100109, 2602, 684, 15, 41, "Print",ExpressionUUID->"ae4d4ea3-92f4-40a2-b910-06c07f0de6a2"],
+Cell[100796, 2619, 689, 15, 41, "Print",ExpressionUUID->"f63e5c09-4cd0-425e-9b03-ba7ba8caab0d"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[101534, 2640, 1267, 30, 88, "Input",ExpressionUUID->"a2381718-518f-4ca6-9441-254c09ddd3f3"],
+Cell[CellGroupData[{
+Cell[102826, 2674, 258, 5, 23, "Print",ExpressionUUID->"2dab5ac6-0b94-438e-aa11-744acfec299e"],
+Cell[103087, 2681, 483, 12, 41, "Print",ExpressionUUID->"0edddb80-cb73-49b8-bfa1-69d9c33fa3ba"],
+Cell[103573, 2695, 484, 12, 41, "Print",ExpressionUUID->"27ea9ebd-dce2-44c7-9fb3-d103e8e79fc3"],
+Cell[104060, 2709, 486, 12, 41, "Print",ExpressionUUID->"47d4f28d-6307-4e59-ab19-44f8fd829f6e"],
+Cell[104549, 2723, 491, 12, 41, "Print",ExpressionUUID->"b2ef70a5-1ccf-4555-85ab-e48e7802cb1a"],
+Cell[105043, 2737, 483, 12, 41, "Print",ExpressionUUID->"43f53754-1c34-4941-aadc-ae43906ab646"],
+Cell[105529, 2751, 484, 12, 41, "Print",ExpressionUUID->"410f0747-696e-4cc8-9de6-2e76972e7018"],
+Cell[106016, 2765, 486, 12, 41, "Print",ExpressionUUID->"0d390cf1-a083-4c71-8024-c1cd7c9eb2bf"],
+Cell[106505, 2779, 489, 12, 41, "Print",ExpressionUUID->"8906b6fb-b911-41a5-9ddb-28b5769f9e88"],
+Cell[106997, 2793, 487, 12, 41, "Print",ExpressionUUID->"6bd482af-d71b-4fd8-b2bf-ce5663633562"],
+Cell[107487, 2807, 492, 12, 41, "Print",ExpressionUUID->"50662a60-7b84-4d5d-afe0-3d98e9aa4a94"]
+}, Open  ]]
+}, Open  ]],
+Cell[108006, 2823, 4583, 98, 333, "Input",ExpressionUUID->"f526fe9d-5cc3-4270-89d2-2a442fb5b746"],
+Cell[CellGroupData[{
+Cell[112614, 2925, 5832, 119, 400, "Input",ExpressionUUID->"1e85b8a7-47f9-40c8-a1dc-5a0561e87d23"],
+Cell[CellGroupData[{
+Cell[118471, 3048, 211, 4, 23, "Print",ExpressionUUID->"0dd42bb0-5dbf-4701-90ca-29d5064622ea"],
+Cell[118685, 3054, 233, 5, 23, "Print",ExpressionUUID->"0fc4b318-3fc8-43fe-821d-2d5993b708fa"],
+Cell[118921, 3061, 231, 5, 23, "Print",ExpressionUUID->"54ca6227-1e12-4942-b0f1-9937a193779d"],
+Cell[119155, 3068, 216, 4, 23, "Print",ExpressionUUID->"74308ebf-22bd-45b6-b779-d985b094e2cf"],
+Cell[119374, 3074, 484, 12, 41, "Print",ExpressionUUID->"b3d07681-b2bd-4a38-b267-681bdbe27e69"],
+Cell[119861, 3088, 484, 12, 41, "Print",ExpressionUUID->"1acfbb67-70dc-44a6-864f-07f9b546517e"],
+Cell[120348, 3102, 489, 12, 41, "Print",ExpressionUUID->"c4c7e35b-3f1f-40f0-9f37-1047c3d79c26"],
+Cell[120840, 3116, 482, 12, 41, "Print",ExpressionUUID->"b5d75457-e27b-48d3-8535-bc0d53cc055b"],
+Cell[121325, 3130, 484, 12, 41, "Print",ExpressionUUID->"45679d64-0b61-4eae-808e-1e635c79b0a6"],
+Cell[121812, 3144, 482, 12, 41, "Print",ExpressionUUID->"9258e674-500e-49b0-827b-d8507341b56e"],
+Cell[122297, 3158, 485, 12, 41, "Print",ExpressionUUID->"fba2f5a6-d6f5-46fc-b9a3-1cef53a6e5c6"],
+Cell[122785, 3172, 485, 12, 41, "Print",ExpressionUUID->"4da2e4af-5f13-40dd-ba43-7373740e2b85"],
+Cell[123273, 3186, 490, 12, 41, "Print",ExpressionUUID->"a59f21f9-0ce9-4ff2-8038-e742812cf654"],
+Cell[123766, 3200, 214, 4, 23, "Print",ExpressionUUID->"7daabf39-a89e-41f4-ac01-1d96b15df626"],
+Cell[123983, 3206, 548, 12, 60, "Print",ExpressionUUID->"f5c895bf-3d6f-446d-94c0-83cac7069cc6"],
+Cell[124534, 3220, 548, 12, 60, "Print",ExpressionUUID->"b492e8a5-83b2-4f7e-bc94-de741a2cc29e"],
+Cell[125085, 3234, 553, 12, 60, "Print",ExpressionUUID->"3fc19c1e-e033-4b30-87a6-73b28c621a40"],
+Cell[125641, 3248, 546, 12, 60, "Print",ExpressionUUID->"df58e85e-d7dc-4a3f-ae02-6a1084013840"],
+Cell[126190, 3262, 544, 12, 60, "Print",ExpressionUUID->"0ef48a4b-5f4c-421e-a7e7-439a7004d706"],
+Cell[126737, 3276, 546, 12, 60, "Print",ExpressionUUID->"d467a9e5-610f-4cbd-a04a-5345b52a32d3"],
+Cell[127286, 3290, 549, 12, 60, "Print",ExpressionUUID->"6c79d6f1-0592-4e2b-8c15-8ed8c9a1fcbd"],
+Cell[127838, 3304, 551, 12, 60, "Print",ExpressionUUID->"83053e3a-3d7d-4c85-96fc-f42b18a46a78"],
+Cell[128392, 3318, 553, 12, 60, "Print",ExpressionUUID->"c388321c-db60-4d34-badf-d369709af0db"],
+Cell[128948, 3332, 216, 4, 23, "Print",ExpressionUUID->"585467fc-2f53-4aee-ac9b-a8bf65a3bc78"],
+Cell[129167, 3338, 677, 14, 79, "Print",ExpressionUUID->"526cf491-4d1a-4ac8-a532-57deea5ba182"],
+Cell[129847, 3354, 680, 14, 79, "Print",ExpressionUUID->"341404aa-ced0-4423-8f08-7af14b8eb8d0"],
+Cell[130530, 3370, 685, 14, 79, "Print",ExpressionUUID->"913f9b38-27d3-4287-bc39-bf1f2e1e72b6"],
+Cell[131218, 3386, 680, 14, 79, "Print",ExpressionUUID->"db3ad297-3d32-4599-91a9-79198e7fd210"],
+Cell[131901, 3402, 678, 14, 79, "Print",ExpressionUUID->"08235e57-236c-4e4a-a93c-92e92ba3ca3f"],
+Cell[132582, 3418, 678, 14, 79, "Print",ExpressionUUID->"08dda5f3-8688-4eeb-95ba-071a58057ec6"],
+Cell[133263, 3434, 681, 14, 79, "Print",ExpressionUUID->"00a4ebc8-1a3a-44b7-9f9d-fa31fcefc076"],
+Cell[133947, 3450, 681, 14, 79, "Print",ExpressionUUID->"ef866cbd-f87e-4544-b9a0-a4330d594693"],
+Cell[134631, 3466, 686, 14, 98, "Print",ExpressionUUID->"b72ab067-97bd-4737-a63b-eb708f65621d"],
+Cell[135320, 3482, 214, 4, 23, "Print",ExpressionUUID->"12d4aa43-d43e-48a1-9bd2-9dfdd6fd9212"],
+Cell[135537, 3488, 970, 18, 155, "Print",ExpressionUUID->"ef26f0d9-2982-4f41-a32f-9b046897ccc2"],
+Cell[136510, 3508, 976, 18, 155, "Print",ExpressionUUID->"6ba7803b-af04-4c93-8f29-e60e5c4e7d51"],
+Cell[137489, 3528, 977, 18, 155, "Print",ExpressionUUID->"a8780ab7-8ecd-4964-ba73-b7b813f54cd5"],
+Cell[138469, 3548, 974, 18, 155, "Print",ExpressionUUID->"f81d437e-b138-4a8b-a1eb-edc5fb61755c"],
+Cell[139446, 3568, 974, 18, 155, "Print",ExpressionUUID->"fa53edd4-110a-46c5-a300-a9fa72cd61db"],
+Cell[140423, 3588, 972, 18, 155, "Print",ExpressionUUID->"7eed0d58-16e1-4e56-bd26-bbc4d22a98bb"],
+Cell[141398, 3608, 977, 18, 155, "Print",ExpressionUUID->"fb96cdab-c090-4c54-9859-27c3fc6ffcb4"],
+Cell[142378, 3628, 977, 18, 155, "Print",ExpressionUUID->"ac4ab9fc-58d2-4916-b23a-da0375e3f463"],
+Cell[143358, 3648, 980, 18, 155, "Print",ExpressionUUID->"8784828c-aa2d-4f60-b92b-e25b669c0c08"],
+Cell[144341, 3668, 216, 4, 23, "Print",ExpressionUUID->"70f7c49e-a9af-4100-8a42-2081495ad985"],
+Cell[144560, 3674, 1627, 26, 287, "Print",ExpressionUUID->"f3695e8c-9c40-4318-944b-816ecfd215be"],
+Cell[146190, 3702, 1630, 26, 287, "Print",ExpressionUUID->"a18fff40-01e3-445c-b3f3-2aadf8c7b1a6"],
+Cell[147823, 3730, 1635, 26, 287, "Print",ExpressionUUID->"cf130d55-8f25-403a-9ba9-fc4cf2867858"],
+Cell[149461, 3758, 1627, 26, 287, "Print",ExpressionUUID->"f9b31a96-5066-4a85-beef-98f15362d8c4"],
+Cell[151091, 3786, 1628, 26, 287, "Print",ExpressionUUID->"3472ee8e-1085-4aaf-91c3-b5dbd442702e"],
+Cell[152722, 3814, 1630, 26, 287, "Print",ExpressionUUID->"0a80c5c7-8215-48df-81bf-67c2c5381c26"],
+Cell[154355, 3842, 1631, 26, 287, "Print",ExpressionUUID->"30bae331-5a37-46b4-80ee-454034eaca8c"],
+Cell[155989, 3870, 1633, 26, 287, "Print",ExpressionUUID->"d77c9e6b-7ca6-4382-bbc4-179679046e5a"],
+Cell[157625, 3898, 1636, 26, 287, "Print",ExpressionUUID->"53be40c7-11c8-40d2-a26e-628472b6a1f3"],
+Cell[159264, 3926, 213, 4, 23, "Print",ExpressionUUID->"2d685039-197b-4e3c-bd27-12685e273903"],
+Cell[159480, 3932, 2942, 43, 570, "Print",ExpressionUUID->"4c5a2b41-d21f-4c33-95f8-90d7e584e3cd"],
+Cell[162425, 3977, 2946, 43, 570, "Print",ExpressionUUID->"e74764da-8cad-4b86-8874-cd46c418bbbb"]
+}, Open  ]]
+}, Open  ]],
+Cell[165398, 4024, 9569, 229, 789, "Input",ExpressionUUID->"600c2424-f368-468d-812a-b7e683b155a7",
  InitializationCell->True],
-Cell[99065, 2515, 7148, 148, 496, "Input",ExpressionUUID->"6ccbbcfe-4cef-49f7-8da5-63b02e82980c"],
-Cell[106216, 2665, 334, 7, 42, "Input",ExpressionUUID->"93dc5eeb-af6e-4677-9f21-7a7f827b3ed2"],
-Cell[106553, 2674, 703, 16, 29, "Input",ExpressionUUID->"228cf6b0-abdf-4679-b6a9-f16828df2f45"],
-Cell[107259, 2692, 1345, 25, 29, "Input",ExpressionUUID->"b8a00759-a107-487f-a54a-6322bdbd3748"],
-Cell[108607, 2719, 1385, 25, 29, "Input",ExpressionUUID->"89d632f7-08d6-4ffd-b73d-aabbeb002f0a"],
-Cell[109995, 2746, 754, 17, 49, "Input",ExpressionUUID->"6d34e752-3379-4cd3-9b34-edcbb59ad6fa"],
-Cell[110752, 2765, 1391, 25, 49, "Input",ExpressionUUID->"d5ca3ea9-b1b0-40a1-8ff0-936847eaadfa"],
-Cell[112146, 2792, 1433, 26, 49, "Input",ExpressionUUID->"6c7a5cc3-13f2-4cac-83b9-2ca8f1818243"],
-Cell[113582, 2820, 3722, 66, 189, "Input",ExpressionUUID->"7eb61e3a-d7a4-4016-96e1-d8cad5ae67ed"],
-Cell[117307, 2888, 5234, 112, 422, "Input",ExpressionUUID->"3de98081-b13f-497c-94d4-754935ef54f5"],
-Cell[122544, 3002, 10750, 242, 967, "Input",ExpressionUUID->"4dd0e3b7-cb80-4ea3-bc16-92657c4b252d",
+Cell[174970, 4255, 7148, 148, 496, "Input",ExpressionUUID->"6ccbbcfe-4cef-49f7-8da5-63b02e82980c"],
+Cell[182121, 4405, 334, 7, 42, "Input",ExpressionUUID->"93dc5eeb-af6e-4677-9f21-7a7f827b3ed2"],
+Cell[182458, 4414, 703, 16, 29, "Input",ExpressionUUID->"228cf6b0-abdf-4679-b6a9-f16828df2f45"],
+Cell[183164, 4432, 1345, 25, 29, "Input",ExpressionUUID->"b8a00759-a107-487f-a54a-6322bdbd3748"],
+Cell[184512, 4459, 1385, 25, 29, "Input",ExpressionUUID->"89d632f7-08d6-4ffd-b73d-aabbeb002f0a"],
+Cell[185900, 4486, 754, 17, 29, "Input",ExpressionUUID->"6d34e752-3379-4cd3-9b34-edcbb59ad6fa"],
+Cell[186657, 4505, 1391, 25, 29, "Input",ExpressionUUID->"d5ca3ea9-b1b0-40a1-8ff0-936847eaadfa"],
+Cell[188051, 4532, 1433, 26, 29, "Input",ExpressionUUID->"6c7a5cc3-13f2-4cac-83b9-2ca8f1818243"],
+Cell[189487, 4560, 3722, 66, 169, "Input",ExpressionUUID->"7eb61e3a-d7a4-4016-96e1-d8cad5ae67ed"],
+Cell[193212, 4628, 5234, 112, 400, "Input",ExpressionUUID->"3de98081-b13f-497c-94d4-754935ef54f5"],
+Cell[198449, 4742, 10750, 242, 818, "Input",ExpressionUUID->"4dd0e3b7-cb80-4ea3-bc16-92657c4b252d",
  InitializationCell->True],
-Cell[133297, 3246, 3252, 74, 296, "Input",ExpressionUUID->"c040466a-b7e1-4ec8-8425-d0db881467a0"],
-Cell[136552, 3322, 482, 10, 42, "Input",ExpressionUUID->"6cc9b99f-0fb9-4fb6-9235-955a9c42e39c"],
-Cell[137037, 3334, 761, 17, 29, "Input",ExpressionUUID->"08fe9b77-8a62-495f-8202-270f32321ea8"],
-Cell[137801, 3353, 1380, 26, 29, "Input",ExpressionUUID->"8f43c2b0-cf80-4478-97d6-b4d48490b17f"],
-Cell[139184, 3381, 1421, 26, 29, "Input",ExpressionUUID->"423932f6-8536-41fb-bbcd-cc73d8d47b4c"],
-Cell[140608, 3409, 9954, 232, 985, "Input",ExpressionUUID->"41ef0553-39fa-4dd1-85b0-34695d4e51e9",
+Cell[209202, 4986, 3252, 74, 276, "Input",ExpressionUUID->"c040466a-b7e1-4ec8-8425-d0db881467a0"],
+Cell[212457, 5062, 482, 10, 42, "Input",ExpressionUUID->"6cc9b99f-0fb9-4fb6-9235-955a9c42e39c"],
+Cell[212942, 5074, 761, 17, 29, "Input",ExpressionUUID->"08fe9b77-8a62-495f-8202-270f32321ea8"],
+Cell[213706, 5093, 1380, 26, 29, "Input",ExpressionUUID->"8f43c2b0-cf80-4478-97d6-b4d48490b17f"],
+Cell[215089, 5121, 1421, 26, 29, "Input",ExpressionUUID->"423932f6-8536-41fb-bbcd-cc73d8d47b4c"],
+Cell[216513, 5149, 9954, 232, 795, "Input",ExpressionUUID->"41ef0553-39fa-4dd1-85b0-34695d4e51e9",
  InitializationCell->True],
-Cell[150565, 3643, 2046, 45, 173, "Input",ExpressionUUID->"22b6bd3d-57ea-4d2d-b9c0-67c1a5cda241"],
-Cell[152614, 3690, 482, 10, 42, "Input",ExpressionUUID->"35b24e1a-6bf6-4567-a9b3-dabe840aad1c"],
-Cell[153099, 3702, 948, 20, 49, "Input",ExpressionUUID->"50912dd9-cbfa-4b4b-aada-2f5e02cb438f"],
-Cell[154050, 3724, 1473, 27, 49, "Input",ExpressionUUID->"3194010d-46d8-4268-9ab7-96cf61a8ccd1"],
-Cell[155526, 3753, 1514, 28, 49, "Input",ExpressionUUID->"43b2dcc2-2d3e-4bc1-b5d7-e96c02d23320"],
-Cell[157043, 3783, 641, 10, 29, "Input",ExpressionUUID->"f36626d0-0941-4913-8d00-99b81ad0cf81"]
+Cell[226470, 5383, 2046, 45, 173, "Input",ExpressionUUID->"22b6bd3d-57ea-4d2d-b9c0-67c1a5cda241"],
+Cell[228519, 5430, 482, 10, 42, "Input",ExpressionUUID->"35b24e1a-6bf6-4567-a9b3-dabe840aad1c"],
+Cell[229004, 5442, 948, 20, 49, "Input",ExpressionUUID->"50912dd9-cbfa-4b4b-aada-2f5e02cb438f"],
+Cell[229955, 5464, 1473, 27, 49, "Input",ExpressionUUID->"3194010d-46d8-4268-9ab7-96cf61a8ccd1"],
+Cell[231431, 5493, 1514, 28, 49, "Input",ExpressionUUID->"43b2dcc2-2d3e-4bc1-b5d7-e96c02d23320"],
+Cell[232948, 5523, 641, 10, 29, "Input",ExpressionUUID->"f36626d0-0941-4913-8d00-99b81ad0cf81"]
 }
 ]
 *)
