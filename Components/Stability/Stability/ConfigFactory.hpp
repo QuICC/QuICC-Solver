@@ -62,6 +62,16 @@ public:
     */
    static ReturnType create();
 
+   /**
+    * @brief Constructor
+    */
+   ConfigFactory() = delete;
+
+   /**
+    * @brief Destructor
+    */
+   ~ConfigFactory() = delete;
+
 protected:
    /**
     * @brief Add stability specific NonDimensional parameters
@@ -69,15 +79,6 @@ protected:
    static void addParameters(std::vector<std::string>& ndNames);
 
 private:
-   /**
-    * @brief Constructor
-    */
-   ConfigFactory() = default;
-
-   /**
-    * @brief Destructor
-    */
-   ~ConfigFactory() = default;
 };
 
 template <class TModel>

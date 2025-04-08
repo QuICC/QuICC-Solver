@@ -40,6 +40,16 @@ public:
     */
    static ReturnType create();
 
+   /**
+    * @brief Constructor
+    */
+   LinearStabilityFactory() = delete;
+
+   /**
+    * @brief Destructor
+    */
+   ~LinearStabilityFactory() = delete;
+
 protected:
    /**
     * @brief Add stability specific NonDimensional parameters
@@ -47,19 +57,10 @@ protected:
    static void addParameters(std::vector<std::string>& ndNames);
 
 private:
-   /**
-    * @brief Constructor
-    */
-   LinearStabilityFactory() = default;
-
-   /**
-    * @brief Destructor
-    */
-   ~LinearStabilityFactory() = default;
 };
 
 template <class TModel>
- void LinearStabilityFactory<TModel>::addParameters(std::vector<std::string>& ndNames)
+void LinearStabilityFactory<TModel>::addParameters(std::vector<std::string>& ndNames)
 {
    // Add configuration parameters for Stability solver
    ndNames.push_back(NonDimensional::Tolerance().tag());

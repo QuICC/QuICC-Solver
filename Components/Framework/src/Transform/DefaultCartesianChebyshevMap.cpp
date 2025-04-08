@@ -47,23 +47,31 @@ namespace Transform {
 
    void DefaultCartesianChebyshevMap::operator()(MapType& m) const
    {
+#ifdef QUICC_HAS_CUDA_BACKEND
+      //using backend_t = Fft::Chebyshev::LinearMap::viewGpu_t;
+      using backend_t = Fft::Chebyshev::LinearMap::base_t;
+#else
+      //using backend_t = Fft::Chebyshev::LinearMap::viewCpu_t;
+      using backend_t = Fft::Chebyshev::LinearMap::base_t;
+#endif
+
       // Create projectors
-      this->addOperator<Fft::Chebyshev::LinearMap::Projector::D1>(m, Backward::D1::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Projector::D2>(m, Backward::D2::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Projector::P>(m, Backward::P::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Projector::D1<backend_t>>(m, Backward::D1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Projector::D2<backend_t>>(m, Backward::D2::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Projector::P<backend_t>>(m, Backward::P::id());
 
       // Create integrators
-      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::P>(m, Forward::P::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2>(m, Forward::I2P::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I4>(m, Forward::I4P::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2D1>(m, Forward::I2D1::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I4D1>(m, Forward::I4D1::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2_I2D1>(m, Forward::I2ZI2D1::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I4D1_I2>(m, Forward::I4D1ZI2::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::P<backend_t>>(m, Forward::P::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2<backend_t>>(m, Forward::I2P::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I4<backend_t>>(m, Forward::I4P::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2D1<backend_t>>(m, Forward::I2D1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I4D1<backend_t>>(m, Forward::I4D1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I2_I2D1<backend_t>>(m, Forward::I2ZI2D1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::I4D1_I2<backend_t>>(m, Forward::I4D1ZI2::id());
 
       // Create reductors
-      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::Energy>(m, Reductor::Energy::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::EnergyD1>(m, Reductor::EnergyD1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::Energy<backend_t>>(m, Reductor::Energy::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::EnergyD1<backend_t>>(m, Reductor::EnergyD1::id());
    }
  
 } // Transform
