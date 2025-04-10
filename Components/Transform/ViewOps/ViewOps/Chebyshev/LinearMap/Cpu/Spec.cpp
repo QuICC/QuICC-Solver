@@ -307,8 +307,7 @@ void SpecOp<Tout, Tin, Operation, Treatment>::differentiate(
    if constexpr(std::is_same_v<std::complex<double>,typename Tout::ScalarType>)
    {
       // 2*a, from y=ax + b
-      //double c = 2.0*(mUpper - mLower);
-      double c = 2.0;
+      double c = 2.0*(mUpper - mLower);
 
       double* dout = reinterpret_cast<double *>(out);
       for (std::size_t k = 2*(Nout - 1); k > 0; k -= 2)
