@@ -362,37 +362,37 @@ Matrix Tester<TOp, TOp2>::applyIntegrator(const ParameterType& param) const
 template <typename TOp, typename TOp2>
 Matrix Tester<TOp, TOp2>::applyReductor(const ParameterType& param) const
 {
-//   if constexpr (has_transform<TOp, Matrix&, const BwdType&>::value)
-//   {
-//      const TestType type = TestType::REDUCTOR;
-//
-//      // Create setup
-//      auto spSetup = this->buildSetup(param, type);
-//
-//      // Input data
-//      BwdType inData(spSetup->specSize(), spSetup->blockSize());
-//      this->readFile(inData, param, type, ContentType::INPUT);
-//
-//      TOp op;
-//      this->initOperator(op, spSetup);
-//
-//      Matrix outData(op.outRows(), op.outCols());
-//
-//   for (unsigned int i = 0; i < this->mIter; ++i)
-//   {
-//      outData = Matrix::Zero(op.outRows(), op.outCols());
-//      op.transform(outData, inData);
-//   }
-//
-//      return outData;
-//   }
-//   else
-//   {
+   if constexpr (has_transform<TOp, Matrix&, const MatrixZ&>::value)
+   {
+      const TestType type = TestType::REDUCTOR;
+
+      // Create setup
+      auto spSetup = this->buildSetup(param, type);
+
+      // Input data
+      BwdType inData(spSetup->specSize(), spSetup->blockSize());
+      this->readFile(inData, param, type, ContentType::INPUT);
+
+      TOp op;
+      this->initOperator(op, spSetup);
+
+      Matrix outData(op.outRows(), op.outCols());
+
+      for (unsigned int i = 0; i < this->mIter; ++i)
+      {
+         outData = Matrix::Zero(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+      }
+
+      return outData;
+   }
+   else
+   {
       throw std::logic_error("This operator is not an reductor");
 
       Matrix out;
       return out;
-//   }
+   }
 }
 
 template <typename TOp, typename TOp2>

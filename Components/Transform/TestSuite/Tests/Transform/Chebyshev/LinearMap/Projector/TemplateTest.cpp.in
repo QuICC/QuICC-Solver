@@ -36,7 +36,21 @@ TEST_CASE( "Error for @Operator@@Impl@ projector", "[@CatchTestName@]" )
    typedef Projector::@Operator@@Impl@ Projector;
    typedef typename currentts::Tester<Projector> Tester;
 
-   Tester tester("@Operator@@DataExt@.dat", currentts::args().dumpData);
+   std::string dataName = "@Operator@";
+   if( std::string("@Operator@") == std::string("D"))
+   {
+      if(
+            std::string("@Impl@").substr(0,3) == "<1," ||
+            std::string("@Impl@").substr(0,3) == "<2," ||
+            std::string("@Impl@").substr(0,3) == "<3," ||
+            std::string("@Impl@").substr(0,3) == "<4,"
+        )
+      {
+         dataName += std::string("@Impl@").substr(1,1);
+      }
+   }
+
+   Tester tester(dataName + ".dat", currentts::args().dumpData);
    tester.setUlp(currentts::args().ulp);
    tester.setIter(currentts::args().iter);
 

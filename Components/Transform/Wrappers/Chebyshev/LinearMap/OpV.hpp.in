@@ -52,6 +52,8 @@ public:
      */
     void transform(Matrix& rOut, const Matrix& in) const final;
 
+    using ILinearMap@Kind@::transform;
+
     /**
      * @brief Initialise View Op
      */

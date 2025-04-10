@@ -74,6 +74,11 @@ public:
     */
    virtual MHDFloat requiredStorage() const override;
 
+   /**
+    * @brief Unused interface
+    */
+   void transform(Matrix& rOut, const MatrixZ& in) const final;
+
 protected:
    /**
     * @brief Initialise FFT backend
@@ -108,14 +113,6 @@ private:
     */
    virtual void applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
       const bool useReal) const = 0;
-
-   /**
-    * @brief Compute transform C2R (disabled)
-    *
-    * @param rOut Output values
-    * @param in   Input values
-    */
-   virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
 };
 
 } // namespace Integrator

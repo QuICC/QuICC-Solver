@@ -105,6 +105,7 @@ function(quicc_add_test target)
   set(CatchTestName ${${QAT_KEYWORD}})
   string(REGEX REPLACE "<" "" CatchTestName ${CatchTestName})
   string(REGEX REPLACE ">" "" CatchTestName ${CatchTestName})
+  string(REGEX REPLACE ":([1,2,3,4])," "\\1:" CatchTestName ${CatchTestName})
 
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${target}.cpp")
     message(VERBOSE "Adding ${target}")

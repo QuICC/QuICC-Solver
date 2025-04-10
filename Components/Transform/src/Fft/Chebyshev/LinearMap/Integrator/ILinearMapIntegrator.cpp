@@ -66,12 +66,6 @@ void ILinearMapIntegrator::transform(Matrix& rOut, const Matrix& in) const
    this->applyPostOperator(rOut);
 }
 
-void ILinearMapIntegrator::transform(Matrix&, const MatrixZ&) const
-{
-   throw std::logic_error(
-      "Data is not compatible with Chebyshev FFT integrator");
-}
-
 int ILinearMapIntegrator::outRows() const
 {
    return this->mspSetup->specSize();
@@ -91,6 +85,11 @@ MHDFloat ILinearMapIntegrator::requiredStorage() const
 #endif // QUICC_STORAGEPROFILE
 
    return mem;
+}
+
+void ILinearMapIntegrator::transform(Matrix&, const MatrixZ&) const
+{
+   throw std::logic_error("init needs to be implemented by the derived class");
 }
 
 } // namespace Integrator
