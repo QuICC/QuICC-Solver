@@ -73,21 +73,6 @@ namespace Views {
    {
       return std::make_pair(this->mFieldIds.begin(), this->mFieldIds.end());
    }
-
-   bool SparseSolverBase::isInitialized() const
-   {
-      return this->mIsInitialized;
-   }
-
-   void SparseSolverBase::setInitialized()
-   {
-      this->mIsInitialized = true;
-   }
-
-   std::size_t SparseSolverBase::solveTiming() const
-   {
-      return this->mSolveTiming;
-   }
 }
 }
 }

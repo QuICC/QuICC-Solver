@@ -1,11 +1,11 @@
 /**
- * @file ISparseTimestepper.hpp
+ * @file ITimestepper.hpp
  * @brief Implementation of base for the templated (coupled) equation
  * timestepper
  */
 
-#ifndef QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_ISPARSETIMESTEPPER_HPP
-#define QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_ISPARSETIMESTEPPER_HPP
+#ifndef QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_ITIMESTEPPER_HPP
+#define QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_ITIMESTEPPER_HPP
 
 // System includes
 //
@@ -24,7 +24,8 @@
 #include "QuICC/ModelOperator/Time.hpp"
 #include "QuICC/Register/Implicit.hpp"
 #include "QuICC/Register/Influence.hpp"
-#include "Timestep/PredictorCorrector//Views/SparseLinearSolver.hpp"
+#include "QuICC/Tag/Operator/Rhs.hpp"
+#include "Timestep/PredictorCorrector/Views/ITimestepperBase.hpp"
 #include "QuICC/Tag/Operator/Influence.hpp"
 
 namespace QuICC {
@@ -247,30 +248,27 @@ void computeInfluenceCorrection(DecoupledZMatrix& y, const DecoupledZMatrix& x);
 /**
  * @brief Implementation of a templated (coupled) equation timestepper
  */
-template <typename TOperator, typename TData, template <typename> class TSolver>
-class ISparseTimestepper
-    : public SparseLinearSolver<TOperator, TData, TSolver>
+template <typename TOperator, typename TData, typename TImpl>
+class ITimestepper
+    : public ITimestepperBase<TOperator, TData, TImpl>
 {
 public:
    /**
     * @brief Constructor
     *
-    * @param start   Starting index (for example without m=0)
     * @param timeId  Solver timing with respect to timestepping
     */
-   ISparseTimestepper(const int start, const std::size_t timeId);
+   ITimestepper(const std::size_t timeId);
 
    /**
     * @brief Destructor
     */
-   virtual ~ISparseTimestepper() = default;
+   virtual ~ITimestepper() = default;
 
    /**
     * @brief Initialise the solver matrices storage
-    *
-    * @param n Size of matrices
     */
-   virtual void initMatrices(const int n);
+   virtual void initMatrices();
 
    /**
     * @brief Update the LHS matrix with new timedependence
@@ -279,19 +277,15 @@ public:
 
    /**
     * @brief Set RHS matrix at t_n
-    *
-    * @param idx Index of the matrix
     */
-   TOperator& rRHSMatrix(const int idx);
+   TOperator& rRHSMatrix();
 
    /**
     * @brief Build the scheme operators
     *
-    * @param idx  Solver index
     * @param ops  Operators for the timestepper
     */
-   virtual void buildOperators(const int idx,
-      const std::map<std::size_t, DecoupledZSparse>& ops, const MHDFloat dt,
+   virtual void buildOperators(const std::map<std::size_t, DecoupledZSparse>& ops, const MHDFloat dt,
       const int size);
 
    /**
@@ -353,27 +347,17 @@ protected:
    std::size_t mRegisterId;
 
    /**
-    * @brief RHS operator
-    */
-   std::vector<TOperator> mRHSMatrix;
-
-   /**
     * @brief Mass matrix operator
     */
-   std::vector<SparseMatrix> mMassMatrix;
-
-   /**
-    * @brief Storage for field
-    */
-   std::map<std::size_t, std::vector<TData>> mStorage;
+   SparseMatrix mMassMatrix;
 
 private:
 };
 
-template <typename TOperator, typename TData, template <typename> class TSolver>
-ISparseTimestepper<TOperator, TData, TSolver>::ISparseTimestepper(
-   const int start, const std::size_t timeId) :
-    SparseLinearSolver<TOperator, TData, TSolver>(start, timeId),
+template <typename TOperator, typename TData, typename TImpl>
+ITimestepper<TOperator, TData, TImpl>::ITimestepper(
+   const std::size_t timeId) :
+    ITimestepperBase<TOperator, TData, TImpl>(timeId),
     mHasExplicit(true),
     mStep(0),
     mDt(-1.0),
@@ -381,20 +365,20 @@ ISparseTimestepper<TOperator, TData, TSolver>::ISparseTimestepper(
     mRegisterId(Register::Implicit::id())
 {}
 
-template <typename TOperator, typename TData, template <typename> class TSolver>
-MHDFloat ISparseTimestepper<TOperator, TData, TSolver>::error() const
+template <typename TOperator, typename TData, typename TImpl>
+MHDFloat ITimestepper<TOperator, TData, TImpl>::error() const
 {
    return this->mError;
 }
 
-template <typename TOperator, typename TData, template <typename> class TSolver>
-bool ISparseTimestepper<TOperator, TData, TSolver>::finished()
+template <typename TOperator, typename TData, typename TImpl>
+bool ITimestepper<TOperator, TData, TImpl>::finished()
 {
    return (this->mStep == 0);
 }
 
-template <typename TOperator, typename TData, template <typename> class TSolver>
-void ISparseTimestepper<TOperator, TData, TSolver>::updateTimeMatrix(
+template <typename TOperator, typename TData, typename TImpl>
+void ITimestepper<TOperator, TData, TImpl>::updateTimeMatrix(
    const MHDFloat dt)
 {
    // Update stored timestep
@@ -410,8 +394,8 @@ void ISparseTimestepper<TOperator, TData, TSolver>::updateTimeMatrix(
    }
 
    // Loop over all operator IDs
-   for (auto opIt = this->mSolverMatrix.begin();
-        opIt != this->mSolverMatrix.end(); ++opIt)
+   for (auto opIt = this->mOperators.begin();
+        opIt != this->mOperators.end(); ++opIt)
    {
       // Loop of step IDs
       for (auto a: filter)
@@ -419,117 +403,88 @@ void ISparseTimestepper<TOperator, TData, TSolver>::updateTimeMatrix(
          // Update is only required if aIm is not zero
          if (opIt->second.count(a) > 0 && a != 0.0)
          {
-            // Loop over matrices within same step
-            for (std::size_t i = 0; i < this->nSystem(); ++i)
+            // Get the number of nonzero elements in time dependence
+            size_t nnz = this->rRHSMatrix().nonZeros();
+
+            // Update LHS and RHS matrices
+            for (size_t k = 0;
+                 k < static_cast<size_t>(this->rRHSMatrix().outerSize());
+                 ++k)
             {
-               // Get the number of nonzero elements in time dependence
-               size_t nnz = this->mRHSMatrix.at(i).nonZeros();
-
-               // Update LHS and RHS matrices
-               for (size_t k = 0;
-                    k < static_cast<size_t>(this->mRHSMatrix.at(i).outerSize());
-                    ++k)
+               typename TOperator::InnerIterator lhsIt(
+                  this->linearOperator(opIt->first, a), k);
+               for (typename TOperator::InnerIterator timeIt(
+                       this->rRHSMatrix(), k);
+                    timeIt; ++timeIt)
                {
-                  typename TOperator::InnerIterator lhsIt(
-                     this->solverMatrix(opIt->first, a, i), k);
-                  for (typename TOperator::InnerIterator timeIt(
-                          this->mRHSMatrix.at(i), k);
-                       timeIt; ++timeIt)
+                  // Only keep going if nonzero elements are left
+                  if (nnz > 0)
                   {
-                     // Only keep going if nonzero elements are left
-                     if (nnz > 0)
+                     assert(lhsIt.col() == timeIt.col());
+                     assert(lhsIt.row() <= timeIt.row());
+
+                     // LHS matrix might have additional nonzero entries
+                     while (lhsIt.row() < timeIt.row() && lhsIt)
                      {
-                        assert(lhsIt.col() == timeIt.col());
-                        assert(lhsIt.row() <= timeIt.row());
-
-                        // LHS matrix might have additional nonzero entries
-                        while (lhsIt.row() < timeIt.row() && lhsIt)
-                        {
-                           ++lhsIt;
-                        }
-
-                        // Update LHS matrix
-                        if (timeIt.row() == lhsIt.row())
-                        {
-                           // Update values
-                           lhsIt.valueRef() +=
-                              a * (oldDt - this->mDt) * timeIt.value();
-
-                           // Update nonzero counter
-                           nnz--;
-                        }
-
-                        // Update LHS iterators and counters
                         ++lhsIt;
                      }
-                     else
+
+                     // Update LHS matrix
+                     if (timeIt.row() == lhsIt.row())
                      {
-                        break;
+                        // Update values
+                        lhsIt.valueRef() +=
+                           a * (oldDt - this->mDt) * timeIt.value();
+
+                        // Update nonzero counter
+                        nnz--;
                      }
+
+                     // Update LHS iterators and counters
+                     ++lhsIt;
+                  }
+                  else
+                  {
+                     break;
                   }
                }
+            }
 
-               // Abort if some nonzero entries where not updated
-               if (nnz != 0)
-               {
-                  throw std::logic_error(
-                     "Update of timestepping matrices failed");
-               }
+            // Abort if some nonzero entries where not updated
+            if (nnz != 0)
+            {
+               throw std::logic_error(
+                  "Update of timestepping matrices failed");
             }
          }
       }
    }
 }
 
-template <typename TOperator, typename TData, template <typename> class TSolver>
-void ISparseTimestepper<TOperator, TData, TSolver>::initMatrices(const int n)
+template <typename TOperator, typename TData, typename TImpl>
+void ITimestepper<TOperator, TData, TImpl>::initMatrices()
 {
    // Initialise base matrices
    for (int i = 0; i < this->steps(); i++)
    {
-      SparseLinearSolver<TOperator, TData, TSolver>::initMatrices(
-         this->aIm(i), n);
+      this->initMatrices(this->aIm(i));
    }
 
-   // Do not reinitialise if work already done by other field
-   if (this->mRHSMatrix.size() == 0)
+   if(this->hasLinearOperator(Tag::Operator::Rhs::id()))
    {
-      // Reserve space for the RHS matrices
-      this->mRHSMatrix.reserve(n);
-
-      // Initialise storage for RHS matrices
-      for (int i = 0; i < n; ++i)
-      {
-         // Create storage for LHS matrices
-         this->mRHSMatrix.push_back(TOperator());
-      }
-   }
-
-   // Do not reinitialise if work already done by other field
-   if (this->mMassMatrix.size() == 0)
-   {
-      // Reserve space for the RHS matrices
-      this->mMassMatrix.reserve(n);
-
-      // Initialise storage for RHS matrices
-      for (int i = 0; i < n; ++i)
-      {
-         // Create storage for LHS matrices
-         this->mMassMatrix.push_back(SparseMatrix());
-      }
+      this->initMatrices(Tag::Operator::Rhs::id(), 0);
    }
 }
 
-template <typename TOperator, typename TData, template <typename> class TSolver>
-TOperator& ISparseTimestepper<TOperator, TData, TSolver>::rRHSMatrix(
-   const int idx)
+template <typename TOperator, typename TData, typename TImpl>
+TOperator& ITimestepper<TOperator, TData, TImpl>::rRHSMatrix()
 {
-   return this->mRHSMatrix.at(idx);
+   return this->linearOperator(Tag::Operator::Rhs::id());
 }
 
-template <typename TOperator, typename TData, template <typename> class TSolver>
-void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
-   const int idx, const std::map<std::size_t, DecoupledZSparse>& ops,
+template <typename TOperator, typename TData, typename TImpl>
+void ITimestepper<TOperator, TData, TImpl>::buildOperators(
+   const std::map<std::size_t, DecoupledZSparse>& ops,
    const MHDFloat dt, const int size)
 {
    std::map<std::size_t, DecoupledZSparse>::const_iterator iOpA =
@@ -552,12 +507,12 @@ void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
    this->mDt = dt;
 
    // Set explicit matrix
-   this->rRHSMatrix(idx).resize(size, size);
-   details::addOperators(this->rRHSMatrix(idx), 1.0, iOpA->second);
+   this->rRHSMatrix().resize(size, size);
+   details::addOperators(this->rRHSMatrix(), 1.0, iOpA->second);
 
    // Set mass matrix
-   this->mMassMatrix.at(idx).resize(size, size);
-   details::addOperators(this->mMassMatrix.at(idx), 1.0, iOpB->second);
+   this->mMassMatrix.resize(size, size);
+   details::addOperators(this->mMassMatrix, 1.0, iOpB->second);
 
    // Set implicit matrix
    for (int i = 0; i < this->steps(); ++i)
@@ -565,7 +520,7 @@ void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
       MHDFloat a = this->aIm(i);
 
       // Set LHS matrix
-      auto&& lhsMat = this->rLHSMatrix(a, idx);
+      auto&& lhsMat = this->rLHSMatrix(a);
       lhsMat.resize(size, size);
       details::addOperators(lhsMat, 1.0, iOpB->second);
       details::addOperators(lhsMat, -a * this->mDt, iOpA->second);
@@ -575,13 +530,11 @@ void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
       {
          // Initialise influence matrices
          MHDFloat aInf = 0.0;
-         SparseLinearSolver<TOperator, TData, TSolver>::initMatrices(
-            Tag::Operator::Influence::id(), aInf,
-            this->mSolverMatrix.at(Tag::Operator::Lhs::id()).at(a).size());
+         this->initMatrices(Tag::Operator::Influence::id(), aInf);
 
          // Set other LHS matrix
          auto&& infMatrix =
-            this->solverMatrix(Tag::Operator::Influence::id(), aInf, idx);
+            this->linearOperator(Tag::Operator::Influence::id(), aInf);
          infMatrix.resize(size, size);
          details::addOperators(infMatrix, 1.0, iOpSA->second);
          details::addOperators(infMatrix, 1.0, iOpSC->second);
@@ -591,13 +544,13 @@ void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
    if (isSplit)
    {
       // Store information for particular solution
-      auto&& infRhs = this->reg(Register::Influence::id()).at(idx);
+      auto&& infRhs = this->reg(Register::Influence::id());
       details::initInfluence(infRhs, iOpSCV->second, iOpSC->second);
    }
 }
 
-template <typename TOperator, typename TData, template <typename> class TSolver>
-void ISparseTimestepper<TOperator, TData, TSolver>::postSolverUpdate()
+template <typename TOperator, typename TData, typename TImpl>
+void ITimestepper<TOperator, TData, TImpl>::postSolverUpdate()
 {
    const auto lhsId = Tag::Operator::Lhs::id();
    const auto opId = Tag::Operator::Influence::id();
@@ -605,29 +558,26 @@ void ISparseTimestepper<TOperator, TData, TSolver>::postSolverUpdate()
    if (this->mSolver.count(lhsId) > 0 && this->mSolver.count(opId) > 0)
    {
       // Solver for both stages
-      auto sIt1 = this->mSolver.at(opId).find(0.0);
-      auto sIt2 = this->mSolver.at(lhsId).begin();
+      auto&& sIt1 = this->mSolver.at(opId).find(0.0)->second;
+      auto&& sIt2 = this->mSolver.at(lhsId).find(0.0)->second;
 
-      // Compute green's functions for each index
-      for (std::size_t idx = this->mZeroIdx; idx < sIt1->second.size(); idx++)
+      // Compute green's functions
+      auto&& infKernel = this->reg(Register::Influence::id());
+      assert(infKernel.real().rows() == infKernel.imag().rows());
+      assert(infKernel.real().cols() == infKernel.imag().cols());
+      auto rows = infKernel.real().rows();
+      auto cols = infKernel.real().cols() / 3;
+      TData rhs(rows, cols);
+      for (int i = 0; i < cols; i++)
       {
-         auto&& infKernel = this->reg(Register::Influence::id()).at(idx);
-         assert(infKernel.real().rows() == infKernel.imag().rows());
-         assert(infKernel.real().cols() == infKernel.imag().cols());
-         auto rows = infKernel.real().rows();
-         auto cols = infKernel.real().cols() / 3;
-         TData rhs(rows, cols);
-         for (int i = 0; i < cols; i++)
-         {
-            rhs.real().col(i) = infKernel.real().col(3 * i + 2);
-            rhs.imag().col(i) = infKernel.imag().col(3 * i + 2);
-         }
-         TData sol(rows, cols);
-         details::solveWrapper(sol, sIt1->second.at(idx), rhs);
-         details::computeMV(rhs, this->mMassMatrix.at(idx), sol);
-         details::solveWrapper(sol, sIt2->second.at(idx), rhs);
-         details::computeSetInfluence(infKernel, sol);
+         rhs.real().col(i) = infKernel.real().col(3 * i + 2);
+         rhs.imag().col(i) = infKernel.imag().col(3 * i + 2);
       }
+      TData sol(rows, cols);
+      details::solveWrapper(sol, sIt1, rhs);
+      details::computeMV(rhs, this->mMassMatrix, sol);
+      details::solveWrapper(sol, sIt2, rhs);
+      details::computeSetInfluence(infKernel, sol);
    }
 }
 
@@ -1130,4 +1080,4 @@ inline void computeInfluenceCorrection(DecoupledZMatrix& y,
 } // namespace Timestep
 } // namespace QuICC
 
-#endif // QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_ISPARSETIMESTEPPER_HPP
+#endif // QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_ITIMESTEPPER_HPP

@@ -69,19 +69,9 @@ namespace Views {
          virtual void initMatrices(const int n);
 
          /**
-          * @brief Initialise solution after data was copied
-          */
-         virtual void initSolutions();
-
-         /**
           * @brief Initialise solver
           */
          void initSolver();
-
-         /**
-          * @brief Update solver after updated solution was copied
-          */
-         virtual void updateSolutions();
 
          /**
           * @brief Update solver
@@ -551,16 +541,6 @@ namespace Views {
             it->second.push_back(TOperator());
          }
       }
-   }
-
-   template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::initSolutions()
-   {
-      // Nothing to be done in general.
-   }
-
-   template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::updateSolutions()
-   {
-      // Nothing to be done in general.
    }
 
    template <typename TOperator,typename TData,template <typename> class TSolver> void SparseLinearSolver<TOperator,TData,TSolver>::addStorage(const int rows, const int cols)

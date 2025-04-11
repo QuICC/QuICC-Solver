@@ -95,12 +95,12 @@ public:
    /**
     * @brief Initialise solution after data was copied
     */
-   virtual void initSolutions();
+   void initSolutions();
 
    /**
     * @brief Update solver after solution was updated
     */
-   virtual void updateSolutions();
+   void updateSolutions();
 
 protected:
    /**
