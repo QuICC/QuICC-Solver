@@ -19,7 +19,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 )
 
 set(PHS
-  Timestep/PredictorCorrector/Factory.hpp
+  Timestep/PredictorCorrector/FactoryViews.hpp
 )
 
 # Add public header

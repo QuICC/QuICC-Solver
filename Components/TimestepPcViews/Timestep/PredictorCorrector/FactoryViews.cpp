@@ -19,7 +19,7 @@ namespace Timestep {
 
 namespace PredictorCorrector {
 
-std::shared_ptr<Timestep::Interface> makeInterface(const std::size_t schemeId,
+std::shared_ptr<Timestep::Interface> makeInterfaceViews(const std::size_t schemeId,
    const MHDFloat time, const Matrix& cfl, const MHDFloat maxError,
    const Timestep::Interface::ScalarEquation_range& scalEq,
    const Timestep::Interface::VectorEquation_range& vectEq,

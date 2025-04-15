@@ -34,12 +34,6 @@ namespace Equations {
    class IVectorEquation: public IFieldEquation
    {
       public:
-         /// Typedef for the the spectral field component ID iterator
-         typedef std::vector<FieldComponents::Spectral::Id>::const_iterator   SpectralComponent_iterator;
-
-         /// Typedef for the the spectral field component ID iterator range
-         typedef std::pair<SpectralComponent_iterator,SpectralComponent_iterator>  SpectralComponent_range;
-
          /**
           * @brief Simple constructor
           *
@@ -86,12 +80,12 @@ namespace Equations {
          /**
           * @brief Get the number of spectral components
           */
-         int nSpectral() const;
+         int nSpectral() const final;
 
          /**
           * @brief Get vector spectral component range
           */
-         SpectralComponent_range spectralRange() const;
+         SpectralComponent_range spectralRange() const final;
 
          /**
           * @brief Transfer solver solution to equation unknown

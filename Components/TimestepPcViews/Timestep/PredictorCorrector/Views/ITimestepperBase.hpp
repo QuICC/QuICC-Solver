@@ -18,11 +18,13 @@
 #include "QuICC/ModelOperator/Boundary.hpp"
 #include "QuICC/Framework/MpiFramework.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
-#include "Timestep/PredictorCorrector/Views/SparseLinearSolverTools.hpp"
+#include "Timestep/PredictorCorrector/Views/details/SparseLinearSolverTools.hpp"
+#include "Timestep/PredictorCorrector/Views/details/TimesteppperTools.hpp"
 #include "QuICC/Register/Solution.hpp"
 #include "QuICC/Register/Rhs.hpp"
 #include "QuICC/Tag/Operator/Lhs.hpp"
 
+#include <iostream>
 namespace QuICC {
 
 namespace Timestep {
@@ -31,16 +33,7 @@ namespace PredictorCorrector {
 
 namespace Views {
 
-   namespace details {
-
-      void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat);
-
-      void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat);
-
-      void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr);
-
-      template <typename TData, typename TCorr> void addCorrection(TData& rVal, const TCorr& corr);
-   }
+   template <typename TOperator, typename TData, typename TImpl> class ITimestepper;
 
    /**
     * @brief Implementation of a generic timestepper
@@ -76,11 +69,6 @@ namespace Views {
          std::size_t solveTiming() const;
 
          /**
-          * @brief Initialise the solver matrices storage
-          */
-         virtual void initMatrices();
-
-         /**
           * @brief Initialise solver
           */
          void initSolver();
@@ -99,13 +87,6 @@ namespace Views {
           * @brief Solve linear systems
           */
          void solve();
-
-         /**
-          * @brief Set LHS matrix
-          *
-          * @param id   ID of matrix
-          */
-         TOperator& rLHSMatrix(const MHDFloat id);
 
          /**
           * @brief Add RHS and solution data storage
@@ -235,14 +216,6 @@ namespace Views {
           * @param opId Operator ID
           * @param id   Id of matrix
           */
-         void initMatrices(const MHDFloat id);
-
-         /**
-          * @brief Initialise the solver matrices storage
-          *
-          * @param opId Operator ID
-          * @param id   Id of matrix
-          */
          void initMatrices(const std::size_t opId, const MHDFloat id);
 
          /**
@@ -289,10 +262,19 @@ namespace Views {
           */
          MHDFloat mId;
 
+      private:
+         /// ITimestepper class is a friend
+         friend class ITimestepper<TOperator, TData, TImpl>;
+
          /**
           * @brief Operators used by solver
           */
          std::map<std::size_t, std::map<MHDFloat, TOperator> >  mOperators;
+
+         /**
+          * @brief Create sparse solvers
+          */
+         std::map<std::size_t, std::map<MHDFloat,SharedSolverType> >  mSolver;
 
          /**
           * @brief Storage for field
@@ -303,13 +285,6 @@ namespace Views {
           * @brief Storage for inhomogeneous boundary conditions
           */
          Eigen::SparseMatrix<typename TData::Scalar>  mInhomogeneous;
-
-         /**
-          * @brief Create sparse solvers
-          */
-         std::map<std::size_t, std::map<MHDFloat,SharedSolverType> >  mSolver;
-
-      private:
    };
 
    template <typename TOperator,typename TData,typename TImpl> ITimestepperBase<TOperator,TData,TImpl>::ITimestepperBase(const std::size_t timeId)
@@ -396,10 +371,7 @@ namespace Views {
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::initSolver()
    {
-      for(auto it = this->mOperators.begin(); it != this->mOperators.end(); ++it)
-      {
-         this->initSolver(it->first);
-      }
+      this->initSolver(Tag::Operator::Lhs::id());
    }
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::initSolver(const std::size_t opId)
@@ -429,10 +401,7 @@ namespace Views {
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::updateSolver()
    {
-      for(auto it = this->mOperators.begin(); it != this->mOperators.end(); ++it)
-      {
-         this->updateSolver(it->first);
-      }
+      this->updateSolver(Tag::Operator::Lhs::id());
    }
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::updateSolver(const std::size_t opId)
@@ -449,6 +418,7 @@ namespace Views {
          // Safety assert to make sur matrix is compressed
          assert(it->second.isCompressed());
 
+         std::cerr << it->second << std::endl;
          sIt->second->compute(it->second);
 
          // Stop simulation if factorization failed
@@ -465,16 +435,6 @@ namespace Views {
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::postSolverUpdate()
    {
       // Default implementation does nothing
-   }
-
-   template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::initMatrices()
-   {
-      this->initMatrices(Tag::Operator::Lhs::id(), 0);
-   }
-
-   template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::initMatrices(const MHDFloat id)
-   {
-      this->initMatrices(Tag::Operator::Lhs::id(), id);
    }
 
    template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::initMatrices(const std::size_t opId, const MHDFloat id)
@@ -509,7 +469,7 @@ namespace Views {
       std::map<std::size_t,DecoupledZSparse>::const_iterator iOpA = ops.find(ModelOperator::ImplicitLinear::id());
       std::map<std::size_t,DecoupledZSparse>::const_iterator iOpC = ops.find(ModelOperator::Boundary::id());
 
-      auto&& lhsMat = this->rLHSMatrix(0);
+      auto&& lhsMat = this->linearOperator(Tag::Operator::Lhs::id(), 0);
       lhsMat.resize(size, size);
       details::addOperators(lhsMat, 1.0, iOpA->second);
       details::addOperators(lhsMat, 1.0, iOpC->second);
@@ -541,11 +501,6 @@ namespace Views {
       assert(this->mOperators.at(opId).count(id) > 0);
 
       return this->mOperators.at(opId).at(id);
-   }
-
-   template <typename TOperator,typename TData,typename TImpl> TOperator& ITimestepperBase<TOperator,TData,TImpl>::rLHSMatrix(const MHDFloat id)
-   {
-      return this->linearOperator(Tag::Operator::Lhs::id(), id);
    }
 
    template <typename TOperator,typename TData,typename TImpl> TData& ITimestepperBase<TOperator,TData,TImpl>::rRHSData()
@@ -588,59 +543,6 @@ namespace Views {
       return this->mSolveTiming;
    }
 
-   namespace details {
-
-      inline void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat)
-      {
-         assert(decMat.real().rows() > 0);
-         assert(decMat.real().cols() > 0);
-         assert(decMat.imag().size() == 0 || decMat.imag().nonZeros() == 0);
-
-         if(c != 1.0)
-         {
-            mat += c*decMat.real();
-         } else
-         {
-            mat += decMat.real();
-         }
-      }
-
-      inline void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat)
-      {
-         assert(decMat.real().rows() > 0);
-         assert(decMat.real().cols() > 0);
-         assert(decMat.imag().rows() > 0);
-         assert(decMat.imag().cols() > 0);
-         assert(decMat.real().rows() == decMat.imag().rows());
-         assert(decMat.real().cols() == decMat.imag().cols());
-
-         if(c != 1.0)
-         {
-            mat += c*decMat.real().cast<MHDComplex>() + c*Math::cI*decMat.imag();
-         } else
-         {
-            mat += decMat.real().cast<MHDComplex>() + Math::cI*decMat.imag();
-         }
-      }
-
-      inline void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr)
-      {
-         assert(rVal.real().rows() > 0);
-         assert(rVal.real().cols() > 0);
-         assert(rVal.imag().rows() > 0);
-         assert(rVal.imag().cols() > 0);
-         assert(rVal.real().rows() == rVal.imag().rows());
-         assert(rVal.real().cols() == rVal.imag().cols());
-
-         rVal.real() += corr.real();
-         rVal.imag() += corr.imag();
-      }
-
-      template <typename TData, typename TCorr> inline void addCorrection(TData& rVal, const TCorr& corr)
-      {
-         rVal += corr;
-      }
-   }
 } // Views
 } // PredictorCorrector
 } // Timestep

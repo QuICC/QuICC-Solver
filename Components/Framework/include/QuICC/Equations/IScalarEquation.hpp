@@ -77,6 +77,16 @@ namespace Equations {
          virtual const Resolution& res() const override;
 
          /**
+          * @brief Get the number of spectral components
+          */
+         int nSpectral() const final;
+
+         /**
+          * @brief Get vector spectral component range
+          */
+         SpectralComponent_range spectralRange() const final;
+
+         /**
           * @brief Transfer solver solution to equation unknown
           *
           * @param compId  Component ID

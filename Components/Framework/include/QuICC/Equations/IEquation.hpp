@@ -43,6 +43,12 @@ namespace Equations {
    class IEquation : public EquationData
    {
       public:
+         /// Typedef for the the spectral field component ID iterator
+         typedef std::vector<FieldComponents::Spectral::Id>::const_iterator   SpectralComponent_iterator;
+
+         /// Typedef for the the spectral field component ID iterator range
+         typedef std::pair<SpectralComponent_iterator,SpectralComponent_iterator>  SpectralComponent_range;
+
          /**
           * @brief Simple constructor
           *
@@ -76,6 +82,16 @@ namespace Equations {
           * @brief Access the shared resolution
           */
          virtual const Resolution& res() const = 0;
+
+         /**
+          * @brief Get the number of spectral components
+          */
+         virtual int nSpectral() const = 0;
+
+         /**
+          * @brief Get vector spectral component range
+          */
+         virtual SpectralComponent_range spectralRange() const  = 0;
 
          /**
           * @brief Initialise the equation

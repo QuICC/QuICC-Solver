@@ -16,8 +16,10 @@
 #include "QuICC/Register/Explicit.hpp"
 #include "QuICC/Register/Implicit.hpp"
 #include "QuICC/Register/Intermediate.hpp"
+#include "QuICC/Register/Solution.hpp"
 #include "Timestep//PredictorCorrector/Views/ITimestepper.hpp"
 #include "Timestep/PredictorCorrector/IImExPCScheme.hpp"
+#include "View/ViewDense.hpp"
 
 namespace QuICC {
 
@@ -92,9 +94,28 @@ public:
    virtual void addStorage(const int rows, const int cols);
 
    /**
-    * @brief Initialise solution after data was copied
+    * @brief Add to RHS
+    *
+    * @param rhs RSH values
+    * @param startRow Start row
     */
-   void initSolutions();
+   void addRhs(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& rhs, const std::size_t startRow);
+
+   /**
+    * @brief Extract solution
+    *
+    * @param sol solution values
+    * @param startRow Start row
+    */
+   void getSolution(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t startRow);
+
+   /**
+    * @brief Set initial solution
+    *
+    * @param sol initial solution data
+    * @param startRow Start row
+    */
+   void setSolution(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t startRow);
 
    /**
     * @brief Update solver after solution was updated
@@ -144,19 +165,6 @@ MHDFloat ImExPCTimestepper<TOperator, TData, TImpl>::aIm(
 }
 
 template <typename TOperator, typename TData, typename TImpl>
-void ImExPCTimestepper<TOperator, TData, TImpl>::initSolutions()
-{
-   details::computeSet(this->reg(Register::Intermediate::id()),
-         this->reg(Register::Solution::id()));
-
-   if (this->mspScheme->useEmbedded())
-   {
-      details::computeSet(this->reg(Register::Error::id()),
-            this->reg(Register::Solution::id()));
-   }
-}
-
-template <typename TOperator, typename TData, typename TImpl>
 void ImExPCTimestepper<TOperator, TData, TImpl>::updateSolutions()
 {
    details::computeSet(this->reg(Register::Intermediate::id()),
@@ -188,8 +196,7 @@ void ImExPCTimestepper<TOperator, TData, TImpl>::addStorage(
    this->addRegister(rows, cols, ids);
 
    // Init storage for inhomogeneous boundary value
-   this->mInhomogeneous.resize(rows, cols);
-   this->mInhomogeneous.setZero();
+   this->initInhomogeneous(rows, cols);
 
    // Register for influence kernels
    ids = {Register::Influence::id()};
@@ -243,7 +250,7 @@ bool ImExPCTimestepper<TOperator, TData, TImpl>::preSolve()
             this->mMassMatrix, aMass,
             this->reg(Register::Intermediate::id()));
       details::computeAMXPY(this->reg(Register::Rhs::id()),
-            this->mRHSMatrix, aIm,
+            this->linearOperator(Tag::Operator::Rhs::id(), 0), aIm,
             this->reg(Register::Intermediate::id()));
 
       this->mId = this->mspScheme->aIm(this->mStep);
@@ -337,6 +344,26 @@ bool ImExPCTimestepper<TOperator, TData, TImpl>::postSolve()
    }
 
    return false;
+}
+
+template <typename TOperator, typename TData, typename TImpl>
+void ImExPCTimestepper<TOperator, TData, TImpl>::setSolution(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t start)
+{
+   details::computeSet(this->reg(Register::Solution::id()),
+         sol);
+}
+
+template <typename TOperator, typename TData, typename TImpl>
+void ImExPCTimestepper<TOperator, TData, TImpl>::addRhs(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& rhs, const std::size_t start)
+{
+   details::computeAXPY(this->reg(Register::Rhs::id()), 1.0,
+         rhs);
+}
+
+template <typename TOperator, typename TData, typename TImpl>
+void ImExPCTimestepper<TOperator, TData, TImpl>::getSolution(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t start)
+{
+   details::computeSet(sol, this->reg(Register::Solution::id()));
 }
 
 } // namespace Views

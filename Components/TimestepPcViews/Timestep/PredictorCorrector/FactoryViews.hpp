@@ -3,8 +3,8 @@
  * @brief Predictor-Corrector timestepper factory
  */
 
-#ifndef QUICC_TIMESTEP_PREDICTORCORRECTOR_FACTORY_HPP
-#define QUICC_TIMESTEP_PREDICTORCORRECTOR_FACTORY_HPP
+#ifndef QUICC_TIMESTEP_PREDICTORCORRECTOR_FACTORYVIEWS_HPP
+#define QUICC_TIMESTEP_PREDICTORCORRECTOR_FACTORYVIEWS_HPP
 
 // System includes
 //
@@ -21,7 +21,7 @@ namespace Timestep {
 /// @brief This namespace contains predictor-corrector timestepping schemes
 namespace PredictorCorrector {
 
-std::shared_ptr<Timestep::Interface> makeInterface(const std::size_t schemeId,
+std::shared_ptr<Timestep::Interface> makeInterfaceViews(const std::size_t schemeId,
    const MHDFloat time, const Matrix& cfl, const MHDFloat maxError,
    const Timestep::Interface::ScalarEquation_range& scalEq,
    const Timestep::Interface::VectorEquation_range& vectEq,
@@ -31,4 +31,4 @@ std::shared_ptr<Timestep::Interface> makeInterface(const std::size_t schemeId,
 } // namespace Timestep
 } // namespace QuICC
 
-#endif // QUICC_TIMESTEP_PREDICTORCORRECTOR_FACTORY_HPP
+#endif // QUICC_TIMESTEP_PREDICTORCORRECTOR_FACTORYVIEWS_HPP

@@ -1,32 +1,23 @@
 /**
- * @file ISparseTimestepper.hpp
+ * @file ITimestepper.hpp
  * @brief Implementation of base for the templated (coupled) equation
  * timestepper
  */
 
-#ifndef QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_ISPARSETIMESTEPPER_HPP
-#define QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_ISPARSETIMESTEPPER_HPP
+#ifndef QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_DETAILS_TIMESTEPPERTOOLS_HPP
+#define QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_DETAILS_TIMESTEPPERTOOLS_HPP
 
 // System includes
 //
 #include <Eigen/Dense>
-#include <map>
-#include <memory>
-#include <set>
 
 // Project includes
 //
-#include "QuICC/ModelOperator/Boundary.hpp"
-#include "QuICC/ModelOperator/ImplicitLinear.hpp"
-#include "QuICC/ModelOperator/SplitBoundary.hpp"
-#include "QuICC/ModelOperator/SplitBoundaryValue.hpp"
-#include "QuICC/ModelOperator/SplitImplicitLinear.hpp"
-#include "QuICC/ModelOperator/Time.hpp"
-#include "QuICC/Register/Implicit.hpp"
-#include "QuICC/Register/Influence.hpp"
-#include "Timestep/PredictorCorrector//Views/SparseLinearSolver.hpp"
-#include "QuICC/Tag/Operator/Influence.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Math.hpp"
+#include "View/View.hpp"
 
+#include <iostream>
 namespace QuICC {
 
 namespace Timestep {
@@ -40,6 +31,21 @@ namespace details {
  * @brief Compute z = y
  */
 template <typename TData> void computeSet(TData& z, const TData& y);
+
+/**
+ * @brief Compute z = y
+ */
+template <typename TData> void computeSet(TData& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x);
+
+/**
+ * @brief Compute y = x
+ */
+template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x);
+
+/**
+ * @brief Compute y = x
+ */
+void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const DecoupledZMatrix& x);
 
 /**
  * @brief Compute z = y
@@ -147,8 +153,19 @@ void computeAXPY(TData& y, const MHDFloat a, const TData& x);
 /**
  * @brief Compute y = a*x + y
  */
+template <typename TData>
+void computeAXPY(TData& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x);
+
+/**
+ * @brief Compute y = a*x + y
+ */
 void computeAXPY(DecoupledZMatrix& y, const MHDFloat a,
    const DecoupledZMatrix& x);
+
+/**
+ * @brief Compute y = a*x + y
+ */
+void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x);
 
 /**
  * @brief Compute y = x + a*y
@@ -242,396 +259,32 @@ void computeInfluenceCorrection(TData& y, const TData& x);
  */
 void computeInfluenceCorrection(DecoupledZMatrix& y, const DecoupledZMatrix& x);
 
-} // namespace details
+/**
+ * @brief Add (scaled) real part of decoupled storage to sparse matrix
+ */
+void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat);
 
 /**
- * @brief Implementation of a templated (coupled) equation timestepper
+ * @brief Add (scaled) decoupled storage to sparse matrix
  */
-template <typename TOperator, typename TData, template <typename> class TSolver>
-class ISparseTimestepper
-    : public SparseLinearSolver<TOperator, TData, TSolver>
-{
-public:
-   /**
-    * @brief Constructor
-    *
-    * @param start   Starting index (for example without m=0)
-    * @param timeId  Solver timing with respect to timestepping
-    */
-   ISparseTimestepper(const int start, const std::size_t timeId);
+void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat);
 
-   /**
-    * @brief Destructor
-    */
-   virtual ~ISparseTimestepper() = default;
+/**
+ * @brief Apply correction to decoupled storage from sparse matrix
+ */
+void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr);
 
-   /**
-    * @brief Initialise the solver matrices storage
-    *
-    * @param n Size of matrices
-    */
-   virtual void initMatrices(const int n);
+/**
+ * @brief Apply correction
+ */
+template <typename TData, typename TCorr> void addCorrection(TData& rVal, const TCorr& corr);
 
-   /**
-    * @brief Update the LHS matrix with new timedependence
-    */
-   void updateTimeMatrix(const MHDFloat dt);
+//
+//
+//
+//
+//
 
-   /**
-    * @brief Set RHS matrix at t_n
-    *
-    * @param idx Index of the matrix
-    */
-   TOperator& rRHSMatrix(const int idx);
-
-   /**
-    * @brief Build the scheme operators
-    *
-    * @param idx  Solver index
-    * @param ops  Operators for the timestepper
-    */
-   virtual void buildOperators(const int idx,
-      const std::map<std::size_t, DecoupledZSparse>& ops, const MHDFloat dt,
-      const int size);
-
-   /**
-    * @brief Finished timestep?
-    */
-   MHDFloat error() const;
-
-   /**
-    * @brief Finished timestep?
-    */
-   bool finished();
-
-   /**
-    * @brief Get current timestep fraction
-    */
-   virtual MHDFloat stepFraction() const = 0;
-
-protected:
-   /**
-    * @brief Number of substeps
-    */
-   virtual int steps() const = 0;
-
-   /**
-    * @brief
-    */
-   virtual void postSolverUpdate();
-
-   /**
-    * @brief Implicit coefficient a for linear operator
-    *
-    * A = (T + a L)
-    */
-   virtual MHDFloat aIm(const int step) const = 0;
-
-   /**
-    * @brief Explicit calculation took place?
-    */
-   bool mHasExplicit;
-
-   /**
-    * @brief Current substep
-    */
-   int mStep;
-
-   /**
-    * @brief Current timestep
-    */
-   MHDFloat mDt;
-
-   /**
-    * @brief Timestep error
-    */
-   MHDFloat mError;
-
-   /**
-    * @brief ID of the register to use
-    */
-   std::size_t mRegisterId;
-
-   /**
-    * @brief RHS operator
-    */
-   std::vector<TOperator> mRHSMatrix;
-
-   /**
-    * @brief Mass matrix operator
-    */
-   std::vector<SparseMatrix> mMassMatrix;
-
-   /**
-    * @brief Storage for field
-    */
-   std::map<std::size_t, std::vector<TData>> mStorage;
-
-private:
-};
-
-template <typename TOperator, typename TData, template <typename> class TSolver>
-ISparseTimestepper<TOperator, TData, TSolver>::ISparseTimestepper(
-   const int start, const std::size_t timeId) :
-    SparseLinearSolver<TOperator, TData, TSolver>(start, timeId),
-    mHasExplicit(true),
-    mStep(0),
-    mDt(-1.0),
-    mError(-1.0),
-    mRegisterId(Register::Implicit::id())
-{}
-
-template <typename TOperator, typename TData, template <typename> class TSolver>
-MHDFloat ISparseTimestepper<TOperator, TData, TSolver>::error() const
-{
-   return this->mError;
-}
-
-template <typename TOperator, typename TData, template <typename> class TSolver>
-bool ISparseTimestepper<TOperator, TData, TSolver>::finished()
-{
-   return (this->mStep == 0);
-}
-
-template <typename TOperator, typename TData, template <typename> class TSolver>
-void ISparseTimestepper<TOperator, TData, TSolver>::updateTimeMatrix(
-   const MHDFloat dt)
-{
-   // Update stored timestep
-   MHDFloat oldDt = this->mDt;
-   this->mDt = dt;
-
-   // Get list of different IDs
-   std::set<MHDFloat> filter;
-   for (int step = 0; step < this->steps(); ++step)
-   {
-      const auto a = this->aIm(step);
-      filter.insert(a);
-   }
-
-   // Loop over all operator IDs
-   for (auto opIt = this->mSolverMatrix.begin();
-        opIt != this->mSolverMatrix.end(); ++opIt)
-   {
-      // Loop of step IDs
-      for (auto a: filter)
-      {
-         // Update is only required if aIm is not zero
-         if (opIt->second.count(a) > 0 && a != 0.0)
-         {
-            // Loop over matrices within same step
-            for (std::size_t i = 0; i < this->nSystem(); ++i)
-            {
-               // Get the number of nonzero elements in time dependence
-               size_t nnz = this->mRHSMatrix.at(i).nonZeros();
-
-               // Update LHS and RHS matrices
-               for (size_t k = 0;
-                    k < static_cast<size_t>(this->mRHSMatrix.at(i).outerSize());
-                    ++k)
-               {
-                  typename TOperator::InnerIterator lhsIt(
-                     this->solverMatrix(opIt->first, a, i), k);
-                  for (typename TOperator::InnerIterator timeIt(
-                          this->mRHSMatrix.at(i), k);
-                       timeIt; ++timeIt)
-                  {
-                     // Only keep going if nonzero elements are left
-                     if (nnz > 0)
-                     {
-                        assert(lhsIt.col() == timeIt.col());
-                        assert(lhsIt.row() <= timeIt.row());
-
-                        // LHS matrix might have additional nonzero entries
-                        while (lhsIt.row() < timeIt.row() && lhsIt)
-                        {
-                           ++lhsIt;
-                        }
-
-                        // Update LHS matrix
-                        if (timeIt.row() == lhsIt.row())
-                        {
-                           // Update values
-                           lhsIt.valueRef() +=
-                              a * (oldDt - this->mDt) * timeIt.value();
-
-                           // Update nonzero counter
-                           nnz--;
-                        }
-
-                        // Update LHS iterators and counters
-                        ++lhsIt;
-                     }
-                     else
-                     {
-                        break;
-                     }
-                  }
-               }
-
-               // Abort if some nonzero entries where not updated
-               if (nnz != 0)
-               {
-                  throw std::logic_error(
-                     "Update of timestepping matrices failed");
-               }
-            }
-         }
-      }
-   }
-}
-
-template <typename TOperator, typename TData, template <typename> class TSolver>
-void ISparseTimestepper<TOperator, TData, TSolver>::initMatrices(const int n)
-{
-   // Initialise base matrices
-   for (int i = 0; i < this->steps(); i++)
-   {
-      SparseLinearSolver<TOperator, TData, TSolver>::initMatrices(
-         this->aIm(i), n);
-   }
-
-   // Do not reinitialise if work already done by other field
-   if (this->mRHSMatrix.size() == 0)
-   {
-      // Reserve space for the RHS matrices
-      this->mRHSMatrix.reserve(n);
-
-      // Initialise storage for RHS matrices
-      for (int i = 0; i < n; ++i)
-      {
-         // Create storage for LHS matrices
-         this->mRHSMatrix.push_back(TOperator());
-      }
-   }
-
-   // Do not reinitialise if work already done by other field
-   if (this->mMassMatrix.size() == 0)
-   {
-      // Reserve space for the RHS matrices
-      this->mMassMatrix.reserve(n);
-
-      // Initialise storage for RHS matrices
-      for (int i = 0; i < n; ++i)
-      {
-         // Create storage for LHS matrices
-         this->mMassMatrix.push_back(SparseMatrix());
-      }
-   }
-}
-
-template <typename TOperator, typename TData, template <typename> class TSolver>
-TOperator& ISparseTimestepper<TOperator, TData, TSolver>::rRHSMatrix(
-   const int idx)
-{
-   return this->mRHSMatrix.at(idx);
-}
-
-template <typename TOperator, typename TData, template <typename> class TSolver>
-void ISparseTimestepper<TOperator, TData, TSolver>::buildOperators(
-   const int idx, const std::map<std::size_t, DecoupledZSparse>& ops,
-   const MHDFloat dt, const int size)
-{
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpA =
-      ops.find(ModelOperator::ImplicitLinear::id());
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpB =
-      ops.find(ModelOperator::Time::id());
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpC =
-      ops.find(ModelOperator::Boundary::id());
-
-   // Check if equation is solved in split form
-   bool isSplit = (ops.count(ModelOperator::SplitImplicitLinear::id()) > 0);
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSC =
-      ops.find(ModelOperator::SplitBoundary::id());
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSA =
-      ops.find(ModelOperator::SplitImplicitLinear::id());
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSCV =
-      ops.find(ModelOperator::SplitBoundaryValue::id());
-
-   // Update timestep
-   this->mDt = dt;
-
-   // Set explicit matrix
-   this->rRHSMatrix(idx).resize(size, size);
-   details::addOperators(this->rRHSMatrix(idx), 1.0, iOpA->second);
-
-   // Set mass matrix
-   this->mMassMatrix.at(idx).resize(size, size);
-   details::addOperators(this->mMassMatrix.at(idx), 1.0, iOpB->second);
-
-   // Set implicit matrix
-   for (int i = 0; i < this->steps(); ++i)
-   {
-      MHDFloat a = this->aIm(i);
-
-      // Set LHS matrix
-      auto&& lhsMat = this->rLHSMatrix(a, idx);
-      lhsMat.resize(size, size);
-      details::addOperators(lhsMat, 1.0, iOpB->second);
-      details::addOperators(lhsMat, -a * this->mDt, iOpA->second);
-      details::addOperators(lhsMat, 1.0, iOpC->second);
-
-      if (isSplit)
-      {
-         // Initialise influence matrices
-         MHDFloat aInf = 0.0;
-         SparseLinearSolver<TOperator, TData, TSolver>::initMatrices(
-            Tag::Operator::Influence::id(), aInf,
-            this->mSolverMatrix.at(Tag::Operator::Lhs::id()).at(a).size());
-
-         // Set other LHS matrix
-         auto&& infMatrix =
-            this->solverMatrix(Tag::Operator::Influence::id(), aInf, idx);
-         infMatrix.resize(size, size);
-         details::addOperators(infMatrix, 1.0, iOpSA->second);
-         details::addOperators(infMatrix, 1.0, iOpSC->second);
-      }
-   }
-
-   if (isSplit)
-   {
-      // Store information for particular solution
-      auto&& infRhs = this->reg(Register::Influence::id()).at(idx);
-      details::initInfluence(infRhs, iOpSCV->second, iOpSC->second);
-   }
-}
-
-template <typename TOperator, typename TData, template <typename> class TSolver>
-void ISparseTimestepper<TOperator, TData, TSolver>::postSolverUpdate()
-{
-   const auto lhsId = Tag::Operator::Lhs::id();
-   const auto opId = Tag::Operator::Influence::id();
-
-   if (this->mSolver.count(lhsId) > 0 && this->mSolver.count(opId) > 0)
-   {
-      // Solver for both stages
-      auto sIt1 = this->mSolver.at(opId).find(0.0);
-      auto sIt2 = this->mSolver.at(lhsId).begin();
-
-      // Compute green's functions for each index
-      for (std::size_t idx = this->mZeroIdx; idx < sIt1->second.size(); idx++)
-      {
-         auto&& infKernel = this->reg(Register::Influence::id()).at(idx);
-         assert(infKernel.real().rows() == infKernel.imag().rows());
-         assert(infKernel.real().cols() == infKernel.imag().cols());
-         auto rows = infKernel.real().rows();
-         auto cols = infKernel.real().cols() / 3;
-         TData rhs(rows, cols);
-         for (int i = 0; i < cols; i++)
-         {
-            rhs.real().col(i) = infKernel.real().col(3 * i + 2);
-            rhs.imag().col(i) = infKernel.imag().col(3 * i + 2);
-         }
-         TData sol(rows, cols);
-         details::solveWrapper(sol, sIt1->second.at(idx), rhs);
-         details::computeMV(rhs, this->mMassMatrix.at(idx), sol);
-         details::solveWrapper(sol, sIt2->second.at(idx), rhs);
-         details::computeSetInfluence(infKernel, sol);
-      }
-   }
-}
-
-namespace details {
 template <typename TData> inline void computeSet(TData& y, const TData& x)
 {
    y = x;
@@ -642,6 +295,68 @@ inline void computeSet(DecoupledZMatrix& y, const DecoupledZMatrix& x)
    y.real() = x.real();
 
    y.imag() = x.imag();
+}
+
+template <typename TData> void computeSet(TData& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x)
+{
+   for(std::size_t j = 0;  j < x.dims()[1]; j++)
+   {
+      for(std::size_t i = 0;  i < x.dims()[0]; i++)
+      {
+         y(i,j) = x(i,j);
+      }
+   }
+}
+
+inline void computeSet(DecoupledZMatrix& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x)
+{
+   std::cerr << "COPY NONLINEAR INTO SOLVER RHS" << std::endl;
+   std::cerr << "View: " << x.dims()[0] << " vs " << x.dims()[1] << std::endl;
+   std::cerr << "Re: " << y.real().rows() << " vs " << y.real().cols() << std::endl;
+   std::cerr << "Im: " << y.imag().rows() << " vs " << y.imag().cols() << std::endl;
+   assert(y.real().cols() == x.dims()[1]);
+   assert(y.imag().cols() == x.dims()[1]);
+   assert(y.real().rows() >= x.dims()[0]);
+   assert(y.imag().rows() >= x.dims()[0]);
+
+   for(std::size_t j = 0;  j < x.dims()[1]; j++)
+   {
+      for(std::size_t i = 0;  i < x.dims()[0]; i++)
+      {
+         y.real()(i,j) = x(i,j).real();
+         y.imag()(i,j) = x(i,j).imag();
+      }
+   }
+   std::cerr << "%%%%%%%%%%%%%%%%%%%%%%%%% NEw RHS " << std::endl;
+   std::cerr << y.real() << std::endl;
+   std::cerr << y.imag() << std::endl;
+}
+
+template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x)
+{
+   for(std::size_t j = 0;  j < y.dims()[1]; j++)
+   {
+      for(std::size_t i = 0;  i < y.dims()[0]; i++)
+      {
+         y(i,j) = x(i,j);
+      }
+   }
+}
+
+inline void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const DecoupledZMatrix& x)
+{
+   assert(x.real().cols() == y.dims()[1]);
+   assert(x.imag().cols() == y.dims()[1]);
+   assert(x.real().rows() >= y.dims()[0]);
+   assert(x.imag().rows() >= y.dims()[0]);
+
+   for(std::size_t j = 0;  j < y.dims()[1]; j++)
+   {
+      for(std::size_t i = 0;  i < y.dims()[0]; i++)
+      {
+         y(i,j) = MHDComplex(x.real()(i,j), x.imag()(i,j));
+      }
+   }
 }
 
 template <typename TData>
@@ -675,6 +390,63 @@ inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a,
       y.real() += a * x.real();
 
       y.imag() += a * x.imag();
+   }
+}
+
+template <typename TData>
+void computeAXPY(TData& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x)
+{
+   if(a != 0)
+   {
+      if(a == 1.0)
+      {
+         for(std::size_t j = 0;  j < x.dims()[1]; j++)
+         {
+            for(std::size_t i = 0;  i < x.dims()[0]; i++)
+            {
+               y(i,j) += x(i,j);
+            }
+         }
+      }
+      else
+      {
+         for(std::size_t j = 0;  j < x.dims()[1]; j++)
+         {
+            for(std::size_t i = 0;  i < x.dims()[0]; i++)
+            {
+               y(i,j) += a*x(i,j);
+            }
+         }
+      }
+   }
+}
+
+inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x)
+{
+   if(a != 0)
+   {
+      if(a == 1.0)
+      {
+         for(std::size_t j = 0;  j < x.dims()[1]; j++)
+         {
+            for(std::size_t i = 0;  i < x.dims()[0]; i++)
+            {
+               y.real()(i,j) += x(i,j).real();
+               y.imag()(i,j) += x(i,j).imag();
+            }
+         }
+      }
+      else
+      {
+         for(std::size_t j = 0;  j < x.dims()[1]; j++)
+         {
+            for(std::size_t i = 0;  i < x.dims()[0]; i++)
+            {
+               y.real()(i,j) += a*x(i,j).real();
+               y.imag()(i,j) += a*x(i,j).imag();
+            }
+         }
+      }
    }
 }
 
@@ -1123,11 +895,61 @@ inline void computeInfluenceCorrection(DecoupledZMatrix& y,
    }
 }
 
-} // namespace details
+inline void addOperators(SparseMatrix& mat, const MHDFloat c, const DecoupledZSparse& decMat)
+{
+   assert(decMat.real().rows() > 0);
+   assert(decMat.real().cols() > 0);
+   assert(decMat.imag().size() == 0 || decMat.imag().nonZeros() == 0);
 
+   if(c != 1.0)
+   {
+      mat += c*decMat.real();
+   } else
+   {
+      mat += decMat.real();
+   }
+}
+
+inline void addOperators(SparseMatrixZ& mat, const MHDFloat c, const DecoupledZSparse& decMat)
+{
+   assert(decMat.real().rows() > 0);
+   assert(decMat.real().cols() > 0);
+   assert(decMat.imag().rows() > 0);
+   assert(decMat.imag().cols() > 0);
+   assert(decMat.real().rows() == decMat.imag().rows());
+   assert(decMat.real().cols() == decMat.imag().cols());
+
+   if(c != 1.0)
+   {
+      mat += c*decMat.real().cast<MHDComplex>() + c*Math::cI*decMat.imag();
+   } else
+   {
+      mat += decMat.real().cast<MHDComplex>() + Math::cI*decMat.imag();
+   }
+}
+
+inline void addCorrection(DecoupledZMatrix& rVal, const SparseMatrixZ& corr)
+{
+   assert(rVal.real().rows() > 0);
+   assert(rVal.real().cols() > 0);
+   assert(rVal.imag().rows() > 0);
+   assert(rVal.imag().cols() > 0);
+   assert(rVal.real().rows() == rVal.imag().rows());
+   assert(rVal.real().cols() == rVal.imag().cols());
+
+   rVal.real() += corr.real();
+   rVal.imag() += corr.imag();
+}
+
+template <typename TData, typename TCorr> inline void addCorrection(TData& rVal, const TCorr& corr)
+{
+   rVal += corr;
+}
+
+} // namespace details
 } // namespace Views
 } // namespace PredictorCorrector
 } // namespace Timestep
 } // namespace QuICC
 
-#endif // QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_ISPARSETIMESTEPPER_HPP
+#endif // QUICC_TIMESTEP_PREDICTORCORRECTOR_VIEWS_DETAILS_TIMESTEPPERTOOLS_HPP
