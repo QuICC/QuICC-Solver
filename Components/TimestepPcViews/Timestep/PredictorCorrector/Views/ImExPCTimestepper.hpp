@@ -40,10 +40,8 @@ class ImExPCTimestepper
 public:
    /**
     * @brief Constructor
-    *
-    * @param timeId  Solver timing with respect to timestepping
     */
-   ImExPCTimestepper(const std::size_t timeId);
+   ImExPCTimestepper();
 
    /**
     * @brief Destructor
@@ -122,6 +120,14 @@ public:
     */
    void updateSolutions();
 
+   /**
+    * @brief Build the scheme operators
+    *
+    * @param ops  Operators for the timestepper
+    */
+   virtual void buildOperators(const std::map<std::size_t, DecoupledZSparse>& ops, const MHDFloat dt,
+      const int size);
+
 protected:
    /**
     * @brief Timestepping scheme
@@ -132,9 +138,8 @@ private:
 };
 
 template <typename TOperator, typename TData, typename TImpl>
-ImExPCTimestepper<TOperator, TData, TImpl>::ImExPCTimestepper(
-   const std::size_t timeId) :
-    ITimestepper<TOperator, TData, TImpl>(timeId)
+ImExPCTimestepper<TOperator, TData, TImpl>::ImExPCTimestepper() :
+    ITimestepper<TOperator, TData, TImpl>()
 {}
 
 template <typename TOperator, typename TData, typename TImpl>
@@ -201,6 +206,73 @@ void ImExPCTimestepper<TOperator, TData, TImpl>::addStorage(
    // Register for influence kernels
    ids = {Register::Influence::id()};
    this->addRegister(1, 1, ids);
+}
+
+template <typename TOperator, typename TData, typename TImpl>
+void ImExPCTimestepper<TOperator, TData, TImpl>::buildOperators(
+   const std::map<std::size_t, DecoupledZSparse>& ops,
+   const MHDFloat dt, const int size)
+{
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpA =
+      ops.find(ModelOperator::ImplicitLinear::id());
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpB =
+      ops.find(ModelOperator::Time::id());
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpC =
+      ops.find(ModelOperator::Boundary::id());
+
+   // Check if equation is solved in split form
+   bool isSplit = (ops.count(ModelOperator::SplitImplicitLinear::id()) > 0);
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSC =
+      ops.find(ModelOperator::SplitBoundary::id());
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSA =
+      ops.find(ModelOperator::SplitImplicitLinear::id());
+   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSCV =
+      ops.find(ModelOperator::SplitBoundaryValue::id());
+
+   // Update timestep
+   this->mDt = dt;
+
+   // Set explicit matrix
+   this->linearOperator(Tag::Operator::Rhs::id(), 0).resize(size, size);
+   details::addOperators(this->linearOperator(Tag::Operator::Rhs::id(), 0), 1.0, iOpA->second);
+
+   // Set mass matrix
+   this->mMassMatrix.resize(size, size);
+   details::addOperators(this->mMassMatrix, 1.0, iOpB->second);
+
+   // Set implicit matrix
+   for (int i = 0; i < this->steps(); ++i)
+   {
+      MHDFloat a = this->aIm(i);
+
+      // Set LHS matrix
+      auto&& lhsMat = this->linearOperator(Tag::Operator::Lhs::id(), a);
+      lhsMat.resize(size, size);
+      details::addOperators(lhsMat, 1.0, iOpB->second);
+      details::addOperators(lhsMat, -a * this->mDt, iOpA->second);
+      details::addOperators(lhsMat, 1.0, iOpC->second);
+
+      if (isSplit)
+      {
+         // Initialise influence matrices
+         MHDFloat aInf = 0.0;
+         this->initMatrices(Tag::Operator::Influence::id(), aInf);
+
+         // Set other LHS matrix
+         auto&& infMatrix =
+            this->linearOperator(Tag::Operator::Influence::id(), aInf);
+         infMatrix.resize(size, size);
+         details::addOperators(infMatrix, 1.0, iOpSA->second);
+         details::addOperators(infMatrix, 1.0, iOpSC->second);
+      }
+   }
+
+   if (isSplit)
+   {
+      // Store information for particular solution
+      auto&& infRhs = this->reg(Register::Influence::id());
+      details::initInfluence(infRhs, iOpSCV->second, iOpSC->second);
+   }
 }
 
 template <typename TOperator, typename TData, typename TImpl>
@@ -347,22 +419,28 @@ bool ImExPCTimestepper<TOperator, TData, TImpl>::postSolve()
 }
 
 template <typename TOperator, typename TData, typename TImpl>
-void ImExPCTimestepper<TOperator, TData, TImpl>::setSolution(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t start)
+void ImExPCTimestepper<TOperator, TData, TImpl>::setSolution(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t startRow)
 {
+   assert(startRow == 0);
+
    details::computeSet(this->reg(Register::Solution::id()),
          sol);
 }
 
 template <typename TOperator, typename TData, typename TImpl>
-void ImExPCTimestepper<TOperator, TData, TImpl>::addRhs(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& rhs, const std::size_t start)
+void ImExPCTimestepper<TOperator, TData, TImpl>::addRhs(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& rhs, const std::size_t startRow)
 {
+   assert(startRow == 0);
+
    details::computeAXPY(this->reg(Register::Rhs::id()), 1.0,
          rhs);
 }
 
 template <typename TOperator, typename TData, typename TImpl>
-void ImExPCTimestepper<TOperator, TData, TImpl>::getSolution(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t start)
+void ImExPCTimestepper<TOperator, TData, TImpl>::getSolution(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t startRow)
 {
+   assert(startRow == 0);
+
    details::computeSet(sol, this->reg(Register::Solution::id()));
 }
 

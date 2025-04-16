@@ -24,7 +24,6 @@
 #include "QuICC/Register/Rhs.hpp"
 #include "QuICC/Tag/Operator/Lhs.hpp"
 
-#include <iostream>
 namespace QuICC {
 
 namespace Timestep {
@@ -43,10 +42,8 @@ namespace Views {
       public:
          /**
           * @brief Constructor
-          *
-          * @param timeId  Solver timing with respect to timestepping
           */
-         ITimestepperBase(const std::size_t timeId);
+         ITimestepperBase();
 
          /**
           * @brief Destructor
@@ -62,11 +59,6 @@ namespace Views {
           * @brief Set operator to initialized
           */
          void setInitialized();
-
-         /**
-          * @brief Solve timing
-          */
-         std::size_t solveTiming() const;
 
          /**
           * @brief Initialise solver
@@ -103,26 +95,6 @@ namespace Views {
           * @param cols Number of columns required
           */
          virtual void initInhomogeneous(const int rows, const int cols);
-
-         /**
-          * @brief Build the scheme operators
-          */
-         void buildOperators(const std::map<std::size_t, DecoupledZSparse>& ops, const int size);
-
-         /**
-          * @brief Set RHS data
-          */
-         TData& rRHSData();
-
-         /**
-          * @brief Get solution data
-          */
-         const TData& solution() const;
-
-         /**
-          * @brief Set solution data
-          */
-         TData& rSolution();
 
          /**
           * @brief Get inhomogeneous boundary condition
@@ -243,11 +215,6 @@ namespace Views {
          virtual int correctSolution(const int iteration);
 
          /**
-          * @brief Solver timing
-          */
-         std::size_t   mSolveTiming;
-
-         /**
           * @brief Flag for operator initialization
           */
          bool mIsInitialized;
@@ -287,8 +254,8 @@ namespace Views {
          Eigen::SparseMatrix<typename TData::Scalar>  mInhomogeneous;
    };
 
-   template <typename TOperator,typename TData,typename TImpl> ITimestepperBase<TOperator,TData,TImpl>::ITimestepperBase(const std::size_t timeId)
-      : mSolveTiming(timeId), mIsInitialized(false), mOpId(Tag::Operator::Lhs::id()), mId(0.0)
+   template <typename TOperator,typename TData,typename TImpl> ITimestepperBase<TOperator,TData,TImpl>::ITimestepperBase()
+      : mIsInitialized(false), mOpId(Tag::Operator::Lhs::id()), mId(0.0)
    {
    }
 
@@ -418,7 +385,6 @@ namespace Views {
          // Safety assert to make sur matrix is compressed
          assert(it->second.isCompressed());
 
-         std::cerr << it->second << std::endl;
          sIt->second->compute(it->second);
 
          // Stop simulation if factorization failed
@@ -464,17 +430,6 @@ namespace Views {
       this->mInhomogeneous.setZero();
    }
 
-   template <typename TOperator,typename TData,typename TImpl> void ITimestepperBase<TOperator,TData,TImpl>::buildOperators(const std::map<std::size_t,DecoupledZSparse>& ops, const int size)
-   {
-      std::map<std::size_t,DecoupledZSparse>::const_iterator iOpA = ops.find(ModelOperator::ImplicitLinear::id());
-      std::map<std::size_t,DecoupledZSparse>::const_iterator iOpC = ops.find(ModelOperator::Boundary::id());
-
-      auto&& lhsMat = this->linearOperator(Tag::Operator::Lhs::id(), 0);
-      lhsMat.resize(size, size);
-      details::addOperators(lhsMat, 1.0, iOpA->second);
-      details::addOperators(lhsMat, 1.0, iOpC->second);
-   }
-
    template <typename TOperator,typename TData,typename TImpl> bool ITimestepperBase<TOperator,TData,TImpl>::hasLinearOperator(const std::size_t opId) const
    {
       bool res = (this->mOperators.count(opId) > 0);
@@ -503,21 +458,6 @@ namespace Views {
       return this->mOperators.at(opId).at(id);
    }
 
-   template <typename TOperator,typename TData,typename TImpl> TData& ITimestepperBase<TOperator,TData,TImpl>::rRHSData()
-   {
-      return this->reg(Register::Rhs::id());
-   }
-
-   template <typename TOperator,typename TData,typename TImpl> const TData& ITimestepperBase<TOperator,TData,TImpl>::solution() const
-   {
-      return this->reg(Register::Solution::id());
-   }
-
-   template <typename TOperator,typename TData,typename TImpl> TData& ITimestepperBase<TOperator,TData,TImpl>::rSolution()
-   {
-      return this->reg(Register::Solution::id());
-   }
-
    template <typename TOperator,typename TData,typename TImpl> const Eigen::SparseMatrix<typename TData::Scalar>& ITimestepperBase<TOperator,TData,TImpl>::inhomogeneous() const
    {
       return this->mInhomogeneous;
@@ -536,11 +476,6 @@ namespace Views {
    template <typename TOperator,typename TData,typename TImpl> void  ITimestepperBase<TOperator,TData,TImpl>::setInitialized()
    {
       this->mIsInitialized = true;
-   }
-
-   template <typename TOperator,typename TData,typename TImpl> std::size_t ITimestepperBase<TOperator,TData,TImpl>::solveTiming() const
-   {
-      return this->mSolveTiming;
    }
 
 } // Views

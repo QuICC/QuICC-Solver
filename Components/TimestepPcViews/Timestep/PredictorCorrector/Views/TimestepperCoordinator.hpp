@@ -19,14 +19,10 @@
 #include "QuICC/Tools/IdToHuman.hpp"
 #endif
 #include "Types/Typedefs.hpp"
-#include "QuICC/SolveTiming/Before.hpp"
-#include "QuICC/SolveTiming/After.hpp"
-#include "QuICC/ScalarFields/ScalarField.hpp"
-#include "QuICC/Equations/IScalarEquation.hpp"
-#include "QuICC/Equations/IVectorEquation.hpp"
 #include "Timestep/PredictorCorrector/Views/Tags.hpp"
 #include "View/ViewDense.hpp"
 
+#include <iostream>
 namespace QuICC {
 
 namespace Timestep {
@@ -40,7 +36,6 @@ namespace Views {
       bool isComplex;
       std::size_t solverIndex;
       std::size_t fieldIndex;
-      std::size_t timeId;
       std::size_t rows;
       std::size_t cols;
       std::size_t blockN;
@@ -84,16 +79,6 @@ namespace Views {
           */
          template <typename TScheme>
          void init(const MHDFloat dt, const std::vector<TimestepperInfo>& info, std::shared_ptr<TScheme> spScheme);
-
-         /**
-          * @brief Get current solver time
-          */
-         std::size_t solveTime() const;
-
-         /**
-          * @brief Set solve time
-          */
-         void setSolveTime(const std::size_t timeId);
 
          /**
           * @brief Clear the RHS data of all solvers
@@ -179,11 +164,6 @@ namespace Views {
          std::map<std::size_t, std::tuple<SharedComplexTimestepperType, std::vector<std::size_t>> > mComplexSteppers;
 
          /**
-          * @brief Storage for the current solve time
-          */
-         std::size_t   mSolveTime;
-
-         /**
           * @brief Flag to signal end of computation
           */
          bool mFinished;
@@ -202,7 +182,7 @@ namespace Views {
    };
 
    template <template <class,class,typename> class TStepper> TimestepperCoordinator<TStepper, base_t>::TimestepperCoordinator()
-      : mSolveTime(0), mFinished(false), mError(-1.0)
+      : mFinished(false), mError(-1.0)
    {
    }
 
@@ -214,16 +194,6 @@ namespace Views {
    template <template <class,class,typename> class TStepper> bool TimestepperCoordinator<TStepper, base_t>::finishedStep() const
    {
       return this->mFinished;
-   }
-
-   template <template <class,class,typename> class TStepper> std::size_t TimestepperCoordinator<TStepper, base_t>::solveTime() const
-   {
-      return this->mSolveTime;
-   }
-
-   template <template <class,class,typename> class TStepper> void TimestepperCoordinator<TStepper, base_t>::setSolveTime(const std::size_t timeId)
-   {
-      this->mSolveTime = timeId;
    }
 
    template <template <class, class, typename> class TStepper>
@@ -240,6 +210,7 @@ namespace Views {
       // Create timesteppers
       //
 
+      DebuggerMacro_msg("Creating " + std::to_string(infos.size()) + " timesteppers", 2);
       for(auto&& info: infos)
       {
          if(info.isComplex)
@@ -251,11 +222,13 @@ namespace Views {
             this->addTimestepper(info, this->mRealSteppers);
          }
       }
+      DebuggerMacro_msg("... done", 2);
 
       //
       // Update the start rows
       //
 
+      DebuggerMacro_msg("Updating start row for " + std::to_string(infos.size()) + " timesteppers", 2);
       for(auto&& info: infos)
       {
          if(info.isComplex)
@@ -267,6 +240,7 @@ namespace Views {
             this->updateStartRow(info, this->mRealSteppers);
          }
       }
+      DebuggerMacro_msg("... done", 2);
 
       //
       // Set timestepping scheme
@@ -285,6 +259,7 @@ namespace Views {
       // Init timesteppers
       //
 
+      DebuggerMacro_msg("Initializing " + std::to_string(infos.size()) + " timesteppers", 2);
       for(auto&& info: infos)
       {
          if(info.isComplex)
@@ -296,26 +271,21 @@ namespace Views {
             this->initTimestepper(info, this->mRealSteppers);
          }
       }
+      DebuggerMacro_msg("... done", 2);
    }
 
    template <template <class,class,typename> class TStepper> template <typename T> void TimestepperCoordinator<TStepper, base_t>::addTimestepper(const TimestepperInfo& info, T& steppers)
    {
       if(steppers.count(info.solverIndex) == 0)
       {
-         DebuggerMacro_msg("Creating timestepper for idx = " + std::to_string(info.solverIndex) + "/" + std::to_string(steppers.size()), 3);
-
-         auto spSolver = std::make_shared<typename std::tuple_element_t<0,typename T::mapped_type>::element_type>(info.timeId);
+         auto spSolver = std::make_shared<typename std::tuple_element_t<0,typename T::mapped_type>::element_type>();
 
          std::vector<std::size_t> startRow(info.fieldIndex + 1, 0);
          auto stepData = std::make_tuple(spSolver, startRow);
          steppers.emplace(info.solverIndex, stepData);
-
-         DebuggerMacro_msg("... current number of timesteppers = " + std::to_string(steppers.size()), 3);
       }
       else
       {
-         DebuggerMacro_msg("Initializing start row for idx = " + std::to_string(info.solverIndex) + "/" + std::to_string(steppers.size()), 3);
-
          // Add start indexes
          auto& stepData = steppers.at(info.solverIndex);
          auto& startRow = std::get<1>(stepData);
@@ -328,7 +298,6 @@ namespace Views {
 
    template <template <class,class,typename> class TStepper> template <typename T> void TimestepperCoordinator<TStepper, base_t>::updateStartRow(const TimestepperInfo& info, T& steppers)
    {
-      DebuggerMacro_msg("Updating start row for idx = " + std::to_string(info.solverIndex) + "/" + std::to_string(steppers.size()), 3);
       assert(steppers.count(info.solverIndex) > 0);
 
       // Update start indexes
@@ -342,8 +311,6 @@ namespace Views {
 
    template <template <class,class,typename> class TStepper> template <typename T> void TimestepperCoordinator<TStepper, base_t>::initTimestepper(const TimestepperInfo& info, T& steppers)
    {
-      DebuggerMacro_msg("Initializing timestepper for idx = " + std::to_string(info.solverIndex) + "/" + std::to_string(steppers.size()), 3);
-
       auto& stepData = steppers.at(info.solverIndex);
       auto spStepper = std::get<0>(stepData);
       if(!spStepper->isInitialized())
@@ -353,6 +320,7 @@ namespace Views {
          spStepper->buildOperators(info.ops, this->mDt, info.rows);
          spStepper->setInitialized();
          spStepper->initSolver();
+         spStepper->zeroSolver();
       }
    }
 
@@ -429,20 +397,13 @@ namespace Views {
       for(auto& tsData: this->mRealSteppers)
       {
          auto& ts = *std::get<0>(tsData.second);
-         if(ts.solveTiming() == this->solveTime())
-         {
-            ts.zeroSolver();
-         }
+         ts.zeroSolver();
       }
-
 
       for(auto& tsData: this->mComplexSteppers)
       {
          auto& ts = *std::get<0>(tsData.second);
-         if(ts.solveTiming() == this->solveTime())
-         {
-            ts.zeroSolver();
-         }
+         ts.zeroSolver();
       }
    }
 
@@ -479,10 +440,14 @@ namespace Views {
    template <template <class,class,typename> class TStepper> void TimestepperCoordinator<TStepper,base_t>::solveSystems()
    {
       // Run complex timesteppers
+      DebuggerMacro_msg("Running complex timesteppers", 6);
       std::pair<bool,MHDFloat> zStatus = this->runSteppers(this->mComplexSteppers);
+      DebuggerMacro_msg("... done", 6);
 
       // Run real timesteppers
+      DebuggerMacro_msg("Running real timesteppers", 6);
       std::pair<bool,MHDFloat> dStatus = this->runSteppers(this->mRealSteppers);
+      DebuggerMacro_msg("... done", 6);
 
       this->mFinished = zStatus.first || dStatus.first;
 
@@ -498,38 +463,32 @@ namespace Views {
       for(auto& tsData: steppers)
       {
          auto& ts = *std::get<0>(tsData.second);
-         if(ts.solveTiming() == this->solveTime())
+         bool solving = false;
+         do
          {
-            bool solving = false;
-            DebuggerMacro_msg("Looping over Solvers", 8);
-            do
+            // Prepare solve of linear system
+            bool needSolve = ts.preSolve();
+
+            if(needSolve)
             {
-               // Prepare solve of linear system
-               bool needSolve = ts.preSolve();
+               // Solve linear system
+               ts.solve();
 
-               if(needSolve)
-               {
-                  DebuggerMacro_msg("...solving", 9);
+               // Work on fields after solve
+               solving = ts.postSolve();
 
-                  // Solve linear system
-                  ts.solve();
-
-                  // Work on fields after solve
-                  solving = ts.postSolve();
-
-               } else
-               {
-                  solving = false;
-               }
-
-            } while (solving);
-
-            status.first = ts.finished();
-
-            if(status.first)
+            } else
             {
-               status.second = std::max(status.second, ts.error());
+               solving = false;
             }
+
+         } while (solving);
+
+         status.first = ts.finished();
+
+         if(status.first)
+         {
+            status.second = std::max(status.second, ts.error());
          }
       }
 

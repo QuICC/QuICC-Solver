@@ -47,10 +47,8 @@ class ITimestepper
 public:
    /**
     * @brief Constructor
-    *
-    * @param timeId  Solver timing with respect to timestepping
     */
-   ITimestepper(const std::size_t timeId);
+   ITimestepper();
 
    /**
     * @brief Destructor
@@ -66,14 +64,6 @@ public:
     * @brief Update the LHS matrix with new timedependence
     */
    void updateTimeMatrix(const MHDFloat dt);
-
-   /**
-    * @brief Build the scheme operators
-    *
-    * @param ops  Operators for the timestepper
-    */
-   virtual void buildOperators(const std::map<std::size_t, DecoupledZSparse>& ops, const MHDFloat dt,
-      const int size);
 
    /**
     * @brief Finished timestep?
@@ -144,9 +134,8 @@ private:
 };
 
 template <typename TOperator, typename TData, typename TImpl>
-ITimestepper<TOperator, TData, TImpl>::ITimestepper(
-   const std::size_t timeId) :
-    ITimestepperBase<TOperator, TData, TImpl>(timeId),
+ITimestepper<TOperator, TData, TImpl>::ITimestepper() :
+    ITimestepperBase<TOperator, TData, TImpl>(),
     mHasExplicit(true),
     mStep(0),
     mDt(-1.0),
@@ -260,80 +249,6 @@ void ITimestepper<TOperator, TData, TImpl>::initMatrices()
    }
 
    this->initMatrices(Tag::Operator::Rhs::id(), 0);
-}
-
-template <typename TOperator, typename TData, typename TImpl>
-void ITimestepper<TOperator, TData, TImpl>::buildOperators(
-   const std::map<std::size_t, DecoupledZSparse>& ops,
-   const MHDFloat dt, const int size)
-{
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpA =
-      ops.find(ModelOperator::ImplicitLinear::id());
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpB =
-      ops.find(ModelOperator::Time::id());
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpC =
-      ops.find(ModelOperator::Boundary::id());
-
-   // Check if equation is solved in split form
-   bool isSplit = (ops.count(ModelOperator::SplitImplicitLinear::id()) > 0);
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSC =
-      ops.find(ModelOperator::SplitBoundary::id());
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSA =
-      ops.find(ModelOperator::SplitImplicitLinear::id());
-   std::map<std::size_t, DecoupledZSparse>::const_iterator iOpSCV =
-      ops.find(ModelOperator::SplitBoundaryValue::id());
-
-   // Update timestep
-   this->mDt = dt;
-
-   // Set explicit matrix
-   this->linearOperator(Tag::Operator::Rhs::id(), 0).resize(size, size);
-   details::addOperators(this->linearOperator(Tag::Operator::Rhs::id(), 0), 1.0, iOpA->second);
-
-   // Set mass matrix
-   this->mMassMatrix.resize(size, size);
-   details::addOperators(this->mMassMatrix, 1.0, iOpB->second);
-
-   // Set implicit matrix
-   for (int i = 0; i < this->steps(); ++i)
-   {
-      MHDFloat a = this->aIm(i);
-
-      // Set LHS matrix
-      auto&& lhsMat = this->linearOperator(Tag::Operator::Lhs::id(), a);
-      lhsMat.resize(size, size);
-      std::cerr << "a = " << a << std::endl;
-      details::addOperators(lhsMat, 1.0, iOpB->second);
-      std::cerr << "B:" << std::endl;
-      std::cerr << lhsMat << std::endl;
-      details::addOperators(lhsMat, -a * this->mDt, iOpA->second);
-      std::cerr << "B - a A:" << std::endl;
-      std::cerr << lhsMat << std::endl;
-      details::addOperators(lhsMat, 1.0, iOpC->second);
-      std::cerr << "B - aA + BC:" << std::endl;
-      std::cerr << lhsMat << std::endl;
-
-      if (isSplit)
-      {
-         // Initialise influence matrices
-         MHDFloat aInf = 0.0;
-         this->initMatrices(Tag::Operator::Influence::id(), aInf);
-
-         // Set other LHS matrix
-         auto&& infMatrix =
-            this->linearOperator(Tag::Operator::Influence::id(), aInf);
-         infMatrix.resize(size, size);
-         details::addOperators(infMatrix, 1.0, iOpSA->second);
-         details::addOperators(infMatrix, 1.0, iOpSC->second);
-      }
-   }
-
-   if (isSplit)
-   {
-      // Store information for particular solution
-      auto&& infRhs = this->reg(Register::Influence::id());
-      details::initInfluence(infRhs, iOpSCV->second, iOpSC->second);
-   }
 }
 
 template <typename TOperator, typename TData, typename TImpl>

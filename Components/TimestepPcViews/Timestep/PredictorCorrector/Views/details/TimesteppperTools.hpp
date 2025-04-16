@@ -310,10 +310,6 @@ template <typename TData> void computeSet(TData& y, const View::View<MHDComplex,
 
 inline void computeSet(DecoupledZMatrix& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x)
 {
-   std::cerr << "COPY NONLINEAR INTO SOLVER RHS" << std::endl;
-   std::cerr << "View: " << x.dims()[0] << " vs " << x.dims()[1] << std::endl;
-   std::cerr << "Re: " << y.real().rows() << " vs " << y.real().cols() << std::endl;
-   std::cerr << "Im: " << y.imag().rows() << " vs " << y.imag().cols() << std::endl;
    assert(y.real().cols() == x.dims()[1]);
    assert(y.imag().cols() == x.dims()[1]);
    assert(y.real().rows() >= x.dims()[0]);
@@ -327,9 +323,6 @@ inline void computeSet(DecoupledZMatrix& y, const View::View<MHDComplex, View::A
          y.imag()(i,j) = x(i,j).imag();
       }
    }
-   std::cerr << "%%%%%%%%%%%%%%%%%%%%%%%%% NEw RHS " << std::endl;
-   std::cerr << y.real() << std::endl;
-   std::cerr << y.imag() << std::endl;
 }
 
 template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x)

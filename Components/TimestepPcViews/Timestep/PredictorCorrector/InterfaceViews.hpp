@@ -16,6 +16,7 @@
 #include "Memory/MemoryResource.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Equations/CouplingInformation.hpp"
 #include "QuICC/Pseudospectral/Coordinator.hpp"
 #include "QuICC/SolveTiming/Prognostic.hpp"
 #include "QuICC/Timestep/Constants.hpp"
@@ -72,11 +73,6 @@ public:
     * @brief Timestep is finished?
     */
    bool finishedStep() const final;
-
-   /**
-    * @brief Set solve time
-    */
-   void setSolveTime(const std::size_t timeId) final;
 
    /**
     * @brief Update equation explicit linear input to solver
@@ -182,6 +178,20 @@ private:
  */
 std::size_t stepperIndex(const std::size_t solverIndex, const std::size_t sysIndex);
 
+Views::TimestepperInfo createInfo(const Equations::CouplingInformation& cinfo);
+
+inline Views::TimestepperInfo createInfo(const Equations::CouplingInformation& cinfo, const std::size_t idx)
+{
+   Views::TimestepperInfo info;
+   info.isComplex = cinfo.isComplex();
+   info.fieldIndex = cinfo.fieldIndex();
+   info.solverIndex = stepperIndex(cinfo.solverIndex(), idx);
+   info.rows = cinfo.systemN(idx);
+   info.cols = cinfo.rhsCols(idx);
+   info.blockN = cinfo.galerkinN(idx);
+
+   return info;
+}
 
 /**
  * @brief Wrapper to build timestepping matrices
@@ -241,20 +251,19 @@ void InterfaceViews<TScheme>::translate(std::vector<Views::TimestepperInfo>& inf
             myId = std::make_pair(eqIt->name(), compIt);
 
             const auto& cinfo = eqIt->couplingInfo(myId.second);
-            typename std::remove_reference_t<decltype(infos)>::value_type info;
-            info.isComplex = cinfo.isComplex();
-            info.fieldIndex = cinfo.fieldIndex();
-            info.timeId = eqIt->solveTiming();
-            for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+            if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
             {
-               info.solverIndex = stepperIndex(cinfo.solverIndex(), i);
-               info.rows = cinfo.systemN(i);
-               info.cols = cinfo.rhsCols(i);
-               info.blockN = cinfo.galerkinN(i);
-               // Set operators
-               buildTimestepMatrixWrapper(info.ops, eqIt, myId.second, i);
+               DebuggerMacro_msg("Creating solver for " + PhysicalNames::Coordinator::tag(eqIt->name()) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(compIt)) + ")", 2);
 
-               infos.push_back(info);
+               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+               {
+                  auto info = createInfo(cinfo, i);
+
+                  // Set operators
+                  buildTimestepMatrixWrapper(info.ops, eqIt, myId.second, i);
+
+                  infos.push_back(info);
+               }
             }
          }
       }
@@ -283,15 +292,9 @@ template <typename TScheme> bool InterfaceViews<TScheme>::finishedStep() const
 }
 
 template <typename TScheme>
-void InterfaceViews<TScheme>::setSolveTime(const std::size_t timeId)
-{
-   this->mSolverCoord.setSolveTime(timeId);
-}
-
-template <typename TScheme>
 void InterfaceViews<TScheme>::initSolution(const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq)
 {
-   auto processSolution = [this](const auto currentTime, auto&& eq_range)
+   auto processSolution = [this](auto&& eq_range)
    {
       // Storage for information and identity
       SpectralFieldId myId;
@@ -299,47 +302,45 @@ void InterfaceViews<TScheme>::initSolution(const ScalarEquation_range& scalEq, c
       // Loop over all scalar equations
       for(auto& eqIt: make_range(eq_range))
       {
-         if(eqIt->solveTiming() == currentTime)
-         {
             for(auto& compIt: make_range(eqIt->spectralRange()))
             {
                // Get field identity
                myId = std::make_pair(eqIt->name(), compIt);
 
                const auto& cinfo = eqIt->couplingInfo(myId.second);
-               Views::TimestepperInfo info;
-               info.isComplex = cinfo.isComplex();
-               info.fieldIndex = cinfo.fieldIndex();
-               info.timeId = eqIt->solveTiming();
 
-               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+               if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
                {
-                  DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                  tmp.setZero();
+                  for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+                  {
+                     auto info = createInfo(cinfo, i);
 
-                  std::visit(
-                        [&](auto&& p)
-                        {
-                        Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmp, i, 0, true, true);
-                        }, eqIt->spUnknown());
+                     DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
+                     tmp.setZero();
 
-                  std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                  std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                  Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
-                  using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                  std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
-                  Views::details::computeSet(tmpView, tmp);
+                     std::visit(
+                           [&](auto&& p)
+                           {
+                           Equations::copyUnknown(*eqIt, p->dom(0).perturbation(), myId.second, tmp, i, 0, true, true);
+                           }, eqIt->spUnknown());
 
-                  this->mSolverCoord.updateSolution(info, tmpView);
+                     std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
+                     std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
+                     Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
+                     using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
+                     std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
+                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
+                     Views::details::computeSet(tmpView, tmp);
+
+                     this->mSolverCoord.updateSolution(info, tmpView);
+                  }
                }
-            }
          }
       }
    };
 
-   processSolution(this->mSolverCoord.solveTime(), scalEq);
-   processSolution(this->mSolverCoord.solveTime(), vectEq);
+   processSolution(scalEq);
+   processSolution(vectEq);
 }
 
 template <typename TScheme>
@@ -349,7 +350,7 @@ void InterfaceViews<TScheme>::getExplicitInput(const std::size_t opId,
 {
    Profiler::RegionFixture<2> fix("Timestep-explicitInput");
 
-   auto processInput = [this](const auto currentTime, auto&& eq_range, const std::size_t opId,
+   auto processInput = [this](auto&& eq_range, const std::size_t opId,
    const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       // Storage for information and identity
@@ -358,84 +359,79 @@ void InterfaceViews<TScheme>::getExplicitInput(const std::size_t opId,
       // Loop over all scalar equations
       for(auto& eqIt: make_range(eq_range))
       {
-         if(eqIt->solveTiming() == currentTime)
+         for(auto& compIt: make_range(eqIt->spectralRange()))
          {
-            for(auto& compIt: make_range(eqIt->spectralRange()))
+            // Get field identity
+            myId = std::make_pair(eqIt->name(), compIt);
+
+            const auto& cinfo = eqIt->couplingInfo(myId.second);
+
+            if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
             {
-               // Get field identity
-               myId = std::make_pair(eqIt->name(), compIt);
+               DebuggerMacro_msg("Get explicit solver input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
-               // Apply constraint on solution
-               eqIt->applyConstraint(myId.second, SolveTiming::Before::id());
-
-               const auto& cinfo = eqIt->couplingInfo(myId.second);
-               Views::TimestepperInfo info;
-               info.isComplex = cinfo.isComplex();
-               info.fieldIndex = cinfo.fieldIndex();
-               info.timeId = eqIt->solveTiming();
-
-               // Get timestep input
-               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-               {
-                  info.solverIndex = stepperIndex(cinfo.solverIndex(), i);
-                  info.rows = cinfo.systemN(i);
-                  info.cols = cinfo.rhsCols(i);
-                  info.blockN = cinfo.galerkinN(i);
-
-                  // Copy field values into solver input
-                  DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                  tmp.setZero();
-
-                  // Build range of operator
-                  auto r = make_range(cinfo.explicitRange(opId));
+               // Build range of operator
+               auto r = make_range(cinfo.explicitRange(opId));
 
 #ifdef QUICC_DEBUG
-                  if(r.size() == 0)
-                  {
-                     DebuggerMacro_msg("(Nothing)", 7);
-                  }
+               if(r.size() == 0)
+               {
+                  DebuggerMacro_msg("(Nothing)", 7);
+               }
 #endif // QUICC_DEBUG
 
-                  // Loop over explicit fields
-                  for(auto& fIt: r)
+               if(r.size() > 0)
+               {
+                  // Get timestep input
+                  for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                   {
-                     DebuggerMacro_msg("Add " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(fIt.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(fIt.second)) + ")", 7);
+                     auto info = createInfo(cinfo, i);
 
-                     // Get explicit input
-                     if(fIt.second == FieldComponents::Spectral::SCALAR)
+                     // Copy field values into solver input
+                     DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
+                     tmp.setZero();
+
+                     // Loop over explicit fields
+                     for(auto& fIt: r)
                      {
-                        std::visit(
-                              [&](auto&& p)
-                              {
-                              Equations::addExplicitTerm(*eqIt, opId, myId.second, tmp, 0, fIt, p->dom(0).perturbation(), i);
-                              }, scalVar.find(fIt.first)->second);
-                     } else
-                     {
-                        std::visit(
-                              [&](auto&& p)
-                              {
-                              Equations::addExplicitTerm(*eqIt, opId, myId.second, tmp, 0, fIt, p->dom(0).perturbation().comp(fIt.second), i);
-                              }, vectVar.find(fIt.first)->second);
+                        DebuggerMacro_msg("Add " + ModelOperator::Coordinator::tag(opId) + " term from " + PhysicalNames::Coordinator::tag(fIt.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(fIt.second)) + ")", 7);
+
+                        // Get explicit input
+                        if(fIt.second == FieldComponents::Spectral::SCALAR)
+                        {
+                           std::visit(
+                                 [&](auto&& p)
+                                 {
+                                 Equations::addExplicitTerm(*eqIt, opId, myId.second, tmp, 0, fIt, p->dom(0).perturbation(), i);
+                                 }, scalVar.find(fIt.first)->second);
+                        } else
+                        {
+                           std::visit(
+                                 [&](auto&& p)
+                                 {
+                                 Equations::addExplicitTerm(*eqIt, opId, myId.second, tmp, 0, fIt, p->dom(0).perturbation().comp(fIt.second), i);
+                                 }, vectVar.find(fIt.first)->second);
+                        }
                      }
+
+                     std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
+                     std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
+                     Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
+                     using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
+                     std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
+                     View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
+                     Views::details::computeSet(tmpView, tmp);
+
+                     this->mSolverCoord.updateRhs(info, tmpView);
                   }
-
-                  std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                  std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                  Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
-                  using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                  std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
-                  Views::details::computeSet(tmpView, tmp);
-
-                  this->mSolverCoord.updateRhs(info, tmpView);
                }
             }
          }
       }
    };
 
-   processInput(this->mSolverCoord.solveTime(), scalEq, opId, scalVar, vectVar);
-   processInput(this->mSolverCoord.solveTime(), vectEq, opId, scalVar, vectVar);
+   processInput(scalEq, opId, scalVar, vectVar);
+   processInput(vectEq, opId, scalVar, vectVar);
 }
 
 template <typename TScheme>
@@ -443,7 +439,7 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
 {
    Profiler::RegionFixture<2> fix("Timestep-input");
 
-   auto processInput = [this](const auto currentTime, auto&& eq_range)
+   auto processInput = [this](auto&& eq_range)
    {
       // Storage for information and identity
       SpectralFieldId myId;
@@ -451,38 +447,29 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
       // Loop over all scalar equations
       for(auto& eqIt: make_range(eq_range))
       {
-         if(eqIt->solveTiming() == currentTime)
+         for(auto& compIt: make_range(eqIt->spectralRange()))
          {
-            for(auto& compIt: make_range(eqIt->spectralRange()))
+            // Get field identity
+            myId = std::make_pair(eqIt->name(), compIt);
+
+            // Apply constraint on solution
+            eqIt->applyConstraint(myId.second, SolveTiming::Before::id());
+
+            const auto& cinfo = eqIt->couplingInfo(myId.second);
+
+            if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
             {
-               // Get field identity
-               myId = std::make_pair(eqIt->name(), compIt);
-
-               // Apply constraint on solution
-               eqIt->applyConstraint(myId.second, SolveTiming::Before::id());
-
-               const auto& cinfo = eqIt->couplingInfo(myId.second);
-               Views::TimestepperInfo info;
-               info.isComplex = cinfo.isComplex();
-               info.fieldIndex = cinfo.fieldIndex();
-               info.timeId = eqIt->solveTiming();
+               DebuggerMacro_msg("Get solver input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
                // Get timestep input
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
-                  info.solverIndex = stepperIndex(cinfo.solverIndex(), i);
-                  info.rows = cinfo.systemN(i);
-                  info.cols = cinfo.rhsCols(i);
-                  info.blockN = cinfo.galerkinN(i);
+                  auto info = createInfo(cinfo, i);
 
                   // Copy field values into solver input
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   tmp.setZero();
                   Equations::copyNonlinear(*eqIt, myId.second, tmp, i, 0);
-                  std::cerr << "COPY NONLINEAR DATA: Re" << std::endl;
-                  std::cerr << tmp.real() << std::endl;
-                  std::cerr << "COPY NONLINEAR DATA: Im" << std::endl;
-                  std::cerr << tmp.imag() << std::endl;
 
                   // Add source term
                   std::visit(
@@ -508,10 +495,10 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
                      std::visit(
                            [&](auto&& p)
                            {
-                              throw std::logic_error("NOT YET IMPLEMENTED");
-                             // Equations::setBoundaryValue(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
+                           throw std::logic_error("NOT YET IMPLEMENTED");
+                           // Equations::setBoundaryValue(*spEq, p->dom(0).perturbation(), id.second, (*solveIt)->rInhomogeneous(i), i, (*solveIt)->startRow(id,i));
                            }, eqIt->spUnknown());
-      //               this->mSolverCoord.updateInhomogeneous(info);
+                     //               this->mSolverCoord.updateInhomogeneous(info);
                   }
                }
             }
@@ -519,8 +506,8 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
       }
    };
 
-   processInput(this->mSolverCoord.solveTime(), scalEq);
-   processInput(this->mSolverCoord.solveTime(), vectEq);
+   processInput(scalEq);
+   processInput(vectEq);
 }
 
 template <typename TScheme>
@@ -528,7 +515,7 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
 {
    Profiler::RegionFixture<2> fix("Timestep-output");
 
-   auto processOutput = [this](const auto currentTime, auto&& eq_range)
+   auto processOutput = [this](auto&& eq_range)
    {
       // Storage for information and identity
       SpectralFieldId myId;
@@ -536,25 +523,29 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
       // Loop over all scalar equations
       for(auto& eqIt: make_range(eq_range))
       {
-         if(eqIt->solveTiming() == currentTime)
+         for(auto& compIt: make_range(eqIt->spectralRange()))
          {
-            for(auto& compIt: make_range(eqIt->spectralRange()))
-            {
-               // Get field identity
-               myId = std::make_pair(eqIt->name(), compIt);
+            // Get field identity
+            myId = std::make_pair(eqIt->name(), compIt);
 
-               const auto& cinfo = eqIt->couplingInfo(myId.second);
-               Views::TimestepperInfo info;
-               info.isComplex = cinfo.isComplex();
-               info.fieldIndex = cinfo.fieldIndex();
-               info.timeId = eqIt->solveTiming();
+            const auto& cinfo = eqIt->couplingInfo(myId.second);
+
+            if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
+            {
+               DebuggerMacro_msg("Get solver solution for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
+
+               // return zero 
+               for(std::size_t i = 0; i < static_cast<std::size_t>(cinfo.fieldStart()); i++)
+               {
+                  DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
+                  tmp.setZero();
+
+                  eqIt->storeSolution(myId.second, tmp, i, 0);
+               }
 
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
-                  info.solverIndex = stepperIndex(cinfo.solverIndex(), i);
-                  info.rows = cinfo.systemN(i);
-                  info.cols = cinfo.rhsCols(i);
-                  info.blockN = cinfo.galerkinN(i);
+                  auto info = createInfo(cinfo, i);
 
                   std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
                   std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
@@ -578,10 +569,7 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                {
                   for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                   {
-                     info.solverIndex = stepperIndex(cinfo.solverIndex(), i);
-                     info.rows = cinfo.systemN(i);
-                     info.cols = cinfo.rhsCols(i);
-                     info.blockN = cinfo.galerkinN(i);
+                     auto info = createInfo(cinfo, i);
 
                      DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                      tmp.setZero();
@@ -608,8 +596,8 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
       }
    };
 
-   processOutput(this->mSolverCoord.solveTime(), scalEq);
-   processOutput(this->mSolverCoord.solveTime(), vectEq);
+   processOutput(scalEq);
+   processOutput(vectEq);
 }
 
 template <typename TScheme>
@@ -794,7 +782,6 @@ void InterfaceViews<TScheme>::stepForward(const ScalarEquation_range& scalEq,
       DebuggerMacro_msg("Time integration sub-step", 2);
 
       this->mpPseudo->evolveUntilPrognostic(this->finishedStep());
-      this->setSolveTime(SolveTiming::Prognostic::id());
 
       // Update the equation input to the timestepper
       this->getInput(scalEq, vectEq);
