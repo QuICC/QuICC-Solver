@@ -1,11 +1,11 @@
 /**
- * @file SphereTorPolEnstrophyLSpectrumWriter.hpp
+ * @file ShellTorPolEnstrophyLSpectrumWriter.hpp
  * @brief Implementation of the ASCII spherical harmonics enstrophy L Spectrum
- * calculation for a Toroidal/Poloidal field in a sphere
+ * calculation for a Toroidal/Poloidal field in a spherical shell
  */
 
-#ifndef QUICC_IO_VARIABLE_SPHERETORPOLENSTROPHYLSPECTRUMWRITER_HPP
-#define QUICC_IO_VARIABLE_SPHERETORPOLENSTROPHYLSPECTRUMWRITER_HPP
+#ifndef QUICC_IO_VARIABLE_SHELLTORPOLENSTROPHYLSPECTRUMWRITER_HPP
+#define QUICC_IO_VARIABLE_SHELLTORPOLENSTROPHYLSPECTRUMWRITER_HPP
 
 // System includes
 //
@@ -23,9 +23,9 @@ namespace Variable {
 
 /**
  * @brief Implementation of the ASCII spherical harmonics enstrophy L spectrum
- * calculation for a Toroidal/Poloidal field in a sphere
+ * calculation for a Toroidal/Poloidal field in a spherical shell
  */
-class SphereTorPolEnstrophyLSpectrumWriter
+class ShellTorPolEnstrophyLSpectrumWriter
     : public ISphericalTorPolEnstrophyLSpectrumWriter
 {
 public:
@@ -35,13 +35,13 @@ public:
     * @param prefix Prefix to use for file name
     * @param type Type of the file (typically scheme name)
     */
-   SphereTorPolEnstrophyLSpectrumWriter(const std::string& prefix,
+   ShellTorPolEnstrophyLSpectrumWriter(const std::string& prefix,
       const std::string& type);
 
    /**
     * @brief Destructor
     */
-   virtual ~SphereTorPolEnstrophyLSpectrumWriter() = default;
+   virtual ~ShellTorPolEnstrophyLSpectrumWriter() = default;
 
    /**
     * @brief Initialise the operator, transform and file
@@ -53,11 +53,11 @@ private:
 };
 
 /// Typedef for a shared pointer
-typedef std::shared_ptr<SphereTorPolEnstrophyLSpectrumWriter>
-   SharedSphereTorPolEnstrophyLSpectrumWriter;
+typedef std::shared_ptr<ShellTorPolEnstrophyLSpectrumWriter>
+   SharedShellTorPolEnstrophyLSpectrumWriter;
 
 } // namespace Variable
 } // namespace Io
 } // namespace QuICC
 
-#endif // QUICC_IO_VARIABLE_SPHERETORPOLENSTROPHYLSPECTRUMWRITER_HPP
+#endif // QUICC_IO_VARIABLE_SHELLTORPOLENSTROPHYLSPECTRUMWRITER_HPP

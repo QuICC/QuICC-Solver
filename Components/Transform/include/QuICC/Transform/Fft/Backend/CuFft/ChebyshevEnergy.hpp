@@ -56,6 +56,11 @@ namespace CuFft {
          virtual void init(const SetupType& setup) const override;
 
          /**
+          * @brief Set Scaler array
+          */
+         void setScaler(const Array& scaler) const;
+
+         /**
           * @brief set spectral operator
           */
          void setSpectralOperator(const SparseMatrix& mat) const;
@@ -79,6 +84,11 @@ namespace CuFft {
           * @brief Set output
           */
          void output(Matrix& rOut) const;
+
+         /**
+          * @brief Set output on grid
+          */
+         void outputGrid(Matrix& rOut) const;
 
          /**
           * @brief Set output mutliplied by scalar operator
@@ -156,6 +166,11 @@ namespace CuFft {
           * @brief Solver for differential operators
           */
          mutable std::shared_ptr<Fftw::DifferentialSolver> mspSolver;
+
+         /**
+          * @brief Scaler array
+          */
+         mutable Array mScaler;
 
          /**
           * @brief FFT scaling factor

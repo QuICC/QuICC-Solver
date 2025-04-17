@@ -1,11 +1,11 @@
 /**
- * @file SphereScalarRSpectrumWriter.hpp
+ * @file ShellTorPolRSpectrumWriter.hpp
  * @brief Implementation of the ASCII spherical harmonics radial power spectrum
- * calculation for a scalar field in a sphere
+ * calculation for a Toroidal/Poloidal field in a spherical shell
  */
 
-#ifndef QUICC_IO_VARIABLE_SPHERESCALARRSPECTRUMWRITER_HPP
-#define QUICC_IO_VARIABLE_SPHERESCALARRSPECTRUMWRITER_HPP
+#ifndef QUICC_IO_VARIABLE_SHELLTORPOLRSPECTRUMWRITER_HPP
+#define QUICC_IO_VARIABLE_SHELLTORPOLRSPECTRUMWRITER_HPP
 
 // System includes
 //
@@ -13,7 +13,9 @@
 
 // Project includes
 //
-#include "QuICC/Io/Variable/ISphericalScalarRSpectrumWriter.hpp"
+#include "QuICC/Enums/FieldIds.hpp"
+#include "QuICC/Io/Variable/ISphericalTorPolRSpectrumWriter.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
 
 namespace QuICC {
 
@@ -23,9 +25,9 @@ namespace Variable {
 
 /**
  * @brief Implementation of the ASCII spherical harmonics radial power spectrum
- * calculation for a scalar field in a sphere
+ * calculation for a Toroidal/Poloidal field in a spherical shell
  */
-class SphereScalarRSpectrumWriter : public ISphericalScalarRSpectrumWriter
+class ShellTorPolRSpectrumWriter : public ISphericalTorPolRSpectrumWriter
 {
 public:
    /**
@@ -34,13 +36,13 @@ public:
     * @param prefix Prefix to use for file name
     * @param type Type of the file (typically scheme name)
     */
-   SphereScalarRSpectrumWriter(const std::string& prefix,
+   ShellTorPolRSpectrumWriter(const std::string& prefix,
       const std::string& type);
 
    /**
     * @brief Destructor
     */
-   virtual ~SphereScalarRSpectrumWriter() = default;
+   virtual ~ShellTorPolRSpectrumWriter() = default;
 
    /**
     * @brief Initialise the operator, transform and file
@@ -52,11 +54,11 @@ private:
 };
 
 /// Typedef for a shared pointer of a HDF5 state file writer
-typedef std::shared_ptr<SphereScalarRSpectrumWriter>
-   SharedSphereScalarRSpectrumWriter;
+typedef std::shared_ptr<ShellTorPolRSpectrumWriter>
+   SharedShellTorPolRSpectrumWriter;
 
 } // namespace Variable
 } // namespace Io
 } // namespace QuICC
 
-#endif // QUICC_IO_VARIABLE_SPHERESCALARRSPECTRUMWRITER_HPP
+#endif // QUICC_IO_VARIABLE_SHELLTORPOLRSPECTRUMWRITER_HPP

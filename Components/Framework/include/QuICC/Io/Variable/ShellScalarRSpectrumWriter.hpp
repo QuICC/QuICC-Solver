@@ -1,11 +1,11 @@
 /**
- * @file SphereScalarRSpectrumWriter.hpp
+ * @file ShellScalarRSpectrumWriter.hpp
  * @brief Implementation of the ASCII spherical harmonics radial power spectrum
- * calculation for a scalar field in a sphere
+ * calculation for a scalar field in a spherical shell
  */
 
-#ifndef QUICC_IO_VARIABLE_SPHERESCALARRSPECTRUMWRITER_HPP
-#define QUICC_IO_VARIABLE_SPHERESCALARRSPECTRUMWRITER_HPP
+#ifndef QUICC_IO_VARIABLE_SHELLSCALARRSPECTRUMWRITER_HPP
+#define QUICC_IO_VARIABLE_SHELLSCALARRSPECTRUMWRITER_HPP
 
 // System includes
 //
@@ -23,9 +23,9 @@ namespace Variable {
 
 /**
  * @brief Implementation of the ASCII spherical harmonics radial power spectrum
- * calculation for a scalar field in a sphere
+ * calculation for a scalar field in a spherical shell
  */
-class SphereScalarRSpectrumWriter : public ISphericalScalarRSpectrumWriter
+class ShellScalarRSpectrumWriter : public ISphericalScalarRSpectrumWriter
 {
 public:
    /**
@@ -34,13 +34,13 @@ public:
     * @param prefix Prefix to use for file name
     * @param type Type of the file (typically scheme name)
     */
-   SphereScalarRSpectrumWriter(const std::string& prefix,
+   ShellScalarRSpectrumWriter(const std::string& prefix,
       const std::string& type);
 
    /**
     * @brief Destructor
     */
-   virtual ~SphereScalarRSpectrumWriter() = default;
+   virtual ~ShellScalarRSpectrumWriter() = default;
 
    /**
     * @brief Initialise the operator, transform and file
@@ -52,11 +52,11 @@ private:
 };
 
 /// Typedef for a shared pointer of a HDF5 state file writer
-typedef std::shared_ptr<SphereScalarRSpectrumWriter>
-   SharedSphereScalarRSpectrumWriter;
+typedef std::shared_ptr<ShellScalarRSpectrumWriter>
+   SharedShellScalarRSpectrumWriter;
 
 } // namespace Variable
 } // namespace Io
 } // namespace QuICC
 
-#endif // QUICC_IO_VARIABLE_SPHERESCALARRSPECTRUMWRITER_HPP
+#endif // QUICC_IO_VARIABLE_SHELLSCALARRSPECTRUMWRITER_HPP
