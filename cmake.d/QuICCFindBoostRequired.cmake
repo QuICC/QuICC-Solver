@@ -9,6 +9,8 @@ macro(quicc_find_boost_required)
     set(multiValueArgs COMPONENTS)
     cmake_parse_arguments(QFBR "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+    message(DEBUG "QFBR_COMPONENTS: ${QFBR_COMPONENTS}")
+
     if(NOT TARGET Boost::headers)
         if(NOT BOOST_ROOT)
             message(VERBOSE "setting BOOST_ROOT")
@@ -34,7 +36,7 @@ macro(quicc_find_boost_required)
         endif()
         # Imported target does not necessarily have global scope
         set_target_properties(Boost::headers PROPERTIES IMPORTED_GLOBAL TRUE)
-        foreach(_comp in ITEMS ${QFBR_COMPONENTS})
+        foreach(_comp IN ITEMS ${QFBR_COMPONENTS})
           set_target_properties(Boost::${_comp} PROPERTIES IMPORTED_GLOBAL TRUE)
         endforeach()
     endif()
