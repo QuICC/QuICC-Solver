@@ -92,7 +92,15 @@ namespace Config {
                      {
                         // Read entry value from file
                         int val;
-                        this->readValue(val, pComponent, itIC->first);
+                        try
+                        {
+                           this->readValue(val, pComponent, itIC->first);
+                        }
+                        catch(const std::logic_error& e)
+                        {
+                           // use default value if missing
+                           val = itIC->second;
+                        }
 
                         // Store value
                         itM->second->iTags().setValue(itIC->first, val);
