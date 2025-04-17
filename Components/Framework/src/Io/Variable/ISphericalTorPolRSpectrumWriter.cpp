@@ -3,22 +3,13 @@
  * @brief Source of the implementation of the ASCII spherical harmonics power spectrum calculation for toroidal/poloidal field in a spherical geometry
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ISphericalTorPolRSpectrumWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ISphericalTorPolRSpectrumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
@@ -424,7 +415,7 @@ namespace Variable {
          // Total spectrum
          for(int i = 0; i < this->mTorPower.rows(); i++)
          {
-            this->mFile << std::left << ioIW() << this->mGrid(i) << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::left << ioIW() << std::setprecision(ioPrec) << this->mGrid(i) << "\t";
             for(int j = 0; j < this->mTorPower.cols(); j++)
             {
                this->mFile << ioFW(ioPrec) << this->mTorPower(i,j) + this->mPolPower(i,j) << "\t";
@@ -440,7 +431,7 @@ namespace Variable {
          // Toroidal spectrum
          for(int i = 0; i < this->mTorPower.rows(); i++)
          {
-            this->mFile << std::left << ioIW() << i << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::left << ioIW() << std::setprecision(ioPrec) << this->mGrid(i) << "\t";
             for(int j = 0; j < this->mTorPower.cols(); j++)
             {
                this->mFile << ioFW(ioPrec) << this->mTorPower(i,j) << "\t";
@@ -456,7 +447,7 @@ namespace Variable {
          // Poloidal spectrum
          for(int i = 0; i < this->mPolPower.rows(); i++)
          {
-            this->mFile << std::left << ioIW() << i << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::left << ioIW() << std::setprecision(ioPrec) << this->mGrid(i) << "\t";
             for(int j = 0; j < this->mPolPower.cols(); j++)
             {
                this->mFile << ioFW(ioPrec) << this->mPolPower(i,j) << "\t";

@@ -3,16 +3,13 @@
  * @brief Source of the high level state generator
  */
 
-// Configuration includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
 // System includes
 //
 
 // Project includes
 //
+#include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Generator/VisualizationGenerator.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
