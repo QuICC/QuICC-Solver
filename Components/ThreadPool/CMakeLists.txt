@@ -44,11 +44,11 @@ add_subdirectory(ThreadPool)
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS
   "${QUICC_CURRENT_COMPONENT_LIB}")
 
-# # Teststuite
-# option(QUICC_TESTSUITE_Cuda "Enable Cuda component testsuite?" OFF)
-# if(QUICC_TESTSUITE_Cuda)
-#   add_subdirectory(TestSuite)
-# endif(QUICC_TESTSUITE_Cuda)
+# Teststuite
+option(QUICC_TESTSUITE_THREADPOOL "Enable ThreadPool component testsuite?" OFF)
+if(QUICC_TESTSUITE_THREADPOOL)
+  add_subdirectory(TestSuite)
+endif(QUICC_TESTSUITE_THREADPOOL)
 
 # Export info
 quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}

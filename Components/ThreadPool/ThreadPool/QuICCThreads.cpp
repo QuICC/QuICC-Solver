@@ -6,7 +6,7 @@
 // Project includes
 //
 #include "ThreadPool/QuICCThreads.hpp"
-#include "ThreadPool/ThreadPool.hpp"
+#include "ThreadPool/Utils.hpp"
 
 namespace QuICC {
 

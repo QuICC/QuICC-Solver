@@ -1,6 +1,6 @@
 /**
- * @file ThreadPool.cpp
- * @brief Source of generic thread pool
+ * @file Utils.cpp
+ * @brief Source of thread pool utils
  */
 
 // System includes
@@ -9,7 +9,7 @@
 
 // Project includes
 //
-#include "ThreadPool/ThreadPool.hpp"
+#include "ThreadPool/Utils.hpp"
 
 namespace QuICC {
 
