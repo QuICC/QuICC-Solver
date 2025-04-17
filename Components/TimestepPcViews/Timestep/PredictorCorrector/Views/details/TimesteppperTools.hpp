@@ -35,17 +35,22 @@ template <typename TData> void computeSet(TData& z, const TData& y);
 /**
  * @brief Compute z = y
  */
-template <typename TData> void computeSet(TData& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x);
+template <typename TData> void computeSet(TData& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow);
 
 /**
  * @brief Compute y = x
  */
-template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x);
+template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x, const std::size_t startRow);
 
 /**
  * @brief Compute y = x
  */
-void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const DecoupledZMatrix& x);
+void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const DecoupledZMatrix& x, const std::size_t startRow);
+
+/**
+ * @brief Compute y = x
+ */
+template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x, const std::size_t startRow);
 
 /**
  * @brief Compute z = y
@@ -154,7 +159,7 @@ void computeAXPY(TData& y, const MHDFloat a, const TData& x);
  * @brief Compute y = a*x + y
  */
 template <typename TData>
-void computeAXPY(TData& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x);
+void computeAXPY(TData& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow);
 
 /**
  * @brief Compute y = a*x + y
@@ -165,7 +170,7 @@ void computeAXPY(DecoupledZMatrix& y, const MHDFloat a,
 /**
  * @brief Compute y = a*x + y
  */
-void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x);
+void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow);
 
 /**
  * @brief Compute y = x + a*y
@@ -297,57 +302,65 @@ inline void computeSet(DecoupledZMatrix& y, const DecoupledZMatrix& x)
    y.imag() = x.imag();
 }
 
-template <typename TData> void computeSet(TData& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x)
+template <typename TData> void computeSet(TData& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow)
 {
-   for(std::size_t j = 0;  j < x.dims()[1]; j++)
-   {
-      for(std::size_t i = 0;  i < x.dims()[0]; i++)
-      {
-         y(i,j) = x(i,j);
-      }
-   }
-}
-
-inline void computeSet(DecoupledZMatrix& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x)
-{
-   assert(y.real().cols() == x.dims()[1]);
-   assert(y.imag().cols() == x.dims()[1]);
-   assert(y.real().rows() >= x.dims()[0]);
-   assert(y.imag().rows() >= x.dims()[0]);
+   assert(static_cast<std::size_t>(y.cols()) == x.dims()[1]);
+   assert(static_cast<std::size_t>(y.rows()) >= x.dims()[0] + startRow);
 
    for(std::size_t j = 0;  j < x.dims()[1]; j++)
    {
       for(std::size_t i = 0;  i < x.dims()[0]; i++)
       {
-         y.real()(i,j) = x(i,j).real();
-         y.imag()(i,j) = x(i,j).imag();
+         y(i + startRow,j) = x(i,j);
       }
    }
 }
 
-template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x)
+inline void computeSet(DecoupledZMatrix& y, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow)
 {
-   for(std::size_t j = 0;  j < y.dims()[1]; j++)
+   assert(static_cast<std::size_t>(y.real().cols()) == x.dims()[1]);
+   assert(static_cast<std::size_t>(y.imag().cols()) == x.dims()[1]);
+   assert(static_cast<std::size_t>(y.real().rows()) >= x.dims()[0] + startRow);
+   assert(static_cast<std::size_t>(y.imag().rows()) >= x.dims()[0] + startRow);
+
+   for(std::size_t j = 0;  j < x.dims()[1]; j++)
    {
-      for(std::size_t i = 0;  i < y.dims()[0]; i++)
+      for(std::size_t i = 0;  i < x.dims()[0]; i++)
       {
-         y(i,j) = x(i,j);
+         std::size_t i_ = i + startRow;
+         y.real()(i_,j) = x(i,j).real();
+         y.imag()(i_,j) = x(i,j).imag();
       }
    }
 }
 
-inline void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const DecoupledZMatrix& x)
+template <typename TData> void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const TData& x, const std::size_t startRow)
 {
-   assert(x.real().cols() == y.dims()[1]);
-   assert(x.imag().cols() == y.dims()[1]);
-   assert(x.real().rows() >= y.dims()[0]);
-   assert(x.imag().rows() >= y.dims()[0]);
+   assert(static_cast<std::size_t>(x.cols()) == y.dims()[1]);
+   assert(static_cast<std::size_t>(x.rows()) >= y.dims()[0] + startRow);
 
    for(std::size_t j = 0;  j < y.dims()[1]; j++)
    {
       for(std::size_t i = 0;  i < y.dims()[0]; i++)
       {
-         y(i,j) = MHDComplex(x.real()(i,j), x.imag()(i,j));
+         y(i,j) = x(i + startRow,j);
+      }
+   }
+}
+
+inline void computeSet(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& y, const DecoupledZMatrix& x, const std::size_t startRow)
+{
+   assert(static_cast<std::size_t>(x.real().cols()) == y.dims()[1]);
+   assert(static_cast<std::size_t>(x.imag().cols()) == y.dims()[1]);
+   assert(static_cast<std::size_t>(x.real().rows()) >= y.dims()[0] + startRow);
+   assert(static_cast<std::size_t>(x.imag().rows()) >= y.dims()[0]  + startRow);
+
+   for(std::size_t j = 0;  j < y.dims()[1]; j++)
+   {
+      for(std::size_t i = 0;  i < y.dims()[0]; i++)
+      {
+         std::size_t i_ = i + startRow;
+         y(i,j) = MHDComplex(x.real()(i_,j), x.imag()(i_,j));
       }
    }
 }
@@ -387,8 +400,11 @@ inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a,
 }
 
 template <typename TData>
-void computeAXPY(TData& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x)
+void computeAXPY(TData& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow)
 {
+   assert(static_cast<std::size_t>(y.cols()) == x.dims()[1]);
+   assert(static_cast<std::size_t>(y.rows()) >= x.dims()[0] + startRow);
+
    if(a != 0)
    {
       if(a == 1.0)
@@ -397,7 +413,7 @@ void computeAXPY(TData& y, const MHDFloat a, const View::View<MHDComplex, View::
          {
             for(std::size_t i = 0;  i < x.dims()[0]; i++)
             {
-               y(i,j) += x(i,j);
+               y(i+startRow,j) += x(i,j);
             }
          }
       }
@@ -407,15 +423,20 @@ void computeAXPY(TData& y, const MHDFloat a, const View::View<MHDComplex, View::
          {
             for(std::size_t i = 0;  i < x.dims()[0]; i++)
             {
-               y(i,j) += a*x(i,j);
+               y(i+startRow,j) += a*x(i,j);
             }
          }
       }
    }
 }
 
-inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x)
+inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& x, const std::size_t startRow)
 {
+   assert(static_cast<std::size_t>(y.real().cols()) == x.dims()[1]);
+   assert(static_cast<std::size_t>(y.imag().cols()) == x.dims()[1]);
+   assert(static_cast<std::size_t>(y.real().rows()) >= x.dims()[0] + startRow);
+   assert(static_cast<std::size_t>(y.imag().rows()) >= x.dims()[0] + startRow);
+
    if(a != 0)
    {
       if(a == 1.0)
@@ -424,8 +445,9 @@ inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<
          {
             for(std::size_t i = 0;  i < x.dims()[0]; i++)
             {
-               y.real()(i,j) += x(i,j).real();
-               y.imag()(i,j) += x(i,j).imag();
+               std::size_t i_ = i + startRow;
+               y.real()(i_,j) += x(i,j).real();
+               y.imag()(i_,j) += x(i,j).imag();
             }
          }
       }
@@ -435,8 +457,9 @@ inline void computeAXPY(DecoupledZMatrix& y, const MHDFloat a, const View::View<
          {
             for(std::size_t i = 0;  i < x.dims()[0]; i++)
             {
-               y.real()(i,j) += a*x(i,j).real();
-               y.imag()(i,j) += a*x(i,j).imag();
+               std::size_t i_ = i + startRow;
+               y.real()(i_,j) += a*x(i,j).real();
+               y.imag()(i_,j) += a*x(i,j).imag();
             }
          }
       }

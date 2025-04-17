@@ -421,27 +421,21 @@ bool ImExPCTimestepper<TOperator, TData, TImpl>::postSolve()
 template <typename TOperator, typename TData, typename TImpl>
 void ImExPCTimestepper<TOperator, TData, TImpl>::setSolution(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t startRow)
 {
-   assert(startRow == 0);
-
    details::computeSet(this->reg(Register::Solution::id()),
-         sol);
+         sol, startRow);
 }
 
 template <typename TOperator, typename TData, typename TImpl>
 void ImExPCTimestepper<TOperator, TData, TImpl>::addRhs(const View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& rhs, const std::size_t startRow)
 {
-   assert(startRow == 0);
-
    details::computeAXPY(this->reg(Register::Rhs::id()), 1.0,
-         rhs);
+         rhs, startRow);
 }
 
 template <typename TOperator, typename TData, typename TImpl>
 void ImExPCTimestepper<TOperator, TData, TImpl>::getSolution(View::View<MHDComplex, View::Attributes<View::DimLevelType<View::dense_t, View::dense_t>>>& sol, const std::size_t startRow)
 {
-   assert(startRow == 0);
-
-   details::computeSet(sol, this->reg(Register::Solution::id()));
+   details::computeSet(sol, this->reg(Register::Solution::id()), startRow);
 }
 
 } // namespace Views

@@ -289,7 +289,7 @@ namespace Views {
          // Add start indexes
          auto& stepData = steppers.at(info.solverIndex);
          auto& startRow = std::get<1>(stepData);
-         for(std::size_t i = 0; i < info.fieldIndex + 1 -startRow.size(); i++)
+         for(std::size_t i = startRow.size(); i < info.fieldIndex + 1; i++)
          {
             startRow.push_back(0);
          }

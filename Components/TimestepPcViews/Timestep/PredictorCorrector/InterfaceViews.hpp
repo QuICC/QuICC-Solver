@@ -253,7 +253,7 @@ void InterfaceViews<TScheme>::translate(std::vector<Views::TimestepperInfo>& inf
             const auto& cinfo = eqIt->couplingInfo(myId.second);
             if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
             {
-               DebuggerMacro_msg("Creating solver for " + PhysicalNames::Coordinator::tag(eqIt->name()) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(compIt)) + ")", 2);
+               DebuggerMacro_msg("Creating timesteppers for " + PhysicalNames::Coordinator::tag(eqIt->name()) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(compIt)) + ")", 2);
 
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
@@ -330,7 +330,7 @@ void InterfaceViews<TScheme>::initSolution(const ScalarEquation_range& scalEq, c
                      using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                      std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
                      View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
-                     Views::details::computeSet(tmpView, tmp);
+                     Views::details::computeSet(tmpView, tmp, 0);
 
                      this->mSolverCoord.updateSolution(info, tmpView);
                   }
@@ -368,7 +368,7 @@ void InterfaceViews<TScheme>::getExplicitInput(const std::size_t opId,
 
             if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
             {
-               DebuggerMacro_msg("Get explicit solver input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
+               DebuggerMacro_msg("Get explicit timestepper input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
                // Build range of operator
                auto r = make_range(cinfo.explicitRange(opId));
@@ -387,7 +387,7 @@ void InterfaceViews<TScheme>::getExplicitInput(const std::size_t opId,
                   {
                      auto info = createInfo(cinfo, i);
 
-                     // Copy field values into solver input
+                     // Copy field values into timestepper input
                      DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                      tmp.setZero();
 
@@ -420,7 +420,7 @@ void InterfaceViews<TScheme>::getExplicitInput(const std::size_t opId,
                      using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                      std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
                      View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
-                     Views::details::computeSet(tmpView, tmp);
+                     Views::details::computeSet(tmpView, tmp, 0);
 
                      this->mSolverCoord.updateRhs(info, tmpView);
                   }
@@ -459,14 +459,14 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
 
             if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
             {
-               DebuggerMacro_msg("Get solver input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
+               DebuggerMacro_msg("Get timestepper input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
                // Get timestep input
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
                   auto info = createInfo(cinfo, i);
 
-                  // Copy field values into solver input
+                  // Copy field values into timestepper input
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   tmp.setZero();
                   Equations::copyNonlinear(*eqIt, myId.second, tmp, i, 0);
@@ -484,7 +484,7 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
                   using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                   std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
                   View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
-                  Views::details::computeSet(tmpView, tmp);
+                  Views::details::computeSet(tmpView, tmp, 0);
 
                   this->mSolverCoord.updateRhs(info, tmpView);
 
@@ -532,7 +532,7 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
 
             if(eqIt->solveTiming() == SolveTiming::Prognostic::id())
             {
-               DebuggerMacro_msg("Get solver solution for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
+               DebuggerMacro_msg("Get timestepper solution for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
                // return zero 
                for(std::size_t i = 0; i < static_cast<std::size_t>(cinfo.fieldStart()); i++)
@@ -556,7 +556,7 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                   this->mSolverCoord.getSolution(tmpView, info);
 
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                  Views::details::computeSet(tmp, tmpView);
+                  Views::details::computeSet(tmp, tmpView, 0);
 
                   eqIt->storeSolution(myId.second, tmp, i, 0);
                }
@@ -564,7 +564,7 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                // Apply constraint on solution
                auto changedSolution = eqIt->applyConstraint(myId.second, SolveTiming::After::id());
 
-               // Update solver solution if constraint modified it
+               // Update timestepper solver solution if constraint modified it
                if(changedSolution)
                {
                   for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
@@ -586,7 +586,7 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                      using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
                      std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
                      View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
-                     Views::details::computeSet(tmpView, tmp);
+                     Views::details::computeSet(tmpView, tmp, 0);
 
                      this->mSolverCoord.updateSolution(info, tmpView);
                   }
