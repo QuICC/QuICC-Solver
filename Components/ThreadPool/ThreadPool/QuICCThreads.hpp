@@ -11,8 +11,6 @@
 
 // Project includes
 //
-#include <memory>
-
 #include "ThreadPool/ThreadPool.hpp"
 
 namespace QuICC {

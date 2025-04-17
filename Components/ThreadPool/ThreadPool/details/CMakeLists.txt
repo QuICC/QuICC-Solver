@@ -1,7 +1,3 @@
 target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY}
-  Utils.cpp
-  ThreadPoolBoost.cpp
-  QuICCThreads.cpp
+  Affinity.cpp
   )
-
-add_subdirectory(details)
