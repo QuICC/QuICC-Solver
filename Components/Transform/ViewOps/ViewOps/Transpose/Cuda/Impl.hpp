@@ -12,8 +12,10 @@
 // Project includes
 //
 #include "Cuda/CudaUtil.hpp"
+#include "Operator/Unary.hpp"
 #include "Profiler/Interface.hpp"
 #include "View/View.hpp"
+#include "ViewOps/Transpose/Tags.hpp"
 
 #define QUICC_MAX_TH_NAIVE 2048
 
