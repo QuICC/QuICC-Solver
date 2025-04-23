@@ -46,8 +46,8 @@ TEST_CASE("Serial DCCSC3D to DCCSC3DJIK 210", "SerialDCCSC3DtoDCCSC3DJIK210")
    ViewBase<std::uint32_t> indicesDev[rank];
 
    // set device views
-   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(),
-      dimensionsIn.data(), pointersDev, indicesDev);
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(),
+      pointersDev, indicesDev);
    VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersDev, indicesDev);
 
@@ -58,9 +58,8 @@ TEST_CASE("Serial DCCSC3D to DCCSC3DJIK 210", "SerialDCCSC3DtoDCCSC3DJIK210")
    // Transpose op
    using namespace QuICC::Transpose::Cuda;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>,
-         p201_t>>();
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>();
    // Pack views
    std::vector<VoutTy> viewsOutDev = {viewOutDev};
    std::vector<VinTy> viewsInDev = {viewInDev};
@@ -130,8 +129,8 @@ TEST_CASE("Serial DCCSC3DJIK to DCCSC3D 120", "SerialDCCSC3DJIKtoDCCSC3D120")
    ViewBase<std::uint32_t> indicesDev[rank];
 
    // set device views
-   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(),
-      dimensionsIn.data(), pointersDev, indicesDev);
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(),
+      pointersDev, indicesDev);
    VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersDev, indicesDev);
 
@@ -142,9 +141,8 @@ TEST_CASE("Serial DCCSC3DJIK to DCCSC3D 120", "SerialDCCSC3DJIKtoDCCSC3D120")
    // Transpose op
    using namespace QuICC::Transpose::Cuda;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>,
-         p120_t>>();
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>();
    // Pack views
    std::vector<VoutTy> viewsOutDev = {viewOutDev};
    std::vector<VinTy> viewsInDev = {viewInDev};
@@ -222,7 +220,7 @@ TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 201",
 
    using VinTy = View<double, S1CLCSC3DJIK>;
    using VoutTy = View<double, DCCSC3DJIK>;
-   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);   
+   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
    VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
 
    // device mem
@@ -235,8 +233,8 @@ TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 201",
    ViewBase<std::uint32_t> indicesDev[rank];
 
    // set device views
-   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(),
-      dimensionsIn.data(), pointersDev, indicesDev);
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(),
+      pointersDev, indicesDev);
    VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersDev, indicesDev);
 
@@ -247,10 +245,9 @@ TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 201",
    // Transpose op
    using namespace QuICC::Transpose::Cuda;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>,
-         p201_t>>();
-   // Pack views  
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>();
+   // Pack views
    std::vector<VoutTy> viewsOutDev = {viewOutDev};
    std::vector<VinTy> viewsInDev = {viewInDev};
    // Apply transpose
@@ -332,8 +329,8 @@ TEST_CASE("Serial DCCSC3DJIK to S1CLCSC3DJIK 120",
    ViewBase<std::uint32_t> indicesDev[rank];
 
    // set device views
-   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(),
-      dimensionsIn.data(), pointersDev, indicesDev);
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(),
+      pointersDev, indicesDev);
    VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersDev, indicesDev);
 
@@ -345,9 +342,8 @@ TEST_CASE("Serial DCCSC3DJIK to S1CLCSC3DJIK 120",
    using namespace QuICC::Transpose::Cuda;
    using namespace QuICC::Transpose;
 
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>,
-         p120_t>>();
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>();
    // Pack views
    std::vector<VoutTy> viewsOutDev = {viewOutDev};
    std::vector<VinTy> viewsInDev = {viewInDev};

@@ -30,7 +30,8 @@ template <class TDATA, int SIZE>
 void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
    const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
-   const View::ViewBase<int> sendBufferDisplsView, const std::int64_t groupSize);
+   const View::ViewBase<int> sendBufferDisplsView,
+   const std::int64_t groupSize);
 
 /// @brief Unpack data from buffer, grouped version
 /// @tparam TDATA
@@ -44,7 +45,8 @@ template <class TDATA, int SIZE>
 void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
    const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
-   const View::ViewBase<int> recvBufferDisplsView, const std::int64_t groupSize);
+   const View::ViewBase<int> recvBufferDisplsView,
+   const std::int64_t groupSize);
 
 
 } // namespace Cuda

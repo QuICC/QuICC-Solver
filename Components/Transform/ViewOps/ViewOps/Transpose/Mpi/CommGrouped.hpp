@@ -59,7 +59,8 @@ public:
    /// @param out
    /// @param in
    template <int SIZE>
-   void exchange(structArray<TDATA*, SIZE>& out, structArray<const TDATA*, SIZE>& in) const;
+   void exchange(structArray<TDATA*, SIZE>& out,
+      structArray<const TDATA*, SIZE>& in) const;
 
    /// @brief check if the comm was setup
    /// @return
@@ -111,7 +112,7 @@ private:
    /// @brief Max Number of variables to communicate
    std::int64_t _maxGroupSize;
 
-   #ifdef QUICC_HAS_CUDA_BACKEND
+#ifdef QUICC_HAS_CUDA_BACKEND
    /// @brief Send buffer displacement for device side packing
    Memory::MemBlock<int> _sendBufferDisplsDevice;
    /// @brief Recv buffer displacement for device side packing
@@ -122,7 +123,7 @@ private:
    /// @brief Entry j specifies the number of elements to receive from rank j.
    /// Needed for device side packing
    Memory::MemBlock<int> _recvCountsDevice;
-   #endif
+#endif
 
    /// @brief All world communicator
    MPI_Comm _comm;
@@ -186,7 +187,8 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
 
    // Move temporarly to host
    using namespace QuICC::Memory;
-   tempOnHostMemorySpace converterS(_sendDisplsViewLin, TransferMode::write | TransferMode::block);
+   tempOnHostMemorySpace converterS(_sendDisplsViewLin,
+      TransferMode::write | TransferMode::block);
    tempOnHostMemorySpace converterR(_recvDisplsViewLin, TransferMode::write);
 
 
@@ -237,7 +239,7 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
    _recvBufferView =
       View::ViewBase<TDATA>(_recvBuffer.data(), _recvBuffer.size());
 
-   #ifndef QUICC_HAS_CUDA_BACKEND
+#ifndef QUICC_HAS_CUDA_BACKEND
    // Buffer offsets
    _sendBufferDisplsView =
       View::ViewBase<int>(_sendBufferDispls.data(), _sendBufferDispls.size());
@@ -249,21 +251,23 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
       View::ViewBase<int>(_sendCounts.data(), _sendCounts.size());
    _recvCountsView =
       View::ViewBase<int>(_recvCounts.data(), _recvCounts.size());
-   #else
+#else
    // Buffer offsets
-   _sendBufferDisplsDevice = std::move(
-      Memory::MemBlock<int>(_sendBufferDispls.size(), _mem.get()));
-   _recvBufferDisplsDevice = std::move(
-      Memory::MemBlock<int>(_recvBufferDispls.size(), _mem.get()));
-   _sendBufferDisplsView =
-      View::ViewBase<int>(_sendBufferDisplsDevice.data(), _sendBufferDisplsDevice.size());
-   _recvBufferDisplsView =
-      View::ViewBase<int>(_recvBufferDisplsDevice.data(), _recvBufferDisplsDevice.size());
+   _sendBufferDisplsDevice =
+      std::move(Memory::MemBlock<int>(_sendBufferDispls.size(), _mem.get()));
+   _recvBufferDisplsDevice =
+      std::move(Memory::MemBlock<int>(_recvBufferDispls.size(), _mem.get()));
+   _sendBufferDisplsView = View::ViewBase<int>(_sendBufferDisplsDevice.data(),
+      _sendBufferDisplsDevice.size());
+   _recvBufferDisplsView = View::ViewBase<int>(_recvBufferDisplsDevice.data(),
+      _recvBufferDisplsDevice.size());
    // Copy to device
-   cudaErrChk(cudaMemcpy(_sendBufferDisplsDevice.data(), _sendBufferDispls.data(),
-      _sendBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
-   cudaErrChk(cudaMemcpy(_recvBufferDisplsDevice.data(), _recvBufferDispls.data(),
-      _recvBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
+   cudaErrChk(
+      cudaMemcpy(_sendBufferDisplsDevice.data(), _sendBufferDispls.data(),
+         _sendBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
+   cudaErrChk(
+      cudaMemcpy(_recvBufferDisplsDevice.data(), _recvBufferDispls.data(),
+         _recvBufferDispls.size() * sizeof(int), cudaMemcpyHostToDevice));
 
    // Send/recv Counts
    _sendCountsDevice =
@@ -279,7 +283,7 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
       _sendCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
    cudaErrChk(cudaMemcpy(_recvCountsDevice.data(), _recvCounts.data(),
       _recvCounts.size() * sizeof(int), cudaMemcpyHostToDevice));
-   #endif
+#endif
 
    //
    // End Buffers
@@ -290,7 +294,8 @@ void CommGrouped<TDATA, TAG>::setComm(const std::vector<point_t>& cooNew,
 
 template <class TDATA, class TAG>
 template <int SIZE>
-void CommGrouped<TDATA, TAG>::exchange(structArray<TDATA*, SIZE>& out, structArray<const TDATA*, SIZE>& in) const
+void CommGrouped<TDATA, TAG>::exchange(structArray<TDATA*, SIZE>& out,
+   structArray<const TDATA*, SIZE>& in) const
 {
    if (_subComm != MPI_COMM_NULL)
    {

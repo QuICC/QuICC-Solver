@@ -338,8 +338,8 @@ TEST_CASE("Comm mpi alltoallv", "[CommMpiAlltoallv]")
 
    // Comm
    using namespace QuICC::Transpose;
-   structArray<const int*, 1> sendBufStruct {sendBuf.data()};
-   structArray<int*, 1> recvBufStruct {recvBuf.data()};
+   structArray<const int*, 1> sendBufStruct{sendBuf.data()};
+   structArray<int*, 1> recvBufStruct{recvBuf.data()};
    comm.exchange(recvBufStruct, sendBufStruct);
 
    // Check
@@ -411,8 +411,8 @@ TEST_CASE("Comm mpi sendrecv", "[CommMpiSendrecv]")
 
    // Comm
    using namespace QuICC::Transpose;
-   structArray<const int*, 1> sendBufStruct {sendBuf.data()};
-   structArray<int*, 1> recvBufStruct {recvBuf.data()};
+   structArray<const int*, 1> sendBufStruct{sendBuf.data()};
+   structArray<int*, 1> recvBufStruct{recvBuf.data()};
    comm.exchange(recvBufStruct, sendBufStruct);
 
    // Check

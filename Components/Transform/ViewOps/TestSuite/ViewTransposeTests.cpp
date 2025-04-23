@@ -45,8 +45,8 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 201", "SerialDCCSC3DtoDCCSC3D201")
    // Transpose op
    using namespace QuICC::Transpose::Cpu;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-   std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>();
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>();
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
@@ -104,8 +104,8 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 120", "SerialDCCSC3DtoDCCSC3D120")
    // Transpose op
    using namespace QuICC::Transpose::Cpu;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>();
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>();
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
@@ -178,8 +178,8 @@ TEST_CASE("Serial S1CLCSC3D to DCCSC3D 201", "SerialS1CLCSC3DtoDCCSC3D201")
    // Transpose op
    using namespace QuICC::Transpose::Cpu;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>();
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>();
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
@@ -246,9 +246,9 @@ TEST_CASE("Serial DCCSC3D to S1CLCSC3D 120", "SerialDCCSC3DtoS1CLCSC3D120")
    // Transpose op
    using namespace QuICC::Transpose::Cpu;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>();
-   // Pack views  
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>();
+   // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
    // Apply transpose

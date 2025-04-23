@@ -9,11 +9,11 @@
 
 // Project includes
 //
-#include "ViewOps/Transpose/Cuda/Packing.hpp"
-#include "View/View.hpp"
 #include "Cuda/CudaUtil.hpp"
+#include "View/View.hpp"
+#include "ViewOps/Transpose/Cuda/Packing.hpp"
 
-# define QUICC_MAX_PACK_THREADS 512
+#define QUICC_MAX_PACK_THREADS 512
 namespace QuICC {
 /// @brief namespace for Transpose type operations
 namespace Transpose {
@@ -21,14 +21,12 @@ namespace Transpose {
 namespace Cuda {
 
 /// @brief namespace for packing and unpacking details
-namespace details
-{
-template<class TDATA, int SIZE>
-__global__ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
-   const View::ViewBase<int> sendCountsView,
+namespace details {
+template <class TDATA, int SIZE>
+__global__ void pack(View::ViewBase<TDATA> buffer,
+   structArray<const TDATA*, SIZE> in, const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
-   const View::ViewBase<int> sendBufferDisplsView,
-   const std::int64_t groupSize)
+   const View::ViewBase<int> sendBufferDisplsView, const std::int64_t groupSize)
 {
    const auto I = sendDisplsView.dims()[0];
    const auto J = sendDisplsView.dims()[1];
@@ -50,7 +48,6 @@ __global__ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZ
          }
       }
    }
-
 }
 
 } // namespace details
@@ -79,22 +76,20 @@ void pack(View::ViewBase<TDATA> buffer, structArray<const TDATA*, SIZE> in,
 
    assert(blockSize.x * blockSize.y <= QUICC_MAX_PACK_THREADS);
    __launch_bounds__(QUICC_MAX_PACK_THREADS);
-   details::pack<TDATA>
-      <<<numBlocks, blockSize>>>(buffer, in, sendCountsView, sendDisplsView, sendBufferDisplsView, groupSize);
+   details::pack<TDATA><<<numBlocks, blockSize>>>(buffer, in, sendCountsView,
+      sendDisplsView, sendBufferDisplsView, groupSize);
 
    cudaErrChk(cudaGetLastError());
    cudaErrChk(cudaDeviceSynchronize());
 }
 
 
-namespace details
-{
-template<class TDATA, int SIZE>
-__global__ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
-   const View::ViewBase<int> recvCountsView,
+namespace details {
+template <class TDATA, int SIZE>
+__global__ void unPack(structArray<TDATA*, SIZE> out,
+   const View::ViewBase<TDATA> buffer, const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
-   const View::ViewBase<int> recvBufferDisplsView,
-   const std::int64_t groupSize)
+   const View::ViewBase<int> recvBufferDisplsView, const std::int64_t groupSize)
 {
 
    const auto I = recvDisplsView.dims()[0];
@@ -109,7 +104,7 @@ __global__ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA
       int recvCount = recvCountsView[i] / groupSize;
       if (j < recvCount)
       {
-         for(int g = 0; g < groupSize; ++g)
+         for (int g = 0; g < groupSize; ++g)
          {
             int recvCount = recvCountsView[i] / groupSize;
             *(out[g] + recvDisplsView[i * J + j]) =
@@ -145,8 +140,8 @@ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
 
    assert(blockSize.x * blockSize.y <= QUICC_MAX_PACK_THREADS);
    __launch_bounds__(QUICC_MAX_PACK_THREADS);
-   details::unPack<TDATA>
-      <<<numBlocks, blockSize>>>(out, buffer, recvCountsView, recvDisplsView, recvBufferDisplsView, groupSize);
+   details::unPack<TDATA><<<numBlocks, blockSize>>>(out, buffer, recvCountsView,
+      recvDisplsView, recvBufferDisplsView, groupSize);
 
    cudaErrChk(cudaGetLastError());
    cudaErrChk(cudaDeviceSynchronize());
@@ -154,96 +149,78 @@ void unPack(structArray<TDATA*, SIZE> out, const View::ViewBase<TDATA> buffer,
 
 // Explicit instantiations
 // >>>>
-template
-void pack(View::ViewBase<int> buffer,
-   structArray<const int*, 1> in,
+template void pack(View::ViewBase<int> buffer, structArray<const int*, 1> in,
    const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void pack(View::ViewBase<double> buffer,
-   structArray<const double*, 1> in,
-   const View::ViewBase<int> sendCountsView,
+template void pack(View::ViewBase<double> buffer,
+   structArray<const double*, 1> in, const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void pack(View::ViewBase<std::complex<double>> buffer,
+template void pack(View::ViewBase<std::complex<double>> buffer,
    structArray<const std::complex<double>*, 1> in,
    const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void unPack(structArray<int*, 1> out,
-   const View::ViewBase<int> buffer,
+template void unPack(structArray<int*, 1> out, const View::ViewBase<int> buffer,
    const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void unPack(structArray<double*, 1> out,
+template void unPack(structArray<double*, 1> out,
    const View::ViewBase<double> buffer,
    const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void unPack(structArray<std::complex<double>*, 1> out,
+template void unPack(structArray<std::complex<double>*, 1> out,
    const View::ViewBase<std::complex<double>> buffer,
    const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void pack(View::ViewBase<int> buffer,
-   structArray<const int*, 16> in,
+template void pack(View::ViewBase<int> buffer, structArray<const int*, 16> in,
    const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void pack(View::ViewBase<double> buffer,
-   structArray<const double*, 16> in,
-   const View::ViewBase<int> sendCountsView,
+template void pack(View::ViewBase<double> buffer,
+   structArray<const double*, 16> in, const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void pack(View::ViewBase<std::complex<double>> buffer,
+template void pack(View::ViewBase<std::complex<double>> buffer,
    structArray<const std::complex<double>*, 16> in,
    const View::ViewBase<int> sendCountsView,
    const View::View<int, View::dense2DRM> sendDisplsView,
    const View::ViewBase<int> sendBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void unPack(structArray<int*, 16> out,
-   const View::ViewBase<int> buffer,
-   const View::ViewBase<int> recvCountsView,
+template void unPack(structArray<int*, 16> out,
+   const View::ViewBase<int> buffer, const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void unPack(structArray<double*, 16> out,
+template void unPack(structArray<double*, 16> out,
    const View::ViewBase<double> buffer,
    const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,
    const View::ViewBase<int> recvBufferDisplsView,
    const std::int64_t groupSize);
 
-template
-void unPack(structArray<std::complex<double>*, 16> out,
+template void unPack(structArray<std::complex<double>*, 16> out,
    const View::ViewBase<std::complex<double>> buffer,
    const View::ViewBase<int> recvCountsView,
    const View::View<int, View::dense2DRM> recvDisplsView,

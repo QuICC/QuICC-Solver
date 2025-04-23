@@ -99,10 +99,9 @@ template <class T> __device__ void pSum(T* vec, std::size_t size)
 }
 
 template <class Tout, class Tin, class Perm>
-__global__ void
-__launch_bounds__(QUICC_MAX_TH_NAIVE)
-perm(View::View<Tout, View::DCCSC3DJIK> out,
-   const View::View<Tin, View::S1CLCSC3DJIK> in)
+__global__ void __launch_bounds__(QUICC_MAX_TH_NAIVE)
+   perm(View::View<Tout, View::DCCSC3DJIK> out,
+      const View::View<Tin, View::S1CLCSC3DJIK> in)
 {
    static_assert(std::is_same_v<Perm, p201_t>,
       "Not implemented for other types");
@@ -169,10 +168,9 @@ perm(View::View<Tout, View::DCCSC3DJIK> out,
 }
 
 template <class Tout, class Tin, class Perm>
-__global__ void
-__launch_bounds__(QUICC_MAX_TH_NAIVE)
-perm(View::View<Tout, View::S1CLCSC3DJIK> out,
-   const View::View<Tin, View::DCCSC3DJIK> in)
+__global__ void __launch_bounds__(QUICC_MAX_TH_NAIVE)
+   perm(View::View<Tout, View::S1CLCSC3DJIK> out,
+      const View::View<Tin, View::DCCSC3DJIK> in)
 {
    static_assert(std::is_same_v<Perm, p120_t>,
       "Not implemented for other types");
@@ -281,67 +279,63 @@ void implPerm120(View::View<Tout, View::S1CLCSC3DJIK>& out,
    const View::View<Tin, View::DCCSC3DJIK>& in);
 
 
-
 template <class Tout, class Tin>
 void implPerm201(View::View<Tout, View::DCCSC3DJIK>& out,
    const View::View<Tin, View::DCCSC3D>& in)
 {
-      // dense transpose
-      assert(out.size() <= in.size()); // input might be padded
-      assert(out.size() == out.dims()[0] * out.dims()[1] * out.dims()[2]);
+   // dense transpose
+   assert(out.size() <= in.size()); // input might be padded
+   assert(out.size() == out.dims()[0] * out.dims()[1] * out.dims()[2]);
 
-      const auto I = in.dims()[0];
-      const auto J = in.dims()[1];
-      const auto K = in.dims()[2];
+   const auto I = in.dims()[0];
+   const auto J = in.dims()[1];
+   const auto K = in.dims()[2];
 
-      // setup grid
-      dim3 blockSize;
-      dim3 numBlocks;
+   // setup grid
+   dim3 blockSize;
+   dim3 numBlocks;
 
-      blockSize.x = 32;
-      blockSize.y = 32;
-      blockSize.z = 1;
-      numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
-      numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
-      numBlocks.z = 1;
+   blockSize.x = 32;
+   blockSize.y = 32;
+   blockSize.z = 1;
+   numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
+   numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
+   numBlocks.z = 1;
 
-      details::perm<Tout, Tin, p201_t>
-         <<<numBlocks, blockSize>>>(out, in);
-      cudaErrChk(cudaPeekAtLastError());
-      cudaErrChk(cudaDeviceSynchronize());
+   details::perm<Tout, Tin, p201_t><<<numBlocks, blockSize>>>(out, in);
+   cudaErrChk(cudaPeekAtLastError());
+   cudaErrChk(cudaDeviceSynchronize());
 }
 
 template <class Tout, class Tin>
 void implPerm120(View::View<Tout, View::DCCSC3D>& out,
    const View::View<Tin, View::DCCSC3DJIK>& in)
 {
-      // dense transpose
-      assert(out.size() >= in.size()); // output might be padded
-      assert(out.size() == out.lds() * out.dims()[1] * out.dims()[2]);
-      // perm = [1, 2, 0]
-      assert(in.dims()[0] == out.dims()[1]);
-      assert(in.dims()[1] == out.dims()[2]);
-      assert(in.dims()[2] == out.dims()[0]);
-      const auto I = in.dims()[0];
-      const auto J = in.dims()[1];
-      const auto K = in.dims()[2];
+   // dense transpose
+   assert(out.size() >= in.size()); // output might be padded
+   assert(out.size() == out.lds() * out.dims()[1] * out.dims()[2]);
+   // perm = [1, 2, 0]
+   assert(in.dims()[0] == out.dims()[1]);
+   assert(in.dims()[1] == out.dims()[2]);
+   assert(in.dims()[2] == out.dims()[0]);
+   const auto I = in.dims()[0];
+   const auto J = in.dims()[1];
+   const auto K = in.dims()[2];
 
-      // setup grid
-      dim3 blockSize;
-      dim3 numBlocks;
+   // setup grid
+   dim3 blockSize;
+   dim3 numBlocks;
 
-      blockSize.x = 32;
-      blockSize.y = 32;
-      blockSize.z = 1;
-      numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
-      numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
-      numBlocks.z = 1;
+   blockSize.x = 32;
+   blockSize.y = 32;
+   blockSize.z = 1;
+   numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
+   numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
+   numBlocks.z = 1;
 
-      details::perm<Tout, Tin, p120_t>
-         <<<numBlocks, blockSize>>>(out, in);
-      cudaErrChk(cudaPeekAtLastError());
-      cudaErrChk(cudaDeviceSynchronize());
-
+   details::perm<Tout, Tin, p120_t><<<numBlocks, blockSize>>>(out, in);
+   cudaErrChk(cudaPeekAtLastError());
+   cudaErrChk(cudaDeviceSynchronize());
 }
 
 template <class Tout, class Tin>
@@ -349,56 +343,54 @@ void implPerm201(View::View<Tout, View::DCCSC3DJIK>& out,
    const View::View<Tin, View::S1CLCSC3DJIK>& in)
 
 {
-      // dense transpose
-      assert(out.size() == in.size());
-      const auto I = in.dims()[0];
-      const auto J = in.dims()[1];
-      const auto K = in.dims()[2];
+   // dense transpose
+   assert(out.size() == in.size());
+   const auto I = in.dims()[0];
+   const auto J = in.dims()[1];
+   const auto K = in.dims()[2];
 
-      // setup grid
-      dim3 blockSize;
-      dim3 numBlocks;
+   // setup grid
+   dim3 blockSize;
+   dim3 numBlocks;
 
-      blockSize.x = 32;
-      blockSize.y = 32;
-      blockSize.z = 1;
-      numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
-      numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
-      numBlocks.z = 1;
+   blockSize.x = 32;
+   blockSize.y = 32;
+   blockSize.z = 1;
+   numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
+   numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
+   numBlocks.z = 1;
 
-      details::perm<Tout, Tin, p201_t>
-         <<<numBlocks, blockSize, sizeof(std::uint32_t) * (2 * I + K)>>>(out,
-            in);
-      cudaErrChk(cudaPeekAtLastError());
-      cudaErrChk(cudaDeviceSynchronize());
+   details::perm<Tout, Tin, p201_t>
+      <<<numBlocks, blockSize, sizeof(std::uint32_t) * (2 * I + K)>>>(out, in);
+   cudaErrChk(cudaPeekAtLastError());
+   cudaErrChk(cudaDeviceSynchronize());
 }
 
 template <class Tout, class Tin>
 void implPerm120(View::View<Tout, View::S1CLCSC3DJIK>& out,
    const View::View<Tin, View::DCCSC3DJIK>& in)
 {
-      // dense transpose
-      assert(out.size() == in.size());
-      const auto I = out.dims()[0];
-      const auto J = out.dims()[1];
-      const auto K = out.dims()[2];
+   // dense transpose
+   assert(out.size() == in.size());
+   const auto I = out.dims()[0];
+   const auto J = out.dims()[1];
+   const auto K = out.dims()[2];
 
-      // setup grid
-      dim3 blockSize;
-      dim3 numBlocks;
+   // setup grid
+   dim3 blockSize;
+   dim3 numBlocks;
 
-      blockSize.x = 32;
-      blockSize.y = 32;
-      blockSize.z = 1;
-      numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
-      numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
-      numBlocks.z = 1;
+   blockSize.x = 32;
+   blockSize.y = 32;
+   blockSize.z = 1;
+   numBlocks.x = (I + blockSize.x - 1) / blockSize.x;
+   numBlocks.y = (J + blockSize.y - 1) / blockSize.y;
+   numBlocks.z = 1;
 
-      details::perm<Tout, Tin, p120_t>
-         <<<numBlocks, blockSize, sizeof(std::uint32_t) * (2 * I + K)>>>(out,
-            in);
-      cudaErrChk(cudaPeekAtLastError());
-      cudaErrChk(cudaDeviceSynchronize());
+   details::perm<Tout, Tin, p120_t>
+      <<<numBlocks, blockSize, sizeof(std::uint32_t) * (2 * I + K)>>>(out, in);
+   cudaErrChk(cudaPeekAtLastError());
+   cudaErrChk(cudaDeviceSynchronize());
 }
 
 } // namespace details

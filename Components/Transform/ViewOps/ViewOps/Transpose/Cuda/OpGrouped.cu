@@ -11,8 +11,8 @@
 // Project includes
 //
 #include "Cuda/CudaUtil.hpp"
-#include "OpGrouped.hpp"
 #include "Impl.hpp"
+#include "OpGrouped.hpp"
 #include "Profiler/Interface.hpp"
 #include "View/View.hpp"
 
@@ -58,23 +58,27 @@ void OpGrouped<Tout, Tin, Perm>::applyImpl(Tout& out, const Tin& in)
 // FT -> AL
 template class OpGrouped<std::vector<View::View<double, View::DCCSC3DJIK>>,
    std::vector<View::View<double, View::DCCSC3D>>, p201_t>;
-template class OpGrouped<std::vector<View::View<std::complex<double>, View::DCCSC3DJIK>>,
+template class OpGrouped<
+   std::vector<View::View<std::complex<double>, View::DCCSC3DJIK>>,
    std::vector<View::View<std::complex<double>, View::DCCSC3D>>, p201_t>;
 // AL -> FT
 template class OpGrouped<std::vector<View::View<double, View::DCCSC3D>>,
    std::vector<View::View<double, View::DCCSC3DJIK>>, p120_t>;
-template class OpGrouped<std::vector<View::View<std::complex<double>, View::DCCSC3D>>,
+template class OpGrouped<
+   std::vector<View::View<std::complex<double>, View::DCCSC3D>>,
    std::vector<View::View<std::complex<double>, View::DCCSC3DJIK>>, p120_t>;
 
 // AL -> JW
 template class OpGrouped<std::vector<View::View<double, View::DCCSC3DJIK>>,
    std::vector<View::View<double, View::S1CLCSC3DJIK>>, p201_t>;
-template class OpGrouped<std::vector<View::View<std::complex<double>, View::DCCSC3DJIK>>,
+template class OpGrouped<
+   std::vector<View::View<std::complex<double>, View::DCCSC3DJIK>>,
    std::vector<View::View<std::complex<double>, View::S1CLCSC3DJIK>>, p201_t>;
 // JW -> AL
 template class OpGrouped<std::vector<View::View<double, View::S1CLCSC3DJIK>>,
    std::vector<View::View<double, View::DCCSC3DJIK>>, p120_t>;
-template class OpGrouped<std::vector<View::View<std::complex<double>, View::S1CLCSC3DJIK>>,
+template class OpGrouped<
+   std::vector<View::View<std::complex<double>, View::S1CLCSC3DJIK>>,
    std::vector<View::View<std::complex<double>, View::DCCSC3DJIK>>, p120_t>;
 
 } // namespace Cuda

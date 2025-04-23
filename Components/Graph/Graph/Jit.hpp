@@ -30,8 +30,8 @@
 // Project includes
 //
 #include "Graph/OpsMap.hpp"
-#include "Graph/Shims/MlirShims.hpp"
 #include "Graph/Shims/CacheLayerSize.hpp"
+#include "Graph/Shims/MlirShims.hpp"
 #include "Graph/Tags.hpp"
 #include "Graph/Types.hpp"
 

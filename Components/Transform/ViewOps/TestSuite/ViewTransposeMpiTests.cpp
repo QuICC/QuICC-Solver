@@ -165,9 +165,8 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 201", "MpiDCCSC3DtoDCCSC3D201")
 
    // Transpose op
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(
-         mem);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(mem);
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
@@ -306,7 +305,7 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3DJIK 201", "MpiDCCSC3DtoDCCSC3DJIK201")
    using VoutTy = View<double, outTy>;
    VinTy viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
    VoutTy viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
-   
+
    // Setup ref data and input data
    using namespace QuICC::Transpose::Mpi;
    using namespace QuICC::Transpose;
@@ -328,9 +327,8 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3DJIK 201", "MpiDCCSC3DtoDCCSC3DJIK201")
 
    // Transpose op
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(
-         mem);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(mem);
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
@@ -451,7 +449,7 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 120", "MpiDCCSC3DtoDCCSC3D120")
    using VoutTy = View<double, outTy>;
    VinTy viewIn(dataIn, dimensionsIn, pointersIn, indicesIn);
    VoutTy viewOut(dataOut, dimensionsOut, pointersOut, indicesOut);
-   
+
    // Setup ref data and input data
    using namespace QuICC::Transpose::Mpi;
    using namespace QuICC::Transpose;
@@ -473,10 +471,9 @@ TEST_CASE("Mpi DCCSC3D to DCCSC3D 120", "MpiDCCSC3DtoDCCSC3D120")
 
    // Transpose op
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(
-         mem);
-   // Pack views  
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(mem);
+   // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
    // Apply transpose
@@ -618,9 +615,8 @@ TEST_CASE("Mpi DCCSC3DJIK to DCCSC3D 120", "MpiDCCSC3DJIKtoDCCSC3D120")
 
    // Transpose op
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(
-         mem);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(mem);
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
@@ -773,9 +769,8 @@ TEST_CASE("Mpi S1CLCSC3D to DCCSC3D 201", "MpiS1CLCSC3DtoDCCSC3D201")
 
    // Transpose op
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(
-         mem);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(mem);
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
@@ -912,9 +907,8 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201",
 
    // Transpose op
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(
-         mem);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(mem);
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
@@ -1036,9 +1030,8 @@ TEST_CASE("Mpi DCCSC3D to S1CLCSC3D 120", "MpiDCCSC3DtoS1CLCSC3D120")
    using namespace QuICC::Transpose;
 
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(
-         mem);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(mem);
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};
@@ -1179,9 +1172,8 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120",
 
    // Transpose op
    auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(
-         mem);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(mem);
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOut};
    std::vector<VinTy> viewsIn = {viewIn};

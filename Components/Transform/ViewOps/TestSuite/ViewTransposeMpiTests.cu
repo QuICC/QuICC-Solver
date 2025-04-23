@@ -24,7 +24,8 @@ using namespace QuICC::Memory;
 using namespace QuICC::View;
 using namespace QuICC::TestSuite;
 
-TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D201JIKCuda")
+TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda",
+   "MpiS1CLCSC3DJIKtoDCCSC3D201JIKCuda")
 {
    int rank, ranks;
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -54,8 +55,7 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
 
    if (rank == 0 && ranks == 1)
    {
-      dataIn = {
-         /*k0*/ 1, 5,
+      dataIn = {/*k0*/ 1, 5,
          /*k0*/ 2, 6,
          /*k0*/ 3, 7,
          /*k0*/ 4, 8,
@@ -63,20 +63,17 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
          /*k1*/ 10, 13,
          /*k1*/ 11, 14,
          /*k2*/ 15, 17,
-         /*k2*/ 16, 18
-      };
+         /*k2*/ 16, 18};
 
       // perm = [2 0 1] -> N K M
-      dataOutRef = {
-         /*m0*/ 1,
+      dataOutRef = {/*m0*/ 1,
          /*m0*/ 5,
          /*m1*/ 2, 9,
          /*m1*/ 6, 12,
          /*m2*/ 3, 10, 15,
          /*m2*/ 7, 13, 17,
          /*m3*/ 4, 11, 16,
-         /*m3*/ 8, 14, 18
-      };
+         /*m3*/ 8, 14, 18};
 
       // Populate meta for fully populated tensor
       // AL space (Stage::PPM and Stage::MPM)
@@ -148,10 +145,14 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
    QuICC::Memory::MemBlock<double> memBlockIn(dataIn.size(), memDev.get());
    QuICC::Memory::MemBlock<double> memBlockOut(dataOut.size(), memDev.get());
 
-   QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrIn(pointersIn[1].size(), memDev.get());
-   QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxIn(indicesIn[1].size(), memDev.get());
-   QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrOut(pointersOut[1].size(), memDev.get());
-   QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxOut(indicesOut[1].size(), memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrIn(pointersIn[1].size(),
+      memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxIn(indicesIn[1].size(),
+      memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrOut(pointersOut[1].size(),
+      memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxOut(indicesOut[1].size(),
+      memDev.get());
 
    // set device pointers and indices
    constexpr std::uint32_t dims = 3;
@@ -160,40 +161,43 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
    ViewBase<std::uint32_t> pointersOutDev[dims];
    ViewBase<std::uint32_t> indicesOutDev[dims];
 
-   pointersInDev[1] = ViewBase<std::uint32_t>(memBlockPtrIn.data(), memBlockPtrIn.size());
-   indicesInDev[1] = ViewBase<std::uint32_t>(memBlockIdxIn.data(), memBlockIdxIn.size());
-   pointersOutDev[1] = ViewBase<std::uint32_t>(memBlockPtrOut.data(), memBlockPtrOut.size());
-   indicesOutDev[1] = ViewBase<std::uint32_t>(memBlockIdxOut.data(), memBlockIdxOut.size());
+   pointersInDev[1] =
+      ViewBase<std::uint32_t>(memBlockPtrIn.data(), memBlockPtrIn.size());
+   indicesInDev[1] =
+      ViewBase<std::uint32_t>(memBlockIdxIn.data(), memBlockIdxIn.size());
+   pointersOutDev[1] =
+      ViewBase<std::uint32_t>(memBlockPtrOut.data(), memBlockPtrOut.size());
+   indicesOutDev[1] =
+      ViewBase<std::uint32_t>(memBlockIdxOut.data(), memBlockIdxOut.size());
 
    // set device views
-   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(),
-      dimensionsIn.data(), pointersInDev, indicesInDev);
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(),
+      pointersInDev, indicesInDev);
    VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersOutDev, indicesOutDev);
 
    // cpu -> gpu
-   cudaErrChk(cudaMemcpy(viewInDev.data(), viewIn.data(), viewIn.size() * sizeof(double),
-      cudaMemcpyHostToDevice));
-   cudaErrChk(cudaMemcpy(pointersInDev[1].data(), pointersIn[1].data(), pointersIn[1].size() * sizeof(std::uint32_t),
-      cudaMemcpyHostToDevice));
-   cudaErrChk(cudaMemcpy(indicesInDev[1].data(), indicesIn[1].data(), indicesIn[1].size() * sizeof(std::uint32_t),
-      cudaMemcpyHostToDevice));
-   cudaErrChk(cudaMemcpy(pointersOutDev[1].data(), pointersOut[1].data(), pointersOut[1].size() * sizeof(std::uint32_t),
-      cudaMemcpyHostToDevice));
-   cudaErrChk(cudaMemcpy(indicesOutDev[1].data(), indicesOut[1].data(), indicesOut[1].size() * sizeof(std::uint32_t),
-      cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(viewInDev.data(), viewIn.data(),
+      viewIn.size() * sizeof(double), cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(pointersInDev[1].data(), pointersIn[1].data(),
+      pointersIn[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(indicesInDev[1].data(), indicesIn[1].data(),
+      indicesIn[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(pointersOutDev[1].data(), pointersOut[1].data(),
+      pointersOut[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(indicesOutDev[1].data(), indicesOut[1].data(),
+      indicesOut[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
 
    // Transpose op
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(
-         memDev);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>(memDev);
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOutDev};
    std::vector<VinTy> viewsIn = {viewInDev};
    // Apply transpose
    transposeOp->apply(viewsOut, viewsIn);
 
-    // gpu -> cpu
+   // gpu -> cpu
    cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(),
       viewOut.size() * sizeof(double), cudaMemcpyDeviceToHost));
 
@@ -204,7 +208,8 @@ TEST_CASE("Mpi S1CLCSC3DJIK to DCCSC3DJIK 201 Cuda", "MpiS1CLCSC3DJIKtoDCCSC3D20
    }
 }
 
-TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJIK120Cuda")
+TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda",
+   "MpiDCCSC3DJIKtoS1CLCSC3DJIK120Cuda")
 {
    int rank, ranks;
    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -235,20 +240,17 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
    if (rank == 0 && ranks == 1)
    {
       // N K M
-      dataIn = {
-         /*m0*/ 1,
+      dataIn = {/*m0*/ 1,
          /*m0*/ 5,
          /*m1*/ 2, 9,
          /*m1*/ 6, 12,
          /*m2*/ 3, 10, 15,
          /*m2*/ 7, 13, 17,
          /*m3*/ 4, 11, 16,
-         /*m3*/ 8, 14, 18
-      };
+         /*m3*/ 8, 14, 18};
 
       // perm = [1 2 0] -> M N K
-      dataOutRef = {
-         /*k0*/ 1, 5,
+      dataOutRef = {/*k0*/ 1, 5,
          /*k0*/ 2, 6,
          /*k0*/ 3, 7,
          /*k0*/ 4, 8,
@@ -256,8 +258,7 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
          /*k1*/ 10, 13,
          /*k1*/ 11, 14,
          /*k2*/ 15, 17,
-         /*k2*/ 16, 18
-      };
+         /*k2*/ 16, 18};
 
       // Populate meta for fully populated tensor
       // Spectral(JW) space (Stage::PMM and Stage::MMM)
@@ -332,10 +333,14 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
    QuICC::Memory::MemBlock<double> memBlockIn(dataIn.size(), memDev.get());
    QuICC::Memory::MemBlock<double> memBlockOut(dataOut.size(), memDev.get());
 
-   QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrIn(pointersIn[1].size(), memDev.get());
-   QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxIn(indicesIn[1].size(), memDev.get());
-   QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrOut(pointersOut[1].size(), memDev.get());
-   QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxOut(indicesOut[1].size(), memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrIn(pointersIn[1].size(),
+      memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxIn(indicesIn[1].size(),
+      memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockPtrOut(pointersOut[1].size(),
+      memDev.get());
+   QuICC::Memory::MemBlock<std::uint32_t> memBlockIdxOut(indicesOut[1].size(),
+      memDev.get());
 
    // set device pointers and indices
    constexpr std::uint32_t dims = 3;
@@ -344,33 +349,36 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
    ViewBase<std::uint32_t> pointersOutDev[dims];
    ViewBase<std::uint32_t> indicesOutDev[dims];
 
-   pointersInDev[1] = ViewBase<std::uint32_t>(memBlockPtrIn.data(), memBlockPtrIn.size());
-   indicesInDev[1] = ViewBase<std::uint32_t>(memBlockIdxIn.data(), memBlockIdxIn.size());
-   pointersOutDev[1] = ViewBase<std::uint32_t>(memBlockPtrOut.data(), memBlockPtrOut.size());
-   indicesOutDev[1] = ViewBase<std::uint32_t>(memBlockIdxOut.data(), memBlockIdxOut.size());
+   pointersInDev[1] =
+      ViewBase<std::uint32_t>(memBlockPtrIn.data(), memBlockPtrIn.size());
+   indicesInDev[1] =
+      ViewBase<std::uint32_t>(memBlockIdxIn.data(), memBlockIdxIn.size());
+   pointersOutDev[1] =
+      ViewBase<std::uint32_t>(memBlockPtrOut.data(), memBlockPtrOut.size());
+   indicesOutDev[1] =
+      ViewBase<std::uint32_t>(memBlockIdxOut.data(), memBlockIdxOut.size());
 
    // set device views
-   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(),
-      dimensionsIn.data(), pointersInDev, indicesInDev);
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(),
+      pointersInDev, indicesInDev);
    VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersOutDev, indicesOutDev);
 
    // cpu -> gpu
-   cudaErrChk(cudaMemcpy(viewInDev.data(), viewIn.data(), viewIn.size() * sizeof(double),
-      cudaMemcpyHostToDevice));
-   cudaErrChk(cudaMemcpy(pointersInDev[1].data(), pointersIn[1].data(), pointersIn[1].size() * sizeof(std::uint32_t),
-      cudaMemcpyHostToDevice));
-   cudaErrChk(cudaMemcpy(indicesInDev[1].data(), indicesIn[1].data(), indicesIn[1].size() * sizeof(std::uint32_t),
-      cudaMemcpyHostToDevice));
-   cudaErrChk(cudaMemcpy(pointersOutDev[1].data(), pointersOut[1].data(), pointersOut[1].size() * sizeof(std::uint32_t),
-      cudaMemcpyHostToDevice));
-   cudaErrChk(cudaMemcpy(indicesOutDev[1].data(), indicesOut[1].data(), indicesOut[1].size() * sizeof(std::uint32_t),
-      cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(viewInDev.data(), viewIn.data(),
+      viewIn.size() * sizeof(double), cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(pointersInDev[1].data(), pointersIn[1].data(),
+      pointersIn[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(indicesInDev[1].data(), indicesIn[1].data(),
+      indicesIn[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(pointersOutDev[1].data(), pointersOut[1].data(),
+      pointersOut[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+   cudaErrChk(cudaMemcpy(indicesOutDev[1].data(), indicesOut[1].data(),
+      indicesOut[1].size() * sizeof(std::uint32_t), cudaMemcpyHostToDevice));
 
    // Transpose op
-   auto transposeOp =
-      std::make_unique<OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(
-         memDev);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>(memDev);
    // Pack views
    std::vector<VoutTy> viewsOut = {viewOutDev};
    std::vector<VinTy> viewsIn = {viewInDev};
@@ -387,4 +395,3 @@ TEST_CASE("Mpi DCCSC3DJIK to S1CLCSC3DJIK 120 Cuda", "MpiDCCSC3DJIKtoS1CLCSC3DJI
       CHECK(dataOut[s] == dataOutRef[s]);
    }
 }
-
