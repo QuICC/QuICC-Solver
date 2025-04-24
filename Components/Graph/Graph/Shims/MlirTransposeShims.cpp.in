@@ -1,0 +1,54 @@
+#include <cassert>
+#include <complex>
+#include <iostream>
+
+#include "Graph/Shims/MlirShims.hpp"
+#include "Graph/Types.hpp"
+#include "ViewOps/Transpose/OpGrouped.hpp"
+
+using namespace QuICC::Graph;
+
+/// @brief C Interface to MLIR for a transpose operator
+/// cpu backend with @GroupSize@ inputs and @GroupSize@ outputs
+/// @param op
+/// @param umod
+/// @param uval
+extern "C" void @FunSignature@{
+#ifndef NDEBUG
+   std::cout << "@FunName@\n";
+#endif
+assert(obj != nullptr);
+assert(pIn0 != nullptr);
+assert(pOut0 != nullptr);
+// assert(pIn0->dataSize >= pOut0->dataSize); // Input might be padded
+// op
+#ifdef QUICC_MPI
+using namespace QuICC::Transpose::Mpi;
+#else
+using namespace QuICC::Transpose::@Backend@;
+#endif
+using namespace QuICC::Transpose;
+using Tin = std::vector<QuICC::View::View<@TypeIn@, QuICC::View::@LayoutIn@>>;
+using Tout =
+   std::vector<QuICC::View::View<@TypeOut@, QuICC::View::@LayoutOut@>>;
+using op_t = OpGrouped<Tout, Tin, p@Perm@_t>;
+// views
+using namespace QuICC::View;
+constexpr std::uint32_t rank = 3;
+ViewBase<std::uint32_t> pointersIn[rank];
+pointersIn[1] = ViewBase<std::uint32_t>(pIn0->pos, pIn0->posSize);
+ViewBase<std::uint32_t> indicesIn[rank];
+indicesIn[1] = ViewBase<std::uint32_t>(pIn0->coo, pIn0->cooSize);
+ViewBase<std::uint32_t> pointersOut[rank];
+pointersOut[1] = ViewBase<std::uint32_t>(pOut0->pos, pOut0->posSize);
+ViewBase<std::uint32_t> indicesOut[rank];
+indicesOut[1] = ViewBase<std::uint32_t>(pOut0->coo, pOut0->cooSize);
+@Lds@
+
+   @ViewDefs@
+
+   @VecViewDefs@
+   // call
+   auto cl = reinterpret_cast<op_t*>(obj);
+cl->apply(viewOuts, viewIns);
+}

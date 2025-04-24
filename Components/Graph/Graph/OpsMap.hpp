@@ -18,7 +18,7 @@
 #include "Graph/Types.hpp"
 #include "Memory/Memory.hpp"
 #ifdef QUICC_MPI
-#include "ViewOps/Transpose/Mpi/Comm.hpp"
+#include "ViewOps/Transpose/Mpi/CommGrouped.hpp"
 #endif
 
 namespace QuICC {
@@ -37,17 +37,6 @@ private:
    /// @brief is the memory space cpu or gpu
    /// to be replaced by a per-operator-attribute
    bool _isCpu = true;
-/// comm
-#ifdef QUICC_MPI
-   /// @brief Fourier space to Associated Legendre space comm
-   std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commFTAL;
-   /// @brief Associated Legendre space to Fourier space comm
-   std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commALFT;
-   /// @brief Associated Legendre space to Jones-Worland space comm
-   std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commALJW;
-   /// @brief Jones-Worland space to Associated Legendre space comm
-   std::shared_ptr<Transpose::Mpi::Comm<std::complex<double>>> _commJWAL;
-#endif
    /// @brief storage for scaling parameters
    PhysicalParameters<double> _physParams;
 

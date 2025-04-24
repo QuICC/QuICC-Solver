@@ -1,5 +1,5 @@
 /**
- * @file Op.hpp
+ * @file OpGrouped.hpp
  * @brief Wrapper for transpose implementation backends
  */
 #pragma once
@@ -9,10 +9,10 @@
 
 // Project includes
 //
-#include "ViewOps/Transpose/Cpu/Op.hpp"
+#include "ViewOps/Transpose/Cpu/OpGrouped.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
-#include "ViewOps/Transpose/Cuda/Op.hpp"
+#include "ViewOps/Transpose/Cuda/OpGrouped.hpp"
 #endif
 #ifdef QUICC_MPI
-#include "ViewOps/Transpose/Mpi/Op.hpp"
+#include "ViewOps/Transpose/Mpi/OpGrouped.hpp"
 #endif
