@@ -1,13 +1,14 @@
 include(BundleCatch2)
 
-add_executable(GraphTests
+add_executable(ThreadPoolTests
     ThreadPoolTests.cpp
     ThreadPoolTestsMain.cpp
 )
 
-target_link_libraries(GraphTests
+target_link_libraries(ThreadPoolTests
     ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}
     QuICC::TestSuite
+    QuICC::Profiling
     Catch2::Catch2
 )
 
