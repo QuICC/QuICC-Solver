@@ -1,0 +1,25 @@
+spack:
+  specs:
+  - kokkos +wrapper+cuda_lambda
+  - kokkos-kernels
+  - mpi
+  - fftw
+  - hdf5
+  - python
+  - py-numpy
+  - openblas
+  - boost
+  - cmake
+  packages:
+    all:
+      providers:
+        mpi: [cray-mpich]
+      variants: +cuda +openmp +mpi cuda_arch=90 build_type=Release
+  concretizer:
+    unify: true
+    targets:
+      host_compatible: false
+  config:
+    install_tree:
+      root: $SCRATCH/views/quicc_software
+  view: $SCRATCH/views/view_quicc

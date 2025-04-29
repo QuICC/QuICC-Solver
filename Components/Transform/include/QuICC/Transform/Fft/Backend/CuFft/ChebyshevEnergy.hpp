@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ChebyshevEnergy.hpp
- * @brief Interface for a generic Chebyshev cuFFT based energy reductor 
+ * @brief Interface for a generic Chebyshev cuFFT based energy reductor
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CUFFT_CHEBYSHEVENERGY_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/IChebyshevBackend.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
 
@@ -36,7 +36,7 @@ namespace CuFft {
 
    /**
     * @brief Interface for a generic Chebyshev cuFFT based energy reductor
-    */ 
+    */
    class ChebyshevEnergy: public IChebyshevBackend
    {
       public:
@@ -49,11 +49,16 @@ namespace CuFft {
           * @brief Destructor
           */
          virtual ~ChebyshevEnergy();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */
          virtual void init(const SetupType& setup) const override;
+
+         /**
+          * @brief Set Scaler array
+          */
+         void setScaler(const Array& scaler) const;
 
          /**
           * @brief set spectral operator
@@ -79,6 +84,11 @@ namespace CuFft {
           * @brief Set output
           */
          void output(Matrix& rOut) const;
+
+         /**
+          * @brief Set output on grid
+          */
+         void outputGrid(Matrix& rOut) const;
 
          /**
           * @brief Set output mutliplied by scalar operator
@@ -118,7 +128,7 @@ namespace CuFft {
           *
           */
          void getSolution(const int zeroRows = 0, const int extraRows = 0) const;
-         
+
       protected:
 
       private:
@@ -156,6 +166,11 @@ namespace CuFft {
           * @brief Solver for differential operators
           */
          mutable std::shared_ptr<Fftw::DifferentialSolver> mspSolver;
+
+         /**
+          * @brief Scaler array
+          */
+         mutable Array mScaler;
 
          /**
           * @brief FFT scaling factor

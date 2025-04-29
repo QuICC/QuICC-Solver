@@ -6,9 +6,10 @@
 #include "View/View.hpp"
 #include "ViewOps/Fourier/Util.hpp"
 #include "ViewOps/Fourier/Tags.hpp"
+#include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Profiler/Interface.hpp"
 
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #endif
 
@@ -18,8 +19,6 @@ namespace Fourier {
 namespace Complex {
 namespace Cpu {
 
-using namespace QuICC::Memory;
-
 template<class Tout, class Tin, std::size_t Ofi, std::size_t Ofj,
     std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment>
 Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::Diff2DOp(ScaleType scale) : mScale(scale){};
@@ -28,12 +27,13 @@ template<class Tout, class Tin, std::size_t Ofi, std::size_t Ofj,
     std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment>
 void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
+    using namespace View;
     static_assert(std::is_same_v<typename Tin::LevelType, DCCSC3D::level>,
-        "implementation assumes dense, CSC, CSC");
+        "implementation assumes dense, compressed, sparse");
 
     Profiler::RegionFixture<4> fix("Diff2DOp::applyImpl");
 
-    #ifdef QUICC_USE_CUFFT
+    #ifdef QUICC_HAS_CUDA_BACKEND
     assert(!QuICC::Cuda::isDeviceMemory(out.data()));
     #endif
 
@@ -46,20 +46,15 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
     constexpr int sgnOfj = 1 - 2*static_cast<int>((Ofj/2) % 2);
     constexpr int sgnFirst = sgnOfi * sgnOfj;
 
-    const auto M = in.dims()[0];
-
     // dealias bounds
-    std::size_t nDealias = M;
-    if constexpr (Treatment & dealias_m)
-    {
-        nDealias *= dealias::rule;
-    }
+    const auto M = in.lds();
+    const auto MDealias = in.dims()[0];
 
     // positive / negative coeff bounds
     const auto negM = M / 2;
     const auto posM = negM + M % 2;
-    const auto negDealias = nDealias / 2;
-    const auto posDealias = negDealias + nDealias % 2;
+    const auto negDealias = MDealias / 2;
+    const auto posDealias = negDealias + MDealias % 2;
 
     float_t fftScaling = 1.0;
     if constexpr (std::is_same_v<Direction, fwd_t> &&
@@ -174,7 +169,6 @@ void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(To
 }
 
 // explicit instantations
-using mods_t = View<std::complex<double>, DCCSC3D>;
 template class Diff2DOp<mods_t, mods_t, 1, 0, 0, 0, fwd_t>;
 template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t>;
 template class Diff2DOp<mods_t, mods_t, 2, 0, 0, 2, fwd_t, inverse_m>;

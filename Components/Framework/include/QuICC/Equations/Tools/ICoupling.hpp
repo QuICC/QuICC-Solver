@@ -6,20 +6,14 @@
 #ifndef QUICC_EQUATIONS_TOOLS_ICOUPLING_HPP
 #define QUICC_EQUATIONS_TOOLS_ICOUPLING_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 
 namespace QuICC {
@@ -73,8 +67,12 @@ namespace Tools {
 
          /**
           * @brief Set system size provided by python code
+          *
+          * @param rSystemNs  System sizes
+          * @param res        Resolution object
+          * @param nFields    Number of coupled fields in system
           */
-         void setSystemN(ArrayI& rSystemNs, const Resolution& res) const;
+         void setSystemN(ArrayI& rSystemNs, const Resolution& res, const int nFields) const;
 
       private:
          /**
@@ -107,7 +105,7 @@ namespace Tools {
          /**
           * @brief Interpret system size provided by python code
           */
-         virtual void interpretSystemN(ArrayI& rSystemNs, const Resolution& res) const = 0;
+         virtual void interpretSystemN(ArrayI& rSystemNs, const Resolution& res, const int nFields) const = 0;
    };
 
    /// Typedef for a shared ICoupling

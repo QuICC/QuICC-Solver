@@ -1,0 +1,38 @@
+# CMake setup for Types
+set(QUICC_CURRENT_COMPONENT_LIB Types)
+set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")
+message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}" )
+
+add_library(${QUICC_CURRENT_COMPONENT_LIB} INTERFACE)
+
+# Options and Defs
+include(cmake.d/Options.cmake)
+
+target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
+  INTERFACE
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
+
+# Dependencies
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+  INTERFACE
+      Eigen3::Eigen
+)
+
+# Alias
+add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS
+  "${QUICC_CURRENT_COMPONENT_LIB}")
+
+# Teststuite
+option(QUICC_TESTSUITE_TYPES "Enable Types component testsuite?" OFF)
+if(QUICC_TESTSUITE_TYPES)
+  add_subdirectory(TestSuite)
+endif(QUICC_TESTSUITE_TYPES)
+
+# Export info
+quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
+  COMPONENT ${QUICC_CURRENT_COMPONENT_LIB}
+  DIRECTORIES
+  "${CMAKE_CURRENT_SOURCE_DIR}/Types"
+)

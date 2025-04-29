@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IndexCounter.hpp
  * @brief Implementation of base class for a generalized index counter
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Io/Hdf5Typedefs.hpp"
 
@@ -25,7 +25,7 @@ namespace QuICC {
 
    /**
     * @brief Implementation of base class for a generalized index counter
-    */ 
+    */
    class IndexCounter
    {
       public:
@@ -79,12 +79,12 @@ namespace QuICC {
          /**
           * @brief Compute the offset for local modes
           */
-         virtual void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const = 0;
+         virtual void computeOffsets(std::vector<std::vector<OffsetType> >& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const = 0;
 
          /**
           * @brief Compute the offset for local modes by comparing to a reference simulation
           */
-         virtual void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const = 0;
+         virtual void computeOffsets(std::vector<std::vector<OffsetType> >& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const = 0;
 
          /**
           * @brief Generate index key as vector
@@ -105,7 +105,7 @@ namespace QuICC {
           * @brief Generate index key
           */
          virtual std::pair<int,int> makeKey(const Dimensions::Transform::Id id, const int i, const int j) const;
-         
+
       protected:
 
       private:

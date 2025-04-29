@@ -6,15 +6,9 @@
 #ifndef QUICC_DIAGNOSTICS_SPHERECFLWRAPPER_HPP
 #define QUICC_DIAGNOSTICS_SPHERECFLWRAPPER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -49,7 +43,7 @@ namespace Diagnostics {
          /**
           * @brief Destructor
           */
-         virtual ~SphereCflWrapper();
+         virtual ~SphereCflWrapper() = default;
 
       protected:
 

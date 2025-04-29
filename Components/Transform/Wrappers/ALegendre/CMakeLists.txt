@@ -9,70 +9,21 @@ set(Kinds "Projector;Integrator")
 set(ProjectorOps "P;D1;Ll;LlD1;DivS1;DivS1Dp;LlDivS1;LlDivS1Dp")
 set(IntegratorOps "P;D1;Ll;LlD1;DivS1;DivS1Dp;LlDivS1;LlDivS1Dp;Ll2;DivLl;DivLlD1;DivLlDivS1;DivLlDivS1Dp")
 
-set(IntegratorOpAttribute "TRCLCSC3D")
-set(ProjectorOpAttribute "CTRRL3D")
+set(IntegratorOpAttribute "S1CLCSC3D")
+set(ProjectorOpAttribute "CS1RL3D")
 set(IntegratorOpInOut "mods_t, phys_t")
 set(ProjectorOpInOut "phys_t, mods_t")
 
 # Ops
-
-set(PPolyBuilder "Plm")
-set(PDiff "0")
-set(PTreatment "none_m")
-
-set(D1PolyBuilder "dPlm")
-set(D1Diff "0")
-set(D1Treatment "${PTreatment}")
-
-set(LlPolyBuilder "Plm")
-set(LlDiff "1")
-set(LlTreatment "${PTreatment}")
-
-set(LlD1PolyBuilder "${D1PolyBuilder}")
-set(LlD1Diff "1")
-set(LlD1Treatment "${PTreatment}")
-
-set(DivS1PolyBuilder "sin_1Plm")
-set(DivS1Diff "0")
-set(DivS1Treatment "${PTreatment}")
-
-set(DivS1DpPolyBuilder "${DivS1PolyBuilder}")
-set(DivS1DpDiff "0")
 set(DivS1DpTreatment "diffPhi_m")
-
-set(LlDivS1PolyBuilder "${DivS1PolyBuilder}")
-set(LlDivS1Diff "1")
-set(LlDivS1Treatment "${PTreatment}")
-
-set(LlDivS1DpPolyBuilder "${DivS1PolyBuilder}")
-set(LlDivS1DpDiff "1")
 set(LlDivS1DpTreatment "diffPhi_m")
-
-set(Ll2PolyBuilder "Plm")
-set(Ll2Diff "2")
-set(Ll2Treatment "${PTreatment}")
-
-set(DivLlPolyBuilder "Plm")
-set(DivLlDiff "-1")
-set(DivLlTreatment "${PTreatment}")
-
-set(DivLlD1PolyBuilder "dPlm")
-set(DivLlD1Diff "-1")
-set(DivLlD1Treatment "${PTreatment}")
-
-set(DivLlDivS1PolyBuilder "sin_1Plm")
-set(DivLlDivS1Diff "-1")
-set(DivLlDivS1Treatment "${PTreatment}")
-
-set(DivLlDivS1DpPolyBuilder "sin_1Plm")
-set(DivLlDivS1DpDiff "-1")
 set(DivLlDivS1DpTreatment "diffPhi_m")
 
 # cpu/gpu
 set(CpuMemRes "Cpu::NewDelete")
 set(GpuMemRes "Cuda::Malloc")
 
-set(GpuLayout "#define QUICC_AL_ROW_MAJOR")
+set(GpuLayout "#define QUICC_AL_ALL_ROW_MAJOR")
 
 set(GpuHppHeaders "#include <cuda/std/complex>
 #include \"Memory/Memory.hpp\""
@@ -176,11 +127,25 @@ foreach(Backend IN LISTS Backends)
         set(OpInOut "${${Kind}OpInOut}")
         set(HostToDevice "${${Backend}${Kind}HostToDevice}")
         set(DeviceToHost "${${Backend}${Kind}DeviceToHost}")
+        if("${Kind}" STREQUAL "Projector")
+            set(OpDirection "bwd_t")
+        else()
+            set(OpDirection "fwd_t")
+        endif()
         foreach(Op IN LISTS Ops)
             set(PolyBuilder "${${Op}PolyBuilder}")
             set(Diff "${${Op}Diff}")
             set(PolyBuilderScale "${${Op}PolyBuilderScale}")
             set(Treatment "${${Op}Treatment}")
+            if(NOT Treatment)
+                set(Treatment "none_m")
+            else()
+                if("${Kind}" STREQUAL "Projector")
+                    set(Treatment "diffPhiPrj_m")
+                else()
+                    set(Treatment "diffPhiInt_m")
+                endif()
+            endif()
 
             configure_file(
                 "OpV.hpp.in"

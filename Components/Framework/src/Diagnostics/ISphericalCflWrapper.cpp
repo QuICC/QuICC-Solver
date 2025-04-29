@@ -3,21 +3,12 @@
  * @brief Source of the CFL constraint wrapper in a spherical geometry
  */
 
-// Debug includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Diagnostics/ISphericalCflWrapper.hpp"
-
 // Project includes
 //
+#include "QuICC/Diagnostics/ISphericalCflWrapper.hpp"
 #include "QuICC/NonDimensional/CflTorsional.hpp"
 #include "QuICC/NonDimensional/CflInertial.hpp"
 #include "QuICC/NonDimensional/CflAlfvenDamping.hpp"
@@ -55,8 +46,8 @@ namespace Diagnostics {
    ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic, const std::map<std::size_t,NonDimensional::SharedINumber>& params)
       : ICflWrapper(spVelocity, spMagnetic),
         mcCourant(0.65),
-        mcAlfvenScale(params.find(NonDimensional::CflAlfvenScale::id())->second->value()),
-        mcAlfvenDamping(params.find(NonDimensional::CflAlfvenDamping::id())->second->value()),
+        mcAlfvenScale((params.count(NonDimensional::CflAlfvenScale::id()) > 0) ? params.find(NonDimensional::CflAlfvenScale::id())->second->value() : 0),
+        mcAlfvenDamping((params.count(NonDimensional::CflAlfvenDamping::id()) > 0) ? params.find(NonDimensional::CflAlfvenDamping::id())->second->value() : 0),
         mGlobalCfl(2)
    {
       this->mGlobalCfl.resize(params.count(NonDimensional::CflInertial::id()) + params.count(NonDimensional::CflTorsional::id()));
@@ -75,10 +66,6 @@ namespace Diagnostics {
          this->mGlobalCfl(iCfl) = params.find(NonDimensional::CflTorsional::id())->second->value();
          iCfl++;
       }
-   }
-
-   ISphericalCflWrapper::~ISphericalCflWrapper()
-   {
    }
 
    void ISphericalCflWrapper::init(const std::vector<Array>& mesh)

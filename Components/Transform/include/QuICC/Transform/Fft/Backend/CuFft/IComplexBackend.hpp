@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IComplexBackend.hpp
- * @brief Backend for a generic complex cuFFT based backend 
+ * @brief Backend for a generic complex cuFFT based backend
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CUFFT_ICOMPLEXBACKEND_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/ICuFftBackend.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Setup.hpp"
 
@@ -36,7 +36,7 @@ namespace CuFft {
 
    /**
     * @brief Backend for a generic complex cuFFT based backend
-    */ 
+    */
    class IComplexBackend: public ICuFftBackend
    {
       public:
@@ -60,7 +60,7 @@ namespace CuFft {
           * @brief Destructor
           */
          virtual ~IComplexBackend();
-         
+
          /**
           * @brief Initialise the cuFFT transforms
           */

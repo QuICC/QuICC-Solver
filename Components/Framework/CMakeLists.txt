@@ -10,7 +10,6 @@ include(cmake.d/setup/RegisterTransformBackward.cmake)
 include(cmake.d/setup/RegisterTransformReductor.cmake)
 include(cmake.d/setup/RegisterTransformPath.cmake)
 include(cmake.d/setup/RegisterTransformSetup.cmake)
-include(cmake.d/setup/RegisterTimestepId.cmake)
 include(cmake.d/setup/RegisterTimestepRegister.cmake)
 include(cmake.d/setup/RegisterTagOperator.cmake)
 include(cmake.d/setup/RegisterBcScheme.cmake)
@@ -33,14 +32,25 @@ target_compile_options(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
 # Set HDF5 typedef depending on version
 include(cmake.d/setup/SetHdf5Typedef.cmake)
 
-target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  ${QUICC_POLYNOMIAL_COMPONENT_LIB}
-  ${QUICC_PYQUICC_COMPONENT_LIB}
-  QuICC::Io
-  QuICC::Common
-  QuICC::Framework::GitHash
-  QuICC::Profiling
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+    QuICC::Polynomial
+    ${QUICC_PYQUICC_COMPONENT_LIB}
+    QuICC::Io
+    QuICC::Common
+    QuICC::Framework::GitHash
+    QuICC::Profiling
+    QuICC::Environment
+    QuICC::TimestepPc
+    QuICC::TimestepRkcb
+)
+
+if (QUICC_USE_MLIR_GRAPH)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+    PUBLIC
+      QuICC::Graph
   )
+endif()
 
 # Add debug option for operator output
 set( _debugModelMatrix "QUICC_DEBUG_OUTPUT_MODEL_MATRIX")

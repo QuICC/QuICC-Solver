@@ -33,7 +33,7 @@ namespace SparseSM {
 
    SparseMatrix ISparseSMOperator::mat() const
    {
-      internal::SparseMatrix mat;
+      Internal::SparseMatrix mat;
       this->buildOpImpl(mat, this->rows(), this->cols());
 
       return mat.cast<MHDFloat>();
@@ -41,7 +41,7 @@ namespace SparseSM {
 
    SparseMatrix ISparseSMOperator::embedded(const int r, const int c) const
    {
-      internal::SparseMatrix mat;
+      Internal::SparseMatrix mat;
       this->buildOpImpl(mat, r, c);
 
       return mat.cast<MHDFloat>();
@@ -49,13 +49,13 @@ namespace SparseSM {
 
    Matrix ISparseSMOperator::banded(unsigned int& kL, unsigned int &kU) const
    {
-      internal::Matrix bd;
+      Internal::Matrix bd;
       this->buildBanded(bd, kL, kU);
 
       return bd.cast<MHDFloat>();
    }
 
-   void ISparseSMOperator::buildOpImpl(internal::SparseMatrix& mat, const int r, const int c) const
+   void ISparseSMOperator::buildOpImpl(Internal::SparseMatrix& mat, const int r, const int c) const
    {
       // Build triplets
       TripletList_t list;
@@ -67,7 +67,7 @@ namespace SparseSM {
       mat.makeCompressed();
    }
 
-   void ISparseSMOperator::buildOpImpl(internal::Matrix& bd, const int r, const int c) const
+   void ISparseSMOperator::buildOpImpl(Internal::Matrix& bd, const int r, const int c) const
    {
       unsigned int kL, kU;
       this->buildBanded(bd, kL, kU);
@@ -81,7 +81,7 @@ namespace SparseSM {
       }
    }
 
-   void ISparseSMOperator::buildBanded(internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
+   void ISparseSMOperator::buildBanded(Internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
    {
       throw std::logic_error("Banded operator not yet implemented!");
    }

@@ -3,23 +3,14 @@
  * @brief Source of the tools for schemes with spherical harmonic expansions with m spectral ordering
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
+// Project includes
 //
 #include "QuICC/Equations/Tools/SHm.hpp"
 #include "QuICC/Enums/DimensionTools.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
-
-// Project includes
-//
 
 namespace QuICC {
 
@@ -44,13 +35,17 @@ namespace Tools {
    void SHm::interpretTauN(ArrayI& rTauNs, const Resolution& res) const
    {
       const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
-      for(int m = 0; m < tRes.dim<Dimensions::Data::DAT3D>(); m++)
+      for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
       {
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-            int m_ = tRes.idx<Dimensions::Data::DAT3D>(m);
-            rTauNs(m) = rTauNs(m)*(res.sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
+            int m = tRes.idx<Dimensions::Data::DAT3D>(k);
+            rTauNs(k) = rTauNs(k)*(res.sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m);
          #else
-            rTauNs(m) = rTauNs(m)*tRes.dim<Dimensions::Data::DAT2D>(m);
+            assert( rTauNs(k) == tRes.dim<Dimensions::Data::DATB1D>(0,k) );
+            for(int j = 1; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               rTauNs(k) += tRes.dim<Dimensions::Data::DATB1D>(j,k);
+            }
          #endif //QUICC_MPISPSOLVE
 
       }
@@ -59,13 +54,20 @@ namespace Tools {
    void SHm::interpretGalerkinN(ArrayI& rGalerkinNs, const Resolution& res) const
    {
       const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
-      for(int m = 0; m < tRes.dim<Dimensions::Data::DAT3D>(); m++)
+      for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
       {
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-            int m_ = tRes.idx<Dimensions::Data::DAT3D>(m);
-            rGalerkinNs(m) = rGalerkinNs(m)*(res.sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
+            int m = tRes.idx<Dimensions::Data::DAT3D>(k);
+            rGalerkinNs(k) = rGalerkinNs(k)*(res.sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m);
          #else
-            rGalerkinNs(m) = rGalerkinNs(m)*tRes.dim<Dimensions::Data::DAT2D>(m);
+            // Get change of truncation due to Galerkin basis
+            int gDelta = tRes.dim<Dimensions::Data::DATB1D>(0,k) - rGalerkinNs(k);
+            assert( gDelta >= 0 );
+
+            for(int j = 1; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               rGalerkinNs(k) += tRes.dim<Dimensions::Data::DATB1D>(j,k) - gDelta;
+            }
          #endif //QUICC_MPISPSOLVE
       }
    }
@@ -75,16 +77,23 @@ namespace Tools {
       // Python setup is sufficient
    }
 
-   void SHm::interpretSystemN(ArrayI& rSystemNs, const Resolution& res) const
+   void SHm::interpretSystemN(ArrayI& rSystemNs, const Resolution& res, const int nFields) const
    {
       const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
-      for(int m = 0; m < tRes.dim<Dimensions::Data::DAT3D>(); m++)
+      for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
       {
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
-            int m_ = tRes.idx<Dimensions::Data::DAT3D>(m);
-            rSystemNs(m) = rSystemNs(m)*(res.sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m_);
+            int m = tRes.idx<Dimensions::Data::DAT3D>(k);
+            rSystemNs(k) = rSystemNs(k)*(res.sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)-m);
          #else
-            rSystemNs(m) = rSystemNs(m)*tRes.dim<Dimensions::Data::DAT2D>(m);
+            // Get change of truncation due to Galerkin basis
+            int gDelta = nFields*tRes.dim<Dimensions::Data::DATB1D>(0,k) - rSystemNs(k);
+            assert( gDelta >= 0 );
+
+            for(int j = 1; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
+            {
+               rSystemNs(k) += nFields*tRes.dim<Dimensions::Data::DATB1D>(j,k) - gDelta;
+            }
          #endif //QUICC_MPISPSOLVE
       }
    }

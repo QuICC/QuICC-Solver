@@ -12,8 +12,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/MatrixOperationsInternal.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/MatrixOperations.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
@@ -317,7 +317,7 @@ namespace Equations {
          int cols = rField.cols();
          int rhsRows = op->cols();
 
-         Datatypes::internal::addMatrixProduct(rField, start, *op, rhs.block(rhsStart, 0, rhsRows, cols));
+         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.block(rhsStart, 0, rhsRows, cols));
 
       } else if(eq.hasQIZ(compId))
       {
@@ -328,7 +328,7 @@ namespace Equations {
          int cols = rField.cols();
          int rhsRows = op->cols();
 
-         Datatypes::internal::addMatrixProduct(rField, start, *op, rhs.block(rhsStart, 0, rhsRows, cols));
+         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.block(rhsStart, 0, rhsRows, cols));
       }
    }
 
@@ -346,7 +346,7 @@ namespace Equations {
          int cols = rField.real().cols();
          int rhsRows = op->cols();
 
-         Datatypes::internal::addMatrixProduct(rField, start, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
+         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
 
       } else if(eq.hasQIZ(compId))
       {
@@ -357,7 +357,7 @@ namespace Equations {
          int cols = rField.real().cols();
          int rhsRows = op->cols();
 
-         Datatypes::internal::addMatrixProduct(rField, start, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
+         Datatypes::details::addMatrixProduct(rField, start, *op, rhs.real().block(rhsStart, 0, rhsRows, cols), rhs.imag().block(rhsStart, 0, rhsRows, cols));
       }
    }
 
@@ -366,7 +366,7 @@ namespace Equations {
       // Create pointer to sparse operator
       const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
 
-      Datatypes::internal::setMatrixProduct(rField, 0, *op, rhs.block(start, 0, op->cols(), rhs.cols()));
+      Datatypes::details::setMatrixProduct(rField, 0, *op, rhs.block(start, 0, op->cols(), rhs.cols()));
    }
 
    template <> inline void applyGalerkinStencil<DecoupledZMatrix>(const IEquation& eq, FieldComponents::Spectral::Id compId, DecoupledZMatrix& rField, const int start, const int matIdx, const DecoupledZMatrix& rhs)
@@ -377,7 +377,7 @@ namespace Equations {
       // Create pointer to sparse operator
       const SparseMatrix * op = &eq.galerkinStencil(compId, matIdx);
 
-      Datatypes::internal::setMatrixProduct(rField, 0, *op, rhs.real().block(start, 0, op->cols(), rhs.real().cols()), rhs.imag().block(start, 0, op->cols(), rhs.imag().cols()));
+      Datatypes::details::setMatrixProduct(rField, 0, *op, rhs.real().block(start, 0, op->cols(), rhs.real().cols()), rhs.imag().block(start, 0, op->cols(), rhs.imag().cols()));
    }
 
    template <typename T, typename TOperator,typename TData> void computeExplicitTerm(const IEquation& eq, const std::size_t opId, FieldComponents::Spectral::Id compId, TData& rSolverField, const int eqStart, SpectralFieldId fieldId, const typename Framework::Selector::ScalarField<T>& explicitField, const int matIdx)
@@ -389,6 +389,7 @@ namespace Equations {
       if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_SINGLE_RHS)
       {
          typename Eigen::Matrix<T,Eigen::Dynamic,1>  tmp(op->cols());
+         const int cols = tRes.dim<Dimensions::Data::DAT2D>(matIdx);
          #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
             // Initialise storage to zero
             tmp.setZero();
@@ -402,14 +403,15 @@ namespace Equations {
             {
                corrDim = tRes.idx<Dimensions::Data::DAT3D>(matIdx)*dimI;
             }
-            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+            for(int j = 0; j < cols; j++)
             {
                j_ = tRes.idx<Dimensions::Data::DAT2D>(j,matIdx)*dimI;
                if(corrDim > 0)
                {
                   j_ -= corrDim;
                }
-               for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
+               const int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+               for(int i = 0; i < useRows; i++)
                {
                   // Compute correct position
                   l = j_ + i;
@@ -420,9 +422,12 @@ namespace Equations {
             }
          #else
             int k = 0;
-            for(int j = 0; j < explicitField.slice(matIdx).cols(); j++)
+            for(int j = 0; j < cols; j++)
             {
-               for(int i = 0; i < explicitField.slice(matIdx).rows(); i++)
+               // Effective rows in case of non-uniform truncation
+               int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, matIdx);
+
+               for(int i = 0; i < usedRows; i++)
                {
                   // Copy slice into flat array
                   tmp(k) = explicitField.point(i,j,matIdx);
@@ -434,12 +439,12 @@ namespace Equations {
          #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
 
          // Apply operator to field
-         Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, tmp);
+         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, tmp);
 
       } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SLOWEST_MULTI_RHS)
       {
          // Apply operator to field
-         Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(matIdx));
+         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(matIdx));
 
       } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {
@@ -450,7 +455,7 @@ namespace Equations {
          assert(op->cols() == explicitField.slice(mode(0)).rows());
 
          // Apply operator to field
-         Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
+         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, explicitField.slice(mode(0)).col(mode(1)));
 
       } else if(eq.couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
       {
@@ -479,10 +484,12 @@ namespace Equations {
          for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
          {
             k_ = tRes.idx<Dimensions::Data::DAT3D>(k)*dimK;
-            for(int j = 0; j < explicitField.slice(k).cols(); j++)
+            const int cols = tRes.dim<Dimensions::Data::DAT2D>(k);
+            for(int j = 0; j < cols; j++)
             {
                j_ = tRes.idx<Dimensions::Data::DAT2D>(j,k)*dimJ;
-               for(int i = 0; i < explicitField.slice(k).rows(); i++)
+               const int usedRows = tRes.dim<Dimensions::Data::DATB1D>(j, k);
+               for(int i = 0; i < usedRows; i++)
                {
                   // Compute correct position
                   l = k_ + j_ + i;
@@ -494,7 +501,7 @@ namespace Equations {
          }
 
          // Apply operator to field
-         Datatypes::internal::addMatrixProduct(rSolverField, eqStart, *op, tmp);
+         Datatypes::details::addMatrixProduct(rSolverField, eqStart, *op, tmp);
       }
    }
 

@@ -6,16 +6,7 @@
 #ifndef QUICC_VISUALIZATIONGENERATORFACTORY_HPP
 #define QUICC_VISUALIZATIONGENERATORFACTORY_HPP
 
-// First include
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -31,26 +22,29 @@ namespace QuICC {
    template <class TModel> class VisualizationGeneratorFactory
    {
       public:
+         /// Typedef of type of object created
+         typedef std::shared_ptr<VisualizationGenerator> ReturnType;
+
          /**
           * @brief Create a shared state generator for the model
           */
-         static SharedVisualizationGenerator createVisualization();
+         static ReturnType create();
 
-      protected:
-
-      private:
          /**
           * @brief Constructor
           */
-         VisualizationGeneratorFactory();
+         VisualizationGeneratorFactory() = delete;
 
          /**
           * @brief Destructor
           */
-         ~VisualizationGeneratorFactory();
+         ~VisualizationGeneratorFactory() = delete;
+      protected:
+
+      private:
    };
 
-   template <class TModel> SharedVisualizationGenerator VisualizationGeneratorFactory<TModel>::createVisualization()
+   template <class TModel> typename VisualizationGeneratorFactory<TModel>::ReturnType VisualizationGeneratorFactory<TModel>::create()
    {
       // Create model
       TModel model;

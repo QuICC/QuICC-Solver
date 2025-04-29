@@ -12,21 +12,14 @@
 
 // Project includes
 //
-#include "Cpp/Span.hpp"
-
-#ifdef __CUDACC__
-#define QUICC_CUDA_HOSTDEV __host__ __device__
-#define QUICC_CUDA_HOST __host__
-#else
-#define QUICC_CUDA_HOSTDEV
-#define QUICC_CUDA_HOST
-#endif
+#include "Std/Span.hpp"
+#include "View/ViewMacros.hpp"
 
 using QuICC::Patch::std::span;
 
 namespace QuICC {
 /// @brief This namespace provides all the View related code
-namespace Memory {
+namespace View {
 
    /// @brief Generic template for a View
    /// @tparam Scalar element type
@@ -88,5 +81,5 @@ namespace Memory {
       QUICC_CUDA_HOSTDEV constexpr Scalar* data() const {return _data;}
    };
 
-} // namespace Memory
+} // namespace View
 } // namespace QuICC

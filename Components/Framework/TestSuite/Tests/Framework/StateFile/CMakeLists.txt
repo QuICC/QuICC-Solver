@@ -54,14 +54,16 @@ foreach(_scheme ${_schemes})
         COMMAND ${TestExe}
         KEYWORD Scheme:Mode
         ID 0
-        OPTIONS algorithm:${_alg}
+        OPTIONS algorithm:${_alg} truncation:uniform
       )
     endforeach()
     add_test(
       NAME ${TestExe}_${_scheme}_validate_algorithm-${_alg}
-      COMMAND h5diff -q state0000.hdf5 state_${_scheme}.hdf5
+      COMMAND h5diff -q state_${_scheme}0000.hdf5 state_${_scheme}.hdf5
       WORKING_DIRECTORY "${QUICC_WORK_DIR}"
       )
+    set_tests_properties(${TestExe}_${_scheme}_validate_algorithm-${_alg}
+      PROPERTIES DEPENDS "${TestExe}_${_scheme}_write_default_algorithm-${_alg}")
   endforeach()
 endforeach()
 
@@ -79,11 +81,47 @@ foreach(_scheme ${_schemes})
         COMMAND ${TestExe}
         KEYWORD Scheme:Mode
         ID 0
-        OPTIONS algorithm:${_alg}
+        OPTIONS algorithm:${_alg} truncation:uniform
         STEPS 10
         PERFONLY
       )
     endforeach()
+  endforeach()
+endforeach()
+
+# disable triangular truncation if not supported by default backend
+set(_dis False)
+if(TARGET QuICC::Cuda)
+  set(_dis True)
+endif()
+if(QUICC_USE_KOKKOS)
+  set(_dis True)
+endif()
+
+set(_schemes
+  WLFl
+  WLFm
+  )
+foreach(_scheme ${_schemes})
+  foreach(_alg serial)
+    foreach(_mode read write)
+      quicc_add_test(${_scheme}:${_mode}
+        COMMAND ${TestExe}
+        KEYWORD Scheme:Mode
+        ID 0
+        OPTIONS algorithm:${_alg} truncation:triangular
+        DISABLED ${_dis}
+      )
+    endforeach()
+    if(NOT ${_dis})
+      add_test(
+        NAME ${TestExe}_${_scheme}_triangular_validate_algorithm-${_alg}
+        COMMAND h5diff -r state_${_scheme}_triangular0000.hdf5 state_${_scheme}_triangular.hdf5
+        WORKING_DIRECTORY "${QUICC_WORK_DIR}"
+        )
+      set_tests_properties(${TestExe}_${_scheme}_triangular_validate_algorithm-${_alg}
+        PROPERTIES DEPENDS "${TestExe}_${_scheme}_write_gq_triangular_algorithm-${_alg}")
+    endif()
   endforeach()
 endforeach()
 

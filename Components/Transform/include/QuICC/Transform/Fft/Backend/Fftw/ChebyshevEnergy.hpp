@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ChebyshevEnergy.hpp
- * @brief Interface for a generic Chebyshev FFTW based energy reductor 
+ * @brief Interface for a generic Chebyshev FFTW based energy reductor
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_CHEBYSHEVENERGY_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/IChebyshevBackend.hpp"
 #include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
@@ -37,7 +37,7 @@ namespace Fftw {
 
    /**
     * @brief Interface for a generic Chebyshev FFTW based energy reductor
-    */ 
+    */
    class ChebyshevEnergy: public IChebyshevBackend
    {
       public:
@@ -50,11 +50,16 @@ namespace Fftw {
           * @brief Destructor
           */
          ~ChebyshevEnergy();
-         
+
          /**
           * @brief Initialise the FFTW transforms
           */
          void init(const SetupType& setup) const final;
+
+         /**
+          * @brief Set Scaler array
+          */
+         void setScaler(const Array& scaler) const;
 
          /**
           * @brief set spectral operator
@@ -70,6 +75,11 @@ namespace Fftw {
           * @brief Set output
           */
          void output(Matrix& rOut, const Matrix& tmp) const;
+
+         /**
+          * @brief Set output on grid
+          */
+         void outputGrid(Matrix& rOut, const Matrix& tmp) const;
 
          /**
           * @brief Set output mutliplied by scalar operator
@@ -105,7 +115,7 @@ namespace Fftw {
           * @param getOut return input or ouput storage
           */
          Matrix& getStorage(const StorageKind = StorageKind::in) const final;
-         
+
          /**
           * @brief Apply padding
           */
@@ -143,6 +153,11 @@ namespace Fftw {
           * @brief Solver for differential operators
           */
          mutable std::shared_ptr<DifferentialSolver> mspSolver;
+
+         /**
+          * @brief Scaler array
+          */
+         mutable Array mScaler;
 
          /**
           * @brief FFT scaling factor

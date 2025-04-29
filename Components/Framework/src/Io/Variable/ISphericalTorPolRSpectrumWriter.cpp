@@ -3,23 +3,14 @@
  * @brief Source of the implementation of the ASCII spherical harmonics power spectrum calculation for toroidal/poloidal field in a spherical geometry
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ISphericalTorPolRSpectrumWriter.hpp"
-
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "QuICC/Io/Variable/ISphericalTorPolRSpectrumWriter.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Tools/Formatter.hpp"
@@ -140,7 +131,7 @@ namespace Variable {
                int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = l_*(l_+1.0);
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeTPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -167,7 +158,7 @@ namespace Variable {
                   factor = 2.0;
                }
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeTPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -217,7 +208,7 @@ namespace Variable {
                int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = std::pow(l_*(l_+1.0),2);
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeQPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -243,7 +234,7 @@ namespace Variable {
                   factor = 2.0;
                }
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeQPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -293,7 +284,7 @@ namespace Variable {
                int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
                lfactor = l_*(l_+1.0);
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeSPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -319,7 +310,7 @@ namespace Variable {
                   factor = 2.0;
                }
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storeSPower(i, l_, m_, factor*lfactor*spectrum(i, idx));
                }
@@ -424,7 +415,7 @@ namespace Variable {
          // Total spectrum
          for(int i = 0; i < this->mTorPower.rows(); i++)
          {
-            this->mFile << std::left << ioIW() << this->mGrid(i) << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::left << ioIW() << std::setprecision(ioPrec) << this->mGrid(i) << "\t";
             for(int j = 0; j < this->mTorPower.cols(); j++)
             {
                this->mFile << ioFW(ioPrec) << this->mTorPower(i,j) + this->mPolPower(i,j) << "\t";
@@ -440,7 +431,7 @@ namespace Variable {
          // Toroidal spectrum
          for(int i = 0; i < this->mTorPower.rows(); i++)
          {
-            this->mFile << std::left << ioIW() << i << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::left << ioIW() << std::setprecision(ioPrec) << this->mGrid(i) << "\t";
             for(int j = 0; j < this->mTorPower.cols(); j++)
             {
                this->mFile << ioFW(ioPrec) << this->mTorPower(i,j) << "\t";
@@ -456,7 +447,7 @@ namespace Variable {
          // Poloidal spectrum
          for(int i = 0; i < this->mPolPower.rows(); i++)
          {
-            this->mFile << std::left << ioIW() << i << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::left << ioIW() << std::setprecision(ioPrec) << this->mGrid(i) << "\t";
             for(int j = 0; j < this->mPolPower.cols(); j++)
             {
                this->mFile << ioFW(ioPrec) << this->mPolPower(i,j) << "\t";

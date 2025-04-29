@@ -1,4 +1,4 @@
-/** 
+/**
  * @file D2.hpp
  * @brief Implementation of the Fourier based D^2 projector
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Projector/IComplexProjector.hpp"
 #include "QuICC/Transform/Fft/Fourier/Tags.hpp"
 

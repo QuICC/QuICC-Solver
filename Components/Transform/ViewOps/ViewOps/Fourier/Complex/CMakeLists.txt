@@ -1,16 +1,16 @@
-target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} PRIVATE
-  Projector/D.cpp
-  Integrator/D.cpp
-  Cpu/Diff.cpp
-  Cpu/Diff2D.cpp
-  Cpu/Mean.cpp
+target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+  PRIVATE
+    Cpu/Diff.cpp
+    Cpu/Diff2D.cpp
+    Cpu/Mean.cpp
 )
 
-if(TARGET QuICC::Fft::CuFft)
-  target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB} PRIVATE
-    Cuda/Diff.cu
-    Cuda/Diff2D.cu
-    Cuda/Mean.cu
+if((TARGET QuICC::Fft::CuFft AND QUICC_USE_CUFFT) OR (TARGET QuICC::Fft::VkFft AND QUICC_USE_VKFFT))
+  target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
+    PRIVATE
+      Cuda/Diff.cu
+      Cuda/Diff2D.cu
+      Cuda/Mean.cu
 
   )
 endif()
@@ -22,6 +22,7 @@ set(PHS
   Complex/Diff.hpp
   Complex/Diff2D.hpp
   Complex/Mean.hpp
+  Complex/Types.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}

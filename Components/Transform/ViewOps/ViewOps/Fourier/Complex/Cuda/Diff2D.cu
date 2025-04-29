@@ -6,6 +6,7 @@
 #include "View/View.hpp"
 #include "ViewOps/Fourier/Util.hpp"
 #include "ViewOps/Fourier/Tags.hpp"
+#include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Cuda/CudaUtil.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -15,11 +16,6 @@ namespace Transform {
 namespace Fourier {
 namespace Complex {
 namespace Cuda {
-
-using namespace QuICC::Memory;
-
-/// @brief Compressed sparse layer 3D tensor (Implicit column major)
-using mods_t = View<std::complex<double>, DCCSC3D>;
 
 /// @brief thread coarsening factor
 constexpr std::size_t tCF = 8;
@@ -42,20 +38,15 @@ namespace details
         constexpr int sgnOfj = 1 - 2*static_cast<int>((Ofj/2) % 2);
         constexpr int sgnFirst = sgnOfi * sgnOfj;
 
-        const auto M = in.dims()[0];
-
         // dealias bounds
-        std::size_t nDealias = M;
-        if constexpr (Treatment & dealias_m)
-        {
-            nDealias *= dealias::rule;
-        }
+        const auto M = in.lds();
+        const auto MDealias = in.dims()[0];
 
         // positive / negative coeff bounds
         const auto negM = M / 2;
         const auto posM = negM + M % 2;
-        const auto negDealias = nDealias / 2;
-        const auto posDealias = negDealias + nDealias % 2;
+        const auto negDealias = MDealias / 2;
+        const auto posDealias = negDealias + MDealias % 2;
 
         double fftScaling = 1.0;
         if constexpr (std::is_same_v<Direction, fwd_t> &&
@@ -123,13 +114,10 @@ namespace details
             }
 
             // dealias
-            if constexpr (Treatment & dealias_m)
+            if(m >= posDealias && m < M - negDealias)
             {
-                if(m >= posDealias && m < M - negDealias)
-                {
-                    tmpFm = {0.0, 0.0};
-                    tmpSm = {0.0, 0.0};
-                }
+                tmpFm = {0.0, 0.0};
+                tmpSm = {0.0, 0.0};
             }
 
             std::size_t k = 0;
@@ -189,8 +177,9 @@ template<class Tout, class Tin, std::size_t Ofi, std::size_t Ofj,
     std::size_t Osi, std::size_t Osj, class Direction, std::uint16_t Treatment>
 void Diff2DOp<Tout, Tin, Ofi, Ofj, Osi, Osj, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
+    using namespace QuICC::View;
     static_assert(std::is_same_v<typename Tin::LevelType, DCCSC3D::level>,
-        "implementation assumes dense, CSC, CSC");
+        "implementation assumes dense, compressed, sparse");
 
     Profiler::RegionFixture<4> fix("Diff2DOp::applyImpl");
 

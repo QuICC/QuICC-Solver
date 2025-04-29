@@ -23,8 +23,6 @@ namespace ALegendre {
    Setup::Setup(const int size, const int specSize, const GridPurpose::Id purpose)
       : ::QuICC::Transform::Poly::Setup(size, specSize, purpose)
    {
-      // Initialize fixtures
-      ExternalLibrary::Kokkos::getInstance();
    }
 
    Setup::~Setup()

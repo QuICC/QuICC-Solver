@@ -12,8 +12,8 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/SphereMaxAbsoluteFieldValueWriter.hpp"
-#include "QuICC/QuICCEnv.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Environment/QuICCEnv.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/MaxAbsoluteFieldValue.hpp"
 

@@ -3,22 +3,13 @@
  * @brief Source of the tools for schemes with two eigen direction
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
+// Project includes
 //
 #include "QuICC/Equations/Tools/Regular2D.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
-
-// Project includes
-//
 
 namespace QuICC {
 
@@ -77,7 +68,7 @@ namespace Tools {
       // Python setup is sufficient
    }
 
-   void Regular2D::interpretSystemN(ArrayI&, const Resolution&) const
+   void Regular2D::interpretSystemN(ArrayI&, const Resolution&, const int) const
    {
       // Python setup is sufficient
    }

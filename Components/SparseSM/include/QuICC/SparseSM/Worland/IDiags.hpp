@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IDiags.hpp
  * @brief Interface to Worland sparse operator diagonals
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 #include "QuICC/SparseSM/Worland/WorlandKind.hpp"
 
 namespace QuICC {
@@ -22,15 +22,15 @@ namespace Worland {
 
    /**
     * @brief Interface to Worland sparse operator diagonals
-    */ 
+    */
    class IDiags
    {
       public:
-         /// Typedef for scalar 
-         typedef internal::MHDFloat Scalar_t;
+         /// Typedef for scalar
+         typedef Internal::MHDFloat Scalar_t;
 
          /// Typedef for coefficient array
-         typedef internal::ACoeff ACoeff_t;
+         typedef Internal::ACoeff ACoeff_t;
 
          /**
           * @brief Constructor
@@ -54,7 +54,7 @@ namespace Worland {
           * @param p    Shift in l
           */
          void precomputeNorm(const int maxN, const int p);
-         
+
       protected:
          /**
           * @brief Get alpha

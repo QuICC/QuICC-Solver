@@ -1,11 +1,10 @@
-/** 
+/**
  * @file I4Lapl.cpp
  * @brief Source of the implementation of the full sphere Worland I4Lapl sparse operator
  */
 
 // System includes
 //
-#include <cassert>
 #include <stdexcept>
 
 // Project includes
@@ -14,7 +13,7 @@
 #include "QuICC/SparseSM/Worland/Chebyshev/I4LaplDiags.hpp"
 //#include "QuICC/SparseSM/Worland/Legendre/I4LaplDiags.hpp"
 //#include "QuICC/SparseSM/Worland/CylEnergy/I4LaplDiags.hpp"
-//#include "QuICC/SparseSM/Worland/SphEnergy/I4LaplDiags.hpp"
+#include "QuICC/SparseSM/Worland/SphEnergy/I4LaplDiags.hpp"
 
 namespace QuICC {
 
@@ -39,8 +38,7 @@ namespace Worland {
             throw std::logic_error("Not yet implemented");
             break;
          case WorlandKind::SPHENERGY:
-            //this->mpImpl = std::make_shared<SphEnergy::I4LaplDiags>(alpha, l);
-            throw std::logic_error("Not yet implemented");
+            this->mpImpl = std::make_shared<SphEnergy::I4LaplDiags>(alpha, l, q);
             break;
       }
    }
@@ -70,7 +68,7 @@ namespace Worland {
       }
    }
 
-   void I4Lapl::buildBanded(internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
+   void I4Lapl::buildBanded(Internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
    {
       kL = 2;
       kU = 8;

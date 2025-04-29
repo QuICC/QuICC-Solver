@@ -25,12 +25,6 @@ public:
     /// @param op this input represents the operator so it is always const
     virtual void apply(Tout& out, const Tin& in, const Top& op) = 0;
 
-    /// @brief apply action of the binary operator
-    /// @param out result of the operation
-    /// @param in input of the operation
-    /// @param op this input represents the operator so it is always const
-    virtual void apply(Tout& out, Tin& in, const Top& op) = 0;
-
     /// @brief dtor
     virtual ~BinaryOp() = default;
 };
@@ -44,15 +38,6 @@ template <class Derived, class Tout, class Tin, class Top>
 class BinaryBaseOp : public BinaryOp<Tout, Tin, Top>
 {
 public:
-    /// @brief apply action of the binary operator by dispatching to derived class implementation
-    /// @param out result of the operation
-    /// @param in input of the operation
-    /// @param op this input represents the operator so it is always const
-    void apply(Tout& out, Tin& in, const Top& op) final {
-        auto derivedPtr = static_cast<Derived*>(this);
-        derivedPtr->applyImpl(out, in, op);
-    }
-
     /// @brief apply action of the binary operator by dispatching to derived class implementation
     /// @param out result of the operation
     /// @param in input of the operation with const qualifier

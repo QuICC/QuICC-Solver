@@ -1,0 +1,27 @@
+.alps-a100_runner:
+  extends: .container-runner-clariden-a100
+  variables:
+    PULL_ON_HOST_MACHINE: 'NO'
+    CSCS_REGISTRY_LOGIN: 'YES'
+    USE_MPI: 'YES'
+    SLURM_TIMELIMIT: '01:20:00'
+
+.alps-gh200_runner:
+  extends: .container-runner-daint-gh200
+  variables:
+    PULL_ON_HOST_MACHINE: 'NO'
+    CSCS_REGISTRY_LOGIN: 'YES'
+    USE_MPI: 'YES'
+    SLURM_CPU_BIND: verbose
+    OMP_DISPLAY_ENV: verbose
+    SLURM_CPUS_PER_TASK: 72
+    SLURM_NTASKS: 1
+    SLURM_TIMELIMIT: '03:10:00'
+
+.alps-zen2_runner:
+  extends: .container-runner-eiger-zen2
+  variables:
+    PULL_ON_HOST_MACHINE: 'NO'
+    CSCS_REGISTRY_LOGIN: 'YES'
+    USE_MPI: 'YES'
+    SLURM_TIMELIMIT: '01:20:00'

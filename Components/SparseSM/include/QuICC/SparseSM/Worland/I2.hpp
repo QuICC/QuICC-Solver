@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/IWorlandOperator.hpp"
 #include "QuICC/SparseSM/Worland/I2Diags.hpp"
 
@@ -63,7 +63,7 @@ namespace Worland {
           * @param kL   Number of lower diagonals
           * @param kU   Number of upper diagonals
           */
-         void buildBanded(internal::Matrix& bd, unsigned int& kL, unsigned int& kU) const final;
+         void buildBanded(Internal::Matrix& bd, unsigned int& kL, unsigned int& kU) const final;
 
          /**
           * @brief Implementation of the diagonals

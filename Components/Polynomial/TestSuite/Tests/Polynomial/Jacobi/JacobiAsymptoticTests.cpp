@@ -1,7 +1,11 @@
 #define CATCH_CONFIG_MAIN
+// System includes
+//
 #include <catch2/catch.hpp>
 
-
+// Project includes
+//
+#include "Types/Internal/Math.hpp"
 #include "QuICC/Polynomial/Jacobi/JacobiAsymptotic.hpp"
 
 namespace QuICC {
@@ -15,10 +19,10 @@ std::pair<bool,T> checkNormal(const T data, const T ref, T refMod = 1.0)
     auto tol = maxUlp * epsilon;
 
     bool isEqual = false;
-    auto diff = precision::abs(data-ref);
+    auto diff = Internal::Math::abs(data-ref);
     if(ref != 0.0)
     {
-        refMod = precision::abs(ref);
+        refMod = Internal::Math::abs(ref);
     }
 
     if(diff < tol)
@@ -41,7 +45,7 @@ TEST_CASE("Stirling's serie", "[Stirling]")
 {
     struct refHolderN
     {
-        using type = QuICC::internal::MHDFloat;
+        using type = QuICC::Internal::MHDFloat;
         type coeff;
     };
 
@@ -77,7 +81,7 @@ TEST_CASE("g(theta), g', g''", "[gTheta]")
 {
     struct refHolderN
     {
-        using type = QuICC::internal::MHDFloat;
+        using type = QuICC::Internal::MHDFloat;
         type t, a, b;
         std::array<type, 3> res;
     };
@@ -85,7 +89,7 @@ TEST_CASE("g(theta), g', g''", "[gTheta]")
     std::vector<refHolderN> ref{
         {MHD_MP(0.1), MHD_MP(-0.5), MHD_MP(-0.5), {MHD_MP(0.0),MHD_MP(0.0),MHD_MP(0.0)}},
         {MHD_MP(0.1), MHD_MP(-0.5), MHD_MP(0.5), {MHD_MP(0.0),MHD_MP(0.0),MHD_MP(0.0)}},
-        {Precision::PI/MHD_MP(2.0), MHD_MP(0.0), MHD_MP(0.0),
+        {Internal::Math::PI/MHD_MP(2.0), MHD_MP(0.0), MHD_MP(0.0),
             {MHD_MP(-0.3183098861837906715377675267450287240689192914809128974953346881),
              MHD_MP(-0.2973576327153244571122410735805447221912824506555069023087819362),
              MHD_MP(-0.2580122754655959134753764215085095087445066891798246138766537777)}},
@@ -126,7 +130,7 @@ TEST_CASE("ExpArgBnd", "[ExpArgBnd]")
 {
     struct refHolderN
     {
-        using type = QuICC::internal::MHDFloat;
+        using type = QuICC::Internal::MHDFloat;
         type n, a, res;
     };
 
@@ -157,7 +161,7 @@ TEST_CASE("ExpArgInt", "[ExpArgInt]")
 {
     struct refHolderN
     {
-        using type = QuICC::internal::MHDFloat;
+        using type = QuICC::Internal::MHDFloat;
         type n, a, b, res;
     };
 

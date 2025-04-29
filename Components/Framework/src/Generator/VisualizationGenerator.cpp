@@ -3,28 +3,28 @@
  * @brief Source of the high level state generator
  */
 
-// Configuration includes
-//
-#include "QuICC/Debug/DebuggerMacro.h"
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
 // System includes
 //
 
 // Project includes
 //
+#include "QuICC/Debug/DebuggerMacro.h"
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Generator/VisualizationGenerator.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/Tools/Formatter.hpp"
+#include "QuICC/Simulation/SimulationIoTools.hpp"
 
 namespace QuICC {
 
    void VisualizationGenerator::preRun()
    {
+      // Write ascii files
+      SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mPseudospectral.transformCoordinator());
+      this->mSimIoCtrl.writeAscii(this->mPseudospectral.startTime(), this->mPseudospectral.startTimestep());
    }
-
 
    void VisualizationGenerator::mainRun()
    {
@@ -60,7 +60,8 @@ namespace QuICC {
 
    void VisualizationGenerator::writeOutput()
    {
-      // Write final state file (using store time and timestep)
+
+      // Write Hdf5 files
       this->mSimIoCtrl.writeHdf5(this->mPseudospectral.startTime(), this->mPseudospectral.startTimestep());
 
       // Synchronise all nodes of simulation

@@ -6,9 +6,6 @@
 // System includes
 //
 
-// External includes
-//
-
 // Class include
 //
 #include "QuICC/Transform/Poly/Worland/Integrator/IWorlandIntegrator.hpp"
@@ -28,12 +25,12 @@ namespace Worland {
 
 namespace Integrator {
 
-   IWorlandIntegrator::IWorlandIntegrator()
-      : IWorlandOperator(),
+IWorlandIntegrator::IWorlandIntegrator() :
+    IWorlandOperator(),
 #ifdef QUICC_TRANSFORM_WORLAND_TRUNCATE_QI
-        mcTruncQI(true)
+    mcTruncQI(true)
 #else
-        mcTruncQI(false)
+    mcTruncQI(false)
 #endif // QUICC_TRANSFORM_WORLAND_TRUNCATE_QI
    {
       this->mProfileTag += "-Integrator";
@@ -43,32 +40,23 @@ namespace Integrator {
    {
    }
 
-   void IWorlandIntegrator::initOperators(const internal::Array& igrid, const internal::Array& iweights) const
+   void IWorlandIntegrator::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
    {
-      #if defined QUICC_WORLAND_INTGIMPL_MATRIX
-         // Reserve storage for the operators
-         this->mOps.reserve(this->mspSetup->slowSize());
+      // Reserve storage for the operators
+      this->mOps.reserve(this->mspSetup->slowSize());
 
-         // Loop over harmonic degrees
-         for(int i = 0; i < this->mspSetup->slowSize(); i++)
-         {
-            // Build operator
-            this->mOps.push_back(Matrix(igrid.size(), this->mspSetup->fastSize(i)));
-            this->makeOperator(this->mOps.back(), igrid, iweights, i);
-         }
-
-      #elif defined QUICC_WORLAND_INTGIMPL_OTF
-
-         // Store grid and weights
-         this->mGrid = igrid;
-         this->mWeights = iweights;
-
-      #endif //defined QUICC_WORLAND_INTGIMPL_MATRIX
+      // Loop over harmonic degrees
+      for(int i = 0; i < this->mspSetup->slowSize(); i++)
+      {
+         // Build operator
+         this->mOps.push_back(Matrix(igrid.size(), this->mspSetup->fastSize(i)));
+         this->makeOperator(this->mOps.back(), igrid, iweights, i);
+      }
    }
 
    void IWorlandIntegrator::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
-      Profiler::RegionFixture<3> fix(this->mProfileTag);
+      Profiler::RegionFixture<3> fix(this->mProfileTag + "::applyOperators");
 
       // assert right sizes for input matrix
       assert(in.rows() == this->mspSetup->fwdSize());
@@ -115,7 +103,7 @@ namespace Integrator {
       return mem;
    }
 
-   void IWorlandIntegrator::defaultApplyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
+   void IWorlandIntegrator::defaultApplyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const
    {
       rOut = this->mOps.at(i).transpose()*in;
    }
@@ -129,7 +117,6 @@ namespace Integrator {
    {
       return this->mspSetup->blockSize();
    }
-
 }
 }
 }

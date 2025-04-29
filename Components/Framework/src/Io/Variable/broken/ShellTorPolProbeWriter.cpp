@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include"Enums/Dimensions.hpp"
 #include"Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/Ro.hpp"

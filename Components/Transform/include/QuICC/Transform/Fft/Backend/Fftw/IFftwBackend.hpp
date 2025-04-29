@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IFftwBackend.hpp
- * @brief Interface for a generic FFTW based backend 
+ * @brief Interface for a generic FFTW based backend
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_IFFTWBACKEND_HPP
@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "Fft/Fftw/Library.hpp"
 
 namespace QuICC {
@@ -36,7 +36,7 @@ namespace Fftw {
 
    /**
     * @brief Interface for a generic FFTW backend
-    */ 
+    */
    class IFftwBackend
    {
       public:
@@ -89,7 +89,7 @@ namespace Fftw {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const;
-         
+
       protected:
          /**
           * @brief Plan for the transform

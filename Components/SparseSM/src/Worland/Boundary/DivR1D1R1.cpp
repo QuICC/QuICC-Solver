@@ -1,4 +1,4 @@
-/** 
+/**
  * @file DivR1D1R1.cpp
  * @brief Source of the implementation of boundary value
  */
@@ -9,6 +9,7 @@
 // Project include
 //
 #include "QuICC/SparseSM/Worland/Boundary/DivR1D1R1.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -42,7 +43,7 @@ namespace Boundary {
       n = (ACoeffI::LinSpaced(maxN+1, 0, maxN)).cast<Scalar_t>();
       return this->invnorm(n)*val;
    }
- 
+
 } // Boundary
 } // Worland
 } // Polynomial

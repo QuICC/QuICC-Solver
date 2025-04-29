@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IComplexIntegrator.hpp
- * @brief Interface for a generic complex FFTW based integrator 
+ * @brief Interface for a generic complex FFTW based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_INTEGRATOR_ICOMPLEXINTEGRATOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/IComplexOperator.hpp"
 #include "QuICC/Transform/Fft/Backend/ComplexIntegrator.hpp"
 
@@ -38,7 +38,7 @@ namespace Integrator {
 
    /**
     * @brief Interface for a generic complex FFTW based integrator
-    */ 
+    */
    class IComplexIntegrator: public IComplexOperator
    {
       public:
@@ -83,25 +83,12 @@ namespace Integrator {
           */
          void dealias(MatrixZ& deAliased, const MatrixZ& aliased) const final;
 
-         
+
       protected:
          /**
           * @brief FFT backend
           */
          Backend::ComplexIntegrator mBackend;
-
-      private:
-         /**
-          * @brief Initialise FFT backend
-          */
-         virtual void initBackend() const override;
-
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         virtual void applyPostOperator(MatrixZ& rOut) const = 0;
 
          /**
           * @brief Compute transform C2R (disabled)
@@ -126,6 +113,19 @@ namespace Integrator {
           * @param in   Input values
           */
          virtual void transform(Matrix& rOut, const Matrix& in) const override;
+
+      private:
+         /**
+          * @brief Initialise FFT backend
+          */
+         virtual void initBackend() const override;
+
+         /**
+          * @brief Apply post FFT operator
+          *
+          * @param rOut Output values
+          */
+         virtual void applyPostOperator(MatrixZ& rOut) const = 0;
    };
 
 }

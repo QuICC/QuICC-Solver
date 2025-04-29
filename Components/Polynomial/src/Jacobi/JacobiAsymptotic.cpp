@@ -1,4 +1,4 @@
-/** 
+/**
  * @file JacobiAsymptotic.cpp
  * @brief Implementation of the Jacobi polynomial base
  */
@@ -60,7 +60,7 @@ std::array<MHDFloat, 2> evalPdPatBnd(const std::uint32_t n, const MHDFloat a, co
    Quadrature::ChebyshevRule<Quadrature::gaussLobatto_t> quad;
    quad.computeQuadrature(grid, weights, nPts, t, 0);
    // avoid division by zero
-   grid(0) = std::numeric_limits<internal::MHDFloat>::epsilon()*t;
+   grid(0) = std::numeric_limits<Internal::MHDFloat>::epsilon()*t;
    Matrix D(nPts, nPts), I(nPts, nPts), T(nPts, nPts), TI(nPts, nPts);
 
    // collocation differentiation matrix

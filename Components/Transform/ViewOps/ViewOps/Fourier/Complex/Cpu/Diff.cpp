@@ -9,9 +9,10 @@
 #include "View/View.hpp"
 #include "ViewOps/Fourier/Util.hpp"
 #include "ViewOps/Fourier/Tags.hpp"
+#include "ViewOps/Fourier/Complex/Types.hpp"
 #include "Profiler/Interface.hpp"
 
-#ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #endif
 
@@ -21,29 +22,29 @@ namespace Fourier {
 namespace Complex {
 namespace Cpu {
 
-using namespace QuICC::Memory;
-
 template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
 DiffOp<Tout, Tin, Order, Direction, Treatment>::DiffOp(ScaleType scale) : mScale(scale){};
 
 template<class Tout, class Tin, std::size_t Order, class Direction, std::uint16_t Treatment>
 void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const Tin& in)
 {
-    Profiler::RegionFixture<4> fix("DiffOp::applyImpl");
+    Profiler::RegionFixture<5> fix("DiffOp::applyImpl");
 
+    assert(out.size() == in.size());
     assert(out.dims()[0] == in.dims()[0]);
     assert(out.dims()[1] == in.dims()[1]);
     assert(out.dims()[2] == in.dims()[2]);
 
-    #ifdef QUICC_USE_CUFFT
+#ifdef QUICC_HAS_CUDA_BACKEND
     assert(!QuICC::Cuda::isDeviceMemory(out.data()));
-    #endif
+#endif
 
     if constexpr (std::is_same_v<Direction, bwd_t> &&
         Treatment == none_m && Order == 0)
     {
-        // if the diff is in place it is a noop
-        if(out.data() == in.data())
+        // if the diff is null and in place and there are no modes
+        // to be zeroed then it is a noop
+        if(out.data() == in.data() && out.dims()[0] == out.lds())
         {
             return;
         }
@@ -56,20 +57,15 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
     using float_t = typename DiffOp<Tout, Tin, Order, Direction, Treatment>::ScaleType;
     std::conditional_t<isComplex, complex_t, float_t> c;
 
-    const auto M = in.dims()[0];
-
     // dealias bounds
-    std::size_t nDealias = M;
-    if constexpr (Treatment & dealias_m)
-    {
-        nDealias *= dealias::rule;
-    }
+    const auto M = in.lds();
+    const auto MDealias = in.dims()[0];
 
     // positive / negative coeff bounds
     const auto negM = M / 2;
     const auto posM = negM + M % 2;
-    const auto negDealias = nDealias / 2;
-    const auto posDealias = negDealias + nDealias % 2;
+    const auto negDealias = MDealias / 2;
+    const auto posDealias = negDealias + MDealias % 2;
 
     float_t fftScaling = 1.0;
     if constexpr (std::is_same_v<Direction, fwd_t>)
@@ -217,7 +213,6 @@ void DiffOp<Tout, Tin, Order, Direction, Treatment>::applyImpl(Tout& out, const 
 }
 
 // explicit instantations
-using mods_t = View<std::complex<double>, DCCSC3D>;
 template class DiffOp<mods_t, mods_t, 0, fwd_t>;
 template class DiffOp<mods_t, mods_t, 0, fwd_t, zeroResetMean_m>;
 template class DiffOp<mods_t, mods_t, 1, fwd_t>;
@@ -227,15 +222,10 @@ template class DiffOp<mods_t, mods_t, 2, fwd_t>;
 template class DiffOp<mods_t, mods_t, 3, fwd_t>;
 template class DiffOp<mods_t, mods_t, 4, fwd_t>;
 template class DiffOp<mods_t, mods_t, 0, bwd_t>;
-template class DiffOp<mods_t, mods_t, 0, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 1, bwd_t>;
-template class DiffOp<mods_t, mods_t, 1, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 2, bwd_t>;
-template class DiffOp<mods_t, mods_t, 2, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 3, bwd_t>;
-template class DiffOp<mods_t, mods_t, 3, bwd_t, dealias_m>;
 template class DiffOp<mods_t, mods_t, 4, bwd_t>;
-template class DiffOp<mods_t, mods_t, 4, bwd_t, dealias_m>;
 
 } // namespace Cpu
 } // namespace Complex

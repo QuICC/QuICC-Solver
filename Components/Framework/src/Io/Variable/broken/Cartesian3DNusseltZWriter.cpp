@@ -19,13 +19,13 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
 #include "QuICC/Io/Variable/NusseltTags.hpp"
 #include "QuICC/PyQuICC/CoreWrapper.hpp"
-#include "QuICC/DecoupledComplexInternal.hpp"
+#include "Types/DecoupledComplexUtils.hpp"
 
 namespace QuICC {
 
@@ -107,7 +107,7 @@ namespace Variable {
                l = k_ + j_ + i;
 
                // Copy field value into field
-               Datatypes::internal::setScalar(field, l, sit->second->dom(0).perturbation().point(i,j,k));
+               Datatypes::details::setScalar(field, l, sit->second->dom(0).perturbation().point(i,j,k));
             }
          }
       }

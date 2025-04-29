@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IChebyshevBackend.hpp
- * @brief Interface for a generic Chebyshev cuFFT based integrator 
+ * @brief Interface for a generic Chebyshev cuFFT based integrator
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CUFFT_ICHEBYSHEVBACKEND_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Backend/CuFft/ICuFftBackend.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
 
@@ -36,7 +36,7 @@ namespace CuFft {
 
    /**
     * @brief Interface for a generic Chebyshev cuFFT based integrator
-    */ 
+    */
    class IChebyshevBackend: public ICuFftBackend
    {
       public:
@@ -60,7 +60,7 @@ namespace CuFft {
           * @brief Destructor
           */
          virtual ~IChebyshevBackend();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */
@@ -70,7 +70,7 @@ namespace CuFft {
           * @brief Set input and output data pointers for FFT (R2R)
           */
          virtual void io(double* out, const double* in) const;
-         
+
       protected:
          /**
           * @brief Minimum number of blocks per batch

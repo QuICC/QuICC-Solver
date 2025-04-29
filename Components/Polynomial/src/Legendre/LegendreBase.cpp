@@ -1,4 +1,4 @@
-/** 
+/**
  * @file LegendreBase.cpp
  * @brief Source of the implementation of the Legendre polynomial
  */
@@ -13,6 +13,7 @@
 // Class include
 //
 #include "QuICC/Polynomial/Legendre/LegendreBase.hpp"
+#include "Types/Internal/Math.hpp"
 
 // Project includes
 //
@@ -31,40 +32,40 @@ namespace Legendre {
    {
    }
 
-   void LegendreBase::Pn(Eigen::Ref<internal::Matrix> ipn, const int n, const Eigen::Ref<const internal::Matrix>& ipn_1, const Eigen::Ref<const internal::Matrix>& ipn_2, const internal::Array& igrid, NormalizerN norm)
+   void LegendreBase::Pn(Eigen::Ref<Internal::Matrix> ipn, const int n, const Eigen::Ref<const Internal::Matrix>& ipn_1, const Eigen::Ref<const Internal::Matrix>& ipn_2, const Internal::Array& igrid, NormalizerN norm)
    {
-      internal::MHDFloat dn = internal::MHDFloat(n);
-      internal::Array cs = norm(dn);
+      Internal::MHDFloat dn = Internal::MHDFloat(n);
+      Internal::Array cs = norm(dn);
 
       ipn.array() = cs(1)*(cs(0)*ipn_2.array() + (igrid.array()*ipn_1.array()).array());
    }
-   
-   void LegendreBase::P0(Eigen::Ref<internal::Matrix> ip0, Normalizer norm)
+
+   void LegendreBase::P0(Eigen::Ref<Internal::Matrix> ip0, Normalizer norm)
    {
-      internal::Array cs = norm();
+      Internal::Array cs = norm();
 
       ip0.setConstant(cs(0));
    }
 
-   void LegendreBase::P1(Eigen::Ref<internal::Matrix> ip1, const internal::Array& igrid, Normalizer norm)
+   void LegendreBase::P1(Eigen::Ref<Internal::Matrix> ip1, const Internal::Array& igrid, Normalizer norm)
    {
-      internal::Array cs = norm();
+      Internal::Array cs = norm();
 
       ip1.array() = (cs(0)*igrid);
    }
 
-   void LegendreBase::dP1(Eigen::Ref<internal::Matrix> idp1, const Eigen::Ref<const internal::Matrix>& ipn_1, Normalizer norm)
+   void LegendreBase::dP1(Eigen::Ref<Internal::Matrix> idp1, const Eigen::Ref<const Internal::Matrix>& ipn_1, Normalizer norm)
    {
-      internal::Array cs = norm();
- 
+      Internal::Array cs = norm();
+
       idp1.array() = cs(0)*ipn_1.array();
    }
 
-   void LegendreBase::dPn(Eigen::Ref<internal::Matrix> idpn, const int n, const Eigen::Ref<const internal::Matrix>& ipn_1, const Eigen::Ref<const internal::Matrix>& idpn_1, const internal::Array& igrid, NormalizerN norm)
+   void LegendreBase::dPn(Eigen::Ref<Internal::Matrix> idpn, const int n, const Eigen::Ref<const Internal::Matrix>& ipn_1, const Eigen::Ref<const Internal::Matrix>& idpn_1, const Internal::Array& igrid, NormalizerN norm)
    {
-      internal::MHDFloat dn = internal::MHDFloat(n);
-      internal::Array cs = norm(dn);
- 
+      Internal::MHDFloat dn = Internal::MHDFloat(n);
+      Internal::Array cs = norm(dn);
+
       idpn.array() = cs(0)*ipn_1.array() + cs(1)*(igrid.array()*idpn_1.array()).array();
    }
 
@@ -116,75 +117,75 @@ namespace Legendre {
       #endif //defined QUICC_LEGENDRE_NORM_NATURAL
    }
 
-   internal::Array LegendreBase::unitP0()
+   Internal::Array LegendreBase::unitP0()
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
-      cs(0) = precision::sqrt(MHD_MP(0.5));
+      cs(0) = Internal::Math::sqrt(MHD_MP(0.5));
 
       return cs;
    }
 
-   internal::Array LegendreBase::unitP1()
+   Internal::Array LegendreBase::unitP1()
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
-      cs(0) = precision::sqrt(MHD_MP(3.0)/MHD_MP(2.0));
+      cs(0) = Internal::Math::sqrt(MHD_MP(3.0)/MHD_MP(2.0));
 
       return cs;
    }
 
-   internal::Array LegendreBase::unitPn(const internal::MHDFloat dn)
+   Internal::Array LegendreBase::unitPn(const Internal::MHDFloat dn)
    {
-      internal::Array cs(2);
+      Internal::Array cs(2);
 
-      cs(0) = -precision::sqrt((MHD_MP(2.0)*dn - MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(3.0)))*(dn - MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(1.0));
-      cs(1) = precision::sqrt((MHD_MP(2.0)*dn + MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(1.0)))*(MHD_MP(2.0)*dn-MHD_MP(1.0))/dn;
+      cs(0) = -Internal::Math::sqrt((MHD_MP(2.0)*dn - MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(3.0)))*(dn - MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(1.0));
+      cs(1) = Internal::Math::sqrt((MHD_MP(2.0)*dn + MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(1.0)))*(MHD_MP(2.0)*dn-MHD_MP(1.0))/dn;
 
       return cs;
    }
 
-   internal::Array LegendreBase::unitdP1()
+   Internal::Array LegendreBase::unitdP1()
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
-      cs(0) = precision::sqrt(MHD_MP(3.0));
+      cs(0) = Internal::Math::sqrt(MHD_MP(3.0));
 
       return cs;
    }
 
-   internal::Array LegendreBase::unitdPn(const internal::MHDFloat dn)
+   Internal::Array LegendreBase::unitdPn(const Internal::MHDFloat dn)
    {
-      internal::Array cs(2);
+      Internal::Array cs(2);
 
-      cs(0) = dn*precision::sqrt((MHD_MP(2.0)*dn + MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(1.0)));
+      cs(0) = dn*Internal::Math::sqrt((MHD_MP(2.0)*dn + MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(1.0)));
 
-      cs(1) = precision::sqrt((MHD_MP(2.0)*dn + MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(1.0)));
+      cs(1) = Internal::Math::sqrt((MHD_MP(2.0)*dn + MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(1.0)));
 
       return cs;
    }
 
-   internal::Array LegendreBase::naturalP0()
+   Internal::Array LegendreBase::naturalP0()
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
       cs(0) = MHD_MP(1.0);
 
       return cs;
    }
 
-   internal::Array LegendreBase::naturalP1()
+   Internal::Array LegendreBase::naturalP1()
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
       cs(0) = MHD_MP(1.0);
 
       return cs;
    }
 
-   internal::Array LegendreBase::naturalPn(const internal::MHDFloat dn)
+   Internal::Array LegendreBase::naturalPn(const Internal::MHDFloat dn)
    {
-      internal::Array cs(2);
+      Internal::Array cs(2);
 
       cs(0) = -(dn - MHD_MP(1.0))/(MHD_MP(2.0)*dn - MHD_MP(1.0));
       cs(1) = (MHD_MP(2.0)*dn - MHD_MP(1.0))/dn;
@@ -192,18 +193,18 @@ namespace Legendre {
       return cs;
    }
 
-   internal::Array LegendreBase::naturaldP1()
+   Internal::Array LegendreBase::naturaldP1()
    {
-      internal::Array cs(1);
+      Internal::Array cs(1);
 
       cs(0) = MHD_MP(1.0);
 
       return cs;
    }
 
-   internal::Array LegendreBase::naturaldPn(const internal::MHDFloat dn)
+   Internal::Array LegendreBase::naturaldPn(const Internal::MHDFloat dn)
    {
-      internal::Array cs(2);
+      Internal::Array cs(2);
 
       cs(0) = dn;
 

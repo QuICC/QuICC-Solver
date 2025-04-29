@@ -20,8 +20,8 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Environment/QuICCEnv.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/AngularMomentum.hpp"
 #include "QuICC/Polynomial/Worland/Operators.hpp"
@@ -97,7 +97,7 @@ namespace Variable {
       if(this->mHasM0 || this->mHasM1)
       {
          int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
-         internal::Matrix iop;
+         Internal::Matrix iop;
          Polynomial::Worland::Operators::integrateRpWnl(iop, 1, 3, nN);
          this->mOp = iop.cast<MHDFloat>();
          assert(this->mOp.rows() == nN && this->mOp.cols() == 1);

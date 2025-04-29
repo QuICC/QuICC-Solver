@@ -83,16 +83,23 @@ make
 # Euler
 
 ```bash
-env2lmod
-module load cmake/3.20.3 gcc/8.2.0 openmpi openblas fftw hdf5 boost python
+module load stack
+module load openmpi fftw hdf5 boost python openblas cmake
 
-cmake </path/to/QuICC> -DQUICC_USE_MPI=ON \
+cmake -DQUICC_USE_MPI=ON \
 -DQUICC_MULTPRECISION=ON \
--DQUICC_MODEL=<GreatSimulation>
-
-make
+-DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
+-DQUICC_MODEL=<GreatSimulation> \
+</path/to/QuICC>
 ```
-the default `h5py` is built with the incorrect hdf5 library, we need to install it ourselves
+
+Euler login nodes are slow, build on compute nodes
+```bash
+salloc --nodes=1 --cpus-per-task=64 --time=00:20:00
+srun make -j 64
+```
+
+In  case of problems with h5py, install into a Python venv
 
 ```bash
 python -m venv quicc_env
@@ -102,4 +109,33 @@ python -m pip install h5py
 afterwards you'll only need to activate the python env
 ```bash
 . quicc_env/bin/activate
+```
+
+# LUMI-C
+
+## Modules
+```sh
+module load LUMI
+module load PrgEnv-gnu
+module load cray-python
+module load cray-fftw
+module load cray-hdf5-parallel
+module load Boost
+module load buildtools
+module load craype-x86-milan
+```
+
+## Compilation
+```sh
+salloc --nodes=1 --account=PROJECT --partition=standard --time=01:00:00
+srun --ntasks=1 cmake .. -GNinja \
+-DCMAKE_CXX_COMPILER=CC \
+-DQUICC_USE_MPI=ON \
+-DQUICC_EIGEN_ENABLE_VECTORIZATION=ON \
+-DQUICC_MODEL=MODEL \
+-DQUICC_PROFILE_LEVEL=0 \
+-DQUICC_PROFILE_BACKEND=none \
+-DCMAKE_CXX_FLAGS=-noopenmp
+
+srun --ntasks=1 --cpus-per-task=64 ninja
 ```

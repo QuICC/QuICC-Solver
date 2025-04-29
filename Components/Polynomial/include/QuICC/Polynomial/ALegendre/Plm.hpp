@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Plm.hpp
  * @brief Implementation of the associated Legendre polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/Polynomial/ALegendre/ALegendreBase.hpp"
 
 namespace QuICC {
@@ -31,21 +31,21 @@ namespace ALegendre {
 
    /**
     * @brief Implementation of the associated Legendre polynomial
-    */ 
+    */
    class Plm: public ALegendreBase
    {
       public:
          /**
           * @brief Compute polynomial through recurrence relation
           */
-         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const internal::Array& fullGrid, const internal::Array& scale, TEvaluator evaluator);
+         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const Internal::Array& fullGrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 
-   template <typename T, typename TEvaluator> void Plm::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const internal::Array& fullGrid, const internal::Array& scale, TEvaluator evaluator)
+   template <typename T, typename TEvaluator> void Plm::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const Internal::Array& fullGrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       // Extract required part of grid
       int gN = (fullGrid.rows()/2 + fullGrid.rows()%2);
-      internal::Array igrid = fullGrid.segment(0, gN);
+      Internal::Array igrid = fullGrid.segment(0, gN);
 
       if (m < 0)
       {
@@ -57,7 +57,7 @@ namespace ALegendre {
          throw std::logic_error("Operator matrix should have at least 1 column");
       }
 
-      internal::Matrix ipoly(gN, 2);
+      Internal::Matrix ipoly(gN, 2);
 
       ALegendreBase::Pmm(ipoly.col(0), m, igrid, ALegendreBase::normPmm());
       if(scale.size() > 0)

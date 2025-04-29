@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IAsciiWriter.cpp
  * @brief Source of the interfact to a general ASCII writer
  */
@@ -21,7 +21,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 
 namespace QuICC {
 

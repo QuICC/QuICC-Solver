@@ -1,4 +1,4 @@
-/** 
+/**
  * @file drWnl.hpp
  * @brief Implementation of the D r Worland polynomial
  */
@@ -6,21 +6,13 @@
 #ifndef QUICC_POLYNOMIAL_WORLAND_DRWNL_HPP
 #define QUICC_POLYNOMIAL_WORLAND_DRWNL_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
+#include "Types/Internal/Literals.hpp"
 #include "QuICC/Polynomial/ThreeTermRecurrence.hpp"
 #include "QuICC/Polynomial/Worland/WorlandBase.hpp"
 
@@ -32,15 +24,32 @@ namespace Worland {
 
    /**
     * @brief Implementation of the D r Worland polynomial
-    */ 
+    */
    class drWnl: public WorlandBase
    {
       public:
-         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator);
+         /**
+          * @brief Default constructor
+          */
+         drWnl() = default;
+
+         /**
+          * @brief Constructor for specific alpha,beta pair
+          *
+          * @param alpha   Jacobi alpha
+          * @param dBeta   Jacobi beta = l + dBeta
+          */
+         drWnl(const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta): WorlandBase(alpha, dBeta){};
+
+         /**
+          * @brief Compute D r Worland polynomial
+          */
+         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 
-   template <typename T, typename TEvaluator> void drWnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const internal::Array& igrid, const internal::Array& scale, TEvaluator evaluator)
+   template <typename T, typename TEvaluator> void drWnl::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int l, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
+      using namespace Internal::Literals;
       int gN = igrid.rows();
 
       if(l < 0)
@@ -58,18 +67,18 @@ namespace Worland {
          throw std::logic_error("Operator matrix does not mach grid size");
       }
 
-      internal::MHDFloat a = this->alpha(l);
-      internal::MHDFloat b = this->beta(l);
-      internal::MHDFloat a1 = this->alpha(l) + MHD_MP(1.0);
-      internal::MHDFloat b1 = this->beta(l) + MHD_MP(1.0);
-      internal::MHDFloat dl1 = internal::MHDFloat(l+1);
+      Internal::MHDFloat a = this->alpha(l);
+      Internal::MHDFloat b = this->beta(l);
+      Internal::MHDFloat a1 = this->alpha(l) + 1.0_mp;
+      Internal::MHDFloat b1 = this->beta(l) + 1.0_mp;
+      Internal::MHDFloat dl1 = Internal::MHDFloat(l+1);
 
       // Make X grid in [-1, 1]
-      internal::Array ixgrid = MHD_MP(2.0)*igrid.array()*igrid.array() - MHD_MP(1.0);
+      Internal::Array ixgrid = 2.0_mp*igrid.array()*igrid.array() - 1.0_mp;
 
       // Storage for P_n^{(alpha,beta)} and dP_n{(alpha,beta)}
-      internal::Matrix ipnab(gN,2);
-      internal::Matrix idpnab(gN,2);
+      Internal::Matrix ipnab(gN,2);
+      Internal::Matrix idpnab(gN,2);
 
       // Compute P_0
       this->computeW0l(ipnab.col(0), l, a, b, igrid, WorlandBase::normWP0ab());

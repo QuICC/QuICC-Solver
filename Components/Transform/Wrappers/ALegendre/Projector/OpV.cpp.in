@@ -1,6 +1,6 @@
 /**
  * @file @Op@@Tag@.cpp
- * @brief Wrapper of the Alegender @Op@ @Kind@
+ * @brief Wrapper of the Alegendre @Op@ @Kind@
  */
 
 // System includes
@@ -9,14 +9,13 @@
 // Project includes
 //
 #include "QuICC/Transform/Wrappers/ALegendre/@Kind@/@Op@@Tag@.hpp.inc"
-#include "QuICC/Polynomial/ALegendre/@PolyBuilder@.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
-#include "ViewOps/ALegendre/Op.hpp"
-#include "ViewOps/ALegendre/Impl.hpp"
-#include "ViewOps/ALegendre/Tags.hpp"
-#include "ViewOps/ALegendre/Builder.hpp"
+#include "ViewOps/Quadrature/Op.hpp"
+#include "ViewOps/Quadrature/Impl.hpp"
+#include "ViewOps/Quadrature/Tags.hpp"
+#include "ViewOps/ALegendre/OpsBuilder.hpp"
 #include "Profiler/Interface.hpp"
 @CppHeaders@
 
@@ -27,7 +26,7 @@ namespace ALegendre {
 namespace @Kind@ {
 
 
-void @Op@<@Tag@>::initOperators(const OpArray& igrid, const OpArray& iweights) const
+void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
 {
     Profiler::RegionFixture<3> fix("@Op@<@Tag@>::initOperators");
 
@@ -46,9 +45,10 @@ void @Op@<@Tag@>::initOperators(const OpArray& igrid, const OpArray& iweights) c
     std::array<std::uint32_t, rank> dimensions {M, K, P};
 
     // Make view operator
+    using namespace QuICC::Transform::Quadrature;
     using namespace QuICC::Transform::ALegendre;
     using backend_t = @BackendNamespace@::ImplOp<phys_t, mods_t, op_t,
-        QuICC::Transform::ALegendre::@Treatment@>;
+        QuICC::Transform::Quadrature::@Treatment@>;
     using derived_t = Op<phys_t, mods_t, op_t, backend_t>;
     auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
 
@@ -58,10 +58,12 @@ void @Op@<@Tag@>::initOperators(const OpArray& igrid, const OpArray& iweights) c
         layers[p] = this->mspSetup->slow(p);
     }
 
-    mOp = std::make_unique<derived_t>(dimensions, layers, mem);
+    mOp = std::make_unique<derived_t>(mem);
     derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
+    derivedOp.allocOp(dimensions, layers);
     auto opView = derivedOp.getOp();
-    builder<op_t, Polynomial::ALegendre::@PolyBuilder@, OpArray::Scalar, @Diff@>(opView, igrid, iweights);
+    OpsBuilder<op_t, @Op@_t, @OpDirection@> tBuilder;
+        tBuilder.compute(opView, igrid, iweights);
 
     ///\todo move view setups to init
 
@@ -114,10 +116,12 @@ void @Op@<@Tag@>::initOperators(const OpArray& igrid, const OpArray& iweights) c
     std::array<std::uint32_t, rank> physDims = {M, N, P};
     mPhysFlat.resize(M * nCols);
 
+    using namespace QuICC::View;
+
     @SetDataViews@
 }
 
-void @Op@<@Tag@>::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
+void @Op@<@Tag@>::applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in) const
 {
     Profiler::RegionFixture<2> fix("@Op@<@Tag@>::applyOperators");
 
@@ -143,13 +147,14 @@ void @Op@<@Tag@>::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
         {
             for (std::int64_t i = 0; i < inB.rows(); ++i)
             {
-                #ifdef QUICC_AL_ROW_MAJOR
+#if defined QUICC_AL_ROW_MAJOR || defined QUICC_AL_ALL_ROW_MAJOR
                 // copy padded to flattened and transpose
                 mModsFlat[offSet + i*inB.cols()+j] = inB.data()[i+j*in.rows()];
-                #else
-                // copy padded to flattened column
-                mModsFlat[offSet + i+j*inB.rows()] = inB.data()[i+j*in.rows()];
-                #endif
+#else
+               // copy padded to flattened column
+               mModsFlat[offSet + i + j * inB.rows()] =
+                  inB.data()[i + j * in.rows()];
+#endif
             }
         }
         offSet += inB.size();
@@ -174,7 +179,7 @@ void @Op@<@Tag@>::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
 
         OpMatrixR outB = rOut.block(0, start, outRows, cols);
 
-        #ifdef QUICC_AL_ROW_MAJOR
+#if defined QUICC_AL_ROW_MAJOR || defined QUICC_AL_ALL_ROW_MAJOR
         for (std::int64_t j = 0; j < outB.cols(); ++j)
         {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
@@ -183,19 +188,19 @@ void @Op@<@Tag@>::applyOperators(OpMatrixZ& rOut, const OpMatrixZ& in) const
                 outB.data()[i+j*rOut.rows()]= mPhysFlat[offSet + i*outB.cols()+j];
             }
         }
-        #else
+#else
         for (std::int64_t i = 0; i < outB.size(); ++i)
         {
             outB.data()[i] = mPhysFlat[offSet + i];
         }
-        #endif
+#endif
 
         offSet += outB.size();
         start += cols;
     }
 }
 
-void @Op@<@Tag@>::makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const
+void @Op@<@Tag@>::makeOperator(QuICC::Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
 {
     throw std::logic_error("view AL operator should never call this");
 }

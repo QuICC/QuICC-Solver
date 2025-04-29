@@ -1,11 +1,10 @@
-/** 
+/**
  * @file I2Qm.cpp
  * @brief Source of the implementation of the full sphere Worland I2Qm sparse operator
  */
 
 // System includes
 //
-#include <cassert>
 #include <stdexcept>
 
 // Project includes
@@ -14,7 +13,7 @@
 #include "QuICC/SparseSM/Worland/Chebyshev/I2QmDiags.hpp"
 //#include "QuICC/SparseSM/Worland/Legendre/I2QmDiags.hpp"
 //#include "QuICC/SparseSM/Worland/CylEnergy/I2QmDiags.hpp"
-//#include "QuICC/SparseSM/Worland/SphEnergy/I2QmDiags.hpp"
+#include "QuICC/SparseSM/Worland/SphEnergy/I2QmDiags.hpp"
 
 namespace QuICC {
 
@@ -39,8 +38,7 @@ namespace Worland {
             throw std::logic_error("Not yet implemented");
             break;
          case WorlandKind::SPHENERGY:
-            //this->mpImpl = std::make_shared<SphEnergy::I2QmDiags>(alpha, l);
-            throw std::logic_error("Not yet implemented");
+            this->mpImpl = std::make_shared<SphEnergy::I2QmDiags>(alpha, l, q);
             break;
       }
    }
@@ -66,7 +64,7 @@ namespace Worland {
       }
    }
 
-   void I2Qm::buildBanded(internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
+   void I2Qm::buildBanded(Internal::Matrix& bd, unsigned int& kL, unsigned int &kU) const
    {
       throw std::logic_error("Banded matrix is not yet implemented");
 

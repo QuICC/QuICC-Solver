@@ -12,6 +12,8 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 
 set(PHS
   "Operator/Unary.hpp"
+  "Operator/Binary.hpp"
+  "Operator/Nary.hpp"
 )
 
 # Add public header
@@ -19,9 +21,6 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
   PROPERTIES
     PUBLIC_HEADER "${PHS}"
 )
-
-# Boost
-target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE Boost::headers)
 
 # Alias
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS "${QUICC_CURRENT_COMPONENT_LIB}")

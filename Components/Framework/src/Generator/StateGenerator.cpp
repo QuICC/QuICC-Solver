@@ -11,10 +11,11 @@
 #include "QuICC/Generator/StateGenerator.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/SolveTiming/Before.hpp"
 #include "QuICC/Tools/Formatter.hpp"
+#include "QuICC/Simulation/SimulationIoTools.hpp"
 
 namespace QuICC {
 
@@ -81,6 +82,10 @@ namespace QuICC {
 
    void StateGenerator::writeOutput()
    {
+      // write ascii files
+      SimulationIoTools::updateHeavyAscii(this->mSimIoCtrl.beginAscii(), this->mSimIoCtrl.endAscii(), this->mPseudospectral.transformCoordinator());
+      this->mSimIoCtrl.writeAscii(this->mPseudospectral.startTime(), this->mPseudospectral.startTimestep());
+
       // Write final state file (using stored time and timestep)
       this->mSimIoCtrl.writeHdf5(-1, -1);
 

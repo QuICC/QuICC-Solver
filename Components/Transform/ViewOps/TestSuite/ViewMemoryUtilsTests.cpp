@@ -4,6 +4,7 @@
 #include "ViewOps/ViewMemoryUtils.hpp"
 
 using namespace QuICC::Memory;
+using namespace QuICC::View;
 TEST_CASE("Do nothing", "[DoNothing]")
 {
     // host mem block

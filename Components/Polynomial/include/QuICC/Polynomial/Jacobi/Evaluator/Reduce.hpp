@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Reduce.hpp
  * @brief Evaluator to compute column sum reduction of polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 
 namespace QuICC {
 
@@ -32,19 +32,19 @@ namespace Evaluator {
 
    /**
     * @brief Evaluator to compute column sum reduction of polynomial
-    */ 
+    */
    class Reduce
    {
       public:
          /**
           * @brief Apply evaluator
           */
-         template <typename T> void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i);
+         template <typename T> void operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i);
    };
 
-   template <typename T> inline void Reduce::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const internal::Matrix>& ipolycol, const int i)
+   template <typename T> inline void Reduce::operator()(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > rOut, const Eigen::Ref<const Internal::Matrix>& ipolycol, const int i)
    {
-      rOut(i,0) = Precision::cast(ipolycol.sum());
+      rOut(i,0) = Internal::cast(ipolycol.sum());
    }
 }
 }

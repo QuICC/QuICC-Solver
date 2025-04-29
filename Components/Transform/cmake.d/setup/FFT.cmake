@@ -2,7 +2,7 @@
 #------------- FFT IMPLEMENTATION ----------------#
 ###################################################
 
-set(_FFT_BACKENDS "FFTW" "cuFFT")
+set(_FFT_BACKENDS "FFTW" "cuFFT" "PfSolve")
 
 quicc_create_option(NAME QUICC_FFT_MIXED
                     OPTS ${_FFT_BACKENDS}
@@ -26,4 +26,7 @@ quicc_create_option(NAME QUICC_FFT_WORLAND
                     OPTS ${_FFT_BACKENDS}
                     LABEL "Worland FFT backend"
                     ADVANCED)
+if (QUICC_USE_PFSOLVE)
+    set(QUICC_FFT_WORLAND "PfSolve")
+endif()
 quicc_add_definition(QUICC_FFT_WORLAND)

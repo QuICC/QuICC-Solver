@@ -28,7 +28,8 @@ namespace Variable {
    {
    }
 
-   StateFileWriter::~StateFileWriter()
+   StateFileWriter::StateFileWriter(std::string name, std::string type, const bool isRegular)
+      : IVariableHdf5NWriter(Tags::StateFile::BASENAME + name, Tags::StateFile::EXTENSION, Tags::StateFile::HEADER, type, Tags::StateFile::VERSION, Dimensions::Space::SPECTRAL, isRegular)
    {
    }
 

@@ -4,8 +4,15 @@ set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")
 message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}" )
 
 # components
+add_subdirectory(ViewOps/Blas)
+add_subdirectory(ViewOps/Pointwise)
+add_subdirectory(ViewOps/Slicewise)
+add_subdirectory(ViewOps/Reduction)
 add_subdirectory(ViewOps/Fourier)
+add_subdirectory(ViewOps/Quadrature)
 add_subdirectory(ViewOps/ALegendre)
+add_subdirectory(ViewOps/Worland)
+add_subdirectory(ViewOps/Transpose)
 
 add_library(${QUICC_CURRENT_COMPONENT_LIB} INTERFACE)
 
@@ -17,6 +24,9 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 
 # Add public headers
 set(PHS
+  ViewOps/ViewIndexUtils.hpp
+  ViewOps/ViewMemoryUtils.hpp
+  ViewOps/ViewSizeUtils.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
@@ -28,8 +38,13 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
 target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
   QuICC::View
   QuICC::Operator
+  QuICC::Memory
   QuICC::ViewOps::Fourier
   QuICC::ViewOps::ALegendre
+  QuICC::ViewOps::Worland
+  QuICC::ViewOps::Transpose
+  QuICC::ViewOps::Pointwise
+  QuICC::ViewOps::Slicewise
 )
 
 # Alias

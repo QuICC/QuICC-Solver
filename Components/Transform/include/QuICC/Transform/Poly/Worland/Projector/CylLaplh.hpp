@@ -12,5 +12,12 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Projector/Base/CylLaplh.hpp"
+#ifdef QUICC_USE_KOKKOS
+#include "QuICC/Transform/Poly/Worland/Projector/Kokkos/CylLaplh.hpp"
+#endif
+#include "QuICC/Transform/Wrappers/Worland/Projector/CylLaplhviewCpu_t.hpp.inc"
+#ifdef QUICC_HAS_CUDA_BACKEND
+#include "QuICC/Transform/Wrappers/Worland/Projector/CylLaplhviewGpu_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_PROJECTOR_CYLLAPLH_HPP

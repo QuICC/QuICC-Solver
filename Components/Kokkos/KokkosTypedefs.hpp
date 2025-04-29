@@ -15,7 +15,6 @@
 #ifdef QUICC_USE_KOKKOS
 #include <Kokkos_Core.hpp>
 #include <Kokkos_UnorderedMap.hpp>
-#include <Kokkos_Layout.hpp>
 #endif
 
 namespace QuICC {
@@ -39,6 +38,9 @@ using Integer = long;
 #else
     using KokkosSpace = Kokkos::CudaSpace;
 #endif  // SE_CUDAUVM
+    using KokkosLayout = Kokkos::LayoutLeft;
+#elif defined(KOKKOS_ENABLE_HIP)
+    using KokkosSpace = Kokkos::Experimental::HIPSpace;
     using KokkosLayout = Kokkos::LayoutLeft;
 #else  // USE_CUDA
 #ifdef KOKKOS_ENABLE_OPENMP
@@ -67,6 +69,9 @@ template <typename T>
 
     template <typename T>
     using ViewMatrixTypeLeft = Kokkos::View<T**, Kokkos::LayoutLeft, KokkosSpace>;
+
+    template <typename T>
+    using ViewMatrixTypeHost = Kokkos::View<T**, KokkosLayout, KokkosHostSpace>;
 
     template <typename T>
     using ViewMatrixTypeLeftHost = Kokkos::View<T**, Kokkos::LayoutLeft, KokkosHostSpace>;

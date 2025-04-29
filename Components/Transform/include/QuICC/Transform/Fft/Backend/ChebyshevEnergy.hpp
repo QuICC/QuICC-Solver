@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ChebyshevEnergy.hpp
- * @brief Interface for a generic API for Chebyshev energy reductor 
+ * @brief Interface for a generic API for Chebyshev energy reductor
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CHEBYSHEVENERGY_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
 #include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
@@ -36,7 +36,7 @@ namespace Backend {
 
    /**
     * @brief Interface for a generic API for Chebyshev energy reductor
-    */ 
+    */
    class ChebyshevEnergy
    {
       public:
@@ -55,11 +55,16 @@ namespace Backend {
           * @brief Destructor
           */
          virtual ~ChebyshevEnergy();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */
          void init(const SetupType& setup) const;
+
+         /**
+          * @brief Set Scaler array
+          */
+         void setScaler(const Array& scaler) const;
 
          /**
           * @brief set spectral operator
@@ -113,6 +118,11 @@ namespace Backend {
          void output(Matrix& rOut, const Matrix& tmp) const;
 
          /**
+          * @brief Set output on grid
+          */
+         void outputGrid(Matrix& rOut, const Matrix& tmp) const;
+
+         /**
           * @brief Set output mutliplied by scalar operator
           */
          void outputSpectral(Matrix& rOut, const Matrix& tmp) const;
@@ -149,7 +159,7 @@ namespace Backend {
           * @brief Get the temporary storage
           */
          Matrix& getStorage(const StorageKind = StorageKind::in) const;
-         
+
       protected:
 
       private:

@@ -16,7 +16,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Io/Ascii/IAsciiWriter.hpp"
 
 namespace QuICC {

@@ -10,7 +10,7 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/ICartesian1DTorPolEnergyBaseWriter.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Transform/Reductor/Energy.hpp"
@@ -85,7 +85,6 @@ namespace Variable {
       const auto& tRes = *this->res().cpu()->dim(TId);
 
       // Compute integral over Chebyshev expansion and sum Fourier coefficients
-      MHDFloat factor = 1.0;
       int idx = 0;
       const auto box2D = this->res().sim().boxScale(Dimensions::Simulation::SIM2D);
       const auto box3D = this->res().sim().boxScale(Dimensions::Simulation::SIM3D);
@@ -116,7 +115,7 @@ namespace Variable {
                if(k_ == 0)
                {
                   factor = 1.0;
-               } 
+               }
                else if(k_ <= this->res().sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL)/2)
                {
                   factor = 2.0;

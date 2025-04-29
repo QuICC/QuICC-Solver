@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_STATEFILEREADER_HPP
 #define QUICC_IO_VARIABLE_STATEFILEREADER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -50,7 +44,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~StateFileReader();
+         virtual ~StateFileReader() = default;
 
          /**
           * @brief Read State from file

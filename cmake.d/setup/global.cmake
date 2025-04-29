@@ -47,23 +47,11 @@ endif()
 if(_BLAS_MKL)
     target_compile_definitions(${_BLAS_TARGET} INTERFACE "QUICC_USING_MKL_BLAS")
 endif()
+
 #
-# Boost
+# Eigen
 #
-if(NOT BOOST_ROOT)
-  message(VERBOSE "setting BOOST_ROOT")
-  list(APPEND _ALL_PATHS $ENV{CPATH} $ENV{C_INCLUDE_PATH} $ENV{CPLUS_INCLUDE_PATH})
-  if(NOT "${_ALL_PATHS}" STREQUAL "")
-    string(REPLACE ":" ";" _ALL_PATHS "${_ALL_PATHS}")
-    include(ListFindRegex)
-    quicc_list(FIND_REGEX _ALL_PATHS "boost" BOOST_ROOT)
-    message(VERBOSE "BOOST_ROOT: ${BOOST_ROOT}")
-  endif()
-endif()
-find_package(Boost 1.78)
-if(NOT Boost_FOUND)
-  message(FATAL_ERROR "Could not find Boost, required >= 1.78, try to specify path: -DBOOST_ROOT=</path/to/boost>")
-endif()
+include(BundleEigen)
 
 #
 # Kokkos
@@ -104,14 +92,21 @@ quicc_create_option(NAME QUICC_FFTPLAN
                     LABEL "FFT plan")
 
 ###################################################
-#--------- LINEAR ALGEBRA IMPLEMENTATION ---------#
+#------------ VKFFT FFT IMPLEMENTATION -----------#
 ###################################################
 
-quicc_create_option(NAME QUICC_LINALG
-                    OPTS Eigen
-                    LABEL "Linear algebra")
-quicc_add_definition(QUICC_LINALG)
+if(QUICC_USE_VKFFT)
+  include(BundleVkFFT)
+endif()
 
+###################################################
+#------------ PFSOLVE JWT IMPLEMENTATION -----------#
+###################################################
+option(QUICC_USE_PFSOLVE "Enable PfSolve backend for JWT" OFF)
+
+if(QUICC_USE_PFSOLVE)
+  include(BundlePfSolve)
+endif()
 ###################################################
 #----- SPARSE LINEAR ALGEBRA IMPLEMENTATION ------#
 ###################################################
@@ -152,10 +147,6 @@ quicc_add_definition(QUICC_SPTRILINALG)
 
 # Look for linear algebra libraries that are in use
 include(MatchAny)
-match_any(NAME "QUICC_" STRING "Eigen")
-if(Eigen_IS_USED)
-  include(BundleEigen)
-endif()
 
 match_any(NAME "QUICC_" STRING "UmfPack")
 if(UmfPack_IS_USED)
@@ -215,43 +206,6 @@ quicc_add_definition(QUICC_SH_NORM)
 
 
 ###################################################
-#-------------- MULTIPLE PRECISION ---------------#
-###################################################
-
-#
-# Use multiple precision computation for inititialisation?.
-#
-option(QUICC_MULTPRECISION "Enable multiple precision computations?" OFF)
-if(QUICC_MULTPRECISION)
-  find_package(Boost REQUIRED)
-
-  quicc_create_option(NAME QUICC_MPBACKEND
-                    OPTS "boost" "gmp" "mpfr" "quad"
-                    LABEL "Multiple precision backend")
-  quicc_add_definition(QUICC_MPBACKEND)
-
-  if(NOT QUICC_LINALG STREQUAL "Eigen")
-    message(SEND_ERROR "------->>> Can't use multiple precision computations with selected implementation <<<-------")
-  else(NOT QUICC_LINALG STREQUAL "Eigen")
-    add_definitions("-DQUICC_MULTPRECISION")
-    quicc_add_definition(QUICC_MPBACKEND)
-    if(NOT QUICC_MPBACKEND STREQUAL "boost")
-      message(FATAL_ERROR "find gmp/mpfr/quad library needs to be implemented")
-    endif()
-    if(NOT QUICC_MPBACKEND STREQUAL "quad")
-      if(NOT DEFINED QUICC_MULTPRECISION_DIGITS)
-        set(QUICC_MULTPRECISION_DIGITS 50)
-      endif(NOT DEFINED QUICC_MULTPRECISION_DIGITS)
-      set(QUICC_MULTPRECISION_DIGITS ${QUICC_MULTPRECISION_DIGITS} CACHE STRING "Multiple precision digits" FORCE)
-      add_definitions("-DQUICC_MULTPRECISION_DIGITS=${QUICC_MULTPRECISION_DIGITS}")
-    endif(NOT QUICC_MPBACKEND STREQUAL "quad")
-    message(STATUS "Multiple precision computations are enabled")
-  endif(NOT QUICC_LINALG STREQUAL "Eigen")
-
-endif(QUICC_MULTPRECISION)
-
-
-###################################################
 #---------- TRANSFORM TREE OPTIMIZATION ----------#
 ###################################################
 
@@ -269,6 +223,23 @@ endif(QUICC_OPTIMIZE_TREE)
 
 find_package(Python REQUIRED COMPONENTS Interpreter Development NumPy)
 
+###################################################
+#-------------------- SLEPc/PETSc ----------------#
+###################################################
+include(cmake.d/PkgConfigSLEPc.cmake)
+
+# Enable stability solver if SLEPc/PETSc are available
+if(QUICC_HAVE_SLEPC)
+  message(STATUS "SLEPc is present. Enabling stability solver.")
+
+  # Enable stability solver
+  set(QUICC_HAVE_STABILITY_SOLVER ON CACHE INTERNAL "Enable stability solver")
+
+# Disable stability solver if SLEPc/PETSc is not available
+else()
+  set(QUICC_HAVE_STABILITY_SOLVER OFF CACHE INTERNAL "Enable stability solver")
+
+  message(STATUS "SLEPc was not found. Stability solver will not be available.")
+endif()
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)
-

@@ -5,22 +5,13 @@
 
 // System includes
 //
-#include <cassert>
 #include <stdexcept>
-
-// Debug includes
-//
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
 
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 
@@ -40,7 +31,7 @@ namespace Worland {
    {
    }
 
-   void IWorlandOperator::init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const
+   void IWorlandOperator::init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       // Store the shared pointer to setup object
       if(spSetup)

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Uniform3D3D.hpp
  * @brief Implementation of the tools for the uniform + uniform + uniform schemes (3D), 3D transform stage
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/Tools/IBase.hpp"
 
 namespace QuICC {
@@ -41,17 +41,17 @@ namespace Tools {
          /**
           * @brief Compute forward truncation
           */
-         int truncationFwd(const int nN, const int l) final;
+         int truncationFwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Compute backward truncation
           */
-         int truncationBwd(const int nN, const int l) final;
+         int truncationBwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Compute index
           */
-         int index(const int nN, const int k) final;
+         int index(const int nN, const int j, const int k) final;
 
          /**
           * @brief Check if chosen resolution is optimal

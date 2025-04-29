@@ -19,8 +19,8 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
-#include "QuICC/Typedefs.hpp"
+#include "Environment/QuICCEnv.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Communicators/Converters/MpiConverterBase.hpp"
 #include "QuICC/Communicators/Converters/MpiConverterTools.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"

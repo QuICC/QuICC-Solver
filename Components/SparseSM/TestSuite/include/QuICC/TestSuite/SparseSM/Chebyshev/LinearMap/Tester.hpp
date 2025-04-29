@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/ISphericalOperator.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/IPlaneOperator.hpp"
@@ -114,6 +114,7 @@ namespace LinearMap {
 
          TOp op(rows, cols, lower, upper, l);
          mat = op.mat();
+         mat.prune(0.0);
       }
       else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::LinearMap::IPlaneOperator, TOp>)
       {
@@ -127,6 +128,7 @@ namespace LinearMap {
 
          TOp op(rows, cols, lower, upper, k1, k2);
          mat = op.mat();
+         mat.prune(0.0);
       }
       else if constexpr(std::is_base_of_v<QuICC::SparseSM::Chebyshev::ILinearMapOperator, TOp>)
       {
@@ -138,6 +140,7 @@ namespace LinearMap {
 
          TOp op(rows, cols, lower, upper);
          mat = op.mat();
+         mat.prune(0.0);
       }
       else
       {
@@ -194,7 +197,7 @@ namespace LinearMap {
 
          QuICC::SparseSM::Chebyshev::LinearMap::Boundary::Operator bcOp(1, maxN+1, lower, upper);
 
-         if constexpr(std::is_constructible_v<TOp, internal::MHDFloat, internal::MHDFloat, typename TOp::Position, int>)
+         if constexpr(std::is_constructible_v<TOp, Internal::MHDFloat, Internal::MHDFloat, typename TOp::Position, int>)
          {
             assert(meta.size() == 5);
             auto l = meta(4);

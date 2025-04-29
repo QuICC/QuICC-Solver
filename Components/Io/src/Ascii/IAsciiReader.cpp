@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IAsciiReader.cpp
  * @brief Source of the interface to a general ASCII reader
  */
@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 
 namespace QuICC {
 

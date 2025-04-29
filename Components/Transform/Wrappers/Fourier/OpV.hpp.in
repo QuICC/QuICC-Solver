@@ -18,8 +18,6 @@ namespace Fourier {
 namespace @Space@ {
 namespace @Kind@ {
 
-using namespace QuICC::Memory;
-
 template<class Impl>
 class @Op@;
 
@@ -48,14 +46,15 @@ public:
     void initBackend() const final;
 
 protected:
+    using I@Space@@Kind@::transform;
 
 private:
     @PreOp@
     @PostOp@
 
-    using ViewAttribute_t = @ViewAttribute@;
-    using @ArgInType@ = View<@InMatrixType@::Scalar, ViewAttribute_t>;
-    using @ArgOutType@ = View<@OutMatrixType@::Scalar, ViewAttribute_t>;
+    using ViewAttribute_t = View::@ViewAttribute@;
+    using @ArgInType@ = View::View<@InMatrixType@::Scalar, ViewAttribute_t>;
+    using @ArgOutType@ = View::View<@OutMatrixType@::Scalar, ViewAttribute_t>;
 
     /// @brief Operator base class pointer
     mutable std::unique_ptr<QuICC::Operator::UnaryOp<@ArgsType@>> mOp;

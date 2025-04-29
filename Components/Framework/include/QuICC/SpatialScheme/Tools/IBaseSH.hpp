@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IBaseSH.hpp
  * @brief Implementation of the tools for the generic + spherical harmonics schemes
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/Tools/IBase.hpp"
 
 namespace QuICC {
@@ -32,6 +32,13 @@ namespace Tools {
           * @brief Default ctor
           */
          IBaseSH() = default;
+
+         /**
+          * @brief ctor with explicit min truncation
+          *
+          * @param min  Minimal truncation
+          */
+         IBaseSH(const int min);
 
          /**
           * @brief Default dtor

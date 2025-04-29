@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Tools.hpp
  * @brief Tools specific to Worland polynomial implementation
  */
@@ -6,21 +6,12 @@
 #ifndef QUICC_POLYNOMIAL_WORLAND_OPERATORS_HPP
 #define QUICC_POLYNOMIAL_WORLAND_OPERATORS_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -31,13 +22,14 @@ namespace Worland {
 namespace Operators {
 
 /**
-* @brief Integrate r^p Wnl over r
-*/
-void integrateRpWnl(internal::Matrix& iop, const int l, const int p, const int size);
+ * @brief Integrate r^p Wnl over r
+ */
+void integrateRpWnl(Internal::Matrix& iop, const int l, const int p,
+   const int size);
 
-}
-}
-}
-}
+} // namespace Operators
+} // namespace Worland
+} // namespace Polynomial
+} // namespace QuICC
 
 #endif // QUICC_POLYNOMIAL_WORLAND_OPERATORS_HPP

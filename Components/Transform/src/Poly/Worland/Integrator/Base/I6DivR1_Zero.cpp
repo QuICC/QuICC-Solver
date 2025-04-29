@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland 1/R1 integrator but 0 mode is zeroed
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 
@@ -27,7 +27,7 @@ namespace Worland {
 
 namespace Integrator {
 
-   void I6DivR1_Zero<base_t>::makeOperator(Matrix& op, const internal::Array& igrid, const internal::Array& iweights, const int i) const
+   void I6DivR1_Zero<base_t>::makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
    {
       int l = this->mspSetup->slow(i);
 
@@ -38,39 +38,23 @@ namespace Integrator {
       if(l == 0)
       {
          op.setZero();
-      } else
+      }
+      else
       {
-         Polynomial::Worland::Wnl wnl;
-
          // Internal computation uses dealiased modes
          const int extraN = 9; // I6 has 9 superdiagonals
          int nN = nPoly + extraN;
          this->checkGridSize(nN, l, igrid.size());
 
-         internal::Matrix tOp(igrid.size(), nN);
-         // **************************************************
-         // Formulation without explicit grid:
-         // Operates on polynomials with l = l-1
-         int l_in = std::abs(l-1);
-         int n_in = nN + 1;
-         this->checkGridSize(n_in, l_in, igrid.size());
+         Internal::Matrix tOp(igrid.size(), nN);
 
-         internal::Matrix opA(igrid.size(), n_in);
-         wnl.compute<internal::MHDFloat>(opA, n_in, l_in, igrid, iweights, ev::Set());
-
-         internal::Matrix opB(igrid.size(), n_in);
-         Polynomial::Worland::r_1Wnl r_1Wnl;
-         r_1Wnl.compute<internal::MHDFloat>(opB, n_in, l_in, igrid, internal::Array(), ev::Set());
-
-         internal::Matrix opC(igrid.size(), nN);
-         Polynomial::Worland::Wnl wnlB;
-         wnlB.compute<internal::MHDFloat>(opC, nN, l, igrid, iweights, ev::Set());
-
-         tOp = (opC.transpose()*opB*opA.transpose()).transpose();
+         using poly_t = QuICC::Polynomial::Worland::implicit_t;
+         Polynomial::Worland::r_1Wnl<poly_t> r_1Wnl;
+         r_1Wnl.compute<Internal::MHDFloat>(tOp, nN, l, igrid, iweights, ev::Set());
 
          // Multiply by Quasi-inverse
-         auto a = wnl.alpha(l);
-         auto b = wnl.dBeta();
+         auto a = r_1Wnl.alpha(l);
+         auto b = r_1Wnl.dBeta();
          ::QuICC::SparseSM::Worland::I6 spasm(nN, nN, a, b, l);
          tOp = (spasm.mat()*tOp.transpose()).transpose();
          op = tOp.cast<MHDFloat>().leftCols(nPoly);
@@ -82,30 +66,7 @@ namespace Integrator {
 
    void I6DivR1_Zero<base_t>::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {
-      #if defined QUICC_WORLAND_INTGIMPL_MATRIX
-         this->defaultApplyOperator(rOut, i, in);
-      #elif defined QUICC_WORLAND_INTGIMPL_OTF
-         int l = this->mspSetup->slow(i);
-         if(l == 0)
-         {
-            rOut.setZero();
-         } else
-         {
-            int nPoly = this->mspSetup->fastSize(i);
-            namespace ev = Polynomial::Worland::Evaluator;
-            Polynomial::Worland::Wnl wnl;
-            wnl.compute<MHDComplex>(rOut, nPoly, std::abs(l-1), this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(in));
-            MatrixZ tmp(in.rows(), in.cols());
-            Polynomial::Worland::r_1Wnl r_1Wnl;
-            r_1Wnl.compute<MHDComplex>(tmp, nPoly, std::abs(l-1), this->mGrid, internal::Array(), ev::OuterProduct<MHDComplex>(rOut));
-            wnl.compute<MHDComplex>(rOut, nPoly, l, this->mGrid, this->mWeights, ev::InnerProduct<MHDComplex>(tmp));
-
-            MHDFloat a = static_cast<MHDFloat>(wnl.alpha(l));
-            MHDFloat b = static_cast<MHDFloat>(wnl.dBeta());
-            ::QuICC::SparseSM::Worland::I6 spasm(nPoly, nPoly, a, b, l);
-            rOut = spasm.mat()*rOut;
-         }
-      #endif //defined QUICC_WORLAND_INTGIMPL_MATRIX
+      this->defaultApplyOperator(rOut, i, in);
    }
 
 }

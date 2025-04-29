@@ -3,21 +3,12 @@
  * @brief Source of the tools for schemes with no eigen direction
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/Tools/FullyCoupled.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/Tools/FullyCoupled.hpp"
 
 namespace QuICC {
 
@@ -52,7 +43,7 @@ namespace Tools {
       // Python setup is sufficient
    }
 
-   void FullyCoupled::interpretSystemN(ArrayI&, const Resolution&) const
+   void FullyCoupled::interpretSystemN(ArrayI&, const Resolution&, const int) const
    {
       // Python setup is sufficient
    }

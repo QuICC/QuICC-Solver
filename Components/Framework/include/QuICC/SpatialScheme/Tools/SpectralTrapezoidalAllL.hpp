@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SpectralTrapezoidalAllL.hpp
  * @brief Implementation of the tools for the trapezoidal + spherical harmonics schemes with all harmonic degrees gathered
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/Tools/IBaseAllL.hpp"
 
 namespace QuICC {
@@ -31,7 +31,14 @@ namespace Tools {
          /**
           * @brief Default ctor
           */
-         SpectralTrapezoidalAllL() = default;
+         SpectralTrapezoidalAllL();
+
+         /**
+          * @brief ctor with explicit min truncation
+          *
+          * @param min  Minimal truncation
+          */
+         SpectralTrapezoidalAllL(const int min);
 
          /**
           * @brief Default dtor
@@ -41,23 +48,19 @@ namespace Tools {
          /**
           * @brief Compute backward truncation
           */
-         int truncationBwd(const int nN, const int l) final;
+         int truncationBwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Compute index
           */
-         int index(const int nN, const int k) final;
+         int index(const int nN, const int j, const int k) final;
 
          /**
           * @brief Check if chosen resolution is optimal
           */
-         bool isOptimal(const int nN, const int maxL) final;
+         virtual bool isOptimal(const int nN, const int maxL);
 
       private:
-         /**
-          * @brief Minimal truncation for highest modes
-          */
-         static const int MIN_TRUNCATION;
    };
 
 } // Tools

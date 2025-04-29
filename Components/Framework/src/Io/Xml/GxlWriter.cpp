@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/DimensionTools.hpp"
 #include "QuICC/Arithmetics/Set.hpp"
 #include "QuICC/Arithmetics/SetNeg.hpp"

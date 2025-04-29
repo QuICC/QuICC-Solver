@@ -32,16 +32,32 @@ quicc_set_ulp(_ulp
   ULP 775 868 215000 107000 107000
   MPULP 11 11 13700 8544 8544
   )
+
+
 foreach(_test ${_tests})
-  foreach(_alg tubular single1d single2d)
-    quicc_add_test(${_test}
-      COMMAND ${TestExe}
-      KEYWORD Scheme
-      ULPS ${_ulp}
-      IDS 0 1 2 3 4
-      OPTIONS algorithm:${_alg}
-    )
-  endforeach()
+  foreach(_impl1d uniform triangular)
+    foreach(_alg tubular single1d single2d)
+    set(_dis False)
+    if(_impl1d STREQUAL "triangular")
+        # The view operators are not implemented for the triangular truncation
+        set (_dis True)
+        if(TARGET QuICC::Cuda)
+          set(_dis True)
+        endif()
+        if(QUICC_USE_KOKKOS)
+          set(_dis True)
+        endif()
+      endif()
+      quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Scheme
+        ULPS ${_ulp}
+        IDS 0 1 2 3 4
+        OPTIONS algorithm:${_alg} truncation:${_impl1d}
+        DISABLED ${_dis}
+      )
+    endforeach()
+endforeach()
 endforeach()
 
 set(_tests
@@ -59,7 +75,7 @@ foreach(_test ${_tests})
       KEYWORD Scheme
       ULPS ${_ulp}
       IDS 0 1 2 3 4
-      OPTIONS algorithm:${_alg}
+      OPTIONS algorithm:${_alg} truncation:uniform
     )
   endforeach()
 endforeach()

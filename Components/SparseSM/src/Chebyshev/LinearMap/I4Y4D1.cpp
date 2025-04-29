@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4Y4D1.cpp
  * @brief Source of the implementation of the I^4 Y^4 D sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4Y4D1.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -27,14 +28,14 @@ namespace LinearMap {
 
    I4Y4D1::ACoeff_t I4Y4D1::d_7(const ACoeff_t& n) const
    {
-      const auto c = precision::pow(this->a()/2.0, 7);
+      const auto c = Internal::Math::pow(this->a()/2.0, 7);
       return c*(n - 7.0)/(n*(n - 3.0)*(n - 2.0)*(n - 1.0));
    }
 
    I4Y4D1::ACoeff_t I4Y4D1::d_6(const ACoeff_t& n) const
    {
-      const auto a2 = this->a()*this->a(); 
-      const auto a6 = a2*a2*a2; 
+      const auto a2 = this->a()*this->a();
+      const auto a6 = a2*a2*a2;
       const auto& b1 = this->b();
       return a6*b1*(n - 6.0)/(16.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0));
    }
@@ -42,8 +43,8 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d_5(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a5 = a2*a2*a1; 
+      const auto a2 = a1*a1;
+      const auto a5 = a2*a2*a1;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       return a5*(n - 5.0)*(a2*n + 13.0*a2 + 24.0*b2*n + 24.0*b2)/(128.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0));
@@ -52,8 +53,8 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d_4(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a4 = a2*a2; 
+      const auto a2 = a1*a1;
+      const auto a4 = a2*a2;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       return a4*b1*(n - 4.0)*(3.0*a2 + b2*n + b2)/(4.0*n*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0));
@@ -62,9 +63,9 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d_3(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a3 = a1*a2; 
-      const auto a4 = a2*a2; 
+      const auto a2 = a1*a1;
+      const auto a3 = a1*a2;
+      const auto a4 = a2*a2;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       const auto b4 = b2*b2;
@@ -74,8 +75,8 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d_2(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a4 = a2*a2; 
+      const auto a2 = a1*a1;
+      const auto a4 = a2*a2;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       return -a4*b1*(3.0*a2*n.pow(2) - 3.0*a2*n - 78.0*a2 + 8.0*b2*n.pow(2) - 24.0*b2*n - 80.0*b2)/(16.0*n*(n - 3.0)*(n - 1.0)*(n + 1.0)*(n + 2.0));
@@ -84,9 +85,9 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d_1(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a3 = a1*a2; 
-      const auto a4 = a2*a2; 
+      const auto a2 = a1*a1;
+      const auto a3 = a1*a2;
+      const auto a4 = a2*a2;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       const auto b4 = b2*b2;
@@ -96,8 +97,8 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d0(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a4 = a2*a2; 
+      const auto a2 = a1*a1;
+      const auto a4 = a2*a2;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       return -3.0*a4*b1*(a2*n.pow(2) - 14.0*a2 + 2.0*b2*n.pow(2) - 18.0*b2)/(2*(n - 3.0)*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0));
@@ -106,9 +107,9 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d1(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a3 = a1*a2; 
-      const auto a4 = a2*a2; 
+      const auto a2 = a1*a1;
+      const auto a3 = a1*a2;
+      const auto a4 = a2*a2;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       const auto b4 = b2*b2;
@@ -118,8 +119,8 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d2(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a4 = a2*a2; 
+      const auto a2 = a1*a1;
+      const auto a4 = a2*a2;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       return a4*b1*(3.0*a2*n.pow(2) + 3.0*a2*n - 78.0*a2 + 8.0*b2*n.pow(2) + 24.0*b2*n - 80.0*b2)/(16.0*n*(n - 2.0)*(n - 1.0)*(n + 1.0)*(n + 3.0));
@@ -128,9 +129,9 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d3(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a3 = a1*a2; 
-      const auto a4 = a2*a2; 
+      const auto a2 = a1*a1;
+      const auto a3 = a1*a2;
+      const auto a4 = a2*a2;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       const auto b4 = b2*b2;
@@ -140,8 +141,8 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d4(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a4 = a2*a2; 
+      const auto a2 = a1*a1;
+      const auto a4 = a2*a2;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       return a4*b1*(n + 4.0)*(3.0*a2 - b2*n + b2)/(4.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0));
@@ -150,9 +151,9 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d5(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a3 = a1*a2; 
-      const auto a5 = a2*a3; 
+      const auto a2 = a1*a1;
+      const auto a3 = a1*a2;
+      const auto a5 = a2*a3;
       const auto& b1 = this->b();
       const auto b2 = b1*b1;
       return -a5*(n + 5.0)*(a2*n - 13.0*a2 + 24.0*b2*n - 24.0*b2)/(128.0*n*(n - 1.0)*(n + 1.0)*(n + 2.0)*(n + 3.0));
@@ -161,8 +162,8 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d6(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a6 = a2*a2*a2; 
+      const auto a2 = a1*a1;
+      const auto a6 = a2*a2*a2;
       const auto& b1 = this->b();
       return -a6*b1*(n + 6.0)/(16.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0));
    }
@@ -170,8 +171,8 @@ namespace LinearMap {
    I4Y4D1::ACoeff_t I4Y4D1::d7(const ACoeff_t& n) const
    {
       const auto& a1 = this->a();
-      const auto a2 = a1*a1; 
-      const auto a7 = a2*a2*a2*a1; 
+      const auto a2 = a1*a1;
+      const auto a7 = a2*a2*a2*a1;
       return -a7*(n + 7.0)/(128.0*n*(n + 1.0)*(n + 2.0)*(n + 3.0));
    }
 

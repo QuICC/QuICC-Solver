@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IChebyshevOperator.hpp
  * @brief Implementation of the generic interface to the Chebyshev sparse operator
  */
@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/ISparseSMOperator.hpp"
 
 namespace QuICC {
@@ -21,7 +21,7 @@ namespace SparseSM {
 
    /**
     * @brief Implementation of the generic interface to the Chebyshev sparse operator
-    */ 
+    */
    class IChebyshevOperator: public ISparseSMOperator
    {
       public:
@@ -37,7 +37,7 @@ namespace SparseSM {
           * @brief Destructor
           */
          virtual ~IChebyshevOperator() = default;
-         
+
       protected:
          /**
           * @brief Wrap around negative column indexes into the matrix

@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/PhysicalNames/Undefined.hpp"
 #include "QuICC/PhysicalOperators/SphericalZComponent.hpp"
 

@@ -3,22 +3,13 @@
  * @brief Source of the tools for schemes with three eigen direction
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Equations/Tools/Regular3D.hpp"
-
 // Project includes
 //
+#include "QuICC/Equations/Tools/Regular3D.hpp"
 
 namespace QuICC {
 
@@ -43,7 +34,7 @@ namespace Tools {
       const auto& tRes = *res.cpu()->dim(Dimensions::Transform::SPECTRAL);
       for(int i = 0; i < tRes.dim<Dimensions::Data::DAT3D>(); ++i)
       {
-         nMat += tRes.dim<Dimensions::Data::DAT2D>(i)*tRes.dim<Dimensions::Data::DATB1D>(i);
+         nMat += tRes.dim<Dimensions::Data::DAT2D>(i)*tRes.dim<Dimensions::Data::DATB1D>(0,i);
       }
 
       return nMat;
@@ -64,7 +55,7 @@ namespace Tools {
       // Python setup is sufficient
    }
 
-   void Regular3D::interpretSystemN(ArrayI&, const Resolution&) const
+   void Regular3D::interpretSystemN(ArrayI&, const Resolution&, const int) const
    {
       // Python setup is sufficient
    }

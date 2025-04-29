@@ -17,12 +17,12 @@ namespace SpatialScheme {
 
 namespace Tools {
 
-   int SpectralUniformAllL::truncationBwd(const int nN, const int l)
+   int SpectralUniformAllL::truncationBwd(const int nN, const int j, const int k)
    {
       return nN;
    }
 
-   int SpectralUniformAllL::index(const int i, const int k)
+   int SpectralUniformAllL::index(const int i, const int j, const int k)
    {
       return i;
    }

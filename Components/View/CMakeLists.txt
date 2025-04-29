@@ -15,6 +15,8 @@ set(PHS
   "View/View.hpp"
   "View/ViewBase.hpp"
   "View/ViewDense.hpp"
+  "View/ViewMacros.hpp"
+  "View/ViewMaps.hpp"
   "View/ViewSparse.hpp"
   "View/Attributes.hpp"
   "View/ViewUtils.hpp"
@@ -28,7 +30,7 @@ set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
 
 # Span patch
 target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
-  QuICC::Cpp
+  QuICC::Std
 )
 
 # Alias

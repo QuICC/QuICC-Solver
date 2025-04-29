@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
 
 namespace QuICC {
@@ -63,12 +63,12 @@ namespace Reductor {
          /**
           * @brief Storage for the quadrature grid
           */
-         mutable internal::Array  mGrid;
+         mutable Internal::Array  mGrid;
 
          /**
           * @brief Storage for the quadrature weights
           */
-         mutable internal::Array  mWeights;
+         mutable Internal::Array  mWeights;
 
       private:
    };

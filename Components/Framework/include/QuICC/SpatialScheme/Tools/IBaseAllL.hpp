@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IBaseAllL.hpp
  * @brief Implementation of the base tools for the radial + spherical harmonics schemes with all harmonic degrees gathered
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SpatialScheme/Tools/IBaseSH.hpp"
 
 namespace QuICC {
@@ -34,14 +34,25 @@ namespace Tools {
          IBaseAllL() = default;
 
          /**
+          * @brief ctor with explicit min truncation
+          *
+          * @param min  Minimal truncation
+          */
+         IBaseAllL(const int min);
+
+         /**
           * @brief Default dtor
           */
          ~IBaseAllL() = default;
 
          /**
           * @brief Compute forward truncation (calls truncationBwd)
+          *
+          * @param nN   Reference truncation
+          * @param j    second dimension
+          * @param k    third dimension
           */
-         int truncationFwd(const int nN, const int l) final;
+         int truncationFwd(const int nN, const int j, const int k) final;
 
          /**
           * @brief Build load balance map of indexes for a generic spherical harmonic spatial schemes

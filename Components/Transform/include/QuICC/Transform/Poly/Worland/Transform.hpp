@@ -15,7 +15,7 @@
 // Project includes
 //
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
@@ -141,12 +141,12 @@ namespace Worland {
          /**
           * @brief Storage for the quadrature points x = [-1, 1] with internal precision
           */
-         internal::Array mIGrid;
+         Internal::Array mIGrid;
 
          /**
           * @brief Storage for the quadrature weights with internal precision
           */
-         internal::Array mIWeights;
+         Internal::Array mIWeights;
 
          /**
           * @brief Polynomial setup object providing the sizes

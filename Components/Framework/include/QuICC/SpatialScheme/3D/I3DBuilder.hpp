@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I3DBuilder.hpp
  * @brief Implementation of a generic regular 3D scheme
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/IBuilder.hpp"
@@ -30,7 +30,7 @@ namespace SpatialScheme {
          /**
           * @brief Constructor
           *
-          * @param dim Dimension truncations 
+          * @param dim Dimension truncations
           * @param purpose Setup purpose: simulation, visualization
           * @param options Options for builder
           */
@@ -52,16 +52,16 @@ namespace SpatialScheme {
           * @param id      ID of the bin
           * @param bins    Total number of bins (useful to build efficient pairs)
           */
-         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::vector<int>& id, const std::vector<int>& bins) override;
+         virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins) override;
 
          /**
-          * @brief Get total of splittable indexes 
+          * @brief Get total of splittable indexes
           *
           * @param transId Transform ID
           * @param flag    Flag to specify location of splitting
           */
          virtual int splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag) override;
-         
+
       protected:
          /**
           * @brief Initialise the domain dimensions with default setup

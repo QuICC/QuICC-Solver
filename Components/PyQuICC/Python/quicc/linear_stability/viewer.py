@@ -56,8 +56,8 @@ def viewSpectra(fields, show = True, save = False, fid = None, max_cols = 3, sub
     if show or save:
         import matplotlib.pylab as pl
         # Plot spectra
-        rows = np.ceil(len(fields)/max_cols)
-        cols = min(max_cols, len(fields))
+        rows = int(np.ceil(len(fields)/max_cols))
+        cols = int(min(max_cols, len(fields)))
         for i,df in enumerate(fields.items()):
             if subplot:
                 pl.subplot(rows,cols,i+1)
@@ -160,7 +160,7 @@ def viewPhysical1D(specs, geometry, res, eigs, eq_params, transf, show = True, s
 
     elif geometry == 's1d':
         import quicc.geometry.spherical.shell_radius as geo
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['r_ratio'])
+        a, b = geo.linear_r2x(eq_params['upper1d'], eq_params['r_ratio'])
         viz_res = (res[0], a, b)
         prof_opt = ()
 
@@ -186,7 +186,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
 
     elif geometry == 'shell':
         import quicc.geometry.spherical.shell_radius as geo
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['r_ratio'])
+        a, b = geo.linear_r2x(eq_params['upper1d'], eq_params['r_ratio'])
         res_1d = (res[0], a, b)
         res_2d = (res[1]-1, int(eigs[0]))
 
@@ -196,7 +196,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
 
     elif geometry == 'annulus':
         import quicc.geometry.cylindrical.annulus_radius as geo
-        a, b = geo.linear_r2x(eq_params['ro'], eq_params['r_ratio'])
+        a, b = geo.linear_r2x(eq_params['upper1d'], eq_params['r_ratio'])
         res_1d = (res[0], a, b)
         res_2d = (res[-1],)
 
@@ -215,7 +215,7 @@ def viewPhysical2D(specs, geometry, res, eigs, eq_params, transf, show = True, s
         sfid = "solution"
         if fid is not None:
             sfid = sfid + "_" + fid
-        viewSlice(sol_slice, grid, show = show, save = False, fid = sfid, max_cols = max_cols)
+        viewSlice(sol_slice, grid, show = show, save = save, fid = sfid, max_cols = max_cols)
 
         if save and save_slice:
             saveSliceData(sol_slice, grid, fid = sfid)
@@ -347,8 +347,8 @@ def viewProfile(fields, grid, fid = None, show = True, save = False, max_cols = 
     """View a profile"""
 
     import matplotlib.pylab as pl
-    rows = np.ceil(len(fields)/max_cols)
-    cols = min(max_cols, len(fields))
+    rows = int(np.ceil(len(fields)/max_cols))
+    cols = int(min(max_cols, len(fields)))
     for i,df in enumerate(fields.items()):
         pl.subplot(rows,cols,i+1)
         pl.plot(grid, df[1].real, 'b-')
@@ -377,8 +377,8 @@ def viewSlice(fields, grid, fid = None, show = True, save = False, max_cols = 3,
     import matplotlib.cm as cm
     from mpl_toolkits.axes_grid1 import make_axes_locatable
     # Plot physical field in meridional slice
-    rows = np.ceil(len(fields)/max_cols)
-    cols = min(max_cols, len(fields))
+    rows = int(np.ceil(len(fields)/max_cols))
+    cols = int(min(max_cols, len(fields)))
     mycm = cm.bwr
     for i,df in enumerate(fields.items()):
         vmax = np.max(np.abs(df[1].real))

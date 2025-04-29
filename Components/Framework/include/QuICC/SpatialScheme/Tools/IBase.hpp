@@ -1,4 +1,4 @@
-/** 
+/**
  * @file IBase.hpp
  * @brief Implementation of the base tools for the spatial schemes
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 
 namespace QuICC {
@@ -29,9 +29,29 @@ namespace Tools {
    {
       public:
          /**
+          * @brief Named minimal truncation
+          */
+         enum class MinimalTruncation
+         {
+            /// Single mode as minimum
+            Single = 1,
+            /// A minimum of 4 modes is required
+            /// to satisfy boundary condition and stable
+            /// timestepping
+            Triangular = 4,
+         };
+
+         /**
           * @brief Default ctor
           */
-         IBase() = default;
+         IBase();
+
+         /**
+          * @brief ctor with explicit min truncation
+          *
+          * @param min  Minimal truncation
+          */
+         IBase(const int min);
 
          /**
           * @brief Default dtor
@@ -40,18 +60,35 @@ namespace Tools {
 
          /**
           * @brief Compute backward truncation
+          *
+          * @param nN   reference truncation
+          * @param j    index of second dimension
+          * @param k    index of third dimension
           */
-         virtual int truncationBwd(const int nN, const int k) = 0;
+         virtual int truncationBwd(const int nN, const int j, const int k) = 0;
 
          /**
           * @brief Compute forward truncation
+          *
+          * @param nN   reference truncation
+          * @param j    index of second dimension
+          * @param k    index of third dimension
           */
-         virtual int truncationFwd(const int nN, const int k) = 0;
+         virtual int truncationFwd(const int nN, const int j, const int k) = 0;
+
+         /**
+          * @Brief Minimal truncation
+          */
+         virtual int min() const;
 
          /**
           * @brief Compute index
+          *
+          * @param nN   reference truncation
+          * @param j    index of second dimension
+          * @param k    index of third dimension
           */
-         virtual int index(const int nN, const int k) = 0;
+         virtual int index(const int nN, const int j, const int k) = 0;
 
          /**
           * @brief Compute total number of modes
@@ -71,12 +108,12 @@ namespace Tools {
          /**
           * @brief Fill the indexes for 2D and 3D for regular spatial schemes
           */
-         void fillIndexes2D3D(std::vector<ArrayI>& idx2D, ArrayI& idx3D, const std::multimap<int,int>& modes);
+         void fillIndexes2D3D(std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::multimap<int,int>& modes);
 
          /**
           * @brief Fill the indexes for 1D for regular spatial schemes
           */
-         void fillIndexes1D(std::vector<ArrayI>& fwd1D, std::vector<ArrayI>& bwd1D, const ArrayI& idx3D, const int nF1D, const int nB1D);
+         void fillIndexes1D(std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, const std::vector<std::vector<int> >& idx2D, const std::vector<int>& idx3D, const int nF1D, const int nB1D);
       protected:
          /**
           * @brief Build map of indexes for a generic spatial schemes
@@ -99,6 +136,12 @@ namespace Tools {
           * @param allowEmpty Allow some parts to be empty
           */
          void balancedSplit(int &n0, int &nN, const int tot, const int parts, const int id, const bool allowEmpty = false);
+
+      protected:
+         /**
+          * @brief Minimal truncation
+          */
+         const int mcMin;
 
    };
 

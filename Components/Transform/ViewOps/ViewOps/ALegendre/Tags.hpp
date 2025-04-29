@@ -4,7 +4,7 @@
  */
 #pragma once
 
-// External includes
+// System includes
 //
 
 // Project includes
@@ -18,14 +18,82 @@ namespace ALegendre {
 // Tags
 //
 
-/// @brief mask for special treatment.
-/// none
-constexpr std::uint16_t none_m = 0;
+/// @brief tag type for projection direction.
+/// Forwards i.e. physical to modal (integrator)
+struct fwd_t
+{
+};
 
-/// @brief mask for special treatment.
-/// diff phi
-constexpr std::uint16_t diffPhi_m = 1;
+/// @brief tag type for projection direction.
+/// Backwards i.e. modal to physical (projector)
+struct bwd_t
+{
+};
 
+/// @brief P op type tag
+struct P_t
+{
+};
+
+/// @brief D1 op type tag
+struct D1_t
+{
+};
+
+/// @brief Ll op type tag
+struct Ll_t
+{
+};
+
+/// @brief LlD1 op type tag
+struct LlD1_t
+{
+};
+
+/// @brief DivS1 op type tag
+struct DivS1_t
+{
+};
+
+/// @brief DivS1Dp op type tag
+struct DivS1Dp_t
+{
+};
+
+/// @brief LlDivS1 op type tag
+struct LlDivS1_t
+{
+};
+
+/// @brief LlDivS1Dp op type tag
+struct LlDivS1Dp_t
+{
+};
+
+/// @brief Ll2 op type tag
+struct Ll2_t
+{
+};
+
+/// @brief DivLl op type tag
+struct DivLl_t
+{
+};
+
+/// @brief DivLlD1 op type tag
+struct DivLlD1_t
+{
+};
+
+/// @brief DivLlDivS1 op type tag
+struct DivLlDivS1_t
+{
+};
+
+/// @brief DivLlDivS1Dp op type tag
+struct DivLlDivS1Dp_t
+{
+};
 
 } // namespace ALegendre
 } // namespace Transform

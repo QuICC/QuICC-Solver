@@ -10,7 +10,7 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/ISphericalTorPolEnergyBaseWriter.hpp"
-#include "QuICC/QuICCEnv.hpp"
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Transform/Reductor/Energy.hpp"

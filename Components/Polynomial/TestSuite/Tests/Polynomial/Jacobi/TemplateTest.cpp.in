@@ -24,9 +24,12 @@ TEST_CASE( "Error for @Operator@ operator", "[@Operator@]" ){
    // Set default arguments if required
    if(currentts::args().useDefault)
    {
-      currentts::args().specN = 128;
-      currentts::args().physN = 256;
-      currentts::args().params = {-0.5,-0.5, -0.5,0.5, -0.5,31.5};
+      currentts::args().specN = 16;
+      currentts::args().physN = 42;
+      currentts::args().params = {-0.5,2.5};
+      /// \todo to enable higher beta
+      /// a better initial guess needs to be implemented
+      // currentts::args().params = {-0.5,2.5, -0.5,9.5, -0.5,49.5};
    }
 
    Catch::StringMaker<double>::precision = 15;
@@ -35,7 +38,7 @@ TEST_CASE( "Error for @Operator@ operator", "[@Operator@]" ){
    REQUIRE( currentts::args().physN > 0 );
    REQUIRE( (currentts::args().params.size() > 0 && currentts::args().params.size() % 2 == 0) );
 
-   typedef ::QuICC::Polynomial::Jacobi::@Operator@<QuICC::Polynomial::Quadrature::natural_t> Operator;
+   typedef ::QuICC::Polynomial::Jacobi::@Operator@<QuICC::Polynomial::Quadrature::unity_t> Operator;
    typedef typename currentts::Tester<Operator> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);

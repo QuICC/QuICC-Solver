@@ -19,7 +19,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Profiler/Interface.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/TestSuite/Transform/TesterBase.hpp"
 #include "QuICC/Transform/Fft/Fourier/Complex/Setup.hpp"
@@ -241,6 +242,10 @@ namespace Fourier {
 
          FwdType outData;
 
+         outData = FwdType(op.outRows(), op.outCols());
+         op.transform(outData, inData);
+         Profiler::RegionResetAll();
+
          for (unsigned int i = 0; i < this->mIter; ++i)
          {
             outData = FwdType(op.outRows(), op.outCols());
@@ -285,6 +290,10 @@ namespace Fourier {
          this->initOperator(op, spSetup);
 
          BwdType outData;
+
+         outData = BwdType(spSetup->bwdSize(), op.outCols());
+         op.transform(outData, inData);
+         Profiler::RegionResetAll();
 
          for (unsigned int i = 0; i < this->mIter; ++i)
          {
@@ -365,6 +374,7 @@ namespace Fourier {
          ss << "_np" << np;
          int r = param.at(2);
          ss << "_r" << r;
+         ss << "_stage2";
       }
 
       return ss.str();
@@ -406,25 +416,20 @@ namespace Fourier {
       readList(meta, fullname);
 
       // Create setup
-      int nMeta = 2;
+      int nMeta = 3;
       int specN = meta(0);
       int physN = meta(1);
-      if (std::is_same_v<typename TOp::SetupType,transf::Mixed::Setup> &&
-            (type == TestType::PROJECTOR || type == TestType::INTEGRATOR)
-         )
-      {
-         // the metadata generated automatically is the aliased size
-         // but the test was setup for dealiased data
-         specN = physN / 3;
-      }
+      int nModes = meta(2);
       auto spSetup = std::make_shared<typename TOp::SetupType>(physN, specN, GridPurpose::SIMULATION);
       spSetup->setBoxScale(1.0);
 
       // Gather indices
       std::map<int,int> indices;
+      int nModes2D = 0;
+      int h = nMeta;
       if(param.size() == 1)
       {
-         for(int i = nMeta; i < meta.size(); i++)
+         for(int i = 2; i < meta.size(); i++)
          {
             int m = static_cast<int>(meta(i));
             indices[m]++;
@@ -432,12 +437,20 @@ namespace Fourier {
       }
       else
       {
-         assert((meta.size() - nMeta) % 2 == 0);
-         for(int i = nMeta; i < meta.size(); i += 2)
+         assert((meta.size() - nMeta - 2*nModes) % 2 == 0);
+         for(int i = 0; i < nModes; i++)
          {
-            int m = static_cast<int>(meta(i));
-            int mult = static_cast<int>(meta(i+1));
+            int m = static_cast<int>(meta(h));
+            int mult = static_cast<int>(meta(h+1));
             indices.insert(std::pair(m,mult));
+            h += 2;
+            nModes2D += mult;
+         }
+
+         // Check meta data size
+         if(meta.size() - nMeta - 2*nModes - 2*nModes2D != 0)
+         {
+            throw std::logic_error("Meta data format is not supported (file: " + fullname + ")");
          }
       }
 

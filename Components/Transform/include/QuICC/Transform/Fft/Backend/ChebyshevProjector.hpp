@@ -1,6 +1,6 @@
-/** 
+/**
  * @file ChebyshevProjector.hpp
- * @brief Interface for a generic API for Chebyshev projector 
+ * @brief Interface for a generic API for Chebyshev projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_CHEBYSHEVPROJECTOR_HPP
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
 #include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
@@ -28,7 +28,7 @@ namespace Backend {
     * @brief Interface for a generic API Chebyshev projector
     *
     * Backward transform, spectral to physical space
-    */ 
+    */
    class ChebyshevProjector
    {
       public:
@@ -47,7 +47,7 @@ namespace Backend {
           * @brief Destructor
           */
          ~ChebyshevProjector();
-         
+
          /**
           * @brief Initialise the FFT transforms
           */
@@ -143,7 +143,7 @@ namespace Backend {
           * @brief Get the temporary storage
           */
          Matrix& getStorage(const StorageKind = StorageKind::in) const;
-         
+
       protected:
 
       private:

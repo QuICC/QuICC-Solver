@@ -10,7 +10,6 @@ set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/Components/Transform/cmake.d")
 
 # Setup for the different transforms
-include(setup/ALegendre)
 include(setup/Worland)
 include(setup/SparseLinearAlgebra)
 include(setup/FFT)
@@ -29,14 +28,21 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 include(setup/TruncateQI)
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
-  QuICC::Common
+  QuICC::Types
+  QuICC::Environment
   ${QUICC_SPARSESM_COMPONENT_LIB}
-  ${QUICC_POLYNOMIAL_COMPONENT_LIB}
+  QuICC::Polynomial
   QuICC::Profiling
   QuICC::ViewOps
   QuICC::Memory
   BLAS::BLAS # banded/tridiag solve/mul TODO: remove dep
   )
+
+# Wrappers depends on kk part
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+  PRIVATE
+    ${QUICC_CURRENT_COMPONENT_LIB_KK}
+)
 
 if(QUICC_WORLAND_BACKEND STREQUAL "BLAS")
   if(NOT TARGET BLAS::BLAS)
@@ -70,6 +76,16 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB_KK}
     ${QUICC_CURRENT_COMPONENT_LIB}
     QuICC::KokkosWrapper
 )
+
+# VkFFT
+if(TARGET VkFFT AND QUICC_USE_VKFFT)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE VkFFT)
+endif()
+
+# PfSolve
+if(TARGET PfSolve AND QUICC_USE_PFSOLVE)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE PfSolve)
+endif()
 
 # View Operator wrappers
 add_subdirectory(Wrappers)

@@ -9,8 +9,8 @@
 // Project includes
 //
 #include "QuICC/Generator/States/CartesianExactVectorState.hpp"
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Math/Constants.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Math.hpp"
 #include "QuICC/SolveTiming/After.hpp"
 #include "QuICC/PhysicalKernels/DoNothing.hpp"
 #include "QuICC/PhysicalKernels/MakeConstant.hpp"
@@ -77,8 +77,8 @@ namespace Equations {
       }
 
       auto features = defaultCouplingFeature();
-      features.at(CouplingFeature::Nonlinear) = true;
-      features.at(CouplingFeature::AllowExplicit) = false;
+      features.at(CouplingFeature::Nonlinear) = hasNL;
+      features.at(CouplingFeature::Source) = hasSource;
       features.at(CouplingFeature::AllowExplicit) = false;
 
       if(this->ss().spectral().ONE() != FieldComponents::Spectral::NOTUSED)

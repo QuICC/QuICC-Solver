@@ -1,6 +1,6 @@
-/** 
+/**
  * @file IMixedProjector.hpp
- * @brief Interface for a generic mixed FFTW based projector 
+ * @brief Interface for a generic mixed FFTW based projector
  */
 
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_MIXED_PROJECTOR_IMIXEDPROJECTOR_HPP
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/IMixedOperator.hpp"
 #include "QuICC/Transform/Fft/Backend/MixedProjector.hpp"
 
@@ -38,7 +38,7 @@ namespace Projector {
 
    /**
     * @brief Interface for a generic mixed FFTW based projector
-    */ 
+    */
    class IMixedProjector: public IMixedOperator
    {
       public:
@@ -74,26 +74,12 @@ namespace Projector {
           * @brief Get the memory requirements
           */
          virtual MHDFloat requiredStorage() const override;
-         
+
       protected:
          /**
           * @brief FFT backend
           */
          Backend::MixedProjector mBackend;
-
-      private:
-         /**
-          * @brief Initialise FFT backend
-          */
-         virtual void initBackend() const override;
-
-         /**
-          * @brief Apply pre FFT operator
-          *
-          * @param out  Copied or scaled input
-          * @param in   Input values
-          */
-         virtual void applyPreOperator(MatrixZ& out, const MatrixZ& in) const = 0;
 
          /**
           * @brief Compute transform C2C or R2R componentwise (disabled)
@@ -118,6 +104,20 @@ namespace Projector {
           * @param in   Input values
           */
          virtual void transform(Matrix& rOut, const Matrix& in) const override;
+
+      private:
+         /**
+          * @brief Initialise FFT backend
+          */
+         virtual void initBackend() const override;
+
+         /**
+          * @brief Apply pre FFT operator
+          *
+          * @param out  Copied or scaled input
+          * @param in   Input values
+          */
+         virtual void applyPreOperator(MatrixZ& out, const MatrixZ& in) const = 0;
    };
 
 }

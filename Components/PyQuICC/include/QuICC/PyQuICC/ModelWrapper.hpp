@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 
 namespace QuICC {
@@ -126,12 +126,12 @@ namespace PyQuICC {
           * @brief Fill sparse matrix with data from Python call
           */
          void fillMatrix(DecoupledZSparse& rMatrix, PyObject* pPyMat);
-  
+
          /**
           * @brief Cleanup wrapper
           */
          void cleanup();
-         
+
       protected:
          /**
           * @brief Initialize the wrapper

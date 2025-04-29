@@ -19,7 +19,7 @@ namespace Fft {
 namespace CuFft {
 
 template<class AttIn, class AttOut>
-FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>::~FftOp()
+FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>::~FftOp()
 {
     // Destroy plan
     if(_plan != nullptr)
@@ -56,20 +56,22 @@ namespace details
 }
 
 template<class AttIn, class AttOut>
-void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>>::applyImpl(View<std::complex<double>, AttOut>& phys, const View<std::complex<double>, AttIn>& mods)
+void FftOp<View::View<std::complex<double>, AttOut>, View::View<std::complex<double>, AttIn>>::applyImpl(View::View<std::complex<double>, AttOut>& phys, const View::View<std::complex<double>, AttIn>& mods)
 {
-    assert(phys.dims()[0] == mods.dims()[0]);
+    using namespace QuICC::View;
     if(_plan == nullptr)
     {
-        Profiler::RegionFixture<4> fix("FftOp::initFft");
+        Profiler::RegionFixture<5> fix("FftOp::initFft");
         int columns = 0;
         if constexpr(std::is_same_v<AttIn, dense2D>)
         {
+            assert(phys.dims()[0] == mods.dims()[0]);
             assert(phys.dims()[1] == mods.dims()[1]);
             columns = phys.dims()[1];
         }
-        else if constexpr(std::is_same_v<AttIn, DCCSC3D>)
+        else if constexpr(std::is_same_v<AttIn, DCCSC3DInOrder>)
         {
+            assert(phys.dims()[0] == mods.lds());
             assert(phys.indices()[1].size() == mods.indices()[1].size());
             columns = phys.indices()[1].size();
         }
@@ -79,7 +81,7 @@ void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>
         }
         _plan = details::setPlanCtoC(phys.dims()[0], columns);
     }
-    Profiler::RegionFixture<4> fix("FftOp::applyFft");
+    Profiler::RegionFixture<5> fix("FftOp::applyFft");
     auto err = cufftExecZ2Z(*static_cast<cufftHandle*>(_plan),
         reinterpret_cast<cufftDoubleComplex*>(mods.data()),
         reinterpret_cast<cufftDoubleComplex*>(phys.data()), CUFFT_INVERSE);
@@ -91,7 +93,7 @@ void FftOp<View<std::complex<double>, AttOut>, View<std::complex<double>, AttIn>
 
 // Explicit instantiations
 template class FftOp<CphysDense2D_t, CmodsDense2D_t>;
-template class FftOp<CphysDCCSC3D_t, CmodsDCCSC3D_t>;
+template class FftOp<CphysDCCSC3DInOrder_t, CmodsDCCSC3DInOrder_t>;
 
 
 } // namespace CuFft

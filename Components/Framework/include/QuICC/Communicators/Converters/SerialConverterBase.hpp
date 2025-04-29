@@ -19,7 +19,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/StorageProviders/DynamicPairProvider.hpp"
 #include "QuICC/Communicators/Converters/IConverter.hpp"
@@ -28,7 +28,7 @@ namespace QuICC {
 
 namespace Parallel {
 
-   namespace internal
+   namespace details
    {
       /**
        * @brief Reorder 3D data
@@ -123,17 +123,17 @@ namespace Parallel {
       // 3D case
       if(this->mDimensions == 3)
       {
-         internal::reorder3D<T,TDataId>(pOut, in, tRes, outConv, inConv);
+         details::reorder3D<T,TDataId>(pOut, in, tRes, outConv, inConv);
       }
       // 2D case
       else if(this->mDimensions == 2)
       {
-         internal::reorder2D<T,TDataId>(pOut, in, tRes, outConv, inConv);
+         details::reorder2D<T,TDataId>(pOut, in, tRes, outConv, inConv);
       }
       // 1D case
       else if(this->mDimensions == 1)
       {
-         internal::reorder1D<T,TDataId>(pOut, in, tRes, outConv, inConv);
+         details::reorder1D<T,TDataId>(pOut, in, tRes, outConv, inConv);
       }
       else
       {
@@ -167,7 +167,7 @@ namespace Parallel {
       storage.holdBwd(*pOut);
    }
 
-   namespace internal
+   namespace details
    {
       template<typename T, Dimensions::Data::Id TId> void reorder3D(T* pOut, const T& in, const TransformResolution& tRes, const IIndexConv& outConv, const IIndexConv& inConv)
       {
@@ -180,9 +180,9 @@ namespace Parallel {
             {
                int idxJ = tRes.template idx<Dimensions::Data::DAT2D>(j,k);
                // Loop over fast direction of output
-               for(int i = 0; i < tRes.template dim<TId>(k); i++)
+               for(int i = 0; i < tRes.template dim<TId>(j,k); i++)
                {
-                  int idxI = tRes.template idx<TId>(i,k);
+                  int idxI = tRes.template idx<TId>(i,j,k);
                   pOut->rPoint(outConv.i(i,j,k,idxI,idxJ,idxK),outConv.j(i,j,k,idxI,idxJ,idxK),outConv.k(i,j,k,idxI,idxJ,idxK)) = in.point(inConv.i(i,j,k,idxI,idxJ,idxK),inConv.j(i,j,k,idxI,idxJ,idxK),inConv.k(i,j,k,idxI,idxJ,idxK));
                }
             }

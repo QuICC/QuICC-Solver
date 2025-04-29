@@ -1,4 +1,4 @@
-/** 
+/**
  * @file R2Diags.hpp
  * @brief Interface to R2 diagonals for full sphere Worland R2 sparse operator
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Worland/R2Diags.hpp"
 
 namespace QuICC {
@@ -24,7 +24,7 @@ namespace Legendre {
 
    /**
     * @brief Implementation of the full sphere Worland R2 sparse operator
-    */ 
+    */
    class R2Diags: public QuICC::SparseSM::Worland::R2Diags
    {
       public:
@@ -47,22 +47,22 @@ namespace Legendre {
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d_1(const ACoeff_t& n) const; 
+         virtual ACoeff_t d_1(const ACoeff_t& n) const;
 
          /**
           * @brief Main diagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d0(const ACoeff_t& n) const; 
+         virtual ACoeff_t d0(const ACoeff_t& n) const;
 
          /**
           * @brief 1. superdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d1(const ACoeff_t& n) const; 
-         
+         virtual ACoeff_t d1(const ACoeff_t& n) const;
+
       protected:
 
       private:

@@ -20,12 +20,92 @@ set_target_properties(
 
 # Create Worland tests targets
 include(ConfigureTests)
-set(WorlandTests WnlTest dWnlTest slaplWnlTest r_1WnlTest r_1drWnlTest drWnlTest dr_1drWnlTest r_1claplhWnlTest claplhWnlTest dclaplhWnlTest)
+set(WorlandTests
+  Wnl:Chebyshev
+  dWnl:Chebyshev
+  slaplWnl:Chebyshev
+  drWnl:Chebyshev
+  dr_1drWnl:Chebyshev
+  r_1claplhWnl:Chebyshev
+  claplhWnl:Chebyshev
+  dclaplhWnl:Chebyshev
+  Wnl:SphEnergy
+  dWnl:SphEnergy
+  slaplWnl:SphEnergy
+  drWnl:SphEnergy
+  dr_1drWnl:SphEnergy
+  r_1claplhWnl:SphEnergy
+  claplhWnl:SphEnergy
+  dclaplhWnl:SphEnergy
+)
+include(SetUlp)
+quicc_set_ulp(_ulp
+  ULP 16000
+  MPULP 11
+)
 foreach(_test ${WorlandTests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Operator
+    KEYWORD Operator:WType
     TYPES matrix weighted
+    ULP ${_ulp}
+  )
+endforeach()
+
+set(WorlandTestsTemplated
+  r_1Wnl:recurrence_t:Chebyshev
+  r_1Wnl:explicit_t:Chebyshev
+  r_1Wnl:recurrence_t:SphEnergy
+  r_1Wnl:explicit_t:SphEnergy
+)
+quicc_set_ulp(_ulp
+  ULP 10000
+  MPULP 11
+)
+foreach(_test ${WorlandTestsTemplated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:Template:WType
+    TYPES matrix weighted
+    ULP ${_ulp}
+  )
+endforeach()
+
+set(WorlandTestsTemplated
+  r_1drWnl:recurrence_t:Chebyshev
+  r_1drWnl:recurrence_t:SphEnergy
+)
+quicc_set_ulp(_ulp
+  ULP 10000
+  MPULP 11
+)
+foreach(_test ${WorlandTestsTemplated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:Template:WType
+    TYPES matrix
+    ULP ${_ulp}
+  )
+endforeach()
+
+quicc_set_ulp(_ulp
+  ULP 20000
+  MPULP 11
+)
+set(WorlandTestsTemplated
+  r_1Wnl:implicit_t:Chebyshev
+  r_1drWnl:explicit_t:Chebyshev
+  r_1drWnl:implicit_t:Chebyshev
+  r_1Wnl:implicit_t:SphEnergy
+  r_1drWnl:explicit_t:SphEnergy
+  r_1drWnl:implicit_t:SphEnergy
+)
+foreach(_test ${WorlandTestsTemplated})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:Template:WType
+    TYPES weighted
+    ULP ${_ulp}
   )
 endforeach()
 

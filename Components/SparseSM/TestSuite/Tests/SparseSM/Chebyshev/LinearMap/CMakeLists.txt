@@ -47,6 +47,7 @@ set(_tests
   I2Y3:sparse
   I2D1:sparse
   I2Y1D1Y1:sparse
+  I2Y2D1Y1:sparse
   I3:sparse
   I4:sparse
   I4D1:sparse
@@ -113,6 +114,7 @@ endforeach()
 
 # Create basis tests targets
 set(_tests
+  I4Y1:sparse
   I4Y3:sparse
   I4Y4D1:sparse
   )

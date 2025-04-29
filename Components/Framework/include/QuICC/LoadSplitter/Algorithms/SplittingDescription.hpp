@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SplittingDescription.hpp
  * @brief Implementation basic description of the obtained splitting (for any algorithm)
  */
@@ -17,7 +17,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Io/Xml/VtpWriter.hpp"
 
@@ -83,7 +83,7 @@ namespace Parallel {
           * @brief Save stage descriptions
           */
          void save();
-         
+
       protected:
 
       private:

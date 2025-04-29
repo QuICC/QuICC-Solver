@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2.cpp
  * @brief Source of the implementation of the I^2 sparse operator, with y = ax + b
  */
@@ -11,6 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 

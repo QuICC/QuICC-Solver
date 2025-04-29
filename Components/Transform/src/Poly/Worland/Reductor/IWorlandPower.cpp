@@ -6,15 +6,10 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Reductor/IWorlandPower.hpp"
 
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Reductor/IWorlandPower.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandSphEnergyRule.hpp"
@@ -41,13 +36,12 @@ namespace Reductor {
    {
    }
 
-   void IWorlandPower::initOperators(const internal::Array& icompgrid, const internal::Array& icompweights) const
+   void IWorlandPower::initOperators(const Internal::Array& icompgrid, const Internal::Array& icompweights) const
    {
       // Energy calculation requires a different quadrature
-      internal::Array igrid, iweights;
+      Internal::Array igrid, iweights;
       this->computePowerQuadrature(igrid, iweights, icompgrid.size());
 
-      #if defined QUICC_WORLAND_REDUIMPL_MATRIX
       // Reserve storage for the operators
       this->mOps.reserve(this->mspSetup->slowSize());
       this->mEOps.reserve(this->mspSetup->slowSize());
@@ -60,15 +54,9 @@ namespace Reductor {
          this->mEOps.push_back(Matrix(igrid.size(), 1));
          this->makeOperator(this->mOps.back(), this->mEOps.back(), igrid, iweights, i);
       }
-      #elif defined QUICC_WORLAND_REDUIMPL_OTF
-
-      this->mGrid = igrid.cast<MHDFloat>();
-      this->mWeights = iweights.cast<MHDFloat>();
-
-      #endif //defined QUICC_WORLAND_REDUIMPL_MATRIX
    }
 
-   void IWorlandPower::computePowerQuadrature(internal::Array& igrid, internal::Array& iweights, const int gSize) const
+   void IWorlandPower::computePowerQuadrature(Internal::Array& igrid, Internal::Array& iweights, const int gSize) const
    {
       int nrgSize = gSize + 2*this->mcShift;
 

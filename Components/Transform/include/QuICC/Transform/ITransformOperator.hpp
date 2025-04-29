@@ -6,22 +6,13 @@
 #ifndef QUICC_TRANSFORM_ITRANSFORMOPERATOR_HPP
 #define QUICC_TRANSFORM_ITRANSFORMOPERATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/Precision.hpp"
+#include "Types/Typedefs.hpp"
+#include "Types/Internal/Typedefs.hpp"
 #include "QuICC/Transform/TransformSetup.hpp"
 
 
@@ -43,14 +34,14 @@ namespace Transform {
          /**
           * @brief Destructor
           */
-         virtual ~ITransformOperator();
+         virtual ~ITransformOperator() = default;
 
          /**
           * @brief Initialise the polynomial transform
           *
           * @param spSetup   Shared setup object for the transform
           */
-         virtual void init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const;
+         virtual void init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const;
 
          /**
           * @brief Initialise the fft transform

@@ -51,51 +51,54 @@ namespace Integrator {
 
    void IWorlandIntegrator::transformBlock(MatrixZ& rOut, const MatrixZ& in, const bool isEven, const bool useReal) const
    {
-      Profiler::RegionStart<3> (this->mProfileTag + "-pre");
+      Profiler::RegionStart<5> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven, useReal);
-      Profiler::RegionStop<3> (this->mProfileTag + "-pre");
+      Profiler::RegionStop<5> (this->mProfileTag + "-pre");
 
-      Profiler::RegionStart<3> (this->mProfileTag + "-fft");
+      Profiler::RegionStart<5> (this->mProfileTag + "-fft");
       this->mBackend.applyFft();
-      Profiler::RegionStop<3> (this->mProfileTag + "-fft");
+      Profiler::RegionStop<5> (this->mProfileTag + "-fft");
 
-      Profiler::RegionStart<3> (this->mProfileTag + "-post");
+      Profiler::RegionStart<5> (this->mProfileTag + "-post");
       this->applyPostOperator(rOut, isEven, useReal);
-      Profiler::RegionStop<3> (this->mProfileTag + "-post");
+      Profiler::RegionStop<5> (this->mProfileTag + "-post");
    }
 
    void IWorlandIntegrator::transformBlock(Matrix& rOut, const Matrix& in, const bool isEven) const
    {
-      Profiler::RegionStart<3> (this->mProfileTag + "-pre");
+      Profiler::RegionStart<5> (this->mProfileTag + "-pre");
       this->applyPreOperator(in, isEven);
-      Profiler::RegionStop<3> (this->mProfileTag + "-pre");
+      Profiler::RegionStop<5> (this->mProfileTag + "-pre");
 
-      Profiler::RegionStart<3> (this->mProfileTag + "-fft");
+      Profiler::RegionStart<5> (this->mProfileTag + "-fft");
       this->mBackend.applyFft();
-      Profiler::RegionStop<3> (this->mProfileTag + "-fft");
+      Profiler::RegionStop<5> (this->mProfileTag + "-fft");
 
-      Profiler::RegionStart<3> (this->mProfileTag + "-post");
+      Profiler::RegionStart<5> (this->mProfileTag + "-post");
       this->applyPostOperator(rOut, isEven);
-      Profiler::RegionStop<3> (this->mProfileTag + "-post");
+      Profiler::RegionStop<5> (this->mProfileTag + "-post");
    }
 
    void IWorlandIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
    {
-      Profiler::RegionFixture<2> fix(this->mProfileTag);
+      Profiler::RegionFixture<2> fix(this->mProfileTag + "::transform");
 
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == in.rows());
       assert(in.cols() <= rOut.cols());
-
+#ifdef QUICC_USE_PFSOLVE
+      this->transformBlock(rOut, in, true, true);
+#else
       this->transformBlock(rOut, in, true, true);
       this->transformBlock(rOut, in, true, false);
       this->transformBlock(rOut, in, false, true);
       this->transformBlock(rOut, in, false, false);
+#endif
    }
 
    void IWorlandIntegrator::transform(Matrix& rOut, const Matrix& in) const
    {
-      Profiler::RegionFixture<2> fix(this->mProfileTag);
+      Profiler::RegionFixture<2> fix(this->mProfileTag + "::transform");
 
       assert(this->isInitialized());
       assert(this->mspSetup->fwdSize() == in.rows());

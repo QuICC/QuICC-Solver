@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SplittingTools.hpp
  * @brief Base of the implementation of the load splitting algorithms
  */
@@ -18,7 +18,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -57,7 +57,7 @@ namespace Parallel {
           * @param id   ID of CPU
           */
          static int groupId(const ArrayI& factors, const int i, const int id);
-         
+
       protected:
 
       private:

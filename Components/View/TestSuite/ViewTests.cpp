@@ -4,14 +4,15 @@
 
 #include "View/View.hpp"
 
-using namespace QuICC::Memory;
+using namespace QuICC::View;
 
 TEST_CASE("Level", "[Level]")
 {
     CHECK(isLevelType_v<dense_t> == true);
     CHECK(isLevelType_v<compressed_t> == true);
-    CHECK(isLevelType_v<triK_t> == true);
-    CHECK(isLevelType_v<CSC_t> == true);
+    CHECK(isLevelType_v<sparse_t> == true);
+    CHECK(isLevelType_v<step1K_t> == true);
+    CHECK(isLevelType_v<step2K_t> == true);
     CHECK(isLevelType_v<double> == false);
 
     CHECK(areLevelType_v<dense_t, dense_t> == true);
@@ -19,8 +20,9 @@ TEST_CASE("Level", "[Level]")
 
     CHECK(isLevelTypeDense_v<dense_t> == true);
     CHECK(isLevelTypeDense_v<compressed_t> == false);
-    CHECK(isLevelTypeDense_v<triK_t> == false);
-    CHECK(isLevelTypeDense_v<CSC_t> == false);
+    CHECK(isLevelTypeDense_v<sparse_t> == false);
+    CHECK(isLevelTypeDense_v<step1K_t> == false);
+    CHECK(isLevelTypeDense_v<step2K_t> == false);
     // this should trigger a static assert
     // CHECK(isLevelTypeDense_v<double> == false);
 

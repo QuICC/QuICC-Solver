@@ -38,34 +38,25 @@ namespace Projector {
    {
    }
 
-   void IWorlandProjector::initOperators(const internal::Array& igrid, const internal::Array& iweights) const
+   void IWorlandProjector::initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const
    {
-      #if defined QUICC_WORLAND_PROJIMPL_MATRIX
-         // Reserve storage for the operators
-         this->mOps.reserve(this->mspSetup->slowSize());
+      // Reserve storage for the operators
+      this->mOps.reserve(this->mspSetup->slowSize());
 
-         // Loop over harmonic degrees
-         for(int i = 0; i < this->mspSetup->slowSize(); i++)
-         {
-            // Build operator
-            this->mOps.push_back(Matrix(this->mspSetup->fastSize(i), igrid.size()));
-            Matrix op;
-            this->makeOperator(op, igrid, iweights, i);
-            this->mOps.back() = op.transpose();
-         }
-
-      #elif defined QUICC_WORLAND_PROJIMPL_OTF
-
-         // Store grid and weights
-         this->mGrid = igrid;
-         this->mWeights = iweights;
-
-      #endif //defined QUICC_WORLAND_PROJIMPL_MATRIX
+      // Loop over harmonic degrees
+      for(int i = 0; i < this->mspSetup->slowSize(); i++)
+      {
+         // Build operator
+         this->mOps.push_back(Matrix(this->mspSetup->fastSize(i), igrid.size()));
+         Matrix op;
+         this->makeOperator(op, igrid, iweights, i);
+         this->mOps.back() = op.transpose();
+      }
    }
 
    void IWorlandProjector::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
    {
-      Profiler::RegionFixture<3> fix(this->mProfileTag);
+      Profiler::RegionFixture<3> fix(this->mProfileTag + "::applyOperators");
 
       // assert right sizes for input  matrix
       assert(in.cols() == this->mspSetup->blockSize());
@@ -112,7 +103,7 @@ namespace Projector {
       return mem;
    }
 
-   void IWorlandProjector::defaultApplyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
+   void IWorlandProjector::defaultApplyOperator(OpMatrixR rOut, const int i, const OpMatrixCR& in) const
    {
       rOut = this->mOps.at(i).transpose()*in;
    }

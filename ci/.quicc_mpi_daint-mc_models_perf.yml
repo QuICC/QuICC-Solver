@@ -1,0 +1,113 @@
+# This file is generated, do not modify!
+include:
+- remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
+- /ci/gitlab/.cscs_builders.yml
+- /ci/gitlab/.cscs_runners.yml
+- /ci/gitlab/.quicc_models_perf.yml
+stages:
+- build_base
+- build
+- model-build-and-test
+- cleanup
+build-quicc-base:
+  extends: .daint-mc_builder
+  stage: build_base
+  variables:
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-mc
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:8c8e2d194906e3a16ce0c75d3241228e
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_daint-mc:8c8e2d194906e3a16ce0c75d3241228e
+    SECONDARY_IMAGE_USERNAME: quicc
+    SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
+build-quicc:
+  extends: .daint-mc_builder
+  stage: build
+  variables:
+    DOCKERFILE: ci/docker/Dockerfile_mpi
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:8c8e2d194906e3a16ce0c75d3241228e"]'
+BoussinesqSphereDynamoExplicit:
+  extends:
+  - .BoussinesqSphereDynamoExplicit
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    SLURM_NTASKS: '36'
+    SLURM_NTASKS_PER_NODE: '36'
+    SLURM_CPUS_PER_TASK: '2'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereDynamoImplicit:
+  extends:
+  - .BoussinesqSphereDynamoImplicit
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    SLURM_NTASKS: '36'
+    SLURM_NTASKS_PER_NODE: '36'
+    SLURM_CPUS_PER_TASK: '2'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellDynamoExplicit:
+  extends:
+  - .BoussinesqShellDynamoExplicit
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    SLURM_NTASKS: '36'
+    SLURM_NTASKS_PER_NODE: '36'
+    SLURM_CPUS_PER_TASK: '2'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTCExplicit:
+  extends:
+  - .BoussinesqSphereRTCExplicit
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    SLURM_NTASKS: '36'
+    SLURM_NTASKS_PER_NODE: '36'
+    SLURM_CPUS_PER_TASK: '2'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTCImplicit:
+  extends:
+  - .BoussinesqSphereRTCImplicit
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    SLURM_NTASKS: '36'
+    SLURM_NTASKS_PER_NODE: '36'
+    SLURM_CPUS_PER_TASK: '2'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellRTCExplicit:
+  extends:
+  - .BoussinesqShellRTCExplicit
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    SLURM_NTASKS: '36'
+    SLURM_NTASKS_PER_NODE: '36'
+    SLURM_CPUS_PER_TASK: '2'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereTCExplicit:
+  extends:
+  - .BoussinesqSphereTCExplicit
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    SLURM_NTASKS: '36'
+    SLURM_NTASKS_PER_NODE: '36'
+    SLURM_CPUS_PER_TASK: '2'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellTCExplicit:
+  extends:
+  - .BoussinesqShellTCExplicit
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    SLURM_NTASKS: '36'
+    SLURM_NTASKS_PER_NODE: '36'
+    SLURM_CPUS_PER_TASK: '2'
+    QUICC_VERSION_TAG: mpi
+ci-cache-cleanup:
+  extends: .container-runner-daint
+  stage: cleanup
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  script:
+  - rm -Rf $CI_CACHE_FOLDER/*

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I6CylLaplh.hpp
  * @brief Implementation of the full sphere Worland I6CylLaplh sparse operator
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/IWorlandOperator.hpp"
 #include "QuICC/SparseSM/Worland/I6CylLaplhDiags.hpp"
 
@@ -23,7 +23,7 @@ namespace Worland {
 
    /**
     * @brief Implementation of the full sphere Worland I6CylLaplh sparse operator
-    */ 
+    */
    class I6CylLaplh: public IWorlandOperator
    {
       public:
@@ -43,7 +43,7 @@ namespace Worland {
           * @brief Destructor
           */
          virtual ~I6CylLaplh() = default;
-         
+
       protected:
 
       private:

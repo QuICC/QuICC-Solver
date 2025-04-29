@@ -17,26 +17,34 @@ namespace SpatialScheme {
 
 namespace Tools {
 
-   const int SpectralTrapezoidalSH::MIN_TRUNCATION = 3;
-
-   int SpectralTrapezoidalSH::truncationFwd(const int nN, const int l)
+   SpectralTrapezoidalSH::SpectralTrapezoidalSH()
+      : IBaseSH(static_cast<int>(MinimalTruncation::Triangular))
    {
-      return this->truncationBwd(nN, l);
    }
 
-   int SpectralTrapezoidalSH::truncationBwd(const int nN, const int l)
+   SpectralTrapezoidalSH::SpectralTrapezoidalSH(const int min)
+      : IBaseSH(min)
    {
-      return std::max(nN - l/2, MIN_TRUNCATION);
    }
 
-   int SpectralTrapezoidalSH::index(const int i, const int l)
+   int SpectralTrapezoidalSH::truncationFwd(const int nN, const int j, const int k)
+   {
+      return this->truncationBwd(nN, j, k);
+   }
+
+   int SpectralTrapezoidalSH::truncationBwd(const int nN, const int j, const int k)
+   {
+      return std::max(nN - k/2, this->min());
+   }
+
+   int SpectralTrapezoidalSH::index(const int i, const int j, const int k)
    {
       return i;
    }
 
    bool SpectralTrapezoidalSH::isOptimal(const int nN, const int maxL)
    {
-      return (this->truncationBwd(nN, maxL) > MIN_TRUNCATION);
+      return (nN - maxL/2 >= this->min());
    }
 
 } // Tools

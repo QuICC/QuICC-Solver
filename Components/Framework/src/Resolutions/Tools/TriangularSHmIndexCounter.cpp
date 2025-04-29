@@ -109,12 +109,12 @@ namespace QuICC {
       return oDims;
    }
 
-   void TriangularSHmIndexCounter::computeOffsets(std::vector<TriangularSHmIndexCounter::OffsetType>& blocks, std::vector<std::vector<TriangularSHmIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const
+   void TriangularSHmIndexCounter::computeOffsets(std::vector<std::vector<TriangularSHmIndexCounter::OffsetType>>& blocks, std::vector<std::vector<TriangularSHmIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const
    {
       this->computeOffsets(blocks, offsets, spaceId, this->mspSim);
    }
 
-   void TriangularSHmIndexCounter::computeOffsets(std::vector<TriangularSHmIndexCounter::OffsetType>& blocks, std::vector<std::vector<TriangularSHmIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
+   void TriangularSHmIndexCounter::computeOffsets(std::vector<std::vector<TriangularSHmIndexCounter::OffsetType>>& blocks, std::vector<std::vector<TriangularSHmIndexCounter::OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const
    {
       Dimensions::Transform::Id transId;
       Dimensions::Simulation::Id simId;
@@ -164,7 +164,9 @@ namespace QuICC {
                m0 = tRes.idx<Dimensions::Data::DAT3D>(iM);
 
                // 1D blocks
-               blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, m_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               std::vector<TriangularSHmIndexCounter::OffsetType> blk;
+               blk.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, m_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               blocks.push_back(blk);
             }
          }
 
@@ -194,7 +196,9 @@ namespace QuICC {
                offsets.push_back(offV);
 
                // 1D blocks
-               blocks.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, i_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               std::vector<TriangularSHmIndexCounter::OffsetType> blk;
+               blk.push_back(std::min(this->dim(Dimensions::Simulation::SIM1D, spaceId, i_), spRef->dim(Dimensions::Simulation::SIM1D,spaceId)));
+               blocks.push_back(blk);
             }
          }
       }

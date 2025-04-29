@@ -18,10 +18,10 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "Timers/TimerMacro.h"
 #include "QuICC/TestSuite/SparseSM/TestType.hpp"
-#include "QuICC/TestSuite/SparseSM/Io.hpp"
+#include "TestSuite/Io.hpp"
 
 namespace QuICC {
 
@@ -432,6 +432,10 @@ namespace SparseSM {
    template <typename TOp> void TesterBase<TOp>::computeError(const SparseMatrix& outData, const SparseMatrix& refData) const
    {
       MHDFloat globalUlp = 0;
+
+      // Check for sparsity
+      INFO( "nnz: " << outData.nonZeros() );
+      CHECK( outData.nonZeros() == refData.nonZeros() );
 
       // Compute error
       //

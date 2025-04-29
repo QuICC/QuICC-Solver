@@ -23,19 +23,25 @@ set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
 
 # Create basis tests targets
 set(_tests
-  Value:boundary
-  D1:boundary
-  D2:boundary
-  R1D1DivR1:boundary
-  InsulatingSphere:boundary
-  DivR1D1R1:boundary
+  Value:Chebyshev:boundary
+  D1:Chebyshev:boundary
+  D2:Chebyshev:boundary
+  R1D1DivR1:Chebyshev:boundary
+  InsulatingSphere:Chebyshev:boundary
+  DivR1D1R1:Chebyshev:boundary
+  Value:SphEnergy:boundary
+  D1:SphEnergy:boundary
+  D2:SphEnergy:boundary
+  R1D1DivR1:SphEnergy:boundary
+  InsulatingSphere:SphEnergy:boundary
+  DivR1D1R1:SphEnergy:boundary
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Operator:type
+    KEYWORD Operator:WType:type
     IDS 0 1 2 3 4 10 11 12 13 14
-    ULP 40 40 40 40 40 40 40 40 40 40
+    ULPS 40 40 40 40 41 40 40 40 40 41
   )
 endforeach()
 

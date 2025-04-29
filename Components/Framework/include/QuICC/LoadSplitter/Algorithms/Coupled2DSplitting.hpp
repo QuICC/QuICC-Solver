@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Coupled2DSplitting.hpp
  * @brief Implementation of a load splitting algorithm for coupled 2D matrices (only slowest dimension can be split for serial solver)
  */
@@ -16,7 +16,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingAlgorithm.hpp"
 #include "QuICC/Resolutions/TransformResolution.hpp"
@@ -49,7 +49,7 @@ namespace Parallel {
           * @brief Check if factorisation is applicable to scheme
           */
          virtual bool applicable() const;
-         
+
       protected:
          /**
           * @brief Split ith dimension transform

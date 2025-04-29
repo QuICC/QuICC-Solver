@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SpectralTriangularSH.hpp
  * @brief Implementation of the tools for the triangular + spherical harmonic spatial schemes
  */
@@ -11,8 +11,8 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
-#include "QuICC/SpatialScheme/Tools/IBaseSH.hpp"
+#include "Types/Typedefs.hpp"
+#include "QuICC/SpatialScheme/Tools/SpectralTrapezoidalSH.hpp"
 
 namespace QuICC {
 
@@ -23,7 +23,7 @@ namespace Tools {
    /**
     * @brief Implementation of the tools for the triangular + spherical harmonic spatial schemes
     */
-   class SpectralTriangularSH: public IBaseSH
+   class SpectralTriangularSH: public SpectralTrapezoidalSH
    {
       public:
          /**
@@ -32,24 +32,16 @@ namespace Tools {
          SpectralTriangularSH() = default;
 
          /**
+          * @brief ctor with explicit min truncation
+          *
+          * @param min Minimum truncation
+          */
+         SpectralTriangularSH(const int min);
+
+         /**
           * @brief Default dtor
           */
          ~SpectralTriangularSH() = default;
-
-         /**
-          * @brief Compute triangular forward truncation
-          */
-         int truncationFwd(const int nN, const int l) final;
-
-         /**
-          * @brief Compute triangular backward truncation
-          */
-         int truncationBwd(const int nN, const int l) final;
-
-         /**
-          * @brief Compute index
-          */
-         int index(const int nN, const int k) final;
 
          /**
           * @brief Check if chosen resolution is optimal
@@ -57,10 +49,6 @@ namespace Tools {
          bool isOptimal(const int nN, const int maxL) final;
 
       private:
-         /**
-          * @brief Minimal truncation for highest modes
-          */
-         static const int MIN_TRUNCATION;
    };
 
 } // Tools

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I4D1.cpp
  * @brief Source of the implementation of the I^4 D sparse operator, with y = ax + b
  */
@@ -11,7 +11,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I4D1.hpp"
-
+#include "Types/Internal/Math.hpp"
 namespace QuICC {
 
 namespace SparseSM {
@@ -31,22 +31,22 @@ namespace LinearMap {
 
    I4D1::ACoeff_t I4D1::d_3(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,3)/(n*(n - 2.0)*(n - 1.0));
+      return Internal::Math::pow(this->a()/2.0,3)/(n*(n - 2.0)*(n - 1.0));
    }
 
    I4D1::ACoeff_t I4D1::d_1(const ACoeff_t& n) const
    {
-      return -precision::pow(this->a()/2.0,3)*3.0/(n*(n - 2.0)*(n + 1.0));
+      return -Internal::Math::pow(this->a()/2.0,3)*3.0/(n*(n - 2.0)*(n + 1.0));
    }
 
    I4D1::ACoeff_t I4D1::d1(const ACoeff_t& n) const
    {
-      return precision::pow(this->a()/2.0,3)*3.0/(n*(n - 1.0)*(n + 2.0));
+      return Internal::Math::pow(this->a()/2.0,3)*3.0/(n*(n - 1.0)*(n + 2.0));
    }
 
    I4D1::ACoeff_t I4D1::d3(const ACoeff_t& n) const
    {
-      return -precision::pow(this->a()/2.0,3)/(n*(n + 1.0)*(n + 2.0));
+      return -Internal::Math::pow(this->a()/2.0,3)/(n*(n + 1.0)*(n + 2.0));
    }
 
    void I4D1::buildTriplets(TripletList_t& list) const

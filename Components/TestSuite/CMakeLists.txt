@@ -1,0 +1,55 @@
+# CMake setup for generic TestSuite
+set(QUICC_CURRENT_COMPONENT_LIB TestSuite)
+set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")
+message(DEBUG "QUICC_CURRENT_COMPONENT_LIB_NAMESPACE: ${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}" )
+
+# Set library sources visibility
+set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
+
+add_library(${QUICC_CURRENT_COMPONENT_LIB} "")
+set_target_properties(${QUICC_CURRENT_COMPONENT_LIB} PROPERTIES LINKER_LANGUAGE CXX)
+
+target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+)
+
+set(PHS
+  TestSuite/Io.hpp
+)
+
+# Add public header
+set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
+  PROPERTIES
+    PUBLIC_HEADER "${PHS}"
+)
+
+add_subdirectory(TestSuite)
+
+# Dependencies
+target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+    QuICC::Types
+    QuICC::View
+)
+
+if(QUICC_USE_MPI)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+    PRIVATE
+      MPI::MPI_CXX
+  )
+  target_compile_definitions(${QUICC_CURRENT_COMPONENT_LIB}
+    PRIVATE "QUICC_MPI")
+endif()
+
+# Alias
+add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS
+  "${QUICC_CURRENT_COMPONENT_LIB}")
+
+# Export info
+quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
+  COMPONENT ${QUICC_CURRENT_COMPONENT_LIB}
+  DIRECTORIES
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)

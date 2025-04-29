@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
 #include "QuICC/Transform/Fft/IFftOperator.hpp"
 
@@ -66,7 +66,7 @@ namespace Chebyshev {
           *
           * @param spSetup   Shared setup object for the transform
           */
-         void init(SharedTransformSetup spSetup, const internal::Array& igrid, const internal::Array& iweights) const override;
+         void init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const override;
 
       protected:
          /**

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Pn.hpp
  * @brief Implementation of the Legendre polynomial
  */
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 #include "QuICC/Polynomial/Legendre/LegendreBase.hpp"
 
 namespace QuICC {
@@ -31,28 +31,28 @@ namespace Legendre {
 
    /**
     * @brief Implementation of the Legendre polynomial
-    */ 
+    */
    class Pn: public LegendreBase
    {
       public:
          /**
           * @brief Compute polynomial through recurrence relation
           */
-         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const internal::Array& fullGrid, const internal::Array& scale, TEvaluator evaluator);
+         template <typename T, typename TEvaluator> void compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::Array& fullGrid, const Internal::Array& scale, TEvaluator evaluator);
    };
 
-   template <typename T, typename TEvaluator> void Pn::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const internal::Array& fullGrid, const internal::Array& scale, TEvaluator evaluator)
+   template <typename T, typename TEvaluator> void Pn::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::Array& fullGrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       // Extract required part of grid
       int gN = (fullGrid.rows()/2 + fullGrid.rows()%2);
-      internal::Array igrid = fullGrid.segment(0, gN);
+      Internal::Array igrid = fullGrid.segment(0, gN);
 
       if (nPoly < 1)
       {
          throw std::logic_error("Operator matrix should have at least 1 column");
       }
 
-      internal::Matrix ipoly(gN, 2);
+      Internal::Matrix ipoly(gN, 2);
 
       LegendreBase::P0(ipoly.col(0), LegendreBase::normP0());
       if(scale.size() > 0)

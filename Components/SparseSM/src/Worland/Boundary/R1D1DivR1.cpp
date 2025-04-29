@@ -1,4 +1,4 @@
-/** 
+/**
  * @file R1D1DivR1.cpp
  * @brief Source of the implementation of boundary value of r D 1/r
  */
@@ -9,6 +9,7 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Worland/Boundary/R1D1DivR1.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -42,7 +43,7 @@ namespace Boundary {
       n = (ACoeffI::LinSpaced(maxN+1, 0, maxN)).cast<Scalar_t>();
       return this->invnorm(n)*val;
    }
- 
+
 } // Boundary
 } // Worland
 } // SparseSM

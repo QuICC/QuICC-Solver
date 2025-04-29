@@ -19,5 +19,4 @@
 #include "QuICC/Transform/Wrappers/ALegendre/Integrator/LlD1viewGpu_t.hpp.inc"
 #endif
 
-
 #endif // QUICC_TRANSFORM_POLY_ALEGENDRE_INTEGRATOR_LLD1_HPP

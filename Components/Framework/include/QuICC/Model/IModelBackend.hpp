@@ -1,13 +1,10 @@
-/** 
+/**
  * @file IModelBackend.hpp
  * @brief Interface for a model backend
  */
 
 #ifndef QUICC_MODEL_IMODELBACKEND_HPP
 #define QUICC_MODEL_IMODELBACKEND_HPP
-
-// Configuration includes
-//
 
 // System includes
 //
@@ -17,12 +14,9 @@
 #include <map>
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/Typedefs.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
@@ -174,7 +168,7 @@ namespace Model {
          bool mUseLinearized;
    };
 
-}
-}
+} // namespace Model
+} // namespace QuICC
 
 #endif // QUICC_MODEL_IMODELBACKEND_HPP

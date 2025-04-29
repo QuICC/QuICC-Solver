@@ -26,17 +26,10 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"  )
 
-target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" QuICC::Profiling::Timers)
-
-# Add MPI dependency
-if(QUICC_MPI)
-  target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" MPI::MPI_CXX)
-endif(QUICC_MPI)
-
-# Boost
-if(QUICC_MULTPRECISION)
-  target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" Boost::headers)
-endif()
+target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}"
+  QuICC::Types
+  QuICC::Profiling::Timers
+)
 
 # Eigen
 if(TARGET Eigen3::Eigen)

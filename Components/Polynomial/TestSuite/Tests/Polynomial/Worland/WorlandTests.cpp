@@ -39,6 +39,9 @@ int main( int argc, char* argv[] )
       | Opt( test::args().params, "harmonicL" )  // Add harmonic degree option
          ["--harmonicL"]
          ("Harmonic degree L")
+      | Opt( test::args().ids, "test metadata ID" ) // Add test ID
+         ["--id"]
+         ("Test metadata ID")
       | Opt( testType, "test type" )                          // Add test type
          ["--type"]
          ("Test type: matrix, weighted, otf_innner, otf_outer, otf_reduce")
@@ -62,14 +65,19 @@ int main( int argc, char* argv[] )
 
    if(test::args().params.size() > 0)
    {
-      if(test::args().specN > 0 && test::args().physN > 0)
+      if((test::args().specN > 0 && test::args().physN > 0) || test::args().ids.size() > 0)
       {
          test::args().useDefault = false;
-      } else
+      }
+      else
       {
-         std::cerr << "You need to specify --specN and --physN" << std::endl;
+         std::cerr << "You need to specify --specN and --physN or provide metadata ID with --id" << std::endl;
          return 1;
       }
+   }
+   else if(test::args().ids.size() > 0)
+   {
+      test::args().useDefault = false;
    }
 
    return session.run();

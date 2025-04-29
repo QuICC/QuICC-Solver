@@ -1,0 +1,252 @@
+# This file is generated, do not modify!
+include:
+- remote: https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml
+- /ci/gitlab/.cscs_builders.yml
+- /ci/gitlab/.cscs_runners.yml
+- /ci/gitlab/.quicc_tests.yml
+- /ci/gitlab/.quicc_models.yml
+stages:
+- build_base
+- build
+- test
+- model-build-and-test
+- cleanup
+build-quicc-base:
+  extends: .daint-mc_builder
+  stage: build_base
+  variables:
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_daint-mc
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:8c8e2d194906e3a16ce0c75d3241228e
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_daint-mc:8c8e2d194906e3a16ce0c75d3241228e
+    SECONDARY_IMAGE_USERNAME: quicc
+    SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
+build-quicc:
+  extends: .daint-mc_builder
+  stage: build
+  variables:
+    DOCKERFILE: ci/docker/Dockerfile_mpi
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_daint-mc:8c8e2d194906e3a16ce0c75d3241228e"]'
+test-quicc-lib:
+  extends:
+  - .test-lib
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+test-quicc-mpi-lib:
+  extends:
+  - .test-lib-mpi
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    SLURM_CPUS_PER_TASK: '18'
+time-quicc-lib:
+  extends:
+  - .time-lib-daint-mc
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+BoussinesqSphereDynamoExplicit_tubular:
+  extends:
+  - .BoussinesqSphereDynamoExplicit_tubular
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    SLURM_CPUS_PER_TASK: '18'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereDynamoImplicit_single2d:
+  extends:
+  - .BoussinesqSphereDynamoImplicit_single2d
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    SLURM_CPUS_PER_TASK: '18'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellDynamoExplicit_tubular:
+  extends:
+  - .BoussinesqShellDynamoExplicit_tubular
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    SLURM_CPUS_PER_TASK: '18'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellDynamoImplicit_single2d:
+  extends:
+  - .BoussinesqShellDynamoImplicit_single2d
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    SLURM_CPUS_PER_TASK: '18'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTCExplicit_single1d:
+  extends:
+  - .BoussinesqSphereRTCExplicit_single1d
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTCExplicit_single2d:
+  extends:
+  - .BoussinesqSphereRTCExplicit_single2d
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTCExplicit_tubular:
+  extends:
+  - .BoussinesqSphereRTCExplicit_tubular
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTCExplicit_tubular_split_equation:
+  extends:
+  - .BoussinesqSphereRTCExplicit_tubular_split_equation
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTCImplicit_single1d:
+  extends:
+  - .BoussinesqSphereRTCImplicit_single1d
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTCImplicit_single2d:
+  extends:
+  - .BoussinesqSphereRTCImplicit_single2d
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereRTCImplicit_tubular:
+  extends:
+  - .BoussinesqSphereRTCImplicit_tubular
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellRTCExplicit_single1d:
+  extends:
+  - .BoussinesqShellRTCExplicit_single1d
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellRTCExplicit_single2d:
+  extends:
+  - .BoussinesqShellRTCExplicit_single2d
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellRTCExplicit_tubular:
+  extends:
+  - .BoussinesqShellRTCExplicit_tubular
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellRTCExplicit_tubular_split_equation:
+  extends:
+  - .BoussinesqShellRTCExplicit_tubular_split_equation
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellRTCImplicit_single2d:
+  extends:
+  - .BoussinesqShellRTCImplicit_single2d
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '6'
+    SLURM_NTASKS_PER_NODE: '6'
+    SLURM_CPUS_PER_TASK: '12'
+    QUICC_VERSION_TAG: mpi
+BoussinesqSphereTCExplicit_tubular:
+  extends:
+  - .BoussinesqSphereTCExplicit_tubular
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    SLURM_CPUS_PER_TASK: '18'
+    QUICC_VERSION_TAG: mpi
+BoussinesqShellTCExplicit_tubular:
+  extends:
+  - .BoussinesqShellTCExplicit_tubular
+  - .daint-mc_runner
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  variables:
+    PULL_IMAGE: 'NO'
+    SLURM_NTASKS: '4'
+    SLURM_NTASKS_PER_NODE: '4'
+    SLURM_CPUS_PER_TASK: '18'
+    QUICC_VERSION_TAG: mpi
+ci-cache-cleanup:
+  extends: .container-runner-daint
+  stage: cleanup
+  image: $CSCS_REGISTRY_PATH/quicc_mpi_daint-mc:$CI_COMMIT_SHA
+  script:
+  - rm -Rf $CI_CACHE_FOLDER/*

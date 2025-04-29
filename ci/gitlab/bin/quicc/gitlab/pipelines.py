@@ -6,27 +6,34 @@ from typing import NamedTuple
 from quicc.gitlab.models import default_configs
 from quicc.gitlab.yaml import base_yaml
 
+"""Config struct to generate a pipeline"""
 class config(NamedTuple):
     tag: str
     backend: str
+    image: str = 'baseimage'
 
-"""Base class, defines a pipeline that build the docker image, test and time the library and cleans up the runner"""
+backend2nodeSize = {
+    "daint-mc": 72,
+    "daint-gpu": 24,
+    "alps-a100": 64,
+    "alps-gh200": 288,
+    "alps-zen2": 128
+}
+
+"""Base class, defines a pipeline that build the docker image, the library and cleans up the runner"""
 class base_pipeline(base_yaml):
     def __init__(self, cnf):
         image_location = '$CSCS_REGISTRY_PATH'
         self.cs_base_yml = 'https://gitlab.com/cscs-ci/recipes/-/raw/master/templates/v2/.ci-ext.yml'
-        self.base_docker = 'ci/docker/baseimage/Dockerfile_quicc_baseimage_cpu'
-        self.cpus_full_node = 72
-        if (cnf.backend == 'gpu'):
-            self.base_docker = 'ci/docker/baseimage/Dockerfile_quicc_baseimage_gpu'
-            self.cpus_full_node = 24
-        base_md5sum = hashlib.md5(open(self.base_docker[3:], 'rb').read()).hexdigest()
         self.backend = cnf.backend
+        self.base_docker = f'ci/docker/baseimage/Dockerfile_quicc_{cnf.image}_{self.backend}'
+        self.cpus_full_node = backend2nodeSize[self.backend]
+        base_md5sum = hashlib.md5(open(self.base_docker[3:], 'rb').read()).hexdigest()
         self.tag = cnf.tag
-
-        image = 'quicc_'+cnf.tag+':$CI_COMMIT_SHA'
+        image = 'quicc_'+cnf.tag+'_'+cnf.backend+':$CI_COMMIT_SHA'
         self.path_image = image_location+'/'+image
-        self.base_path_image = f'{image_location}/baseimage/quicc_baseimage_{cnf.backend}:{base_md5sum}'
+        self.base_path_image = f'{image_location}/baseimage/quicc_{cnf.image}_{cnf.backend}:{base_md5sum}'
+        self.dockerhub_base_image = f'docker.io/quicc/quicc_{cnf.image}_{cnf.backend}:{base_md5sum}'
         self.docker = 'ci/docker/Dockerfile_'+cnf.tag
 
         # pipeline actions
@@ -46,7 +53,8 @@ class base_pipeline(base_yaml):
             'include':
                 [
                     {'remote': self.cs_base_yml},
-                    '/ci/gitlab/.daint_runner.yml',
+                    '/ci/gitlab/.cscs_builders.yml',
+                    '/ci/gitlab/.cscs_runners.yml',
                 ],
             'stages':
                 [
@@ -55,17 +63,20 @@ class base_pipeline(base_yaml):
                 ],
             'build-quicc-base':
                 {
-                    'extends': '.container-builder',
+                    'extends': '.'+self.backend+'_builder',
                     'stage': 'build_base',
                     'variables':
                         {
                             'DOCKERFILE': self.base_docker,
                             'PERSIST_IMAGE_NAME': self.base_path_image,
+                            'SECONDARY_IMAGE_NAME': self.dockerhub_base_image,
+                            'SECONDARY_IMAGE_USERNAME': 'quicc',
+                            'SECONDARY_IMAGE_PASSWORD': '$DOCKERHUB_ACCESS_TOKEN'
                         },
                 },
             'build-quicc':
                 {
-                    'extends': '.container-builder',
+                    'extends': '.'+self.backend+'_builder',
                     'stage': 'build',
                     'variables':
                         {
@@ -83,7 +94,7 @@ class base_pipeline(base_yaml):
                 ],
             )
         self.config['ci-cache-cleanup'] = {
-            'extends': '.container-runner-daint-gpu',
+            'extends': '.'+self.backend+'_runner',
             'stage': 'cleanup',
             'image': self.path_image,
             'script':
@@ -113,12 +124,70 @@ class libtest_pipeline(base_pipeline):
                 'extends':
                     [
                         '.test-lib',
+                        '.'+self.backend+'_runner'
+                    ],
+                'image': self.path_image,
+            }
+        if (self.tag == 'mpi'):
+            tasks = '4'
+            self.config['test-quicc-mpi-lib'] = {
+                'extends':
+                    [
+                        '.test-lib-mpi',
+                        '.'+self.backend+'_runner'
+                    ],
+                'image': self.path_image,
+                'variables':
+                    {
+                        'SLURM_NTASKS': tasks,
+                        'SLURM_NTASKS_PER_NODE': tasks,
+                        'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks))
+                    },
+            }
+
+"""Add library PETSc testing to the base pipeline"""
+class libtest_petsc_pipeline(base_pipeline):
+    def __init__(self, cnf):
+        super(libtest_petsc_pipeline, self).__init__(cnf)
+        self.actions.extend([self.testlib_yaml])
+
+    def testlib_yaml(self):
+        self.config['include'].extend(
+                [
+                    '/ci/gitlab/.quicc_tests.yml',
+                ],
+            )
+        self.config['stages'].extend(
+                [
+                    'test', # test stage is running on PizDaint (on 1 node)
+                ],
+            )
+        self.config['test-quicc-petsc-lib'] = {
+                'extends':
+                    [
+                        '.test-petsc-lib',
                         '.'+self.backend
                     ],
                 'image': self.path_image,
             }
+        if (self.tag == 'mpi'):
+            tasks = '4'
+            self.config['test-quicc-mpi-lib'] = {
+                'extends':
+                    [
+                        '.test-petsc-lib-mpi',
+                        '.'+self.backend
+                    ],
+                'image': self.path_image,
+                'variables':
+                    {
+                        'SLURM_NTASKS': tasks,
+                        'SLURM_NTASKS_PER_NODE': tasks,
+                        'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks))
+                    },
+            }
 
-"""Add library timing to the base pipeline"""
+"""Add library timing to the libtest pipeline"""
 class libtime_pipeline(libtest_pipeline):
     def __init__(self, cnf):
         super(libtime_pipeline, self).__init__(cnf)
@@ -129,10 +198,40 @@ class libtime_pipeline(libtest_pipeline):
                 'extends':
                     [
                         '.time-lib-'+self.backend,
-                        '.'+self.backend
+                        '.'+self.backend+'_runner'
                     ],
                 'image': self.path_image,
             }
+
+"""Add library sweep timing to the base pipeline and changes default name of the yml file"""
+class libtime_sweep_pipeline(base_pipeline):
+    def __init__(self, cnf):
+        super(libtime_sweep_pipeline, self).__init__(cnf)
+        self.actions.extend([self.timelib_yaml])
+
+    def set_file_name(self):
+        self.file_name = '.quicc_'+self.tag+'_'+self.backend+'_perf'
+
+    def timelib_yaml(self):
+        self.config['include'].extend(
+                [
+                    '/ci/gitlab/.quicc_tests.yml',
+                ],
+            )
+        self.config['stages'].extend(
+                [
+                    'test',
+                ],
+            )
+        self.config['time-quicc-lib'] = {
+                'extends':
+                    [
+                        '.time-lib-sweep-'+self.backend,
+                        '.'+self.backend+'_runner'
+                    ],
+                'image': self.path_image,
+            }
+
 
 """Add model testing to the libtime pipeline"""
 class model_pipeline(libtime_pipeline):
@@ -158,13 +257,13 @@ class model_pipeline(libtime_pipeline):
                     'extends':
                         [
                             '.'+model,
-                            '.'+self.backend
+                            '.'+self.backend+'_runner'
                         ],
                     'image': self.path_image,
                     'variables':
                     {
                         # the image is pulled in the lib test stage
-                        'PULL_IMAGE': 'NO',
+                        'PULL_IMAGE': 'YES',
                         'SLURM_NTASKS': tasks,
                         'SLURM_NTASKS_PER_NODE': tasks,
                         'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks)),
@@ -196,6 +295,44 @@ class model_pipeline_notiming(libtest_pipeline):
                     'extends':
                         [
                             '.'+model,
+                            '.'+self.backend+'_runner'
+                        ],
+                    'image': self.path_image,
+                    'variables':
+                    {
+                        # the image is pulled in the lib test stage
+                        'PULL_IMAGE': 'NO',
+                        'SLURM_NTASKS': tasks,
+                        'SLURM_NTASKS_PER_NODE': tasks,
+                        'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks)),
+                        'QUICC_VERSION_TAG': self.tag
+                    },
+                }
+
+"""Add model testing to the libtest petsc pipeline"""
+class model_stability_pipeline(libtest_petsc_pipeline):
+    def __init__(self, cnf):
+        super(model_stability_pipeline, self).__init__(cnf)
+        self.actions.extend([self.model_yaml])
+
+    def model_yaml(self):
+        self.config['include'].extend(
+                [
+                    '/ci/gitlab/.quicc_petsc_models.yml',
+                ],
+            )
+        self.config['stages'].extend(
+                [
+                    'model-build-and-test',
+                ],
+            )
+        for mode_config in default_configs(self.tag):
+            model = mode_config.fullname()
+            tasks = str(mode_config.tasks)
+            self.config[model] = {
+                    'extends':
+                        [
+                            '.'+model,
                             '.'+self.backend
                         ],
                     'image': self.path_image,
@@ -212,13 +349,13 @@ class model_pipeline_notiming(libtest_pipeline):
 
 
 """Add model timing to the base pipeline and changes default name of the yml file"""
-class perf_pipeline(base_pipeline):
+class model_perf_pipeline(base_pipeline):
     def __init__(self, cnf):
-        super(perf_pipeline, self).__init__(cnf)
+        super(model_perf_pipeline, self).__init__(cnf)
         self.actions.extend([self.model_yaml])
 
     def set_file_name(self):
-        self.file_name = '.quicc_'+self.tag+'_'+self.backend+'_perf'
+        self.file_name = '.quicc_'+self.tag+'_'+self.backend+'_models_perf'
 
     def model_yaml(self):
         self.config['include'].extend(
@@ -241,7 +378,7 @@ class perf_pipeline(base_pipeline):
                     'extends':
                         [
                             '.'+model,
-                            '.'+self.backend
+                            '.'+self.backend+'_runner'
                         ],
                     'image': self.path_image,
                     'variables':

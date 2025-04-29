@@ -10,7 +10,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/IALegendreProjector.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Tags.hpp"
 
@@ -55,7 +55,7 @@ namespace Projector {
          /**
           * @brief Make operator
           */
-         virtual void makeOperator(OpMatrix& op, const OpArray& igrid, const OpArray& iweights, const int i) const;
+         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const;
    };
 
 }

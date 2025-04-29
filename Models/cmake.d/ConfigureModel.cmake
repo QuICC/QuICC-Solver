@@ -1,3 +1,5 @@
+include(ModelFunctions)
+
 #
 # Utility to add models
 #
@@ -8,13 +10,18 @@
 #
 function(quicc_add_model target)
   # parse inputs
-  set(multiValueArgs TYPES)
+  set(multiValueArgs TYPES SOURCE_DIRS)
   cmake_parse_arguments(QAM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_model")
   list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
   message(DEBUG "target: ${target}")
   message(DEBUG "QAM_TYPES: ${QAM_TYPES}")
+
+  if(NOT QAM_SOURCE_DIRS)
+    set(QAM_SOURCE_DIRS Model/)
+  endif()
+  message(DEBUG "QAM_SOURCE_DIRS: ${QAM_SOURCE_DIRS}")
 
   # Set Model name and library name
   get_filename_component(modName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -30,7 +37,7 @@ function(quicc_add_model target)
   add_library(${QUICC_CURRENT_MODEL_LIB} "")
   set_target_properties(${QUICC_CURRENT_MODEL_LIB} PROPERTIES LINKER_LANGUAGE CXX)
   target_include_directories(${QUICC_CURRENT_MODEL_LIB} PUBLIC
-    include/
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     ${PROJECT_BINARY_DIR}/${QUICC_CURRENT_MODEL_DIR}/Git
     )
   target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
@@ -44,7 +51,7 @@ function(quicc_add_model target)
     add_library(${modLib} "")
     set_target_properties(${modLib} PROPERTIES LINKER_LANGUAGE CXX)
     target_include_directories(${modLib} PUBLIC
-      include/
+      "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
       )
     target_link_libraries(${modLib} PUBLIC
       ${QUICC_CURRENT_MODEL_LIB}
@@ -53,7 +60,7 @@ function(quicc_add_model target)
     string(TOUPPER "QUICC_MODEL_${modName}_${type}_BACKEND" _modBackend)
     quicc_create_option(
       NAME ${_modBackend}
-      OPTS "Python" "CPP"
+      OPTS "CPP" "Python"
       LABEL "Backend used for model definition"
       )
     if(${_modBackend} STREQUAL "CPP")
@@ -73,7 +80,9 @@ function(quicc_add_model target)
     )
   add_dependencies(${QUICC_CURRENT_MODEL_LIB} ${QUICC_CURRENT_MODEL_LIB}_updatepy)
 
-  add_subdirectory(src)
+  foreach(src ${QAM_SOURCE_DIRS})
+    add_subdirectory(${src})
+  endforeach()
 
   # Generate git hash library
   include(gitUtils/AddGitHashLib)
@@ -93,6 +102,7 @@ function(quicc_add_model target)
     quicc_create_config_exe(${ModelId} "${modLib}")
     quicc_create_state_exe(${ModelId} "${modLib}")
     quicc_create_model_exe(${ModelId} "${modLib}")
+    quicc_create_stability_exe(${ModelId} "${modLib}")
     quicc_create_visu_exe(${ModelId} "${modLib}")
   endforeach()
 

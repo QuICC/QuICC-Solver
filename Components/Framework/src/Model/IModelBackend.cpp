@@ -1,27 +1,15 @@
-/** 
+/**
  * @file IModelBackend.cpp
  * @brief Source of the interface for a model backend
  */
-
-// First includes
-//
-
-// Configuration includes
-//
 
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Model/IModelBackend.hpp"
-
 // Project includes
 //
+#include "QuICC/Model/IModelBackend.hpp"
 #include "QuICC/Hasher.hpp"
 #include "QuICC/NonDimensional/Coordinator.hpp"
 #include "QuICC/PhysicalNames/Coordinator.hpp"
@@ -119,5 +107,6 @@ namespace Model {
    {
       this->mUseLinearized = flag;
    }
-}
-}
+
+} // namespace Model
+} // namespace QuICC

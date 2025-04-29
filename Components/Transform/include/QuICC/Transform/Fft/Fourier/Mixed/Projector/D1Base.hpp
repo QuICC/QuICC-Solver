@@ -1,4 +1,4 @@
-/** 
+/**
  * @file D1.hpp
  * @brief Implementation of the Fourier based D projector
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Fourier/Mixed/Projector/IMixedProjector.hpp"
 #include "QuICC/Transform/Fft/Fourier/Tags.hpp"
 
@@ -33,7 +33,7 @@ namespace Projector {
 
    /**
     * @brief Implementation of the Fourier based D projector
-    */ 
+    */
    template<>
    class D1<base_t>: public IMixedProjector
    {
@@ -47,7 +47,7 @@ namespace Projector {
           * @brief Destructor
           */
          ~D1() = default;
-         
+
       protected:
 
       private:

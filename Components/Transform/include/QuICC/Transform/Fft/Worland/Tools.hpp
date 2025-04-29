@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Tools.hpp
  * @brief Tools specific to FFT based Worland transform
  */
@@ -6,21 +6,12 @@
 #ifndef QUICC_TRANSFORM_FFT_WORLAND_TOOLS_HPP
 #define QUICC_TRANSFORM_FFT_WORLAND_TOOLS_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "QuICC/Precision.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -35,7 +26,7 @@ namespace Tools {
 /**
 * @brief Compute physical grid
 */
-void computeGrid(internal::Array& grid, const int size);
+void computeGrid(Internal::Array& grid, const int size);
 
 }
 }

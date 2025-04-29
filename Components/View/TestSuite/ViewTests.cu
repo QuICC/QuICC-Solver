@@ -8,7 +8,7 @@
 #include "View/ViewUtils.hpp"
 
 
-using namespace QuICC::Memory;
+using namespace QuICC::View;
 
 __global__
 void add1(View<double, dense1D> out, View<double, dense1D> in)

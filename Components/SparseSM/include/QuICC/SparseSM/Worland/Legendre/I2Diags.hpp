@@ -1,4 +1,4 @@
-/** 
+/**
  * @file I2Diags.hpp
  * @brief Interface to I2 diagonals for full sphere Worland I2 sparse operator
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Worland/I2Diags.hpp"
 
 namespace QuICC {
@@ -25,7 +25,7 @@ namespace Legendre {
 
    /**
     * @brief Implementation of the full sphere Worland I2 sparse operator
-    */ 
+    */
    class I2Diags: public QuICC::SparseSM::Worland::I2Diags
    {
       public:
@@ -48,36 +48,36 @@ namespace Legendre {
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d_2(const ACoeff_t& n) const; 
+         virtual ACoeff_t d_2(const ACoeff_t& n) const;
 
          /**
           * @brief 1. subdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d_1(const ACoeff_t& n) const; 
+         virtual ACoeff_t d_1(const ACoeff_t& n) const;
 
          /**
           * @brief Main diagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d0(const ACoeff_t& n) const; 
+         virtual ACoeff_t d0(const ACoeff_t& n) const;
 
          /**
           * @brief 1. superdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d1(const ACoeff_t& n) const; 
+         virtual ACoeff_t d1(const ACoeff_t& n) const;
 
          /**
           * @brief 2. superdiagonal
           *
           * @param n Array of n indexes
           */
-         virtual ACoeff_t d2(const ACoeff_t& n) const; 
-         
+         virtual ACoeff_t d2(const ACoeff_t& n) const;
+
       protected:
 
       private:

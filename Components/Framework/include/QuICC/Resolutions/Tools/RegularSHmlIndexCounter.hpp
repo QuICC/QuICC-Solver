@@ -1,4 +1,4 @@
-/** 
+/**
  * @file RegularSHmlIndexCounter.hpp
  * @brief Implementation of spherical harmonic index counter with m spectral ordering, regular radial truncation, and l transform ordering
  */
@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Resolutions/Tools/IResolutionIndexCounter.hpp"
 
@@ -21,7 +21,7 @@ namespace QuICC {
 
    /**
     * @brief Implementation of spherical harmonic index counter with m spectral ordering, regular radial truncation and l transform ordering
-    */ 
+    */
    class RegularSHmlIndexCounter: public IResolutionIndexCounter
    {
       public:
@@ -57,12 +57,12 @@ namespace QuICC {
          /**
           * @brief Comput the offsets for the local modes
           */
-         void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const final;
+         void computeOffsets(std::vector<std::vector<OffsetType> >& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId) const final;
 
          /**
           * @brief Compute the offsets for the local modes by comparing to a reference simulation
           */
-         void computeOffsets(std::vector<OffsetType>& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const final;
+         void computeOffsets(std::vector<std::vector<OffsetType> >& blocks, std::vector<std::vector<OffsetType> >& offsets, const Dimensions::Space::Id spaceId, SharedCSimulationResolution spRef) const final;
 
          /**
           * @brief Generate index key as vector
@@ -73,7 +73,7 @@ namespace QuICC {
           * @brief Generate index key
           */
          std::tuple<int,int,int> makeKey(const Dimensions::Transform::Id id, const int i, const int j, const int k) const final;
-         
+
       protected:
 
       private:
@@ -81,7 +81,7 @@ namespace QuICC {
    };
 
    /// Typedef for an smart reference counting pointer for a RegularSHmlIndexCounter
-   typedef std::shared_ptr<RegularSHmlIndexCounter>   SharedSHmIndexCounter;
+   typedef std::shared_ptr<RegularSHmlIndexCounter>   SharedRegularSHmlIndexCounter;
 
 } // QuICC
 

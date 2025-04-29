@@ -4,7 +4,7 @@ add_executable(ViewOpsTest "")
 
 set(Tags "Cpu")
 
-if(TARGET CUDA::cufft AND QUICC_USE_CUFFT)
+if((TARGET QuICC::Fft::CuFft AND QUICC_USE_CUFFT) OR (TARGET QuICC::Fft::VkFft AND QUICC_USE_VKFFT))
     list(APPEND Tags "Cuda")
 endif()
 
@@ -51,6 +51,38 @@ Set(CudaView3D "// Get offsets of packed pointers
 "
 )
 
+Set(CudaView3DDealias "// Get offsets of packed pointers
+    auto psz = pointers[1].size();
+    auto isz = indices[1].size();
+
+    // device mem
+    QuICC::Memory::Cuda::Malloc mem_res;
+    QuICC::Memory::MemBlock<typename mods_t::ScalarType> modsIn_d(S, &mem_res);
+    QuICC::Memory::MemBlock<typename mods_t::ScalarType> modsOut_d(S, &mem_res);
+    QuICC::Memory::MemBlock<std::uint32_t> ptrAndIdx_d(psz + isz, &mem_res);
+
+    {
+    // Set device pointers (pointers and indices within the device block)
+    constexpr size_t rank = 3;
+    ViewBase<std::uint32_t> pointers_d[rank];
+    pointers_d[1] = ViewBase<std::uint32_t>(ptrAndIdx_d.data(), psz);
+    ViewBase<std::uint32_t> indices_d[rank];
+    indices_d[1] = ViewBase<std::uint32_t>(ptrAndIdx_d.data() + psz, isz);
+
+    // device view
+    mods_t modsInV(modsIn_d.data(), modsIn.size(), dimensions.data(), pointers_d, indices_d, lds);
+    mods_t modsOutV(modsOut_d.data(), modsOut.size(), dimensions.data(), pointers_d, indices_d, lds);
+
+    // Copy to gpu
+    cudaErrChk(cudaMemcpy(modsIn_d.data(), modsIn.data(),
+        S*sizeof(typename mods_t::ScalarType), cudaMemcpyHostToDevice));
+    cudaErrChk(cudaMemcpy(modsInV.pointers()[1].data(), pointers[1].data(),
+        psz*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+    cudaErrChk(cudaMemcpy(modsInV.indices()[1].data(), indices[1].data(),
+        isz*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+"
+)
+
 set(CudaCopyBack3D "// copy back
     cudaErrChk(cudaMemcpy(modsOut.data(), modsOut_d.data(),
         S*sizeof(typename mods_t::ScalarType), cudaMemcpyDeviceToHost));
@@ -62,6 +94,7 @@ foreach(Tag IN LISTS Tags)
     set(Extension "${${Tag}Extension}")
     set(Header "${${Tag}Header}")
     set(View3D "${${Tag}View3D}")
+    set(View3DDealias "${${Tag}View3DDealias}")
     set(CopyBack3D "${${Tag}CopyBack3D}")
     configure_file(
         "MixedDiffTests.cpp.in"
@@ -76,6 +109,13 @@ foreach(Tag IN LISTS Tags)
     )
     target_sources(ViewOpsTest PRIVATE
         "${CMAKE_CURRENT_BINARY_DIR}/ComplexDiffTest.${Extension}"
+    )
+    configure_file(
+        "ComplexDiff2DTests.cpp.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/ComplexDiff2DTest.${Extension}"
+    )
+    target_sources(ViewOpsTest PRIVATE
+        "${CMAKE_CURRENT_BINARY_DIR}/ComplexDiff2DTest.${Extension}"
     )
 endforeach()
 
@@ -116,3 +156,193 @@ add_test(
     WORKING_DIRECTORY
     "${QUICC_WORK_DIR}"
 )
+
+#
+# View Pointwise Tests
+#
+
+add_executable(ViewPointwiseTest
+    ViewPointwiseTests.cpp
+)
+
+if(TARGET QuICC::Cuda)
+    target_sources(ViewPointwiseTest
+        PRIVATE
+            ViewPointwiseTests.cu
+    )
+endif()
+
+target_link_libraries(ViewPointwiseTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Pointwise
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewPointwiseTest
+    COMMAND ViewPointwiseTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+#
+# View Slicewise Tests
+#
+
+add_executable(ViewSlicewiseTest
+    ViewSlicewiseTests.cpp
+)
+
+if(TARGET QuICC::Cuda)
+    target_sources(ViewSlicewiseTest
+        PRIVATE
+            ViewSlicewiseTests.cu
+    )
+endif()
+
+target_link_libraries(ViewSlicewiseTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Slicewise
+    Catch2::Catch2
+    QuICC::Memory
+    QuICC::Polynomial
+)
+
+add_test(
+    NAME ViewSlicewiseTest
+    COMMAND ViewSlicewiseTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+#
+# View Reduction Tests
+#
+
+add_executable(ViewReductionTest
+    ViewReductionTests.cpp
+)
+
+target_link_libraries(ViewReductionTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Reduction
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewReductionTest
+    COMMAND ViewReductionTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+#
+# View Transpose Tests
+#
+
+add_executable(ViewTransposeTest
+    ViewTransposeTests.cpp
+)
+
+if(TARGET QuICC::Cuda)
+    target_sources(ViewTransposeTest
+        PRIVATE
+            ViewTransposeTests.cu
+    )
+endif()
+
+target_link_libraries(ViewTransposeTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
+    Catch2::Catch2
+    QuICC::Memory
+)
+
+add_test(
+    NAME ViewTransposeTest
+    COMMAND ViewTransposeTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+
+# Mpi
+if(QUICC_USE_MPI)
+    add_executable(ViewTransposeMpiTest
+        ViewTransposeMpiTests.cpp
+    )
+
+    if(TARGET QuICC::Cuda)
+        target_sources(ViewTransposeMpiTest
+            PRIVATE
+                ViewTransposeMpiTests.cu
+        )
+    endif()
+
+    target_link_libraries(ViewTransposeMpiTest
+        ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
+        Catch2::Catch2
+        QuICC::Memory
+        QuICC::TestSuite
+    )
+
+    # Reusing LoadSplitter data
+    set(QUICC_WORK_DIR "${CMAKE_BINARY_DIR}/Components/Framework/TestSuite")
+
+    # Base dir for reference data archive
+    set(QUICC_REF_ARCHIVE_DIR "${CMAKE_BINARY_DIR}/_refdata")
+
+    # Fetch reference data
+    include(FetchTestReference)
+    quicc_fetch_test_reference(
+        ViewTransposeMpiTest
+        COMPONENT Framework
+        FILENAME "LoadSplitter.tar.gz"
+        ARCHIVEDIR ${QUICC_REF_ARCHIVE_DIR}
+        DATADIR ${QUICC_WORK_DIR}
+    )
+
+    add_test(
+        NAME ViewTransposeMpiTest
+        COMMAND ViewTransposeMpiTest
+        WORKING_DIRECTORY
+        "${QUICC_WORK_DIR}"
+    )
+
+    add_executable(ViewTransposeMpiCommTest
+        ViewTransposeMpiCommTests.cpp
+    )
+
+    target_link_libraries(ViewTransposeMpiCommTest
+        ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose
+        Catch2::Catch2
+        QuICC::Memory
+    )
+
+    add_test(
+        NAME ViewTransposeMpiCommTest
+        COMMAND ViewTransposeMpiCommTest
+        WORKING_DIRECTORY
+        "${QUICC_WORK_DIR}"
+    )
+endif()
+
+#
+# View Blas Tests
+#
+if(TARGET QuICC::Cuda)
+    add_executable(ViewBlasTest
+        ViewBlasTests.cu
+    )
+
+    target_link_libraries(ViewBlasTest
+        ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Blas
+        Catch2::Catch2
+        QuICC::Memory
+    )
+
+    add_test(
+        NAME ViewBlasTest
+        COMMAND ViewBlasTest
+        WORKING_DIRECTORY
+        "${QUICC_WORK_DIR}"
+    )
+endif()

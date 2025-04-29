@@ -12,5 +12,8 @@
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Integrator/Base/I6CylLaplh_I4D1R1.hpp"
+#ifdef QUICC_USE_KOKKOS
+#include "QuICC/Transform/Poly/Worland/Integrator/Kokkos/I6CylLaplh_I4D1R1.hpp"
+#endif
 
 #endif // QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I6CYLLAPLH_I4D1R1_HPP

@@ -23,7 +23,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Transform/Poly/ALegendre/IALegendreOperator.hpp"
@@ -124,12 +124,12 @@ namespace ALegendre {
          /**
           * @brief Storage for the quadrature points x = [-1, 1] with internal precision
           */
-         internal::Array mIGrid;
+         Internal::Array mIGrid;
 
          /**
           * @brief Storage for the quadrature weights with internal precision
           */
-         internal::Array mIWeights;
+         Internal::Array mIWeights;
 
          /**
           * @brief Storage for the quadrature points x = [-1, 1] with internal precision

@@ -1,4 +1,4 @@
-/** 
+/**
  * @file FFBuilder.hpp
  * @brief Implementation of the Fourier + Fourier scheme
  */
@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/SpatialScheme/2D/IRegular2DBuilder.hpp"
@@ -31,7 +31,7 @@ namespace SpatialScheme {
          /**
           * @brief Constructor
           *
-          * @param dim Dimension truncations 
+          * @param dim Dimension truncations
           * @param purpose Setup purpose: simulation, visualization
           * @param options Options for builder
           */
@@ -46,7 +46,7 @@ namespace SpatialScheme {
           * @brief Add the transform setups to resolution
           */
          void addTransformSetups(SharedResolution spRes) const final;
-         
+
       protected:
          /**
           * @brief Initialise the domain dimensions

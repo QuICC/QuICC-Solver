@@ -151,7 +151,7 @@ namespace Diagnostics {
          int nJ = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(k);
          for(int j = 0; j < nJ; ++j)
          {
-            int nI = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>(k);
+            int nI = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>(j,k);
             for(int i = 0; i < nI; ++i)
             {
                newCfl = dx3(i)/std::abs(this->mspVelocity->three().point(i,j,k));

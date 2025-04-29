@@ -1,5 +1,5 @@
-/** 
- * @file IConfigurationTag.hpp 
+/**
+ * @file IConfigurationTag.hpp
  * @brief Implementation of a configuration tag of the configuration file
  */
 
@@ -20,7 +20,7 @@
 
 // Project includes
 //
-#include "QuICC/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 
 namespace QuICC {
@@ -89,7 +89,7 @@ namespace Config {
           * @brief Output run information
           */
          void printInfo() const;
-         
+
          /**
           * @brief Add XML tag with integer data
           */

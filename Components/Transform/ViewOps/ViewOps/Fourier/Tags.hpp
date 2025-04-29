@@ -4,7 +4,7 @@
  */
 #pragma once
 
-// External includes
+// System includes
 //
 
 // Project includes
@@ -20,23 +20,19 @@ namespace Fourier {
 
 /// @brief tag type for differentiation direction.
 /// Forwards i.e. physical to modal
-struct fwd_t {};
+struct fwd_t
+{
+};
 
 /// @brief tag type for differentiation direction.
 /// Backwards i.e. modal to physical
-struct bwd_t {};
+struct bwd_t
+{
+};
 
 /// @brief mask for special treatment.
 /// none
 constexpr std::uint16_t none_m = 0;
-
-/// @brief mask for special treatment.
-/// dealias
-constexpr std::uint16_t dealias_m = 1;
-
-/// @brief mask for special treatment.
-/// pass every option but dealias
-constexpr std::uint16_t allButDealias_m = 0xFFFF - dealias_m;
 
 /// @brief mask for special treatment.
 /// zero mode is always zero just projection
@@ -56,6 +52,90 @@ constexpr std::uint16_t zeroResetMean_m = 1 << 3;
 /// inverse (1/coeff)
 constexpr std::uint16_t inverse_m = 1 << 4;
 
+/// view cpu implementation tag
+struct viewCpu_t
+{
+};
+
+/// view gpu implementation tag
+struct viewGpu_t
+{
+};
+
+/// view gpu VkFFT implementation tag
+struct viewGpuVkFFT_t
+{
+};
+
+/// @brief P op type tag
+struct P_t
+{
+};
+
+/// @brief P_Clean op type tag
+struct P_Clean_t
+{
+};
+
+/// @brief D1 op type tag
+struct D1_t
+{
+};
+
+/// @brief D1_P op type tag
+struct D1_P_t
+{
+};
+
+/// @brief D1_Neg op type tag
+struct D1_Neg_t
+{
+};
+
+/// @brief D2 op type tag
+struct D2_t
+{
+};
+
+/// @brief D3 op type tag
+struct D3_t
+{
+};
+
+/// @brief D4 op type tag
+struct D4_t
+{
+};
+
+/// @brief Lapl2D_t op type tag
+struct Lapl2D_t
+{
+};
+
+/// @brief Df1Lapl2D_t op type tag
+struct Df1Lapl2D_t
+{
+};
+
+/// @brief Ds1Lapl2D_t op type tag
+struct Ds1Lapl2D_t
+{
+};
+
+/// @brief InvLapl2D_t op type tag
+struct InvLapl2D_t
+{
+};
+
+/// @brief Df1InvLapl2D_t op type tag
+struct Df1InvLapl2D_t
+{
+};
+
+/// @brief Mean_t op type tag
+struct Mean_t
+{
+};
 
 } // namespace Fourier
 } // namespace Transform
