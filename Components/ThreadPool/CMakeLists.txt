@@ -21,6 +21,11 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
+target_compile_definitions(${QUICC_CURRENT_COMPONENT_LIB}
+  PUBLIC
+    QUICC_USE_THREADPOOL
+)
+
 set(PHS
   ThreadPool/ThreadPool.hpp
   ThreadPool/ThreadPoolBoost.hpp

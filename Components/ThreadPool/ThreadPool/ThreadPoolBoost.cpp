@@ -85,7 +85,7 @@ void ThreadPool<boost_t>::configureAffinity()
    boost::barrier mainBar(1);
    details::setAffinity(mainBar, 0);
 
-#ifdef QUICC_DEBUG
+//#ifdef QUICC_DEBUG
    details::printAffinity();
    tasks.clear();
    for(int i = 0; i < this->mSize; i++)
@@ -98,7 +98,7 @@ void ThreadPool<boost_t>::configureAffinity()
    {
       task.wait();
    }
-#endif
+//#endif
 }
 
 } // namespace ThreadPool

@@ -534,17 +534,34 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
             {
                DebuggerMacro_msg("Get timestepper solution for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
+#ifdef QUICC_USE_THREADPOOL
+               auto& tp = QuICC::QuICCThreads();
+               std::vector<std::future<void>> tasks;
+
                // return zero 
                for(std::size_t i = 0; i < static_cast<std::size_t>(cinfo.fieldStart()); i++)
                {
+                  auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+                           [&cinfo,&eqIt,i,myId]
+                           {
+      Profiler::RegionStart<2>("thread-zero");
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   tmp.setZero();
 
                   eqIt->storeSolution(myId.second, tmp, i, 0);
+      Profiler::RegionStop<2>("thread-zero");
+                  }
+                  ));
+
+                  tasks.push_back(std::move(fut));
                }
 
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
+                  auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+                           [&cinfo,&eqIt,i,myId,this]
+                           {
+      Profiler::RegionStart<2>("thread-input");
                   auto info = createInfo(cinfo, i);
 
                   std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
@@ -554,12 +571,64 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                   std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
                   View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
                   this->mSolverCoord.getSolution(tmpView, info);
+      Profiler::RegionStop<2>("thread-input");
 
+      Profiler::RegionStart<2>("thread-set");
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   Views::details::computeSet(tmp, tmpView, 0);
+      Profiler::RegionStop<2>("thread-set");
+
+      Profiler::RegionStart<2>("thread-output");
+                  eqIt->storeSolution(myId.second, tmp, i, 0);
+      Profiler::RegionStop<2>("thread-output");
+                  }
+                  ));
+
+                  tasks.push_back(std::move(fut));
+               }
+
+               // Wait for threads and update status
+               for(auto&& task: tasks)
+               {
+                  task.wait();
+               }
+
+#else
+               // return zero 
+               for(std::size_t i = 0; i < static_cast<std::size_t>(cinfo.fieldStart()); i++)
+               {
+      Profiler::RegionStart<2>("nothread-zero");
+                  DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
+                  tmp.setZero();
 
                   eqIt->storeSolution(myId.second, tmp, i, 0);
+      Profiler::RegionStop<2>("nothread-zero");
                }
+
+               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
+               {
+      Profiler::RegionStart<2>("nothread-input");
+                  auto info = createInfo(cinfo, i);
+
+                  std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
+                  std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
+                  Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
+                  using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
+                  std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
+                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
+                  this->mSolverCoord.getSolution(tmpView, info);
+      Profiler::RegionStop<2>("nothread-input");
+
+      Profiler::RegionStart<2>("nothread-set");
+                  DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
+                  Views::details::computeSet(tmp, tmpView, 0);
+      Profiler::RegionStop<2>("nothread-set");
+
+      Profiler::RegionStart<2>("nothread-output");
+                  eqIt->storeSolution(myId.second, tmp, i, 0);
+      Profiler::RegionStop<2>("nothread-output");
+               }
+#endif //QUICC_USE_THREADPOOL
 
                // Apply constraint on solution
                auto changedSolution = eqIt->applyConstraint(myId.second, SolveTiming::After::id());
@@ -604,6 +673,8 @@ template <typename TScheme>
 void InterfaceViews<TScheme>::adaptTimestep(const Matrix& cfl,
    const ScalarEquation_range&, const VectorEquation_range&)
 {
+   Profiler::RegionFixture<2> fix("Timestep-adapt");
+
    // Store old timestep
    this->mOldDt = this->timestep();
 

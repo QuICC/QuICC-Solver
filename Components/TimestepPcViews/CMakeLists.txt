@@ -33,6 +33,7 @@ add_subdirectory(Timestep)
 # Dependencies
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
+    QuICC::ThreadPool
     QuICC::Framework
 )
 
