@@ -19,6 +19,7 @@ set(tags
   Elsasser
   EosType
   Epsilon
+  EquationsForm
   Eta
   FastMean
   Gamma
