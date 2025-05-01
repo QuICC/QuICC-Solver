@@ -38,7 +38,7 @@ namespace Boundary {
           * @param pos   Position of the boundary
           * @param Fb    Boundary value of the radial field
           */
-         StressFreePolAnelastic(const Scalar_t lower, const Scalar_t upper, const Position pos, const MHDFloat Fb);
+         StressFreePolAnelastic(const Scalar_t lower, const Scalar_t upper, const Position pos, const Internal::MHDFloat Fb);
 
          /**
           * @brief Destructor
@@ -56,7 +56,7 @@ namespace Boundary {
          /**
           * @brief Radial field boundary value
           */
-         MHDFloat mFb;
+         Internal::MHDFloat mFb;
    };
 
 } // Boundary

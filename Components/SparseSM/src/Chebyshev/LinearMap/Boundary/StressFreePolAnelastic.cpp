@@ -20,7 +20,7 @@ namespace LinearMap {
 
 namespace Boundary {
 
-   StressFreePolAnelastic::StressFreePolAnelastic(const Scalar_t lower, const Scalar_t upper, const Position pos, const MHDFloat Fb)
+   StressFreePolAnelastic::StressFreePolAnelastic(const Scalar_t lower, const Scalar_t upper, const Position pos, const Internal::MHDFloat Fb)
          : ICondition(lower, upper, pos), mFb(Fb)
    {
    }
