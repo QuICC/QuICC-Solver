@@ -45,6 +45,13 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
     QuICC::TimestepRkcb
 )
 
+if (QUICC_USE_THREADPOOL)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+    PUBLIC
+      QuICC::ThreadPool
+  )
+endif()
+
 if (QUICC_USE_MLIR_GRAPH)
   target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
     PUBLIC
