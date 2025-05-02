@@ -10,7 +10,6 @@
 // Project includes
 //
 #include "ThreadPool/Utils.hpp"
-#include <iostream>
 
 namespace QuICC {
 
@@ -22,7 +21,6 @@ int envSize(const int defaultSize)
 
    const char* envSize = std::getenv("QUICC_THREADPOOL_SIZE");
 
-   std::cerr << "******************************************* envSize: " << std::endl;
    if (envSize)
    {
       size = std::stoi(envSize);
