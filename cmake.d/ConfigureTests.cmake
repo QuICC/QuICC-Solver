@@ -27,12 +27,14 @@
 #     add generic options given as cmd:value converted to --cmd value
 # WORKDIR
 #     work directory. Set to QUICC_WORK_DIR if not set.
+# RANKS
+#     if larger than 1, create MPI test with ${RANKS} ranks.
 #
 
 # support function
 function(__add_test _testname)
   # parse inputs
-  set(oneValueArgs DIS PRF WORKDIR)
+  set(oneValueArgs DIS PRF RKS WORKDIR)
   set(multiValueArgs COMM STP)
   cmake_parse_arguments(_QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -43,10 +45,39 @@ function(__add_test _testname)
   message(DEBUG "_QAT_DIS: ${_QAT_DIS}")
   message(DEBUG "_QAT_STP: ${_QAT_STP}")
   message(DEBUG "_QAT_PRF: ${_QAT_PRF}")
+  message(DEBUG "_QAT_RKS: ${_QAT_RKS}")
+  if(NOT _QAT_RKS)
+    set(_QAT_RKS 0)
+  endif()
   if(NOT _QAT_WORKDIR)
     set(_QAT_WORKDIR "${QUICC_WORK_DIR}")
   endif()
   message(DEBUG "_QAT_WORKDIR: ${_QAT_WORKDIR}")
+
+  # Get mpi runner
+  if(QUICC_USE_MPI AND NOT QUICC_MPI_CI AND _QAT_RKS GREATER 1)
+    # check which command is available
+    foreach(_mpiexe IN ITEMS srun mpirun)
+      message(VERBOSE "_mpiexe: ${_mpiexe}")
+      find_program(mpiexe ${_mpiexe})
+      if(mpiexe STREQUAL "mpiexe-NOTFOUND")
+        message(VERBOSE "not found")
+      else()
+        message(VERBOSE "found")
+        break()
+      endif()
+    endforeach()
+    # check that we actually found something
+    if(mpiexe STREQUAL "mpiexe-NOTFOUND")
+      message(SEND_ERROR "could not find mpi executable.")
+    endif()
+    message(DEBUG "_QAT_COMM: ${_QAT_COMM}") 
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.29)
+      set_target_properties(FrameworkIoTests PROPERTIES TEST_LAUNCHER "${mpiexe};-n;${_QAT_RKS}")
+    else()
+      set_target_properties(FrameworkIoTests PROPERTIES CROSSCOMPILING_EMULATOR "${mpiexe};-n;${_QAT_RKS}")
+    endif()
+  endif()
 
   # performance only test
   if(NOT _QAT_PRF)
@@ -78,7 +109,7 @@ endfunction()
 function(quicc_add_test target)
   # parse inputs
   set(options PERFONLY)
-  set(oneValueArgs COMMAND KEYWORD ULP DISABLED WORKDIR)
+  set(oneValueArgs COMMAND KEYWORD ULP DISABLED RANKS WORKDIR)
   set(multiValueArgs TYPES IDS ULPS STEPS SPLITS OPTIONS)
   cmake_parse_arguments(QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -95,6 +126,7 @@ function(quicc_add_test target)
   message(DEBUG "QAT_SPLITS: ${QAT_SPLITS}")
   message(DEBUG "QAT_DISABLED: ${QAT_DISABLED}")
   message(DEBUG "QAT_PERFONLY: ${QAT_PERFONLY}")
+  message(DEBUG "QAT_RANKS: ${QAT_RANKS}")
   message(DEBUG "QAT_OPTIONS: ${QAT_OPTIONS}")
 
   if(NOT _QAT_WORKDIR)
@@ -185,6 +217,7 @@ function(quicc_add_test target)
       DIS ${QAT_DISABLED}
       STP ${QAT_STEPS}
       PRF ${QAT_PERFONLY}
+      RKS ${QAT_RANKS}
       WORKDIR ${QAT_WORKDIR}
     )
   elseif(${_ids_len} LESS 1)
@@ -196,6 +229,7 @@ function(quicc_add_test target)
         DIS ${QAT_DISABLED}
         STP ${QAT_STEPS}
         PRF ${QAT_PERFONLY}
+        RKS ${QAT_RANKS}
         WORKDIR ${QAT_WORKDIR}
       )
     endforeach()
@@ -239,6 +273,7 @@ function(quicc_add_test target)
         DIS ${QAT_DISABLED}
         STP ${_steps}
         PRF ${QAT_PERFONLY}
+        RKS ${QAT_RANKS}
         WORKDIR ${QAT_WORKDIR}
       )
 
