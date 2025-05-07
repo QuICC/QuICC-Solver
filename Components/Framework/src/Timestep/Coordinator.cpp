@@ -13,7 +13,7 @@
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "Timestep/RungeKuttaCB/Factory.hpp"
-//#include "Timestep/PredictorCorrector/Factory.hpp"
+#include "Timestep/PredictorCorrector/Factory.hpp"
 #include "Timestep/PredictorCorrector/FactoryViews.hpp"
 
 namespace QuICC {
@@ -77,6 +77,12 @@ namespace Timestep {
       if(!this->mpImpl)
       {
          this->mpImpl = PredictorCorrector::makeInterfaceViews(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);
+      }
+
+      // Try old Predictor-Corrector schemes
+      if(!this->mpImpl)
+      {
+         this->mpImpl = PredictorCorrector::makeInterface(schemeId, time, cfl, maxError, scalEq, vectEq, pseudo);
       }
 
       // No interface was created
