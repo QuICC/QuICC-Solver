@@ -50,6 +50,7 @@
     - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiCommTest
     - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiTest
     - ctest --no-tests=error --output-on-failure -R GraphTestsMpi
+    - ctest --no-tests=error --output-on-failure -R FrameworkIoTestsMpi_
 
 .test-lib-petsc:
   variables:
