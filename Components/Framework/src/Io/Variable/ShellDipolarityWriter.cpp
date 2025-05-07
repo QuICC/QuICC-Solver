@@ -248,7 +248,7 @@ namespace Variable {
       int ioPrec = 14;
 
       MHDFloat ro = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
-      //this->mCmbSpectrum = this->mCmbSpectrum/ro;
+      this->mCmbSpectrum = this->mCmbSpectrum/ro;
       this->mAxialDipole = this->mAxialDipole/ro;
       this->mNonAxialDipole = this->mNonAxialDipole/ro;
 
