@@ -32,7 +32,7 @@ namespace Boundary {
       auto cnst = this->c()/(3.0*this->a()*this->a());
       const auto a_1 = 1.0/this->a();
 
-      // at the bottom (x = 1)
+      // at the top (x = 1)
       if(this->position() == Position::TOP)
       {
          for(int i = 1; i < val.size(); i++)
@@ -40,14 +40,14 @@ namespace Boundary {
             const auto n = static_cast<Scalar_t>(i);
             const auto n2 = n*n;
             const auto n4 = n2*n2;
-            if(n<2)
-            {
-               val(i) = -a_1*n2*this->mFb;
-            }
-            else
-            {
-               val(i) = cnst*(n4 - n2) -a_1*n2*this->mFb;
-            }
+            //if(n<2)
+            //{
+            //   val(i) = -a_1*n2*this->mFb;
+            //}
+            //else
+            //{
+               val(i) = cnst*(n4 - n2) -a_1*n2*this->mFb*this->c();
+            //}
          }
       }
       // at the bottom (x = -1)
@@ -60,11 +60,11 @@ namespace Boundary {
             const auto n4 = n2*n2;
             if(n<2)
             {
-               val(i) = a_1*n2*this->mFb;
+               val(i) = a_1*n2*this->mFb*this->c();
             }
             else
             {
-               val(i) = cnst*(n4 - n2) +a_1*n2*this->mFb;
+               val(i) = cnst*(n4 - n2) +a_1*n2*this->mFb*this->c();
             }
             if(i%2 == 1)
             {
