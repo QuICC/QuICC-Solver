@@ -1116,11 +1116,6 @@ namespace Equations {
    template<typename TData, typename TField>
       void IFieldEquation::storeSolutionImpl(TField& field, FieldComponents::Spectral::Id compId, const TData& storage, const int matIdx, const int start)
    {
-      if(matIdx == 0)
-      {
-         field.rComp(compId).rData().setConstant(42.42);
-      }
-
       const TData * solution;
       TData tmp;
       int solStart;
@@ -1214,7 +1209,6 @@ namespace Equations {
                field.rComp(compId).setPoint(dataPoint,i,j,matIdx);
             }
          }
-
       }
       else if(this->couplingInfo(compId).indexType() == CouplingIndexType::MODE)
       {

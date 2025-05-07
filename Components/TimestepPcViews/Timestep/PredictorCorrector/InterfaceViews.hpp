@@ -461,9 +461,19 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
             {
                DebuggerMacro_msg("Get timestepper input for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
+#ifdef QUICC_USE_THREADPOOL
+               auto& tp = QuICC::QuICCThreads();
+               std::vector<std::future<void>> tasks;
+#endif //QUICC_USE_THREADPOOL
+
                // Get timestep input
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
+#ifdef QUICC_USE_THREADPOOL
+                  auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+                           [&cinfo,&eqIt,i,myId,this]
+                           {
+#endif //QUICC_USE_THREADPOOL
                   auto info = createInfo(cinfo, i);
 
                   // Copy field values into timestepper input
@@ -500,7 +510,21 @@ void InterfaceViews<TScheme>::getInput(const ScalarEquation_range& scalEq, const
                            }, eqIt->spUnknown());
                      //               this->mSolverCoord.updateInhomogeneous(info);
                   }
+#ifdef QUICC_USE_THREADPOOL
+                  }
+                  ));
+
+                  tasks.push_back(std::move(fut));
+#endif //QUICC_USE_THREADPOOL
                }
+
+#ifdef QUICC_USE_THREADPOOL
+               // Wait for threads and update status
+               for(auto&& task: tasks)
+               {
+                  task.wait();
+               }
+#endif //QUICC_USE_THREADPOOL
             }
          }
       }
@@ -534,34 +558,41 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
             {
                DebuggerMacro_msg("Get timestepper solution for " + PhysicalNames::Coordinator::tag(myId.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(myId.second)) + ")", 6);
 
+               // Fill with bad values
+               //eqIt->corruptUnknown(myId.second);
+
 #ifdef QUICC_USE_THREADPOOL
                auto& tp = QuICC::QuICCThreads();
                std::vector<std::future<void>> tasks;
 
+#endif //QUICC_USE_THREADPOOL
                // return zero 
                for(std::size_t i = 0; i < static_cast<std::size_t>(cinfo.fieldStart()); i++)
                {
+#ifdef QUICC_USE_THREADPOOL
                   auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
                            [&cinfo,&eqIt,i,myId]
                            {
-      Profiler::RegionStart<2>("thread-zero");
+#endif //QUICC_USE_THREADPOOL
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   tmp.setZero();
 
                   eqIt->storeSolution(myId.second, tmp, i, 0);
-      Profiler::RegionStop<2>("thread-zero");
+#ifdef QUICC_USE_THREADPOOL
                   }
                   ));
 
                   tasks.push_back(std::move(fut));
+#endif //QUICC_USE_THREADPOOL
                }
 
                for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                {
+#ifdef QUICC_USE_THREADPOOL
                   auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
                            [&cinfo,&eqIt,i,myId,this]
                            {
-      Profiler::RegionStart<2>("thread-input");
+#endif //QUICC_USE_THREADPOOL
                   auto info = createInfo(cinfo, i);
 
                   std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
@@ -571,63 +602,26 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                   std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
                   View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
                   this->mSolverCoord.getSolution(tmpView, info);
-      Profiler::RegionStop<2>("thread-input");
 
-      Profiler::RegionStart<2>("thread-set");
                   DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
                   Views::details::computeSet(tmp, tmpView, 0);
-      Profiler::RegionStop<2>("thread-set");
 
-      Profiler::RegionStart<2>("thread-output");
                   eqIt->storeSolution(myId.second, tmp, i, 0);
-      Profiler::RegionStop<2>("thread-output");
+#ifdef QUICC_USE_THREADPOOL
                   }
                   ));
 
                   tasks.push_back(std::move(fut));
+#endif //QUICC_USE_THREADPOOL
                }
 
+#ifdef QUICC_USE_THREADPOOL
                // Wait for threads and update status
                for(auto&& task: tasks)
                {
                   task.wait();
                }
-
-#else
-               // return zero 
-               for(std::size_t i = 0; i < static_cast<std::size_t>(cinfo.fieldStart()); i++)
-               {
-      Profiler::RegionStart<2>("nothread-zero");
-                  DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                  tmp.setZero();
-
-                  eqIt->storeSolution(myId.second, tmp, i, 0);
-      Profiler::RegionStop<2>("nothread-zero");
-               }
-
-               for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
-               {
-      Profiler::RegionStart<2>("nothread-input");
-                  auto info = createInfo(cinfo, i);
-
-                  std::uint32_t mem_rows = static_cast<std::uint32_t>(cinfo.galerkinN(i));
-                  std::uint32_t mem_cols = static_cast<std::uint32_t>(cinfo.rhsCols(i));
-                  Memory::MemBlock<MHDComplex> data(mem_rows*mem_cols, this->_mem.get());
-                  using dense2D = View::DimLevelType<View::dense_t, View::dense_t>;
-                  std::array<std::uint32_t, 2> dimensions {mem_rows, mem_cols};
-                  View::View<MHDComplex, View::Attributes<dense2D>> tmpView(data, dimensions); 
-                  this->mSolverCoord.getSolution(tmpView, info);
-      Profiler::RegionStop<2>("nothread-input");
-
-      Profiler::RegionStart<2>("nothread-set");
-                  DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
-                  Views::details::computeSet(tmp, tmpView, 0);
-      Profiler::RegionStop<2>("nothread-set");
-
-      Profiler::RegionStart<2>("nothread-output");
-                  eqIt->storeSolution(myId.second, tmp, i, 0);
-      Profiler::RegionStop<2>("nothread-output");
-               }
+               tasks.clear();
 #endif //QUICC_USE_THREADPOOL
 
                // Apply constraint on solution
@@ -638,6 +632,11 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                {
                   for(std::size_t i = cinfo.fieldStart(); i < static_cast<std::size_t>(cinfo.nSystems()); i++)
                   {
+#ifdef QUICC_USE_THREADPOOL
+                  auto fut = boost::asio::post(tp.pool(), std::packaged_task<void()>(
+                           [&cinfo,&eqIt,i,myId,this]
+                           {
+#endif //QUICC_USE_THREADPOOL
                      auto info = createInfo(cinfo, i);
 
                      DecoupledZMatrix tmp(cinfo.galerkinN(i), cinfo.rhsCols(i));
@@ -658,7 +657,21 @@ void InterfaceViews<TScheme>::transferOutput(const ScalarEquation_range& scalEq,
                      Views::details::computeSet(tmpView, tmp, 0);
 
                      this->mSolverCoord.updateSolution(info, tmpView);
+#ifdef QUICC_USE_THREADPOOL
                   }
+                  ));
+
+                  tasks.push_back(std::move(fut));
+#endif //QUICC_USE_THREADPOOL
+                  }
+
+#ifdef QUICC_USE_THREADPOOL
+               // Wait for threads and update status
+               for(auto&& task: tasks)
+               {
+                  task.wait();
+               }
+#endif //QUICC_USE_THREADPOOL
                }
             }
          }
