@@ -16,6 +16,7 @@
 #include "ViewOps/ViewMemoryUtils.hpp"
 #include "ViewOps/Worland/TypeTraits.hpp"
 #include "ThreadPool/QuICCThreads.hpp"
+#include "Profiler/Interface.hpp"
 
 namespace QuICC {
 namespace Transform {
@@ -50,6 +51,8 @@ template <class TView, class TDenseOpBuilder, class TDirection>
 void Builder<TView, TDenseOpBuilder, TDirection>::compute(TView opView,
    const Internal::Array& grid, const Internal::Array& weights)
 {
+   Profiler::RegionStart<3>("Worland::Builder::computeA");
+
    using IndexType = typename TView::IndexType;
 
    // L - harmonic degree index
@@ -102,6 +105,9 @@ void Builder<TView, TDenseOpBuilder, TDirection>::compute(TView opView,
       throw std::logic_error("builder for this type is not implemented.");
    }
 
+   Profiler::RegionStop<3>("Worland::Builder::computeA");
+
+   Profiler::RegionStart<3>("Worland::Builder::computeB");
 #ifdef QUICC_USE_THREADPOOL
    auto& tp = QuICC::QuICCThreads();
    std::vector<std::future<void>> tasks;
@@ -180,6 +186,7 @@ void Builder<TView, TDenseOpBuilder, TDirection>::compute(TView opView,
       task.wait();
    }
 #endif //QUICC_USE_THREADPOOL
+   Profiler::RegionStop<3>("Worland::Builder::computeB");
 }
 
 

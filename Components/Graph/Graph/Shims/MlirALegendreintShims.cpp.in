@@ -46,7 +46,7 @@ extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_S1CLCSC3D_complexf64_D
     assert(pUmod->coo == pUval->coo);
     Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
-    Profiler::RegionStart<3>("MlirAlegendreintShims");
+    QuICC::Profiler::RegionStart<3>("MlirAlegendreintShims");
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
@@ -75,7 +75,7 @@ extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_S1CLCSC3D_complexf64_D
         OpsBuilder<Top, @Kind@_t, @OpDirection@> tBuilder;
         tBuilder.compute(opView, igrid, iweights);
     }
-    Profiler::RegionStop<3>("MlirAlegendreintShims");
+    QuICC::Profiler::RegionStop<3>("MlirAlegendreintShims");
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewMod, viewVal);
@@ -120,7 +120,7 @@ extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_S1CLCSC3DJIK_complexf6
     assert(QuICC::Cuda::isDeviceMemory(pUval->data));
     Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
-    Profiler::RegionStart<3>("MlirAlegendreintShims");
+    QuICC::Profiler::RegionStart<3>("MlirAlegendreintShims");
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
@@ -153,7 +153,7 @@ extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_S1CLCSC3DJIK_complexf6
         OpsBuilder<Top, @Kind@_t, @OpDirection@> tBuilder;
         tBuilder.compute(opView, igrid, iweights);
     }
-    Profiler::RegionStop<3>("MlirAlegendreintShims");
+    QuICC::Profiler::RegionStop<3>("MlirAlegendreintShims");
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewMod, viewVal);
