@@ -76,7 +76,8 @@ namespace Parallel {
       #endif
       this->converter(Dimensions::Transform::TRA1D).setup();
 
-
+      // DISABLE IS USING MLIR GRAPH transform
+#ifndef QUICC_USE_MLIR_GRAPH
       /////////////////////////////////////////////////////////////////////////////////
       // Initialise 1D/2D converter
       //
@@ -172,6 +173,8 @@ namespace Parallel {
       // Do (MPI) storage profiling on 3D converter
       this->converter(Dimensions::Transform::TRA3D).profileStorage();
 #endif // QUICC_STORAGEPROFILE
+
+#endif //QUICC_USE_MLIR_GRAPH
    }
 
 }
