@@ -46,11 +46,11 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
     assert(pUmod->cooSize == pUval->cooSize);
     Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
-    QuICC::Profiler::RegionStart<3>("MlirWorlandintShims");
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
     {
+      QuICC::Profiler::RegionStart<3>("MlirWorlandintShims");
         // dim 0 - N  - radial modes
         // dim 1 - Nr - radial points
         // dim 2 - L  - harmonic degree
@@ -73,8 +73,8 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
         auto opView = cl->getOp();
         OpsBuilder<Top, @Kind@_t, @OpDirection@> tBuilder;
         tBuilder.compute(opView, igrid, iweights);
+      QuICC::Profiler::RegionStop<3>("MlirWorlandintShims");
     }
-    QuICC::Profiler::RegionStop<3>("MlirWorlandintShims");
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewMod, viewVal);
@@ -119,11 +119,11 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
     assert(QuICC::Cuda::isDeviceMemory(pUval->data));
     Tin viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
     Tout viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
-    QuICC::Profiler::RegionStart<3>("MlirWorlandintShims");
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
     {
+      QuICC::Profiler::RegionStart<3>("MlirWorlandintShims");
         // dim 0 - N  - radial modes
         // dim 1 - Nr - radial points
         // dim 2 - L  - harmonic degree
@@ -150,8 +150,8 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
         auto opView = cl->getOp();
         OpsBuilder<Top, @Kind@_t, @OpDirection@> tBuilder;
         tBuilder.compute(opView, igrid, iweights);
+      QuICC::Profiler::RegionStop<3>("MlirWorlandintShims");
     }
-    QuICC::Profiler::RegionStop<3>("MlirWorlandintShims");
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewMod, viewVal);
