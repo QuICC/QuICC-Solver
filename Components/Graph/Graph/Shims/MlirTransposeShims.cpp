@@ -5,6 +5,7 @@
 #include "Graph/Shims/MlirShims.hpp"
 #include "Graph/Types.hpp"
 #include "ViewOps/Transpose/Op.hpp"
+#include "Profiler/Interface.hpp"
 
 using namespace QuICC::Graph;
 
@@ -17,6 +18,8 @@ extern "C" void
 _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj,
    view3_cd_t* pOut, const view3_cd_t* pIn)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirTransposeShims");
+
 #ifndef NDEBUG
    std::cout << "_ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_"
                 "DCCSC3D\n";
@@ -65,6 +68,8 @@ extern "C" void
 _ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_complexf64_DCCSC3D(
    void* obj, view3_cd_t* pOut, const view3_cd_t* pIn)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirTransposeShims");
+
 #ifndef NDEBUG
    std::cout << "_ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_"
                 "complexf64_DCCSC3D\n";
@@ -117,6 +122,8 @@ extern "C" void
 _ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj,
    view3_cd_t* pOut, const view3_cd_t* pIn)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirTransposeShims");
+
 #ifndef NDEBUG
    std::cout << "_ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_"
                 "DCCSC3D\n";
@@ -165,6 +172,8 @@ extern "C" void
 _ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_DCCSC3DJIK(
    void* obj, view3_cd_t* pOut, const view3_cd_t* pIn)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirTransposeShims");
+
 #ifndef NDEBUG
    std::cout << "_ciface_quiccir_transpose_120_complexf64_DCCSC3D_complexf64_"
                 "DCCSC3DJIK\n";
@@ -217,6 +226,8 @@ extern "C" void
 _ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_S1CLCSC3D(void* obj,
    view3_cd_t* pOut, const view3_cd_t* pIn)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirTransposeShims");
+
 #ifndef NDEBUG
    std::cout << "_ciface_quiccir_transpose_201_complexf64_DCCSC3D_complexf64_"
                 "S1CLCSC3D\n";
@@ -263,6 +274,8 @@ extern "C" void
 _ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_complexf64_S1CLCSC3DJIK(
    void* obj, view3_cd_t* pOut, const view3_cd_t* pIn)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirTransposeShims");
+
 #ifndef NDEBUG
    std::cout << "_ciface_quiccir_transpose_201_complexf64_DCCSC3DJIK_"
                 "complexf64_S1CLCSC3DJIK\n";
@@ -314,6 +327,8 @@ extern "C" void
 _ciface_quiccir_transpose_120_complexf64_S1CLCSC3D_complexf64_DCCSC3D(void* obj,
    view3_cd_t* pOut, const view3_cd_t* pIn)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirTransposeShims");
+
 #ifndef NDEBUG
    std::cout << "_ciface_quiccir_transpose_120_complexf64_S1CLCSC3D_complexf64_"
                 "DCCSC3D\n";
@@ -360,6 +375,8 @@ extern "C" void
 _ciface_quiccir_transpose_120_complexf64_S1CLCSC3DJIK_complexf64_DCCSC3DJIK(
    void* obj, view3_cd_t* pOut, const view3_cd_t* pIn)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirTransposeShims");
+
 #ifndef NDEBUG
    std::cout << "_ciface_quiccir_transpose_120_complexf64_S1CLCSC3DJIK_"
                 "complexf64_DCCSC3DJIK\n";
