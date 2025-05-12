@@ -63,11 +63,6 @@ namespace Parallel {
          virtual ~IConverter();
 
          /**
-          * @brief Convert is setup?
-          */
-         bool isSetup() const;
-
-         /**
           * @brief Set up the converter
           */
          virtual void setup() = 0;
@@ -175,11 +170,6 @@ namespace Parallel {
          virtual void profileStorage() const = 0;
 
       protected:
-         /**
-          * @brief Converter is setup?
-          */
-         bool mIsSetup;
-
          /**
           * @brief Dimensions of data
           */

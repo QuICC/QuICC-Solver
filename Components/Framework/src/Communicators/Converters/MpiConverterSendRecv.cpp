@@ -47,8 +47,6 @@ void MpiConverterSendRecv::setup()
 
    // setup the communication requests
    this->setupRequests();
-
-   this->mIsSetup = true;
 }
 
 void MpiConverterSendRecv::setupCommunication(const int packs,
