@@ -12,12 +12,12 @@
               //"program": "${fileBasenameNoExtension}",
               
               // For the nonlinear model
-              //"program": "/QuICC/QuICC_newDenseSM/build_NL_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCExplicitModel",
-              //"cwd": "/QuICC/AnelasticShellRTC/debug/nonlinear/"
+              "program": "/QuICC/QuICC-Solver/build_NL_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCImplicitModel",
+              "cwd": "/QuICC/AnelasticShellRTC/debug/nonlinear/"
               
               // for the linear model
-              "program": "/QuICC/QuICC_newDenseSM/build_stability_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCImplicitStability",
-              "cwd": "/QuICC/AnelasticShellRTC/debug/stability/"
+              //"program": "/QuICC/QuICC_newDenseSM/build_stability_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCImplicitStability",
+              //"cwd": "/QuICC/AnelasticShellRTC/debug/stability/"
           }
       ]
   }
