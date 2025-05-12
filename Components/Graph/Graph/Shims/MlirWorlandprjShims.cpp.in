@@ -9,6 +9,7 @@
 #include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/Worland/OpsBuilder.hpp"
 #include "ViewOps/Worland/OpsQuadrature.hpp"
+#include "Profiler/Interface.hpp"
 
 using namespace QuICC::Graph;
 
@@ -44,6 +45,7 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
     assert(pUmod->coo == pUval->coo);
     Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    Profiler::RegionStart<3>("MlirWorlandprjShims");
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
@@ -72,6 +74,7 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
         OpsBuilder<Top, @Kind@_t, @OpDirection@> tBuilder;
         tBuilder.compute(opView, igrid, ::QuICC::Internal::Array());
     }
+    Profiler::RegionStop<3>("MlirWorlandprjShims");
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewVal, viewMod);
@@ -115,6 +118,7 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
     assert(QuICC::Cuda::isDeviceMemory(pUval->data));
     Tin viewMod(pUmod->data, pUmod->dataSize, pUmod->dims, pointers, indices);
     Tout viewVal(pUval->data, pUval->dataSize, pUval->dims, pointers, indices);
+    Profiler::RegionStart<3>("MlirWorlandprjShims");
     // Check that op was set up
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
@@ -147,6 +151,7 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
         OpsBuilder<Top, @Kind@_t, @OpDirection@> tBuilder;
         tBuilder.compute(opView, igrid, ::QuICC::Internal::Array());
     }
+    Profiler::RegionStop<3>("MlirWorlandprjShims");
     assert(cl->getOp().data() != nullptr);
     // call
     cl->apply(viewVal, viewMod);
