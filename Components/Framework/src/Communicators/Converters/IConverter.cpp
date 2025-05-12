@@ -24,12 +24,17 @@ namespace QuICC {
 namespace Parallel {
 
    IConverter::IConverter()
-      : mDimensions(-1)
+      : mIsSetup(false), mDimensions(-1)
    {
    }
 
    IConverter::~IConverter()
    {
+   }
+
+   bool IConverter::isSetup() const
+   {
+      return this->mIsSetup;
    }
 
    void IConverter::setIndexConverter(std::shared_ptr<IIndexConv> spConv)

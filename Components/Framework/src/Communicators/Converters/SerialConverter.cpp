@@ -55,6 +55,7 @@ namespace Parallel {
 
    void SerialConverter::setup()
    {
+      this->mIsSetup = true;
    }
 
    void SerialConverter::setupCommunication(const int packs, const TransformDirection::Id direction)

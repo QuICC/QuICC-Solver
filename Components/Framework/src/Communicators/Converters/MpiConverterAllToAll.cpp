@@ -41,6 +41,8 @@ namespace Parallel {
 
       // setup the communication data
       this->setupCommData();
+
+      this->mIsSetup = true;
    }
 
    void MpiConverterAllToAll::setupCommunication(const int packs, const TransformDirection::Id direction)

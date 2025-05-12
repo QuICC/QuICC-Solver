@@ -120,7 +120,13 @@ namespace Parallel {
 
    inline IConverter& CommunicatorStorage::converter(const Dimensions::Transform::Id id)
    {
-      return *this->mConverters.find(id)->second;
+      auto& conv = *this->mConverters.find(id)->second;
+      if(!conv.isSetup())
+      {
+         conv.setup();
+      }
+
+      return conv;
    }
 
    template <Dimensions::Transform::Id TID>
@@ -132,7 +138,13 @@ namespace Parallel {
    template <Dimensions::Transform::Id TID>
       IConverter& CommunicatorStorage::converter()
    {
-      return *this->mConverters.find(TID)->second;
+      auto& conv = *this->mConverters.find(TID)->second;
+      if(!conv.isSetup())
+      {
+         conv.setup();
+      }
+
+      return conv;
    }
 
 }
