@@ -294,7 +294,7 @@ public:
     *
     * @param it   Iteration index
     */
-   void computeNonlinear(const int it);
+   void computeNonlinear(const int it, const bool saveOutput = true);
 
    /**
     * @brief Explicit linear the trivial equations

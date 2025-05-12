@@ -27,7 +27,7 @@ namespace QuICC {
 namespace Pseudospectral {
 
 
-void Coordinator::computeNonlinear(const int it)
+void Coordinator::computeNonlinear(const int it, const bool saveOutput)
 {
    Profiler::RegionFixture<1> fix(
       "Pseudospectral::Coordinator::computeNonlinear");
@@ -42,7 +42,14 @@ void Coordinator::computeNonlinear(const int it)
       this->updatePhysical(it);
 
       // compute nonlinear interaction and forward transform
-      this->updateSpectral(it);
+      if(saveOutput)
+      {
+         this->updateSpectral(it);
+      }
+      else
+      {
+         this->updateSpectral(true, true, false, false, it);
+      }
       Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlOld");
 
 #ifdef QUICC_USE_MLIR_GRAPH
@@ -189,16 +196,19 @@ void Coordinator::computeNonlinear(const int it)
 
       Profiler::RegionStop<2>("Pseudospectral::Coordinator::nlNew");
 
-      // Copy back spectral coeff
-      details::copyView2Scalar(temp, tempVarv, jwRes);
-      details::copyView2Vector(vecVel, TorVelVarv, PolVelVarv, jwRes);
+      if(saveOutput)
+      {
+         // Copy back spectral coeff
+         details::copyView2Scalar(temp, tempVarv, jwRes);
+         details::copyView2Vector(vecVel, TorVelVarv, PolVelVarv, jwRes);
+      }
 
       // Copy back physical vel for cfl computation
       /// \todo move cfl computation in the graph and remove these copies
       const auto& ftRes = *mspRes->cpu()->dim(Dimensions::Transform::TRA3D);
       details::copyView2Vector(vecVel, UrVarv, UthetaVarv, UphiVarv, ftRes);
 
-      if (mIsMag)
+      if (mIsMag && saveOutput)
       {
          auto& vecMag = mVectorVariables[PhysicalNames::Magnetic::id()];
          // Copy back spectral coeff

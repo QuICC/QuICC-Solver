@@ -943,11 +943,8 @@ void Coordinator::preSolveEquations()
    this->explicitTrivialEquations(ModelOperator::ExplicitNextstep::id(), it);
    this->solveTrivialEquations(SolveTiming::After::id(), it);
 
-   // Compute physical values
-   this->updatePhysical(it);
-
-   // Only compute forward transform for diagnostic and trivial equations
-   this->updateSpectral(true, true, false, false, it);
+   // Compute full nonlinear loop but ignore output
+   this->computeNonlinear(it, false);
 
    // Solve diagnostic equations
    this->explicitDiagnosticEquations(ModelOperator::ExplicitNonlinear::id(),
