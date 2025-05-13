@@ -550,8 +550,11 @@ void Coordinator::prepareEvolution(const std::size_t schemeId)
       this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), sP, vP, *this);
 
    // Compute physical space values if required
-   this->mspImposedBwdGrouper->transform(this->mImposedScalarVariables,
-      this->mImposedVectorVariables, *this->mspImposedTransformCoordinator);
+   if(this->mImposedScalarVariables.size() + this->mImposedVectorVariables.size() > 0)
+   {
+      this->mspImposedBwdGrouper->transform(this->mImposedScalarVariables,
+         this->mImposedVectorVariables, *this->mspImposedTransformCoordinator);
+   }
 }
 
 void Coordinator::cleanupForRun()
