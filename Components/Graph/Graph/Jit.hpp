@@ -30,6 +30,7 @@
 // Project includes
 //
 #include "Graph/OpsMap.hpp"
+#include "Graph/Shims/CacheLayerSize.hpp"
 #include "Graph/Shims/MlirShims.hpp"
 #include "Graph/Tags.hpp"
 #include "Graph/Types.hpp"
@@ -62,6 +63,8 @@ struct PipelineOptions
 {
    /// @brief Wrapper pass options
    mlir::quiccir::QuiccirViewWrapperOptions wrap;
+   /// @brief Grouping pass options
+   mlir::quiccir::QuiccirTransposeGroupingOptions grouping;
 };
 
 /// @brief classe to setup and JIT the mlir graph
@@ -157,7 +160,11 @@ private:
 public:
    ~Jit()
    {
-      /// \todo clearup meta
+      /// \todo clear up meta
+
+      // Invalidate cache
+      auto& cache = details::CacheLayerSize<const std::uint32_t>::getInstance();
+      cache.invalidate();
    }
 
    /// @brief Setup Graph from string
@@ -382,6 +389,10 @@ void Jit<RANK>::insertWrapper(const std::array<std::uint32_t, RANK> physDims,
    // Optimization passes
    nestedFuncPmPre.addPass(mlir::quiccir::createTransformContractionPass());
    pmPre.addPass(mlir::createCSEPass());
+   if (_opt.grouping.group != 1)
+   {
+      pmPre.addPass(mlir::quiccir::createTransposeGroupingPass(_opt.grouping));
+   }
 
    std::vector<std::vector<std::int64_t>> dimArgs(1);
    std::vector<std::string> layArgs(1);
@@ -531,7 +542,7 @@ template <std::uint32_t RANK> void Jit<RANK>::setEngineAndJit()
 
    // An optimization pipeline to use within the execution engine.
    auto optPipeline = mlir::makeOptimizingTransformer(
-      /*optLevel=*/0, /*sizeLevel=*/0,
+      /*optLevel=*/3, /*sizeLevel=*/0,
       /*targetMachine=*/nullptr);
 
    // Create an MLIR execution engine. The execution engine eagerly JIT-compiles
