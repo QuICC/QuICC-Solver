@@ -1,6 +1,6 @@
 /**
- * @file Op.hpp
- * @brief Transpose operations on Views
+ * @file OpGrouped.hpp
+ * @brief Grouped Transpose operations on Views
  */
 #pragma once
 
@@ -25,13 +25,13 @@ using namespace QuICC::Operator;
 /// @tparam Tout
 /// @tparam Tin
 template <class Tout, class Tin, class Perm>
-class Op : public UnaryBaseOp<Op<Tout, Tin, Perm>, Tout, Tin>
+class OpGrouped : public UnaryBaseOp<OpGrouped<Tout, Tin, Perm>, Tout, Tin>
 {
 public:
    /// @brief default constructor
-   Op() = default;
+   OpGrouped() = default;
    /// @brief dtor
-   ~Op() = default;
+   ~OpGrouped() = default;
 
 private:
    /// @brief action implementation
@@ -39,7 +39,7 @@ private:
    /// @param in input View
    void applyImpl(Tout& out, const Tin& in);
    /// @brief give access to base class
-   friend UnaryBaseOp<Op<Tout, Tin, Perm>, Tout, Tin>;
+   friend UnaryBaseOp<OpGrouped<Tout, Tin, Perm>, Tout, Tin>;
 };
 
 } // namespace Cuda

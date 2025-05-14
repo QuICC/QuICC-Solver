@@ -130,6 +130,7 @@ namespace Variable {
 
       // Compute CMB magnetic field spectrum B^2
       MHDFloat factor, lfactor;
+
       if(this->mHasMOrdering)
       {
          // Loop over harmonic order m
@@ -177,7 +178,6 @@ namespace Variable {
          {
             int l_ = tRes.idx<Dimensions::Data::DAT3D>(k);
             lfactor = l_ * l_ * (2.0 * l_ + 1.0) * (l_ + 1.0);
-            const auto& op = this->mValue.at(l_);
             for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
                int m_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
@@ -253,7 +253,7 @@ namespace Variable {
       // Abort if is NaN
       if(std::isnan(this->mCmbSpectrum.sum()))
       {
-         QuICCEnv().abort("Sphere dipolarity momentum is NaN!");
+         QuICCEnv().abort("Sphere dipolarity is NaN!");
       }
    }
 

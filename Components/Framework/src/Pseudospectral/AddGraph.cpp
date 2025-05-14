@@ -244,6 +244,7 @@ void Coordinator::addGraph(const std::string& graphStr,
    Graph::PipelineOptions opt;
    opt.wrap.dimRets = dimRets;
    opt.wrap.layRets = layRets;
+   opt.grouping.group = mGraphOptions.groupingSize;
    mJitter = std::make_unique<QuICC::Graph::Jit<3>>(graphStr, mMemRsr, physDims,
       modsDims, layOpt, Graph::Stage::MMM, Graph::Stage::MMM, meta, physParams,
       opt);

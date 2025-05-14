@@ -10,6 +10,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOM
 
 set(PHS
   ../../Graph/Shims/MlirShims.hpp
+  ../../Graph/Shims/CacheLayerSize.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
@@ -26,7 +27,6 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PRIVATE
     MlirShims.cpp
     MlirDotShims.cpp
-    MlirTransposeShims.cpp
     MlirAllocShims.cpp
     MlirDeallocShims.cpp
 )
@@ -55,6 +55,7 @@ include(ConfigJW.cmake)
 include(ConfigPointwise.cmake)
 include(ConfigMulConst.cmake)
 include(ConfigCross.cmake)
+include(ConfigTranspose.cmake)
 
 # Alias
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}${QUICC_CURRENT_SUBCOMPONENT_LIB}

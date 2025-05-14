@@ -2,32 +2,7 @@
 # and the QuICC Pointwise operators. This is done to avoid writing boiler
 # plate code for each operator.
 
-function(mapType2mlir TYPE MLIRTYPE)
-    if(${TYPE} STREQUAL "double")
-        set(${MLIRTYPE} "f64" PARENT_SCOPE)
-    elseif(${TYPE} STREQUAL "std::complex<double>")
-        set(${MLIRTYPE} "complexf64" PARENT_SCOPE)
-    else()
-        message(SEND_ERROR "unknown type")
-    endif()
-endfunction()
-
-function(mapType2cuda TYPE CUDATYPE)
-    if(${TYPE} STREQUAL "double")
-        set(${CUDATYPE} "double" PARENT_SCOPE)
-    elseif(${TYPE} STREQUAL "std::complex<double>")
-        set(${CUDATYPE} "cuda::std::complex<double>" PARENT_SCOPE)
-    else()
-        message(SEND_ERROR "unknown type")
-    endif()
-endfunction()
-
-function(camelCase STRIN STROUT)
-    string (TOUPPER "${STRIN}" U)
-    string (SUBSTRING "${U}"   0  1 A)
-    string (SUBSTRING "${STRIN}" 1 -1 B)
-    set (${STROUT} "${A}${B}" PARENT_SCOPE)
-endfunction()
+include(ConfigUtils.cmake)
 
 set(Ops "add;sub")
 set(Types "double;std::complex<double>")
