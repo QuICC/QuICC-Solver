@@ -20,11 +20,6 @@ namespace Mpi {
 //
 
 /// @brief
-struct alltoallw_t
-{
-};
-
-/// @brief
 struct alltoallv_t
 {
 };

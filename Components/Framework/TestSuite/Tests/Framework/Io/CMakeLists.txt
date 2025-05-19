@@ -82,19 +82,31 @@ set(_tests
   SLFl:Temperature:ShellScalarLSpectrumWriter
   SLFl:Temperature:ShellScalarMSpectrumWriter
   SLFl:Temperature:ShellScalarModeSpectrumWriter
+  SLFl:Temperature:ShellScalarRSpectrumWriter
   SLFl:Velocity:ShellTorPolEnergyWriter
   SLFl:Velocity:ShellTorPolLSpectrumWriter
   SLFl:Velocity:ShellTorPolMSpectrumWriter
   SLFl:Velocity:ShellTorPolModeSpectrumWriter
+  SLFl:Velocity:ShellTorPolRSpectrumWriter
+  SLFl:Velocity:ShellTorPolEnstrophyWriter
+  SLFl:Velocity:ShellTorPolEnstrophyLSpectrumWriter
+  SLFl:Velocity:ShellTorPolEnstrophyMSpectrumWriter
+  SLFl:Magnetic:ShellDipolarityWriter
   SLFm:Temperature:ShellNusseltWriter
   SLFm:Temperature:ShellScalarEnergyWriter
   SLFm:Temperature:ShellScalarLSpectrumWriter
   SLFm:Temperature:ShellScalarMSpectrumWriter
   SLFm:Temperature:ShellScalarModeSpectrumWriter
+  SLFm:Temperature:ShellScalarRSpectrumWriter
   SLFm:Velocity:ShellTorPolEnergyWriter
   SLFm:Velocity:ShellTorPolLSpectrumWriter
   SLFm:Velocity:ShellTorPolMSpectrumWriter
   SLFm:Velocity:ShellTorPolModeSpectrumWriter
+  SLFm:Velocity:ShellTorPolRSpectrumWriter
+  SLFm:Velocity:ShellTorPolEnstrophyWriter
+  SLFm:Velocity:ShellTorPolEnstrophyLSpectrumWriter
+  SLFm:Velocity:ShellTorPolEnstrophyMSpectrumWriter
+  SLFm:Magnetic:ShellDipolarityWriter
 )
 
 foreach(_test IN LISTS _tests)
