@@ -61,13 +61,6 @@ namespace ALegendre {
          static void Plm(Eigen::Ref<Internal::Matrix> iplm, const int m, const int l, const Eigen::Ref<const Internal::Matrix>& ipl_1m, const Eigen::Ref<const Internal::Matrix>& ipl_2m, const Internal::Array& igrid, NormalizerML norm);
 
          /**
-          * @brief Compute the associated Legendre \f$\frac{P_l^m (\cos\theta)}{\sin\theta}\f$
-          *
-          * Internal computation can be done in multiple precision
-          */
-         template <typename T> void computeSin_1Plm(Eigen::Ref<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> > ipl1m, const int m, const int l, const Eigen::Ref<const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >& ipl1m1, const Eigen::Ref<const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >& ipl1m_1);
-
-         /**
           * @brief Compute the associated Legendre \f$P_m^m (\cos\theta)\f$
           *
           * Internal computation can be done in multiple precision
@@ -103,7 +96,7 @@ namespace ALegendre {
          static void dPmm(Eigen::Ref<Internal::Array> op, const int m, const Eigen::Ref<const Internal::Array>& iplm_1, NormalizerM norm);
 
          /**
-          * @brief Compute the associated Legendre \f$1/\sin\theta P_m^m (\cos\theta)\f$
+          * @brief Compute the associated Legendre \f$1/\sin\theta P_l^m (\cos\theta)\f$
           *
           * Internal computation can be done in multiple precision
           */

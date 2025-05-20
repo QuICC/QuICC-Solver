@@ -81,6 +81,9 @@
         "sparseextra": "cpp",
         "alignedvector3": "cpp",
         "matrixfunctions": "cpp",
-        "nonlinearoptimization": "cpp"
+        "nonlinearoptimization": "cpp",
+        "*.inc": "cpp",
+        "fft": "cpp",
+        "*.evaluator": "cpp"
     }
 }

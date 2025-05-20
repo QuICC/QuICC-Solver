@@ -1,6 +1,18 @@
 /**
  * @file ALegendreBase.cpp
  * @brief Source of the implementation of the associated Legendre polynomial
+ * 
+ * Implements recurrence relations to calculate Plm and derived functions, such as d Plm / d\theta
+ * 
+ * notes:
+ * 
+ * ** Normalisation factors, cs **
+ *   they are chosen so that, assuming:
+ *          Ylm = clm Plm exp(im\phi), clm = ||Ylm||  sqrt( (2l+1) (l-m)! / 2 / (l+m)! ) / sqrt(2 Pi)
+ *   a recurrence relation such as
+ *          (l-m) Plm = (2l-1) x Pl-1m - (l+m-1) Pl-2m
+ *   is coded like this:
+ *          iplm =  (||Ylm|| / clm) ^(-1) [ (||Yl_1m|| / cl_1m) (2l-1) x ipl_1m - (||Yl_2m|| / cl_2m) (l+m-1) ipl_2m ]
  */
 
 // System includes
@@ -34,6 +46,8 @@ namespace ALegendre {
       Internal::MHDFloat dl = Internal::MHDFloat(l);
       Internal::MHDFloat dm = Internal::MHDFloat(m);
       Internal::Array cs = norm(dm, dl);
+
+      // (l-m) Plm = (2l-1) x Pl-1m - (l+m-1) Pl-2m
 
       iplm.array() = cs(1)*(cs(0)*ipl_2m.array() + (igrid.array()*ipl_1m.array()).array());
    }
@@ -113,6 +127,8 @@ namespace ALegendre {
       Internal::MHDFloat dl = Internal::MHDFloat(l);
       Internal::MHDFloat dm = Internal::MHDFloat(m);
       Internal::Array cs = norm(dm, dl);
+
+      // dPlm/dtheta = -sqrt(1-x^2) dPlm/dx = -(1/2)[ (l+m)(l-m+1)Plm-1 - Plm+1 ]
 
       idplm.array() = cs(0)*iplm_1.array() - cs(1)*iplm1.array();
    }
