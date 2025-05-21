@@ -646,6 +646,44 @@ namespace Transform {
       return transform;
    }
 
+   std::vector<TransformPath>  ShellTransformSteps::backwardDvDr(const std::map<FieldComponents::Physical::Id,bool>& req) const
+   {
+      std::vector<TransformPath> transform;
+
+      if(this->ss().formulation() == VectorFormulation::TORPOL)
+      {
+         if(req.find(FieldComponents::Physical::R)->second)
+         {
+            // Toroidal part
+
+            // Poloidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
+            transform.back().addEdge(Backward::Overr1::id());//change this: I need to implement Overr1D1 or Overr2D1R1
+            transform.back().addEdge(Backward::Laplh::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
+         }
+
+         if(req.find(FieldComponents::Physical::THETA)->second)
+         {
+            // Toroidal part
+
+            // Poloidal part: (1/r)d_\theta d^2_r (r S) = 2 d_\theta d_r (S)/r + d_\theta d^2_r (S)
+         }
+
+         if(req.find(FieldComponents::Physical::PHI)->second)
+         {
+            // Toroidal part
+
+            // Poloidal part
+         }
+      } else
+      {
+         throw std::logic_error("Radial derivative in primitive form is not implemented yet");
+      }
+
+      return transform;
+   }
+
    std::vector<TransformPath>  ShellTransformSteps::backwardDivergence() const
    {
       std::vector<TransformPath> transform;

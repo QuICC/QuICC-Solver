@@ -1,161 +1,109 @@
 /**
  * @file SphericalViscousDissipationAnelastic.hpp
- * @brief Implementation of the viscous dissipation term in the anelastic approximation
- * 
- * Q_\nu  
+ * @brief Implementation of the spherical coriolis term
  */
 
-#ifndef QUICC_PHYSICAL_SPHERICALVISCOUSDISSIPATIONANELASTIC_HPP
-#define QUICC_PHYSICAL_SPHERICALVISCOUSDISSIPATIONANELASTIC_HPP
-
-// Configuration includes
-//
-
-// System includes
-//
-
-// External includes
-//
-
-// Project includes
-//
-#include "Types/Typedefs.hpp"
-#include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/VectorFields/VectorField.hpp"
-#include "QuICC/ScalarFields/ScalarField.hpp"
-
-namespace QuICC {
-
-namespace Physical {
-
-   /**
-    * @brief Implementation of a generic primitive mass flux advection in 3D space
-    */
-   template <FieldComponents::Physical::Id TONE, 
-             FieldComponents::Physical::Id TTWO, 
-             FieldComponents::Physical::Id TTHREE> class SphericalViscousDissipationAnelastic
-   {
-      public:
-         /**
-          * @brief Set S to viscous dissipation
-          */
+ #ifndef QUICC_PHYSICAL_SPHERICALVISCOUSDISSIPATIONANELASTIC_HPP
+ #define QUICC_PHYSICAL_SPHERICALVISCOUSDISSIPATIONANELASTIC_HPP
+ 
+ // Configuration includes
+ //
+ 
+ // System includes
+ //
+ 
+ // External includes
+ //
+ 
+ // Project includes
+ //
+ #include "Types/Typedefs.hpp"
+ #include "QuICC/Enums/FieldIds.hpp"
+ #include "QuICC/VectorFields/VectorField.hpp"
+ #include "QuICC/Resolutions/Resolution.hpp"
+ #include "QuICC/ScalarFields/ScalarField.hpp"
+ #include "QuICC/Equations/IVectorEquation.hpp"
+ 
+ 
+ //#include "QuICC/DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
+ #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+ 
+ namespace QuICC {
+ 
+ namespace Physical {
+ 
+    /**
+     * @brief Implementation of the spherical coriolis term
+     */
+    class SphericalViscousDissipationAnelastic
+    {
+       public:
+          /**
+           * @brief Set S to Coriolis term
+           */
           static void set(Framework::Selector::PhysicalScalarField &rS, 
-                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, 
-                          FieldComponents::Physical::Id> &u, 
-                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, 
-                          FieldComponents::Physical::Id> &gradQ, 
+                          const Resolution& res, 
+                          const Array& r, 
+                          const Array& cosTheta, 
+                          const Array& sinTheta,
+                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
+                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
+                          const QuICC::Equations::EquationParameters &eqParam,
                           const MHDFloat c = 1.0);
-
-         /**
-          * @brief Add viscous dissipation to S
-          */
+ 
+          /**
+           * @brief Add Coriolis term to S
+           */
           static void add(Framework::Selector::PhysicalScalarField &rS, 
-                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, 
-                          FieldComponents::Physical::Id> &u, 
-                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, 
-                          FieldComponents::Physical::Id> &gradQ, 
+                          const Resolution& res, 
+                          const Array& r, 
+                          const Array& cosTheta, 
+                          const Array& sinTheta,
+                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
+                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
+                          const QuICC::Equations::EquationParameters &eqParams,
                           const MHDFloat c = 1.0);
-
-         /**
-          * @brief Substract viscous dissipation from S
-          */
+ 
+          /**
+           * @brief Substract Coriolis term from S
+           */
           static void sub(Framework::Selector::PhysicalScalarField &rS, 
-                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, 
-                          FieldComponents::Physical::Id> &u,
-                           const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, 
-                           FieldComponents::Physical::Id> &gradQ, 
-                           const MHDFloat c = 1.0);
-
-      protected:
-
-      private:
-         /**
-          * @brief Empty constructor
-          */
-         SphericalViscousDissipationAnelastic() = default;
-
-         /**
-          * @brief Empty destructor
-          */
-         ~SphericalViscousDissipationAnelastic() = default;
-   };
-
-   template <FieldComponents::Physical::Id TONE, 
-             FieldComponents::Physical::Id TTWO, 
-             FieldComponents::Physical::Id TTHREE> 
-             void SphericalViscousDissipationAnelastic<TONE,TTWO,TTHREE>::set(Framework::Selector::PhysicalScalarField &rS, 
-                                                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &u, 
-                                                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &gradQ, 
-                                                                              const MHDFloat c)
-   {
-      if(c != 1.0)
-      {
-         rS.setData(c*(u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
-
-         rS.addData(c*(u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
-
-         rS.addData(c*(u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array()).matrix());
-      } else
-      {
-         rS.setData((u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
-
-         rS.addData((u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
-
-         rS.addData((u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array()).matrix());
-      }
-   }
-
-   template <FieldComponents::Physical::Id TONE, 
-             FieldComponents::Physical::Id TTWO, 
-             FieldComponents::Physical::Id TTHREE> 
-             void SphericalViscousDissipationAnelastic<TONE,TTWO,TTHREE>::add(Framework::Selector::PhysicalScalarField &rS, 
-                                                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &u, 
-                                                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &gradQ, 
-                                                                              const MHDFloat c)
-   {
-      if(c != 1.0)
-      {
-         rS.addData(c*(u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
-
-         rS.addData(c*(u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
-
-         rS.addData(c*(u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array()).matrix());
-      } else
-      {
-         rS.addData((u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
-
-         rS.addData((u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
-
-         rS.addData((u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array()).matrix());
-      }
-   }
-
-   template <FieldComponents::Physical::Id TONE, 
-             FieldComponents::Physical::Id TTWO, 
-             FieldComponents::Physical::Id TTHREE> 
-             void SphericalViscousDissipationAnelastic<TONE,TTWO,TTHREE>::sub(Framework::Selector::PhysicalScalarField &rS, 
-                                                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &u, 
-                                                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &gradQ, 
-                                                                              const MHDFloat c)
-   {
-      if(c != 1.0)
-      {
-         rS.subData(c*(u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
-
-         rS.subData(c*(u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
-
-         rS.subData(c*(u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array()).matrix());
-      } else
-      {
-         rS.subData((u.comp(TONE).data().array()*gradQ.comp(TONE).data().array()).matrix());
-
-         rS.subData((u.comp(TTWO).data().array()*gradQ.comp(TTWO).data().array()).matrix());
-
-         rS.subData((u.comp(TTHREE).data().array()*gradQ.comp(TTHREE).data().array()).matrix());
-      }
-   }
-
-   }
-}
-
-#endif // QUICC_PHYSICAL_SPHERICALVISCOUSDISSIPATIONANELASTIC_HPP
+                          const Resolution& res, 
+                          const Array& r, 
+                          const Array& cosTheta, 
+                          const Array& sinTheta,
+                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
+                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
+                          const QuICC::Equations::EquationParameters &eqParams,
+                          const MHDFloat c = 1.0);
+ 
+       protected:
+ 
+       private:
+          /**
+           * @brief Empty constructor
+           */
+          SphericalViscousDissipationAnelastic() = default;
+ 
+          /**
+           * @brief Empty destructor
+           */
+          ~SphericalViscousDissipationAnelastic() = default;
+    };
+ }
+ }
+ 
+ #endif // QUICC_PHYSICAL_SPHERICALVISCOUSDISSIPATIONANELASTIC_HPP
+ 
