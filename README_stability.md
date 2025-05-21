@@ -1,7 +1,7 @@
 Linear stability solver
 =======================
 
-This component provides as simple linear stability solver to be used together with the C++ backend implementations of the Models.
+Th Stability component provides as simple linear stability solver to be used together with the C++ backend implementations of the Models.
 The underlying generalized eigenvalue problem is solved using PETSc/SLEPc.
 
 General setup
@@ -36,10 +36,15 @@ The parameters for the physical model are read from the `parameters.cfg` file. T
 
 In addition to the parameters for the nonlinear simulations, the following parameters are added:
 - omega: the target frequency for the GEVP solver
+- growth_rate: the target growth rate for the GEVP solver
+- tolerance: tolerance for converged eigenvalues
+- max_iteration: max iterations for eigensolver
 - nev: the number of eigenvalues to compute
 - sort: sorting to apply to the eigenpairs. This is applied after the eigenvalues have been computed.
     - 0: no additional sorting
     - 1: decreasing real part
 - stability_mode: computation mode for the solver:
-    - 0: solve GEVP with provided parameters and save eigenfunction(s)
-    - 1: compute critical Rayleigh number starting from provided initial guess
+    - 0: solve GEVP with provided parameters
+    - 1: solve GEVP with provided parameters and save eigenfunction(s)
+    - 2: compute critical Rayleigh number starting from provided initial guess
+- write_mtx: write matrices to MatrixMarket format

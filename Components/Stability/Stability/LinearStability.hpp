@@ -16,6 +16,7 @@
 #include "QuICC/Equations/EquationParameters.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
+#include "Stability/Options.hpp"
 
 namespace QuICC {
 
@@ -28,7 +29,6 @@ public:
    /**
     * @brief Constructor
     *
-    * @param idc     ID of critical parameter
     * @param eigs    Indexes of matrix to solve (eg. m for rotating spherical
     * setup)
     * @param spRes   Resolution
@@ -36,16 +36,21 @@ public:
     * @param bcMap   Boundary conditions
     * @param spModel Model backend
     */
-   LinearStability(const std::size_t idc, const std::vector<MHDFloat>& eigs,
-      SharedResolution spRes,
+   LinearStability(const std::vector<MHDFloat>& eigs, SharedResolution spRes,
       const Equations::EquationParameters::NDMapType& params,
       const std::map<std::size_t, std::size_t>& bcMap,
-      std::shared_ptr<Model::IModelBackend> spModel);
+      std::shared_ptr<Model::IModelBackend> spModel,
+      std::shared_ptr<const Stability::Options> opt);
 
    /**
     * @brief Simple empty destructor
     */
    virtual ~LinearStability();
+
+   /**
+    * @brief Set ID of critical parameter
+    */
+   void setCriticalId(const std::size_t);
 
    /**
     * @brief Compute growth rate for given critical parameter value
@@ -74,6 +79,11 @@ public:
       std::vector<std::vector<MHDComplex>>& efs, const int nev,
       const MHDFloat vc);
 
+   /**
+    * @brief Get options
+    */
+   const Stability::Options& options() const;
+
 protected:
    /**
     * @brief Get resolution
@@ -91,13 +101,23 @@ private:
     *
     * @param matA Linear operator
     * @param matB Mass matrix
-    * @param matC Boundary condition matrix
     * @param eigs Indexes for matrix to solve
     * @param nds  Nondimensional parameters
     */
-   void buildMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
-      SparseMatrixZ& matC, const std::vector<MHDFloat>& eigs,
+   void buildMatrices(DecoupledZSparse& matA, DecoupledZSparse& matB,
+      const std::vector<MHDFloat>& eigs,
       const Equations::EquationParameters::NDMapType& nds);
+
+   /**
+    * @brief cast matrices
+    *
+    * @param matA Linear operator
+    * @param matB Mass matrix
+    * @param decA Decoupled linear operator
+    * @param decB Decoupled Mass matrix
+    */
+   void castMatrices(SparseMatrixZ& matA, SparseMatrixZ& matB,
+      const DecoupledZSparse& decA, const DecoupledZSparse& decB);
 
    /**
     * @brief Convert matrices to used with SLEPc/PETSc
@@ -106,6 +126,18 @@ private:
     * @param matB Mass matrix
     */
    void convertMatrices(const SparseMatrixZ& matA, const SparseMatrixZ& matB);
+
+   /**
+    * @brief Use custom initial guess
+    */
+   void setCustomGuess();
+
+   /**
+    * @brief Set random initial guess with given parity
+    *
+    * @param parity Parity in l for each field
+    */
+   void setParityGuess(const std::vector<int>& parity);
 
    /**
     * @brief Solve Generalized eigenvalue problem (GEVP)
@@ -190,6 +222,11 @@ private:
     * @brief Target for shift-invert
     */
    MHDComplex mTarget;
+
+   /**
+    * @brief Options for EPS object
+    */
+   std::shared_ptr<const Stability::Options> mOptions;
 };
 } // namespace QuICC
 
