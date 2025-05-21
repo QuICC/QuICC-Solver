@@ -110,6 +110,13 @@ void SimulationBase::initBase()
    // Initialise the workflow
    QuICCEnv().setup(nCpu);
 
+#ifdef QUICC_USE_MLIR_GRAPH
+   // Forward graph options
+   Pseudospectral::GraphOptions options;
+   options.groupingSize = this->config().groupingSize();
+   this->mPseudospectral.setGraphOptions(options);
+#endif
+
    // Initialise additional things depending on implementation
    this->initAdditionalBase();
 

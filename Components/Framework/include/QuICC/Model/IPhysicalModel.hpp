@@ -25,8 +25,9 @@
 #include "QuICC/NonDimensional/registerAll.hpp"
 #include "QuICC/PhysicalNames/registerAll.hpp"
 #include "QuICC/RuntimeStatus/registerAll.hpp"
-#include "QuICC/SolveTiming/registerAll.hpp"
 #include "QuICC/PseudospectralTag/registerAll.hpp"
+#include "QuICC/SolveTiming/registerAll.hpp"
+#include "QuICC/Simulation/SimulationBase.hpp"
 
 namespace QuICC {
 
@@ -154,7 +155,7 @@ namespace Model {
          /**
           * @brief Interface to adding ASCII output file
           */
-         template <typename T> void enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim);
+         template <typename T> void enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<SimulationBase> spSim);
 
       protected:
          /**
@@ -307,7 +308,7 @@ namespace Model {
       return this->mpBackend;
    }
 
-   template <typename TSim, typename TState, typename TVis> template <typename T> void IPhysicalModel<TSim,TState,TVis>::enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim)
+   template <typename TSim, typename TState, typename TVis> template <typename T> void IPhysicalModel<TSim,TState,TVis>::enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<SimulationBase> spSim)
    {
       if(spSim->config().model(tag).at("enable"))
       {

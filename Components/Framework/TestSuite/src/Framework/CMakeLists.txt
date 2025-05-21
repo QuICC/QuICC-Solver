@@ -1,4 +1,5 @@
 add_subdirectory(Communicators)
+add_subdirectory(Io)
 add_subdirectory(LoadSplitter)
 add_subdirectory(StateFile)
 add_subdirectory(Transform)

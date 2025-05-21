@@ -1,97 +1,21 @@
 /**
  * @file I4.hpp
- * @brief Implementation of the Chebyshev based I^4 of P integrator, with linear map y = ax + b
+ * @brief Implementation of the Chebyshev based I4 integrator, with linear map y = ax + b
  */
 
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_I4_HPP
 #define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_I4_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
 //
-#include "Types/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/IChebyshevIntegrator.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Integrator/Base/I4.hpp"
+//#include "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Integrator/I4viewCpu_t.hpp.inc"
+#ifdef QUICC_HAS_CUDA_BACKEND
+//#include "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Integrator/I4viewGpu_t.hpp.inc"
+#endif
 
-namespace QuICC {
-
-namespace Transform {
-
-namespace Fft {
-
-namespace Chebyshev {
-
-namespace LinearMap {
-
-namespace Integrator {
-
-   /**
-    * @brief Implementation of the Chebyshev based I^4 of P integrator, with linear map y = ax + b
-    */
-   class I4: public IChebyshevIntegrator
-   {
-      public:
-         /**
-          * @brief Constructor
-          */
-         I4();
-
-         /**
-          * @brief Destructor
-          */
-         ~I4();
-
-      protected:
-         /**
-          * @brief Sparse matrix operator
-          */
-         mutable SparseMatrix mOp;
-
-      private:
-         /**
-          * @brief Initialize solver operators
-          */
-         void initOperator() const final;
-
-         /**
-          * @brief Apply post FFT operator
-          *
-          * @param rOut Output values
-          */
-         void applyPostOperator(Matrix& rOut) const final;
-
-         /**
-          * @brief Apply pre FFT operator for component wise openerations
-          *
-          * @param in   Input values
-          * @param useReal Real vs Imag flag
-          */
-         void applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const final;
-
-         /**
-          * @brief Apply post FFT operator for component wise operations
-          *
-          * @param rOut Output values
-          * @param useReal Real vs Imag flag
-          */
-         void applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const final;
-   };
-
-}
-}
-}
-}
-}
-}
 
 #endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_INTEGRATOR_I4_HPP
