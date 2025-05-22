@@ -35,7 +35,22 @@ We assume we are running in a container.
 
 - Open project folder. In our case `/QuICC/QuICC/`
 
-# Debug
+
+## Connect to remote host (eg LUMI)
+
+Follow instructions on https://code.visualstudio.com/docs/remote/ssh 
+
+Specifically:
+- Install Remote-SSH extension
+- in the command palette of VSCode:
+
+        >Remote-SSH: Connect to Host
+- Add new host if it's the first time: maffeist@lumi.cscs.fi
+- Choose the `.ssh/config` file to login. *things need to be set up properly for a ssh login on this host*
+- Enter password
+
+
+## Debug
 
 
 - If needed, install the gdb in the running container (from the terminal window):
@@ -104,9 +119,9 @@ We assume we are running in a container.
     - https://code.visualstudio.com/docs/editor/debugging
 
 
-# Debug tricks
+## Debug tricks
 
-## Print variable values
+### Print variable values
 
 In the debug console, once a breakpoint is hit, the command `print` can be used to print variables values. 
 
