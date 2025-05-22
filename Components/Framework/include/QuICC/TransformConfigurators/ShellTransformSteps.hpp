@@ -105,12 +105,12 @@ namespace QuICC {
             /**
              * @brief Generate the list of branches in dv/dr transform
              */
-            virtual std::vector<TransformPath>  backwardDvDr(const std::map<FieldComponents::Physical::Id,bool>& req) const;
+            virtual std::vector<TransformPath>  backwardDrComp(const std::map<FieldComponents::Physical::Id,bool>& req) const;
 
             /**
              * @brief Generate the list of branches in dv/dphi transform
              */
-            //virtual std::vector<TransformPath>  backwardDvDphi(const std::map<FieldComponents::Physical::Id,bool>& req) const;
+            //virtual std::vector<TransformPath>  backwardDphiComp(const std::map<FieldComponents::Physical::Id,bool>& req) const;
 
             /**
              * @brief Generate the list of branches in vector divergence transform

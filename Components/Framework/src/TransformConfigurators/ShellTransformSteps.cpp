@@ -53,6 +53,7 @@
 #include "QuICC/Transform/Backward/D1.hpp"
 #include "QuICC/Transform/Backward/D1Laplh.hpp"
 #include "QuICC/Transform/Backward/Overr1D1R1.hpp"
+#include "QuICC/Transform/Backward/Overr2D1R1.hpp"
 #include "QuICC/Transform/Backward/OversinDphi.hpp"
 #include "QuICC/Transform/Backward/OversinLaplhDphi.hpp"
 #include "QuICC/Transform/Backward/Slaplr.hpp"
@@ -646,7 +647,7 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  ShellTransformSteps::backwardDvDr(const std::map<FieldComponents::Physical::Id,bool>& req) const
+   std::vector<TransformPath>  ShellTransformSteps::backwardDrComp(const std::map<FieldComponents::Physical::Id,bool>& req) const
    {
       std::vector<TransformPath> transform;
 
@@ -657,24 +658,62 @@ namespace Transform {
             // Toroidal part
 
             // Poloidal part
-            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
-            transform.back().addEdge(Backward::Overr1::id());//change this: I need to implement Overr1D1 or Overr2D1R1
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2D1R1::id());
             transform.back().addEdge(Backward::Laplh::id());
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2::id());
+            transform.back().addEdge(Backward::Laplh::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Sub::id());
+
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2::id());
+            transform.back().addEdge(Backward::Laplh::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::R, Arithmetics::Sub::id());
          }
 
          if(req.find(FieldComponents::Physical::THETA)->second)
          {
             // Toroidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::OversinDphi::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
 
-            // Poloidal part: (1/r)d_\theta d^2_r (r S) = 2 d_\theta d_r (S)/r + d_\theta d^2_r (S)
+            // Poloidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Slaplr::id());
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2D1R1::id());
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::THETA, Arithmetics::Sub::id());
+            
          }
 
          if(req.find(FieldComponents::Physical::PHI)->second)
          {
             // Toroidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Add::id());
 
             // Poloidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Slaplr::id());
+            transform.back().addEdge(Backward::OversinDphi::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2D1R1::id());
+            transform.back().addEdge(Backward::OversinDphi::id());
+            transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::PHI, Arithmetics::Sub::id());
+
          }
       } else
       {
