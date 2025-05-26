@@ -6,6 +6,7 @@ COPY . /QuICC.src
 RUN mkdir -p /QuICC.src/build \
   && cd /QuICC.src/build \
   && cmake .. -DCMAKE_BUILD_TYPE=RelWithAssert \
+    -GNinja \
     -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE \
     -DCMAKE_CXX_FLAGS="-march=broadwell" \
     -DMLIR_DIR=/lib/llvm-17/lib/cmake/mlir \

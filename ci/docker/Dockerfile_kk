@@ -6,6 +6,7 @@ COPY . /QuICC.src
 RUN mkdir -p /QuICC.src/build \
   && cd /QuICC.src/build \
   && cmake .. -DCMAKE_BUILD_TYPE=Release \
+    -GNinja \
     -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE \
     -DQUICC_USE_KOKKOS=ON \
     -DMLIR_DIR=/lib/llvm-17/lib/cmake/mlir \
