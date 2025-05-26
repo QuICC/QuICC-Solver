@@ -16,4 +16,4 @@ RUN mkdir -p /QuICC.src/build \
     -DQUICC_PROFILE_NATIVE_SAMPLE=500 \
     -DPETSC_DIR=/opt/view \
     -DSLEPC_DIR=/opt/view \
-  && make -j $(grep processor /proc/cpuinfo | wc -l)
+  && ninja -j $(grep processor /proc/cpuinfo | wc -l)

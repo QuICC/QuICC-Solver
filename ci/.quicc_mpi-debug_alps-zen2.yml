@@ -12,8 +12,8 @@ build-quicc-base:
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-zen2
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:881ca97a49afd300d29fc4289c43d420
-    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_alps-zen2:881ca97a49afd300d29fc4289c43d420
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:8a19031c9ebe88a284607a1ad2e23102
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_alps-zen2:8a19031c9ebe88a284607a1ad2e23102
     SECONDARY_IMAGE_USERNAME: quicc
     SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
@@ -22,7 +22,7 @@ build-quicc:
   variables:
     DOCKERFILE: ci/docker/Dockerfile_mpi-debug
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi-debug_alps-zen2:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:881ca97a49afd300d29fc4289c43d420"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:8a19031c9ebe88a284607a1ad2e23102"]'
 ci-cache-cleanup:
   extends: .alps-zen2_runner
   stage: cleanup

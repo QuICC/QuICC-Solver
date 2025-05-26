@@ -7,7 +7,7 @@ ARG NUM_PROCS
 # use spack-install-helper that has all the spack boilerplate
 # First argument is the target machine, the rest are spack specs
 RUN spack-install-helper --target alps-gh200 \
-    "git" "cmake" "valgrind" "py-scipy" "py-filelock" "py-tabulate" "py-lxml" "vim +python +perl +lua" \
+    "git" "cmake" "ninja" "valgrind" "py-scipy" "py-filelock" "py-tabulate" "py-lxml" "vim +python +perl +lua" \
     "fftw" "hdf5" "openblas" "boost@1.78.0" "kokkos +wrapper +cuda_lambda" "kokkos-kernels"
 
 
