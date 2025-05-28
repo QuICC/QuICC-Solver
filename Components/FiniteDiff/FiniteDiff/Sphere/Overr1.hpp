@@ -59,12 +59,19 @@ namespace Sphere {
       rOut.resize(nR, nR);
 
       std::vector<Eigen::Triplet<T>> coeffs;
-      for(int i = 0; i < nR; i++)
+      coeffs.emplace_back(0,0, 0_mp);
+      for(int i = 1; i < nR; i++)
       {
          coeffs.emplace_back(i,i, 1_mp/igrid(i));
       }
 
       rOut.setFromTriplets(coeffs.begin(), coeffs.end());
+
+      // Zero r = 0 and r = 1
+      Internal::Array qid = Internal::Array::Ones(igrid.size());
+      qid(0) = 0;
+      qid(nR-1) = 0;
+      rOut = qid.asDiagonal() * rOut;
    }
 
 } // namespace Sphere

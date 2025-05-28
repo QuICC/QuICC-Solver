@@ -65,6 +65,12 @@ namespace Sphere {
       }
 
       rOut.setFromTriplets(coeffs.begin(), coeffs.end());
+
+      // Zero r = 0 and r = 1
+      Internal::Array qid = Internal::Array::Ones(igrid.size());
+      qid(0) = 0;
+      qid(nR-1) = 0;
+      rOut = qid.asDiagonal() * rOut;
    }
 
 } // namespace Sphere

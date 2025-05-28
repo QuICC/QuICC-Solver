@@ -62,6 +62,13 @@ namespace Sphere {
       this->fdMatrices(wMat, igrid, this->mOrder, 1);
 
       rOut = wMat.at(1);
+
+      Internal::Array qid = Internal::Array::Ones(igrid.size());
+      qid(0) = 0;
+      qid(nR-1) = 0;
+
+      // Zero r = 0 and r = 1
+      rOut = qid.asDiagonal() * rOut;
    }
 
 } // namespace Sphere

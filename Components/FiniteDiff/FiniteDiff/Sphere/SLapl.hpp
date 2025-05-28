@@ -68,12 +68,15 @@ namespace Sphere {
          invgrid(i) = 1_mp/igrid(i);
       }
 
-      Internal::Array qid = Internal::Array::Ones(igrid.size());
-      qid(0) = 0;
-
-      rOut = qid.asDiagonal()*wMat.at(2);
+      rOut = wMat.at(2);
       rOut += 2_mp*invgrid.asDiagonal()*wMat.at(1);
       rOut -= static_cast<Internal::MHDFloat>(l*(l+1))*invgrid.array().pow(2).matrix().asDiagonal();
+
+      // Zero r = 0 and r = 1
+      Internal::Array qid = Internal::Array::Ones(igrid.size());
+      qid(0) = 0;
+      qid(nR-1) = 0;
+      rOut = qid.asDiagonal() * rOut;
    }
 
 } // namespace Sphere
