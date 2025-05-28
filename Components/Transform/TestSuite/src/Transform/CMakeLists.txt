@@ -6,4 +6,5 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_TEST_LIB} ${QUICC_CMAKE_SRC_VISIB
 add_subdirectory(Chebyshev)
 add_subdirectory(ALegendre)
 add_subdirectory(Fourier)
+add_subdirectory(FiniteDiff)
 add_subdirectory(Worland)

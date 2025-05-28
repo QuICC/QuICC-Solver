@@ -21,6 +21,10 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   WFT.cpp
   WFTBuilder.cpp
   WFTMesher.cpp
+  xLF.cpp
+  xLFlBuilder.cpp
+  xLFmBuilder.cpp
+  xLFMesher.cpp
   SLFMesher.cpp
   SLFl.cpp
   SLFlBuilder.cpp
@@ -31,4 +35,9 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   WLFlBuilder.cpp
   WLFm.cpp
   WLFmBuilder.cpp
+  FdWLFl.cpp
+  FdWLFlBuilder.cpp
+  FdWLFm.cpp
+  FdWLFmBuilder.cpp
+  FdWLFMesher.cpp
 )

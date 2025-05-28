@@ -68,7 +68,7 @@ namespace Worland {
    {
       if(this->mIGrid.size() == 0 || this->mIWeights.size() == 0)
       {
-         throw std::logic_error("Transform has not been initialised!");
+         throw std::logic_error("Worland transform has not been initialised!");
       }
 
       return this->mIGrid.cast<MHDFloat>();

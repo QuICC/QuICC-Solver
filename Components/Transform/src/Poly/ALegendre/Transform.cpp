@@ -72,7 +72,7 @@ namespace ALegendre {
    {
       if(this->mIGrid.size() == 0 || this->mThGrid.size() == 0 || this->mIWeights.size() == 0)
       {
-         throw std::logic_error("Transform has not been initialised!");
+         throw std::logic_error("ALegendre transform has not been initialised!");
       }
 
       return this->mThGrid;

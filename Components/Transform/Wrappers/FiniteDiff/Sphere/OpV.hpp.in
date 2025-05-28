@@ -1,0 +1,124 @@
+/**
+ * @file @Op@@Tag@.hpp.inc
+ * @brief Wrapper of the Finite Differences Sphere @Op@ @Kind@
+ */
+#pragma once
+@Layout@
+
+// System includes
+//
+#include <vector>
+#include <complex>
+@HppHeaders@
+
+// Project includes
+//
+#include "Types/Typedefs.hpp"
+#include "QuICC/Transform/FiniteDiff/Sphere/@Kind@/I@Kind@.hpp"
+#include "QuICC/Transform/FiniteDiff/Sphere/Tags.hpp"
+#include "View/View.hpp"
+#include "Operator/Unary.hpp"
+
+namespace QuICC {
+namespace Transform {
+namespace FiniteDiff {
+namespace Sphere {
+namespace @Kind@ {
+
+template <class Impl>
+class @Op@;
+
+/**
+* @brief Implementation of the FiniteDiff based @Op@ @Kind@
+*/
+template<>
+class @Op@<@Tag@>: public I@Kind@
+{
+public:
+
+    /**
+     * @brief Constructor
+     */
+    @Op@() = default;
+
+    /**
+     * @brief Destructor
+     */
+    ~@Op@() = default;
+
+private:
+    /// @brief Replace base @Kind@ init
+    /// we need to be able to propagate igrid/iweights to view ctor
+    /// @param igrid
+    void initOperators(const Internal::Array& igrid) const final;
+
+
+    /// @brief Make operator
+    /// this is not used in the view implementations
+    /// @param op
+    /// @param igrid
+    /// @param iweights
+    /// @param i
+    void makeOperator(Matrix& op, const Internal::Array& igrid, const int i) const final;
+
+    /// @brief
+    /// @param rOut
+    /// @param in
+    void applyOperators(MatrixZ& rOut, const MatrixZ& in) const final;
+
+    /// @brief
+    /// @param rOut
+    /// @param in
+    void applyOperators(Matrix& rOut, const MatrixZ& in) const final;
+
+    /// @brief Apply ith operator
+    /// this is not used in the view implementations
+    /// @param rOut
+    /// @param i
+    /// @param in
+    void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const final;
+
+    // Uniform truncation
+    #ifdef QUICC_FD_SPHERE_ROW_MAJOR
+    using mods_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using op_t = View::View<double, View::@OpAttribute@>;
+    #elif defined QUICC_FD_SPHERE_ALL_ROW_MAJOR
+    using mods_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using op_t = View::View<double, View::@OpAttribute@JIK>;
+    #else
+    using mods_t = View::View<std::complex<double>, View::DCCSC3D>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3D>;
+    using op_t = View::View<double, View::@OpAttribute@JIK>;
+    #endif
+
+    /// @brief Operator backend class pointer
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<@OpInOut@>> mOp;
+
+    /// @brief Output View
+    mutable mods_t mModsView;
+
+    /// @brief Input View
+    mutable phys_t mPhysView;
+
+    /// @brief Temporary storage for flattened output
+    mutable std::vector<std::complex<double>> mModsFlat;
+
+    /// @brief Temporary storage for flattened input
+    mutable std::vector<std::complex<double>> mPhysFlat;
+
+    /// @brief Data pointers
+    mutable std::vector<std::uint32_t> mDataPointers;
+
+    /// @brief Data indices
+    mutable std::vector<std::uint32_t> mDataIndices;
+
+    @Storage@
+};
+
+} // namespace @Kind@
+} // namespace Sphere
+} // namespace FiniteDiff
+} // namespace Transform
+} // namespace QuICC

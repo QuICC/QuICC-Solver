@@ -2,6 +2,7 @@ set(tags
   Default
   GaussianQuadrature
   Fft
+  FiniteDiff
   Uniform
   Triangular
   Trapezoidal

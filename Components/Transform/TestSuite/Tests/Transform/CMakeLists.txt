@@ -6,5 +6,6 @@ add_subdirectory(Chebyshev)
 add_subdirectory(ALegendre)
 add_subdirectory(Fourier)
 add_subdirectory(Worland)
+add_subdirectory(FiniteDiff)
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)

@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "QuICC/SpatialScheme/ISpatialScheme.hpp"
+#include "QuICC/SpatialScheme/3D/xLF.hpp"
 #include "QuICC/SpatialScheme/IBuilder.hpp"
 
 namespace QuICC {
@@ -22,7 +22,7 @@ namespace SpatialScheme {
    /**
     * @brief ID of the sphere Worland(poly) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme with spectral l ordering
     */
-   class WLFl: public ISpatialScheme
+   class WLFl: public xLF
    {
       public:
          /**
@@ -64,26 +64,6 @@ namespace SpatialScheme {
           * @brief Create spectral decomposition tools
           */
          std::shared_ptr<Equations::Tools::ICoupling> createCouplingTools(const Equations::CouplingIndexType indexType) const final;
-
-         /**
-          * @brief Get variant forward transform data type with correct type ininitialized
-          */
-         VariantTransformDataPointer fwdPtr(const Dimensions::Transform::Id id) const final;
-
-         /**
-          * @brief Get variant forward transform data type with correct type ininitialized
-          */
-         VariantTransformDataPointer bwdPtr(const Dimensions::Transform::Id id) const final;
-
-         /**
-          * @brief Create variant scalar variable
-          */
-         ScalarVariable createSVar(std::shared_ptr<Resolution> spRes) const final;
-
-         /**
-          * @brief Create variant vector variable
-          */
-         VectorVariable createVVar(std::shared_ptr<Resolution> spRes) const final;
 
       protected:
 

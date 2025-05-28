@@ -12,9 +12,8 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
-#include "QuICC/SpatialScheme/3D/IRegularSHmlBuilder.hpp"
+#include "QuICC/SpatialScheme/3D/xLFmBuilder.hpp"
 #include "QuICC/Transform/TransformSetup.hpp"
 
 namespace QuICC {
@@ -24,7 +23,7 @@ namespace SpatialScheme {
    /**
     * @brief Implementation of the sphere Worland(poly) + Spherical harmonics (Associated Legendre(poly) +  Fourier) scheme with spectral m ordering
     */
-   class WLFmBuilder: public IRegularSHmlBuilder
+   class WLFmBuilder: public xLFmBuilder
    {
       public:
          /**
@@ -51,11 +50,6 @@ namespace SpatialScheme {
           */
          void addTransformSetups(SharedResolution spRes) const final;
 
-         /**
-          * @brief Spectral ordering is different from transform
-          */
-         bool sameSpectralOrdering() const final;
-
       protected:
          /**
           * @brief Initialise the domain dimensions
@@ -67,16 +61,6 @@ namespace SpatialScheme {
           * @brief Construct setup object for first transform
           */
          Transform::SharedTransformSetup  spSetup1D(SharedResolution spRes) const;
-
-         /**
-          * @brief Construct setup object for second transform
-          */
-         Transform::SharedTransformSetup  spSetup2D(SharedResolution spRes) const;
-
-         /**
-          * @brief Construct setup object for third transform
-          */
-         Transform::SharedTransformSetup  spSetup3D(SharedResolution spRes) const;
    };
 
 } // SpatialScheme

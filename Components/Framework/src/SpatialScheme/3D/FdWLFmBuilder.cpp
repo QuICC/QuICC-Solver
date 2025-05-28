@@ -1,0 +1,272 @@
+/**
+ * @file FdWLFmBuilder.cpp
+ * @brief Source of the Finite Differences sphere + Spherical Harmonics (Associated Legendre(poly) + Fourrier) scheme implementation with spectral m ordering
+ */
+
+// System includes
+//
+#include <set>
+
+// Project includes
+//
+#include "QuICC/SpatialScheme/3D/FdWLFmBuilder.hpp"
+#include "Environment/QuICCEnv.hpp"
+#include "QuICC/Framework/MpiFramework.hpp"
+#include "QuICC/Transform/FiniteDiff/Setup.hpp"
+#include "QuICC/Transform/Setup/FiniteDiff.hpp"
+#include "QuICC/SpatialScheme/3D/FdWLFMesher.hpp"
+
+namespace QuICC {
+
+namespace SpatialScheme {
+
+   void FdWLFmBuilder::tuneResolution(SharedResolution spRes, const Parallel::SplittingDescription& descr)
+   {
+      this->tuneMpiResolution(descr);
+
+      // Create spectral space sub communicators
+      #if defined QUICC_MPI && defined QUICC_MPISPSOLVE
+         // MPI error code
+         int ierr;
+
+         // Get world group
+         MPI_Group world;
+         MPI_Group group;
+         ierr = MPI_Comm_group(MPI_COMM_WORLD, &world);
+         QuICCEnv().check(ierr, 811);
+
+         // Create minimial MPI group
+         ierr = MPI_Group_incl(world, MpiFramework::transformCpus(0).size(), MpiFramework::transformCpus(0).data(), &group);
+         QuICCEnv().check(ierr, 812);
+
+         // Create minimial MPI communicator
+         MPI_Comm comm;
+         ierr = MPI_Comm_create(MPI_COMM_WORLD, group, &comm);
+         QuICCEnv().check(ierr, 813);
+
+         const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA1D);
+
+         // Initialise the ranks with local rank
+         std::vector<std::set<int> >  ranks;
+         ArrayI modes(tRes.dim<Dimensions::Data::DAT3D>());
+         std::map<int, int>  mapModes;
+         int k_ = 0;
+         for(int k = 0; k < spRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL); ++k)
+         {
+            ranks.push_back(std::set<int>());
+            if(k_ < tRes.dim<Dimensions::Data::DAT3D>() && k == tRes.idx<Dimensions::Data::DAT3D>(k_))
+            {
+               ranks.back().insert(QuICCEnv().id());
+               modes(k_) = tRes.idx<Dimensions::Data::DAT3D>(k_);
+               mapModes.insert(std::make_pair(tRes.idx<Dimensions::Data::DAT3D>(k_),k));
+               k_++;
+            }
+         }
+
+         // Loop over all cpus
+         int commId;
+         int globalCpu = QuICCEnv().id();
+         ierr = MPI_Comm_rank(comm, &commId);
+         QuICCEnv().check(ierr, 814);
+         ArrayI tmp;
+         for(int commCpu = 0; commCpu < MpiFramework::transformCpus(0).size(); ++commCpu)
+         {
+            int size;
+            if(commCpu == commId)
+            {
+               // Send the size
+               size = modes.size();
+               ierr = MPI_Bcast(&size, 1, MPI_INT, commCpu, comm);
+               QuICCEnv().check(ierr, 815);
+               MPI_Barrier(comm);
+
+               // Send global CPU rank
+               globalCpu = QuICCEnv().id();
+               ierr = MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
+               QuICCEnv().check(ierr, 816);
+               MPI_Barrier(comm);
+
+               // Send modes
+               ierr = MPI_Bcast(modes.data(), modes.size(), MPI_INT, commCpu, comm);
+               QuICCEnv().check(ierr, 817);
+               MPI_Barrier(comm);
+            } else
+            {
+               // Get size
+               ierr = MPI_Bcast(&size, 1, MPI_INT, commCpu, comm);
+               QuICCEnv().check(ierr, 818);
+               MPI_Barrier(comm);
+
+               // Get global CPU rank
+               ierr = MPI_Bcast(&globalCpu, 1, MPI_INT, commCpu, comm);
+               QuICCEnv().check(ierr, 819);
+               MPI_Barrier(comm);
+
+               // Receive modes
+               tmp.resize(size);
+               ierr = MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, commCpu, comm);
+               QuICCEnv().check(ierr, 820);
+               MPI_Barrier(comm);
+
+               std::map<int,int>::iterator mapIt;
+               for(int i = 0; i < size; i++)
+               {
+                  mapIt = mapModes.find(tmp(i));
+                  if(mapIt != mapModes.end())
+                  {
+                     ranks.at(mapIt->second).insert(globalCpu);
+                  }
+               }
+            }
+
+            // Synchronize
+            QuICCEnv().synchronize();
+         }
+
+         MpiFramework::initSubComm(MpiFramework::SPECTRAL, tRes.dim<Dimensions::Data::DAT3D>());
+
+         std::set<int>  subRanks;
+         int i_ = 0;
+         for(size_t i = 0; i < ranks.size(); i++)
+         {
+            subRanks.clear();
+            for(int cpu = 0; cpu < spRes->nCpu(); ++cpu)
+            {
+               int size;
+               if(cpu == QuICCEnv().id())
+               {
+                  size = ranks.at(i).size();
+                  ierr = MPI_Bcast(&size, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 821);
+                  QuICCEnv().synchronize();
+
+                  if(size > 0)
+                  {
+                     tmp.resize(size);
+                     int j = 0;
+                     for(auto sIt = ranks.at(i).begin(); sIt != ranks.at(i).end(); ++sIt)
+                     {
+                        tmp(j) = *sIt;
+                        ++j;
+                        subRanks.insert(*sIt);
+                     }
+                     ierr = MPI_Bcast(tmp.data(), size, MPI_INT, cpu, MPI_COMM_WORLD);
+                     QuICCEnv().check(ierr, 822);
+                     QuICCEnv().synchronize();
+                  }
+               } else
+               {
+                  // Get size
+                  ierr = MPI_Bcast(&size, 1, MPI_INT, cpu, MPI_COMM_WORLD);
+                  QuICCEnv().check(ierr, 823);
+                  QuICCEnv().synchronize();
+
+                  // Receive ranks
+                  if(size > 0)
+                  {
+                     tmp.resize(size);
+                     ierr = MPI_Bcast(tmp.data(), tmp.size(), MPI_INT, cpu, MPI_COMM_WORLD);
+                     QuICCEnv().check(ierr, 824);
+                     QuICCEnv().synchronize();
+
+                     for(int j = 0; j < size; ++j)
+                     {
+                        subRanks.insert(tmp(j));
+                     }
+                  }
+               }
+
+               // Synchronize
+               QuICCEnv().synchronize();
+            }
+
+            MpiFramework::setSubComm(MpiFramework::SPECTRAL, i_, subRanks);
+
+            if(i_ < tRes.dim<Dimensions::Data::DAT3D>() && i == static_cast<size_t>(tRes.idx<Dimensions::Data::DAT3D>(i_)))
+            {
+               i_++;
+            }
+         }
+
+         // Free communicator
+         ierr = MPI_Comm_free(&comm);
+         QuICCEnv().check(ierr, 825);
+      #endif //defined QUICC_MPI && defined QUICC_MPISPSOLVE
+   }
+
+   void FdWLFmBuilder::addTransformSetups(SharedResolution spRes) const
+   {
+      // Add setup for first transform
+      auto  spS1D = this->spSetup1D(spRes);
+      spRes->addTransformSetup(Dimensions::Transform::TRA1D, spS1D);
+
+      // Setup 2D/3D
+      xLFmBuilder::addTransformSetups(spRes);
+   }
+
+   Transform::SharedTransformSetup FdWLFmBuilder::spSetup1D(SharedResolution spRes) const
+   {
+      const auto& tRes = *spRes->cpu()->dim(Dimensions::Transform::TRA1D);
+
+      // Get spectral size of the polynomial transform
+      int specSize = spRes->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+
+      Transform::SharedTransformSetup spSetup;
+
+      const auto& opt = this->mOptions.at(0);
+
+      // Finite Differences algorithm setup
+      if(std::find(opt.begin(), opt.end(), Transform::Setup::FiniteDiff::id()) != opt.end())
+      {
+         auto spFdSetup = std::make_shared<Transform::FiniteDiff::Setup>(specSize, this->purpose());
+         spSetup = spFdSetup;
+      }
+      else
+      {
+         throw std::logic_error("Unknown finite differences algorithm");
+      }
+
+      // Get number of transforms and list of indexes
+      for(int i = 0; i < tRes.dim<Dimensions::Data::DAT3D>(); i++)
+      {
+         auto l = tRes.idx<Dimensions::Data::DAT3D>(i);
+         auto nN = tRes.dim<Dimensions::Data::DATB1D>(0,i);
+
+         spSetup->addIndex(l, tRes.dim<Dimensions::Data::DAT2D>(i), nN);
+      }
+
+      spSetup->lock();
+
+      return spSetup;
+   }
+
+   FdWLFmBuilder::FdWLFmBuilder(const ArrayI& dim, const GridPurpose::Id purpose, const std::map<std::size_t,std::vector<std::size_t>>& options)
+      : xLFmBuilder(dim, purpose, options)
+   {
+   }
+
+   void FdWLFmBuilder::setDimensions()
+   {
+      // Set default mesher
+      auto m = std::make_shared<FdWLFMesher>(this->purpose());
+      this->setMesher(m, false);
+      // ... initialize mesher
+      std::vector<int> d = {this->mI, this->mL, this->mM};
+      this->mesher().init(d, this->mOptions);
+
+      // Set dimensions using mesher
+      I3DBuilder::setDimensions();
+
+      //
+      // Change order for 2D, 3D in spectral space
+      //
+
+      // Initialise second dimension of first transform
+      this->setDimension(this->mesher().nSpec2D(), Dimensions::Transform::SPECTRAL, Dimensions::Data::DAT2D);
+
+      // Initialise third dimension of first transform
+      this->setDimension(this->mesher().nSpec3D(), Dimensions::Transform::SPECTRAL, Dimensions::Data::DAT3D);
+   }
+
+} // SpatialScheme
+} // QuICC

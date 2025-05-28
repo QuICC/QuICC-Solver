@@ -1,0 +1,71 @@
+/**
+ * @file Overr1D1R1.hpp
+ * @brief Implementation of 1/r d r  operator 
+ */
+
+#ifndef QUICC_FINITEDIFF_SPHERE_OVERRR1D1R1_HPP
+#define QUICC_FINITEDIFF_SPHERE_OVERRR1D1R1_HPP
+
+// System includes
+//
+
+// Project includes
+//
+#include "Types/Internal/Typedefs.hpp"
+#include "Types/Internal/Literals.hpp"
+#include "FiniteDiff/Sphere/Operator.hpp"
+
+namespace QuICC {
+
+namespace FiniteDiff {
+
+namespace Sphere {
+
+   /**
+    * @brief Implementation of 1/r d r operator
+    */
+   class Overr1D1R1: public Operator
+   {
+      public:
+         /**
+          * @brief Constructor
+          */
+         Overr1D1R1(const size_t order);
+
+         /**
+          * @brief Constructor
+          */
+         Overr1D1R1();
+
+         /**
+          * @brief Destructor
+          */
+         ~Overr1D1R1() = default;
+
+         /**
+          * @brief Compute operator on grid
+          */
+         template <typename T> void compute(Eigen::SparseMatrix<T>& rOut , const int l, const Internal::Array& igrid);
+
+      private:
+
+   };
+
+   template <typename T>
+   void Overr1D1R1::compute(Eigen::SparseMatrix<T>& rOut, const int l, const Internal::Array& igrid)
+   {
+      using namespace Internal::Literals;
+      const int nR = igrid.size();
+      rOut.resize(nR, nR);
+
+      std::vector<Internal::SparseMatrix> wMat;
+      this->fdMatrices(wMat, igrid, this->mOrder, 1);
+
+      rOut = igrid.array().pow(-1).matrix().asDiagonal()*wMat.at(1)*igrid.asDiagonal();
+   }
+
+} // namespace Sphere
+} // namespace FiniteDiff
+} // namespace QuICC
+
+#endif // QUICC_FINITEDIFF_SPHERE_OVERRR1D1R1_HPP

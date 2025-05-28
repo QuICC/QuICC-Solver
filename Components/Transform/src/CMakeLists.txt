@@ -4,4 +4,5 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
 )
 
 add_subdirectory(Fft)
+add_subdirectory(FiniteDiff)
 add_subdirectory(Poly)
