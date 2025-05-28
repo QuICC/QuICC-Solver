@@ -29,8 +29,20 @@ namespace Sphere {
       public:
          /**
           * @brief Constructor
+          *
+          * @param order   Order of accuracy
+          * @param zTop    Zero rows at top
+          * @param zBot    Zero rows at bottom
           */
-         Id(const size_t order);
+         Id(const size_t order, const std::size_t zTop, const std::size_t zBot);
+
+         /**
+          * @brief Constructor
+          *
+          * @param zTop    Zero rows at top
+          * @param zBot    Zero rows at bottom
+          */
+         Id(const std::size_t zTop, const std::size_t zBot);
 
          /**
           * @brief Constructor
@@ -48,6 +60,16 @@ namespace Sphere {
          template <typename T> void compute(Eigen::SparseMatrix<T>& rOut , const int l, const Internal::Array& igrid);
 
       private:
+         /**
+          * @brief Zero rows at top
+          */
+         std::size_t mZtop;
+
+         /**
+          * @brief Zero rows at bottom
+          */
+         std::size_t mZbot;
+
 
    };
 
@@ -59,7 +81,7 @@ namespace Sphere {
       rOut.resize(nR, nR);
 
       std::vector<Eigen::Triplet<T>> coeffs;
-      for(int i = 0; i < nR; i++)
+      for(int i = static_cast<int>(this->mZtop); i < nR - static_cast<int>(this->mZbot); i++)
       {
          coeffs.emplace_back(i,i, 1_mp);
       }

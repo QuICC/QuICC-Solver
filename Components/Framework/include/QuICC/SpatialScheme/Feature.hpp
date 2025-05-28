@@ -64,6 +64,8 @@ namespace SpatialScheme {
       SolveFourthOrder,
       /// Split fourth order equation into 2 second order
       SplitFourthOrder,
+      /// Does not use quasi-inverse
+      NoQuasiInverse,
    };
 } // SpatialScheme
 } // QuICC

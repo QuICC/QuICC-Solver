@@ -59,7 +59,6 @@ namespace Sphere {
           * @brief Scheme order
           */
          std::size_t mOrder;
-
    };
 
 } // namespace Sphere

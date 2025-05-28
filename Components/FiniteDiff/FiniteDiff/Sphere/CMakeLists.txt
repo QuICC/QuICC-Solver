@@ -10,3 +10,4 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}
   UniformRadialGrid.cpp
   )
 
+add_subdirectory(Boundary)

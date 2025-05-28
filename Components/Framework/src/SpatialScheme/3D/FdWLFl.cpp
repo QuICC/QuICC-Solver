@@ -36,6 +36,7 @@ namespace SpatialScheme {
       this->enable(Feature::FourierIndex2);
       this->enable(Feature::SpectralMatrix1D);
       this->enable(Feature::SpectralOrdering132);
+      this->enable(Feature::NoQuasiInverse);
    }
 
    void FdWLFl::setImplementation(const std::map<std::size_t,std::vector<std::size_t>>& type)

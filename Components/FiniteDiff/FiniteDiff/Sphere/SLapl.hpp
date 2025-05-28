@@ -62,9 +62,18 @@ namespace Sphere {
       std::vector<Internal::SparseMatrix> wMat;
       this->fdMatrices(wMat, igrid, this->mOrder, 2);
 
-      rOut = wMat.at(2);
-      rOut += 2_mp*igrid.array().pow(-1).matrix().asDiagonal()*wMat.at(1);
-      rOut -= static_cast<Internal::MHDFloat>(l*(l+1))*igrid.array().pow(-2).matrix().asDiagonal();
+      Internal::Array invgrid = Internal::Array::Zero(igrid.size());
+      for(int i = 1; i < igrid.size(); i++)
+      {
+         invgrid(i) = 1_mp/igrid(i);
+      }
+
+      Internal::Array qid = Internal::Array::Ones(igrid.size());
+      qid(0) = 0;
+
+      rOut = qid.asDiagonal()*wMat.at(2);
+      rOut += 2_mp*invgrid.asDiagonal()*wMat.at(1);
+      rOut -= static_cast<Internal::MHDFloat>(l*(l+1))*invgrid.array().pow(2).matrix().asDiagonal();
    }
 
 } // namespace Sphere
