@@ -79,6 +79,8 @@ namespace Datatypes {
           * @brief Initialise the physical gradient values storage
           */
          void initPhysicalGradient(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps);
+         // overload for tensor form of the gradient acting on a vector
+         void initPhysicalGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps);
 
          /**
           * @brief Initialise the physical curl values storage
@@ -171,6 +173,15 @@ namespace Datatypes {
       for(size_t i = 0; i < this->mDomains.size(); i++)
       {
          this->mDomains.at(i).initPhysicalGradient(id, comps);
+      }
+   }
+   // overload for tensor form of the gradient acting on a vector
+   template <typename TVariable, int DOMAINS> void  VariableDomain<TVariable,DOMAINS>::initPhysicalGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps)
+   {
+      // Loop over all domains
+      for(size_t i = 0; i < this->mDomains.size(); i++)
+      {
+         this->mDomains.at(i).initPhysicalGradient(comps);
       }
    }
 

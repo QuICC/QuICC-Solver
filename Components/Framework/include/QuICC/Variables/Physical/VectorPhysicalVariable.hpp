@@ -225,6 +225,7 @@ namespace Datatypes {
    template <typename TScalar> inline const TensorField<TScalar,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar>::grad() const
    {
       // Safety assertion
+      
       assert(this->mTGrad);
 
       return *this->mTGrad;
@@ -349,6 +350,7 @@ namespace Datatypes {
    template <typename TScalar> void VectorPhysicalVariable<TScalar>::initPhysicalGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps)
    {
       // Safety assert
+
       assert(! this->mTGrad);
 
       this->mTGrad = std::make_shared<TensorField<TScalar,FieldComponents::Physical::Id> >(this->res().spPhysicalSetup(), comps);

@@ -56,14 +56,12 @@ namespace Physical {
    void SphericalViscousDissipationAnelastic::set(Framework::Selector::PhysicalScalarField &rS,
                                              const Resolution& res, 
                                              const Array& r, 
-                                             const Array& cosTheta, 
-                                             const Array& sinTheta,
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              //const Datatypes::SymmetricTensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV,
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT,
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // intended for derivative of log(Rho)
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV, // Viscosity
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT, // Temperature
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    { /* TO BE IIMPLEMENTED IF NEEDED*/}
@@ -71,20 +69,16 @@ namespace Physical {
    void SphericalViscousDissipationAnelastic::add(Framework::Selector::PhysicalScalarField &rS,
                                              const Resolution& res, 
                                              const Array& r, 
-                                             const Array& cosTheta, 
-                                             const Array& sinTheta,
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
-                                             //const Datatypes::SymmetricTensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV,
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT,
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // intended for derivative of log(Rho)
+                                             const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV, // Viscosity
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT, // Temperature
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
-      int nTh;
-      int iTh_;
       int iR_;
 
       auto nu        = pV->evaluate(r, 0, 0); 
@@ -94,25 +88,18 @@ namespace Physical {
 
       for(int iR = 0; iR < nR; ++iR)
       {
-         iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);
-         nTh = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR); 
-         
-         for(int iTh = 0; iTh < nTh; ++iTh)
-         {
-            iTh_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR);
+         iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);         
 
-            rS.addProfile(c* 2*Rho(iR_)*nu(iR_) * (
-                                                   // e_rr = dvr/dr
-                                                   v.comp(FieldComponents::Physical::R).profile(iTh,iR)
-                                                   )/T(iR_), iTh, iR);
-            
-            // coriolis example:
-            // rS.subProfile(c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
-            //advection example:
-            //rS.setSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array() 
-            // * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-            // / Rho(iR_) / Rho(iR_)).matrix(), iR);
-         }
+         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
+                                                // e_rr
+                                                v.comp(FieldComponents::Physical::R).slice(iR).array()
+                                                )/T(iR_)).matrix(), iR);
+         
+         //advection example:
+         //rS.setSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array() 
+         // * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+         // / Rho(iR_) / Rho(iR_)).matrix(), iR);
+         
       }
          
       
@@ -127,14 +114,12 @@ namespace Physical {
    void SphericalViscousDissipationAnelastic::sub(Framework::Selector::PhysicalScalarField &rS,
                                              const Resolution& res, 
                                              const Array& r, 
-                                             const Array& cosTheta, 
-                                             const Array& sinTheta,
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              //const Datatypes::SymmetricTensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV,
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT,
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // intended for derivative of log(Rho)
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV, // Viscosity
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT, // Temperature
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    { /* TO BE IIMPLEMENTED IF NEEDED*/}
