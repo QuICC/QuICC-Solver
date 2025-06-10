@@ -7,6 +7,7 @@ set(tags
   I2CurlNl
   I2ScalarNl
   NegI2CurlCurlNl
+  NegI2rCurlCurlNl
   NegI4CurlCurlNl
   Scalar
   ScalarNl

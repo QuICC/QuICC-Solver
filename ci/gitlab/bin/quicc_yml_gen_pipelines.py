@@ -5,7 +5,7 @@ import os
 from typing import NamedTuple
 from quicc.gitlab.pipelines import config, base_pipeline, \
     libtest_pipeline, model_pipeline, model_pipeline_notiming, \
-    model_perf_pipeline, libtime_sweep_pipeline
+    model_perf_pipeline, libtime_sweep_pipeline, model_stability_pipeline
 
 if __name__ == '__main__':
     # Build only pipelines
@@ -24,6 +24,13 @@ if __name__ == '__main__':
         pipe = libtest_pipeline(c)
         pipe.write()
 
+    # Model stability without timing pipelines
+    model_stability_confs = [
+        config('petsc-mpi', 'daint-mc', 'petsc')
+        ]
+    for c in model_stability_confs:
+        pipe = model_stability_pipeline(c)
+        pipe.write()
 
     # Model without timing pipelines
     model_notiming_confs = [
@@ -38,7 +45,8 @@ if __name__ == '__main__':
         config('mpi', 'daint-mc'),
         config('kk', 'daint-mc'),
         config('kkgpu', 'daint-gpu'),
-        config('kkgpu', 'alps-a100')
+        config('kkgpu', 'alps-a100'),
+        config('kkgpu', 'alps-gh200')
         ]
     for c in model_confs:
         pipe = model_pipeline(c)
@@ -48,7 +56,8 @@ if __name__ == '__main__':
     lib_perf_confs = [
         config('mpi', 'daint-mc'),
         config('kkgpu', 'daint-gpu'),
-        config('kkgpu', 'alps-a100')
+        config('kkgpu', 'alps-a100'),
+        config('kkgpu', 'alps-gh200')
     ]
     for c in lib_perf_confs:
         pipe = libtime_sweep_pipeline(c)

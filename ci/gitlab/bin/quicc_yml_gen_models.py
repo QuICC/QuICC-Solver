@@ -2,7 +2,7 @@
 # Script to generate yml files for QuICC model tests
 #
 from quicc.gitlab.models import default_configs
-from quicc.gitlab.model_pipelines import perf_model, test_model
+from quicc.gitlab.model_pipelines import perf_model, test_model, stability_model
 
 if __name__ == '__main__':
     # Test pipeline
@@ -14,4 +14,8 @@ if __name__ == '__main__':
 
     # Perf pipeline
     pipe = perf_model(default_configs('perf'))
+    pipe.write()
+
+    # Stability pipeline
+    pipe = stability_model(default_configs('petsc-mpi'))
     pipe.write()

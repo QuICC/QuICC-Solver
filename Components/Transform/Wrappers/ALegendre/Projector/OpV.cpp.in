@@ -9,14 +9,13 @@
 // Project includes
 //
 #include "QuICC/Transform/Wrappers/ALegendre/@Kind@/@Op@@Tag@.hpp.inc"
-#include "QuICC/Polynomial/ALegendre/@PolyBuilder@.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
 #include "ViewOps/Quadrature/Op.hpp"
 #include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/Quadrature/Tags.hpp"
-#include "ViewOps/ALegendre/Builder.hpp"
+#include "ViewOps/ALegendre/OpsBuilder.hpp"
 #include "Profiler/Interface.hpp"
 @CppHeaders@
 
@@ -59,10 +58,12 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid, const Internal::Ar
         layers[p] = this->mspSetup->slow(p);
     }
 
-    mOp = std::make_unique<derived_t>(dimensions, layers, mem);
+    mOp = std::make_unique<derived_t>(mem);
     derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
+    derivedOp.allocOp(dimensions, layers);
     auto opView = derivedOp.getOp();
-    builder<op_t, Polynomial::ALegendre::@PolyBuilder@, Internal::Array::Scalar, @Diff@>(opView, igrid, iweights);
+    OpsBuilder<op_t, @Op@_t, @OpDirection@> tBuilder;
+        tBuilder.compute(opView, igrid, iweights);
 
     ///\todo move view setups to init
 
@@ -146,13 +147,14 @@ void @Op@<@Tag@>::applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in)
         {
             for (std::int64_t i = 0; i < inB.rows(); ++i)
             {
-                #ifdef QUICC_AL_ROW_MAJOR
+#if defined QUICC_AL_ROW_MAJOR || defined QUICC_AL_ALL_ROW_MAJOR
                 // copy padded to flattened and transpose
                 mModsFlat[offSet + i*inB.cols()+j] = inB.data()[i+j*in.rows()];
-                #else
-                // copy padded to flattened column
-                mModsFlat[offSet + i+j*inB.rows()] = inB.data()[i+j*in.rows()];
-                #endif
+#else
+               // copy padded to flattened column
+               mModsFlat[offSet + i + j * inB.rows()] =
+                  inB.data()[i + j * in.rows()];
+#endif
             }
         }
         offSet += inB.size();
@@ -177,7 +179,7 @@ void @Op@<@Tag@>::applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in)
 
         OpMatrixR outB = rOut.block(0, start, outRows, cols);
 
-        #ifdef QUICC_AL_ROW_MAJOR
+#if defined QUICC_AL_ROW_MAJOR || defined QUICC_AL_ALL_ROW_MAJOR
         for (std::int64_t j = 0; j < outB.cols(); ++j)
         {
             for (std::int64_t i = 0; i < outB.rows(); ++i)
@@ -186,12 +188,12 @@ void @Op@<@Tag@>::applyOperators(QuICC::MatrixZ& rOut, const QuICC::MatrixZ& in)
                 outB.data()[i+j*rOut.rows()]= mPhysFlat[offSet + i*outB.cols()+j];
             }
         }
-        #else
+#else
         for (std::int64_t i = 0; i < outB.size(); ++i)
         {
             outB.data()[i] = mPhysFlat[offSet + i];
         }
-        #endif
+#endif
 
         offSet += outB.size();
         start += cols;

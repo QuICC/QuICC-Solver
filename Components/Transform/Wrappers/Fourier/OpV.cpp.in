@@ -3,12 +3,11 @@
  * @brief Wrapper of the Fourier @Space@ @Op@ @Kind@
  */
 #include "QuICC/Transform/Wrappers/Fourier/@Space@/@Kind@/@Op@@Tag@.hpp.inc"
-#include "Fft/Fft.hpp"
+// #include "Fft/Fft.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
-#include "ViewOps/Fourier/Tags.hpp"
 #include "ViewOps/Fourier/Util.hpp"
-#include "ViewOps/Fourier/@Space@/@Kind@/D.hpp"
-#include "ViewOps/Fourier/@Space@/Diff.hpp"
+#include "ViewOps/Fourier/@Space@/OpsType.hpp"
+#include "ViewOps/Fourier/Tags.hpp"
 @CppHeader@
 @CuHeader@
 #include "Profiler/Interface.hpp"
@@ -33,10 +32,10 @@ void @Op@<@Tag@>::initBackend() const
     // Make operators
     using namespace QuICC::Transform::Fourier;
     using namespace QuICC::Transform::Fourier::@Space@;
-    using namespace QuICC::Transform::Fourier::@Space@::@Kind@;
 
     auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
-    mOp = std::make_unique<@PtrParam@>(@Mem@);
+    using op_t = OpsType<@ArgOutType@, @ArgInType@, @Op@_t, @OpDirection@, Transform::Fourier::@Tag@>;
+    mOp = std::make_unique<op_t>(@Mem@);
 
     @Alloc@
 }

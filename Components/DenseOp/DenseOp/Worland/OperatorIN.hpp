@@ -4,8 +4,8 @@
  * operator builder with quasi-inverse
  */
 
-#ifndef QUICC_DENSESM_WORLAND_OPERATORIN_HPP
-#define QUICC_DENSESM_WORLAND_OPERATORIN_HPP
+#ifndef QUICC_DENSEOP_WORLAND_OPERATORIN_HPP
+#define QUICC_DENSEOP_WORLAND_OPERATORIN_HPP
 
 // System includes
 //
@@ -13,14 +13,14 @@
 
 // Project includes
 //
-#include "DenseSM/IDenseSMOperator.hpp"
-#include "DenseSM/Worland/GetSuperN.hpp"
+#include "DenseOp/IDenseOpOperator.hpp"
+#include "DenseOp/Worland/GetSuperN.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
-namespace DenseSM {
+namespace DenseOp {
 /// @brief namespace for generic dense spectral Worland operator builders
 namespace Worland {
 
@@ -28,7 +28,7 @@ namespace Worland {
 /// @tparam TPolyBuilder polynomial builder
 /// @tparam TINBuilder IN builder
 template <class TPolyBuilder, class TINBuilder>
-class OperatorIN : IDenseSMOperator
+class OperatorIN : IDenseOpOperator
 {
 public:
    /// @brief ctor
@@ -74,7 +74,7 @@ void OperatorIN<TPolyBuilder, TINBuilder>::compute(Eigen::Ref<Matrix> op,
 }
 
 } // namespace Worland
-} // namespace DenseSM
+} // namespace DenseOp
 } // namespace QuICC
 
-#endif // define QUICC_DENSESM_WORLAND_OPERATORIN_HPP
+#endif // define QUICC_DENSEOP_WORLAND_OPERATORIN_HPP

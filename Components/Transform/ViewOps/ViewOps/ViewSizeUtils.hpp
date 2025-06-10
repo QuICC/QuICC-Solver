@@ -47,6 +47,18 @@ std::size_t getDataSize<DCCSC3D>(const std::array<std::uint32_t, 3> dim,
    return cumWidth * dim[0];
 }
 
+/// @brief Get data size of view of type DCCSC3DJIK
+/// from dimensions and meta data
+/// @param dim
+/// @param meta
+/// @return
+template <>
+std::size_t getDataSize<DCCSC3DJIK>(const std::array<std::uint32_t, 3> dim,
+   const ptrAndIdx& meta)
+{
+   return getDataSize<DCCSC3D>(dim, meta);
+}
+
 /// @brief Get data size of view of type S1CLCSC3D
 /// from dimensions and meta data
 /// @param dim
@@ -67,6 +79,19 @@ std::size_t getDataSize<S1CLCSC3D>(const std::array<std::uint32_t, 3> dim,
    }
    return cumSize;
 }
+
+/// @brief Get data size of view of type S1CLCSC3DJIK
+/// from dimensions and meta data
+/// @param dim
+/// @param meta
+/// @return
+template <>
+std::size_t getDataSize<S1CLCSC3DJIK>(const std::array<std::uint32_t, 3> dim,
+   const ptrAndIdx& meta)
+{
+   return getDataSize<S1CLCSC3D>(dim, meta);
+}
+
 
 } // namespace View
 } // namespace QuICC
