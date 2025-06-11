@@ -275,30 +275,6 @@ namespace TCoord {
             polFwdPathId = Transform::Path::CurlCurlNl::id();
             vBwdPathId = Transform::Path::TorPol::id();
             break;
-         case Test::PathId::BFLOOP_BESSEL_VALUE:
-            isNonlinearPath = false;
-            sFwdPathId = Transform::Path::ValueScalarNl::id();
-            sBwdPathId = Transform::Path::ValueScalar::id();
-            torFwdPathId = Transform::Path::ValueTorPol::id();
-            polFwdPathId = Transform::Path::ValueTorPol::id();
-            vBwdPathId = Transform::Path::ValueTorPol::id();
-            break;
-         case Test::PathId::BFLOOP_BESSEL_NOPENETRATION:
-            isNonlinearPath = false;
-            sFwdPathId = Transform::Path::Empty::id();
-            sBwdPathId = Transform::Path::Empty::id();
-            torFwdPathId = Transform::Path::NoPenetrationTorPol::id();
-            polFwdPathId = Transform::Path::NoPenetrationTorPol::id();
-            vBwdPathId = Transform::Path::NoPenetrationTorPol::id();
-            break;
-         case Test::PathId::BFLOOP_BESSEL_INSULATING:
-            isNonlinearPath = false;
-            sFwdPathId = Transform::Path::Empty::id();
-            sBwdPathId = Transform::Path::Empty::id();
-            torFwdPathId = Transform::Path::InsulatingTorPol::id();
-            polFwdPathId = Transform::Path::InsulatingTorPol::id();
-            vBwdPathId = Transform::Path::InsulatingTorPol::id();
-            break;
          default:
             throw std::logic_error("Test for this transform path id = " + std::to_string(static_cast<int>(test.pathId)) + " is not implemented");
       }

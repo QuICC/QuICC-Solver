@@ -7,7 +7,6 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ITransformSteps.cpp
   ShellTransformSteps.cpp
   SphereTransformSteps.cpp
-  SphereBesselTransformSteps.cpp
   TransformPath.cpp
   TransformPathEdge.cpp
   TransformStepsFactory.cpp

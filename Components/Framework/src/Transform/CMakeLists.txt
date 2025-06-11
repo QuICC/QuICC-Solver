@@ -9,17 +9,14 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB}_transform ${QUICC_CMAKE_SRC_
   DefaultCartesianChebyshevMap.cpp
   DefaultCylinderWorlandMap.cpp
   DefaultShellChebyshevMap.cpp
-  DefaultSphereBesselMap.cpp
   DefaultSphereWorlandMap.cpp
   MixedFourierTransform.cpp
   RegisterAnnulusChebyshevMap.cpp
   RegisterCartesianChebyshevMap.cpp
   RegisterCylinderWorlandMap.cpp
   RegisterShellChebyshevMap.cpp
-  RegisterSphereBesselMap.cpp
   RegisterSphereWorlandMap.cpp
   ShellChebyshevTransform.cpp
   SphereFftWorlandTransform.cpp
-  SphereBesselTransform.cpp
   SphereWorlandTransform.cpp
 )

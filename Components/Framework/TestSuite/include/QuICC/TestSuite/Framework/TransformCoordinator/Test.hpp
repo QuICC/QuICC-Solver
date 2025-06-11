@@ -66,9 +66,6 @@ namespace TCoord {
       {
          BFLOOP = 0,
          NLLOOP,
-         BFLOOP_BESSEL_VALUE,
-         BFLOOP_BESSEL_NOPENETRATION,
-         BFLOOP_BESSEL_INSULATING,
       };
 
       enum class SpectrumId
