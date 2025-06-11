@@ -19,6 +19,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   QuICC::Common
+  QuICC::Environment
   QuICC::Polynomial
   ${QUICC_SPARSESM_COMPONENT_LIB}
   ${QUICC_PYQUICC_COMPONENT_LIB}
@@ -42,7 +43,6 @@ add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB} ALIAS
   "${QUICC_CURRENT_COMPONENT_LIB}")
 
 # Teststuite
-# option(QUICC_TESTSUITE_Cuda "Enable Cuda component testsuite?" OFF)
 include(cmake.d/setup/TestSuite.cmake)
 
 # Export info
