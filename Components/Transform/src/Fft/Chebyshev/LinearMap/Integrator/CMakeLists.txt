@@ -5,6 +5,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   I2D1.cpp
   I2D1_I2.cpp
   I2Y1D1Y1_Zero.cpp
+  I2Y2D1Y1_Zero.cpp
   I2Y1_Zero.cpp
   I2Y2_Zero.cpp
   I4.cpp

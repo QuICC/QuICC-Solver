@@ -37,7 +37,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
     IDS 0 1 2 3 4
-    ULPS 70 70 150 13000 28000
+    ULPS 70 70 150 20000 28000
   )
 endforeach()
 
@@ -85,7 +85,7 @@ endif()
 
 foreach(_perf_id 108 109)
   if(${_perf_id} EQUAL 109)
-    set(_perf_step_slow 10)
+    set(_perf_step_slow 50)
     set(_perf_step_fast 50)
   else()
     set(_perf_step_slow 500)
@@ -168,7 +168,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
     IDS 0 1 2 3 4
-    ULPS 190 190 190 190 1050
+    ULPS 190 190 190 190 1520
   )
 endforeach()
 

@@ -106,6 +106,13 @@ private:
     using modsAbs_t = View::View<double, View::DCCSC3DJIK>;
     using modsRed_t = View::View<double, View::CSC>;
     using op_t = View::View<double, View::@OpAttribute@>;
+    #elif defined QUICC_JW_ALL_ROW_MAJOR
+    using mods_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using physAbs_t = View::View<double, View::DCCSC3DJIK>;
+    using modsAbs_t = View::View<double, View::DCCSC3DJIK>;
+    using modsRed_t = View::View<double, View::CSC>;
+    using op_t = View::View<double, View::@OpAttribute@JIK>;
     #else
     using mods_t = View::View<std::complex<double>, View::DCCSC3D>;
     using phys_t = View::View<std::complex<double>, View::DCCSC3D>;

@@ -48,6 +48,18 @@
     - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiCommTest
     - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiTest
 
+.test-petsc-lib:
+  variables:
+    TEST_NCPU: 'grep processor /proc/cpuinfo | wc -l'
+  script:
+    - pwd
+    - cd /QuICC.src/build
+
+.test-petsc_lib-mpi:
+  script:
+    - pwd
+    - cd /QuICC.src/build
+
 .time-lib-daint-mc:
   script:
     - pwd
@@ -80,4 +92,10 @@
   extends: .time-lib-daint-gpu
 
 .time-lib-sweep-alps-a100:
+  extends: .time-lib-sweep-daint-gpu
+
+.time-lib-alps-gh200:
+  extends: .time-lib-daint-gpu
+
+.time-lib-sweep-alps-gh200:
   extends: .time-lib-sweep-daint-gpu

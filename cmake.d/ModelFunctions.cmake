@@ -26,6 +26,18 @@ endfunction (quicc_create_model_exe)
 
 
 #
+# Create the RunStability executable
+#
+function (quicc_create_stability_exe ModelId ModelLib)
+  if(QUICC_HAVE_STABILITY_SOLVER)
+    quicc_create_all_exe("${ModelId}" "Stability")
+    quicc_add_exe("${ModelId}" "Stability" "${QUICC_EXE_DIR}/RunStability.cpp" "${ModelLib}"
+      EXTRALIBS QuICC::Stability)
+  endif()
+endfunction (quicc_create_stability_exe)
+
+
+#
 # Create the Visu executable
 #
 function (quicc_create_visu_exe ModelId ModelLib)
@@ -71,6 +83,10 @@ endfunction ()
 # Create executable
 #
 function (quicc_add_exe ModelId Postfix ExeSrc ModelLib)
+  # parse inputs
+  set(multiValueArgs EXTRALIBS)
+  cmake_parse_arguments(QAE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
   list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
   # Create simple model name
@@ -87,6 +103,14 @@ function (quicc_add_exe ModelId Postfix ExeSrc ModelLib)
   target_link_libraries(${ExeName}
     ${ModelLib}
     )
+  # Add extra libraries
+  foreach(_lib ${QAE_EXTRALIBS})
+    target_link_libraries(${ExeName}
+      ${_lib}
+      )
+  endforeach()
+
+  # Includes
   target_include_directories(${ExeName} PUBLIC
     "include/"
     )

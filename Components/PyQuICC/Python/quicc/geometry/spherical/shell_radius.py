@@ -201,6 +201,14 @@ def i2r1d1r1(nr, ri, ro, bc, coeff = 1.0):
     mat = coeff*spsp.diags(diags, offsets, format = 'coo')
     return radbc.constrain(mat, ri, ro, bc)
 
+def i2r2d1r1(nr, ri, ro, bc, coeff = 1.0):
+    """Create operator for 2nd integral of r^2 D_r r T_n(x)."""
+
+    diags, offsets = cheb.i2y2d1y1_diags(nr, ri, ro)
+
+    mat = coeff*spsp.diags(diags, offsets, format = 'coo')
+    return radbc.constrain(mat, ri, ro, bc)
+
 def i2r2d1(nr, ri, ro, bc, coeff = 1.0):
     """Create operator for 2nd integral of r^2 D_r T_n(x)."""
 

@@ -35,16 +35,18 @@ class Op : public Operator::UnaryBaseOp<Op<Tout, Tin, Top, Backend>, Tout, Tin>
 {
 public:
    /// @brief internal constructor
-   /// @param dimensions
-   /// @param layers
-   /// \todo template might be MP
-   Op(span<const typename Top::IndexType> dimensions,
-      span<const typename Top::IndexType> layers,
-      std::shared_ptr<QuICC::Memory::memory_resource> mem);
+   /// @param mem memory resource for the operator
+   Op(std::shared_ptr<QuICC::Memory::memory_resource> mem);
    /// @brief default constructor
    Op() = delete;
    /// @brief dtor
    ~Op() = default;
+   /// @brief Allocate operator storage
+   /// @param dimensions
+   /// @param layers
+   void allocOp(span<const typename Top::IndexType> dimensions,
+      span<const typename Top::IndexType> layers);
+
    /// @brief operator accessor
    /// @return operator view
    Top& getOp();
@@ -84,9 +86,7 @@ public:
 
 
 template <class Tout, class Tin, class Top, class Backend>
-Op<Tout, Tin, Top, Backend>::Op(span<const typename Top::IndexType> dimensions,
-   span<const typename Top::IndexType> layers,
-   std::shared_ptr<Memory::memory_resource> mem) :
+Op<Tout, Tin, Top, Backend>::Op(std::shared_ptr<Memory::memory_resource> mem) :
     _mem(mem)
 {
    // forward memory resource if needed
@@ -98,7 +98,13 @@ Op<Tout, Tin, Top, Backend>::Op(span<const typename Top::IndexType> dimensions,
    {
       mImpl = std::make_unique<Backend>(mem);
    }
+}
 
+template <class Tout, class Tin, class Top, class Backend>
+void Op<Tout, Tin, Top, Backend>::allocOp(
+   span<const typename Top::IndexType> dimensions,
+   span<const typename Top::IndexType> layers)
+{
    ///\todo move here in details namespace
    auto meta = getOpMeta<Top>(dimensions, layers);
 
@@ -132,7 +138,7 @@ Op<Tout, Tin, Top, Backend>::Op(span<const typename Top::IndexType> dimensions,
 template <class Tout, class Tin, class Top, class Backend>
 void Op<Tout, Tin, Top, Backend>::applyImpl(Tout& out, const Tin& in)
 {
-   Profiler::RegionFixture<4> fix("Quadrature::Projector::Op::applyImpl");
+   Profiler::RegionFixture<4> fix("Quadrature::Op::applyImpl");
 
    // Apply backend
    mImpl->apply(out, in, _opView);

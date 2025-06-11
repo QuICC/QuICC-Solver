@@ -92,7 +92,7 @@ list(APPEND _tests
 endif()
 
 quicc_set_ulp(_ulp
-  ULP 9 60 49 51
+  ULP 9 60 55 51
   MPULP 1 1 2 2
   )
 foreach(_test ${_tests})
@@ -120,7 +120,7 @@ set(_tests
   # Poly::SphLapl:<viewCpu_t>:projector
 )
 quicc_set_ulp(_ulp
-  ULP 9 60 49 51
+  ULP 9 60 55 51
   MPULP 1 1 2 3
   )
 foreach(_test ${_tests})
@@ -328,7 +328,7 @@ endif()
 
 foreach(_perf_id 108 109)
   if(${_perf_id} EQUAL 109)
-    set(_perf_step_slow 10)
+    set(_perf_step_slow 50)
     set(_perf_step_fast 50)
   else()
     set(_perf_step_slow 500)

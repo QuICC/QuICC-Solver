@@ -1,10 +1,10 @@
 /**
- * @file IDenseSMOperator.hpp
+ * @file IDenseOpOperator.hpp
  * @brief Implementation of the generic interface dense spectral operator
  */
 
-#ifndef QUICC_DENSESM_IDENSESMOPERATOR_HPP
-#define QUICC_DENSESM_IDENSESMOPERATOR_HPP
+#ifndef QUICC_DENSEOP_IDENSEOPOPERATOR_HPP
+#define QUICC_DENSEOP_IDENSEOPOPERATOR_HPP
 
 // System includes
 //
@@ -15,17 +15,17 @@
 
 namespace QuICC {
 /// @brief namespace for generic dense spectral operator builders
-namespace DenseSM {
+namespace DenseOp {
 
 /// @brief base class for dense operator
-class IDenseSMOperator
+class IDenseOpOperator
 {
 public:
    /// @brief ctor
-   IDenseSMOperator() = default;
+   IDenseOpOperator() = default;
 
    /// @brief dtor
-   virtual ~IDenseSMOperator() = default;
+   virtual ~IDenseOpOperator() = default;
 
    /// @brief populate op matrix
    /// @param op
@@ -36,7 +36,7 @@ public:
       const Internal::Array& weights, const std::uint32_t l = 0) = 0;
 };
 
-} // namespace DenseSM
+} // namespace DenseOp
 } // namespace QuICC
 
-#endif // define QUICC_DENSESM_IDENSESMOPERATOR_HPP
+#endif // define QUICC_DENSEOP_IDENSEOPOPERATOR_HPP

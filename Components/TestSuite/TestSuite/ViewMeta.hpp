@@ -51,13 +51,5 @@ dimsAndMeta readDimsAndMeta(const std::string path, const std::string dist,
 View::ptrAndIdx unPackMeta(const std::vector<MHDFloat>& db,
    std::uint32_t maxLayers);
 
-/// @brief util to reconstruc meta from file
-/// Jones Worland metadata is reversed
-/// @param db
-/// @param maxLayers
-/// @return
-View::ptrAndIdx unPackMetaJW(const std::vector<MHDFloat>& db,
-   std::uint32_t maxLayers);
-
 } // namespace TestSuite
 } // namespace QuICC

@@ -7,7 +7,7 @@
 using namespace QuICC::Memory;
 using namespace QuICC::View;
 
-TEST_CASE("Serial DCCSC3D to DCCSC3D 210", "SerialDCCSC3DtoDCCSC3D210")
+TEST_CASE("Serial DCCSC3D to DCCSC3D 201", "SerialDCCSC3DtoDCCSC3D201")
 {
    // FFT out -> AL in
    // Full data and type
@@ -16,10 +16,14 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 210", "SerialDCCSC3DtoDCCSC3D210")
    constexpr size_t K = 2;
 
    constexpr size_t S = M * N * K;
-   std::array<double, S> dataIn = {/*k0*/ 1, 2, 3, 4,
+
+   // clang-format off
+   std::array<double, S> dataIn = {
+      /*k0*/ 1, 2, 3, 4,
       /*k0*/ 5, 6, 7, 8,
       /*k1*/ 9, 10, 11, 12,
       /*k1*/ 13, 14, 15, 16};
+   // clang-format on
 
    // perm = [2 0 1] -> N K M
    std::array<double, S> dataOut;
@@ -69,10 +73,13 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 120", "SerialDCCSC3DtoDCCSC3D120")
    constexpr size_t K = 2;
 
    constexpr size_t S = M * N * K;
-   std::array<double, S> dataIn = {/*k0*/ 1, 2, 3, 4,
+   // clang-format off
+   std::array<double, S> dataIn = {
+      /*k0*/ 1, 2, 3, 4,
       /*k0*/ 5, 6, 7, 8,
       /*k1*/ 9, 10, 11, 12,
       /*k1*/ 13, 14, 15, 16};
+   // clang-format on
 
    // perm = [1 2 0] -> K M N
    std::array<double, S> dataOut;
@@ -113,7 +120,7 @@ TEST_CASE("Serial DCCSC3D to DCCSC3D 120", "SerialDCCSC3DtoDCCSC3D120")
    }
 }
 
-TEST_CASE("Serial S1CLCSC3D to DCCSC3D 210", "SerialS1CLCSC3DtoDCCSC3D210")
+TEST_CASE("Serial S1CLCSC3D to DCCSC3D 201", "SerialS1CLCSC3DtoDCCSC3D201")
 {
    // AL out -> JW in
    // Full data and type
@@ -122,24 +129,29 @@ TEST_CASE("Serial S1CLCSC3D to DCCSC3D 210", "SerialS1CLCSC3DtoDCCSC3D210")
    constexpr size_t K = 3;
 
    constexpr size_t S = (M + (M - 1) + (M - 2)) * N;
-   std::array<double, S> dataIn = {/*k0*/ 1, 2, 3, 4,
+   // clang-format off
+   std::array<double, S> dataIn = {
+      /*k0*/ 1, 2, 3, 4,
       /*k0*/ 5, 6, 7, 8,
       /*k1*/ 9, 10, 11,
       /*k1*/ 12, 13, 14,
       /*k2*/ 15, 16,
-      /*k2*/ 17, 18};
+      /*k2*/ 17, 18
+   };
 
    // perm = [2 0 1] -> N K M
-   std::array<double, S> dataRef = {/*m0*/ 1, 5,
-      /*m0*/ 9, 12,
-      /*m0*/ 15, 17,
+   std::array<double, S> dataRef = {
+      /*m0*/ 1, 5,
       /*m1*/ 2, 6,
-      /*m1*/ 10, 13,
-      /*m1*/ 16, 18,
+      /*m1*/ 9, 12,
       /*m2*/ 3, 7,
-      /*m2*/ 11, 14,
-      /*m3*/ 4,
-      /*m3*/ 8};
+      /*m2*/ 10, 13,
+      /*m2*/ 15, 17,
+      /*m3*/ 4, 8,
+      /*m3*/ 11, 14,
+      /*m3*/ 16, 18
+   };
+   // clang-format on
 
    std::array<double, S> dataOut;
 
@@ -180,25 +192,31 @@ TEST_CASE("Serial DCCSC3D to S1CLCSC3D 120", "SerialDCCSC3DtoS1CLCSC3D120")
    constexpr size_t K = 3;
 
    constexpr size_t S = (M + (M - 1) + (M - 2)) * N;
+
+   // clang-format off
    // N K M
-   std::array<double, S> dataIn = {/*m0*/ 1, 5,
-      /*m0*/ 9, 12,
-      /*m0*/ 15, 17,
+   std::array<double, S> dataIn = {
+      /*m0*/ 1, 5,
       /*m1*/ 2, 6,
-      /*m1*/ 10, 13,
-      /*m1*/ 16, 18,
+      /*m1*/ 9, 12,
       /*m2*/ 3, 7,
-      /*m2*/ 11, 14,
-      /*m3*/ 4,
-      /*m3*/ 8};
+      /*m2*/ 10, 13,
+      /*m2*/ 15, 17,
+      /*m3*/ 4, 8,
+      /*m3*/ 11, 14,
+      /*m3*/ 16, 18
+   };
 
    // perm = [1 2 0] -> M N K
-   std::array<double, S> dataRef = {/*k0*/ 1, 2, 3, 4,
+   std::array<double, S> dataRef = {
+      /*k0*/ 1, 2, 3, 4,
       /*k0*/ 5, 6, 7, 8,
       /*k1*/ 9, 10, 11,
       /*k1*/ 12, 13, 14,
       /*k2*/ 15, 16,
-      /*k2*/ 17, 18};
+      /*k2*/ 17, 18
+   };
+   // clang-format on
 
    std::array<double, S> dataOut;
 

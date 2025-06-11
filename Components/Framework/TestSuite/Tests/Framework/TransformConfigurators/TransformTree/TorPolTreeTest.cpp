@@ -30,6 +30,8 @@
 #include "QuICC/Transform/Forward/I4S.hpp"
 #include "QuICC/Transform/Forward/I2Q.hpp"
 #include "QuICC/Transform/Forward/I2S.hpp"
+#include "QuICC/Transform/Forward/I2rQ.hpp"
+#include "QuICC/Transform/Forward/I2rS.hpp"
 
 void createTorPolTree(std::vector<::QuICC::Transform::TransformPath>& t);
 void createTorPolNLTree(std::vector<::QuICC::Transform::TransformPath>& t);
