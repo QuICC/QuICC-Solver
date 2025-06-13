@@ -144,12 +144,12 @@ namespace Transform {
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::OverlaplhOversinDphi::id());
-            transform.back().addEdge(Forward::P::id(), curlId, Arithmetics::Add::id());
+            transform.back().addEdge(Forward::T::id(), curlId, Arithmetics::Add::id());
 
             transform.push_back(TransformPath(FieldComponents::Physical::PHI, FieldType::VECTOR));
             transform.back().addEdge(Forward::P::id());
             transform.back().addEdge(Forward::OverlaplhD1::id());
-            transform.back().addEdge(Forward::P::id(), curlId, Arithmetics::Sub::id());
+            transform.back().addEdge(Forward::T::id(), curlId, Arithmetics::Sub::id());
 
             // Compute Poloidal component
             transform.push_back(TransformPath(FieldComponents::Physical::R, FieldType::VECTOR));

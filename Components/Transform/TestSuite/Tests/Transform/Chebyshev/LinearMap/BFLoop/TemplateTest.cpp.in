@@ -3,10 +3,6 @@
  * @brief Tests for the linear map Chebyshev based @Operator@ transform loop
  */
 
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -20,7 +16,7 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::Chebyshev::LinearMap;
 
-TEST_CASE( "Error for @Operator@ backward-forward loop", "[@Operator@:@type@]" )
+TEST_CASE( "Error for @Operator@@Impl@ backward-forward loop", "[@CatchTestName@]" )
 {
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -31,14 +27,15 @@ TEST_CASE( "Error for @Operator@ backward-forward loop", "[@Operator@:@type@]" )
    Catch::StringMaker<double>::precision = 15;
 
    // Set type
-   currentts::args().setType("@type@");
+   currentts::args().setType("@Type@");
 
    REQUIRE( (currentts::args().type == ::QuICC::TestSuite::Transform::TestType::BFLOOP && "Test type is bfloop") );
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::Fft::Chebyshev::LinearMap::Projector::@Operator@ Projector;
-   typedef ::QuICC::Transform::Fft::Chebyshev::LinearMap::Integrator::P Integrator;
+   using namespace ::QuICC::Transform::Fft::Chebyshev::LinearMap;
+   typedef Projector::@Operator@@Impl@ Projector;
+   typedef Integrator::P@Impl@ Integrator;
    typedef typename currentts::Tester<Projector,Integrator> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);

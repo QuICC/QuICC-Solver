@@ -3,23 +3,14 @@
  * @brief Source of the implementation of the ASCII spherical harmonics power on radial grid calculation for scalar field in a spherical geometry
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ISphericalScalarRSpectrumWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ISphericalScalarRSpectrumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
@@ -142,7 +133,7 @@ namespace Variable {
             {
                int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storePower(i, l_, m_, factor*spectrum(i, idx));
                }
@@ -169,7 +160,7 @@ namespace Variable {
                   factor = 2.0;
                }
 
-               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(k); i++)
+               for(int i = 0; i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
                {
                   this->storePower(i, l_, m_, factor*spectrum(i, idx));
                }
@@ -232,7 +223,7 @@ namespace Variable {
          // Spectrum
          for(int i = 0; i < this->mPower.rows(); i++)
          {
-            this->mFile << std::left << ioIW() << this->mGrid(i) << "\t" << std::setprecision(ioPrec);
+            this->mFile << std::left << ioIW() << std::setprecision(ioPrec) << this->mGrid(i) << "\t";
             for(int j = 0; j < this->mPower.cols(); j++)
             {
                this->mFile << ioFW(ioPrec) << this->mPower(i,j) << "\t";

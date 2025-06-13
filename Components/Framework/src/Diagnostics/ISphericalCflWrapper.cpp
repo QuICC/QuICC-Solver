@@ -47,8 +47,8 @@ namespace Diagnostics {
    ISphericalCflWrapper::ISphericalCflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic, const std::map<std::size_t,NonDimensional::SharedINumber>& params)
       : ICflWrapper(spVelocity, spMagnetic),
         mcCourant(0.4),
-        mcAlfvenScale(params.find(NonDimensional::CflAlfvenScale::id())->second->value()),
-        mcAlfvenDamping(params.find(NonDimensional::CflAlfvenDamping::id())->second->value()),
+        mcAlfvenScale((params.count(NonDimensional::CflAlfvenScale::id()) > 0) ? params.find(NonDimensional::CflAlfvenScale::id())->second->value() : 0),
+        mcAlfvenDamping((params.count(NonDimensional::CflAlfvenDamping::id()) > 0) ? params.find(NonDimensional::CflAlfvenDamping::id())->second->value() : 0),
         mGlobalCfl(2)
    {
       this->mGlobalCfl.resize(params.count(NonDimensional::CflInertial::id()) + params.count(NonDimensional::CflTorsional::id()));

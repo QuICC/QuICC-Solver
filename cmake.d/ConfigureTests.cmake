@@ -25,12 +25,14 @@
 #     if true add only perf test
 # OPTIONS
 #     add generic options given as cmd:value converted to --cmd value
+# WORKDIR
+#     work directory. Set to QUICC_WORK_DIR if not set.
 #
 
 # support function
 function(__add_test _testname)
   # parse inputs
-  set(oneValueArgs DIS PRF)
+  set(oneValueArgs DIS PRF WORKDIR)
   set(multiValueArgs COMM STP)
   cmake_parse_arguments(_QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -41,6 +43,10 @@ function(__add_test _testname)
   message(DEBUG "_QAT_DIS: ${_QAT_DIS}")
   message(DEBUG "_QAT_STP: ${_QAT_STP}")
   message(DEBUG "_QAT_PRF: ${_QAT_PRF}")
+  if(NOT _QAT_WORKDIR)
+    set(_QAT_WORKDIR "${QUICC_WORK_DIR}")
+  endif()
+  message(DEBUG "_QAT_WORKDIR: ${_QAT_WORKDIR}")
 
   # performance only test
   if(NOT _QAT_PRF)
@@ -48,7 +54,7 @@ function(__add_test _testname)
       NAME ${_testname}
       COMMAND ${_QAT_COMM}
       WORKING_DIRECTORY
-      "${QUICC_WORK_DIR}"
+      "${_QAT_WORKDIR}"
     )
   endif()
   if(_QAT_DIS)
@@ -61,7 +67,7 @@ function(__add_test _testname)
         NAME prof_${_testname}
         COMMAND ${_QAT_COMM} --timeOnly --iter ${_QAT_STP}
         WORKING_DIRECTORY
-        "${QUICC_WORK_DIR}"
+        "${_QAT_WORKDIR}"
       )
     endif()
   endif()
@@ -72,7 +78,7 @@ endfunction()
 function(quicc_add_test target)
   # parse inputs
   set(options PERFONLY)
-  set(oneValueArgs COMMAND KEYWORD ULP DISABLED)
+  set(oneValueArgs COMMAND KEYWORD ULP DISABLED WORKDIR)
   set(multiValueArgs TYPES IDS ULPS STEPS SPLITS OPTIONS)
   cmake_parse_arguments(QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -90,6 +96,11 @@ function(quicc_add_test target)
   message(DEBUG "QAT_DISABLED: ${QAT_DISABLED}")
   message(DEBUG "QAT_PERFONLY: ${QAT_PERFONLY}")
   message(DEBUG "QAT_OPTIONS: ${QAT_OPTIONS}")
+
+  if(NOT _QAT_WORKDIR)
+    set(_QAT_WORKDIR "${QUICC_WORK_DIR}")
+  endif()
+  message(DEBUG "QAT_WORKDIR: ${QAT_WORKDIR}")
 
   set(CatchTestName ${${QAT_KEYWORD}})
   string(REGEX REPLACE "<" "" CatchTestName ${CatchTestName})
@@ -174,6 +185,7 @@ function(quicc_add_test target)
       DIS ${QAT_DISABLED}
       STP ${QAT_STEPS}
       PRF ${QAT_PERFONLY}
+      WORKDIR ${QAT_WORKDIR}
     )
   elseif(${_ids_len} LESS 1)
     foreach(_type ${QAT_TYPES})
@@ -184,6 +196,7 @@ function(quicc_add_test target)
         DIS ${QAT_DISABLED}
         STP ${QAT_STEPS}
         PRF ${QAT_PERFONLY}
+        WORKDIR ${QAT_WORKDIR}
       )
     endforeach()
   elseif(${_types_len} LESS 1)
@@ -226,6 +239,7 @@ function(quicc_add_test target)
         DIS ${QAT_DISABLED}
         STP ${_steps}
         PRF ${QAT_PERFONLY}
+        WORKDIR ${QAT_WORKDIR}
       )
 
       # loop index

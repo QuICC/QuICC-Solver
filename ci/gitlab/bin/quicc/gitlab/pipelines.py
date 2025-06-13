@@ -16,7 +16,8 @@ backend2nodeSize = {
     "daint-mc": 72,
     "daint-gpu": 24,
     "alps-a100": 64,
-    "alps-gh200": 288
+    "alps-gh200": 288,
+    "alps-zen2": 128
 }
 
 """Base class, defines a pipeline that build the docker image, the library and cleans up the runner"""
@@ -32,6 +33,7 @@ class base_pipeline(base_yaml):
         image = 'quicc_'+cnf.tag+'_'+cnf.backend+':$CI_COMMIT_SHA'
         self.path_image = image_location+'/'+image
         self.base_path_image = f'{image_location}/baseimage/quicc_{cnf.image}_{cnf.backend}:{base_md5sum}'
+        self.dockerhub_base_image = f'docker.io/quicc/quicc_{cnf.image}_{cnf.backend}:{base_md5sum}'
         self.docker = 'ci/docker/Dockerfile_'+cnf.tag
 
         # pipeline actions
@@ -67,6 +69,9 @@ class base_pipeline(base_yaml):
                         {
                             'DOCKERFILE': self.base_docker,
                             'PERSIST_IMAGE_NAME': self.base_path_image,
+                            'SECONDARY_IMAGE_NAME': self.dockerhub_base_image,
+                            'SECONDARY_IMAGE_USERNAME': 'quicc',
+                            'SECONDARY_IMAGE_PASSWORD': '$DOCKERHUB_ACCESS_TOKEN'
                         },
                 },
             'build-quicc':
@@ -88,12 +93,8 @@ class base_pipeline(base_yaml):
                     'cleanup',
                 ],
             )
-        if (self.backend == 'gpu'):
-            runner = '.container-runner-daint-gpu'
-        else:
-            runner = '.container-runner-daint'
         self.config['ci-cache-cleanup'] = {
-            'extends': runner,
+            'extends': '.'+self.backend+'_runner',
             'stage': 'cleanup',
             'image': self.path_image,
             'script':
@@ -262,7 +263,7 @@ class model_pipeline(libtime_pipeline):
                     'variables':
                     {
                         # the image is pulled in the lib test stage
-                        'PULL_IMAGE': 'NO',
+                        'PULL_IMAGE': 'YES',
                         'SLURM_NTASKS': tasks,
                         'SLURM_NTASKS_PER_NODE': tasks,
                         'SLURM_CPUS_PER_TASK': str(self.cpus_full_node//int(tasks)),

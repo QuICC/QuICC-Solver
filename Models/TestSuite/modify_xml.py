@@ -20,9 +20,21 @@ except ET.ParseError:
 
     root = ET.fromstring(xml_string)
 
-# Find requested node and update value
+# Find requested node and update value if exists
 node = root.find(args.path)
-node.text = args.value
+if node is not None:
+    node.text = args.value
+else:
+    # Otherwise create the missing node
+    elements = args.path.split('/')
+    parent = root
+    for elem in elements[:-1]:
+        next_node = parent.find(elem)
+        if next_node is None:
+            next_node = ET.SubElement(parent, elem)
+        parent = next_node
+    new_node = ET.SubElement(parent, elements[-1])
+    new_node.text = args.value
 
 # Create new XML file
 tree = ET.ElementTree(root)

@@ -52,7 +52,7 @@ dimsAndMeta readDimsAndMeta(const std::string path, const std::string dist,
 }
 
 View::ptrAndIdx unPackMeta(const std::vector<MHDFloat>& db,
-   std::uint32_t maxLayers)
+   const std::uint32_t maxLayers)
 {
    // Unpack metadata
    std::uint32_t nLayers = db[2];

@@ -26,12 +26,12 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
-   Transform::TestArgs& args();
+Transform::TestArgs& args();
 
-} // LinearMap
-} // Chebyshev
-} // Transform
-} // TestSuite
-} // QuICC
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace Transform
+} // namespace TestSuite
+} // namespace QuICC
 
-#endif //QUICC_TESTSUITE_TRANSFORM_CHEBYSHEV_LINEARMAP_TESTARGS_HPP
+#endif // QUICC_TESTSUITE_TRANSFORM_CHEBYSHEV_LINEARMAP_TESTARGS_HPP

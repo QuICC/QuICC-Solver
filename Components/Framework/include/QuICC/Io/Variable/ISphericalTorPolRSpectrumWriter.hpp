@@ -91,12 +91,12 @@ namespace Variable {
           */
          bool mShowParity;
 
-      private:
          /**
           * @brief Radial grid
           */
          Array mGrid;
 
+      private:
          /**
           * @brief Storage for the Toroidal power
           */

@@ -74,6 +74,14 @@ void readData(Matrix& inData, const std::string& path)
    }
    else
    {
+      // Ignore header
+      int s = infile.peek();
+      while (s == '#')
+      {
+         infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+         s = infile.peek();
+      }
+
       // Get size from first two values
       if (inData.size() == 0)
       {
@@ -90,6 +98,12 @@ void readData(Matrix& inData, const std::string& path)
          for (int j = 0; j < inData.cols(); ++j)
          {
             infile >> inData(i, j);
+            if (infile.fail())
+            {
+               throw std::logic_error(
+                  path + ": Failed to read real data file at (i,j): (" +
+                  std::to_string(i) + "," + std::to_string(j) + ")");
+            }
          }
       }
       infile.close();
@@ -127,6 +141,12 @@ void readData(MatrixZ& inData, const std::string& path)
          {
             infile >> val;
             inData(i, j) = val;
+            if (infile.fail())
+            {
+               throw std::logic_error(
+                  "Failed to read real part of complex data file at (i,j): (" +
+                  std::to_string(i) + "," + std::to_string(j) + ")");
+            }
          }
       }
 
@@ -137,6 +157,13 @@ void readData(MatrixZ& inData, const std::string& path)
          {
             infile >> val;
             inData(i, j) += val * Math::cI;
+            if (infile.fail())
+            {
+               throw std::logic_error("Failed to read  imaginary part of "
+                                      "complex data file at (i,j): (" +
+                                      std::to_string(i) + "," +
+                                      std::to_string(j) + ")");
+            }
          }
       }
       infile.close();
@@ -200,6 +227,12 @@ void readList(Array& inData, const std::string& path)
       for (int i = 0; i < inData.size(); ++i)
       {
          infile >> inData(i);
+         if (infile.fail())
+         {
+            throw std::logic_error(
+               "Failed to read list from data file at (i): (" +
+               std::to_string(i) + ")");
+         }
       }
       infile.close();
    }
@@ -250,7 +283,76 @@ void readList(std::vector<MHDFloat>& inData, const std::string& path)
       {
          MHDFloat tmp;
          infile >> tmp;
+         if (infile.fail())
+         {
+            throw std::logic_error(
+               "Failed to read list from data file at (i): (" +
+               std::to_string(i) + ")");
+         }
          inData[i] = tmp;
+      }
+      infile.close();
+   }
+}
+
+void readBlockData(std::vector<Matrix>& inBlocks, const std::string& path)
+{
+   std::ifstream infile;
+   infile.open(path, std::ios::in | std::ios::binary);
+   if (!infile.is_open())
+   {
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr << "  Couldn't open real input file: " + path << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+
+      for(auto& inData: inBlocks)
+      {
+         inData.resize(0, 0);
+      }
+   }
+   else
+   {
+      for(auto& inData: inBlocks)
+      {
+         // Ignore header
+         int s = infile.peek();
+         while (s == '#' || s == ' ' || s == '\n')
+         {
+            infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            s = infile.peek();
+         }
+
+         // Get size from first two values
+         if (inData.size() == 0)
+         {
+            MHDFloat r;
+            infile >> r;
+            MHDFloat c;
+            infile >> c;
+            inData.resize(static_cast<int>(r), static_cast<int>(c));
+         }
+
+         // Loop over data
+         for (int i = 0; i < inData.rows(); ++i)
+         {
+            for (int j = 0; j < inData.cols(); ++j)
+            {
+               infile >> inData(i, j);
+            }
+         }
+
+         // Ignore rest of the line
+         infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       }
       infile.close();
    }

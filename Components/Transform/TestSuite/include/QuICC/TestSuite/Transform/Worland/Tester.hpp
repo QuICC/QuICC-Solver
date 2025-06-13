@@ -210,11 +210,16 @@ namespace Worland {
       // Read database file
       ParameterType dbParam = {param.at(0)};
       auto spDbSetup = this->buildSetup(dbParam, type);
+
       int dbRows = data.rows();
       int dbCols = spDbSetup->slowSize();
       if(type == TestType::PROJECTOR && ctype == ContentType::INPUT)
       {
          dbRows = spDbSetup->fastSize(0);
+      }
+      else if(type == TestType::REDUCTOR && ctype == ContentType::REFERENCE && data.cols() == 1)
+      {
+         dbRows = 1;
       }
 
       TData dbData = TData::Zero(dbRows, dbCols);

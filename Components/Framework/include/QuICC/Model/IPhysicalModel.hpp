@@ -25,9 +25,9 @@
 #include "QuICC/NonDimensional/registerAll.hpp"
 #include "QuICC/PhysicalNames/registerAll.hpp"
 #include "QuICC/RuntimeStatus/registerAll.hpp"
-#include "QuICC/SolveTiming/registerAll.hpp"
 #include "QuICC/PseudospectralTag/registerAll.hpp"
 #include "QuICC/Transform/Reductor/registerAll.hpp"
+#include "QuICC/SolveTiming/registerAll.hpp"
 
 namespace QuICC {
 

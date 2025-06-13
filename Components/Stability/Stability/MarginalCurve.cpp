@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <boost/math/tools/roots.hpp>
 #include <iostream>
+#include <limits>
 
 // Project includes
 //
@@ -17,9 +18,14 @@
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Io/Variable/StateFileWriter.hpp"
+#include "QuICC/NonDimensional/GrowthRate.hpp"
+#include "QuICC/NonDimensional/MaxIteration.hpp"
 #include "QuICC/NonDimensional/Nev.hpp"
+#include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/Rayleigh.hpp"
 #include "QuICC/NonDimensional/StabilityMode.hpp"
+#include "QuICC/NonDimensional/Tolerance.hpp"
+#include "QuICC/NonDimensional/WriteMtx.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
@@ -30,6 +36,7 @@
 #include "QuICC/Variables/RequirementTools.hpp"
 #include "Stability/LinearStability.hpp"
 #include "Stability/MarginalCurve.hpp"
+#include "Stability/Options.hpp"
 #include "Types/Math.hpp"
 
 namespace QuICC {
@@ -123,6 +130,134 @@ MarginalCurve::~MarginalCurve()
    PetscCallVoid(SlepcFinalize());
 }
 
+void MarginalCurve::processEigenpairs(const std::vector<MHDFloat> ks,
+   std::vector<MHDComplex>& evs, std::vector<std::vector<MHDComplex>>& efs,
+   const Stability::Options& opt)
+{
+   // Scaling options
+   if (opt.scalingType > 0)
+   {
+      const int m = static_cast<int>(ks.at(0));
+      const auto& tRes =
+         *this->mspRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
+
+      for (auto& ef: efs)
+      {
+
+         std::map<std::pair<std::size_t, FieldComponents::Spectral::Id>,
+            std::pair<int, std::complex<MHDFloat>>>
+            infoMax;
+         std::map<std::pair<std::size_t, FieldComponents::Spectral::Id>,
+            std::pair<int, std::complex<MHDFloat>>>
+            infoFirst;
+         std::size_t idx = 0;
+         for (auto fId: this->mspBackend->fieldIds())
+         {
+            std::vector<FieldComponents::Spectral::Id> comps;
+            if (fId == PhysicalNames::Velocity::id() ||
+                fId == PhysicalNames::Magnetic::id())
+            {
+               comps = {FieldComponents::Spectral::TOR,
+                  FieldComponents::Spectral::POL};
+            }
+            else if (fId == PhysicalNames::Temperature::id())
+            {
+               comps = {FieldComponents::Spectral::SCALAR};
+            }
+            else
+            {
+               throw std::logic_error(
+                  "Unknown field for processing eigenfuction");
+            }
+            for (auto cId: comps)
+            {
+               std::pair<int, MHDComplex> iFirst = {-1, 0};
+               std::pair<int, MHDComplex> iMax = {-1, 0};
+               for (int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
+               {
+                  int k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+                  if (k_ == m)
+                  {
+                     for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k);
+                        j++)
+                     {
+                        for (int i = 0;
+                           i < tRes.dim<Dimensions::Data::DATB1D>(j, k); i++)
+                        {
+                           auto val = ef.at(idx);
+                           auto norm = std::abs(val);
+                           if (iFirst.first == -1 && norm > 1e-6)
+                           {
+                              iFirst = {idx, val};
+                           }
+                           if (std::abs(iMax.second) < norm)
+                           {
+                              iMax = {idx, val};
+                           }
+                           idx++;
+                        }
+                     }
+                  }
+               }
+               infoMax.try_emplace(std::make_pair(fId, cId), iMax);
+               infoFirst.try_emplace(std::make_pair(fId, cId), iFirst);
+            }
+         }
+
+         MHDComplex s = 0;
+         if (opt.scalingType == 1)
+         {
+            MHDComplex vMax = 0;
+            for (auto&& f: opt.scalingRef)
+            {
+               auto v = infoMax.at(f).second;
+               if (std::abs(vMax) < std::abs(v))
+               {
+                  vMax = v;
+               }
+            }
+            s = std::abs(vMax) / vMax;
+         }
+         else if (opt.scalingType == 2)
+         {
+            MHDComplex vMax = 0;
+            for (auto&& f: opt.scalingRef)
+            {
+               auto v = infoMax.at(f).second;
+               if (std::abs(vMax) < std::abs(v))
+               {
+                  vMax = v;
+               }
+            }
+            s = 1.0 / vMax;
+         }
+
+         if (s == 0)
+         {
+            throw std::logic_error("Failed to find proper scaling coefficient");
+         }
+
+         for (auto& c: ef)
+         {
+            c *= s;
+         }
+      }
+   }
+
+   // Force m = 0 to be real
+   const int m = static_cast<int>(ks.at(0));
+   if (m == 0 && opt.makeM0Real)
+   {
+      for (auto& ef: efs)
+      {
+         for (auto& c: ef)
+         {
+            c.imag(0);
+         }
+      }
+   }
+}
+
 void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
    const std::vector<MHDComplex>& ef)
 {
@@ -170,7 +305,16 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
       {
          this->mpH5File->addVector(v);
       }
+
+      // Set Physical parameters
+      std::map<std::string, MHDFloat> phys = this->config().physical();
+      this->mpH5File->setPhysical(phys, this->config().boundary());
    }
+
+   std::map<std::string, MHDFloat> evPhys;
+   evPhys.insert(std::make_pair(NonDimensional::Omega().tag(), ev.imag()));
+   evPhys.insert(std::make_pair(NonDimensional::GrowthRate().tag(), ev.real()));
+   this->mpH5File->updatePhysical(evPhys);
 
    // Fields
    auto pId = this->mspBackend->fieldIds().at(0);
@@ -209,10 +353,10 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
                   if (k_ == m)
                   {
                      for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k);
-                          j++)
+                        j++)
                      {
                         for (int i = 0;
-                             i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
+                           i < tRes.dim<Dimensions::Data::DATB1D>(j, k); i++)
                         {
                            p->rDom(0).rPerturbation().setPoint(ef.at(idx), i, j,
                               k);
@@ -239,10 +383,10 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
                   if (k_ == m)
                   {
                      for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k);
-                          j++)
+                        j++)
                      {
                         for (int i = 0;
-                             i < tRes.dim<Dimensions::Data::DATF1D>(j, k); i++)
+                           i < tRes.dim<Dimensions::Data::DATB1D>(j, k); i++)
                         {
                            p->rDom(0)
                               .rPerturbation()
@@ -268,18 +412,32 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
    this->mpH5File->finalize();
 }
 
-void MarginalCurve::mainRun()
+int MarginalCurve::countFields() const
 {
-   std::vector<MHDFloat> eigs;
-   std::size_t max_nev;
+   // Get number of fields in matrix
+   int nF = 0;
+   for (auto&& f: this->mspBackend->fieldIds())
+   {
+      for (auto&& c: {FieldComponents::Spectral::SCALAR,
+              FieldComponents::Spectral::POL, FieldComponents::Spectral::POL})
+      {
+         auto fc = std::make_pair(f, c);
+         Model::EquationInfo info;
+         this->mspBackend->equationInfo(info, fc, *this->mspRes);
+         nF = std::max(nF, static_cast<int>(info.im.size()));
+      }
+   }
 
+   return nF;
+}
+
+std::size_t MarginalCurve::getMatrixSize() const
+{
+   int nF = this->countFields();
+
+   std::size_t max_nev;
    if (this->mspRes->sim().ss().has(SpatialScheme::Feature::SpectralMatrix1D))
    {
-      eigs.clear();
-      eigs = {this->mspRes->sim().boxScale(Dimensions::Simulation::SIM2D),
-         this->mspRes->sim().boxScale(Dimensions::Simulation::SIM3D)};
-
-      int nF = this->mspBackend->fieldIds().size();
       int nN = this->mspRes->sim().dim(Dimensions::Simulation::SIM1D,
          Dimensions::Space::SPECTRAL);
       max_nev = nF * nN;
@@ -290,11 +448,7 @@ void MarginalCurve::mainRun()
       int m = this->mspRes->sim().dim(Dimensions::Simulation::SIM3D,
                  Dimensions::Space::SPECTRAL) -
               1;
-      MHDFloat m_ = static_cast<MHDFloat>(m);
-      eigs.clear();
-      eigs = {m_};
 
-      int nF = this->mspBackend->fieldIds().size();
       int nN = this->mspRes->sim().dim(Dimensions::Simulation::SIM1D,
          Dimensions::Space::SPECTRAL);
       int nL = (this->mspRes->sim().dim(Dimensions::Simulation::SIM2D,
@@ -307,92 +461,199 @@ void MarginalCurve::mainRun()
       throw std::logic_error("3D spectral matrix not setup");
    }
 
-   auto idc = NonDimensional::Rayleigh::id();
-   auto name = NonDimensional::Coordinator::tag(idc);
+   return max_nev;
+}
 
-   auto spLinStab = std::make_shared<LinearStability>(idc, eigs, this->mspRes,
-      this->mspEqParams->map(), this->createBoundary()->map(),
-      this->mspBackend);
+std::vector<MHDFloat> MarginalCurve::getMatrixMode() const
+{
+   std::vector<MHDFloat> eigs;
 
-   auto nev_ = this->mspEqParams->nd(NonDimensional::Nev::id());
-   unsigned int nev = 0;
-   if (nev_ <= 0)
+   if (this->mspRes->sim().ss().has(SpatialScheme::Feature::SpectralMatrix1D))
    {
-      nev = max_nev;
+      eigs.clear();
+      eigs = {this->mspRes->sim().boxScale(Dimensions::Simulation::SIM2D),
+         this->mspRes->sim().boxScale(Dimensions::Simulation::SIM3D)};
+   }
+   else if (this->mspRes->sim().ss().has(
+               SpatialScheme::Feature::SpectralMatrix2D))
+   {
+      int m = this->mspRes->sim().dim(Dimensions::Simulation::SIM3D,
+                 Dimensions::Space::SPECTRAL) -
+              1;
+      MHDFloat m_ = static_cast<MHDFloat>(m);
+      eigs.clear();
+      eigs = {m_};
    }
    else
    {
-      nev = static_cast<unsigned int>(nev_);
+      throw std::logic_error("3D spectral matrix not setup");
    }
 
-   int solver_mode = this->mspEqParams->nd(NonDimensional::StabilityMode::id());
+   return eigs;
+}
 
-   // Single mode calculation
-   if (solver_mode == 0)
+void MarginalCurve::setOptions(Stability::Options& opt)
+{
+   // Select eigensolver
+   //opt.eigensolver_type = 1;
+
+   // Set options from parameter file
+   if (this->mspEqParams->nd(NonDimensional::Tolerance::id()) > 0)
    {
-      std::vector<MHDComplex> evs(nev);
-      std::vector<std::vector<MHDComplex>> efs(nev);
-      auto vc = this->mspEqParams->nd(idc);
-      spLinStab->eigenpairs(evs, efs, nev, vc);
+      opt.tolerance = this->mspEqParams->nd(NonDimensional::Tolerance::id());
+   }
+   if (this->mspEqParams->nd(NonDimensional::MaxIteration::id()) > 0)
+   {
+      opt.maxIteration =
+         this->mspEqParams->nd(NonDimensional::MaxIteration::id());
+   }
 
-      // Print eigenvalues
+   opt.solver_mode = this->mspEqParams->nd(NonDimensional::StabilityMode::id());
+
+   auto nev_ = this->mspEqParams->nd(NonDimensional::Nev::id());
+   if (nev_ <= 0)
+   {
+      // Get max number of EV (matrix size)
+      opt.nev = this->getMatrixSize();
+   }
+   else
+   {
+      opt.nev = static_cast<std::size_t>(nev_);
+   }
+
+   // Write MatrixMarket files
+   opt.writeMtx = (this->mspEqParams->nd(NonDimensional::WriteMtx::id()) == 1);
+
+   // Output SLEPc diagnostics
+   opt.verboseDiagnostics = true;
+
+   // Use initial guess with parity
+   // opt.useCustomGuess = true;
+   // opt.guessType = 1;
+
+   // Set imaginary part of m = 0 to zero
+   // opt.makeM0Real = true;
+
+   // Scale eigenfunctions to have first coefficient real and positive
+   opt.scalingType = 1;
+   opt.scalingRef = {
+      {PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR},
+      {PhysicalNames::Velocity::id(), FieldComponents::Spectral::POL}};
+}
+
+void MarginalCurve::computeSingleMode(
+   std::shared_ptr<const Stability::Options> opt)
+{
+   // Modes for setting up matrix
+   std::vector<MHDFloat> eigs = this->getMatrixMode();
+
+   auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
+      this->mspEqParams->map(), this->createBoundary()->map(), this->mspBackend,
+      opt);
+
+   std::vector<MHDComplex> evs(opt->nev);
+   std::vector<std::vector<MHDComplex>> efs;
+   if (opt->solver_mode == 1)
+   {
+      efs.resize(opt->nev);
+   }
+   // Last argument is not used
+   spLinStab->eigenpairs(evs, efs, opt->nev,
+      std::numeric_limits<MHDFloat>::max());
+
+   // Print eigenvalues
+   if(QuICCEnv().allowsIO())
+   {
+      std::ofstream logger("evs.log");
+      unsigned int prec = (std::numeric_limits<MHDFloat>::digits10 * 3) / 4 + 1;
       for (auto&& e: evs)
       {
-         std::cerr << e << std::endl;
+         logger << std::setprecision(prec) << e << std::endl;
       }
+   }
+   QuICCEnv().synchronize();
 
-      for (std::size_t i = 0; i < efs.size(); i++)
+   this->processEigenpairs(eigs, evs, efs, *opt);
+
+   for (std::size_t i = 0; i < efs.size(); i++)
+   {
+      if (this->mspRes->sim().ss().has(
+             SpatialScheme::Feature::SpectralMatrix2D))
       {
-         if (this->mspRes->sim().ss().has(
-                SpatialScheme::Feature::SpectralMatrix2D))
-         {
-            int k_ = static_cast<int>(eigs.at(0));
-            saveEigenfunction(k_, evs.at(i), efs.at(i));
-         }
-         else
-         {
-            // Writing other eigenfunctions is not yet implemented
-         }
+         int k_ = static_cast<int>(eigs.at(0));
+         this->saveEigenfunction(k_, evs.at(i), efs.at(i));
       }
+      else
+      {
+         // Writing other eigenfunctions is not yet implemented
+      }
+   }
+}
+
+void MarginalCurve::findCriticalParameter(
+   std::shared_ptr<const Stability::Options> opt)
+{
+   // Modes for setting up matrix
+   std::vector<MHDFloat> eigs = this->getMatrixMode();
+
+   auto spLinStab = std::make_shared<LinearStability>(eigs, this->mspRes,
+      this->mspEqParams->map(), this->createBoundary()->map(), this->mspBackend,
+      opt);
+
+   auto idc = NonDimensional::Rayleigh::id();
+   auto name = NonDimensional::Coordinator::tag(idc);
+   spLinStab->setCriticalId(idc);
+
+   MHDFloat guess = this->mspEqParams->nd(idc);
+   MHDFloat factor = 1.1; // To multiply
+   int digits =
+      std::numeric_limits<MHDFloat>::digits; // Maximum possible binary
+                                             // digits accuracy for type T.
+                                             // digits used to control how
+                                             // accurate to try to make the
+                                             // result.
+   int get_digits = (digits * 3) / 4; // Near maximum (3/4) possible accuracy.
+
+   const boost::uintmax_t maxit = 20;
+   boost::uintmax_t it =
+      maxit; // Initally our chosen max iterations, but updated with actual.
+             // We could also have used a maximum iterations provided by any
+             // policy: boost::uintmax_t max_it =
+             // policies::get_max_root_iterations<Policy>();
+   bool is_rising =
+      true; // So if result if guess^3 is too low, try increasing guess.
+   boost::math::tools::eps_tolerance<double> tol(get_digits);
+
+   auto spLog = std::make_shared<std::ofstream>("marginal.log");
+
+   std::pair<MHDFloat, MHDFloat> r = boost::math::tools::bracket_and_solve_root(
+      func<1>(name, spLinStab, spLog), guess, factor, is_rising, tol, it);
+
+   std::ofstream& logger = *spLog;
+
+   unsigned int prec = (std::numeric_limits<MHDFloat>::digits10 * 3) / 4 + 1;
+   logger << std::string(50, '-') << std::endl
+          << "Critical " + name + " number converged to the bracket: "
+          << std::endl
+          << std::setprecision(prec) << r.first << " < " << name << " < "
+          << r.second << std::endl;
+}
+
+void MarginalCurve::mainRun()
+{
+   // Set options
+   auto spOpt = std::make_shared<Stability::Options>();
+   this->setOptions(*spOpt);
+
+   // Single mode calculation
+   if (spOpt->solver_mode == 0 || spOpt->solver_mode == 1)
+   {
+      this->computeSingleMode(spOpt);
    }
    // Find critical parameter
    else
    {
-      MHDFloat guess = this->mspEqParams->nd(idc);
-      MHDFloat factor = 1.1; // To multiply
-      int digits =
-         std::numeric_limits<MHDFloat>::digits; // Maximum possible binary
-                                                // digits accuracy for type T.
-                                                // digits used to control how
-                                                // accurate to try to make the
-                                                // result.
-      int get_digits =
-         (digits * 3) / 4; // Near maximum (3/4) possible accuracy.
-
-      const boost::uintmax_t maxit = 20;
-      boost::uintmax_t it =
-         maxit; // Initally our chosen max iterations, but updated with actual.
-                // We could also have used a maximum iterations provided by any
-                // policy: boost::uintmax_t max_it =
-                // policies::get_max_root_iterations<Policy>();
-      bool is_rising =
-         true; // So if result if guess^3 is too low, try increasing guess.
-      boost::math::tools::eps_tolerance<double> tol(get_digits);
-
-      auto spLog = std::make_shared<std::ofstream>("marginal.log");
-
-      std::pair<MHDFloat, MHDFloat> r =
-         boost::math::tools::bracket_and_solve_root(
-            func<1>(name, spLinStab, spLog), guess, factor, is_rising, tol, it);
-
-      std::ofstream& logger = *spLog;
-
-      unsigned int prec = (std::numeric_limits<MHDFloat>::digits10 * 3) / 4 + 1;
-      logger << std::string(50, '-') << std::endl
-             << "Critical " + name + " number converged to the bracket: "
-             << std::endl
-             << std::setprecision(prec) << r.first << " < " << name << " < "
-             << r.second << std::endl;
+      this->findCriticalParameter(spOpt);
    }
 }
 
