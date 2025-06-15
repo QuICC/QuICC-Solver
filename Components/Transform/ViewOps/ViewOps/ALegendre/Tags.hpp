@@ -40,6 +40,11 @@ struct D1_t
 {
 };
 
+/// @brief D2 op type tag
+struct D2_t
+{
+};
+
 /// @brief Ll op type tag
 struct Ll_t
 {

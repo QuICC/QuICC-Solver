@@ -6,7 +6,7 @@ endif()
 
 set(Kinds "Projector;Integrator")
 
-set(ProjectorOps "P;D1;Ll;LlD1;DivS1;DivS1Dp;LlDivS1;LlDivS1Dp")
+set(ProjectorOps "P;D1;D2;Ll;LlD1;DivS1;DivS1Dp;LlDivS1;LlDivS1Dp")
 set(IntegratorOps "P;D1;Ll;LlD1;DivS1;DivS1Dp;LlDivS1;LlDivS1Dp;Ll2;DivLl;DivLlD1;DivLlDivS1;DivLlDivS1Dp")
 
 set(IntegratorOpAttribute "S1CLCSC3D")

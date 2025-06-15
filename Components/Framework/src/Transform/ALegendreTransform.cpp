@@ -14,6 +14,7 @@
 #include "QuICC/Transform/Poly/ALegendre/Projector/P.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/Ll.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/D1.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Projector/D2.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/LlD1.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/DivS1.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/DivS1Dp.hpp"
@@ -52,6 +53,7 @@
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/Laplh.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
+#include "QuICC/Transform/Backward/D2.hpp"
 #include "QuICC/Transform/Backward/D1Laplh.hpp"
 #include "QuICC/Transform/Backward/Oversin.hpp"
 #include "QuICC/Transform/Backward/OversinDphi.hpp"
@@ -99,6 +101,7 @@ namespace Transform {
       this->mImpl.addOperator<Poly::ALegendre::Projector::P<backend_t>>(Backward::P::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::Ll<backend_t>>(Backward::Laplh::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::D1<backend_t>>(Backward::D1::id());
+      this->mImpl.addOperator<Poly::ALegendre::Projector::D2<backend_t>>(Backward::D2::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::LlD1<backend_t>>(Backward::D1Laplh::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1<backend_t>>(Backward::Oversin::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1Dp<backend_t>>(Backward::OversinDphi::id());
