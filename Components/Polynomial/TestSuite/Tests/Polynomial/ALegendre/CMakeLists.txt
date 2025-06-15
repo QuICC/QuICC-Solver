@@ -23,6 +23,7 @@ include(ConfigureTests)
 set(ALegendreTests
   Plm
   dPlm
+  d2Plm
   sin_1Plm
 )
 include(SetUlp)

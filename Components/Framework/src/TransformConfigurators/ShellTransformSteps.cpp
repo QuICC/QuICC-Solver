@@ -369,12 +369,14 @@ namespace Transform {
       {
          pairId = std::make_pair(FieldComponents::Physical::R,FieldComponents::Physical::R);
          if(req.find(pairId)->second)
-         {  //dvr/dr
+         {  //du_r/dr
             
             // Toroidal part
 
             // Poloidal part
-            /*
+
+            // not a good form for the full sphere case
+            
             transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
             transform.back().addEdge(Backward::Overr2D1R1::id());
             transform.back().addEdge(Backward::Laplh::id());
@@ -390,37 +392,63 @@ namespace Transform {
             transform.back().addEdge(Backward::Overr2::id());
             transform.back().addEdge(Backward::Laplh::id());
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Sub::id());
-            */
+            
 
            // test: vector:
+           /*
            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
             transform.back().addEdge(Backward::Overr1::id());
             transform.back().addEdge(Backward::Laplh::id());
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
+            */
          }
 
          pairId = std::make_pair(FieldComponents::Physical::R,FieldComponents::Physical::THETA);
          if(req.find(pairId)->second)
-         {
+         {  // (1/r)du_r/dt - u_t/r
+            // Toroidal part
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
-            transform.back().addEdge(Backward::P::id());
-            transform.back().addEdge(Backward::P::id());
+            transform.back().addEdge(Backward::Overr1::id());
+            transform.back().addEdge(Backward::OversinDphi::id());
+            transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Sub::id());
+
+            // Poloidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2::id());
+            transform.back().addEdge(Backward::D1Laplh::id());
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2D1R1::id());
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Sub::id());
          }
 
          pairId = std::make_pair(FieldComponents::Physical::R,FieldComponents::Physical::PHI);
          if(req.find(pairId)->second)
-         {
+         {// 1/(r sin t) * d u_r/dp - u_p/r
+            // Toroidal part
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
-            transform.back().addEdge(Backward::P::id());
-            transform.back().addEdge(Backward::P::id());
+            transform.back().addEdge(Backward::Overr1::id());
+            transform.back().addEdge(Backward::D1::id());
+            transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
+
+            // Poloidal part
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2::id());
+            transform.back().addEdge(Backward::OversinLaplhDphi::id());
+            transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2D1R1::id());
+            transform.back().addEdge(Backward::OversinDphi::id());
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
          }
 
          pairId = std::make_pair(FieldComponents::Physical::THETA,FieldComponents::Physical::R);
          if(req.find(pairId)->second)
-         {  //dvt/dr
-            /*
+         {  //du_t/dr
+            
             // Toroidal part
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
             transform.back().addEdge(Backward::D1::id());
@@ -428,7 +456,7 @@ namespace Transform {
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
             
             // Poloidal part
-            
+            // not a good form for the full sphere case
             // QuICC doesn't like this one:
             transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
             transform.back().addEdge(Backward::Slaplr::id());
@@ -439,9 +467,10 @@ namespace Transform {
             transform.back().addEdge(Backward::Overr2D1R1::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Sub::id());
-            */
+            
 
             // test vector:
+            /*
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
             transform.back().addEdge(Backward::P::id());
             transform.back().addEdge(Backward::OversinDphi::id());
@@ -451,13 +480,14 @@ namespace Transform {
             transform.back().addEdge(Backward::Overr1D1R1::id());
             transform.back().addEdge(Backward::D1::id());
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
+            */
            
             
          }
 
          pairId = std::make_pair(FieldComponents::Physical::THETA,FieldComponents::Physical::THETA);
          if(req.find(pairId)->second)
-         {
+         { // (1/r) * du_t/t + u_r/r
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
             transform.back().addEdge(Backward::P::id());
             transform.back().addEdge(Backward::P::id());
@@ -475,8 +505,8 @@ namespace Transform {
 
          pairId = std::make_pair(FieldComponents::Physical::PHI,FieldComponents::Physical::R);
          if(req.find(pairId)->second)
-         {  //dvp/dr
-            /*
+         {  //du_p/dr
+            
             // Toroidal part
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
             transform.back().addEdge(Backward::D1::id());
@@ -484,6 +514,7 @@ namespace Transform {
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
             
             // Poloidal part
+            // not a good form for the full sphere case
             // QuICC doesn't like this bit:
             
             transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
@@ -495,9 +526,10 @@ namespace Transform {
             transform.back().addEdge(Backward::Overr2D1R1::id());
             transform.back().addEdge(Backward::OversinDphi::id());
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Sub::id());
-            */
+            
 
             // test vector:
+            /*
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
             transform.back().addEdge(Backward::P::id());
             transform.back().addEdge(Backward::D1::id());
@@ -507,13 +539,14 @@ namespace Transform {
             transform.back().addEdge(Backward::Overr1D1R1::id());
             transform.back().addEdge(Backward::OversinDphi::id());
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
+            */
             
             
          }
 
          pairId = std::make_pair(FieldComponents::Physical::PHI,FieldComponents::Physical::THETA);
          if(req.find(pairId)->second)
-         {
+         {// (1/r) * du_p/dt
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
             transform.back().addEdge(Backward::P::id());
             transform.back().addEdge(Backward::P::id());
@@ -522,7 +555,7 @@ namespace Transform {
 
          pairId = std::make_pair(FieldComponents::Physical::PHI,FieldComponents::Physical::PHI);
          if(req.find(pairId)->second)
-         {
+         {// 1/(r sin t) * du_p/dp + cot t * u_t/r + u_r/r
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
             transform.back().addEdge(Backward::P::id());
             transform.back().addEdge(Backward::P::id());

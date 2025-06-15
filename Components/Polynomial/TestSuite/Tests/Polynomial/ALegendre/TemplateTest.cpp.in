@@ -24,9 +24,23 @@ TEST_CASE( "Error for @Operator@ operator", "[@Operator@]" ){
    // Set default arguments if required
    if(currentts::args().useDefault)
    {
+      
       currentts::args().specN = 128;
       currentts::args().physN = 256;
       currentts::args().params = {0,1,2,5,20,128};
+      /*
+      // Alternative implementation
+      // (1,16,0), (1,16,1), (1,16,2) passes !! Init stage is correct
+      // (2,16,0), (2,16,1), (2,16,2) passes
+      // (3,16,0), (3,16,1), (3,16,2) passes
+      // (4,16,0), (4,16,1), (4,16,2) passes!!!!!!!!
+      // (5,16,1) passes!!!! (for some reason this is the one that triggers m==1, general form)
+      // (128,16,0) fails!
+      currentts::args().specN = 16;
+      currentts::args().physN = 16;
+      currentts::args().params = {0,1,2};
+      */
+      
    }
 
    Catch::StringMaker<double>::precision = 15;

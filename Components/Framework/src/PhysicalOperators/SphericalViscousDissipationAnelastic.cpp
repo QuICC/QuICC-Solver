@@ -90,15 +90,18 @@ namespace Physical {
       {
          iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);         
 
-         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
+         /*rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * (0*(
                                                 // e_rr
                                                 v.comp(FieldComponents::Physical::R).slice(iR).array()
+                                                )/T(iR_)).matrix(), iR);*/
+
+         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
+                                                
+                                                10*v.comp(FieldComponents::Physical::R).slice(iR).array() - Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::R).slice(iR).array()
+                                                +10*v.comp(FieldComponents::Physical::THETA).slice(iR).array() - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::R).slice(iR).array()
+                                                +10*v.comp(FieldComponents::Physical::PHI).slice(iR).array() - Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::R).slice(iR).array()
                                                 )/T(iR_)).matrix(), iR);
          
-         //advection example:
-         //rS.setSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array() 
-         // * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-         // / Rho(iR_) / Rho(iR_)).matrix(), iR);
          
       }
          
