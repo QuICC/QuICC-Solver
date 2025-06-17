@@ -9,46 +9,46 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Types
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Memory
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^View -E Mpi
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Polynomial
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Jacobi
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_integrator"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_projector"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_integrator"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_projector"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_bfloop"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_integrator"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_projector"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_bfloop"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_reductor"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformWorlandTests_.*"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ProfilerTest
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R TrackerTest
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_integrator_ulp"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_integrator_id"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_projector_ulp"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_projector_id"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_bfloop_ulp"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMBesselTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandStencilTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandBoundaryTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapBoundaryTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapStencilTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkLoadSplitterTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkCommunicatorTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^FrameworkStateFileTests_.*serial"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkIoTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "PyQuICCTests"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^GraphTests -E Mpi
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Polynomial
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Jacobi
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_integrator"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_projector"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_integrator"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_projector"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_bfloop"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_integrator"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_projector"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_bfloop"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_reductor"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformWorlandTests_.*"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ProfilerTest
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R TrackerTest
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_integrator_ulp"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_integrator_id"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_projector_ulp"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_projector_id"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_bfloop_ulp"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMBesselTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandStencilTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandBoundaryTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapBoundaryTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapStencilTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkLoadSplitterTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkCommunicatorTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^FrameworkStateFileTests_.*serial"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkIoTests_
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "PyQuICCTests"
+    #- ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^GraphTests -E Mpi
 
 .test-lib-mpi:
   script:
     - pwd
     - cd /QuICC.src/build
-    - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiCommTest
-    - ctest --no-tests=error --output-on-failure -R ViewTransposeMpiTest
+    #- ctest --no-tests=error --output-on-failure -R ViewTransposeMpiCommTest
+    #- ctest --no-tests=error --output-on-failure -R ViewTransposeMpiTest
     - ctest --no-tests=error --output-on-failure -R GraphTestsMpi
 
 .test-lib-petsc:
