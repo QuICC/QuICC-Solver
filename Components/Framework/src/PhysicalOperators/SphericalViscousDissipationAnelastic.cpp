@@ -101,6 +101,12 @@ namespace Physical {
                                                 +10*v.comp(FieldComponents::Physical::THETA).slice(iR).array() - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::R).slice(iR).array()
                                                 +10*v.comp(FieldComponents::Physical::PHI).slice(iR).array() - Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::R).slice(iR).array()
                                                 )/T(iR_)).matrix(), iR);
+
+         // just a test: to see if it runs without crashing
+         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
+                                                
+                                                10*v.comp(FieldComponents::Physical::R).slice(iR).array() - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::THETA).slice(iR).array()
+                                                )/T(iR_)).matrix(), iR);
          
          
       }

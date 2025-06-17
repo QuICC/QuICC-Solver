@@ -51,6 +51,7 @@
 #include "QuICC/Transform/Backward/Overr1.hpp"
 #include "QuICC/Transform/Backward/Overr2.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
+#include "QuICC/Transform/Backward/D2.hpp"
 #include "QuICC/Transform/Backward/D1Laplh.hpp"
 #include "QuICC/Transform/Backward/Overr1D1R1.hpp"
 #include "QuICC/Transform/Backward/Overr2D1R1.hpp"
@@ -488,9 +489,23 @@ namespace Transform {
          pairId = std::make_pair(FieldComponents::Physical::THETA,FieldComponents::Physical::THETA);
          if(req.find(pairId)->second)
          { // (1/r) * du_t/t + u_r/r
+
+            // Toridal part
+            /* code it!!! */
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::GRADIENT));
             transform.back().addEdge(Backward::P::id());
             transform.back().addEdge(Backward::P::id());
+            transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
+
+            // Poloidal part   
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2::id());
+            transform.back().addEdge(Backward::Laplh::id());
+            transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
+
+            transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
+            transform.back().addEdge(Backward::Overr2D1R1::id());
+            transform.back().addEdge(Backward::D2::id());
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
          }
 

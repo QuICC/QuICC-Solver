@@ -111,13 +111,6 @@ namespace ALegendre {
           *
           * Internal computation can be done in multiple precision. Uses recurrence relation for the wanted expression.
           */
-         static void d2P11(Eigen::Ref<Internal::Matrix> id2p11, const Eigen::Ref<const Internal::Matrix>& ip11, Normalizer norm);
-
-         /**
-          * @brief Compute the associated Legendre \f$\frac{d^2}{d_\theta^2} P_l (\cos\theta)\f$
-          *
-          * Internal computation can be done in multiple precision. Uses recurrence relation for the wanted expression.
-          */
          static void d2Pl0(Eigen::Ref<Internal::Matrix> id2pl0, const int l, const Eigen::Ref<const Internal::Matrix>& ipl2, const Eigen::Ref<const Internal::Matrix>& ipl0, NormalizerL norm);
 
          /**
@@ -143,11 +136,39 @@ namespace ALegendre {
          static void d2Pmm0m1(Eigen::Ref<Internal::Array> op, const int m, const int l, const Eigen::Ref<const Internal::Array>& iplm_2, const Eigen::Ref<const Internal::Array>& iplm, NormalizerML norm);
 
          /**
+          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta}[ P_1^1 (\cos\theta) / \sin\theta]\f$ 
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dsin_1P11(Eigen::Ref<Internal::Array> op, const Eigen::Ref<const Internal::Array>& ip21, NormalizerL norm);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta}[ P_l^1 (\cos\theta) / \sin\theta]\f$ 
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dsin_1Pl1(Eigen::Ref<Internal::Array> op, const int l, const Eigen::Ref<const Internal::Array>& ipl13, const Eigen::Ref<const Internal::Array>& ipl11, NormalizerL norm);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta}[ P_m^m (\cos\theta) / \sin\theta]\f$ 
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dsin_1Pmm(Eigen::Ref<Internal::Array> op, const int m, const Eigen::Ref<const Internal::Array>& ipm1m_2, const Eigen::Ref<const Internal::Array>& ipm1m, NormalizerML norm);
+
+         /**
           * @brief Compute the associated Legendre \f$1/\sin\theta P_l^m (\cos\theta)\f$
           *
           * Internal computation can be done in multiple precision
           */
          static void sin_1Plm(Eigen::Ref<Internal::Matrix> isin_1plm, const int m, const int l, const Eigen::Ref<const Internal::Matrix>& ipl1m1, const Eigen::Ref<const Internal::Matrix>& ipl1m_1, NormalizerML norm);
+
+         /**
+          * @brief Compute the associated Legendre \f$\frac{d}{d_\theta}[ P_l^m (\cos\theta) / \sin\theta]\f$
+          *
+          * Internal computation can be done in multiple precision
+          */
+         static void dsin_1Plm(Eigen::Ref<Internal::Array> op, const int m, const int l, const Eigen::Ref<const Internal::Array>& ipl1m_2, const Eigen::Ref<const Internal::Array>& ipl1m, const Eigen::Ref<const Internal::Array>& ipl1m2, NormalizerML norm);
 
          static NormalizerM normPmm();
          static NormalizerM normPm1m();
@@ -158,6 +179,8 @@ namespace ALegendre {
          static NormalizerL normd2Pl0();
          static NormalizerL normd2Pl1();
          static NormalizerML normdPlm();
+         static NormalizerL normdsin_1Pl1();
+         static NormalizerML normdsin_1Plm();
          static NormalizerML normd2Plm();
          static NormalizerML normsin_1Plm();
 
@@ -171,6 +194,16 @@ namespace ALegendre {
           * @brief Recurrence coefficient for first derivative of Associated Legendre function
           */
          static Internal::MHDFloat A1(const Internal::MHDFloat dl, const Internal::MHDFloat dm);
+
+         /**
+          * @brief Recurrence coefficient for first derivative of Associated Legendre function
+          */
+         static Internal::MHDFloat C1(const Internal::MHDFloat dm);
+
+         /**
+          * @brief Recurrence coefficient for first derivative of Associated Legendre function
+          */
+         static Internal::MHDFloat C2(const Internal::MHDFloat dl, const Internal::MHDFloat dm);
 
          /**
           * @brief Polynomial normalizer for unit Associated Legendre normalization
@@ -228,6 +261,16 @@ namespace ALegendre {
          static Internal::Array unitsin_1Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl);
 
          /**
+          * @brief Polynomial normalizer for unit Associated Legendre normalization
+          */
+         static Internal::Array unitdsin_1Pl1(const Internal::MHDFloat dl);
+
+         /**
+          * @brief Polynomial normalizer for unit Associated Legendre normalization
+          */
+         static Internal::Array unitdsin_1Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl);
+
+         /**
           * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
           */
          static Internal::Array schmidtPmm(const Internal::MHDFloat dm);
@@ -281,6 +324,16 @@ namespace ALegendre {
           * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
           */
          static Internal::Array schmidtsin_1Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl);
+
+         /**
+          * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
+          */
+         static Internal::Array schmidtdsin_1Pl1(const Internal::MHDFloat dl);
+
+         /**
+          * @brief Polynomial normalizer for Schmidt Associated Legendre quasi-normalization
+          */
+         static Internal::Array schmidtdsin_1Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl);
 
       private:
 
