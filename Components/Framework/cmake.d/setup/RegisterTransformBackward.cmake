@@ -22,6 +22,7 @@ set(tags
   Slaplr
   Oversin
   OversinD1Sin
+  D1OversinDphi
   OversinDphi
   OversinLaplh
   OversinLaplhDphi
