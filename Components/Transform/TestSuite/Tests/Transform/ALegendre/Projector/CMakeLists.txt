@@ -6,10 +6,12 @@ include(ConfigureTests)
 set(_tests_templated
     Poly::P:<base_t>:projector
     Poly::D1:<base_t>:projector
+    Poly::D2:<base_t>:projector
     Poly::Ll:<base_t>:projector
     Poly::LlD1:<base_t>:projector
     Poly::P:<viewCpu_t>:projector
     Poly::D1:<viewCpu_t>:projector
+    Poly::D2:<viewCpu_t>:projector
     Poly::Ll:<viewCpu_t>:projector
     Poly::LlD1:<viewCpu_t>:projector
 )
@@ -18,6 +20,7 @@ if(TARGET QuICC::Cuda)
     list(APPEND _tests_templated
         Poly::P:<viewGpu_t>:projector
         Poly::D1:<viewGpu_t>:projector
+        Poly::D2:<viewGpu_t>:projector
         Poly::Ll:<viewGpu_t>:projector
         Poly::LlD1:<viewGpu_t>:projector
     )
@@ -27,6 +30,7 @@ if(QUICC_USE_KOKKOS)
     list(APPEND _tests_templated
         Poly::P:<kokkos_t>:projector
         Poly::D1:<kokkos_t>:projector
+        Poly::D2:<kokkos_t>:projector
         Poly::Ll:<kokkos_t>:projector
         Poly::LlD1:<kokkos_t>:projector
     )
@@ -76,12 +80,18 @@ set(_tests_templated
     Poly::DivS1Dp:<base_t>:projector
     Poly::DivS1:<viewCpu_t>:projector
     Poly::DivS1Dp:<viewCpu_t>:projector
+    Poly::D1DivS1:<base_t>:projector
+    Poly::D1DivS1Dp:<base_t>:projector
+    Poly::D1DivS1:<viewCpu_t>:projector
+    Poly::D1DivS1Dp:<viewCpu_t>:projector
 )
 
 if(TARGET QuICC::Cuda)
     list(APPEND _tests_templated
         Poly::DivS1:<viewGpu_t>:projector
         Poly::DivS1Dp:<viewGpu_t>:projector
+        Poly::D1DivS1:<viewGpu_t>:projector
+        Poly::D1DivS1Dp:<viewGpu_t>:projector
     )
 endif()
 
@@ -89,6 +99,8 @@ if(QUICC_USE_KOKKOS)
     list(APPEND _tests_templated
         Poly::DivS1:<kokkos_t>:projector
         Poly::DivS1Dp:<kokkos_t>:projector
+        Poly::D1DivS1:<kokkos_t>:projector
+        Poly::D1DivS1Dp:<kokkos_t>:projector
     )
 endif()
 

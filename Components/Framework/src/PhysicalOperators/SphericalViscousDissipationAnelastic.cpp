@@ -95,19 +95,43 @@ namespace Physical {
                                                 v.comp(FieldComponents::Physical::R).slice(iR).array()
                                                 )/T(iR_)).matrix(), iR);*/
 
+         // Test the diagonal gradient components
+         /*
          rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
-                                                
-                                                10*v.comp(FieldComponents::Physical::R).slice(iR).array() - Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::R).slice(iR).array()
-                                                +10*v.comp(FieldComponents::Physical::THETA).slice(iR).array() - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::R).slice(iR).array()
-                                                +10*v.comp(FieldComponents::Physical::PHI).slice(iR).array() - Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::R).slice(iR).array()
+                                                Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::R).slice(iR).array()
+                                                + Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::THETA).slice(iR).array()
+                                                + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::PHI).slice(iR).array()
                                                 )/T(iR_)).matrix(), iR);
-
-         // just a test: to see if it runs without crashing
-         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
-                                                
-                                                10*v.comp(FieldComponents::Physical::R).slice(iR).array() - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::THETA).slice(iR).array()
-                                                )/T(iR_)).matrix(), iR);
+         */
          
+         // test the curl-r
+         // very very small errors
+         /*
+         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
+                                                v.comp(FieldComponents::Physical::R).slice(iR).array()
+                                                + Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::PHI).slice(iR).array()
+                                                - Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::THETA).slice(iR).array()
+                                                )/T(iR_)).matrix(), iR);
+         */
+         
+         // test the curl-theta
+         // very small errors
+         /*
+         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * (10*(
+                                                v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                                                - Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::PHI).slice(iR).array()
+                                                + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::R).slice(iR).array()
+                                                )/T(iR_)).matrix(), iR);
+         */
+         // test the curl-phi
+         // this is perfectly correct
+         /*
+         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * (10*(
+                                                v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                                                - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::R).slice(iR).array()
+                                                + Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::THETA).slice(iR).array()
+                                                )/T(iR_)).matrix(), iR);
+         */
          
       }
          

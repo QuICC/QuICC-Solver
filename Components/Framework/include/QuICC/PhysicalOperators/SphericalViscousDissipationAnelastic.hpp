@@ -39,7 +39,7 @@
     {
        public:
           /**
-           * @brief Set S to Coriolis term
+           * @brief Set S to viscous dissipation term
            */
           static void set(Framework::Selector::PhysicalScalarField &rS, 
                           const Resolution& res, 
@@ -54,7 +54,7 @@
                           const MHDFloat c = 1.0);
  
           /**
-           * @brief Add Coriolis term to S
+           * @brief Add viscous dissipation term to S
            */
           static void add(Framework::Selector::PhysicalScalarField &rS, 
                           const Resolution& res, 
@@ -69,7 +69,7 @@
                           const MHDFloat c = 1.0);
  
           /**
-           * @brief Substract Coriolis term from S
+           * @brief Substract viscous dissipation term from S
            */
           static void sub(Framework::Selector::PhysicalScalarField &rS, 
                           const Resolution& res, 
