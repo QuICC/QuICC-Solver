@@ -32,32 +32,54 @@ namespace QuICC {
 
 namespace Physical {
 
-   // \todo the arguments in add, sub, and set are repeated. Should be a function
-   // Issues with the return types. I got as far as
-   // type:Eigen::MatrixBase<Derived>
-   // But it probably should go in the .hpp file
-   /*
-   type:Eigen::MatrixBase<Derived> BoussinesqRcomp(const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
-                       const Datatypes::SymmetricTensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,
-                       const int iTh,
-                       const int iR,
-                       const int iR_, 
-                       const MHDFloat c)
-   {
-      //return v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array().cols();
-      return c*(   v.comp(FieldComponents::Physical::R).profile(iTh,iR).array() 
-                                       * w.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()
-                                          / Rho(iR_) / Rho(iR_)
-                                          ).matrix();
+   // Helper function to implement the calculation of Di* Q_nu/T
+   // Di is the dissipation number (passed via c);
+   // Q_nu = 2 nu rho (E:E -(div(v))^2/3);
+   // and E is the strain rate associate to the velocity field v = u/rho
+   Eigen::Matrix<MHDFloat, 
+                 Eigen::Dynamic, 
+                 Eigen::Dynamic>SphericalViscousDissipationAnelastic::computeViscousSlice(const int iR,
+                                                                                          const int iR_,
+                                                                                          const MHDFloat c,
+                                                                                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, 
+                                                                                             FieldComponents::Physical::Id>& v,
+                                                                                          const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, 
+                                                                                             FieldComponents::Physical::Id>& Dv,
+                                                                                          const MHDFloat nu,
+                                                                                          const MHDFloat T,
+                                                                                          const MHDFloat Rho,
+                                                                                          const MHDFloat dLogRho)
+{
+    return (c * 2 * Rho * nu * (
+                                 // E_rr^2 
+                                 ( -v.comp(FieldComponents::Physical::R).slice(iR).array()*dLogRho/Rho 
+                                   + Dv.comp(FieldComponents::Physical::R, FieldComponents::Physical::R).slice(iR).array()/Rho ).pow(2)
+                                 // + E_tt^2
+                                 + ( Dv.comp(FieldComponents::Physical::THETA, FieldComponents::Physical::THETA).slice(iR).array()/Rho ).pow(2)
+                                 // + E_pp^2
+                                 + ( Dv.comp(FieldComponents::Physical::PHI, FieldComponents::Physical::PHI).slice(iR).array()/Rho ).pow(2)
+                                 // + 2* (E_rt)^2
+                                 + 2*( -0.5*v.comp(FieldComponents::Physical::THETA).slice(iR).array()*dLogRho/Rho  
+                                      + 0.5*(  Dv.comp(FieldComponents::Physical::R, FieldComponents::Physical::THETA).slice(iR).array() 
+                                                +  Dv.comp(FieldComponents::Physical::THETA, FieldComponents::Physical::R).slice(iR).array() )/Rho ).pow(2)
+                                 // + 2* (E_rp)^2
+                                 + 2*( -0.5*v.comp(FieldComponents::Physical::PHI).slice(iR).array()*dLogRho/Rho  
+                                      + 0.5*(  Dv.comp(FieldComponents::Physical::R, FieldComponents::Physical::PHI).slice(iR).array() 
+                                                +  Dv.comp(FieldComponents::Physical::PHI, FieldComponents::Physical::R).slice(iR).array() )/Rho ).pow(2)
+                                 // + 2* (E_tp)^2
+                                 + 2*( 0.5*(  Dv.comp(FieldComponents::Physical::THETA, FieldComponents::Physical::PHI).slice(iR).array() 
+                                                +  Dv.comp(FieldComponents::Physical::PHI, FieldComponents::Physical::THETA).slice(iR).array() )/Rho ).pow(2)
+                                 // -(1/3)div(v)
+                                 - (1.0/3.0) * ( -v.comp(FieldComponents::Physical::R).slice(iR).array()*dLogRho/Rho ).pow(2)
+                              ) / T).matrix();
+}
 
-   }
-   */
 
    void SphericalViscousDissipationAnelastic::set(Framework::Selector::PhysicalScalarField &rS,
                                              const Resolution& res, 
                                              const Array& r, 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
-                                             //const Datatypes::SymmetricTensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
+                                             const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV, // Viscosity
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT, // Temperature
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // density, Rho
@@ -90,10 +112,14 @@ namespace Physical {
       {
          iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);         
 
-         /*rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * (0*(
-                                                // e_rr
-                                                v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                )/T(iR_)).matrix(), iR);*/
+         //rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
+         //                                       // e_rr
+         //                                       Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::R).slice(iR).array()
+         //                                       )/T(iR_)).matrix(), iR);
+         auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), Rho(iR_), dLogRho(iR_));
+
+         rS.addSlice(slice, iR);
+
 
          // Test the diagonal gradient components
          /*
@@ -148,14 +174,31 @@ namespace Physical {
                                              const Resolution& res, 
                                              const Array& r, 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
-                                             //const Datatypes::SymmetricTensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
+                                             const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV, // Viscosity
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT, // Temperature
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // density, Rho
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
-   { /* TO BE IIMPLEMENTED IF NEEDED*/}
+   {
+      int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+      int iR_;
+
+      auto nu        = pV->evaluate(r, 0, 0); 
+      auto T         = pT->evaluate(r, 0, 0); 
+      auto Rho       = pF->evaluate(r, 0, 0); 
+      auto dLogRho   = pDF->evaluate(r, 0, 0);
+
+      for(int iR = 0; iR < nR; ++iR)
+      {
+         iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);         
+
+         auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), Rho(iR_), dLogRho(iR_));
+
+         rS.subSlice(slice, iR);
+      }
+   }
 
 }
 }

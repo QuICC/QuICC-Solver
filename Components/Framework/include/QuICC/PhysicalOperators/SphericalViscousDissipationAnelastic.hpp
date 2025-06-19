@@ -45,12 +45,12 @@
                           const Resolution& res, 
                           const Array& r, 
                           const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                          //const Datatypes::SymmetricTensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv, 
+                          const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv, 
                           std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV,
                           std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT,
                           std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
                           std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
-                          const QuICC::Equations::EquationParameters &eqParam,
+                          const QuICC::Equations::EquationParameters &eqParams,
                           const MHDFloat c = 1.0);
  
           /**
@@ -75,7 +75,7 @@
                           const Resolution& res, 
                           const Array& r, 
                           const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                          //const Datatypes::SymmetricTensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv, 
+                          const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv, 
                           std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV,
                           std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT,
                           std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
@@ -95,6 +95,24 @@
            * @brief Empty destructor
            */
           ~SphericalViscousDissipationAnelastic() = default;
+
+          /**
+           * @brief helper function to calculate viscous dissipation slice
+           */
+          static Eigen::Matrix<MHDFloat, 
+                               Eigen::Dynamic, 
+                               Eigen::Dynamic> computeViscousSlice(const int iR,
+                                                                     const int iR_,
+                                                                     const MHDFloat c,
+                                                                     const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, 
+                                                                           FieldComponents::Physical::Id>& v,
+                                                                     const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, 
+                                                                           FieldComponents::Physical::Id>& Dv,
+                                                                     const MHDFloat nu,
+                                                                     const MHDFloat T,
+                                                                     const MHDFloat Rho,
+                                                                     const MHDFloat dLogRho);
+
     };
  }
  }
