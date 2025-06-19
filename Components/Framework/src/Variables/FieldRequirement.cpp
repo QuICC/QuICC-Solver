@@ -21,7 +21,7 @@
 namespace QuICC {
 
    FieldRequirement::FieldRequirement(const bool isScalar, const Tools::ComponentAlias<FieldComponents::Spectral::Id> spec, const Tools::ComponentAlias<FieldComponents::Physical::Id> phys)
-      : mIsScalar(isScalar), mNeedSpectral(false), mNeedPhysical(false), mNeedGradient(false), mNeedCurl(false), mNeedGradient2(false), mPhysicalComps(3), mGradientComps(), mCurlComps(3), mGradient2Comps()
+      : mIsScalar(isScalar), mNeedSpectral(false), mNeedPhysical(false), mNeedGradient(false), mNeedCurl(false), mNeedGradient2(false), mPhysicalComps(3), mGradientComps(), mGradientTComps(3,3), mCurlComps(3), mGradient2Comps()
    {
       // Init default physical and spectral IDs
       this->initDefaultIds(spec, phys);
@@ -31,15 +31,23 @@ namespace QuICC {
 
       // Set default curl needs
       this->mCurlComps.setConstant(this->mNeedCurl);
+      
 
       // Set default gradient needs
-      ArrayB arr(3);
-      arr.setConstant(this->mNeedGradient);
-      for(auto id: this->mSpectralIds)
-      {
-         this->mGradientComps.insert(std::make_pair(id, arr));
-      }
-
+      //if(this->mIsScalar)
+      //{  // for scalars, grad is a 3d vector
+         ArrayB arr(3);
+         arr.setConstant(this->mNeedGradient);
+         for(auto id: this->mSpectralIds)
+         {
+            this->mGradientComps.insert(std::make_pair(id, arr));
+         }
+      //}
+      //else
+      //{ // for vectors, grad is 3x3 tensor
+         this->mGradientTComps.setConstant(this->mNeedGradient);
+      //}
+      
       // Set default 2nd order gradient needs
       MatrixB mat = MatrixB::Zero(3,3);
       mat.triangularView<Eigen::Upper>().setConstant(this->mNeedGradient2);
@@ -95,14 +103,22 @@ namespace QuICC {
       this->mPhysicalComps.setConstant(this->mNeedPhysical);
    }
 
-   void FieldRequirement::enableGradient()
+   void FieldRequirement::enableGradient(bool tensorForm)
    {
       this->mNeedGradient = true;
+      this->mNeedTensorGradient = tensorForm;
 
       // Enable all components
-      for(auto& c: this->mGradientComps)
+      if(!this->mIsScalar && tensorForm) // vector input and requested a tensor gradient
       {
-         c.second.setConstant(this->mNeedGradient);
+         this->mGradientTComps.setConstant(this->mNeedGradient); 
+      }
+      else // scalar input or requested vector form of gradient
+      {
+         for(auto& c: this->mGradientComps)
+         {
+            c.second.setConstant(this->mNeedGradient);
+         }
       }
    }
 
@@ -150,6 +166,11 @@ namespace QuICC {
       return this->mNeedGradient;
    }
 
+   bool FieldRequirement::needTensorGradient() const
+   {
+      return this->mNeedTensorGradient;
+   }
+
    bool FieldRequirement::needPhysicalCurl() const
    {
       return this->mNeedCurl;
@@ -170,6 +191,11 @@ namespace QuICC {
       assert(this->mGradientComps.count(id));
 
       return this->mGradientComps.find(id)->second;
+   }
+   // overload for the gradient of a vector (tensorial form)
+   const MatrixB& FieldRequirement::gradientComps() const
+   {
+      return this->mGradientTComps;
    }
 
    const ArrayB& FieldRequirement::curlComps() const
@@ -203,6 +229,21 @@ namespace QuICC {
       for(unsigned int i = 0; i < this->mPhysicalIds.size(); i++)
       {
          comps.insert(std::make_pair(this->mPhysicalIds.at(i), this->mGradientComps.find(id)->second(i)));
+      }
+
+      return comps;
+   }
+   // overload for the tensor form of the gradient of a vector
+   std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool> FieldRequirement::mapGradientComps() const
+   {
+      std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool> comps;
+
+      for(unsigned int i = 0; i < this->mPhysicalIds.size(); i++)
+      {
+         for(unsigned int j = 0; j < this->mPhysicalIds.size(); j++)
+         {
+            comps.insert(std::make_pair(std::make_pair(this->mPhysicalIds.at(i), this->mPhysicalIds.at(j)), this->mGradientTComps(i,j))); 
+         }
       }
 
       return comps;
@@ -262,6 +303,13 @@ namespace QuICC {
          this->mNeedGradient = this->mNeedGradient || it->second.any();
       }
    }
+   // overload
+   void FieldRequirement::updateGradient(const MatrixB& comps)
+   {
+      this->mGradientTComps = comps;
+
+      this->mNeedGradient = this->mGradientTComps.any();
+   }
 
    void FieldRequirement::updateCurl(const ArrayB& comps)
    {
@@ -310,9 +358,16 @@ namespace QuICC {
       // Do OR operation of physical gradient components requirement
       if(req.needPhysicalGradient())
       {
-         for(auto it = this->mSpectralIds.cbegin(); it != this->mSpectralIds.cend(); ++it)
+         if(this->mIsScalar)
          {
-            this->mGradientComps.find(*it)->second = this->mGradientComps.find(*it)->second || req.gradientComps(*it);
+            for(auto it = this->mSpectralIds.cbegin(); it != this->mSpectralIds.cend(); ++it)
+            {
+               this->mGradientComps.find(*it)->second = this->mGradientComps.find(*it)->second || req.gradientComps(*it);
+            }
+         }
+         else
+         {
+            this->mGradientTComps = this->mGradientTComps || req.gradientComps();
          }
       }
 

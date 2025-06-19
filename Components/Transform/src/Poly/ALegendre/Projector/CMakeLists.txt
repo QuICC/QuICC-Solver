@@ -1,9 +1,12 @@
 quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB_KK} ${QUICC_CMAKE_SRC_VISIBILITY}
   Base/P.cpp
   Base/D1.cpp
+  Base/D2.cpp
   Base/DivS1.cpp
+  Base/D1DivS1.cpp
   Base/DivS1D1S1.cpp
   Base/DivS1Dp.cpp
+  Base/D1DivS1Dp.cpp
   Base/Ll.cpp
   Base/LlD1.cpp
   Base/LlDivS1.cpp
@@ -21,8 +24,11 @@ if(QUICC_USE_KOKKOS AND NOT QUICC_USE_KOKKOS_CUDA)
   quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB_KK} ${QUICC_CMAKE_SRC_VISIBILITY}
     Kokkos/P.cpp
     Kokkos/D1.cpp
+    Kokkos/D2.cpp
     Kokkos/DivS1.cpp
+    Kokkos/D1DivS1.cpp
     Kokkos/DivS1Dp.cpp
+    Kokkos/D1DivS1Dp.cpp
     Kokkos/Ll.cpp
     Kokkos/LlD1.cpp
     Kokkos/LlDivS1.cpp
@@ -34,8 +40,11 @@ if(QUICC_USE_KOKKOS AND QUICC_USE_KOKKOS_CUDA)
    quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB_KK} ${QUICC_CMAKE_SRC_VISIBILITY}
     KokkosCuda/P.cpp
     KokkosCuda/D1.cpp
+    KokkosCuda/D2.cpp
     KokkosCuda/DivS1.cpp
+    KokkosCuda/D1DivS1.cpp
     KokkosCuda/DivS1Dp.cpp
+    KokkosCuda/D1DivS1Dp.cpp
     KokkosCuda/Ll.cpp
     KokkosCuda/LlD1.cpp
     KokkosCuda/LlDivS1.cpp

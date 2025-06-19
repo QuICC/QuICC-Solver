@@ -59,7 +59,7 @@ namespace QuICC {
          /**
           * brief Enable physical space gradient values
           */
-         void enableGradient();
+         void enableGradient(bool tensorForm = false);
 
          /**
           * brief Enable physical space curl values
@@ -110,6 +110,13 @@ namespace QuICC {
           * @brief Get the physical gradient components requirements
           */
          const ArrayB& gradientComps(const FieldComponents::Spectral::Id id) const;
+         // overload for the gradient of a vector (tensorial form)
+         const MatrixB& gradientComps() const;
+
+         /**
+          * @brief Get the physical gradient components requirements
+          */
+         bool needTensorGradient() const;
 
          /**
           * @brief Get the physical curl components requirements
@@ -140,6 +147,8 @@ namespace QuICC {
           * @brief Get map for gradient components to field requirements
           */
          std::map<FieldComponents::Physical::Id,bool> mapGradientComps(const FieldComponents::Spectral::Id id) const;
+         // overload for the tensor form of the gradient of a vector
+         std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool> mapGradientComps() const;
 
          /**
           * @brief Get map for curl components to field requirements
@@ -160,6 +169,8 @@ namespace QuICC {
           * @brief Update the gradient component requirements
           */
          void updateGradient(const std::map<FieldComponents::Spectral::Id,ArrayB>& comps);
+         // overload for the gradient of a vector (tensor form)
+         void updateGradient(const MatrixB& comps);
 
          /**
           * @brief Update the curl component requirements
@@ -207,6 +218,11 @@ namespace QuICC {
          bool  mNeedGradient;
 
          /**
+          * @brief Storage for tensor form of gradient requirements
+          */
+         bool  mNeedTensorGradient = false;
+
+         /**
           * @brief Storage for physical curl storage requirements
           */
          bool  mNeedCurl;
@@ -235,6 +251,11 @@ namespace QuICC {
           * @brief Detailed requirements for gradient field components
           */
          std::map<FieldComponents::Spectral::Id,ArrayB> mGradientComps;
+
+         /**
+          * @brief Detailed requirements for gradient field tensor components
+          */
+         MatrixB mGradientTComps;
 
          /**
           * @brief Detailed requirements for curl field components

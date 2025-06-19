@@ -81,6 +81,9 @@ namespace QuICC {
              * @brief Generate the list of branches in scalar gradient transform
              */
             virtual std::vector<TransformPath>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req) const;
+            //overload to calculate the tensor form of grad(u)
+            virtual std::vector<TransformPath>  backwardGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req) const;
+
 
             /**
              * @brief Generate the list of branches in scalar 2nd order gradient transform
@@ -101,11 +104,6 @@ namespace QuICC {
              * @brief Generate the list of branches in vector curl transform
              */
             virtual std::vector<TransformPath>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req) const;
-
-            /**
-             * @brief Generate the list of branches in dv/dr transform
-             */
-            virtual std::vector<TransformPath>  backwardDrComp(const std::map<FieldComponents::Physical::Id,bool>& req) const;
 
             /**
              * @brief Generate the list of branches in dv/dphi transform

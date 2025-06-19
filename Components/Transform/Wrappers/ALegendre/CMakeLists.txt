@@ -6,7 +6,7 @@ endif()
 
 set(Kinds "Projector;Integrator")
 
-set(ProjectorOps "P;D1;Ll;LlD1;DivS1;DivS1Dp;LlDivS1;LlDivS1Dp")
+set(ProjectorOps "P;D1;D2;Ll;LlD1;DivS1;DivS1Dp;D1DivS1;D1DivS1Dp;LlDivS1;LlDivS1Dp")
 set(IntegratorOps "P;D1;Ll;LlD1;DivS1;DivS1Dp;LlDivS1;LlDivS1Dp;Ll2;DivLl;DivLlD1;DivLlDivS1;DivLlDivS1Dp")
 
 set(IntegratorOpAttribute "S1CLCSC3D")
@@ -16,6 +16,7 @@ set(ProjectorOpInOut "phys_t, mods_t")
 
 # Ops
 set(DivS1DpTreatment "diffPhi_m")
+set(D1DivS1DpTreatment "diffPhi_m")
 set(LlDivS1DpTreatment "diffPhi_m")
 set(DivLlDivS1DpTreatment "diffPhi_m")
 
