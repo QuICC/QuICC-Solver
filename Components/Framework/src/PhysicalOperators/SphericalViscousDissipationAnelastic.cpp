@@ -86,7 +86,24 @@ namespace Physical {
                                              std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
-   { /* TO BE IIMPLEMENTED IF NEEDED*/}
+   {
+      int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+      int iR_;
+
+      auto nu        = pV->evaluate(r, 0, 0); 
+      auto T         = pT->evaluate(r, 0, 0); 
+      auto Rho       = pF->evaluate(r, 0, 0); 
+      auto dLogRho   = pDF->evaluate(r, 0, 0);
+
+      for(int iR = 0; iR < nR; ++iR)
+      {
+         iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);         
+
+         auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), Rho(iR_), dLogRho(iR_));
+
+         rS.setSlice(slice, iR);
+      }
+   }
 
    void SphericalViscousDissipationAnelastic::add(Framework::Selector::PhysicalScalarField &rS,
                                              const Resolution& res, 
