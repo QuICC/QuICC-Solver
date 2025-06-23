@@ -358,5 +358,64 @@ void readBlockData(std::vector<Matrix>& inBlocks, const std::string& path)
    }
 }
 
+void readLines(std::vector<std::string>& lines, const std::string& path)
+{
+   std::ifstream infile;
+   infile.open(path, std::ios::in | std::ios::binary);
+   if (!infile.is_open())
+   {
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr << "  Couldn't open real input file: " + path << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      inData.setConstant(std::numeric_limits<MHDFloat>::max());
+   }
+   else
+   {
+      std::string line;
+
+      while(std::getline(infile, line))
+      {
+	 // Ignore commented lines     
+	 if(lines[0] != '#')
+	 {
+            lines.push_back(line);
+	 }
+      }
+      infile.close();
+   }
+}
+
+void splitLine(std::vector<std::string>& words, const std::string& line, const char delim)
+{
+   std::stringstream ss(line);
+   std::string word;
+
+   while(std::getline(ss, word, delim))
+   {
+      words.push_back(word);
+   }
+}
+
+void getCommand(int& argc, std::vector<char *>& argv, const std::vectors<td::string>& options)
+{
+   argc = options.size();
+
+   argv.reserve(options.size());
+   for(auto& o: options)
+   {
+      argv.push_back(o.c_str());
+   }
+}
+
 } // namespace TestSuite
 } // namespace QuICC

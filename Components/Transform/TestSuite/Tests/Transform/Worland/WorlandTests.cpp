@@ -30,6 +30,8 @@ int main( int argc, char* argv[] )
 
    std::string testType = "";
 
+   std::string commandFile = "";
+
    // Build a new parser on top of Catch's
    using namespace Catch::clara;
    auto cli
@@ -57,13 +59,29 @@ int main( int argc, char* argv[] )
          ("Iterations")
       | Opt( test::args().dumpData )          // Add keep output data option
          ["--dumpData"]
-         ("Write output data to file?");
+         ("Write output data to file?")
+      | Opt( options_file )          // Read options from file
+         ["--options_file"]
+         ("Read command options from file");
 
    // Now pass the new composite back to Catch so it uses that
    session.cli( cli );
 
+   std::string testType = "";
+   test::args().clear();
+
+   std::vector<std::string> commands;
+   QuICC::TestSuite::readLines(commands, options_file);
+
+   for(const auto& command: commands)
+   {
+	   std::vector<std::string> options;
+	   QuICC::TestSuite::splitLine(options, command, ';');
+
+	   int run_argc;
+	   std::vector<char *> run_argv;
    // Let Catch (using Clara) parse the command line
-   int returnCode = session.applyCommandLine( argc, argv );
+   int returnCode = session.applyCommandLine( run_argc, run_argv.data() );
    if( returnCode != 0 ) // Indicates a command line error
       return returnCode;
 
@@ -79,6 +97,7 @@ int main( int argc, char* argv[] )
    }
 
    auto ret = session.run();
+   }
 
    QuICC::Profiler::Finalize();
 
