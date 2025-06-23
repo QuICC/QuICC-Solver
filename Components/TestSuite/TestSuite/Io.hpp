@@ -78,6 +78,7 @@ void readLines(std::vector<std::string>& lines, const std::string& path);
 /// @param delim delimiter to use for splitting
 void splitLine(std::vector<std::string>& words, const std::string& line, const char delim);
 
+/// @brief Set standard argc/argv based on options vector
 void getCommand(int& argc, std::vector<char *> argv, const std::vector<std::string>& options);
 
 } // namespace TestSuite

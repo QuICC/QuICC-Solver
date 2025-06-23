@@ -15,6 +15,7 @@
 // Project includes
 //
 #include "Environment/QuICCEnv.hpp"
+#include "TestSuite/Io.hpp"
 #include "QuICC/TestSuite/Transform/Worland/TestArgs.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -30,7 +31,7 @@ int main( int argc, char* argv[] )
 
    std::string testType = "";
 
-   std::string commandFile = "";
+   std::string optionsFile = "";
 
    // Build a new parser on top of Catch's
    using namespace Catch::clara;
@@ -60,26 +61,33 @@ int main( int argc, char* argv[] )
       | Opt( test::args().dumpData )          // Add keep output data option
          ["--dumpData"]
          ("Write output data to file?")
-      | Opt( options_file )          // Read options from file
+      | Opt( optionsFile, "options file" )          // Read options from file
          ["--options_file"]
          ("Read command options from file");
 
    // Now pass the new composite back to Catch so it uses that
    session.cli( cli );
 
-   std::string testType = "";
-   test::args().clear();
-
    std::vector<std::string> commands;
-   QuICC::TestSuite::readLines(commands, options_file);
+   QuICC::TestSuite::readLines(commands, optionsFile);
 
+   int ret = -1;
    for(const auto& command: commands)
    {
+      // Reset 
+      Catch::ConfigData cd = {0};
+      session.useConfigData(cd);
+      testType = "";
+      test::args().clear();
+
+      // Process next line
 	   std::vector<std::string> options;
 	   QuICC::TestSuite::splitLine(options, command, ';');
 
 	   int run_argc;
 	   std::vector<char *> run_argv;
+      QuICC::TestSuite::getCommand(run_argc, run_argv, options);
+
    // Let Catch (using Clara) parse the command line
    int returnCode = session.applyCommandLine( run_argc, run_argv.data() );
    if( returnCode != 0 ) // Indicates a command line error
@@ -96,7 +104,7 @@ int main( int argc, char* argv[] )
       test::args().useDefault = false;
    }
 
-   auto ret = session.run();
+   ret = session.run();
    }
 
    QuICC::Profiler::Finalize();

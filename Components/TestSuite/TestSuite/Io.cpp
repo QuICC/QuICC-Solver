@@ -377,7 +377,8 @@ void readLines(std::vector<std::string>& lines, const std::string& path)
       std::cerr
          << "*****************************************************************"
          << std::endl;
-      inData.setConstant(std::numeric_limits<MHDFloat>::max());
+
+      lines.clear();
    }
    else
    {
@@ -386,7 +387,7 @@ void readLines(std::vector<std::string>& lines, const std::string& path)
       while(std::getline(infile, line))
       {
 	 // Ignore commented lines     
-	 if(lines[0] != '#')
+	 if(line[0] != '#')
 	 {
             lines.push_back(line);
 	 }
@@ -406,14 +407,14 @@ void splitLine(std::vector<std::string>& words, const std::string& line, const c
    }
 }
 
-void getCommand(int& argc, std::vector<char *>& argv, const std::vectors<td::string>& options)
+void getCommand(int& argc, std::vector<char *>& argv, const std::vector<std::string>& options)
 {
    argc = options.size();
 
    argv.reserve(options.size());
    for(auto& o: options)
    {
-      argv.push_back(o.c_str());
+      argv.push_back(const_cast<char *>(o.c_str()));
    }
 }
 
