@@ -70,7 +70,9 @@ void readData(SparseMatrix& inData, const std::string& path);
 /// @brief Read lines from file
 /// @param lines storage for lines
 /// @param path path to the file
-void readLines(std::vector<std::string>& lines, const std::string& path);
+/// @param jid  parallel job id
+/// @param jN  number of parallel jobs
+void readLines(std::vector<std::string>& lines, const std::string& path, const std::size_t jid, const std::size_t jN);
 
 /// @brief Split line into words
 /// @param words storage for words

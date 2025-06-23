@@ -358,7 +358,7 @@ void readBlockData(std::vector<Matrix>& inBlocks, const std::string& path)
    }
 }
 
-void readLines(std::vector<std::string>& lines, const std::string& path)
+void readLines(std::vector<std::string>& lines, const std::string& path, const std::size_t jid, const std::size_t jN)
 {
    std::ifstream infile;
    infile.open(path, std::ios::in | std::ios::binary);
@@ -384,13 +384,18 @@ void readLines(std::vector<std::string>& lines, const std::string& path)
    {
       std::string line;
 
+      std::size_t c = 0;
       while(std::getline(infile, line))
       {
-	 // Ignore commented lines     
-	 if(line[0] != '#')
-	 {
-            lines.push_back(line);
-	 }
+         // Ignore commented lines
+         if(line[0] != '#')
+         {
+            if(c % jN == jid)
+            {
+               lines.push_back(line);
+            }
+            c++;
+         }
       }
       infile.close();
    }

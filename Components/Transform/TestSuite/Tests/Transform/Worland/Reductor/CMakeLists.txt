@@ -5,6 +5,7 @@ include(SetUlp)
 
 # Create tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 set(_tests
   Poly::Energy:<base_t>:reductor
@@ -847,3 +848,14 @@ foreach(_test ${_split_tests})
         SPLITS 4:0 8:0 8:0 96:0 288:0 256:0 3072:0 9216:0
     )
 endforeach()
+
+# Merged tests
+set(_jN 32)
+math(EXPR _jMax "${_jN} - 1")
+foreach(_jid RANGE ${_jMax})
+  add_test(
+    NAME ${TestExe}_reductor_merged_${_jid}_${_jN}
+    COMMAND ${TestExe} --options_file ${CMAKE_CURRENT_BINARY_DIR}/all_tests.txt --jid ${_jid} --jN ${_jN}
+    WORKING_DIRECTORY ${QUICC_WORK_DIR}
+  )
+  endforeach()

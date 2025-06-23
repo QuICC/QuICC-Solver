@@ -5,6 +5,7 @@ include(SetUlp)
 
 # Create  tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 set(_tests
   Poly::P:<base_t>:projector
@@ -366,4 +367,15 @@ foreach(_perf_id 108 109)
       PERFONLY
       )
   endforeach()
+endforeach()
+
+# Merged tests
+set(_jN 32)
+math(EXPR _jMax "${_jN} - 1")
+foreach(_jid RANGE ${_jMax})
+  add_test(
+    NAME ${TestExe}_projector_merged_${_jid}_${_jN}
+    COMMAND ${TestExe} --options_file ${CMAKE_CURRENT_BINARY_DIR}/all_tests.txt --jid ${_jid} --jN ${_jN}
+    WORKING_DIRECTORY ${QUICC_WORK_DIR}
+  )
 endforeach()

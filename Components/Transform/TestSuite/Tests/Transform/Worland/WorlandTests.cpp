@@ -32,6 +32,8 @@ int main( int argc, char* argv[] )
    std::string testType = "";
 
    std::string optionsFile = "";
+   std::size_t jid = 0;
+   std::size_t jN = 1;
 
    // Build a new parser on top of Catch's
    using namespace Catch::clara;
@@ -63,7 +65,13 @@ int main( int argc, char* argv[] )
          ("Write output data to file?")
       | Opt( optionsFile, "options file" )          // Read options from file
          ["--options_file"]
-         ("Read command options from file");
+         ("Read command options from file")
+      | Opt( jid, "parallel id" )          // Read options from file
+         ["--jid"]
+         ("Id of parallel executor")
+      | Opt( jN, "parallel jobs (only with options_file)" )          // Read options from file
+         ["--jN"]
+         ("Number of parallel jobs (only with options_file)");
 
    // Now pass the new composite back to Catch so it uses that
    session.cli( cli );
@@ -92,7 +100,7 @@ int main( int argc, char* argv[] )
    else
    {
       std::vector<std::string> commands;
-      QuICC::TestSuite::readLines(commands, optionsFile);
+      QuICC::TestSuite::readLines(commands, optionsFile, jid, jN);
 
       std::vector<std::string> failed;
       std::size_t counter = 0;
