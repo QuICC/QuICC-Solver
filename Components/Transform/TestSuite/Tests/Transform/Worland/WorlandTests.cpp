@@ -95,9 +95,11 @@ int main( int argc, char* argv[] )
       QuICC::TestSuite::readLines(commands, optionsFile);
 
       std::vector<std::string> failed;
+      std::size_t counter = 0;
       for(const auto& command: commands)
       {
          // Reset session
+         QuICC::Profiler::RegionResetAll();
          Catch::ConfigData cd = {0};
          session.useConfigData(cd);
          testType = "";
@@ -106,6 +108,13 @@ int main( int argc, char* argv[] )
          // Process next line
          std::vector<std::string> options;
          QuICC::TestSuite::splitLine(options, command, ';');
+
+         std::cout << "[" << counter << "/" << commands.size() << "]:";
+         for(auto&& o: options)
+         {
+            std::cout << ' ' << o;
+         }
+         std::cout << std::endl;
 
          int run_argc;
          std::vector<char *> run_argv;
@@ -128,6 +137,7 @@ int main( int argc, char* argv[] )
          }
 
          ret = session.run();
+         counter++;
 
          if(ret != 0)
          {
