@@ -68,46 +68,90 @@ int main( int argc, char* argv[] )
    // Now pass the new composite back to Catch so it uses that
    session.cli( cli );
 
-   std::vector<std::string> commands;
-   QuICC::TestSuite::readLines(commands, optionsFile);
-
-   int ret = -1;
-   for(const auto& command: commands)
-   {
-      // Reset 
-      Catch::ConfigData cd = {0};
-      session.useConfigData(cd);
-      testType = "";
-      test::args().clear();
-
-      // Process next line
-	   std::vector<std::string> options;
-	   QuICC::TestSuite::splitLine(options, command, ';');
-
-	   int run_argc;
-	   std::vector<char *> run_argv;
-      QuICC::TestSuite::getCommand(run_argc, run_argv, options);
-
    // Let Catch (using Clara) parse the command line
-   int returnCode = session.applyCommandLine( run_argc, run_argv.data() );
+   int returnCode = session.applyCommandLine( argc, argv );
    if( returnCode != 0 ) // Indicates a command line error
       return returnCode;
 
-   // Set test from command line
-   if(testType != "")
+   if(optionsFile == "")
    {
-      test::args().setType(testType);
-   }
+      // Set test from command line
+      if(testType != "")
+      {
+         test::args().setType(testType);
+      }
 
-   if(test::args().params.size() > 0)
+      if(test::args().params.size() > 0)
+      {
+         test::args().useDefault = false;
+      }
+
+      returnCode = session.run();
+   }
+   // Process commands from options file
+   else
    {
-      test::args().useDefault = false;
-   }
+      std::vector<std::string> commands;
+      QuICC::TestSuite::readLines(commands, optionsFile);
 
-   ret = session.run();
+      std::vector<std::string> failed;
+      for(const auto& command: commands)
+      {
+         // Reset session
+         Catch::ConfigData cd = {0};
+         session.useConfigData(cd);
+         testType = "";
+         test::args().clear();
+
+         // Process next line
+         std::vector<std::string> options;
+         QuICC::TestSuite::splitLine(options, command, ';');
+
+         int run_argc;
+         std::vector<char *> run_argv;
+         QuICC::TestSuite::getCommand(run_argc, run_argv, options);
+
+         // Let Catch (using Clara) parse the command line
+         int ret = session.applyCommandLine( run_argc, run_argv.data() );
+         if( ret != 0 ) // Indicates a command line error
+            return ret;
+
+         // Set test from command line
+         if(testType != "")
+         {
+            test::args().setType(testType);
+         }
+
+         if(test::args().params.size() > 0)
+         {
+            test::args().useDefault = false;
+         }
+
+         ret = session.run();
+
+         if(ret != 0)
+         {
+            failed.push_back(options.at(1));
+         }
+      }
+
+      returnCode = failed.size();
+
+      if(returnCode == 0)
+      {
+         std::cout << "All merged tests passed" << std::endl;
+      }
+      else
+      {
+         std::cout << "Following merged tests failed: " << std::endl;
+         for(auto&& tag: failed)
+         {
+            std::cout << "   " << tag << std::endl;
+         }
+      }
    }
 
    QuICC::Profiler::Finalize();
 
-   return ret;
+   return returnCode;
 }

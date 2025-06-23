@@ -79,7 +79,10 @@ void readLines(std::vector<std::string>& lines, const std::string& path);
 void splitLine(std::vector<std::string>& words, const std::string& line, const char delim);
 
 /// @brief Set standard argc/argv based on options vector
-void getCommand(int& argc, std::vector<char *> argv, const std::vector<std::string>& options);
+/// @param argc      Output argc
+/// @param argv      Output argv
+/// @param options   Options vector
+void getCommand(int& argc, std::vector<char *>& argv, const std::vector<std::string>& options);
 
 } // namespace TestSuite
 } // namespace QuICC

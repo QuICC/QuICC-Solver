@@ -71,6 +71,16 @@ function(__add_test _testname)
       )
     endif()
   endif()
+
+  if(NOT _QAT_DIS)
+    if(_QAT_STP)
+      if(${_QAT_STP} GREATER "0")
+        MESSAGE(STATUS "${_QAT_COMM} --timeOnly --iter ${_QAT_STP}")
+      endif()
+    else()
+      MESSAGE(STATUS ${_QAT_COMM})
+    endif()
+  endif()
 endfunction()
 
 
