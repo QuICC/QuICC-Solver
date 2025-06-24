@@ -10,13 +10,13 @@
 #include <array>
 #include <iomanip>
 #include <utility>
+#include <random>
+#include <algorithm>
 
 #ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5DataSpace.hpp>
 #include <highfive/H5File.hpp>
-#include <random>
-#include <algorithm>
 #endif
 
 #include "PeakRss.hpp"
