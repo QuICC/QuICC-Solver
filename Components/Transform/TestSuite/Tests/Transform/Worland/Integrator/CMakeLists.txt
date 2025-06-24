@@ -635,12 +635,8 @@ foreach(_perf_id 108 109)
 endforeach()
 
 # Merged tests
-set(_jN 4)
-math(EXPR _jMax "${_jN} - 1")
-foreach(_jid RANGE ${_jMax})
-  add_test(
-    NAME ${TestExe}_integrator_merged_${_jid}_${_jN}
-    COMMAND ${TestExe} --options_file ${CMAKE_CURRENT_BINARY_DIR}/all_tests.txt --jid ${_jid} --jN ${_jN}
-    WORKING_DIRECTORY ${QUICC_WORK_DIR}
-  )
-endforeach()
+quicc_add_merged_test(
+  ${TestExe}_integrator_merged
+  COMMAND ${TestExe}
+  JN 32
+)

@@ -57,12 +57,8 @@ foreach(_test ${_tests})
 endforeach()
 
 # Merged tests
-set(_jN 6)
-math(EXPR _jMax "${_jN} - 1")
-foreach(_jid RANGE ${_jMax})
-  add_test(
-    NAME ${TestExe}_bfloop_merged_${_jid}_${_jN}
-    COMMAND ${TestExe} --options_file ${CMAKE_CURRENT_BINARY_DIR}/all_tests.txt --jid ${_jid} --jN ${_jN}
-    WORKING_DIRECTORY ${QUICC_WORK_DIR}
-  )
-endforeach()
+quicc_add_merged_test(
+  ${TestExe}_bfloop_merged
+  COMMAND ${TestExe}
+  JN 6
+)
