@@ -71,6 +71,16 @@ function(__add_test _testname)
       )
     endif()
   endif()
+
+  if(NOT _QAT_DIS)
+    if(_QAT_STP)
+      if(${_QAT_STP} GREATER "0")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/prof_all_tests.txt" "${_QAT_COMM} --timeOnly --iter ${_QAT_STP}\n")
+      endif()
+    else()
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/all_tests.txt" "${_QAT_COMM}\n")
+    endif()
+  endif()
 endfunction()
 
 
@@ -248,4 +258,44 @@ function(quicc_add_test target)
   endif()
 
   list(POP_BACK CMAKE_MESSAGE_INDENT)
+endfunction()
+
+function(quicc_add_merged_test target)
+  # parse inputs
+  set(options )
+  set(oneValueArgs COMMAND JN LISTDIR WORKDIR)
+  set(multiValueArgs )
+  cmake_parse_arguments(QAMT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+  message(DEBUG "quicc_add_merged_test")
+  list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+
+  message(DEBUG "target: ${target}")
+  message(DEBUG "QAMT_COMMAND: ${QAMT_COMMAND}")
+  if(NOT QAMT_JN)
+    set(QAMT_JN 1)
+  endif()
+  message(DEBUG "QAMT_JN: ${QAMT_JN}")
+  if(NOT QAMT_LISTDIR)
+    set(QAMT_LISTDIR ${CMAKE_CURRENT_BINARY_DIR})
+  endif()
+  message(DEBUG "QAMT_LISTDIR: ${QAMT_LISTDIR}")
+  if(NOT QAMT_WORKDIR)
+    set(QAMT_WORKDIR ${QUICC_WORK_DIR})
+  endif()
+  message(DEBUG "QAMT_WORKDIR: ${QAMT_WORKDIR}")
+
+  math(EXPR _jMax "${QAMT_JN} - 1")
+  foreach(_jid RANGE ${_jMax})
+    add_test(
+      NAME ${target}_${_jid}_${QAMT_JN}
+      COMMAND ${QAMT_COMMAND} --options_file ${QAMT_LISTDIR}/all_tests.txt --jid ${_jid} --jN ${QAMT_JN}
+      WORKING_DIRECTORY ${QAMT_WORKDIR}
+    )
+  endforeach()
+endfunction()
+
+function(quicc_clear_test_list )
+  message(DEBUG "Removing old test listings")
+  file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/all_tests.txt" "${CMAKE_CURRENT_BINARY_DIR}/prof_all_tests.txt")
 endfunction()
