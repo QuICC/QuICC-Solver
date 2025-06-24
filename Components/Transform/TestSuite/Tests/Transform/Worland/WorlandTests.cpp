@@ -5,9 +5,6 @@
 
 #define CATCH_CONFIG_RUNNER
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -17,6 +14,7 @@
 #include "Environment/QuICCEnv.hpp"
 #include "TestSuite/Io.hpp"
 #include "QuICC/TestSuite/Transform/Worland/TestArgs.hpp"
+#include "QuICC/TestSuite/Transform/MergeTest.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace test = QuICC::TestSuite::Transform::Worland;
@@ -31,27 +29,25 @@ int main( int argc, char* argv[] )
 
    std::string testType = "";
 
-   std::string optionsFile = "";
-   std::size_t jid = 0;
-   std::size_t jN = 1;
+   QuICC::TestSuite::Transform::MergeInfo info;
 
    // Build a new parser on top of Catch's
    using namespace Catch::clara;
    auto cli
       = session.cli()
-      | Opt( test::args().ulp, "ulp" )        // Add max ulp option
+      | Opt( test::args().ulp, "ulp" )       // Add max ulp option
          ["--ulp"]
          ("Maximum acceptable ulp")
-      | Opt( test::args().params, "id" )      // Add test id option
+      | Opt( test::args().params, "id" )     // Add test id option
          ["--id"]
          ("Test id")
-      | Opt( test::args().np, "np" )      // Add test np option
+      | Opt( test::args().np, "np" )         // Add test np option
          ["--np"]
          ("# MPI ranks")
-      | Opt( test::args().rank, "rank" )      // Add test rank option
+      | Opt( test::args().rank, "rank" )     // Add test rank option
          ["--rank"]
          ("MPI rank")
-      | Opt( testType, "test type" )                          // Add test type
+      | Opt( testType, "test type" )         // Add test type
          ["--type"]
          ("Test type: projector, integrator, reductor, bfloop")
       | Opt( test::args().timeOnly )         // Add timing only
@@ -60,18 +56,18 @@ int main( int argc, char* argv[] )
       | Opt( test::args().iter, "iter" )     // Number of iterations
          ["--iter"]
          ("Iterations")
-      | Opt( test::args().dumpData )          // Add keep output data option
+      | Opt( test::args().dumpData )         // Add keep output data option
          ["--dumpData"]
          ("Write output data to file?")
-      | Opt( optionsFile, "options file" )          // Read options from file
+      | Opt( info.file, "options file" )     // Read options from file
          ["--options_file"]
          ("Read command options from file")
-      | Opt( jid, "parallel id" )          // Read options from file
+      | Opt( info.jid, "parallel id" )       // Read options from file
          ["--jid"]
          ("Id of parallel executor")
-      | Opt( jN, "parallel jobs (only with options_file)" )          // Read options from file
+      | Opt( info.jN, "parallel jobs" )      // Read options from file
          ["--jN"]
-         ("Number of parallel jobs (only with options_file)");
+         ("Number of parallel jobs");
 
    // Now pass the new composite back to Catch so it uses that
    session.cli( cli );
@@ -79,9 +75,12 @@ int main( int argc, char* argv[] )
    // Let Catch (using Clara) parse the command line
    int returnCode = session.applyCommandLine( argc, argv );
    if( returnCode != 0 ) // Indicates a command line error
+   {
       return returnCode;
+   }
 
-   if(optionsFile == "")
+   // run with given command line arguments
+   if(info.file == "")
    {
       // Set test from command line
       if(testType != "")
@@ -99,74 +98,7 @@ int main( int argc, char* argv[] )
    // Process commands from options file
    else
    {
-      std::vector<std::string> commands;
-      QuICC::TestSuite::readLines(commands, optionsFile, jid, jN);
-
-      std::vector<std::string> failed;
-      std::size_t counter = 0;
-      for(const auto& command: commands)
-      {
-         // Reset session
-         QuICC::Profiler::RegionResetAll();
-         Catch::ConfigData cd = {0};
-         session.useConfigData(cd);
-         testType = "";
-         test::args().clear();
-
-         // Process next line
-         std::vector<std::string> options;
-         QuICC::TestSuite::splitLine(options, command, ';');
-
-         std::cout << "[" << counter << "/" << commands.size() << "]:";
-         for(auto&& o: options)
-         {
-            std::cout << ' ' << o;
-         }
-         std::cout << std::endl;
-
-         int run_argc;
-         std::vector<char *> run_argv;
-         QuICC::TestSuite::getCommand(run_argc, run_argv, options);
-
-         // Let Catch (using Clara) parse the command line
-         int ret = session.applyCommandLine( run_argc, run_argv.data() );
-         if( ret != 0 ) // Indicates a command line error
-            return ret;
-
-         // Set test from command line
-         if(testType != "")
-         {
-            test::args().setType(testType);
-         }
-
-         if(test::args().params.size() > 0)
-         {
-            test::args().useDefault = false;
-         }
-
-         ret = session.run();
-         counter++;
-
-         if(ret != 0)
-         {
-            failed.push_back(options.at(1));
-         }
-      }
-
-      returnCode = failed.size();
-
-      if(returnCode == 0)
-      {
-         std::cout << "All merged tests passed" << std::endl;
-      }
-      else
-      {
-         std::cout << "Following merged tests failed: " << std::endl;
-         for(auto&& tag: failed)
-         {
-            std::cout << "   " << tag << std::endl;
-         }
-      }
+      returnCode = QuICC::TestSuite::Transform::runMergedTests(info, session, test::args());
    }
 
    QuICC::Profiler::Finalize();

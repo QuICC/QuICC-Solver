@@ -371,7 +371,7 @@ endforeach()
 
 # Merged tests
 quicc_add_merged_test(
-  NAME ${TestExe}_projector_merged
+  ${TestExe}_projector_merged
   COMMAND ${TestExe}
   JN 32
 )
