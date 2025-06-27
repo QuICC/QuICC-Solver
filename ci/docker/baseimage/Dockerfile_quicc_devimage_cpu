@@ -1,0 +1,72 @@
+# Depend on CSCS official spack base container helpers
+FROM ghcr.io/eth-cscs/docker-ci-ext/spack-base-containers/spack-build:spack0.23.0-ubuntu22.04-cpu AS builder
+
+ARG NUM_PROCS=14
+ARG TARGETPLATFORM
+
+# Override standard target definitions
+COPY scripts/spack-install-helper-10-preprocessing.patch /tmp/spack-install-helper-10-preprocessing.patch
+RUN patch -p1 /usr/local/bin/spack-install-helper-10-preprocessing /tmp/spack-install-helper-10-preprocessing.patch
+RUN rm /tmp/spack-install-helper-10-preprocessing.patch
+
+# use spack-install-helper that has all the spack boilerplate
+# First argument is the target machine, the rest are spack specs
+RUN spack-install-helper --target $TARGETPLATFORM \
+    "git" \
+    "vim +python +perl +lua" \
+    "cmake" \
+    "fftw" \
+    "hdf5" \
+    "openblas" \
+    "boost@1.85.0" \
+    "py-scipy" \
+    "py-numpy" \
+    "py-matplotlib" \
+    "gdb" \
+    "valgrind"
+
+# Bare OS image to run the installed executables
+FROM ghcr.io/eth-cscs/docker-ci-ext/spack-base-containers/spack-runtime:ubuntu22.04-cpu
+
+# it is important to keep the paths, otherwise your installation is broken
+# all these paths are created with the above `spack-install-helper` invocation
+COPY --from=builder /opt/spack-environment /opt/spack-environment
+COPY --from=builder /opt/software /opt/software
+COPY --from=builder /opt/._view /opt/._view
+COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
+
+# Some boilerplate to get all paths correctly - fix_spack_install is part of the base image
+# and makes sure that all important things are being correctly setup
+RUN fix_spack_install
+
+# Finally install software that is needed, e.g. compilers
+# It is also possible to build compilers via spack and let all dependencies be handled by spack
+RUN apt-get -yqq update && apt-get -yqq upgrade \
+ && apt-get -yqq install build-essential gfortran gcc g++ ninja-build tmux bash-completion
+
+#################
+# Install LLVM 17
+RUN apt-get -yqq install lsb-release wget \
+ software-properties-common gnupg
+
+RUN wget https://apt.llvm.org/llvm.sh \
+ && chmod +x llvm.sh \
+ && ./llvm.sh 17
+
+RUN apt-get -yqq install libmlir-17-dev mlir-17-tools
+
+#################
+# Install Reframe
+RUN cd /opt \
+ && rm -rf rfm_venv \
+ && python3 -m venv rfm_venv \
+ && source rfm_venv/bin/activate \
+ && rm -rf reframe \
+ && git clone https://github.com/reframe-hpc/reframe.git \
+ && (cd reframe; git checkout v4.7.1; ./bootstrap.sh) \
+ && export PATH=/opt/reframe/bin:$PATH \
+ && reframe --version
+
+RUN echo "source /opt/rfm_venv/bin/activate" >> /etc/profile.d/z99_reframe.sh \
+ && echo "export PATH=/opt/reframe/bin:$PATH" >> /etc/profile.d/z99_reframe.sh
+

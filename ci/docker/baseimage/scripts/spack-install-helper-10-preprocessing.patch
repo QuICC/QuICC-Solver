@@ -1,0 +1,27 @@
+--- /home/philippe/Downloads/spack-install-helper-10-preprocessing	2025-06-19 15:53:03.048459805 +0200
++++ spack-install-helper-10-preprocessing	2025-06-20 09:55:21.560596697 +0200
+@@ -24,7 +24,7 @@
+ SPECS_ONLY_DEPENDENCIES=()
+ TARGET_MACHINE=
+ 
+-POSSIBLE_TARGETS="daint-gpu daint-mc alps-zen2 alps-a100 alps-mi200 alps-gh200 alps-mi300a"
++POSSIBLE_TARGETS="daint-gpu daint-mc alps-zen2 alps-a100 alps-mi200 alps-gh200 alps-mi300a linux/amd64 linux/arm64"
+ DEFAULT_VARIANTS="+openmp +mpi build_type=Release"
+ CUDA_EXTERNAL_DEF=""
+ ROCM_EXTERNAL_DEF=""
+@@ -162,7 +162,15 @@
+     alps-mi300a)
+         #TODO
+         ;;
++    linux/amd64)
++        TARGET="broadwell"
++        ;;
++    linux/arm64)
++        DEFAULT_VARIANTS="+mpi build_type=Release"
++        TARGET="aarch64"
++        ;;
+     *)
++        echo "Given target: $TARGET_MACHINE"
+         echo "The target argument must be any of '$POSSIBLE_TARGETS'."
+         exit 1
+         ;;

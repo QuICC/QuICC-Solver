@@ -8,6 +8,10 @@ jobs:
       image: quicc/quicc_devimage_cpu:latest
 
     steps:
+      - name: Initialize spack
+        run: |
+          spack-env bash
+
       - name: Checkout
         uses: actions/checkout@v4
 
