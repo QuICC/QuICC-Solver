@@ -29,10 +29,7 @@ build-quicc:
     DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:e1a7eea3e189eb5473b6355770b72ab8"]'
 test-quicc-lib:
   variables:
-    SLURM_NTASKS: 1
-    SLURM_NTASKS_PER_NODE: 1
-    SLURM_CPUS_PER_TASK: '288'
-    TEST_NCPU: '288'
+    TEST_NCPU: '72'
   extends:
   - .test-lib
   - .alps-gh200_runner

@@ -132,10 +132,7 @@ class libtest_pipeline(base_pipeline):
         self.config['test-quicc-lib'] = {
                 'variables':
                     {
-                        'SLURM_NTASKS': 1,
-                        'SLURM_NTASKS_PER_NODE': 1,
-                        'SLURM_CPUS_PER_TASK': str(self.cpus_full_node),
-                        'TEST_NCPU': str(self.cpus_full_node)
+                        'TEST_NCPU': str(self.cpus_full_socket)
                     },
                 'extends':
                     [
