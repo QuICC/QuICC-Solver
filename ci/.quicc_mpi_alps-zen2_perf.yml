@@ -25,22 +25,11 @@ build-quicc:
     DOCKERFILE: ci/docker/Dockerfile_mpi
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
     DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:098a6f351d02d3d61f1273db9a80028a"]'
-test-quicc-lib:
-  variables:
-    TEST_NCPU: '128'
+time-quicc-lib:
   extends:
-  - .test-lib
+  - .time-lib-sweep-alps-zen2
   - .alps-zen2_runner
   image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-test-quicc-mpi-lib:
-  extends:
-  - .test-lib-mpi
-  - .alps-zen2_runner
-  image: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-  variables:
-    SLURM_NTASKS: '4'
-    SLURM_NTASKS_PER_NODE: '4'
-    SLURM_CPUS_PER_TASK: '32'
 ci-cache-cleanup:
   extends: .alps-zen2_runner
   stage: cleanup

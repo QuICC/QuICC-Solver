@@ -121,6 +121,10 @@ class libtest_pipeline(base_pipeline):
                 ],
             )
         self.config['test-quicc-lib'] = {
+                'variables':
+                    {
+                        'TEST_NCPU': str(self.cpus_full_node)
+                    },
                 'extends':
                     [
                         '.test-lib',

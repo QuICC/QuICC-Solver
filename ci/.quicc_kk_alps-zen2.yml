@@ -12,146 +12,146 @@ stages:
 - model-build-and-test
 - cleanup
 build-quicc-base:
-  extends: .alps-a100_builder
+  extends: .alps-zen2_builder
   stage: build_base
   variables:
-    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-a100
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:0f3392897131451c71e8647ac33ca01e
-    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_alps-a100:0f3392897131451c71e8647ac33ca01e
+    DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-zen2
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:098a6f351d02d3d61f1273db9a80028a
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_alps-zen2:098a6f351d02d3d61f1273db9a80028a
     SECONDARY_IMAGE_USERNAME: quicc
     SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
-  extends: .alps-a100_builder
+  extends: .alps-zen2_builder
   stage: build
   variables:
-    DOCKERFILE: ci/docker/Dockerfile_kkgpu
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:0f3392897131451c71e8647ac33ca01e"]'
+    DOCKERFILE: ci/docker/Dockerfile_kk
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:098a6f351d02d3d61f1273db9a80028a"]'
 test-quicc-lib:
   variables:
-    TEST_NCPU: '64'
+    TEST_NCPU: '128'
   extends:
   - .test-lib
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
 time-quicc-lib:
   extends:
-  - .time-lib-alps-a100
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .time-lib-alps-zen2
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
 BoussinesqSphereDynamoExplicit_serial:
   extends:
   - .BoussinesqSphereDynamoExplicit_serial
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '64'
-    QUICC_VERSION_TAG: kkgpu
+    SLURM_CPUS_PER_TASK: '128'
+    QUICC_VERSION_TAG: kk
 BoussinesqSphereDynamoImplicit_serial:
   extends:
   - .BoussinesqSphereDynamoImplicit_serial
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '64'
-    QUICC_VERSION_TAG: kkgpu
+    SLURM_CPUS_PER_TASK: '128'
+    QUICC_VERSION_TAG: kk
 BoussinesqShellDynamoExplicit_serial:
   extends:
   - .BoussinesqShellDynamoExplicit_serial
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '64'
-    QUICC_VERSION_TAG: kkgpu
+    SLURM_CPUS_PER_TASK: '128'
+    QUICC_VERSION_TAG: kk
 BoussinesqShellDynamoImplicit_serial:
   extends:
   - .BoussinesqShellDynamoImplicit_serial
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '64'
-    QUICC_VERSION_TAG: kkgpu
+    SLURM_CPUS_PER_TASK: '128'
+    QUICC_VERSION_TAG: kk
 BoussinesqSphereRTCExplicit_serial:
   extends:
   - .BoussinesqSphereRTCExplicit_serial
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '64'
-    QUICC_VERSION_TAG: kkgpu
+    SLURM_CPUS_PER_TASK: '128'
+    QUICC_VERSION_TAG: kk
 BoussinesqSphereRTCImplicit_serial:
   extends:
   - .BoussinesqSphereRTCImplicit_serial
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '64'
-    QUICC_VERSION_TAG: kkgpu
+    SLURM_CPUS_PER_TASK: '128'
+    QUICC_VERSION_TAG: kk
 BoussinesqShellRTCExplicit_serial:
   extends:
   - .BoussinesqShellRTCExplicit_serial
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '64'
-    QUICC_VERSION_TAG: kkgpu
+    SLURM_CPUS_PER_TASK: '128'
+    QUICC_VERSION_TAG: kk
 BoussinesqShellRTCImplicit_serial:
   extends:
   - .BoussinesqShellRTCImplicit_serial
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '64'
-    QUICC_VERSION_TAG: kkgpu
+    SLURM_CPUS_PER_TASK: '128'
+    QUICC_VERSION_TAG: kk
 BoussinesqSphereTCExplicit_serial:
   extends:
   - .BoussinesqSphereTCExplicit_serial
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '64'
-    QUICC_VERSION_TAG: kkgpu
+    SLURM_CPUS_PER_TASK: '128'
+    QUICC_VERSION_TAG: kk
 BoussinesqShellTCExplicit_serial:
   extends:
   - .BoussinesqShellTCExplicit_serial
-  - .alps-a100_runner
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  - .alps-zen2_runner
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   variables:
     PULL_IMAGE: 'YES'
     SLURM_NTASKS: '1'
     SLURM_NTASKS_PER_NODE: '1'
-    SLURM_CPUS_PER_TASK: '64'
-    QUICC_VERSION_TAG: kkgpu
+    SLURM_CPUS_PER_TASK: '128'
+    QUICC_VERSION_TAG: kk
 ci-cache-cleanup:
-  extends: .alps-a100_runner
+  extends: .alps-zen2_runner
   stage: cleanup
-  image: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
+  image: $CSCS_REGISTRY_PATH/quicc_kk_alps-zen2:$CI_COMMIT_SHA
   script:
   - rm -Rf $CI_CACHE_FOLDER/*
