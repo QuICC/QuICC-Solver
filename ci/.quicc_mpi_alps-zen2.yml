@@ -14,8 +14,8 @@ build-quicc-base:
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-zen2
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:8a19031c9ebe88a284607a1ad2e23102
-    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_alps-zen2:8a19031c9ebe88a284607a1ad2e23102
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:e7889f88ad84c318fddefabbf1807159
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_alps-zen2:e7889f88ad84c318fddefabbf1807159
     SECONDARY_IMAGE_USERNAME: quicc
     SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
@@ -24,7 +24,7 @@ build-quicc:
   variables:
     DOCKERFILE: ci/docker/Dockerfile_mpi
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_mpi_alps-zen2:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:8a19031c9ebe88a284607a1ad2e23102"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-zen2:e7889f88ad84c318fddefabbf1807159"]'
 test-quicc-lib:
   extends:
   - .test-lib

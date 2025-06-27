@@ -14,8 +14,8 @@ build-quicc-base:
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-a100
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:bdda7bce5fcfd0b180a0419f896649f6
-    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_alps-a100:bdda7bce5fcfd0b180a0419f896649f6
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:e7ed8f1c46ff78a0abf4c2373f40a7cf
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_alps-a100:e7ed8f1c46ff78a0abf4c2373f40a7cf
     SECONDARY_IMAGE_USERNAME: quicc
     SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
@@ -24,7 +24,7 @@ build-quicc:
   variables:
     DOCKERFILE: ci/docker/Dockerfile_kkgpu
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-a100:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:bdda7bce5fcfd0b180a0419f896649f6"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:e7ed8f1c46ff78a0abf4c2373f40a7cf"]'
 time-quicc-lib:
   extends:
   - .time-lib-sweep-alps-a100
