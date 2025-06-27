@@ -28,6 +28,8 @@ build-quicc:
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
     DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:37f4d74ab1a3b33edf7c065be7d46709"]'
 test-quicc-lib:
+  variables:
+    TEST_NCPU: 280
   extends:
   - .test-lib
   - .alps-gh200_runner
