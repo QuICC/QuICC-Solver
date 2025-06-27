@@ -15,7 +15,6 @@ RUN spack-install-helper --target alps-zen2 \
     "openblas" \
     "boost@1.85.0" \
     "py-scipy" \
-    "kokkos +wrapper +cuda_lambda" \
     "kokkos-kernels" \
     "gdb" \
     "valgrind"
