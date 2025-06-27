@@ -9,6 +9,7 @@ ARG NUM_PROCS=16
 RUN spack-install-helper --target alps-zen2 \
     "git" \
     "cmake" \
+    "ninja" \
     "valgrind" \
     "vim +python +perl +lua" \
     "fftw" \
