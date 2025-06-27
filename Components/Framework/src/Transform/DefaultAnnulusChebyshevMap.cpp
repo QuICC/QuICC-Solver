@@ -40,19 +40,27 @@ namespace Transform {
 
    void DefaultAnnulusChebyshevMap::operator()(MapType& m) const
    {
+#ifdef QUICC_HAS_CUDA_BACKEND
+      //using backend_t = Fft::Chebyshev::LinearMap::viewGpu_t;
+      using backend_t = Fft::Chebyshev::LinearMap::base_t;
+#else
+      //using backend_t = Fft::Chebyshev::LinearMap::viewCpu_t;
+      using backend_t = Fft::Chebyshev::LinearMap::base_t;
+#endif
+
       // Create projectors
-      this->addOperator<Fft::Chebyshev::LinearMap::Projector::P>(m, Backward::P::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1>(m, Backward::Overr1::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2>(m, Backward::Overr2::id());
-      this->addOperator<Fft::Chebyshev::LinearMap::Projector::D1>(m, Backward::D1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Projector::P<backend_t>>(m, Backward::P::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1<backend_t>>(m, Backward::Overr1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2<backend_t>>(m, Backward::Overr2::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Projector::D1<backend_t>>(m, Backward::D1::id());
       //NOT IMPLEMENTED YET this->addOperator<Fft::Chebyshev::LinearMap::Projector::D1>(m, Backward::Overr1D1::id());
       //NOT IMPLEMENTED YET this->addOperator<Fft::Chebyshev::LinearMap::Projector::D1>(m, Backward::D1Overr1::id());
 
       // Create integrators
-      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::P>(m, Forward::P::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Integrator::P<backend_t>>(m, Forward::P::id());
 
       // Create reductors
-      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::Energy>(m, Reductor::Energy::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::Energy<backend_t>>(m, Reductor::Energy::id());
    }
  
 } // Transform

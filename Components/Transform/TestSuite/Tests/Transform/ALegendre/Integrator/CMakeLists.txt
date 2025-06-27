@@ -2,6 +2,7 @@ message(VERBOSE "Integrators:")
 
 # Create integrator tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 set(_tests_templated
     Poly::P:<base_t>:integrator
@@ -223,3 +224,10 @@ foreach(_test ${_tests_templated})
         DISABLED ${_disabled}
     )
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_integrator_merged
+  COMMAND ${TestExe}
+  JN 8
+)

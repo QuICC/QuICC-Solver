@@ -220,6 +220,11 @@ namespace CuFft {
       this->io(this->mTmpComp.data(), this->mTmp.data());
    }
 
+   void ChebyshevEnergy::setScaler(const Array& scaler) const
+   {
+      this->mScaler = scaler;
+   }
+
    void ChebyshevEnergy::setSpectralOperator(const SparseMatrix& mat) const
    {
       this->mSpecOp = mat;
@@ -238,14 +243,32 @@ namespace CuFft {
       rOut.transpose() = this->mFftScaling*this->mEWeights.topRows(rows).transpose()*this->mTmp.topRows(rows);
    }
 
+   void ChebyshevEnergy::outputGrid(Matrix& rOut) const
+   {
+      rOut.transpose() = this->mTmp;
+   }
+
    void ChebyshevEnergy::square(const bool isFirst) const
    {
-      if(isFirst)
+      if(this->mScaler.size() > 0)
       {
-         this->mTmpMid = this->mTmpComp.array().pow(2);
-      } else
+         if(isFirst)
+         {
+            this->mTmpMid = (this->mScaler.asDiagonal()*this->mTmpComp).array().pow(2);
+         } else
+         {
+            this->mTmpMid.array() += (this->mScaler.asDiagonal()*this->mTmpComp).array().pow(2);
+         }
+      }
+      else
       {
-         this->mTmpMid.array() += this->mTmpComp.array().pow(2);
+         if(isFirst)
+         {
+            this->mTmpMid = this->mTmpComp.array().pow(2);
+         } else
+         {
+            this->mTmpMid.array() += this->mTmpComp.array().pow(2);
+         }
       }
       this->io(this->mTmp.data(), this->mTmpMid.data());
    }

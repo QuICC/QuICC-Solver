@@ -263,6 +263,7 @@ add_test(
     "${QUICC_WORK_DIR}"
 )
 
+
 # Mpi
 if(QUICC_USE_MPI)
     add_executable(ViewTransposeMpiTest
@@ -309,13 +310,6 @@ if(QUICC_USE_MPI)
     add_executable(ViewTransposeMpiCommTest
         ViewTransposeMpiCommTests.cpp
     )
-
-    # if(TARGET QuICC::Cuda)
-    #     target_sources(ViewTransposeMpiCommTest
-    #         PRIVATE
-    #             ViewTransposeMpiCommTests.cu
-    #     )
-    # endif()
 
     target_link_libraries(ViewTransposeMpiCommTest
         ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose

@@ -108,6 +108,11 @@ namespace Fftw {
       fftw_execute_r2r(this->mFwdPlan, const_cast<MHDFloat *>(phys.data()), mods.data());
    }
 
+   void ChebyshevEnergy::setScaler(const Array& scaler) const
+   {
+      this->mScaler = scaler;
+   }
+
    void ChebyshevEnergy::setSpectralOperator(const SparseMatrix& mat) const
    {
       this->mSpecOp = mat;
@@ -120,6 +125,14 @@ namespace Fftw {
       rOut.transpose() = this->mFftScaling*this->mEWeights.topRows(this->mSpecOp.rows()).transpose()*this->mSpecOp*tmp.topRows(2*this->mSpecSize);
    }
 
+   void ChebyshevEnergy::outputGrid(Matrix& rOut, const Matrix& tmp) const
+   {
+      for(int i = 0; i < this->mFwdSize; i++)
+      {
+         rOut.row(i) = tmp.row(2*i);
+      }
+   }
+
    void ChebyshevEnergy::output(Matrix& rOut, const Matrix& tmp) const
    {
       int rows = 2*this->mSpecSize;
@@ -128,12 +141,25 @@ namespace Fftw {
 
    void ChebyshevEnergy::square(Matrix& tmp, const Matrix& in,const bool isFirst) const
    {
-      if(isFirst)
+      if(this->mScaler.size() > 0)
       {
-         tmp = in.array().pow(2);
-      } else
+         if(isFirst)
+         {
+            tmp = (this->mScaler.asDiagonal()*in).array().pow(2);
+         } else
+         {
+            tmp.array() += (this->mScaler.asDiagonal()*in).array().pow(2);
+         }
+      }
+      else
       {
-         tmp.array() += in.array().pow(2);
+         if(isFirst)
+         {
+            tmp = in.array().pow(2);
+         } else
+         {
+            tmp.array() += in.array().pow(2);
+         }
       }
    }
 

@@ -52,6 +52,11 @@ namespace Backend {
       this->mpImpl->init(setup);
    }
 
+   void ChebyshevEnergy::setScaler(const Array& scaler) const
+   {
+      this->mpImpl->setScaler(scaler);
+   }
+
    void ChebyshevEnergy::setSpectralOperator(const SparseMatrix& mat) const
    {
       this->mpImpl->setSpectralOperator(mat);
@@ -88,6 +93,11 @@ namespace Backend {
    void ChebyshevEnergy::output(Matrix& rOut, const Matrix& tmp) const
    {
       this->mpImpl->output(rOut, tmp);
+   }
+
+   void ChebyshevEnergy::outputGrid(Matrix& rOut, const Matrix& tmp) const
+   {
+      this->mpImpl->outputGrid(rOut, tmp);
    }
 
    void ChebyshevEnergy::outputSpectral(Matrix& rOut, const Matrix& tmp) const

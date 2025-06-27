@@ -11,6 +11,7 @@ RUN spack-install-helper \
     fftw \
     hdf5 \
     cmake \
+    ninja \
     openblas \
     "boost@1.78.0" \
     "kokkos +wrapper +cuda_lambda" \

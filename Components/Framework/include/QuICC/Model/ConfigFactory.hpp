@@ -60,18 +60,19 @@ namespace QuICC {
           */
          static ReturnType create();
 
-      protected:
-
-      private:
          /**
           * @brief Constructor
           */
-         ConfigFactory();
+         ConfigFactory() = delete;
 
          /**
           * @brief Destructor
           */
-         ~ConfigFactory();
+         ~ConfigFactory() = delete;
+
+      protected:
+
+      private:
    };
 
    template <class TModel> typename ConfigFactory<TModel>::ReturnType ConfigFactory<TModel>::create()

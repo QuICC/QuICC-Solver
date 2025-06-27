@@ -51,14 +51,15 @@ class base_model(base_yaml):
                     ' -DQUICC_TESTSUITE_TRANSFORM=OFF' \
                     ' -DQUICC_TESTSUITE_PROFILING=OFF' \
                     ' -DQUICC_TESTSUITE_SPARSESM=OFF' \
-                    ' && make install\"',
+                    ' -GNinja' \
+                    ' && ninja install\"',
                 # then move to the shared location to build the model
                 'export QUICC_ROOT='+self.model_path,
                 'echo $QUICC_ROOT',
                 'mkdir -p $QUICC_ROOT/build',
                 'cd $QUICC_ROOT/build',
                 # echo command is added to make lock unique per each pipeline
-                '/QuICC.src/ci/gitlab/bin/mpi_lock.sh \"cmake /QuICC.src --log-level=VERBOSE -DQUICC_MODEL='+self.model_name+' -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR='+self.lib_path+'/share/quicc/cmake && bash -c \'time make -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_'+self.config_name+'\'\"',
+                '/QuICC.src/ci/gitlab/bin/mpi_lock.sh \"cmake /QuICC.src -GNinja --log-level=VERBOSE -DQUICC_MODEL='+self.model_name+' -DQUICC_TESTSUITE_MODEL=ON -DQUICC_GITHUB_PROTOCOL=https -DQUICC_USE_SYSTEM_QUICC=ON -Dquicc_DIR='+self.lib_path+'/share/quicc/cmake && bash -c \'time ninja -j $(grep processor /proc/cpuinfo | wc -l) && echo ${QUICC_VERSION_TAG}_'+self.config_name+'\'\"',
             ],
         }
 
