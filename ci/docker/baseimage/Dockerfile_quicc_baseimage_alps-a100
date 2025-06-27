@@ -1,5 +1,5 @@
 # Depend on CSCS official spack base container helpers
-FROM $CSCS_REGISTRY/docker-ci-ext/base-containers/public/spack-build:spack0.23.0-ubuntu22.04-cuda12.4.1 AS builder
+FROM jfrog.svc.cscs.ch/docker-ci-ext/base-containers/public/spack-build:spack0.23.0-ubuntu22.04-cuda12.4.1 AS builder
 
 # number or processes used for building the spack software stack
 ARG NUM_PROCS=16
@@ -21,7 +21,7 @@ RUN spack-install-helper --target alps-a100 \
     "valgrind"
 
 # Bare OS image to run the installed executables
-FROM $CSCS_REGISTRY/docker-ci-ext/base-containers/public/spack-runtime:ubuntu22.04-cuda12.4.1
+FROM jfrog.svc.cscs.ch/docker-ci-ext/base-containers/public/spack-runtime:ubuntu22.04-cuda12.4.1
 
 # it is important to keep the paths, otherwise your installation is broken
 # all these paths are created with the above `spack-install-helper` invocation
