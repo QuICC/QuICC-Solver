@@ -29,6 +29,9 @@ build-quicc:
     DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-a100:0f3392897131451c71e8647ac33ca01e"]'
 test-quicc-lib:
   variables:
+    SLURM_NTASKS: 1
+    SLURM_NTASKS_PER_NODE: 1
+    SLURM_CPUS_PER_TASK: '64'
     TEST_NCPU: '64'
   extends:
   - .test-lib
