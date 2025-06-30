@@ -10,6 +10,8 @@
 #include <array>
 #include <iomanip>
 #include <utility>
+#include <random>
+#include <algorithm>
 
 #ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE
 #include <highfive/H5DataSet.hpp>
@@ -23,8 +25,24 @@
 #include <cuda_runtime_api.h>
 #endif
 
+#define QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE_UNIQUEFILE
+
 namespace QuICC {
 namespace Profiler {
+
+namespace details {
+   std::string generate_random_string(size_t length)
+   {
+       const std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+       std::random_device random_device;
+       std::mt19937 generator(random_device());
+
+       std::string random_string(characters);
+       std::shuffle(random_string.begin(), random_string.end(), generator);
+
+       return random_string.substr(0, length);
+   }
+}
 
 
 #ifdef QUICC_MPI
@@ -123,7 +141,12 @@ void Tracker::print_hdf5()
 {
 #ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE
 
+#ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE_UNIQUEFILE
+    std::string fid = details::generate_random_string(6);
+    std::string outFile = "profile_" + fid + ".hdf5";
+#else
     std::string outFile = "profile.hdf5";
+#endif
 
     int rank{};
     int nRanks{1};

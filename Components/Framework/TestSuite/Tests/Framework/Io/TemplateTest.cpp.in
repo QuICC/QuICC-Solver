@@ -1,0 +1,40 @@
+/**
+ * @file DipolarityTest.cpp
+ * @brief Tests for the Framework IO
+ */
+
+// System includes
+//
+#include <catch2/catch.hpp>
+
+// Project includes
+//
+#include "Environment/QuICCEnv.hpp"
+#include "QuICC/TestSuite/Framework/Io/TestArgs.hpp"
+#include "QuICC/TestSuite/Framework/Io/TestBackend.hpp"
+#include "QuICC/TestSuite/Framework/Io/TestUtils.hpp"
+#include "QuICC/SpatialScheme/3D/@Scheme@.hpp"
+#include "QuICC/PhysicalNames/@Field@.hpp"
+#include "QuICC/Io/Variable/@Writer@.hpp"
+#include "Profiler/Interface.hpp"
+
+namespace currentts = ::QuICC::TestSuite::Framework::Io;
+
+static const auto badValueOut = std::numeric_limits<QuICC::MHDFloat>::max();
+
+TEST_CASE( "Check ASCII writers @Writer@ for @Field@ for @Scheme@", "[@Scheme@:@Field@:@Writer@]" )
+{
+   Catch::StringMaker<double>::precision = 15;
+
+   currentts::TestParameters test;
+
+   test.refdir = "../../../../_refdata/Framework/Io/@Scheme@/";
+   test.datadir = "./";
+   test.maxUlp = currentts::args().ulp;
+
+   auto spFile = std::make_shared<QuICC::Io::Variable::@Writer@>(::QuICC::PhysicalNames::@Field@().tag(), "@Scheme@");
+   spFile->expect(::QuICC::PhysicalNames::@Field@::id());
+   test.files.push_back(spFile);
+
+   currentts::testFile<QuICC::SpatialScheme::@Scheme@>(test);
+}

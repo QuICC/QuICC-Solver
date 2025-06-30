@@ -186,6 +186,35 @@ add_test(
 )
 
 #
+# View Slicewise Tests
+#
+
+add_executable(ViewSlicewiseTest
+    ViewSlicewiseTests.cpp
+)
+
+if(TARGET QuICC::Cuda)
+    target_sources(ViewSlicewiseTest
+        PRIVATE
+            ViewSlicewiseTests.cu
+    )
+endif()
+
+target_link_libraries(ViewSlicewiseTest
+    ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Slicewise
+    Catch2::Catch2
+    QuICC::Memory
+    QuICC::Polynomial
+)
+
+add_test(
+    NAME ViewSlicewiseTest
+    COMMAND ViewSlicewiseTest
+    WORKING_DIRECTORY
+    "${QUICC_WORK_DIR}"
+)
+
+#
 # View Reduction Tests
 #
 
@@ -234,11 +263,19 @@ add_test(
     "${QUICC_WORK_DIR}"
 )
 
+
 # Mpi
 if(QUICC_USE_MPI)
     add_executable(ViewTransposeMpiTest
         ViewTransposeMpiTests.cpp
     )
+
+    if(TARGET QuICC::Cuda)
+        target_sources(ViewTransposeMpiTest
+            PRIVATE
+                ViewTransposeMpiTests.cu
+        )
+    endif()
 
     target_link_libraries(ViewTransposeMpiTest
         ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Transpose

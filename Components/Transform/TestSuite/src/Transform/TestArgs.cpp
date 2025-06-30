@@ -49,6 +49,19 @@ namespace Transform {
       }
    }
 
+   void TestArgs::clear()
+   {
+      this->useDefault = true;
+      this->dumpData = false;
+      this->timeOnly = false;
+      this->type = TestType::PROJECTOR;
+      this->ulp = 11;
+      this->np = 0;
+      this->rank = 0;
+      this->iter = 1;
+      this->params.clear();
+   }
+
 }
 }
 }

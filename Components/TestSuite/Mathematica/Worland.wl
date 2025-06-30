@@ -30,6 +30,7 @@ wweights::usage="wweights[n] computes the Worland quadrature weights";
 wnorm::usage="wnorm[k,\[Alpha],\[Beta]] norm of Worland polynomial k";
 
 (* Operators to work on grid*)
+Wnabl::usage="Wnl[n,\[Alpha],d\[Beta],l,r]";
 Wnl::usage="Wnl[n,l,r]";
 rWnl::usage="rWnl[n,l,r]";
 dWnl::usage="dWnl[n,l,r]";
@@ -146,6 +147,7 @@ ddivrdrWorland[n_,l_,t_]=Simplify[D[1/t D[t^(l+1) JacobiP[n,$w\[Alpha],l+$wd\[Be
 
 
 (* Operators to work on grid*)
+Wnabl[n_,\[Alpha]_,d\[Beta]_,l_,r_]:=r^l JacobiP[n,\[Alpha],l+d\[Beta],2r^2-1]/wnorm[n,\[Alpha],l+d\[Beta]]
 Wnl[n_,l_,r_]:=r^l JacobiP[n,$w\[Alpha],l+$wd\[Beta],2r^2-1]/wnorm[n,$w\[Alpha],l+$wd\[Beta]]
 rWnl[n_,l_,r_]:=r^(l+1) JacobiP[n,$w\[Alpha],l+$wd\[Beta],2r^2-1]/wnorm[n,$w\[Alpha],l+$wd\[Beta]]
 dWnl[n_,l_,r_]:=If[n>0,dWorland[n,l,r],dWorland0[l,r]]/wnorm[n,$w\[Alpha],l+$wd\[Beta]];

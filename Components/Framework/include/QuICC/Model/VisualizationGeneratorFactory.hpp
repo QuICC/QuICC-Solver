@@ -30,18 +30,18 @@ namespace QuICC {
           */
          static ReturnType create();
 
-      protected:
-
-      private:
          /**
           * @brief Constructor
           */
-         VisualizationGeneratorFactory();
+         VisualizationGeneratorFactory() = delete;
 
          /**
           * @brief Destructor
           */
-         ~VisualizationGeneratorFactory();
+         ~VisualizationGeneratorFactory() = delete;
+      protected:
+
+      private:
    };
 
    template <class TModel> typename VisualizationGeneratorFactory<TModel>::ReturnType VisualizationGeneratorFactory<TModel>::create()

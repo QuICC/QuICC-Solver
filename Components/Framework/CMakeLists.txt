@@ -43,7 +43,14 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
     QuICC::Environment
     QuICC::TimestepPc
     QuICC::TimestepRkcb
+)
+
+if (QUICC_USE_MLIR_GRAPH)
+  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
+    PUBLIC
+      QuICC::Graph
   )
+endif()
 
 # Add debug option for operator output
 set( _debugModelMatrix "QUICC_DEBUG_OUTPUT_MODEL_MATRIX")
