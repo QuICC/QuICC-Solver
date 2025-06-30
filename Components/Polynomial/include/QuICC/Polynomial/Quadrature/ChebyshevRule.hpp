@@ -92,12 +92,12 @@ class ChebyshevRule
       /**
        * @brief Compute the quadrature with lower and upper bound
        */
-      void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const std::uint32_t size, const MHDFloat lower, const MHDFloat upper)
+      void computeQuadrature(Internal::Array& igrid, Internal::Array& iweights, const std::uint32_t size, const Internal::MHDFloat lower, const Internal::MHDFloat upper)
       {
          computeQuadrature(igrid, iweights, size);
 
-         MHDFloat a = (upper - lower)/2.0;
-         MHDFloat b =  (upper + lower)/2.0;
+         Internal::MHDFloat a = (upper - lower)/2.0;
+         Internal::MHDFloat b =  (upper + lower)/2.0;
          igrid.array() = a*igrid.array() + b;
       }
 

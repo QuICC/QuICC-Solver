@@ -1,6 +1,4 @@
 .test-lib:
-  variables:
-    TEST_NCPU: $(grep processor /proc/cpuinfo | wc -l)
   script:
     - pwd
     - echo "$TEST_NCPU"
@@ -36,7 +34,7 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapStencilTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkLoadSplitterTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkCommunicatorTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^FrameworkStateFileTests_.*serial"
+    - ctest --no-tests=error --output-on-failure -R "^FrameworkStateFileTests_.*serial"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkIoTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "PyQuICCTests"
@@ -52,7 +50,7 @@
 
 .test-lib-petsc:
   variables:
-    TEST_NCPU: 'grep processor /proc/cpuinfo | wc -l'
+    TEST_NCPU: 4
   script:
     - pwd
     - cd /QuICC.src/build

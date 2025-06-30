@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     62021,       1673]
-NotebookOptionsPosition[     60174,       1643]
-NotebookOutlinePosition[     60618,       1660]
-CellTagsIndexPosition[     60575,       1657]
+NotebookDataLength[     85369,       2285]
+NotebookOptionsPosition[     78539,       2182]
+NotebookOutlinePosition[     78959,       2199]
+CellTagsIndexPosition[     78916,       2196]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -214,8 +214,8 @@ Cell[BoxData[{
   RowBox[{"refdir", "=", 
    RowBox[{"{", 
     RowBox[{
-    "\"\<_newref\>\"", ",", "\"\<Polynomial\>\"", ",", "\"\<Quadrature\>\""}],
-     "}"}]}], ";"}]}], "Input",
+    "\"\<_refdata\>\"", ",", "\"\<Polynomial\>\"", ",", 
+     "\"\<Quadrature\>\""}], "}"}]}], ";"}]}], "Input",
  CellChangeTimes->{{3.781513135978331*^9, 3.781513213835363*^9}, {
    3.781513333138479*^9, 3.781513371201046*^9}, {3.781513425680089*^9, 
    3.781513485223351*^9}, 3.781513709875547*^9, 3.7815138089352818`*^9, {
@@ -244,8 +244,11 @@ Cell[BoxData[{
    3.848138211311514*^9, 3.84813822311095*^9}, {3.848138433297167*^9, 
    3.848138441537271*^9}, {3.848138559764002*^9, 3.848138565602911*^9}, {
    3.8481386160682993`*^9, 3.848138616629723*^9}, {3.9162797739911346`*^9, 
-   3.916279890957472*^9}, {3.9162799242873983`*^9, 3.916279964592413*^9}},
- CellLabel->"In[1]:=",ExpressionUUID->"caf2e5b4-7238-4596-bbe8-4253ccac444f"],
+   3.916279890957472*^9}, {3.9162799242873983`*^9, 3.916279964592413*^9}, {
+   3.960001017544177*^9, 3.9600010181295233`*^9}, {3.960001313107933*^9, 
+   3.96000131313132*^9}},
+ CellLabel->
+  "In[113]:=",ExpressionUUID->"caf2e5b4-7238-4596-bbe8-4253ccac444f"],
 
 Cell[BoxData[
  RowBox[{
@@ -325,8 +328,12 @@ Cell[BoxData[
    3.7848719653422213`*^9, 3.7848719656281633`*^9}, {3.784872019104246*^9, 
    3.78487202802567*^9}, {3.7848722160797653`*^9, 3.784872342415881*^9}, {
    3.847774411025206*^9, 3.8477744552146997`*^9}, {3.847775677745078*^9, 
-   3.8477756878785267`*^9}},
- CellLabel->"In[26]:=",ExpressionUUID->"e5a0e68c-00b9-4132-9bfc-56cffcabe517"],
+   3.8477756878785267`*^9}, {3.9600010672240257`*^9, 
+   3.9600010772888412`*^9}, {3.960001319684519*^9, 3.960001320022703*^9}},
+ CellLabel->
+  "In[139]:=",ExpressionUUID->"e5a0e68c-00b9-4132-9bfc-56cffcabe517"],
+
+Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{
@@ -345,7 +352,133 @@ Cell[BoxData[
   3.784619524802009*^9}, {3.7849450845616417`*^9, 3.7849451141078243`*^9}, {
   3.7849453989646797`*^9, 3.784945403321402*^9}, {3.84814053021103*^9, 
   3.848140533040265*^9}, {3.9162800424920797`*^9, 3.916280044924018*^9}},
- CellLabel->"In[27]:=",ExpressionUUID->"9dd105fd-a621-4ab9-a514-42a6ebf37cc8"],
+ CellLabel->"In[52]:=",ExpressionUUID->"9dd105fd-a621-4ab9-a514-42a6ebf37cc8"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 47...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000236162871*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"38c6ac9a-8ae7-460a-85ba-3dc5d1e0d6e9"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 48...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600002366128798`*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"83d7ef14-8663-4287-b4e3-cdaad01822bd"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 256...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000237067231*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"ab5e7068-60de-4d61-bd97-25bdbfe88a14"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 255...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600002373255444`*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"45d1776e-5a98-41ac-845f-ad1ecb2a277d"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 511...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600002376286077`*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"0ec91893-e723-4107-aa2d-d072e17881ce"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 512...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.96000023791369*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"4f81b58e-1918-4cb4-8296-099b35f3b4dc"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 1024...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000238247384*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"2a1c853d-4a6c-484f-933a-8d965a9c5e0c"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 1025...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600002385776873`*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"8998dce9-0930-4146-9854-80e3b9b56093"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 4098...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000239091507*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"ac725984-2ed1-49c9-a843-c2feb60a57ad"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 4093...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600002396474648`*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"88c01219-af6a-4b8c-8f06-14469ac13f46"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 9217...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600002405952168`*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"c505aeea-2b11-4642-9663-c0f4e74ee97b"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandchebyshev quadrature for N = 9234...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000241358005*^9},
+ CellLabel->
+  "During evaluation of \
+In[52]:=",ExpressionUUID->"82e6cc7e-dd83-4039-a6bc-076b28c41c6f"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{
@@ -359,7 +492,73 @@ Cell[BoxData[
  CellChangeTimes->{{3.84776014665976*^9, 3.847760154917376*^9}, 
    3.847766768462598*^9, {3.847773470406931*^9, 3.847773473126753*^9}, {
    3.847774064064786*^9, 3.847774076295939*^9}},
- CellLabel->"In[28]:=",ExpressionUUID->"5216ee22-8f15-40eb-8d98-769141a3c045"],
+ CellLabel->"In[53]:=",ExpressionUUID->"5216ee22-8f15-40eb-8d98-769141a3c045"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandsphenergy quadrature for N = 47...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000241949926*^9},
+ CellLabel->
+  "During evaluation of \
+In[53]:=",ExpressionUUID->"bb15c390-e9ac-4869-a784-43199d6d9e26"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandsphenergy quadrature for N = 48...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000242475205*^9},
+ CellLabel->
+  "During evaluation of \
+In[53]:=",ExpressionUUID->"92cbe142-c85b-447a-90f4-c804e9e72dde"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandsphenergy quadrature for N = 256...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000254957245*^9},
+ CellLabel->
+  "During evaluation of \
+In[53]:=",ExpressionUUID->"e3651416-2ce0-41d9-bf17-e012b57da2be"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandsphenergy quadrature for N = 255...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000267623954*^9},
+ CellLabel->
+  "During evaluation of \
+In[53]:=",ExpressionUUID->"3ab3cc13-b329-4c07-b25e-fab152085be4"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandsphenergy quadrature for N = 512...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000367915183*^9},
+ CellLabel->
+  "During evaluation of \
+In[53]:=",ExpressionUUID->"7377a803-8ca8-4782-b291-35314177cbd8"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandsphenergy quadrature for N = 511...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.96000046693734*^9},
+ CellLabel->
+  "During evaluation of \
+In[53]:=",ExpressionUUID->"6046adc2-4ca3-4ae4-ab24-e0636061e9db"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{
@@ -373,7 +572,73 @@ Cell[BoxData[
  CellChangeTimes->{{3.847760246053018*^9, 3.847760253788905*^9}, 
    3.8477667711822443`*^9, {3.8477734763089*^9, 3.847773478505044*^9}, 
    3.847775211624851*^9, 3.847775782906372*^9},
- CellLabel->"In[27]:=",ExpressionUUID->"c94e7d6a-0de6-439d-ac53-4e532636bbef"],
+ CellLabel->"In[54]:=",ExpressionUUID->"c94e7d6a-0de6-439d-ac53-4e532636bbef"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandlegendre quadrature for N = 47...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000467148151*^9},
+ CellLabel->
+  "During evaluation of \
+In[54]:=",ExpressionUUID->"0d3757b6-cd6e-46a0-9b6b-8b0da025b4d8"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandlegendre quadrature for N = 48...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000467338827*^9},
+ CellLabel->
+  "During evaluation of \
+In[54]:=",ExpressionUUID->"38c2cdfc-c932-46c7-af7c-3080692f5c0b"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandlegendre quadrature for N = 256...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000475827614*^9},
+ CellLabel->
+  "During evaluation of \
+In[54]:=",ExpressionUUID->"3b64075d-b62c-4746-a610-85a71b5a78cd"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandlegendre quadrature for N = 255...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000484017385*^9},
+ CellLabel->
+  "During evaluation of \
+In[54]:=",ExpressionUUID->"f82b5977-3009-4e17-ad75-e098b8f40b8f"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandlegendre quadrature for N = 512...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000549849228*^9},
+ CellLabel->
+  "During evaluation of \
+In[54]:=",ExpressionUUID->"905e495b-b354-4d8d-9f25-fc5ce9e002dd"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandlegendre quadrature for N = 511...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000615434292*^9},
+ CellLabel->
+  "During evaluation of \
+In[54]:=",ExpressionUUID->"b1ac8b97-24fd-42e1-82f9-8f196d586df4"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{
@@ -385,7 +650,91 @@ Cell[BoxData[
       "511"}], "}"}], ",", "wcylgrid", ",", "wcylweights", ",", 
     "\"\<worlandcylenergy\>\""}], "]"}], ";"}]], "Input",
  CellChangeTimes->{{3.8481397639134617`*^9, 3.848139765645452*^9}},
- CellLabel->"In[28]:=",ExpressionUUID->"ca4d9d34-2b6b-451a-8026-2f9a440f3c14"],
+ CellLabel->
+  "In[140]:=",ExpressionUUID->"ca4d9d34-2b6b-451a-8026-2f9a440f3c14"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandcylenergy quadrature for N = 16...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600006154918127`*^9, 3.960000973618466*^9, 
+  3.960001025148301*^9, 3.960001083083206*^9, 3.9600013249854717`*^9},
+ CellLabel->
+  "During evaluation of \
+In[140]:=",ExpressionUUID->"5d72ce69-a06f-43c9-b73c-40da01ef867d"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandcylenergy quadrature for N = 47...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600006154918127`*^9, 3.960000973618466*^9, 
+  3.960001025148301*^9, 3.960001083083206*^9, 3.960001325628274*^9},
+ CellLabel->
+  "During evaluation of \
+In[140]:=",ExpressionUUID->"6031473d-e36a-421b-9e32-53427419f6c8"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandcylenergy quadrature for N = 48...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600006154918127`*^9, 3.960000973618466*^9, 
+  3.960001025148301*^9, 3.960001083083206*^9, 3.960001325975238*^9},
+ CellLabel->
+  "During evaluation of \
+In[140]:=",ExpressionUUID->"6b1dc352-94cd-4750-9ce6-3e465d42d170"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandcylenergy quadrature for N = 256...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600006154918127`*^9, 3.960000973618466*^9, 
+  3.960001025148301*^9, 3.960001083083206*^9, 3.960001327581723*^9},
+ CellLabel->
+  "During evaluation of \
+In[140]:=",ExpressionUUID->"7378e73a-186f-4ce4-8428-665a5e70cf73"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandcylenergy quadrature for N = 255...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600006154918127`*^9, 3.960000973618466*^9, 
+  3.960001025148301*^9, 3.960001083083206*^9, 3.9600013290682373`*^9},
+ CellLabel->
+  "During evaluation of \
+In[140]:=",ExpressionUUID->"7c2e8155-8b98-4478-9f32-2c838e0872a0"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandcylenergy quadrature for N = 512...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600006154918127`*^9, 3.960000973618466*^9, 
+  3.960001025148301*^9, 3.960001083083206*^9, 3.9600013372804537`*^9},
+ CellLabel->
+  "During evaluation of \
+In[140]:=",ExpressionUUID->"78742396-6d07-4c91-82ca-a8b33d4e3561"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting worlandcylenergy quadrature for N = 511...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600006154918127`*^9, 3.960000973618466*^9, 
+  3.960001025148301*^9, 3.960001083083206*^9, 3.960001345646159*^9},
+ CellLabel->
+  "During evaluation of \
+In[140]:=",ExpressionUUID->"5a06505c-af53-40c8-9e6f-661f79ee15a0"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{
@@ -401,7 +750,113 @@ Cell[BoxData[
    3.782106920850173*^9}, {3.78210695684234*^9, 3.782107013901009*^9}, {
    3.7846195269171047`*^9, 3.784619527331444*^9}, {3.784945121060042*^9, 
    3.7849451274440737`*^9}, 3.784945408779904*^9},
- CellLabel->"In[29]:=",ExpressionUUID->"78f2a386-6a54-47a0-adc3-b77e06956d39"],
+ CellLabel->"In[56]:=",ExpressionUUID->"78f2a386-6a54-47a0-adc3-b77e06956d39"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting chebyshev quadrature for N = 47...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600006355249166`*^9},
+ CellLabel->
+  "During evaluation of \
+In[56]:=",ExpressionUUID->"fcfe840e-78a7-4786-81d3-b035d4cf688d"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting chebyshev quadrature for N = 48...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600006355442953`*^9},
+ CellLabel->
+  "During evaluation of \
+In[56]:=",ExpressionUUID->"4aefc8b4-8bb3-45f0-8d9d-71a4d64fa28f"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting chebyshev quadrature for N = 256...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000635573773*^9},
+ CellLabel->
+  "During evaluation of \
+In[56]:=",ExpressionUUID->"022f64ed-0ceb-4fba-b432-eea9a5520dfa"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting chebyshev quadrature for N = 255...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000635601768*^9},
+ CellLabel->
+  "During evaluation of \
+In[56]:=",ExpressionUUID->"b481f489-0f36-4a2f-8d37-47e6004a3a2a"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting chebyshev quadrature for N = 1024...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000635673108*^9},
+ CellLabel->
+  "During evaluation of \
+In[56]:=",ExpressionUUID->"94190fe8-8ad5-4c48-b655-a0bc3aa1738e"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting chebyshev quadrature for N = 1025...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.96000063573951*^9},
+ CellLabel->
+  "During evaluation of \
+In[56]:=",ExpressionUUID->"b81635ec-47c3-48df-9b7f-7076eefce435"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting chebyshev quadrature for N = 4098...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000635960024*^9},
+ CellLabel->
+  "During evaluation of \
+In[56]:=",ExpressionUUID->"69e5432f-11b2-482e-b4f4-1270a61b4fd6"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting chebyshev quadrature for N = 4093...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000636187642*^9},
+ CellLabel->
+  "During evaluation of \
+In[56]:=",ExpressionUUID->"ebd76e74-c019-43c4-b334-2d106cb9d9bb"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting chebyshev quadrature for N = 9217...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000636696761*^9},
+ CellLabel->
+  "During evaluation of \
+In[56]:=",ExpressionUUID->"e20a8156-a240-4cdf-8f46-6ba12f392478"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting chebyshev quadrature for N = 9234...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000637205432*^9},
+ CellLabel->
+  "During evaluation of \
+In[56]:=",ExpressionUUID->"2d4beef0-354f-4d23-aad5-74a2d43fdcf3"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{
@@ -419,7 +874,91 @@ Cell[BoxData[
    3.784948471238228*^9}, 3.7849566072125463`*^9, {3.78497609617717*^9, 
    3.78497609632036*^9}, {3.84777348874043*^9, 3.84777349099667*^9}, {
    3.848138660685329*^9, 3.848138662293996*^9}},
- CellLabel->"In[30]:=",ExpressionUUID->"5065d87d-3606-4191-94d8-b2b2ca22ee53"],
+ CellLabel->"In[57]:=",ExpressionUUID->"5065d87d-3606-4191-94d8-b2b2ca22ee53"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting legendre quadrature for N = 47...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000637301012*^9},
+ CellLabel->
+  "During evaluation of \
+In[57]:=",ExpressionUUID->"5b4756e5-d610-4c1c-8398-a1172a9a9006"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting legendre quadrature for N = 48...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000637361105*^9},
+ CellLabel->
+  "During evaluation of \
+In[57]:=",ExpressionUUID->"4280a679-f3a9-4fc7-94f1-ec31e0cb1710"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting legendre quadrature for N = 256...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000638853137*^9},
+ CellLabel->
+  "During evaluation of \
+In[57]:=",ExpressionUUID->"0eebdbd2-a17f-4b0d-a77c-a945b2ac8ae2"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting legendre quadrature for N = 255...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600006402807417`*^9},
+ CellLabel->
+  "During evaluation of \
+In[57]:=",ExpressionUUID->"b317e40b-eafe-4784-81ff-a70486d61e50"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting legendre quadrature for N = 512...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000648605606*^9},
+ CellLabel->
+  "During evaluation of \
+In[57]:=",ExpressionUUID->"56074c43-125b-4caf-b9c4-9dee4e075bf3"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting legendre quadrature for N = 511...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000657239766*^9},
+ CellLabel->
+  "During evaluation of \
+In[57]:=",ExpressionUUID->"b5fab833-66e2-4ed0-abfc-ee6df05b9534"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting legendre quadrature for N = 1022...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.9600007232841578`*^9},
+ CellLabel->
+  "During evaluation of \
+In[57]:=",ExpressionUUID->"34c8536b-9380-4f51-a8b4-ccd13d203f91"],
+
+Cell[BoxData[
+ TemplateBox[{"\"Exporting legendre quadrature for N = 1024...\"", 
+   StyleBox[
+   "\" Done\"", FontColor -> RGBColor[0, 1, 0], StripOnInput -> False]},
+  "RowDefault"]], "Print",
+ CellChangeTimes->{3.960000790581296*^9},
+ CellLabel->
+  "During evaluation of \
+In[57]:=",ExpressionUUID->"5ca054eb-efc5-422f-b027-11d35c10625b"]
+}, Open  ]]
+}, Open  ]],
 
 Cell[BoxData[{
  RowBox[{
@@ -1641,10 +2180,10 @@ Cell[BoxData[{
   3.78211542458708*^9}},ExpressionUUID->"f0210d22-1d20-4265-a540-\
 c4270c2581e0"]
 },
-WindowSize->{742.4516129032257, 872.516129032258},
-WindowMargins->{{0, Automatic}, {0, Automatic}},
+WindowSize->{742.5, 858},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
 Magnification:>1.1 Inherited,
-FrontEndVersion->"13.3 for Linux x86 (64-bit) (June 3, 2023)",
+FrontEndVersion->"14.1 for Linux x86 (64-bit) (July 11, 2024)",
 StyleDefinitions->"Default.nb",
 ExpressionUUID->"de5b43c3-8d96-4503-90c2-967091160267"
 ]
@@ -1659,22 +2198,95 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 8711, 227, 979, "Input",ExpressionUUID->"caf2e5b4-7238-4596-bbe8-4253ccac444f"],
-Cell[9272, 249, 3598, 79, 406, "Input",ExpressionUUID->"e5a0e68c-00b9-4132-9bfc-56cffcabe517"],
-Cell[12873, 330, 951, 17, 55, "Input",ExpressionUUID->"9dd105fd-a621-4ab9-a514-42a6ebf37cc8"],
-Cell[13827, 349, 544, 12, 55, "Input",ExpressionUUID->"5216ee22-8f15-40eb-8d98-769141a3c045"],
-Cell[14374, 363, 542, 12, 55, "Input",ExpressionUUID->"c94e7d6a-0de6-439d-ac53-4e532636bbef"],
-Cell[14919, 377, 439, 10, 55, "Input",ExpressionUUID->"ca4d9d34-2b6b-451a-8026-2f9a440f3c14"],
-Cell[15361, 389, 740, 14, 55, "Input",ExpressionUUID->"78f2a386-6a54-47a0-adc3-b77e06956d39"],
-Cell[16104, 405, 853, 16, 55, "Input",ExpressionUUID->"5065d87d-3606-4191-94d8-b2b2ca22ee53"],
-Cell[16960, 423, 1797, 43, 165, "Input",ExpressionUUID->"3c72194d-990b-457b-8b47-dd170a28efc9"],
-Cell[18760, 468, 1304, 35, 165, "Input",ExpressionUUID->"3a162c97-ad05-42de-a26c-e08fd510cc68"],
-Cell[20067, 505, 2792, 74, 312, "Input",ExpressionUUID->"8a0a35a3-97ed-456a-9fe9-f6be9957d499"],
-Cell[22862, 581, 7570, 206, 911, "Input",ExpressionUUID->"984327df-c2f9-40ec-a7d4-bf6d4ff77a26"],
-Cell[30435, 789, 6280, 177, 687, "Input",ExpressionUUID->"d8cbae50-6979-40e0-be12-2f589d5e34ee"],
-Cell[36718, 968, 7141, 205, 720, "Input",ExpressionUUID->"40e54cb4-394d-4292-b546-a8b45b2f462c"],
-Cell[43862, 1175, 9169, 269, 904, "Input",ExpressionUUID->"9cd195d0-d533-47ca-87eb-c89efbe54e44"],
-Cell[53034, 1446, 7136, 195, 729, "Input",ExpressionUUID->"f0210d22-1d20-4265-a540-c4270c2581e0"]
+Cell[558, 20, 8819, 230, 978, "Input",ExpressionUUID->"caf2e5b4-7238-4596-bbe8-4253ccac444f"],
+Cell[9380, 252, 3702, 81, 431, "Input",ExpressionUUID->"e5a0e68c-00b9-4132-9bfc-56cffcabe517"],
+Cell[CellGroupData[{
+Cell[13107, 337, 951, 17, 54, "Input",ExpressionUUID->"9dd105fd-a621-4ab9-a514-42a6ebf37cc8"],
+Cell[CellGroupData[{
+Cell[14083, 358, 347, 8, 25, "Print",ExpressionUUID->"38c6ac9a-8ae7-460a-85ba-3dc5d1e0d6e9"],
+Cell[14433, 368, 349, 8, 25, "Print",ExpressionUUID->"83d7ef14-8663-4287-b4e3-cdaad01822bd"],
+Cell[14785, 378, 348, 8, 25, "Print",ExpressionUUID->"ab5e7068-60de-4d61-bd97-25bdbfe88a14"],
+Cell[15136, 388, 350, 8, 25, "Print",ExpressionUUID->"45d1776e-5a98-41ac-845f-ad1ecb2a277d"],
+Cell[15489, 398, 350, 8, 25, "Print",ExpressionUUID->"0ec91893-e723-4107-aa2d-d072e17881ce"],
+Cell[15842, 408, 347, 8, 25, "Print",ExpressionUUID->"4f81b58e-1918-4cb4-8296-099b35f3b4dc"],
+Cell[16192, 418, 349, 8, 25, "Print",ExpressionUUID->"2a1c853d-4a6c-484f-933a-8d965a9c5e0c"],
+Cell[16544, 428, 351, 8, 25, "Print",ExpressionUUID->"8998dce9-0930-4146-9854-80e3b9b56093"],
+Cell[16898, 438, 349, 8, 25, "Print",ExpressionUUID->"ac725984-2ed1-49c9-a843-c2feb60a57ad"],
+Cell[17250, 448, 351, 8, 25, "Print",ExpressionUUID->"88c01219-af6a-4b8c-8f06-14469ac13f46"],
+Cell[17604, 458, 351, 8, 25, "Print",ExpressionUUID->"c505aeea-2b11-4642-9663-c0f4e74ee97b"],
+Cell[17958, 468, 349, 8, 25, "Print",ExpressionUUID->"82e6cc7e-dd83-4039-a6bc-076b28c41c6f"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[18356, 482, 544, 12, 54, "Input",ExpressionUUID->"5216ee22-8f15-40eb-8d98-769141a3c045"],
+Cell[CellGroupData[{
+Cell[18925, 498, 347, 8, 25, "Print",ExpressionUUID->"bb15c390-e9ac-4869-a784-43199d6d9e26"],
+Cell[19275, 508, 347, 8, 25, "Print",ExpressionUUID->"92cbe142-c85b-447a-90f4-c804e9e72dde"],
+Cell[19625, 518, 348, 8, 25, "Print",ExpressionUUID->"e3651416-2ce0-41d9-bf17-e012b57da2be"],
+Cell[19976, 528, 348, 8, 25, "Print",ExpressionUUID->"3ab3cc13-b329-4c07-b25e-fab152085be4"],
+Cell[20327, 538, 348, 8, 25, "Print",ExpressionUUID->"7377a803-8ca8-4782-b291-35314177cbd8"],
+Cell[20678, 548, 347, 8, 25, "Print",ExpressionUUID->"6046adc2-4ca3-4ae4-ab24-e0636061e9db"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21074, 562, 542, 12, 54, "Input",ExpressionUUID->"c94e7d6a-0de6-439d-ac53-4e532636bbef"],
+Cell[CellGroupData[{
+Cell[21641, 578, 346, 8, 25, "Print",ExpressionUUID->"0d3757b6-cd6e-46a0-9b6b-8b0da025b4d8"],
+Cell[21990, 588, 346, 8, 25, "Print",ExpressionUUID->"38c2cdfc-c932-46c7-af7c-3080692f5c0b"],
+Cell[22339, 598, 347, 8, 25, "Print",ExpressionUUID->"3b64075d-b62c-4746-a610-85a71b5a78cd"],
+Cell[22689, 608, 347, 8, 25, "Print",ExpressionUUID->"f82b5977-3009-4e17-ad75-e098b8f40b8f"],
+Cell[23039, 618, 347, 8, 25, "Print",ExpressionUUID->"905e495b-b354-4d8d-9f25-fc5ce9e002dd"],
+Cell[23389, 628, 347, 8, 25, "Print",ExpressionUUID->"b1ac8b97-24fd-42e1-82f9-8f196d586df4"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23785, 642, 443, 11, 54, "Input",ExpressionUUID->"ca4d9d34-2b6b-451a-8026-2f9a440f3c14"],
+Cell[CellGroupData[{
+Cell[24253, 657, 443, 9, 25, "Print",ExpressionUUID->"5d72ce69-a06f-43c9-b73c-40da01ef867d"],
+Cell[24699, 668, 441, 9, 25, "Print",ExpressionUUID->"6031473d-e36a-421b-9e32-53427419f6c8"],
+Cell[25143, 679, 441, 9, 25, "Print",ExpressionUUID->"6b1dc352-94cd-4750-9ce6-3e465d42d170"],
+Cell[25587, 690, 442, 9, 25, "Print",ExpressionUUID->"7378e73a-186f-4ce4-8428-665a5e70cf73"],
+Cell[26032, 701, 444, 9, 25, "Print",ExpressionUUID->"7c2e8155-8b98-4478-9f32-2c838e0872a0"],
+Cell[26479, 712, 444, 9, 25, "Print",ExpressionUUID->"78742396-6d07-4c91-82ca-a8b33d4e3561"],
+Cell[26926, 723, 442, 9, 25, "Print",ExpressionUUID->"5a06505c-af53-40c8-9e6f-661f79ee15a0"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[27417, 738, 740, 14, 54, "Input",ExpressionUUID->"78f2a386-6a54-47a0-adc3-b77e06956d39"],
+Cell[CellGroupData[{
+Cell[28182, 756, 342, 8, 25, "Print",ExpressionUUID->"fcfe840e-78a7-4786-81d3-b035d4cf688d"],
+Cell[28527, 766, 342, 8, 25, "Print",ExpressionUUID->"4aefc8b4-8bb3-45f0-8d9d-71a4d64fa28f"],
+Cell[28872, 776, 341, 8, 25, "Print",ExpressionUUID->"022f64ed-0ceb-4fba-b432-eea9a5520dfa"],
+Cell[29216, 786, 341, 8, 25, "Print",ExpressionUUID->"b481f489-0f36-4a2f-8d37-47e6004a3a2a"],
+Cell[29560, 796, 342, 8, 25, "Print",ExpressionUUID->"94190fe8-8ad5-4c48-b655-a0bc3aa1738e"],
+Cell[29905, 806, 341, 8, 25, "Print",ExpressionUUID->"b81635ec-47c3-48df-9b7f-7076eefce435"],
+Cell[30249, 816, 342, 8, 25, "Print",ExpressionUUID->"69e5432f-11b2-482e-b4f4-1270a61b4fd6"],
+Cell[30594, 826, 342, 8, 25, "Print",ExpressionUUID->"ebd76e74-c019-43c4-b334-2d106cb9d9bb"],
+Cell[30939, 836, 342, 8, 25, "Print",ExpressionUUID->"e20a8156-a240-4cdf-8f46-6ba12f392478"],
+Cell[31284, 846, 342, 8, 25, "Print",ExpressionUUID->"2d4beef0-354f-4d23-aad5-74a2d43fdcf3"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[31675, 860, 853, 16, 54, "Input",ExpressionUUID->"5065d87d-3606-4191-94d8-b2b2ca22ee53"],
+Cell[CellGroupData[{
+Cell[32553, 880, 339, 8, 25, "Print",ExpressionUUID->"5b4756e5-d610-4c1c-8398-a1172a9a9006"],
+Cell[32895, 890, 339, 8, 25, "Print",ExpressionUUID->"4280a679-f3a9-4fc7-94f1-ec31e0cb1710"],
+Cell[33237, 900, 340, 8, 25, "Print",ExpressionUUID->"0eebdbd2-a17f-4b0d-a77c-a945b2ac8ae2"],
+Cell[33580, 910, 342, 8, 25, "Print",ExpressionUUID->"b317e40b-eafe-4784-81ff-a70486d61e50"],
+Cell[33925, 920, 340, 8, 25, "Print",ExpressionUUID->"56074c43-125b-4caf-b9c4-9dee4e075bf3"],
+Cell[34268, 930, 340, 8, 25, "Print",ExpressionUUID->"b5fab833-66e2-4ed0-abfc-ee6df05b9534"],
+Cell[34611, 940, 343, 8, 25, "Print",ExpressionUUID->"34c8536b-9380-4f51-a8b4-ccd13d203f91"],
+Cell[34957, 950, 341, 8, 25, "Print",ExpressionUUID->"5ca054eb-efc5-422f-b027-11d35c10625b"]
+}, Open  ]]
+}, Open  ]],
+Cell[35325, 962, 1797, 43, 163, "Input",ExpressionUUID->"3c72194d-990b-457b-8b47-dd170a28efc9"],
+Cell[37125, 1007, 1304, 35, 163, "Input",ExpressionUUID->"3a162c97-ad05-42de-a26c-e08fd510cc68"],
+Cell[38432, 1044, 2792, 74, 311, "Input",ExpressionUUID->"8a0a35a3-97ed-456a-9fe9-f6be9957d499"],
+Cell[41227, 1120, 7570, 206, 911, "Input",ExpressionUUID->"984327df-c2f9-40ec-a7d4-bf6d4ff77a26"],
+Cell[48800, 1328, 6280, 177, 687, "Input",ExpressionUUID->"d8cbae50-6979-40e0-be12-2f589d5e34ee"],
+Cell[55083, 1507, 7141, 205, 720, "Input",ExpressionUUID->"40e54cb4-394d-4292-b546-a8b45b2f462c"],
+Cell[62227, 1714, 9169, 269, 904, "Input",ExpressionUUID->"9cd195d0-d533-47ca-87eb-c89efbe54e44"],
+Cell[71399, 1985, 7136, 195, 729, "Input",ExpressionUUID->"f0210d22-1d20-4265-a540-c4270c2581e0"]
 }
 ]
 *)
