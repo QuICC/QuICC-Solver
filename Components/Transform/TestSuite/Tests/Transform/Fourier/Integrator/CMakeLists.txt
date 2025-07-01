@@ -2,6 +2,7 @@ message(VERBOSE "Integrators:")
 
 # Create integrator tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 # Mixed Fourier tests
 
@@ -220,3 +221,10 @@ foreach(_test ${_tests})
     ULPS  25520 81616 600000
   )
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_integrator_merged
+  COMMAND ${TestExe}
+  JN 32
+)

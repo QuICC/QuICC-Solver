@@ -5,6 +5,7 @@ include(SetUlp)
 
 # Create tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 set(_tests
   Poly::Energy:<base_t>:reductor
@@ -847,3 +848,10 @@ foreach(_test ${_split_tests})
         SPLITS 4:0 8:0 8:0 96:0 288:0 256:0 3072:0 9216:0
     )
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_reductor_merged
+  COMMAND ${TestExe}
+  JN 32
+)

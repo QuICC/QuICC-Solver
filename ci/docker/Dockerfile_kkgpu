@@ -6,6 +6,7 @@ COPY . /QuICC.src
 RUN mkdir -p /QuICC.src/build \
   && cd /QuICC.src/build \
   && cmake .. -DCMAKE_BUILD_TYPE=Release \
+    -GNinja \
     -DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE \
     -DCMAKE_CUDA_COMPILER=nvcc \
     -DQUICC_USE_VKFFT=ON \
@@ -30,5 +31,5 @@ RUN mkdir -p /QuICC.src/build \
     -DQUICC_TESTSUITE_FRAMEWORK=ON \
     -DQUICC_TESTSUITE_GRAPH=ON \
     -DQUICC_TESTSUITE_PYQUICC=ON \
-  && make -j $(grep processor /proc/cpuinfo | wc -l)
+  && ninja -j $(grep processor /proc/cpuinfo | wc -l)
 

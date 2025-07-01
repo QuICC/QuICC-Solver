@@ -1,6 +1,4 @@
 .test-lib:
-  variables:
-    TEST_NCPU: $(grep processor /proc/cpuinfo | wc -l)
   script:
     - pwd
     - echo "$TEST_NCPU"
@@ -11,23 +9,22 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^View -E Mpi
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Polynomial
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ^Jacobi
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_integrator"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Complex_.*_projector"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_integrator"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_projector"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_Mixed_.*_bfloop"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_integrator"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_projector"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_bfloop"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_.*_reductor"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformWorlandTests_.*"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_integrator_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_projector_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformFourierTests_bfloop_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_integrator_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_projector_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_bfloop_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformChebyshevTests_reductor_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformWorlandTests_integrator_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformWorlandTests_projector_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformWorlandTests_bfloop_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformWorlandTests_reductor_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_integrator_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_projector_merged"
+    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_bfloop_merged"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R ProfilerTest
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R TrackerTest
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_integrator_ulp"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_integrator_id"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_projector_ulp"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_projector_id"
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^TransformALegendreTests_Poly_.*_bfloop_ulp"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMBesselTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMWorlandStencilTests_
@@ -37,7 +34,7 @@
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R SparseSMChebyshevLinearMapStencilTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkLoadSplitterTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkCommunicatorTests_
-    - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "^FrameworkStateFileTests_.*serial"
+    - ctest --no-tests=error --output-on-failure -R "^FrameworkStateFileTests_.*serial"
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkTransformCoordinatorTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R FrameworkIoTests_
     - ctest -j $TEST_NCPU --no-tests=error --output-on-failure -R "PyQuICCTests"
@@ -54,7 +51,7 @@
 
 .test-lib-petsc:
   variables:
-    TEST_NCPU: 'grep processor /proc/cpuinfo | wc -l'
+    TEST_NCPU: 4
   script:
     - pwd
     - cd /QuICC.src/build

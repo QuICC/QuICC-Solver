@@ -1,16 +1,21 @@
 # CMake setup for Stability component
-set(QUICC_CURRENT_COMPONENT_DIR Components/Stability)
-set(QUICC_CURRENT_COMPONENT_LIB Stability)
-set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT_LIB}::")
+set(QUICC_CURRENT_COMPONENT Stability)
+set(QUICC_CURRENT_COMPONENT_DIR Components/${QUICC_CURRENT_COMPONENT})
+set(QUICC_CURRENT_COMPONENT_LIB ${QUICC_CURRENT_COMPONENT})
+set(QUICC_CURRENT_COMPONENT_LIB_NAMESPACE "${QUICC_CURRENT_COMPONENT}::")
 
 # Set library sources visibility
 set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
 
 # Set CMake module path
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/Components/Stability/cmake.d")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/cmake.d")
+set(QUICC_COMPONENT_CMAKE_MODULE_PATH_${QUICC_CURRENT_COMPONENT} "${PROJECT_SOURCE_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/cmake.d" CACHE INTERNAL "CMake modules from ${QUICC_CURRENT_COMPONENT} component")
+
+#  Generate specific nondimension parameters
+include(cmake.d/setup/RegisterNonDimensional.cmake)
 
 # Enable stability solver if SLEPc/PETSc are available
-if(QUICC_HAVE_STABILITY_SOLVER)
+if(TARGET PkgConfig::SLEPC)
   # Create component library
   add_library(${QUICC_CURRENT_COMPONENT_LIB} "")
   set_target_properties(${QUICC_CURRENT_COMPONENT_LIB} PROPERTIES LINKER_LANGUAGE CXX)
@@ -57,4 +62,6 @@ if(QUICC_HAVE_STABILITY_SOLVER)
   quicc_export_target(${QUICC_CURRENT_COMPONENT_LIB}
     COMPONENT ${QUICC_CURRENT_COMPONENT_LIB}
   )
+else()
+  message(STATUS "SLEPc is missing. Stability component will not be enabled")
 endif()
