@@ -382,6 +382,12 @@ namespace TCoord {
                               auto val = test.spRef->inTor(test, i, j_, k_);
                               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(val, i,j,k);
                            }
+			   else
+			   {
+                              auto val = test.spRef->inTor(test, i, j_, k_);
+                              val = 0;
+                              p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(val, i,j,k);
+			   }
 
                            // Poloidal component
                            if(test.fieldId == Test::FieldId::POL ||
@@ -391,20 +397,30 @@ namespace TCoord {
                               auto val = test.spRef->inPol(test, i, j_, k_);
                               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(val, i,j,k);
                            }
+			   else
+			   {
+                              auto val = test.spRef->inPol(test, i, j_, k_);
+                              val = 0;
+                              p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(val, i,j,k);
+			   }
                         }
                      }
                   }
+                  std::cerr << "Spectral truncation:" << std::endl;
                   std::cerr << sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL) << std::endl;
                   std::cerr << sRes.dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL) << std::endl;
                   std::cerr << sRes.dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL) << std::endl;
+                  std::cerr << "Physical truncation:" << std::endl;
                   std::cerr << sRes.dim(Dimensions::Simulation::SIM1D, Dimensions::Space::PHYSICAL) << std::endl;
                   std::cerr << sRes.dim(Dimensions::Simulation::SIM2D, Dimensions::Space::PHYSICAL) << std::endl;
                   std::cerr << sRes.dim(Dimensions::Simulation::SIM3D, Dimensions::Space::PHYSICAL) << std::endl;
-                  std::cerr << std::string(50, '&') << std::endl;
+                  std::cerr << std::endl << std::string(50, '-') << std::endl;
+                  std::cerr << "Initial toroidal spectral data" << std::endl;
                   std::cerr << p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).data() << std::endl;
-                  std::cerr << std::string(50, '@') << std::endl;
+                  std::cerr << std::endl << std::string(50, '-') << std::endl;
+                  std::cerr << "Initial poloidal spectral data" << std::endl;
                   std::cerr << p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).data() << std::endl;
-                  std::cerr << std::string(50, 'q') << std::endl;
+                  std::cerr << std::string(50, '=') << std::endl;
                },
             f.second);
       }
@@ -506,11 +522,13 @@ namespace TCoord {
          std::visit(
                [&](auto&& p)
                {
-               std::cerr << std::string(80,'-') << std::endl;
-               std::cerr << p->dom(0).perturbation().comp(FieldComponents::Spectral::TOR).data() << std::endl;
-               std::cerr << std::string(80,'_') << std::endl;
-               std::cerr << p->dom(0).perturbation().comp(FieldComponents::Spectral::POL).data() << std::endl;
-               std::cerr << std::string(80,'=') << std::endl;
+                  std::cerr << std::endl << std::string(50,'-') << std::endl;
+                  std::cerr << "Output toroidal spectral data" << std::endl;
+                  std::cerr << p->dom(0).perturbation().comp(FieldComponents::Spectral::TOR).data() << std::endl;
+                  std::cerr << std::endl << std::string(50,'-') << std::endl;
+                  std::cerr << "Output poloidal spectral data" << std::endl;
+                  std::cerr << p->dom(0).perturbation().comp(FieldComponents::Spectral::POL).data() << std::endl;
+                  std::cerr << std::string(50,'=') << std::endl;
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
                   const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
