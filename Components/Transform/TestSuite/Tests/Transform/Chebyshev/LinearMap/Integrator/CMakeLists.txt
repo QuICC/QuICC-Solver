@@ -2,6 +2,8 @@ message(VERBOSE "Integrators:")
 
 # Create integrator tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
+
 set(_tests
   P:<base_t>:integrator
   P_Zero:<base_t>:integrator
@@ -90,3 +92,10 @@ foreach(_test ${_tests})
     IDS 0 1 2 3 4 5
   )
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_integrator_merged
+  COMMAND ${TestExe}
+  JN 4
+)

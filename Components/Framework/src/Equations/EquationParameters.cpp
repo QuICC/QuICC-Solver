@@ -32,6 +32,11 @@ namespace Equations {
 
    MHDFloat EquationParameters::nd(std::size_t id) const
    {
+      if(this->mND.count(id) == 0)
+      {
+         throw std::logic_error("Nondimensional parameter " + NonDimensional::Coordinator::tag(id) + " is not available");
+      }
+
       return this->mND.find(id)->second->value();
    }
 

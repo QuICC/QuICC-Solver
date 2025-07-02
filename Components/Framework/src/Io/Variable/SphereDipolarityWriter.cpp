@@ -32,7 +32,7 @@ namespace Variable {
    void SphereDipolarityWriter::init()
    {
       this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::TransformSpectralOrdering123);
-      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
+      const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::TRA1D);
 
       // Compute boundary operators
       int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
@@ -54,7 +54,8 @@ namespace Variable {
                }
             }
          }
-      } else
+      }
+      else
       {
          // Loop over harmonic degree l
          for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
@@ -68,7 +69,7 @@ namespace Variable {
       for (auto& [l, op] : this->mValue)
       {
          auto a = wb.alpha(l);
-         auto db = wb.dBeta();      
+         auto db = wb.dBeta();
          SparseSM::Worland::Boundary::Value bc(a, db, l);
          op = bc.compute(nN-1).cast<MHDFloat>();
       }
@@ -128,6 +129,9 @@ namespace Variable {
       // Compute energy reduction
       spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolQ), 1);
 
+      // Radial truncation
+      int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+
       // Compute CMB magnetic field spectrum B^2
       MHDFloat factor, lfactor;
 
@@ -155,7 +159,7 @@ namespace Variable {
                std::visit(
                      [&](auto&& p)
                      {
-                        spectrum = this->mValue.at(l_).transpose() * p->profile(j,k); 
+                        spectrum = this->mValue.at(l_).transpose() * p->profile(j,k).topRows(nN);
                      },
                      pInVarPolQ);
 
@@ -171,7 +175,8 @@ namespace Variable {
                }
             }
          }
-      } else
+      }
+      else
       {
          // Loop over harmonic degree l
          for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
@@ -193,7 +198,7 @@ namespace Variable {
                std::visit(
                      [&](auto&& p)
                      {
-                        spectrum = this->mValue.at(l_).transpose() * p->profile(j,k); 
+                        spectrum = this->mValue.at(l_).transpose() * p->profile(j,k).topRows(nN);
                      },
                      pInVarPolQ);
 
@@ -244,6 +249,11 @@ namespace Variable {
       {
          this->mFile << std::scientific;
          this->mFile << std::setprecision(ioPrec) << ioFW(ioPrec) << this->mTime << "\t" << ioFW(ioPrec) << this->mDipolarity << "\t" << this->mAxialDipole << "\t" << this->mNonAxialDipole.real() << "\t" << this->mNonAxialDipole.imag();
+
+         for(int count = 0; count < this->mCmbSpectrum.size(); count ++)
+         {
+            this->mFile  << "\t" << this->mCmbSpectrum(count);
+         }
          this->mFile << std::endl;
       }
 

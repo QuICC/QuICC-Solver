@@ -113,7 +113,7 @@ namespace Variable {
          {
             for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {
-               std::max(nN, tRes.dim<Dimensions::Data::DATB1D>(j,k));
+               nN = std::max(nN, tRes.dim<Dimensions::Data::DATB1D>(j,k));
             }
          }
       }

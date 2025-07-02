@@ -5,6 +5,7 @@ include(SetUlp)
 
 # Create tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 #set(_tests
 #  Poly::I4DivR1D1R1_I2:integrator
@@ -632,3 +633,10 @@ foreach(_perf_id 108 109)
     )
   endforeach()
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_integrator_merged
+  COMMAND ${TestExe}
+  JN 32
+)

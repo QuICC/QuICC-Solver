@@ -5,6 +5,7 @@ include(SetUlp)
 
 # Create  tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 set(_tests
   Poly::P:<base_t>:projector
@@ -367,3 +368,10 @@ foreach(_perf_id 108 109)
       )
   endforeach()
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_projector_merged
+  COMMAND ${TestExe}
+  JN 32
+)
