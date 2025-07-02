@@ -12,6 +12,7 @@ bnorm::usage="bnorm[k,l,dv] norm of Bessel k";
 
 $valueD\[Nu]::usage="nu = l + d\[Nu] for value boundary condition";
 $insulatingD\[Nu]::usage="nu = l + d\[Nu] for insulating boundary condition";
+$nsD\[Nu]::usage="nu = l + d\[Nu] for no-slip boundary condition";
 
 (* Zeros *)
 getZero::usage="getZero[n,l,d\[Nu]]"
