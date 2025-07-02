@@ -52,7 +52,7 @@ void ShellScalarRSpectrumWriter::init()
    this->mGrid.resize(size/2);
    for(int i = 0; i < size/2; i++)
    {
-      this->mGrid(i) = g(2*i);
+      this->mGrid(i) = static_cast<MHDFloat>(g(2*i));
    }
 
    ISphericalScalarRSpectrumWriter::init();
