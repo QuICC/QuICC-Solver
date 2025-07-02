@@ -65,12 +65,12 @@ inline void NoSlip<TOp>::compute(
    }
    else
    {
-      std::vector<Internal::MHDFloat> roots_extra = {};
-      SphericalBessel::getRoots(roots_extra, l + TOp::EXTRA_L, nPoly + TOp::EXTRA_POLY,
+      std::vector<Internal::MHDFloat> roots_extra = {0};
+      SphericalBessel::getRoots(roots_extra, l + TOp::EXTRA_L, nPoly -1 + TOp::EXTRA_POLY,
          SphericalBessel::NoSlip_dNu());
 
       TOp::compute(rOut, roots, roots_extra, l, igrid, scale,
-         SphericalBessel::NoSlip_dNu(), SphericalBessel::Value_dNu());
+         SphericalBessel::NoSlip_dNu(), SphericalBessel::NoSlip_dNu());
    }
 }
 
