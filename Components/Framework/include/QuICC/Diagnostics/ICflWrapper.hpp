@@ -6,15 +6,9 @@
 #ifndef QUICC_DIAGNOSTICS_ICFLWRAPPER_HPP
 #define QUICC_DIAGNOSTICS_ICFLWRAPPER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -33,28 +27,28 @@ namespace Diagnostics {
       public:
          /**
           * @brief Constructor
-          *
-          * @param Velocity wrapper
           */
-         ICflWrapper(const SharedIVectorWrapper spVelocity);
-
-         /**
-          * @brief Constructor
-          *
-          * @param Velocity wrapper
-          * @param Magnetic wrapper
-          */
-         ICflWrapper(const SharedIVectorWrapper spVelocity, const SharedIVectorWrapper spMagnetic);
+         ICflWrapper(const MHDFloat courant);
 
          /**
           * @brief Destructor
           */
-         virtual ~ICflWrapper();
+         virtual ~ICflWrapper() = default;
+
+         /**
+          * @brief Set field
+          */
+         void setField(const std::size_t id, const SharedIVectorWrapper spField);
 
          /**
           * @brief Initialize wrapper
           */
          virtual void init(const std::vector<Array>& mesh) = 0;
+
+         /**
+          * @brief Cfl constraint is active
+          */
+         bool isActive() const;
 
          /**
           * @brief Get initial CFL constraint
@@ -68,26 +62,27 @@ namespace Diagnostics {
 
       protected:
          /**
-          * @brief Shared velocity wrapper
+          * @brief Courant constant used for the CFL computation
           */
-         SharedIVectorWrapper mspVelocity;
+         const MHDFloat mcCourant;
 
          /**
-          * @brief Shared magnetic wrapper
+          * @brief CFL contraint is active?
           */
-         SharedIVectorWrapper mspMagnetic;
+         bool mIsActive;
 
          /**
-          * @brief Update minimum CFL in matrix
+          * @brief Shared field wrappers
           */
-         void updateCflMatrix(Matrix& cfl) const;
+         std::map<std::size_t,SharedIVectorWrapper> mFields;
 
       private:
    };
 
    /// Typedef for a shared ICflWrapper
    typedef std::shared_ptr<ICflWrapper> SharedICflWrapper;
-}
-}
+
+} // namespace Diagnostics
+} // namespace QuICC
 
 #endif // QUICC_DIAGNOSTICS_ICFLWRAPPER_HPP

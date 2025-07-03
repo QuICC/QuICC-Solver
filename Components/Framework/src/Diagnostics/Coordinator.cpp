@@ -3,30 +3,24 @@
  * @brief Source of the diagnostic coordinator
  */
 
-// Debug includes
+// System includes
 //
 #include <cassert>
 
-#include "QuICC/Debug/DebuggerMacro.h"
-
-// System includes
-//
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Diagnostics/Coordinator.hpp"
-
 // Project includes
 //
+#include "QuICC/Diagnostics/Coordinator.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "Environment/MpiTypes.hpp"
-#include "QuICC/Diagnostics/CartesianCflWrapper.hpp"
-#include "QuICC/Diagnostics/CartesianTorPolWrapper.hpp"
-#include "QuICC/Diagnostics/ShellCflWrapper.hpp"
-#include "QuICC/Diagnostics/SphereCflWrapper.hpp"
+#include "QuICC/Diagnostics/CartesianCfl.hpp"
+#include "QuICC/Diagnostics/ShellCfl.hpp"
+#include "QuICC/Diagnostics/SphereCfl.hpp"
+#include "QuICC/Diagnostics/InertialWaveCfl.hpp"
+#include "QuICC/Diagnostics/TorsionalOscillationCfl.hpp"
+#include "QuICC/Diagnostics/ISphericalHydroCfl.hpp"
+#include "QuICC/Diagnostics/ISphericalMagneticCfl.hpp"
 #include "QuICC/Diagnostics/SphericalTorPolWrapper.hpp"
+#include "QuICC/Diagnostics/CartesianTorPolWrapper.hpp"
 #include "QuICC/Diagnostics/StreamVerticalWrapper.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Streamfunction.hpp"
@@ -55,8 +49,6 @@ Coordinator::Coordinator() :
 {
    this->mCfl.setZero();
 }
-
-Coordinator::~Coordinator() {}
 
 void Coordinator::init(const std::vector<Array>& mesh,
    const std::map<std::size_t,
@@ -89,9 +81,18 @@ void Coordinator::init(const std::vector<Array>& mesh,
          auto spMagnetic = std::make_shared<SphericalTorPolWrapper>(
             vectors.find(PhysicalNames::Magnetic::id())->second);
 
-         this->mspCflWrapper =
-            std::make_shared<ShellCflWrapper>(spVelocity, spMagnetic, params);
-         // Create a full sphere wrapper
+         auto iwCfl = std::make_shared<InertialWaveCfl>(params, 0.4);
+         this->mCflOps.push_back(iwCfl);
+         auto toCfl = std::make_shared<TorsionalOscillationCfl>(params, 0.4);
+         this->mCflOps.push_back(toCfl);
+         auto locCfl = std::make_shared<ShellCfl<ISphericalMagneticCfl>>(params, 0.4);
+         locCfl->defineVelocity(PhysicalNames::Velocity::id());
+         locCfl->defineMagnetic(PhysicalNames::Magnetic::id());
+         locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
+         locCfl->setField(PhysicalNames::Magnetic::id(), spMagnetic);
+         this->mCflOps.push_back(locCfl);
+
+      // Create a full sphere wrapper
       }
       else if (spScheme->has(SpatialScheme::Feature::SphereGeometry) &&
                spScheme->formulation() == VectorFormulation::TORPOL)
@@ -101,8 +102,16 @@ void Coordinator::init(const std::vector<Array>& mesh,
          auto spMagnetic = std::make_shared<SphericalTorPolWrapper>(
             vectors.find(PhysicalNames::Magnetic::id())->second);
 
-         this->mspCflWrapper =
-            std::make_shared<SphereCflWrapper>(spVelocity, spMagnetic, params);
+         auto iwCfl = std::make_shared<InertialWaveCfl>(params, 0.4);
+         this->mCflOps.push_back(iwCfl);
+         auto toCfl = std::make_shared<TorsionalOscillationCfl>(params, 0.4);
+         this->mCflOps.push_back(toCfl);
+         auto locCfl = std::make_shared<SphereCfl<ISphericalMagneticCfl>>(params, 0.4);
+         locCfl->defineVelocity(PhysicalNames::Velocity::id());
+         locCfl->defineMagnetic(PhysicalNames::Magnetic::id());
+         locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
+         locCfl->setField(PhysicalNames::Magnetic::id(), spMagnetic);
+         this->mCflOps.push_back(locCfl);
       }
       else
       {
@@ -126,10 +135,12 @@ void Coordinator::init(const std::vector<Array>& mesh,
          auto spVelocity = std::make_shared<CartesianTorPolWrapper>(
             vectors.find(PhysicalNames::Velocity::id())->second);
 
-         this->mspCflWrapper =
-            std::make_shared<CartesianCflWrapper>(spVelocity);
+         auto locCfl = std::make_shared<CartesianCfl>(params, 0.65);
+         locCfl->defineVelocity(PhysicalNames::Velocity::id());
+         locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
+         this->mCflOps.push_back(locCfl);
 
-         // Create a toroidal/poloidal spherical shell wrapper
+      // Create a toroidal/poloidal spherical shell wrapper
       }
       else if (spScheme->has(SpatialScheme::Feature::ShellGeometry) &&
                spScheme->formulation() == VectorFormulation::TORPOL)
@@ -137,18 +148,30 @@ void Coordinator::init(const std::vector<Array>& mesh,
          auto spVelocity = std::make_shared<SphericalTorPolWrapper>(
             vectors.find(PhysicalNames::Velocity::id())->second);
 
-         this->mspCflWrapper =
-            std::make_shared<ShellCflWrapper>(spVelocity, params);
-         // Create a full sphere wrapper
+         auto iwCfl = std::make_shared<InertialWaveCfl>(params, 0.4);
+         this->mCflOps.push_back(iwCfl);
+         auto toCfl = std::make_shared<TorsionalOscillationCfl>(params, 0.4);
+         this->mCflOps.push_back(toCfl);
+         auto locCfl = std::make_shared<ShellCfl<ISphericalHydroCfl>>(params, 0.4);
+         locCfl->defineVelocity(PhysicalNames::Velocity::id());
+         locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
+         this->mCflOps.push_back(locCfl);
+      // Create a full sphere wrapper
       }
       else if (spScheme->has(SpatialScheme::Feature::SphereGeometry) &&
                spScheme->formulation() == VectorFormulation::TORPOL)
       {
          auto spVelocity = std::make_shared<SphericalTorPolWrapper>(
             vectors.find(PhysicalNames::Velocity::id())->second);
-
-         this->mspCflWrapper =
-            std::make_shared<SphereCflWrapper>(spVelocity, params);
+         
+         auto iwCfl = std::make_shared<InertialWaveCfl>(params, 0.4);
+         this->mCflOps.push_back(iwCfl);
+         auto toCfl = std::make_shared<TorsionalOscillationCfl>(params, 0.4);
+         this->mCflOps.push_back(toCfl);
+         auto locCfl = std::make_shared<SphereCfl<ISphericalHydroCfl>>(params, 0.4);
+         locCfl->defineVelocity(PhysicalNames::Velocity::id());
+         locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
+         this->mCflOps.push_back(locCfl);
       }
       else
       {
@@ -158,7 +181,7 @@ void Coordinator::init(const std::vector<Array>& mesh,
 
       this->mFixedStep = tstep(1);
 
-      // Create a stream function and vertical velocity wrapper
+   // Create a stream function and vertical velocity wrapper
    }
    else if (scalars.count(PhysicalNames::Streamfunction::id()) &&
             scalars.count(PhysicalNames::VelocityZ::id()))
@@ -174,8 +197,10 @@ void Coordinator::init(const std::vector<Array>& mesh,
             scalars.find(PhysicalNames::Streamfunction::id())->second,
             scalars.find(PhysicalNames::VelocityZ::id())->second);
 
-         this->mspCflWrapper =
-            std::make_shared<CartesianCflWrapper>(spVelocity);
+         auto locCfl = std::make_shared<CartesianCfl>(params, 0.65);
+         locCfl->defineVelocity(PhysicalNames::Streamfunction::id());
+         locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
+         this->mCflOps.push_back(locCfl);
       }
       else
       {
@@ -192,9 +217,18 @@ void Coordinator::init(const std::vector<Array>& mesh,
       this->mFixedStep = tstep(1);
    }
 
-   if (this->mspCflWrapper)
+   if (this->mCflOps.size() > 0)
    {
-      this->mspCflWrapper->init(mesh);
+      int cols = 1;
+      for(auto op: this->mCflOps)
+      {
+         assert(op);
+         op->init(mesh);
+         cols += op->initialCfl().cols();
+      }
+
+      this->mCfl.resize(2, cols);
+      this->mCfl.setZero();
    }
 
    // Store configuration file start time
@@ -224,12 +258,21 @@ void Coordinator::initialCfl()
       this->mCfl(0, 0) = this->mFixedStep;
       this->mCfl(1, 0) = Timestep::FIXEDSTEP_LOCATION;
 
-      // Compute initial CFL condition
+   // Compute initial CFL condition
    }
-   else if (this->mspCflWrapper)
+   else if (this->mCflOps.size() > 0)
    {
       // Compute CFL for initial state
-      this->mCfl = this->mspCflWrapper->initialCfl();
+      int col = 1;
+      for(auto op: this->mCflOps)
+      {
+         assert(op);
+
+         auto tmp = op->initialCfl();
+         this->mCfl.block(0, 2, col, col + tmp.cols()) = tmp;
+         col += tmp.cols();
+      }
+      this->updateCflMatrix(this->mCfl);
 
       if (this->mcMinStep < this->mCfl(0, 0))
       {
@@ -247,14 +290,23 @@ void Coordinator::updateCfl()
       this->mCfl(0, 0) = this->mFixedStep;
       this->mCfl(1, 0) = Timestep::FIXEDSTEP_LOCATION;
 
-      // Compute CFL condition
+   // Compute CFL condition
    }
-   else if (this->mspCflWrapper)
+   else if (this->mCflOps.size() > 0)
    {
       // Safety assert
-      assert(this->mspCflWrapper);
+      assert(this->mCflOps.size() > 0);
 
-      this->mCfl = this->mspCflWrapper->cfl();
+      int col = 1;
+      for(auto op: this->mCflOps)
+      {
+         assert(op);
+
+         auto tmp = op->cfl();
+         this->mCfl.block(0, 2, col, col + tmp.cols()) = tmp;
+         col += tmp.cols();
+      }
+      this->updateCflMatrix(this->mCfl);
 
       // Check for maximum timestep
       if (this->mcMaxStep < this->mCfl(0, 0))
@@ -332,6 +384,17 @@ void Coordinator::useStateTime(const MHDFloat time, const MHDFloat timestep)
    if (this->mStartTimestep < 0)
    {
       this->mStartTimestep = timestep;
+   }
+}
+
+void Coordinator::updateCflMatrix(Matrix& cfl) const
+{
+   int idx;
+   cfl(0,0) = cfl.row(0).tail(cfl.cols()-1).minCoeff(&idx);
+
+   if(cfl.rows() > 1)
+   {
+      cfl.col(0).tail(cfl.rows()-1) = cfl.col(idx+1).tail(cfl.rows()-1);
    }
 }
 

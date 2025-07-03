@@ -143,6 +143,15 @@ namespace Model {
          virtual void addStatsOutputFiles(std::shared_ptr<TSim> spSim);
 
          /**
+          * @brief Add diagnostic
+          *
+          * Default implementation provides standard CFL calculation
+          *
+          * @param spSim   Shared simulation object
+          */
+         virtual void addDiagnostics(std::shared_ptr<TSim> spSim);
+
+         /**
           * @brief Set the initial state
           *
           * @param spSim   Shared simulation object
@@ -232,6 +241,10 @@ namespace Model {
 
       // Propagate split 4th order equations flag
       this->mpBackend->enableSplitEquation(f.count(SpatialScheme::Feature::SplitFourthOrder));
+   }
+
+   template <typename TSim, typename TState, typename TVis> void IPhysicalModel<TSim,TState,TVis>::addDiagnostics(std::shared_ptr<TSim> spSim)
+   {
    }
 
    template <typename TSim, typename TState, typename TVis> void IPhysicalModel<TSim,TState,TVis>::setGeneratorState(std::shared_ptr<TState> spGen)

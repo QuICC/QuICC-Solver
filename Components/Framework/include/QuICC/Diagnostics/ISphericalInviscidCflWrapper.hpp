@@ -1,10 +1,10 @@
 /**
- * @file ISphericalCflWrapper.hpp
+ * @file ISphericalInviscidCflWrapper.hpp
  * @brief CFL constraint in a spherical geometry
  */
 
-#ifndef QUICC_DIAGNOSTICS_ISPHERICALCFLWRAPPER_HPP
-#define QUICC_DIAGNOSTICS_ISPHERICALCFLWRAPPER_HPP
+#ifndef QUICC_DIAGNOSTICS_ISPHERICALINVISCIDCFLWRAPPER_HPP
+#define QUICC_DIAGNOSTICS_ISPHERICALINVISCIDCFLWRAPPER_HPP
 
 // System includes
 //
@@ -22,19 +22,19 @@ namespace Diagnostics {
    /**
     * @brief CFL constraint in a spherical geometry
     */
-   class ISphericalCflWrapper: public ICflWrapper
+   class ISphericalInviscidCflWrapper: public ICflWrapper
    {
       public:
          /**
           * @brief Constructor
           *
           */
-         ISphericalCflWrapper(const MHDFloat courant);
+         ISphericalInviscidCflWrapper(const MHDFloat courant);
 
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalCflWrapper() = default;
+         virtual ~ISphericalInviscidCflWrapper() = default;
 
       protected:
          /**
@@ -55,9 +55,9 @@ namespace Diagnostics {
       private:
    };
 
-   /// Typedef for a shared ISphericalCflWrapper
-   typedef std::shared_ptr<ISphericalCflWrapper> SharedISphericalCflWrapper;
+   /// Typedef for a shared ISphericalInviscidCflWrapper
+   typedef std::shared_ptr<ISphericalInviscidCflWrapper> SharedISphericalInviscidCflWrapper;
 }
 }
 
-#endif // QUICC_DIAGNOSTICS_ISPHERICALCFLWRAPPER_HPP
+#endif // QUICC_DIAGNOSTICS_ISPHERICALINVISCIDCFLWRAPPER_HPP

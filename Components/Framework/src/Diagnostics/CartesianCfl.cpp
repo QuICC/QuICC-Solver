@@ -1,44 +1,38 @@
 /**
- * @file CartesianCflWrapper.cpp
+ * @file CartesianCfl.cpp
  * @brief Source of the CFL constraint wrapper in a Cartesian geometry
  */
-
-// Debug includes
-//
 
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Diagnostics/CartesianCflWrapper.hpp"
-
 // Project includes
 //
+#include "QuICC/Diagnostics/CartesianCfl.hpp"
 
 namespace QuICC {
 
 namespace Diagnostics {
 
-   CartesianCflWrapper::CartesianCflWrapper(const SharedIVectorWrapper spVelocity)
-      : ICflWrapper(spVelocity), mcCourant(0.65)
+   CartesianCfl::CartesianCfl(const std::map<std::size_t,NonDimensional::SharedINumber>& params, const MHDFloat courant)
+      : ICflWrapper(courant), mVelId(0)
    {
+      this->mIsActive = true;
    }
 
-   CartesianCflWrapper::~CartesianCflWrapper()
+   void CartesianCfl::defineVelocity(const std::size_t velId)
    {
+      this->mVelId = velId;
+      this->mFields.try_emplace(this->mVelId, nullptr);
    }
 
-   void CartesianCflWrapper::init(const std::vector<Array>& mesh)
+   void CartesianCfl::init(const std::vector<Array>& mesh)
    {
       // Initialize the mesh
       this->initMesh(mesh);
    }
 
-   void CartesianCflWrapper::initMesh(const std::vector<Array>& mesh)
+   void CartesianCfl::initMesh(const std::vector<Array>& mesh)
    {
       // Compute the mesh spacings
       this->mMeshSpacings.reserve(mesh.size());
@@ -70,7 +64,7 @@ namespace Diagnostics {
       }
    }
 
-   Matrix CartesianCflWrapper::initialCfl() const
+   Matrix CartesianCfl::initialCfl() const
    {
       Matrix cfl = this->cfl();
 
@@ -82,65 +76,65 @@ namespace Diagnostics {
       MHDFloat newCfl;
       int idx;
       newCfl = this->mcCourant*dx1.minCoeff(&idx)/100.;
+      if(newCfl < cfl(0,0))
+      {
+         cfl(0,0) = newCfl;
+         cfl(1,0) = dx1(idx);
+      }
+      newCfl = this->mcCourant*dx2.minCoeff(&idx)/100.;
       if(newCfl < cfl(0,1))
       {
          cfl(0,1) = newCfl;
-         cfl(1,1) = dx1(idx);
+         cfl(1,1) = dx2(idx);
       }
-      newCfl = this->mcCourant*dx2.minCoeff(&idx)/100.;
+      newCfl = this->mcCourant*dx3.minCoeff(&idx)/100.;
       if(newCfl < cfl(0,2))
       {
          cfl(0,2) = newCfl;
-         cfl(1,2) = dx2(idx);
+         cfl(1,2) = dx3(idx);
       }
-      newCfl = this->mcCourant*dx3.minCoeff(&idx)/100.;
-      if(newCfl < cfl(0,3))
-      {
-         cfl(0,3) = newCfl;
-         cfl(1,3) = dx3(idx);
-      }
-
-      this->updateCflMatrix(cfl);
 
       return cfl;
    }
 
-   Matrix CartesianCflWrapper::cfl() const
+   Matrix CartesianCfl::cfl() const
    {
       // Compute most stringent CFL condition
       MHDFloat newCfl;
-      Matrix cfl = Matrix::Constant(2,4, std::numeric_limits<MHDFloat>::max());
+      Matrix cfl = Matrix::Constant(2,3, std::numeric_limits<MHDFloat>::max());
 
       const Array& dx1 = this->mMeshSpacings.at(0);
       const Array& dx2 = this->mMeshSpacings.at(1);
       const Array& dx3 = this->mMeshSpacings.at(2);
 
-      int nK = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+      const auto& vel = this->mFields.at(this->mVelId);
+
+      int nK = vel->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
 
       // CFL from first component
       for(int k = 0; k < nK; ++k)
       {
-         int k_ = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
-         newCfl = dx1(k_)/this->mspVelocity->one().slice(k).array().abs().maxCoeff();
-         if(newCfl < cfl(0,1))
+         int k_ = vel->res().cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
+         newCfl = dx1(k_)/vel->one().slice(k).array().abs().maxCoeff();
+         if(newCfl < cfl(0,0))
          {
-            cfl(0,1) = newCfl;
-            cfl(1,1) = 0;
+            cfl(0,0) = newCfl;
+            cfl(1,0) = 0;
          }
       }
 
       // CFL from second component
       for(int k = 0; k < nK; ++k)
       {
-         int nJ = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(k);
+         int nJ = vel->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(k);
          for(int j = 0; j < nJ; ++j)
          {
-            int j_ = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(j,k);
-            newCfl = dx2(j_)/this->mspVelocity->two().profile(j,k).array().abs().maxCoeff();
-            if(newCfl < cfl(0,2))
+            int j_ = vel->res().cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(j,k);
+            newCfl = dx2(j_)/vel->two().profile(j,k).array().abs().maxCoeff();
+            if(newCfl < cfl(0,1))
             {
-               cfl(0,2) = newCfl;
-               cfl(1,2) = 0;
+               cfl(0,1) = newCfl;
+               cfl(1,1) = 0;
             }
          }
       }
@@ -148,24 +142,23 @@ namespace Diagnostics {
       // CFL from second component
       for(int k = 0; k < nK; ++k)
       {
-         int nJ = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(k);
+         int nJ = vel->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(k);
          for(int j = 0; j < nJ; ++j)
          {
-            int nI = this->mspVelocity->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>(j,k);
+            int nI = vel->res().cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DATF1D>(j,k);
             for(int i = 0; i < nI; ++i)
             {
-               newCfl = dx3(i)/std::abs(this->mspVelocity->three().point(i,j,k));
-               if(newCfl < cfl(0,3))
+               newCfl = dx3(i)/std::abs(vel->three().point(i,j,k));
+               if(newCfl < cfl(0,2))
                {
-                  cfl(0,3) = newCfl;
-                  cfl(1,3) = 0;
+                  cfl(0,2) = newCfl;
+                  cfl(1,2) = 0;
                }
             }
          }
       }
 
-      cfl.row(0).tail(cfl.cols()-1).array() *= this->mcCourant;
-      this->updateCflMatrix(cfl);
+      cfl.row(0).array() *= this->mcCourant;
 
       return cfl;
    }
