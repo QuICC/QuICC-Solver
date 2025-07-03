@@ -21,7 +21,7 @@ namespace Diagnostics {
       // Torsional wave CFL
       if(params.count(NonDimensional::CflTorsional::id()) > 0)
       {
-         this->mCfl(0,0) = params.find(NonDimensional::CflTorsional::id())->second->value();
+         this->mCfl(0,0) = this->mcCourant*params.find(NonDimensional::CflTorsional::id())->second->value();
          this->mIsActive = false;
       }
       else

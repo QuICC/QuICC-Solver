@@ -281,7 +281,7 @@ void Coordinator::initialCfl()
          assert(op);
 
          auto tmp = op->initialCfl();
-         this->mCfl.block(0, 2, col, col + tmp.cols()) = tmp;
+         this->mCfl.block(0, col, 2, tmp.cols()) = tmp;
          col += tmp.cols();
       }
       this->updateCflMatrix(this->mCfl);
@@ -315,7 +315,7 @@ void Coordinator::updateCfl()
          assert(op);
 
          auto tmp = op->cfl();
-         this->mCfl.block(0, 2, col, col + tmp.cols()) = tmp;
+         this->mCfl.block(0, col, 2, tmp.cols()) = tmp;
          col += tmp.cols();
       }
       this->updateCflMatrix(this->mCfl);
@@ -342,7 +342,7 @@ void Coordinator::synchronize()
 //
 #ifdef QUICC_MPI
 
-   if (this->mFixedStep <= 0 && this->mspCflWrapper)
+   if (this->mFixedStep <= 0 && this->mCflOps.size() > 0)
    {
       // Create MPI operation
       MPI_Op op;

@@ -21,7 +21,7 @@ namespace Diagnostics {
       // Inertial wave CFL
       if(params.count(NonDimensional::CflInertial::id()) > 0)
       {
-         this->mCfl(0,0) = params.find(NonDimensional::CflInertial::id())->second->value();
+         this->mCfl(0,0) = this->mcCourant*params.find(NonDimensional::CflInertial::id())->second->value();
          this->mIsActive = true;
       }
       else
