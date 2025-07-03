@@ -23,11 +23,19 @@
 #include "QuICC/ModelOperator/registerAll.hpp"
 #include "QuICC/ModelOperatorBoundary/registerAll.hpp"
 #include "QuICC/NonDimensional/registerAll.hpp"
+#include "QuICC/PhysicalNames/Streamfunction.hpp"
 #include "QuICC/PhysicalNames/registerAll.hpp"
 #include "QuICC/RuntimeStatus/registerAll.hpp"
 #include "QuICC/PseudospectralTag/registerAll.hpp"
 #include "QuICC/Transform/Reductor/registerAll.hpp"
 #include "QuICC/SolveTiming/registerAll.hpp"
+#include "QuICC/Diagnostics/CartesianCfl.hpp"
+#include "QuICC/Diagnostics/ShellCfl.hpp"
+#include "QuICC/Diagnostics/SphereCfl.hpp"
+#include "QuICC/Diagnostics/InertialWaveCfl.hpp"
+#include "QuICC/Diagnostics/TorsionalOscillationCfl.hpp"
+#include "QuICC/Diagnostics/ISphericalHydroCfl.hpp"
+#include "QuICC/Diagnostics/ISphericalMagneticCfl.hpp"
 
 namespace QuICC {
 
@@ -245,6 +253,95 @@ namespace Model {
 
    template <typename TSim, typename TState, typename TVis> void IPhysicalModel<TSim,TState,TVis>::addDiagnostics(std::shared_ptr<TSim> spSim)
    {
+      const auto& params = spSim->eqParams()->map();
+
+      auto fields = this->backend().fieldIds();
+
+      // Create a toroidal/poloidal spherical shell default CFL
+      if (spSim->ss().has(SpatialScheme::Feature::ShellGeometry) &&
+          spSim->ss().formulation() == VectorFormulation::TORPOL)
+      {
+         const MHDFloat courant = 0.65;
+
+         auto iwCfl = std::make_shared<Diagnostics::InertialWaveCfl>(params, courant);
+         spSim->addCfl(iwCfl);
+
+         auto toCfl = std::make_shared<Diagnostics::TorsionalOscillationCfl>(params, courant);
+         spSim->addCfl(toCfl);
+
+         bool hasVel = std::find(fields.begin(), fields.end(), PhysicalNames::Velocity::id()) != fields.end();
+         bool hasMag = std::find(fields.begin(), fields.end(), PhysicalNames::Magnetic::id()) != fields.end();
+
+         if(hasMag && hasVel)
+         {
+            auto locCfl = std::make_shared<Diagnostics::ShellCfl<Diagnostics::ISphericalMagneticCfl>>(params, courant);
+            locCfl->defineVelocity(PhysicalNames::Velocity::id());
+            locCfl->defineMagnetic(PhysicalNames::Magnetic::id());
+            spSim->addCfl(locCfl);
+         }
+         else if(hasVel)
+         {
+            auto locCfl = std::make_shared<Diagnostics::ShellCfl<Diagnostics::ISphericalHydroCfl>>(params, courant);
+            locCfl->defineVelocity(PhysicalNames::Velocity::id());
+            spSim->addCfl(locCfl);
+         }
+      }
+      // Create a toroidal/poloidal full sphere default CFL
+      else if (spSim->ss().has(SpatialScheme::Feature::SphereGeometry) &&
+               spSim->ss().formulation() == VectorFormulation::TORPOL)
+      {
+         const MHDFloat courant = 0.65;
+
+         auto iwCfl = std::make_shared<Diagnostics::InertialWaveCfl>(params, courant);
+         spSim->addCfl(iwCfl);
+
+         auto toCfl = std::make_shared<Diagnostics::TorsionalOscillationCfl>(params, courant);
+         spSim->addCfl(toCfl);
+
+         bool hasVel = std::find(fields.begin(), fields.end(), PhysicalNames::Velocity::id()) != fields.end();
+         bool hasMag = std::find(fields.begin(), fields.end(), PhysicalNames::Magnetic::id()) != fields.end();
+
+         if(hasMag && hasVel)
+         {
+            auto locCfl = std::make_shared<Diagnostics::SphereCfl<Diagnostics::ISphericalMagneticCfl>>(params, courant);
+            locCfl->defineVelocity(PhysicalNames::Velocity::id());
+            locCfl->defineMagnetic(PhysicalNames::Magnetic::id());
+            spSim->addCfl(locCfl);
+         }
+         else if(hasVel)
+         {
+            auto locCfl = std::make_shared<Diagnostics::SphereCfl<Diagnostics::ISphericalHydroCfl>>(params, courant);
+            locCfl->defineVelocity(PhysicalNames::Velocity::id());
+            spSim->addCfl(locCfl);
+         }
+      }
+      // Create a toroidal/poloidal cartesian default CFL
+      else if (spSim->ss().has(SpatialScheme::Feature::CartesianGeometry) &&
+          spSim->ss().formulation() == VectorFormulation::TORPOL)
+      {
+         const MHDFloat courant = 0.65;
+
+         bool hasVel = std::find(fields.begin(), fields.end(), PhysicalNames::Velocity::id()) != fields.end();
+
+         if(hasVel)
+         {
+            auto locCfl = std::make_shared<Diagnostics::CartesianCfl>(params, courant);
+            locCfl->defineVelocity(PhysicalNames::Velocity::id());
+            spSim->addCfl(locCfl);
+         }
+      }
+      if (spSim->ss().has(SpatialScheme::Feature::CartesianGeometry))
+      {
+         bool hasStream = std::find(fields.begin(), fields.end(), PhysicalNames::Streamfunction::id()) != fields.end();
+         bool hasVelZ = std::find(fields.begin(), fields.end(), PhysicalNames::VelocityZ::id()) != fields.end();
+
+         if(hasVelZ && hasStream)
+         {
+            auto locCfl = std::make_shared<Diagnostics::CartesianCfl>(params, 0.65);
+            locCfl->defineVelocity(PhysicalNames::Streamfunction::id());
+            spSim->addCfl(locCfl);
+         }
+      }
    }
 
    template <typename TSim, typename TState, typename TVis> void IPhysicalModel<TSim,TState,TVis>::setGeneratorState(std::shared_ptr<TState> spGen)

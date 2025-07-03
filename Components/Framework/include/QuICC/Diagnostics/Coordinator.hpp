@@ -39,6 +39,11 @@ namespace Diagnostics {
          virtual ~Coordinator() = default;
 
          /**
+          * @brief Add CFL
+          */
+         void addCfl(SharedICflWrapper spCfl);
+
+         /**
           * @brief Initialise the coordinator
           *
           * @param mesh    Vector of grid values

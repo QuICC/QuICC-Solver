@@ -24,6 +24,17 @@ namespace Diagnostics {
       return this->mIsActive;
    }
 
+   std::vector<std::size_t> ICflWrapper::fieldIds() const
+   {
+      std::vector<std::size_t> ids;
+      for(const auto& [id, c] : this->mFields)
+      {
+         ids.push_back(id);
+      }
+
+      return ids;
+   }
+
    void ICflWrapper::setField(const std::size_t id, const SharedIVectorWrapper spField)
    {
       if(this->mFields.count(id) != 1)

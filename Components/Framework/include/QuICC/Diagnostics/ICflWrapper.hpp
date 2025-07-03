@@ -36,6 +36,11 @@ namespace Diagnostics {
          virtual ~ICflWrapper() = default;
 
          /**
+          * @brief Required fields
+          */
+         std::vector<std::size_t> fieldIds() const;
+
+         /**
           * @brief Set field
           */
          void setField(const std::size_t id, const SharedIVectorWrapper spField);
