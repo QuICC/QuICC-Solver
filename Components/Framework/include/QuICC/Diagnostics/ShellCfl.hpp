@@ -9,10 +9,12 @@
 // System includes
 //
 #include <memory>
+#include <map>
 
 // Project includes
 //
-#include "QuICC/Diagnostics/ISphericalCflWrapper.hpp"
+#include "QuICC/NonDimensional/INumber.hpp"
+#include "QuICC/Enums/Dimensions.hpp"
 
 namespace QuICC {
 

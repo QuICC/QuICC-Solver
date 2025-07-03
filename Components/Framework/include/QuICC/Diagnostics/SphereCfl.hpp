@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "QuICC/Diagnostics/ISphericalCflWrapper.hpp"
+#include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 
 namespace QuICC {

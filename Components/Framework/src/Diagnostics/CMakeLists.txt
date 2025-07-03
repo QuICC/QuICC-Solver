@@ -6,8 +6,6 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ISphericalCflWrapper.cpp
   ISphericalHydroCfl.cpp
   ISphericalMagneticCfl.cpp
-  ISphericalInviscidCflWrapper.cpp
-  ISphericalMagneticInviscidCfl.cpp
   IVectorWrapper.cpp
   InertialWaveCfl.cpp
   TorsionalOscillationCfl.cpp
