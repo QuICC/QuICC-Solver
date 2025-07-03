@@ -82,15 +82,18 @@ void Coordinator::init(const std::vector<Array>& mesh,
             vectors.find(PhysicalNames::Magnetic::id())->second);
 
          auto iwCfl = std::make_shared<InertialWaveCfl>(params, 0.4);
-         this->mCflOps.push_back(iwCfl);
+         if(iwCfl->isActive())
+            this->mCflOps.push_back(iwCfl);
          auto toCfl = std::make_shared<TorsionalOscillationCfl>(params, 0.4);
-         this->mCflOps.push_back(toCfl);
+         if(toCfl->isActive())
+            this->mCflOps.push_back(toCfl);
          auto locCfl = std::make_shared<ShellCfl<ISphericalMagneticCfl>>(params, 0.4);
          locCfl->defineVelocity(PhysicalNames::Velocity::id());
          locCfl->defineMagnetic(PhysicalNames::Magnetic::id());
          locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
          locCfl->setField(PhysicalNames::Magnetic::id(), spMagnetic);
-         this->mCflOps.push_back(locCfl);
+         if(locCfl->isActive())
+            this->mCflOps.push_back(locCfl);
 
       // Create a full sphere wrapper
       }
@@ -103,15 +106,18 @@ void Coordinator::init(const std::vector<Array>& mesh,
             vectors.find(PhysicalNames::Magnetic::id())->second);
 
          auto iwCfl = std::make_shared<InertialWaveCfl>(params, 0.4);
-         this->mCflOps.push_back(iwCfl);
+         if(iwCfl->isActive())
+            this->mCflOps.push_back(iwCfl);
          auto toCfl = std::make_shared<TorsionalOscillationCfl>(params, 0.4);
-         this->mCflOps.push_back(toCfl);
+         if(toCfl->isActive())
+            this->mCflOps.push_back(toCfl);
          auto locCfl = std::make_shared<SphereCfl<ISphericalMagneticCfl>>(params, 0.4);
          locCfl->defineVelocity(PhysicalNames::Velocity::id());
          locCfl->defineMagnetic(PhysicalNames::Magnetic::id());
          locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
          locCfl->setField(PhysicalNames::Magnetic::id(), spMagnetic);
-         this->mCflOps.push_back(locCfl);
+         if(locCfl->isActive())
+            this->mCflOps.push_back(locCfl);
       }
       else
       {
@@ -138,10 +144,10 @@ void Coordinator::init(const std::vector<Array>& mesh,
          auto locCfl = std::make_shared<CartesianCfl>(params, 0.65);
          locCfl->defineVelocity(PhysicalNames::Velocity::id());
          locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
-         this->mCflOps.push_back(locCfl);
-
-      // Create a toroidal/poloidal spherical shell wrapper
+         if(locCfl->isActive())
+            this->mCflOps.push_back(locCfl);
       }
+      // Create a toroidal/poloidal spherical shell wrapper
       else if (spScheme->has(SpatialScheme::Feature::ShellGeometry) &&
                spScheme->formulation() == VectorFormulation::TORPOL)
       {
@@ -149,15 +155,18 @@ void Coordinator::init(const std::vector<Array>& mesh,
             vectors.find(PhysicalNames::Velocity::id())->second);
 
          auto iwCfl = std::make_shared<InertialWaveCfl>(params, 0.4);
-         this->mCflOps.push_back(iwCfl);
+         if(iwCfl->isActive())
+            this->mCflOps.push_back(iwCfl);
          auto toCfl = std::make_shared<TorsionalOscillationCfl>(params, 0.4);
-         this->mCflOps.push_back(toCfl);
+         if(toCfl->isActive())
+            this->mCflOps.push_back(toCfl);
          auto locCfl = std::make_shared<ShellCfl<ISphericalHydroCfl>>(params, 0.4);
          locCfl->defineVelocity(PhysicalNames::Velocity::id());
          locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
-         this->mCflOps.push_back(locCfl);
-      // Create a full sphere wrapper
+         if(locCfl->isActive())
+            this->mCflOps.push_back(locCfl);
       }
+      // Create a full sphere wrapper
       else if (spScheme->has(SpatialScheme::Feature::SphereGeometry) &&
                spScheme->formulation() == VectorFormulation::TORPOL)
       {
@@ -165,13 +174,16 @@ void Coordinator::init(const std::vector<Array>& mesh,
             vectors.find(PhysicalNames::Velocity::id())->second);
          
          auto iwCfl = std::make_shared<InertialWaveCfl>(params, 0.4);
-         this->mCflOps.push_back(iwCfl);
+         if(iwCfl->isActive())
+            this->mCflOps.push_back(iwCfl);
          auto toCfl = std::make_shared<TorsionalOscillationCfl>(params, 0.4);
-         this->mCflOps.push_back(toCfl);
+         if(toCfl->isActive())
+            this->mCflOps.push_back(toCfl);
          auto locCfl = std::make_shared<SphereCfl<ISphericalHydroCfl>>(params, 0.4);
          locCfl->defineVelocity(PhysicalNames::Velocity::id());
          locCfl->setField(PhysicalNames::Velocity::id(), spVelocity);
-         this->mCflOps.push_back(locCfl);
+         if(locCfl->isActive())
+            this->mCflOps.push_back(locCfl);
       }
       else
       {

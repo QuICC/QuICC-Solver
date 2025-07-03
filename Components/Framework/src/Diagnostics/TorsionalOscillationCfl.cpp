@@ -26,7 +26,7 @@ namespace Diagnostics {
       }
       else
       {
-         this->mCfl(0,0) = params.find(NonDimensional::CflTorsional::id())->second->value();
+         this->mCfl(0,0) = -1;
          this->mIsActive = false;
       }
       this->mCfl(1,0) = -1;
