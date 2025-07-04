@@ -22,7 +22,7 @@ namespace Diagnostics {
       if(params.count(NonDimensional::CflTorsional::id()) > 0)
       {
          this->mCfl(0,0) = this->mcCourant*params.find(NonDimensional::CflTorsional::id())->second->value();
-         this->mIsActive = false;
+         this->mIsActive = true;
       }
       else
       {
