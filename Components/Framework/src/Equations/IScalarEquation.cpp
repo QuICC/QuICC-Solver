@@ -13,6 +13,7 @@
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
 #include "QuICC/Transform/Path/I2ScalarNl.hpp"
 
@@ -117,7 +118,7 @@ namespace Equations {
       return disabled;
    }
 
-   std::vector<Transform::TransformPath> IScalarEquation::backwardPaths()
+   std::vector<Transform::TransformPath> IScalarEquation::defaultBackwardPaths(const std::size_t pathId) const
    {
       // Disable some paths
       auto disabled = this->disabledBackwardPaths();
@@ -129,50 +130,59 @@ namespace Equations {
 
       auto spSteps = this->transformSteps();
 
+      std::size_t disabledPathId = Transform::Path::Empty::id();
+
+      auto makeMap = [&](auto&& enabled, const bool disabled)
+      {
+         std::map<typename std::remove_reference<decltype(enabled)>::type::key_type,std::size_t> m;
+         for(auto&& c: enabled)
+         {
+            std::size_t id = disabledPathId;
+            if(c.second && !disabled)
+            {
+               id = pathId;
+            }
+            m.try_emplace(c.first,id);
+         }
+         return m;
+      };
+
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, this->spUnknown()))
       {
-         std::map<FieldComponents::Physical::Id,bool> compsMap;
-         compsMap.insert(std::make_pair(FieldComponents::Physical::SCALAR, true));
-         if(disabledPhys)
-         {
-            for(auto&& c: compsMap)
-            {
-               c.second = false;
-            }
-         }
+         std::map<FieldComponents::Physical::Id, bool> e = {{FieldComponents::Physical::SCALAR, true}};
+         auto compsMap = makeMap(e, disabledPhys);
          auto b = spSteps->backwardScalar(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad());}, this->spUnknown()))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).grad().enabled());}, this->spUnknown());
-         if(disabledGrad)
-         {
-            for(auto&& c: compsMap)
-            {
-               c.second = false;
-            }
-         }
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  return makeMap(p->dom(0).grad().enabled(), disabledGrad);
+               }, this->spUnknown());
          auto b = spSteps->backwardGradient(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad2());}, this->spUnknown()))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>{return (p->dom(0).grad2().enabled());}, this->spUnknown());
-         if(disabledGrad2)
-         {
-            for(auto&& c: compsMap)
-            {
-               c.second = false;
-            }
-         }
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  return makeMap(p->dom(0).grad2().enabled(), disabledGrad2);
+               }, this->spUnknown());
          auto b = spSteps->backwardGradient2(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
 
       return paths;
+   }
+
+   std::vector<Transform::TransformPath> IScalarEquation::backwardPaths()
+   {
+      return this->defaultBackwardPaths(Transform::Path::Scalar::id());
    }
 
    void IScalarEquation::setConstraintKernel(Spectral::Kernel::SharedISpectralKernel spKernel)

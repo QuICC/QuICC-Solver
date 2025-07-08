@@ -3,34 +3,19 @@
  * @brief Source of the diagnostic coordinator
  */
 
-// Debug includes
+// System includes
 //
 #include <cassert>
 
-#include "QuICC/Debug/DebuggerMacro.h"
-
-// System includes
-//
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Diagnostics/Coordinator.hpp"
-
 // Project includes
 //
+#include "QuICC/Diagnostics/Coordinator.hpp"
+#include "QuICC/Debug/DebuggerMacro.h"
 #include "Environment/MpiTypes.hpp"
-#include "QuICC/Diagnostics/CartesianCflWrapper.hpp"
-#include "QuICC/Diagnostics/CartesianTorPolWrapper.hpp"
-#include "QuICC/Diagnostics/ShellCflWrapper.hpp"
-#include "QuICC/Diagnostics/SphereCflWrapper.hpp"
 #include "QuICC/Diagnostics/SphericalTorPolWrapper.hpp"
+#include "QuICC/Diagnostics/CartesianTorPolWrapper.hpp"
 #include "QuICC/Diagnostics/StreamVerticalWrapper.hpp"
-#include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Streamfunction.hpp"
-#include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/VelocityZ.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Timestep/Constants.hpp"
@@ -56,7 +41,13 @@ Coordinator::Coordinator() :
    this->mCfl.setZero();
 }
 
-Coordinator::~Coordinator() {}
+void Coordinator::addCfl(SharedICflWrapper spCfl)
+{
+   if(spCfl->isActive())
+   {
+      this->mCflOps.push_back(spCfl);
+   }
+}
 
 void Coordinator::init(const std::vector<Array>& mesh,
    const std::map<std::size_t,
@@ -72,129 +63,80 @@ void Coordinator::init(const std::vector<Array>& mesh,
       this->mFixedStep = std::max(this->mcMinStep, tstep(1));
       this->mFixedStep = std::min(this->mFixedStep, this->mcMaxStep);
    }
-   else if (vectors.count(PhysicalNames::Velocity::id()) &&
-            vectors.count(PhysicalNames::Magnetic::id()))
+   else if(this->mCflOps.size() > 0)
    {
-      namespace S = SpatialScheme;
-      std::shared_ptr<const S::ISpatialScheme> spScheme = std::visit(
-         [](auto&& p) { return p->dom(0).res().sim().spSpatialScheme(); },
-         vectors.find(PhysicalNames::Velocity::id())->second);
-
-      // Create a toroidal/poloidal spherical shell wrapper
-      if (spScheme->has(SpatialScheme::Feature::ShellGeometry) &&
-          spScheme->formulation() == VectorFormulation::TORPOL)
+      for(auto cfl: this->mCflOps)
       {
-         auto spVelocity = std::make_shared<SphericalTorPolWrapper>(
-            vectors.find(PhysicalNames::Velocity::id())->second);
-         auto spMagnetic = std::make_shared<SphericalTorPolWrapper>(
-            vectors.find(PhysicalNames::Magnetic::id())->second);
+         auto ids = cfl->fieldIds();
+         for(auto id: ids)
+         {
+            if(vectors.count(id) > 0)
+            {
+               namespace S = SpatialScheme;
+               std::shared_ptr<const S::ISpatialScheme> spScheme = std::visit(
+                  [](auto&& p) { return p->dom(0).res().sim().spSpatialScheme(); },
+                  vectors.find(id)->second);
 
-         this->mspCflWrapper =
-            std::make_shared<ShellCflWrapper>(spVelocity, spMagnetic, params);
-         // Create a full sphere wrapper
-      }
-      else if (spScheme->has(SpatialScheme::Feature::SphereGeometry) &&
-               spScheme->formulation() == VectorFormulation::TORPOL)
-      {
-         auto spVelocity = std::make_shared<SphericalTorPolWrapper>(
-            vectors.find(PhysicalNames::Velocity::id())->second);
-         auto spMagnetic = std::make_shared<SphericalTorPolWrapper>(
-            vectors.find(PhysicalNames::Magnetic::id())->second);
+               // Create a toroidal/poloidal spherical wrapper
+               if (spScheme->formulation() == VectorFormulation::TORPOL)
+               {
+                  if (spScheme->has(SpatialScheme::Feature::ShellGeometry) || 
+                        spScheme->has(SpatialScheme::Feature::SphereGeometry))
+                  {
+                     auto spField = std::make_shared<SphericalTorPolWrapper>(
+                        vectors.find(id)->second);
+                     cfl->setField(id, spField);
+                  }
+                  else if (spScheme->has(SpatialScheme::Feature::CartesianGeometry))
+                  {
+                     auto spField = std::make_shared<CartesianTorPolWrapper>(
+                        vectors.find(id)->second);
+                     cfl->setField(id, spField);
+                  }
+               }
+            }
+            else if(scalars.count(id) > 0)
+            {
+               namespace S = SpatialScheme;
+               std::shared_ptr<const S::ISpatialScheme> spScheme = std::visit(
+                  [](auto&& p) { return p->dom(0).res().sim().spSpatialScheme(); },
+                  scalars.find(id)->second);
 
-         this->mspCflWrapper =
-            std::make_shared<SphereCflWrapper>(spVelocity, spMagnetic, params);
-      }
-      else
-      {
-         throw std::logic_error(
-            "Could not setup velocity and magnetic wrappers");
+               if (spScheme->has(SpatialScheme::Feature::CartesianGeometry))
+               {
+                  if(id == PhysicalNames::Streamfunction::id() &&
+                        scalars.count(PhysicalNames::VelocityZ::id() > 0))
+                  {
+                     auto spVelocity = std::make_shared<StreamVerticalWrapper>(
+                        scalars.find(id)->second,
+                        scalars.find(PhysicalNames::VelocityZ::id())->second);
+                     cfl->setField(id, spVelocity);
+                  }
+               }
+            }
+         }
       }
 
       this->mFixedStep = tstep(1);
    }
-   else if (vectors.count(PhysicalNames::Velocity::id()))
-   {
-      namespace S = SpatialScheme;
-      std::shared_ptr<const S::ISpatialScheme> spScheme = std::visit(
-         [](auto&& p) { return p->dom(0).res().sim().spSpatialScheme(); },
-         vectors.find(PhysicalNames::Velocity::id())->second);
-
-      // Create a cartesian toroidal/poloidal warpper
-      if (spScheme->has(SpatialScheme::Feature::CartesianGeometry) &&
-          spScheme->formulation() == VectorFormulation::TORPOL)
-      {
-         auto spVelocity = std::make_shared<CartesianTorPolWrapper>(
-            vectors.find(PhysicalNames::Velocity::id())->second);
-
-         this->mspCflWrapper =
-            std::make_shared<CartesianCflWrapper>(spVelocity);
-
-         // Create a toroidal/poloidal spherical shell wrapper
-      }
-      else if (spScheme->has(SpatialScheme::Feature::ShellGeometry) &&
-               spScheme->formulation() == VectorFormulation::TORPOL)
-      {
-         auto spVelocity = std::make_shared<SphericalTorPolWrapper>(
-            vectors.find(PhysicalNames::Velocity::id())->second);
-
-         this->mspCflWrapper =
-            std::make_shared<ShellCflWrapper>(spVelocity, params);
-         // Create a full sphere wrapper
-      }
-      else if (spScheme->has(SpatialScheme::Feature::SphereGeometry) &&
-               spScheme->formulation() == VectorFormulation::TORPOL)
-      {
-         auto spVelocity = std::make_shared<SphericalTorPolWrapper>(
-            vectors.find(PhysicalNames::Velocity::id())->second);
-
-         this->mspCflWrapper =
-            std::make_shared<SphereCflWrapper>(spVelocity, params);
-      }
-      else
-      {
-         throw std::logic_error(
-            "Could not setup velocity wrapper for velocity");
-      }
-
-      this->mFixedStep = tstep(1);
-
-      // Create a stream function and vertical velocity wrapper
-   }
-   else if (scalars.count(PhysicalNames::Streamfunction::id()) &&
-            scalars.count(PhysicalNames::VelocityZ::id()))
-   {
-      namespace S = SpatialScheme;
-      std::shared_ptr<const S::ISpatialScheme> spScheme = std::visit(
-         [](auto&& p) { return p->dom(0).res().sim().spSpatialScheme(); },
-         vectors.find(PhysicalNames::Streamfunction::id())->second);
-
-      if (spScheme->has(SpatialScheme::Feature::CartesianGeometry))
-      {
-         auto spVelocity = std::make_shared<StreamVerticalWrapper>(
-            scalars.find(PhysicalNames::Streamfunction::id())->second,
-            scalars.find(PhysicalNames::VelocityZ::id())->second);
-
-         this->mspCflWrapper =
-            std::make_shared<CartesianCflWrapper>(spVelocity);
-      }
-      else
-      {
-         throw std::logic_error(
-            "Could not setup velocity wrapper for velocity");
-      }
-
-      this->mFixedStep = tstep(1);
-
-      // Required wrapper is not implemented
-   }
+   // Required wrapper is not implemented
    else
    {
       this->mFixedStep = tstep(1);
    }
 
-   if (this->mspCflWrapper)
+   if (this->mCflOps.size() > 0)
    {
-      this->mspCflWrapper->init(mesh);
+      int cols = 1;
+      for(auto op: this->mCflOps)
+      {
+         assert(op);
+         op->init(mesh);
+         cols += op->initialCfl().cols();
+      }
+
+      this->mCfl.resize(2, cols);
+      this->mCfl.setZero();
    }
 
    // Store configuration file start time
@@ -224,12 +166,21 @@ void Coordinator::initialCfl()
       this->mCfl(0, 0) = this->mFixedStep;
       this->mCfl(1, 0) = Timestep::FIXEDSTEP_LOCATION;
 
-      // Compute initial CFL condition
+   // Compute initial CFL condition
    }
-   else if (this->mspCflWrapper)
+   else if (this->mCflOps.size() > 0)
    {
       // Compute CFL for initial state
-      this->mCfl = this->mspCflWrapper->initialCfl();
+      int col = 1;
+      for(auto op: this->mCflOps)
+      {
+         assert(op);
+
+         auto tmp = op->initialCfl();
+         this->mCfl.block(0, col, 2, tmp.cols()) = tmp;
+         col += tmp.cols();
+      }
+      this->updateCflMatrix(this->mCfl);
 
       if (this->mcMinStep < this->mCfl(0, 0))
       {
@@ -247,14 +198,23 @@ void Coordinator::updateCfl()
       this->mCfl(0, 0) = this->mFixedStep;
       this->mCfl(1, 0) = Timestep::FIXEDSTEP_LOCATION;
 
-      // Compute CFL condition
+   // Compute CFL condition
    }
-   else if (this->mspCflWrapper)
+   else if (this->mCflOps.size() > 0)
    {
       // Safety assert
-      assert(this->mspCflWrapper);
+      assert(this->mCflOps.size() > 0);
 
-      this->mCfl = this->mspCflWrapper->cfl();
+      int col = 1;
+      for(auto op: this->mCflOps)
+      {
+         assert(op);
+
+         auto tmp = op->cfl();
+         this->mCfl.block(0, col, 2, tmp.cols()) = tmp;
+         col += tmp.cols();
+      }
+      this->updateCflMatrix(this->mCfl);
 
       // Check for maximum timestep
       if (this->mcMaxStep < this->mCfl(0, 0))
@@ -278,7 +238,7 @@ void Coordinator::synchronize()
 //
 #ifdef QUICC_MPI
 
-   if (this->mFixedStep <= 0 && this->mspCflWrapper)
+   if (this->mFixedStep <= 0 && this->mCflOps.size() > 0)
    {
       // Create MPI operation
       MPI_Op op;
@@ -332,6 +292,17 @@ void Coordinator::useStateTime(const MHDFloat time, const MHDFloat timestep)
    if (this->mStartTimestep < 0)
    {
       this->mStartTimestep = timestep;
+   }
+}
+
+void Coordinator::updateCflMatrix(Matrix& cfl) const
+{
+   int idx;
+   cfl(0,0) = cfl.row(0).tail(cfl.cols()-1).minCoeff(&idx);
+
+   if(cfl.rows() > 1)
+   {
+      cfl.col(0).tail(cfl.rows()-1) = cfl.col(idx+1).tail(cfl.rows()-1);
    }
 }
 

@@ -15,6 +15,7 @@
 #include "QuICC/Bc/Scheme/Galerkin.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
+#include "QuICC/Diagnostics/ICflWrapper.hpp"
 #include "QuICC/QuICCTimer.hpp"
 #include "QuICC/Simulation/SimulationBase.hpp"
 #include "QuICC/Simulation/SimulationIoTools.hpp"
@@ -122,6 +123,11 @@ void SimulationBase::initBase()
 
    // Make sure nodes are synchronised after initialisation
    QuICCEnv().synchronize();
+}
+
+void SimulationBase::addCfl(Diagnostics::SharedICflWrapper spCfl)
+{
+   this->mPseudospectral.addCfl(spCfl);
 }
 
 void SimulationBase::init(const SharedSimulationBoundary spBcs)

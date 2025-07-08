@@ -6,15 +6,9 @@
 #ifndef QUICC_TRANSFORM_ITRANSFORMSTEPS_HPP
 #define QUICC_TRANSFORM_ITRANSFORMSTEPS_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <map>
-
-// External includes
-//
 
 // Project includes
 //
@@ -33,8 +27,14 @@ namespace QuICC {
       class ITransformSteps
       {
          public:
-            ///
+            /// Path ID for forward direction
             typedef std::pair<FieldComponents::Spectral::Id,std::size_t> PathId;
+
+            /// Path description for backward direction
+            typedef std::map<FieldComponents::Physical::Id,std::size_t> PhysPathId;
+
+            /// Path description for backward second gradient
+            typedef std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,std::size_t> Grad2PathId;
 
             /**
              * @brief Constructor
@@ -44,7 +44,7 @@ namespace QuICC {
             /**
              * @brief Constructor
              */
-            virtual ~ITransformSteps();
+            virtual ~ITransformSteps() = default;
 
             /**
              * @brief Generate the list of branches in scalar integration transform
@@ -73,32 +73,32 @@ namespace QuICC {
             /**
              * @brief Generate the list of branches in scalar projection transform
              */
-            virtual std::vector<TransformPath>  backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req) const = 0;
+            virtual std::vector<TransformPath>  backwardScalar(const PhysPathId& req) const = 0;
 
             /**
              * @brief Generate the list of branches in scalar gradient transform
              */
-            virtual std::vector<TransformPath>  backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req) const = 0;
+            virtual std::vector<TransformPath>  backwardGradient(const PhysPathId& req) const = 0;
 
             /**
              * @brief Generate the list of branches in scalar 2nd order gradient transform
              */
-            virtual std::vector<TransformPath>  backwardGradient2(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req) const = 0;
+            virtual std::vector<TransformPath>  backwardGradient2(const Grad2PathId& req) const = 0;
 
             /**
              * @brief Generate the list of branches in vector projection transform
              */
-            virtual std::vector<TransformPath>  backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req) const = 0;
+            virtual std::vector<TransformPath>  backwardVector(const PhysPathId& req) const = 0;
 
             /**
              * @brief Generate the list of branches in vector gradient transform
              */
-            virtual std::vector<TransformPath>  backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req) const = 0;
+            virtual std::vector<TransformPath>  backwardVGradient(FieldComponents::Spectral::Id id, const PhysPathId& req) const = 0;
 
             /**
              * @brief Generate the list of branches in vector curl transform
              */
-            virtual std::vector<TransformPath>  backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req) const = 0;
+            virtual std::vector<TransformPath>  backwardCurl(const PhysPathId& req) const = 0;
 
             /**
              * @brief Generate the list of branches in vector divergence transform

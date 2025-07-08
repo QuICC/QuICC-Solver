@@ -1,11 +1,11 @@
 /**
- * @file Operators.hpp
- * @brief Implementation of the spherical Bessel basis for magnetic toroidal
+ * @file Jnl.hpp
+ * @brief Implementation of the spherical Bessel
  * boundary conditions
  */
 
-#ifndef QUICC_POLYNOMIAL_BESSEL_DETAILS_OPERATORS_HPP
-#define QUICC_POLYNOMIAL_BESSEL_DETAILS_OPERATORS_HPP
+#ifndef QUICC_POLYNOMIAL_SPHERICALBESSEL_JNL_HPP
+#define QUICC_POLYNOMIAL_SPHERICALBESSEL_JNL_HPP
 
 // System includes
 //
@@ -18,9 +18,7 @@ namespace QuICC {
 
 namespace Polynomial {
 
-namespace Bessel {
-
-namespace details {
+namespace SphericalBessel {
 
 /**
  * @brief Zero boundary value Bessel function nu = l + dNu
@@ -31,6 +29,11 @@ Internal::MHDFloat Value_dNu();
  * @brief Insulating boundary Bessel function nu = l + dNu
  */
 Internal::MHDFloat Insulating_dNu();
+
+/**
+ * @brief No-slip boundary Bessel function nu = l + dNu
+ */
+Internal::MHDFloat NoSlip_dNu();
 
 /**
  * @brief Norm of spherical Bessel basis Jnl(k, l, r)
@@ -80,6 +83,16 @@ Internal::MHDFloat r_1SphJnl(const Internal::MHDFloat k, const int l,
  * @param r Radius r
  */
 Internal::MHDFloat dSphJnl(const Internal::MHDFloat k, const int l,
+   const Internal::MHDFloat r, const Internal::MHDFloat dNu);
+
+/**
+ * @brief D^2 of Spherical Bessel basis Jnl(k, l, r)
+ *
+ * @param k Basis specific constant k
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat d2SphJnl(const Internal::MHDFloat k, const int l,
    const Internal::MHDFloat r, const Internal::MHDFloat dNu);
 
 /**
@@ -140,9 +153,79 @@ Internal::MHDFloat lowerSphJnl(const Internal::MHDFloat k, const int l,
 void getRoots(std::vector<Internal::MHDFloat>& roots, const int l,
    const int nRoots, const Internal::MHDFloat dNu);
 
-} // namespace details
-} // namespace Bessel
+/**
+ * @brief Norm of spherical Bessel basis fundamental mode r^l
+ *
+ * @param l Harmonic degree
+ */
+Internal::MHDFloat normFundamental(const int l);
+
+/**
+ * @brief Spherical Bessel basis fundamental mode r^l
+ *
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat Fundamental(const int l, const Internal::MHDFloat r);
+
+/**
+ * @brief r of Spherical Bessel basis fundamental mode r^l
+ *
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat rFundamental(const int l, const Internal::MHDFloat r);
+
+/**
+ * @brief 1/r of Spherical Bessel basis fundamental mode r^l
+ *
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat r_1Fundamental(const int l, const Internal::MHDFloat r);
+
+/**
+ * @brief D of Spherical Bessel basis fundamental mode r^l
+ *
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat dFundamental(const int l, const Internal::MHDFloat r);
+
+/**
+ * @brief D^2 of Spherical Bessel basis fundamental mode r^l
+ *
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat d2Fundamental(const int l, const Internal::MHDFloat r);
+
+/**
+ * @brief D r of Spherical Bessel basis fundamental mode r^l
+ *
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat drFundamental(const int l, const Internal::MHDFloat r);
+
+/**
+ * @brief 1/r D r of Spherical Bessel basis fundamental mode r^l
+ *
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat r_1drFundamental(const int l, const Internal::MHDFloat r);
+
+/**
+ * @brief Spherical laplacian of Spherical Bessel fundamental mode r^l
+ *
+ * @param l Harmonic degree
+ * @param r Radius r
+ */
+Internal::MHDFloat slaplFundamental(const int l, const Internal::MHDFloat r);
+
+} // namespace SphericalBessel
 } // namespace Polynomial
 } // namespace QuICC
 
-#endif // QUICC_POLYNOMIAL_BESSEL_DETAILS_OPERATORS_HPP
+#endif // QUICC_POLYNOMIAL_SPHERICALBESSEL_JNL_HPP

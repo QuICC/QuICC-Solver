@@ -24,6 +24,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   Python::Python
   Python::NumPy
   )
+add_library(QuICC::PyQuICC ALIAS ${QUICC_PYQUICC_COMPONENT_LIB})
 
 # Install python files
 add_dependencies(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CURRENT_COMPONENT_LIB}_updatepy)

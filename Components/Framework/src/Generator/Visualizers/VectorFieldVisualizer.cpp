@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the basic vector field visualizer
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Generator/Visualizers/VectorFieldVisualizer.hpp"
-
 // Project includes
 //
+#include "QuICC/Generator/Visualizers/VectorFieldVisualizer.hpp"
 #include "Types/Typedefs.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/SolveTiming/After.hpp"
@@ -28,11 +19,7 @@ namespace QuICC {
 namespace Equations {
 
    VectorFieldVisualizer::VectorFieldVisualizer(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend)
-      : IVectorEquation(spEqParams,spScheme,spBackend), mViewField(true), mViewGradient(false), mViewCurl(false)
-   {
-   }
-
-   VectorFieldVisualizer::~VectorFieldVisualizer()
+      : IVectorEquation(spEqParams,spScheme,spBackend), mViewField(true), mViewGradient(false), mViewCurl(false), mBwdPathId(Transform::Path::TorPol::id()), mFwdPathId(Transform::Path::TorPol::id())
    {
    }
 
@@ -75,6 +62,16 @@ namespace Equations {
       }
    }
 
+   void VectorFieldVisualizer::setBackwardPath(const std::size_t pathId)
+   {
+      this->mBwdPathId = pathId;
+   }
+
+   void VectorFieldVisualizer::setForwardPath(const std::size_t pathId)
+   {
+      this->mFwdPathId = pathId;
+   }
+
    void VectorFieldVisualizer::setRequirements()
    {
       // Set solver timing
@@ -99,7 +96,7 @@ namespace Equations {
       std::size_t pathId;
       if(this->ss().formulation() == VectorFormulation::TORPOL)
       {
-         pathId = Transform::Path::TorPol::id();
+         pathId = this->mFwdPathId;
       }
       else
       {
@@ -120,6 +117,11 @@ namespace Equations {
       {
          this->addNLComponent(this->ss().spectral().THREE(), pathId);
       }
+   }
+
+   std::vector<Transform::TransformPath> VectorFieldVisualizer::backwardPaths()
+   {
+      return this->defaultBackwardPaths(this->mBwdPathId);
    }
 
 }
