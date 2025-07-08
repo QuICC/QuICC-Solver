@@ -14,21 +14,9 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Transform/Path/TorPol.hpp"
-#include "QuICC/Transform/Path/InsulatingTorPol.hpp"
-#include "QuICC/Transform/Path/NoSlipTorPol.hpp"
-#include "QuICC/Transform/Path/NoPenetrationTorPol.hpp"
-#include "QuICC/Transform/Path/StressFreeTorPol.hpp"
 #include "QuICC/Transform/Reductor/Energy.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
 #include "QuICC/Transform/Reductor/EnergyD1R1.hpp"
-#include "QuICC/Transform/Reductor/ValueEnergy.hpp"
-#include "QuICC/Transform/Reductor/ValueEnergyR2.hpp"
-#include "QuICC/Transform/Reductor/ValueEnergyD1R1.hpp"
-#include "QuICC/Transform/Reductor/InsulatingEnergy.hpp"
-#include "QuICC/Transform/Reductor/InsulatingEnergyD1R1.hpp"
-#include "QuICC/Transform/Reductor/InsulatingEnergyR2.hpp"
-#include "QuICC/Transform/Reductor/NoSlipEnergy.hpp"
-#include "QuICC/Transform/Reductor/NoSlipEnergyD1R1.hpp"
 #include "QuICC/Io/Variable/Tags/Energy.hpp"
 
 namespace QuICC {
@@ -41,6 +29,10 @@ namespace Variable {
    {
       // Set default path
       this->setTransformPath(Transform::Path::TorPol::id());
+
+      // Default path to operator map
+      std::vector<std::size_t> ops = {Transform::Reductor::EnergyR2::id(), Transform::Reductor::Energy::id(), Transform::Reductor::EnergyD1R1::id()};
+      this->addPath2Op(Transform::Path::TorPol::id(), ops);
    }
 
    void ISphericalTorPolEnergyBaseWriter::showParity()
@@ -79,38 +71,15 @@ namespace Variable {
    {
       DebuggerMacro_msg("ISphericalTorPolEnergyBaseWriter::compute" ,4);
 
-      std::size_t torEnergyR2Id;
-      std::size_t polEnergyId;
-      std::size_t polEnergyD1R1Id;
-
-      if(this->mPathId == Transform::Path::TorPol::id())
-      {
-         torEnergyR2Id = Transform::Reductor::EnergyR2::id();
-         polEnergyId = Transform::Reductor::Energy::id();
-         polEnergyD1R1Id = Transform::Reductor::EnergyD1R1::id();
-      }
-      else if(this->mPathId == Transform::Path::InsulatingTorPol::id())
-      {
-         torEnergyR2Id = Transform::Reductor::ValueEnergyR2::id();
-         polEnergyId = Transform::Reductor::InsulatingEnergy::id();
-         polEnergyD1R1Id = Transform::Reductor::InsulatingEnergyD1R1::id();
-      }
-      else if(this->mPathId == Transform::Path::NoSlipTorPol::id())
-      {
-         torEnergyR2Id = Transform::Reductor::ValueEnergyR2::id();
-         polEnergyId = Transform::Reductor::NoSlipEnergy::id();
-         polEnergyD1R1Id = Transform::Reductor::NoSlipEnergyD1R1::id();
-      }
-      else if(this->mPathId == Transform::Path::NoPenetrationTorPol::id())
-      {
-         torEnergyR2Id = Transform::Reductor::InsulatingEnergyR2::id();
-         polEnergyId = Transform::Reductor::ValueEnergy::id();
-         polEnergyD1R1Id = Transform::Reductor::ValueEnergyD1R1::id();
-      }
-      else
+      // Map path to operators
+      if(this->mPath2Op.count(this->mPathId) == 0)
       {
          throw std::logic_error("Unknown energy transform reductor path (" + std::to_string(this->mPathId) + ") requested for Toroidal/Poloidal");
       }
+      const auto& ops = this->mPath2Op.at(this->mPathId);
+      std::size_t torEnergyR2Id = ops.at(0);
+      std::size_t polEnergyId = ops.at(1);
+      std::size_t polEnergyD1R1Id = ops.at(2);
 
       constexpr auto TId = Dimensions::Transform::TRA1D;
       Matrix spectrum;

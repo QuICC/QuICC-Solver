@@ -43,29 +43,6 @@ set(tags
   Oversin
   OversinDphi
   T
-  ValueP
-  ValuePol
-  ValueQ
-  ValueS
-  ValueT
-  ValueBc1Q
-  ValueBc1S
-  InsulatingBc2Q
-  InsulatingBc2S
-  InsulatingP
-  InsulatingPol
-  InsulatingQ
-  InsulatingS
-  InsulatingT
-  NoSlipP
-  NoSlipPol
-  NoSlipQ
-  NoSlipS
-  NoSlipT
-  NoSlipBc1Q
-  NoSlipBc1S
-  StressFreeP
-  StressFreeT
   )
 
 include(RegisterTags)

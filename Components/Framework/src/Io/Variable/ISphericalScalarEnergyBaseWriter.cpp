@@ -15,9 +15,7 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
-#include "QuICC/Transform/Path/ValueScalar.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
-#include "QuICC/Transform/Reductor/ValueEnergyR2.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
 #include "QuICC/Io/Variable/Tags/Energy.hpp"
 
@@ -32,6 +30,10 @@ namespace Variable {
    {
       // Set default path
       this->setTransformPath(Transform::Path::Scalar::id());
+
+      // Default path to operator map
+      std::vector<std::size_t> ops = {Transform::Reductor::EnergyR2::id()};
+      this->addPath2Op(Transform::Path::Scalar::id(), ops);
    }
 
    void ISphericalScalarEnergyBaseWriter::showParity()
@@ -69,20 +71,12 @@ namespace Variable {
 
       constexpr auto TId = Dimensions::Transform::TRA1D;
 
-      std::size_t energyR2Id;
-
-      if(this->mPathId == Transform::Path::Scalar::id())
-      {
-         energyR2Id = Transform::Reductor::EnergyR2::id();
-      }
-      else if(this->mPathId == Transform::Path::ValueScalar::id())
-      {
-         energyR2Id = Transform::Reductor::ValueEnergyR2::id();
-      }
-      else
+      // Map path to operators
+      if(this->mPath2Op.count(this->mPathId) == 0)
       {
          throw std::logic_error("Unknown energy transform reductor path (" + std::to_string(this->mPathId) + ") requested for scalar");
       }
+      std::size_t energyR2Id = this->mPath2Op.at(this->mPathId).at(0);
 
       // Prepare spectral data for transform
       this->prepareInput(coord);

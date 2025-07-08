@@ -3,22 +3,13 @@
  * @brief Source of the implementation of a generic variable data file reader
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/IVariableHdf5Reader.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/IVariableHdf5Reader.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 #include "QuICC/Io/Variable/Tags/VariableHdf5.hpp"
@@ -32,10 +23,6 @@ namespace Variable {
 
    IVariableHdf5Reader::IVariableHdf5Reader(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const bool isRegular)
       : IHdf5Reader(name, ext, header, type, version), mIsRegular(isRegular), mSpaceId(id)
-   {
-   }
-
-   IVariableHdf5Reader::~IVariableHdf5Reader()
    {
    }
 

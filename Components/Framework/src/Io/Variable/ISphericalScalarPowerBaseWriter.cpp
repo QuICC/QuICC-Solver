@@ -3,31 +3,20 @@
  * @brief Source of the implementation of the ASCII spherical harmonics power calculation for scalar field in a spherical geometry
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ISphericalScalarPowerBaseWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ISphericalScalarPowerBaseWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
-#include "QuICC/Transform/Path/ValueScalar.hpp"
 #include "QuICC/Transform/Reductor/PowerR2.hpp"
-#include "QuICC/Transform/Reductor/ValuePowerR2.hpp"
 #include "QuICC/ScalarFields/FieldTools.hpp"
 #include "QuICC/Io/Variable/Tags/Power.hpp"
 
@@ -42,10 +31,10 @@ namespace Variable {
    {
       // Set default path
       this->setTransformPath(Transform::Path::Scalar::id());
-   }
 
-   ISphericalScalarPowerBaseWriter::~ISphericalScalarPowerBaseWriter()
-   {
+      // Default path to operator map
+      std::vector<std::size_t> ops = {Transform::Reductor::PowerR2::id()};
+      this->addPath2Op(Transform::Path::Scalar::id(), ops);
    }
 
    void ISphericalScalarPowerBaseWriter::showParity()
@@ -88,19 +77,12 @@ namespace Variable {
       auto pInVar = coord.ss().bwdPtr(TId);
       coord.communicator().receiveBackward(TId, pInVar);
 
-      std::size_t powerR2Id;
-      if(this->mPathId == Transform::Path::Scalar::id())
-      {
-         powerR2Id = Transform::Reductor::PowerR2::id();
-      }
-      else if(this->mPathId == Transform::Path::ValueScalar::id())
-      {
-         powerR2Id = Transform::Reductor::ValuePowerR2::id();
-      }
-      else
+      // Map path to operators
+      if(this->mPath2Op.count(this->mPathId) == 0)
       {
          throw std::logic_error("Unknown power transform reductor path (" + std::to_string(this->mPathId) + ") requested for scalar");
       }
+      std::size_t powerR2Id = this->mPath2Op.at(this->mPathId).at(0);
 
       const auto& tRes = *this->res().cpu()->dim(TId);
 

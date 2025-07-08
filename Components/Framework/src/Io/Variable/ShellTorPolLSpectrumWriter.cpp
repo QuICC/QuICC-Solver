@@ -3,22 +3,13 @@
  * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for scalar field in a spherical shell
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ShellTorPolLSpectrumWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ShellTorPolLSpectrumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
@@ -34,10 +25,6 @@ namespace Variable {
 
    ShellTorPolLSpectrumWriter::ShellTorPolLSpectrumWriter(const std::string& prefix, const std::string& type)
       : ISphericalTorPolLSpectrumWriter(prefix, type)
-   {
-   }
-
-   ShellTorPolLSpectrumWriter::~ShellTorPolLSpectrumWriter()
    {
    }
 

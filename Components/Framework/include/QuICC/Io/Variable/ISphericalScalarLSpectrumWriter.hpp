@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_ISPHERICALSCALARLSPECTRUMWRITER_HPP
 #define QUICC_IO_VARIABLE_ISPHERICALSCALARLSPECTRUMWRITER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -45,7 +39,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalScalarLSpectrumWriter();
+         virtual ~ISphericalScalarLSpectrumWriter() = default;
 
          /**
           * @brief Initialise the operator, transform and file

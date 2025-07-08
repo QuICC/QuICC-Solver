@@ -30,10 +30,6 @@ namespace Variable {
    {
    }
 
-   ISphericalTorPolRSpectrumWriter::~ISphericalTorPolRSpectrumWriter()
-   {
-   }
-
    void ISphericalTorPolRSpectrumWriter::init()
    {
       // Resize storage for spectra

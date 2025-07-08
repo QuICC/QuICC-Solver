@@ -14,31 +14,6 @@ set(tags
   Scalar
   ScalarNl
   TorPol
-  ValueScalar
-  ValueScalarNl
-  ValueTorPol
-  ValueCurlNl
-  ValueCurlCurlNl
-  ValueNegCurlCurlNl
-  ValueBc1NegCurlCurlNl
-  ValueLaplhCurlNl
-  ValueLaplhCurlCurlNl
-  ValueWithL0CurlNl
-  InsulatingBc2NegCurlCurlNl
-  InsulatingScalar
-  InsulatingScalarNl
-  InsulatingTorPol
-  InsulatingCurlNl
-  InsulatingCurlCurlNl
-  InsulatingNegCurlCurlNl
-  InsulatingLaplhCurlNl
-  InsulatingLaplhCurlCurlNl
-  InsulatingWithL0CurlNl
-  StressFreeTorPol
-  StressFreeCurlNl
-  NoSlipTorPol
-  NoSlipBc1NegCurlCurlNl
-  NoPenetrationTorPol
   )
 
 include(RegisterTags)

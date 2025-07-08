@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_SPHERESCALARENERGYWRITER_HPP
 #define QUICC_IO_VARIABLE_SPHERESCALARENERGYWRITER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -43,7 +37,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~SphereScalarEnergyWriter();
+         virtual ~SphereScalarEnergyWriter() = default;
 
          /**
           * @brief Initialise the operator, transform and file

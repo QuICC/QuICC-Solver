@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the HDF5 visualisation file writer
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/VisualizationFileWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/VisualizationFileWriter.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/PhysicalNames/Coordinator.hpp"
@@ -34,10 +25,6 @@ namespace Variable {
 
    VisualizationFileWriter::VisualizationFileWriter(std::string type)
       : IVariableHdf5NWriter(Tags::VisualizationFile::BASENAME, Tags::VisualizationFile::EXTENSION, Tags::VisualizationFile::HEADER, type, Tags::VisualizationFile::VERSION, Dimensions::Space::PHYSICAL, true)
-   {
-   }
-
-   VisualizationFileWriter::~VisualizationFileWriter()
    {
    }
 

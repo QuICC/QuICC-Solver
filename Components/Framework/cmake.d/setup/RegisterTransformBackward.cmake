@@ -24,24 +24,6 @@ set(tags
   OversinDphi
   OversinLaplh
   OversinLaplhDphi
-  ValueP
-  ValueOverr1
-  ValueD1
-  ValueOverr1D1R1
-  ValueSlapl
-  InsulatingP
-  InsulatingOverr1
-  InsulatingD1
-  InsulatingOverr1D1R1
-  InsulatingSlapl
-  NoSlipP
-  NoSlipOverr1
-  NoSlipD1
-  NoSlipOverr1D1R1
-  NoSlipSlapl
-  StressFreeP
-  StressFreeOverr1
-  StressFreeOverr1D1R1
   )
 
 include(RegisterTags)

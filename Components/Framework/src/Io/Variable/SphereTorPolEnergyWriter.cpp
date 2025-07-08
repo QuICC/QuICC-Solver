@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for toroidal/poloidal field in a sphere
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/SphereTorPolEnergyWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/SphereTorPolEnergyWriter.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "Types/Math.hpp"
@@ -31,10 +22,6 @@ namespace Variable {
 
    SphereTorPolEnergyWriter::SphereTorPolEnergyWriter(const std::string& prefix, const std::string& type)
       : ISphericalTorPolEnergyWriter(prefix, type)
-   {
-   }
-
-   SphereTorPolEnergyWriter::~SphereTorPolEnergyWriter()
    {
    }
 

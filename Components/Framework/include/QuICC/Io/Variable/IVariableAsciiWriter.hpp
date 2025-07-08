@@ -116,6 +116,11 @@ namespace Variable {
          void addVector(const std::pair<std::size_t,Framework::Selector::VariantSharedVectorVariable>& vector);
 
          /**
+          * @brief Add Path to operator
+          */
+         void addPath2Op(const std::size_t pathId, const std::vector<std::size_t>& ops);
+
+         /**
           * @brief Perform heavy calculations
           */
          virtual void compute(Transform::TransformCoordinatorType& coord);
@@ -172,6 +177,11 @@ namespace Variable {
           * @brief Storage for the mesh
           */
          std::vector<Array> mMesh;
+
+         /**
+          * @brief Path to Operator map
+          */
+         std::map<std::size_t,std::vector<std::size_t>> mPath2Op;
 
          /**
           * @brief Time

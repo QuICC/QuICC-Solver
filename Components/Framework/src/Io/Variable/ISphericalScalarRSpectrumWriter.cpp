@@ -31,10 +31,6 @@ namespace Variable {
    {
    }
 
-   ISphericalScalarRSpectrumWriter::~ISphericalScalarRSpectrumWriter()
-   {
-   }
-
    void ISphericalScalarRSpectrumWriter::init()
    {
       this->mPower = Matrix::Zero(this->res().sim().dim(Dimensions::Simulation::SIM1D,Dimensions::Space::PHYSICAL), this->res().sim().dim(Dimensions::Simulation::SIM2D,Dimensions::Space::SPECTRAL));

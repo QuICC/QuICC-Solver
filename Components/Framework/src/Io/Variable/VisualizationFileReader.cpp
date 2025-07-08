@@ -3,22 +3,13 @@
  * @brief Source of the implementation of the HDF5 visualisation file reader
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/VisualizationFileReader.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/VisualizationFileReader.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/PhysicalNames/Coordinator.hpp"
@@ -34,10 +25,6 @@ namespace Variable {
 
    VisualizationFileReader::VisualizationFileReader(std::string name, std::string type)
       : IVariableHdf5Reader(Tags::VisualizationFile::BASENAME + name, Tags::VisualizationFile::EXTENSION, Tags::VisualizationFile::HEADER, type, Tags::VisualizationFile::VERSION, Dimensions::Space::PHYSICAL, true)
-   {
-   }
-
-   VisualizationFileReader::~VisualizationFileReader()
    {
    }
 

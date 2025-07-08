@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLENSTROPHYWBASERITER_HPP
 #define QUICC_IO_VARIABLE_ISPHERICALTORPOLENSTROPHYWBASERITER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -50,7 +44,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalTorPolEnstrophyBaseWriter();
+         virtual ~ISphericalTorPolEnstrophyBaseWriter() = default;
 
          /**
           * @brief Activate output of parity splitting in enstrophy output

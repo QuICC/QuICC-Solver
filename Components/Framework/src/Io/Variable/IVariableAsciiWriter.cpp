@@ -119,6 +119,18 @@ namespace Variable {
       }
    }
 
+   void IVariableAsciiWriter::addPath2Op(const std::size_t pathId, const std::vector<std::size_t>& ops)
+   {
+      if(this->mPath2Op.count(pathId) > 0)
+      {
+         this->mPath2Op.at(pathId) = ops;
+      }
+      else
+      {
+         this->mPath2Op.try_emplace(pathId, ops);
+      }
+   }
+
    IVariableAsciiWriter::scalar_iterator_range  IVariableAsciiWriter::scalarRange()
    {
       return std::make_pair(this->mScalars.begin(), this->mScalars.end());

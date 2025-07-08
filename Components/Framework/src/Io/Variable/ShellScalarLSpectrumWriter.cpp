@@ -3,22 +3,13 @@
  * @brief Source of the implementation of the ASCII spherical harmonics L energy spectrum calculation for scalar field in a spherical shell
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ShellScalarLSpectrumWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ShellScalarLSpectrumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
@@ -35,10 +26,6 @@ namespace Variable {
 
    ShellScalarLSpectrumWriter::ShellScalarLSpectrumWriter(const std::string& prefix, const std::string& type)
       : ISphericalScalarLSpectrumWriter(prefix, type)
-   {
-   }
-
-   ShellScalarLSpectrumWriter::~ShellScalarLSpectrumWriter()
    {
    }
 

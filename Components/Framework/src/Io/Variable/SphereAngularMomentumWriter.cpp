@@ -3,23 +3,14 @@
  * @brief Source of the implementation of the ASCII angular momentum number in a sphere
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/SphereAngularMomentumWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/SphereAngularMomentumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Tools/Formatter.hpp"
@@ -34,10 +25,6 @@ namespace Variable {
 
    SphereAngularMomentumWriter::SphereAngularMomentumWriter(const std::string& prefix, const std::string& type)
       : IVariableAsciiWriter(prefix + Tags::AngularMomentum::BASENAME, Tags::AngularMomentum::EXTENSION, prefix + Tags::AngularMomentum::HEADER, type, Tags::AngularMomentum::VERSION, Dimensions::Space::SPECTRAL, EXTEND), mHasMOrdering(false), mHasM0(false), mHasM1(false), mM0j(-1), mM0k(-1), mM1j(-1), mM1k(-1), mMomentum(3)
-   {
-   }
-
-   SphereAngularMomentumWriter::~SphereAngularMomentumWriter()
    {
    }
 

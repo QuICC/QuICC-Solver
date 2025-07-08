@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_ISPHERICALSCALARPOWERBASEWRITER_HPP
 #define QUICC_IO_VARIABLE_ISPHERICALSCALARPOWERBASEWRITER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -50,7 +44,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalScalarPowerBaseWriter();
+         virtual ~ISphericalScalarPowerBaseWriter() = default;
 
          /**
           * @brief Activate output of parity splitting in power output

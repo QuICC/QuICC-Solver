@@ -6,16 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLNSPECTRUMWRITER_HPP
 #define QUICC_IO_VARIABLE_ISPHERICALTORPOLNSPECTRUMWRITER_HPP
 
-// Configuration includes
-//
-
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -46,7 +39,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalTorPolNSpectrumWriter();
+         virtual ~ISphericalTorPolNSpectrumWriter() = default;
 
          /**
           * @brief Initialise the operator, transform and file

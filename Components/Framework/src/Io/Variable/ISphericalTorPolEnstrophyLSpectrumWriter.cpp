@@ -3,23 +3,14 @@
  * @brief Source of the implementation of the ASCII spherical harmonics enstrophy L spectrum calculation for toroidal/poloidal field in a spherical geometry
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ISphericalTorPolEnstrophyLSpectrumWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ISphericalTorPolEnstrophyLSpectrumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
@@ -34,10 +25,6 @@ namespace Variable {
 
    ISphericalTorPolEnstrophyLSpectrumWriter::ISphericalTorPolEnstrophyLSpectrumWriter(const std::string& prefix, const std::string& type)
       : ISphericalTorPolEnstrophyBaseWriter(prefix + Tags::EnstrophySpectrum::BASENAME + Tags::EnstrophySpectrum::LBASENAME, Tags::EnstrophySpectrum::EXTENSION, prefix + Tags::EnstrophySpectrum::HEADER, type, Tags::EnstrophySpectrum::VERSION, Dimensions::Space::SPECTRAL), mTorEnstrophy(0), mPolEnstrophy(0)
-   {
-   }
-
-   ISphericalTorPolEnstrophyLSpectrumWriter::~ISphericalTorPolEnstrophyLSpectrumWriter()
    {
    }
 

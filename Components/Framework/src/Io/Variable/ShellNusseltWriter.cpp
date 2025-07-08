@@ -3,23 +3,14 @@
  * @brief Source of the implementation of the ASCII Nusselt number in a spherical shell
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ShellNusseltWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ShellNusseltWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
@@ -37,10 +28,6 @@ namespace Variable {
 
    ShellNusseltWriter::ShellNusseltWriter(const std::string& prefix, const std::string& type)
       : IVariableAsciiWriter(prefix + Tags::Nusselt::BASENAME, Tags::Nusselt::EXTENSION, prefix + Tags::Nusselt::HEADER, type, Tags::Nusselt::VERSION, Dimensions::Space::SPECTRAL, EXTEND), mHasMOrdering(false), mNusselt(2), mBackground(2), mBoundary(0,0)
-   {
-   }
-
-   ShellNusseltWriter::~ShellNusseltWriter()
    {
    }
 

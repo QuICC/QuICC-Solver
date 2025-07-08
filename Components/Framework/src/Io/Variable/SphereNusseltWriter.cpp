@@ -3,23 +3,14 @@
  * @brief Source of the implementation of the ASCII Nusselt number in a sphere
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/SphereNusseltWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/SphereNusseltWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Tools/Formatter.hpp"
@@ -35,10 +26,6 @@ namespace Variable {
 
    SphereNusseltWriter::SphereNusseltWriter(const std::string& prefix, const std::string& type)
       : IVariableAsciiWriter(prefix + Tags::Nusselt::BASENAME, Tags::Nusselt::EXTENSION, prefix + Tags::Nusselt::HEADER, type, Tags::Nusselt::VERSION, Dimensions::Space::SPECTRAL, EXTEND), mHasMOrdering(false), mNusselt(std::numeric_limits<MHDFloat>::quiet_NaN()), mTb(std::numeric_limits<MHDFloat>::quiet_NaN()), mOrigin(0,0)
-   {
-   }
-
-   SphereNusseltWriter::~SphereNusseltWriter()
    {
    }
 

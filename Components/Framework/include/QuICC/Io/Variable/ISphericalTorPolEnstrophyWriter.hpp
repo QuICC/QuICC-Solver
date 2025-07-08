@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLENSTROPHYWRITER_HPP
 #define QUICC_IO_VARIABLE_ISPHERICALTORPOLENSTROPHYWRITER_HPP
 
-// Configuration includes
-//
-#include <memory>
-
 // System includes
 //
-
-// External includes
-//
+#include <memory>
 
 // Project includes
 //
@@ -45,7 +39,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~ISphericalTorPolEnstrophyWriter();
+         virtual ~ISphericalTorPolEnstrophyWriter() = default;
          
       protected:
          /**

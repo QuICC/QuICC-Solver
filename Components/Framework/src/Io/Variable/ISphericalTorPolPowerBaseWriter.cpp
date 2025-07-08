@@ -3,41 +3,21 @@
  * @brief Source of the implementation of the ASCII spherical harmonics power spectrum calculation for toroidal/poloidal field in a spherical geometry
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ISphericalTorPolPowerBaseWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ISphericalTorPolPowerBaseWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 #include "QuICC/Transform/Path/TorPol.hpp"
-#include "QuICC/Transform/Path/NoSlipTorPol.hpp"
-#include "QuICC/Transform/Path/InsulatingTorPol.hpp"
-#include "QuICC/Transform/Path/NoPenetrationTorPol.hpp"
 #include "QuICC/Transform/Reductor/Power.hpp"
 #include "QuICC/Transform/Reductor/PowerR2.hpp"
 #include "QuICC/Transform/Reductor/PowerD1R1.hpp"
-#include "QuICC/Transform/Reductor/ValuePower.hpp"
-#include "QuICC/Transform/Reductor/ValuePowerR2.hpp"
-#include "QuICC/Transform/Reductor/ValuePowerD1R1.hpp"
-#include "QuICC/Transform/Reductor/InsulatingPower.hpp"
-#include "QuICC/Transform/Reductor/InsulatingPowerD1R1.hpp"
-#include "QuICC/Transform/Reductor/InsulatingPowerR2.hpp"
-#include "QuICC/Transform/Reductor/NoSlipPower.hpp"
-#include "QuICC/Transform/Reductor/NoSlipPowerD1R1.hpp"
 #include "QuICC/Io/Variable/Tags/Power.hpp"
 
 namespace QuICC {
@@ -50,10 +30,10 @@ namespace Variable {
    {
       // Set default path
       this->setTransformPath(Transform::Path::TorPol::id());
-   }
 
-   ISphericalTorPolPowerBaseWriter::~ISphericalTorPolPowerBaseWriter()
-   {
+      // Default path to operator map
+      std::vector<std::size_t> ops = {Transform::Reductor::PowerR2::id(), Transform::Reductor::Power::id(), Transform::Reductor::PowerD1R1::id()};
+      this->addPath2Op(Transform::Path::TorPol::id(), ops);
    }
 
    void ISphericalTorPolPowerBaseWriter::showParity()
@@ -93,38 +73,15 @@ namespace Variable {
       constexpr auto TId = Dimensions::Transform::TRA1D;
       Matrix spectrum;
 
-      std::size_t torPowerR2Id;
-      std::size_t polPowerId;
-      std::size_t polPowerD1R1Id;
-
-      if(this->mPathId == Transform::Path::TorPol::id())
-      {
-         torPowerR2Id = Transform::Reductor::PowerR2::id();
-         polPowerId = Transform::Reductor::Power::id();
-         polPowerD1R1Id = Transform::Reductor::PowerD1R1::id();
-      }
-      else if(this->mPathId == Transform::Path::InsulatingTorPol::id())
-      {
-         torPowerR2Id = Transform::Reductor::ValuePowerR2::id();
-         polPowerId = Transform::Reductor::InsulatingPower::id();
-         polPowerD1R1Id = Transform::Reductor::InsulatingPowerD1R1::id();
-      }
-      else if(this->mPathId == Transform::Path::NoSlipTorPol::id())
-      {
-         torPowerR2Id = Transform::Reductor::ValuePowerR2::id();
-         polPowerId = Transform::Reductor::NoSlipPower::id();
-         polPowerD1R1Id = Transform::Reductor::NoSlipPowerD1R1::id();
-      }
-      else if(this->mPathId == Transform::Path::NoPenetrationTorPol::id())
-      {
-         torPowerR2Id = Transform::Reductor::InsulatingPowerR2::id();
-         polPowerId = Transform::Reductor::ValuePower::id();
-         polPowerD1R1Id = Transform::Reductor::ValuePowerD1R1::id();
-      }
-      else
+      // Map path to operators
+      if(this->mPath2Op.count(this->mPathId) == 0)
       {
          throw std::logic_error("Unknown power transform reductor path (" + std::to_string(this->mPathId) + ") requested for Toroidal/Poloidal");
       }
+      const auto& ops = this->mPath2Op.at(this->mPathId);
+      std::size_t torPowerR2Id = ops.at(0);
+      std::size_t polPowerId = ops.at(1);
+      std::size_t polPowerD1R1Id = ops.at(2);
 
       // Prepare spectral data for transform
       this->prepareInput(FieldComponents::Spectral::TOR, coord);

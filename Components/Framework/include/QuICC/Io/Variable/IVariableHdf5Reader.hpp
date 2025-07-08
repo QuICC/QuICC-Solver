@@ -11,9 +11,6 @@
 #include <set>
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
 #include "Types/Typedefs.hpp"
@@ -50,7 +47,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~IVariableHdf5Reader();
+         virtual ~IVariableHdf5Reader() = default;
 
          /**
           * @brief Add name of expected variable to be added
