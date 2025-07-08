@@ -1,6 +1,7 @@
-/** 
+/**
  * @file ShellScalarMSpectrumWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics M energy spectrum calculation for a scalar field in a spherical shell
+ * @brief Implementation of the ASCII spherical harmonics M energy spectrum
+ * calculation for a scalar field in a spherical shell
  */
 
 #ifndef QUICC_IO_VARIABLE_SHELLSCALARMSPECTRUMWRITER_HPP
@@ -20,40 +21,42 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the ASCII spherical harmonics M energy spectrum
+ * calculation for a scalar field in a spherical shell
+ */
+class ShellScalarMSpectrumWriter : public ISphericalScalarMSpectrumWriter
+{
+public:
    /**
-    * @brief Implementation of the ASCII spherical harmonics M energy spectrum calculation for a scalar field in a spherical shell
+    * @brief Constructor
+    *
+    * @param prefix Prefix to use for file name
+    * @param type Type of the file (typically scheme name)
     */
-   class ShellScalarMSpectrumWriter: public ISphericalScalarMSpectrumWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param prefix Prefix to use for file name
-          * @param type Type of the file (typically scheme name)
-          */
-         ShellScalarMSpectrumWriter(const std::string& prefix, const std::string& type);
+   ShellScalarMSpectrumWriter(const std::string& prefix,
+      const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~ShellScalarMSpectrumWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~ShellScalarMSpectrumWriter() = default;
 
-         /**
-          * @brief Initialise the operator, transform and file
-          */
-         virtual void init();
-         
-      protected:
+   /**
+    * @brief Initialise the operator, transform and file
+    */
+   virtual void init();
 
-      private:
-   };
+protected:
+private:
+};
 
-   /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<ShellScalarMSpectrumWriter> SharedShellScalarMSpectrumWriter;
+/// Typedef for a shared pointer of a HDF5 state file writer
+typedef std::shared_ptr<ShellScalarMSpectrumWriter>
+   SharedShellScalarMSpectrumWriter;
 
-}
-}
-}
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_SHELLSCALARMSPECTRUMWRITER_HPP

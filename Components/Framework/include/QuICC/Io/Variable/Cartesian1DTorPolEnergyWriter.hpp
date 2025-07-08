@@ -1,6 +1,7 @@
-/** 
+/**
  * @file Cartesian1DTorPolEnergyWriter.hpp
- * @brief Implementation of the ASCII Chebyshev calculation for a Toroidal/Poloidal field in a plane layer
+ * @brief Implementation of the ASCII Chebyshev calculation for a
+ * Toroidal/Poloidal field in a plane layer
  */
 
 #ifndef QUICC_IO_VARIABLE_CARTESIAN1DTORPOLENERGYWRITER_HPP
@@ -20,40 +21,42 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the ASCII Chebyshev energy calculation for a
+ * Toroidal/Poloidal field in a plane layer
+ */
+class Cartesian1DTorPolEnergyWriter : public ICartesian1DTorPolEnergyWriter
+{
+public:
    /**
-    * @brief Implementation of the ASCII Chebyshev energy calculation for a Toroidal/Poloidal field in a plane layer
+    * @brief Constructor
+    *
+    * @param prefix Prefix to use for file name
+    * @param type Type of the file (typically scheme name)
     */
-   class Cartesian1DTorPolEnergyWriter: public ICartesian1DTorPolEnergyWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param prefix Prefix to use for file name
-          * @param type Type of the file (typically scheme name)
-          */
-         Cartesian1DTorPolEnergyWriter(const std::string& prefix, const std::string& type);
+   Cartesian1DTorPolEnergyWriter(const std::string& prefix,
+      const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~Cartesian1DTorPolEnergyWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~Cartesian1DTorPolEnergyWriter() = default;
 
-         /**
-          * @brief Initialise the operator, transform and file
-          */
-         virtual void init();
-         
-      protected:
+   /**
+    * @brief Initialise the operator, transform and file
+    */
+   virtual void init();
 
-      private:
-   };
+protected:
+private:
+};
 
-   /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<Cartesian1DTorPolEnergyWriter> SharedCartesian1DTorPolEnergyWriter;
+/// Typedef for a shared pointer of a HDF5 state file writer
+typedef std::shared_ptr<Cartesian1DTorPolEnergyWriter>
+   SharedCartesian1DTorPolEnergyWriter;
 
-} // Variable
-} // Io
-} // QuICC
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_CARTESIAN1DTORPOLENERGYWRITER_HPP

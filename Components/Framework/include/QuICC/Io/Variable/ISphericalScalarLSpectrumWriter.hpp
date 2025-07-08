@@ -1,6 +1,7 @@
-/** 
+/**
  * @file ISphericalScalarLSpectrumWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics L energy spectrum calculation for a scalar field in a spherical geometry
+ * @brief Implementation of the ASCII spherical harmonics L energy spectrum
+ * calculation for a scalar field in a spherical geometry
  */
 
 #ifndef QUICC_IO_VARIABLE_ISPHERICALSCALARLSPECTRUMWRITER_HPP
@@ -13,8 +14,8 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/ISphericalScalarEnergyBaseWriter.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
 
 namespace QuICC {
 
@@ -22,55 +23,57 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the ASCII spherical harmonics L energy spectrum
+ * calculation for a scalar field in a spherical geometry
+ */
+class ISphericalScalarLSpectrumWriter : public ISphericalScalarEnergyBaseWriter
+{
+public:
    /**
-    * @brief Implementation of the ASCII spherical harmonics L energy spectrum calculation for a scalar field in a spherical geometry
+    * @brief Constructor
+    *
+    * @param prefix Prefix to use for file name
+    * @param type Type of the file (typically scheme name)
     */
-   class ISphericalScalarLSpectrumWriter: public ISphericalScalarEnergyBaseWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param prefix Prefix to use for file name
-          * @param type Type of the file (typically scheme name)
-          */
-         ISphericalScalarLSpectrumWriter(const std::string& prefix, const std::string& type);
+   ISphericalScalarLSpectrumWriter(const std::string& prefix,
+      const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~ISphericalScalarLSpectrumWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~ISphericalScalarLSpectrumWriter() = default;
 
-         /**
-          * @brief Initialise the operator, transform and file
-          */
-         virtual void init();
-         
-      protected:
-         /**
-          * @brief Write content
-          */
-         virtual void writeContent();
+   /**
+    * @brief Initialise the operator, transform and file
+    */
+   virtual void init();
 
-      private:
-         /**
-          * @brief Storage for the scalar energy
-          */
-         Array mEnergy;
+protected:
+   /**
+    * @brief Write content
+    */
+   virtual void writeContent();
 
-         /**
-          * @brief Reset energy storage
-          */
-         virtual void resetEnergy();
+private:
+   /**
+    * @brief Storage for the scalar energy
+    */
+   Array mEnergy;
 
-         /**
-          * @brief Store energy
-          */
-         virtual void storeEnergy(const int l, const int m, const MHDFloat energy);
-   };
+   /**
+    * @brief Reset energy storage
+    */
+   virtual void resetEnergy();
 
-}
-}
-}
+   /**
+    * @brief Store energy
+    */
+   virtual void storeEnergy(const int l, const int m, const MHDFloat energy);
+};
+
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_ISPHERICALSCALARLSPECTRUMWRITER_HPP

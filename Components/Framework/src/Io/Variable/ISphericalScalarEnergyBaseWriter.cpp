@@ -1,6 +1,7 @@
 /**
  * @file ISphericalScalarEnergyBaseWriter.cpp
- * @brief Source of the implementation of the ASCII spherical harmonics energy calculation for scalar field in a spherical geometry
+ * @brief Source of the implementation of the ASCII spherical harmonics energy
+ * calculation for scalar field in a spherical geometry
  */
 
 // System includes
@@ -10,14 +11,14 @@
 
 // Project includes
 //
-#include "QuICC/Io/Variable/ISphericalScalarEnergyBaseWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
+#include "QuICC/Io/Variable/ISphericalScalarEnergyBaseWriter.hpp"
+#include "QuICC/Io/Variable/Tags/Energy.hpp"
+#include "QuICC/ScalarFields/FieldTools.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
-#include "QuICC/ScalarFields/FieldTools.hpp"
-#include "QuICC/Io/Variable/Tags/Energy.hpp"
 
 namespace QuICC {
 
@@ -25,134 +26,146 @@ namespace Io {
 
 namespace Variable {
 
-   ISphericalScalarEnergyBaseWriter::ISphericalScalarEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IVariableAsciiWriter(name, ext ,header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
-   {
-      // Set default path
-      this->setTransformPath(Transform::Path::Scalar::id());
+ISphericalScalarEnergyBaseWriter::ISphericalScalarEnergyBaseWriter(
+   std::string name, std::string ext, std::string header, std::string type,
+   std::string version, const Dimensions::Space::Id id,
+   const IAsciiWriter::WriteMode mode) :
+    IVariableAsciiWriter(name, ext, header, type, version, id, mode),
+    mHasMOrdering(false),
+    mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()),
+    mShowParity(false)
+{
+   // Set default path
+   this->setTransformPath(Transform::Path::Scalar::id());
 
-      // Default path to operator map
-      std::vector<std::size_t> ops = {Transform::Reductor::EnergyR2::id()};
-      this->addPath2Op(Transform::Path::Scalar::id(), ops);
-   }
+   // Default path to operator map
+   std::vector<std::size_t> ops = {Transform::Reductor::EnergyR2::id()};
+   this->addPath2Op(Transform::Path::Scalar::id(), ops);
+}
 
-   void ISphericalScalarEnergyBaseWriter::showParity()
-   {
-      this->mShowParity = true;
-   }
+void ISphericalScalarEnergyBaseWriter::showParity()
+{
+   this->mShowParity = true;
+}
 
-   void ISphericalScalarEnergyBaseWriter::prepareInput(Transform::TransformCoordinatorType& coord)
-   {
-      // Get field data
-      scalar_iterator_range sRange = this->scalarRange();
-      assert(std::distance(sRange.first, sRange.second) == 1);
-      auto&& field = sRange.first->second;
+void ISphericalScalarEnergyBaseWriter::prepareInput(
+   Transform::TransformCoordinatorType& coord)
+{
+   // Get field data
+   scalar_iterator_range sRange = this->scalarRange();
+   assert(std::distance(sRange.first, sRange.second) == 1);
+   auto&& field = sRange.first->second;
 
-      constexpr auto TId = Dimensions::Transform::TRA1D;
-      const int packs = 1;
-      coord.communicator().converter<TId>().setupCommunication(packs, TransformDirection::BACKWARD);
+   constexpr auto TId = Dimensions::Transform::TRA1D;
+   const int packs = 1;
+   coord.communicator().converter<TId>().setupCommunication(packs,
+      TransformDirection::BACKWARD);
 
-      coord.communicator().converter<TId>().prepareBackwardReceive();
+   coord.communicator().converter<TId>().prepareBackwardReceive();
 
-      // Dealias variable data
-      std::visit(
-            [&](auto&& p)
-            {
-               coord.communicator().transferForward(Dimensions::Transform::SPECTRAL, p->rDom(0).rTotal(), false);
-            },
-            field);
-
-      coord.communicator().converter<TId>().initiateForwardSend();
-   }
-
-   void ISphericalScalarEnergyBaseWriter::compute(Transform::TransformCoordinatorType& coord)
-   {
-      DebuggerMacro_msg("ISphericalScalarEnergyBaseWriter::compute" ,4);
-
-      constexpr auto TId = Dimensions::Transform::TRA1D;
-
-      // Map path to operators
-      if(this->mPath2Op.count(this->mPathId) == 0)
+   // Dealias variable data
+   std::visit(
+      [&](auto&& p)
       {
-         throw std::logic_error("Unknown energy transform reductor path (" + std::to_string(this->mPathId) + ") requested for scalar");
-      }
-      std::size_t energyR2Id = this->mPath2Op.at(this->mPathId).at(0);
+         coord.communicator().transferForward(Dimensions::Transform::SPECTRAL,
+            p->rDom(0).rTotal(), false);
+      },
+      field);
 
-      // Prepare spectral data for transform
-      this->prepareInput(coord);
+   coord.communicator().converter<TId>().initiateForwardSend();
+}
 
-      // Recover dealiased BWD data
-      auto pInVar = coord.ss().bwdPtr(TId);
-      coord.communicator().receiveBackward(TId, pInVar);
+void ISphericalScalarEnergyBaseWriter::compute(
+   Transform::TransformCoordinatorType& coord)
+{
+   DebuggerMacro_msg("ISphericalScalarEnergyBaseWriter::compute", 4);
 
-      // Compute energy reduction
-      Matrix spectrum(std::visit([](auto&& p)->int{return p->data().cols();}, pInVar), 1);
-      std::visit(
-            [&](auto&& p)
-            {
-               coord.transform1D().reduce(spectrum, p->data(), energyR2Id);
-            },
-            pInVar);
+   constexpr auto TId = Dimensions::Transform::TRA1D;
 
-      this->resetEnergy();
+   // Map path to operators
+   if (this->mPath2Op.count(this->mPathId) == 0)
+   {
+      throw std::logic_error("Unknown energy transform reductor path (" +
+                             std::to_string(this->mPathId) +
+                             ") requested for scalar");
+   }
+   std::size_t energyR2Id = this->mPath2Op.at(this->mPathId).at(0);
 
-      const auto& tRes = *this->res().cpu()->dim(TId);
+   // Prepare spectral data for transform
+   this->prepareInput(coord);
 
-      MHDFloat factor = 1.0;
-      int idx = 0;
-      if(this->mHasMOrdering)
+   // Recover dealiased BWD data
+   auto pInVar = coord.ss().bwdPtr(TId);
+   coord.communicator().receiveBackward(TId, pInVar);
+
+   // Compute energy reduction
+   Matrix spectrum(
+      std::visit([](auto&& p) -> int { return p->data().cols(); }, pInVar), 1);
+   std::visit([&](auto&& p)
+      { coord.transform1D().reduce(spectrum, p->data(), energyR2Id); }, pInVar);
+
+   this->resetEnergy();
+
+   const auto& tRes = *this->res().cpu()->dim(TId);
+
+   MHDFloat factor = 1.0;
+   int idx = 0;
+   if (this->mHasMOrdering)
+   {
+      // Loop over harmonic order m
+      for (int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         // Loop over harmonic order m
-         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
+         int m_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+         // m = 0, no factor of two
+         if (m_ == 0)
          {
-            int m_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+            factor = 1.0;
+         }
+         else
+         {
+            factor = 2.0;
+         }
+
+         for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
+         {
+            int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
+
+            this->storeEnergy(l_, m_, factor * spectrum(idx, 0));
+            idx += 1;
+         }
+      }
+   }
+   else
+   {
+      // Loop over harmonic degree l
+      for (int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
+      {
+         int l_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+
+         // m = 0, no factor of two
+         for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
+         {
+            int m_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
             // m = 0, no factor of two
-            if(m_ == 0)
+            if (m_ == 0)
             {
                factor = 1.0;
-            } else
+            }
+            else
             {
                factor = 2.0;
             }
 
-            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
-            {
-               int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
-
-               this->storeEnergy(l_, m_, factor*spectrum(idx, 0));
-               idx += 1;
-            }
-         }
-      } else
-      {
-         // Loop over harmonic degree l
-         for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
-         {
-            int l_ = tRes.idx<Dimensions::Data::DAT3D>(k);
-
-            // m = 0, no factor of two
-            for(int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
-            {
-               int m_ = tRes.idx<Dimensions::Data::DAT2D>(j,k);
-               // m = 0, no factor of two
-               if(m_ == 0)
-               {
-                  factor = 1.0;
-               } else
-               {
-                  factor = 2.0;
-               }
-
-               this->storeEnergy(l_, m_, factor*spectrum(idx, 0));
-               idx += 1;
-            }
+            this->storeEnergy(l_, m_, factor * spectrum(idx, 0));
+            idx += 1;
          }
       }
-
-      // Free BWD storage
-      coord.communicator().storage<TId>().freeBwd(pInVar);
    }
 
-} // Variable
-} // Io
-} // QuICC
+   // Free BWD storage
+   coord.communicator().storage<TId>().freeBwd(pInVar);
+}
+
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC

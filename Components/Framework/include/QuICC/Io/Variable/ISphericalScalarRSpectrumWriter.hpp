@@ -1,6 +1,7 @@
-/** 
+/**
  * @file ISphericalScalarRSpectrumWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics radial power spectrum calculation for a scalar field in a spherical geometry
+ * @brief Implementation of the ASCII spherical harmonics radial power spectrum
+ * calculation for a scalar field in a spherical geometry
  */
 
 #ifndef QUICC_IO_VARIABLE_ISPHERICALSCALARRARSPECTRUMWRITER_HPP
@@ -13,8 +14,8 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
 
 namespace QuICC {
 
@@ -22,100 +23,103 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the ASCII spherical harmonics radial power spectrum
+ * calculation for a scalar field in a spherical geometry
+ */
+class ISphericalScalarRSpectrumWriter : public IVariableAsciiWriter
+{
+public:
    /**
-    * @brief Implementation of the ASCII spherical harmonics radial power spectrum calculation for a scalar field in a spherical geometry
+    * @brief Constructor
+    *
+    * @param prefix Prefix to use for file name
+    * @param type Type of the file (typically scheme name)
     */
-   class ISphericalScalarRSpectrumWriter: public IVariableAsciiWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param prefix Prefix to use for file name
-          * @param type Type of the file (typically scheme name)
-          */
-         ISphericalScalarRSpectrumWriter(const std::string& prefix, const std::string& type);
+   ISphericalScalarRSpectrumWriter(const std::string& prefix,
+      const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~ISphericalScalarRSpectrumWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~ISphericalScalarRSpectrumWriter() = default;
 
-         /**
-          * @brief Initialise the operator, transform and file
-          */
-         virtual void init() override;
+   /**
+    * @brief Initialise the operator, transform and file
+    */
+   virtual void init() override;
 
-         /**
-          * @brief Activate output of parity splitting in power output
-          */
-         void showParity();
+   /**
+    * @brief Activate output of parity splitting in power output
+    */
+   void showParity();
 
-         /**
-          * @brief Compute power for scalar field
-          */
-         void compute(Transform::TransformCoordinatorType& coord) override;
+   /**
+    * @brief Compute power for scalar field
+    */
+   void compute(Transform::TransformCoordinatorType& coord) override;
 
-         /**
-          * @brief Requires heavy calculation?
-          */
-         virtual bool isHeavy() const override; 
-         
-      protected:
-         /**
-          * @brief Prepare spectral field data for computation
-          */
-         void prepareInput(Transform::TransformCoordinatorType& coord);
+   /**
+    * @brief Requires heavy calculation?
+    */
+   virtual bool isHeavy() const override;
 
-         /**
-          * @brief Write content
-          */
-         virtual void writeContent() override;
+protected:
+   /**
+    * @brief Prepare spectral field data for computation
+    */
+   void prepareInput(Transform::TransformCoordinatorType& coord);
 
-         /**
-          * @brief Data ordering is m slowest
-          */
-         bool mHasMOrdering;
+   /**
+    * @brief Write content
+    */
+   virtual void writeContent() override;
 
-         /*
-          * @brief Spherical volume to normalize power to power density
-          */
-         MHDFloat mVolume;
+   /**
+    * @brief Data ordering is m slowest
+    */
+   bool mHasMOrdering;
 
-         /**
-          * @brief Flag to show parity split in power
-          */
-         bool mShowParity;
+   /*
+    * @brief Spherical volume to normalize power to power density
+    */
+   MHDFloat mVolume;
 
-         /**
-          * @brief Radial grid
-          */
-         Array mGrid;
+   /**
+    * @brief Flag to show parity split in power
+    */
+   bool mShowParity;
 
-      private:
-         /**
-          * @brief Storage for the scalar power
-          */
-         Matrix mPower;
+   /**
+    * @brief Radial grid
+    */
+   Array mGrid;
 
-         /**
-          * @brief Reset power storage
-          */
-         virtual void resetPower();
+private:
+   /**
+    * @brief Storage for the scalar power
+    */
+   Matrix mPower;
 
-         /**
-          * @brief Store power
-          */
-         virtual void storePower(const int n, const int l, const int m, const MHDFloat power);
-   };
+   /**
+    * @brief Reset power storage
+    */
+   virtual void resetPower();
 
-   inline bool ISphericalScalarRSpectrumWriter::isHeavy() const
-   {
-      return true;
-   }
+   /**
+    * @brief Store power
+    */
+   virtual void storePower(const int n, const int l, const int m,
+      const MHDFloat power);
+};
 
+inline bool ISphericalScalarRSpectrumWriter::isHeavy() const
+{
+   return true;
 }
-}
-}
+
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_ISPHERICALSCALARRARSPECTRUMWRITER_HPP

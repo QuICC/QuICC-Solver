@@ -1,6 +1,7 @@
-/** 
+/**
  * @file ShellScalarEnergyWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field in a spherical shell
+ * @brief Implementation of the ASCII spherical harmonics energy calculation for
+ * a scalar field in a spherical shell
  */
 
 #ifndef QUICC_IO_VARIABLE_SHELLSCALARENERGYWRITER_HPP
@@ -13,8 +14,8 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/ISphericalScalarEnergyWriter.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
 
 namespace QuICC {
 
@@ -22,40 +23,40 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the ASCII spherical harmonics energy calculation for
+ * a scalar field in a spherical shell
+ */
+class ShellScalarEnergyWriter : public ISphericalScalarEnergyWriter
+{
+public:
    /**
-    * @brief Implementation of the ASCII spherical harmonics energy calculation for a scalar field in a spherical shell
+    * @brief Constructor
+    *
+    * @param prefix Prefix to use for file name
+    * @param type Type of the file (typically scheme name)
     */
-   class ShellScalarEnergyWriter: public ISphericalScalarEnergyWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param prefix Prefix to use for file name
-          * @param type Type of the file (typically scheme name)
-          */
-         ShellScalarEnergyWriter(const std::string& prefix, const std::string& type);
+   ShellScalarEnergyWriter(const std::string& prefix, const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~ShellScalarEnergyWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~ShellScalarEnergyWriter() = default;
 
-         /**
-          * @brief Initialise the operator, transform and file
-          */
-         virtual void init();
-         
-      protected:
+   /**
+    * @brief Initialise the operator, transform and file
+    */
+   virtual void init();
 
-      private:
-   };
+protected:
+private:
+};
 
-   /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<ShellScalarEnergyWriter> SharedShellScalarEnergyWriter;
+/// Typedef for a shared pointer of a HDF5 state file writer
+typedef std::shared_ptr<ShellScalarEnergyWriter> SharedShellScalarEnergyWriter;
 
-}
-}
-}
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_SHELLSCALARENERGYWRITER_HPP

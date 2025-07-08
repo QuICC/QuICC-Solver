@@ -1,4 +1,4 @@
-/** 
+/**
  * @file SphereDipolarityWriter.hpp
  * @brief Implementation of the dipolarity in a sphere
  */
@@ -20,98 +20,99 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the dipolarity in a sphere
+ */
+class SphereDipolarityWriter : public IVariableAsciiWriter
+{
+public:
    /**
-    * @brief Implementation of the dipolarity in a sphere
+    * @brief Constructor
+    *
+    * @param prefix Prefix to use for file name
+    * @param type Type of the file (typically scheme name)
     */
-   class SphereDipolarityWriter: public IVariableAsciiWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param prefix Prefix to use for file name
-          * @param type Type of the file (typically scheme name)
-          */
-         SphereDipolarityWriter(const std::string& prefix, const std::string& type);
+   SphereDipolarityWriter(const std::string& prefix, const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         ~SphereDipolarityWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   ~SphereDipolarityWriter() = default;
 
-         /**
-          * @brief Initialise the operator, transform and file
-          */
-         virtual void init();
+   /**
+    * @brief Initialise the operator, transform and file
+    */
+   virtual void init();
 
-         /**
-          * @brief Compute dipolarity of magnetic field
-          */
-         void compute(Transform::TransformCoordinatorType& coord);
+   /**
+    * @brief Compute dipolarity of magnetic field
+    */
+   void compute(Transform::TransformCoordinatorType& coord);
 
-         /**
-          * @brief Requires heavy calculation?
-          */
-         virtual bool isHeavy() const; 
-         
-      protected:
-         /**
-          * @brief Prepare spectral field data for computation
-          */
-         void prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord);
+   /**
+    * @brief Requires heavy calculation?
+    */
+   virtual bool isHeavy() const;
 
-         /**
-          * @brief Write State to file
-          */
-         virtual void writeContent();
+protected:
+   /**
+    * @brief Prepare spectral field data for computation
+    */
+   void prepareInput(const FieldComponents::Spectral::Id sId,
+      Transform::TransformCoordinatorType& coord);
 
-         /**
-          * @brief Data ordering is m slowest
-          */
-         bool mHasMOrdering;
+   /**
+    * @brief Write State to file
+    */
+   virtual void writeContent();
 
-      private:
-         /**
-          * @brief Reset energy storage
-          */
-         void resetEnergy();
+   /**
+    * @brief Data ordering is m slowest
+    */
+   bool mHasMOrdering;
 
-         /**
-          * @brief Dipolarity
-          */
-         MHDFloat mDipolarity;
+private:
+   /**
+    * @brief Reset energy storage
+    */
+   void resetEnergy();
 
-         /**
-          * @brief Axial dipole component
-          */
-         MHDFloat mAxialDipole;
+   /**
+    * @brief Dipolarity
+    */
+   MHDFloat mDipolarity;
 
-         /**
-          * @brief Non axial dipole component
-          */
-         MHDComplex mNonAxialDipole;
+   /**
+    * @brief Axial dipole component
+    */
+   MHDFloat mAxialDipole;
 
-         /**
-          * @brief Energy spectrum at CMB
-          */
-         Array mCmbSpectrum;
+   /**
+    * @brief Non axial dipole component
+    */
+   MHDComplex mNonAxialDipole;
 
-         /**
-          * @brief Boundary value operators
-          */
-         std::map<int,Array> mValue;
-   };
+   /**
+    * @brief Energy spectrum at CMB
+    */
+   Array mCmbSpectrum;
 
-   /// Typedef for a shared pointer to and DipolarityWriter
-   typedef std::shared_ptr<SphereDipolarityWriter> SharedSphereDipolarityWriter;
+   /**
+    * @brief Boundary value operators
+    */
+   std::map<int, Array> mValue;
+};
 
-   inline bool SphereDipolarityWriter::isHeavy() const
-   {
-      return true;
-   }
+/// Typedef for a shared pointer to and DipolarityWriter
+typedef std::shared_ptr<SphereDipolarityWriter> SharedSphereDipolarityWriter;
 
-} // namespace Io
+inline bool SphereDipolarityWriter::isHeavy() const
+{
+   return true;
+}
+
 } // namespace Variable
+} // namespace Io
 } // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_SPHEREDIPOLARITYWRITER_HPP

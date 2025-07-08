@@ -1,4 +1,4 @@
-/** 
+/**
  * @file ShellNusseltWriter.hpp
  * @brief Implementation of the Nusselt number in a spherical shell
  */
@@ -20,73 +20,73 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the Nusselt number in a spherical shell
+ */
+class ShellNusseltWriter : public IVariableAsciiWriter
+{
+public:
    /**
-    * @brief Implementation of the Nusselt number in a spherical shell
+    * @brief Constructor
+    *
+    * @param prefix Prefix to use for file name
+    * @param type Type of the file (typically scheme name)
     */
-   class ShellNusseltWriter: public IVariableAsciiWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param prefix Prefix to use for file name
-          * @param type Type of the file (typically scheme name)
-          */
-         ShellNusseltWriter(const std::string& prefix, const std::string& type);
+   ShellNusseltWriter(const std::string& prefix, const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~ShellNusseltWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~ShellNusseltWriter() = default;
 
-         /**
-          * @brief Initialise the operator, transform and file
-          */
-         virtual void init();
+   /**
+    * @brief Initialise the operator, transform and file
+    */
+   virtual void init();
 
-         /**
-          * @brief Requires heavy calculation?
-          */
-         virtual bool isHeavy() const; 
-         
-      protected:
-         /**
-          * @brief Write State to file
-          */
-         virtual void writeContent();
+   /**
+    * @brief Requires heavy calculation?
+    */
+   virtual bool isHeavy() const;
 
-         /**
-          * @brief Data ordering is m slowest
-          */
-         bool mHasMOrdering;
+protected:
+   /**
+    * @brief Write State to file
+    */
+   virtual void writeContent();
 
-      private:
-         /**
-          * @brief Nusselt number
-          */
-         Array mNusselt;
+   /**
+    * @brief Data ordering is m slowest
+    */
+   bool mHasMOrdering;
 
-         /*
-          * @brief Heat flux from background profile
-          */
-         Array mBackground;
+private:
+   /**
+    * @brief Nusselt number
+    */
+   Array mNusselt;
 
-         /**
-          * @brief Origin projector
-          */
-         Matrix mBoundary;
-   };
+   /*
+    * @brief Heat flux from background profile
+    */
+   Array mBackground;
 
-   /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<ShellNusseltWriter> SharedShellNusseltWriter;
+   /**
+    * @brief Origin projector
+    */
+   Matrix mBoundary;
+};
 
-   inline bool ShellNusseltWriter::isHeavy() const
-   {
-      return false;
-   }
+/// Typedef for a shared pointer of a HDF5 state file writer
+typedef std::shared_ptr<ShellNusseltWriter> SharedShellNusseltWriter;
 
+inline bool ShellNusseltWriter::isHeavy() const
+{
+   return false;
 }
-}
-}
+
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_SHELLNUSSELTWRITER_HPP
