@@ -62,6 +62,9 @@ void Coordinator::init(const std::vector<Array>& mesh,
    {
       this->mFixedStep = std::max(this->mcMinStep, tstep(1));
       this->mFixedStep = std::min(this->mFixedStep, this->mcMaxStep);
+
+      // Clear CFL operators
+      this->mCflOps.clear();
    }
    else if(this->mCflOps.size() > 0)
    {
@@ -123,6 +126,9 @@ void Coordinator::init(const std::vector<Array>& mesh,
    else
    {
       this->mFixedStep = tstep(1);
+
+      // Clear CFL operators
+      this->mCflOps.clear();
    }
 
    if (this->mCflOps.size() > 0)
@@ -165,9 +171,8 @@ void Coordinator::initialCfl()
    {
       this->mCfl(0, 0) = this->mFixedStep;
       this->mCfl(1, 0) = Timestep::FIXEDSTEP_LOCATION;
-
-   // Compute initial CFL condition
    }
+   // Compute initial CFL condition
    else if (this->mCflOps.size() > 0)
    {
       // Compute CFL for initial state
@@ -197,9 +202,8 @@ void Coordinator::updateCfl()
    {
       this->mCfl(0, 0) = this->mFixedStep;
       this->mCfl(1, 0) = Timestep::FIXEDSTEP_LOCATION;
-
-   // Compute CFL condition
    }
+   // Compute CFL condition
    else if (this->mCflOps.size() > 0)
    {
       // Safety assert
