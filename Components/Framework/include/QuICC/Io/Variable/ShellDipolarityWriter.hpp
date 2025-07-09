@@ -54,6 +54,11 @@ public:
     */
    virtual bool isHeavy() const;
 
+   /**
+    * @brief Set truncation of CMB spectrum output
+    */
+   void setCmbTruncation(const int nL);
+
 protected:
    /**
     * @brief Prepare spectral field data for computation
@@ -76,6 +81,11 @@ private:
     * @brief Reset energy storage
     */
    void resetEnergy();
+
+   /**
+    * @brief CMB spectrum output truncation
+    */
+   int mCmbNl;
 
    /**
     * @brief Dipolarity
