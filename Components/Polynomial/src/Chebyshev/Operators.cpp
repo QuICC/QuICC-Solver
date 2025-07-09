@@ -7,6 +7,7 @@
 //
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 
 // External includes
 //
@@ -86,8 +87,8 @@ namespace Operators {
       auto a = 0.5*(ro-ri);
       auto b = 0.5*(ro+ri);
 
-      Internal::Array Avec(p,1);
-      Internal::Matrix Bmat(p, nN);
+      Internal::Array Avec(p+1,1);
+      Internal::Matrix Bmat(p+1, nN);
 
       // Avec entries
       Avec(0,0) = std::pow(a, 1 + p);
@@ -106,9 +107,10 @@ namespace Operators {
          {
             n0=0;
          }
-         for(int in = 0; in<(nN-n0); in++)
+         //for(int in = 0; in<=(nN-n0)/2; in++)
+         for(int n = n0; n<nN; n=n+2)
          {
-            int n = n0+2*in;
+            //int n = n0+2*in;
             auto alphaMax = 0.5*(p - k - n0);
             MHDFloat SalphaMax = std::pow(2, 1-p+k) * fc(n0+2*alphaMax) * IntTnTj(n,n0+2*alphaMax);
 
@@ -128,6 +130,7 @@ namespace Operators {
       }
 
       iop = (Avec.transpose()*Bmat).cast<MHDFloat>().transpose();
+
    }
 
 }
