@@ -3,8 +3,6 @@
  * @brief Source of the implementation of the ASCII angular momentum number in a shell
  */
 
- // Angular moomentum tests:
- // looks like there is a factor of 2 in Lx, Ly
 // Configuration includes
 //
 
@@ -106,7 +104,7 @@ namespace Variable {
          int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          
          Internal::Matrix iop;
-         Polynomial::Chebyshev::Operators::integrateRpTn(iop, 3, nN, ro, ri); // ro,ri
+         Polynomial::Chebyshev::Operators::integrateRpTn(iop, 3, nN, ro, ri); 
          this->mOp = iop.cast<MHDFloat>();
          assert(this->mOp.rows() == nN && this->mOp.cols() == 1);
       }
