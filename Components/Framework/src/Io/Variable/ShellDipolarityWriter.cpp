@@ -34,6 +34,7 @@ ShellDipolarityWriter::ShellDipolarityWriter(const std::string& prefix,
        Tags::Dipolarity::EXTENSION, prefix + Tags::Dipolarity::HEADER, type,
        Tags::Dipolarity::VERSION, Dimensions::Space::SPECTRAL, EXTEND),
     mHasMOrdering(false),
+    mCmbNl(-1),
     mAxialDipole(0.0),
     mNonAxialDipole(0.0)
 {}
@@ -88,6 +89,11 @@ void ShellDipolarityWriter::init()
    {
       SparseSM::Chebyshev::LinearMap::Boundary::Value bc(ri, ro, Position::TOP);
       op = bc.compute(nN - 1).cast<MHDFloat>();
+   }
+
+   if(this->mCmbNl < 0)
+   {
+      this->mCmbNl = this->mCmbSpectrum.size();
    }
 
    IVariableAsciiWriter::init();
@@ -304,7 +310,7 @@ void ShellDipolarityWriter::writeContent()
                   << this->mAxialDipole << "\t" << this->mNonAxialDipole.real()
                   << "\t" << this->mNonAxialDipole.imag();
 
-      for (int count = 0; count < this->mCmbSpectrum.size(); count++)
+      for (int count = 0; count < std::min(this->mCmbNl, static_cast<int>(this->mCmbSpectrum.size())); count++)
       {
          this->mFile << "\t" << this->mCmbSpectrum(count);
       }
@@ -319,6 +325,16 @@ void ShellDipolarityWriter::writeContent()
    {
       QuICCEnv().abort("Shell dipolarity is NaN!");
    }
+}
+
+void ShellDipolarityWriter::setCmbTruncation(const int nL)
+{
+   if(nL < 0)
+   {
+      throw std::logic_error("Cannot set a negative truncation");
+   }
+
+   this->mCmbNl = nL;
 }
 
 void ShellDipolarityWriter::resetEnergy()
