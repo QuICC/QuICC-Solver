@@ -3,6 +3,14 @@
 #
 
 macro(quicc_find_boost_required)
+    # parse inputs
+    set(options )
+    set(oneValueArgs )
+    set(multiValueArgs COMPONENTS)
+    cmake_parse_arguments(QFBR "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    message(DEBUG "QFBR_COMPONENTS: ${QFBR_COMPONENTS}")
+
     if(NOT TARGET Boost::headers)
         if(NOT BOOST_ROOT)
             message(VERBOSE "setting BOOST_ROOT")
@@ -18,11 +26,18 @@ macro(quicc_find_boost_required)
             cmake_policy(SET CMP0167 NEW)
         endif()
         set(_version "1.78")
-        find_package(Boost ${_version})
+        if(NOT QFBR_COMPONENTS)
+          find_package(Boost ${_version})
+        else()
+          find_package(Boost ${_version} COMPONENTS ${QFBR_COMPONENTS} REQUIRED)
+        endif()
         if(NOT Boost_FOUND)
             message(FATAL_ERROR "Could not find Boost, required >= ${_version}, try to specify path: -DBOOST_ROOT=</path/to/boost>")
         endif()
         # Imported target does not necessarily have global scope
         set_target_properties(Boost::headers PROPERTIES IMPORTED_GLOBAL TRUE)
+        foreach(_comp IN ITEMS ${QFBR_COMPONENTS})
+          set_target_properties(Boost::${_comp} PROPERTIES IMPORTED_GLOBAL TRUE)
+        endforeach()
     endif()
 endmacro()
