@@ -15,6 +15,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/ISphericalTorPolEnergyBaseWriter.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -33,8 +34,9 @@ namespace Variable {
           *
           * @param prefix Prefix to use for file name
           * @param type Type of the file (typically scheme name)
+          * @param pF   pointer to a radial profile (e.g. density)
           */
-         ISphericalTorPolEnergyWriter(const std::string& prefix, const std::string& type);
+         ISphericalTorPolEnergyWriter(const std::string& prefix, const std::string& type, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF = nullptr);
 
          /**
           * @brief Destructor

@@ -125,6 +125,10 @@ namespace Backend {
       return this->mpImpl->solver();
    }
 
+   Array& ChebyshevEnergy::getEGrid() const
+   {
+      return this->mpImpl->getEGrid();
+   }
 }
 }
 }

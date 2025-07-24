@@ -23,8 +23,8 @@ namespace Io {
 
 namespace Variable {
 
-   ISphericalTorPolEnergyWriter::ISphericalTorPolEnergyWriter(const std::string& prefix, const std::string& type)
-      : ISphericalTorPolEnergyBaseWriter(prefix + Tags::Energy::BASENAME, Tags::Energy::EXTENSION, prefix + Tags::Energy::HEADER, type, Tags::Energy::VERSION, Dimensions::Space::SPECTRAL), mTorEnergy(2), mPolEnergy(2)
+   ISphericalTorPolEnergyWriter::ISphericalTorPolEnergyWriter(const std::string& prefix, const std::string& type, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+      : ISphericalTorPolEnergyBaseWriter(prefix + Tags::Energy::BASENAME, Tags::Energy::EXTENSION, prefix + Tags::Energy::HEADER, type, Tags::Energy::VERSION, Dimensions::Space::SPECTRAL, IAsciiWriter::EXTEND, pF), mTorEnergy(2), mPolEnergy(2)
    {
       this->mTorEnergy.setConstant(-1);
       this->mPolEnergy.setConstant(-1);

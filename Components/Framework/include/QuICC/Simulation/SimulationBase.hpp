@@ -172,6 +172,11 @@ namespace QuICC {
           */
          const SimulationConfig& config() const;
 
+         /**
+          * @brief Get eqation parameters
+          */
+         const Equations::SharedEquationParameters eqParams() const;
+
       protected:
          /**
           * @brief Shared resolution

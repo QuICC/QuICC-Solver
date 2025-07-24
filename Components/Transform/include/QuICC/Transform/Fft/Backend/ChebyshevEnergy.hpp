@@ -146,6 +146,12 @@ namespace Backend {
          void getSolution(Matrix& tmp, const int zeroRows = 0, const int extraRows = 0) const;
 
          /**
+          * @brief Get energy grid
+          *
+          */
+         Array& getEGrid() const;
+
+         /**
           * @brief Get the temporary storage
           */
          Matrix& getStorage(const StorageKind = StorageKind::in) const;

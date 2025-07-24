@@ -32,8 +32,8 @@ namespace Io {
 
 namespace Variable {
 
-   ShellTorPolLSpectrumWriter::ShellTorPolLSpectrumWriter(const std::string& prefix, const std::string& type)
-      : ISphericalTorPolLSpectrumWriter(prefix, type)
+   ShellTorPolLSpectrumWriter::ShellTorPolLSpectrumWriter(const std::string& prefix, const std::string& type, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+      : ISphericalTorPolLSpectrumWriter(prefix, type, pF)
    {
    }
 

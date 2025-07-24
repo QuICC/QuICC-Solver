@@ -16,6 +16,7 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Transform/ITransform.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Transform.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -99,6 +100,19 @@ namespace Transform {
           * @param id         Energy reductor to use
           */
          void reduce(Matrix& spectrum, const MatrixZ& in, const std::size_t id) override;
+
+          /**
+          * @brief Compute energy reduction operation
+          *
+          * Compute energy reduction operation
+          * Overloaded for the anelastic case
+          * 
+          * @param spectrum   Output energy spectrum
+          * @param in         Input spectral coefficients
+          * @param id         Energy reductor to use
+          * @param pF         Radial profile (e.g. density)
+          */
+         void reduce(Matrix& spectrum, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) override;
 
          /**
           * @brief Get the memory requirements

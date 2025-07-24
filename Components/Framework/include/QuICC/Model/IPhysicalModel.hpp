@@ -27,6 +27,7 @@
 #include "QuICC/RuntimeStatus/registerAll.hpp"
 #include "QuICC/SolveTiming/registerAll.hpp"
 #include "QuICC/PseudospectralTag/registerAll.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -154,8 +155,19 @@ namespace Model {
          /**
           * @brief Interface to adding ASCII output file
           */
-         template <typename T> void enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim);
+         template <typename T> void enableAsciiFile(const std::string tag, 
+                                                    const std::string prefix, 
+                                                    const std::size_t id, 
+                                                    std::shared_ptr<TSim> spSim);
 
+         /**
+          * @brief Interface to adding ASCII output file (anelastic case)
+          */
+         template <typename T> void enableAsciiFile(const std::string tag, 
+                                                    const std::string prefix, 
+                                                    const std::size_t id, 
+                                                    std::shared_ptr<TSim> spSim,
+                                                    std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
       protected:
          /**
           * @brief Register Named IDs needed for simulation
@@ -307,11 +319,36 @@ namespace Model {
       return this->mpBackend;
    }
 
-   template <typename TSim, typename TState, typename TVis> template <typename T> void IPhysicalModel<TSim,TState,TVis>::enableAsciiFile(const std::string tag, const std::string prefix, const std::size_t id, std::shared_ptr<TSim> spSim)
+   template <typename TSim, typename TState, typename TVis> template <typename T> void IPhysicalModel<TSim,TState,TVis>::enableAsciiFile(const std::string tag, 
+                                                                                                                                         const std::string prefix, 
+                                                                                                                                         const std::size_t id, 
+                                                                                                                                         std::shared_ptr<TSim> spSim)
    {
       if(spSim->config().model(tag).at("enable"))
       {
          auto spFile = std::make_shared<T>(prefix, spSim->ss().tag());
+         spFile->expect(id);
+         if((spSim->config().model(tag).count("numbered") > 0) && spSim->config().model(tag).at("numbered"))
+         {
+            spFile->numberOutput();
+         }
+         if(spSim->config().model(tag).count("only_every") > 0)
+         {
+            spFile->onlyEvery(spSim->config().model(tag).at("only_every"));
+         }
+         spSim->addAsciiOutputFile(spFile);
+      }
+   }
+
+   template <typename TSim, typename TState, typename TVis> template <typename T> void IPhysicalModel<TSim,TState,TVis>::enableAsciiFile(const std::string tag, 
+                                                                                                                                         const std::string prefix, 
+                                                                                                                                         const std::size_t id, 
+                                                                                                                                         std::shared_ptr<TSim> spSim,
+                                                                                                                                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   {
+      if(spSim->config().model(tag).at("enable"))
+      {
+         auto spFile = std::make_shared<T>(prefix, spSim->ss().tag(), pF);
          spFile->expect(id);
          if((spSim->config().model(tag).count("numbered") > 0) && spSim->config().model(tag).at("numbered"))
          {

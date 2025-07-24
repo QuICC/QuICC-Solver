@@ -355,6 +355,11 @@ namespace QuICC {
       return this->mSimIoCtrl.config();
    }
 
+   const Equations::SharedEquationParameters SimulationBase::eqParams() const 
+   { 
+      return this->mspEqParams; 
+   }
+
    void SimulationBase::tuneOutput()
    {
    }

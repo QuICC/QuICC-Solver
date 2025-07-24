@@ -172,5 +172,14 @@ The above depends on the available methods in a specific variable.
     
     $10 = {-7.0422654329261449e-22, -6.2139287690149649e-22, -5.607314587353385e-22, -5.2212513267841266e-22, -5.0383597814835437e-22, -5.0281346547060178e-22, -5.1514657175950327e-22, -5.365816772684157e-22, -5.6301657379493283e-22, -5.9089395740012698e-22}
 
+#### Example 3: print array sizes:
 
+for arrays:
+    
+    print rho.size()
+
+for matrices
+
+    print tmpSquare.cols()
+    print tmpSquare.rows()
 

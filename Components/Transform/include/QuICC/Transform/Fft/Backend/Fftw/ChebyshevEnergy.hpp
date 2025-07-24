@@ -110,6 +110,12 @@ namespace Fftw {
           * @brief Apply padding
           */
          void applyPadding(Matrix& rData, const int extraRows = 0) const final;
+
+         /**
+          * @brief Get the energy grid
+          */
+         Array& getEGrid() const;
+
       protected:
 
       private:
@@ -118,6 +124,11 @@ namespace Fftw {
           * @brief Compute energy weights
           */
          void computeEWeights(const int size, const MHDFloat lower, const MHDFloat upper) const;
+
+         /**
+          * @brief Compute chebyshev grid
+          */
+         void computeEGrid(const int size, const MHDFloat lower, const MHDFloat upper) const;
 
          /**
           * @brief Temporary data for mid operations
@@ -153,6 +164,11 @@ namespace Fftw {
           * @brief Energy weights
           */
          mutable Array mEWeights;
+
+          /**
+          * @brief Energy weights
+          */
+         mutable Array mEGrid;
 
          /**
           * @brief Spectral operator

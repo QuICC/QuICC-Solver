@@ -35,6 +35,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   QuICC::Profiling
   QuICC::ViewOps
   QuICC::Memory
+  QuICC::DenseSM
   BLAS::BLAS # banded/tridiag solve/mul TODO: remove dep
   )
 

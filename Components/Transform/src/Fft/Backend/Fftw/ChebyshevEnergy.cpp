@@ -17,6 +17,7 @@
 
 // Project includes
 //
+#include "Types/Math.hpp"
 
 namespace QuICC {
 
@@ -60,6 +61,9 @@ namespace Fftw {
       // Compute energy weights
       this->computeEWeights(bwdSize, setup.lower(), setup.upper());
 
+      // Compute energy grid
+      this->computeEGrid(bwdSize, setup.lower(), setup.upper());
+
       // Create the two plans
       const int  *fftSize = &fwdSize;
 
@@ -95,6 +99,31 @@ namespace Fftw {
          this->mEWeights(2*i) = 2.0*a*(2.0/(1.0 - n*n));
       }
       this->mEWeights(0) *= 0.5;
+   }
+
+   void ChebyshevEnergy::computeEGrid(const int size, const MHDFloat lower, const MHDFloat upper) const
+   {
+      if(upper > lower)
+      {
+         // Initialise grid storage
+         this->mEGrid = Array::Zero(size);
+
+         // Compute linear map y = ax + b
+         MHDFloat b = (upper + lower)/2.0;
+         MHDFloat a = (upper - lower)/2.0;
+
+         // Create Chebyshev grid
+         for(int k = 0; k < size; k++)
+         {
+            this->mEGrid(k) = std::cos((Math::PI)*(static_cast<MHDFloat>(k)+0.5)/static_cast<MHDFloat>(size));
+
+            this->mEGrid(k) = a*this->mEGrid(k) + b;
+         }
+
+      } else
+      {
+         throw std::logic_error("generateGrid called with incompatible gap bounds: lower = " + std::to_string(lower) + ", upper = " + std::to_string(upper));
+      }
    }
 
    void ChebyshevEnergy::applyPadding(Matrix& rData, const int extraRows) const
@@ -166,6 +195,11 @@ namespace Fftw {
    DifferentialSolver& ChebyshevEnergy::solver() const
    {
       return *this->mspSolver;
+   }
+
+   Array& ChebyshevEnergy::getEGrid() const
+   {
+      return this->mEGrid;
    }
 
 }

@@ -23,8 +23,8 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-   ISphericalTorPolEnergyBaseWriter::ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
+   ISphericalTorPolEnergyBaseWriter::ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false), mpF(pF)
    {
    }
 
@@ -73,13 +73,37 @@ namespace Variable {
       coord.communicator().receiveBackward(TId, pInVarTor);
 
       // Compute energy reduction
-      spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarTor), 1);
-      std::visit(
-            [&](auto&& p)
-            {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyR2::id());
-            },
-            pInVarTor);
+      if (mpF == nullptr)
+      {
+         // Boussinesq version
+         //
+         // Call stack to reduce (up to Energy operators):
+         // ISphericalTorPolEnergyBaseWriter::compute (* where we are now *)
+         // -> ShellChebyshevTransform::reduce
+         //    -> Transform::Fft::Chebyshev::LinearMap::Transform::transform(Matrix& rOut, const MatrixZ& in, const std::size_t id)
+         //       -> Transform::Fft::Chebyshev::LinearMap::Transform::transform(Matrix& rOut, const MatrixZ& in, const IChebyshevOperator& op)
+         //          -> IChebyshevEnergy::transform
+         //             -> Transform::Fft::Chebyshev::LinearMap::Reductor::EnergyY2 (or Energy or EnergyD1Y1)
+         //                ...
+         
+         spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarTor), 1);
+         std::visit(
+               [&](auto&& p)
+               {
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyR2::id());
+               },
+               pInVarTor);
+      }
+      else
+      {
+         spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarTor), 1);
+         std::visit(
+               [&](auto&& p)
+               {
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyR2::id(), mpF);
+               },
+               pInVarTor);
+      }
 
       this->resetEnergy();
 
