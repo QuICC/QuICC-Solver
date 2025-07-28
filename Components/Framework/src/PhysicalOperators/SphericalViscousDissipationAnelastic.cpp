@@ -102,6 +102,41 @@ namespace Physical {
          auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), Rho(iR_), dLogRho(iR_));
 
          rS.setSlice(slice, iR);
+
+
+         // Test the diagonal gradient components: OK (rms is 10^-40 or so)
+         /*
+         rS.setSlice(((Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::R).slice(iR).array()
+                        + Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::THETA).slice(iR).array()
+                        + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::PHI).slice(iR).array()
+                        )).matrix(), iR);
+         */
+         
+         // test the curl-r: NOT GOOD (rms is O(1) or so, vs O(1) rms curl values)
+         // Poloidal part is ok (r curl =0)
+         /*
+         rS.setSlice((v.comp(FieldComponents::Physical::R).slice(iR).array()
+                        + Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::PHI).slice(iR).array()
+                        - Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::THETA).slice(iR).array()
+                        ).matrix(), iR);
+         */
+         
+         // test the curl-theta: OK (rms is 10^-30 or so, vs O(100) rms curl values), but check if I am cheating
+         /*
+         rS.setSlice(((v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                        - Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::PHI).slice(iR).array()
+                        + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::R).slice(iR).array()
+                        )).matrix(), iR);
+         */
+         
+         // test the curl-phi: OK (rms is 10^-30 or so, vs O(100) rms curl values), but check if I am cheating
+         /*
+         rS.addSlice(((v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                        - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::R).slice(iR).array()
+                        + Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::THETA).slice(iR).array()
+                        )).matrix(), iR);
+         */
+         
       }
    }
 
@@ -136,50 +171,8 @@ namespace Physical {
          auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), Rho(iR_), dLogRho(iR_));
 
          rS.addSlice(slice, iR);
-
-
-         // Test the diagonal gradient components
-         /*
-         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
-                                                Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::R).slice(iR).array()
-                                                + Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::THETA).slice(iR).array()
-                                                + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::PHI).slice(iR).array()
-                                                )/T(iR_)).matrix(), iR);
-         */
-         
-         // test the curl-r
-         // very very small errors
-         /*
-         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
-                                                v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                + Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::PHI).slice(iR).array()
-                                                - Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::THETA).slice(iR).array()
-                                                )/T(iR_)).matrix(), iR);
-         */
-         
-         // test the curl-theta
-         // very small errors
-         /*
-         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * (10*(
-                                                v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                - Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::PHI).slice(iR).array()
-                                                + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::R).slice(iR).array()
-                                                )/T(iR_)).matrix(), iR);
-         */
-         // test the curl-phi
-         // this is perfectly correct
-         /*
-         rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * (10*(
-                                                v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::R).slice(iR).array()
-                                                + Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::THETA).slice(iR).array()
-                                                )/T(iR_)).matrix(), iR);
-         */
-         
       }
-         
-      
-      
+
       
    // *** to print the result ** //
    // std::cerr << "NL(R) = "<<rS.data()<<" \n";
