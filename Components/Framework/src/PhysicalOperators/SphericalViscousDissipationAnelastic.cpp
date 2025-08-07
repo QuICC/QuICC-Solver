@@ -164,10 +164,6 @@ namespace Physical {
       {
          iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);         
 
-         //rS.addSlice(c* 2*Rho(iR_)*nu(iR_) * ((
-         //                                       // e_rr
-         //                                       Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::R).slice(iR).array()
-         //                                       )/T(iR_)).matrix(), iR);
          auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), Rho(iR_), dLogRho(iR_));
 
          rS.addSlice(slice, iR);
@@ -208,6 +204,92 @@ namespace Physical {
 
          rS.subSlice(slice, iR);
       }
+   }
+
+   void SphericalViscousDissipationAnelastic::test(Framework::Selector::PhysicalScalarField &rS,
+                                             const Resolution& res, 
+                                             const Array& r, 
+                                             const Array& thGrid,    // Add theta grid
+                                             const Array& phGrid,    // Add phi grid 
+                                             const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
+                                             const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV, // Viscosity
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT, // Temperature
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // derivative of log(Rho)
+                                             const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
+                                             const MHDFloat c)
+   {
+      int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+      int iR_;
+
+      auto nu        = pV->evaluate(r, 0, 0); 
+      auto T         = pT->evaluate(r, 0, 0); 
+      auto Rho       = pF->evaluate(r, 0, 0); 
+      auto dLogRho   = pDF->evaluate(r, 0, 0);
+
+      for(int iR = 0; iR < nR; ++iR)
+      {
+         iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);         
+         int nTh = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT2D>(iR); 
+         
+         auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), Rho(iR_), dLogRho(iR_));
+
+         rS.addSlice(slice, iR);
+
+         // to test the implementation
+         std::cerr << "(iR, iR_) = ("<<iR<<","<<iR_<<")"<<" \n";
+         std::cerr << "(r(iR), r(iR_)) = ("<<r(iR)<<","<<r(iR_)<<")"<<" \n";
+         // Print theta and phi coordinates
+         std::cerr << " theta = \n";
+         for(int iTh = 0; iTh < nTh; ++iTh)
+         {
+            int iTh_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(iTh, iR);
+            MHDFloat theta = thGrid(iTh_);
+            
+            std::cerr << theta << " ";
+            
+         }
+         // Print phi values - use grid size directly since phi is typically uniform
+         int nPh = phGrid.size();
+         std::cerr << "\n phi = \n";
+         for(int iPh = 0; iPh < nPh; ++iPh)
+         {
+            MHDFloat phi = phGrid(iPh);
+            std::cerr <<phi << " ";
+         }
+         std::cerr << "\n";
+         // for density_type=0, this is r
+         std::cerr << "rho(iR) =  ("<<Rho(iR)<<")"<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "v_r = "<<v.comp(FieldComponents::Physical::R).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "v_theta = "<<v.comp(FieldComponents::Physical::THETA).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "v_phi = "<<v.comp(FieldComponents::Physical::PHI).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+
+         std::cerr << "v_rphi = "<<Dv.comp(FieldComponents::Physical::R, FieldComponents::Physical::PHI).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "v_thetaphi = "<<Dv.comp(FieldComponents::Physical::THETA, FieldComponents::Physical::PHI).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "v_phir = "<<Dv.comp(FieldComponents::Physical::PHI, FieldComponents::Physical::R).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "v_phitheta = "<<Dv.comp(FieldComponents::Physical::PHI, FieldComponents::Physical::THETA).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "v_phiphi = "<<Dv.comp(FieldComponents::Physical::PHI, FieldComponents::Physical::PHI).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "Q_nu = "<< (slice/c)*T(iR_)<<" \n";
+         std::cerr << "c = "<< c<<" \n";
+
+         
+      }
+
+      
+   // *** to print the result ** //
+   // std::cerr << "NL(R) = "<<rS.data()<<" \n";
+
+   
    }
 
 }

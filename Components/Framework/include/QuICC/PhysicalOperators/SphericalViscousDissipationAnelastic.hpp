@@ -82,6 +82,20 @@
                           std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
                           const QuICC::Equations::EquationParameters &eqParams,
                           const MHDFloat c = 1.0);
+
+         static void test(Framework::Selector::PhysicalScalarField &rS, 
+                          const Resolution& res, 
+                          const Array& r, 
+                          const Array& thGrid,    // Add theta grid
+                          const Array& phGrid,    // Add phi grid 
+                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
+                          const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv, 
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                          std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, 
+                          const QuICC::Equations::EquationParameters &eqParams,
+                          const MHDFloat c = 1.0);
  
        protected:
  
