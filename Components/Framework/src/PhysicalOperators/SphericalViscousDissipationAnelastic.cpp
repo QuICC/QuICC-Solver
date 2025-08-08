@@ -269,7 +269,15 @@ namespace Physical {
          std::cerr << "v_phi = "<<v.comp(FieldComponents::Physical::PHI).slice(iR).array()<<" \n";
          std::cerr <<" \n";
 
+         std::cerr << "v_rr = "<<Dv.comp(FieldComponents::Physical::R, FieldComponents::Physical::R).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "v_rtheta = "<<Dv.comp(FieldComponents::Physical::R, FieldComponents::Physical::THETA).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
          std::cerr << "v_rphi = "<<Dv.comp(FieldComponents::Physical::R, FieldComponents::Physical::PHI).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "v_thetar = "<<Dv.comp(FieldComponents::Physical::THETA, FieldComponents::Physical::R).slice(iR).array()<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "v_thetatheta = "<<Dv.comp(FieldComponents::Physical::THETA, FieldComponents::Physical::THETA).slice(iR).array()<<" \n";
          std::cerr <<" \n";
          std::cerr << "v_thetaphi = "<<Dv.comp(FieldComponents::Physical::THETA, FieldComponents::Physical::PHI).slice(iR).array()<<" \n";
          std::cerr <<" \n";
@@ -280,6 +288,9 @@ namespace Physical {
          std::cerr << "v_phiphi = "<<Dv.comp(FieldComponents::Physical::PHI, FieldComponents::Physical::PHI).slice(iR).array()<<" \n";
          std::cerr <<" \n";
          std::cerr << "Q_nu = "<< (slice/c)*T(iR_)<<" \n";
+         std::cerr <<" \n";
+         std::cerr << "Di*Q_nu/T = "<< slice<<" \n";
+         std::cerr <<" \n";
          std::cerr << "c = "<< c<<" \n";
 
          

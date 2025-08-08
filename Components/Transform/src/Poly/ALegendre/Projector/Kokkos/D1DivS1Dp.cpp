@@ -27,7 +27,7 @@ void D1DivS1Dp<kokkos_t>::applyUnitOperator(const OpMatrixLZ& rOutView,
    const OpMatrixLZ& inView, const OpVectorI& scan, const int total) const
 {
    constantMultiplyMatrix<1>(this->mspSetup, scan, inView);
-   DivS1<kokkos_t>::applyUnitOperator(rOutView, inView, scan, total);
+   D1DivS1<kokkos_t>::applyUnitOperator(rOutView, inView, scan, total);
 }
 
 } // namespace Projector

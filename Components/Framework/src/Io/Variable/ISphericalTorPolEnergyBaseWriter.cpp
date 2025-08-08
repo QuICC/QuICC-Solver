@@ -173,14 +173,26 @@ namespace Variable {
       coord.communicator().receiveBackward(TId, pInVarPolQ);
 
       // Compute energy reduction
-      spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolQ), 1);
-      std::visit(
-            [&](auto&& p)
-            {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Energy::id());
-            },
-            pInVarPolQ);
-
+      if (mpF == nullptr)
+      {
+         spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolQ), 1);
+         std::visit(
+               [&](auto&& p)
+               {
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Energy::id());
+               },
+               pInVarPolQ);
+      }
+      else
+      {
+         spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolQ), 1);
+         std::visit(
+               [&](auto&& p)
+               {
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Energy::id(), mpF);
+               },
+               pInVarPolQ);
+      }
       // Compute energy in Q component of QST decomposition
       idx = 0;
       if(this->mHasMOrdering)
@@ -243,14 +255,26 @@ namespace Variable {
       coord.communicator().receiveBackward(TId, pInVarPolS);
 
       // Compute energy reduction
-      spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolS), 1);
-      std::visit(
-            [&](auto&& p)
-            {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyD1R1::id());
-            },
-            pInVarPolS);
-
+      if (mpF == nullptr)
+      {
+         spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolS), 1);
+         std::visit(
+               [&](auto&& p)
+               {
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyD1R1::id());
+               },
+               pInVarPolS);
+      }
+      else
+      {
+         spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolS), 1);
+         std::visit(
+               [&](auto&& p)
+               {
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyD1R1::id(),mpF);
+               },
+               pInVarPolS);
+      }
       // Compute energy in S component of QST decomposition
       idx = 0;
       if(this->mHasMOrdering)

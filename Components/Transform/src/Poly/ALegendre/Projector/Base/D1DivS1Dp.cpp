@@ -25,7 +25,7 @@ namespace Projector {
    void D1DivS1Dp<base_t>::applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
    {
       MHDComplex c(0.0,static_cast<MHDFloat>(this->mspSetup->slow(i)));
-      DivS1<base_t>::applyOperator(rOut, i, c*in);
+      D1DivS1<base_t>::applyOperator(rOut, i, c*in);
    }
 
 }

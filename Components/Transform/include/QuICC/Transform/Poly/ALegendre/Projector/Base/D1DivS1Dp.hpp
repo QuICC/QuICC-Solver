@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "QuICC/Transform/Poly/ALegendre/Projector/Base/DivS1.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Projector/Base/D1DivS1.hpp"
 
 namespace QuICC {
 
@@ -31,7 +31,7 @@ namespace Projector {
     * @brief Implementation of the associated Legendre based D1(1/sin P d_phi) projector
     */
    template <>
-   class D1DivS1Dp<base_t>: public DivS1<base_t>
+   class D1DivS1Dp<base_t>: public D1DivS1<base_t>
    {
       public:
          /**
