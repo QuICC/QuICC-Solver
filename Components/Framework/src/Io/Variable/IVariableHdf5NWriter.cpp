@@ -39,6 +39,11 @@ Dimensions::Space::Id IVariableHdf5NWriter::space() const
    return this->mSpaceId;
 }
 
+void IVariableHdf5NWriter::setGit(const std::map<std::string, std::string>& info)
+{
+   this->mGit = info;
+}
+
 void IVariableHdf5NWriter::setPhysical(
    const std::map<std::string, MHDFloat>& parameters,
    const std::map<std::string, std::size_t>& boundary)
@@ -309,6 +314,22 @@ void IVariableHdf5NWriter::writeTruncation()
 
    // close group
    H5Gclose(base);
+}
+
+void IVariableHdf5NWriter::writeGit()
+{
+   // Create the Git information group
+   hid_t group = H5Gcreate(this->file(), Tags::VariableHdf5::GITINFO.c_str(),
+      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+   // Write Git information flags
+   for (auto it = this->mGit.cbegin(); it != this->mGit.cend(); ++it)
+   {
+      this->writeString(group, it->first, it->second);
+   }
+
+   // close group
+   H5Gclose(group);
 }
 
 void IVariableHdf5NWriter::writePhysical()
