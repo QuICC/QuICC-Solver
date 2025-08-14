@@ -23,7 +23,8 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-   ISphericalTorPolEnergyBaseWriter::ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   // anelastic case: pF needs to be an array of pointers to DenseSM profiles with one element (density)
+   ISphericalTorPolEnergyBaseWriter::ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
       : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false), mpF(pF)
    {
    }
@@ -73,7 +74,7 @@ namespace Variable {
       coord.communicator().receiveBackward(TId, pInVarTor);
 
       // Compute energy reduction
-      if (mpF == nullptr)
+      if (mpF.empty())
       {
          // Boussinesq version
          //
@@ -100,7 +101,7 @@ namespace Variable {
          std::visit(
                [&](auto&& p)
                {
-                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyR2::id(), mpF);
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyR2::id(), mpF[0]);
                },
                pInVarTor);
       }
@@ -173,7 +174,7 @@ namespace Variable {
       coord.communicator().receiveBackward(TId, pInVarPolQ);
 
       // Compute energy reduction
-      if (mpF == nullptr)
+      if (mpF.empty())
       {
          spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolQ), 1);
          std::visit(
@@ -189,7 +190,7 @@ namespace Variable {
          std::visit(
                [&](auto&& p)
                {
-                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Energy::id(), mpF);
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Energy::id(), mpF[0]);
                },
                pInVarPolQ);
       }
@@ -255,7 +256,7 @@ namespace Variable {
       coord.communicator().receiveBackward(TId, pInVarPolS);
 
       // Compute energy reduction
-      if (mpF == nullptr)
+      if (mpF.empty())
       {
          spectrum.resize(std::visit([](auto&& p)->int{return p->data().cols();}, pInVarPolS), 1);
          std::visit(
@@ -271,7 +272,7 @@ namespace Variable {
          std::visit(
                [&](auto&& p)
                {
-                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyD1R1::id(),mpF);
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyD1R1::id(),mpF[0]);
                },
                pInVarPolS);
       }

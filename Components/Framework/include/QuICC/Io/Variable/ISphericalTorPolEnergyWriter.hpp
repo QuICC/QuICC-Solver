@@ -36,7 +36,7 @@ namespace Variable {
           * @param type Type of the file (typically scheme name)
           * @param pF   pointer to a radial profile (e.g. density)
           */
-         ISphericalTorPolEnergyWriter(const std::string& prefix, const std::string& type, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF = nullptr);
+         ISphericalTorPolEnergyWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {});
 
          /**
           * @brief Destructor

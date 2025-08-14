@@ -31,8 +31,8 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-
-   ISphericalTorPolLSpectrumWriter::ISphericalTorPolLSpectrumWriter(const std::string& prefix, const std::string& type, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   // anelastic case: pF needs to be an array of pointers to DenseSM profiles with one element (density)
+   ISphericalTorPolLSpectrumWriter::ISphericalTorPolLSpectrumWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
       : ISphericalTorPolEnergyBaseWriter(prefix + Tags::Spectrum::LBASENAME, Tags::Spectrum::EXTENSION, prefix + Tags::Spectrum::HEADER, type, Tags::Spectrum::VERSION, Dimensions::Space::SPECTRAL, OVERWRITE, pF), mTorEnergy(0), mPolEnergy(0)
    {
    }

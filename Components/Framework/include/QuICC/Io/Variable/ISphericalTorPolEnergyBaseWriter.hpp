@@ -40,7 +40,7 @@ namespace Variable {
           * @param id         ID of the dimension space
           * @param mode       Write mode of file
           */
-         ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF = nullptr);
+         ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {});
 
          /**
           * @brief Destructor
@@ -84,9 +84,9 @@ namespace Variable {
          bool mShowParity;
 
          /**
-          * @brief Shared pointer to radial profiles (e.g. density)
+          * @brief Vector of shared pointers to radial profiles (e.g. density)
           */
-         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> mpF;
+         std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> mpF;
 
       private:
          /**

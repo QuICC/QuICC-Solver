@@ -31,6 +31,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   IVariableHdf5Reader.cpp
   ShellAngularMomentumWriter.cpp
   ShellNusseltWriter.cpp
+  ShellLuminosityWriter.cpp
   ShellScalarEnergyWriter.cpp
   ShellScalarLSpectrumWriter.cpp
   ShellScalarMSpectrumWriter.cpp
