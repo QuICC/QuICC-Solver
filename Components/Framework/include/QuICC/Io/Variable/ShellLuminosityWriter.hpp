@@ -41,7 +41,7 @@ namespace Variable {
           */
          ShellLuminosityWriter(const std::string& prefix, 
                                const std::string& type, 
-                               std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF); 
+                               std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF);
 
          /**
           * @brief Destructor
@@ -69,31 +69,16 @@ namespace Variable {
           */
          bool mHasMOrdering;
 
-         /**
-          * @brief Vector of shared pointers to radial profiles (e.g. density)
-          */
-         std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> mpF;
-
-         /**
-          * @brief shared pointers to density*Temperature*kappa profile 
-          */
-         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> mpRhoTempKappa;
-
-         /**
-          * @brief shared pointers to D1ConductiveEntropy profile 
-          */
-         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> mpD1Sc;
-
       private:
-         /**
-          * @brief Luminosity
-          */
-         Array mLuminosity;
-
          /**
           * @brief Nusselt number
           */
          Array mNusselt;
+
+         /**
+          * @brief Luminosity
+          */
+         Array mLuminosity;
 
          /*
           * @brief Heat flux from background profile
@@ -104,6 +89,16 @@ namespace Variable {
           * @brief Origin projector
           */
          Matrix mBoundary;
+
+         /**
+          * @brief shared pointers to density*Temperature*kappa profile 
+          */
+         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> mpRhoTempKappa;
+
+         /**
+          * @brief shared pointers to D1ConductiveEntropy profile 
+          */
+         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> mpD1Sc;
    };
 
    /// Typedef for a shared pointer of a HDF5 state file writer

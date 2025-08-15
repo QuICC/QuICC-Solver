@@ -16,8 +16,6 @@
 //
 #include <iomanip>
 #include <stdexcept>
-#include <cassert>
-#include <iostream>
 
 // External includes
 //
@@ -33,6 +31,7 @@
 #include "QuICC/NonDimensional/Upper1d.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Heating.hpp"
+#include "QuICC/NonDimensional/Beta.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "QuICC/Io/Variable/Tags/Luminosity.hpp"
 
@@ -41,14 +40,11 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-   // pF is a vector of pointers to denseSM profiles. Needs to be:
-   // pF[0] = pointer to kappa*Temperature*density
-   // pf[1] = pointer to D1(ConductiveEntropy)
+
    ShellLuminosityWriter::ShellLuminosityWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
-      : IVariableAsciiWriter(prefix + Tags::Luminosity::BASENAME, Tags::Luminosity::EXTENSION, prefix + Tags::Luminosity::HEADER, type, Tags::Luminosity::VERSION, Dimensions::Space::SPECTRAL, EXTEND), mHasMOrdering(false), mLuminosity(2), mBackground(2), mBoundary(0,0)//, mpF(pF)
+      : IVariableAsciiWriter(prefix + Tags::Luminosity::BASENAME, Tags::Luminosity::EXTENSION, prefix + Tags::Luminosity::HEADER, type, Tags::Luminosity::VERSION, Dimensions::Space::SPECTRAL, EXTEND), mHasMOrdering(false), mNusselt(2), mLuminosity(2), mBackground(2), mBoundary(0,0)
    {
       assert(pF.size() >= 2 && "ShellLuminosityWriter requires at least 2 elements in pF vector");
-      mpF = pF;
       mpRhoTempKappa = pF[0];
       mpD1Sc = pF[1];
    }
@@ -61,14 +57,6 @@ namespace Variable {
    {
       this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::SpectralOrdering123);
       const auto& tRes = *this->res().cpu()->dim(Dimensions::Transform::SPECTRAL);
-
-      auto ro = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
-      auto ri = this->mPhysical.find(NonDimensional::Lower1d::id())->second->value();
-      auto a = (ro - ri)/2.0;
-
-      Internal::Array rbArr(2);
-      rbArr(0) = ro;
-      rbArr(1) = ri;
 
       int m0, l0;
       if(this->mHasMOrdering)
@@ -84,6 +72,14 @@ namespace Variable {
       // Look for l = 0, m = 0 mode
       if(m0 == 0 && l0 == 0)
       {
+         auto ro = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
+         auto ri = this->mPhysical.find(NonDimensional::Lower1d::id())->second->value();
+         auto a = (ro - ri)/2.0;
+
+         Internal::Array rbArr(2);
+         rbArr(0) = ro;
+         rbArr(1) = ri;
+
 
          this->mBackground.resize(2);
          int flag = this->mPhysical.find(NonDimensional::Heating::id())->second->value();
@@ -91,12 +87,17 @@ namespace Variable {
          if(flag == 0)
          {
             Internal::Array bgArray = -(this->mpRhoTempKappa->evaluate(rbArr,0,0).array()) * (this->mpD1Sc->evaluate(rbArr,0,0).array());
+            //this->mBackground(0) = -ro;
+            //this->mBackground(1) = -ri;
             this->mBackground(0) = bgArray(0) * (4.0*Math::PI)*ro*ro;
             this->mBackground(1) = bgArray(1) * (4.0*Math::PI)*ri*ri;    
-
          }
          else if(flag == 1)
          {
+            throw std::logic_error("Unknown background profile for spherical shell Luminosity writer. Potentially outdated option");
+         }
+         else if(flag == 2 || flag ==3)
+         {            
             throw std::logic_error("Unknown background profile for spherical shell Luminosity writer. Potentially outdated option");
          }
          else
@@ -108,6 +109,8 @@ namespace Variable {
          this->mBoundary.resize(nN, 2);
          for(int i = 0; i < this->mBoundary.rows(); i++)
          {
+            //this->mBoundary(i,0) = (2.0/a)*i*i/std::sqrt(4.0*Math::PI);
+            //this->mBoundary(i,1) = std::pow(-1,i+1)*this->mBoundary(i,0);
             this->mBoundary(i,0) = (2.0/a)*i*i/std::sqrt(4.0*Math::PI)   * (4.0*Math::PI)*ro*ro*(-this->mpRhoTempKappa->evaluate(rbArr,0,0).array()(0));
             this->mBoundary(i,1) = std::pow(-1,i+1)*this->mBoundary(i,0) * (4.0*Math::PI)*ri*ri*(-this->mpRhoTempKappa->evaluate(rbArr,0,0).array()(1)); 
          }
@@ -128,13 +131,11 @@ namespace Variable {
 
       if(this->mBackground.size() > 0)
       {
-         //std::cerr<<this->mBoundary.array()<<"\n";
-         
          this->mNusselt = std::visit([&](auto&& p)->Array{return (this->mBackground + this->mBoundary.transpose()*p->dom(0).total().profile(0,0).real()).array()/this->mBackground.array();}, sRange.first->second);
          this->mLuminosity = std::visit([&](auto&& p)->Array{return (this->mBackground + this->mBoundary.transpose()*p->dom(0).total().profile(0,0).real()).array();}, sRange.first->second);
-         //this->mLuminosity = std::visit([&](auto&& p)->Array{return (this->mBackground);}, sRange.first->second);
       } else
       {
+         this->mNusselt.setZero();
          this->mLuminosity.setZero();
       }
 
@@ -143,6 +144,7 @@ namespace Variable {
 
       // Get the "global" Kinetic energy from MPI code
       #ifdef QUICC_MPI
+         MPI_Allreduce(MPI_IN_PLACE, this->mNusselt.data(), this->mNusselt.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
          MPI_Allreduce(MPI_IN_PLACE, this->mLuminosity.data(), this->mLuminosity.size(), MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
       #endif //QUICC_MPI
 
@@ -153,16 +155,18 @@ namespace Variable {
       if(QuICCEnv().allowsIO())
       {
          this->mFile << std::scientific;
-         this->mFile << std::setprecision(ioPrec) << ioFW(ioPrec) << this->mTime << "\t" << ioFW(ioPrec) << this->mLuminosity(0) << "\t" << ioFW(ioPrec) << this->mNusselt(0) << "\t" << ioFW(ioPrec) << this->mLuminosity(1)<< "\t" << ioFW(ioPrec) << this->mNusselt(1) << std::endl;
+         //this->mFile << std::setprecision(ioPrec) << ioFW(ioPrec) << this->mTime << "\t" << ioFW(ioPrec) << this->mNusselt(0) << "\t" << ioFW(ioPrec) << this->mNusselt(1) << std::endl;
+         this->mFile << std::setprecision(ioPrec) << ioFW(ioPrec) << this->mTime << "\t" << ioFW(ioPrec) << this->mLuminosity(0) << "\t" << ioFW(ioPrec) << this->mNusselt(0) << "\t" << ioFW(ioPrec) << this->mLuminosity(1) << "\t" << ioFW(ioPrec) << this->mNusselt(1) << std::endl;
+
       }
 
       // Close file
       this->postWrite();
 
       // Abort if kinetic energy is NaN
-      if(std::isnan(this->mLuminosity.sum()))
+      if(std::isnan(this->mNusselt.sum()) || std::isnan(this->mLuminosity.sum()))
       {
-         QuICCEnv().abort("Spherical shell Luminosity is NaN!");
+         QuICCEnv().abort("Spherical shell Luminosity or Nusselt is NaN!");
       }
    }
 
