@@ -80,6 +80,28 @@ namespace Operators {
    }
 
    // Function to compute the integral of r^p T_n(x)
+   // Calculates operator iop to calculate 
+   // \int_ri^ro f(r) r^p dr = iop^T * f_n
+   //
+   // * some details: *
+   //
+   // iop = a \int_{-1}^1 T_n(x) r^p dx,  where r = ax + b
+   //
+   // The function integrateRpTn makes use of:
+   //
+   // 1) x^n = \sum'_{j=0}^n c_j T_j(x) ; where \sum' is a \sum with the j=0 term multiplied by 0.5
+   //       and c_j = 2^(1-n) * binomial_coefficient(n ; (n-j)/2) ; for n-j even
+   //           c_j = 0 ; for n-j odd
+   // (see for example Sabara, 2021)
+   // 
+   // 2) \int_{-1}^1 T_n T_j dx = (1/2) * \int_{-1}^1 [ T_{n+j} + T_{|n-j|} ] dx 
+   // (see for example Wikipedia)
+   //
+   // 3) \int_{-1}^1 T_n dx = ((-1)^n + 1)/(1-n^2) ; for n!=1, 0 otherwise
+   // (see for example Wikipedia)
+   //
+   // combining 1) 2) 3) we can get to a closed formula for iop. It requires some index reordering to get to the final formula.
+   //
    void integrateRpTn(Internal::Matrix& iop, const int p, const int nN, const MHDFloat ro, const MHDFloat ri)
    {
 
