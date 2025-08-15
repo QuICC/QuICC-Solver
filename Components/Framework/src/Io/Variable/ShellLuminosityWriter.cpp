@@ -112,7 +112,7 @@ namespace Variable {
             //this->mBoundary(i,0) = (2.0/a)*i*i/std::sqrt(4.0*Math::PI);
             //this->mBoundary(i,1) = std::pow(-1,i+1)*this->mBoundary(i,0);
             this->mBoundary(i,0) = (2.0/a)*i*i/std::sqrt(4.0*Math::PI)   * (4.0*Math::PI)*ro*ro*(-this->mpRhoTempKappa->evaluate(rbArr,0,0).array()(0));
-            this->mBoundary(i,1) = std::pow(-1,i+1)*this->mBoundary(i,0) * (4.0*Math::PI)*ri*ri*(-this->mpRhoTempKappa->evaluate(rbArr,0,0).array()(1)); 
+            this->mBoundary(i,1) = std::pow(-1,i+1)*(2.0/a)*i*i/std::sqrt(4.0*Math::PI) * (4.0*Math::PI)*ri*ri*(-this->mpRhoTempKappa->evaluate(rbArr,0,0).array()(1)); 
          }
       }
       else
