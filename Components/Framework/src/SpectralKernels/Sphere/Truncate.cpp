@@ -25,8 +25,12 @@
 #include "QuICC/Bc/Name/NoSlip.hpp"
 #include "QuICC/Bc/Name/StressFree.hpp"
 #include "QuICC/Bc/Name/NoPenetration.hpp"
+#include "QuICC/SparseSM/Worland/Id.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/Value.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/D1.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/ValueD1.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/ValueD2.hpp"
+#include "QuICC/SparseSM/Worland/Stencil/InsulatingSphere.hpp"
 #include "QuICC/Solver/SparseSolver.hpp"
 #include "QuICC/SparseSolvers/SparseLinearSolverTools.hpp"
 
@@ -141,57 +145,28 @@ namespace Sphere {
                            {
                               iv(i,0) = tv(i,0);
                            }
-                           tv.setZero();
                            iv = intg.transpose() * (proj * iv);
 
-                           // Convert to Galerkin basis
-                           if(this->mBcId > 0)
-                           {
-                              SparseMatrix matS;
-                              if(this->mBcId == Bc::Name::FixedTemperature::id() || this->mBcId == Bc::Name::Insulating::id())
-                              {
-                                 SparseSM::Worland::Stencil::Value S(inNPoly-1, inNPoly-1, outAlpha, outDBeta, l_);
-                                 matS = S.mat();
-                              }
-                              else if(this->mBcId == Bc::Name::FixedFlux::id())
-                              {
-                                 SparseSM::Worland::Stencil::D1 S(inNPoly-1, inNPoly-1, outAlpha, outDBeta, l_);
-                                 matS = S.mat();
-                              }
-                              else
-                              {
-                                 throw std::logic_error("Unknown boundary condition");
-                              }
-                              matS.makeCompressed();
-                              Framework::Selector::SparseSolver<SparseMatrix> solver;
-                              solver.compute(matS);
-                              tv = iv.topRows(matS.rows());
-                              Solver::details::solveWrapper(iv, solver, tv);
-
-                              // Truncate Galerkin expansion
-                              int nPoly = outNPoly - (inNPoly - matS.rows());
-                              tv = iv.topRows(nPoly);
-                              if(this->mBcId == Bc::Name::FixedTemperature::id() || this->mBcId == Bc::Name::Insulating::id())
-                              {
-                                 SparseSM::Worland::Stencil::Value S(nPoly+1, nPoly, outAlpha, outDBeta, l_);
-                                 matS = S.mat();
-                              }
-                              else if(this->mBcId == Bc::Name::FixedFlux::id())
-                              {
-                                 SparseSM::Worland::Stencil::D1 S(nPoly+1, nPoly, outAlpha, outDBeta, l_);
-                                 matS = S.mat();
-                              }
-                              else
-                              {
-                                 throw std::logic_error("Unknown boundary condition");
-                              }
-                              matS.makeCompressed();
-                              iv = matS * tv;
-                           }
-                           else
+                           // Truncate Galerkin expansion
+                           SparseMatrix matS = stencil(inNPoly, outAlpha, outDBeta, l_, true);
+                           if(this->mBcId == 0 || matS.rows() == 0)
                            {
                               tv = iv.topRows(outNPoly);
                               iv = tv;
+                           }
+                           else
+                           {
+                              Framework::Selector::SparseSolver<SparseMatrix> solver;
+                              solver.compute(matS);
+                              tv = iv.topRows(matS.rows());
+                              iv = tv;
+                              iv.setZero();
+                              Solver::details::solveWrapper(iv, solver, tv);
+
+                              int nPoly = outNPoly - (inNPoly - matS.rows());
+                              matS = stencil(outNPoly, outAlpha, outDBeta, l_, false);
+                              tv = iv.topRows(nPoly);
+                              iv = matS * tv;
                            }
 
                            // Project back to original basis
@@ -222,6 +197,8 @@ namespace Sphere {
             }
             else
             {
+               throw std::logic_error("Not yet implemented for L ordering");
+
                typedef typename std::remove_cv<decltype(comp.point(0,0,0))>::type  DataType;
                typedef Eigen::Matrix<DataType, Eigen::Dynamic, Eigen::Dynamic>  MatType;
 
@@ -298,6 +275,70 @@ namespace Sphere {
             throw std::logic_error("Missing field");
          }
       }
+   }
+
+   SparseMatrix Truncate::stencil(const int tN, const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta, const int l, const bool isSquare)
+   {
+      const std::size_t& bcId = this->mBcId;
+      const FieldComponents::Spectral::Id& comp = this->mComp;
+
+      SparseMatrix matS;
+      int bc = 0;
+      if(
+         bcId == Bc::Name::FixedTemperature::id() ||
+         (comp == FieldComponents::Spectral::TOR && bcId == Bc::Name::Insulating::id()) ||
+         (comp == FieldComponents::Spectral::POL && bcId == Bc::Name::NoPenetration::id())
+         )
+      {
+         bc = 1;
+         SparseSM::Worland::Stencil::Value S(tN, tN - bc, alpha, dBeta, l);
+         matS = S.mat();
+      }
+      else if(bcId == Bc::Name::FixedFlux::id())
+      {
+         bc = 1;
+         SparseSM::Worland::Stencil::D1 S(tN, tN - bc, alpha, dBeta, l);
+         matS = S.mat();
+      }
+      else if(
+         (comp == FieldComponents::Spectral::POL && bcId == Bc::Name::Insulating::id())
+         )
+      {
+         bc = 1;
+         SparseSM::Worland::Stencil::InsulatingSphere S(tN, tN - bc, alpha, dBeta, l);
+         matS = S.mat();
+      }
+      else if(bcId == Bc::Name::NoSlip::id())
+      {
+         bc = 2;
+         SparseSM::Worland::Stencil::ValueD1 S(tN, tN - bc, alpha, dBeta, l);
+         matS = S.mat();
+      }
+      else if(bcId == Bc::Name::StressFree::id())
+      {
+         bc = 2;
+         SparseSM::Worland::Stencil::ValueD2 S(tN, tN - bc, alpha, dBeta, l);
+         matS = S.mat();
+      }
+      else if(
+         (comp == FieldComponents::Spectral::TOR && bcId == Bc::Name::NoPenetration::id())
+         )
+      {
+         matS.resize(0,0);
+      }
+      else
+      {
+         throw std::logic_error("Unknown boundary condition");
+      }
+      matS.makeCompressed();
+
+      if (isSquare && matS.rows() > 0)
+      {
+         SparseSM::Worland::Id qId(tN - bc, tN, alpha, dBeta, l);
+         matS = qId.mat() * matS;
+      }
+
+      return matS;
    }
 
 } // Sphere

@@ -68,6 +68,17 @@ public:
    virtual void apply(const std::size_t timeId) final;
 
 protected:
+   /**
+    * @brief Get Galerkin stencil
+    *
+    * @param tN         Tau truncation
+    * @param alpha      Worland alpha
+    * @param dBeta      Worland dBeta
+    * @param l          harmonic degree
+    * @param isSquare   Build square operator
+    */
+   SparseMatrix stencil(const int tN, const Internal::MHDFloat alpha, const Internal::MHDFloat dBeta, const int l, const bool isSquare);
+
 private:
    /**
     * @brief Spectral component to act on
