@@ -34,6 +34,8 @@
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/EnergyY2.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/EnergyD1Y1.hpp"
 
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Spectrum.hpp"
+
 #include "QuICC/Transform/Forward/P.hpp"
 #include "QuICC/Transform/Forward/R1.hpp"
 #include "QuICC/Transform/Forward/Pol.hpp"
@@ -58,6 +60,10 @@
 #include "QuICC/Transform/Reductor/Energy.hpp"
 #include "QuICC/Transform/Reductor/EnergyR2.hpp"
 #include "QuICC/Transform/Reductor/EnergyD1R1.hpp"
+
+#include "QuICC/Transform/Reductor/PowerR2.hpp"
+
+#include "QuICC/Transform/Reductor/Spectrum.hpp"
 
 namespace QuICC {
 
@@ -92,6 +98,9 @@ namespace Transform {
       this->addOperator<Fft::Chebyshev::LinearMap::Reductor::Energy>(m, Reductor::Energy::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Reductor::EnergyD1Y1>(m, Reductor::EnergyD1R1::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Reductor::EnergyY2>(m, Reductor::EnergyR2::id());
+
+      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::Spectrum>(m, Reductor::Spectrum::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Reductor::Spectrum>(m, Reductor::PowerR2::id());
    }
  
 } // Transform
