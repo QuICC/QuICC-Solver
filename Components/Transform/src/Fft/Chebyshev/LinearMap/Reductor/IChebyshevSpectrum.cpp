@@ -107,7 +107,7 @@ namespace Reductor {
       // field in physical space
       this->mBackend.applyFft(tmpOut, tmpIn);  
       // divide by sqrt(rho)
-      tmpOut = tmpOut.array().colwise() / rho.array().pow(1/2);
+      tmpOut = tmpOut.array().colwise() / rho.array().pow(0.5);
       // calculate spectra
       this->mBackend.applyFwdFft(tmpOut, tmpOut); 
       // adjust for fft scaling:
@@ -123,7 +123,7 @@ namespace Reductor {
       // field in physical space
       this->mBackend.applyFft(tmpOut, tmpIn); 
       // divide by sqrt(rho)
-      tmpOut = tmpOut.array().colwise() / rho.array().pow(1/2);
+      tmpOut = tmpOut.array().colwise() / rho.array().pow(0.5);
       // calculate spectra
       this->mBackend.applyFwdFft(tmpOut, tmpOut); 
       // adjust for fft scaling:
