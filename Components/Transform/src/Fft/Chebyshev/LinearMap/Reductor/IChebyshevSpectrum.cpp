@@ -55,12 +55,12 @@ namespace Reductor {
    {
       rOut = in.array().abs2();
 
-      std::cerr << "in = \n";
-      std::cerr << in << "\n";
-      std::cerr << "\n";
-      std::cerr << "rOut = \n";
-      std::cerr << rOut << "\n";
-      std::cerr << "\n";
+      //std::cerr << "in = \n";
+      //std::cerr << in << "\n";
+      //std::cerr << "\n";
+      //std::cerr << "rOut = \n";
+      //std::cerr << rOut << "\n";
+      //std::cerr << "\n";
 
       /*
       // Energy version
@@ -106,20 +106,10 @@ namespace Reductor {
       this->mBackend.input(tmpIn,in,true); 
       // field in physical space
       this->mBackend.applyFft(tmpOut, tmpIn);  
-
-      std::cerr << "tmpOut, physical space = \n";
-      std::cerr << tmpOut << "\n";
-      std::cerr << "\n";
-
       // divide by sqrt(rho)
       tmpOut = tmpOut.array().colwise() / rho.array().pow(1/2);
       // calculate spectra
       this->mBackend.applyFwdFft(tmpOut, tmpOut); 
-
-      std::cerr << "tmpOut, spectral space = \n";
-      std::cerr << tmpOut << "\n";
-      std::cerr << "\n";
-
       // adjust for fft scaling:
       tmpOut = tmpOut.array()*(this->mBackend.getFftScaling());
       // square it
@@ -127,45 +117,26 @@ namespace Reductor {
       // store real part of spectra in a new temporary matrix:
       //Matrix tmpOutIm = tmpOut;
 
-      std::cerr << "tmpSquare, imaginary = \n";
-      std::cerr << tmpSquare << "\n";
-      std::cerr << "\n";
-
       // imaginary part:
       //this->applyPreOperator(tmpIn, in, false);
       this->mBackend.input(tmpIn,in,false);
       // field in physical space
       this->mBackend.applyFft(tmpOut, tmpIn); 
-
-      std::cerr << "tmpOut, physical space = \n";
-      std::cerr << tmpOut << "\n";
-      std::cerr << "\n";
-
       // divide by sqrt(rho)
       tmpOut = tmpOut.array().colwise() / rho.array().pow(1/2);
       // calculate spectra
       this->mBackend.applyFwdFft(tmpOut, tmpOut); 
-
-      std::cerr << "tmpOut, spectral space = \n";
-      std::cerr << tmpOut << "\n";
-      std::cerr << "\n";
-
-
       // adjust for fft scaling:
       tmpOut = tmpOut.array()*(this->mBackend.getFftScaling());
       // square it
       this->mBackend.square(tmpSquare, tmpOut, false); // tmpSquare now contains the spectral coefficients, imaginary and real part
 
-      std::cerr << "tmpSquare, real + imaginary = \n";
-      std::cerr << tmpSquare << "\n";
-      std::cerr << "\n";
-
       rOut = tmpSquare;
       //this->mBackend.square(tmpSquare, tmpOut, false);
 
-      std::cerr << "rOut = \n";
-      std::cerr << rOut << "\n";
-      std::cerr << "\n";
+      //std::cerr << "rOut = \n";
+      //std::cerr << rOut << "\n";
+      //std::cerr << "\n";
 
       //this->applyPostOperator(rOut, tmpOut);  // I don't think we need this for Chebyshev spectra calculation
       // HOWEVER::::
