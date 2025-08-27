@@ -42,6 +42,7 @@ namespace Reductor {
       this->mBackend.input(tmp, in);
    }
 
+   // I don't think we need this
    void Spectrum::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
    {
       assert(rOut.cols() == 1);

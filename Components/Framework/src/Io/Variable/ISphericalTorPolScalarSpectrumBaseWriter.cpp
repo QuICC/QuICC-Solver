@@ -31,8 +31,8 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-   ISphericalTorPolScalarSpectrumBaseWriter::ISphericalTorPolScalarSpectrumBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode)
-      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false)
+   ISphericalTorPolScalarSpectrumBaseWriter::ISphericalTorPolScalarSpectrumBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
+      : IVariableAsciiWriter(name, ext, header, type, version, id, mode), mHasMOrdering(false), mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()), mShowParity(false), mpF(pF)
    {
    }
 
@@ -106,13 +106,26 @@ namespace Variable {
       size.first = nN;
 
       // Compute power reduction
-      spectrum.resize(size.first, size.second);
-      std::visit(
-            [&](auto&& p)
-            {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Spectrum::id());
-            },
-            pInVarTor);
+      if (mpF.empty())
+      {
+         spectrum.resize(size.first, size.second);
+         std::visit(
+               [&](auto&& p)
+               {
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Spectrum::id()); //I don't really need Spectrum. A generic IChebyshevSpectrum (or a random Power operator, I am not using it anyway) would suffice
+               },
+               pInVarTor);
+      }
+      else 
+      {
+         spectrum.resize(size.first, size.second);
+         std::visit(
+               [&](auto&& p)
+               {
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Spectrum::id(), mpF[0]);
+               },
+               pInVarTor);
+      }
 
       this->resetPower();
 
@@ -184,13 +197,27 @@ namespace Variable {
       coord.communicator().receiveBackward(TId, pInVarPolS);
 
       // Compute power reduction
-      spectrum.setZero();
-      std::visit(
-            [&](auto&& p)
-            {
-               coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Spectrum::id());
-            },
-            pInVarPolS);
+      if (mpF.empty())
+      {
+         spectrum.setZero();
+         std::visit(
+               [&](auto&& p)
+               {
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Spectrum::id());
+               },
+               pInVarPolS);
+      }
+      else
+      {
+         spectrum.setZero();
+         std::visit(
+               [&](auto&& p)
+               {
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Spectrum::id(), mpF[0]);
+               },
+               pInVarPolS);
+      }
+
 
       // Compute power in S component of QST decomposition
       idx = 0;

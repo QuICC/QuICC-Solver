@@ -116,6 +116,11 @@ namespace Fftw {
           */
          Array& getEGrid() const;
 
+         /**
+          * @brief Get fft scaling
+          */
+         MHDFloat getFftScaling() const;
+
       protected:
 
       private:

@@ -129,6 +129,11 @@ namespace Backend {
    {
       return this->mpImpl->getEGrid();
    }
+
+   MHDFloat ChebyshevEnergy::getFftScaling() const
+   {
+      return this->mpImpl->getFftScaling();
+   }
 }
 }
 }

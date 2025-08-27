@@ -202,6 +202,11 @@ namespace Fftw {
       return this->mEGrid;
    }
 
+   MHDFloat ChebyshevEnergy::getFftScaling() const
+   {
+      return this->mFftScaling;
+   }
+
 }
 }
 }

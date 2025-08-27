@@ -7,6 +7,13 @@
 //
 #include <cassert>
 #include <stdexcept>
+// ****************
+//Stuff that needs to be removed later
+#include <cstdio>
+#include <filesystem>
+#include <sstream>
+#include <iostream>
+// ****************
 
 // External includes
 //
@@ -47,6 +54,14 @@ namespace Reductor {
    void IChebyshevSpectrum::transform(Matrix& rOut, const MatrixZ& in) const
    {
       rOut = in.array().abs2();
+
+      std::cerr << "in = \n";
+      std::cerr << in << "\n";
+      std::cerr << "\n";
+      std::cerr << "rOut = \n";
+      std::cerr << rOut << "\n";
+      std::cerr << "\n";
+
       /*
       // Energy version
       assert(this->isInitialized());
@@ -70,30 +85,91 @@ namespace Reductor {
    // anelastic version:
    void IChebyshevSpectrum::transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
    {
-      throw std::logic_error("Anelastic spectrum not yet implemented");
-      /*
+      //throw std::logic_error("Anelastic spectrum not yet implemented");
+      
       // Energy version
-      assert(this->isInitialized());
-      assert(rOut.cols() == this->outCols());
-      assert(rOut.rows() == this->outRows());
+      //assert(this->isInitialized());
+      //assert(rOut.cols() == this->outCols()); // fails
+      //assert(rOut.rows() == this->outRows());
 
       auto eGrid = this->mBackend.getEGrid();
       
       auto rho = pF->evaluate(eGrid,0,0);
 
       auto& tmpIn = this->mBackend.getStorage(StorageKind::in);
+      //auto& tmpOutRe = this->mBackend.getStorage(StorageKind::out);
       auto& tmpOut = this->mBackend.getStorage(StorageKind::out);
       auto& tmpSquare = this->mBackend.getStorage(StorageKind::mid);
-      this->applyPreOperator(tmpIn, in, true);
-      this->mBackend.applyFft(tmpOut, tmpIn);
-      this->mBackend.square(tmpSquare, tmpOut, true);
-      this->applyPreOperator(tmpIn, in, false);
-      this->mBackend.applyFft(tmpOut, tmpIn);
-      this->mBackend.square(tmpSquare, tmpOut, false);
-      tmpSquare = tmpSquare.array().colwise() / rho.array(); // divides energy by rho
-      this->mBackend.applyFwdFft(tmpOut, tmpSquare);
-      this->applyPostOperator(rOut, tmpOut);
-      */
+
+      // real part:
+      //this->applyPreOperator(tmpIn, in, true);
+      this->mBackend.input(tmpIn,in,true); 
+      // field in physical space
+      this->mBackend.applyFft(tmpOut, tmpIn);  
+
+      std::cerr << "tmpOut, physical space = \n";
+      std::cerr << tmpOut << "\n";
+      std::cerr << "\n";
+
+      // divide by sqrt(rho)
+      tmpOut = tmpOut.array().colwise() / rho.array().pow(1/2);
+      // calculate spectra
+      this->mBackend.applyFwdFft(tmpOut, tmpOut); 
+
+      std::cerr << "tmpOut, spectral space = \n";
+      std::cerr << tmpOut << "\n";
+      std::cerr << "\n";
+
+      // adjust for fft scaling:
+      tmpOut = tmpOut.array()*(this->mBackend.getFftScaling());
+      // square it
+      this->mBackend.square(tmpSquare, tmpOut, true); // tmpSquare now contains the spectral coefficients, real part
+      // store real part of spectra in a new temporary matrix:
+      //Matrix tmpOutIm = tmpOut;
+
+      std::cerr << "tmpSquare, imaginary = \n";
+      std::cerr << tmpSquare << "\n";
+      std::cerr << "\n";
+
+      // imaginary part:
+      //this->applyPreOperator(tmpIn, in, false);
+      this->mBackend.input(tmpIn,in,false);
+      // field in physical space
+      this->mBackend.applyFft(tmpOut, tmpIn); 
+
+      std::cerr << "tmpOut, physical space = \n";
+      std::cerr << tmpOut << "\n";
+      std::cerr << "\n";
+
+      // divide by sqrt(rho)
+      tmpOut = tmpOut.array().colwise() / rho.array().pow(1/2);
+      // calculate spectra
+      this->mBackend.applyFwdFft(tmpOut, tmpOut); 
+
+      std::cerr << "tmpOut, spectral space = \n";
+      std::cerr << tmpOut << "\n";
+      std::cerr << "\n";
+
+
+      // adjust for fft scaling:
+      tmpOut = tmpOut.array()*(this->mBackend.getFftScaling());
+      // square it
+      this->mBackend.square(tmpSquare, tmpOut, false); // tmpSquare now contains the spectral coefficients, imaginary and real part
+
+      std::cerr << "tmpSquare, real + imaginary = \n";
+      std::cerr << tmpSquare << "\n";
+      std::cerr << "\n";
+
+      rOut = tmpSquare;
+      //this->mBackend.square(tmpSquare, tmpOut, false);
+
+      std::cerr << "rOut = \n";
+      std::cerr << rOut << "\n";
+      std::cerr << "\n";
+
+      //this->applyPostOperator(rOut, tmpOut);  // I don't think we need this for Chebyshev spectra calculation
+      // HOWEVER::::
+      // the result of FwdFftw is 2*Ngrid too big. Postoperator does something to fix this, I guess.
    }
 
 
@@ -122,8 +198,8 @@ namespace Reductor {
       /*
       // Energy version
       assert(this->isInitialized());
-      assert(rOut.cols() == this->outCols());
-      assert(rOut.rows() == this->outRows());
+      //assert(rOut.cols() == this->outCols());
+      //assert(rOut.rows() == this->outRows());
 
       auto eGrid = this->mBackend.getEGrid();
       
@@ -135,7 +211,7 @@ namespace Reductor {
       this->applyPreOperator(tmpIn, in);
       this->mBackend.applyFft(tmpOut, tmpIn);
       this->mBackend.square(tmpSquare, tmpOut, true);
-      tmpSquare = tmpSquare.array().colwise() / rho.array(); // divides energy by rho
+      //tmpSquare = tmpSquare.array().colwise() / rho.array(); // divides energy by rho
       this->mBackend.applyFwdFft(tmpOut, tmpSquare);
       this->applyPostOperator(rOut, tmpOut);
       */

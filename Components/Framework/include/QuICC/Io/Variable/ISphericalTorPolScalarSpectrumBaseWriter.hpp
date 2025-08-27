@@ -21,6 +21,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -45,7 +46,7 @@ namespace Variable {
           * @param id         ID of the dimension space
           * @param mode       Write mode of file
           */
-         ISphericalTorPolScalarSpectrumBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND);
+         ISphericalTorPolScalarSpectrumBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {});
 
          /**
           * @brief Destructor
@@ -87,6 +88,11 @@ namespace Variable {
           * @brief Flag to show parity split in power
           */
          bool mShowParity;
+
+         /**
+          * @brief Vector of shared pointers to radial profiles (e.g. density)
+          */
+         std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> mpF;
 
       private:
          /**

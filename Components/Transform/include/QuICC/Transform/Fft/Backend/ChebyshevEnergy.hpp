@@ -150,6 +150,12 @@ namespace Backend {
           *
           */
          Array& getEGrid() const;
+         
+         /**
+          * @brief Get fft scaling
+          *
+          */
+         MHDFloat getFftScaling() const;
 
          /**
           * @brief Get the temporary storage

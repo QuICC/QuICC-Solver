@@ -54,13 +54,15 @@ namespace Reductor {
       auto& tmpOut = this->mBackend.getStorage(StorageKind::out);
       auto& tmpSquare = this->mBackend.getStorage(StorageKind::mid);
       this->applyPreOperator(tmpIn, in, true);
-      this->mBackend.applyFft(tmpOut, tmpIn);
-      this->mBackend.square(tmpSquare, tmpOut, true);
+      this->mBackend.applyFft(tmpOut, tmpIn); // calculates toroidal/poloidal scalars in physical space (with pre-operator applied earlier). Puts it in tmpOut
+      this->mBackend.square(tmpSquare, tmpOut, true); // squares it, put the result in tmpSquare
       this->applyPreOperator(tmpIn, in, false);
       this->mBackend.applyFft(tmpOut, tmpIn);
       this->mBackend.square(tmpSquare, tmpOut, false);
-      this->mBackend.applyFwdFft(tmpOut, tmpSquare);
-      this->applyPostOperator(rOut, tmpOut);
+      this->mBackend.applyFwdFft(tmpOut, tmpSquare); // calculates Chebyshev coefficients of tmpSquare
+      this->applyPostOperator(rOut, tmpOut); //this does the correct energy integral
+      // For Energy.cpp, this integration is found in -> Fftw/ChebyshevEnergy.cpp::output(Matrix& rOut, const Matrix& tmp) 
+      // which calculates the correct integral (NOT an FFT), using \int T_n dx (see for example Wikipedia)
    }
 
    // anelastic version:
