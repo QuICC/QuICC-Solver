@@ -42,7 +42,7 @@ list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
 add_subdirectory(Projector)
 add_subdirectory(Integrator)
-#add_subdirectory(Reductor)
+add_subdirectory(Reductor)
 #add_subdirectory(BFLoop)
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)

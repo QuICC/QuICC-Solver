@@ -1,6 +1,6 @@
 /**
  * @file @Op@@Tag@.cpp
- * @brief Wrapper of the Worland @Op@ Reductor
+ * @brief Wrapper of the Finite Difference sphere @Op@ Reductor
  */
 
 // System includes
@@ -8,9 +8,9 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Wrappers/Worland/Reductor/@Op@@Tag@.hpp.inc"
-#include "ViewOps/Worland/OpsBuilder.hpp"
-#include "ViewOps/Worland/OpsQuadrature.hpp"
+#include "QuICC/Transform/Wrappers/FiniteDiff/Sphere/Reductor/@Op@@Tag@.hpp.inc"
+#include "ViewOps/FiniteDiff/Sphere/OpsBuilder.hpp"
+#include "ViewOps/FiniteDiff/Sphere/OpsQuadrature.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
@@ -19,15 +19,15 @@
 #include "ViewOps/Reduction/Cpu/Reduction.hpp"
 #include "ViewOps/Quadrature/Op.hpp"
 #include "ViewOps/Quadrature/Impl.hpp"
-#include "ViewOps/Worland/Tags.hpp"
-#include "ViewOps/Worland/Builder.hpp"
+#include "ViewOps/FiniteDiff/Sphere/Tags.hpp"
+#include "ViewOps/FiniteDiff/Sphere/Builder.hpp"
 #include "Profiler/Interface.hpp"
 @CppHeaders@
 
 namespace QuICC {
 namespace Transform {
-namespace Poly {
-namespace Worland {
+namespace FiniteDiff {
+namespace Sphere {
 namespace Reductor {
 
 @Op@<@Tag@>::@Op@() : IWorlandPower(1)
@@ -36,15 +36,9 @@ namespace Reductor {
 }
 
 
-void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal::Array& icompweights) const
+void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
 {
     Profiler::RegionFixture<3> fix("@Op@<@Tag@>::initOperators");
-
-    // Energy calculation requires a different quadrature
-    Internal::Array igrid, iweights;
-    using namespace QuICC::Transform::Worland;
-    OpsQuadrature<@Op@_t> quad;
-    quad.computeQuadrature(igrid, iweights, icompgrid.size());
 
     std::uint32_t M = igrid.size();
     std::uint32_t K = static_cast<std::uint32_t>(this->mspSetup->fastSize(0));
@@ -53,12 +47,6 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
 
     ///\todo this should be the full matrix size
     std::uint32_t P = static_cast<std::uint32_t>(this->mspSetup->slow(nLayers-1)) + 1;
-
-    std::vector<std::uint32_t> layers(nLayers);
-    for(std::uint32_t p = 0; p < nLayers; ++p)
-    {
-        layers[p] = this->mspSetup->slow(p);
-    }
 
     constexpr size_t rank = 3;
     // dim 0 - Nr - radial points
@@ -70,16 +58,22 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& icompgrid, const Internal
     using namespace QuICC::Transform::Quadrature;
     using backendPrj_t = @BackendNamespace@::ImplOp<phys_t, mods_t, op_t>;
     using derivedPrj_t = Op<phys_t, mods_t, op_t, backendPrj_t>;
-
     auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
+
+    std::vector<std::uint32_t> layers(nLayers);
+    for(std::uint32_t p = 0; p < nLayers; ++p)
+    {
+        layers[p] = this->mspSetup->slow(p);
+    }
+
     mPrj = std::make_unique<derivedPrj_t>(mem);
     derivedPrj_t& derivedPrjOp = dynamic_cast<derivedPrj_t&>(*mPrj);
     derivedPrjOp.allocOp(dimensionsPrj, layers);
     auto prjView = derivedPrjOp.getOp();
 
-    using namespace QuICC::Polynomial::Worland;
+    using namespace QuICC::FiniteDiff::Sphere;
     OpsBuilder<op_t, @Op@_t, bwd_t> tBuilderBwd;
-    tBuilderBwd.compute(prjView, igrid, Internal::Array());
+    tBuilderBwd.compute(prjView, igrid);
 
     @SetIntOp@
 
@@ -192,23 +186,23 @@ void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in) const
     @ViewToEigen@
 }
 
-void @Op@<@Tag@>::makeOperator(Matrix& op, Matrix& eop, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const
+void @Op@<@Tag@>::makeOperator(Matrix& op, Matrix& eop, const Internal::Array& igrid, const int i) const
 {
-    throw std::logic_error("view Worland operator should never call this");
+    throw std::logic_error("view Finite Differences Sphere operator should never call this");
 }
 
 void @Op@<@Tag@>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
 {
-    throw std::logic_error("view Worland operator should never call this");
+    throw std::logic_error("view Finite Differences Sphere operator should never call this");
 }
 
 void @Op@<@Tag@>::applyOperator(Eigen::Ref<Matrix> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const
 {
-    throw std::logic_error("view Worland operator should never call this");
+    throw std::logic_error("view Finite Differences Sphere operator should never call this");
 }
 
 } // namespace Reductor
-} // namespace Worland
-} // namespace Poly
+} // namespace Sphere
+} // namespace FiniteDiff
 } // namespace Transform
 } // namespace QuICC

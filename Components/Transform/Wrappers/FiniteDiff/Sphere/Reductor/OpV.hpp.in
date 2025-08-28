@@ -1,6 +1,6 @@
 /**
  * @file @Op@@Tag@.hpp.inc
- * @brief Wrapper of the Worland @Op@ Reductor
+ * @brief Wrapper of the Finite Difference @Op@ Reductor
  */
 #pragma once
 @Layout@
@@ -14,27 +14,26 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "QuICC/Transform/Poly/Worland/Reductor/IWorlandPower.hpp"
-#include "QuICC/Transform/Poly/Worland/Reductor/IWorlandReductor.hpp"
-#include "QuICC/Transform/Poly/Worland/Tags.hpp"
+#include "QuICC/Transform/FiniteDiff/Sphere/Reductor/IReductor.hpp"
+#include "QuICC/Transform/FiniteDiff/Sphere/Tags.hpp"
 #include "View/View.hpp"
 #include "Operator/Unary.hpp"
 #include "Operator/Nary.hpp"
 
 namespace QuICC {
 namespace Transform {
-namespace Poly {
-namespace Worland {
+namespace FiniteDiff {
+namespace Sphere {
 namespace Reductor {
 
 template <class Impl>
 class @Op@;
 
 /**
-* @brief Implementation of the Worland based @Op@ Reductor
+* @brief Implementation of the Finite Difference sphere @Op@ Reductor
 */
 template<>
-class @Op@<@Tag@>: public IWorlandPower
+class @Op@<@Tag@>: public IReductor
 {
 public:
 
@@ -68,8 +67,7 @@ private:
     /// @brief Replace base Reductor init
     /// we need to be able to propagate igrid/iweights to view ctor
     /// @param igrid
-    /// @param iweights
-    void initOperators(const Internal::Array& igrid, const Internal::Array& iweights) const final;
+    void initOperators(const Internal::Array& igrid) const final;
 
 
     /// @brief Make operator
@@ -77,9 +75,8 @@ private:
     /// @param op
     /// @param eop
     /// @param igrid
-    /// @param iweights
     /// @param i
-    void makeOperator(Matrix& op, Matrix& eop, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const final;
+    void makeOperator(Matrix& op, Matrix& eop, const Internal::Array& igrid, const int i) const final;
 
     /// @brief
     /// @param rOut
@@ -175,7 +172,7 @@ private:
 };
 
 } // namespace Reductor
-} // namespace Worland
-} // namespace Poly
+} // namespace Sphere
+} // namespace FiniteDiff
 } // namespace Transform
 } // namespace QuICC
