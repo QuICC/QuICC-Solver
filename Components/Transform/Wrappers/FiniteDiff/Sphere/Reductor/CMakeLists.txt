@@ -4,9 +4,9 @@ if(TARGET QuICC::Cuda)
     list(APPEND Backends "Gpu")
 endif()
 
-set(Kinds "Power;Energy;Radial")
+set(Kinds "Energy")
 
-set(PowerOps "Power;PowerR2;PowerD1R1;PowerSLaplR2")
+set(PowerOps "")
 set(EnergyOps "Energy;EnergyR2;EnergyD1R1;EnergySLaplR2")
 set(RadialOps "RadialPower;RadialPowerDivR1;RadialPowerDivR1D1R1")
 
@@ -43,7 +43,7 @@ set(IntOp
     auto intView = derivedOp.getOp();
 
     OpsBuilder<op_t, @Op@_t, fwd_t> tBuilderFwd;
-    tBuilderFwd.compute(intView, igrid, iweights);
+    tBuilderFwd.compute(intView, igrid);
 ")
 
 # cpu/gpu
@@ -389,19 +389,19 @@ foreach(Backend IN LISTS Backends)
 
             configure_file(
                 "OpV.hpp.in"
-                "${CMAKE_BINARY_DIR}/include/QuICC/Transform/Wrappers/Worland/Reductor/${Op}${Tag}.hpp.inc"
+                "${CMAKE_BINARY_DIR}/include/QuICC/Transform/Wrappers/FiniteDiff/Sphere/Reductor/${Op}${Tag}.hpp.inc"
             )
             set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}
                 PROPERTIES
-                    PUBLIC_HEADER "${CMAKE_BINARY_DIR}/include/QuICC/Transform/Wrappers/Worland/Reductor/${Op}${Tag}.hpp.inc"
+                PUBLIC_HEADER "${CMAKE_BINARY_DIR}/include/QuICC/Transform/Wrappers/FiniteDiff/Sphere/Reductor/${Op}${Tag}.hpp.inc"
             )
 
             configure_file(
                 "OpV.cpp.in"
-                "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/src/Wrappers/Worland/Reductor/${Op}${Tag}.cpp"
+                "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/src/Wrappers/FiniteDiff/Sphere/Reductor/${Op}${Tag}.cpp"
             )
             target_sources(${QUICC_CURRENT_COMPONENT_LIB} PRIVATE
-                "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/src/Wrappers/Worland/Reductor/${Op}${Tag}.cpp"
+              "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/src/Wrappers/FiniteDiff/Sphere/Reductor/${Op}${Tag}.cpp"
             )
 
         endforeach()

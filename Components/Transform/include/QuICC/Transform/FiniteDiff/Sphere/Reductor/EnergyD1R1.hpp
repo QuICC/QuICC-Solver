@@ -8,6 +8,6 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Wrappers/Worland/Reductor/EnergyD1R1viewCpu_t.hpp.inc"
+#include "QuICC/Transform/Wrappers/FiniteDiff/Sphere/Reductor/EnergyD1R1viewCpu_t.hpp.inc"
 
 #endif // QUICC_TRANSFORM_FINITEDIFF_SPHERE_REDUCTOR_ENERGYD1R1_HPP

@@ -1,6 +1,6 @@
 /**
  * @file DivR1.hpp
- * @brief Implementation of the Worland based 1/R projector
+ * @brief Implementation of the Finite Differences based 1/R projector
  */
 
 #ifndef QUICC_TRANSFORM_FINITEDIFF_SPHERE_PROJECTOR_DIVR1_HPP

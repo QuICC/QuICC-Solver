@@ -1,6 +1,6 @@
 /**
  * @file SphLapl.hpp
- * @brief Implementation of the Worland based spherical laplacian projector
+ * @brief Implementation of the Finite Differences based spherical laplacian projector
  */
 
 #ifndef QUICC_TRANSFORM_FINITEDIFF_SPHERE_PROJECTOR_SPHLAPL_HPP

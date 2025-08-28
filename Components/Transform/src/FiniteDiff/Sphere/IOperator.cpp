@@ -1,6 +1,6 @@
 /**
  * @file IOperator.cpp
- * @brief Source of the interface for a Worland based transform operator
+ * @brief Source of the interface for a Finite Differences based transform operator
  */
 
 // System includes
@@ -71,12 +71,12 @@ namespace Sphere {
 
    void IOperator::applyOperators(MatrixZ&, const MatrixZ&) const
    {
-      throw std::logic_error("Data is not compatible with Worland operator");
+      throw std::logic_error("Data is not compatible with Finite Differences operator");
    }
 
    void IOperator::applyOperators(Matrix&, const MatrixZ&) const
    {
-      throw std::logic_error("Data is not compatible with Worland operator");
+      throw std::logic_error("Data is not compatible with Finite Differences operator");
    }
 
    void IOperator::checkGridSize(const int n, const int l, const int gN) const
@@ -85,7 +85,7 @@ namespace Sphere {
       bool notValid = (n > allowedN);
       if(notValid)
       {
-         throw std::logic_error("Worland grid is too small! (" + std::to_string(n) + " > " + std::to_string(allowedN) + ", n = " + std::to_string(n) + ", l = " + std::to_string(l) + ", gN = " + std::to_string(gN) + ")");
+         throw std::logic_error("Finite Differences grid is too small! (" + std::to_string(n) + " > " + std::to_string(allowedN) + ", n = " + std::to_string(n) + ", l = " + std::to_string(l) + ", gN = " + std::to_string(gN) + ")");
       }
    }
 

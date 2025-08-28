@@ -10,7 +10,6 @@
 //
 #include "QuICC/Transform/Wrappers/FiniteDiff/Sphere/Reductor/@Op@@Tag@.hpp.inc"
 #include "ViewOps/FiniteDiff/Sphere/OpsBuilder.hpp"
-#include "ViewOps/FiniteDiff/Sphere/OpsQuadrature.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
@@ -29,12 +28,6 @@ namespace Transform {
 namespace FiniteDiff {
 namespace Sphere {
 namespace Reductor {
-
-@Op@<@Tag@>::@Op@() : IWorlandPower(1)
-{
-    this->setProfileTag();
-}
-
 
 void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
 {
@@ -56,6 +49,7 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
 
     // Make projector view operator
     using namespace QuICC::Transform::Quadrature;
+    using namespace QuICC::Transform::FiniteDiff::Sphere;
     using backendPrj_t = @BackendNamespace@::ImplOp<phys_t, mods_t, op_t>;
     using derivedPrj_t = Op<phys_t, mods_t, op_t, backendPrj_t>;
     auto mem = std::make_shared<QuICC::Memory::@MemRes@>();

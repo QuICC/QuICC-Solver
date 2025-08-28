@@ -14,7 +14,7 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
-#include "QuICC/Transform/FiniteDiff/Sphere/Reductor/IReductor.hpp"
+#include "QuICC/Transform/FiniteDiff/Sphere/Reductor/IEnergy.hpp"
 #include "QuICC/Transform/FiniteDiff/Sphere/Tags.hpp"
 #include "View/View.hpp"
 #include "Operator/Unary.hpp"
@@ -33,14 +33,14 @@ class @Op@;
 * @brief Implementation of the Finite Difference sphere @Op@ Reductor
 */
 template<>
-class @Op@<@Tag@>: public IReductor
+class @Op@<@Tag@>: public IEnergy
 {
 public:
 
     /**
      * @brief Constructor
      */
-    @Op@();
+    @Op@() = default;
 
     /**
      * @brief Destructor
@@ -65,7 +65,7 @@ public:
 
 private:
     /// @brief Replace base Reductor init
-    /// we need to be able to propagate igrid/iweights to view ctor
+    /// we need to be able to propagate igrid to view ctor
     /// @param igrid
     void initOperators(const Internal::Array& igrid) const final;
 

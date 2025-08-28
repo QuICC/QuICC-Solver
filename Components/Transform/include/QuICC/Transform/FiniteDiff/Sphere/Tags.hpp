@@ -20,8 +20,8 @@ namespace Sphere {
     /// view cpu wrapper tag
     struct viewCpu_t {};
 
-} // namespace Worland
-} // namespace Poly
+} // namespace Sphere
+} // namespace FinieDiff
 } // namespace Transform
 } // namespace QuICC
 

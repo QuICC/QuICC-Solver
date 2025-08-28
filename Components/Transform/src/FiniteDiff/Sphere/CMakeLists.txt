@@ -5,4 +5,4 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB_KK} ${QUICC_CMAKE_SRC_VISIBILITY}
 
 add_subdirectory(Projector)
 add_subdirectory(Integrator)
-#add_subdirectory(Reductor)
+add_subdirectory(Reductor)

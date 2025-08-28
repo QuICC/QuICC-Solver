@@ -1,10 +1,10 @@
 /**
  * @file IReductor.hpp
- * @brief Interface for a Worland based reduction operator
+ * @brief Interface for a Finite Difference based reduction operator
  */
 
-#ifndef QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_IREDUCTOR_HPP
-#define QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_IREDUCTOR_HPP
+#ifndef QUICC_TRANSFORM_FINITEDIFF_SPHERE_REDUCTOR_IREDUCTOR_HPP
+#define QUICC_TRANSFORM_FINITEDIFF_SPHERE_REDUCTOR_IREDUCTOR_HPP
 
 // System includes
 //
@@ -18,16 +18,16 @@ namespace QuICC {
 
 namespace Transform {
 
-namespace Poly {
+namespace FiniteDiff {
 
-namespace Worland {
+namespace Sphere {
 
 namespace Reductor {
 
    /**
-    * @brief Interface for a Worland based energy operator
+    * @brief Interface for a Finite Differences based energy operator
     */
-   class IReductor: public IWorlandOperator
+   class IReductor: public IOperator
    {
       public:
          /**
@@ -38,7 +38,7 @@ namespace Reductor {
          /**
           * @brief Destructor
           */
-         virtual ~IReductor();
+         virtual ~IReductor() = default;
 
          /**
           * @brief Get the memory requirements
@@ -56,18 +56,13 @@ namespace Reductor {
           */
          mutable Internal::Array  mGrid;
 
-         /**
-          * @brief Storage for the quadrature weights
-          */
-         mutable Internal::Array  mWeights;
-
       private:
    };
 
-}
-}
-}
-}
-}
+} // namespace Reductor
+} // namespace Sphere
+} // namespace FiniteDiff
+} // namespace Transform
+} // namespace QuICC
 
-#endif // QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_IREDUCTOR_HPP
+#endif // QUICC_TRANSFORM_FINITEDIFF_SPHERE_REDUCTOR_IREDUCTOR_HPP

@@ -118,7 +118,7 @@ namespace Sphere {
          this->transform(rOut, in, *(it->second));
       } else
       {
-         throw std::logic_error("Requested Worland transform operator is not avaible");
+         throw std::logic_error("Requested Finite Differences transform operator is not avaible");
       }
    }
 
@@ -131,7 +131,7 @@ namespace Sphere {
          this->transform(rOut, in, *(it->second));
       } else
       {
-         throw std::logic_error("Requested Worland transform operator is not avaible");
+         throw std::logic_error("Requested Finite Differences transform operator is not avaible");
       }
    }
 
@@ -155,7 +155,7 @@ namespace Sphere {
       return mem;
    }
 
-} // Worland
-} // Poly
+} // Sphere
+} // FiniteDiff
 } // Transform
 } // QuICC

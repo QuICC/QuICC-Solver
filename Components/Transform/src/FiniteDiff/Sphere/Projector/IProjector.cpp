@@ -1,6 +1,6 @@
 /**
  * @file IProjector.cpp
- * @brief Source of the interface to a Worland based projector
+ * @brief Source of the interface to a Finite Differences based projector
  */
 
 // System includes

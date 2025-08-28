@@ -1,6 +1,6 @@
 /**
  * @file DivR1_Zero.hpp
- * @brief Implementation of the Worland based 1/R projector but 0 mode is zeroed
+ * @brief Implementation of the Finite Differences based 1/R projector but 0 mode is zeroed
  */
 
 #ifndef QUICC_TRANSFORM_FINITEDIFF_SPHERE_PROJECTOR_DIVR1_ZERO_HPP

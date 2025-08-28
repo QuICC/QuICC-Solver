@@ -1,6 +1,6 @@
 /**
  * @file P.hpp
- * @brief Implementation of the Worland based P projector
+ * @brief Implementation of the Finite Difference based P projector
  */
 
 #ifndef QUICC_TRANSFORM_FINITEDIFF_SPHERE_PROJECTOR_P_HPP
