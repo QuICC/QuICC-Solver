@@ -47,7 +47,7 @@ namespace Projector {
       // Check for division by 0!
       assert(this->mspSetup->lower() > 0.0 || this->mspSetup->upper() < 0.0);
 
-      // For (1/y^2)D1Y1, we solve Y1 f = I1Y2 g
+      // For (1/y^2)D1Y1, we solve Y1 f = I1 g and then apply the 1/y^2 scaling
       // First set up I1 operator
       ::QuICC::SparseSM::Chebyshev::LinearMap::I1 op(this->mspSetup->specSize()+2,
                                                      this->mspSetup->specSize()+2, 
@@ -87,7 +87,7 @@ namespace Projector {
       // Apply spectral operator (Y1)
       auto specOp = this->mBackend.solver().getSpectralOperator();
       tmp.topRows(specOp.rows()) = specOp * tmp.topRows(specOp.cols());
-      // Solve system Y1 f = I1Y2 g
+      // Solve system Y1 f = I1 g
       this->mBackend.getSolution(tmp, 1, 1);
    }
 

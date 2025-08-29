@@ -5,8 +5,8 @@ include(ConfigureTests)
 include(SetUlp)
 
 quicc_set_ulp(_ulps
-  ULP 40 40 40 250 400 250 625
-  MPULP 40 40 40 900 900 900 600
+  ULP 40 40 40 250 400 250 625 625 625
+  MPULP 40 40 40 900 900 900 600 600 600
   )
 
 set(_tests
@@ -15,6 +15,7 @@ set(_tests
   DivY2:projector
   D1Y1:projector
   D2Y1:projector
+  DivY1D1:projector
   DivY1D1Y1:projector
   DivY2D1Y1:projector
   SphRadLapl:projector

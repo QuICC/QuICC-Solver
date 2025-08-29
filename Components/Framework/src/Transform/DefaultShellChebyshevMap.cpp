@@ -16,6 +16,7 @@
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY2.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D1Y1.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY1D1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY1D1Y1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY2D1Y1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/SphRadLapl.hpp"
@@ -53,6 +54,7 @@
 #include "QuICC/Transform/Backward/D1.hpp"
 #include "QuICC/Transform/Backward/D1R1.hpp"
 #include "QuICC/Transform/Backward/D2.hpp"
+#include "QuICC/Transform/Backward/Overr1D1.hpp"
 #include "QuICC/Transform/Backward/Overr1D1R1.hpp"
 #include "QuICC/Transform/Backward/Overr2D1R1.hpp"
 #include "QuICC/Transform/Backward/Slaplr.hpp"
@@ -79,6 +81,7 @@ namespace Transform {
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::D1Y1>(m, Backward::D1R1::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::D2>(m, Backward::D2::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D1Y1>(m, Backward::Overr1D1R1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D1>(m, Backward::Overr1D1::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2D1Y1>(m, Backward::Overr2D1R1::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::SphRadLapl>(m, Backward::Slaplr::id());
 
