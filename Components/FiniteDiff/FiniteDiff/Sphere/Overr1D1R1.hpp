@@ -3,8 +3,8 @@
  * @brief Implementation of 1/r d r  operator 
  */
 
-#ifndef QUICC_FINITEDIFF_SPHERE_OVERRR1D1R1_HPP
-#define QUICC_FINITEDIFF_SPHERE_OVERRR1D1R1_HPP
+#ifndef QUICC_FINITEDIFF_SPHERE_OVERR1D1R1_HPP
+#define QUICC_FINITEDIFF_SPHERE_OVERR1D1R1_HPP
 
 // System includes
 //
@@ -80,4 +80,4 @@ namespace Sphere {
 } // namespace FiniteDiff
 } // namespace QuICC
 
-#endif // QUICC_FINITEDIFF_SPHERE_OVERRR1D1R1_HPP
+#endif // QUICC_FINITEDIFF_SPHERE_OVERR1D1R1_HPP

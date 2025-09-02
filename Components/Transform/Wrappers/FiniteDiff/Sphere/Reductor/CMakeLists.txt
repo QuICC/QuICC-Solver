@@ -6,45 +6,12 @@ endif()
 
 set(Kinds "Energy")
 
-set(PowerOps "")
 set(EnergyOps "Energy;EnergyR2;EnergyD1R1;EnergySLaplR2")
-set(RadialOps "RadialPower;RadialPowerDivR1;RadialPowerDivR1D1R1")
 
-set(PowerOpAttribute "CSL3D")
 set(EnergyOpAttribute "CSL3D")
-set(RadialOpAttribute "CSL3D")
 
-set(PowerRedType "mods")
-set(EnergyRedType "mods")
-set(RadialRedType "phys")
-
-set(PowerSizeRow "this->mspSetup->fastSize(0);")
-set(PowerSizeCol "this->mspSetup->blockSize();")
 set(EnergySizeRow "this->mspSetup->blockSize();")
 set(EnergySizeCol "1;")
-set(RadialSizeRow "this->mspSetup->fwdSize();")
-set(RadialSizeCol "this->mspSetup->blockSize();")
-
-# Integrator operator
-set(IntOp
-"
-    // dim 0 - R  - radial modes
-    // dim 1 - Nr - radial points
-    // dim 2 - L  - harmonic degree
-    std::array<std::uint32_t, rank> dimensionsInt {K, M, P};
-
-    // Make view integrator operator
-    using backendInt_t = @BackendNamespace@::ImplOp<mods_t, phys_t, op_t>;
-    using derivedInt_t = Op<mods_t, phys_t, op_t, backendInt_t>;
-
-    mInt = std::make_unique<derivedInt_t>(mem);
-    derivedInt_t& derivedOp = dynamic_cast<derivedInt_t&>(*mInt);
-    derivedOp.allocOp(dimensionsInt, layers);
-    auto intView = derivedOp.getOp();
-
-    OpsBuilder<op_t, @Op@_t, fwd_t> tBuilderFwd;
-    tBuilderFwd.compute(intView, igrid);
-")
 
 # cpu/gpu
 set(CpuMemRes "Cpu::NewDelete")
@@ -105,39 +72,15 @@ set(CpuSetDataViews
 
     // set views
     mModsView = mods_t(mModsFlat.data(), mModsFlat.size(), modsDims.data(), dataPointers, dataIndices);
-    mPhysView = phys_t(mPhysFlat.data(), mPhysFlat.size(), physDims.data(), dataPointers, dataIndices);"
-)
+    mPhysView = phys_t(mPhysFlat.data(), mPhysFlat.size(), physDims.data(), dataPointers, dataIndices);
 
-set(PowerCpuSetPowerView
-"
-    mModsAbsFlat.resize(inFlatSize);
-    mModsAbsView = modsAbs_t(mModsAbsFlat.data(), mModsAbsFlat.size(), modsDims.data(), dataPointers, dataIndices);
-")
-
-set(EnergyCpuSetReductorView
-"
-    mModsAbsFlat.resize(inFlatSize);
-    mModsAbsView = modsAbs_t(mModsAbsFlat.data(), mModsAbsFlat.size(), modsDims.data(), dataPointers, dataIndices);
-
-    // setup reductor
-    mRed = std::make_unique<QuICC::Reduction::Cpu::Op<modsRed_t, modsAbs_t, 0>>();
-
-    // set pointers
-    ViewBase<std::uint32_t> dataPointers2D[rank-1];
-    dataPointers2D[0] = ViewBase<std::uint32_t>(mDataPointers.data(), mDataPointers.size());
-    ViewBase<std::uint32_t> dataIndices2D[rank-1];
-    dataIndices2D[0] = ViewBase<std::uint32_t>(mDataIndices.data(), mDataIndices.size());
-
-    // set views
-    mModsRedFlat.resize(inFlatSize/K);
-    mModsRedView = modsRed_t(mModsRedFlat.data(), mModsRedFlat.size(), modsDims.data(), dataPointers2D, dataIndices2D);"
-)
-
-set(RadialCpuSetPowerView
-"
     mPhysAbsFlat.resize(M * nCols);
     mPhysAbsView = physAbs_t(mPhysAbsFlat.data(), mPhysAbsFlat.size(), physDims.data(), dataPointers, dataIndices);
-")
+
+    std::array<std::uint32_t, rank> redDims = {1, N, P};
+    mModsRedFlat.resize(nCols);
+    mModsRedView = modsRed_t(mModsRedFlat.data(), mModsRedFlat.size(), redDims.data(), dataPointers, dataIndices);"
+)
 
 set(GpuSetDataViews
 "
@@ -218,63 +161,13 @@ set(RadialGpuSetPowerView
     mPhysAbsView = physAbs_t(mPhysAbsFlat_d.data(), mPhysAbsFlat_d.size(), physDims.data(), dataPointers_d, dataIndices_d);
 ")
 
-set(PowerCompTree
-"
-    /// project to modal space
-    mInt->apply(mModsView, mPhysView);
-    /// pointwise op on coefficients
-    mPnt->apply(mModsAbsView, mModsView);
-")
-
 set(EnergyCompTree
-"
-    /// project to modal space
-    mInt->apply(mModsView, mPhysView);
-    /// pointwise op on coefficients
-    mPnt->apply(mModsAbsView, mModsView);
-    /// reduction op on coefficients
-    mRed->apply(mModsRedView, mModsAbsView);
-")
-
-set(RadialCompTree
 "
     /// pointwise op on grid points
     mPnt->apply(mPhysAbsView, mPhysView);
+    /// Apply reductor to modal space
+    mRed->apply(mModsRedView, mPhysAbsView);
 ")
-
-set(PowerViewToEigen
-"
-    assert(static_cast<std::size_t>(rOut.rows()) == mModsAbsView.dims()[0]);
-    assert(static_cast<std::size_t>(rOut.cols()) == mModsAbsView.indices()[1].size());
-
-    start = 0;
-    offSet = 0;
-    for(std::uint32_t p = 0; p < nLayers; p++)
-    {
-        int cols = this->mspSetup->mult(p);
-        int outRows = this->mspSetup->fastSize(p);
-
-        Eigen::Ref<Matrix> outB = rOut.block(0, start, outRows, cols);
-
-        for (std::int64_t j = 0; j < outB.cols(); ++j)
-        {
-            for (std::int64_t i = 0; i < outB.rows(); ++i)
-            {
-            #ifdef QUICC_FD_SPHERE_ALL_ROW_MAJOR
-                // copy to padded from flattened column and transpose
-                outB.data()[i+j*rOut.rows()]= mModsAbsFlat[offSet + i*outB.cols()+j];
-                #else
-                // copy to padded from flattened column
-                outB.data()[i+j*rOut.rows()]= mModsAbsFlat[offSet + i+j*outB.rows()];
-                #endif
-            }
-        }
-
-        offSet += outB.size();
-        start += cols;
-    }
-"
-)
 
 set(EnergyViewToEigen
 "
@@ -283,40 +176,6 @@ set(EnergyViewToEigen
     for(std::uint32_t i = 0; i < rOut.size(); i++)
     {
         rOut.data()[i]= mModsRedFlat[i];
-    }
-"
-)
-
-set(RadialViewToEigen
-"
-    assert(static_cast<std::size_t>(rOut.rows()) == mPhysAbsView.dims()[0]);
-    assert(static_cast<std::size_t>(rOut.cols()) == mPhysAbsView.indices()[1].size());
-
-    start = 0;
-    offSet = 0;
-    int outRows = this->mspSetup->fwdSize();
-    for(std::uint32_t p = 0; p < nLayers; p++)
-    {
-        int cols = this->mspSetup->mult(p);
-
-        Eigen::Ref<Matrix> outB = rOut.block(0, start, outRows, cols);
-
-        for (std::int64_t j = 0; j < outB.cols(); ++j)
-        {
-            for (std::int64_t i = 0; i < outB.rows(); ++i)
-            {
-            #ifdef QUICC_FD_SPHERE_ALL_ROW_MAJOR
-                // copy to padded from flattened column and transpose
-                outB.data()[i+j*rOut.rows()]= mPhysAbsFlat[offSet + i*outB.cols()+j];
-                #else
-                // copy to padded from flattened column
-                outB.data()[i+j*rOut.rows()]= mPhysAbsFlat[offSet + i+j*outB.rows()];
-                #endif
-            }
-        }
-
-        offSet += outB.size();
-        start += cols;
     }
 "
 )
@@ -366,7 +225,6 @@ foreach(Backend IN LISTS Backends)
     foreach(Kind IN LISTS Kinds)
         set(Ops "${${Kind}Ops}")
         set(OpAttribute "${${Kind}OpAttribute}")
-        set(RedType "${${Kind}RedType}")
         set(Grid "${${Kind}Grid}")
         # set(OpInOut "${${Kind}OpInOut}")
         set(SizeRow "${${Kind}SizeRow}")
@@ -375,9 +233,7 @@ foreach(Backend IN LISTS Backends)
         set(HostToDevice "${${Backend}HostToDevice}")
         set(DeviceToHost "${${Backend}${Kind}DeviceToHost}")
 
-        set(SetPowerView "${${Kind}${Backend}SetPowerView}")
         set(SetReductorView "${${Kind}${Backend}SetReductorView}")
-        set(SetRadialView "${${Kind}${Backend}SetRadialView}")
         set(CompTree "${${Kind}CompTree}")
 
         foreach(Op IN LISTS Ops)

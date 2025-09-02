@@ -17,7 +17,7 @@ namespace FiniteDiff {
 namespace Sphere {
 
    Id::Id(const std::size_t order, const std::size_t zTop, const std::size_t zBot)
-      : Operator(order), mZtop(zTop), mZbot(zBot)
+      : Operator(order, zTop, zBot)
    {
    }
 

@@ -1,10 +1,10 @@
 /**
- * @file R1.hpp
- * @brief Implementation of multiplication by R operator 
+ * @file D1R1.hpp
+ * @brief Implementation of d r  operator 
  */
 
-#ifndef QUICC_FINITEDIFF_SPHERE_R1_HPP
-#define QUICC_FINITEDIFF_SPHERE_R1_HPP
+#ifndef QUICC_FINITEDIFF_SPHERE_D1R1_HPP
+#define QUICC_FINITEDIFF_SPHERE_D1R1_HPP
 
 // System includes
 //
@@ -22,9 +22,9 @@ namespace FiniteDiff {
 namespace Sphere {
 
    /**
-    * @brief Implementation of multiplication by R operator
+    * @brief Implementation of d r operator
     */
-   class R1: public Operator
+   class D1R1: public Operator
    {
       public:
          /**
@@ -34,26 +34,25 @@ namespace Sphere {
           * @param zTop    Zero rows at top
           * @param zBot    Zero rows at bottom
           */
-         R1(const size_t order, const std::size_t zTop, const std::size_t zBot);
+         D1R1(const size_t order, const std::size_t zTop, const std::size_t zBot);
 
          /**
           * @brief Constructor
           *
-          * @param order   Order of accuracy
           * @param zTop    Zero rows at top
           * @param zBot    Zero rows at bottom
           */
-         R1(const std::size_t zTop, const std::size_t zBot);
+         D1R1(const std::size_t zTop, const std::size_t zBot);
 
          /**
           * @brief Constructor
           */
-         R1();
+         D1R1();
 
          /**
           * @brief Destructor
           */
-         ~R1() = default;
+         ~D1R1() = default;
 
          /**
           * @brief Compute operator on grid
@@ -65,23 +64,23 @@ namespace Sphere {
    };
 
    template <typename T>
-   void R1::compute(Eigen::SparseMatrix<T>& rOut, const int l, const Internal::Array& igrid)
+   void D1R1::compute(Eigen::SparseMatrix<T>& rOut, const int l, const Internal::Array& igrid)
    {
       using namespace Internal::Literals;
       const int nR = igrid.size();
       rOut.resize(nR, nR);
 
-      std::vector<Eigen::Triplet<T>> coeffs;
-      for(int i = static_cast<int>(this->mZtop); i < nR - static_cast<int>(this->mZbot); i++)
-      {
-         coeffs.emplace_back(i,i, igrid(i));
-      }
+      std::vector<Internal::SparseMatrix> wMat;
+      this->fdMatrices(wMat, igrid, this->mOrder, 1);
 
-      rOut.setFromTriplets(coeffs.begin(), coeffs.end());
+      rOut = wMat.at(1)*igrid.asDiagonal();
+
+      // Zero top and bottom
+      rOut = this->zeroTopBottom(nR) * rOut;
    }
 
 } // namespace Sphere
 } // namespace FiniteDiff
 } // namespace QuICC
 
-#endif // QUICC_FINITEDIFF_SPHERE_R1_HPP
+#endif // QUICC_FINITEDIFF_SPHERE_D1R1_HPP

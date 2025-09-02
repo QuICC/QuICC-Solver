@@ -16,8 +16,13 @@ namespace FiniteDiff {
 
 namespace Sphere {
 
+   Operator::Operator(const std::size_t order, const std::size_t zTop, const std::size_t zBot)
+      : mOrder(order), mZtop(zTop), mZbot(zBot)
+   {
+   }
+
    Operator::Operator(const std::size_t order)
-      : mOrder(order)
+      : Operator(order, 0, 0)
    {
    }
 
@@ -88,7 +93,7 @@ namespace Sphere {
       std::size_t nR = static_cast<std::size_t>(grid.size());
 
       // Initialize storage
-      for(int p = 0; p < grid.size(); p++)
+      for(std::size_t p = 0; p <= m; p++)
       {
          wMat.emplace_back(nR, nR);
       }
@@ -140,6 +145,8 @@ namespace Sphere {
             }
 
             row.setFromTriplets(coeffs.begin(), coeffs.end());
+            row.makeCompressed();
+            wMat.at(j).makeCompressed();
             wMat.at(j) += row;
 
             // Store previous stencil size
@@ -159,6 +166,21 @@ namespace Sphere {
       {
          wMat.at(j).makeCompressed();
       }
+   }
+
+   SparseMatrix Operator::zeroTopBottom(const int nR) const
+   {
+      SparseMatrix op(nR, nR);
+
+      std::vector<Eigen::Triplet<MHDFloat>> coeffs;
+      for(int i = static_cast<int>(this->mZtop); i < nR - static_cast<int>(this->mZbot); i++)
+      {
+         coeffs.emplace_back(i,i, 1);
+      }
+
+      op.setFromTriplets(coeffs.begin(), coeffs.end());
+
+      return op;
    }
 
 } // namespace Sphere

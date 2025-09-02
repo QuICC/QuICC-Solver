@@ -69,10 +69,25 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
     OpsBuilder<op_t, @Op@_t, bwd_t> tBuilderBwd;
     tBuilderBwd.compute(prjView, igrid);
 
-    @SetIntOp@
-
     // setup pointwise operator
-    mPnt = std::make_unique<QuICC::Pointwise::@BackendNamespace@::Op<QuICC::Pointwise::Abs2Functor<double>, @RedType@Abs_t, @RedType@_t>>(QuICC::Pointwise::Abs2Functor<double>());
+    mPnt = std::make_unique<QuICC::Pointwise::@BackendNamespace@::Op<QuICC::Pointwise::Abs2Functor<double>, physAbs_t, phys_t>>(QuICC::Pointwise::Abs2Functor<double>());
+
+    // dim 0 - R  - radial modes
+    // dim 1 - Nr - radial points
+    // dim 2 - L  - harmonic degree
+    std::array<std::uint32_t, rank> dimensionsRed {1, M, P};
+
+    // Make view reductor operator
+    using backendRed_t = @BackendNamespace@::ImplOp<modsRed_t, physAbs_t, op_t>;
+    using derivedRed_t = Op<modsRed_t, physAbs_t, op_t, backendRed_t>;
+
+    mRed = std::make_unique<derivedRed_t>(mem);
+    derivedRed_t& derivedOp = dynamic_cast<derivedRed_t&>(*mRed);
+    derivedOp.allocOp(dimensionsRed, layers);
+    auto redView = derivedOp.getOp();
+
+    OpsBuilder<op_t, @Op@_t, fwd_t> tBuilderFwd;
+    tBuilderFwd.compute(redView, igrid);
 
     ///\todo move view setups to init
 
@@ -116,7 +131,6 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
     // dim 2 - L  - harmonic degree
     std::array<std::uint32_t, rank> modsDims = {K, N, P};
     mModsFlat.resize(inFlatSize);
-    mModsAbsFlat.resize(inFlatSize);
 
     // dim 0 - Nr - radial points
     // dim 1 - M  - harmonic order
@@ -127,9 +141,7 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
     using namespace QuICC::View;
 
     @SetDataViews@
-    @SetPowerView@
     @SetReductorView@
-    @SetRadialView@
 }
 
 void @Op@<@Tag@>::applyOperators(Matrix& rOut, const MatrixZ& in) const

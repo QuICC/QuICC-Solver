@@ -11,6 +11,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 
+add_subdirectory(DenseOp/FiniteDiff)
 add_subdirectory(DenseOp/Worland)
 
 set(PHS

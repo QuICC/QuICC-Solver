@@ -3,8 +3,8 @@
  * @brief Implementation of division by R operator 
  */
 
-#ifndef QUICC_FINITEDIFF_SPHERE_OVERRR1_HPP
-#define QUICC_FINITEDIFF_SPHERE_OVERRR1_HPP
+#ifndef QUICC_FINITEDIFF_SPHERE_OVERR1_HPP
+#define QUICC_FINITEDIFF_SPHERE_OVERR1_HPP
 
 // System includes
 //
@@ -78,4 +78,4 @@ namespace Sphere {
 } // namespace FiniteDiff
 } // namespace QuICC
 
-#endif // QUICC_FINITEDIFF_SPHERE_OVERRR1_HPP
+#endif // QUICC_FINITEDIFF_SPHERE_OVERR1_HPP

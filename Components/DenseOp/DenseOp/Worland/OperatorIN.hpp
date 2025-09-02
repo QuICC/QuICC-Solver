@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "DenseOp/IDenseOpOperator.hpp"
+#include "DenseOp/Worland/IBaseOperator.hpp"
 #include "DenseOp/Worland/GetSuperN.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
@@ -28,7 +28,7 @@ namespace Worland {
 /// @tparam TPolyBuilder polynomial builder
 /// @tparam TINBuilder IN builder
 template <class TPolyBuilder, class TINBuilder>
-class OperatorIN : IDenseOpOperator
+class OperatorIN : IBaseOperator
 {
 public:
    /// @brief ctor

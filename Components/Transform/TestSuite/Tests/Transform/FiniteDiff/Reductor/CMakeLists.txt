@@ -26,3 +26,19 @@ foreach(_test ${_tests})
     ULPS ${_ulp}
   )
 endforeach()
+
+set(_tests
+  FiniteDiff::EnergyD1R1:<viewCpu_t>:reductor
+)
+quicc_set_ulp(_ulp
+  ULP 30 201 230 240
+  MPULP 11 11 11 11
+)
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Algorithm::Operator:Template:type
+    IDS ${_ids}
+    ULPS ${_ulp}
+  )
+endforeach()

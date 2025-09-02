@@ -28,6 +28,11 @@ namespace Sphere {
          /**
           * @brief Constructor
           */
+         Operator(const size_t order, const std::size_t zTop, const std::size_t zBot);
+
+         /**
+          * @brief Constructor
+          */
          Operator(const size_t order);
 
          /**
@@ -56,9 +61,24 @@ namespace Sphere {
          void fdMatrices(std::vector<Internal::SparseMatrix>& w, const Internal::Array& grid, const std::size_t s, const std::size_t m) const;
 
          /**
+          * @brief Get operator to zero top and bottom rows
+          */
+         SparseMatrix zeroTopBottom(const int nR) const;
+
+         /**
           * @brief Scheme order
           */
          std::size_t mOrder;
+
+         /**
+          * @brief Zero rows at top
+          */
+         std::size_t mZtop;
+
+         /**
+          * @brief Zero rows at bottom
+          */
+         std::size_t mZbot;
    };
 
 } // namespace Sphere

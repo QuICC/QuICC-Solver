@@ -28,14 +28,6 @@ public:
 
    /// @brief dtor
    virtual ~IDenseOpOperator() = default;
-
-   /// @brief populate op matrix
-   /// @param op
-   /// @param grid
-   /// @param weights
-   /// @param l optional, operator might not depend on 3rd dimension
-   virtual void compute(Eigen::Ref<Matrix> op, const Internal::Array& grid,
-      const Internal::Array& weights, const std::uint32_t l = 0) = 0;
 };
 
 } // namespace DenseOp

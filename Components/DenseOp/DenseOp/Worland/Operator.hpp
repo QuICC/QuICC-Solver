@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "DenseOp/IDenseOpOperator.hpp"
+#include "DenseOp/Worland/IBaseOperator.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/OuterProduct.hpp"
 #include "QuICC/Polynomial/Worland/Evaluator/Set.hpp"
 #include "Types/Internal/Typedefs.hpp"
@@ -25,7 +25,7 @@ namespace Worland {
 
 /// @brief Wrapper for generic Worland operator
 /// @tparam TPolyBuilder polynomial builder
-template <class TPolyBuilder> class Operator : IDenseOpOperator
+template <class TPolyBuilder> class Operator : IBaseOperator
 {
 public:
    /// @brief Pass-by-value polynomial builder ctor

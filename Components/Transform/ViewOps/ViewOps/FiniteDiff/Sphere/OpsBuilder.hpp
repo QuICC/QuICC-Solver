@@ -12,10 +12,14 @@
 //
 #include "SparseOp/FiniteDiff/Operator.hpp"
 #include "SparseOp/FiniteDiff/OperatorWithMean.hpp"
+#include "DenseOp/FiniteDiff/Operator.hpp"
 #include "FiniteDiff/Sphere/Id.hpp"
+#include "FiniteDiff/Sphere/Integral.hpp"
+#include "FiniteDiff/Sphere/IntegralR2.hpp"
 #include "FiniteDiff/Sphere/D1.hpp"
 #include "FiniteDiff/Sphere/R1.hpp"
 #include "FiniteDiff/Sphere/Overr1.hpp"
+#include "FiniteDiff/Sphere/D1R1.hpp"
 #include "FiniteDiff/Sphere/Overr1D1R1.hpp"
 #include "FiniteDiff/Sphere/SLapl.hpp"
 #include "ViewOps/FiniteDiff/Sphere/Builder.hpp"
@@ -118,6 +122,16 @@ template <class VOP> struct OpsBuilderMap<VOP, SphLapl_t, bwd_t>
       FiniteDiff::Sphere::Builder<VOP, QuICC::SparseOp::FiniteDiff::Operator<SLapl>, bwd_t>;
 };
 
+/// @brief R1_Zero Builder
+/// Projector only
+/// @tparam VOP operator view type
+template <class VOP> struct OpsBuilderMap<VOP, R1_Zero_t, bwd_t>
+{
+   using type = FiniteDiff::Sphere::Builder<VOP,
+      QuICC::SparseOp::FiniteDiff::OperatorWithMean<R1, void>,
+      bwd_t>;
+};
+
 /// @brief P_Zero Builder
 /// Integrator only
 /// @tparam VOP operator view type
@@ -166,7 +180,10 @@ template <class VOP> struct EnergyHelperMap<VOP, Energy_t>
 /// @tparam VOP operator view type
 template <class VOP> struct OpsBuilderMap<VOP, Energy_t, fwd_t>
 {
-   using type = EnergyHelperMap<VOP, Energy_t>;
+   using type = Builder<VOP,
+      QuICC::DenseOp::FiniteDiff::Operator<
+         Integral>,
+      fwd_t>;
 };
 
 /// @brief Energy Builder
@@ -176,7 +193,7 @@ template <class VOP> struct OpsBuilderMap<VOP, Energy_t, bwd_t>
 {
    using type = Builder<VOP,
       QuICC::SparseOp::FiniteDiff::Operator<
-         Overr1>,
+         Id>,
       bwd_t>;
 };
 
@@ -188,15 +205,13 @@ template <class VOP> struct EnergyHelperMap<VOP, EnergyD1R1_t>
 {
    void compute(VOP opView, const Internal::Array& grid)
    {
-      throw std::logic_error("Not implemented");
-#if 0
-      Wnl fWnl(Polynomial::FiniteDiff::worland_sphenergy_t::ALPHA,
-         Polynomial::FiniteDiff::worland_sphenergy_t::DBETA, -1);
-      QuICC::SparseOp::FiniteDiff::OperatorWithMean<Wnl, void> denseBuilder(fWnl);
-      Builder<VOP, QuICC::SparseOp::FiniteDiff::OperatorWithMean<Wnl, void>, fwd_t>
-         tBuilderFwd(denseBuilder);
-      tBuilderFwd.compute(opView, grid, weights);
-#endif
+      D1R1 op(1, 0);
+      QuICC::SparseOp::FiniteDiff::Operator<D1R1> opBuilder(op);
+      Builder<VOP,
+         QuICC::SparseOp::FiniteDiff::Operator<
+            D1R1>,
+         bwd_t> viewBuilder(opBuilder);
+      viewBuilder.compute(opView, grid);
    }
 };
 
@@ -205,7 +220,10 @@ template <class VOP> struct EnergyHelperMap<VOP, EnergyD1R1_t>
 /// @tparam VOP operator view type
 template <class VOP> struct OpsBuilderMap<VOP, EnergyD1R1_t, fwd_t>
 {
-   using type = EnergyHelperMap<VOP, EnergyD1R1_t>;
+   using type = Builder<VOP,
+      QuICC::DenseOp::FiniteDiff::Operator<
+         Integral>,
+      fwd_t>;
 };
 
 /// @brief EnergyD1R1 Builder
@@ -213,29 +231,24 @@ template <class VOP> struct OpsBuilderMap<VOP, EnergyD1R1_t, fwd_t>
 /// @tparam VOP operator view type
 template <class VOP> struct OpsBuilderMap<VOP, EnergyD1R1_t, bwd_t>
 {
-   using type = Builder<VOP,
-      QuICC::SparseOp::FiniteDiff::Operator<
-         Overr1D1R1>,
-      bwd_t>;
+   using type = EnergyHelperMap<VOP, EnergyD1R1_t>;
 };
 
 /// @brief Helper for EnergyR2
 /// It is needed in order to avoid having to pass
-/// extra parameters to energy integrators
+/// extra parameters to energy projector
 /// @tparam VOP
 template <class VOP> struct EnergyHelperMap<VOP, EnergyR2_t>
 {
    void compute(VOP opView, const Internal::Array& grid)
    {
-      throw std::logic_error("Not implemented");
-#if 0
-      Wnl fWnl(Polynomial::FiniteDiff::worland_sphenergy_t::ALPHA,
-         Polynomial::FiniteDiff::worland_sphenergy_t::DBETA, 0);
-      QuICC::SparseOp::FiniteDiff::Operator<Wnl> denseBuilder(fWnl);
-      Builder<VOP, QuICC::SparseOp::FiniteDiff::Operator<Wnl>, fwd_t> tBuilderFwd(
-         denseBuilder);
-      tBuilderFwd.compute(opView, grid, weights);
-#endif
+      R1 op(0, 0);
+      QuICC::SparseOp::FiniteDiff::Operator<R1> opBuilder(op);
+      Builder<VOP,
+         QuICC::SparseOp::FiniteDiff::Operator<
+            R1>,
+         bwd_t> viewBuilder(opBuilder);
+      viewBuilder.compute(opView, grid);
    }
 };
 
@@ -244,7 +257,10 @@ template <class VOP> struct EnergyHelperMap<VOP, EnergyR2_t>
 /// @tparam VOP operator view type
 template <class VOP> struct OpsBuilderMap<VOP, EnergyR2_t, fwd_t>
 {
-   using type = EnergyHelperMap<VOP, EnergyR2_t>;
+   using type = Builder<VOP,
+      QuICC::DenseOp::FiniteDiff::Operator<
+         Integral>,
+      fwd_t>;
 };
 
 /// @brief EnergyR2 Builder
@@ -252,26 +268,24 @@ template <class VOP> struct OpsBuilderMap<VOP, EnergyR2_t, fwd_t>
 /// @tparam VOP operator view type
 template <class VOP> struct OpsBuilderMap<VOP, EnergyR2_t, bwd_t>
 {
-   using type = OpsBuilder<VOP, P_t, bwd_t>;
+   using type = EnergyHelperMap<VOP, EnergyR2_t>;
 };
 
 /// @brief Helper for EnergySLaplR2
 /// It is needed in order to avoid having to pass
-/// extra parameters to energy integrators
+/// extra parameters to energy projectors
 /// @tparam VOP
 template <class VOP> struct EnergyHelperMap<VOP, EnergySLaplR2_t>
 {
    void compute(VOP opView, const Internal::Array& grid)
    {
-      throw std::logic_error("Not implemented");
-#if 0
-      Wnl fWnl(Polynomial::FiniteDiff::worland_sphenergy_t::ALPHA,
-         Polynomial::FiniteDiff::worland_sphenergy_t::DBETA, 0);
-      QuICC::SparseOp::FiniteDiff::Operator<Wnl> denseBuilder(fWnl);
-      Builder<VOP, QuICC::SparseOp::FiniteDiff::Operator<Wnl>, fwd_t> tBuilderFwd(
-         denseBuilder);
-      tBuilderFwd.compute(opView, grid, weights);
-#endif
+      SLapl op(1, 0);
+      QuICC::SparseOp::FiniteDiff::Operator<SLapl> opBuilder(op);
+      Builder<VOP,
+         QuICC::SparseOp::FiniteDiff::Operator<
+            SLapl>,
+         bwd_t> viewBuilder(opBuilder);
+      viewBuilder.compute(opView, grid);
    }
 };
 
@@ -280,7 +294,10 @@ template <class VOP> struct EnergyHelperMap<VOP, EnergySLaplR2_t>
 /// @tparam VOP operator view type
 template <class VOP> struct OpsBuilderMap<VOP, EnergySLaplR2_t, fwd_t>
 {
-   using type = EnergyHelperMap<VOP, EnergySLaplR2_t>;
+   using type = Builder<VOP,
+      QuICC::DenseOp::FiniteDiff::Operator<
+         IntegralR2>,
+      fwd_t>;
 };
 
 /// @brief EnergySLaplR2 Builder
@@ -288,7 +305,7 @@ template <class VOP> struct OpsBuilderMap<VOP, EnergySLaplR2_t, fwd_t>
 /// @tparam VOP operator view type
 template <class VOP> struct OpsBuilderMap<VOP, EnergySLaplR2_t, bwd_t>
 {
-   using type = OpsBuilder<VOP, SphLapl_t, bwd_t>;
+   using type = EnergyHelperMap<VOP, EnergySLaplR2_t>;
 };
 
 /// @brief Power Builder

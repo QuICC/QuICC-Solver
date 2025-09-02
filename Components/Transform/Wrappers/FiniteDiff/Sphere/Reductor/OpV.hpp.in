@@ -100,42 +100,33 @@ private:
     using mods_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
     using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
     using physAbs_t = View::View<double, View::DCCSC3DJIK>;
-    using modsAbs_t = View::View<double, View::DCCSC3DJIK>;
-    using modsRed_t = View::View<double, View::CSC>;
+    using modsRed_t = View::View<double, View::DCCSC3DJIK>;
     using op_t = View::View<double, View::@OpAttribute@>;
     #elif defined QUICC_FD_SPHERE_ALL_ROW_MAJOR
     using mods_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
     using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
     using physAbs_t = View::View<double, View::DCCSC3DJIK>;
-    using modsAbs_t = View::View<double, View::DCCSC3DJIK>;
-    using modsRed_t = View::View<double, View::CSC>;
+    using modsRed_t = View::View<double, View::DCCSC3DJIK>;
     using op_t = View::View<double, View::@OpAttribute@JIK>;
     #else
     using mods_t = View::View<std::complex<double>, View::DCCSC3D>;
     using phys_t = View::View<std::complex<double>, View::DCCSC3D>;
     using physAbs_t = View::View<double, View::DCCSC3D>;
-    using modsAbs_t = View::View<double, View::DCCSC3D>;
-    using modsRed_t = View::View<double, View::CSC>;
+    using modsRed_t = View::View<double, View::DCCSC3D>;
     using op_t = View::View<double, View::@OpAttribute@JIK>;
     #endif
 
     /// @brief Projector backend class pointer
     mutable std::unique_ptr<QuICC::Operator::UnaryOp<phys_t, mods_t>> mPrj;
 
-    /// @brief Integrator backend class pointer
-    mutable std::unique_ptr<QuICC::Operator::UnaryOp<mods_t, phys_t>> mInt;
-
     /// @brief Pointwise backend class pointer
-    mutable std::unique_ptr<QuICC::Operator::NaryOp<@RedType@Abs_t, @RedType@_t>> mPnt;
+    mutable std::unique_ptr<QuICC::Operator::NaryOp<physAbs_t, phys_t>> mPnt;
 
     /// @brief Reduction backend class pointer
-    mutable std::unique_ptr<QuICC::Operator::UnaryOp<modsRed_t, modsAbs_t>> mRed;
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<modsRed_t, physAbs_t>> mRed;
 
     /// @brief Input View
     mutable mods_t mModsView;
-
-    /// @brief temp/output View
-    mutable modsAbs_t mModsAbsView;
 
 
     /// @brief temp/output View
@@ -149,9 +140,6 @@ private:
 
     /// @brief Temporary storage for flattened input
     mutable std::vector<std::complex<double>> mModsFlat;
-
-    /// @brief Temporary storage for flattened temp/output
-    mutable std::vector<double> mModsAbsFlat;
 
     /// @brief Temporary storage for flattened temp/output
     mutable std::vector<double> mModsRedFlat;

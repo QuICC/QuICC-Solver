@@ -12,6 +12,7 @@
 // Project includes
 //
 #include "SparseOp/FiniteDiff/Operator.hpp"
+#include "DenseOp/FiniteDiff/Operator.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 #include "ViewOps/FiniteDiff/Sphere/TypeTraits.hpp"
@@ -23,14 +24,14 @@ namespace Sphere {
 
 /// @brief Generic Finite Difference builder operator
 /// @tparam TView  type View of the operator
-/// @tparam TSparseOpBuilder FD builder
+/// @tparam TFdOpBuilder FD builder
 /// @tparam TDirection
-template <class TView, class TSparseOpBuilder, class TDirection> class Builder
+template <class TView, class TFdOpBuilder, class TDirection> class Builder
 {
 public:
    /// @brief Pass-by-value dense builder ctor
-   /// @param denseBuilder to be stored and used
-   Builder(TSparseOpBuilder denseBuilder) : mSparseBuilder(denseBuilder){};
+   /// @param fdBuilder to be stored and used
+   Builder(TFdOpBuilder fdBuilder) : mFdBuilder(fdBuilder){};
 
    /// @brief default ctor
    Builder() = default;
@@ -41,12 +42,12 @@ public:
    void compute(TView opView, const Internal::Array& grid);
 
 private:
-   TSparseOpBuilder mSparseBuilder;
+   TFdOpBuilder mFdBuilder;
 };
 
 
-template <class TView, class TSparseOpBuilder, class TDirection>
-void Builder<TView, TSparseOpBuilder, TDirection>::compute(TView opView,
+template <class TView, class TFdOpBuilder, class TDirection>
+void Builder<TView, TFdOpBuilder, TDirection>::compute(TView opView,
    const Internal::Array& grid)
 {
    using IndexType = typename TView::IndexType;
@@ -117,19 +118,31 @@ void Builder<TView, TSparseOpBuilder, TDirection>::compute(TView opView,
          }
       }
 
-      // temporary slice
       using slice_t = Eigen::Matrix<ScalarType, Eigen::Dynamic, Eigen::Dynamic>;
-      using sparse_t = Eigen::SparseMatrix<ScalarType>;
-      sparse_t op;
-
-      // Build operator
-      op.resize(grid.size(), grid.size());
-      // QuICC::SparseOp::FiniteDiff::Operator<ScalarType, TData, TFdBuilder>
-      // help compiler to deduce type
-      mSparseBuilder.compute(op, grid, k);
-
       slice_t opT;
-      opT = op;
+
+      if constexpr(std::is_same_v<Eigen::SparseMatrix<ScalarType>, typename TFdOpBuilder::OpType>)
+      {
+         // temporary slice
+         using sparse_t = Eigen::SparseMatrix<ScalarType>;
+         sparse_t op;
+
+         // Build operator
+         op.resize(grid.size(), grid.size());
+         // QuICC::SparseOp::FiniteDiff::Operator<ScalarType, TData, TFdBuilder>
+         // help compiler to deduce type
+         mFdBuilder.compute(op, grid, k);
+
+         opT = op;
+      }
+      else
+      {
+         // Build operator
+         opT.resize(opView.dims()[0], opView.dims()[1]);
+         // QuICC::DenseOp::FiniteDiff::Operator<ScalarType, TData, TFdBuilder>
+         // help compiler to deduce type
+         mFdBuilder.compute(opT, grid, k);
+      }
 
       for (int j = 0; j < opT.cols(); ++j)
       {

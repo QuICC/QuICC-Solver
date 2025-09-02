@@ -1,10 +1,10 @@
 /**
  * @file Operator.hpp
- * @brief Implementation of the generic interface for a sparse finite difference operator
+ * @brief Implementation of the generic interface for a dense finite difference operator
  */
 
-#ifndef QUICC_SPARSEOP_FINITEDIFF_OPERATOR_HPP
-#define QUICC_SPARSEOP_FINITEDIFF_OPERATOR_HPP
+#ifndef QUICC_DENSEOP_FINITEDIFF_OPERATOR_HPP
+#define QUICC_DENSEOP_FINITEDIFF_OPERATOR_HPP
 
 // System includes
 //
@@ -12,17 +12,16 @@
 
 // Project includes
 //
-#include "SparseOp/FiniteDiff/IBaseOperator.hpp"
+#include "DenseOp/FiniteDiff/IBaseOperator.hpp"
 #include "Types/Typedefs.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
-namespace SparseOp {
-/// @brief namespace for generic sparse Finite Differences operator builders
+namespace DenseOp {
 namespace FiniteDiff {
 
 /// @brief Wrapper for generic Finite Differences operator
-/// @tparam TFdBuilder finite difference builder
+/// @tparam TFdBuilder FD builder
 template <class TFdBuilder> class Operator : public IBaseOperator
 {
 public:
@@ -41,7 +40,7 @@ public:
    /// @param grid
    /// @param weights
    /// @param l
-   void compute(SparseMatrix& op, const Internal::Array& grid,
+   void compute(Eigen::Ref<Matrix> op, const Internal::Array& grid,
       const std::uint32_t l) final;
 
 private:
@@ -49,18 +48,15 @@ private:
 };
 
 template <class TFdBuilder>
-void Operator<TFdBuilder>::compute(SparseMatrix& op,
-   const Internal::Array& grid,
-   const std::uint32_t l)
+void Operator<TFdBuilder>::compute(Eigen::Ref<Matrix> op,
+   const Internal::Array& grid, const std::uint32_t l)
 {
-   assert(op.rows() == grid.size());
-
    mFdBuilder.compute(op, static_cast<int>(l), grid);
 }
 
 
 } // namespace FiniteDiff
-} // namespace SparseOp
+} // namespace DenseOp
 } // namespace QuICC
 
-#endif // define QUICC_SPARSEOP_FINITEDIFF_OPERATOR_HPP
+#endif // define QUICC_DENSEOP_FINITEDIFF_OPERATOR_HPP

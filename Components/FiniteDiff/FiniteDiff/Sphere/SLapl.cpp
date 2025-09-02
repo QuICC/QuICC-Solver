@@ -16,13 +16,18 @@ namespace FiniteDiff {
 
 namespace Sphere {
 
-   SLapl::SLapl(const std::size_t order)
-      : Operator(order)
+   SLapl::SLapl(const std::size_t order, const std::size_t zTop, const std::size_t zBot)
+      : Operator(order, zTop, zBot)
+   {
+   }
+
+   SLapl::SLapl(const std::size_t zTop, const std::size_t zBot)
+      : SLapl(QUICC_FINITEDIFF_SPHERE_ORDER, zTop, zBot)
    {
    }
 
    SLapl::SLapl()
-      : SLapl(QUICC_FINITEDIFF_SPHERE_ORDER)
+      : SLapl(QUICC_FINITEDIFF_SPHERE_ORDER, 1, 1)
    {
    }
 

@@ -30,8 +30,20 @@ namespace Sphere {
       public:
          /**
           * @brief Constructor
+          *
+          * @param order   Order of accuracy
+          * @param zTop    Zero rows at top
+          * @param zBot    Zero rows at bottom
           */
-         SLapl(const size_t order);
+         SLapl(const size_t order, const std::size_t zTop, const std::size_t zBot);
+
+         /**
+          * @brief Constructor
+          *
+          * @param zTop    Zero rows at top
+          * @param zBot    Zero rows at bottom
+          */
+         SLapl(const std::size_t zTop, const std::size_t zBot);
 
          /**
           * @brief Constructor
@@ -72,11 +84,20 @@ namespace Sphere {
       rOut += 2_mp*invgrid.asDiagonal()*wMat.at(1);
       rOut -= static_cast<Internal::MHDFloat>(l*(l+1))*invgrid.array().pow(2).matrix().asDiagonal();
 
-      // Zero r = 0 and r = 1
-      Internal::Array qid = Internal::Array::Ones(igrid.size());
-      qid(0) = 0;
-      qid(nR-1) = 0;
-      rOut = qid.asDiagonal() * rOut;
+      // Zero top and bottom
+      if(this->mZtop > 0 || this->mZbot > 0)
+      {
+         Internal::Array qid = Internal::Array::Ones(igrid.size());
+         for(int i = 0; i < static_cast<int>(this->mZtop); i++)
+         {
+            qid(i) = 0;
+         }
+         for(int i = 0; i < static_cast<int>(this->mZbot); i++)
+         {
+            qid(nR - 1 - i) = 0;
+         }
+         rOut = qid.asDiagonal() * rOut;
+      }
    }
 
 } // namespace Sphere

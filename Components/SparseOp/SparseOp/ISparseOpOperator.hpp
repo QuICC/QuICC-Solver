@@ -28,13 +28,6 @@ public:
 
    /// @brief dtor
    virtual ~ISparseOpOperator() = default;
-
-   /// @brief populate op matrix
-   /// @param op
-   /// @param grid
-   /// @param l optional, operator might not depend on 3rd dimension
-   virtual void compute(SparseMatrix& op, const Internal::Array& grid,
-      const std::uint32_t l = 0) = 0;
 };
 
 } // namespace SparseOp

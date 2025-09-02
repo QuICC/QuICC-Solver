@@ -60,16 +60,6 @@ namespace Sphere {
          template <typename T> void compute(Eigen::SparseMatrix<T>& rOut , const int l, const Internal::Array& igrid);
 
       private:
-         /**
-          * @brief Zero rows at top
-          */
-         std::size_t mZtop;
-
-         /**
-          * @brief Zero rows at bottom
-          */
-         std::size_t mZbot;
-
 
    };
 

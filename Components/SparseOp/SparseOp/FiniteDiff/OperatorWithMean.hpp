@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "SparseOp/ISparseOpOperator.hpp"
+#include "SparseOp/FiniteDiff/IBaseOperator.hpp"
 #include "Types/Typedefs.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
@@ -25,7 +25,7 @@ namespace FiniteDiff {
 /// @tparam TFdBuilder builder for l!=0
 /// @tparam TZeroBuilder builder for l=0
 template <class TFdBuilder, class TZeroBuilder = void>
-class OperatorWithMean : ISparseOpOperator
+class OperatorWithMean : public IBaseOperator
 {
 public:
    /// @brief Pass-by-value polynomial builder ctor
