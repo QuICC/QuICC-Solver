@@ -689,3 +689,72 @@ TEST_CASE("ViewThreeDim Triangular Column/Layer CSC in NK plane JIK",
    CHECK_THROWS(fullData[1 * N + 0 + M * N * 3] == someView(1, 0, 3));
    CHECK_THROWS(fullData[0 * N + 0 + M * N * 3] == someView(0, 0, 3));
 }
+
+TEST_CASE("View Three Dimensional CSC in sparse layer", "[ViewThreeDimCSCSL3D]")
+{
+   constexpr size_t M = 4;
+   constexpr size_t N = 3;
+   constexpr size_t K = 4;
+   constexpr size_t SF = M * N * K;
+   std::array<double, SF> fullData = { 1,  0,  9,
+                                       0,  0, 10,
+                                       0,  0, 11,
+                                       4,  0,  0,
+                                                 13, 17,  0,
+                                                  0, 18,  0,
+                                                 15, 19,  0,
+                                                 16,  0,  0,
+                                                             0,  0,  0,
+                                                             0,  0,  0,
+                                                             0,  0,  0,
+                                                             0,  0,  0,
+                                                                       37,  0, 45,
+                                                                        0,  0,  0,
+                                                                       39, 43, 47,
+                                                                        0,  0, 48};
+
+   constexpr size_t S = (2 + 0 + 3) + (3 + 3 + 0) + (0 + 0 + 0) + (2 + 1 + 3);
+   std::array<double, S> data = {1, 4, 9, 10, 11, 13, 15, 16, 17, 18, 19, 37, 39, 43, 45, 47, 48};
+
+
+   // Sparse CSR operator in sparse layer
+   using CSCSL3D = Attributes<DimLevelType<compressed_t, sparse_t, sparse_t>>;
+   std::array<std::uint32_t, 3> dimensions{M, N, K};
+   std::array<std::vector<std::uint32_t>, 3> pointers = {{{0, 2, 2, 5, 5, 8, 11, 11, 11, 13, 14, 17}, {0, 4, 8, 8, 12}, {}}};
+   std::array<std::vector<std::uint32_t>, 3> indices = {{{0, 3, 0, 1, 2, 0, 2, 3, 0, 1, 2, 0, 2, 2, 0, 2, 3}, {}, {}}};
+   View<double, CSCSL3D> someView(data, dimensions, pointers, indices);
+
+   CHECK(someView.rank() == 3);
+   CHECK(someView.dims()[0] == M);
+   CHECK(someView.dims()[1] == N);
+   CHECK(someView.dims()[2] == K);
+
+   for (std::size_t l = 0; l < S; ++l)
+   {
+      CHECK(data[l] == someView.data()[l]);
+   }
+
+   CHECK(fullData[0] == someView(0, 0, 0));
+   CHECK(fullData[9] == someView(3, 0, 0));
+   CHECK(fullData[2] == someView(0, 2, 0));
+   CHECK(fullData[5] == someView(1, 2, 0));
+   CHECK(fullData[8] == someView(2, 2, 0));
+
+   CHECK(fullData[12] == someView(0, 0, 1));
+   CHECK(fullData[18] == someView(2, 0, 1));
+   CHECK(fullData[21] == someView(3, 0, 1));
+   CHECK(fullData[13] == someView(0, 1, 1));
+   CHECK(fullData[16] == someView(1, 1, 1));
+   CHECK(fullData[19] == someView(2, 1, 1));
+
+   CHECK(fullData[36] == someView(0, 0, 3));
+   CHECK(fullData[42] == someView(2, 0, 3));
+   CHECK(fullData[43] == someView(2, 1, 3));
+   CHECK(fullData[38] == someView(0, 2, 3));
+   CHECK(fullData[44] == someView(2, 2, 3));
+   CHECK(fullData[SF-1] == someView(3, 2, 3));
+
+   CHECK_THROWS(fullData[1] == someView(0, 1, 0));
+   CHECK_THROWS(fullData[31] == someView(2, 1, 2));
+   CHECK_THROWS(fullData[40] == someView(1, 1, 3));
+}

@@ -345,4 +345,21 @@ if(TARGET QuICC::Cuda)
         WORKING_DIRECTORY
         "${QUICC_WORK_DIR}"
     )
+else()
+    add_executable(ViewBlasTest
+        ViewBlasTests.cpp
+    )
+
+    target_link_libraries(ViewBlasTest
+        ${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB}::Blas
+        Catch2::Catch2
+        QuICC::Memory
+    )
+
+    add_test(
+        NAME ViewBlasTest
+        COMMAND ViewBlasTest
+        WORKING_DIRECTORY
+        "${QUICC_WORK_DIR}"
+    )
 endif()

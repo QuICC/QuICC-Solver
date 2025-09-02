@@ -33,11 +33,11 @@
 #include "QuICC/Transform/FiniteDiff/Sphere/Projector/DivR1_Zero.hpp"
 #include "QuICC/Transform/FiniteDiff/Sphere/Projector/P.hpp"
 #include "QuICC/Transform/FiniteDiff/Sphere/Projector/SphLapl.hpp"
-#ifdef FD_ENERGY_IMPLEMENTED
 #include "QuICC/Transform/FiniteDiff/Sphere/Reductor/Energy.hpp"
 #include "QuICC/Transform/FiniteDiff/Sphere/Reductor/EnergyD1R1.hpp"
 #include "QuICC/Transform/FiniteDiff/Sphere/Reductor/EnergyR2.hpp"
 #include "QuICC/Transform/FiniteDiff/Sphere/Reductor/EnergySLaplR2.hpp"
+#ifdef FD_ENERGY_IMPLEMENTED
 #include "QuICC/Transform/FiniteDiff/Sphere/Reductor/Power.hpp"
 #include "QuICC/Transform/FiniteDiff/Sphere/Reductor/PowerD1R1.hpp"
 #include "QuICC/Transform/FiniteDiff/Sphere/Reductor/PowerR2.hpp"
@@ -95,7 +95,6 @@ void DefaultSphereFiniteDiffMap::operator()(MapType& m) const
       Forward::T::id());
 
    // Create reductors
-#ifdef FD_ENERGY_IMPLEMENTED
    this->addOperator<FiniteDiff::Sphere::Reductor::EnergySLaplR2<backend_t>>(m,
       Reductor::EnergySlaplR2::id());
    this->addOperator<FiniteDiff::Sphere::Reductor::EnergyD1R1<backend_t>>(m,
@@ -104,6 +103,7 @@ void DefaultSphereFiniteDiffMap::operator()(MapType& m) const
       Reductor::EnergyR2::id());
    this->addOperator<FiniteDiff::Sphere::Reductor::Energy<backend_t>>(m,
       Reductor::Energy::id());
+#ifdef FD_ENERGY_IMPLEMENTED
    this->addOperator<FiniteDiff::Sphere::Reductor::PowerSLaplR2<backend_t>>(m,
       Reductor::PowerSlaplR2::id());
    this->addOperator<FiniteDiff::Sphere::Reductor::PowerD1R1<backend_t>>(m,
