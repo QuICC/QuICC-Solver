@@ -264,3 +264,145 @@ TEST_CASE("Mixed GEMM using Eigen ArmBcmCcm", "[MixedGEMMEigenArmBcmCcm]")
       CHECK(std::abs(c_r[i].imag() - c_h[i].imag()) < eps );
    }
 }
+
+TEST_CASE("Mixed GEMM using Naive AcscBrmCrm", "[MixedGEMMNaiveAcscBrmCrm]")
+{
+   constexpr unsigned int M = 1 << 8;
+   constexpr unsigned int N = 1 << 8;
+   constexpr unsigned int K = 1 << 8;
+
+   std::array<double, M * K> a_d;
+   std::vector<double> a_s;
+   std::vector<std::uint32_t> a_p(M+1, 0);
+   std::vector<std::uint32_t> a_i;
+   std::array<std::complex<double>, K * N> b_h;
+   std::array<std::complex<double>, M * N> c_h;
+   std::array<std::complex<double>, M * N> c_r;
+
+   // Initialize matrices
+   for (std::size_t i = 0; i < M * K; ++i)
+   {
+      bool isNonzero = (std::abs(randf<double>()) < 0.1);
+      if(isNonzero)
+      {
+         a_d[i] = randf<double>();
+         a_s.push_back(a_d[i]);
+         a_i.push_back(i%M);
+         a_p[i/M + 1]++;
+      }
+      else
+      {
+         a_d[i] = 0;
+      }
+   }
+   for(std::size_t i = 1; i < a_p.size(); i++)
+   {
+      a_p[i] += a_p[i-1];
+   }
+   for (std::size_t i = 0; i < K * N; ++i)
+   {
+      b_h[i] = std::complex<double>(randf<double>(), randf<double>());
+   }
+   for (std::size_t i = 0; i < M * N; ++i)
+   {
+      c_h[i] = 0.0;
+      c_r[i] = 0.0;
+   }
+
+   std::array<std::uint32_t, 2> dimA {M, K};
+   std::array<std::uint32_t, 2> dimB {K, N};
+   std::array<std::uint32_t, 2> dimC {M, N};
+   std::array<std::vector<std::uint32_t>,2> a_vp = {{a_p,{}}};
+   std::array<std::vector<std::uint32_t>,2> a_vi = {{a_i,{}}};
+
+   QuICC::View::View<double, QuICC::View::dense2D> vAd(a_d, dimA);
+   QuICC::View::View<double, QuICC::View::CSC> vA(a_s, dimA, a_vp, a_vi);
+   QuICC::View::View<std::complex<double>, QuICC::View::dense2DRM> vB(b_h, dimB);
+   QuICC::View::View<std::complex<double>, QuICC::View::dense2DRM> vC(c_h, dimC);
+
+   constexpr auto layout = memlay::AcmBrmCrm;
+
+   /// Eigen
+   QuICC::Blas::Cpu::Eigen::matmul(vC, vA, vB, 1.0);
+
+   /// check
+   cpu_naive_gemm<std::complex<double>, double, std::complex<double>, layout>( c_r.data(), a_d.data(), b_h.data(), M, K, N);
+
+   double eps = 1.e-10;
+   for (std::uint64_t i = 0; i < c_r.size(); ++i)
+   {
+      CHECK(std::abs(c_r[i].real() - c_h[i].real()) < eps );
+      CHECK(std::abs(c_r[i].imag() - c_h[i].imag()) < eps );
+   }
+}
+
+TEST_CASE("Mixed GEMM using Naive AcsrBcmCcm", "[MixedGEMMNaiveAcsrBcmCcm]")
+{
+   constexpr unsigned int M = 1 << 8;
+   constexpr unsigned int N = 1 << 8;
+   constexpr unsigned int K = 1 << 8;
+
+   std::array<double, M * K> a_d;
+   std::vector<double> a_s;
+   std::vector<std::uint32_t> a_p(K+1, 0);
+   std::vector<std::uint32_t> a_i;
+   std::array<std::complex<double>, K * N> b_h;
+   std::array<std::complex<double>, M * N> c_h;
+   std::array<std::complex<double>, M * N> c_r;
+
+   // Initialize matrices
+   for (std::size_t i = 0; i < M * K; ++i)
+   {
+      bool isNonzero = (std::abs(randf<double>()) < 0.1);
+      if(isNonzero)
+      {
+         a_d[i] = randf<double>();
+         a_s.push_back(a_d[i]);
+         a_i.push_back(i%K);
+         a_p[i/K + 1]++;
+      }
+      else
+      {
+         a_d[i] = 0;
+      }
+   }
+   for(std::size_t i = 1; i < a_p.size(); i++)
+   {
+      a_p[i] += a_p[i-1];
+   }
+   for (std::size_t i = 0; i < K * N; ++i)
+   {
+      b_h[i] = std::complex<double>(randf<double>(), randf<double>());
+   }
+   for (std::size_t i = 0; i < M * N; ++i)
+   {
+      c_h[i] = 0.0;
+      c_r[i] = 0.0;
+   }
+
+   std::array<std::uint32_t, 2> dimA {M, K};
+   std::array<std::uint32_t, 2> dimB {K, N};
+   std::array<std::uint32_t, 2> dimC {M, N};
+   std::array<std::vector<std::uint32_t>,2> a_vp = {{{}, a_p}};
+   std::array<std::vector<std::uint32_t>,2> a_vi = {{{}, a_i}};
+
+   QuICC::View::View<double, QuICC::View::dense2DRM> vAd(a_d, dimA);
+   QuICC::View::View<double, QuICC::View::CSR> vA(a_s, dimA, a_vp, a_vi);
+   QuICC::View::View<std::complex<double>, QuICC::View::dense2D> vB(b_h, dimB);
+   QuICC::View::View<std::complex<double>, QuICC::View::dense2D> vC(c_h, dimC);
+
+   constexpr auto layout = memlay::ArmBcmCcm;
+
+   /// Eigen
+   QuICC::Blas::Cpu::Eigen::matmul(vC, vA, vB, 1.0);
+
+   /// check
+   cpu_naive_gemm<std::complex<double>, double, std::complex<double>, layout>( c_r.data(), a_d.data(), b_h.data(), M, K, N);
+
+   double eps = 1.e-10;
+   for (std::uint64_t i = 0; i < c_r.size(); ++i)
+   {
+      CHECK(std::abs(c_r[i].real() - c_h[i].real()) < eps );
+      CHECK(std::abs(c_r[i].imag() - c_h[i].imag()) < eps );
+   }
+}

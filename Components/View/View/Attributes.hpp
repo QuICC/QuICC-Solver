@@ -468,6 +468,11 @@ using dense2DRM =
    Attributes<DimLevelType<dense_t, dense_t>, LoopOrderType<j_t, i_t>>;
 
 /**
+ * @brief 2D CSR row major matrix (M,N)
+ */
+using CSR = Attributes<DimLevelType<sparse_t, compressed_t>>;
+
+/**
  * @brief 2D CSC column major matrix (M,N)
  */
 using CSC = Attributes<DimLevelType<compressed_t, sparse_t>>;
@@ -609,6 +614,11 @@ using S2CLCSC3DJIK = Attributes<DimLevelType<step2K_t, compressed_t, sparse_t>,
  * @brief Sparse Layer of 2D CSC sparse data
  */
 using CSCSL3D = Attributes<DimLevelType<compressed_t, sparse_t, sparse_t>>;
+
+/**
+ * @brief Sparse Layer of 2D CSR sparse data
+ */
+using CSRSL3D = Attributes<DimLevelType<sparse_t, compressed_t, sparse_t>>;
 
 } // namespace View
 } // namespace QuICC

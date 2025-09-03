@@ -724,17 +724,45 @@ const Scalar& View<Scalar, Attributes<Args...>>::operator()(const IndexType i,
       throw std::logic_error("Trying to refer to an implicit zero.");
    }
    else if constexpr (std::is_same_v<LevelType,
+                    DimLevelType<sparse_t, compressed_t, sparse_t>>)
+   {
+      if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
+      {
+         assert(_pointers[2].data() != nullptr);
+         assert(_pointers[1].data() != nullptr);
+         assert(_indices[1].data() != nullptr);
+
+         if(_pointers[2][k+1] > _pointers[2][k])
+         {
+            IndexType idk = _pointers[2][k] + i;
+            for (IndexType idj = _pointers[1][idk]; idj < _pointers[1][idk+1]; ++idj)
+            {
+               if (_indices[1][idj] == j)
+               {
+                  assert(idj < this->_size);
+                  return this->_data[idj];
+               }
+            }
+         }
+      }
+      else
+      {
+         throw std::logic_error("Not implemented yet.");
+      }
+      throw std::logic_error("Trying to refer to an implicit zero.");
+   }
+   else if constexpr (std::is_same_v<LevelType,
                     DimLevelType<compressed_t, sparse_t, sparse_t>>)
    {
       if constexpr (std::is_same_v<OrderType, LoopOrderType<i_t, j_t, k_t>>)
       {
-         assert(_pointers[1].data() != nullptr);
+         assert(_pointers[2].data() != nullptr);
          assert(_pointers[0].data() != nullptr);
          assert(_indices[0].data() != nullptr);
 
-         if(_pointers[1][k+1] > _pointers[1][k])
+         if(_pointers[2][k+1] > _pointers[2][k])
          {
-            IndexType idk = _pointers[1][k] + j;
+            IndexType idk = _pointers[2][k] + j;
             for (IndexType idj = _pointers[0][idk]; idj < _pointers[0][idk+1]; ++idj)
             {
                if (_indices[0][idj] == i)

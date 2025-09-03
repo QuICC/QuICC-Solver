@@ -7,6 +7,7 @@
 // External includes
 //
 #include <Eigen/Core>
+#include <Eigen/Sparse>
 
 // Project includes
 //
@@ -174,6 +175,98 @@ inline void matmul(View::View<TC, View::dense2DRM>& C,
    assert(C.size() == M * N);
 
    ::Eigen::Map<AMatrix> eA(A.data(), M, K);
+   ::Eigen::Map<BMatrixZRM> eB(B.data(), K, N);
+   ::Eigen::Map<CMatrixZRM> eC(C.data(), M, N);
+
+   // Order of operations is important with mixed (complex/real) types!
+   eC = eA * eB * alpha;
+}
+
+/// @brief Eigen matmul with mixed types with sparse A
+/// @tparam TA CSC
+/// @tparam TB row major
+/// @tparam TC row major
+/// @tparam Talpha
+/// @param C
+/// @param A
+/// @param B
+/// @param alpha
+template <class TA, class TB, class TC, class Talpha>
+inline void matmul(View::View<TC, View::dense2DRM>& C,
+   const View::View<TA, View::CSC>& A,
+   const View::View<TB, View::dense2DRM>& B, const Talpha alpha)
+{
+   assert(C.dims()[0] == A.dims()[0]);
+   assert(C.dims()[1] == B.dims()[1]);
+   assert(A.dims()[1] == B.dims()[0]);
+
+   const auto M = C.dims()[0];
+   const auto N = C.dims()[1];
+   const auto K = A.dims()[1];
+
+   using AMatrix = ::Eigen::SparseMatrix<TA>;
+   using BMatrixZRM = ::Eigen::Matrix<TB, ::Eigen::Dynamic, ::Eigen::Dynamic,
+      ::Eigen::RowMajor>;
+   using CMatrixZRM = ::Eigen::Matrix<TC, ::Eigen::Dynamic, ::Eigen::Dynamic,
+      ::Eigen::RowMajor>;
+
+   assert(A.size() == M * K);
+   assert(B.size() == K * N);
+   assert(C.size() == M * N);
+
+   auto&& t_p = A.pointers()[0];
+   auto&& t_i = A.indices()[0];
+   std::vector<int> a_p;
+   std::copy_n(t_p.data(), t_p.size(), std::back_inserter(a_p));
+   std::vector<int> a_i;
+   std::copy_n(t_i.data(), t_i.size(), std::back_inserter(a_i));
+
+   ::Eigen::Map<const AMatrix> eA(M, K, A.size(), a_p.data(), a_i.data(), A.data());
+   ::Eigen::Map<BMatrixZRM> eB(B.data(), K, N);
+   ::Eigen::Map<CMatrixZRM> eC(C.data(), M, N);
+
+   // Order of operations is important with mixed (complex/real) types!
+   eC = eA * eB * alpha;
+}
+
+/// @brief Eigen matmul with mixed types with sparse A
+/// @tparam TA CSR
+/// @tparam TB row major
+/// @tparam TC row major
+/// @tparam Talpha
+/// @param C
+/// @param A
+/// @param B
+/// @param alpha
+template <class TA, class TB, class TC, class Talpha>
+inline void matmul(View::View<TC, View::dense2D>& C,
+   const View::View<TA, View::CSR>& A,
+   const View::View<TB, View::dense2D>& B, const Talpha alpha)
+{
+   assert(C.dims()[0] == A.dims()[0]);
+   assert(C.dims()[1] == B.dims()[1]);
+   assert(A.dims()[1] == B.dims()[0]);
+
+   const auto M = C.dims()[0];
+   const auto N = C.dims()[1];
+   const auto K = A.dims()[1];
+
+   using AMatrix = ::Eigen::SparseMatrix<TA, ::Eigen::RowMajor>;
+   using BMatrixZRM = ::Eigen::Matrix<TB, ::Eigen::Dynamic, ::Eigen::Dynamic>;
+   using CMatrixZRM = ::Eigen::Matrix<TC, ::Eigen::Dynamic, ::Eigen::Dynamic>;
+
+   assert(A.size() == M * K);
+   assert(B.size() == K * N);
+   assert(C.size() == M * N);
+
+   auto&& t_p = A.pointers()[1];
+   auto&& t_i = A.indices()[1];
+   std::vector<int> a_p;
+   std::copy_n(t_p.data(), t_p.size(), std::back_inserter(a_p));
+   std::vector<int> a_i;
+   std::copy_n(t_i.data(), t_i.size(), std::back_inserter(a_i));
+
+   ::Eigen::Map<const AMatrix> eA(M, K, A.size(), a_p.data(), a_i.data(), A.data());
    ::Eigen::Map<BMatrixZRM> eB(B.data(), K, N);
    ::Eigen::Map<CMatrixZRM> eC(C.data(), M, N);
 
