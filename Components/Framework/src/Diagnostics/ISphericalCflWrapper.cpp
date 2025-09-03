@@ -114,6 +114,10 @@ namespace Diagnostics {
          // Compute average horizontal grid spacing
          MHDFloat effL = this->effectiveMaxL(r(j));
          r_ll1(j) = r(j)/std::sqrt(effL*(effL + 1.0));
+         if(r_ll1(j) == 0)
+         {
+            r_ll1(j) = std::numeric_limits<MHDFloat>::max();
+         }
       }
    }
 
