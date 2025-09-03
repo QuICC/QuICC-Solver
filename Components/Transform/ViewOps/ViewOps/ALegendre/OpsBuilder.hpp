@@ -111,6 +111,15 @@ template <class VOP, class DIR> struct OpsBuilderMap<VOP, LlD1_t, DIR>
       ::QuICC::Internal::Array::Scalar, 1>;
 };
 
+/// @brief Llm1D1 Builder
+/// @tparam VOP operator view type
+/// @tparam DIR fwd_t or bwd_t
+template <class VOP, class DIR> struct OpsBuilderMap<VOP, Llm1D1_t, DIR>
+{
+   using type = HelperBuilder<VOP, ::QuICC::Polynomial::ALegendre::dPlm,
+      ::QuICC::Internal::Array::Scalar, 1>;
+};
+
 /// @brief DivS1 Builder
 /// @tparam VOP operator view type
 /// @tparam DIR fwd_t or bwd_t
@@ -158,6 +167,14 @@ template <class VOP, class DIR> struct OpsBuilderMap<VOP, LlDivS1_t, DIR>
 /// @tparam VOP operator view type
 /// @tparam DIR fwd_t or bwd_t
 template <class VOP, class DIR> struct OpsBuilderMap<VOP, LlDivS1Dp_t, DIR>
+{
+   using type = OpsBuilder<VOP, LlDivS1_t, DIR>;
+};
+
+/// @brief Llm1DivS1Dp Builder
+/// @tparam VOP operator view type
+/// @tparam DIR fwd_t or bwd_t
+template <class VOP, class DIR> struct OpsBuilderMap<VOP, Llm1DivS1Dp_t, DIR>
 {
    using type = OpsBuilder<VOP, LlDivS1_t, DIR>;
 };

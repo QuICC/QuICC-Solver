@@ -55,6 +55,11 @@ struct LlD1_t
 {
 };
 
+/// @brief Llm1D1 op type tag
+struct Llm1D1_t
+{
+};
+
 /// @brief DivS1 op type tag
 struct DivS1_t
 {
@@ -82,6 +87,11 @@ struct LlDivS1_t
 
 /// @brief LlDivS1Dp op type tag
 struct LlDivS1Dp_t
+{
+};
+
+/// @brief Llm1DivS1Dp op type tag
+struct Llm1DivS1Dp_t
 {
 };
 

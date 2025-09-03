@@ -16,11 +16,13 @@
 #include "QuICC/Transform/Poly/ALegendre/Projector/D1.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/D2.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/LlD1.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Projector/Llm1D1.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/DivS1.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/DivS1Dp.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/D1DivS1Dp.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/LlDivS1.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/LlDivS1Dp.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Projector/Llm1DivS1Dp.hpp"
 #include "QuICC/Transform/Poly/ALegendre/Projector/DivS1D1S1.hpp"
 
 #include "QuICC/Transform/Poly/ALegendre/Integrator/P.hpp"
@@ -56,11 +58,13 @@
 #include "QuICC/Transform/Backward/D1.hpp"
 #include "QuICC/Transform/Backward/D2.hpp"
 #include "QuICC/Transform/Backward/D1Laplh.hpp"
+#include "QuICC/Transform/Backward/D1Laplhm1.hpp"
 #include "QuICC/Transform/Backward/Oversin.hpp"
 #include "QuICC/Transform/Backward/OversinDphi.hpp"
 #include "QuICC/Transform/Backward/D1OversinDphi.hpp"
 #include "QuICC/Transform/Backward/OversinLaplh.hpp"
 #include "QuICC/Transform/Backward/OversinLaplhDphi.hpp"
+#include "QuICC/Transform/Backward/OversinLaplhm1Dphi.hpp"
 #include "QuICC/Transform/Backward/OversinD1Sin.hpp"
 
 namespace QuICC {
@@ -105,11 +109,13 @@ namespace Transform {
       this->mImpl.addOperator<Poly::ALegendre::Projector::D1<backend_t>>(Backward::D1::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::D2<backend_t>>(Backward::D2::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::LlD1<backend_t>>(Backward::D1Laplh::id());
+      this->mImpl.addOperator<Poly::ALegendre::Projector::Llm1D1<backend_t>>(Backward::D1Laplhm1::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1<backend_t>>(Backward::Oversin::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1Dp<backend_t>>(Backward::OversinDphi::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::D1DivS1Dp<backend_t>>(Backward::D1OversinDphi::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::LlDivS1<backend_t>>(Backward::OversinLaplh::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::LlDivS1Dp<backend_t>>(Backward::OversinLaplhDphi::id());
+      this->mImpl.addOperator<Poly::ALegendre::Projector::Llm1DivS1Dp<backend_t>>(Backward::OversinLaplhm1Dphi::id());
       /// \todo not ported
       this->mImpl.addOperator<Poly::ALegendre::Projector::DivS1D1S1<base_t>>(Backward::OversinD1Sin::id());
 

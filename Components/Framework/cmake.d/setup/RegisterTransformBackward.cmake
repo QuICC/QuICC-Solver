@@ -1,6 +1,7 @@
 set(tags 
   D1
   D1Laplh
+  D1Laplhm1
   D1LaplhZD1Overr1D1R1
   D1R1
   D1ZP
@@ -16,9 +17,11 @@ set(tags
   Overr1D1
   Overr1D1R1
   Overr2D1R1
+  Overr1D2R1
   Overr1LaplhPm
   Overr1Pm
   Overr2
+  OverrSq
   Slapl
   Slaplr
   Oversin
@@ -28,6 +31,7 @@ set(tags
   D1OversinDphi
   OversinLaplh
   OversinLaplhDphi
+  OversinLaplhm1Dphi
   )
 
 include(RegisterTags)
