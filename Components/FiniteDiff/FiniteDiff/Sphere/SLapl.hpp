@@ -80,24 +80,11 @@ namespace Sphere {
          invgrid(i) = 1_mp/igrid(i);
       }
 
-      rOut = wMat.at(2);
-      rOut += 2_mp*invgrid.asDiagonal()*wMat.at(1);
-      rOut -= static_cast<Internal::MHDFloat>(l*(l+1))*invgrid.array().pow(2).matrix().asDiagonal();
+      Internal::SparseMatrix tmp = wMat.at(2);
+      tmp += 2_mp*invgrid.asDiagonal()*wMat.at(1);
+      tmp -= static_cast<Internal::MHDFloat>(l*(l+1))*invgrid.array().pow(2).matrix().asDiagonal();
 
-      // Zero top and bottom
-      if(this->mZtop > 0 || this->mZbot > 0)
-      {
-         Internal::Array qid = Internal::Array::Ones(igrid.size());
-         for(int i = 0; i < static_cast<int>(this->mZtop); i++)
-         {
-            qid(i) = 0;
-         }
-         for(int i = 0; i < static_cast<int>(this->mZbot); i++)
-         {
-            qid(nR - 1 - i) = 0;
-         }
-         rOut = qid.asDiagonal() * rOut;
-      }
+      rOut = (this->zeroTopBottom(nR)*tmp).cast<T>();
    }
 
 } // namespace Sphere

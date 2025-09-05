@@ -29,8 +29,20 @@ namespace Sphere {
       public:
          /**
           * @brief Constructor
+          *
+          * @param order   Order of accuracy
+          * @param zTop    Zero rows at top
+          * @param zBot    Zero rows at bottom
           */
-         Overr1(const size_t order);
+         Overr1(const size_t order, const std::size_t zTop, const std::size_t zBot);
+
+         /**
+          * @brief Constructor
+          *
+          * @param zTop    Zero rows at top
+          * @param zBot    Zero rows at bottom
+          */
+         Overr1(const std::size_t zTop, const std::size_t zBot);
 
          /**
           * @brief Constructor
@@ -59,19 +71,12 @@ namespace Sphere {
       rOut.resize(nR, nR);
 
       std::vector<Eigen::Triplet<T>> coeffs;
-      coeffs.emplace_back(0,0, 0_mp);
-      for(int i = 1; i < nR; i++)
+      for(int i = static_cast<int>(this->mZtop); i < nR - static_cast<int>(this->mZbot); i++)
       {
-         coeffs.emplace_back(i,i, 1_mp/igrid(i));
+         coeffs.emplace_back(i,i, static_cast<T>(1_mp/igrid(i)));
       }
 
       rOut.setFromTriplets(coeffs.begin(), coeffs.end());
-
-      // Zero r = 0 and r = 1
-      Internal::Array qid = Internal::Array::Ones(igrid.size());
-      qid(0) = 0;
-      qid(nR-1) = 0;
-      rOut = qid.asDiagonal() * rOut;
    }
 
 } // namespace Sphere

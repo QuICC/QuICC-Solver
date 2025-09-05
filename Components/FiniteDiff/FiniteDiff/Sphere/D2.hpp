@@ -29,8 +29,20 @@ namespace Sphere {
       public:
          /**
           * @brief Constructor
+          *
+          * @param order   Order of accuracy
+          * @param zTop    Zero rows at top
+          * @param zBot    Zero rows at bottom
           */
-         D2(const size_t order);
+         D2(const size_t order, const std::size_t zTop, const std::size_t zBot);
+
+         /**
+          * @brief Constructor
+          *
+          * @param zTop    Zero rows at top
+          * @param zBot    Zero rows at bottom
+          */
+         D2(const std::size_t zTop, const std::size_t zBot);
 
          /**
           * @brief Constructor
@@ -61,14 +73,7 @@ namespace Sphere {
       std::vector<Internal::SparseMatrix> wMat;
       this->fdMatrices(wMat, igrid, this->mOrder, 2);
 
-      rOut = wMat.back();
-
-      Internal::Array qid = Internal::Array::Ones(igrid.size());
-      qid(0) = 0;
-      qid(nR-1) = 0;
-
-      // Zero r = 0 and r = 1
-      rOut = qid.asDiagonal() * rOut;
+      rOut = (this->zeroTopBottom(nR)*wMat.back()).cast<T>();
    }
 
 } // namespace Sphere

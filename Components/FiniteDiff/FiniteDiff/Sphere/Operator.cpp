@@ -9,6 +9,7 @@
 // Project includes
 //
 #include "FiniteDiff/Sphere/Operator.hpp"
+#include "Types/Internal/Literals.hpp"
 
 namespace QuICC {
 
@@ -43,23 +44,25 @@ namespace Sphere {
 
    void Operator::fdWeights(std::vector<std::vector<Internal::MHDFloat> >& w, const Internal::MHDFloat z, const std::vector<Internal::MHDFloat>& x, const std::size_t m) const
    {
+      using namespace Internal::Literals;
+
       assert(w.size() == 0);
 
       // Initialize storage
       for(std::size_t i = 0; i <= m; i++)
       {
-         w.emplace_back(x.size(), 0);
+         w.emplace_back(x.size(), 0_mp);
       }
 
       Internal::MHDFloat c1,c2,c3,c4,c5;
 
-      c1 = 1.0;
+      c1 = 1.0_mp;
       c4 = x.at(0) - z;
-      w[0][0] = 1.0;
+      w[0][0] = 1.0_mp;
       for(std::size_t i = 1; i < x.size(); i++)
       {
          std::size_t mn = std::min(i, m);
-         c2 = 1.0;
+         c2 = 1.0_mp;
          c5 = c4;
          c4 = x[i] - z;
          for(std::size_t j = 0; j < i; j++)
@@ -168,14 +171,16 @@ namespace Sphere {
       }
    }
 
-   SparseMatrix Operator::zeroTopBottom(const int nR) const
+   Internal::SparseMatrix Operator::zeroTopBottom(const int nR) const
    {
-      SparseMatrix op(nR, nR);
+      using namespace Internal::Literals;
 
-      std::vector<Eigen::Triplet<MHDFloat>> coeffs;
+      Internal::SparseMatrix op(nR, nR);
+
+      std::vector<Eigen::Triplet<Internal::MHDFloat>> coeffs;
       for(int i = static_cast<int>(this->mZtop); i < nR - static_cast<int>(this->mZbot); i++)
       {
-         coeffs.emplace_back(i,i, 1);
+         coeffs.emplace_back(i,i, 1_mp);
       }
 
       op.setFromTriplets(coeffs.begin(), coeffs.end());

@@ -73,10 +73,8 @@ namespace Sphere {
       std::vector<Internal::SparseMatrix> wMat;
       this->fdMatrices(wMat, igrid, this->mOrder, 1);
 
-      rOut = wMat.at(1)*igrid.asDiagonal();
-
-      // Zero top and bottom
-      rOut = this->zeroTopBottom(nR) * rOut;
+      Internal::SparseMatrix tmp = wMat.at(1)*igrid.asDiagonal();
+      rOut = (this->zeroTopBottom(nR) * tmp).cast<T>();
    }
 
 } // namespace Sphere

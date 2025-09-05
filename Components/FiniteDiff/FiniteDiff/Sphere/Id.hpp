@@ -73,7 +73,7 @@ namespace Sphere {
       std::vector<Eigen::Triplet<T>> coeffs;
       for(int i = static_cast<int>(this->mZtop); i < nR - static_cast<int>(this->mZbot); i++)
       {
-         coeffs.emplace_back(i,i, 1_mp);
+         coeffs.emplace_back(i,i, static_cast<T>(1_mp));
       }
 
       rOut.setFromTriplets(coeffs.begin(), coeffs.end());

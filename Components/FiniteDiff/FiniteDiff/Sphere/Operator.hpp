@@ -63,7 +63,7 @@ namespace Sphere {
          /**
           * @brief Get operator to zero top and bottom rows
           */
-         SparseMatrix zeroTopBottom(const int nR) const;
+         Internal::SparseMatrix zeroTopBottom(const int nR) const;
 
          /**
           * @brief Scheme order

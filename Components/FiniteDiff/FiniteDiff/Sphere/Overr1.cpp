@@ -16,13 +16,18 @@ namespace FiniteDiff {
 
 namespace Sphere {
 
-   Overr1::Overr1(const std::size_t order)
-      : Operator(order)
+   Overr1::Overr1(const std::size_t order, const std::size_t zTop, const std::size_t zBot)
+      : Operator(order, zTop, zBot)
+   {
+   }
+
+   Overr1::Overr1(const std::size_t zTop, const std::size_t zBot)
+      : Operator(QUICC_FINITEDIFF_SPHERE_ORDER, zTop, zBot)
    {
    }
 
    Overr1::Overr1()
-      : Overr1(QUICC_FINITEDIFF_SPHERE_ORDER)
+      : Overr1(QUICC_FINITEDIFF_SPHERE_ORDER, 1, 1)
    {
    }
 
