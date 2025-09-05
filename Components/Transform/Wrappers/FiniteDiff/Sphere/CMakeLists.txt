@@ -6,11 +6,11 @@ endif()
 
 set(Kinds "Projector;Integrator")
 
-set(ProjectorOps "P;D1;DivR1;DivR1_Zero;DivR1D1R1;DivR1D1R1_Zero;SphLapl")
+set(ProjectorOps "P;R1;D1;D2;D3;D4;DivR1;R1_Zero;DivR1_Zero;DivR1D1R1;DivR1D1R1_Zero;SphLapl")
 set(IntegratorOps "P;P_Zero;R1_Zero;DivR1_Zero;DivR1D1R1_Zero")
 
-set(IntegratorOpAttribute "CSL3D")
-set(ProjectorOpAttribute "CSL3D")
+set(IntegratorOpAttribute "CSCSL3D")
+set(ProjectorOpAttribute "CSCSL3D")
 set(IntegratorOpInOut "mods_t, phys_t")
 set(ProjectorOpInOut "phys_t, mods_t")
 

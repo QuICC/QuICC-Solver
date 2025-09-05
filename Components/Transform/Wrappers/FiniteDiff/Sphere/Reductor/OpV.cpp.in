@@ -16,6 +16,8 @@
 #include "ViewOps/Pointwise/Cpu/Pointwise.hpp"
 #include "ViewOps/Pointwise/Functors.hpp"
 #include "ViewOps/Reduction/Cpu/Reduction.hpp"
+#include "ViewOps/Quadrature/SparseOp.hpp"
+#include "ViewOps/Quadrature/SparseImpl.hpp"
 #include "ViewOps/Quadrature/Op.hpp"
 #include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/FiniteDiff/Sphere/Tags.hpp"
@@ -50,8 +52,8 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
     // Make projector view operator
     using namespace QuICC::Transform::Quadrature;
     using namespace QuICC::Transform::FiniteDiff::Sphere;
-    using backendPrj_t = @BackendNamespace@::ImplOp<phys_t, mods_t, op_t>;
-    using derivedPrj_t = Op<phys_t, mods_t, op_t, backendPrj_t>;
+    using backendPrj_t = @BackendNamespace@::SparseImplOp<phys_t, mods_t, op_t>;
+    using derivedPrj_t = SparseOp<phys_t, mods_t, op_t, backendPrj_t>;
     auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
 
     std::vector<std::uint32_t> layers(nLayers);
@@ -67,7 +69,9 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
 
     using namespace QuICC::FiniteDiff::Sphere;
     OpsBuilder<op_t, @Op@_t, bwd_t> tBuilderBwd;
-    tBuilderBwd.compute(prjView, igrid);
+    op_t::IndexType nnz;
+    tBuilderBwd.compute(prjView, igrid, nnz);
+    derivedPrjOp.compress(nnz);
 
     // setup pointwise operator
     mPnt = std::make_unique<QuICC::Pointwise::@BackendNamespace@::Op<QuICC::Pointwise::Abs2Functor<double>, physAbs_t, phys_t>>(QuICC::Pointwise::Abs2Functor<double>());
@@ -78,15 +82,15 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
     std::array<std::uint32_t, rank> dimensionsRed {1, M, P};
 
     // Make view reductor operator
-    using backendRed_t = @BackendNamespace@::ImplOp<modsRed_t, physAbs_t, op_t>;
-    using derivedRed_t = Op<modsRed_t, physAbs_t, op_t, backendRed_t>;
+    using backendRed_t = @BackendNamespace@::ImplOp<modsRed_t, physAbs_t, red_t>;
+    using derivedRed_t = Op<modsRed_t, physAbs_t, red_t, backendRed_t>;
 
     mRed = std::make_unique<derivedRed_t>(mem);
     derivedRed_t& derivedOp = dynamic_cast<derivedRed_t&>(*mRed);
     derivedOp.allocOp(dimensionsRed, layers);
     auto redView = derivedOp.getOp();
 
-    OpsBuilder<op_t, @Op@_t, fwd_t> tBuilderFwd;
+    OpsBuilder<red_t, @Op@_t, fwd_t> tBuilderFwd;
     tBuilderFwd.compute(redView, igrid);
 
     ///\todo move view setups to init

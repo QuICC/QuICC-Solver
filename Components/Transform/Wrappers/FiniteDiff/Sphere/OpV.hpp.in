@@ -86,11 +86,11 @@ private:
     #elif defined QUICC_FD_SPHERE_ALL_ROW_MAJOR
     using mods_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
     using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
-    using op_t = View::View<double, View::@OpAttribute@JIK>;
+    using op_t = View::View<double, View::@OpAttribute@>;
     #else
     using mods_t = View::View<std::complex<double>, View::DCCSC3D>;
     using phys_t = View::View<std::complex<double>, View::DCCSC3D>;
-    using op_t = View::View<double, View::@OpAttribute@JIK>;
+    using op_t = View::View<double, View::@OpAttribute@>;
     #endif
 
     /// @brief Operator backend class pointer

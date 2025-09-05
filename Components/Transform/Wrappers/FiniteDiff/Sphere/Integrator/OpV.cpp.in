@@ -13,8 +13,8 @@
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
-#include "ViewOps/Quadrature/Op.hpp"
-#include "ViewOps/Quadrature/Impl.hpp"
+#include "ViewOps/Quadrature/SparseOp.hpp"
+#include "ViewOps/Quadrature/SparseImpl.hpp"
 #include "ViewOps/FiniteDiff/Sphere/Tags.hpp"
 #include "ViewOps/FiniteDiff/Sphere/Builder.hpp"
 #include "Profiler/Interface.hpp"
@@ -48,8 +48,8 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
     // Make view operator
     using namespace QuICC::Transform::Quadrature;
     using namespace QuICC::Transform::FiniteDiff::Sphere;
-    using backend_t = @BackendNamespace@::ImplOp<mods_t, phys_t, op_t>;
-    using derived_t = Op<mods_t, phys_t, op_t, backend_t>;
+    using backend_t = @BackendNamespace@::SparseImplOp<mods_t, phys_t, op_t>;
+    using derived_t = SparseOp<mods_t, phys_t, op_t, backend_t>;
     auto mem = std::make_shared<QuICC::Memory::@MemRes@>();
 
     std::vector<std::uint32_t> layers(nLayers);
@@ -64,8 +64,9 @@ void @Op@<@Tag@>::initOperators(const Internal::Array& igrid) const
     auto opView = derivedOp.getOp();
     using namespace QuICC::FiniteDiff::Sphere;
     OpsBuilder<op_t, @Op@_t, fwd_t> tBuilder;
-    tBuilder.compute(opView, igrid);
-
+    op_t::IndexType nnz;
+    tBuilder.compute(opView, igrid, nnz);
+    derivedOp.compress(nnz);
 
     ///\todo move view setups to init
 
