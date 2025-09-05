@@ -46,6 +46,21 @@ struct D1_t
 {
 };
 
+/// @brief D1 op type tag
+struct D2_t
+{
+};
+
+/// @brief D1 op type tag
+struct D3_t
+{
+};
+
+/// @brief D1 op type tag
+struct D4_t
+{
+};
+
 /// @brief DivR1 op type tag
 struct DivR1_t
 {
@@ -68,6 +83,11 @@ struct DivR1D1R1_Zero_t
 
 /// @brief SphLapl op type tag
 struct SphLapl_t
+{
+};
+
+/// @brief R1 op type tag
+struct R1_t
 {
 };
 

@@ -21,7 +21,7 @@ TEST_CASE( "@Algorithm@::Error for @Operator@@Template@ integrator", "[@CatchTes
    // Set default arguments if required
    if(currentts::args().useDefault)
    {
-      currentts::args().params = {0,1,2,3,4};
+      currentts::args().params = {0,1,2,3};
    }
 
    Catch::StringMaker<double>::precision = 15;

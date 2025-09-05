@@ -265,7 +265,7 @@ TEST_CASE("Mixed GEMM using Eigen ArmBcmCcm", "[MixedGEMMEigenArmBcmCcm]")
    }
 }
 
-TEST_CASE("Mixed GEMM using Naive AcscBrmCrm", "[MixedGEMMNaiveAcscBrmCrm]")
+TEST_CASE("Mixed GEMM using Eigen AcscBrmCrm", "[MixedGEMMEigenAcscBrmCrm]")
 {
    constexpr unsigned int M = 1 << 8;
    constexpr unsigned int N = 1 << 8;
@@ -336,7 +336,7 @@ TEST_CASE("Mixed GEMM using Naive AcscBrmCrm", "[MixedGEMMNaiveAcscBrmCrm]")
    }
 }
 
-TEST_CASE("Mixed GEMM using Naive AcsrBcmCcm", "[MixedGEMMNaiveAcsrBcmCcm]")
+TEST_CASE("Mixed GEMM using Eigen AcsrBcmCcm", "[MixedGEMMEigenAcsrBcmCcm]")
 {
    constexpr unsigned int M = 1 << 8;
    constexpr unsigned int N = 1 << 8;

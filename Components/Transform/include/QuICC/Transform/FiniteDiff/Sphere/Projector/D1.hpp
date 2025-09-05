@@ -1,6 +1,6 @@
 /**
  * @file D1.hpp
- * @brief Implementation of the Finite Differences based D projector
+ * @brief Implementation of the Finite Differences based D1 projector
  */
 
 #ifndef QUICC_TRANSFORM_FINITEDIFF_SPHERE_PROJECTOR_D1_HPP

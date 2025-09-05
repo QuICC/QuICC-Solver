@@ -1,6 +1,6 @@
 /**
- * @file Impl.hpp
- * @brief cpu implementation of dense quadrature operator
+ * @file SparseImpl.hpp
+ * @brief cpu implementation of sparse quadrature operator
  */
 #pragma once
 
@@ -18,6 +18,7 @@
 #include "ViewOps/Quadrature/Tags.hpp"
 #include "ViewOps/Quadrature/ViewBatchedMatmulUtils.hpp"
 
+
 namespace QuICC {
 namespace Transform {
 /// @brief namespace for quadrature based operators
@@ -25,7 +26,7 @@ namespace Quadrature {
 /// @brief Cpu backend namespace
 namespace Cpu {
 
-/// @brief Derived classes implement dense quadrature operators.
+/// @brief Derived classes implement sparse quadrature operators.
 /// In practice it boils down to a batched matmul with each batch having
 /// different sizes.
 /// @tparam Tout differentiated modes type
@@ -33,14 +34,14 @@ namespace Cpu {
 /// @tparam Top operator type
 /// @tparam Treatment tag to include scaling due to derivative
 template <class Tout, class Tin, class Top, std::uint16_t Treatment = 0>
-class ImplOp : public Operator::BinaryBaseOp<ImplOp<Tout, Tin, Top, Treatment>,
+class SparseImplOp : public Operator::BinaryBaseOp<SparseImplOp<Tout, Tin, Top, Treatment>,
                   Tout, Tin, Top>
 {
 public:
    /// @brief Default constructor
-   ImplOp() = default;
+   SparseImplOp() = default;
    /// @brief dtor
-   ~ImplOp() = default;
+   ~SparseImplOp() = default;
 
 private:
    /// @brief Action implementation
@@ -49,7 +50,7 @@ private:
    /// @param op operator
    void applyImpl(Tout& out, const Tin& in, const Top& op);
    /// @brief Give access to base class
-   friend Operator::BinaryBaseOp<ImplOp<Tout, Tin, Top, Treatment>, Tout, Tin,
+   friend Operator::BinaryBaseOp<SparseImplOp<Tout, Tin, Top, Treatment>, Tout, Tin,
       Top>;
    /// @brief index typedef
    using IndexType = typename Tin::IndexType;
@@ -60,7 +61,7 @@ private:
 };
 
 template <class Tout, class Tin, class Top, std::uint16_t Treatment>
-void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in,
+void SparseImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in,
    const Top& op)
 {
    // batched matmul out = op*in
@@ -90,6 +91,9 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in,
 
    // matmul loop
    std::uint32_t offSetA = 0;
+   std::uint32_t nnzA = 0;
+   std::uint32_t csIdxA = 0;
+   std::uint32_t csJumpA = 0;
    std::uint32_t offSetB = 0;
    std::uint32_t offSetC = 0;
 
@@ -99,7 +103,7 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in,
       constexpr bool isSliceOpRowMaj = std::is_same_v<typename Top::OrderType,
          View::LoopOrderType<View::j_t, View::i_t, View::k_t>>;
       using opSliceAtt_t =
-         std::conditional_t<isSliceOpRowMaj, View::dense2DRM, View::dense2D>;
+         std::conditional_t<isSliceOpRowMaj, View::CSR, View::CSC>;
       using dataSliceAtt_t =
          std::conditional_t<isSliceOpRowMaj, View::dense2D, View::dense2DRM>;
 
@@ -110,13 +114,38 @@ void ImplOp<Tout, Tin, Top, Treatment>::applyImpl(Tout& out, const Tin& in,
       auto N = dims.N;
 
       // check mem bounds
-      assert(offSetA + M * K <= op.size());
       assert(offSetB + K * N <= in.size());
       assert(offSetC + M * N <= out.size());
 
-      // set dense views
+      // set sparse views
+      std::array<std::vector<typename Top::IndexType>,2> a_p = {{{},{}}};
+      std::array<std::vector<typename Top::IndexType>,2> a_i = {{{},{}}};
+      if(isSliceOpRowMaj)
+      {
+         csIdxA = 1;
+         csJumpA = M + 1;
+      }
+      else
+      {
+         csIdxA = 0;
+         csJumpA = K + 1;
+      }
+      nnzA = op.pointers()[csIdxA][(h+1)*csJumpA-1] - op.pointers()[csIdxA][h*csJumpA];
+      assert(offSetA + nnzA <= op.size());
+      a_p[csIdxA].reserve(csJumpA);
+      a_i[csIdxA].reserve(nnzA);
+      for(std::uint32_t i = 0; i < csJumpA; i++)
+      {
+         a_p[csIdxA].push_back(op.pointers()[csIdxA][h*csJumpA + i] - op.pointers()[csIdxA][h*csJumpA]);
+      }
+      for(std::uint32_t i = 0; i < nnzA; i++)
+      {
+         a_i[csIdxA].push_back(op.indices()[csIdxA][op.pointers()[csIdxA][h*(M+1)] + i]);
+      }
       View::View<typename Top::ScalarType, opSliceAtt_t> A(
-         {op.data() + offSetA, M * K}, {M, K});
+         {op.data() + offSetA, nnzA}, {M, K}, a_p, a_i);
+
+      // set dense views
       View::View<typename Tin::ScalarType, dataSliceAtt_t> B(
          {in.data() + offSetB, K * N}, {K, N});
       View::View<typename Tout::ScalarType, dataSliceAtt_t> C(

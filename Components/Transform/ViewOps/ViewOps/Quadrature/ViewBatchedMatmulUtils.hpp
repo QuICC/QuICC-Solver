@@ -22,7 +22,7 @@ namespace Quadrature {
 template <class T> struct opMeta
 {
    std::size_t dataSize;
-   T pointersSize, indicesSize, idx;
+   T pointersSize, indicesSize, idx, csPointersSize, csIndicesSize, csIdx;
 };
 
 /// @brief compute operator metadata based on type, dimensions and number of
@@ -96,6 +96,38 @@ QUICC_CUDA_HOSTDEV inline opMeta<typename Top::IndexType> getOpMeta(
          varSize += nPoly;
       }
       meta.dataSize = M * varSize;
+   }
+   else if constexpr (std::is_same_v<opLevelType, CSCSL3D::level>)
+   {
+      // Sparse CSC operator
+      // dim 0 - Nr - radial points/modes
+      // dim 1 - R  - radial modes/points
+      // dim 2 - L  - harmonic degree
+      auto M = dimensions[0];
+      auto K = dimensions[1];
+      meta.pointersSize = nLayers + 1;
+      meta.indicesSize = nLayers;
+      meta.idx = 2;
+      meta.dataSize = M * K * nLayers;
+      meta.csPointersSize = nLayers * (K + 1);
+      meta.csIndicesSize = M * K * nLayers;
+      meta.csIdx = 0;
+   }
+   else if constexpr (std::is_same_v<opLevelType, CSRSL3D::level>)
+   {
+      // Sparse CSR operator
+      // dim 0 - Nr - radial points/modes
+      // dim 1 - R  - radial modes/points
+      // dim 2 - L  - harmonic degree
+      auto M = dimensions[0];
+      auto K = dimensions[1];
+      meta.pointersSize = nLayers + 1;
+      meta.indicesSize = nLayers;
+      meta.idx = 2;
+      meta.dataSize = M * K * nLayers;
+      meta.csPointersSize = nLayers * (M + 1);
+      meta.csIndicesSize = M * K * nLayers;
+      meta.csIdx = 1;
    }
    else
    {
@@ -180,6 +212,44 @@ QUICC_CUDA_HOSTDEV inline void setIndicesAndPointers(
          indices[metaIdx][p] = layers[p];
       }
    }
+   // Set up pointers / indices for operator
+   else if constexpr (std::is_same_v<opLevelType, CSCSL3D::level>)
+   {
+      //auto M = dimensions[0];
+      auto K = dimensions[1];
+
+      IndexType metaIdx = 2;
+
+      // Uniform M * K slice per layer
+      pointers[metaIdx][0] = 0;
+      for (IndexType p = 0; p < nLayers; ++p)
+      {
+         // Pointers for K columns
+         pointers[metaIdx][p+1] = pointers[metaIdx][p] + K + 1;
+
+         // set index
+         indices[metaIdx][p] = layers[p];
+      }
+   }
+   // Set up pointers / indices for operator
+   else if constexpr (std::is_same_v<opLevelType, CSRSL3D::level>)
+   {
+      auto M = dimensions[0];
+      //auto K = dimensions[1];
+
+      IndexType metaIdx = 2;
+
+      // Uniform M * K slice per layer
+      pointers[metaIdx][0] = 0;
+      for (IndexType p = 0; p < nLayers; ++p)
+      {
+         // Pointers for M rows
+         pointers[metaIdx][p+1] = pointers[metaIdx][p] + M + 1;
+
+         // set index
+         indices[metaIdx][p] = layers[p];
+      }
+   }
    else
    {
       static_assert(std::is_same_v<opLevelType, void>,
@@ -205,7 +275,9 @@ getModsPointers(const Tout& out, const Tin& in, const Top& op)
    ViewBase<IndexType> modsPointers;
    using opLevelType = typename Top::LevelType;
    // JW uniform truncation projector/integrator ijk order
-   if constexpr (std::is_same_v<opLevelType, CSL3D::level>)
+   if constexpr (std::is_same_v<opLevelType, CSL3D::level> ||
+         std::is_same_v<opLevelType, CSCSL3D::level> ||
+         std::is_same_v<opLevelType, CSRSL3D::level>)
    {
       modsPointers = in.pointers()[1];
    }
@@ -259,7 +331,9 @@ QUICC_CUDA_HOSTDEV inline matmulDims<typename Tin::IndexType> getMatmulDims(
 
    IndexType M, N, K;
    // JW uniform truncation projector/integrator
-   if constexpr (std::is_same_v<opLevelType, CSL3D::level>)
+   if constexpr (std::is_same_v<opLevelType, CSL3D::level> ||
+                 std::is_same_v<opLevelType, CSCSL3D::level> ||
+                 std::is_same_v<opLevelType, CSRSL3D::level>)
    {
       M = op.dims()[0]; // radial points/modes
       K = op.dims()[1]; // radial modes/points

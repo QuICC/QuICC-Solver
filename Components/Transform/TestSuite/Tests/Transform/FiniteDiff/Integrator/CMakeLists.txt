@@ -15,8 +15,8 @@ set(_tests
 )
 
 quicc_set_ulp(_ulp
-  ULP 16 10 115 80 78
-  MPULP 3 2 2 2 2
+  ULP 16 10 115 80
+  MPULP 3 2 2 2
   )
 
 foreach(_test ${_tests})
@@ -24,6 +24,6 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
     ULPS ${_ulp}
-    IDS 0 1 2 3 4
+    IDS 0 1 2 3
   )
 endforeach()

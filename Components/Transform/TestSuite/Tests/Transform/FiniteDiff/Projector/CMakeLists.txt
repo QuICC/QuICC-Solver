@@ -8,10 +8,15 @@ include(ConfigureTests)
 
 set(_tests
   FiniteDiff::P:<viewCpu_t>:projector
+  FiniteDiff::R1:<viewCpu_t>:projector
   FiniteDiff::DivR1:<viewCpu_t>:projector
   FiniteDiff::D1:<viewCpu_t>:projector
+  FiniteDiff::D2:<viewCpu_t>:projector
+  FiniteDiff::D3:<viewCpu_t>:projector
+  FiniteDiff::D4:<viewCpu_t>:projector
   FiniteDiff::DivR1D1R1:<viewCpu_t>:projector
   FiniteDiff::SphLapl:<viewCpu_t>:projector
+  FiniteDiff::R1_Zero:<viewCpu_t>:projector
   FiniteDiff::DivR1_Zero:<viewCpu_t>:projector
   FiniteDiff::DivR1D1R1_Zero:<viewCpu_t>:projector
 )

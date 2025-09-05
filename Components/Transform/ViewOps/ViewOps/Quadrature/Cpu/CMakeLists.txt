@@ -1,6 +1,7 @@
 # Add public header
 set(PHS
   Cpu/Impl.hpp
+  Cpu/SparseImpl.hpp
 )
 
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}

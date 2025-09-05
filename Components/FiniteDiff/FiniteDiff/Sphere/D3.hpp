@@ -1,10 +1,10 @@
 /**
- * @file D1.hpp
+ * @file D3.hpp
  * @brief Implementation of first derivative operator 
  */
 
-#ifndef QUICC_FINITEDIFF_SPHERE_D1_HPP
-#define QUICC_FINITEDIFF_SPHERE_D1_HPP
+#ifndef QUICC_FINITEDIFF_SPHERE_D3_HPP
+#define QUICC_FINITEDIFF_SPHERE_D3_HPP
 
 // System includes
 //
@@ -24,23 +24,23 @@ namespace Sphere {
    /**
     * @brief Implementation of first derivative operator
     */
-   class D1: public Operator
+   class D3: public Operator
    {
       public:
          /**
           * @brief Constructor
           */
-         D1(const size_t order);
+         D3(const size_t order);
 
          /**
           * @brief Constructor
           */
-         D1();
+         D3();
 
          /**
           * @brief Destructor
           */
-         ~D1() = default;
+         ~D3() = default;
 
          /**
           * @brief Compute operator on grid
@@ -52,14 +52,14 @@ namespace Sphere {
    };
 
    template <typename T>
-   void D1::compute(Eigen::SparseMatrix<T>& rOut, const int l, const Internal::Array& igrid)
+   void D3::compute(Eigen::SparseMatrix<T>& rOut, const int l, const Internal::Array& igrid)
    {
       using namespace Internal::Literals;
       const int nR = igrid.size();
       rOut.resize(nR, nR);
 
       std::vector<Internal::SparseMatrix> wMat;
-      this->fdMatrices(wMat, igrid, this->mOrder, 1);
+      this->fdMatrices(wMat, igrid, this->mOrder, 3);
 
       rOut = wMat.back();
 
@@ -75,4 +75,4 @@ namespace Sphere {
 } // namespace FiniteDiff
 } // namespace QuICC
 
-#endif // QUICC_FINITEDIFF_SPHERE_D1_HPP
+#endif // QUICC_FINITEDIFF_SPHERE_D3_HPP

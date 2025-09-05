@@ -5,6 +5,9 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}
   Integral.cpp
   IntegralR2.cpp
   D1.cpp
+  D2.cpp
+  D3.cpp
+  D4.cpp
   D1R1.cpp
   Overr1.cpp
   Overr1D1R1.cpp

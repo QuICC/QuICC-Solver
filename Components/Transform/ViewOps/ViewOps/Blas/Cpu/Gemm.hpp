@@ -210,7 +210,6 @@ inline void matmul(View::View<TC, View::dense2DRM>& C,
    using CMatrixZRM = ::Eigen::Matrix<TC, ::Eigen::Dynamic, ::Eigen::Dynamic,
       ::Eigen::RowMajor>;
 
-   assert(A.size() == M * K);
    assert(B.size() == K * N);
    assert(C.size() == M * N);
 
@@ -255,7 +254,6 @@ inline void matmul(View::View<TC, View::dense2D>& C,
    using BMatrixZRM = ::Eigen::Matrix<TB, ::Eigen::Dynamic, ::Eigen::Dynamic>;
    using CMatrixZRM = ::Eigen::Matrix<TC, ::Eigen::Dynamic, ::Eigen::Dynamic>;
 
-   assert(A.size() == M * K);
    assert(B.size() == K * N);
    assert(C.size() == M * N);
 

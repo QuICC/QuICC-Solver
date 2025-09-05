@@ -17,6 +17,9 @@
 #include "FiniteDiff/Sphere/Integral.hpp"
 #include "FiniteDiff/Sphere/IntegralR2.hpp"
 #include "FiniteDiff/Sphere/D1.hpp"
+#include "FiniteDiff/Sphere/D2.hpp"
+#include "FiniteDiff/Sphere/D3.hpp"
+#include "FiniteDiff/Sphere/D4.hpp"
 #include "FiniteDiff/Sphere/R1.hpp"
 #include "FiniteDiff/Sphere/Overr1.hpp"
 #include "FiniteDiff/Sphere/D1R1.hpp"
@@ -75,6 +78,33 @@ template <class VOP, class DIR> struct OpsBuilderMap<VOP, D1_t, DIR>
       FiniteDiff::Sphere::Builder<VOP, QuICC::SparseOp::FiniteDiff::Operator<D1>, DIR>;
 };
 
+/// @brief D2 Builder
+/// @tparam VOP operator view type
+/// @tparam DIR fwd_t or bwd_t
+template <class VOP, class DIR> struct OpsBuilderMap<VOP, D2_t, DIR>
+{
+   using type =
+      FiniteDiff::Sphere::Builder<VOP, QuICC::SparseOp::FiniteDiff::Operator<D2>, DIR>;
+};
+
+/// @brief D3 Builder
+/// @tparam VOP operator view type
+/// @tparam DIR fwd_t or bwd_t
+template <class VOP, class DIR> struct OpsBuilderMap<VOP, D3_t, DIR>
+{
+   using type =
+      FiniteDiff::Sphere::Builder<VOP, QuICC::SparseOp::FiniteDiff::Operator<D3>, DIR>;
+};
+
+/// @brief D4 Builder
+/// @tparam VOP operator view type
+/// @tparam DIR fwd_t or bwd_t
+template <class VOP, class DIR> struct OpsBuilderMap<VOP, D4_t, DIR>
+{
+   using type =
+      FiniteDiff::Sphere::Builder<VOP, QuICC::SparseOp::FiniteDiff::Operator<D4>, DIR>;
+};
+
 /// @brief DivR1 Builder
 /// Projector only
 /// @tparam VOP operator view type
@@ -122,6 +152,16 @@ template <class VOP> struct OpsBuilderMap<VOP, SphLapl_t, bwd_t>
       FiniteDiff::Sphere::Builder<VOP, QuICC::SparseOp::FiniteDiff::Operator<SLapl>, bwd_t>;
 };
 
+/// @brief R1 Builder
+/// Projector only
+/// @tparam VOP operator view type
+template <class VOP> struct OpsBuilderMap<VOP, R1_t, bwd_t>
+{
+   using type = FiniteDiff::Sphere::Builder<VOP,
+      QuICC::SparseOp::FiniteDiff::Operator<R1>,
+      bwd_t>;
+};
+
 /// @brief R1_Zero Builder
 /// Projector only
 /// @tparam VOP operator view type
@@ -155,26 +195,6 @@ template <class VOP> struct OpsBuilderMap<VOP, R1_Zero_t, fwd_t>
 /// extra parameters to energy integrators
 template <class VOP, class OP> struct EnergyHelperMap;
 
-/// @brief Helper for Energy
-/// It is needed in order to avoid having to pass
-/// extra parameters to energy integrators
-/// @tparam VOP
-template <class VOP> struct EnergyHelperMap<VOP, Energy_t>
-{
-   void compute(VOP opView, const Internal::Array& grid)
-   {
-      throw std::logic_error("Not implemented");
-#if 0
-      Wnl fWnl(Polynomial::FiniteDiff::worland_sphenergy_t::ALPHA,
-         Polynomial::FiniteDiff::worland_sphenergy_t::DBETA, -1);
-      QuICC::SparseOp::FiniteDiff::OperatorWithMean<Wnl, void> denseBuilder(fWnl);
-      Builder<VOP, QuICC::SparseOp::FiniteDiff::OperatorWithMean<Wnl, void>, fwd_t>
-         tBuilderFwd(denseBuilder);
-      tBuilderFwd.compute(opView, grid, weights);
-#endif
-   }
-};
-
 /// @brief Energy Builder
 /// Integrator only
 /// @tparam VOP operator view type
@@ -203,7 +223,7 @@ template <class VOP> struct OpsBuilderMap<VOP, Energy_t, bwd_t>
 /// @tparam VOP
 template <class VOP> struct EnergyHelperMap<VOP, EnergyD1R1_t>
 {
-   void compute(VOP opView, const Internal::Array& grid)
+   void compute(VOP opView, const Internal::Array& grid, typename VOP::IndexType& nnz)
    {
       D1R1 op(1, 0);
       QuICC::SparseOp::FiniteDiff::Operator<D1R1> opBuilder(op);
@@ -211,7 +231,7 @@ template <class VOP> struct EnergyHelperMap<VOP, EnergyD1R1_t>
          QuICC::SparseOp::FiniteDiff::Operator<
             D1R1>,
          bwd_t> viewBuilder(opBuilder);
-      viewBuilder.compute(opView, grid);
+      viewBuilder.compute(opView, grid, nnz);
    }
 };
 
@@ -240,7 +260,7 @@ template <class VOP> struct OpsBuilderMap<VOP, EnergyD1R1_t, bwd_t>
 /// @tparam VOP
 template <class VOP> struct EnergyHelperMap<VOP, EnergyR2_t>
 {
-   void compute(VOP opView, const Internal::Array& grid)
+   void compute(VOP opView, const Internal::Array& grid, typename VOP::IndexType& nnz)
    {
       R1 op(0, 0);
       QuICC::SparseOp::FiniteDiff::Operator<R1> opBuilder(op);
@@ -248,7 +268,7 @@ template <class VOP> struct EnergyHelperMap<VOP, EnergyR2_t>
          QuICC::SparseOp::FiniteDiff::Operator<
             R1>,
          bwd_t> viewBuilder(opBuilder);
-      viewBuilder.compute(opView, grid);
+      viewBuilder.compute(opView, grid, nnz);
    }
 };
 
@@ -277,7 +297,7 @@ template <class VOP> struct OpsBuilderMap<VOP, EnergyR2_t, bwd_t>
 /// @tparam VOP
 template <class VOP> struct EnergyHelperMap<VOP, EnergySLaplR2_t>
 {
-   void compute(VOP opView, const Internal::Array& grid)
+   void compute(VOP opView, const Internal::Array& grid, typename VOP::IndexType& nnz)
    {
       SLapl op(1, 0);
       QuICC::SparseOp::FiniteDiff::Operator<SLapl> opBuilder(op);
@@ -285,7 +305,7 @@ template <class VOP> struct EnergyHelperMap<VOP, EnergySLaplR2_t>
          QuICC::SparseOp::FiniteDiff::Operator<
             SLapl>,
          bwd_t> viewBuilder(opBuilder);
-      viewBuilder.compute(opView, grid);
+      viewBuilder.compute(opView, grid, nnz);
    }
 };
 

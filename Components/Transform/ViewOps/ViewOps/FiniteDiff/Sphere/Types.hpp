@@ -23,14 +23,18 @@ using modsRM_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
 using phys_t = View::View<std::complex<double>, View::DCCSC3D>;
 /// @brief physical coefficients view with row major layout (in a layer)
 using physRM_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+/// @brief Operator view with CSC layout (in a layer)
+using cscop_t = View::View<double, View::CSCSL3D>;
+/// @brief Operator view with CSR layout (in a layer)
+using csrop_t = View::View<double, View::CSRSL3D>;
 /// @brief projector view with column major layout (in a layer)
-using proj_t = View::View<double, View::CSL3D>;
+using proj_t = View::View<double, View::CSCSL3D>;
 /// @brief projector view with row major layout (in a layer)
-using projRM_t = View::View<double, View::CSL3DJIK>;
+using projRM_t = View::View<double, View::CSRSL3D>;
 /// @brief integrator view with column major layout (in a layer)
-using int_t = View::View<double, View::CSL3D>;
+using int_t = View::View<double, View::CSCSL3D>;
 /// @brief integrator view with row major layout (in a layer)
-using intRM_t = View::View<double, View::CSL3DJIK>;
+using intRM_t = View::View<double, View::CSRSL3D>;
 
 } // namespace Sphere
 } // namespace FiniteDiff
