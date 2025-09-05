@@ -358,5 +358,70 @@ void readBlockData(std::vector<Matrix>& inBlocks, const std::string& path)
    }
 }
 
+void readLines(std::vector<std::string>& lines, const std::string& path, const std::size_t jid, const std::size_t jN)
+{
+   std::ifstream infile;
+   infile.open(path, std::ios::in | std::ios::binary);
+   if (!infile.is_open())
+   {
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr << "  Couldn't open real input file: " + path << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+      std::cerr
+         << "*****************************************************************"
+         << std::endl;
+
+      lines.clear();
+   }
+   else
+   {
+      std::string line;
+
+      std::size_t c = 0;
+      while(std::getline(infile, line))
+      {
+         // Ignore commented lines
+         if(line[0] != '#')
+         {
+            if(c % jN == jid)
+            {
+               lines.push_back(line);
+            }
+            c++;
+         }
+      }
+      infile.close();
+   }
+}
+
+void splitLine(std::vector<std::string>& words, const std::string& line, const char delim)
+{
+   std::stringstream ss(line);
+   std::string word;
+
+   while(std::getline(ss, word, delim))
+   {
+      words.push_back(word);
+   }
+}
+
+void getCommand(int& argc, std::vector<char *>& argv, const std::vector<std::string>& options)
+{
+   argc = options.size();
+
+   argv.reserve(options.size());
+   for(auto& o: options)
+   {
+      argv.push_back(const_cast<char *>(o.c_str()));
+   }
+}
+
 } // namespace TestSuite
 } // namespace QuICC

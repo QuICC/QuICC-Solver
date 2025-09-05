@@ -13,6 +13,15 @@ target_link_libraries(${TestExe}
   ${QUICC_CURRENT_COMPONENT_TEST_LIB}
 )
 
+if(QUICC_USE_MPI)
+  # Add target for all MPI tests
+  add_executable(${TestExe}Mpi IoTests.cpp)
+
+  target_link_libraries(${TestExe}Mpi
+    ${QUICC_CURRENT_COMPONENT_TEST_LIB}
+  )
+endif()
+
 set(QUICC_WORK_DIR "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_COMPONENT_DIR}/TestSuite")
 
 set_target_properties(
@@ -109,14 +118,42 @@ set(_tests
   SLFm:Magnetic:ShellDipolarityWriter
 )
 
+# Create list of unique schemes
+set(_schemes )
 foreach(_test IN LISTS _tests)
   string(REPLACE ":" ";" _tags ${_test})
   list(GET _tags 0 _scheme)
-  add_custom_command(TARGET ${TestExe} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E remove _data/Framework/Io/${_scheme}/*
-    COMMAND ${CMAKE_COMMAND} -E copy _refdata/Framework/Io/${_scheme}/parameters.cfg _data/Framework/Io/${_scheme}/
-    WORKING_DIRECTORY ${QUICC_WORK_DIR}
-    )
+  list(APPEND _schemes "${_scheme}")
+endforeach()
+list(REMOVE_DUPLICATES _schemes)
+
+# Setup test data through custom command
+set(_mod_cfg )
+set(_copy_data )
+foreach(_scheme IN LISTS _schemes)
+  # Prepare serial tests
+  list(APPEND _copy_data "COMMAND" "${CMAKE_COMMAND}" "-E" "remove" "_data/Framework/Io/${_scheme}/*")
+  list(APPEND _copy_data "COMMAND" "${CMAKE_COMMAND}" "-E" "copy" "_refdata/Framework/Io/${_scheme}/parameters.cfg" "_data/Framework/Io/${_scheme}/")
+
+  # Prepare MPI tests
+  if(QUICC_USE_MPI)
+    list(APPEND _copy_data "COMMAND" "${CMAKE_COMMAND}" "-E" "remove" "_data/Framework/Io/${_scheme}_mpi/*")
+    list(APPEND _copy_data "COMMAND" "${CMAKE_COMMAND}" "-E" "copy_directory" "_data/Framework/Io/${_scheme}" "_data/Framework/Io/${_scheme}_mpi")
+    list(APPEND _mod_cfg "COMMAND" "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/Models/TestSuite/modify_xml.py" "-i" "_data/Framework/Io/${_scheme}_mpi/parameters.cfg" "-p" "framework/parallel/algorithm" "-v" "tubular"  "-o" "_data/Framework/Io/${_scheme}_mpi/parameters_tmp.cfg")
+    list(APPEND _mod_cfg "COMMAND" "${Python_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/Models/TestSuite/modify_xml.py" "-i" "_data/Framework/Io/${_scheme}_mpi/parameters_tmp.cfg" "-p" "framework/parallel/cpus" "-v" "4"  "-o" "_data/Framework/Io/${_scheme}_mpi/parameters.cfg")
+    list(APPEND _mod_cfg "COMMAND" "${CMAKE_COMMAND}" "-E" "remove" "_data/Framework/Io/${_scheme}_mpi/parameters_tmp.cfg")
+  endif()
+endforeach()
+add_custom_command(TARGET ${TestExe} POST_BUILD
+  ${_copy_data}
+  ${_mod_cfg}
+  WORKING_DIRECTORY ${QUICC_WORK_DIR}
+  )
+
+# Create serial tests
+foreach(_test IN LISTS _tests)
+  string(REPLACE ":" ";" _tags ${_test})
+  list(GET _tags 0 _scheme)
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Scheme:Field:Writer
@@ -126,6 +163,22 @@ foreach(_test IN LISTS _tests)
   )
 endforeach()
 
+# Create MPI tests
+if(QUICC_USE_MPI)
+  foreach(_test IN LISTS _tests)
+    string(REPLACE ":" ";" _tags ${_test})
+    list(GET _tags 0 _scheme)
+    quicc_add_test(${_test}
+      COMMAND ${TestExe}Mpi
+      KEYWORD Scheme:Field:Writer
+      ID 0
+      ULP 500
+      RANKS 4
+      WORKDIR "${QUICC_WORK_DIR}/_data/Framework/Io/${_scheme}_mpi"
+    )
+  endforeach()
+endif()
+
 set(_tests
   WLFl:Velocity:SphereMaxAbsoluteFieldValueWriter
   WLFm:Velocity:SphereMaxAbsoluteFieldValueWriter
@@ -134,11 +187,6 @@ set(_tests
 foreach(_test IN LISTS _tests)
   string(REPLACE ":" ";" _tags ${_test})
   list(GET _tags 0 _scheme)
-  add_custom_command(TARGET ${TestExe} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E remove _data/Framework/Io/${_scheme}/*
-    COMMAND ${CMAKE_COMMAND} -E copy _refdata/Framework/Io/${_scheme}/parameters.cfg _data/Framework/Io/${_scheme}/
-    WORKING_DIRECTORY ${QUICC_WORK_DIR}
-    )
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Scheme:Field:Writer

@@ -1,6 +1,7 @@
-/** 
+/**
  * @file ShellTorPolModeSpectrumWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics mode energy spectrum calculation for a Toroidal/Poloidal field in a spherical shell
+ * @brief Implementation of the ASCII spherical harmonics mode energy spectrum
+ * calculation for a Toroidal/Poloidal field in a spherical shell
  */
 
 #ifndef QUICC_IO_VARIABLE_SHELLTORPOLMODESPECTRUMWRITER_HPP
@@ -13,8 +14,8 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/ISphericalTorPolModeSpectrumWriter.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
 
 namespace QuICC {
 
@@ -22,40 +23,42 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the ASCII spherical harmonics mode energy spectrum
+ * calculation for a Toroidal/Poloidal field in a spherical shell
+ */
+class ShellTorPolModeSpectrumWriter : public ISphericalTorPolModeSpectrumWriter
+{
+public:
    /**
-    * @brief Implementation of the ASCII spherical harmonics mode energy spectrum calculation for a Toroidal/Poloidal field in a spherical shell
+    * @brief Constructor
+    *
+    * @param prefix Prefix to use for file name
+    * @param type Type of the file (typically scheme name)
     */
-   class ShellTorPolModeSpectrumWriter: public ISphericalTorPolModeSpectrumWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param prefix Prefix to use for file name
-          * @param type Type of the file (typically scheme name)
-          */
-         ShellTorPolModeSpectrumWriter(const std::string& prefix, const std::string& type);
+   ShellTorPolModeSpectrumWriter(const std::string& prefix,
+      const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~ShellTorPolModeSpectrumWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~ShellTorPolModeSpectrumWriter() = default;
 
-         /**
-          * @brief Initialise the operator, transform and file
-          */
-         virtual void init();
-         
-      protected:
+   /**
+    * @brief Initialise the operator, transform and file
+    */
+   virtual void init();
 
-      private:
-   };
+protected:
+private:
+};
 
-   /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<ShellTorPolModeSpectrumWriter> SharedShellTorPolModeSpectrumWriter;
+/// Typedef for a shared pointer of a HDF5 state file writer
+typedef std::shared_ptr<ShellTorPolModeSpectrumWriter>
+   SharedShellTorPolModeSpectrumWriter;
 
-}
-}
-}
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_SHELLTORPOLMODESPECTRUMWRITER_HPP

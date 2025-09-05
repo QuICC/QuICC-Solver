@@ -3,21 +3,12 @@
  * @brief Source of the implementation of the equation to generate an exact vector solution in a sphere
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Generator/States/SphereExactVectorState.hpp"
-
 // Project includes
 //
+#include "QuICC/Generator/States/SphereExactVectorState.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
 #include "Types/Typedefs.hpp"
 #include "Types/Math.hpp"
@@ -33,8 +24,18 @@ namespace QuICC {
 namespace Equations {
 
    SphereExactVectorState::SphereExactVectorState(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend)
-      : IVectorEquation(spEqParams,spScheme,spBackend), mPathTag(0)
+      : IVectorEquation(spEqParams,spScheme,spBackend), mBwdPathId(Transform::Path::TorPol::id()), mFwdPathId(0)
    {
+   }
+
+   void SphereExactVectorState::setBackwardPath(const std::size_t pathId)
+   {
+      this->mBwdPathId = pathId;
+   }
+
+   void SphereExactVectorState::setForwardPath(const std::size_t pathId)
+   {
+      this->mFwdPathId = pathId;
    }
 
    void SphereExactVectorState::setIdentity(const std::size_t name)
@@ -50,7 +51,7 @@ namespace Equations {
    {
       // Use transform path for nonlinear computations
       this->setForwardPathsType(FWD_IS_NONLINEAR);
-      this->mPathTag = tag;
+      this->mFwdPathId = tag;
    }
 
    void SphereExactVectorState::setPhysicalKernel(Physical::Kernel::SharedIPhysicalKernel spKernel)
@@ -114,6 +115,15 @@ namespace Equations {
       }
    }
 
+   void SphereExactVectorState::initConstraintKernel(const std::shared_ptr<std::vector<Array> > spMesh)
+   {
+      for(auto it = this->mConstraintKernel.begin(); it != this->mConstraintKernel.end(); ++it)
+      {
+         it->second->setField(this->name(), this->spUnknown());
+         it->second->setResolution(this->spRes());
+      }
+   }
+
    void SphereExactVectorState::initNLKernel(const bool force)
    {
       // Initialize if empty or forced
@@ -123,7 +133,8 @@ namespace Equations {
          {
             this->mspNLKernel = this->mspPhysKernel;
 
-         } else if(this->mSrcKernel.size() > 0)
+         }
+         else if(this->mSrcKernel.size() > 0 || this->mConstraintKernel.size() > 0)
          {
             // Pur spectral state is used
             auto spNLKernel = std::make_shared<Physical::Kernel::DoNothing>();
@@ -147,11 +158,11 @@ namespace Equations {
       this->setForwardPathsType(FWD_IS_FIELD);
       if(this->ss().formulation() == VectorFormulation::TORPOL)
       {
-         this->mPathTag = Transform::Path::TorPol::id();
+         this->mFwdPathId = Transform::Path::TorPol::id();
       }
       else
       {
-         this->mPathTag = 0;
+         this->mFwdPathId = 0;
       }
 
       // Get reference to spatial scheme
@@ -167,18 +178,23 @@ namespace Equations {
    {
       if(this->ss().spectral().ONE() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().ONE(), this->mPathTag);
+         this->addNLComponent(this->ss().spectral().ONE(), this->mFwdPathId);
       }
 
       if(this->ss().spectral().TWO() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().TWO(), this->mPathTag);
+         this->addNLComponent(this->ss().spectral().TWO(), this->mFwdPathId);
       }
 
       if(this->ss().spectral().THREE() != FieldComponents::Spectral::NOTUSED)
       {
-         this->addNLComponent(this->ss().spectral().THREE(), this->mPathTag);
+         this->addNLComponent(this->ss().spectral().THREE(), this->mFwdPathId);
       }
+   }
+
+   std::vector<Transform::TransformPath> SphereExactVectorState::backwardPaths()
+   {
+      return this->defaultBackwardPaths(this->mBwdPathId);
    }
 
 }

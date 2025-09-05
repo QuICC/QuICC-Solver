@@ -24,9 +24,11 @@ set(tags
   Iota
   Kappa
   Lambda
+  Lehnert
   Lower1d
   Lower2d
   Lower3d
+  Lundquist
   MagneticEkman
   MagneticPrandtl
   MagneticReynolds

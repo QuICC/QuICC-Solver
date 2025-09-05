@@ -6,16 +6,10 @@
 #ifndef QUICC_DIAGNOSTICS_COORDINATOR_HPP
 #define QUICC_DIAGNOSTICS_COORDINATOR_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <string>
 #include <vector>
-
-// External includes
-//
 
 // Project includes
 //
@@ -42,7 +36,12 @@ namespace Diagnostics {
          /**
           * @brief Destructor
           */
-         virtual ~Coordinator();
+         virtual ~Coordinator() = default;
+
+         /**
+          * @brief Add CFL
+          */
+         void addCfl(SharedICflWrapper spCfl);
 
          /**
           * @brief Initialise the coordinator
@@ -95,6 +94,10 @@ namespace Diagnostics {
          void synchronize();
 
       protected:
+         /**
+          * @brief Update minimum CFL in matrix
+          */
+         void updateCflMatrix(Matrix& cfl) const;
 
       private:
          /**
@@ -133,9 +136,9 @@ namespace Diagnostics {
          MHDFloat mStartTimestep;
 
          /**
-          * @brief Shared pointer to a CFL condition wrapper
+          * @brief CFL calculators
           */
-         SharedICflWrapper  mspCflWrapper;
+         std::vector<SharedICflWrapper>  mCflOps;
    };
 
 }
