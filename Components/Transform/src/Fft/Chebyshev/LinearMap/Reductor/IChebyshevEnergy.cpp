@@ -117,9 +117,9 @@ namespace Reductor {
       // BUT ENERGYY2 is not calling the initBackend, uses Boussinesq size... (or does it.....)
       // SOMETHING IS OFF WITH THE SIZES: ANELASTIC = BOUSSINESQ....
 
-      std::cerr << "in =  \n";
-      std::cerr << in;
-      std::cerr << "\n";
+      //std::cerr << "in =  \n";
+      //std::cerr << in;
+      //std::cerr << "\n";
 
       // Set small values to zero
       //MatrixZ cleanedIn = in;
@@ -156,53 +156,53 @@ namespace Reductor {
                                                // Anelastic: contains e-310 and e+194  numbers !!!
 
 
-      std::cerr << "tmpIn =  \n";
-      std::cerr << tmpIn;
-      std::cerr << "\n";
+      //std::cerr << "tmpIn =  \n";
+      //std::cerr << tmpIn;
+      //std::cerr << "\n";
 
 
 
       this->mBackend.applyFft(tmpOut, tmpIn); // Boussinesq gives second col = 1
                                               // anelasitc gives second col = 1, bit also some e+175
 
-      std::cerr << "tmpOut =  \n"; 
-      std::cerr << tmpOut;
-      std::cerr << "\n";
+      //std::cerr << "tmpOut =  \n"; 
+      //std::cerr << tmpOut;
+      //std::cerr << "\n";
 
 
       this->mBackend.square(tmpSquare, tmpOut, true); // therefore gives inf
 
-      std::cerr << "tmpSquare =  \n";
-      std::cerr << tmpSquare;
-      std::cerr << "\n";
+      //std::cerr << "tmpSquare =  \n";
+      //std::cerr << tmpSquare;
+      //std::cerr << "\n";
 
 
       this->applyPreOperator(tmpIn, in, false);
 
-      std::cerr << "tmpIn =  \n";
-      std::cerr << tmpIn;
-      std::cerr << "\n";
+      //std::cerr << "tmpIn =  \n";
+      //std::cerr << tmpIn;
+      //std::cerr << "\n";
 
       this->mBackend.applyFft(tmpOut, tmpIn); // give too big numbers
       
-      std::cerr << "tmpOut =  \n";
-      std::cerr << tmpOut;
-      std::cerr << "\n";
+      //std::cerr << "tmpOut =  \n";
+      //std::cerr << tmpOut;
+      //std::cerr << "\n";
 
       this->mBackend.square(tmpSquare, tmpOut, false); // therefore gives inf
 
-      std::cerr << "tmpSquare =  \n";
-      std::cerr << tmpSquare;
-      std::cerr << "\n";
+      //std::cerr << "tmpSquare =  \n";
+      //std::cerr << tmpSquare;
+      //std::cerr << "\n";
 
 
       tmpSquare = tmpSquare.array().colwise() / rho.array(); // divides energy by rho
       this->mBackend.applyFwdFft(tmpOut, tmpSquare);
       this->applyPostOperator(rOut, tmpOut);
 
-      std::cerr << "tmpOut =  \n";
-      std::cerr << tmpOut;
-      std::cerr << "\n";
+      //std::cerr << "tmpOut =  \n";
+      //std::cerr << tmpOut;
+      //std::cerr << "\n";
 
 
    }
