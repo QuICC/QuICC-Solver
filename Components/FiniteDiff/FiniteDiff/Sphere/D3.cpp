@@ -27,7 +27,7 @@ namespace Sphere {
    }
 
    D3::D3()
-      : D3(QUICC_FINITEDIFF_SPHERE_ORDER, 1, 1)
+      : D3(QUICC_FINITEDIFF_SPHERE_ORDER, 0, 0)
    {
    }
 

@@ -73,7 +73,9 @@ namespace Sphere {
       std::vector<Internal::SparseMatrix> wMat;
       this->fdMatrices(wMat, igrid, this->mOrder, 4);
 
-      rOut = (this->zeroTopBottom(nR)*wMat.back()).cast<T>();
+      int zTop = std::max(static_cast<int>(this->mZtop), static_cast<int>(l == 1 || l == 3 || l > 4));
+      int zBot = static_cast<int>(this->mZbot);
+      rOut = (this->zeroTopBottom(nR, zTop, zBot)*wMat.back()).cast<T>();
    }
 
 } // namespace Sphere

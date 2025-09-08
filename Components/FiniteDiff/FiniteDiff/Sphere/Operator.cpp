@@ -171,14 +171,14 @@ namespace Sphere {
       }
    }
 
-   Internal::SparseMatrix Operator::zeroTopBottom(const int nR) const
+   Internal::SparseMatrix Operator::zeroTopBottom(const int nR, const int zTop, const int zBot) const
    {
       using namespace Internal::Literals;
 
       Internal::SparseMatrix op(nR, nR);
 
       std::vector<Eigen::Triplet<Internal::MHDFloat>> coeffs;
-      for(int i = static_cast<int>(this->mZtop); i < nR - static_cast<int>(this->mZbot); i++)
+      for(int i = zTop; i < nR - zBot; i++)
       {
          coeffs.emplace_back(i,i, 1_mp);
       }
@@ -186,6 +186,11 @@ namespace Sphere {
       op.setFromTriplets(coeffs.begin(), coeffs.end());
 
       return op;
+   }
+
+   Internal::SparseMatrix Operator::zeroTopBottom(const int nR) const
+   {
+      return this->zeroTopBottom(nR, static_cast<int>(this->mZtop), static_cast<int>(this->mZbot));
    }
 
 } // namespace Sphere

@@ -12,9 +12,6 @@ fdsphunigrid::usage="fdsphunigrid[n] Uniform spherical finite difference grid";
 
 fdsphintegral::usage="fdintegral[rg, l, t, k] compute integral weights for given grid rg and order p";
 
-fdsphzt::usage="fdsphzt[n] zero top";
-fdsphzb::usage="fdsphzb[n] zero bottom";
-fdsphztb::usage="fdsphztb[n] zero top and bottom";
 fdsphid::usage="fdsphid[rg, l] identity";
 fdsphproj::usage="fdsphidz[rg, l] identity with zeros are r=0, r=1";
 fdsphr1::usage="fdsphr1[rg, l] identity";
@@ -27,6 +24,9 @@ fdsphd3::usage="fdsphd3[rg, l, k] third derivative";
 fdsphd4::usage="fdsphd[rg, l, k] fourth derivative";
 fdsphlapl::usage="fdsphlapl[rg, l, k] Compute the finite differences spherical laplacian";
 
+fdsphzt::usage="fdsphzt[f] zero top";
+fdsphzb::usage="fdsphzb[f] zero bottom";
+fdsphztb::usage="fdsphztb[f] zero top and bottom";
 fdsphzerol0::usage="fdsphzerol0[f] zero if l = 0";
 
 
@@ -45,28 +45,30 @@ fdsphchegrid[n_]:=N[Flatten[{0,Table[Cos[(2k-1)/(4n) \[Pi]],{k,n,1,-1}],1}],$mpp
 fdsphgrid[n_]:=fdsphunigrid[n];
 
 
-fdsphzt[n_]:=DiagonalMatrix[Flatten[{0,Table[1,n-1]}]]
-fdsphzb[n_]:=DiagonalMatrix[Flatten[{Table[1,n-1],0}]]
-fdsphztb[n_]:=DiagonalMatrix[Flatten[{0,Table[1,n-2],0}]]
-
-
 fdsphdiff[rg_,l_,p_,k_:$FDSphereOrder]:=Module[{ds},
 ds=NDSolve`FiniteDifferenceDerivative[p,rg,"DifferenceOrder"->k]["DifferentiationMatrix"];
 ds]
-fdsphr1[rg_,l_]:=fdsphztb[Length@rg] . DiagonalMatrix[rg];
-fdsphdivr1[rg_,l_]:=fdsphztb[Length@rg] . DiagonalMatrix[Flatten[{0,Table[1/rg[[i]],{i,2,Length@rg}]}]];
-fdsphdivr1d1r1[rg_,l_,k_:$FDSphereOrder]:=fdsphdivr1[rg,l] . fdsphdiff[rg,l,1,k] . DiagonalMatrix[rg];
+fdsphr1[rg_,l_]:=DiagonalMatrix[rg];
+fdsphdivr1[rg_,l_]:=Module[{dvir1},divr1=DiagonalMatrix[Flatten[{0,Table[1/rg[[i]],{i,2,Length@rg}]}]]+DiagonalMatrix[Table[If[l==1&&n==1,1,0],{n,1,Length@rg}]] . fdsphd1[rg,l];divr1]
+fdsphdivr1d1r1[rg_,l_,k_:$FDSphereOrder]:=Module[{divr1d1r1},divr1d1r1=fdsphdivr1[rg,l] + fdsphdiff[rg,l,1,k];If[l==0||l>1,divr1d1r1=fdsphzt[fdsphid][rg,l] . divr1d1r1];divr1d1r1]
 fdsphid[rg_,l_]:=fdsphdiff[rg,l,0,$FDSphereOrder];
-fdsphproj[rg_,l_]:=If[l>0,fdsphzt[Length@rg] . fdsphid[rg,l],fdsphid[rg,l]];
-fdsphd1[rg_,l_,k_:$FDSphereOrder]:=fdsphztb[Length@rg] . fdsphdiff[rg,l,1,k];
-fdsphd2[rg_,l_,k_:$FDSphereOrder]:=fdsphztb[Length@rg] . fdsphdiff[rg,l,2,k];
-fdsphd3[rg_,l_,k_:$FDSphereOrder]:=fdsphztb[Length@rg] . fdsphdiff[rg,l,3,k];
-fdsphd4[rg_,l_,k_:$FDSphereOrder]:=fdsphztb[Length@rg] . fdsphdiff[rg,l,4,k];
-fdsphlapl[rg_,l_,k_:$FDSphereOrder]:=Module[{ds,slapl,invrg},
-ds=Table[NDSolve`FiniteDifferenceDerivative[i,rg,"DifferenceOrder"->k]["DifferentiationMatrix"],{i,0,2}];
-invrg=Flatten[{0,1/rg[[2;;]]}];
-slapl=ds[[3]]+2 invrg ds[[2]]-l(l+1)invrg^2 ds[[1]];
-fdsphztb[Length@rg] . slapl]
+fdsphproj[rg_,l_]:=If[l>0,fdsphid[rg,l],fdsphid[rg,l]];
+fdsphd1[rg_,l_,k_:$FDSphereOrder]:=Module[{d1},d1=fdsphdiff[rg,l,1,k];If[l==0||l>1,d1=fdsphzt[fdsphid][rg,l] . d1];d1]
+fdsphd2[rg_,l_,k_:$FDSphereOrder]:=Module[{d2},d2=fdsphdiff[rg,l,2,k];If[l==1||l>2,d2=fdsphzt[fdsphid][rg,l] . d2];d2]
+fdsphd3[rg_,l_,k_:$FDSphereOrder]:=Module[{d3},d3=fdsphdiff[rg,l,3,k];If[l==0||l==2||l>3,d3=fdsphzt[fdsphid][rg,l] . d3];d3]
+fdsphd4[rg_,l_,k_:$FDSphereOrder]:=Module[{d4},d4=fdsphdiff[rg,l,4,k];If[l==1||l==3||l>4,d4=fdsphzt[fdsphid][rg,l] . d4];d4]
+fdsphlapl[rg_,l_,k_:$FDSphereOrder]:=Module[{id,d1,d2,slapl,invr,invr2},
+id=fdsphid[rg,l];
+d1=fdsphd1[rg,l,k];
+d2=fdsphd2[rg,l,k];
+invr=fdsphdivr1[rg,l];
+invr2=invr . invr;
+If[l==0,
+slapl=d2+2 invr . d1;,
+slapl=d2+ 2 fdsphdivr1[rg,l-1] . d1-l(l+1)invr2;
+slapl=fdsphzt[fdsphid][rg,l] . slapl;
+];
+slapl]
 
 
 fdsphintegral[rg_,l_,t_:$FDSphereTaylorOrder,k_:$FDSphereOrder]:=Module[{drm,drp,ds,wgts},
@@ -78,6 +80,9 @@ wgts
 ]
 
 
+fdsphzt[f_]:=Module[{g},g=Function[{rg,l},DiagonalMatrix[Flatten[{0,Table[1,Length@rg-1]}] . f[rg,l]]];g]
+fdsphzb[f_]:=Module[{g},g=Function[{rg,l},DiagonalMatrix[Flatten[{Table[1,Length@rg-1],0}] . f[rg,l]]];g]
+fdsphztb[f_]:=Module[{g},g=Function[{rg,l},DiagonalMatrix[Flatten[{0,Table[1,Length@rg-2],0}] . f[rg,l]]];g]
 fdsphzerol0[f_]:=Module[{g},g=Function[{rg,l},If[l>0,f[rg,l],SparseArray[{},{Length[rg],Length[rg]}]]];g]
 
 

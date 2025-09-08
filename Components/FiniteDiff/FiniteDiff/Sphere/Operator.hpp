@@ -63,6 +63,11 @@ namespace Sphere {
          /**
           * @brief Get operator to zero top and bottom rows
           */
+         Internal::SparseMatrix zeroTopBottom(const int nR, const int zTop, const int zBot) const;
+
+         /**
+          * @brief Get operator to zero top and bottom rows
+          */
          Internal::SparseMatrix zeroTopBottom(const int nR) const;
 
          /**

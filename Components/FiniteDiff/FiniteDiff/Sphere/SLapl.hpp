@@ -84,7 +84,9 @@ namespace Sphere {
       tmp += 2_mp*invgrid.asDiagonal()*wMat.at(1);
       tmp -= static_cast<Internal::MHDFloat>(l*(l+1))*invgrid.array().pow(2).matrix().asDiagonal();
 
-      rOut = (this->zeroTopBottom(nR)*tmp).cast<T>();
+      int zTop = std::max(static_cast<int>(this->mZtop), static_cast<int>(l > 0));
+      int zBot = static_cast<int>(this->mZbot);
+      rOut = (this->zeroTopBottom(nR, zTop, zBot)*tmp).cast<T>();
    }
 
 } // namespace Sphere

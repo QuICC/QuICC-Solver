@@ -79,8 +79,17 @@ namespace Sphere {
          invgrid(i) = 1_mp/igrid(i);
       }
 
-      Internal::SparseMatrix tmp = invgrid.asDiagonal()*wMat.at(1)*igrid.asDiagonal();
-      rOut = (this->zeroTopBottom(nR)*tmp).cast<T>();
+      Internal::SparseMatrix tmp = wMat.back();
+      tmp += invgrid.asDiagonal();
+
+      if(l == 1 && this->mZtop == 0)
+      {
+         tmp += this->zeroTopBottom(nR, 0, nR-1)*wMat.back();
+      }
+
+      int zTop = std::max(static_cast<int>(this->mZtop), static_cast<int>(l == 0 || l > 1));
+      int zBot = static_cast<int>(this->mZbot);
+      rOut = (this->zeroTopBottom(nR, zTop, zBot)*tmp).cast<T>();
    }
 
 } // namespace Sphere

@@ -27,7 +27,7 @@ namespace Sphere {
    }
 
    SLapl::SLapl()
-      : SLapl(QUICC_FINITEDIFF_SPHERE_ORDER, 1, 1)
+      : SLapl(QUICC_FINITEDIFF_SPHERE_ORDER, 0, 0)
    {
    }
 

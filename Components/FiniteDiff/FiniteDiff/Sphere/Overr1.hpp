@@ -70,13 +70,24 @@ namespace Sphere {
       const int nR = igrid.size();
       rOut.resize(nR, nR);
 
-      std::vector<Eigen::Triplet<T>> coeffs;
-      for(int i = static_cast<int>(this->mZtop); i < nR - static_cast<int>(this->mZbot); i++)
+      int i0 = std::max(static_cast<int>(this->mZtop), 1);
+      std::vector<Eigen::Triplet<Internal::MHDFloat>> coeffs;
+      for(int i = i0; i < nR - static_cast<int>(this->mZbot); i++)
       {
-         coeffs.emplace_back(i,i, static_cast<T>(1_mp/igrid(i)));
+         coeffs.emplace_back(i,i, 1_mp/igrid(i));
       }
 
-      rOut.setFromTriplets(coeffs.begin(), coeffs.end());
+      Internal::SparseMatrix tmp(nR, nR);
+      tmp.setFromTriplets(coeffs.begin(), coeffs.end());
+
+      if(l == 1 && this->mZtop == 0)
+      {
+         std::vector<Internal::SparseMatrix> wMat;
+         this->fdMatrices(wMat, igrid, this->mOrder, 1);
+         tmp += this->zeroTopBottom(nR, 0, nR-1)*wMat.back();
+      }
+
+      rOut = tmp.cast<T>();
    }
 
 } // namespace Sphere

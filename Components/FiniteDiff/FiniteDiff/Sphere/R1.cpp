@@ -27,7 +27,7 @@ namespace Sphere {
    }
 
    R1::R1()
-      : R1(QUICC_FINITEDIFF_SPHERE_ORDER, 1, 1)
+      : R1(QUICC_FINITEDIFF_SPHERE_ORDER, 0, 0)
    {
    }
 
