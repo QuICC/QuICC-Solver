@@ -15,7 +15,7 @@ set(_tests
 )
 
 quicc_set_ulp(_ulp
-  ULP 16 10 115 80
+  ULP 25 25 25 25
   MPULP 3 2 2 2
   )
 

@@ -118,7 +118,7 @@ namespace Sphere {
          this->transform(rOut, in, *(it->second));
       } else
       {
-         throw std::logic_error("Requested Finite Differences transform operator is not avaible");
+         throw std::logic_error("Requested Finite Differences transform operator is not available");
       }
    }
 
@@ -131,7 +131,7 @@ namespace Sphere {
          this->transform(rOut, in, *(it->second));
       } else
       {
-         throw std::logic_error("Requested Finite Differences transform operator is not avaible");
+         throw std::logic_error("Requested Finite Differences transform operator is not available");
       }
    }
 
