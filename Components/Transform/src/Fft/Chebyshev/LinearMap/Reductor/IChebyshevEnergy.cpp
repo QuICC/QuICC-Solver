@@ -77,9 +77,9 @@ namespace Reductor {
       assert(rOut.cols() == this->outCols());
       assert(rOut.rows() == this->outRows());
       // set sizes : Components/Transform/src/Fft/Backend/Fftw/ChebyshevEnergy.cpp
-      std::cerr << "in =  \n";
-      std::cerr << in;
-      std::cerr << "\n";
+      //std::cerr << "in =  \n";
+      //std::cerr << in;
+      //std::cerr << "\n";
 
       auto& tmpIn = this->mBackend.getStorage(StorageKind::in);
       auto& tmpOut = this->mBackend.getStorage(StorageKind::out);
