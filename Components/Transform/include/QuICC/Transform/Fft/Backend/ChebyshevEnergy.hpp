@@ -24,6 +24,7 @@
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
 #include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 
 namespace QuICC {
@@ -60,6 +61,11 @@ namespace Backend {
           * @brief Initialise the FFT transforms
           */
          void init(const SetupType& setup) const;
+
+         /**
+          * @brief Initialise the FFT transforms, anelastic overload
+          */
+         void init(const SetupType& setup, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const;
 
          /**
           * @brief set spectral operator
@@ -161,6 +167,16 @@ namespace Backend {
           * @brief Get the temporary storage
           */
          Matrix& getStorage(const StorageKind = StorageKind::in) const;
+
+         /**
+         * @brief Set extra size for anelastic calculations
+         */
+         void setExtraSize(int extraSize) const;
+         
+         /**
+          * @brief Get extra size for anelastic calculations  
+          */
+         int getExtraSize() const;
 
       protected:
 

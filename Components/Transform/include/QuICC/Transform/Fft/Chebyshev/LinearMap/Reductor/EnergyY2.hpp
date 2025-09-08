@@ -38,6 +38,11 @@ namespace Reductor {
    /**
     * @brief Implementation of the Chebyshev based R^2 energy reductor, with linear map y = ax + b
     */
+   // Inheritance: EnergyY2 
+   //                -> IChebyshevEnergy  
+   //                   -> IChebyshevOperator 
+   //                      -> IFftOperator 
+   //                         -> ITransformOperator
    class EnergyY2: public IChebyshevEnergy
    {
       public:

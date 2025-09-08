@@ -34,9 +34,12 @@ namespace Reductor {
 
    void EnergyY2::initOperator() const
    {
-      int size = 2*this->mspSetup->specSize() + std::min(2, 2*this->mspSetup->padSize());
+      // ExtraSize is = 0 in the Boussinesq case
+      // ExtraSize is Background_Density::nN() in the anelastic case
+      int extraSize = this->mBackend.getExtraSize(); 
+      int size = 2*this->mspSetup->specSize() + extraSize + std::min(2, 2*this->mspSetup->padSize());
       ::QuICC::SparseSM::Chebyshev::LinearMap::Y2 op(size, size, this->mspSetup->lower(), this->mspSetup->upper());
-      this->mBackend.setSpectralOperator(op.mat().leftCols(2*this->mspSetup->specSize()));
+      this->mBackend.setSpectralOperator(op.mat().leftCols(2*this->mspSetup->specSize() + extraSize));
    }
 
    void EnergyY2::applyPreOperator(Matrix& tmp, const Matrix& in) const

@@ -22,6 +22,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/IChebyshevEnergy.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -61,6 +62,11 @@ namespace Reductor {
           * @brief Initialize storage
           */
          void initBackend() const final;
+         
+         /**
+          * @brief Initialize storage, anelastic version
+          */
+         void initBackendAnelastic(std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const final;
 
       private:
          /**

@@ -57,6 +57,15 @@ namespace Reductor {
       this->mBackend.addSolver(1);
    }
 
+   void EnergyD1Y1::initBackendAnelastic(std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+   {
+      // Call parent initializer
+      IChebyshevEnergy::initBackendAnelastic(pF);
+
+      // Initialize the solver
+      this->mBackend.addSolver(1);
+   }
+
    void EnergyD1Y1::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
       this->mBackend.input(tmp, in);

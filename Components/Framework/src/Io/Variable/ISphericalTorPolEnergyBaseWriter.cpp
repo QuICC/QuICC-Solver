@@ -91,7 +91,10 @@ namespace Variable {
          std::visit(
                [&](auto&& p)
                {
-                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyR2::id());
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::EnergyR2::id()); 
+                  // spectrum is the output ; m_rows=blocksize, m_cols =1
+                  // p->data the spectral coefficients, input ; m_rows=blocksize, m_cols =setup.bwdSize
+                  // Transform::Reductor::EnergyR2::id() is the operator we act on the spectral coefficients
                },
                pInVarTor);
       }

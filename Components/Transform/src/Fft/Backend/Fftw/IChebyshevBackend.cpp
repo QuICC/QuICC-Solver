@@ -101,6 +101,17 @@ namespace Fftw {
       }
    }
 
+   /*
+   void IChebyshevBackend::setExtraSize(int extraSize) const
+   {
+      this->mExtraSize = extraSize;
+   }
+
+   int IChebyshevBackend::getExtraSize() const
+   {
+      return this->mExtraSize;
+   }
+   */
 }
 }
 }

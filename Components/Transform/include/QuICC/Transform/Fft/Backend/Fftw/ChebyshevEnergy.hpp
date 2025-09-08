@@ -24,6 +24,7 @@
 #include "QuICC/Transform/Fft/Backend/Fftw/IChebyshevBackend.hpp"
 #include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -38,6 +39,9 @@ namespace Fftw {
    /**
     * @brief Interface for a generic Chebyshev FFTW based energy reductor
     */
+   // Inheritance: ChebyshevEnergy
+   //                -> IChebyshevBackend 
+   //                   -> IFftwBackend
    class ChebyshevEnergy: public IChebyshevBackend
    {
       public:
@@ -55,6 +59,11 @@ namespace Fftw {
           * @brief Initialise the FFTW transforms
           */
          void init(const SetupType& setup) const final;
+
+         /**
+          * @brief Initialise the FFTW transforms, anelastic overload
+          */
+         void init(const SetupType& setup, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const;
 
          /**
           * @brief set spectral operator
@@ -120,6 +129,10 @@ namespace Fftw {
           * @brief Get fft scaling
           */
          MHDFloat getFftScaling() const;
+         
+         void setExtraSize(int extraSize) const;
+
+         int getExtraSize() const;
 
       protected:
 
@@ -179,6 +192,8 @@ namespace Fftw {
           * @brief Spectral operator
           */
          mutable SparseMatrix mSpecOp;
+
+         mutable int mExtraSize = 0; 
 
    };
 
