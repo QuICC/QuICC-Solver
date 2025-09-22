@@ -58,6 +58,7 @@ set(tags
   Roberts
   Rossby
   Sigma
+  SimulationMode
   StabilityMode
   Sort
   Tau
