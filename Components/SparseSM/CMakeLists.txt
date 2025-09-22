@@ -7,7 +7,10 @@ set(QUICC_CMAKE_SRC_VISIBILITY PRIVATE)
 
 # Create component library
 add_library(${QUICC_CURRENT_COMPONENT_LIB} "")
-set_target_properties(${QUICC_CURRENT_COMPONENT_LIB} PROPERTIES LINKER_LANGUAGE CXX)
+
+set_property(TARGET ${QUICC_CURRENT_COMPONENT_LIB}
+  PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -15,6 +18,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     QuICC::Common
+    Polynomial::SphericalBessel
   )
 
 # Boost for Bessel
@@ -24,6 +28,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
   PRIVATE
     Boost::headers
 )
+add_library(QuICC::SparseSM ALIAS ${QUICC_SPARSESM_COMPONENT_LIB})
 
 # Add source directory
 add_subdirectory(src)

@@ -10,7 +10,7 @@ include(ModelFunctions)
 #
 function(quicc_add_model target)
   # parse inputs
-  set(multiValueArgs TYPES SOURCE_DIRS)
+  set(multiValueArgs TYPES SOURCE_DIRS EXTRA_LIBS)
   cmake_parse_arguments(QAM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_model")
@@ -43,6 +43,11 @@ function(quicc_add_model target)
   target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
     QuICC::Framework
     )
+  foreach(_extra_lib ${QAM_EXTRA_LIBS})
+    target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
+      ${_extra_lib}
+      )
+  endforeach()
 
   # Create model implementations libraries
   foreach(type ${QAM_TYPES})

@@ -20,78 +20,78 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the mean value of a scalar field in a sphere
+ */
+class SphereScalarMeanWriter : public IVariableAsciiWriter
+{
+public:
    /**
-    * @brief Implementation of the mean value of a scalar field in a sphere
+    * @brief Constructor
+    *
+    * @param prefix Prefix to use for file name
+    * @param type Type of the file (typically scheme name)
     */
-   class SphereScalarMeanWriter: public IVariableAsciiWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param prefix Prefix to use for file name
-          * @param type Type of the file (typically scheme name)
-          */
-         SphereScalarMeanWriter(const std::string& prefix, const std::string& type);
+   SphereScalarMeanWriter(const std::string& prefix, const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         ~SphereScalarMeanWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   ~SphereScalarMeanWriter() = default;
 
-         /**
-          * @brief Initialise the operator, transform and file
-          */
-         void init() final;
+   /**
+    * @brief Initialise the operator, transform and file
+    */
+   void init() final;
 
-         /**
-          * @brief Requires heavy calculation?
-          */
-         bool isHeavy() const final;
+   /**
+    * @brief Requires heavy calculation?
+    */
+   bool isHeavy() const final;
 
-      protected:
-         /**
-          * @brief Write State to file
-          */
-         void writeContent() final;
+protected:
+   /**
+    * @brief Write State to file
+    */
+   void writeContent() final;
 
-         /**
-          * @brief Data ordering is m slowest
-          */
-         bool mHasMOrdering;
+   /**
+    * @brief Data ordering is m slowest
+    */
+   bool mHasMOrdering;
 
-      private:
-         /**
-          * @brief Mean value
-          */
-         MHDFloat mMean;
+private:
+   /**
+    * @brief Mean value
+    */
+   MHDFloat mMean;
 
-         /*
-          * @brief Spherical volume to normalize energy to energy density
-          */
-         MHDFloat mVolume;
+   /*
+    * @brief Spherical volume to normalize energy to energy density
+    */
+   MHDFloat mVolume;
 
-         /**
-          * @brief Background state
-          */
-         ArrayZ mBg;
+   /**
+    * @brief Background state
+    */
+   ArrayZ mBg;
 
-         /**
-          * @brief Projector to extract mean
-          */
-         Matrix mProjector;
-   };
+   /**
+    * @brief Projector to extract mean
+    */
+   Matrix mProjector;
+};
 
-   /// Typedef for a shared pointer of a HDF5 state file writer
-   typedef std::shared_ptr<SphereScalarMeanWriter> SharedSphereScalarMeanWriter;
+/// Typedef for a shared pointer of a HDF5 state file writer
+typedef std::shared_ptr<SphereScalarMeanWriter> SharedSphereScalarMeanWriter;
 
-   inline bool SphereScalarMeanWriter::isHeavy() const
-   {
-      return false;
-   }
-
+inline bool SphereScalarMeanWriter::isHeavy() const
+{
+   return false;
 }
-}
-}
+
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_SPHERESCALARMEANWRITER_HPP

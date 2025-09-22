@@ -16,15 +16,20 @@ build-quicc-base:
   stage: build_base
   variables:
     DOCKERFILE: ci/docker/baseimage/Dockerfile_quicc_baseimage_alps-gh200
-    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:3cfa49dfa946aeb4b1dd1d40e87a3c12
+    PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:e1a7eea3e189eb5473b6355770b72ab8
+    SECONDARY_IMAGE_NAME: docker.io/quicc/quicc_baseimage_alps-gh200:e1a7eea3e189eb5473b6355770b72ab8
+    SECONDARY_IMAGE_USERNAME: quicc
+    SECONDARY_IMAGE_PASSWORD: $DOCKERHUB_ACCESS_TOKEN
 build-quicc:
   extends: .alps-gh200_builder
   stage: build
   variables:
     DOCKERFILE: ci/docker/Dockerfile_kkgpu
     PERSIST_IMAGE_NAME: $CSCS_REGISTRY_PATH/quicc_kkgpu_alps-gh200:$CI_COMMIT_SHA
-    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:3cfa49dfa946aeb4b1dd1d40e87a3c12"]'
+    DOCKER_BUILD_ARGS: '["BASEIMAGE=$CSCS_REGISTRY_PATH/baseimage/quicc_baseimage_alps-gh200:e1a7eea3e189eb5473b6355770b72ab8"]'
 test-quicc-lib:
+  variables:
+    TEST_NCPU: '72'
   extends:
   - .test-lib
   - .alps-gh200_runner

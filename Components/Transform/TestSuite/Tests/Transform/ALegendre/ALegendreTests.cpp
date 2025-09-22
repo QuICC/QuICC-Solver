@@ -5,23 +5,21 @@
 
 #define CATCH_CONFIG_RUNNER
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
 
 // Project includes
 #include "Environment/QuICCEnv.hpp"
+#include "TestSuite/Io.hpp"
 #include "QuICC/TestSuite/Transform/ALegendre/TestArgs.hpp"
+#include "QuICC/TestSuite/Transform/MergeTest.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace test = QuICC::TestSuite::Transform::ALegendre;
 
 int main( int argc, char* argv[] )
 {
-   // Environment fixture
    QuICC::QuICCEnv();
 
    QuICC::Profiler::Initialize();
@@ -29,6 +27,8 @@ int main( int argc, char* argv[] )
    Catch::Session session; // There must be exactly one instance
 
    std::string testType = "";
+
+   QuICC::TestSuite::Transform::MergeInfo info;
 
    // Build a new parser on top of Catch's
    using namespace Catch::clara;
@@ -57,7 +57,16 @@ int main( int argc, char* argv[] )
          ("Iterations")
       | Opt( test::args().dumpData )         // Add keep output data option
          ["--dumpData"]
-         ("Write output data to file?");
+         ("Write output data to file?")
+      | Opt( info.file, "options file" )     // Read options from file
+         ["--options_file"]
+         ("Read command options from file")
+      | Opt( info.jid, "parallel id" )       // Read options from file
+         ["--jid"]
+         ("Id of parallel executor")
+      | Opt( info.jN, "parallel jobs" )      // Read options from file
+         ["--jN"]
+         ("Number of parallel jobs");
 
    // Now pass the new composite back to Catch so it uses that
    session.cli( cli );
@@ -65,20 +74,31 @@ int main( int argc, char* argv[] )
    // Let Catch (using Clara) parse the command line
    int returnCode = session.applyCommandLine( argc, argv );
    if( returnCode != 0 ) // Indicates a command line error
+   {
       return returnCode;
-
-   // Set test from command line
-   if(testType != "")
-   {
-      test::args().setType(testType);
    }
 
-   if(test::args().params.size() > 0)
+   // run with given command line arguments
+   if(info.file == "")
    {
-      test::args().useDefault = false;
-   }
+      // Set test from command line
+      if(testType != "")
+      {
+         test::args().setType(testType);
+      }
 
-   returnCode = session.run();
+      if(test::args().params.size() > 0)
+      {
+         test::args().useDefault = false;
+      }
+
+      returnCode = session.run();
+   }
+   // Process commands from options file
+   else
+   {
+      returnCode = QuICC::TestSuite::Transform::runMergedTests(info, session, test::args());
+   }
 
    QuICC::Profiler::Finalize();
 

@@ -12,11 +12,11 @@
 
 // Project includes
 //
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Io/Variable/ISphericalTorPolModeSpectrumWriter.hpp"
 #include "QuICC/Io/Variable/Tags/Spectrum.hpp"
-#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 
 namespace QuICC {
@@ -120,7 +120,7 @@ void ISphericalTorPolModeSpectrumWriter::writeContent()
       this->mFile << ioFW(ioPrec) << tT << "\t";
       this->mFile << ioFW(ioPrec) << tP << std::endl;
 
-      this->mFile << std::left << ioIW() << "l"
+      this->mFile << std::left << ioIW() << "# l"
                   << "\t"
                   << "m"
                   << "\t";

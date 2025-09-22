@@ -1,6 +1,7 @@
-/** 
+/**
  * @file ISphericalTorPolEnergyBaseWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical geometry
+ * @brief Implementation of the ASCII spherical harmonics energy calculation for
+ * a Toroidal/Poloidal field in a spherical geometry
  */
 
 #ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYWBASERITER_HPP
@@ -13,8 +14,8 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
 
 namespace QuICC {
 
@@ -22,107 +23,115 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the ASCII spherical harmonics energy calculation for
+ * a Toroidal/Poloidal field in a spherical geometry
+ */
+class ISphericalTorPolEnergyBaseWriter : public IVariableAsciiWriter
+{
+public:
    /**
-    * @brief Implementation of the ASCII spherical harmonics energy calculation for a Toroidal/Poloidal field in a spherical geometry
+    * @brief Constructor
+    *
+    * @param name       Filename
+    * @param ext        File extension
+    * @param header     Header string of file
+    * @param type       Type string of file
+    * @param version    Version string of file
+    * @param id         ID of the dimension space
+    * @param mode       Write mode of file
     */
-   class ISphericalTorPolEnergyBaseWriter: public IVariableAsciiWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param name       Filename
-          * @param ext        File extension
-          * @param header     Header string of file
-          * @param type       Type string of file
-          * @param version    Version string of file
-          * @param id         ID of the dimension space
-          * @param mode       Write mode of file
-          */
-         ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND);
+   ISphericalTorPolEnergyBaseWriter(std::string name, std::string ext,
+      std::string header, std::string type, std::string version,
+      const Dimensions::Space::Id id,
+      const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~ISphericalTorPolEnergyBaseWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~ISphericalTorPolEnergyBaseWriter() = default;
 
-         /**
-          * @brief Activate output of parity splitting in energy output
-          */
-         void showParity();
+   /**
+    * @brief Activate output of parity splitting in energy output
+    */
+   void showParity();
 
-         /**
-          * @brief Compute energy
-          */
-         void compute(Transform::TransformCoordinatorType& coord);
+   /**
+    * @brief Compute energy
+    */
+   void compute(Transform::TransformCoordinatorType& coord);
 
-         /**
-          * @brief Requires heavy calculation?
-          */
-         virtual bool isHeavy() const;
-         
-      protected:
-         /**
-          * @brief Prepare spectral field data for computation
-          */
-         void prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord);
+   /**
+    * @brief Requires heavy calculation?
+    */
+   virtual bool isHeavy() const;
 
-         /**
-          * @brief Data ordering is m slowest
-          */
-         bool mHasMOrdering;
+protected:
+   /**
+    * @brief Prepare spectral field data for computation
+    */
+   void prepareInput(const FieldComponents::Spectral::Id sId,
+      Transform::TransformCoordinatorType& coord);
 
-         /**
-          * @brief Spherical volume to normalize energy to energy density
-          */
-         MHDFloat mVolume;
+   /**
+    * @brief Data ordering is m slowest
+    */
+   bool mHasMOrdering;
 
-         /**
-          * @brief Flag to show parity split in energy
-          */
-         bool mShowParity;
+   /**
+    * @brief Spherical volume to normalize energy to energy density
+    */
+   MHDFloat mVolume;
 
-      private:
-         /**
-          * @brief Reset energy storage
-          */
-         virtual void resetEnergy() = 0;
+   /**
+    * @brief Flag to show parity split in energy
+    */
+   bool mShowParity;
 
-         /**
-          * @brief Store energy from Q component
-          *
-          * @param l      Harmonic degree
-          * @param m      Harmonic order
-          * @param energy  Energy of mode
-          */
-         virtual void storeQEnergy(const int l, const int m, const MHDFloat energy) = 0;
+private:
+   /**
+    * @brief Reset energy storage
+    */
+   virtual void resetEnergy() = 0;
 
-         /**
-          * @brief Store energy from S component
-          *
-          * @param l      Harmonic degree
-          * @param m      Harmonic order
-          * @param energy  Energy of mode
-          */
-         virtual void storeSEnergy(const int l, const int m, const MHDFloat energy) = 0;
+   /**
+    * @brief Store energy from Q component
+    *
+    * @param l      Harmonic degree
+    * @param m      Harmonic order
+    * @param energy  Energy of mode
+    */
+   virtual void storeQEnergy(const int l, const int m,
+      const MHDFloat energy) = 0;
 
-         /**
-          * @brief Store energy from T component
-          *
-          * @param l      Harmonic degree
-          * @param m      Harmonic order
-          * @param energy  Energy of mode
-          */
-         virtual void storeTEnergy(const int l, const int m, const MHDFloat energy) = 0;
-   };
+   /**
+    * @brief Store energy from S component
+    *
+    * @param l      Harmonic degree
+    * @param m      Harmonic order
+    * @param energy  Energy of mode
+    */
+   virtual void storeSEnergy(const int l, const int m,
+      const MHDFloat energy) = 0;
 
-   inline bool ISphericalTorPolEnergyBaseWriter::isHeavy() const
-   {
-      return true;
-   }
+   /**
+    * @brief Store energy from T component
+    *
+    * @param l      Harmonic degree
+    * @param m      Harmonic order
+    * @param energy  Energy of mode
+    */
+   virtual void storeTEnergy(const int l, const int m,
+      const MHDFloat energy) = 0;
+};
 
-} // Variable
-} // Io
-} // QuICC
+inline bool ISphericalTorPolEnergyBaseWriter::isHeavy() const
+{
+   return true;
+}
+
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_ISPHERICALTORPOLENERGYBASEWRITER_HPP

@@ -266,11 +266,6 @@ View<Scalar, Attributes<Args...>>::View(const Scalar* data,
 
    for (std::size_t i = 0; i < _rank; ++i)
    {
-      /// \todo check space consistency
-      // assert(QuICC::Cuda::isDeviceMemory(data) ==
-      //    QuICC::Cuda::isDeviceMemory(pointers[i]) ||
-      //    pointers[i] == nullptr);
-
       _dimensions[i] = dimensions[i];
       _pointers[i] = pointers[i];
       _indices[i] = indices[i];
@@ -544,7 +539,7 @@ const Scalar& View<Scalar, Attributes<Args...>>::operator()(const IndexType i,
             std::size_t kmn = 0;
             for (std::size_t ii = 0; ii < k; ++ii)
             {
-               kmn += _dimensions[0] - ii; // cumulative column height
+               kmn += _dimensions[0] - ii; // comulative column height
             }
             kmn *= _dimensions[1];
             assert(i - k + j * m + kmn < this->_size);
@@ -577,7 +572,7 @@ const Scalar& View<Scalar, Attributes<Args...>>::operator()(const IndexType i,
                assert(i - k + j * m + kmn < this->_size);
                return this->_data[i - k + j * m + kmn];
             }
-            // cumulative m (column height)
+            // comulative m (column height)
             kmn += _dimensions[0] - p;
          }
       }
@@ -597,7 +592,7 @@ const Scalar& View<Scalar, Attributes<Args...>>::operator()(const IndexType i,
                assert(j + (i - k) * n + kmn < this->_size);
                return this->_data[j + (i - k) * n + kmn];
             }
-            // cumulative m
+            // comulative m
             kmn += _dimensions[0] - p;
          }
       }
@@ -627,7 +622,7 @@ const Scalar& View<Scalar, Attributes<Args...>>::operator()(const IndexType i,
                assert(i + (j - k) * m + kmn < this->_size);
                return this->_data[i + (j - k) * m + kmn];
             }
-            // cumulative n
+            // comulative n
             kmn += _dimensions[1] - p;
          }
       }
@@ -647,7 +642,7 @@ const Scalar& View<Scalar, Attributes<Args...>>::operator()(const IndexType i,
                assert(j - k + i * n + kmn < this->_size);
                return this->_data[j - k + i * n + kmn];
             }
-            // cumulative n
+            // comulative n
             kmn += _dimensions[1] - p;
          }
       }

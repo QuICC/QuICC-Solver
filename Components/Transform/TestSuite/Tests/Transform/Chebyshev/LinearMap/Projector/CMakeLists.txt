@@ -2,6 +2,7 @@ message(VERBOSE "Projectors:")
 
 # Create projector tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 include(SetUlp)
 
 quicc_set_ulp(_ulps
@@ -10,18 +11,18 @@ quicc_set_ulp(_ulps
   )
 
 set(_tests
-  P:projector
-  DivY1:projector
-  DivY2:projector
-  D1Y1:projector
-  DivY1D1Y1:projector
-  SphRadLapl:projector
+  P:<base_t>:projector
+  DivY1:<base_t>:projector
+  DivY2:<base_t>:projector
+  D1Y1:<base_t>:projector
+  DivY1D1Y1:<base_t>:projector
+  SphRadLapl:<base_t>:projector
   )
 
 foreach(_test _ulp IN ZIP_LISTS _tests _ulps)
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Operator:Type
+    KEYWORD Operator:Impl:Type
     ULP ${_ulp}
   )
 endforeach()
@@ -32,15 +33,22 @@ quicc_set_ulp(_ulps
   )
 
 set(_tests
-  D:1:projector
-  D:2:projector
-  D:3:projector
-  D:4:projector
+  D:<1,base_t>:projector
+  D:<2,base_t>:projector
+  D:<3,base_t>:projector
+  D:<4,base_t>:projector
   )
 foreach(_test _ulp IN ZIP_LISTS _tests _ulps)
   quicc_add_test(${_test}
     COMMAND ${TestExe}
-    KEYWORD Operator:Template:Type
+    KEYWORD Operator:Impl:Type
     ULP ${_ulp}
   )
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_projector_merged
+  COMMAND ${TestExe}
+  JN 4
+)

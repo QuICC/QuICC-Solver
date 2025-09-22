@@ -31,18 +31,18 @@ namespace QuICC {
           */
          static ReturnType create();
 
-      protected:
-
-      private:
          /**
           * @brief Constructor
           */
-         StateGeneratorFactory();
+         StateGeneratorFactory() = delete;
 
          /**
           * @brief Destructor
           */
-         ~StateGeneratorFactory();
+         ~StateGeneratorFactory() = delete;
+      protected:
+
+      private:
    };
 
    template <class TModel> typename StateGeneratorFactory<TModel>::ReturnType StateGeneratorFactory<TModel>::create()
@@ -91,6 +91,9 @@ namespace QuICC {
 
       // Initialise the simulation
       spGen->init(spBcs);
+
+      // Set initial state
+      model.setGeneratorState(spGen);
 
       return spGen;
    }

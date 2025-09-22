@@ -45,12 +45,14 @@ public:
    /**
     * @brief Compute spherical bessel basis
     *
-    * @param rOut    Output matrix
-    * @param roots   Vector of Bessel roots k: j(l, k_n r)
-    * @param l       Harmonic degree l
-    * @param igrid   Physical grid points
-    * @param scale   Scaling array, ie. weights
-    * @param dNu     nu shift used in bessel function J(l + dnu, x)
+    * @param rOut       Output matrix
+    * @param roots      Vector of Bessel roots k: j(l, k_n r)
+    * @param roots_l1   Vector of Bessel roots k: j(l1, k_n r)
+    * @param l          Harmonic degree l
+    * @param igrid      Physical grid points
+    * @param scale      Scaling array, ie. weights
+    * @param dNu        nu shift used in bessel function J(l + dnu, x)
+    * @param dNu_l1     nu shift used in bessel function J(l1 + dnu1, x)
     */
    template <typename T>
    void compute(
@@ -58,7 +60,7 @@ public:
       const std::vector<Internal::MHDFloat>& roots,
       const std::vector<Internal::MHDFloat>& roots_l1, const int l,
       const Internal::Array& igrid, const Internal::Array& scale,
-      const Internal::MHDFloat dNu);
+      const Internal::MHDFloat dNu, const Internal::MHDFloat dNu_l1);
 };
 
 template <typename T>
@@ -67,7 +69,7 @@ inline void r_1drSphJnl<implicit_t>::compute(
    const std::vector<Internal::MHDFloat>& roots,
    const std::vector<Internal::MHDFloat>& roots_l1, const int l,
    const Internal::Array& igrid, const Internal::Array& scale,
-   const Internal::MHDFloat dNu)
+   const Internal::MHDFloat dNu, const Internal::MHDFloat dNu_l1)
 {
    Polynomial::Bessel::r_1drSphJnl<recurrence_t> r_1drSphJnl;
 
@@ -101,11 +103,11 @@ inline void r_1drSphJnl<implicit_t>::compute(
 
       Internal::Matrix opA(igrid.size(), n_in);
       Polynomial::Bessel::SphJnl jnl;
-      jnl.compute<Internal::MHDFloat>(opA, roots_l1, lm, igrid, scale, dNu);
+      jnl.compute<Internal::MHDFloat>(opA, roots_l1, lm, igrid, scale, dNu_l1);
 
       Internal::Matrix opB(igrid.size(), n_in);
       r_1drSphJnl.compute<Internal::MHDFloat>(opB, roots_l1, lm, igrid,
-         Internal::Array(), dNu);
+         Internal::Array(), dNu_l1);
 
       Internal::Matrix opC(igrid.size(), nPoly);
       Polynomial::Bessel::SphJnl jnlB;

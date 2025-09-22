@@ -3,10 +3,6 @@
  * @brief Tests for the linear map Chebyshev based @Operator@ integrator
  */
 
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <catch2/catch.hpp>
@@ -19,7 +15,7 @@
 
 namespace currentts = ::QuICC::TestSuite::Transform::Chebyshev::LinearMap;
 
-TEST_CASE( "Error for @Operator@ integrator", "[@Operator@:@type@]" )
+TEST_CASE( "Error for @Operator@@Impl@ integrator", "[@CatchTestName@]" )
 {
    // Set default arguments if required
    if(currentts::args().useDefault)
@@ -30,13 +26,14 @@ TEST_CASE( "Error for @Operator@ integrator", "[@Operator@:@type@]" )
    Catch::StringMaker<double>::precision = 15;
 
    // Set type
-   currentts::args().setType("@type@");
+   currentts::args().setType("@Type@");
 
    REQUIRE( (currentts::args().type == ::QuICC::TestSuite::Transform::TestType::INTEGRATOR && "Test type is integrator") );
    REQUIRE( currentts::args().params.size() > 0 );
 
    // Typedef for used operator
-   typedef ::QuICC::Transform::Fft::Chebyshev::LinearMap::Integrator::@Operator@ Integrator;
+   using namespace ::QuICC::Transform::Fft::Chebyshev::LinearMap;
+   typedef Integrator::@Operator@@Impl@ Integrator;
    typedef typename currentts::Tester<Integrator> Tester;
 
    Tester tester("@Operator@.dat", currentts::args().dumpData);

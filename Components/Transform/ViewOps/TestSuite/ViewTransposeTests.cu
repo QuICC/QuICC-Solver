@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
 
-#include "ViewOps/Transpose/Op.hpp"
+#include "ViewOps/Transpose/OpGrouped.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
 
 using namespace QuICC::Memory;
@@ -31,10 +31,10 @@ TEST_CASE("Serial DCCSC3D to DCCSC3DJIK 210", "SerialDCCSC3DtoDCCSC3DJIK210")
    // they are not used in the serial aka dense tranpose
    std::array<std::vector<std::uint32_t>, rank> pointers = {{{}, {}, {}}};
    std::array<std::vector<std::uint32_t>, rank> indices = {{{}, {}, {}}};
-   using Tin = DCCSC3D;
-   using Tout = DCCSC3DJIK;
-   View<double, Tin> viewIn(dataIn, dimensionsIn, pointers, indices);
-   View<double, Tout> viewOut(dataOut, dimensionsOut, pointers, indices);
+   using VinTy = View<double, DCCSC3D>;
+   using VoutTy = View<double, DCCSC3DJIK>;
+   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
+   VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
 
    // device mem
    auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
@@ -46,9 +46,9 @@ TEST_CASE("Serial DCCSC3D to DCCSC3DJIK 210", "SerialDCCSC3DtoDCCSC3DJIK210")
    ViewBase<std::uint32_t> indicesDev[rank];
 
    // set device views
-   View<double, Tin> viewInDev(memBlockIn.data(), memBlockIn.size(),
-      dimensionsIn.data(), pointersDev, indicesDev);
-   View<double, Tout> viewOutDev(memBlockOut.data(), memBlockOut.size(),
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(),
+      pointersDev, indicesDev);
+   VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersDev, indicesDev);
 
    // cpu -> gpu
@@ -58,10 +58,13 @@ TEST_CASE("Serial DCCSC3D to DCCSC3DJIK 210", "SerialDCCSC3DtoDCCSC3DJIK210")
    // Transpose op
    using namespace QuICC::Transpose::Cuda;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-      std::make_unique<Op<View<double, Tout>, View<double, Tin>, p201_t>>();
-
-   transposeOp->apply(viewOutDev, viewInDev);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>();
+   // Pack views
+   std::vector<VoutTy> viewsOutDev = {viewOutDev};
+   std::vector<VinTy> viewsInDev = {viewInDev};
+   // Apply transpose
+   transposeOp->apply(viewsOutDev, viewsInDev);
 
    // gpu -> cpu
    cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(),
@@ -111,10 +114,10 @@ TEST_CASE("Serial DCCSC3DJIK to DCCSC3D 120", "SerialDCCSC3DJIKtoDCCSC3D120")
    // they are not used in the serial aka dense tranpose
    std::array<std::vector<std::uint32_t>, rank> pointers = {{{}, {}, {}}};
    std::array<std::vector<std::uint32_t>, rank> indices = {{{}, {}, {}}};
-   using Tin = DCCSC3DJIK;
-   using Tout = DCCSC3D;
-   View<double, Tin> viewIn(dataIn, dimensionsIn, pointers, indices);
-   View<double, Tout> viewOut(dataOut, dimensionsOut, pointers, indices);
+   using VinTy = View<double, DCCSC3DJIK>;
+   using VoutTy = View<double, DCCSC3D>;
+   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
+   VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
 
    // device mem
    auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
@@ -126,9 +129,9 @@ TEST_CASE("Serial DCCSC3DJIK to DCCSC3D 120", "SerialDCCSC3DJIKtoDCCSC3D120")
    ViewBase<std::uint32_t> indicesDev[rank];
 
    // set device views
-   View<double, Tin> viewInDev(memBlockIn.data(), memBlockIn.size(),
-      dimensionsIn.data(), pointersDev, indicesDev);
-   View<double, Tout> viewOutDev(memBlockOut.data(), memBlockOut.size(),
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(),
+      pointersDev, indicesDev);
+   VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersDev, indicesDev);
 
    // cpu -> gpu
@@ -138,10 +141,13 @@ TEST_CASE("Serial DCCSC3DJIK to DCCSC3D 120", "SerialDCCSC3DJIKtoDCCSC3D120")
    // Transpose op
    using namespace QuICC::Transpose::Cuda;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-      std::make_unique<Op<View<double, Tout>, View<double, Tin>, p120_t>>();
-
-   transposeOp->apply(viewOutDev, viewInDev);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>();
+   // Pack views
+   std::vector<VoutTy> viewsOutDev = {viewOutDev};
+   std::vector<VinTy> viewsInDev = {viewInDev};
+   // Apply transpose
+   transposeOp->apply(viewsOutDev, viewsInDev);
 
    // gpu -> cpu
    cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(),
@@ -206,17 +212,16 @@ TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 201",
    // view
    constexpr std::uint32_t rank = 3;
    std::array<std::uint32_t, rank> dimensionsIn{M, N, K};
-   std::array<std::uint32_t, rank> dimensionsOut{N, M, K};
+   std::array<std::uint32_t, rank> dimensionsOut{N, K, M};
    // skip setting up pointers and indices
    // they are not used in the serial aka dense tranpose
    std::array<std::vector<std::uint32_t>, rank> pointers = {{{}, {}, {}}};
    std::array<std::vector<std::uint32_t>, rank> indices = {{{}, {}, {}}};
 
-   using Tin = S1CLCSC3DJIK;
-   using Tout = DCCSC3DJIK;
-
-   View<double, Tin> viewIn(dataIn, dimensionsIn, pointers, indices);
-   View<double, Tout> viewOut(dataOut, dimensionsOut, pointers, indices);
+   using VinTy = View<double, S1CLCSC3DJIK>;
+   using VoutTy = View<double, DCCSC3DJIK>;
+   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
+   VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
 
    // device mem
    auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
@@ -228,9 +233,9 @@ TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 201",
    ViewBase<std::uint32_t> indicesDev[rank];
 
    // set device views
-   View<double, Tin> viewInDev(memBlockIn.data(), memBlockIn.size(),
-      dimensionsIn.data(), pointersDev, indicesDev);
-   View<double, Tout> viewOutDev(memBlockOut.data(), memBlockOut.size(),
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(),
+      pointersDev, indicesDev);
+   VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersDev, indicesDev);
 
    // cpu -> gpu
@@ -240,10 +245,13 @@ TEST_CASE("Serial S1CLCSC3DJIK to DCCSC3DJIK 201",
    // Transpose op
    using namespace QuICC::Transpose::Cuda;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-      std::make_unique<Op<View<double, Tout>, View<double, Tin>, p201_t>>();
-
-   transposeOp->apply(viewOutDev, viewInDev);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p201_t>>();
+   // Pack views
+   std::vector<VoutTy> viewsOutDev = {viewOutDev};
+   std::vector<VinTy> viewsInDev = {viewInDev};
+   // Apply transpose
+   transposeOp->apply(viewsOutDev, viewsInDev);
 
    // gpu -> cpu
    cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(), S * sizeof(double),
@@ -305,11 +313,11 @@ TEST_CASE("Serial DCCSC3DJIK to S1CLCSC3DJIK 120",
    std::array<std::vector<std::uint32_t>, rank> pointers = {{{}, {}, {}}};
    std::array<std::vector<std::uint32_t>, rank> indices = {{{}, {}, {}}};
 
-   using Tin = DCCSC3DJIK;
-   using Tout = S1CLCSC3DJIK;
-
-   View<double, Tin> viewIn(dataIn, dimensionsIn, pointers, indices);
-   View<double, Tout> viewOut(dataOut, dimensionsOut, pointers, indices);
+   // View types
+   using VinTy = View<double, DCCSC3DJIK>;
+   using VoutTy = View<double, S1CLCSC3DJIK>;
+   VinTy viewIn(dataIn, dimensionsIn, pointers, indices);
+   VoutTy viewOut(dataOut, dimensionsOut, pointers, indices);
 
    // device mem
    auto memDev = std::make_shared<QuICC::Memory::Cuda::Malloc>();
@@ -321,9 +329,9 @@ TEST_CASE("Serial DCCSC3DJIK to S1CLCSC3DJIK 120",
    ViewBase<std::uint32_t> indicesDev[rank];
 
    // set device views
-   View<double, Tin> viewInDev(memBlockIn.data(), memBlockIn.size(),
-      dimensionsIn.data(), pointersDev, indicesDev);
-   View<double, Tout> viewOutDev(memBlockOut.data(), memBlockOut.size(),
+   VinTy viewInDev(memBlockIn.data(), memBlockIn.size(), dimensionsIn.data(),
+      pointersDev, indicesDev);
+   VoutTy viewOutDev(memBlockOut.data(), memBlockOut.size(),
       dimensionsOut.data(), pointersDev, indicesDev);
 
    // cpu -> gpu
@@ -333,10 +341,14 @@ TEST_CASE("Serial DCCSC3DJIK to S1CLCSC3DJIK 120",
    // Transpose op
    using namespace QuICC::Transpose::Cuda;
    using namespace QuICC::Transpose;
-   auto transposeOp =
-      std::make_unique<Op<View<double, Tout>, View<double, Tin>, p120_t>>();
 
-   transposeOp->apply(viewOutDev, viewInDev);
+   auto transposeOp = std::make_unique<
+      OpGrouped<std::vector<VoutTy>, std::vector<VinTy>, p120_t>>();
+   // Pack views
+   std::vector<VoutTy> viewsOutDev = {viewOutDev};
+   std::vector<VinTy> viewsInDev = {viewInDev};
+   // Apply transpose
+   transposeOp->apply(viewsOutDev, viewsInDev);
 
    // gpu -> cpu
    cudaErrChk(cudaMemcpy(viewOut.data(), viewOutDev.data(),

@@ -49,7 +49,7 @@ dimsAndMeta readDimsAndMeta(const std::string path, const std::string dist,
 /// @param maxLayers
 /// @return
 View::ptrAndIdx unPackMeta(const std::vector<MHDFloat>& db,
-   std::uint32_t maxLayers);
+   const std::uint32_t maxLayers);
 
 } // namespace TestSuite
 } // namespace QuICC

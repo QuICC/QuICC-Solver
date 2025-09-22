@@ -5,6 +5,7 @@ include(SetUlp)
 
 # Create tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 set(_tests
   Poly::P:<base_t>:bfloop
@@ -54,3 +55,10 @@ foreach(_test ${_tests})
     ULPS 5 5 12 5 5 9 11 16 38 76 155
   )
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_bfloop_merged
+  COMMAND ${TestExe}
+  JN 6
+)
