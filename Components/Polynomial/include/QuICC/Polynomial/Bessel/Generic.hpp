@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Polynomial/Bessel/details/Operators.hpp"
+#include "Polynomial/SphericalBessel/Jnl.hpp"
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
@@ -71,7 +71,7 @@ inline void Generic<TOp>::compute(
    const Internal::Array& scale)
 {
    std::vector<Internal::MHDFloat> roots;
-   details::getRoots(roots, l, nPoly + TOp::EXTRA_POLY, this->mDNu);
+   SphericalBessel::getRoots(roots, l, nPoly + TOp::EXTRA_POLY, this->mDNu);
 
    if constexpr (TOp::EXTRA_L == 0)
    {
@@ -80,7 +80,7 @@ inline void Generic<TOp>::compute(
    else
    {
       std::vector<Internal::MHDFloat> roots_extra;
-      details::getRoots(roots_extra, l + TOp::EXTRA_L, nPoly + TOp::EXTRA_POLY,
+      SphericalBessel::getRoots(roots_extra, l + TOp::EXTRA_L, nPoly + TOp::EXTRA_POLY,
          this->mDNu);
 
       TOp::compute(rOut, roots, roots_extra, l, igrid, scale, this->mDNu);

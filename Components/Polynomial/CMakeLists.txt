@@ -29,9 +29,11 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 
 # Components
 add_subdirectory(Bessel)
+add_subdirectory(SphericalBessel)
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB} PUBLIC
   QuICC::Types
   Polynomial::Bessel
+  Polynomial::SphericalBessel
 )
 
 # Additional configuration

@@ -6,9 +6,6 @@
 #ifndef QUICC_TESTSUITE_FRAMEWORK_TCOORD_TESTARGS_HPP
 #define QUICC_TESTSUITE_FRAMEWORK_TCOORD_TESTARGS_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>

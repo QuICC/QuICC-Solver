@@ -3,21 +3,12 @@
  * @brief Source of the factory to create transform steps
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/TransformConfigurators/ITransformSteps.hpp"
-
 // Project includes
 //
+#include "QuICC/TransformConfigurators/ITransformSteps.hpp"
 
 namespace QuICC {
 
@@ -25,10 +16,6 @@ namespace Transform {
 
    ITransformSteps::ITransformSteps(std::shared_ptr<const SpatialScheme::ISpatialScheme> spScheme)
       : mspScheme(spScheme)
-   {
-   }
-
-   ITransformSteps::~ITransformSteps()
    {
    }
 

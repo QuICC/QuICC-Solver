@@ -11,11 +11,11 @@
 
 // Project includes
 //
+#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Io/Variable/ISphericalScalarModeSpectrumWriter.hpp"
 #include "QuICC/Io/Variable/Tags/Spectrum.hpp"
-#include "Environment/QuICCEnv.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 
 namespace QuICC {

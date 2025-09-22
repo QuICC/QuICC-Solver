@@ -1,26 +1,21 @@
-/** 
+/**
  * @file ISphericalTorPolRSpectrumWriter.hpp
- * @brief Implementation of the ASCII spherical harmonics radial power spectrum calculation for a Toroidal/Poloidal field in a spherical geometry
+ * @brief Implementation of the ASCII spherical harmonics radial power spectrum
+ * calculation for a Toroidal/Poloidal field in a spherical geometry
  */
 
 #ifndef QUICC_IO_VARIABLE_ISPHERICALTORPOLRSPECTRUMWRITER_HPP
 #define QUICC_IO_VARIABLE_ISPHERICALTORPOLRSPECTRUMWRITER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
 
 namespace QuICC {
 
@@ -28,113 +23,119 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the ASCII spherical harmonics radial power spectrum
+ * calculation for a Toroidal/Poloidal field in a spherical geometry
+ */
+class ISphericalTorPolRSpectrumWriter : public IVariableAsciiWriter
+{
+public:
    /**
-    * @brief Implementation of the ASCII spherical harmonics radial power spectrum calculation for a Toroidal/Poloidal field in a spherical geometry
+    * @brief Constructor
+    *
     */
-   class ISphericalTorPolRSpectrumWriter: public IVariableAsciiWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          */
-         ISphericalTorPolRSpectrumWriter(const std::string& prefix, const std::string& type);
+   ISphericalTorPolRSpectrumWriter(const std::string& prefix,
+      const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~ISphericalTorPolRSpectrumWriter();
+   /**
+    * @brief Destructor
+    */
+   virtual ~ISphericalTorPolRSpectrumWriter() = default;
 
-         /**
-          * @brief Initialise the operator, transform and file
-          */
-         virtual void init() override;
+   /**
+    * @brief Initialise the operator, transform and file
+    */
+   virtual void init() override;
 
-         /**
-          * @brief Activate output of parity splitting in power output
-          */
-         void showParity();
+   /**
+    * @brief Activate output of parity splitting in power output
+    */
+   void showParity();
 
-         /**
-          * @brief Compute power
-          */
-         void compute(Transform::TransformCoordinatorType& coord) override;
+   /**
+    * @brief Compute power
+    */
+   void compute(Transform::TransformCoordinatorType& coord) override;
 
-         /**
-          * @brief Requires heavy calculation?
-          */
-         virtual bool isHeavy() const override;
-         
-      protected:
-         /**
-          * @brief Prepare spectral field data for computation
-          */
-         void prepareInput(const FieldComponents::Spectral::Id sId, Transform::TransformCoordinatorType& coord);
+   /**
+    * @brief Requires heavy calculation?
+    */
+   virtual bool isHeavy() const override;
 
-         /**
-          * @brief Write content
-          */
-         virtual void writeContent() override;
+protected:
+   /**
+    * @brief Prepare spectral field data for computation
+    */
+   void prepareInput(const FieldComponents::Spectral::Id sId,
+      Transform::TransformCoordinatorType& coord);
 
-         /**
-          * @brief Data ordering is m slowest
-          */
-         bool mHasMOrdering;
+   /**
+    * @brief Write content
+    */
+   virtual void writeContent() override;
 
-         /**
-          * @brief Spherical volume to normalize power to power density
-          */
-         MHDFloat mVolume;
+   /**
+    * @brief Data ordering is m slowest
+    */
+   bool mHasMOrdering;
 
-         /**
-          * @brief Flag to show parity split in power
-          */
-         bool mShowParity;
+   /**
+    * @brief Spherical volume to normalize power to power density
+    */
+   MHDFloat mVolume;
 
-         /**
-          * @brief Radial grid
-          */
-         Array mGrid;
+   /**
+    * @brief Flag to show parity split in power
+    */
+   bool mShowParity;
 
-      private:
-         /**
-          * @brief Storage for the Toroidal power
-          */
-         Matrix mTorPower;
+   /**
+    * @brief Radial grid
+    */
+   Array mGrid;
 
-         /**
-          * @brief Storage for the Poloidal power
-          */
-         Matrix mPolPower;
+private:
+   /**
+    * @brief Storage for the Toroidal power
+    */
+   Matrix mTorPower;
 
-         /**
-          * @brief Reset power storage
-          */
-         virtual void resetPower();
+   /**
+    * @brief Storage for the Poloidal power
+    */
+   Matrix mPolPower;
 
-         /**
-          * @brief Store power from Q component
-          */
-         virtual void storeQPower(const int n, const int l, const int m, const MHDFloat power);
+   /**
+    * @brief Reset power storage
+    */
+   virtual void resetPower();
 
-         /**
-          * @brief Store power from S component
-          */
-         virtual void storeSPower(const int n, const int l, const int m, const MHDFloat power);
+   /**
+    * @brief Store power from Q component
+    */
+   virtual void storeQPower(const int n, const int l, const int m,
+      const MHDFloat power);
 
-         /**
-          * @brief Store power from T component
-          */
-         virtual void storeTPower(const int n, const int l, const int m, const MHDFloat power);
-   };
+   /**
+    * @brief Store power from S component
+    */
+   virtual void storeSPower(const int n, const int l, const int m,
+      const MHDFloat power);
 
-   inline bool ISphericalTorPolRSpectrumWriter::isHeavy() const
-   {
-      return true;
-   }
+   /**
+    * @brief Store power from T component
+    */
+   virtual void storeTPower(const int n, const int l, const int m,
+      const MHDFloat power);
+};
 
+inline bool ISphericalTorPolRSpectrumWriter::isHeavy() const
+{
+   return true;
 }
-}
-}
+
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_ISPHERICALTORPOLPOWERBASEWRITER_HPP

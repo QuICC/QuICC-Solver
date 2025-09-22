@@ -136,6 +136,15 @@ configurations = {  'BoussinesqSphereDynamo': {
                             'serial' : [variant('build_only', 1)],
                             'petsc-mpi' : [variant('tubular',1)]
                         }
+                    },
+                    'BoussinesqSphereModifiedTaylor': {
+                        'Linear' : {
+                            'serial' : [variant()],
+                            'mpi' : [variant('single2d', 4)],
+                            'kk' : [variant()],
+                            'kkgpu' : [variant()],
+                            'perf' : [variant('none', -1)]
+                        }
                     }
                 }
 

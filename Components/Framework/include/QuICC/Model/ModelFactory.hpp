@@ -96,6 +96,11 @@ namespace QuICC {
       model.addEquations(spSim);
       stage.done();
 
+      // Add diagnostics
+      stage.start("adding diagnostics");
+      model.addDiagnostics(spSim);
+      stage.done();
+
       // Add ASCII output files
       stage.start("adding model ASCII output");
       model.addAsciiOutputFiles(spSim);
