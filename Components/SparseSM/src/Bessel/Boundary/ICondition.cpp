@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Condition.cpp
  * @brief Source of the interface to a generic Bessel boundary condition
  */
@@ -18,12 +18,9 @@ namespace Bessel {
 
 namespace Boundary {
 
-   ICondition::ICondition(const BesselKind type, const int l)
-      : IDiags(type, l)
-   {
-   }
- 
-} // Boundary
-} // Bessel
-} // Polynomial
-} // QuICC
+ICondition::ICondition(const BesselKind type, const int l) : IDiags(type, l) {}
+
+} // namespace Boundary
+} // namespace Bessel
+} // namespace SparseSM
+} // namespace QuICC
