@@ -1,0 +1,69 @@
+/** 
+ * @file SphericalOhmicDissipationAnelastic.cpp
+ * @brief Source of the implementation of the spherical Coriolis term
+ */
+
+// Configuration includes
+//
+
+// System includes
+//
+// ****************
+//Stuff that needs to be removed later
+#include <cstdio>
+#include <filesystem>
+#include <sstream>
+#include <iostream>
+// ****************
+// External includes
+//
+
+// Class include
+//
+#include "QuICC/PhysicalOperators/SphericalOhmicDissipationAnelastic.hpp"
+
+// Project includes
+//#include "QuICC/DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+#include "Types/Internal/Typedefs.hpp"
+//
+
+namespace QuICC {
+
+namespace Physical {
+
+   void SphericalOhmicDissipationAnelastic::add(Framework::Selector::PhysicalScalarField &rS,
+                                                const Resolution& res, 
+                                                const Array& r, 
+                                                const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
+                                                std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for magnetic diffusivity, Eta
+                                                const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
+                                                const MHDFloat c)
+   {
+      int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+      int iR_;
+
+      auto Eta       = pF->evaluate(r, 0, 0); 
+
+      for(int iR = 0; iR < nR; ++iR)
+         {
+            iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);
+
+            // Boussinesq part (not vanishing for dLogEta =0)
+            rS.addSlice(c*Eta(iR_)*(   w.comp(FieldComponents::Physical::R).slice(iR).array() 
+                                 * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                                    ).matrix(), iR);
+            
+            rS.addSlice(c*Eta(iR_)*(   w.comp(FieldComponents::Physical::THETA).slice(iR).array() 
+                                 * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                                    ).matrix(), iR);
+
+            rS.addSlice(c*Eta(iR_)*(   w.comp(FieldComponents::Physical::PHI).slice(iR).array() 
+                                 * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                                    ).matrix(), iR);
+         
+         }
+   }
+
+}
+}

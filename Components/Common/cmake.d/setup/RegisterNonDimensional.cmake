@@ -34,6 +34,7 @@ set(tags
   Lower2d
   Lower3d
   Lundquist
+  MagDiffType
   MagneticEkman
   MagneticPrandtl
   MagneticReynolds
