@@ -11,8 +11,8 @@
 
 // Project includes
 //
-#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/ILinearMapOperator.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -22,55 +22,55 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
+/**
+ * @brief Implementation of the I^2 D sparse operator, with y = ax + b
+ */
+class I2D1 : public ILinearMapOperator
+{
+public:
    /**
-    * @brief Implementation of the I^2 D sparse operator, with y = ax + b
+    * @brief Constructor
+    *
+    * @param rows    Number of rows
+    * @param cols    Number of columns
+    * @param lower   Lower bound of domain
+    * @param upper   Upper bound of domain
     */
-   class I2D1: public ILinearMapOperator
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param rows    Number of rows
-          * @param cols    Number of columns
-          * @param lower   Lower bound of domain
-          * @param upper   Upper bound of domain
-          */
-         I2D1(const int rows, const int cols, const Scalar_t lower, const Scalar_t upper);
+   I2D1(const int rows, const int cols, const Scalar_t lower,
+      const Scalar_t upper);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~I2D1();
+   /**
+    * @brief Destructor
+    */
+   virtual ~I2D1();
 
-      protected:
+protected:
+private:
+   /**
+    * @brief 1st subdiagonal
+    *
+    * @param n mode indexes
+    */
+   ACoeff_t d_1(const ACoeff_t& n) const;
 
-      private:
-         /**
-          * @brief 1st subdiagonal
-          *
-          * @param n mode indexes
-          */
-         ACoeff_t d_1(const ACoeff_t& n) const;
+   /**
+    * @brief 1st superdiagonal
+    *
+    * @param n mode indexes
+    */
+   ACoeff_t d1(const ACoeff_t& n) const;
 
-         /**
-          * @brief 1st superdiagonal
-          *
-          * @param n mode indexes
-          */
-         ACoeff_t d1(const ACoeff_t& n) const;
+   /**
+    * @brief Build triplet representation of matrix
+    *
+    * @param[out] list containing triplets
+    */
+   virtual void buildTriplets(TripletList_t& list) const;
+};
 
-         /**
-          * @brief Build triplet representation of matrix
-          *
-          * @param[out] list containing triplets
-          */
-         virtual void buildTriplets(TripletList_t& list) const;
-   };
-
-}
-}
-}
-}
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_I2D1_HPP

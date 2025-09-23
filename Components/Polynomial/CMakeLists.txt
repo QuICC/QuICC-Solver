@@ -41,6 +41,10 @@ include(setup/Worland_configure)
 
 # Install python files
 add_dependencies(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CURRENT_COMPONENT_LIB}_updatepy)
+if(QUICC_CURRENT_UPDATEPY_TARGET)
+   add_dependencies(${QUICC_CURRENT_UPDATEPY_TARGET} ${QUICC_CURRENT_COMPONENT_LIB}_updatepy)
+endif()
+set(QUICC_CURRENT_UPDATEPY_TARGET "${QUICC_CURRENT_COMPONENT_LIB}_updatepy" CACHE STRING "Make dependencies across updatepy" FORCE)
 
 # Add source directory
 add_subdirectory(src)
