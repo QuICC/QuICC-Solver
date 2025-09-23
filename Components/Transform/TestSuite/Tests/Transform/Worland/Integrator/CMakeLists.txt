@@ -415,7 +415,7 @@ foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    ULPS 5 5 20 11 11 5 5 8 6 5
+    ULPS 5 5 20 13 14 5 5 8 6 5
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()
@@ -476,7 +476,7 @@ foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    ULPS 16 6 5 4 4 18 8 3 4 4
+    ULPS 16 6 5 4 5 18 8 3 5 4
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()

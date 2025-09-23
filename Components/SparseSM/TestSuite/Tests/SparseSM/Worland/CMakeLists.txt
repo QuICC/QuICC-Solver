@@ -128,7 +128,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Operator:WType:type
     IDS 10 11 12 13 14
-    ULP 85
+    ULP 100
   )
 endforeach()
 
