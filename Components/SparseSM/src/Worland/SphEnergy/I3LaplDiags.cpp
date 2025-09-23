@@ -21,11 +21,10 @@ namespace Worland {
 
 namespace SphEnergy {
 
-   using namespace Internal::Literals;
+using namespace Internal::Literals;
 
 I3LaplDiags::I3LaplDiags(const Scalar_t alpha, const int l, const int q) :
-    QuICC::SparseSM::Worland::I3LaplDiags(alpha, 0.5_mp, l, q),
-    mI3(alpha, l, 0)
+    QuICC::SparseSM::Worland::I3LaplDiags(alpha, 0.5_mp, l, q), mI3(alpha, l, 0)
 {
    if (q > 2)
    {
@@ -37,7 +36,13 @@ I3LaplDiags::ACoeff_t I3LaplDiags::d_2(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = 64.0_mp*(2.0_mp*l<1>() + 2.0_mp*n - 3.0_mp)*(2.0_mp*l<1>() + 2.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 2.0_mp*n + 1.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n - 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 3.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 1.0_mp));
+   val = 64.0_mp * (2.0_mp * l<1>() + 2.0_mp * n - 3.0_mp) *
+         (2.0_mp * l<1>() + 2.0_mp * n - 1.0_mp) *
+         (2.0_mp * l<1>() + 2.0_mp * n + 1.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n - 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 3.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 1.0_mp));
 
    // Correct if q == 2
    this->correctQ2(val, n, -2);
@@ -49,7 +54,13 @@ I3LaplDiags::ACoeff_t I3LaplDiags::d_1(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = -64.0_mp*(2.0_mp*l<1>() - 4.0_mp*n - 3.0_mp)*(2.0_mp*l<1>() + 2.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 2.0_mp*n + 1.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n - 3.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 5.0_mp));
+   val = -64.0_mp * (2.0_mp * l<1>() - 4.0_mp * n - 3.0_mp) *
+         (2.0_mp * l<1>() + 2.0_mp * n - 1.0_mp) *
+         (2.0_mp * l<1>() + 2.0_mp * n + 1.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n - 3.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 5.0_mp));
 
    // Correct if q == 2
    this->correctQ2(val, n, -1);
@@ -61,7 +72,12 @@ I3LaplDiags::ACoeff_t I3LaplDiags::d0(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = -384.0_mp*(2.0_mp*l<1>() - 1.0_mp)*(n + 1.0_mp)*(2.0_mp*l<1>() + 2.0_mp*n + 1.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 7.0_mp));
+   val = -384.0_mp * (2.0_mp * l<1>() - 1.0_mp) * (n + 1.0_mp) *
+         (2.0_mp * l<1>() + 2.0_mp * n + 1.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n - 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 7.0_mp));
 
    // Correct if q == 2
    this->correctQ2(val, n, 0);
@@ -73,7 +89,12 @@ I3LaplDiags::ACoeff_t I3LaplDiags::d1(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = -256.0_mp*(n + 1.0_mp)*(n + 2.0_mp)*(6.0_mp*l<1>() + 4.0_mp*n + 3.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n + 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 7.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 9.0_mp));
+   val = -256.0_mp * (n + 1.0_mp) * (n + 2.0_mp) *
+         (6.0_mp * l<1>() + 4.0_mp * n + 3.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n + 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 7.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 9.0_mp));
 
    // Correct if q == 2
    this->correctQ2(val, n, 1);
@@ -85,7 +106,11 @@ I3LaplDiags::ACoeff_t I3LaplDiags::d2(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = -512.0_mp*(n + 1.0_mp)*(n + 2.0_mp)*(n + 3.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n + 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 7.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 9.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 11.0_mp));
+   val = -512.0_mp * (n + 1.0_mp) * (n + 2.0_mp) * (n + 3.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n + 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 7.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 9.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 11.0_mp));
 
    // Correct if q == 2
    this->correctQ2(val, n, 2);

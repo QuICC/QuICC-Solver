@@ -31,7 +31,15 @@ I3Diags::ACoeff_t I3Diags::d_3(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = 64.0_mp*(2.0_mp*l<1>() + 2.0_mp*n - 3.0_mp)*(2.0_mp*l<1>() + 2.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 2.0_mp*n + 1.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n - 9.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 7.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 3.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 1.0_mp));
+   val = 64.0_mp * (2.0_mp * l<1>() + 2.0_mp * n - 3.0_mp) *
+         (2.0_mp * l<1>() + 2.0_mp * n - 1.0_mp) *
+         (2.0_mp * l<1>() + 2.0_mp * n + 1.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n - 9.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 7.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 3.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 1.0_mp));
 
    // Truncate operator
    this->zeroLast(val, this->mQ - 1);
@@ -43,7 +51,15 @@ I3Diags::ACoeff_t I3Diags::d_2(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = -192.0_mp*(2.0_mp*l<1>() + 1.0_mp)*(2.0_mp*l<1>() + 2.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 2.0_mp*n + 1.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n - 7.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 3.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 5.0_mp));
+   val = -192.0_mp * (2.0_mp * l<1>() + 1.0_mp) *
+         (2.0_mp * l<1>() + 2.0_mp * n - 1.0_mp) *
+         (2.0_mp * l<1>() + 2.0_mp * n + 1.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n - 7.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 3.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 5.0_mp));
 
    // Truncate operator
    this->zeroLast(val, this->mQ);
@@ -55,7 +71,15 @@ I3Diags::ACoeff_t I3Diags::d_1(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = 192.0_mp*(2.0_mp*l<1>() + 2.0_mp*n + 1.0_mp)*(4.0_mp*l<2>() - 4.0_mp*l<1>()*n + 4.0_mp*l<1>() - 4.0_mp*n*n - 2.0_mp*n + 5.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n - 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 3.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 7.0_mp));
+   val = 192.0_mp * (2.0_mp * l<1>() + 2.0_mp * n + 1.0_mp) *
+         (4.0_mp * l<2>() - 4.0_mp * l<1>() * n + 4.0_mp * l<1>() -
+            4.0_mp * n * n - 2.0_mp * n + 5.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n - 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 3.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 7.0_mp));
 
    // Truncate operator
    this->zeroLast(val, this->mQ + 1);
@@ -67,7 +91,15 @@ I3Diags::ACoeff_t I3Diags::d0(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = -64.0_mp*(2.0_mp*l<1>() + 1.0_mp)*(4.0_mp*l<2>() - 24.0_mp*l<1>()*n - 8.0_mp*l<1>() - 24.0_mp*n*n - 36.0_mp*n + 3.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n - 3.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 7.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 9.0_mp));
+   val = -64.0_mp * (2.0_mp * l<1>() + 1.0_mp) *
+         (4.0_mp * l<2>() - 24.0_mp * l<1>() * n - 8.0_mp * l<1>() -
+            24.0_mp * n * n - 36.0_mp * n + 3.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n - 3.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n - 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 7.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 9.0_mp));
 
    // Truncate operator
    this->zeroLast(val, this->mQ + 2);
@@ -79,7 +111,15 @@ I3Diags::ACoeff_t I3Diags::d1(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = -384.0_mp*(n + 1.0_mp)*(4.0_mp*l<2>() - 4.0_mp*l<1>()*n - 4.0_mp*n*n - 10.0_mp*n - 1.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n - 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 7.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 9.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 11.0_mp));
+   val = -384.0_mp * (n + 1.0_mp) *
+         (4.0_mp * l<2>() - 4.0_mp * l<1>() * n - 4.0_mp * n * n - 10.0_mp * n -
+            1.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n - 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 7.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 9.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 11.0_mp));
 
    // Truncate operator
    this->zeroLast(val, this->mQ + 3);
@@ -91,7 +131,13 @@ I3Diags::ACoeff_t I3Diags::d2(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = -768.0_mp*(2.0_mp*l<1>() + 1.0_mp)*(n + 1.0_mp)*(n + 2.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n + 1.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 7.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 9.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 11.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 13.0_mp));
+   val = -768.0_mp * (2.0_mp * l<1>() + 1.0_mp) * (n + 1.0_mp) * (n + 2.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n + 1.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 7.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 9.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 11.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 13.0_mp));
 
    // Truncate operator
    this->zeroLast(val, this->mQ + 4);
@@ -103,7 +149,13 @@ I3Diags::ACoeff_t I3Diags::d3(const ACoeff_t& n) const
 {
    ACoeff_t val;
 
-   val = -512.0_mp*(n + 1.0_mp)*(n + 2.0_mp)*(n + 3.0_mp)/((2.0_mp*l<1>() + 4.0_mp*n + 5.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 7.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 9.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 11.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 13.0_mp)*(2.0_mp*l<1>() + 4.0_mp*n + 15.0_mp));
+   val = -512.0_mp * (n + 1.0_mp) * (n + 2.0_mp) * (n + 3.0_mp) /
+         ((2.0_mp * l<1>() + 4.0_mp * n + 5.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 7.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 9.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 11.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 13.0_mp) *
+            (2.0_mp * l<1>() + 4.0_mp * n + 15.0_mp));
 
    // Truncate operator
    this->zeroLast(val, this->mQ + 5);

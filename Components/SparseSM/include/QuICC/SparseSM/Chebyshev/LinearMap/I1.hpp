@@ -11,8 +11,8 @@
 
 // Project includes
 //
-#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/Chebyshev/ILinearMapOperator.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -22,59 +22,60 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
+/**
+ * @brief Implementation of the I sparse integration operator, with mapping y =
+ * ax + b
+ *
+ * Setup the relation between the spectral coefficients of a function and the
+ * spectral coefficients of its first order derivative in a form suitable to
+ * initialize a sparse matrix
+ */
+class I1 : public ILinearMapOperator
+{
+public:
    /**
-    * @brief Implementation of the I sparse integration operator, with mapping y = ax + b
+    * @brief Constructor
     *
-    * Setup the relation between the spectral coefficients of a function and the spectral
-    * coefficients of its first order derivative in a form suitable to initialize a sparse
-    * matrix
+    * @param rows    Number of rows
+    * @param cols    Number of columns
+    * @param lower   Lower bound of domain
+    * @param upper   Upper bound of domain
     */
-   class I1: public ILinearMapOperator
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param rows    Number of rows
-          * @param cols    Number of columns
-          * @param lower   Lower bound of domain
-          * @param upper   Upper bound of domain
-          */
-         I1(const int rows, const int cols, const Scalar_t lower, const Scalar_t upper);
+   I1(const int rows, const int cols, const Scalar_t lower,
+      const Scalar_t upper);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~I1() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~I1() = default;
 
-      protected:
+protected:
+private:
+   /**
+    * @brief 1st subdiagonal
+    *
+    * @param n mode indexes
+    */
+   ACoeff_t d_1(const ACoeff_t& n) const;
 
-      private:
-         /**
-          * @brief 1st subdiagonal
-          *
-          * @param n mode indexes
-          */
-         ACoeff_t d_1(const ACoeff_t& n) const;
+   /**
+    * @brief 1st superdiagonal
+    *
+    * @param n mode indexes
+    */
+   ACoeff_t d1(const ACoeff_t& n) const;
 
-         /**
-          * @brief 1st superdiagonal
-          *
-          * @param n mode indexes
-          */
-         ACoeff_t d1(const ACoeff_t& n) const;
+   /**
+    * @brief Build triplet representation of matrix
+    *
+    * @param[out] list containing triplets
+    */
+   virtual void buildTriplets(TripletList_t& list) const;
+};
 
-         /**
-          * @brief Build triplet representation of matrix
-          *
-          * @param[out] list containing triplets
-          */
-         virtual void buildTriplets(TripletList_t& list) const;
-   };
-
-}
-}
-}
-}
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_I1_HPP

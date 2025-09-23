@@ -11,8 +11,8 @@
 
 // Project includes
 //
-#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/ICondition.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 
 namespace QuICC {
 
@@ -24,40 +24,40 @@ namespace LinearMap {
 
 namespace Boundary {
 
+/**
+ * @brief Implementation of the boundary value for Chebyshev polynomial
+ */
+class Value : public ICondition
+{
+public:
    /**
-    * @brief Implementation of the boundary value for Chebyshev polynomial
+    * @brief Constructor for given position
+    *
+    * @param lower Lower bound of y
+    * @param upper Upper bound of y
+    * @param pos Position of the boundary
     */
-   class Value: public ICondition
-   {
-      public:
-         /**
-          * @brief Constructor for given position
-          *
-          * @param lower Lower bound of y
-          * @param upper Upper bound of y
-          * @param pos Position of the boundary
-          */
-         Value(const Scalar_t lower, const Scalar_t upper, const Position pos);
+   Value(const Scalar_t lower, const Scalar_t upper, const Position pos);
 
-         /**
-          * @brief Destructor
-          */
-         ~Value() = default;
+   /**
+    * @brief Destructor
+    */
+   ~Value() = default;
 
-         /**
-          * @brief Compute list of boundary values
-          *
-          * @param maxN       Highest polynomial
-          */
-         ACoeff_t compute(const int maxN);
+   /**
+    * @brief Compute list of boundary values
+    *
+    * @param maxN       Highest polynomial
+    */
+   ACoeff_t compute(const int maxN);
 
-      private:
-   };
+private:
+};
 
-} // Boundary
-} // LinearMap
-} // Chebyshev
-} // SparseSM
-} // QuICC
+} // namespace Boundary
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_BOUNDARY_VALUE_HPP

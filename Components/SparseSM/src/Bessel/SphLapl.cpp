@@ -11,8 +11,8 @@
 //
 #include "QuICC/SparseSM/Bessel/SphLapl.hpp"
 #include "QuICC/SparseSM/Bessel/Insulating/SphLaplDiags.hpp"
-#include "QuICC/SparseSM/Bessel/Value/SphLaplDiags.hpp"
 #include "QuICC/SparseSM/Bessel/NoSlip/SphLaplDiags.hpp"
+#include "QuICC/SparseSM/Bessel/Value/SphLaplDiags.hpp"
 
 namespace QuICC {
 

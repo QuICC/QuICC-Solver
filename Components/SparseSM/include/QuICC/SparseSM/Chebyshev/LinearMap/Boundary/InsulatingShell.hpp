@@ -1,6 +1,7 @@
 /**
  * @file InsulatingShell.hpp
- * @brief Implementation of the boundary insulating condition in a shell for Chebyshev polynomials
+ * @brief Implementation of the boundary insulating condition in a shell for
+ * Chebyshev polynomials
  */
 
 #ifndef QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_BOUNDARY_INSULATINGSHELL_HPP
@@ -11,8 +12,8 @@
 
 // Project includes
 //
-#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/ICondition.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 
 namespace QuICC {
 
@@ -24,45 +25,47 @@ namespace LinearMap {
 
 namespace Boundary {
 
+/**
+ * @brief Implementation of the boundary insulating condition in a shell for
+ * Chebyshev polynomial
+ */
+class InsulatingShell : public ICondition
+{
+public:
    /**
-    * @brief Implementation of the boundary insulating condition in a shell for Chebyshev polynomial
+    * @brief Constructor for given position
+    *
+    * @param lower Lower bound of y
+    * @param upper Upper bound of y
+    * @param pos   Position of the boundary
+    * @param l     Harmonic degree
     */
-   class InsulatingShell: public ICondition
-   {
-      public:
-         /**
-          * @brief Constructor for given position
-          *
-          * @param lower Lower bound of y
-          * @param upper Upper bound of y
-          * @param pos   Position of the boundary
-          * @param l     Harmonic degree
-          */
-         InsulatingShell(const Scalar_t lower, const Scalar_t upper, const Position position, const int l);
+   InsulatingShell(const Scalar_t lower, const Scalar_t upper,
+      const Position position, const int l);
 
-         /**
-          * @brief Destructor
-          */
-         ~InsulatingShell() = default;
+   /**
+    * @brief Destructor
+    */
+   ~InsulatingShell() = default;
 
-         /**
-          * @brief Compute list of boundary values
-          *
-          * @param maxN       Highest polynomial
-          */
-         ACoeff_t compute(const int maxN);
+   /**
+    * @brief Compute list of boundary values
+    *
+    * @param maxN       Highest polynomial
+    */
+   ACoeff_t compute(const int maxN);
 
-      private:
-         /**
-          * @brief Harmonic degree
-          */
-         int mL;
-   };
+private:
+   /**
+    * @brief Harmonic degree
+    */
+   int mL;
+};
 
-} // Boundary
-} // LinearMap
-} // Chebyshev
-} // SparseSM
-} // QuICC
+} // namespace Boundary
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_CHEBYSHEV_LINEARMAP_BOUNDARY_INSULATINGSHELL_HPP
