@@ -203,9 +203,33 @@ function(run_iq_proj_tests tag)
     endforeach()
   endforeach()
 endfunction()
-set(_qis 0 2 3)
 
 # Create Gaunt projection dipolar tests
+set(_qis 0)
+set(_tests
+  ProjCurlPolCrossPol:dense
+  )
+set (_min_qis 1)
+set (_ids 0 2 4 6 8 10 12)
+run_iq_proj_tests("Gaunt projection, dipolar, fA" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
+set (_min_qis 1)
+set (_ids 1 3 5 7 9 11 13)
+run_iq_proj_tests("Gaunt projection, dipolar, fB" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
+
+set(_tests
+  ProjCurlCurlTorCrossPol:dense
+  ProjCurlCurlPolCrossTor:dense
+  ProjCurlCurlCPolCrossPol:dense
+  )
+set (_min_qis 1 1 1)
+set (_ids 0 2 4 6 8 10 12)
+run_iq_proj_tests("Gaunt projection, dipolar, fA" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULP 6500)
+set (_min_qis 1 1 3)
+set (_ids 1 3 5 7 9 11 13)
+run_iq_proj_tests("Gaunt projection, dipolar, fB" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULP 6500)
+
+# Create Gaunt projection dipolar tests
+set(_qis 2 3)
 set(_tests
   ProjCurlPolCrossPol:dense
   ProjCurlCurlTorCrossPol:dense
@@ -219,6 +243,7 @@ set (_min_qis 1 1 1 3)
 set (_ids 1 3 5 7 9 11 13)
 run_iq_proj_tests("Gaunt projection, dipolar, fB" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
 
+set(_qis 0 2 3)
 # Create Elsasser projection dipolar tests
 set(_tests
   ProjCurlTorCrossPol:dense
@@ -236,6 +261,38 @@ set (_ids 101 103 105 107 109 111 113)
 run_iq_proj_tests("Elsasser projection, dipolar, fB" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
 
 # Create Gaunt projection quadrupolar tests
+set(_qis 0)
+set(_tests
+  ProjCurlPolCrossPol:dense
+  ProjCurlCurlTorCrossPol:dense
+  ProjCurlCurlPolCrossTor:dense
+  ProjCurlCurlCPolCrossPol:dense
+  )
+set (_min_qis 1 1 1 1)
+set (_ids 200 202 204 206 208 210 212 214 216 218)
+run_iq_proj_tests("Gaunt projection, quadrupolar, fA" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULP 1600)
+set (_min_qis 1 1 1 3)
+set (_ids 203 205 207 209 211 213 215 217 219)
+run_iq_proj_tests("Gaunt projection, quadrupolar, fB" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
+
+set(_tests
+  ProjCurlPolCrossPol:dense
+  ProjCurlCurlTorCrossPol:dense
+  ProjCurlCurlPolCrossTor:dense
+  )
+set (_min_qis 1 1 1)
+set (_ids 201)
+run_iq_proj_tests("Gaunt projection, quadrupolar, fB" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
+
+set(_tests
+  ProjCurlCurlCPolCrossPol:dense
+  )
+set (_min_qis 3)
+set (_ids 201)
+run_iq_proj_tests("Gaunt projection, quadrupolar, fB" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULP 11000)
+
+# Create Gaunt projection quadrupolar tests
+set(_qis 2 3)
 set(_tests
   ProjCurlPolCrossPol:dense
   ProjCurlCurlTorCrossPol:dense
@@ -249,6 +306,7 @@ set (_min_qis 1 1 1 3)
 set (_ids 201 203 205 207 209 211 213 215 217 219)
 run_iq_proj_tests("Gaunt projection, quadrupolar, fB" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
 
+set(_qis 0 2 3)
 # Create Elsasser projection quadrupolar tests
 set(_tests
   ProjCurlTorCrossPol:dense
