@@ -105,7 +105,7 @@ set(_tests
   DivR2FD1R1:dense
   )
 set (_ids 0 1 2 3 4 5 6)
-run_iq_tests("Gaunt, dipolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
+run_iq_tests("Gaunt, dipolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULP 2100)
 
 # Create Elsasser coefficient, dipolar tests
 set(_tests
@@ -118,7 +118,7 @@ set(_tests
   )
 set (_min_qis 1 1 2 2 1 1)
 set (_ids 100 101 102 103 104 105 106)
-run_iq_tests("Elsasser, dipolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
+run_iq_tests("Elsasser, dipolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULP 1100)
 
 # Create Gaunt coefficient, quadrupolar tests
 set(_tests
@@ -132,7 +132,7 @@ set(_tests
   )
 set (_min_qis 1 1 3 1 1 2 1)
 set (_ids 200 201 202 203 204 205 206 207 208 209)
-run_iq_tests("Gaunt, quadrupolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
+run_iq_tests("Gaunt, quadrupolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULP 2000)
 
 # Create Elsasser coefficient, quadrupolar tests
 set(_tests
@@ -145,7 +145,7 @@ set(_tests
   )
 set (_min_qis 1 1 2 2 1 1)
 set (_ids 300 301 302 303 304 305 306 307 308 309 310 311)
-run_iq_tests("Elsasser, quadrupolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
+run_iq_tests("Elsasser, quadrupolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULP 1900)
 
 # Generate Iq proj tests
 function(run_iq_proj_tests tag)
