@@ -83,6 +83,14 @@ namespace Reductor {
    void EnergyD1Y1::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
       this->mBackend.input(tmp, in, useReal);
+      
+      // clean input from overflow errors.
+      // Apparently not a problem in the Boussinesq case,
+      // -> we do it for the anelastic case
+      if(this->mBackend.getExtraSize() > 0)
+      {
+         tmp.bottomRows(tmp.rows()-this->mspSetup->specSize()).setZero();
+      }   
       auto specOp = this->mBackend.solver().getSpectralOperator();
       tmp.topRows(specOp.rows()) = specOp * tmp.topRows(specOp.cols());
       this->mBackend.getSolution(tmp, 1, 1);
