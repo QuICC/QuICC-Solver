@@ -39,6 +39,7 @@ namespace QuICC {
           * @brief Destructor
           */
          ~VisualizationGeneratorFactory() = delete;
+
       protected:
 
       private:
