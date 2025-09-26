@@ -23,6 +23,7 @@ set(tags
   Eta
   FastMean
   Gamma
+  GravityType
   GrowthRate
   Heating
   Iota
