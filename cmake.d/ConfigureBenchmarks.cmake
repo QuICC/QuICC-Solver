@@ -6,7 +6,7 @@
 # MODEL
 #     name of the model
 # TYPE
-#     defaults for type of benchmark: Model or Stability
+#     defaults for type of benchmark: Config, State, Model, Visualization or Stability
 # PREFIX
 #     prefix for benchmark
 # EXE_POSTFIX
@@ -61,6 +61,15 @@ function(quicc_add_benchmark target)
   if(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "Model")
     set(QAB_PREFIX "")
     set(_prefix "")
+  elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "Config")
+    set(QAB_PREFIX "Config")
+    set(_prefix "config_")
+  elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "State")
+    set(QAB_PREFIX "State")
+    set(_prefix "state_")
+  elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "Visualization")
+    set(QAB_PREFIX "Visualization")
+    set(_prefix "visualization_")
   elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "Stability")
     set(QAB_PREFIX "Stability")
     set(_prefix "stability_")
@@ -72,6 +81,12 @@ function(quicc_add_benchmark target)
 
   if(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "Model")
     set(QAB_EXE_POSTFIX "Model")
+  elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "Config")
+    set(QAB_EXE_POSTFIX "Config")
+  elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "State")
+    set(QAB_EXE_POSTFIX "State")
+  elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "Visualization")
+    set(QAB_EXE_POSTFIX "Visu")
   elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "Stability")
     set(QAB_EXE_POSTFIX "Stability")
   endif()
@@ -79,6 +94,12 @@ function(quicc_add_benchmark target)
 
   if(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "Model")
     set(QAB_STARTFILES "parameters.cfg" "state_initial.hdf5")
+  elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "Config")
+    set(QAB_STARTFILES "")
+  elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "State")
+    set(QAB_STARTFILES "parameters.cfg")
+  elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "Visualization")
+    set(QAB_STARTFILES "parameters.cfg" "state4Visu.hdf5")
   elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "Stability")
     set(QAB_STARTFILES "parameters.cfg")
   endif()
@@ -164,9 +185,9 @@ function(quicc_add_benchmark target)
   if(TARGET ${_exe})
     set(_bench "${QAB_PREFIX}Benchmark${_exe}${_runid}")
 
-    set(_refdir "${QAB_WORKDIR}/_refdata/${target}${_dataid}")
+    set(_refdir "${QAB_WORKDIR}/_refdata/${QAB_PREFIX}${target}${_dataid}")
     message(VERBOSE "_refdir: ${_refdir}")
-    set(_rundir "${QAB_WORKDIR}/_data/${target}${_runid}")
+    set(_rundir "${QAB_WORKDIR}/_data/${QAB_PREFIX}${target}${_runid}")
     message(VERBOSE "_rundir: ${_rundir}")
     set(_binsdir "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_MODEL_DIR}/Executables")
     message(VERBOSE "_binsdir: ${_binsdir}")
@@ -197,23 +218,27 @@ function(quicc_add_benchmark target)
         )
     endforeach()
 
-    # Modify parameters.cfg for variants
-    set(_mod_cfg )
-    foreach(_variant IN ITEMS ${QAB_VARIANTS})
-      string(REGEX REPLACE ":" ";" _vlist "${_variant}")
-      list(GET _vlist 0 _path)
-      list(GET _vlist 1 _value)
-      list(APPEND _mod_cfg "COMMAND" ${CMAKE_COMMAND} -E rename parameters.cfg parameters_tmp.cfg)
-      list(APPEND _mod_cfg "COMMAND" "${Python_EXECUTABLE}"
-        "${_toolsdir}/modify_xml.py" "-i" "parameters_tmp.cfg" "-p" "${_path}" "-v" "${_value}" "-o" "parameters.cfg")
-      list(APPEND _mod_cfg "COMMAND" ${CMAKE_COMMAND} -E remove parameters_tmp.cfg)
-    endforeach()
+    if("parameters.cfg" IN_LIST QAB_STARTFILES)
+      set(_cp_orig "COMMAND" "${CMAKE_COMMAND}" "-E" "copy" "parameters.cfg" "parameters_orig.cfg")
+
+      # Modify parameters.cfg for variants
+      set(_mod_cfg )
+      foreach(_variant IN ITEMS ${QAB_VARIANTS})
+        string(REGEX REPLACE ":" ";" _vlist "${_variant}")
+        list(GET _vlist 0 _path)
+        list(GET _vlist 1 _value)
+        list(APPEND _mod_cfg "COMMAND" ${CMAKE_COMMAND} -E rename parameters.cfg parameters_tmp.cfg)
+        list(APPEND _mod_cfg "COMMAND" "${Python_EXECUTABLE}"
+          "${_toolsdir}/modify_xml.py" "-i" "parameters_tmp.cfg" "-p" "${_path}" "-v" "${_value}" "-o" "parameters.cfg")
+        list(APPEND _mod_cfg "COMMAND" ${CMAKE_COMMAND} -E remove parameters_tmp.cfg)
+      endforeach()
+    endif()
 
     # Prepare startup files
     add_custom_command(TARGET ${_bench} POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E remove *.dat *.hdf5 *.gxl *.vtp
       ${_cp_start}
-      COMMAND ${CMAKE_COMMAND} -E copy parameters.cfg parameters_orig.cfg
+      ${_cp_orig}
       ${_mod_cfg}
       WORKING_DIRECTORY ${_rundir}
     )
