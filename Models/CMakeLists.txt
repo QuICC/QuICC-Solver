@@ -44,7 +44,7 @@ quicc_set_default_git_branch(BoussinesqSphereRDDDynamo BRANCH "feature/add_exe" 
 quicc_set_default_git_branch(BoussinesqSphereDynamo BRANCH "feature/add_exe" TYPE Model)
 quicc_set_default_git_branch(BoussinesqShellDynamo BRANCH "feature/add_exe" TYPE Model)
 quicc_set_default_git_branch(BoussinesqSphereITO BRANCH "feature/add_exe" TYPE Model)
-quicc_set_default_git_branch(BoussinesqSphereRDDC BRANCH "add_exe" TYPE Model)
+quicc_set_default_git_branch(BoussinesqSphereRDDC BRANCH "feature/add_exe" TYPE Model)
 quicc_set_default_git_branch(BoussinesqSphereRTC BRANCH "feature/add_exe" TYPE Model)
 quicc_set_default_git_branch(BoussinesqShellITO BRANCH "feature/add_exe" TYPE Model)
 quicc_set_default_git_branch(BoussinesqShellRTC BRANCH "feature/add_exe" TYPE Model)
