@@ -131,6 +131,11 @@ public:
       std::shared_ptr<Model::IModelBackend> spBackend,
       std::shared_ptr<TOptions> spOptions);
 
+   /**
+    * Add CFL diagnostic
+    */
+   void addCfl(Diagnostics::SharedICflWrapper cfl);
+
 #ifdef QUICC_USE_MLIR_GRAPH
    /**
     * @brief Add graph description to solver

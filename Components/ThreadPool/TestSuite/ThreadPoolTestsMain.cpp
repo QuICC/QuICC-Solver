@@ -14,7 +14,12 @@ int main(int argc, char** argv)
 
    Catch::Session session; // There must be exactly one instance
 
-   auto returnCode = session.run();
+   // Let Catch (using Clara) parse the command line
+   int returnCode = session.applyCommandLine( argc, argv );
+   if( returnCode != 0 ) // Indicates a command line error
+      return returnCode;
+
+   returnCode = session.run();
 
    QuICC::Profiler::Finalize();
 

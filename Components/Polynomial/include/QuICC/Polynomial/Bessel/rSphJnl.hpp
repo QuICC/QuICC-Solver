@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "QuICC/Polynomial/Bessel/details/Operators.hpp"
+#include "Polynomial/SphericalBessel/Jnl.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
@@ -74,7 +74,7 @@ inline void rSphJnl::compute(
       Internal::Array col(igrid.size());
       for (int i = 0; i < igrid.size(); i++)
       {
-         col(i) = details::rSphJnl(k, l, igrid(i), dNu);
+         col(i) = SphericalBessel::rSphJnl(k, l, igrid(i), dNu);
       }
 
       if (scale.size() > 0)

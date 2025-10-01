@@ -19,6 +19,8 @@
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/SparseSM/IBesselOperator.hpp"
 #include "QuICC/TestSuite/SparseSM/TesterBase.hpp"
+#include "QuICC/SparseSM/Bessel/Boundary/ICondition.hpp"
+#include "QuICC/SparseSM/Bessel/Boundary/Operator.hpp"
 #include "Types/Typedefs.hpp"
 
 namespace QuICC {
@@ -151,6 +153,18 @@ void Tester<TOp>::buildOperator(Matrix& mat, const ParameterType& param,
       TOp op(rows, cols, btype, l);
       unsigned int KL, KU;
       mat = op.banded(KL, KU);
+   }
+   else if constexpr(std::is_base_of_v<QuICC::SparseSM::Bessel::Boundary::ICondition, TOp>)
+   {
+      int cols = static_cast<int>(meta(0));
+      auto btype = static_cast<QuICC::SparseSM::Bessel::BesselKind>(
+         static_cast<int>(meta(1)));
+      auto l = meta(2);
+
+      QuICC::SparseSM::Bessel::Boundary::Operator bcOp(1, cols, btype, l, true);
+
+      bcOp.addRow<TOp>();
+      mat = bcOp.mat();
    }
 }
 

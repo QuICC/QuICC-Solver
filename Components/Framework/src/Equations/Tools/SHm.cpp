@@ -88,7 +88,7 @@ namespace Tools {
          #else
             // Get change of truncation due to Galerkin basis
             int gDelta = nFields*tRes.dim<Dimensions::Data::DATB1D>(0,k) - rSystemNs(k);
-            assert( gDelta >= 0 );
+            assert( nFields == 0 || gDelta >= 0 );
 
             for(int j = 1; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
             {

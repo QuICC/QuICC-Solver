@@ -3,21 +3,12 @@
  * @brief Source of the factory to create transform steps
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
-
 // Project includes
 //
+#include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
 #include "QuICC/TransformConfigurators/ITransformSteps.hpp"
 #include "QuICC/TransformConfigurators/CartesianTransformSteps.hpp"
 #include "QuICC/TransformConfigurators/AnnulusTransformSteps.hpp"

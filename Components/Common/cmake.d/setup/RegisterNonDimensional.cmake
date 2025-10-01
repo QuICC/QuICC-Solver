@@ -24,15 +24,16 @@ set(tags
   Iota
   Kappa
   Lambda
+  Lehnert
   Lower1d
   Lower2d
   Lower3d
+  Lundquist
   MagneticEkman
   MagneticPrandtl
   MagneticReynolds
   ModifiedElsasser
   Mu
-  Nev
   Nu
   Omega
   Omicron
@@ -48,8 +49,6 @@ set(tags
   Roberts
   Rossby
   Sigma
-  StabilityMode
-  Sort
   Tau
   Taylor
   Theta

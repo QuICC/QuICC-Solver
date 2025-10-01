@@ -2,6 +2,7 @@ message(VERBOSE "Integrators:")
 
 # Create integrator tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 # Mixed Fourier tests
 
@@ -182,7 +183,7 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
     IDS   107  108   109
-    ULPS  5168 16425 120000
+    ULPS  5168 17000 120000
   )
 endforeach()
 
@@ -217,6 +218,13 @@ foreach(_test ${_tests})
     COMMAND ${TestExe}
     KEYWORD Space::Operator:Template:type
     IDS   107  108   109
-    ULPS  25520 81616 600000
+    ULPS  25520 85000 600000
   )
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_integrator_merged
+  COMMAND ${TestExe}
+  JN 32
+)

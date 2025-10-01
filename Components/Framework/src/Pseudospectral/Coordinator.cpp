@@ -14,6 +14,7 @@
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
+#include "QuICC/Diagnostics/ICflWrapper.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Equations/Tools/EquationTools.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
@@ -147,6 +148,11 @@ void Coordinator::addEquation(Equations::SharedIVectorEquation spEq,
 
    this->mVectorEqMap.at(key).push_back(spEq);
    DebuggerMacro_msg("... done", 1);
+}
+
+void Coordinator::addCfl(Diagnostics::SharedICflWrapper spCfl)
+{
+   this->mDiagnostics.addCfl(spCfl);
 }
 
 Coordinator::ScalarEquation_range Coordinator::scalarRange(

@@ -1,6 +1,7 @@
 /**
  * @file IWorlandOperator.cpp
- * @brief Source of the implementation of generic interface to a full sphere Worland sparse operator
+ * @brief Source of the implementation of generic interface to a full sphere
+ * Worland sparse operator
  */
 
 // System includes
@@ -19,16 +20,17 @@ namespace QuICC {
 
 namespace SparseSM {
 
-   IWorlandOperator::IWorlandOperator(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta)
-      : ISparseSMOperator(rows, cols)
-   {
-      this->mType = Worland::Tools::identifyBasis(alpha, dBeta);
-   }
-
-   Worland::WorlandKind IWorlandOperator::type() const
-   {
-      return this->mType;
-   }
-
+IWorlandOperator::IWorlandOperator(const int rows, const int cols,
+   const Scalar_t alpha, const Scalar_t dBeta) :
+    ISparseSMOperator(rows, cols)
+{
+   this->mType = Worland::Tools::identifyBasis(alpha, dBeta);
 }
+
+Worland::WorlandKind IWorlandOperator::type() const
+{
+   return this->mType;
 }
+
+} // namespace SparseSM
+} // namespace QuICC

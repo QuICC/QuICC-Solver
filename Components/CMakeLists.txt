@@ -11,6 +11,9 @@ function(quicc_add_component component)
   list(POP_BACK CMAKE_MESSAGE_INDENT)
 endfunction()
 
+# Track dependencies for updatepy as a workaround for parallel build
+set(QUICC_CURRENT_UPDATEPY_TARGET "" CACHE STRING "Make dependencies across updatepy" FORCE)
+
 quicc_add_component(Git)
 quicc_add_component(Std)
 quicc_add_component(Cuda)
@@ -32,6 +35,7 @@ quicc_add_component(Fft)
 quicc_add_component(TestSuite)
 quicc_add_component(Transform/ViewOps)
 quicc_add_component(Transform)
+quicc_add_component(DenseSM)
 quicc_add_component(TimestepLegacy)
 quicc_add_component(TimestepPc)
 quicc_add_component(TimestepPcViews)

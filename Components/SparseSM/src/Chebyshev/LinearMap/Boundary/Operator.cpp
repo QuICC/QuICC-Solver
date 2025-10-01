@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Operator.cpp
  * @brief Source of the implementation of boundary operator
  */
@@ -20,36 +20,39 @@ namespace LinearMap {
 
 namespace Boundary {
 
-   Operator::Operator(const int rows, const int cols, const Scalar_t lower, const Scalar_t upper, const bool atTop)
-      : ILinearMapOperator(rows, cols, lower, upper), mAtTop(atTop), mLower(lower), mUpper(upper)
+Operator::Operator(const int rows, const int cols, const Scalar_t lower,
+   const Scalar_t upper, const bool atTop) :
+    ILinearMapOperator(rows, cols, lower, upper),
+    mAtTop(atTop),
+    mLower(lower),
+    mUpper(upper)
+{}
+
+void Operator::buildTriplets(TripletList_t& list) const
+{
+   assert(this->mBcs.size() <= static_cast<std::size_t>(this->rows()));
+
+   int i = 0;
+   if (!this->mAtTop)
    {
+      i = this->rows() - this->mBcs.size();
    }
 
-   void Operator::buildTriplets(TripletList_t& list) const
+   for (auto row: this->mBcs)
    {
-      assert(this->mBcs.size() <= static_cast<std::size_t>(this->rows()));
+      assert(row.size() >= this->cols());
 
-      int i = 0;
-      if(!this->mAtTop)
+      for (int j = 0; j < this->cols(); j++)
       {
-         i = this->rows()-this->mBcs.size();
+         Triplet_t t(i, j, row(j));
+         list.emplace_back(t);
       }
-
-      for(auto row: this->mBcs)
-      {
-         assert(row.size() >= this->cols());
-
-         for(int j = 0; j < this->cols(); j++)
-         {
-            Triplet_t t(i, j, row(j));
-            list.emplace_back(t);
-         }
-         i++;
-      }
+      i++;
    }
- 
-} // Boundary
-} // LinearMap
-} // Chebyshev
-} // Polynomial
-} // QuICC
+}
+
+} // namespace Boundary
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace SparseSM
+} // namespace QuICC

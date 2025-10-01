@@ -18,6 +18,7 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}
 target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
   PUBLIC
     QuICC::Common
+    Polynomial::SphericalBessel
   )
 
 # Boost for Bessel
@@ -27,6 +28,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
   PRIVATE
     Boost::headers
 )
+add_library(QuICC::SparseSM ALIAS ${QUICC_SPARSESM_COMPONENT_LIB})
 
 # Add source directory
 add_subdirectory(src)

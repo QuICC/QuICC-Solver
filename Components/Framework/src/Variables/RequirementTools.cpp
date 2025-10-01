@@ -9,6 +9,9 @@
 // Project includes
 //
 #include "QuICC/Variables/RequirementTools.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
+#include "QuICC/Transform/Path/Scalar.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
 
 namespace QuICC {
 
@@ -332,14 +335,14 @@ namespace QuICC {
       }
    }
 
-   void RequirementTools::buildBackwardTree(std::vector<Transform::TransformTree>& backwardTree, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalarVars, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectorVars)
+   void RequirementTools::buildBackwardTree(std::vector<Transform::TransformTree>& backwardTree, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalarVars, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectorVars, const std::size_t scalarPathId, const std::size_t vectorPathId)
    {
       std::map<std::size_t, std::vector<Transform::TransformPath> > branches;
 
       // Loop over scalar equations
       for(auto scalIt = scalarVars.begin(); scalIt != scalarVars.end(); scalIt++)
       {
-         auto eqBranches = RequirementTools::backwardPaths(scalIt->second);
+         auto eqBranches = RequirementTools::backwardPaths(scalIt->second, scalarPathId);
          if(eqBranches.size() > 0)
          {
             branches.insert(std::make_pair(scalIt->first, std::vector<Transform::TransformPath>()));
@@ -350,7 +353,7 @@ namespace QuICC {
       // Loop over vector equations
       for(auto vectIt = vectorVars.begin(); vectIt != vectorVars.end(); vectIt++)
       {
-         auto eqBranches = RequirementTools::backwardPaths(vectIt->second);
+         auto eqBranches = RequirementTools::backwardPaths(vectIt->second, vectorPathId);
          if(eqBranches.size() > 0)
          {
             branches.insert(std::make_pair(vectIt->first, std::vector<Transform::TransformPath>()));
@@ -362,31 +365,60 @@ namespace QuICC {
       Transform::TransformTreeTools::generateTrees(backwardTree, branches, TransformDirection::BACKWARD);
    }
 
-   std::vector<Transform::TransformPath> RequirementTools::backwardPaths(Framework::Selector::VariantSharedScalarVariable spScalar)
+   std::vector<Transform::TransformPath> RequirementTools::backwardPaths(Framework::Selector::VariantSharedScalarVariable spScalar, const std::size_t pathId)
    {
+      const bool& disabledPhys = false;
+      const bool& disabledGrad = false;
+      const bool& disabledGrad2 = false;
+
       std::vector<Transform::TransformPath> paths;
 
       std::shared_ptr<Transform::ITransformSteps>  spSteps;
       std::visit([&](auto&& p){spSteps = Transform::createTransformSteps(p->dom(0).res().sim().spSpatialScheme());}, spScalar);
 
+      std::size_t disabledPathId = Transform::Path::Empty::id();
+
+      auto makeMap = [&](auto&& enabled, const bool disabled)
+      {
+         std::map<typename std::remove_reference<decltype(enabled)>::type::key_type,std::size_t> m;
+         for(auto&& c: enabled)
+         {
+            std::size_t id = disabledPathId;
+            if(c.second && !disabled)
+            {
+               id = pathId;
+            }
+            m.try_emplace(c.first,id);
+         }
+         return m;
+      };
+
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, spScalar))
       {
-         std::map<FieldComponents::Physical::Id,bool> compsMap;
-         compsMap.insert(std::make_pair(FieldComponents::Physical::SCALAR, true));
+         std::map<FieldComponents::Physical::Id, bool> e = {{FieldComponents::Physical::SCALAR, true}};
+         auto compsMap = makeMap(e, disabledPhys);
          auto b = spSteps->backwardScalar(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad());}, spScalar))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).grad().enabled());}, spScalar);
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  return makeMap(p->dom(0).grad().enabled(), disabledGrad);
+               }, spScalar);
          auto b = spSteps->backwardGradient(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad2());}, spScalar))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>{return (p->dom(0).grad2().enabled());}, spScalar);
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  return makeMap(p->dom(0).grad2().enabled(), disabledGrad2);
+               }, spScalar);
          auto b = spSteps->backwardGradient2(compsMap);
          paths.insert(paths.end(), b.begin(), b.end());
       }
@@ -394,17 +426,41 @@ namespace QuICC {
       return paths;
    }
 
-
-   std::vector<Transform::TransformPath> RequirementTools::backwardPaths(Framework::Selector::VariantSharedVectorVariable spVector)
+   std::vector<Transform::TransformPath> RequirementTools::backwardPaths(Framework::Selector::VariantSharedVectorVariable spVector, const std::size_t pathId)
    {
+      const bool& disabledPhys = false;
+      const bool& disabledGrad = false;
+      const bool& disabledCurl = false;
+
       std::vector<Transform::TransformPath> paths;
 
       std::shared_ptr<Transform::ITransformSteps>  spSteps;
       std::visit([&](auto&& p){spSteps = Transform::createTransformSteps(p->dom(0).res().sim().spSpatialScheme());}, spVector);
 
+      const std::size_t disabledPathId = Transform::Path::Empty::id();
+
+      auto makeMap = [&](auto&& enabled, const bool disabled)
+      {
+         std::map<FieldComponents::Physical::Id,std::size_t> m;
+         for(auto&& c: enabled)
+         {
+            std::size_t id = disabledPathId;
+            if(c.second && !disabled)
+            {
+               id = pathId;
+            }
+            m.try_emplace(c.first,id);
+         }
+         return m;
+      };
+
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, spVector))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).phys().enabled());}, spVector);
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  return makeMap(p->dom(0).phys().enabled(), disabledPhys);
+               }, spVector);
          auto branches = spSteps->backwardVector(compsMap);
          paths.insert(paths.end(), branches.begin(), branches.end());
       }
@@ -416,28 +472,29 @@ namespace QuICC {
          {
             if(it->second)
             {
-               auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).grad(it->first).enabled());}, spVector);
+               auto compsMap = std::visit(
+                  [&](auto&& p)
+                  {
+                     return makeMap(p->dom(0).grad(it->first).enabled(), disabledGrad);
+                  }, spVector);
                auto b = spSteps->backwardVGradient(it->first, compsMap);
                paths.insert(paths.end(), b.begin(), b.end());
             }
          }
       }
 
-// Not yet implemented
 //      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad2());}, spVector))
 //      {
-//         auto range = this->spectralRange();
-//         for(auto it = range.first; it != range.second; ++it)
-//         {
-//            auto compsMap = std::visit([&](auto&& p)->std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>{return (p->dom(0).grad2(*it).enabled());}, spVector);
-//            auto b = spSteps->backwardVGradient2(*it, compsMap);
-//            paths.insert(paths.end(),b.begin(), b.end());
-//         }
+//          Grad2 is not yet implemented yet implemented
 //      }
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasCurl());}, spVector))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).curl().enabled());}, spVector);
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  return makeMap(p->dom(0).curl().enabled(), disabledCurl);
+               }, spVector);
          auto b = spSteps->backwardCurl(compsMap);
          paths.insert(paths.end(),b.begin(), b.end());
       }

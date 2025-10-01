@@ -10,7 +10,7 @@ include(ModelFunctions)
 #
 function(quicc_add_model target)
   # parse inputs
-  set(multiValueArgs TYPES SOURCE_DIRS)
+  set(multiValueArgs TYPES SOURCE_DIRS EXTRA_LIBS)
   cmake_parse_arguments(QAM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_model")
@@ -43,6 +43,11 @@ function(quicc_add_model target)
   target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
     QuICC::Framework
     )
+  foreach(_extra_lib ${QAM_EXTRA_LIBS})
+    target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
+      ${_extra_lib}
+      )
+  endforeach()
 
   # Create model implementations libraries
   foreach(type ${QAM_TYPES})
@@ -79,6 +84,10 @@ function(quicc_add_model target)
     VERBATIM
     )
   add_dependencies(${QUICC_CURRENT_MODEL_LIB} ${QUICC_CURRENT_MODEL_LIB}_updatepy)
+  if(QUICC_CURRENT_UPDATEPY_TARGET)
+     add_dependencies(${QUICC_CURRENT_UPDATEPY_TARGET} ${QUICC_CURRENT_MODEL_LIB}_updatepy)
+  endif()
+  set(QUICC_CURRENT_UPDATEPY_TARGET "${QUICC_CURRENT_MODEL_LIB}_updatepy" CACHE STRING "Make dependencies across updatepy" FORCE)
 
   foreach(src ${QAM_SOURCE_DIRS})
     add_subdirectory(${src})

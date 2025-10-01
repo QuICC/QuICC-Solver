@@ -27,6 +27,8 @@
 #include "QuICC/TransformConfigurators/TransformTreeTools.hpp"
 #include "QuICC/TransformConfigurators/ITransformSteps.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
+#include "QuICC/Transform/Path/Scalar.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
 
 namespace QuICC {
 
@@ -108,17 +110,17 @@ namespace QuICC {
           * @param backwardTree Transform tree for backward projection
           * @param varInfo      Variable requirements
           */
-         static void buildBackwardTree(std::vector<Transform::TransformTree>& backwardTree, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalarVars, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectorVars);
+         static void buildBackwardTree(std::vector<Transform::TransformTree>& backwardTree, const std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>& scalarVars, const std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>& vectorVars, const std::size_t scalarPathId = Transform::Path::Scalar::id(), const std::size_t vectorPathId = Transform::Path::TorPol::id());
 
          /**
           * @brief Get backward transform paths
           */
-         static std::vector<Transform::TransformPath> backwardPaths(Framework::Selector::VariantSharedScalarVariable spScalar);
+         static std::vector<Transform::TransformPath> backwardPaths(Framework::Selector::VariantSharedScalarVariable spScalar, const std::size_t pathId);
 
          /**
           * @brief Get backward transform paths
           */
-         static std::vector<Transform::TransformPath> backwardPaths(Framework::Selector::VariantSharedVectorVariable spVector);
+         static std::vector<Transform::TransformPath> backwardPaths(Framework::Selector::VariantSharedVectorVariable spVector, const std::size_t pathId);
 
       protected:
 

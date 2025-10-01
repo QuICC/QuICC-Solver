@@ -20,7 +20,6 @@ int envSize(const int defaultSize)
    int size = defaultSize;
 
    const char* envSize = std::getenv("QUICC_THREADPOOL_SIZE");
-
    if (envSize)
    {
       size = std::stoi(envSize);

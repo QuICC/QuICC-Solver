@@ -129,6 +129,13 @@ namespace Equations {
       protected:
          /**
           * @brief Get backward transform paths
+          *
+          * @param pathId  ID of enabled path
+          */
+         std::vector<Transform::TransformPath> defaultBackwardPaths(const std::size_t pathId) const;
+
+         /**
+          * @brief Get backward transform paths
           */
          virtual std::vector<bool> disabledBackwardPaths() const override;
 

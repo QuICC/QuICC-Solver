@@ -203,6 +203,11 @@ public:
    void addEquation(Equations::SharedIVectorEquation spEq,
       const std::size_t eqId, const int it);
 
+   /**
+    * @brief Add CFL diagnostic
+    */
+   void addCfl(Diagnostics::SharedICflWrapper spCfl);
+
 #ifdef QUICC_USE_MLIR_GRAPH
    /**
     * @brief Add graph description to solver
