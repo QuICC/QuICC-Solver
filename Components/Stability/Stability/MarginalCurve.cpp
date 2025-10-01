@@ -38,6 +38,7 @@
 #include "Stability/MarginalCurve.hpp"
 #include "Stability/Options.hpp"
 #include "Types/Math.hpp"
+#include "QuICC/Bc/Scheme/Galerkin.hpp"
 
 namespace QuICC {
 
@@ -509,6 +510,10 @@ void MarginalCurve::setOptions(Stability::Options& opt)
    }
 
    opt.solver_mode = this->mspEqParams->nd(NonDimensional::StabilityMode::id());
+   if (opt.solver_mode == 1 && (this->config().bcScheme() == Bc::Scheme::Galerkin::id()))
+   {
+      throw std::logic_error("Saving Galerkin eigenfunctions is not implemented yet");
+   }
 
    auto nev_ = this->mspEqParams->nd(NonDimensional::Nev::id());
    if (nev_ <= 0)
