@@ -132,6 +132,13 @@ namespace Equations {
 
       protected:
          /**
+          * @brief Get backward transform paths
+          *
+          * @param pathId  ID of enabled path
+          */
+         std::vector<Transform::TransformPath> defaultBackwardPaths(const std::size_t pathId) const;
+
+         /**
           * @brief Set the nonlinear integration components
           */
          virtual void setNLComponents() override;

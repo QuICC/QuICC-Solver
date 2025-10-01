@@ -11,6 +11,7 @@
 //
 #include "QuICC/SparseSM/Bessel/SphLapl.hpp"
 #include "QuICC/SparseSM/Bessel/Insulating/SphLaplDiags.hpp"
+#include "QuICC/SparseSM/Bessel/NoSlip/SphLaplDiags.hpp"
 #include "QuICC/SparseSM/Bessel/Value/SphLaplDiags.hpp"
 
 namespace QuICC {
@@ -30,6 +31,12 @@ SphLapl::SphLapl(const int rows, const int cols, const BesselKind type,
       break;
    case BesselKind::INSULATING:
       this->mpImpl = std::make_shared<Insulating::SphLaplDiags>(l);
+      break;
+   case BesselKind::NOSLIP:
+      this->mpImpl = std::make_shared<NoSlip::SphLaplDiags>(l);
+      break;
+   default:
+      throw std::logic_error("BesselKind not implemented for SphLapl");
       break;
    }
 }

@@ -74,8 +74,8 @@ wleggrid[n_]:=lgrid[2n][[n+1;;]];
 wlegweights[n_]:=lweights[2n][[n+1;;]];
 (*Cylindrical energy type*)
 $wcyl\[Alpha]=0;$wcyld\[Beta]=0;
-wcylgrid[n_]:=(lgrid[n]+1)/2;
-wcylweights[n_]:=lweights[n] wcylgrid[n]/2;
+wcylgrid[n_]:=Sqrt[(lgrid[n]+1)/2];
+wcylweights[n_]:=lweights[n]/4;
 (*Spherical energy type*)
 $wsph\[Alpha]=0;$wsphd\[Beta]=1/2;
 wsphgrid[n_]:=lgrid[2n][[n+1;;]];

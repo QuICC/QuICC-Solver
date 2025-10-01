@@ -13,10 +13,15 @@
 //
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Model/IPhysicalModel.hpp"
+#include "QuICC/NonDimensional/registerStability.hpp"
+#include "QuICC/NonDimensional/GrowthRate.hpp"
+#include "QuICC/NonDimensional/MaxIteration.hpp"
 #include "QuICC/NonDimensional/Nev.hpp"
 #include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
 #include "QuICC/NonDimensional/StabilityMode.hpp"
+#include "QuICC/NonDimensional/Tolerance.hpp"
+#include "QuICC/NonDimensional/WriteMtx.hpp"
 #include "Stability/MarginalCurve.hpp"
 
 namespace QuICC {
@@ -44,13 +49,36 @@ public:
     * @brief Destructor
     */
    ~LinearStabilityFactory() = delete;
+
 protected:
+   /**
+    * @brief Add stability specific NonDimensional parameters
+    */
+   static void addParameters(std::vector<std::string>& ndNames);
+
 private:
 };
 
 template <class TModel>
+void LinearStabilityFactory<TModel>::addParameters(std::vector<std::string>& ndNames)
+{
+   // Add configuration parameters for Stability solver
+   ndNames.push_back(NonDimensional::Tolerance().tag());
+   ndNames.push_back(NonDimensional::MaxIteration().tag());
+   ndNames.push_back(NonDimensional::Omega().tag());
+   ndNames.push_back(NonDimensional::GrowthRate().tag());
+   ndNames.push_back(NonDimensional::Nev().tag());
+   ndNames.push_back(NonDimensional::Sort().tag());
+   ndNames.push_back(NonDimensional::StabilityMode().tag());
+   ndNames.push_back(NonDimensional::WriteMtx().tag());
+}
+
+template <class TModel>
 typename LinearStabilityFactory<TModel>::ReturnType LinearStabilityFactory<TModel>::create()
 {
+   // Register stability specific nondimensional parameters
+   NonDimensional::registerStability();
+
    // Create model
    TModel model;
    model.init();
@@ -67,11 +95,7 @@ typename LinearStabilityFactory<TModel>::ReturnType LinearStabilityFactory<TMode
 
    // Create list of nondimensional ID strings for physical parameters
    std::vector<std::string> ndNames = model.backend().paramNames();
-   // Add configuration parameters for Stability solver
-   ndNames.push_back(NonDimensional::Omega().tag());
-   ndNames.push_back(NonDimensional::Nev().tag());
-   ndNames.push_back(NonDimensional::Sort().tag());
-   ndNames.push_back(NonDimensional::StabilityMode().tag());
+   LinearStabilityFactory::addParameters(ndNames);
 
    // Get model configuration tags
    auto modelCfg = model.configTags();

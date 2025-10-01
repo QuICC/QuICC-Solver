@@ -14,6 +14,9 @@
 // Project includes
 //
 #include "Environment/QuICCEnv.hpp"
+#ifdef QUICC_USE_THREADPOOL
+#include "ThreadPool/QuICCThreads.hpp"
+#endif // QUICC_USE_THREADPOOL
 #include "Profiler/Interface.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 
@@ -53,6 +56,11 @@ template <template <typename> class TFactory, typename TModel> int run_applicati
 
    if(status == 0)
    {
+#ifdef QUICC_USE_THREADPOOL
+      // Initialize threads
+      QuICC::QuICCThreads();
+#endif // QUICC_USE_THREADPOOL
+
       // Run application
       spApp->run();
 

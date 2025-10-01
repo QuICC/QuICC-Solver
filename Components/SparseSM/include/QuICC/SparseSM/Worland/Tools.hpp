@@ -8,8 +8,8 @@
 
 // Project includes
 //
-#include "Types/Internal/BasicTypes.hpp"
 #include "QuICC/SparseSM/Worland/WorlandKind.hpp"
+#include "Types/Internal/BasicTypes.hpp"
 
 namespace QuICC {
 
@@ -17,39 +17,38 @@ namespace SparseSM {
 
 namespace Worland {
 
+/**
+ * @brief Tools for sparse full sphere Worland operators
+ */
+class Tools
+{
+public:
+   /// Typedef for scalar
+   typedef Internal::MHDFloat Scalar_t;
+
    /**
-    * @brief Tools for sparse full sphere Worland operators
+    * @brief Identify type of Worland basis
+    *
+    * @param alpha   Jacobi alpha
+    * @param dBeta   Jacobi beta = l + dBeta
     */
-   class Tools
-   {
-      public:
-         /// Typedef for scalar
-         typedef Internal::MHDFloat Scalar_t;
+   static WorlandKind identifyBasis(const Scalar_t alpha, const Scalar_t dBeta);
 
-         /**
-          * @brief Identify type of Worland basis
-          *
-          * @param alpha   Jacobi alpha
-          * @param dBeta   Jacobi beta = l + dBeta
-          */
-         static WorlandKind identifyBasis(const Scalar_t alpha, const Scalar_t dBeta);
+protected:
+private:
+   /**
+    * @brief Constructor
+    */
+   Tools() = default;
 
-      protected:
+   /**
+    * @brief Destructor
+    */
+   virtual ~Tools() = default;
+};
 
-      private:
-         /**
-          * @brief Constructor
-          */
-         Tools() = default;
-
-         /**
-          * @brief Destructor
-          */
-         virtual ~Tools() = default;
-   };
-
-}
-}
-}
+} // namespace Worland
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_WORLAND_TOOLS_HPP

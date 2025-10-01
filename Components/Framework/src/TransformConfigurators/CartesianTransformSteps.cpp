@@ -13,6 +13,7 @@
 #include "QuICC/Arithmetics/Add.hpp"
 #include "QuICC/Arithmetics/Sub.hpp"
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
 #include "QuICC/Transform/Path/Scalar.hpp"
 #include "QuICC/Transform/Path/TorPol.hpp"
 #include "QuICC/Transform/Path/ScalarNl.hpp"
@@ -305,7 +306,7 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  CartesianTransformSteps::backwardScalar(const std::map<FieldComponents::Physical::Id,bool>& req) const
+   std::vector<TransformPath>  CartesianTransformSteps::backwardScalar(const PhysPathId& req) const
    {
       std::vector<TransformPath> transform;
 
@@ -317,11 +318,11 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  CartesianTransformSteps::backwardGradient(const std::map<FieldComponents::Physical::Id,bool>& req) const
+   std::vector<TransformPath>  CartesianTransformSteps::backwardGradient(const PhysPathId& req) const
    {
       std::vector<TransformPath> transform;
 
-      if(req.find(this->ss().physical().ONE())->second)
+      if(req.find(this->ss().physical().ONE())->second != Path::Empty::id())
       {
          transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
          if(this->ss().dimension() > 1) transform.back().addEdge(Backward::D1::id());
@@ -336,7 +337,7 @@ namespace Transform {
          }
       }
 
-      if(this->ss().dimension() > 1 && req.find(this->ss().physical().TWO())->second)
+      if(this->ss().dimension() > 1 && req.find(this->ss().physical().TWO())->second != Path::Empty::id())
       {
          transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
          transform.back().addEdge(Backward::P::id());
@@ -351,7 +352,7 @@ namespace Transform {
          }
       }
 
-      if(this->ss().dimension() > 2 && req.find(this->ss().physical().THREE())->second)
+      if(this->ss().dimension() > 2 && req.find(this->ss().physical().THREE())->second != Path::Empty::id())
       {
          transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
          transform.back().addEdge(Backward::P::id());
@@ -362,13 +363,13 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  CartesianTransformSteps::backwardGradient2(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req) const
+   std::vector<TransformPath>  CartesianTransformSteps::backwardGradient2(const Grad2PathId& req) const
    {
       std::vector<TransformPath> transform;
       std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>  pairId;
 
       pairId = std::make_pair(this->ss().physical().ONE(),this->ss().physical().ONE());
-      if(req.find(pairId)->second)
+      if(req.find(pairId)->second != Path::Empty::id())
       {
          transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
          if(this->ss().dimension() > 1) transform.back().addEdge(Backward::D2::id());
@@ -386,7 +387,7 @@ namespace Transform {
       if(this->ss().dimension() > 1)
       {
          pairId = std::make_pair(this->ss().physical().ONE(),this->ss().physical().TWO());
-         if(req.find(pairId)->second)
+         if(req.find(pairId)->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
             transform.back().addEdge(Backward::D1::id());
@@ -405,7 +406,7 @@ namespace Transform {
       if(this->ss().dimension() > 2)
       {
          pairId = std::make_pair(this->ss().physical().ONE(),this->ss().physical().THREE());
-         if(req.find(pairId)->second)
+         if(req.find(pairId)->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
             transform.back().addEdge(Backward::D1::id());
@@ -417,7 +418,7 @@ namespace Transform {
       if(this->ss().dimension() > 1)
       {
          pairId = std::make_pair(this->ss().physical().TWO(),this->ss().physical().TWO());
-         if(req.find(pairId)->second)
+         if(req.find(pairId)->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
             transform.back().addEdge(Backward::P::id());
@@ -436,7 +437,7 @@ namespace Transform {
       if(this->ss().dimension() > 2)
       {
          pairId = std::make_pair(this->ss().physical().TWO(),this->ss().physical().THREE());
-         if(req.find(pairId)->second)
+         if(req.find(pairId)->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
             transform.back().addEdge(Backward::P::id());
@@ -445,7 +446,7 @@ namespace Transform {
          }
 
          pairId = std::make_pair(this->ss().physical().THREE(),this->ss().physical().THREE());
-         if(req.find(pairId)->second)
+         if(req.find(pairId)->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT2));
             transform.back().addEdge(Backward::P::id());
@@ -457,13 +458,13 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  CartesianTransformSteps::backwardVector(const std::map<FieldComponents::Physical::Id,bool>& req) const
+   std::vector<TransformPath>  CartesianTransformSteps::backwardVector(const PhysPathId& req) const
    {
       std::vector<TransformPath> transform;
 
       if(this->ss().formulation() == VectorFormulation::TORPOL)
       {
-         if(req.find(FieldComponents::Physical::X)->second)
+         if(req.find(FieldComponents::Physical::X)->second != Path::Empty::id())
          {
             // Toroidal contribution
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
@@ -484,7 +485,7 @@ namespace Transform {
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::X, Arithmetics::Add::id());
          }
 
-         if(req.find(FieldComponents::Physical::Y)->second)
+         if(req.find(FieldComponents::Physical::Y)->second != Path::Empty::id())
          {
             // Toroidal contribution
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
@@ -505,7 +506,7 @@ namespace Transform {
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::Y, Arithmetics::Add::id());
          }
 
-         if(req.find(FieldComponents::Physical::Z)->second)
+         if(req.find(FieldComponents::Physical::Z)->second != Path::Empty::id())
          {
             // Poloidal contributions
             transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
@@ -516,7 +517,7 @@ namespace Transform {
       }
       else
       {
-         if(req.find(this->ss().physical().ONE())->second)
+         if(req.find(this->ss().physical().ONE())->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(this->ss().spectral().ONE(), FieldType::VECTOR));
             if(this->ss().dimension() > 1) transform.back().addEdge(Backward::P::id());
@@ -526,7 +527,7 @@ namespace Transform {
 
          if(this->ss().dimension() > 1)
          {
-            if(req.find(this->ss().physical().TWO())->second)
+            if(req.find(this->ss().physical().TWO())->second != Path::Empty::id())
             {
                transform.push_back(TransformPath(this->ss().spectral().TWO(), FieldType::VECTOR));
                transform.back().addEdge(Backward::P::id());
@@ -537,7 +538,7 @@ namespace Transform {
 
          if(this->ss().dimension() > 2)
          {
-            if(req.find(this->ss().physical().THREE())->second)
+            if(req.find(this->ss().physical().THREE())->second != Path::Empty::id())
             {
                transform.push_back(TransformPath(this->ss().spectral().THREE(), FieldType::VECTOR));
                transform.back().addEdge(Backward::P::id());
@@ -550,7 +551,7 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  CartesianTransformSteps::backwardVGradient(FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& req) const
+   std::vector<TransformPath>  CartesianTransformSteps::backwardVGradient(FieldComponents::Spectral::Id id, const PhysPathId& req) const
    {
       std::vector<TransformPath> transform;
 
@@ -560,7 +561,7 @@ namespace Transform {
       }
       else
       {
-         if(req.find(this->ss().physical().ONE())->second)
+         if(req.find(this->ss().physical().ONE())->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(id, FieldType::GRADIENT));
             if(this->ss().dimension() > 1) transform.back().addEdge(Backward::D1::id());
@@ -577,7 +578,7 @@ namespace Transform {
 
          if(this->ss().dimension() > 1)
          {
-            if(req.find(this->ss().physical().TWO())->second)
+            if(req.find(this->ss().physical().TWO())->second != Path::Empty::id())
             {
                transform.push_back(TransformPath(id, FieldType::GRADIENT));
                transform.back().addEdge(Backward::P::id());
@@ -595,7 +596,7 @@ namespace Transform {
 
          if(this->ss().dimension() > 2)
          {
-            if(req.find(this->ss().physical().THREE())->second)
+            if(req.find(this->ss().physical().THREE())->second != Path::Empty::id())
             {
                transform.push_back(TransformPath(id, FieldType::GRADIENT));
                transform.back().addEdge(Backward::P::id());
@@ -608,13 +609,13 @@ namespace Transform {
       return transform;
    }
 
-   std::vector<TransformPath>  CartesianTransformSteps::backwardCurl(const std::map<FieldComponents::Physical::Id,bool>& req) const
+   std::vector<TransformPath>  CartesianTransformSteps::backwardCurl(const PhysPathId& req) const
    {
       std::vector<TransformPath> transform;
 
       if(this->ss().formulation() == VectorFormulation::TORPOL)
       {
-         if(req.find(FieldComponents::Physical::X)->second)
+         if(req.find(FieldComponents::Physical::X)->second != Path::Empty::id())
          {
             // Toroidal contribution
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
@@ -640,7 +641,7 @@ namespace Transform {
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::X, Arithmetics::Sub::id());
          }
 
-         if(req.find(FieldComponents::Physical::Y)->second)
+         if(req.find(FieldComponents::Physical::Y)->second != Path::Empty::id())
          {
             // Toroidal contribution
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
@@ -666,7 +667,7 @@ namespace Transform {
             transform.back().addEdge(Backward::P::id(), FieldComponents::Physical::Y, Arithmetics::Add::id());
          }
 
-         if(req.find(FieldComponents::Physical::Z)->second)
+         if(req.find(FieldComponents::Physical::Z)->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
             transform.back().addEdge(Backward::P::id());
@@ -681,7 +682,7 @@ namespace Transform {
             throw std::logic_error("Curl cannot be computed!");
          }
 
-         if(req.find(this->ss().physical().ONE())->second)
+         if(req.find(this->ss().physical().ONE())->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(this->ss().spectral().TWO(), FieldType::CURL));
             transform.back().addEdge(Backward::P::id());
@@ -694,7 +695,7 @@ namespace Transform {
             transform.back().addEdge(Backward::P::id(), this->ss().physical().ONE(), Arithmetics::Add::id());
          }
 
-         if(req.find(this->ss().physical().TWO())->second)
+         if(req.find(this->ss().physical().TWO())->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(this->ss().spectral().ONE(), FieldType::CURL));
             transform.back().addEdge(Backward::P::id());
@@ -707,7 +708,7 @@ namespace Transform {
             transform.back().addEdge(Backward::P::id(), this->ss().physical().TWO(), Arithmetics::Sub::id());
          }
 
-         if(req.find(this->ss().physical().THREE())->second)
+         if(req.find(this->ss().physical().THREE())->second != Path::Empty::id())
          {
             transform.push_back(TransformPath(this->ss().spectral().ONE(), FieldType::CURL));
             transform.back().addEdge(Backward::P::id());

@@ -4,19 +4,9 @@
  * steps in a spherical shell
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <stdexcept>
-
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/TransformConfigurators/ShellTransformSteps.hpp"
 
 // Project includes
 //
@@ -51,6 +41,7 @@
 #include "QuICC/Transform/Forward/T.hpp"
 #include "QuICC/Transform/Path/CurlCurlNl.hpp"
 #include "QuICC/Transform/Path/CurlNl.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
 #include "QuICC/Transform/Path/I2CurlCurlNl.hpp"
 #include "QuICC/Transform/Path/I2CurlNl.hpp"
 #include "QuICC/Transform/Path/I2ScalarNl.hpp"
@@ -60,6 +51,7 @@
 #include "QuICC/Transform/Path/Scalar.hpp"
 #include "QuICC/Transform/Path/ScalarNl.hpp"
 #include "QuICC/Transform/Path/TorPol.hpp"
+#include "QuICC/TransformConfigurators/ShellTransformSteps.hpp"
 
 namespace QuICC {
 
@@ -383,7 +375,7 @@ std::vector<TransformPath> ShellTransformSteps::forwardNLVector(
 }
 
 std::vector<TransformPath> ShellTransformSteps::backwardScalar(
-   const std::map<FieldComponents::Physical::Id, bool>& req) const
+   const PhysPathId& req) const
 {
    std::vector<TransformPath> transform;
 
@@ -398,11 +390,11 @@ std::vector<TransformPath> ShellTransformSteps::backwardScalar(
 }
 
 std::vector<TransformPath> ShellTransformSteps::backwardGradient(
-   const std::map<FieldComponents::Physical::Id, bool>& req) const
+   const PhysPathId& req) const
 {
    std::vector<TransformPath> transform;
 
-   if (req.find(FieldComponents::Physical::R)->second)
+   if (req.find(FieldComponents::Physical::R)->second != Path::Empty::id())
    {
       transform.push_back(
          TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
@@ -412,7 +404,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardGradient(
          Arithmetics::Add::id());
    }
 
-   if (req.find(FieldComponents::Physical::THETA)->second)
+   if (req.find(FieldComponents::Physical::THETA)->second != Path::Empty::id())
    {
       transform.push_back(
          TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
@@ -422,7 +414,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardGradient(
          FieldComponents::Physical::THETA, Arithmetics::Add::id());
    }
 
-   if (req.find(FieldComponents::Physical::PHI)->second)
+   if (req.find(FieldComponents::Physical::PHI)->second != Path::Empty::id())
    {
       transform.push_back(
          TransformPath(FieldComponents::Spectral::SCALAR, FieldType::GRADIENT));
@@ -436,9 +428,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardGradient(
 }
 
 std::vector<TransformPath> ShellTransformSteps::backwardGradient2(
-   const std::map<
-      std::pair<FieldComponents::Physical::Id, FieldComponents::Physical::Id>,
-      bool>& req) const
+   const Grad2PathId& req) const
 {
    std::vector<TransformPath> transform;
    std::pair<FieldComponents::Physical::Id, FieldComponents::Physical::Id>
@@ -448,7 +438,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardGradient2(
 
    pairId = std::make_pair(FieldComponents::Physical::R,
       FieldComponents::Physical::R);
-   if (req.find(pairId)->second)
+   if (req.find(pairId)->second != Path::Empty::id())
    {
       transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR,
          FieldType::GRADIENT2));
@@ -460,7 +450,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardGradient2(
 
    pairId = std::make_pair(FieldComponents::Physical::R,
       FieldComponents::Physical::THETA);
-   if (req.find(pairId)->second)
+   if (req.find(pairId)->second != Path::Empty::id())
    {
       transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR,
          FieldType::GRADIENT2));
@@ -472,7 +462,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardGradient2(
 
    pairId = std::make_pair(FieldComponents::Physical::R,
       FieldComponents::Physical::PHI);
-   if (req.find(pairId)->second)
+   if (req.find(pairId)->second != Path::Empty::id())
    {
       transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR,
          FieldType::GRADIENT2));
@@ -484,7 +474,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardGradient2(
 
    pairId = std::make_pair(FieldComponents::Physical::THETA,
       FieldComponents::Physical::THETA);
-   if (req.find(pairId)->second)
+   if (req.find(pairId)->second != Path::Empty::id())
    {
       transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR,
          FieldType::GRADIENT2));
@@ -496,7 +486,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardGradient2(
 
    pairId = std::make_pair(FieldComponents::Physical::THETA,
       FieldComponents::Physical::PHI);
-   if (req.find(pairId)->second)
+   if (req.find(pairId)->second != Path::Empty::id())
    {
       transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR,
          FieldType::GRADIENT2));
@@ -508,7 +498,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardGradient2(
 
    pairId = std::make_pair(FieldComponents::Physical::PHI,
       FieldComponents::Physical::PHI);
-   if (req.find(pairId)->second)
+   if (req.find(pairId)->second != Path::Empty::id())
    {
       transform.push_back(TransformPath(FieldComponents::Spectral::SCALAR,
          FieldType::GRADIENT2));
@@ -522,13 +512,13 @@ std::vector<TransformPath> ShellTransformSteps::backwardGradient2(
 }
 
 std::vector<TransformPath> ShellTransformSteps::backwardVector(
-   const std::map<FieldComponents::Physical::Id, bool>& req) const
+   const PhysPathId& req) const
 {
    std::vector<TransformPath> transform;
 
    if (this->ss().formulation() == VectorFormulation::TORPOL)
    {
-      if (req.find(FieldComponents::Physical::R)->second)
+      if (req.find(FieldComponents::Physical::R)->second != Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::POL, FieldType::VECTOR));
@@ -538,7 +528,8 @@ std::vector<TransformPath> ShellTransformSteps::backwardVector(
             FieldComponents::Physical::R, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::THETA)->second)
+      if (req.find(FieldComponents::Physical::THETA)->second !=
+          Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
@@ -555,7 +546,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardVector(
             FieldComponents::Physical::THETA, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::PHI)->second)
+      if (req.find(FieldComponents::Physical::PHI)->second != Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::TOR, FieldType::VECTOR));
@@ -574,7 +565,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardVector(
    }
    else
    {
-      if (req.find(FieldComponents::Physical::R)->second)
+      if (req.find(FieldComponents::Physical::R)->second != Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::R, FieldType::VECTOR));
@@ -584,7 +575,8 @@ std::vector<TransformPath> ShellTransformSteps::backwardVector(
             FieldComponents::Physical::R, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::THETA)->second)
+      if (req.find(FieldComponents::Physical::THETA)->second !=
+          Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::THETA, FieldType::VECTOR));
@@ -594,7 +586,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardVector(
             FieldComponents::Physical::THETA, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::PHI)->second)
+      if (req.find(FieldComponents::Physical::PHI)->second != Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::PHI, FieldType::VECTOR));
@@ -609,14 +601,13 @@ std::vector<TransformPath> ShellTransformSteps::backwardVector(
 }
 
 std::vector<TransformPath> ShellTransformSteps::backwardVGradient(
-   FieldComponents::Spectral::Id id,
-   const std::map<FieldComponents::Physical::Id, bool>& req) const
+   FieldComponents::Spectral::Id id, const PhysPathId& req) const
 {
    std::vector<TransformPath> transform;
 
    if (this->ss().formulation() == VectorFormulation::TORPOL)
    {
-      if (req.find(FieldComponents::Physical::R)->second)
+      if (req.find(FieldComponents::Physical::R)->second != Path::Empty::id())
       {
          transform.push_back(TransformPath(id, FieldType::GRADIENT));
          transform.back().addEdge(Backward::D1::id());
@@ -625,7 +616,8 @@ std::vector<TransformPath> ShellTransformSteps::backwardVGradient(
             FieldComponents::Physical::R, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::THETA)->second)
+      if (req.find(FieldComponents::Physical::THETA)->second !=
+          Path::Empty::id())
       {
          transform.push_back(TransformPath(id, FieldType::GRADIENT));
          transform.back().addEdge(Backward::Overr1::id());
@@ -634,7 +626,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardVGradient(
             FieldComponents::Physical::THETA, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::PHI)->second)
+      if (req.find(FieldComponents::Physical::PHI)->second != Path::Empty::id())
       {
          transform.push_back(TransformPath(id, FieldType::GRADIENT));
          transform.back().addEdge(Backward::Overr1::id());
@@ -645,7 +637,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardVGradient(
    }
    else
    {
-      if (req.find(FieldComponents::Physical::R)->second)
+      if (req.find(FieldComponents::Physical::R)->second != Path::Empty::id())
       {
          transform.push_back(TransformPath(id, FieldType::GRADIENT));
          transform.back().addEdge(Backward::D1::id());
@@ -654,7 +646,8 @@ std::vector<TransformPath> ShellTransformSteps::backwardVGradient(
             FieldComponents::Physical::R, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::THETA)->second)
+      if (req.find(FieldComponents::Physical::THETA)->second !=
+          Path::Empty::id())
       {
          transform.push_back(TransformPath(id, FieldType::GRADIENT));
          transform.back().addEdge(Backward::Overr1::id());
@@ -663,7 +656,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardVGradient(
             FieldComponents::Physical::THETA, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::PHI)->second)
+      if (req.find(FieldComponents::Physical::PHI)->second != Path::Empty::id())
       {
          transform.push_back(TransformPath(id, FieldType::GRADIENT));
          transform.back().addEdge(Backward::Overr1::id());
@@ -677,13 +670,13 @@ std::vector<TransformPath> ShellTransformSteps::backwardVGradient(
 }
 
 std::vector<TransformPath> ShellTransformSteps::backwardCurl(
-   const std::map<FieldComponents::Physical::Id, bool>& req) const
+   const PhysPathId& req) const
 {
    std::vector<TransformPath> transform;
 
    if (this->ss().formulation() == VectorFormulation::TORPOL)
    {
-      if (req.find(FieldComponents::Physical::R)->second)
+      if (req.find(FieldComponents::Physical::R)->second != Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
@@ -693,7 +686,8 @@ std::vector<TransformPath> ShellTransformSteps::backwardCurl(
             FieldComponents::Physical::R, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::THETA)->second)
+      if (req.find(FieldComponents::Physical::THETA)->second !=
+          Path::Empty::id())
       {
          // Toroidal part
          transform.push_back(
@@ -720,7 +714,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardCurl(
             FieldComponents::Physical::THETA, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::PHI)->second)
+      if (req.find(FieldComponents::Physical::PHI)->second != Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::TOR, FieldType::CURL));
@@ -746,7 +740,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardCurl(
    }
    else
    {
-      if (req.find(FieldComponents::Physical::R)->second)
+      if (req.find(FieldComponents::Physical::R)->second != Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::THETA, FieldType::CURL));
@@ -763,7 +757,8 @@ std::vector<TransformPath> ShellTransformSteps::backwardCurl(
             FieldComponents::Physical::R, Arithmetics::Add::id());
       }
 
-      if (req.find(FieldComponents::Physical::THETA)->second)
+      if (req.find(FieldComponents::Physical::THETA)->second !=
+          Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::R, FieldType::CURL));
@@ -780,7 +775,7 @@ std::vector<TransformPath> ShellTransformSteps::backwardCurl(
             FieldComponents::Physical::THETA, Arithmetics::Sub::id());
       }
 
-      if (req.find(FieldComponents::Physical::PHI)->second)
+      if (req.find(FieldComponents::Physical::PHI)->second != Path::Empty::id())
       {
          transform.push_back(
             TransformPath(FieldComponents::Spectral::R, FieldType::CURL));

@@ -15,16 +15,17 @@ namespace SparseSM {
 
 namespace Worland {
 
-   /// Different kinds of Worland polynomials
-   enum class WorlandKind {
-      CHEBYSHEV,
-      LEGENDRE,
-      CYLENERGY,
-      SPHENERGY,
-   };
+/// Different kinds of Worland polynomials
+enum class WorlandKind
+{
+   CHEBYSHEV,
+   LEGENDRE,
+   CYLENERGY,
+   SPHENERGY,
+};
 
-}
-}
-}
+} // namespace Worland
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_WORLAND_WORLANDKIND_HPP

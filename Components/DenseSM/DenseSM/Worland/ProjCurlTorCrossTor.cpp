@@ -1,0 +1,56 @@
+/**
+ * @file ProjCurlTorCrossTor.cpp
+ * @brief Source of the implementation of the projection r Curl Tor ^ Tor
+ */
+
+// System includes
+//
+#include <Eigen/Dense>
+#include <cassert>
+#include <cmath>
+#include <stdexcept>
+
+// Project includes
+//
+#include "DenseSM/Worland/ProjCurlTorCrossTor.hpp"
+
+namespace QuICC {
+
+namespace DenseSM {
+
+namespace Worland {
+
+ProjCurlTorCrossTor::ProjCurlTorCrossTor(const int nNr, const int nNc,
+   const int q, const int lOut, const int mOut, const int lA, const int mA, const int lB,
+   const int mB, std::shared_ptr<RadialTorPolFunction> pTorA,
+   std::shared_ptr<RadialTorPolFunction> pTorB, const Scalar_t alpha,
+   const Scalar_t dBeta) :
+    IProjCrossOperator(nNr, nNc, q, lOut, mOut, lA, mA, lB, mB, alpha, dBeta)
+{
+   // Radial function A is given
+   if (pTorA && pTorB == nullptr)
+   {
+      // Nothing to do
+   }
+   // Radial function B is given
+   else if (pTorB && pTorA == nullptr)
+   {
+      // Nothing to do
+   }
+   else
+   {
+      throw std::logic_error("One of the radial functions should be null");
+   }
+
+   this->mIsZero = true;
+}
+
+void ProjCurlTorCrossTor::buildOpImpl(Internal::Matrix& mat, const int rows,
+   const int cols) const
+{
+   mat = Matrix::Zero(this->rows(), this->cols());
+}
+
+} // namespace Worland
+} // namespace DenseSM
+} // namespace QuICC

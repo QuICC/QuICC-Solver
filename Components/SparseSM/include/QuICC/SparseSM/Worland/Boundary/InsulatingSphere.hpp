@@ -1,6 +1,7 @@
 /**
  * @file InsulatingSphere.hpp
- * @brief Implementation of the boundary condition for insulating sphere for Worland polynomials
+ * @brief Implementation of the boundary condition for insulating sphere for
+ * Worland polynomials
  */
 
 #ifndef QUICC_SPARSESM_WORLAND_BOUNDARY_INSULATINGSPHERE_HPP
@@ -22,48 +23,49 @@ namespace Worland {
 
 namespace Boundary {
 
+/**
+ * @brief Implementation of the boundary condition for insulating spehre for
+ * Worland polynomial
+ */
+class InsulatingSphere : public ICondition
+{
+public:
    /**
-    * @brief Implementation of the boundary condition for insulating spehre for Worland polynomial
+    * @brief Constructor for specific alpha,beta pair
+    *
+    * @param alpha   Jacobi alpha
+    * @param dBeta   Jacobi beta = l + dBeta
+    * @param l       Harmonic degree l
     */
-   class InsulatingSphere: public ICondition
-   {
-      public:
-         /**
-          * @brief Constructor for specific alpha,beta pair
-          *
-          * @param alpha   Jacobi alpha
-          * @param dBeta   Jacobi beta = l + dBeta
-          * @param l       Harmonic degree l
-          */
-         InsulatingSphere(const Scalar_t alpha, const Scalar_t dBeta, const int l);
+   InsulatingSphere(const Scalar_t alpha, const Scalar_t dBeta, const int l);
 
-         /**
-          * @brief Destructor
-          */
-         ~InsulatingSphere() = default;
+   /**
+    * @brief Destructor
+    */
+   ~InsulatingSphere() = default;
 
-         /**
-          * @brief Compute list of boundary values
-          *
-          * @param maxN Highest polynomial
-          */
-         ACoeff_t compute(const int maxN);
+   /**
+    * @brief Compute list of boundary values
+    *
+    * @param maxN Highest polynomial
+    */
+   ACoeff_t compute(const int maxN);
 
-      private:
-         /**
-          * @brief Boundary value for k = 0, l = l
-          */
-         Value mBCk0;
+private:
+   /**
+    * @brief Boundary value for k = 0, l = l
+    */
+   Value mBCk0;
 
-         /**
-          * @brief Boundary value for k = 1, l = l+1
-          */
-         Value mBCk1;
-   };
+   /**
+    * @brief Boundary value for k = 1, l = l+1
+    */
+   Value mBCk1;
+};
 
-} // Boundary
-} // Worland
-} // SparseSM
-} // QuICC
+} // namespace Boundary
+} // namespace Worland
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_WORLAND_BOUNDARY_INSULATINGSPHERE_HPP

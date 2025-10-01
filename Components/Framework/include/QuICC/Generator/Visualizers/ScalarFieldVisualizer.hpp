@@ -6,15 +6,9 @@
 #ifndef QUICC_EQUATIONS_SCALARFIELDVISUALIZER_HPP
 #define QUICC_EQUATIONS_SCALARFIELDVISUALIZER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -41,7 +35,7 @@ namespace Equations {
          /**
           * @brief Simple empty destructor
           */
-         virtual ~ScalarFieldVisualizer();
+         virtual ~ScalarFieldVisualizer() = default;
 
          /**
           * @brief Set the unknown name and requirements
@@ -53,16 +47,40 @@ namespace Equations {
           */
          void setFields(const bool viewField, const bool viewGradient, const bool viewGradient2 = false);
 
+         /**
+          * @brief Set backward path ID
+          *
+          * @param pathId Path ID
+          */
+         void setBackwardPath(const std::size_t id);
+
+         /**
+          * @brief Set forward path ID
+          *
+          * @param pathId Path ID
+          */
+         void setForwardPath(const std::size_t id);
+
+         /**
+          * @brief Get backward transform paths
+          */
+         virtual std::vector<Transform::TransformPath> backwardPaths() override;
+
       protected:
+         /**
+          * @brief Set the nonlinear integration components
+          */
+         virtual void setNLComponents() override;
+
          /**
           * @brief Set variable requirements
           */
-         virtual void setRequirements();
+         virtual void setRequirements() override;
 
          /**
           * @brief Set coupling information
           */
-         virtual void setCoupling();
+         virtual void setCoupling() override;
 
       private:
          /**
@@ -79,6 +97,16 @@ namespace Equations {
           * @brief Storage for output 2nd order gradient flag
           */
          bool mViewGradient2;
+
+         /**
+          * @brief Backward Transform path ID
+          */
+         std::size_t mBwdPathId;
+
+         /**
+          * @brief Forward Transform path ID
+          */
+         std::size_t mFwdPathId;
    };
 
    /// Typedef for a shared ScalarFieldVisualizer

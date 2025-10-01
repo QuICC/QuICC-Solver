@@ -67,6 +67,11 @@ namespace Transform {
        * @brief Translate string test type to enum
        */
       void setType(const std::string& type);
+
+      /**
+       * @brief Reset values to default
+       */
+      void clear();
    };
 
 }

@@ -13,6 +13,8 @@
 #include "QuICC/ModelOperator/ExplicitNonlinear.hpp"
 #include "QuICC/ModelOperator/ExplicitNextstep.hpp"
 #include "QuICC/TransformConfigurators/TransformStepsFactory.hpp"
+#include "QuICC/Transform/Path/Empty.hpp"
+#include "QuICC/Transform/Path/TorPol.hpp"
 
 namespace QuICC {
 
@@ -118,7 +120,7 @@ namespace Equations {
       return disabled;
    }
 
-   std::vector<Transform::TransformPath> IVectorEquation::backwardPaths()
+   std::vector<Transform::TransformPath> IVectorEquation::defaultBackwardPaths(const std::size_t pathId) const
    {
       // Disable some paths
       auto disabled = this->disabledBackwardPaths();
@@ -130,16 +132,30 @@ namespace Equations {
 
       auto spSteps = this->transformSteps();
 
+      const std::size_t disabledPathId = Transform::Path::Empty::id();
+
+      auto makeMap = [&](auto&& enabled, const bool disabled)
+      {
+         std::map<FieldComponents::Physical::Id,std::size_t> m;
+         for(auto&& c: enabled)
+         {
+            std::size_t id = disabledPathId;
+            if(c.second && !disabled)
+            {
+               id = pathId;
+            }
+            m.try_emplace(c.first,id);
+         }
+         return m;
+      };
+
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasPhys());}, this->spUnknown()))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).phys().enabled());}, this->spUnknown());
-         if(disabledPhys)
-         {
-            for(auto&& c: compsMap)
-            {
-               c.second = false;
-            }
-         }
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  return makeMap(p->dom(0).phys().enabled(), disabledPhys);
+               }, this->spUnknown());
          auto branches = spSteps->backwardVector(compsMap);
          paths.insert(paths.end(), branches.begin(), branches.end());
       }
@@ -149,46 +165,38 @@ namespace Equations {
          auto range = this->spectralRange();
          for(auto it = range.first; it != range.second; ++it)
          {
-            auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).grad(*it).enabled());}, this->spUnknown());
-            if(disabledGrad)
-            {
-               for(auto&& c: compsMap)
+            auto compsMap = std::visit(
+               [&](auto&& p)
                {
-                  c.second = false;
-               }
-            }
+                  return makeMap(p->dom(0).grad(*it).enabled(), disabledGrad);
+               }, this->spUnknown());
             auto b = spSteps->backwardVGradient(*it, compsMap);
             paths.insert(paths.end(), b.begin(), b.end());
          }
       }
 
-// Not yet implemented
 //      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad2());}, this->spUnknown()))
 //      {
-//         auto range = this->spectralRange();
-//         for(auto it = range.first; it != range.second; ++it)
-//         {
-//            auto compsMap = std::visit([&](auto&& p)->std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>{return (p->dom(0).grad2(*it).enabled());}, this->spUnknown());
-//            auto b = spSteps->backwardVGradient2(*it, compsMap);
-//            paths.insert(paths.end(),b.begin(), b.end());
-//         }
+//          Grad2 is not yet implemented yet implemented
 //      }
 
       if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasCurl());}, this->spUnknown()))
       {
-         auto compsMap = std::visit([&](auto&& p)->std::map<FieldComponents::Physical::Id,bool>{return (p->dom(0).curl().enabled());}, this->spUnknown());
-         if(disabledCurl)
-         {
-            for(auto&& c: compsMap)
-            {
-               c.second = false;
-            }
-         }
+         auto compsMap = std::visit(
+               [&](auto&& p)
+               {
+                  return makeMap(p->dom(0).curl().enabled(), disabledCurl);
+               }, this->spUnknown());
          auto b = spSteps->backwardCurl(compsMap);
          paths.insert(paths.end(),b.begin(), b.end());
       }
 
       return paths;
+   }
+
+   std::vector<Transform::TransformPath> IVectorEquation::backwardPaths()
+   {
+      return this->defaultBackwardPaths(Transform::Path::TorPol::id());
    }
 
 } // Equations
