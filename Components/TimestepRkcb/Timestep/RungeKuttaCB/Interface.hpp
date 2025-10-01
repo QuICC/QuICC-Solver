@@ -75,11 +75,6 @@ public:
    bool finishedStep() const final;
 
    /**
-    * @brief Set solve time
-    */
-   void setSolveTime(const std::size_t timeId) final;
-
-   /**
     * @brief Update equation explicit linear input to solver
     *
     * @param scalEq Scalar equations
@@ -127,6 +122,10 @@ public:
    void printInfo(std::ostream& stream) final;
 
 protected:
+   /**
+    * @brief Set solve time
+    */
+   void setSolveTime(const std::size_t timeId);
 private:
    /**
     * @brief Update time dependence

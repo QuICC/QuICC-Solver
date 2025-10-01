@@ -44,11 +44,6 @@ namespace Timestep {
       return this->mpImpl->finishedStep();
    }
 
-   void Coordinator::setSolveTime(const std::size_t timeId)
-   {
-      this->mpImpl->setSolveTime(timeId);
-   }
-
    void Coordinator::getExplicitInput(const std::size_t opId, const ScalarEquation_range& scalEq, const VectorEquation_range& vectEq, const ScalarVariable_map& scalVar, const VectorVariable_map& vectVar)
    {
       this->mpImpl->getExplicitInput(opId, scalEq, vectEq, scalVar, vectVar);
