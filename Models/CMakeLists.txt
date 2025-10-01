@@ -40,6 +40,7 @@ include(setup/ModelTestSuite)
 include(FetchRepository)
 
 # Default branch for main models
+quicc_set_default_git_branch(BoussinesqSphereInertialessDynamo BRANCH "feature/add_exe" TYPE Model)
 quicc_set_default_git_branch(BoussinesqSphereRDDDynamo BRANCH "feature/add_exe" TYPE Model)
 quicc_set_default_git_branch(BoussinesqSphereDynamo BRANCH "feature/add_exe" TYPE Model)
 quicc_set_default_git_branch(BoussinesqShellDynamo BRANCH "feature/add_exe" TYPE Model)

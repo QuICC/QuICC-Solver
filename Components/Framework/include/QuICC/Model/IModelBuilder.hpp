@@ -86,7 +86,7 @@ namespace Model {
          /**
           * @brief Add diagnostics
           */
-         void addDiagnostics(std::shared_ptr<TSim> spSim);
+         virtual void addDiagnostics(std::shared_ptr<TSim> spSim);
 
       protected:
 

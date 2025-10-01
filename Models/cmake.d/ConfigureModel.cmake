@@ -8,7 +8,7 @@
 #
 function(quicc_add_model target)
   # parse inputs
-  set(multiValueArgs TYPES SOURCE_DIRS MODEL_DIRNAME)
+  set(multiValueArgs TYPES SOURCE_DIRS MODEL_DIRNAME EXTRA_LIBS)
   cmake_parse_arguments(QAM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_model")
@@ -21,6 +21,7 @@ function(quicc_add_model target)
     set(QAM_SOURCE_DIRS Model/)
   endif()
   message(DEBUG "QAM_SOURCE_DIRS: ${QAM_SOURCE_DIRS}")
+  message(DEBUG "QAM_EXTRA_LIBS: ${QAM_EXTRA_LIBS}")
 
   set(_model_dir "Models/${QAM_MODEL_DIRNAME}")
   string(TOLOWER "quicc_${QAM_MODEL_DIRNAME}" _model_lib)
@@ -40,6 +41,11 @@ function(quicc_add_model target)
   target_link_libraries(${_model_lib} PUBLIC
     QuICC::Framework
     )
+  foreach(_extra_lib ${QAM_EXTRA_LIBS})
+    target_link_libraries(${_model_lib} PUBLIC
+      ${_extra_lib}
+      )
+  endforeach()
 
   # Update python files
   add_custom_target(${_model_lib}_updatepy)

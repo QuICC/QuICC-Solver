@@ -47,7 +47,7 @@ namespace Model {
           *
           * @param spGen   Shared generator
           */
-         void setGeneratorState(std::shared_ptr<TState> spGen);
+         virtual void setGeneratorState(std::shared_ptr<TState> spGen);
 
       protected:
          /**
