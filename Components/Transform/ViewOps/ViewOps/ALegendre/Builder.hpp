@@ -42,7 +42,6 @@ template <class Tview, class TPolyBuilder, class Tdata>
 void builder(Tview opView, const Evector<Tdata>& grid,
    const Evector<Tdata>& weights, Evector<typename Tview::ScalarType>& scaling)
 {
-   Profiler::RegionStart<3>("ALegendre::Builder::computeA");
    using IndexType = typename Tview::IndexType;
 
    // L - harmonic degree index
@@ -93,8 +92,6 @@ void builder(Tview opView, const Evector<Tdata>& grid,
    {
       LIdx = 1;
    }
-   Profiler::RegionStop<3>("ALegendre::Builder::computeA");
-   Profiler::RegionStart<3>("ALegendre::Builder::computeB");
 
 #ifdef QUICC_USE_THREADPOOL
    auto& tp = QuICC::QuICCThreads();
@@ -196,7 +193,6 @@ void builder(Tview opView, const Evector<Tdata>& grid,
       task.wait();
    }
 #endif //QUICC_USE_THREADPOOL
-   Profiler::RegionStop<3>("ALegendre::Builder::computeB");
 }
 
 /// @brief convenience wrapper for common scalings
