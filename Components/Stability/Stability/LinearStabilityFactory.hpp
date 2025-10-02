@@ -55,8 +55,6 @@ protected:
     * @brief Add stability specific NonDimensional parameters
     */
    static void addParameters(std::vector<std::string>& ndNames);
-
-private:
 };
 
 template <class TModel>

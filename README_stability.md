@@ -1,7 +1,7 @@
 Linear stability solver
 =======================
 
-Th Stability component provides as simple linear stability solver to be used together with the C++ backend implementations of the Models.
+The Stability component provides as simple linear stability solver to be used together with the C++ backend implementations of the Models.
 The underlying generalized eigenvalue problem is solved using PETSc/SLEPc.
 
 General setup
