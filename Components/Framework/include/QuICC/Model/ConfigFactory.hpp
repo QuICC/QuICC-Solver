@@ -122,6 +122,6 @@ namespace QuICC {
       return spConfig;
    }
 
-}
+} // namespace QuICC
 
 #endif // QUICC_CONFIGFACTORY_HPP

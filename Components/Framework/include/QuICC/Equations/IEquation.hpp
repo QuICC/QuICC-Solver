@@ -91,7 +91,7 @@ namespace Equations {
          /**
           * @brief Get vector spectral component range
           */
-         virtual SpectralComponent_range spectralRange() const  = 0;
+         virtual SpectralComponent_range spectralRange() const = 0;
 
          /**
           * @brief Initialise the equation
