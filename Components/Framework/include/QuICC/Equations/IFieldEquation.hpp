@@ -1129,8 +1129,8 @@ namespace Equations {
 
          solStart = 0;
          solution = &tmp;
-
-      } else
+      }
+      else
       {
          solStart = start;
          solution = &storage;
@@ -1228,8 +1228,8 @@ namespace Equations {
             // increase linear storage counter
             k++;
          }
-
-      } else if(this->couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
+      }
+      else if(this->couplingInfo(compId).indexType() == CouplingIndexType::SINGLE)
       {
          assert(matIdx == 0);
 

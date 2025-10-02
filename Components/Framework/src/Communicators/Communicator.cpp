@@ -2,33 +2,16 @@
  * @file Communicator.cpp
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Communicators/Communicator.hpp"
-
 // Project includes
 //
+#include "QuICC/Communicators/Communicator.hpp"
 
 namespace QuICC {
 
 namespace Parallel {
-
-   Communicator::Communicator()
-   {
-   }
-
-   Communicator::~Communicator()
-   {
-   }
 
    void Communicator::init(const Dimensions::Transform::Id id, SharedFwdSetupType spSetupFwd, SharedBwdSetupType spSetupBwd)
    {
@@ -76,7 +59,8 @@ namespace Parallel {
       #endif
       this->converter(Dimensions::Transform::TRA1D).setup();
 
-      // DISABLE IS USING MLIR GRAPH transform
+
+      // Disable if using MLIR graph transform 
 #ifndef QUICC_USE_MLIR_GRAPH
       /////////////////////////////////////////////////////////////////////////////////
       // Initialise 1D/2D converter
@@ -177,5 +161,5 @@ namespace Parallel {
 #endif //QUICC_USE_MLIR_GRAPH
    }
 
-}
-}
+} // namespace Parallel
+} // namespace QuICC
