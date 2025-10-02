@@ -130,6 +130,13 @@ namespace Equations {
          virtual void setSrcKernel(Spectral::Kernel::SharedISpectralKernel spKernel);
          using IFieldEquation::setSrcKernel;
 
+         /**
+          * @brief Set unknown field to bad value
+          *
+          * @param compId  Component ID
+          */
+         void corruptUnknown(FieldComponents::Spectral::Id compId);
+
       protected:
          /**
           * @brief Get backward transform paths

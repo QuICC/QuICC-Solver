@@ -363,6 +363,9 @@ namespace Solver {
       DebuggerMacro_msg("Get solver solution for " + PhysicalNames::Coordinator::tag(id.first) + "(" + Tools::IdToHuman::toString(static_cast<FieldComponents::Spectral::Id>(id.second)) + ")", 6);
 
       // Get solver output
+#ifdef QUICC_DEBUG
+      spEq->corruptUnknown(id.second);
+#endif //QUICC_DEBUG
       for(std::size_t i = 0; i < (*solIt)->nSystem(); i++)
       {
          spEq->storeSolution(id.second, (*solIt)->solution(i), i, (*solIt)->startRow(id,i));
