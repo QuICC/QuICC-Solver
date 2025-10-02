@@ -583,9 +583,10 @@ namespace Transform {
             // variant 1: just renamed Overr2 operator
             
             transform.push_back(TransformPath(FieldComponents::Spectral::POL, FieldType::GRADIENT));
-            transform.back().addEdge(Backward::OverrSq::id()); 
-            //transform.back().addEdge(Backward::Overr2D1R1::id());  // test, memory error....
-            transform.back().addEdge(Backward::Laplh::id());
+            transform.back().addEdge(Backward::OverrSq::id());  // memory error....
+            //transform.back().addEdge(Backward::Overr1D1R1::id());  // test
+            transform.back().addEdge(Backward::Laplh::id()); // correct one
+            //transform.back().addEdge(Backward::D1OversinDphi::id()); // a test
             transform.back().addEdge(Backward::P::id(), pairId, Arithmetics::Add::id());
             
             

@@ -1,7 +1,6 @@
 /**
  * @file DivYSq.cpp
  * @brief Source of the implementation of the Chebyshev 1/R^2 projector
- * equivalent to DivY2
  */
 
 // System includes
