@@ -155,7 +155,7 @@ namespace LinearMap {
    {
       if(!op.isInitialized())
       {
-         op.init(this->mspSetup);
+         op.init(this->mspSetup, pF);
       }
 
       op.transform(rOut, in, pF);

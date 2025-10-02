@@ -57,6 +57,15 @@ namespace Reductor {
       this->mBackend.addSolver(1);
    }
 
+   void EnergyD1Y1::initBackendAnelastic(std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+   {
+      // Call parent initializer
+      IChebyshevEnergy::initBackendAnelastic(pF);
+
+      // Initialize the solver
+      this->mBackend.addSolver(1);
+   }
+
    void EnergyD1Y1::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
       this->mBackend.input(tmp, in);
@@ -74,6 +83,14 @@ namespace Reductor {
    void EnergyD1Y1::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
       this->mBackend.input(tmp, in, useReal);
+      
+      // clean input from overflow errors.
+      // Apparently not a problem in the Boussinesq case,
+      // -> we do it for the anelastic case
+      if(this->mBackend.getExtraSize() > 0)
+      {
+         tmp.bottomRows(tmp.rows()-this->mspSetup->specSize()).setZero();
+      }   
       auto specOp = this->mBackend.solver().getSpectralOperator();
       tmp.topRows(specOp.rows()) = specOp * tmp.topRows(specOp.cols());
       this->mBackend.getSolution(tmp, 1, 1);

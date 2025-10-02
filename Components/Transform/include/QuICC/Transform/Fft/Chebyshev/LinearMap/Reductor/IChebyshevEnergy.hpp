@@ -40,6 +40,10 @@ namespace Reductor {
    /**
     * @brief Interface for a generic Chebyshev FFT based energy reductor
     */
+   // Inheritance: IChebyshevEnergy
+   //                -> IChebyshevOperator
+   //                   -> IFftOperator
+   //                      -> ITransformOperator
    class IChebyshevEnergy: public IChebyshevOperator
    {
       public:
@@ -103,6 +107,8 @@ namespace Reductor {
           */
          virtual MHDFloat requiredStorage() const override;
 
+         int getExtraSize() const;
+
       protected:
          /**
           * @brief Initialise FFT backend
@@ -110,9 +116,17 @@ namespace Reductor {
          virtual void initBackend() const override;
 
          /**
+          * @brief Initialise FFT backend, anelastic overload
+          * @param pF   Shared pointer to radial profile
+          */
+         virtual void initBackendAnelastic(std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const override;
+
+         /**
           * @brief FFT backend
           */
          Backend::ChebyshevEnergy mBackend;
+
+         mutable int mExtraSize = 0;
 
       private:
          /**

@@ -23,6 +23,7 @@ set(tags
   Eta
   FastMean
   Gamma
+  GravityType
   GrowthRate
   Heating
   Iota
@@ -34,6 +35,7 @@ set(tags
   Lower2d
   Lower3d
   Lundquist
+  MagDiffType
   MagneticEkman
   MagneticPrandtl
   MagneticReynolds
@@ -58,6 +60,7 @@ set(tags
   Roberts
   Rossby
   Sigma
+  SimulationMode
   StabilityMode
   Sort
   Tau
