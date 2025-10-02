@@ -54,6 +54,16 @@ namespace Equations {
       return std::visit([](auto&& p)->const Resolution& {return p->dom(0).res();}, this->spUnknown());
    }
 
+   int IScalarEquation::nSpectral() const
+   {
+      return this->mRequirements.field(this->name()).spectralIds().size();
+   }
+
+   typename IScalarEquation::SpectralComponent_range IScalarEquation::spectralRange() const
+   {
+      return std::make_pair(this->mRequirements.field(this->name()).spectralIds().begin(), this->mRequirements.field(this->name()).spectralIds().end());
+   }
+
    void IScalarEquation::initSpectralMatrices()
    {
       // Make sure it is safe to do nothing

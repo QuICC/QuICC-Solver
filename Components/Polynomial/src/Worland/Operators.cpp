@@ -1,20 +1,14 @@
 /**
- * @file Tools.cpp
- * @brief Source of the tools for Jones-Worland polynomial implementation
+ * @file Operators.cpp
+ * @brief Source of the special operators for Jones-Worland polynomial implementation
  */
 
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Polynomial/Worland/Operators.hpp"
-
 // Project includes
 //
+#include "QuICC/Polynomial/Worland/Operators.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
 #include "QuICC/Polynomial/Worland/Wnl.hpp"
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
@@ -60,7 +54,7 @@ namespace Operators {
       iop = (volWeights.transpose()*tmp.transpose()*proj).cast<MHDFloat>().transpose();
    }
 
-}
-}
-}
-}
+} // namespace Operators
+} // namespace Worland
+} // namespace Polynomial
+} // namespace QuICC
