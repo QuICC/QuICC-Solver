@@ -5,6 +5,10 @@
 #     name/path of the model
 # TYPES
 #     list of model types
+# SOURCES_DIRS
+#     addition source directories
+# EXTRA_LIBS
+#     additional libraries to link to
 #
 function(quicc_add_model target)
   # parse inputs
