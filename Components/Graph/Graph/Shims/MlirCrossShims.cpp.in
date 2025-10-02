@@ -6,6 +6,7 @@
 #include "ViewOps/Pointwise/Pointwise.hpp"
 #include "ViewOps/Pointwise/Functors.hpp"
 #include "Graph/Types.hpp"
+#include "Profiler/Interface.hpp"
 
 
 using namespace QuICC::Graph;
@@ -33,6 +34,8 @@ extern "C" void _ciface_quiccir_cross_@Kind@_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D
     ViewDescriptor<double, std::uint32_t, 3>* pV2
     )
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirCrossShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_cross_@Kind@_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_cpu\n";
@@ -99,6 +102,8 @@ extern "C" void _ciface_quiccir_cross_@Kind@_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D
     ViewDescriptor<double, std::uint32_t, 3>* pV2
     )
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirCrossShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_cross_@Kind@_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_gpu\n";

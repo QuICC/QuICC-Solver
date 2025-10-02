@@ -9,6 +9,7 @@
 #include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/ALegendre/OpsBuilder.hpp"
 #include "ViewOps/ALegendre/OpsQuadrature.hpp"
+#include "Profiler/Interface.hpp"
 
 using namespace QuICC::Graph;
 
@@ -19,6 +20,8 @@ using namespace QuICC::Graph;
 /// @param uval
 extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_S1CLCSC3D(void* obj,  view3_cd_t* pUval, view3_cd_t* pUmod)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirALegendreprjShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_al_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_S1CLCSC3D\n";
@@ -49,6 +52,8 @@ extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_S1C
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
     {
+        QuICC::Profiler::RegionFixture<3> fixInit("MlirALegendreprjShims-init");
+
         /// dim 0 - Ntheta - colatitudinal points
         /// dim 1 - L  - harmonic degree
         /// dim 2 - M  - harmonic order
@@ -86,6 +91,8 @@ extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_S1C
 /// @param uval
 extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_S1CLCSC3DJIK(void* obj,  view3_cd_t* pUval, view3_cd_t* pUmod)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirALegendreprjShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_al_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_S1CLCSC3DJIK\n";
@@ -121,6 +128,8 @@ extern "C" void _ciface_quiccir_al_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
     {
+        QuICC::Profiler::RegionFixture<3> fixInit("MlirALegendreprjShims-init");
+
         /// dim 0 - Ntheta - colatitudinal points
         /// dim 1 - L  - harmonic degree
         /// dim 2 - M  - harmonic order

@@ -6,6 +6,7 @@
 #include "Graph/Types.hpp"
 #include "ViewOps/Pointwise/Functors.hpp"
 #include "ViewOps/Pointwise/Pointwise.hpp"
+#include "Profiler/Interface.hpp"
 
 
 using namespace QuICC::Graph;
@@ -30,6 +31,8 @@ _ciface_quiccir_dot_transport_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f6
    ViewDescriptor<double, std::uint32_t, 3>* pV1,
    ViewDescriptor<double, std::uint32_t, 3>* pV2)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirDotShims");
+
 #ifndef NDEBUG
    std::cout << "_ciface_quiccir_dot_transport_f64_DCCSC3D_f64_DCCSC3D_f64_"
                 "DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_cpu\n";
@@ -87,6 +90,8 @@ _ciface_quiccir_dot_transport_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f6
    ViewDescriptor<double, std::uint32_t, 3>* pV1,
    ViewDescriptor<double, std::uint32_t, 3>* pV2)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirDotShims");
+
 #ifndef NDEBUG
    std::cout << "_ciface_quiccir_dot_transport_f64_DCCSC3D_f64_DCCSC3D_f64_"
                 "DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_f64_DCCSC3D_gpu\n";
