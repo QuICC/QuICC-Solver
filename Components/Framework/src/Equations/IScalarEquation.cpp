@@ -204,5 +204,17 @@ namespace Equations {
    {
       this->setSrcKernel(FieldComponents::Spectral::SCALAR, spKernel);
    }
+
+   void IScalarEquation::corruptUnknown(FieldComponents::Spectral::Id compId)
+   {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
+      std::visit(
+            [&](auto&& p)
+            {
+               p->rDom(0).rPerturbation().rComp(compId).rData().setConstant(42.42);
+            }, this->spUnknown());
+   }
 } // Equations
 } // QuICC

@@ -119,6 +119,13 @@ namespace Equations {
           */
          virtual std::vector<Transform::TransformPath> backwardPaths() override;
 
+         /**
+          * @brief Set unknown field to bad value
+          *
+          * @param compId  Component ID
+          */
+         void corruptUnknown(FieldComponents::Spectral::Id compId);
+
       protected:
          /**
           * @brief Get backward transform paths

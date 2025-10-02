@@ -6,15 +6,9 @@
 #ifndef QUICC_PARALLEL_COMMUNICATOR_HPP
 #define QUICC_PARALLEL_COMMUNICATOR_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -48,12 +42,12 @@ namespace Parallel {
          /**
          * @brief Constructor
          */
-         Communicator();
+         Communicator() = default;
 
          /**
          * @brief Destructor
          */
-         ~Communicator();
+         ~Communicator() = default;
 
          /**
           * @brief Initialise the communicator for given dimension
