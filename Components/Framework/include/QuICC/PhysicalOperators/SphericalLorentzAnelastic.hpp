@@ -65,6 +65,21 @@ namespace Physical {
                          const QuICC::Equations::EquationParameters &eqParams,
                          const MHDFloat c = 1.0);
 
+         /**
+          * @brief Add Lorentz term to S
+          */
+         static void test(Framework::Selector::PhysicalScalarField &rS, 
+                         FieldComponents::Physical::Id compId, 
+                         const Resolution& res, 
+                         const Array& r, 
+                         const Array& thGrid,    // Add theta grid
+                         const Array& phGrid,    // Add phi grid 
+                         const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
+                         const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
+                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                         const QuICC::Equations::EquationParameters &eqParams,
+                         const MHDFloat c = 1.0);
+
       protected:
 
       private:
