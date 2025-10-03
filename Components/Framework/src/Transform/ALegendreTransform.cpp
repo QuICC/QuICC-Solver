@@ -55,6 +55,7 @@
 
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/Laplh.hpp"
+#include "QuICC/Transform/Backward/LaplhD0.hpp"
 #include "QuICC/Transform/Backward/D1.hpp"
 #include "QuICC/Transform/Backward/D2.hpp"
 #include "QuICC/Transform/Backward/D1Laplh.hpp"
@@ -106,6 +107,7 @@ namespace Transform {
 #endif
       this->mImpl.addOperator<Poly::ALegendre::Projector::P<backend_t>>(Backward::P::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::Ll<backend_t>>(Backward::Laplh::id());
+      this->mImpl.addOperator<Poly::ALegendre::Projector::Ll<backend_t>>(Backward::LaplhD0::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::D1<backend_t>>(Backward::D1::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::D2<backend_t>>(Backward::D2::id());
       this->mImpl.addOperator<Poly::ALegendre::Projector::LlD1<backend_t>>(Backward::D1Laplh::id());

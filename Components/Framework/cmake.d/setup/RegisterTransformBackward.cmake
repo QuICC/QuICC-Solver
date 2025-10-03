@@ -10,13 +10,16 @@ set(tags
   DfLaplh
   DsLaplh
   Laplh
+  LaplhD0
   LaplhZOverr1D1R1
   P
   P0
   Overr1
+  Overr1D0
   Overr1D1
   Overr1D1R1
   Overr2D1R1
+  OverrSqD1R1
   Overr1D2R1
   Overr1LaplhPm
   Overr1Pm

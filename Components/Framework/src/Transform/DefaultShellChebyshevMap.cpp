@@ -52,6 +52,7 @@
 
 #include "QuICC/Transform/Backward/P.hpp"
 #include "QuICC/Transform/Backward/Overr1.hpp"
+#include "QuICC/Transform/Backward/Overr1D0.hpp" // equivalent to the above
 #include "QuICC/Transform/Backward/Overr2.hpp"
 #include "QuICC/Transform/Backward/OverrSq.hpp" // equivalent to the above
 #include "QuICC/Transform/Backward/D1.hpp"
@@ -59,7 +60,8 @@
 #include "QuICC/Transform/Backward/D2.hpp"
 #include "QuICC/Transform/Backward/Overr1D1.hpp"
 #include "QuICC/Transform/Backward/Overr1D1R1.hpp"
-#include "QuICC/Transform/Backward/Overr2D1R1.hpp"
+#include "QuICC/Transform/Backward/Overr2D1R1.hpp" 
+#include "QuICC/Transform/Backward/OverrSqD1R1.hpp" // equivalent to the above
 #include "QuICC/Transform/Backward/Overr1D2R1.hpp"
 #include "QuICC/Transform/Backward/Slaplr.hpp"
 
@@ -80,6 +82,7 @@ namespace Transform {
       // Create projectors
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::P>(m, Backward::P::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1>(m, Backward::Overr1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1>(m, Backward::Overr1D0::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2>(m, Backward::Overr2::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivYSq>(m, Backward::OverrSq::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::D1>(m, Backward::D1::id());
@@ -88,6 +91,7 @@ namespace Transform {
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D1Y1>(m, Backward::Overr1D1R1::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D1>(m, Backward::Overr1D1::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2D1Y1>(m, Backward::Overr2D1R1::id());
+      this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2D1Y1>(m, Backward::OverrSqD1R1::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::SphRadLapl>(m, Backward::Slaplr::id());
       this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D2Y1>(m, Backward::Overr1D2R1::id());
 
