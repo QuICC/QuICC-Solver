@@ -65,7 +65,6 @@ public:
     */
    virtual Array evaluateDiff(const int p, const Internal::Array& r, const int l,
       const int m, const Internal::MHDFloat lb, const Internal::MHDFloat ub) const;
-
 protected:
 private:
 };

@@ -28,11 +28,13 @@ namespace Variable {
 ISphericalTorPolEnergyBaseWriter::ISphericalTorPolEnergyBaseWriter(
    std::string name, std::string ext, std::string header, std::string type,
    std::string version, const Dimensions::Space::Id id,
-   const IAsciiWriter::WriteMode mode) :
+   const IAsciiWriter::WriteMode mode,
+   std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF) :
     IVariableAsciiWriter(name, ext, header, type, version, id, mode),
     mHasMOrdering(false),
     mVolume(std::numeric_limits<MHDFloat>::quiet_NaN()),
-    mShowParity(false)
+    mShowParity(false),
+    mpF(pF)
 {
    // Set default path
    this->setTransformPath(Transform::Path::TorPol::id());
@@ -122,9 +124,19 @@ void ISphericalTorPolEnergyBaseWriter::compute(
    spectrum.resize(
       std::visit([](auto&& p) -> int { return p->data().cols(); }, pInVarTor),
       1);
-   std::visit([&](auto&& p)
-      { coord.transform1D().reduce(spectrum, p->data(), torEnergyR2Id); },
-      pInVarTor);
+
+   if (mpF.empty())
+   {
+      std::visit([&](auto&& p)
+         { coord.transform1D().reduce(spectrum, p->data(), torEnergyR2Id); },
+         pInVarTor);
+   }
+   else
+   {
+      std::visit([&](auto&& p)
+         { coord.transform1D().reduce(spectrum, p->data(), torEnergyR2Id, mpF[0]); },
+         pInVarTor);
+   }
 
    this->resetEnergy();
 
@@ -200,9 +212,19 @@ void ISphericalTorPolEnergyBaseWriter::compute(
    spectrum.resize(
       std::visit([](auto&& p) -> int { return p->data().cols(); }, pInVarPolQ),
       1);
-   std::visit([&](auto&& p)
-      { coord.transform1D().reduce(spectrum, p->data(), polEnergyId); },
-      pInVarPolQ);
+
+   if (mpF.empty())
+   {
+      std::visit([&](auto&& p)
+         { coord.transform1D().reduce(spectrum, p->data(), polEnergyId); },
+         pInVarPolQ);
+   }
+   else
+   {
+      std::visit([&](auto&& p)
+         { coord.transform1D().reduce(spectrum, p->data(), polEnergyId, mpF[0]); },
+         pInVarPolQ);
+   }
 
    // Compute energy in Q component of QST decomposition
    idx = 0;
@@ -272,9 +294,19 @@ void ISphericalTorPolEnergyBaseWriter::compute(
    spectrum.resize(
       std::visit([](auto&& p) -> int { return p->data().cols(); }, pInVarPolS),
       1);
-   std::visit([&](auto&& p)
+   if (mpF.empty())
+   {
+      std::visit([&](auto&& p)
       { coord.transform1D().reduce(spectrum, p->data(), polEnergyD1R1Id); },
       pInVarPolS);
+   }
+   else
+   {
+      std::visit([&](auto&& p)
+      { coord.transform1D().reduce(spectrum, p->data(), polEnergyD1R1Id, mpF[0]); },
+      pInVarPolS);
+   }
+   
 
    // Compute energy in S component of QST decomposition
    idx = 0;

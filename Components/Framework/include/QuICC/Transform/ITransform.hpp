@@ -26,6 +26,7 @@
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -141,6 +142,20 @@ namespace Transform {
           * @param in   Real input values
           */
          virtual void reduce(MatrixZ& rOut, const Matrix& in, const std::size_t id) = 0;
+
+         /**
+          * @brief Compute reduction transform
+          * 
+          * Overloaded to accept a shared pointer to a (e.g. radial) profile, pF
+          *
+          * @param rOut Real output values
+          * @param in   Complex input values
+          * @param pF   Shared pointer to the profile
+          */
+         virtual void reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+         {
+            this->reduce(rOut, in, id);
+         }
 
          /**
           * @brief Compute reduction transform

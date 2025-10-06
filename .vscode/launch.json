@@ -1,0 +1,32 @@
+{
+      // Use IntelliSense to learn about possible attributes.
+      // Hover to view descriptions of existing attributes.
+      // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+      "version": "0.2.0",
+      "configurations": [
+
+          {
+              "type": "by-gdb",
+              "request": "launch",
+              "name": "Launch(gdb)",
+              //"program": "${fileBasenameNoExtension}",
+              
+              // For the nonlinear model
+              //"program": "/QuICC/QuICC-Solver/build_NL_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCImplicitModel",
+              //"program": "/QuICC/QuICC-Solver/build_NL_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCExplicitModel",
+              "program": "/QuICC/QuICC-Solver/build_NL_shell_dynamo_debug/Models/BoussinesqShellDynamo/Executables/BoussinesqShellDynamoExplicitModel",
+              //"program": "/QuICC/QuICC-Solver/build_NL_sphere_dynamo_debug/Models/BoussinesqSphereDynamo/Executables/BoussinesqSphereDynamoImplicitModel",
+              //"program": "/QuICC/QuICC-Solver/build_NL_sphere_dynamo_debug/Models/BoussinesqSphereDynamo/Executables/BoussinesqSphereDynamoExplicitModel",
+              
+              //"cwd": "/QuICC/AnelasticShellRTC/debug/nonlinear/implicit/"
+              //"cwd": "/QuICC/AnelasticShellRTC/debug/nonlinear/explicit/serial/"
+              "cwd": "/QuICC/BoussinesqShellDynamo/debug/nonlinear/explicit/serial/"
+              //"cwd": "/QuICC/BoussinesqSphereDynamo/debug/nonlinear/implicit/"
+              //"cwd": "/QuICC/BoussinesqSphereDynamo/debug/nonlinear/explicit/"
+              
+              // for the linear model
+              //"program": "/QuICC/QuICC_newDenseSM/build_stability_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCImplicitStability",
+              //"cwd": "/QuICC/AnelasticShellRTC/debug/stability/"
+          }
+      ]
+  }

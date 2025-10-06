@@ -19,9 +19,11 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ISphericalTorPolLSpectrumWriter.cpp
   ISphericalTorPolMSpectrumWriter.cpp
   ISphericalTorPolModeSpectrumWriter.cpp
+  ISphericalTorPolNScalarSpectrumWriter.cpp
   ISphericalTorPolNSpectrumWriter.cpp
   ISphericalTorPolRSpectrumWriter.cpp
   ISphericalTorPolPowerBaseWriter.cpp
+  ISphericalTorPolScalarSpectrumBaseWriter.cpp
   ISphericalTorPolEnstrophyBaseWriter.cpp
   ISphericalTorPolEnstrophyWriter.cpp
   ISphericalTorPolEnstrophyLSpectrumWriter.cpp
@@ -29,14 +31,18 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   IVariableAsciiWriter.cpp
   IVariableHdf5NWriter.cpp
   IVariableHdf5Reader.cpp
+  ShellAngularMomentumWriter.cpp
   ShellNusseltWriter.cpp
   ShellDipolarityWriter.cpp
+  ShellLuminosityWriter.cpp
   ShellScalarEnergyWriter.cpp
+  ShellScalarNSpectrumWriter.cpp
   ShellScalarLSpectrumWriter.cpp
   ShellScalarMSpectrumWriter.cpp
   ShellScalarModeSpectrumWriter.cpp
   ShellScalarRSpectrumWriter.cpp
   ShellTorPolEnergyWriter.cpp
+  ShellTorPolNScalarSpectrumWriter.cpp
   ShellTorPolLSpectrumWriter.cpp
   ShellTorPolMSpectrumWriter.cpp
   ShellTorPolModeSpectrumWriter.cpp

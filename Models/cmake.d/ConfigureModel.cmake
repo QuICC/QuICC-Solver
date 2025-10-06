@@ -44,6 +44,7 @@ function(quicc_add_model target)
     )
   target_link_libraries(${_model_lib} PUBLIC
     QuICC::Framework
+    QuICC::DenseSM
     )
   foreach(_extra_lib ${QAM_EXTRA_LIBS})
     target_link_libraries(${_model_lib} PUBLIC

@@ -7,6 +7,8 @@
 //
 #include <cassert>
 #include <stdexcept>
+#include <iostream>
+
 
 // Project includes
 //
@@ -62,6 +64,12 @@ namespace Transform {
    void ShellChebyshevTransform::reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id)
    {
       this->mImpl.transform(rOut, in, id);
+   }
+
+   // overload for the anelastic case
+   void ShellChebyshevTransform::reduce(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   {
+      this->mImpl.transform(rOut, in, id, pF);
    }
 
    //

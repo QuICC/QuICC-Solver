@@ -23,10 +23,10 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-
+// anelastic case: pF needs to be an array of pointers to DenseSM profiles with one element (density)
 ShellTorPolMSpectrumWriter::ShellTorPolMSpectrumWriter(
-   const std::string& prefix, const std::string& type) :
-    ISphericalTorPolMSpectrumWriter(prefix, type)
+   const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF) :
+    ISphericalTorPolMSpectrumWriter(prefix, type, pF)
 {}
 
 void ShellTorPolMSpectrumWriter::init()

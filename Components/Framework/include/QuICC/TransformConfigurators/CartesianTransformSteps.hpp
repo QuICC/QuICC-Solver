@@ -76,6 +76,9 @@ namespace QuICC {
              */
             virtual std::vector<TransformPath>  backwardGradient(const PhysPathId& req) const override;
 
+            // tensor form of the gradient of a vector
+            virtual std::vector<TransformPath>  backwardGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req) const;
+
             /**
              * @brief Generate the list of branches in scalar 2nd order gradient transform
              */

@@ -102,6 +102,12 @@ namespace Fftw {
           */
          virtual Matrix& getStorage(const StorageKind = StorageKind::in) const;
 
+         /*
+         void setExtraSize(int extraSize) const;
+         
+         int getExtraSize() const;
+         */
+
       protected:
          /**
           * @brief Spec size
@@ -127,6 +133,8 @@ namespace Fftw {
           * @brief Temporary data for component wise operations
           */
          mutable Matrix  mTmpComp;
+
+         mutable int mExtraSize = 0;
 
       private:
    };

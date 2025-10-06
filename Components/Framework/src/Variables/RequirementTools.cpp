@@ -92,12 +92,28 @@ namespace QuICC {
                if(infoIt->second.isScalar())
                {
                   std::visit([&](auto&& p){p->initPhysicalGradient(FieldComponents::Spectral::SCALAR, infoIt->second.mapGradientComps(FieldComponents::Spectral::SCALAR));}, rScalarVars.at(infoIt->first));
-               } else
+               } else // is vector
                {
-                  for(auto it = infoIt->second.spectralIds().cbegin(); it != infoIt->second.spectralIds().cend(); ++it)
+                  // tensor form of gradient
+                  //if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad(true));}, rVectorVars.at(infoIt->first)))
+                  //if(std::visit([&](auto&& p)->bool{
+                     // Check if tensor gradient was enabled and the field is initialized
+                  //   return p->dom(0).hasGrad(true) ||  (infoIt->second.needTensorGradient()); }, rVectorVars.at(infoIt->first))) 
+                  
+                  if(infoIt->second.needTensorGradient()) 
                   {
-                     std::visit([&](auto&& p){p->initPhysicalGradient(*it, infoIt->second.mapGradientComps(*it));}, rVectorVars.at(infoIt->first));
+                     std::visit([&](auto&& p){p->initPhysicalGradient(infoIt->second.mapGradientComps());}, rVectorVars.at(infoIt->first));
                   }
+                  // vector form of gradient
+                  //if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad(false));}, rVectorVars.at(infoIt->first)))
+                  else
+                  { 
+                     for(auto it = infoIt->second.spectralIds().cbegin(); it != infoIt->second.spectralIds().cend(); ++it)
+                     {
+                        std::visit([&](auto&& p){p->initPhysicalGradient(*it, infoIt->second.mapGradientComps(*it));}, rVectorVars.at(infoIt->first));
+                     }
+                  }
+                  
                }
             }
 
@@ -465,7 +481,8 @@ namespace QuICC {
          paths.insert(paths.end(), branches.begin(), branches.end());
       }
 
-      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad());}, spVector))
+      // vector form
+      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad(false));}, spVector))
       {
          auto specMap = std::visit([&](auto&& p)->std::map<FieldComponents::Spectral::Id,bool>{return (p->dom(0).perturbation().enabled());}, spVector);
          for(auto it = specMap.begin(); it != specMap.end(); ++it)
@@ -481,6 +498,13 @@ namespace QuICC {
                paths.insert(paths.end(), b.begin(), b.end());
             }
          }
+      }
+      // tensor form
+      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad(true));}, spVector))
+      {
+         auto compsMap = std::visit([&](auto&& p)->std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>{return (p->dom(0).grad().enabled());}, spVector);
+         auto b = spSteps->backwardGradient(compsMap);
+         paths.insert(paths.end(),b.begin(), b.end());
       }
 
 //      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad2());}, spVector))
