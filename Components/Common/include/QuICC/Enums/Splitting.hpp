@@ -66,6 +66,8 @@ namespace QuICC {
             TUBULAR,
             /// Single load splitting on slowest direction on first transform
             COUPLED2D,
+            /// Load splitting using KaHIP graph library
+            KAHIP,
          };
       };
 

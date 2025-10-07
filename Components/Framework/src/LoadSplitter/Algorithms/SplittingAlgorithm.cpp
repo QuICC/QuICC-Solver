@@ -362,6 +362,7 @@ namespace Parallel {
 
          for(it = loads.at(d).begin(); it != loads.at(d).end(); it++)
          {
+            std::cerr << it->second << std::endl;
             perCpu(it->first) += it->second;
             optimal += it->second;
          }

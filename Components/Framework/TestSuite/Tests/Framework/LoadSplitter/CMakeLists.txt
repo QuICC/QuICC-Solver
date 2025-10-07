@@ -142,6 +142,36 @@ foreach(_test ${_tests})
   endforeach()
 endforeach()
 
+# KaHIP tests
+set(_alg "kahip")
+set(_db 106)
+foreach(_test ${_tests})
+  foreach(_st 0 1 2 3)
+    foreach(_np 6 128 288)
+      quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Scheme
+        OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} checkRanks
+      )
+    endforeach()
+  endforeach()
+endforeach()
+
+# KaHIP tests 2**8
+set(_alg "kahip")
+set(_db 108)
+foreach(_test ${_tests})
+  foreach(_st 0 1 2)
+    foreach(_np 144)
+      quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Scheme
+        OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} checkRanks
+      )
+    endforeach()
+  endforeach()
+endforeach()
+
 # Full decomposition tests for single1d
 set(_alg "single1d")
 set(_db 106)
@@ -172,6 +202,20 @@ endforeach()
 
 # Full decomposition tests for tubular
 set(_alg "tubular")
+set(_db 106)
+set(_np 36)
+foreach(_test ${_tests})
+  foreach(_st 0 1 2 3)
+    quicc_add_test(${_test}
+      COMMAND ${TestExe}
+      KEYWORD Scheme
+      OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} id:${_np}
+    )
+  endforeach()
+endforeach()
+
+# Full decomposition tests for KaHIP
+set(_alg "kahip")
 set(_db 106)
 set(_np 36)
 foreach(_test ${_tests})
@@ -281,6 +325,38 @@ foreach(_test ${_tests})
   endforeach()
 endforeach()
 
+# KaHIP tests
+set(_alg "kahip")
+set(_db 106)
+foreach(_test ${_tests})
+  foreach(_st 0 3)
+    foreach(_np 6 128 288)
+      quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Scheme
+        OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} truncation:triangular checkRanks
+        DISABLED ${_dis}
+      )
+    endforeach()
+  endforeach()
+endforeach()
+
+# KaHIP tests 2**8
+set(_alg "kahip")
+set(_db 108)
+foreach(_test ${_tests})
+  foreach(_st 0)
+    foreach(_np 144)
+      quicc_add_test(${_test}
+        COMMAND ${TestExe}
+        KEYWORD Scheme
+        OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} truncation:triangular checkRanks
+        DISABLED ${_dis}
+      )
+    endforeach()
+  endforeach()
+endforeach()
+
 # Full decomposition tests for single1d
 set(_alg "single1d")
 set(_db 106)
@@ -313,6 +389,21 @@ endforeach()
 
 # Full decomposition tests for tubular
 set(_alg "tubular")
+set(_db 106)
+set(_np 36)
+foreach(_test ${_tests})
+  foreach(_st 0 3)
+    quicc_add_test(${_test}
+      COMMAND ${TestExe}
+      KEYWORD Scheme
+      OPTIONS algorithm:${_alg} np:${_np} db:${_db} stage:${_st} id:${_np} truncation:triangular
+      DISABLED ${_dis}
+    )
+  endforeach()
+endforeach()
+
+# Full decomposition tests for KaHIP
+set(_alg "kahip")
 set(_db 106)
 set(_np 36)
 foreach(_test ${_tests})

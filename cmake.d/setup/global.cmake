@@ -242,4 +242,6 @@ else()
   message(STATUS "SLEPc was not found. Stability solver will not be available.")
 endif()
 
+find_package(KaHIP)
+
 list(POP_BACK CMAKE_MESSAGE_INDENT)

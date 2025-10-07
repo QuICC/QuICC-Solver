@@ -86,6 +86,16 @@ namespace QuICC {
          typedef BackwardTubularConfigurator  BwdConfigType;
       };
 
+      /// Transform configurator selector specialised for KAHIP case
+      template <> struct ConfigSelector<Splitting::Algorithms::KAHIP>
+      {
+         /// Typedef for forward configurator
+         typedef ForwardTubularConfigurator   FwdConfigType;
+
+         /// Typedef for forward configurator
+         typedef BackwardTubularConfigurator  BwdConfigType;
+      };
+
       /// Transform configurator selector specialised for COUPLED2D case
       template <> struct ConfigSelector<Splitting::Algorithms::COUPLED2D>
       {
@@ -182,6 +192,9 @@ namespace QuICC {
          } else if(dims == 3 && algo == Splitting::Algorithms::TUBULAR)
          {
             setGrouper<TGroup,Splitting::Algorithms::TUBULAR>(spFwdGrouper, spBwdGrouper);
+         } else if(dims == 3 && algo == Splitting::Algorithms::KAHIP)
+         {
+            setGrouper<TGroup,Splitting::Algorithms::KAHIP>(spFwdGrouper, spBwdGrouper);
          } else if(dims == 3 && algo == Splitting::Algorithms::COUPLED2D)
          {
             setGrouper<TGroup,Splitting::Algorithms::COUPLED2D>(spFwdGrouper, spBwdGrouper);

@@ -55,6 +55,17 @@ namespace SpatialScheme {
          virtual int fillIndexes(const Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, std::vector<std::vector<int> >& idx2D, std::vector<int>& idx3D, const std::vector<int>& id, const std::vector<int>& bins) override;
 
          /**
+          * @brief Create 1D indexes
+          *
+          * @param transId Transform ID
+          * @param fwd1D   Storage for forward indexes of first dimension
+          * @param bwd1D   Storage for backward indexes of first dimension
+          * @param idx2D   Storage for the indexes of second dimension
+          * @param idx3D   Storage for forward indexes of third dimension
+          */
+         virtual int fillIndexes1D(const Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, const std::vector<std::vector<int> >& idx2D, const std::vector<int>& idx3D) override;
+
+         /**
           * @brief Get total of splittable indexes
           *
           * @param transId Transform ID

@@ -69,6 +69,21 @@ namespace SpatialScheme {
       return status;
    }
 
+   int I3DBuilder::fillIndexes1D(const Dimensions::Transform::Id transId, std::vector<std::vector<std::vector<int> > >& fwd1D, std::vector<std::vector<std::vector<int> > >& bwd1D, const std::vector<std::vector<int>>& idx2D, const std::vector<int>& idx3D)
+   {
+      // Make sure we start with empty indexes
+      fwd1D.clear();
+      bwd1D.clear();
+
+      // Truncation tools
+      auto spTools = this->truncationTools(transId);
+
+      // Fill indexes for 1D
+      spTools->fillIndexes1D(fwd1D, bwd1D, idx2D, idx3D, this->dim(transId, Dimensions::Data::DATF1D), this->dim(transId, Dimensions::Data::DATB1D));
+
+      return 0;
+   }
+
    int I3DBuilder::splittableTotal(const Dimensions::Transform::Id transId, Splitting::Locations::Id flag)
    {
       auto spTools = this->truncationTools(transId);

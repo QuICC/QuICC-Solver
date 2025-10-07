@@ -52,6 +52,10 @@ namespace Splitting {
       {
          return Algorithms::TUBULAR;
       }
+      else if(tag == "kahip")
+      {
+         return Algorithms::KAHIP;
+      }
       else if(tag == "coupled2d")
       {
          return Algorithms::COUPLED2D;
