@@ -1,2 +1,0 @@
-State file {#pManStateFile}
-==========

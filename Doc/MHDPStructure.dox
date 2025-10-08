@@ -1,9 +1,0 @@
-/** \page mhdPStructure Structure
- *
- * <center>
- * | \subpage mhdPStrSimulation |
- *   \subpage mhdPStrInitial |
- *   \subpage mhdPStrVisualize |
- *   \subpage mhdPStrConfig |
- * </center>
- */
