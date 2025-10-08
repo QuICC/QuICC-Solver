@@ -34,15 +34,7 @@ namespace LinearMap {
 
 namespace Projector {
 
-   DivY1D2Y1::DivY1D2Y1()
-   {
-   }
-
-   DivY1D2Y1::~DivY1D2Y1()
-   {
-   }
-
-   void DivY1D2Y1::initOperator() const
+   void DivY1D2Y1<base_t>::initOperator() const
    {
       // Check for division by 0!
       assert(this->mspSetup->lower() > 0.0 || this->mspSetup->upper() < 0.0);
@@ -59,16 +51,16 @@ namespace Projector {
       this->mBackend.setScaler(igrid.array().pow(-2).cast<MHDFloat>().matrix());
    }
 
-   void DivY1D2Y1::initBackend() const
+   void DivY1D2Y1<base_t>::initBackend() const
    {
       // Call parent initializer
-      IChebyshevProjector::initBackend();
+      ILinearMapProjector::initBackend();
 
       // Initialize the solver
       this->mBackend.addSolver(2);
    }
 
-   void DivY1D2Y1::applyPreOperator(Matrix& tmp, const Matrix& in) const
+   void DivY1D2Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
       this->mBackend.input(tmp, in, 1);
       this->mBackend.getSolution(tmp, 3, -1, true);
@@ -77,12 +69,12 @@ namespace Projector {
       this->mBackend.getSolution(tmp, 1, 2);
    }
 
-   void DivY1D2Y1::applyPostOperator(Matrix& rOut) const
+   void DivY1D2Y1<base_t>::applyPostOperator(Matrix& rOut) const
    {
       this->mBackend.outputScale(rOut);
    }
 
-   void DivY1D2Y1::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
+   void DivY1D2Y1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
       this->mBackend.input(tmp, in, 1, useReal);
       this->mBackend.getSolution(tmp, 3, -1, true);
@@ -91,7 +83,7 @@ namespace Projector {
       this->mBackend.getSolution(tmp, 1, 2);
    }
 
-   void DivY1D2Y1::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void DivY1D2Y1<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
       this->mBackend.outputScale(rOut, tmp, useReal);
    }

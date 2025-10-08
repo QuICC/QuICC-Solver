@@ -13,7 +13,7 @@
 
 // Project includes
 //
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/D2Y1.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/Base/D2Y1.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Y1.hpp"
 
@@ -29,9 +29,9 @@ namespace LinearMap {
 
 namespace Projector {
 
-   void D2Y1::initOperator() const
+   void D2Y1<base_t>::initOperator() const
    {
-      // We want to find y from D2Y1 x = y
+      // We want to find y from D2Y1<base_t> x = y
       // To solve this: I2D2 (Y1 x) = I2 y, where I2D2=identity with 2 zero rows.
       // Y1 x = I2 y can be inverted for y
       //
@@ -51,16 +51,16 @@ namespace Projector {
       this->mBackend.solver().setSpectralOperator(opY1.mat(), 2);
    }
 
-   void D2Y1::initBackend() const
+   void D2Y1<base_t>::initBackend() const
    {
       // Call parent initializer
-      IChebyshevProjector::initBackend();
+      ILinearMapProjector::initBackend();
 
       // Initialize the solver
       this->mBackend.addSolver(1); // I2 has size N+1
    }
 
-   void D2Y1::applyPreOperator(Matrix& tmp, const Matrix& in) const
+   void D2Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
       this->mBackend.input(tmp, in);
       auto specOp = this->mBackend.solver().getSpectralOperator();
@@ -69,11 +69,11 @@ namespace Projector {
                                              // 1 extra modes
    }
 
-   void D2Y1::applyPostOperator(Matrix&) const
+   void D2Y1<base_t>::applyPostOperator(Matrix&) const
    {
    }
 
-   void D2Y1::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
+   void D2Y1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
       this->mBackend.input(tmp, in, useReal);
       auto specOp = this->mBackend.solver().getSpectralOperator();
@@ -82,7 +82,7 @@ namespace Projector {
                                              // 1 extra mode
    }
 
-   void D2Y1::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void D2Y1<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
       this->mBackend.output(rOut, tmp, useReal);
    }

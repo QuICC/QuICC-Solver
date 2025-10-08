@@ -44,7 +44,6 @@
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY2D1Y1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY1D2Y1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY2.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivYSq.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/P.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/SphRadLapl.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Energy.hpp"
@@ -100,7 +99,7 @@ void DefaultShellChebyshevMap::operator()(MapType& m) const
       Backward::Overr1D0::id());
    this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2<backend_t>>(m,
       Backward::Overr2::id());
-   this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivYSq<backend_t>>(m,
+   this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2<backend_t>>(m,
       Backward::OverrSq::id());
    this->addOperator<Fft::Chebyshev::LinearMap::Projector::D1<backend_t>>(m,
       Backward::D1::id());
@@ -111,14 +110,14 @@ void DefaultShellChebyshevMap::operator()(MapType& m) const
    this
       ->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D1Y1<backend_t>>(
          m, Backward::Overr1D1R1::id());
-   this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D1>(m, 
+   this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D1<backend_t>>(m, 
       Backward::Overr1D1::id());
-   this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2D1Y1>(m, 
+   this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2D1Y1<backend_t>>(m, 
       Backward::Overr2D1R1::id());
    this->addOperator<
       Fft::Chebyshev::LinearMap::Projector::SphRadLapl<backend_t>>(m,
       Backward::Slaplr::id());
-   this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D2Y1>(m, 
+   this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY1D2Y1<backend_t>>(m, 
       Backward::Overr1D2R1::id());
 
    // Create integrators

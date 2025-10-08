@@ -35,7 +35,21 @@ namespace Io {
 namespace Variable {
 
    ShellAngularMomentumWriter::ShellAngularMomentumWriter(const std::string& prefix, const std::string& type)
-      : IVariableAsciiWriter(prefix + Tags::AngularMomentum::BASENAME, Tags::AngularMomentum::EXTENSION, prefix + Tags::AngularMomentum::HEADER, type, Tags::AngularMomentum::VERSION, Dimensions::Space::SPECTRAL, EXTEND), mHasMOrdering(false), mHasM0(false), mHasM1(false), mM0j(-1), mM0k(-1), mM1j(-1), mM1k(-1), mMomentum(3)
+      : IVariableAsciiWriter(prefix + Tags::AngularMomentum::BASENAME, 
+                             Tags::AngularMomentum::EXTENSION, 
+                             prefix + Tags::AngularMomentum::HEADER, 
+                             type, 
+                             Tags::AngularMomentum::VERSION, 
+                             Dimensions::Space::SPECTRAL, 
+                             EXTEND), 
+         mHasMOrdering(false), 
+         mHasM0(false), 
+         mHasM1(false), 
+         mM0j(-1), 
+         mM0k(-1), 
+         mM1j(-1), 
+         mM1k(-1), 
+         mMomentum(3)
    {
    }
 

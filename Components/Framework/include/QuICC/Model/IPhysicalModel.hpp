@@ -95,11 +95,11 @@ namespace Model {
          /**
           * @brief Interface to adding ASCII output file (anelastic case)
           */
-         template <typename T> void enableAsciiFile(const std::string tag, 
-                                                    const std::string prefix, 
-                                                    const std::size_t id, 
-                                                    std::shared_ptr<TSim> spSim,
-                                                    std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF);
+         template <typename T, typename TApp> std::shared_ptr<T> enableAsciiFile(const std::string tag, 
+                                                                                 const std::string prefix, 
+                                                                                 const std::size_t id, 
+                                                                                 std::shared_ptr<TApp> spSim,
+                                                                                 std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF);
       protected:
          /**
           * @brief Register Named IDs needed for simulation
@@ -140,11 +140,11 @@ namespace Model {
 
    // anelastic case overload:
    // this version accepts a vector of pointers to DenseSM profiles
-   template <typename TSim, typename TState, typename TVis> template <typename T> void IPhysicalModel<TSim,TState,TVis>::enableAsciiFile(const std::string tag, 
-                                                                                                                                         const std::string prefix, 
-                                                                                                                                         const std::size_t id, 
-                                                                                                                                         std::shared_ptr<TSim> spSim,
-                                                                                                                                         std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
+   template <typename T, typename TApp> std::shared_ptr<T> IPhysicalModel::enableAsciiFile(const std::string tag, 
+                                                                                           const std::string prefix, 
+                                                                                           const std::size_t id, 
+                                                                                           std::shared_ptr<TApp> spSim,
+                                                                                           std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
    {
       if(spSim->config().model(tag).at("enable"))
       {

@@ -13,14 +13,13 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/DivY2D1Y1.hpp"
-
 // Project includes
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I1.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Y1.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Y2.hpp"
 #include "QuICC/Polynomial/Quadrature/ChebyshevRule.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/Base/DivY2D1Y1.hpp"
 
 namespace QuICC {
 
@@ -34,15 +33,8 @@ namespace LinearMap {
 
 namespace Projector {
 
-   DivY2D1Y1::DivY2D1Y1()
-   {
-   }
 
-   DivY2D1Y1::~DivY2D1Y1()
-   {
-   }
-
-   void DivY2D1Y1::initOperator() const
+   void DivY2D1Y1<base_t>::initOperator() const
    {
       // Check for division by 0!
       assert(this->mspSetup->lower() > 0.0 || this->mspSetup->upper() < 0.0);
@@ -72,16 +64,16 @@ namespace Projector {
       this->mBackend.setScaler(igrid.array().pow(-2).cast<MHDFloat>().matrix());
    }
 
-   void DivY2D1Y1::initBackend() const
+   void DivY2D1Y1<base_t>::initBackend() const
    {
       // Call parent initializer
-      IChebyshevProjector::initBackend();
+      ILinearMapProjector::initBackend();
 
       // Initialize the solver with 1 extra mode for first derivative
       this->mBackend.addSolver(1);
    }
 
-   void DivY2D1Y1::applyPreOperator(Matrix& tmp, const Matrix& in) const
+   void DivY2D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
       this->mBackend.input(tmp, in);
       // Apply spectral operator (Y1)
@@ -91,14 +83,14 @@ namespace Projector {
       this->mBackend.getSolution(tmp, 1, 1);
    }
 
-   void DivY2D1Y1::applyPostOperator(Matrix& rOut) const
+   void DivY2D1Y1<base_t>::applyPostOperator(Matrix& rOut) const
    {
        // Apply 1/y^2 scaling in physical space
       this->mBackend.outputScale(rOut);
    }
 
    // Complex version of pre-operator
-   void DivY2D1Y1::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
+   void DivY2D1Y1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
       this->mBackend.input(tmp, in, useReal);
       auto specOp = this->mBackend.solver().getSpectralOperator();
@@ -107,7 +99,7 @@ namespace Projector {
    }
 
    // Complex version of post-operator
-   void DivY2D1Y1::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
+   void DivY2D1Y1<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const
    {
       this->mBackend.outputScale(rOut, tmp, useReal);
    }

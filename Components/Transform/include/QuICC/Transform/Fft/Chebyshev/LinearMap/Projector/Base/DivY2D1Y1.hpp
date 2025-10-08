@@ -1,11 +1,10 @@
 /**
- * @file DivYSq.hpp
- * @brief Implementation of the Chebyshev based 1/Y^2 projector, with linear map y = ax + b
- * equivalent to DivY2
+ * @file DivY2D1Y1.hpp
+ * @brief Implementation of the Chebyshev based 1/Y D Y projector, with linear map y = ax + b
  */
 
-#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_PROJECTOR_DIVYSQ_HPP
-#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_PROJECTOR_DIVYSQ_HPP
+#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_PROJECTOR_DIVY2D1Y1_BASE_HPP
+#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_PROJECTOR_DIVY2D1Y1_BASE_HPP
 
 // Debug includes
 //
@@ -21,8 +20,9 @@
 
 // Project includes
 //
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/ILinearMapProjector.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Tags.hpp"
 #include "Types/Typedefs.hpp"
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Projector/IChebyshevProjector.hpp"
 
 namespace QuICC {
 
@@ -36,23 +36,30 @@ namespace LinearMap {
 
 namespace Projector {
 
+
+template <typename Impl> class DivY2D1Y1;
+
    /**
-    * @brief Implementation of the Chebyshev based 1/Y^2 projector, with y = ax + b
+    * @brief Implementation of the Chebyshev based 1/Y D Y projector, with linear map y = ax +  b
     */
-   class DivYSq: public IChebyshevProjector
+   template <> class DivY2D1Y1<base_t> : public ILinearMapProjector
    {
       public:
          /**
           * @brief Constructor
           */
-         DivYSq();
+         DivY2D1Y1() = default;
 
          /**
           * @brief Destructor
           */
-         ~DivYSq();
+         ~DivY2D1Y1() = default;
 
       protected:
+         /**
+          * @brief Initialize storage
+          */
+         void initBackend() const final;
 
       private:
          /**
@@ -100,4 +107,4 @@ namespace Projector {
 }
 }
 
-#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_PROJECTOR_DIVYSQ_HPP
+#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_PROJECTOR_DIVY2D1Y1_BASE_HPP
