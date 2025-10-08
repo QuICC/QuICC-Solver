@@ -17,7 +17,7 @@
 0. Upload your SSH key to your github profile
 1. Clone repository
    ```bash
-   git clone -b main git@github.com:QuICC/QuICC.git
+   git clone -b main git@github.com:QuICC/QuICC-Solver.git
    ```
 
 2. Create build directory
@@ -25,15 +25,15 @@
    mkdir </path/to/Builds>
    cd </path/to/Builds>
    ```
-3. Configure build with CMake specifying the model(s) to build
+3. Configure build with CMake specifying the model(s) to build. As an example, we use the BoussinesqSphereRTC and BoussinesqShellDynamo models.
    ```bash
-   cmake </path/to/QuICC> -DQUICC_MODEL=<GreatSimulation1>\;<GreatSimulation2>
+   cmake </path/to/QuICC> -DQUICC_MODEL=BoussinesqSphereRTC\;BoussinesqShellDynamo
    ```
-   The physical model descriptions are stored in separate git repositories. A list of existing models is obtained [here](https://github.com/QuICC?q=Model-+in%3Aname&type=&language=). All official model repositories follow the naming "Model-<GreatSimulation>".
+   The physical model descriptions are stored in separate git repositories. A list of existing models is obtained [here](https://github.com/QuICC?q=Model-+in%3Aname&type=&language=). All official model repositories follow the naming "Model-<ApproximationGeometryType>".
 
    The registered models are cloned into Models/.
 
-   Custom models can be added into Models/.
+   It is also possible to add a custom model manually into Models/.
 
 4. Compile the model executables
    ```bash
@@ -41,29 +41,25 @@
    ```
 5. Create configuration XML
    ```bash
-   </path/to/Builds>/bin/<GreatSimulation>Config
+   </path/to/Builds>/bin/BoussinesqSphereRTCConfig
    mv parameters_GEOMETRY.cfg parameters.cfg
    edit parameters.cfg
    ```
 6. Create initial state
    ```bash
-   </path/to/Builds>/bin/<GreatSimulation>State
+   </path/to/Builds>/bin/BoussinesqSphereRTCState
    mv state0000.hdf5 state_initial.hdf5
    ```
 7. Run simulation
    ```bash
-   </path/to/Builds>/bin/<GreatSimulation>Model
+   </path/to/Builds>/bin/BoussinesqSphereRTCModel
    ```
 8. Create physical space data for visualization
    ```bash
    ln -s state0042.hdf5 state4Visu.hdf5
-   </path/to/Builds>/bin/<GreatSimulation>Visu
+   </path/to/Builds>/bin/BoussinesqSphereRTCVisu
    ```
 9. visualize *visState0000.hdf5*
-
-## Benchmarks
-
-A set of benchmarks is provided in the [Benchmarks](https://github.com/QuICC/Benchmarks) repository.
 
 
 ## Tests
@@ -78,9 +74,9 @@ then, after compiling, one can run all the available tests
 ```bash
 ctest --output-on-failure
 ```
-or a specific test
+or specific tests
 ```bash
-ctest -R <only-this-test> --output-on-failure
+ctest -R <test-regexp> --output-on-failure
 ```
 
 ## Code completion in Vim
