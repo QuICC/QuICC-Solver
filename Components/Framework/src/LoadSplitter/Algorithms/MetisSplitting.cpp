@@ -1,18 +1,17 @@
 /**
- * @file KaHIPSplitting.cpp
- * @brief Source of the implementation of a load splitting algorithm using KaHIP
+ * @file MetisSplitting.cpp
+ * @brief Source of the implementation of a load splitting algorithm using Metis
  */
 
 // System includes
 //
-#include "kaHIP_interface.h"
+#include "metis.h"
 #include <iostream>
-#include <fstream>
 #include <set>
 
 // Project includes
 //
-#include "QuICC/LoadSplitter/Algorithms/KaHIPSplitting.hpp"
+#include "QuICC/LoadSplitter/Algorithms/MetisSplitting.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/Splitting.hpp"
 #include "QuICC/LoadSplitter/Algorithms/SplittingTools.hpp"
@@ -21,14 +20,14 @@ namespace QuICC {
 
 namespace Parallel {
 
-   KaHIPSplitting::KaHIPSplitting(const int id, const int nCpu, const ArrayI& dim, Splitting::Algorithms::Id algorithm, const std::list<int>& factors)
+   MetisSplitting::MetisSplitting(const int id, const int nCpu, const ArrayI& dim, Splitting::Algorithms::Id algorithm, const std::list<int>& factors)
       : SplittingAlgorithm(id, nCpu, dim, algorithm)
    {
       // Initialise the NCpu factors
       this->initFactors(1);
    }
 
-   bool KaHIPSplitting::applicable() const
+   bool MetisSplitting::applicable() const
    {
       bool status = true;
 
@@ -37,7 +36,7 @@ namespace Parallel {
       return status;
    }
    
-   void KaHIPSplitting::mapNodes(std::map<std::pair<int,int>,int>& nodes, std::map<std::pair<int,int>,std::vector<int>>* pmodes, std::map<std::pair<int,int>,std::vector<int>>* pgrid, const Dimensions::Transform::Id transId, const int start)
+   void MetisSplitting::mapNodes(std::map<std::pair<int,int>,int>& nodes, std::map<std::pair<int,int>,std::vector<int>>* pmodes, std::map<std::pair<int,int>,std::vector<int>>* pgrid, const Dimensions::Transform::Id transId, const int start)
    {
       // Create arrays for the IDs and bins
       std::vector<int> ids = {0,0};
@@ -74,13 +73,14 @@ namespace Parallel {
       }
    }
 
-   void KaHIPSplitting::computeEdgeCut()
+   void MetisSplitting::computeEdgeCut()
    {
-      std::vector<int> xadj;
-      std::vector<int> adjncy;
-      std::vector<int> vwgt;
-      std::vector<int> adjcwgt;
-      std::vector<int> xnodes = {0};
+      std::vector<idx_t> xadj;
+      std::vector<idx_t> adjncy;
+      std::vector<idx_t> vwgt;
+      std::vector<idx_t> adjcwgt;
+      std::vector<idx_t> vsize;
+      std::vector<idx_t> xnodes = {0};
 
       // create 1D nodes
       std::cerr << "INDEXES FOR 1D" << std::endl;
@@ -101,8 +101,8 @@ namespace Parallel {
       this->mapNodes(this->mMap3Dnodes, &map3Dmodes, nullptr, Dimensions::Transform::TRA3D, xnodes.back());
       xnodes.push_back(xnodes.back() + this->mMap3Dnodes.size());
 
-      bool weightVertex = false;
       int vweight = 1;
+      int vcomm = 1;
       int eweight = 1;
 
       // Connect nodes
@@ -127,16 +127,11 @@ namespace Parallel {
          }
          xadj.push_back(sze);
 
-         // Vertex weight
-         if(weightVertex)
-         {
-            vweight = 1;
-         }
-         else
-         {
-            vweight = 1;
-         }
          vwgt.push_back(vweight);
+         vwgt.push_back(1);
+         vwgt.push_back(0);
+         vwgt.push_back(0);
+         vsize.push_back(vcomm);
       }
       for(auto&& [k, v]: mMap2Dnodes)
       {
@@ -171,15 +166,11 @@ namespace Parallel {
          xadj.push_back(sze);
 
          // Vertex weight
-         if(weightVertex)
-         {
-            vweight = 1;
-         }
-         else
-         {
-            vweight = 1;
-         }
          vwgt.push_back(vweight);
+         vwgt.push_back(0);
+         vwgt.push_back(1);
+         vwgt.push_back(0);
+         vsize.push_back(vcomm);
       }
       for(auto&& [k, v]: mMap3Dnodes)
       {
@@ -199,37 +190,43 @@ namespace Parallel {
          }
          xadj.push_back(sze);
 
-         // Vertex weight
-         if(weightVertex)
-         {
-            vweight = 1;
-         }
-         else
-         {
-            vweight = 1;
-         }
          vwgt.push_back(vweight);
+         vwgt.push_back(0);
+         vwgt.push_back(0);
+         vwgt.push_back(1);
+         vsize.push_back(vcomm);
       }
 
       std::string filebase = "graph";
       details::writeMetis(filebase + ".metis", xadj, adjncy, vwgt, adjcwgt);
 
-      int n            = xadj.size()-1;
-      double imbalance = 0.03;
-      mPartition.resize(n);
-      int edge_cut     = 0;
-      int nparts       = this->nCpu();
-      kaffpa_balance_NE(&n, vwgt.data(), xadj.data(), adjcwgt.data(), adjncy.data(), &nparts, &imbalance, false, 0, STRONG, & edge_cut, mPartition.data());
-      details::writePartition(filebase + "_partition.txt", mPartition);
+      idx_t nvtxs = xadj.size()-1;
+      idx_t ncon = 4;
+      std::vector<real_t> ubvec = {1.001, 1.001, 1.001, 1.001};
+      
+      mPartition.resize(nvtxs);
+      idx_t edge_cut     = 0;
+      idx_t nparts       = this->nCpu();
+      std::vector<idx_t> partition(nvtxs);
 
+      std::vector<idx_t> options(METIS_NOPTIONS);
+      int status = METIS_SetDefaultOptions(options.data());
+      //options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_CUT;
+      options[METIS_OPTION_OBJTYPE] = METIS_OBJTYPE_VOL;
+
+      //status = METIS_PartGraphRecursive(&nvtxs, &ncon, xadj.data(), adjncy.data(), vwgt.data(), vsize.data(), adjcwgt.data(), &nparts, NULL, ubvec.data(), NULL, &edge_cut, partition.data());
+      status = METIS_PartGraphKway(&nvtxs, &ncon, xadj.data(), adjncy.data(), vwgt.data(), vsize.data(), adjcwgt.data(), &nparts, NULL, ubvec.data(), NULL, &edge_cut, partition.data());
+
+      mPartition = partition;
+      details::writePartition(filebase + "_partition.txt", mPartition);
       details::writeDot(filebase + ".dot", xnodes, xadj, adjncy, mPartition);
       details::writeDot(filebase + "_1D2D.dot", xnodes, xadj, adjncy, mPartition, 0);
       details::writeDot(filebase + "_2D3D.dot", xnodes, xadj, adjncy, mPartition, 1);
    }
 
-   SharedTransformResolution  KaHIPSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status)
+   SharedTransformResolution  MetisSplitting::splitDimension(const Dimensions::Transform::Id transId, const int cpuId, int& status)
    {
-      std::cerr << "SPLITTING DIMENSIONS " << static_cast<int>(transId) << " WITH KAHIP: rank = " << cpuId << std::endl;
+      std::cerr << "SPLITTING DIMENSIONS " << static_cast<int>(transId) << " WITH METIS: rank = " << cpuId << std::endl;
       if(this->mPartition.size() == 0)
       {
          this->computeEdgeCut();
@@ -302,7 +299,7 @@ namespace Parallel {
       return spTraRes;
    }
 
-   void KaHIPSplitting::selectGrouper(const Splitting::Groupers::Id selected)
+   void MetisSplitting::selectGrouper(const Splitting::Groupers::Id selected)
    {
       // Only split in first transpose
       if(this->factors()(1) == 1 && selected != Splitting::Groupers::SINGLE1D)
@@ -320,7 +317,7 @@ namespace Parallel {
       }
    }
 
-   Array KaHIPSplitting::computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp)
+   Array MetisSplitting::computeScore(SharedResolution spResolution, const Splitting::Groupers::Id grp)
    {
       // Initialise the score
       Array details(4);
@@ -340,9 +337,9 @@ namespace Parallel {
       // Select best transform grouper algorithm
       this->selectGrouper(grp);
 
-      std::cerr << comm.transpose() << std::endl;
-      std::cerr << balance.transpose() << std::endl;
-      std::cerr << details.transpose() << std::endl;
+      std::cerr << "comm: " << comm.transpose() << std::endl;
+      std::cerr << "balance: " << balance.transpose() << std::endl;
+      std::cerr << "details: " << details.transpose() << std::endl;
 
       return details;
    }

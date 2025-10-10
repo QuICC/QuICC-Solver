@@ -96,6 +96,16 @@ namespace QuICC {
          typedef BackwardTubularConfigurator  BwdConfigType;
       };
 
+      /// Transform configurator selector specialised for METIS case
+      template <> struct ConfigSelector<Splitting::Algorithms::METIS>
+      {
+         /// Typedef for forward configurator
+         typedef ForwardTubularConfigurator   FwdConfigType;
+
+         /// Typedef for forward configurator
+         typedef BackwardTubularConfigurator  BwdConfigType;
+      };
+
       /// Transform configurator selector specialised for COUPLED2D case
       template <> struct ConfigSelector<Splitting::Algorithms::COUPLED2D>
       {
@@ -183,23 +193,32 @@ namespace QuICC {
             setGrouper<TGroup,Splitting::Algorithms::SERIAL>(spFwdGrouper, spBwdGrouper);
 
       #ifdef QUICC_MPI
-         } else if(algo == Splitting::Algorithms::SINGLE1D)
+         }
+         else if(algo == Splitting::Algorithms::SINGLE1D)
          {
             setGrouper<TGroup,Splitting::Algorithms::SINGLE1D>(spFwdGrouper, spBwdGrouper);
-         } else if(dims == 3 && algo == Splitting::Algorithms::SINGLE2D)
+         }
+         else if(dims == 3 && algo == Splitting::Algorithms::SINGLE2D)
          {
             setGrouper<TGroup,Splitting::Algorithms::SINGLE2D>(spFwdGrouper, spBwdGrouper);
-         } else if(dims == 3 && algo == Splitting::Algorithms::TUBULAR)
+         }
+         else if(dims == 3 && algo == Splitting::Algorithms::TUBULAR)
          {
             setGrouper<TGroup,Splitting::Algorithms::TUBULAR>(spFwdGrouper, spBwdGrouper);
-         } else if(dims == 3 && algo == Splitting::Algorithms::KAHIP)
+         }
+         else if(dims == 3 && algo == Splitting::Algorithms::KAHIP)
          {
             setGrouper<TGroup,Splitting::Algorithms::KAHIP>(spFwdGrouper, spBwdGrouper);
-         } else if(dims == 3 && algo == Splitting::Algorithms::COUPLED2D)
+         }
+         else if(dims == 3 && algo == Splitting::Algorithms::METIS)
+         {
+            setGrouper<TGroup,Splitting::Algorithms::METIS>(spFwdGrouper, spBwdGrouper);
+         }
+         else if(dims == 3 && algo == Splitting::Algorithms::COUPLED2D)
          {
             setGrouper<TGroup,Splitting::Algorithms::COUPLED2D>(spFwdGrouper, spBwdGrouper);
       #endif //QUICC_MPI
-         } else
+         }else
          {
             throw std::logic_error("Unknown algorithm for transform grouper setup");
          }

@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <numeric>
 #include <functional>
+#include <fstream>
 
 // Class include
 //
@@ -148,6 +149,89 @@ namespace Parallel {
             throw std::logic_error("Unknown input provided!");
       }
    }
+
+namespace details
+{
+void writeDot(std::string filename, const std::vector<int>& xnodes, const std::vector<int>& xadj, const std::vector<int>& adjncy, const std::vector<int>& part, const int stage)
+{
+   int n = xadj.size()-1;
+
+   std::ofstream dot(filename);
+
+   dot << "strict graph {" << std::endl;
+   dot << "node [colorscheme=set19]" << std::endl;
+   for(int s = 0; s < xnodes.size() - 1; s++)
+   {
+      for(int node = 0; node < xnodes[s+1] - xnodes[s]; node++)
+      {
+         dot << "\"s" << s << "_" << node << "\"" << " [style = filled, color=" << part[node] + 1 << "]" << std::endl;
+      }
+   }
+   for(int node = 0; node < n; node++)
+   {
+      for(int i = xadj[node]; i < xadj[node+1]; i++)
+      {
+         int nLeft = node;
+         int nRight = adjncy[i];
+         int sLeft = -42;
+         int sRight = -42;
+         for(int k = 1; k < xnodes.size(); k++)
+         {
+            if(sLeft < 0 && nLeft - xnodes[k] < 0)
+            {
+               sLeft = k-1;
+               nLeft -= xnodes[k-1];
+            }
+            if(sRight < 0 && nRight - xnodes[k] < 0)
+            {
+               sRight = k-1;
+               nRight -= xnodes[k-1];
+            }
+         }
+
+         if(stage < 0 || ((sLeft == stage && sRight == stage + 1) || (sLeft == stage + 1 && sRight == stage)))
+         {
+            dot << "\"s" << sLeft << "_" << nLeft << "\" -- \"s" << sRight << "_" << nRight << "\"" << std::endl;
+         }
+      }
+   }
+
+  // Close the file
+  dot << "}" << std::endl;
+  dot.close();
+}
+
+void writePartition(const std::string filename, const std::vector<int>& part)
+{
+   std::ofstream partition(filename);
+
+   for(auto&& c: part)
+   {
+      partition << c << std::endl;
+   }
+
+   partition.close();
+}
+
+void writeMetis(const std::string filename, const std::vector<int>& xadj, const std::vector<int>& adjncy, const std::vector<int>& vwgt, const std::vector<int>& adjcwgt)
+{
+   std::ofstream metis(filename);
+
+   metis << xadj.size() - 1 << " " << adjncy.size()/2 << " " << 11 << std::endl;
+
+   for(int node = 0; node < xadj.size()-1; node++)
+   {
+      metis << vwgt[node];
+      for(int i = xadj[node]; i < xadj[node+1]; i++)
+      {
+         metis << " " << adjncy[i] + 1 << " " << adjcwgt[i];
+      }
+      metis << std::endl;
+   }
+
+   metis.close();
+}
+}
 
 }
 }

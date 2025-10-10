@@ -68,6 +68,8 @@ namespace QuICC {
             COUPLED2D,
             /// Load splitting using KaHIP graph library
             KAHIP,
+            /// Load splitting using METIS graph library
+            METIS,
          };
       };
 

@@ -21,6 +21,7 @@
 #include "QuICC/LoadSplitter/Algorithms/SerialSplitting.hpp"
 #include "QuICC/LoadSplitter/Algorithms/TubularSplitting.hpp"
 #include "QuICC/LoadSplitter/Algorithms/KaHIPSplitting.hpp"
+#include "QuICC/LoadSplitter/Algorithms/MetisSplitting.hpp"
 #include "QuICC/LoadSplitter/Algorithms/Coupled2DSplitting.hpp"
 
 namespace QuICC {
@@ -73,10 +74,16 @@ namespace Parallel {
                   this->mAlgorithms.push_back(std::make_shared<TubularSplitting>(this->mId, this->mNCpu, dim, Splitting::Algorithms::TUBULAR, factors));
                }
 
-               // Add the tubular splitting algorithm
+               // Add the KaHIP splitting algorithm
                if(enabled.count(Splitting::Algorithms::KAHIP) == 1)
                {
                   this->mAlgorithms.push_back(std::make_shared<KaHIPSplitting>(this->mId, this->mNCpu, dim, Splitting::Algorithms::TUBULAR, factors));
+               }
+
+               // Add the Metis splitting algorithm
+               if(enabled.count(Splitting::Algorithms::METIS) == 1)
+               {
+                  this->mAlgorithms.push_back(std::make_shared<MetisSplitting>(this->mId, this->mNCpu, dim, Splitting::Algorithms::TUBULAR, factors));
                }
             }
 
@@ -238,6 +245,9 @@ namespace Parallel {
                break;
             case(Splitting::Algorithms::KAHIP):
                tmpStr = "KaHIP";
+               break;
+            case(Splitting::Algorithms::METIS):
+               tmpStr = "METIS";
                break;
             case(Splitting::Algorithms::COUPLED2D):
                tmpStr = "Coupled 2D";

@@ -1,10 +1,10 @@
 /**
- * @file KaHIPSplitting.hpp
- * @brief Implementation of load distribution using KaHIP library
+ * @file MetisSplitting.hpp
+ * @brief Implementation of load distribution using METIS library
  */
 
-#ifndef QUICC_PARALLEL_KAHIPSPLITTING_HPP
-#define QUICC_PARALLEL_KAHIPSPLITTING_HPP
+#ifndef QUICC_PARALLEL_METISSPLITTING_HPP
+#define QUICC_PARALLEL_METISSPLITTING_HPP
 
 // System includes
 //
@@ -24,9 +24,9 @@ namespace QuICC {
 namespace Parallel {
 
    /**
-    * @brief Implementation of a load distribution algorithm using KaHIP library
+    * @brief Implementation of a load distribution algorithm using METIS library
     */
-   class KaHIPSplitting: public SplittingAlgorithm
+   class MetisSplitting: public SplittingAlgorithm
    {
       public:
          /**
@@ -38,12 +38,12 @@ namespace Parallel {
           * @param algorithm  Splitting algorithm
           * @param factors Imposed CPU factorizations
           */
-         KaHIPSplitting(const int id, const int nCpu, const ArrayI& dim, Splitting::Algorithms::Id algorithm, const std::list<int>& factors);
+         MetisSplitting(const int id, const int nCpu, const ArrayI& dim, Splitting::Algorithms::Id algorithm, const std::list<int>& factors);
 
          /**
           * @brief Destructor
           */
-         ~KaHIPSplitting() = default;
+         ~MetisSplitting() = default;
 
          /**
           * @brief Check if factorisation is applicable to scheme
@@ -85,4 +85,4 @@ namespace Parallel {
 }
 }
 
-#endif // QUICC_PARALLEL_KAHIPSPLITTING_HPP
+#endif // QUICC_PARALLEL_METISSPLITTING_HPP

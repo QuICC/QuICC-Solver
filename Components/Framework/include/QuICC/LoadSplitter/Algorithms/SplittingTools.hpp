@@ -86,6 +86,12 @@ namespace Parallel {
          ~SplittingTools() = default;
    };
 
+   namespace details {
+      void writeDot(std::string filename, const std::vector<int>& xnodes, const std::vector<int>& xadj, const std::vector<int>& adjncy, const std::vector<int>& part, const int stage = -1);
+      void writePartition(const std::string filename, const std::vector<int>& part);
+      void writeMetis(const std::string filename, const std::vector<int>& xadj, const std::vector<int>& adjncy, const std::vector<int>& vwgt, const std::vector<int>& adjcwgt);
+   }
+
 }
 }
 

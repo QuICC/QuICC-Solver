@@ -1,7 +1,7 @@
-# FindKaHIP
+# FindKAHIP
 # -----------
 #
-# This module looks for the KaHIP library.
+# This module looks for the KAHIP library.
 #
 # The following variables are set
 #

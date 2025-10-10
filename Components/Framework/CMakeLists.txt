@@ -44,6 +44,7 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}
     QuICC::TimestepPc
     QuICC::TimestepRkcb
     KAHIP::KAHIP
+    METIS::METIS
 )
 
 if (QUICC_USE_THREADPOOL)

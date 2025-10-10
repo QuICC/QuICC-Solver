@@ -191,6 +191,10 @@ TEST_CASE( "@Scheme@ splitting tests", "[@Scheme@]" ){
       {
          algoPrefix = "KaHIP/";
       }
+      else if(best.second.algorithm == QuICC::Splitting::Algorithms::METIS)
+      {
+         algoPrefix = "METIS/";
+      }
       const std::string refPrefix =  "_refdata/Framework/LoadSplitter/@Scheme@/" + algoPrefix;
       const std::string dataPrefix =  "_data/Framework/LoadSplitter/@Scheme@/" + algoPrefix;
       std::stringstream ss;

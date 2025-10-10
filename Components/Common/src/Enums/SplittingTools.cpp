@@ -56,6 +56,10 @@ namespace Splitting {
       {
          return Algorithms::KAHIP;
       }
+      else if(tag == "metis")
+      {
+         return Algorithms::METIS;
+      }
       else if(tag == "coupled2d")
       {
          return Algorithms::COUPLED2D;
