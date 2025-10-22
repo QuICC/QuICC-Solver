@@ -68,6 +68,13 @@ public:
    Dimensions::Space::Id space() const;
 
    /**
+    * @brief Set the Git hash of the simulation
+    *
+    * @param info Git related information
+    */
+   void setGit(const std::map<std::string,std::string>& info);
+
+   /**
     * @brief Set the physical parameters of the simulation
     *
     * @param parameters Physical parameters
@@ -162,6 +169,11 @@ protected:
    void setDatasetOffsets();
 
    /**
+    * @brief Write Git information to file
+    */
+   void writeGit();
+
+   /**
     * @brief Write truncation information
     */
    void writeTruncation();
@@ -180,6 +192,11 @@ protected:
     * @brief Get iterator range to vectors
     */
    vector_iterator_range vectorRange();
+
+   /**
+    * @brief Git information
+    */
+   std::map<std::string, std::string> mGit;
 
    /**
     * @brief Physical parameters of the simulation
