@@ -52,19 +52,21 @@ function(quicc_add_model target)
   endforeach()
 
   # Update python files
-  add_custom_target(${_model_lib}_updatepy)
-  add_custom_command(TARGET ${_model_lib}_updatepy POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/Python"
-    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/python"
-    COMMENT "Copying Python files for ${QAM_MODEL_DIRNAME}"
-    VERBATIM
-    )
-  add_dependencies(${_model_lib} ${_model_lib}_updatepy)
-  if(QUICC_CURRENT_UPDATEPY_TARGET)
-     add_dependencies(${QUICC_CURRENT_UPDATEPY_TARGET} ${_model_lib}_updatepy)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Python")
+    add_custom_target(${_model_lib}_updatepy)
+    add_custom_command(TARGET ${_model_lib}_updatepy POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_directory
+      "${CMAKE_CURRENT_SOURCE_DIR}/Python"
+      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/python"
+      COMMENT "Copying Python files for ${QAM_MODEL_DIRNAME}"
+      VERBATIM
+      )
+    add_dependencies(${_model_lib} ${_model_lib}_updatepy)
+    if(QUICC_CURRENT_UPDATEPY_TARGET)
+      add_dependencies(${QUICC_CURRENT_UPDATEPY_TARGET} ${_model_lib}_updatepy)
+    endif()
+    set(QUICC_CURRENT_UPDATEPY_TARGET "${_model_lib}_updatepy" CACHE STRING "Make dependencies across updatepy" FORCE)
   endif()
-  set(QUICC_CURRENT_UPDATEPY_TARGET "${_model_lib}_updatepy" CACHE STRING "Make dependencies across updatepy" FORCE)
 
   # Generate git hash library
   include(gitUtils/AddGitHashLib)
