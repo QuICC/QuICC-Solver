@@ -159,9 +159,14 @@ void Tracker::print_hdf5()
     // Write in a format compatible to conduit
     using namespace HighFive;
 
+    #if QUICC_MPI
+    auto fapl = FileAccessProps{};
+    fapl.add(MPIOFileAccess(mComm, MPI_INFO_NULL));
+    #endif
+
     File file(outFile, File::ReadWrite | File::Create | File::Truncate
     #if QUICC_MPI
-    , MPIOFileDriver(mComm, MPI_INFO_NULL)
+    , fapl
     #endif
     );
 
