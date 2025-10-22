@@ -46,6 +46,9 @@ void StateFileWriter::write()
    // Create the header and version information
    this->createFileInfo();
 
+   // Write the Git information
+   this->writeGit();
+
    // Write the Physical parameters
    this->writePhysical();
 
