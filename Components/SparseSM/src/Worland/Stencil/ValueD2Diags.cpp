@@ -1,6 +1,7 @@
-/** 
+/**
  * @file ValueD2Diags.cpp
- * @brief Source of the implementation of the full sphere Worland ValueD2 boundary condition stencil
+ * @brief Source of the implementation of the full sphere Worland ValueD2
+ * boundary condition stencil
  */
 
 // System includes
@@ -20,12 +21,12 @@ namespace Worland {
 
 namespace Stencil {
 
-   ValueD2Diags::ValueD2Diags(const Scalar_t alpha, const Scalar_t dBeta, const int l)
-      : IDiags(alpha, dBeta, l, 0)
-   {
-   }
+ValueD2Diags::ValueD2Diags(const Scalar_t alpha, const Scalar_t dBeta,
+   const int l) :
+    IDiags(alpha, dBeta, l, 0)
+{}
 
-} // Stencil
-} // Worland
-} // SparseSM
-} // QuICC
+} // namespace Stencil
+} // namespace Worland
+} // namespace SparseSM
+} // namespace QuICC

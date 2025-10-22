@@ -9,6 +9,7 @@
 #include "ViewOps/Quadrature/Impl.hpp"
 #include "ViewOps/Worland/OpsBuilder.hpp"
 #include "ViewOps/Worland/OpsQuadrature.hpp"
+#include "Profiler/Interface.hpp"
 
 using namespace QuICC::Graph;
 
@@ -19,6 +20,8 @@ using namespace QuICC::Graph;
 /// @param umod
 extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCCSC3D(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirWorlandprjShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCCSC3D\n";
@@ -48,6 +51,8 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
     {
+        QuICC::Profiler::RegionFixture<3> fixInit("MlirWorlandprjShims-init");
+
         // dim 0 - Nr - radial points
         // dim 1 - N  - radial modes
         // dim 2 - L  - harmonic degree
@@ -85,6 +90,8 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3D_complexf64_DCC
 /// @param umod
 extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK(void* obj, view3_cd_t* pUval, view3_cd_t* pUmod)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirWorlandprjShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_DCCSC3DJIK\n";
@@ -119,6 +126,8 @@ extern "C" void _ciface_quiccir_jw_@Op@_@Kind@_complexf64_DCCSC3DJIK_complexf64_
     auto cl = reinterpret_cast<op_t*>(obj);
     if (cl->getOp().data() == nullptr)
     {
+        QuICC::Profiler::RegionFixture<3> fixInit("MlirWorlandprjShims-init");
+
         // dim 0 - Nr - radial points
         // dim 1 - N  - radial modes
         // dim 2 - L  - harmonic degree

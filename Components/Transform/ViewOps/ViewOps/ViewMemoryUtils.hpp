@@ -15,6 +15,7 @@
 #include "Memory/Memory.hpp"
 #include "Memory/Pensieve.hpp"
 #include "View/View.hpp"
+#include "Profiler/Interface.hpp"
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #include "Memory/Cuda/Malloc.hpp"
@@ -79,6 +80,8 @@ tempOnHostMemorySpace<Tview>::tempOnHostMemorySpace(const Tview& view,
     // we restore the initial state of the view on exit
     _viewRef(const_cast<Tview&>(view)), _mode(mode)
 {
+   Profiler::RegionFixture<3> fix("tempOnHostMemorySpace::ctor");
+
    using namespace QuICC::View;
 #ifdef QUICC_HAS_CUDA_BACKEND
    if (QuICC::Cuda::isDeviceMemory(view.data()))
@@ -112,6 +115,8 @@ tempOnHostMemorySpace<Tview>::tempOnHostMemorySpace(const Tview& view,
 
 template <class Tview> tempOnHostMemorySpace<Tview>::~tempOnHostMemorySpace()
 {
+   Profiler::RegionFixture<3> fix("tempOnHostMemorySpace::dtor");
+
 #ifdef QUICC_HAS_CUDA_BACKEND
    if (_dataDevice.data() != nullptr)
    {

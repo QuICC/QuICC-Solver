@@ -54,6 +54,16 @@ namespace Equations {
       return std::visit([](auto&& p)->const Resolution& {return p->dom(0).res();}, this->spUnknown());
    }
 
+   int IScalarEquation::nSpectral() const
+   {
+      return this->mRequirements.field(this->name()).spectralIds().size();
+   }
+
+   typename IScalarEquation::SpectralComponent_range IScalarEquation::spectralRange() const
+   {
+      return std::make_pair(this->mRequirements.field(this->name()).spectralIds().begin(), this->mRequirements.field(this->name()).spectralIds().end());
+   }
+
    void IScalarEquation::initSpectralMatrices()
    {
       // Make sure it is safe to do nothing
@@ -193,6 +203,18 @@ namespace Equations {
    void IScalarEquation::setSrcKernel(Spectral::Kernel::SharedISpectralKernel spKernel)
    {
       this->setSrcKernel(FieldComponents::Spectral::SCALAR, spKernel);
+   }
+
+   void IScalarEquation::corruptUnknown(FieldComponents::Spectral::Id compId)
+   {
+      // Assert scalar
+      assert(compId == FieldComponents::Spectral::SCALAR);
+
+      std::visit(
+            [&](auto&& p)
+            {
+               p->rDom(0).rPerturbation().rComp(compId).rData().setConstant(42.42);
+            }, this->spUnknown());
    }
 } // Equations
 } // QuICC

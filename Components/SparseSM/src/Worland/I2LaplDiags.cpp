@@ -1,6 +1,7 @@
-/** 
+/**
  * @file I2LaplDiags.cpp
- * @brief Source of the implementation of the full sphere Worland I2Lapl sparse operator
+ * @brief Source of the implementation of the full sphere Worland I2Lapl sparse
+ * operator
  */
 
 // System includes
@@ -18,11 +19,11 @@ namespace SparseSM {
 
 namespace Worland {
 
-   I2LaplDiags::I2LaplDiags(const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
-      : IDiags(alpha, dBeta, l, q)
-   {
-   }
+I2LaplDiags::I2LaplDiags(const Scalar_t alpha, const Scalar_t dBeta,
+   const int l, const int q) :
+    IDiags(alpha, dBeta, l, q)
+{}
 
-}
-}
-}
+} // namespace Worland
+} // namespace SparseSM
+} // namespace QuICC

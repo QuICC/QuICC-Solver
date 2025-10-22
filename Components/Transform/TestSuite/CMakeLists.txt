@@ -23,6 +23,10 @@ add_custom_command(TARGET ${QUICC_CURRENT_COMPONENT_TEST_LIB}_updatepy POST_BUIL
   VERBATIM
 )
 add_dependencies(${QUICC_CURRENT_COMPONENT_TEST_LIB} ${QUICC_CURRENT_COMPONENT_TEST_LIB}_updatepy)
+if(QUICC_CURRENT_UPDATEPY_TARGET)
+   add_dependencies(${QUICC_CURRENT_UPDATEPY_TARGET} ${QUICC_CURRENT_COMPONENT_TEST_LIB}_updatepy)
+endif()
+set(QUICC_CURRENT_UPDATEPY_TARGET "${QUICC_CURRENT_COMPONENT_TEST_LIB}_updatepy" CACHE STRING "Make dependencies across updatepy" FORCE)
 
 # Add source and tests directories
 add_subdirectory(src)

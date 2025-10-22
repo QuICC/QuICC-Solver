@@ -77,6 +77,16 @@ namespace Equations {
          virtual const Resolution& res() const override;
 
          /**
+          * @brief Get the number of spectral components
+          */
+         int nSpectral() const final;
+
+         /**
+          * @brief Get vector spectral component range
+          */
+         SpectralComponent_range spectralRange() const final;
+
+         /**
           * @brief Transfer solver solution to equation unknown
           *
           * @param compId  Component ID
@@ -119,6 +129,13 @@ namespace Equations {
           */
          virtual void setSrcKernel(Spectral::Kernel::SharedISpectralKernel spKernel);
          using IFieldEquation::setSrcKernel;
+
+         /**
+          * @brief Set unknown field to bad value
+          *
+          * @param compId  Component ID
+          */
+         void corruptUnknown(FieldComponents::Spectral::Id compId);
 
       protected:
          /**

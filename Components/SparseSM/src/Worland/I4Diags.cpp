@@ -1,6 +1,7 @@
-/** 
+/**
  * @file I4Diags.cpp
- * @brief Source of the implementation of the full sphere Worland I4 sparse operator
+ * @brief Source of the implementation of the full sphere Worland I4 sparse
+ * operator
  */
 
 // System includes
@@ -18,11 +19,11 @@ namespace SparseSM {
 
 namespace Worland {
 
-   I4Diags::I4Diags(const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
-      : IDiags(alpha, dBeta, l, q)
-   {
-   }
+I4Diags::I4Diags(const Scalar_t alpha, const Scalar_t dBeta, const int l,
+   const int q) :
+    IDiags(alpha, dBeta, l, q)
+{}
 
-}
-}
-}
+} // namespace Worland
+} // namespace SparseSM
+} // namespace QuICC

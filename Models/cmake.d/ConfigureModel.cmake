@@ -7,6 +7,10 @@ include(ModelFunctions)
 #     name/path of the model
 # TYPES
 #     list of model types
+# SOURCES_DIRS
+#     addition source directories
+# EXTRA_LIBS
+#     additional libraries to link to
 #
 function(quicc_add_model target)
   # parse inputs
@@ -84,6 +88,10 @@ function(quicc_add_model target)
     VERBATIM
     )
   add_dependencies(${QUICC_CURRENT_MODEL_LIB} ${QUICC_CURRENT_MODEL_LIB}_updatepy)
+  if(QUICC_CURRENT_UPDATEPY_TARGET)
+     add_dependencies(${QUICC_CURRENT_UPDATEPY_TARGET} ${QUICC_CURRENT_MODEL_LIB}_updatepy)
+  endif()
+  set(QUICC_CURRENT_UPDATEPY_TARGET "${QUICC_CURRENT_MODEL_LIB}_updatepy" CACHE STRING "Make dependencies across updatepy" FORCE)
 
   foreach(src ${QAM_SOURCE_DIRS})
     add_subdirectory(${src})
