@@ -56,6 +56,11 @@ namespace Tags {
          static const std::string   TRUNCDIM;
 
          /**
+          * @brief Git information part for State file
+          */
+         static const std::string   GITINFO;
+
+         /**
           * @brief Physical parameters part for State file
           */
          static const std::string   PHYSICAL;

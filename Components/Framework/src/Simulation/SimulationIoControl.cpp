@@ -33,6 +33,33 @@ namespace QuICC {
       this->mspCfg = std::make_shared<SimulationConfig>(this->mspCfgFile);
    }
 
+   void SimulationIoControl::setupGitInformation(const std::string modelVersion)
+   {
+      // Framework information
+      this->mGit.try_emplace("framework_hash", std::string(Framework::gitHash));
+
+      // Extract model information
+      std::vector<std::string> gInfo;
+      std::istringstream ss(modelVersion);
+      std::string s;
+      while (std::getline(ss, s, ':'))
+      {
+         gInfo.push_back(s);
+      }
+
+      // Store model information
+      auto gIt = gInfo.cbegin();
+      if(gInfo.size() > 1)
+      {
+         this->mGit.try_emplace("model_name", *gIt);
+         gIt++;
+      }
+      if(gInfo.size() >= 1)
+      {
+         this->mGit.try_emplace("model_hash", *gIt);
+      }
+   }
+
    void SimulationIoControl::init(const std::string modelVersion)
    {
       // Init configuration file
@@ -43,6 +70,9 @@ namespace QuICC {
 
       // Print parameters file parameters
       this->mspCfgFile->printInfo();
+
+      // Process and store git information
+      this->setupGitInformation(modelVersion);
 
       // Print version information
       Tools::Formatter::printNewline(std::cout);
@@ -130,6 +160,7 @@ namespace QuICC {
 
    void SimulationIoControl::addHdf5OutputFile(Io::Variable::SharedIVariableHdf5NWriter spOutFile)
    {
+      spOutFile->setGit(this->mGit);
       this->mHdf5Writers.push_back(spOutFile);
    }
 

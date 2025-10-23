@@ -207,6 +207,11 @@ namespace QuICC {
 
       private:
          /**
+          * @brief Setup Git information
+          */
+         void setupGitInformation(const std::string modelVersion);
+
+         /**
           * @brief Is is time to write statistics file?
           */
          bool isStatsTime() const;
@@ -275,6 +280,11 @@ namespace QuICC {
           * @brief Activate stats writing
           */
          bool mActiveStatsWrite;
+
+         /**
+          * @brief Git information
+          */
+         std::map<std::string,std::string> mGit;
 
          /**
           * @brief Initialise the configuration file
