@@ -11,7 +11,9 @@ add_subdirectory(ViewOps/Reduction)
 add_subdirectory(ViewOps/Fourier)
 add_subdirectory(ViewOps/Quadrature)
 add_subdirectory(ViewOps/ALegendre)
+#add_subdirectory(ViewOps/ALegendre_parallALT)
 add_subdirectory(ViewOps/Worland)
+add_subdirectory(ViewOps/Worland_parallALT)
 add_subdirectory(ViewOps/Transpose)
 
 add_library(${QUICC_CURRENT_COMPONENT_LIB} INTERFACE)
@@ -41,7 +43,9 @@ target_link_libraries("${QUICC_CURRENT_COMPONENT_LIB}" INTERFACE
   QuICC::Memory
   QuICC::ViewOps::Fourier
   QuICC::ViewOps::ALegendre
+  #QuICC::ViewOps::ALegendre_parallALT
   QuICC::ViewOps::Worland
+  QuICC::ViewOps::Worland_parallALT
   QuICC::ViewOps::Transpose
   QuICC::ViewOps::Pointwise
   QuICC::ViewOps::Slicewise

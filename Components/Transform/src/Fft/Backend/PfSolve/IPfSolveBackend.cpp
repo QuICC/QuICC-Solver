@@ -20,7 +20,7 @@ namespace Fft {
 
 namespace Backend {
 
-namespace PfSolve {
+namespace PfSolve_parallALT {
 
 IPfSolveBackend::IPfSolveBackend() : mPlan(NULL) { this->initLibrary(); }
 
@@ -66,7 +66,7 @@ void IPfSolveBackend::applyFft(MatrixZ &, const MatrixZ &) const {
   std::logic_error("Backend not implemented.");
 };
 
-} // namespace PfSolve
+} // namespace ParallALT
 } // namespace Backend
 } // namespace Fft
 } // namespace Transform

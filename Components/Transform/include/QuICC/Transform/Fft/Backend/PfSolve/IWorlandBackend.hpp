@@ -30,6 +30,7 @@
 #include <hip/hip_runtime_api.h>
 #include <hip/hiprtc.h>
 #endif
+#include "parallALT.hpp"
 
 namespace QuICC {
 
@@ -39,15 +40,8 @@ namespace Fft {
 
 namespace Backend {
 
-namespace PfSolve {
+namespace PfSolve_parallALT {
 
-namespace VkFFT {
-#include "vkFFT.h"
-}
-
-namespace PfSolve_JW {
-#include "pfSolve_AppCollectionManager.hpp"
-}
 /**
  * @brief Interface for a generic Worland PFSOLVE based integrator
  */
@@ -460,22 +454,39 @@ protected:
   mutable bool mFlipped;
 
   /**
+   * @brief parallALT configurations
+   */
+  mutable parallALT_configuration config_forward = {};
+  mutable parallALT_configuration config_backward = {};
+
+  /**
+   * @brief parallALT app pointers
+   */
+  mutable parallALT_app appContainer_forward = {};
+  mutable parallALT_app appContainer_backward = {};
+
+   /**
+   * @brief parallALT app pointers
+   */
+  mutable PfSolve::VkGPU VkGPU = {};
+
+  /**
    * @brief VkFFT app pointer that is currently in use
    */
-  mutable VkFFT::VkFFTApplication *mpApp;
+  mutable parallALT_VkFFT::VkFFTApplication *mpApp;
 
   /**
    * @brief VkFFT DCT app for even polynomials
    */
-  mutable VkFFT::VkFFTConfiguration mEvenConfiguration = {};
-  mutable VkFFT::VkFFTApplication mEvenApp = {};
+  mutable parallALT_VkFFT::VkFFTConfiguration mEvenConfiguration = {};
+  mutable parallALT_VkFFT::VkFFTApplication mEvenApp = {};
   mutable uint64_t mEvenSize;
 
   /**
    * @brief VkFFT DCT app for odd polynomials
    */
-  mutable VkFFT::VkFFTConfiguration mOddConfiguration = {};
-  mutable VkFFT::VkFFTApplication mOddApp = {};
+  mutable parallALT_VkFFT::VkFFTConfiguration mOddConfiguration = {};
+  mutable parallALT_VkFFT::VkFFTApplication mOddApp = {};
   mutable uint64_t mOddSize;
 
   /**
@@ -486,7 +497,7 @@ protected:
   /**
    * @brief Library that collects and manages all kernels related to PfSolve
    */
-  mutable PfSolve_JW::PfSolve_AppLibrary appLibrary = {};
+  mutable PfSolve::PfSolve_AppLibrary appLibrary = {};
 
   /**
    * @brief Map that keeps track of zeropadding u

@@ -29,6 +29,8 @@ namespace Worland {
     /// view gpu wrapper tag
     struct viewGpu_t {};
 
+    /// view gpu parallALT wrapper tag
+    struct viewGpuParallalt_t {};
 } // namespace Worland
 } // namespace Fft
 } // namespace Transform

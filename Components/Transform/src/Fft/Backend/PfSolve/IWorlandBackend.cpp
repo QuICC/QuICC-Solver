@@ -21,7 +21,7 @@ namespace Fft {
 
 namespace Backend {
 
-namespace PfSolve {
+namespace PfSolve_parallALT {
 
 const MHDFloat IWorlandBackend::UPPER_BANDED = 424242.424242;
 
@@ -35,21 +35,21 @@ IWorlandBackend::IWorlandBackend() : mFlipped(false) {
 }
 
 IWorlandBackend::~IWorlandBackend() {
-  for (std::map<PfSolve_JW::PfSolve_MapKey_JonesWorland,
-                PfSolve_JW::PfSolveApplication>::iterator it =
+  for (std::map<PfSolve::PfSolve_MapKey_JonesWorland,
+                PfSolve::PfSolveApplication>::iterator it =
            appLibrary.mapJonesWorland.begin();
        it != appLibrary.mapJonesWorland.end(); ++it)
-    PfSolve_JW::deletePfSolve(&it->second);
-  for (std::map<PfSolve_JW::PfSolve_MapKey_dgbmv,
-                PfSolve_JW::PfSolveApplication>::iterator it =
+    PfSolve::deletePfSolve(&it->second);
+  for (std::map<PfSolve::PfSolve_MapKey_dgbmv,
+                PfSolve::PfSolveApplication>::iterator it =
            appLibrary.mapDGBMV.begin();
        it != appLibrary.mapDGBMV.end(); ++it)
-    PfSolve_JW::deletePfSolve(&it->second);
-  for (std::map<PfSolve_JW::PfSolve_MapKey_block,
-                PfSolve_JW::PfSolveApplication>::iterator it =
+    PfSolve::deletePfSolve(&it->second);
+  for (std::map<PfSolve::PfSolve_MapKey_block,
+                PfSolve::PfSolveApplication>::iterator it =
            appLibrary.mapBlock.begin();
        it != appLibrary.mapBlock.end(); ++it)
-    PfSolve_JW::deletePfSolve(&it->second);
+    PfSolve::deletePfSolve(&it->second);
 }
 void IWorlandBackend::transferDataToGPU(void *gpu_buffer, void *cpu_arr,
                                         uint64_t gpuOffset, uint64_t cpuOffset,
@@ -575,7 +575,7 @@ void IWorlandBackend::applyTriProduct(Matrix &out, int id, const int start,
   int r = A.cols();
   char UPLO;
   void *wTmpGPU = this->workTmpGPU(id);
-  PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
 #if (VKFFT_BACKEND == 1)
   CUresult res = CUDA_SUCCESS;
   cudaError_t res3 = cudaSuccess;
@@ -626,8 +626,8 @@ void IWorlandBackend::applyTriProduct(Matrix &out, int id, const int start,
   int LDA = 2;
   int INCX = 1;
 
-  PfSolve_JW::PfSolveApplication *tempSolveApp = 0;
-  PfSolve_JW::PfSolve_MapKey_JonesWorland mapKey = {};
+  PfSolve::PfSolveApplication *tempSolveApp = 0;
+  PfSolve::PfSolve_MapKey_JonesWorland mapKey = {};
   mapKey.size[0] = B.rows();
   mapKey.upperBanded = (A(0, 0) == UPPER_BANDED);
   mapKey.type =
@@ -635,10 +635,10 @@ void IWorlandBackend::applyTriProduct(Matrix &out, int id, const int start,
        RUNTIME_INPUTBUFFERSTRIDE + RUNTIME_OUTPUTBUFFERSTRIDE) *
           1000 +
       JWT_USE_PARALLEL_THOMAS + JWT_DISABLE_TRIDIAGONAL_SOLVE;
-  PfSolve_JW::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
+  PfSolve::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
   if (!tempSolveApp) {
-    PfSolve_JW::PfSolveApplication appSolve = {};
-    PfSolve_JW::PfSolveConfiguration configurationSolve = {};
+    PfSolve::PfSolveApplication appSolve = {};
+    PfSolve::PfSolveConfiguration configurationSolve = {};
     configurationSolve.size[0] = mapKey.size[0];
     configurationSolve.size[1] = cols;
     configurationSolve.scaleC = 1;
@@ -650,12 +650,12 @@ void IWorlandBackend::applyTriProduct(Matrix &out, int id, const int start,
     configurationSolve.isOutputFormatted = 1;
     configurationSolve.device = &this->device;
     configurationSolve.num_streams = 1;
-    resFFT = PfSolve_JW::initializePfSolve(&appSolve, configurationSolve);
+    resFFT = PfSolve::initializePfSolve(&appSolve, configurationSolve);
     resFFT =
-        PfSolve_JW::addToLibrary_JonesWorland(&appLibrary, mapKey, &appSolve);
-    PfSolve_JW::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
+        PfSolve::addToLibrary_JonesWorland(&appLibrary, mapKey, &appSolve);
+    PfSolve::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
   }
-  PfSolve_JW::PfSolveLaunchParams launchParams = {};
+  PfSolve::PfSolveLaunchParams launchParams = {};
   launchParams.buffer = (void **)&this->bufferTemp;
   launchParams.outputBuffer = (void **)&wTmpGPU;
   launchParams.inputZeropad[0] = prevOutputZeropad[currentStream][0][start];
@@ -667,7 +667,7 @@ void IWorlandBackend::applyTriProduct(Matrix &out, int id, const int start,
   launchParams.inputBufferStride = mapKey.size[0];
   launchParams.batchSize = 2 * cols;
   tempSolveApp->configuration.stream = &pStream[currentStream];
-  resFFT = PfSolve_JW::PfSolveAppend(tempSolveApp, -1, &launchParams);
+  resFFT = PfSolve::PfSolveAppend(tempSolveApp, -1, &launchParams);
   prevOutputZeropad[currentStream][0][start] = launchParams.outputZeropad[0];
   prevOutputZeropad[currentStream][1][start] = launchParams.outputZeropad[1];
 }
@@ -696,23 +696,23 @@ void IWorlandBackend::applyBandProduct(Matrix &out, int id, const int start,
   int INCX = 1;
   double BETA = 0.0;
 
-  PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
   IWorlandBackend::transferDataToGPU(&bufferTemp, B.data(), 0, 0,
                                      LDA * B.rows() * sizeof(MHDFloat),
                                      &pStream[currentStream]);
 
-  PfSolve_JW::PfSolveApplication *tempSolveApp = 0;
-  PfSolve_JW::PfSolve_MapKey_dgbmv mapKey = {};
+  PfSolve::PfSolveApplication *tempSolveApp = 0;
+  PfSolve::PfSolve_MapKey_dgbmv mapKey = {};
   mapKey.size[0] = B.rows();
   mapKey.size[1] = 2 * cols;
   mapKey.LDA = LDA;
   mapKey.KU = KU;
   mapKey.KL = KL;
 
-  PfSolve_JW::checkLibrary_dgbmv(&appLibrary, mapKey, &tempSolveApp);
+  PfSolve::checkLibrary_dgbmv(&appLibrary, mapKey, &tempSolveApp);
   if (!tempSolveApp) {
-    PfSolve_JW::PfSolveApplication appSolve = {};
-    PfSolve_JW::PfSolveConfiguration configurationSolve = {};
+    PfSolve::PfSolveApplication appSolve = {};
+    PfSolve::PfSolveConfiguration configurationSolve = {};
     configurationSolve.size[0] = mapKey.size[0];
     configurationSolve.size[1] = mapKey.size[1];
     configurationSolve.jw_control_bitmask =
@@ -727,11 +727,11 @@ void IWorlandBackend::applyBandProduct(Matrix &out, int id, const int start,
     configurationSolve.device = &this->device;
     configurationSolve.num_streams = 1;
 
-    resFFT = PfSolve_JW::initializePfSolve(&appSolve, configurationSolve);
-    resFFT = PfSolve_JW::addToLibrary_dgbmv(&appLibrary, mapKey, &appSolve);
-    PfSolve_JW::checkLibrary_dgbmv(&appLibrary, mapKey, &tempSolveApp);
+    resFFT = PfSolve::initializePfSolve(&appSolve, configurationSolve);
+    resFFT = PfSolve::addToLibrary_dgbmv(&appLibrary, mapKey, &appSolve);
+    PfSolve::checkLibrary_dgbmv(&appLibrary, mapKey, &tempSolveApp);
   }
-  PfSolve_JW::PfSolveLaunchParams launchParams = {};
+  PfSolve::PfSolveLaunchParams launchParams = {};
   launchParams.inputZeropad[0] = prevOutputZeropad[currentStream][0][start];
   launchParams.inputZeropad[1] = prevOutputZeropad[currentStream][1][start];
   launchParams.outputZeropad[0] = 0;
@@ -742,7 +742,7 @@ void IWorlandBackend::applyBandProduct(Matrix &out, int id, const int start,
   launchParams.buffer = (void **)&this->bufferTemp;
   launchParams.outputBuffer = (void **)&wTmpGPU;
   tempSolveApp->configuration.stream = &pStream[currentStream];
-  resFFT = PfSolve_JW::PfSolveAppend(tempSolveApp, -1, &launchParams);
+  resFFT = PfSolve::PfSolveAppend(tempSolveApp, -1, &launchParams);
   prevOutputZeropad[currentStream][0][start] = launchParams.outputZeropad[0];
   prevOutputZeropad[currentStream][1][start] = launchParams.outputZeropad[1];
 }
@@ -763,7 +763,7 @@ void IWorlandBackend::applyTriSolve(Matrix &out, int id, const int start,
                                     Matrix &A) const {
   char UPLO;
   void *wTmpGPU = this->workTmpGPU(id);
-  PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
 #if (VKFFT_BACKEND == 1)
   CUresult res = CUDA_SUCCESS;
   cudaError_t res3 = cudaSuccess;
@@ -821,8 +821,8 @@ void IWorlandBackend::applyTriSolve(Matrix &out, int id, const int start,
   int INCX = 1;
   int r = A.cols();
 
-  PfSolve_JW::PfSolveApplication *tempSolveApp = 0;
-  PfSolve_JW::PfSolve_MapKey_JonesWorland mapKey = {};
+  PfSolve::PfSolveApplication *tempSolveApp = 0;
+  PfSolve::PfSolve_MapKey_JonesWorland mapKey = {};
   mapKey.size[0] = B.rows();
   mapKey.upperBanded = (A(0, 0) != UPPER_BANDED);
   mapKey.type = (RUNTIME_OFFSETSOLUTION + RUNTIME_INPUTZEROPAD +
@@ -830,10 +830,10 @@ void IWorlandBackend::applyTriSolve(Matrix &out, int id, const int start,
                  RUNTIME_INPUTBUFFERSTRIDE + RUNTIME_OUTPUTBUFFERSTRIDE) *
                     1000 +
                 JWT_USE_PARALLEL_THOMAS + JWT_DIAGONAL_MATVECMUL;
-  PfSolve_JW::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
+  PfSolve::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
   if (!tempSolveApp) {
-    PfSolve_JW::PfSolveApplication appSolve = {};
-    PfSolve_JW::PfSolveConfiguration configurationSolve = {};
+    PfSolve::PfSolveApplication appSolve = {};
+    PfSolve::PfSolveConfiguration configurationSolve = {};
     configurationSolve.size[0] = mapKey.size[0];
     configurationSolve.jw_type = mapKey.type % 1000;
     configurationSolve.upperBanded = mapKey.upperBanded;
@@ -843,13 +843,13 @@ void IWorlandBackend::applyTriSolve(Matrix &out, int id, const int start,
     configurationSolve.device = &this->device;
     configurationSolve.num_streams = 1;
 
-    resFFT = PfSolve_JW::initializePfSolve(&appSolve, configurationSolve);
+    resFFT = PfSolve::initializePfSolve(&appSolve, configurationSolve);
     resFFT =
-        PfSolve_JW::addToLibrary_JonesWorland(&appLibrary, mapKey, &appSolve);
-    PfSolve_JW::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
+        PfSolve::addToLibrary_JonesWorland(&appLibrary, mapKey, &appSolve);
+    PfSolve::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
   }
 
-  PfSolve_JW::PfSolveLaunchParams launchParams = {};
+  PfSolve::PfSolveLaunchParams launchParams = {};
   launchParams.buffer = (void **)&this->bufferTemp;
   launchParams.outputBuffer = (void **)&wTmpGPU;
   launchParams.inputZeropad[0] = prevOutputZeropad[currentStream][0][start];
@@ -864,7 +864,7 @@ void IWorlandBackend::applyTriSolve(Matrix &out, int id, const int start,
   launchParams.offsetM = 0;
   launchParams.offsetV = 0;
   tempSolveApp->configuration.stream = &pStream[currentStream];
-  resFFT = PfSolve_JW::PfSolveAppend(tempSolveApp, -1, &launchParams);
+  resFFT = PfSolve::PfSolveAppend(tempSolveApp, -1, &launchParams);
   prevOutputZeropad[currentStream][0][start] = launchParams.outputZeropad[0];
   prevOutputZeropad[currentStream][1][start] = launchParams.outputZeropad[1];
 }
@@ -888,25 +888,25 @@ void IWorlandBackend::applyPair(Matrix &out, const int id, const int start,
                                 const Matrix &PS, const void *PSGPU) const {
   char UPLO;
   void *wTmpGPU = this->workTmpGPU(id);
-  PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
 #if (VKFFT_BACKEND == 1)
   CUresult res = CUDA_SUCCESS;
   cudaError_t res3 = cudaSuccess;
 #elif (VKFFT_BACKEND == 2)
   hipError_t res = hipSuccess;
 #endif
-  PfSolve_JW::PfSolveApplication *tempSolveApp = 0;
-  PfSolve_JW::PfSolve_MapKey_JonesWorland mapKey = {};
+  PfSolve::PfSolveApplication *tempSolveApp = 0;
+  PfSolve::PfSolve_MapKey_JonesWorland mapKey = {};
   mapKey.size[0] = PS.cols();
   mapKey.upperBanded = (PS(2, 0) == UPPER_BANDED);
   mapKey.type =
       (RUNTIME_OFFSETSOLUTION + RUNTIME_INPUTZEROPAD + RUNTIME_OUTPUTZEROPAD +
        RUNTIME_INPUTBUFFERSTRIDE + RUNTIME_OUTPUTBUFFERSTRIDE) *
           1000 + JWT_USE_PARALLEL_THOMAS;
-  PfSolve_JW::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
+  PfSolve::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
   if (!tempSolveApp) {
-    PfSolve_JW::PfSolveApplication appSolve = {};
-    PfSolve_JW::PfSolveConfiguration configurationSolve = {};
+    PfSolve::PfSolveApplication appSolve = {};
+    PfSolve::PfSolveConfiguration configurationSolve = {};
     configurationSolve.size[0] = mapKey.size[0];
     configurationSolve.offsetV = 2 * mapKey.size[0];
     configurationSolve.scaleC = 1;
@@ -918,12 +918,12 @@ void IWorlandBackend::applyPair(Matrix &out, const int id, const int start,
     configurationSolve.device = &this->device;
     configurationSolve.num_streams = 1;
 
-    resFFT = PfSolve_JW::initializePfSolve(&appSolve, configurationSolve);
+    resFFT = PfSolve::initializePfSolve(&appSolve, configurationSolve);
     resFFT =
-        PfSolve_JW::addToLibrary_JonesWorland(&appLibrary, mapKey, &appSolve);
-    PfSolve_JW::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
+        PfSolve::addToLibrary_JonesWorland(&appLibrary, mapKey, &appSolve);
+    PfSolve::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
   }
-  PfSolve_JW::PfSolveLaunchParams launchParams = {};
+  PfSolve::PfSolveLaunchParams launchParams = {};
   launchParams.buffer = (void **)&PSGPU;
   launchParams.outputBuffer = (void **)&wTmpGPU;
   launchParams.inputZeropad[0] = 0;
@@ -942,7 +942,7 @@ void IWorlandBackend::applyPair(Matrix &out, const int id, const int start,
   launchParams.batchSize = 2 * cols;
 
   tempSolveApp->configuration.stream = &pStream[currentStream];
-  resFFT = PfSolve_JW::PfSolveAppend(tempSolveApp, -1, &launchParams);
+  resFFT = PfSolve::PfSolveAppend(tempSolveApp, -1, &launchParams);
   prevOutputZeropad[currentStream][0][start] = launchParams.outputZeropad[0];
   prevOutputZeropad[currentStream][1][start] = launchParams.outputZeropad[1];
 }
@@ -954,25 +954,25 @@ void IWorlandBackend::applyPairCombined(Matrix &out, const int id,
                                         const void **bandedGPU) const {
   char UPLO;
   void *wTmpGPU = this->workTmpGPU(id);
-  PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
 #if (VKFFT_BACKEND == 1)
   CUresult res = CUDA_SUCCESS;
   cudaError_t res3 = cudaSuccess;
 #elif (VKFFT_BACKEND == 2)
   hipError_t res = hipSuccess;
 #endif
-  PfSolve_JW::PfSolveApplication *tempSolveApp = 0;
-  PfSolve_JW::PfSolve_MapKey_JonesWorland mapKey = {};
+  PfSolve::PfSolveApplication *tempSolveApp = 0;
+  PfSolve::PfSolve_MapKey_JonesWorland mapKey = {};
   mapKey.size[0] = rows_start * 100000 + rows_end;
   mapKey.upperBanded = (PS(2, 0) == UPPER_BANDED);
   mapKey.type =
       (RUNTIME_OFFSETSOLUTION + RUNTIME_INPUTZEROPAD + RUNTIME_OUTPUTZEROPAD +
        RUNTIME_INPUTBUFFERSTRIDE + RUNTIME_OUTPUTBUFFERSTRIDE) *
           1000 + JWT_USE_PARALLEL_THOMAS;
-  PfSolve_JW::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
+  PfSolve::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
   if (!tempSolveApp) {
-    PfSolve_JW::PfSolveApplication appSolve = {};
-    PfSolve_JW::PfSolveConfiguration configurationSolve = {};
+    PfSolve::PfSolveApplication appSolve = {};
+    PfSolve::PfSolveConfiguration configurationSolve = {};
     configurationSolve.size[0] = mapKey.size[0] / 100000;
     configurationSolve.useMultipleInputBuffers = abs(rows_start - rows_end);
     configurationSolve.numConsecutiveJWIterations = abs(rows_start - rows_end);
@@ -985,12 +985,12 @@ void IWorlandBackend::applyPairCombined(Matrix &out, const int id,
     configurationSolve.device = &this->device;
     configurationSolve.num_streams = 1;
 
-    resFFT = PfSolve_JW::initializePfSolve(&appSolve, configurationSolve);
+    resFFT = PfSolve::initializePfSolve(&appSolve, configurationSolve);
     resFFT =
-        PfSolve_JW::addToLibrary_JonesWorland(&appLibrary, mapKey, &appSolve);
-    PfSolve_JW::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
+        PfSolve::addToLibrary_JonesWorland(&appLibrary, mapKey, &appSolve);
+    PfSolve::checkLibrary_JonesWorland(&appLibrary, mapKey, &tempSolveApp);
   }
-  PfSolve_JW::PfSolveLaunchParams launchParams = {};
+  PfSolve::PfSolveLaunchParams launchParams = {};
   launchParams.buffer = (void **)bandedGPU;
   launchParams.outputBuffer = (void **)&wTmpGPU;
   launchParams.inputZeropad[0] = 0;
@@ -1013,7 +1013,7 @@ void IWorlandBackend::applyPairCombined(Matrix &out, const int id,
   launchParams.batchSize = 2 * cols;
 
   tempSolveApp->configuration.stream = &pStream[currentStream];
-  resFFT = PfSolve_JW::PfSolveAppend(tempSolveApp, -1, &launchParams);
+  resFFT = PfSolve::PfSolveAppend(tempSolveApp, -1, &launchParams);
   prevOutputZeropad[currentStream][0][start] = launchParams.outputZeropad[0];
   prevOutputZeropad[currentStream][1][start] = launchParams.outputZeropad[1];
 }
@@ -1027,7 +1027,7 @@ void IWorlandBackend::scaleC(const MHDFloat c, const bool isEven0,
                              const unsigned int id) const {
   Matrix &wTmp = this->workTmp(id);
 
-  PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
   for (int isEven = 0; isEven < 2; isEven++) {
     int start = 0;
     currentStream = isPhysEven(isEven);
@@ -1039,18 +1039,18 @@ void IWorlandBackend::scaleC(const MHDFloat c, const bool isEven0,
       int cols = std::get<2>(loc);
       start += cols;
     }
-    PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-    PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+    PfSolve::PfSolveApplication *tempAppCopy = 0;
+    PfSolve::PfSolve_MapKey_block mapKey = {};
     mapKey.size[0] = wTmp.rows();
     mapKey.size[1] = 2 * start;
     mapKey.type = (RUNTIME_OFFSETM + RUNTIME_OFFSETSOLUTION + RUNTIME_SCALEC +
                    RUNTIME_INPUTBUFFERSTRIDE + RUNTIME_OUTPUTBUFFERSTRIDE) *
                       1000 +
                   BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
-    resFFT = PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+    resFFT = PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
     if (!tempAppCopy) {
-      PfSolve_JW::PfSolveApplication appCopy = {};
-      PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+      PfSolve::PfSolveApplication appCopy = {};
+      PfSolve::PfSolveConfiguration configurationCopy = {};
 
       configurationCopy.size[0] = mapKey.size[0];
       configurationCopy.size[1] = mapKey.size[1];
@@ -1061,13 +1061,13 @@ void IWorlandBackend::scaleC(const MHDFloat c, const bool isEven0,
       configurationCopy.device = &this->device;
       configurationCopy.num_streams = 1;
 
-      resFFT = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
-      resFFT = PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+      resFFT = PfSolve::initializePfSolve(&appCopy, configurationCopy);
+      resFFT = PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
       resFFT =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
     }
 
-    PfSolve_JW::PfSolveLaunchParams launchParams = {};
+    PfSolve::PfSolveLaunchParams launchParams = {};
     launchParams.offsetM = 0;
     launchParams.offsetSolution = 0;
     launchParams.scaleC = c;
@@ -1077,7 +1077,7 @@ void IWorlandBackend::scaleC(const MHDFloat c, const bool isEven0,
     launchParams.outputBuffer = (void **)&wTmpGPU;
 
     tempAppCopy->configuration.stream = &pStream[currentStream];
-    resFFT = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+    resFFT = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
   }
 }
 
@@ -1093,13 +1093,13 @@ void IWorlandBackend::scaleALPY(const MHDFloat a, const MHDFloat y,
     Matrix &wTmp = this->workTmp(id);
     void *wTmpGPU = this->workTmpGPU(id);
 
-    PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+    PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
     for (auto loc : *this->pLoc(isEven, id)) {
       int l = std::get<4>(loc) + lshift;
       int cols = std::get<2>(loc);
       int rows = std::get<3>(loc);
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = rows;
       mapKey.size[1] = 2 * cols;
       mapKey.type =
@@ -1110,10 +1110,10 @@ void IWorlandBackend::scaleALPY(const MHDFloat a, const MHDFloat y,
           BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
 
       resFFT =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -1124,12 +1124,12 @@ void IWorlandBackend::scaleALPY(const MHDFloat a, const MHDFloat y,
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resFFT = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
-        resFFT = PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+        resFFT = PfSolve::initializePfSolve(&appCopy, configurationCopy);
+        resFFT = PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resFFT =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
       launchParams.offsetM = 2 * start * wTmp.rows();
       launchParams.offsetSolution = 2 * start * wTmp.rows();
       launchParams.scaleC = a * l + y;
@@ -1145,7 +1145,7 @@ void IWorlandBackend::scaleALPY(const MHDFloat a, const MHDFloat y,
       launchParams.outputBuffer = (void **)&wTmpGPU;
 
       tempAppCopy->configuration.stream = &pStream[currentStream];
-      resFFT = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+      resFFT = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
 
       prevOutputZeropad[currentStream][0][start] =
           launchParams.outputZeropad[0];
@@ -1168,13 +1168,13 @@ void IWorlandBackend::scaleD(const bool isEven0, const int lshift,
     Matrix &wTmp = this->workTmp(id);
     void *wTmpGPU = this->workTmpGPU(id);
 
-    PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+    PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
     for (auto loc : *this->pLoc(isEven, id)) {
       int l = std::get<4>(loc) + lshift;
       int cols = std::get<2>(loc);
       int rows = std::get<3>(loc);
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = rows;
       mapKey.size[1] = 2 * cols;
       mapKey.type =
@@ -1185,10 +1185,10 @@ void IWorlandBackend::scaleD(const bool isEven0, const int lshift,
           BLOCK_SCALED + BLOCK_READ_REAL_WRITE_REAL;
       mapKey.lshift = l;
       resFFT =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -1200,12 +1200,12 @@ void IWorlandBackend::scaleD(const bool isEven0, const int lshift,
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resFFT = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
-        resFFT = PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+        resFFT = PfSolve::initializePfSolve(&appCopy, configurationCopy);
+        resFFT = PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resFFT =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
       launchParams.offsetM = 2 * start * wTmp.rows();
       launchParams.offsetSolution = 2 * start * wTmp.rows();
       launchParams.scaleC = alpha;
@@ -1221,7 +1221,7 @@ void IWorlandBackend::scaleD(const bool isEven0, const int lshift,
       launchParams.outputBuffer = (void **)&wTmpGPU;
 
       tempAppCopy->configuration.stream = &pStream[currentStream];
-      resFFT = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+      resFFT = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
       prevOutputZeropad[currentStream][0][start] =
           launchParams.outputZeropad[0];
       prevOutputZeropad[currentStream][1][start] =
@@ -1243,13 +1243,13 @@ void IWorlandBackend::scaleSphLaplA(const bool isEven0, const int lshift,
     Matrix &wTmp = this->workTmp(id);
     void *wTmpGPU = this->workTmpGPU(id);
 
-    PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+    PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
     for (auto loc : *this->pLoc(isEven, id)) {
       int l = std::get<4>(loc) + lshift;
       int cols = std::get<2>(loc);
       int rows = std::get<3>(loc);
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = rows;
       mapKey.size[1] = 2 * cols;
       mapKey.type =
@@ -1260,10 +1260,10 @@ void IWorlandBackend::scaleSphLaplA(const bool isEven0, const int lshift,
           BLOCK_SCALESPHLAPLA + BLOCK_READ_REAL_WRITE_REAL;
       mapKey.lshift = l;
       resFFT =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -1275,12 +1275,12 @@ void IWorlandBackend::scaleSphLaplA(const bool isEven0, const int lshift,
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resFFT = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
-        resFFT = PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+        resFFT = PfSolve::initializePfSolve(&appCopy, configurationCopy);
+        resFFT = PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resFFT =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
       launchParams.offsetM = 2 * start * wTmp.rows();
       launchParams.offsetSolution = 2 * start * wTmp.rows();
       launchParams.scaleC = alpha;
@@ -1296,7 +1296,7 @@ void IWorlandBackend::scaleSphLaplA(const bool isEven0, const int lshift,
       launchParams.outputBuffer = (void **)&wTmpGPU;
 
       tempAppCopy->configuration.stream = &pStream[currentStream];
-      resFFT = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+      resFFT = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
       prevOutputZeropad[currentStream][0][start] =
           launchParams.outputZeropad[0];
       prevOutputZeropad[currentStream][1][start] =
@@ -1318,13 +1318,13 @@ void IWorlandBackend::scaleSphLaplB(const bool isEven0, const int lshift,
     Matrix &wTmp = this->workTmp(id);
     void *wTmpGPU = this->workTmpGPU(id);
 
-    PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+    PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
     for (auto loc : *this->pLoc(isEven, id)) {
       int l = std::get<4>(loc) + lshift;
       int cols = std::get<2>(loc);
       int rows = std::get<3>(loc);
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = rows;
       mapKey.size[1] = 2 * cols;
       mapKey.type =
@@ -1335,10 +1335,10 @@ void IWorlandBackend::scaleSphLaplB(const bool isEven0, const int lshift,
           BLOCK_SCALESPHLAPLB + BLOCK_READ_REAL_WRITE_REAL;
       mapKey.lshift = l;
       resFFT =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -1350,12 +1350,12 @@ void IWorlandBackend::scaleSphLaplB(const bool isEven0, const int lshift,
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resFFT = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
-        resFFT = PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+        resFFT = PfSolve::initializePfSolve(&appCopy, configurationCopy);
+        resFFT = PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resFFT =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
       launchParams.offsetM = 2 * start * wTmp.rows();
       launchParams.offsetSolution = 2 * start * wTmp.rows();
       launchParams.scaleC = alpha;
@@ -1370,7 +1370,7 @@ void IWorlandBackend::scaleSphLaplB(const bool isEven0, const int lshift,
       launchParams.buffer = (void **)&wTmpGPU;
       launchParams.outputBuffer = (void **)&wTmpGPU;
       tempAppCopy->configuration.stream = &pStream[currentStream];
-      resFFT = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+      resFFT = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
 
       prevOutputZeropad[currentStream][0][start] =
           launchParams.outputZeropad[0];
@@ -1402,12 +1402,12 @@ void IWorlandBackend::nshift(const unsigned int id, const int nshift,
     void *wTmpGPU = this->workTmpGPU(id);
     int s = std::abs(nshift);
 
-    PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+    PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
     for (auto loc : *this->pLoc(isEven, id)) {
       int cols = std::get<2>(loc);
       int rows = std::get<3>(loc) - s;
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = rows;
       mapKey.size[1] = 2 * cols;
       mapKey.type = (RUNTIME_OFFSETM + RUNTIME_OFFSETSOLUTION +
@@ -1416,10 +1416,10 @@ void IWorlandBackend::nshift(const unsigned int id, const int nshift,
                         1000 +
                     BLOCK_READ_REAL_WRITE_REAL;
       resFFT =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -1431,12 +1431,12 @@ void IWorlandBackend::nshift(const unsigned int id, const int nshift,
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resFFT = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
-        resFFT = PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+        resFFT = PfSolve::initializePfSolve(&appCopy, configurationCopy);
+        resFFT = PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resFFT =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
       launchParams.inputZeropad[0] = prevOutputZeropad[currentStream][0][start];
       launchParams.inputZeropad[1] = prevOutputZeropad[currentStream][1][start];
 
@@ -1457,7 +1457,7 @@ void IWorlandBackend::nshift(const unsigned int id, const int nshift,
       launchParams.outputBuffer = (void **)&wTmpGPU;
 
       tempAppCopy->configuration.stream = &pStream[currentStream];
-      resFFT = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+      resFFT = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
       prevOutputZeropad[currentStream][0][start] =
           launchParams.outputZeropad[0];
       prevOutputZeropad[currentStream][1][start] =
@@ -1486,12 +1486,12 @@ void IWorlandBackend::copy(const int to, const int from, const int nshift,
       *this->pLoc(isEven, to) = *this->pLoc(isEven, from);
     }
 
-    PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+    PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
     for (auto loc : *this->pLoc(isEven, to)) {
       int cols = std::get<2>(loc);
       int rows = std::get<3>(loc) - s;
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = rows;
       mapKey.size[1] = 2 * cols;
       mapKey.type = (RUNTIME_OFFSETM + RUNTIME_OFFSETSOLUTION +
@@ -1500,10 +1500,10 @@ void IWorlandBackend::copy(const int to, const int from, const int nshift,
                         1000 +
                     BLOCK_READ_REAL_WRITE_REAL;
       resFFT =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -1515,13 +1515,13 @@ void IWorlandBackend::copy(const int to, const int from, const int nshift,
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resFFT = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
-        resFFT = PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+        resFFT = PfSolve::initializePfSolve(&appCopy, configurationCopy);
+        resFFT = PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resFFT =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
 
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
       launchParams.inputZeropad[0] = prevOutputZeropad[currentStream][0][start];
       launchParams.inputZeropad[1] = prevOutputZeropad[currentStream][1][start];
       if (nshift > 0) {
@@ -1541,7 +1541,7 @@ void IWorlandBackend::copy(const int to, const int from, const int nshift,
       launchParams.buffer = (void **)&wTmpGPU;
       launchParams.outputBuffer = (void **)&extraTmpGPU;
       tempAppCopy->configuration.stream = &pStream[currentStream];
-      resFFT = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+      resFFT = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
 
       prevOutputZeropad[currentStream][0][start] =
           launchParams.outputZeropad[0];
@@ -1568,12 +1568,12 @@ void IWorlandBackend::add(const int to, const int from, const int nshift,
 
     int s = std::abs(nshift);
 
-    PfSolve_JW::PfSolveResult resFFT = PfSolve_JW::PFSOLVE_SUCCESS;
+    PfSolve::PfSolveResult resFFT = PfSolve::PFSOLVE_SUCCESS;
     for (auto loc : *this->pLoc(isEven, to)) {
       int cols = std::get<2>(loc);
       int rows = std::get<3>(loc) - s;
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = rows;
       mapKey.size[1] = 2 * cols;
       mapKey.type = (RUNTIME_OFFSETM + RUNTIME_OFFSETSOLUTION +
@@ -1581,10 +1581,10 @@ void IWorlandBackend::add(const int to, const int from, const int nshift,
                         1000 +
                     BLOCK_ADD_OUTPUTBUFFER_VALUES + BLOCK_READ_REAL_WRITE_REAL;
       resFFT =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -1595,12 +1595,12 @@ void IWorlandBackend::add(const int to, const int from, const int nshift,
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resFFT = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
-        resFFT = PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+        resFFT = PfSolve::initializePfSolve(&appCopy, configurationCopy);
+        resFFT = PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resFFT =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
 
       if (nshift > 0) {
         launchParams.offsetM = 2 * start * extraTmp.rows();
@@ -1614,7 +1614,7 @@ void IWorlandBackend::add(const int to, const int from, const int nshift,
       launchParams.buffer = (void **)&extraTmpGPU;
       launchParams.outputBuffer = (void **)&wTmpGPU;
       tempAppCopy->configuration.stream = &pStream[currentStream];
-      resFFT = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+      resFFT = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
       start += cols;
     }
   }

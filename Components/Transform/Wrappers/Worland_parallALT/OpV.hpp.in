@@ -1,0 +1,183 @@
+/**
+ * @file @Op@@Tag@.hpp.inc
+ * @brief Wrapper of the Worland @Op@ @Kind@
+ */
+#pragma once
+@Layout@
+
+// System includes
+//
+#include <vector>
+#include <complex>
+@HppHeaders@
+
+// Project includes
+//
+#include "Types/Typedefs.hpp"
+#include "QuICC/Transform/Fft/Worland/@Kind@/IWorland@Kind@.hpp"
+#include "QuICC/Transform/Fft/Worland/Tags.hpp"
+#include "View/View.hpp"
+#include "Operator/Unary.hpp"
+
+#include <cuComplex.h>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <cuda_runtime_api.h>
+#include <nvrtc.h>
+#include "parallALT.hpp"
+
+namespace QuICC {
+namespace Transform {
+namespace Fft {
+namespace Worland {
+namespace @Kind@ {
+
+template <class Impl>
+class @Op@;
+
+/**
+* @brief Implementation of the Worland based @Op@ @Kind@
+*/
+template<>
+class @Op@<@Tag@>: public IWorland@Kind@
+{
+public:
+
+    /**
+     * @brief Constructor
+     */
+    @Op@() = default;
+
+    /**
+     * @brief Destructor
+     */
+    ~@Op@();
+protected:
+         /**
+          * @brief Initialise FFT backend
+          */
+         void computeWorlandExpansion(const bool isEven) const final;
+private:
+
+        /**
+          * @brief Apply pre FFT operator
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          */
+          void applyPreOperator(const Matrix& in, const bool isEven) const final;
+
+         /**
+          * @brief Apply post FFT operator
+          *
+          * @param rOut Output values
+          */
+         void applyPostOperator(Matrix& rOut, const bool isEven) const final;
+
+         /**
+          * @brief Apply pre FFT operator for component wise openerations
+          *
+          * @param in   Input values
+          * @param useReal Real vs Imag flag
+          */
+         void applyPreOperator(const MatrixZ& in, const bool isEven, const bool useReal) const final;
+
+         /**
+          * @brief Apply post FFT operator for component wise operations
+          *
+          * @param rOut Output values
+          * @param useReal Real vs Imag flag
+          */
+         void applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const final;
+    /// @brief Replace base @Kind@ init
+    /// @param igrid
+    /// @param iweights
+    void initBackend() const;
+
+
+    /// @brief Make operator
+    /// this is not used in the view implementations
+    /// @param op
+    /// @param igrid
+    /// @param iweights
+    /// @param i
+    void makeOperator(Matrix& op, const int i) const;
+
+    /// @brief
+    /// @param rOut
+    /// @param in
+    void applyOperators(MatrixZ& rOut, const MatrixZ& in) const;
+
+    /// @brief
+    /// @param rOut
+    /// @param in
+    void applyOperators(Matrix& rOut, const MatrixZ& in) const;
+
+    /// @brief Apply ith operator
+    /// this is not used in the view implementations
+    /// @param rOut
+    /// @param i
+    /// @param in
+    void applyOperator(Eigen::Ref<MatrixZ> rOut, const int i, const Eigen::Ref<const MatrixZ>& in) const;
+
+    // Uniform truncation
+    #ifdef QUICC_JW_ROW_MAJOR
+    using mods_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using op_t = View::View<double, View::@OpAttribute@>;
+    #elif defined QUICC_JW_ALL_ROW_MAJOR
+    using mods_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3DJIK>;
+    using op_t = View::View<double, View::@OpAttribute@JIK>;
+    #else
+    using mods_t = View::View<std::complex<double>, View::DCCSC3D>;
+    using phys_t = View::View<std::complex<double>, View::DCCSC3D>;
+    using op_t = View::View<double, View::@OpAttribute@JIK>;
+    #endif
+
+    /// @brief Operator backend class pointer
+    mutable std::unique_ptr<QuICC::Operator::UnaryOp<@OpInOut@>> mOp;
+
+    /// @brief Output View
+    mutable mods_t mModsView;
+
+    /// @brief Input View
+    mutable phys_t mPhysView;
+
+    /// @brief Temporary storage for flattened output
+    mutable std::vector<std::complex<double>> mModsFlat;
+
+    /// @brief Temporary storage for flattened input
+    mutable std::vector<std::complex<double>> mPhysFlat;
+
+    /// @brief Data pointers
+    mutable std::vector<std::uint32_t> mDataPointers;
+
+    /// @brief Data indices
+    mutable std::vector<std::uint32_t> mDataIndices;
+
+    /**
+    * @brief parallALT configurations
+    */
+    mutable parallALT_configuration config_forward = {};
+    mutable parallALT_configuration config_backward = {};
+
+    /**
+    * @brief parallALT app pointers
+    */
+    mutable parallALT_app appContainer_forward = {};
+    mutable parallALT_app appContainer_backward = {};
+
+    /**
+    * @brief parallALT app pointers
+    */
+    mutable PfSolve::VkGPU VkGPU = {};
+
+    @Storage@
+};
+
+} // namespace @Kind@
+} // namespace Worland
+} // namespace Poly
+} // namespace Transform
+} // namespace QuICC

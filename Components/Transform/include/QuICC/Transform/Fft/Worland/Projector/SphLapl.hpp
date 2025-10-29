@@ -13,4 +13,8 @@
 //
 #include "QuICC/Transform/Fft/Worland/Projector/Base/SphLapl.hpp"
 
+#ifdef QUICC_USE_PFSOLVE
+#include "QuICC/Transform/Wrappers/Worland/Projector/SphLaplviewGpuParallalt_t.hpp.inc"
+#endif
+
 #endif // QUICC_TRANSFORM_FFT_WORLAND_PROJECTOR_SPHLAPL_HPP

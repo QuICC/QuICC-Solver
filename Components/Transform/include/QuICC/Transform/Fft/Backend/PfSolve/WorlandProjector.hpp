@@ -22,7 +22,7 @@ namespace Fft {
 
 namespace Backend {
 
-namespace PfSolve {
+namespace PfSolve_parallALT {
 
 /**
  * @brief Interface for a generic Worland PFSOLVE based projector

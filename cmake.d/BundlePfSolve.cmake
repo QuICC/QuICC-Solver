@@ -12,48 +12,55 @@ option(QUICC_USE_QUADDOUBLEDOUBLE_PFSOLVE "Use quad double-double version of PfS
 add_library(PfSolve INTERFACE IMPORTED)
 set(QUICC_MESSAGE_QUIET ON)
 set(VKFFT_BACKEND 1 CACHE STRING "0 - Vulkan, 1 - CUDA, 2 - HIP, 3 - OpenCL")
-add_definitions(-DVKFFT_BACKEND=${VKFFT_BACKEND})
-add_definitions(-DQUICC_USE_PFSOLVE)
+target_compile_definitions(PfSolve INTERFACE -DVKFFT_BACKEND=${VKFFT_BACKEND})
 if(QUICC_USE_QUADDOUBLEDOUBLE_PFSOLVE)
-    add_definitions(-DPFSOLVE_FP128)
+    target_compile_definitions(PfSolve INTERFACE -DPFSOLVE_FP128)
 endif() 
 
 if(QUICC_USE_SYSTEM_PFSOLVE)
-    find_path(PFSOLVE_DIR
-    NAMES pfSolve.h
-    HINTS "${PFSOLVE_SOURCE_DIR}"
-    DOC "pfSolve directory"
-    )
-    if(NOT PFSOLVE_DIR)
-    message(FATAL_ERROR "Not found PfSolve")
-    endif()
-    if(NOT PFSOLVE_SOURCE_DIR)
-        set(PFSOLVE_SOURCE_DIR "${PFSOLVE_DIR}")
-    endif()
-    if(NOT PFSOLVE_KERNELS_DIR)
-        set(PFSOLVE_KERNELS_DIR "${PFSOLVE_SOURCE_DIR}")
-    endif()
-    add_definitions(-DPFSOLVE_KERNELS_DIR="${PFSOLVE_KERNELS_DIR}")
-else()
-    include(FetchContent)
-    FetchContent_Declare(
-        PfSolve
-        GIT_REPOSITORY "https://github.com/QuICC/PfSolve"
-        GIT_TAG ${QUICC_PFSOLVE_VERSION}
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND ""
-    )
-    FetchContent_Populate(PfSolve)
-    set(PFSOLVE_SOURCE_DIR "${FETCHCONTENT_BASE_DIR}/pfsolve-src/PfSolve")
+    #find_path(PFSOLVE_DIR
+    #NAMES pfSolve.h
+    #HINTS "${PFSOLVE_SOURCE_DIR}"
+    #DOC "pfSolve directory"
+    #)
+    #if(NOT PFSOLVE_DIR)
+    #message(FATAL_ERROR "Not found PfSolve")
+    #endif()
+    #if(NOT PFSOLVE_SOURCE_DIR)
+    #    set(PFSOLVE_SOURCE_DIR "${PFSOLVE_DIR}")
+    #endif()
+    #if(NOT PFSOLVE_KERNELS_DIR)
+    #    set(PFSOLVE_KERNELS_DIR "${PFSOLVE_SOURCE_DIR}")
+    #endif()
+    #add_definitions(-DPFSOLVE_KERNELS_DIR="${PFSOLVE_KERNELS_DIR}")
+
+    set(PFSOLVE_PFSOLVE_SOURCE_DIR "${FETCHCONTENT_BASE_DIR}/pfsolve-src/PfSolve")
+    set(PFSOLVE_VKFFT_SOURCE_DIR "${FETCHCONTENT_BASE_DIR}/pfsolve-src/vkFFT")
+    set(PFSOLVE_PARALLALT_SOURCE_DIR "${FETCHCONTENT_BASE_DIR}/pfsolve-src/parallALT/include")
     set(PFSOLVE_KERNELS_DIR "${FETCHCONTENT_BASE_DIR}/pfsolve-build")
-    add_definitions(-DPFSOLVE_KERNELS_DIR="${PFSOLVE_KERNELS_DIR}")
+    target_compile_definitions(PfSolve INTERFACE -DPFSOLVE_KERNELS_DIR="${PFSOLVE_KERNELS_DIR}")
+else()
+    #include(FetchContent)
+    #FetchContent_Declare(
+    #    PfSolve
+    #    GIT_REPOSITORY "https://github.com/QuICC/PfSolve"
+    #    GIT_TAG ${QUICC_PFSOLVE_VERSION}
+    #    CONFIGURE_COMMAND ""
+    #    BUILD_COMMAND ""
+    #    INSTALL_COMMAND ""
+    #)
+    #FetchContent_Populate(PfSolve)
+    set(PFSOLVE_PFSOLVE_SOURCE_DIR "${FETCHCONTENT_BASE_DIR}/pfsolve-src/PfSolve")
+    set(PFSOLVE_VKFFT_SOURCE_DIR "${FETCHCONTENT_BASE_DIR}/pfsolve-src/vkFFT")
+    set(PFSOLVE_PARALLALT_SOURCE_DIR "${FETCHCONTENT_BASE_DIR}/pfsolve-src/parallALT/include")
+    set(PFSOLVE_KERNELS_DIR "${FETCHCONTENT_BASE_DIR}/pfsolve-build")
+    target_compile_definitions(PfSolve INTERFACE -DPFSOLVE_KERNELS_DIR="${PFSOLVE_KERNELS_DIR}")
 endif()
     
 if(${VKFFT_BACKEND} EQUAL 0)
 elseif(${VKFFT_BACKEND} EQUAL 1)
     enable_language(CUDA)
-    add_definitions(-DCUDA_TOOLKIT_ROOT_DIR="${CUDA_TOOLKIT_ROOT_DIR}")
+    target_compile_definitions(PfSolve INTERFACE -DCUDA_TOOLKIT_ROOT_DIR="${CUDA_TOOLKIT_ROOT_DIR}")
 elseif(${VKFFT_BACKEND} EQUAL 2)
     find_package(hip)
 endif()
@@ -83,7 +90,7 @@ if(QUICC_USE_QUADDOUBLEDOUBLE_PFSOLVE)
 endif()
 
 if((${VKFFT_BACKEND} EQUAL 1) OR (${VKFFT_BACKEND} EQUAL 2))
-    target_include_directories(PfSolve INTERFACE "${PFSOLVE_SOURCE_DIR}")
+    target_include_directories(PfSolve INTERFACE "${PFSOLVE_PFSOLVE_SOURCE_DIR}" "${PFSOLVE_VKFFT_SOURCE_DIR}" "${PFSOLVE_PARALLALT_SOURCE_DIR}")
 endif()
 
 list(POP_BACK CMAKE_MESSAGE_INDENT)

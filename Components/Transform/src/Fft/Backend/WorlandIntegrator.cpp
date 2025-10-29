@@ -25,7 +25,7 @@
    #define BACKENDIMPL CuFft
 #elif defined QUICC_FFT_WORLAND_PFSOLVE
    #include "QuICC/Transform/Fft/Backend/PfSolve/WorlandIntegrator.hpp"
-   #define BACKENDIMPL PfSolve
+   #define BACKENDIMPL PfSolve_parallALT
 #endif
 
 namespace QuICC {

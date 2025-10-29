@@ -23,7 +23,7 @@ namespace Fft {
 
 namespace Backend {
 
-namespace PfSolve {
+namespace PfSolve_parallALT {
 
 /**
  * @brief Interface for a generic PFSOLVE backend
@@ -98,7 +98,7 @@ private:
   void cleanupFft();
 };
 
-} // namespace PfSolve
+} // namespace ParallALT
 } // namespace Backend
 } // namespace Fft
 } // namespace Transform

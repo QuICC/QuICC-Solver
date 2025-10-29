@@ -223,6 +223,11 @@ endforeach()
 set(_tests
   Fft::P:<base_t>:projector
 )
+if(TARGET PfSolve)
+  list(APPEND _tests
+    Fft::P:<viewGpuParallalt_t>:projector
+  )
+endif()
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -247,6 +252,11 @@ endforeach()
 set(_tests
   Fft::D1:<base_t>:projector
 )
+if(TARGET PfSolve)
+  list(APPEND _tests
+    Fft::D1:<viewGpuParallalt_t>:projector
+  )
+endif()
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -271,6 +281,11 @@ endforeach()
 set(_tests
   Fft::SphLapl:<base_t>:projector
 )
+if(TARGET PfSolve)
+  list(APPEND _tests
+    Fft::SphLapl:<viewGpuParallalt_t>:projector
+  )
+endif()
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}

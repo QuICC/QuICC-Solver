@@ -22,16 +22,18 @@ namespace Fft {
 
 namespace Backend {
 
-namespace PfSolve {
+namespace PfSolve_parallALT {
 
 WorlandProjector::WorlandProjector() {}
 
 WorlandProjector::~WorlandProjector() {
-  this->freeBanded(false);
+   //deleteParallALT(&VkGPU, &appContainer_backward);
+   /* this->freeBanded(false);
   this->freeBanded(true);
   deleteVkFFT(&mEvenApp);
   deleteVkFFT(&mOddApp);
-  for (int i = 0; i < 2; i++) {
+   for (int i = 0; i < 2; i++)
+  {
 #if (VKFFT_BACKEND == 1)
     cudaFree(bufferSolve[i]);
     cudaFree(bufferSolve2[i]);
@@ -49,6 +51,7 @@ WorlandProjector::~WorlandProjector() {
 #elif (VKFFT_BACKEND == 2)
   hipFree(bufferSolve2[2]);
 #endif
+*/
 }
 
 void WorlandProjector::init(const SetupType &setup, const int lshift,
@@ -79,26 +82,26 @@ void WorlandProjector::init(const SetupType &setup, const int lshift,
   // Initialize temporary storage
   int blockSize = std::max(this->mEBlockSize, this->mOBlockSize);
   // Input temporary storage
-  this->initStorage(bwdSize, blockSize, 1, this->mInTmp);
+  //this->initStorage(bwdSize, blockSize, 1, this->mInTmp);
   // Output temporary storage
-  this->initStorage(fwdSize, blockSize, 1, this->mOutTmp);
+  //this->initStorage(fwdSize, blockSize, 1, this->mOutTmp);
 
   // Set sizes
   this->mPadSize = setup.padSize();
 
   // Initialise temporary storage
   blockSize = this->mEBlockSize;
-  Matrix tmpF = Matrix::Zero(fwdSize, blockSize);
-  Matrix tmpB = Matrix::Zero(bwdSize, blockSize);
+  //Matrix tmpF = Matrix::Zero(fwdSize, blockSize);
+  //Matrix tmpB = Matrix::Zero(bwdSize, blockSize);
 
   // Create the spectral to physical plan
-  mEvenConfiguration.FFTdim = 1;
+  /* mEvenConfiguration.FFTdim = 1;
   mEvenConfiguration.size[0] = fwdSize;
   mEvenConfiguration.numberBatches = 2 * blockSize;
   mEvenConfiguration.doublePrecision = 1;
   mEvenConfiguration.performDCT = 3;
   mEvenConfiguration.device = &this->device;
-  mEvenConfiguration.num_streams = 1;
+ // mEvenConfiguration.num_streams = 1;
   mEvenSize = fwdSize * 2 * blockSize * sizeof(double);
   mEvenConfiguration.bufferSize = &mEvenSize;
 
@@ -116,7 +119,7 @@ void WorlandProjector::init(const SetupType &setup, const int lshift,
   mOddConfiguration.doublePrecision = 1;
   mOddConfiguration.performDCT = 4;
   mOddConfiguration.device = &this->device;
-  mOddConfiguration.num_streams = 1;
+ // mOddConfiguration.num_streams = 1;
   mOddSize = bwdSize * 2 * blockSize * sizeof(double);
   mOddConfiguration.bufferSize = &mOddSize;
 
@@ -152,7 +155,79 @@ void WorlandProjector::init(const SetupType &setup, const int lshift,
   hipStreamCreate(&pStream[1]);
 
   hipMalloc((void **)&bufferSolve2[2], 8 * (mEvenSize + mOddSize));
-#endif
+#endif*/
+  PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+  config_backward = {};
+	config_backward.Ntheta = setup.bwdSize();
+    //config_backward.M = ((this->mSpecSize+1)/2)*2;
+    //config_backward.L = 3*config_backward.M/2;
+    
+    config_backward.radialTransform = 1;
+	config_backward.useGraphs = 1;
+	config_backward.testMerge = 0;
+	config_backward.testAccuracy = 1;
+	config_backward.doALTOnly = 1;
+	config_backward.useMatMulConnection = 1;
+	config_backward.use_tc = 2;
+	config_backward.mergeType = 1;
+	config_backward.numMergedIterMatMul = 8;
+	config_backward.numMergedIterMax = 1;
+	config_backward.numMergedIterMin = 1;
+	config_backward.disableCaching = 1;
+	config_backward.fixAccuracy = 1;
+	config_backward.numRadialBatches = 1;
+	config_backward.profile_iter = 1;
+	config_backward.profile_iter_combined = 1;
+	config_backward.WMMA_M = 8;
+	config_backward.WMMA_N = 8;
+	config_backward.WMMA_K = 4;
+	appContainer_backward = {};
+   config_backward.projector = 1;
+
+   //printf("\n%d %d \n", config_backward.Ntheta, config_backward.L);
+   for (auto &loc : *this->pLoc(1)) {
+      config_backward.num_m_even++;
+   }
+   for (auto &loc : *this->pLoc(0)) {
+      config_backward.num_m_odd++;
+   }
+   //printf("\n%d %d \n", config_backward.num_m_even, config_backward.num_m_odd);
+   int start = 0;
+   int iter = 0;
+   int* m_even = (int*)calloc(config_backward.num_m_even, sizeof(int));
+   int* m_even_endBatch = (int*)calloc(config_backward.num_m_even, sizeof(int));
+   int* m_odd = (int*)calloc(config_backward.num_m_odd, sizeof(int));
+   int* m_odd_endBatch = (int*)calloc(config_backward.num_m_odd, sizeof(int));
+   config_backward.m_even_list = m_even;
+   config_backward.m_even_endBatch = m_even_endBatch;
+   config_backward.m_odd_list = m_odd;
+   config_backward.m_odd_endBatch = m_odd_endBatch;
+   
+   for (auto &loc : *this->pLoc(true)) {
+      start += std::get<2>(loc);
+      m_even[iter] = std::get<4>(loc);
+      m_even_endBatch[iter] = 2*start;
+      //printf("%d %d %d \n", m_even[iter], m_even_endBatch[iter], iter);
+      iter++;
+   }
+   start = 0;
+   iter = 0;
+   for (auto &loc : *this->pLoc(false)) {
+      start += std::get<2>(loc);
+      m_odd[iter] = std::get<4>(loc);
+      m_odd_endBatch[iter] = 2*start;
+      //printf("%d %d %d \n", m_odd[iter], m_odd_endBatch[iter], iter);
+      iter++;
+   }
+   config_backward.M = ((m_even[config_backward.num_m_even - 1]) / 2 + 1) * 2;// M;
+    config_backward.L = this->mSpecSize + config_backward.M / 2;// 3 * M / 2;
+	
+	resPfSolve = initializeParallALT(&VkGPU, config_backward, &appContainer_backward);
+   //std::cout << resPfSolve;
+   free(m_even);
+   free(m_even_endBatch);
+   free(m_odd);
+   free(m_odd_endBatch);
 }
 
 int WorlandProjector::lSize(const int l) const { return this->mWSize - l / 2; }
@@ -164,22 +239,104 @@ int WorlandProjector::lSize(const int i, const int) const {
 void WorlandProjector::io(const bool isEven) const {
   this->setPlan(isEven);
 
-  this->io(this->mOutTmp.at(0).data(), this->mInTmp.at(0).data());
+  //this->io(this->mOutTmp.at(0).data(), this->mInTmp.at(0).data());
 }
 
 void WorlandProjector::input(const MatrixZ &in) const {
-  Matrix &inTmp = this->mInTmp.at(0);
+  //Matrix &inTmp = this->mInTmp.at(0);
 
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
   bufferSolveRes2 = bufferSolve2[2];
   Profiler::RegionStart<2>("applyOperators");
-
-  assert(in.rows() * in.cols() * sizeof(MHDComplex) <= 8 * (mEvenSize + mOddSize));
-  IWorlandBackend::transferDataToGPU(&bufferSolveRes2, (void *)in.data(), 0, 0,
+  double* inSplit = (double*)calloc(
+     appContainer_backward.config.Ntheta *
+        (appContainer_backward.config
+              .m_even_endBatch[appContainer_backward.config.num_m_even - 1] +
+           appContainer_backward.config
+              .m_odd_endBatch[appContainer_backward.config.num_m_odd - 1]),
+     sizeof(MHDFloat));
+  //printf("%d %d %d\n", in.cols(), in.rows(), appContainer_backward.config.Ntheta);
+  std::vector<int> Mseq(appContainer_backward.config.num_m_even + appContainer_backward.config.num_m_odd);
+  for (int i = 0; i < appContainer_backward.config.num_m_even; i++)
+  {
+     Mseq[i] = appContainer_backward.config.m_even_list[i];
+  }
+  for (int i = 0; i < appContainer_backward.config.num_m_odd; i++)
+  {
+     Mseq[appContainer_backward.config.num_m_even+i] = appContainer_backward.config.m_odd_list[i];
+  }
+  std::sort(Mseq.begin(), Mseq.end());
+   int evenID = 0;
+  int oddID = 0;
+  int even_startBatch = 0;
+  int odd_startBatch = appContainer_backward.config.m_even_endBatch[appContainer_backward.config.num_m_even - 1];
+  int current_i = 0;
+  for (int i = 0; i < appContainer_backward.config.num_m_even + appContainer_backward.config.num_m_odd; i++)
+  {
+      if (Mseq[i] % 2)
+      {
+          int numBatches =
+            (oddID == 0)
+               ? appContainer_backward.config.m_odd_endBatch[0]
+               : appContainer_backward.config.m_odd_endBatch[oddID] -
+                    appContainer_backward.config.m_odd_endBatch[oddID - 1];
+           for (int l = 0;
+            l < (numBatches/2); l++)
+         {
+            for (int j = 0; j < in.rows(); j++)
+            {
+               /*printf("%.2e %.2e\n",
+                  outSplit[j + i * 2 * appContainer_backward.config.Ntheta],
+                  outSplit[j + i * 2 * appContainer_backward.config.Ntheta +
+                           appContainer_backward.config.Ntheta]);*/
+               inSplit[j + odd_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l] =in(j,current_i).real();
+               inSplit[j + odd_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l +
+                           appContainer_backward.config.Ntheta] = in(j,current_i).imag();
+        
+            }
+         }
+         odd_startBatch += numBatches;
+         current_i += numBatches/2;
+         oddID++;
+     }
+      else
+      {
+         int numBatches =
+            (evenID == 0)
+               ? appContainer_backward.config.m_even_endBatch[0]
+               : appContainer_backward.config.m_even_endBatch[evenID] -
+                    appContainer_backward.config.m_even_endBatch[evenID - 1];
+         for (int l = 0;
+            l < (numBatches/2); l++)
+         {
+            for (int j = 0; j < in.rows(); j++)
+            {
+               /*printf("%.2e %.2e\n",
+                  outSplit[j + i * 2 * appContainer_backward.config.Ntheta],
+                  outSplit[j + i * 2 * appContainer_backward.config.Ntheta +
+                           appContainer_backward.config.Ntheta]);*/
+               inSplit[j + even_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l] =in(j,current_i).real();
+               inSplit[j + even_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l +
+                           appContainer_backward.config.Ntheta] = in(j,current_i).imag();
+            }
+         }
+         even_startBatch += numBatches;
+         current_i += numBatches /2;
+         evenID++;
+      }
+  }
+  /* assert(
+     in.rows() * in.cols() * sizeof(MHDComplex) <= 8 * (mEvenSize + mOddSize));
+   IWorlandBackend::transferDataToGPU(&bufferSolveRes2, (void*)in.data(), 0,
+     0,
                                      in.rows() * in.cols() * sizeof(MHDComplex),
-                                     &pStream[currentStream]);
+                                     &pStream[currentStream]);*/
+
+  transferDataToGPU_parallALT(&VkGPU, inSplit, &appContainer_backward);
   cudaDeviceSynchronize();
-  for (int isEven = 0; isEven < 2; isEven++) {
+  free(inSplit);
+  /* for (int isEven = 0; isEven < 2; isEven++)
+  {
     int start = 0;
     currentStream = isPhysEven(isEven);
     bufferSolveRes = bufferSolve[isPhysEven(isEven)];
@@ -189,8 +346,8 @@ void WorlandProjector::input(const MatrixZ &in) const {
       cudaMemsetAsync(bufferSolveRes, 0, mOddSize, pStream[currentStream]);
     bufferTemp = bufferTemp0[isPhysEven(isEven)];
     for (auto &loc : *this->pLoc(isEven)) {
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = in.rows();
       mapKey.size[1] = std::get<2>(loc);
       mapKey.type = BLOCK_READ_COMPLEX_STRIDED_WRITE_COMPLEX_PACKED;
@@ -200,10 +357,10 @@ void WorlandProjector::input(const MatrixZ &in) const {
                      1000;
 
       resSolve =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -214,14 +371,14 @@ void WorlandProjector::input(const MatrixZ &in) const {
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+        resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
         resSolve =
-            PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+            PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
 
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
       launchParams.offsetM = std::get<1>(loc) * in.rows();
       launchParams.offsetSolution = start * inTmp.rows();
       launchParams.inputZeropad[0] = 0;
@@ -244,7 +401,7 @@ void WorlandProjector::input(const MatrixZ &in) const {
       start += std::get<2>(loc);
       std::get<3>(loc) = in.rows();
     }
-  }
+  }*/
   Profiler::RegionStart<2>("applyImpl");
 }
 
@@ -287,10 +444,104 @@ void WorlandProjector::input(const MatrixZ &in, const bool isEven,
 void WorlandProjector::output(MatrixZ &rOut) const {
   Profiler::RegionStop<2>("applyImpl");
 
-  Matrix &outTmp = this->mOutTmp.at(0);
+  //Matrix &outTmp = this->mOutTmp.at(0);
 
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
-  bufferSolveRes2 = bufferSolve2[2];
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
+  double* outSplit = (double*)calloc(
+     appContainer_backward.config.Ntheta *
+        (appContainer_backward.config
+              .m_even_endBatch[appContainer_backward.config.num_m_even - 1] +
+           appContainer_backward.config
+              .m_odd_endBatch[appContainer_backward.config.num_m_odd - 1]),
+     sizeof(MHDFloat));
+  
+  
+  transferDataFromGPU_parallALT(&VkGPU, outSplit, &appContainer_backward);
+
+ // printf("%d %d %d\n", rOut.cols(), rOut.rows(), appContainer_backward.config.Ntheta);
+  std::vector<int> Mseq(appContainer_backward.config.num_m_even + appContainer_backward.config.num_m_odd);
+  for (int i = 0; i < appContainer_backward.config.num_m_even; i++)
+  {
+     Mseq[i] = appContainer_backward.config.m_even_list[i];
+  }
+  for (int i = 0; i < appContainer_backward.config.num_m_odd; i++)
+  {
+     Mseq[appContainer_backward.config.num_m_even+i] = appContainer_backward.config.m_odd_list[i];
+  }
+  std::sort(Mseq.begin(), Mseq.end());
+  for (int i = 0; i < appContainer_backward.config.num_m_even +
+                         appContainer_backward.config.num_m_odd;
+     i++)
+  {
+    // printf("%d\n", Mseq[i]);
+  }
+  int evenID = 0;
+  int oddID = 0;
+  int even_startBatch = 0;
+  int odd_startBatch = appContainer_backward.config.m_even_endBatch[appContainer_backward.config.num_m_even - 1];
+  int current_i = 0;
+  for (int i = 0; i < appContainer_backward.config.num_m_even + appContainer_backward.config.num_m_odd; i++)
+  {
+      if (Mseq[i] % 2)
+      {
+          int numBatches =
+            (oddID == 0)
+               ? appContainer_backward.config.m_odd_endBatch[0]
+               : appContainer_backward.config.m_odd_endBatch[oddID] -
+                    appContainer_backward.config.m_odd_endBatch[oddID - 1];
+           for (int l = 0;
+            l < (numBatches/2); l++)
+         {
+            for (int j = 0; j < rOut.rows(); j++)
+            {
+               /*printf("%.2e %.2e\n",
+                  outSplit[j + i * 2 * appContainer_backward.config.Ntheta],
+                  outSplit[j + i * 2 * appContainer_backward.config.Ntheta +
+                           appContainer_backward.config.Ntheta]);*/
+                //printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + odd_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l],outSplit[j + odd_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l +
+               //            appContainer_backward.config.Ntheta]);
+               rOut(j, current_i) = std::complex<double>(
+                  outSplit[j + odd_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l],
+                  outSplit[j + odd_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l +
+                           appContainer_backward.config.Ntheta]);
+            }
+         }
+         odd_startBatch += numBatches;
+         current_i += numBatches/2;
+         oddID++;
+     }
+      else
+      {
+         int numBatches =
+            (evenID == 0)
+               ? appContainer_backward.config.m_even_endBatch[0]
+               : appContainer_backward.config.m_even_endBatch[evenID] -
+                    appContainer_backward.config.m_even_endBatch[evenID - 1];
+         for (int l = 0;
+            l < (numBatches/2); l++)
+         {
+            for (int j = 0; j < rOut.rows(); j++)
+            {
+               /*printf("%.2e %.2e\n",
+                  outSplit[j + i * 2 * appContainer_backward.config.Ntheta],
+                  outSplit[j + i * 2 * appContainer_backward.config.Ntheta +
+                           appContainer_backward.config.Ntheta]);*/
+              // printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + even_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l],outSplit[j + even_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l +
+              //             appContainer_backward.config.Ntheta]);
+               rOut(j, current_i) = std::complex<double>(
+                  outSplit[j + even_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l],
+                  outSplit[j + even_startBatch * appContainer_backward.config.Ntheta + appContainer_backward.config.Ntheta *2*l +
+                           appContainer_backward.config.Ntheta]);
+            }
+         }
+         even_startBatch += numBatches;
+         current_i += numBatches /2;
+         evenID++;
+      }
+     //printf("\n");
+  }
+  free(outSplit);
+  /* bufferSolveRes2 = bufferSolve2[2];
 
   assert(rOut.rows() * rOut.cols() * sizeof(MHDComplex) <= 8 * (mEvenSize + mOddSize));
   for (int isEven = 0; isEven < 2; isEven++) {
@@ -299,8 +550,8 @@ void WorlandProjector::output(MatrixZ &rOut) const {
     bufferSolveRes = bufferSolve[isPhysEven(isEven)];
     bufferTemp = bufferTemp0[isPhysEven(isEven)];
     for (auto &loc : *this->pLoc(isEven)) {
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = rOut.rows();
       mapKey.size[1] = std::get<2>(loc);
       mapKey.type = BLOCK_READ_COMPLEX_PACKED_WRITE_COMPLEX_STRIDED;
@@ -310,10 +561,10 @@ void WorlandProjector::output(MatrixZ &rOut) const {
                      1000;
 
       resSolve =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -324,14 +575,14 @@ void WorlandProjector::output(MatrixZ &rOut) const {
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+        resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
         resSolve =
-            PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+            PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
 
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
       launchParams.offsetM = start * outTmp.rows();
       launchParams.offsetSolution = std::get<1>(loc) * rOut.rows();
       launchParams.inputZeropad[0] = 0;
@@ -357,7 +608,7 @@ void WorlandProjector::output(MatrixZ &rOut) const {
   cudaDeviceSynchronize();
   IWorlandBackend::transferDataFromGPU(
       rOut.data(), &bufferSolveRes2, 0, 0,
-      rOut.rows() * rOut.cols() * sizeof(MHDComplex), &pStream[currentStream]);
+      rOut.rows() * rOut.cols() * sizeof(MHDComplex), &pStream[currentStream]);*/
   for (auto loc : this->mZLoc) {
     int s = std::get<1>(loc);
     int cols = std::get<2>(loc);
@@ -402,16 +653,17 @@ void WorlandProjector::applyPadding(Matrix &rData, const int extraRows) const {
 }
 
 void WorlandProjector::applyFft() const {
-  for (int isEven = 0; isEven < 2; isEven++) {
+   /* for (int isEven = 0; isEven < 2; isEven++)
+   {
     currentStream = isPhysEven(isEven);
     bufferSolveRes = bufferSolve[isPhysEven(isEven)];
     bufferTemp = bufferTemp0[isPhysEven(isEven)];
     this->setPlan(isEven);
     VkFFT::VkFFTLaunchParams launchParams = {};
     launchParams.buffer = (void **)&this->bufferSolveRes;
-    mpApp->configuration.stream = &pStream[currentStream];
+    //mpApp->configuration.stream = &pStream[currentStream];
     VkFFT::VkFFTResult rr = VkFFT::VkFFTAppend(mpApp, -1, &launchParams);
-  }
+  }*/
 }
 
 void WorlandProjector::partialBackwardWorland(
@@ -434,7 +686,8 @@ void WorlandProjector::partialBackwardWorland(
 
 void WorlandProjector::backwardWorland(const bool isEven0,
                                        const unsigned int id) const {
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
+    launchApp_parallALT(&appContainer_backward);
+   /* PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
   Matrix &inTmp = this->mInTmp.at(id);
 
   for (int isEven = 0; isEven < 2; isEven++) {
@@ -471,8 +724,8 @@ void WorlandProjector::backwardWorland(const bool isEven0,
       // Rescale first mode for l = 0 for FFT
       if (std::get<4>(pL->at(0)) == 0) {
 
-        PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-        PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+        PfSolve::PfSolveApplication *tempAppCopy = 0;
+        PfSolve::PfSolve_MapKey_block mapKey = {};
         mapKey.size[0] = std::get<2>(pL->at(0));
         mapKey.size[1] = 2;
         mapKey.type = (RUNTIME_SCALEC + RUNTIME_INPUTBUFFERSTRIDE +
@@ -480,13 +733,13 @@ void WorlandProjector::backwardWorland(const bool isEven0,
                           1000 +
                       BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         // Initialize applications. This function loads shaders, creates
         // pipeline and configures FFT based on configuration file. No buffer
         // allocations inside PfSolve library.
         if (!tempAppCopy) {
-          PfSolve_JW::PfSolveApplication appCopy = {};
-          PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+          PfSolve::PfSolveApplication appCopy = {};
+          PfSolve::PfSolveConfiguration configurationCopy = {};
 
           // create PfSolve appSolve
           configurationCopy.size[0] = mapKey.size[0];
@@ -498,14 +751,14 @@ void WorlandProjector::backwardWorland(const bool isEven0,
           configurationCopy.device = &this->device;
           configurationCopy.num_streams = 1;
 
-          resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+          resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
           resSolve =
-              PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+              PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
           resSolve =
-              PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+              PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         }
 
-        PfSolve_JW::PfSolveLaunchParams launchParams = {};
+        PfSolve::PfSolveLaunchParams launchParams = {};
         launchParams.offsetM = 0;
         launchParams.offsetSolution = 0;
         launchParams.buffer = (void **)&wTmpGPU;
@@ -514,13 +767,13 @@ void WorlandProjector::backwardWorland(const bool isEven0,
         launchParams.outputBufferStride = inTmp.rows();
         launchParams.scaleC = std::sqrt(2.0);
         tempAppCopy->configuration.stream = &pStream[currentStream];
-        resSolve = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+        resSolve = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
       }
 
       // reset current l
       this->resetLocations(isEven, id);
     }
-  }
+  }*/
 }
 
 void WorlandProjector::lowerAlpha(const MHDFloat alpha, const bool isEven0,
@@ -548,7 +801,7 @@ void WorlandProjector::lowerAlpha(const MHDFloat alpha, const bool isEven0,
 void WorlandProjector::lowerBeta(const MHDFloat alpha, const bool isEven0,
                                  const unsigned int id,
                                  const MHDFloat norm) const {
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
   for (int isEven = 0; isEven < 2; isEven++) {
     int start = 0;
     currentStream = isPhysEven(isEven);
@@ -567,8 +820,8 @@ void WorlandProjector::lowerBeta(const MHDFloat alpha, const bool isEven0,
         this->applyTriSolve(wTmp, id, start, cols, scale, V);
         std::get<4>(loc)--;
       } else {
-        PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-        PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+        PfSolve::PfSolveApplication *tempAppCopy = 0;
+        PfSolve::PfSolve_MapKey_block mapKey = {};
         mapKey.size[0] = this->lSize(l);
         mapKey.size[1] = 2 * cols;
         mapKey.type =
@@ -578,13 +831,13 @@ void WorlandProjector::lowerBeta(const MHDFloat alpha, const bool isEven0,
                 1000 +
             BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         // Initialize applications. This function loads shaders, creates
         // pipeline and configures FFT based on configuration file. No buffer
         // allocations inside PfSolve library.
         if (!tempAppCopy) {
-          PfSolve_JW::PfSolveApplication appCopy = {};
-          PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+          PfSolve::PfSolveApplication appCopy = {};
+          PfSolve::PfSolveConfiguration configurationCopy = {};
 
           // create PfSolve appSolve
           configurationCopy.size[0] = mapKey.size[0];
@@ -596,14 +849,14 @@ void WorlandProjector::lowerBeta(const MHDFloat alpha, const bool isEven0,
           configurationCopy.device = &this->device;
           configurationCopy.num_streams = 1;
 
-          resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+          resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
           resSolve =
-              PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+              PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
           resSolve =
-              PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+              PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         }
 
-        PfSolve_JW::PfSolveLaunchParams launchParams = {};
+        PfSolve::PfSolveLaunchParams launchParams = {};
         launchParams.offsetM = 2 * start * wTmp.rows();
         launchParams.offsetSolution = 2 * start * wTmp.rows();
         launchParams.buffer = (void **)&this->bufferSolveRes;
@@ -620,7 +873,7 @@ void WorlandProjector::lowerBeta(const MHDFloat alpha, const bool isEven0,
         launchParams.inputBufferStride = wTmp.rows();
         launchParams.outputBufferStride = wTmp.rows();
         tempAppCopy->configuration.stream = &pStream[currentStream];
-        resSolve = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+        resSolve = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
         prevOutputZeropad[currentStream][0][start] =
             launchParams.outputZeropad[0];
         prevOutputZeropad[currentStream][1][start] =
@@ -636,7 +889,7 @@ void WorlandProjector::lowerBeta(const MHDFloat alpha, const bool isEven0,
 void WorlandProjector::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
                                    const unsigned int id,
                                    const MHDFloat norm) const {
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
   for (int isEven = 0; isEven < 2; isEven++) {
     int start = 0;
     currentStream = isPhysEven(isEven);
@@ -649,8 +902,8 @@ void WorlandProjector::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
       int l = std::get<4>(loc);
       int cols = std::get<2>(loc);
       if (l < 0) {
-        PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-        PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+        PfSolve::PfSolveApplication *tempAppCopy = 0;
+        PfSolve::PfSolve_MapKey_block mapKey = {};
         mapKey.size[0] = this->lSize(l);
         mapKey.size[1] = 2 * cols;
         mapKey.type = (RUNTIME_OFFSETM + RUNTIME_OFFSETSOLUTION +
@@ -659,13 +912,13 @@ void WorlandProjector::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
                           1000 +
                       BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         // Initialize applications. This function loads shaders, creates
         // pipeline and configures FFT based on configuration file. No buffer
         // allocations inside PfSolve library.
         if (!tempAppCopy) {
-          PfSolve_JW::PfSolveApplication appCopy = {};
-          PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+          PfSolve::PfSolveApplication appCopy = {};
+          PfSolve::PfSolveConfiguration configurationCopy = {};
 
           // create PfSolve appSolve
           configurationCopy.size[0] = mapKey.size[0];
@@ -678,13 +931,13 @@ void WorlandProjector::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
           configurationCopy.device = &this->device;
           configurationCopy.num_streams = 1;
 
-          resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+          resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
           resSolve =
-              PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+              PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
           resSolve =
-              PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+              PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         }
-        PfSolve_JW::PfSolveLaunchParams launchParams = {};
+        PfSolve::PfSolveLaunchParams launchParams = {};
         launchParams.offsetM = 2 * start * wTmp.rows();
         launchParams.offsetSolution = 2 * start * wTmp.rows();
         launchParams.buffer = (void **)&this->bufferSolveRes;
@@ -700,7 +953,7 @@ void WorlandProjector::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
         launchParams.inputBufferStride = wTmp.rows();
         launchParams.outputBufferStride = wTmp.rows();
         tempAppCopy->configuration.stream = &pStream[currentStream];
-        resSolve = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+        resSolve = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
 
         prevOutputZeropad[currentStream][0][start] =
             launchParams.outputZeropad[0];
@@ -713,8 +966,8 @@ void WorlandProjector::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
         this->applyTriProduct(wTmp, id, start, cols, M);
         std::get<4>(loc)--;
       } else {
-        PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-        PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+        PfSolve::PfSolveApplication *tempAppCopy = 0;
+        PfSolve::PfSolve_MapKey_block mapKey = {};
         mapKey.size[0] = this->lSize(l);
         mapKey.size[1] = 2 * cols;
         mapKey.type = (RUNTIME_OFFSETM + RUNTIME_OFFSETSOLUTION +
@@ -723,13 +976,13 @@ void WorlandProjector::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
                           1000 +
                       BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         // Initialize applications. This function loads shaders, creates
         // pipeline and configures FFT based on configuration file. No buffer
         // allocations inside PfSolve library.
         if (!tempAppCopy) {
-          PfSolve_JW::PfSolveApplication appCopy = {};
-          PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+          PfSolve::PfSolveApplication appCopy = {};
+          PfSolve::PfSolveConfiguration configurationCopy = {};
 
           // create PfSolve appSolve
           configurationCopy.size[0] = mapKey.size[0];
@@ -742,14 +995,14 @@ void WorlandProjector::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
           configurationCopy.device = &this->device;
           configurationCopy.num_streams = 1;
 
-          resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+          resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
           resSolve =
-              PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+              PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
           resSolve =
-              PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+              PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         }
 
-        PfSolve_JW::PfSolveLaunchParams launchParams = {};
+        PfSolve::PfSolveLaunchParams launchParams = {};
         launchParams.offsetM = 2 * start * wTmp.rows();
         launchParams.offsetSolution = 2 * start * wTmp.rows();
         launchParams.buffer = (void **)&this->bufferSolveRes;
@@ -765,7 +1018,7 @@ void WorlandProjector::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
         launchParams.inputBufferStride = wTmp.rows();
         launchParams.outputBufferStride = wTmp.rows();
         tempAppCopy->configuration.stream = &pStream[currentStream];
-        resSolve = PfSolve_JW::PfSolveAppend(tempAppCopy, -1, &launchParams);
+        resSolve = PfSolve::PfSolveAppend(tempAppCopy, -1, &launchParams);
         prevOutputZeropad[currentStream][0][start] =
             launchParams.outputZeropad[0];
         prevOutputZeropad[currentStream][1][start] =

@@ -21,7 +21,7 @@ namespace Fft {
 
 namespace Backend {
 
-namespace PfSolve {
+namespace PfSolve_parallALT {
 
 /**
  * @brief Contains some useful constants and tools for PFSOLVE

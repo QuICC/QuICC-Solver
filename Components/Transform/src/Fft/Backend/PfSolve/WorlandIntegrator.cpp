@@ -24,12 +24,13 @@ namespace Fft {
 
 namespace Backend {
 
-namespace PfSolve {
+namespace PfSolve_parallALT {
 
 WorlandIntegrator::WorlandIntegrator() {}
 
 WorlandIntegrator::~WorlandIntegrator() {
-  this->freeBanded(false);
+    //deleteParallALT(&VkGPU, &appContainer_forward);
+    /* this->freeBanded(false);
   this->freeBanded(true);
   deleteVkFFT(&mEvenApp);
   deleteVkFFT(&mOddApp);
@@ -51,6 +52,7 @@ WorlandIntegrator::~WorlandIntegrator() {
 #elif (VKFFT_BACKEND == 2)
   hipFree(bufferSolve2[2]);
 #endif
+*/
 }
 
 void WorlandIntegrator::init(const SetupType &setup, const int lshift,
@@ -94,7 +96,7 @@ void WorlandIntegrator::init(const SetupType &setup, const int lshift,
 
   // Initialise temporary even storage
   blockSize = this->mEBlockSize;
-  Matrix tmpF = Matrix::Zero(fwdSize, blockSize);
+  /* Matrix tmpF = Matrix::Zero(fwdSize, blockSize);
   Matrix tmpB = Matrix::Zero(bwdSize, blockSize);
 
   // Create the even physical to spectral plan
@@ -159,7 +161,79 @@ void WorlandIntegrator::init(const SetupType &setup, const int lshift,
   hipStreamCreate(&pStream[1]);
 
   hipMalloc((void **)&bufferSolve2[2], 8 * (mEvenSize + mOddSize));
-#endif
+#endif*/
+   PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+  config_forward = {};
+	config_forward.Ntheta = setup.fwdSize();
+    //config_forward.M = ((this->mSpecSize+1)/2)*2;
+    //config_forward.L = 3*config_forward.M/2;
+    
+    config_forward.radialTransform = 1;
+	config_forward.useGraphs = 1;
+	config_forward.testMerge = 0;
+	config_forward.testAccuracy = 1;
+	config_forward.doALTOnly = 1;
+	config_forward.useMatMulConnection = 1;
+	config_forward.use_tc = 2;
+	config_forward.mergeType = 1;
+	config_forward.numMergedIterMatMul = 8;
+	config_forward.numMergedIterMax = 1;
+	config_forward.numMergedIterMin = 1;
+	config_forward.disableCaching = 1;
+	config_forward.fixAccuracy = 1;
+	config_forward.numRadialBatches = 1;
+	config_forward.profile_iter = 1;
+	config_forward.profile_iter_combined = 1;
+	config_forward.WMMA_M = 8;
+	config_forward.WMMA_N = 8;
+	config_forward.WMMA_K = 4;
+	appContainer_forward = {};
+    config_forward.projector = 0;
+
+   //printf("\n%d %d \n", config_forward.Ntheta, config_forward.L);
+   for (auto &loc : *this->pLoc(1)) {
+      config_forward.num_m_even++;
+   }
+   for (auto &loc : *this->pLoc(0)) {
+      config_forward.num_m_odd++;
+   }
+   //printf("\n%d %d \n", config_forward.num_m_even, config_forward.num_m_odd);
+   int start = 0;
+   int iter = 0;
+   int* m_even = (int*)calloc(config_forward.num_m_even, sizeof(int));
+   int* m_even_endBatch = (int*)calloc(config_forward.num_m_even, sizeof(int));
+   int* m_odd = (int*)calloc(config_forward.num_m_odd, sizeof(int));
+   int* m_odd_endBatch = (int*)calloc(config_forward.num_m_odd, sizeof(int));
+   config_forward.m_even_list = m_even;
+   config_forward.m_even_endBatch = m_even_endBatch;
+   config_forward.m_odd_list = m_odd;
+   config_forward.m_odd_endBatch = m_odd_endBatch;
+   
+   for (auto &loc : *this->pLoc(true)) {
+      start += std::get<2>(loc);
+      m_even[iter] = std::get<4>(loc);
+      m_even_endBatch[iter] = 2*start;
+      //printf("%d %d %d \n", m_even[iter], m_even_endBatch[iter], iter);
+      iter++;
+   }
+   start = 0;
+   iter = 0;
+   for (auto &loc : *this->pLoc(false)) {
+      start += std::get<2>(loc);
+      m_odd[iter] = std::get<4>(loc);
+      m_odd_endBatch[iter] = 2*start;
+      //printf("%d %d %d \n", m_odd[iter], m_odd_endBatch[iter], iter);
+      iter++;
+   }
+   config_forward.M = ((m_even[config_forward.num_m_even - 1]) / 2 + 1) * 2;// M;
+    config_forward.L = this->mSpecSize + config_forward.M / 2;// 3 * M / 2;
+	
+	resPfSolve = initializeParallALT(&VkGPU, config_forward, &appContainer_forward);
+   //std::cout << resPfSolve;
+   free(m_even);
+   free(m_even_endBatch);
+   free(m_odd);
+   free(m_odd_endBatch);
 }
 
 int WorlandIntegrator::lSize(const int l) const { return this->mWSize - l / 2; }
@@ -178,11 +252,91 @@ void WorlandIntegrator::io(const bool isEven) const {
 void WorlandIntegrator::input(const MatrixZ &in) const {
   Matrix &inTmp = this->mInTmp.at(0);
 
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
-  bufferSolveRes2 = bufferSolve2[2];
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
+  //bufferSolveRes2 = bufferSolve2[2];
   Profiler::RegionStart<2>("applyOperators");
-
-  assert(in.rows() * in.cols() * sizeof(MHDComplex) <= 8 * (mEvenSize + mOddSize));
+  double* inSplit = (double*)calloc(
+     appContainer_forward.config.Ntheta *
+        (appContainer_forward.config
+              .m_even_endBatch[appContainer_forward.config.num_m_even - 1] +
+           appContainer_forward.config
+              .m_odd_endBatch[appContainer_forward.config.num_m_odd - 1]),
+     sizeof(MHDFloat));
+  //printf("%d %d %d\n", in.cols(), in.rows(), appContainer_forward.config.Ntheta);
+  std::vector<int> Mseq(appContainer_forward.config.num_m_even + appContainer_forward.config.num_m_odd);
+  for (int i = 0; i < appContainer_forward.config.num_m_even; i++)
+  {
+     Mseq[i] = appContainer_forward.config.m_even_list[i];
+  }
+  for (int i = 0; i < appContainer_forward.config.num_m_odd; i++)
+  {
+     Mseq[appContainer_forward.config.num_m_even+i] = appContainer_forward.config.m_odd_list[i];
+  }
+  std::sort(Mseq.begin(), Mseq.end());
+   int evenID = 0;
+  int oddID = 0;
+  int even_startBatch = 0;
+  int odd_startBatch = appContainer_forward.config.m_even_endBatch[appContainer_forward.config.num_m_even - 1];
+  int current_i = 0;
+  for (int i = 0; i < appContainer_forward.config.num_m_even + appContainer_forward.config.num_m_odd; i++)
+  {
+      if (Mseq[i] % 2)
+      {
+          int numBatches =
+            (oddID == 0)
+               ? appContainer_forward.config.m_odd_endBatch[0]
+               : appContainer_forward.config.m_odd_endBatch[oddID] -
+                    appContainer_forward.config.m_odd_endBatch[oddID - 1];
+           for (int l = 0;
+            l < (numBatches/2); l++)
+         {
+            for (int j = 0; j < in.rows(); j++)
+            {
+               /*printf("%.2e %.2e\n",
+                  outSplit[j + i * 2 * appContainer_forward.config.Ntheta],
+                  outSplit[j + i * 2 * appContainer_forward.config.Ntheta +
+                           appContainer_forward.config.Ntheta]);*/
+               inSplit[j + odd_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l] =in(j,current_i).real();
+               inSplit[j + odd_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l +
+                           appContainer_forward.config.Ntheta] = in(j,current_i).imag();
+        
+            }
+         }
+         odd_startBatch += numBatches;
+         current_i += numBatches/2;
+         oddID++;
+     }
+      else
+      {
+         int numBatches =
+            (evenID == 0)
+               ? appContainer_forward.config.m_even_endBatch[0]
+               : appContainer_forward.config.m_even_endBatch[evenID] -
+                    appContainer_forward.config.m_even_endBatch[evenID - 1];
+         for (int l = 0;
+            l < (numBatches/2); l++)
+         {
+            for (int j = 0; j < in.rows(); j++)
+            {
+               /*printf("%.2e %.2e\n",
+                  outSplit[j + i * 2 * appContainer_forward.config.Ntheta],
+                  outSplit[j + i * 2 * appContainer_forward.config.Ntheta +
+                           appContainer_forward.config.Ntheta]);*/
+               inSplit[j + even_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l] =in(j,current_i).real();
+               inSplit[j + even_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l +
+                           appContainer_forward.config.Ntheta] = in(j,current_i).imag();
+            }
+         }
+         even_startBatch += numBatches;
+         current_i += numBatches /2;
+         evenID++;
+      }
+  }
+  transferDataToGPU_parallALT(&VkGPU, inSplit, &appContainer_forward);
+  cudaDeviceSynchronize();
+  free(inSplit);
+  /* assert(
+     in.rows() * in.cols() * sizeof(MHDComplex) <= 8 * (mEvenSize + mOddSize));
   IWorlandBackend::transferDataToGPU(&bufferSolveRes2, (void *)in.data(), 0, 0,
                                      in.rows() * in.cols() * sizeof(MHDComplex),
                                      &pStream[currentStream]);
@@ -193,8 +347,8 @@ void WorlandIntegrator::input(const MatrixZ &in) const {
     bufferSolveRes = bufferSolve[isPhysEven(isEven)];
     bufferTemp = bufferTemp0[isPhysEven(isEven)];
     for (auto &loc : *this->pLoc(isEven)) {
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = in.rows();
       mapKey.size[1] = std::get<2>(loc);
       mapKey.type = BLOCK_READ_COMPLEX_STRIDED_WRITE_COMPLEX_PACKED;
@@ -204,10 +358,10 @@ void WorlandIntegrator::input(const MatrixZ &in) const {
                      1000;
 
       resSolve =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -218,14 +372,14 @@ void WorlandIntegrator::input(const MatrixZ &in) const {
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+        resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
         resSolve =
-            PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+            PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
 
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
       launchParams.offsetM = std::get<1>(loc) * in.rows();
       launchParams.offsetSolution = start * inTmp.rows();
       launchParams.inputZeropad[0] = 0;
@@ -247,7 +401,7 @@ void WorlandIntegrator::input(const MatrixZ &in) const {
 
       start += std::get<2>(loc);
     }
-  }
+  }*/
   Profiler::RegionStart<2>("applyImpl");
 }
 
@@ -281,7 +435,8 @@ void WorlandIntegrator::input(const MatrixZ &in, const bool isEven,
 }
 
 void WorlandIntegrator::applyFft() const {
-  for (int isEven = 0; isEven < 2; isEven++) {
+   /* for (int isEven = 0; isEven < 2; isEven++)
+   {
     currentStream = isPhysEven(isEven);
     bufferSolveRes = bufferSolve[isPhysEven(isEven)];
     bufferTemp = bufferTemp0[isPhysEven(isEven)];
@@ -291,7 +446,7 @@ void WorlandIntegrator::applyFft() const {
     mpApp->configuration.stream = &pStream[currentStream];
 
     VkFFT::VkFFTResult rr = VkFFTAppend(mpApp, -1, &launchParams);
-  }
+  }*/
 }
 
 void WorlandIntegrator::partialForwardWorland(
@@ -313,8 +468,10 @@ void WorlandIntegrator::partialForwardWorland(
 }
 
 void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
+     launchApp_parallALT(&appContainer_forward);
   // Reset current l
-  for (int isEven = 0; isEven < 2; isEven++) {
+     /*for (int isEven = 0; isEven < 2; isEven++)
+     {
     int start = 0;
     currentStream = isPhysEven(isEven);
     bufferSolveRes = bufferSolve[isPhysEven(isEven)];
@@ -322,7 +479,7 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
     bufferTemp = bufferTemp0[isPhysEven(isEven)];
     this->resetLocations(isEven, id);
 
-    PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
+    PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
     Matrix &outTmp = this->mOutTmp.at(id);
     void *wTmpGPU = this->workTmpGPU(id);
     const std::vector<Matrix> &banded = this->banded(isEven);
@@ -335,8 +492,8 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
       cols = outTmp.cols() - start;
       if (l < 2) {
         {
-          PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-          PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+          PfSolve::PfSolveApplication *tempAppCopy = 0;
+          PfSolve::PfSolve_MapKey_block mapKey = {};
           mapKey.size[0] = this->lSize(l);
           mapKey.size[1] = 2 * std::get<2>(loc);
           mapKey.type =
@@ -345,13 +502,13 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
                   1000 +
               BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
           resSolve =
-              PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+              PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
           // Initialize applications. This function loads shaders, creates
           // pipeline and configures FFT based on configuration file. No buffer
           // allocations inside PfSolve library.
           if (!tempAppCopy) {
-            PfSolve_JW::PfSolveApplication appCopy = {};
-            PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+            PfSolve::PfSolveApplication appCopy = {};
+            PfSolve::PfSolveConfiguration configurationCopy = {};
 
             // create PfSolve appSolve
             configurationCopy.size[0] = mapKey.size[0];
@@ -364,14 +521,14 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
             configurationCopy.num_streams = 1;
 
             resSolve =
-                PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+                PfSolve::initializePfSolve(&appCopy, configurationCopy);
             resSolve =
-                PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
-            resSolve = PfSolve_JW::checkLibrary_block(&appLibrary, mapKey,
+                PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+            resSolve = PfSolve::checkLibrary_block(&appLibrary, mapKey,
                                                       &tempAppCopy);
           }
 
-          PfSolve_JW::PfSolveLaunchParams launchParams = {};
+          PfSolve::PfSolveLaunchParams launchParams = {};
           launchParams.buffer = (void **)&wTmpGPU;
           launchParams.offsetM = 2 * start * outTmp.rows();
           launchParams.offsetSolution = 2 * start * outTmp.rows();
@@ -383,8 +540,8 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
           resSolve = PfSolveAppend(tempAppCopy, -1, &launchParams);
         }
         if (l == 0) {
-          PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-          PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+          PfSolve::PfSolveApplication *tempAppCopy = 0;
+          PfSolve::PfSolve_MapKey_block mapKey = {};
           mapKey.size[0] = 1;
           mapKey.size[1] = 2 * std::get<2>(loc);
           mapKey.type =
@@ -393,13 +550,13 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
                   1000 +
               BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
           resSolve =
-              PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+              PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
           // Initialize applications. This function loads shaders, creates
           // pipeline and configures FFT based on configuration file. No buffer
           // allocations inside PfSolve library.
           if (!tempAppCopy) {
-            PfSolve_JW::PfSolveApplication appCopy = {};
-            PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+            PfSolve::PfSolveApplication appCopy = {};
+            PfSolve::PfSolveConfiguration configurationCopy = {};
 
             configurationCopy.size[0] = mapKey.size[0];
             configurationCopy.size[1] = mapKey.size[1];
@@ -411,14 +568,14 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
             configurationCopy.num_streams = 1;
 
             resSolve =
-                PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+                PfSolve::initializePfSolve(&appCopy, configurationCopy);
             resSolve =
-                PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
-            resSolve = PfSolve_JW::checkLibrary_block(&appLibrary, mapKey,
+                PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+            resSolve = PfSolve::checkLibrary_block(&appLibrary, mapKey,
                                                       &tempAppCopy);
           }
 
-          PfSolve_JW::PfSolveLaunchParams launchParams = {};
+          PfSolve::PfSolveLaunchParams launchParams = {};
           launchParams.buffer = (void **)&wTmpGPU;
           launchParams.offsetM = 2 * start * outTmp.rows();
           launchParams.offsetSolution = 2 * start * outTmp.rows();
@@ -431,8 +588,8 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
         }
       } else {
         if (i0 == 0) {
-          PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-          PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+          PfSolve::PfSolveApplication *tempAppCopy = 0;
+          PfSolve::PfSolve_MapKey_block mapKey = {};
           mapKey.size[0] = this->lSize(0, l);
           mapKey.size[1] = 2 * cols;
           mapKey.type =
@@ -441,13 +598,13 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
                   1000 +
               BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
           resSolve =
-              PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+              PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
           // Initialize applications. This function loads shaders, creates
           // pipeline and configures FFT based on configuration file. No buffer
           // allocations inside PfSolve library.
           if (!tempAppCopy) {
-            PfSolve_JW::PfSolveApplication appCopy = {};
-            PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+            PfSolve::PfSolveApplication appCopy = {};
+            PfSolve::PfSolveConfiguration configurationCopy = {};
 
             // create PfSolve appSolve
             configurationCopy.size[0] = mapKey.size[0];
@@ -460,14 +617,14 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
             configurationCopy.num_streams = 1;
 
             resSolve =
-                PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+                PfSolve::initializePfSolve(&appCopy, configurationCopy);
             resSolve =
-                PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
-            resSolve = PfSolve_JW::checkLibrary_block(&appLibrary, mapKey,
+                PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+            resSolve = PfSolve::checkLibrary_block(&appLibrary, mapKey,
                                                       &tempAppCopy);
           }
 
-          PfSolve_JW::PfSolveLaunchParams launchParams = {};
+          PfSolve::PfSolveLaunchParams launchParams = {};
           launchParams.buffer = (void **)&wTmpGPU;
           launchParams.offsetM = 2 * start * outTmp.rows();
           launchParams.offsetSolution = 2 * start * outTmp.rows();
@@ -485,7 +642,7 @@ void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
       std::get<3>(loc) = this->lSize(l);
       start += std::get<2>(loc);
     }
-  }
+  }*/
 }
 
 void WorlandIntegrator::lowerBeta(const MHDFloat alpha, const bool isEven0,
@@ -512,7 +669,7 @@ void WorlandIntegrator::lowerBeta(const MHDFloat alpha, const bool isEven0,
 
 void WorlandIntegrator::raiseBeta(const MHDFloat alpha, const bool isEven0,
                                   const int id, const MHDFloat norm) const {
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
   for (int isEven = 0; isEven < 2; isEven++) {
     int start = 0;
     currentStream = isPhysEven(isEven);
@@ -525,8 +682,8 @@ void WorlandIntegrator::raiseBeta(const MHDFloat alpha, const bool isEven0,
       int l = std::get<4>(loc);
       int cols = std::get<2>(loc);
       if (l < 0) {
-        PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-        PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+        PfSolve::PfSolveApplication *tempAppCopy = 0;
+        PfSolve::PfSolve_MapKey_block mapKey = {};
         mapKey.size[0] = outTmp.rows();
         mapKey.size[1] = 2 * cols;
         mapKey.type = (RUNTIME_OFFSETM + RUNTIME_OFFSETSOLUTION +
@@ -536,13 +693,13 @@ void WorlandIntegrator::raiseBeta(const MHDFloat alpha, const bool isEven0,
                       BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
 
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         // Initialize applications. This function loads shaders, creates
         // pipeline and configures FFT based on configuration file. No buffer
         // allocations inside PfSolve library.
         if (!tempAppCopy) {
-          PfSolve_JW::PfSolveApplication appCopy = {};
-          PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+          PfSolve::PfSolveApplication appCopy = {};
+          PfSolve::PfSolveConfiguration configurationCopy = {};
 
           // create PfSolve appSolve
           configurationCopy.size[0] = mapKey.size[0];
@@ -554,14 +711,14 @@ void WorlandIntegrator::raiseBeta(const MHDFloat alpha, const bool isEven0,
           configurationCopy.scaleC = 0;
           configurationCopy.device = &this->device;
           configurationCopy.num_streams = 1;
-          resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+          resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
           resSolve =
-              PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+              PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
           resSolve =
-              PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+              PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         }
 
-        PfSolve_JW::PfSolveLaunchParams launchParams = {};
+        PfSolve::PfSolveLaunchParams launchParams = {};
         launchParams.offsetM = 2 * start * mapKey.size[0];
         launchParams.offsetSolution = 2 * start * mapKey.size[0];
         launchParams.buffer = (void **)&wTmpGPU;
@@ -601,7 +758,7 @@ void WorlandIntegrator::raiseBeta(const MHDFloat alpha, const bool isEven0,
 
 void WorlandIntegrator::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
                                     const int id, const MHDFloat norm) const {
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
   for (int isEven = 0; isEven < 2; isEven++) {
     int start = 0;
     currentStream = isPhysEven(isEven);
@@ -614,8 +771,8 @@ void WorlandIntegrator::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
       int l = std::get<4>(loc);
       int cols = std::get<2>(loc);
       if (l < 0) {
-        PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-        PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+        PfSolve::PfSolveApplication *tempAppCopy = 0;
+        PfSolve::PfSolve_MapKey_block mapKey = {};
         mapKey.size[0] = outTmp.rows();
         mapKey.size[1] = 2 * cols;
         mapKey.type = (RUNTIME_OFFSETM + RUNTIME_OFFSETSOLUTION +
@@ -625,13 +782,13 @@ void WorlandIntegrator::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
                       BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
 
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         // Initialize applications. This function loads shaders, creates
         // pipeline and configures FFT based on configuration file. No buffer
         // allocations inside PfSolve library.
         if (!tempAppCopy) {
-          PfSolve_JW::PfSolveApplication appCopy = {};
-          PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+          PfSolve::PfSolveApplication appCopy = {};
+          PfSolve::PfSolveConfiguration configurationCopy = {};
 
           // create PfSolve appSolve
           configurationCopy.size[0] = mapKey.size[0];
@@ -644,14 +801,14 @@ void WorlandIntegrator::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
           configurationCopy.device = &this->device;
           configurationCopy.num_streams = 1;
 
-          resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+          resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
           resSolve =
-              PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+              PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
           resSolve =
-              PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+              PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         }
 
-        PfSolve_JW::PfSolveLaunchParams launchParams = {};
+        PfSolve::PfSolveLaunchParams launchParams = {};
         launchParams.offsetM = 2 * start * mapKey.size[0];
         launchParams.offsetSolution = 2 * start * mapKey.size[0];
         launchParams.buffer = (void **)&wTmpGPU;
@@ -687,7 +844,8 @@ void WorlandIntegrator::lowerR2Beta(const MHDFloat alpha, const bool isEven0,
 void WorlandIntegrator::raiseR2Beta(const MHDFloat alpha, const bool isEven0,
                                     const int id, const MHDFloat norm,
                                     const bool scaleL0) const {
-  for (int isEven = 0; isEven < 2; isEven++) {
+   /* for (int isEven = 0; isEven < 2; isEven++)
+   {
     int start = 0;
     currentStream = isPhysEven(isEven);
     bufferSolveRes = bufferSolve[isPhysEven(isEven)];
@@ -704,12 +862,13 @@ void WorlandIntegrator::raiseR2Beta(const MHDFloat alpha, const bool isEven0,
       std::get<4>(loc)++;
       start += cols;
     }
-  }
+  }*/
 }
 
 void WorlandIntegrator::lowerAlpha(const MHDFloat alpha, const bool isEven0,
                                    const int id, const MHDFloat norm) const {
-  for (int isEven = 0; isEven < 2; isEven++) {
+   /* for (int isEven = 0; isEven < 2; isEven++)
+   {
     int start = 0;
     currentStream = isPhysEven(isEven);
     bufferSolveRes = bufferSolve[isPhysEven(isEven)];
@@ -725,13 +884,13 @@ void WorlandIntegrator::lowerAlpha(const MHDFloat alpha, const bool isEven0,
       this->applyTriSolve(outTmp, id, start, cols, scale, U);
       start += cols;
     }
-  }
+  }*/
 }
 
 void WorlandIntegrator::raiseAlpha(const MHDFloat alpha, const bool isEven0,
                                    const int id, const MHDFloat norm) const {
-  throw std::logic_error("Raise alpha operator has not been tested!");
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
+   /* throw std::logic_error("Raise alpha operator has not been tested!");
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
   for (int isEven = 0; isEven < 2; isEven++) {
     int start = 0;
     currentStream = isPhysEven(isEven);
@@ -744,8 +903,8 @@ void WorlandIntegrator::raiseAlpha(const MHDFloat alpha, const bool isEven0,
       int l = std::get<4>(loc);
       int cols = std::get<2>(loc);
       if (l < 0) {
-        PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-        PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+        PfSolve::PfSolveApplication *tempAppCopy = 0;
+        PfSolve::PfSolve_MapKey_block mapKey = {};
         mapKey.size[0] = outTmp.rows();
         mapKey.size[1] = 2 * cols;
         mapKey.type = (RUNTIME_OFFSETM + RUNTIME_OFFSETSOLUTION +
@@ -755,13 +914,13 @@ void WorlandIntegrator::raiseAlpha(const MHDFloat alpha, const bool isEven0,
                       BLOCK_SCALEC + BLOCK_READ_REAL_WRITE_REAL;
 
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         // Initialize applications. This function loads shaders, creates
         // pipeline and configures FFT based on configuration file. No buffer
         // allocations inside PfSolve library.
         if (!tempAppCopy) {
-          PfSolve_JW::PfSolveApplication appCopy = {};
-          PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+          PfSolve::PfSolveApplication appCopy = {};
+          PfSolve::PfSolveConfiguration configurationCopy = {};
 
           // create PfSolve appSolve
           configurationCopy.size[0] = mapKey.size[0];
@@ -774,14 +933,14 @@ void WorlandIntegrator::raiseAlpha(const MHDFloat alpha, const bool isEven0,
           configurationCopy.device = &this->device;
           configurationCopy.num_streams = 1;
 
-          resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+          resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
           resSolve =
-              PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+              PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
           resSolve =
-              PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+              PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
         }
 
-        PfSolve_JW::PfSolveLaunchParams launchParams = {};
+        PfSolve::PfSolveLaunchParams launchParams = {};
         launchParams.offsetM = 2 * start * mapKey.size[0];
         launchParams.offsetSolution = 2 * start * mapKey.size[0];
         launchParams.buffer = (void **)&wTmpGPU;
@@ -811,11 +970,11 @@ void WorlandIntegrator::raiseAlpha(const MHDFloat alpha, const bool isEven0,
       std::get<3>(loc)--;
       start += cols;
     }
-  }
+  }*/
 }
 
 void WorlandIntegrator::applyI2(const bool isEven0, const int id) const {
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
   for (int isEven = 0; isEven < 2; isEven++) {
     int start = 0;
     currentStream = isPhysEven(isEven);
@@ -842,7 +1001,7 @@ void WorlandIntegrator::applyI2(const bool isEven0, const int id) const {
 }
 
 void WorlandIntegrator::applyI4(const bool isEven0, const int id) const {
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
   for (int isEven = 0; isEven < 2; isEven++) {
     int start = 0;
     currentStream = isPhysEven(isEven);
@@ -873,8 +1032,8 @@ void WorlandIntegrator::output(MatrixZ &rOut) const {
 
   Matrix &outTmp = this->mOutTmp.at(0);
 
-  PfSolve_JW::PfSolveResult resSolve = PfSolve_JW::PFSOLVE_SUCCESS;
-  bufferSolveRes2 = bufferSolve2[2];
+ /* PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
+   bufferSolveRes2 = bufferSolve2[2];
 
   assert(rOut.rows() * rOut.cols() * sizeof(MHDComplex) <= 8 * (mEvenSize + mOddSize));
   for (int isEven = 0; isEven < 2; isEven++) {
@@ -884,8 +1043,8 @@ void WorlandIntegrator::output(MatrixZ &rOut) const {
     bufferTemp = bufferTemp0[isPhysEven(isEven)];
 
     for (auto &loc : *this->pLoc(isEven)) {
-      PfSolve_JW::PfSolveApplication *tempAppCopy = 0;
-      PfSolve_JW::PfSolve_MapKey_block mapKey = {};
+      PfSolve::PfSolveApplication *tempAppCopy = 0;
+      PfSolve::PfSolve_MapKey_block mapKey = {};
       mapKey.size[0] = this->mSpecSize;
       mapKey.size[1] = std::get<2>(loc);
       mapKey.type = BLOCK_READ_COMPLEX_PACKED_WRITE_COMPLEX_STRIDED;
@@ -895,10 +1054,10 @@ void WorlandIntegrator::output(MatrixZ &rOut) const {
                      1000;
 
       resSolve =
-          PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       if (!tempAppCopy) {
-        PfSolve_JW::PfSolveApplication appCopy = {};
-        PfSolve_JW::PfSolveConfiguration configurationCopy = {};
+        PfSolve::PfSolveApplication appCopy = {};
+        PfSolve::PfSolveConfiguration configurationCopy = {};
 
         configurationCopy.size[0] = mapKey.size[0];
         configurationCopy.size[1] = mapKey.size[1];
@@ -909,14 +1068,14 @@ void WorlandIntegrator::output(MatrixZ &rOut) const {
         configurationCopy.device = &this->device;
         configurationCopy.num_streams = 1;
 
-        resSolve = PfSolve_JW::initializePfSolve(&appCopy, configurationCopy);
+        resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
         resSolve =
-            PfSolve_JW::addToLibrary_block(&appLibrary, mapKey, &appCopy);
+            PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
         resSolve =
-            PfSolve_JW::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
+            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
       }
 
-      PfSolve_JW::PfSolveLaunchParams launchParams = {};
+      PfSolve::PfSolveLaunchParams launchParams = {};
       launchParams.offsetM = start * outTmp.rows();
       launchParams.offsetSolution = std::get<1>(loc) * rOut.rows();
       launchParams.inputZeropad[0] = 0;
@@ -942,7 +1101,103 @@ void WorlandIntegrator::output(MatrixZ &rOut) const {
   cudaDeviceSynchronize();
   IWorlandBackend::transferDataFromGPU(
       rOut.data(), &bufferSolveRes2, 0, 0,
-      rOut.rows() * rOut.cols() * sizeof(MHDComplex), &pStream[currentStream]);
+      rOut.rows() * rOut.cols() * sizeof(MHDComplex), &pStream[currentStream]);*/
+
+  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
+  double* outSplit = (double*)calloc(
+     appContainer_forward.config.Ntheta *
+        (appContainer_forward.config
+              .m_even_endBatch[appContainer_forward.config.num_m_even - 1] +
+           appContainer_forward.config
+              .m_odd_endBatch[appContainer_forward.config.num_m_odd - 1]),
+     sizeof(MHDFloat));
+  
+  
+  transferDataFromGPU_parallALT(&VkGPU, outSplit, &appContainer_forward);
+
+ // printf("%d %d %d\n", rOut.cols(), rOut.rows(), appContainer_forward.config.Ntheta);
+  std::vector<int> Mseq(appContainer_forward.config.num_m_even + appContainer_forward.config.num_m_odd);
+  for (int i = 0; i < appContainer_forward.config.num_m_even; i++)
+  {
+     Mseq[i] = appContainer_forward.config.m_even_list[i];
+  }
+  for (int i = 0; i < appContainer_forward.config.num_m_odd; i++)
+  {
+     Mseq[appContainer_forward.config.num_m_even+i] = appContainer_forward.config.m_odd_list[i];
+  }
+  std::sort(Mseq.begin(), Mseq.end());
+  for (int i = 0; i < appContainer_forward.config.num_m_even +
+                         appContainer_forward.config.num_m_odd;
+     i++)
+  {
+    // printf("%d\n", Mseq[i]);
+  }
+  int evenID = 0;
+  int oddID = 0;
+  int even_startBatch = 0;
+  int odd_startBatch = appContainer_forward.config.m_even_endBatch[appContainer_forward.config.num_m_even - 1];
+  int current_i = 0;
+  for (int i = 0; i < appContainer_forward.config.num_m_even + appContainer_forward.config.num_m_odd; i++)
+  {
+      if (Mseq[i] % 2)
+      {
+          int numBatches =
+            (oddID == 0)
+               ? appContainer_forward.config.m_odd_endBatch[0]
+               : appContainer_forward.config.m_odd_endBatch[oddID] -
+                    appContainer_forward.config.m_odd_endBatch[oddID - 1];
+           for (int l = 0;
+            l < (numBatches/2); l++)
+         {
+            for (int j = 0; j < rOut.rows(); j++)
+            {
+               /*printf("%.2e %.2e\n",
+                  outSplit[j + i * 2 * appContainer_forward.config.Ntheta],
+                  outSplit[j + i * 2 * appContainer_forward.config.Ntheta +
+                           appContainer_forward.config.Ntheta]);*/
+                //printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + odd_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l],outSplit[j + odd_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l +
+               //            appContainer_forward.config.Ntheta]);
+               rOut(j, current_i) = std::complex<double>(
+                  outSplit[j + odd_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l] * 2 * PI_long_parallALT,
+                  outSplit[j + odd_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l +
+                           appContainer_forward.config.Ntheta] * 2 * PI_long_parallALT);
+            }
+         }
+         odd_startBatch += numBatches;
+         current_i += numBatches/2;
+         oddID++;
+     }
+      else
+      {
+         int numBatches =
+            (evenID == 0)
+               ? appContainer_forward.config.m_even_endBatch[0]
+               : appContainer_forward.config.m_even_endBatch[evenID] -
+                    appContainer_forward.config.m_even_endBatch[evenID - 1];
+         for (int l = 0;
+            l < (numBatches/2); l++)
+         {
+            for (int j = 0; j < rOut.rows(); j++)
+            {
+               /*printf("%.2e %.2e\n",
+                  outSplit[j + i * 2 * appContainer_forward.config.Ntheta],
+                  outSplit[j + i * 2 * appContainer_forward.config.Ntheta +
+                           appContainer_forward.config.Ntheta]);*/
+              // printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + even_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l],outSplit[j + even_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l +
+              //             appContainer_forward.config.Ntheta]);
+               rOut(j, current_i) = std::complex<double>(
+                  outSplit[j + even_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l] * 2 * PI_long_parallALT,
+                  outSplit[j + even_startBatch * appContainer_forward.config.Ntheta + appContainer_forward.config.Ntheta *2*l +
+                           appContainer_forward.config.Ntheta] * 2 * PI_long_parallALT);
+            }
+         }
+         even_startBatch += numBatches;
+         current_i += numBatches /2;
+         evenID++;
+      }
+     //printf("\n");
+  }
+  free(outSplit);
   for (auto loc : this->mZLoc) {
     int s = std::get<1>(loc);
     int cols = std::get<2>(loc);
