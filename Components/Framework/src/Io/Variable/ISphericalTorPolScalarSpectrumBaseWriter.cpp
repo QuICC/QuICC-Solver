@@ -112,7 +112,7 @@ namespace Variable {
          std::visit(
                [&](auto&& p)
                {
-                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Spectrum::id()); //I don't really need Spectrum. A generic IChebyshevSpectrum (or a random Power operator, I am not using it anyway) would suffice
+                  coord.transform1D().reduce(spectrum, p->data(), Transform::Reductor::Spectrum::id()); //I don't really need Spectrum. A generic ILinearMapSpectrum (or a random Power operator, I am not using it anyway) would suffice
                },
                pInVarTor);
       }

@@ -20,11 +20,12 @@
 // Project includes
 //
 #include "Environment/QuICCEnv.hpp"
-#include "Types/Math.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/NonDimensional/Lower1d.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
+#include "QuICC/ScalarFields/FieldTools.hpp"
+#include "Types/Math.hpp"
 
 namespace QuICC {
 
@@ -37,10 +38,6 @@ namespace Variable {
    {
    }
 
-   ShellScalarNSpectrumWriter::~ShellScalarNSpectrumWriter()
-   {
-   }
-
    void ShellScalarNSpectrumWriter::init()
    {
       // Spherical shell volume: 4/3*pi*(r_o^3 - r_i^3)
@@ -48,7 +45,8 @@ namespace Variable {
       MHDFloat ro = this->mPhysical.find(NonDimensional::Upper1d::id())->second->value();
       this->mVolume = (4.0/3.0)*Math::PI*(std::pow(ro,3) - std::pow(ri,3));
 
-      this->mHasMOrdering = this->res().sim().ss().has(SpatialScheme::Feature::TransformSpectralOrdering123);
+      this->mHasMOrdering = this->res().sim().ss().has(
+         SpatialScheme::Feature::TransformSpectralOrdering123);
 
       ISphericalScalarNSpectrumWriter::init();
    }

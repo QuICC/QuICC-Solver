@@ -1,5 +1,5 @@
 /**
- * @file IChebyshevSpectrum.cpp
+ * @file ILinearMapSpectrum.cpp
  * @brief Source of the interface for a generic FFT based Chebyshev spectrum reductor
  */
 
@@ -20,7 +20,7 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/IChebyshevSpectrum.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/ILinearMapSpectrum.hpp"
 
 // Project includes
 //
@@ -38,20 +38,12 @@ namespace LinearMap {
 
 namespace Reductor {
 
-   IChebyshevSpectrum::IChebyshevSpectrum()
-   {
-   }
-
-   IChebyshevSpectrum::~IChebyshevSpectrum()
-   {
-   }
-
-   void IChebyshevSpectrum::initBackend() const
+   void ILinearMapSpectrum::initBackend() const
    {
       this->mBackend.init(*this->mspSetup);
    }
 
-   void IChebyshevSpectrum::transform(Matrix& rOut, const MatrixZ& in) const
+   void ILinearMapSpectrum::transform(Matrix& rOut, const MatrixZ& in) const
    {
       rOut = in.array().abs2();
 
@@ -83,7 +75,7 @@ namespace Reductor {
    }
 
    // anelastic version:
-   void IChebyshevSpectrum::transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+   void ILinearMapSpectrum::transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
    {
       //throw std::logic_error("Anelastic spectrum not yet implemented");
       
@@ -144,7 +136,7 @@ namespace Reductor {
    }
 
 
-   void IChebyshevSpectrum::transform(Matrix& rOut, const Matrix& in) const
+   void ILinearMapSpectrum::transform(Matrix& rOut, const Matrix& in) const
    {
       rOut = in.array().abs2();
       /*
@@ -163,7 +155,7 @@ namespace Reductor {
       */
    }
 
-   void IChebyshevSpectrum::transform(Matrix& rOut, const Matrix& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+   void ILinearMapSpectrum::transform(Matrix& rOut, const Matrix& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
    {
       throw std::logic_error("Anelastic spectrum not yet implemented");
       /*
@@ -187,18 +179,18 @@ namespace Reductor {
       this->applyPostOperator(rOut, tmpOut);
       */
    }
-
-   void IChebyshevSpectrum::transform(MatrixZ&, const MatrixZ&) const
+   
+   void ILinearMapSpectrum::transform(MatrixZ&, const MatrixZ&) const
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
    }
 
-   void IChebyshevSpectrum::transform(MatrixZ&, const Matrix&) const
+   void ILinearMapSpectrum::transform(MatrixZ&, const Matrix&) const
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT energy reductor");
    }
-
-   MHDFloat IChebyshevSpectrum::requiredStorage() const
+   
+   MHDFloat ILinearMapSpectrum::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 
@@ -209,14 +201,14 @@ namespace Reductor {
       return mem;
    }
 
-   int IChebyshevSpectrum::outRows() const
+   int ILinearMapSpectrum::outRows() const
    {
-      return this->mspSetup->blockSize();
+      return this->mspSetup->fwdSize();
    }
 
-   int IChebyshevSpectrum::outCols() const
+   int ILinearMapSpectrum::outCols() const
    {
-      return 1;
+      return this->mspSetup->blockSize();
    }
 
 }

@@ -14,13 +14,16 @@
               // For the nonlinear model
               //"program": "/QuICC/QuICC-Solver/build_NL_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCImplicitModel",
               //"program": "/QuICC/QuICC-Solver/build_NL_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCExplicitModel",
-              "program": "/QuICC/QuICC-Solver/build_NL_shell_dynamo_debug/Models/BoussinesqShellDynamo/Executables/BoussinesqShellDynamoExplicitModel",
+              "program": "/QuICC/QuICC-Solver-merge/build_NL_anelastic_debug/Models/AnelasticShellRTC/Executables/AnelasticShellRTCExplicitModel",
+              //"program": "/QuICC/QuICC-Solver/build_NL_shell_dynamo_debug/Models/BoussinesqShellDynamo/Executables/BoussinesqShellDynamoExplicitModel",
+              //"program": "/QuICC/QuICC-Solver-merge/build_NL_shell_RTC_debug/Models/BoussinesqShellRTC/Executables/BoussinesqShellRTCExplicitModel",
               //"program": "/QuICC/QuICC-Solver/build_NL_sphere_dynamo_debug/Models/BoussinesqSphereDynamo/Executables/BoussinesqSphereDynamoImplicitModel",
               //"program": "/QuICC/QuICC-Solver/build_NL_sphere_dynamo_debug/Models/BoussinesqSphereDynamo/Executables/BoussinesqSphereDynamoExplicitModel",
               
               //"cwd": "/QuICC/AnelasticShellRTC/debug/nonlinear/implicit/"
-              //"cwd": "/QuICC/AnelasticShellRTC/debug/nonlinear/explicit/serial/"
-              "cwd": "/QuICC/BoussinesqShellDynamo/debug/nonlinear/explicit/serial/"
+              "cwd": "/QuICC/AnelasticShellRTC/debug/nonlinear/explicit/serial/"
+              //"cwd": "/QuICC/BoussinesqShellDynamo/debug/nonlinear/explicit/serial/"
+              //"cwd": "/QuICC/BoussinesqShellRTC/debug/nonlinear/explicit/"
               //"cwd": "/QuICC/BoussinesqSphereDynamo/debug/nonlinear/implicit/"
               //"cwd": "/QuICC/BoussinesqSphereDynamo/debug/nonlinear/explicit/"
               

@@ -112,6 +112,8 @@ void ALegendreTransform::initOperators()
       Backward::P::id());
    this->mImpl.addOperator<Poly::ALegendre::Projector::Ll<backend_t>>(
       Backward::Laplh::id());
+   this->mImpl.addOperator<Poly::ALegendre::Projector::Ll<backend_t>>(
+      Backward::LaplhD0::id());
    this->mImpl.addOperator<Poly::ALegendre::Projector::D1<backend_t>>(
       Backward::D1::id());
    this->mImpl.addOperator<Poly::ALegendre::Projector::D2<backend_t>>(

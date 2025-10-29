@@ -12,7 +12,7 @@
 
 // Class include
 //
-#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Spectrum.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Base/Spectrum.hpp"
 
 // Project includes
 //
@@ -29,27 +29,25 @@ namespace LinearMap {
 
 namespace Reductor {
 
-   Spectrum::Spectrum()
+   void Spectrum<base_t>::initOperator() const
    {
+      // Check for division by 0!
+      assert(this->mspSetup->lower() > 0.0 || this->mspSetup->upper() < 0.0);
    }
 
-   Spectrum::~Spectrum()
-   {
-   }
-
-   void Spectrum::applyPreOperator(Matrix& tmp, const Matrix& in) const
+   void Spectrum<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
    {
       this->mBackend.input(tmp, in);
    }
 
    // I don't think we need this
-   void Spectrum::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
+   void Spectrum<base_t>::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
    {
       assert(rOut.cols() == 1);
       this->mBackend.output(rOut, tmp);
    }
 
-   void Spectrum::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
+   void Spectrum<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in, const bool useReal) const
    {
       this->mBackend.input(tmp, in, useReal);
    }

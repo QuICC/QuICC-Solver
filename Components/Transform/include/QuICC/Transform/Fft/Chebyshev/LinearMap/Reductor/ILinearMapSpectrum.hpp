@@ -1,10 +1,10 @@
 /**
- * @file IChebyshevSpectrum.hpp
+ * @file ILinearMapSpectrum.hpp
  * @brief Interface for a generic Chebyshev FFT based spectrum reductor
  */
 
-#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVSPECTRUM_HPP
-#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVSPECTRUM_HPP
+#ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPSPECTRUM_HPP
+#define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPSPECTRUM_HPP
 
 // Debug includes
 //
@@ -40,18 +40,18 @@ namespace Reductor {
    /**
     * @brief Interface for a generic Chebyshev FFT based energy reductor
     */
-   class IChebyshevSpectrum: public IChebyshevOperator
+   class ILinearMapSpectrum: public IChebyshevOperator
    {
       public:
          /**
           * @brief Constructor
           */
-         IChebyshevSpectrum();
+         ILinearMapSpectrum() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~IChebyshevSpectrum();
+         virtual ~ILinearMapSpectrum() = default;
 
          /**
           * @brief Compute reduction of complex data
@@ -161,4 +161,4 @@ namespace Reductor {
 }
 }
 
-#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ICHEBYSHEVSPECTRUM_HPP
+#endif // QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPSPECTRUM_HPP

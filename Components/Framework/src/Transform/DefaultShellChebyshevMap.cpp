@@ -53,6 +53,7 @@
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/RadialPower.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/RadialPowerDivY1.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/RadialPowerDivY1D1Y1.hpp"
+#include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Spectrum.hpp"
 #include "QuICC/Transform/Forward/I2Q.hpp"
 #include "QuICC/Transform/Forward/I2S.hpp"
 #include "QuICC/Transform/Forward/I2T.hpp"
@@ -73,7 +74,6 @@
 #include "QuICC/Transform/Reductor/RadialPowerOverr1D1R1.hpp"
 
 #include "QuICC/Transform/Reductor/PowerR2.hpp"
-
 #include "QuICC/Transform/Reductor/Spectrum.hpp"
 
 namespace QuICC {
@@ -114,6 +114,8 @@ void DefaultShellChebyshevMap::operator()(MapType& m) const
       Backward::Overr1D1::id());
    this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2D1Y1<backend_t>>(m, 
       Backward::Overr2D1R1::id());
+   this->addOperator<Fft::Chebyshev::LinearMap::Projector::DivY2D1Y1<backend_t>>(m, 
+      Backward::OverrSqD1R1::id());
    this->addOperator<
       Fft::Chebyshev::LinearMap::Projector::SphRadLapl<backend_t>>(m,
       Backward::Slaplr::id());
@@ -170,6 +172,13 @@ void DefaultShellChebyshevMap::operator()(MapType& m) const
    this->addOperator<
       Fft::Chebyshev::LinearMap::Reductor::RadialPowerDivY1D1Y1<backend_t>>(m,
       Reductor::RadialPowerOverr1D1R1::id());
+   
+   this->addOperator<
+      Fft::Chebyshev::LinearMap::Reductor::Spectrum<backend_t>>(m,
+      Reductor::PowerR2::id());
+   this->addOperator<
+      Fft::Chebyshev::LinearMap::Reductor::Spectrum<backend_t>>(m,
+      Reductor::Spectrum::id());
 }
 
 } // namespace Transform

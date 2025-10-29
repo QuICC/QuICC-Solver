@@ -50,7 +50,7 @@ void DivY1D1<base_t>::initBackend() const
    ILinearMapProjector::initBackend();
 
    // Initialize the solver
-   this->mBackend.addSolver(1);
+   this->mBackend.addSolver();
 }
 
 void DivY1D1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const

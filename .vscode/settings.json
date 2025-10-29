@@ -101,6 +101,9 @@
         "queue": "cpp",
         "stack": "cpp",
         "orderingmethods": "cpp",
-        "cassert": "cpp"
+        "cassert": "cpp",
+        "any": "cpp",
+        "coroutine": "cpp",
+        "source_location": "cpp"
     }
 }

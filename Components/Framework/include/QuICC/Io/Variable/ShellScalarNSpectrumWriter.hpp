@@ -45,7 +45,7 @@ namespace Variable {
          /**
           * @brief Destructor
           */
-         virtual ~ShellScalarNSpectrumWriter();
+         virtual ~ShellScalarNSpectrumWriter() = default;
 
          /**
           * @brief Initialise the operator, transform and file
@@ -60,8 +60,8 @@ namespace Variable {
    /// Typedef for a shared pointer of a HDF5 state file writer
    typedef std::shared_ptr<ShellScalarNSpectrumWriter> SharedShellScalarNSpectrumWriter;
 
-}
-}
-}
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_SHELLTORPOLNSPECTRUMWRITER_HPP

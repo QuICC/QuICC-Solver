@@ -159,6 +159,12 @@ namespace Model {
             spFile->onlyEvery(spSim->config().model(tag).at("only_every"));
          }
          spSim->addAsciiOutputFile(spFile);
+
+         return spFile;
+      }
+      else
+      {
+         return nullptr;
       }
    }
 
