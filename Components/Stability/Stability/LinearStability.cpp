@@ -30,6 +30,7 @@
 #include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
+#include "QuICC/PhysicalNames/MassFlux.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "Stability/LinearStability.hpp"
 #include "Stability/Options.hpp"
