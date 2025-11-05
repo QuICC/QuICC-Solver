@@ -5,7 +5,7 @@ if(TARGET PfSolve)
 endif()
 
 set(ProjectorOps "P;D1;SphLapl")
-#set(IntegratorOps "P")
+set(IntegratorOps "P")
 
 set(Kinds "Projector;Integrator")
 

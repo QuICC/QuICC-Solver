@@ -51,7 +51,7 @@ public:
     /// @param out differentiatied modes
     /// @param in input modes
     void initImpl(Tout& out, const Tin& in){
-        std::uint32_t Ntheta = out.dims()[0];//igrid.size();
+        std::uint32_t Ntheta = (Direction) ? out.dims()[0] : in.dims()[0];//igrid.size();
         
         //std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
 
@@ -143,7 +143,7 @@ public:
         }
         free(temp_pointers);
         config.M = ((m_even[config.num_m_even - 1]) / 2 + 1) * 2;// M;
-        config.L = in.dims()[0];// 3 * M / 2;
+        config.L = (Direction) ? in.dims()[0] : out.dims()[0];// 3 * M / 2;
 
 	    //appContainer.input_buffer_S = (double*)in.data();
         //appContainer.buffer_S = (double*)out.data();

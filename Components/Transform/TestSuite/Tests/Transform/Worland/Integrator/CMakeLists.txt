@@ -399,6 +399,11 @@ set(_tests_templated
   Fft::P_Zero:<base_t>:integrator
   Fft::R1_Zero:<base_t>:integrator
   )
+if(TARGET PfSolve)
+  list(APPEND _tests_templated
+    Fft::P:<viewGpuParallalt_t>:integrator
+  )
+endif()
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
