@@ -173,6 +173,14 @@ private:
     */
     mutable PfSolve::VkGPU VkGPU = {};
 
+    mutable int num_m_even;
+    mutable int num_m_odd;
+
+    mutable int* m_even;
+    mutable int* m_even_endBatch;
+    mutable int* m_odd;
+    mutable int* m_odd_endBatch;
+
     @Storage@
 };
 

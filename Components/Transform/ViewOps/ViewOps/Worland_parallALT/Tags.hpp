@@ -12,7 +12,7 @@
 
 namespace QuICC {
 namespace Transform {
-namespace Worland {
+namespace Worland_parallALT {
 
 //
 // Tags

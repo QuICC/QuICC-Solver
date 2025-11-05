@@ -6,12 +6,12 @@
 
 // Project includes
 //
-#include "ViewOps/Worland/Tags.hpp"
-#include "ViewOps/Worland/Types.hpp"
+#include "ViewOps/Worland_parallALT/Tags.hpp"
+#include "ViewOps/Worland_parallALT/Types.hpp"
 
 namespace QuICC {
 namespace Transform {
-namespace Worland {
+namespace Worland_parallALT {
 
 namespace Uniform {
 

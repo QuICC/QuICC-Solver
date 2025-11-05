@@ -9,14 +9,14 @@
 // Project includes
 //
 #include "QuICC/Transform/Wrappers/Worland/@Kind@/@Op@@Tag@.hpp.inc"
-#include "ViewOps/Worland/OpsBuilder.hpp"
+//#include "ViewOps/Worland/OpsBuilder.hpp"
 
 #include "View/ViewSparse.hpp"
 #include "Memory/Cpu/NewDelete.hpp"
 //#include "ViewOps/Quadrature/Op.hpp"
 //#include "ViewOps/Quadrature/Impl.hpp"
-#include "ViewOps/Worland/Tags.hpp"
-#include "ViewOps/Worland/Builder.hpp"
+#include "ViewOps/Worland_parallALT/Tags.hpp"
+#include "ViewOps/Worland_parallALT/Builder.hpp"
 #include "Profiler/Interface.hpp"
 @CppHeaders@
 
@@ -27,18 +27,18 @@ namespace Worland {
 namespace @Kind@ {
 
 @Op@<@Tag@>::~@Op@() {
-   deleteParallALT(&VkGPU, &appContainer_backward);
-   cudaFree(appContainer_backward.input_buffer_S);
-   cudaFree(&appContainer_backward.buffer_S);
-   free(config_backward.m_even_list);
-   free(config_backward.m_even_endBatch);
-   free(config_backward.m_odd_list);
-   free(config_backward.m_odd_endBatch);
+   //deleteParallALT(&VkGPU, &appContainer_backward);
+   //cudaFree(appContainer_backward.input_buffer_S);
+   //cudaFree(&appContainer_backward.buffer_S);
+   free(m_even);
+   free(m_even_endBatch);
+   free(m_odd);
+   free(m_odd_endBatch);
 }
 
 void @Op@<@Tag@>::computeWorlandExpansion(const bool isEven) const
 {
-    launchApp_parallALT(&appContainer_backward);
+    //launchApp_parallALT(&appContainer_backward,0);
 }
 
 void @Op@<@Tag@>::applyPreOperator(const Matrix& in, const bool isEven) const
@@ -51,51 +51,50 @@ void @Op@<@Tag@>::applyPostOperator(Matrix& rOut, const bool isEven) const
 
 void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const bool useReal) const
 {
-    PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
-  //bufferSolveRes2 = bufferSolve2[2];
+    std::uint32_t Ntheta = this->mspSetup->bwdSize();
   Profiler::RegionStart<2>("applyOperators");
   double* inSplit = (double*)calloc(
-     config_backward.Ntheta *
-        (config_backward.m_even_endBatch[config_backward.num_m_even - 1] +
-           config_backward.m_odd_endBatch[config_backward.num_m_odd - 1]),
+     Ntheta *
+        (m_even_endBatch[num_m_even - 1] +
+           m_odd_endBatch[num_m_odd - 1]),
      sizeof(MHDFloat));
-  //printf("%d %d %d\n", in.cols(), in.rows(), config_backward.Ntheta);
-  std::vector<int> Mseq(config_backward.num_m_even + config_backward.num_m_odd);
-  for (int i = 0; i < config_backward.num_m_even; i++)
+  //printf("%d %d %d\n", in.cols(), in.rows(), Ntheta);
+  std::vector<int> Mseq(num_m_even + num_m_odd);
+  for (int i = 0; i < num_m_even; i++)
   {
-     Mseq[i] = config_backward.m_even_list[i];
+     Mseq[i] = m_even[i];
   }
-  for (int i = 0; i < config_backward.num_m_odd; i++)
+  for (int i = 0; i < num_m_odd; i++)
   {
-     Mseq[config_backward.num_m_even+i] = config_backward.m_odd_list[i];
+     Mseq[num_m_even+i] = m_odd[i];
   }
   std::sort(Mseq.begin(), Mseq.end());
    int evenID = 0;
   int oddID = 0;
   int even_startBatch = 0;
-  int odd_startBatch = config_backward.m_even_endBatch[config_backward.num_m_even - 1];
+  int odd_startBatch = m_even_endBatch[num_m_even - 1];
   int current_i = 0;
-  for (int i = 0; i < config_backward.num_m_even + config_backward.num_m_odd; i++)
+  for (int i = 0; i < num_m_even + num_m_odd; i++)
   {
       if (Mseq[i] % 2)
       {
           int numBatches =
             (oddID == 0)
-               ? config_backward.m_odd_endBatch[0]
-               : config_backward.m_odd_endBatch[oddID] -
-                    config_backward.m_odd_endBatch[oddID - 1];
+               ? m_odd_endBatch[0]
+               : m_odd_endBatch[oddID] -
+                    m_odd_endBatch[oddID - 1];
            for (int l = 0;
             l < (numBatches/2); l++)
          {
             for (int j = 0; j < in.rows(); j++)
             {
                /*printf("%.2e %.2e\n",
-                  outSplit[j + i * 2 * config_backward.Ntheta],
-                  outSplit[j + i * 2 * config_backward.Ntheta +
-                           config_backward.Ntheta]);*/
-               inSplit[j + odd_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l] =in(j,current_i).real();
-               inSplit[j + odd_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l +
-                           config_backward.Ntheta] = in(j,current_i).imag();
+                  outSplit[j + i * 2 * Ntheta],
+                  outSplit[j + i * 2 * Ntheta +
+                           Ntheta]);*/
+               inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] =in(j,current_i).real();
+               inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
+                           Ntheta] = in(j,current_i).imag();
         
             }
          }
@@ -107,21 +106,21 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
       {
          int numBatches =
             (evenID == 0)
-               ? config_backward.m_even_endBatch[0]
-               : config_backward.m_even_endBatch[evenID] -
-                    config_backward.m_even_endBatch[evenID - 1];
+               ? m_even_endBatch[0]
+               : m_even_endBatch[evenID] -
+                    m_even_endBatch[evenID - 1];
          for (int l = 0;
             l < (numBatches/2); l++)
          {
             for (int j = 0; j < in.rows(); j++)
             {
                /*printf("%.2e %.2e\n",
-                  outSplit[j + i * 2 * config_backward.Ntheta],
-                  outSplit[j + i * 2 * config_backward.Ntheta +
-                           config_backward.Ntheta]);*/
-               inSplit[j + even_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l] =in(j,current_i).real();
-               inSplit[j + even_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l +
-                           config_backward.Ntheta] = in(j,current_i).imag();
+                  outSplit[j + i * 2 * Ntheta],
+                  outSplit[j + i * 2 * Ntheta +
+                           Ntheta]);*/
+               inSplit[j + even_startBatch * Ntheta + Ntheta *2*l] =in(j,current_i).real();
+               inSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
+                           Ntheta] = in(j,current_i).imag();
             }
          }
          even_startBatch += numBatches;
@@ -136,44 +135,58 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
                                      in.rows() * in.cols() * sizeof(MHDComplex),
                                      &pStream[currentStream]);*/
 
-  transferDataToGPU_parallALT(&VkGPU, inSplit, &appContainer_backward);
+  //transferDataToGPU_parallALT(&VkGPU, inSplit, &appContainer_backward);
+  uint64_t bufferSizeReducedEven = Ntheta * m_even_endBatch[num_m_even-1] * sizeof(double);
+	uint64_t bufferSizeReducedOdd = Ntheta * m_odd_endBatch[num_m_odd-1] * sizeof(double);
+    PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+    double* gpuIn = (double*)mModsFlat_d.data();
+  resPfSolve = PfSolve::transferDataFromCPU(&VkGPU, inSplit, &gpuIn, bufferSizeReducedEven);
+    //if (resPfSolve != PfSolve::PFSOLVE_SUCCESS) return resPfSolve;
+    gpuIn = gpuIn + Ntheta * m_even_endBatch[num_m_even-1];
+    resPfSolve = PfSolve::transferDataFromCPU(&VkGPU, inSplit + Ntheta * m_even_endBatch[num_m_even-1], &gpuIn, bufferSizeReducedOdd);
+    //if (resPfSolve != PfSolve::PFSOLVE_SUCCESS) return resPfSolve;
   cudaDeviceSynchronize();
   free(inSplit);
  
   Profiler::RegionStart<2>("applyImpl");
 
-  computeWorlandExpansion(0);
+  mOp->apply(mPhysView, mModsView);
 }
 
 void @Op@<@Tag@>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
 {
+ std::uint32_t Ntheta = this->mspSetup->bwdSize();
+  
 Profiler::RegionStop<2>("applyImpl");
 
   //Matrix &outTmp = this->mOutTmp.at(0);
 
-  PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
+  PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
   double* outSplit = (double*)calloc(
-     config_backward.Ntheta *
-        (config_backward.m_even_endBatch[config_backward.num_m_even - 1] +
-           config_backward.m_odd_endBatch[config_backward.num_m_odd - 1]),
+     Ntheta *
+        (m_even_endBatch[num_m_even - 1] +
+           m_odd_endBatch[num_m_odd - 1]),
      sizeof(MHDFloat));
-  
-  
-  transferDataFromGPU_parallALT(&VkGPU, outSplit, &appContainer_backward);
 
- // printf("%d %d %d\n", rOut.cols(), rOut.rows(), config_backward.Ntheta);
-  std::vector<int> Mseq(config_backward.num_m_even + config_backward.num_m_odd);
-  for (int i = 0; i < config_backward.num_m_even; i++)
+  uint64_t bufferSize = Ntheta * (m_even_endBatch[num_m_even-1]+m_odd_endBatch[num_m_odd-1]) * sizeof(double);
+  double* gpuOut = (double*)mPhysFlat_d.data();
+  resPfSolve = PfSolve::transferDataToCPU(&VkGPU, outSplit, &gpuOut, bufferSize);
+  //if (resPfSolve != PfSolve::PFSOLVE_SUCCESS) return resPfSolve;
+  //transferDataFromGPU_parallALT(&VkGPU, outSplit, &appContainer_backward);
+
+ // printf("%d %d %d\n", rOut.cols(), rOut.rows(), Ntheta);
+  std::vector<int> Mseq(num_m_even + num_m_odd);
+  for (int i = 0; i < num_m_even; i++)
   {
-     Mseq[i] = config_backward.m_even_list[i];
+     Mseq[i] = m_even[i];
   }
-  for (int i = 0; i < config_backward.num_m_odd; i++)
+  for (int i = 0; i < num_m_odd; i++)
   {
-     Mseq[config_backward.num_m_even+i] = config_backward.m_odd_list[i];
+     Mseq[num_m_even+i] = m_odd[i];
   }
   std::sort(Mseq.begin(), Mseq.end());
-  for (int i = 0; i < config_backward.num_m_even +
-                         config_backward.num_m_odd;
+  for (int i = 0; i < num_m_even +
+                         num_m_odd;
      i++)
   {
     // printf("%d\n", Mseq[i]);
@@ -181,32 +194,32 @@ Profiler::RegionStop<2>("applyImpl");
   int evenID = 0;
   int oddID = 0;
   int even_startBatch = 0;
-  int odd_startBatch = config_backward.m_even_endBatch[config_backward.num_m_even - 1];
+  int odd_startBatch = m_even_endBatch[num_m_even - 1];
   int current_i = 0;
-  for (int i = 0; i < config_backward.num_m_even + config_backward.num_m_odd; i++)
+  for (int i = 0; i < num_m_even + num_m_odd; i++)
   {
       if (Mseq[i] % 2)
       {
           int numBatches =
             (oddID == 0)
-               ? config_backward.m_odd_endBatch[0]
-               : config_backward.m_odd_endBatch[oddID] -
-                    config_backward.m_odd_endBatch[oddID - 1];
+               ? m_odd_endBatch[0]
+               : m_odd_endBatch[oddID] -
+                    m_odd_endBatch[oddID - 1];
            for (int l = 0;
             l < (numBatches/2); l++)
          {
             for (int j = 0; j < rOut.rows(); j++)
             {
                /*printf("%.2e %.2e\n",
-                  outSplit[j + i * 2 * config_backward.Ntheta],
-                  outSplit[j + i * 2 * config_backward.Ntheta +
-                           config_backward.Ntheta]);*/
-                //printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + odd_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l],outSplit[j + odd_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l +
-               //            config_backward.Ntheta]);
+                  outSplit[j + i * 2 * Ntheta],
+                  outSplit[j + i * 2 * Ntheta +
+                           Ntheta]);*/
+                //printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l],outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
+               //            Ntheta]);
                rOut(j, current_i) = std::complex<double>(
-                  outSplit[j + odd_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l],
-                  outSplit[j + odd_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l +
-                           config_backward.Ntheta]);
+                  outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l],
+                  outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
+                           Ntheta]);
             }
          }
          odd_startBatch += numBatches;
@@ -217,24 +230,24 @@ Profiler::RegionStop<2>("applyImpl");
       {
          int numBatches =
             (evenID == 0)
-               ? config_backward.m_even_endBatch[0]
-               : config_backward.m_even_endBatch[evenID] -
-                    config_backward.m_even_endBatch[evenID - 1];
+               ? m_even_endBatch[0]
+               : m_even_endBatch[evenID] -
+                    m_even_endBatch[evenID - 1];
          for (int l = 0;
             l < (numBatches/2); l++)
          {
             for (int j = 0; j < rOut.rows(); j++)
             {
                /*printf("%.2e %.2e\n",
-                  outSplit[j + i * 2 * config_backward.Ntheta],
-                  outSplit[j + i * 2 * config_backward.Ntheta +
-                           config_backward.Ntheta]);*/
-              // printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + even_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l],outSplit[j + even_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l +
-              //             config_backward.Ntheta]);
+                  outSplit[j + i * 2 * Ntheta],
+                  outSplit[j + i * 2 * Ntheta +
+                           Ntheta]);*/
+              // printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + even_startBatch * Ntheta + Ntheta *2*l],outSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
+              //             Ntheta]);
                rOut(j, current_i) = std::complex<double>(
-                  outSplit[j + even_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l],
-                  outSplit[j + even_startBatch * config_backward.Ntheta + config_backward.Ntheta *2*l +
-                           config_backward.Ntheta]);
+                  outSplit[j + even_startBatch * Ntheta + Ntheta *2*l],
+                  outSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
+                           Ntheta]);
             }
          }
          even_startBatch += numBatches;
@@ -332,9 +345,9 @@ void @Op@<@Tag@>::initBackend() const
 
     ///\todo this should be the full matrix size
     std::uint32_t M = static_cast<std::uint32_t>(this->mspSetup->slow(nLayers-1)) + 1;
-
+    std::uint32_t L = this->mspSetup->specSize();
     PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
-    config_backward = {};
+    /*config_backward = {};
 	config_backward.Ntheta = Ntheta;//this->mspSetup->bwdSize();
     const char* proj_operator = "@Op@";
     if (!strcmp(proj_operator, "P"))
@@ -364,29 +377,30 @@ void @Op@<@Tag@>::initBackend() const
 	config_backward.WMMA_N = 8;
 	config_backward.WMMA_K = 4;
 	appContainer_backward = {};
-    config_backward.projector = 1;
-
+    config_backward.projector = 1;*/
+    num_m_even = 0;
+    num_m_odd = 0;
     for (std::uint32_t i = 0; i < nLayers; ++i)
     {
         if ((static_cast<std::uint32_t>(this->mspSetup->slow(i))%2) == 0 )
         {
-            config_backward.num_m_even++;
+            num_m_even++;
         }
         if ((static_cast<std::uint32_t>(this->mspSetup->slow(i))%2) == 1 )
         {
-            config_backward.num_m_odd++;
+            num_m_odd++;
         }
     }
     int start = 0;
     int iter = 0;
-    int* m_even = (int*)calloc(config_backward.num_m_even, sizeof(int));
-    int* m_even_endBatch = (int*)calloc(config_backward.num_m_even, sizeof(int));
-    int* m_odd = (int*)calloc(config_backward.num_m_odd, sizeof(int));
-    int* m_odd_endBatch = (int*)calloc(config_backward.num_m_odd, sizeof(int));
-    config_backward.m_even_list = m_even;
-    config_backward.m_even_endBatch = m_even_endBatch;
-    config_backward.m_odd_list = m_odd;
-    config_backward.m_odd_endBatch = m_odd_endBatch;
+    m_even = (int*)calloc(num_m_even, sizeof(int));
+    m_even_endBatch = (int*)calloc(num_m_even, sizeof(int));
+    m_odd = (int*)calloc(num_m_odd, sizeof(int));
+    m_odd_endBatch = (int*)calloc(num_m_odd, sizeof(int));
+    //config_backward.m_even_list = m_even;
+    //config_backward.m_even_endBatch = m_even_endBatch;
+    //config_backward.m_odd_list = m_odd;
+    //config_backward.m_odd_endBatch = m_odd_endBatch;
    
     for (std::uint32_t i = 0; i < nLayers; ++i)
     {
@@ -414,23 +428,43 @@ void @Op@<@Tag@>::initBackend() const
         }
     }
     
-    config_backward.M = ((m_even[config_backward.num_m_even - 1]) / 2 + 1) * 2;// M;
-    config_backward.L = this->mspSetup->specSize();// 3 * M / 2;
-	
+    //config_backward.M = ((m_even[config_backward.num_m_even - 1]) / 2 + 1) * 2;// M;
+    //config_backward.L = this->mspSetup->specSize();// 3 * M / 2;
+
     //std::cout << resPfSolve;
 
     constexpr size_t rank = 3;
     // dim 0 - Nr - radial points
     // dim 1 - R  - radial modes
     // dim 2 - L  - harmonic degree
-    //std::array<std::uint32_t, rank> dimensions {M, K, P};
+    std::array<std::uint32_t, rank> dimensions {M, K, M};
+
+    std::vector<std::uint32_t> layers(nLayers);
+    for(std::uint32_t p = 0; p < nLayers; ++p)
+    {
+        layers[p] = this->mspSetup->slow(p);
+    }
 
     // Make view operator
-    //using namespace QuICC::Transform::Quadrature;
-    //using namespace QuICC::Transform::Worland;
-    //using backend_t = Cuda::ImplOp<phys_t, mods_t, op_t>;
-    //using derived_t = Op<phys_t, mods_t, op_t, backend_t>;
     auto mem = std::make_shared<QuICC::Memory::Cuda::Malloc>();
+    const char* proj_operator = "@Op@";
+    if (!strcmp(proj_operator, "P"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL>>(mem);
+    if (!strcmp(proj_operator, "DivR"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_DIVR>>(mem);
+    if (!strcmp(proj_operator, "D1"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_DR>>(mem);
+    if (!strcmp(proj_operator, "SphLapl"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, PFSOLVE_RADIAL_SPHLAPL>>(mem);
+
+    //using op_t = QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, opType>;
+    //mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, opType>>(mem);
+
+    //using namespace QuICC::Transform::Quadrature;
+   /* using namespace QuICC::Transform::Worland;
+    using backend_t = Cuda::ImplOp<phys_t, mods_t, op_t>;
+    using derived_t = Op<phys_t, mods_t, op_t, backend_t>;
+    auto mem = std::make_shared<QuICC::Memory::Cuda::Malloc>();*/
 
     /*std::vector<std::uint32_t> layers(nLayers);
     for(std::uint32_t p = 0; p < nLayers; ++p)
@@ -438,13 +472,13 @@ void @Op@<@Tag@>::initBackend() const
         layers[p] = this->mspSetup->slow(p);
     }*/
 
-    //mOp = std::make_unique<derived_t>(mem);
-    //derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
-    //derivedOp.allocOp(dimensions, layers);
-    //auto opView = derivedOp.getOp();
-    //using namespace QuICC::Polynomial::Worland;
-    //OpsBuilder<op_t, P_t, bwd_t> tBuilder;
-    //tBuilder.compute(opView, igrid, Internal::Array());
+    /*mOp = std::make_unique<derived_t>(mem);
+    derived_t& derivedOp = dynamic_cast<derived_t&>(*mOp);
+    derivedOp.allocOp(dimensions, layers);
+    auto opView = derivedOp.getOp();
+    using namespace QuICC::Fft::Worland;
+    OpsBuilder<op_t, P_t, bwd_t> tBuilder;
+    tBuilder.compute(opView);*/
 
     ///\todo move view setups to init
 
@@ -486,46 +520,49 @@ void @Op@<@Tag@>::initBackend() const
     // dim 0 - R  - radial modes
     // dim 1 - M  - harmonic order
     // dim 2 - L  - harmonic degree
-    std::array<std::uint32_t, rank> modsDims = {Ntheta, config_backward.M, config_backward.L};
+    //std::array<std::uint32_t, rank> modsDims = {Ntheta, config_backward.M, config_backward.L};
     //mModsFlat.resize(config_backward.Ntheta* 2*(m_even_endBatch[config_backward.num_m_even -1] + m_odd_endBatch[config_backward.num_m_odd -1]));
-
+    std::array<std::uint32_t, rank> modsDims = {L, N, M};
+    mModsFlat.resize(Ntheta * nCols);//slightly more for now
     // dim 0 - Nr - radial points
     // dim 1 - M  - harmonic order
     // dim 2 - L  - harmonic degree
-    std::array<std::uint32_t, rank> physDims = {Ntheta, config_backward.M, config_backward.L};
+    //std::array<std::uint32_t, rank> physDims = {Ntheta, config_backward.M, config_backward.L};
     //mPhysFlat.resize(config_backward.Ntheta* 2*(m_even_endBatch[config_backward.num_m_even -1] + m_odd_endBatch[config_backward.num_m_odd -1]));
+    std::array<std::uint32_t, rank> physDims = {Ntheta, N, M};
+    mPhysFlat.resize(Ntheta * nCols);
 
     using namespace QuICC::View;
 
     // alloc device memory
-    //mModsFlat_d = std::move(QuICC::Memory::MemBlock<cuda::std::complex<double>>(config_backward.Ntheta* (m_even_endBatch[config_backward.num_m_even -1] + m_odd_endBatch[config_backward.num_m_odd -1]), mem.get()));
-    //mDataPointers_d = std::move(QuICC::Memory::MemBlock<std::uint32_t>(mDataPointers.size(), mem.get()));
-    //mDataIndices_d = std::move(QuICC::Memory::MemBlock<std::uint32_t>(mDataIndices.size(), mem.get()));
-    //mPhysFlat_d = std::move(QuICC::Memory::MemBlock<cuda::std::complex<double>>(config_backward.Ntheta* (m_even_endBatch[config_backward.num_m_even -1] + m_odd_endBatch[config_backward.num_m_odd -1]), mem.get()));
+    mModsFlat_d = std::move(QuICC::Memory::MemBlock<cuda::std::complex<double>>(mModsFlat.size(), mem.get()));
+    mDataPointers_d = std::move(QuICC::Memory::MemBlock<std::uint32_t>(mDataPointers.size(), mem.get()));
+    mDataIndices_d = std::move(QuICC::Memory::MemBlock<std::uint32_t>(mDataIndices.size(), mem.get()));
+    mPhysFlat_d = std::move(QuICC::Memory::MemBlock<cuda::std::complex<double>>(mPhysFlat.size(), mem.get()));
 
     // set device pointers
-    //ViewBase<std::uint32_t> dataPointers_d[rank];
-    //dataPointers_d[1] = ViewBase<std::uint32_t>(mDataPointers_d.data(), mDataPointers_d.size());
-    //ViewBase<std::uint32_t> dataIndices_d[rank];
-    //dataIndices_d[1] = ViewBase<std::uint32_t>(mDataIndices_d.data(), mDataIndices_d.size());
+    ViewBase<std::uint32_t> dataPointers_d[rank];
+    dataPointers_d[1] = ViewBase<std::uint32_t>(mDataPointers_d.data(), mDataPointers_d.size());
+    ViewBase<std::uint32_t> dataIndices_d[rank];
+    dataIndices_d[1] = ViewBase<std::uint32_t>(mDataIndices_d.data(), mDataIndices_d.size());
 
     // copy to device memory
-    //cudaErrChk(cudaMemcpyAsync(reinterpret_cast<std::complex<double>*>(mModsFlat_d.data()), mModsFlat.data(),
-    //    mModsFlat_d.size()*sizeof(cuda::std::complex<double>), cudaMemcpyHostToDevice));
-   // cudaErrChk(cudaMemcpyAsync(mDataPointers_d.data(), mDataPointers.data(),
-   //     mDataPointers_d.size()*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
-   // cudaErrChk(cudaMemcpyAsync(mDataIndices_d.data(), mDataIndices.data(),
-    //    mDataIndices_d.size()*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
-    //cudaErrChk(cudaMemcpyAsync(reinterpret_cast<std::complex<double>*>(mPhysFlat_d.data()), mPhysFlat.data(),
-     //   mPhysFlat_d.size()*sizeof(cuda::std::complex<double>), cudaMemcpyHostToDevice));
+    cudaErrChk(cudaMemcpyAsync(reinterpret_cast<std::complex<double>*>(mModsFlat_d.data()), mModsFlat.data(),
+        mModsFlat_d.size()*sizeof(cuda::std::complex<double>), cudaMemcpyHostToDevice));
+    cudaErrChk(cudaMemcpyAsync(mDataPointers_d.data(), mDataPointers.data(),
+        mDataPointers_d.size()*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+    cudaErrChk(cudaMemcpyAsync(mDataIndices_d.data(), mDataIndices.data(),
+        mDataIndices_d.size()*sizeof(std::uint32_t), cudaMemcpyHostToDevice));
+    cudaErrChk(cudaMemcpyAsync(reinterpret_cast<std::complex<double>*>(mPhysFlat_d.data()), mPhysFlat.data(),
+        mPhysFlat_d.size()*sizeof(cuda::std::complex<double>), cudaMemcpyHostToDevice));
 
     // set device views
-    //mModsView = mods_t(reinterpret_cast<std::complex<double>*>(mModsFlat_d.data()), mModsFlat_d.size(), modsDims.data(), dataPointers_d, dataIndices_d);
-    //mPhysView = phys_t(reinterpret_cast<std::complex<double>*>(mPhysFlat_d.data()), mPhysFlat_d.size(), physDims.data(), dataPointers_d, dataIndices_d);
+    mModsView = mods_t(reinterpret_cast<std::complex<double>*>(mModsFlat_d.data()), mModsFlat_d.size(), modsDims.data(), dataPointers_d, dataIndices_d);
+    mPhysView = phys_t(reinterpret_cast<std::complex<double>*>(mPhysFlat_d.data()), mPhysFlat_d.size(), physDims.data(), dataPointers_d, dataIndices_d);
 
-    cudaMalloc((void**)&appContainer_backward.input_buffer_S, 2*sizeof(double)*config_backward.Ntheta* (m_even_endBatch[config_backward.num_m_even -1] + m_odd_endBatch[config_backward.num_m_odd -1]));
-    cudaMalloc((void**)&appContainer_backward.buffer_S, 2*sizeof(double)*config_backward.Ntheta* (m_even_endBatch[config_backward.num_m_even -1] + m_odd_endBatch[config_backward.num_m_odd -1]));
-    resPfSolve = initializeParallALT(&VkGPU, config_backward, &appContainer_backward);
+    //cudaMalloc((void**)&appContainer_backward.input_buffer_S, 2*sizeof(double)*config_backward.Ntheta* (m_even_endBatch[config_backward.num_m_even -1] + m_odd_endBatch[config_backward.num_m_odd -1]));
+    //cudaMalloc((void**)&appContainer_backward.buffer_S, 2*sizeof(double)*config_backward.Ntheta* (m_even_endBatch[config_backward.num_m_even -1] + m_odd_endBatch[config_backward.num_m_odd -1]));
+    //resPfSolve = initializeParallALT(&VkGPU, config_backward, &appContainer_backward);
     
 }
 

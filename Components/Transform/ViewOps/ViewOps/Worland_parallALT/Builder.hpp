@@ -1,160 +1,206 @@
 /**
  * @file Builder.hpp
- * @brief Generic Worland operator builder
+ * @brief Generic Worland parallALT operator builder
  */
-
 #pragma once
 
-// System includes
+// External includes
 //
-#include <Eigen/Core>
+#include <memory>
+#include <cstdint>
 
 // Project includes
 //
+#include "Operator/Binary.hpp"
+#include "Profiler/Interface.hpp"
 #include "Types/Internal/Typedefs.hpp"
 #include "ViewOps/ViewMemoryUtils.hpp"
-#include "ViewOps/Worland/TypeTraits.hpp"
+#include "ViewOps/Worland_parallALT/TypeTraits.hpp"
+
+#include <cuComplex.h>
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <cuda_runtime_api.h>
+#include <nvrtc.h>
+#include "parallALT.hpp"
 
 namespace QuICC {
 namespace Transform {
-namespace Worland {
-
-/// @brief Generic JW builder operator
-/// @tparam TView  type View of the operator
-/// @tparam TDenseOpBuilder Polynomial builder
-/// @tparam TDirection
-template <class TView, class TDenseOpBuilder, class TDirection> class Builder
-{
+namespace Worland_parallALT {
+using namespace QuICC::Operator;
+using type = QuICC::Memory::Cuda::Malloc;
+/// @brief Derived classes implement the differentiation in modal space
+/// @tparam Tout differentiated modes type
+/// @tparam Tin input modes type
+/// @tparam Order of differentiation
+/// @tparam Direction Fft direction tag
+/// @tparam Treatment special treatment mask, typically of mode zero or dealiasing
+template<class Tout, class Tin, std::int64_t Direction, std::int64_t Type>
+class ParallaltOp : public UnaryBaseOp<ParallaltOp<Tout, Tin, Direction, Type>, Tout, Tin> {
 public:
-   /// @brief Pass-by-value dense builder ctor
-   /// @param denseBuilder to be stored and used
-   Builder(TDenseOpBuilder denseBuilder) : mDenseBuilder(denseBuilder){};
+    /// @brief Default constructor
+   ParallaltOp(std::shared_ptr<Memory::memory_resource> mem) : _mem(mem) {
+   };
+    /// @brief dtor
+    ~ParallaltOp()
+    {
+       deleteParallALT(&VkGPU, &appContainer);
+    };
 
-   /// @brief default ctor
-   Builder() = default;
+    /// @brief Action implementation
+    /// @param out differentiatied modes
+    /// @param in input modes
+    void initImpl(Tout& out, const Tin& in){
+        std::uint32_t Ntheta = out.dims()[0];//igrid.size();
+        
+        //std::uint32_t nLayers = static_cast<std::uint32_t>(this->mspSetup->slowSize());
 
-   /// @brief dtor
-   ~Builder() = default;
+        ///\todo this should be the full matrix size
+        //std::uint32_t M = out.pointers()->size() - 1;
 
-   void compute(TView opView, const Internal::Array& grid,
-      const Internal::Array& weights);
+        PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+        config = {};
+	    config.Ntheta = Ntheta;//this->mspSetup->bwdSize();
+        config.radialTransform = Type;
+        config.useGraphs = 1;
+	    config.testMerge = 0;
+	    config.testAccuracy = 1;
+	    config.doALTOnly = 1;
+	    config.useMatMulConnection = 1;
+	    config.use_tc = 2;
+	    config.mergeType = 1;
+	    config.numMergedIterMatMul = 8;
+	    config.numMergedIterMax = 1;
+	    config.numMergedIterMin = 1;
+	    config.disableCaching = 1;
+	    config.fixAccuracy = 1;
+	    config.numRadialBatches = 1;
+	    config.profile_iter = 1;
+	    config.profile_iter_combined = 1;
+        config.specifyBuffersAtLaunch = 1;
+	    config.WMMA_M = 8;
+	    config.WMMA_N = 8;
+	    config.WMMA_K = 4;
+	    appContainer = {};
+        config.projector = Direction;
 
-private:
-   TDenseOpBuilder mDenseBuilder;
+         std::uint32_t* temp_pointers =
+           (std::uint32_t*)calloc(out.pointers()[1].size(), sizeof(std::uint32_t));
+        cudaErrChk(cudaMemcpyAsync(temp_pointers, out.pointers()[1].data(),
+        out.pointers()[1].size() * sizeof(std::uint32_t), cudaMemcpyDeviceToHost));
+        for (std::uint32_t i = 1; i < out.pointers()[1].size(); ++i)
+        {
+           int numRHS = temp_pointers[i] - temp_pointers[i-1];
+           if ((((i - 1) % 2) == 0) && (numRHS!=0))
+            {
+                config.num_m_even++;
+            }
+            if ((((i-1)%2) == 1 ) && (numRHS!=0))
+            {
+                config.num_m_odd++;
+            }
+        }
+
+        int start = 0;
+        int iter = 0;
+        int* m_even = (int*)calloc(config.num_m_even, sizeof(int));
+        int* m_even_endBatch = (int*)calloc(config.num_m_even, sizeof(int));
+        int* m_odd = (int*)calloc(config.num_m_odd, sizeof(int));
+        int* m_odd_endBatch = (int*)calloc(config.num_m_odd, sizeof(int));
+        config.m_even_list = m_even;
+        config.m_even_endBatch = m_even_endBatch;
+        config.m_odd_list = m_odd;
+        config.m_odd_endBatch = m_odd_endBatch;
+        
+        for (std::uint32_t i = 1; i < out.pointers()[1].size(); ++i)
+        {
+            int numRHS = temp_pointers[i] - temp_pointers[i-1];
+            if ((((i - 1) % 2) == 0) && (numRHS!=0))
+            {
+                start += numRHS;
+                m_even[iter] = i-1;
+                m_even_endBatch[iter] = 2*start;
+                printf("%d %d %d \n", m_even[iter], m_even_endBatch[iter], iter);
+                iter++;
+            }
+        }
+    
+        //current_nCols = 0;
+        start = 0;
+        iter = 0;
+        for (std::uint32_t i = 1; i < out.pointers()[1].size(); ++i)
+        {
+            int numRHS = temp_pointers[i] - temp_pointers[i-1];
+            if ((((i - 1) % 2) == 1) && (numRHS!=0))
+            {
+                start += numRHS;
+                m_odd[iter] = i-1;
+                m_odd_endBatch[iter] = 2*start;
+                printf("%d %d %d \n", m_odd[iter], m_odd_endBatch[iter], iter);
+                iter++;
+            }
+
+        }
+        free(temp_pointers);
+        config.M = ((m_even[config.num_m_even - 1]) / 2 + 1) * 2;// M;
+        config.L = in.dims()[0];// 3 * M / 2;
+
+	    //appContainer.input_buffer_S = (double*)in.data();
+        //appContainer.buffer_S = (double*)out.data();
+       initializeParallALT(&VkGPU, config, &appContainer);
+    };
+    /// @brief Action implementation
+    /// @param out differentiatied modes
+    /// @param in input modes
+    void applyImpl(Tout& out, const Tin& in){
+        if (appContainer.config.Ntheta == 0)
+        {
+            initImpl(out, in);
+        }
+      Profiler::RegionFixture<5> fix("ParallaltOp::applyImpl");
+
+      assert(out.size() == in.size());
+      //assert(out.dims()[0] == in.dims()[0]);
+      assert(out.dims()[1] == in.dims()[1]);
+      assert(out.dims()[2] == in.dims()[2]);
+      assert(QuICC::Cuda::isDeviceMemory(out.data()));
+      assert(QuICC::Cuda::isDeviceMemory(in.data()));
+      parallALT_launchParams launchParams;
+      launchParams.input_buffer_S = (double*)in.data();
+      launchParams.buffer_S = (double*)out.data();
+
+      launchApp_parallALT(&appContainer, &launchParams);
+      };
+
+ private:
+
+    /**
+    * @brief parallALT configurations
+    */
+    mutable parallALT_configuration config = {};
+
+    /**
+    * @brief parallALT app pointers
+    */
+    mutable parallALT_app appContainer = {};
+
+    /**
+    * @brief parallALT app pointers
+    */
+    mutable PfSolve::VkGPU VkGPU = {};
+
+    /// @brief memory resource
+    /// needs shared ptr for memory pools
+    /// note, this must call the dtor last
+    /// otherwise we cannot dealloc data
+    /// \todo consider removing shared ptr and using singleton
+    std::shared_ptr<Memory::memory_resource> _mem;
+
+    /// @brief Give access to base class
+    //friend BinaryBaseOp<DiffOp<Tout, Tin, Order, Direction, Treatment>, Tout, Tin, ScaleType>;
+
 };
 
-
-template <class TView, class TDenseOpBuilder, class TDirection>
-void Builder<TView, TDenseOpBuilder, TDirection>::compute(TView opView,
-   const Internal::Array& grid, const Internal::Array& weights)
-{
-   using IndexType = typename TView::IndexType;
-
-   // L - harmonic degree index
-   IndexType metaIdx;
-   /// \todo direction might not be needed, check after triangular truncation is
-   /// implemented
-   if constexpr (Uniform::is_projector_v<TView, TDirection> ||
-                 Uniform::is_integrator_v<TView, TDirection>)
-   {
-      metaIdx = 2;
-   }
-   else
-   {
-      throw std::logic_error("builder for this type is not implemented.");
-   }
-
-   using namespace QuICC::Memory;
-   using namespace QuICC::View;
-
-   ViewBase<IndexType>& pointers =
-      const_cast<ViewBase<IndexType>*>(opView.pointers())[metaIdx];
-   ViewBase<IndexType>& indices =
-      const_cast<ViewBase<IndexType>*>(opView.indices())[metaIdx];
-
-   using ScalarType = typename TView::ScalarType;
-   ViewBase<ScalarType> viewData(opView.data(), opView.size());
-
-   // Setup converters
-   tempOnHostMemorySpace converterP(pointers, TransferMode::read);
-   tempOnHostMemorySpace converterI(indices,
-      TransferMode::read | TransferMode::block);
-   tempOnHostMemorySpace converterD(viewData, TransferMode::write);
-
-   // Redirect view (noop if already on cpu)
-   opView = TView(viewData.data(), viewData.size(), opView.dims(),
-      opView.pointers(), opView.indices());
-
-   // L - harmonic degree index
-   IndexType LIdx;
-   if constexpr (Uniform::is_integrator_v<TView, TDirection>)
-   {
-      LIdx = 0;
-   }
-   else if constexpr (Uniform::is_projector_v<TView, TDirection>)
-   {
-      LIdx = 1;
-   }
-   else
-   {
-      throw std::logic_error("builder for this type is not implemented.");
-   }
-
-   IndexType offSet = 0;
-   IndexType layerCounter = 0;
-   for (IndexType k = 0; k < opView.dims()[2]; ++k)
-   {
-      // check if layer is populated
-      if constexpr (Uniform::is_projector_v<TView, TDirection> ||
-                    Uniform::is_integrator_v<TView, TDirection>)
-      {
-         if (layerCounter >= indices.size())
-         {
-            break;
-         }
-         if (indices[layerCounter] != k)
-         {
-            continue;
-         }
-      }
-
-      // temporary slice
-      using slice_t = Eigen::Matrix<ScalarType, Eigen::Dynamic, Eigen::Dynamic>;
-      slice_t op;
-
-      // Build operator
-      int nPoly = opView.dims()[LIdx];
-      op.resize(grid.size(), nPoly);
-      // QuICC::DenseOp::Worland::Operator<ScalarType, TData, TPolyBuilder>
-      // help compiler to deduce type
-      Eigen::Ref<slice_t> ref(op);
-      mDenseBuilder.compute(ref, grid, weights, k);
-
-      slice_t opT;
-      if constexpr (std::is_same_v<TDirection, fwd_t>)
-      {
-         opT = op.transpose();
-      }
-      else
-      {
-         opT = op;
-      }
-
-      for (int j = 0; j < opT.cols(); ++j)
-      {
-         for (int i = 0; i < opT.rows(); ++i)
-         {
-            opView(i, j, k) = opT(i, j);
-         }
-      }
-
-      offSet += opT.size();
-
-      ++layerCounter;
-   }
-}
-
-
-} // namespace Worland
+} // namespace Worland_parallALT
 } // namespace Transform
 } // namespace QuICC

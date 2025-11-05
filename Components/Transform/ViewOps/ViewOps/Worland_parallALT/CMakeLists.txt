@@ -12,7 +12,6 @@ target_include_directories(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOM
 set(PHS
   Builder.hpp
 )
-
 set_target_properties(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
   PROPERTIES
     PUBLIC_HEADER "${PHS}"
@@ -22,9 +21,9 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
   INTERFACE
     QuICC::Std
     QuICC::View
-    QuICC::Fft
-    QuICC::Profiling
+    QuICC::Operator
     QuICC::Memory
+    QuICC::Profiling
 )
 
 

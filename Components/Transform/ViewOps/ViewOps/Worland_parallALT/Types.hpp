@@ -11,7 +11,7 @@
 namespace QuICC {
 namespace Transform {
 /// @brief namespace for Worland operators
-namespace Worland {
+namespace Worland_parallALT {
 /// @brief namespace for uniform truncation
 namespace Uniform {
 
