@@ -14,6 +14,7 @@
 #include "Types/Internal/BasicTypes.hpp"
 #include "Types/Typedefs.hpp"
 #include "Types/Internal/Typedefs.hpp"
+#include "DenseSM/IGenericProfile.hpp"
 
 namespace QuICC {
 
@@ -26,7 +27,7 @@ namespace LinearMap {
 /**
  * @brief Implementation of the generic radial toroidal/poloidal function
  */
-class RadialTorPolFunction
+class RadialTorPolFunction : public IGenericProfile
 {
 public:
    /**

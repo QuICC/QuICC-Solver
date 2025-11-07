@@ -149,13 +149,10 @@ namespace LinearMap {
          {
             pF = std::make_shared<QuadrupolarS2>();
          }
-<<<<<<< HEAD
-=======
          else if (fId == 2)
          {
             pF = std::make_shared<Polytrope>(0.35, 5, 3);
          }
->>>>>>> fix_gradient
          else
          {
             throw std::logic_error("Unknown forcing function ID");
@@ -198,13 +195,10 @@ namespace LinearMap {
          {
             pF = std::make_shared<QuadrupolarS2>();
          }
-<<<<<<< HEAD
-=======
          else if (fId == 2)
          {
             pF = std::make_shared<Polytrope>(0.35, 5, 3);
          }
->>>>>>> fix_gradient
          else
          {
             throw std::logic_error("Unknown forcing function ID");
@@ -252,13 +246,10 @@ namespace LinearMap {
             {
                pFa = std::make_shared<QuadrupolarS2>();
             }
-<<<<<<< HEAD
-=======
             else if (fAId == 2)
             {
                pFa = std::make_shared<Polytrope>(0.35, 5, 3);
             }
->>>>>>> fix_gradient
             else
             {
                throw std::logic_error("Unknown forcing function");
@@ -278,14 +269,11 @@ namespace LinearMap {
             {
                pFb = std::make_shared<QuadrupolarS2>();
             }
-<<<<<<< HEAD
-=======
             else if (fBId == 2)
             {
                pFb = std::make_shared<Polytrope>(0.35, 5, 3);
             }
             
->>>>>>> fix_gradient
             else
             {
                throw std::logic_error("Unknown forcing function");

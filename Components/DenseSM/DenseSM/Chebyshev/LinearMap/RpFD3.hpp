@@ -43,6 +43,7 @@
      * @param mF      harmonic order of f
      * @param lIn     Input harmonic degree
      * @param mIn     Input harmonic order
+     * @param pF      Shared pointer to radial profile function
      * @param lower   Lower boundary
      * @param upper   Upper boundary
      */

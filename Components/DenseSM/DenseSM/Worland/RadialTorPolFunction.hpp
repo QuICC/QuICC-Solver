@@ -12,6 +12,8 @@
 // Project includes
 //
 #include "Types/Internal/Typedefs.hpp"
+#include "DenseSM/IGenericProfile.hpp"
+
 
 namespace QuICC {
 
@@ -22,7 +24,7 @@ namespace Worland {
 /**
  * @brief Implementation of the generic radial toroidal/poloidal function
  */
-class RadialTorPolFunction
+class RadialTorPolFunction : public IGenericProfile
 {
 public:
    /**

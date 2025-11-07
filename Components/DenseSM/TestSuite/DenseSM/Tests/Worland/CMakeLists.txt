@@ -105,11 +105,7 @@ set(_tests
   DivR2FD1R1:dense
   )
 set (_ids 0 1 2 3 4 5 6)
-<<<<<<< HEAD
 run_iq_tests("Gaunt, dipolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis} ULP 2100)
-=======
-run_iq_tests("Gaunt, dipolar" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
->>>>>>> fix_gradient
 
 # Create Elsasser coefficient, dipolar tests
 set(_tests

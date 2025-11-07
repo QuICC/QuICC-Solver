@@ -48,24 +48,14 @@ void FR1D1::buildOpImpl(Internal::Matrix& mat, const int rows,
    auto sBwd = std::make_shared<SetupType>(rN, this->cols(), this->cols(), pId);
    sBwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
    sBwd->lock();
-   //cheb::Projector::P TBwd;
-   //TBwd.init(sBwd);
 
    Matrix tA = Matrix::Identity(rN,this->cols());
-   //Matrix tB = Matrix::Zero(rN,this->cols());
-   //TBwd.transform(tB, tA);
 
    cheb::Projector::D<1> TD1Bwd;
    TD1Bwd.init(sBwd);
 
    Matrix td1B = Matrix::Zero(rN,this->cols());
    TD1Bwd.transform(td1B, tA);
-
-   //cheb::Projector::D<2> TD2Bwd;
-   //TD2Bwd.init(sBwd);
-
-   //Matrix td2B = Matrix::Zero(rN,this->cols());
-   //TD2Bwd.transform(td2B, tA);
 
    Matrix f = this->mpF->evaluate(igrid, this->mLf, this->mMf).cast<MHDFloat>();
 
@@ -77,15 +67,6 @@ void FR1D1::buildOpImpl(Internal::Matrix& mat, const int rows,
 
    Matrix sf = Matrix::Zero(rN, 1);
    TFFwd.transform(sf, f);
-
-   //auto sFBwd = std::make_shared<SetupType>(rN, 1, this->mpF->nN(), pId);
-   //sFBwd->setBounds(static_cast<MHDFloat>(this->mcLower), static_cast<MHDFloat>(this->mcUpper));
-   //sFBwd->lock();
-   //cheb::Projector::D<1> TFd1Bwd;
-   //TFd1Bwd.init(sFBwd);
-
-   //Matrix d1f = Matrix::Zero(rN, 1);
-   //TFd1Bwd.transform(d1f, sf);
 
    const int l = this->mLin;
    const Internal::Array& r = igrid; 

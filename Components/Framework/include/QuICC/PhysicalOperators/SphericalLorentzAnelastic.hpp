@@ -6,13 +6,7 @@
 #ifndef QUICC_PHYSICAL_SPHERICALLORENTZANELASTIC_HPP
 #define QUICC_PHYSICAL_SPHERICALLORENTZANELASTIC_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -24,8 +18,6 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
 
-
-//#include "QuICC/DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {

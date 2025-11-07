@@ -27,6 +27,7 @@
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+//#include "DenseSM/IGenericProfile.hpp"
 
 namespace QuICC {
 

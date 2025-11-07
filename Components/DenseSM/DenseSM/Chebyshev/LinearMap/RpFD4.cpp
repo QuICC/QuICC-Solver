@@ -57,10 +57,9 @@ void RpFD4::buildOpImpl(Internal::Matrix& mat, const int rows,
    Matrix td4B = Utils::evaluateD<4>(tA, this->cols(), lb, ub);
 
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
-   if(this->mP > 0)
-   {
-      f = igrid.array().pow(this->mP).matrix().asDiagonal() * f;
-   }
+   // constructor forces mP>0
+   f = igrid.array().pow(this->mP).matrix().asDiagonal() * f;
+   
 
    td4B = f.cast<MHDFloat>().asDiagonal() * td4B;
 

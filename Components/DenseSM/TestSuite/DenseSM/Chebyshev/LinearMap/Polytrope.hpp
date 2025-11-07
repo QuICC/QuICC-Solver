@@ -27,7 +27,8 @@ namespace LinearMap {
 /**
  * @brief Implementation of the polytropic field
  */
-class Polytrope: public QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction
+class Polytrope
+    : public QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction
 {
 public:
    /**
@@ -53,16 +54,17 @@ public:
    /**
     * @brief Evaluate on radial grid
     */
-   Internal::Array evaluate(const Internal::Array& r, const int l, const int m) const final;
+   Internal::Array evaluate(const Internal::Array& r, const int l,
+      const int m) const final;
 
    /**
     * @brief Radius Ratio
     */
-   const MHDFloat mRratio; 
+   const MHDFloat mRratio;
    /**
     * @brief Scale heights
     */
-   const MHDFloat mNrho; 
+   const MHDFloat mNrho;
    /**
     * @brief polytropic index
     */
@@ -70,14 +72,13 @@ public:
 
 
 protected:
-
 private:
 };
 
-}
-}
-}
-}
+} // namespace LinearMap
+} // namespace Chebyshev
+} // namespace DenseSM
+} // namespace TestSuite
 } // namespace QuICC
 
 #endif // QUICC_TESTSUITE_DENSESM_CHEBYSHEV_LINEARMAP_POLYTROPE_HPP

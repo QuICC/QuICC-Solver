@@ -6,15 +6,9 @@
 #ifndef QUICC_IO_VARIABLE_SHELLLUMINOSITYWRITER_HPP
 #define QUICC_IO_VARIABLE_SHELLLUMINOSITYWRITER_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //

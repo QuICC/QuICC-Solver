@@ -10,9 +10,6 @@
 //
 #include <string>
 
-// External includes
-//
-
 // Project includes
 //
 

@@ -6,13 +6,7 @@
 #ifndef QUICC_PHYSICAL_SPHERICALCORIOLISANELASTIC_HPP
 #define QUICC_PHYSICAL_SPHERICALCORIOLISANELASTIC_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -23,7 +17,6 @@
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 
-//#include "QuICC/DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {

@@ -6,13 +6,7 @@
 #ifndef QUICC_PHYSICAL_MASSFLUXADVECTION_HPP
 #define QUICC_PHYSICAL_MASSFLUXADVECTION_HPP
 
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes

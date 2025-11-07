@@ -22,7 +22,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/ISphericalTorPolScalarSpectrumBaseWriter.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+#include "DenseSM//IGenericProfile.hpp"
 
 namespace QuICC {
 

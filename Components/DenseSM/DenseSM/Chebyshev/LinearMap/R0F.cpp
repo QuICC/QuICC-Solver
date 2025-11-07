@@ -30,17 +30,12 @@ R0F::R0F(const int nNr, const int nNc, const int p, const int lOut, const int mO
     ITripleHarmonicOperator(nNr, nNc, p, lOut, mOut, lF, mF, lIn, mIn, pF, lower,
        upper)
 {
-   /*
-   if(this->mP < 2)
-   {
-      throw std::logic_error("Radial prefactor should be at least r^p");
-   }*/
 }
 
 void R0F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const int cols) const
 {
-   int fN = this->mpF->nN()- 1; //+ this->mP;
+   int fN = this->mpF->nN()- 1;
    int rN =
       2 * (fN + 2);
 
@@ -51,7 +46,6 @@ void R0F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const Internal::MHDFloat& ub = this->mcUpper;
 
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
-   //f = igrid.array().pow(this->mP-1).matrix().asDiagonal() * f;
    Matrix gF = f.cast<MHDFloat>();
 
    Matrix sF = Utils::computeExpansion(gF, fN, lb, ub);
