@@ -3,23 +3,14 @@
  * @brief Source of the implementation of the ASCII angular momentum number in a shell
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ShellAngularMomentumWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ShellAngularMomentumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Tools/Formatter.hpp"

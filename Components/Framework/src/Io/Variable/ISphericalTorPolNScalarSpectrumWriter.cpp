@@ -11,15 +11,9 @@
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ISphericalTorPolNScalarSpectrumWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ISphericalTorPolNScalarSpectrumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
@@ -31,7 +25,6 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-   // anelastic case: pF needs to be an array of pointers to DenseSM profiles with one element (density)
    ISphericalTorPolNScalarSpectrumWriter::ISphericalTorPolNScalarSpectrumWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>> pF)
       : ISphericalTorPolScalarSpectrumBaseWriter(prefix + Tags::Spectrum::NBASENAME, Tags::Spectrum::EXTENSION, prefix + Tags::Spectrum::HEADER, type, Tags::Spectrum::VERSION, Dimensions::Space::SPECTRAL, OVERWRITE, pF), mTorPower(0,0), mPolPower(0,0)
    {

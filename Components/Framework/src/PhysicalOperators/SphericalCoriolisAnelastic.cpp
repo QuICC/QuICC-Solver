@@ -8,25 +8,13 @@
 
 // System includes
 //
-// ****************
-//Stuff that needs to be removed later
-#include <cstdio>
-#include <filesystem>
-#include <sstream>
-#include <iostream>
-// ****************
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/PhysicalOperators/SphericalCoriolisAnelastic.hpp"
 
 // Project includes
-//#include "QuICC/DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
+//
+#include "QuICC/PhysicalOperators/SphericalCoriolisAnelastic.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "Types/Internal/Typedefs.hpp"
-//
+
 
 namespace QuICC {
 
@@ -169,13 +157,6 @@ namespace Physical {
       {
          if(c != 1.0)
          {
-            // ****** just to try to check things.
-            //std::cerr << "here = " << " \n";
-            //iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(nR-1);
-            //std::cerr << "nR -1 = "<<nR-1 << "; iR_ ="<< iR_ << " \n";
-
-            //std::cerr << "r = "<<r(iR_) << "; vr = "<< v.comp(FieldComponents::Physical::R).profile(0,nR-1)<<" \n";
-
             for(int iR = 0; iR < nR; ++iR)
             {
                iR_ = res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(iR);

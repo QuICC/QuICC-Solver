@@ -15,18 +15,13 @@
 #include <sstream>
 #include <iostream>
 // ****************
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/PhysicalOperators/SphericalLorentzAnelastic.hpp"
 
 // Project includes
-//#include "QuICC/DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
+//
+#include "QuICC/PhysicalOperators/SphericalLorentzAnelastic.hpp"
 #include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "Types/Internal/Typedefs.hpp"
-//
+
 
 namespace QuICC {
 

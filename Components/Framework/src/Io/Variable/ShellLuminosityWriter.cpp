@@ -9,23 +9,14 @@
 // total luminosity  = (backgraound luminosity) + (convective luminosity) (definition of Jones et al., 2011)
 // nusselt           = (total luminosity) / (background luminosity)
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <iomanip>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ShellLuminosityWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ShellLuminosityWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/NonDimensional/Upper1d.hpp"
@@ -87,8 +78,6 @@ namespace Variable {
          if(flag == 0)
          {
             Internal::Array bgArray = -(this->mpRhoTempKappa->evaluate(rbArr,0,0).array()) * (this->mpD1Sc->evaluate(rbArr,0,0).array());
-            //this->mBackground(0) = -ro;
-            //this->mBackground(1) = -ri;
             this->mBackground(0) = bgArray(0) * (4.0*Math::PI)*ro*ro;
             this->mBackground(1) = bgArray(1) * (4.0*Math::PI)*ri*ri;    
          }
@@ -109,8 +98,6 @@ namespace Variable {
          this->mBoundary.resize(nN, 2);
          for(int i = 0; i < this->mBoundary.rows(); i++)
          {
-            //this->mBoundary(i,0) = (2.0/a)*i*i/std::sqrt(4.0*Math::PI);
-            //this->mBoundary(i,1) = std::pow(-1,i+1)*this->mBoundary(i,0);
             this->mBoundary(i,0) = (2.0/a)*i*i/std::sqrt(4.0*Math::PI)   * (4.0*Math::PI)*ro*ro*(-this->mpRhoTempKappa->evaluate(rbArr,0,0).array()(0));
             this->mBoundary(i,1) = std::pow(-1,i+1)*(2.0/a)*i*i/std::sqrt(4.0*Math::PI) * (4.0*Math::PI)*ri*ri*(-this->mpRhoTempKappa->evaluate(rbArr,0,0).array()(1)); 
          }
@@ -155,7 +142,6 @@ namespace Variable {
       if(QuICCEnv().allowsIO())
       {
          this->mFile << std::scientific;
-         //this->mFile << std::setprecision(ioPrec) << ioFW(ioPrec) << this->mTime << "\t" << ioFW(ioPrec) << this->mNusselt(0) << "\t" << ioFW(ioPrec) << this->mNusselt(1) << std::endl;
          this->mFile << std::setprecision(ioPrec) << ioFW(ioPrec) << this->mTime << "\t" << ioFW(ioPrec) << this->mLuminosity(0) << "\t" << ioFW(ioPrec) << this->mNusselt(0) << "\t" << ioFW(ioPrec) << this->mLuminosity(1) << "\t" << ioFW(ioPrec) << this->mNusselt(1) << std::endl;
 
       }

@@ -10,15 +10,9 @@
 //
 #include <iomanip>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Io/Variable/ShellTorPolNScalarSpectrumWriter.hpp"
-
 // Project includes
 //
+#include "QuICC/Io/Variable/ShellTorPolNScalarSpectrumWriter.hpp"
 #include "Environment/QuICCEnv.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
@@ -31,15 +25,12 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-   // anelastic case: pF needs to be an array of pointers to DenseSM profiles with one element (density)
    ShellTorPolNScalarSpectrumWriter::ShellTorPolNScalarSpectrumWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF)
       : ISphericalTorPolNScalarSpectrumWriter(prefix, type, std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>>(pF.begin(), pF.end()))
    {
    }
 
-   ShellTorPolNScalarSpectrumWriter::~ShellTorPolNScalarSpectrumWriter()
-   {
-   }
+   ShellTorPolNScalarSpectrumWriter::~ShellTorPolNScalarSpectrumWriter() = default;
 
    void ShellTorPolNScalarSpectrumWriter::init()
    {

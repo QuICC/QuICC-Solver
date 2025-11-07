@@ -64,14 +64,20 @@ namespace Datatypes {
           * @brief Get the physical vector gradient values
           */
          const VectorField<TScalar,FieldComponents::Physical::Id>&   grad(FieldComponents::Spectral::Id id) const;
-         // overload to calculate tensorial grad(u)
+         
+         /**
+          * @brief Get the physical vector gradient values (tensor form)
+          */
          const TensorField<TScalar,FieldComponents::Physical::Id>&   grad() const;
 
          /**
           * @brief Set the physical vector gradient values
           */
          VectorField<TScalar,FieldComponents::Physical::Id>&   rGrad(FieldComponents::Spectral::Id id);
-         // overload to calculate tensorial grad(u)
+         
+         /**
+          * @brief Set the physical vector gradient values (tensor form)
+          */
          TensorField<TScalar,FieldComponents::Physical::Id>&   rGrad();
 
          /**
@@ -108,7 +114,10 @@ namespace Datatypes {
           * @brief Initialise the physical gradient storage
           */
          void initPhysicalGradient(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps);
-         // overload to calculate tensorial grad(u)
+         
+         /**
+          * @brief Initialise the physical gradient storage (tensor form)
+          */
          void initPhysicalGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps);
 
          /**
@@ -221,6 +230,7 @@ namespace Datatypes {
 
       return *(this->mVGrad.find(id)->second);
    }
+
    // overload to calculate tensorial grad(u)
    template <typename TScalar> inline const TensorField<TScalar,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar>::grad() const
    {
@@ -239,6 +249,7 @@ namespace Datatypes {
 
       return *(this->mVGrad.find(id)->second);
    }
+
    // overload to calculate tensorial grad(u)
    template <typename TScalar> inline TensorField<TScalar,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar>::rGrad()
    {
@@ -346,6 +357,7 @@ namespace Datatypes {
       // Insert into map
       this->mVGrad.insert(std::make_pair(id, spGrad));
    }
+   
    // overload to compute the tensor form of grad(u)
    template <typename TScalar> void VectorPhysicalVariable<TScalar>::initPhysicalGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps)
    {

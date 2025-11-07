@@ -192,6 +192,7 @@ namespace QuICC {
 
       return this->mGradientComps.find(id)->second;
    }
+
    // overload for the gradient of a vector (tensorial form)
    const MatrixB& FieldRequirement::gradientComps() const
    {
@@ -233,6 +234,7 @@ namespace QuICC {
 
       return comps;
    }
+
    // overload for the tensor form of the gradient of a vector
    std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool> FieldRequirement::mapGradientComps() const
    {
@@ -303,6 +305,7 @@ namespace QuICC {
          this->mNeedGradient = this->mNeedGradient || it->second.any();
       }
    }
+   
    // overload
    void FieldRequirement::updateGradient(const MatrixB& comps)
    {

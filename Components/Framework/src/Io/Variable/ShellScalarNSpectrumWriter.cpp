@@ -32,7 +32,6 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-   // anelastic case: pF needs to be an array of pointers to DenseSM profiles with one element (density)
    ShellScalarNSpectrumWriter::ShellScalarNSpectrumWriter(const std::string& prefix, const std::string& type)
       : ISphericalScalarNSpectrumWriter(prefix, type)
    {
