@@ -1,6 +1,7 @@
-/** 
+/**
  * @file ICartesian1DScalarEnergyWriter.hpp
- * @brief Implementation of the ASCII Chebyshev energy calculation for a scalar field in a plane layer
+ * @brief Implementation of the ASCII Chebyshev energy calculation for a scalar
+ * field in a plane layer
  */
 
 #ifndef QUICC_IO_VARIABLE_ICARTESIAN1DSCALARENERGYWRITER_HPP
@@ -13,8 +14,8 @@
 // Project includes
 //
 #include "QuICC/Enums/FieldIds.hpp"
-#include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/Io/Variable/ICartesian1DScalarEnergyBaseWriter.hpp"
+#include "QuICC/Resolutions/Resolution.hpp"
 
 namespace QuICC {
 
@@ -22,54 +23,56 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of the ASCII Chebyshev energy calculation for a scalar
+ * field in a plane layer
+ */
+class ICartesian1DScalarEnergyWriter : public ICartesian1DScalarEnergyBaseWriter
+{
+public:
    /**
-    * @brief Implementation of the ASCII Chebyshev energy calculation for a scalar field in a plane layer 
+    * @brief Constructor
+    *
+    * @param prefix Prefix to use for file name
+    * @param type Type of the file (typically scheme name)
     */
-   class ICartesian1DScalarEnergyWriter: public ICartesian1DScalarEnergyBaseWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param prefix Prefix to use for file name
-          * @param type Type of the file (typically scheme name)
-          */
-         ICartesian1DScalarEnergyWriter(const std::string& prefix, const std::string& type);
+   ICartesian1DScalarEnergyWriter(const std::string& prefix,
+      const std::string& type);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~ICartesian1DScalarEnergyWriter() = default;
-         
-      protected:
-         /**
-          * @brief Write content
-          */
-         virtual void writeContent();
+   /**
+    * @brief Destructor
+    */
+   virtual ~ICartesian1DScalarEnergyWriter() = default;
 
-      private:
-         /**
-          * @brief Storage for the scalar energy
-          */
-         Array mEnergy;
+protected:
+   /**
+    * @brief Write content
+    */
+   virtual void writeContent();
 
-         /**
-          * @brief Reset energy storage
-          */
-         virtual void resetEnergy();
+private:
+   /**
+    * @brief Storage for the scalar energy
+    */
+   Array mEnergy;
 
-         /**
-          * @brief Store energy
-          *
-          * @param kx      Fourier mode in X
-          * @param ky      Fourier mode in Y
-          * @param energy  Energy of mode
-          */
-         virtual void storeEnergy(const int kx, const int ky, const MHDFloat energy);
-   };
+   /**
+    * @brief Reset energy storage
+    */
+   virtual void resetEnergy();
 
-} // Variable
-} // Io
-} // QuICC
+   /**
+    * @brief Store energy
+    *
+    * @param kx      Fourier mode in X
+    * @param ky      Fourier mode in Y
+    * @param energy  Energy of mode
+    */
+   virtual void storeEnergy(const int kx, const int ky, const MHDFloat energy);
+};
+
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_ICARTESIAN1DSCALARENERGYWRITER_HPP

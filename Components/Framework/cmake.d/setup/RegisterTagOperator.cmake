@@ -1,6 +1,7 @@
 set(tags
   Lhs
   Influence
+  Rhs
   )
 
 include(RegisterTags)

@@ -1,3 +1,5 @@
+include(ModelFunctions)
+
 #
 # Utility to add models
 #
@@ -5,10 +7,14 @@
 #     name/path of the model
 # TYPES
 #     list of model types
+# SOURCES_DIRS
+#     addition source directories
+# EXTRA_LIBS
+#     additional libraries to link to
 #
 function(quicc_add_model target)
   # parse inputs
-  set(multiValueArgs TYPES SOURCE_DIRS)
+  set(multiValueArgs TYPES SOURCE_DIRS EXTRA_LIBS)
   cmake_parse_arguments(QAM "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   message(DEBUG "quicc_add_model")
@@ -41,6 +47,11 @@ function(quicc_add_model target)
   target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
     QuICC::Framework
     )
+  foreach(_extra_lib ${QAM_EXTRA_LIBS})
+    target_link_libraries(${QUICC_CURRENT_MODEL_LIB} PUBLIC
+      ${_extra_lib}
+      )
+  endforeach()
 
   # Create model implementations libraries
   foreach(type ${QAM_TYPES})
@@ -68,15 +79,21 @@ function(quicc_add_model target)
   endforeach()
 
   # Update python files
-  add_custom_target(${QUICC_CURRENT_MODEL_LIB}_updatepy)
-  add_custom_command(TARGET ${QUICC_CURRENT_MODEL_LIB}_updatepy POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/Python"
-    "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/python"
-    COMMENT "Copying Python files for ${modName}"
-    VERBATIM
-    )
-  add_dependencies(${QUICC_CURRENT_MODEL_LIB} ${QUICC_CURRENT_MODEL_LIB}_updatepy)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Python")
+    add_custom_target(${QUICC_CURRENT_MODEL_LIB}_updatepy)
+    add_custom_command(TARGET ${QUICC_CURRENT_MODEL_LIB}_updatepy POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_directory
+      "${CMAKE_CURRENT_SOURCE_DIR}/Python"
+      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/python"
+      COMMENT "Copying Python files for ${modName}"
+      VERBATIM
+      )
+    add_dependencies(${QUICC_CURRENT_MODEL_LIB} ${QUICC_CURRENT_MODEL_LIB}_updatepy)
+    if(QUICC_CURRENT_UPDATEPY_TARGET)
+       add_dependencies(${QUICC_CURRENT_UPDATEPY_TARGET} ${QUICC_CURRENT_MODEL_LIB}_updatepy)
+    endif()
+    set(QUICC_CURRENT_UPDATEPY_TARGET "${QUICC_CURRENT_MODEL_LIB}_updatepy" CACHE STRING "Make dependencies across updatepy" FORCE)
+  endif()
 
   foreach(src ${QAM_SOURCE_DIRS})
     add_subdirectory(${src})

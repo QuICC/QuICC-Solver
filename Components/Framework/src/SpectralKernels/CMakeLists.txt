@@ -3,6 +3,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   IoValidation.cpp
   MakeConstant.cpp
   MakeRandom.cpp
+  Rescale.cpp
   Set3DModes.cpp
 )
 

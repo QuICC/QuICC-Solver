@@ -73,11 +73,6 @@ namespace Timestep {
          virtual bool finishedStep() const = 0;
 
          /**
-          * @brief Set solve time
-          */
-         virtual void setSolveTime(const std::size_t timeId) = 0;
-
-         /**
           * @brief Update equation explicit linear input to solver
           *
           * @param scalEq Scalar equations

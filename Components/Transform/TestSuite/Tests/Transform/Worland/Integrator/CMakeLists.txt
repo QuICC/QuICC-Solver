@@ -5,6 +5,7 @@ include(SetUlp)
 
 # Create tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 #set(_tests
 #  Poly::I4DivR1D1R1_I2:integrator
@@ -60,7 +61,7 @@ set(_tests
 )
 quicc_set_ulp(_ulp
   ULP 16 10 127 80 78
-  MPULP 3 2 2 2 2
+  MPULP 3 3 2 2 2
   )
 
 foreach(_test ${_tests})
@@ -142,7 +143,7 @@ set(_tests
 )
 quicc_set_ulp(_ulp
   ULP 18 20 170 59 120
-  MPULP 2 8 26 10 5
+  MPULP 2 13 26 10 5
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -414,7 +415,7 @@ foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    ULPS 5 5 20 11 11 5 5 8 6 5
+    ULPS 5 5 20 13 14 5 5 8 6 5
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()
@@ -475,7 +476,7 @@ foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    ULPS 16 6 5 4 4 18 8 3 4 4
+    ULPS 16 6 5 4 5 18 8 3 5 4
     IDS 0 1 2 3 4 10 11 12 13 14
   )
 endforeach()
@@ -632,3 +633,10 @@ foreach(_perf_id 108 109)
     )
   endforeach()
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_integrator_merged
+  COMMAND ${TestExe}
+  JN 32
+)

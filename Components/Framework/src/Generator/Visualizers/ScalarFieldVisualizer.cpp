@@ -3,35 +3,23 @@
  * @brief Source of the implementation of the basic scalar field visualizer
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Generator/Visualizers/ScalarFieldVisualizer.hpp"
-
 // Project includes
 //
+#include "QuICC/Generator/Visualizers/ScalarFieldVisualizer.hpp"
 #include "Types/Typedefs.hpp"
 #include "Types/Math.hpp"
 #include "QuICC/SolveTiming/After.hpp"
+#include "QuICC/Transform/Path/Scalar.hpp"
 
 namespace QuICC {
 
 namespace Equations {
 
    ScalarFieldVisualizer::ScalarFieldVisualizer(SharedEquationParameters spEqParams, SpatialScheme::SharedCISpatialScheme spScheme, std::shared_ptr<Model::IModelBackend> spBackend)
-      : IScalarEquation(spEqParams,spScheme,spBackend), mViewField(true), mViewGradient(false), mViewGradient2(false)
-   {
-   }
-
-   ScalarFieldVisualizer::~ScalarFieldVisualizer()
+      : IScalarEquation(spEqParams,spScheme,spBackend), mViewField(true), mViewGradient(false), mViewGradient2(false), mBwdPathId(Transform::Path::Scalar::id()), mFwdPathId(Transform::Path::Scalar::id())
    {
    }
 
@@ -51,6 +39,16 @@ namespace Equations {
       this->mViewGradient = viewGradient;
 
       this->mViewGradient2 = viewGradient2;
+   }
+
+   void ScalarFieldVisualizer::setBackwardPath(const std::size_t pathId)
+   {
+      this->mBwdPathId = pathId;
+   }
+
+   void ScalarFieldVisualizer::setForwardPath(const std::size_t pathId)
+   {
+      this->mFwdPathId = pathId;
    }
 
    void ScalarFieldVisualizer::setCoupling()
@@ -78,6 +76,16 @@ namespace Equations {
       if(this->mViewField) req.enablePhysical();
       if(this->mViewGradient) req.enableGradient();
       if(this->mViewGradient2) req.enableGradient2();
+   }
+
+   std::vector<Transform::TransformPath> ScalarFieldVisualizer::backwardPaths()
+   {
+      return this->defaultBackwardPaths(this->mBwdPathId);
+   }
+
+   void ScalarFieldVisualizer::setNLComponents()
+   {
+      this->addNLComponent(FieldComponents::Spectral::SCALAR, this->mFwdPathId);
    }
 
 }

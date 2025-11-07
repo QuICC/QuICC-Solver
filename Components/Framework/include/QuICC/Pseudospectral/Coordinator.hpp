@@ -38,8 +38,14 @@ namespace QuICC {
 
 namespace Pseudospectral {
 
+/// @brief Graph options wrapper
+struct GraphOptions
+{
+   int groupingSize = 1;
+};
+
 /**
- * @brief High level pseudospectral coordinator
+ * @brief Constructor
  */
 class Coordinator
 {
@@ -197,6 +203,11 @@ public:
    void addEquation(Equations::SharedIVectorEquation spEq,
       const std::size_t eqId, const int it);
 
+   /**
+    * @brief Add CFL diagnostic
+    */
+   void addCfl(Diagnostics::SharedICflWrapper spCfl);
+
 #ifdef QUICC_USE_MLIR_GRAPH
    /**
     * @brief Add graph description to solver
@@ -222,6 +233,12 @@ public:
     * @param spBcs Boundary condition information
     */
    void init(const Array& tstep, const SharedSimulationBoundary spBcs);
+
+#ifdef QUICC_USE_MLIR_GRAPH
+   /// @brief store configuration wrapper
+   /// @param GraphOptions
+   void setGraphOptions(const GraphOptions& options);
+#endif
 
    /**
     * @brief Use state file time and timestep for diagnostics
@@ -276,18 +293,6 @@ public:
     * @param it Iteration index
     */
    void updateSpectral(const int it);
-
-   /**
-    * @brief Update spectral space fields
-    *
-    * @param isTrivial        Update trivial equations?
-    * @param isDiagnostic     Update diagnostic equations?
-    * @param isPrognostic     Update prognostic equations?
-    * @param isWrapper        Update wrapper equations?
-    * @param it               Iteration index
-    */
-   void updateSpectral(const bool isTrivial, const bool isDiagnostic,
-      const bool isPrognostic, const bool isWrapper, const int it);
 
    /**
     * @brief Compute the nonlinear terms
@@ -365,11 +370,6 @@ public:
     * @param schemeId ID of timestepping scheme
     */
    void prepareEvolution(const std::size_t schemeId);
-
-   /**
-    * @brief Pre solve equations for full initialisation
-    */
-   void preSolveEquations();
 
    /**
     * @brief Solve equations before prognostic equations
@@ -649,6 +649,8 @@ protected:
    std::vector<Memory::MemBlock<std::uint32_t>> mBlocksMeta;
    /// @brief is the magnetic field equation present?
    bool mIsMag = false;
+   /// @brief graph options
+   GraphOptions mGraphOptions;
 #endif
 
 private:

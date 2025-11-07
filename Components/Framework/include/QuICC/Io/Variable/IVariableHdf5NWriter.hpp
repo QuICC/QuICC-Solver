@@ -8,20 +8,20 @@
 
 // System includes
 //
-#include <set>
 #include <memory>
+#include <set>
 
 // External includes
 //
 
 // Project includes
 //
-#include "Types/Typedefs.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
+#include "QuICC/Io/Hdf5/IHdf5NWriter.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
-#include "QuICC/Io/Hdf5/IHdf5NWriter.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -29,216 +29,252 @@ namespace Io {
 
 namespace Variable {
 
+/**
+ * @brief Implementation of a generic variable to HDF5 file writer
+ */
+class IVariableHdf5NWriter : public Io::Hdf5::IHdf5NWriter
+{
+public:
    /**
-    * @brief Implementation of a generic variable to HDF5 file writer
+    * @brief Constructor
+    *
+    * @param name       Filename
+    * @param ext        File extension
+    * @param header     Header string of file
+    * @param type       Type string of file
+    * @param version    Version string of file
+    * @param id         ID of the dimension space
+    * @param isRegular  Is data regular?
     */
-   class IVariableHdf5NWriter: public Io::Hdf5::IHdf5NWriter
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param name       Filename
-          * @param ext        File extension
-          * @param header     Header string of file
-          * @param type       Type string of file
-          * @param version    Version string of file
-          * @param id         ID of the dimension space
-          * @param isRegular  Is data regular?
-          */
-         IVariableHdf5NWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const bool isRegular);
+   IVariableHdf5NWriter(std::string name, std::string ext, std::string header,
+      std::string type, std::string version, const Dimensions::Space::Id id,
+      const bool isRegular);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~IVariableHdf5NWriter() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~IVariableHdf5NWriter() = default;
 
-         /**
-          * @brief Add name of expected variable to be added
-          *
-          * @param id ID of field
-          */
-         void expect(const std::size_t id);
+   /**
+    * @brief Add name of expected variable to be added
+    *
+    * @param id ID of field
+    */
+   void expect(const std::size_t id);
 
-         /**
-          * @brief Get dimension space file is working on
-          */
-         Dimensions::Space::Id   space() const;
+   /**
+    * @brief Get dimension space file is working on
+    */
+   Dimensions::Space::Id space() const;
 
-         /**
-          * @brief Set the physical parameters of the simulation
-          *
-          * @param parameters Physical parameters
-          * @param boundary Boundary flags
-          */
-         void setPhysical(const std::map<std::string,MHDFloat>& parameters, const std::map<std::string,std::size_t>& boundary);
+   /**
+    * @brief Set the Git hash of the simulation
+    *
+    * @param info Git related information
+    */
+   void setGit(const std::map<std::string,std::string>& info);
 
-         /**
-          * @brief Set the mesh grid arrays
-          *
-          * @param mesh    Grid arrays of the mesh
-          */
-         void setMesh(const std::vector<Array>& mesh);
+   /**
+    * @brief Set the physical parameters of the simulation
+    *
+    * @param parameters Physical parameters
+    * @param boundary Boundary flags
+    */
+   void setPhysical(const std::map<std::string, MHDFloat>& parameters,
+      const std::map<std::string, std::size_t>& boundary);
 
-         /**
-          * @brief Set the simulation time parameters
-          *
-          * @param time       Reached simulation time
-          * @param timestep   Last timestep size
-          */
-         void setSimTime(const MHDFloat time, const MHDFloat timestep);
+   /**
+    * @brief Update the physical parameters of the simulation
+    *
+    * @param parameters Physical parameters
+    */
+   void updatePhysical(const std::map<std::string, MHDFloat>& parameters);
 
-         /**
-          * @brief Make sure all the expected variables have been added
-          */
-         bool isFull() const;
+   /**
+    * @brief Set the mesh grid arrays
+    *
+    * @param mesh    Grid arrays of the mesh
+    */
+   void setMesh(const std::vector<Array>& mesh);
 
-         /**
-          * @brief Add scalar variable to file
-          *
-          * @param scalar Scalar variable to add
-          */
-         void addScalar(const std::pair<std::size_t,Framework::Selector::VariantSharedScalarVariable>& scalar);
+   /**
+    * @brief Set the simulation time parameters
+    *
+    * @param time       Reached simulation time
+    * @param timestep   Last timestep size
+    */
+   void setSimTime(const MHDFloat time, const MHDFloat timestep);
 
-         /**
-          * @brief Add vector variable to file
-          *
-          * @param vector Vector variable to add
-          */
-         void addVector(const std::pair<std::size_t,Framework::Selector::VariantSharedVectorVariable>& vector);
+   /**
+    * @brief Make sure all the expected variables have been added
+    */
+   bool isFull() const;
 
-         /**
-          * @brief Write State to file
-          */
-         virtual void write() = 0;
+   /**
+    * @brief Add scalar variable to file
+    *
+    * @param scalar Scalar variable to add
+    */
+   void addScalar(const std::pair<std::size_t,
+      Framework::Selector::VariantSharedScalarVariable>& scalar);
 
-      protected:
-         /// Typedef for the scalar const iterator
-         typedef std::map<std::size_t,Framework::Selector::VariantSharedScalarVariable>::const_iterator  scalar_iterator;
+   /**
+    * @brief Add vector variable to file
+    *
+    * @param vector Vector variable to add
+    */
+   void addVector(const std::pair<std::size_t,
+      Framework::Selector::VariantSharedVectorVariable>& vector);
 
-         /// Typedef for the vector const iterator
-         typedef std::map<std::size_t,Framework::Selector::VariantSharedVectorVariable>::const_iterator  vector_iterator;
+   /**
+    * @brief Write State to file
+    */
+   virtual void write() = 0;
 
-         /// Typedef for the scalar iterator range
-         typedef std::pair<scalar_iterator,scalar_iterator>  scalar_iterator_range;
+protected:
+   /// Typedef for the scalar const iterator
+   typedef std::map<std::size_t,
+      Framework::Selector::VariantSharedScalarVariable>::const_iterator
+      scalar_iterator;
 
-         /// Typedef for the scalar iterator range
-         typedef std::pair<vector_iterator, vector_iterator>  vector_iterator_range;
+   /// Typedef for the vector const iterator
+   typedef std::map<std::size_t,
+      Framework::Selector::VariantSharedVectorVariable>::const_iterator
+      vector_iterator;
 
-         /**
-          * @brief Get resolution
-          */
-         const Resolution& res() const;
+   /// Typedef for the scalar iterator range
+   typedef std::pair<scalar_iterator, scalar_iterator> scalar_iterator_range;
 
-         /**
-          * @brief Write run information to file
-          */
-         void writeRun();
+   /// Typedef for the scalar iterator range
+   typedef std::pair<vector_iterator, vector_iterator> vector_iterator_range;
 
-         /**
-          * @brief Set the size of the dataset
-          */
-         void setDatasetSize();
+   /**
+    * @brief Get resolution
+    */
+   const Resolution& res() const;
 
-         /**
-          * @brief Set the offsets of the dataset
-          */
-         void setDatasetOffsets();
+   /**
+    * @brief Write run information to file
+    */
+   void writeRun();
 
-         /**
-          * @brief Write truncation information
-          */
-         void writeTruncation();
+   /**
+    * @brief Set the size of the dataset
+    */
+   void setDatasetSize();
 
-         /**
-          * @brief Write Physical parameters to file
-          */
-         void writePhysical();
+   /**
+    * @brief Set the offsets of the dataset
+    */
+   void setDatasetOffsets();
 
-         /**
-          * @brief Get iterator range to scalars
-          */
-         scalar_iterator_range   scalarRange();
+   /**
+    * @brief Write Git information to file
+    */
+   void writeGit();
 
-         /**
-          * @brief Get iterator range to vectors
-          */
-         vector_iterator_range   vectorRange();
+   /**
+    * @brief Write truncation information
+    */
+   void writeTruncation();
 
-         /**
-          * @brief Physical parameters of the simulation
-          */
-         std::map<std::size_t,NonDimensional::SharedINumber> mPhysical;
+   /**
+    * @brief Write Physical parameters to file
+    */
+   void writePhysical();
 
-         /**
-          * @brief Boundary flags of the simulation
-          */
-         std::map<std::string,std::size_t> mBoundary;
+   /**
+    * @brief Get iterator range to scalars
+    */
+   scalar_iterator_range scalarRange();
 
-         /**
-          * @brief Storage for the mesh
-          */
-         std::vector<Array> mMesh;
+   /**
+    * @brief Get iterator range to vectors
+    */
+   vector_iterator_range vectorRange();
 
-         /**
-          * @brief Time
-          */
-         MHDFloat mTime;
+   /**
+    * @brief Git information
+    */
+   std::map<std::string, std::string> mGit;
 
-         /**
-          * @brief Timestep
-          */
-         MHDFloat mTimestep;
+   /**
+    * @brief Physical parameters of the simulation
+    */
+   std::map<std::size_t, NonDimensional::SharedINumber> mPhysical;
 
-         /**
-          * @brief Is file working on regular data?
-          */
-         bool mIsRegular;
+   /**
+    * @brief Boundary flags of the simulation
+    */
+   std::map<std::string, std::size_t> mBoundary;
 
-      private:
-         /**
-          * @brief Set the resolution and use it for preliminary initialisation
-          */
-         void setResolution(SharedResolution spRes);
+   /**
+    * @brief Storage for the mesh
+    */
+   std::vector<Array> mMesh;
 
-         /**
-          * @brief Set the maximum number of IO operations
-          */
-         void setCollIo();
+   /**
+    * @brief Time
+    */
+   MHDFloat mTime;
 
-         /**
-          * @brief The dimension space the file is working on
-          */
-         Dimensions::Space::Id mSpaceId;
+   /**
+    * @brief Timestep
+    */
+   MHDFloat mTimestep;
 
-         /**
-          * @brief Storage for the names of the expecte variables
-          */
-         std::set<std::size_t>  mExpected;
+   /**
+    * @brief Is file working on regular data?
+    */
+   bool mIsRegular;
 
-         /**
-          * @brief Resolution information
-          *
-          * @param spRes      Resolution information
-          */
-         SharedResolution mspRes;
+private:
+   /**
+    * @brief Set the resolution and use it for preliminary initialisation
+    */
+   void setResolution(SharedResolution spRes);
 
-         /**
-          * @brief Storage for the scalars
-          */
-         std::map<std::size_t,Framework::Selector::VariantSharedScalarVariable>   mScalars;
+   /**
+    * @brief Set the maximum number of IO operations
+    */
+   void setCollIo();
 
-         /**
-          * @brief Storage for the vectors
-          */
-         std::map<std::size_t,Framework::Selector::VariantSharedVectorVariable>   mVectors;
-   };
+   /**
+    * @brief The dimension space the file is working on
+    */
+   Dimensions::Space::Id mSpaceId;
 
-   /// Typedef for a smart reference counting pointer of a Variable HDF5 numbering writer
-   typedef std::shared_ptr<IVariableHdf5NWriter>   SharedIVariableHdf5NWriter;
+   /**
+    * @brief Storage for the names of the expecte variables
+    */
+   std::set<std::size_t> mExpected;
 
-}
-}
-}
+   /**
+    * @brief Resolution information
+    *
+    * @param spRes      Resolution information
+    */
+   SharedResolution mspRes;
+
+   /**
+    * @brief Storage for the scalars
+    */
+   std::map<std::size_t, Framework::Selector::VariantSharedScalarVariable>
+      mScalars;
+
+   /**
+    * @brief Storage for the vectors
+    */
+   std::map<std::size_t, Framework::Selector::VariantSharedVectorVariable>
+      mVectors;
+};
+
+/// Typedef for a smart reference counting pointer of a Variable HDF5 numbering
+/// writer
+typedef std::shared_ptr<IVariableHdf5NWriter> SharedIVariableHdf5NWriter;
+
+} // namespace Variable
+} // namespace Io
+} // namespace QuICC
 
 #endif // QUICC_IO_VARIABLE_IVARIABLEHDF5NWRITER_HPP

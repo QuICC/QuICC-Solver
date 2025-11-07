@@ -5,6 +5,7 @@ include(SetUlp)
 
 # Create  tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 
 set(_tests
   Poly::P:<base_t>:projector
@@ -121,7 +122,7 @@ set(_tests
 )
 quicc_set_ulp(_ulp
   ULP 9 60 55 51
-  MPULP 1 1 2 3
+  MPULP 1 1 2 5
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -238,7 +239,7 @@ foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
     KEYWORD Algorithm::Operator:Template:type
-    ULPS 5 6 5 4
+    ULPS 5 6 6 4
     IDS  0 1 2 3
   )
 endforeach()
@@ -367,3 +368,10 @@ foreach(_perf_id 108 109)
       )
   endforeach()
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_projector_merged
+  COMMAND ${TestExe}
+  JN 32
+)

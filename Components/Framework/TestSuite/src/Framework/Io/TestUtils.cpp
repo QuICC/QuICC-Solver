@@ -112,7 +112,7 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
       std::pair<Spectral::Kernel::Complex3DMapType::iterator, bool> ptSH;
       for(int m = 0; m <= maxM; m++)
       {
-         for(int l = std::min(l0,m); l <= maxL; l++)
+         for(int l = std::max(l0,m); l <= maxL; l++)
          {
             ptSH = tSH.insert(
                std::make_pair(std::make_pair(l, m), std::map<int, MHDComplex>()));
@@ -134,7 +134,7 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
       std::pair<Spectral::Kernel::Complex3DMapType::iterator, bool> ptSH;
       for(int m = 0; m <= maxM; m++)
       {
-         for(int l = std::min(l0,m); l <= maxL; l++)
+         for(int l = std::max(l0,m); l <= maxL; l++)
          {
             ptSH = tSH.insert(
                std::make_pair(std::make_pair(l, m), std::map<int, MHDComplex>()));
@@ -156,7 +156,7 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
       std::pair<Spectral::Kernel::Complex3DMapType::iterator, bool> ptSH;
       for(int m = 0; m <= maxM; m++)
       {
-         for(int l = std::min(l0,m); l <= maxL; l++)
+         for(int l = std::max(l0,m); l <= maxL; l++)
          {
             ptSH = tSH.insert(
                std::make_pair(std::make_pair(l, m), std::map<int, MHDComplex>()));

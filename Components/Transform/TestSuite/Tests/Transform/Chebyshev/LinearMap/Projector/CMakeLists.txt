@@ -2,6 +2,7 @@ message(VERBOSE "Projectors:")
 
 # Create projector tests targets
 include(ConfigureTests)
+quicc_clear_test_list()
 include(SetUlp)
 
 quicc_set_ulp(_ulps
@@ -138,3 +139,10 @@ foreach(_test ${_tests})
     IDS 0 1 2 6 7 8
   )
 endforeach()
+
+# Merged tests
+quicc_add_merged_test(
+  ${TestExe}_projector_merged
+  COMMAND ${TestExe}
+  JN 4
+)

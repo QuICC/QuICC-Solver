@@ -10,6 +10,8 @@
 #include <array>
 #include <iomanip>
 #include <utility>
+#include <random>
+#include <algorithm>
 
 #ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE
 #include <highfive/H5DataSet.hpp>
@@ -23,8 +25,24 @@
 #include <cuda_runtime_api.h>
 #endif
 
+#define QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE_UNIQUEFILE
+
 namespace QuICC {
 namespace Profiler {
+
+namespace details {
+   std::string generate_random_string(size_t length)
+   {
+       const std::string characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+       std::random_device random_device;
+       std::mt19937 generator(random_device());
+
+       std::string random_string(characters);
+       std::shuffle(random_string.begin(), random_string.end(), generator);
+
+       return random_string.substr(0, length);
+   }
+}
 
 
 #ifdef QUICC_MPI
@@ -123,12 +141,21 @@ void Tracker::print_hdf5()
 {
 #ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE
 
-    std::string outFile = "profile.hdf5";
+   std::string fid = "";
+#ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE_UNIQUEFILE
+    fid = "_" + details::generate_random_string(6);
+#ifdef QUICC_MPI
+    std::vector<char> cfid(fid.begin(), fid.end());
+    MPI_Bcast(cfid.data(), cfid.size(), MPI_CHAR, 0, mComm);
+    fid.assign(cfid.begin(), cfid.end());
+#endif
+#endif
+    std::string outFile = "profile" + fid + ".hdf5";
 
     int rank{};
     int nRanks{1};
 
-    #if QUICC_MPI
+    #ifdef QUICC_MPI
     MPI_Comm_rank(mComm, &rank);
     MPI_Comm_size(mComm, &nRanks);
     #endif
@@ -136,9 +163,14 @@ void Tracker::print_hdf5()
     // Write in a format compatible to conduit
     using namespace HighFive;
 
+    #ifdef QUICC_MPI
+    auto fapl = FileAccessProps{};
+    fapl.add(MPIOFileAccess(mComm, MPI_INFO_NULL));
+    #endif
+
     File file(outFile, File::ReadWrite | File::Create | File::Truncate
-    #if QUICC_MPI
-    , MPIOFileDriver(mComm, MPI_INFO_NULL)
+    #ifdef QUICC_MPI
+    , fapl
     #endif
     );
 
@@ -183,7 +215,7 @@ void Tracker::print_hdf5()
             .select({std::size_t(rank)*sampleSize}, {sampleSize})
             .write(std::get<tracking::time>(reg->second).data());
 
-        #if QUICC_MPI
+        #ifdef QUICC_MPI
         // wait for everyone to be done
         MPI_Barrier(mComm);
         #endif

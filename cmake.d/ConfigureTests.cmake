@@ -27,12 +27,14 @@
 #     add generic options given as cmd:value converted to --cmd value
 # WORKDIR
 #     work directory. Set to QUICC_WORK_DIR if not set.
+# RANKS
+#     if larger than 1, create MPI test with ${RANKS} ranks.
 #
 
 # support function
 function(__add_test _testname)
   # parse inputs
-  set(oneValueArgs DIS PRF WORKDIR)
+  set(oneValueArgs DIS PRF RKS WORKDIR)
   set(multiValueArgs COMM STP)
   cmake_parse_arguments(_QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -43,10 +45,40 @@ function(__add_test _testname)
   message(DEBUG "_QAT_DIS: ${_QAT_DIS}")
   message(DEBUG "_QAT_STP: ${_QAT_STP}")
   message(DEBUG "_QAT_PRF: ${_QAT_PRF}")
+  message(DEBUG "_QAT_RKS: ${_QAT_RKS}")
+  if(NOT _QAT_RKS)
+    set(_QAT_RKS 0)
+  endif()
   if(NOT _QAT_WORKDIR)
     set(_QAT_WORKDIR "${QUICC_WORK_DIR}")
   endif()
   message(DEBUG "_QAT_WORKDIR: ${_QAT_WORKDIR}")
+
+  # Get mpi runner
+  if(QUICC_USE_MPI AND NOT QUICC_MPI_CI AND _QAT_RKS GREATER 0)
+    # check which command is available
+    foreach(_mpiexe IN ITEMS srun mpirun)
+      message(VERBOSE "_mpiexe: ${_mpiexe}")
+      find_program(mpiexe ${_mpiexe})
+      if(mpiexe STREQUAL "mpiexe-NOTFOUND")
+        message(VERBOSE "not found")
+      else()
+        message(VERBOSE "found")
+        break()
+      endif()
+    endforeach()
+    # check that we actually found something
+    if(mpiexe STREQUAL "mpiexe-NOTFOUND")
+      message(SEND_ERROR "could not find mpi executable.")
+    endif()
+    message(DEBUG "_QAT_COMM: ${_QAT_COMM}")
+    list(GET _QAT_COMM 0 _cmd)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.29)
+      set_target_properties(${_cmd} PROPERTIES TEST_LAUNCHER "${mpiexe};-n;${_QAT_RKS}")
+    else()
+      set_target_properties(${_cmd} PROPERTIES CROSSCOMPILING_EMULATOR "${mpiexe};-n;${_QAT_RKS}")
+    endif()
+  endif()
 
   # performance only test
   if(NOT _QAT_PRF)
@@ -71,6 +103,16 @@ function(__add_test _testname)
       )
     endif()
   endif()
+
+  if(NOT _QAT_DIS)
+    if(_QAT_STP)
+      if(${_QAT_STP} GREATER "0")
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/prof_all_tests.txt" "${_QAT_COMM} --timeOnly --iter ${_QAT_STP}\n")
+      endif()
+    else()
+        file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/all_tests.txt" "${_QAT_COMM}\n")
+    endif()
+  endif()
 endfunction()
 
 
@@ -78,7 +120,7 @@ endfunction()
 function(quicc_add_test target)
   # parse inputs
   set(options PERFONLY)
-  set(oneValueArgs COMMAND KEYWORD ULP DISABLED WORKDIR)
+  set(oneValueArgs COMMAND KEYWORD ULP DISABLED RANKS WORKDIR)
   set(multiValueArgs TYPES IDS ULPS STEPS SPLITS OPTIONS)
   cmake_parse_arguments(QAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -95,6 +137,7 @@ function(quicc_add_test target)
   message(DEBUG "QAT_SPLITS: ${QAT_SPLITS}")
   message(DEBUG "QAT_DISABLED: ${QAT_DISABLED}")
   message(DEBUG "QAT_PERFONLY: ${QAT_PERFONLY}")
+  message(DEBUG "QAT_RANKS: ${QAT_RANKS}")
   message(DEBUG "QAT_OPTIONS: ${QAT_OPTIONS}")
 
   if(NOT _QAT_WORKDIR)
@@ -186,6 +229,7 @@ function(quicc_add_test target)
       DIS ${QAT_DISABLED}
       STP ${QAT_STEPS}
       PRF ${QAT_PERFONLY}
+      RKS ${QAT_RANKS}
       WORKDIR ${QAT_WORKDIR}
     )
   elseif(${_ids_len} LESS 1)
@@ -197,6 +241,7 @@ function(quicc_add_test target)
         DIS ${QAT_DISABLED}
         STP ${QAT_STEPS}
         PRF ${QAT_PERFONLY}
+        RKS ${QAT_RANKS}
         WORKDIR ${QAT_WORKDIR}
       )
     endforeach()
@@ -240,6 +285,7 @@ function(quicc_add_test target)
         DIS ${QAT_DISABLED}
         STP ${_steps}
         PRF ${QAT_PERFONLY}
+        RKS ${QAT_RANKS}
         WORKDIR ${QAT_WORKDIR}
       )
 
@@ -249,4 +295,44 @@ function(quicc_add_test target)
   endif()
 
   list(POP_BACK CMAKE_MESSAGE_INDENT)
+endfunction()
+
+function(quicc_add_merged_test target)
+  # parse inputs
+  set(options )
+  set(oneValueArgs COMMAND JN LISTDIR WORKDIR)
+  set(multiValueArgs )
+  cmake_parse_arguments(QAMT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+  message(DEBUG "quicc_add_merged_test")
+  list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+
+  message(DEBUG "target: ${target}")
+  message(DEBUG "QAMT_COMMAND: ${QAMT_COMMAND}")
+  if(NOT QAMT_JN)
+    set(QAMT_JN 1)
+  endif()
+  message(DEBUG "QAMT_JN: ${QAMT_JN}")
+  if(NOT QAMT_LISTDIR)
+    set(QAMT_LISTDIR ${CMAKE_CURRENT_BINARY_DIR})
+  endif()
+  message(DEBUG "QAMT_LISTDIR: ${QAMT_LISTDIR}")
+  if(NOT QAMT_WORKDIR)
+    set(QAMT_WORKDIR ${QUICC_WORK_DIR})
+  endif()
+  message(DEBUG "QAMT_WORKDIR: ${QAMT_WORKDIR}")
+
+  math(EXPR _jMax "${QAMT_JN} - 1")
+  foreach(_jid RANGE ${_jMax})
+    add_test(
+      NAME ${target}_${_jid}_${QAMT_JN}
+      COMMAND ${QAMT_COMMAND} --options_file ${QAMT_LISTDIR}/all_tests.txt --jid ${_jid} --jN ${QAMT_JN}
+      WORKING_DIRECTORY ${QAMT_WORKDIR}
+    )
+  endforeach()
+endfunction()
+
+function(quicc_clear_test_list )
+  message(DEBUG "Removing old test listings")
+  file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/all_tests.txt" "${CMAKE_CURRENT_BINARY_DIR}/prof_all_tests.txt")
 endfunction()

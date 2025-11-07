@@ -218,6 +218,7 @@ function(quicc_add_benchmark target)
       )
     set_tests_properties(${_run} PROPERTIES
       TIMEOUT ${QAB_TIMEOUT}
+      FIXTURES_SETUP ${_run}
       )
 
 
@@ -232,6 +233,7 @@ function(quicc_add_benchmark target)
     set_tests_properties(${_validate} PROPERTIES
       PASS_REGULAR_EXPRESSION "All benchmark validation tests passed!"
       TIMEOUT 60
+      FIXTURES_REQUIRED ${_run}
       )
 
     set_tests_properties(${_validate} PROPERTIES DEPENDS "${_run}")

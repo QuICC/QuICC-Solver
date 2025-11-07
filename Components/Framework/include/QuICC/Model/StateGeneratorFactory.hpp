@@ -23,26 +23,29 @@ namespace QuICC {
    template <class TModel> class StateGeneratorFactory
    {
       public:
+         /// Typdef of type of oject created
+         typedef std::shared_ptr<StateGenerator> ReturnType;
+
          /**
           * @brief Create a shared state generator for the model
           */
-         static SharedStateGenerator createGenerator();
+         static ReturnType create();
 
-      protected:
-
-      private:
          /**
           * @brief Constructor
           */
-         StateGeneratorFactory();
+         StateGeneratorFactory() = delete;
 
          /**
           * @brief Destructor
           */
-         ~StateGeneratorFactory();
+         ~StateGeneratorFactory() = delete;
+      protected:
+
+      private:
    };
 
-   template <class TModel> SharedStateGenerator StateGeneratorFactory<TModel>::createGenerator()
+   template <class TModel> typename StateGeneratorFactory<TModel>::ReturnType StateGeneratorFactory<TModel>::create()
    {
       // Create model
       TModel model;
@@ -88,6 +91,9 @@ namespace QuICC {
 
       // Initialise the simulation
       spGen->init(spBcs);
+
+      // Set initial state
+      model.setGeneratorState(spGen);
 
       return spGen;
    }

@@ -77,6 +77,16 @@ namespace Equations {
          virtual const Resolution& res() const override;
 
          /**
+          * @brief Get the number of spectral components
+          */
+         int nSpectral() const final;
+
+         /**
+          * @brief Get vector spectral component range
+          */
+         SpectralComponent_range spectralRange() const final;
+
+         /**
           * @brief Transfer solver solution to equation unknown
           *
           * @param compId  Component ID
@@ -120,7 +130,21 @@ namespace Equations {
          virtual void setSrcKernel(Spectral::Kernel::SharedISpectralKernel spKernel);
          using IFieldEquation::setSrcKernel;
 
+         /**
+          * @brief Set unknown field to bad value
+          *
+          * @param compId  Component ID
+          */
+         void corruptUnknown(FieldComponents::Spectral::Id compId);
+
       protected:
+         /**
+          * @brief Get backward transform paths
+          *
+          * @param pathId  ID of enabled path
+          */
+         std::vector<Transform::TransformPath> defaultBackwardPaths(const std::size_t pathId) const;
+
          /**
           * @brief Set the nonlinear integration components
           */

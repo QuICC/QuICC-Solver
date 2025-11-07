@@ -117,7 +117,7 @@ namespace Communicators {
       mt.clear();
 
       // Create backward scalar transform tree
-      std::map<FieldComponents::Physical::Id,bool> req = {{FieldComponents::Physical::SCALAR,true}};
+      Transform::ITransformSteps::PhysPathId req = {{FieldComponents::Physical::SCALAR,Transform::Path::Scalar::id()}};
       t = spSteps->backwardScalar(req);
       mt.insert(std::make_pair(PhysicalNames::Temperature::id(), t));
 
