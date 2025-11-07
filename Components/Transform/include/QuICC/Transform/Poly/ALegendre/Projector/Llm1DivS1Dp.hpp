@@ -1,10 +1,10 @@
 /**
  * @file Llm1DivS1Dp.hpp
- * @brief Implementation of the associated Legendre based 1/sin [l(l+1)-1] P d_phi P projector
+ * @brief Implementation of the associated Legendre based 1/sin [l(l+1)-1] P d_phi  projector
  */
 
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_LLM1DIVS1DP_HPP
-#define QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_LLDIVS1DP_HPP
+#define QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_LLM1DIVS1DP_HPP
 
 // System includes
 //

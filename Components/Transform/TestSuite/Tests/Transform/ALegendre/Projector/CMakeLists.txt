@@ -89,6 +89,10 @@ set(_tests_templated
     Poly::D1DivS1Dp:<base_t>:projector
     Poly::D1DivS1:<viewCpu_t>:projector
     Poly::D1DivS1Dp:<viewCpu_t>:projector
+    Poly::Llm1DivS1:<base_t>:projector
+    Poly::Llm1DivS1Dp:<base_t>:projector
+    Poly::Llm1DivS1:<viewCpu_t>:projector
+    Poly::Llm1DivS1Dp:<viewCpu_t>:projector
 )
 
 if(TARGET QuICC::Cuda)

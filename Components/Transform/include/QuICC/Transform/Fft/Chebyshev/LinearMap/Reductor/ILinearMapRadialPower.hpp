@@ -14,7 +14,6 @@
 #include "QuICC/Transform/Fft/Backend/ChebyshevEnergy.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/IChebyshevOperator.hpp"
 #include "Types/Typedefs.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -53,32 +52,12 @@ public:
    virtual void transform(Matrix& rOut, const MatrixZ& in) const override;
 
    /**
-    * @brief Compute reduction of complex data, anelastic case
-    *
-    * @param rOut Output values
-    * @param in   Input values
-    * @param pF   Radial profile (e.g density)
-    */
-   virtual void transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const override;
-
-
-   /**
     * @brief Compute reduction of real data
     *
     * @param rOut Output values
     * @param in   Input values
     */
    virtual void transform(Matrix& rOut, const Matrix& in) const override;
-
-   /**
-    * @brief Compute reduction of real data, anelastic case
-    *
-    * @param rOut Output values
-    * @param in   Input values
-    * @param pF   Radial profile (e.g density)
-    */
-   virtual void transform(Matrix& rOut, const Matrix& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const override;
-
 
    /**
     * @brief Rows of output data
@@ -95,8 +74,6 @@ public:
     */
    virtual MHDFloat requiredStorage() const override;
 
-   int getExtraSize() const;
-
 protected:
    /**
     * @brief Initialise FFT backend
@@ -104,17 +81,9 @@ protected:
    virtual void initBackend() const override;
 
    /**
-    * @brief Initialise FFT backend, anelastic overload
-    * @param pF   Shared pointer to radial profile
-    */
-   virtual void initBackendAnelastic(std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const override;
-
-   /**
     * @brief FFT backend
     */
    Backend::ChebyshevEnergy mBackend;
-
-   mutable int mExtraSize = 0;
 
 private:
    /**

@@ -12,6 +12,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB_KK} ${QUICC_CMAKE_SRC_VISIBIL
   Base/Llm1D1.cpp
   Base/LlDivS1.cpp
   Base/LlDivS1Dp.cpp
+  Base/Llm1DivS1.cpp
   Base/Llm1DivS1Dp.cpp
   IALegendreProjector.cpp
 )

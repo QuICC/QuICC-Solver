@@ -104,6 +104,7 @@
         "cassert": "cpp",
         "any": "cpp",
         "coroutine": "cpp",
-        "source_location": "cpp"
+        "source_location": "cpp",
+        "debug.inlineValues": "on"
     }
 }

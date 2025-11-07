@@ -90,6 +90,11 @@ struct LlDivS1Dp_t
 {
 };
 
+/// @brief Llm1DivS1 op type tag
+struct Llm1DivS1_t
+{
+};
+
 /// @brief Llm1DivS1Dp op type tag
 struct Llm1DivS1Dp_t
 {

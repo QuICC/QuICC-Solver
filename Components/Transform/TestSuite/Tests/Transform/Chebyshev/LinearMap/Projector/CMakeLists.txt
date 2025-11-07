@@ -18,6 +18,7 @@ set(_tests
   D2Y1:<base_t>:projector
   DivY1D1:<base_t>:projector
   DivY1D1Y1:<base_t>:projector
+  DivY1D2Y1:<base_t>:projector
   DivY2D1Y1:<base_t>:projector
   SphRadLapl:<base_t>:projector
   )

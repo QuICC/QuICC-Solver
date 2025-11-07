@@ -30,6 +30,7 @@ The easiest thing to do is to modify an existing reference. Some caveats/things 
 
 - For the projection operator, only run the `generateProjectors` function. Not the whole notebook. You don't need, for example, `generateIntegrators` for this example.
 
+- The reference files (_meta, _in, _ref) should be in `build/Components/Transform/TestSuite/_refdata`
 
 
 
@@ -50,6 +51,24 @@ In the `build` directory (or wherever you put the tests):
 -       ctest -R Llm1D1 --output-on-failure
 
 
+### Add the tests to the gitlab repository
 
+This will ensure the correct tests are grabbed at compile time so they don't have to be run from Mathematica again:
+
+- The repository is `https://gitlab.ethz.ch/quicc` -> `Test-TestData`
+- For this particular test we need to grab `test-testdata/ref/Transform/ALegendre.tar.gz`
+- untar it, put the new tests in it
+- tar it again. On mac:
+`tar czf ALegendre.tar.gz Transform`
+
+
+- run sha256sum
 
 #### Some troubleshooting
+
+To run tests with a given id and have more information:
+
+- Go to `build/Components/Transform/TestSuite`
+- There should be an executable: `TransformALegendreTests`
+- To only run the tests with id=0 and to print the output ref.dat: `./TransformALegendreTests [Poly::Llm1D1:base_t:projector] --id 2 --dumpData`
+- this will create the file `Llm1D1_id0_ref.dat` in the `_data` folder

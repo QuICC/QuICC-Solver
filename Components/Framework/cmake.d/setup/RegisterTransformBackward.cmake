@@ -31,7 +31,6 @@ set(tags
   OversinD1Sin
   D1OversinDphi
   OversinDphi
-  D1OversinDphi
   OversinLaplh
   OversinLaplhDphi
   OversinLaplhm1Dphi

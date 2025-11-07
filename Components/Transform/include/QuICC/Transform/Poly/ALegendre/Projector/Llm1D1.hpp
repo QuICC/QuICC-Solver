@@ -1,6 +1,6 @@
 /**
  * @file Llm1D1.hpp
- * @brief Implementation of the associated Legendre based l(l+1) D projector
+ * @brief Implementation of the associated Legendre based 1/sin l(l+1) P projector
  */
 
 #ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_LLM1D1_HPP

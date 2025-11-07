@@ -112,7 +112,7 @@ namespace Physical {
                         )).matrix(), iR);
          */
          
-         // test the curl-r: NOT GOOD (rms is O(1) or so, vs O(1) rms curl values)
+         // test the curl-r: OK
          // Poloidal part is ok (r curl =0)
          /*
          rS.setSlice((v.comp(FieldComponents::Physical::R).slice(iR).array()
@@ -121,15 +121,15 @@ namespace Physical {
                         ).matrix(), iR);
          */
          
-         // test the curl-theta: OK (rms is 10^-30 or so, vs O(100) rms curl values), but check if I am cheating
+         // test the curl-theta: OK
          /*
          rS.setSlice(((v.comp(FieldComponents::Physical::THETA).slice(iR).array()
                         - Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::PHI).slice(iR).array()
                         + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::R).slice(iR).array()
                         )).matrix(), iR);
-         */
+         */         
          
-         // test the curl-phi: OK (rms is 10^-30 or so, vs O(100) rms curl values), but check if I am cheating
+         // test the curl-phi: OK?
          /*
          rS.addSlice(((v.comp(FieldComponents::Physical::PHI).slice(iR).array()
                         - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::R).slice(iR).array()
