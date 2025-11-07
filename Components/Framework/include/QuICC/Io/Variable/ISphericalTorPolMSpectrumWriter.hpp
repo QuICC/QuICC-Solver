@@ -16,7 +16,7 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Io/Variable/ISphericalTorPolEnergyBaseWriter.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+#include "DenseSM/IGenericProfile.hpp"
 
 namespace QuICC {
 
@@ -39,7 +39,7 @@ public:
     */
    ISphericalTorPolMSpectrumWriter(const std::string& prefix,
       const std::string& type, 
-      std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {}
+      std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>> pF = {}
    );
 
    /**

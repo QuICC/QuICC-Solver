@@ -39,7 +39,7 @@ public:
     */
    ISphericalTorPolLSpectrumWriter(const std::string& prefix,
       const std::string& type,
-      std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {}
+      std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>> pF = {}
    );
 
    /**

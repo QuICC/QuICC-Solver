@@ -25,7 +25,7 @@ namespace Io {
 namespace Variable {
 // anelastic case: pF needs to be an array of pointers to DenseSM profiles with one element (density)
 ISphericalTorPolEnergyWriter::ISphericalTorPolEnergyWriter(
-   const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF) :
+   const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>> pF) :
     ISphericalTorPolEnergyBaseWriter(prefix + Tags::Energy::BASENAME,
        Tags::Energy::EXTENSION, prefix + Tags::Energy::HEADER, type,
        Tags::Energy::VERSION, Dimensions::Space::SPECTRAL, EXTEND, pF),

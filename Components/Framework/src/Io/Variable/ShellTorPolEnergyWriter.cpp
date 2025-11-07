@@ -26,7 +26,7 @@ namespace Variable {
 // anelastic case: pF needs to be an array of pointers to DenseSM profiles with one element (density)
 ShellTorPolEnergyWriter::ShellTorPolEnergyWriter(const std::string& prefix,
    const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF) :
-    ISphericalTorPolEnergyWriter(prefix, type, pF)
+    ISphericalTorPolEnergyWriter(prefix, type, std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>>(pF.begin(), pF.end()))
 {}
 
 void ShellTorPolEnergyWriter::init()

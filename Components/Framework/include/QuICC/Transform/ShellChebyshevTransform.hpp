@@ -112,7 +112,7 @@ namespace Transform {
           * @param id         Energy reductor to use
           * @param pF         Radial profile (e.g. density)
           */
-         void reduce(Matrix& spectrum, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) override;
+         void reduce(Matrix& spectrum, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF) override;
 
          /**
           * @brief Get the memory requirements

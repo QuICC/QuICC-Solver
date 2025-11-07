@@ -47,7 +47,7 @@ public:
       std::string header, std::string type, std::string version,
       const Dimensions::Space::Id id,
       const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND,
-      std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {}
+      std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>> pF = {}
    );
 
    /**
@@ -95,7 +95,7 @@ protected:
    /**
     * @brief Vector of shared pointers to radial profiles (e.g. density)
     */
-   std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> mpF;
+   std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>> mpF;
 
 private:
    /**

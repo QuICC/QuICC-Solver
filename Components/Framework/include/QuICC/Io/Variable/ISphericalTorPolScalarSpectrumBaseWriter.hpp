@@ -46,7 +46,7 @@ namespace Variable {
           * @param id         ID of the dimension space
           * @param mode       Write mode of file
           */
-         ISphericalTorPolScalarSpectrumBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {});
+         ISphericalTorPolScalarSpectrumBaseWriter(std::string name, std::string ext, std::string header, std::string type, std::string version, const Dimensions::Space::Id id, const IAsciiWriter::WriteMode mode = IAsciiWriter::EXTEND, std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>> pF = {});
 
          /**
           * @brief Destructor
@@ -92,7 +92,7 @@ namespace Variable {
          /**
           * @brief Vector of shared pointers to radial profiles (e.g. density)
           */
-         std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> mpF;
+         std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>> mpF;
 
       private:
          /**
