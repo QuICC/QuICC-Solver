@@ -6,17 +6,9 @@
 #ifndef QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPSPECTRUM_HPP
 #define QUICC_TRANSFORM_FFT_CHEBYSHEV_LINEARMAP_ILINEARMAPSPECTRUM_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 
-// External includes
-//
 
 // Project includes
 //
