@@ -3,23 +3,16 @@
  * @brief Source of the implementation of the spherical Coriolis term
  */
 
-// Configuration includes
-//
-
 // System includes
 //
-// ****************
-//Stuff that needs to be removed later
 #include <cstdio>
 #include <filesystem>
 #include <sstream>
 #include <iostream>
-// ****************
 
 // Project includes
 //
 #include "QuICC/PhysicalOperators/SphericalLorentzAnelastic.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 
@@ -33,7 +26,7 @@ namespace Physical {
                                              const Array& r, 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // intended for density, Rho
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
@@ -104,7 +97,7 @@ namespace Physical {
                                              const Array& r, 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // intended for density, Rho
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
@@ -176,7 +169,7 @@ namespace Physical {
                                              const Array& phGrid,    // Add phi grid 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // intended for density, Rho
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {

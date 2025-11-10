@@ -34,19 +34,16 @@ namespace QuICC {
       
 
       // Set default gradient needs
-      //if(this->mIsScalar)
-      //{  // for scalars, grad is a 3d vector
-         ArrayB arr(3);
-         arr.setConstant(this->mNeedGradient);
-         for(auto id: this->mSpectralIds)
-         {
-            this->mGradientComps.insert(std::make_pair(id, arr));
-         }
-      //}
-      //else
-      //{ // for vectors, grad is 3x3 tensor
-         this->mGradientTComps.setConstant(this->mNeedGradient);
-      //}
+
+      // for scalars, grad is a 3d vector
+      ArrayB arr(3);
+      arr.setConstant(this->mNeedGradient);
+      for(auto id: this->mSpectralIds)
+      {
+         this->mGradientComps.insert(std::make_pair(id, arr));
+      }
+      // for vectors, grad is 3x3 tensor
+      this->mGradientTComps.setConstant(this->mNeedGradient);
       
       // Set default 2nd order gradient needs
       MatrixB mat = MatrixB::Zero(3,3);

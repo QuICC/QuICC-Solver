@@ -3,55 +3,18 @@
  * @brief Source of the implementation of the spherical Coriolis term
  */
 
-// Configuration includes
-//
 
 // System includes
 //
-// ****************
-//Stuff that needs to be removed later
-#include <cstdio>
-#include <filesystem>
-#include <sstream>
-#include <iostream>
-// ****************
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/PhysicalOperators/SphericalSelfAdvectionAnelastic.hpp"
 
 // Project includes
-//#include "QuICC/DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
-#include "Types/Internal/Typedefs.hpp"
 //
+#include "QuICC/PhysicalOperators/SphericalSelfAdvectionAnelastic.hpp"
+#include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
 
 namespace Physical {
-
-   // \todo the arguments in add, sub, and set are repeated. Should be a function
-   // Issues with the return types. I got as far as
-   // type:Eigen::MatrixBase<Derived>
-   // But it probably should go in the .hpp file
-   /*
-   type:Eigen::MatrixBase<Derived> BoussinesqRcomp(const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
-                       const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,
-                       const int iTh,
-                       const int iR,
-                       const int iR_, 
-                       const MHDFloat c)
-   {
-      //return v.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array().cols();
-      return c*(   v.comp(FieldComponents::Physical::R).profile(iTh,iR).array() 
-                                       * w.comp(FieldComponents::Physical::PHI).profile(iTh,iR).array()
-                                          / Rho(iR_) / Rho(iR_)
-                                          ).matrix();
-
-   }
-   */
 
    void SphericalSelfAdvectionAnelastic::set(Framework::Selector::PhysicalScalarField &rS,
                                              FieldComponents::Physical::Id compId, 
@@ -59,8 +22,8 @@ namespace Physical {
                                              const Array& r, 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // intended for derivative of log(Rho)
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // intended for density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pDF, // intended for derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
@@ -123,8 +86,6 @@ namespace Physical {
             
             }
          }
-      // *** to print the result ** //
-      // std::cerr << "NL(R) = "<<rS.data()<<" \n";
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
@@ -221,8 +182,8 @@ namespace Physical {
                                              const Array& r, 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // intended for derivative of log(Rho)
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // intended for density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pDF, // intended for derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
@@ -285,8 +246,6 @@ namespace Physical {
             
             }
          }
-      // *** to print the result ** //
-      // std::cerr << "NL(R) = "<<rS.data()<<" \n";
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
@@ -384,8 +343,8 @@ namespace Physical {
                                              const Array& r, 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for density, Rho
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // intended for derivative of log(Rho)
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // intended for density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pDF, // intended for derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {

@@ -102,12 +102,6 @@ namespace Fftw {
           */
          virtual Matrix& getStorage(const StorageKind = StorageKind::in) const;
 
-         /*
-         void setExtraSize(int extraSize) const;
-         
-         int getExtraSize() const;
-         */
-
       protected:
          /**
           * @brief Spec size

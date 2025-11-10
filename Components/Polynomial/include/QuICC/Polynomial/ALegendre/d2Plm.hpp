@@ -6,16 +6,7 @@
 #ifndef QUICC_POLYNOMIAL_ALEGENDRE_D2PLM_HPP
 #define QUICC_POLYNOMIAL_ALEGENDRE_D2PLM_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -46,8 +37,6 @@ namespace ALegendre {
    template <typename T, typename TEvaluator> void d2Plm::compute(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const int m, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       // Extract required part of grid
-      //int gN = (igrid.rows()/2 + igrid.rows()%2);
-      //Internal::Array igrid = igrid.segment(0, gN);
       int gN = igrid.rows();
       
       if (m < 0)
@@ -183,8 +172,6 @@ namespace ALegendre {
    template <typename T, typename TEvaluator> void d2Plm::computed2Pl0(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       // Extract required part of grid
-      //int gN = (igrid.rows()/2 + igrid.rows()%2);
-      //Internal::Array igrid = igrid.segment(0, gN);
       int gN = igrid.rows();
 
       if (nPoly < 1)
@@ -272,8 +259,6 @@ namespace ALegendre {
    template <typename T, typename TEvaluator> void d2Plm::computed2Pl1(Eigen::Ref<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> > rOut, const int nPoly, const Internal::Array& igrid, const Internal::Array& scale, TEvaluator evaluator)
    {
       // Extract required part of grid
-      //int gN = (igrid.rows()/2 + igrid.rows()%2);
-      //Internal::Array igrid = igrid.segment(0, gN);
       int gN = igrid.rows();
       
       if (nPoly < 1)

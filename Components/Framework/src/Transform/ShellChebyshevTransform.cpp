@@ -7,8 +7,6 @@
 //
 #include <cassert>
 #include <stdexcept>
-#include <iostream>
-
 
 // Project includes
 //

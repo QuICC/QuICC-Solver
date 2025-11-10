@@ -95,17 +95,11 @@ namespace QuICC {
                } else // is vector
                {
                   // tensor form of gradient
-                  //if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad(true));}, rVectorVars.at(infoIt->first)))
-                  //if(std::visit([&](auto&& p)->bool{
-                     // Check if tensor gradient was enabled and the field is initialized
-                  //   return p->dom(0).hasGrad(true) ||  (infoIt->second.needTensorGradient()); }, rVectorVars.at(infoIt->first))) 
-                  
                   if(infoIt->second.needTensorGradient()) 
                   {
                      std::visit([&](auto&& p){p->initPhysicalGradient(infoIt->second.mapGradientComps());}, rVectorVars.at(infoIt->first));
                   }
                   // vector form of gradient
-                  //if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad(false));}, rVectorVars.at(infoIt->first)))
                   else
                   { 
                      for(auto it = infoIt->second.spectralIds().cbegin(); it != infoIt->second.spectralIds().cend(); ++it)

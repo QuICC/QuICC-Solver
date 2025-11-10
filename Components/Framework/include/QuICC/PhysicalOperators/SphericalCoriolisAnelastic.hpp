@@ -17,7 +17,7 @@
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+#include "DenseSM/IGenericProfile.hpp"
 
 namespace QuICC {
 
@@ -39,7 +39,7 @@ namespace Physical {
                          const Array& cosTheta, 
                          const Array& sinTheta, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                         std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, 
                          const MHDFloat c = 1.0);
 
          /**
@@ -52,7 +52,7 @@ namespace Physical {
                          const Array& cosTheta, 
                          const Array& sinTheta, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                         std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, 
                          const MHDFloat c = 1.0);
 
          /**
@@ -65,7 +65,7 @@ namespace Physical {
                          const Array& cosTheta, 
                          const Array& sinTheta, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                         std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, 
                          const MHDFloat c = 1.0);
 
       protected:

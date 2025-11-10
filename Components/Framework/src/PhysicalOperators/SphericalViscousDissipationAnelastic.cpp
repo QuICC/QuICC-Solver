@@ -3,28 +3,16 @@
  * @brief Source of the implementation of the spherical Coriolis term
  */
 
-// Configuration includes
-//
-
 // System includes
 //
-// ****************
-//Stuff that needs to be removed later
 #include <cstdio>
 #include <filesystem>
 #include <sstream>
 #include <iostream>
-// ****************
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/PhysicalOperators/SphericalViscousDissipationAnelastic.hpp"
 
 // Project includes
-//#include "QuICC/DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+#include "QuICC/PhysicalOperators/SphericalViscousDissipationAnelastic.hpp"
+#include "DenseSM/IGenericProfile.hpp"
 #include "Types/Internal/Typedefs.hpp"
 //
 
@@ -80,10 +68,10 @@ namespace Physical {
                                              const Array& r, 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV, // Viscosity
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT, // Temperature
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // density, Rho
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // derivative of log(Rho)
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pV, // Viscosity
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pT, // Temperature
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pDF, // derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
@@ -145,10 +133,10 @@ namespace Physical {
                                              const Array& r, 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV, // Viscosity
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT, // Temperature
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // density, Rho
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // derivative of log(Rho)
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pV, // Viscosity
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pT, // Temperature
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pDF, // derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
@@ -181,10 +169,10 @@ namespace Physical {
                                              const Array& r, 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV, // Viscosity
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT, // Temperature
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // density, Rho
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // derivative of log(Rho)
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pV, // Viscosity
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pT, // Temperature
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pDF, // derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {
@@ -213,10 +201,10 @@ namespace Physical {
                                              const Array& phGrid,    // Add phi grid 
                                              const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v,
                                              const Datatypes::TensorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &Dv,  
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pV, // Viscosity
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pT, // Temperature
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // density, Rho
-                                             std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pDF, // derivative of log(Rho)
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pV, // Viscosity
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pT, // Temperature
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // density, Rho
+                                             std::shared_ptr<QuICC::DenseSM::IGenericProfile> pDF, // derivative of log(Rho)
                                              const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                              const MHDFloat c)
    {

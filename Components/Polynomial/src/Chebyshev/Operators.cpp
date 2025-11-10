@@ -1,5 +1,5 @@
 /**
- * @file Tools.cpp
+ * @file Operators.cpp
  * @brief Source of the tools for Chebyshev polynomial implementation
  */
 
@@ -9,15 +9,9 @@
 #include <stdexcept>
 #include <iostream>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Polynomial/Chebyshev/Operators.hpp"
-
 // Project includes
 //
+#include "QuICC/Polynomial/Chebyshev/Operators.hpp"
 #include "Types/Internal/Math.hpp"
 
 namespace QuICC {

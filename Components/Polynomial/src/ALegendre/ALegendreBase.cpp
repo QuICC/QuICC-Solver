@@ -614,7 +614,6 @@ namespace ALegendre {
    Internal::Array ALegendreBase::schmidtdPl0(const Internal::MHDFloat dl)
    {
       Internal::Array cs(1);
-      // needs checking: is the 0.5 factor correct?
       cs(0) = MHD_MP(0.5)*Internal::Math::sqrt(dl*(dl + MHD_MP(1.0)));
 
       return cs;

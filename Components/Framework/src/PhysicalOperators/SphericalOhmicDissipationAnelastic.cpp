@@ -3,30 +3,17 @@
  * @brief Source of the implementation of the spherical Coriolis term
  */
 
-// Configuration includes
-//
-
 // System includes
 //
-// ****************
-//Stuff that needs to be removed later
 #include <cstdio>
 #include <filesystem>
 #include <sstream>
 #include <iostream>
-// ****************
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/PhysicalOperators/SphericalOhmicDissipationAnelastic.hpp"
 
 // Project includes
-//#include "QuICC/DenseSM/Chebyshev/LinearMap/ILinearMapOperator.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
-#include "Types/Internal/Typedefs.hpp"
 //
+#include "Types/Internal/Typedefs.hpp"
+#include "QuICC/PhysicalOperators/SphericalOhmicDissipationAnelastic.hpp"
 
 namespace QuICC {
 
@@ -36,7 +23,7 @@ namespace Physical {
                                                 const Resolution& res, 
                                                 const Array& r, 
                                                 const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
-                                                std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for magnetic diffusivity, Eta
+                                                std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // intended for magnetic diffusivity, Eta
                                                 const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                                 const MHDFloat c)
    {
@@ -71,7 +58,7 @@ namespace Physical {
                                                 const Array& thGrid,    // Add theta grid
                                                 const Array& phGrid,    // Add phi grid 
                                                 const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w,  
-                                                std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, // intended for magnetic diffusivity, Eta
+                                                std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, // intended for magnetic diffusivity, Eta
                                                 const QuICC::Equations::EquationParameters &eqParams, // physical nondimensional model parameters
                                                 const MHDFloat c)
    {

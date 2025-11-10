@@ -8,15 +8,10 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
+// Project includes
 //
 #include "QuICC/Transform/Fft/Backend/Fftw/IChebyshevBackend.hpp"
 
-// Project includes
-//
 
 namespace QuICC {
 
@@ -101,17 +96,6 @@ namespace Fftw {
       }
    }
 
-   /*
-   void IChebyshevBackend::setExtraSize(int extraSize) const
-   {
-      this->mExtraSize = extraSize;
-   }
-
-   int IChebyshevBackend::getExtraSize() const
-   {
-      return this->mExtraSize;
-   }
-   */
 }
 }
 }

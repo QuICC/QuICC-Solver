@@ -18,7 +18,7 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
 
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+#include "DenseSM/IGenericProfile.hpp"
 
 namespace QuICC {
 
@@ -40,7 +40,7 @@ namespace Physical {
                          const Array& r, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
-                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                         std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF,
                          const QuICC::Equations::EquationParameters &eqParams,
                          const MHDFloat c = 1.0);
 
@@ -53,7 +53,7 @@ namespace Physical {
                          const Array& r, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
-                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                         std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF,
                          const QuICC::Equations::EquationParameters &eqParams,
                          const MHDFloat c = 1.0);
 
@@ -68,7 +68,7 @@ namespace Physical {
                          const Array& phGrid,    // Add phi grid 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
                          const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &w, 
-                         std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF,
+                         std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF,
                          const QuICC::Equations::EquationParameters &eqParams,
                          const MHDFloat c = 1.0);
 

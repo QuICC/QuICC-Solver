@@ -3,16 +3,13 @@
  * @brief Source of the implementation of the spherical Coriolis term
  */
 
-// Configuration includes
-//
-
 // System includes
 //
 
 // Project includes
 //
 #include "QuICC/PhysicalOperators/SphericalCoriolisAnelastic.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+#include "DenseSM/IGenericProfile.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 
@@ -27,7 +24,7 @@ namespace Physical {
                                         const Array& cosTheta, 
                                         const Array& sinTheta, 
                                         const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                                        std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                                        std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, 
                                         const MHDFloat c)
    {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
@@ -142,7 +139,7 @@ namespace Physical {
                                         const Array& cosTheta, 
                                         const Array& sinTheta, 
                                         const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                                        std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                                        std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, 
                                         const MHDFloat c)
    {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
@@ -259,7 +256,7 @@ namespace Physical {
                                         const Array& cosTheta, 
                                         const Array& sinTheta, 
                                         const Datatypes::VectorField<Framework::Selector::PhysicalScalarField, FieldComponents::Physical::Id> &v, 
-                                        std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF, 
+                                        std::shared_ptr<QuICC::DenseSM::IGenericProfile> pF, 
                                         const MHDFloat c)
    {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
