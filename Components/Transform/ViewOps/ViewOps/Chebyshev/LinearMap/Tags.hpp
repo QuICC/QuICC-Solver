@@ -56,53 +56,60 @@ struct spec_id: public spec_no_sparseop
    constexpr static std::array<std::size_t, 1> t = {0};
 };
 
-/// @brief tag type for spectral padding operation
+/// @brief tag type for multiplication by y^1
 struct spec_y1: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {0};
    constexpr static std::array<std::size_t, 1> t = {1};
 };
 
-/// @brief tag type for spectral padding operation
+/// @brief tag type for spectral derivative
 struct spec_d1: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {1};
    constexpr static std::array<std::size_t, 1> t = {0};
 };
 
-/// @brief tag type for spectral padding operation
+/// @brief tag type for spectral second derivative
 struct spec_d2: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {2};
    constexpr static std::array<std::size_t, 1> t = {0};
 };
 
-/// @brief tag type for spectral padding operation
+/// @brief tag type for spectral third derivative
 struct spec_d3: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {3};
    constexpr static std::array<std::size_t, 1> t = {0};
 };
 
-/// @brief tag type for spectral padding operation
+/// @brief tag type for spectral fourth derivative
 struct spec_d4: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {4};
    constexpr static std::array<std::size_t, 1> t = {0};
 };
 
-/// @brief tag type for spectral padding operation
+/// @brief tag type for spectral operator D^1Y^1
 struct spec_d1y1: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 1> p = {1};
    constexpr static std::array<std::size_t, 1> t = {1};
 };
 
-/// @brief tag type for spectral padding operation
+/// @brief tag type for spectral operator D^1Y^2D^1
 struct spec_d1y2d1: public spec_no_sparseop
 {
    constexpr static std::array<std::size_t, 2> p = {1, 1};
    constexpr static std::array<std::size_t, 2> t = {0, 2};
+};
+
+/// @brief tag type for weighting with integral
+struct spec_int: public spec_no_sparseop
+{
+   constexpr static std::array<std::size_t, 1> p = {0};
+   constexpr static std::array<std::size_t, 1> t = {0};
 };
 
 /// @brief sparse operator op type tag
@@ -333,6 +340,31 @@ struct I4Y3D1Y1_Zero_t
 
 /// @brief I4Y3_Zero op type tag
 struct I4Y3_Zero_t
+{
+};
+
+/// @brief Energy op type tag
+struct Energy_t
+{
+};
+
+/// @brief EnergyD1 op type tag
+struct EnergyD1_t
+{
+};
+
+/// @brief EnergyD1Y1 op type tag
+struct EnergyD1Y1_t
+{
+};
+
+/// @brief Energy op type tag
+struct EnergyY2_t
+{
+};
+
+/// @brief EnergySLaplR2 op type tag
+struct EnergySLaplR2_t
 {
 };
 

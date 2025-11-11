@@ -74,6 +74,13 @@ void SpecOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out,
 
       nDealias = in.dims()[0];
    }
+   else if constexpr (Treatment == none_t)
+   {
+      assert(out.size() >= in.size());
+      assert(out.dims()[0] >= in.dims()[0]);
+
+      nDealias = out.lds();
+   }
    else
    {
       throw std::logic_error("Unknown Treatment parameter");
@@ -121,9 +128,22 @@ void SpecOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out,
 
          if (t == 0)
          {
-            for (; n < nDealias; ++n)
+            if constexpr(std::is_same_v<Operation, spec_int>)
             {
-               out.data()[nko + n] = in.data()[nki + n] * c;
+               ScaleType cc = c * (this->mUpper - this->mLower);
+               for (; n < nDealias; ++n)
+               {
+                  out.data()[nko + n] = in.data()[nki + n] * cc /static_cast<ScaleType>(1 - n*n);
+                  n++;
+                  out.data()[nko + n] *= 0;
+               }
+            }
+            else
+            {
+               for (; n < nDealias; ++n)
+               {
+                  out.data()[nko + n] = in.data()[nki + n] * c;
+               }
             }
          }
          else
@@ -355,6 +375,7 @@ template class SpecOp<mods_t, mods_t, spec_d3, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d4, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d1y1, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d1y2d1, ndealias_in | zero_pad>;
+template class SpecOp<power_t, power_t, spec_int, none_t>;
 
 } // namespace Cpu
 } // namespace LinearMap

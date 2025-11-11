@@ -9,6 +9,10 @@ set(_tests
   EnergyY2:<base_t>:reductor
   EnergyD1:<base_t>:reductor
   EnergyD1Y1:<base_t>:reductor
+  Energy:<viewCpu_t>:reductor
+  EnergyY2:<viewCpu_t>:reductor
+  EnergyD1:<viewCpu_t>:reductor
+  EnergyD1Y1:<viewCpu_t>:reductor
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}

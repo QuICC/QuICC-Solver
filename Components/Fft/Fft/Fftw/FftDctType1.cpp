@@ -22,6 +22,77 @@ namespace QuICC {
 namespace Fft {
 namespace Fftw {
 
+namespace details {
+fftw_plan setPlanDctType1(const int fwdSize, const int blockSize, const int mult);
+} // namespace details
+
+//
+// DCT of real data
+//
+
+template <class AttIn, class AttOut>
+FftOp<View::View<double, AttOut>,
+   View::View<double, AttIn>, dct_type1_t>::FftOp()
+{
+   // FFTW Fixture
+   Library::getInstance();
+}
+
+template <class AttIn, class AttOut>
+FftOp<View::View<double, AttOut>,
+   View::View<double, AttIn>, dct_type1_t>::~FftOp()
+{
+   // Destroy plan
+   if (_plan != nullptr)
+   {
+      fftw_destroy_plan(static_cast<fftw_plan>(_plan));
+      _plan = nullptr;
+   }
+}
+
+template <class AttIn, class AttOut>
+void FftOp<View::View<double, AttOut>,
+   View::View<double, AttIn>, dct_type1_t>::applyImpl(View::View<double,
+                                            AttOut>& phys,
+   const View::View<double, AttIn>& mods)
+{
+   using namespace QuICC::View;
+   if (_plan == nullptr)
+   {
+      Profiler::RegionFixture<5> fix("Fftw::FftOp::initFft-DctType1");
+      int columns = 0;
+      if constexpr (std::is_same_v<AttIn, dense2D>)
+      {
+         assert(phys.dims()[0] == mods.dims()[0]);
+         assert(phys.dims()[1] == mods.dims()[1]);
+         columns = phys.dims()[1];
+      }
+      else if constexpr (std::is_same_v<AttIn, DCCSC3D>)
+      {
+         assert(phys.dims()[0] == mods.lds());
+         assert(phys.indices()[1].size() == mods.indices()[1].size());
+         columns = phys.indices()[1].size();
+      }
+      else
+      {
+         throw std::logic_error("Not implemented yet.");
+      }
+      _plan = details::setPlanDctType1(phys.dims()[0], columns, 1);
+   }
+   Profiler::RegionFixture<5> fix("Fftw::FftOp::applyFft-DctType1");
+   fftw_execute_r2r(static_cast<fftw_plan>(_plan),
+      const_cast<double*>(mods.data()),
+      phys.data());
+}
+
+// Explicit instantiations
+template class FftOp<RmodsDense2D_t, RphysDense2D_t, dct_type1_t>;
+template class FftOp<RmodsDCCSC3D_t, RphysDCCSC3D_t, dct_type1_t>;
+
+//
+// DCT of complex components
+//
+
 template <class AttIn, class AttOut>
 FftOp<View::View<std::complex<double>, AttOut>,
    View::View<std::complex<double>, AttIn>, dct_type1_t>::FftOp()
@@ -41,32 +112,6 @@ FftOp<View::View<std::complex<double>, AttOut>,
       _plan = nullptr;
    }
 }
-
-namespace details {
-fftw_plan setPlanDctType1(const int fwdSize, const int blockSize)
-{
-   using fwdType = double;
-   using bwdType = double;
-
-   // create temporary storage for plan computation
-   const int bwdSize = fwdSize;
-   std::vector<fwdType> fwdTmp(2*fwdSize * blockSize);
-   std::vector<bwdType> bwdTmp(2*bwdSize * blockSize);
-
-   const int* fftSize = &fwdSize;
-
-   // Create the real to real type I plan
-   const fftw_r2r_kind fftKind[] = {FFTW_REDFT00};
-   auto fftwPlan = fftw_plan_many_r2r(1, fftSize, blockSize, bwdTmp.data(),
-      NULL, 2, 2*bwdSize, fwdTmp.data(), NULL, 2, 2*fwdSize, fftKind, Library::planFlag());
-   if (fftwPlan == NULL)
-   {
-      throw std::logic_error("FFTW plan failed!");
-   }
-   return fftwPlan;
-}
-} // namespace details
-
 
 template <class AttIn, class AttOut>
 void FftOp<View::View<std::complex<double>, AttOut>,
@@ -95,7 +140,7 @@ void FftOp<View::View<std::complex<double>, AttOut>,
       {
          throw std::logic_error("Not implemented yet.");
       }
-      _plan = details::setPlanDctType1(phys.dims()[0], columns);
+      _plan = details::setPlanDctType1(phys.dims()[0], columns, 2);
    }
    Profiler::RegionFixture<5> fix("Fftw::FftOp::applyFft-DctType1");
    fftw_execute_r2r(static_cast<fftw_plan>(_plan),
@@ -110,6 +155,31 @@ void FftOp<View::View<std::complex<double>, AttOut>,
 template class FftOp<CmodsDense2D_t, CphysDense2D_t, dct_type1_t>;
 template class FftOp<CmodsDCCSC3D_t, CphysDCCSC3D_t, dct_type1_t>;
 
+
+namespace details {
+fftw_plan setPlanDctType1(const int fwdSize, const int blockSize, const int mult)
+{
+   using fwdType = double;
+   using bwdType = double;
+
+   // create temporary storage for plan computation
+   const int bwdSize = fwdSize;
+   std::vector<fwdType> fwdTmp(mult*fwdSize * blockSize);
+   std::vector<bwdType> bwdTmp(mult*bwdSize * blockSize);
+
+   const int* fftSize = &fwdSize;
+
+   // Create the real to real type I plan
+   const fftw_r2r_kind fftKind[] = {FFTW_REDFT00};
+   auto fftwPlan = fftw_plan_many_r2r(1, fftSize, blockSize, bwdTmp.data(),
+      NULL, mult, mult*bwdSize, fwdTmp.data(), NULL, mult, mult*fwdSize, fftKind, Library::planFlag());
+   if (fftwPlan == NULL)
+   {
+      throw std::logic_error("FFTW plan failed!");
+   }
+   return fftwPlan;
+}
+} // namespace details
 
 } // namespace Fftw
 } // namespace Fft

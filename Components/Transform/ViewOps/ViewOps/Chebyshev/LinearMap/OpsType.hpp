@@ -13,10 +13,14 @@
 //
 #include "Fft/Fft.hpp"
 #include "Fft/FftTags.hpp"
+#include "ViewOps/Reduction/Reduction.hpp"
+#include "ViewOps/Pointwise/Pointwise.hpp"
+#include "ViewOps/Pointwise/Functors.hpp"
 #include "ViewOps/Chebyshev/LinearMap/FftTypeMap.hpp"
 #include "ViewOps/Chebyshev/LinearMap/Grid.hpp"
 #include "ViewOps/Chebyshev/LinearMap/Integrator/GFS.hpp"
 #include "ViewOps/Chebyshev/LinearMap/Projector/SFG.hpp"
+#include "ViewOps/Chebyshev/LinearMap/Reductor/SFGPFSR.hpp"
 #include "ViewOps/Chebyshev/LinearMap/Spec.hpp"
 #include "ViewOps/Chebyshev/LinearMap/Tags.hpp"
 
@@ -110,6 +114,62 @@ template <class Tphys, class Operation, std::uint16_t Treatment>
 struct Grid<viewGpuVkFFT_t, Tphys, Operation, Treatment>
 {
    using type = typename Cuda::GridOp<Tphys, Tphys, Operation, Treatment>;
+};
+#endif
+
+template <class Backend, class Tout, class Tin, class Functor>
+struct Point;
+
+template <class Backend, class Tout, class Tin, class Functor>
+using Point_t = typename Point<Backend, Tout, Tin,Functor>::type;
+
+template <class Tout, class Tin, class Functor>
+struct Point<viewCpu_t, Tout, Tin, Functor>
+{
+   using type = typename Pointwise::Cpu::Op<Functor, Tout, Tin>;
+};
+
+#ifdef QUICC_HAS_CUDA_BACKEND
+template <class Tout, class Tin, class Functor>
+struct Point<viewGpu_t, Tout, Tin, Functor>
+{
+   using type = typename Pointwise::Cuda::Op<Functor, Tout, Tin>;
+};
+#endif
+
+#ifdef QUICC_USE_VKFFT
+template <class Tout, class Tin, class Functor>
+struct Grid<viewGpuVkFFT_t, Tout, Tin, Functor>
+{
+   using type = typename Pointwise::Cuda::Op<Functor, Tout, Tin>;
+};
+#endif
+
+template <class Backend, class Tout, class Tin, std::uint32_t Dir>
+struct Red;
+
+template <class Backend, class Tout, class Tin, std::uint32_t Dir>
+using Red_t = typename Red<Backend, Tout, Tin, Dir>::type;
+
+template <class Tout, class Tin, std::uint32_t Dir>
+struct Red<viewCpu_t, Tout, Tin, Dir>
+{
+   using type = typename Reduction::Cpu::Op<Tout, Tin, Dir>;
+};
+
+#ifdef QUICC_HAS_CUDA_BACKEND
+template <class Tout, class Tin, std::uint32_t Dir>
+struct Red<viewGpu_t, Tout, Tin, Dir>
+{
+   using type = typename Reduction::Cuda::Op<Tout, Tin, Dir>;
+};
+#endif
+
+#ifdef QUICC_USE_VKFFT
+template <class Tout, class Tin, std::uint32_t Dir>
+struct Red<viewGpuVkFFT_t, Tout, Tin, Dir>
+{
+   using type = typename Reduction::Cuda::Op<Tout, Tin, Dir>;
 };
 #endif
 
@@ -574,6 +634,131 @@ struct OpsTypeMap<Tout, Tin, SphRadLapl_t, bwd_t, BACKEND>
    using backendGrid_t = Grid_t<BACKEND, Tout, grid_divy2, none_t>;
    using type =
       Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op Energy type map
+/// Energy operator
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, Energy_t, bwd_t, BACKEND>
+{
+   using powerView_t = View::View<double,  View::DCCSC3D>;
+
+   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_id, ndealias_in | zero_pad>;
+   using backendFftIn_t =
+      details::Fft_t<BACKEND, Tin, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using functor_t = Pointwise::Abs2Functor<double>;
+   using backendPoint_t = Point_t<BACKEND, powerView_t, Tin, functor_t>;
+   using backendFftOut_t =
+      details::Fft_t<BACKEND, powerView_t, powerView_t, QuICC::Fft::dct_type2_t>;
+   using backendSpecOut_t = Spec_t<BACKEND, powerView_t, spec_int, none_t>;
+   using backendReductor_t = Red_t<BACKEND, Tout, powerView_t, 0>;
+   using type =
+      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t>;
+   ;
+};
+
+/// @brief Op EnergyD1 type map
+/// Energy operator
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, EnergyD1_t, bwd_t, BACKEND>
+{
+   using powerView_t = View::View<double,  View::DCCSC3D>;
+
+   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_id, ndealias_in | zero_pad>;
+   using backendFftIn_t =
+      details::Fft_t<BACKEND, Tin, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using functor_t = Pointwise::Abs2Functor<double>;
+   using backendPoint_t = Point_t<BACKEND, powerView_t, Tin, functor_t>;
+   using backendFftOut_t =
+      details::Fft_t<BACKEND, powerView_t, powerView_t, QuICC::Fft::dct_type2_t>;
+   using backendSpecOut_t = Spec_t<BACKEND, powerView_t, spec_int, none_t>;
+   using backendReductor_t = Red_t<BACKEND, Tout, powerView_t, 0>;
+   using type =
+      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t>;
+   ;
+};
+
+/// @brief Op EnergyD1Y1 type map
+/// Energy operator
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, EnergyD1Y1_t, bwd_t, BACKEND>
+{
+   using powerView_t = View::View<double,  View::DCCSC3D>;
+
+   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_id, ndealias_in | zero_pad>;
+   using backendFftIn_t =
+      details::Fft_t<BACKEND, Tin, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using functor_t = Pointwise::Abs2Functor<double>;
+   using backendPoint_t = Point_t<BACKEND, powerView_t, Tin, functor_t>;
+   using backendFftOut_t =
+      details::Fft_t<BACKEND, powerView_t, powerView_t, QuICC::Fft::dct_type2_t>;
+   using backendSpecOut_t = Spec_t<BACKEND, powerView_t, spec_int, none_t>;
+   using backendReductor_t = Red_t<BACKEND, Tout, powerView_t, 0>;
+   using type =
+      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t>;
+   ;
+};
+
+/// @brief Op EnergyY2 type map
+/// Energy operator
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, EnergyY2_t, bwd_t, BACKEND>
+{
+   using powerView_t = View::View<double,  View::DCCSC3D>;
+
+   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_id, ndealias_in | zero_pad>;
+   using backendFftIn_t =
+      details::Fft_t<BACKEND, Tin, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using functor_t = Pointwise::Abs2Functor<double>;
+   using backendPoint_t = Point_t<BACKEND, powerView_t, Tin, functor_t>;
+   using backendFftOut_t =
+      details::Fft_t<BACKEND, powerView_t, powerView_t, QuICC::Fft::dct_type2_t>;
+   using backendSpecOut_t = Spec_t<BACKEND, powerView_t, spec_int, none_t>;
+   using backendReductor_t = Red_t<BACKEND, Tout, powerView_t, 0>;
+   using type =
+      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t>;
+   ;
+};
+
+/// @brief Op EnergySLaplR2 type map
+/// Energy operator
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, EnergySLaplR2_t, bwd_t, BACKEND>
+{
+   using powerView_t = View::View<double,  View::DCCSC3D>;
+
+   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_id, ndealias_in | zero_pad>;
+   using backendFftIn_t =
+      details::Fft_t<BACKEND, Tin, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
+   using functor_t = Pointwise::Abs2Functor<double>;
+   using backendPoint_t = Point_t<BACKEND, powerView_t, Tin, functor_t>;
+   using backendFftOut_t =
+      details::Fft_t<BACKEND, powerView_t, powerView_t, QuICC::Fft::dct_type2_t>;
+   using backendReductor_t = Red_t<BACKEND, Tout, powerView_t, 0>;
+   using backendSpecOut_t = Spec_t<BACKEND, powerView_t, spec_int, none_t>;
+   using type =
+      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t>;
    ;
 };
 

@@ -25,6 +25,19 @@ namespace Cpu {
 
 using namespace QuICC::Operator;
 
+namespace details {
+   template <class T> struct scale_type
+   {
+      using type = T;
+   };
+   template <class T> struct scale_type<std::complex<T>>
+   {
+      using type = T;
+   };
+   template <class T>
+      using scale_type_t = typename scale_type<T>::type;
+}
+
 /// @brief Derived classes implement the spectral operations in modal space
 /// the padded region is set to zero
 /// @tparam Tout output modes type
@@ -33,7 +46,7 @@ using namespace QuICC::Operator;
 /// @tparam Treatment special treatment mask
 template <class Tout, class Tin, class Operation, std::uint16_t Treatment>
 class SpecOp : public BinaryBaseOp<SpecOp<Tout, Tin, Operation, Treatment>,
-                  Tout, Tin, typename Tout::ScalarType::value_type>
+                  Tout, Tin, typename details::scale_type_t<typename Tout::ScalarType>>
 {
 public:
    /// @brief Type of treatment mask

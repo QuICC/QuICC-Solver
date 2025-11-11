@@ -13,8 +13,7 @@
 // Project includes
 //
 #include "QuICC/Transform/Fft/Chebyshev/LinearMap/Reductor/Base/EnergyY2.hpp"
-// #include
-// "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Reductor/EnergyY2viewCpu_t.hpp.inc"
+#include "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Reductor/EnergyY2viewCpu_t.hpp.inc"
 #ifdef QUICC_HAS_CUDA_BACKEND
 // #include
 // "QuICC/Transform/Wrappers/Chebyshev/LinearMap/Reductor/EnergyY2viewGpu_t.hpp.inc"

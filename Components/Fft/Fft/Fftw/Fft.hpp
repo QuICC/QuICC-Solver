@@ -99,6 +99,28 @@ private:
     void* _plan{nullptr};
 };
 
+/// @brief Real to Real batched Fft, DCT Type 1
+/// @tparam AttIn attributes describing the input View
+/// @tparam AttOut attributes describing the output View
+template<class AttIn, class AttOut>
+class FftOp<View::View<double, AttOut>, View::View<double, AttIn>, dct_type1_t> :
+    public Operator::UnaryBaseOp<FftOp<View::View<double, AttOut>, View::View<double, AttIn>, dct_type1_t>,
+        View::View<double, AttOut>, View::View<double, AttIn>>
+{
+public:
+    /// @brief ctor
+    FftOp();
+    /// @brief dtor
+    ~FftOp();
+    /// @brief action implementation
+    /// @param out output View
+    /// @param in input View
+    void applyImpl(View::View<double, AttOut>& out, const View::View<double, AttIn>& in);
+private:
+    /// @brief pointer to store the fft plan
+    void* _plan{nullptr};
+};
+
 /// @brief Real to Real of Complex components batched Fft, DCT Type 1
 /// @tparam AttIn attributes describing the input View
 /// @tparam AttOut attributes describing the output View
@@ -116,6 +138,28 @@ public:
     /// @param out output View
     /// @param in input View
     void applyImpl(View::View<std::complex<double>, AttOut>& out, const View::View<std::complex<double>, AttIn>& in);
+private:
+    /// @brief pointer to store the fft plan
+    void* _plan{nullptr};
+};
+
+/// @brief Real to Real batched Fft, DCT Type 2
+/// @tparam AttIn attributes describing the input View
+/// @tparam AttOut attributes describing the output View
+template<class AttIn, class AttOut>
+class FftOp<View::View<double, AttOut>, View::View<double, AttIn>, dct_type2_t> :
+    public Operator::UnaryBaseOp<FftOp<View::View<double, AttOut>, View::View<double, AttIn>, dct_type2_t>,
+        View::View<double, AttOut>, View::View<double, AttIn>>
+{
+public:
+    /// @brief ctor
+    FftOp();
+    /// @brief dtor
+    ~FftOp();
+    /// @brief action implementation
+    /// @param out output View
+    /// @param in input View
+    void applyImpl(View::View<double, AttOut>& out, const View::View<double, AttIn>& in);
 private:
     /// @brief pointer to store the fft plan
     void* _plan{nullptr};
@@ -143,6 +187,28 @@ private:
     void* _plan{nullptr};
 };
 
+/// @brief Real to Real batched Fft, DCT Type 3
+/// @tparam AttIn attributes describing the input View
+/// @tparam AttOut attributes describing the output View
+template<class AttIn, class AttOut>
+class FftOp<View::View<double, AttOut>, View::View<double, AttIn>, dct_type3_t> :
+    public Operator::UnaryBaseOp<FftOp<View::View<double, AttOut>, View::View<double, AttIn>, dct_type3_t>,
+        View::View<double, AttOut>, View::View<double, AttIn>>
+{
+public:
+    /// @brief ctor
+    FftOp();
+    /// @brief dtor
+    ~FftOp();
+    /// @brief action implementation
+    /// @param out output View
+    /// @param in input View
+    void applyImpl(View::View<double, AttOut>& out, const View::View<double, AttIn>& in);
+private:
+    /// @brief pointer to store the fft plan
+    void* _plan{nullptr};
+};
+
 /// @brief Real to Real of Complex components batched Fft, DCT Type 3
 /// @tparam AttIn attributes describing the input View
 /// @tparam AttOut attributes describing the output View
@@ -160,6 +226,28 @@ public:
     /// @param out output View
     /// @param in input View
     void applyImpl(View::View<std::complex<double>, AttOut>& out, const View::View<std::complex<double>, AttIn>& in);
+private:
+    /// @brief pointer to store the fft plan
+    void* _plan{nullptr};
+};
+
+/// @brief Real to Real batched Fft, DCT Type 4
+/// @tparam AttIn attributes describing the input View
+/// @tparam AttOut attributes describing the output View
+template<class AttIn, class AttOut>
+class FftOp<View::View<double, AttOut>, View::View<double, AttIn>, dct_type4_t> :
+    public Operator::UnaryBaseOp<FftOp<View::View<double, AttOut>, View::View<double, AttIn>, dct_type4_t>,
+        View::View<double, AttOut>, View::View<double, AttIn>>
+{
+public:
+    /// @brief ctor
+    FftOp();
+    /// @brief dtor
+    ~FftOp();
+    /// @brief action implementation
+    /// @param out output View
+    /// @param in input View
+    void applyImpl(View::View<double, AttOut>& out, const View::View<double, AttIn>& in);
 private:
     /// @brief pointer to store the fft plan
     void* _plan{nullptr};
