@@ -12,7 +12,7 @@
 
 // Project includes
 //
-#include "Types/Internal/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 #include "QuICC/PhysicalOperators/SphericalOhmicDissipationAnelastic.hpp"
 
 namespace QuICC {
@@ -30,7 +30,7 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
-      auto Eta       = pF->evaluate(r, 0, 0); 
+      auto Eta       = pF->evaluateLP(r, 0, 0); 
 
       for(int iR = 0; iR < nR; ++iR)
          {
@@ -65,7 +65,7 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
-      auto Eta       = pF->evaluate(r, 0, 0); 
+      auto Eta       = pF->evaluateLP(r, 0, 0); 
 
       for(int iR = 0; iR < nR; ++iR)
          {

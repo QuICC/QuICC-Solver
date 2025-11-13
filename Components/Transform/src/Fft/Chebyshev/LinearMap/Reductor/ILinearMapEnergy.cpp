@@ -71,7 +71,7 @@ void ILinearMapEnergy::transform(Matrix& rOut, const MatrixZ& in, std::shared_pt
 
    auto eGrid = this->mBackend.getEGrid();
    
-   auto rho = pF->evaluate(eGrid,0,0);
+   auto rho = pF->evaluateLP(eGrid,0,0);
 
    auto& tmpIn = this->mBackend.getStorage(StorageKind::in); 
    auto& tmpOut = this->mBackend.getStorage(StorageKind::out); 
@@ -117,7 +117,7 @@ void ILinearMapEnergy::transform(Matrix& rOut, const Matrix& in, std::shared_ptr
 
    auto eGrid = this->mBackend.getEGrid();
    
-   auto rho = pF->evaluate(eGrid,0,0);
+   auto rho = pF->evaluateLP(eGrid,0,0);
 
    auto& tmpIn = this->mBackend.getStorage(StorageKind::in);
    auto& tmpOut = this->mBackend.getStorage(StorageKind::out);

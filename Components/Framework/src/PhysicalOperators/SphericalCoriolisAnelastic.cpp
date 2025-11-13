@@ -10,7 +10,7 @@
 //
 #include "QuICC/PhysicalOperators/SphericalCoriolisAnelastic.hpp"
 #include "DenseSM/IGenericProfile.hpp"
-#include "Types/Internal/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 
 
 namespace QuICC {
@@ -32,7 +32,7 @@ namespace Physical {
       int iTh_;
       int iR_;
 
-      auto rho = pF->evaluate(r, 0, 0); 
+      auto rho = pF->evaluateLP(r, 0, 0); 
 
       if(compId == FieldComponents::Physical::R)
       {
@@ -147,7 +147,7 @@ namespace Physical {
       int iTh_;
       int iR_;
 
-      auto rho = pF->evaluate(r, 0, 0); 
+      auto rho = pF->evaluateLP(r, 0, 0); 
       
 
       if(compId == FieldComponents::Physical::R)
@@ -264,7 +264,7 @@ namespace Physical {
       int iTh_;
       int iR_;
 
-      auto rho = pF->evaluate(r, 0, 0); 
+      auto rho = pF->evaluateLP(r, 0, 0); 
 
       if(compId == FieldComponents::Physical::R)
       {

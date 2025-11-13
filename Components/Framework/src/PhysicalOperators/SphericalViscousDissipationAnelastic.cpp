@@ -13,7 +13,7 @@
 // Project includes
 #include "QuICC/PhysicalOperators/SphericalViscousDissipationAnelastic.hpp"
 #include "DenseSM/IGenericProfile.hpp"
-#include "Types/Internal/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 //
 
 namespace QuICC {
@@ -78,10 +78,10 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
-      auto nu        = pV->evaluate(r, 0, 0); 
-      auto T         = pT->evaluate(r, 0, 0); 
-      auto Rho       = pF->evaluate(r, 0, 0); 
-      auto dLogRho   = pDF->evaluate(r, 0, 0);
+      auto nu        = pV->evaluateLP(r, 0, 0); 
+      auto T         = pT->evaluateLP(r, 0, 0); 
+      auto Rho       = pF->evaluateLP(r, 0, 0); 
+      auto dLogRho   = pDF->evaluateLP(r, 0, 0);
 
       for(int iR = 0; iR < nR; ++iR)
       {
@@ -143,10 +143,10 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
-      auto nu        = pV->evaluate(r, 0, 0); 
-      auto T         = pT->evaluate(r, 0, 0); 
-      auto Rho       = pF->evaluate(r, 0, 0); 
-      auto dLogRho   = pDF->evaluate(r, 0, 0);
+      auto nu        = pV->evaluateLP(r, 0, 0); 
+      auto T         = pT->evaluateLP(r, 0, 0); 
+      auto Rho       = pF->evaluateLP(r, 0, 0); 
+      auto dLogRho   = pDF->evaluateLP(r, 0, 0);
 
       for(int iR = 0; iR < nR; ++iR)
       {
@@ -179,10 +179,10 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
-      auto nu        = pV->evaluate(r, 0, 0); 
-      auto T         = pT->evaluate(r, 0, 0); 
-      auto Rho       = pF->evaluate(r, 0, 0); 
-      auto dLogRho   = pDF->evaluate(r, 0, 0);
+      auto nu        = pV->evaluateLP(r, 0, 0); 
+      auto T         = pT->evaluateLP(r, 0, 0); 
+      auto Rho       = pF->evaluateLP(r, 0, 0); 
+      auto dLogRho   = pDF->evaluateLP(r, 0, 0);
 
       for(int iR = 0; iR < nR; ++iR)
       {
@@ -211,10 +211,10 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
-      auto nu        = pV->evaluate(r, 0, 0); 
-      auto T         = pT->evaluate(r, 0, 0); 
-      auto Rho       = pF->evaluate(r, 0, 0); 
-      auto dLogRho   = pDF->evaluate(r, 0, 0);
+      auto nu        = pV->evaluateLP(r, 0, 0); 
+      auto T         = pT->evaluateLP(r, 0, 0); 
+      auto Rho       = pF->evaluateLP(r, 0, 0); 
+      auto dLogRho   = pDF->evaluateLP(r, 0, 0);
 
       for(int iR = 0; iR < nR; ++iR)
       {

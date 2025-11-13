@@ -51,6 +51,18 @@ public:
    virtual Internal::Array evaluate(const Internal::Array& r, const int l,
       const int m) const = 0;
 
+   /**
+    * @brief Evaluate function on grid, non-multiprecision version
+    */
+   Array evaluateLP(const Array& r, const int l, const int m) const
+   {
+      // Cast input r (single-precision) to Internal::Array (multiprecision)
+      Internal::Array rMP = r.template cast<Internal::MHDFloat>().eval();
+
+      // Evaluate in multiprecision, then cast result back to single-precision Array
+      return this->evaluate(rMP, l, m).template cast<MHDFloat>().eval();
+   }
+
 protected:
 
 

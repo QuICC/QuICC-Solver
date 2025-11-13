@@ -10,7 +10,7 @@
 // Project includes
 //
 #include "QuICC/PhysicalOperators/SphericalSelfAdvectionAnelastic.hpp"
-#include "Types/Internal/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -30,8 +30,8 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
-      auto Rho       = pF->evaluate(r, 0, 0); 
-      auto dLogRho   = pDF->evaluate(r, 0, 0);
+      auto Rho       = pF->evaluateLP(r, 0, 0); 
+      auto dLogRho   = pDF->evaluateLP(r, 0, 0);
 
       if(compId == FieldComponents::Physical::R)
       {
@@ -190,8 +190,8 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
-      auto Rho       = pF->evaluate(r, 0, 0); 
-      auto dLogRho   = pDF->evaluate(r, 0, 0);
+      auto Rho       = pF->evaluateLP(r, 0, 0); 
+      auto dLogRho   = pDF->evaluateLP(r, 0, 0);
 
       if(compId == FieldComponents::Physical::R)
       {
@@ -351,8 +351,8 @@ namespace Physical {
       int nR = res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
       int iR_;
 
-      auto Rho       = pF->evaluate(r, 0, 0); 
-      auto dLogRho   = pDF->evaluate(r, 0, 0); 
+      auto Rho       = pF->evaluateLP(r, 0, 0); 
+      auto dLogRho   = pDF->evaluateLP(r, 0, 0); 
 
       if(compId == FieldComponents::Physical::R)
       {

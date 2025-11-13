@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "Types/Internal/Typedefs.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -60,7 +60,7 @@ static MHDFloat ratioS(int p, int k, int n0, int n, int alpha);
 /**
  * @brief Integrate r^p Tn over r
  */
-void integrateRpTn(Internal::Matrix& iop, const int p,
+void integrateRpTn(Matrix& iop, const int p,
    const int size, const MHDFloat ro, const MHDFloat ri);
 
 } // namespace Operators

@@ -12,7 +12,7 @@
 // Project includes
 //
 #include "QuICC/Polynomial/Chebyshev/Operators.hpp"
-#include "Types/Internal/Math.hpp"
+#include "Types/Math.hpp"
 
 namespace QuICC {
 
@@ -48,7 +48,7 @@ namespace Operators {
    // Integral of Tn Tj over -1<=x<=1
    MHDFloat IntTnTj(int n, int j)
    {
-      return 0.5*(IntT(n+j)+IntT(Internal::Math::abs(n-j)));
+      return 0.5*(IntT(n+j)+IntT(std::abs(n-j)));
    }
 
    // ratio  IntTnTj(int n, int j-2) / IntTnTj(int n, int j)
@@ -96,15 +96,15 @@ namespace Operators {
    //
    // combining 1) 2) 3) we can get to a closed formula for iop. It requires some index reordering to get to the final formula.
    //
-   void integrateRpTn(Internal::Matrix& iop, const int p, const int nN, const MHDFloat ro, const MHDFloat ri)
+   void integrateRpTn(Matrix& iop, const int p, const int nN, const MHDFloat ro, const MHDFloat ri)
    {
 
       // Chebyshev grid: x = (r-a)/b
       auto a = 0.5*(ro-ri);
       auto b = 0.5*(ro+ri);
 
-      Internal::Array Avec(p+1,1);
-      Internal::Matrix Bmat(p+1, nN);
+      Array Avec(p+1,1);
+      Matrix Bmat(p+1, nN);
 
       // Avec entries
       Avec(0,0) = std::pow(a, 1 + p);

@@ -20,7 +20,7 @@ namespace LinearMap {
 
 namespace Boundary {
 
-   StressFreeTorAnelastic::StressFreeTorAnelastic(const Scalar_t lower, const Scalar_t upper, const Position pos, const Internal::MHDFloat Fb)
+   StressFreeTorAnelastic::StressFreeTorAnelastic(const Scalar_t lower, const Scalar_t upper, const Position pos, const MHDFloat Fb)
       : ICondition(lower, upper, pos), mFb(Fb)
    {
    }

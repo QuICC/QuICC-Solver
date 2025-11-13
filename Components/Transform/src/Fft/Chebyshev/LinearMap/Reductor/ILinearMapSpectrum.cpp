@@ -47,7 +47,7 @@ namespace Reductor {
 
       auto eGrid = this->mBackend.getEGrid();
       
-      auto rho = pF->evaluate(eGrid,0,0);
+      auto rho = pF->evaluateLP(eGrid,0,0);
 
       auto& tmpIn = this->mBackend.getStorage(StorageKind::in);
       auto& tmpOut = this->mBackend.getStorage(StorageKind::out);

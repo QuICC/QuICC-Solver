@@ -67,7 +67,7 @@ namespace Variable {
          auto ri = this->mPhysical.find(NonDimensional::Lower1d::id())->second->value();
          auto a = (ro - ri)/2.0;
 
-         Internal::Array rbArr(2);
+         Array rbArr(2);
          rbArr(0) = ro;
          rbArr(1) = ri;
 
@@ -77,7 +77,7 @@ namespace Variable {
          // Internal heating
          if(flag == 0)
          {
-            Internal::Array bgArray = -(this->mpRhoTempKappa->evaluate(rbArr,0,0).array()) * (this->mpD1Sc->evaluate(rbArr,0,0).array());
+            Array bgArray = -(this->mpRhoTempKappa->evaluateLP(rbArr,0,0).array()) * (this->mpD1Sc->evaluateLP(rbArr,0,0).array());
             this->mBackground(0) = bgArray(0) * (4.0*Math::PI)*ro*ro;
             this->mBackground(1) = bgArray(1) * (4.0*Math::PI)*ri*ri;    
          }
@@ -98,8 +98,8 @@ namespace Variable {
          this->mBoundary.resize(nN, 2);
          for(int i = 0; i < this->mBoundary.rows(); i++)
          {
-            this->mBoundary(i,0) = (2.0/a)*i*i/std::sqrt(4.0*Math::PI)   * (4.0*Math::PI)*ro*ro*(-this->mpRhoTempKappa->evaluate(rbArr,0,0).array()(0));
-            this->mBoundary(i,1) = std::pow(-1,i+1)*(2.0/a)*i*i/std::sqrt(4.0*Math::PI) * (4.0*Math::PI)*ri*ri*(-this->mpRhoTempKappa->evaluate(rbArr,0,0).array()(1)); 
+            this->mBoundary(i,0) = (2.0/a)*i*i/std::sqrt(4.0*Math::PI)   * (4.0*Math::PI)*ro*ro*(-this->mpRhoTempKappa->evaluateLP(rbArr,0,0).array()(0));
+            this->mBoundary(i,1) = std::pow(-1,i+1)*(2.0/a)*i*i/std::sqrt(4.0*Math::PI) * (4.0*Math::PI)*ri*ri*(-this->mpRhoTempKappa->evaluateLP(rbArr,0,0).array()(1)); 
          }
       }
       else

@@ -108,9 +108,10 @@ namespace Variable {
          
          int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
          
-         Internal::Matrix iop;
+         Matrix iop;
          Polynomial::Chebyshev::Operators::integrateRpTn(iop, 3, nN, ro, ri); 
-         this->mOp = iop.cast<MHDFloat>();
+         //this->mOp = iop.cast<MHDFloat>();
+         this->mOp = iop;
          assert(this->mOp.rows() == nN && this->mOp.cols() == 1);
       }
 

@@ -11,7 +11,7 @@
 
 // Project includes
 //
-#include "Types/Internal/BasicTypes.hpp"
+#include "Types/BasicTypes.hpp"
 #include "QuICC/SparseSM/Chebyshev/LinearMap/Boundary/ICondition.hpp"
 
 namespace QuICC {
@@ -38,7 +38,7 @@ namespace Boundary {
           * @param pos   Position of the boundary
           * @param Fb    Boundary value of the radial field
           */
-         StressFreeTorAnelastic(const Scalar_t lower, const Scalar_t upper, const Position pos, const Internal::MHDFloat Fb);
+         StressFreeTorAnelastic(const Scalar_t lower, const Scalar_t upper, const Position pos, const MHDFloat Fb);
 
          /**
           * @brief Destructor
@@ -56,7 +56,7 @@ namespace Boundary {
          /**
           * @brief Radial field boundary value
           */
-         Internal::MHDFloat mFb;
+         MHDFloat mFb;
    };
 
 } // Boundary

@@ -90,11 +90,12 @@ namespace Shell {
       {
          int nN = this->res().sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
 
-         Internal::Matrix iop;
+         Matrix iop;
          Polynomial::Chebyshev::Operators::integrateRpTn(iop, 3, nN, this->mRo, this->mRi);
          iop.col(0).bottomRows(iop.rows()-1) /= -iop(0,0);
-         iop(0,0) = MHD_MP(0);
-         this->mOp = iop.cast<MHDFloat>();
+         iop(0,0) = 0.0;
+         //this->mOp = iop.cast<MHDFloat>();
+         this->mOp = iop;
          assert(this->mOp.rows() == nN && this->mOp.cols() == 1);
       }
    }
