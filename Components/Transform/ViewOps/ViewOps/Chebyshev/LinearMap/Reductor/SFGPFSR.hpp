@@ -7,6 +7,7 @@
 // External includes
 //
 #include <memory>
+#include <cstdint>
 
 // Project includes
 //
@@ -37,11 +38,13 @@ namespace Reductor {
 /// @tparam FftOutBackend  type of FFT operator output
 /// @tparam SpecOutBackend type of spectral operator on output
 /// @tparam ReductorBackend type of reductor operator
+/// @tparam SizeMult multiplier for size
+/// @tparam SizeAdd additional modes for size
 template <class Tout, class Tpower, class Tin, class SpecInBackend, class FftInBackend,
-   class GridBackend, class PointBackend, class Functor, class FftOutBackend, class SpecOutBackend, class ReductorBackend>
+   class GridBackend, class PointBackend, class Functor, class FftOutBackend, class SpecOutBackend, class ReductorBackend, std::uint32_t SizeMult, std::uint32_t SizeAdd>
 class SFGPFSROp
     : public Operator::UnaryBaseOp<
-         SFGPFSROp<Tout, Tpower, Tin, SpecInBackend, FftInBackend, GridBackend, PointBackend, Functor, FftOutBackend, SpecOutBackend, ReductorBackend>, Tout, Tin>
+         SFGPFSROp<Tout, Tpower, Tin, SpecInBackend, FftInBackend, GridBackend, PointBackend, Functor, FftOutBackend, SpecOutBackend, ReductorBackend, SizeMult, SizeAdd>, Tout, Tin>
 {
 public:
    /// @brief type of scale parameter, i.e. float 32/64 bits
@@ -79,7 +82,7 @@ private:
    std::unique_ptr<Operator::UnaryOp<Tout, Tpower>> mReductor;
    /// @brief give access to base class
    friend Operator::UnaryBaseOp<
-      SFGPFSROp<Tout, Tpower, Tin, SpecInBackend, FftInBackend, GridBackend, PointBackend, Functor, FftOutBackend, SpecOutBackend, ReductorBackend>, Tout, Tin>;
+      SFGPFSROp<Tout, Tpower, Tin, SpecInBackend, FftInBackend, GridBackend, PointBackend, Functor, FftOutBackend, SpecOutBackend, ReductorBackend, SizeMult, SizeAdd>, Tout, Tin>;
    /// @brief memory resource
    /// needs shared ptr for memory pools
    /// note, this must call the dtor last
@@ -96,8 +99,8 @@ private:
 };
 
 template <class Tout, class Tpower, class Tin, class SpecInBackend, class FftInBackend,
-   class GridBackend, class PointBackend, class Functor, class FftOutBackend, class SpecOutBackend, class ReductorBackend>
-SFGPFSROp<Tout, Tpower, Tin, SpecInBackend, FftInBackend, GridBackend, PointBackend, Functor, FftOutBackend, SpecOutBackend, ReductorBackend>::SFGPFSROp(
+   class GridBackend, class PointBackend, class Functor, class FftOutBackend, class SpecOutBackend, class ReductorBackend, std::uint32_t SizeMult, std::uint32_t SizeAdd>
+SFGPFSROp<Tout, Tpower, Tin, SpecInBackend, FftInBackend, GridBackend, PointBackend, Functor, FftOutBackend, SpecOutBackend, ReductorBackend, SizeMult, SizeAdd>::SFGPFSROp(
    std::shared_ptr<Memory::memory_resource> mem, const double lower,
    const double upper, ScaleType scale) :
     mSpecIn(std::make_unique<SpecInBackend>(lower, upper)),
@@ -111,8 +114,8 @@ SFGPFSROp<Tout, Tpower, Tin, SpecInBackend, FftInBackend, GridBackend, PointBack
 {}
 
 template <class Tout, class Tpower, class Tin, class SpecInBackend, class FftInBackend,
-   class GridBackend, class PointBackend, class Functor, class FftOutBackend, class SpecOutBackend, class ReductorBackend>
-void SFGPFSROp<Tout, Tpower, Tin, SpecInBackend, FftInBackend, GridBackend, PointBackend, Functor, FftOutBackend, SpecOutBackend, ReductorBackend>::applyImpl(
+   class GridBackend, class PointBackend, class Functor, class FftOutBackend, class SpecOutBackend, class ReductorBackend, std::uint32_t SizeMult, std::uint32_t SizeAdd>
+void SFGPFSROp<Tout, Tpower, Tin, SpecInBackend, FftInBackend, GridBackend, PointBackend, Functor, FftOutBackend, SpecOutBackend, ReductorBackend, SizeMult, SizeAdd>::applyImpl(
    Tout& out, const Tin& in)
 {
    Profiler::RegionFixture<4> fix(
@@ -130,91 +133,55 @@ void SFGPFSROp<Tout, Tpower, Tin, SpecInBackend, FftInBackend, GridBackend, Poin
       //        }
       //        else
       {
+         auto sze = SizeMult*in.dims()[0] + SizeAdd;
+         auto memsze = sze*in.pointers()[1][in.pointers()[1].size()-1];
+
          _tmpData = std::move(Memory::MemBlock<typename Tin::ScalarType>(
-            in.size(), _mem.get()));
-         _tmpView = Tin(_tmpData.data(), _tmpData.size(), in.dims(),
-            in.pointers(), in.indices(), in.lds());
+            memsze, _mem.get()));
+         std::array<typename Tin::IndexType, 3> tmpDims;
+         std::copy(in.dims(), in.dims() + 3, tmpDims.data());
+         tmpDims[0] = sze;
+         _tmpView = Tin(_tmpData.data(), _tmpData.size(), tmpDims.data(),
+            in.pointers(), in.indices(), tmpDims[0]);
       }
    }
 
    // setup power storage
    if (_powerView.data() == nullptr)
    {
-      _powerData = std::move(Memory::MemBlock<typename Tpower::ScalarType>(
-               in.size(), _mem.get()));
-      _powerView = Tpower(_powerData.data(), _powerData.size(), in.dims(),
-            in.pointers(), in.indices(), in.lds());
-   }
+      auto sze = SizeMult*in.dims()[0] + SizeAdd;
+      auto memsze = sze*in.pointers()[1][in.pointers()[1].size()-1];
 
-   std::cerr << "IN:" << std::endl;
-   for(int i = 0; i < in.size(); i++)
-   {
-      std::cerr << in.data()[i] << std::endl;
+      _powerData = std::move(Memory::MemBlock<typename Tpower::ScalarType>(
+               memsze, _mem.get()));
+      std::array<typename Tin::IndexType, 3> powerDims;
+      std::copy(in.dims(), in.dims() + 3, powerDims.data());
+      powerDims[0] = sze;
+      _powerView = Tpower(_powerData.data(), _powerData.size(), powerDims.data(),
+            in.pointers(), in.indices(), powerDims[0]);
    }
 
    // spectral operation on input
    mSpecIn->apply(_tmpView, in, 1.0);
 
-   std::cerr << "SPECIN OUT:" << std::endl;
-   for(int i = 0; i < _tmpView.size(); i++)
-   {
-      std::cerr << _tmpView.data()[i] << std::endl;
-   }
-
    // FFT
    mFftIn->apply(_tmpView, _tmpView);
-
-   std::cerr << "FFT BWD OUT:" << std::endl;
-   for(int i = 0; i < _tmpView.size(); i++)
-   {
-      std::cerr << _tmpView.data()[i] << std::endl;
-   }
 
    // grid operation
    mGrid->apply(_tmpView, _tmpView, 1);
 
-   std::cerr << "GRID OUT:" << std::endl;
-   for(int i = 0; i < _tmpView.size(); i++)
-   {
-      std::cerr << _tmpView.data()[i] << std::endl;
-   }
-
    // pointwise operation
    mPoint->apply(_powerView, _tmpView);
 
-   std::cerr << "POINT OUT:" << std::endl;
-   for(int i = 0; i < _powerView.size(); i++)
-   {
-      std::cerr << _powerView.data()[i] << std::endl;
-   }
-
    // FFT
    mFftOut->apply(_powerView, _powerView);
-
-   std::cerr << "FFT OUT:" << std::endl;
-   for(int i = 0; i < _powerView.size(); i++)
-   {
-      std::cerr << _powerView.data()[i] << std::endl;
-   }
 
    // spectral operation on input
    ScaleType fftScaling = 1.0 / static_cast<ScaleType>(2 * _powerView.dims()[0]);
    mSpecOut->apply(_powerView, _powerView, fftScaling);
 
-   std::cerr << "SPECOUT OUT:" << std::endl;
-   for(int i = 0; i < _powerView.size(); i++)
-   {
-      std::cerr << _powerView.data()[i] << std::endl;
-   }
-
    // reduction operation
    mReductor->apply(out, _powerView);
-
-   std::cerr << "REDUCTION OUT:" << std::endl;
-   for(int i = 0; i < out.size(); i++)
-   {
-      std::cerr << out.data()[i] << std::endl;
-   }
 }
 
 } // namespace Reductor

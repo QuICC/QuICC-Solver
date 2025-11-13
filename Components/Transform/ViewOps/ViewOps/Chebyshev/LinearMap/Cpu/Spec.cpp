@@ -1,5 +1,4 @@
 #include <complex>
-#include <iostream>
 #include <memory>
 
 #include "Spec.hpp"
@@ -130,13 +129,15 @@ void SpecOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out,
          {
             if constexpr(std::is_same_v<Operation, spec_int>)
             {
-               ScaleType cc = c * (this->mUpper - this->mLower);
+               ScaleType cc = c * 2.0 * (this->mUpper - this->mLower);
                for (; n < nDealias; ++n)
                {
-                  out.data()[nko + n] = in.data()[nki + n] * cc /static_cast<ScaleType>(1 - n*n);
+                  ScaleType dn = static_cast<ScaleType>(n);
+                  out.data()[nko + n] = in.data()[nki + n] * cc /(1 - dn*dn);
                   n++;
                   out.data()[nko + n] *= 0;
                }
+               out.data()[nko] *= 0.5;
             }
             else
             {
@@ -148,8 +149,14 @@ void SpecOp<Tout, Tin, Operation, Treatment>::applyImpl(Tout& out,
          }
          else
          {
-            assert(Nin >= nDealias + 1);
-            n = nDealias + 1;
+            if constexpr (Treatment & ndealias_out)
+            {
+               n = nDealias + 1;
+            }
+            else if constexpr (Treatment & ndealias_in)
+            {
+               n = in.dims()[0];
+            }
             typename Tout::ScalarType* inPtr = in.data() + nki;
             typename Tout::ScalarType* outPtr = out.data() + nko;
             for (std::size_t j = 1; j <= t; j++)
@@ -369,6 +376,7 @@ template class SpecOp<mods_t, mods_t, spec_i4y3, ndealias_out | zero_l0>;
 template class SpecOp<mods_t, mods_t, spec_i4d1, ndealias_out>;
 template class SpecOp<mods_t, mods_t, spec_i4d1, ndealias_out | mean_op>;
 template class SpecOp<mods_t, mods_t, spec_id, ndealias_in | zero_pad>;
+template class SpecOp<mods_t, mods_t, spec_y1, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d1, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d2, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d3, ndealias_in | zero_pad>;

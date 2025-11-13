@@ -658,7 +658,7 @@ struct OpsTypeMap<Tout, Tin, Energy_t, bwd_t, BACKEND>
    using backendSpecOut_t = Spec_t<BACKEND, powerView_t, spec_int, none_t>;
    using backendReductor_t = Red_t<BACKEND, Tout, powerView_t, 0>;
    using type =
-      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t>;
+      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t, 2, 0>;
    ;
 };
 
@@ -672,7 +672,7 @@ struct OpsTypeMap<Tout, Tin, EnergyD1_t, bwd_t, BACKEND>
 {
    using powerView_t = View::View<double,  View::DCCSC3D>;
 
-   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_id, ndealias_in | zero_pad>;
+   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_d1, ndealias_in | zero_pad>;
    using backendFftIn_t =
       details::Fft_t<BACKEND, Tin, Tin, QuICC::Fft::dct_type3_t>;
    using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
@@ -683,7 +683,7 @@ struct OpsTypeMap<Tout, Tin, EnergyD1_t, bwd_t, BACKEND>
    using backendSpecOut_t = Spec_t<BACKEND, powerView_t, spec_int, none_t>;
    using backendReductor_t = Red_t<BACKEND, Tout, powerView_t, 0>;
    using type =
-      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t>;
+      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t, 2, 0>;
    ;
 };
 
@@ -697,7 +697,7 @@ struct OpsTypeMap<Tout, Tin, EnergyD1Y1_t, bwd_t, BACKEND>
 {
    using powerView_t = View::View<double,  View::DCCSC3D>;
 
-   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_id, ndealias_in | zero_pad>;
+   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_d1y1, ndealias_in | zero_pad>;
    using backendFftIn_t =
       details::Fft_t<BACKEND, Tin, Tin, QuICC::Fft::dct_type3_t>;
    using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
@@ -708,7 +708,7 @@ struct OpsTypeMap<Tout, Tin, EnergyD1Y1_t, bwd_t, BACKEND>
    using backendSpecOut_t = Spec_t<BACKEND, powerView_t, spec_int, none_t>;
    using backendReductor_t = Red_t<BACKEND, Tout, powerView_t, 0>;
    using type =
-      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t>;
+      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t, 2, 0>;
    ;
 };
 
@@ -722,7 +722,7 @@ struct OpsTypeMap<Tout, Tin, EnergyY2_t, bwd_t, BACKEND>
 {
    using powerView_t = View::View<double,  View::DCCSC3D>;
 
-   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_id, ndealias_in | zero_pad>;
+   using backendSpecIn_t = Spec_t<BACKEND, Tin, spec_y1, ndealias_in | zero_pad>;
    using backendFftIn_t =
       details::Fft_t<BACKEND, Tin, Tin, QuICC::Fft::dct_type3_t>;
    using backendGrid_t = Grid_t<BACKEND, Tin, grid_id, none_t>;
@@ -733,7 +733,7 @@ struct OpsTypeMap<Tout, Tin, EnergyY2_t, bwd_t, BACKEND>
    using backendSpecOut_t = Spec_t<BACKEND, powerView_t, spec_int, none_t>;
    using backendReductor_t = Red_t<BACKEND, Tout, powerView_t, 0>;
    using type =
-      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t>;
+      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t, 2, 2>;
    ;
 };
 
@@ -758,7 +758,7 @@ struct OpsTypeMap<Tout, Tin, EnergySLaplR2_t, bwd_t, BACKEND>
    using backendReductor_t = Red_t<BACKEND, Tout, powerView_t, 0>;
    using backendSpecOut_t = Spec_t<BACKEND, powerView_t, spec_int, none_t>;
    using type =
-      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t>;
+      Reductor::SFGPFSROp<Tout, powerView_t, Tin, backendSpecIn_t, backendFftIn_t, backendGrid_t, backendPoint_t, functor_t, backendFftOut_t, backendSpecOut_t, backendReductor_t, 2, 0>;
    ;
 };
 
