@@ -33,7 +33,7 @@ RpFD1::RpFD1(const int nNr, const int nNc, const int p, const int lOut,
     ITripleHarmonicOperator(nNr, nNc, p, lOut, mOut, lF, mF, lIn, mIn, pF, lower,
        upper)
 {
-   if(this->mP <1)
+   if(this->mP<1)
    {
       throw std::logic_error("Radial prefactor needs to be r^p, with p>0");
    }
@@ -44,7 +44,7 @@ void RpFD1::buildOpImpl(Internal::Matrix& mat, const int rows,
 {
    namespace cheb = Transform::Fft::Chebyshev::LinearMap;
 
-    int rN = 2 * (std::max(this->rows(), this->cols()) + this->mpF->nN() + 4 + 2); // same as RpDivR1FC
+    int rN = 2*(std::max(this->rows(),this->cols())+this->mpF->nN()+4+2); // same as RpDivR1FC
 
 
    // Compute grid
