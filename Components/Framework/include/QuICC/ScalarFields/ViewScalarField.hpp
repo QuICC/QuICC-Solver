@@ -1,11 +1,10 @@
 /**
- * @file FlatScalarField.hpp
- * @brief Base for a  scalar field with flat data layout
+ * @file ViewScalarField.hpp
+ * @brief Base for a  scalar field with View data layout
  */
 
-#ifndef QUICC_DATATYPES_FLATSCALARFIELD_HPP
-#define QUICC_DATATYPES_FLATSCALARFIELD_HPP
-
+#ifndef QUICC_DATATYPES_VIEWSCALARFIELD_HPP
+#define QUICC_DATATYPES_VIEWSCALARFIELD_HPP
 
 // System includes
 //
@@ -24,9 +23,9 @@ namespace QuICC {
 namespace Datatypes {
 
    /**
-    * @brief Base for a  scalar field with flat data layout
+    * @brief Base for a  scalar field with View data layout
     */
-   template <typename TData> class FlatScalarField
+   template <typename TData> class ViewScalarField
    {
       public:
          /// Typedef for the coefficient type
@@ -50,17 +49,17 @@ namespace Datatypes {
          /**
           * @brief Constructor
           */
-         explicit FlatScalarField(std::shared_ptr<ScalarFieldSetup> spSetup);
+         explicit ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup);
 
          /**
           * @brief Copy constructor
           */
-         FlatScalarField(const FlatScalarField<TData>& other);
+         ViewScalarField(const ViewScalarField<TData>& other);
 
          /**
           * @brief Destructor
           */
-         ~FlatScalarField() = default;
+         ~ViewScalarField() = default;
 
          /**
           * @brief Get a point value of the field
@@ -296,14 +295,14 @@ namespace Datatypes {
           *
           * @param i Index of the component
           */
-         template <typename TType> const FlatScalarField<TData>& comp(const TType id) const;
+         template <typename TType> const ViewScalarField<TData>& comp(const TType id) const;
 
          /**
           * @brief Set field component
           *
           * @param i Index of the component
           */
-         template <typename TType> FlatScalarField<TData>& rComp(const TType id);
+         template <typename TType> ViewScalarField<TData>& rComp(const TType id);
 
       protected:
 
@@ -319,12 +318,12 @@ namespace Datatypes {
          std::shared_ptr<StorageType>  mspField;
    };
 
-   template <typename TData> inline typename FlatScalarField<TData>::PointType FlatScalarField<TData>::point(const int i, const int j, const int k) const
+   template <typename TData> inline typename ViewScalarField<TData>::PointType ViewScalarField<TData>::point(const int i, const int j, const int k) const
    {
       return (*this->mspField)(i,this->mspSetup->colIdx(j,k));
    }
 
-   template <typename TData> inline typename FlatScalarField<TData>::PointType FlatScalarField<TData>::point(const std::vector<int>& coord) const
+   template <typename TData> inline typename ViewScalarField<TData>::PointType ViewScalarField<TData>::point(const std::vector<int>& coord) const
    {
       switch(coord.size())
       {
@@ -339,17 +338,17 @@ namespace Datatypes {
       }
    }
 
-   template <typename TData> inline typename FlatScalarField<TData>::ProfileType FlatScalarField<TData>::profile(const int j, const int k) const
+   template <typename TData> inline typename ViewScalarField<TData>::ProfileType ViewScalarField<TData>::profile(const int j, const int k) const
    {
       return this->mspField->col(this->mspSetup->colIdx(j,k));
    }
 
-   template <typename TData> inline typename FlatScalarField<TData>::SliceType FlatScalarField<TData>::slice(const int k) const
+   template <typename TData> inline typename ViewScalarField<TData>::SliceType ViewScalarField<TData>::slice(const int k) const
    {
       return this->mspField->block(0,this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k));
    }
 
-   template <typename TData> inline const TData* FlatScalarField<TData>::data(const int k) const
+   template <typename TData> inline const TData* ViewScalarField<TData>::data(const int k) const
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -358,7 +357,7 @@ namespace Datatypes {
       return this->mspField->data() + this->mspSetup->dataRows()*this->mspSetup->blockIdx(k);
    }
 
-   template <typename TData> inline const typename FlatScalarField<TData>::StorageType& FlatScalarField<TData>::data() const
+   template <typename TData> inline const typename ViewScalarField<TData>::StorageType& ViewScalarField<TData>::data() const
    {
       // Assert for positive sizes
       assert(this->mspField);
@@ -366,7 +365,7 @@ namespace Datatypes {
       return *this->mspField;
    }
 
-   template <typename TData> inline typename FlatScalarField<TData>::StorageType& FlatScalarField<TData>::rData()
+   template <typename TData> inline typename ViewScalarField<TData>::StorageType& ViewScalarField<TData>::rData()
    {
       // Assert for positive sizes
       assert(this->mspField);
@@ -374,7 +373,7 @@ namespace Datatypes {
       return *this->mspField;
    }
 
-   template <typename TData> inline TData* FlatScalarField<TData>::rData(const int k)
+   template <typename TData> inline TData* ViewScalarField<TData>::rData(const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -383,7 +382,7 @@ namespace Datatypes {
       return this->mspField->data() + this->mspSetup->dataRows()*this->mspSetup->blockIdx(k);
    }
 
-   template <typename TData> void FlatScalarField<TData>::setPoint(const FlatScalarField<TData>::PointType pt, const int i, const int j, const int k)
+   template <typename TData> void ViewScalarField<TData>::setPoint(const ViewScalarField<TData>::PointType pt, const int i, const int j, const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -392,7 +391,7 @@ namespace Datatypes {
       (*this->mspField)(i,this->mspSetup->colIdx(j,k)) = pt;
    }
 
-   template <typename TData> void FlatScalarField<TData>::setPoint(const MHDVariant pt, const int i, const int j, const int k)
+   template <typename TData> void ViewScalarField<TData>::setPoint(const MHDVariant pt, const int i, const int j, const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -401,7 +400,7 @@ namespace Datatypes {
       (*this->mspField)(i,this->mspSetup->colIdx(j,k)) = std::get<TData>(pt);
    }
 
-   template <typename TData> inline typename FlatScalarField<TData>::PointType& FlatScalarField<TData>::rPoint(const int i, const int j, const int k)
+   template <typename TData> inline typename ViewScalarField<TData>::PointType& ViewScalarField<TData>::rPoint(const int i, const int j, const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -410,7 +409,7 @@ namespace Datatypes {
       return (*this->mspField)(i,this->mspSetup->colIdx(j,k));
    }
 
-   template <typename TData> inline typename FlatScalarField<TData>::PointType& FlatScalarField<TData>::rPoint(const std::vector<int>& coord)
+   template <typename TData> inline typename ViewScalarField<TData>::PointType& ViewScalarField<TData>::rPoint(const std::vector<int>& coord)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -429,7 +428,7 @@ namespace Datatypes {
       }
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::setProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::setProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -438,7 +437,7 @@ namespace Datatypes {
       this->mspField->col(this->mspSetup->colIdx(j,k)) = pf;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::addProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::addProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -447,7 +446,7 @@ namespace Datatypes {
       this->mspField->col(this->mspSetup->colIdx(j,k)) += pf;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::subProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::subProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -456,7 +455,7 @@ namespace Datatypes {
       this->mspField->col(this->mspSetup->colIdx(j,k)) -= pf;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::setSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::setSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -465,7 +464,7 @@ namespace Datatypes {
       this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) = sl;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -478,7 +477,7 @@ namespace Datatypes {
       this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) *= mat;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -487,7 +486,7 @@ namespace Datatypes {
       this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) += sl;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::subSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::subSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -496,7 +495,7 @@ namespace Datatypes {
       this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) -= sl;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::setSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::setSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -508,7 +507,7 @@ namespace Datatypes {
       this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) = sl;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k, const int rows)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k, const int rows)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -524,7 +523,7 @@ namespace Datatypes {
       this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) *= mat;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -536,7 +535,7 @@ namespace Datatypes {
       this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) += sl;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::subSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::subSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -548,7 +547,7 @@ namespace Datatypes {
       this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) -= sl;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::setData(const Eigen::MatrixBase<Derived>& field)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::setData(const Eigen::MatrixBase<Derived>& field)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() == field.rows());
@@ -558,7 +557,7 @@ namespace Datatypes {
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) = field;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::addData(const Eigen::MatrixBase<Derived>& field)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::addData(const Eigen::MatrixBase<Derived>& field)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() == field.rows());
@@ -567,7 +566,7 @@ namespace Datatypes {
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) += field;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::subData(const Eigen::MatrixBase<Derived>& field)
+   template <typename TData> template<typename Derived> void ViewScalarField<TData>::subData(const Eigen::MatrixBase<Derived>& field)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() == field.rows());
@@ -576,23 +575,23 @@ namespace Datatypes {
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) -= field;
    }
 
-   template <typename TData> FlatScalarField<TData>::FlatScalarField(std::shared_ptr<ScalarFieldSetup> spSetup)
+   template <typename TData> ViewScalarField<TData>::ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup)
       : mspSetup(spSetup), mspField(new StorageType(spSetup->dataRows(), spSetup->dataCols()))
    {
    }
 
-   template <typename TData> FlatScalarField<TData>::FlatScalarField(const FlatScalarField<TData>& other)
+   template <typename TData> ViewScalarField<TData>::ViewScalarField(const ViewScalarField<TData>& other)
       : mspSetup(other.mspSetup), mspField(new StorageType(other.mspField->rows(),other.mspField->cols()))
    {
       *this->mspField = *(other.mspField);
    }
 
-   template <typename TData> void FlatScalarField<TData>::setZeros()
+   template <typename TData> void ViewScalarField<TData>::setZeros()
    {
       this->mspField->setConstant(0.0);
    }
 
-   template <typename TData> void FlatScalarField<TData>::rescale(const MHDFloat scale)
+   template <typename TData> void ViewScalarField<TData>::rescale(const MHDFloat scale)
    {
       // Assert for positive sizes
       assert(this->mspField->rows() > 0);
@@ -601,26 +600,26 @@ namespace Datatypes {
       *this->mspField *= scale;
    }
 
-   template <typename TData> int FlatScalarField<TData>::nSlice() const
+   template <typename TData> int ViewScalarField<TData>::nSlice() const
    {
       return this->mspSetup->nBlock();
    }
 
-   template <typename TData> template <typename TType> inline const FlatScalarField<TData>& FlatScalarField<TData>::comp(const TType id) const
+   template <typename TData> template <typename TType> inline const ViewScalarField<TData>& ViewScalarField<TData>::comp(const TType id) const
    {
       assert(TType::SCALAR == id);
 
       return *this;
    }
 
-   template <typename TData> template <typename TType> inline FlatScalarField<TData>& FlatScalarField<TData>::rComp(const TType id)
+   template <typename TData> template <typename TType> inline ViewScalarField<TData>& ViewScalarField<TData>::rComp(const TType id)
    {
       assert(TType::SCALAR == id);
 
       return *this;
    }
 
-   template <typename TData> MHDFloat FlatScalarField<TData>::requiredStorage() const
+   template <typename TData> MHDFloat ViewScalarField<TData>::requiredStorage() const
    {
       MHDFloat mem = 0.0;
 
@@ -634,4 +633,4 @@ namespace Datatypes {
 }
 }
 
-#endif // QUICC_DATATYPES_FLATSCALARFIELD_HPP
+#endif // QUICC_DATATYPES_VIEWSCALARFIELD_HPP
