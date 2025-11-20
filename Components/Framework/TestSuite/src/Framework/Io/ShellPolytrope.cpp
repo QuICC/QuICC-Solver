@@ -1,5 +1,5 @@
 /**
- * @file Polytrope.cpp
+ * @file ShellPolytrope.cpp
  * @brief Source of the implementation of the polytropic density field
  */
 
@@ -8,7 +8,7 @@
 
 // Project includes
 //
-#include "TestSuite/DenseSM/Chebyshev/LinearMap/Polytrope.hpp"
+#include "QuICC/TestSuite/Framework/Io/ShellPolytrope.hpp"
 #include "Types/Internal/Literals.hpp"
 #include "Types/Internal/Math.hpp"
 
@@ -16,23 +16,21 @@ namespace QuICC {
 
 namespace TestSuite {
 
-namespace DenseSM {
+namespace Framework {
 
-namespace Chebyshev {
+namespace Io {
 
-namespace LinearMap {
-
-Polytrope::Polytrope(const MHDFloat rratio, const MHDFloat Nrho,
+ShellPolytrope::ShellPolytrope(const MHDFloat rratio, const MHDFloat Nrho,
    const MHDFloat npoly) :
     mRratio(rratio), mNrho(Nrho), mNpoly(npoly)
 {}
 
-int Polytrope::nN() const
+int ShellPolytrope::nN() const
 {
    return 2;
 }
 
-Internal::Array Polytrope::evaluate(const Internal::Array& r, const int l,
+Internal::Array ShellPolytrope::evaluate(const Internal::Array& r, const int l,
    const int m) const
 {
    using namespace Internal::Literals;
@@ -64,15 +62,14 @@ Internal::Array Polytrope::evaluate(const Internal::Array& r, const int l,
    return val;
 }
 
-std::vector<int> Polytrope::ls() const
+std::vector<int> ShellPolytrope::ls() const
 {
    std::vector<int> l = {1};
 
    return l;
 }
 
-} // namespace LinearMap
-} // namespace Chebyshev
-} // namespace DenseSM
+} // namespace Io
+} // namespace Framework
 } // namespace TestSuite
 } // namespace QuICC
