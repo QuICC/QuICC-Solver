@@ -34,6 +34,8 @@ namespace Tags {
 
    const std::string VariableHdf5::TRUNCDIM = "dim";
 
+   const std::string VariableHdf5::GITINFO = "git";
+
    const std::string VariableHdf5::PHYSICAL = "physical";
 
    const std::string VariableHdf5::RUN = "run";

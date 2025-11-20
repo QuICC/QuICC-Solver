@@ -6,7 +6,7 @@
 # MODEL
 #     name of the model
 # TYPE
-#     defaults for type of benchmark: Config, State, Model, Visualization or Stability
+#     defaults for type of benchmark: Config, State, Model, Visualization, Stability or StabilityConfig
 # PREFIX
 #     prefix for benchmark
 # EXE_POSTFIX
@@ -73,6 +73,9 @@ function(quicc_add_benchmark target)
   elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "Stability")
     set(QAB_PREFIX "Stability")
     set(_prefix "stability_")
+  elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "StabilityConfig")
+    set(QAB_PREFIX "StabilityConfig")
+    set(_prefix "stability_config_")
   elseif(QAB_PREFIX)
     string(TOLOWER "${QAB_PREFIX}" _prefix)
     set(_prefix "${_prefix}_")
@@ -89,6 +92,8 @@ function(quicc_add_benchmark target)
     set(QAB_EXE_POSTFIX "Visu")
   elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "Stability")
     set(QAB_EXE_POSTFIX "Stability")
+  elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "StabilityConfig")
+    set(QAB_EXE_POSTFIX "StabilityConfig")
   endif()
   message(DEBUG "QAB_EXE_POSTFIX: ${QAB_EXE_POSTFIX}")
 
@@ -102,6 +107,8 @@ function(quicc_add_benchmark target)
     set(QAB_STARTFILES "parameters.cfg" "state4Visu.hdf5")
   elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "Stability")
     set(QAB_STARTFILES "parameters.cfg")
+  elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "StabilityConfig")
+    set(QAB_STARTFILES "")
   endif()
   message(DEBUG "QAB_STARTFILES: ${QAB_STARTFILES}")
 
