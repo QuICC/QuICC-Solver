@@ -195,7 +195,7 @@ namespace Communicators {
                   sk = &j_;
                }
                // Initialize to bad value
-               p->rData().setConstant(badValueOut);
+               p->setConstant(badValueOut);
                // Initialize with id representing mode, c depends on resolution: id = (i + 1) + c*j + c^2*k
                for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                {
@@ -227,7 +227,7 @@ namespace Communicators {
                // store buffer address
                addr = reinterpret_cast<std::size_t>(p->data().data());
                // Initialize buffer with bad values
-               p->rData().setConstant(badValueIn);
+               p->setConstant(badValueIn);
             },
          pInData);
       comm.storage(outId).freeBwd(pInData);
@@ -309,7 +309,7 @@ namespace Communicators {
                   sk = &j_;
                }
                // Initialize to bad value
-               p->rData().setConstant(badValueOut);
+               p->setConstant(badValueOut);
                // Initialize with id representing mode, c depends on resolution: id = (i + 1) + c*j + c^2*k
                for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                {
@@ -342,7 +342,7 @@ namespace Communicators {
                // store buffer address
                addr = reinterpret_cast<std::size_t>(p->data().data());
                // Initialize buffer with bad values
-               p->rData().setConstant(badValueIn);
+               p->setConstant(badValueIn);
             },
          pInData);
       comm.storage(outId).freeBwd(pInData);
@@ -405,7 +405,7 @@ namespace Communicators {
                sj = &i_;
                sk = &k_;
                // Initialize to bad value
-               p->rData().setConstant(badValueOut);
+               p->setConstant(badValueOut);
                // Initialize with id representing mode, c depends on resolution: id = (i + 1) + c*j + c^2*k
                for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                {
@@ -437,7 +437,7 @@ namespace Communicators {
                // store buffer address
                addr = reinterpret_cast<std::size_t>(p->data().data());
                // Initialize buffer with bad values
-               p->rData().setConstant(badValueIn);
+               p->setConstant(badValueIn);
             },
          pInData);
       comm.storage(outId).freeBwd(pInData);

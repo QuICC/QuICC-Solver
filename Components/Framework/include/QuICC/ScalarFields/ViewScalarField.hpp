@@ -9,13 +9,17 @@
 // System includes
 //
 #include <cassert>
+#include <cstdint>
 #include <vector>
 #include <memory>
 
 // Project includes
 //
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
+#include "Memory/Memory.hpp"
+#include "Memory/MemoryResource.hpp"
 #include "Types/Typedefs.hpp"
+#include "View/View.hpp"
 #include "QuICC/ScalarFields/ScalarFieldSetup.hpp"
 
 namespace QuICC {
@@ -38,18 +42,18 @@ namespace Datatypes {
          typedef TData PointType;
 
          /// Typedef for the storage type
-         typedef typename Eigen::Matrix<PointType, Eigen::Dynamic, Eigen::Dynamic> StorageType;
+         using StorageType = View::View<PointType, View::DCCSC3D>;
 
          /// Typedef for the profiles of the storage type
-         typedef typename StorageType::ColXpr  ProfileType;
+         using ProfileType = View::View<PointType, View::dense1D>;
 
          /// Typedef for the slices of the storage type
-         typedef typename Eigen::Block<StorageType>  SliceType;
+         using SliceType = View::View<PointType, View::dense2D>;
 
          /**
           * @brief Constructor
           */
-         explicit ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup);
+         explicit ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup, std::shared_ptr<Memory::memory_resource> mem);
 
          /**
           * @brief Copy constructor
@@ -121,7 +125,7 @@ namespace Datatypes {
           * @param j    Index of the profile
           * @param k    Index of the slice
           */
-         template <typename Derived> void setProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k = 0);
+         void setProfile(const ProfileType& pf, const int j, const int k = 0);
 
          /**
           * @brief Add a profile of the field
@@ -130,7 +134,7 @@ namespace Datatypes {
           * @param j    Index of the profile
           * @param k    Index of the slice
           */
-         template <typename Derived> void addProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k = 0);
+         void addProfile(const ProfileType& pf, const int j, const int k = 0);
 
          /**
           * @brief Substract a profile of the field
@@ -139,7 +143,7 @@ namespace Datatypes {
           * @param j    Index of the profile
           * @param k    Index of the slice
           */
-         template <typename Derived> void subProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k = 0);
+         void subProfile(const ProfileType& pf, const int j, const int k = 0);
 
          /**
           * @brief Set a 2D slice of the field
@@ -147,15 +151,7 @@ namespace Datatypes {
           * @param sl   Slice values
           * @param k    Index of the slice
           */
-         template <typename Derived> void setSlice(const Eigen::MatrixBase<Derived>& sl, const int k);
-
-         /**
-          * @brief Multiply a 2D slice of the field by a matrix
-          *
-          * @param mat  Left matrix multiplication
-          * @param k    Index of the slice
-          */
-         template <typename Derived> void multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k);
+         void setSlice(const SliceType& sl, const int k);
 
          /**
           * @brief Add to 2D slice of the field
@@ -163,7 +159,7 @@ namespace Datatypes {
           * @param sl   Slice values
           * @param k    Index of the slice
           */
-         template <typename Derived> void addSlice(const Eigen::MatrixBase<Derived>& sl, const int k);
+         void addSlice(const SliceType& sl, const int k);
 
          /**
           * @brief Substract from 2D slice of the field
@@ -171,7 +167,7 @@ namespace Datatypes {
           * @param sl   Slice values
           * @param k    Index of the slice
           */
-         template <typename Derived> void subSlice(const Eigen::MatrixBase<Derived>& sl, const int k);
+         void subSlice(const SliceType& sl, const int k);
 
          /**
           * @brief Set the top rows of a 2D slice of the field
@@ -181,17 +177,7 @@ namespace Datatypes {
           * @param sl   Slice values
           * @param k    Index of the slice
           */
-         template <typename Derived> void setSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows);
-
-         /**
-          * @brief Multiply the top rows of a 2D slice of the field by a matrix
-          *
-          * Use this to adapt to differentenlty dealiased data
-          *
-          * @param mat  Slice values
-          * @param k    Index of the slice
-          */
-         template <typename Derived> void multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k, const int rows);
+         void setSlice(const SliceType& sl, const int k, const int rows);
 
          /**
           * @brief Add to the top rows of a 2D slice of the field
@@ -201,7 +187,7 @@ namespace Datatypes {
           * @param sl   Slice values
           * @param k    Index of the slice
           */
-         template <typename Derived> void addSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows);
+         void addSlice(const SliceType& sl, const int k, const int rows);
 
          /**
           * @brief Substract from the top rows of a 2D slice of the field
@@ -211,7 +197,7 @@ namespace Datatypes {
           * @param sl   Slice values
           * @param k    Index of the slice
           */
-         template <typename Derived> void subSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows);
+         void subSlice(const SliceType& sl, const int k, const int rows);
 
          /**
           * @brief Get internal storage field data pointer
@@ -226,22 +212,32 @@ namespace Datatypes {
          /**
           * @brief Set internal storage field data
           */
-         template <typename Derived> void setData(const Eigen::MatrixBase<Derived>& field);
+         void setData(const StorageType& field);
+
+         /**
+          * @brief Set internal storage field data with flipped sign
+          */
+         void setNegData(const StorageType& field);
 
          /**
           * @brief Add to internal storage field data
           */
-         template <typename Derived> void addData(const Eigen::MatrixBase<Derived>& field);
+         void addData(const StorageType& field);
 
          /**
           * @brief Substract from internal storage field data
           */
-         template <typename Derived> void subData(const Eigen::MatrixBase<Derived>& field);
+         void subData(const StorageType& field);
 
          /**
           * @brief Set the complete field to zero
           */
          void setZeros();
+
+         /**
+          * @brief Set the complete field to constant
+          */
+         void setConstant(const PointType c);
 
          /**
           * @brief Rescale the complete field by a real coefficient
@@ -308,19 +304,34 @@ namespace Datatypes {
 
       private:
          /**
-          * @brief Setup object for the scalar field
+          * @brief Memory resources
           */
-         std::shared_ptr<ScalarFieldSetup> mspSetup;
+         std::shared_ptr<Memory::memory_resource> mMem;
 
          /**
-          * @brief Field values in shared flat storage
+          * @brief Data view
           */
-         std::shared_ptr<StorageType>  mspField;
+         StorageType mView;
+
+         /**
+          * @brief Data storage
+          */
+         std::shared_ptr<Memory::MemBlock<PointType>> mspData;
+
+         /**
+          * @brief Indices storage
+          */
+         std::shared_ptr<Memory::MemBlock<typename StorageType::IndexType>> mspIndices;
+
+         /**
+          * @brief Pointer storage
+          */
+         std::shared_ptr<Memory::MemBlock<typename StorageType::IndexType>> mspPointers;
    };
 
    template <typename TData> inline typename ViewScalarField<TData>::PointType ViewScalarField<TData>::point(const int i, const int j, const int k) const
    {
-      return (*this->mspField)(i,this->mspSetup->colIdx(j,k));
+      return this->mView(i,j,k);
    }
 
    template <typename TData> inline typename ViewScalarField<TData>::PointType ViewScalarField<TData>::point(const std::vector<int>& coord) const
@@ -340,80 +351,66 @@ namespace Datatypes {
 
    template <typename TData> inline typename ViewScalarField<TData>::ProfileType ViewScalarField<TData>::profile(const int j, const int k) const
    {
-      return this->mspField->col(this->mspSetup->colIdx(j,k));
+      std::uint32_t idx = (this->mView.pointers()[1][k] + j)*this->mView.lds();
+      View::ViewBase<PointType> pView(this->mView.data() + idx, this->mView.lds());
+      std::array<typename ProfileType::IndexType, 1> dims = {this->mView.dims()[0]};
+      ProfileType profile(pView, dims);
+      return profile;
    }
 
    template <typename TData> inline typename ViewScalarField<TData>::SliceType ViewScalarField<TData>::slice(const int k) const
    {
-      return this->mspField->block(0,this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k));
+      std::uint32_t idx = (this->mView.pointers()[1][k])*this->mView.lds();
+      std::uint32_t cols = this->mView.pointers()[1][k+1] - this->mView.pointers()[1][k];
+      View::ViewBase<PointType> pView(this->mView.data() + idx, cols*this->mView.lds());
+      std::array<typename SliceType::IndexType, 2> dims = {this->mView.dims()[0], cols};
+      SliceType slice(pView, {dims});
+      return slice;
    }
 
    template <typename TData> inline const TData* ViewScalarField<TData>::data(const int k) const
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
-
-      return this->mspField->data() + this->mspSetup->dataRows()*this->mspSetup->blockIdx(k);
+      auto idx = this->mView.pointers()[1][k] * this->mView.lds();
+      return this->mView.data() + idx;
    }
 
    template <typename TData> inline const typename ViewScalarField<TData>::StorageType& ViewScalarField<TData>::data() const
    {
-      // Assert for positive sizes
-      assert(this->mspField);
-
-      return *this->mspField;
+      return this->mView;
    }
 
    template <typename TData> inline typename ViewScalarField<TData>::StorageType& ViewScalarField<TData>::rData()
    {
-      // Assert for positive sizes
-      assert(this->mspField);
-
-      return *this->mspField;
+      return this->mView;
    }
 
    template <typename TData> inline TData* ViewScalarField<TData>::rData(const int k)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
-
-      return this->mspField->data() + this->mspSetup->dataRows()*this->mspSetup->blockIdx(k);
+      auto idx = this->mView.pointers()[1][k] * this->mView.lds();
+      return this->mView.data() + idx;
    }
 
    template <typename TData> void ViewScalarField<TData>::setPoint(const ViewScalarField<TData>::PointType pt, const int i, const int j, const int k)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
-
-      (*this->mspField)(i,this->mspSetup->colIdx(j,k)) = pt;
+      this->mView(i,j,k) = pt;
    }
 
    template <typename TData> void ViewScalarField<TData>::setPoint(const MHDVariant pt, const int i, const int j, const int k)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
-
-      (*this->mspField)(i,this->mspSetup->colIdx(j,k)) = std::get<TData>(pt);
+      this->mView(i,j,k) = std::get<TData>(pt);
    }
 
    template <typename TData> inline typename ViewScalarField<TData>::PointType& ViewScalarField<TData>::rPoint(const int i, const int j, const int k)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
-
-      return (*this->mspField)(i,this->mspSetup->colIdx(j,k));
+      auto idx = (this->mView.pointers()[1][k] + j) * this->mView.lds() + i;
+      return *(this->mView.data() + idx);
    }
 
    template <typename TData> inline typename ViewScalarField<TData>::PointType& ViewScalarField<TData>::rPoint(const std::vector<int>& coord)
    {
       // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      assert(this->mView.dims()[0] > 0);
+      assert(this->mView.pointers()[1][this->mView.dims()[2]] > 0);
 
       switch(coord.size())
       {
@@ -428,181 +425,284 @@ namespace Datatypes {
       }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::setProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)
+   template <typename TData> void ViewScalarField<TData>::setProfile(const ProfileType& pf, const int j, const int k)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      assert(this->mView.dims()[0] == pf.dims()[0]);
 
-      this->mspField->col(this->mspSetup->colIdx(j,k)) = pf;
+      for(std::uint32_t i = 0; i < this->mView.dims()[0]; i++)
+      {
+         this->mView(i,j,k) = pf(i);
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::addProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)
+   template <typename TData> void ViewScalarField<TData>::addProfile(const ProfileType& pf, const int j, const int k)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      assert(this->mView.dims()[0] == pf.dims()[0]);
 
-      this->mspField->col(this->mspSetup->colIdx(j,k)) += pf;
+      for(std::uint32_t i = 0; i < this->mView.dims()[0]; i++)
+      {
+         this->mView(i,j,k) += pf(i);
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::subProfile(const Eigen::MatrixBase<Derived>& pf, const int j, const int k)
+   template <typename TData> void ViewScalarField<TData>::subProfile(const ProfileType& pf, const int j, const int k)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      assert(this->mView.dims()[0] == pf.dims()[0]);
 
-      this->mspField->col(this->mspSetup->colIdx(j,k)) -= pf;
+      for(std::uint32_t i = 0; i < this->mView.dims()[0]; i++)
+      {
+         this->mView(i,j,k) -= pf(i);
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::setSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
+   template <typename TData> void ViewScalarField<TData>::setSlice(const SliceType& sl, const int k)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      auto rows = this->mView.dims()[0];
+      auto cols = this->mView.pointers()[1][k+1] - this->mView.pointers()[1][k];
+      assert(this->mView.dims()[0] == sl.dims()[0]);
+      assert(cols == sl.dims()[1]);
 
-      this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) = sl;
+      for(std::uint32_t j = 0; j < cols; j++)
+      {
+         for(std::uint32_t i = 0; i < rows; i++)
+         {
+            this->mView(i,j,k) = sl(i, j);
+         }
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k)
+   template <typename TData> void ViewScalarField<TData>::addSlice(const SliceType& sl, const int k)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      auto rows = this->mView.dims()[0];
+      auto cols = this->mView.pointers()[1][k+1] - this->mView.pointers()[1][k];
+      assert(this->mView.dims()[0] == sl.dims()[0]);
+      assert(cols == sl.dims()[1]);
 
-      // Assert for compatible matrix
-      assert(mat.rows() == mat.cols());
-      assert(mat.cols() == this->mspSetup->blockRows(k));
-
-      this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) *= mat;
+      for(std::uint32_t j = 0; j < cols; j++)
+      {
+         for(std::uint32_t i = 0; i < rows; i++)
+         {
+            this->mView(i,j,k) += sl(i, j);
+         }
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
+   template <typename TData> void ViewScalarField<TData>::subSlice(const SliceType& sl, const int k)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      auto rows = this->mView.dims()[0];
+      auto cols = this->mView.pointers()[1][k+1] - this->mView.pointers()[1][k];
+      assert(this->mView.dims()[0] == sl.dims()[0]);
+      assert(cols == sl.dims()[1]);
 
-      this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) += sl;
+      for(std::uint32_t j = 0; j < cols; j++)
+      {
+         for(std::uint32_t i = 0; i < rows; i++)
+         {
+            this->mView(i,j,k) -= sl(i, j);
+         }
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::subSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
+   template <typename TData> void ViewScalarField<TData>::setSlice(const SliceType& sl, const int k, const int rows)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      auto cols = this->mView.pointers()[1][k+1] - this->mView.pointers()[1][k];
+      assert(static_cast<std::uint32_t>(rows) <= this->mView.dims()[0]);
+      assert(static_cast<std::uint32_t>(rows) <= sl.dims()[0]);
+      assert(cols == sl.dims()[1]);
 
-      this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) -= sl;
+      for(std::uint32_t j = 0; j < cols; j++)
+      {
+         for(std::uint32_t i = 0; i < static_cast<std::uint32_t>(rows); i++)
+         {
+            this->mView(i,j,k) = sl(i, j);
+         }
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::setSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
+   template <typename TData> void ViewScalarField<TData>::addSlice(const SliceType& sl, const int k, const int rows)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      auto cols = this->mView.pointers()[1][k+1] - this->mView.pointers()[1][k];
+      assert(static_cast<std::uint32_t>(rows) <= this->mView.dims()[0]);
+      assert(static_cast<std::uint32_t>(rows) <= sl.dims()[0]);
+      assert(cols == sl.dims()[1]);
 
-      // Should not be called as a replacement of the shorter version
-      assert(rows < this->mspSetup->blockRows(k));
-
-      this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) = sl;
+      for(std::uint32_t j = 0; j < cols; j++)
+      {
+         for(std::uint32_t i = 0; i < static_cast<std::uint32_t>(rows); i++)
+         {
+            this->mView(i,j,k) += sl(i, j);
+         }
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k, const int rows)
+   template <typename TData> void ViewScalarField<TData>::subSlice(const SliceType& sl, const int k, const int rows)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      auto cols = this->mView.pointers()[1][k+1] - this->mView.pointers()[1][k];
+      assert(static_cast<std::uint32_t>(rows) <= this->mView.dims()[0]);
+      assert(static_cast<std::uint32_t>(rows) <= sl.dims()[0]);
+      assert(cols == sl.dims()[1]);
 
-      // Assert for compatible matrix
-      assert(mat.rows() == mat.cols());
-      assert(mat.cols() == rows);
-
-      // Should not be called as a replacement of the shorter version
-      assert(rows < this->mspSetup->blockRows(k));
-
-      this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) *= mat;
+      for(std::uint32_t j = 0; j < cols; j++)
+      {
+         for(std::uint32_t i = 0; i < static_cast<std::uint32_t>(rows); i++)
+         {
+            this->mView(i,j,k) -= sl(i, j);
+         }
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
+   template <typename TData> void ViewScalarField<TData>::setData(const StorageType& field)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      auto rows = this->mView.dims()[0];
+      auto cols = this->mView.pointers()[1][this->mView.dims()[2]];
+      assert(field.dims()[0] == rows);
+      assert(field.pointers()[1][this->mView.dims()[2]] == cols);
 
-      // Should not be called as a replacement of the shorter version
-      assert(rows < this->mspSetup->blockRows(k));
-
-      this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) += sl;
+      for(std::uint32_t j = 0; j < cols; j++)
+      {
+         for(std::uint32_t i = 0; i < rows; i++)
+         {
+            this->mView.data()[i + j*this->mView.lds()] = field.data()[i + j*field.lds()];
+         }
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::subSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
+   template <typename TData> void ViewScalarField<TData>::setNegData(const StorageType& field)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
+      auto rows = this->mView.dims()[0];
+      auto cols = this->mView.pointers()[1][this->mView.dims()[2]];
+      assert(field.dims()[0] == rows);
+      assert(field.pointers()[1][this->mView.dims()[2]] == cols);
 
-      // Should not be called as a replacement of the shorter version
-      assert(rows < this->mspSetup->blockRows(k));
-
-      this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) -= sl;
+      for(std::uint32_t j = 0; j < cols; j++)
+      {
+         for(std::uint32_t i = 0; i < rows; i++)
+         {
+            this->mView.data()[i + j*this->mView.lds()] = -field.data()[i + j*field.lds()];
+         }
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::setData(const Eigen::MatrixBase<Derived>& field)
+   template <typename TData> void ViewScalarField<TData>::addData(const StorageType& field)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() == field.rows());
-      assert(this->mspField->cols() == field.cols());
+      auto rows = this->mView.dims()[0];
+      auto cols = this->mView.pointers()[1][this->mView.dims()[2]];
+      assert(field.dims()[0] == rows);
+      assert(field.pointers()[1][this->mView.dims()[2]] == cols);
 
-      // Assert for positive sizes
-      this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) = field;
+      for(std::uint32_t j = 0; j < cols; j++)
+      {
+         for(std::uint32_t i = 0; i < rows; i++)
+         {
+            this->mView.data()[i + j*this->mView.lds()] += field.data()[i + j*field.lds()];
+         }
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::addData(const Eigen::MatrixBase<Derived>& field)
+   template <typename TData> void ViewScalarField<TData>::subData(const StorageType& field)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() == field.rows());
-      assert(this->mspField->cols() == field.cols());
+      auto rows = this->mView.dims()[0];
+      auto cols = this->mView.pointers()[1][this->mView.dims()[2]];
+      assert(field.dims()[0] == rows);
+      assert(field.pointers()[1][this->mView.dims()[2]] == cols);
 
-      this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) += field;
+      for(std::uint32_t j = 0; j < cols; j++)
+      {
+         for(std::uint32_t i = 0; i < rows; i++)
+         {
+            this->mView.data()[i + j*this->mView.lds()] -= field.data()[i + j*field.lds()];
+         }
+      }
    }
 
-   template <typename TData> template<typename Derived> void ViewScalarField<TData>::subData(const Eigen::MatrixBase<Derived>& field)
+   template <typename TData> ViewScalarField<TData>::ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup, std::shared_ptr<Memory::memory_resource> mem)
+      : mMem(mem)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() == field.rows());
-      assert(this->mspField->cols() == field.cols());
+      // Get second dimensions
+      std::uint32_t n2D = 0;
+      for(int k = 0; k < spSetup->nBlock(); k++)
+      {
+         n2D = std::max(n2D, static_cast<std::uint32_t>(spSetup->blockCols(k)));
+      }
 
-      this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) -= field;
-   }
+      std::array<std::uint32_t, 3> dimensions{static_cast<std::uint32_t>(spSetup->dataRows()), n2D, static_cast<std::uint32_t>(spSetup->nBlock())};
+      std::uint32_t dataSize = spSetup->dataRows()*spSetup->dataCols();
+      std::uint32_t pointersSize = spSetup->nBlock() + 1;
+      std::uint32_t indicesSize = spSetup->dataCols();
 
-   template <typename TData> ViewScalarField<TData>::ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup)
-      : mspSetup(spSetup), mspField(new StorageType(spSetup->dataRows(), spSetup->dataCols()))
-   {
+      // Alloc op storage
+      this->mspData = std::make_shared<Memory::MemBlock<PointType>>(dataSize, this->mMem.get());
+      this->mspPointers = std::make_shared<Memory::MemBlock<typename StorageType::IndexType>>(pointersSize, this->mMem.get());
+      this->mspIndices = std::make_shared<Memory::MemBlock<typename StorageType::IndexType>>(indicesSize, this->mMem.get());
+
+      // Set op view
+      View::ViewBase<typename StorageType::IndexType> pointers[this->mView.rank()];
+      View::ViewBase<typename StorageType::IndexType> indices[this->mView.rank()];
+      pointers[1] =
+         View::ViewBase<typename StorageType::IndexType>(this->mspPointers->data(), this->mspPointers->size());
+      indices[1] =
+         View::ViewBase<typename StorageType::IndexType>(this->mspIndices->data(), this->mspIndices->size());
+      this->mView = StorageType(this->mspData->data(), this->mspData->size(), dimensions.data(), pointers, indices);
+
+      // Set pointers and indices
+      pointers[1][0] = 0;
+      int ii = 0;
+      for(std::uint32_t k = 1; k < pointers[1].size(); k++)
+      {
+         pointers[1][k] = pointers[1][k-1] + spSetup->blockCols(k-1);
+         for(int j = 0; j < spSetup->blockCols(k-1); j++)
+         {
+            indices[1][ii] = j;
+            ii++;
+         }
+      }
    }
 
    template <typename TData> ViewScalarField<TData>::ViewScalarField(const ViewScalarField<TData>& other)
-      : mspSetup(other.mspSetup), mspField(new StorageType(other.mspField->rows(),other.mspField->cols()))
    {
-      *this->mspField = *(other.mspField);
+      this->mMem = other.mMem;
+      this->mView = other.mView;
+      this->mView = other.mspData;
+      this->mView = other.mspIndices;
+      this->mView = other.mspPointers;
    }
 
    template <typename TData> void ViewScalarField<TData>::setZeros()
    {
-      this->mspField->setConstant(0.0);
+      auto ptr = this->mView.data();
+      
+      for(std::uint32_t i  = 0; i < this->mView.size(); i++)
+      {
+         *ptr = 0;
+         ptr++;
+      }
+   }
+
+   template <typename TData> void ViewScalarField<TData>::setConstant(const PointType c)
+   {
+      auto ptr = this->mView.data();
+      
+      for(std::uint32_t i  = 0; i < this->mView.size(); i++)
+      {
+         *ptr = c;
+         ptr++;
+      }
    }
 
    template <typename TData> void ViewScalarField<TData>::rescale(const MHDFloat scale)
    {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
-
-      *this->mspField *= scale;
+      auto ptr = this->mView.data();
+      
+      for(std::uint32_t i  = 0; i < this->mView.size(); i++)
+      {
+         *ptr *= scale;
+         ptr++;
+      }
    }
 
    template <typename TData> int ViewScalarField<TData>::nSlice() const
    {
-      return this->mspSetup->nBlock();
+      return this->mView.pointers()[1].size() - 1;
    }
 
    template <typename TData> template <typename TType> inline const ViewScalarField<TData>& ViewScalarField<TData>::comp(const TType id) const

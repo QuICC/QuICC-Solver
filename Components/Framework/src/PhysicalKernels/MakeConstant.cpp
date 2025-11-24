@@ -41,7 +41,7 @@ namespace Kernel {
 
    void MakeConstant::compute(Framework::Selector::PhysicalScalarField& rNLComp, FieldComponents::Physical::Id id) const
    {
-      rNLComp.rData().setConstant(this->mValue);
+      rNLComp.setConstant(this->mValue);
    }
 
 }

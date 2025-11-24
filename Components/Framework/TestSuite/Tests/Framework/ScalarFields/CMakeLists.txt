@@ -6,6 +6,7 @@ add_executable(${TestExe}
   details/Helper.cpp
   ScalarFieldTests.cpp
   FlatScalarFieldTests.cpp
+  ViewScalarFieldTests.cpp
 )
 
 target_link_libraries(${TestExe}

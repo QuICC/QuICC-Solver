@@ -151,14 +151,6 @@ namespace Datatypes {
          template <typename Derived> void setSlice(const Eigen::MatrixBase<Derived>& sl, const int k);
 
          /**
-          * @brief Multiply a 2D slice of the field by a matrix
-          *
-          * @param mat  Left matrix multiplication
-          * @param k    Index of the slice
-          */
-         template <typename Derived> void multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k);
-
-         /**
           * @brief Add to 2D slice of the field
           *
           * @param sl   Slice values
@@ -183,16 +175,6 @@ namespace Datatypes {
           * @param k    Index of the slice
           */
          template <typename Derived> void setSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows);
-
-         /**
-          * @brief Multiply the top rows of a 2D slice of the field by a matrix
-          *
-          * Use this to adapt to differentenlty dealiased data
-          *
-          * @param mat  Slice values
-          * @param k    Index of the slice
-          */
-         template <typename Derived> void multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k, const int rows);
 
          /**
           * @brief Add to the top rows of a 2D slice of the field
@@ -230,6 +212,11 @@ namespace Datatypes {
          template <typename Derived> void setData(const Eigen::MatrixBase<Derived>& field);
 
          /**
+          * @brief Set internal storage field data with flipped sign
+          */
+         template <typename Derived> void setNegData(const Eigen::MatrixBase<Derived>& field);
+
+         /**
           * @brief Add to internal storage field data
           */
          template <typename Derived> void addData(const Eigen::MatrixBase<Derived>& field);
@@ -243,6 +230,11 @@ namespace Datatypes {
           * @brief Set the complete field to zero
           */
          void setZeros();
+
+         /**
+          * @brief Set the complete field to constant
+          */
+         void setConstant(const PointType c);
 
          /**
           * @brief Rescale the complete field by a real coefficient
@@ -465,19 +457,6 @@ namespace Datatypes {
       this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) = sl;
    }
 
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k)
-   {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
-
-      // Assert for compatible matrix
-      assert(mat.rows() == mat.cols());
-      assert(mat.cols() == this->mspSetup->blockRows(k));
-
-      this->mspField->block(0, this->mspSetup->blockIdx(k), this->mspSetup->blockRows(k), this->mspSetup->blockCols(k)) *= mat;
-   }
-
    template <typename TData> template<typename Derived> void FlatScalarField<TData>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k)
    {
       // Assert for positive sizes
@@ -506,22 +485,6 @@ namespace Datatypes {
       assert(rows < this->mspSetup->blockRows(k));
 
       this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) = sl;
-   }
-
-   template <typename TData> template<typename Derived> void FlatScalarField<TData>::multSlice(const Eigen::SparseMatrixBase<Derived>& mat, const int k, const int rows)
-   {
-      // Assert for positive sizes
-      assert(this->mspField->rows() > 0);
-      assert(this->mspField->cols() > 0);
-
-      // Assert for compatible matrix
-      assert(mat.rows() == mat.cols());
-      assert(mat.cols() == rows);
-
-      // Should not be called as a replacement of the shorter version
-      assert(rows < this->mspSetup->blockRows(k));
-
-      this->mspField->block(0, this->mspSetup->blockIdx(k), rows, this->mspSetup->blockCols(k)) *= mat;
    }
 
    template <typename TData> template<typename Derived> void FlatScalarField<TData>::addSlice(const Eigen::MatrixBase<Derived>& sl, const int k, const int rows)
@@ -558,6 +521,16 @@ namespace Datatypes {
       this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) = field;
    }
 
+   template <typename TData> template<typename Derived> void FlatScalarField<TData>::setNegData(const Eigen::MatrixBase<Derived>& field)
+   {
+      // Assert for positive sizes
+      assert(this->mspField->rows() == field.rows());
+      assert(this->mspField->cols() == field.cols());
+
+      // Assert for positive sizes
+      this->mspField->block(0, 0, this->mspSetup->dataRows(), this->mspSetup->dataCols()) = -field;
+   }
+
    template <typename TData> template<typename Derived> void FlatScalarField<TData>::addData(const Eigen::MatrixBase<Derived>& field)
    {
       // Assert for positive sizes
@@ -590,6 +563,11 @@ namespace Datatypes {
    template <typename TData> void FlatScalarField<TData>::setZeros()
    {
       this->mspField->setConstant(0.0);
+   }
+
+   template <typename TData> void FlatScalarField<TData>::setConstant(const PointType c)
+   {
+      this->mspField->setConstant(c);
    }
 
    template <typename TData> void FlatScalarField<TData>::rescale(const MHDFloat scale)

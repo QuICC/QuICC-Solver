@@ -150,7 +150,7 @@ namespace Parallel {
          // Recover storage from provider
          storage.recoverFwd(pTmp);
 
-         pData->rData() = pTmp->data();
+         pData->setData(pTmp->data());
 
          storage.freeFwd(*pTmp);
       }
@@ -171,7 +171,7 @@ namespace Parallel {
          // Recover storage from provider
          storage.recoverBwd(pTmp);
 
-         pData->rData() = pTmp->data();
+         pData->setData(pTmp->data());
 
          storage.freeBwd(*pTmp);
 

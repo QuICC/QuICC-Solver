@@ -6,18 +6,9 @@
 #ifndef QUICC_DATATYPES_SCALARFIELDSETUP_HPP
 #define QUICC_DATATYPES_SCALARFIELDSETUP_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
-
-// External includes
-//
 
 // Project includes
 //

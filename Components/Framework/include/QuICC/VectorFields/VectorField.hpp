@@ -82,7 +82,7 @@ namespace Datatypes {
           *
           * \warning This routine should only be used in exceptional cases. Use setData, addData, subData when you can!
          */
-         std::map<TType,TScalar>& rData();
+         std::map<TType,TScalar>& rComps();
 
       protected:
          /**
@@ -123,7 +123,7 @@ namespace Datatypes {
       return this->mComponents;
    }
 
-   template <typename TScalar, typename TType> inline std::map<TType,TScalar>& VectorField<TScalar,TType>::rData()
+   template <typename TScalar, typename TType> inline std::map<TType,TScalar>& VectorField<TScalar,TType>::rComps()
    {
       return this->mComponents;
    }
