@@ -13,11 +13,13 @@
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/TestSuite/Framework/Io/TestUtils.hpp"
 #include "QuICC/TestSuite/Framework/Io/TestBackend.hpp"
+#include "QuICC/TestSuite/Framework/Io/ShellPolytrope.hpp"
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/Generator/States/SphereExactScalarState.hpp"
 #include "QuICC/Generator/States/SphereExactVectorState.hpp"
 #include "QuICC/SpectralKernels/Typedefs.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
+#include "QuICC/PhysicalNames/Entropy.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/Model/IModelBackend.hpp"
@@ -184,6 +186,13 @@ Equations::SharedIEquation createStates(std::shared_ptr<StateGenerator> spRunner
    spScalar =
       spRunner->addEquation<Equations::SphereExactScalarState>(spBackend);
    spScalar->setIdentity(PhysicalNames::Temperature::id());
+   tSH.clear();
+   setScalarModes(tSH, maxN, maxL, maxM, 0);
+   spScalar->setSpectralModes(tSH);
+
+   spScalar =
+      spRunner->addEquation<Equations::SphereExactScalarState>(spBackend);
+   spScalar->setIdentity(PhysicalNames::Entropy::id());
    tSH.clear();
    setScalarModes(tSH, maxN, maxL, maxM, 0);
    spScalar->setSpectralModes(tSH);
@@ -363,6 +372,10 @@ std::vector<std::tuple<std::string,int,int,int>> checkSphericalFiles(const TestP
       {
          fileList.emplace_back(n, nR, nL + 1, 1);
       }
+      else if(n == "entropyluminosity.dat")
+      {
+         fileList.emplace_back(n, 1, 2, 1);
+      }
       else if(n == "velocity_energy.dat")
       {
          fileList.emplace_back(n, 1, 4, 1);
@@ -430,6 +443,29 @@ ErrorType computeUlp(const MHDFloat data, const MHDFloat ref, MHDFloat refMod, c
    auto ulp = diff / (refMod * eps);
 
    return std::make_tuple(isEqual, ulp, diff);
+}
+
+std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> 
+createTestProfiles()
+{
+   std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> profiles;
+   
+   std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF;
+   pF = std::make_shared<ShellPolytrope>(0.35, 5, 3);
+   profiles.push_back(pF);
+   profiles.push_back(pF);
+   
+   return profiles;
+}
+
+// Specialization for ShellLuminosityWriter (3 arguments)
+template<>
+std::shared_ptr<QuICC::Io::Variable::ShellLuminosityWriter> 
+createWriter<QuICC::Io::Variable::ShellLuminosityWriter>(
+   const std::string& tag, const std::string& scheme)
+{
+   auto profiles = createTestProfiles();
+   return std::make_shared<QuICC::Io::Variable::ShellLuminosityWriter>(tag, scheme, profiles);
 }
 
 } // namespace Io
