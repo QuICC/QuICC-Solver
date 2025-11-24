@@ -93,6 +93,7 @@ set(_tests
   SLFl:Temperature:ShellScalarModeSpectrumWriter
   SLFl:Temperature:ShellScalarRSpectrumWriter
   SLFl:Entropy:ShellLuminosityWriter
+  SLFl:Velocity:ShellAngularMomentumWriter
   SLFl:Velocity:ShellTorPolEnergyWriter
   SLFl:Velocity:ShellTorPolLSpectrumWriter
   SLFl:Velocity:ShellTorPolMSpectrumWriter
@@ -109,6 +110,7 @@ set(_tests
   SLFm:Temperature:ShellScalarModeSpectrumWriter
   SLFm:Temperature:ShellScalarRSpectrumWriter
   SLFm:Entropy:ShellLuminosityWriter
+  SLFm:Velocity:ShellAngularMomentumWriter
   SLFm:Velocity:ShellTorPolEnergyWriter
   SLFm:Velocity:ShellTorPolLSpectrumWriter
   SLFm:Velocity:ShellTorPolMSpectrumWriter

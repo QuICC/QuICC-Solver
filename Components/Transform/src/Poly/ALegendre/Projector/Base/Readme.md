@@ -50,19 +50,13 @@ In the `build` directory (or wherever you put the tests):
 
 -       ctest -R Llm1D1 --output-on-failure
 
+To see available tests:
 
-### Add the tests to the gitlab repository
+        ctest -N
 
-This will ensure the correct tests are grabbed at compile time so they don't have to be run from Mathematica again:
+might need to pipe the output to be useful:
 
-- The repository is `https://gitlab.ethz.ch/quicc` -> `Test-TestData`
-- For this particular test we need to grab `test-testdata/ref/Transform/ALegendre.tar.gz`
-- untar it, put the new tests in it
-- tar it again. On mac:
-`tar czf ALegendre.tar.gz Transform`
-
-
-- run sha256sum
+        ctest -N | grep ALegendre | grep DivS1
 
 #### Some troubleshooting
 
