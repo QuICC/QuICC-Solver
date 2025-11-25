@@ -10,12 +10,12 @@ TEST_CASE("FlatScalarField get point data", "[FlatScalarField::point]")
    auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
 
    auto&& field = *spField;
-   
-   CHECK( field.point(0,0,0) == details::fieldValueA<double>(0,0,0) );
-   CHECK( field.point(3,0,0) == details::fieldValueA<double>(3,0,0) );
-   CHECK( field.point(1,1,0) == details::fieldValueA<double>(1,1,0) );
-   CHECK( field.point(1,0,1) == details::fieldValueA<double>(1,0,1) );
-   CHECK( field.point(3,2,3) == details::fieldValueA<double>(3,2,3) );
+
+   std::vector<std::vector<int>> pts = {{0,0,0}, {3,0,0}, {1,1,0}, {1,0,1}, {3,2,3}};
+   for(auto&& pt: pts)
+   {
+      CHECK( field.point(pt.at(0),pt.at(1),pt.at(2)) == details::fieldValueA<double>(pt.at(0),pt.at(1),pt.at(2)) );
+   }
 }
 
 TEST_CASE("FlatScalarField get point data from coord", "[FlatScalarField::point_coord]")
@@ -25,17 +25,12 @@ TEST_CASE("FlatScalarField get point data from coord", "[FlatScalarField::point_
    auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
 
    auto&& field = *spField;
-   
-   std::vector<int> coord = {0,0,0};
-   CHECK( field.point(coord) == details::fieldValueA<double>(0,0,0) );
-   coord = {3, 0, 0};
-   CHECK( field.point(coord) == details::fieldValueA<double>(3,0,0) );
-   coord = {1, 1, 0};
-   CHECK( field.point(coord) == details::fieldValueA<double>(1,1,0) );
-   coord = {1, 0, 1};
-   CHECK( field.point(coord) == details::fieldValueA<double>(1,0,1) );
-   coord = {3, 2, 3};
-   CHECK( field.point(coord) == details::fieldValueA<double>(3,2,3) );
+
+   std::vector<std::vector<int>> pts = {{0,0,0}, {3,0,0}, {1,1,0}, {1,0,1}, {3,2,3}};
+   for(auto&& pt: pts)
+   {
+      CHECK( field.point(pt) == details::fieldValueA<double>(pt.at(0),pt.at(1),pt.at(2)) );
+   }
 }
 
 TEST_CASE("FlatScalarField get profile data", "[FlatScalarField::profile]")
@@ -45,23 +40,15 @@ TEST_CASE("FlatScalarField get profile data", "[FlatScalarField::profile]")
    auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
 
    auto&& field = *spField;
-  
-   auto&& p0 = field.profile(1);
-   for(int i = 0; i < dim1D; i++)
+
+   std::vector<std::pair<int,int>> jks = {{1,0},{2,3},{5,4}};
+   for(auto&& jk: jks)
    {
-      CHECK( p0(i) == details::fieldValueA<double>(i,1,0) );
-   }
-  
-   auto&& p3 = field.profile(2, 3);
-   for(int i = 0; i < dim1D; i++)
-   {
-      CHECK( p3(i) == details::fieldValueA<double>(i,2,3) );
-   }
-  
-   auto&& p4 = field.profile(5, 4);
-   for(int i = 0; i < dim1D; i++)
-   {
-      CHECK( p4(i) == details::fieldValueA<double>(i,5,4) );
+      auto&& p = field.profile(jk.first, jk.second);
+      for(int i = 0; i < dim1D; i++)
+      {
+         CHECK( p(i) == details::fieldValueA<double>(i,jk.first,jk.second) );
+      }
    }
 }
 
@@ -72,34 +59,17 @@ TEST_CASE("FlatScalarField get slice data", "[FlatScalarField::slice]")
    auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
 
    auto&& field = *spField;
-  
-   int k = 0;
-   auto&& s0 = field.slice(k);
-   for(int j = 0; j < k + 2; j++)
+
+   std::vector<int> ks = {0, 2, 4};
+   for(auto&& k: ks)
    {
-      for(int i = 0; i < dim1D; i++)
+      auto&& s = field.slice(k);
+      for(int j = 0; j < k + 2; j++)
       {
-         CHECK( s0(i, j) == details::fieldValueA<double>(i,j,k) );
-      }
-   }
-  
-   k = 2;
-   auto&& s2 = field.slice(k);
-   for(int j = 0; j < k + 2; j++)
-   {
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( s2(i, j) == details::fieldValueA<double>(i,j,k) );
-      }
-   }
-  
-   k = 4;
-   auto&& s4 = field.slice(k);
-   for(int j = 0; j < k + 2; j++)
-   {
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( s4(i, j) == details::fieldValueA<double>(i,j,k) );
+         for(int i = 0; i < dim1D; i++)
+         {
+            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+         }
       }
    }
 }
@@ -161,58 +131,37 @@ TEST_CASE("FlatScalarField set profile data", "[FlatScalarField::setProfile]")
       np(i) = details::fieldValueB<double>(i,0,0);
    }
 
-   field.setProfile(np, 0, 0);
-   field.setProfile(np, 3, 2);
-   field.setProfile(np, 3, 3);
-   field.setProfile(np, 1, 4);
-  
+   std::vector<std::pair<int,int>> jks = {{0,0}, {3,2}, {3,3}, {1,4}};
+   for(auto jk: jks)
    {
-      int j = 0;
-      int k = 0;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
+      field.setProfile(np, jk.first, jk.second);
+   }
+
+   {
+      std::vector<std::pair<int,int>> jks = {{0,0}, {3,2}, {3,3}, {1,4}};
+      for(auto jk: jks)
       {
-         CHECK( p(i) == details::fieldValueB<double>(i,0,0) );
+         int j = jk.first;
+         int k = jk.second;
+         auto&& p = field.profile(j, k);
+         for(int i = 0; i < dim1D; i++)
+         {
+            CHECK( p(i) == details::fieldValueB<double>(i,0,0) );
+         }
       }
    }
-  
+
    {
-      int j = 3;
-      int k = 2;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
+      std::vector<std::pair<int,int>> jks = {{2,2}};
+      for(auto jk: jks)
       {
-         CHECK( p(i) == details::fieldValueB<double>(i,0,0) );
-      }
-   }
-  
-   {
-      int j = 3;
-      int k = 3;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( p(i) == details::fieldValueB<double>(i,0,0) );
-      }
-   }
-  
-   {
-      int j = 1;
-      int k = 4;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( p(i) == details::fieldValueB<double>(i,0,0) );
-      }
-   }
-  
-   {
-      int j = 2;
-      int k = 2;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
+         int j = jk.first;
+         int k = jk.second;
+         auto&& p = field.profile(j, k);
+         for(int i = 0; i < dim1D; i++)
+         {
+            CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
+         }
       }
    }
 }
@@ -231,58 +180,37 @@ TEST_CASE("FlatScalarField add profile data", "[FlatScalarField::addProfile]")
       np(i) = details::fieldValueB<double>(i,0,0);
    }
 
-   field.addProfile(np, 0, 0);
-   field.addProfile(np, 3, 2);
-   field.addProfile(np, 3, 3);
-   field.addProfile(np, 1, 4);
-  
+   std::vector<std::pair<int,int>> jks = {{0,0}, {3,2}, {3,3}, {1,4}};
+   for(auto jk: jks)
    {
-      int j = 0;
-      int k = 0;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
+      field.addProfile(np, jk.first, jk.second);
+   }
+
+   {
+      std::vector<std::pair<int,int>> jks = {{0,0}, {3,2}, {3,3}, {1,4}};
+      for(auto jk: jks)
       {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) +  (details::fieldValueB<double>(i,0,0)) );
+         int j = jk.first;
+         int k = jk.second;
+         auto&& p = field.profile(j, k);
+         for(int i = 0; i < dim1D; i++)
+         {
+            CHECK( p(i) == details::fieldValueA<double>(i,j,k) +  (details::fieldValueB<double>(i,0,0)) );
+         }
       }
    }
-  
+
    {
-      int j = 3;
-      int k = 2;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
+      std::vector<std::pair<int,int>> jks = {{2,2}};
+      for(auto jk: jks)
       {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,0,0)) );
-      }
-   }
-  
-   {
-      int j = 3;
-      int k = 3;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,0,0)) );
-      }
-   }
-  
-   {
-      int j = 1;
-      int k = 4;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,0,0)) );
-      }
-   }
-  
-   {
-      int j = 2;
-      int k = 2;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
+         int j = jk.first;
+         int k = jk.second;
+         auto&& p = field.profile(j, k);
+         for(int i = 0; i < dim1D; i++)
+         {
+            CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
+         }
       }
    }
 }
@@ -301,58 +229,37 @@ TEST_CASE("FlatScalarField subtract profile data", "[FlatScalarField::subProfile
       np(i) = details::fieldValueB<double>(i,0,0);
    }
 
-   field.subProfile(np, 0, 0);
-   field.subProfile(np, 3, 2);
-   field.subProfile(np, 3, 3);
-   field.subProfile(np, 1, 4);
-  
+   std::vector<std::pair<int,int>> jks = {{0,0}, {3,2}, {3,3}, {1,4}};
+   for(auto jk: jks)
    {
-      int j = 0;
-      int k = 0;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
+      field.subProfile(np, jk.first, jk.second);
+   }
+
+   {
+      std::vector<std::pair<int,int>> jks = {{0,0}, {3,2}, {3,3}, {1,4}};
+      for(auto jk: jks)
       {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,0,0)) );
+         int j = jk.first;
+         int k = jk.second;
+         auto&& p = field.profile(j, k);
+         for(int i = 0; i < dim1D; i++)
+         {
+            CHECK( p(i) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,0,0)) );
+         }
       }
    }
-  
+
    {
-      int j = 3;
-      int k = 2;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
+      std::vector<std::pair<int,int>> jks = {{2,2}};
+      for(auto jk: jks)
       {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,0,0)) );
-      }
-   }
-  
-   {
-      int j = 3;
-      int k = 3;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,0,0)) );
-      }
-   }
-  
-   {
-      int j = 1;
-      int k = 4;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,0,0)) );
-      }
-   }
-  
-   {
-      int j = 2;
-      int k = 2;
-      auto&& p = field.profile(j, k);
-      for(int i = 0; i < dim1D; i++)
-      {
-         CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
+         int j = jk.first;
+         int k = jk.second;
+         auto&& p = field.profile(j, k);
+         for(int i = 0; i < dim1D; i++)
+         {
+            CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
+         }
       }
    }
 }
@@ -366,90 +273,49 @@ TEST_CASE("FlatScalarField set slice data", "[FlatScalarField::setSlice]")
    auto&& field = *spField;
 
    {
-      int k = 0;
-      QuICC::Matrix ns(dim1D, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         QuICC::Matrix ns(dim1D, k + 2);
+         ns.setZero();
+         for(int j = 0; j < k + 2; j++)
          {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
+            for(int i = 0; i < dim1D; i++)
+            {
+               ns(i, j) = details::fieldValueB<double>(i,j,k);
+            }
          }
+
+         field.setSlice(ns, k);
       }
-
-      field.setSlice(ns, k);
-
-      k = 2;
-      ns.resize(dim1D, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.setSlice(ns, k);
-
-      k = 4;
-      ns.resize(dim1D, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.setSlice(ns, k);
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0,2,4};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            }
          }
       }
    }
 
    {
-      int k = 1;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {1};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            }
          }
       }
    }
@@ -464,90 +330,49 @@ TEST_CASE("FlatScalarField add slice data", "[FlatScalarField::addSlice]")
    auto&& field = *spField;
 
    {
-      int k = 0;
-      QuICC::Matrix ns(dim1D, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         QuICC::Matrix ns(dim1D, k + 2);
+         ns.setZero();
+         for(int j = 0; j < k + 2; j++)
          {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
+            for(int i = 0; i < dim1D; i++)
+            {
+               ns(i, j) = details::fieldValueB<double>(i,j,k);
+            }
          }
+
+         field.addSlice(ns, k);
       }
-
-      field.addSlice(ns, k);
-
-      k = 2;
-      ns.resize(dim1D, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.addSlice(ns, k);
-
-      k = 4;
-      ns.resize(dim1D, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.addSlice(ns, k);
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0,2,4};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
+            }
          }
       }
    }
 
    {
-      int k = 1;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {1};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            }
          }
       }
    }
@@ -562,90 +387,49 @@ TEST_CASE("FlatScalarField subtract slice data", "[FlatScalarField::subSlice]")
    auto&& field = *spField;
 
    {
-      int k = 0;
-      QuICC::Matrix ns(dim1D, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         QuICC::Matrix ns(dim1D, k + 2);
+         ns.setZero();
+         for(int j = 0; j < k + 2; j++)
          {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
+            for(int i = 0; i < dim1D; i++)
+            {
+               ns(i, j) = details::fieldValueB<double>(i,j,k);
+            }
          }
+
+         field.subSlice(ns, k);
       }
-
-      field.subSlice(ns, k);
-
-      k = 2;
-      ns.resize(dim1D, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.subSlice(ns, k);
-
-      k = 4;
-      ns.resize(dim1D, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.subSlice(ns, k);
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0,2,4};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
+            }
          }
       }
    }
 
    {
-      int k = 1;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {1};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            }
          }
       }
    }
@@ -660,102 +444,54 @@ TEST_CASE("FlatScalarField set top rows of slice data", "[FlatScalarField::setSl
    auto&& field = *spField;
 
    {
-      int k = 0;
-      QuICC::Matrix ns(dim1D/2, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D/2; i++)
+         QuICC::Matrix ns(dim1D/2, k + 2);
+         ns.setZero();
+         for(int j = 0; j < k + 2; j++)
          {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
+            for(int i = 0; i < dim1D/2; i++)
+            {
+               ns(i, j) = details::fieldValueB<double>(i,j,k);
+            }
          }
+
+         field.setSlice(ns, k, dim1D/2);
       }
-
-      field.setSlice(ns, k, dim1D/2);
-
-      k = 2;
-      ns.resize(dim1D/2, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.setSlice(ns, k, dim1D/2);
-
-      k = 4;
-      ns.resize(dim1D/2, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.setSlice(ns, k, dim1D/2);
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0,2,4};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D/2; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
-         }
-         for(int i = dim1D/2; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            for(int i = 0; i < dim1D/2; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            }
+            for(int i = dim1D/2; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            }
          }
       }
    }
 
    {
-      int k = 1;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {1};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
-         }
-         for(int i = dim1D/2; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
-         }
-         for(int i = dim1D/2; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            }
          }
       }
    }
@@ -770,102 +506,54 @@ TEST_CASE("FlatScalarField add to top rows of slice data", "[FlatScalarField::ad
    auto&& field = *spField;
 
    {
-      int k = 0;
-      QuICC::Matrix ns(dim1D/2, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D/2; i++)
+         QuICC::Matrix ns(dim1D/2, k + 2);
+         ns.setZero();
+         for(int j = 0; j < k + 2; j++)
          {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
+            for(int i = 0; i < dim1D/2; i++)
+            {
+               ns(i, j) = details::fieldValueB<double>(i,j,k);
+            }
          }
+
+         field.addSlice(ns, k, dim1D/2);
       }
-
-      field.addSlice(ns, k, dim1D/2);
-
-      k = 2;
-      ns.resize(dim1D/2, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.addSlice(ns, k, dim1D/2);
-
-      k = 4;
-      ns.resize(dim1D/2, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.addSlice(ns, k, dim1D/2);
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0,2,4};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D/2; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
-         }
-         for(int i = dim1D/2; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            for(int i = 0; i < dim1D/2; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
+            }
+            for(int i = dim1D/2; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            }
          }
       }
    }
 
    {
-      int k = 1;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {1};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
-         }
-         for(int i = dim1D/2; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
-         }
-         for(int i = dim1D/2; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            }
          }
       }
    }
@@ -880,102 +568,54 @@ TEST_CASE("FlatScalarField subtract from top rows of slice data", "[FlatScalarFi
    auto&& field = *spField;
 
    {
-      int k = 0;
-      QuICC::Matrix ns(dim1D/2, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D/2; i++)
+         QuICC::Matrix ns(dim1D/2, k + 2);
+         ns.setZero();
+         for(int j = 0; j < k + 2; j++)
          {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
+            for(int i = 0; i < dim1D/2; i++)
+            {
+               ns(i, j) = details::fieldValueB<double>(i,j,k);
+            }
          }
+
+         field.subSlice(ns, k, dim1D/2);
       }
-
-      field.subSlice(ns, k, dim1D/2);
-
-      k = 2;
-      ns.resize(dim1D/2, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.subSlice(ns, k, dim1D/2);
-
-      k = 4;
-      ns.resize(dim1D/2, k + 2);
-      ns.setZero();
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            ns(i, j) = details::fieldValueB<double>(i,j,k);
-         }
-      }
-
-      field.subSlice(ns, k, dim1D/2);
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0,2,4};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D/2; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
-         }
-         for(int i = dim1D/2; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            for(int i = 0; i < dim1D/2; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
+            }
+            for(int i = dim1D/2; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            }
          }
       }
    }
 
    {
-      int k = 1;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {1};
+      for(int k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
-         }
-         for(int i = dim1D/2; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D/2; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
-         }
-         for(int i = dim1D/2; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            }
          }
       }
    }
@@ -990,34 +630,20 @@ TEST_CASE("FlatScalarField get data pointer", "[FlatScalarField::data]")
    auto&& field = *spField;
 
    {
-      int k = 0;
-      auto&& dptr = field.data(k);
-      
-      CHECK( dptr[0] == 0 );
-      CHECK( dptr[3] == 3 );
-      CHECK( dptr[1*dim1D + 3] == 1*100 + 3 );
-   }
+      std::vector<std::vector<int>> ijks = {{0,0,0},{3,0,0},{2,1,0},{0,0,2},{3,0,2},{2,1,2},{0,0,4},{3,0,4},{2,1,4}};
+      for(auto&& ijk: ijks)
+      {
+         auto&& i = ijk.at(0);
+         auto&& j = ijk.at(1);
+         auto&& k = ijk.at(2);
+         auto&& dptr = field.data(k);
 
-   {
-      int k = 2;
-      auto&& dptr = field.data(k);
-      
-      CHECK( dptr[0] == k*100*100 + 0 );
-      CHECK( dptr[3] == k*100*100 + 3 );
-      CHECK( dptr[1*dim1D + 1] == k*100*100 + 101 );
-   }
-
-   {
-      int k = 4;
-      auto&& dptr = field.data(k);
-      
-      CHECK( dptr[0] == k*100*100 + 0 );
-      CHECK( dptr[3] == k*100*100 + 3 );
-      CHECK( dptr[1*dim1D + 2] == k*100*100 + 102 );
+         CHECK( dptr[j*dim1D + i] == details::fieldValueA<double>(i, j, k) );
+      }
    }
 }
 
-TEST_CASE("FlatScalarField get data reference", "[FlatScalarField::data_ref]")
+TEST_CASE("FlatScalarField get data", "[FlatScalarField::data_ref]")
 {
    int dim3D = 5;
    int dim1D = 2*dim3D;
@@ -1027,28 +653,20 @@ TEST_CASE("FlatScalarField get data reference", "[FlatScalarField::data_ref]")
 
    {
       auto&& mat = field.data();
-      
-      CHECK( mat(0, 0) == 0 );
-      CHECK( mat(3, 0) == 3 );
-      CHECK( mat(2, 1) == 1*100 + 2 );
-   }
 
-   {
-      int k = 2;
-      auto&& mat = field.data();
-      
-      CHECK( mat(0, (0 + 2) + (1 + 2) + 0) == k*100*100 + 0 );
-      CHECK( mat(3, (0 + 2) + (1 + 2) + 0) == k*100*100 + 3 );
-      CHECK( mat(1, (0 + 2) + (1 + 2) + 1) == k*100*100 + 1*100 + 1 );
-   }
-
-   {
-      int k = 4;
-      auto&& mat = field.data();
-      
-      CHECK( mat(0, (0 + 2) + (1 + 2) + (2 + 2) + (3 + 2) + 0) == k*100*100 + 0 );
-      CHECK( mat(3, (0 + 2) + (1 + 2) + (2 + 2) + (3 + 2) + 0) == k*100*100 + 3 );
-      CHECK( mat(3, (0 + 2) + (1 + 2) + (2 + 2) + (3 + 2) + 1) == k*100*100 + 1*100 + 3 );
+      std::vector<std::vector<int>> ijks = {{0,0,0},{3,0,0},{2,1,0},{0,0,2},{3,0,2},{2,1,2},{0,0,4},{3,0,4},{2,1,4}};
+      for(auto&& ijk: ijks)
+      {
+         auto&& i = ijk.at(0);
+         auto&& j = ijk.at(1);
+         auto&& k = ijk.at(2);
+         auto jj = j;
+         for(int kk = 0; kk < k; kk++)
+         {
+            jj += kk + 2;
+         }
+         CHECK( mat(i, jj) == details::fieldValueA<double>(i, j, k) );
+      }
    }
 }
 
@@ -1080,37 +698,16 @@ TEST_CASE("FlatScalarField set data", "[FlatScalarField::setData]")
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(auto&& k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            }
          }
       }
    }
@@ -1144,37 +741,16 @@ TEST_CASE("FlatScalarField set data with flipped sign", "[FlatScalarField::setNe
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(auto&& k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == -(details::fieldValueB<double>(i,j,k)) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == -(details::fieldValueB<double>(i,j,k)) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == -(details::fieldValueB<double>(i,j,k)) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == -(details::fieldValueB<double>(i,j,k)) );
+            }
          }
       }
    }
@@ -1208,37 +784,16 @@ TEST_CASE("FlatScalarField add data", "[FlatScalarField::addData]")
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(auto&& k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
+            }
          }
       }
    }
@@ -1272,37 +827,16 @@ TEST_CASE("FlatScalarField subtract data", "[FlatScalarField::subData]")
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(auto&& k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
+            }
          }
       }
    }
@@ -1319,37 +853,16 @@ TEST_CASE("FlatScalarField set zeros", "[FlatScalarField::setZeros]")
    field.setZeros();
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(auto&& k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == 0 );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == 0 );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == 0 );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == 0 );
+            }
          }
       }
    }
@@ -1400,88 +913,49 @@ TEST_CASE("FlatScalarField set slice data from pointer", "[FlatScalarField::rDat
    auto&& field = *spField;
 
    {
-      int k = 0;
-      double* dptr = field.rData(k);
-
-      int ii = 0;
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(auto&& k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
-         {
-            dptr[ii] = details::fieldValueB<double>(i,j,k);
-            ii++;
-         }
-      }
+         double* dptr = field.rData(k);
 
-      k = 2;
-      dptr = field.rData(k);
-      ii = 0;
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
+         int ii = 0;
+         for(int j = 0; j < k + 2; j++)
          {
-            dptr[ii] = details::fieldValueB<double>(i,j,k);
-            ii++;
-         }
-      }
-
-      k = 4;
-      dptr = field.rData(k);
-      ii = 0;
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            dptr[ii] = details::fieldValueB<double>(i,j,k);
-            ii++;
+            for(int i = 0; i < dim1D; i++)
+            {
+               dptr[ii] = details::fieldValueB<double>(i,j,k);
+               ii++;
+            }
          }
       }
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(auto&& k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            }
          }
       }
    }
 
    {
-      int k = 1;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {1};
+      for(auto&& k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
+            }
          }
       }
    }
@@ -1496,7 +970,7 @@ TEST_CASE("FlatScalarField set whole data from reference", "[FlatScalarField::rD
    auto&& field = *spField;
 
    {
-      QuICC::Matrix nd(dim1D, ((dim3D + 1)*(dim3D + 4))/2);
+      QuICC::Matrix nd(dim1D, ((dim3D)*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
       for(int k = 0; k < dim3D; k++)
@@ -1515,37 +989,16 @@ TEST_CASE("FlatScalarField set whole data from reference", "[FlatScalarField::rD
    }
 
    {
-      int k = 0;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
+      std::vector<int> ks = {0, 2, 4};
+      for(auto&& k: ks)
       {
-         for(int i = 0; i < dim1D; i++)
+         auto&& s = field.slice(k);
+         for(int j = 0; j < k + 2; j++)
          {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 2;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
-         }
-      }
-   }
-
-   {
-      int k = 4;
-      auto&& s = field.slice(k);
-      for(int j = 0; j < k + 2; j++)
-      {
-         for(int i = 0; i < dim1D; i++)
-         {
-            CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            for(int i = 0; i < dim1D; i++)
+            {
+               CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
+            }
          }
       }
    }
