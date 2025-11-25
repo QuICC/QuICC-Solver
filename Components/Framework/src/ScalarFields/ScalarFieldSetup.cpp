@@ -3,28 +3,20 @@
  * @brief Source of the scalar field setup
  */
 
-// Debug includes
-//
-
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/ScalarFields/ScalarFieldSetup.hpp"
-
 // Project includes
 //
-//
+#include "Memory/MemoryResource.hpp"
+#include "QuICC/ScalarFields/ScalarFieldSetup.hpp"
+
 namespace QuICC {
 
 namespace Datatypes {
 
-   ScalarFieldSetup::ScalarFieldSetup(SharedArrayI spDim1D, SharedArrayI spDim2D, const int dim3D)
-      : mspDim1D(spDim1D), mspDim2D(spDim2D), mDim3D(dim3D), mDataRows(0), mDataCols(0)
+   ScalarFieldSetup::ScalarFieldSetup(SharedArrayI spDim1D, SharedArrayI spDim2D, const int dim3D, std::shared_ptr<Memory::memory_resource> mem)
+      : mspDim1D(spDim1D), mspDim2D(spDim2D), mDim3D(dim3D), mDataRows(0), mDataCols(0), mMem(mem)
    {
       // Safety assertions
       assert(dim3D > 0 || (dim3D == 0 && this->mspDim2D->size() == 0 && this->mspDim1D->size() == 0));
@@ -39,10 +31,6 @@ namespace Datatypes {
          this->mDataRows = this->mspDim1D->maxCoeff();
          this->mDataCols = this->mspDim2D->sum();
       }
-   }
-
-   ScalarFieldSetup::~ScalarFieldSetup()
-   {
    }
 
    int ScalarFieldSetup::dataRows() const
@@ -86,6 +74,11 @@ namespace Datatypes {
    int ScalarFieldSetup::nBlock() const
    {
       return this->mDim3D;
+   }
+
+   std::shared_ptr<Memory::memory_resource> ScalarFieldSetup::mem() const
+   {
+      return this->mMem;
    }
 
 }

@@ -1336,9 +1336,9 @@ TEST_CASE("ViewScalarField copy constructor", "[ViewScalarField::Copy]")
 {
    int dim3D = 5;
    int dim1D = 2*dim3D;
-   auto spFieldA = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
-   auto spFieldB = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
-   auto spFieldC = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   auto spFieldA = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   auto spFieldB = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   auto spFieldC = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
 
    auto&& fieldA = *spFieldA;
    fieldA.setZeros();

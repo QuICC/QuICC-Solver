@@ -13,6 +13,8 @@
 // Project includes
 //
 #include "Types/Typedefs.hpp"
+#include "Memory/Memory.hpp"
+#include "Memory/MemoryResource.hpp"
 
 namespace QuICC {
 
@@ -27,12 +29,12 @@ namespace Datatypes {
          /**
           * @brief Constructor for 3D scalar field
           */
-         ScalarFieldSetup(SharedArrayI spDim1D, SharedArrayI spDim2D, const int dim3D);
+         ScalarFieldSetup(SharedArrayI spDim1D, SharedArrayI spDim2D, const int dim3D, std::shared_ptr<Memory::memory_resource> mem);
 
          /**
           * @brief Destructor
           */
-         virtual ~ScalarFieldSetup();
+         virtual ~ScalarFieldSetup() = default;
 
          /**
           * @brief Get number of rows in data storage
@@ -69,6 +71,11 @@ namespace Datatypes {
           */
          int nBlock() const;
 
+         /**
+          * @brief Get memory resource
+          */
+         std::shared_ptr<Memory::memory_resource> mem() const;
+
       protected:
 
       private:
@@ -96,6 +103,11 @@ namespace Datatypes {
           * @brief Number of columns of 2D storage
           */
          int mDataCols;
+
+         /**
+          * @brief Memory resources
+          */
+         std::shared_ptr<Memory::memory_resource> mMem;
    };
 
 }

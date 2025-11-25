@@ -58,9 +58,7 @@ namespace details {
    {
       auto spSetup = details::createSetup(details::SetupType::UniformUp, dim1D, dim3D);
 
-      auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
-
-      auto spField = std::make_shared<QuICC::Datatypes::ViewScalarField<T>>(spSetup, mem);
+      auto spField = std::make_shared<QuICC::Datatypes::ViewScalarField<T>>(spSetup);
       auto&& data = spField->rDataView();
 
       for(int k = 0; k < spSetup->nBlock(); k++)

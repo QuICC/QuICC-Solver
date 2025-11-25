@@ -62,6 +62,11 @@ namespace Datatypes {
          explicit ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup, std::shared_ptr<Memory::memory_resource> mem);
 
          /**
+          * @brief Constructor
+          */
+         explicit ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup);
+
+         /**
           * @brief Copy constructor
           */
          ViewScalarField(const ViewScalarField<TData>& other);
@@ -763,6 +768,11 @@ namespace Datatypes {
       }
    }
 
+   template <typename TData> ViewScalarField<TData>::ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup)
+      : ViewScalarField(spSetup, spSetup->mem())
+   {
+   }
+
    template <typename TData> ViewScalarField<TData>::ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup, std::shared_ptr<Memory::memory_resource> mem)
       : mMem(mem)
    {
@@ -810,9 +820,9 @@ namespace Datatypes {
    {
       this->mMem = other.mMem;
       this->mView = other.mView;
-      this->mView = other.mspData;
-      this->mView = other.mspIndices;
-      this->mView = other.mspPointers;
+      this->mspData  = other.mspData;
+      this->mspIndices = other.mspIndices;
+      this->mspPointers = other.mspPointers;
    }
 
    template <typename TData> void ViewScalarField<TData>::setZeros()

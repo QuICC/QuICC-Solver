@@ -6,16 +6,10 @@
 #ifndef QUICC_RESOLUTION_HPP
 #define QUICC_RESOLUTION_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <vector>
 #include <memory>
-
-// External includes
-//
 
 // Project includes
 //
@@ -24,6 +18,8 @@
 #include "QuICC/Resolutions/SimulationResolution.hpp"
 #include "QuICC/Resolutions/CoreResolution.hpp"
 #include "QuICC/Transform/TransformSetup.hpp"
+#include "Memory/Memory.hpp"
+#include "Memory/MemoryResource.hpp"
 
 // Forward declarations
 namespace QuICC {
@@ -58,7 +54,7 @@ namespace QuICC {
          /**
           * @brief Empty Destructor
           */
-         ~Resolution();
+         ~Resolution() = default;
 
          /**
           * @brief Get the simulation resolution
@@ -196,6 +192,11 @@ namespace QuICC {
           * @brief Storage for the index counter
           */
          std::shared_ptr<IndexCounter>   mspCounter;
+
+         /**
+          * @brief Memory resource
+          */
+         std::shared_ptr<Memory::memory_resource> mspMem;
    };
 
    /// Typedef for a shared pointer to a Resolution object

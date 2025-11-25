@@ -44,7 +44,9 @@ namespace details {
          throw std::logic_error("Unknown setup type");
       }
 
-      auto spSetup = std::make_shared<QuICC::Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, dim3D);
+      auto mem = std::make_shared<QuICC::Memory::Cpu::NewDelete>();
+
+      auto spSetup = std::make_shared<QuICC::Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, dim3D, mem);
 
       return spSetup;
    }

@@ -9,6 +9,7 @@
 #include <variant>
 
 #include "QuICC/ScalarFields/FlatScalarField.hpp"
+#include "QuICC/ScalarFields/ViewScalarField.hpp"
 #include "QuICC/Variables/Variable.hpp"
 #include "QuICC/Variables/Spectral/ScalarVariable.hpp"
 #include "QuICC/Variables/Spectral/VectorVariable.hpp"
@@ -21,7 +22,9 @@ namespace Selector {
 
    /// Template typedef for scalar field implementation
    template <typename TData>
-      using ScalarField = QuICC::Datatypes::FlatScalarField<TData>;
+      using ScalarField = QuICC::Datatypes::ViewScalarField<TData>;
+   //template <typename TData>
+   //   using ScalarField = QuICC::Datatypes::FlatScalarField<TData>;
 
    /// Template typedef for shared scalar field implementation
    template <typename TData>
