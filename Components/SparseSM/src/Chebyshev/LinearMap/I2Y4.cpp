@@ -13,6 +13,7 @@
 //
 #include "QuICC/SparseSM/Chebyshev/LinearMap/I2Y4.hpp"
 #include "Types/Internal/Math.hpp"
+#include "Types/Internal/Literals.hpp"
 
 namespace QuICC {
 
@@ -22,6 +23,8 @@ namespace Chebyshev {
 
 namespace LinearMap {
 
+using namespace Internal::Literals;
+
 I2Y4::I2Y4(const int rows, const int cols, const Scalar_t lower,
    const Scalar_t upper) :
     ILinearMapOperator(rows, cols, lower, upper)
@@ -29,109 +32,76 @@ I2Y4::I2Y4(const int rows, const int cols, const Scalar_t lower,
 
 I2Y4::ACoeff_t I2Y4::d_6(const ACoeff_t& n) const
 {
-   auto a1 = this->a();
-   return Internal::Math::pow(a1 / 2.0, 6) / (n * (n - 1.0));
+   return Internal::Math::pow(a<1>() / 2.0_mp, 6) / (n * (n - 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d_5(const ACoeff_t& n) const
 {
-   auto a1 = this->a();
-   return Internal::Math::pow(a1, 5) * this->b() / (8.0 * n * (n - 1.0));
+   return Internal::Math::pow(a<1>(), 5) * b<1>() / (8.0_mp * n * (n - 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d_4(const ACoeff_t& n) const
 {
-   auto a1 = this->a();
-   auto a2 = this->a() * this->a();
-   auto b2 = this->b() * this->b();
-
-   return Internal::Math::pow(a1 / 2.0, 4) *
-          (a2 * (n + 2.0) + 12.0 * b2 * (n + 1.0)) /
-          (2.0 * n * (n - 1.0) * (n + 1.0));
+   return Internal::Math::pow(a<1>() / 2.0_mp, 4) *
+          (a<2>() * (n + 2.0_mp) + 12.0_mp * b<2>() * (n + 1.0_mp)) /
+          (2.0_mp * n * (n - 1.0_mp) * (n + 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d_3(const ACoeff_t& n) const
 {
-   auto a1 = this->a();
-   auto b1 = this->b();
-   auto a2 = this->a() * this->a();
-   auto b2 = this->b() * this->b();
-   return Internal::Math::pow(a1 / 2.0, 3) * b1 *
-          (a2 * (n + 3.0) + 4.0 * b2 * (n + 1.0)) / (n * (n - 1.0) * (n + 1.0));
+   return Internal::Math::pow(a<1>() / 2.0_mp, 3) * b<1>() *
+          (a<2>() * (n + 3.0_mp) + 4.0_mp * b<2>() * (n + 1.0_mp)) / (n * (n - 1.0_mp) * (n + 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d_2(const ACoeff_t& n) const
 {
-   auto a2 = this->a() * this->a();
-   auto b2 = this->b() * this->b();
-   auto a4 = a2 * a2;
-   auto b4 = b2 * b2;
-
-   return -a2 * (a4 * (n - 5.0) - 48.0 * a2 * b2 - 16.0 * b4 * (n + 1.0)) /
-          (64.0 * n * (n - 1.0) * (n + 1.0));
+   return -a<2>() * (a<4>() * (n - 5.0_mp) - 48.0_mp * a<2>() * b<2>() - 16.0_mp * b<4>() * (n + 1.0_mp)) /
+          (64.0_mp * n * (n - 1.0_mp) * (n + 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d_1(const ACoeff_t& n) const
 {
-   auto a2 = this->a() * this->a();
-   auto b2 = this->b() * this->b();
-   auto a3 = a2 * this->a();
-   return -a3 * this->b() * (a2 + 2.0 * b2) / (4.0 * n * (n + 1.0));
+   return -a<3>() * this->b() * (a<2>() + 2.0_mp * b<2>()) / (4.0_mp * n * (n + 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d0(const ACoeff_t& n) const
 {
-   auto a2 = this->a() * this->a();
-   auto b2 = this->b() * this->b();
-   auto a4 = a2 * a2;
-   auto b4 = b2 * b2;
-   return -a2 * (a4 + 12.0 * a2 * b2 + 8.0 * b4) /
-          (16.0 * (n - 1.0) * (n + 1.0));
+   return -a<2>() * (a<4>() + 12.0_mp * a<2>() * b<2>() + 8.0_mp * b<4>()) /
+          (16.0_mp * (n - 1.0_mp) * (n + 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d1(const ACoeff_t& n) const
 {
-   return this->d_1(n - 1.0);
+   return this->d_1(n - 1.0_mp);
 }
 
 I2Y4::ACoeff_t I2Y4::d2(const ACoeff_t& n) const
 {
-   auto a2 = this->a() * this->a();
-   auto b2 = this->b() * this->b();
-   auto a4 = a2 * a2;
-   auto b4 = b2 * b2;
-   return -a2 * (a4 * (n + 5.0) + 48.0 * a2 * b2 - 16.0 * b4 * (n - 1.0)) /
-          (64.0 * n * (n - 1.0) * (n + 1.0));
+   return -a<2>() * (a<4>() * (n + 5.0_mp) + 48.0_mp * a<2>() * b<2>() - 16.0_mp * b<4>() * (n - 1.0_mp)) /
+          (64.0_mp * n * (n - 1.0_mp) * (n + 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d3(const ACoeff_t& n) const
 {
-   auto a2 = this->a() * this->a();
-   auto b2 = this->b() * this->b();
-   auto b1 = this->b();
-   auto a3 = a2 * this->a();
-   return a3 * b1 * (a2 * (n - 3.0) + 4.0 * b2 * (n - 1.0)) /
-          (8.0 * n * (n - 1.0) * (n + 1.0));
+   return a<3>() * b<1>() * (a<2>() * (n - 3.0_mp) + 4.0_mp * b<2>() * (n - 1.0_mp)) /
+          (8.0_mp * n * (n - 1.0_mp) * (n + 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d4(const ACoeff_t& n) const
 {
-   auto a2 = this->a() * this->a();
-   auto b2 = this->b() * this->b();
-
-   return Internal::Math::pow(this->a() / 2.0, 4) *
-          (a2 * (n - 2.0) + 12.0 * b2 * (n - 1.0)) /
-          (2.0 * n * (n - 1.0) * (n + 1.0));
+   return Internal::Math::pow(a<1>() / 2.0_mp, 4) *
+          (a<2>() * (n - 2.0_mp) + 12.0_mp * b<2>() * (n - 1.0_mp)) /
+          (2.0_mp * n * (n - 1.0_mp) * (n + 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d5(const ACoeff_t& n) const
 {
-   return d_5(n + 1.0);
+   return d_5(n + 1.0_mp);
 }
 
 I2Y4::ACoeff_t I2Y4::d6(const ACoeff_t& n) const
 {
-   return d_6(n + 1.0);
+   return d_6(n + 1.0_mp);
 }
 
 void I2Y4::buildTriplets(TripletList_t& list) const
