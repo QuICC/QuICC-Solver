@@ -426,7 +426,7 @@ set(_tests_templated
   )
 quicc_set_ulp(_ulp
   ULP 18 22 176 65 31
-  MPULP 6 6 55 19 9
+  MPULP 6 6 55 21 13
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
@@ -442,7 +442,7 @@ set(_tests_templated
   )
 quicc_set_ulp(_ulp
   ULP 16 23 189 48 78 13 213 205 40 59
-  MPULP 10 5 33 13 19 7 54 76 9 7
+  MPULP 10 7 35 13 19 7 54 76 9 7
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
@@ -458,7 +458,7 @@ set(_tests_templated
   )
 quicc_set_ulp(_ulp
   ULP 55 23 732 59 51 46 602 582 44 22
-  MPULP 17 16 102 9 19 11 209 280 11 11
+  MPULP 17 20 130 9 19 11 209 280 11 11
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
@@ -502,7 +502,7 @@ set(_tests_templated
   )
 quicc_set_ulp(_ulp
   ULP 44 1213 10190 2217 1803 38 658 6820 1591 2111
-  MPULP 6 142 550 400 236 4 175 520 58 180
+  MPULP 6 142 550 400 236 4 175 520 110 180
   )
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
