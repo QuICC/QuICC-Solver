@@ -4,7 +4,7 @@
 message(DEBUG "HighFive")
 list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
 
-set(QUICC_HIGHFIVE_VERSION "2.8.0")
+set(QUICC_HIGHFIVE_VERSION "3.2.0")
 
 option(QUICC_USE_SYSTEM_HIGHFIVE "Use system installed HighFive." OFF)
 
@@ -20,7 +20,7 @@ else()
         include(FetchContent)
             FetchContent_Declare(
                 h5
-                GIT_REPOSITORY https://github.com/BlueBrain/HighFive
+                GIT_REPOSITORY https://github.com/highfive-devs/highfive
                 GIT_TAG "v${QUICC_HIGHFIVE_VERSION}"
                 GIT_SHALLOW TRUE
                 GIT_PROGRESS TRUE

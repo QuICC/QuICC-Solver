@@ -141,17 +141,21 @@ void Tracker::print_hdf5()
 {
 #ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE
 
+   std::string fid = "";
 #ifdef QUICC_PROFILE_NATIVE_WRITER_HIGHFIVE_UNIQUEFILE
-    std::string fid = details::generate_random_string(6);
-    std::string outFile = "profile_" + fid + ".hdf5";
-#else
-    std::string outFile = "profile.hdf5";
+    fid = "_" + details::generate_random_string(6);
+#ifdef QUICC_MPI
+    std::vector<char> cfid(fid.begin(), fid.end());
+    MPI_Bcast(cfid.data(), cfid.size(), MPI_CHAR, 0, mComm);
+    fid.assign(cfid.begin(), cfid.end());
 #endif
+#endif
+    std::string outFile = "profile" + fid + ".hdf5";
 
     int rank{};
     int nRanks{1};
 
-    #if QUICC_MPI
+    #ifdef QUICC_MPI
     MPI_Comm_rank(mComm, &rank);
     MPI_Comm_size(mComm, &nRanks);
     #endif
@@ -159,9 +163,14 @@ void Tracker::print_hdf5()
     // Write in a format compatible to conduit
     using namespace HighFive;
 
+    #ifdef QUICC_MPI
+    auto fapl = FileAccessProps{};
+    fapl.add(MPIOFileAccess(mComm, MPI_INFO_NULL));
+    #endif
+
     File file(outFile, File::ReadWrite | File::Create | File::Truncate
-    #if QUICC_MPI
-    , MPIOFileDriver(mComm, MPI_INFO_NULL)
+    #ifdef QUICC_MPI
+    , fapl
     #endif
     );
 
@@ -206,7 +215,7 @@ void Tracker::print_hdf5()
             .select({std::size_t(rank)*sampleSize}, {sampleSize})
             .write(std::get<tracking::time>(reg->second).data());
 
-        #if QUICC_MPI
+        #ifdef QUICC_MPI
         // wait for everyone to be done
         MPI_Barrier(mComm);
         #endif
