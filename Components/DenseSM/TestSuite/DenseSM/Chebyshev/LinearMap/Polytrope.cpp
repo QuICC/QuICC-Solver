@@ -44,21 +44,24 @@ Internal::Array Polytrope::evaluate(const Internal::Array& r, const int l,
    }
    else
    {
+      const Internal::MHDFloat rratio = static_cast<Internal::MHDFloat>(mRratio);
+      const Internal::MHDFloat nRho = static_cast<Internal::MHDFloat>(mNrho);
+      const Internal::MHDFloat nPoly = static_cast<Internal::MHDFloat>(mNpoly);
 
       const Internal::MHDFloat zetaO =
-         (mRratio + 1) / (mRratio * Internal::Math::exp(mNrho / mNpoly) + 1);
+         (rratio + 1) / (rratio * Internal::Math::exp(nRho / nPoly) + 1);
 
       const Internal::MHDFloat c0 =
-         (2.0_mp * zetaO - mRratio - 1.0_mp) / (1.0_mp - mRratio);
+         (2.0_mp * zetaO - rratio - 1.0_mp) / (1.0_mp - rratio);
 
-      const Internal::MHDFloat c1 = (1.0_mp + mRratio) * (1.0_mp - zetaO) /
-                                    (1.0_mp - mRratio) / (1.0_mp - mRratio);
+      const Internal::MHDFloat c1 = (1.0_mp + rratio) * (1.0_mp - zetaO) /
+                                    (1.0_mp - rratio) / (1.0_mp - rratio);
 
-      const Internal::MHDFloat zetaI = (1.0_mp + mRratio - zetaO) / mRratio;
+      const Internal::MHDFloat zetaI = (1.0_mp + rratio - zetaO) / rratio;
 
       auto zeta = c0 + c1 / r.array();
 
-      val = zeta.array().pow(mNpoly);
+      val = zeta.array().pow(nPoly);
    }
 
    return val;

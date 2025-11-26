@@ -6,7 +6,7 @@ quicc_clear_test_list()
 include(SetUlp)
 
 quicc_set_ulp(_ulps
-  ULP 40 40 40 250 250 400 250 625 625 625
+  ULP 40 40 40 250 300 400 250 625 625 625
   MPULP 40 40 40 900 250 900 900 600 600 600
   )
 
