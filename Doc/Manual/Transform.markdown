@@ -1,2 +1,0 @@
-Projector/Integrator tree {#pManTransform}
-=========================

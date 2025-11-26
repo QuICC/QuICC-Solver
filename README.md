@@ -17,7 +17,7 @@
 0. Upload your SSH key to your github profile
 1. Clone repository
    ```bash
-   git clone -b main git@github.com:QuICC/QuICC.git
+   git clone -b main git@github.com:QuICC/QuICC-Solver.git
    ```
 
 2. Create build directory
@@ -25,15 +25,15 @@
    mkdir </path/to/Builds>
    cd </path/to/Builds>
    ```
-3. Configure build with CMake specifying the model(s) to build
+3. Configure build with CMake specifying the model(s) to build. As an example, we use the BoussinesqSphereRTC and BoussinesqShellDynamo models.
    ```bash
-   cmake </path/to/QuICC> -DQUICC_MODEL=<GreatSimulation1>\;<GreatSimulation2>
+   cmake </path/to/QuICC> -DQUICC_MODEL=BoussinesqSphereRTC\;BoussinesqShellDynamo
    ```
-   The physical model descriptions are stored in separate git repositories. A list of existing models is obtained [here](https://github.com/QuICC?q=Model-+in%3Aname&type=&language=). All official model repositories follow the naming "Model-<GreatSimulation>".
+   The physical model descriptions are stored in separate git repositories. A list of existing models is obtained [here](https://github.com/QuICC?q=Model-+in%3Aname&type=&language=). All official model repositories follow the naming "Model-<ApproximationGeometryType>".
 
    The registered models are cloned into Models/.
 
-   Custom models can be added into Models/.
+   It is also possible to add a custom model manually into Models/.
 
 4. Compile the model executables
    ```bash
@@ -41,29 +41,25 @@
    ```
 5. Create configuration XML
    ```bash
-   </path/to/Builds>/bin/<GreatSimulation>Config
+   </path/to/Builds>/bin/BoussinesqSphereRTCConfig
    mv parameters_GEOMETRY.cfg parameters.cfg
    edit parameters.cfg
    ```
 6. Create initial state
    ```bash
-   </path/to/Builds>/bin/<GreatSimulation>State
+   </path/to/Builds>/bin/BoussinesqSphereRTCState
    mv state0000.hdf5 state_initial.hdf5
    ```
 7. Run simulation
    ```bash
-   </path/to/Builds>/bin/<GreatSimulation>Model
+   </path/to/Builds>/bin/BoussinesqSphereRTCModel
    ```
 8. Create physical space data for visualization
    ```bash
    ln -s state0042.hdf5 state4Visu.hdf5
-   </path/to/Builds>/bin/<GreatSimulation>Visu
+   </path/to/Builds>/bin/BoussinesqSphereRTCVisu
    ```
 9. visualize *visState0000.hdf5*
-
-## Benchmarks
-
-A set of benchmarks is provided in the [Benchmarks](https://github.com/QuICC/Benchmarks) repository.
 
 
 ## Tests
@@ -78,9 +74,9 @@ then, after compiling, one can run all the available tests
 ```bash
 ctest --output-on-failure
 ```
-or a specific test
+or specific tests
 ```bash
-ctest -R <only-this-test> --output-on-failure
+ctest -R <test-regexp> --output-on-failure
 ```
 
 ## Code completion in Vim
@@ -142,7 +138,6 @@ One could still use MKL for the BLAS back-end and ensure that the FFTW shared ob
 LD_PRELOAD=</path/to/FFTW>/libfftw3.so <executable>
 ```
 
-
 ## Debugging
 
 ### gdb hook
@@ -161,91 +156,8 @@ By setting the enviroment variable `QUICC_PROFILE_MPI_BARRIER` to either `after`
 
 # Use docker image
 
-In order to simplify setting up a local version of QuICC, a docker image with required dependencies installed is provided. The latest image can be found on docker hub at [quicc/buildbase](https://hub.docker.com/repository/docker/quicc/buildbase/general). The setup described below will mount the `</path/to/QuICC_mnt>` directory into the container. Everything that needs to remain even after stopping the docker container should be stored in this directory. For example, source and build directory should be created in `</path/to/QuICC_mnt>`. In the commands below, `</path/to/QuICC_mnt>` needs to be replaced with an actual path.
-
-## Linux and MacOS
-
-### Setup docker
-
-The following steps should produce a working environment:
- 1. Install docker:
-    - *Linux:* Follow instructions for your distribution.
-    - *MacOS:* Install docker desktop from [Install on Mac](https://docs.docker.com/desktop/install/mac-install/).
- 2. Add your SSH keys to the SSH agent if not already present, i.e. for each key you need, run:
-    ```bash
-    ssh-add </path/to/SSH_KEY>
-    ```
- 3. Start docker
- 4. Open Terminal:
-    - Pull docker image from hub
-     ```bash
-     docker pull quicc/buildbase:latest
-     ```
-    - Create directory where sources and builds will be kept. This directory is persistent and will be mounted into the container.
-    ```bash
-    mkdir </path/to/QuICC_mnt>
-    ```
-    - Clone QuICC repository into `<path/to/QuICC_mnt>`, for example to clone the `main` branch:
-    ```bash
-    git clone -b main git@github.com:QuICC/QuICC </path/to/QuICC_mnt>/QuICC
-    ```
-    
-### Run docker image in Linux
-
-The directory `</path/to/QuICC_mnt>` will be mounted into the container under `/QuICC`. The content of this directory is persistent and will not disappear when the container is deleted.
-```bash
-docker run --rm -it \
--v </path/to/QuICC_mnt>:/QuICC \
---mount type=bind,src="$SSH_AUTH_SOCK",target=/run/host-services/ssh-auth.sock \
--e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
-quicc/buildbase:latest
-```
-
-If everything worked, you should now be inside the container. Create a build directory in `/QuICC` and proceed as usual to configure, build and run QuICC.
-    
-### Run docker image in MacOS
-
-The directory `</path/to/QuICC_mnt>` will be mounted into the container under `/QuICC`. The content of this directory is persistent and will not disappear when the container is deleted.
-```bash
-docker run --rm -it \
--v </path/to/QuICC_mnt>:/QuICC \
---mount type=bind,src="/run/host-services/ssh-auth.sock",target=/run/host-services/ssh-auth.sock \
--e SSH_AUTH_SOCK="/run/host-services/ssh-auth.sock" \
-quicc/buildbase:latest
-```
-
-If everything worked, you should now be inside the container. Create a build directory in `/QuICC` and proceed as usual to configure, build and run QuICC.
+In order to simplify setting up a local version of QuICC, a docker image with required dependencies installed is provided. The latest image can be found on docker hub at [quicc/buildbase](https://hub.docker.com/repository/docker/quicc/buildbase/general). The setup described below will mount the `</path/to/QuICC_mnt>` directory into the container. Everything that needs to remain even after stopping the docker container should be stored in this directory. For example, source and build directory should be created in `</path/to/QuICC_mnt>`. In the commands below, `</path/to/QuICC_mnt>` needs to be replaced with an actual path. Further documentation can be found in [Doc/docker.md](https://quicc.github.io/tutorial/docker).
 
 # Linear stability calculations
 
-QuICC provides a set of Python scripts to do linear stability calculations. The tools require PETSc and SLEPc, as well as their Python bindings petsc4py and slepc4py. As those library are quite complex and provide a lot of different options during installation, obtaining the right setup can be challenging. In order to simplify the setup, a docker image which contains all dependencies is provided. The image is available on the docker hub as "quicc/stability". In order to use it, follow the instructions above to setup docker but use "quicc/stability" in place of "quicc/buildbase".
-
-## Run the marginal curve tracing tool
-
-Let's assume the configured build directory is called `build_dir` and the model used is `BoussinesqSphereRTC`. To trace a marginal curve do the following:
- 1. Change to build directory
-    ```bash
-    cd /path/to/build_dir
-    ```
- 2. Copy linear stability files to build directory
-    ```bash
-    make quicc_pyquicc quicc_boussinesqspherertc_updatepy
-    ```
- 3. The scripts are installed under `lib64/python/linear_stability`
-    ```bash
-    cd lib64/python/linear_stability/boussinesq/sphere/rtc/
-    ```
- 4. Define the parameters and options in `trace_marginal.py`. The script contains a few examples for different parameters, resolutions, etc. At the bottom of the file are the main options for the tracing tool. The options are described in `lib64/python/quicc/linear_stability/marginal_curve.py` in `default_options` line 597. The main options are
-    - `marginal_options['curve']`: True/False trace marginal curve
-    - `marginal_options['minimum']`: True/False compute minimum
-    - `marginal_options['solve']`: True/False compute single point
-    - `marginal_options['solve_nev']`: Number of eigenvalues to compute
-    - `marginal_options['curve_points']`: list of modes where to compute the marginal curve
- 5. Tell Python where to find the modules
-    ```bash
-    export PYTHONPATH=/path/to/build_dir/lib64/python
-    ```
- 6. Run the marginal curve tracing script:
-    ```bash
-    python trace_marginal.py -st_type sinvert -eps_target 0 -eps_target_real
-    ```
+QuICC provides a linear stability solver combining the model description and the PETSc and SLEPc library. A legacy imPython plementation using the python model is also available but not maintained anymore. the  Further documentation can be found in [Doc/stability.md](https://quicc.github.io/tutorial/docker).
