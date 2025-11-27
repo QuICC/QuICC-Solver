@@ -37,7 +37,7 @@ I2Y4::ACoeff_t I2Y4::d_6(const ACoeff_t& n) const
 
 I2Y4::ACoeff_t I2Y4::d_5(const ACoeff_t& n) const
 {
-   return a<5>() * b<1>() / (256.0_mp * n * (n - 1.0_mp));
+   return a<5>() * b<1>() / (8.0_mp * n * (n - 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d_4(const ACoeff_t& n) const
@@ -86,9 +86,9 @@ I2Y4::ACoeff_t I2Y4::d3(const ACoeff_t& n) const
 
 I2Y4::ACoeff_t I2Y4::d4(const ACoeff_t& n) const
 {
-   return Internal::Math::pow(a<1>() / 2.0_mp, 4) *
+   return a<4>() *
           (a<2>() * (n - 2.0_mp) + 12.0_mp * b<2>() * (n - 1.0_mp)) /
-          (2.0_mp * n * (n - 1.0_mp) * (n + 1.0_mp));
+          (32.0_mp * n * (n - 1.0_mp) * (n + 1.0_mp));
 }
 
 I2Y4::ACoeff_t I2Y4::d5(const ACoeff_t& n) const
