@@ -283,17 +283,17 @@ def hdf5Test(fname, refFile, dataFile, ds, tid, tol = 11, threshold = -1, percol
         if percol and perrow:
             ref_max = np.max(np.abs(ref[:,:]))
             def get_ulp(r, idx):
-                ulp = compute_ulp(r)
+                ulp = compute_ulp(ref_max)
                 return ulp
         elif percol:
             col_max = np.max(np.abs(ref), axis = 0)
             def get_ulp(r, idx):
-                ulp = compute_ulp(r)
+                ulp = compute_ulp(col_max[idx[1]])
                 return ulp
         elif perrow:
             row_max = np.max(np.abs(ref[:,:]), axis = 1)
             def get_ulp(r, idx):
-                ulp = compute_ulp(r)
+                ulp = compute_ulp(row_max[idx[0]])
                 return ulp
         else:
             def get_ulp(r, idx):
