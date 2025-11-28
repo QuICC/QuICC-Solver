@@ -1,6 +1,7 @@
 /**
  * @file IWorlandOperator.hpp
- * @brief Implementation of the generic interface to the full sphere Worland sparse operator
+ * @brief Implementation of the generic interface to the full sphere Worland
+ * sparse operator
  */
 
 #ifndef QUICC_SPARSESM_IWORLANDOPERATOR_HPP
@@ -12,49 +13,51 @@
 
 // Project includes
 //
-#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/ISparseSMOperator.hpp"
 #include "QuICC/SparseSM/Worland/WorlandKind.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
 namespace SparseSM {
 
+/**
+ * @brief Implementation of the generic interface to the full sphere Worland
+ * sparse operator
+ */
+class IWorlandOperator : public ISparseSMOperator
+{
+public:
    /**
-    * @brief Implementation of the generic interface to the full sphere Worland sparse operator
+    * @brief Constructor
+    *
+    * @param rows    Number of rows
+    * @param cols    Number of columns
+    * @param alpha   Jacobi alpha parameter
+    * @param veta    Jacobi alpha parameter
     */
-   class IWorlandOperator: public ISparseSMOperator
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param rows    Number of rows
-          * @param cols    Number of columns
-          * @param alpha   Jacobi alpha parameter
-          * @param veta    Jacobi alpha parameter
-          */
-         IWorlandOperator(const int rows, const int cols, const Scalar_t  alpha, const Scalar_t dBeta);
+   IWorlandOperator(const int rows, const int cols, const Scalar_t alpha,
+      const Scalar_t dBeta);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~IWorlandOperator() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~IWorlandOperator() = default;
 
-      protected:
-         /**
-          * @brief Type of Worland implementation
-          */
-         Worland::WorlandKind type() const;
+protected:
+   /**
+    * @brief Type of Worland implementation
+    */
+   Worland::WorlandKind type() const;
 
-      private:
-         /**
-          * Type of Worland implementation
-          */
-         Worland::WorlandKind mType;
-   };
+private:
+   /**
+    * Type of Worland implementation
+    */
+   Worland::WorlandKind mType;
+};
 
-}
-}
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_IWORLANDOPERATOR_HPP

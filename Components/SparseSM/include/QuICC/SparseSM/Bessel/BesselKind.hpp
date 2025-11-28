@@ -20,6 +20,7 @@ enum class BesselKind
 {
    VALUE,
    INSULATING,
+   NOSLIP,
 };
 
 } // namespace Bessel

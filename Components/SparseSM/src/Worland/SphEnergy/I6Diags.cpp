@@ -12,8 +12,8 @@
 // Project includes
 //
 #include "QuICC/SparseSM/Worland/SphEnergy/I6Diags.hpp"
-#include "Types/Internal/Math.hpp"
 #include "Types/Internal/Literals.hpp"
+#include "Types/Internal/Math.hpp"
 
 namespace QuICC {
 
@@ -23,7 +23,7 @@ namespace Worland {
 
 namespace SphEnergy {
 
-   using namespace Internal::Literals;
+using namespace Internal::Literals;
 
 I6Diags::I6Diags(const Scalar_t alpha, const int l, const int q) :
     QuICC::SparseSM::Worland::I6Diags(alpha, 0.5_mp, l, q)

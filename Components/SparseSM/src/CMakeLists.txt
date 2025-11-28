@@ -3,6 +3,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   IBesselOperator.cpp
   IChebyshevOperator.cpp
   IWorlandOperator.cpp
+  Id.cpp
 )
 
 add_subdirectory(Bessel)

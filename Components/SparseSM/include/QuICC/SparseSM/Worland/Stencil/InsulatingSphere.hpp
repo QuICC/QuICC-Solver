@@ -1,6 +1,7 @@
 /**
  * @file InsulatingSphere.hpp
- * @brief Implementation of the full sphere Worland insulating sphere boundary condition stencil
+ * @brief Implementation of the full sphere Worland insulating sphere boundary
+ * condition stencil
  */
 
 #ifndef QUICC_SPARSESM_WORLAND_STENCIL_INSULATINGSPHERE_HPP
@@ -11,9 +12,9 @@
 
 // Project includes
 //
-#include "Types/Typedefs.hpp"
 #include "QuICC/SparseSM/IWorlandOperator.hpp"
 #include "QuICC/SparseSM/Worland/Stencil/InsulatingSphereDiags.hpp"
+#include "Types/Typedefs.hpp"
 
 namespace QuICC {
 
@@ -23,47 +24,48 @@ namespace Worland {
 
 namespace Stencil {
 
+/**
+ * @brief Implementation of the full sphere Worland insulating sphere boundary
+ * condition stencil
+ */
+class InsulatingSphere : public IWorlandOperator
+{
+public:
    /**
-    * @brief Implementation of the full sphere Worland insulating sphere boundary condition stencil
+    * @brief Constructor
+    *
+    * @param rows    Number of row
+    * @param cols    Number of cols
+    * @param alpha   Jacobi alpha
+    * @param dBeta   Jacobi beta = l + dBeta
+    * @param l       Harmonic degree l
     */
-   class InsulatingSphere: public IWorlandOperator
-   {
-      public:
-         /**
-          * @brief Constructor
-          *
-          * @param rows    Number of row
-          * @param cols    Number of cols
-          * @param alpha   Jacobi alpha
-          * @param dBeta   Jacobi beta = l + dBeta
-          * @param l       Harmonic degree l
-          */
-         InsulatingSphere(const int rows, const int cols, const Scalar_t alpha, const Scalar_t dBeta, const int l);
+   InsulatingSphere(const int rows, const int cols, const Scalar_t alpha,
+      const Scalar_t dBeta, const int l);
 
-         /**
-          * @brief Destructor
-          */
-         virtual ~InsulatingSphere() = default;
+   /**
+    * @brief Destructor
+    */
+   virtual ~InsulatingSphere() = default;
 
-      protected:
+protected:
+private:
+   /**
+    * @brief Build triplet representation of matrix
+    *
+    * @param list List of triplets (row, col, value)
+    */
+   void buildTriplets(TripletList_t& list) const final;
 
-      private:
-         /**
-          * @brief Build triplet representation of matrix
-          *
-          * @param list List of triplets (row, col, value)
-          */
-         void buildTriplets(TripletList_t& list) const final;
+   /**
+    * @brief Implementation of the diagonals
+    */
+   std::shared_ptr<InsulatingSphereDiags> mpImpl;
+};
 
-         /**
-          * @brief Implementation of the diagonals
-          */
-         std::shared_ptr<InsulatingSphereDiags> mpImpl;
-   };
-
-} // Stencil
-} // Worland
-} // SparseSM
-} // QuICC
+} // namespace Stencil
+} // namespace Worland
+} // namespace SparseSM
+} // namespace QuICC
 
 #endif // QUICC_SPARSESM_WORLAND_STENCIL_INSULATINGSPHERE_HPP

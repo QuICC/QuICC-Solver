@@ -14,6 +14,7 @@
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/DebuggerMacro.h"
 #include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
+#include "QuICC/Diagnostics/ICflWrapper.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/Equations/Tools/EquationTools.hpp"
 #include "QuICC/ModelOperator/ExplicitLinear.hpp"
@@ -147,6 +148,11 @@ void Coordinator::addEquation(Equations::SharedIVectorEquation spEq,
 
    this->mVectorEqMap.at(key).push_back(spEq);
    DebuggerMacro_msg("... done", 1);
+}
+
+void Coordinator::addCfl(Diagnostics::SharedICflWrapper spCfl)
+{
+   this->mDiagnostics.addCfl(spCfl);
 }
 
 Coordinator::ScalarEquation_range Coordinator::scalarRange(
@@ -351,57 +357,6 @@ void Coordinator::updateSpectral(const int it)
       this->mTransformCoordinator);
 }
 
-void Coordinator::updateSpectral(const bool isTrivial, const bool isDiagnostic,
-   const bool isPrognostic, const bool isWrapper, const int it)
-{
-   /// \todo This needs to be checked as it currently doesn't do anything
-
-   std::map<std::size_t, Physical::Kernel::SharedIPhysicalKernel> kernels;
-
-   // Get kernels from trivial equations
-   if (isTrivial)
-   {
-      auto sR = this->scalarRange(PseudospectralTag::Trivial::id(), it);
-      Equations::Tools::getNonlinearKernels(kernels, sR.first, sR.second);
-      auto vR = this->vectorRange(PseudospectralTag::Trivial::id(), it);
-      Equations::Tools::getNonlinearKernels(kernels, vR.first, vR.second);
-   }
-
-   // Get kernels from diagnostic equations
-   if (isDiagnostic)
-   {
-      auto sR = this->scalarRange(PseudospectralTag::Diagnostic::id(), it);
-      Equations::Tools::getNonlinearKernels(kernels, sR.first, sR.second);
-      auto vR = this->vectorRange(PseudospectralTag::Diagnostic::id(), it);
-      Equations::Tools::getNonlinearKernels(kernels, vR.first, vR.second);
-   }
-
-   // Get kernels from prognostic equations
-   if (isPrognostic)
-   {
-      auto sR = this->scalarRange(PseudospectralTag::Prognostic::id(), it);
-      Equations::Tools::getNonlinearKernels(kernels, sR.first, sR.second);
-      auto vR = this->vectorRange(PseudospectralTag::Prognostic::id(), it);
-      Equations::Tools::getNonlinearKernels(kernels, vR.first, vR.second);
-   }
-
-   // Get kernels from wrapper equations
-   if (isWrapper)
-   {
-      auto sR = this->scalarRange(PseudospectralTag::Wrapper::id(), it);
-      Equations::Tools::getNonlinearKernels(kernels, sR.first, sR.second);
-      auto vR = this->vectorRange(PseudospectralTag::Wrapper::id(), it);
-      Equations::Tools::getNonlinearKernels(kernels, vR.first, vR.second);
-   }
-
-   // Set mesh for kernels
-   Equations::Tools::setupPhysicalKernels(kernels,
-      this->mTransformCoordinator.mesh());
-
-   // this->mspFwdGrouper->transform(this->mScalarVariables,
-   // this->mVectorVariables, kernels, this->mTransformCoordinator);
-}
-
 void Coordinator::init(const Array& tstep, const SharedSimulationBoundary spBcs)
 {
    StageTimer stage;
@@ -532,9 +487,6 @@ void Coordinator::prepareEvolution(const std::size_t schemeId)
    // Update equation time
    this->updateEquationTime(this->mDiagnostics.startTime(), false);
 
-   // Initialise all values (solve and nonlinear computations except timestep)
-   this->preSolveEquations();
-
    // Update CFL condition
    this->mDiagnostics.initialCfl();
 
@@ -557,8 +509,11 @@ void Coordinator::prepareEvolution(const std::size_t schemeId)
       this->mDiagnostics.cfl(), this->mDiagnostics.maxError(), sP, vP, *this);
 
    // Compute physical space values if required
-   this->mspImposedBwdGrouper->transform(this->mImposedScalarVariables,
-      this->mImposedVectorVariables, *this->mspImposedTransformCoordinator);
+   if(this->mImposedScalarVariables.size() + this->mImposedVectorVariables.size() > 0)
+   {
+      this->mspImposedBwdGrouper->transform(this->mImposedScalarVariables,
+         this->mImposedVectorVariables, *this->mspImposedTransformCoordinator);
+   }
 }
 
 void Coordinator::cleanupForRun()
@@ -928,55 +883,6 @@ void Coordinator::explicitEquations(const int it)
    this->explicitPrognosticEquations(ModelOperator::ExplicitLinear::id(), it);
    Profiler::RegionStop<2>(
       "Pseudospectral::Coordinator::explicitEquations-prognostic");
-}
-
-void Coordinator::preSolveEquations()
-{
-   /// \todo No models are currently requiring a preSolve stage (only some
-   /// cartesian models did). Implementation needs to be checked
-
-   StageTimer stage;
-   stage.start("initializing fields");
-
-   // only execute for for iteration
-   // SHOULD THIS BE ITERATIONS UNTIL FIRST PROGNOSTIC EQUATIONS???
-   int it = 0;
-
-   // Solve diagnostic equations
-   this->explicitDiagnosticEquations(ModelOperator::ExplicitNextstep::id(), it);
-   this->solveDiagnosticEquations(SolveTiming::After::id(), it);
-
-   // Solve trivial equations
-   this->explicitTrivialEquations(ModelOperator::ExplicitNextstep::id(), it);
-   this->solveTrivialEquations(SolveTiming::After::id(), it);
-
-   // Compute physical values
-   this->updatePhysical(it);
-
-   // Only compute forward transform for diagnostic and trivial equations
-   this->updateSpectral(true, true, false, false, it);
-
-   // Solve diagnostic equations
-   this->explicitDiagnosticEquations(ModelOperator::ExplicitNonlinear::id(),
-      it);
-   this->solveDiagnosticEquations(SolveTiming::Before::id(), it);
-
-   // Solve trivial equations
-   this->explicitTrivialEquations(ModelOperator::ExplicitNonlinear::id(), it);
-   this->solveTrivialEquations(SolveTiming::Before::id(), it);
-
-   // Solve diagnostic equations
-   this->explicitDiagnosticEquations(ModelOperator::ExplicitNextstep::id(), it);
-   this->solveDiagnosticEquations(SolveTiming::After::id(), it);
-
-   // Solve trivial equations
-   this->explicitTrivialEquations(ModelOperator::ExplicitNextstep::id(), it);
-   this->solveTrivialEquations(SolveTiming::After::id(), it);
-
-   stage.done();
-
-   // Synchronise all nodes of simulation
-   QuICCEnv().synchronize();
 }
 
 void Coordinator::solveEquationsBefore(const int it)

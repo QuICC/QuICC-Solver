@@ -1,4 +1,4 @@
-/** 
+/**
  * @file Condition.cpp
  * @brief Source of the interface to a generic Worland boundary condition
  */
@@ -18,12 +18,12 @@ namespace Worland {
 
 namespace Boundary {
 
-   ICondition::ICondition(const Scalar_t alpha, const Scalar_t dBeta, const int l, const int q)
-      : IDiags(alpha, dBeta, l, 0)
-   {
-   }
- 
-} // Boundary
-} // Worland
-} // Polynomial
-} // QuICC
+ICondition::ICondition(const Scalar_t alpha, const Scalar_t dBeta, const int l,
+   const int q) :
+    IDiags(alpha, dBeta, l, 0)
+{}
+
+} // namespace Boundary
+} // namespace Worland
+} // namespace SparseSM
+} // namespace QuICC

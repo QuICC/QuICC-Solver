@@ -6,6 +6,7 @@
 #include "ViewOps/Pointwise/Pointwise.hpp"
 #include "ViewOps/Pointwise/Functors.hpp"
 #include "Graph/Types.hpp"
+#include "Profiler/Interface.hpp"
 
 
 using namespace QuICC::Graph;
@@ -19,6 +20,8 @@ using namespace QuICC::Graph;
 extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_cpu(void* obj,
     ViewDescriptor<@Type@, std::uint32_t, 3>* pRet, ViewDescriptor<@Type@, std::uint32_t, 3>* pLhs, ViewDescriptor<@Type@, std::uint32_t, 3>* pRhs)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirPointwiseShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_cpu\n";
@@ -60,6 +63,8 @@ extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@Ml
 extern "C" void _ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_gpu(void* obj,
     ViewDescriptor<@Type@, std::uint32_t, 3>* pRet, ViewDescriptor<@Type@, std::uint32_t, 3>* pLhs, ViewDescriptor<@Type@, std::uint32_t, 3>* pRhs)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirPointwiseShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_@Op@_@MlirType@_@Layout@_@MlirType@_@Layout@_@MlirType@_@Layout@_gpu\n";

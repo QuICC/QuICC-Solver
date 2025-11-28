@@ -1,5 +1,5 @@
 # Depend on CSCS official spack base container helpers
-FROM jfrog.svc.cscs.ch/docker-ci-ext/base-containers/public/spack-build:spack0.21.0-ubuntu22.04-cuda12.4.1 as builder
+FROM jfrog.svc.cscs.ch/docker-ci-ext/base-containers/public/spack-build:spack0.23.0-ubuntu22.04-cuda12.4.1 AS builder
 
 # number of processes to use for building the spack software stack
 ARG NUM_PROCS
@@ -7,9 +7,18 @@ ARG NUM_PROCS
 # use spack-install-helper that has all the spack boilerplate
 # First argument is the target machine, the rest are spack specs
 RUN spack-install-helper --target alps-gh200 \
-    "git" "cmake" "valgrind" "py-scipy" "py-filelock" "py-tabulate" "py-lxml" "vim +python +perl +lua" \
-    "fftw" "hdf5" "openblas" "boost@1.78.0" "kokkos +wrapper +cuda_lambda" "kokkos-kernels"
-
+    "git" \
+    "vim +python +perl +lua" \
+    "cmake" \
+    "fftw" \
+    "hdf5" \
+    "openblas" \
+    "boost@1.85.0" \
+    "py-scipy" \
+    "kokkos +wrapper +cuda_lambda" \
+    "kokkos-kernels" \
+    "gdb" \
+    "valgrind"
 
 # Bare OS image to run the installed executables
 FROM jfrog.svc.cscs.ch/docker-ci-ext/base-containers/public/spack-runtime:ubuntu22.04-cuda12.4.1
@@ -28,20 +37,21 @@ RUN fix_spack_install
 # Finally install software that is needed, e.g. compilers
 # It is also possible to build compilers via spack and let all dependencies be handled by spack
 RUN apt-get -yqq update && apt-get -yqq upgrade \
- && apt-get -yqq install build-essential gfortran gcc g++
+ && apt-get -yqq install build-essential gfortran gcc g++ ninja-build
 
+#################
 # Install LLVM 17
 RUN apt-get -yqq install lsb-release wget \
-software-properties-common gnupg
+ software-properties-common gnupg
 
 RUN wget https://apt.llvm.org/llvm.sh \
-&& chmod +x llvm.sh \
-&& ./llvm.sh 17
+ && chmod +x llvm.sh \
+ && ./llvm.sh 17
 
 RUN apt-get -yqq install libmlir-17-dev mlir-17-tools
 
+#################
 # Install Reframe
-
 ENV CUDAARCHS 90
 
 RUN cd /opt \
@@ -56,5 +66,5 @@ RUN cd /opt \
 
 
 RUN echo "source /opt/rfm_venv/bin/activate" >> /etc/profile.d/z99_reframe.sh \
-&& echo "export PATH=/opt/reframe/bin:$PATH" >> /etc/profile.d/z99_reframe.sh
+ && echo "export PATH=/opt/reframe/bin:$PATH" >> /etc/profile.d/z99_reframe.sh
 

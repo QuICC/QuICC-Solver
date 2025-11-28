@@ -8,6 +8,7 @@
 #ifdef QUICC_HAS_CUDA_BACKEND
 #include "Cuda/CudaUtil.hpp"
 #endif
+#include "Profiler/Interface.hpp"
 
 using namespace QuICC::Graph;
 
@@ -17,6 +18,8 @@ using namespace QuICC::Graph;
 /// @param umod
 extern "C" inline void _ciface_quiccir_fr_@Op@_@Kind@_f64_DCCSC3D_complexf64_DCCSC3D_cpu(void* obj, view3_t* pUval, view3_cd_t* pUmod)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirFourierprjShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_fr_@Op@_@Kind@_f64_DCCSC3D_complexf64_DCCSC3D_cpu\n";
@@ -53,6 +56,8 @@ extern "C" inline void _ciface_quiccir_fr_@Op@_@Kind@_f64_DCCSC3D_complexf64_DCC
 /// @param umod
 extern "C" inline void _ciface_quiccir_fr_@Op@_@Kind@_f64_DCCSC3D_complexf64_DCCSC3D_gpu(void* obj, view3_t* pUval, view3_cd_t* pUmod)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirFourierprjShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_fr_@Op@_@Kind@_f64_DCCSC3D_complexf64_DCCSC3D_gpu\n";

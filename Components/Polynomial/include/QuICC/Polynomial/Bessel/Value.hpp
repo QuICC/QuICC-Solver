@@ -4,15 +4,15 @@
  * conditions
  */
 
-#ifndef _VALUE_
-#define _VALUE_
+#ifndef QUICC_POLYNOMIAL_BESSEL_VALUE_HPP
+#define QUICC_POLYNOMIAL_BESSEL_VALUE_HPP
 
 // System includes
 //
 
 // Project includes
 //
-#include "QuICC/Polynomial/Bessel/details/Operators.hpp"
+#include "Polynomial/SphericalBessel/Jnl.hpp"
 #include "Types/Internal/Typedefs.hpp"
 
 namespace QuICC {
@@ -57,20 +57,20 @@ inline void Value<TOp>::compute(
    const Internal::Array& scale)
 {
    std::vector<Internal::MHDFloat> roots;
-   details::getRoots(roots, l, nPoly + TOp::EXTRA_POLY, details::Value_dNu());
+   SphericalBessel::getRoots(roots, l, nPoly + TOp::EXTRA_POLY, SphericalBessel::Value_dNu());
 
    if constexpr (TOp::EXTRA_L == 0)
    {
-      TOp::compute(rOut, roots, l, igrid, scale, details::Value_dNu());
+      TOp::compute(rOut, roots, l, igrid, scale, SphericalBessel::Value_dNu());
    }
    else
    {
       std::vector<Internal::MHDFloat> roots_extra;
-      details::getRoots(roots_extra, l + TOp::EXTRA_L, nPoly + TOp::EXTRA_POLY,
-         details::Value_dNu());
+      SphericalBessel::getRoots(roots_extra, l + TOp::EXTRA_L, nPoly + TOp::EXTRA_POLY,
+         SphericalBessel::Value_dNu());
 
       TOp::compute(rOut, roots, roots_extra, l, igrid, scale,
-         details::Value_dNu());
+         SphericalBessel::Value_dNu(), SphericalBessel::Value_dNu());
    }
 }
 
@@ -78,4 +78,4 @@ inline void Value<TOp>::compute(
 } // namespace Polynomial
 } // namespace QuICC
 
-#endif // _VALUE_
+#endif // QUICC_POLYNOMIAL_BESSEL_VALUE_HPP

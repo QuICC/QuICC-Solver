@@ -21,7 +21,7 @@ namespace Worland {
 
 namespace SphEnergy {
 
-   using namespace Internal::Literals;
+using namespace Internal::Literals;
 
 I4Diags::I4Diags(const Scalar_t alpha, const int l, const int q) :
     QuICC::SparseSM::Worland::I4Diags(alpha, 0.5_mp, l, q)

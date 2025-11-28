@@ -203,6 +203,11 @@ public:
    void addEquation(Equations::SharedIVectorEquation spEq,
       const std::size_t eqId, const int it);
 
+   /**
+    * @brief Add CFL diagnostic
+    */
+   void addCfl(Diagnostics::SharedICflWrapper spCfl);
+
 #ifdef QUICC_USE_MLIR_GRAPH
    /**
     * @brief Add graph description to solver
@@ -290,18 +295,6 @@ public:
    void updateSpectral(const int it);
 
    /**
-    * @brief Update spectral space fields
-    *
-    * @param isTrivial        Update trivial equations?
-    * @param isDiagnostic     Update diagnostic equations?
-    * @param isPrognostic     Update prognostic equations?
-    * @param isWrapper        Update wrapper equations?
-    * @param it               Iteration index
-    */
-   void updateSpectral(const bool isTrivial, const bool isDiagnostic,
-      const bool isPrognostic, const bool isWrapper, const int it);
-
-   /**
     * @brief Compute the nonlinear terms
     *
     * @param it   Iteration index
@@ -377,11 +370,6 @@ public:
     * @param schemeId ID of timestepping scheme
     */
    void prepareEvolution(const std::size_t schemeId);
-
-   /**
-    * @brief Pre solve equations for full initialisation
-    */
-   void preSolveEquations();
 
    /**
     * @brief Solve equations before prognostic equations

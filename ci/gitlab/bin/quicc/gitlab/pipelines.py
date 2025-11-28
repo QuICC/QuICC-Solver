@@ -20,6 +20,14 @@ backend2nodeSize = {
     "alps-zen2": 128
 }
 
+backend2socketSize = {
+    "daint-mc": 72,
+    "daint-gpu": 24,
+    "alps-a100": 64,
+    "alps-gh200": 72,
+    "alps-zen2": 64
+}
+
 """Base class, defines a pipeline that build the docker image, the library and cleans up the runner"""
 class base_pipeline(base_yaml):
     def __init__(self, cnf):
@@ -28,6 +36,7 @@ class base_pipeline(base_yaml):
         self.backend = cnf.backend
         self.base_docker = f'ci/docker/baseimage/Dockerfile_quicc_{cnf.image}_{self.backend}'
         self.cpus_full_node = backend2nodeSize[self.backend]
+        self.cpus_full_socket = backend2socketSize[self.backend]
         base_md5sum = hashlib.md5(open(self.base_docker[3:], 'rb').read()).hexdigest()
         self.tag = cnf.tag
         image = 'quicc_'+cnf.tag+'_'+cnf.backend+':$CI_COMMIT_SHA'
@@ -121,6 +130,10 @@ class libtest_pipeline(base_pipeline):
                 ],
             )
         self.config['test-quicc-lib'] = {
+                'variables':
+                    {
+                        'TEST_NCPU': str(self.cpus_full_socket)
+                    },
                 'extends':
                     [
                         '.test-lib',

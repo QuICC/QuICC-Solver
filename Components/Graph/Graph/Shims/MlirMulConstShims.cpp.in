@@ -9,6 +9,7 @@
 
 #include "QuICC/Polynomial/Quadrature/WorlandRule.hpp"
 #include "QuICC/Polynomial/Quadrature/LegendreRule.hpp"
+#include "Profiler/Interface.hpp"
 
 
 using namespace QuICC::Graph;
@@ -22,6 +23,8 @@ extern "C" void _ciface_quiccir_mul_const_@Kind@_f64_DCCSC3D_f64_DCCSC3D_cpu(voi
     view3_t* pRet,
     view3_t* pRhs)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirMulConstShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_mul_const_@Kind@_f64_DCCSC3D_f64_DCCSC3D_cpu\n";
@@ -58,6 +61,8 @@ extern "C" void _ciface_quiccir_mul_const_@Kind@_f64_DCCSC3D_f64_DCCSC3D_gpu(voi
     view3_t* pRet,
     view3_t* pRhs)
 {
+    QuICC::Profiler::RegionFixture<3> fixTotal("MlirMulConstShims");
+
     #ifndef NDEBUG
     std::cout <<
         "_ciface_quiccir_mul_const_@Kind@_f64_DCCSC3D_f64_DCCSC3D_gpu\n";

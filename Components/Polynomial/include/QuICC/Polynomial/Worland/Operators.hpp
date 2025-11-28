@@ -1,6 +1,6 @@
 /**
- * @file Tools.hpp
- * @brief Tools specific to Worland polynomial implementation
+ * @file Operators.hpp
+ * @brief Worland based special operators
  */
 
 #ifndef QUICC_POLYNOMIAL_WORLAND_OPERATORS_HPP

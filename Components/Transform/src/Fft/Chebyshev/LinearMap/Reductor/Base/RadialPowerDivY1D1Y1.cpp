@@ -63,7 +63,6 @@ void RadialPowerDivY1D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& i
 
 void RadialPowerDivY1D1Y1<base_t>::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
 {
-   assert(rOut.cols() == 1);
    this->mBackend.outputGrid(rOut, tmp);
 }
 
