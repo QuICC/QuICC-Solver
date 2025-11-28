@@ -213,6 +213,10 @@ namespace Transform {
                alThetaId = Forward::OversinDphi::id();
                alPhiId = Forward::D1::id();
             }
+            else
+            {
+               throw std::logic_error("Sphere transform steps setup is wrong");
+            }
 
             // Compute curl component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));

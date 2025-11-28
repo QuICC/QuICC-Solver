@@ -55,7 +55,7 @@ Internal::Array ShellPolytrope::evaluate(const Internal::Array& r, const int l,
       const Internal::MHDFloat c1 = (1.0_mp + rratio) * (1.0_mp - zetaO) /
                                     (1.0_mp - rratio) / (1.0_mp - rratio);
 
-      const Internal::MHDFloat zetaI = (1.0_mp + rratio - zetaO) / rratio;
+      //const Internal::MHDFloat zetaI = (1.0_mp + rratio - zetaO) / rratio;
 
       auto zeta = c0 + c1 / r.array();
 

@@ -24,34 +24,44 @@ namespace Operators {
 
    // Functions needed for the computation of Bmat
 
-   // normalization factor for the Chebyshev polynomials
+   /**
+    * @brief normalization factor for the Chebyshev polynomials
+    */
    static int fT(int n)
    {
       if (n==0) { return 1; }
       else { return 2; }
    }
 
-   // factor to half the first element of the sum in (2) of Saibaba, 2021
+   /**
+    * @brief factor to half the first element of the sum in (2) of Saibaba, 2021
+    */
    static MHDFloat fc(int n)
    {
       if (n==0) { return 0.5; }
       else { return 1; }
    }
 
-   //Integral of Chebyshev polynomial, Tn over -1<=x<=1
+   /**
+    * @brief Integral of Chebyshev polynomial, Tn over -1<=x<=1
+    */
    static MHDFloat IntT(int n)
    {
       if (n==1) { return 0; }
       else { return (std::pow(-1, n) +1)/(1-n*n); }
    }
 
-   // Integral of Tn Tj over -1<=x<=1
-   MHDFloat IntTnTj(int n, int j)
+   /**
+    * @brief Integral of Tn Tj over -1<=x<=1
+    */
+   static MHDFloat IntTnTj(int n, int j)
    {
       return 0.5*(IntT(n+j)+IntT(std::abs(n-j)));
    }
 
-   // ratio  IntTnTj(int n, int j-2) / IntTnTj(int n, int j)
+   /**
+    * @brief ratio  IntTnTj(int n, int j-2) / IntTnTj(int n, int j)
+    */
    static MHDFloat ratioIntTnTj2(int n, int j)
    {
       if (IntTnTj(n, j)==0.0) 
@@ -61,13 +71,17 @@ namespace Operators {
       return IntTnTj(n, j-2)/IntTnTj(n, j);
    }
 
-   // ratio of cBar(n,j-2)/cBar(n,j)
+   /**
+    * @brief ratio of cBar(n,j-2)/cBar(n,j)
+    */
    static MHDFloat ratioC2(int n, int j)
    {
       return (fc(j-2)/fc(j) ) * (n+j)/(n-j+2);
    }
 
-   // ratio for the recursive relation to calculate tmpSum in Bmat
+   /**
+    * @brief ratio for the recursive relation to calculate tmpSum in Bmat
+    */
    static MHDFloat ratioS(int p, int k, int n0, int n, int alpha)
    {
       return ratioC2(p-k,n0+2*alpha) * ratioIntTnTj2(n,n0+2*alpha);

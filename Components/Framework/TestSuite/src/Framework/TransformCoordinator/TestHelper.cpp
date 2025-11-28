@@ -329,7 +329,7 @@ namespace TCoord {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
+                  //const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
@@ -371,12 +371,12 @@ namespace TCoord {
                               auto val = test.spRef->inTor(test, i, j_, k_);
                               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(val, i,j,k);
                            }
-			   else
-			   {
+                           else
+                           {
                               auto val = test.spRef->inTor(test, i, j_, k_);
                               val = 0;
                               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::TOR).setPoint(val, i,j,k);
-			   }
+                           }
 
                            // Poloidal component
                            if(test.fieldId == Test::FieldId::POL ||
@@ -386,12 +386,12 @@ namespace TCoord {
                               auto val = test.spRef->inPol(test, i, j_, k_);
                               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(val, i,j,k);
                            }
-			   else
-			   {
+                           else
+                           {
                               auto val = test.spRef->inPol(test, i, j_, k_);
                               val = 0;
                               p->rDom(0).rPerturbation().rComp(FieldComponents::Spectral::POL).setPoint(val, i,j,k);
-			   }
+                           }
                         }
                      }
                   }
@@ -475,7 +475,7 @@ namespace TCoord {
                [&](auto&& p)
                {
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
+                  //const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);
@@ -519,7 +519,7 @@ namespace TCoord {
                   std::cerr << p->dom(0).perturbation().comp(FieldComponents::Spectral::POL).data() << std::endl;
                   std::cerr << std::string(50,'=') << std::endl;
                   const auto& tRes = *test.spRes->cpu()->dim(Dimensions::Transform::SPECTRAL);
-                  const auto& sRes = test.spRes->sim();
+                  //const auto& sRes = test.spRes->sim();
                   for(int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); k++)
                   {
                      auto k_ = tRes.idx<Dimensions::Data::DAT3D>(k);

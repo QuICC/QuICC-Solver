@@ -53,7 +53,7 @@ void SphereDipolarityWriter::init()
       // Loop over harmonic order m
       for (int k = 0; k < tRes.dim<Dimensions::Data::DAT3D>(); ++k)
       {
-         int m_ = tRes.idx<Dimensions::Data::DAT3D>(k);
+         //int m_ = tRes.idx<Dimensions::Data::DAT3D>(k);
          for (int j = 0; j < tRes.dim<Dimensions::Data::DAT2D>(k); j++)
          {
             int l_ = tRes.idx<Dimensions::Data::DAT2D>(j, k);
