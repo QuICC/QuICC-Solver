@@ -28,7 +28,9 @@
 #include "QuICC/NonDimensional/WriteMtx.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
+#include "QuICC/PhysicalNames/Entropy.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
+#include "QuICC/PhysicalNames/MassFlux.hpp"
 #include "QuICC/QuICCTimer.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/SpatialScheme/Feature.hpp"
@@ -272,13 +274,15 @@ void MarginalCurve::saveEigenfunction(const int m, const MHDComplex ev,
       for (auto fId: this->mspBackend->fieldIds())
       {
          if (fId == PhysicalNames::Velocity::id() ||
-             fId == PhysicalNames::Magnetic::id())
+             fId == PhysicalNames::Magnetic::id() ||
+             fId == PhysicalNames::MassFlux::id())
          {
             auto& req = varInfo.addField(fId,
                FieldRequirement(false, ss.spectral(), ss.physical()));
             req.enableSpectral();
          }
-         else if (fId == PhysicalNames::Temperature::id())
+         else if (fId == PhysicalNames::Temperature::id() ||
+                  fId == PhysicalNames::Entropy::id())
          {
             auto& req = varInfo.addField(fId,
                FieldRequirement(true, ss.spectral(), ss.physical()));

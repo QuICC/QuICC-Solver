@@ -23,12 +23,11 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-
 ISphericalTorPolEnergyWriter::ISphericalTorPolEnergyWriter(
-   const std::string& prefix, const std::string& type) :
+   const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>> pF) :
     ISphericalTorPolEnergyBaseWriter(prefix + Tags::Energy::BASENAME,
        Tags::Energy::EXTENSION, prefix + Tags::Energy::HEADER, type,
-       Tags::Energy::VERSION, Dimensions::Space::SPECTRAL),
+       Tags::Energy::VERSION, Dimensions::Space::SPECTRAL, EXTEND, pF),
     mTorEnergy(2),
     mPolEnergy(2)
 {

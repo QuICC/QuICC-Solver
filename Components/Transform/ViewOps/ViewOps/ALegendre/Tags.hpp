@@ -40,6 +40,11 @@ struct D1_t
 {
 };
 
+/// @brief D2 op type tag
+struct D2_t
+{
+};
+
 /// @brief Ll op type tag
 struct Ll_t
 {
@@ -47,6 +52,11 @@ struct Ll_t
 
 /// @brief LlD1 op type tag
 struct LlD1_t
+{
+};
+
+/// @brief Llm1D1 op type tag
+struct Llm1D1_t
 {
 };
 
@@ -60,6 +70,16 @@ struct DivS1Dp_t
 {
 };
 
+/// @brief D1DivS1 op type tag
+struct D1DivS1_t
+{
+};
+
+/// @brief D1DivS1Dp op type tag
+struct D1DivS1Dp_t
+{
+};
+
 /// @brief LlDivS1 op type tag
 struct LlDivS1_t
 {
@@ -67,6 +87,16 @@ struct LlDivS1_t
 
 /// @brief LlDivS1Dp op type tag
 struct LlDivS1Dp_t
+{
+};
+
+/// @brief Llm1DivS1 op type tag
+struct Llm1DivS1_t
+{
+};
+
+/// @brief Llm1DivS1Dp op type tag
+struct Llm1DivS1Dp_t
 {
 };
 

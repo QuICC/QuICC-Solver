@@ -1,0 +1,24 @@
+/**
+ * @file D1DivS1Dp.hpp
+ * @brief Implementation of the associated Legendre based D1(1/sin P d_phi) projector
+ */
+
+#ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_D1DIVS1DP_HPP
+#define QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_D1DIVS1DP_HPP
+
+// System includes
+//
+
+// Project includes
+//
+#include "QuICC/Transform/Poly/ALegendre/Projector/Base/D1DivS1Dp.hpp"
+#ifdef QUICC_USE_KOKKOS
+#include "QuICC/Transform/Poly/ALegendre/Projector/Kokkos/D1DivS1Dp.hpp"
+#endif
+#include "QuICC/Transform/Wrappers/ALegendre/Projector/D1DivS1DpviewCpu_t.hpp.inc"
+#ifdef QUICC_HAS_CUDA_BACKEND
+#include "QuICC/Transform/Wrappers/ALegendre/Projector/D1DivS1DpviewGpu_t.hpp.inc"
+#endif
+
+
+#endif // QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_D1DIVS1DP_HPP

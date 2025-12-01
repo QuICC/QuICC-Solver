@@ -6,16 +6,7 @@
 #ifndef QUICC_POLYNOMIAL_ALEGENDRE_DPLM_HPP
 #define QUICC_POLYNOMIAL_ALEGENDRE_DPLM_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -80,7 +71,7 @@ namespace ALegendre {
             ALegendreBase::Plm(iplm_1.col(0), m-1, m+1, iplm_1.col(1), iplm_1.col(0), igrid, ALegendreBase::normPlm());
             iplm_1.col(0).swap(iplm_1.col(1));
 
-            // Increment P_l^{m+1}
+            // Initialize P_l^{m+1}
             ALegendreBase::Pmm(iplm1.col(0), m+1, igrid, ALegendreBase::normPmm());
             if(scale.size() > 0)
             {

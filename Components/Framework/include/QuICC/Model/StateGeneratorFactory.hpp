@@ -13,7 +13,6 @@
 //
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Generator/StateGenerator.hpp"
-#include "QuICC/Model/IPhysicalModel.hpp"
 
 namespace QuICC {
 
@@ -40,6 +39,7 @@ namespace QuICC {
           * @brief Destructor
           */
          ~StateGeneratorFactory() = delete;
+
       protected:
 
       private:

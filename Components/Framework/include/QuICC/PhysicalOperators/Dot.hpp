@@ -72,7 +72,7 @@ namespace Physical {
          ++vIt;
          ++wIt;
 
-         for(; vIt != v.data.cend(); ++vIt,++wIt)
+         for(; vIt != v.data().cend(); ++vIt,++wIt)
          {
             rS.addData(c*(vIt->second.data().array()*wIt->second.data().array()).matrix());
          }
@@ -82,7 +82,7 @@ namespace Physical {
          ++vIt;
          ++wIt;
 
-         for(; vIt != v.data.cend(); ++vIt,++wIt)
+         for(; vIt != v.data().cend(); ++vIt,++wIt)
          {
             rS.addData((vIt->second.data().array()*wIt->second.data().array()).matrix());
          }
@@ -94,14 +94,14 @@ namespace Physical {
       auto wIt = w.data().cbegin();
       if(c != 1.0)
       {
-         for(auto vIt = v.data().cbegin(); vIt != v.data.cend(); ++vIt)
+         for(auto vIt = v.data().cbegin(); vIt != v.data().cend(); ++vIt)
          {
             rS.addData(c*(vIt->second.data().array()*wIt->second.data().array()).matrix());
             ++wIt;
          }
       } else
       {
-         for(auto vIt = v.data().cbegin(); vIt != v.data.cend(); ++vIt)
+         for(auto vIt = v.data().cbegin(); vIt != v.data().cend(); ++vIt)
          {
             rS.addData((vIt->second.data().array()*wIt->second.data().array()).matrix());
             ++wIt;
@@ -114,14 +114,14 @@ namespace Physical {
       auto wIt = w.data().cbegin();
       if(c != 1.0)
       {
-         for(auto vIt = v.data().cbegin(); vIt != v.data.cend(); ++vIt)
+         for(auto vIt = v.data().cbegin(); vIt != v.data().cend(); ++vIt)
          {
             rS.subData(c*(vIt->second.data().array()*wIt->second.data().array()).matrix());
             ++wIt;
          }
       } else
       {
-         for(auto vIt = v.data().cbegin(); vIt != v.data.cend(); ++vIt)
+         for(auto vIt = v.data().cbegin(); vIt != v.data().cend(); ++vIt)
          {
             rS.subData((vIt->second.data().array()*wIt->second.data().array()).matrix());
             ++wIt;
