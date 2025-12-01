@@ -96,7 +96,6 @@ void ShellNusseltWriter::init()
             bg1 = 1 / (1 - std::pow(chi, 3));
          }
 
-         auto den1 = 1;
          this->mBackground(0) = -1;
          this->mBackground(1) = -(beta / bg1) * (ri / ro) -
                                 (1 - beta / bg1) * (ro / ri) * (ro / ri);

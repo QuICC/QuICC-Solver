@@ -32,9 +32,16 @@ TEST_CASE( "Check ASCII writers @Writer@ for @Field@ for @Scheme@", "[@Scheme@:@
    test.datadir = "./";
    test.maxUlp = currentts::args().ulp;
 
+   /*
    auto spFile = std::make_shared<QuICC::Io::Variable::@Writer@>(::QuICC::PhysicalNames::@Field@().tag(), "@Scheme@");
    spFile->expect(::QuICC::PhysicalNames::@Field@::id());
    test.files.push_back(spFile);
+   */
 
+   auto spFile = currentts::createWriter<QuICC::Io::Variable::@Writer@>(
+      ::QuICC::PhysicalNames::@Field@().tag(), "@Scheme@");
+   spFile->expect(::QuICC::PhysicalNames::@Field@::id());
+   test.files.push_back(spFile);
+   
    currentts::testFile<QuICC::SpatialScheme::@Scheme@>(test);
 }

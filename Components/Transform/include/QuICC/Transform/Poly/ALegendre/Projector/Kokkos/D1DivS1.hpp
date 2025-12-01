@@ -1,0 +1,67 @@
+/**
+ * @file D1DivS1.hpp
+ * @brief Implementation of the associated Legendre based D1(1/sin P) projector
+ */
+
+#ifndef QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_KOKKOS_D1DIVS1_HPP
+#define QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_KOKKOS_D1DIVS1_HPP
+
+// System includes
+//
+
+// Project includes
+//
+#include "Types/Typedefs.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Tags.hpp"
+#include "QuICC/Transform/Poly/ALegendre/Projector/Kokkos/KokkosIALegendreProjector.hpp"
+
+
+namespace QuICC {
+
+namespace Transform {
+
+namespace Poly {
+
+namespace ALegendre {
+
+namespace Projector {
+
+   template <class Impl>
+   class D1DivS1;
+
+   /**
+    * @brief Implementation of the associated Legendre based P integrator
+    */
+   template <>
+   class D1DivS1<kokkos_t>: public KokkosIALegendreProjector
+   {
+      public:
+        /**
+         * @brief Constructor
+         */
+        D1DivS1() = default;
+
+        /**
+         * @brief Destructor
+         */
+        virtual ~D1DivS1() = default;
+
+        virtual void applyUnitOperator(const OpMatrixLZ &rOut,
+           const OpMatrixLZ &in, const OpVectorI &scan,
+           const int totalOpsCols) const;
+
+      protected:
+         /**
+          * @brief Make operator
+          */
+         virtual void makeOperator(Matrix& op, const Internal::Array& igrid, const Internal::Array& iweights, const int i) const;
+
+   };
+
+}
+}
+}
+}
+}
+
+#endif // QUICC_TRANSFORM_POLY_ALEGENDRE_PROJECTOR_KOKKOS_D1DIVS1_HPP

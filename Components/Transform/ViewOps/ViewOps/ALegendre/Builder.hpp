@@ -222,6 +222,45 @@ void builder(Tview opView, const Evector<Tdata>& grid,
 }
 
 
+/// @brief convenience wrapper for common scalings
+/// @tparam Tview  type View of the operator
+/// @tparam TPolyBuilder Polynomial builder
+/// @tparam Tdata type of the computation (needed for MP)
+/// @tparam LlDiff order of differentiation
+/// @param opView operator view to be set by the builder
+/// @param grid
+/// @param weights
+template <class Tview, class TPolyBuilder, class Tdata>
+void builderLlm1(Tview opView, const Evector<Tdata>& grid,
+   const Evector<Tdata>& weights)
+{
+   using IndexType = typename Tview::IndexType;
+   // L - harmonic degree index
+   IndexType LIdx;
+   if constexpr (is_integrator_v<Tview>)
+   {
+      LIdx = 0;
+   }
+   else if constexpr (is_projector_v<Tview>)
+   {
+      LIdx = 1;
+   }
+   else
+   {
+      throw std::logic_error("builder for this type is not implemented.");
+   }
+
+   using ScalarType = typename Tview::ScalarType;
+   Evector<ScalarType> scaling;
+   
+   auto L = opView.dims()[LIdx];
+   scaling = Evector<ScalarType>::LinSpaced(L, 0, L - 1);
+   scaling = scaling.array() * (scaling.array() + 1.0) -1.0;
+
+   builder<Tview, TPolyBuilder, Tdata>(opView, grid, weights, scaling);
+}
+
+
 } // namespace ALegendre
 } // namespace Transform
 } // namespace QuICC

@@ -49,6 +49,19 @@ namespace Fft {
       this->mIsInitialized = true;
    }
 
+   // anelastic overload
+   void IFftOperator::initBase(std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+   {
+      // Initialize FFT backend
+      this->initBackendAnelastic(pF);
+
+      // Operator specific initialization
+      this->initOperator();
+
+      // Set initialization flag
+      this->mIsInitialized = true;
+   }
+
    void IFftOperator::initOperator() const
    {
    }

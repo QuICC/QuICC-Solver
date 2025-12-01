@@ -12,6 +12,7 @@ set(tags
   RadialPower
   RadialPowerOverr1
   RadialPowerOverr1D1R1
+  Spectrum
   )
 
 include(RegisterTags)

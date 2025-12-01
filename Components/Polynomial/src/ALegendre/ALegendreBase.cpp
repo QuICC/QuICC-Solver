@@ -1,6 +1,22 @@
 /**
  * @file ALegendreBase.cpp
  * @brief Source of the implementation of the associated Legendre polynomial
+ * 
+ * Implements recurrence relations to calculate Plm and derived functions, such as d Plm / d\theta
+ * 
+ * notes:
+ * 
+ * ** Normalisation factors, cs **
+ *   they are chosen so that, assuming (not sure about the sqrt(2 Pi) factors in clm below):
+ *          Ylm = clm Plm exp(im\phi), clm = ||Ylm||  sqrt( (2l+1) (l-m)! / 2 / (l+m)! ) / sqrt(2 Pi)
+ *          with
+ *          unitnorm ->     ||Ylm|| = 1
+ *          schmidtnorm ->  ||Ylm|| = 4*Pi/(2l+1)
+ * 
+ *   a recurrence relation such as
+ *          (l-m) Plm = (2l-1) x Pl-1m - (l+m-1) Pl-2m
+ *   is coded like this:
+ *          iplm =   (clm/cl_1m) (2l-1) x ipl_1m - (clm /cl_2m) (l+m-1) ipl_2m 
  */
 
 // System includes
@@ -34,6 +50,8 @@ namespace ALegendre {
       Internal::MHDFloat dl = Internal::MHDFloat(l);
       Internal::MHDFloat dm = Internal::MHDFloat(m);
       Internal::Array cs = norm(dm, dl);
+
+      // (l-m) Plm = (2l-1) x Pl-1m - (l+m-1) Pl-2m
 
       iplm.array() = cs(1)*(cs(0)*ipl_2m.array() + (igrid.array()*ipl_1m.array()).array());
    }
@@ -87,6 +105,37 @@ namespace ALegendre {
       idpl0.array() = cs(0)*ipl1.array();
    }
 
+   void ALegendreBase::d2P10(Eigen::Ref<Internal::Matrix> id2p10, const Eigen::Ref<const Internal::Matrix>& ip10, Normalizer norm)
+   {
+      Internal::Array cs = norm();
+
+      id2p10.array() = cs(0)*ip10.array();
+   }
+
+
+   void ALegendreBase::d2Pl0(Eigen::Ref<Internal::Matrix> id2pl0, const int l, const Eigen::Ref<const Internal::Matrix>& ipl2, const Eigen::Ref<const Internal::Matrix>& ipl0, NormalizerL norm)
+   {
+      // Safety assert
+      assert(l > 0);
+
+      Internal::MHDFloat dl = Internal::MHDFloat(l);
+      Internal::Array cs = norm(dl);
+
+      id2pl0.array() = -cs(0)*ipl0.array() + cs(1)*ipl2.array();
+   }
+
+   void ALegendreBase::d2Pl1(Eigen::Ref<Internal::Matrix> id2pl1, const int l, const Eigen::Ref<const Internal::Matrix>& ipl3, const Eigen::Ref<const Internal::Matrix>& ipl1, NormalizerL norm)
+   {
+      // Safety assert
+      assert(l > 0);
+
+      Internal::MHDFloat dl = Internal::MHDFloat(l);
+      Internal::Array cs = norm(dl);
+
+      id2pl1.array() = -cs(0)*ipl1.array() + cs(1)*ipl3.array();
+   }
+
+
    void ALegendreBase::dPmm(Eigen::Ref<Internal::Array> idpmm, const int m, const Eigen::Ref<const Internal::Array>& iplm_1, NormalizerM norm)
    {
       if(m < 0)
@@ -114,7 +163,82 @@ namespace ALegendre {
       Internal::MHDFloat dm = Internal::MHDFloat(m);
       Internal::Array cs = norm(dm, dl);
 
+      // dPlm/dtheta = -sqrt(1-x^2) dPlm/dx = -(1/2)[ (l+m)(l-m+1)Plm-1 - Plm+1 ]
+
       idplm.array() = cs(0)*iplm_1.array() - cs(1)*iplm1.array();
+   }
+
+   void ALegendreBase::d2Pmm0m1(Eigen::Ref<Internal::Array> op, const int m, const int l, const Eigen::Ref<const Internal::Array>& iplm_2, const Eigen::Ref<const Internal::Array>& iplm, NormalizerML norm)
+   {
+      // works for both l=m and l=m+1
+      if(m < 0)
+      {
+         throw std::logic_error("Tried to compute associated Legendre polynomial P_l^m with m < 0");
+      } else if(m == 0)
+      {
+         op.setConstant(MHD_MP(0.0));
+
+      } else
+      {
+         Internal::MHDFloat dl = Internal::MHDFloat(l);
+         Internal::MHDFloat dm = Internal::MHDFloat(m);
+         Internal::Array cs = norm(dm, dl);
+
+         op = cs(0)*iplm_2 - cs(1)*iplm;
+      }
+   }
+
+   void ALegendreBase::dsin_1P11(Eigen::Ref<Internal::Array> op, const Eigen::Ref<const Internal::Array>& ip21, NormalizerL norm)
+   {
+      
+      Internal::Array cs = norm(MHD_MP(1.0));
+
+      op = cs(0)*ip21;
+      
+   }
+
+   void ALegendreBase::dsin_1Pl1(Eigen::Ref<Internal::Array> op, const int l, const Eigen::Ref<const Internal::Array>& ipl13, const Eigen::Ref<const Internal::Array>& ipl11, NormalizerL norm)
+   {
+      Internal::MHDFloat dl = Internal::MHDFloat(l);
+      Internal::Array cs = norm(dl);
+
+      op = cs(0)*ipl11 + cs(1)*ipl13;
+      
+   }
+
+   void ALegendreBase::dsin_1Pmm(Eigen::Ref<Internal::Array> op, const int m, const Eigen::Ref<const Internal::Array>& ipm1m_2, const Eigen::Ref<const Internal::Array>& ipm1m, NormalizerML norm)
+   {
+      if(m < 0)
+      {
+         throw std::logic_error("Tried to compute associated Legendre polynomial P_l^m with m < 0");
+      } else if(m == 0)
+      {
+         // Polynomials is set to zero for m=0 as it only appears combined with \partial_\phi
+         op.setConstant(MHD_MP(0.0));
+
+      } else
+      {
+         Internal::MHDFloat dm = Internal::MHDFloat(m);
+         Internal::Array cs = norm(dm,dm);
+
+         op = -cs(0)*ipm1m_2 + cs(1)*ipm1m;
+      }
+   }
+
+   void ALegendreBase::d2Plm(Eigen::Ref<Internal::Matrix> id2plm, const int m, const int l, const Eigen::Ref<const Internal::Matrix>& iplm_2, const Eigen::Ref<const Internal::Matrix>& iplm, const Eigen::Ref<const Internal::Matrix>& iplm2, NormalizerML norm)
+   {
+      // Safety assert
+      assert(l-m > 1);
+
+      Internal::MHDFloat dl = Internal::MHDFloat(l);
+      Internal::MHDFloat dm = Internal::MHDFloat(m);
+      Internal::Array cs = norm(dm, dl);
+
+      // d2Plm/dtheta2 = (1/4) A1(l,m)A1(l,m-1) Plm-2
+      //                 -(1/4) [A1(l,m) + A1(l,m+1)] Plm
+      //                 +(1/4) Plm+2
+
+      id2plm.array() = cs(0)*iplm_2.array() - cs(1)*iplm.array() + cs(2)*iplm2.array();
    }
 
    void ALegendreBase::sin_1Plm(Eigen::Ref<Internal::Matrix> isin_1plm, const int m, const int l, const Eigen::Ref<const Internal::Matrix>& ipl1m1, const Eigen::Ref<const Internal::Matrix>& ipl1m_1, NormalizerML norm)
@@ -124,6 +248,26 @@ namespace ALegendre {
       Internal::Array cs = norm(dm, dl);
 
       isin_1plm.array() = cs(1)*(ipl1m1.array() + cs(0)*ipl1m_1.array());
+   }
+
+   void ALegendreBase::dsin_1Plm(Eigen::Ref<Internal::Array> op, const int m, const int l, const Eigen::Ref<const Internal::Array>& ipl1m_2, const Eigen::Ref<const Internal::Array>& ipl1m, const Eigen::Ref<const Internal::Array>& ipl1m2, NormalizerML norm)
+   {
+      if(m < 0)
+      {
+         throw std::logic_error("Tried to compute associated Legendre polynomial P_l^m with m < 0");
+      } else if(m == 0)
+      {
+         // Polynomials is set to zero for m=0 as it only appears combined with \partial_\phi
+         op.setConstant(MHD_MP(0.0));
+
+      } else
+      {
+         Internal::MHDFloat dm = Internal::MHDFloat(m);
+         Internal::MHDFloat dl = Internal::MHDFloat(l);
+         Internal::Array cs = norm(dm,dl);
+
+         op = -cs(0)*ipl1m_2 + cs(1)*ipl1m + cs(2)*ipl1m2;
+      }
    }
 
    //
@@ -174,12 +318,48 @@ namespace ALegendre {
       #endif //defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
    }
 
+   ALegendreBase::Normalizer ALegendreBase::normd2P10()
+   {
+      #if defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+         return &ALegendreBase::schmidtd2P10;
+      #elif defined QUICC_ALEGENDRE_NORM_SHUNITY
+         return &ALegendreBase::unitd2P10;
+      #endif //defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+   }
+
+   ALegendreBase::NormalizerL ALegendreBase::normd2Pl0()
+   {
+      #if defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+         return &ALegendreBase::schmidtd2Pl0;
+      #elif defined QUICC_ALEGENDRE_NORM_SHUNITY
+         return &ALegendreBase::unitd2Pl0;
+      #endif //defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+   }
+
+   ALegendreBase::NormalizerL ALegendreBase::normd2Pl1()
+   {
+      #if defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+         return &ALegendreBase::schmidtd2Pl1;
+      #elif defined QUICC_ALEGENDRE_NORM_SHUNITY
+         return &ALegendreBase::unitd2Pl1;
+      #endif //defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+   }
+
    ALegendreBase::NormalizerML ALegendreBase::normdPlm()
    {
       #if defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
          return &ALegendreBase::schmidtdPlm;
       #elif defined QUICC_ALEGENDRE_NORM_SHUNITY
          return &ALegendreBase::unitdPlm;
+      #endif //defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+   }
+
+   ALegendreBase::NormalizerML ALegendreBase::normd2Plm()
+   {
+      #if defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+         return &ALegendreBase::schmidtd2Plm;
+      #elif defined QUICC_ALEGENDRE_NORM_SHUNITY
+         return &ALegendreBase::unitd2Plm;
       #endif //defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
    }
 
@@ -190,6 +370,49 @@ namespace ALegendre {
       #elif defined QUICC_ALEGENDRE_NORM_SHUNITY
          return &ALegendreBase::unitsin_1Plm;
       #endif //defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+   }
+
+
+   ALegendreBase::NormalizerL ALegendreBase::normdsin_1Pl1()
+   {
+      #if defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+         return &ALegendreBase::schmidtdsin_1Pl1;
+      #elif defined QUICC_ALEGENDRE_NORM_SHUNITY
+         return &ALegendreBase::unitdsin_1Pl1;
+      #endif //defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+   }
+
+   ALegendreBase::NormalizerML ALegendreBase::normdsin_1Plm()
+   {
+      #if defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+         return &ALegendreBase::schmidtdsin_1Plm;
+      #elif defined QUICC_ALEGENDRE_NORM_SHUNITY
+         return &ALegendreBase::unitdsin_1Plm;
+      #endif //defined QUICC_ALEGENDRE_NORM_SHSCHMIDT
+   }
+
+   Internal::MHDFloat ALegendreBase::A1(const Internal::MHDFloat dl, const Internal::MHDFloat dm)
+   {
+      // (l,m)-dependent coefficient for the relation:
+      // dPlm/dtheta = (1/2) [ A1(l,m) Plm-1 - Plm+1 ]
+
+      return (dl+dm)*(dl-dm+ MHD_MP(1.0));
+   }
+
+   Internal::MHDFloat ALegendreBase::C1(const Internal::MHDFloat dm)
+   {
+      // m-dependent coefficient for the relation:
+      // Plm/sin(theta) = C1(m) Pl+1m-1 + C2(m) Pl+1m+1 ]
+
+      return -MHD_MP(1.0)/ (MHD_MP(2.0) * dm);
+   }
+
+   Internal::MHDFloat ALegendreBase::C2(const Internal::MHDFloat dl, const Internal::MHDFloat dm)
+   {
+      // (l,m)-dependent coefficient for the relation:
+      // Plm/sin(theta) = C1(m) Pl+1m-1 + C2(m) Pl+1m+1 ]
+
+      return -( MHD_MP(1.0)/ (MHD_MP(2.0) * dm) ) * ( dl-dm+MHD_MP(2.0) ) * ( dl-dm+MHD_MP(1.0) );
    }
 
    Internal::Array ALegendreBase::unitPmm(const Internal::MHDFloat dm)
@@ -235,6 +458,46 @@ namespace ALegendre {
       return cs;
    }
 
+   Internal::Array ALegendreBase::unitd2P10()
+   {
+      Internal::Array cs(1);
+
+      cs(0) = -MHD_MP(0.25)* ( ALegendreBase::A1(MHD_MP(1.0), MHD_MP(0.0)) + ALegendreBase::A1(MHD_MP(1.0), MHD_MP(1.0)) );
+
+      return cs;
+   }
+
+   Internal::Array ALegendreBase::unitd2Pl0(const Internal::MHDFloat dl)
+   {
+      Internal::MHDFloat dm = MHD_MP(0.0);
+
+      Internal::Array cs(2);
+
+      cs(0) = MHD_MP(0.25) * ( ALegendreBase::A1(dl, dm) + ALegendreBase::A1(dl, dm + MHD_MP(1.0)) );
+
+      cs(1) = MHD_MP(0.25) * ( MHD_MP(1.0) 
+                              + ALegendreBase::A1(dl, dm)*ALegendreBase::A1(dl, dm - MHD_MP(1.0)) 
+                                 / ( (dl + MHD_MP(2.0)) * (dl + MHD_MP(1.0)) * dl * (dl - MHD_MP(1.0)) ) 
+                              ) * Internal::Math::sqrt( (dl + MHD_MP(2.0)) * (dl + MHD_MP(1.0)) * dl * (dl - MHD_MP(1.0)) );
+
+      return cs;
+   }
+
+   Internal::Array ALegendreBase::unitd2Pl1(const Internal::MHDFloat dl)
+   {
+      Internal::MHDFloat dm = MHD_MP(1.0);
+
+      Internal::Array cs(2);
+
+      cs(0) = MHD_MP(0.25) * (ALegendreBase::A1(dl, dm)*ALegendreBase::A1(dl, dm - MHD_MP(1.0)) 
+                                 / ( (dl + MHD_MP(1.0)) * dl ) 
+                              + ALegendreBase::A1(dl, dm) + ALegendreBase::A1(dl, dm + MHD_MP(1.0)) );
+
+      cs(1) = MHD_MP(0.25) *  Internal::Math::sqrt( (dl + MHD_MP(3.0)) *(dl + MHD_MP(2.0)) * (dl - MHD_MP(1.0)) * (dl - MHD_MP(2.0)) );
+
+      return cs;
+   }
+
    Internal::Array ALegendreBase::unitdPmm(const Internal::MHDFloat dm)
    {
       Internal::Array cs(1);
@@ -255,6 +518,22 @@ namespace ALegendre {
       return cs;
    }
 
+   Internal::Array ALegendreBase::unitd2Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl) 
+   {
+      Internal::Array cs(3);
+
+      cs(0) = MHD_MP(0.25) * ALegendreBase::A1(dl, dm)*ALegendreBase::A1(dl, dm-MHD_MP(1.0))
+                           * Internal::Math::sqrt( MHD_MP(1.0) / ( (dl + dm - MHD_MP(1.0))*(dl + dm) ) )
+                           * Internal::Math::sqrt( MHD_MP(1.0) / ( (dl - dm + MHD_MP(2.0))*(dl - dm + MHD_MP(1.0)) ) );
+
+      cs(1) = MHD_MP(0.25) * ( ALegendreBase::A1(dl, dm) + ALegendreBase::A1(dl, dm+MHD_MP(1.0)) );
+
+      cs(2) = MHD_MP(0.25) * Internal::Math::sqrt( (dl - dm - MHD_MP(1.0))*(dl - dm) )
+                           * Internal::Math::sqrt( (dl + dm + MHD_MP(2.0))*(dl + dm + MHD_MP(1.0)) );
+
+      return cs;
+   }
+
    Internal::Array ALegendreBase::unitsin_1Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl)
    {
       Internal::Array cs(2);
@@ -262,6 +541,44 @@ namespace ALegendre {
       cs(0) = Internal::Math::sqrt(((dl - dm + MHD_MP(1.0))*(dl - dm + MHD_MP(2.0)))/((dl + dm + MHD_MP(1.0))*(dl + dm + MHD_MP(2.0))));
 
       cs(1) = -Internal::Math::sqrt((MHD_MP(2.0)*dl + MHD_MP(1.0))/(MHD_MP(2.0)*dl + MHD_MP(3.0)))*Internal::Math::sqrt((dl + dm + MHD_MP(1.0))*(dl + dm + MHD_MP(2.0)))/(2.0*dm);
+
+      return cs;
+   }
+
+   Internal::Array ALegendreBase::unitdsin_1Pl1(const Internal::MHDFloat dl)
+   {
+      Internal::Array cs(2);
+
+      cs(0) = ( MHD_MP(0.5)* ALegendreBase::C2(dl, MHD_MP(1.0))*ALegendreBase::A1(dl+MHD_MP(1.0), MHD_MP(0.0)) 
+                           / ((dl+MHD_MP(2.0))*(dl+MHD_MP(1.0)))  
+               +MHD_MP(0.5)* ( ALegendreBase::C2(dl, MHD_MP(1.0)) -ALegendreBase::C1(MHD_MP(1.0))*ALegendreBase::A1(dl + MHD_MP(1.0), MHD_MP(2.0)) )
+               ) * Internal::Math::sqrt( (dl + MHD_MP(2.0))/dl )
+               * Internal::Math::sqrt( (MHD_MP(2.0)*dl+MHD_MP(1.0)) / (MHD_MP(2.0)*dl+MHD_MP(3.0)) );
+
+      cs(1) = MHD_MP(0.5) * ALegendreBase::C1(MHD_MP(1.0))
+                           * Internal::Math::sqrt( dl-MHD_MP(1.0) ) * Internal::Math::sqrt( (dl+MHD_MP(4.0)) * (dl+MHD_MP(3.0)) * (dl+MHD_MP(2.0)) )
+                           * Internal::Math::sqrt( (MHD_MP(2.0)*dl+MHD_MP(1.0)) / (MHD_MP(2.0)*dl+MHD_MP(3.0)) );
+
+                           
+      return cs;
+   }
+
+   Internal::Array ALegendreBase::unitdsin_1Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl)
+   {
+      Internal::Array cs(3);
+
+      cs(0) = MHD_MP(0.5) * ALegendreBase::C2(dl, dm)*ALegendreBase::A1(dl+MHD_MP(1.0), dm-MHD_MP(1.0)) 
+                           * Internal::Math::sqrt( MHD_MP(1.0)/(dl + dm) )
+                           * Internal::Math::sqrt( MHD_MP(1.0)/(dl - dm + MHD_MP(3.0))/(dl - dm + MHD_MP(2.0))/(dl - dm + MHD_MP(1.0)) )
+                           * Internal::Math::sqrt( (MHD_MP(2.0)*dl+MHD_MP(1.0)) / (MHD_MP(2.0)*dl+MHD_MP(3.0)) );
+
+      cs(1) = MHD_MP(0.5) * ( ALegendreBase::C2(dl,dm) - ALegendreBase::C1(dm)*ALegendreBase::A1(dl+MHD_MP(1.0),dm+MHD_MP(1.0)) )
+                           * Internal::Math::sqrt( (dl+dm+MHD_MP(1.0)) / (dl-dm+MHD_MP(1.0)) )
+                           * Internal::Math::sqrt( (MHD_MP(2.0)*dl+MHD_MP(1.0)) / (MHD_MP(2.0)*dl+MHD_MP(3.0)) );
+                           
+      cs(2) = MHD_MP(0.5) * ALegendreBase::C1(dm)
+                           * Internal::Math::sqrt( dl-dm ) * Internal::Math::sqrt( (dl+dm+MHD_MP(3.0)) * (dl+dm+MHD_MP(2.0)) * (dl+dm+MHD_MP(1.0)) )
+                           * Internal::Math::sqrt( (MHD_MP(2.0)*dl+MHD_MP(1.0)) / (MHD_MP(2.0)*dl+MHD_MP(3.0)) );
 
       return cs;
    }
@@ -297,8 +614,51 @@ namespace ALegendre {
    Internal::Array ALegendreBase::schmidtdPl0(const Internal::MHDFloat dl)
    {
       Internal::Array cs(1);
-
       cs(0) = MHD_MP(0.5)*Internal::Math::sqrt(dl*(dl + MHD_MP(1.0)));
+
+      return cs;
+   }
+
+   Internal::Array ALegendreBase::schmidtd2P10()
+   {
+      Internal::Array cs(1);
+
+      cs(0) = -MHD_MP(0.25)* ( ALegendreBase::A1(MHD_MP(1.0), MHD_MP(0.0)) + ALegendreBase::A1(MHD_MP(1.0), MHD_MP(1.0)) );
+
+      return cs;
+   }
+
+   Internal::Array ALegendreBase::schmidtd2Pl0(const Internal::MHDFloat dl)
+   {
+
+      throw std::logic_error("schmidt quasi normalized d2Pl0 norm not implemented");
+      // This implementation needs proper checking.
+
+      Internal::Array cs(2);
+
+      Internal::MHDFloat dm = MHD_MP(0.0);
+
+      cs(0) = MHD_MP(0.25) * ( ALegendreBase::A1(dl, dm) + ALegendreBase::A1(dl, dm + MHD_MP(1.0)) );
+
+      cs(1) = MHD_MP(0.25) * ( MHD_MP(1.0) 
+                              + ALegendreBase::A1(dl, dm)*ALegendreBase::A1(dl, dm - MHD_MP(1.0)) 
+                                 / ( (dl + MHD_MP(2.0)) * (dl + MHD_MP(1.0)) * dl * (dl - MHD_MP(1.0)) ) 
+                              ) * Internal::Math::sqrt( (dl + MHD_MP(2.0)) * (dl + MHD_MP(1.0)) * dl * (dl - MHD_MP(1.0)) );
+
+      return cs;
+   }
+
+   Internal::Array ALegendreBase::schmidtd2Pl1(const Internal::MHDFloat dl)
+   {
+      Internal::MHDFloat dm = MHD_MP(1.0);
+
+      Internal::Array cs(2);
+
+      cs(0) = MHD_MP(0.25) * (ALegendreBase::A1(dl, dm)*ALegendreBase::A1(dl, dm - MHD_MP(1.0)) 
+                                 / ( (dl + MHD_MP(1.0)) * dl ) 
+                              + ALegendreBase::A1(dl, dm) + ALegendreBase::A1(dl, dm + MHD_MP(1.0)) );
+
+      cs(1) = MHD_MP(0.25) *  Internal::Math::sqrt( (dl + MHD_MP(3.0)) *(dl + MHD_MP(2.0)) * (dl - MHD_MP(1.0)) * (dl - MHD_MP(2.0)) );
 
       return cs;
    }
@@ -323,6 +683,22 @@ namespace ALegendre {
       return cs;
    }
 
+   Internal::Array ALegendreBase::schmidtd2Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl) 
+   {
+      Internal::Array cs(3);
+
+      cs(0) = MHD_MP(0.25) * ALegendreBase::A1(dl, dm)*ALegendreBase::A1(dl, dm-MHD_MP(1.0))
+                           * Internal::Math::sqrt( MHD_MP(1.0) / ( (dl + dm - MHD_MP(1.0))*(dl + dm) ) )
+                           * Internal::Math::sqrt( MHD_MP(1.0) / ( (dl - dm + MHD_MP(2.0))*(dl - dm + MHD_MP(1.0)) ) );
+
+      cs(1) = MHD_MP(0.25) * ( ALegendreBase::A1(dl, dm) + ALegendreBase::A1(dl, dm+MHD_MP(1.0)) );
+
+      cs(2) = MHD_MP(0.25) * Internal::Math::sqrt( (dl - dm - MHD_MP(1.0))*(dl - dm) )
+                           * Internal::Math::sqrt( (dl + dm + MHD_MP(2.0))*(dl + dm + MHD_MP(1.0)) );
+
+      return cs;
+   }
+
    Internal::Array ALegendreBase::schmidtsin_1Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl)
    {
       Internal::Array cs(2);
@@ -330,6 +706,39 @@ namespace ALegendre {
       cs(0) = Internal::Math::sqrt(((dl - dm + MHD_MP(1.0))*(dl - dm + MHD_MP(2.0)))/((dl + dm + MHD_MP(1.0))*(dl + dm + MHD_MP(2.0))));
 
       cs(1) = -Internal::Math::sqrt((dl + dm + MHD_MP(1.0))*(dl + dm + MHD_MP(2.0)))/MHD_MP(2.0*dm);
+
+      return cs;
+   }
+
+   Internal::Array ALegendreBase::schmidtdsin_1Pl1(const Internal::MHDFloat dl)
+   {
+      Internal::Array cs(2);
+
+      cs(0) = ( MHD_MP(0.5)* ALegendreBase::C2(dl, MHD_MP(1.0))*ALegendreBase::A1(dl+MHD_MP(1.0), MHD_MP(0.0)) 
+                           / ((dl+MHD_MP(2.0))*(dl+MHD_MP(1.0)))  
+               +MHD_MP(0.5)* ( ALegendreBase::C2(dl, MHD_MP(1.0)) -ALegendreBase::C1(MHD_MP(1.0))*ALegendreBase::A1(dl + MHD_MP(1.0), MHD_MP(2.0)) )
+               ) * Internal::Math::sqrt( (dl + MHD_MP(2.0))/dl );
+
+      cs(1) = MHD_MP(0.5) * ALegendreBase::C1(MHD_MP(1.0))
+                           * Internal::Math::sqrt( dl-MHD_MP(1.0) ) * Internal::Math::sqrt( (dl+MHD_MP(4.0)) * (dl+MHD_MP(3.0)) * (dl+MHD_MP(2.0)) );
+
+                           
+      return cs;
+   }
+
+   Internal::Array ALegendreBase::schmidtdsin_1Plm(const Internal::MHDFloat dm, const Internal::MHDFloat dl)
+   {
+      Internal::Array cs(3);
+
+      cs(0) = MHD_MP(0.5) * ALegendreBase::C2(dl, dm)*ALegendreBase::A1(dl+MHD_MP(1.0), dm-MHD_MP(1.0)) 
+                           * Internal::Math::sqrt( MHD_MP(1.0)/(dl + dm) )
+                           * Internal::Math::sqrt( MHD_MP(1.0)/(dl - dm + MHD_MP(3.0))/(dl - dm + MHD_MP(2.0))/(dl - dm + MHD_MP(1.0)) );
+
+      cs(1) = MHD_MP(0.5) * ( ALegendreBase::C2(dl,dm) - ALegendreBase::C1(dm)*ALegendreBase::A1(dl+MHD_MP(1.0),dm+MHD_MP(1.0)) )
+                           * Internal::Math::sqrt( (dl+dm+MHD_MP(1.0)) / (dl-dm+MHD_MP(1.0)) );
+                           
+      cs(2) = MHD_MP(0.5) * ALegendreBase::C1(dm)
+                           * Internal::Math::sqrt( dl-dm ) * Internal::Math::sqrt( (dl+dm+MHD_MP(3.0)) * (dl+dm+MHD_MP(2.0)) * (dl+dm+MHD_MP(1.0)) );
 
       return cs;
    }

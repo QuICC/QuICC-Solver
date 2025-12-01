@@ -150,6 +150,17 @@ namespace LinearMap {
       op.transform(rOut, in);
    }
 
+   // overload for the anelastic case
+   void Transform::transform(Matrix& rOut, const MatrixZ& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   {
+      if(!op.isInitialized())
+      {
+         op.init(this->mspSetup, pF);
+      }
+
+      op.transform(rOut, in, pF);
+   }
+
    void Transform::transform(Matrix& rOut, const Matrix& in, const IChebyshevOperator& op)
    {
       if(!op.isInitialized())
@@ -158,6 +169,17 @@ namespace LinearMap {
       }
 
       op.transform(rOut, in);
+   }
+
+   // overload for the anelastic case
+   void Transform::transform(Matrix& rOut, const Matrix& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   {
+      if(!op.isInitialized())
+      {
+         op.init(this->mspSetup);
+      }
+
+      op.transform(rOut, in, pF);
    }
 
    void Transform::transform(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)
@@ -186,6 +208,21 @@ namespace LinearMap {
       }
    }
 
+   // Overload for the anelastic case
+
+   void Transform::transform(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   {
+      auto it = this->mOps.find(id);
+
+      if(it != this->mOps.end())
+      {
+         this->transform(rOut, in, *(it->second), pF);
+      } else
+      {
+         throw std::logic_error("Requested Chebyshev LinearMap transform operator is not available");
+      }
+   }
+
    void Transform::transform(Matrix& rOut, const Matrix& in, const std::size_t id)
    {
       auto it = this->mOps.find(id);
@@ -193,6 +230,21 @@ namespace LinearMap {
       if(it != this->mOps.end())
       {
          this->transform(rOut, in, *(it->second));
+      } else
+      {
+         throw std::logic_error("Requested Chebyshev LinearMap transform operator is not available");
+      }
+   }
+
+   // Overload for the anelastic case
+
+   void Transform::transform(Matrix& rOut, const Matrix& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF)
+   {
+      auto it = this->mOps.find(id);
+
+      if(it != this->mOps.end())
+      {
+         this->transform(rOut, in, *(it->second), pF);
       } else
       {
          throw std::logic_error("Requested Chebyshev LinearMap transform operator is not available");

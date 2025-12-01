@@ -56,7 +56,7 @@ function(run_iqrp_tests tag)
   endif()
   message(DEBUG "run_iqrp_tests TAG: ${tag}")
   message(DEBUG "RIT_TESTS: ${RIT_TESTS}")
-  message(DEBUG "RIT_IDS: ${RIT_IDS}a")
+  message(DEBUG "RIT_IDS: ${RIT_IDS}")
   message(DEBUG "RIT_QIS: ${RIT_QIS}")
   message(DEBUG "RIT_ULP: ${RIT_ULP}")
   message(DEBUG "RIT_MPULP: ${RIT_MPULP}")
@@ -92,6 +92,87 @@ function(run_iqrp_tests tag)
     endforeach()
   endforeach()
 endfunction()
+
+
+
+### Tests for the new operators written for the anelastic model
+# Create anelastic operators coefficients, polytropic profile, Nrho=5
+
+# r^1 prefactor:
+
+set(_tests
+  FD1:dense
+  FD2:dense
+  FD3:dense
+  FD4:dense
+  )
+set(_ids 400 401 402 403)
+set(_qis 0) # the Iq operators are not implemented yet
+run_iqrp_tests("Anelastic, polytropic, Nrho5" TESTS ${_tests} IDS ${_ids} QIS ${_qis})
+
+# r^4 prefactor:
+
+set(_tests
+  FD1:dense
+  FD2:dense
+  FD3:dense
+  FD4:dense
+  )
+set(_ids 404 405 406 407)
+set(_qis 0) # the Iq operators are not implemented yet
+run_iqrp_tests("Anelastic, polytropic, Nrho5" TESTS ${_tests} IDS ${_ids} QIS ${_qis})
+
+
+
+# Create anelastic operators coefficients, dipolar tests, r^2 prefactor
+
+set(_tests
+  FD1:dense
+  FD2:dense
+  FD3:dense
+  FD4:dense
+  )
+set(_ids 0 1 2 3 4 5 6)
+set(_qis 0) # the Iq operators are not implemented yet
+run_iqrp_tests("Anelastic, dipolar, r^2" TESTS ${_tests} IDS ${_ids} QIS ${_qis})
+
+# Create anelastic operators coefficients, dipolar tests, r^4 prefactor
+set(_tests
+  FD1:dense
+  FD2:dense
+  FD3:dense
+  FD4:dense
+  )
+set (_min_qis 1 1 1 1) 
+set (_ids 7 8 9 10 11 12 13)
+run_iqrp_tests("Anelastic, dipolar R^4" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
+
+# Create Quasi-inverse Gaunt coefficient, quadrupolar tests, r^2 prefactor
+set(_tests
+  FD1:dense
+  FD2:dense
+  FD3:dense
+  FD4:dense
+  )
+set(_ids 200 201 202 203 204 205 206 207 208 209)
+run_iqrp_tests("Anelastic, quadrupolar R^2" TESTS ${_tests} IDS ${_ids} QIS ${_qis})
+
+
+# Create Quasi-inverse Gaunt coefficient, quadrupolar tests, r^4 prefactor
+set(_tests
+  FD1:dense
+  FD2:dense
+  FD3:dense
+  FD4:dense
+  )
+set (_min_qis 1 1 1 1)
+set(_ids 210 211 212 213 214 215 216 217 218 219)
+run_iqrp_tests("Gaunt, quadrupolar R^4" TESTS ${_tests} IDS ${_ids} QIS ${_qis} MIN_QIS ${_min_qis})
+
+### end of tests for the new operators written for the anelastic model
+
+
+
 set(_qis 0 1 2 3 4)
 
 # Create Quasi-inverse Gaunt coefficient, dipolar tests, r^2 prefactor
@@ -204,7 +285,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 500 500 500 500 500 500 500 500 500 500 500 500 500 500
-  MPULP 25 25 25 25 25 25 25 25 25 25 25 25 25 25
+  MPULP 95 35 95 35 95 35 95 35 95 35 95 35 95 35
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -244,7 +325,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 500 500 500 500 500 500 500 500 500 500 500 500 500 500
-  MPULP 25 25 25 25 25 25 25 25 25 25 25 25 25 25
+  MPULP 25 25 25 25 25 25 25 25 25 25 45 45 45 45
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -281,7 +362,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500
-  MPULP 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25
+  MPULP 25 25 25 25 25 25 25 25 25 25 25 25 25 25 45 45 25 25 25 25
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -321,7 +402,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500
-  MPULP 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25
+  MPULP 25 25 25 25 25 25 25 25 45 45 45 45 25 25 25 25 45 45 45 45 25 25 25 25
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}

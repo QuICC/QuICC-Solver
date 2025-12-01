@@ -38,6 +38,10 @@ set(tags
   VorticityX
   VorticityY
   VorticityZ
+  Momentum
+  MomentumZ
+  MassFlux
+  MassFluxZ
 )
 
 include(RegisterTags)

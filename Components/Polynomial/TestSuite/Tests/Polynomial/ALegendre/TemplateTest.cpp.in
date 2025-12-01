@@ -24,9 +24,11 @@ TEST_CASE( "Error for @Operator@ operator", "[@Operator@]" ){
    // Set default arguments if required
    if(currentts::args().useDefault)
    {
+      
       currentts::args().specN = 128;
       currentts::args().physN = 256;
       currentts::args().params = {0,1,2,5,20,128};
+      
    }
 
    Catch::StringMaker<double>::precision = 15;

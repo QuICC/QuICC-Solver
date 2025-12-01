@@ -56,6 +56,12 @@ namespace Backend {
    {
       this->mpImpl->setScaler(scaler);
    }
+   
+   // anelastic overload
+   void ChebyshevEnergy::init(const SetupType& setup, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+   {
+      this->mpImpl->init(setup, pF);
+   }
 
    void ChebyshevEnergy::setSpectralOperator(const SparseMatrix& mat) const
    {
@@ -135,6 +141,25 @@ namespace Backend {
       return this->mpImpl->solver();
    }
 
+   Array& ChebyshevEnergy::getEGrid() const
+   {
+      return this->mpImpl->getEGrid();
+   }
+
+   MHDFloat ChebyshevEnergy::getFftScaling() const
+   {
+      return this->mpImpl->getFftScaling();
+   }
+
+   void ChebyshevEnergy::setExtraSize(int extraSize) const
+   {
+      this->mpImpl->setExtraSize(extraSize);
+   }
+
+   int ChebyshevEnergy::getExtraSize() const
+   {
+      return this->mpImpl->getExtraSize();
+   }
 }
 }
 }
