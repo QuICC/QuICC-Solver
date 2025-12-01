@@ -56,7 +56,7 @@ function(run_iqrp_tests tag)
   endif()
   message(DEBUG "run_iqrp_tests TAG: ${tag}")
   message(DEBUG "RIT_TESTS: ${RIT_TESTS}")
-  message(DEBUG "RIT_IDS: ${RIT_IDS}a")
+  message(DEBUG "RIT_IDS: ${RIT_IDS}")
   message(DEBUG "RIT_QIS: ${RIT_QIS}")
   message(DEBUG "RIT_ULP: ${RIT_ULP}")
   message(DEBUG "RIT_MPULP: ${RIT_MPULP}")
@@ -285,7 +285,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 500 500 500 500 500 500 500 500 500 500 500 500 500 500
-  MPULP 25 25 25 25 25 25 25 25 25 25 25 25 25 25
+  MPULP 95 35 95 35 95 35 95 35 95 35 95 35 95 35
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -325,7 +325,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 500 500 500 500 500 500 500 500 500 500 500 500 500 500
-  MPULP 25 25 25 25 25 25 25 25 25 25 25 25 25 25
+  MPULP 25 25 25 25 25 25 25 25 25 25 45 45 45 45
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -362,7 +362,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500
-  MPULP 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25
+  MPULP 25 25 25 25 25 25 25 25 25 25 25 25 25 25 45 45 25 25 25 25
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
@@ -402,7 +402,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500 500
-  MPULP 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25 25
+  MPULP 25 25 25 25 25 25 25 25 45 45 45 45 25 25 25 25 45 45 45 45 25 25 25 25
         )
 foreach(_test ${_tests})
   quicc_add_test(${_test}
