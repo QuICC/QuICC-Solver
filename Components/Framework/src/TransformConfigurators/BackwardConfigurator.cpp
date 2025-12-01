@@ -151,16 +151,31 @@ void BackwardConfigurator::preparePhysical(const TransformTree& tree,
    }
    // Put vector gradient component into temporary hold storage
    else if (edge.fieldId() == FieldType::GRADIENT)
-   {
-      std::visit(
-         [&](auto&& p)
+   {  
+      // check whether vector or tensor form of gradient has been requested:
+      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad(true));}, rVector))
+      {// tensor gradient form         
+         std::visit([&](auto&& p)
          {
             coord.communicator().holdPhysical(
                p->rDom(0)
-                  .rGrad(tree.comp<FieldComponents::Spectral::Id>())
-                  .rComp(edge.outId<FieldComponents::Physical::Id>()));
-         },
-         rVector);
+                  .rGrad()
+                  .rComp(edge.outId<FieldComponents::Physical::Id>(0),edge.outId<FieldComponents::Physical::Id>(1)));
+               }, 
+               rVector);
+      }
+      else
+      {// vector gradient form:
+         std::visit(
+            [&](auto&& p)
+            {
+               coord.communicator().holdPhysical(
+                  p->rDom(0)
+                     .rGrad(tree.comp<FieldComponents::Spectral::Id>())
+                     .rComp(edge.outId<FieldComponents::Physical::Id>()));
+            },
+            rVector);      
+      }
    }
    // Put curl component into temporary hold storage
    else if (edge.fieldId() == FieldType::CURL)

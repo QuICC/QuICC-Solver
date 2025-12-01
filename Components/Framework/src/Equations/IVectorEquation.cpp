@@ -160,7 +160,8 @@ namespace Equations {
          paths.insert(paths.end(), branches.begin(), branches.end());
       }
 
-      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad());}, this->spUnknown()))
+      // vector form
+      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad(false));}, this->spUnknown()))
       {
          auto range = this->spectralRange();
          for(auto it = range.first; it != range.second; ++it)
@@ -174,6 +175,21 @@ namespace Equations {
             paths.insert(paths.end(), b.begin(), b.end());
          }
       }
+      // tensor form
+      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad(true));}, this->spUnknown()))
+      {
+         auto compsMap = std::visit([&](auto&& p)->std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>{return (p->dom(0).grad().enabled());}, this->spUnknown());
+         if(disabledGrad)
+         {
+            for(auto&& c: compsMap)
+            {
+               c.second = false;
+            }
+         }
+         auto b = spSteps->backwardGradient(compsMap);
+         paths.insert(paths.end(),b.begin(), b.end());
+      }
+      
 
 //      if(std::visit([&](auto&& p)->bool{return (p->dom(0).hasGrad2());}, this->spUnknown()))
 //      {

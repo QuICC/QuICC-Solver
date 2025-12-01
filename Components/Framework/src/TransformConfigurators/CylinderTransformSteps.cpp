@@ -272,6 +272,15 @@ namespace Transform {
       return transform;
    }
 
+   std::vector<TransformPath>  CylinderTransformSteps::backwardGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req) const
+   {
+      std::vector<TransformPath> transform;
+
+      throw std::logic_error("Tensor form of Gradient is not implementated yet!");
+
+      return transform;
+   }
+   
    std::vector<TransformPath>  CylinderTransformSteps::backwardGradient2(const Grad2PathId& req) const
    {
       std::vector<TransformPath> transform;

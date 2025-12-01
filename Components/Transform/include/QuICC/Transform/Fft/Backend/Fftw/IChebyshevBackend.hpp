@@ -128,6 +128,8 @@ namespace Fftw {
           */
          mutable Matrix  mTmpComp;
 
+         mutable int mExtraSize = 0;
+
       private:
    };
 

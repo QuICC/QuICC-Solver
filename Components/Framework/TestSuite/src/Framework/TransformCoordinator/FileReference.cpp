@@ -32,7 +32,7 @@ namespace TCoord {
 
    void FileReference::readFile(MatrixZ& data, const std::string path, const Test& test)
    {
-      auto nN = test.spRes->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
+      //auto nN = test.spRes->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::SPECTRAL);
       auto nL = test.spRes->sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
       auto nM = test.spRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
       int nModes = 0;
@@ -55,8 +55,8 @@ namespace TCoord {
          this->readFile(data, path, test);
       }
 
-      auto nL = test.spRes->sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
-      auto nM = test.spRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
+      //auto nL = test.spRes->sim().dim(Dimensions::Simulation::SIM2D, Dimensions::Space::SPECTRAL);
+      //auto nM = test.spRes->sim().dim(Dimensions::Simulation::SIM3D, Dimensions::Space::SPECTRAL);
       int col = 0;
       for(int il = 0; il < l; il++)
       {

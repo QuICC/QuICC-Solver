@@ -24,6 +24,7 @@
 #include "QuICC/Transform/Fft/Backend/Fftw/IChebyshevBackend.hpp"
 #include "QuICC/Transform/Fft/Backend/StorageKind.hpp"
 #include "QuICC/Transform/Fft/Backend/Fftw/DifferentialSolver.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -38,6 +39,9 @@ namespace Fftw {
    /**
     * @brief Interface for a generic Chebyshev FFTW based energy reductor
     */
+   // Inheritance: ChebyshevEnergy
+   //                -> IChebyshevBackend 
+   //                   -> IFftwBackend
    class ChebyshevEnergy: public IChebyshevBackend
    {
       public:
@@ -60,6 +64,11 @@ namespace Fftw {
           * @brief Set Scaler array
           */
          void setScaler(const Array& scaler) const;
+
+         /**
+          * @brief Initialise the FFTW transforms, anelastic overload
+          */
+         void init(const SetupType& setup, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const;
 
          /**
           * @brief set spectral operator
@@ -120,6 +129,21 @@ namespace Fftw {
           * @brief Apply padding
           */
          void applyPadding(Matrix& rData, const int extraRows = 0) const final;
+
+         /**
+          * @brief Get the energy grid
+          */
+         Array& getEGrid() const;
+
+         /**
+          * @brief Get fft scaling
+          */
+         MHDFloat getFftScaling() const;
+         
+         void setExtraSize(int extraSize) const;
+
+         int getExtraSize() const;
+
       protected:
 
       private:
@@ -128,6 +152,11 @@ namespace Fftw {
           * @brief Compute energy weights
           */
          void computeEWeights(const int size, const MHDFloat lower, const MHDFloat upper) const;
+
+         /**
+          * @brief Compute chebyshev grid
+          */
+         void computeEGrid(const int size, const MHDFloat lower, const MHDFloat upper) const;
 
          /**
           * @brief Temporary data for mid operations
@@ -169,10 +198,17 @@ namespace Fftw {
           */
          mutable Array mEWeights;
 
+          /**
+          * @brief Energy weights
+          */
+         mutable Array mEGrid;
+
          /**
           * @brief Spectral operator
           */
          mutable SparseMatrix mSpecOp;
+
+         mutable int mExtraSize = 0; 
 
    };
 

@@ -9,6 +9,8 @@
 // System includes
 //
 #include <string>
+#include <memory>
+#include <vector>
 
 // Project includes
 //
@@ -16,6 +18,8 @@
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Io/Variable/IVariableAsciiWriter.hpp"
 #include "QuICC/PhysicalNames/registerAll.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
+#include "QuICC/Io/Variable/ShellLuminosityWriter.hpp"
 
 namespace QuICC {
 
@@ -113,6 +117,25 @@ template <typename TScheme> void testFile(TestParameters& test)
    // Cleanup and close file handles
    spRunner->finalize();
 }
+
+
+// Helper to create test profiles
+std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> 
+createTestProfiles();
+
+// Generic writer creation (2 arguments) - inline template
+template<typename WriterType>
+std::shared_ptr<WriterType> createWriter(const std::string& tag, const std::string& scheme)
+{
+   return std::make_shared<WriterType>(tag, scheme);
+}
+
+// Specialization for ShellLuminosityWriter (3 arguments) - declare only
+template<>
+std::shared_ptr<QuICC::Io::Variable::ShellLuminosityWriter> 
+createWriter<QuICC::Io::Variable::ShellLuminosityWriter>(
+   const std::string& tag, const std::string& scheme);
+
 
 } // namespace Io
 } // namespace Framework

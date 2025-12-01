@@ -12,7 +12,8 @@
 // Project includes
 //
 #include "DenseSM/Worland/IWorlandOperator.hpp"
-#include "include/QuICC/Polynomial/Worland/WorlandTypes.hpp"
+#include "DenseSM/Worland/Tools.hpp"
+#include "QuICC/Polynomial/Worland/WorlandTypes.hpp"
 
 namespace QuICC {
 
@@ -23,54 +24,49 @@ namespace Worland {
 IWorlandOperator::IWorlandOperator(const int rows, const int cols,
    const Scalar_t alpha, const Scalar_t dBeta) :
     DenseSM::IMatrixSMOperator(rows, cols), mcAlpha(alpha), mcDBeta(dBeta)
-{}
+{
+   this->mType = Worland::Tools::identifyBasis(this->mcAlpha, this->mcDBeta);
+}
 
 void IWorlandOperator::computeQuadrature(Internal::Array& igrid,
    Internal::Array& iweights, const int size) const
 {
-   // Using Chebyshev type
+   switch(this->type())
    {
-      typedef Polynomial::Worland::worland_chebyshev_t WType;
-      WType wt;
-      if (this->mcAlpha == wt.ALPHA && this->mcDBeta == wt.DBETA)
+      // Using Chebyshev type
+      case WorlandKind::CHEBYSHEV:
       {
-         WType::Rule quad;
+         Polynomial::Worland::worland_chebyshev_t::Rule quad;
          quad.computeQuadrature(igrid, iweights, size);
+         break;
+      }
+      // Using Legendre type
+      case WorlandKind::LEGENDRE:
+      {
+         Polynomial::Worland::worland_legendre_t::Rule quad;
+         quad.computeQuadrature(igrid, iweights, size);
+         break;
+      }
+      // Using cylindrical energy type
+      case WorlandKind::CYLENERGY:
+      {
+         Polynomial::Worland::worland_cylenergy_t::Rule quad;
+         quad.computeQuadrature(igrid, iweights, size);
+         break;
+      }
+      // Using spherical energy type
+      case WorlandKind::SPHENERGY:
+      {
+         Polynomial::Worland::worland_sphenergy_t::Rule quad;
+         quad.computeQuadrature(igrid, iweights, size);
+         break;
       }
    }
+}
 
-   // Using Legendre type
-   {
-      typedef Polynomial::Worland::worland_legendre_t WType;
-      WType wt;
-      if (this->mcAlpha == wt.ALPHA && this->mcDBeta == wt.DBETA)
-      {
-         WType::Rule quad;
-         quad.computeQuadrature(igrid, iweights, size);
-      }
-   }
-
-   // Using spherical energy type
-   {
-      typedef Polynomial::Worland::worland_sphenergy_t WType;
-      WType wt;
-      if (this->mcAlpha == wt.ALPHA && this->mcDBeta == wt.DBETA)
-      {
-         WType::Rule quad;
-         quad.computeQuadrature(igrid, iweights, size);
-      }
-   }
-
-   // Using cylindrical energy type
-   {
-      typedef Polynomial::Worland::worland_cylenergy_t WType;
-      WType wt;
-      if (this->mcAlpha == wt.ALPHA && this->mcDBeta == wt.DBETA)
-      {
-         WType::Rule quad;
-         quad.computeQuadrature(igrid, iweights, size);
-      }
-   }
+Worland::WorlandKind IWorlandOperator::type() const
+{
+   return this->mType;
 }
 
 } // namespace Worland
