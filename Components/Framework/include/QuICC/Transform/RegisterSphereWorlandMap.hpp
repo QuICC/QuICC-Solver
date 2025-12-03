@@ -14,7 +14,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/ITransformMap.hpp"
-#include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
+#include "QuICC/Transform/Fft/Worland/IWorlandOperator.hpp"
 
 namespace QuICC {
 
@@ -26,7 +26,7 @@ namespace Transform {
    class RegisterSphereWorlandMap
    {
       public:
-         typedef std::vector<std::shared_ptr<ITransformMap<Poly::Worland::IWorlandOperator> > > MapVector;
+         typedef std::vector<std::shared_ptr<ITransformMap<Fft::Worland::IWorlandOperator> > > MapVector;
 
          /**
           * @brief Store transform operator to ID mapping

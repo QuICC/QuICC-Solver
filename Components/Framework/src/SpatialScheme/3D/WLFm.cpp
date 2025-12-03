@@ -11,7 +11,7 @@
 #include "QuICC/Hasher.hpp"
 #include "QuICC/SpatialScheme/3D/WLFm.hpp"
 #include "QuICC/SpatialScheme/3D/WLFmBuilder.hpp"
-#include "QuICC/Transform/SphereWorlandTransform.hpp"
+#include "QuICC/Transform/SphereFftWorlandTransform.hpp"
 #include "QuICC/Transform/ALegendreTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
 #include "QuICC/Transform/Setup/Default.hpp"
@@ -130,8 +130,8 @@ namespace SpatialScheme {
       {
          case Dimensions::Transform::TRA1D:
          {
-            auto spWT = std::make_shared<Transform::SphereWorlandTransform>();
-            auto spST = std::dynamic_pointer_cast<Transform::SphereWorlandTransform::SetupType>(spSetup);
+            auto spWT = std::make_shared<Transform::SphereFftWorlandTransform>();
+            auto spST = std::dynamic_pointer_cast<Transform::SphereFftWorlandTransform::SetupType>(spSetup);
             if(!spST)
             {
                throw std::logic_error("Incompatible transform setup given");

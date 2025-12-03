@@ -13,7 +13,7 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/ITransformMap.hpp"
-#include "QuICC/Transform/Poly/Worland/IWorlandOperator.hpp"
+#include "QuICC/Transform/Fft/Worland/IWorlandOperator.hpp"
 
 namespace QuICC {
 
@@ -22,7 +22,7 @@ namespace Transform {
    /**
     * @brief Implementation of the Worland transform in a sphere
     */
-   class DefaultSphereWorlandMap: public ITransformMap<Poly::Worland::IWorlandOperator>
+   class DefaultSphereWorlandMap: public ITransformMap<Fft::Worland::IWorlandOperator>
    {
       public:
          /**

@@ -45,12 +45,12 @@ namespace Transform {
          /**
           * @brief Constructor
           */
-         SphereFftWorlandTransform();
+         SphereFftWorlandTransform() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~SphereFftWorlandTransform();
+         virtual ~SphereFftWorlandTransform() = default;
 
          /**
           * @brief set list of required options

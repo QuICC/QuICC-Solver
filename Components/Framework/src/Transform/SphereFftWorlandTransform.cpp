@@ -14,7 +14,8 @@
 // Class include
 //
 #include "QuICC/Transform/SphereFftWorlandTransform.hpp"
-
+#include "QuICC/Transform/RegisterSphereWorlandMap.hpp"
+#include "Profiler/Interface.hpp"
 // Project includes
 //
 
@@ -81,14 +82,6 @@ namespace QuICC {
 
 namespace Transform {
 
-   SphereFftWorlandTransform::SphereFftWorlandTransform()
-   {
-   }
-
-   SphereFftWorlandTransform::~SphereFftWorlandTransform()
-   {
-   }
-
    void SphereFftWorlandTransform::requiredOptions(std::set<std::size_t>& list, const Dimensions::Transform::Id dimId) const
    {
       this->mImpl.requiredOptions(list, dimId);
@@ -115,8 +108,38 @@ namespace Transform {
 
    void SphereFftWorlandTransform::initOperators()
    {
-      using backend_t = Fft::Worland::base_t;
+    #ifdef QUICC_USE_PFSOLVE
+       using backend_t = Fft::Worland::viewGpuParallalt_t;
+        this->mImpl.addOperator<Fft::Worland::Projector::P<backend_t>>(Backward::P::id());
+        this->mImpl.addOperator<Fft::Worland::Projector::DivR1_Zero<backend_t>>(Backward::Overr1::id());
+      this->mImpl.addOperator<Fft::Worland::Projector::D1<backend_t>>(Backward::D1::id());
+      //this->mImpl.addOperator<Fft::Worland::Projector::D1R1<backend_t>>(Backward::D1R1::id());
+      this->mImpl.addOperator<Fft::Worland::Projector::DivR1D1R1_Zero<backend_t>>(Backward::Overr1D1R1::id());
+      this->mImpl.addOperator<Fft::Worland::Projector::SphLapl<backend_t>>(Backward::Slapl::id());
 
+      // Create integrators
+      this->mImpl.addOperator<Fft::Worland::Integrator::P<backend_t>>(Forward::P::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::R1_Zero<backend_t>>(Forward::Pol::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::DivR1_Zero<backend_t>>(Forward::Q::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::DivR1D1R1_Zero<backend_t>>(Forward::S::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::P_Zero<backend_t>>(Forward::T::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I2<backend_t>>(Forward::I2P::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I2DivR1_Zero<backend_t>>(Forward::I2Q::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I2DivR1D1R1_Zero<backend_t>>(Forward::I2S::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I2_Zero<backend_t>>(Forward::I2T::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I4DivR1_Zero<backend_t>>(Forward::I4Q::id());
+      this->mImpl.addOperator<Fft::Worland::Integrator::I4DivR1D1R1_Zero<backend_t>>(Forward::I4S::id());
+      // Create reductors
+      this->mImpl.addOperator<Fft::Worland::Reductor::EnergySLaplR2<Fft::Worland::base_t>>(Reductor::EnergySlaplR2::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::EnergyD1R1<Fft::Worland::base_t>>(Reductor::EnergyD1R1::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::EnergyR2<Fft::Worland::base_t>>(Reductor::EnergyR2::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::Energy<Fft::Worland::base_t>>(Reductor::Energy::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::PowerSLaplR2<Fft::Worland::base_t>>(Reductor::PowerSlaplR2::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::PowerD1R1<Fft::Worland::base_t>>(Reductor::PowerD1R1::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::PowerR2<Fft::Worland::base_t>>(Reductor::PowerR2::id());
+      this->mImpl.addOperator<Fft::Worland::Reductor::Power<Fft::Worland::base_t>>(Reductor::Power::id());
+    #else
+       using backend_t = Fft::Worland::base_t;
       // Create projectors
       this->mImpl.addOperator<Fft::Worland::Projector::P<backend_t>>(Backward::P::id());
       this->mImpl.addOperator<Fft::Worland::Projector::DivR1_Zero<backend_t>>(Backward::Overr1::id());
@@ -147,6 +170,7 @@ namespace Transform {
       this->mImpl.addOperator<Fft::Worland::Reductor::PowerD1R1<backend_t>>(Reductor::PowerD1R1::id());
       this->mImpl.addOperator<Fft::Worland::Reductor::PowerR2<backend_t>>(Reductor::PowerR2::id());
       this->mImpl.addOperator<Fft::Worland::Reductor::Power<backend_t>>(Reductor::Power::id());
+ #endif
    }
 
    void SphereFftWorlandTransform::forward(MatrixZ& rOut, const MatrixZ& in, const std::size_t id)

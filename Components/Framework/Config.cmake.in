@@ -90,9 +90,13 @@ endif()
 if(QUICC_USE_PFSOLVE)
   set(QUICC_USE_SYSTEM_PFSOLVE ON
     CACHE BOOL "This is set by the framework" FORCE)
-  set(PFSOLVE_SOURCE_DIR @PFSOLVE_SOURCE_DIR@
+  set(PFSOLVE_PFSOLVE_SOURCE_DIR @PFSOLVE_PFSOLVE_SOURCE_DIR@
     CACHE BOOL "This is set by the framework" FORCE)
   set(PFSOLVE_KERNELS_DIR @PFSOLVE_KERNELS_DIR@
+    CACHE BOOL "This is set by the framework" FORCE)
+  set(PFSOLVE_PARALLALT_SOURCE_DIR @PFSOLVE_PARALLALT_SOURCE_DIR@
+    CACHE BOOL "This is set by the framework" FORCE)
+  set(PFSOLVE_VKFFT_SOURCE_DIR @PFSOLVE_VKFFT_SOURCE_DIR@
     CACHE BOOL "This is set by the framework" FORCE)
 endif()
 

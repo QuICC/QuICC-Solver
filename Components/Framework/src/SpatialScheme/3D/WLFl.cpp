@@ -11,7 +11,7 @@
 #include "QuICC/Hasher.hpp"
 #include "QuICC/SpatialScheme/3D/WLFl.hpp"
 #include "QuICC/SpatialScheme/3D/WLFlBuilder.hpp"
-#include "QuICC/Transform/SphereWorlandTransform.hpp"
+//#include "QuICC/Transform/SphereWorlandTransform.hpp"
 #include "QuICC/Transform/SphereFftWorlandTransform.hpp"
 #include "QuICC/Transform/ALegendreTransform.hpp"
 #include "QuICC/Transform/MixedFourierTransform.hpp"
@@ -78,7 +78,8 @@ namespace SpatialScheme {
       mOpt1D.clear();
       if(std::find(opt1D.begin(), opt1D.end(), Transform::Setup::Default::id()) != opt1D.end())
       {
-         mOpt1D.push_back(Transform::Setup::GaussianQuadrature::id());
+         mOpt1D.push_back(Transform::Setup::Fft::id());
+         //mOpt1D.push_back(Transform::Setup::GaussianQuadrature::id());
          mOpt1D.push_back(Transform::Setup::Uniform::id());
       }
       else
@@ -143,7 +144,10 @@ namespace SpatialScheme {
                }
                spWT->init(spST);
                spTransform = spWT;
-            } else if(std::find(impl.begin(), impl.end(), Transform::Setup::GaussianQuadrature::id()) != impl.end())
+            } /*
+            else if (std::find(impl.begin(), impl.end(),
+                        Transform::Setup::GaussianQuadrature::id()) !=
+                     impl.end())
             {
                auto spWT = std::make_shared<Transform::SphereWorlandTransform>();
                auto spST = std::dynamic_pointer_cast<Transform::SphereWorlandTransform::SetupType>(spSetup);
@@ -153,7 +157,7 @@ namespace SpatialScheme {
                }
                spWT->init(spST);
                spTransform = spWT;
-            }
+            }*/
             else
             {
                throw std::logic_error("Implementation type is not set properly for 1D");
