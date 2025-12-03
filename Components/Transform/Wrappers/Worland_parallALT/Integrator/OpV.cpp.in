@@ -30,10 +30,14 @@ namespace @Kind@ {
    //deleteParallALT(&VkGPU, &appContainer_backward);
    //cudaFree(appContainer_backward.input_buffer_S);
    //cudaFree(&appContainer_backward.buffer_S);
-   free(m_even);
-   free(m_even_endBatch);
-   free(m_odd);
-   free(m_odd_endBatch);
+   if(m_even)
+     free(m_even);
+   if(m_even_endBatch)
+    free(m_even_endBatch);
+   if(m_odd)
+    free(m_odd);
+   if(m_odd_endBatch)
+    free(m_odd_endBatch);
 }
 
 void @Op@<@Tag@>::computeWorlandExpansion(const bool isEven) const
@@ -163,7 +167,7 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
 void @Op@<@Tag@>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
 {
     std::uint32_t Ntheta = this->mspSetup->fwdSize();
-
+    cudaDeviceSynchronize();
     Profiler::RegionStop<2>("applyImpl");
 
     PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
@@ -207,7 +211,7 @@ void @Op@<@Tag@>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool
          {
             for (int j = 0; j < rOut.rows(); j++)
             {
-               rOut(j, current_i) = std::complex<double>(outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] * 2 * 3.1415926535897932384626433832795029,
+               rOut(j, current_i + l) = std::complex<double>(outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] * 2 * 3.1415926535897932384626433832795029,
                outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
                            Ntheta]* 2 * 3.1415926535897932384626433832795029);
         
@@ -233,7 +237,7 @@ void @Op@<@Tag@>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool
                   outSplit[j + i * 2 * Ntheta],
                   outSplit[j + i * 2 * Ntheta +
                            Ntheta]);*/
-               rOut(j, current_i) = std::complex<double>(outSplit[j + even_startBatch * Ntheta + Ntheta *2*l]* 2 * 3.1415926535897932384626433832795029,
+               rOut(j, current_i + l) = std::complex<double>(outSplit[j + even_startBatch * Ntheta + Ntheta *2*l]* 2 * 3.1415926535897932384626433832795029,
                outSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
                            Ntheta]* 2 * 3.1415926535897932384626433832795029);
             }
@@ -336,13 +340,49 @@ void @Op@<@Tag@>::initBackend() const
     const char* proj_operator = "@Op@";
     if (!strcmp(proj_operator, "P"))
         mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL>>(mem);
-    if (!strcmp(proj_operator, "DivR"))
+    if (!strcmp(proj_operator, "P_Zero"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_ZERO>>(mem);
+    if (!strcmp(proj_operator, "DivR1"))
         mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_DIVR>>(mem);
+    if (!strcmp(proj_operator, "DivR1_Zero"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_DIVR_ZERO>>(mem);
     if (!strcmp(proj_operator, "D1"))
         mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_DR>>(mem);
+    if (!strcmp(proj_operator, "R1"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_R>>(mem);
+    if (!strcmp(proj_operator, "R1_Zero"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_R_ZERO>>(mem);
+    if (!strcmp(proj_operator, "DivR1D1R1"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_DIVR_DR_R>>(mem);
+    if (!strcmp(proj_operator, "DivR1D1R1_Zero"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_DIVR_DR_R_ZERO>>(mem);
     if (!strcmp(proj_operator, "SphLapl"))
         mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_SPHLAPL>>(mem);
 
+    if (!strcmp(proj_operator, "I2"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2>>(mem);
+    if (!strcmp(proj_operator, "I2_Zero"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2_ZERO>>(mem);
+    if (!strcmp(proj_operator, "I2DivR1"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2_DIVR>>(mem);
+    if (!strcmp(proj_operator, "I2DivR1_Zero"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2_DIVR_ZERO>>(mem);
+    if (!strcmp(proj_operator, "I2DivR1D1R1"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2_DIVR_DR_R>>(mem);
+    if (!strcmp(proj_operator, "I2DivR1D1R1_Zero"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I2_DIVR_DR_R_ZERO>>(mem);
+    if (!strcmp(proj_operator, "I4"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4>>(mem);    
+    if (!strcmp(proj_operator, "I4_Zero"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4_ZERO>>(mem);
+    if (!strcmp(proj_operator, "I4DivR1"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4_DIVR>>(mem);
+    if (!strcmp(proj_operator, "I4DivR1_Zero"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4_DIVR_ZERO>>(mem);
+    if (!strcmp(proj_operator, "I4DivR1D1R1"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4_DIVR_DR_R>>(mem);
+    if (!strcmp(proj_operator, "I4DivR1D1R1_Zero"))
+        mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 0, PFSOLVE_RADIAL_I4_DIVR_DR_R_ZERO>>(mem);
     //using op_t = QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, opType>;
     //mOp = std::make_unique<QuICC::Transform::Worland_parallALT::ParallaltOp<phys_t, mods_t, 1, opType>>(mem);
 

@@ -44,7 +44,14 @@ public:
     /// @brief dtor
     ~ParallaltOp()
     {
-       deleteParallALT(&VkGPU, &appContainer);
+        if (appContainer.config.Ntheta != 0)
+            deleteParallALT(&VkGPU, &appContainer);
+
+       if (temp_buffer != 0)
+      {
+         cudaFree(temp_buffer);
+         temp_buffer = 0;
+      }
     };
 
     /// @brief Action implementation
@@ -62,7 +69,9 @@ public:
         config = {};
 	    config.Ntheta = Ntheta;//this->mspSetup->bwdSize();
         config.radialTransform = Type;
-        config.useGraphs = 1;
+        config.useGraphs = 0;
+        config.initializeGraph = 0;
+        config.useUberKernel = 1;
 	    config.testMerge = 0;
 	    config.testAccuracy = 1;
 	    config.doALTOnly = 1;
@@ -142,12 +151,17 @@ public:
 
         }
         free(temp_pointers);
-        config.M = ((m_even[config.num_m_even - 1]) / 2 + 1) * 2;// M;
+        config.M = (m_even[config.num_m_even - 1] > m_odd[config.num_m_odd - 1]) ? ((m_even[config.num_m_even - 1]) / 2 + 1) * 2 : ((m_odd[config.num_m_odd - 1]) / 2 + 1) * 2;// M;
         config.L = (Direction) ? in.dims()[0] : out.dims()[0];// 3 * M / 2;
 
 	    //appContainer.input_buffer_S = (double*)in.data();
         //appContainer.buffer_S = (double*)out.data();
        initializeParallALT(&VkGPU, config, &appContainer);
+        free(m_even);
+        free(m_even_endBatch);
+        free(m_odd);
+        free(m_odd_endBatch);
+
     };
     /// @brief Action implementation
     /// @param out differentiatied modes
@@ -165,8 +179,16 @@ public:
       assert(out.dims()[2] == in.dims()[2]);
       assert(QuICC::Cuda::isDeviceMemory(out.data()));
       assert(QuICC::Cuda::isDeviceMemory(in.data()));
+
+      if (temp_buffer == 0)
+      {
+         cudaMalloc((void**)&temp_buffer,
+            appContainer.config.Ntheta * (appContainer.config.sizeEvenBlock + appContainer.config.sizeOddBlock) *
+               sizeof(double));
+      }
       parallALT_launchParams launchParams;
       launchParams.input_buffer_S = (double*)in.data();
+      launchParams.temp_buffer_S = temp_buffer;
       launchParams.buffer_S = (double*)out.data();
 
       launchApp_parallALT(&appContainer, &launchParams);
@@ -184,6 +206,7 @@ public:
     */
     mutable parallALT_app appContainer = {};
 
+    mutable double* temp_buffer = 0;
     /**
     * @brief parallALT app pointers
     */

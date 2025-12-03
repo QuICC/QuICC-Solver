@@ -686,7 +686,7 @@ void WorlandProjector::partialBackwardWorland(
 
 void WorlandProjector::backwardWorland(const bool isEven0,
                                        const unsigned int id) const {
-    launchApp_parallALT(&appContainer_backward);
+    //launchApp_parallALT(&appContainer_backward);
    /* PfSolve::PfSolveResult resSolve = PfSolve::PFSOLVE_SUCCESS;
   Matrix &inTmp = this->mInTmp.at(id);
 

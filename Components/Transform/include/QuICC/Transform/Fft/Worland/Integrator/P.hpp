@@ -11,6 +11,11 @@
 
 // Project includes
 //
+
 #include "QuICC/Transform/Fft/Worland/Integrator/Base/P.hpp"
+
+#ifdef QUICC_USE_PFSOLVE
+#include "QuICC/Transform/Wrappers/Worland/Integrator/PviewGpuParallalt_t.hpp.inc"
+#endif
 
 #endif // QUICC_TRANSFORM_FFT_WORLAND_INTEGRATOR_P_HPP

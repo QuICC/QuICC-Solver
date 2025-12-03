@@ -29,7 +29,7 @@ namespace Projector {
 
    void P<base_t>::computeWorlandExpansion(const bool isEven) const
    {
-      this->mBackend.scaleC(1.0/std::sqrt(Math::PI), isEven);
+      //this->mBackend.scaleC(1.0/std::sqrt(Math::PI), isEven);
       this->mBackend.backwardWorland(isEven);
    }
 

@@ -240,6 +240,11 @@ endforeach()
 set(_tests
   Fft::DivR1_Zero:<base_t>:projector
 )
+if(TARGET PfSolve)
+  list(APPEND _perf_tests
+    Fft::DivR1_Zero:<viewGpuParallalt_t>:projector
+  )
+endif()
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -269,6 +274,11 @@ endforeach()
 set(_tests
   Fft::DivR1D1R1_Zero:<base_t>:projector
 )
+if(TARGET PfSolve)
+  list(APPEND _perf_tests
+    Fft::DivR1D1R1_Zero:<viewGpuParallalt_t>:projector
+  )
+endif()
 foreach(_test ${_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -312,7 +322,11 @@ if(QUICC_USE_KOKKOS)
       Poly::P:<kokkos_t>:projector
   )
 endif()
-
+if(TARGET PfSolve)
+  list(APPEND _split_tests
+    Fft::P:<viewGpuParallalt_t>:projector
+  )
+endif()
 foreach(_test ${_split_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -341,7 +355,11 @@ if(QUICC_USE_KOKKOS)
         Poly::P:<kokkos_t>:projector
         )
 endif()
-
+if(TARGET PfSolve)
+  list(APPEND _perf_tests
+    Fft::P:<viewGpuParallalt_t>:projector
+  )
+endif()
 foreach(_perf_id 108 109)
   if(${_perf_id} EQUAL 109)
     set(_perf_step_slow 50)

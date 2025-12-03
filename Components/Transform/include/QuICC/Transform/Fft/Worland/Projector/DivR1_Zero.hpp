@@ -13,4 +13,8 @@
 //
 #include "QuICC/Transform/Fft/Worland/Projector/Base/DivR1_Zero.hpp"
 
+#ifdef QUICC_USE_PFSOLVE
+#include "QuICC/Transform/Wrappers/Worland/Projector/DivR1_ZeroviewGpuParallalt_t.hpp.inc"
+#endif
+
 #endif // QUICC_TRANSFORM_FFT_WORLAND_PROJECTOR_DIVR1_ZERO_HPP

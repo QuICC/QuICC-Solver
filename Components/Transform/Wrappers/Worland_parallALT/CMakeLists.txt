@@ -4,8 +4,9 @@ if(TARGET PfSolve)
     list(APPEND Backends "GpuParallalt")
 endif()
 
-set(ProjectorOps "P;D1;SphLapl")
-set(IntegratorOps "P")
+set(ProjectorOps "P;D1;D1R1;DivR1;DivR1_Zero;DivR1D1R1;DivR1D1R1_Zero;SphLapl")
+set(IntegratorOps "P;P_Zero;R1;R1_Zero;DivR1;DivR1_Zero;I2;I2_Zero;I2DivR1_Zero;I4DivR1_Zero;DivR1D1R1;DivR1D1R1_Zero;I2DivR1D1R1_Zero;I4DivR1D1R1_Zero")
+
 
 set(Kinds "Projector;Integrator")
 

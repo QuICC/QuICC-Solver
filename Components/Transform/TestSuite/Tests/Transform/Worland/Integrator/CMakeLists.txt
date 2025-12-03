@@ -402,6 +402,8 @@ set(_tests_templated
 if(TARGET PfSolve)
   list(APPEND _tests_templated
     Fft::P:<viewGpuParallalt_t>:integrator
+    Fft::P_Zero:<viewGpuParallalt_t>:integrator
+    Fft::R1_Zero:<viewGpuParallalt_t>:integrator
   )
 endif()
 foreach(_test ${_tests_templated})
@@ -416,6 +418,11 @@ endforeach()
 set(_tests_templated
   Fft::DivR1_Zero:<base_t>:integrator
   )
+if(TARGET PfSolve)
+  list(APPEND _tests_templated
+    Fft::DivR1_Zero:<viewGpuParallalt_t>:integrator
+  )
+endif()
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -429,6 +436,12 @@ set(_tests_templated
   Fft::I2:<base_t>:integrator
   Fft::I2_Zero:<base_t>:integrator
   )
+if(TARGET PfSolve)
+  list(APPEND _tests_templated
+    Fft::I2:<viewGpuParallalt_t>:integrator
+    Fft::I2_Zero:<viewGpuParallalt_t>:integrator
+  )
+endif()
 quicc_set_ulp(_ulp
   ULP 18 22 176 65 31
   MPULP 6 6 55 19 9
@@ -445,6 +458,11 @@ endforeach()
 set(_tests_templated
   Fft::I2DivR1_Zero:<base_t>:integrator
   )
+if(TARGET PfSolve)
+  list(APPEND _tests_templated
+    Fft::I2DivR1_Zero:<viewGpuParallalt_t>:integrator
+  )
+endif()
 quicc_set_ulp(_ulp
   ULP 16 23 189 48 78 13 213 205 40 59
   MPULP 10 5 33 13 19 7 54 76 9 7
@@ -461,6 +479,11 @@ endforeach()
 set(_tests_templated
   Fft::I4DivR1_Zero:<base_t>:integrator
   )
+if(TARGET PfSolve)
+  list(APPEND _tests_templated
+    Fft::I4DivR1_Zero:<viewGpuParallalt_t>:integrator
+  )
+endif()
 quicc_set_ulp(_ulp
   ULP 55 23 732 59 51 46 602 582 44 22
   MPULP 17 16 102 9 19 11 209 280 11 11
@@ -477,6 +500,11 @@ endforeach()
 set(_tests_templated
   Fft::DivR1D1R1_Zero:<base_t>:integrator
   )
+if(TARGET PfSolve)
+  list(APPEND _tests_templated
+    Fft::DivR1D1R1_Zero:<viewGpuParallalt_t>:integrator
+  )
+endif()
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -489,6 +517,11 @@ endforeach()
 set(_tests_templated
   Fft::I2DivR1D1R1_Zero:<base_t>:integrator
   )
+if(TARGET PfSolve)
+  list(APPEND _tests_templated
+    Fft::I2DivR1D1R1_Zero:<viewGpuParallalt_t>:integrator
+  )
+endif()
 quicc_set_ulp(_ulp
   ULP 11 392 1359 1067 1258 11 193 1111 393 884
   MPULP 4 75 278 95 149 3 57 107 163 97
@@ -505,6 +538,11 @@ endforeach()
 set(_tests_templated
   Fft::I4DivR1D1R1_Zero:<base_t>:integrator
   )
+if(TARGET PfSolve)
+  list(APPEND _tests_templated
+    Fft::I4DivR1D1R1_Zero:<viewGpuParallalt_t>:integrator
+  )
+endif()
 quicc_set_ulp(_ulp
   ULP 44 1213 10190 2217 1803 38 658 6820 1591 2111
   MPULP 6 142 550 400 236 4 175 520 58 180
@@ -525,6 +563,11 @@ endforeach()
 set(_tests_templated
   Fft::P:<base_t>:integrator
   )
+if(TARGET PfSolve)
+  list(APPEND _tests_templated
+    Fft::P:<viewGpuParallalt_t>:integrator
+  )
+endif()
 foreach(_test ${_tests_templated})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -537,6 +580,11 @@ endforeach()
 set(_tests_templated
   Fft::I2:<base_t>:integrator
   )
+if(TARGET PfSolve)
+  list(APPEND _tests_templated
+    Fft::I2:<viewGpuParallalt_t>:integrator
+  )
+endif()
 quicc_set_ulp(_ulp
   ULP 56 130 472 1145
   MPULP 74 20 26 33
@@ -567,7 +615,11 @@ if(QUICC_USE_KOKKOS)
         Poly::P:<kokkos_t>:integrator
         )
 endif()
-
+if(TARGET PfSolve)
+  list(APPEND _split_tests
+    Fft::P:<viewGpuParallalt_t>:integrator
+  )
+endif()
 foreach(_test ${_split_tests})
   quicc_add_test(${_test}
     COMMAND ${TestExe}
@@ -596,7 +648,11 @@ if(QUICC_USE_KOKKOS)
         Poly::P:<kokkos_t>:integrator
         )
 endif()
-
+if(TARGET PfSolve)
+  list(APPEND _perf_tests
+    Fft::P:<viewGpuParallalt_t>:integrator
+  )
+endif()
 foreach(_perf_id 108 109)
   if(${_perf_id} EQUAL 109)
     set(_perf_step_slow 50)

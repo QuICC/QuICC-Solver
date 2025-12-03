@@ -468,7 +468,7 @@ void WorlandIntegrator::partialForwardWorland(
 }
 
 void WorlandIntegrator::forwardWorland(const bool isEven0, const int id) const {
-     launchApp_parallALT(&appContainer_forward);
+     // launchApp_parallALT(&appContainer_forward);
   // Reset current l
      /*for (int isEven = 0; isEven < 2; isEven++)
      {

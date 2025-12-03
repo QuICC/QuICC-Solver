@@ -13,4 +13,8 @@
 //
 #include "QuICC/Transform/Fft/Worland/Integrator/Base/I2_Zero.hpp"
 
+#ifdef QUICC_USE_PFSOLVE
+#include "QuICC/Transform/Wrappers/Worland/Integrator/I2_ZeroviewGpuParallalt_t.hpp.inc"
+#endif
+
 #endif // QUICC_TRANSFORM_FFT_WORLAND_INTEGRATOR_I2_ZERO_HPP
