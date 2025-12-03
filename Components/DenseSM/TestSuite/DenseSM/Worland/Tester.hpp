@@ -219,6 +219,11 @@ namespace Worland {
             mB = mF;
          }
 
+         if(fAId < 0 && fBId < 0)
+         {
+            throw std::logic_error("Test metadata is not setup correctly");
+         }
+
          TOp op(nNr, nNc, q, lOut, mOut, lA, mA, lB, mB, pFa, pFb, alpha, dBeta);
 
          outData = op.mat();

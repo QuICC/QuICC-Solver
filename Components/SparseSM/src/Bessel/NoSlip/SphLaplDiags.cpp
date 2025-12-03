@@ -31,7 +31,7 @@ SphLaplDiags::ACoeff_t SphLaplDiags::d0(const ACoeff_t& n) const
    getRoots(roots, static_cast<int>(this->l()), n.size() - 1);
 
    ACoeff_t val = ACoeff_t::Ones(n.size());
-   assert(roots.size() == val.size());
+   assert(roots.size() == static_cast<std::size_t>(val.size()));
    for (std::size_t i = 0; i < roots.size(); i++)
    {
       const auto& k = roots.at(i);

@@ -14,7 +14,6 @@
 #include "QuICC/Enums/GridPurpose.hpp"
 #include "QuICC/Timers/StageTimer.hpp"
 #include "QuICC/Simulation/Simulation.hpp"
-#include "QuICC/Model/IPhysicalModel.hpp"
 #include "Profiler/Interface.hpp"
 
 namespace QuICC {

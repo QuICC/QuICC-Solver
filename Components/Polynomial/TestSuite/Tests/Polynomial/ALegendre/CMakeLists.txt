@@ -23,7 +23,9 @@ include(ConfigureTests)
 set(ALegendreTests
   Plm
   dPlm
+  d2Plm
   sin_1Plm
+  dsin_1Plm
 )
 include(SetUlp)
 quicc_set_ulp(_ulp
