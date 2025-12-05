@@ -109,9 +109,9 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
                             Ntheta]);*/
                 //printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l],outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
                 //            Ntheta]);
-                inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] = in(j, current_i).real();
+                inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] = in(j, current_i+l).real();
                 inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
-                            Ntheta] = in(j, current_i).imag();
+                            Ntheta] = in(j, current_i+l).imag();
             }
             }
             odd_startBatch += numBatches;
@@ -136,9 +136,9 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
                             Ntheta]);*/
                 // printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + even_startBatch * Ntheta + Ntheta *2*l],outSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
                 //             Ntheta]);
-                inSplit[j + even_startBatch * Ntheta + Ntheta *2*l] = in(j, current_i).real();
+                inSplit[j + even_startBatch * Ntheta + Ntheta *2*l] = in(j, current_i+l).real();
                 inSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
-                            Ntheta] = in(j, current_i).imag();
+                            Ntheta] = in(j, current_i+l).imag();
                          
             }
             }

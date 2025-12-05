@@ -79,7 +79,7 @@ public:
    /// @brief default ctor for empty view
    View() = default;
    /// @brief dtor
-   virtual ~View() = default;
+   QUICC_CUDA_HOSTDEV virtual ~View() = default;
 
    /// @brief Generic constructor
    /// @param data

@@ -186,12 +186,227 @@ public:
             appContainer.config.Ntheta * (appContainer.config.sizeEvenBlock + appContainer.config.sizeOddBlock) *
                sizeof(double));
       }
+      /* double* xx = (double*)calloc(2 * appContainer.config.Ntheta *
+                                         (appContainer.config.sizeEvenBlock +
+                                            appContainer.config.sizeOddBlock),
+            sizeof(double));
+         double* xx2 = (double*)calloc(2*appContainer.config.Ntheta *
+                                          (appContainer.config.sizeEvenBlock +
+                                             appContainer.config.sizeOddBlock),
+            sizeof(double));
+       std::vector<int> Mseq(
+            appContainer.config.num_m_even + appContainer.config.num_m_odd);
+         for (int i = 0; i < appContainer.config.num_m_even; i++)
+         {
+            Mseq[i] = appContainer.config.m_even_list[i];
+         }
+         for (int i = 0; i < appContainer.config.num_m_odd; i++)
+         {
+            Mseq[appContainer.config.num_m_even + i] = appContainer.config.m_odd_list[i];
+         }
+         std::sort(Mseq.begin(), Mseq.end());
+          cudaMemcpy(xx, in.data(),
+            appContainer.config.Ntheta *
+               (appContainer.config.sizeEvenBlock +
+                  appContainer.config.sizeOddBlock) *
+               sizeof(double),
+            cudaMemcpyDeviceToHost);
+         if (appContainer.config.projector)
+         {
+            for (int j = 0; j < 64; j++)
+            {
+               for (int i = 0; i < appContainer.config.Ntheta; i++)
+               {
+                  printf("%.3e %.3e | ", xx[2 * i+ 2*j * appContainer.config.Ntheta], xx[2 * i + 1+ 2*j * appContainer.config.Ntheta]);
+               }
+               printf("\n");
+            }
+         }
+          if (1)
+      {
+
+         int evenID = 0;
+         int oddID = 0;
+         int even_startBatch = 0;
+         int odd_startBatch =
+            appContainer.config
+               .m_even_endBatch[appContainer.config.num_m_even - 1];
+         int current_i = 0;
+         
+         for (int i = 0;
+            i < appContainer.config.num_m_even + appContainer.config.num_m_odd;
+            i++)
+         {
+            if (Mseq[i] % 2)
+            {
+               int numBatches =
+                  (oddID == 0)
+                     ? appContainer.config.m_odd_endBatch[0]
+                     : appContainer.config.m_odd_endBatch[oddID] -
+                          appContainer.config.m_odd_endBatch[oddID - 1];
+               for (int l = 0; l < (numBatches / 2); l++)
+               {
+                  for (int j = 0; j < appContainer.config.Ntheta; j++)
+                  {
+
+                     xx2[j + odd_startBatch * appContainer.config.Ntheta + appContainer.config.Ntheta * 2 * l] =
+                        xx[2 * j + appContainer.config.Ntheta * 2 * (current_i+l)];
+                     xx2[j + odd_startBatch * appContainer.config.Ntheta + appContainer.config.Ntheta * 2 * l +
+                         appContainer.config.Ntheta] = xx[2 * j + 1 + appContainer.config.Ntheta * 2 * (current_i+l)];
+                  }
+               }
+               odd_startBatch += numBatches;
+               current_i += numBatches / 2;
+               oddID++;
+            }
+            else
+            {
+               int numBatches =
+                  (evenID == 0)
+                     ? appContainer.config.m_even_endBatch[0]
+                     : appContainer.config.m_even_endBatch[evenID] -
+                          appContainer.config.m_even_endBatch[evenID - 1];
+               for (int l = 0; l < (numBatches / 2); l++)
+               {
+                  for (int j = 0; j < appContainer.config.Ntheta; j++)
+                  {
+
+                     xx2[j + even_startBatch * appContainer.config.Ntheta + appContainer.config.Ntheta * 2 * l] =
+                        xx[2 * j + appContainer.config.Ntheta * 2 * (current_i+l)];
+                     xx2[j + even_startBatch * appContainer.config.Ntheta + appContainer.config.Ntheta * 2 * l +
+                         appContainer.config.Ntheta] = xx[2 * j + 1 + appContainer.config.Ntheta * 2 * (current_i+l)];
+                  }
+               }
+               even_startBatch += numBatches;
+               current_i += numBatches / 2;
+               evenID++;
+            }
+         }
+
+      }
+
+        if (appContainer.config.projector)
+          for (int i = 0; i < appContainer.config.Ntheta; i++)
+          {
+             //printf("%.3e %.3e | ", xx2[i+ Ntheta], xx2[2 * i + 1]);
+         }
+      cudaMemcpy(temp_buffer, xx2,
+            2 * appContainer.config.Ntheta *
+               (appContainer.config.sizeEvenBlock +
+                  appContainer.config.sizeOddBlock) *
+               sizeof(double),
+            cudaMemcpyHostToDevice);
+            */
       parallALT_launchParams launchParams;
       launchParams.input_buffer_S = (double*)in.data();
       launchParams.temp_buffer_S = temp_buffer;
       launchParams.buffer_S = (double*)out.data();
 
       launchApp_parallALT(&appContainer, &launchParams);
+      /*
+      cudaMemcpy(xx, out.data(),
+            2 * appContainer.config.Ntheta *
+               (appContainer.config.sizeEvenBlock +
+                  appContainer.config.sizeOddBlock) *
+               sizeof(double),
+            cudaMemcpyDeviceToHost);
+      if (appContainer.config.projector)
+      {
+         for (int j = 0; j < 8; j++)
+            {
+               for (int i = 0; i < appContainer.config.Ntheta; i++)
+               {
+                  printf("%.3e %.3e | ", xx[i], xx[i+ appContainer.config.Ntheta]);
+               }
+               printf("\n");
+            }
+      }
+      if (1)
+      {
+         int evenID = 0;
+         int oddID = 0;
+         int even_startBatch = 0;
+         int odd_startBatch =
+            appContainer.config
+               .m_even_endBatch[appContainer.config.num_m_even - 1];
+         int current_i = 0;
+        
+         for (int i = 0;
+            i < appContainer.config.num_m_even + appContainer.config.num_m_odd;
+            i++)
+         {
+            if (Mseq[i] % 2)
+            {
+               int numBatches =
+                  (oddID == 0)
+                     ? appContainer.config.m_odd_endBatch[0]
+                     : appContainer.config.m_odd_endBatch[oddID] -
+                          appContainer.config.m_odd_endBatch[oddID - 1];
+               for (int l = 0; l < (numBatches / 2); l++)
+               {
+                  for (int j = 0; j < appContainer.config.Ntheta; j++)
+                  {
+
+                     xx2[2 * j + appContainer.config.Ntheta * 2 * (current_i+l)] = xx[j + odd_startBatch * appContainer.config.Ntheta + appContainer.config.Ntheta * 2 * l];
+                     xx2[2 * j + 1 + appContainer.config.Ntheta * 2 * (current_i+l)] = xx[j + odd_startBatch * appContainer.config.Ntheta + appContainer.config.Ntheta * 2 * l +
+                         appContainer.config.Ntheta];
+                     if (!appContainer.config.projector)
+                     {
+                        xx2[2 * j +
+                            appContainer.config.Ntheta * 2 * (current_i + l)] *=
+                           2 * 3.1415926535897932384626433832795029;
+                        xx2[2 * j + 1 +
+                            appContainer.config.Ntheta * 2 * (current_i + l)] *=
+                           2 * 3.1415926535897932384626433832795029;
+                     }
+                  }
+               }
+               odd_startBatch += numBatches;
+               current_i += numBatches / 2;
+               oddID++;
+            }
+            else
+            {
+               int numBatches =
+                  (evenID == 0)
+                     ? appContainer.config.m_even_endBatch[0]
+                     : appContainer.config.m_even_endBatch[evenID] -
+                          appContainer.config.m_even_endBatch[evenID - 1];
+               for (int l = 0; l < (numBatches / 2); l++)
+               {
+                  for (int j = 0; j < appContainer.config.Ntheta; j++)
+                  {
+
+                     xx2[2 * j + appContainer.config.Ntheta * 2 * (current_i+l)] = xx[j + even_startBatch * appContainer.config.Ntheta + appContainer.config.Ntheta * 2 * l];
+                     xx2[2 * j + 1 + appContainer.config.Ntheta * 2 * (current_i+l)] =
+                        xx[j + even_startBatch * appContainer.config.Ntheta + appContainer.config.Ntheta * 2 * l +
+                           appContainer.config.Ntheta];
+                     if (!appContainer.config.projector)
+                     {
+                        xx2[2 * j +
+                            appContainer.config.Ntheta * 2 * (current_i + l)] *=
+                           2 * 3.1415926535897932384626433832795029;
+                        xx2[2 * j + 1 +
+                            appContainer.config.Ntheta * 2 * (current_i + l)] *=
+                           2 * 3.1415926535897932384626433832795029;
+                     }
+                  }
+               }
+               even_startBatch += numBatches;
+               current_i += numBatches / 2;
+               evenID++;
+            }
+         }
+         
+      }
+       cudaMemcpy(out.data(), xx2,
+            2 * appContainer.config.Ntheta *
+               (appContainer.config.sizeEvenBlock +
+                  appContainer.config.sizeOddBlock) *
+               sizeof(double),
+            cudaMemcpyHostToDevice);
+      free(xx);
+         free(xx2);*/
       };
 
  private:

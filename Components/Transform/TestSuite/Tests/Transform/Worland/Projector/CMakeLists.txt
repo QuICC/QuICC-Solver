@@ -275,7 +275,7 @@ set(_tests
   Fft::DivR1D1R1_Zero:<base_t>:projector
 )
 if(TARGET PfSolve)
-  list(APPEND _perf_tests
+  list(APPEND _tests
     Fft::DivR1D1R1_Zero:<viewGpuParallalt_t>:projector
   )
 endif()

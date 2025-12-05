@@ -96,9 +96,9 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
                   outSplit[j + i * 2 * Ntheta],
                   outSplit[j + i * 2 * Ntheta +
                            Ntheta]);*/
-               inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] =in(j,current_i).real();
+               inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] =in(j,current_i + l).real();
                inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
-                           Ntheta] = in(j,current_i).imag();
+                           Ntheta] = in(j,current_i + l).imag();
         
             }
          }
@@ -122,9 +122,9 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
                   outSplit[j + i * 2 * Ntheta],
                   outSplit[j + i * 2 * Ntheta +
                            Ntheta]);*/
-               inSplit[j + even_startBatch * Ntheta + Ntheta *2*l] =in(j,current_i).real();
+               inSplit[j + even_startBatch * Ntheta + Ntheta *2*l] =in(j,current_i + l).real();
                inSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
-                           Ntheta] = in(j,current_i).imag();
+                           Ntheta] = in(j,current_i + l).imag();
             }
          }
          even_startBatch += numBatches;

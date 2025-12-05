@@ -46,7 +46,7 @@ namespace View {
       /// @brief ctor, empty ViewBase
       ViewBase() = default;
       /// @brief dtor
-      virtual ~ViewBase() = default;
+      QUICC_CUDA_HOSTDEV virtual ~ViewBase() = default;
       /// @brief ctor
       /// @param data pointer to memory location
       /// @param size in number of elements

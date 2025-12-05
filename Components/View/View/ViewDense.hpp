@@ -70,7 +70,7 @@ public:
    /// @brief default ctor for empty view
    ViewDenseBase() = default;
    /// @brief dtor
-   virtual ~ViewDenseBase() = default;
+   QUICC_CUDA_HOSTDEV virtual ~ViewDenseBase() = default;
 
    /// @brief import base ctors
    using ViewBase<Scalar>::ViewBase;
@@ -158,7 +158,7 @@ public:
    /// @brief default ctor for empty view
    View() = default;
    /// @brief dtor
-   ~View() = default;
+   QUICC_CUDA_HOSTDEV ~View() = default;
 
    /// @brief imported from ViewDenseBase
    /// @tparam Scalar
