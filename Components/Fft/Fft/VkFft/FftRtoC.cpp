@@ -24,7 +24,7 @@ FftOp<View::View<std::complex<double>, AttOut>,
    // Destroy plan
    if (_plan != nullptr)
    {
-      free(((VkFFTApplication*)_plan)->configuration.device);
+      //free(((VkFFTApplication*)_plan)->configuration.device);
       deleteVkFFT((VkFFTApplication*)_plan);
       delete static_cast<VkFFTApplication*>(_plan);
       _plan = nullptr;
@@ -104,6 +104,8 @@ VkFFTApplication* setPlanRtoC(const int fwdSize, const int blockSize)
    {
       free(configuration.loadApplicationString);
    }
+
+   free(configuration.device);
 
    if (configuration.saveApplicationToString)
    {
