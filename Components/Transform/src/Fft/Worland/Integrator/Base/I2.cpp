@@ -26,7 +26,6 @@ namespace Integrator {
       this->setProfileTag();
    }
 
-
    void I2<base_t>::initBackend() const
    {
       int lshift = 0; // operator shifts l by one
@@ -34,14 +33,14 @@ namespace Integrator {
       this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 
-   void I2<base_t>::applyPostOperator(Matrix& rOut, const bool isEven) const
+   void I2<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const bool isEven) const
    {
       P<base_t>::computeWorlandExpansion(isEven);
       this->mBackend.applyI2(isEven);
       this->mBackend.output(rOut, isEven);
    }
 
-   void I2<base_t>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
+   void I2<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const
    {
       P<base_t>::computeWorlandExpansion(isEven);
       this->mBackend.applyI2(isEven);

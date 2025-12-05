@@ -24,7 +24,7 @@ namespace Complex {
 
 namespace Projector {
 
-   void Ds1Lapl2D<base_t>::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
+   void Ds1Lapl2D<base_t>::applyPreOperator(MatrixZ& tmp, const Eigen::Ref<const MatrixZ>& in) const
    {
       std::vector<std::pair<int,int> > orders = { {2,1}, {0,3} };
       this->mBackend.inputDiff2D(tmp, in, orders, this->mspSetup->boxScale(), this->mspSetup->idBlocks());

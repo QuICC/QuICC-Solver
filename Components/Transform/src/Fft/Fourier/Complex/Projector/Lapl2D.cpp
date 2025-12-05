@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Fourier/Complex/Projector/Lapl2DBase.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Fourier/Complex/Projector/Lapl2DBase.hpp"
 
 namespace QuICC {
 
@@ -29,7 +23,7 @@ namespace Complex {
 
 namespace Projector {
 
-   void Lapl2D<base_t>::applyPreOperator(MatrixZ& tmp, const MatrixZ& in) const
+   void Lapl2D<base_t>::applyPreOperator(MatrixZ& tmp, const Eigen::Ref<const MatrixZ>& in) const
    {
       std::vector<std::pair<int,int> > orders = { {2,0}, {0,2} };
       this->mBackend.inputDiff2D(tmp, in, orders, this->mspSetup->boxScale(), this->mspSetup->idBlocks());

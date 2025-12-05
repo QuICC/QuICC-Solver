@@ -259,7 +259,7 @@ set(ProjectorPreOp "/**
 * @param in   Input mods values
 * @param out  Copied and padded input
 */
-void applyPreOperator(MatrixZ& out, const MatrixZ& in) const final {};"
+void applyPreOperator(MatrixZ& out, const Eigen::Ref<const MatrixZ>& in) const final {};"
 )
 
 # PostOp
@@ -268,7 +268,7 @@ set(IntegratorPostOp "/**
 *
 * @param rOut Output values
 */
-void applyPostOperator(MatrixZ& rOut) const final {};"
+void applyPostOperator(Eigen::Ref<MatrixZ> rOut) const final {};"
 )
 
 # loop

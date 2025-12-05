@@ -7,15 +7,9 @@
 //
 #include <cassert>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/IFftwBackend.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/IFftwBackend.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
 namespace QuICC {
@@ -45,10 +39,25 @@ namespace Fftw {
       QuICC::Fft::Fftw::Library::getInstance();
    }
 
-   void IFftwBackend::applyFft(Matrix& phys, const Matrix& mods) const
+   void IFftwBackend::applyFft(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const
    {
-      fftw_execute_r2r(this->mPlan, const_cast<MHDFloat *>(mods.data()), phys.data());
+      fftw_execute_r2r(this->mPlan, const_cast<MHDFloat *>(in.data()), rOut.data());
    }
+
+   void IFftwBackend::applyFft(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
+   {
+      fftw_execute_dft_c2r(this->mPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex *>(in.data())), rOut.data());
+   };
+
+   void IFftwBackend::applyFft(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const Matrix>& in) const
+   {
+      fftw_execute_dft_r2c(this->mPlan, const_cast<MHDFloat*>(in.data()), reinterpret_cast<fftw_complex* >(rOut.data()));
+   };
+
+   void IFftwBackend::applyFft(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
+   {
+      fftw_execute_dft(this->mPlan, reinterpret_cast<fftw_complex *>(const_cast<MHDComplex*>(in.data())), reinterpret_cast<fftw_complex *>(rOut.data()));
+   };
 
    void IFftwBackend::cleanupFft()
    {
@@ -71,11 +80,7 @@ namespace Fftw {
       return mem;
    }
 
-   // to be removed
    void IFftwBackend::applyFft() const {std::logic_error("Backend not implemented.");};
-   void IFftwBackend::applyFft(Matrix&, const MatrixZ&) const {std::logic_error("Backend not implemented.");};
-   void IFftwBackend::applyFft(MatrixZ&, const Matrix&) const {std::logic_error("Backend not implemented.");};
-   void IFftwBackend::applyFft(MatrixZ&, const MatrixZ&) const {std::logic_error("Backend not implemented.");};
 
 }
 }

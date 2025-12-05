@@ -30,7 +30,7 @@ namespace Projector {
       this->mBackend.init(*this->mspSetup);
    }
 
-   void ILinearMapProjector::transform(MatrixZ& rOut, const MatrixZ& in) const
+   void ILinearMapProjector::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
@@ -48,7 +48,7 @@ namespace Projector {
       this->applyPostOperator(rOut, tmpOut, false);
    }
 
-   void ILinearMapProjector::transform(Matrix& rOut, const Matrix& in) const
+   void ILinearMapProjector::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const
    {
       assert(this->isInitialized());
       assert(rOut.cols() == this->outCols());
@@ -61,12 +61,12 @@ namespace Projector {
       this->applyPostOperator(rOut);
    }
 
-   void ILinearMapProjector::transform(Matrix&, const MatrixZ&) const
+   void ILinearMapProjector::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const MatrixZ>&) const
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT projector");
    }
 
-   void ILinearMapProjector::transform(MatrixZ&, const Matrix&) const
+   void ILinearMapProjector::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const Matrix>&) const
    {
       throw std::logic_error("Data is not compatible with Chebyshev FFT projector");
    }

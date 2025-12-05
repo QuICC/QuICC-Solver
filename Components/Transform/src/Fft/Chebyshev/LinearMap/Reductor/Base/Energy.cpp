@@ -24,18 +24,18 @@ namespace LinearMap {
 
 namespace Reductor {
 
-void Energy<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void Energy<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in);
 }
 
-void Energy<base_t>::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
+void Energy<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
 {
    assert(rOut.cols() == 1);
    this->mBackend.output(rOut, tmp);
 }
 
-void Energy<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void Energy<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);

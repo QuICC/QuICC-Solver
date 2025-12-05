@@ -43,7 +43,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         virtual ~ChebyshevIntegrator();
+         virtual ~ChebyshevIntegrator() = default;
 
          /**
           * @brief Initialise the FFT transforms
@@ -62,22 +62,22 @@ namespace Backend {
          /**
           * @brief Set output
           */
-         void output(Matrix& rOut) const;
+         void output(Eigen::Ref<Matrix> rOut) const;
 
          /**
           * @brief Set output
           */
-         void output(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
+         void output(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
           * @brief Set output multiplied aby spectral operator
           */
-         void outputSpectral(Matrix& rOut) const;
+         void outputSpectral(Eigen::Ref<Matrix> rOut) const;
 
          /**
           * @brief Set output multiplied aby spectral operator
           */
-         void outputSpectral(MatrixZ& rOut, const Matrix& tmp, const bool useReal) const;
+         void outputSpectral(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp, const bool useReal) const;
 
          /**
           * @brief Apply FFT
@@ -85,7 +85,7 @@ namespace Backend {
           * @param phys FFT input
           * @param mods FFT output
           */
-         void applyFft(Matrix& mods, const Matrix& phys) const;
+         void applyFft(Eigen::Ref<Matrix> mods, const Eigen::Ref<const Matrix>& phys) const;
 
          /**
           * @brief Set spectral operator

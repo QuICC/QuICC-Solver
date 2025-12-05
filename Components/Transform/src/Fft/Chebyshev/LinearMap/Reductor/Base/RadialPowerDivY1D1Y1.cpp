@@ -53,7 +53,7 @@ void RadialPowerDivY1D1Y1<base_t>::initBackend() const
    this->mBackend.addSolver(1);
 }
 
-void RadialPowerDivY1D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void RadialPowerDivY1D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in);
    auto specOp = this->mBackend.solver().getSpectralOperator();
@@ -61,12 +61,12 @@ void RadialPowerDivY1D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& i
    this->mBackend.getSolution(tmp, 1, 1);
 }
 
-void RadialPowerDivY1D1Y1<base_t>::applyPostOperator(Matrix& rOut, const Matrix& tmp) const
+void RadialPowerDivY1D1Y1<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const Matrix& tmp) const
 {
    this->mBackend.outputGrid(rOut, tmp);
 }
 
-void RadialPowerDivY1D1Y1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void RadialPowerDivY1D1Y1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);

@@ -23,7 +23,7 @@ namespace Complex {
 
 namespace Integrator {
 
-   void P<base_t>::applyPostOperator(MatrixZ& rOut) const
+   void P<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut) const
    {
       this->mBackend.output(rOut);
    }

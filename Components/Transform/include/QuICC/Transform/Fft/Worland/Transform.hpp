@@ -6,23 +6,14 @@
 #ifndef QUICC_TRANSFORM_FFT_WORLAND_TRANSFORM_HPP
 #define QUICC_TRANSFORM_FFT_WORLAND_TRANSFORM_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
 // System includes
 //
 #include <set>
 #include <map>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
@@ -51,12 +42,12 @@ namespace Worland {
          /**
           * @brief Constructor
           */
-         Transform();
+         Transform() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~Transform();
+         virtual ~Transform() = default;
 
          /**
           * @brief Initialise the polynomial transform
@@ -91,7 +82,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in, const IWorlandOperator& op);
+         void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const IWorlandOperator& op);
 
          /**
           * @brief Compute transform
@@ -99,7 +90,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(Matrix& rOut, const MatrixZ& in, const IWorlandOperator& op);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const IWorlandOperator& op);
 
          /**
           * @brief Compute transform
@@ -107,7 +98,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in, const std::size_t id);
+         void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Compute transform
@@ -115,7 +106,7 @@ namespace Worland {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(Matrix& rOut, const MatrixZ& in, const std::size_t id);
+         void transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Get the memory requirements

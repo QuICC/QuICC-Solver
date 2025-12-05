@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_FFTW_MIXEDPROJECTOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_FFTW_MIXEDPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -42,12 +33,12 @@ namespace Fftw {
          /**
           * @brief Constructor
           */
-         MixedProjector();
+         MixedProjector() = default;
 
          /**
           * @brief Destructor
           */
-         ~MixedProjector();
+         ~MixedProjector() = default;
 
          /**
           * @brief Initialise the FFTW transforms
@@ -64,11 +55,6 @@ namespace Fftw {
           * and and pad FFT temporary input
           */
          void inputDiff(MatrixZ& out, const MatrixZ& rData, const int order, const MHDFloat scale) const;
-
-         /**
-          * @brief Apply FFT
-          */
-         void applyFft(Matrix& phys, const MatrixZ& mods) const override;
 
       protected:
 

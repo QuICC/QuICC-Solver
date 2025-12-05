@@ -56,7 +56,7 @@ namespace Integrator {
           *
           * @param rOut Output values
           */
-         void applyPostOperator(Matrix& rOut, const bool isEven) const final;
+         void applyPostOperator(Eigen::Ref<Matrix> rOut, const bool isEven) const final;
 
          /**
           * @brief Apply post FFT operator for component wise operations
@@ -64,7 +64,7 @@ namespace Integrator {
           * @param rOut Output values
           * @param useReal Real vs Imag flag
           */
-         void applyPostOperator(MatrixZ& rOut, const bool useReal, const bool isEven) const final;
+         void applyPostOperator(Eigen::Ref<MatrixZ> rOut, const bool useReal, const bool isEven) const final;
    };
 
 }

@@ -6,15 +6,9 @@
 // System includes
 //
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Poly/Worland/Projector/IWorlandProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Poly/Worland/Projector/IWorlandProjector.hpp"
 #include "Profiler/Interface.hpp"
 #include "QuICC/Debug/StorageProfiler/MemorySize.hpp"
 
@@ -54,7 +48,7 @@ namespace Projector {
       }
    }
 
-   void IWorlandProjector::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   void IWorlandProjector::applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<3> fix(this->mProfileTag + "::applyOperators");
 
@@ -77,7 +71,7 @@ namespace Projector {
       }
    }
 
-   void IWorlandProjector::applyOperators(Matrix& rOut, const MatrixZ& in) const
+   void IWorlandProjector::applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       throw std::logic_error("Interface not used");
    }

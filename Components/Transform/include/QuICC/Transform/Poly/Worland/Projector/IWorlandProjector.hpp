@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_PROJECTOR_IWORLANDPROJECTOR_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_PROJECTOR_IWORLANDPROJECTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -106,7 +97,7 @@ namespace Projector {
           * @param rOut Output physical values
           * @param in   Input spectral coefficients
           */
-         void applyOperators(MatrixZ& rOut, const MatrixZ& in) const override;
+         void applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Compute polynomial projection
@@ -114,7 +105,7 @@ namespace Projector {
           * @param rOut Output physical values
           * @param in   Input spectral coefficients
           */
-         void applyOperators(Matrix& rOut, const MatrixZ& in) const override;
+         void applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
          /**
           * @brief Apply ith operator

@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/ChebyshevIntegrator.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/ChebyshevIntegrator.hpp"
 
 namespace QuICC {
 
@@ -27,10 +21,6 @@ namespace Fft {
 namespace Backend {
 
 namespace Fftw {
-
-ChebyshevIntegrator::ChebyshevIntegrator() {}
-
-ChebyshevIntegrator::~ChebyshevIntegrator() {}
 
 void ChebyshevIntegrator::init(const SetupType& setup) const
 {
@@ -79,7 +69,7 @@ void ChebyshevIntegrator::setMeanOperator(const SparseMatrix& mat) const
    this->mMeanOp = mat;
 }
 
-void ChebyshevIntegrator::output(Matrix& rOut) const
+void ChebyshevIntegrator::output(Eigen::Ref<Matrix> rOut) const
 {
    if (this->mMeanOp.size() > 0)
    {
@@ -96,7 +86,7 @@ void ChebyshevIntegrator::output(Matrix& rOut) const
    }
 }
 
-void ChebyshevIntegrator::outputSpectral(Matrix& rOut) const
+void ChebyshevIntegrator::outputSpectral(Eigen::Ref<Matrix> rOut) const
 {
    if (this->mMeanOp.size() > 0)
    {
@@ -114,7 +104,7 @@ void ChebyshevIntegrator::outputSpectral(Matrix& rOut) const
    }
 }
 
-void ChebyshevIntegrator::output(MatrixZ& rOut, const Matrix& tmp,
+void ChebyshevIntegrator::output(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
    const bool useReal) const
 {
    if (this->mMeanOp.size() > 0)
@@ -153,7 +143,7 @@ void ChebyshevIntegrator::output(MatrixZ& rOut, const Matrix& tmp,
    }
 }
 
-void ChebyshevIntegrator::outputSpectral(MatrixZ& rOut, const Matrix& tmp,
+void ChebyshevIntegrator::outputSpectral(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
    const bool useReal) const
 {
    if (this->mMeanOp.size() > 0)

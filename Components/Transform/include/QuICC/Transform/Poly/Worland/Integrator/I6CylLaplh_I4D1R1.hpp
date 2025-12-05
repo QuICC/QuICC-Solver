@@ -6,9 +6,6 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I6CYLLAPLH_I4D1R1_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_INTEGRATOR_I6CYLLAPLH_I4D1R1_HPP
 
-// External includes
-//
-
 // Project includes
 //
 #include "QuICC/Transform/Poly/Worland/Integrator/Base/I6CylLaplh_I4D1R1.hpp"

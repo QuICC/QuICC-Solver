@@ -6,16 +6,7 @@
 #ifndef QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_ENERGYREDUCTOR_HPP
 #define QUICC_TRANSFORM_POLY_WORLAND_REDUCTOR_ENERGYREDUCTOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes
@@ -74,7 +65,7 @@ namespace Reductor {
           * @param rOut Output physical values
           * @param in   Input spectral coefficients
           */
-         virtual void applyOperators(Matrix& rOut, const MatrixZ& in) const override;
+         virtual void applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
 	 /**
           * @brief Compute energy (integral of squared values)
@@ -82,11 +73,11 @@ namespace Reductor {
           * @param rOut Output physical values
           * @param in   Input spectral coefficients
           */
-         virtual void applyOperators(MatrixZ& rOut, const MatrixZ& in) const override;
+         virtual void applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const override;
 
    };
 
-   template <typename T> void EnergyReductor<T>::applyOperators(Matrix& rOut, const MatrixZ& in) const
+   template <typename T> void EnergyReductor<T>::applyOperators(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       Profiler::RegionFixture<3> fix(this->mProfileTag+"::applyOperators");
 
@@ -108,7 +99,7 @@ namespace Reductor {
       }
    }
 
-   template <typename T> void EnergyReductor<T>::applyOperators(MatrixZ& rOut, const MatrixZ& in) const
+   template <typename T> void EnergyReductor<T>::applyOperators(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
    {
       throw std::logic_error("Unused interface");
    }

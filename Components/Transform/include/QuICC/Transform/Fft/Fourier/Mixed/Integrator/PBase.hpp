@@ -55,7 +55,7 @@ namespace Integrator {
           *
           * @param rOut Output values
           */
-         void applyPostOperator(MatrixZ& rOut) const final;
+         void applyPostOperator(Eigen::Ref<MatrixZ> rOut) const final;
    };
 
 }

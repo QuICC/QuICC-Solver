@@ -3,7 +3,7 @@
  * @brief Source of the implementation of the Worland spherical laplacian projector
  */
 
-// External includes
+// System includes
 //
 #include <cassert>
 

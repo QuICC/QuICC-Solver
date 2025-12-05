@@ -8,15 +8,9 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
-//
-#include "QuICC/Transform/Fft/Backend/Fftw/MixedProjector.hpp"
-
 // Project includes
 //
+#include "QuICC/Transform/Fft/Backend/Fftw/MixedProjector.hpp"
 #include "Types/Math.hpp"
 #include "Profiler/Interface.hpp"
 
@@ -29,14 +23,6 @@ namespace Fft {
 namespace Backend {
 
 namespace Fftw {
-
-   MixedProjector::MixedProjector()
-   {
-   }
-
-   MixedProjector::~MixedProjector()
-   {
-   }
 
    void MixedProjector::init(const SetupType& setup) const
    {
@@ -97,12 +83,6 @@ namespace Fftw {
 
       // Set the padded values to zero
       rData.bottomRows(this->mPadSize).setZero();
-   }
-
-   void MixedProjector::applyFft(Matrix& phys, const MatrixZ& mods) const
-   {
-      Profiler::RegionFixture<4> fix("MixedProjector::applyFft");
-      fftw_execute_dft_c2r(this->mPlan, reinterpret_cast<fftw_complex* >(const_cast<MHDComplex *>(mods.data())), phys.data());
    }
 
 }

@@ -6,18 +6,9 @@
 #ifndef QUICC_TRANSFORM_FFT_BACKEND_WORLANDINTEGRATOR_HPP
 #define QUICC_TRANSFORM_FFT_BACKEND_WORLANDINTEGRATOR_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
 //
 #include <set>
-
-// External includes
-//
 
 // Project includes
 //
@@ -52,7 +43,7 @@ namespace Backend {
          /**
           * @brief Destructor
           */
-         virtual ~WorlandIntegrator();
+         virtual ~WorlandIntegrator() = default;
 
          /**
           * @brief Initialise the FFT transforms
@@ -82,22 +73,22 @@ namespace Backend {
          /**
           * @brief Set input and output data pointers for FFT (R2R)
           */
-         void input(const Matrix& in, const bool isEven) const;
+         void input(const Eigen::Ref<const Matrix>& in, const bool isEven) const;
 
          /**
           * @brief Set input and output data pointers for FFT (R2R)
           */
-         void input(const MatrixZ& out, const bool isEven, const bool useReal) const;
+         void input(const Eigen::Ref<const MatrixZ>& in, const bool isEven, const bool useReal) const;
 
          /**
           * @brief Set output
           */
-         void output(Matrix& rOut, const bool isEven) const;
+         void output(Eigen::Ref<Matrix> rOut, const bool isEven) const;
 
          /**
           * @brief Set output
           */
-         void output(MatrixZ& rOut, const bool isEven, const bool useReal) const;
+         void output(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const;
 
          /**
           * @brief Apply FFT

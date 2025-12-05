@@ -6,23 +6,14 @@
 #ifndef QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_TRANSFORM_HPP
 #define QUICC_TRANSFORM_FFT_FOURIER_COMPLEX_TRANSFORM_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
-
 // System includes
 //
 #include <set>
 #include <map>
 
-// External includes
-//
-
 // Project includes
 //
+#include "QuICC/Debug/StorageProfiler/StorageProfilerMacro.h"
 #include "Types/Typedefs.hpp"
 #include "QuICC/Enums/Dimensions.hpp"
 #include "QuICC/NonDimensional/INumber.hpp"
@@ -53,12 +44,12 @@ namespace Complex {
          /**
           * @brief Constructor
           */
-         Transform();
+         Transform() = default;
 
          /**
           * @brief Destructor
           */
-         virtual ~Transform();
+         virtual ~Transform() = default;
 
          /**
           * @brief Initialise the polynomial transform
@@ -93,7 +84,7 @@ namespace Complex {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in, const IComplexOperator& op);
+         void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const IComplexOperator& op);
 
          /**
           * @brief Compute transform
@@ -101,7 +92,7 @@ namespace Complex {
           * @param rOut Output values
           * @param in   Input values
           */
-         void transform(MatrixZ& rOut, const MatrixZ& in, const std::size_t id);
+         void transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in, const std::size_t id);
 
          /**
           * @brief Get the memory requirements

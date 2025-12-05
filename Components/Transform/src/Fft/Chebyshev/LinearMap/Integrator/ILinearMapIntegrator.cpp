@@ -30,7 +30,7 @@ void ILinearMapIntegrator::initBackend() const
    this->mBackend.init(*this->mspSetup);
 }
 
-void ILinearMapIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
+void ILinearMapIntegrator::transform(Eigen::Ref<MatrixZ> rOut, const Eigen::Ref<const MatrixZ>& in) const
 {
    assert(this->isInitialized());
    assert(this->mspSetup->fwdSize() == in.rows());
@@ -49,7 +49,7 @@ void ILinearMapIntegrator::transform(MatrixZ& rOut, const MatrixZ& in) const
    this->applyPostOperator(rOut, tmpOut, false);
 }
 
-void ILinearMapIntegrator::transform(Matrix& rOut, const Matrix& in) const
+void ILinearMapIntegrator::transform(Eigen::Ref<Matrix> rOut, const Eigen::Ref<const Matrix>& in) const
 {
    assert(this->isInitialized());
    assert(this->mspSetup->fwdSize() == in.rows());
@@ -61,13 +61,13 @@ void ILinearMapIntegrator::transform(Matrix& rOut, const Matrix& in) const
    this->applyPostOperator(rOut);
 }
 
-void ILinearMapIntegrator::transform(Matrix&, const MatrixZ&) const
+void ILinearMapIntegrator::transform(Eigen::Ref<Matrix>, const Eigen::Ref<const MatrixZ>&) const
 {
    throw std::logic_error(
       "Data is not compatible with Chebyshev FFT integrator");
 }
 
-void ILinearMapIntegrator::transform(MatrixZ&, const Matrix&) const
+void ILinearMapIntegrator::transform(Eigen::Ref<MatrixZ>, const Eigen::Ref<const Matrix>&) const
 {
    throw std::logic_error(
       "Data is not compatible with Chebyshev FFT integrator");

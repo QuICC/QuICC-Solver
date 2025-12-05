@@ -38,23 +38,23 @@ void DivY1<base_t>::initOperator() const
    this->mBackend.setScaler(igrid.array().pow(-1).cast<MHDFloat>().matrix());
 }
 
-void DivY1<base_t>::applyPreOperator(Matrix& tmp, const Matrix& in) const
+void DivY1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const Matrix>& in) const
 {
    this->mBackend.input(tmp, in);
 }
 
-void DivY1<base_t>::applyPostOperator(Matrix& rOut) const
+void DivY1<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut) const
 {
    this->mBackend.outputScale(rOut);
 }
 
-void DivY1<base_t>::applyPreOperator(Matrix& tmp, const MatrixZ& in,
+void DivY1<base_t>::applyPreOperator(Matrix& tmp, const Eigen::Ref<const MatrixZ>& in,
    const bool useReal) const
 {
    this->mBackend.input(tmp, in, useReal);
 }
 
-void DivY1<base_t>::applyPostOperator(MatrixZ& rOut, const Matrix& tmp,
+void DivY1<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const Matrix& tmp,
    const bool useReal) const
 {
    this->mBackend.outputScale(rOut, tmp, useReal);

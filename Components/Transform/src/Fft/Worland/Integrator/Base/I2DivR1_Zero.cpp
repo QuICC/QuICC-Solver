@@ -38,14 +38,14 @@ namespace Integrator {
       this->mBackend.init(*this->mspSetup, lshift, extraN);
    }
 
-   void I2DivR1_Zero<base_t>::applyPostOperator(Matrix& rOut, const bool isEven) const
+   void I2DivR1_Zero<base_t>::applyPostOperator(Eigen::Ref<Matrix> rOut, const bool isEven) const
    {
       DivR1<base_t>::computeWorlandExpansion(isEven);
       this->mBackend.applyI2(isEven);
       this->mBackend.output(rOut, isEven);
    }
 
-   void I2DivR1_Zero<base_t>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
+   void I2DivR1_Zero<base_t>::applyPostOperator(Eigen::Ref<MatrixZ> rOut, const bool isEven, const bool useReal) const
    {
       DivR1<base_t>::computeWorlandExpansion(isEven);
       this->mBackend.applyI2(isEven);
