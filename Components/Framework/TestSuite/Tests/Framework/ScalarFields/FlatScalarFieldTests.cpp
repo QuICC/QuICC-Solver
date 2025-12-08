@@ -1,13 +1,15 @@
 #include <catch2/catch.hpp>
+#include <cstddef>
 
 #include "QuICC/Enums/FieldIds.hpp"
 #include "details/Helper.hpp"
 
 TEST_CASE("FlatScalarField get point data", "[FlatScalarField::point]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -20,9 +22,10 @@ TEST_CASE("FlatScalarField get point data", "[FlatScalarField::point]")
 
 TEST_CASE("FlatScalarField get point data from coord", "[FlatScalarField::point_coord]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -35,9 +38,10 @@ TEST_CASE("FlatScalarField get point data from coord", "[FlatScalarField::point_
 
 TEST_CASE("FlatScalarField get profile data", "[FlatScalarField::profile]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -45,7 +49,7 @@ TEST_CASE("FlatScalarField get profile data", "[FlatScalarField::profile]")
    for(auto&& jk: jks)
    {
       auto&& p = field.profile(jk.first, jk.second);
-      for(int i = 0; i < dim1D; i++)
+      for(std::size_t i = 0; i < dim1D; i++)
       {
          CHECK( p(i) == details::fieldValueA<double>(i,jk.first,jk.second) );
       }
@@ -54,9 +58,10 @@ TEST_CASE("FlatScalarField get profile data", "[FlatScalarField::profile]")
 
 TEST_CASE("FlatScalarField get slice data", "[FlatScalarField::slice]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -66,7 +71,7 @@ TEST_CASE("FlatScalarField get slice data", "[FlatScalarField::slice]")
       auto&& s = field.slice(k);
       for(int j = 0; j < k + 2; j++)
       {
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
          }
@@ -76,9 +81,10 @@ TEST_CASE("FlatScalarField get slice data", "[FlatScalarField::slice]")
 
 TEST_CASE("FlatScalarField set point data", "[FlatScalarField::setPoint]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -95,9 +101,10 @@ TEST_CASE("FlatScalarField set point data", "[FlatScalarField::setPoint]")
 
 TEST_CASE("FlatScalarField set point data from variant", "[FlatScalarField::setPoint_variant]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
    QuICC::MHDVariant pt;
@@ -119,14 +126,15 @@ TEST_CASE("FlatScalarField set point data from variant", "[FlatScalarField::setP
 
 TEST_CASE("FlatScalarField set profile data", "[FlatScalarField::setProfile]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
    QuICC::Array np(dim1D);
-   for(int i = 0; i < dim1D; i++)
+   for(std::size_t i = 0; i < dim1D; i++)
    {
       np(i) = details::fieldValueB<double>(i,0,0);
    }
@@ -144,7 +152,7 @@ TEST_CASE("FlatScalarField set profile data", "[FlatScalarField::setProfile]")
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueB<double>(i,0,0) );
          }
@@ -158,7 +166,7 @@ TEST_CASE("FlatScalarField set profile data", "[FlatScalarField::setProfile]")
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
          }
@@ -168,14 +176,15 @@ TEST_CASE("FlatScalarField set profile data", "[FlatScalarField::setProfile]")
 
 TEST_CASE("FlatScalarField add profile data", "[FlatScalarField::addProfile]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
    QuICC::Array np(dim1D);
-   for(int i = 0; i < dim1D; i++)
+   for(std::size_t i = 0; i < dim1D; i++)
    {
       np(i) = details::fieldValueB<double>(i,0,0);
    }
@@ -193,7 +202,7 @@ TEST_CASE("FlatScalarField add profile data", "[FlatScalarField::addProfile]")
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) +  (details::fieldValueB<double>(i,0,0)) );
          }
@@ -207,7 +216,7 @@ TEST_CASE("FlatScalarField add profile data", "[FlatScalarField::addProfile]")
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
          }
@@ -217,14 +226,15 @@ TEST_CASE("FlatScalarField add profile data", "[FlatScalarField::addProfile]")
 
 TEST_CASE("FlatScalarField subtract profile data", "[FlatScalarField::subProfile]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
    QuICC::Array np(dim1D);
-   for(int i = 0; i < dim1D; i++)
+   for(std::size_t i = 0; i < dim1D; i++)
    {
       np(i) = details::fieldValueB<double>(i,0,0);
    }
@@ -242,7 +252,7 @@ TEST_CASE("FlatScalarField subtract profile data", "[FlatScalarField::subProfile
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,0,0)) );
          }
@@ -256,7 +266,7 @@ TEST_CASE("FlatScalarField subtract profile data", "[FlatScalarField::subProfile
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
          }
@@ -266,9 +276,10 @@ TEST_CASE("FlatScalarField subtract profile data", "[FlatScalarField::subProfile
 
 TEST_CASE("FlatScalarField set slice data", "[FlatScalarField::setSlice]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -280,7 +291,7 @@ TEST_CASE("FlatScalarField set slice data", "[FlatScalarField::setSlice]")
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -297,7 +308,7 @@ TEST_CASE("FlatScalarField set slice data", "[FlatScalarField::setSlice]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
@@ -312,7 +323,7 @@ TEST_CASE("FlatScalarField set slice data", "[FlatScalarField::setSlice]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -323,9 +334,10 @@ TEST_CASE("FlatScalarField set slice data", "[FlatScalarField::setSlice]")
 
 TEST_CASE("FlatScalarField add slice data", "[FlatScalarField::addSlice]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -337,7 +349,7 @@ TEST_CASE("FlatScalarField add slice data", "[FlatScalarField::addSlice]")
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -354,7 +366,7 @@ TEST_CASE("FlatScalarField add slice data", "[FlatScalarField::addSlice]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
             }
@@ -369,7 +381,7 @@ TEST_CASE("FlatScalarField add slice data", "[FlatScalarField::addSlice]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -380,9 +392,10 @@ TEST_CASE("FlatScalarField add slice data", "[FlatScalarField::addSlice]")
 
 TEST_CASE("FlatScalarField subtract slice data", "[FlatScalarField::subSlice]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -394,7 +407,7 @@ TEST_CASE("FlatScalarField subtract slice data", "[FlatScalarField::subSlice]")
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -411,7 +424,7 @@ TEST_CASE("FlatScalarField subtract slice data", "[FlatScalarField::subSlice]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
             }
@@ -426,7 +439,7 @@ TEST_CASE("FlatScalarField subtract slice data", "[FlatScalarField::subSlice]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -437,9 +450,10 @@ TEST_CASE("FlatScalarField subtract slice data", "[FlatScalarField::subSlice]")
 
 TEST_CASE("FlatScalarField set top rows of slice data", "[FlatScalarField::setSlice_rows]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -452,7 +466,7 @@ TEST_CASE("FlatScalarField set top rows of slice data", "[FlatScalarField::setSl
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -469,11 +483,11 @@ TEST_CASE("FlatScalarField set top rows of slice data", "[FlatScalarField::setSl
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
-            for(int i = dim1D/2; i < dim1D; i++)
+            for(std::size_t i = dim1D/2; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -488,7 +502,7 @@ TEST_CASE("FlatScalarField set top rows of slice data", "[FlatScalarField::setSl
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -499,9 +513,10 @@ TEST_CASE("FlatScalarField set top rows of slice data", "[FlatScalarField::setSl
 
 TEST_CASE("FlatScalarField add to top rows of slice data", "[FlatScalarField::addSlice_rows]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -514,7 +529,7 @@ TEST_CASE("FlatScalarField add to top rows of slice data", "[FlatScalarField::ad
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -531,11 +546,11 @@ TEST_CASE("FlatScalarField add to top rows of slice data", "[FlatScalarField::ad
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
             }
-            for(int i = dim1D/2; i < dim1D; i++)
+            for(std::size_t i = dim1D/2; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -550,7 +565,7 @@ TEST_CASE("FlatScalarField add to top rows of slice data", "[FlatScalarField::ad
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -561,9 +576,10 @@ TEST_CASE("FlatScalarField add to top rows of slice data", "[FlatScalarField::ad
 
 TEST_CASE("FlatScalarField subtract from top rows of slice data", "[FlatScalarField::subSlice_rows]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -576,7 +592,7 @@ TEST_CASE("FlatScalarField subtract from top rows of slice data", "[FlatScalarFi
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -593,11 +609,11 @@ TEST_CASE("FlatScalarField subtract from top rows of slice data", "[FlatScalarFi
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
             }
-            for(int i = dim1D/2; i < dim1D; i++)
+            for(std::size_t i = dim1D/2; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -612,7 +628,7 @@ TEST_CASE("FlatScalarField subtract from top rows of slice data", "[FlatScalarFi
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -623,9 +639,10 @@ TEST_CASE("FlatScalarField subtract from top rows of slice data", "[FlatScalarFi
 
 TEST_CASE("FlatScalarField get data pointer", "[FlatScalarField::data]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -645,9 +662,10 @@ TEST_CASE("FlatScalarField get data pointer", "[FlatScalarField::data]")
 
 TEST_CASE("FlatScalarField get data", "[FlatScalarField::data_ref]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -672,9 +690,10 @@ TEST_CASE("FlatScalarField get data", "[FlatScalarField::data_ref]")
 
 TEST_CASE("FlatScalarField set data", "[FlatScalarField::setData]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -682,11 +701,11 @@ TEST_CASE("FlatScalarField set data", "[FlatScalarField::setData]")
       QuICC::Matrix nd(dim1D, ((dim3D)*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                nd(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -704,7 +723,7 @@ TEST_CASE("FlatScalarField set data", "[FlatScalarField::setData]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
@@ -715,9 +734,10 @@ TEST_CASE("FlatScalarField set data", "[FlatScalarField::setData]")
 
 TEST_CASE("FlatScalarField set data with flipped sign", "[FlatScalarField::setNegData]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -725,11 +745,11 @@ TEST_CASE("FlatScalarField set data with flipped sign", "[FlatScalarField::setNe
       QuICC::Matrix nd(dim1D, ((dim3D)*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                nd(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -747,7 +767,7 @@ TEST_CASE("FlatScalarField set data with flipped sign", "[FlatScalarField::setNe
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == -(details::fieldValueB<double>(i,j,k)) );
             }
@@ -758,9 +778,10 @@ TEST_CASE("FlatScalarField set data with flipped sign", "[FlatScalarField::setNe
 
 TEST_CASE("FlatScalarField add data", "[FlatScalarField::addData]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -768,11 +789,11 @@ TEST_CASE("FlatScalarField add data", "[FlatScalarField::addData]")
       QuICC::Matrix nd(dim1D, ((dim3D)*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                nd(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -790,7 +811,7 @@ TEST_CASE("FlatScalarField add data", "[FlatScalarField::addData]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
             }
@@ -801,9 +822,10 @@ TEST_CASE("FlatScalarField add data", "[FlatScalarField::addData]")
 
 TEST_CASE("FlatScalarField subtract data", "[FlatScalarField::subData]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -811,11 +833,11 @@ TEST_CASE("FlatScalarField subtract data", "[FlatScalarField::subData]")
       QuICC::Matrix nd(dim1D, ((dim3D)*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                nd(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -833,7 +855,7 @@ TEST_CASE("FlatScalarField subtract data", "[FlatScalarField::subData]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
             }
@@ -844,9 +866,10 @@ TEST_CASE("FlatScalarField subtract data", "[FlatScalarField::subData]")
 
 TEST_CASE("FlatScalarField set zeros", "[FlatScalarField::setZeros]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -859,7 +882,7 @@ TEST_CASE("FlatScalarField set zeros", "[FlatScalarField::setZeros]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == 0 );
             }
@@ -870,9 +893,10 @@ TEST_CASE("FlatScalarField set zeros", "[FlatScalarField::setZeros]")
 
 TEST_CASE("FlatScalarField rescale data by scalar", "[FlatScalarField::rescale]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -885,7 +909,7 @@ TEST_CASE("FlatScalarField rescale data by scalar", "[FlatScalarField::rescale]"
       auto&& s = field.slice(k);
       for(int j = 0; j < k + 2; j++)
       {
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( s(i, j) == c*(details::fieldValueA<double>(i,j,k)) );
          }
@@ -895,20 +919,22 @@ TEST_CASE("FlatScalarField rescale data by scalar", "[FlatScalarField::rescale]"
 
 TEST_CASE("FlatScalarField get number of slices", "[FlatScalarField::nSlice]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
-   CHECK( field.nSlice() == dim3D );
+   CHECK( field.nSlice() == static_cast<int>(dim3D) );
 }
 
 TEST_CASE("FlatScalarField set slice data from pointer", "[FlatScalarField::rData]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -921,7 +947,7 @@ TEST_CASE("FlatScalarField set slice data from pointer", "[FlatScalarField::rDat
          int ii = 0;
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                dptr[ii] = details::fieldValueB<double>(i,j,k);
                ii++;
@@ -937,7 +963,7 @@ TEST_CASE("FlatScalarField set slice data from pointer", "[FlatScalarField::rDat
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
@@ -952,7 +978,7 @@ TEST_CASE("FlatScalarField set slice data from pointer", "[FlatScalarField::rDat
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -963,9 +989,10 @@ TEST_CASE("FlatScalarField set slice data from pointer", "[FlatScalarField::rDat
 
 TEST_CASE("FlatScalarField set whole data from reference", "[FlatScalarField::rData_ref]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -973,11 +1000,11 @@ TEST_CASE("FlatScalarField set whole data from reference", "[FlatScalarField::rD
       QuICC::Matrix nd(dim1D, ((dim3D)*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                nd(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -995,7 +1022,7 @@ TEST_CASE("FlatScalarField set whole data from reference", "[FlatScalarField::rD
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
@@ -1006,9 +1033,10 @@ TEST_CASE("FlatScalarField set whole data from reference", "[FlatScalarField::rD
 
 TEST_CASE("FlatScalarField set point data from reference", "[FlatScalarField::rPoint]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1025,9 +1053,10 @@ TEST_CASE("FlatScalarField set point data from reference", "[FlatScalarField::rP
 
 TEST_CASE("FlatScalarField set point data from reference from coord", "[FlatScalarField::rPoint_coord]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1037,7 +1066,7 @@ TEST_CASE("FlatScalarField set point data from reference from coord", "[FlatScal
    field.rPoint(coord) = -700.008;
    coord = {7, 3, 3};
    field.rPoint(coord) = -700.009;
-   coord = {dim1D-1, 1, 4};
+   coord = {static_cast<int>(dim1D-1), 1, 4};
    field.rPoint(coord) = -700.017;
 
    CHECK( field.point(0, 1, 0) == -700.007);
@@ -1048,11 +1077,12 @@ TEST_CASE("FlatScalarField set point data from reference from coord", "[FlatScal
 
 TEST_CASE("FlatScalarField copy constructor", "[FlatScalarField::Copy]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spFieldA = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
-   auto spFieldB = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
-   auto spFieldC = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spFieldA = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
+   auto spFieldB = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
+   auto spFieldC = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& fieldA = *spFieldA;
    fieldA.setZeros();
@@ -1096,9 +1126,10 @@ TEST_CASE("FlatScalarField copy constructor", "[FlatScalarField::Copy]")
 
 TEST_CASE("FlatScalarField get component by reference", "[FlatScalarField::comp]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1107,9 +1138,10 @@ TEST_CASE("FlatScalarField get component by reference", "[FlatScalarField::comp]
 
 TEST_CASE("FlatScalarField set component by reference", "[FlatScalarField::rComp]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createFlatScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 

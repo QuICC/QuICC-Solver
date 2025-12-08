@@ -14,11 +14,11 @@ namespace details {
       TriangularDown
    };
 
-   std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> createSetup(const SetupType type, const int dim1D, const int dim3D);
+   std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> createSetup(const SetupType type, const std::size_t dim1D, const std::size_t dim3D, const std::vector<std::size_t>& idx3D);
 
-   template <typename T> std::shared_ptr<QuICC::Datatypes::FlatScalarField<T>> createFlatScalarField(const SetupType type, const int dim1D, const int dim3D);
+   template <typename T> std::shared_ptr<QuICC::Datatypes::FlatScalarField<T>> createFlatScalarField(const SetupType type, const std::size_t dim1D, const std::size_t dim3D, const std::vector<std::size_t>& idx3D);
 
-   template <typename T> std::shared_ptr<QuICC::Datatypes::ViewScalarField<T>> createViewScalarField(const SetupType type, const int dim1D, const int dim3D);
+   template <typename T> std::shared_ptr<QuICC::Datatypes::ViewScalarField<T>> createViewScalarField(const SetupType type, const std::size_t dim1D, const std::size_t dim3D, const std::vector<std::size_t>& idx3D);
 
    template <typename T> T fieldValueA(const int i, const int j, const int k);
    template <typename T> T fieldValueB(const int i, const int j, const int k);
@@ -32,9 +32,10 @@ namespace details {
    {
       return -700 - k*100*100 - j - i*0.001;
    }
-   template <typename T> std::shared_ptr<QuICC::Datatypes::FlatScalarField<T>> createFlatScalarField(const SetupType type, const int dim1D, const int dim3D)
+
+   template <typename T> std::shared_ptr<QuICC::Datatypes::FlatScalarField<T>> createFlatScalarField(const SetupType type, const std::size_t dim1D, const std::size_t dim3D, const std::vector<std::size_t>& idx3D)
    {
-      auto spSetup = details::createSetup(details::SetupType::UniformUp, dim1D, dim3D);
+      auto spSetup = details::createSetup(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
       auto spField = std::make_shared<QuICC::Datatypes::FlatScalarField<T>>(spSetup);
       auto&& data = spField->rData();
@@ -54,9 +55,9 @@ namespace details {
       return spField;
    }
 
-   template <typename T> std::shared_ptr<QuICC::Datatypes::ViewScalarField<T>> createViewScalarField(const SetupType type, const int dim1D, const int dim3D)
+   template <typename T> std::shared_ptr<QuICC::Datatypes::ViewScalarField<T>> createViewScalarField(const SetupType type, const std::size_t dim1D, const std::size_t dim3D, const std::vector<std::size_t>& idx3D)
    {
-      auto spSetup = details::createSetup(details::SetupType::UniformUp, dim1D, dim3D);
+      auto spSetup = details::createSetup(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
       auto spField = std::make_shared<QuICC::Datatypes::ViewScalarField<T>>(spSetup);
       auto&& data = spField->rDataView();

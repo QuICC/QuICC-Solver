@@ -17,7 +17,6 @@
 #include "QuICC/SpatialScheme/ISpatialScheme.hpp"
 #include "QuICC/Resolutions/Tools/IndexCounter.hpp"
 
-#include <iostream>
 namespace QuICC {
 
    Resolution::Resolution(const std::vector<SharedCoreResolution>& coreRes, const ArrayI& simDim, const ArrayI& transDim)
@@ -170,71 +169,27 @@ namespace QuICC {
    {
       const auto& tRes = *this->cpu()->dim(id);
 
-      // Get forward dimensions
-      auto spDim1D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
-      for(int i = 0; i < spDim1D->size(); ++i)
-      {
-         (*spDim1D)(i) = tRes.dim<Dimensions::Data::DATF1D>(0,i);
-      }
+      auto meta = tRes.viewMeta(Dimensions::Data::DATF1D);
 
-      // Get 2D dimensions
-      auto spDim2D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
-      for(int i = 0; i < spDim2D->size(); ++i)
-      {
-         (*spDim2D)(i) = tRes.dim<Dimensions::Data::DAT2D>(i);
-      }
-
-      return std::make_shared<Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, tRes.dim<Dimensions::Data::DAT3D>(), this->mspMem);
+      return std::make_shared<Datatypes::ScalarFieldSetup>(meta, this->mspMem);
    }
 
    std::shared_ptr<Datatypes::ScalarFieldSetup> Resolution::spBwdSetup(const Dimensions::Transform::Id id) const
    {
       const auto& tRes = *this->cpu()->dim(id);
 
-      // Get backward dimensions
-      auto spDim1D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
-      for(int i = 0; i < spDim1D->size(); ++i)
-      {
-         (*spDim1D)(i) = tRes.dim<Dimensions::Data::DATB1D>(0,i);
-      }
+      auto meta = tRes.viewMeta(Dimensions::Data::DATB1D);
 
-      // Get 2D dimensions
-      auto spDim2D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
-      for(int i = 0; i < spDim2D->size(); ++i)
-      {
-         (*spDim2D)(i) = tRes.dim<Dimensions::Data::DAT2D>(i);
-      }
-
-      return std::make_shared<Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, tRes.dim<Dimensions::Data::DAT3D>(), this->mspMem);
+      return std::make_shared<Datatypes::ScalarFieldSetup>(meta, this->mspMem);
    }
 
    std::shared_ptr<Datatypes::ScalarFieldSetup> Resolution::spSpectralSetup() const
    {
       const auto& tRes = *this->cpu()->dim(Dimensions::Transform::SPECTRAL);
 
-      // Get backward dimensions
-      const int sze3D = tRes.dim<Dimensions::Data::DAT3D>();
-      auto spDim1D = std::make_shared<ArrayI>(sze3D);
-      spDim1D->setConstant(this->sim().dim(Dimensions::Simulation::SIM1D, Dimensions::Space::TRANSFORM));
-      for(int k = 0; k < sze3D; ++k)
-      {
-         const int sze2D = tRes.dim<Dimensions::Data::DAT2D>(k);
-         int sze1D = 0;
-         for(int j = 0; j < sze2D; ++j)
-         {
-            sze1D = std::max(sze1D, tRes.dim<Dimensions::Data::DATB1D>(j,k));
-         }
-         (*spDim1D)(k) = sze1D;
-      }
+      auto meta = tRes.viewMeta(Dimensions::Data::DATB1D);
 
-      // Get 2D dimensions
-      auto spDim2D = std::make_shared<ArrayI>(tRes.dim<Dimensions::Data::DAT3D>());
-      for(int i = 0; i < spDim2D->size(); ++i)
-      {
-         (*spDim2D)(i) = tRes.dim<Dimensions::Data::DAT2D>(i);
-      }
-
-      return std::make_shared<Datatypes::ScalarFieldSetup>(spDim1D, spDim2D, tRes.dim<Dimensions::Data::DAT3D>(), this->mspMem);
+      return std::make_shared<Datatypes::ScalarFieldSetup>(meta, this->mspMem);
    }
 
    std::shared_ptr<Datatypes::ScalarFieldSetup> Resolution::spPhysicalSetup() const

@@ -15,6 +15,7 @@
 #include "Types/Typedefs.hpp"
 #include "Memory/Memory.hpp"
 #include "Memory/MemoryResource.hpp"
+#include "QuICC/Resolutions/CscMetadata.hpp"
 
 namespace QuICC {
 
@@ -29,7 +30,7 @@ namespace Datatypes {
          /**
           * @brief Constructor for 3D scalar field
           */
-         ScalarFieldSetup(SharedArrayI spDim1D, SharedArrayI spDim2D, const int dim3D, std::shared_ptr<Memory::memory_resource> mem);
+         ScalarFieldSetup(std::shared_ptr<CscMetadata> spMeta, std::shared_ptr<Memory::memory_resource> mem);
 
          /**
           * @brief Destructor
@@ -72,6 +73,11 @@ namespace Datatypes {
          int nBlock() const;
 
          /**
+          * @brief Get ptr and idx vectors for View
+          */
+         std::shared_ptr<CscMetadata> viewMeta() const;
+
+         /**
           * @brief Get memory resource
           */
          std::shared_ptr<Memory::memory_resource> mem() const;
@@ -105,12 +111,17 @@ namespace Datatypes {
          int mDataCols;
 
          /**
+          * @brief Csc Metadata
+          */
+         std::shared_ptr<CscMetadata> mspMeta;
+
+         /**
           * @brief Memory resources
           */
          std::shared_ptr<Memory::memory_resource> mMem;
    };
 
-}
-}
+} // namespace Datatypes
+} // namespace QuICC
 
 #endif // QUICC_DATATYPES_SCALARFIELDSETUP_HPP

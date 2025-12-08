@@ -21,10 +21,10 @@ namespace Framework {
 namespace Selector {
 
    /// Template typedef for scalar field implementation
-   //template <typename TData>
-   //   using ScalarField = QuICC::Datatypes::ViewScalarField<TData>;
    template <typename TData>
-      using ScalarField = QuICC::Datatypes::FlatScalarField<TData>;
+      using ScalarField = QuICC::Datatypes::ViewScalarField<TData>;
+   //template <typename TData>
+   //   using ScalarField = QuICC::Datatypes::FlatScalarField<TData>;
 
    /// Template typedef for shared scalar field implementation
    template <typename TData>

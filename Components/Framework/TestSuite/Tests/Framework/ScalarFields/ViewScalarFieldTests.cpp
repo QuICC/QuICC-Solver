@@ -5,9 +5,10 @@
 
 TEST_CASE("ViewScalarField get point data", "[ViewScalarField::point]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -20,9 +21,10 @@ TEST_CASE("ViewScalarField get point data", "[ViewScalarField::point]")
 
 TEST_CASE("ViewScalarField get point data from coord", "[ViewScalarField::point_coord]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -35,9 +37,10 @@ TEST_CASE("ViewScalarField get point data from coord", "[ViewScalarField::point_
 
 TEST_CASE("ViewScalarField get profile data", "[ViewScalarField::profile]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -45,7 +48,7 @@ TEST_CASE("ViewScalarField get profile data", "[ViewScalarField::profile]")
    for(auto&& jk: jks)
    {
       auto&& p = field.profile(jk.first, jk.second);
-      for(int i = 0; i < dim1D; i++)
+      for(std::size_t i = 0; i < dim1D; i++)
       {
          CHECK( p(i) == details::fieldValueA<double>(i,jk.first,jk.second) );
       }
@@ -54,9 +57,10 @@ TEST_CASE("ViewScalarField get profile data", "[ViewScalarField::profile]")
 
 TEST_CASE("ViewScalarField get slice data", "[ViewScalarField::slice]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -66,7 +70,7 @@ TEST_CASE("ViewScalarField get slice data", "[ViewScalarField::slice]")
       auto&& s = field.slice(k);
       for(int j = 0; j < k + 2; j++)
       {
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
          }
@@ -76,9 +80,10 @@ TEST_CASE("ViewScalarField get slice data", "[ViewScalarField::slice]")
 
 TEST_CASE("ViewScalarField set point data", "[ViewScalarField::setPoint]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -95,9 +100,10 @@ TEST_CASE("ViewScalarField set point data", "[ViewScalarField::setPoint]")
 
 TEST_CASE("ViewScalarField set point data from variant", "[ViewScalarField::setPoint_variant]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
    QuICC::MHDVariant pt;
@@ -119,9 +125,10 @@ TEST_CASE("ViewScalarField set point data from variant", "[ViewScalarField::setP
 
 TEST_CASE("ViewScalarField set profile data (View)", "[ViewScalarField::setProfileView]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -129,7 +136,7 @@ TEST_CASE("ViewScalarField set profile data (View)", "[ViewScalarField::setProfi
    QuICC::View::ViewBase<double> pView(pData.data(), pData.size());
    std::array<std::uint32_t, 1> dims = {static_cast<std::uint32_t>(dim1D)};
    QuICC::View::View<double, QuICC::View::dense1D> np(pView, dims);
-   for(int i = 0; i < dim1D; i++)
+   for(std::size_t i = 0; i < dim1D; i++)
    {
       np(i) = details::fieldValueB<double>(i,0,0);
    }
@@ -147,7 +154,7 @@ TEST_CASE("ViewScalarField set profile data (View)", "[ViewScalarField::setProfi
          auto j = jk.first;
          auto k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueB<double>(i,0,0) );
          }
@@ -161,7 +168,7 @@ TEST_CASE("ViewScalarField set profile data (View)", "[ViewScalarField::setProfi
          auto j = jk.first;
          auto k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
          }
@@ -171,9 +178,10 @@ TEST_CASE("ViewScalarField set profile data (View)", "[ViewScalarField::setProfi
 
 TEST_CASE("ViewScalarField set slice data (View)", "[ViewScalarField::setSliceView]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -189,7 +197,7 @@ TEST_CASE("ViewScalarField set slice data (View)", "[ViewScalarField::setSliceVi
          QuICC::View::View<double, QuICC::View::dense2D> ns(sView, {dims});
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -206,7 +214,7 @@ TEST_CASE("ViewScalarField set slice data (View)", "[ViewScalarField::setSliceVi
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
@@ -221,7 +229,7 @@ TEST_CASE("ViewScalarField set slice data (View)", "[ViewScalarField::setSliceVi
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -233,9 +241,10 @@ TEST_CASE("ViewScalarField set slice data (View)", "[ViewScalarField::setSliceVi
 
 TEST_CASE("ViewScalarField set top rows of slice data (View)", "[ViewScalarField::setSliceView_rows]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -251,7 +260,7 @@ TEST_CASE("ViewScalarField set top rows of slice data (View)", "[ViewScalarField
          QuICC::View::View<double, QuICC::View::dense2D> ns(sView, {dims});
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -268,11 +277,11 @@ TEST_CASE("ViewScalarField set top rows of slice data (View)", "[ViewScalarField
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
-            for(int i = dim1D/2; i < dim1D; i++)
+            for(std::size_t i = dim1D/2; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -287,7 +296,7 @@ TEST_CASE("ViewScalarField set top rows of slice data (View)", "[ViewScalarField
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -298,9 +307,10 @@ TEST_CASE("ViewScalarField set top rows of slice data (View)", "[ViewScalarField
 
 TEST_CASE("ViewScalarField set data (View)", "[ViewScalarField::setDataView]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -311,11 +321,11 @@ TEST_CASE("ViewScalarField set data (View)", "[ViewScalarField::setDataView]")
       QuICC::Matrix dMat(dim1D, (dim3D*(dim3D + 3))/2);
       dMat.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                dMat(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -343,7 +353,7 @@ TEST_CASE("ViewScalarField set data (View)", "[ViewScalarField::setDataView]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
@@ -354,14 +364,15 @@ TEST_CASE("ViewScalarField set data (View)", "[ViewScalarField::setDataView]")
 
 TEST_CASE("ViewScalarField set profile data (Eigen)", "[ViewScalarField::setProfile]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
    QuICC::Array np(dim1D);
-   for(int i = 0; i < dim1D; i++)
+   for(std::size_t i = 0; i < dim1D; i++)
    {
       np(i) = details::fieldValueB<double>(i,0,0);
    }
@@ -379,7 +390,7 @@ TEST_CASE("ViewScalarField set profile data (Eigen)", "[ViewScalarField::setProf
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == (details::fieldValueB<double>(i,0,0)) );
          }
@@ -393,7 +404,7 @@ TEST_CASE("ViewScalarField set profile data (Eigen)", "[ViewScalarField::setProf
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
          }
@@ -403,14 +414,15 @@ TEST_CASE("ViewScalarField set profile data (Eigen)", "[ViewScalarField::setProf
 
 TEST_CASE("ViewScalarField add profile data (Eigen)", "[ViewScalarField::addProfile]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
    QuICC::Array np(dim1D);
-   for(int i = 0; i < dim1D; i++)
+   for(std::size_t i = 0; i < dim1D; i++)
    {
       np(i) = details::fieldValueB<double>(i,0,0);
    }
@@ -428,7 +440,7 @@ TEST_CASE("ViewScalarField add profile data (Eigen)", "[ViewScalarField::addProf
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) +  (details::fieldValueB<double>(i,0,0)) );
          }
@@ -442,7 +454,7 @@ TEST_CASE("ViewScalarField add profile data (Eigen)", "[ViewScalarField::addProf
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
          }
@@ -452,14 +464,15 @@ TEST_CASE("ViewScalarField add profile data (Eigen)", "[ViewScalarField::addProf
 
 TEST_CASE("ViewScalarField subtract profile data (Eigen)", "[ViewScalarField::subProfile]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
    QuICC::Array np(dim1D);
-   for(int i = 0; i < dim1D; i++)
+   for(std::size_t i = 0; i < dim1D; i++)
    {
       np(i) = details::fieldValueB<double>(i,0,0);
    }
@@ -477,7 +490,7 @@ TEST_CASE("ViewScalarField subtract profile data (Eigen)", "[ViewScalarField::su
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,0,0)) );
          }
@@ -491,7 +504,7 @@ TEST_CASE("ViewScalarField subtract profile data (Eigen)", "[ViewScalarField::su
          int j = jk.first;
          int k = jk.second;
          auto&& p = field.profile(j, k);
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( p(i) == details::fieldValueA<double>(i,j,k) );
          }
@@ -501,9 +514,10 @@ TEST_CASE("ViewScalarField subtract profile data (Eigen)", "[ViewScalarField::su
 
 TEST_CASE("ViewScalarField set slice data (Eigen)", "[ViewScalarField::setSlice]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -515,7 +529,7 @@ TEST_CASE("ViewScalarField set slice data (Eigen)", "[ViewScalarField::setSlice]
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -532,7 +546,7 @@ TEST_CASE("ViewScalarField set slice data (Eigen)", "[ViewScalarField::setSlice]
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == (details::fieldValueB<double>(i,j,k)) );
             }
@@ -547,7 +561,7 @@ TEST_CASE("ViewScalarField set slice data (Eigen)", "[ViewScalarField::setSlice]
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -558,9 +572,10 @@ TEST_CASE("ViewScalarField set slice data (Eigen)", "[ViewScalarField::setSlice]
 
 TEST_CASE("ViewScalarField add slice data (Eigen)", "[ViewScalarField::addSlice]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -572,7 +587,7 @@ TEST_CASE("ViewScalarField add slice data (Eigen)", "[ViewScalarField::addSlice]
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -589,7 +604,7 @@ TEST_CASE("ViewScalarField add slice data (Eigen)", "[ViewScalarField::addSlice]
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
             }
@@ -604,7 +619,7 @@ TEST_CASE("ViewScalarField add slice data (Eigen)", "[ViewScalarField::addSlice]
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -615,9 +630,10 @@ TEST_CASE("ViewScalarField add slice data (Eigen)", "[ViewScalarField::addSlice]
 
 TEST_CASE("ViewScalarField subtract slice data (Eigen)", "[ViewScalarField::subSlice]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -629,7 +645,7 @@ TEST_CASE("ViewScalarField subtract slice data (Eigen)", "[ViewScalarField::subS
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -646,7 +662,7 @@ TEST_CASE("ViewScalarField subtract slice data (Eigen)", "[ViewScalarField::subS
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
             }
@@ -661,7 +677,7 @@ TEST_CASE("ViewScalarField subtract slice data (Eigen)", "[ViewScalarField::subS
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -672,9 +688,10 @@ TEST_CASE("ViewScalarField subtract slice data (Eigen)", "[ViewScalarField::subS
 
 TEST_CASE("ViewScalarField set top rows of slice data (Eigen)", "[ViewScalarField::setSlice_rows]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -687,7 +704,7 @@ TEST_CASE("ViewScalarField set top rows of slice data (Eigen)", "[ViewScalarFiel
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -704,11 +721,11 @@ TEST_CASE("ViewScalarField set top rows of slice data (Eigen)", "[ViewScalarFiel
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                CHECK( s(i, j) == (details::fieldValueB<double>(i,j,k)) );
             }
-            for(int i = dim1D/2; i < dim1D; i++)
+            for(std::size_t i = dim1D/2; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -723,7 +740,7 @@ TEST_CASE("ViewScalarField set top rows of slice data (Eigen)", "[ViewScalarFiel
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -734,9 +751,10 @@ TEST_CASE("ViewScalarField set top rows of slice data (Eigen)", "[ViewScalarFiel
 
 TEST_CASE("ViewScalarField add to top rows of slice data (Eigen)", "[ViewScalarField::addSlice_rows]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -749,7 +767,7 @@ TEST_CASE("ViewScalarField add to top rows of slice data (Eigen)", "[ViewScalarF
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -766,11 +784,11 @@ TEST_CASE("ViewScalarField add to top rows of slice data (Eigen)", "[ViewScalarF
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
             }
-            for(int i = dim1D/2; i < dim1D; i++)
+            for(std::size_t i = dim1D/2; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -785,7 +803,7 @@ TEST_CASE("ViewScalarField add to top rows of slice data (Eigen)", "[ViewScalarF
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -796,9 +814,10 @@ TEST_CASE("ViewScalarField add to top rows of slice data (Eigen)", "[ViewScalarF
 
 TEST_CASE("ViewScalarField subtract from top rows of slice data (Eigen)", "[ViewScalarField::subSlice_rows]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -811,7 +830,7 @@ TEST_CASE("ViewScalarField subtract from top rows of slice data (Eigen)", "[View
          ns.setZero();
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                ns(i, j) = details::fieldValueB<double>(i,j,k);
             }
@@ -828,11 +847,11 @@ TEST_CASE("ViewScalarField subtract from top rows of slice data (Eigen)", "[View
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D/2; i++)
+            for(std::size_t i = 0; i < dim1D/2; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
             }
-            for(int i = dim1D/2; i < dim1D; i++)
+            for(std::size_t i = dim1D/2; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -845,7 +864,7 @@ TEST_CASE("ViewScalarField subtract from top rows of slice data (Eigen)", "[View
       auto&& s = field.slice(k);
       for(int j = 0; j < k + 2; j++)
       {
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
          }
@@ -857,11 +876,11 @@ TEST_CASE("ViewScalarField subtract from top rows of slice data (Eigen)", "[View
       auto&& s = field.slice(k);
       for(int j = 0; j < k + 2; j++)
       {
-         for(int i = 0; i < dim1D/2; i++)
+         for(std::size_t i = 0; i < dim1D/2; i++)
          {
             CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
          }
-         for(int i = dim1D/2; i < dim1D; i++)
+         for(std::size_t i = dim1D/2; i < dim1D; i++)
          {
             CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
          }
@@ -873,11 +892,11 @@ TEST_CASE("ViewScalarField subtract from top rows of slice data (Eigen)", "[View
       auto&& s = field.slice(k);
       for(int j = 0; j < k + 2; j++)
       {
-         for(int i = 0; i < dim1D/2; i++)
+         for(std::size_t i = 0; i < dim1D/2; i++)
          {
             CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
          }
-         for(int i = dim1D/2; i < dim1D; i++)
+         for(std::size_t i = dim1D/2; i < dim1D; i++)
          {
             CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
          }
@@ -887,9 +906,10 @@ TEST_CASE("ViewScalarField subtract from top rows of slice data (Eigen)", "[View
 
 TEST_CASE("ViewScalarField get data pointer", "[ViewScalarField::data]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -909,9 +929,10 @@ TEST_CASE("ViewScalarField get data pointer", "[ViewScalarField::data]")
 
 TEST_CASE("ViewScalarField get data view", "[ViewScalarField::dataView]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -931,9 +952,10 @@ TEST_CASE("ViewScalarField get data view", "[ViewScalarField::dataView]")
 
 TEST_CASE("ViewScalarField get data (Eigen)", "[ViewScalarField::data]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -958,9 +980,10 @@ TEST_CASE("ViewScalarField get data (Eigen)", "[ViewScalarField::data]")
 
 TEST_CASE("ViewScalarField set data (Eigen)", "[ViewScalarField::setData]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -968,11 +991,11 @@ TEST_CASE("ViewScalarField set data (Eigen)", "[ViewScalarField::setData]")
       QuICC::Matrix nd(dim1D, (dim3D*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                nd(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -990,7 +1013,7 @@ TEST_CASE("ViewScalarField set data (Eigen)", "[ViewScalarField::setData]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
@@ -1001,9 +1024,10 @@ TEST_CASE("ViewScalarField set data (Eigen)", "[ViewScalarField::setData]")
 
 TEST_CASE("ViewScalarField set data with flipped sign (Eigen)", "[ViewScalarField::setNegData]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1011,11 +1035,11 @@ TEST_CASE("ViewScalarField set data with flipped sign (Eigen)", "[ViewScalarFiel
       QuICC::Matrix nd(dim1D, (dim3D*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                nd(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -1033,7 +1057,7 @@ TEST_CASE("ViewScalarField set data with flipped sign (Eigen)", "[ViewScalarFiel
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == -(details::fieldValueB<double>(i,j,k)) );
             }
@@ -1044,9 +1068,10 @@ TEST_CASE("ViewScalarField set data with flipped sign (Eigen)", "[ViewScalarFiel
 
 TEST_CASE("ViewScalarField add data (Eigen)", "[ViewScalarField::addData]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1054,11 +1079,11 @@ TEST_CASE("ViewScalarField add data (Eigen)", "[ViewScalarField::addData]")
       QuICC::Matrix nd(dim1D, (dim3D*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                nd(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -1076,7 +1101,7 @@ TEST_CASE("ViewScalarField add data (Eigen)", "[ViewScalarField::addData]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) + (details::fieldValueB<double>(i,j,k)) );
             }
@@ -1087,9 +1112,10 @@ TEST_CASE("ViewScalarField add data (Eigen)", "[ViewScalarField::addData]")
 
 TEST_CASE("ViewScalarField subtract data (Eigen)", "[ViewScalarField::subData]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1097,11 +1123,11 @@ TEST_CASE("ViewScalarField subtract data (Eigen)", "[ViewScalarField::subData]")
       QuICC::Matrix nd(dim1D, (dim3D*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                nd(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -1119,7 +1145,7 @@ TEST_CASE("ViewScalarField subtract data (Eigen)", "[ViewScalarField::subData]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) - (details::fieldValueB<double>(i,j,k)) );
             }
@@ -1130,9 +1156,10 @@ TEST_CASE("ViewScalarField subtract data (Eigen)", "[ViewScalarField::subData]")
 
 TEST_CASE("ViewScalarField set zeros", "[ViewScalarField::setZeros]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1145,7 +1172,7 @@ TEST_CASE("ViewScalarField set zeros", "[ViewScalarField::setZeros]")
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == 0 );
             }
@@ -1156,9 +1183,10 @@ TEST_CASE("ViewScalarField set zeros", "[ViewScalarField::setZeros]")
 
 TEST_CASE("ViewScalarField rescale data by scalar", "[ViewScalarField::rescale]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1171,7 +1199,7 @@ TEST_CASE("ViewScalarField rescale data by scalar", "[ViewScalarField::rescale]"
       auto&& s = field.slice(k);
       for(int j = 0; j < k + 2; j++)
       {
-         for(int i = 0; i < dim1D; i++)
+         for(std::size_t i = 0; i < dim1D; i++)
          {
             CHECK( s(i, j) == c*(details::fieldValueA<double>(i,j,k)) );
          }
@@ -1181,20 +1209,22 @@ TEST_CASE("ViewScalarField rescale data by scalar", "[ViewScalarField::rescale]"
 
 TEST_CASE("ViewScalarField get number of slices", "[ViewScalarField::nSlice]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
-   CHECK( field.nSlice() == dim3D );
+   CHECK( field.nSlice() == static_cast<int>(dim3D) );
 }
 
 TEST_CASE("ViewScalarField set slice data from pointer", "[ViewScalarField::rData]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1207,7 +1237,7 @@ TEST_CASE("ViewScalarField set slice data from pointer", "[ViewScalarField::rDat
          int ii = 0;
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                dptr[ii] = details::fieldValueB<double>(i,j,k);
                ii++;
@@ -1223,7 +1253,7 @@ TEST_CASE("ViewScalarField set slice data from pointer", "[ViewScalarField::rDat
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
@@ -1238,7 +1268,7 @@ TEST_CASE("ViewScalarField set slice data from pointer", "[ViewScalarField::rDat
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueA<double>(i,j,k) );
             }
@@ -1249,9 +1279,10 @@ TEST_CASE("ViewScalarField set slice data from pointer", "[ViewScalarField::rDat
 
 TEST_CASE("ViewScalarField set whole data from reference", "[ViewScalarField::rData_ref]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1259,11 +1290,11 @@ TEST_CASE("ViewScalarField set whole data from reference", "[ViewScalarField::rD
       QuICC::Matrix nd(dim1D, ((dim3D)*(dim3D + 3))/2);
       nd.setZero();
       int j_ = 0;
-      for(int k = 0; k < dim3D; k++)
+      for(std::size_t k = 0; k < dim3D; k++)
       {
-         for(int j = 0; j < k + 2; j++)
+         for(std::size_t j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                nd(i, j_) = details::fieldValueB<double>(i,j,k);
             }
@@ -1281,7 +1312,7 @@ TEST_CASE("ViewScalarField set whole data from reference", "[ViewScalarField::rD
          auto&& s = field.slice(k);
          for(int j = 0; j < k + 2; j++)
          {
-            for(int i = 0; i < dim1D; i++)
+            for(std::size_t i = 0; i < dim1D; i++)
             {
                CHECK( s(i, j) == details::fieldValueB<double>(i,j,k) );
             }
@@ -1292,9 +1323,10 @@ TEST_CASE("ViewScalarField set whole data from reference", "[ViewScalarField::rD
 
 TEST_CASE("ViewScalarField set point data from reference", "[ViewScalarField::rPoint]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1311,9 +1343,10 @@ TEST_CASE("ViewScalarField set point data from reference", "[ViewScalarField::rP
 
 TEST_CASE("ViewScalarField set point data from reference from coord", "[ViewScalarField::rPoint_coord]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1323,7 +1356,7 @@ TEST_CASE("ViewScalarField set point data from reference from coord", "[ViewScal
    field.rPoint(coord) = -700.008;
    coord = {7, 3, 3};
    field.rPoint(coord) = -700.009;
-   coord = {dim1D-1, 1, 4};
+   coord = {static_cast<int>(dim1D-1), 1, 4};
    field.rPoint(coord) = -700.017;
 
    CHECK( field.point(0, 1, 0) == -700.007);
@@ -1334,11 +1367,12 @@ TEST_CASE("ViewScalarField set point data from reference from coord", "[ViewScal
 
 TEST_CASE("ViewScalarField copy constructor", "[ViewScalarField::Copy]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spFieldA = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
-   auto spFieldB = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
-   auto spFieldC = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spFieldA = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
+   auto spFieldB = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
+   auto spFieldC = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& fieldA = *spFieldA;
    fieldA.setZeros();
@@ -1382,9 +1416,10 @@ TEST_CASE("ViewScalarField copy constructor", "[ViewScalarField::Copy]")
 
 TEST_CASE("ViewScalarField get component by reference", "[ViewScalarField::comp]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 
@@ -1393,9 +1428,10 @@ TEST_CASE("ViewScalarField get component by reference", "[ViewScalarField::comp]
 
 TEST_CASE("ViewScalarField set component by reference", "[ViewScalarField::rComp]")
 {
-   int dim3D = 5;
-   int dim1D = 2*dim3D;
-   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D);
+   std::size_t dim3D = 5;
+   std::size_t dim1D = 2*dim3D;
+   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
+   auto spField = details::createViewScalarField<double>(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
 
    auto&& field = *spField;
 

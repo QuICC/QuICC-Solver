@@ -358,14 +358,24 @@ namespace Datatypes {
          void setSlice(const ViewSliceType& sl, const int k, const int rows);
 
          /**
-          * @brief Get internal storage field data
+          * @brief Get full data view
           */
          const ViewStorageType& dataView() const;
 
          /**
-          * @brief Get internal storage field data
+          * @brief Set full data view
           */
          ViewStorageType& rDataView();
+
+         /**
+          * @brief Get full data global view
+          */
+         const ViewStorageType& globalView() const;
+
+         /**
+          * @brief Set full data global view
+          */
+         ViewStorageType& rGlobalView();
 
          /**
           * @brief Set full field data
@@ -376,6 +386,16 @@ namespace Datatypes {
 
       private:
          /**
+          * @brief Set metadata for local view (compressed)
+          */
+         void setLocalMetadata(std::shared_ptr<ScalarFieldSetup> spSetup);
+
+         /**
+          * @brief Set metadata for global view
+          */
+         void setGlobalMetadata(std::shared_ptr<ScalarFieldSetup> spSetup);
+
+         /**
           * @brief Memory resources
           */
          std::shared_ptr<Memory::memory_resource> mMem;
@@ -384,6 +404,11 @@ namespace Datatypes {
           * @brief Data view
           */
          ViewStorageType mView;
+
+         /**
+          * @brief Global Data view
+          */
+         ViewStorageType mGlobalView;
 
          /**
           * @brief Data storage
@@ -399,6 +424,11 @@ namespace Datatypes {
           * @brief Pointer storage
           */
          std::shared_ptr<Memory::MemBlock<typename ViewStorageType::IndexType>> mspPointers;
+
+         /**
+          * @brief Pointer storage
+          */
+         std::shared_ptr<Memory::MemBlock<typename ViewStorageType::IndexType>> mspGlobalPointers;
    };
 
    template <typename TData> inline typename ViewScalarField<TData>::PointType ViewScalarField<TData>::point(const int i, const int j, const int k) const
@@ -495,6 +525,16 @@ namespace Datatypes {
    template <typename TData> inline typename ViewScalarField<TData>::ViewStorageType& ViewScalarField<TData>::rDataView()
    {
       return this->mView;
+   }
+
+   template <typename TData> inline const typename ViewScalarField<TData>::ViewStorageType& ViewScalarField<TData>::globalView() const
+   {
+      return this->mGlobalView;
+   }
+
+   template <typename TData> inline typename ViewScalarField<TData>::ViewStorageType& ViewScalarField<TData>::rGlobalView()
+   {
+      return this->mGlobalView;
    }
 
    template <typename TData> void ViewScalarField<TData>::setProfile(const ViewProfileType& pf, const int j, const int k)
@@ -776,44 +816,8 @@ namespace Datatypes {
    template <typename TData> ViewScalarField<TData>::ViewScalarField(std::shared_ptr<ScalarFieldSetup> spSetup, std::shared_ptr<Memory::memory_resource> mem)
       : mMem(mem)
    {
-      // Get second dimensions
-      std::uint32_t n2D = 0;
-      for(int k = 0; k < spSetup->nBlock(); k++)
-      {
-         n2D = std::max(n2D, static_cast<std::uint32_t>(spSetup->blockCols(k)));
-      }
-
-      std::array<std::uint32_t, 3> dimensions{static_cast<std::uint32_t>(spSetup->dataRows()), n2D, static_cast<std::uint32_t>(spSetup->nBlock())};
-      std::uint32_t dataSize = spSetup->dataRows()*spSetup->dataCols();
-      std::uint32_t pointersSize = spSetup->nBlock() + 1;
-      std::uint32_t indicesSize = spSetup->dataCols();
-
-      // Alloc op storage
-      this->mspData = std::make_shared<Memory::MemBlock<PointType>>(dataSize, this->mMem.get());
-      this->mspPointers = std::make_shared<Memory::MemBlock<typename ViewStorageType::IndexType>>(pointersSize, this->mMem.get());
-      this->mspIndices = std::make_shared<Memory::MemBlock<typename ViewStorageType::IndexType>>(indicesSize, this->mMem.get());
-
-      // Set op view
-      View::ViewBase<typename ViewStorageType::IndexType> pointers[this->mView.rank()];
-      View::ViewBase<typename ViewStorageType::IndexType> indices[this->mView.rank()];
-      pointers[1] =
-         View::ViewBase<typename ViewStorageType::IndexType>(this->mspPointers->data(), this->mspPointers->size());
-      indices[1] =
-         View::ViewBase<typename ViewStorageType::IndexType>(this->mspIndices->data(), this->mspIndices->size());
-      this->mView = ViewStorageType(this->mspData->data(), this->mspData->size(), dimensions.data(), pointers, indices);
-
-      // Set pointers and indices
-      pointers[1][0] = 0;
-      int ii = 0;
-      for(std::uint32_t k = 1; k < pointers[1].size(); k++)
-      {
-         pointers[1][k] = pointers[1][k-1] + spSetup->blockCols(k-1);
-         for(int j = 0; j < spSetup->blockCols(k-1); j++)
-         {
-            indices[1][ii] = j;
-            ii++;
-         }
-      }
+      this->setLocalMetadata(spSetup);
+      this->setGlobalMetadata(spSetup);
    }
 
    template <typename TData> ViewScalarField<TData>::ViewScalarField(const ViewScalarField<TData>& other)
@@ -823,6 +827,8 @@ namespace Datatypes {
       this->mspData  = other.mspData;
       this->mspIndices = other.mspIndices;
       this->mspPointers = other.mspPointers;
+      this->mGlobalView = other.mGlobalView;
+      this->mspGlobalPointers = other.mspGlobalPointers;
    }
 
    template <typename TData> void ViewScalarField<TData>::setZeros()
@@ -882,6 +888,81 @@ namespace Datatypes {
       assert(TType::SCALAR == id);
 
       return *this;
+   }
+
+   template <typename TData> void ViewScalarField<TData>::setLocalMetadata(std::shared_ptr<ScalarFieldSetup> spSetup)
+   {
+      auto meta = *spSetup->viewMeta();
+
+      // Get dimensions
+      std::uint32_t n1D = static_cast<std::uint32_t>(spSetup->dataRows());
+      std::uint32_t n2D = 0;
+      for(int k = 0; k < spSetup->nBlock(); k++)
+      {
+         n2D = std::max(n2D, static_cast<std::uint32_t>(spSetup->blockCols(k)));
+      }
+      std::uint32_t n3D = static_cast<std::uint32_t>(spSetup->nBlock());
+
+      std::array<std::uint32_t, 3> dimensions{n1D, n2D, n3D};
+      std::uint32_t dataSize = n1D*static_cast<std::uint32_t>(spSetup->dataCols());
+
+      // Alloc storage
+      this->mspData = std::make_shared<Memory::MemBlock<PointType>>(dataSize, this->mMem.get());
+      this->mspPointers = std::make_shared<Memory::MemBlock<typename ViewStorageType::IndexType>>(n3D + 1, this->mMem.get());
+      this->mspIndices = std::make_shared<Memory::MemBlock<typename ViewStorageType::IndexType>>(meta.idx2D.size(), this->mMem.get());
+
+      // Set view
+      View::ViewBase<typename ViewStorageType::IndexType> pointers[this->mView.rank()];
+      View::ViewBase<typename ViewStorageType::IndexType> indices[this->mView.rank()];
+      pointers[1] =
+         View::ViewBase<typename ViewStorageType::IndexType>(this->mspPointers->data(), this->mspPointers->size());
+      indices[1] =
+         View::ViewBase<typename ViewStorageType::IndexType>(this->mspIndices->data(), this->mspIndices->size());
+      this->mView = ViewStorageType(this->mspData->data(), this->mspData->size(), dimensions.data(), pointers, indices);
+
+      // Set pointers and indices
+      std::uint32_t ii = 1;
+      pointers[1][0] = 0;
+      for(std::uint32_t i = 1; i < meta.ptr2D.size(); i++)
+      {
+         if(meta.ptr2D.at(i) > meta.ptr2D.at(i-1))
+         {
+            assert(ii < pointers[1].size());
+            pointers[1][ii] = meta.ptr2D.at(i);
+            ii++;
+         }
+      }
+      std::copy(meta.idx2D.begin(), meta.idx2D.end(), indices[1].data());
+   }
+
+   template <typename TData> void ViewScalarField<TData>::setGlobalMetadata(std::shared_ptr<ScalarFieldSetup> spSetup)
+   {
+      auto meta = *spSetup->viewMeta();
+
+      // Get dimensions
+      std::uint32_t n1D = meta.global1D;
+      std::uint32_t n2D = meta.global2D;
+      std::uint32_t n3D = meta.global3D;
+
+      std::array<std::uint32_t, 3> dimensions{n1D, n2D, n3D};
+      std::uint32_t dataSize = static_cast<std::uint32_t>(spSetup->dataRows())*static_cast<std::uint32_t>(spSetup->dataCols());
+
+      // Alloc storage
+      assert(this->mspData->size() == dataSize);
+      this->mspGlobalPointers = std::make_shared<Memory::MemBlock<typename ViewStorageType::IndexType>>(n3D + 1, this->mMem.get());
+
+      // Set view
+      View::ViewBase<typename ViewStorageType::IndexType> pointers[this->mView.rank()];
+      pointers[1] =
+         View::ViewBase<typename ViewStorageType::IndexType>(this->mspGlobalPointers->data(), this->mspGlobalPointers->size());
+      this->mGlobalView = ViewStorageType(this->mspData->data(), this->mspData->size(), dimensions.data(), pointers, this->mView.indices());
+
+      // Set pointers and indices
+      assert(meta.ptr2D.size() == pointers[1].size());
+      for(std::uint32_t i = 0; i < meta.ptr2D.size(); i++)
+      {
+         pointers[1][i] = meta.ptr2D.at(i);
+      }
    }
 
    template <typename TData> MHDFloat ViewScalarField<TData>::requiredStorage() const
