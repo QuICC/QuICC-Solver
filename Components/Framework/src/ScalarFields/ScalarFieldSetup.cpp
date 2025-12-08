@@ -38,8 +38,8 @@ namespace Datatypes {
       }
 
       this->mDim3D = layers.size();
-      assert(dim2D.size() == this->mDim3D);
-      assert(dim1D.size() == this->mDim3D);
+      assert(dim2D.size() == static_cast<std::size_t>(this->mDim3D));
+      assert(dim1D.size() == static_cast<std::size_t>(this->mDim3D));
 
       mspDim1D = std::make_shared<ArrayI>(this->mDim3D);
       for(std::size_t i = 0; i < dim1D.size(); i++)
