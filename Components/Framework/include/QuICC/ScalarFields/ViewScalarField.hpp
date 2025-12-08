@@ -426,9 +426,14 @@ namespace Datatypes {
          std::shared_ptr<Memory::MemBlock<typename ViewStorageType::IndexType>> mspPointers;
 
          /**
-          * @brief Pointer storage
+          * @brief Global pointer storage
           */
          std::shared_ptr<Memory::MemBlock<typename ViewStorageType::IndexType>> mspGlobalPointers;
+
+         /**
+          * @brief Global indices storage
+          */
+         std::shared_ptr<Memory::MemBlock<typename ViewStorageType::IndexType>> mspGlobalIndices;
    };
 
    template <typename TData> inline typename ViewScalarField<TData>::PointType ViewScalarField<TData>::point(const int i, const int j, const int k) const
@@ -932,7 +937,15 @@ namespace Datatypes {
             ii++;
          }
       }
-      std::copy(meta.idx2D.begin(), meta.idx2D.end(), indices[1].data());
+      ii = 0;
+      for(std::uint32_t i = 0; i < pointers[1].size() - 1; i++)
+      {
+         for(std::uint32_t j = 0; j < pointers[1][i+1] - pointers[1][i]; j++)
+         {
+            indices[1][ii] = j;
+            ii++;
+         }
+      }
    }
 
    template <typename TData> void ViewScalarField<TData>::setGlobalMetadata(std::shared_ptr<ScalarFieldSetup> spSetup)
@@ -950,12 +963,16 @@ namespace Datatypes {
       // Alloc storage
       assert(this->mspData->size() == dataSize);
       this->mspGlobalPointers = std::make_shared<Memory::MemBlock<typename ViewStorageType::IndexType>>(n3D + 1, this->mMem.get());
+      this->mspGlobalIndices = std::make_shared<Memory::MemBlock<typename ViewStorageType::IndexType>>(meta.idx2D.size(), this->mMem.get());
 
       // Set view
       View::ViewBase<typename ViewStorageType::IndexType> pointers[this->mView.rank()];
+      View::ViewBase<typename ViewStorageType::IndexType> indices[this->mView.rank()];
       pointers[1] =
          View::ViewBase<typename ViewStorageType::IndexType>(this->mspGlobalPointers->data(), this->mspGlobalPointers->size());
-      this->mGlobalView = ViewStorageType(this->mspData->data(), this->mspData->size(), dimensions.data(), pointers, this->mView.indices());
+      indices[1] =
+         View::ViewBase<typename ViewStorageType::IndexType>(this->mspGlobalIndices->data(), this->mspGlobalIndices->size());
+      this->mGlobalView = ViewStorageType(this->mspData->data(), this->mspData->size(), dimensions.data(), pointers, indices);
 
       // Set pointers and indices
       assert(meta.ptr2D.size() == pointers[1].size());
@@ -963,6 +980,7 @@ namespace Datatypes {
       {
          pointers[1][i] = meta.ptr2D.at(i);
       }
+      std::copy(meta.idx2D.begin(), meta.idx2D.end(), indices[1].data());
    }
 
    template <typename TData> MHDFloat ViewScalarField<TData>::requiredStorage() const
