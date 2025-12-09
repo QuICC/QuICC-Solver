@@ -22,7 +22,6 @@
 //
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/ITransformOperator.hpp"
-#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -63,38 +62,12 @@ namespace Fft {
          virtual void transform(MatrixZ& rOut, const Matrix& in) const = 0;
 
          /**
-          * @brief Compute transform R2C, anelastic version
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          * @param pF   radial profile
-          */
-         virtual void transform(Matrix& rOut, const Matrix& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
-         {
-            // Default implementation just ignores pF and calls the standard transform
-            this->transform(rOut, in);
-         }
-
-         /**
           * @brief Compute transform C2R
           *
           * @param rOut Output values
           * @param in   Input values
           */
          virtual void transform(Matrix& rOut, const MatrixZ& in) const = 0;
-
-         /**
-          * @brief Compute transform C2R, anelastic version
-          *
-          * @param rOut Output values
-          * @param in   Input values
-          * @param pF   radial profile
-          */
-         virtual void transform(Matrix& rOut, const MatrixZ& in, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
-         {
-            // Default implementation just ignores pF and calls the standard transform
-            this->transform(rOut, in);
-         }
 
          /**
           * @brief Compute transform R2R
@@ -138,11 +111,6 @@ namespace Fft {
           */
          void initBase() const;
 
-         /**
-          * @brief Initialize base, anelastic overload
-          */
-         void initBase(std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const;
-
       private:
          /**
           * @brief Operator specific initialization with empty default implementation
@@ -153,16 +121,6 @@ namespace Fft {
           * @brief Initialise FFT backend
           */
          virtual void initBackend() const = 0;
-
-         /**
-          * @brief Initialise FFT backend, anelastic overload
-          * @param pF   Shared pointer to radial profile
-          */
-         virtual void initBackendAnelastic(std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
-         {
-            // Default implementation: just call standard initBackend
-            this->initBackend();
-         }
    };
 
 }

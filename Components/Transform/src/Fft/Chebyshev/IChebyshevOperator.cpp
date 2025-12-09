@@ -64,6 +64,19 @@ namespace Chebyshev {
    {
    }
 
+   // anelastic overload
+   void IChebyshevOperator::initBase(std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+   {
+      // Initialize FFT backend
+      this->initBackendAnelastic(pF);
+
+      // Operator specific initialization
+      this->initOperator();
+
+      // Set initialization flag
+      this->mIsInitialized = true;
+   }
+
    MHDFloat IChebyshevOperator::requiredStorage() const
    {
       MHDFloat mem = 0.0;
