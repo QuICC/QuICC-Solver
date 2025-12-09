@@ -20,11 +20,17 @@ namespace Framework {
 
 namespace Selector {
 
+#ifdef QUICC_USE_MLIR_GRAPH
+   /// Template typedef for scalar field implementation
+   template <typename TData>
+      using ScalarField = QuICC::Datatypes::ViewScalarField<TData>;
+#else
    /// Template typedef for scalar field implementation
    template <typename TData>
       using ScalarField = QuICC::Datatypes::ViewScalarField<TData>;
    //template <typename TData>
    //   using ScalarField = QuICC::Datatypes::FlatScalarField<TData>;
+#endif
 
    /// Template typedef for shared scalar field implementation
    template <typename TData>

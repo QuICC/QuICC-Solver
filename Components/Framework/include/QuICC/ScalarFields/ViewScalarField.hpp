@@ -50,6 +50,14 @@ namespace Datatypes {
          /// Typedef for the storage type
          using ViewStorageType = View::View<PointType, View::DCCSC3D>;
 
+#ifdef QUICC_HAS_CUDA_BACKEND
+         /// Typedef for the device storage type
+         using ViewDeviceStorageType = View::View<PointType, View::DCCSC3D>;
+#else
+         /// Typedef for the device storage type
+         using ViewDeviceStorageType = ViewStorageType;
+#endif
+
          /// Typedef for the profiles of the storage type
          using ViewProfileType = View::View<PointType, View::dense1D>;
 
@@ -382,6 +390,16 @@ namespace Datatypes {
           */
          void setData(const ViewStorageType& field);
 
+         /**
+          * @brief Get full device data global view
+          */
+         const ViewStorageType& globalDeviceView() const;
+
+         /**
+          * @brief Set full device data global view
+          */
+         ViewStorageType& rGlobalDeviceView();
+
       protected:
 
       private:
@@ -434,6 +452,28 @@ namespace Datatypes {
           * @brief Global indices storage
           */
          std::shared_ptr<Memory::MemBlock<typename ViewStorageType::IndexType>> mspGlobalIndices;
+
+         /**
+          * @brief Global Data view
+          */
+         ViewDeviceStorageType mGlobalDeviceView;
+
+#ifdef QUICC_HAS_CUDA_BACKEND
+         /**
+          * @brief Data storage
+          */
+         std::shared_ptr<Memory::MemBlock<PointType>> mspDeviceData;
+
+         /**
+          * @brief Global pointer device storage
+          */
+         std::shared_ptr<Memory::MemBlock<typename ViewDeviceStorageType::IndexType>> mspGlobalDevicePointers;
+
+         /**
+          * @brief Global indices device storage
+          */
+         std::shared_ptr<Memory::MemBlock<typename ViewDeviceStorageType::IndexType>> mspGlobalDeviceIndices;
+#endif
    };
 
    template <typename TData> inline typename ViewScalarField<TData>::PointType ViewScalarField<TData>::point(const int i, const int j, const int k) const
@@ -881,6 +921,16 @@ namespace Datatypes {
       return this->mView.pointers()[1].size() - 1;
    }
 
+   template <typename TData> inline const typename ViewScalarField<TData>::ViewStorageType& ViewScalarField<TData>::globalDeviceView() const
+   {
+      return this->mGlobalDeviceView;
+   }
+
+   template <typename TData> inline typename ViewScalarField<TData>::ViewStorageType& ViewScalarField<TData>::rGlobalDeviceView()
+   {
+      return this->mGlobalDeviceView;
+   }
+
    template <typename TData> template <typename TType> inline const ViewScalarField<TData>& ViewScalarField<TData>::comp(const TType id) const
    {
       assert(TType::SCALAR == id);
@@ -981,6 +1031,12 @@ namespace Datatypes {
          pointers[1][i] = meta.ptr2D.at(i);
       }
       std::copy(meta.idx2D.begin(), meta.idx2D.end(), indices[1].data());
+
+#ifdef QUICC_HAS_CUDA_BACKEND
+      static_assert(false, "Device memory of scalar field is not yet setup");
+#else
+      this->mGlobalDeviceView = ViewDeviceStorageType(this->mspData->data(), this->mspData->size(), dimensions.data(), pointers, indices);
+#endif
    }
 
    template <typename TData> MHDFloat ViewScalarField<TData>::requiredStorage() const

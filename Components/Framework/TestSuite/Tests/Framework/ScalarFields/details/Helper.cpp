@@ -97,6 +97,8 @@ namespace details {
       {
          throw std::logic_error("Unknown setup type");
       }
+
+      // Global dimension
       meta.global1D = *std::max_element(meta.dim1D.begin(), meta.dim1D.end());
       meta.global2D = 0;
       for(std::size_t i = 0; i < meta.ptr2D.size() - 1; i++)
