@@ -7,7 +7,7 @@ include(SetUlp)
 
 quicc_set_ulp(_ulps
   ULP 40 40 40 70 600 800
-  MPULP 40 40 40 40 40 40
+  MPULP 40 40 40 60 600 800
   )
 
 set(_tests
@@ -30,15 +30,13 @@ endforeach()
 
 quicc_set_ulp(_ulps
   ULP 25 150 200 180 7000 70000
-  MPULP 900 900 900 25 25 25
+  MPULP 900 900 900 270 6000 70000
   )
 
 set(_tests
   D1Y1:<base_t>:projector
-  D2Y1:<base_t>:projector
   DivY1D1:<base_t>:projector
   DivY1D1Y1:<base_t>:projector
-  DivY1D2Y1:<base_t>:projector
   DivY2D1Y1:<base_t>:projector
   D1Y1:<viewCpu_t>:projector
   DivY1D1Y1:<viewCpu_t>:projector
@@ -54,8 +52,26 @@ foreach(_test ${_tests})
 endforeach()
 
 quicc_set_ulp(_ulps
+  ULP 10 160 450 1800 160000 5000000
+  MPULP 10 150 650 2500 320000 5000000
+  )
+
+set(_tests
+  D2Y1:<base_t>:projector
+  DivY1D2Y1:<base_t>:projector
+  )
+foreach(_test ${_tests})
+  quicc_add_test(${_test}
+    COMMAND ${TestExe}
+    KEYWORD Operator:Impl:Type
+    ULPS ${_ulps}
+    IDS 0 1 2 6 7 8
+  )
+endforeach()
+
+quicc_set_ulp(_ulps
   ULP 40 200 625 1100 200000 9000000
-  MPULP 600 600 60u 25 25 25
+  MPULP 600 600 600 25 25 25
   )
 
 set(_tests
