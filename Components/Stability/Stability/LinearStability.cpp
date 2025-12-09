@@ -30,6 +30,7 @@
 #include "QuICC/NonDimensional/Omega.hpp"
 #include "QuICC/NonDimensional/Sort.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
+#include "QuICC/PhysicalNames/MassFlux.hpp"
 #include "QuICC/Tools/Formatter.hpp"
 #include "Stability/LinearStability.hpp"
 #include "Stability/Options.hpp"
@@ -101,8 +102,28 @@ void LinearStability::buildMatrices(DecoupledZSparse& matA,
    const Equations::EquationParameters::NDMapType& nds)
 {
    // Fields
-   auto fId = std::make_pair(PhysicalNames::Velocity::id(),
-      FieldComponents::Spectral::TOR);
+   
+   // pick the correct momentum variable (velocity or massflux) 
+   auto fieldList = this->mspModel->fieldIds();
+   bool isVel   = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::Velocity::id()) != fieldList.end();
+   bool isMassF = std::find(fieldList.begin(), fieldList.end(), PhysicalNames::MassFlux::id()) != fieldList.end();
+   
+   std::size_t momId;
+   if(isVel && !isMassF) 
+   {
+      momId = PhysicalNames::Velocity::id();
+   } 
+   else if(!isVel && isMassF)
+   {
+      momId = PhysicalNames::MassFlux::id();
+   }
+   else
+   {
+      throw std::logic_error("Momentum variable not recognized");
+   }
+
+   //auto fId = std::make_pair(PhysicalNames::Velocity::id(), FieldComponents::Spectral::TOR);
+   auto fId = std::make_pair(momId, FieldComponents::Spectral::TOR);
 
    const int matIdx = 0;
    const auto& res = *this->mspRes;

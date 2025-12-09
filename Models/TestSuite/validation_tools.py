@@ -257,7 +257,7 @@ def checkHdf5(fname, ref_dir, data_dir, physicals, tid):
 
     return ((1, int(not cond), f'{fname}', (tid, 0)), (fname, refFile, dataFile))
 
-def hdf5Test(fname, refFile, dataFile, ds, tid, tol = 11, threshold = -1, percol = False, perrow = False, only_existence = False):
+def hdf5Test(fname, refFile, dataFile, ds, tid, tol = 11, threshold = -1, peraxis = False, only_existence = False):
 
     # Process arguments
     checks = np.zeros(2, dtype='i8')
@@ -280,20 +280,11 @@ def hdf5Test(fname, refFile, dataFile, ds, tid, tol = 11, threshold = -1, percol
 
         max_ulp = 0
         # compute reference ulp
-        if percol and perrow:
-            ref_max = np.max(np.abs(ref[:,:]))
+        if peraxis:
+            ref_max = np.max(ref, axis = peraxis)
             def get_ulp(r, idx):
-                ulp = compute_ulp(r)
-                return ulp
-        elif percol:
-            col_max = np.max(np.abs(ref), axis = 0)
-            def get_ulp(r, idx):
-                ulp = compute_ulp(r)
-                return ulp
-        elif perrow:
-            row_max = np.max(np.abs(ref[:,:]), axis = 1)
-            def get_ulp(r, idx):
-                ulp = compute_ulp(r)
+                idx_max = [idx[i] for i in range(0,3) if i not in peraxis]
+                ulp = compute_ulp(ref_max[*idx_max])
                 return ulp
         else:
             def get_ulp(r, idx):

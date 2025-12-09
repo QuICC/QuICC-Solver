@@ -12,28 +12,39 @@ set(tags
   Chandrasekhar
   Chi
   Delta
+  DensityType
   Eady
   Ekman
   Elevator
   Elsasser
+  EosType
   Epsilon
+  EquationsForm
   Eta
   FastMean
   Gamma
+  GravityType
+  GrowthRate
   Heating
   Iota
   Kappa
+  KappaType
   Lambda
   Lehnert
   Lower1d
   Lower2d
   Lower3d
   Lundquist
+  MagDiffType
   MagneticEkman
   MagneticPrandtl
   MagneticReynolds
+  MaxIteration
   ModifiedElsasser
   Mu
+  Nev
+  Npoly
+  Nrho
   Nu
   Omega
   Omicron
@@ -49,13 +60,18 @@ set(tags
   Roberts
   Rossby
   Sigma
+  SimulationMode
+  StabilityMode
+  Sort
   Tau
   Taylor
   Theta
+  Tolerance
   Upper1d
   Upper2d
   Upper3d
   Upsilon
+  ViscType
   Xi
   Zeta
 )

@@ -14,6 +14,7 @@
 #include "Types/Typedefs.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/Setup.hpp"
 #include "QuICC/Transform/ITransformOperator.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -51,6 +52,14 @@ namespace Chebyshev {
           * @param spSetup   Shared setup object for the transform
           */
          void init(SharedTransformSetup spSetup) const override;
+
+         /**
+          * @brief Initialise the transform, anelastic overload
+          *
+          * @param spSetup   Shared setup object for the transform
+          * @param pF        Shared pointer to radial profile
+          */
+         void init(SharedTransformSetup spSetup, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const;
 
          /**
           * @brief Initialise the transform

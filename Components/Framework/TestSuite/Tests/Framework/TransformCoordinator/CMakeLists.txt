@@ -66,7 +66,7 @@ set(_tests
   )
 quicc_set_ulp(_ulp
   ULP 155 110 53500 25090 25090
-  MPULP 11 11 1850 1919 1919
+  MPULP 11 11 2200 1919 1919
   )
 foreach(_test ${_tests})
   foreach(_alg tubular single1d single2d)

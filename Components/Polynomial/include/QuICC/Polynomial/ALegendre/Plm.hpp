@@ -6,16 +6,7 @@
 #ifndef QUICC_POLYNOMIAL_ALEGENDRE_PLM_HPP
 #define QUICC_POLYNOMIAL_ALEGENDRE_PLM_HPP
 
-// Debug includes
-//
-
-// Configuration includes
-//
-
 // System includes
-//
-
-// External includes
 //
 
 // Project includes

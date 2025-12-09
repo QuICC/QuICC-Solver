@@ -26,6 +26,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   ProjCurlPolCrossTor.cpp
   ProjCurlTorCrossPol.cpp
   ProjCurlTorCrossTor.cpp
+  Tools.cpp
 )
 
 set(PHS

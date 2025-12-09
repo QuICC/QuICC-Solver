@@ -35,7 +35,11 @@ quicc_set_ulp(_ulps
 
 set(_tests
   D1Y1:<base_t>:projector
+  D2Y1:<base_t>:projector
+  DivY1D1:<base_t>:projector
   DivY1D1Y1:<base_t>:projector
+  DivY1D2Y1:<base_t>:projector
+  DivY2D1Y1:<base_t>:projector
   D1Y1:<viewCpu_t>:projector
   DivY1D1Y1:<viewCpu_t>:projector
   )

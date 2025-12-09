@@ -19,6 +19,7 @@
 #include "QuICC/NonDimensional/INumber.hpp"
 #include "QuICC/Transform/Fft/Chebyshev/IChebyshevOperator.hpp"
 #include "QuICC/Transform/ITransformMap.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -102,12 +103,31 @@ namespace LinearMap {
          void transform(Matrix& rOut, const MatrixZ& in, const IChebyshevOperator& op);
 
          /**
+          * @brief Compute transform (anelastic case)
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          * @param pF   radial profile
+          */
+         void transform(Matrix& rOut, const MatrixZ& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
+
+         /**
           * @brief Compute transform
           *
           * @param rOut Output values
           * @param in   Input values
           */
          void transform(Matrix& rOut, const Matrix& in, const IChebyshevOperator& op);
+
+         /**
+          * @brief Compute transform (anelastic case)
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          * @param pF   radial profile
+          */
+         void transform(Matrix& rOut, const Matrix& in, const IChebyshevOperator& op, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
+
 
          /**
           * @brief Compute transform
@@ -126,12 +146,30 @@ namespace LinearMap {
          void transform(Matrix& rOut, const MatrixZ& in, const std::size_t id);
 
          /**
+          * @brief Compute transform for the anelastic case
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          * @param pF   Radial profile
+          */
+         void transform(Matrix& rOut, const MatrixZ& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
+
+         /**
           * @brief Compute transform
           *
           * @param rOut Output values
           * @param in   Input values
           */
          void transform(Matrix& rOut, const Matrix& in, const std::size_t id);
+
+         /**
+          * @brief Compute transform for the anelastic case
+          *
+          * @param rOut Output values
+          * @param in   Input values
+          * @param pF   Radial profile
+          */
+         void transform(Matrix& rOut, const Matrix& in, const std::size_t id, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF);
 
          /**
           * @brief Get the memory requirements

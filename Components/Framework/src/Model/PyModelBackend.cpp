@@ -22,6 +22,7 @@
 #include "QuICC/Bc/Name/NoSlip.hpp"
 #include "QuICC/Bc/Name/StressFree.hpp"
 #include "QuICC/Bc/Name/FixedTemperature.hpp"
+#include "QuICC/Bc/Name/FixedEntropy.hpp"
 #include "QuICC/Bc/Name/FixedFlux.hpp"
 #include "QuICC/Bc/Name/Insulating.hpp"
 
@@ -217,6 +218,10 @@ namespace Model {
             bcVal = 2;
          }
          else if(bc.second == Bc::Name::FixedTemperature::id())
+         {
+            bcVal = 0;
+         }
+         else if(bc.second == Bc::Name::FixedEntropy::id())
          {
             bcVal = 0;
          }

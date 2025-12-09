@@ -8,15 +8,10 @@
 #include <cassert>
 #include <stdexcept>
 
-// External includes
-//
-
-// Class include
+// Project includes
 //
 #include "QuICC/Transform/Fft/Backend/Fftw/IChebyshevBackend.hpp"
 
-// Project includes
-//
 
 namespace QuICC {
 

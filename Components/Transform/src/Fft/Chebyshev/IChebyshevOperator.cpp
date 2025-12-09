@@ -33,6 +33,16 @@ namespace Chebyshev {
       this->initBase();
    }
 
+   // anelastic overload
+   void IChebyshevOperator::init(SharedTransformSetup spSetup, std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction> pF) const
+   {
+      // Store the shared pointer to setup object
+      this->mspSetup = std::dynamic_pointer_cast<IChebyshevOperator::SetupType>(spSetup);
+
+      //
+      this->initBase(pF);
+   }
+
    void IChebyshevOperator::init(SharedTransformSetup spSetup, const Internal::Array& igrid, const Internal::Array& iweights) const
    {
       throw std::logic_error("Unused interface");
