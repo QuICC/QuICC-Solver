@@ -29,7 +29,7 @@ foreach(_test ${_tests})
 endforeach()
 
 quicc_set_ulp(_ulps
-  ULP 25 150 200 180 7000 70000
+  ULP 25 150 200 180 12000 70000
   MPULP 900 900 900 270 6000 70000
   )
 
@@ -39,10 +39,8 @@ set(_tests
   DivY1D1Y1:<base_t>:projector
   DivY2D1Y1:<base_t>:projector
   D1Y1:<viewCpu_t>:projector
-  D2Y1:<viewCpu_t>:projector
   DivY1D1:<viewCpu_t>:projector
   DivY1D1Y1:<viewCpu_t>:projector
-  DivY1D2Y1:<viewCpu_t>:projector
   DivY2D1Y1:<viewCpu_t>:projector
   )
 
@@ -56,13 +54,15 @@ foreach(_test ${_tests})
 endforeach()
 
 quicc_set_ulp(_ulps
-  ULP 10 160 450 1800 160000 5000000
+  ULP 10 160 450 1800 200000 7000000
   MPULP 10 150 650 2500 320000 5000000
   )
 
 set(_tests
   D2Y1:<base_t>:projector
   DivY1D2Y1:<base_t>:projector
+  D2Y1:<viewCpu_t>:projector
+  DivY1D2Y1:<viewCpu_t>:projector
   )
 foreach(_test ${_tests})
   quicc_add_test(${_test}

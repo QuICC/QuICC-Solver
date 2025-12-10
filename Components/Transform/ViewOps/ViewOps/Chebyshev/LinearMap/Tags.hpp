@@ -101,8 +101,8 @@ struct spec_d1y1: public spec_no_sparseop
 /// @brief tag type for spectral operator D^2Y^1
 struct spec_d2y1: public spec_no_sparseop
 {
-   constexpr static std::array<std::size_t, 1> p = {2};
-   constexpr static std::array<std::size_t, 1> t = {1};
+   constexpr static std::array<std::size_t, 2> p = {1, 1};
+   constexpr static std::array<std::size_t, 2> t = {1, 0};
 };
 
 /// @brief tag type for spectral operator D^1Y^2D^1
