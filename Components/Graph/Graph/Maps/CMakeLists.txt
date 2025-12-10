@@ -3,6 +3,7 @@ target_sources(${QUICC_CURRENT_COMPONENT_LIB}
     FourierMap.cpp
     ALegendreMap.cpp
     WorlandMap.cpp
+    ChebyshevLinearMapMap.cpp
     PointwiseMap.cpp
     CrossMap.cpp
     DotMap.cpp

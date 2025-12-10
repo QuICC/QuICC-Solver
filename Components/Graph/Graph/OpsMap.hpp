@@ -68,12 +68,18 @@ private:
    /// @brief map ALegendre integrators
    /// @param op
    void setALegendreInt(mlir::quiccir::AlIOp op);
-   /// @brief map ALegendre projectors
+   /// @brief map Worland projectors
    /// @param op
    void setWorlandPrj(mlir::quiccir::JWPOp op);
    /// @brief map Worland integrators
    /// @param op
    void setWorlandInt(mlir::quiccir::JWIOp op);
+   /// @brief map Chebyshev LinearMap projectors
+   /// @param op
+   void setChebyshevLinearMapPrj(mlir::quiccir::CLPOp op);
+   /// @brief map Chebyshev LinearMap integrators
+   /// @param op
+   void setChebyshevLineraMapInt(mlir::quiccir::CLIOp op);
    /// @brief map pointwise addition
    /// @param op
    void setAdd(mlir::quiccir::AddOp op);

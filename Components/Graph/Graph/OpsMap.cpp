@@ -52,6 +52,14 @@ MapOps::MapOps(mlir::ModuleOp module,
          {
             setWorlandInt(jwInt);
          }
+         else if (auto clPrj = dyn_cast<mlir::quiccir::CLPOp>(op))
+         {
+            setChebyshevLinearMapPrj(clPrj);
+         }
+         else if (auto clInt = dyn_cast<mlir::quiccir::CLIOp>(op))
+         {
+            setChebyshevLinearMapInt(clInt);
+         }
          else if (auto add = dyn_cast<mlir::quiccir::AddOp>(op))
          {
             setAdd(add);

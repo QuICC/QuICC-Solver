@@ -28,7 +28,7 @@ using QuICC::Operator::UnaryOp;
 /// @brief Fourier Phys
 using R_DCCSC3D_t = View::View<double, View::DCCSC3D>;
 using R_DCCSC3DJIK_t = View::View<double, View::DCCSC3DJIK>;
-/// @brief Fourier Mods or AL Phys or JW Phys/Mods
+/// @brief Fourier Mods or AL Phys or JW Phys/Mods or CL Phys/Mods
 using C_DCCSC3D_t = QuICC::View::View<std::complex<double>, View::DCCSC3D>;
 using C_DCCSC3DJIK_t =
    QuICC::View::View<std::complex<double>, View::DCCSC3DJIK>;

@@ -48,7 +48,7 @@ ptrAndIdx denseTransposePtrAndIdx(const std::array<std::uint32_t, 3> dims)
 }
 
 /// @brief compute pointers and index meta data for fully populated
-/// tensor as ouput of a Transpose operation between AL and JW
+/// tensor as ouput of a Transpose operation between AL and JW/CL
 /// @tparam C_DCCSC3D_t new buffer type
 /// @tparam C_S1CLCSC3D_t producer type
 /// @param dims output dimensions
@@ -58,7 +58,7 @@ ptrAndIdx denseTransposePtrAndIdx<C_DCCSC3D_t, C_S1CLCSC3D_t>(
    const std::array<std::uint32_t, 3> dims);
 
 /// @brief compute pointers and index meta data for fully populated
-/// tensor as ouput of a Transpose operation between JW and AL
+/// tensor as ouput of a Transpose operation between JW/CL and AL
 /// @tparam C_S1CLCSC3D_t new buffer type
 /// @tparam C_DCCSC3D_t producer type
 /// @param dims output dimensions
@@ -68,7 +68,7 @@ ptrAndIdx denseTransposePtrAndIdx<C_S1CLCSC3D_t, C_DCCSC3D_t>(
    const std::array<std::uint32_t, 3> dims);
 
 /// @brief compute pointers and index meta data for fully populated
-/// tensor as ouput of a Transpose operation between AL and JW
+/// tensor as ouput of a Transpose operation between AL and JW/CL
 /// @tparam C_DCCSC3DJIK_t new buffer type
 /// @tparam C_S1CLCSC3DJIK_t producer type
 /// @param dims output dimensions
@@ -78,7 +78,7 @@ ptrAndIdx denseTransposePtrAndIdx<C_DCCSC3DJIK_t, C_S1CLCSC3DJIK_t>(
    const std::array<std::uint32_t, 3> dims);
 
 /// @brief compute pointers and index meta data for fully populated
-/// tensor as ouput of a Transpose operation between JW and AL
+/// tensor as ouput of a Transpose operation between JW/CL and AL
 /// @tparam C_S1CLCSC3DJIK_t new buffer type
 /// @tparam C_DCCSC3DJIK_t producer type
 /// @param dims output dimensions
