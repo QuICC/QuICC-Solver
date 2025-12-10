@@ -7,10 +7,10 @@
 
 TEST_CASE("Uniform increasing ScalarField setup test", "[Datatypes::ScalarFieldSetup_uniformUp]")
 {
-   std::size_t dim3D = 5;
-   std::size_t dim1D = 2*dim3D;
-   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
-   auto spSetup = details::createSetup(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
+   std::size_t dim3D;
+   std::size_t dim1D;
+   std::vector<std::size_t> idx3D;
+   auto spSetup = details::createSetup(dim1D, dim3D, idx3D, details::SetupType::UniformUp);
 
    auto dfct = [](const std::size_t k){return k + 2;};
    auto sze = [&](const std::size_t& a, const auto& b){return a + dfct(b);};
@@ -33,10 +33,10 @@ TEST_CASE("Uniform increasing ScalarField setup test", "[Datatypes::ScalarFieldS
 
 TEST_CASE("Uniform increasing ScalarField setup global test", "[Datatypes::ScalarFieldSetup_global_uniformUp]")
 {
-   std::size_t dim3D = 10;
-   std::size_t dim1D = 2*dim3D;
-   std::vector<std::size_t> idx3D = {2, 3, 5, 6, 8};
-   auto spSetup = details::createSetup(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
+   std::size_t dim3D;
+   std::size_t dim1D;
+   std::vector<std::size_t> idx3D;
+   auto spSetup = details::createSetup(dim1D, dim3D, idx3D, details::SetupType::UniformUp, 1);
 
    auto dfct = [](const std::size_t k){return k + 2;};
    auto sze = [&](const std::size_t& a, const auto& b){return a + dfct(b);};
@@ -59,10 +59,10 @@ TEST_CASE("Uniform increasing ScalarField setup global test", "[Datatypes::Scala
 
 TEST_CASE("Uniform increasing ScalarField setup view test", "[Datatypes::ScalarFieldSetup_view_uniformUp]")
 {
-   std::size_t dim3D = 5;
-   std::size_t dim1D = 2*dim3D;
-   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
-   auto spSetup = details::createSetup(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
+   std::size_t dim3D;
+   std::size_t dim1D;
+   std::vector<std::size_t> idx3D;
+   auto spSetup = details::createSetup(dim1D, dim3D, idx3D, details::SetupType::UniformUp);
    auto&& meta = *spSetup->viewMeta();
 
    auto dfct = [](const std::size_t k){return k + 2;};
@@ -83,10 +83,10 @@ TEST_CASE("Uniform increasing ScalarField setup view test", "[Datatypes::ScalarF
 
 TEST_CASE("Uniform increasing ScalarField setup global view test", "[Datatypes::ScalarFieldSetup_global_view_uniformUp]")
 {
-   std::size_t dim3D = 10;
-   std::size_t dim1D = 2*dim3D;
-   std::vector<std::size_t> idx3D = {2, 3, 5, 6, 8};
-   auto spSetup = details::createSetup(details::SetupType::UniformUp, dim1D, dim3D, idx3D);
+   std::size_t dim3D;
+   std::size_t dim1D;
+   std::vector<std::size_t> idx3D;
+   auto spSetup = details::createSetup(dim1D, dim3D, idx3D, details::SetupType::UniformUp, 1);
    auto&& meta = *spSetup->viewMeta();
 
    auto dfct = [](const std::size_t k){return k + 2;};
@@ -117,10 +117,10 @@ TEST_CASE("Uniform increasing ScalarField setup global view test", "[Datatypes::
 
 TEST_CASE("Uniform decreasing ScalarField setup test", "[Datatypes::ScalarFieldSetup_uniformDown]")
 {
-   std::size_t dim3D = 5;
-   std::size_t dim1D = 2*dim3D;
-   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
-   auto spSetup = details::createSetup(details::SetupType::UniformDown, dim1D, dim3D, idx3D);
+   std::size_t dim3D;
+   std::size_t dim1D;
+   std::vector<std::size_t> idx3D;
+   auto spSetup = details::createSetup(dim1D, dim3D, idx3D, details::SetupType::UniformDown);
 
    auto dfct = [&](const std::size_t k){return dim1D - k;};
    auto sze = [&](const std::size_t& a, const auto& b){return a + dfct(b);};
@@ -142,10 +142,10 @@ TEST_CASE("Uniform decreasing ScalarField setup test", "[Datatypes::ScalarFieldS
 
 TEST_CASE("Uniform decreasing ScalarField setup view test", "[Datatypes::ScalarFieldSetup_view_uniformDown]")
 {
-   std::size_t dim3D = 5;
-   std::size_t dim1D = 2*dim3D;
-   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
-   auto spSetup = details::createSetup(details::SetupType::UniformDown, dim1D, dim3D, idx3D);
+   std::size_t dim3D;
+   std::size_t dim1D;
+   std::vector<std::size_t> idx3D;
+   auto spSetup = details::createSetup(dim1D, dim3D, idx3D, details::SetupType::UniformDown);
    auto&& meta = *spSetup->viewMeta();
 
    auto dfct = [&](const std::size_t k){return dim1D - k;};
@@ -165,10 +165,10 @@ TEST_CASE("Uniform decreasing ScalarField setup view test", "[Datatypes::ScalarF
 
 TEST_CASE("Triangular increasing ScalarField setup test", "[Datatypes::ScalarFieldSetup_triangularUp]")
 {
-   std::size_t dim3D = 5;
-   std::size_t dim1D = 2;
-   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
-   auto spSetup = details::createSetup(details::SetupType::TriangularUp, dim1D, dim3D, idx3D);
+   std::size_t dim3D;
+   std::size_t dim1D;
+   std::vector<std::size_t> idx3D;
+   auto spSetup = details::createSetup(dim1D, dim3D, idx3D, details::SetupType::TriangularUp);
 
    auto dfct = [&](const std::size_t k){return k + 1;};
    auto sze = [&](const std::size_t& a, const auto& b){return a + dfct(b);};
@@ -191,10 +191,10 @@ TEST_CASE("Triangular increasing ScalarField setup test", "[Datatypes::ScalarFie
 
 TEST_CASE("Triangular increasing ScalarField setup view test", "[Datatypes::ScalarFieldSetup_view_triangularUp]")
 {
-   std::size_t dim3D = 5;
-   std::size_t dim1D = 2;
-   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
-   auto spSetup = details::createSetup(details::SetupType::TriangularUp, dim1D, dim3D, idx3D);
+   std::size_t dim3D;
+   std::size_t dim1D;
+   std::vector<std::size_t> idx3D;
+   auto spSetup = details::createSetup(dim1D, dim3D, idx3D, details::SetupType::TriangularUp);
    auto&& meta = *spSetup->viewMeta();
 
    auto dfct = [&](const std::size_t k){return k + 1;};
@@ -215,10 +215,10 @@ TEST_CASE("Triangular increasing ScalarField setup view test", "[Datatypes::Scal
 
 TEST_CASE("Triangular decreasing ScalarField setup test", "[Datatypes::ScalarFieldSetup_triangularDown]")
 {
-   std::size_t dim3D = 5;
-   std::size_t dim1D = 3*dim3D;
-   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
-   auto spSetup = details::createSetup(details::SetupType::TriangularDown, dim1D, dim3D, idx3D);
+   std::size_t dim3D;
+   std::size_t dim1D;
+   std::vector<std::size_t> idx3D;
+   auto spSetup = details::createSetup(dim1D, dim3D, idx3D, details::SetupType::TriangularDown);
 
    auto dfct = [&](const std::size_t k){return dim1D - 2*k;};
    auto sze = [&](const std::size_t& a, const auto& b){return a + dfct(b);};
@@ -240,10 +240,10 @@ TEST_CASE("Triangular decreasing ScalarField setup test", "[Datatypes::ScalarFie
 
 TEST_CASE("Triangular decreasing ScalarField setup view test", "[Datatypes::ScalarFieldSetup_view_triangularDown]")
 {
-   std::size_t dim3D = 5;
-   std::size_t dim1D = 3*dim3D;
-   std::vector<std::size_t> idx3D = {0, 1, 2, 3, 4};
-   auto spSetup = details::createSetup(details::SetupType::TriangularDown, dim1D, dim3D, idx3D);
+   std::size_t dim3D;
+   std::size_t dim1D;
+   std::vector<std::size_t> idx3D;
+   auto spSetup = details::createSetup(dim1D, dim3D, idx3D, details::SetupType::TriangularDown);
    auto&& meta = *spSetup->viewMeta();
 
    auto dfct = [&](const std::size_t k){return dim1D - 2*k;};

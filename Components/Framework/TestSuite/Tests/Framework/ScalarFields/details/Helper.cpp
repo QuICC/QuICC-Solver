@@ -1,10 +1,26 @@
 #include <algorithm>
+#include <cstdint>
 #include "Helper.hpp"
 
 namespace details {
 
-   std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> createSetup(const SetupType type, const std::size_t dim1D, const std::size_t dim3D, const std::vector<std::size_t>& idx3D)
+   std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> createSetup(std::size_t& dim1D, std::size_t& dim3D, std::vector<std::size_t>& idx3D, const SetupType type, const std::uint32_t variant)
    {
+      if(variant == 0)
+      {
+         dim3D = 5;
+         idx3D = {0, 1, 2, 3, 4};
+      }
+      else if(variant == 1)
+      {
+         dim3D = 10;
+         idx3D = {2, 3, 5, 6, 8};
+      }
+      else
+      {
+         throw std::logic_error("Unknown variant");
+      }
+
       auto spMeta = std::make_shared<QuICC::CscMetadata>();
       auto& meta = *spMeta;
 
@@ -15,6 +31,7 @@ namespace details {
       auto it3D = idx3D.cbegin();
       if(type == SetupType::UniformUp)
       {
+         dim1D = 2*dim3D;
          for(std::size_t i = 0; i < dim3D; i++)
          {
             if(i == *it3D)
@@ -35,6 +52,7 @@ namespace details {
       }
       else if(type == SetupType::UniformDown)
       {
+         dim1D = 2*dim3D;
          for(std::size_t i = 0; i < dim3D; i++)
          {
             if(i == *it3D)
@@ -55,6 +73,7 @@ namespace details {
       }
       else if(type == SetupType::TriangularUp)
       {
+         dim1D = 2;
          for(std::size_t i = 0; i < dim3D; i++)
          {
             if(i == *it3D)
@@ -75,6 +94,7 @@ namespace details {
       }
       else if(type == SetupType::TriangularDown)
       {
+         dim1D = 3*dim3D;
          for(std::size_t i = 0; i < dim3D; i++)
          {
             if(i == *it3D)
@@ -103,7 +123,7 @@ namespace details {
       meta.global2D = 0;
       for(std::size_t i = 0; i < meta.ptr2D.size() - 1; i++)
       {
-         meta.global2D = std::max(meta.global2D, meta.ptr2D.at(i+1) - meta.ptr2D.at(i));
+         meta.global2D = std::max(meta.global2D, meta.ptr2D.at(i+1) - meta.ptr2D.at(i) + 1);
       }
 
       for(std::uint32_t i = 0; i < meta.ptr2D.size()-1; i++)
@@ -111,7 +131,8 @@ namespace details {
          auto sze = meta.ptr2D.at(i + 1) - meta.ptr2D.at(i);
          for(std::uint32_t j = 0; j < sze; j++)
          {
-            meta.idx2D.push_back(j);
+            // Shift by one to trigger error if local indexes are wrong
+            meta.idx2D.push_back(j+1);
          }
       }
 
