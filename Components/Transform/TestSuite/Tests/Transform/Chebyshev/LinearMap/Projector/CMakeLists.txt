@@ -39,7 +39,11 @@ set(_tests
   DivY1D1Y1:<base_t>:projector
   DivY2D1Y1:<base_t>:projector
   D1Y1:<viewCpu_t>:projector
+  D2Y1:<viewCpu_t>:projector
+  DivY1D1:<viewCpu_t>:projector
   DivY1D1Y1:<viewCpu_t>:projector
+  DivY1D2Y1:<viewCpu_t>:projector
+  DivY2D1Y1:<viewCpu_t>:projector
   )
 
 foreach(_test ${_tests})

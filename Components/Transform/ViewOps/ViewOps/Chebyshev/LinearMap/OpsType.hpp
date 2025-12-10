@@ -601,6 +601,42 @@ struct OpsTypeMap<Tout, Tin, D1Y1_t, bwd_t, BACKEND>
    ;
 };
 
+/// @brief Op D2Y1 type map
+/// Projector of D^2Y1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, D2Y1_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d2y1, ndealias_in | zero_pad>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t = Grid_t<BACKEND, Tout, grid_id, none_t>;
+   using type =
+      Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op DivY1D1 type map
+/// Projector of 1/Y^1 D^1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, DivY1D1_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d1, ndealias_in | zero_pad>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t = Grid_t<BACKEND, Tout, grid_divy1, none_t>;
+   using type =
+      Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
 /// @brief Op DivY1D1Y1 type map
 /// Projector of 1/Y^1 D^1Y1
 /// @tparam Tout
@@ -614,6 +650,42 @@ struct OpsTypeMap<Tout, Tin, DivY1D1Y1_t, bwd_t, BACKEND>
    using backendFft_t =
       details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
    using backendGrid_t = Grid_t<BACKEND, Tout, grid_divy1, none_t>;
+   using type =
+      Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op DivY1D2Y1 type map
+/// Projector of 1/Y^1 D^2Y1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, DivY1D2Y1_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d2y1, ndealias_in | zero_pad>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t = Grid_t<BACKEND, Tout, grid_divy1, none_t>;
+   using type =
+      Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
+   ;
+};
+
+/// @brief Op DivY2D1Y1 type map
+/// Projector of 1/Y^2 D^1Y1
+/// @tparam Tout
+/// @tparam Tin
+/// @tparam BACKEND
+template <class Tout, class Tin, class BACKEND>
+struct OpsTypeMap<Tout, Tin, DivY2D1Y1_t, bwd_t, BACKEND>
+{
+   using backendSpec_t =
+      Spec_t<BACKEND, Tin, spec_d1y1, ndealias_in | zero_pad>;
+   using backendFft_t =
+      details::Fft_t<BACKEND, Tout, Tin, QuICC::Fft::dct_type3_t>;
+   using backendGrid_t = Grid_t<BACKEND, Tout, grid_divy2, none_t>;
    using type =
       Projector::SFGOp<Tout, Tin, backendSpec_t, backendFft_t, backendGrid_t>;
    ;

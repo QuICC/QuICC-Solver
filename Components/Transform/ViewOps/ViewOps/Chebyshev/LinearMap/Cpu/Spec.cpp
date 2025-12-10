@@ -382,6 +382,7 @@ template class SpecOp<mods_t, mods_t, spec_d2, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d3, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d4, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d1y1, ndealias_in | zero_pad>;
+template class SpecOp<mods_t, mods_t, spec_d2y1, ndealias_in | zero_pad>;
 template class SpecOp<mods_t, mods_t, spec_d1y2d1, ndealias_in | zero_pad>;
 template class SpecOp<power_t, power_t, spec_int, none_t>;
 
