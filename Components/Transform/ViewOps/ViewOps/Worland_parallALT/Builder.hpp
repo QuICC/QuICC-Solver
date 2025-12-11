@@ -87,12 +87,13 @@ public:
 	    config.profile_iter = 1;
 	    config.profile_iter_combined = 1;
         config.specifyBuffersAtLaunch = 1;
+        config.convertPackedStrided = 1;
 	    config.WMMA_M = 8;
 	    config.WMMA_N = 8;
 	    config.WMMA_K = 4;
 	    appContainer = {};
         config.projector = Direction;
-
+        
          std::uint32_t* temp_pointers =
            (std::uint32_t*)calloc(out.pointers()[1].size(), sizeof(std::uint32_t));
         cudaErrChk(cudaMemcpyAsync(temp_pointers, out.pointers()[1].data(),
@@ -116,11 +117,30 @@ public:
         int* m_even_endBatch = (int*)calloc(config.num_m_even, sizeof(int));
         int* m_odd = (int*)calloc(config.num_m_odd, sizeof(int));
         int* m_odd_endBatch = (int*)calloc(config.num_m_odd, sizeof(int));
+
+        int* m_list = (int*)calloc(config.num_m_even + config.num_m_odd, sizeof(int));
+        int* m_endBatch = (int*)calloc(config.num_m_even+config.num_m_odd, sizeof(int));
+	   
+        for (std::uint32_t i = 1; i < out.pointers()[1].size(); ++i)
+        {
+            int numRHS = temp_pointers[i] - temp_pointers[i-1];
+           if (numRHS != 0)
+           {
+              start += numRHS;
+              m_endBatch[iter] = 2 * start;
+              m_list[iter] = i - 1;
+              iter++;
+           }
+        }
+        config.m_list = m_list;
+	    config.m_endBatch = m_endBatch;
+
         config.m_even_list = m_even;
         config.m_even_endBatch = m_even_endBatch;
         config.m_odd_list = m_odd;
         config.m_odd_endBatch = m_odd_endBatch;
-        
+        start = 0;
+        iter = 0;
         for (std::uint32_t i = 1; i < out.pointers()[1].size(); ++i)
         {
             int numRHS = temp_pointers[i] - temp_pointers[i-1];
@@ -153,7 +173,15 @@ public:
         free(temp_pointers);
         config.M = (m_even[config.num_m_even - 1] > m_odd[config.num_m_odd - 1]) ? ((m_even[config.num_m_even - 1]) / 2 + 1) * 2 : ((m_odd[config.num_m_odd - 1]) / 2 + 1) * 2;// M;
         config.L = (Direction) ? in.dims()[0] : out.dims()[0];// 3 * M / 2;
-
+        if (config.projector) {
+		    config.inputBufferStride = config.L;
+		    config.outputBufferStride = Ntheta;
+        }
+        else
+        {
+            config.inputBufferStride = Ntheta;
+		    config.outputBufferStride = config.L;
+        }
 	    //appContainer.input_buffer_S = (double*)in.data();
         //appContainer.buffer_S = (double*)out.data();
        initializeParallALT(&VkGPU, config, &appContainer);
@@ -161,12 +189,14 @@ public:
         free(m_even_endBatch);
         free(m_odd);
         free(m_odd_endBatch);
-
+        free(m_list);
+        free(m_endBatch);
     };
     /// @brief Action implementation
     /// @param out differentiatied modes
     /// @param in input modes
     void applyImpl(Tout& out, const Tin& in){
+
         if (appContainer.config.Ntheta == 0)
         {
             initImpl(out, in);
@@ -301,7 +331,8 @@ public:
       launchParams.input_buffer_S = (double*)in.data();
       launchParams.temp_buffer_S = temp_buffer;
       launchParams.buffer_S = (double*)out.data();
-
+     // if (testAccuracy) {
+				
       launchApp_parallALT(&appContainer, &launchParams);
       /*
       cudaMemcpy(xx, out.data(),

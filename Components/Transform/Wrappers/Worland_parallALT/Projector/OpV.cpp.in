@@ -55,7 +55,22 @@ void @Op@<@Tag@>::applyPostOperator(Matrix& rOut, const bool isEven) const
 
 void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const bool useReal) const
 {
+    Profiler::RegionStart<2>("applyOperators");
     std::uint32_t Ntheta = this->mspSetup->bwdSize();
+    
+  uint64_t bufferSize = in.rows() * (m_even_endBatch[num_m_even-1] + m_odd_endBatch[num_m_odd-1]) * sizeof(double);
+    PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+    double* gpuIn = (double*)mModsFlat_d.data();
+    void* in_cpu = (void*)in.data();
+  resPfSolve = PfSolve::transferDataFromCPU(&VkGPU, in_cpu, &gpuIn, bufferSize);
+    //if (resPfSolve != PfSolve::PFSOLVE_SUCCESS) return resPfSolve;
+  cudaDeviceSynchronize();
+ 
+  Profiler::RegionStart<2>("applyImpl");
+
+  mOp->apply(mPhysView, mModsView);
+  return;
+ /*   //std::uint32_t Ntheta = this->mspSetup->bwdSize();
   Profiler::RegionStart<2>("applyOperators");
   double* inSplit = (double*)calloc(
      Ntheta *
@@ -92,10 +107,7 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
          {
             for (int j = 0; j < in.rows(); j++)
             {
-               /*printf("%.2e %.2e\n",
-                  outSplit[j + i * 2 * Ntheta],
-                  outSplit[j + i * 2 * Ntheta +
-                           Ntheta]);*/
+               
                inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] =in(j,current_i + l).real();
                inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
                            Ntheta] = in(j,current_i + l).imag();
@@ -118,10 +130,7 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
          {
             for (int j = 0; j < in.rows(); j++)
             {
-               /*printf("%.2e %.2e\n",
-                  outSplit[j + i * 2 * Ntheta],
-                  outSplit[j + i * 2 * Ntheta +
-                           Ntheta]);*/
+              
                inSplit[j + even_startBatch * Ntheta + Ntheta *2*l] =in(j,current_i + l).real();
                inSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
                            Ntheta] = in(j,current_i + l).imag();
@@ -132,12 +141,7 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
          evenID++;
       }
   }
-  /* assert(
-     in.rows() * in.cols() * sizeof(MHDComplex) <= 8 * (mEvenSize + mOddSize));
-   IWorlandBackend::transferDataToGPU(&bufferSolveRes2, (void*)in.data(), 0,
-     0,
-                                     in.rows() * in.cols() * sizeof(MHDComplex),
-                                     &pStream[currentStream]);*/
+  
 
   //transferDataToGPU_parallALT(&VkGPU, inSplit, &appContainer_backward);
   uint64_t bufferSizeReducedEven = Ntheta * m_even_endBatch[num_m_even-1] * sizeof(double);
@@ -154,7 +158,7 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
  
   Profiler::RegionStart<2>("applyImpl");
 
-  mOp->apply(mPhysView, mModsView);
+  mOp->apply(mPhysView, mModsView);*/
 }
 
 void @Op@<@Tag@>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
@@ -162,10 +166,15 @@ void @Op@<@Tag@>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool
  std::uint32_t Ntheta = this->mspSetup->bwdSize();
   cudaDeviceSynchronize();
 Profiler::RegionStop<2>("applyImpl");
-
+uint64_t bufferSize = rOut.rows() * (m_even_endBatch[num_m_even-1]+m_odd_endBatch[num_m_odd-1]) * sizeof(double);
+  double* gpuOut = (double*)mPhysFlat_d.data();
+   void* out_cpu = rOut.data();
+   PfSolve::PfSolveResult resPfSolve = PfSolve::transferDataToCPU(&VkGPU, out_cpu, &gpuOut, bufferSize);
+  Profiler::RegionStop<2>("applyOperators");
+  return;
   //Matrix &outTmp = this->mOutTmp.at(0);
 
-  PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+  /*PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
   double* outSplit = (double*)calloc(
      Ntheta *
         (m_even_endBatch[num_m_even - 1] +
@@ -214,10 +223,7 @@ Profiler::RegionStop<2>("applyImpl");
          {
             for (int j = 0; j < rOut.rows(); j++)
             {
-               /*printf("%.2e %.2e\n",
-                  outSplit[j + i * 2 * Ntheta],
-                  outSplit[j + i * 2 * Ntheta +
-                           Ntheta]);*/
+             
                 //printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l],outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
                //            Ntheta]);
                rOut(j, current_i + l) = std::complex<double>(
@@ -242,10 +248,7 @@ Profiler::RegionStop<2>("applyImpl");
          {
             for (int j = 0; j < rOut.rows(); j++)
             {
-               /*printf("%.2e %.2e\n",
-                  outSplit[j + i * 2 * Ntheta],
-                  outSplit[j + i * 2 * Ntheta +
-                           Ntheta]);*/
+               
               // printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + even_startBatch * Ntheta + Ntheta *2*l],outSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
               //             Ntheta]);
                rOut(j, current_i + l) = std::complex<double>(
@@ -261,80 +264,13 @@ Profiler::RegionStop<2>("applyImpl");
      //printf("\n");
   }
   free(outSplit);
-  /* bufferSolveRes2 = bufferSolve2[2];
 
-  assert(rOut.rows() * rOut.cols() * sizeof(MHDComplex) <= 8 * (mEvenSize + mOddSize));
-  for (int isEven = 0; isEven < 2; isEven++) {
-    int start = 0;
-    currentStream = isPhysEven(isEven);
-    bufferSolveRes = bufferSolve[isPhysEven(isEven)];
-    bufferTemp = bufferTemp0[isPhysEven(isEven)];
-    for (auto &loc : *this->pLoc(isEven)) {
-      PfSolve::PfSolveApplication *tempAppCopy = 0;
-      PfSolve::PfSolve_MapKey_block mapKey = {};
-      mapKey.size[0] = rOut.rows();
-      mapKey.size[1] = std::get<2>(loc);
-      mapKey.type = BLOCK_READ_COMPLEX_PACKED_WRITE_COMPLEX_STRIDED;
-      mapKey.type += (RUNTIME_OFFSETM + RUNTIME_OFFSETSOLUTION +
-                      RUNTIME_INPUTZEROPAD + RUNTIME_OUTPUTZEROPAD +
-                      RUNTIME_INPUTBUFFERSTRIDE + RUNTIME_OUTPUTBUFFERSTRIDE) *
-                     1000;
-
-      resSolve =
-          PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
-      if (!tempAppCopy) {
-        PfSolve::PfSolveApplication appCopy = {};
-        PfSolve::PfSolveConfiguration configurationCopy = {};
-
-        configurationCopy.size[0] = mapKey.size[0];
-        configurationCopy.size[1] = mapKey.size[1];
-        configurationCopy.block = mapKey.type % 1000;
-        configurationCopy.isOutputFormatted = 1;
-        configurationCopy.jw_control_bitmask = mapKey.type / 1000;
-        configurationCopy.doublePrecision = 1;
-        configurationCopy.device = &this->device;
-        configurationCopy.num_streams = 1;
-
-        resSolve = PfSolve::initializePfSolve(&appCopy, configurationCopy);
-        resSolve =
-            PfSolve::addToLibrary_block(&appLibrary, mapKey, &appCopy);
-        resSolve =
-            PfSolve::checkLibrary_block(&appLibrary, mapKey, &tempAppCopy);
-      }
-
-      PfSolve::PfSolveLaunchParams launchParams = {};
-      launchParams.offsetM = start * outTmp.rows();
-      launchParams.offsetSolution = std::get<1>(loc) * rOut.rows();
-      launchParams.inputZeropad[0] = 0;
-      launchParams.inputZeropad[1] = mapKey.size[0];
-      launchParams.outputZeropad[0] = 0;
-      launchParams.outputZeropad[1] = mapKey.size[0];
-      launchParams.inputBufferStride = outTmp.rows();
-      launchParams.outputBufferStride = rOut.rows();
-      launchParams.buffer = (void **)&this->bufferSolveRes;
-      launchParams.outputBuffer = (void **)&this->bufferSolveRes2;
-      tempAppCopy->configuration.stream = &pStream[currentStream];
-
-      resSolve = PfSolveAppend(tempAppCopy, -1, &launchParams);
-
-      prevOutputZeropad[currentStream][0][start] =
-          launchParams.outputZeropad[0];
-      prevOutputZeropad[currentStream][1][start] =
-          launchParams.outputZeropad[1];
-      start += std::get<2>(loc);
-    }
-  }
-
-  cudaDeviceSynchronize();
-  IWorlandBackend::transferDataFromGPU(
-      rOut.data(), &bufferSolveRes2, 0, 0,
-      rOut.rows() * rOut.cols() * sizeof(MHDComplex), &pStream[currentStream]);*/
   //for (auto loc : this->mZLoc) {
   //  int s = std::get<1>(loc);
   //  int cols = std::get<2>(loc);
   //  rOut.block(0, s, rOut.rows(), cols).setZero();
   //}
-  Profiler::RegionStop<2>("applyOperators");
+  Profiler::RegionStop<2>("applyOperators");*/
 }
 
 void @Op@<@Tag@>::initBackend() const

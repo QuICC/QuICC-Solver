@@ -55,7 +55,22 @@ void @Op@<@Tag@>::applyPostOperator(Matrix& rOut, const bool isEven) const
 
 void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const bool useReal) const
 {
+     Profiler::RegionStart<2>("applyOperators");
     std::uint32_t Ntheta = this->mspSetup->fwdSize();
+    
+  uint64_t bufferSize = in.rows() * (m_even_endBatch[num_m_even-1] + m_odd_endBatch[num_m_odd-1]) * sizeof(double);
+    PfSolve::PfSolveResult resPfSolve = PfSolve::PFSOLVE_SUCCESS;
+    double* gpuIn = (double*)mPhysFlat_d.data();
+    void* in_cpu = (void*)in.data();
+  resPfSolve = PfSolve::transferDataFromCPU(&VkGPU, &in_cpu, &gpuIn, bufferSize);
+    //if (resPfSolve != PfSolve::PFSOLVE_SUCCESS) return resPfSolve;
+  cudaDeviceSynchronize();
+ 
+  Profiler::RegionStart<2>("applyImpl");
+
+  mOp->apply(mModsView, mPhysView);
+  return;
+  /*std::uint32_t Ntheta = this->mspSetup->fwdSize();
 
     Profiler::RegionStart<2>("applyOperators");
 
@@ -103,10 +118,7 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
             {
             for (int j = 0; j < in.rows(); j++)
             {
-                /*printf("%.2e %.2e\n",
-                    outSplit[j + i * 2 * Ntheta],
-                    outSplit[j + i * 2 * Ntheta +
-                            Ntheta]);*/
+
                 //printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l],outSplit[j + odd_startBatch * Ntheta + Ntheta *2*l +
                 //            Ntheta]);
                 inSplit[j + odd_startBatch * Ntheta + Ntheta *2*l] = in(j, current_i+l).real();
@@ -130,10 +142,7 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
             {
             for (int j = 0; j < in.rows(); j++)
             {
-                /*printf("%.2e %.2e\n",
-                    outSplit[j + i * 2 * Ntheta],
-                    outSplit[j + i * 2 * Ntheta +
-                            Ntheta]);*/
+
                 // printf("%d %d %.2e %.2e\n",j, current_i,  outSplit[j + even_startBatch * Ntheta + Ntheta *2*l],outSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
                 //             Ntheta]);
                 inSplit[j + even_startBatch * Ntheta + Ntheta *2*l] = in(j, current_i+l).real();
@@ -161,12 +170,22 @@ void @Op@<@Tag@>::applyPreOperator(const MatrixZ& in, const bool isEven, const b
 
     Profiler::RegionStart<2>("applyImpl");
 
-    mOp->apply(mModsView, mPhysView);
+    mOp->apply(mModsView, mPhysView);*/
 }
 
 void @Op@<@Tag@>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool useReal) const
 {
     std::uint32_t Ntheta = this->mspSetup->fwdSize();
+  cudaDeviceSynchronize();
+Profiler::RegionStop<2>("applyImpl");
+uint64_t bufferSize = rOut.rows() * (m_even_endBatch[num_m_even-1]+m_odd_endBatch[num_m_odd-1]) * sizeof(double);
+  double* gpuOut = (double*)mModsFlat_d.data();
+   void* out_cpu = rOut.data();
+   PfSolve::PfSolveResult resPfSolve = PfSolve::transferDataToCPU(&VkGPU, out_cpu, &gpuOut, bufferSize);
+  Profiler::RegionStop<2>("applyOperators");
+  return;
+
+    /*std::uint32_t Ntheta = this->mspSetup->fwdSize();
     cudaDeviceSynchronize();
     Profiler::RegionStop<2>("applyImpl");
 
@@ -233,10 +252,7 @@ void @Op@<@Tag@>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool
          {
             for (int j = 0; j < rOut.rows(); j++)
             {
-               /*printf("%.2e %.2e\n",
-                  outSplit[j + i * 2 * Ntheta],
-                  outSplit[j + i * 2 * Ntheta +
-                           Ntheta]);*/
+               
                rOut(j, current_i + l) = std::complex<double>(outSplit[j + even_startBatch * Ntheta + Ntheta *2*l]* 2 * 3.1415926535897932384626433832795029,
                outSplit[j + even_startBatch * Ntheta + Ntheta *2*l +
                            Ntheta]* 2 * 3.1415926535897932384626433832795029);
@@ -250,7 +266,7 @@ void @Op@<@Tag@>::applyPostOperator(MatrixZ& rOut, const bool isEven, const bool
     cudaDeviceSynchronize();
     free(outSplit);
 
-    Profiler::RegionStop<2>("applyOperators");
+    Profiler::RegionStop<2>("applyOperators");*/
 
 }
 void @Op@<@Tag@>::initBackend() const
