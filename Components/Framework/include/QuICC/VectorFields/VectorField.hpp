@@ -31,6 +31,9 @@ namespace Datatypes {
    template <typename TScalar, typename TType> class VectorField
    {
       public:
+         ///
+         typedef TScalar ScalarFieldType;
+
          /**
           * @brief Constructor with simplified interface
           *

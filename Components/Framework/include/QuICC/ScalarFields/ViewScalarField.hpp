@@ -874,6 +874,7 @@ namespace Datatypes {
       this->mspPointers = other.mspPointers;
       this->mGlobalView = other.mGlobalView;
       this->mspGlobalPointers = other.mspGlobalPointers;
+      this->mspGlobalIndices = other.mspGlobalIndices;
    }
 
    template <typename TData> void ViewScalarField<TData>::setZeros()
