@@ -10,6 +10,7 @@ add_executable(${TestExe}
   MassFluxAdvectionTests.cpp
   SphericalBuoyancyTests.cpp
   SphericalCoriolisTests.cpp
+  SphericalHeatAdvectionTests.cpp
   SphericalSComponentTests.cpp
   SphericalZComponentTests.cpp
   StreamAdvectionTests.cpp

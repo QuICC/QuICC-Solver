@@ -16,7 +16,6 @@
 #include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
-#include "ViewOps/Slicewise/Functors.hpp"
 #include "ViewOps/Slicewise/NoGridOp.hpp"
 
 namespace QuICC {
