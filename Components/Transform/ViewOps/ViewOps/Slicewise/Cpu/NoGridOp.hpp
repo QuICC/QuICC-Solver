@@ -11,6 +11,7 @@
 // External includes
 //
 #include <type_traits>
+#include <utility>
 
 // Project includes
 //
@@ -35,10 +36,10 @@ using namespace QuICC::Operator;
 /// @tparam Functor Nary scalar functor
 /// @tparam Tout output View
 /// @tparam ...Targs input Views
-template <std::uint8_t Dir, class Functor, class Tout, class Tgrid,
+template <std::uint8_t Dir, class Functor, class Tout, std::uint8_t Ngrid,
    class... Targs>
-class NoGridOp : public NaryBaseOp<NoGridOp<Dir, Functor, Tout, Tgrid, Targs...>,
-              Tout, Tgrid, Targs...>
+class NoGridOp : public NaryBaseOp<NoGridOp<Dir, Functor, Tout, Ngrid, Targs...>,
+              Tout, Targs...>
 {
 private:
    /// @brief stored functor, i.e. struct with method
@@ -57,16 +58,18 @@ public:
 
 private:
    /// @brief give access to base class
-   friend NaryBaseOp<NoGridOp<Dir, Functor, Tout, Tgrid, Targs...>, Tout,
-      Tgrid, Targs...>;
+   friend NaryBaseOp<NoGridOp<Dir, Functor, Tout, Ngrid, Targs...>, Tout,
+      Targs...>;
    /// @brief action implementation
    /// @param out output View
    /// @param ...args input Views
-   void applyImpl(Tout& out, const Tgrid&, const Targs&... args);
+   void applyImpl(Tout& out, const Targs&... args);
    /// @brief specialized implementation for Phi-Theta slice
-   void phiThetaImpl(Tout& out, const Tgrid& grid, const Targs&... args);
+   template <std::size_t... Is, std::size_t... Js>
+   void phiThetaImpl(Tout& out, const std::tuple<Targs...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>);
    /// @brief specialized implementation for Phi-R slice
-   void phiRImpl(Tout& out, const Tgrid& grid, const Targs&... args);
+   template <std::size_t... Is, std::size_t... Js>
+   void phiRImpl(Tout& out, const std::tuple<Targs...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>);
    /// @brief index typedef
    using IndexType = typename Tout::IndexType;
    /// @brief layer index cache
@@ -77,30 +80,37 @@ private:
 
 
 template <std::uint8_t Dir, class Functor, class Tout,
-   class Tgrid, class... Targs>
-void NoGridOp<Dir, Functor, Tout, Tgrid, Targs...>::applyImpl(Tout& out,
-   const Tgrid& grid, const Targs&... args)
+   std::uint8_t Ngrid, class... Targs>
+void NoGridOp<Dir, Functor, Tout, Ngrid, Targs...>::applyImpl(Tout& out,
+   const Targs&... args)
 {
    Profiler::RegionFixture<4> fix("SlicewiseNoGrid::Cpu::applyImpl");
 
    // check Tout and Targs.. match Functor op
    using res_t =
-      std::invoke_result_t<Functor, typename Tgrid::ScalarType, typename Targs::ScalarType...>;
+      std::invoke_result_t<Functor, typename Targs::ScalarType...>;
    static_assert(std::is_same_v<typename Tout::ScalarType, res_t>,
       "Mismatch in functor or arguments");
-   // check same size
-   assert(((out.size() == args.size()) && ...));
 
    // implemented only for physical space
    static_assert(std::is_same_v<Tout, View::View<double, View::DCCSC3D>>);
 
    if constexpr (Dir == 1)
    {
-      phiRImpl(out, grid, args...);
+      constexpr std::size_t n = sizeof...(Targs) - Ngrid;
+      phiRImpl(out,
+            std::tuple<Targs...>(args...),
+            std::make_integer_sequence<std::size_t, Ngrid>(),
+            std::make_integer_sequence<std::size_t, n>());
    }
    else if constexpr (Dir == 2)
    {
-      phiThetaImpl(out, grid, args...);
+      constexpr std::size_t n = sizeof...(Targs) - Ngrid;
+      phiThetaImpl(out,
+            std::tuple<Targs...>(args...),
+            std::make_integer_sequence<std::size_t, Ngrid>(),
+            std::make_integer_sequence<std::size_t, n>());
+
    }
    else
    {
@@ -109,9 +119,10 @@ void NoGridOp<Dir, Functor, Tout, Tgrid, Targs...>::applyImpl(Tout& out,
 }
 
 template <std::uint8_t Dir, class Functor, class Tout,
-   class Tgrid, class... Targs>
-void NoGridOp<Dir, Functor, Tout, Tgrid, Targs...>::phiRImpl(Tout& out,
-   const Tgrid& grid, const Targs&... args)
+   std::uint8_t Ngrid, class... Targs>
+   template <std::size_t... Is, std::size_t... Js>
+void NoGridOp<Dir, Functor, Tout, Ngrid, Targs...>::phiRImpl(Tout& out,
+      const std::tuple<Targs...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>)
 {
    assert(Dir == 1);
 
@@ -127,22 +138,23 @@ void NoGridOp<Dir, Functor, Tout, Tgrid, Targs...>::phiRImpl(Tout& out,
 
       // check mem bounds
       assert((col + 1) * M <= out.size());
-      assert(thetaIdx < grid.size());
+      assert(thetaIdx < std::get<0>(args).size());
 
       // column major
       for (std::size_t m = 0; m < M; ++m)
       {
          auto mnk = m + col * M;
-         out[mnk] = _f(grid[thetaIdx], args[mnk]...);
+         out[mnk] = _f(std::get<Is>(args)[thetaIdx]..., std::get<Js+Ngrid>(args)[mnk]...);
       }
    }
 }
 
 
 template <std::uint8_t Dir, class Functor, class Tout,
-   class Tgrid, class... Targs>
-void NoGridOp<Dir, Functor, Tout, Tgrid, Targs...>::phiThetaImpl(Tout& out,
-   const Tgrid& grid, const Targs&... args)
+   std::uint8_t Ngrid, class... Targs>
+   template <std::size_t... Is, std::size_t... Js>
+void NoGridOp<Dir, Functor, Tout, Ngrid, Targs...>::phiThetaImpl(Tout& out,
+   const std::tuple<Targs...>& args, std::index_sequence<Is...>, std::index_sequence<Js...>)
 {
    assert(Dir == 2);
 
@@ -184,7 +196,7 @@ void NoGridOp<Dir, Functor, Tout, Tgrid, Targs...>::phiThetaImpl(Tout& out,
          for (std::size_t m = 0; m < M; ++m)
          {
             auto mnk = offSet + m + n * M;
-            out[mnk] = _f(grid[l], args[mnk]...);
+            out[mnk] = _f(std::get<Is>(args)[l]..., std::get<Js+Ngrid>(args)[mnk]...);
          }
       }
 
