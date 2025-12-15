@@ -16,6 +16,7 @@
 #include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "ViewOps/Slicewise/NoGridOp.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
 
 namespace QuICC {
 
@@ -144,68 +145,6 @@ namespace Physical {
             }
          };
 
-         /// @tparam T scalar
-         template <class T = double> struct AddFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            AddFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            AddFunctor() = delete;
-
-            /// @brief dtor
-            ~AddFunctor() = default;
-
-            /// @brief Dot product
-            /// @param g
-            /// @param ui
-            /// @param uj
-            /// @param uk
-            /// @param vi
-            /// @param vj
-            /// @param vk
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T g, T w, T ui, T uj, T uk, T vi, T vj, T vk)
-            {
-               return w + _scaling * (ui * vi + uj * vj + uk * vk - g * ui);
-            }
-         };
-
-         /// @tparam T scalar
-         template <class T = double> struct SubFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            SubFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            SubFunctor() = delete;
-
-            /// @brief dtor
-            ~SubFunctor() = default;
-
-            /// @brief Dot product
-            /// @param g
-            /// @param ui
-            /// @param uj
-            /// @param uk
-            /// @param vi
-            /// @param vj
-            /// @param vk
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T g, T w, T ui, T uj, T uk, T vi, T vj, T vk)
-            {
-               return w - _scaling * (ui * vi + uj * vj + uk * vk - g * ui);
-            }
-         };
-
          template <typename TFIELD>
          static void collectViews(std::vector<typename TFIELD::ScalarFieldType::ViewStorageType>& vs, const TFIELD& f);
    };
@@ -303,14 +242,14 @@ namespace Physical {
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
          using grid_t = View::ViewBase<double>;
-         using fct_t = AddFunctor<scalar_t>;
+         using fct_t = details::AddTmplFunctor<scalar_t, SetFunctor>;
          fct_t f(c);
          grid_t vGrid(const_cast<scalar_t *>(r.data()), r.size());
          std::vector<view_t> vs;
          collectViews(vs, u);
          collectViews(vs, gradQ);
          Slicewise::Cpu::NoGridOp<2, fct_t, view_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
-         op.apply(rS.rGlobalView(), vGrid, rS.dataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5));
+         op.apply(rS.rGlobalView(), vGrid, vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5), rS.dataView());
       }
       else
       {
@@ -354,14 +293,14 @@ namespace Physical {
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
          using grid_t = View::ViewBase<double>;
-         using fct_t = SubFunctor<scalar_t>;
+         using fct_t = details::SubTmplFunctor<scalar_t, SetFunctor>;
          fct_t f(c);
          grid_t vGrid(const_cast<scalar_t *>(r.data()), r.size());
          std::vector<view_t> vs;
          collectViews(vs, u);
          collectViews(vs, gradQ);
          Slicewise::Cpu::NoGridOp<2, fct_t, view_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
-         op.apply(rS.rGlobalView(), vGrid, rS.dataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5));
+         op.apply(rS.rGlobalView(), vGrid, vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5), rS.dataView());
       }
       else
       {

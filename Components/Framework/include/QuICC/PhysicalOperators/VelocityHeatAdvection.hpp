@@ -15,8 +15,8 @@
 #include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
-#include "ViewOps/Pointwise/Functors.hpp"
 #include "ViewOps/Pointwise/Pointwise.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
 
 namespace QuICC {
 
@@ -96,66 +96,6 @@ namespace Physical {
             }
          };
 
-         /// @tparam T scalar
-         template <class T = double> struct AddVelHeatAdvFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            AddVelHeatAdvFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            AddVelHeatAdvFunctor() = delete;
-
-            /// @brief dtor
-            ~AddVelHeatAdvFunctor() = default;
-
-            /// @brief Dot product
-            /// @param ui
-            /// @param uj
-            /// @param uk
-            /// @param vi
-            /// @param vj
-            /// @param vk
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T w, T ui, T uj, T uk, T vi, T vj, T vk)
-            {
-               return w + _scaling * (ui * vi + uj * vj + uk * vk - uk);
-            }
-         };
-
-         /// @tparam T scalar
-         template <class T = double> struct SubVelHeatAdvFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            SubVelHeatAdvFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            SubVelHeatAdvFunctor() = delete;
-
-            /// @brief dtor
-            ~SubVelHeatAdvFunctor() = default;
-
-            /// @brief Dot product
-            /// @param ui
-            /// @param uj
-            /// @param uk
-            /// @param vi
-            /// @param vj
-            /// @param vk
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T w, T ui, T uj, T uk, T vi, T vj, T vk)
-            {
-               return w - _scaling * (ui * vi + uj * vj + uk * vk - uk);
-            }
-         };
-
          template <typename TFIELD>
          static void collectViews(std::vector<typename TFIELD::ScalarFieldType::ViewStorageType>& vs, const TFIELD& f);
    };
@@ -213,13 +153,13 @@ namespace Physical {
          if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
-         using fct_t = AddVelHeatAdvFunctor<scalar_t>;
+         using fct_t = details::AddTmplFunctor<scalar_t, VelHeatAdvFunctor>;
          fct_t f(c);
          Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
          std::vector<view_t> vs;
          collectViews(vs, u);
          collectViews(vs, gradQ);
-         op.apply(rS.rDataView(), rS.dataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5));
+         op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5), rS.dataView());
          }
          else
          {
@@ -249,13 +189,13 @@ namespace Physical {
          if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
             using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
-            using fct_t = SubVelHeatAdvFunctor<scalar_t>;
+            using fct_t = details::SubTmplFunctor<scalar_t, VelHeatAdvFunctor>;
             fct_t f(c);
             Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             std::vector<view_t> vs;
             collectViews(vs, u);
             collectViews(vs, gradQ);
-            op.apply(rS.rDataView(), rS.dataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5));
+            op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5), rS.dataView());
          }
          else
          {
@@ -349,62 +289,6 @@ namespace Physical {
             }
          };
 
-         /// @tparam T scalar
-         template <class T = double> struct AddVelHeatAdvFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            AddVelHeatAdvFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            AddVelHeatAdvFunctor() = delete;
-
-            /// @brief dtor
-            ~AddVelHeatAdvFunctor() = default;
-
-            /// @brief Dot product
-            /// @param ui
-            /// @param uj
-            /// @param vi
-            /// @param vj
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T w, T ui, T uj, T vi, T vj)
-            {
-               return w + _scaling * (ui * vi + uj * vj - vj);
-            }
-         };
-
-         /// @tparam T scalar
-         template <class T = double> struct SubVelHeatAdvFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            SubVelHeatAdvFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            SubVelHeatAdvFunctor() = delete;
-
-            /// @brief dtor
-            ~SubVelHeatAdvFunctor() = default;
-
-            /// @brief Dot product
-            /// @param ui
-            /// @param uj
-            /// @param vi
-            /// @param vj
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T w, T ui, T uj, T uk, T vi, T vj)
-            {
-               return w - _scaling * (ui * vi + uj * vj - vj);
-            }
-         };
-
          template <typename TFIELD>
          static void collectViews(std::vector<typename TFIELD::ScalarFieldType::ViewStorageType>& vs, const TFIELD& f);
    };
@@ -457,13 +341,13 @@ namespace Physical {
          if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
             using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
-            using fct_t = AddVelHeatAdvFunctor<scalar_t>;
+            using fct_t = details::AddTmplFunctor<scalar_t, VelHeatAdvFunctor>;
             fct_t f(c);
             Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             std::vector<view_t> vs;
             collectViews(vs, u);
             collectViews(vs, gradQ);
-            op.apply(rS.rDataView(), rS.dataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3));
+            op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), rS.dataView());
          }
          else
          {
@@ -489,13 +373,13 @@ namespace Physical {
          if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
             using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
-            using fct_t = SubVelHeatAdvFunctor<scalar_t>;
+            using fct_t = details::SubTmplFunctor<scalar_t, VelHeatAdvFunctor>;
             fct_t f(c);
             Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             std::vector<view_t> vs;
             collectViews(vs, u);
             collectViews(vs, gradQ);
-            op.apply(rS.rDataView(), rS.dataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3));
+            op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), rS.dataView());
          }
          else
          {

@@ -18,6 +18,7 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "ViewOps/Slicewise/NoGridOp.hpp"
 #include "ViewOps/Slicewise/NoTwoGridOp.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
 
 namespace QuICC {
 
@@ -135,58 +136,6 @@ namespace Physical {
          };
 
          /// @tparam T scalar
-         template <class T = double> struct AddRTFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            AddRTFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            AddRTFunctor() = delete;
-
-            /// @brief dtor
-            ~AddRTFunctor() = default;
-
-            /// @brief Dot product
-            /// @param g
-            /// @param ui
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T g, T w, T ui)
-            {
-               return w - _scaling * (g * ui);
-            }
-         };
-
-         /// @tparam T scalar
-         template <class T = double> struct SubRTFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            SubRTFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            SubRTFunctor() = delete;
-
-            /// @brief dtor
-            ~SubRTFunctor() = default;
-
-            /// @brief Dot product
-            /// @param g
-            /// @param ui
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T g, T w, T ui)
-            {
-               return w + _scaling * (g * ui);
-            }
-         };
-
-         /// @tparam T scalar
          template <class T = double> struct SetPFunctor
          {
             /// @brief non dimensional scaling for transport term
@@ -211,62 +160,6 @@ namespace Physical {
             QUICC_CUDA_HOSTDEV T operator()(T gc, T gs, T ui, T uj)
             {
                return _scaling * (gc * ui + gs * uj);
-            }
-         };
-
-         /// @tparam T scalar
-         template <class T = double> struct AddPFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            AddPFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            AddPFunctor() = delete;
-
-            /// @brief dtor
-            ~AddPFunctor() = default;
-
-            /// @brief Dot product
-            /// @param gc
-            /// @param gs
-            /// @param ui
-            /// @param uj
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T gc, T gs, T w, T ui, T uj)
-            {
-               return w + _scaling * (gc * ui + gs * uj);
-            }
-         };
-
-         /// @tparam T scalar
-         template <class T = double> struct SubPFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            SubPFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            SubPFunctor() = delete;
-
-            /// @brief dtor
-            ~SubPFunctor() = default;
-
-            /// @brief Dot product
-            /// @param gc
-            /// @param gs
-            /// @param ui
-            /// @param uj
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T gc, T gs, T w, T ui, T uj)
-            {
-               return w - _scaling * (gc * ui + gs * uj);
             }
          };
    };
@@ -442,11 +335,11 @@ namespace Physical {
          {
             using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
             using grid_t = View::ViewBase<double>;
-            using fct_t = AddRTFunctor<scalar_t>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetRTFunctor>;
             fct_t f(c);
             grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
             Slicewise::Cpu::NoGridOp<1, fct_t, view_t, grid_t, view_t, view_t> op(f);
-            op.apply(rS.rGlobalView(), vSin, rS.dataView(), v.comp(FieldComponents::Physical::PHI).globalView());
+            op.apply(rS.rGlobalView(), vSin, v.comp(FieldComponents::Physical::PHI).globalView(), rS.dataView());
          }
          else
          {
@@ -483,11 +376,11 @@ namespace Physical {
          {
             using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
             using grid_t = View::ViewBase<double>;
-            using fct_t = AddRTFunctor<scalar_t>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetRTFunctor>;
             fct_t f(c);
             grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
             Slicewise::Cpu::NoGridOp<1, fct_t, view_t, grid_t, view_t, view_t> op(f);
-            op.apply(rS.rGlobalView(), vCos, rS.dataView(), v.comp(FieldComponents::Physical::PHI).globalView());
+            op.apply(rS.rGlobalView(), vCos, v.comp(FieldComponents::Physical::PHI).globalView(), rS.dataView());
          }
          else
          {
@@ -524,12 +417,12 @@ namespace Physical {
          {
             using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
             using grid_t = View::ViewBase<double>;
-            using fct_t = AddPFunctor<scalar_t>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetPFunctor>;
             fct_t f(c);
             grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
             grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
             Slicewise::Cpu::NoTwoGridOp<1, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
-            op.apply(rS.rGlobalView(), vCos, vSin, rS.dataView(), v.comp(FieldComponents::Physical::THETA).globalView(), v.comp(FieldComponents::Physical::R).globalView());
+            op.apply(rS.rGlobalView(), vCos, vSin, v.comp(FieldComponents::Physical::THETA).globalView(), v.comp(FieldComponents::Physical::R).globalView(), rS.dataView());
          }
          else
          {
@@ -578,11 +471,11 @@ namespace Physical {
          {
             using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
             using grid_t = View::ViewBase<double>;
-            using fct_t = SubRTFunctor<scalar_t>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetRTFunctor>;
             fct_t f(c);
             grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
             Slicewise::Cpu::NoGridOp<1, fct_t, view_t, grid_t, view_t, view_t> op(f);
-            op.apply(rS.rGlobalView(), vSin, rS.dataView(), v.comp(FieldComponents::Physical::PHI).globalView());
+            op.apply(rS.rGlobalView(), vSin, v.comp(FieldComponents::Physical::PHI).globalView(), rS.dataView());
          }
          else
          {
@@ -619,11 +512,11 @@ namespace Physical {
          {
             using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
             using grid_t = View::ViewBase<double>;
-            using fct_t = SubRTFunctor<scalar_t>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetRTFunctor>;
             fct_t f(c);
             grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
             Slicewise::Cpu::NoGridOp<1, fct_t, view_t, grid_t, view_t, view_t> op(f);
-            op.apply(rS.rGlobalView(), vCos, rS.dataView(), v.comp(FieldComponents::Physical::PHI).globalView());
+            op.apply(rS.rGlobalView(), vCos, v.comp(FieldComponents::Physical::PHI).globalView(), rS.dataView());
          }
          else
          {
@@ -660,12 +553,12 @@ namespace Physical {
          {
             using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
             using grid_t = View::ViewBase<double>;
-            using fct_t = SubPFunctor<scalar_t>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetPFunctor>;
             fct_t f(c);
             grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
             grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
             Slicewise::Cpu::NoTwoGridOp<1, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
-            op.apply(rS.rGlobalView(), vCos, vSin, rS.dataView(), v.comp(FieldComponents::Physical::THETA).globalView(), v.comp(FieldComponents::Physical::R).globalView());
+            op.apply(rS.rGlobalView(), vCos, vSin, v.comp(FieldComponents::Physical::THETA).globalView(), v.comp(FieldComponents::Physical::R).globalView(), rS.dataView());
          }
          else
          {

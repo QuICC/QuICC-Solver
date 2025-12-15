@@ -17,8 +17,9 @@
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/Equations/IVectorEquation.hpp"
-
 #include "DenseSM/IGenericProfile.hpp"
+#include "ViewOps/Slicewise/NoTwoGridOp.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
 
 namespace QuICC {
 
@@ -151,7 +152,100 @@ namespace Physical {
                return _res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
             }
          };
+
+         /// @tparam T scalar
+         template <class T = double> struct SetRFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _scaling;
+
+            /// @brief ctor
+            /// @param scaling
+            SetRFunctor(T scaling) : _scaling(scaling){};
+
+            /// @brief deleted default constructor
+            SetRFunctor() = delete;
+
+            /// @brief dtor
+            ~SetRFunctor() = default;
+
+            /// @brief Dot product
+            /// @param g
+            /// @param ui
+            /// @return
+            QUICC_CUDA_HOSTDEV T operator()(T rho, T dLog, T ui, T uj, T uk, T vi, T vj, T vk)
+            {
+               return _scaling * (uk * vj - uj * vk + dLog * (uj * uj + uk * uk)) / (rho * rho);
+            }
+         };
+
+         /// @tparam T scalar
+         template <class T = double> struct SetTFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _scaling;
+
+            /// @brief ctor
+            /// @param scaling
+            SetTFunctor(T scaling) : _scaling(scaling){};
+
+            /// @brief deleted default constructor
+            SetTFunctor() = delete;
+
+            /// @brief dtor
+            ~SetTFunctor() = default;
+
+            /// @brief Dot product
+            /// @param gc
+            /// @param gs
+            /// @param ui
+            /// @param uj
+            /// @return
+            QUICC_CUDA_HOSTDEV T operator()(T rho, T dLog, T ui, T uj, T uk, T vi, T vj, T vk)
+            {
+               return _scaling * (ui * vk - uk * vi - dLog * (ui * uj)) / (rho * rho);
+            }
+         };
+
+         /// @tparam T scalar
+         template <class T = double> struct SetPFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _scaling;
+
+            /// @brief ctor
+            /// @param scaling
+            SetPFunctor(T scaling) : _scaling(scaling){};
+
+            /// @brief deleted default constructor
+            SetPFunctor() = delete;
+
+            /// @brief dtor
+            ~SetPFunctor() = default;
+
+            /// @brief Dot product
+            /// @param gc
+            /// @param gs
+            /// @param ui
+            /// @param uj
+            /// @return
+            QUICC_CUDA_HOSTDEV T operator()(T rho, T dLog, T ui, T uj, T uk, T vi, T vj, T vk)
+            {
+               return _scaling * (uj * vi - ui * vj - dLog * (ui * uk )) / (rho * rho);
+            }
+         };
+
+         template <typename TFIELD>
+         static void collectViews(std::vector<typename TFIELD::ScalarFieldType::ViewStorageType>& vs, const TFIELD& f);
    };
+
+   template <typename TFIELD> void SphericalSelfAdvectionAnelastic::collectViews(std::vector<typename TFIELD::ScalarFieldType::ViewStorageType>& vs, const TFIELD& f)
+   {
+      for(auto&& [k, flag]: f.enabled())
+      {
+         vs.push_back(f.comp(k).dataView());
+      }
+   }
 
    template <typename TFIELD>
    void SphericalSelfAdvectionAnelastic::set(TFIELD &rS,
@@ -222,142 +316,196 @@ namespace Physical {
 
       if(compId == FieldComponents::Physical::R)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
-            {
-               iR_ = idxFunc.idx3D(iR);
-
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.setSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               rS.subSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
-
-               rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                )/ rho(iR_) / rho(iR_)).matrix(),  iR);
-
-            }
-         } else
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = SetRFunctor<scalar_t>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+            std::vector<view_t> vs;
+            collectViews(vs, v);
+            collectViews(vs, w);
+            Slicewise::Cpu::NoTwoGridOp<2, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]);
+         }
+         else
          {
-            for(int iR = 0; iR < nR; ++iR)
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
 
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.setSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.setSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               rS.subSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  rS.subSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
 
-               rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                )/ rho(iR_) / rho(iR_)).matrix(),  iR);
+                  rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              )/ rho(iR_) / rho(iR_)).matrix(),  iR);
 
+               }
+            } else
+            {
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
+
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.setSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  rS.subSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+
+                  rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              )/ rho(iR_) / rho(iR_)).matrix(),  iR);
+
+               }
             }
          }
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
-            {
-               iR_ = idxFunc.idx3D(iR);
-
-              // Boussinesq part (not vanishing for dLogRho =0)
-               rS.setSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               rS.subSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
-            }
-         } else
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = SetTFunctor<scalar_t>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+            std::vector<view_t> vs;
+            collectViews(vs, v);
+            collectViews(vs, w);
+            Slicewise::Cpu::NoTwoGridOp<2, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]);
+         }
+         else
          {
-            for(int iR = 0; iR < nR; ++iR)
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
 
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.setSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.setSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               rS.subSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  rS.subSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+               }
+            } else
+            {
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
+
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.setSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  rS.subSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+               }
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
-            {
-               iR_ = idxFunc.idx3D(iR);
-
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.setSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               rS.subSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
-            }
-         } else
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = SetPFunctor<scalar_t>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+            std::vector<view_t> vs;
+            collectViews(vs, v);
+            collectViews(vs, w);
+            Slicewise::Cpu::NoTwoGridOp<2, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]);
+         }
+         else
          {
-            for(int iR = 0; iR < nR; ++iR)
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
 
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.setSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.setSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               rS.subSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  rS.subSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+               }
+            } else
+            {
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
+
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.setSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  rS.subSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+               }
             }
          }
       }
@@ -378,143 +526,198 @@ namespace Physical {
 
       if(compId == FieldComponents::Physical::R)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
-            {
-               iR_ = idxFunc.idx3D(iR);
-
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.addSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               rS.subSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
-
-               rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                )/ rho(iR_) / rho(iR_)).matrix(),  iR);
-
-            }
-         } else
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            //using fct_t = AddRFunctor<scalar_t>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetRFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+            std::vector<view_t> vs;
+            collectViews(vs, v);
+            collectViews(vs, w);
+            Slicewise::Cpu::NoTwoGridOp<2, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
+         }
+         else
          {
-            for(int iR = 0; iR < nR; ++iR)
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
 
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.addSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.addSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               rS.subSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  rS.subSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
 
-               rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                )/ rho(iR_) / rho(iR_)).matrix(),  iR);
+                  rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              )/ rho(iR_) / rho(iR_)).matrix(),  iR);
 
+               }
+            } else
+            {
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
+
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.addSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  rS.subSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+
+                  rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              )/ rho(iR_) / rho(iR_)).matrix(),  iR);
+
+               }
             }
          }
 
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
-            {
-               iR_ = idxFunc.idx3D(iR);
-
-              // Boussinesq part (not vanishing for dLogRho =0)
-               rS.addSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               rS.subSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
-
-            }
-         } else
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetTFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+            std::vector<view_t> vs;
+            collectViews(vs, v);
+            collectViews(vs, w);
+            Slicewise::Cpu::NoTwoGridOp<2, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
+         }
+         else
          {
-            for(int iR = 0; iR < nR; ++iR)
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
 
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.addSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.addSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               rS.subSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  rS.subSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+
+               }
+            } else
+            {
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
+
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.addSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  rS.subSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+               }
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
-            {
-               iR_ = idxFunc.idx3D(iR);
-
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.addSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               rS.subSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
-            }
-         } else
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetPFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+            std::vector<view_t> vs;
+            collectViews(vs, v);
+            collectViews(vs, w);
+            Slicewise::Cpu::NoTwoGridOp<2, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
+         }
+         else
          {
-            for(int iR = 0; iR < nR; ++iR)
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
 
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.addSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.addSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               rS.subSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  rS.subSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+               }
+            } else
+            {
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
+
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.addSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  rS.subSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+               }
             }
          }
       }
@@ -535,144 +738,198 @@ namespace Physical {
 
       if(compId == FieldComponents::Physical::R)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
-            {
-               iR_ = idxFunc.idx3D(iR);
-
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.subSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               rS.addSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
-
-               rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                )/ rho(iR_) / rho(iR_)).matrix(),  iR);
-
-            }
-         } else
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetRFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+            std::vector<view_t> vs;
+            collectViews(vs, v);
+            collectViews(vs, w);
+            Slicewise::Cpu::NoTwoGridOp<2, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
+         }
+         else
          {
-            for(int iR = 0; iR < nR; ++iR)
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
 
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.subSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.subSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               rS.addSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  rS.addSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
 
-               rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                )/ rho(iR_) / rho(iR_)).matrix(),  iR);
+                  rS.subSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              )/ rho(iR_) / rho(iR_)).matrix(),  iR);
+
+               }
+            } else
+            {
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
+
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.subSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  rS.addSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+
+                  rS.subSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              )/ rho(iR_) / rho(iR_)).matrix(),  iR);
+               }
             }
          }
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
-            {
-               iR_ = idxFunc.idx3D(iR);
-
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.subSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               rS.addSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
-
-            }
-         } else
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetTFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+            std::vector<view_t> vs;
+            collectViews(vs, v);
+            collectViews(vs, w);
+            Slicewise::Cpu::NoTwoGridOp<2, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
+         }
+         else
          {
-            for(int iR = 0; iR < nR; ++iR)
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
 
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.subSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.subSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               rS.addSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  rS.addSlice(c*(   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
 
+               }
+            } else
+            {
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
+
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.subSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  rS.addSlice((   v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+
+               }
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
-            {
-               iR_ = idxFunc.idx3D(iR);
-
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.subSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               rS.addSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
-
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
-
-            }
-         } else
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetPFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+            std::vector<view_t> vs;
+            collectViews(vs, v);
+            collectViews(vs, w);
+            Slicewise::Cpu::NoTwoGridOp<2, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
+         }
+         else
          {
-            for(int iR = 0; iR < nR; ++iR)
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
 
-               // Boussinesq part (not vanishing for dLogRho =0)
-               rS.subSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.subSlice(c*(   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               rS.addSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                       / rho(iR_) / rho(iR_)).matrix(), iR);
+                  rS.addSlice(c*(   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
 
-               // Anelastic part (vanishing for dLogRho =0)
-               rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
-                                                * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                                   ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.addSlice(c*(  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
 
+               }
+            } else
+            {
+               for(int iR = 0; iR < nR; ++iR)
+               {
+                  iR_ = idxFunc.idx3D(iR);
+
+                  // Boussinesq part (not vanishing for dLogRho =0)
+                  rS.subSlice((   v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  rS.addSlice((   v.comp(FieldComponents::Physical::R).slice(iR).array()
+                           * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                           / rho(iR_) / rho(iR_)).matrix(), iR);
+
+                  // Anelastic part (vanishing for dLogRho =0)
+                  rS.addSlice((  dLogRho(iR_) * ( v.comp(FieldComponents::Physical::R).slice(iR).array()
+                              * v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                              ) / rho(iR_) / rho(iR_)).matrix(),  iR);
+
+               }
             }
          }
       }

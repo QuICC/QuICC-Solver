@@ -17,6 +17,7 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "ViewOps/Pointwise/Functors.hpp"
 #include "ViewOps/Pointwise/Pointwise.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
 
 namespace QuICC {
 
@@ -60,65 +61,6 @@ namespace Physical {
          ~Dot() = default;
 
       private:
-         /// @tparam T scalar
-         template <class T = double> struct AddDotFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            AddDotFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            AddDotFunctor() = delete;
-
-            /// @brief dtor
-            ~AddDotFunctor() = default;
-
-            /// @brief Dot product
-            /// @param ui
-            /// @param uj
-            /// @param uk
-            /// @param vi
-            /// @param vj
-            /// @param vk
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T w, T ui, T uj, T uk, T vi, T vj, T vk)
-            {
-               return w + _scaling * (ui * vi + uj * vj + uk * vk);
-            }
-         };
-
-         /// @tparam T scalar
-         template <class T = double> struct SubDotFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            SubDotFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            SubDotFunctor() = delete;
-
-            /// @brief dtor
-            ~SubDotFunctor() = default;
-
-            /// @brief Dot product
-            /// @param ui
-            /// @param uj
-            /// @param uk
-            /// @param vi
-            /// @param vj
-            /// @param vk
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T w, T ui, T uj, T uk, T vi, T vj, T vk)
-            {
-               return w - _scaling * (ui * vi + uj * vj + uk * vk);
-            }
-         };
 
          template <typename TFIELD>
          static void collectViews(std::vector<typename TFIELD::ScalarFieldType::ViewStorageType>& vs, const TFIELD& f);
@@ -181,13 +123,13 @@ namespace Physical {
       if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
-         using fct_t = AddDotFunctor<scalar_t>;
+         using fct_t = details::AddTmplFunctor<scalar_t,Pointwise::DotFunctor>;
          fct_t f(c);
          Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
          std::vector<view_t> vs;
          collectViews(vs, v);
          collectViews(vs, w);
-         op.apply(rS.rDataView(), rS.dataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5));
+         op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5), rS.dataView());
       }
       else
       {
@@ -216,14 +158,14 @@ namespace Physical {
       if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
-         using fct_t = SubDotFunctor<scalar_t>;
+         using fct_t = details::SubTmplFunctor<scalar_t,Pointwise::DotFunctor>;
          fct_t f(c);
          Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
          std::vector<view_t> vViews;
          std::vector<view_t> vs;
          collectViews(vs, v);
          collectViews(vs, w);
-         op.apply(rS.rDataView(), rS.dataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5));
+         op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), vs.at(4), vs.at(5), rS.dataView());
       }
       else
       {

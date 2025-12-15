@@ -17,6 +17,7 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "ViewOps/Pointwise/Functors.hpp"
 #include "ViewOps/Pointwise/Pointwise.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
 
 namespace QuICC {
 
@@ -94,62 +95,6 @@ namespace Physical {
             }
          };
 
-         /// @tparam T scalar
-         template <class T = double> struct AddStreamHeatAdvFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            AddStreamHeatAdvFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            AddStreamHeatAdvFunctor() = delete;
-
-            /// @brief dtor
-            ~AddStreamHeatAdvFunctor() = default;
-
-            /// @brief Dot product
-            /// @param ui
-            /// @param uj
-            /// @param vi
-            /// @param vj
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T w, T ui, T uj, T vi, T vj)
-            {
-               return w + _scaling * (ui * vj - uj * vi - uj);
-            }
-         };
-
-         /// @tparam T scalar
-         template <class T = double> struct SubStreamHeatAdvFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            SubStreamHeatAdvFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            SubStreamHeatAdvFunctor() = delete;
-
-            /// @brief dtor
-            ~SubStreamHeatAdvFunctor() = default;
-
-            /// @brief Dot product
-            /// @param ui
-            /// @param uj
-            /// @param vi
-            /// @param vj
-            /// @return
-            QUICC_CUDA_HOSTDEV T operator()(T w, T ui, T uj, T vi, T vj)
-            {
-               return w - _scaling * (ui * vj - uj * vi - uj);
-            }
-         };
-
          template <typename TFIELD>
          static void collectViews(std::vector<typename TFIELD::ScalarFieldType::ViewStorageType>& vs, const TFIELD& f);
    };
@@ -202,13 +147,13 @@ namespace Physical {
       if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
-         using fct_t = AddStreamHeatAdvFunctor<scalar_t>;
+         using fct_t = details::AddTmplFunctor<scalar_t, StreamHeatAdvFunctor>;
          fct_t f(c);
          Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
          std::vector<view_t> vs;
          collectViews(vs, dPsi);
          collectViews(vs, w);
-         op.apply(rS.rDataView(), rS.dataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3));
+         op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), rS.dataView());
       }
       else
       {
@@ -234,13 +179,13 @@ namespace Physical {
       if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
-         using fct_t = SubStreamHeatAdvFunctor<scalar_t>;
+         using fct_t = details::SubTmplFunctor<scalar_t, StreamHeatAdvFunctor>;
          fct_t f(c);
          Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
          std::vector<view_t> vs;
          collectViews(vs, dPsi);
          collectViews(vs, w);
-         op.apply(rS.rDataView(), rS.dataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3));
+         op.apply(rS.rDataView(), vs.at(0), vs.at(1), vs.at(2), vs.at(3), rS.dataView());
       }
       else
       {

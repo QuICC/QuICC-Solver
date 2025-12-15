@@ -17,6 +17,7 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "ViewOps/Pointwise/Functors.hpp"
 #include "ViewOps/Pointwise/Pointwise.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
 
 namespace QuICC {
 
@@ -60,61 +61,6 @@ namespace Physical {
          ~Cross() = default;
 
       private:
-         /// @tparam T scalar
-         template <class T = double> struct AddCrossCompFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            AddCrossCompFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            AddCrossCompFunctor() = delete;
-
-            /// @brief dtor
-            ~AddCrossCompFunctor() = default;
-
-            /// @brief Cross product, component wise
-            /// @param uj
-            /// @param uk
-            /// @param vj
-            /// @param vk
-            /// @return i component of cross product
-            QUICC_CUDA_HOSTDEV T operator()(T w, T uj, T uk, T vj, T vk)
-            {
-               return w + _scaling * (uj * vk - uk * vj);
-            }
-         };
-
-         /// @tparam T scalar
-         template <class T = double> struct SubCrossCompFunctor
-         {
-            /// @brief non dimensional scaling for transport term
-            T _scaling;
-
-            /// @brief ctor
-            /// @param scaling
-            SubCrossCompFunctor(T scaling) : _scaling(scaling){};
-
-            /// @brief deleted default constructor
-            SubCrossCompFunctor() = delete;
-
-            /// @brief dtor
-            ~SubCrossCompFunctor() = default;
-
-            /// @brief Cross product, component wise
-            /// @param uj
-            /// @param uk
-            /// @param vj
-            /// @param vk
-            /// @return i component of cross product
-            QUICC_CUDA_HOSTDEV T operator()(T w, T uj, T uk, T vj, T vk)
-            {
-               return w - _scaling * (uj * vk - uk * vj);
-            }
-         };
    };
 
    template <FieldComponents::Physical::Id TFIRST,FieldComponents::Physical::Id TSECOND> template <typename TFIELD> inline void Cross<TFIRST,TSECOND>::set(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &v, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &w, const MHDFloat c)
@@ -150,10 +96,10 @@ namespace Physical {
       if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
-         using fct_t = AddCrossCompFunctor<scalar_t>;
+         using fct_t = details::AddTmplFunctor<scalar_t, Pointwise::CrossCompFunctor>;
          fct_t f(c);
          Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
-         op.apply(rS.rDataView(), rS.dataView(), v.comp(TFIRST).dataView(), v.comp(TSECOND).dataView(), w.comp(TFIRST).dataView(), w.comp(TSECOND).dataView());
+         op.apply(rS.rDataView(), v.comp(TFIRST).dataView(), v.comp(TSECOND).dataView(), w.comp(TFIRST).dataView(), w.comp(TSECOND).dataView(), rS.dataView());
       }
       else
       {
@@ -177,10 +123,10 @@ namespace Physical {
       if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
          using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
-         using fct_t = SubCrossCompFunctor<scalar_t>;
+         using fct_t = details::SubTmplFunctor<scalar_t, Pointwise::CrossCompFunctor>;
          fct_t f(c);
          Pointwise::Cpu::Op<fct_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
-         op.apply(rS.rDataView(), rS.dataView(), v.comp(TFIRST).dataView(), v.comp(TSECOND).dataView(), w.comp(TFIRST).dataView(), w.comp(TSECOND).dataView());
+         op.apply(rS.rDataView(), v.comp(TFIRST).dataView(), v.comp(TSECOND).dataView(), w.comp(TFIRST).dataView(), w.comp(TSECOND).dataView(), rS.dataView());
       }
       else
       {
