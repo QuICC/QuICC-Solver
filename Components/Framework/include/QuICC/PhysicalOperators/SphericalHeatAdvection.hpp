@@ -94,15 +94,18 @@ namespace Physical {
          {
             const Resolution& _res;
 
-            const int dim3D;
-
-            IdxResFunctor(const Resolution& res) : _res(res), dim3D(res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>()) {};
+            IdxResFunctor(const Resolution& res) : _res(res) {};
 
             /// @brief deleted default constructor
             IdxResFunctor() = delete;
 
             /// @brief dtor
             ~IdxResFunctor() = default;
+
+            int dim3D() const
+            {
+               return _res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
+            }
 
             int idx3D(const int k) const
             {
@@ -260,7 +263,7 @@ namespace Physical {
       }
       else
       {
-         int nR = idxFunc.dim3D;
+         int nR = idxFunc.dim3D();
          int iR_;
 
          if(c != 1.0)
@@ -311,7 +314,7 @@ namespace Physical {
       }
       else
       {
-         int nR = idxFunc.dim3D;
+         int nR = idxFunc.dim3D();
          int iR_;
 
          if(c != 1.0)
@@ -362,7 +365,7 @@ namespace Physical {
       }
       else
       {
-         int nR = idxFunc.dim3D;
+         int nR = idxFunc.dim3D();
          int iR_;
 
          if(c != 1.0)

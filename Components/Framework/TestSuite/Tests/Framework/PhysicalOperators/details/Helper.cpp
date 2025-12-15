@@ -119,5 +119,18 @@ namespace details {
 
       return spSetup;
    }
+
+   std::vector<std::uint32_t> validationVariants()
+   {
+      std::vector<std::uint32_t> variants = {0, 10, 20};
+      return variants;
+   }
+
+   std::vector<std::uint32_t> performanceVariants()
+   {
+      //std::vector<std::uint32_t> variants = {0, 10, 20, 30, 40};
+      std::vector<std::uint32_t> variants = {20};
+      return variants;
+   }
 }
 

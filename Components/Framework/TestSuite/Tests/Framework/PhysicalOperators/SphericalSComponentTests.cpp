@@ -18,9 +18,7 @@ using TestOp = QuICC::Physical::SphericalSComponent;
 
 TEST_CASE("SphericalSComponent product validation FlatScalarField vs ViewScalarField", "[SphericalSComponentValidation]")
 {
-   INFO( "SphericalSComponent" );
-
-   std::vector<std::uint32_t> variants = {0, 10, 20};
+   std::vector<std::uint32_t> variants = details::validationVariants();
    for(std::uint32_t varBase: variants)
    {
       INFO( "variant = " << varBase );
@@ -32,10 +30,10 @@ TEST_CASE("SphericalSComponent product validation FlatScalarField vs ViewScalarF
       std::vector<std::size_t> idx3D;
       auto spSetup = details::createSetup(dim1D, dim2D, dim3D, idx2D, idx3D, details::SetupType::UniformUp, varBase + 0);
 
-      auto spSFlatA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+      auto spSFlatA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
       auto spVFlatA = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
-      auto spSViewA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+      auto spSViewA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
       auto spVViewA = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
       QuICC::Array cosTheta(dim2D);
@@ -47,7 +45,7 @@ TEST_CASE("SphericalSComponent product validation FlatScalarField vs ViewScalarF
          sinTheta(i) = std::sin(theta);
       }
 
-      details::IdxFunctor idxFunc(idx3D.size(), idx2D, idx3D);
+      details::IdxFunctor idxFunc(idx2D, idx3D);
 
       constexpr auto R = QuICC::FieldComponents::Physical::R;
       constexpr auto T = QuICC::FieldComponents::Physical::THETA;
@@ -95,11 +93,11 @@ TEST_CASE("SphericalSComponent product validation FlatScalarField vs ViewScalarF
 
 TEST_CASE("SphericalSComponent product timing", "[SphericalSComponentTiming]")
 {
-   INFO( "SphericalSComponent" );
+   const std::string testName = "SphericalSComponentTests";
 
    std::uint32_t itMax = 100;
    std::vector<double> cs = {1.0, 3.0};
-   std::vector<std::uint32_t> variants = {0, 10, 20, 30, 40};
+   std::vector<std::uint32_t> variants = details::performanceVariants();
 
    std::string ctag = "";
    for(std::uint32_t varBase: variants)
@@ -119,7 +117,7 @@ TEST_CASE("SphericalSComponent product timing", "[SphericalSComponentTiming]")
          sinTheta(i) = std::sin(theta);
       }
 
-      details::IdxFunctor idxFunc(idx3D.size(), idx2D, idx3D);
+      details::IdxFunctor idxFunc(idx2D, idx3D);
 
       for(auto&& c: cs)
       {
@@ -134,43 +132,43 @@ TEST_CASE("SphericalSComponent product timing", "[SphericalSComponentTiming]")
 
          // Timing FlatScalarField
          {
-            auto spScalarA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+            auto spScalarA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
             auto spVectorA = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
             for(std::uint32_t it = 0; it < itMax; it++)
             {
-               QuICC::Profiler::RegionStart<1>("SphericalSComponentTests::Flat" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Set_" + std::to_string(varBase));
                TestOp::set(*spScalarA, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               QuICC::Profiler::RegionStop<1>("SphericalSComponentTests::Flat" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Set_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("SphericalSComponentTests::Flat" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Add_" + std::to_string(varBase));
                TestOp::add(*spScalarA, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               QuICC::Profiler::RegionStop<1>("SphericalSComponentTests::Flat" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Add_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("SphericalSComponentTests::Flat" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Sub_" + std::to_string(varBase));
                TestOp::sub(*spScalarA, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               QuICC::Profiler::RegionStop<1>("SphericalSComponentTests::Flat" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Sub_" + std::to_string(varBase));
             }
          }
 
          // Timing ViewScalarField
          {
-            auto spScalarA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+            auto spScalarA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
             auto spVectorA = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
             for(std::uint32_t it = 0; it < itMax; it++)
             {
-               QuICC::Profiler::RegionStart<1>("SphericalSComponentTests::View" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Set_" + std::to_string(varBase));
                TestOp::set(*spScalarA, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               QuICC::Profiler::RegionStop<1>("SphericalSComponentTests::View" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Set_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("SphericalSComponentTests::View" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Add_" + std::to_string(varBase));
                TestOp::add(*spScalarA, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               QuICC::Profiler::RegionStop<1>("SphericalSComponentTests::View" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Add_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("SphericalSComponentTests::View" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Sub_" + std::to_string(varBase));
                TestOp::sub(*spScalarA, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               QuICC::Profiler::RegionStop<1>("SphericalSComponentTests::View" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Sub_" + std::to_string(varBase));
             }
          }
       }

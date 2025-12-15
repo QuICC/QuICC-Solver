@@ -9,6 +9,7 @@
 #include "QuICC/ScalarFields/FlatScalarField.hpp"
 #include "QuICC/ScalarFields/ViewScalarField.hpp"
 #include "QuICC/VectorFields/VectorField.hpp"
+#include "QuICC/TensorFields/TensorField.hpp"
 
 namespace details {
 
@@ -22,12 +23,22 @@ namespace details {
 
    template <typename T, template <typename> class TField> std::shared_ptr<QuICC::Datatypes::VectorField<TField<T>, QuICC::FieldComponents::Physical::Id>> createVectorField(const std::size_t dim1D, const std::size_t dim3D, const std::vector<std::vector<std::size_t>>& idx2D, const std::vector<std::size_t>& idx3D, std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> spSetup, const std::uint32_t variant);
 
+   template <typename T, template <typename> class TField> std::shared_ptr<QuICC::Datatypes::TensorField<TField<T>, QuICC::FieldComponents::Physical::Id>> createTensorField(const std::size_t dim1D, const std::size_t dim3D, const std::vector<std::vector<std::size_t>>& idx2D, const std::vector<std::size_t>& idx3D, std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> spSetup, const std::uint32_t variant);
+
+   std::vector<std::uint32_t> validationVariants();
+   std::vector<std::uint32_t> performanceVariants();
+
    template <typename T> T fieldValueGeneric(const int i, const int j, const int k, const T offset, const T base, const T c);
    template <typename T> T fieldValueA(const int i, const int j, const int k);
    template <typename T> T fieldValueB(const int i, const int j, const int k);
    template <typename T> T fieldValueC(const int i, const int j, const int k);
    template <typename T> T fieldValueD(const int i, const int j, const int k);
    template <typename T> T fieldValueE(const int i, const int j, const int k);
+   template <typename T> T fieldValueF(const int i, const int j, const int k);
+   template <typename T> T fieldValueG(const int i, const int j, const int k);
+   template <typename T> T fieldValueH(const int i, const int j, const int k);
+   template <typename T> T fieldValueI(const int i, const int j, const int k);
+   template <typename T> T fieldValueK(const int i, const int j, const int k);
    template <typename T> T fieldValueBad(const int i, const int j, const int k);
 
    template <typename T> T fieldValueGeneric(const int i, const int j, const int k, const T offset, const T base, const T c)
@@ -60,6 +71,31 @@ namespace details {
       return fieldValueGeneric<T>(i, j, k, -56.0, 104.0, -1.0);
    }
 
+   template <typename T> T fieldValueF(const int i, const int j, const int k)
+   {
+      return fieldValueGeneric<T>(i, j, k, 17.0, 33.0, 1.0);
+   }
+
+   template <typename T> T fieldValueG(const int i, const int j, const int k)
+   {
+      return fieldValueGeneric<T>(i, j, k, -3.0, 27.0, -1.0);
+   }
+
+   template <typename T> T fieldValueH(const int i, const int j, const int k)
+   {
+      return fieldValueGeneric<T>(i, j, k, -11.0, 46.0, 1.0);
+   }
+
+   template <typename T> T fieldValueI(const int i, const int j, const int k)
+   {
+      return fieldValueGeneric<T>(i, j, k, 9.0, 15.0, -1.0);
+   }
+
+   template <typename T> T fieldValueJ(const int i, const int j, const int k)
+   {
+      return fieldValueGeneric<T>(i, j, k, -5.0, 39.0, 1.0);
+   }
+
    template <typename T> T fieldValueBad(const int i, const int j, const int k)
    {
       return fieldValueGeneric<T>(i, j, k, 42.42, 0.01, -1.0);
@@ -67,12 +103,10 @@ namespace details {
 
    struct IdxFunctor
    {
-      const int dim3D;
-
       const std::vector<std::vector<std::size_t>>& _idx2D;
       const std::vector<std::size_t>& _idx3D;
 
-      IdxFunctor(const int dim3D, const std::vector<std::vector<std::size_t>>& idx2D, const std::vector<std::size_t>& idx3D) : dim3D(dim3D), _idx2D(idx2D), _idx3D(idx3D) {};
+      IdxFunctor(const std::vector<std::vector<std::size_t>>& idx2D, const std::vector<std::size_t>& idx3D) : _idx2D(idx2D), _idx3D(idx3D) {};
 
       IdxFunctor() = delete;
 
@@ -91,6 +125,11 @@ namespace details {
          return _idx2D.at(k).at(j);
       };
 
+      std::size_t dim3D() const
+      {
+         return _idx3D.size();
+      };
+
       std::size_t idx3D(const int k) const
       {
          assert(static_cast<std::size_t>(k) < _idx3D.size());
@@ -104,33 +143,48 @@ namespace details {
       using FieldValueFct = T (*)(const int i, const int j, const int k);
       FieldValueFct valueFct = nullptr;
 
-      if(variant % 10 == 0)
+      if(variant < 100)
       {
-         valueFct = fieldValueA;
-      }
-      else if(variant % 10 == 1)
-      {
-         valueFct = fieldValueB;
-      }
-      else if(variant % 10 == 2)
-      {
-         valueFct = fieldValueC;
-      }
-      else if(variant % 10 == 3)
-      {
-         valueFct = fieldValueD;
-      }
-      else if(variant % 10 == 4)
-      {
-         valueFct = fieldValueE;
-      }
-      else if(variant % 10 == 9)
-      {
-         valueFct = fieldValueBad;
+         switch(variant % 10)
+         {
+            case 0:
+               valueFct = fieldValueA;
+               break;
+            case 1:
+               valueFct = fieldValueB;
+               break;
+            case 2:
+               valueFct = fieldValueC;
+               break;
+            case 3:
+               valueFct = fieldValueD;
+               break;
+            case 4:
+               valueFct = fieldValueE;
+               break;
+            case 5:
+               valueFct = fieldValueF;
+               break;
+            case 6:
+               valueFct = fieldValueG;
+               break;
+            case 7:
+               valueFct = fieldValueH;
+               break;
+            case 8:
+               valueFct = fieldValueI;
+               break;
+            case 9:
+               valueFct = fieldValueJ;
+               break;
+            default:
+               throw std::logic_error("Unknown variant");
+               break;
+         }
       }
       else
       {
-         throw std::logic_error("Unknown variant");
+         valueFct = fieldValueBad;
       }
 
       assert(static_cast<std::size_t>(spSetup->nBlock()) == idx3D.size());
@@ -163,10 +217,13 @@ namespace details {
 
    template <typename T, template <typename> class TField> std::shared_ptr<QuICC::Datatypes::VectorField<TField<T>,QuICC::FieldComponents::Physical::Id>> createVectorField(const std::size_t dim1D, const std::size_t dim3D, const std::vector<std::vector<std::size_t>>& idx2D, const std::vector<std::size_t>& idx3D, std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> spSetup, const std::uint32_t variant)
    {
+      constexpr auto R = QuICC::FieldComponents::Physical::R;
+      constexpr auto THETA = QuICC::FieldComponents::Physical::THETA;
+      constexpr auto PHI = QuICC::FieldComponents::Physical::PHI;
       std::map<QuICC::FieldComponents::Physical::Id, bool> comps = {
-         {QuICC::FieldComponents::Physical::R, true},
-         {QuICC::FieldComponents::Physical::THETA, true},
-         {QuICC::FieldComponents::Physical::PHI, true}
+         {R, true},
+         {THETA, true},
+         {PHI, true}
       };
       auto spField = std::make_shared<QuICC::Datatypes::VectorField<TField<T>,QuICC::FieldComponents::Physical::Id>>(spSetup, comps);
       auto&& vfield = *spField;
@@ -175,6 +232,35 @@ namespace details {
       for(auto&& [c, v]: comps)
       {
          setFieldValue(vfield.rComp(c), dim1D, dim3D, idx2D, idx3D, spSetup, var);
+         var++;
+      }
+
+      return spField;
+   }
+
+   template <typename T, template <typename> class TField> std::shared_ptr<QuICC::Datatypes::TensorField<TField<T>,QuICC::FieldComponents::Physical::Id>> createTensorField(const std::size_t dim1D, const std::size_t dim3D, const std::vector<std::vector<std::size_t>>& idx2D, const std::vector<std::size_t>& idx3D, std::shared_ptr<QuICC::Datatypes::ScalarFieldSetup> spSetup, const std::uint32_t variant)
+   {
+      constexpr auto R = QuICC::FieldComponents::Physical::R;
+      constexpr auto THETA = QuICC::FieldComponents::Physical::THETA;
+      constexpr auto PHI = QuICC::FieldComponents::Physical::PHI;
+      std::map<std::pair<QuICC::FieldComponents::Physical::Id,QuICC::FieldComponents::Physical::Id>, bool> comps = {
+         {{R,R}, true},
+         {{R,THETA}, true},
+         {{R,PHI}, true},
+         {{THETA,R}, true},
+         {{THETA,THETA}, true},
+         {{THETA,PHI}, true},
+         {{PHI,R}, true},
+         {{PHI,THETA}, true},
+         {{PHI,PHI}, true}
+      };
+      auto spField = std::make_shared<QuICC::Datatypes::TensorField<TField<T>,QuICC::FieldComponents::Physical::Id>>(spSetup, comps);
+      auto&& vfield = *spField;
+
+      std::uint32_t var = variant;
+      for(auto&& [c, v]: comps)
+      {
+         setFieldValue(vfield.rComp(c.first, c.second), dim1D, dim3D, idx2D, idx3D, spSetup, var);
          var++;
       }
 

@@ -19,7 +19,7 @@ using TestOp = QuICC::Physical::SphericalHeatAdvection<TTONE,TTWO,TTHREE>;
 
 TEST_CASE("SphericalHeatAdvection product validation FlatScalarField vs ViewScalarField", "[SphericalHeatAdvectionValidation]")
 {
-   std::vector<std::uint32_t> variants = {0, 10, 20};
+   std::vector<std::uint32_t> variants = details::validationVariants();
    for(std::uint32_t varBase: variants)
    {
       INFO( "variant = " << varBase );
@@ -31,11 +31,11 @@ TEST_CASE("SphericalHeatAdvection product validation FlatScalarField vs ViewScal
       std::vector<std::size_t> idx3D;
       auto spSetup = details::createSetup(dim1D, dim2D, dim3D, idx2D, idx3D, details::SetupType::UniformUp, varBase + 0);
 
-      auto spSFlatA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+      auto spSFlatA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
       auto spVFlatA = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
       auto spVFlatB = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 2);
 
-      auto spSViewA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+      auto spSViewA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
       auto spVViewA = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
       auto spVViewB = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 2);
 
@@ -45,7 +45,7 @@ TEST_CASE("SphericalHeatAdvection product validation FlatScalarField vs ViewScal
          r(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
       }
 
-      details::IdxFunctor idxFunc(idx3D.size(), idx2D, idx3D);
+      details::IdxFunctor idxFunc(idx2D, idx3D);
 
       constexpr auto R = QuICC::FieldComponents::Physical::R;
       constexpr auto T = QuICC::FieldComponents::Physical::THETA;
@@ -94,13 +94,15 @@ TEST_CASE("SphericalHeatAdvection product validation FlatScalarField vs ViewScal
 
 TEST_CASE("SphericalHeatAdvection product timing", "[SphericalHeatAdvectionTiming]")
 {
+   const std::string testName = "SphericalHeatAdvectionTests";
+
    constexpr auto R = QuICC::FieldComponents::Physical::R;
    constexpr auto T = QuICC::FieldComponents::Physical::THETA;
    constexpr auto P = QuICC::FieldComponents::Physical::PHI;
 
    std::uint32_t itMax = 100;
    std::vector<double> cs = {1.0, 3.0};
-   std::vector<std::uint32_t> variants = {0, 10, 20, 30, 40};
+   std::vector<std::uint32_t> variants = details::performanceVariants();
 
    std::string ctag = "";
    for(std::uint32_t varBase: variants)
@@ -117,7 +119,7 @@ TEST_CASE("SphericalHeatAdvection product timing", "[SphericalHeatAdvectionTimin
          r(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
       }
 
-      details::IdxFunctor idxFunc(idx3D.size(), idx2D, idx3D);
+      details::IdxFunctor idxFunc(idx2D, idx3D);
 
       for(auto&& c: cs)
       {
@@ -132,45 +134,45 @@ TEST_CASE("SphericalHeatAdvection product timing", "[SphericalHeatAdvectionTimin
 
          // Timing FlatScalarField
          {
-            auto spScalarA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+            auto spScalarA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
             auto spVectorA = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
             auto spVectorB = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 2);
 
             for(std::uint32_t it = 0; it < itMax; it++)
             {
-               QuICC::Profiler::RegionStart<1>("SphericalHeatAdvectionTests::Flat" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Set_" + std::to_string(varBase));
                TestOp<R,T,P>::set(*spScalarA, idxFunc, r, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("SphericalHeatAdvectionTests::Flat" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Set_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("SphericalHeatAdvectionTests::Flat" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Add_" + std::to_string(varBase));
                TestOp<R,T,P>::add(*spScalarA, idxFunc, r, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("SphericalHeatAdvectionTests::Flat" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Add_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("SphericalHeatAdvectionTests::Flat" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Sub_" + std::to_string(varBase));
                TestOp<R,T,P>::sub(*spScalarA, idxFunc, r, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("SphericalHeatAdvectionTests::Flat" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Sub_" + std::to_string(varBase));
             }
          }
 
          // Timing ViewScalarField
          {
-            auto spScalarA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+            auto spScalarA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
             auto spVectorA = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
             auto spVectorB = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 2);
 
             for(std::uint32_t it = 0; it < itMax; it++)
             {
-               QuICC::Profiler::RegionStart<1>("SphericalHeatAdvectionTests::View" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Set_" + std::to_string(varBase));
                TestOp<R,T,P>::set(*spScalarA, idxFunc, r, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("SphericalHeatAdvectionTests::View" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Set_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("SphericalHeatAdvectionTests::View" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Add_" + std::to_string(varBase));
                TestOp<R,T,P>::add(*spScalarA, idxFunc, r, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("SphericalHeatAdvectionTests::View" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Add_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("SphericalHeatAdvectionTests::View" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Sub_" + std::to_string(varBase));
                TestOp<R,T,P>::sub(*spScalarA, idxFunc, r, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("SphericalHeatAdvectionTests::View" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Sub_" + std::to_string(varBase));
             }
          }
       }

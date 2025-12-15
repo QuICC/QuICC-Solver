@@ -2,7 +2,7 @@ message(VERBOSE "Enabling PhysicalOperators tests:")
 
 set(TestExe FrameworkPhysicalOperatorsTests)
 
-add_executable(${TestExe} 
+add_executable(${TestExe}
   details/Helper.cpp
   PhysicalOperatorsTests.cpp
   CrossTests.cpp
@@ -10,9 +10,16 @@ add_executable(${TestExe}
   MassFluxAdvectionTests.cpp
   SphericalBuoyancyTests.cpp
   SphericalCoriolisTests.cpp
+  SphericalCoriolisAnelasticTests.cpp
   SphericalHeatAdvectionTests.cpp
+  SphericalLorentzAnelasticTests.cpp
+  SphericalPoincareTests.cpp
+  SphericalPrecessionTests.cpp
   SphericalSComponentTests.cpp
   SphericalZComponentTests.cpp
+  SphericalSelfAdvectionAnelasticTests.cpp
+  SphericalOhmicDissipationAnelasticTests.cpp
+  SphericalViscousDissipationAnelasticTests.cpp
   StreamAdvectionTests.cpp
   StreamHeatAdvectionTests.cpp
   VelocityAdvectionTests.cpp

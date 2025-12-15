@@ -84,9 +84,7 @@ namespace Physical {
          {
             const Resolution& _res;
 
-            const int dim3D;
-
-            IdxResFunctor(const Resolution& res) : _res(res), dim3D(res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>()) {};
+            IdxResFunctor(const Resolution& res) : _res(res) {};
 
             /// @brief deleted default constructor
             IdxResFunctor() = delete;
@@ -102,6 +100,11 @@ namespace Physical {
             int idx2D(const int j, const int k) const
             {
                return _res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT2D>(j, k);
+            }
+
+            int dim3D() const
+            {
+               return _res.cpu()->dim(Dimensions::Transform::TRA3D)->dim<Dimensions::Data::DAT3D>();
             }
          };
 
@@ -230,7 +233,7 @@ namespace Physical {
       }
       else
       {
-         int nR = idxFunc.dim3D;
+         int nR = idxFunc.dim3D();
          int nTh;
          int iTh_;
 
@@ -238,7 +241,7 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               nTh = idxFunc.dim2D(iR); 
+               nTh = idxFunc.dim2D(iR);
                for(int iTh = 0; iTh < nTh; ++iTh)
                {
                   iTh_ = idxFunc.idx2D(iTh, iR);
@@ -251,7 +254,7 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               nTh = idxFunc.dim2D(iR); 
+               nTh = idxFunc.dim2D(iR);
                for(int iTh = 0; iTh < nTh; ++iTh)
                {
                   iTh_ = idxFunc.idx2D(iTh, iR);
@@ -281,7 +284,7 @@ namespace Physical {
       }
       else
       {
-         int nR = idxFunc.dim3D;
+         int nR = idxFunc.dim3D();
          int nTh;
          int iTh_;
 
@@ -289,7 +292,7 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               nTh = idxFunc.dim2D(iR); 
+               nTh = idxFunc.dim2D(iR);
                for(int iTh = 0; iTh < nTh; ++iTh)
                {
                   iTh_ = idxFunc.idx2D(iTh, iR);
@@ -302,7 +305,7 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               nTh = idxFunc.dim2D(iR); 
+               nTh = idxFunc.dim2D(iR);
                for(int iTh = 0; iTh < nTh; ++iTh)
                {
                   iTh_ = idxFunc.idx2D(iTh, iR);
@@ -332,7 +335,7 @@ namespace Physical {
       }
       else
       {
-         int nR = idxFunc.dim3D;
+         int nR = idxFunc.dim3D();
          int nTh;
          int iTh_;
 
@@ -340,7 +343,7 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               nTh = idxFunc.dim2D(iR); 
+               nTh = idxFunc.dim2D(iR);
                for(int iTh = 0; iTh < nTh; ++iTh)
                {
                   iTh_ = idxFunc.idx2D(iTh, iR);
@@ -353,7 +356,7 @@ namespace Physical {
          {
             for(int iR = 0; iR < nR; ++iR)
             {
-               nTh = idxFunc.dim2D(iR); 
+               nTh = idxFunc.dim2D(iR);
                for(int iTh = 0; iTh < nTh; ++iTh)
                {
                   iTh_ = idxFunc.idx2D(iTh, iR);

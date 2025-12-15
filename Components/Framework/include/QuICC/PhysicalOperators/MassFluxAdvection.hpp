@@ -169,7 +169,7 @@ namespace Physical {
          vs.push_back(f.comp(TTHREE).dataView());
       }
 
-   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE> 
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
       template <typename TFIELD>
       void MassFluxAdvection<TONE,TTWO,TTHREE>::set(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
    {
@@ -204,7 +204,7 @@ namespace Physical {
          }
       }
    }
- 
+
    template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
       template <typename TFIELD>
       void MassFluxAdvection<TONE,TTWO,TTHREE>::add(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)

@@ -6,15 +6,9 @@
 #ifndef QUICC_DATATYPES_TENSORFIELD_HPP
 #define QUICC_DATATYPES_TENSORFIELD_HPP
 
-// Configuration includes
-//
-
 // System includes
 //
 #include <map>
-
-// External includes
-//
 
 // Project includes
 //
@@ -31,6 +25,9 @@ namespace Datatypes {
    template <typename TScalar, typename TType> class TensorField
    {
       public:
+         ///
+         typedef TScalar ScalarFieldType;
+
          /**
           * @brief Constructor with simplified interface
           *
@@ -172,7 +169,7 @@ namespace Datatypes {
       return mem;
    }
 
-}
-}
+} // namespace Datatypes
+} // namespace QuICC
 
 #endif // QUICC_DATATYPES_TENSORFIELD_HPP

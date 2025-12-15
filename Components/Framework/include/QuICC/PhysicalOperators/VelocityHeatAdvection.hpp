@@ -169,7 +169,7 @@ namespace Physical {
          vs.push_back(f.comp(TTHREE).dataView());
       }
 
-   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE> 
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
       template <typename TFIELD>
       void VelocityHeatAdvection<TONE,TTWO,TTHREE>::set(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
       {
@@ -205,7 +205,7 @@ namespace Physical {
          }
       }
 
-   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE> 
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
       template <typename TFIELD>
       void VelocityHeatAdvection<TONE,TTWO,TTHREE>::add(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
       {
@@ -241,7 +241,7 @@ namespace Physical {
          }
       }
 
-   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE> 
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO, FieldComponents::Physical::Id TTHREE>
       template <typename TFIELD>
       void VelocityHeatAdvection<TONE,TTWO,TTHREE>::sub(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
       {
@@ -417,7 +417,7 @@ namespace Physical {
          vs.push_back(f.comp(TTWO).dataView());
       }
 
-   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO> 
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO>
       template <typename TFIELD>
       void VelocityHeatAdvection<TONE,TTWO,FieldComponents::Physical::NOTUSED>::set(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
       {
@@ -449,7 +449,7 @@ namespace Physical {
          }
       }
 
-   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO> 
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO>
       template <typename TFIELD>
       void VelocityHeatAdvection<TONE,TTWO,FieldComponents::Physical::NOTUSED>::add(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
       {
@@ -481,7 +481,7 @@ namespace Physical {
          }
       }
 
-   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO> 
+   template <FieldComponents::Physical::Id TONE, FieldComponents::Physical::Id TTWO>
       template <typename TFIELD>
       void VelocityHeatAdvection<TONE,TTWO,FieldComponents::Physical::NOTUSED>::sub(TFIELD &rS, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &u, const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &gradQ, const MHDFloat c)
       {

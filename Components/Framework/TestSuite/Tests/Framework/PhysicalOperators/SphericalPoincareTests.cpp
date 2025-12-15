@@ -5,7 +5,7 @@
 //#include "QuICC/Enums/FieldIds.hpp"
 #include "QuICC/ScalarFields/ScalarFieldSetup.hpp"
 #include "details/Helper.hpp"
-#include "QuICC/PhysicalOperators/SphericalCoriolis.hpp"
+#include "QuICC/PhysicalOperators/SphericalPoincare.hpp"
 #include "Profiler/Interface.hpp"
 #include "Types/Math.hpp"
 
@@ -14,9 +14,9 @@ template <typename T>
 template <typename T>
    using sview_t = QuICC::Datatypes::ViewScalarField<T>;
 
-using TestOp = QuICC::Physical::SphericalCoriolis;
+using TestOp = QuICC::Physical::SphericalPoincare;
 
-TEST_CASE("SphericalCoriolis product validation FlatScalarField vs ViewScalarField", "[SphericalCoriolisValidation]")
+TEST_CASE("SphericalPoincare product validation FlatScalarField vs ViewScalarField", "[SphericalPoincareValidation]")
 {
    std::vector<std::uint32_t> variants = details::validationVariants();
    for(std::uint32_t varBase: variants)
@@ -31,19 +31,30 @@ TEST_CASE("SphericalCoriolis product validation FlatScalarField vs ViewScalarFie
       auto spSetup = details::createSetup(dim1D, dim2D, dim3D, idx2D, idx3D, details::SetupType::UniformUp, varBase + 0);
 
       auto spSFlatA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
-      auto spVFlatA = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
       auto spSViewA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
-      auto spVViewA = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
-      QuICC::Array cosTheta(dim2D);
-      QuICC::Array sinTheta(dim2D);
+      QuICC::Array rGrid(dim3D);
+      for(std::uint32_t i = 0; i < dim3D; i++)
+      {
+         rGrid(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+      }
+
+      QuICC::Array tGrid(dim2D);
       for(std::uint32_t i = 0; i < dim2D; i++)
       {
-         double theta = 2.0*QuICC::Math::PI*static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
-         cosTheta(i) = std::cos(theta);
-         sinTheta(i) = std::sin(theta);
+         double theta = QuICC::Math::PI*static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         tGrid(i) = theta;
       }
+
+      QuICC::Array pGrid(dim1D);
+      for(std::uint32_t i = 0; i < dim1D; i++)
+      {
+         double phi = 2.0*QuICC::Math::PI*static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         pGrid(i) = phi;
+      }
+
+      const double t = 0.13;
 
       details::IdxFunctor idxFunc(idx2D, idx3D);
 
@@ -52,9 +63,6 @@ TEST_CASE("SphericalCoriolis product validation FlatScalarField vs ViewScalarFie
       constexpr auto P = QuICC::FieldComponents::Physical::PHI;
 
       details::checkComputation(spSetup, *spSFlatA, *spSViewA);
-      details::checkComputation(spSetup, spVFlatA->comp(R), spVViewA->comp(R));
-      details::checkComputation(spSetup, spVFlatA->comp(T), spVViewA->comp(T));
-      details::checkComputation(spSetup, spVFlatA->comp(P), spVViewA->comp(P));
 
       std::vector<double> cs = {1.0, 3.0};
       for(auto&& c: cs)
@@ -66,16 +74,18 @@ TEST_CASE("SphericalCoriolis product validation FlatScalarField vs ViewScalarFie
             INFO( "Set operation" );
 
             INFO( "R component" );
-            TestOp::set(*spSFlatA, R, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::set(*spSViewA, R, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            TestOp::set(*spSFlatA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
+            TestOp::set(*spSViewA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
             details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+
             INFO( "T component" );
-            TestOp::set(*spSFlatA, T, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::set(*spSViewA, T, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            TestOp::set(*spSFlatA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
+            TestOp::set(*spSViewA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
             details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+
             INFO( "P component" );
-            TestOp::set(*spSFlatA, P, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::set(*spSViewA, P, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            TestOp::set(*spSFlatA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
+            TestOp::set(*spSViewA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
             details::checkComputation(spSetup, *spSFlatA, *spSViewA);
          }
 
@@ -84,16 +94,18 @@ TEST_CASE("SphericalCoriolis product validation FlatScalarField vs ViewScalarFie
             INFO( "Add operation" );
 
             INFO( "R component" );
-            TestOp::add(*spSFlatA, R, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::add(*spSViewA, R, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            TestOp::add(*spSFlatA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
+            TestOp::add(*spSViewA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
             details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+
             INFO( "T component" );
-            TestOp::add(*spSFlatA, T, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::add(*spSViewA, T, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            TestOp::add(*spSFlatA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
+            TestOp::add(*spSViewA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
             details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+
             INFO( "P component" );
-            TestOp::add(*spSFlatA, P, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::add(*spSViewA, P, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            TestOp::add(*spSFlatA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
+            TestOp::add(*spSViewA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
             details::checkComputation(spSetup, *spSFlatA, *spSViewA);
          }
 
@@ -102,25 +114,27 @@ TEST_CASE("SphericalCoriolis product validation FlatScalarField vs ViewScalarFie
             INFO( "Sub operation" );
 
             INFO( "R component" );
-            TestOp::sub(*spSFlatA, R, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::sub(*spSViewA, R, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            TestOp::sub(*spSFlatA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
+            TestOp::sub(*spSViewA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
             details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+
             INFO( "T component" );
-            TestOp::sub(*spSFlatA, T, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::sub(*spSViewA, T, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            TestOp::sub(*spSFlatA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
+            TestOp::sub(*spSViewA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
             details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+
             INFO( "P component" );
-            TestOp::sub(*spSFlatA, P, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::sub(*spSViewA, P, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            TestOp::sub(*spSFlatA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
+            TestOp::sub(*spSViewA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
             details::checkComputation(spSetup, *spSFlatA, *spSViewA);
          }
       }
    }
 }
 
-TEST_CASE("SphericalCoriolis product timing", "[SphericalCoriolisTiming]")
+TEST_CASE("SphericalPoincare product timing", "[SphericalPoincareTiming]")
 {
-   const std::string testName = "SphericalCoriolisTests";
+   const std::string testName = "SphericalPoincareTests";
 
    constexpr auto R = QuICC::FieldComponents::Physical::R;
    constexpr auto T = QuICC::FieldComponents::Physical::THETA;
@@ -139,16 +153,30 @@ TEST_CASE("SphericalCoriolis product timing", "[SphericalCoriolisTiming]")
       std::vector<std::vector<std::size_t>> idx2D;
       std::vector<std::size_t> idx3D;
       auto spSetup = details::createSetup(dim1D, dim2D, dim3D, idx2D, idx3D, details::SetupType::UniformUp, varBase + 0);
-      QuICC::Array cosTheta(dim2D);
-      QuICC::Array sinTheta(dim2D);
-      for(std::uint32_t i = 0; i < dim2D; i++)
-      {
-         auto theta = 2.0*QuICC::Math::PI*static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
-         cosTheta(i) = std::cos(theta);
-         sinTheta(i) = std::sin(theta);
-      }
 
       details::IdxFunctor idxFunc(idx2D, idx3D);
+
+      QuICC::Array rGrid(dim3D);
+      for(std::uint32_t i = 0; i < dim3D; i++)
+      {
+         rGrid(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+      }
+
+      QuICC::Array tGrid(dim2D);
+      for(std::uint32_t i = 0; i < dim2D; i++)
+      {
+         double theta = QuICC::Math::PI*static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         tGrid(i) = theta;
+      }
+
+      QuICC::Array pGrid(dim1D);
+      for(std::uint32_t i = 0; i < dim1D; i++)
+      {
+         double phi = 2.0*QuICC::Math::PI*static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         pGrid(i) = phi;
+      }
+
+      const double t = 0.13;
 
       for(auto&& c: cs)
       {
@@ -164,26 +192,25 @@ TEST_CASE("SphericalCoriolis product timing", "[SphericalCoriolisTiming]")
          // Timing FlatScalarField
          {
             auto spScalarA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
-            auto spVectorA = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
             for(std::uint32_t it = 0; it < itMax; it++)
             {
                QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Set_" + std::to_string(varBase));
-               TestOp::set(*spScalarA, R, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::set(*spScalarA, T, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::set(*spScalarA, P, idxFunc, cosTheta, sinTheta, *spVectorA, c);
+               TestOp::set(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::set(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::set(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
                QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Set_" + std::to_string(varBase));
 
                QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Add_" + std::to_string(varBase));
-               TestOp::add(*spScalarA, R, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::add(*spScalarA, T, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::add(*spScalarA, P, idxFunc, cosTheta, sinTheta, *spVectorA, c);
+               TestOp::add(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::add(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::add(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
                QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Add_" + std::to_string(varBase));
 
                QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Sub_" + std::to_string(varBase));
-               TestOp::sub(*spScalarA, R, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::sub(*spScalarA, T, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::sub(*spScalarA, P, idxFunc, cosTheta, sinTheta, *spVectorA, c);
+               TestOp::sub(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::sub(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::sub(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
                QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Sub_" + std::to_string(varBase));
             }
          }
@@ -191,26 +218,25 @@ TEST_CASE("SphericalCoriolis product timing", "[SphericalCoriolisTiming]")
          // Timing ViewScalarField
          {
             auto spScalarA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
-            auto spVectorA = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
             for(std::uint32_t it = 0; it < itMax; it++)
             {
                QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Set_" + std::to_string(varBase));
-               TestOp::set(*spScalarA, R, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::set(*spScalarA, T, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::set(*spScalarA, P, idxFunc, cosTheta, sinTheta, *spVectorA, c);
+               TestOp::set(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::set(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::set(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
                QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Set_" + std::to_string(varBase));
 
                QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Add_" + std::to_string(varBase));
-               TestOp::add(*spScalarA, R, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::add(*spScalarA, T, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::add(*spScalarA, P, idxFunc, cosTheta, sinTheta, *spVectorA, c);
+               TestOp::add(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::add(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::add(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
                QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Add_" + std::to_string(varBase));
 
                QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Sub_" + std::to_string(varBase));
-               TestOp::sub(*spScalarA, R, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::sub(*spScalarA, T, idxFunc, cosTheta, sinTheta, *spVectorA, c);
-               TestOp::sub(*spScalarA, P, idxFunc, cosTheta, sinTheta, *spVectorA, c);
+               TestOp::sub(*spScalarA, R, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::sub(*spScalarA, T, idxFunc, rGrid, tGrid, pGrid, t, c);
+               TestOp::sub(*spScalarA, P, idxFunc, rGrid, tGrid, pGrid, t, c);
                QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Sub_" + std::to_string(varBase));
             }
          }

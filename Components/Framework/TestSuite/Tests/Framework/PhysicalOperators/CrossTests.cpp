@@ -18,7 +18,7 @@ template <QuICC::FieldComponents::Physical::Id TFIRST, QuICC::FieldComponents::P
 
 TEST_CASE("Cross product validation FlatScalarField vs ViewScalarField", "[CrossValidation]")
 {
-   std::vector<std::uint32_t> variants = {0, 10, 20};
+   std::vector<std::uint32_t> variants = details::validationVariants();
    for(std::uint32_t varBase: variants)
    {
       INFO( "variant = " << varBase );
@@ -30,11 +30,11 @@ TEST_CASE("Cross product validation FlatScalarField vs ViewScalarField", "[Cross
       std::vector<std::size_t> idx3D;
       auto spSetup = details::createSetup(dim1D, dim2D, dim3D, idx2D, idx3D, details::SetupType::UniformUp, varBase + 0);
 
-      auto spSFlatA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+      auto spSFlatA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
       auto spVFlatA = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 0);
       auto spVFlatB = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
-      auto spSViewA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+      auto spSViewA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
       auto spVViewA = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 0);
       auto spVViewB = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
@@ -93,13 +93,15 @@ TEST_CASE("Cross product validation FlatScalarField vs ViewScalarField", "[Cross
 
 TEST_CASE("Cross product timing", "[CrossTiming]")
 {
+   const std::string testName = "CrossTests";
+
    constexpr auto R = QuICC::FieldComponents::Physical::R;
    constexpr auto T = QuICC::FieldComponents::Physical::THETA;
    constexpr auto P = QuICC::FieldComponents::Physical::PHI;
 
    std::uint32_t itMax = 100;
    std::vector<double> cs = {1.0, 3.0};
-   std::vector<std::uint32_t> variants = {0, 10, 20, 30, 40};
+   std::vector<std::uint32_t> variants = details::performanceVariants();
 
    std::string ctag = "";
    for(std::uint32_t varBase: variants)
@@ -124,57 +126,57 @@ TEST_CASE("Cross product timing", "[CrossTiming]")
 
          // Timing FlatScalarField
          {
-            auto spScalarA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+            auto spScalarA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
             auto spVectorA = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 0);
             auto spVectorB = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
             for(std::uint32_t it = 0; it < itMax; it++)
             {
-               QuICC::Profiler::RegionStart<1>("CrossTests::Flat" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Set_" + std::to_string(varBase));
                TestOp<T,P>::set(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<P,R>::set(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<R,T>::set(*spScalarA, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("CrossTests::Flat" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Set_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("CrossTests::Flat" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Add_" + std::to_string(varBase));
                TestOp<T,P>::add(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<P,R>::add(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<R,T>::add(*spScalarA, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("CrossTests::Flat" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Add_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("CrossTests::Flat" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::Flat" + ctag + "Sub_" + std::to_string(varBase));
                TestOp<T,P>::sub(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<P,R>::sub(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<R,T>::sub(*spScalarA, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("CrossTests::Flat" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::Flat" + ctag + "Sub_" + std::to_string(varBase));
             }
          }
 
          // Timing ViewScalarField
          {
-            auto spScalarA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 9);
+            auto spScalarA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
             auto spVectorA = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 0);
             auto spVectorB = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
 
             for(std::uint32_t it = 0; it < itMax; it++)
             {
-               QuICC::Profiler::RegionStart<1>("CrossTests::View" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Set_" + std::to_string(varBase));
                TestOp<T,P>::set(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<P,R>::set(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<R,T>::set(*spScalarA, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("CrossTests::View" + ctag + "Set_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Set_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("CrossTests::View" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Add_" + std::to_string(varBase));
                TestOp<T,P>::add(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<P,R>::add(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<R,T>::add(*spScalarA, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("CrossTests::View" + ctag + "Add_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Add_" + std::to_string(varBase));
 
-               QuICC::Profiler::RegionStart<1>("CrossTests::View" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStart<1>(testName + "::View" + ctag + "Sub_" + std::to_string(varBase));
                TestOp<T,P>::sub(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<P,R>::sub(*spScalarA, *spVectorA, *spVectorB, c);
                TestOp<R,T>::sub(*spScalarA, *spVectorA, *spVectorB, c);
-               QuICC::Profiler::RegionStop<1>("CrossTests::View" + ctag + "Sub_" + std::to_string(varBase));
+               QuICC::Profiler::RegionStop<1>(testName + "::View" + ctag + "Sub_" + std::to_string(varBase));
             }
          }
       }
