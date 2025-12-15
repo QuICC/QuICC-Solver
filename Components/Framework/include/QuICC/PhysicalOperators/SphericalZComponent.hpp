@@ -16,7 +16,7 @@
 #include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
-#include "ViewOps/Slicewise/NoTwoGridOp.hpp"
+#include "ViewOps/Slicewise/NoGridOp.hpp"
 #include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
 
 namespace QuICC {
@@ -173,7 +173,7 @@ namespace Physical {
          fct_t f(c);
          grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
          grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
-         Slicewise::Cpu::NoTwoGridOp<1, fct_t, view_t, grid_t, grid_t, view_t, view_t> op(f);
+         Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t> op(f);
          op.apply(rS.rGlobalView(), vCos, vSin, v.comp(FieldComponents::Physical::R).globalView(), v.comp(FieldComponents::Physical::THETA).globalView());
       }
       else
@@ -224,7 +224,7 @@ namespace Physical {
          fct_t f(c);
          grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
          grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
-         Slicewise::Cpu::NoTwoGridOp<1, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+         Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t> op(f);
          op.apply(rS.rGlobalView(), vCos, vSin, v.comp(FieldComponents::Physical::R).globalView(), v.comp(FieldComponents::Physical::THETA).globalView(), rS.dataView());
       }
       else
@@ -275,7 +275,7 @@ namespace Physical {
          fct_t f(c);
          grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
          grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
-         Slicewise::Cpu::NoTwoGridOp<1, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+         Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t> op(f);
          op.apply(rS.rGlobalView(), vCos, vSin, v.comp(FieldComponents::Physical::R).globalView(), v.comp(FieldComponents::Physical::THETA).globalView(), rS.dataView());
       }
       else

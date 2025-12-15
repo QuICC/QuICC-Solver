@@ -17,7 +17,6 @@
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "ViewOps/Slicewise/NoGridOp.hpp"
-#include "ViewOps/Slicewise/NoTwoGridOp.hpp"
 #include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
 
 namespace QuICC {
@@ -202,7 +201,7 @@ namespace Physical {
             using fct_t = SetRTFunctor<scalar_t>;
             fct_t f(c);
             grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
-            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, grid_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 1, grid_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vSin, v.comp(FieldComponents::Physical::PHI).globalView());
          }
          else
@@ -243,7 +242,7 @@ namespace Physical {
             using fct_t = SetRTFunctor<scalar_t>;
             fct_t f(c);
             grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
-            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, grid_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 1, grid_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vCos, v.comp(FieldComponents::Physical::PHI).globalView());
          }
          else
@@ -285,7 +284,7 @@ namespace Physical {
             fct_t f(c);
             grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
             grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
-            Slicewise::Cpu::NoTwoGridOp<1, fct_t, view_t, grid_t, grid_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vCos, vSin, v.comp(FieldComponents::Physical::THETA).globalView(), v.comp(FieldComponents::Physical::R).globalView());
          }
          else
@@ -338,7 +337,7 @@ namespace Physical {
             using fct_t = details::AddTmplFunctor<scalar_t, SetRTFunctor>;
             fct_t f(c);
             grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
-            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, grid_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 1, grid_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vSin, v.comp(FieldComponents::Physical::PHI).globalView(), rS.dataView());
          }
          else
@@ -379,7 +378,7 @@ namespace Physical {
             using fct_t = details::AddTmplFunctor<scalar_t, SetRTFunctor>;
             fct_t f(c);
             grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
-            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, grid_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 1, grid_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vCos, v.comp(FieldComponents::Physical::PHI).globalView(), rS.dataView());
          }
          else
@@ -421,7 +420,7 @@ namespace Physical {
             fct_t f(c);
             grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
             grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
-            Slicewise::Cpu::NoTwoGridOp<1, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vCos, vSin, v.comp(FieldComponents::Physical::THETA).globalView(), v.comp(FieldComponents::Physical::R).globalView(), rS.dataView());
          }
          else
@@ -474,7 +473,7 @@ namespace Physical {
             using fct_t = details::SubTmplFunctor<scalar_t, SetRTFunctor>;
             fct_t f(c);
             grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
-            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, grid_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 1, grid_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vSin, v.comp(FieldComponents::Physical::PHI).globalView(), rS.dataView());
          }
          else
@@ -515,7 +514,7 @@ namespace Physical {
             using fct_t = details::SubTmplFunctor<scalar_t, SetRTFunctor>;
             fct_t f(c);
             grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
-            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, grid_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 1, grid_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vCos, v.comp(FieldComponents::Physical::PHI).globalView(), rS.dataView());
          }
          else
@@ -557,7 +556,7 @@ namespace Physical {
             fct_t f(c);
             grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
             grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
-            Slicewise::Cpu::NoTwoGridOp<1, fct_t, view_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<1, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vCos, vSin, v.comp(FieldComponents::Physical::THETA).globalView(), v.comp(FieldComponents::Physical::R).globalView(), rS.dataView());
          }
          else

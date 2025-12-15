@@ -125,7 +125,7 @@ namespace Physical {
             /// @return
             QUICC_CUDA_HOSTDEV T operator()(T g, T ui)
             {
-               return _scaling * (g * ui);
+               return _scaling * g * ui;
             }
          };
    };
@@ -164,7 +164,7 @@ namespace Physical {
             using fct_t = SetFunctor<scalar_t>;
             fct_t f(c);
             grid_t vGrid(const_cast<scalar_t *>(r.data()), r.size());
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, grid_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 1, grid_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vGrid, q.globalView());
          }
          else
@@ -209,7 +209,7 @@ namespace Physical {
             using fct_t = details::AddTmplFunctor<scalar_t, SetFunctor>;
             fct_t f(c);
             grid_t vGrid(const_cast<scalar_t *>(r.data()), r.size());
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, grid_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 1, grid_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vGrid, q.globalView(), rS.dataView());
          }
          else
@@ -249,7 +249,7 @@ namespace Physical {
             using fct_t = details::SubTmplFunctor<scalar_t, SetFunctor>;
             fct_t f(c);
             grid_t vGrid(const_cast<scalar_t *>(r.data()), r.size());
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, grid_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 1, grid_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vGrid, q.globalView(), rS.dataView());
          }
          else

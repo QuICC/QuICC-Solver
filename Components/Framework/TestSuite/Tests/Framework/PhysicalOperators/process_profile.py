@@ -23,7 +23,7 @@ h5file = h5py.File(fname, 'r')
 refImpl = 'Flat'
 variants = [20]
 impls = [refImpl, 'View']
-ops = ['Set', 'Add', 'Sub']
+ops = ['Set', 'Add', 'Sub', 'CSet', 'CAdd', 'CSub']
 ds = [
         'Cross',
         'Dot',
