@@ -20,6 +20,8 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "QuICC/Equations/EquationParameters.hpp"
 #include "DenseSM/IGenericProfile.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
+#include "ViewOps/Slicewise/Cpu/NoGridOp.hpp"
 
 namespace QuICC {
 
@@ -128,6 +130,32 @@ namespace Physical {
             }
          };
 
+         /// @tparam T scalar
+         template <class T = double> struct SetFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _scaling;
+
+            /// @brief ctor
+            /// @param scaling
+            SetFunctor(T scaling) : _scaling(scaling){};
+
+            /// @brief deleted default constructor
+            SetFunctor() = delete;
+
+            /// @brief dtor
+            ~SetFunctor() = default;
+
+            /// @brief Dot product
+            /// @param g
+            /// @param ui
+            /// @return
+            QUICC_CUDA_HOSTDEV T operator()(T gr, T ui, T uj, T uk)
+            {
+               return _scaling * gr * (ui * ui  + uj * uj + uk * uk);
+            }
+         };
+
    };
 
    template <typename TFIELD>
@@ -167,27 +195,44 @@ namespace Physical {
                                                 const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &w,
                                                 const MHDFloat c)
    {
-      int nR = idxFunc.dim3D();
-      int iR_;
+      using scalar_t = typename TFIELD::PointType;
+      if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
+      {
+         using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+         using grid_t = View::ViewBase<double>;
+         using fct_t = SetFunctor<scalar_t>;
+         fct_t f(c);
+         grid_t vEta(const_cast<scalar_t *>(eta.data()), eta.size());
+         Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 1, 0, 0, grid_t, view_t, view_t, view_t> op(f);
+         auto vR = w.comp(FieldComponents::Physical::R).dataView();
+         auto vT = w.comp(FieldComponents::Physical::THETA).dataView();
+         auto vP = w.comp(FieldComponents::Physical::PHI).dataView();
+         op.apply(rS.rGlobalView(), vEta, vR, vT, vP);
+      }
+      else
+      {
+         int nR = idxFunc.dim3D();
+         int iR_;
 
-      for(int iR = 0; iR < nR; ++iR)
+         for(int iR = 0; iR < nR; ++iR)
          {
             iR_ = idxFunc.idx3D(iR);
 
             // Boussinesq part (not vanishing for dLogEta =0)
             rS.addSlice(c*eta(iR_)*(   w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                 * w.comp(FieldComponents::Physical::R).slice(iR).array()
-                                    ).matrix(), iR);
+                     * w.comp(FieldComponents::Physical::R).slice(iR).array()
+                     ).matrix(), iR);
 
             rS.addSlice(c*eta(iR_)*(   w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                 * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                                    ).matrix(), iR);
+                     * w.comp(FieldComponents::Physical::THETA).slice(iR).array()
+                     ).matrix(), iR);
 
             rS.addSlice(c*eta(iR_)*(   w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                 * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                                    ).matrix(), iR);
+                     * w.comp(FieldComponents::Physical::PHI).slice(iR).array()
+                     ).matrix(), iR);
 
          }
+      }
    }
 
    template <typename TFIELD, typename TIDXFUNC>

@@ -32,11 +32,11 @@ TEST_CASE("SphericalViscousDissipationAnelastic product validation FlatScalarFie
 
       auto spSFlatA = details::createScalarField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100 );
       auto spVFlatA = details::createVectorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
-      auto spTFlatB = details::createTensorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 2);
+      auto spTFlatB = details::createTensorField<double, sflat_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 3);
 
       auto spSViewA = details::createScalarField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 100);
       auto spVViewA = details::createVectorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 1);
-      auto spTViewB = details::createTensorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 2);
+      auto spTViewB = details::createTensorField<double, sview_t>(dim1D, dim3D, idx2D, idx3D, spSetup, varBase + 3);
 
       QuICC::Array rGrid(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
@@ -47,25 +47,25 @@ TEST_CASE("SphericalViscousDissipationAnelastic product validation FlatScalarFie
       QuICC::Array nu(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         nu(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         nu(i) = static_cast<double>(i+2)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array temp(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         temp(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         temp(i) = static_cast<double>(i+3)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array rho(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         rho(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         rho(i) = static_cast<double>(i+4)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array dLogRho(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         dLogRho(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         dLogRho(i) = static_cast<double>(i+0.1)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array tGrid(dim2D);
@@ -169,25 +169,25 @@ TEST_CASE("SphericalViscousDissipationAnelastic product timing", "[SphericalVisc
       QuICC::Array nu(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         nu(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         nu(i) = static_cast<double>(i+2)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array temp(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         temp(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         temp(i) = static_cast<double>(i+3)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array rho(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         rho(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         rho(i) = static_cast<double>(i+4)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array dLogRho(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         dLogRho(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         dLogRho(i) = static_cast<double>(i+0.)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array tGrid(dim2D);

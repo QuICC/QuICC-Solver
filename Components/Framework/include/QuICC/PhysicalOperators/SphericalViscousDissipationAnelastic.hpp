@@ -18,6 +18,8 @@
  #include "QuICC/ScalarFields/ScalarField.hpp"
  #include "QuICC/Equations/EquationParameters.hpp"
 #include "DenseSM/IGenericProfile.hpp"
+#include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
+#include "ViewOps/Slicewise/Cpu/NoGridOp.hpp"
 #include <iostream>
 
  namespace QuICC {
@@ -100,7 +102,7 @@
           static void set(TFIELD &rS,
                           const TIDXFUNC& idxFunc,
                           const Array& nu,
-                          const Array& T,
+                          const Array& temp,
                           const Array& rho,
                           const Array& dLogRho,
                           const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &v,
@@ -114,7 +116,7 @@
           static void add(TFIELD &rS,
                           const TIDXFUNC& idxFunc,
                           const Array& nu,
-                          const Array& T,
+                          const Array& temp,
                           const Array& rho,
                           const Array& dLogRho,
                           const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &v,
@@ -128,7 +130,7 @@
           static void sub(TFIELD &rS,
                           const TIDXFUNC& idxFunc,
                           const Array& nu,
-                          const Array& T,
+                          const Array& temp,
                           const Array& rho,
                           const Array& dLogRho,
                           const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &v,
@@ -212,6 +214,40 @@
             int idx3D(const int k) const
             {
                return _res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
+            }
+         };
+
+         /// @tparam T scalar
+         template <class T = double> struct SetFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _scaling;
+
+            /// @brief ctor
+            /// @param scaling
+            SetFunctor(T scaling) : _scaling(scaling){};
+
+            /// @brief deleted default constructor
+            SetFunctor() = delete;
+
+            /// @brief dtor
+            ~SetFunctor() = default;
+
+            /// @brief Dot product
+            /// @param g
+            /// @param ui
+            /// @returN
+            QUICC_CUDA_HOSTDEV T operator()(T nu, T temp, T rho, T dLogRho, T ui, T uj, T uk, T vii, T vij, T vik, T vji, T vjj, T vjk, T vki, T vkj, T vkk)
+            {
+               return _scaling * 2.0 * nu * rho * (
+                     + std::pow(-ui * dLogRho/rho +  vii / rho, 2)                  // E_rr^2
+                     + std::pow(vjj / rho, 2)                                       // E_tt^2
+                     + std::pow(vkk / rho, 2)                                       // E_pp^2
+                     + 2.0*std::pow( -0.5*uj*dLogRho/rho + 0.5*(vij +  vji)/rho, 2) // 2*E_rt^2
+                     + 2.0*std::pow( -0.5*uk*dLogRho/rho + 0.5*(vik +  vki)/rho, 2) // 2*E_rp^2
+                     + 2.0*std::pow(0.5*(vjk +  vkj)/rho, 2)                        // 2*E_tp^2
+                     - (1./3.)*std::pow(-ui * dLogRho/rho, 2)                       // - 1/3 div(u)
+                     ) / temp;
             }
          };
 
@@ -307,58 +343,90 @@
    void SphericalViscousDissipationAnelastic::set(TFIELD &rS,
                                              const TIDXFUNC& idxFunc,
                                              const Array& nu,
-                                             const Array& T,
+                                             const Array& temp,
                                              const Array& rho,
                                              const Array& dLogRho,
                                              const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &v,
                                              const Datatypes::TensorField<TFIELD, FieldComponents::Physical::Id> &Dv,
                                              const MHDFloat c)
    {
-      int nR = idxFunc.dim3D();
-      int iR_;
-
-      for(int iR = 0; iR < nR; ++iR)
+      using scalar_t = typename TFIELD::PointType;
+      if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
-         iR_ = idxFunc.idx3D(iR);
+         using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+         using grid_t = View::ViewBase<double>;
+         using fct_t = SetFunctor<scalar_t>;
+         fct_t f(c);
+         grid_t vNu(const_cast<scalar_t *>(nu.data()), nu.size());
+         grid_t vT(const_cast<scalar_t *>(temp.data()), temp.size());
+         grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+         grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+         Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 4, 0, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+         const auto R = FieldComponents::Physical::R;
+         const auto T = FieldComponents::Physical::THETA;
+         const auto P = FieldComponents::Physical::PHI;
+         auto uR = v.comp(R).dataView();
+         auto uT = v.comp(T).dataView();
+         auto uP = v.comp(P).dataView();
+         auto dRR = Dv.comp(R,R).dataView();
+         auto dRT = Dv.comp(R,T).dataView();
+         auto dRP = Dv.comp(R,P).dataView();
+         auto dTR = Dv.comp(T,R).dataView();
+         auto dTT = Dv.comp(T,T).dataView();
+         auto dTP = Dv.comp(T,P).dataView();
+         auto dPR = Dv.comp(P,R).dataView();
+         auto dPT = Dv.comp(P,T).dataView();
+         auto dPP = Dv.comp(P,P).dataView();
+         op.apply(rS.rGlobalView(), vNu, vT, vRho, vDLog, uR, uT, uP, dRR, dRT, dRP, dTR, dTT, dTP, dPR, dPT, dPP);
+      }
+      else
+      {
+         int nR = idxFunc.dim3D();
+         int iR_;
 
-         auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), rho(iR_), dLogRho(iR_));
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            iR_ = idxFunc.idx3D(iR);
 
-         rS.setSlice(slice, iR);
+            auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), temp(iR_), rho(iR_), dLogRho(iR_));
+
+            rS.setSlice(slice, iR);
 
 
-         // Test the diagonal gradient components: OK (rms is 10^-40 or so)
-         /*
-         rS.setSlice(((Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::R).slice(iR).array()
-                        + Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::THETA).slice(iR).array()
-                        + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::PHI).slice(iR).array()
-                        )).matrix(), iR);
-         */
+            // Test the diagonal gradient components: OK (rms is 10^-40 or so)
+            /*
+               rS.setSlice(((Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::R).slice(iR).array()
+               + Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::THETA).slice(iR).array()
+               + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::PHI).slice(iR).array()
+               )).matrix(), iR);
+               */
 
-         // test the curl-r: OK
-         // Poloidal part is ok (r curl =0)
-         /*
-         rS.setSlice((v.comp(FieldComponents::Physical::R).slice(iR).array()
-                        + Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::PHI).slice(iR).array()
-                        - Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::THETA).slice(iR).array()
-                        ).matrix(), iR);
-         */
+            // test the curl-r: OK
+            // Poloidal part is ok (r curl =0)
+            /*
+               rS.setSlice((v.comp(FieldComponents::Physical::R).slice(iR).array()
+               + Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::PHI).slice(iR).array()
+               - Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::THETA).slice(iR).array()
+               ).matrix(), iR);
+               */
 
-         // test the curl-theta: OK
-         /*
-         rS.setSlice(((v.comp(FieldComponents::Physical::THETA).slice(iR).array()
-                        - Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::PHI).slice(iR).array()
-                        + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::R).slice(iR).array()
-                        )).matrix(), iR);
-         */
+            // test the curl-theta: OK
+            /*
+               rS.setSlice(((v.comp(FieldComponents::Physical::THETA).slice(iR).array()
+               - Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::PHI).slice(iR).array()
+               + Dv.comp(FieldComponents::Physical::PHI,FieldComponents::Physical::R).slice(iR).array()
+               )).matrix(), iR);
+               */
 
-         // test the curl-phi: OK?
-         /*
-         rS.addSlice(((v.comp(FieldComponents::Physical::PHI).slice(iR).array()
-                        - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::R).slice(iR).array()
-                        + Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::THETA).slice(iR).array()
-                        )).matrix(), iR);
-         */
+            // test the curl-phi: OK?
+            /*
+               rS.addSlice(((v.comp(FieldComponents::Physical::PHI).slice(iR).array()
+               - Dv.comp(FieldComponents::Physical::THETA,FieldComponents::Physical::R).slice(iR).array()
+               + Dv.comp(FieldComponents::Physical::R,FieldComponents::Physical::THETA).slice(iR).array()
+               )).matrix(), iR);
+               */
 
+         }
       }
    }
 
@@ -366,53 +434,114 @@
    void SphericalViscousDissipationAnelastic::add(TFIELD &rS,
                                              const TIDXFUNC& idxFunc,
                                              const Array& nu,
-                                             const Array& T,
+                                             const Array& temp,
                                              const Array& rho,
                                              const Array& dLogRho,
                                              const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &v,
                                              const Datatypes::TensorField<TFIELD, FieldComponents::Physical::Id> &Dv,
                                              const MHDFloat c)
    {
-      int nR = idxFunc.dim3D();
-      int iR_;
-
-      for(int iR = 0; iR < nR; ++iR)
+      using scalar_t = typename TFIELD::PointType;
+      if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
-         iR_ = idxFunc.idx3D(iR);
-
-         auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), rho(iR_), dLogRho(iR_));
-
-         rS.addSlice(slice, iR);
+         using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+         using grid_t = View::ViewBase<double>;
+         using fct_t = details::AddTmplFunctor<scalar_t, SetFunctor>;
+         fct_t f(c);
+         grid_t vNu(const_cast<scalar_t *>(nu.data()), nu.size());
+         grid_t vT(const_cast<scalar_t *>(temp.data()), temp.size());
+         grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+         grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+         Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 4, 0, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+         const auto R = FieldComponents::Physical::R;
+         const auto T = FieldComponents::Physical::THETA;
+         const auto P = FieldComponents::Physical::PHI;
+         auto uR = v.comp(R).dataView();
+         auto uT = v.comp(T).dataView();
+         auto uP = v.comp(P).dataView();
+         auto dRR = Dv.comp(R,R).dataView();
+         auto dRT = Dv.comp(R,T).dataView();
+         auto dRP = Dv.comp(R,P).dataView();
+         auto dTR = Dv.comp(T,R).dataView();
+         auto dTT = Dv.comp(T,T).dataView();
+         auto dTP = Dv.comp(T,P).dataView();
+         auto dPR = Dv.comp(P,R).dataView();
+         auto dPT = Dv.comp(P,T).dataView();
+         auto dPP = Dv.comp(P,P).dataView();
+         op.apply(rS.rGlobalView(), vNu, vT, vRho, vDLog, uR, uT, uP, dRR, dRT, dRP, dTR, dTT, dTP, dPR, dPT, dPP, rS.dataView());
       }
+      else
+      {
+         int nR = idxFunc.dim3D();
+         int iR_;
 
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            iR_ = idxFunc.idx3D(iR);
 
-   // *** to print the result ** //
-   // std::cerr << "NL(R) = "<<rS.data()<<" \n";
+            auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), temp(iR_), rho(iR_), dLogRho(iR_));
 
+            rS.addSlice(slice, iR);
+         }
 
+         // *** to print the result ** //
+         // std::cerr << "NL(R) = "<<rS.data()<<" \n";
+      }
    }
 
    template<typename TFIELD, typename TIDXFUNC>
    void SphericalViscousDissipationAnelastic::sub(TFIELD &rS,
                                              const TIDXFUNC& idxFunc,
                                              const Array& nu,
-                                             const Array& T,
+                                             const Array& temp,
                                              const Array& rho,
                                              const Array& dLogRho,
                                              const Datatypes::VectorField<TFIELD, FieldComponents::Physical::Id> &v,
                                              const Datatypes::TensorField<TFIELD, FieldComponents::Physical::Id> &Dv,
                                              const MHDFloat c)
    {
-      int nR = idxFunc.dim3D();
-      int iR_;
-
-      for(int iR = 0; iR < nR; ++iR)
+      using scalar_t = typename TFIELD::PointType;
+      if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
       {
-         iR_ = idxFunc.idx3D(iR);
+         using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+         using grid_t = View::ViewBase<double>;
+         using fct_t = details::SubTmplFunctor<scalar_t, SetFunctor>;
+         fct_t f(c);
+         grid_t vNu(const_cast<scalar_t *>(nu.data()), nu.size());
+         grid_t vT(const_cast<scalar_t *>(temp.data()), temp.size());
+         grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+         grid_t vDLog(const_cast<scalar_t *>(dLogRho.data()), dLogRho.size());
+         Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 4, 0, 0, grid_t, grid_t, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+         const auto R = FieldComponents::Physical::R;
+         const auto T = FieldComponents::Physical::THETA;
+         const auto P = FieldComponents::Physical::PHI;
+         auto uR = v.comp(R).dataView();
+         auto uT = v.comp(T).dataView();
+         auto uP = v.comp(P).dataView();
+         auto dRR = Dv.comp(R,R).dataView();
+         auto dRT = Dv.comp(R,T).dataView();
+         auto dRP = Dv.comp(R,P).dataView();
+         auto dTR = Dv.comp(T,R).dataView();
+         auto dTT = Dv.comp(T,T).dataView();
+         auto dTP = Dv.comp(T,P).dataView();
+         auto dPR = Dv.comp(P,R).dataView();
+         auto dPT = Dv.comp(P,T).dataView();
+         auto dPP = Dv.comp(P,P).dataView();
+         op.apply(rS.rGlobalView(), vNu, vT, vRho, vDLog, uR, uT, uP, dRR, dRT, dRP, dTR, dTT, dTP, dPR, dPT, dPP, rS.dataView());
+      }
+      else
+      {
+         int nR = idxFunc.dim3D();
+         int iR_;
 
-         auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), T(iR_), rho(iR_), dLogRho(iR_));
+         for(int iR = 0; iR < nR; ++iR)
+         {
+            iR_ = idxFunc.idx3D(iR);
 
-         rS.subSlice(slice, iR);
+            auto slice = computeViscousSlice(iR, iR_, c, v, Dv, nu(iR_), temp(iR_), rho(iR_), dLogRho(iR_));
+
+            rS.subSlice(slice, iR);
+         }
       }
    }
 
@@ -527,7 +656,7 @@
                                                                                           const MHDFloat Rho,
                                                                                           const MHDFloat dLogRho)
 {
-    return (c * 2 * Rho * nu * (
+    return (c * 2.0 * Rho * nu * (
                                  // E_rr^2
                                  ( -v.comp(FieldComponents::Physical::R).slice(iR).array()*dLogRho/Rho
                                    + Dv.comp(FieldComponents::Physical::R, FieldComponents::Physical::R).slice(iR).array()/Rho ).pow(2)
@@ -536,15 +665,15 @@
                                  // + E_pp^2
                                  + ( Dv.comp(FieldComponents::Physical::PHI, FieldComponents::Physical::PHI).slice(iR).array()/Rho ).pow(2)
                                  // + 2* (E_rt)^2
-                                 + 2*( -0.5*v.comp(FieldComponents::Physical::THETA).slice(iR).array()*dLogRho/Rho
+                                 + 2.0*( -0.5*v.comp(FieldComponents::Physical::THETA).slice(iR).array()*dLogRho/Rho
                                       + 0.5*(  Dv.comp(FieldComponents::Physical::R, FieldComponents::Physical::THETA).slice(iR).array()
                                                 +  Dv.comp(FieldComponents::Physical::THETA, FieldComponents::Physical::R).slice(iR).array() )/Rho ).pow(2)
                                  // + 2* (E_rp)^2
-                                 + 2*( -0.5*v.comp(FieldComponents::Physical::PHI).slice(iR).array()*dLogRho/Rho
+                                 + 2.0*( -0.5*v.comp(FieldComponents::Physical::PHI).slice(iR).array()*dLogRho/Rho
                                       + 0.5*(  Dv.comp(FieldComponents::Physical::R, FieldComponents::Physical::PHI).slice(iR).array()
                                                 +  Dv.comp(FieldComponents::Physical::PHI, FieldComponents::Physical::R).slice(iR).array() )/Rho ).pow(2)
                                  // + 2* (E_tp)^2
-                                 + 2*( 0.5*(  Dv.comp(FieldComponents::Physical::THETA, FieldComponents::Physical::PHI).slice(iR).array()
+                                 + 2.0*( 0.5*(  Dv.comp(FieldComponents::Physical::THETA, FieldComponents::Physical::PHI).slice(iR).array()
                                                 +  Dv.comp(FieldComponents::Physical::PHI, FieldComponents::Physical::THETA).slice(iR).array() )/Rho ).pow(2)
                                  // -(1/3)div(v)
                                  - (1.0/3.0) * ( -v.comp(FieldComponents::Physical::R).slice(iR).array()*dLogRho/Rho ).pow(2)

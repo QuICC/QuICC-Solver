@@ -47,7 +47,7 @@ TEST_CASE("SphericalLorentzAnelastic product validation FlatScalarField vs ViewS
       QuICC::Array rho(dim3D);
       for(std::uint32_t i = 0; i < dim3D; i++)
       {
-         rho(i) = static_cast<double>(i+1)/static_cast<double>(dim3D + 1);
+         rho(i) = static_cast<double>(i+2)/static_cast<double>(dim3D + 1);
       }
 
       QuICC::Array tGrid(dim2D);
@@ -87,40 +87,52 @@ TEST_CASE("SphericalLorentzAnelastic product validation FlatScalarField vs ViewS
          {
             INFO( "Set operation" );
 
-            INFO( "R component" );
-            TestOp::set(*spSFlatA, R, idxFunc, rho, *spVFlatA, *spVFlatB, c);
-            TestOp::set(*spSViewA, R, idxFunc, rho, *spVViewA, *spVViewB, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::set(*spSFlatA, R, idxFunc, rho, *spVFlatA, *spVFlatB, c);
+               TestOp::set(*spSViewA, R, idxFunc, rho, *spVViewA, *spVViewB, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "T component" );
-            TestOp::set(*spSFlatA, T, idxFunc, rho, *spVFlatA, *spVFlatB, c);
-            TestOp::set(*spSViewA, T, idxFunc, rho, *spVViewA, *spVViewB, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "T component" );
+               TestOp::set(*spSFlatA, T, idxFunc, rho, *spVFlatA, *spVFlatB, c);
+               TestOp::set(*spSViewA, T, idxFunc, rho, *spVViewA, *spVViewB, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "P component" );
-            TestOp::set(*spSFlatA, P, idxFunc, rho, *spVFlatA, *spVFlatB, c);
-            TestOp::set(*spSViewA, P, idxFunc, rho, *spVViewA, *spVViewB, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "P component" );
+               TestOp::set(*spSFlatA, P, idxFunc, rho, *spVFlatA, *spVFlatB, c);
+               TestOp::set(*spSViewA, P, idxFunc, rho, *spVViewA, *spVViewB, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
 
          // Check add operation
          {
             INFO( "Add operation" );
 
-            INFO( "R component" );
-            TestOp::add(*spSFlatA, R, idxFunc, rho, *spVFlatA, *spVFlatB, c);
-            TestOp::add(*spSViewA, R, idxFunc, rho, *spVViewA, *spVViewB, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::add(*spSFlatA, R, idxFunc, rho, *spVFlatA, *spVFlatB, c);
+               TestOp::add(*spSViewA, R, idxFunc, rho, *spVViewA, *spVViewB, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "T component" );
-            TestOp::add(*spSFlatA, T, idxFunc, rho, *spVFlatA, *spVFlatB, c);
-            TestOp::add(*spSViewA, T, idxFunc, rho, *spVViewA, *spVViewB, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "T component" );
+               TestOp::add(*spSFlatA, T, idxFunc, rho, *spVFlatA, *spVFlatB, c);
+               TestOp::add(*spSViewA, T, idxFunc, rho, *spVViewA, *spVViewB, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
 
-            INFO( "P component" );
-            TestOp::add(*spSFlatA, P, idxFunc, rho, *spVFlatA, *spVFlatB, c);
-            TestOp::add(*spSViewA, P, idxFunc, rho, *spVViewA, *spVViewB, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "P component" );
+               TestOp::add(*spSFlatA, P, idxFunc, rho, *spVFlatA, *spVFlatB, c);
+               TestOp::add(*spSViewA, P, idxFunc, rho, *spVViewA, *spVViewB, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
 
 #if 0

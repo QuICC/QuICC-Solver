@@ -328,7 +328,7 @@ namespace Physical {
             std::vector<view_t> vs;
             collectViews(vs, v);
             collectViews(vs, w);
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, 0, 0, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]);
          }
          else
@@ -400,7 +400,7 @@ namespace Physical {
             std::vector<view_t> vs;
             collectViews(vs, v);
             collectViews(vs, w);
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, 0, 0, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]);
          }
          else
@@ -461,7 +461,7 @@ namespace Physical {
             std::vector<view_t> vs;
             collectViews(vs, v);
             collectViews(vs, w);
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, 0, 0, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5]);
          }
          else
@@ -539,7 +539,7 @@ namespace Physical {
             std::vector<view_t> vs;
             collectViews(vs, v);
             collectViews(vs, w);
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, 0, 0, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
          }
          else
@@ -611,7 +611,7 @@ namespace Physical {
             std::vector<view_t> vs;
             collectViews(vs, v);
             collectViews(vs, w);
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, 0, 0, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
          }
          else
@@ -673,7 +673,7 @@ namespace Physical {
             std::vector<view_t> vs;
             collectViews(vs, v);
             collectViews(vs, w);
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, 0, 0, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
          }
          else
@@ -750,7 +750,7 @@ namespace Physical {
             std::vector<view_t> vs;
             collectViews(vs, v);
             collectViews(vs, w);
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, 0, 0, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
          }
          else
@@ -820,7 +820,7 @@ namespace Physical {
             std::vector<view_t> vs;
             collectViews(vs, v);
             collectViews(vs, w);
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, 0, 0, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
          }
          else
@@ -883,7 +883,7 @@ namespace Physical {
             std::vector<view_t> vs;
             collectViews(vs, v);
             collectViews(vs, w);
-            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
+            Slicewise::Cpu::NoGridOp<2, fct_t, view_t, 2, 0, 0, grid_t, grid_t, view_t, view_t, view_t, view_t, view_t, view_t, view_t> op(f);
             op.apply(rS.rGlobalView(), vRho, vDLog, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], rS.dataView());
          }
          else

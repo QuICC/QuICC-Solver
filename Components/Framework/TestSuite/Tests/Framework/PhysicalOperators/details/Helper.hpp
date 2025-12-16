@@ -48,7 +48,7 @@ namespace details {
 
    template <typename T> T fieldValueA(const int i, const int j, const int k)
    {
-      return fieldValueGeneric<T>(i, j, k, 0.0, 100.0, 1.0);
+      return fieldValueGeneric<T>(i, j, k, 7.0, 100.0, 1.0);
    }
 
    template <typename T> T fieldValueB(const int i, const int j, const int k)

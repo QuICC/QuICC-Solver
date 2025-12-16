@@ -18,6 +18,7 @@
 #include "QuICC/ScalarFields/ScalarField.hpp"
 #include "DenseSM/IGenericProfile.hpp"
 #include "QuICC/PhysicalOperators/details/FunctorHelpers.hpp"
+#include "ViewOps/Slicewise/Cpu/NoGridOp.hpp"
 
 namespace QuICC {
 
@@ -157,6 +158,58 @@ namespace Physical {
                return _res.cpu()->dim(Dimensions::Transform::TRA3D)->idx<Dimensions::Data::DAT3D>(k);
             }
          };
+
+         /// @tparam T scalar
+         template <class T = double> struct SetRTFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _scaling;
+
+            /// @brief ctor
+            /// @param scaling
+            SetRTFunctor(T scaling) : _scaling(scaling){};
+
+            /// @brief deleted default constructor
+            SetRTFunctor() = delete;
+
+            /// @brief dtor
+            ~SetRTFunctor() = default;
+
+            /// @brief Dot product
+            /// @param g
+            /// @param ui
+            /// @return
+            QUICC_CUDA_HOSTDEV T operator()(T gr, T gt, T ui)
+            {
+               return -_scaling * (gt * ui / gr);
+            }
+         };
+
+         /// @tparam T scalar
+         template <class T = double> struct SetPFunctor
+         {
+            /// @brief non dimensional scaling for transport term
+            T _scaling;
+
+            /// @brief ctor
+            /// @param scaling
+            SetPFunctor(T scaling) : _scaling(scaling){};
+
+            ///@brief deleted default constructor
+            SetPFunctor() = delete;
+
+            /// @brief dtor
+            ~SetPFunctor() = default;
+
+            /// @brief Dot product
+            /// @param g
+            /// @param ui
+            /// @return
+            QUICC_CUDA_HOSTDEV T operator()(T gr, T gc, T gs, T ui, T uj)
+            {
+               return _scaling * (gs * ui + gc * uj) / gr;
+            }
+         };
    };
 
    template <typename TFIELD>
@@ -224,96 +277,142 @@ namespace Physical {
 
       if(compId == FieldComponents::Physical::R)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = SetRTFunctor<scalar_t>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
+            Slicewise::Cpu::NoGridOp<3, fct_t, view_t, 1, 1, 0, grid_t, grid_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vSin, v.comp(FieldComponents::Physical::PHI).dataView());
+         }
+         else
+         {
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.setProfile(-c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.setProfile(-c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
+                  }
                }
-            }
-         } else
-         {
-            for(int iR = 0; iR < nR; ++iR)
+            } else
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.setProfile(-v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*sinTheta(iTh_)/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.setProfile(-v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*sinTheta(iTh_)/rho(iR_), iTh, iR);
+                  }
                }
             }
          }
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = SetRTFunctor<scalar_t>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
+            Slicewise::Cpu::NoGridOp<3, fct_t, view_t, 1, 1, 0, grid_t, grid_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vCos, v.comp(FieldComponents::Physical::PHI).dataView());
+         }
+         else
+         {
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.setProfile(-c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.setProfile(-c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  }
                }
-            }
-         } else
-         {
-            for(int iR = 0; iR < nR; ++iR)
+            } else
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.setProfile(-v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.setProfile(-v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  }
                }
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = SetPFunctor<scalar_t>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
+            grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
+            Slicewise::Cpu::NoGridOp<3, fct_t, view_t, 1, 2, 0, grid_t, grid_t, grid_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vCos, vSin, v.comp(FieldComponents::Physical::R).dataView(), v.comp(FieldComponents::Physical::THETA).dataView());
+         }
+         else
+         {
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.setProfile(c*(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
-                  rS.addProfile(c*(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.setProfile(c*(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
+                     rS.addProfile(c*(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  }
                }
-            }
-         } else
-         {
-            for(int iR = 0; iR < nR; ++iR)
+            } else
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.setProfile(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_)/rho(iR_), iTh, iR);
-                  rS.addProfile(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.setProfile(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_)/rho(iR_), iTh, iR);
+                     rS.addProfile(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  }
                }
             }
          }
@@ -337,97 +436,143 @@ namespace Physical {
 
       if(compId == FieldComponents::Physical::R)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetRTFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
+            Slicewise::Cpu::NoGridOp<3, fct_t, view_t, 1, 1, 0, grid_t, grid_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vSin, v.comp(FieldComponents::Physical::PHI).dataView(), rS.dataView());
+         }
+         else
+         {
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.subProfile(c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
 
+                     rS.subProfile(c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
+
+                  }
                }
-            }
-         } else
-         {
-            for(int iR = 0; iR < nR; ++iR)
+            } else
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.subProfile(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*sinTheta(iTh_)/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.subProfile(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*sinTheta(iTh_)/rho(iR_), iTh, iR);
+                  }
                }
             }
          }
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetRTFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
+            Slicewise::Cpu::NoGridOp<3, fct_t, view_t, 1, 1, 0, grid_t, grid_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vCos, v.comp(FieldComponents::Physical::PHI).dataView(), rS.dataView());
+         }
+         else
+         {
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.subProfile(c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.subProfile(c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  }
                }
-            }
-         } else
-         {
-            for(int iR = 0; iR < nR; ++iR)
+            } else
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.subProfile(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.subProfile(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  }
                }
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::AddTmplFunctor<scalar_t, SetPFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
+            grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
+            Slicewise::Cpu::NoGridOp<3, fct_t, view_t, 1, 2, 0, grid_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vCos, vSin, v.comp(FieldComponents::Physical::R).dataView(), v.comp(FieldComponents::Physical::THETA).dataView(), rS.dataView());
+         }
+         else
+         {
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.addProfile(c*(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
-                  rS.addProfile(c*(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.addProfile(c*(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
+                     rS.addProfile(c*(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  }
                }
-            }
-         } else
-         {
-            for(int iR = 0; iR < nR; ++iR)
+            } else
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.addProfile(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_)/rho(iR_), iTh, iR);
-                  rS.addProfile(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.addProfile(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_)/rho(iR_), iTh, iR);
+                     rS.addProfile(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  }
                }
             }
          }
@@ -451,6 +596,20 @@ namespace Physical {
 
       if(compId == FieldComponents::Physical::R)
       {
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
+         {
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetRTFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
+            Slicewise::Cpu::NoGridOp<3, fct_t, view_t, 1, 1, 0, grid_t, grid_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vSin, v.comp(FieldComponents::Physical::PHI).dataView(), rS.dataView());
+         }
+         else
+         {
          if(c != 1.0)
          {
             for(int iR = 0; iR < nR; ++iR)
@@ -480,67 +639,99 @@ namespace Physical {
                }
             }
          }
+         }
       } else if(compId == FieldComponents::Physical::THETA)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetRTFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
+            Slicewise::Cpu::NoGridOp<3, fct_t, view_t, 1, 1, 0, grid_t, grid_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vCos, v.comp(FieldComponents::Physical::PHI).dataView(), rS.dataView());
+         }
+         else
+         {
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.addProfile(c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.addProfile(c*(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  }
                }
-            }
-         } else
-         {
-            for(int iR = 0; iR < nR; ++iR)
+            } else
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.addProfile(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.addProfile(v.comp(FieldComponents::Physical::PHI).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  }
                }
             }
          }
       } else if(compId == FieldComponents::Physical::PHI)
       {
-         if(c != 1.0)
+         using scalar_t = typename TFIELD::PointType;
+         if constexpr(std::is_same_v<TFIELD, Datatypes::ViewScalarField<scalar_t>>)
          {
-            for(int iR = 0; iR < nR; ++iR)
+            using view_t = typename Datatypes::ViewScalarField<scalar_t>::ViewStorageType;
+            using grid_t = View::ViewBase<double>;
+            using fct_t = details::SubTmplFunctor<scalar_t, SetPFunctor>;
+            fct_t f(c);
+            grid_t vRho(const_cast<scalar_t *>(rho.data()), rho.size());
+            grid_t vCos(const_cast<scalar_t *>(cosTheta.data()), cosTheta.size());
+            grid_t vSin(const_cast<scalar_t *>(sinTheta.data()), sinTheta.size());
+            Slicewise::Cpu::NoGridOp<3, fct_t, view_t, 1, 2, 0, grid_t, grid_t, grid_t, view_t, view_t, view_t> op(f);
+            op.apply(rS.rGlobalView(), vRho, vCos, vSin, v.comp(FieldComponents::Physical::R).dataView(), v.comp(FieldComponents::Physical::THETA).dataView(), rS.dataView());
+         }
+         else
+         {
+            if(c != 1.0)
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.subProfile(c*(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
-                  rS.subProfile(c*(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.subProfile(c*(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_))/rho(iR_), iTh, iR);
+                     rS.subProfile(c*(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_))/rho(iR_), iTh, iR);
+                  }
                }
-            }
-         } else
-         {
-            for(int iR = 0; iR < nR; ++iR)
+            } else
             {
-               iR_ = idxFunc.idx3D(iR);
-               nTh = idxFunc.dim2D(iR);
-
-               for(int iTh = 0; iTh < nTh; ++iTh)
+               for(int iR = 0; iR < nR; ++iR)
                {
-                  iTh_ = idxFunc.idx2D(iTh, iR);
+                  iR_ = idxFunc.idx3D(iR);
+                  nTh = idxFunc.dim2D(iR);
 
-                  rS.subProfile(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_)/rho(iR_), iTh, iR);
-                  rS.subProfile(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  for(int iTh = 0; iTh < nTh; ++iTh)
+                  {
+                     iTh_ = idxFunc.idx2D(iTh, iR);
+
+                     rS.subProfile(v.comp(FieldComponents::Physical::R).profile(iTh,iR)*sinTheta(iTh_)/rho(iR_), iTh, iR);
+                     rS.subProfile(v.comp(FieldComponents::Physical::THETA).profile(iTh,iR)*cosTheta(iTh_)/rho(iR_), iTh, iR);
+                  }
                }
             }
          }

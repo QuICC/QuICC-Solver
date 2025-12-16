@@ -64,9 +64,11 @@ for dbase in ds:
                     if impl == refImpl:
                         refAvg = avg
                         speedup = 0.0
+                        speedInfo =' '
                     else:
                         speedup = 100.0*(avg - refAvg)/refAvg
-                    print(f'{sp}{sp}{sp}{impl}: {min:.2E}/{max:.2E}/{avg:.2E} ({np.ceil(speedup):+} %)')
+                        speedInfo = f'({np.ceil(speedup):+} %)'
+                    print(f'{sp}{sp}{sp}{impl}: {min:.2E}/{max:.2E}/{avg:.2E}{speedInfo}')
                 else:
                     print(f'{sp}{sp}{sp}{impl}: NOT IMPLEMENTED')
 

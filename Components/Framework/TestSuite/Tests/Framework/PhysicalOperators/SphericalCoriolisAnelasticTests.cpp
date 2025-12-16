@@ -71,54 +71,72 @@ TEST_CASE("SphericalCoriolisAnelastic product validation FlatScalarField vs View
          {
             INFO( "Set operation" );
 
-            INFO( "R component" );
-            TestOp::set(*spSFlatA, R, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::set(*spSViewA, R, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
-            INFO( "T component" );
-            TestOp::set(*spSFlatA, T, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::set(*spSViewA, T, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
-            INFO( "P component" );
-            TestOp::set(*spSFlatA, P, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::set(*spSViewA, P, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::set(*spSFlatA, R, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
+               TestOp::set(*spSViewA, R, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
+            {
+               INFO( "T component" );
+               TestOp::set(*spSFlatA, T, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
+               TestOp::set(*spSViewA, T, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
+            {
+               INFO( "P component" );
+               TestOp::set(*spSFlatA, P, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
+               TestOp::set(*spSViewA, P, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
 
          // Check add operation
          {
             INFO( "Add operation" );
 
-            INFO( "R component" );
-            TestOp::add(*spSFlatA, R, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::add(*spSViewA, R, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
-            INFO( "T component" );
-            TestOp::add(*spSFlatA, T, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::add(*spSViewA, T, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
-            INFO( "P component" );
-            TestOp::add(*spSFlatA, P, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::add(*spSViewA, P, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::add(*spSFlatA, R, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
+               TestOp::add(*spSViewA, R, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
+            {
+               INFO( "T component" );
+               TestOp::add(*spSFlatA, T, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
+               TestOp::add(*spSViewA, T, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
+            {
+               INFO( "P component" );
+               TestOp::add(*spSFlatA, P, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
+               TestOp::add(*spSViewA, P, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
 
          // Check sub operation
          {
             INFO( "Sub operation" );
 
-            INFO( "R component" );
-            TestOp::sub(*spSFlatA, R, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::sub(*spSViewA, R, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
-            INFO( "T component" );
-            TestOp::sub(*spSFlatA, T, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::sub(*spSViewA, T, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
-            INFO( "P component" );
-            TestOp::sub(*spSFlatA, P, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
-            TestOp::sub(*spSViewA, P, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
-            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            {
+               INFO( "R component" );
+               TestOp::sub(*spSFlatA, R, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
+               TestOp::sub(*spSViewA, R, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
+            {
+               INFO( "T component" );
+               TestOp::sub(*spSFlatA, T, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
+               TestOp::sub(*spSViewA, T, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
+            {
+               INFO( "P component" );
+               TestOp::sub(*spSFlatA, P, idxFunc, rho, cosTheta, sinTheta, *spVFlatA, c);
+               TestOp::sub(*spSViewA, P, idxFunc, rho, cosTheta, sinTheta, *spVViewA, c);
+               details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+            }
          }
       }
    }

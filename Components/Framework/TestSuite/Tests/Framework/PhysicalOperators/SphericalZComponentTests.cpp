@@ -62,19 +62,28 @@ TEST_CASE("SphericalZComponent product validation FlatScalarField vs ViewScalarF
          INFO( "c = " << c );
 
          // Check set operation
-         TestOp::set(*spSFlatA, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-         TestOp::set(*spSViewA, idxFunc, cosTheta, sinTheta, *spVViewA, c);
-         details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+         {
+            INFO ( "set operation" );
+            TestOp::set(*spSFlatA, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
+            TestOp::set(*spSViewA, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+         }
 
          // Check add operation
-         TestOp::add(*spSFlatA, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-         TestOp::add(*spSViewA, idxFunc, cosTheta, sinTheta, *spVViewA, c);
-         details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+         {
+            INFO ( "add operation" );
+            TestOp::add(*spSFlatA, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
+            TestOp::add(*spSViewA, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+         }
 
          // Check sub operation
-         TestOp::sub(*spSFlatA, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
-         TestOp::sub(*spSViewA, idxFunc, cosTheta, sinTheta, *spVViewA, c);
-         details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+         {
+            INFO ( "sub operation" );
+            TestOp::sub(*spSFlatA, idxFunc, cosTheta, sinTheta, *spVFlatA, c);
+            TestOp::sub(*spSViewA, idxFunc, cosTheta, sinTheta, *spVViewA, c);
+            details::checkComputation(spSetup, *spSFlatA, *spSViewA);
+         }
       }
    }
 }
