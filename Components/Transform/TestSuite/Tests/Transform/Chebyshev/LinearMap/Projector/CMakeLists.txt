@@ -6,8 +6,8 @@ quicc_clear_test_list()
 include(SetUlp)
 
 quicc_set_ulp(_ulps
-  ULP 40 40 40 250 250 625
-  MPULP 40 40 40 900 900 600
+  ULP 40 40 40 250 300 400 250 625 625 625
+  MPULP 40 40 40 900 250 900 900 600 900 600
   )
 
 set(_tests
@@ -15,7 +15,11 @@ set(_tests
   DivY1:<base_t>:projector
   DivY2:<base_t>:projector
   D1Y1:<base_t>:projector
+  D2Y1:<base_t>:projector
+  DivY1D1:<base_t>:projector
   DivY1D1Y1:<base_t>:projector
+  DivY1D2Y1:<base_t>:projector
+  DivY2D1Y1:<base_t>:projector
   SphRadLapl:<base_t>:projector
   )
 

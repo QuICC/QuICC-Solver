@@ -11,6 +11,7 @@
 //
 #include "QuICC/TestSuite/Framework/Io/TestBackend.hpp"
 #include "QuICC/PhysicalNames/Temperature.hpp"
+#include "QuICC/PhysicalNames/Entropy.hpp"
 #include "QuICC/PhysicalNames/Velocity.hpp"
 #include "QuICC/PhysicalNames/Magnetic.hpp"
 
@@ -31,7 +32,8 @@ std::vector<std::string> TestBackend::fieldNames() const
    std::vector<std::string> names = {
       PhysicalNames::Velocity().tag(),
       PhysicalNames::Magnetic().tag(),
-      PhysicalNames::Temperature().tag()
+      PhysicalNames::Temperature().tag(),
+      PhysicalNames::Entropy().tag()
    };
 
    return names;

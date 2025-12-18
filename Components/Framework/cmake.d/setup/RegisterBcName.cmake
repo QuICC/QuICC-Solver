@@ -3,6 +3,7 @@ set(tags
   NoSlip 
   StressFree
   FixedTemperature
+  FixedEntropy
   FixedFlux
   Insulating
   )

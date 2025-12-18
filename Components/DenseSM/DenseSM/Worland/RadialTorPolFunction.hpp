@@ -11,7 +11,8 @@
 
 // Project includes
 //
-#include "Types/Internal/Typedefs.hpp"
+#include "DenseSM/IGenericProfile.hpp"
+
 
 namespace QuICC {
 
@@ -22,7 +23,7 @@ namespace Worland {
 /**
  * @brief Implementation of the generic radial toroidal/poloidal function
  */
-class RadialTorPolFunction
+class RadialTorPolFunction : public IGenericProfile
 {
 public:
    /**
@@ -34,22 +35,6 @@ public:
     * @brief Destructor
     */
    virtual ~RadialTorPolFunction() = default;
-
-   /**
-    * @brief Required spectral truncation
-    */
-   virtual int nN() const = 0;
-
-   /**
-    * @brief Nonzero harmonic degrees
-    */
-   virtual std::vector<int> ls() const = 0;
-
-   /**
-    * @brief Evaluate function on grid
-    */
-   virtual Internal::Array evaluate(const Internal::Array& r, const int l,
-      const int m) const = 0;
 
 protected:
 private:

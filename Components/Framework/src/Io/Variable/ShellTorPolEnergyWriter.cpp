@@ -23,10 +23,9 @@ namespace QuICC {
 namespace Io {
 
 namespace Variable {
-
 ShellTorPolEnergyWriter::ShellTorPolEnergyWriter(const std::string& prefix,
-   const std::string& type) :
-    ISphericalTorPolEnergyWriter(prefix, type)
+   const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF) :
+    ISphericalTorPolEnergyWriter(prefix, type, std::vector<std::shared_ptr<QuICC::DenseSM::IGenericProfile>>(pF.begin(), pF.end()))
 {}
 
 void ShellTorPolEnergyWriter::init()

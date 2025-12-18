@@ -14,6 +14,7 @@
 // Project includes
 //
 #include "DenseSM/IMatrixSMOperator.hpp"
+#include "DenseSM/Worland/WorlandKind.hpp"
 #include "Types/Typedefs.hpp"
 
 namespace QuICC {
@@ -62,7 +63,16 @@ protected:
     */
    const Scalar_t mcDBeta;
 
+   /**
+    * @brief Type of Worland implementation
+    */
+   WorlandKind type() const;
+
 private:
+   /**
+    * Type of Worland implementation
+    */
+   WorlandKind mType;
 };
 
 } // namespace Worland

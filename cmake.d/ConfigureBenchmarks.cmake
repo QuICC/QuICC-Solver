@@ -5,6 +5,12 @@
 #     target implementation
 # MODEL
 #     name of the model
+# TYPE
+#     defaults for type of benchmark: Config, State, Model, Visualization, Stability or StabilityConfig
+# PREFIX
+#     prefix for benchmark
+# EXE_POSTFIX
+#     postfix for executable
 # ARCHIVEDIR
 #     directory for storing the archive
 # WORKDIR
@@ -13,6 +19,8 @@
 #     list of files required to start
 # TOOLS
 #     list of tools
+# TOOLSDIR
+#     tools directory
 # VARIANTS
 #     list of paths to edit in parameters.cfg
 #     format: xmlpath:value
@@ -23,7 +31,7 @@
 #
 function(quicc_add_benchmark target)
   # parse inputs
-  set(oneValueArgs MODEL ARCHIVEDIR WORKDIR TIMEOUT GITTAG MPIRANKS)
+  set(oneValueArgs MODEL TYPE ARCHIVEDIR WORKDIR TIMEOUT GITTAG MPIRANKS PREFIX EXE_POSTFIX TOOLSDIR)
   set(multiValueArgs STARTFILES TOOLS VARIANTS FILTER DATAFILTER)
   cmake_parse_arguments(QAB "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -31,8 +39,15 @@ function(quicc_add_benchmark target)
   list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
   message(DEBUG "target: ${target}")
   message(DEBUG "QAB_MODEL: ${QAB_MODEL}")
+
+  if(NOT QAB_TYPE)
+    set(QAB_TYPE "Model")
+  endif()
+  message(DEBUG "QAB_TYPE: ${QAB_TYPE}")
+
   message(DEBUG "QAB_WORKDIR: ${QAB_WORKDIR}")
   message(DEBUG "QAB_ARCHIVEDIR: ${QAB_ARCHIVEDIR}")
+
   if(NOT QAB_MPIRANKS)
     set(QAB_MPIRANKS 4)
   endif()
@@ -43,8 +58,57 @@ function(quicc_add_benchmark target)
   endif()
   message(DEBUG "QAB_TIMEOUT: ${QAB_TIMEOUT}")
 
-  if(NOT QAB_STARTFILES)
+  if(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "Model")
+    set(QAB_PREFIX "")
+    set(_prefix "")
+  elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "Config")
+    set(QAB_PREFIX "Config")
+    set(_prefix "config_")
+  elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "State")
+    set(QAB_PREFIX "State")
+    set(_prefix "state_")
+  elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "Visualization")
+    set(QAB_PREFIX "Visualization")
+    set(_prefix "visualization_")
+  elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "Stability")
+    set(QAB_PREFIX "Stability")
+    set(_prefix "stability_")
+  elseif(NOT QAB_PREFIX AND QAB_TYPE STREQUAL "StabilityConfig")
+    set(QAB_PREFIX "StabilityConfig")
+    set(_prefix "stability_config_")
+  elseif(QAB_PREFIX)
+    string(TOLOWER "${QAB_PREFIX}" _prefix)
+    set(_prefix "${_prefix}_")
+  endif()
+  message(DEBUG "QAB_PREFIX: ${QAB_PREFIX}")
+
+  if(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "Model")
+    set(QAB_EXE_POSTFIX "Model")
+  elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "Config")
+    set(QAB_EXE_POSTFIX "Config")
+  elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "State")
+    set(QAB_EXE_POSTFIX "State")
+  elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "Visualization")
+    set(QAB_EXE_POSTFIX "Visu")
+  elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "Stability")
+    set(QAB_EXE_POSTFIX "Stability")
+  elseif(NOT QAB_EXE_POSTFIX AND QAB_TYPE STREQUAL "StabilityConfig")
+    set(QAB_EXE_POSTFIX "StabilityConfig")
+  endif()
+  message(DEBUG "QAB_EXE_POSTFIX: ${QAB_EXE_POSTFIX}")
+
+  if(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "Model")
     set(QAB_STARTFILES "parameters.cfg" "state_initial.hdf5")
+  elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "Config")
+    set(QAB_STARTFILES "")
+  elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "State")
+    set(QAB_STARTFILES "parameters.cfg")
+  elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "Visualization")
+    set(QAB_STARTFILES "parameters.cfg" "state4Visu.hdf5")
+  elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "Stability")
+    set(QAB_STARTFILES "parameters.cfg")
+  elseif(NOT QAB_STARTFILES AND QAB_TYPE STREQUAL "StabilityConfig")
+    set(QAB_STARTFILES "")
   endif()
   message(DEBUG "QAB_STARTFILES: ${QAB_STARTFILES}")
 
@@ -52,6 +116,11 @@ function(quicc_add_benchmark target)
     set(QAB_TOOLS "validation_tools.py" "colorcodes.py")
   endif()
   message(DEBUG "QAB_TOOLS: ${QAB_TOOLS}")
+
+  if(NOT QAB_TOOLSDIR)
+    set(QAB_TOOLSDIR "${PROJECT_SOURCE_DIR}/${QUICC_MODEL_PATH}")
+  endif()
+  message(DEBUG "QAB_TOOLSDIR: ${QAB_TOOLSDIR}")
 
   if(NOT QAB_FILTER)
     set(QAB_FILTER "algorithm")
@@ -119,17 +188,17 @@ function(quicc_add_benchmark target)
   message(DEBUG "_runid: ${_runid}")
   message(DEBUG "_dataid: ${_dataid}")
 
-  set(_exe "${QAB_MODEL}${target}Model")
+  set(_exe "${QAB_MODEL}${target}${QAB_EXE_POSTFIX}")
   if(TARGET ${_exe})
-    set(_bench "Benchmark${_exe}${_runid}")
+    set(_bench "${QAB_PREFIX}Benchmark${_exe}${_runid}")
 
-    set(_refdir "${QAB_WORKDIR}/_refdata/${target}${_dataid}")
+    set(_refdir "${QAB_WORKDIR}/_refdata/${QAB_PREFIX}${target}${_dataid}")
     message(VERBOSE "_refdir: ${_refdir}")
-    set(_rundir "${QAB_WORKDIR}/_data/${target}${_runid}")
+    set(_rundir "${QAB_WORKDIR}/_data/${QAB_PREFIX}${target}${_runid}")
     message(VERBOSE "_rundir: ${_rundir}")
     set(_binsdir "${CMAKE_BINARY_DIR}/${QUICC_CURRENT_MODEL_DIR}/Executables")
     message(VERBOSE "_binsdir: ${_binsdir}")
-    set(_toolsdir "${PROJECT_SOURCE_DIR}/${QUICC_MODEL_PATH}/TestSuite")
+    set(_toolsdir "${QAB_TOOLSDIR}/TestSuite")
 
     set(_args )
     foreach(_file IN LISTS QAB_TOOLS)
@@ -142,8 +211,8 @@ function(quicc_add_benchmark target)
 
     add_custom_target(${_bench} ALL
       COMMAND ${CMAKE_COMMAND} -E copy
-        "${CMAKE_CURRENT_SOURCE_DIR}/validate_benchmark_${target}${_dataid}.py"
-        "${_rundir}/validate_benchmark.py"
+        "${CMAKE_CURRENT_SOURCE_DIR}/validate_${_prefix}benchmark_${target}${_dataid}.py"
+        "${_rundir}/validate_${_prefix}benchmark.py"
       ${_args}
       )
     add_dependencies(${_bench} ${_exe})
@@ -156,23 +225,27 @@ function(quicc_add_benchmark target)
         )
     endforeach()
 
-    # Modify parameters.cfg for variants
-    set(_mod_cfg )
-    foreach(_variant IN ITEMS ${QAB_VARIANTS})
-      string(REGEX REPLACE ":" ";" _vlist "${_variant}")
-      list(GET _vlist 0 _path)
-      list(GET _vlist 1 _value)
-      list(APPEND _mod_cfg "COMMAND" ${CMAKE_COMMAND} -E rename parameters.cfg parameters_tmp.cfg)
-      list(APPEND _mod_cfg "COMMAND" "${Python_EXECUTABLE}"
-        "${_toolsdir}/modify_xml.py" "-i" "parameters_tmp.cfg" "-p" "${_path}" "-v" "${_value}" "-o" "parameters.cfg")
-      list(APPEND _mod_cfg "COMMAND" ${CMAKE_COMMAND} -E remove parameters_tmp.cfg)
-    endforeach()
+    if("parameters.cfg" IN_LIST QAB_STARTFILES)
+      set(_cp_orig "COMMAND" "${CMAKE_COMMAND}" "-E" "copy" "parameters.cfg" "parameters_orig.cfg")
+
+      # Modify parameters.cfg for variants
+      set(_mod_cfg )
+      foreach(_variant IN ITEMS ${QAB_VARIANTS})
+        string(REGEX REPLACE ":" ";" _vlist "${_variant}")
+        list(GET _vlist 0 _path)
+        list(GET _vlist 1 _value)
+        list(APPEND _mod_cfg "COMMAND" ${CMAKE_COMMAND} -E rename parameters.cfg parameters_tmp.cfg)
+        list(APPEND _mod_cfg "COMMAND" "${Python_EXECUTABLE}"
+          "${_toolsdir}/modify_xml.py" "-i" "parameters_tmp.cfg" "-p" "${_path}" "-v" "${_value}" "-o" "parameters.cfg")
+        list(APPEND _mod_cfg "COMMAND" ${CMAKE_COMMAND} -E remove parameters_tmp.cfg)
+      endforeach()
+    endif()
 
     # Prepare startup files
     add_custom_command(TARGET ${_bench} POST_BUILD
       COMMAND ${CMAKE_COMMAND} -E remove *.dat *.hdf5 *.gxl *.vtp
       ${_cp_start}
-      COMMAND ${CMAKE_COMMAND} -E copy parameters.cfg parameters_orig.cfg
+      ${_cp_orig}
       ${_mod_cfg}
       WORKING_DIRECTORY ${_rundir}
     )
@@ -182,7 +255,7 @@ function(quicc_add_benchmark target)
     quicc_fetch_benchmark_reference(
       ${_bench}
       MODEL ${QAB_MODEL}
-      FILENAME "${target}${_dataid}.tar.gz"
+      FILENAME "${QAB_PREFIX}${target}${_dataid}.tar.gz"
       ARCHIVEDIR ${QAB_ARCHIVEDIR}
       DATADIR ${QAB_WORKDIR}
       GITTAG ${QAB_GITTAG}
@@ -225,7 +298,7 @@ function(quicc_add_benchmark target)
     set(_validate "Validate${_bench}")
     add_test(
       NAME ${_validate}
-      COMMAND "${Python_EXECUTABLE}" validate_benchmark.py
+      COMMAND "${Python_EXECUTABLE}" validate_${_prefix}benchmark.py
         -d "${_rundir}"
         -r "${_refdir}"
       WORKING_DIRECTORY "${_rundir}"
