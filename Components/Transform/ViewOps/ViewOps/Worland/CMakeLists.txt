@@ -25,18 +25,11 @@ target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONEN
     QuICC::Profiling
     QuICC::Memory
     QuICC::DenseOp
+    QuICC::ThreadPool
     QuICC::ViewOps::Quadrature
     QuICC::ViewOps::Pointwise
     QuICC::ViewOps::Reduction
 )
-
-if (QUICC_USE_THREADPOOL)
-  target_link_libraries(${QUICC_CURRENT_COMPONENT_LIB}_${QUICC_CURRENT_SUBCOMPONENT_LIB}
-    INTERFACE
-      QuICC::ThreadPool
-  )
-endif()
-
 
 # Alias
 add_library(${QUICC_NAMESPACE}${QUICC_CURRENT_COMPONENT_LIB_NAMESPACE}${QUICC_CURRENT_SUBCOMPONENT_LIB}
