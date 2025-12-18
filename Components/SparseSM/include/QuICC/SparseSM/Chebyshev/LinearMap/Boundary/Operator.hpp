@@ -65,6 +65,15 @@ public:
    template <typename TCondition>
    void addRow(const ICondition::Position pos, const int l);
 
+   /**
+    * @brief Add boundary tau row which depends on a radial field
+    *
+    * @param pos  Boundary position
+    * @param Fb   Boundary value of the radial field
+    */
+   template <typename TCondition> void addRow(const ICondition::Position pos, const MHDFloat Fb);
+
+
 private:
    /**
     * @brief Compute list of boundary values
@@ -111,6 +120,15 @@ void Operator::addRow(const ICondition::Position pos, const int l)
    auto val = bc.compute(this->cols() - 1);
    this->mBcs.emplace_back(val);
 }
+
+template <typename TCondition> 
+void Operator::addRow(const ICondition::Position pos, const MHDFloat Fb)
+   {
+      TCondition bc(this->mLower, this->mUpper, pos, Fb);
+
+      auto val = bc.compute(this->cols() - 1);
+      this->mBcs.emplace_back(val);
+   }
 
 } // namespace Boundary
 } // namespace LinearMap

@@ -14,6 +14,7 @@
 // Project includes
 //
 #include "QuICC/Io/Variable/ISphericalTorPolEnergyWriter.hpp"
+#include "DenseSM/Chebyshev/LinearMap/RadialTorPolFunction.hpp"
 
 namespace QuICC {
 
@@ -34,7 +35,7 @@ public:
     * @param prefix Prefix to use for file name
     * @param type Type of the file (typically scheme name)
     */
-   ShellTorPolEnergyWriter(const std::string& prefix, const std::string& type);
+   ShellTorPolEnergyWriter(const std::string& prefix, const std::string& type, std::vector<std::shared_ptr<QuICC::DenseSM::Chebyshev::LinearMap::RadialTorPolFunction>> pF = {});
 
    /**
     * @brief Destructor

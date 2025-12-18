@@ -30,7 +30,7 @@ RpDivR1F::RpDivR1F(const int nNr, const int nNc, const int p, const int lOut, co
     ITripleHarmonicOperator(nNr, nNc, p, lOut, mOut, lF, mF, lIn, mIn, pF, lower,
        upper)
 {
-   if(this->mP < 2)
+   if(this->mP < 1)
    {
       throw std::logic_error("Radial prefactor should be at least r^p");
    }
@@ -50,7 +50,10 @@ void RpDivR1F::buildOpImpl(Internal::Matrix& mat, const int rows,
    const Internal::MHDFloat& ub = this->mcUpper;
 
    auto f = this->mpF->evaluate(igrid, this->mLf, this->mMf);
-   f = igrid.array().pow(this->mP-1).matrix().asDiagonal() * f;
+   if(this->mP>1.0)
+   {
+      f = igrid.array().pow(this->mP-1).matrix().asDiagonal() * f;
+   }
    Matrix gF = f.cast<MHDFloat>();
 
    Matrix sF = Utils::computeExpansion(gF, fN, lb, ub);

@@ -11,6 +11,7 @@ quicc_target_sources(${QUICC_CURRENT_COMPONENT_LIB} ${QUICC_CMAKE_SRC_VISIBILITY
   MaxAbsoluteFieldValue.cpp
   Mean.cpp
   Nusselt.cpp
+  Luminosity.cpp
   Power.cpp
   Spectrum.cpp
   StateFile.cpp

@@ -1,5 +1,7 @@
 import os,sys, getopt
 import numpy as np
+import h5py
+import xml.etree.ElementTree as ET
 
 import struct
 import math
@@ -8,7 +10,6 @@ import colorcodes as cc
 _c = cc.Colorcodes()
 
 success_str = 'All benchmark validation tests passed!'
-stability_success_str = 'All stability benchmark validation tests passed!'
 
 def compute_ulp(x):
     """Return the value of the least significant bit of a
@@ -137,7 +138,7 @@ def printSummary(results, rows, reftol = None):
 
 def tableTest(fname, ref_dir, data_dir, tid, tol = 11, usecols = None, max_rows = None, threshold = -1, percol = False, perrow = False, max_firstcol = 0):
 
-    # Validate nusselt number
+    # Process arguments
     extra = ''
     if usecols is not None:
         extra = f' usecols = {usecols}'
@@ -223,6 +224,122 @@ def tableTest(fname, ref_dir, data_dir, tid, tol = 11, usecols = None, max_rows 
         print(f'\t{details}')
 
     return (1, int(not cond), f'{fname}{extra}', (tid, max_ulp))
+
+def checkHdf5(fname, ref_dir, data_dir, physicals, tid):
+
+    cond = True
+    checks = np.zeros(2, dtype='i8')
+
+    # Check reference file exists
+    if cond:
+        cond = os.path.exists(ref_dir + fname)
+        checks += printResult(cond, 'Checking if reference exists')
+
+    # Check data file exists
+    if cond:
+        cond = os.path.exists(data_dir + fname)
+        checks += printResult(cond, 'Checking if data exists')
+
+    # Check file
+    if cond:
+        refFile = h5py.File(ref_dir + fname,'r')
+        dataFile = h5py.File(data_dir + fname,'r')
+        # Check root attributes
+        for a in ['header', 'type', 'version']:
+            tcond = (refFile['/'].attrs[a] == dataFile.attrs[a])
+            checks += printResult(tcond, f'Checking {a} attribute match ({a}: {refFile.attrs[a]})')
+            cond = cond and tcond
+        # Check physical parameters
+        for p in physicals:
+            tcond = (refFile['physical'][p][()] == dataFile['physical'][p][()])
+            checks += printResult(tcond, f'Checking physical paramter {p}')
+            cond = cond and tcond
+
+    return ((1, int(not cond), f'{fname}', (tid, 0)), (fname, refFile, dataFile))
+
+def hdf5Test(fname, refFile, dataFile, ds, tid, tol = 11, threshold = -1, peraxis = False, only_existence = False):
+
+    # Process arguments
+    checks = np.zeros(2, dtype='i8')
+
+    cond = True
+
+    # Check datasets exist
+    if cond:
+        cond = (ds in dataFile.keys())
+        checks += printResult(cond, f'Checking {ds} in datasets')
+
+    if only_existence:
+        max_ulp = 0
+
+    # Check datasets
+    if cond and not only_existence:
+        # data arrays
+        ref = refFile[ds][()]
+        data = dataFile[ds][()]
+
+        max_ulp = 0
+        # compute reference ulp
+        if peraxis:
+            ref_max = np.max(ref, axis = peraxis)
+            def get_ulp(r, idx):
+                idx_max = [idx[i] for i in range(0,3) if i not in peraxis]
+                ulp = compute_ulp(ref_max[*idx_max])
+                return ulp
+        else:
+            def get_ulp(r, idx):
+                return compute_ulp(r)
+
+        # Compute error on data
+        for idx, r in np.ndenumerate(ref):
+            if r > threshold:
+                d = data[idx]
+                diff = np.abs(r-d)
+                ulp = diff/get_ulp(r,idx)
+                if ulp > max_ulp:
+                    max_ulp = ulp
+                if ulp > tol:
+                    print((r.item(), d.item(), diff, ulp))
+
+        cond = (max_ulp < tol)
+        if tol > 1e3:
+            details = f'(tol: {tol:.3e}, '
+        else:
+            details = f'(tol: {tol:.0f}, '
+        if max_ulp > 1e3:
+            msg = f'Checking error tolerance'
+            details += f'max ulp: {max_ulp:.3e})'
+        else:
+            msg = f'Checking error tolerance'
+            details += f'max ulp: {max_ulp:.0f})'
+        checks += printResult(cond, msg)
+        print(f'\t{details}')
+
+    return (1, int(not cond), f'{fname}/{ds}', (tid, max_ulp))
+
+def checkXml(fname, ref_dir, data_dir, tid):
+
+    cond = True
+    checks = np.zeros(2, dtype='i8')
+
+    # Check reference file exists
+    if cond:
+        cond = os.path.exists(ref_dir + fname)
+        checks += printResult(cond, 'Checking if reference exists')
+
+    # Check data file exists
+    if cond:
+        cond = os.path.exists(data_dir + fname)
+        checks += printResult(cond, 'Checking if data exists')
+
+    # Check file
+    if cond:
+        refTree = ET.parse(ref_dir + fname)
+        dataTree = ET.parse(data_dir + fname)
+        cond = (ET.tostring(refTree.getroot()) == ET.tostring(dataTree.getroot()))
+        checks += printResult(cond, f'Checking XML files are the same')
+
+    return (1, int(not cond), f'{fname}', (tid, 0))
 
 def scan_setup(fname, ref_dir, data_dir, trigger, lines_to_check):
     checked = lines_to_check

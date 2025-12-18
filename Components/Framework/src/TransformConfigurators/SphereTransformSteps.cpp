@@ -213,6 +213,10 @@ namespace Transform {
                alThetaId = Forward::OversinDphi::id();
                alPhiId = Forward::D1::id();
             }
+            else
+            {
+               throw std::logic_error("Sphere transform steps setup is wrong");
+            }
 
             // Compute curl component
             transform.push_back(TransformPath(FieldComponents::Physical::THETA, FieldType::VECTOR));
@@ -423,6 +427,15 @@ namespace Transform {
       return transform;
    }
 
+   std::vector<TransformPath>  SphereTransformSteps::backwardGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& req) const
+   {
+      std::vector<TransformPath> transform;
+
+      throw std::logic_error("Tensor form of Gradient is not implementated yet!");
+
+      return transform;
+   }
+   
    std::vector<TransformPath>  SphereTransformSteps::backwardGradient2(const Grad2PathId& req) const
    {
       std::vector<TransformPath> transform;

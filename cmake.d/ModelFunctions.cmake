@@ -1,52 +1,4 @@
 #
-# Create the Config executable
-#
-function (quicc_create_config_exe ModelId ModelLib)
-  quicc_create_all_exe("${ModelId}" "Config")
-  quicc_add_exe("${ModelId}" "Config" "${QUICC_EXE_DIR}/WriteConfig.cpp" "${ModelLib}")
-endfunction (quicc_create_config_exe)
-
-
-#
-# Create the State executable
-#
-function (quicc_create_state_exe ModelId ModelLib)
-  quicc_create_all_exe("${ModelId}" "State")
-  quicc_add_exe("${ModelId}" "State" "${QUICC_EXE_DIR}/GenerateState.cpp" "${ModelLib}")
-endfunction (quicc_create_state_exe)
-
-
-#
-# Create the Run executable
-#
-function (quicc_create_model_exe ModelId ModelLib)
-  quicc_create_all_exe("${ModelId}" "Model")
-  quicc_add_exe("${ModelId}" "Model" "${QUICC_EXE_DIR}/RunSimulation.cpp" "${ModelLib}")
-endfunction (quicc_create_model_exe)
-
-
-#
-# Create the RunStability executable
-#
-function (quicc_create_stability_exe ModelId ModelLib)
-  if(QUICC_HAVE_STABILITY_SOLVER)
-    quicc_create_all_exe("${ModelId}" "Stability")
-    quicc_add_exe("${ModelId}" "Stability" "${QUICC_EXE_DIR}/RunStability.cpp" "${ModelLib}"
-      EXTRALIBS QuICC::Stability)
-  endif()
-endfunction (quicc_create_stability_exe)
-
-
-#
-# Create the Visu executable
-#
-function (quicc_create_visu_exe ModelId ModelLib)
-  quicc_create_all_exe("${ModelId}" "Visu")
-  quicc_add_exe("${ModelId}" "Visu" "${QUICC_EXE_DIR}/VisualizeState.cpp" "${ModelLib}")
-endfunction (quicc_create_visu_exe)
-
-
-#
 # Convert Model ID into Model name
 #
 function (quicc_model_id2name Name ModelId)
@@ -82,26 +34,30 @@ endfunction ()
 #
 # Create executable
 #
-function (quicc_add_exe ModelId Postfix ExeSrc ModelLib)
+function (quicc_add_exe ModelId)
   # parse inputs
+  set(oneValueArgs POSTFIX EXESOURCE MODELLIB)
   set(multiValueArgs EXTRALIBS)
   cmake_parse_arguments(QAE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+  message(DEBUG "QAE_POSTFIX: ${QAE_POSTFIX}")
+  message(DEBUG "QAE_EXESOURCE: ${QAE_EXESOURCE}")
+  message(DEBUG "QAE_MODELLIB: ${QAE_MODELLIB}")
 
   # Create simple model name
   quicc_model_id2name(ModelName ${ModelId})
   quicc_model_id2cpp(CPPModel ${ModelId})
 
   # Create new name for executable
-  set(ExeName ${ModelName}${Postfix})
+  set(ExeName ${ModelName}${QAE_POSTFIX})
 
   # Add executable to target list
-  add_executable(${ExeName} ${ExeSrc})
+  add_executable(${ExeName} ${QAE_EXESOURCE})
 
   # Link to model library
   target_link_libraries(${ExeName}
-    ${ModelLib}
+    ${QAE_MODELLIB}
     )
   # Add extra libraries
   foreach(_lib ${QAE_EXTRALIBS})
@@ -118,11 +74,7 @@ function (quicc_add_exe ModelId Postfix ExeSrc ModelLib)
   # Set special properties of target
   set_target_properties(${ExeName} PROPERTIES
     OUTPUT_NAME ${ExeName}
-    RUNTIME_OUTPUT_DIRECTORY "Executables/"
-    )
-  target_compile_definitions(${ExeName} PRIVATE
-    "QUICC_RUNSIM_PATH=${ModelId}"
-    "QUICC_RUNSIM_CPPMODEL=${CPPModel}"
+    RUNTIME_OUTPUT_DIRECTORY "./"
     )
 
   # Install
@@ -130,6 +82,30 @@ function (quicc_add_exe ModelId Postfix ExeSrc ModelLib)
 
   # Show message
   message(VERBOSE "added ${ExeName}")
+
+  list(POP_BACK CMAKE_MESSAGE_INDENT)
+endfunction ()
+
+#
+# Setup executable
+#
+function (quicc_setup_exe ModelId)
+  # parse inputs
+  set(oneValueArgs POSTFIX EXESOURCE MODELLIB)
+  set(multiValueArgs EXTRALIBS)
+  cmake_parse_arguments(QSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+  list(APPEND CMAKE_MESSAGE_INDENT "${QUICC_CMAKE_INDENT}")
+  message(DEBUG "QSE_POSTFIX: ${QSE_POSTFIX}")
+  message(DEBUG "QSE_EXESOURCE: ${QSE_EXESOURCE}")
+  message(DEBUG "QSE_MODELLIB: ${QSE_MODELLIB}")
+
+  quicc_create_all_exe("${ModelId}" "${QSE_POSTFIX}")
+  quicc_add_exe("${ModelId}"
+    POSTFIX "${QSE_POSTFIX}"
+    EXESOURCE "${QSE_EXESOURCE}"
+    MODELLIB "${QSE_MODELLIB}"
+    EXTRALIBS ${QSE_EXTRALIBS})
 
   list(POP_BACK CMAKE_MESSAGE_INDENT)
 endfunction ()

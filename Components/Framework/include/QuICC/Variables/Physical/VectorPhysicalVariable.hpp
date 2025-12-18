@@ -22,6 +22,7 @@
 #include "QuICC/Resolutions/Resolution.hpp"
 #include "QuICC/VectorFields/VectorField.hpp"
 #include "QuICC/TensorFields/SymmetricTensorField.hpp"
+#include "QuICC/TensorFields/TensorField.hpp"
 #include "QuICC/Variables/VariableBase.hpp"
 
 namespace QuICC {
@@ -63,11 +64,21 @@ namespace Datatypes {
           * @brief Get the physical vector gradient values
           */
          const VectorField<TScalar,FieldComponents::Physical::Id>&   grad(FieldComponents::Spectral::Id id) const;
+         
+         /**
+          * @brief Get the physical vector gradient values (tensor form)
+          */
+         const TensorField<TScalar,FieldComponents::Physical::Id>&   grad() const;
 
          /**
           * @brief Set the physical vector gradient values
           */
          VectorField<TScalar,FieldComponents::Physical::Id>&   rGrad(FieldComponents::Spectral::Id id);
+         
+         /**
+          * @brief Set the physical vector gradient values (tensor form)
+          */
+         TensorField<TScalar,FieldComponents::Physical::Id>&   rGrad();
 
          /**
           * @brief Get the physical curl values
@@ -103,6 +114,11 @@ namespace Datatypes {
           * @brief Initialise the physical gradient storage
           */
          void initPhysicalGradient(const FieldComponents::Spectral::Id id, const std::map<FieldComponents::Physical::Id,bool>& comps);
+         
+         /**
+          * @brief Initialise the physical gradient storage (tensor form)
+          */
+         void initPhysicalGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps);
 
          /**
           * @brief Initialise the physical curl storage
@@ -122,7 +138,7 @@ namespace Datatypes {
          /**
           * @brief Check if variable has vector gradient data setup
           */
-         bool hasGrad() const;
+         bool hasGrad(bool tensorForm = false) const;
 
          /**
           * @brief Check if variable has curl data setup
@@ -153,6 +169,11 @@ namespace Datatypes {
          std::map<FieldComponents::Spectral::Id,std::shared_ptr<VectorField<TScalar,FieldComponents::Physical::Id> > > mVGrad;
 
          /**
+          * @brief Smart pointer for the physical vector 2nd order gradient values
+          */
+         std::shared_ptr<TensorField<TScalar,FieldComponents::Physical::Id> > mTGrad;
+
+         /**
           * @brief Smart pointer for the physical curl values
           */
          std::shared_ptr<VectorField<TScalar,FieldComponents::Physical::Id> > mspCurl;
@@ -168,8 +189,11 @@ namespace Datatypes {
       return static_cast<bool>(this->mspPhys);
    }
 
-   template <typename TScalar> inline bool VectorPhysicalVariable<TScalar>::hasGrad() const
+   template <typename TScalar> inline bool VectorPhysicalVariable<TScalar>::hasGrad(bool tensorForm) const
    {
+      if (tensorForm) {
+         return static_cast<bool>(this->mTGrad);
+      }
       return this->mVGrad.size();
    }
 
@@ -207,12 +231,32 @@ namespace Datatypes {
       return *(this->mVGrad.find(id)->second);
    }
 
+   // overload to calculate tensorial grad(u)
+   template <typename TScalar> inline const TensorField<TScalar,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar>::grad() const
+   {
+      // Safety assertion
+      
+      assert(this->mTGrad);
+
+      return *this->mTGrad;
+   }
+
+
    template <typename TScalar> inline VectorField<TScalar,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar>::rGrad(FieldComponents::Spectral::Id id)
    {
       // Safety assertion
       assert(this->mVGrad.count(id));
 
       return *(this->mVGrad.find(id)->second);
+   }
+
+   // overload to calculate tensorial grad(u)
+   template <typename TScalar> inline TensorField<TScalar,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar>::rGrad()
+   {
+      // Safety assertion
+      assert(this->mTGrad);
+
+      return *this->mTGrad;
    }
 
    template <typename TScalar> inline const VectorField<TScalar,FieldComponents::Physical::Id>&  VectorPhysicalVariable<TScalar>::curl() const
@@ -265,12 +309,17 @@ namespace Datatypes {
       }
 
       // Initialise vector gradient values to zero if required
-      if(this->hasGrad())
+      if(this->hasGrad(false)) // Vector form
       {
          for(auto it = this->mVGrad.begin(); it != this->mVGrad.end(); ++it)
          {
             it->second->setZeros();
          }
+      }
+
+      if(this->hasGrad(true))   // Tensor form
+      {
+         this->rGrad().setZeros();
       }
 
       // Initialise curl values to zero if required
@@ -308,6 +357,16 @@ namespace Datatypes {
       // Insert into map
       this->mVGrad.insert(std::make_pair(id, spGrad));
    }
+   
+   // overload to compute the tensor form of grad(u)
+   template <typename TScalar> void VectorPhysicalVariable<TScalar>::initPhysicalGradient(const std::map<std::pair<FieldComponents::Physical::Id,FieldComponents::Physical::Id>,bool>& comps)
+   {
+      // Safety assert
+
+      assert(! this->mTGrad);
+
+      this->mTGrad = std::make_shared<TensorField<TScalar,FieldComponents::Physical::Id> >(this->res().spPhysicalSetup(), comps);
+   }
 
    template <typename TScalar> void VectorPhysicalVariable<TScalar>::initPhysicalCurl(const std::map<FieldComponents::Physical::Id,bool>& comps)
    {
@@ -343,12 +402,17 @@ namespace Datatypes {
       }
 
       // Physical vector gradient storage
-      if(this->hasGrad())
+      if(this->hasGrad(false)) // Vector form
       {
          for(auto it = this->mVGrad.cbegin(); it != this->mVGrad.cend(); ++it)
          {
             mem += it->second->requiredStorage();
          }
+      }
+
+      if(this->hasGrad(true)) // Tensor form
+      {
+         mem += this->grad().requiredStorage();
       }
 
       // Physical curl storage
